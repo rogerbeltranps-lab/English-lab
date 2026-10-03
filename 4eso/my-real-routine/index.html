@@ -17,47 +17,297 @@
       --shadow:0 14px 36px rgba(35,50,76,.07);
       --radius:22px;
     }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.5
+    }
+
     a{color:inherit;text-decoration:none}
-    .wrap{width:min(1120px,calc(100% - 32px));margin:auto}
-    header{position:sticky;top:0;z-index:20;background:rgba(247,248,250,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-    nav{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+
+    .wrap{
+      width:min(1120px,calc(100% - 32px));
+      margin:auto
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(247,248,250,.96);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line)
+    }
+
+    nav{
+      min-height:70px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px
+    }
+
     .brand{font-weight:800;letter-spacing:-.03em}
-    .navlinks{display:flex;gap:8px;flex-wrap:wrap}
-    .navlinks a{padding:9px 12px;border-radius:12px;color:var(--muted)}
-    .navlinks a:hover{background:var(--surface);color:var(--text)}
-    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center;padding:62px 0 34px}
-    .eyebrow{display:inline-block;padding:8px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dark);font-size:.8rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-bottom:18px}
-    h1{margin:0;font-size:clamp(3rem,7vw,5.4rem);line-height:.96;letter-spacing:-.055em}
-    .hero p{margin:22px 0 0;max-width:660px;color:var(--muted);font-size:1.06rem}
-    .hero-card{background:var(--surface);border:1px solid var(--line);border-radius:30px;padding:30px;box-shadow:var(--shadow)}
-    .hero-card .kicker{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-dark)}
-    .hero-card h2{margin:10px 0 8px;font-size:1.8rem;letter-spacing:-.04em}
-    .hero-card p{margin:0;color:var(--muted);font-size:.96rem}
-    .tabs{display:flex;gap:10px;overflow-x:auto;padding:14px 0 28px;scrollbar-width:none}
+
+    .navlinks{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap
+    }
+
+    .navlinks a{
+      padding:9px 12px;
+      border-radius:12px;
+      color:var(--muted)
+    }
+
+    .navlinks a:hover{
+      background:var(--surface);
+      color:var(--text)
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:40px;
+      align-items:center;
+      padding:62px 0 34px
+    }
+
+    .eyebrow{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:var(--accent-dark);
+      font-size:.8rem;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      margin-bottom:18px
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(3rem,7vw,5.4rem);
+      line-height:.96;
+      letter-spacing:-.055em
+    }
+
+    .hero p{
+      margin:22px 0 0;
+      max-width:660px;
+      color:var(--muted);
+      font-size:1.06rem
+    }
+
+    .hero-card{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:30px;
+      box-shadow:var(--shadow)
+    }
+
+    .hero-card .kicker{
+      font-size:.78rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--accent-dark)
+    }
+
+    .hero-card h2{
+      margin:10px 0 8px;
+      font-size:1.8rem;
+      letter-spacing:-.04em
+    }
+
+    .hero-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:.96rem
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      padding:14px 0 28px;
+      scrollbar-width:none
+    }
+
     .tabs::-webkit-scrollbar{display:none}
-    .tabbtn{border:1px solid var(--line);background:var(--surface);padding:11px 15px;border-radius:14px;font:inherit;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
-    .tabbtn.active{background:var(--accent-soft);border-color:#d4ddea;color:var(--accent-dark)}
-    .panel{display:none;padding-bottom:60px}
+
+    .tabbtn{
+      border:1px solid var(--line);
+      background:var(--surface);
+      padding:11px 15px;
+      border-radius:14px;
+      font:inherit;
+      font-weight:700;
+      color:var(--muted);
+      cursor:pointer;
+      white-space:nowrap;
+      transition:.2s ease
+    }
+
+    .tabbtn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 6px 18px rgba(35,50,76,.06)
+    }
+
+    .tabbtn.active{
+      background:var(--accent-soft);
+      border-color:#d4ddea;
+      color:var(--accent-dark)
+    }
+
+    .panel{
+      display:none;
+      padding-bottom:60px
+    }
+
     .panel.active{display:block}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:0 5px 18px rgba(35,50,76,.03)}
-    .num{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);color:var(--accent-dark);display:grid;place-items:center;font-weight:800;margin-bottom:20px}
-    .card h3{margin:0 0 8px;font-size:1.22rem;letter-spacing:-.03em}
-    .card p{margin:0;color:var(--muted)}
-    .card .link{display:inline-block;margin-top:18px;color:var(--accent-dark);font-weight:800}
-    .overview{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-    .bigcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
-    .bigcard h2{margin:0 0 10px;font-size:1.7rem;letter-spacing:-.04em}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px
+    }
+
+    .card{
+      display:block;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:24px;
+      box-shadow:0 5px 18px rgba(35,50,76,.03);
+      cursor:pointer;
+      transition:.2s ease;
+      min-height:250px
+    }
+
+    .card:hover{
+      transform:translateY(-3px);
+      box-shadow:var(--shadow);
+      border-color:#cfd9e8
+    }
+
+    .card:focus-visible{
+      outline:3px solid var(--accent-soft);
+      outline-offset:3px
+    }
+
+    .num{
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      background:var(--accent-soft);
+      color:var(--accent-dark);
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      margin-bottom:20px
+    }
+
+    .card h3{
+      margin:0 0 8px;
+      font-size:1.22rem;
+      letter-spacing:-.03em
+    }
+
+    .card p{
+      margin:0;
+      color:var(--muted)
+    }
+
+    .card .link{
+      display:inline-block;
+      margin-top:18px;
+      color:var(--accent-dark);
+      font-weight:800
+    }
+
+    .overview{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px
+    }
+
+    .bigcard{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:28px
+    }
+
+    .bigcard h2{
+      margin:0 0 10px;
+      font-size:1.7rem;
+      letter-spacing:-.04em
+    }
+
     .bigcard p{color:var(--muted)}
-    .checklist{padding:0;margin:18px 0 0;list-style:none}
-    .checklist li{padding:9px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+
+    .checklist{
+      padding:0;
+      margin:18px 0 0;
+      list-style:none
+    }
+
+    .checklist li{
+      padding:9px 0;
+      border-bottom:1px solid var(--line);
+      color:var(--muted)
+    }
+
     .checklist li:last-child{border-bottom:0}
-    footer{border-top:1px solid var(--line);padding:28px 0 34px;color:var(--muted);font-size:.9rem}
-    @media(max-width:820px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.overview{grid-template-columns:1fr}.navlinks{display:none}}
+
+    .notice{
+      position:fixed;
+      left:50%;
+      bottom:26px;
+      transform:translate(-50%,20px);
+      background:var(--text);
+      color:white;
+      padding:12px 17px;
+      border-radius:14px;
+      box-shadow:var(--shadow);
+      opacity:0;
+      pointer-events:none;
+      transition:.22s ease;
+      z-index:50;
+      text-align:center;
+      max-width:calc(100% - 32px)
+    }
+
+    .notice.show{
+      opacity:1;
+      transform:translate(-50%,0)
+    }
+
+    footer{
+      border-top:1px solid var(--line);
+      padding:28px 0 34px;
+      color:var(--muted);
+      font-size:.9rem
+    }
+
+    @media(max-width:820px){
+      .hero{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr}
+      .overview{grid-template-columns:1fr}
+      .navlinks{display:none}
+    }
   </style>
 </head>
+
 <body>
   <header>
     <div class="wrap">
@@ -77,19 +327,26 @@
       <div>
         <span class="eyebrow">4 ESO · Learning Situation</span>
         <h1>My Real Routine</h1>
-        <p>Use richer, more natural English to describe everyday life, habits, commuting, work and the way you unwind.</p>
+        <p>
+          Use richer, more natural English to describe everyday life, habits,
+          commuting, responsibilities and the way people unwind.
+        </p>
       </div>
+
       <aside class="hero-card">
         <div class="kicker">Your challenge</div>
-        <h2>Sound more natural</h2>
-        <p>Move beyond basic routines and use richer expressions, connectors and real-life language with confidence.</p>
+        <h2>Explain your routine and a friend’s routine naturally</h2>
+        <p>
+          Use richer expressions, connectors and real-life language to describe
+          your own routine and compare it with another person’s.
+        </p>
       </aside>
     </section>
 
     <div class="tabs">
       <button class="tabbtn active" data-panel="overview">Overview</button>
-      <button class="tabbtn" data-panel="sessions">Sessions</button>
-      <button class="tabbtn" data-panel="language">Language & Knowledge</button>
+      <button class="tabbtn" data-panel="learning-path">Learning Path</button>
+      <button class="tabbtn" data-panel="language">Language &amp; Knowledge</button>
       <button class="tabbtn" data-panel="final">Final Product</button>
     </div>
 
@@ -97,7 +354,10 @@
       <div class="overview">
         <article class="bigcard">
           <h2>What will you learn?</h2>
-          <p>You will develop more natural and flexible English for talking about everyday routines and real experiences.</p>
+          <p>
+            You will develop more natural and flexible English for describing your
+            own routine and another person’s routine in real contexts.
+          </p>
           <ul class="checklist">
             <li>Natural Present Simple in context</li>
             <li>Richer routine and commute vocabulary</li>
@@ -106,6 +366,7 @@
             <li>More developed speaking and writing</li>
           </ul>
         </article>
+
         <article class="bigcard">
           <h2>How will we work?</h2>
           <p>Realistic texts, listening, language noticing and progressive production.</p>
@@ -120,44 +381,132 @@
       </div>
     </section>
 
-    <section class="panel" id="sessions">
+    <section class="panel" id="learning-path">
       <div class="grid">
-        <article class="card"><div class="num">1</div><h3>Getting started</h3><p>Introduce the challenge and activate prior knowledge.</p><span class="link">Open →</span></article>
-        <article class="card"><div class="num">2</div><h3>A day in real life</h3><p>Work with realistic routines, commuting and daily responsibilities.</p><span class="link">Open →</span></article>
-        <article class="card"><div class="num">3</div><h3>Useful expressions</h3><p>Practise natural phrasal verbs and idiomatic chunks in context.</p><span class="link">Open →</span></article>
-        <article class="card"><div class="num">4</div><h3>Evening & unwinding</h3><p>Talk about how people slow down, relax and finish the day.</p><span class="link">Open →</span></article>
-        <article class="card"><div class="num">5</div><h3>Review & refine</h3><p>Improve accuracy, naturalness and organisation.</p><span class="link">Open →</span></article>
-        <article class="card"><div class="num">6</div><h3>Final product</h3><p>Use your best language in a clear, personal final task.</p><span class="link">Open →</span></article>
+
+        <a class="card step-card" href="#" data-step="Getting started">
+          <div class="num">1</div>
+          <h3>Getting started</h3>
+          <p>Introduce the challenge and activate prior knowledge.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="#" data-step="A day in real life">
+          <div class="num">2</div>
+          <h3>A day in real life</h3>
+          <p>Work with realistic routines, commuting and daily responsibilities.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="#" data-step="Useful expressions">
+          <div class="num">3</div>
+          <h3>Useful expressions</h3>
+          <p>Practise natural phrasal verbs and idiomatic chunks in context.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="#" data-step="Evening & unwinding">
+          <div class="num">4</div>
+          <h3>Evening &amp; unwinding</h3>
+          <p>Talk about how people slow down, relax and finish the day.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="#" data-step="Review & refine">
+          <div class="num">5</div>
+          <h3>Review &amp; refine</h3>
+          <p>Improve accuracy, naturalness and organisation.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card" href="#final" id="final-card">
+          <div class="num">6</div>
+          <h3>Final product</h3>
+          <p>Bring your routine and a friend’s routine together in a richer final task.</p>
+          <span class="link">Open →</span>
+        </a>
+
       </div>
     </section>
 
     <section class="panel" id="language">
       <div class="overview">
-        <article class="bigcard"><h2>Grammar & discourse</h2><ul class="checklist"><li>Present Simple in natural contexts</li><li>Past Simple when relevant</li><li>Cause: because</li><li>Contrast: but, although, whereas, however</li><li>Consequence: so, as a result</li></ul></article>
-        <article class="bigcard"><h2>Vocabulary & expressions</h2><ul class="checklist"><li>head out, set off, catch up on</li><li>get down to, knock off</li><li>rush hour, hit the road</li><li>bite the bullet, call it a day</li><li>Evening and unwinding expressions</li></ul></article>
+        <article class="bigcard">
+          <h2>Grammar &amp; discourse</h2>
+          <ul class="checklist">
+            <li>Present Simple in natural contexts</li>
+            <li>Past Simple when relevant</li>
+            <li>Cause: because</li>
+            <li>Contrast: but, although, whereas, however</li>
+            <li>Consequence: so, as a result</li>
+          </ul>
+        </article>
+
+        <article class="bigcard">
+          <h2>Vocabulary &amp; expressions</h2>
+          <ul class="checklist">
+            <li>head out, set off, catch up on</li>
+            <li>get down to, knock off</li>
+            <li>rush hour, hit the road</li>
+            <li>bite the bullet, call it a day</li>
+            <li>Evening and unwinding expressions</li>
+          </ul>
+        </article>
       </div>
     </section>
 
     <section class="panel" id="final">
       <div class="bigcard">
         <span class="eyebrow">Final challenge</span>
-        <h2>Your real routine, naturally expressed</h2>
-        <p>Create a more developed final product that combines accurate language, natural expressions and personal reflection.</p>
+        <h2>My routine &amp; my friend’s routine</h2>
+        <p>
+          Create a more developed final product in which you explain your own routine
+          and describe a friend’s routine using accurate language, natural expressions,
+          connectors and personal reflection.
+        </p>
       </div>
     </section>
   </main>
 
-  <footer><div class="wrap">English with Roger · 4 ESO · My Real Routine</div></footer>
+  <div class="notice" id="notice">
+    This Learning Path page will be connected when its activity is uploaded.
+  </div>
+
+  <footer>
+    <div class="wrap">English with Roger · 4 ESO · My Real Routine</div>
+  </footer>
 
   <script>
-    const buttons=document.querySelectorAll('.tabbtn');
-    const panels=document.querySelectorAll('.panel');
-    buttons.forEach(btn=>btn.addEventListener('click',()=>{
-      buttons.forEach(b=>b.classList.remove('active'));
-      panels.forEach(p=>p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.panel).classList.add('active');
-    }));
+    const buttons = document.querySelectorAll('.tabbtn');
+    const panels = document.querySelectorAll('.panel');
+
+    function openPanel(id) {
+      buttons.forEach(b => b.classList.toggle('active', b.dataset.panel === id));
+      panels.forEach(p => p.classList.toggle('active', p.id === id));
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => openPanel(btn.dataset.panel));
+    });
+
+    const notice = document.getElementById('notice');
+    let noticeTimer;
+
+    document.querySelectorAll('.step-card').forEach(card => {
+      card.addEventListener('click', event => {
+        event.preventDefault();
+        notice.textContent = `${card.dataset.step}: this activity will open here once its HTML page is connected.`;
+        notice.classList.add('show');
+        clearTimeout(noticeTimer);
+        noticeTimer = setTimeout(() => notice.classList.remove('show'), 2600);
+      });
+    });
+
+    document.getElementById('final-card').addEventListener('click', event => {
+      event.preventDefault();
+      openPanel('final');
+      window.scrollTo({top: document.querySelector('.tabs').offsetTop - 85, behavior:'smooth'});
+    });
   </script>
 </body>
 </html>
