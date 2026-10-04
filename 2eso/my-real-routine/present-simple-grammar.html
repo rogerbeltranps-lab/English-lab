@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2 ESO · Present Simple grammar</title>
+<style>
+:root{--bg:#f7f8f7;--paper:#fff;--text:#172033;--muted:#68736f;--line:#dfe7e2;--accent:#6d9482;--dark:#4f7865;--soft:#edf5f1;--amber:#d97706;--red:#c94b4b}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55}.wrap{width:min(1040px,calc(100% - 24px));margin:auto}.topbar{position:sticky;top:0;z-index:20;background:#195b48;color:#fff}.toprow{min-height:68px;display:flex;align-items:center;gap:14px}.brand{display:flex;align-items:center;gap:10px;font-weight:850}.brand a{color:#fff;text-decoration:none}.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#fff;color:#195b48;font-weight:900}.jump{margin-left:auto;display:flex;align-items:center;gap:8px}.jump label{font-size:.78rem;font-weight:800}.jump select{max-width:255px;padding:9px 10px;border:0;border-radius:10px}.progress{width:160px}.progress-row{display:flex;justify-content:space-between;font-size:.76rem}.track{height:7px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden;margin-top:4px}.bar{height:100%;width:0;background:#fff}.hero{padding:42px 0 28px;background:linear-gradient(145deg,#edf5f1,#fff)}.eyebrow{display:inline-block;background:#dfeee7;color:#195b48;padding:6px 10px;border-radius:999px;font-weight:850;font-size:.78rem;text-transform:uppercase}h1{font-size:clamp(2rem,6vw,3.7rem);margin:14px 0 10px;line-height:1.05}.lead{max-width:800px;color:#52625c}.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.route{border:2px solid transparent;border-radius:16px;background:#fff;padding:14px;text-align:left}.route strong{display:block}.route span{display:block;color:var(--muted);font-size:.84rem;margin-top:3px}.route.active{border-color:#195b48;background:#edf5f1}.route[data-level=safe].active{border-color:#2563eb;background:#eff6ff}.route[data-level=daring].active{border-color:var(--amber);background:#fffbeb}main{padding:24px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px}.tab{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 12px;font-weight:780;white-space:nowrap}.tab.active{background:#195b48;color:#fff}.panel{display:none;background:#fff;border:1px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,34px)}.panel.active{display:block}.head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.pill{background:var(--soft);color:#195b48;border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:850}h2{margin:0 0 6px}.instruction{margin:0;color:var(--muted)}.rule{border-left:4px solid #195b48;background:var(--soft);padding:12px 14px;border-radius:0 10px 10px 0;margin:14px 0}.formula{font-family:ui-monospace,monospace;background:#f3f5f4;padding:10px 12px;border-radius:10px;margin:8px 0}.example,.task{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 13px;margin:8px 0}.note{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:11px;padding:11px 13px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.task select{padding:7px 8px;border:1px solid #cbd5e1;border-radius:8px}.feedback{font-weight:750;margin-top:6px;min-height:20px}.ok{color:#047857}.no{color:var(--red)}.actions{text-align:center;margin-top:18px}.btn{border:0;border-radius:11px;padding:10px 14px;background:#195b48;color:#fff;font-weight:800}.result{display:none;margin-top:14px;padding:12px;background:var(--soft);border-radius:11px;text-align:center;font-weight:800}.result.show{display:block}@media(max-width:760px){.toprow{flex-wrap:wrap;padding:8px 0}.jump{order:3;width:100%;margin-left:0}.jump label{display:none}.jump select{width:100%;max-width:none}.progress{margin-left:auto;width:120px}.routes,.grid{grid-template-columns:1fr}.head{display:block}.pill{display:inline-block;margin-top:8px}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap toprow">
+<div class="brand"><a href="index.html">← My Real Routine</a><span class="mark">4</span><span>Present Simple grammar</span></div>
+<div class="jump"><label>Learning Path</label><select id="sessionJump">
+<option value="getting-started.html">1 · Getting started</option>
+<option value="a-day-in-my-life.html">2 · Routine expressions</option>
+<option value="same-day-different-person.html">3 · Same day, different person</option>
+<option selected value="present-simple-grammar.html">4 · Present Simple grammar</option>
+<option value="healthy-habits.html">5 · Healthy habits</option>
+<option disabled value="#">6 · Review & improve · Soon</option>
+<option value="index.html#final">7 · Final product</option>
+</select></div>
+<div class="progress"><div class="progress-row"><span id="levelLabel">Insecure</span><span id="progressText">0 / 6</span></div><div class="track"><div class="bar" id="progressBar"></div></div></div>
+</div></div>
+
+<header class="hero"><div class="wrap">
+<span class="eyebrow">Learning Path 4 · Grammar only</span>
+<h1>Present Simple grammar</h1>
+<p class="lead">No new vocabulary. We only use routine expressions from the other sessions to understand how the Present Simple works.</p>
+<div class="routes">
+<button class="route active" data-level="insecure"><strong>Insecure</strong><span>Explicat en català · molt guiat</span></button>
+<button class="route" data-level="safe"><strong>Safe</strong><span>Clear explanation · normal support</span></button>
+<button class="route" data-level="daring"><strong>Daring</strong><span>More nuance · negative questions · accuracy</span></button>
+</div></div></header>
+
+<main class="wrap">
+<nav class="tabs">
+<button class="tab active" data-panel="map">1 Grammar map</button>
+<button class="tab" data-panel="affirmative">2 Affirmative</button>
+<button class="tab" data-panel="negative">3 Negative</button>
+<button class="tab" data-panel="questions">4 Questions</button>
+<button class="tab" data-panel="negativeQuestions">5 Negative questions</button>
+<button class="tab" data-panel="mixed">6 Mixed practice</button>
+</nav>
+
+<section class="panel active" id="map"><div class="head"><div><h2>Grammar map</h2><p class="instruction">See the whole system before practising.</p></div><span class="pill">overview</span></div><div id="mapContent"></div><div class="actions"><button class="btn" data-complete="map">Got it ✓</button></div></section>
+<section class="panel" id="affirmative"><div class="head"><div><h2>Affirmative sentences</h2><p class="instruction">Focus on he / she / it.</p></div><span class="pill">-s · -es · -ies</span></div><div id="affirmativeContent"></div><div id="affirmativeTasks"></div><div class="actions"><button class="btn" data-check="affirmative">Check</button></div><div class="result" id="affirmativeResult"></div></section>
+<section class="panel" id="negative"><div class="head"><div><h2>Negative sentences</h2><p class="instruction">don't / doesn't + base verb.</p></div><span class="pill">don't · doesn't</span></div><div id="negativeContent"></div><div id="negativeTasks"></div><div class="actions"><button class="btn" data-check="negative">Check</button></div><div class="result" id="negativeResult"></div></section>
+<section class="panel" id="questions"><div class="head"><div><h2>Questions</h2><p class="instruction">Do / Does + subject + base verb.</p></div><span class="pill">Do...? · Does...?</span></div><div id="questionsContent"></div><div id="questionsTasks"></div><div class="actions"><button class="btn" data-check="questions">Check</button></div><div class="result" id="questionsResult"></div></section>
+<section class="panel" id="negativeQuestions"><div class="head"><div><h2>Negative questions</h2><p class="instruction">Don't you...? / Doesn't he/she...?</p></div><span class="pill">expectation · surprise</span></div><div id="negativeQuestionsContent"></div><div id="negativeQuestionsTasks"></div><div class="actions"><button class="btn" data-check="negativeQuestions">Check</button></div><div class="result" id="negativeQuestionsResult"></div></section>
+<section class="panel" id="mixed"><div class="head"><div><h2>Mixed practice</h2><p class="instruction">Put all the rules together.</p></div><span class="pill">review</span></div><div id="mixedTasks"></div><div class="actions"><button class="btn" data-check="mixed">Check</button></div><div class="result" id="mixedResult"></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+let level=localStorage.getItem('s2GrammarLevel')||'insecure';
+let state=JSON.parse(localStorage.getItem('s2GrammarState')||'{}');
+function routeState(){if(!state[level])state[level]={done:{}};return state[level]}
+function save(){localStorage.setItem('s2GrammarLevel',level);localStorage.setItem('s2GrammarState',JSON.stringify(state));updateProgress()}
+function complete(k){routeState().done[k]=true;save()}
+function updateProgress(){const keys=['map','affirmative','negative','questions','negativeQuestions','mixed'];const n=keys.filter(k=>routeState().done[k]).length;$('#levelLabel').textContent=level.charAt(0).toUpperCase()+level.slice(1);$('#progressText').textContent=n+' / 6';$('#progressBar').style.width=(n/6*100)+'%'}
+const content={
+insecure:{
+map:'<div class="rule"><strong>Present Simple = rutines i coses que passen habitualment.</strong></div><div class="grid"><div class="example"><strong>I / you / we / they</strong><br>I get home. · I don\'t get home. · Do you get home?</div><div class="example"><strong>he / she / it</strong><br>She gets home. · She doesn\'t get home. · Does she get home?</div></div><div class="note">La -s de he/she només va a l\'afirmativa. Amb <strong>does / doesn\'t</strong>, el verb torna a la forma base.</div><h3>Verbs que cal recordar</h3><div class="example">have → <strong>has</strong> · do → <strong>does</strong> · go → <strong>goes</strong> · watch → <strong>watches</strong> · study → <strong>studies</strong></div>',
+affirmative:'<div class="formula">I/You/We/They + base verb</div><div class="formula">He/She/It + verb-s / -es / -ies</div><div class="example">I wake up at seven. · She wakes up at seven.</div>',
+negative:'<div class="formula">I/You/We/They + don\'t + base verb</div><div class="formula">He/She/It + doesn\'t + base verb</div><div class="note">Correcte: She doesn\'t <strong>get</strong> home at six. Incorrecte: She doesn\'t gets home.</div>',
+questions:'<div class="formula">Do + I/you/we/they + base verb...?</div><div class="formula">Does + he/she/it + base verb...?</div><div class="example">Do you wind down with music? · Does she turn in at ten?</div>',
+negativeQuestions:'<div class="rule">Les preguntes negatives sovint serveixen per confirmar una cosa que creiem certa o mostrar sorpresa.</div><div class="example"><strong>Don\'t you</strong> get home at five?</div><div class="example"><strong>Doesn\'t he</strong> turn in at ten?</div><div class="example"><strong>Doesn\'t she</strong> wind down with music?</div><div class="note">Amb <strong>you</strong>: Don\'t you...? · Amb <strong>he/she</strong>: Doesn\'t he/she...?</div>'
+},
+safe:{
+map:'<div class="rule"><strong>Use the Present Simple for routines, habits and repeated actions.</strong></div><div class="grid"><div class="example">I get home · I don\'t get home · Do you get home?</div><div class="example">She gets home · She doesn\'t get home · Does she get home?</div></div><h3>Third-person forms</h3><div class="example">get → gets · go → goes · watch → watches · study → studies · have → has</div>',
+affirmative:'<div class="formula">He/She/It + third-person form</div><div class="example">Mia wakes up, has breakfast and heads out for school.</div>',
+negative:'<div class="formula">don\'t / doesn\'t + base verb</div><div class="example">I don\'t sleep in on school days. · Leo doesn\'t wind down with music.</div>',
+questions:'<div class="formula">Do/Does + subject + base verb...?</div><div class="example">Do they sleep in on Saturdays? · Does Mia get home before Leo?</div>',
+negativeQuestions:'<div class="rule">Negative questions often check an expectation or express mild surprise.</div><div class="example">Don\'t you get home at five? · Doesn\'t Mia turn in at ten?</div>'
+},
+daring:{
+map:'<div class="rule"><strong>Present Simple = habits, repeated behaviour and general states.</strong></div><div class="example">She usually gets home early. · They both sleep in on weekends.</div><div class="note">Frequency adverbs normally go before the main verb: She <strong>usually gets</strong> home early. With <em>be</em>: She <strong>is usually</strong> tired.</div>',
+affirmative:'<div class="rule">Keep agreement consistent across coordinated verbs.</div><div class="example">She <strong>wakes up</strong>, <strong>has</strong> breakfast and <strong>heads out</strong> at eight.</div>',
+negative:'<div class="rule">The auxiliary carries the person marking.</div><div class="example">She <strong>doesn\'t get</strong> home at five. ✓ · She <strong>doesn\'t gets</strong> home at five. ✗</div>',
+questions:'<div class="rule">Auxiliary + subject + base verb.</div><div class="example">Why does she turn in early? · How often do they sleep in?</div>',
+negativeQuestions:'<div class="rule">Negative questions can check an assumption, invite agreement or show surprise.</div><div class="example">Doesn\'t he usually wind down before bed?</div><div class="note">Doesn\'t she get home at five? → <strong>Yes, she does</strong> if she does get home at five.</div>'
+}};
+const tasks={
+affirmative:[['I ___ home at five.',['get','gets'],'get'],['She ___ home at five.',['get','gets'],'gets'],['He ___ breakfast at seven.',['have','has'],'has'],['Mia ___ to school at eight.',['go','goes'],'goes'],['Leo ___ a short show.',['watch','watches'],'watches'],['They ___ in on Saturdays.',['sleep','sleeps'],'sleep']],
+negative:[['I ___ sleep in on school days.',['don\'t','doesn\'t'],"don't"],['She ___ get home at six.',['don\'t','doesn\'t'],"doesn't"],['He doesn\'t ___ a show every day.',['watch','watches'],'watch'],['They don\'t ___ in late.',['turn','turns'],'turn'],['Mia doesn\'t ___ out at nine.',['head','heads'],'head'],['We ___ wind down with TV.',['don\'t','doesn\'t'],"don't"]],
+questions:[['___ you get home at five?',['Do','Does'],'Do'],['___ she turn in at ten?',['Do','Does'],'Does'],['Does Leo ___ breakfast at home?',['have','has'],'have'],['Do they ___ in on Sundays?',['sleep','sleeps'],'sleep'],['___ Mia wind down with music?',['Do','Does'],'Does'],['Does he ___ to school at eight?',['go','goes'],'go']],
+negativeQuestions:[['___ you get home at five?',['Don\'t','Doesn\'t'],"Don't"],['___ she turn in at ten?',['Don\'t','Doesn\'t'],"Doesn't"],['Doesn\'t he ___ breakfast first?',['have','has'],'have'],['___ they sleep in on weekends?',['Don\'t','Doesn\'t'],"Don't"],['Doesn\'t Mia ___ down with music?',['wind','winds'],'wind'],['___ Leo go to school at 8:15?',['Don\'t','Doesn\'t'],"Doesn't"]],
+mixed:[['She usually ___ up at seven.',['wake','wakes'],'wakes'],['She ___ get up immediately.',['don\'t','doesn\'t'],"doesn't"],['___ she have breakfast at home?',['Do','Does'],'Does'],['He ___ his homework after school.',['do','does'],'does'],['Doesn\'t he ___ in early?',['turn','turns'],'turn'],['They ___ sleep in on weekdays.',['don\'t','doesn\'t'],"don't"]]
+};
+function renderTasks(key){const box=$('#'+key+'Tasks');box.innerHTML=tasks[key].map((q,i)=>{const options=q[1].map(x=>'<option>'+x+'</option>').join('');return '<div class="task">'+(i+1)+'. '+q[0].replace('___','<select><option value="">Choose…</option>'+options+'</select>')+'<div class="feedback"></div></div>'}).join('')}
+function render(){['map','affirmative','negative','questions','negativeQuestions'].forEach(k=>$('#'+k+'Content').innerHTML=content[level][k]);['affirmative','negative','questions','negativeQuestions','mixed'].forEach(renderTasks);updateProgress()}
+$$('.route').forEach(b=>b.onclick=()=>{level=b.dataset.level;$$('.route').forEach(x=>x.classList.toggle('active',x.dataset.level===level));render();save()});
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab,.panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#'+t.dataset.panel).classList.add('active');window.scrollTo({top:$('main').offsetTop-70,behavior:'smooth'})});
+$$('[data-complete]').forEach(b=>b.onclick=()=>complete(b.dataset.complete));
+$$('[data-check]').forEach(b=>b.onclick=()=>{const key=b.dataset.check;let score=0;$$('#'+key+'Tasks .task').forEach((row,i)=>{const ok=row.querySelector('select').value===tasks[key][i][2],f=row.querySelector('.feedback');if(ok)score++;f.textContent=ok?'Correct!':'Try again.';f.className='feedback '+(ok?'ok':'no')});const r=$('#'+key+'Result');r.textContent=score+' / '+tasks[key].length+' correct';r.classList.add('show');if(score>=tasks[key].length-1)complete(key)});
+$('#sessionJump').onchange=e=>{if(e.target.value&&e.target.value!=='#')location.href=e.target.value};
+render();
+</script></body></html>
