@@ -492,15 +492,17 @@
     const notice = document.getElementById('notice');
     let noticeTimer;
 
-    document.querySelectorAll('.step-card').forEach(card => {
-      card.addEventListener('click', event => {
-        event.preventDefault();
-        notice.textContent = `${card.dataset.step}: this activity will open here once its HTML page is connected.`;
-        notice.classList.add('show');
-        clearTimeout(noticeTimer);
-        noticeTimer = setTimeout(() => notice.classList.remove('show'), 2600);
-      });
-    });
+document.querySelectorAll('.step-card').forEach(card => {
+  card.addEventListener('click', event => {
+    if (card.getAttribute('href') === '#') {
+      event.preventDefault();
+      notice.textContent = `${card.dataset.step}: this activity will open here once its HTML page is connected.`;
+      notice.classList.add('show');
+      clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => notice.classList.remove('show'), 2600);
+    }
+  });
+});
 
     document.getElementById('final-card').addEventListener('click', event => {
       event.preventDefault();
