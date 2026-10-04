@@ -38,11 +38,15 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 .topbar .session-jump label,.topbar .jump label{font-size:12px!important;line-height:1.1!important;font-weight:800!important}
 .topbar .session-jump select,.topbar .jump select{font-size:15px!important;line-height:1.2!important;font-weight:700!important;height:38px!important}
 .topbar .progress-label,.topbar .progress-row{font-size:12px!important;line-height:1.1!important}
+
+.lp-home-link{display:inline-flex;align-items:center;text-decoration:none!important;color:inherit!important;font-weight:850!important;
+  white-space:nowrap;padding:6px 8px;border-radius:9px}
+.lp-home-link:hover{background:rgba(255,255,255,.12)}
 </style>
 </head>
 <body>
 <div class="topbar"><div class="wrap toprow">
-  <div class="brand"><a href="index.html">← My Real Routine</a><span class="brand-mark">1</span><span class="brand-title">Getting started<small>2 ESO · My Real Routine · Learning Path 1</small></span></div>
+  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← My Real Routine</a><span class="brand-mark">1</span><span class="brand-title">Getting started<small>2 ESO · My Real Routine · Learning Path 1</small></span></div>
   <div class="session-jump">
       <label for="sessionJump">Learning Path</label>
       <select id="sessionJump" aria-label="Go to another Learning Path session">
