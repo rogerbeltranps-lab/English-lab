@@ -57,21 +57,22 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 </section>
 
 <section class="panel" id="listen">
-  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Listen to real English and catch the main ideas, details and contrasts.</p></div><span class="pill">Real video · ELLLO / Vimeo</span></div>
+  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Listen to a real B1-level description of a daily routine. Focus on the sequence and familiar routine ideas.</p></div><span class="pill">Real video · YouTube</span></div>
   <div class="section-card">
-    <h3>Daily Routine</h3>
-    <p class="instruction">Gareth talks about his weekday and weekend routine, commuting and evening habits.</p>
+    <h3>A Day in My Life</h3>
+    <p class="instruction">A real speaker describes a typical day from morning to evening. Focus on routines, breaks, work and relaxation.</p>
     <div style="position:relative;padding-top:56.25%;margin:16px 0;border-radius:14px;overflow:hidden;background:#000">
       <iframe
-        src="https://player.vimeo.com/video/1085177050?app_id=58479&autopause=0&badge=0&byline=0&player_id=0&portrait=0&title=0"
+        src="https://www.youtube-nocookie.com/embed/f4-OEjWWVp0"
+        title="B1 daily routine listening"
         style="position:absolute;inset:0;width:100%;height:100%"
         frameborder="0"
-        allow="autoplay; fullscreen; picture-in-picture"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen>
       </iframe>
     </div>
     <div class="actions">
-      <a class="btn secondary" href="https://www.elllo.org/english/1051/1092-Gareth-Routine.htm" target="_blank" rel="noopener" style="text-decoration:none">Open original lesson ↗</a>
+      <a class="btn secondary" href="https://www.youtube.com/watch?v=f4-OEjWWVp0" target="_blank" rel="noopener" style="text-decoration:none">Open on YouTube ↗</a>
     </div>
     <form id="listenForm"></form>
     <div class="actions"><button class="btn" id="checkListen" type="button">Check listening</button></div>
@@ -106,7 +107,7 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 </main>
 
 <script>
-const listening=[{"q":"What does Gareth say about his routine?","o":["It is a little irregular","It is exactly the same every day","It only happens at weekends"],"a":0},{"q":"What time does he usually wake up on weekdays?","o":["Around 6:00","Around 9:00","Around 11:00"],"a":0},{"q":"How does he commute to work?","o":["By bus and train","Only on foot","By bike"],"a":0},{"q":"What time does he usually get home?","o":["Around seven","Around noon","Around four"],"a":0},{"q":"What does he often do in the evening?","o":["Relax with family, watch a movie or read","Go back to work","Exercise all night"],"a":0},{"q":"How does Gareth describe himself?","o":["A night owl who has adapted to early mornings","Always an early bird","Someone who never feels tired"],"a":0}];
+const listening=[{"q":"What is the speaker describing?","o":["A typical day","A holiday abroad","A school subject"],"a":0},{"q":"Which part of the day is included?","o":["Morning to evening","Only lunchtime","Only the weekend"],"a":0},{"q":"Which familiar routine idea appears?","o":["Taking a break","Buying a plane ticket","Going skiing"],"a":0},{"q":"What does the speaker return to after a break?","o":["Work","Bed","Breakfast"],"a":0},{"q":"What kind of evening idea appears?","o":["Relaxing","Starting school","Commuting to work"],"a":0},{"q":"What is the best strategy for this warm-up?","o":["Understand the main sequence and familiar ideas","Stop for every unknown word","Memorise new vocabulary"],"a":0}];
 const reading={"text":"<p>Maya and Leo both have busy weekdays. Maya usually gets down to her homework soon after she gets home, whereas Leo takes a short break first. They both try to stay hydrated and get enough sleep. Maya limits screen time before bed, while Leo prefers to wind down by listening to music. Their routines are different, but both try to find a balance between schoolwork and rest.</p>","qs":[["Who starts homework sooner?",["Maya","Leo","Neither"],0],["What does Leo do first?",["Takes a short break","Goes to bed","Has breakfast"],0],["Which habit do they share?",["They try to stay hydrated","They never use screens","They go to bed at the same time"],0],["How does Maya wind down?",["She limits screen time","She goes to school","She skips sleep"],0],["What contrast word appears?",["whereas","because","so"],0],["What is the main idea?",["Different routines can still aim for balance","Everyone needs the same routine","Rest is not important"],0]]};
 const speakTask={"insecure":"Give a short description of your own routine in 4–5 sentences.","safe":"Compare one part of your routine with a classmate’s routine.","daring":"Compare routines and briefly explain which habit helps you feel more balanced."};
 const speakModel={"insecure":"I usually head out at eight. After school, I get home and take a short break. Then I get down to my homework.","safe":"My classmate gets down to homework immediately, whereas I take a short break first. We both try to stay hydrated during the day.","daring":"My classmate and I have different routines. I take more breaks while studying, whereas she limits screen time more consistently. Both habits can help us keep a better balance."};
