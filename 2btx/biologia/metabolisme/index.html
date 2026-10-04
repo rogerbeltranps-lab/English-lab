@@ -148,12 +148,18 @@ h1{font-size:2.65rem;margin-top:10px}
 .explore-controls{grid-template-columns:1fr 1fr;padding:9px}
 .explore-point{font-size:.82rem;padding:8px}
 }
+
+.home-link{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--accent-dark);font-weight:850;
+  border:1px solid var(--line);background:#fff;padding:8px 11px;border-radius:10px;white-space:nowrap}
+.home-link:hover{background:var(--soft)}
+.toprow .brand-wrap{display:flex;align-items:center;gap:12px;min-width:0}
+@media(max-width:700px){.toprow .brand-wrap{width:100%}.home-link{padding:7px 9px}}
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="wrap toprow">
-    <div class="brand">Biologia amb Roger<small>2n Batxillerat · Metabolisme</small></div>
+    <div class="brand-wrap"><a class="home-link" href="/English-lab/index.html">⌂ Home</a><div class="brand">Biologia amb Roger<small>2n Batxillerat · Metabolisme</small></div></div>
     <div class="progress-shell">
       <div class="progress-label"><span>Progrés</span><span id="progressText">0 / 6</span></div>
       <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
