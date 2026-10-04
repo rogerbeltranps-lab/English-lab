@@ -48,6 +48,76 @@ textarea{width:100%;min-height:175px;border:1px solid #cbd9eb;border-radius:12px
 .topbar .session-jump label,.topbar .jump label{font-size:12px!important;line-height:1.1!important;font-weight:800!important}
 .topbar .session-jump select,.topbar .jump select{font-size:15px!important;line-height:1.2!important;font-weight:700!important;height:38px!important}
 .topbar .progress-label,.topbar .progress-row{font-size:12px!important;line-height:1.1!important}
+
+/* Unified 4 ESO top bar — same visual treatment across every Learning Path */
+.topbar{
+  background:rgba(35,71,119,.97)!important;
+  color:#fff!important;
+  box-shadow:0 4px 18px rgba(35,71,119,.16)!important;
+  border-bottom:0!important;
+}
+.topbar .toprow{
+  min-height:58px!important;
+  height:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:16px!important;
+}
+.topbar .brand{color:#fff!important}
+.topbar .brand>a{color:#fff!important}
+.topbar .brand-mark,.topbar .logo,.topbar .mark{
+  background:#fff!important;
+  color:#315a8f!important;
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  border-radius:12px!important;
+  font-size:18px!important;
+  line-height:38px!important;
+}
+.topbar .brand-title,.topbar .lp-title{color:#fff!important}
+.topbar .brand-title small,.topbar .lp-title small{color:#d8e8ff!important}
+.topbar .session-jump,.topbar .jump{
+  margin-left:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+.topbar .session-jump label,.topbar .jump label{
+  color:#dce8f8!important;
+  display:block!important;
+}
+.topbar .session-jump select,.topbar .jump select{
+  background:rgba(255,255,255,.12)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  box-shadow:none!important;
+  border-radius:10px!important;
+  height:38px!important;
+  padding:8px 30px 8px 10px!important;
+  font-weight:750!important;
+}
+.topbar .session-jump select:focus,.topbar .jump select:focus{
+  border-color:#fff!important;
+  outline:none!important;
+}
+.topbar .session-jump option,.topbar .jump option{
+  color:#1f2937!important;
+  background:#fff!important;
+}
+.topbar .progress-label,.topbar .progress-row{color:#dcefe7!important}
+.topbar .progress-track,.topbar .track{
+  background:rgba(255,255,255,.18)!important;
+}
+.topbar .progress-bar,.topbar .bar{
+  background:#8fc2ff!important;
+}
+@media(max-width:980px){
+  .topbar .toprow{flex-wrap:wrap!important;padding:8px 0!important}
+  .topbar .session-jump,.topbar .jump{order:3!important;width:100%!important;margin-left:0!important}
+  .topbar .session-jump label,.topbar .jump label{display:none!important}
+  .topbar .session-jump select,.topbar .jump select{width:100%!important;max-width:none!important}
+}
 </style>
 </head>
 <body>
