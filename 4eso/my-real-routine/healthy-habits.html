@@ -64,8 +64,23 @@ textarea{width:100%;min-height:175px;border:1px solid #cbd9eb;border-radius:12px
   <div class="section-card"><h3><span class="step-number">3</span> Build</h3><p class="instruction">Ordena les paraules per construir frases correctes que després podràs reutilitzar.</p><div class="builder-list" id="builderList" style="margin-top:14px"></div><div class="actions"><button class="btn" id="checkBuilders">Check sentences</button><button class="btn secondary" id="resetBuilders">Start again</button></div><div class="result" id="builderResult"></div></div>
 </section>
 <section class="panel" id="listeningPanel">
-  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Escolta una rutina real i identifica hàbits, causes, contrastos i conseqüències.</p></div><span class="pill">Listen · infer · connect</span></div>
-  <div class="section-card"><p class="instruction">Escolta la Jordan parlant de com intenta mantenir una rutina equilibrada. Escolta primer per la idea general i després pels detalls.</p><div class="audio-card"><div class="audio-row"><button class="btn small" id="normalSpeed">▶ Listen</button><button class="btn small secondary" id="slowSpeed">Slow 0.8×</button><span class="audio-status" id="audioStatus">Ready to listen</span></div><p class="tiny">Think about food, hydration, sleep, movement, stress and screen habits.</p></div><form id="listenForm"></form><div class="actions"><button class="btn" type="button" id="checkListen">Check listening</button></div><div class="result" id="listenResult"></div></div>
+  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Escolta un reportatge real de VOA Learning English sobre com construir hàbits saludables a partir d’hàbits que ja tenim.</p></div><span class="pill">Real listening · VOA</span></div>
+  <div class="section-card">
+    <h3>Use Habit Stacking to Help Get Healthy</h3>
+    <p class="instruction">VOA Learning English · Health & Lifestyle · 5:13. És un listening més exigent: centra’t en la idea principal, exemples i conclusions.</p>
+    <div class="audio-card">
+      <audio class="audio-player" id="realAudio" controls preload="metadata"><source src="https://voa-audio.voanews.eu/vle/2024/09/23/db0cb8ab-292f-4edd-9a64-a572e67fc21d.mp3?download=1" type="audio/mpeg"></audio>
+      <div class="audio-row">
+        <button class="btn small" id="normalSpeed" type="button">Normal speed</button>
+        <button class="btn small secondary" id="slowSpeed" type="button">Slow 0.8×</button>
+        <a class="btn small secondary" href="https://learningenglish.voanews.com/a/use-habit-stacking-to-help-get-healthy/7795202.html" target="_blank" rel="noopener">Open original report ↗</a>
+        <span class="audio-status" id="audioStatus">Speed: normal</span>
+      </div>
+    </div>
+    <form id="listenForm"></form>
+    <div class="actions"><button class="btn" type="button" id="checkListen">Check listening</button></div>
+    <div class="result" id="listenResult"></div>
+  </div>
 </section>
 <section class="panel" id="readingPanel">
   <div class="panel-head"><div><h2>Reading</h2><p class="instruction">Llegeix el text de la teva ruta i identifica vocabulari, idees principals i detalls importants.</p></div><span class="pill">Read · Notice · Understand</span></div>
@@ -98,30 +113,49 @@ textarea{width:100%;min-height:175px;border:1px solid #cbd9eb;border-radius:12px
 <script>
 const alexText=`Hi, I’m Jordan. My routine is fairly busy, so I try to make conscious choices instead of aiming for a perfect day. I rarely skip breakfast because I concentrate better when I eat before school, and I carry a reusable bottle so I can stay hydrated. I walk part of the way home most days, which helps me be active without needing extra time for exercise. When I start homework, I usually put my phone away for forty minutes because constant notifications make it harder to focus. In the evening, I try to wind down before bed, although I do not always manage it. If I have been stressed, I listen to music or take a short walk. I also try to get enough sleep during the week, but at weekends my schedule changes. For me, the goal is to strike a balance that I can actually maintain.`;
 const vocabMap={
- insecure:[['Core habits',['eat regular meals','stay hydrated','get enough sleep','be physically active','take regular breaks']],['Balance',['limit screen time','wind down before bed','spend time outdoors','manage stress','avoid skipping meals']]],
- safe:[['Food & energy',['maintain a balanced diet','choose nutrient-rich foods','cut down on sugary drinks','cut back on ultra-processed food','fuel your body']],['Routine & recovery',['establish a sleep routine','make time for exercise','take screen breaks','recharge','build consistency']]],
- daring:[['Habit change',['make conscious choices','build sustainable habits','break a bad habit','fall into a habit','stick to a routine']],['Reflection & balance',['strike a balance between','prioritise your wellbeing','make a realistic adjustment','manage your workload','set healthy boundaries']]]
+ insecure:[['Core habits',['stay hydrated','get enough sleep','be physically active','take regular breaks','limit screen time','manage stress']]],
+ safe:[['Useful routines',['maintain a balanced diet','establish a sleep routine','cut down on sugary drinks','take screen breaks','recharge']]],
+ daring:[['Habit change',['make conscious choices','build sustainable habits','strike a balance between','make a realistic adjustment']]]
 };
 const ca={
-'eat regular meals':'fer àpats regulars','stay hydrated':'mantenir-se hidratat/da','get enough sleep':'dormir prou','be physically active':'mantenir-se físicament actiu/va','take regular breaks':'fer pauses regulars',
-'limit screen time':'limitar el temps de pantalla','wind down before bed':'relaxar-se abans d’anar a dormir','spend time outdoors':'passar temps a l’aire lliure','manage stress':'gestionar l’estrès','avoid skipping meals':'evitar saltar-se àpats',
-'maintain a balanced diet':'mantenir una alimentació equilibrada','choose nutrient-rich foods':'triar aliments nutritius','cut down on sugary drinks':'reduir les begudes ensucrades','cut back on ultra-processed food':'reduir els aliments ultraprocessats','fuel your body':'donar al cos l’energia que necessita',
-'establish a sleep routine':'establir una rutina de son','make time for exercise':'trobar temps per fer exercici','take screen breaks':'fer pauses de pantalla','recharge':'recuperar energia','build consistency':'crear constància',
-'make conscious choices':'prendre decisions conscients','build sustainable habits':'construir hàbits sostenibles','break a bad habit':'trencar un mal hàbit','fall into a habit':'caure/agafar un hàbit','stick to a routine':'mantenir-se fidel a una rutina',
-'strike a balance between':'trobar un equilibri entre','prioritise your wellbeing':'prioritzar el benestar','make a realistic adjustment':'fer un ajust realista','manage your workload':'gestionar la càrrega de feina','set healthy boundaries':'establir límits saludables'};
+'stay hydrated':'mantenir-se hidratat/da',
+'get enough sleep':'dormir prou',
+'be physically active':'mantenir-se físicament actiu/va',
+'take regular breaks':'fer pauses regulars',
+'limit screen time':'limitar el temps de pantalla',
+'manage stress':'gestionar l’estrès',
+'maintain a balanced diet':'mantenir una alimentació equilibrada',
+'establish a sleep routine':'establir una rutina de son',
+'cut down on sugary drinks':'reduir les begudes ensucrades',
+'take screen breaks':'fer pauses de pantalla',
+'recharge':'recuperar energia',
+'make conscious choices':'prendre decisions conscients',
+'build sustainable habits':'construir hàbits sostenibles',
+'strike a balance between':'trobar un equilibri entre',
+'make a realistic adjustment':'fer un ajust realista'
+};
 const examples={
+'stay hydrated':'I carry a bottle of water to stay hydrated.',
+'get enough sleep':'I try to get enough sleep during the week.',
+'be physically active':'I try to be physically active most days.',
+'take regular breaks':'I take regular breaks when I study.',
+'limit screen time':'I limit screen time before bed.',
+'manage stress':'A short walk helps me manage stress.',
 'maintain a balanced diet':'I try to maintain a balanced diet during the school week.',
 'establish a sleep routine':'A regular bedtime helps me establish a sleep routine.',
-'recharge':'I need a short break after school to recharge.',
-'strike a balance between':'I try to strike a balance between schoolwork, exercise and downtime.',
+'cut down on sugary drinks':'I am trying to cut down on sugary drinks.',
+'take screen breaks':'I take screen breaks while studying.',
+'recharge':'I take a short break after school to recharge.',
 'make conscious choices':'I make conscious choices about when I use my phone.',
-'set healthy boundaries':'I set healthy boundaries by putting my phone away while I study.'
+'build sustainable habits':'Small changes can help build sustainable habits.',
+'strike a balance between':'I try to strike a balance between schoolwork and rest.',
+'make a realistic adjustment':'I can make a realistic adjustment to my evening routine.'
 };
 function exampleFor(x){if(examples[x])return examples[x];return `I try to ${x}.`.replace('I try to be physically active.','I try to be physically active most days.').replace('I try to recharge.','I take a short break to recharge.')}
 const levelInfo={
- insecure:{label:'Insecure',note:'Expressa hàbits clars sobre alimentació, descans, moviment i pantalles amb suport.',builders:[['I','eat','regular','meals','on','school','days.'],['I','try','to','stay','hydrated','during','the','day.'],['I','take','regular','breaks','when','I','study.'],['I','wind','down','before','bed.']],actions:['I eat regular meals','I stay hydrated','I get enough sleep','I am physically active','I take regular breaks','I limit screen time','I wind down before bed','I spend time outdoors','I manage stress'],requirements:['Write 50–70 words.','Talk about your own healthy habits.','Use at least 3 target expressions.','Include one reason using because.'],minWords:50,maxWords:70,connectors:['because','also','but','usually'],writingTask:'Escriu 50–70 paraules sobre els teus hàbits. Inclou alimentació, descans, moviment o pantalles i almenys 3 expressions treballades.',speakingTask:'Explica la teva pròpia rutina saludable en 4–5 frases. Fes servir almenys 3 expressions i una raó.',speakingChecklist:['4–5 connected sentences','3 target expressions','one reason','Clear pace']},
- safe:{label:'Safe',note:'Compara dues rutines i explica per què alguns hàbits funcionen millor o pitjor per a cada persona.',builders:[['We','both','try','to','stay','hydrated.'],['She','establishes','a','sleep','routine,','whereas','I','go','to','bed','later.'],['I','make','time','for','exercise','after','school.'],['He','takes','screen','breaks','because','they','help','him','focus.']],actions:['We maintain a balanced diet','She chooses nutrient-rich foods','He cuts down on sugary drinks','I establish a sleep routine','We make time for exercise','She takes screen breaks','He recharges after school','We build consistency'],requirements:['Write 100–120 words.','Compare your classmate’s habits with your own.','Use at least 5 target expressions.','Use cause and contrast.','Include a brief reflection on balance.'],minWords:100,maxWords:120,connectors:['because','whereas','although','however','while','both','so'],writingTask:'Escriu 100–120 paraules comparant els hàbits d’un company o companya amb els teus. Explica similituds, diferències i com afecten l’equilibri de la rutina.',speakingTask:'Compara la rutina saludable d’un company o companya amb la teva. Inclou almenys 4 expressions, causa, contrast i una breu reflexió.',speakingChecklist:['5+ connected sentences','4 target expressions','comparison','cause + contrast','brief reflection']},
- daring:{label:'Daring',note:'Analitza patrons, justifica interpretacions i proposa ajustos realistes sense jutjar la persona.',builders:[['She','makes','conscious','choices','about','her','screen','time.'],['I','try','to','strike','a','balance','between','work','and','recovery.'],['We','could','make','a','realistic','adjustment','to','our','evening','routine.'],['Setting','healthy','boundaries','helps','me','manage','my','workload.']],actions:['We make conscious choices','She builds sustainable habits','He sticks to a routine','I strike a balance between','We prioritise our wellbeing','She makes a realistic adjustment','He manages his workload','I set healthy boundaries'],requirements:['Write 130–160 words.','Compare and analyse both routines.','Use at least 6 target expressions.','Use cause, contrast and consequence.','Suggest one realistic improvement respectfully and justify it.'],minWords:130,maxWords:160,connectors:['because','whereas','although','however','as a result','therefore','while','in contrast'],writingTask:'Escriu 130–160 paraules comparant i analitzant les dues rutines. Explica patrons, possibles conseqüències i proposa un ajust realista i respectuós.',speakingTask:'Compara i analitza les dues rutines. Justifica una interpretació i proposa un petit ajust realista sense jutjar la persona.',speakingChecklist:['6+ connected sentences','5+ target expressions','developed comparison','justified reflection','realistic respectful suggestion']}
+ insecure:{label:'Insecure',note:'Només el vocabulari essencial per parlar de benestar i rutina.',builders:[['I','stay','hydrated','during','the','day.'],['I','take','regular','breaks','when','I','study.'],['I','limit','screen','time','before','bed.'],['I','try','to','manage','stress.']],actions:['I stay hydrated','I get enough sleep','I am physically active','I take regular breaks','I limit screen time','I manage stress'],requirements:['Write 50–70 words.','Talk about your own habits.','Use at least 3 target expressions.'],minWords:50,maxWords:70,connectors:['because','also','but'],writingTask:'Escriu 50–70 paraules sobre els teus hàbits. Inclou almenys 3 expressions treballades.',speakingTask:'Explica la teva pròpia rutina saludable en 4–5 frases. Fes servir almenys 3 expressions i una raó.',speakingChecklist:['4–5 connected sentences','3 target expressions','one reason','Clear pace']},
+ safe:{label:'Safe',note:'Afegeix unes poques expressions per comparar dues rutines sense sobrecarregar vocabulari.',builders:[['We','both','maintain','a','balanced','diet.'],['She','establishes','a','sleep','routine.'],['He','takes','screen','breaks','when','he','studies.'],['I','need','time','to','recharge.']],actions:['We maintain a balanced diet','She establishes a sleep routine','He cuts down on sugary drinks','I take screen breaks','We recharge'],requirements:['Write 100–120 words.','Compare your classmate’s habits with your own.','Use at least 5 target expressions.','Use cause and contrast.'],minWords:100,maxWords:120,connectors:['because','whereas','although','however','while','both'],writingTask:'Escriu 100–120 paraules comparant els hàbits d’un company o companya amb els teus. Explica similituds, diferències i equilibri.',speakingTask:'Compara la rutina saludable d’un company o companya amb la teva. Inclou causa, contrast i una breu reflexió.',speakingChecklist:['5+ connected sentences','4 target expressions','comparison','cause + contrast','brief reflection']},
+ daring:{label:'Daring',note:'Quatre expressions extra per analitzar hàbits i proposar ajustos realistes.',builders:[['She','makes','conscious','choices','about','screen','time.'],['We','build','sustainable','habits','slowly.'],['I','try','to','strike','a','balance','between','work','and','rest.'],['We','could','make','a','realistic','adjustment.']],actions:['We make conscious choices','She builds sustainable habits','I strike a balance between','We make a realistic adjustment'],requirements:['Write 130–160 words.','Compare and analyse both routines.','Use at least 6 target expressions.','Suggest one realistic improvement respectfully.'],minWords:130,maxWords:160,connectors:['because','whereas','although','however','as a result','while'],writingTask:'Escriu 130–160 paraules comparant i analitzant les dues rutines. Proposa un ajust realista i respectuós.',speakingTask:'Compara i analitza les dues rutines. Justifica una interpretació i proposa un petit ajust realista.',speakingChecklist:['6+ connected sentences','5+ target expressions','developed comparison','justified reflection','realistic respectful suggestion']}
 };
 const readingData={
  insecure:{
@@ -163,28 +197,28 @@ const readingData={
 };
 const listening={
  insecure:[
-  {q:'Why does Jordan rarely skip breakfast?',o:['Jordan concentrates better after eating','Jordan dislikes water','Jordan trains before school'],a:0},
-  {q:'What does Jordan carry?',o:['A reusable water bottle','A laptop only','Coffee'],a:0},
-  {q:'How does Jordan add movement to the day?',o:['Walks part of the way home','Runs every morning','Never walks'],a:0},
-  {q:'What happens during homework?',o:['The phone is put away for forty minutes','The phone stays in Jordan’s hand','Jordan watches videos'],a:0},
-  {q:'What helps Jordan wind down after stress?',o:['Music or a short walk','More notifications','Skipping sleep'],a:0},
-  {q:'What is Jordan’s goal?',o:['A balance that can be maintained','A perfect routine','No free time'],a:0}
+  {q:'What daily activity did Lindsay Kee start with?',o:['Walking her dog','Going swimming','Cycling to work'],a:0},
+  {q:'What did she do before the dog walk?',o:['Standing stretches','Cooking dinner','Reading'],a:0},
+  {q:'What did she do after the walk?',o:['Other exercises such as jumping jacks','Went back to bed','Watched TV'],a:0},
+  {q:'What is habit stacking?',o:['Adding a new habit to something you already do','Doing many habits at the same time','Stopping an old habit immediately'],a:0},
+  {q:'Where does Kee put her vitamins?',o:['Next to the coffee machine','In her car','Under her bed'],a:0},
+  {q:'What is one benefit of habit stacking?',o:['It can make new habits easier to remember','It removes the need for exercise','It guarantees perfect habits'],a:0}
  ],
  safe:[
-  {q:'What cause-and-effect link is stated about breakfast?',o:['Eating helps concentration','Breakfast reduces sleep','Breakfast causes stress'],a:0},
-  {q:'Why does Jordan walk part of the way home?',o:['It adds activity without needing extra exercise time','Transport is impossible','Jordan is training for a race'],a:0},
-  {q:'Why is the phone put away?',o:['Notifications make focus harder','The battery is empty','Phones are banned at home'],a:0},
-  {q:'What contrast appears in the evening routine?',o:['Jordan tries to wind down but does not always manage it','Jordan never uses screens','Jordan always sleeps perfectly'],a:0},
-  {q:'What changes at weekends?',o:['The sleep schedule','The water bottle','The school timetable only'],a:0},
-  {q:'What does “strike a balance” refer to?',o:['Finding a sustainable mix of habits','Doing everything perfectly','Avoiding all technology'],a:0}
+  {q:'Why did adding exercises around the dog walk help Kee?',o:['It reduced the pressure of creating a completely new routine','It made the dog walk shorter','It removed all decisions from her life'],a:0},
+  {q:'Which example shows habit stacking with personal care?',o:['Doing push-ups before a shower','Sleeping after breakfast','Drinking coffee before school'],a:0},
+  {q:'What does Dana Santas do while brushing her teeth?',o:['Leg exercises','Jumping jacks','Yoga on the floor'],a:0},
+  {q:'How much moderate activity do experts suggest per week?',o:['150 minutes','15 minutes','500 minutes'],a:0},
+  {q:'What barrier does habit stacking help reduce?',o:['Decision-making','Hydration','Transport'],a:0},
+  {q:'What does Gretchen Rubin call a new, less stable behavior?',o:['A shaky habit','A perfect habit','A final habit'],a:0}
  ],
  daring:[
-  {q:'Which principle best explains Jordan’s routine?',o:['Sustainable choices are more useful than perfection','Strict rules are always best','Healthy habits require expensive equipment'],a:0},
-  {q:'Which habit is integrated into an existing routine rather than added as a separate task?',o:['Walking part of the way home','Buying a gym membership','Running at midnight'],a:0},
-  {q:'What does putting the phone away mainly address?',o:['Attention management','Hydration','Food choice'],a:0},
-  {q:'What does the phrase “although I do not always manage it” reveal?',o:['The routine is realistic and imperfect','Jordan has no routine','Jordan never winds down'],a:0},
-  {q:'Which contextual factor affects sleep?',o:['The difference between weekdays and weekends','Water intake','Walking home'],a:0},
-  {q:'What is the strongest overall inference?',o:['Jordan prioritises habits that fit a busy real life','Jordan follows a rigid health plan','Jordan thinks one habit solves everything'],a:0}
+  {q:'What is the main principle behind habit stacking?',o:['Attach a desired behavior to an established cue or routine','Replace every old habit with a new one','Rely on motivation alone'],a:0},
+  {q:'Why are small actions important in the report?',o:['They can build consistency even if each action is brief','They replace all recommended exercise','They only work for professional athletes'],a:0},
+  {q:'How does the electric toothbrush function in Santas’s routine?',o:['Its timing cue helps her change exercises','It measures her heart rate','It starts a workout video'],a:0},
+  {q:'What does the report imply about decision-making?',o:['Reducing decisions can make habits easier to maintain','More decisions always improve consistency','Decisions do not affect habits'],a:0},
+  {q:'What is Rubin’s “strong habit” in the podcast example?',o:['Listening to a podcast','Running on a machine','Buying exercise equipment'],a:0},
+  {q:'Which conclusion best matches the report?',o:['Sustainable habits can grow by linking small new actions to established routines','Healthy habits require major life changes','Habit stacking works perfectly for everyone'],a:0}
  ]
 };
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],shuffle=a=>[...a].sort(()=>Math.random()-.5);
@@ -212,23 +246,10 @@ $('#resetMatch').onclick=renderMatch;
 function practiceItems(){const d=deck(),size=10,start=practiceSet*size;return d.slice(start,start+size)}function firstWord(exp){return exp.split(' ')[0]}
 function renderPractice(){const d=deck(),items=practiceItems(),totalSets=Math.ceil(d.length/10);if(!items.length){practiceSet=0;return renderPractice()}$('#practiceSetLabel').textContent=`Set ${practiceSet+1} of ${totalSets}`;$('#practiceCoverage').textContent=`${Math.min(practiceSet*10+items.length,d.length)} / ${d.length} expressions reached`;const pool=[...new Set(d.map(x=>firstWord(x.expression)))];$('#practiceList').innerHTML='';items.forEach((item,i)=>{const ans=firstWord(item.expression),rest=item.expression.split(' ').slice(1).join(' '),opts=shuffle([ans,...shuffle(pool.filter(x=>x!==ans)).slice(0,3)]);const box=document.createElement('div');box.className='task';box.innerHTML=`${practiceSet*10+i+1}. <select><option value="">Choose…</option>${opts.map(x=>`<option>${x}</option>`).join('')}</select> ${rest}<div class="feedback"></div>`;box.dataset.answer=ans;$('#practiceList').appendChild(box)});$('#practiceResult').classList.remove('show')}
 $('#checkPractice').onclick=()=>{let score=0;$$('#practiceList .task').forEach(box=>{const good=box.querySelector('select').value===box.dataset.answer;box.classList.toggle('good',good);box.classList.toggle('bad',!good);box.querySelector('.feedback').textContent=good?'Correct!':'Look again at the complete expression.';box.querySelector('.feedback').className='feedback '+(good?'ok':'no');if(good)score++});$('#practiceResult').textContent=`${score} / ${$$('#practiceList .task').length} correct`;$('#practiceResult').classList.add('show');state().practiceSeen[practiceSet]=true;if(state().practiceSeen.filter(Boolean).length>=Math.ceil(deck().length/10))complete('practice');else save()};$('#nextPractice').onclick=()=>{practiceSet=(practiceSet+1)%Math.ceil(deck().length/10);renderPractice()};
-let listeningVoice=null;
-function playListening(rate){
-  if(!('speechSynthesis' in window)){ $('#audioStatus').textContent='Text-to-speech is not available in this browser.'; return; }
-  window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(alexText);
-  u.lang='en-US';
-  u.rate=rate;
-  const voices=window.speechSynthesis.getVoices();
-  const preferred=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith('en-us'))||voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith('en'));
-  if(preferred)u.voice=preferred;
-  u.onstart=()=>$('#audioStatus').textContent=rate<1?'Playing: slow 0.8×':'Playing: normal';
-  u.onend=()=>$('#audioStatus').textContent='Ready to listen again';
-  window.speechSynthesis.speak(u);
-}
-$('#normalSpeed').onclick=()=>playListening(1);
-$('#slowSpeed').onclick=()=>playListening(.8);
-function renderListening()function renderListening(){const form=$('#listenForm');form.innerHTML='';listening[level].forEach((q,i)=>{const box=document.createElement('div');box.className='question';box.innerHTML=`<p class="q-title">${i+1}. ${q.q}</p><div class="options">${q.o.map((o,j)=>`<label class="option"><input type="radio" name="listen${i}" value="${j}"><span>${o}</span></label>`).join('')}</div><div class="feedback" id="lf${i}"></div>`;form.appendChild(box)});$('#listenResult').classList.remove('show')}
+const audio=$('#realAudio');
+$('#normalSpeed').onclick=()=>{audio.playbackRate=1;$('#audioStatus').textContent='Speed: normal';audio.play()};
+$('#slowSpeed').onclick=()=>{audio.playbackRate=.8;$('#audioStatus').textContent='Speed: slow 0.8×';audio.play()};
+function renderListening()function renderListening()function renderListening(){const form=$('#listenForm');form.innerHTML='';listening[level].forEach((q,i)=>{const box=document.createElement('div');box.className='question';box.innerHTML=`<p class="q-title">${i+1}. ${q.q}</p><div class="options">${q.o.map((o,j)=>`<label class="option"><input type="radio" name="listen${i}" value="${j}"><span>${o}</span></label>`).join('')}</div><div class="feedback" id="lf${i}"></div>`;form.appendChild(box)});$('#listenResult').classList.remove('show')}
 $('#checkListen').onclick=()=>{let score=0;listening[level].forEach((q,i)=>{const c=$(`input[name=listen${i}]:checked`);if(c&&+c.value===q.a)score++;$('#lf'+i).textContent=c&&+c.value===q.a?'Correct!':'Listen again.';$('#lf'+i).className='feedback '+(c&&+c.value===q.a?'ok':'no')});$('#listenResult').textContent=`${score} / ${listening[level].length} correct`;$('#listenResult').classList.add('show');if(score>=listening[level].length-1)complete('listen')};
 function renderReading(){
   const data=readingData[level];
