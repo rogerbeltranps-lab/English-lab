@@ -57,18 +57,23 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 </section>
 
 <section class="panel" id="listen">
-  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Listen to real English and catch the main ideas. You do not need to understand every word.</p></div><span class="pill">Real audio · ELLLO</span></div>
+  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Listen to real English and catch the main ideas. You do not need to understand every word.</p></div><span class="pill">Real audio · ELLLO / SoundCloud</span></div>
   <div class="section-card">
     <h3>Morning Routine</h3>
-    <p class="instruction">Hear six real speakers describe how they usually start the day.</p>
-    <div class="actions" style="margin-top:14px">
-      <audio id="realAudio" controls preload="metadata" style="width:100%"><source src="https://www.elllo.org/Audio/AMXR/025-MXR-typicalmorning.mp3" type="audio/mpeg"></audio>
+    <p class="instruction">John and Sarah talk about what they usually do in the morning.</p>
+    <div style="margin:16px 0">
+      <iframe
+        width="100%"
+        height="166"
+        scrolling="no"
+        frameborder="no"
+        allow="autoplay"
+        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/elllo-todd/beginner-esl-lesson-1-morning-routine&color=%231f6b52&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false">
+      </iframe>
     </div>
     <div class="actions">
-      <button class="btn" id="normalSpeed" type="button">Normal speed</button>
-      <button class="btn secondary" id="slowSpeed" type="button">Slow 0.8×</button>
-      <a class="btn secondary" href="https://www.elllo.org/english/Mixers/T025-MorningRoutine.htm" target="_blank" rel="noopener" style="text-decoration:none">Open original lesson ↗</a>
-      <span class="instruction" id="audioStatus">Speed: normal</span>
+      <a class="btn secondary" href="https://soundcloud.com/elllo-todd/beginner-esl-lesson-1-morning-routine" target="_blank" rel="noopener" style="text-decoration:none">Open audio ↗</a>
+      <a class="btn secondary" href="https://www.elllo.org/grammar/A1-20-Adverbs-of-Frequency-Routines.htm" target="_blank" rel="noopener" style="text-decoration:none">Transcript ↗</a>
     </div>
     <form id="listenForm"></form>
     <div class="actions"><button class="btn" id="checkListen" type="button">Check listening</button></div>
@@ -103,7 +108,7 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 </main>
 
 <script>
-const listening=[{"q":"What do several speakers do in the morning?","o":["Have breakfast or a drink","Go to bed","Have dinner"],"a":0},{"q":"What does Akane do after getting up?","o":["Takes a shower","Goes to school immediately","Has dinner"],"a":0},{"q":"What does Naomi usually have in the morning?","o":["Coffee and toast","Soup and rice","Nothing"],"a":0},{"q":"What time does Jeyong get up?","o":["Around 7:00","Around 12:00","Around 3:00"],"a":0},{"q":"What does Mark usually do before work?","o":["Gets dressed and grabs breakfast","Goes back to bed","Cooks dinner"],"a":0},{"q":"What is the main idea of the audio?","o":["People have different morning routines","Everyone has exactly the same routine","Nobody eats breakfast"],"a":0}];
+const listening=[{"q":"What time does John sometimes wake up early?","o":["Around 6:00","Around 8:30","Around 12:30"],"a":0},{"q":"What does John like to do when he gets up early?","o":["Take a shower and have breakfast","Go back to bed","Have dinner"],"a":0},{"q":"What time does Sarah usually wake up?","o":["8:00","6:00","11:00"],"a":0},{"q":"What does Sarah do first after waking up?","o":["Makes coffee","Goes shopping","Has lunch"],"a":0},{"q":"What do Sarah and her children have for breakfast?","o":["Bread, yogurt and fruit","Soup and spaghetti","Only coffee"],"a":0},{"q":"What is the main idea?","o":["John and Sarah have different morning routines","They do exactly the same thing every day","They only talk about lunch"],"a":0}];
 const reading={"text":"<p>Emma has a simple school-day routine. She gets up early, has breakfast and goes to school. She gets home in the afternoon and does her homework. In the evening, she has dinner and watches TV for a short time. She also tries to drink water and get enough sleep.</p>","qs":[["What does Emma do before school?",["Has breakfast","Has dinner","Goes to bed"],0],["When does she get home?",["In the afternoon","At midnight","Before breakfast"],0],["What does she do after she gets home?",["Does homework","Goes to school","Has breakfast"],0],["What does she do in the evening?",["Has dinner","Goes to school","Gets up"],0],["Which healthy habit appears?",["Drinking water","Skipping sleep","No breaks"],0],["Which sentence is the best summary?",["Emma has a normal school-day routine","Emma never goes to school","Emma only talks about food"],0]]};
 const speakTask={"insecure":"Say 3 short sentences about your routine.","safe":"Say 4–5 sentences about your routine and give one reason.","daring":"Say 5 sentences and compare one habit with another person."};
 const speakModel={"insecure":"I wake up at seven. I have breakfast. I get home at five.","safe":"I wake up at seven and have breakfast before school. I go to school on foot because I live nearby. After school, I get home and do my homework.","daring":"I usually get home at five, whereas my friend gets home earlier. We both do our homework after school, but I go to bed later."};
@@ -123,10 +128,6 @@ $$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.re
 
 $$(".choice").forEach(b=>b.onclick=()=>b.classList.toggle("selected"));
 $("#finishQuick").onclick=()=>{complete("quick");$("#quickResult").classList.add("show")};
-
-const audio=$("#realAudio");
-$("#normalSpeed").onclick=()=>{audio.playbackRate=1;$("#audioStatus").textContent="Speed: normal";audio.play()};
-$("#slowSpeed").onclick=()=>{audio.playbackRate=.8;$("#audioStatus").textContent="Speed: slow 0.8×";audio.play()};
 
 function renderQuestions(formId,data,prefix){
   const f=$(formId);f.innerHTML="";
