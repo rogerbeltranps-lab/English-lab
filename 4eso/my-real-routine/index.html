@@ -269,29 +269,6 @@
 
     .checklist li:last-child{border-bottom:0}
 
-    .notice{
-      position:fixed;
-      left:50%;
-      bottom:26px;
-      transform:translate(-50%,20px);
-      background:var(--text);
-      color:white;
-      padding:12px 17px;
-      border-radius:14px;
-      box-shadow:var(--shadow);
-      opacity:0;
-      pointer-events:none;
-      transition:.22s ease;
-      z-index:50;
-      text-align:center;
-      max-width:calc(100% - 32px)
-    }
-
-    .notice.show{
-      opacity:1;
-      transform:translate(-50%,0)
-    }
-
     footer{
       border-top:1px solid var(--line);
       padding:28px 0 34px;
@@ -468,10 +445,6 @@
     </section>
   </main>
 
-  <div class="notice" id="notice">
-    This Learning Path page will be connected when its activity is uploaded.
-  </div>
-
   <footer>
     <div class="wrap">English with Roger · 4 ESO · My Real Routine</div>
   </footer>
@@ -489,13 +462,13 @@
       btn.addEventListener('click', () => openPanel(btn.dataset.panel));
     });
 
-    const notice = document.getElementById('notice');
-    let noticeTimer;
-
     document.getElementById('final-card').addEventListener('click', event => {
       event.preventDefault();
       openPanel('final');
-      window.scrollTo({top: document.querySelector('.tabs').offsetTop - 85, behavior:'smooth'});
+      window.scrollTo({
+        top: document.querySelector('.tabs').offsetTop - 85,
+        behavior:'smooth'
+      });
     });
   </script>
 </body>
