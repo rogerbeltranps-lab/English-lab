@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1f6b52">
+<title>Learning Path 6 · Review & improve</title>
+<style>
+:root{--forest:#1f6b52;--forest-dark:#174d3d;--leaf:#2f8768;--mint:#e9f5ef;--mint2:#d8eee3;--paper:#fff;--cream:#fbfcf8;--ink:#20312b;--muted:#66766f;--line:#d8e6df;--amber:#9f641e;--red:#b84343;--shadow:0 14px 38px rgba(31,107,82,.10)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--cream);color:var(--ink);line-height:1.5}
+button,select,textarea,input{font:inherit}button{cursor:pointer}.wrap{width:min(1080px,calc(100% - 30px));margin:auto}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(23,77,61,.97);color:#fff;box-shadow:0 4px 18px rgba(23,77,61,.16)}
+.toprow{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:10px;font-weight:850;min-width:0}
+.brand>a{color:#fff;text-decoration:none}.brand-mark{width:38px;height:38px;min-width:38px;border-radius:12px;display:grid;place-items:center;background:#fff;color:var(--forest);font-size:18px}
+.brand-title{font-size:.98rem}.brand small{display:block;font-size:.7rem;font-weight:650;color:#cce5da;margin-top:1px}.lp-home-link{padding:6px 8px;border-radius:9px;white-space:nowrap}.lp-home-link:hover{background:rgba(255,255,255,.12)}
+.session-jump{margin-left:auto;display:flex;align-items:center;gap:8px}.session-jump label{font-size:12px;font-weight:800;color:#dcefe7}.session-jump select{max-width:250px;height:38px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:8px 30px 8px 10px;font-weight:750;outline:none}.session-jump option{color:#1f2937;background:#fff}
+.progress-shell{width:158px}.progress-label{display:flex;justify-content:space-between;font-size:12px;color:#dcefe7;margin-bottom:4px}.progress-track{height:5px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}.progress-bar{height:100%;width:0;background:#8de0bc;border-radius:99px;transition:.3s}
+.hero{padding:42px 0 30px;background:linear-gradient(135deg,#edf7f2 0%,#fbfcf8 57%,#f3f8e9 100%);border-bottom:1px solid var(--line)}
+.eyebrow{display:inline-flex;background:var(--mint2);color:var(--forest-dark);padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.055em}
+h1{margin:15px 0 10px;color:var(--forest-dark);font-size:clamp(2.05rem,6vw,4rem);line-height:1.03;letter-spacing:-.045em}.lead{max-width:820px;margin:0;color:#52665e;font-size:clamp(1rem,2vw,1.16rem)}
+.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}.route{border:1px solid var(--line);background:#fff;border-radius:18px;padding:15px;text-align:left;box-shadow:0 5px 18px rgba(31,107,82,.05)}.route strong{display:block;color:var(--forest-dark)}.route span{display:block;color:var(--muted);font-size:.84rem;margin-top:3px}.route.active{border:2px solid var(--forest);background:var(--mint)}
+main{padding:24px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 1px 14px}.tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:#52665e;border-radius:12px;padding:10px 15px;font-weight:780}.tab.active{background:var(--forest);border-color:var(--forest);color:#fff}
+.panel{display:none;background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:clamp(19px,4vw,36px);box-shadow:var(--shadow)}.panel.active{display:block}
+.panel-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:22px}h2{margin:0 0 6px;color:var(--forest-dark);font-size:clamp(1.5rem,3vw,2.15rem)}h3{color:var(--forest-dark);margin:0 0 9px}.instruction{margin:0;color:var(--muted)}.pill{white-space:nowrap;background:var(--mint);color:var(--forest-dark);border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:850}
+.section-card{border:1px solid var(--line);border-radius:18px;background:#fbfdfb;padding:18px;margin:16px 0}.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:800;background:var(--forest);color:#fff;box-shadow:0 5px 14px rgba(31,107,82,.15)}.btn.secondary{background:#fff;color:var(--forest-dark);border:1px solid var(--line);box-shadow:none}.btn.amber{background:var(--amber)}
+.review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.review-card{border:1px solid var(--line);background:#fff;border-radius:15px;padding:14px}.review-card strong{display:block;color:var(--forest-dark);margin-bottom:5px}.tagrow{display:flex;flex-wrap:wrap;gap:8px}.tag{padding:6px 9px;border-radius:999px;background:var(--mint);font-weight:750;font-size:.86rem;color:var(--forest-dark)}
+.task{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;margin:10px 0}.task.good{background:#ebf8f0;border-color:#8fc8a6}.task.bad{background:#fff0f0;border-color:#e9a5a5}.task select,.task input{border:1px solid #c7dbd1;border-radius:9px;padding:7px 9px;background:#fff}.feedback{margin-top:7px;font-weight:720;font-size:.9rem}.ok{color:var(--forest)}.no{color:var(--red)}
+.question{padding:17px 0;border-top:1px solid var(--line)}.question:first-of-type{border-top:0}.q-title{font-weight:760;margin:0 0 10px}.options{display:grid;gap:8px}.option{display:flex;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.result{display:none;margin-top:18px;padding:15px;border-radius:14px;background:var(--mint);color:var(--forest-dark);font-weight:760;text-align:center}.result.show{display:block}
+.audio-card{padding:18px;border:1px solid var(--line);border-radius:18px;background:#f8fbf9}.audio-player{width:100%;margin:9px 0}.reading-text{padding:18px;border:1px solid var(--line);border-radius:16px;background:#fff;line-height:1.75}
+textarea{width:100%;min-height:170px;border:1px solid #c7dbd1;border-radius:12px;padding:12px;resize:vertical;line-height:1.55}.checklist{list-style:none;padding:0}.checklist li{margin:7px 0;color:#53675f}.checklist li::before{content:'□';margin-right:8px;color:var(--forest);font-weight:900}.tiny{font-size:.83rem;color:var(--muted)}.record-status{padding:10px 12px;border-radius:11px;background:#f4f8f6;color:#52665e;border:1px solid var(--line)}.transcript-box{min-height:120px}.footer-note{text-align:center;color:var(--muted);padding-top:24px;font-size:.87rem}
+@media(max-width:900px){.toprow{flex-wrap:wrap;padding:8px 0}.session-jump{order:3;width:100%;margin-left:0}.session-jump label{display:none}.session-jump select{width:100%;max-width:none}}
+@media(max-width:760px){.routes,.review-grid{grid-template-columns:1fr}.panel-head{display:block}.pill{display:inline-block;margin-top:9px}.wrap{width:min(100% - 20px,1080px)}.panel{padding:18px;border-radius:19px}.progress-shell{width:120px}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap toprow">
+  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← My Real Routine</a><span class="brand-mark">6</span><span class="brand-title">Review &amp; improve<small>2 ESO · My Real Routine · Learning Path 6</small></span></div>
+  <div class="session-jump"><label for="sessionJump">Learning Path</label><select id="sessionJump">
+    <option value="getting-started.html">1 · Getting started</option><option value="a-day-in-my-life.html">2 · Routine expressions</option><option value="same-day-different-person.html">3 · Same day, different person</option><option value="present-simple-grammar.html">4 · Present Simple grammar</option><option value="healthy-habits.html">5 · Healthy habits</option><option value="review-improve.html" selected>6 · Review & improve</option><option value="index.html#final">7 · Final product</option>
+  </select></div>
+  <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 6</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
+</div></div>
+
+<header class="hero"><div class="wrap">
+  <span class="eyebrow">Learning Path 6 · Review before the final challenge</span>
+  <h1>Review &amp; improve</h1>
+  <p class="lead">Bring together the language from the whole Learning Situation, find the mistakes that still appear, and improve your writing and speaking before the final product.</p>
+  <div class="routes">
+    <button class="route active" data-level="insecure"><strong>Insecure</strong><span>Essential language · clear support</span></button>
+    <button class="route" data-level="safe"><strong>Safe</strong><span>Connect ideas · improve accuracy</span></button>
+    <button class="route" data-level="daring"><strong>Daring</strong><span>Refine language · compare and reflect</span></button>
+  </div>
+</div></header>
+
+<main class="wrap">
+<nav class="tabs">
+  <button class="tab active" data-panel="vocabulary">1 Vocabulary</button><button class="tab" data-panel="practice">2 Practice</button><button class="tab" data-panel="listening">3 Listening</button><button class="tab" data-panel="reading">4 Reading</button><button class="tab" data-panel="writing">5 Writing</button><button class="tab" data-panel="speaking">6 Speaking</button>
+</nav>
+
+<section class="panel active" id="vocabulary">
+ <div class="panel-head"><div><h2>Vocabulary review</h2><p class="instruction">No new vocabulary. Recover the expressions you already need for the final challenge.</p></div><span class="pill">Recall</span></div>
+ <div class="section-card"><div class="review-grid" id="vocabReview"></div><div class="actions"><button class="btn" id="finishVocab">I have reviewed them ✓</button></div></div>
+</section>
+
+<section class="panel" id="practice">
+ <div class="panel-head"><div><h2>Accuracy check</h2><p class="instruction">Fix the grammar and language problems that often appear in routines.</p></div><span class="pill">Notice · Fix</span></div>
+ <div class="section-card"><div id="practiceList"></div><div class="actions"><button class="btn" id="checkPractice">Check</button><button class="btn secondary" id="resetPractice">Try again</button></div><div class="result" id="practiceResult"></div></div>
+</section>
+
+<section class="panel" id="listening">
+ <div class="panel-head"><div><h2>Listening review</h2><p class="instruction">Listen again to Alex. This time focus on the whole routine and the language choices.</p></div><span class="pill">6 questions</span></div>
+ <div class="section-card"><div class="audio-card"><audio id="reviewAudio" class="audio-player" controls preload="metadata"><source src="alex-listening.mp3" type="audio/mpeg"></audio><div class="actions"><button class="btn secondary" id="normalSpeed">Normal speed</button><button class="btn secondary" id="slowSpeed">Slow 0.8×</button></div></div><form id="listenForm"></form><div class="actions"><button class="btn" id="checkListen" type="button">Check listening</button></div><div class="result" id="listenResult"></div></div>
+</section>
+
+<section class="panel" id="reading">
+ <div class="panel-head"><div><h2>Reading review</h2><p class="instruction">Read a short routine and notice grammar, sequencing, expressions and healthy habits.</p></div><span class="pill">6 questions</span></div>
+ <div class="section-card"><div class="reading-text" id="readingText"></div><form id="readingForm"></form><div class="actions"><button class="btn" id="checkReading" type="button">Check reading</button></div><div class="result" id="readingResult"></div></div>
+</section>
+
+<section class="panel" id="writing">
+ <div class="panel-head"><div><h2>Improve a draft</h2><p class="instruction">Write or paste a draft you could use in the final challenge. Then check it against your route.</p></div><span class="pill">Draft → Improve</span></div>
+ <div class="section-card"><div id="writingModel" class="review-card"></div><h3 style="margin-top:18px">Your improved text</h3><p class="instruction" id="writingTask"></p><textarea id="writingText" placeholder="Write or paste your draft here..."></textarea><ul class="checklist" id="writingChecklist"></ul><p class="tiny"><span id="wordCount">0</span> words</p><div class="actions"><button class="btn" id="correctWriting">Correct with AI</button><button class="btn secondary" id="clearWriting">Reset</button></div></div>
+</section>
+
+<section class="panel" id="speaking">
+ <div class="panel-head"><div><h2>Final rehearsal</h2><p class="instruction">Prepare → Record → Automatic transcript → Improve</p></div><span class="pill">Rehearsal</span></div>
+ <div class="section-card"><h3>Prepare</h3><p id="speakingTask" class="instruction"></p><textarea id="speakingPlan" placeholder="Write the ideas or sentences you are going to say..."></textarea><ul class="checklist" id="speakingChecklist"></ul></div>
+ <div class="section-card"><h3>Record</h3><div class="actions" style="justify-content:flex-start"><button class="btn" id="startRecord">● Record</button><button class="btn secondary" id="stopRecord" disabled>■ Stop</button><button class="btn secondary" id="downloadWav" disabled>Download WAV</button></div><div class="record-status" id="recordStatus">Ready to record.</div><audio id="recordedAudio" controls style="width:100%;display:none;margin-top:12px"></audio></div>
+ <div class="section-card"><h3>Automatic transcript</h3><p class="instruction">With Chrome, the transcript is created automatically while you record. Review it before feedback.</p><textarea id="speechTranscript" class="transcript-box" placeholder="Your automatic transcript will appear here..."></textarea></div>
+ <div class="section-card"><h3>Improve with AI</h3><p class="instruction">The WAV will download and ChatGPT will open with the feedback prompt prepared.</p><div class="actions"><button class="btn" id="correctSpeaking">Correct with AI</button></div><p class="tiny" id="speakingStatus"></p></div>
+</section>
+<p class="footer-note">Review what you need. The aim is to arrive at the final challenge with fewer repeated mistakes.</p>
+</main>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let level=localStorage.getItem('lp6reviewLevel')||'insecure';
+const state=JSON.parse(localStorage.getItem('lp6reviewState')||'{"insecure":{},"safe":{},"daring":{}}');
+function st(){state[level]=state[level]||{};return state[level]} function save(){localStorage.setItem('lp6reviewLevel',level);localStorage.setItem('lp6reviewState',JSON.stringify(state));updateProgress()}
+function done(k){st()[k]=true;save()}
+const info={
+ insecure:{label:'Insecure',vocab:['wake up','get up','head out for school','get home','wind down','turn in','have breakfast','do homework','drink water','get enough sleep'],writingTask:'Write 45–60 words about your classmate’s routine. Use he or she and clear Present Simple sentences.',writingChecklist:['45–60 words','he / she','at least 3 routine expressions','one healthy habit','check he/she + -s'],speakingTask:'Explain your classmate’s routine in 4–5 short sentences. Use at least 2 routine expressions.',speakingChecklist:['4–5 short sentences','he / she','2 routine expressions','speak slowly and clearly']},
+ safe:{label:'Safe',vocab:['wake up','head out for school','get home','wind down','turn in','have a snack','run errands','stay hydrated','take screen breaks','cut down on sugary drinks','because','but','although'],writingTask:'Write 80–100 words about your classmate’s routine. Add a reason or contrast and mention one healthy habit.',writingChecklist:['80–100 words','4+ target expressions','because','but or although','one healthy habit','check Present Simple accuracy'],speakingTask:'Present your classmate’s routine in 5–6 connected sentences. Use 3 target expressions and a reason or contrast.',speakingChecklist:['5–6 connected sentences','3 target expressions','because / but / although','one healthy habit','natural pace']},
+ daring:{label:'Daring',vocab:['make an effort','have a break','do some work','make progress','pay attention','wind down','strike a balance','stick to a routine','although','whereas','so','as a result'],writingTask:'Write 100–120 words comparing your classmate’s routine with your own. Include cause, contrast, consequence and a brief reflection.',writingChecklist:['100–120 words','5+ target expressions','cause + contrast + consequence','comparison with your routine','brief reflection','accurate Present Simple'],speakingTask:'Compare your classmate’s routine with your own. Use 3+ target expressions, cause, contrast and one brief reflection.',speakingChecklist:['6+ connected sentences','3+ target expressions','cause + contrast','comparison','brief reflection','natural pronunciation']}
+};
+const ca={'wake up':'despertar-se','get up':'llevar-se','head out for school':'sortir cap a l’escola','get home':'arribar a casa','wind down':'relaxar-se','turn in':'anar a dormir','have breakfast':'esmorzar','do homework':'fer els deures','drink water':'beure aigua','get enough sleep':'dormir prou','have a snack':'fer un mos / berenar','run errands':'fer encàrrecs','stay hydrated':'mantenir-se hidratat/da','take screen breaks':'fer pauses de pantalla','cut down on sugary drinks':'reduir les begudes ensucrades','make an effort':'fer un esforç','have a break':'fer una pausa','do some work':'fer una mica de feina','make progress':'progressar','pay attention':'parar atenció','strike a balance':'trobar un equilibri','stick to a routine':'mantenir una rutina','because':'perquè','but':'però','although':'encara que','whereas':'mentre que / en canvi','so':'per tant / així que','as a result':'com a resultat'};
+function renderVocab(){const d=info[level];$('#vocabReview').innerHTML=d.vocab.map(x=>`<div class="review-card"><strong>${x}</strong><span class="tiny">${ca[x]||''}</span></div>`).join('')}
+$('#finishVocab').onclick=()=>done('vocab');
+
+const practice={
+ insecure:[
+  ['She ___ up at seven.','get','gets'],['He ___ to school at eight.','go','goes'],['She doesn’t ___ breakfast at home.','has','have'],['___ he get home at five?','Do','Does'],['He ___ down with music.','wind','winds'],['She ___ enough sleep.','get','gets']
+ ],
+ safe:[
+  ['She ___ up at seven.','get','gets'],['He doesn’t ___ out late.','goes','go'],['___ she usually have a snack?','Do','Does'],['Although she is tired, she ___ her homework.','do','does'],['He ___ screen breaks because he studies online.','take','takes'],['She ___ down on sugary drinks.','cut','cuts']
+ ],
+ daring:[
+  ['She ___ an effort to start early.','make','makes'],['He doesn’t ___ off his homework.','puts','put'],['___ she usually wind down before bed?','Do','Does'],['Although he is busy, he ___ a balance.','strike','strikes'],['She ___ progress because she sticks to a routine.','make','makes'],['Whereas I turn in early, he ___ up later.','stay','stays']
+ ]
+};
+function renderPractice(){const list=$('#practiceList');list.innerHTML='';practice[level].forEach((q,i)=>{const box=document.createElement('div');box.className='task';box.dataset.answer=q[2];box.innerHTML=`${i+1}. ${q[0].replace('___',`<select><option value="">Choose…</option><option>${q[1]}</option><option>${q[2]}</option></select>`)}<div class="feedback"></div>`;list.appendChild(box)});$('#practiceResult').classList.remove('show')}
+$('#checkPractice').onclick=()=>{let score=0;$$('#practiceList .task').forEach(x=>{const ok=x.querySelector('select').value===x.dataset.answer;x.classList.toggle('good',ok);x.classList.toggle('bad',!ok);x.querySelector('.feedback').textContent=ok?'Correct!':'Check the verb form again.';x.querySelector('.feedback').className='feedback '+(ok?'ok':'no');if(ok)score++});$('#practiceResult').textContent=`${score} / 6 correct`;$('#practiceResult').classList.add('show');if(score>=5)done('practice')};$('#resetPractice').onclick=renderPractice;
+
+const listenQs={
+ insecure:[
+  ['What time does Alex wake up?',['7:00','7:10','7:30'],0],['What does he have for breakfast?',['Cereal and a banana','Toast and milk','Nothing'],0],['How does he go to school?',['By bus','On foot','By bike'],1],['What time does he get home?',['4:00','4:30','5:00'],1],['What does he do after getting home?',['Snack, break, homework','Dinner, TV, bed','Shopping'],0],['What does he do after dinner?',['Listens to music or reads','Runs errands','Does homework'],0]
+ ],
+ safe:[
+  ['Why are wake up and get up different in Alex’s routine?',['They happen at different times','They mean exactly the same thing','One is only for weekends'],0],['Who does Alex walk to school with?',['A friend','His sister','Nobody'],0],['Which happens first after school?',['A snack','Homework','Dinner'],0],['Which collocation is used correctly?',['make homework','do homework','take homework'],1],['What does the family do at dinner?',['Talk about their day','Watch TV','Read'],0],['Which summary is best?',['A balanced school-day routine','A weekend routine','A sports training day'],0]
+ ],
+ daring:[
+  ['What contrast appears at the beginning?',['wake up vs get up','school vs home','reading vs music'],0],['Which sequence is correct?',['snack → break → homework','homework → snack → break','break → school → dinner'],0],['Which part shows social interaction?',['Walking with a friend','Having a shower','Reading alone'],0],['Which habit helps Alex wind down?',['Listening to music or reading','Doing more homework','Running errands'],0],['What is the overall structure?',['Chronological routine','Argumentative essay','Interview'],0],['What could be a reasonable reflection?',['The routine combines responsibilities and relaxation','Alex never rests','Alex only studies'],0]
+ ]};
+function qForm(target,data,prefix){const f=$(target);f.innerHTML='';data.forEach((q,i)=>{const box=document.createElement('div');box.className='question';box.innerHTML=`<p class="q-title">${i+1}. ${q[0]}</p><div class="options">${q[1].map((o,j)=>`<label class="option"><input type="radio" name="${prefix}${i}" value="${j}"><span>${o}</span></label>`).join('')}</div><div class="feedback" id="${prefix}f${i}"></div>`;f.appendChild(box)})}
+function checkQ(data,prefix,result,key){let score=0;data.forEach((q,i)=>{const s=$(`input[name="${prefix}${i}"]:checked`),ok=s&&+s.value===q[2];if(ok)score++;$('#'+prefix+'f'+i).textContent=ok?'Correct!':'Check again.';$('#'+prefix+'f'+i).className='feedback '+(ok?'ok':'no')});$(result).textContent=`${score} / 6 correct`;$(result).classList.add('show');if(score>=5)done(key)}
+$('#checkListen').onclick=()=>checkQ(listenQs[level],'l','#listenResult','listen');
+const audio=$('#reviewAudio');$('#normalSpeed').onclick=()=>{audio.playbackRate=1;audio.play()};$('#slowSpeed').onclick=()=>{audio.playbackRate=.8;audio.play()};
+
+const reading={
+ insecure:{text:'<p>Mia wakes up at seven and gets up at seven fifteen. She has breakfast and heads out for school at eight. She gets home at half past four and does her homework. In the evening, she drinks water with dinner, winds down with music and turns in at ten. She usually gets enough sleep.</p>',qs:[
+ ['What time does Mia wake up?',['7:00','7:15','8:00'],0],['When does she head out for school?',['7:15','8:00','8:30'],1],['What does she do after getting home?',['Does homework','Goes to bed','Eats out'],0],['Which healthy habit appears?',['Drinks water','Skips sleep','Never rests'],0],['How does she wind down?',['With music','With homework','With shopping'],0],['Which sentence is about sleep?',['She turns in at ten','She heads out at eight','She gets home at 4:30'],0]]},
+ safe:{text:'<p>Mia usually gets up early because she likes having enough time before school. She has breakfast, heads out at eight and gets home at half past four. After school, she has a snack and does her homework, but she takes a short break if she is tired. In the evening, she takes screen breaks and drinks water with dinner. Although she sometimes wants to stay up, she usually turns in at ten because she wants to get enough sleep.</p>',qs:[
+ ['Why does Mia get up early?',['To have enough time','To go shopping','To watch TV'],0],['What contrast appears after school?',['Homework but a break if tired','Breakfast but no school','Dinner but no water'],0],['Which healthy habit concerns screens?',['Take screen breaks','Eat out','Run errands'],0],['Why does she turn in at ten?',['To get enough sleep','To study all night','To miss school'],0],['Which connector gives a reason?',['because','although','but'],0],['Which summary is best?',['She balances school tasks and healthy habits','She avoids all routines','She only talks about food'],0]]},
+ daring:{text:'<p>Mia makes an effort to keep her weekday routine organised because busy mornings can easily become stressful. She heads out for school at eight and gets home at half past four. After a snack, she does some work, although she usually has a short break first. She also takes screen breaks and drinks water regularly. Whereas her brother often stays up late, Mia turns in at ten, so she normally gets enough sleep. She thinks this helps her strike a better balance between school responsibilities and time to wind down.</p>',qs:[
+ ['Why does Mia organise her mornings?',['Busy mornings can become stressful','She dislikes school','She has no homework'],0],['Which phrase shows effort?',['makes an effort','gets home','has a snack'],0],['Which connector introduces contrast with her brother?',['Whereas','Because','So'],0],['What consequence follows turning in at ten?',['She gets enough sleep','She misses school','She skips dinner'],0],['What does strike a balance mean here?',['Combine responsibilities and rest reasonably','Avoid all work','Sleep all day'],0],['What is Mia’s reflection?',['Her routine helps balance work and relaxation','All routines are identical','Healthy habits are impossible'],0]]}
+};
+function renderReading(){const d=reading[level];$('#readingText').innerHTML=d.text;qForm('#readingForm',d.qs,'r');$('#readingResult').classList.remove('show')} $('#checkReading').onclick=()=>checkQ(reading[level].qs,'r','#readingResult','reading');
+
+function renderWriting(){const d=info[level];$('#writingTask').textContent=d.writingTask;$('#writingChecklist').innerHTML=d.writingChecklist.map(x=>`<li>${x}</li>`).join('');$('#writingModel').innerHTML=level==='insecure'?'<strong>Before</strong><p>She wake up at seven. She go school at eight.</p><strong>Improve</strong><p>She <b>wakes up</b> at seven. She <b>goes to school</b> at eight.</p>':level==='safe'?'<strong>Improve by connecting ideas</strong><p>She gets home at five. She has a snack. → She gets home at five and has a snack <b>because</b> she is hungry.</p>':'<strong>Improve by adding comparison and reflection</strong><p><b>Whereas</b> my classmate turns in early, I often stay up later, <b>so</b> I probably need to improve my sleep routine.</p>';$('#writingText').value=st().writing||'';countWords()}
+function countWords(){const t=$('#writingText').value.trim();$('#wordCount').textContent=t?t.split(/\s+/).length:0;st().writing=t;save()} $('#writingText').oninput=countWords;$('#clearWriting').onclick=()=>{$('#writingText').value='';countWords()}
+function writingPrompt(){const d=info[level],t=$('#writingText').value.trim();return `Actua com a tutor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”. Aquesta és la sessió Review & improve abans del producte final.\n\nNivell: ${d.label}. Tasca: ${d.writingTask}\n\nText de l'alumne:\n${t}\n\nDona el feedback en català, clar i breu. No posis nota numèrica. Prioritza errors que l'alumne pugui corregir abans del producte final. Respon només amb:\n1. ✅ Què ja està preparat per al producte final.\n2. ⚠️ Què falta o no segueix la tasca.\n3. 🔧 Màxim 3 correccions importants.\n4. 📝 Versió millorada mantenint les idees de l'alumne.\n5. 🎯 Una sola prioritat abans del producte final.`}
+$('#correctWriting').onclick=()=>{if(!$('#writingText').value.trim()){alert('Write or paste your draft first.');return}done('writing');window.open('https://chatgpt.com/?prompt='+encodeURIComponent(writingPrompt()),'_blank','noopener,noreferrer')};
+
+function renderSpeaking(){const d=info[level];$('#speakingTask').textContent=d.speakingTask;$('#speakingChecklist').innerHTML=d.speakingChecklist.map(x=>`<li>${x}</li>`).join('');$('#speakingPlan').value=st().plan||''} $('#speakingPlan').oninput=()=>{st().plan=$('#speakingPlan').value;save()};
+
+let audioCtx,sourceNode,processor,stream,pcm=[],recSampleRate=44100,recordBlob=null,recordUrl=null,recognition=null,speechIsRecording=false,speechRestartTimer=null,speechFinalText='';
+function encodeWav(buffers,sampleRate){let length=buffers.reduce((n,a)=>n+a.length,0),samples=new Float32Array(length),o=0;buffers.forEach(a=>{samples.set(a,o);o+=a.length});const ab=new ArrayBuffer(44+samples.length*2),v=new DataView(ab);const w=(off,s)=>{for(let i=0;i<s.length;i++)v.setUint8(off+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+samples.length*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sampleRate,true);v.setUint32(28,sampleRate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,samples.length*2,true);let p=44;for(let i=0;i<samples.length;i++,p+=2){let s=Math.max(-1,Math.min(1,samples[i]));v.setInt16(p,s<0?s*0x8000:s*0x7fff,true)}return new Blob([v],{type:'audio/wav'})}
+function startSpeech(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){$('#recordStatus').textContent='Automatic transcription is not available in this browser.';return}speechFinalText='';$('#speechTranscript').value='';speechIsRecording=true;const launch=()=>{if(!speechIsRecording)return;try{recognition=new SR();recognition.lang='en-US';recognition.continuous=true;recognition.interimResults=true;recognition.maxAlternatives=1;recognition.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)speechFinalText+=t.trim()+' ';else interim+=t}$('#speechTranscript').value=(speechFinalText+interim).trim()};recognition.onend=()=>{if(speechIsRecording)speechRestartTimer=setTimeout(launch,180)};recognition.start()}catch(e){if(speechIsRecording)speechRestartTimer=setTimeout(launch,250)}};launch()}
+function stopSpeech(){speechIsRecording=false;if(speechRestartTimer){clearTimeout(speechRestartTimer);speechRestartTimer=null}try{recognition&&recognition.stop()}catch(e){}}
+$('#startRecord').onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({audio:true});audioCtx=new (window.AudioContext||window.webkitAudioContext)();recSampleRate=audioCtx.sampleRate;sourceNode=audioCtx.createMediaStreamSource(stream);processor=audioCtx.createScriptProcessor(4096,1,1);pcm=[];processor.onaudioprocess=e=>pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));sourceNode.connect(processor);processor.connect(audioCtx.destination);$('#startRecord').disabled=true;$('#stopRecord').disabled=false;$('#recordStatus').textContent='Recording… automatic transcript is starting.';startSpeech()}catch(e){$('#recordStatus').textContent='Microphone access was not available.'}}
+$('#stopRecord').onclick=async()=>{if(!processor)return;stopSpeech();await new Promise(r=>setTimeout(r,250));processor.disconnect();sourceNode.disconnect();stream.getTracks().forEach(t=>t.stop());await audioCtx.close();recordBlob=encodeWav(pcm,recSampleRate);if(recordUrl)URL.revokeObjectURL(recordUrl);recordUrl=URL.createObjectURL(recordBlob);$('#recordedAudio').src=recordUrl;$('#recordedAudio').style.display='block';$('#downloadWav').disabled=false;$('#startRecord').disabled=false;$('#stopRecord').disabled=true;$('#recordStatus').textContent='Recording ready. Review the automatic transcript below.';done('speaking')}
+$('#downloadWav').onclick=()=>{if(!recordBlob)return;const a=document.createElement('a');a.href=recordUrl;a.download=`review-${level}.wav`;a.click()};
+function speakingPrompt(){const d=info[level],tr=$('#speechTranscript').value.trim();return `Escolta l'àudio adjunt i actua com a professor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”. Aquesta és la sessió Review & improve abans del producte final.\n\nNivell: ${d.label}. Tasca: ${d.speakingTask}\n\nTranscripció automàtica revisable:\n${tr}\n\nDona el feedback en català, clar i breu. No posis nota numèrica. Respon només amb:\n1. 📝 Transcripció — què diu realment l'alumne.\n2. ✅ Què ja està preparat per al producte final.\n3. 🔧 Màxim 2 correccions importants.\n4. 🗣️ Una observació de pronunciació només si és clara.\n5. 📋 Si ha complert la tasca.\n6. 🎯 Una sola prioritat abans del producte final.`}
+$('#correctSpeaking').onclick=()=>{if(!recordBlob){alert('Record your speaking first.');return}const p=speakingPrompt(),a=document.createElement('a');a.href=recordUrl;a.download=`review-${level}.wav`;a.click();window.open('https://chatgpt.com/?prompt='+encodeURIComponent(p),'_blank','noopener,noreferrer');$('#speakingStatus').textContent='✓ WAV downloaded · ChatGPT opened with the prompt prepared.'};
+
+function updateProgress(){const s=st(),n=['vocab','practice','listen','reading','writing','speaking'].filter(k=>s[k]).length;$('#progressLabel').textContent=info[level].label;$('#progressText').textContent=`${n} / 6`;$('#progressBar').style.width=`${n/6*100}%`}
+function setLevel(x){level=x;$$('.route').forEach(b=>b.classList.toggle('active',b.dataset.level===x));renderAll();save()} $$('.route').forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab,.panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#'+t.dataset.panel).classList.add('active');window.scrollTo({top:$('main').offsetTop-64,behavior:'smooth'})});
+$('#sessionJump').onchange=e=>{if(e.target.value)location.href=e.target.value};
+function renderAll(){renderVocab();renderPractice();qForm('#listenForm',listenQs[level],'l');$('#listenResult').classList.remove('show');renderReading();renderWriting();renderSpeaking();updateProgress();$$('.route').forEach(b=>b.classList.toggle('active',b.dataset.level===level))}
+renderAll();
+</script>
+</body>
+</html>
