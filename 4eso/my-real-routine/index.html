@@ -404,10 +404,10 @@
     </section>
 
     <div class="tabs">
-      <button class="tabbtn active" data-panel="overview">Overview</button>
-      <button class="tabbtn" data-panel="learning-path">Learning Path</button>
-      <button class="tabbtn" data-panel="language">Language &amp; Knowledge</button>
-      <button class="tabbtn" data-panel="final">Final Product</button>
+      <button type="button" class="tabbtn active" data-panel="overview" onclick="openPanel('overview')">Overview</button>
+      <button type="button" class="tabbtn" data-panel="learning-path" onclick="openPanel('learning-path')">Learning Path</button>
+      <button type="button" class="tabbtn" data-panel="language" onclick="openPanel('language')">Language &amp; Knowledge</button>
+      <button type="button" class="tabbtn" data-panel="final" onclick="openPanel('final')">Final Product</button>
     </div>
 
     <section class="panel active" id="overview">
@@ -540,10 +540,6 @@
       buttons.forEach(b => b.classList.toggle('active', b.dataset.panel === id));
       panels.forEach(p => p.classList.toggle('active', p.id === id));
     }
-
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => openPanel(btn.dataset.panel));
-    });
 
     const navMenus = [...document.querySelectorAll('.nav-menu')];
 
