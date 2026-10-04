@@ -13,6 +13,12 @@
 main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 1px 14px}.tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:12px;padding:10px 15px;font-weight:780}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}.panel{display:none;background:#fff;border:1px solid var(--line);border-radius:24px;padding:clamp(19px,4vw,34px);box-shadow:var(--shadow)}.panel.active{display:block}.panel-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}h2{margin:0 0 6px;color:var(--dark);font-size:clamp(1.5rem,3vw,2.1rem)}h3{color:var(--dark);margin:0 0 8px}.instruction{margin:0;color:var(--muted)}.pill{white-space:nowrap;background:var(--soft);color:var(--dark);border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:850}.section-card{border:1px solid var(--line);border-radius:18px;background:#f8fbf9;padding:18px;margin:15px 0}.choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.choice{border:1px solid var(--line);background:#fff;border-radius:13px;padding:13px;text-align:left;color:var(--ink);font-weight:700}.choice.selected{border-color:var(--accent);background:var(--soft)}.question{padding:16px 0;border-top:1px solid var(--line)}.question:first-child{border-top:0}.q-title{font-weight:760;margin:0 0 9px}.options{display:grid;gap:8px}.option{display:flex;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}.feedback{min-height:20px;margin-top:7px;font-size:.9rem;font-weight:720}.ok{color:var(--accent)}.no{color:#b84343}.btn{border:0;border-radius:12px;padding:10px 15px;font-weight:800;background:var(--accent);color:#fff}.btn.secondary{background:#fff;color:var(--dark);border:1px solid var(--line)}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.result{display:none;margin-top:15px;padding:13px;border-radius:12px;background:var(--soft);color:var(--dark);font-weight:760}.result.show{display:block}.reading{padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff;line-height:1.75;margin-bottom:10px}.model{padding:14px;border-radius:13px;background:#fff;border:1px solid var(--line);font-weight:650}.speak-support{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mini-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.mini-card strong{color:var(--dark)}textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:12px;padding:12px;resize:vertical}.footer-note{text-align:center;color:var(--muted);font-size:.86rem;padding-top:20px}
 @media(max-width:760px){.routes,.choice-grid,.speak-support{grid-template-columns:1fr}.panel-head{display:block}.pill{display:inline-block;margin-top:8px}.progress-shell{width:112px}}
 .session-jump{display:flex;align-items:center;gap:8px;margin-left:auto}.session-jump label{font-size:.7rem;font-weight:800;color:rgba(255,255,255,.78);white-space:nowrap}.session-jump select{max-width:235px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:8px 30px 8px 10px;font-weight:750;outline:none}.session-jump select:focus{border-color:#fff}.session-jump option{color:#1f2937;background:#fff}@media(max-width:760px){.toprow{flex-wrap:wrap;padding:8px 0}.session-jump{order:3;width:100%;margin-left:0}.session-jump label{display:none}.session-jump select{width:100%;max-width:none}.progress-shell{margin-left:auto}}
+
+.session-access{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:13px 15px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.04)}
+.session-access strong{white-space:nowrap;color:var(--dark,var(--navy,#20312b))}
+.session-access select{flex:1;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff;color:var(--ink);font-weight:750}
+.session-access .go-session{border:0;border-radius:11px;padding:10px 14px;background:var(--accent,var(--blue,#2563eb));color:#fff;font-weight:800}
+@media(max-width:760px){.session-access{display:grid;grid-template-columns:1fr auto}.session-access strong{grid-column:1/-1}.session-access select{width:100%}}
 </style>
 </head>
 <body>
@@ -39,6 +45,12 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 </div></header>
 
 <main class="wrap">
+<div class="session-access">
+  <strong>Learning Path sessions</strong>
+  <select id="sessionAccessSelect" aria-label="Choose another Learning Path session"><option value="getting-started.html" selected>1 · Getting started</option><option value="a-day-in-my-life.html">2 · Routine expressions</option><option value="same-day-different-person.html">3 · Same day, different person</option><option value="#" disabled>4 · My evening routine · Soon</option><option value="healthy-habits.html">5 · Healthy habits</option><option value="#" disabled>6 · Review & improve · Soon</option><option value="index.html#final">7 · Final product</option></select>
+  <button class="go-session" id="sessionAccessGo" type="button">Go →</button>
+</div>
+
 <nav class="tabs" aria-label="Warm-up sections">
   <button class="tab active" data-panel="quick">1 Quick start</button>
   <button class="tab" data-panel="listen">2 Listening</button>
@@ -165,6 +177,19 @@ setLevel(level);renderSpeak();updateProgress();
 
 const sessionJump=document.getElementById('sessionJump');
 if(sessionJump){sessionJump.addEventListener('change',()=>{const target=sessionJump.value;if(target&&target!=='#')window.location.href=target;});}
+
+const sessionAccessSelect=document.getElementById('sessionAccessSelect');
+const sessionAccessGo=document.getElementById('sessionAccessGo');
+if(sessionAccessSelect&&sessionAccessGo){
+  sessionAccessGo.addEventListener('click',()=>{
+    const target=sessionAccessSelect.value;
+    if(target&&target!=='#') window.location.href=target;
+  });
+  sessionAccessSelect.addEventListener('change',()=>{
+    const target=sessionAccessSelect.value;
+    if(target&&target!=='#') window.location.href=target;
+  });
+}
 </script>
 </body>
 </html>
