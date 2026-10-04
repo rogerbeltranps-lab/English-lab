@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Metabolisme · Biologia 2n de Batxillerat · teoria, pràctica i preparació PAU">
+<title>Metabolisme · Biologia 2n BTX</title>
+<style>
+:root{
+  --bg:#f6f8f7;--surface:#fff;--text:#17231f;--muted:#65736d;--line:#dfe8e3;
+  --accent:#2f7358;--accent-dark:#20543f;--soft:#eaf4ef;--soft2:#f1f7f4;
+  --warn:#9a6318;--warn-soft:#fff5df;--blue:#315d8f;--blue-soft:#edf4fb;
+  --red:#a44444;--red-soft:#fff0f0;--shadow:0 16px 42px rgba(26,52,41,.08);
+  --radius:22px
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.wrap{width:min(1120px,calc(100% - 32px));margin:auto}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(246,248,247,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.toprow{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{font-weight:850;letter-spacing:-.035em}.brand small{display:block;font-size:.72rem;color:var(--muted);font-weight:650;letter-spacing:0}
+.progress-shell{width:190px}.progress-label{display:flex;justify-content:space-between;font-size:.74rem;font-weight:800;color:var(--muted)}
+.progress-track{height:7px;background:#e5ece8;border-radius:999px;overflow:hidden;margin-top:5px}.progress-bar{height:100%;width:0;background:var(--accent);transition:.3s}
+.hero{padding:58px 0 30px}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center}
+.eyebrow,.pill{display:inline-block;padding:8px 11px;border-radius:999px;background:var(--soft);color:var(--accent-dark);font-size:.78rem;font-weight:850;letter-spacing:.04em;text-transform:uppercase}
+h1{margin:16px 0 0;font-size:clamp(3rem,7vw,5.5rem);line-height:.95;letter-spacing:-.06em}
+.lead{font-size:1.07rem;color:var(--muted);max-width:690px;margin:20px 0 0}
+.hero-card{background:linear-gradient(145deg,#204f3d,#2f7358);color:#fff;border-radius:28px;padding:26px;box-shadow:var(--shadow)}
+.hero-card h2{margin:8px 0 7px;font-size:1.65rem;letter-spacing:-.04em}.hero-card p{margin:0;color:rgba(255,255,255,.82)}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:20px}.stat{padding:12px;border-radius:15px;background:rgba(255,255,255,.11)}.stat strong{display:block;font-size:1.35rem}.stat span{font-size:.75rem;color:rgba(255,255,255,.78)}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 0 24px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid var(--line);background:var(--surface);padding:10px 14px;border-radius:13px;color:var(--muted);font-weight:780;white-space:nowrap}
+.tab.active{background:var(--accent);border-color:var(--accent);color:white}
+.panel{display:none;padding-bottom:64px}.panel.active{display:block}
+.panel-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:18px}.panel-head h2{margin:0;font-size:2.1rem;letter-spacing:-.045em}.panel-head p{margin:5px 0 0;color:var(--muted);max-width:690px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card,.section-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 5px 20px rgba(25,51,40,.035)}
+.card h3,.section-card h3{margin:0 0 8px;letter-spacing:-.025em}.card p,.section-card p{color:var(--muted)}
+.step{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--soft);color:var(--accent-dark);font-weight:900;margin-bottom:15px}
+.route-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0 22px}
+.route{border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:17px;text-align:left}.route strong{display:block}.route span{font-size:.82rem;color:var(--muted)}.route.active{border-color:#93b9a8;background:var(--soft)}
+.callout{border-left:4px solid var(--accent);background:var(--soft2);padding:15px 17px;border-radius:0 14px 14px 0;margin:14px 0}
+.warning{border-left-color:var(--warn);background:var(--warn-soft)}
+.exam{border-left-color:var(--blue);background:var(--blue-soft)}
+.accordion{display:grid;gap:12px}.accordion details{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:0 18px}.accordion summary{list-style:none;padding:17px 0;font-weight:850;cursor:pointer}.accordion summary::-webkit-details-marker{display:none}.accordion summary::after{content:"+";float:right;color:var(--accent)}.accordion details[open] summary::after{content:"–"}.details-body{padding:0 0 18px;color:#33433d}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;margin-top:14px}table{width:100%;border-collapse:collapse;min-width:660px;background:#fff}th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#f2f6f4;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:#52635b}
+.metabolic-map{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:stretch}.node{border:1px solid var(--line);border-radius:18px;padding:17px;background:#fff;min-height:136px}.node strong{display:block;font-size:1.05rem}.node small{color:var(--muted)}.node .where{display:inline-block;margin-top:10px;font-size:.74rem;font-weight:850;color:var(--accent-dark);background:var(--soft);padding:6px 8px;border-radius:999px}.arrowline{text-align:center;color:var(--accent);font-size:1.6rem;font-weight:900;align-self:center}
+.quiz-list{display:grid;gap:14px}.question{border:1px solid var(--line);border-radius:17px;padding:18px;background:#fff}.question h4{margin:0 0 10px}.options{display:grid;gap:8px}.option{display:flex;gap:9px;padding:9px 11px;border:1px solid var(--line);border-radius:11px}.option.correct{background:#eaf7ef;border-color:#89bd9e}.option.wrong{background:var(--red-soft);border-color:#dfa3a3}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.btn{border:0;background:var(--accent);color:#fff;padding:10px 14px;border-radius:12px;font-weight:800}.btn.secondary{background:#fff;color:var(--accent-dark);border:1px solid var(--line)}.btn.blue{background:var(--blue)}
+.result{margin-top:12px;font-weight:760}.good{color:#277047}.bad{color:#9a4040}
+.short-grid{display:grid;gap:12px}.shortq{padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff}.shortq label{display:block;font-weight:800;margin-bottom:8px}.shortq textarea{width:100%;min-height:85px;border:1px solid #cbd8d2;border-radius:11px;padding:10px;resize:vertical}
+.answer{display:none;margin-top:10px;padding:12px;border-radius:12px;background:var(--soft2);border:1px solid var(--line)}.answer.show{display:block}
+.pau-task{border:1px solid #cbd9e7;background:#fff;border-radius:20px;padding:21px;margin-bottom:15px}.pau-tag{display:inline-block;font-size:.75rem;font-weight:850;color:var(--blue);background:var(--blue-soft);padding:6px 9px;border-radius:999px}.points{float:right;color:var(--muted);font-size:.8rem;font-weight:800}
+.rubric{margin:12px 0 0;padding-left:20px;color:#41524b}
+.comp{border-left:4px solid var(--accent);padding:4px 0 4px 14px}.comp strong{display:block}
+.checkrow{display:flex;align-items:flex-start;gap:10px;padding:10px;border-bottom:1px solid var(--line)}.checkrow:last-child{border-bottom:0}
+.footer-note{color:var(--muted);font-size:.84rem;text-align:center;padding:8px 0 48px}
+.source-list a{color:var(--blue);text-decoration:underline}
+.mini{font-size:.82rem;color:var(--muted)}
+@media(max-width:900px){.hero-grid,.grid2,.grid3,.route-strip{grid-template-columns:1fr}.metabolic-map{grid-template-columns:1fr 1fr}.progress-shell{width:145px}.hero{padding-top:38px}}
+@media(max-width:620px){.wrap{width:min(100% - 20px,1120px)}.toprow{min-height:64px}.brand small{display:none}.progress-shell{width:110px}.hero{padding-top:28px}.metabolic-map{grid-template-columns:1fr}.panel-head{display:block}.hero-stats{grid-template-columns:1fr 1fr 1fr}.card,.section-card{padding:17px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap toprow">
+    <div class="brand">Biologia amb Roger<small>2n Batxillerat · Metabolisme</small></div>
+    <div class="progress-shell">
+      <div class="progress-label"><span>Progrés</span><span id="progressText">0 / 6</span></div>
+      <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">2n BTX · Biologia · PAU</span>
+      <h1>Metabolisme</h1>
+      <p class="lead">Entén com la cèl·lula transforma matèria i energia, connecta les vies metabòliques i practica exactament les habilitats que et demanen al Batxillerat i a la PAU.</p>
+    </div>
+    <aside class="hero-card">
+      <span class="mini" style="color:rgba(255,255,255,.72)">OBJECTIU FINAL</span>
+      <h2>No memoritzis vies aïllades. Connecta-les.</h2>
+      <p>Per cada via has de saber què entra, què surt, on passa, què passa amb l'energia i amb els coenzims, i per què és útil biològicament.</p>
+      <div class="hero-stats">
+        <div class="stat"><strong>6</strong><span>blocs</span></div>
+        <div class="stat"><strong>3</strong><span>nivells</span></div>
+        <div class="stat"><strong>PAU</strong><span>focus</span></div>
+      </div>
+    </aside>
+  </div>
+</header>
+
+<main class="wrap">
+<nav class="tabs" aria-label="Seccions">
+  <button class="tab active" data-panel="start">1 Comença</button>
+  <button class="tab" data-panel="theory">2 Teoria</button>
+  <button class="tab" data-panel="map">3 Mapa visual</button>
+  <button class="tab" data-panel="practice">4 Pràctica</button>
+  <button class="tab" data-panel="pau">5 PAU trainer</button>
+  <button class="tab" data-panel="competences">6 Competències</button>
+</nav>
+
+<section class="panel active" id="start">
+  <div class="panel-head"><div><h2>Què has de dominar?</h2><p>Una ruta clara abans d'entrar en els detalls.</p></div><span class="pill">Learn → Connect → Apply</span></div>
+  <div class="grid3">
+    <article class="card"><div class="step">1</div><h3>Entendre</h3><p>Catabolisme, anabolisme, ATP, NADH, FADH₂ i NADPH. Sense això, la resta són noms desconnectats.</p></article>
+    <article class="card"><div class="step">2</div><h3>Localitzar</h3><p>Citosol, matriu mitocondrial, membrana interna, estroma i tilacoides. A PAU, dir només “mitocondri” sovint no és suficient.</p></article>
+    <article class="card"><div class="step">3</div><h3>Relacionar</h3><p>Glucòlisi → piruvat → acetil-CoA → Krebs → cadena respiratòria; o fermentació quan cal regenerar NAD⁺.</p></article>
+    <article class="card"><div class="step">4</div><h3>Comparar</h3><p>Aerobi vs anaerobi, respiració vs fermentació, fotosíntesi vs respiració i rendiment energètic.</p></article>
+    <article class="card"><div class="step">5</div><h3>Interpretar dades</h3><p>Taules, esquemes, gràfics, experiments, consums d'O₂, concentracions i balanços.</p></article>
+    <article class="card"><div class="step">6</div><h3>Argumentar</h3><p>Explicar el perquè: paper de l'oxigen, regulació enzimàtica, canvis en una via i conseqüències metabòliques.</p></article>
+  </div>
+  <div class="callout exam"><strong>Focus PAU.</strong> L'examen actual de Biologia té quatre exercicis obligatoris de 2,5 punts. Les preguntes són contextualitzades i poden combinar continguts de blocs diferents.</div>
+  <div class="actions"><button class="btn" data-complete="start">Ja tinc clar el mapa de la unitat ✓</button></div>
+</section>
+
+<section class="panel" id="theory">
+  <div class="panel-head"><div><h2>Teoria essencial</h2><p>El que has de saber explicar, no només reconèixer.</p></div><span class="pill">Conceptes clau</span></div>
+  <div class="accordion">
+    <details open><summary>1. Metabolisme, catabolisme i anabolisme</summary><div class="details-body">
+      <p><strong>Metabolisme</strong> és el conjunt de reaccions químiques que tenen lloc a la cèl·lula. Una <strong>via metabòlica</strong> és una seqüència ordenada de reaccions en què el producte d'una reacció és substrat de la següent.</p>
+      <div class="grid2">
+        <div class="callout"><strong>Catabolisme</strong><br>Degrada molècules complexes. És globalment oxidatiu i exergònic: allibera energia que es conserva sobretot en ATP i coenzims reduïts.</div>
+        <div class="callout"><strong>Anabolisme</strong><br>Construeix molècules complexes. És globalment reductor i endergònic: necessita energia i poder reductor, sovint ATP i NADPH.</div>
+      </div>
+    </div></details>
+    <details><summary>2. ATP i coenzims: què transporta cadascun?</summary><div class="details-body">
+      <p><strong>ATP</strong> transfereix energia entre processos. <strong>NADH i FADH₂</strong> transporten electrons d'alta energia cap a la cadena respiratòria. <strong>NADPH</strong> s'associa sobretot amb processos anabòlics, com la fase de fixació del carboni de la fotosíntesi.</p>
+      <div class="callout warning"><strong>Error típic:</strong> NADH no és “energia” exactament. És un transportador de poder reductor; la seva oxidació permet obtenir ATP a la fosforilació oxidativa.</div>
+    </div></details>
+    <details><summary>3. Glucòlisi i destins del piruvat</summary><div class="details-body">
+      <p>La <strong>glucòlisi</strong> té lloc al <strong>citosol</strong>. Transforma una glucosa en dos piruvats, produeix una petita quantitat neta d'ATP i redueix NAD⁺ a NADH.</p>
+      <p>Amb disponibilitat d'oxigen i mitocondris funcionals, el piruvat es transforma en <strong>acetil-CoA</strong> i entra al cicle de Krebs. En condicions anaeròbies, el NADH s'ha de reoxidar a NAD⁺ mitjançant una <strong>fermentació</strong> per permetre que la glucòlisi continuï.</p>
+    </div></details>
+    <details><summary>4. Respiració aeròbica</summary><div class="details-body">
+      <p><strong>Descarboxilació oxidativa del piruvat:</strong> matriu mitocondrial; produeix acetil-CoA, CO₂ i NADH.</p>
+      <p><strong>Cicle de Krebs:</strong> matriu mitocondrial; oxida l'acetil-CoA, allibera CO₂ i genera NADH, FADH₂ i una petita quantitat d'ATP/GTP.</p>
+      <p><strong>Cadena de transport electrònic i fosforilació oxidativa:</strong> membrana interna mitocondrial. Els electrons permeten crear un gradient de protons; l'ATP-sintasa usa aquest gradient per sintetitzar ATP. L'<strong>O₂ és l'acceptor final d'electrons</strong> i es redueix a aigua.</p>
+    </div></details>
+    <details><summary>5. β-oxidació dels àcids grassos</summary><div class="details-body">
+      <p>En eucariotes, la β-oxidació té lloc principalment a la <strong>matriu mitocondrial</strong>. Escurça progressivament els àcids grassos i genera <strong>acetil-CoA, NADH i FADH₂</strong>. Això explica el gran rendiment energètic dels lípids.</p>
+    </div></details>
+    <details><summary>6. Fermentacions</summary><div class="details-body">
+      <p>Les fermentacions són degradacions parcials i no utilitzen la cadena respiratòria. La seva funció clau és <strong>regenerar NAD⁺</strong> perquè la glucòlisi pugui continuar.</p>
+      <p><strong>Làctica:</strong> piruvat → lactat. <strong>Alcohòlica:</strong> piruvat → etanol + CO₂. El rendiment d'ATP és molt inferior al de la respiració aeròbica.</p>
+    </div></details>
+    <details><summary>7. Fotosíntesi i anabolisme autòtrof</summary><div class="details-body">
+      <p>La fase lluminosa té lloc a les <strong>membranes dels tilacoides</strong>: fotòlisi de l'aigua, transport d'electrons, producció d'ATP i NADPH. El <strong>cicle de Calvin</strong> té lloc a l'<strong>estroma</strong> i fixa CO₂ utilitzant ATP i NADPH.</p>
+      <p>La fotosíntesi emmagatzema energia química en matèria orgànica; la respiració cel·lular n'extreu energia utilitzable. Són processos relacionats però no simplement “l'invers exacte” l'un de l'altre.</p>
+    </div></details>
+    <details><summary>8. Enzims i regulació metabòlica</summary><div class="details-body">
+      <p>Els enzims disminueixen l'energia d'activació i controlen la velocitat de les reaccions. L'activitat enzimàtica depèn de la concentració de substrat, temperatura, pH i inhibidors, entre altres factors.</p>
+      <p>La regulació de passos clau evita malgastar energia i permet ajustar el metabolisme a les necessitats de la cèl·lula.</p>
+    </div></details>
+  </div>
+  <div class="actions"><button class="btn" data-complete="theory">Teoria revisada ✓</button></div>
+</section>
+
+<section class="panel" id="map">
+  <div class="panel-head"><div><h2>Mapa visual del metabolisme</h2><p>Segueix el carboni, l'energia i els electrons.</p></div><span class="pill">On · Entra · Surt</span></div>
+  <div class="section-card">
+    <h3>Respiració de la glucosa</h3>
+    <div class="metabolic-map">
+      <div class="node"><strong>Glucòlisi</strong><small>Glucosa → 2 piruvats<br>ATP net + NADH</small><span class="where">Citosol</span></div>
+      <div class="node"><strong>Piruvat → acetil-CoA</strong><small>CO₂ + NADH<br>Entrada a Krebs</small><span class="where">Matriu</span></div>
+      <div class="node"><strong>Cicle de Krebs</strong><small>CO₂ + NADH + FADH₂<br>+ ATP/GTP</small><span class="where">Matriu</span></div>
+      <div class="node"><strong>Fosforilació oxidativa</strong><small>NADH/FADH₂ → ATP<br>O₂ → H₂O</small><span class="where">Membrana interna</span></div>
+    </div>
+  </div>
+  <div class="section-card" style="margin-top:16px">
+    <h3>Quan el carboni ve dels greixos</h3>
+    <div class="metabolic-map">
+      <div class="node"><strong>Triacilglicèrids</strong><small>Alliberen glicerol i àcids grassos.</small></div>
+      <div class="node"><strong>Àcids grassos</strong><small>Activació i entrada al mitocondri.</small></div>
+      <div class="node"><strong>β-oxidació</strong><small>Acetil-CoA + NADH + FADH₂</small><span class="where">Matriu</span></div>
+      <div class="node"><strong>Krebs + cadena</strong><small>Convergència amb el catabolisme dels glúcids.</small></div>
+    </div>
+  </div>
+  <div class="section-card" style="margin-top:16px">
+    <h3>Què has de poder fer amb qualsevol esquema</h3>
+    <div class="grid3">
+      <div class="callout"><strong>1. Identificar</strong><br>Nom de la via i molècules d'entrada/sortida.</div>
+      <div class="callout"><strong>2. Localitzar</strong><br>Cèl·lula, orgànul i subcompartiment.</div>
+      <div class="callout"><strong>3. Justificar</strong><br>ATP, coenzims, oxidació/reducció i significat biològic.</div>
+    </div>
+  </div>
+  <div class="actions"><button class="btn" data-complete="map">Mapa dominat ✓</button></div>
+</section>
+
+<section class="panel" id="practice">
+  <div class="panel-head"><div><h2>Pràctica</h2><p>Progressa des del reconeixement fins al raonament.</p></div><span class="pill">3 nivells</span></div>
+  <div class="route-strip">
+    <button class="route active" data-level="understand"><strong>Entén</strong><span>Conceptes i localització</span></button>
+    <button class="route" data-level="connect"><strong>Connecta</strong><span>Relacions entre vies</span></button>
+    <button class="route" data-level="reason"><strong>Raona</strong><span>Conseqüències i dades</span></button>
+  </div>
+  <div class="section-card">
+    <div class="quiz-list" id="quizList"></div>
+    <div class="actions"><button class="btn" id="checkQuiz">Comprova</button><button class="btn secondary" id="newQuiz">Nou set</button></div>
+    <div class="result" id="quizResult"></div>
+  </div>
+  <div class="section-card" style="margin-top:16px">
+    <h3>Respostes curtes</h3>
+    <p>Formula primer la resposta. Després compara-la amb els punts clau.</p>
+    <div class="short-grid" id="shortGrid"></div>
+  </div>
+  <div class="actions"><button class="btn" data-complete="practice">Pràctica feta ✓</button></div>
+</section>
+
+<section class="panel" id="pau">
+  <div class="panel-head"><div><h2>PAU trainer</h2><p>Preguntes originals, però construïdes amb la tipologia i els criteris que apareixen a les proves oficials.</p></div><span class="pill">Aplicació · Context · Precisió</span></div>
+
+  <article class="pau-task">
+    <span class="pau-tag">PAU-style 1 · esport</span><span class="points">2,5 punts</span>
+    <h3>Un esprint de 50 metres</h3>
+    <p>Durant un esprint molt intens, el múscul augmenta ràpidament la demanda d'ATP i l'aportació d'oxigen pot resultar insuficient temporalment.</p>
+    <ol>
+      <li>Indica quina via permet regenerar NAD⁺ en aquestes condicions i explica per què és necessària.</li>
+      <li>Localitza la glucòlisi i la fermentació làctica.</li>
+      <li>Compara el rendiment energètic amb la respiració aeròbica.</li>
+      <li>Explica què passa amb el piruvat quan torna a haver-hi disponibilitat d'oxigen.</li>
+    </ol>
+    <button class="btn blue reveal">Veure criteris de correcció</button>
+    <div class="answer"><strong>Idees que han d'aparèixer:</strong><ul class="rubric"><li>Fermentació làctica; reoxida NADH a NAD⁺.</li><li>Glucòlisi i fermentació: citosol.</li><li>La fermentació només conserva l'ATP obtingut a la glucòlisi; la respiració aeròbica produeix molt més ATP.</li><li>El piruvat pot entrar al mitocondri, formar acetil-CoA i continuar per Krebs i fosforilació oxidativa.</li></ul></div>
+  </article>
+
+  <article class="pau-task">
+    <span class="pau-tag">PAU-style 2 · dieta i greixos</span><span class="points">2,5 punts</span>
+    <h3>Mobilització d'àcids grassos</h3>
+    <p>En un període prolongat d'exercici moderat augmenta l'ús d'àcids grassos com a combustible.</p>
+    <ol>
+      <li>Anomena la via que transforma els àcids grassos en unitats d'acetil-CoA i indica on té lloc.</li>
+      <li>Quins dos coenzims reduïts es generen i per a què serviran?</li>
+      <li>Explica per què el catabolisme dels greixos convergeix amb el de la glucosa.</li>
+      <li>Justifica el paper de l'oxigen encara que la β-oxidació no el consumeixi directament.</li>
+    </ol>
+    <button class="btn blue reveal">Veure criteris de correcció</button>
+    <div class="answer"><strong>Idees que han d'aparèixer:</strong><ul class="rubric"><li>β-oxidació; matriu mitocondrial.</li><li>NADH i FADH₂; cediran electrons a la cadena respiratòria.</li><li>L'acetil-CoA entra al cicle de Krebs, igual que l'acetil-CoA derivat de la glucosa.</li><li>L'O₂ és l'acceptor final d'electrons de la cadena; sense ell no es poden reoxidar de manera sostinguda NADH i FADH₂.</li></ul></div>
+  </article>
+
+  <article class="pau-task">
+    <span class="pau-tag">PAU-style 3 · experiment</span><span class="points">2,5 punts</span>
+    <h3>Consum d'oxigen en llevats</h3>
+    <p>Dos cultius de llevat reben la mateixa concentració de glucosa. El cultiu A té oxigen abundant; el B es manté sense oxigen. Al cap d'una hora, B ha consumit molta més glucosa per unitat de biomassa.</p>
+    <ol>
+      <li>Proposa una explicació metabòlica per al major consum de glucosa de B.</li>
+      <li>Indica el principal procés energètic de cada cultiu.</li>
+      <li>Prediu quin cultiu acumularà més etanol i justifica-ho.</li>
+      <li>Dissenya una mesura senzilla per comprovar experimentalment una de les teves prediccions.</li>
+    </ol>
+    <button class="btn blue reveal">Veure criteris de correcció</button>
+    <div class="answer"><strong>Idees que han d'aparèixer:</strong><ul class="rubric"><li>Sense O₂, el rendiment d'ATP per glucosa és molt inferior i cal consumir més substrat.</li><li>A: respiració aeròbica; B: fermentació alcohòlica.</li><li>B acumularà més etanol.</li><li>Mesura coherent: etanol, CO₂, consum de glucosa o consum d'O₂ amb control de variables.</li></ul></div>
+  </article>
+  <div class="callout exam"><strong>Estratègia d'examen:</strong> si et demanen una via, respon sempre amb el “paquet complet” quan sigui rellevant: <em>nom + localització + substrat/producte + ATP/coenzims + significat</em>.</div>
+  <div class="actions"><button class="btn" data-complete="pau">PAU trainer completat ✓</button></div>
+</section>
+
+<section class="panel" id="competences">
+  <div class="panel-head"><div><h2>Competències i criteris</h2><p>La unitat no només treballa continguts: entrena les accions que demana el currículum competencial.</p></div><span class="pill">Currículum Catalunya</span></div>
+  <div class="grid2">
+    <article class="card comp"><strong>Interpretar informació científica</strong><p>Esquemes, taules, gràfics, models metabòlics i resultats experimentals.</p></article>
+    <article class="card comp"><strong>Comunicar amb rigor</strong><p>Respostes curtes però precises, amb terminologia biològica adequada i justificació.</p></article>
+    <article class="card comp"><strong>Resoldre problemes</strong><p>Aplicar coneixement de vies metabòliques a contextos nous: esport, nutrició, microorganismes o canvis ambientals.</p></article>
+    <article class="card comp"><strong>Analitzar evidències</strong><p>Proposar hipòtesis, identificar variables, interpretar dades i dissenyar petites comprovacions experimentals.</p></article>
+  </div>
+  <div class="section-card" style="margin-top:16px">
+    <h3>Checklist d'assoliment</h3>
+    <div class="checkrow"><input type="checkbox" class="selfcheck"><span>Puc diferenciar anabolisme i catabolisme i explicar el paper d'ATP, NADH, FADH₂ i NADPH.</span></div>
+    <div class="checkrow"><input type="checkbox" class="selfcheck"><span>Puc situar glucòlisi, β-oxidació, Krebs, cadena respiratòria, fermentació i fotosíntesi.</span></div>
+    <div class="checkrow"><input type="checkbox" class="selfcheck"><span>Puc explicar què passa amb carboni, electrons i energia en les principals rutes.</span></div>
+    <div class="checkrow"><input type="checkbox" class="selfcheck"><span>Puc comparar metabolisme aeròbic i anaeròbic amb criteri energètic.</span></div>
+    <div class="checkrow"><input type="checkbox" class="selfcheck"><span>Puc interpretar un experiment o una gràfica i justificar una resposta metabòlica.</span></div>
+    <div class="checkrow"><input type="checkbox" class="selfcheck"><span>Puc respondre una pregunta PAU sense limitar-me a repetir una definició memoritzada.</span></div>
+  </div>
+  <div class="section-card source-list" style="margin-top:16px">
+    <h3>Fonts oficials utilitzades</h3>
+    <p><a href="https://xtec.gencat.cat/ca/curriculum/batxillerat/curriculum-171-2022/materies-de-modalitat/ciencies-i-tecnologia/" target="_blank" rel="noopener">Currículum de Biologia · XTEC</a></p>
+    <p><a href="https://universitats.gencat.cat/ca/pau/materies-pau/biologia/" target="_blank" rel="noopener">Estructura i criteris de la PAU de Biologia · Canal Universitats</a></p>
+    <p><a href="https://universitats.gencat.cat/ca/pau/models-examen-anys-anteriors/biologia/" target="_blank" rel="noopener">Models i exàmens de Biologia d'anys anteriors</a></p>
+  </div>
+  <div class="actions"><button class="btn" data-complete="competences">Checklist revisada ✓</button></div>
+</section>
+<p class="footer-note">El progrés queda desat només en aquest dispositiu.</p>
+</main>
+
+<script>
+const tabs=[...document.querySelectorAll('.tab')];
+const panels=[...document.querySelectorAll('.panel')];
+function openPanel(id){
+  panels.forEach(p=>p.classList.toggle('active',p.id===id));
+  tabs.forEach(t=>t.classList.toggle('active',t.dataset.panel===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+tabs.forEach(t=>t.addEventListener('click',()=>openPanel(t.dataset.panel)));
+
+const completeKey='metabolisme2btx-complete';
+let completed=new Set(JSON.parse(localStorage.getItem(completeKey)||'[]'));
+function renderProgress(){
+  const n=completed.size;
+  document.getElementById('progressText').textContent=n+' / 6';
+  document.getElementById('progressBar').style.width=(n/6*100)+'%';
+  document.querySelectorAll('[data-complete]').forEach(b=>{
+    const done=completed.has(b.dataset.complete);
+    b.textContent=done?'Completat ✓':'Marca com a completat ✓';
+    b.classList.toggle('secondary',done);
+  });
+}
+document.querySelectorAll('[data-complete]').forEach(b=>b.addEventListener('click',()=>{
+  const id=b.dataset.complete;
+  completed.has(id)?completed.delete(id):completed.add(id);
+  localStorage.setItem(completeKey,JSON.stringify([...completed]));renderProgress();
+}));
+renderProgress();
+
+const banks={
+understand:[
+ {q:"On té lloc la glucòlisi?",o:["Matriu mitocondrial","Citosol","Membrana interna mitocondrial","Estroma"],a:1,e:"La glucòlisi és citosòlica."},
+ {q:"Quin és l'acceptor final d'electrons de la cadena respiratòria aeròbica?",o:["CO₂","NAD⁺","O₂","Piruvat"],a:2,e:"L'oxigen accepta els electrons al final de la cadena i es redueix a aigua."},
+ {q:"On té lloc principalment la β-oxidació en una cèl·lula eucariota?",o:["Nucli","Citosol","Matriu mitocondrial","Ribosoma"],a:2,e:"La β-oxidació mitocondrial es localitza a la matriu."},
+ {q:"Quin coenzim s'associa especialment al poder reductor de l'anabolisme?",o:["NADPH","NADH","ATP","ADP"],a:0,e:"El NADPH és clau en moltes reaccions reductores anabòliques."},
+ {q:"Quina és la funció essencial de la fermentació respecte al NAD?",o:["Produir O₂","Regenerar NAD⁺","Produir FADH₂","Entrar a Krebs"],a:1,e:"Regenera NAD⁺ perquè la glucòlisi pugui continuar."}
+],
+connect:[
+ {q:"Quina molècula connecta directament β-oxidació i cicle de Krebs?",o:["Lactat","Acetil-CoA","Glucosa","NADPH"],a:1,e:"La β-oxidació genera acetil-CoA que entra a Krebs."},
+ {q:"Si s'atura la cadena respiratòria, quin canvi és més immediat?",o:["S'acumulen NADH i FADH₂","Augmenta NAD⁺","Augmenta molt l'ATP","Comença la fotosíntesi"],a:0,e:"Els coenzims reduïts no poden cedir electrons i reoxidar-se."},
+ {q:"Per què la respiració aeròbica produeix més ATP que la fermentació?",o:["Perquè la fermentació no fa glucòlisi","Perquè l'oxidació del substrat és molt més completa i hi ha fosforilació oxidativa","Perquè usa NADPH","Perquè no produeix CO₂"],a:1,e:"La cadena respiratòria aprofita gran part de l'energia dels electrons."},
+ {q:"Quina relació correcta hi ha entre fase lluminosa i cicle de Calvin?",o:["El Calvin produeix llum","La fase lluminosa aporta ATP i NADPH al Calvin","El Calvin produeix O₂","Tenen lloc al citosol"],a:1,e:"ATP i NADPH generats als tilacoides alimenten la fixació de carboni a l'estroma."},
+ {q:"Què comparteixen catabolisme de glucosa i d'àcids grassos?",o:["Tots dos comencen amb glucòlisi","Tots dos poden alimentar Krebs i la cadena respiratòria","Tots dos són fermentacions","Tots dos produeixen NADPH com a producte principal"],a:1,e:"Convergeixen en acetil-CoA/coenzims reduïts i respiració mitocondrial."}
+],
+reason:[
+ {q:"Una cèl·lula sense mitocondris funcionals pot obtenir ATP de la glucosa?",o:["No, mai","Sí, per glucòlisi; pot necessitar fermentació per regenerar NAD⁺","Sí, només per Krebs","Sí, per β-oxidació"],a:1,e:"La glucòlisi és citosòlica i pot continuar si es regenera NAD⁺."},
+ {q:"Si no hi ha O₂, per què s'acaba frenant Krebs en una cèl·lula aeròbica?",o:["Per falta directa de glucosa","Perquè no es poden reoxidar prou NADH/FADH₂ i falten coenzims oxidats","Perquè Krebs necessita llum","Perquè l'O₂ entra directament a Krebs"],a:1,e:"L'efecte és indirecte: la cadena s'atura i no regenera NAD⁺/FAD."},
+ {q:"Un inhibidor de l'ATP-sintasa provoca inicialment...",o:["Disminució de síntesi d'ATP i manteniment del gradient de protons","Més ATP","Més fermentació alcohòlica en totes les cèl·lules","Més fixació de CO₂"],a:0,e:"Els protons no poden tornar eficientment a la matriu a través de l'ATP-sintasa."},
+ {q:"Per què un àcid gras és una reserva energètica molt eficient?",o:["Perquè està molt oxidat","Perquè conté molts carbonis reduïts que poden generar molt NADH/FADH₂","Perquè no necessita enzims","Perquè només produeix ATP directe"],a:1,e:"La seva oxidació genera molt poder reductor que alimenta la fosforilació oxidativa."},
+ {q:"Un cultiu anaerobi consumeix més glucosa per créixer igual. La millor explicació és...",o:["Cada glucosa rendeix menys ATP","La glucosa conté menys energia sense O₂","La fermentació no regenera NAD⁺","El cultiu fa fotosíntesi"],a:0,e:"Amb menys ATP per glucosa cal metabolitzar més substrat."}
+]};
+
+const shortBanks={
+understand:[
+ ["Defineix via metabòlica.","Seqüència ordenada de reaccions en què els productes d'un pas alimenten els següents, regulada per enzims."],
+ ["Quin paper té l'O₂ en la respiració aeròbica?","És l'acceptor final d'electrons de la cadena respiratòria i es redueix a H₂O."],
+ ["Diferencia NADH i ATP en una frase.","NADH transporta poder reductor/electrons; ATP transfereix energia química directament entre processos."]
+],
+connect:[
+ ["Explica per què la fermentació permet que continuï la glucòlisi.","Reoxida NADH a NAD⁺, necessari perquè una reacció de la glucòlisi pugui continuar."],
+ ["Relaciona β-oxidació, Krebs i cadena respiratòria.","La β-oxidació genera acetil-CoA, NADH i FADH₂; l'acetil-CoA entra a Krebs i els coenzims reduïts alimenten la cadena respiratòria."],
+ ["Compara fotosíntesi i respiració en termes de matèria i energia.","La fotosíntesi sintetitza matèria orgànica i emmagatzema energia; la respiració oxida matèria orgànica i n'extreu energia per formar ATP."]
+],
+reason:[
+ ["Què passaria amb el NADH si s'inhibís el complex final de la cadena respiratòria?","Tendiria a acumular-se perquè els electrons no podrien avançar fins a l'acceptor final; disminuiria la regeneració de NAD⁺."],
+ ["Per què una resposta 'cicle de Krebs: mitocondri' és poc precisa?","Perquè la localització subcel·lular correcta és la matriu mitocondrial; la PAU pot exigir aquesta precisió."],
+ ["Explica per què l'O₂ és essencial per a la β-oxidació sostinguda encara que no sigui reactiu directe de cada volta.","La β-oxidació genera NADH i FADH₂; aquests s'han de reoxidar a la cadena respiratòria, que necessita O₂ com a acceptor final."]
+]};
+
+let level='understand',quizOffset=0;
+const quizList=document.getElementById('quizList'), shortGrid=document.getElementById('shortGrid');
+function renderPractice(){
+  const arr=banks[level], qs=[0,1,2,3].map(i=>arr[(i+quizOffset)%arr.length]);
+  quizList.innerHTML=qs.map((x,i)=>'<div class="question" data-answer="'+x.a+'"><h4>'+(i+1)+'. '+x.q+'</h4><div class="options">'+x.o.map((o,j)=>'<label class="option"><input type="radio" name="q'+i+'" value="'+j+'"> <span>'+o+'</span></label>').join('')+'</div><div class="mini explanation" style="display:none;margin-top:8px">'+x.e+'</div></div>').join('');
+  shortGrid.innerHTML=shortBanks[level].map((x,i)=>'<div class="shortq"><label>'+(i+1)+'. '+x[0]+'</label><textarea placeholder="Escriu la teva resposta..."></textarea><button class="btn secondary show-answer" style="margin-top:8px">Mostra punts clau</button><div class="answer">'+x[1]+'</div></div>').join('');
+  document.getElementById('quizResult').textContent='';
+  document.querySelectorAll('.show-answer').forEach(b=>b.addEventListener('click',()=>b.nextElementSibling.classList.toggle('show')));
+}
+document.querySelectorAll('.route').forEach(r=>r.addEventListener('click',()=>{
+  document.querySelectorAll('.route').forEach(x=>x.classList.remove('active'));r.classList.add('active');level=r.dataset.level;quizOffset=0;renderPractice();
+}));
+document.getElementById('newQuiz').addEventListener('click',()=>{quizOffset=(quizOffset+1)%banks[level].length;renderPractice()});
+document.getElementById('checkQuiz').addEventListener('click',()=>{
+  let score=0,total=0;
+  document.querySelectorAll('#quizList .question').forEach(q=>{
+    total++;const a=Number(q.dataset.answer),pick=q.querySelector('input:checked');
+    q.querySelectorAll('.option').forEach(x=>x.classList.remove('correct','wrong'));
+    q.querySelectorAll('.option')[a].classList.add('correct');
+    if(pick){const ix=Number(pick.value);if(ix===a)score++;else q.querySelectorAll('.option')[ix].classList.add('wrong')}
+    q.querySelector('.explanation').style.display='block';
+  });
+  const el=document.getElementById('quizResult');el.textContent='Resultat: '+score+' / '+total;el.className='result '+(score>=3?'good':'bad');
+});
+renderPractice();
+
+document.querySelectorAll('.reveal').forEach(b=>b.addEventListener('click',()=>b.nextElementSibling.classList.toggle('show')));
+
+const checks=[...document.querySelectorAll('.selfcheck')],checkKey='metabolisme2btx-selfcheck';
+const saved=JSON.parse(localStorage.getItem(checkKey)||'[]');
+checks.forEach((c,i)=>{c.checked=!!saved[i];c.addEventListener('change',()=>localStorage.setItem(checkKey,JSON.stringify(checks.map(x=>x.checked))))});
+</script>
+</body>
+</html>
