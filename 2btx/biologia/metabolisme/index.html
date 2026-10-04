@@ -62,8 +62,30 @@ h1{margin:16px 0 0;font-size:clamp(3rem,7vw,5.5rem);line-height:.95;letter-spaci
 .footer-note{color:var(--muted);font-size:.84rem;text-align:center;padding:8px 0 48px}
 .source-list a{color:var(--blue);text-decoration:underline}
 .mini{font-size:.82rem;color:var(--muted)}
-@media(max-width:900px){.hero-grid,.grid2,.grid3,.route-strip{grid-template-columns:1fr}.metabolic-map{grid-template-columns:1fr 1fr}.progress-shell{width:145px}.hero{padding-top:38px}}
-@media(max-width:620px){.wrap{width:min(100% - 20px,1120px)}.toprow{min-height:64px}.brand small{display:none}.progress-shell{width:110px}.hero{padding-top:28px}.metabolic-map{grid-template-columns:1fr}.panel-head{display:block}.hero-stats{grid-template-columns:1fr 1fr 1fr}.card,.section-card{padding:17px}}
+.organelle-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:stretch;margin-bottom:18px}
+.organelle-stage{background:linear-gradient(145deg,#f7fbf9,#edf5f1);border:1px solid var(--line);border-radius:24px;padding:22px;min-height:360px;display:flex;align-items:center;justify-content:center}
+.mito{position:relative;width:min(520px,100%);aspect-ratio:1.75/1;border:8px solid #6d9f89;border-radius:50% 44% 48% 52%;background:#fdfefe;box-shadow:inset 0 0 0 7px #dcece4}
+.mito::before{content:"";position:absolute;inset:20% 14%;border-radius:46%;background:
+radial-gradient(ellipse at 18% 50%,transparent 0 16%,#79aa94 17% 22%,transparent 23% 31%,#79aa94 32% 37%,transparent 38%),
+radial-gradient(ellipse at 48% 50%,transparent 0 14%,#79aa94 15% 20%,transparent 21% 30%,#79aa94 31% 36%,transparent 37%),
+radial-gradient(ellipse at 78% 50%,transparent 0 14%,#79aa94 15% 20%,transparent 21% 30%,#79aa94 31% 36%,transparent 37%)}
+.hotspot{position:absolute;border:2px solid #fff;background:var(--accent);color:#fff;border-radius:999px;width:34px;height:34px;display:grid;place-items:center;font-weight:900;box-shadow:0 5px 14px rgba(31,84,63,.25);z-index:3}
+.hotspot.active{outline:4px solid rgba(47,115,88,.18);transform:scale(1.08)}
+.hot-matrix{left:48%;top:47%}.hot-inner{right:19%;top:20%}.hot-inter{left:14%;top:24%}.hot-cytosol{left:-5%;bottom:6%;background:var(--blue)}
+.organelle-info{background:#fff;border:1px solid var(--line);border-radius:24px;padding:22px;display:flex;flex-direction:column;justify-content:center}
+.organelle-info h3{margin:6px 0 8px;font-size:1.45rem}.organelle-info ul{padding-left:20px;margin:10px 0;color:#42534c}
+.info-kicker{font-size:.75rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--accent-dark)}
+.chloro{position:relative;width:min(520px,100%);aspect-ratio:1.8/1;border:8px solid #78a26f;border-radius:50%;background:#f8fff7;box-shadow:inset 0 0 0 6px #dcebd8;overflow:hidden}
+.grana{position:absolute;width:54px;height:76px;border-radius:14px;background:repeating-linear-gradient(to bottom,#6e9f66 0 8px,#a8c89f 8px 12px)}
+.g1{left:18%;top:28%}.g2{left:43%;top:19%}.g3{right:18%;top:33%}
+.stroma-wave{position:absolute;inset:20%;border:3px dashed #b5cfad;border-radius:42%}
+.hot-stroma{left:56%;bottom:16%}.hot-thyl{left:21%;top:19%}
+.recall-box{border:1px solid var(--line);background:var(--soft2);border-radius:18px;padding:18px;margin-bottom:16px}
+.recall-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.recall-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.recall-item select{width:100%;margin-top:8px;border:1px solid #cbd8d2;border-radius:10px;padding:8px;background:#fff}
+.recall-item.correct{border-color:#89bd9e;background:#eff9f3}.recall-item.wrong{border-color:#dfa3a3;background:#fff4f4}
+@media(max-width:900px){.hero-grid,.grid2,.grid3,.route-strip,.organelle-grid{grid-template-columns:1fr}.metabolic-map{grid-template-columns:1fr 1fr}.recall-grid{grid-template-columns:1fr 1fr}.progress-shell{width:145px}.hero{padding-top:38px}}
+@media(max-width:620px){.wrap{width:min(100% - 20px,1120px)}.toprow{min-height:64px}.brand small{display:none}.progress-shell{width:110px}.hero{padding-top:28px}.metabolic-map,.recall-grid{grid-template-columns:1fr}.panel-head{display:block}.hero-stats{grid-template-columns:1fr 1fr 1fr}.card,.section-card{padding:17px}.organelle-stage{min-height:280px}.hotspot{width:30px;height:30px}}
 </style>
 </head>
 <body>
@@ -123,6 +145,37 @@ h1{margin:16px 0 0;font-size:clamp(3rem,7vw,5.5rem);line-height:.95;letter-spaci
 
 <section class="panel" id="theory">
   <div class="panel-head"><div><h2>Teoria essencial</h2><p>El que has de saber explicar, no només reconèixer.</p></div><span class="pill">Conceptes clau</span></div>
+  <div class="section-card" style="margin-bottom:18px">
+    <h3>Explora el mitocondri</h3>
+    <p>Prem els punts. Relaciona cada compartiment amb el procés que hi té lloc.</p>
+    <div class="organelle-grid">
+      <div class="organelle-stage">
+        <div class="mito" aria-label="Esquema interactiu d'un mitocondri">
+          <button class="hotspot hot-cytosol active" data-org="cytosol">1</button>
+          <button class="hotspot hot-matrix" data-org="matrix">2</button>
+          <button class="hotspot hot-inner" data-org="inner">3</button>
+          <button class="hotspot hot-inter" data-org="inter">4</button>
+        </div>
+      </div>
+      <div class="organelle-info" id="mitoInfo"></div>
+    </div>
+  </div>
+
+  <div class="section-card" style="margin-bottom:18px">
+    <h3>Explora el cloroplast</h3>
+    <p>La fotosíntesi també depèn d'una compartimentació molt precisa.</p>
+    <div class="organelle-grid">
+      <div class="organelle-stage">
+        <div class="chloro" aria-label="Esquema interactiu d'un cloroplast">
+          <div class="stroma-wave"></div><div class="grana g1"></div><div class="grana g2"></div><div class="grana g3"></div>
+          <button class="hotspot hot-thyl active" data-chloro="thyl">1</button>
+          <button class="hotspot hot-stroma" data-chloro="stroma">2</button>
+        </div>
+      </div>
+      <div class="organelle-info" id="chloroInfo"></div>
+    </div>
+  </div>
+
   <div class="accordion">
     <details open><summary>1. Metabolisme, catabolisme i anabolisme</summary><div class="details-body">
       <p><strong>Metabolisme</strong> és el conjunt de reaccions químiques que tenen lloc a la cèl·lula. Una <strong>via metabòlica</strong> és una seqüència ordenada de reaccions en què el producte d'una reacció és substrat de la següent.</p>
@@ -200,6 +253,13 @@ h1{margin:16px 0 0;font-size:clamp(3rem,7vw,5.5rem);line-height:.95;letter-spaci
     <button class="route active" data-level="understand"><strong>Entén</strong><span>Conceptes i localització</span></button>
     <button class="route" data-level="connect"><strong>Connecta</strong><span>Relacions entre vies</span></button>
     <button class="route" data-level="reason"><strong>Raona</strong><span>Conseqüències i dades</span></button>
+  </div>
+  <div class="recall-box">
+    <h3 style="margin-top:0">0. Recorda d'on passa</h3>
+    <p class="mini">Abans de raonar, recupera la localització de les vies sense mirar la teoria.</p>
+    <div class="recall-grid" id="recallGrid"></div>
+    <div class="actions"><button class="btn secondary" id="checkRecall">Comprova localitzacions</button></div>
+    <div class="result" id="recallResult"></div>
   </div>
   <div class="section-card">
     <div class="quiz-list" id="quizList"></div>
@@ -318,6 +378,54 @@ document.querySelectorAll('[data-complete]').forEach(b=>b.addEventListener('clic
   localStorage.setItem(completeKey,JSON.stringify([...completed]));renderProgress();
 }));
 renderProgress();
+
+const mitoData={
+  cytosol:{k:"Fora del mitocondri",t:"Citosol",b:["Glucòlisi: glucosa → 2 piruvats","ATP per fosforilació a nivell de substrat","NAD⁺ → NADH","També hi tenen lloc les fermentacions"]},
+  matrix:{k:"Compartiment intern",t:"Matriu mitocondrial",b:["Descarboxilació oxidativa del piruvat","Cicle de Krebs","β-oxidació dels àcids grassos","Es generen NADH i FADH₂"]},
+  inner:{k:"Membrana",t:"Membrana interna",b:["Cadena de transport electrònic","Bombament de H⁺","ATP-sintasa","Fosforilació oxidativa"]},
+  inter:{k:"Entre membranes",t:"Espai intermembranós",b:["S'hi acumulen protons (H⁺)","El gradient electroquímic emmagatzema energia potencial","Els H⁺ retornen a la matriu a través de l'ATP-sintasa"]}
+};
+function renderMito(key){
+  const x=mitoData[key];
+  document.getElementById('mitoInfo').innerHTML='<div class="info-kicker">'+x.k+'</div><h3>'+x.t+'</h3><ul>'+x.b.map(i=>'<li>'+i+'</li>').join('')+'</ul>';
+}
+document.querySelectorAll('[data-org]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-org]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderMito(b.dataset.org);
+}));
+renderMito('cytosol');
+
+const chloroData={
+  thyl:{k:"Membranes internes",t:"Tilacoides",b:["Fase lluminosa","Fotòlisi de l'aigua","Transport electrònic","Producció d'ATP i NADPH","Alliberament d'O₂"]},
+  stroma:{k:"Medi intern",t:"Estroma",b:["Cicle de Calvin","Fixació de CO₂","Ús d'ATP i NADPH","Síntesi de molècules orgàniques"]}
+};
+function renderChloro(key){
+  const x=chloroData[key];
+  document.getElementById('chloroInfo').innerHTML='<div class="info-kicker">'+x.k+'</div><h3>'+x.t+'</h3><ul>'+x.b.map(i=>'<li>'+i+'</li>').join('')+'</ul>';
+}
+document.querySelectorAll('[data-chloro]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-chloro]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderChloro(b.dataset.chloro);
+}));
+renderChloro('thyl');
+
+const recallItems=[
+  ["Glucòlisi","Citosol"],
+  ["Fermentació làctica","Citosol"],
+  ["β-oxidació","Matriu mitocondrial"],
+  ["Cicle de Krebs","Matriu mitocondrial"],
+  ["Cadena respiratòria","Membrana interna mitocondrial"],
+  ["Cicle de Calvin","Estroma del cloroplast"]
+];
+const recallOptions=["Citosol","Matriu mitocondrial","Membrana interna mitocondrial","Espai intermembranós","Estroma del cloroplast","Membrana dels tilacoides"];
+const recallGrid=document.getElementById('recallGrid');
+recallGrid.innerHTML=recallItems.map((x,i)=>'<div class="recall-item"><strong>'+x[0]+'</strong><select data-answer="'+x[1]+'"><option value="">Tria...</option>'+recallOptions.map(o=>'<option>'+o+'</option>').join('')+'</select></div>').join('');
+document.getElementById('checkRecall').addEventListener('click',()=>{
+  let score=0;
+  document.querySelectorAll('.recall-item').forEach(item=>{
+    const s=item.querySelector('select'),ok=s.value===s.dataset.answer;
+    item.classList.remove('correct','wrong');item.classList.add(ok?'correct':'wrong');if(ok)score++;
+  });
+  const el=document.getElementById('recallResult');el.textContent='Localitzacions: '+score+' / '+recallItems.length;el.className='result '+(score>=5?'good':'bad');
+});
 
 const banks={
 understand:[
