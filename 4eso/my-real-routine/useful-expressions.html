@@ -121,6 +121,39 @@
 .lp-home-link{display:inline-flex;align-items:center;text-decoration:none!important;color:inherit!important;font-weight:850!important;
   white-space:nowrap;padding:6px 8px;border-radius:9px}
 .lp-home-link:hover{background:rgba(255,255,255,.12)}
+
+/* Prevent top-bar overlap on medium-width screens */
+@media(max-width:1100px){
+  .topbar .toprow{
+    flex-wrap:wrap!important;
+    padding:8px 0!important;
+  }
+  .topbar .brand{
+    flex:1 1 auto!important;
+    min-width:0!important;
+  }
+  .topbar .brand>.lp-title{
+    white-space:normal!important;
+    max-width:280px!important;
+  }
+  .topbar .progress-shell{
+    flex:0 0 158px!important;
+    margin-left:auto!important;
+  }
+  .topbar .session-jump{
+    order:3!important;
+    width:100%!important;
+    margin-left:0!important;
+  }
+  .topbar .session-jump label{
+    display:none!important;
+  }
+  .topbar .session-jump select{
+    width:100%!important;
+    max-width:none!important;
+  }
+}
+
 </style>
 </head>
 <body>
