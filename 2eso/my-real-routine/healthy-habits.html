@@ -64,8 +64,23 @@ textarea{width:100%;min-height:175px;border:1px solid #c7dbd1;border-radius:12px
   <div class="section-card"><h3><span class="step-number">3</span> Build</h3><p class="instruction">Ordena les paraules per construir frases correctes que després podràs reutilitzar.</p><div class="builder-list" id="builderList" style="margin-top:14px"></div><div class="actions"><button class="btn" id="checkBuilders">Check sentences</button><button class="btn secondary" id="resetBuilders">Start again</button></div><div class="result" id="builderResult"></div></div>
 </section>
 <section class="panel" id="listeningPanel">
-  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Escolta com una alumna parla dels seus hàbits i identifica les idees i expressions que has treballat.</p></div><span class="pill">Listen & notice</span></div>
-  <div class="section-card"><p class="instruction">Escolta la Jamie parlant dels seus hàbits quotidians. Pots escoltar el text a velocitat normal o lenta.</p><div class="audio-card"><div class="audio-row"><button class="btn small" id="normalSpeed">▶ Listen</button><button class="btn small secondary" id="slowSpeed">Slow 0.8×</button><span class="audio-status" id="audioStatus">Ready to listen</span></div><p class="tiny">Tip: escolta una vegada per entendre la idea general i una segona vegada per respondre.</p></div><form id="listenForm"></form><div class="actions"><button class="btn" type="button" id="checkListen">Check listening</button></div><div class="result" id="listenResult"></div></div>
+  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Escolta un listening real de VOA Learning English sobre com prendre decisions saludables amb el menjar.</p></div><span class="pill">Real listening · VOA</span></div>
+  <div class="section-card">
+    <h3>Making Healthy Choices</h3>
+    <p class="instruction">VOA Learning English · Level 1 · 3:34. Escolta primer la idea general i després respon les preguntes.</p>
+    <div class="audio-card">
+      <audio class="audio-player" id="realAudio" controls preload="metadata"><source src="https://voa-audio.voanews.eu/vle/2017/01/30/e8edcdf8-a252-41eb-af50-d1337bbb614f_hq.mp3?download=1" type="audio/mpeg"></audio>
+      <div class="audio-row">
+        <button class="btn small" id="normalSpeed" type="button">Normal speed</button>
+        <button class="btn small secondary" id="slowSpeed" type="button">Slow 0.8×</button>
+        <a class="btn small secondary" href="https://learningenglish.voanews.com/a/lets-learn-english-lesson-44-making-healthy-choices/3688552.html" target="_blank" rel="noopener">Open original lesson ↗</a>
+        <span class="audio-status" id="audioStatus">Speed: normal</span>
+      </div>
+    </div>
+    <form id="listenForm"></form>
+    <div class="actions"><button class="btn" type="button" id="checkListen">Check listening</button></div>
+    <div class="result" id="listenResult"></div>
+  </div>
 </section>
 <section class="panel" id="readingPanel">
   <div class="panel-head"><div><h2>Reading</h2><p class="instruction">Llegeix el text de la teva ruta i identifica vocabulari, idees principals i detalls importants.</p></div><span class="pill">Read · Notice · Understand</span></div>
@@ -98,30 +113,49 @@ textarea{width:100%;min-height:175px;border:1px solid #c7dbd1;border-radius:12px
 <script>
 const alexText=`Hi, I’m Jamie. On school days, I always have breakfast before I leave home. I usually have toast, fruit and water. I take a bottle of water to school because I want to stay hydrated. At break time, I often eat fruit or a sandwich. I go home on foot three days a week, and I play basketball on Tuesdays and Thursdays. In the evening, I do my homework and then I take a short screen break. I try to stop using my phone before bed because it helps me wind down. I usually go to bed at half past ten, so I can get enough sleep.`;
 const vocabMap={
- insecure:[['Food & water',['have breakfast','drink water','eat fruit','eat vegetables','have a healthy snack']],['Sleep & rest',['go to bed early','get enough sleep','take a break']],['Movement & screens',['go on foot','play sport','spend time outdoors','limit screen time']]],
- safe:[['Balanced choices',['have a balanced meal','stay hydrated','eat regular meals','choose a healthy snack','cut down on sugary drinks']],['Rest & movement',['be active','take screen breaks','wind down before bed','get enough rest','spend less time on screens']]],
- daring:[['Healthy routines',['make healthy choices','build a healthy routine','make an effort to','get into a good habit','stick to a routine']],['Balance & change',['strike a balance','cut back on','make a small change','look after yourself','recharge']]]
+ insecure:[['Core habits',['have breakfast','drink water','eat fruit and vegetables','get enough sleep','be active','limit screen time']]],
+ safe:[['Useful healthy choices',['stay hydrated','have a balanced meal','take screen breaks','wind down before bed','cut down on sugary drinks']]],
+ daring:[['Reflect & improve',['make healthy choices','make an effort to','strike a balance','stick to a routine']]]
 };
 const ca={
-'have breakfast':'esmorzar','drink water':'beure aigua','eat fruit':'menjar fruita','eat vegetables':'menjar verdures','have a healthy snack':'fer un berenar / mos saludable',
-'go to bed early':'anar al llit d’hora','get enough sleep':'dormir prou','take a break':'fer una pausa','go on foot':'anar a peu','play sport':'fer esport','spend time outdoors':'passar temps a l’aire lliure','limit screen time':'limitar el temps de pantalla',
-'have a balanced meal':'fer un àpat equilibrat','stay hydrated':'mantenir-se hidratat/da','eat regular meals':'fer àpats regulars','choose a healthy snack':'triar un berenar saludable','cut down on sugary drinks':'reduir les begudes ensucrades',
-'be active':'mantenir-se actiu/va','take screen breaks':'fer pauses de pantalla','wind down before bed':'relaxar-se abans d’anar a dormir','get enough rest':'descansar prou','spend less time on screens':'passar menys temps amb pantalles',
-'make healthy choices':'prendre decisions saludables','build a healthy routine':'construir una rutina saludable','make an effort to':'fer un esforç per','get into a good habit':'agafar un bon hàbit','stick to a routine':'mantenir una rutina',
-'strike a balance':'trobar un equilibri','cut back on':'reduir','make a small change':'fer un petit canvi','look after yourself':'cuidar-se','recharge':'recuperar energia'};
+'have breakfast':'esmorzar',
+'drink water':'beure aigua',
+'eat fruit and vegetables':'menjar fruita i verdures',
+'get enough sleep':'dormir prou',
+'be active':'mantenir-se actiu/va',
+'limit screen time':'limitar el temps de pantalla',
+'stay hydrated':'mantenir-se hidratat/da',
+'have a balanced meal':'fer un àpat equilibrat',
+'take screen breaks':'fer pauses de pantalla',
+'wind down before bed':'relaxar-se abans d’anar a dormir',
+'cut down on sugary drinks':'reduir les begudes ensucrades',
+'make healthy choices':'prendre decisions saludables',
+'make an effort to':'fer un esforç per',
+'strike a balance':'trobar un equilibri',
+'stick to a routine':'mantenir una rutina'
+};
 const examples={
-'have breakfast':'I have breakfast every school day.',
-'stay hydrated':'I carry a bottle of water to stay hydrated.',
-'wind down before bed':'I read for ten minutes to wind down before bed.',
+'have breakfast':'I have breakfast before school.',
+'drink water':'I drink water during the school day.',
+'eat fruit and vegetables':'I eat fruit and vegetables every day.',
+'get enough sleep':'I try to get enough sleep on school nights.',
+'be active':'I am active after school.',
+'limit screen time':'I limit screen time before bed.',
+'stay hydrated':'I carry water to stay hydrated.',
+'have a balanced meal':'I try to have a balanced meal at lunch.',
+'take screen breaks':'I take screen breaks when I study.',
+'wind down before bed':'I read to wind down before bed.',
 'cut down on sugary drinks':'I am trying to cut down on sugary drinks.',
-'strike a balance':'I try to strike a balance between screen time and being active.',
-'make an effort to':'I make an effort to go to bed earlier on school nights.'
+'make healthy choices':'I try to make healthy choices during the week.',
+'make an effort to':'I make an effort to go to bed earlier.',
+'strike a balance':'I try to strike a balance between screens and being active.',
+'stick to a routine':'I stick to a routine on school days.'
 };
 function exampleFor(x){if(examples[x])return examples[x];return `I ${x}.`.replace('I go on foot.','I go to school on foot.').replace('I recharge.','I recharge by taking a short break.')}
 const levelInfo={
- insecure:{label:'Insecure',note:'Treballa hàbits saludables amb frases molt curtes i vocabulari molt freqüent.',builders:[['I','drink','water','every','day.'],['I','eat','fruit','at','break','time.'],['I','go','to','bed','early','on','school','nights.'],['I','go','to','school','on','foot.']],actions:['I have breakfast','I drink water','I eat fruit','I eat vegetables','I have a healthy snack','I take a break','I go on foot','I play sport','I limit screen time'],requirements:['Write 35–50 words.','Describe a classmate using he or she.','Use at least 2 healthy-habit expressions.','Use Then or because if you can.'],minWords:35,maxWords:50,connectors:['Then','because'],writingTask:'Escriu 35–50 paraules sobre alguns hàbits saludables d’un company o companya. Fes servir he o she i almenys 2 expressions treballades.',speakingTask:'Explica 3 o 4 hàbits saludables d’un company o companya. Fes servir he o she i almenys 2 expressions treballades.',speakingChecklist:['3–4 clear sentences','he / she','2 healthy-habit expressions','Speak slowly and clearly']},
- safe:{label:'Safe',note:'Explica hàbits amb més detall i dona una raó o un contrast senzill.',builders:[['She','stays','hydrated','during','the','school','day.'],['He','takes','screen','breaks','in','the','evening.'],['She','winds','down','before','bed.'],['He','cuts','down','on','sugary','drinks.']],actions:['She stays hydrated','He eats regular meals','She chooses a healthy snack','He is active','She takes screen breaks','He winds down before bed','She gets enough rest','He spends less time on screens'],requirements:['Write 70–90 words.','Describe a classmate using he or she.','Use at least 4 target expressions.','Use because and but or although.'],minWords:70,maxWords:90,connectors:['because','but','although','also','usually'],writingTask:'Escriu 70–90 paraules sobre els hàbits d’un company o companya. Inclou alimentació, descans o moviment, almenys 4 expressions i una raó o contrast.',speakingTask:'Explica els hàbits d’un company o companya en 4–5 frases. Inclou almenys 3 expressions i una raó o contrast.',speakingChecklist:['4–5 connected sentences','3 target expressions','because / but / although','Clear pronunciation']},
- daring:{label:'Daring',note:'Compara hàbits i reflexiona sobre petits canvis realistes amb llenguatge natural.',builders:[['I','try','to','strike','a','balance','between','screens','and','exercise.'],['She','makes','an','effort','to','get','enough','sleep.'],['We','both','try','to','make','healthy','choices.'],['He','could','make','a','small','change','to','his','evening','routine.']],actions:['We make healthy choices','She builds a healthy routine','He makes an effort to','We stick to a routine','I strike a balance','She cuts back on','He makes a small change','We look after ourselves'],requirements:['Write 100–120 words.','Compare your classmate’s habits with your own.','Use at least 5 target expressions.','Include cause, contrast and one respectful suggestion or reflection.'],minWords:100,maxWords:120,connectors:['because','although','whereas','however','so','both','while'],writingTask:'Escriu 100–120 paraules comparant els hàbits saludables d’un company o companya amb els teus. Inclou similituds, diferències i una reflexió o petit canvi realista.',speakingTask:'Compara els hàbits d’un company o companya amb els teus. Inclou almenys 4 expressions, una similitud, una diferència i una reflexió respectuosa.',speakingChecklist:['5+ connected sentences','4 target expressions','similarity + difference','reflection / realistic suggestion','Natural pace']}
+ insecure:{label:'Insecure',note:'Només el vocabulari essencial per parlar d’hàbits saludables.',builders:[['I','have','breakfast','before','school.'],['I','drink','water','during','the','day.'],['I','get','enough','sleep','on','school','nights.'],['I','limit','screen','time','before','bed.']],actions:['I have breakfast','I drink water','I eat fruit and vegetables','I get enough sleep','I am active','I limit screen time'],requirements:['Write 35–50 words.','Describe a classmate using he or she.','Use at least 2 target expressions.'],minWords:35,maxWords:50,connectors:['Then','because'],writingTask:'Escriu 35–50 paraules sobre alguns hàbits saludables d’un company o companya. Fes servir he o she i almenys 2 expressions treballades.',speakingTask:'Explica 3 o 4 hàbits saludables d’un company o companya. Fes servir he o she i almenys 2 expressions treballades.',speakingChecklist:['3–4 clear sentences','he / she','2 healthy-habit expressions','Speak slowly and clearly']},
+ safe:{label:'Safe',note:'Afegeix unes poques expressions per explicar hàbits amb més detall.',builders:[['She','stays','hydrated','during','the','day.'],['He','takes','screen','breaks','when','he','studies.'],['She','winds','down','before','bed.'],['He','cuts','down','on','sugary','drinks.']],actions:['She stays hydrated','He has a balanced meal','She takes screen breaks','He winds down before bed','She cuts down on sugary drinks'],requirements:['Write 70–90 words.','Describe a classmate using he or she.','Use at least 4 target expressions.','Use because and but or although.'],minWords:70,maxWords:90,connectors:['because','but','although','also'],writingTask:'Escriu 70–90 paraules sobre els hàbits d’un company o companya. Inclou almenys 4 expressions i una raó o contrast.',speakingTask:'Explica els hàbits d’un company o companya en 4–5 frases. Inclou almenys 3 expressions i una raó o contrast.',speakingChecklist:['4–5 connected sentences','3 target expressions','because / but / although','Clear pronunciation']},
+ daring:{label:'Daring',note:'Només quatre expressions extra per comparar i reflexionar, sense carregar més vocabulari.',builders:[['We','both','make','healthy','choices.'],['She','makes','an','effort','to','sleep','well.'],['I','try','to','strike','a','balance.'],['He','sticks','to','a','routine','during','the','week.']],actions:['We make healthy choices','She makes an effort to','I strike a balance','He sticks to a routine'],requirements:['Write 100–120 words.','Compare your classmate’s habits with your own.','Use at least 5 target expressions.','Include one respectful reflection.'],minWords:100,maxWords:120,connectors:['because','although','whereas','however','both'],writingTask:'Escriu 100–120 paraules comparant els hàbits saludables d’un company o companya amb els teus. Inclou similituds, diferències i una reflexió.',speakingTask:'Compara els hàbits d’un company o companya amb els teus. Inclou una similitud, una diferència i una reflexió respectuosa.',speakingChecklist:['5+ connected sentences','4 target expressions','similarity + difference','reflection','Natural pace']}
 };
 const readingData={
  insecure:{
@@ -163,28 +197,28 @@ const readingData={
 };
 const listening={
  insecure:[
-  {q:'What does Jamie always do before leaving home?',o:['Has breakfast','Plays basketball','Goes to bed'],a:0},
-  {q:'What does Jamie drink at breakfast?',o:['Water','Coffee','Soda'],a:0},
-  {q:'What does Jamie often eat at break time?',o:['Fruit or a sandwich','Ice cream','Nothing'],a:0},
-  {q:'How often does Jamie go home on foot?',o:['Three days a week','Every day','Never'],a:0},
-  {q:'When does Jamie play basketball?',o:['Tuesdays and Thursdays','Mondays only','At the weekend'],a:0},
-  {q:'What time does Jamie usually go to bed?',o:['10:30','9:00','12:00'],a:0}
+  {q:'Why does Anna want junk food?',o:['Because she is hungry','Because she is tired','Because she is late'],a:0},
+  {q:'Where does Ashley tell Anna to go?',o:['The Giant supermarket','A restaurant','A gym'],a:0},
+  {q:'What does Anna see in the supermarket?',o:['Lots of fruits and vegetables','Only cakes','Only drinks'],a:0},
+  {q:'What food does Junky want in the frozen aisle?',o:['Ice cream','Frozen peas','Salad'],a:0},
+  {q:'What does Healthy want Anna to buy at the bakery?',o:['Whole wheat bread','Donuts','Candy'],a:0},
+  {q:'What does Anna decide at the end?',o:['To buy healthy food and some junk food','To buy only junk food','To buy nothing'],a:0}
  ],
  safe:[
-  {q:'Why does Jamie take water to school?',o:['To stay hydrated','To wash a phone','To cook lunch'],a:0},
-  {q:'Which is a healthy snack in the listening?',o:['Fruit','Candy only','No snack'],a:0},
-  {q:'Which movement habit appears?',o:['Going home on foot','Driving everywhere','No activity'],a:0},
-  {q:'What does Jamie do after homework?',o:['Takes a short screen break','Plays basketball at midnight','Has breakfast'],a:0},
-  {q:'Why does Jamie stop using the phone before bed?',o:['It helps Jamie wind down','The phone is broken','School starts at night'],a:0},
-  {q:'Which expression best matches the final idea?',o:['get enough sleep','cut down on breakfast','skip water'],a:0}
+  {q:'What is Anna’s main problem at the beginning?',o:['She wants junk food but knows healthy food is better','She cannot find the supermarket','She does not like vegetables'],a:0},
+  {q:'Which food is described as mostly water?',o:['Celery','Ice cream','Bread'],a:0},
+  {q:'Which pair represents the argument in Anna’s mind?',o:['Healthy vs Junky','Fruit vs Water','Shopper vs Cashier'],a:0},
+  {q:'What does Healthy say Anna should eat more of?',o:['Vegetables','Donuts','Ice cream'],a:0},
+  {q:'What does Anna’s final decision suggest?',o:['Balance rather than perfection','Only junk food is acceptable','Healthy food should be avoided'],a:0},
+  {q:'Which expression best matches the lesson?',o:['make healthy choices','skip every meal','avoid all treats forever'],a:0}
  ],
  daring:[
-  {q:'Which two habits are connected to hydration and food?',o:['Carrying water and eating fruit or a sandwich','Using a phone and playing games','Sleeping and watching TV'],a:0},
-  {q:'What balance does Jamie’s afternoon show?',o:['Movement, homework and a screen break','Only homework','Only screens'],a:0},
-  {q:'Which habit could be described as “sticking to a routine”?',o:['Regular bedtime','Random meals','Changing sleep time every night'],a:0},
-  {q:'What cause-and-effect relationship is stated?',o:['Less phone before bed helps Jamie wind down','Basketball causes breakfast','Water causes screen time'],a:0},
-  {q:'Which statement is supported by the listening?',o:['Jamie has several realistic healthy habits','Jamie follows a perfect routine','Jamie never uses a phone'],a:0},
-  {q:'What is the best summary?',o:['Jamie combines food, hydration, movement, rest and screen habits','Jamie only cares about sport','Jamie has no routine'],a:0}
+  {q:'Why are Healthy and Junky characters useful in the listening?',o:['They represent Anna’s conflicting thoughts','They are supermarket workers','They are doctors'],a:0},
+  {q:'Which food choice is presented as the healthier bakery option?',o:['Whole wheat bread','Donuts','Ice cream'],a:0},
+  {q:'What is the tone of the conversation?',o:['Humorous but educational','Very formal','Completely serious and scientific'],a:0},
+  {q:'What does Anna reject at the end?',o:['The idea that she must choose only one extreme','All healthy food','All supermarket food'],a:0},
+  {q:'Which idea best connects to “strike a balance”?',o:['Including mostly healthy choices without demanding perfection','Eating only desserts','Never making choices'],a:0},
+  {q:'What is the best overall message?',o:['Healthy choices can include balance and moderation','Healthy eating means never eating treats','Junk food is always the best option'],a:0}
  ]
 };
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],shuffle=a=>[...a].sort(()=>Math.random()-.5);
@@ -212,23 +246,10 @@ $('#resetMatch').onclick=renderMatch;
 function practiceItems(){const d=deck(),size=10,start=practiceSet*size;return d.slice(start,start+size)}function firstWord(exp){return exp.split(' ')[0]}
 function renderPractice(){const d=deck(),items=practiceItems(),totalSets=Math.ceil(d.length/10);if(!items.length){practiceSet=0;return renderPractice()}$('#practiceSetLabel').textContent=`Set ${practiceSet+1} of ${totalSets}`;$('#practiceCoverage').textContent=`${Math.min(practiceSet*10+items.length,d.length)} / ${d.length} expressions reached`;const pool=[...new Set(d.map(x=>firstWord(x.expression)))];$('#practiceList').innerHTML='';items.forEach((item,i)=>{const ans=firstWord(item.expression),rest=item.expression.split(' ').slice(1).join(' '),opts=shuffle([ans,...shuffle(pool.filter(x=>x!==ans)).slice(0,3)]);const box=document.createElement('div');box.className='task';box.innerHTML=`${practiceSet*10+i+1}. <select><option value="">Choose…</option>${opts.map(x=>`<option>${x}</option>`).join('')}</select> ${rest}<div class="feedback"></div>`;box.dataset.answer=ans;$('#practiceList').appendChild(box)});$('#practiceResult').classList.remove('show')}
 $('#checkPractice').onclick=()=>{let score=0;$$('#practiceList .task').forEach(box=>{const good=box.querySelector('select').value===box.dataset.answer;box.classList.toggle('good',good);box.classList.toggle('bad',!good);box.querySelector('.feedback').textContent=good?'Correct!':'Look again at the complete expression.';box.querySelector('.feedback').className='feedback '+(good?'ok':'no');if(good)score++});$('#practiceResult').textContent=`${score} / ${$$('#practiceList .task').length} correct`;$('#practiceResult').classList.add('show');state().practiceSeen[practiceSet]=true;if(state().practiceSeen.filter(Boolean).length>=Math.ceil(deck().length/10))complete('practice');else save()};$('#nextPractice').onclick=()=>{practiceSet=(practiceSet+1)%Math.ceil(deck().length/10);renderPractice()};
-let listeningVoice=null;
-function playListening(rate){
-  if(!('speechSynthesis' in window)){ $('#audioStatus').textContent='Text-to-speech is not available in this browser.'; return; }
-  window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(alexText);
-  u.lang='en-US';
-  u.rate=rate;
-  const voices=window.speechSynthesis.getVoices();
-  const preferred=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith('en-us'))||voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith('en'));
-  if(preferred)u.voice=preferred;
-  u.onstart=()=>$('#audioStatus').textContent=rate<1?'Playing: slow 0.8×':'Playing: normal';
-  u.onend=()=>$('#audioStatus').textContent='Ready to listen again';
-  window.speechSynthesis.speak(u);
-}
-$('#normalSpeed').onclick=()=>playListening(1);
-$('#slowSpeed').onclick=()=>playListening(.8);
-function renderListening()function renderListening(){const form=$('#listenForm');form.innerHTML='';listening[level].forEach((q,i)=>{const box=document.createElement('div');box.className='question';box.innerHTML=`<p class="q-title">${i+1}. ${q.q}</p><div class="options">${q.o.map((o,j)=>`<label class="option"><input type="radio" name="listen${i}" value="${j}"><span>${o}</span></label>`).join('')}</div><div class="feedback" id="lf${i}"></div>`;form.appendChild(box)});$('#listenResult').classList.remove('show')}
+const audio=$('#realAudio');
+$('#normalSpeed').onclick=()=>{audio.playbackRate=1;$('#audioStatus').textContent='Speed: normal';audio.play()};
+$('#slowSpeed').onclick=()=>{audio.playbackRate=.8;$('#audioStatus').textContent='Speed: slow 0.8×';audio.play()};
+function renderListening()function renderListening()function renderListening(){const form=$('#listenForm');form.innerHTML='';listening[level].forEach((q,i)=>{const box=document.createElement('div');box.className='question';box.innerHTML=`<p class="q-title">${i+1}. ${q.q}</p><div class="options">${q.o.map((o,j)=>`<label class="option"><input type="radio" name="listen${i}" value="${j}"><span>${o}</span></label>`).join('')}</div><div class="feedback" id="lf${i}"></div>`;form.appendChild(box)});$('#listenResult').classList.remove('show')}
 $('#checkListen').onclick=()=>{let score=0;listening[level].forEach((q,i)=>{const c=$(`input[name=listen${i}]:checked`);if(c&&+c.value===q.a)score++;$('#lf'+i).textContent=c&&+c.value===q.a?'Correct!':'Listen again.';$('#lf'+i).className='feedback '+(c&&+c.value===q.a?'ok':'no')});$('#listenResult').textContent=`${score} / ${listening[level].length} correct`;$('#listenResult').classList.add('show');if(score>=listening[level].length-1)complete('listen')};
 function renderReading(){
   const data=readingData[level];
