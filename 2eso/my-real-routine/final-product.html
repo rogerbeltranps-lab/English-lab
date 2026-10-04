@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1f6b52">
+<title>Learning Path 6 · Final product</title>
+<style>
+:root{--accent:#1f6b52;--dark:#174d3d;--soft:#e9f5ef;--soft2:#d8eee3;--cream:#fbfcf8;--ink:#20312b;--muted:#66766f;--line:#d8e6df;--shadow:0 14px 38px rgba(31,107,82,.10)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--cream);color:var(--ink);line-height:1.5}button,textarea,input{font:inherit}.wrap{width:min(1080px,calc(100% - 30px));margin:auto}
+.topbar{position:sticky;top:0;z-index:30;background:var(--dark);color:#fff}.toprow{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;align-items:center;gap:10px;font-weight:850}.brand a{color:#fff;text-decoration:none}.brand-mark{width:38px;height:38px;min-width:38px;border-radius:12px;display:grid;place-items:center;background:#fff;color:var(--accent);font-size:18px;font-weight:900}.brand-title{font-size:16px;line-height:1.15;font-weight:850;white-space:nowrap}.brand-title small{display:block;font-size:11px;line-height:1.2;color:#dcebe5;margin-top:2px}.lp-home-link{display:inline-flex;align-items:center;text-decoration:none!important;color:inherit!important;font-weight:850!important;white-space:nowrap;padding:6px 8px;border-radius:9px}.lp-home-link:hover{background:rgba(255,255,255,.12)}
+.session-jump{display:flex;align-items:center;gap:8px;margin-left:auto}.session-jump label{display:none}.session-jump select{max-width:260px;height:38px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:8px 30px 8px 10px;font-size:15px;font-weight:700;outline:none}.session-jump option{color:#1f2937;background:#fff}.progress-shell{width:150px}.progress-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:#e7f1ed}.progress-track{height:5px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}.progress-bar{height:100%;width:0;background:#fff;border-radius:99px;transition:.25s}
+.hero{padding:38px 0 28px;background:linear-gradient(135deg,var(--soft) 0%,var(--cream) 60%,#fff 100%);border-bottom:1px solid var(--line)}.eyebrow{display:inline-flex;background:var(--soft2);color:var(--dark);padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.05em}h1{margin:14px 0 8px;color:var(--dark);font-size:clamp(2.1rem,6vw,4rem);line-height:1.03}.lead{max-width:820px;margin:0;color:var(--muted);font-size:1.05rem}.hero-note{margin-top:14px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:14px;color:var(--muted);font-size:.94rem}.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.route{border:1px solid var(--line);background:#fff;border-radius:18px;padding:15px;text-align:left;color:var(--ink);cursor:pointer}.route strong{display:block;color:var(--dark)}.route span{display:block;color:var(--muted);font-size:.84rem;margin-top:3px}.route.active{border:2px solid var(--accent);background:var(--soft)}
+main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 1px 14px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:12px;padding:10px 15px;font-weight:780;cursor:pointer}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}.panel{display:none;background:#fff;border:1px solid var(--line);border-radius:24px;padding:clamp(19px,4vw,34px);box-shadow:var(--shadow)}.panel.active{display:block}.panel-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}h2{margin:0 0 6px;color:var(--dark);font-size:clamp(1.5rem,3vw,2.1rem)}h3{color:var(--dark);margin:0 0 8px}.instruction{margin:0;color:var(--muted)}.pill{white-space:nowrap;background:var(--soft);color:var(--dark);border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:850}.section-card{border:1px solid var(--line);border-radius:18px;background:#f8fbf9;padding:18px;margin:15px 0}.step-number{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--accent);color:#fff;font-size:.82rem;margin-right:7px}.task-grid,.site-grid,.check-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}.mini-card{border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff}.mini-card strong{display:block;color:var(--dark);margin-bottom:5px}.mini-card p{margin:0;color:var(--muted);font-size:.92rem}.question-list{display:grid;gap:8px;margin-top:12px}.question-chip{padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}.level-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;margin-top:12px}.level-box ul{margin:8px 0 0;padding-left:20px;color:var(--muted)}.level-box li{margin:6px 0}.model{padding:14px;border-radius:13px;background:#fff;border:1px solid var(--line);font-weight:650;color:var(--ink)}textarea{width:100%;min-height:160px;border:1px solid var(--line);border-radius:12px;padding:12px;resize:vertical;background:#fff}.checklist{display:grid;gap:8px;margin-top:14px}.checkitem{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}.checkitem input{margin-top:4px;accent-color:var(--accent)}.callout{border-left:4px solid var(--accent);background:var(--soft);border-radius:0 14px 14px 0;padding:14px 16px;margin:14px 0;color:var(--dark)}.btn{border:0;border-radius:12px;padding:10px 15px;font-weight:800;background:var(--accent);color:#fff;cursor:pointer}.btn.secondary{background:#fff;color:var(--dark);border:1px solid var(--line)}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.result{display:none;margin-top:15px;padding:13px;border-radius:12px;background:var(--soft);color:var(--dark);font-weight:760}.result.show{display:block}.footer-note{text-align:center;color:var(--muted);font-size:.86rem;padding-top:20px}
+@media(max-width:1050px){.toprow{flex-wrap:wrap;padding:8px 0}.session-jump{order:3;width:100%;margin-left:0}.session-jump select{width:100%;max-width:none}}
+@media(max-width:760px){.routes,.task-grid,.site-grid,.check-grid{grid-template-columns:1fr}.panel-head{display:block}.pill{display:inline-block;margin-top:8px}.progress-shell{margin-left:auto;width:112px}.brand-title{display:none}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap toprow">
+  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← My Real Routine</a><span class="brand-mark">6</span><span class="brand-title">Final product<small>2 ESO · My Real Routine · Learning Path 6</small></span></div>
+  <div class="session-jump">
+    <label for="sessionJump">Learning Path</label>
+    <select id="sessionJump" aria-label="Go to another Learning Path session">
+      <option value="getting-started.html">1 · Getting started</option>
+      <option value="a-day-in-my-life.html">2 · Routine expressions</option>
+      <option value="same-day-different-person.html">3 · Same day, different person</option>
+      <option value="present-simple-grammar.html">4 · Present Simple grammar</option>
+      <option value="healthy-habits.html">5 · Healthy habits</option>
+      <option value="final-product.html" selected>6 · Final product</option>
+    </select>
+  </div>
+  <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 6</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
+</div></div>
+
+<header class="hero"><div class="wrap">
+  <span class="eyebrow">Learning Path 6 · Final challenge</span>
+  <h1>Final product</h1>
+  <p class="lead">Turn a real interview into a simple Google Site, then record your screen while you explain your classmate’s routine in English.</p>
+  <div class="hero-note"><strong>Your Google Site is your visual support.</strong> Do not read every sentence. Use it to help you explain the routine clearly.</div>
+  <div class="routes" aria-label="Choose your route">
+    <button class="route active" data-level="insecure"><strong>Insecure</strong><span>Short and clear · lots of support</span></button>
+    <button class="route" data-level="safe"><strong>Safe</strong><span>Organised explanation · reasons and contrast</span></button>
+    <button class="route" data-level="daring"><strong>Daring</strong><span>Compare · connect · reflect</span></button>
+  </div>
+</div></header>
+
+<main class="wrap">
+<nav class="tabs" aria-label="Final product sections">
+  <button class="tab active" data-panel="mission">1 Mission</button>
+  <button class="tab" data-panel="interview">2 Interview</button>
+  <button class="tab" data-panel="site">3 Google Site</button>
+  <button class="tab" data-panel="prepare">4 Prepare</button>
+  <button class="tab" data-panel="record">5 Record</button>
+  <button class="tab" data-panel="submit">6 Check & submit</button>
+</nav>
+
+<section class="panel active" id="mission">
+  <div class="panel-head"><div><h2>Your mission</h2><p class="instruction">Show what you can do with the language from this Learning Situation.</p></div><span class="pill">Interview → Site → Speaking</span></div>
+  <div class="section-card">
+    <h3>What are you creating?</h3>
+    <div class="task-grid">
+      <div class="mini-card"><strong>1 · A real interview</strong><p>Ask a classmate about their school-day routine and healthy habits.</p></div>
+      <div class="mini-card"><strong>2 · A Google Site</strong><p>Organise the most important information with short text and useful visuals.</p></div>
+      <div class="mini-card"><strong>3 · An oral presentation</strong><p>Record your screen while you move through the Site and explain the routine.</p></div>
+      <div class="mini-card"><strong>4 · A short reflection</strong><p>Notice one positive habit. Daring students also compare it with their own routine.</p></div>
+    </div>
+  </div>
+  <div class="section-card">
+    <h3 id="missionLevelTitle">Insecure route</h3>
+    <div class="level-box" id="missionLevel"></div>
+    <div class="actions"><button class="btn" data-complete="mission">Mission understood ✓</button></div>
+  </div>
+</section>
+
+<section class="panel" id="interview">
+  <div class="panel-head"><div><h2>Interview your classmate</h2><p class="instruction">Take short notes. You do not need to write complete sentences while your classmate speaks.</p></div><span class="pill">Real interaction</span></div>
+  <div class="section-card">
+    <h3><span class="step-number">1</span> Ask useful questions</h3>
+    <div class="question-list" id="interviewQuestions"></div>
+  </div>
+  <div class="section-card">
+    <h3><span class="step-number">2</span> Your notes</h3>
+    <textarea id="interviewNotes" placeholder="Write short notes from the interview here..."></textarea>
+    <div class="actions"><button class="btn" data-complete="interview">Interview complete ✓</button></div>
+  </div>
+</section>
+
+<section class="panel" id="site">
+  <div class="panel-head"><div><h2>Build your Google Site</h2><p class="instruction">Keep it visual and simple. The Site should support your speaking, not replace it.</p></div><span class="pill">Digital product</span></div>
+  <div class="section-card">
+    <h3><span class="step-number">1</span> Suggested structure</h3>
+    <div class="site-grid">
+      <div class="mini-card"><strong>Home</strong><p>Title + classmate’s first name or invented name + a simple image or icon.</p></div>
+      <div class="mini-card"><strong>Morning</strong><p>Wake up, breakfast, getting ready and going to school.</p></div>
+      <div class="mini-card"><strong>After school</strong><p>Getting home, homework, free time, sport or other activities.</p></div>
+      <div class="mini-card"><strong>Evening</strong><p>Dinner, screens, winding down and bedtime.</p></div>
+      <div class="mini-card"><strong>Healthy habits</strong><p>One or more habits connected to food, water, sleep, movement or screen time.</p></div>
+      <div class="mini-card" id="daringSiteCard"><strong>Compare</strong><p>A small section showing one similarity or difference between your routines.</p></div>
+    </div>
+  </div>
+  <div class="section-card">
+    <h3><span class="step-number">2</span> Keep it clear</h3>
+    <div class="callout">Use <strong>short sentences, headings, icons or appropriate images</strong>. Avoid long paragraphs. Never publish private information about your classmate.</div>
+    <div class="checklist">
+      <label class="checkitem"><input type="checkbox" data-site-check><span>I use <strong>he / she + Present Simple</strong> correctly.</span></label>
+      <label class="checkitem"><input type="checkbox" data-site-check><span>I include routine expressions from the Learning Path.</span></label>
+      <label class="checkitem"><input type="checkbox" data-site-check><span>My Site is easy to follow and not overloaded with text.</span></label>
+      <label class="checkitem"><input type="checkbox" data-site-check><span>I do not include private or sensitive information.</span></label>
+    </div>
+    <div class="actions"><button class="btn" id="finishSite">My Site is ready ✓</button></div>
+    <div class="result" id="siteResult"></div>
+  </div>
+</section>
+
+<section class="panel" id="prepare">
+  <div class="panel-head"><div><h2>Prepare what you will say</h2><p class="instruction">Plan your explanation before you record. Use the Site as a guide, but speak to your audience.</p></div><span class="pill">Plan → Rehearse</span></div>
+  <div class="section-card">
+    <h3>Model structure</h3>
+    <div class="model" id="speakingModel"></div>
+  </div>
+  <div class="section-card">
+    <h3>Your speaking plan</h3>
+    <p class="instruction" id="speakingTask"></p>
+    <textarea id="speakingPlan" placeholder="Write keywords or short sentences for your presentation..."></textarea>
+    <div class="callout"><strong>Tip:</strong> Practise once without recording. Then try again looking less at your notes.</div>
+    <div class="actions"><button class="btn" data-complete="prepare">I have rehearsed ✓</button></div>
+  </div>
+</section>
+
+<section class="panel" id="record">
+  <div class="panel-head"><div><h2>Record your presentation</h2><p class="instruction">Open your Google Site and record your screen while you explain it in English.</p></div><span class="pill">Screen + voice</span></div>
+  <div class="section-card">
+    <h3><span class="step-number">1</span> Before you start</h3>
+    <div class="check-grid">
+      <div class="mini-card"><strong>Open your Site</strong><p>Start on the home page and close tabs you do not need.</p></div>
+      <div class="mini-card"><strong>Check your microphone</strong><p>Make sure your voice can be heard clearly.</p></div>
+      <div class="mini-card"><strong>Know your route</strong><p>Decide which Site sections you will show and in what order.</p></div>
+      <div class="mini-card"><strong>Speak, do not read</strong><p>Use your notes only when you need them.</p></div>
+    </div>
+  </div>
+  <div class="section-card">
+    <h3><span class="step-number">2</span> While you record</h3>
+    <div class="callout">Move through the Site slowly. Give your audience time to see each section while you explain it.</div>
+    <div class="level-box" id="recordRequirements"></div>
+    <div class="actions"><button class="btn" data-complete="record">Recording finished ✓</button></div>
+  </div>
+</section>
+
+<section class="panel" id="submit">
+  <div class="panel-head"><div><h2>Check & submit</h2><p class="instruction">Watch your recording once and check the final product before you hand it in.</p></div><span class="pill">Final check</span></div>
+  <div class="section-card">
+    <h3>Final checklist</h3>
+    <div class="checklist" id="finalChecklist"></div>
+    <div class="actions"><button class="btn" id="finishFinal">Final product ready ✓</button><button class="btn secondary" id="resetProgress">Reset checklist</button></div>
+    <div class="result" id="finalResult">Ready to submit. Make sure you share both the Google Site link and the recording in the place indicated by your teacher.</div>
+  </div>
+  <div class="section-card">
+    <h3>What matters most?</h3>
+    <div class="task-grid">
+      <div class="mini-card"><strong>Speaking</strong><p>Clear, understandable and organised.</p></div>
+      <div class="mini-card"><strong>Language</strong><p>Present Simple, useful expressions and connectors from the Learning Path.</p></div>
+      <div class="mini-card"><strong>Google Site</strong><p>Useful visual support with clear, short written English.</p></div>
+      <div class="mini-card"><strong>Process</strong><p>Interview, planning, revision and respectful reflection.</p></div>
+    </div>
+  </div>
+</section>
+
+<p class="footer-note">Your notes and progress are saved on this device.</p>
+</main>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const storageKey='finalProduct2ESO';
+let level=localStorage.getItem(storageKey+'Level')||'insecure';
+let state=JSON.parse(localStorage.getItem(storageKey)||'{"done":{},"notes":"","plan":""}');
+
+const data={
+ insecure:{
+   mission:['Present your classmate’s routine.','Use 4–6 clear ideas.','Use he / she + Present Simple.','Use basic routine expressions.','Include one positive healthy habit.'],
+   questions:['What time do you wake up?','What do you do before school?','What do you do after school?','What do you do in the evening?','What time do you go to bed?','What is one healthy habit you have?'],
+   task:'Prepare 4–6 short, clear ideas about your classmate’s routine.',
+   model:'This is Alex. He wakes up at seven. He has breakfast and goes to school at eight. After school, he gets home and does his homework. In the evening, he winds down and goes to bed at ten. He also drinks water during the day.',
+   record:['About 45–60 seconds is enough.','Use 4–6 clear ideas.','Speak slowly and clearly.','Use the Site to help you, but do not read everything.'],
+   checklist:['My Site has the main parts of the routine.','I use he / she correctly.','I use Present Simple.','I use routine expressions from the Learning Path.','I mention one positive healthy habit.','My voice is clear in the recording.']
+ },
+ safe:{
+   mission:['Present your classmate’s routine in a clear sequence.','Use several target expressions.','Use because and but or although.','Include one positive healthy habit.','Explain at least one reason or contrast.'],
+   questions:['What time do you usually wake up?','What do you normally do before school?','How do you get to school?','What do you do when you get home?','What do you usually do in the evening?','What helps you stay healthy during the week?','Is there a habit you would like to improve?'],
+   task:'Prepare a clear presentation of your classmate’s routine. Include a reason or contrast.',
+   model:'This is Mia. She usually wakes up at half past six because she needs time to get ready. She has breakfast before school and then heads out. After school, she gets home and does her homework. Although she sometimes feels tired, she plays volleyball twice a week. In the evening, she winds down by listening to music and usually turns in at about ten thirty.',
+   record:['Aim for about 1–1½ minutes.','Sequence the routine clearly.','Use several target expressions.','Include because and but or although.','Do not read your Site word for word.'],
+   checklist:['My Site is organised into clear sections.','I use he / she + Present Simple accurately.','I use several target expressions.','I use because and a contrast connector.','I mention and explain a healthy habit.','My presentation is clear and organised.','I speak more than I read.']
+ },
+ daring:{
+   mission:['Present your classmate’s routine and compare it with your own.','Use similarities and differences.','Use richer connectors and natural expressions.','Include a brief respectful reflection on healthy habits.'],
+   questions:['What does a normal school day look like for you?','Which part of your routine is always the same?','What do you do after school and why?','How do you usually wind down in the evening?','Which healthy habit are you happy with?','Which habit would you like to improve?','How often do you do sport or other active things?','What is one thing that makes your routine different from mine?'],
+   task:'Prepare a connected presentation. Present your classmate’s routine, compare at least one habit with your own and finish with a short reflection.',
+   model:'This is Leo. On school days, he usually gets up earlier than I do, whereas we both head out at about the same time. After school, he gets down to his homework immediately because he prefers to relax later. I tend to take a break first. We both try to stay active, although we do different sports. I think his routine is quite balanced because he makes time to wind down before bed.',
+   record:['Aim for about 1½–2 minutes.','Include similarities and differences.','Use richer connectors such as whereas, although or however.','Use natural routine expressions.','Finish with a brief respectful reflection.'],
+   checklist:['My Site shows my classmate’s routine clearly.','I use accurate Present Simple and third person forms.','I use natural target expressions.','I include similarities and differences.','I use varied connectors.','I reflect respectfully on healthy habits.','My presentation sounds prepared but not read.']
+ }
+};
+
+function save(){state.notes=$('#interviewNotes').value;state.plan=$('#speakingPlan').value;localStorage.setItem(storageKey,JSON.stringify(state));localStorage.setItem(storageKey+'Level',level);updateProgress()}
+function complete(k){state.done[k]=true;save()}
+function updateProgress(){const keys=['mission','interview','site','prepare','record','submit'];const n=keys.filter(k=>state.done[k]).length;$('#progressLabel').textContent=level[0].toUpperCase()+level.slice(1);$('#progressText').textContent=n+' / 6';$('#progressBar').style.width=(n/6*100)+'%'}
+function setLevel(x){level=x;$$('.route').forEach(b=>b.classList.toggle('active',b.dataset.level===x));render();save()}
+$$('.route').forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
+
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab,.panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#'+t.dataset.panel).classList.add('active');window.scrollTo({top:document.querySelector('main').offsetTop-64,behavior:'smooth'})});
+
+function render(){
+ const d=data[level];
+ $('#missionLevelTitle').textContent=d?level[0].toUpperCase()+level.slice(1)+' route':'';
+ $('#missionLevel').innerHTML='<ul>'+d.mission.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+ $('#interviewQuestions').innerHTML=d.questions.map((q,i)=>'<div class="question-chip"><strong>'+(i+1)+'.</strong> '+q+'</div>').join('');
+ $('#speakingTask').textContent=d.task;
+ $('#speakingModel').textContent=d.model;
+ $('#recordRequirements').innerHTML='<ul>'+d.record.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+ $('#finalChecklist').innerHTML=d.checklist.map((x,i)=>'<label class="checkitem"><input type="checkbox" data-final-check="'+i+'"><span>'+x+'</span></label>').join('');
+ $('#daringSiteCard').style.display=level==='daring'?'block':'none';
+ updateProgress();
+}
+$$('[data-complete]').forEach(b=>b.onclick=()=>complete(b.dataset.complete));
+$('#finishSite').onclick=()=>{const boxes=$$('[data-site-check]');if(boxes.every(x=>x.checked)){complete('site');$('#siteResult').textContent='Your Google Site is ready to support your presentation.';$('#siteResult').classList.add('show')}else{$('#siteResult').textContent='Check the four points before you continue.';$('#siteResult').classList.add('show')}};
+$('#finishFinal').onclick=()=>{const boxes=$$('[data-final-check]');if(boxes.length&&boxes.every(x=>x.checked)){complete('submit');$('#finalResult').classList.add('show')}else{$('#finalResult').textContent='Complete the checklist first. Watch your recording again if you are not sure.';$('#finalResult').classList.add('show')}};
+$('#resetProgress').onclick=()=>{if(confirm('Reset the final-product checklist and notes?')){state={done:{},notes:'',plan:''};localStorage.removeItem(storageKey);$('#interviewNotes').value='';$('#speakingPlan').value='';$$('input[type=checkbox]').forEach(x=>x.checked=false);$('#finalResult').classList.remove('show');$('#siteResult').classList.remove('show');updateProgress()}};
+$('#interviewNotes').value=state.notes||'';$('#speakingPlan').value=state.plan||'';
+$('#interviewNotes').addEventListener('input',save);$('#speakingPlan').addEventListener('input',save);
+$('#sessionJump').onchange=e=>{if(e.target.value)location.href=e.target.value};
+render();
+</script>
+</body>
+</html>
