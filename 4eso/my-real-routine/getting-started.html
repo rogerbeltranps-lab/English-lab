@@ -57,15 +57,24 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 </section>
 
 <section class="panel" id="listen">
-  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Listen to a short routine and catch the main ideas.</p></div><span class="pill">6 questions</span></div>
+  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Listen to real English and catch the main ideas. You do not need to understand every word.</p></div><span class="pill">Real audio · ELLLO</span></div>
   <div class="section-card">
-    <div class="actions" style="margin-top:0"><button class="btn" id="playListen">▶ Listen</button><button class="btn secondary" id="playSlow">Slow 0.8×</button><span class="instruction" id="audioStatus">Ready</span></div>
+    <h3>Daily Routine</h3>
+    <p class="instruction">Hear Gareth describe his weekday and weekend routine, commuting and evening habits.</p>
+    <div class="actions" style="margin-top:14px">
+      <audio id="realAudio" controls preload="metadata" style="width:100%"><source src="https://www.elllo.org/Audio/A1051/1092-Gareth-Routine.mp3" type="audio/mpeg"></audio>
+    </div>
+    <div class="actions">
+      <button class="btn" id="normalSpeed" type="button">Normal speed</button>
+      <button class="btn secondary" id="slowSpeed" type="button">Slow 0.8×</button>
+      <a class="btn secondary" href="https://www.elllo.org/english/1051/1092-Gareth-Routine.htm" target="_blank" rel="noopener" style="text-decoration:none">Open original lesson ↗</a>
+      <span class="instruction" id="audioStatus">Speed: normal</span>
+    </div>
     <form id="listenForm"></form>
-    <div class="actions"><button class="btn" id="checkListen">Check listening</button></div>
+    <div class="actions"><button class="btn" id="checkListen" type="button">Check listening</button></div>
     <div class="result" id="listenResult"></div>
   </div>
 </section>
-
 <section class="panel" id="read">
   <div class="panel-head"><div><h2>Reading</h2><p class="instruction">Read a short routine and notice ideas you already understand.</p></div><span class="pill">6 questions</span></div>
   <div class="section-card">
@@ -94,8 +103,7 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 </main>
 
 <script>
-const listeningText="Hi, I’m Alex. On weekdays, I usually head out at eight. After school, I get home and take a short break before I get down to my homework. I try to stay hydrated during the day, and in the evening I limit screen time so I can wind down before bed. I do not follow the same routine every day, but I try to get enough sleep.";
-const listening=[{"q":"What time does Alex usually head out?","o":["At eight","At six","At ten"],"a":0},{"q":"What happens before homework?","o":["A short break","Dinner","Bedtime"],"a":0},{"q":"Which phrase means Alex starts working seriously?","o":["gets down to homework","heads out","winds down"],"a":0},{"q":"Which healthy habit appears during the day?","o":["staying hydrated","skipping meals","avoiding all breaks"],"a":0},{"q":"Why does Alex limit screen time in the evening?","o":["To wind down before bed","To start school","To eat dinner"],"a":0},{"q":"What is the main idea?","o":["Alex tries to keep a balanced routine","Alex follows exactly the same day every day","Alex never studies"],"a":0}];
+const listening=[{"q":"What is Gareth’s routine like?","o":["A little irregular","Exactly the same every day","Only a weekend routine"],"a":0},{"q":"How does he commute on weekdays?","o":["By bus and train","Only on foot","By bike"],"a":0},{"q":"What time does he usually wake up on weekdays?","o":["Around 6:00","Around 9:00","Around 11:00"],"a":0},{"q":"What time does he get home?","o":["Around sevenish","Around noon","Around four"],"a":0},{"q":"What does he usually do in the evening?","o":["Relaxes with his family, watches a movie or reads","Goes straight to work","Exercises all night"],"a":0},{"q":"What contrast does Gareth describe about himself?","o":["Night owl vs early bird","Healthy vs unhealthy food","Weekday vs school holiday"],"a":0}];
 const reading={"text":"<p>Maya and Leo both have busy weekdays. Maya usually gets down to her homework soon after she gets home, whereas Leo takes a short break first. They both try to stay hydrated and get enough sleep. Maya limits screen time before bed, while Leo prefers to wind down by listening to music. Their routines are different, but both try to find a balance between schoolwork and rest.</p>","qs":[["Who starts homework sooner?",["Maya","Leo","Neither"],0],["What does Leo do first?",["Takes a short break","Goes to bed","Has breakfast"],0],["Which habit do they share?",["They try to stay hydrated","They never use screens","They go to bed at the same time"],0],["How does Maya wind down?",["She limits screen time","She goes to school","She skips sleep"],0],["What contrast word appears?",["whereas","because","so"],0],["What is the main idea?",["Different routines can still aim for balance","Everyone needs the same routine","Rest is not important"],0]]};
 const speakTask={"insecure":"Give a short description of your own routine in 4–5 sentences.","safe":"Compare one part of your routine with a classmate’s routine.","daring":"Compare routines and briefly explain which habit helps you feel more balanced."};
 const speakModel={"insecure":"I usually head out at eight. After school, I get home and take a short break. Then I get down to my homework.","safe":"My classmate gets down to homework immediately, whereas I take a short break first. We both try to stay hydrated during the day.","daring":"My classmate and I have different routines. I take more breaks while studying, whereas she limits screen time more consistently. Both habits can help us keep a better balance."};
@@ -116,18 +124,9 @@ $$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.re
 $$(".choice").forEach(b=>b.onclick=()=>b.classList.toggle("selected"));
 $("#finishQuick").onclick=()=>{complete("quick");$("#quickResult").classList.add("show")};
 
-function play(rate){
-  if(!("speechSynthesis" in window)){$("#audioStatus").textContent="Text-to-speech is not available.";return}
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(listeningText);u.lang="en-US";u.rate=rate;
-  const voices=speechSynthesis.getVoices();
-  const v=voices.find(x=>x.lang&&x.lang.toLowerCase().startsWith("en-us"))||voices.find(x=>x.lang&&x.lang.toLowerCase().startsWith("en"));
-  if(v)u.voice=v;
-  u.onstart=()=>$("#audioStatus").textContent=rate<1?"Playing slowly":"Playing";
-  u.onend=()=>$("#audioStatus").textContent="Ready";
-  speechSynthesis.speak(u)
-}
-$("#playListen").onclick=()=>play(1);$("#playSlow").onclick=()=>play(.8);
+const audio=$("#realAudio");
+$("#normalSpeed").onclick=()=>{audio.playbackRate=1;$("#audioStatus").textContent="Speed: normal";audio.play()};
+$("#slowSpeed").onclick=()=>{audio.playbackRate=.8;$("#audioStatus").textContent="Speed: slow 0.8×";audio.play()};
 
 function renderQuestions(formId,data,prefix){
   const f=$(formId);f.innerHTML="";
