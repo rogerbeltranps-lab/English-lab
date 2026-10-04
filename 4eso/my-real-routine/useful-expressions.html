@@ -117,11 +117,15 @@
   .topbar .session-jump label,.topbar .jump label{display:none!important}
   .topbar .session-jump select,.topbar .jump select{width:100%!important;max-width:none!important}
 }
+
+.lp-home-link{display:inline-flex;align-items:center;text-decoration:none!important;color:inherit!important;font-weight:850!important;
+  white-space:nowrap;padding:6px 8px;border-radius:9px}
+.lp-home-link:hover{background:rgba(255,255,255,.12)}
 </style>
 </head>
 <body>
   <div class="topbar"><div class="wrap toprow">
-  <div class="brand"><a href="index.html" style="color:inherit;text-decoration:none">← My Real Routine</a><span class="logo">3</span><span class="lp-title">Phrasal verbs in a daily routine<small>4 ESO · My Real Routine · Learning Path 3</small></span></div>
+  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html" style="color:inherit;text-decoration:none">← My Real Routine</a><span class="logo">3</span><span class="lp-title">Phrasal verbs in a daily routine<small>4 ESO · My Real Routine · Learning Path 3</small></span></div>
   <div class="session-jump"><label for="sessionJump">Learning Path</label><select id="sessionJump" aria-label="Go to another Learning Path session">
     <option value="getting-started.html">1 · Getting started</option>
     <option value="a-day-in-real-life.html">2 · A day in real life</option>
