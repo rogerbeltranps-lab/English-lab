@@ -124,7 +124,7 @@ textarea{width:100%;min-height:175px;border:1px solid #c7dbd1;border-radius:12px
   <div class="section-card"><h3>Model</h3><div class="model-box" id="speakingModel"></div></div>
   <div class="section-card"><h3>Prepare</h3><p class="instruction" id="speakingTask"></p><div id="speakingSupport"></div><div class="field" style="margin-top:18px"><label for="speakingPlan"><strong>Write what you are going to say</strong></label><p class="tiny" id="speakingPlanHelp" style="margin:5px 0 8px">Escriu aquí les frases que després diràs. Pots mirar-les mentre practiques.</p><textarea id="speakingPlan" placeholder="Write your speaking here..."></textarea></div><ul class="checklist" id="speakingChecklist"></ul></div>
   <div class="section-card"><h3>Record</h3><div class="record-box"><div class="actions" style="justify-content:flex-start"><button class="btn" id="startRecord">● Record</button><button class="btn secondary" id="stopRecord" disabled>■ Stop</button><button class="btn secondary" id="downloadWav" disabled>Download WAV</button></div><div class="record-status" id="recordStatus">Ready to record.</div><audio id="recordedAudio" controls style="width:100%;display:none"></audio></div></div>
-  <div class="section-card"><h3>Transcript</h3><p class="instruction">Si el navegador permet transcripció de veu, apareixerà aquí mentre graves. Revisa-la abans d’enviar el feedback.</p><p class="tiny" id="speechSupportStatus"></p><textarea id="speechTranscript" class="transcript-box" placeholder="Your transcript will appear here. You can correct it or type it manually."></textarea></div>
+  <div class="section-card"><h3>Transcript</h3><p class="instruction">Amb Chrome, la transcripció es genera automàticament mentre graves. Revisa-la abans d’enviar el feedback.</p><p class="tiny" id="speechSupportStatus"></p><textarea id="speechTranscript" class="transcript-box" placeholder="Your automatic transcript will appear here. You can correct it before sending."></textarea></div>
   <div class="section-card"><h3>Get feedback</h3><p class="instruction">Quan premis <strong>Correct with AI</strong>, el WAV es descarregarà automàticament i s’obrirà ChatGPT amb el prompt ja preparat. Adjunta el WAV i després prem Send.</p><div class="actions"><button class="btn" id="prepareSpeakingFeedback">Correct with AI</button></div><p class="tiny" id="speakingCopyStatus"></p></div>
 </section>
 
@@ -292,9 +292,114 @@ $('#sendWritingFeedback').onclick=()=>{if(!$('#routineText').value.trim()){alert
 function renderSpeaking(){const d=levelInfo[level];$('#speakingPill').textContent=d.label+' route';const model={insecure:'I get home at five. Then I have a snack. I go to bed at ten.\n\nArribo a casa a les cinc. Després faig un mos. Vaig al llit a les deu.',safe:'After school, I get home and have a snack because I am hungry. Then I do my homework, but I usually take a short break first.',daring:'After school, I usually do some work before dinner. Although I sometimes feel tired, I make an effort to finish early, so I can have a break and wind down later.'}[level];$('#speakingModel').innerHTML=`<div class="example">${model.replaceAll('\n','<br>')}</div>`;$('#speakingTask').textContent=d.speakingTask;$('#speakingSupport').innerHTML=level==='insecure'?'<p><b>I get home at ___.</b><br><span class="tiny">Arribo a casa a les ___.</span></p><p><b>Then I ___.</b></p>':`<div class="connector-strip">${d.connectors.map(x=>`<span class="connector">${x}</span>`).join('')}</div>`;$('#speakingPlan').value=state().speakingPlan||'';$('#speakingPlan').placeholder=level==='insecure'?'I get home at five. Then I...':'Write the sentences you are going to say...';$('#speakingChecklist').innerHTML=d.speakingChecklist.map(x=>`<li>${x}</li>`).join('')}
 $('#speakingPlan').oninput=()=>{state().speakingPlan=$('#speakingPlan').value;save()};
 let audioCtx,sourceNode,processor,stream,pcm=[],recSampleRate=44100,recognition=null;
+let speechFinalText='',speechIsRecording=false,speechRestartTimer=null;
+
+function renderSpeechTranscript(interim=''){
+  const box=document.getElementById('speechTranscript');
+  if(box) box.value=(speechFinalText+' '+interim).trim();
+}
+function stopSpeechRecognition(){
+  speechIsRecording=false;
+  if(speechRestartTimer){clearTimeout(speechRestartTimer);speechRestartTimer=null}
+  try{if(recognition)recognition.stop()}catch(e){}
+}
+function startSpeechRecognition(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    $('#recordStatus').textContent='Automatic transcription is not available in this browser.';
+    return;
+  }
+  speechFinalText='';
+  renderSpeechTranscript('');
+  speechIsRecording=true;
+
+  const launch=()=>{
+    if(!speechIsRecording)return;
+    try{
+      recognition=new SR();
+      recognition.lang='en-US';
+      recognition.continuous=true;
+      recognition.interimResults=true;
+      recognition.maxAlternatives=1;
+
+      recognition.onresult=e=>{
+        let interim='';
+        for(let i=e.resultIndex;i<e.results.length;i++){
+          const t=e.results[i][0].transcript;
+          if(e.results[i].isFinal) speechFinalText+=t.trim()+' ';
+          else interim+=t;
+        }
+        renderSpeechTranscript(interim);
+      };
+
+      recognition.onerror=e=>{
+        if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+          speechIsRecording=false;
+          $('#recordStatus').textContent='Chrome needs permission for speech recognition. Allow microphone access and try again.';
+        }else if(e.error!=='no-speech'&&e.error!=='aborted'){
+          $('#recordStatus').textContent='Recording continues. Automatic transcription had a temporary error ('+e.error+').';
+        }
+      };
+
+      recognition.onend=()=>{
+        if(speechIsRecording){
+          speechRestartTimer=setTimeout(launch,180);
+        }
+      };
+
+      recognition.start();
+    }catch(e){
+      if(speechIsRecording) speechRestartTimer=setTimeout(launch,250);
+    }
+  };
+  launch();
+}
+
 function encodeWav(buffers,sampleRate){let length=buffers.reduce((n,a)=>n+a.length,0),samples=new Float32Array(length),o=0;buffers.forEach(a=>{samples.set(a,o);o+=a.length});const ab=new ArrayBuffer(44+samples.length*2),v=new DataView(ab);const w=(off,s)=>{for(let i=0;i<s.length;i++)v.setUint8(off+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+samples.length*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sampleRate,true);v.setUint32(28,sampleRate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,samples.length*2,true);let p=44;for(let i=0;i<samples.length;i++,p+=2){let s=Math.max(-1,Math.min(1,samples[i]));v.setInt16(p,s<0?s*0x8000:s*0x7fff,true)}return new Blob([v],{type:'audio/wav'})}
-$('#startRecord').onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({audio:true});audioCtx=new (window.AudioContext||window.webkitAudioContext)();recSampleRate=audioCtx.sampleRate;sourceNode=audioCtx.createMediaStreamSource(stream);processor=audioCtx.createScriptProcessor(4096,1,1);pcm=[];processor.onaudioprocess=e=>pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));sourceNode.connect(processor);processor.connect(audioCtx.destination);$('#recordStatus').textContent='Recording… speak now.';$('#startRecord').disabled=true;$('#stopRecord').disabled=false;const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){recognition=new SR();recognition.lang='en-US';recognition.continuous=true;recognition.interimResults=true;let finalText='';recognition.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)finalText+=t+' ';else interim+=t}$('#speechTranscript').value=(finalText+interim).trim()};try{recognition.start()}catch(e){}}else{$('#recordStatus').textContent='Recording… automatic transcript is not available in this browser.';}}catch(e){$('#recordStatus').textContent='Microphone access was not available.'}}
-$('#stopRecord').onclick=async()=>{if(processor){processor.disconnect();sourceNode.disconnect();stream.getTracks().forEach(t=>t.stop());await audioCtx.close();try{recognition&&recognition.stop()}catch(e){}recordBlob=encodeWav(pcm,recSampleRate);if(recordUrl)URL.revokeObjectURL(recordUrl);recordUrl=URL.createObjectURL(recordBlob);$('#recordedAudio').src=recordUrl;$('#recordedAudio').style.display='block';$('#downloadWav').disabled=false;$('#recordStatus').textContent='Recording ready. Listen to it and download the WAV.';$('#startRecord').disabled=false;$('#stopRecord').disabled=true;complete('speaking')}}
+
+$('#startRecord').onclick=async()=>{
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    recSampleRate=audioCtx.sampleRate;
+    sourceNode=audioCtx.createMediaStreamSource(stream);
+    processor=audioCtx.createScriptProcessor(4096,1,1);
+    pcm=[];
+    processor.onaudioprocess=e=>pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+    sourceNode.connect(processor);
+    processor.connect(audioCtx.destination);
+
+    $('#recordStatus').textContent='Recording… automatic transcript is starting.';
+    $('#startRecord').disabled=true;
+    $('#stopRecord').disabled=false;
+    startSpeechRecognition();
+  }catch(e){
+    $('#recordStatus').textContent='Microphone access was not available.';
+  }
+}
+
+$('#stopRecord').onclick=async()=>{
+  if(processor){
+    stopSpeechRecognition();
+    // Give Chrome a brief moment to deliver the last final recognition result.
+    await new Promise(r=>setTimeout(r,250));
+    processor.disconnect();
+    sourceNode.disconnect();
+    stream.getTracks().forEach(t=>t.stop());
+    await audioCtx.close();
+
+    recordBlob=encodeWav(pcm,recSampleRate);
+    if(recordUrl)URL.revokeObjectURL(recordUrl);
+    recordUrl=URL.createObjectURL(recordBlob);
+    $('#recordedAudio').src=recordUrl;
+    $('#recordedAudio').style.display='block';
+    $('#downloadWav').disabled=false;
+    $('#recordStatus').textContent='Recording ready. The automatic transcript is below; review it before feedback.';
+    $('#startRecord').disabled=false;
+    $('#stopRecord').disabled=true;
+    complete('speaking');
+  }
+}
 $('#downloadWav').onclick=()=>{if(!recordBlob)return;const a=document.createElement('a');a.href=recordUrl;a.download=`routine-${level}.wav`;a.click()};
 function speakingPrompt(){const d=levelInfo[level],tr=$('#speechTranscript').value.trim();return `Escolta l'àudio adjunt i actua com a professor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”.\n\nNivell: ${d.label}. Tasca: ${d.speakingTask}\n${tr?`\nTranscripció revisada per l'alumne:\n${tr}\n`:''}\nDona el feedback en català, clar i breu. No posis nota numèrica. Respon només amb aquests apartats:\n1. 📝 Transcripció — escriu què diu realment l'alumne.\n2. ✅ Què ha fet bé — una o dues coses concretes.\n3. 🔧 Què ha de corregir — màxim 2 errors importants; escriu exactament com ho hauria de dir.\n4. 🗣️ Pronunciació — comenta només un problema clar; si no n'hi ha, digues que és correcta per al nivell.\n5. 📋 Instruccions — indica breument si ha complert la tasca.\n6. 🎯 Un següent pas — una sola millora concreta.`}
 function copyPromptNow(text){
