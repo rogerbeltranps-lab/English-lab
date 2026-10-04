@@ -32,6 +32,12 @@
     .practice-block{border:1px solid var(--line);border-radius:18px;padding:20px;background:#fbfdfb;margin-top:18px}
     .practice-block+.practice-block{margin-top:22px}
     @media(max-width:760px){.toprow{flex-wrap:wrap;padding:8px 0}.session-jump{order:3;width:100%;margin-left:0}.session-jump label{display:none}.session-jump select{width:100%;max-width:none}}
+
+.session-access{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:13px 15px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.04)}
+.session-access strong{white-space:nowrap;color:var(--dark,var(--navy,#20312b))}
+.session-access select{flex:1;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff;color:var(--ink);font-weight:750}
+.session-access .go-session{border:0;border-radius:11px;padding:10px 14px;background:var(--accent,var(--blue,#2563eb));color:#fff;font-weight:800}
+@media(max-width:760px){.session-access{display:grid;grid-template-columns:1fr auto}.session-access strong{grid-column:1/-1}.session-access select{width:100%}}
 </style>
 </head>
 <body>
@@ -50,6 +56,12 @@
 </div></div>
 <header class="hero"><div class="wrap"><span class="eyebrow">Learning Path 3 · My Real Routine</span><h1>Same day different person</h1><p class="lead">Learn the routine vocabulary, notice how verbs change with he and she, then write and speak about another person.</p><div class="routes"><button class="route active" data-level="insecure"><strong>Insecure</strong><span>Very short tasks, models and maximum support</span></button><button class="route" data-level="safe"><strong>Safe</strong><span>Less support and full sentences</span></button><button class="route" data-level="daring"><strong>Daring</strong><span>Compare, infer and explain choices</span></button></div></div></header>
 <main class="wrap">
+<div class="session-access">
+  <strong>Learning Path sessions</strong>
+  <select id="sessionAccessSelect" aria-label="Choose another Learning Path session"><option value="getting-started.html">1 · Getting started</option><option value="a-day-in-my-life.html">2 · Routine expressions</option><option value="same-day-different-person.html" selected>3 · Same day, different person</option><option value="#" disabled>4 · My evening routine · Soon</option><option value="healthy-habits.html">5 · Healthy habits</option><option value="#" disabled>6 · Review & improve · Soon</option><option value="index.html#final">7 · Final product</option></select>
+  <button class="go-session" id="sessionAccessGo" type="button">Go →</button>
+</div>
+
 <nav class="tabs"><button class="tab active" data-panel="cards">1 Vocabulary</button><button class="tab" data-panel="practice">2 Practice</button><button class="tab" data-panel="listen">3 Listening</button><button class="tab" data-panel="read">4 Reading</button><button class="tab" data-panel="write">5 Writing</button><button class="tab" data-panel="speak">6 Speaking</button></nav>
 <section class="panel active" id="cards">
 <div class="panel-head"><div><h2 id="vocabHeading">Vocabulary first</h2><p class="instruction" id="vocabInstruction"></p><div class="level-note" id="cardsNote"></div></div><span class="pill" id="cardsPill"></span></div>
@@ -205,6 +217,19 @@ $('#resetRoute').onclick=()=>{if(confirm(level==='insecure'?'Vols reiniciar tot 
 function renderAll(){const d=levels[level];$$('.route').forEach(x=>x.classList.toggle('active',x.dataset.level===level));renderCards();renderMatch();renderQuestions(d.listening,'#listenForm','l');renderQuestions(d.reading,'#readForm','r');$('#listenResult').classList.remove('show');$('#readResult').classList.remove('show');renderForms();renderWriting();renderSpeak();if(level==='insecure'){$('#match .panel-head h2').textContent='Relaciona les expressions';$('#match .instruction').textContent='Tria una expressió i després el seu significat en català.';$('#resetMatch').textContent='Torna-ho a provar';$('#listen .panel-head h2').textContent='La Mia explica el seu dia';$('#listen .instruction').textContent='Escolta una vegada per entendre la idea general i una altra vegada per trobar els detalls.';$('#normalSpeed').textContent='Velocitat normal';$('#slowSpeed').textContent='Lent 0.8×';$('#toggleTranscript').textContent='Mostra la transcripció després d’escoltar';$('#checkListen').textContent='Comprova el listening';$('#read .panel-head h2').textContent='Dues rutines diferents';$('#read .instruction').textContent='Llegeix la rutina de la Mia i en Leo. Busca què fan igual i què fan diferent.';$('#checkRead').textContent='Comprova el reading';$('#forms .panel-head h2').textContent='Com canvia el verb';$('#checkForms').textContent='Comprova els verbs';$('#resetForms').textContent='Torna-ho a provar';$('#resetRoute').textContent='Reinicia aquest nivell'}else{$('#match .panel-head h2').textContent='Match the expressions';$('#match .instruction').textContent='Choose an expression, then choose its meaning in Catalan.';$('#resetMatch').textContent='Try again';$('#listen .panel-head h2').textContent='Mia tells us about her day';$('#listen .instruction').textContent='Listen once for the main idea and again for the details.';$('#normalSpeed').textContent='Normal speed';$('#slowSpeed').textContent='Slow 0.8×';$('#toggleTranscript').textContent='Show transcript after listening';$('#checkListen').textContent='Check listening';$('#read .panel-head h2').textContent='Two different routines';$('#read .instruction').textContent='Read about Mia and Leo. Look for similarities and differences.';$('#checkRead').textContent='Check reading';$('#forms .panel-head h2').textContent='How the verb changes';$('#checkForms').textContent='Check forms';$('#resetForms').textContent='Try again';$('#resetRoute').textContent='Reset this route'}updateProgress()}
 const sessionJump=document.getElementById('sessionJump');
 if(sessionJump)sessionJump.addEventListener('change',()=>{const target=sessionJump.value;if(target&&target!=='#')window.location.href=target});
-renderAll();</script>
+renderAll();
+const sessionAccessSelect=document.getElementById('sessionAccessSelect');
+const sessionAccessGo=document.getElementById('sessionAccessGo');
+if(sessionAccessSelect&&sessionAccessGo){
+  sessionAccessGo.addEventListener('click',()=>{
+    const target=sessionAccessSelect.value;
+    if(target&&target!=='#') window.location.href=target;
+  });
+  sessionAccessSelect.addEventListener('change',()=>{
+    const target=sessionAccessSelect.value;
+    if(target&&target!=='#') window.location.href=target;
+  });
+}
+</script>
 </body>
 </html>
