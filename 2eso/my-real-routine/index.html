@@ -221,6 +221,7 @@
       transition:.2s ease
     }
 
+    .tabs label.tabbtn{display:inline-block}
     .tabbtn:hover{
       transform:translateY(-1px);
       box-shadow:0 6px 18px rgba(24,39,31,.06)
@@ -237,7 +238,29 @@
       padding-bottom:60px
     }
 
-    .panel.active{display:block}
+    .panel.active{display:none}
+
+    .tab-radio{
+      position:absolute;
+      opacity:0;
+      pointer-events:none
+    }
+
+    #tab-overview:checked ~ .tabs label[for="tab-overview"],
+    #tab-learning-path:checked ~ .tabs label[for="tab-learning-path"],
+    #tab-language:checked ~ .tabs label[for="tab-language"],
+    #tab-final:checked ~ .tabs label[for="tab-final"]{
+      background:var(--accent-soft);
+      border-color:var(--accent);
+      color:var(--accent-dark)
+    }
+
+    #tab-overview:checked ~ #overview,
+    #tab-learning-path:checked ~ #learning-path,
+    #tab-language:checked ~ #language,
+    #tab-final:checked ~ #final{
+      display:block
+    }
 
     .grid{
       display:grid;
@@ -426,14 +449,19 @@
       </aside>
     </section>
 
+    <input class="tab-radio" type="radio" name="ls-tab" id="tab-overview" checked>
+    <input class="tab-radio" type="radio" name="ls-tab" id="tab-learning-path">
+    <input class="tab-radio" type="radio" name="ls-tab" id="tab-language">
+    <input class="tab-radio" type="radio" name="ls-tab" id="tab-final">
+
     <div class="tabs">
-      <button type="button" class="tabbtn active" data-panel="overview" onclick="openPanel('overview')">Overview</button>
-      <button type="button" class="tabbtn" data-panel="learning-path" onclick="openPanel('learning-path')">Learning Path</button>
-      <button type="button" class="tabbtn" data-panel="language" onclick="openPanel('language')">Language &amp; Knowledge</button>
-      <button type="button" class="tabbtn" data-panel="final" onclick="openPanel('final')">Final Product</button>
+      <label class="tabbtn" for="tab-overview">Overview</label>
+      <label class="tabbtn" for="tab-learning-path">Learning Path</label>
+      <label class="tabbtn" for="tab-language">Language &amp; Knowledge</label>
+      <label class="tabbtn" for="tab-final">Final Product</label>
     </div>
 
-    <section class="panel active" id="overview">
+    <section class="panel" id="overview">
       <div class="overview">
         <article class="bigcard">
           <h2>What will you learn?</h2>
@@ -502,12 +530,12 @@
           <span class="link">Open →</span>
         </a>
 
-        <a class="card" href="#final" id="final-card">
+        <label class="card" for="tab-final" id="final-card">
           <div class="num">6</div>
           <h3>Final product</h3>
           <p>Bring your routine and your friend’s routine together in a meaningful final task.</p>
           <span class="link">Open →</span>
-        </a>
+        </label>
 
       </div>
     </section>
@@ -556,14 +584,6 @@
   </footer>
 
   <script>
-    const buttons = document.querySelectorAll('.tabbtn');
-    const panels = document.querySelectorAll('.panel');
-
-    function openPanel(id) {
-      buttons.forEach(b => b.classList.toggle('active', b.dataset.panel === id));
-      panels.forEach(p => p.classList.toggle('active', p.id === id));
-    }
-
     const navMenus = [...document.querySelectorAll('.nav-menu')];
 
     navMenus.forEach(menu => {
@@ -580,11 +600,6 @@
       navMenus.forEach(menu => menu.open = false;
     });
 
-    document.getElementById('final-card').addEventListener('click', event => {
-      event.preventDefault();
-      openPanel('final');
-      window.scrollTo({top: document.querySelector('.tabs').offsetTop - 85, behavior:'smooth'});
-    });
   </script>
 </body>
 </html>
