@@ -415,7 +415,15 @@
       .navlinks > a,.nav-menu > summary{padding:8px 9px}
       .dropdown{position:fixed;left:16px;right:16px;top:72px;min-width:0}
     }
-  </style>
+  
+.course-group{padding:7px 8px;border-bottom:1px solid var(--line)}
+.course-group:last-child{border-bottom:0}
+.course-link,.ls-link{display:block!important;border-radius:10px;padding:9px 10px!important}
+.course-link{font-weight:850}
+.ls-link{font-size:.92rem;padding-left:18px!important}
+.muted-group{display:grid;gap:3px}
+.ls-dropdown{min-width:250px}
+</style>
 </head>
 
 <body>
@@ -426,20 +434,22 @@
         <div class="navlinks">
           <a href="../../index.html">Home</a>
           <details class="nav-menu">
-            <summary>Courses</summary>
-            <div class="dropdown">
-              <span class="disabled">1 ESO <span class="soon">Soon</span></span>
-              <a class="current" href="../../2eso/index.html">2 ESO <span>✓</span></a>
-              <span class="disabled">3 ESO <span class="soon">Soon</span></span>
-              <a href="../../4eso/index.html">4 ESO</a>
-              <span class="disabled">1 BATX <span class="soon">Soon</span></span>
-              <span class="disabled">2 BATX <span class="soon">Soon</span></span>
-            </div>
-          </details>
-          <details class="nav-menu">
             <summary>Learning Situations</summary>
-            <div class="dropdown">
-              <a class="current" href="index.html">My Real Routine <span>✓</span></a>
+            <div class="dropdown ls-dropdown">
+              <div class="course-group">
+                <a class="course-link current" href="../../2eso/index.html">2 ESO <span>✓</span></a>
+                <a class="ls-link current" href="index.html">↳ My Real Routine</a>
+              </div>
+              <div class="course-group">
+                <a class="course-link" href="../../4eso/index.html">4 ESO</a>
+                <a class="ls-link" href="../../4eso/my-real-routine/index.html">↳ My Real Routine</a>
+              </div>
+              <div class="course-group muted-group">
+                <span class="disabled">1 ESO <span class="soon">Soon</span></span>
+                <span class="disabled">3 ESO <span class="soon">Soon</span></span>
+                <span class="disabled">1 BATX <span class="soon">Soon</span></span>
+                <span class="disabled">2 BATX <span class="soon">Soon</span></span>
+              </div>
             </div>
           </details>
           <a href="../../index.html#english-lab">English Lab</a>
