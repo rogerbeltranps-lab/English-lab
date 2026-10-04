@@ -108,6 +108,18 @@
 .lp-home-link{display:inline-flex;align-items:center;text-decoration:none!important;color:inherit!important;font-weight:850!important;
   white-space:nowrap;padding:6px 8px;border-radius:9px}
 .lp-home-link:hover{background:rgba(255,255,255,.12)}
+
+/* Prevent top-bar overlap on medium-width screens */
+@media(max-width:1100px){
+  .topbar .toprow{flex-wrap:wrap!important;padding:8px 0!important}
+  .topbar .brand{flex:1 1 auto!important;min-width:0!important}
+  .topbar .lp-title,.topbar .brand-title{white-space:normal!important}
+  .topbar .progress,.topbar .progress-shell{flex:0 0 160px!important;margin-left:auto!important}
+  .topbar .jump,.topbar .session-jump{order:3!important;width:100%!important;margin-left:0!important}
+  .topbar .jump label,.topbar .session-jump label{display:none!important}
+  .topbar .jump select,.topbar .session-jump select{width:100%!important;max-width:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -119,7 +131,6 @@
 <option value="useful-expressions.html">3 · Useful expressions</option>
 <option selected value="grammar-phrasal-verbs.html">4 · Grammar & phrasal verbs</option>
 <option value="healthy-habits.html">5 · Healthy habits</option>
-<option disabled value="#">6 · Review & refine · Soon</option>
 <option value="index.html#final">6 · Final product</option>
 </select></div>
 <div class="progress"><div class="progress-row"><span id="levelLabel">Insecure</span><span id="progressText">0 / 6</span></div><div class="track"><div class="bar" id="progressBar"></div></div></div>
@@ -160,6 +171,7 @@
 </main>
 
 <script>
+window.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('sessionJump');if(s)s.value='grammar-phrasal-verbs.html';});
 const $=s=>document.querySelector(s),qsa=s=>Array.from(document.querySelectorAll(s));
 let level=localStorage.getItem('s4GrammarLevel')||'insecure';
 let state=JSON.parse(localStorage.getItem('s4GrammarState')||'{}');
