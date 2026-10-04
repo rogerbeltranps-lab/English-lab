@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1f6b52">
+<title>Learning Path 5 · Healthy habits</title>
+<style>
+:root{--forest:#1f6b52;--forest-dark:#174d3d;--leaf:#2f8768;--mint:#e9f5ef;--mint-2:#d8eee3;--cream:#fbfcf8;--paper:#fff;--ink:#20312b;--muted:#66766f;--line:#d8e6df;--amber:#b66a18;--amber-bg:#fff7e9;--red:#b84343;--shadow:0 14px 38px rgba(31,107,82,.10)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--cream);line-height:1.5}button,select,textarea,input{font:inherit}button{cursor:pointer}.wrap{width:min(1080px,calc(100% - 30px));margin:auto}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(23,77,61,.97);color:#fff;box-shadow:0 4px 18px rgba(23,77,61,.16)}.toprow{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:10px;font-weight:850}.brand-mark{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#fff;color:var(--forest);font-size:18px}.brand-title{font-size:.98rem}.brand small{display:block;font-size:.7rem;font-weight:650;color:#cce5da;margin-top:1px}.progress-shell{width:158px}.progress-label{display:flex;justify-content:space-between;font-size:.68rem;color:#dcefe7;margin-bottom:4px}.progress-track{height:5px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}.progress-bar{height:100%;width:0;background:#8de0bc;border-radius:99px;transition:.3s}
+.hero{padding:42px 0 30px;backgro<source src="https://rogerbeltranps-lab.github.io/English-lab/2eso/my-real-routine/alex-listening.mp3" type="audio/mpeg">und:linear-gradient(135deg,#edf7f2 0%,#fbfcf8 57%,#f3f8e9 100%);border-bottom:1px solid var(--line)}.eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--mint-2);color:var(--forest-dark);padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.055em}h1{margin:15px 0 10px;color:var(--forest-dark);font-size:clamp(2.05rem,6vw,4rem);line-height:1.03;letter-spacing:-.045em}.lead{max-width:780px;margin:0;color:#52665e;font-size:clamp(1rem,2vw,1.16rem)}
+.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}.route{border:1px solid var(--line);background:#fff;border-radius:18px;padding:15px;text-align:left;color:var(--ink);box-shadow:0 5px 18px rgba(31,107,82,.05)}.route strong{display:block;color:var(--forest-dark);font-size:1rem}.route span{display:block;color:var(--muted);font-size:.84rem;margin-top:3px}.route.active{border:2px solid var(--forest);background:var(--mint)}.route[data-level="daring"].active{border-color:#a46318;background:#fff8e9}
+main{padding:24px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 1px 14px;scrollbar-width:thin}.tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:#52665e;border-radius:12px;padding:10px 15px;font-weight:780}.tab:hover,.tab:focus-visible{border-color:#90bca9;color:var(--forest-dark)}.tab.active{background:var(--forest);border-color:var(--forest);color:#fff}.panel{display:none;background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:clamp(19px,4vw,36px);box-shadow:var(--shadow)}.panel.active{display:block}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:22px}h2{margin:0 0 6px;color:var(--forest-dark);font-size:clamp(1.5rem,3vw,2.15rem);letter-spacing:-.025em}h3{color:var(--forest-dark);margin:0 0 9px}.instruction{margin:0;color:var(--muted)}.pill{white-space:nowrap;background:var(--mint);color:var(--forest-dark);border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:850}.level-note{margin-top:12px;padding:10px 13px;background:var(--mint);border-left:4px solid var(--forest);border-radius:0 11px 11px 0;color:#425a50;font-size:.9rem}
+.section-card{border:1px solid var(--line);border-radius:18px;background:#fbfdfb;padding:18px;margin:16px 0}.section-card>h3{display:flex;align-items:center;gap:8px}.step-number{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:99px;background:var(--forest);color:#fff;font-size:.78rem}.connector-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.connector{padding:6px 9px;border-radius:999px;background:#fff3df;color:#8a5719;border:1px solid #efd1a2;font-weight:800;font-size:.86rem}
+.vocab-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.vocab-group{border:1px solid var(--line);background:#fbfdfb;border-radius:18px;padding:16px}.vocab-group h3{font-size:1rem;margin-bottom:11px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{position:relative;border:1px solid #cfe3d9;background:#fff;border-radius:999px;padding:7px 10px;font-size:.9rem;color:#355247;cursor:help}.chip:hover,.chip:focus{border-color:#89b7a3;background:var(--mint);outline:none}.chip-tooltip{pointer-events:none;opacity:0;transform:translateY(5px);transition:.16s;position:absolute;left:50%;bottom:calc(100% + 9px);z-index:10;width:max-content;max-width:290px;translate:-50% 0;background:#173f33;color:#fff;border-radius:10px;padding:9px 11px;font-size:.8rem;line-height:1.35;box-shadow:0 8px 22px rgba(0,0,0,.18)}.chip:hover .chip-tooltip,.chip:focus .chip-tooltip{opacity:1;transform:none}.chip-tooltip b{display:block;color:#bfe9d5;margin-bottom:3px}.study-summary{margin:18px 0 0;padding:13px 15px;border-radius:14px;background:#f5faf7;color:#50655d;border:1px solid var(--line)}
+.flashcard{min-height:260px;perspective:900px;cursor:pointer;outline:none}.flash-inner{position:relative;width:100%;height:260px;transition:transform .5s;transform-style:preserve-3d}.flashcard.flipped .flash-inner{transform:rotateY(180deg)}.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;border:2px solid #b9daca;background:linear-gradient(145deg,#eff8f3,#fff);padding:26px;display:grid;place-content:center;text-align:center}.face.back{transform:rotateY(180deg);background:linear-gradient(145deg,#f5faef,#fff);border-color:#cbdca9}.face .label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:850;margin-bottom:10px}.face strong{font-size:clamp(1.5rem,5vw,2.25rem);color:var(--forest-dark)}.face p{margin:9px 0 0;color:#5b6d65}.counter{text-align:center;color:var(--muted);font-size:.9rem;margin-top:10px}.actions,.flash-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:800;background:var(--forest);color:#fff;box-shadow:0 5px 14px rgba(31,107,82,.15)}.btn:hover{filter:brightness(.97);transform:translateY(-1px)}.btn.secondary{background:#fff;color:var(--forest-dark);border:1px solid var(--line);box-shadow:none}.btn.amber{background:#9f641e}.btn.small{padding:8px 11px;font-size:.88rem}.result{display:none;margin-top:18px;padding:15px;border-radius:14px;background:var(--mint);color:var(--forest-dark);font-weight:760;text-align:center}.result.show{display:block}.feedback{min-height:22px;margin-top:8px;font-size:.9rem;font-weight:720}.ok{color:var(--forest)}.no{color:var(--red)}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.match-col{display:grid;gap:9px}.match-card{min-height:54px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);padding:10px;font-weight:720;text-align:left}.match-card.selected{outline:3px solid #acd5c2;background:var(--mint)}.match-card.matched{background:#e8f6ed;border-color:#83c59f;color:var(--forest);cursor:default}.match-card.wrong{background:#fff0f0;border-color:#e9a5a5}.practice-meta{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px;color:var(--muted);font-size:.9rem}.task-list{display:grid;gap:12px}.task{padding:14px;border-radius:14px;background:#fbfdfb;border:1px solid var(--line)}.task select{border:1px solid #c7dbd1;border-radius:9px;padding:7px 9px;background:#fff;color:var(--forest-dark);font-weight:700}.task.good{background:#ebf8f0;border-color:#8fc8a6}.task.bad{background:#fff7ed;border-color:#efc081}
+.audio-card{padding:18px;border:1px solid var(--line);border-radius:18px;background:#f8fbf9;margin-bottom:18px}.audio-player{width:100%;margin:9px 0 12px}.audio-row{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.audio-status{color:var(--muted);font-weight:700}.transcript-box{width:100%;min-height:115px;margin-top:10px}.question{padding:17px 0;border-top:1px solid var(--line)}.question:first-of-type{border-top:0}.q-title{font-weight:760;margin:0 0 10px}.options{display:grid;gap:8px}.option{display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}.option.correct{background:#e9f7ee;border-color:#8cc6a3}.option.wrong{background:#fff0f0;border-color:#e9a5a5}
+.builder-list{display:grid;gap:16px}.build-item{padding:16px;border:1px solid var(--line);border-radius:16px}.word-bank,.sentence-line{display:flex;flex-wrap:wrap;gap:8px;min-height:51px;padding:10px;border-radius:12px}.word-bank{background:#f0f7f3}.sentence-line{border:2px dashed #bfd2c9;margin-top:9px;align-items:center}.word{border:1px solid #9fc6b4;background:#fff;color:var(--forest-dark);padding:7px 10px;border-radius:10px;font-weight:720}.word.used{opacity:.28}.sentence-line .word{background:var(--forest);color:#fff;border-color:var(--forest)}
+.compose-grid{display:grid;grid-template-columns:1fr 1.18fr;gap:17px}.compose-card{border:1px solid var(--line);border-radius:18px;padding:18px;background:#fbfdfb}.field{margin:11px 0}.field label{display:block;font-weight:730;margin-bottom:5px}.field select,.field input{width:100%;border:1px solid #c7dbd1;border-radius:10px;padding:9px;background:#fff}.generated{min-height:72px;border-radius:12px;padding:13px;background:var(--mint);color:var(--forest-dark);font-weight:750}.reading-text{margin:8px 0 18px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#fff;line-height:1.75}
+.reading-text p{margin:0}
+textarea{width:100%;min-height:175px;border:1px solid #c7dbd1;border-radius:12px;padding:12px;resize:vertical;line-height:1.55}.checklist{list-style:none;padding:0;margin:13px 0}.checklist li{margin:7px 0;color:#53675f}.checklist li::before{content:'□';margin-right:8px;color:var(--forest);font-weight:900}.model-box{border:1px solid #bedccd;background:#f1f8f4;border-radius:17px;padding:16px;margin-bottom:14px}.model-box .example{margin-top:9px;padding:11px;border-radius:11px;background:#fff;border:1px solid #d6e7df;font-weight:650}.plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.plan-q{border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff}.plan-q label{display:block;font-weight:750;margin-bottom:5px}.record-box{display:grid;gap:12px}.record-status{padding:10px 12px;border-radius:11px;background:#f4f8f6;color:#52665e;border:1px solid var(--line)}.feedback-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}.feedback-card{padding:18px;border-radius:17px;border:1px solid var(--line);background:#fbfdfb}.feedback-card ul{margin:10px 0 0;padding-left:20px}.tiny{font-size:.83rem;color:var(--muted)}.footer-note{text-align:center;color:var(--muted);padding:24px 0 0;font-size:.87rem}
+@media(max-width:760px){.progress-shell{width:120px}.routes,.vocab-groups,.compose-grid,.feedback-layout,.plan-grid{grid-template-columns:1fr}.panel-head{display:block}.pill{display:inline-block;margin-top:9px}.match-grid{gap:7px}.wrap{width:min(100% - 20px,1080px)}.hero{padding-top:30px}.panel{padding:18px;border-radius:19px}.chip-tooltip{left:0;translate:0 0;max-width:240px}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap toprow">
+  <div class="brand">
+  <a href="index.html" style="color:white;text-decoration:none;font-weight:800;margin-right:8px;">← My Real Routine</a>
+  <span class="brand-mark">✓</span>
+  <span class="brand-title">Healthy habits<small>2 ESO · My Real Routine · Learning Path 5</small></span>
+</div>
+  <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 5</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
+</div></div>
+<header class="hero"><div class="wrap">
+  <span class="eyebrow">Learning Path 5 · Healthy habits</span>
+  <h1>Healthy habits</h1>
+  <p class="lead">Learn how to talk about food, hydration, sleep, movement and screen habits, then use that language to describe and reflect on real routines.</p>
+  <div class="routes" aria-label="Choose your route">
+    <button class="route active" data-level="insecure"><strong>Insecure</strong><span>Simple healthy habits · lots of support</span></button>
+    <button class="route" data-level="safe"><strong>Safe</strong><span>Explain habits · give simple reasons</span></button>
+    <button class="route" data-level="daring"><strong>Daring</strong><span>Compare habits · reflect and suggest</span></button>
+  </div>
+</div></header>
+<main class="wrap">
+<nav class="tabs" aria-label="Session sections">
+  <button class="tab active" data-panel="vocabulary">1 Vocabulary</button>
+  <button class="tab" data-panel="practicePanel">2 Practice</button>
+  <button class="tab" data-panel="listeningPanel">3 Listening</button>
+  <button class="tab" data-panel="readingPanel">4 Reading</button>
+  <button class="tab" data-panel="writing">5 Writing</button>
+  <button class="tab" data-panel="speaking">6 Speaking</button>
+</nav>
+<section class="panel active" id="vocabulary">
+  <div class="panel-head"><div><h2>Vocabulary</h2><p class="instruction" id="vocabIntro">Primer descobreix el vocabulari d’hàbits saludables de la teva ruta i després estudia’l amb les targetes.</p><div class="level-note" id="exploreNote"></div></div><span class="pill" id="explorePill"></span></div>
+  <div class="section-card"><h3><span class="step-number">1</span> Explore</h3><p class="instruction">Passa el ratolí per sobre de cada expressió per veure el significat en català i un exemple.</p><div class="vocab-groups" id="vocabGroups" style="margin-top:14px"></div><div class="study-summary" id="studySummary"></div><div class="actions"><button class="btn" id="finishExplore">Ja les he explorat ✓</button></div></div>
+  <div class="section-card"><h3><span class="step-number">2</span> Study cards</h3><p class="instruction">Digues l’expressió en veu alta. Gira la targeta per comprovar el significat i l’exemple.</p><div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardCategory"></div><strong id="cardFront"></strong><p>Click to turn the card</p></div><div class="face back"><div class="label">Català + example</div><strong id="cardBack"></strong><p id="cardHint"></p></div></div></div><div class="counter" id="cardCounter"></div><div class="flash-actions"><button class="btn secondary" id="prevCard">← Previous</button><button class="btn" id="knowCard">I know it ✓</button><button class="btn secondary" id="nextCard">Next →</button></div></div>
+</section>
+<section class="panel" id="practicePanel">
+  <div class="panel-head"><div><h2>Practice</h2><p class="instruction">Practica el vocabulari d’hàbits saludables abans d’utilitzar-lo per parlar de rutines reals.</p></div><span class="pill">Match · Choose · Build</span></div>
+  <div class="section-card"><h3><span class="step-number">1</span> Match</h3><p class="instruction">Uneix les parts per formar expressions naturals. Si una combinació és correcta en anglès, comptarà com a correcta encara que hi hagi més d’una opció possible.</p><div class="match-grid" style="margin-top:14px"><div class="match-col" id="matchLeft"></div><div class="match-col" id="matchRight"></div></div><div class="result" id="matchResult"></div><div class="actions"><button class="btn secondary" id="resetMatch">New mix</button></div></div>
+  <div class="section-card"><h3><span class="step-number">2</span> Practise</h3><p class="instruction">Completa les expressions. Fes els diferents sets fins haver treballat tot el vocabulari de la teva ruta.</p><div class="practice-meta"><span id="practiceSetLabel"></span><span id="practiceCoverage"></span></div><div class="task-list" id="practiceList"></div><div class="actions"><button class="btn" id="checkPractice">Check</button><button class="btn secondary" id="nextPractice">Next set →</button></div><div class="result" id="practiceResult"></div></div>
+  <div class="section-card"><h3><span class="step-number">3</span> Build</h3><p class="instruction">Ordena les paraules per construir frases correctes que després podràs reutilitzar.</p><div class="builder-list" id="builderList" style="margin-top:14px"></div><div class="actions"><button class="btn" id="checkBuilders">Check sentences</button><button class="btn secondary" id="resetBuilders">Start again</button></div><div class="result" id="builderResult"></div></div>
+</section>
+<section class="panel" id="listeningPanel">
+  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Escolta com una alumna parla dels seus hàbits i identifica les idees i expressions que has treballat.</p></div><span class="pill">Listen & notice</span></div>
+  <div class="section-card"><p class="instruction">Escolta la Jamie parlant dels seus hàbits quotidians. Pots escoltar el text a velocitat normal o lenta.</p><div class="audio-card"><div class="audio-row"><button class="btn small" id="normalSpeed">▶ Listen</button><button class="btn small secondary" id="slowSpeed">Slow 0.8×</button><span class="audio-status" id="audioStatus">Ready to listen</span></div><p class="tiny">Tip: escolta una vegada per entendre la idea general i una segona vegada per respondre.</p></div><form id="listenForm"></form><div class="actions"><button class="btn" type="button" id="checkListen">Check listening</button></div><div class="result" id="listenResult"></div></div>
+</section>
+<section class="panel" id="readingPanel">
+  <div class="panel-head"><div><h2>Reading</h2><p class="instruction">Llegeix el text de la teva ruta i identifica vocabulari, idees principals i detalls importants.</p></div><span class="pill">Read · Notice · Understand</span></div>
+  <div class="section-card">
+    <h3 id="readingTitle"></h3>
+    <div class="reading-text" id="readingText"></div>
+    <form id="readingForm"></form>
+    <div class="actions"><button class="btn" type="button" id="checkReading">Check reading</button></div>
+    <div class="result" id="readingResult"></div>
+  </div>
+</section>
+<section class="panel" id="writing">
+  <div class="panel-head"><div><h2>Writing</h2><p class="instruction" id="writeInstruction"></p></div><span class="pill">Get ready → Plan → Write → Check</span></div>
+  <div class="section-card"><h3>Get ready to write</h3><div class="model-box" id="useExample"></div><div class="connector-strip" id="connectorStrip"></div><div class="compose-grid" style="margin-top:14px"><div class="compose-card"><h3>Sentence starter</h3><div class="field"><label for="actionSelect">Action</label><select id="actionSelect"></select></div><div class="field"><label for="timeSelect">When / how often</label><select id="timeSelect"><option>every day</option><option>at breakfast</option><option>with lunch</option><option>after school</option><option>in the afternoon</option><option>in the evening</option><option>before bed</option><option>at the weekend</option></select></div><div class="generated" id="generatedSentence"></div><button class="btn small" id="copySentence">Add to my text</button></div><div class="compose-card"><h3>Useful language</h3><div id="writingSupport"></div></div></div></div>
+  <div class="section-card"><h3>Plan your ideas</h3><p class="instruction">Escriu només notes curtes.</p><div class="plan-grid" id="planGrid" style="margin-top:12px"></div></div>
+  <div class="section-card"><h3>Write your text</h3><p class="instruction" id="writingTask"></p><textarea id="routineText" placeholder="Write about healthy habits here..."></textarea><ul class="checklist" id="writeChecklist"></ul><p class="instruction"><span id="wordCount">0</span> words.</p></div>
+  <div class="section-card"><h3>Check your writing</h3><p class="instruction">Quan estiguis preparat, obre ChatGPT. El text i les instruccions del teu nivell s’inclouen al prompt. El feedback no porta nota numèrica.</p><div class="actions"><button class="btn" id="sendWritingFeedback">Correct with AI</button><button class="btn secondary" id="resetWriting">Reset writing</button></div><div class="result" id="writeResult"></div></div>
+</section>
+<section class="panel" id="speaking">
+  <div class="panel-head"><div><h2>Speaking</h2><p class="instruction">Model → Prepare → Record → Transcript → Get feedback</p></div><span class="pill" id="speakingPill"></span></div>
+  <div class="section-card"><h3>Model</h3><div class="model-box" id="speakingModel"></div></div>
+  <div class="section-card"><h3>Prepare</h3><p class="instruction" id="speakingTask"></p><div id="speakingSupport"></div><div class="field" style="margin-top:18px"><label for="speakingPlan"><strong>Write what you are going to say</strong></label><p class="tiny" id="speakingPlanHelp" style="margin:5px 0 8px">Escriu aquí les frases que després diràs. Pots mirar-les mentre practiques.</p><textarea id="speakingPlan" placeholder="Write your speaking here..."></textarea></div><ul class="checklist" id="speakingChecklist"></ul></div>
+  <div class="section-card"><h3>Record</h3><div class="record-box"><div class="actions" style="justify-content:flex-start"><button class="btn" id="startRecord">● Record</button><button class="btn secondary" id="stopRecord" disabled>■ Stop</button><button class="btn secondary" id="downloadWav" disabled>Download WAV</button></div><div class="record-status" id="recordStatus">Ready to record.</div><audio id="recordedAudio" controls style="width:100%;display:none"></audio></div></div>
+  <div class="section-card"><h3>Transcript</h3><p class="instruction">Si el navegador permet transcripció de veu, apareixerà aquí mentre graves. Revisa-la abans d’enviar el feedback.</p><textarea id="speechTranscript" class="transcript-box" placeholder="Your transcript will appear here. You can correct it."></textarea></div>
+  <div class="section-card"><h3>Get feedback</h3><p class="instruction">Quan premis <strong>Correct with AI</strong>, el WAV es descarregarà automàticament i s’obrirà ChatGPT amb el prompt ja preparat. Adjunta el WAV i després prem Send.</p><div class="actions"><button class="btn" id="prepareSpeakingFeedback">Correct with AI</button></div><p class="tiny" id="speakingCopyStatus"></p></div>
+</section>
+
+<p class="footer-note">Your progress is saved on this device.</p>
+</main>
+<script>
+const alexText=`Hi, I’m Jamie. On school days, I always have breakfast before I leave home. I usually have toast, fruit and water. I take a bottle of water to school because I want to stay hydrated. At break time, I often eat fruit or a sandwich. I go home on foot three days a week, and I play basketball on Tuesdays and Thursdays. In the evening, I do my homework and then I take a short screen break. I try to stop using my phone before bed because it helps me wind down. I usually go to bed at half past ten, so I can get enough sleep.`;
+const vocabMap={
+ insecure:[['Food & water',['have breakfast','drink water','eat fruit','eat vegetables','have a healthy snack']],['Sleep & rest',['go to bed early','get enough sleep','take a break']],['Movement & screens',['go on foot','play sport','spend time outdoors','limit screen time']]],
+ safe:[['Balanced choices',['have a balanced meal','stay hydrated','eat regular meals','choose a healthy snack','cut down on sugary drinks']],['Rest & movement',['be active','take screen breaks','wind down before bed','get enough rest','spend less time on screens']]],
+ daring:[['Healthy routines',['make healthy choices','build a healthy routine','make an effort to','get into a good habit','stick to a routine']],['Balance & change',['strike a balance','cut back on','make a small change','look after yourself','recharge']]]
+};
+const ca={
+'have breakfast':'esmorzar','drink water':'beure aigua','eat fruit':'menjar fruita','eat vegetables':'menjar verdures','have a healthy snack':'fer un berenar / mos saludable',
+'go to bed early':'anar al llit d’hora','get enough sleep':'dormir prou','take a break':'fer una pausa','go on foot':'anar a peu','play sport':'fer esport','spend time outdoors':'passar temps a l’aire lliure','limit screen time':'limitar el temps de pantalla',
+'have a balanced meal':'fer un àpat equilibrat','stay hydrated':'mantenir-se hidratat/da','eat regular meals':'fer àpats regulars','choose a healthy snack':'triar un berenar saludable','cut down on sugary drinks':'reduir les begudes ensucrades',
+'be active':'mantenir-se actiu/va','take screen breaks':'fer pauses de pantalla','wind down before bed':'relaxar-se abans d’anar a dormir','get enough rest':'descansar prou','spend less time on screens':'passar menys temps amb pantalles',
+'make healthy choices':'prendre decisions saludables','build a healthy routine':'construir una rutina saludable','make an effort to':'fer un esforç per','get into a good habit':'agafar un bon hàbit','stick to a routine':'mantenir una rutina',
+'strike a balance':'trobar un equilibri','cut back on':'reduir','make a small change':'fer un petit canvi','look after yourself':'cuidar-se','recharge':'recuperar energia'};
+const examples={
+'have breakfast':'I have breakfast every school day.',
+'stay hydrated':'I carry a bottle of water to stay hydrated.',
+'wind down before bed':'I read for ten minutes to wind down before bed.',
+'cut down on sugary drinks':'I am trying to cut down on sugary drinks.',
+'strike a balance':'I try to strike a balance between screen time and being active.',
+'make an effort to':'I make an effort to go to bed earlier on school nights.'
+};
+function exampleFor(x){if(examples[x])return examples[x];return `I ${x}.`.replace('I go on foot.','I go to school on foot.').replace('I recharge.','I recharge by taking a short break.')}
+const levelInfo={
+ insecure:{label:'Insecure',note:'Treballa hàbits saludables amb frases molt curtes i vocabulari molt freqüent.',builders:[['I','drink','water','every','day.'],['I','eat','fruit','at','break','time.'],['I','go','to','bed','early','on','school','nights.'],['I','go','to','school','on','foot.']],actions:['I have breakfast','I drink water','I eat fruit','I eat vegetables','I have a healthy snack','I take a break','I go on foot','I play sport','I limit screen time'],requirements:['Write 35–50 words.','Describe a classmate using he or she.','Use at least 2 healthy-habit expressions.','Use Then or because if you can.'],minWords:35,maxWords:50,connectors:['Then','because'],writingTask:'Escriu 35–50 paraules sobre alguns hàbits saludables d’un company o companya. Fes servir he o she i almenys 2 expressions treballades.',speakingTask:'Explica 3 o 4 hàbits saludables d’un company o companya. Fes servir he o she i almenys 2 expressions treballades.',speakingChecklist:['3–4 clear sentences','he / she','2 healthy-habit expressions','Speak slowly and clearly']},
+ safe:{label:'Safe',note:'Explica hàbits amb més detall i dona una raó o un contrast senzill.',builders:[['She','stays','hydrated','during','the','school','day.'],['He','takes','screen','breaks','in','the','evening.'],['She','winds','down','before','bed.'],['He','cuts','down','on','sugary','drinks.']],actions:['She stays hydrated','He eats regular meals','She chooses a healthy snack','He is active','She takes screen breaks','He winds down before bed','She gets enough rest','He spends less time on screens'],requirements:['Write 70–90 words.','Describe a classmate using he or she.','Use at least 4 target expressions.','Use because and but or although.'],minWords:70,maxWords:90,connectors:['because','but','although','also','usually'],writingTask:'Escriu 70–90 paraules sobre els hàbits d’un company o companya. Inclou alimentació, descans o moviment, almenys 4 expressions i una raó o contrast.',speakingTask:'Explica els hàbits d’un company o companya en 4–5 frases. Inclou almenys 3 expressions i una raó o contrast.',speakingChecklist:['4–5 connected sentences','3 target expressions','because / but / although','Clear pronunciation']},
+ daring:{label:'Daring',note:'Compara hàbits i reflexiona sobre petits canvis realistes amb llenguatge natural.',builders:[['I','try','to','strike','a','balance','between','screens','and','exercise.'],['She','makes','an','effort','to','get','enough','sleep.'],['We','both','try','to','make','healthy','choices.'],['He','could','make','a','small','change','to','his','evening','routine.']],actions:['We make healthy choices','She builds a healthy routine','He makes an effort to','We stick to a routine','I strike a balance','She cuts back on','He makes a small change','We look after ourselves'],requirements:['Write 100–120 words.','Compare your classmate’s habits with your own.','Use at least 5 target expressions.','Include cause, contrast and one respectful suggestion or reflection.'],minWords:100,maxWords:120,connectors:['because','although','whereas','however','so','both','while'],writingTask:'Escriu 100–120 paraules comparant els hàbits saludables d’un company o companya amb els teus. Inclou similituds, diferències i una reflexió o petit canvi realista.',speakingTask:'Compara els hàbits d’un company o companya amb els teus. Inclou almenys 4 expressions, una similitud, una diferència i una reflexió respectuosa.',speakingChecklist:['5+ connected sentences','4 target expressions','similarity + difference','reflection / realistic suggestion','Natural pace']}
+};
+const readingData={
+ insecure:{
+  title:'Mia’s healthy school day',
+  text:`<p>Mia has breakfast every morning. She drinks water with breakfast and takes a bottle of water to school. At break time, she often eats fruit. She goes home on foot twice a week and plays volleyball on Friday. In the evening, she takes a short break from screens and goes to bed at ten thirty.</p>`,
+  questions:[
+   {q:'What does Mia do every morning?',o:['She has breakfast','She skips breakfast','She goes running'],a:0},
+   {q:'What does she take to school?',o:['A bottle of water','A fizzy drink','Coffee'],a:0},
+   {q:'What does she often eat at break time?',o:['Fruit','Cake','Nothing'],a:0},
+   {q:'How does she go home twice a week?',o:['On foot','By taxi','By train'],a:0},
+   {q:'What sport does she play?',o:['Volleyball','Tennis','Football'],a:0},
+   {q:'What does she do in the evening?',o:['Takes a screen break','Uses screens all night','Eats breakfast'],a:0}
+  ]
+ },
+ safe:{
+  title:'A routine that helps Leo feel ready',
+  text:`<p>Leo tries to keep a balanced routine on school days. He has a balanced breakfast because he does not like starting class hungry. He carries water and tries to stay hydrated during the day. After school, he has a healthy snack and is active for a while before doing homework. In the evening, he takes screen breaks and usually winds down before bed by listening to music. He likes sugary drinks, but he is trying to cut down on them during the week.</p>`,
+  questions:[
+   {q:'Why does Leo have breakfast?',o:['He does not like starting class hungry','He wants to stay awake all night','He never eats lunch'],a:0},
+   {q:'What does he do to stay hydrated?',o:['Carries water','Drinks only soda','Skips drinks'],a:0},
+   {q:'What happens after school?',o:['Healthy snack and some activity','He goes straight to bed','He skips food'],a:0},
+   {q:'How does he wind down?',o:['By listening to music','By doing more homework','By drinking coffee'],a:0},
+   {q:'What is he trying to cut down on?',o:['Sugary drinks','Water','Fruit'],a:0},
+   {q:'Which connector introduces contrast?',o:['but','because','and'],a:0}
+  ]
+ },
+ daring:{
+  title:'Small changes, better balance',
+  text:`<p>Noah and Laia both want a healthy routine, but their habits are different. Noah makes an effort to be active every afternoon, whereas Laia prefers walking and spending time outdoors at the weekend. Laia is good at winding down before bed, while Noah often stays on his phone too long. They both stay hydrated and usually eat regular meals. Noah wants to cut back on screen time, and Laia wants to make a small change by being more active during the week. They agree that healthy habits are not about being perfect; they are about finding a balance that is realistic.</p>`,
+  questions:[
+   {q:'What habit is Noah good at?',o:['Being active in the afternoon','Going to bed very early','Avoiding all screens'],a:0},
+   {q:'What does Laia prefer?',o:['Walking and outdoor time','Playing video games all weekend','Skipping meals'],a:0},
+   {q:'What habit do they share?',o:['Staying hydrated','Never using screens','Doing the same sport'],a:0},
+   {q:'What does Noah want to change?',o:['Screen time','Breakfast','Water'],a:0},
+   {q:'What does Laia want to change?',o:['Be more active during the week','Drink less water','Sleep less'],a:0},
+   {q:'What is the main message?',o:['Healthy habits should be realistic and balanced','Everyone needs the same routine','Being perfect is essential'],a:0}
+  ]
+ }
+};
+const listening={
+ insecure:[
+  {q:'What does Jamie always do before leaving home?',o:['Has breakfast','Plays basketball','Goes to bed'],a:0},
+  {q:'What does Jamie drink at breakfast?',o:['Water','Coffee','Soda'],a:0},
+  {q:'What does Jamie often eat at break time?',o:['Fruit or a sandwich','Ice cream','Nothing'],a:0},
+  {q:'How often does Jamie go home on foot?',o:['Three days a week','Every day','Never'],a:0},
+  {q:'When does Jamie play basketball?',o:['Tuesdays and Thursdays','Mondays only','At the weekend'],a:0},
+  {q:'What time does Jamie usually go to bed?',o:['10:30','9:00','12:00'],a:0}
+ ],
+ safe:[
+  {q:'Why does Jamie take water to school?',o:['To stay hydrated','To wash a phone','To cook lunch'],a:0},
+  {q:'Which is a healthy snack in the listening?',o:['Fruit','Candy only','No snack'],a:0},
+  {q:'Which movement habit appears?',o:['Going home on foot','Driving everywhere','No activity'],a:0},
+  {q:'What does Jamie do after homework?',o:['Takes a short screen break','Plays basketball at midnight','Has breakfast'],a:0},
+  {q:'Why does Jamie stop using the phone before bed?',o:['It helps Jamie wind down','The phone is broken','School starts at night'],a:0},
+  {q:'Which expression best matches the final idea?',o:['get enough sleep','cut down on breakfast','skip water'],a:0}
+ ],
+ daring:[
+  {q:'Which two habits are connected to hydration and food?',o:['Carrying water and eating fruit or a sandwich','Using a phone and playing games','Sleeping and watching TV'],a:0},
+  {q:'What balance does Jamie’s afternoon show?',o:['Movement, homework and a screen break','Only homework','Only screens'],a:0},
+  {q:'Which habit could be described as “sticking to a routine”?',o:['Regular bedtime','Random meals','Changing sleep time every night'],a:0},
+  {q:'What cause-and-effect relationship is stated?',o:['Less phone before bed helps Jamie wind down','Basketball causes breakfast','Water causes screen time'],a:0},
+  {q:'Which statement is supported by the listening?',o:['Jamie has several realistic healthy habits','Jamie follows a perfect routine','Jamie never uses a phone'],a:0},
+  {q:'What is the best summary?',o:['Jamie combines food, hydration, movement, rest and screen habits','Jamie only cares about sport','Jamie has no routine'],a:0}
+ ]
+};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],shuffle=a=>[...a].sort(()=>Math.random()-.5);
+let level=localStorage.getItem('healthyHabitsLevel2ESO')||'insecure',cardIndex=0,selectedMatch=null,matched=0,currentMatchExpressions=[],currentMatchTotal=0,built=[],practiceSet=0,recordBlob=null,recordUrl=null;
+const allState=JSON.parse(localStorage.getItem('healthyHabitsState2ESO')||'{}');
+function state(){allState[level]=allState[level]||{done:{},known:[],text:'',speakingPlan:'',practiceSeen:[]};return allState[level]}
+function save(){localStorage.setItem('healthyHabitsState2ESO',JSON.stringify(allState));localStorage.setItem('healthyHabitsLevel2ESO',level);updateProgress()}
+function complete(k){state().done[k]=true;save()}
+function cumulativeGroups(){const keys=level==='insecure'?['insecure']:level==='safe'?['insecure','safe']:['insecure','safe','daring'];const out=[];for(const k of keys){for(const [cat,items] of vocabMap[k]){let g=out.find(x=>x[0]===cat);if(!g){g=[cat,[]];out.push(g)}for(const item of items)if(!g[1].includes(item))g[1].push(item)}}return out}
+function deck(){return cumulativeGroups().flatMap(([category,items])=>items.map(expression=>({category,expression,ca:ca[expression]||'—',example:exampleFor(expression)})))}
+function updateProgress(){const d=state().done;const vocabDone=['explore','cards'].every(k=>d[k]);const practiceDone=['match','practice','build'].every(k=>d[k]);const n=[vocabDone,practiceDone,d.listen,d.reading,d.write,d.speaking].filter(Boolean).length;$('#progressLabel').textContent=levelInfo[level].label;$('#progressText').textContent=`${n} / 6`;$('#progressBar').style.width=`${n/6*100}%`}
+function setLevel(x){level=x;cardIndex=0;practiceSet=0;$$('.route').forEach(b=>b.classList.toggle('active',b.dataset.level===level));renderAll();save()}
+$$('.route').forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab,.panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#'+t.dataset.panel).classList.add('active');window.scrollTo({top:$('main').offsetTop-64,behavior:'smooth'})});
+function renderExplore(){const info=levelInfo[level];$('#exploreNote').textContent=info.note;$('#explorePill').textContent=info.label+' route';$('#vocabGroups').innerHTML=cumulativeGroups().map(([cat,items])=>`<article class="vocab-group"><h3>${cat}</h3><div class="chips">${items.map(x=>`<span class="chip" tabindex="0">${x}<span class="chip-tooltip"><b>${ca[x]||'—'}</b>${exampleFor(x)}</span></span>`).join('')}</div></article>`).join('');$('#studySummary').textContent=`${deck().length} expressions. Les tornaràs a veure a les targetes i a les activitats.`}
+$('#finishExplore').onclick=()=>complete('explore');
+function renderCards(){const d=deck();if(cardIndex>=d.length)cardIndex=0;const v=d[cardIndex];$('#flashcard').classList.remove('flipped');$('#cardCategory').textContent=v.category;$('#cardFront').textContent=v.expression;$('#cardBack').textContent=v.ca;$('#cardHint').textContent=v.example;$('#cardCounter').textContent=`Card ${cardIndex+1} of ${d.length} · ${state().known.includes(cardIndex)?'✓ Known':'Practising'}`}
+function moveCard(n){cardIndex=(cardIndex+n+deck().length)%deck().length;renderCards()}$('#flashcard').onclick=()=>$('#flashcard').classList.toggle('flipped');$('#prevCard').onclick=()=>moveCard(-1);$('#nextCard').onclick=()=>moveCard(1);$('#knowCard').onclick=()=>{const s=state();if(!s.known.includes(cardIndex))s.known.push(cardIndex);if(s.known.length>=deck().length)complete('cards');else save();moveCard(1)};
+function splitChunk(exp){const words=exp.split(' ');let cut=1;if(words[0].toLowerCase()==='pay'||words[0].toLowerCase()==='take'||words[0].toLowerCase()==='make'||words[0].toLowerCase()==='have'||words[0].toLowerCase()==='do')cut=1;return [words.slice(0,cut).join(' '),words.slice(cut).join(' ')]}
+function normaliseMatchText(s){return s.toLowerCase().replace(/\s+/g,' ').trim()}
+function renderMatch(){selectedMatch=null;matched=0;$('#matchResult').classList.remove('show');const chosen=shuffle(deck().filter(x=>x.expression.split(' ').length>1)).slice(0,8).map((x,i)=>{const [l,r]=splitChunk(x.expression);return {l,r,id:i,expression:x.expression}});currentMatchExpressions=chosen.map(x=>normaliseMatchText(x.expression));currentMatchTotal=chosen.length;drawMatch(shuffle(chosen),'#matchLeft','l','left');drawMatch(shuffle(chosen),'#matchRight','r','right')}
+function drawMatch(items,sel,key,side){const el=$(sel);el.innerHTML='';items.forEach(x=>{const b=document.createElement('button');b.className='match-card';b.textContent=x[key];b.dataset.id=x.id;b.dataset.value=x[key];b.onclick=()=>pickMatch(b,side);el.appendChild(b)})}
+function pickMatch(btn,side){if(btn.classList.contains('matched'))return;if(!selectedMatch){selectedMatch={btn,side};btn.classList.add('selected');return}if(selectedMatch.side===side){selectedMatch.btn.classList.remove('selected');selectedMatch={btn,side};btn.classList.add('selected');return}const left=side==='right'?selectedMatch.btn:btn;const right=side==='right'?btn:selectedMatch.btn;const candidate=normaliseMatchText(`${left.dataset.value} ${right.dataset.value}`);if(currentMatchExpressions.includes(candidate)){selectedMatch.btn.classList.remove('selected');selectedMatch.btn.classList.add('matched');btn.classList.add('matched');matched++;if(matched===currentMatchTotal){$('#matchResult').textContent=`Great! All ${currentMatchTotal} expressions are correct.`;$('#matchResult').classList.add('show');complete('match')}}else{const old=selectedMatch.btn;btn.classList.add('wrong');old.classList.add('wrong');setTimeout(()=>{btn.classList.remove('wrong');old.classList.remove('wrong','selected')},420)}selectedMatch=null}
+$('#resetMatch').onclick=renderMatch;
+function practiceItems(){const d=deck(),size=10,start=practiceSet*size;return d.slice(start,start+size)}function firstWord(exp){return exp.split(' ')[0]}
+function renderPractice(){const d=deck(),items=practiceItems(),totalSets=Math.ceil(d.length/10);if(!items.length){practiceSet=0;return renderPractice()}$('#practiceSetLabel').textContent=`Set ${practiceSet+1} of ${totalSets}`;$('#practiceCoverage').textContent=`${Math.min(practiceSet*10+items.length,d.length)} / ${d.length} expressions reached`;const pool=[...new Set(d.map(x=>firstWord(x.expression)))];$('#practiceList').innerHTML='';items.forEach((item,i)=>{const ans=firstWord(item.expression),rest=item.expression.split(' ').slice(1).join(' '),opts=shuffle([ans,...shuffle(pool.filter(x=>x!==ans)).slice(0,3)]);const box=document.createElement('div');box.className='task';box.innerHTML=`${practiceSet*10+i+1}. <select><option value="">Choose…</option>${opts.map(x=>`<option>${x}</option>`).join('')}</select> ${rest}<div class="feedback"></div>`;box.dataset.answer=ans;$('#practiceList').appendChild(box)});$('#practiceResult').classList.remove('show')}
+$('#checkPractice').onclick=()=>{let score=0;$$('#practiceList .task').forEach(box=>{const good=box.querySelector('select').value===box.dataset.answer;box.classList.toggle('good',good);box.classList.toggle('bad',!good);box.querySelector('.feedback').textContent=good?'Correct!':'Look again at the complete expression.';box.querySelector('.feedback').className='feedback '+(good?'ok':'no');if(good)score++});$('#practiceResult').textContent=`${score} / ${$$('#practiceList .task').length} correct`;$('#practiceResult').classList.add('show');state().practiceSeen[practiceSet]=true;if(state().practiceSeen.filter(Boolean).length>=Math.ceil(deck().length/10))complete('practice');else save()};$('#nextPractice').onclick=()=>{practiceSet=(practiceSet+1)%Math.ceil(deck().length/10);renderPractice()};
+let listeningVoice=null;
+function playListening(rate){
+  if(!('speechSynthesis' in window)){ $('#audioStatus').textContent='Text-to-speech is not available in this browser.'; return; }
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(alexText);
+  u.lang='en-US';
+  u.rate=rate;
+  const voices=window.speechSynthesis.getVoices();
+  const preferred=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith('en-us'))||voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith('en'));
+  if(preferred)u.voice=preferred;
+  u.onstart=()=>$('#audioStatus').textContent=rate<1?'Playing: slow 0.8×':'Playing: normal';
+  u.onend=()=>$('#audioStatus').textContent='Ready to listen again';
+  window.speechSynthesis.speak(u);
+}
+$('#normalSpeed').onclick=()=>playListening(1);
+$('#slowSpeed').onclick=()=>playListening(.8);
+function renderListening()function renderListening(){const form=$('#listenForm');form.innerHTML='';listening[level].forEach((q,i)=>{const box=document.createElement('div');box.className='question';box.innerHTML=`<p class="q-title">${i+1}. ${q.q}</p><div class="options">${q.o.map((o,j)=>`<label class="option"><input type="radio" name="listen${i}" value="${j}"><span>${o}</span></label>`).join('')}</div><div class="feedback" id="lf${i}"></div>`;form.appendChild(box)});$('#listenResult').classList.remove('show')}
+$('#checkListen').onclick=()=>{let score=0;listening[level].forEach((q,i)=>{const c=$(`input[name=listen${i}]:checked`);if(c&&+c.value===q.a)score++;$('#lf'+i).textContent=c&&+c.value===q.a?'Correct!':'Listen again.';$('#lf'+i).className='feedback '+(c&&+c.value===q.a?'ok':'no')});$('#listenResult').textContent=`${score} / ${listening[level].length} correct`;$('#listenResult').classList.add('show');if(score>=listening[level].length-1)complete('listen')};
+function renderReading(){
+  const data=readingData[level];
+  $('#readingTitle').textContent=data.title;
+  $('#readingText').innerHTML=data.text;
+  const form=$('#readingForm');
+  form.innerHTML='';
+  data.questions.forEach((q,i)=>{
+    const box=document.createElement('div');
+    box.className='question';
+    box.innerHTML=`<p class="q-title">${i+1}. ${q.q}</p><div class="options">${q.o.map((o,j)=>`<label class="option"><input type="radio" name="reading${i}" value="${j}"><span>${o}</span></label>`).join('')}</div><div class="feedback" id="rf${i}"></div>`;
+    form.appendChild(box);
+  });
+  $('#readingResult').classList.remove('show');
+}
+$('#checkReading').onclick=()=>{
+  let score=0;
+  readingData[level].questions.forEach((q,i)=>{
+    const selected=$(`input[name=reading${i}]:checked`);
+    const ok=selected&&+selected.value===q.a;
+    if(ok)score++;
+    $('#rf'+i).textContent=ok?'Correct!':'Read the text again and check this idea.';
+    $('#rf'+i).className='feedback '+(ok?'ok':'no');
+  });
+  $('#readingResult').textContent=`${score} / ${readingData[level].questions.length} correct`;
+  $('#readingResult').classList.add('show');
+  if(score>=5)complete('reading');
+};
+function renderBuilders(){built=levelInfo[level].builders.map(()=>[]);const el=$('#builderList');el.innerHTML='';levelInfo[level].builders.forEach((sentence,i)=>{const item=document.createElement('div');item.className='build-item';item.innerHTML=`<h3>Sentence ${i+1}</h3><div class="word-bank" data-bank="${i}"></div><div class="sentence-line" data-line="${i}"><span class="instruction">Build your sentence here…</span></div><div class="feedback"></div>`;el.appendChild(item);shuffle(sentence.map((w,j)=>({w,j}))).forEach(obj=>{const b=document.createElement('button');b.className='word';b.textContent=obj.w;b.dataset.index=obj.j;b.onclick=()=>addWord(i,obj.j,b);item.querySelector('.word-bank').appendChild(b)})});$('#builderResult').classList.remove('show')}
+function addWord(i,j,b){if(built[i].includes(j))return;built[i].push(j);b.classList.add('used');drawBuilt(i)}function drawBuilt(i){const line=$(`[data-line="${i}"]`);line.innerHTML='';built[i].forEach(j=>{const b=document.createElement('button');b.className='word';b.textContent=levelInfo[level].builders[i][j];b.onclick=()=>{built[i]=built[i].filter(x=>x!==j);$(`[data-bank="${i}"] [data-index="${j}"]`).classList.remove('used');drawBuilt(i)};line.appendChild(b)});if(!built[i].length)line.innerHTML='<span class="instruction">Build your sentence here…</span>'}
+$('#checkBuilders').onclick=()=>{let score=0;levelInfo[level].builders.forEach((s,i)=>{const ans=built[i].map(j=>s[j]).join(' '),correct=s.join(' '),f=$$('.build-item .feedback')[i];f.textContent=ans===correct?'Correct!':'Not yet. Check the order.';f.className='feedback '+(ans===correct?'ok':'no');if(ans===correct)score++});$('#builderResult').textContent=`${score} / ${levelInfo[level].builders.length} correct`;$('#builderResult').classList.add('show');if(score===levelInfo[level].builders.length)complete('build')};$('#resetBuilders').onclick=renderBuilders;
+function renderWriting(){const d=levelInfo[level];
+  $('#writeInstruction').textContent=level==='insecure'?'Descriu hàbits saludables amb frases curtes i clares.':level==='safe'?'Explica els hàbits amb detalls, raons i algun contrast.':'Compara hàbits i reflexiona sobre un canvi realista.';
+  const ex={
+    insecure:'She has breakfast every day. She drinks water at school. Then she eats fruit at break time. She goes to bed early on school nights.',
+    safe:'My classmate stays hydrated because she takes water to school. She also chooses a healthy snack, but she sometimes spends too much time on screens in the evening. She tries to wind down before bed.',
+    daring:'My classmate and I both try to make healthy choices. She makes an effort to get enough sleep, whereas I am more active after school. However, we both need to strike a better balance with screen time, so we could make one small change in the evening.'
+  }[level];
+  $('#useExample').innerHTML=`<h3>Model</h3><div class="example">${ex}</div>`;
+  $('#connectorStrip').innerHTML=d.connectors.map(x=>`<span class="connector">${x}</span>`).join('');
+  $('#actionSelect').innerHTML=d.actions.map(x=>`<option>${x}</option>`).join('');
+  $('#writingSupport').innerHTML=level==='insecure'
+    ?'<p><b>He / She ___ every day.</b></p><p><b>Then he / she ___.</b></p><p><b>This is a healthy habit because ___.</b></p>'
+    :level==='safe'
+    ?'<p><b>He / She ___ because ___.</b></p><p><b>He / She ___, but ___.</b></p><p><b>Another healthy habit is ___.</b></p>'
+    :'<p><b>We both ___, whereas ___.</b></p><p><b>Although ___, ___.</b></p><p><b>A realistic change could be ___ because ___.</b></p>';
+  $('#planGrid').innerHTML=['Food & water: what does the person usually do?','Sleep & rest: what is their routine?','Movement & screens: what habits do they have?','Which target expressions and connectors will you use?'].map((q,i)=>`<div class="plan-q"><label>${q}</label><input id="plan${i}" placeholder="Short notes..."></div>`).join('');
+  $('#writingTask').textContent=d.writingTask;
+  $('#writeChecklist').innerHTML=d.requirements.map(x=>`<li>${x}</li>`).join('');
+  $('#routineText').value=state().text||'';
+  generateSentence();countWords()
+}
+function generateSentence()function generateSentence(){const action=$('#actionSelect').value,time=$('#timeSelect').value;$('#generatedSentence').textContent=`${action} ${time}.`}$('#actionSelect').onchange=generateSentence;$('#timeSelect').onchange=generateSentence;$('#copySentence').onclick=()=>{const t=$('#routineText');t.value+=(t.value.trim()?'\n':'')+$('#generatedSentence').textContent;countWords();t.focus()};function countWords(){const t=$('#routineText').value.trim(),n=t?t.split(/\s+/).length:0;$('#wordCount').textContent=n;state().text=t;save()}$('#routineText').oninput=countWords;
+function writingPrompt(){const d=levelInfo[level],text=$('#routineText').value.trim();return `Actua com a tutor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”, secció “Healthy habits”.\n\nNivell: ${d.label}. Tasca: ${d.writingTask}\n\nText de l'alumne:\n${text}\n\nDona el feedback en català, clar i breu. No posis nota numèrica. Mantén la veu i el nivell de l'alumne. Valora també si parla dels hàbits de manera respectuosa i sense fer comentaris sobre el cos o el pes. Respon només amb aquests apartats:\n1. ✅ Què està bé — una o dues coses concretes.\n2. ⚠️ Què falta / què no segueix les instruccions.\n3. 🔧 Correccions importants — màxim 3.\n4. 📝 Versió corregida — en anglès, mantenint les idees de l'alumne.\n5. 🎯 Un següent pas — una sola cosa concreta per millorar.`}
+$('#sendWritingFeedback')$('#sendWritingFeedback').onclick=()=>{if(!$('#routineText').value.trim()){alert('Write your text first.');return}complete('write');const url='https://chatgpt.com/?prompt='+encodeURIComponent(writingPrompt());window.open(url,'_blank','noopener,noreferrer');$('#writeResult').textContent='Your text is ready to be corrected with AI.';$('#writeResult').classList.add('show')};$('#resetWriting').onclick=()=>{$('#routineText').value='';state().text='';save();countWords()};
+function renderSpeaking(){const d=levelInfo[level];$('#speakingPill').textContent=d.label+' route';
+  const model={
+    insecure:'She drinks water every day. She eats fruit at break time. She goes to bed early.',
+    safe:'My classmate stays hydrated because she takes water to school. She is active after school, but she sometimes spends a lot of time on screens.',
+    daring:'My classmate and I both have some healthy habits. She makes an effort to get enough sleep, whereas I am more active. We could both strike a better balance with screen time.'
+  }[level];
+  $('#speakingModel').innerHTML=`<div class="example">${model}</div>`;
+  $('#speakingTask').textContent=d.speakingTask;
+  $('#speakingSupport').innerHTML=level==='insecure'
+    ?'<p><b>He / She ___ every day.</b></p><p><b>He / She also ___.</b></p>'
+    :`<div class="connector-strip">${d.connectors.map(x=>`<span class="connector">${x}</span>`).join('')}</div>`;
+  $('#speakingPlan').value=state().speakingPlan||'';
+  $('#speakingPlan').placeholder=level==='insecure'?'She drinks water every day. She...':'Write the sentences you are going to say...';
+  $('#speakingChecklist').innerHTML=d.speakingChecklist.map(x=>`<li>${x}</li>`).join('')
+}
+$('#speakingPlan').oninput$('#speakingPlan').oninput=()=>{state().speakingPlan=$('#speakingPlan').value;save()};
+let audioCtx,sourceNode,processor,stream,pcm=[],recSampleRate=44100,recognition=null;
+function encodeWav(buffers,sampleRate){let length=buffers.reduce((n,a)=>n+a.length,0),samples=new Float32Array(length),o=0;buffers.forEach(a=>{samples.set(a,o);o+=a.length});const ab=new ArrayBuffer(44+samples.length*2),v=new DataView(ab);const w=(off,s)=>{for(let i=0;i<s.length;i++)v.setUint8(off+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+samples.length*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sampleRate,true);v.setUint32(28,sampleRate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,samples.length*2,true);let p=44;for(let i=0;i<samples.length;i++,p+=2){let s=Math.max(-1,Math.min(1,samples[i]));v.setInt16(p,s<0?s*0x8000:s*0x7fff,true)}return new Blob([v],{type:'audio/wav'})}
+$('#startRecord').onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({audio:true});audioCtx=new (window.AudioContext||window.webkitAudioContext)();recSampleRate=audioCtx.sampleRate;sourceNode=audioCtx.createMediaStreamSource(stream);processor=audioCtx.createScriptProcessor(4096,1,1);pcm=[];processor.onaudioprocess=e=>pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));sourceNode.connect(processor);processor.connect(audioCtx.destination);$('#recordStatus').textContent='Recording… speak now.';$('#startRecord').disabled=true;$('#stopRecord').disabled=false;const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){recognition=new SR();recognition.lang='en-US';recognition.continuous=true;recognition.interimResults=true;let finalText='';recognition.onresult=e=>{let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)finalText+=t+' ';else interim+=t}$('#speechTranscript').value=(finalText+interim).trim()};try{recognition.start()}catch(e){}}}catch(e){$('#recordStatus').textContent='Microphone access was not available.'}}
+$('#stopRecord').onclick=async()=>{if(processor){processor.disconnect();sourceNode.disconnect();stream.getTracks().forEach(t=>t.stop());await audioCtx.close();try{recognition&&recognition.stop()}catch(e){}recordBlob=encodeWav(pcm,recSampleRate);if(recordUrl)URL.revokeObjectURL(recordUrl);recordUrl=URL.createObjectURL(recordBlob);$('#recordedAudio').src=recordUrl;$('#recordedAudio').style.display='block';$('#downloadWav').disabled=false;$('#recordStatus').textContent='Recording ready. Listen to it and download the WAV.';$('#startRecord').disabled=false;$('#stopRecord').disabled=true;complete('speaking')}}
+$('#downloadWav').onclick=()=>{if(!recordBlob)return;const a=document.createElement('a');a.href=recordUrl;a.download=`healthy-habits-${level}.wav`;a.click()};
+function speakingPrompt(){const d=levelInfo[level],tr=$('#speechTranscript').value.trim();return `Escolta l'àudio adjunt i actua com a professor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”, secció “Healthy habits”.\n\nNivell: ${d.label}. Tasca: ${d.speakingTask}\n${tr?`\nTranscripció revisada per l'alumne:\n${tr}\n`:''}\nDona el feedback en català, clar i breu. No posis nota numèrica. Valora que el llenguatge sobre hàbits sigui respectuós i centrat en conductes, no en cossos ni pes. Respon només amb aquests apartats:\n1. 📝 Transcripció — escriu què diu realment l'alumne.\n2. ✅ Què ha fet bé — una o dues coses concretes.\n3. 🔧 Què ha de corregir — màxim 2 errors importants; escriu exactament com ho hauria de dir.\n4. 🗣️ Pronunciació — comenta només un problema clar; si no n'hi ha, digues que és correcta per al nivell.\n5. 📋 Instruccions — indica breument si ha complert la tasca.\n6. 🎯 Un següent pas — una sola millora concreta.`}
+function copyPromptNowfunction copyPromptNow(text){
+  // Use a synchronous copy while the button click still counts as a user gesture.
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  ta.setAttribute('readonly','');
+  ta.style.position='fixed';
+  ta.style.opacity='0';
+  ta.style.pointerEvents='none';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0,ta.value.length);
+  let ok=false;
+  try{ok=document.execCommand('copy')}catch(e){ok=false}
+  ta.remove();
+  return ok;
+}
+$('#prepareSpeakingFeedback').onclick=()=>{
+  if(!recordBlob){alert('Record your speaking first.');return}
+  const p=speakingPrompt();
+
+  // IMPORTANT: use the same prompt-prefill mechanism as the older page that worked.
+  // Open ChatGPT directly from the student's click; do not await clipboard APIs first.
+  const chatUrl='https://chatgpt.com/?prompt='+encodeURIComponent(p);
+  const chatWindow=window.open(chatUrl,'_blank','noopener,noreferrer');
+
+  // Download the WAV automatically.
+  const a=document.createElement('a');
+  a.href=recordUrl;
+  a.download=`healthy-habits-${level}.wav`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  // Clipboard is only a backup now; the prompt is already included in the ChatGPT URL.
+  let copied=copyPromptNow(p);
+  if(!copied && navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(p).catch(()=>{});
+  }
+
+  $('#speakingCopyStatus').textContent=chatWindow
+    ?'✓ WAV downloaded · ChatGPT opened with the prompt prepared. Attach the WAV and press Send.'
+    :'The browser blocked the ChatGPT tab. Allow pop-ups and try again.';
+};
+function renderAll(){renderExplore();renderCards();renderMatch();renderPractice();renderListening();renderReading();renderBuilders();renderWriting();renderSpeaking();updateProgress();$$('.route').forEach(b=>b.classList.toggle('active',b.dataset.level===level))}
+renderAll();
+</script>
+</body>
+</html>
