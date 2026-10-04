@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#315f9f">
+<title>Learning Path 1 · Getting started</title>
+<style>
+:root{--accent:#315f9f;--dark:#234777;--soft:#edf4ff;--soft2:#dceafe;--cream:#f7f9fd;--ink:#172033;--muted:#687386;--line:#dbe5f1;--shadow:0 14px 38px rgba(49,95,159,.10)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--cream);color:var(--ink);line-height:1.5}button,textarea{font:inherit}button{cursor:pointer}.wrap{width:min(1080px,calc(100% - 30px));margin:auto}
+.topbar{position:sticky;top:0;z-index:30;background:var(--dark);color:#fff}.toprow{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;align-items:center;gap:10px;font-weight:850}.brand a{color:#fff;text-decoration:none}.brand-mark{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#fff;color:var(--accent)}.brand-title small{display:block;font-size:.7rem;color:#dcebe5;margin-top:1px}.progress-shell{width:150px}.progress-label{display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:4px;color:#e7f1ed}.progress-track{height:5px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}.progress-bar{height:100%;width:0;background:#fff;border-radius:99px;transition:.25s}
+.hero{padding:38px 0 28px;background:linear-gradient(135deg,var(--soft) 0%,var(--cream) 60%,#fff 100%);border-bottom:1px solid var(--line)}.eyebrow{display:inline-flex;background:var(--soft2);color:var(--dark);padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.05em}h1{margin:14px 0 8px;color:var(--dark);font-size:clamp(2.1rem,6vw,4rem);line-height:1.03}.lead{max-width:790px;margin:0;color:var(--muted);font-size:1.05rem}.warm-note{margin-top:14px;padding:11px 13px;background:#fff;border:1px solid var(--line);border-radius:13px;color:var(--muted);font-size:.92rem}.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.route{border:1px solid var(--line);background:#fff;border-radius:18px;padding:15px;text-align:left;color:var(--ink)}.route strong{display:block;color:var(--dark)}.route span{display:block;color:var(--muted);font-size:.84rem;margin-top:3px}.route.active{border:2px solid var(--accent);background:var(--soft)}
+main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 1px 14px}.tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:12px;padding:10px 15px;font-weight:780}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}.panel{display:none;background:#fff;border:1px solid var(--line);border-radius:24px;padding:clamp(19px,4vw,34px);box-shadow:var(--shadow)}.panel.active{display:block}.panel-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}h2{margin:0 0 6px;color:var(--dark);font-size:clamp(1.5rem,3vw,2.1rem)}h3{color:var(--dark);margin:0 0 8px}.instruction{margin:0;color:var(--muted)}.pill{white-space:nowrap;background:var(--soft);color:var(--dark);border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:850}.section-card{border:1px solid var(--line);border-radius:18px;background:#f8fbff;padding:18px;margin:15px 0}.choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.choice{border:1px solid var(--line);background:#fff;border-radius:13px;padding:13px;text-align:left;color:var(--ink);font-weight:700}.choice.selected{border-color:var(--accent);background:var(--soft)}.question{padding:16px 0;border-top:1px solid var(--line)}.question:first-child{border-top:0}.q-title{font-weight:760;margin:0 0 9px}.options{display:grid;gap:8px}.option{display:flex;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}.feedback{min-height:20px;margin-top:7px;font-size:.9rem;font-weight:720}.ok{color:var(--accent)}.no{color:#b84343}.btn{border:0;border-radius:12px;padding:10px 15px;font-weight:800;background:var(--accent);color:#fff}.btn.secondary{background:#fff;color:var(--dark);border:1px solid var(--line)}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.result{display:none;margin-top:15px;padding:13px;border-radius:12px;background:var(--soft);color:var(--dark);font-weight:760}.result.show{display:block}.reading{padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff;line-height:1.75;margin-bottom:10px}.model{padding:14px;border-radius:13px;background:#fff;border:1px solid var(--line);font-weight:650}.speak-support{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mini-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.mini-card strong{color:var(--dark)}textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:12px;padding:12px;resize:vertical}.footer-note{text-align:center;color:var(--muted);font-size:.86rem;padding-top:20px}
+@media(max-width:760px){.routes,.choice-grid,.speak-support{grid-template-columns:1fr}.panel-head{display:block}.pill{display:inline-block;margin-top:8px}.progress-shell{width:112px}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap toprow">
+  <div class="brand"><a href="index.html">← My Real Routine</a><span class="brand-mark">1</span><span class="brand-title">Getting started<small>4 ESO · My Real Routine · Learning Path 1</small></span></div>
+  <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 4</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
+</div></div>
+
+<header class="hero"><div class="wrap">
+  <span class="eyebrow">Learning Path 1 · Warm-up</span>
+  <h1>Getting started</h1>
+  <p class="lead">Activate what you already know about routines, habits and comparison before the Learning Situation begins.</p>
+  <div class="warm-note"><strong>No new vocabulary here.</strong> Everything you see in this warm-up will appear again later in the Learning Situation.</div>
+  <div class="routes">
+    <button class="route active" data-level="insecure"><strong>Insecure</strong><span>Clear answers · strong support</span></button>
+    <button class="route" data-level="safe"><strong>Safe</strong><span>Compare · connect ideas</span></button>
+    <button class="route" data-level="daring"><strong>Daring</strong><span>Develop · justify · reflect</span></button></div>
+</div></header>
+
+<main class="wrap">
+<nav class="tabs" aria-label="Warm-up sections">
+  <button class="tab active" data-panel="quick">1 Quick start</button>
+  <button class="tab" data-panel="listen">2 Listening</button>
+  <button class="tab" data-panel="read">3 Reading</button>
+  <button class="tab" data-panel="speak">4 Speaking</button>
+</nav>
+
+<section class="panel active" id="quick">
+  <div class="panel-head"><div><h2>Quick start</h2><p class="instruction">Activate what you already know. No notes, no studying — just react.</p></div><span class="pill">2–3 min</span></div>
+  <div class="section-card">
+    <h3>Which sentences could describe a real school day?</h3>
+    <p class="instruction">Click the sentences that could be true for you. There is no “perfect” routine.</p>
+    <div class="choice-grid">
+      <button class="choice" data-ok="1">I usually head out in the morning.</button>
+      <button class="choice" data-ok="1">I get down to my homework after school.</button>
+      <button class="choice" data-ok="1">I take regular breaks when I study.</button>
+      <button class="choice" data-ok="1">I try to stay hydrated during the day.</button>
+      <button class="choice" data-ok="1">I wind down before bed.</button>
+      <button class="choice" data-ok="1">I try to get enough sleep.</button></div>
+    <div class="actions"><button class="btn" id="finishQuick">Done ✓</button></div>
+    <div class="result" id="quickResult">Good. You already have language you can use in this Learning Situation.</div>
+  </div>
+</section>
+
+<section class="panel" id="listen">
+  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Listen to a short routine and catch the main ideas.</p></div><span class="pill">6 questions</span></div>
+  <div class="section-card">
+    <div class="actions" style="margin-top:0"><button class="btn" id="playListen">▶ Listen</button><button class="btn secondary" id="playSlow">Slow 0.8×</button><span class="instruction" id="audioStatus">Ready</span></div>
+    <form id="listenForm"></form>
+    <div class="actions"><button class="btn" id="checkListen">Check listening</button></div>
+    <div class="result" id="listenResult"></div>
+  </div>
+</section>
+
+<section class="panel" id="read">
+  <div class="panel-head"><div><h2>Reading</h2><p class="instruction">Read a short routine and notice ideas you already understand.</p></div><span class="pill">6 questions</span></div>
+  <div class="section-card">
+    <div class="reading" id="readingText"></div>
+    <form id="readForm"></form>
+    <div class="actions"><button class="btn" id="checkRead">Check reading</button></div>
+    <div class="result" id="readResult"></div>
+  </div>
+</section>
+
+<section class="panel" id="speak">
+  <div class="panel-head"><div><h2>Speaking</h2><p class="instruction">Finish by saying something simple about a real routine.</p></div><span class="pill" id="speakPill">Insecure route</span></div>
+  <div class="section-card">
+    <h3>Your mini challenge</h3>
+    <p class="instruction" id="speakTask"></p>
+    <div class="speak-support" style="margin-top:14px">
+      <div class="mini-card"><strong>Model</strong><div class="model" id="speakModel" style="margin-top:8px"></div></div>
+      <div class="mini-card"><strong>Prepare</strong><textarea id="speakPlan" placeholder="Write a few words or sentences before you speak..."></textarea></div>
+    </div>
+    <div class="actions"><button class="btn" id="finishSpeak">I’m ready ✓</button></div>
+    <div class="result" id="speakResult">Warm-up complete. You are ready for the next Learning Path.</div>
+  </div>
+</section>
+
+<p class="footer-note">This session is only a warm-up. It does not introduce new vocabulary.</p>
+</main>
+
+<script>
+const listeningText="Hi, I’m Alex. On weekdays, I usually head out at eight. After school, I get home and take a short break before I get down to my homework. I try to stay hydrated during the day, and in the evening I limit screen time so I can wind down before bed. I do not follow the same routine every day, but I try to get enough sleep.";
+const listening=[{"q":"What time does Alex usually head out?","o":["At eight","At six","At ten"],"a":0},{"q":"What happens before homework?","o":["A short break","Dinner","Bedtime"],"a":0},{"q":"Which phrase means Alex starts working seriously?","o":["gets down to homework","heads out","winds down"],"a":0},{"q":"Which healthy habit appears during the day?","o":["staying hydrated","skipping meals","avoiding all breaks"],"a":0},{"q":"Why does Alex limit screen time in the evening?","o":["To wind down before bed","To start school","To eat dinner"],"a":0},{"q":"What is the main idea?","o":["Alex tries to keep a balanced routine","Alex follows exactly the same day every day","Alex never studies"],"a":0}];
+const reading={"text":"<p>Maya and Leo both have busy weekdays. Maya usually gets down to her homework soon after she gets home, whereas Leo takes a short break first. They both try to stay hydrated and get enough sleep. Maya limits screen time before bed, while Leo prefers to wind down by listening to music. Their routines are different, but both try to find a balance between schoolwork and rest.</p>","qs":[["Who starts homework sooner?",["Maya","Leo","Neither"],0],["What does Leo do first?",["Takes a short break","Goes to bed","Has breakfast"],0],["Which habit do they share?",["They try to stay hydrated","They never use screens","They go to bed at the same time"],0],["How does Maya wind down?",["She limits screen time","She goes to school","She skips sleep"],0],["What contrast word appears?",["whereas","because","so"],0],["What is the main idea?",["Different routines can still aim for balance","Everyone needs the same routine","Rest is not important"],0]]};
+const speakTask={"insecure":"Give a short description of your own routine in 4–5 sentences.","safe":"Compare one part of your routine with a classmate’s routine.","daring":"Compare routines and briefly explain which habit helps you feel more balanced."};
+const speakModel={"insecure":"I usually head out at eight. After school, I get home and take a short break. Then I get down to my homework.","safe":"My classmate gets down to homework immediately, whereas I take a short break first. We both try to stay hydrated during the day.","daring":"My classmate and I have different routines. I take more breaks while studying, whereas she limits screen time more consistently. Both habits can help us keep a better balance."};
+const storageKey="gettingStarted4ESO";
+let level=localStorage.getItem(storageKey+"Level")||"insecure";
+const state=JSON.parse(localStorage.getItem(storageKey)||'{"done":{}}');
+
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+
+function save(){localStorage.setItem(storageKey,JSON.stringify(state));localStorage.setItem(storageKey+"Level",level);updateProgress()}
+function complete(k){state.done[k]=true;save()}
+function updateProgress(){const n=["quick","listen","read","speak"].filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / 4";$("#progressBar").style.width=(n/4*100)+"%"}
+function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));renderSpeak();save()}
+$$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
+
+$$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");window.scrollTo({top:document.querySelector("main").offsetTop-64,behavior:"smooth"})});
+
+$$(".choice").forEach(b=>b.onclick=()=>b.classList.toggle("selected"));
+$("#finishQuick").onclick=()=>{complete("quick");$("#quickResult").classList.add("show")};
+
+function play(rate){
+  if(!("speechSynthesis" in window)){$("#audioStatus").textContent="Text-to-speech is not available.";return}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(listeningText);u.lang="en-US";u.rate=rate;
+  const voices=speechSynthesis.getVoices();
+  const v=voices.find(x=>x.lang&&x.lang.toLowerCase().startsWith("en-us"))||voices.find(x=>x.lang&&x.lang.toLowerCase().startsWith("en"));
+  if(v)u.voice=v;
+  u.onstart=()=>$("#audioStatus").textContent=rate<1?"Playing slowly":"Playing";
+  u.onend=()=>$("#audioStatus").textContent="Ready";
+  speechSynthesis.speak(u)
+}
+$("#playListen").onclick=()=>play(1);$("#playSlow").onclick=()=>play(.8);
+
+function renderQuestions(formId,data,prefix){
+  const f=$(formId);f.innerHTML="";
+  data.forEach((q,i)=>{
+    const box=document.createElement("div");box.className="question";
+    box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+q.o.map((o,j)=>'<label class="option"><input type="radio" name="'+prefix+i+'" value="'+j+'"><span>'+o+'</span></label>').join("")+'</div><div class="feedback" id="'+prefix+'f'+i+'"></div>';
+    f.appendChild(box)
+  })
+}
+renderQuestions("#listenForm",listening,"l");
+$("#readingText").innerHTML=reading.text;
+const readData=reading.qs.map(x=>({q:x[0],o:x[1],a:x[2]}));
+renderQuestions("#readForm",readData,"r");
+
+function check(data,prefix,resultId,key){
+  let score=0;
+  data.forEach((q,i)=>{const c=document.querySelector('input[name="'+prefix+i+'"]:checked');const ok=c&&+c.value===q.a;if(ok)score++;const f=$("#"+prefix+"f"+i);f.textContent=ok?"Correct!":"Try again.";f.className="feedback "+(ok?"ok":"no")});
+  $(resultId).textContent=score+" / "+data.length+" correct";
+  $(resultId).classList.add("show");
+  if(score>=data.length-1)complete(key)
+}
+$("#checkListen").onclick=()=>check(listening,"l","#listenResult","listen");
+$("#checkRead").onclick=()=>check(readData,"r","#readResult","read");
+
+function renderSpeak(){$("#speakPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";$("#speakTask").textContent=speakTask[level];$("#speakModel").textContent=speakModel[level]}
+$("#finishSpeak").onclick=()=>{complete("speak");$("#speakResult").classList.add("show")};
+
+setLevel(level);renderSpeak();updateProgress();
+</script>
+</body>
+</html>
