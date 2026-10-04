@@ -198,4 +198,10 @@ qsa('[data-complete]').forEach(b=>b.onclick=()=>complete(b.dataset.complete));
 qsa('[data-check]').forEach(b=>b.onclick=()=>{const key=b.dataset.check;let score=0;qsa('#'+key+'Tasks .task').forEach((row,i)=>{const ok=row.querySelector('select').value===tasks[key][i][2],fb=row.querySelector('.feedback');if(ok)score++;fb.textContent=ok?'Correct!':'Try again.';fb.className='feedback '+(ok?'ok':'no')});const r=$('#'+key+'Result');r.textContent=score+' / '+tasks[key].length+' correct';r.classList.add('show');if(score>=tasks[key].length-1)complete(key)});
 $('#sessionJump').onchange=e=>{if(e.target.value&&e.target.value!=='#')location.href=e.target.value};
 render();
-</script></body></html>
+
+/* FORCE_CURRENT_SESSION_SELECTION */
+const forceCurrentSession=()=>{const s=document.getElementById('sessionJump');if(s)s.value='grammar-phrasal-verbs.html';};
+window.addEventListener('DOMContentLoaded',forceCurrentSession);
+window.addEventListener('pageshow',forceCurrentSession);
+</script><!-- DEPLOY_REFRESH_20261004_grammar_dropdown_fix -->
+</body></html>
