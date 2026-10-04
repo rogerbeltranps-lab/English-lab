@@ -29,6 +29,25 @@ textarea{width:100%;min-height:175px;border:1px solid #cbd9eb;border-radius:12px
 .session-access select{flex:1;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff;color:var(--ink);font-weight:750}
 .session-access .go-session{border:0;border-radius:11px;padding:10px 14px;background:var(--accent,var(--blue,#2563eb));color:#fff;font-weight:800}
 @media(max-width:760px){.session-access{display:grid;grid-template-columns:1fr auto}.session-access strong{grid-column:1/-1}.session-access select{width:100%}}
+
+/* Shared top-bar sizing: keep every Learning Path visually consistent */
+.topbar .brand{display:flex;align-items:center;gap:10px;min-width:0}
+.topbar .brand>a{font-size:16px!important;line-height:1.1!important;font-weight:800!important;white-space:nowrap}
+.topbar .brand-mark,.topbar .logo,.topbar .mark{
+  width:38px!important;height:38px!important;min-width:38px!important;flex:0 0 38px!important;
+  border-radius:12px!important;font-size:18px!important;line-height:38px!important;font-weight:900!important;
+  text-align:center!important;display:grid!important;place-items:center!important;padding:0!important
+}
+.topbar .brand-title,.topbar .brand>.lp-title{
+  font-size:16px!important;line-height:1.15!important;font-weight:850!important;display:block!important;white-space:nowrap
+}
+.topbar .brand-title small,.topbar .brand>.lp-title small{
+  display:block!important;font-size:11px!important;line-height:1.2!important;font-weight:700!important;
+  opacity:.88!important;margin-top:2px!important
+}
+.topbar .session-jump label,.topbar .jump label{font-size:12px!important;line-height:1.1!important;font-weight:800!important}
+.topbar .session-jump select,.topbar .jump select{font-size:15px!important;line-height:1.2!important;font-weight:700!important;height:38px!important}
+.topbar .progress-label,.topbar .progress-row{font-size:12px!important;line-height:1.1!important}
 </style>
 </head>
 <body>
