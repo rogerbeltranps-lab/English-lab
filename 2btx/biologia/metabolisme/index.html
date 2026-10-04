@@ -84,17 +84,24 @@ radial-gradient(ellipse at 78% 50%,transparent 0 14%,#79aa94 15% 20%,transparent
 .recall-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.recall-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
 .recall-item select{width:100%;margin-top:8px;border:1px solid #cbd8d2;border-radius:10px;padding:8px;background:#fff}
 .recall-item.correct{border-color:#89bd9e;background:#eff9f3}.recall-item.wrong{border-color:#dfa3a3;background:#fff4f4}
-.visual-wrap{display:grid;gap:16px;margin-bottom:16px}
-.visual-card{background:linear-gradient(145deg,#ffffff,#f7faf8);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 5px 20px rgba(25,51,40,.035)}
-.visual-card h3{margin:0 0 6px}.visual-card p{margin:0 0 16px;color:var(--muted)}
-.visual-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:10px;align-items:center}
 .flow-step{border:1px solid var(--line);border-radius:16px;background:#fff;padding:15px;min-height:118px;display:flex;flex-direction:column;justify-content:center}
 .flow-step strong{font-size:1.02rem}.flow-step span{font-size:.8rem;color:var(--muted);margin-top:5px}
-.flow-step.primary{background:var(--soft);border-color:#b9d4c7}.flow-step.blue{background:var(--blue-soft);border-color:#c7d9ea}.flow-step.warn{background:var(--warn-soft);border-color:#ead19a}
-.flow-arrow{font-size:1.6rem;font-weight:900;color:var(--accent);text-align:center}
-.split-path{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-.path{border-radius:16px;padding:14px;border:1px solid var(--line)}.path.aero{background:var(--blue-soft)}.path.ana{background:var(--warn-soft)}
 .photo-note{font-size:.78rem;color:var(--muted);margin-top:9px}
+.real-image-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:16px}
+.image-card{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 5px 20px rgba(25,51,40,.035)}
+.image-card img{display:block;width:100%;height:360px;object-fit:contain;background:#fff;padding:12px}
+.image-card .image-copy{padding:16px 18px 18px;border-top:1px solid var(--line)}
+.image-card h3{margin:0 0 5px;font-size:1.08rem}
+.image-card p{margin:0;color:var(--muted);font-size:.9rem}
+.image-credit{margin-top:8px;font-size:.72rem;color:#7a8781}
+.image-credit a{color:var(--blue);text-decoration:underline}
+.image-card.wide{grid-column:1/-1}
+.image-card.wide img{height:420px}
+@media(max-width:700px){
+  .real-image-grid{grid-template-columns:1fr}
+  .image-card.wide{grid-column:auto}
+  .image-card img,.image-card.wide img{height:auto;max-height:440px}
+}
 @media(max-width:900px){.hero-grid,.grid2,.grid3,.route-strip,.organelle-grid{grid-template-columns:1fr}.metabolic-map{grid-template-columns:1fr 1fr}.recall-grid{grid-template-columns:1fr 1fr}.progress-shell{width:145px}.hero{padding-top:38px}}
 @media(max-width:620px){
 .wrap{width:min(100% - 20px,1120px)}
@@ -120,9 +127,6 @@ h1{font-size:2.65rem;margin-top:10px}
 .card,.section-card{padding:16px}
 .organelle-stage{min-height:250px;padding:14px}
 .hotspot{width:30px;height:30px}
-.visual-flow{grid-template-columns:1fr!important}
-.flow-arrow{transform:rotate(90deg)}
-.visual-card{padding:14px!important}
 }
 </style>
 </head>
@@ -256,44 +260,60 @@ h1{font-size:2.65rem;margin-top:10px}
 
 <section class="panel" id="map">
   <div class="panel-head"><div><h2>Mapa visual del metabolisme</h2><p>Segueix el carboni, l'energia i els electrons.</p></div><span class="pill">On · Entra · Surt</span></div>
-  <div class="visual-wrap">
-  <div class="visual-card">
-    <h3>1. De la glucosa a l'ATP: la ruta completa</h3>
-    <p>Segueix el carboni i mira on es va capturant l'energia.</p>
-    <div class="visual-flow">
-      <div class="flow-step"><strong>Glucosa</strong><span>6 carbonis</span></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step primary"><strong>Glucòlisi</strong><span>Citosol · 2 piruvats · ATP + NADH</span></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step"><strong>Acetil-CoA</strong><span>Entra al mitocondri</span></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step blue"><strong>Krebs + cadena</strong><span>CO₂ · NADH/FADH₂ · molt ATP</span></div>
+  <div class="real-image-grid">
+  <article class="image-card wide">
+    <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fate%20of%20Pyruvate.svg" alt="Destins metabòlics del piruvat segons hi hagi oxigen o no" loading="lazy">
+    <div class="image-copy">
+      <h3>Del piruvat a la respiració o a la fermentació</h3>
+      <p>Aquest esquema és especialment útil per entendre la decisió metabòlica després de la glucòlisi: amb oxigen, el piruvat continua cap al mitocondri; sense oxigen, la fermentació regenera NAD⁺.</p>
+      <div class="image-credit">Wikimedia Commons · Lisawerner9 · CC BY-SA 4.0 · <a href="https://commons.wikimedia.org/wiki/File:Fate_of_Pyruvate.svg" target="_blank" rel="noopener">font i llicència</a></div>
     </div>
-    <div class="split-path">
-      <div class="path aero"><strong>Amb O₂</strong><br>El piruvat entra al mitocondri → respiració aeròbica → gran rendiment d'ATP.</div>
-      <div class="path ana"><strong>Sense prou O₂</strong><br>El piruvat participa en fermentacions → es regenera NAD⁺ → poc ATP total.</div>
-    </div>
-  </div>
+  </article>
 
-  <div class="visual-card">
-    <h3>2. Respiració vs fermentació</h3>
-    <p>La diferència clau no és només l'oxigen: és fins a quin punt s'oxida el combustible i quant ATP se n'obté.</p>
-    <div class="grid2">
-      <div class="flow-step blue"><strong>Respiració aeròbica</strong><span>Glucòlisi + acetil-CoA + Krebs + cadena respiratòria<br><br>O₂ = acceptor final d'electrons<br>Rendiment d'ATP: alt</span></div>
-      <div class="flow-step warn"><strong>Fermentació</strong><span>Glucòlisi + regeneració de NAD⁺<br><br>Sense cadena respiratòria<br>Rendiment d'ATP: baix</span></div>
+  <article class="image-card">
+    <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Glycolysis-es.svg" alt="Esquema de la glucòlisi amb etiquetes en castellà" loading="lazy">
+    <div class="image-copy">
+      <h3>Glucòlisi</h3>
+      <p>Per veure les etapes de conversió de glucosa a piruvat i identificar on es consumeix i on es produeix ATP i NADH.</p>
+      <div class="image-credit">Wikimedia Commons · YassineMrabet / Alejandro Porto · CC BY-SA 3.0 · <a href="https://commons.wikimedia.org/wiki/File:Glycolysis-es.svg" target="_blank" rel="noopener">font i llicència</a></div>
     </div>
-  </div>
+  </article>
 
-  <div class="visual-card">
-    <h3>3. Fotosíntesi: dues fases connectades</h3>
-    <p>Una fase capta energia; l'altra la utilitza per fixar carboni.</p>
-    <div class="visual-flow" style="grid-template-columns:1fr auto 1fr">
-      <div class="flow-step blue"><strong>Fase lluminosa</strong><span>Tilacoides<br>Llum + H₂O → O₂ + ATP + NADPH</span></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step primary"><strong>Cicle de Calvin</strong><span>Estroma<br>CO₂ + ATP + NADPH → matèria orgànica</span></div>
+  <article class="image-card">
+    <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Ciclo%20de%20Krebs-es.svg" alt="Esquema del cicle de Krebs" loading="lazy">
+    <div class="image-copy">
+      <h3>Cicle de Krebs</h3>
+      <p>Visualitza l'entrada d'acetil-CoA, la regeneració d'oxaloacetat i la producció de CO₂, NADH, FADH₂ i GTP.</p>
+      <div class="image-credit">Wikimedia Commons · r@ge, obra derivada · llicència indicada a Commons · <a href="https://commons.wikimedia.org/wiki/File:Ciclo_de_Krebs-es.svg" target="_blank" rel="noopener">font i llicència</a></div>
     </div>
-    <div class="photo-note">Idea clau: ATP i NADPH connecten les dues fases.</div>
-  </div>
+  </article>
+
+  <article class="image-card wide">
+    <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Mitochondrial%20electron%20transport%20chain%E2%80%94es.svg" alt="Cadena de transport electrònic mitocondrial" loading="lazy">
+    <div class="image-copy">
+      <h3>Cadena respiratòria i fosforilació oxidativa</h3>
+      <p>Permet veure la membrana interna, els complexos de transport, el bombeig de protons, l'ATP-sintasa i el paper final de l'O₂.</p>
+      <div class="image-credit">Wikimedia Commons · versió en castellà · domini públic · <a href="https://commons.wikimedia.org/wiki/File:Mitochondrial_electron_transport_chain%E2%80%94es.svg" target="_blank" rel="noopener">font i llicència</a></div>
+    </div>
+  </article>
+
+  <article class="image-card">
+    <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Photosynthesis%20-%20light%20reactions.png" alt="Esquema de les reaccions lluminoses de la fotosíntesi" loading="lazy">
+    <div class="image-copy">
+      <h3>Fase lluminosa</h3>
+      <p>Esquema per seguir el transport electrònic als tilacoides i la formació d'ATP i NADPH.</p>
+      <div class="image-credit">Wikimedia Commons · Jiří Janoušek · domini públic · <a href="https://commons.wikimedia.org/wiki/File:Photosynthesis_-_light_reactions.png" target="_blank" rel="noopener">font i llicència</a></div>
+    </div>
+  </article>
+
+  <article class="image-card">
+    <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Calvin%20Cycle%205.svg" alt="Esquema del cicle de Calvin" loading="lazy">
+    <div class="image-copy">
+      <h3>Cicle de Calvin</h3>
+      <p>Ajuda a situar la fixació del CO₂ i l'ús de l'ATP i el NADPH produïts a la fase lluminosa.</p>
+      <div class="image-credit">Wikimedia Commons · fitxer amb llicència indicada a Commons · <a href="https://commons.wikimedia.org/wiki/File:Calvin_Cycle_5.svg" target="_blank" rel="noopener">font i llicència</a></div>
+    </div>
+  </article>
 </div>
 
 <div class="section-card">
