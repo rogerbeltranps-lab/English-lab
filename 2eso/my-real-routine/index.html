@@ -386,10 +386,30 @@
       font-size:.9rem
     }
 
+
+    .curriculum-card{margin-top:20px}
+    .challenge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+    .route-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+    .route-box h3{margin:8px 0 8px}
+    .route-box p{color:var(--muted)}
+    .route-box ul{margin:14px 0 0;padding-left:20px;color:var(--muted)}
+    .route-box li{margin:6px 0}
+    .route-tag{display:inline-block;padding:6px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dark);font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+    .daring-box{border-color:var(--accent)}
+    .assessment-box{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+    .assessment-box h3{margin:0 0 14px;font-size:1.3rem}
+    .assessment-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .assessment-grid>div{background:var(--accent-soft);border-radius:14px;padding:14px}
+    .assessment-grid strong{display:block;color:var(--accent-dark);margin-bottom:6px}
+    .assessment-grid span{display:block;color:var(--muted);font-size:.88rem}
+    .assessment-note{margin:16px 0 0;color:var(--muted);font-size:.92rem}
+
     @media(max-width:820px){
       .hero{grid-template-columns:1fr}
       .grid{grid-template-columns:1fr}
       .overview{grid-template-columns:1fr}
+      .challenge-grid{grid-template-columns:1fr}
+      .assessment-grid{grid-template-columns:1fr}
       nav{align-items:flex-start;padding:14px 0}
       .navlinks{gap:2px}
       .navlinks > a,.nav-menu > summary{padding:8px 9px}
@@ -441,10 +461,10 @@
 
       <aside class="hero-card">
         <div class="kicker">Your challenge</div>
-        <h2>Explain your routine and a friend’s routine</h2>
+        <h2>Present a classmate’s real routine</h2>
         <p>
-          Use Present Simple, everyday expressions and clear sequencing to describe
-          what you usually do and what another person usually does.
+          Interview a classmate, organise their habits on a Google Site and record
+          a short presentation. Daring students also compare the routine with their own.
         </p>
       </aside>
     </section>
@@ -490,6 +510,29 @@
           </ul>
         </article>
       </div>
+      <div class="overview">
+        <article class="bigcard curriculum-card">
+          <h2>Curriculum competences</h2>
+          <p>This Learning Situation develops the Catalan curriculum for Foreign Language through a real communicative challenge.</p>
+          <ul class="checklist">
+            <li><strong>CE3 · Oral communication:</strong> speak clearly about everyday routines and interact with a classmate.</li>
+            <li><strong>CE5 · Written & multimodal production:</strong> create a short, clear Google Site using the language practised.</li>
+            <li><strong>CPSAA · Personal, social & learning to learn:</strong> reflect on everyday habits and wellbeing in a respectful way.</li>
+            <li><strong>Digital competence:</strong> create and share a simple multimodal product responsibly.</li>
+          </ul>
+        </article>
+
+        <article class="bigcard curriculum-card">
+          <h2>How the challenge is assessed</h2>
+          <p>The final product is connected directly to these assessment criteria:</p>
+          <ul class="checklist">
+            <li><strong>3.1:</strong> produce a short, structured and understandable oral text about everyday life.</li>
+            <li><strong>3.2:</strong> plan, produce and review the oral presentation with guided strategies and digital resources.</li>
+            <li><strong>3.3:</strong> take part in a short interaction with a classmate respectfully.</li>
+            <li><strong>5.1:</strong> write a short, clear and coherent multimodal text for the Google Site.</li>
+          </ul>
+        </article>
+      </div>
     </section>
 
     <section class="panel" id="learning-path">
@@ -523,15 +566,22 @@
           <span class="link">Open →</span>
         </a>
 
-        <a class="card step-card" href="#" data-step="Review & improve">
+        <a class="card step-card" href="#" data-step="Healthy habits">
           <div class="num">5</div>
+          <h3>Healthy habits</h3>
+          <p>Talk about food, hydration, sleep, movement and screen time using respectful language.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="#" data-step="Review & improve">
+          <div class="num">6</div>
           <h3>Review &amp; improve</h3>
           <p>Check your language, fix mistakes and make your work stronger.</p>
           <span class="link">Open →</span>
         </a>
 
         <label class="card" for="tab-final" id="final-card">
-          <div class="num">6</div>
+          <div class="num">7</div>
           <h3>Final product</h3>
           <p>Bring your routine and your friend’s routine together in a meaningful final task.</p>
           <span class="link">Open →</span>
@@ -569,12 +619,56 @@
     <section class="panel" id="final">
       <div class="bigcard">
         <span class="eyebrow">Final challenge</span>
-        <h2>My routine &amp; my friend’s routine</h2>
-        <p>
-          Create a clear final product in which you explain your own routine and
-          describe a friend’s routine using the language practised throughout the
-          Learning Situation.
-        </p>
+        <h2>From interview to presentation</h2>
+        <p>Use what you have learnt to turn a real classmate interview into a clear digital and oral product.</p>
+      </div>
+
+      <div class="challenge-grid">
+        <article class="route-box">
+          <span class="route-tag">Insecure</span>
+          <h3>My classmate’s routine</h3>
+          <p>Interview a classmate. Create a simple Google Site and record a short explanation of their routine.</p>
+          <ul>
+            <li>4–6 clear ideas</li>
+            <li>he / she + Present Simple</li>
+            <li>basic routine expressions</li>
+            <li>highlight one positive healthy habit</li>
+          </ul>
+        </article>
+        <article class="route-box">
+          <span class="route-tag">Safe</span>
+          <h3>My classmate’s routine</h3>
+          <p>Interview a classmate, organise the information on a Google Site and record a clear presentation.</p>
+          <ul>
+            <li>sequence the routine clearly</li>
+            <li>use several target expressions</li>
+            <li>add a reason or contrast</li>
+            <li>highlight one positive healthy habit</li>
+          </ul>
+        </article>
+        <article class="route-box daring-box">
+          <span class="route-tag">Daring</span>
+          <h3>Compare our routines</h3>
+          <p>Do the 4 ESO-style challenge: present your classmate’s routine and compare it with your own.</p>
+          <ul>
+            <li>similarities + differences</li>
+            <li>richer connectors</li>
+            <li>natural collocations</li>
+            <li>brief reflection on healthy habits</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="assessment-box">
+        <h3>What counts in the final assessment?</h3>
+        <div class="assessment-grid">
+          <div><strong>35% · Speaking</strong><span>Clear, understandable and organised oral presentation · CE3.1</span></div>
+          <div><strong>20% · Language</strong><span>Present Simple, target expressions, connectors and accuracy</span></div>
+          <div><strong>15% · Google Site</strong><span>Clear written/multimodal support · CE5.1</span></div>
+          <div><strong>15% · Planning & revision</strong><span>Prepare, improve and use feedback · CE3.2</span></div>
+          <div><strong>15% · Interaction & reflection</strong><span>Respectful interview + healthy-habit reflection · CE3.3 + CPSAA</span></div>
+        </div>
+        <p class="assessment-note"><strong>Healthy habits:</strong> talk about behaviours such as food, hydration, sleep, movement and screen time. Do not comment on bodies or weight.</p>
       </div>
     </section>
   </main>
