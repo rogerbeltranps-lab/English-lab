@@ -95,6 +95,14 @@ radial-gradient(ellipse at 78% 50%,transparent 0 14%,#79aa94 15% 20%,transparent
 .image-card p{margin:0;color:var(--muted);font-size:.9rem}
 .image-credit{margin-top:8px;font-size:.72rem;color:#7a8781}
 .image-credit a{color:var(--blue);text-decoration:underline}
+.theory-figure{margin:4px 0 18px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff}
+.theory-figure img{display:block;width:100%;height:auto;max-height:390px;object-fit:contain;background:#fff;padding:12px}
+.theory-figure figcaption{padding:10px 14px 12px;border-top:1px solid var(--line);font-size:.84rem;color:var(--muted);line-height:1.45}
+.theory-figure .credit{display:block;margin-top:5px;font-size:.72rem;color:#829089}
+.theory-figure .credit a{color:var(--blue);text-decoration:underline}
+.theory-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0 18px}
+.theory-pair .theory-figure{margin:0}
+@media(max-width:700px){.theory-pair{grid-template-columns:1fr}.theory-figure img{max-height:330px;padding:8px}}
 .image-card.wide{grid-column:1/-1}
 .image-card.wide img{height:420px}
 @media(max-width:700px){
@@ -220,6 +228,12 @@ h1{font-size:2.65rem;margin-top:10px}
 
   <div class="accordion">
     <details open><summary>1. Metabolisme, catabolisme i anabolisme</summary><div class="details-body">
+      <figure class="theory-figure">
+        <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Catabolism%2C%20energy%20carriers%20and%20anabolism.png" alt="Esquema que relaciona catabolisme, transportadors d'energia i anabolisme" loading="lazy">
+        <figcaption>El catabolisme allibera energia i poder reductor; l'anabolisme els utilitza per construir molècules.
+          <span class="credit">Wikimedia Commons · <a href="https://commons.wikimedia.org/wiki/File:Catabolism,_energy_carriers_and_anabolism.png" target="_blank" rel="noopener">font i llicència</a></span>
+        </figcaption>
+      </figure>
       <p><strong>Metabolisme</strong> és el conjunt de reaccions químiques que tenen lloc a la cèl·lula. Una <strong>via metabòlica</strong> és una seqüència ordenada de reaccions en què el producte d'una reacció és substrat de la següent.</p>
       <div class="grid2">
         <div class="callout"><strong>Catabolisme</strong><br>Degrada molècules complexes. És globalment oxidatiu i exergònic: allibera energia que es conserva sobretot en ATP i coenzims reduïts.</div>
@@ -227,30 +241,104 @@ h1{font-size:2.65rem;margin-top:10px}
       </div>
     </div></details>
     <details><summary>2. ATP i coenzims: què transporta cadascun?</summary><div class="details-body">
+      <figure class="theory-figure">
+        <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/ADP%20ATP%20cycle.png" alt="Cicle d'ATP i ADP en el metabolisme cel·lular" loading="lazy">
+        <figcaption>L'ATP connecta processos que alliberen energia amb processos que en necessiten.
+          <span class="credit">Wikimedia Commons · <a href="https://commons.wikimedia.org/wiki/File:ADP_ATP_cycle.png" target="_blank" rel="noopener">font i llicència</a></span>
+        </figcaption>
+      </figure>
       <p><strong>ATP</strong> transfereix energia entre processos. <strong>NADH i FADH₂</strong> transporten electrons d'alta energia cap a la cadena respiratòria. <strong>NADPH</strong> s'associa sobretot amb processos anabòlics, com la fase de fixació del carboni de la fotosíntesi.</p>
       <div class="callout warning"><strong>Error típic:</strong> NADH no és “energia” exactament. És un transportador de poder reductor; la seva oxidació permet obtenir ATP a la fosforilació oxidativa.</div>
     </div></details>
     <details><summary>3. Glucòlisi i destins del piruvat</summary><div class="details-body">
+      <div class="theory-pair">
+        <figure class="theory-figure">
+          <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Glycolysis-es.svg" alt="Esquema detallat de la glucòlisi" loading="lazy">
+          <figcaption>Glucòlisi: glucosa → piruvat, amb formació d'ATP i NADH.
+            <span class="credit">Wikimedia Commons · <a href="https://commons.wikimedia.org/wiki/File:Glycolysis-es.svg" target="_blank" rel="noopener">font i llicència</a></span>
+          </figcaption>
+        </figure>
+        <figure class="theory-figure">
+          <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fate%20of%20Pyruvate.svg" alt="Destins del piruvat en presència o absència d'oxigen" loading="lazy">
+          <figcaption>El piruvat pot continuar cap a la respiració o participar en fermentacions.
+            <span class="credit">Wikimedia Commons · <a href="https://commons.wikimedia.org/wiki/File:Fate_of_Pyruvate.svg" target="_blank" rel="noopener">font i llicència</a></span>
+          </figcaption>
+        </figure>
+      </div>
       <p>La <strong>glucòlisi</strong> té lloc al <strong>citosol</strong>. Transforma una glucosa en dos piruvats, produeix una petita quantitat neta d'ATP i redueix NAD⁺ a NADH.</p>
       <p>Amb disponibilitat d'oxigen i mitocondris funcionals, el piruvat es transforma en <strong>acetil-CoA</strong> i entra al cicle de Krebs. En condicions anaeròbies, el NADH s'ha de reoxidar a NAD⁺ mitjançant una <strong>fermentació</strong> per permetre que la glucòlisi continuï.</p>
     </div></details>
     <details><summary>4. Respiració aeròbica</summary><div class="details-body">
+      <div class="theory-pair">
+        <figure class="theory-figure">
+          <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Ciclo%20de%20Krebs-es.svg" alt="Esquema del cicle de Krebs" loading="lazy">
+          <figcaption>El cicle de Krebs oxida l'acetil-CoA i carrega NADH i FADH₂.
+            <span class="credit">Wikimedia Commons · <a href="https://commons.wikimedia.org/wiki/File:Ciclo_de_Krebs-es.svg" target="_blank" rel="noopener">font i llicència</a></span>
+          </figcaption>
+        </figure>
+        <figure class="theory-figure">
+          <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Mitochondrial%20electron%20transport%20chain%E2%80%94es.svg" alt="Cadena de transport electrònic mitocondrial i ATP-sintasa" loading="lazy">
+          <figcaption>La cadena crea el gradient de protons que permet a l'ATP-sintasa formar ATP.
+            <span class="credit">Wikimedia Commons · <a href="https://commons.wikimedia.org/wiki/File:Mitochondrial_electron_transport_chain%E2%80%94es.svg" target="_blank" rel="noopener">font i llicència</a></span>
+          </figcaption>
+        </figure>
+      </div>
       <p><strong>Descarboxilació oxidativa del piruvat:</strong> matriu mitocondrial; produeix acetil-CoA, CO₂ i NADH.</p>
       <p><strong>Cicle de Krebs:</strong> matriu mitocondrial; oxida l'acetil-CoA, allibera CO₂ i genera NADH, FADH₂ i una petita quantitat d'ATP/GTP.</p>
       <p><strong>Cadena de transport electrònic i fosforilació oxidativa:</strong> membrana interna mitocondrial. Els electrons permeten crear un gradient de protons; l'ATP-sintasa usa aquest gradient per sintetitzar ATP. L'<strong>O₂ és l'acceptor final d'electrons</strong> i es redueix a aigua.</p>
     </div></details>
     <details><summary>5. β-oxidació dels àcids grassos</summary><div class="details-body">
+      <figure class="theory-figure">
+        <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Beta-oxidacion.svg" alt="Esquema de la beta-oxidació dels àcids grassos" loading="lazy">
+        <figcaption>Cada volta de β-oxidació escurça l'àcid gras i genera acetil-CoA, NADH i FADH₂.
+          <span class="credit">Wikimedia Commons · CC0 · <a href="https://commons.wikimedia.org/wiki/File:Beta-oxidacion.svg" target="_blank" rel="noopener">font i llicència</a></span>
+        </figcaption>
+      </figure>
       <p>En eucariotes, la β-oxidació té lloc principalment a la <strong>matriu mitocondrial</strong>. Escurça progressivament els àcids grassos i genera <strong>acetil-CoA, NADH i FADH₂</strong>. Això explica el gran rendiment energètic dels lípids.</p>
     </div></details>
     <details><summary>6. Fermentacions</summary><div class="details-body">
+      <div class="theory-pair">
+        <figure class="theory-figure">
+          <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fermentacion-lactica.svg" alt="Fermentació del piruvat a lactat" loading="lazy">
+          <figcaption>Fermentació làctica: el piruvat es redueix a lactat i es regenera NAD⁺.
+            <span class="credit">Wikimedia Commons · CC BY-SA 3.0 · <a href="https://commons.wikimedia.org/wiki/File:Fermentacion-lactica.svg" target="_blank" rel="noopener">font i llicència</a></span>
+          </figcaption>
+        </figure>
+        <figure class="theory-figure">
+          <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Fermentacion-alcoholica.svg" alt="Fermentació alcohòlica del piruvat a etanol i diòxid de carboni" loading="lazy">
+          <figcaption>Fermentació alcohòlica: es formen etanol i CO₂ mentre es recupera NAD⁺.
+            <span class="credit">Wikimedia Commons · CC BY-SA 3.0 · <a href="https://commons.wikimedia.org/wiki/File:Fermentacion-alcoholica.svg" target="_blank" rel="noopener">font i llicència</a></span>
+          </figcaption>
+        </figure>
+      </div>
       <p>Les fermentacions són degradacions parcials i no utilitzen la cadena respiratòria. La seva funció clau és <strong>regenerar NAD⁺</strong> perquè la glucòlisi pugui continuar.</p>
       <p><strong>Làctica:</strong> piruvat → lactat. <strong>Alcohòlica:</strong> piruvat → etanol + CO₂. El rendiment d'ATP és molt inferior al de la respiració aeròbica.</p>
     </div></details>
     <details><summary>7. Fotosíntesi i anabolisme autòtrof</summary><div class="details-body">
+      <div class="theory-pair">
+        <figure class="theory-figure">
+          <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Photosynthesis%20-%20light%20reactions.png" alt="Esquema de les reaccions lluminoses de la fotosíntesi" loading="lazy">
+          <figcaption>Als tilacoides, la llum impulsa el transport electrònic i la síntesi d'ATP i NADPH.
+            <span class="credit">Wikimedia Commons · domini públic · <a href="https://commons.wikimedia.org/wiki/File:Photosynthesis_-_light_reactions.png" target="_blank" rel="noopener">font i llicència</a></span>
+          </figcaption>
+        </figure>
+        <figure class="theory-figure">
+          <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Calvin%20Cycle%205.svg" alt="Esquema del cicle de Calvin" loading="lazy">
+          <figcaption>A l'estroma, el cicle de Calvin utilitza ATP i NADPH per fixar CO₂.
+            <span class="credit">Wikimedia Commons · <a href="https://commons.wikimedia.org/wiki/File:Calvin_Cycle_5.svg" target="_blank" rel="noopener">font i llicència</a></span>
+          </figcaption>
+        </figure>
+      </div>
       <p>La fase lluminosa té lloc a les <strong>membranes dels tilacoides</strong>: fotòlisi de l'aigua, transport d'electrons, producció d'ATP i NADPH. El <strong>cicle de Calvin</strong> té lloc a l'<strong>estroma</strong> i fixa CO₂ utilitzant ATP i NADPH.</p>
       <p>La fotosíntesi emmagatzema energia química en matèria orgànica; la respiració cel·lular n'extreu energia utilitzable. Són processos relacionats però no simplement “l'invers exacte” l'un de l'altre.</p>
     </div></details>
     <details><summary>8. Enzims i regulació metabòlica</summary><div class="details-body">
+      <figure class="theory-figure">
+        <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Enzyme%20inhibition%20schemes-es%20-%20esquemas%20de%20inhibicion%20enzimatica.png" alt="Esquemes d'inhibició enzimàtica competitiva i no competitiva" loading="lazy">
+        <figcaption>Els inhibidors poden actuar sobre el centre actiu o modificar l'activitat de l'enzim des d'un altre punt.
+          <span class="credit">Wikimedia Commons · CC BY-SA 3.0 · <a href="https://commons.wikimedia.org/wiki/File:Enzyme_inhibition_schemes-es_-_esquemas_de_inhibicion_enzimatica.png" target="_blank" rel="noopener">font i llicència</a></span>
+        </figcaption>
+      </figure>
       <p>Els enzims disminueixen l'energia d'activació i controlen la velocitat de les reaccions. L'activitat enzimàtica depèn de la concentració de substrat, temperatura, pH i inhibidors, entre altres factors.</p>
       <p>La regulació de passos clau evita malgastar energia i permet ajustar el metabolisme a les necessitats de la cèl·lula.</p>
     </div></details>
