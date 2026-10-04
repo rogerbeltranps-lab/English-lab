@@ -363,10 +363,30 @@
       font-size:.9rem
     }
 
+
+    .curriculum-card{margin-top:20px}
+    .challenge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+    .route-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+    .route-box h3{margin:8px 0 8px}
+    .route-box p{color:var(--muted)}
+    .route-box ul{margin:14px 0 0;padding-left:20px;color:var(--muted)}
+    .route-box li{margin:6px 0}
+    .route-tag{display:inline-block;padding:6px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dark);font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+    .daring-box{border-color:var(--accent)}
+    .assessment-box{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+    .assessment-box h3{margin:0 0 14px;font-size:1.3rem}
+    .assessment-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .assessment-grid>div{background:var(--accent-soft);border-radius:14px;padding:14px}
+    .assessment-grid strong{display:block;color:var(--accent-dark);margin-bottom:6px}
+    .assessment-grid span{display:block;color:var(--muted);font-size:.88rem}
+    .assessment-note{margin:16px 0 0;color:var(--muted);font-size:.92rem}
+
     @media(max-width:820px){
       .hero{grid-template-columns:1fr}
       .grid{grid-template-columns:1fr}
       .overview{grid-template-columns:1fr}
+      .challenge-grid{grid-template-columns:1fr}
+      .assessment-grid{grid-template-columns:1fr}
       nav{align-items:flex-start;padding:14px 0}
       .navlinks{gap:2px}
       .navlinks > a,.nav-menu > summary{padding:8px 9px}
@@ -418,10 +438,10 @@
 
       <aside class="hero-card">
         <div class="kicker">Your challenge</div>
-        <h2>Explain your routine and a friend’s routine naturally</h2>
+        <h2>Compare real routines and reflect on habits</h2>
         <p>
-          Use richer expressions, connectors and real-life language to describe
-          your own routine and compare it with another person’s.
+          Interview a classmate, build a Google Site and record a presentation that
+          compares routines and reflects on everyday choices and wellbeing.
         </p>
       </aside>
     </section>
@@ -467,6 +487,30 @@
           </ul>
         </article>
       </div>
+      <div class="overview">
+        <article class="bigcard curriculum-card">
+          <h2>Curriculum competences</h2>
+          <p>This Learning Situation develops the Catalan curriculum for Foreign Language through a more autonomous, comparative and reflective challenge.</p>
+          <ul class="checklist">
+            <li><strong>CE3 · Oral communication:</strong> describe, compare and explain routines using a clear, coherent spoken text.</li>
+            <li><strong>CE5 · Written & multimodal production:</strong> create and revise a coherent Google Site for a real audience.</li>
+            <li><strong>CPSAA · Personal, social & learning to learn:</strong> reflect critically on routines, balance and wellbeing.</li>
+            <li><strong>Digital competence:</strong> plan, create and communicate a multimodal product responsibly.</li>
+          </ul>
+        </article>
+
+        <article class="bigcard curriculum-card">
+          <h2>How the challenge is assessed</h2>
+          <p>The final product is connected directly to these assessment criteria:</p>
+          <ul class="checklist">
+            <li><strong>3.1:</strong> produce a structured, coherent oral text to describe, compare, explain and justify ideas.</li>
+            <li><strong>3.2:</strong> plan, produce and review the presentation using appropriate strategies and digital resources.</li>
+            <li><strong>3.3:</strong> interact and collaborate actively and respectfully with a classmate.</li>
+            <li><strong>5.1:</strong> write and publish a coherent, accurate multimodal text of appropriate length on the Google Site.</li>
+            <li><strong>5.2:</strong> plan, produce and revise the written product with increasing autonomy.</li>
+          </ul>
+        </article>
+      </div>
     </section>
 
     <section class="panel" id="learning-path">
@@ -500,15 +544,22 @@
           <span class="link">Open →</span>
         </a>
 
-        <a class="card step-card" href="#" data-step="Review & refine">
+        <a class="card step-card" href="#" data-step="Healthy habits">
           <div class="num">5</div>
+          <h3>Healthy habits</h3>
+          <p>Explore food, hydration, sleep, movement, stress and screen habits, then reflect on balance and wellbeing.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="#" data-step="Review & refine">
+          <div class="num">6</div>
           <h3>Review &amp; refine</h3>
           <p>Improve accuracy, naturalness and organisation.</p>
           <span class="link">Open →</span>
         </a>
 
         <label class="card" for="tab-final" id="final-card">
-          <div class="num">6</div>
+          <div class="num">7</div>
           <h3>Final product</h3>
           <p>Bring your routine and a friend’s routine together in a richer final task.</p>
           <span class="link">Open →</span>
@@ -546,12 +597,56 @@
     <section class="panel" id="final">
       <div class="bigcard">
         <span class="eyebrow">Final challenge</span>
-        <h2>My routine &amp; my friend’s routine</h2>
-        <p>
-          Create a more developed final product in which you explain your own routine
-          and describe a friend’s routine using accurate language, natural expressions,
-          connectors and personal reflection.
-        </p>
+        <h2>Compare, explain and reflect</h2>
+        <p>Use real information from a classmate interview to create a coherent Google Site and a recorded presentation adapted to your route.</p>
+      </div>
+
+      <div class="challenge-grid">
+        <article class="route-box">
+          <span class="route-tag">Insecure</span>
+          <h3>My real routine</h3>
+          <p>Create a Google Site about your own routine and record a clear explanation.</p>
+          <ul>
+            <li>organise the day clearly</li>
+            <li>use target routine expressions</li>
+            <li>include one healthy-habit reflection</li>
+            <li>keep the message simple and accurate</li>
+          </ul>
+        </article>
+        <article class="route-box">
+          <span class="route-tag">Safe</span>
+          <h3>Compare our routines</h3>
+          <p>Interview a classmate, present their routine and compare it with your own on a Google Site and in a recorded presentation.</p>
+          <ul>
+            <li>similarities + differences</li>
+            <li>cause, contrast and consequence</li>
+            <li>natural routine expressions</li>
+            <li>reflect on balance and healthy habits</li>
+          </ul>
+        </article>
+        <article class="route-box daring-box">
+          <span class="route-tag">Daring</span>
+          <h3>Compare, explain & reflect</h3>
+          <p>Compare both routines in depth and explain how choices can affect wellbeing, using evidence from the habits described.</p>
+          <ul>
+            <li>developed comparison</li>
+            <li>richer collocations and connectors</li>
+            <li>justify interpretations</li>
+            <li>suggest one realistic improvement respectfully</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="assessment-box">
+        <h3>What counts in the final assessment?</h3>
+        <div class="assessment-grid">
+          <div><strong>35% · Speaking</strong><span>Coherent, clear and developed oral presentation · CE3.1</span></div>
+          <div><strong>20% · Comparison & language</strong><span>Range, accuracy, connectors and natural expressions</span></div>
+          <div><strong>15% · Google Site</strong><span>Coherent written/multimodal product for an audience · CE5.1</span></div>
+          <div><strong>15% · Planning & revision</strong><span>Plan, improve and revise with increasing autonomy · CE3.2 + CE5.2</span></div>
+          <div><strong>15% · Interaction & reflection</strong><span>Respectful interview + thoughtful healthy-habit reflection · CE3.3 + CPSAA</span></div>
+        </div>
+        <p class="assessment-note"><strong>Healthy habits:</strong> focus on behaviours such as food, hydration, sleep, movement, stress management and screen time. No comments about bodies or weight.</p>
       </div>
     </section>
   </main>
