@@ -52,23 +52,87 @@
       gap:20px
     }
 
-    .brand{font-weight:800;letter-spacing:-.03em}
+    .brand{font-weight:800;letter-spacing:-.03em;white-space:nowrap}
 
     .navlinks{
       display:flex;
-      gap:8px;
+      align-items:center;
+      justify-content:flex-end;
+      gap:6px;
       flex-wrap:wrap
     }
 
-    .navlinks a{
+    .navlinks > a,
+    .nav-menu > summary{
       padding:9px 12px;
       border-radius:12px;
-      color:var(--muted)
+      color:var(--muted);
+      font-weight:650;
+      cursor:pointer;
+      list-style:none;
+      user-select:none
     }
 
-    .navlinks a:hover{
+    .nav-menu > summary::-webkit-details-marker{display:none}
+
+    .navlinks > a:hover,
+    .nav-menu > summary:hover,
+    .nav-menu[open] > summary{
       background:var(--surface);
       color:var(--text)
+    }
+
+    .nav-menu{position:relative}
+
+    .nav-menu > summary::after{
+      content:" ▾";
+      font-size:.74em
+    }
+
+    .dropdown{
+      position:absolute;
+      top:calc(100% + 8px);
+      right:0;
+      min-width:220px;
+      padding:8px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:var(--surface);
+      box-shadow:var(--shadow)
+    }
+
+    .dropdown a,
+    .dropdown .disabled{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:10px 11px;
+      border-radius:10px;
+      font-size:.94rem
+    }
+
+    .dropdown a:hover{
+      background:var(--accent-soft);
+      color:var(--accent-dark)
+    }
+
+    .dropdown a.current{
+      background:var(--accent-soft);
+      color:var(--accent-dark);
+      font-weight:800
+    }
+
+    .dropdown .disabled{
+      color:#a1a8ae;
+      cursor:default
+    }
+
+    .soon{
+      font-size:.72rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.04em
     }
 
     .hero{
@@ -280,7 +344,10 @@
       .hero{grid-template-columns:1fr}
       .grid{grid-template-columns:1fr}
       .overview{grid-template-columns:1fr}
-      .navlinks{display:none}
+      nav{align-items:flex-start;padding:14px 0}
+      .navlinks{gap:2px}
+      .navlinks > a,.nav-menu > summary{padding:8px 9px}
+      .dropdown{position:fixed;left:16px;right:16px;top:72px;min-width:0}
     }
   </style>
 </head>
@@ -292,8 +359,24 @@
         <a class="brand" href="../../index.html">English with Roger</a>
         <div class="navlinks">
           <a href="../../index.html">Home</a>
-          <a href="../index.html">4 ESO</a>
-          <a href="#">My Real Routine</a>
+          <details class="nav-menu">
+            <summary>Courses</summary>
+            <div class="dropdown">
+              <span class="disabled">1 ESO <span class="soon">Soon</span></span>
+              <a href="../../2eso/index.html">2 ESO</a>
+              <span class="disabled">3 ESO <span class="soon">Soon</span></span>
+              <a class="current" href="../../4eso/index.html">4 ESO <span>✓</span></a>
+              <span class="disabled">1 BATX <span class="soon">Soon</span></span>
+              <span class="disabled">2 BATX <span class="soon">Soon</span></span>
+            </div>
+          </details>
+          <details class="nav-menu">
+            <summary>Learning Situations</summary>
+            <div class="dropdown">
+              <a class="current" href="index.html">My Real Routine <span>✓</span></a>
+            </div>
+          </details>
+          <a href="../../index.html#english-lab">English Lab</a>
         </div>
       </nav>
     </div>
@@ -460,6 +543,22 @@
 
     buttons.forEach(btn => {
       btn.addEventListener('click', () => openPanel(btn.dataset.panel));
+    });
+
+    const navMenus = [...document.querySelectorAll('.nav-menu')];
+
+    navMenus.forEach(menu => {
+      menu.addEventListener('toggle', () => {
+        if (!menu.open) return;
+        navMenus.forEach(other => {
+          if (other !== menu) other.open = false;
+        });
+      });
+    });
+
+    document.addEventListener('click', event => {
+      if (event.target.closest('.nav-menu')) return;
+      navMenus.forEach(menu => menu.open = false;
     });
 
     document.getElementById('final-card').addEventListener('click', event => {
