@@ -73,6 +73,15 @@ radial-gradient(ellipse at 78% 50%,transparent 0 14%,#79aa94 15% 20%,transparent
 .hotspot.active{outline:4px solid rgba(47,115,88,.18);transform:scale(1.08)}
 .hot-matrix{left:48%;top:47%}.hot-inner{right:19%;top:20%}.hot-inter{left:14%;top:24%}.hot-cytosol{left:-5%;bottom:6%;background:var(--blue)}
 .organelle-info{background:#fff;border:1px solid var(--line);border-radius:24px;padding:22px;display:flex;flex-direction:column;justify-content:center}
+.explore-media{background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden;display:flex;flex-direction:column}
+.explore-media img{display:block;width:100%;height:360px;object-fit:contain;background:#fff;padding:14px}
+.explore-controls{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px;border-top:1px solid var(--line);background:#f8faf9}
+.explore-point{border:1px solid #bdd2c8;background:#fff;color:var(--accent-dark);border-radius:12px;padding:10px 11px;text-align:left;font-weight:800;display:flex;align-items:center;gap:8px}
+.explore-point .n{width:26px;height:26px;border-radius:999px;background:var(--accent);color:#fff;display:grid;place-items:center;flex:0 0 auto;font-size:.8rem}
+.explore-point.active{background:var(--soft);border-color:#88ad9c}
+.explore-point.blue .n{background:var(--blue)}
+.explore-credit{padding:0 14px 12px;font-size:.69rem;color:#7a8781;background:#f8faf9}
+.explore-credit a{color:var(--blue);text-decoration:underline}
 .organelle-info h3{margin:6px 0 8px;font-size:1.45rem}.organelle-info ul{padding-left:20px;margin:10px 0;color:#42534c}
 .info-kicker{font-size:.75rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--accent-dark)}
 .chloro{position:relative;width:min(520px,100%);aspect-ratio:1.8/1;border:8px solid #78a26f;border-radius:50%;background:#f8fff7;box-shadow:inset 0 0 0 6px #dcebd8;overflow:hidden}
@@ -135,6 +144,9 @@ h1{font-size:2.65rem;margin-top:10px}
 .card,.section-card{padding:16px}
 .organelle-stage{min-height:250px;padding:14px}
 .hotspot{width:30px;height:30px}
+.explore-media img{height:auto;max-height:390px;padding:8px}
+.explore-controls{grid-template-columns:1fr 1fr;padding:9px}
+.explore-point{font-size:.82rem;padding:8px}
 }
 </style>
 </head>
@@ -199,13 +211,15 @@ h1{font-size:2.65rem;margin-top:10px}
     <h3>Explora el mitocondri</h3>
     <p>Prem els punts. Relaciona cada compartiment amb el procés que hi té lloc.</p>
     <div class="organelle-grid">
-      <div class="organelle-stage">
-        <div class="mito" aria-label="Esquema interactiu d'un mitocondri">
-          <button type="button" class="hotspot hot-cytosol active" data-org="cytosol">1</button>
-          <button type="button" class="hotspot hot-matrix" data-org="matrix">2</button>
-          <button type="button" class="hotspot hot-inner" data-org="inner">3</button>
-          <button type="button" class="hotspot hot-inter" data-org="inter">4</button>
+      <div class="explore-media">
+        <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Schema%20mitochondrion%20basic.svg" alt="Diagrama científic d'un mitocondri amb les membranes i les crestes" loading="eager">
+        <div class="explore-controls" aria-label="Parts del mitocondri">
+          <button type="button" class="explore-point blue active" data-org="cytosol"><span class="n">1</span>Citosol</button>
+          <button type="button" class="explore-point" data-org="matrix"><span class="n">2</span>Matriu</button>
+          <button type="button" class="explore-point" data-org="inner"><span class="n">3</span>Membrana interna</button>
+          <button type="button" class="explore-point" data-org="inter"><span class="n">4</span>Espai intermembranós</button>
         </div>
+        <div class="explore-credit">Imatge: Bionet · Wikimedia Commons · CC BY-SA 4.0 · <a href="https://commons.wikimedia.org/wiki/File:Schema_mitochondrion_basic.svg" target="_blank" rel="noopener">font i llicència</a></div>
       </div>
       <div class="organelle-info" id="mitoInfo"></div>
     </div>
@@ -215,12 +229,13 @@ h1{font-size:2.65rem;margin-top:10px}
     <h3>Explora el cloroplast</h3>
     <p>La fotosíntesi també depèn d'una compartimentació molt precisa.</p>
     <div class="organelle-grid">
-      <div class="organelle-stage">
-        <div class="chloro" aria-label="Esquema interactiu d'un cloroplast">
-          <div class="stroma-wave"></div><div class="grana g1"></div><div class="grana g2"></div><div class="grana g3"></div>
-          <button type="button" class="hotspot hot-thyl active" data-chloro="thyl">1</button>
-          <button type="button" class="hotspot hot-stroma" data-chloro="stroma">2</button>
+      <div class="explore-media">
+        <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Chloroplast%20diagram-es.svg" alt="Diagrama científic d'un cloroplast amb tilacoides, grana i estroma" loading="lazy">
+        <div class="explore-controls" aria-label="Parts del cloroplast">
+          <button type="button" class="explore-point active" data-chloro="thyl"><span class="n">1</span>Tilacoides</button>
+          <button type="button" class="explore-point" data-chloro="stroma"><span class="n">2</span>Estroma</button>
         </div>
+        <div class="explore-credit">Imatge: Ollin / Smartse / Pitana · Wikimedia Commons · CC BY-SA 4.0 · <a href="https://commons.wikimedia.org/wiki/File:Chloroplast_diagram-es.svg" target="_blank" rel="noopener">font i llicència</a></div>
       </div>
       <div class="organelle-info" id="chloroInfo"></div>
     </div>
