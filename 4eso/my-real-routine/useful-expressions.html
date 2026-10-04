@@ -57,6 +57,23 @@
 }
 .topbar .session-jump select:focus{border-color:#506c98!important}
 .topbar .session-jump option{color:#1f2937!important;background:#fff!important}
+
+/* Prevent top-bar title / Learning Path selector overlap */
+.topbar .toprow{gap:14px!important}
+.topbar .brand{flex:1 1 430px!important;min-width:0!important}
+.topbar .brand>.lp-title{max-width:310px!important;white-space:normal!important}
+.topbar .session-jump{flex:0 0 265px!important;margin-left:0!important}
+.topbar .session-jump label{display:none!important}
+.topbar .session-jump select{width:265px!important;max-width:265px!important}
+.topbar .progress-shell{flex:0 0 270px!important;width:270px!important}
+@media(max-width:980px){
+  .topbar .toprow{flex-wrap:wrap!important;padding:8px 0!important}
+  .topbar .brand{flex:1 1 100%!important}
+  .topbar .brand>.lp-title{max-width:none!important}
+  .topbar .session-jump{flex:1 1 55%!important}
+  .topbar .session-jump select{width:100%!important;max-width:none!important}
+  .topbar .progress-shell{flex:1 1 35%!important;width:auto!important}
+}
 </style>
 </head>
 <body>
