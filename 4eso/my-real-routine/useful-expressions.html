@@ -122,8 +122,22 @@
   white-space:nowrap;padding:6px 8px;border-radius:9px}
 .lp-home-link:hover{background:rgba(255,255,255,.12)}
 
+/* Useful expressions: keep the desktop top bar from colliding */
+.topbar>.wrap{width:min(1320px,calc(100% - 32px))!important}
+.topbar .brand{flex:1 1 560px!important;min-width:0!important}
+.topbar .brand>.lp-title{
+  flex:1 1 auto!important;
+  min-width:180px!important;
+  max-width:310px!important;
+  white-space:normal!important;
+  line-height:1.05!important;
+}
+.topbar .session-jump{flex:0 1 300px!important;min-width:245px!important}
+.topbar .session-jump select{width:100%!important;max-width:300px!important}
+.topbar .progress-shell{flex:0 0 260px!important;width:260px!important;min-width:220px!important}
+
 /* Prevent top-bar overlap on medium-width screens */
-@media(max-width:1100px){
+@media(max-width:1260px){
   .topbar .toprow{
     flex-wrap:wrap!important;
     padding:8px 0!important;
@@ -500,20 +514,31 @@ No inventis errors que no puguis sentir. No facis una nota numèrica.`;
         return !!ok;
       }catch(e){return false}
     }
+    function openChatGPTWithPrompt(prompt){
+      const url='https://chatgpt.com/?prompt='+encodeURIComponent(prompt);
+      const win=window.open(url,'_blank','noopener,noreferrer');
+      return !!win;
+    }
 
-    async function openAudioFeedback(){
+    function openAudioFeedback(){
       if(!recordingBlob)return;
       const prompt=speakingFeedbackPrompt();
       $('#speakingPromptPreview').value=prompt;
       $('#speakingPromptBox').style.display='block';
+      // Open ChatGPT immediately from the student's click so the browser does not block
+      // the new tab. The prompt is passed in the URL, exactly like the writing flow.
+      const opened=openChatGPTWithPrompt(prompt);
+      // Also copy the same prompt as a fallback, then save the WAV.
+      copyTextRobust(prompt).then(copied=>{
+        $('#recordStatus').textContent=level==='insecure'
+          ?(opened
+            ?'✅ ChatGPT obert amb el prompt preparat i àudio desat. Adjunta speaking-'+level+'.'+recordingExt+' i prem Enviar.'+(copied?' El prompt també és al porta-retalls.':'')
+            :'El navegador ha bloquejat ChatGPT. Permet finestres emergents i torna-ho a provar.')
+          :(opened
+            ?'✅ ChatGPT opened with the prompt ready and the audio saved. Attach speaking-'+level+'.'+recordingExt+' and press Send.'+(copied?' The prompt is also on your clipboard.':'')
+            :'The browser blocked ChatGPT. Allow pop-ups and try again.');
+      });
       downloadSpeakingRecording();
-      // Use the same prompt-prefill flow as Writing. If a browser helper auto-sends it,
-      // the prompt explicitly tells ChatGPT to WAIT for the audio before giving feedback.
-      try{await copyTextRobust(prompt)}catch(e){}
-      openChatGPTWithPrompt(prompt);
-      $('#recordStatus').textContent=level==='insecure'
-        ?'Àudio desat i ChatGPT obert amb les instruccions. Ara adjunta speaking-'+level+'.'+recordingExt+'. Si el missatge ja s’ha enviat automàticament, ChatGPT esperarà l’àudio. Si encara és al quadre de text, adjunta primer l’àudio i després prem Enviar.'
-        :'Audio saved and ChatGPT opened with the feedback instructions. Now attach speaking-'+level+'.'+recordingExt+'. If the prompt was auto-sent, ChatGPT will wait for the audio. If it is still in the composer, attach the audio first and then press Send.';
     }
     $('#startRecording').onclick=startSpeakingRecording;
     $('#stopRecording').onclick=stopSpeakingRecording;
