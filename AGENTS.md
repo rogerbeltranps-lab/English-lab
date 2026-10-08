@@ -1,5 +1,7 @@
 # English Lab project guidance
 
+Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
+
 ## Start from working examples
 - Before implementing a page or feature, inspect the closest successful page in the repository and reuse its structure, styles and interaction patterns where appropriate.
 - Use each course’s `my-real-routine/getting-started.html` as the shell/topbar reference. Reuse `shared/css/layout.css`, `topbar.css`, `activities.css` and existing shared helpers rather than creating a new visual system.
