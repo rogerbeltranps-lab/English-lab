@@ -1,0 +1,385 @@
+/* ==========================================================================
+   Shared Top Navigation Bar & Course Navigation
+   Used across all Learning Path sessions (2 ESO & 4 ESO) and Course Hubs
+   ========================================================================== */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--dark, #174d3d);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .14);
+  border-bottom: 0;
+}
+
+.topbar .toprow {
+  min-height: 58px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.topbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: #fff;
+}
+
+.topbar .brand > a {
+  font-size: 16px !important;
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+  white-space: nowrap;
+  color: #fff;
+  text-decoration: none;
+}
+
+.topbar .brand-mark,
+.topbar .logo,
+.topbar .mark {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  flex: 0 0 38px !important;
+  border-radius: 12px !important;
+  font-size: 18px !important;
+  line-height: 38px !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  background: #fff !important;
+  color: var(--accent, #1f6b52) !important;
+}
+
+.topbar .brand-title,
+.topbar .brand > .lp-title,
+.topbar .lp-title {
+  font-size: 16px !important;
+  line-height: 1.15 !important;
+  font-weight: 850 !important;
+  display: block !important;
+  white-space: nowrap;
+  color: #fff;
+}
+
+.topbar .brand-title small,
+.topbar .brand > .lp-title small,
+.topbar .lp-title small {
+  display: block !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  opacity: .88 !important;
+  margin-top: 2px !important;
+  color: rgba(255, 255, 255, .88);
+}
+
+.topbar .session-jump,
+.topbar .jump {
+  margin-left: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.topbar .session-jump label,
+.topbar .jump label {
+  font-size: 12px !important;
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+  color: rgba(255, 255, 255, .82) !important;
+  white-space: nowrap;
+}
+
+.topbar .session-jump select,
+.topbar .jump select {
+  font-size: 15px !important;
+  line-height: 1.2 !important;
+  font-weight: 750 !important;
+  height: 38px !important;
+  max-width: 260px;
+  background: rgba(255, 255, 255, .12) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, .28) !important;
+  box-shadow: none !important;
+  border-radius: 10px !important;
+  padding: 8px 30px 8px 10px !important;
+  outline: none !important;
+}
+
+.topbar .session-jump select:focus,
+.topbar .jump select:focus {
+  border-color: #fff !important;
+  outline: none !important;
+}
+
+.topbar .session-jump option,
+.topbar .jump option {
+  color: #1f2937 !important;
+  background: #fff !important;
+}
+
+.topbar .progress-shell,
+.topbar .progress {
+  width: 150px;
+}
+
+.topbar .progress-label,
+.topbar .progress-row {
+  font-size: 12px !important;
+  line-height: 1.1 !important;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, .88) !important;
+}
+
+.topbar .progress-track,
+.topbar .track {
+  height: 5px;
+  background: rgba(255, 255, 255, .18) !important;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.topbar .progress-bar,
+.topbar .bar {
+  height: 100%;
+  width: 0;
+  background: #fff;
+  border-radius: 99px;
+  transition: .25s ease;
+}
+
+.lp-home-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none !important;
+  color: inherit !important;
+  font-weight: 850 !important;
+  white-space: nowrap;
+  padding: 6px 8px;
+  border-radius: 9px;
+}
+
+.lp-home-link:hover {
+  background: rgba(255, 255, 255, .12);
+}
+
+/* Responsive top bar rules */
+@media (max-width: 1350px) {
+  .topbar .toprow {
+    flex-wrap: wrap !important;
+    padding: 8px 0 !important;
+  }
+  .topbar .brand {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  .topbar .lp-title,
+  .topbar .brand-title {
+    white-space: normal !important;
+  }
+  .topbar .progress,
+  .topbar .progress-shell {
+    flex: 0 0 160px !important;
+    margin-left: auto !important;
+  }
+  .topbar .jump,
+  .topbar .session-jump {
+    order: 3 !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+  .topbar .jump label,
+  .topbar .session-jump label {
+    display: none !important;
+  }
+  .topbar .jump select,
+  .topbar .session-jump select {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar .toprow {
+    flex-wrap: wrap;
+    padding: 8px 0;
+  }
+  .topbar .session-jump,
+  .topbar .jump {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+  }
+  .topbar .session-jump label,
+  .topbar .jump label {
+    display: none;
+  }
+  .topbar .session-jump select,
+  .topbar .jump select {
+    width: 100%;
+    max-width: none;
+  }
+  .topbar .progress-shell,
+  .topbar .progress {
+    margin-left: auto;
+    width: 112px;
+  }
+}
+
+/* ==========================================================================
+   Course Hub Header & Nav Dropdowns
+   ========================================================================== */
+
+header.course-header,
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--nav-bg, rgba(247, 248, 248, .96));
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line, #e5e9ec);
+}
+
+.site-nav {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.site-nav .brand {
+  font-weight: 800;
+  letter-spacing: -.03em;
+  white-space: nowrap;
+}
+
+.site-nav .navlinks {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.site-nav .navlinks > a,
+.site-nav .nav-menu > summary {
+  padding: 9px 12px;
+  border-radius: 12px;
+  color: var(--muted, #687078);
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.site-nav .nav-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-nav .navlinks > a:hover,
+.site-nav .nav-menu > summary:hover,
+.site-nav .nav-menu[open] > summary {
+  background: var(--surface, #fff);
+  color: var(--text, #172033);
+}
+
+.site-nav .nav-menu {
+  position: relative;
+}
+
+.site-nav .nav-menu > summary::after {
+  content: " ▾";
+  font-size: .74em;
+}
+
+.site-nav .dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  padding: 8px;
+  border: 1px solid var(--line, #e5e9ec);
+  border-radius: 16px;
+  background: var(--surface, #fff);
+  box-shadow: var(--shadow, 0 14px 36px rgba(23, 32, 51, .07));
+  z-index: 40;
+}
+
+.site-nav .dropdown a,
+.site-nav .dropdown .disabled {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 11px;
+  border-radius: 10px;
+  font-size: .94rem;
+}
+
+.site-nav .dropdown a:hover {
+  background: var(--accent-soft, #edf5f1);
+  color: var(--accent-dark, #557c68);
+}
+
+.site-nav .dropdown a.current {
+  background: var(--accent-soft, #edf5f1);
+  color: var(--accent-dark, #557c68);
+  font-weight: 800;
+}
+
+.site-nav .dropdown .disabled {
+  color: #a1a8ae;
+  cursor: default;
+}
+
+.soon {
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.course-group {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line, #e5e9ec);
+}
+
+.course-group:last-child {
+  border-bottom: 0;
+}
+
+.course-link,
+.ls-link {
+  display: block !important;
+  border-radius: 10px;
+  padding: 9px 10px !important;
+}
+
+.course-link {
+  font-weight: 850;
+}
+
+.ls-link {
+  font-size: .92rem;
+  padding-left: 18px !important;
+}
+
+.muted-group {
+  display: grid;
+  gap: 3px;
+}
+
+.ls-dropdown {
+  min-width: 250px;
+}

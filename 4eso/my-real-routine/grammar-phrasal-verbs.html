@@ -1,123 +1,1024 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>4 ESO · Grammar & phrasal verbs</title>
-<style>
-:root{--bg:#f7f8fa;--paper:#fff;--text:#172033;--muted:#687180;--line:#e1e6ee;--accent:#6d86ad;--dark:#506c98;--soft:#eef3fa;--amber:#d97706;--red:#c94b4b}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55}.wrap{width:min(1040px,calc(100% - 24px));margin:auto}.topbar{position:sticky;top:0;z-index:20;background:#465f86;color:#fff}.toprow{min-height:68px;display:flex;align-items:center;gap:14px}.brand{display:flex;align-items:center;gap:10px;font-weight:850}.brand a{color:#fff;text-decoration:none}.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#fff;color:#465f86;font-weight:900}.jump{margin-left:auto;display:flex;align-items:center;gap:8px}.jump label{font-size:.78rem;font-weight:800}.jump select{max-width:255px;padding:9px 10px;border:0;border-radius:10px}.progress{width:160px}.progress-row{display:flex;justify-content:space-between;font-size:.76rem}.track{height:7px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden;margin-top:4px}.bar{height:100%;width:0;background:#fff}.hero{padding:42px 0 28px;background:linear-gradient(145deg,#eef3fa,#fff)}.eyebrow{display:inline-block;background:#dfe7f3;color:#465f86;padding:6px 10px;border-radius:999px;font-weight:850;font-size:.78rem;text-transform:uppercase}h1{font-size:clamp(2rem,6vw,3.7rem);margin:14px 0 10px;line-height:1.05}.lead{max-width:820px;color:#536174}.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.route{border:2px solid transparent;border-radius:16px;background:#fff;padding:14px;text-align:left}.route strong{display:block}.route span{display:block;color:var(--muted);font-size:.84rem;margin-top:3px}.route.active{border-color:#465f86;background:#eef3fa}.route[data-level=safe].active{border-color:#2563eb;background:#eff6ff}.route[data-level=daring].active{border-color:var(--amber);background:#fffbeb}main{padding:24px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px}.tab{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 12px;font-weight:780;white-space:nowrap}.tab.active{background:#465f86;color:#fff}.panel{display:none;background:#fff;border:1px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,34px)}.panel.active{display:block}.head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.pill{background:var(--soft);color:#465f86;border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:850}h2{margin:0 0 6px}.instruction{margin:0;color:var(--muted)}.rule{border-left:4px solid #465f86;background:var(--soft);padding:12px 14px;border-radius:0 10px 10px 0;margin:14px 0}.formula{font-family:ui-monospace,monospace;background:#f3f5f8;padding:10px 12px;border-radius:10px;margin:8px 0}.example,.task{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 13px;margin:8px 0}.note{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:11px;padding:11px 13px;margin:12px 0}.mini-table{width:100%;border-collapse:collapse;margin:12px 0}.mini-table th,.mini-table td{border:1px solid var(--line);padding:9px;text-align:left}.mini-table th{background:var(--soft)}.task select{padding:7px 8px;border:1px solid #cbd5e1;border-radius:8px;margin-top:6px}.feedback{font-weight:750;margin-top:6px;min-height:20px}.ok{color:#047857}.no{color:var(--red)}.actions{text-align:center;margin-top:18px}.btn{border:0;border-radius:11px;padding:10px 14px;background:#465f86;color:#fff;font-weight:800}.result{display:none;margin-top:14px;padding:12px;background:var(--soft);border-radius:11px;text-align:center;font-weight:800}.result.show{display:block}@media(max-width:760px){.toprow{flex-wrap:wrap;padding:8px 0}.jump{order:3;width:100%;margin-left:0}.jump label{display:none}.jump select{width:100%;max-width:none}.progress{margin-left:auto;width:120px}.routes{grid-template-columns:1fr}.head{display:block}.pill{display:inline-block;margin-top:8px}}
-
-/* Shared top-bar sizing: keep every Learning Path visually consistent */
-.topbar .brand{display:flex;align-items:center;gap:10px;min-width:0}
-.topbar .brand>a{font-size:16px!important;line-height:1.1!important;font-weight:800!important;white-space:nowrap}
-.topbar .brand-mark,.topbar .logo,.topbar .mark{
-  width:38px!important;height:38px!important;min-width:38px!important;flex:0 0 38px!important;
-  border-radius:12px!important;font-size:18px!important;line-height:38px!important;font-weight:900!important;
-  text-align:center!important;display:grid!important;place-items:center!important;padding:0!important
-}
-.topbar .brand-title,.topbar .brand>.lp-title{
-  font-size:16px!important;line-height:1.15!important;font-weight:850!important;display:block!important;white-space:nowrap
-}
-.topbar .brand-title small,.topbar .brand>.lp-title small{
-  display:block!important;font-size:11px!important;line-height:1.2!important;font-weight:700!important;
-  opacity:.88!important;margin-top:2px!important
-}
-.topbar .session-jump label,.topbar .jump label{font-size:12px!important;line-height:1.1!important;font-weight:800!important}
-.topbar .session-jump select,.topbar .jump select{font-size:15px!important;line-height:1.2!important;font-weight:700!important;height:38px!important}
-.topbar .progress-label,.topbar .progress-row{font-size:12px!important;line-height:1.1!important}
-
-/* Keep the Learning Path dropdown visually consistent on grammar pages */
-.topbar .jump select{
-  background:#fff!important;
-  color:#465f86!important;
-  border:1px solid #c7d2e3!important;
-  box-shadow:none!important;
-}
-.topbar .jump select option{
-  background:#fff!important;
-  color:#172033!important;
-}
-
-/* Stable grammar top bar */
-.topbar .jump label,.topbar .session-jump label{display:none!important}
-.topbar .jump select,.topbar .session-jump select{max-width:260px!important}
-@media(max-width:1050px){
-  .topbar .toprow{flex-wrap:wrap!important;padding:8px 0!important}
-  .topbar .jump,.topbar .session-jump{order:3!important;width:100%!important;margin-left:0!important}
-  .topbar .jump select,.topbar .session-jump select{width:100%!important;max-width:none!important}
-}
-
-</style>
-</head>
-<body>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#315f9f"><title>4 ESO · Present Simple &amp; Phrasal verbs</title>
+<link rel="stylesheet" href="../../shared/css/layout.css"><link rel="stylesheet" href="../../shared/css/topbar.css"><link rel="stylesheet" href="../../shared/css/activities.css">
+<style>:root{--accent:#315f9f;--dark:#234777;--soft:#edf4ff;--soft2:#dceafe;--cream:#f7f9fd;--ink:#172033;--muted:#687386;--line:#dbe5f1;--shadow:0 14px 38px rgba(49,95,159,.10)}
+.btn{border:0;border-radius:12px;padding:10px 15px;font-weight:800;background:var(--accent);color:#fff}.btn.secondary{background:#fff;color:var(--dark);border:1px solid var(--line)}
+.topbar{background:rgba(35,71,119,.97)!important;box-shadow:0 4px 18px rgba(35,71,119,.16)!important}
+.topbar .brand-mark,.topbar .logo,.topbar .mark{color:#315a8f!important}
+.topbar .brand-title small,.topbar .lp-title small{color:#d8e8ff!important}
+.topbar .session-jump label,.topbar .jump label{color:#dce8f8!important}
+.topbar .progress-label,.topbar .progress-row{color:#dcefe7!important}
+.topbar .progress-bar,.topbar .bar{background:#8fc2ff!important}
+.model{padding:14px;border-radius:13px;background:#fff;border:1px solid var(--line);font-weight:650;margin:12px 0}
+.mini-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+.task-list{display:grid;gap:12px}
+.mini-card label{display:block;font-weight:700;margin-bottom:8px}
+.mini-card select,.mini-card input{max-width:100%;width:100%;padding:9px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit;margin-bottom:10px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.tiny{font-size:.86rem;color:var(--muted);margin-top:8px}
+.verb{font-weight:850;color:var(--dark)}
+.particle{background:var(--soft2);color:var(--dark);border-radius:6px;padding:2px 5px}
+.object{text-decoration:underline;text-underline-offset:4px}
+@media(max-width:760px){.mini-card input,.mini-card select{min-width:0}}
+:root{--card-bg:#fbfdff}
+</style></head><body>
 <div class="topbar"><div class="wrap toprow">
-<div class="brand"><a href="index.html">← My Real Routine</a><span class="mark">4</span><span class="lp-title">Grammar & phrasal verbs<small>4 ESO · My Real Routine · Learning Path 4</small></span></div>
-<div class="jump"><label>Learning Path</label><select id="sessionJump">
-<option value="getting-started.html">1 · Getting started</option>
-<option value="a-day-in-real-life.html">2 · A day in real life</option>
-<option value="useful-expressions.html">3 · Useful expressions</option>
-<option selected value="grammar-phrasal-verbs.html">4 · Grammar & phrasal verbs</option>
-<option value="healthy-habits.html">5 · Healthy habits</option>
-<option value="index.html#final">6 · Final product</option>
-</select></div>
-<div class="progress"><div class="progress-row"><span id="levelLabel">Insecure</span><span id="progressText">0 / 6</span></div><div class="track"><div class="bar" id="progressBar"></div></div></div>
+  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← My Real Routine</a><span class="brand-mark">4</span><span class="brand-title">Present Simple &amp; Phrasal verbs<small>4 ESO · My Real Routine · Learning Path 4</small></span></div>
+  <div class="session-jump">
+      <label for="sessionJump">Learning Path</label>
+      <select id="sessionJump" aria-label="Go to another Learning Path session">
+        <option value="getting-started.html">1 · Getting started</option><option value="a-day-in-real-life.html">2 · A day in real life</option><option value="useful-expressions.html">3 · Useful expressions</option><option value="grammar-phrasal-verbs.html" selected>4 · Present Simple &amp; Phrasal verbs</option><option value="healthy-habits.html">5 · Healthy habits</option><option value="final-product.html">6 · Final product</option>
+      </select>
+    </div>
+    <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 6</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
 </div></div>
 
-<header class="hero"><div class="wrap">
-<span class="eyebrow">Learning Path 4 · Grammar only</span>
-<h1>Grammar & phrasal verbs</h1>
-<p class="lead">Review the Present Simple and learn how the phrasal verbs from this Learning Situation behave when they take objects, pronouns, questions and negatives.</p>
-<div class="routes">
-<button class="route active" data-level="insecure"><strong>Insecure</strong><span>Explicat en català · models clars</span></button>
-<button class="route" data-level="safe"><strong>Safe</strong><span>Clear rules · guided accuracy</span></button>
-<button class="route" data-level="daring"><strong>Daring</strong><span>Separable · inseparable · pronoun placement</span></button>
-</div></div></header>
-
-
-<main class="wrap">
-<nav class="tabs">
-<button class="tab active" data-panel="present">1 Present Simple map</button>
-<button class="tab" data-panel="affirmative">2 Affirmative</button>
-<button class="tab" data-panel="negative">3 Negative</button>
-<button class="tab" data-panel="questions">4 Questions</button>
-<button class="tab" data-panel="phrasal">5 Phrasal verbs</button>
-<button class="tab" data-panel="phrasalPractice">6 Phrasal verb practice</button>
-</nav>
-
-<section class="panel active" id="present"><div class="head"><div><h2>Present Simple: the whole system</h2><p class="instruction">First see how affirmative, negative and question forms fit together.</p></div><span class="pill">overview</span></div><div id="presentContent"></div><div class="actions"><button class="btn" data-complete="present">Got it ✓</button></div></section>
-
-<section class="panel" id="affirmative"><div class="head"><div><h2>Present Simple · Affirmative</h2><p class="instruction">Routines, habits and repeated actions.</p></div><span class="pill">he / she / it</span></div><div id="affirmativeContent"></div><div id="affirmativeTasks"></div><div class="actions"><button class="btn" data-check="affirmative">Check</button></div><div class="result" id="affirmativeResult"></div></section>
-
-<section class="panel" id="negative"><div class="head"><div><h2>Present Simple · Negative</h2><p class="instruction">Use don't / doesn't + base verb.</p></div><span class="pill">don't · doesn't</span></div><div id="negativeContent"></div><div id="negativeTasks"></div><div class="actions"><button class="btn" data-check="negative">Check</button></div><div class="result" id="negativeResult"></div></section>
-
-<section class="panel" id="questions"><div class="head"><div><h2>Present Simple · Questions</h2><p class="instruction">Do / Does, Wh- questions and negative questions.</p></div><span class="pill">Do...? · Does...? · Doesn't...?</span></div><div id="questionsContent"></div><div id="questionsTasks"></div><div class="actions"><button class="btn" data-check="questions">Check</button></div><div class="result" id="questionsResult"></div></section>
-
-<section class="panel" id="phrasal"><div class="head"><div><h2>How phrasal verbs work</h2><p class="instruction">Understand the patterns before moving the object.</p></div><span class="pill">verb + particle</span></div><div id="phrasalContent"></div><div class="actions"><button class="btn" data-complete="phrasal">Got it ✓</button></div></section>
-
-<section class="panel" id="phrasalPractice"><div class="head"><div><h2>Object position & pronouns</h2><p class="instruction">Practise separable verbs, fixed patterns and pronouns.</p></div><span class="pill">pick it up · catch up on it</span></div><div id="phrasalPracticeContent"></div><div id="phrasalPracticeTasks"></div><div class="actions"><button class="btn" data-check="phrasalPractice">Check</button></div><div class="result" id="phrasalPracticeResult"></div></section>
-</main>
-
+<header class="hero"><div class="wrap"><span class="eyebrow">Learning Path 4 · Grammar</span><h1>Present Simple &amp; Phrasal verbs</h1><p class="lead" id="grammarLead">Review the Present Simple; add phrasal verbs in Safe and Daring.</p><div class="routes" aria-label="Choose your route"><button class="route active" data-level="insecure" type="button"><strong>Insecure</strong><span>Present Simple · català i models</span></button><button class="route" data-level="safe" type="button"><strong>Safe</strong><span>Present Simple + phrasal verbs · guided practice</span></button><button class="route" data-level="daring" type="button"><strong>Daring</strong><span>Present Simple + phrasal verbs · independent practice</span></button></div></div></header>
+<main class="wrap"><nav class="tabs" aria-label="Grammar steps"><button class="tab active" data-panel="recognise" type="button">1 Understand and recognise</button><button class="tab" data-panel="controlled" type="button">2 Controlled practice</button><button class="tab" data-panel="transform" type="button">3 Transform</button><button class="tab" data-panel="edit" type="button">4 Edit</button><button class="tab" data-panel="produce" type="button">5 Short production</button><button class="tab" data-panel="selfcheck" type="button">6 Final self-check</button></nav><section class="panel active" id="recognise"><div class="panel-head"><div><h2 id="recogniseTitle"></h2><p class="instruction" id="recogniseIntro"></p></div><span class="pill">1 / 6</span></div><div id="lessonCards"></div><div class="section-card"><div class="task-list" id="recogniseTasks"></div></div></section>
+<section class="panel" id="controlled"><div class="panel-head"><div><h2 id="controlledTitle"></h2><p class="instruction" id="controlledIntro"></p></div><span class="pill">2 / 6</span></div><div class="section-card"><div class="task-list" id="controlledTasks"></div></div></section>
+<section class="panel" id="transform"><div class="panel-head"><div><h2 id="transformTitle"></h2><p class="instruction" id="transformIntro"></p></div><span class="pill">3 / 6</span></div><div class="section-card"><div class="task-list" id="transformTasks"></div></div></section>
+<section class="panel" id="edit"><div class="panel-head"><div><h2 id="editTitle"></h2><p class="instruction" id="editIntro"></p></div><span class="pill">4 / 6</span></div><div class="section-card"><div class="task-list" id="editTasks"></div></div></section>
+<section class="panel" id="produce"><div class="panel-head"><div><h2 id="produceTitle"></h2><p class="instruction" id="produceIntro"></p></div><span class="pill">5 / 6</span></div><div class="section-card"><h3>Task / Tasca</h3><p id="productionPrompt"></p><div class="model" id="productionModel"></div><textarea id="productionText"></textarea></div><div class="section-card"><h3>Self-review / Autorevisió</h3><div class="options" id="productionCriteria"></div><div class="actions"><button class="btn" type="button" id="checkProduction"></button></div><p class="feedback" id="productionFeedback" aria-live="polite"></p></div></section>
+<section class="panel" id="selfcheck"><div class="panel-head"><div><h2 id="selfcheckTitle"></h2><p class="instruction" id="selfcheckIntro"></p></div><span class="pill">6 / 6</span></div><div class="section-card"><div class="task-list" id="selfcheckTasks"></div></div><div class="actions"><button class="btn secondary" id="resetRoute" type="button"></button></div></section>
+<p class="footer-note">Your answers and progress are saved separately for each route on this device.</p></main>
 <script>
-const $=s=>document.querySelector(s),qsa=s=>Array.from(document.querySelectorAll(s));
-let level=localStorage.getItem('s4GrammarLevel')||'insecure';
-let state=JSON.parse(localStorage.getItem('s4GrammarState')||'{}');
-const content={"insecure":{"present":"<div class=\"rule\"><strong>El Present Simple és un sol sistema.</strong> El fem servir per parlar de rutines, hàbits i coses que passen habitualment.</div>\n<table class=\"mini-table\"><tr><th></th><th>I / you / we / they</th><th>he / she / it</th></tr>\n<tr><td><strong>Afirmativa</strong></td><td>They head out at eight.</td><td>She heads out at eight.</td></tr>\n<tr><td><strong>Negativa</strong></td><td>They don't head out at nine.</td><td>She doesn't head out at nine.</td></tr>\n<tr><td><strong>Pregunta</strong></td><td>Do they head out at eight?</td><td>Does she head out at eight?</td></tr></table>\n<div class=\"note\"><strong>Idea clau:</strong> la <strong>-s</strong> de he/she/it només apareix a l'afirmativa. Quan utilitzem <strong>does / doesn't</strong>, el verb torna a la forma base: <em>Does she head out...?</em>, no <em>Does she heads out...?</em></div>\n<h3>Adverbis de freqüència</h3><div class=\"example\">She <strong>usually</strong> heads out at eight. · They <strong>sometimes</strong> sleep in.</div>\n<h3>El verb <em>be</em> és diferent</h3><div class=\"example\">I <strong>am</strong> active. · She <strong>is</strong> active. · They <strong>are</strong> active.</div><div class=\"example\">She <strong>isn't</strong> active today. · <strong>Is</strong> she active?</div>","affirmative":"<div class=\"rule\"><strong>Afirmativa:</strong> amb I/you/we/they fem servir la forma base. Amb he/she/it, normalment afegim <strong>-s</strong>.</div>\n<div class=\"formula\">I / you / we / they + base verb</div><div class=\"formula\">he / she / it + verb-s / -es / -ies</div>\n<div class=\"example\">head out → she <strong>heads out</strong></div><div class=\"example\">go → she <strong>goes</strong></div><div class=\"example\">watch → he <strong>watches</strong></div><div class=\"example\">study → she <strong>studies</strong></div><div class=\"example\">have → she <strong>has</strong></div>\n<div class=\"note\">Si hi ha més d'un verb, tots han de concordar: <strong>She wakes up, has breakfast and heads out.</strong></div>","negative":"<div class=\"rule\"><strong>Negativa:</strong> fem servir <strong>don't</strong> amb I/you/we/they i <strong>doesn't</strong> amb he/she/it.</div>\n<div class=\"formula\">I / you / we / they + don't + base verb</div><div class=\"formula\">he / she / it + doesn't + base verb</div>\n<div class=\"example\">They <strong>don't sleep in</strong> on school days.</div><div class=\"example\">She <strong>doesn't put off</strong> her homework.</div>\n<div class=\"note\">Després de <strong>doesn't</strong> mai posem -s al verb: <strong>doesn't head out</strong> ✓ · <strong>doesn't heads out</strong> ✗</div>","questions":"<div class=\"rule\"><strong>Preguntes de sí/no:</strong> posem <strong>Do / Does</strong> al principi.</div>\n<div class=\"formula\">Do + I/you/we/they + base verb...?</div><div class=\"formula\">Does + he/she/it + base verb...?</div>\n<div class=\"example\"><strong>Do</strong> you wind down with music?</div><div class=\"example\"><strong>Does</strong> she get home at five?</div>\n<h3>Wh- questions</h3><div class=\"example\"><strong>When does</strong> she get home? · <strong>How often do</strong> they sleep in?</div>\n<h3>Preguntes negatives</h3><div class=\"rule\">Les fem servir sovint per confirmar una cosa que esperem o per mostrar sorpresa.</div>\n<div class=\"example\"><strong>Don't you</strong> get home at five?</div><div class=\"example\"><strong>Doesn't he</strong> turn in at ten?</div>\n<div class=\"note\">Amb <strong>you</strong>: Don't you...? · Amb <strong>he/she</strong>: Doesn't he/she...? El verb continua en forma base.</div>","phrasal":"<div class=\"rule\"><strong>Què és un phrasal verb?</strong> És un verb + una partícula curta, com <em>up, out, off, down</em>. Junts formen una expressió que hem d'aprendre com una unitat.</div>\n<div class=\"example\"><strong>pick up</strong> = recollir · <strong>put off</strong> = ajornar · <strong>wind down</strong> = relaxar-se</div>\n<h3>Abans de continuar: què és un objecte?</h3><div class=\"rule\"><strong>L'objecte</strong> és la persona o cosa que rep l'acció del verb.</div><div class=\"example\">I pick up <strong>the groceries</strong>. → <strong>the groceries</strong> és l'objecte: és la cosa que recullo.</div><div class=\"example\">I put off <strong>the task</strong>. → <strong>the task</strong> és l'objecte: és la cosa que ajorno.</div><div class=\"note\"><strong>Sense objecte</strong> vol dir que el verb ja té sentit tot sol i no necessita dir “què” o “qui” rep l'acció. Exemple: <em>I wind down after dinner.</em> No estic “relaxant una cosa”; simplement em relaxo.</div>\n<h3>1. Phrasal verbs sense objecte</h3><div class=\"example\"><strong>head out</strong> · <strong>set off</strong> · <strong>wind down</strong> · <strong>turn in</strong></div><div class=\"note\">Aquests no necessiten objecte: <em>I head out at eight.</em> · <em>I wind down after dinner.</em> · <em>I turn in at eleven.</em></div>\n<h3>2. Phrasal verbs separables</h3><div class=\"example\"><strong>pick up the groceries</strong> = <strong>pick the groceries up</strong></div><div class=\"example\"><strong>put off the task</strong> = <strong>put the task off</strong></div>\n<div class=\"note\">Aquí sí que hi ha objecte: <strong>the groceries</strong>, <strong>the task</strong>. Amb un nom, les dues posicions poden ser correctes. Amb un pronom, només una: <strong>pick it up</strong> ✓ · <strong>pick up it</strong> ✗</div>\n<h3>3. Patrons fixos</h3><div class=\"example\"><strong>catch up on</strong> a show · <strong>get down to</strong> homework · <strong>head out for</strong> school</div><div class=\"note\">Aquí l'objecte va després de tota l'expressió: <strong>catch up on the show</strong>, <strong>get down to homework</strong>. No movem les parts.</div>","phrasalPractice":"<div class=\"rule\"><strong>Abans de triar:</strong> pregunta't si hi ha un objecte i quin és.</div><div class=\"example\">The groceries → objecte → <strong>pick them up</strong></div><div class=\"example\">The task → objecte → <strong>put it off</strong></div><div class=\"example\">A show → objecte d'un patró fix → <strong>catch up on it</strong></div><div class=\"example\">Homework → objecte d'un patró fix → <strong>get down to it</strong></div><div class=\"note\">Regla ràpida: separable + pronom → pronom al mig. Patró fix → el pronom va després del patró complet.</div>"},"safe":{"present":"<div class=\"rule\"><strong>The Present Simple is one system:</strong> affirmative, negative and question forms all describe routines, habits and repeated behaviour.</div>\n<table class=\"mini-table\"><tr><th></th><th>I / you / we / they</th><th>he / she / it</th></tr>\n<tr><td>Affirmative</td><td>They set off early.</td><td>She sets off early.</td></tr>\n<tr><td>Negative</td><td>They don't set off late.</td><td>She doesn't set off late.</td></tr>\n<tr><td>Question</td><td>Do they set off early?</td><td>Does she set off early?</td></tr></table>\n<div class=\"note\">Third-person marking appears on the main verb only in affirmative clauses. After <strong>does / doesn't</strong>, use the base form.</div>\n<h3>Frequency</h3><div class=\"example\">She <strong>usually sets off</strong> early. · They <strong>sometimes sleep in</strong>.</div>\n<h3>Present Simple of <em>be</em></h3><div class=\"example\">I am · you/we/they are · he/she is</div><div class=\"example\">She isn't physically active every day. · Is she active after school?</div>","affirmative":"<div class=\"formula\">I/you/we/they + base verb</div><div class=\"formula\">he/she/it + third-person form</div>\n<div class=\"example\">set → sets · go → goes · watch → watches · study → studies · have → has</div>\n<div class=\"example\">She wakes up, has breakfast, heads out and gets home at five.</div>","negative":"<div class=\"formula\">don't / doesn't + base verb</div><div class=\"example\">They don't put off their homework.</div><div class=\"example\">He doesn't catch up on shows during the week.</div><div class=\"note\">The auxiliary carries the person marking: <strong>doesn't put</strong>, not <strong>doesn't puts</strong>.</div>","questions":"<div class=\"formula\">Do/Does + subject + base verb...?</div><div class=\"example\">Does she wind down before bed?</div>\n<h3>Wh- questions</h3><div class=\"example\">When does she head out? · How often do they catch up on a show?</div>\n<h3>Negative questions</h3><div class=\"example\">Don't you usually get home at five? · Doesn't he turn in early?</div><div class=\"note\">Negative questions often check an expectation or express mild surprise.</div>","phrasal":"<div class=\"rule\">A phrasal verb combines a verb with a particle. Learn the whole expression and its grammar pattern.</div>\n<h3>What is an object?</h3><div class=\"example\">The <strong>object</strong> is the person or thing affected by the action: <em>I pick up <strong>the groceries</strong></em>. “The groceries” is the object.</div><div class=\"note\"><strong>No object</strong> means the verb does not need a person or thing after it to complete the meaning. Example: <em>I wind down after dinner.</em> The action is complete without saying what I “wind down”.</div>\n<table class=\"mini-table\"><tr><th>Pattern</th><th>What it means</th><th>Examples from this LS</th></tr><tr><td>No object</td><td>The expression works on its own.</td><td>head out · set off · wind down · turn in</td></tr><tr><td>Separable</td><td>There is an object, and a noun object can often go in two positions.</td><td>pick sth up · put sth off</td></tr><tr><td>Fixed / three-part</td><td>The object comes after the complete expression.</td><td>catch up on sth · get down to sth · head out for sth</td></tr></table>","phrasalPractice":"<div class=\"rule\">First identify the object, then decide which phrasal-verb pattern you have.</div><div class=\"example\">the groceries = object → pick up the groceries / pick the groceries up</div><div class=\"example\">them = object pronoun → pick <strong>them</strong> up ✓ · pick up them ✗</div><div class=\"example\">a show = object of a fixed pattern → catch up on the show / catch up on it</div><div class=\"example\">homework = object of a fixed pattern → get down to homework / get down to it</div>"},"daring":{"present":"<div class=\"rule\"><strong>The Present Simple is one system:</strong> affirmative, negative and question forms all describe routines, habits and repeated behaviour.</div>\n<table class=\"mini-table\"><tr><th></th><th>I / you / we / they</th><th>he / she / it</th></tr>\n<tr><td>Affirmative</td><td>They set off early.</td><td>She sets off early.</td></tr>\n<tr><td>Negative</td><td>They don't set off late.</td><td>She doesn't set off late.</td></tr>\n<tr><td>Question</td><td>Do they set off early?</td><td>Does she set off early?</td></tr></table>\n<div class=\"note\">Third-person marking appears on the main verb only in affirmative clauses. After <strong>does / doesn't</strong>, use the base form.</div>\n<h3>Frequency</h3><div class=\"example\">She <strong>usually sets off</strong> early. · They <strong>sometimes sleep in</strong>.</div>\n<h3>Present Simple of <em>be</em></h3><div class=\"example\">I am · you/we/they are · he/she is</div><div class=\"example\">She isn't physically active every day. · Is she active after school?</div>","affirmative":"<div class=\"formula\">I/you/we/they + base verb</div><div class=\"formula\">he/she/it + third-person form</div>\n<div class=\"example\">set → sets · go → goes · watch → watches · study → studies · have → has</div>\n<div class=\"example\">She wakes up, has breakfast, heads out and gets home at five.</div>","negative":"<div class=\"formula\">don't / doesn't + base verb</div><div class=\"example\">They don't put off their homework.</div><div class=\"example\">He doesn't catch up on shows during the week.</div><div class=\"note\">The auxiliary carries the person marking: <strong>doesn't put</strong>, not <strong>doesn't puts</strong>.</div>","questions":"<div class=\"formula\">Do/Does + subject + base verb...?</div><div class=\"example\">Does she wind down before bed?</div>\n<h3>Wh- questions</h3><div class=\"example\">When does she head out? · How often do they catch up on a show?</div>\n<h3>Negative questions</h3><div class=\"example\">Don't you usually get home at five? · Doesn't he turn in early?</div><div class=\"note\">Negative questions often check an expectation or express mild surprise.</div>","phrasal":"<div class=\"rule\">A phrasal verb combines a verb with a particle. Learn the whole expression and its grammar pattern.</div>\n<h3>What is an object?</h3><div class=\"example\">The <strong>object</strong> is the person or thing affected by the action: <em>I pick up <strong>the groceries</strong></em>. “The groceries” is the object.</div><div class=\"note\"><strong>No object</strong> means the verb does not need a person or thing after it to complete the meaning. Example: <em>I wind down after dinner.</em> The action is complete without saying what I “wind down”.</div>\n<table class=\"mini-table\"><tr><th>Pattern</th><th>What it means</th><th>Examples from this LS</th></tr><tr><td>No object</td><td>The expression works on its own.</td><td>head out · set off · wind down · turn in</td></tr><tr><td>Separable</td><td>There is an object, and a noun object can often go in two positions.</td><td>pick sth up · put sth off</td></tr><tr><td>Fixed / three-part</td><td>The object comes after the complete expression.</td><td>catch up on sth · get down to sth · head out for sth</td></tr></table>","phrasalPractice":"<div class=\"rule\">First identify the object, then decide which phrasal-verb pattern you have.</div><div class=\"example\">the groceries = object → pick up the groceries / pick the groceries up</div><div class=\"example\">them = object pronoun → pick <strong>them</strong> up ✓ · pick up them ✗</div><div class=\"example\">a show = object of a fixed pattern → catch up on the show / catch up on it</div><div class=\"example\">homework = object of a fixed pattern → get down to homework / get down to it</div>"}};
-const tasks={"affirmative":[["She usually ___ out at eight.",["head","heads"],"heads"],["They ___ off early on Mondays.",["set","sets"],"set"],["He ___ breakfast before school.",["have","has"],"has"],["Mia ___ home at five.",["get","gets"],"gets"],["Leo ___ a short show.",["watch","watches"],"watches"],["They ___ in on Saturdays.",["sleep","sleeps"],"sleep"]],"negative":[["They ___ put off their homework.",["don't","doesn't"],"don't"],["She ___ head out at nine.",["don't","doesn't"],"doesn't"],["He doesn't ___ a show every night.",["watch","watches"],"watch"],["Mia doesn't ___ home at six.",["get","gets"],"get"],["We ___ turn in late on weekdays.",["don't","doesn't"],"don't"],["She doesn't ___ breakfast late.",["have","has"],"have"]],"questions":[["___ she wind down with music?",["Do","Does"],"Does"],["___ they sleep in on Sundays?",["Do","Does"],"Do"],["When ___ she get home?",["do","does"],"does"],["How often ___ they catch up on a show?",["do","does"],"do"],["___ you usually get home at five?",["Don't","Doesn't"],"Don't"],["___ he turn in early?",["Don't","Doesn't"],"Doesn't"]],"phrasalPractice":[["The groceries are ready. I will ___.",["pick them up","pick up them"],"pick them up"],["The task can wait. I will ___.",["put it off","put off it"],"put it off"],["I missed the show. I need to ___.",["catch up on it","catch it up on"],"catch up on it"],["The homework is waiting. I need to ___.",["get down to it","get it down to"],"get down to it"],["Choose the correct expression: ___.",["head out for school","head school out for"],"head out for school"],["Choose the correct expression: ___.",["pick the groceries up","pick groceries the up"],"pick the groceries up"]]};
-const keys=['present','affirmative','negative','questions','phrasal','phrasalPractice'];
-function routeState(){if(!state[level])state[level]={done:{}};return state[level]}
-function save(){localStorage.setItem('s4GrammarLevel',level);localStorage.setItem('s4GrammarState',JSON.stringify(state));updateProgress()}
-function complete(k){routeState().done[k]=true;save()}
-function updateProgress(){const n=keys.filter(k=>routeState().done[k]).length;$('#levelLabel').textContent=level.charAt(0).toUpperCase()+level.slice(1);$('#progressText').textContent=n+' / 6';$('#progressBar').style.width=(n/6*100)+'%'}
-function renderTasks(key){const box=$('#'+key+'Tasks');if(!box)return;box.innerHTML=(tasks[key]||[]).map((q,i)=>{const options=q[1].map(x=>'<option>'+x+'</option>').join('');return '<div class="task">'+(i+1)+'. '+q[0].replace('___','<select><option value="">Choose…</option>'+options+'</select>')+'<div class="feedback"></div></div>'}).join('')}
-function render(){keys.forEach(k=>{const box=$('#'+k+'Content');if(box)box.innerHTML=content[level][k]||''});['affirmative','negative','questions','phrasalPractice'].forEach(renderTasks);updateProgress()}
-qsa('.route').forEach(b=>b.onclick=()=>{level=b.dataset.level;qsa('.route').forEach(x=>x.classList.toggle('active',x.dataset.level===level));render();save()});
-qsa('.tab').forEach(t=>t.onclick=()=>{qsa('.tab,.panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#'+t.dataset.panel).classList.add('active');window.scrollTo({top:$('main').offsetTop-70,behavior:'smooth'})});
-qsa('[data-complete]').forEach(b=>b.onclick=()=>complete(b.dataset.complete));
-qsa('[data-check]').forEach(b=>b.onclick=()=>{const key=b.dataset.check;let score=0;qsa('#'+key+'Tasks .task').forEach((row,i)=>{const ok=row.querySelector('select').value===tasks[key][i][2],fb=row.querySelector('.feedback');if(ok)score++;fb.textContent=ok?'Correct!':'Try again.';fb.className='feedback '+(ok?'ok':'no')});const r=$('#'+key+'Result');r.textContent=score+' / '+tasks[key].length+' correct';r.classList.add('show');if(score>=tasks[key].length-1)complete(key)});
-$('#sessionJump').onchange=e=>{if(e.target.value&&e.target.value!=='#')location.href=e.target.value};
-render();
+const storagePrefix='s4Grammar';
+const englishLead="Review the Present Simple; in Safe and Daring, add phrasal verbs and practise object and pronoun placement.";
+const catalanLead="Repassa el Present Simple: afirmatives, negatives, preguntes, respostes curtes i adverbis de freqüència. En Insecure no treballem phrasal verbs.";
+const course={
+ "insecure": {
+  "lessons": [
+   [
+    "1 · Rutines en Present Simple",
+    "Parlem d’hàbits i accions que es repeteixen. <strong>I study every afternoon.</strong> Mira qui fa l’acció i quan es repeteix. En aquesta ruta només repassem el Present Simple."
+   ],
+   [
+    "2 · Afirmativa",
+    "Amb <strong>I / you / we / they</strong>, fes servir el verb base: <strong>I work.</strong> Amb <strong>he / she / it</strong>, afegeix -s o -es: <strong>She works. He watches TV.</strong><div class=\"model\">have → has · do → does · go → goes<br>She has breakfast. He does his homework. She goes to school.</div>"
+   ],
+   [
+    "3 · Negativa",
+    "<strong>I / you / we / they + don’t + verb base.</strong><br><strong>He / she / it + doesn’t + verb base.</strong><div class=\"model\">I don’t work on Sundays.<br>She doesn’t study at night. ✓<br>She doesn’t studies at night. ✗</div>Amb doesn’t, el verb principal no porta -s."
+   ],
+   [
+    "4 · Preguntes i respostes curtes",
+    "<strong>Do / Does + persona + verb base…?</strong><div class=\"model\">Do you walk to school? → Yes, I do. / No, I don’t.<br>Does she have breakfast? → Yes, she does. / No, she doesn’t.</div>Amb he / she / it, utilitza does; després escriu have, no has."
+   ],
+   [
+    "5 · Freqüència",
+    "<strong>always, usually, often, sometimes, never</strong> van abans del verb principal, però després de be.<div class=\"model\">She usually studies after school.<br>She is often tired.</div>Never ja vol dir mai: no afegeixis don’t / doesn’t."
+   ]
+  ],
+  "recognise": [
+   {
+    "prompt": "Tria: She ___ breakfast.",
+    "answers": [
+     "has"
+    ],
+    "why": "Amb she, have passa a has.",
+    "options": [
+     "have",
+     "has"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Tria: He doesn’t ___ at night.",
+    "answers": [
+     "study"
+    ],
+    "why": "Després de doesn’t, escriu study, sense -s.",
+    "options": [
+     "study",
+     "studies"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Tria la resposta: Does Mia walk to school?",
+    "answers": [
+     "Yes, she does."
+    ],
+    "why": "La pregunta porta does; la resposta sobre Mia també porta she does.",
+    "options": [
+     "Yes, she do.",
+     "Yes, she does."
+    ],
+    "hint": ""
+   }
+  ],
+  "controlled": [
+   {
+    "prompt": "Completa: They ___ to school on foot.",
+    "answers": [
+     "go"
+    ],
+    "why": "They necessita el verb base go.",
+    "options": [
+     "go",
+     "goes"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Completa: He ___ his homework.",
+    "answers": [
+     "does"
+    ],
+    "why": "Amb he a l’afirmativa, do passa a does.",
+    "options": [
+     "do",
+     "does"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Completa: ___ she have breakfast?",
+    "answers": [
+     "Does"
+    ],
+    "why": "Amb she, la pregunta comença amb Does.",
+    "options": [
+     "Do",
+     "Does"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Tria l’ordre correcte.",
+    "answers": [
+     "She usually studies after school."
+    ],
+    "why": "Usually va abans del verb studies.",
+    "options": [
+     "She usually studies after school.",
+     "She studies usually after school."
+    ],
+    "hint": ""
+   }
+  ],
+  "transform": [
+   {
+    "prompt": "Canvia I per she: I go to school.",
+    "answers": [
+     "She goes to school."
+    ],
+    "why": "Amb she, go passa a goes.",
+    "options": null,
+    "hint": "She + goes + to school."
+   },
+   {
+    "prompt": "Fes la negativa: He has breakfast.",
+    "answers": [
+     "He doesn’t have breakfast."
+    ],
+    "why": "Utilitza doesn’t + have, no has.",
+    "options": null,
+    "hint": "He + doesn’t + have breakfast."
+   },
+   {
+    "prompt": "Fes la pregunta: She studies after school.",
+    "answers": [
+     "Does she study after school?"
+    ],
+    "why": "Does va davant de she; study queda sense -s.",
+    "options": null,
+    "hint": "Does + she + study…?"
+   }
+  ],
+  "edit": [
+   {
+    "prompt": "Corregeix: She don’t walk to school.",
+    "answers": [
+     "She doesn’t walk to school."
+    ],
+    "why": "She necessita doesn’t, no don’t.",
+    "options": null,
+    "hint": "Canvia només don’t."
+   },
+   {
+    "prompt": "Corregeix: He does his homework never.",
+    "answers": [
+     "He never does his homework."
+    ],
+    "why": "Never va abans del verb principal does.",
+    "options": null,
+    "hint": "He + never + does…"
+   },
+   {
+    "prompt": "Corregeix: She usually is tired.",
+    "answers": [
+     "She is usually tired."
+    ],
+    "why": "Amb is, usually va després del verb.",
+    "options": null,
+    "hint": "She + is + usually…"
+   }
+  ],
+  "selfcheck": [
+   {
+    "prompt": "Completa: She ___ to school.",
+    "answers": [
+     "goes"
+    ],
+    "why": "Amb she a l’afirmativa, utilitza goes.",
+    "options": [
+     "go",
+     "goes"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Completa: They ___ study at night.",
+    "answers": [
+     "don’t"
+    ],
+    "why": "They necessita don’t + verb base.",
+    "options": [
+     "don’t",
+     "doesn’t"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Does he have breakfast? No, he ___.",
+    "answers": [
+     "doesn’t"
+    ],
+    "why": "La resposta curta manté does i afegeix la negativa.",
+    "options": [
+     "don’t",
+     "doesn’t"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Tria la frase correcta.",
+    "answers": [
+     "She never watches TV at night."
+    ],
+    "why": "Never va abans de watches i no necessita doesn’t.",
+    "options": [
+     "She doesn’t never watch TV at night.",
+     "She never watches TV at night."
+    ],
+    "hint": ""
+   }
+  ],
+  "production": "Escriu dues frases sobre la rutina d’una persona: una afirmativa amb usually i una negativa amb doesn’t. Mira el model i canvia l’activitat o el moment del dia.",
+  "model": "She usually studies after school on weekdays. She doesn’t watch TV at night.",
+  "criteria": [
+   "He utilitzat he/she amb el verb correcte.",
+   "He posat usually abans del verb principal.",
+   "Després de doesn’t, he escrit el verb sense -s."
+  ],
+  "minWords": 12,
+  "minSentences": 2
+ },
+ "safe": {
+  "lessons": [
+   [
+    "The routine system",
+    "Use the Present Simple for repeated actions. <strong>I get up at seven. She gets up at seven.</strong> Match the verb to the subject."
+   ],
+   [
+    "Affirmative forms",
+    "I / you / we / they use the base verb. He / she / it use the third-person form: <strong>gets, watches, studies, has, does, goes</strong>.<div class=\"model\">Mia wakes up, has breakfast and goes to school.</div>"
+   ],
+   [
+    "Negatives and questions",
+    "Use <strong>don’t / doesn’t + base verb</strong>. Put <strong>do / does before the subject</strong> in questions; the main verb stays in its base form.<div class=\"model\">She doesn’t go out on weekdays.<br>Does she go out on weekdays?<br>When does she get home?</div>"
+   ],
+   [
+    "Short answers",
+    "Use the matching auxiliary: <strong>Yes, I do. No, I don’t. Yes, she does. No, she doesn’t.</strong> A short answer does not repeat the main verb."
+   ],
+   [
+    "Frequency and word order",
+    "Put always / usually / often / sometimes / never <strong>before the main verb</strong>, but <strong>after be</strong>: <strong>She usually has breakfast. She is usually tired.</strong> Never already has a negative meaning. With coordinated verbs, keep agreement consistent: <strong>She gets home and does her homework.</strong> Be uses am / is / are; these activities use be only to practise adverb placement."
+   ],
+   [
+    "Verb, particle and object",
+    "A phrasal verb combines a verb and a particle: <strong>wind down, turn in, pick up, put off</strong>. Learn its meaning and object pattern together.<div class=\"model\"><span class=\"verb\">pick</span> <span class=\"particle\">up</span> <span class=\"object\">the kids</span></div>Bold = verb; shaded = particle; underlined = object."
+   ],
+   [
+    "Transitive or intransitive?",
+    "The object is the person or thing affected by the action. <strong>I pick up the kids</strong> has an object (transitive use). <strong>I wind down</strong> and <strong>I turn in</strong> need no object (intransitive uses). Check the meaning: another use of the same verb may have a different pattern."
+   ],
+   [
+    "Separable + noun object",
+    "For <strong>pick up</strong> and <strong>put off</strong>, a noun object can go after the particle or between verb and particle.<div class=\"model\">I pick up the kids. = I pick the kids up.<br>I put off my homework. = I put my homework off.</div>Both noun positions are accepted in the activities."
+   ],
+   [
+    "Separable + pronoun object",
+    "An object pronoun must go between the verb and the particle.<div class=\"model\">I <span class=\"verb\">pick</span> <span class=\"object\">them</span> <span class=\"particle\">up</span>. ✓<br>I pick up them. ✗<br>I put it off. ✓</div>Use them for the kids; it for my homework."
+   ],
+   [
+    "Fixed / inseparable pattern",
+    "The routine expressions <strong>catch up on</strong> and <strong>get down to</strong> keep all their parts together. The noun or pronoun follows the complete expression.<div class=\"model\">I catch up on a show. → I catch up on it.<br>I get down to my homework. → I get down to it.</div>These three-part expressions end in a preposition. Do not move the object into the middle."
+   ]
+  ],
+  "recognise": [
+   {
+    "prompt": "Choose the accurate routine.",
+    "answers": [
+     "Mia has breakfast and goes to school."
+    ],
+    "why": "Both coordinated verbs agree with Mia.",
+    "options": [
+     "Mia have breakfast and goes to school.",
+     "Mia has breakfast and goes to school."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the question.",
+    "answers": [
+     "Does Leo get home at five?"
+    ],
+    "why": "Does carries the third-person marking; use get.",
+    "options": [
+     "Does Leo gets home at five?",
+     "Does Leo get home at five?"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Classify pick up in I pick up the kids.",
+    "answers": [
+     "separable"
+    ],
+    "why": "A noun can appear in pick up the kids or pick the kids up.",
+    "options": [
+     "separable",
+     "fixed / inseparable",
+     "no object"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Classify catch up on in I catch up on emails.",
+    "answers": [
+     "fixed / inseparable"
+    ],
+    "why": "Emails follows the full expression catch up on.",
+    "options": [
+     "separable",
+     "fixed / inseparable",
+     "no object"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Classify turn in in I turn in at ten.",
+    "answers": [
+     "no object"
+    ],
+    "why": "At ten gives the time; it is not an object affected by turn in.",
+    "options": [
+     "separable",
+     "fixed / inseparable",
+     "no object"
+    ],
+    "hint": ""
+   }
+  ],
+  "controlled": [
+   {
+    "prompt": "Mia and Leo ___ home at five.",
+    "answers": [
+     "get"
+    ],
+    "why": "Two people form a plural subject: use get.",
+    "options": [
+     "get",
+     "gets"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Mia ___ sleep in on weekdays.",
+    "answers": [
+     "doesn’t"
+    ],
+    "why": "A singular third-person subject needs doesn’t.",
+    "options": [
+     "don’t",
+     "doesn’t"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Which pair has two correct noun positions?",
+    "answers": [
+     "pick up the kids / pick the kids up"
+    ],
+    "why": "A noun object can go in either position with pick up.",
+    "options": [
+     "pick up the kids / pick the kids up",
+     "catch up on emails / catch emails up on"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the correct pronoun position.",
+    "answers": [
+     "She puts it off."
+    ],
+    "why": "Put off requires an object pronoun between the verb and particle.",
+    "options": [
+     "She puts off it.",
+     "She puts it off."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the correct fixed pattern.",
+    "answers": [
+     "I get down to it."
+    ],
+    "why": "Keep get down to together; it follows to.",
+    "options": [
+     "I get it down to.",
+     "I get down to it."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Complete: I catch ___ emails before work.",
+    "answers": [
+     "up on"
+    ],
+    "why": "The studied expression is catch up on; both parts precede emails.",
+    "options": [
+     "up on",
+     "on up"
+    ],
+    "hint": ""
+   }
+  ],
+  "transform": [
+   {
+    "prompt": "Make this negative: Leo does his homework after school.",
+    "answers": [
+     "Leo doesn’t do his homework after school."
+    ],
+    "why": "Use doesn’t + do; don’t keep does.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Ask about the time: Mia gets home at five.",
+    "answers": [
+     "When does Mia get home?"
+    ],
+    "why": "Use When + does + Mia + get home; the answer is the time.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Use the other noun position: I pick up the kids.",
+    "answers": [
+     "I pick the kids up."
+    ],
+    "why": "Move the noun between pick and up.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Replace her homework with it: She puts off her homework.",
+    "answers": [
+     "She puts it off."
+    ],
+    "why": "The object pronoun goes between puts and off.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Replace emails with them: I catch up on emails.",
+    "answers": [
+     "I catch up on them."
+    ],
+    "why": "The pronoun follows the whole fixed expression.",
+    "options": null,
+    "hint": ""
+   }
+  ],
+  "edit": [
+   {
+    "prompt": "Correct: Does she goes to school on foot?",
+    "answers": [
+     "Does she go to school on foot?"
+    ],
+    "why": "Use go after Does.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Correct: He don’t have breakfast.",
+    "answers": [
+     "He doesn’t have breakfast."
+    ],
+    "why": "He needs doesn’t + have.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Correct: She picks up them after school.",
+    "answers": [
+     "She picks them up after school."
+    ],
+    "why": "Pick up is separable, so them must go in the middle.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Correct: I get my homework down to after school.",
+    "answers": [
+     "I get down to my homework after school."
+    ],
+    "why": "Get down to is fixed; the noun follows to.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Correct: I catch emails up on before work.",
+    "answers": [
+     "I catch up on emails before work."
+    ],
+    "why": "Keep catch up on together before emails.",
+    "options": null,
+    "hint": ""
+   }
+  ],
+  "selfcheck": [
+   {
+    "prompt": "Choose the accurate question.",
+    "answers": [
+     "Does Mia do her homework?"
+    ],
+    "why": "The auxiliary is Does; the main verb is do.",
+    "options": [
+     "Does Mia does her homework?",
+     "Does Mia do her homework?"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the accurate negative.",
+    "answers": [
+     "They don’t have breakfast at school."
+    ],
+    "why": "They requires don’t + have.",
+    "options": [
+     "They doesn’t have breakfast at school.",
+     "They don’t have breakfast at school."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the accurate explanation.",
+    "answers": [
+     "Noun objects can go in two positions with pick up."
+    ],
+    "why": "Separable verbs allow either noun position, but pronouns must go in the middle.",
+    "options": [
+     "All phrasal verbs can be split.",
+     "Noun objects can go in two positions with pick up."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Rewrite with them: She picks up the kids.",
+    "answers": [
+     "She picks them up."
+    ],
+    "why": "Them belongs between picks and up.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the accurate sentence.",
+    "answers": [
+     "I get down to it after school."
+    ],
+    "why": "It follows the fixed expression get down to.",
+    "options": [
+     "I get it down to after school.",
+     "I get down to it after school."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the accurate sentence.",
+    "answers": [
+     "I put my homework off."
+    ],
+    "why": "Put off allows this noun-object position.",
+    "options": [
+     "I put my off homework.",
+     "I put my homework off."
+    ],
+    "hint": ""
+   }
+  ],
+  "production": "Use the Present Simple throughout. Include a third-person routine sentence, a negative and a question. Write three sentences about an afternoon routine. Use pick up or put off with a noun, rewrite that object as it/them, and add a sentence with catch up on or get down to.",
+  "model": "Mia usually studies after school. She doesn’t put her homework off. Does she pick the kids up before she studies? I put off my homework. I put it off until later. Then I get down to it.",
+  "criteria": [
+   "My Present Simple verbs agree with their subjects; negatives and questions use does/doesn’t + a base verb.",
+   "My pronoun goes in the middle of the separable verb.",
+   "My object follows the complete fixed expression."
+  ],
+  "minWords": 15,
+  "minSentences": 3
+ },
+ "daring": {
+  "lessons": [
+   [
+    "The routine system",
+    "Use the Present Simple for repeated actions. <strong>I get up at seven. She gets up at seven.</strong> Match the verb to the subject."
+   ],
+   [
+    "Affirmative forms",
+    "I / you / we / they use the base verb. He / she / it use the third-person form: <strong>gets, watches, studies, has, does, goes</strong>.<div class=\"model\">Mia wakes up, has breakfast and goes to school.</div>"
+   ],
+   [
+    "Negatives and questions",
+    "Use <strong>don’t / doesn’t + base verb</strong>. Put <strong>do / does before the subject</strong> in questions; the main verb stays in its base form.<div class=\"model\">She doesn’t go out on weekdays.<br>Does she go out on weekdays?<br>When does she get home?</div>"
+   ],
+   [
+    "Short answers",
+    "Use the matching auxiliary: <strong>Yes, I do. No, I don’t. Yes, she does. No, she doesn’t.</strong> A short answer does not repeat the main verb."
+   ],
+   [
+    "Frequency and word order",
+    "Put always / usually / often / sometimes / never <strong>before the main verb</strong>, but <strong>after be</strong>: <strong>She usually has breakfast. She is usually tired.</strong> Never already has a negative meaning. With coordinated verbs, keep agreement consistent: <strong>She gets home and does her homework.</strong> Be uses am / is / are; these activities use be only to practise adverb placement."
+   ],
+   [
+    "Verb, particle and object",
+    "A phrasal verb combines a verb and a particle: <strong>wind down, turn in, pick up, put off</strong>. Learn its meaning and object pattern together.<div class=\"model\"><span class=\"verb\">pick</span> <span class=\"particle\">up</span> <span class=\"object\">the kids</span></div>Bold = verb; shaded = particle; underlined = object."
+   ],
+   [
+    "Transitive or intransitive?",
+    "The object is the person or thing affected by the action. <strong>I pick up the kids</strong> has an object (transitive use). <strong>I wind down</strong> and <strong>I turn in</strong> need no object (intransitive uses). Check the meaning: another use of the same verb may have a different pattern."
+   ],
+   [
+    "Separable + noun object",
+    "For <strong>pick up</strong> and <strong>put off</strong>, a noun object can go after the particle or between verb and particle.<div class=\"model\">I pick up the kids. = I pick the kids up.<br>I put off my homework. = I put my homework off.</div>Both noun positions are accepted in the activities."
+   ],
+   [
+    "Separable + pronoun object",
+    "An object pronoun must go between the verb and the particle.<div class=\"model\">I <span class=\"verb\">pick</span> <span class=\"object\">them</span> <span class=\"particle\">up</span>. ✓<br>I pick up them. ✗<br>I put it off. ✓</div>Use them for the kids; it for my homework."
+   ],
+   [
+    "Fixed / inseparable pattern",
+    "The routine expressions <strong>catch up on</strong> and <strong>get down to</strong> keep all their parts together. The noun or pronoun follows the complete expression.<div class=\"model\">I catch up on a show. → I catch up on it.<br>I get down to my homework. → I get down to it.</div>These three-part expressions end in a preposition. Do not move the object into the middle."
+   ],
+   [
+    "Explain the pattern, not just the sentence",
+    "Compare <strong>I put it off</strong> with <strong>I get down to it</strong>. The pronoun is the same, but its position follows each expression’s pattern. <strong>Put off</strong> is separable; <strong>get down to</strong> is fixed. Context does not make an incorrect pronoun position acceptable."
+   ]
+  ],
+  "recognise": [
+   {
+    "prompt": "Choose the accurate description.",
+    "answers": [
+     "She usually has breakfast and goes to school on foot."
+    ],
+    "why": "Both verbs agree with she; usually precedes the first main verb.",
+    "options": [
+     "She usually has breakfast and go to school on foot.",
+     "She usually has breakfast and goes to school on foot."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the accurate question.",
+    "answers": [
+     "Why does Leo usually turn in early?"
+    ],
+    "why": "Why + does + subject + usually + base verb.",
+    "options": [
+     "Why does Leo usually turns in early?",
+     "Why does Leo usually turn in early?"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Which explanation accounts for I pick them up?",
+    "answers": [
+     "Them is a pronoun object of a separable verb."
+    ],
+    "why": "Object pronouns must go between pick and up.",
+    "options": [
+     "Every object must go in the middle.",
+     "Them is a pronoun object of a separable verb."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Why is I catch up on them correct?",
+    "answers": [
+     "Catch up on is fixed, so the pronoun follows on."
+    ],
+    "why": "Three-part catch up on keeps its parts together.",
+    "options": [
+     "Pronouns always go in the middle.",
+     "Catch up on is fixed, so the pronoun follows on."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "What is at ten in I turn in at ten?",
+    "answers": [
+     "a time phrase, not a direct object"
+    ],
+    "why": "Turn in is intransitive in this routine meaning.",
+    "options": [
+     "a direct object",
+     "a time phrase, not a direct object"
+    ],
+    "hint": ""
+   }
+  ],
+  "controlled": [
+   {
+    "prompt": "Choose the accurate negative.",
+    "answers": [
+     "She doesn’t usually sleep in on weekdays."
+    ],
+    "why": "Doesn’t + usually + base verb keeps the routine meaning.",
+    "options": [
+     "She doesn’t usually sleeps in on weekdays.",
+     "She doesn’t usually sleep in on weekdays."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Complete: Leo usually ___ his homework before he ___ down.",
+    "answers": [
+     "does / winds"
+    ],
+    "why": "Both verbs have the singular subject Leo/he.",
+    "options": [
+     "do / winds",
+     "does / wind",
+     "does / winds"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose both acceptable noun forms.",
+    "answers": [
+     "She puts off her homework / She puts her homework off"
+    ],
+    "why": "Put off permits both positions for a noun object.",
+    "options": [
+     "She puts off her homework / She puts her homework off",
+     "She gets down to her homework / She gets her homework down to"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the accurate contextual sentence.",
+    "answers": [
+     "She picks them up before she gets down to work."
+    ],
+    "why": "Them goes inside pick up; work follows the fixed expression get down to.",
+    "options": [
+     "She picks up them before she gets down to work.",
+     "She picks them up before she gets down to work."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Replace the kids with them: She usually picks up the kids after school.",
+    "answers": [
+     "She usually picks them up after school."
+    ],
+    "why": "Move the pronoun between picks and up without moving usually.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Complete the fixed expression: I get ___ my homework.",
+    "answers": [
+     "down to"
+    ],
+    "why": "The complete expression is get down to, not get to down.",
+    "options": [
+     "down to",
+     "to down"
+    ],
+    "hint": ""
+   }
+  ],
+  "transform": [
+   {
+    "prompt": "Change they to Mia: They usually get home and do their homework.",
+    "answers": [
+     "Mia usually gets home and does her homework."
+    ],
+    "why": "Both verbs change to third person, and their becomes her.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Make this negative: Leo always goes to bed early.",
+    "answers": [
+     "Leo doesn’t always go to bed early."
+    ],
+    "why": "Doesn’t + always + go; this means not on every occasion.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Rewrite using it: Although I put off my homework, I get down to my homework later.",
+    "answers": [
+     "Although I put it off, I get down to it later."
+    ],
+    "why": "Put off takes it in the middle; get down to takes it at the end.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Use the other noun position: She picks up the kids before dinner.",
+    "answers": [
+     "She picks the kids up before dinner."
+    ],
+    "why": "Pick up is separable and the object is a noun phrase.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Use them: I catch up on emails before I pick up the kids.",
+    "answers": [
+     "I catch up on them before I pick them up."
+    ],
+    "why": "Both objects are plural, but each expression has a different placement rule.",
+    "options": null,
+    "hint": ""
+   }
+  ],
+  "edit": [
+   {
+    "prompt": "Correct both errors: She usually get home early, but she don’t start her homework immediately.",
+    "answers": [
+     "She usually gets home early, but she doesn’t start her homework immediately."
+    ],
+    "why": "Use gets in the affirmative and doesn’t + start in the negative.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Correct: How often does Leo watches a film?",
+    "answers": [
+     "How often does Leo watch a film?"
+    ],
+    "why": "The main verb stays watch after does.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Correct both positions: I put off it, then I get it down to.",
+    "answers": [
+     "I put it off, then I get down to it."
+    ],
+    "why": "It belongs inside put off, but after get down to.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Correct: She picks the up kids before she catches emails up on.",
+    "answers": [
+     "She picks the kids up before she catches up on emails.",
+     "She picks up the kids before she catches up on emails."
+    ],
+    "why": "Keep the noun phrase the kids together; keep catch up on together.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Correct: I get to down my homework after school.",
+    "answers": [
+     "I get down to my homework after school."
+    ],
+    "why": "The fixed order is get down to, followed by its object.",
+    "options": null,
+    "hint": ""
+   }
+  ],
+  "selfcheck": [
+   {
+    "prompt": "Choose the accurate pair.",
+    "answers": [
+     "She does her homework. Does she do her homework?"
+    ],
+    "why": "Does is the main verb in the statement, but the auxiliary in the question.",
+    "options": [
+     "She do her homework. Does she does her homework?",
+     "She does her homework. Does she do her homework?"
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the accurate adverb order.",
+    "answers": [
+     "She is usually active and often walks home."
+    ],
+    "why": "Usually follows be; often precedes walks.",
+    "options": [
+     "She usually is active and walks often home.",
+     "She is usually active and often walks home."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Which principle is accurate?",
+    "answers": [
+     "Pronoun position depends on the verb’s object pattern."
+    ],
+    "why": "Separable and fixed patterns place pronouns differently.",
+    "options": [
+     "Every phrasal verb allows two object positions.",
+     "Pronoun position depends on the verb’s object pattern."
+    ],
+    "hint": ""
+   },
+   {
+    "prompt": "Use it: She puts her homework off.",
+    "answers": [
+     "She puts it off."
+    ],
+    "why": "It must precede off.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Use them: I catch up on emails.",
+    "answers": [
+     "I catch up on them."
+    ],
+    "why": "Them follows the full fixed expression.",
+    "options": null,
+    "hint": ""
+   },
+   {
+    "prompt": "Choose the correct reason for I wind down.",
+    "answers": [
+     "In this meaning, the verb needs no object."
+    ],
+    "why": "Wind down means relax here and is intransitive.",
+    "options": [
+     "The object is hidden between wind and down.",
+     "In this meaning, the verb needs no object."
+    ],
+    "hint": ""
+   }
+  ],
+  "production": "Use the Present Simple throughout. Include a third-person routine sentence, a negative and a question. Write three or four sentences about a busy afternoon. Use a separable verb with a noun and then a pronoun, plus a fixed expression with an object. Finish with a brief explanation of why you placed one pronoun there.",
+  "model": "Mia usually studies after school. She doesn’t put her homework off. Does she pick the kids up before she studies? I pick up the kids after school. I pick them up before I get down to my homework. The pronoun them goes between pick and up because pick up is separable.",
+  "criteria": [
+   "My Present Simple verbs agree with their subjects; negatives and questions use does/doesn’t + a base verb.",
+   "I distinguish noun and pronoun placement for separable verbs.",
+   "I keep fixed expressions together and explain one placement decision."
+  ],
+  "minWords": 22,
+  "minSentences": 3
+ }
+};
+const labels={"ca": ["Entén i reconeix", "Pràctica guiada", "Transforma", "Corregeix", "Producció curta", "Comprovació final"], "en": ["Understand and recognise", "Controlled practice", "Transform", "Edit", "Short production", "Final self-check"]};
+const instructions={"ca": ["Llegeix les explicacions i els exemples abans de triar les respostes.", "Segueix el model. Tria o escriu la resposta i llegeix el perquè.", "Canvia només el que demana la instrucció. Utilitza els models si cal.", "Cada frase conté un error de les regles estudiades. Escriu la frase correcta.", "Després de la pràctica guiada, escriu i revisa amb la llista.", "Comprova les regles principals. Pots tornar a les explicacions i repetir les respostes."], "en": ["Read the explanations and examples before recognising the correct patterns.", "Apply the model and read the reason given with each answer.", "Change only what the instruction asks; preserve the rest of the meaning.", "Correct the studied grammar errors. Write the complete corrected sentence.", "Use the controlled practice to write a short response, then review it yourself.", "Check the main rules independently. Revisit the explanations and retry when needed."]};
 
-const forceCurrentSession=()=>{const s=document.getElementById('sessionJump');if(s)s.value='grammar-phrasal-verbs.html';};
-window.addEventListener('DOMContentLoaded',forceCurrentSession);
-window.addEventListener('pageshow',forceCurrentSession);
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const steps=['recognise','controlled','transform','edit','produce','selfcheck'];
+let stored={};try{stored=JSON.parse(localStorage.getItem(storagePrefix+'State')||'{}')||{}}catch(e){}
+let level=localStorage.getItem(storagePrefix+'Level')||'insecure';if(!course[level])level='insecure';
+function routeState(){const old=stored[level]||{};if(old.version!==3)stored[level]={version:3,answers:{},checked:{},done:{},production:'',review:[false,false,false]};stored[level].checked=stored[level].checked||{};return stored[level]}
+function normalise(value){return value.toLowerCase().replace(/\s+/g,' ').replace(/[’‘]/g,"'").replace(/\bdoes not\b/g,"doesn't").replace(/\bdo not\b/g,"don't").replace(/[.,!?]/g,'').replace(/\s+/g,' ').trim()}
+function evaluate(task,value){return task.answers.some(a=>normalise(a)===normalise(value))}
+function feedbackFor(task,value){if(!value.trim())return {ok:false,text:level==='insecure'?'Tria o escriu una resposta abans de comprovar.':'Choose or write an answer first.'};const ok=evaluate(task,value);return {ok,text:(ok?(level==='insecure'?'Correcte. ':'Correct. '):(level==='insecure'?'Encara no. ':'Try again. '))+task.why}}
+function save(){localStorage.setItem(storagePrefix+'State',JSON.stringify(stored));localStorage.setItem(storagePrefix+'Level',level);updateProgress()}
+function updateProgress(){const count=steps.filter(k=>routeState().done[k]).length;$('#progressLabel').textContent=level[0].toUpperCase()+level.slice(1);$('#progressText').textContent=`${count} / 6`;$('#progressBar').style.width=`${count/6*100}%`}
+function refreshStep(key){const tasks=course[level][key];routeState().done[key]=tasks.every((t,i)=>routeState().checked[key+':'+i]&&evaluate(t,routeState().answers[key+':'+i]||''));save()}
+function add(tag,parent,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;parent.appendChild(el);return el}
+function renderTasks(key){const parent=$('#'+key+'Tasks');parent.replaceChildren();course[level][key].forEach((task,i)=>{const id=key+':'+i,row=add('div',parent,undefined,'mini-card'),label=add('label',row,(i+1)+'. '+task.prompt);let input;
+ if(task.options){input=add('select',row);add('option',input,level==='insecure'?'Tria…':'Choose…').value='';task.options.forEach(option=>add('option',input,option).value=option)}else{input=add('input',row);input.type='text';input.autocomplete='off';input.spellcheck=false}
+ input.id=key+'Answer'+i;label.htmlFor=input.id;input.value=routeState().answers[id]||'';if(task.hint)add('p',row,task.hint,'tiny');
+ const button=add('button',row,level==='insecure'?'Comprova':'Check','btn small');button.type='button';const result=add('p',row,'','feedback');result.setAttribute('aria-live','polite');
+ const check=()=>{routeState().answers[id]=input.value;routeState().checked[id]=true;const feedback=feedbackFor(task,input.value);result.textContent=feedback.text;result.className='feedback '+(feedback.ok?'ok':'no');refreshStep(key)};
+ button.onclick=check;if(task.options)input.onchange=check;else{input.oninput=()=>{routeState().answers[id]=input.value;routeState().checked[id]=false;result.textContent='';result.className='feedback';refreshStep(key)};input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();check()}}}
+ if(input.value&&routeState().checked[id]){const feedback=feedbackFor(task,input.value);result.textContent=feedback.text;result.className='feedback '+(feedback.ok?'ok':'no')}
+ })}
+function productionReady(text,review){const words=(text.trim().match(/\S+/g)||[]).length,sentences=text.split(/[.!?]+/).filter(x=>x.trim()).length;return words>=course[level].minWords&&sentences>=course[level].minSentences&&review.every(Boolean)}
+function checkProduction(){const s=routeState();s.production=$('#productionText').value;s.review=$$('[data-review]').map(x=>x.checked);s.done.produce=productionReady(s.production,s.review);$('#productionFeedback').textContent=s.done.produce?(level==='insecure'?'Autorevisió completada. Has revisat les regles de la llista; això no és una correcció automàtica del text.':'Self-review complete. You checked the listed rules; this is not an automatic grammar assessment.'):(level==='insecure'?`Escriu almenys ${course[level].minSentences} frases i ${course[level].minWords} paraules; després revisa i marca els tres punts.`:`Write at least ${course[level].minSentences} sentences and ${course[level].minWords} words, then review and tick all three points.`);$('#productionFeedback').className='feedback '+(s.done.produce?'ok':'no');save()}
+function render(){const d=course[level],ca=level==='insecure';$$('.route').forEach(x=>x.classList.toggle('active',x.dataset.level===level));$$('.tab').forEach((tab,i)=>tab.textContent=(i+1)+' '+labels[ca?'ca':'en'][i]);$('#grammarLead').textContent=ca?catalanLead:englishLead;steps.forEach((key,i)=>{$('#'+key+'Title').textContent=(i+1)+' · '+labels[ca?'ca':'en'][i];$('#'+key+'Intro').textContent=instructions[ca?'ca':'en'][i]});
+ $('#lessonCards').replaceChildren();d.lessons.forEach(([title,body])=>{const card=add('div',$('#lessonCards'),undefined,'section-card');add('h3',card,title);const content=add('div',card);content.innerHTML=body});
+ for(const key of ['recognise','controlled','transform','edit','selfcheck'])renderTasks(key);
+ $('#productionPrompt').textContent=d.production;$('#productionModel').textContent=d.model;$('#productionText').value=routeState().production;$('#productionText').setAttribute('aria-label',ca?'La teva producció curta':'Your short production');$('#productionCriteria').replaceChildren();d.criteria.forEach((text,i)=>{const label=add('label',$('#productionCriteria'),undefined,'option'),check=add('input',label);check.type='checkbox';check.dataset.review=i;check.checked=!!routeState().review[i];add('span',label,text);check.onchange=()=>{routeState().review[i]=check.checked;routeState().done.produce=false;$('#productionFeedback').textContent='';save()}});$('#productionFeedback').textContent='';$('#checkProduction').textContent=ca?'Acaba l’autorevisió':'Complete self-review';$('#resetRoute').textContent=ca?'Reinicia aquesta ruta':'Reset this route';updateProgress()}
+$$('.route').forEach(b=>b.onclick=()=>{level=b.dataset.level;render();save()});
+$$('.tab').forEach(b=>b.onclick=()=>{$$('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.panel).classList.add('active');window.scrollTo({top:document.querySelector('main').offsetTop-76,behavior:'smooth'})});
+$('#productionText').oninput=()=>{routeState().production=$('#productionText').value;routeState().done.produce=false;$('#productionFeedback').textContent='';save()};$('#checkProduction').onclick=checkProduction;
+$('#resetRoute').onclick=()=>{if(confirm(level==='insecure'?'Vols reiniciar només aquesta ruta de gramàtica?':'Reset only this grammar route?')){delete stored[level];render();save()}};
+$('#sessionJump').onchange=e=>{if(e.target.value)location.href=e.target.value};render();
 </script></body></html>

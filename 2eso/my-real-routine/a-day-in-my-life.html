@@ -63,7 +63,7 @@ textarea{width:100%;min-height:175px;border:1px solid #c7dbd1;border-radius:12px
   <div class="session-jump">
       <label for="sessionJump">Learning Path</label>
       <select id="sessionJump" aria-label="Go to another Learning Path session">
-        <option value="getting-started.html">1 · Getting started</option><option value="a-day-in-my-life.html" selected>2 · Routine expressions</option><option value="same-day-different-person.html">3 · Same day, different person</option><option value="present-simple-grammar.html">4 · Present Simple grammar</option><option value="healthy-habits.html">5 · Healthy habits</option><option value="final-product.html">6 · Final product</option>
+        <option value="getting-started.html">1 · Getting started</option><option value="a-day-in-my-life.html" selected>2 · Routine expressions</option><option value="same-day-different-person.html">3 · Same day, different person</option><option value="present-simple-grammar.html">4 · Present Simple</option><option value="healthy-habits.html">5 · Healthy habits</option><option value="final-product.html">6 · Final product</option>
       </select>
     </div>
     <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 5</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
@@ -88,22 +88,22 @@ textarea{width:100%;min-height:175px;border:1px solid #c7dbd1;border-radius:12px
   <button class="tab" data-panel="speaking">6 Speaking</button>
 </nav>
 <section class="panel active" id="vocabulary">
-  <div class="panel-head"><div><h2>Vocabulary</h2><p class="instruction" id="vocabIntro">Primer descobreix les expressions de la teva ruta i després estudia-les amb les targetes.</p><div class="level-note" id="exploreNote"></div></div><span class="pill" id="explorePill"></span></div>
-  <div class="section-card"><h3><span class="step-number">1</span> Explore</h3><p class="instruction">Passa el ratolí per sobre de cada expressió per veure el significat en català i un exemple.</p><div class="vocab-groups" id="vocabGroups" style="margin-top:14px"></div><div class="study-summary" id="studySummary"></div><div class="actions"><button class="btn" id="finishExplore">Ja les he explorat ✓</button></div></div>
-  <div class="section-card"><h3><span class="step-number">2</span> Study cards</h3><p class="instruction">Digues l’expressió en veu alta. Gira la targeta per comprovar el significat i l’exemple.</p><div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardCategory"></div><strong id="cardFront"></strong><p>Click to turn the card</p></div><div class="face back"><div class="label">Català + example</div><strong id="cardBack"></strong><p id="cardHint"></p></div></div></div><div class="counter" id="cardCounter"></div><div class="flash-actions"><button class="btn secondary" id="prevCard">← Previous</button><button class="btn" id="knowCard">I know it ✓</button><button class="btn secondary" id="nextCard">Next →</button></div></div>
+  <div class="panel-head"><div><h2>Vocabulary</h2><p class="instruction" id="vocabIntro" data-support-ca="Primer descobreix les expressions de la teva ruta i després estudia-les amb les targetes." data-support-en="Explore your route’s expressions, then study them with the cards.">Primer descobreix les expressions de la teva ruta i després estudia-les amb les targetes.</p><div class="level-note" id="exploreNote"></div></div><span class="pill" id="explorePill"></span></div>
+  <div class="section-card"><h3><span class="step-number">1</span> Explore</h3><p class="instruction" data-support-ca="Mira el significat i l’exemple de cada expressió. Passa-hi el ratolí o selecciona-la amb el teclat; observa quines paraules van juntes." data-support-en="Explore each expression’s meaning and example. Hover or focus on it to see the support.">Passa el ratolí per sobre de cada expressió per veure el significat en català i un exemple.</p><div class="vocab-groups" id="vocabGroups" style="margin-top:14px"></div><div class="study-summary" id="studySummary"></div><div class="actions"><button class="btn" id="finishExplore">Ja les he explorat ✓</button></div></div>
+  <div class="section-card"><h3><span class="step-number">2</span> Study cards</h3><p class="instruction" data-support-ca="Digues l’expressió en veu alta i intenta recordar què vol dir. Gira la targeta i comprova el significat i l’exemple." data-support-en="Say the expression aloud, recall its meaning, then turn the card to check the meaning and example.">Digues l’expressió en veu alta. Gira la targeta per comprovar el significat i l’exemple.</p><div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardCategory"></div><strong id="cardFront"></strong><p>Click to turn the card</p></div><div class="face back"><div class="label">Català + example</div><strong id="cardBack"></strong><p id="cardHint"></p></div></div></div><div class="counter" id="cardCounter"></div><div class="flash-actions"><button class="btn secondary" id="prevCard">← Previous</button><button class="btn" id="knowCard">I know it ✓</button><button class="btn secondary" id="nextCard">Next →</button></div></div>
 </section>
 <section class="panel" id="practicePanel">
-  <div class="panel-head"><div><h2>Practice</h2><p class="instruction">Practica les expressions de diferents maneres abans d’utilitzar-les.</p></div><span class="pill">Match · Choose · Build</span></div>
-  <div class="section-card"><h3><span class="step-number">1</span> Match</h3><p class="instruction">Uneix les parts per formar expressions naturals. Si una combinació és correcta en anglès, comptarà com a correcta encara que hi hagi més d’una opció possible.</p><div class="match-grid" style="margin-top:14px"><div class="match-col" id="matchLeft"></div><div class="match-col" id="matchRight"></div></div><div class="result" id="matchResult"></div><div class="actions"><button class="btn secondary" id="resetMatch">New mix</button></div></div>
-  <div class="section-card"><h3><span class="step-number">2</span> Practise</h3><p class="instruction">Completa les expressions. Fes els diferents sets fins haver treballat tot el vocabulari de la teva ruta.</p><div class="practice-meta"><span id="practiceSetLabel"></span><span id="practiceCoverage"></span></div><div class="task-list" id="practiceList"></div><div class="actions"><button class="btn" id="checkPractice">Check</button><button class="btn secondary" id="nextPractice">Next set →</button></div><div class="result" id="practiceResult"></div></div>
-  <div class="section-card"><h3><span class="step-number">3</span> Build</h3><p class="instruction">Ordena les paraules per construir frases correctes que després podràs reutilitzar.</p><div class="builder-list" id="builderList" style="margin-top:14px"></div><div class="actions"><button class="btn" id="checkBuilders">Check sentences</button><button class="btn secondary" id="resetBuilders">Start again</button></div><div class="result" id="builderResult"></div></div>
+  <div class="panel-head"><div><h2>Practice</h2><p class="instruction" data-support-ca="Practica les expressions de diferents maneres abans d’utilitzar-les." data-support-en="Practise the studied expressions in different ways before using them.">Practica les expressions de diferents maneres abans d’utilitzar-les.</p></div><span class="pill">Match · Choose · Build</span></div>
+  <div class="section-card"><h3><span class="step-number">1</span> Match</h3><p class="instruction" data-support-ca="Relaciona les expressions que has estudiat en aquesta ruta. Algunes paraules poden combinar-se de manera natural d’altres formes en anglès, però en aquesta activitat has de formar les expressions estudiades al Learning Path. Si una paraula apareix més d’una vegada, pots utilitzar qualsevol fitxa idèntica amb l’expressió estudiada correcta." data-support-en="Match the expressions studied in this route. Other combinations may sound natural in English, but here you should match the expressions studied in the Learning Path. Any identical tile can be used with the correct studied expression.">Relaciona les expressions que has estudiat en aquesta ruta. Algunes paraules poden combinar-se de manera natural d’altres formes en anglès, però en aquesta activitat has de formar les expressions estudiades al Learning Path. Si una paraula apareix més d’una vegada, pots utilitzar qualsevol fitxa idèntica amb l’expressió estudiada correcta.</p><div class="match-grid" style="margin-top:14px"><div class="match-col" id="matchLeft"></div><div class="match-col" id="matchRight"></div></div><div class="result" id="matchResult"></div><div class="actions"><button class="btn secondary" id="resetMatch">New mix</button></div></div>
+  <div class="section-card"><h3><span class="step-number">2</span> Practise</h3><p class="instruction" data-support-ca="Tria la paraula que completa l’expressió estudiada. Per exemple: have + breakfast. Revisa el vocabulari si dubtes i fes els diferents grups." data-support-en="Complete the studied expressions. Work through all sets to cover your route’s vocabulary.">Completa les expressions. Fes els diferents sets fins haver treballat tot el vocabulari de la teva ruta.</p><div class="practice-meta"><span id="practiceSetLabel"></span><span id="practiceCoverage"></span></div><div class="task-list" id="practiceList"></div><div class="actions"><button class="btn" id="checkPractice">Check</button><button class="btn secondary" id="nextPractice">Next set →</button></div><div class="result" id="practiceResult"></div></div>
+  <div class="section-card"><h3><span class="step-number">3</span> Build</h3><p class="instruction" data-support-ca="Ordena les paraules: qui fa l’acció → verb → detalls. Per exemple: I have breakfast before school. Pots tornar a clicar una paraula per treure-la." data-support-en="Order the words into complete sentences: subject → verb → details. Click a selected word to remove it.">Ordena les paraules per construir frases correctes que després podràs reutilitzar.</p><div class="builder-list" id="builderList" style="margin-top:14px"></div><div class="actions"><button class="btn" id="checkBuilders">Check sentences</button><button class="btn secondary" id="resetBuilders">Start again</button></div><div class="result" id="builderResult"></div></div>
 </section>
 <section class="panel" id="listeningPanel">
   <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Escolta una rutina real i identifica les expressions que has treballat.</p></div><span class="pill">Listen & notice</span></div>
   <div class="section-card"><p class="instruction">Escolta la rutina d’Alex i fixa’t en les expressions que ja has estudiat.</p><div class="audio-card"><audio class="audio-player" id="alexAudio" controls preload="metadata"><source src="https://rogerbeltranps-lab.github.io/English-lab/2eso/my-real-routine/alex-listening.mp3" type="audio/mpeg"></audio><div class="audio-row"><button class="btn small" id="normalSpeed">Normal speed</button><button class="btn small secondary" id="slowSpeed">Slow 0.8×</button><span class="audio-status" id="audioStatus">Speed: normal</span></div></div><form id="listenForm"></form><div class="actions"><button class="btn" type="button" id="checkListen">Check listening</button></div><div class="result" id="listenResult"></div></div>
 </section>
 <section class="panel" id="readingPanel">
-  <div class="panel-head"><div><h2>Reading</h2><p class="instruction">Llegeix el text de la teva ruta i identifica vocabulari, idees principals i detalls importants.</p></div><span class="pill">Read · Notice · Understand</span></div>
+  <div class="panel-head"><div><h2>Reading</h2><p class="instruction" data-support-ca="Llegeix primer per saber de qui parla el text. Després busca la frase que justifica cada resposta. Fixa’t en les hores, les accions i paraules com after o before." data-support-en="Read for the main idea, then find evidence for each answer. Notice times, actions and sequence markers.">Llegeix el text de la teva ruta i identifica vocabulari, idees principals i detalls importants.</p></div><span class="pill">Read · Notice · Understand</span></div>
   <div class="section-card">
     <h3 id="readingTitle"></h3>
     <div class="reading-text" id="readingText"></div>
@@ -115,21 +115,22 @@ textarea{width:100%;min-height:175px;border:1px solid #c7dbd1;border-radius:12px
 <section class="panel" id="writing">
   <div class="panel-head"><div><h2>Writing</h2><p class="instruction" id="writeInstruction"></p></div><span class="pill">Get ready → Plan → Write → Check</span></div>
   <div class="section-card"><h3>Get ready to write</h3><div class="model-box" id="useExample"></div><div class="connector-strip" id="connectorStrip"></div><div class="compose-grid" style="margin-top:14px"><div class="compose-card"><h3>Sentence starter</h3><div class="field"><label for="actionSelect">Action</label><select id="actionSelect"></select></div><div class="field"><label for="timeSelect">Time</label><select id="timeSelect"><option>at seven</option><option>at half past seven</option><option>at eight</option><option>after school</option><option>at half past four</option><option>at five</option><option>in the evening</option><option>at half past ten</option></select></div><div class="generated" id="generatedSentence"></div><button class="btn small" id="copySentence">Add to my text</button></div><div class="compose-card"><h3>Useful language</h3><div id="writingSupport"></div></div></div></div>
-  <div class="section-card"><h3>Plan your ideas</h3><p class="instruction">Escriu només notes curtes.</p><div class="plan-grid" id="planGrid" style="margin-top:12px"></div></div>
-  <div class="section-card"><h3>Write your text</h3><p class="instruction" id="writingTask"></p><textarea id="routineText" placeholder="Write your routine here..."></textarea><ul class="checklist" id="writeChecklist"></ul><p class="instruction"><span id="wordCount">0</span> words.</p></div>
-  <div class="section-card"><h3>Check your writing</h3><p class="instruction">Quan estiguis preparat, obre ChatGPT. El text i les instruccions del teu nivell s’inclouen al prompt. El feedback no porta nota numèrica.</p><div class="actions"><button class="btn" id="sendWritingFeedback">Correct with AI</button><button class="btn secondary" id="resetWriting">Reset writing</button></div><div class="result" id="writeResult"></div></div>
+  <div class="section-card"><h3>Plan your ideas</h3><p class="instruction" data-support-ca="Anota una acció i una hora per cada part del dia. Després transforma les notes en frases en anglès seguint el model." data-support-en="Write short notes, then turn them into complete English sentences.">Escriu només notes curtes.</p><div class="plan-grid" id="planGrid" style="margin-top:12px"></div></div>
+  <div class="section-card"><h3>Write your text</h3><p class="instruction" id="writingTask"></p><textarea id="routineText" placeholder="Write your routine here..."></textarea><ul class="checklist" id="writeChecklist"></ul><p class="instruction"><span id="wordCount">0</span> <span data-support-ca="paraules." data-support-en="words.">words.</span></p></div>
+  <div class="section-card"><h3>Check your writing</h3><p class="instruction" data-support-ca="Escriu el text en anglès i comprova la llista. Després obre ChatGPT per revisar-lo: llegeix el perquè de cada correcció i millora una frase. El feedback no porta nota numèrica." data-support-en="Review the checklist, then open ChatGPT with your text and route instructions. Use the explanations to revise your draft; no numerical grade is given.">Quan estiguis preparat, obre ChatGPT. El text i les instruccions del teu nivell s’inclouen al prompt. El feedback no porta nota numèrica.</p><div class="actions"><button class="btn" id="sendWritingFeedback" data-support-ca="Corregeix amb IA" data-support-en="Correct with AI">Correct with AI</button><button class="btn secondary" id="resetWriting">Reset writing</button></div><div class="result" id="writeResult"></div></div>
 </section>
 <section class="panel" id="speaking">
-  <div class="panel-head"><div><h2>Speaking</h2><p class="instruction">Model → Prepare → Record → Transcript → Get feedback</p></div><span class="pill" id="speakingPill"></span></div>
+  <div class="panel-head"><div><h2>Speaking</h2><p class="instruction" data-support-ca="Mira el model → prepara frases pròpies → grava → escolta’t i revisa la transcripció → demana feedback. Canvia els detalls del model, no el copiïs tal qual." data-support-en="Model → Prepare → Record → Check transcript → Use feedback to revise">Model → Prepare → Record → Transcript → Get feedback</p></div><span class="pill" id="speakingPill"></span></div>
   <div class="section-card"><h3>Model</h3><div class="model-box" id="speakingModel"></div></div>
   <div class="section-card"><h3>Prepare</h3><p class="instruction" id="speakingTask"></p><div id="speakingSupport"></div><div class="field" style="margin-top:18px"><label for="speakingPlan"><strong>Write what you are going to say</strong></label><p class="tiny" id="speakingPlanHelp" style="margin:5px 0 8px">Escriu aquí les frases que després diràs. Pots mirar-les mentre practiques.</p><textarea id="speakingPlan" placeholder="Write your speaking here..."></textarea></div><ul class="checklist" id="speakingChecklist"></ul></div>
-  <div class="section-card"><h3>Record</h3><div class="record-box"><div class="actions" style="justify-content:flex-start"><button class="btn" id="startRecord">● Record</button><button class="btn secondary" id="stopRecord" disabled>■ Stop</button><button class="btn secondary" id="downloadWav" disabled>Download WAV</button></div><div class="record-status" id="recordStatus">Ready to record.</div><audio id="recordedAudio" controls style="width:100%;display:none"></audio></div></div>
-  <div class="section-card"><h3>Transcript</h3><p class="instruction">Amb Chrome, la transcripció es genera automàticament mentre graves. Revisa-la abans d’enviar el feedback.</p><p class="tiny" id="speechSupportStatus"></p><textarea id="speechTranscript" class="transcript-box" placeholder="Your automatic transcript will appear here. You can correct it before sending."></textarea></div>
-  <div class="section-card"><h3>Get feedback</h3><p class="instruction">Quan premis <strong>Correct with AI</strong>, el WAV es descarregarà automàticament i s’obrirà ChatGPT amb el prompt ja preparat. Adjunta el WAV i després prem Send.</p><div class="actions"><button class="btn" id="prepareSpeakingFeedback">Correct with AI</button></div><p class="tiny" id="speakingCopyStatus"></p></div>
+  <div class="section-card"><h3 data-support-ca="Grava" data-support-en="Record">Record</h3><div class="record-box"><div class="actions" style="justify-content:flex-start"><button class="btn" id="startRecord">● Record</button><button class="btn secondary" id="stopRecord" disabled>■ Stop</button><button class="btn secondary" id="downloadWav" disabled data-support-ca="Descarrega el WAV" data-support-en="Download WAV">Download WAV</button></div><div class="record-status" id="recordStatus">Ready to record.</div><audio id="recordedAudio" controls style="width:100%;display:none"></audio></div></div>
+  <div class="section-card"><h3>Transcript</h3><p class="instruction" data-support-ca="Amb Chrome, la transcripció es genera mentre graves. Escolta l’àudio i corregeix el text perquè coincideixi amb el que has dit. Si no apareix, escriu-lo." data-support-en="With Chrome, a transcript is created while recording. Check it against the audio and correct it; type it yourself if needed.">Amb Chrome, la transcripció es genera automàticament mentre graves. Revisa-la abans d’enviar el feedback.</p><p class="tiny" id="speechSupportStatus"></p><textarea id="speechTranscript" class="transcript-box" placeholder="Your automatic transcript will appear here. You can correct it before sending."></textarea></div>
+  <div class="section-card"><h3>Get feedback</h3><p class="instruction" data-support-ca="Prem &lt;strong&gt;Corregeix amb IA&lt;/strong&gt; per descarregar el WAV i obrir ChatGPT. Adjunta el WAV i prem Envia. Escolta i practica la frase corregida." data-support-en="Press &lt;strong&gt;Correct with AI&lt;/strong&gt; to download the WAV and open ChatGPT. Attach the WAV and press Send, then use the feedback to practise again.">Quan premis <strong data-support-ca="Corregeix amb IA" data-support-en="Correct with AI">Correct with AI</strong>, el WAV es descarregarà automàticament i s’obrirà ChatGPT amb el prompt ja preparat. Adjunta el WAV i després prem Send.</p><div class="actions"><button class="btn" id="prepareSpeakingFeedback" data-support-ca="Corregeix amb IA" data-support-en="Correct with AI">Correct with AI</button></div><p class="tiny" id="speakingCopyStatus"></p></div>
 </section>
 
 <p class="footer-note">Your progress is saved on this device.</p>
 </main>
+<script src="../../shared/js/learning-path-support.js"></script>
 <script>
 
 function updateSpeechSupportStatus(){
@@ -159,9 +160,9 @@ const ca={
 const examples={'go on foot':'I usually go to school on foot.','run errands':'I run errands with my dad on Saturday mornings.','make an effort':'I make an effort to start my homework early.','do your homework':'I do my homework after a snack.','have a break':'I have a short break after school.','pay attention':'I pay attention when the teacher explains something new.'};
 function exampleFor(x){if(examples[x])return examples[x];const clean=x.split(' / ')[0];if(['always','usually','often','sometimes','never'].includes(x))return `I ${x} have breakfast at home.`;if(x.startsWith('by '))return 'I go to school by bus.';if(x.startsWith('every '))return `I read ${x.split(' / ')[0]}.`;if(x.includes('week'))return `I do it ${x.split(' / ')[0]}.`;return `I ${clean}.`.replace('I have an early','I have an early').replace('I friends','My friends')}
 const levelInfo={
- insecure:{label:'Insecure',note:'Comença amb expressions molt freqüents i frases curtes.',builders:[['I','usually','wake','up','at','seven.'],['We','walk','to','school','at','eight.'],['I','get','home','at','half','past','four.'],['I','go','to','bed','at','half','past','ten.']],actions:['I wake up','I get up','I have a shower','I have breakfast','I walk to school','I come home','I have dinner','I watch TV','I go to bed'],requirements:['Write 35–50 words.','Use at least 2 routine expressions.','Use a simple connector: Then or After that.'],minWords:35,maxWords:50,connectors:['Then','After that'],writingTask:'Escriu 35–50 paraules sobre la teva rutina. Fes frases curtes i clares.',speakingTask:'Digues 2 o 3 frases curtes sobre la teva rutina. Fes servir com a mínim 1 expressió treballada.',speakingChecklist:['2–3 short sentences','1 routine expression','Speak slowly and clearly']},
- safe:{label:'Safe',note:'Treballa més expressions i combina-les amb més autonomia.',builders:[['I','get','up','early','on','weekdays.'],['After','school,','I','get','home','and','have','a','snack.'],['On','Saturday,','we','run','errands','and','do','the','shopping.'],['In','the','evening,','I','have','a','chat','with','my','family.']],actions:['I get up early','I have cereal for breakfast','I have a snack','I brush my teeth','I make the bed','I do the shopping','I run errands','I stay in','I go out','I eat out','I have a chat'],requirements:['Write 80–100 words.','Use at least 4 routine expressions.','Use because and but or although.'],minWords:80,maxWords:100,connectors:['because','but','although','Then','After that'],writingTask:'Escriu 80–100 paraules sobre la teva rutina. Fes servir almenys 4 expressions, because i but o although.',speakingTask:'Explica la teva rutina en 4–5 frases. Fes servir almenys 2 expressions treballades i una raó o contrast.',speakingChecklist:['4–5 sentences','2 routine expressions','because / but if useful','Natural pace']},
- daring:{label:'Daring',note:'Fes servir collocations naturals i connecta millor les idees.',builders:[['I','do','my','homework','after','a','snack.'],['We','have','a','short','break','after','school.'],['I','make','an','effort','to','start','on','time.'],['In','the','evening,','I','have','a','chat','with','my','family.']],actions:['I do my homework','I make an effort','I do some work','I have a break','I have a chat','I make a phone call','I make progress','I take action','I pay attention'],requirements:['Write 100–120 words.','Use at least 5 target expressions.','Show cause, contrast and consequence.','Add a brief comparison or reflection.'],minWords:100,maxWords:120,connectors:['because','although','however','so','as a result','whereas'],writingTask:'Escriu 100–120 paraules sobre la teva rutina real. Inclou causa, contrast, conseqüència i una breu comparació o reflexió.',speakingTask:'Explica la teva rutina amb detall. Inclou almenys 3 expressions, una causa, un contrast i una conseqüència o reflexió.',speakingChecklist:['5+ connected sentences','3 target expressions','cause + contrast','consequence / reflection','Natural pronunciation']}
+ insecure:{label:'Insecure',note:'Comença amb expressions molt freqüents i frases curtes.',builders:[['I','usually','wake','up','at','seven.'],['We','walk','to','school','at','eight.'],['I','get','home','at','half','past','four.'],['I','go','to','bed','at','half','past','ten.']],actions:['I wake up','I get up','I have a shower','I have breakfast','I walk to school','I come home','I have dinner','I watch TV','I go to bed'],requirements:['Escriu 35–50 paraules en anglès.','Utilitza almenys 2 expressions de rutina treballades.','Ordena les idees amb Then o After that.'],minWords:35,maxWords:50,connectors:['Then','After that'],writingTask:'Escriu 35–50 paraules sobre la teva rutina. Fes frases curtes i clares.',speakingTask:'Digues 2 o 3 frases curtes sobre la teva rutina. Fes servir com a mínim 1 expressió treballada.',speakingChecklist:['Prepara 2–3 frases curtes en anglès.','Utilitza almenys 1 expressió de rutina treballada.','Parla a poc a poc i comprova que s’entén.']},
+ safe:{label:'Safe',note:'Practise more expressions and combine them with growing independence.',builders:[['I','get','up','early','on','weekdays.'],['After','school,','I','get','home','and','have','a','snack.'],['On','Saturday,','we','run','errands','and','do','the','shopping.'],['In','the','evening,','I','have','a','chat','with','my','family.']],actions:['I get up early','I have cereal for breakfast','I have a snack','I brush my teeth','I make the bed','I do the shopping','I run errands','I stay in','I go out','I eat out','I have a chat'],requirements:['Write 80–100 words.','Use at least 4 routine expressions.','Use because and but or although.'],minWords:80,maxWords:100,connectors:['because','but','although','Then','After that'],writingTask:"Write 80–100 words about your routine. Use at least 4 studied expressions, because and but or although.",speakingTask:"Describe your routine in 4–5 sentences. Include studied expressions, a reason and a contrast.",speakingChecklist:['4–5 sentences','2 routine expressions','because / but if useful','Natural pace']},
+ daring:{label:'Daring',note:'Use studied collocations precisely and connect your ideas independently.',builders:[['I','do','my','homework','after','a','snack.'],['We','have','a','short','break','after','school.'],['I','make','an','effort','to','start','on','time.'],['In','the','evening,','I','have','a','chat','with','my','family.']],actions:['I do my homework','I make an effort','I do some work','I have a break','I have a chat','I make a phone call','I make progress','I take action','I pay attention'],requirements:['Write 100–120 words.','Use at least 5 target expressions.','Show cause, contrast and consequence.','Add a brief comparison or reflection.'],minWords:100,maxWords:120,connectors:['because','although','however','so','as a result','whereas'],writingTask:"Write 100–120 words about your routine. Use at least 5 studied expressions; show cause, contrast and consequence, and add a brief comparison or reflection.",speakingTask:"Describe your routine in detail using studied expressions. Include a cause, a contrast and a consequence or reflection.",speakingChecklist:['5+ connected sentences','3 target expressions','cause + contrast','consequence / reflection','Natural pronunciation']}
 };
 const readingData={
   insecure:{
@@ -227,6 +228,7 @@ const listening={
     {q:'Which summary best describes Alex’s routine?',o:['A balanced school-day routine with study and relaxation','A weekend full of errands','A day mainly focused on sport'],a:0}
   ]
 };
+const supportHints={"l": ["Wake up passa a les set; get up passa deu minuts després. No són la mateixa acció.", "Ten past seven vol dir les 7:10: és quan s’aixeca del llit.", "L’Alex diu cereal and a banana: busca els dos aliments.", "I walk to school indica que va a peu, no amb transport.", "Half past four vol dir les 4:30: és quan arriba a casa.", "After dinner, diu listen to music or read; els deures són abans."], "r": ["El text diu wakes up at seven; no confonguis despertar-se amb llevar-se deu minuts després.", "Walks to school vol dir anar-hi caminant: on foot.", "Half past four vol dir les 4:30.", "After that uneix l’arribada a casa amb el berenar i els deures.", "El text diu with his family: no només amb la germana.", "Al final del text apareix goes to bed; és la forma amb he de go to bed."]};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],shuffle=a=>[...a].sort(()=>Math.random()-.5);
 let level=localStorage.getItem('lp2Level')||'insecure',cardIndex=0,selectedMatch=null,matched=0,currentMatchExpressions=[],currentMatchTotal=0,built=[],practiceSet=0,recordBlob=null,recordUrl=null;
 const allState=JSON.parse(localStorage.getItem('lp2StateV2')||'{}');
@@ -243,18 +245,200 @@ function renderExplore(){const info=levelInfo[level];$('#exploreNote').textConte
 $('#finishExplore').onclick=()=>complete('explore');
 function renderCards(){const d=deck();if(cardIndex>=d.length)cardIndex=0;const v=d[cardIndex];$('#flashcard').classList.remove('flipped');$('#cardCategory').textContent=v.category;$('#cardFront').textContent=v.expression;$('#cardBack').textContent=v.ca;$('#cardHint').textContent=v.example;$('#cardCounter').textContent=`Card ${cardIndex+1} of ${d.length} · ${state().known.includes(cardIndex)?'✓ Known':'Practising'}`}
 function moveCard(n){cardIndex=(cardIndex+n+deck().length)%deck().length;renderCards()}$('#flashcard').onclick=()=>$('#flashcard').classList.toggle('flipped');$('#prevCard').onclick=()=>moveCard(-1);$('#nextCard').onclick=()=>moveCard(1);$('#knowCard').onclick=()=>{const s=state();if(!s.known.includes(cardIndex))s.known.push(cardIndex);if(s.known.length>=deck().length)complete('cards');else save();moveCard(1)};
-function splitChunk(exp){const words=exp.split(' ');let cut=1;if(words[0].toLowerCase()==='pay'||words[0].toLowerCase()==='take'||words[0].toLowerCase()==='make'||words[0].toLowerCase()==='have'||words[0].toLowerCase()==='do')cut=1;return [words.slice(0,cut).join(' '),words.slice(cut).join(' ')]}
+const matchingRounds={
+ "insecure": [
+  [
+   ["wake", "up", "wake up"],
+   ["get", "up", "get up"],
+   ["go to", "the bathroom", "go to the bathroom"],
+   ["go to", "bed", "go to bed"],
+   ["have", "breakfast", "have breakfast"],
+   ["have", "a shower", "have a shower"],
+   ["listen to", "the radio", "listen to the radio"],
+   ["phone / call", "a friend", "phone / call a friend"]
+  ],
+  [
+   ["clean", "the house / your room", "clean the house / your room"],
+   ["wash", "clothes", "wash clothes"],
+   ["write", "emails / letters", "write emails / letters"],
+   ["go for", "a walk", "go for a walk"],
+   ["go to", "the cinema", "go to the cinema"],
+   ["watch", "TV", "watch TV"],
+   ["watch", "a film", "watch a film"],
+   ["read", "in bed", "read in bed"]
+  ],
+  [
+   ["make", "dinner", "make dinner"],
+   ["come", "home", "come home"],
+   ["walk", "home", "walk home"],
+   ["go on", "foot", "go on foot"],
+   ["by", "bus / train / car", "by bus / train / car"],
+   ["every", "morning / evening / weekend", "every morning / evening / weekend"],
+   ["two or three times", "a week", "two or three times a week"],
+   ["phone / call", "a friend", "phone / call a friend"]
+  ],
+  [
+   ["have", "dinner", "have dinner"],
+   ["have", "a cup of tea / coffee", "have a cup of tea / coffee"],
+   ["go to", "work / school", "go to work / school"],
+   ["go to", "the bathroom", "go to the bathroom"],
+   ["go to", "bed", "go to bed"],
+   ["go to", "the cinema", "go to the cinema"],
+   ["listen to", "the radio", "listen to the radio"],
+   ["phone / call", "a friend", "phone / call a friend"]
+  ]
+ ],
+ "safe": [
+  [
+   ["have", "cereal for breakfast", "have cereal for breakfast"],
+   ["have", "a light lunch", "have a light lunch"],
+   ["have", "a snack", "have a snack"],
+   ["have", "a main meal", "have a main meal"],
+   ["have", "an early / late night", "have an early / late night"],
+   ["have", "a wash / a bath / a shave", "have a wash / a bath / a shave"],
+   ["have", "a chat", "have a chat"],
+   ["have", "a cup of tea / coffee", "have a cup of tea / coffee"]
+  ],
+  [
+   ["get", "up early", "get up early"],
+   ["get", "home", "get home"],
+   ["get / order", "a takeaway", "get / order a takeaway"],
+   ["feed", "the cat / dog", "feed the cat / dog"],
+   ["clean / brush", "your teeth", "clean / brush your teeth"],
+   ["put on", "make-up", "put on make-up"],
+   ["bother to", "cook", "bother to cook"],
+   ["make", "the bed", "make the bed"]
+  ],
+  [
+   ["run", "errands", "run errands"],
+   ["stay", "in", "stay in"],
+   ["go", "out", "go out"],
+   ["eat", "out", "eat out"],
+   ["friends come", "round", "friends come round"],
+   ["reply", "straight away", "reply straight away"],
+   ["on", "weekdays", "on weekdays"],
+   ["at", "the weekend", "at the weekend"]
+  ],
+  [
+   ["wake someone", "up", "wake up / wake someone up"],
+   ["fall", "asleep", "go to sleep / fall asleep"],
+   ["do", "the housework / washing / ironing / shopping", "do the housework / washing / ironing / shopping"],
+   ["go", "shopping", "go shopping"],
+   ["once", "a week", "once a week"],
+   ["straight", "away", "straight away"],
+   ["have", "a snack", "have a snack"],
+   ["have", "a chat", "have a chat"]
+  ]
+ ],
+ "daring": [
+  [
+   ["make", "arrangements", "make arrangements"],
+   ["make", "a change", "make a change"],
+   ["make", "a choice", "make a choice"],
+   ["make", "a comment", "make a comment"],
+   ["make", "a decision", "make a decision"],
+   ["make", "an effort", "make an effort"],
+   ["make", "an excuse", "make an excuse"],
+   ["make", "friends", "make friends"]
+  ],
+  [
+   ["make", "a mistake", "make a mistake"],
+   ["make", "a phone call", "make a phone call"],
+   ["make", "progress", "make progress"],
+   ["make", "arrangements", "make arrangements"],
+   ["make", "a change", "make a change"],
+   ["make", "a choice", "make a choice"],
+   ["make", "a comment", "make a comment"],
+   ["make", "a decision", "make a decision"]
+  ],
+  [
+   ["do", "your best", "do your best"],
+   ["do", "damage", "do damage"],
+   ["do", "an experiment", "do an experiment"],
+   ["do", "exercises", "do exercises"],
+   ["do", "someone a favour", "do someone a favour"],
+   ["do", "your hair", "do your hair"],
+   ["do", "your homework", "do your homework"],
+   ["do", "the cooking / ironing / shopping / washing", "do the cooking / ironing / shopping / washing"]
+  ],
+  [
+   ["do", "some work", "do some work"],
+   ["do", "your best", "do your best"],
+   ["do", "damage", "do damage"],
+   ["do", "an experiment", "do an experiment"],
+   ["do", "exercises", "do exercises"],
+   ["do", "someone a favour", "do someone a favour"],
+   ["do", "your hair", "do your hair"],
+   ["do", "your homework", "do your homework"]
+  ],
+  [
+   ["have", "an accident", "have an accident"],
+   ["have", "an argument / a row", "have an argument / a row"],
+   ["have", "a break", "have a break"],
+   ["have", "a conversation / chat", "have a conversation / chat"],
+   ["have", "difficulty", "have difficulty"],
+   ["have", "a dream / nightmare", "have a dream / nightmare"],
+   ["have", "fun / a good time", "have fun / a good time"],
+   ["have", "a look", "have a look"]
+  ],
+  [
+   ["have", "a party", "have a party"],
+   ["have", "a problem", "have a problem"],
+   ["have", "a try / go", "have a try / go"],
+   ["have", "an accident", "have an accident"],
+   ["have", "an argument / a row", "have an argument / a row"],
+   ["have", "a break", "have a break"],
+   ["have", "a conversation / chat", "have a conversation / chat"],
+   ["have", "difficulty", "have difficulty"]
+  ],
+  [
+   ["take", "a holiday / trip", "take a holiday / trip"],
+   ["take", "the train / bus", "take the train / bus"],
+   ["take", "a risk / chance", "take a risk / chance"],
+   ["take", "photos", "take photos"],
+   ["take", "action", "take action"],
+   ["pay", "attention", "pay attention"],
+   ["pay", "a compliment", "pay a compliment"],
+   ["pay", "tribute", "pay tribute"]
+  ],
+  [
+   ["pay", "attention", "pay attention"],
+   ["pay", "a compliment", "pay a compliment"],
+   ["pay", "tribute", "pay tribute"],
+   ["take", "action", "take action"],
+   ["take", "photos", "take photos"],
+   ["take", "the train / bus", "take the train / bus"],
+   ["take", "a risk / chance", "take a risk / chance"],
+   ["take", "a holiday / trip", "take a holiday / trip"]
+  ]
+ ]
+};
+// Reviewed chunks preserve taught alternatives and avoid competing collocation families.
+let matchingRoundIndex={insecure:0,safe:0,daring:0};
 function normaliseMatchText(s){return s.toLowerCase().replace(/\s+/g,' ').trim()}
-function renderMatch(){selectedMatch=null;matched=0;$('#matchResult').classList.remove('show');const chosen=shuffle(deck().filter(x=>x.expression.split(' ').length>1)).slice(0,8).map((x,i)=>{const [l,r]=splitChunk(x.expression);return {l,r,id:i,expression:x.expression}});currentMatchExpressions=chosen.map(x=>normaliseMatchText(x.expression));currentMatchTotal=chosen.length;drawMatch(shuffle(chosen),'#matchLeft','l','left');drawMatch(shuffle(chosen),'#matchRight','r','right')}
-function drawMatch(items,sel,key,side){const el=$(sel);el.innerHTML='';items.forEach(x=>{const b=document.createElement('button');b.className='match-card';b.textContent=x[key];b.dataset.id=x.id;b.dataset.value=x[key];b.onclick=()=>pickMatch(b,side);el.appendChild(b)})}
-function pickMatch(btn,side){if(btn.classList.contains('matched'))return;if(!selectedMatch){selectedMatch={btn,side};btn.classList.add('selected');return}if(selectedMatch.side===side){selectedMatch.btn.classList.remove('selected');selectedMatch={btn,side};btn.classList.add('selected');return}const left=side==='right'?selectedMatch.btn:btn;const right=side==='right'?btn:selectedMatch.btn;const candidate=normaliseMatchText(`${left.dataset.value} ${right.dataset.value}`);if(currentMatchExpressions.includes(candidate)){selectedMatch.btn.classList.remove('selected');selectedMatch.btn.classList.add('matched');btn.classList.add('matched');matched++;if(matched===currentMatchTotal){$('#matchResult').textContent=`Great! All ${currentMatchTotal} expressions are correct.`;$('#matchResult').classList.add('show');complete('match')}}else{const old=selectedMatch.btn;btn.classList.add('wrong');old.classList.add('wrong');setTimeout(()=>{btn.classList.remove('wrong');old.classList.remove('wrong','selected')},420)}selectedMatch=null}
+function matchingItems(){const taught=new Set(deck().map(x=>x.expression));const keys=level==='insecure'?['insecure']:level==='safe'?['insecure','safe']:['insecure','safe','daring'];return keys.flatMap(k=>matchingRounds[k].flat()).filter(x=>taught.has(x[2]))}
+function isClearMatchRound(items){
+ return items.every(a=>items.every(b=>!currentMatchExpressions.includes(normaliseMatchText(`${a[0]} ${b[1]}`))||a[0]===b[0]||a[1]===b[1]));
+}
+function renderMatch(){
+ selectedMatch=null;matched=0;$('#matchResult').classList.remove('show');
+ currentMatchExpressions=[...new Set(matchingItems().map(x=>normaliseMatchText(`${x[0]} ${x[1]}`)))];
+ const rounds=matchingRounds[level],index=matchingRoundIndex[level]++%rounds.length;
+ const chosen=rounds[index];
+ if(!chosen.every(x=>deck().some(v=>v.expression===x[2]))||!isClearMatchRound(chosen))throw new Error('Invalid curated matching round');
+ currentMatchTotal=chosen.length;
+ const items=chosen.map(([l,r])=>({l,r}));drawMatch(shuffle(items),'#matchLeft','l','left');drawMatch(shuffle(items),'#matchRight','r','right');
+}
+function drawMatch(items,sel,key,side){const el=$(sel);el.innerHTML='';items.forEach(x=>{const b=document.createElement('button');b.className='match-card';b.textContent=x[key];b.dataset.value=x[key];b.onclick=()=>pickMatch(b,side);el.appendChild(b)})}
+function pickMatch(btn,side){if(btn.classList.contains('matched'))return;if(!selectedMatch){selectedMatch={btn,side};btn.classList.add('selected');return}if(selectedMatch.side===side){selectedMatch.btn.classList.remove('selected');selectedMatch={btn,side};btn.classList.add('selected');return}const left=side==='right'?selectedMatch.btn:btn;const right=side==='right'?btn:selectedMatch.btn;const candidate=normaliseMatchText(`${left.dataset.value} ${right.dataset.value}`);if(currentMatchExpressions.includes(candidate)){
+$('#matchResult').classList.remove('show');selectedMatch.btn.classList.remove('selected');selectedMatch.btn.classList.add('matched');btn.classList.add('matched');matched++;if(matched===currentMatchTotal){$('#matchResult').textContent=(level==='insecure'?`Molt bé! Has format les ${currentMatchTotal} expressions estudiades.`:`Great! All ${currentMatchTotal} expressions are correct.`);$('#matchResult').classList.add('show');complete('match')}}else{$('#matchResult').textContent=learningSupport.feedback(level,false,'«'+left.dataset.value+' '+right.dataset.value+'» no és una expressió estudiada en aquesta ruta. Revisa el significat i la combinació al vocabulari; qualsevol fitxa idèntica serveix.','This pair is not a studied expression in this route. Check the vocabulary; identical tiles are interchangeable.');$('#matchResult').classList.add('show');const old=selectedMatch.btn;btn.classList.add('wrong');old.classList.add('wrong');setTimeout(()=>{btn.classList.remove('wrong');old.classList.remove('wrong','selected')},420)}selectedMatch=null}
 $('#resetMatch').onclick=renderMatch;
 function practiceItems(){const d=deck(),size=10,start=practiceSet*size;return d.slice(start,start+size)}function firstWord(exp){return exp.split(' ')[0]}
-function renderPractice(){const d=deck(),items=practiceItems(),totalSets=Math.ceil(d.length/10);if(!items.length){practiceSet=0;return renderPractice()}$('#practiceSetLabel').textContent=`Set ${practiceSet+1} of ${totalSets}`;$('#practiceCoverage').textContent=`${Math.min(practiceSet*10+items.length,d.length)} / ${d.length} expressions reached`;const pool=[...new Set(d.map(x=>firstWord(x.expression)))];$('#practiceList').innerHTML='';items.forEach((item,i)=>{const ans=firstWord(item.expression),rest=item.expression.split(' ').slice(1).join(' '),opts=shuffle([ans,...shuffle(pool.filter(x=>x!==ans)).slice(0,3)]);const box=document.createElement('div');box.className='task';box.innerHTML=`${practiceSet*10+i+1}. <select><option value="">Choose…</option>${opts.map(x=>`<option>${x}</option>`).join('')}</select> ${rest}<div class="feedback"></div>`;box.dataset.answer=ans;$('#practiceList').appendChild(box)});$('#practiceResult').classList.remove('show')}
-$('#checkPractice').onclick=()=>{let score=0;$$('#practiceList .task').forEach(box=>{const good=box.querySelector('select').value===box.dataset.answer;box.classList.toggle('good',good);box.classList.toggle('bad',!good);box.querySelector('.feedback').textContent=good?'Correct!':'Look again at the complete expression.';box.querySelector('.feedback').className='feedback '+(good?'ok':'no');if(good)score++});$('#practiceResult').textContent=`${score} / ${$$('#practiceList .task').length} correct`;$('#practiceResult').classList.add('show');state().practiceSeen[practiceSet]=true;if(state().practiceSeen.filter(Boolean).length>=Math.ceil(deck().length/10))complete('practice');else save()};$('#nextPractice').onclick=()=>{practiceSet=(practiceSet+1)%Math.ceil(deck().length/10);renderPractice()};
+function renderPractice(){const d=deck(),items=practiceItems(),totalSets=Math.ceil(d.length/10);if(!items.length){practiceSet=0;return renderPractice()}$('#practiceSetLabel').textContent=`Set ${practiceSet+1} of ${totalSets}`;$('#practiceCoverage').textContent=`${Math.min(practiceSet*10+items.length,d.length)} / ${d.length} expressions reached`;const pool=[...new Set(d.map(x=>firstWord(x.expression)))];$('#practiceList').innerHTML='';items.forEach((item,i)=>{const ans=firstWord(item.expression),rest=item.expression.split(' ').slice(1).join(' '),opts=shuffle([ans,...shuffle(pool.filter(x=>x!==ans)).slice(0,3)]);const box=document.createElement('div');box.className='task';box.innerHTML=`${practiceSet*10+i+1}. <select><option value="">Choose…</option>${opts.map(x=>`<option>${x}</option>`).join('')}</select> ${rest}<div class="feedback"></div>`;box.dataset.answer=ans;box.dataset.expression=item.expression;$('#practiceList').appendChild(box)});$('#practiceResult').classList.remove('show')}
+$('#checkPractice').onclick=()=>{let score=0;$$('#practiceList .task').forEach(box=>{const good=box.querySelector('select').value===box.dataset.answer;box.classList.toggle('good',good);box.classList.toggle('bad',!good);box.querySelector('.feedback').textContent=learningSupport.feedback(level,good,'L’expressió estudiada és «'+box.dataset.expression+'». Revisa la combinació completa al vocabulari; no tradueixis paraula per paraula.','The studied expression starts with '+box.dataset.answer+'. Check the complete expression in the vocabulary.');box.querySelector('.feedback').className='feedback '+(good?'ok':'no');if(good)score++});$('#practiceResult').textContent=`${score} / ${$$('#practiceList .task').length} correct`;$('#practiceResult').classList.add('show');state().practiceSeen[practiceSet]=true;if(state().practiceSeen.filter(Boolean).length>=Math.ceil(deck().length/10))complete('practice');else save()};$('#nextPractice').onclick=()=>{practiceSet=(practiceSet+1)%Math.ceil(deck().length/10);renderPractice()};
 const audio=$('#alexAudio');$('#normalSpeed').onclick=()=>{audio.playbackRate=1;$('#audioStatus').textContent='Speed: normal';audio.play()};$('#slowSpeed').onclick=()=>{audio.playbackRate=.8;$('#audioStatus').textContent='Speed: slow 0.8×';audio.play()};
 function renderListening(){const form=$('#listenForm');form.innerHTML='';listening[level].forEach((q,i)=>{const box=document.createElement('div');box.className='question';box.innerHTML=`<p class="q-title">${i+1}. ${q.q}</p><div class="options">${q.o.map((o,j)=>`<label class="option"><input type="radio" name="listen${i}" value="${j}"><span>${o}</span></label>`).join('')}</div><div class="feedback" id="lf${i}"></div>`;form.appendChild(box)});$('#listenResult').classList.remove('show')}
-$('#checkListen').onclick=()=>{let score=0;listening[level].forEach((q,i)=>{const c=$(`input[name=listen${i}]:checked`);if(c&&+c.value===q.a)score++;$('#lf'+i).textContent=c&&+c.value===q.a?'Correct!':'Listen again.';$('#lf'+i).className='feedback '+(c&&+c.value===q.a?'ok':'no')});$('#listenResult').textContent=`${score} / ${listening[level].length} correct`;$('#listenResult').classList.add('show');if(score>=listening[level].length-1)complete('listen')};
+$('#checkListen').onclick=()=>{let score=0;listening[level].forEach((q,i)=>{const c=$(`input[name=listen${i}]:checked`);if(c&&+c.value===q.a)score++;$('#lf'+i).textContent=learningSupport.evidence(level,c&&+c.value===q.a,c,q.o[q.a],level==='insecure'?supportHints.l[i]:null,true);$('#lf'+i).className='feedback '+(c&&+c.value===q.a?'ok':'no')});$('#listenResult').textContent=`${score} / ${listening[level].length} correct`;$('#listenResult').classList.add('show');if(score>=listening[level].length-1)complete('listen')};
 function renderReading(){
   const data=readingData[level];
   $('#readingTitle').textContent=data.title;
@@ -275,20 +459,20 @@ $('#checkReading').onclick=()=>{
     const selected=$(`input[name=reading${i}]:checked`);
     const ok=selected&&+selected.value===q.a;
     if(ok)score++;
-    $('#rf'+i).textContent=ok?'Correct!':'Read the text again and check this idea.';
+    $('#rf'+i).textContent=learningSupport.evidence(level,ok,selected,q.o[q.a],level==='insecure'?supportHints.r[i]:null,false);
     $('#rf'+i).className='feedback '+(ok?'ok':'no');
   });
   $('#readingResult').textContent=`${score} / ${readingData[level].questions.length} correct`;
   $('#readingResult').classList.add('show');
   if(score>=5)complete('reading');
 };
-function renderBuilders(){built=levelInfo[level].builders.map(()=>[]);const el=$('#builderList');el.innerHTML='';levelInfo[level].builders.forEach((sentence,i)=>{const item=document.createElement('div');item.className='build-item';item.innerHTML=`<h3>Sentence ${i+1}</h3><div class="word-bank" data-bank="${i}"></div><div class="sentence-line" data-line="${i}"><span class="instruction">Build your sentence here…</span></div><div class="feedback"></div>`;el.appendChild(item);shuffle(sentence.map((w,j)=>({w,j}))).forEach(obj=>{const b=document.createElement('button');b.className='word';b.textContent=obj.w;b.dataset.index=obj.j;b.onclick=()=>addWord(i,obj.j,b);item.querySelector('.word-bank').appendChild(b)})});$('#builderResult').classList.remove('show')}
-function addWord(i,j,b){if(built[i].includes(j))return;built[i].push(j);b.classList.add('used');drawBuilt(i)}function drawBuilt(i){const line=$(`[data-line="${i}"]`);line.innerHTML='';built[i].forEach(j=>{const b=document.createElement('button');b.className='word';b.textContent=levelInfo[level].builders[i][j];b.onclick=()=>{built[i]=built[i].filter(x=>x!==j);$(`[data-bank="${i}"] [data-index="${j}"]`).classList.remove('used');drawBuilt(i)};line.appendChild(b)});if(!built[i].length)line.innerHTML='<span class="instruction">Build your sentence here…</span>'}
-$('#checkBuilders').onclick=()=>{let score=0;levelInfo[level].builders.forEach((s,i)=>{const ans=built[i].map(j=>s[j]).join(' '),correct=s.join(' '),f=$$('.build-item .feedback')[i];f.textContent=ans===correct?'Correct!':'Not yet. Check the order.';f.className='feedback '+(ans===correct?'ok':'no');if(ans===correct)score++});$('#builderResult').textContent=`${score} / ${levelInfo[level].builders.length} correct`;$('#builderResult').classList.add('show');if(score===levelInfo[level].builders.length)complete('build')};$('#resetBuilders').onclick=renderBuilders;
-function renderWriting(){const d=levelInfo[level];$('#writeInstruction').textContent=level==='insecure'?'Segueix el model. Frases curtes i clares.':level==='safe'?'Fes servir les expressions amb més autonomia i connecta les idees.':'Fes servir collocations naturals i una estructura més rica.';const ex={insecure:'I wake up at seven. Then I have breakfast. After that, I walk to school at eight. I get home at half past four.',safe:'On weekdays, I get up early and have cereal for breakfast. After school, I get home and have a snack because I am hungry, but I do my homework before I relax. Sometimes I run errands with my family.',daring:'On weekdays, I make an effort to start on time because mornings can be busy. After school, I do some work and then have a break. Although I sometimes feel tired, I usually finish what I need to do, so I can wind down later.'}[level];$('#useExample').innerHTML=`<h3>Model</h3><div class="example">${ex}</div>${level==='insecure'?'<p class="tiny"><b>Example:</b> I get home at five. = Arribo a casa a les cinc.</p>':''}`;$('#connectorStrip').innerHTML=d.connectors.map(x=>`<span class="connector">${x}</span>`).join('');$('#actionSelect').innerHTML=d.actions.map(x=>`<option>${x}</option>`).join('');$('#writingSupport').innerHTML=level==='insecure'?'<p><b>I get home at ___.</b><br><span class="tiny">Arribo a casa a les ___.</span></p><p><b>Then I ___.</b><br><span class="tiny">Després jo ___.</span></p>':level==='safe'?'<p><b>I ___ because ___.</b></p><p><b>I ___, but ___.</b></p>':'<p><b>Although ___, I ___.</b></p><p><b>___, so ___.</b></p><p><b>Whereas ___, I ___.</b></p>';$('#planGrid').innerHTML=['What time do you start your day?','What do you do after school?','What do you do in the evening?','Which expressions will you use?'].map((q,i)=>`<div class="plan-q"><label>${q}</label><input id="plan${i}" placeholder="Short notes..."></div>`).join('');$('#writingTask').textContent=d.writingTask;$('#writeChecklist').innerHTML=d.requirements.map(x=>`<li>${x}</li>`).join('');$('#routineText').value=state().text||'';generateSentence();countWords()}
+function renderBuilders(){built=levelInfo[level].builders.map(()=>[]);const el=$('#builderList');el.innerHTML='';levelInfo[level].builders.forEach((sentence,i)=>{const item=document.createElement('div');item.className='build-item';item.innerHTML=`<h3>Sentence ${i+1}</h3><div class="word-bank" data-bank="${i}"></div><div class="sentence-line" data-line="${i}"><span class="instruction">${level==='insecure'?'Construeix la frase aquí: qui + acció + detalls.':'Build your sentence here…'}</span></div><div class="feedback"></div>`;el.appendChild(item);shuffle(sentence.map((w,j)=>({w,j}))).forEach(obj=>{const b=document.createElement('button');b.className='word';b.textContent=obj.w;b.dataset.index=obj.j;b.onclick=()=>addWord(i,obj.j,b);item.querySelector('.word-bank').appendChild(b)})});$('#builderResult').classList.remove('show')}
+function addWord(i,j,b){if(built[i].includes(j))return;built[i].push(j);b.classList.add('used');drawBuilt(i)}function drawBuilt(i){const line=$(`[data-line="${i}"]`);line.innerHTML='';built[i].forEach(j=>{const b=document.createElement('button');b.className='word';b.textContent=levelInfo[level].builders[i][j];b.onclick=()=>{built[i]=built[i].filter(x=>x!==j);$(`[data-bank="${i}"] [data-index="${j}"]`).classList.remove('used');drawBuilt(i)};line.appendChild(b)});if(!built[i].length)line.innerHTML=`<span class="instruction">${level==='insecure'?'Construeix la frase aquí: qui + acció + detalls.':'Build your sentence here…'}</span>`}
+$('#checkBuilders').onclick=()=>{let score=0;levelInfo[level].builders.forEach((s,i)=>{const ans=built[i].map(j=>s[j]).join(' '),correct=s.join(' '),f=$$('.build-item .feedback')[i];f.textContent=learningSupport.order(level,ans===correct,correct);f.className='feedback '+(ans===correct?'ok':'no');if(ans===correct)score++});$('#builderResult').textContent=`${score} / ${levelInfo[level].builders.length} correct`;$('#builderResult').classList.add('show');if(score===levelInfo[level].builders.length)complete('build')};$('#resetBuilders').onclick=renderBuilders;
+function renderWriting(){const d=levelInfo[level];$('#writeInstruction').textContent=level==='insecure'?'Segueix el model. Frases curtes i clares.':level==='safe'?'Use studied expressions and connect your ideas.':'Use studied collocations independently in a richer, coherent routine.';const ex={insecure:'I wake up at seven. Then I have breakfast. After that, I walk to school at eight. I get home at half past four.',safe:'On weekdays, I get up early and have cereal for breakfast. After school, I get home and have a snack because I am hungry, but I do my homework before I relax. Sometimes I run errands with my family.',daring:'On weekdays, I make an effort to start on time because mornings can be busy. After school, I do some work and then have a break. Although I sometimes feel tired, I usually finish what I need to do, so I can wind down later.'}[level];$('#useExample').innerHTML=`<h3>Model</h3><div class="example">${ex}</div>${level==='insecure'?'<p class="tiny"><b>Example:</b> I get home at five. = Arribo a casa a les cinc.</p>':''}`;$('#connectorStrip').innerHTML=d.connectors.map(x=>`<span class="connector">${x}</span>`).join('');$('#actionSelect').innerHTML=d.actions.map(x=>`<option>${x}</option>`).join('');$('#writingSupport').innerHTML=level==='insecure'?'<p><b>I get home at ___.</b><br><span class="tiny">Arribo a casa a les ___.</span></p><p><b>Then I ___.</b><br><span class="tiny">Després jo ___.</span></p>':level==='safe'?'<p><b>I ___ because ___.</b></p><p><b>I ___, but ___.</b></p>':'<p><b>Although ___, I ___.</b></p><p><b>___, so ___.</b></p><p><b>Whereas ___, I ___.</b></p>';$('#planGrid').innerHTML=(level==='insecure'?['A quina hora comences el dia?','Què fas després de classe?','Què fas al vespre?','Quines expressions treballades utilitzaràs?']:['What time do you start your day?','What do you do after school?','What do you do in the evening?','Which expressions will you use?']).map((q,i)=>`<div class="plan-q"><label>${q}</label><input id="plan${i}" placeholder="${level==='insecure'?'Una acció i una hora…':'Short notes...'}"></div>`).join('');$('#writingTask').textContent=d.writingTask;$('#writeChecklist').innerHTML=d.requirements.map(x=>`<li>${x}</li>`).join('');$('#routineText').value=state().text||'';generateSentence();countWords()}
 function generateSentence(){const action=$('#actionSelect').value,time=$('#timeSelect').value;$('#generatedSentence').textContent=`${action} ${time}.`}$('#actionSelect').onchange=generateSentence;$('#timeSelect').onchange=generateSentence;$('#copySentence').onclick=()=>{const t=$('#routineText');t.value+=(t.value.trim()?'\n':'')+$('#generatedSentence').textContent;countWords();t.focus()};function countWords(){const t=$('#routineText').value.trim(),n=t?t.split(/\s+/).length:0;$('#wordCount').textContent=n;state().text=t;save()}$('#routineText').oninput=countWords;
-function writingPrompt(){const d=levelInfo[level],text=$('#routineText').value.trim();return `Actua com a tutor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”.\n\nNivell: ${d.label}. Tasca: ${d.writingTask}\n\nText de l'alumne:\n${text}\n\nDona el feedback en català, clar i breu. No posis nota numèrica. Mantén la veu i el nivell de l'alumne. Respon només amb aquests apartats:\n1. ✅ Què està bé — una o dues coses concretes.\n2. ⚠️ Què falta / què no segueix les instruccions.\n3. 🔧 Correccions importants — màxim 3.\n4. 📝 Versió corregida — en anglès, mantenint les idees de l'alumne.\n5. 🎯 Un següent pas — una sola cosa concreta per millorar.`}
-$('#sendWritingFeedback').onclick=()=>{if(!$('#routineText').value.trim()){alert('Write your text first.');return}complete('write');const url='https://chatgpt.com/?prompt='+encodeURIComponent(writingPrompt());window.open(url,'_blank','noopener,noreferrer');$('#writeResult').textContent='Your text is ready to be corrected with AI.';$('#writeResult').classList.add('show')};$('#resetWriting').onclick=()=>{$('#routineText').value='';state().text='';save();countWords()};
+function writingPrompt(){const d=levelInfo[level],text=$('#routineText').value.trim();return `Actua com a tutor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”.\n\nNivell: ${d.label}. Tasca: ${d.writingTask}\n\nText de l'alumne:\n${text}\n\n${learningSupport.aiLanguage(level)} No posis nota numèrica. Mantén la veu i el nivell de l'alumne. Respon només amb aquests apartats:\n1. ✅ Què està bé — una o dues coses concretes.\n2. ⚠️ Què falta / què no segueix les instruccions.\n3. 🔧 Correccions importants — màxim 3.\n4. 📝 Versió corregida — en anglès, mantenint les idees de l'alumne.\n5. 🎯 Un següent pas — una sola cosa concreta per millorar.`}
+$('#sendWritingFeedback').onclick=()=>{if(!$('#routineText').value.trim()){alert(level==='insecure'?'Escriu el teu text en anglès primer. Utilitza el model i les notes si cal.':'Write your text first.');return}complete('write');const url='https://chatgpt.com/?prompt='+encodeURIComponent(writingPrompt());window.open(url,'_blank','noopener,noreferrer');$('#writeResult').textContent=level==='insecure'?'El text està preparat per revisar-lo amb IA. Llegeix el perquè de cada correcció i millora les frases.':'Your text is ready to be corrected with AI.';$('#writeResult').classList.add('show')};$('#resetWriting').onclick=()=>{$('#routineText').value='';state().text='';save();countWords()};
 function renderSpeaking(){const d=levelInfo[level];$('#speakingPill').textContent=d.label+' route';const model={insecure:'I get home at five. Then I have a snack. I go to bed at ten.\n\nArribo a casa a les cinc. Després faig un mos. Vaig al llit a les deu.',safe:'After school, I get home and have a snack because I am hungry. Then I do my homework, but I usually take a short break first.',daring:'After school, I usually do some work before dinner. Although I sometimes feel tired, I make an effort to finish early, so I can have a break and wind down later.'}[level];$('#speakingModel').innerHTML=`<div class="example">${model.replaceAll('\n','<br>')}</div>`;$('#speakingTask').textContent=d.speakingTask;$('#speakingSupport').innerHTML=level==='insecure'?'<p><b>I get home at ___.</b><br><span class="tiny">Arribo a casa a les ___.</span></p><p><b>Then I ___.</b></p>':`<div class="connector-strip">${d.connectors.map(x=>`<span class="connector">${x}</span>`).join('')}</div>`;$('#speakingPlan').value=state().speakingPlan||'';$('#speakingPlan').placeholder=level==='insecure'?'I get home at five. Then I...':'Write the sentences you are going to say...';$('#speakingChecklist').innerHTML=d.speakingChecklist.map(x=>`<li>${x}</li>`).join('')}
 $('#speakingPlan').oninput=()=>{state().speakingPlan=$('#speakingPlan').value;save()};
 let audioCtx,sourceNode,processor,stream,pcm=[],recSampleRate=44100,recognition=null;
@@ -401,7 +585,7 @@ $('#stopRecord').onclick=async()=>{
   }
 }
 $('#downloadWav').onclick=()=>{if(!recordBlob)return;const a=document.createElement('a');a.href=recordUrl;a.download=`routine-${level}.wav`;a.click()};
-function speakingPrompt(){const d=levelInfo[level],tr=$('#speechTranscript').value.trim();return `Escolta l'àudio adjunt i actua com a professor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”.\n\nNivell: ${d.label}. Tasca: ${d.speakingTask}\n${tr?`\nTranscripció revisada per l'alumne:\n${tr}\n`:''}\nDona el feedback en català, clar i breu. No posis nota numèrica. Respon només amb aquests apartats:\n1. 📝 Transcripció — escriu què diu realment l'alumne.\n2. ✅ Què ha fet bé — una o dues coses concretes.\n3. 🔧 Què ha de corregir — màxim 2 errors importants; escriu exactament com ho hauria de dir.\n4. 🗣️ Pronunciació — comenta només un problema clar; si no n'hi ha, digues que és correcta per al nivell.\n5. 📋 Instruccions — indica breument si ha complert la tasca.\n6. 🎯 Un següent pas — una sola millora concreta.`}
+function speakingPrompt(){const d=levelInfo[level],tr=$('#speechTranscript').value.trim();return `Escolta l'àudio adjunt i actua com a professor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”.\n\nNivell: ${d.label}. Tasca: ${d.speakingTask}\n${tr?`\nTranscripció revisada per l'alumne:\n${tr}\n`:''}\n${learningSupport.aiLanguage(level)} No posis nota numèrica. Respon només amb aquests apartats:\n1. 📝 Transcripció — escriu què diu realment l'alumne.\n2. ✅ Què ha fet bé — una o dues coses concretes.\n3. 🔧 Què ha de corregir — màxim 2 errors importants; escriu exactament com ho hauria de dir.\n4. 🗣️ Pronunciació — comenta només un problema clar; si no n'hi ha, digues que és correcta per al nivell.\n5. 📋 Instruccions — indica breument si ha complert la tasca.\n6. 🎯 Un següent pas — una sola millora concreta.`}
 function copyPromptNow(text){
   // Use a synchronous copy while the button click still counts as a user gesture.
   const ta=document.createElement('textarea');
@@ -446,7 +630,7 @@ $('#prepareSpeakingFeedback').onclick=()=>{
     ?'✓ WAV downloaded · ChatGPT opened with the prompt prepared. Attach the WAV and press Send.'
     :'The browser blocked the ChatGPT tab. Allow pop-ups and try again.';
 };
-function renderAll(){renderExplore();renderCards();renderMatch();renderPractice();renderListening();renderReading();renderBuilders();renderWriting();renderSpeaking();updateProgress();$$('.route').forEach(b=>b.classList.toggle('active',b.dataset.level===level))}
+function renderAll(){renderExplore();renderCards();renderMatch();renderPractice();renderListening();renderReading();renderBuilders();renderWriting();renderSpeaking();learningSupport.apply(level);updateProgress();$$('.route').forEach(b=>b.classList.toggle('active',b.dataset.level===level))}
 renderAll();
 
 const sessionJump=document.getElementById('sessionJump');

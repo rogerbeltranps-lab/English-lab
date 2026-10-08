@@ -5,43 +5,28 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1f6b52">
 <title>Learning Path 1 · Getting started</title>
+<link rel="stylesheet" href="../../shared/css/layout.css">
+<link rel="stylesheet" href="../../shared/css/topbar.css">
+<link rel="stylesheet" href="../../shared/css/activities.css">
 <style>
 :root{--accent:#1f6b52;--dark:#174d3d;--soft:#e9f5ef;--soft2:#d8eee3;--cream:#fbfcf8;--ink:#20312b;--muted:#66766f;--line:#d8e6df;--shadow:0 14px 38px rgba(31,107,82,.10)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--cream);color:var(--ink);line-height:1.5}button,textarea{font:inherit}button{cursor:pointer}.wrap{width:min(1080px,calc(100% - 30px));margin:auto}
-.topbar{position:sticky;top:0;z-index:30;background:var(--dark);color:#fff}.toprow{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;align-items:center;gap:10px;font-weight:850}.brand a{color:#fff;text-decoration:none}.brand-mark{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#fff;color:var(--accent)}.brand-title small{display:block;font-size:.7rem;color:#dcebe5;margin-top:1px}.progress-shell{width:150px}.progress-label{display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:4px;color:#e7f1ed}.progress-track{height:5px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}.progress-bar{height:100%;width:0;background:#fff;border-radius:99px;transition:.25s}
-.hero{padding:38px 0 28px;background:linear-gradient(135deg,var(--soft) 0%,var(--cream) 60%,#fff 100%);border-bottom:1px solid var(--line)}.eyebrow{display:inline-flex;background:var(--soft2);color:var(--dark);padding:7px 11px;border-radius:999px;font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.05em}h1{margin:14px 0 8px;color:var(--dark);font-size:clamp(2.1rem,6vw,4rem);line-height:1.03}.lead{max-width:790px;margin:0;color:var(--muted);font-size:1.05rem}.warm-note{margin-top:14px;padding:11px 13px;background:#fff;border:1px solid var(--line);border-radius:13px;color:var(--muted);font-size:.92rem}.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.route{border:1px solid var(--line);background:#fff;border-radius:18px;padding:15px;text-align:left;color:var(--ink)}.route strong{display:block;color:var(--dark)}.route span{display:block;color:var(--muted);font-size:.84rem;margin-top:3px}.route.active{border:2px solid var(--accent);background:var(--soft)}
-main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 1px 14px}.tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:12px;padding:10px 15px;font-weight:780}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}.panel{display:none;background:#fff;border:1px solid var(--line);border-radius:24px;padding:clamp(19px,4vw,34px);box-shadow:var(--shadow)}.panel.active{display:block}.panel-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}h2{margin:0 0 6px;color:var(--dark);font-size:clamp(1.5rem,3vw,2.1rem)}h3{color:var(--dark);margin:0 0 8px}.instruction{margin:0;color:var(--muted)}.pill{white-space:nowrap;background:var(--soft);color:var(--dark);border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:850}.section-card{border:1px solid var(--line);border-radius:18px;background:#f8fbf9;padding:18px;margin:15px 0}.choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.choice{border:1px solid var(--line);background:#fff;border-radius:13px;padding:13px;text-align:left;color:var(--ink);font-weight:700}.choice.selected{border-color:var(--accent);background:var(--soft)}.question{padding:16px 0;border-top:1px solid var(--line)}.question:first-child{border-top:0}.q-title{font-weight:760;margin:0 0 9px}.options{display:grid;gap:8px}.option{display:flex;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}.feedback{min-height:20px;margin-top:7px;font-size:.9rem;font-weight:720}.ok{color:var(--accent)}.no{color:#b84343}.btn{border:0;border-radius:12px;padding:10px 15px;font-weight:800;background:var(--accent);color:#fff}.btn.secondary{background:#fff;color:var(--dark);border:1px solid var(--line)}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.result{display:none;margin-top:15px;padding:13px;border-radius:12px;background:var(--soft);color:var(--dark);font-weight:760}.result.show{display:block}.reading{padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff;line-height:1.75;margin-bottom:10px}.model{padding:14px;border-radius:13px;background:#fff;border:1px solid var(--line);font-weight:650}.speak-support{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mini-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.mini-card strong{color:var(--dark)}textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:12px;padding:12px;resize:vertical}.record-box{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px}.record-status{margin:10px 0;color:var(--muted);font-weight:700}.tiny{font-size:.86rem;color:var(--muted);margin-top:8px}.footer-note{text-align:center;color:var(--muted);font-size:.86rem;padding-top:20px}
-@media(max-width:760px){.routes,.choice-grid,.speak-support{grid-template-columns:1fr}.panel-head{display:block}.pill{display:inline-block;margin-top:8px}.progress-shell{width:112px}}
-.session-jump{display:flex;align-items:center;gap:8px;margin-left:auto}.session-jump label{font-size:.7rem;font-weight:800;color:rgba(255,255,255,.78);white-space:nowrap}.session-jump select{max-width:235px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:8px 30px 8px 10px;font-weight:750;outline:none}.session-jump select:focus{border-color:#fff}.session-jump option{color:#1f2937;background:#fff}@media(max-width:760px){.toprow{flex-wrap:wrap;padding:8px 0}.session-jump{order:3;width:100%;margin-left:0}.session-jump label{display:none}.session-jump select{width:100%;max-width:none}.progress-shell{margin-left:auto}}
-
-.session-access{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:13px 15px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.04)}
-.session-access strong{white-space:nowrap;color:var(--dark,var(--navy,#20312b))}
-.session-access select{flex:1;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff;color:var(--ink);font-weight:750}
-.session-access .go-session{border:0;border-radius:11px;padding:10px 14px;background:var(--accent,var(--blue,#2563eb));color:#fff;font-weight:800}
-@media(max-width:760px){.session-access{display:grid;grid-template-columns:1fr auto}.session-access strong{grid-column:1/-1}.session-access select{width:100%}}
-
-/* Shared top-bar sizing: keep every Learning Path visually consistent */
-.topbar .brand{display:flex;align-items:center;gap:10px;min-width:0}
-.topbar .brand>a{font-size:16px!important;line-height:1.1!important;font-weight:800!important;white-space:nowrap}
-.topbar .brand-mark,.topbar .logo,.topbar .mark{
-  width:38px!important;height:38px!important;min-width:38px!important;flex:0 0 38px!important;
-  border-radius:12px!important;font-size:18px!important;line-height:38px!important;font-weight:900!important;
-  text-align:center!important;display:grid!important;place-items:center!important;padding:0!important
-}
-.topbar .brand-title,.topbar .brand>.lp-title{
-  font-size:16px!important;line-height:1.15!important;font-weight:850!important;display:block!important;white-space:nowrap
-}
-.topbar .brand-title small,.topbar .brand>.lp-title small{
-  display:block!important;font-size:11px!important;line-height:1.2!important;font-weight:700!important;
-  opacity:.88!important;margin-top:2px!important
-}
-.topbar .session-jump label,.topbar .jump label{font-size:12px!important;line-height:1.1!important;font-weight:800!important}
-.topbar .session-jump select,.topbar .jump select{font-size:15px!important;line-height:1.2!important;font-weight:700!important;height:38px!important}
-.topbar .progress-label,.topbar .progress-row{font-size:12px!important;line-height:1.1!important}
-
-.lp-home-link{display:inline-flex;align-items:center;text-decoration:none!important;color:inherit!important;font-weight:850!important;
-  white-space:nowrap;padding:6px 8px;border-radius:9px}
-.lp-home-link:hover{background:rgba(255,255,255,.12)}
+.btn{border:0;border-radius:12px;padding:10px 15px;font-weight:800;background:var(--accent);color:#fff}.btn.secondary{background:#fff;color:var(--dark);border:1px solid var(--line)}
+.warm-note{margin-top:14px;padding:11px 13px;background:#fff;border:1px solid var(--line);border-radius:13px;color:var(--muted);font-size:.92rem}
+.choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.choice{border:1px solid var(--line);background:#fff;border-radius:13px;padding:13px;text-align:left;color:var(--ink);font-weight:700}
+.choice.selected{border-color:var(--accent);background:var(--soft)}
+.reading{padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff;line-height:1.75;margin-bottom:10px}
+.model{padding:14px;border-radius:13px;background:#fff;border:1px solid var(--line);font-weight:650}
+.speak-support{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mini-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+.mini-card strong{color:var(--dark)}
+.tiny{font-size:.86rem;color:var(--muted);margin-top:8px}
+@media(max-width:760px){.choice-grid,.speak-support{grid-template-columns:1fr}}
+/* Speaking surfaces follow the course reference; keep layout and controls unchanged. */
+#speak .section-card,#speak .mini-card{background:#fbfdfb}
+#speak .model{background:#f1f8f4;border-color:#bedccd}
+#speak .record-box{background:transparent;border:0;padding:0;display:grid;gap:12px}
+#speak .record-status{padding:10px 12px;border-radius:11px;background:#f4f8f6;color:#52665e;border:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -50,7 +35,7 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
   <div class="session-jump">
       <label for="sessionJump">Learning Path</label>
       <select id="sessionJump" aria-label="Go to another Learning Path session">
-        <option value="getting-started.html" selected>1 · Getting started</option><option value="a-day-in-my-life.html">2 · Routine expressions</option><option value="same-day-different-person.html">3 · Same day, different person</option><option value="present-simple-grammar.html">4 · Present Simple grammar</option><option value="healthy-habits.html">5 · Healthy habits</option><option value="final-product.html">6 · Final product</option>
+        <option value="getting-started.html" selected>1 · Getting started</option><option value="a-day-in-my-life.html">2 · Routine expressions</option><option value="same-day-different-person.html">3 · Same day, different person</option><option value="present-simple-grammar.html">4 · Present Simple</option><option value="healthy-habits.html">5 · Healthy habits</option><option value="final-product.html">6 · Final product</option>
       </select>
     </div>
     <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 4</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
@@ -76,10 +61,10 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 </nav>
 
 <section class="panel active" id="quick">
-  <div class="panel-head"><div><h2>Quick start</h2><p class="instruction">Activate what you already know. No notes, no studying — just react.</p></div><span class="pill">2–3 min</span></div>
+  <div class="panel-head"><div><h2>Quick start</h2><p class="instruction" data-support-ca="Recorda expressions que ja coneixes. Llegeix cada frase i pensa si descriu el teu dia; no cal estudiar vocabulari nou." data-support-en="Activate what you already know. No notes, no studying — just react.">Activate what you already know. No notes, no studying — just react.</p></div><span class="pill">2–3 min</span></div>
   <div class="section-card">
     <h3>Which sentences could describe a real school day?</h3>
-    <p class="instruction">Click the sentences that could be true for you. There is no “perfect” routine.</p>
+    <p class="instruction" data-support-ca="Marca les frases que podrien descriure el teu dia. Per exemple, marca I have breakfast before school si esmorzes abans d’anar a classe. No hi ha una rutina perfecta." data-support-en="Click the sentences that could be true for you. There is no “perfect” routine.">Click the sentences that could be true for you. There is no “perfect” routine.</p>
     <div class="choice-grid">
       <button class="choice" data-ok="1">I wake up at seven.</button>
       <button class="choice" data-ok="1">I have breakfast before school.</button>
@@ -87,16 +72,16 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
       <button class="choice" data-ok="1">I get home in the afternoon.</button>
       <button class="choice" data-ok="1">I have dinner with my family.</button>
       <button class="choice" data-ok="1">I go to bed at ten.</button></div>
-    <div class="actions"><button class="btn" id="finishQuick">Done ✓</button></div>
-    <div class="result" id="quickResult">Good. You already have language you can use in this Learning Situation.</div>
+    <div class="actions"><button class="btn" id="finishQuick" data-support-ca="Ja he triat ✓" data-support-en="Done ✓">Done ✓</button></div>
+    <div class="result" id="quickResult" data-support-ca="Ja has identificat expressions que coneixes. Les faràs servir per explicar una rutina en anglès." data-support-en="Good. You already have language you can use in this Learning Situation.">Good. You already have language you can use in this Learning Situation.</div>
   </div>
 </section>
 
 <section class="panel" id="listen">
-  <div class="panel-head"><div><h2>Listening</h2><p class="instruction">Watch and listen to a real-life morning routine. You do not need to understand every word.</p></div><span class="pill">Real video · YouTube</span></div>
+  <div class="panel-head"><div><h2>Listening</h2><p class="instruction" data-support-ca="Escolta una vegada per entendre el tema general. Torna a escoltar buscant les accions del matí; pots pausar o repetir el vídeo. No cal entendre totes les paraules." data-support-en="Watch and listen to a real-life morning routine. You do not need to understand every word.">Watch and listen to a real-life morning routine. You do not need to understand every word.</p></div><span class="pill">Real video · YouTube</span></div>
   <div class="section-card">
     <h3>My Morning Routine</h3>
-    <p class="instruction">A real speaker shows a normal morning in clear, natural English. Focus on routine actions you already know.</p>
+    <p class="instruction" data-support-ca="Abans d’escoltar de nou, llegeix les opcions. Fixa’t en les accions i en l’ordre en què passen; les imatges també et poden ajudar." data-support-en="A real speaker shows a normal morning in clear, natural English. Focus on routine actions you already know.">A real speaker shows a normal morning in clear, natural English. Focus on routine actions you already know.</p>
     <div style="position:relative;padding-top:56.25%;margin:16px 0;border-radius:14px;overflow:hidden;background:#000">
       <iframe
         src="https://www.youtube-nocookie.com/embed/JvYzUYe5nX4"
@@ -111,68 +96,70 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
       <a class="btn secondary" href="https://www.youtube.com/watch?v=JvYzUYe5nX4" target="_blank" rel="noopener" style="text-decoration:none">Open on YouTube ↗</a>
     </div>
     <form id="listenForm"></form>
-    <div class="actions"><button class="btn" id="checkListen" type="button">Check listening</button></div>
+    <div class="actions"><button class="btn" id="checkListen" type="button" data-support-ca="Comprova el listening" data-support-en="Check listening">Check listening</button></div>
     <div class="result" id="listenResult"></div>
   </div>
 </section>
 <section class="panel" id="read">
-  <div class="panel-head"><div><h2>Reading</h2><p class="instruction">Read a short routine and notice ideas you already understand.</p></div><span class="pill">6 questions</span></div>
+  <div class="panel-head"><div><h2>Reading</h2><p class="instruction" data-support-ca="Llegeix primer per saber de qui parla el text. Després busca la frase que respon cada pregunta. No triïs segons la teva pròpia rutina." data-support-en="Read a short routine and notice ideas you already understand.">Read a short routine and notice ideas you already understand.</p></div><span class="pill">6 questions</span></div>
   <div class="section-card">
     <div class="reading" id="readingText"></div>
     <form id="readForm"></form>
-    <div class="actions"><button class="btn" id="checkRead">Check reading</button></div>
+    <div class="actions"><button class="btn" id="checkRead" data-support-ca="Comprova el reading" data-support-en="Check reading">Check reading</button></div>
     <div class="result" id="readResult"></div>
   </div>
 </section>
 
 <section class="panel" id="speak">
-  <div class="panel-head"><div><h2>Speaking</h2><p class="instruction">Prepare → Record → Listen → Transcript → Correct with AI</p></div><span class="pill" id="speakPill">Insecure route</span></div>
+  <div class="panel-head"><div><h2>Speaking</h2><p class="instruction" data-support-ca="Prepara unes frases → grava-les → escolta’t → revisa la transcripció → demana feedback. Canvia les hores i les activitats del model per parlar de tu." data-support-en="Prepare → Record → Listen → Transcript → Correct with AI">Prepare → Record → Listen → Transcript → Correct with AI</p></div><span class="pill" id="speakPill">Insecure route</span></div>
   <div class="section-card">
-    <h3>Your mini challenge</h3>
+    <h3 data-support-ca="El teu petit repte" data-support-en="Your mini challenge">Your mini challenge</h3>
     <p class="instruction" id="speakTask"></p>
     <div class="speak-support" style="margin-top:14px">
       <div class="mini-card"><strong>Model</strong><div class="model" id="speakModel" style="margin-top:8px"></div></div>
-      <div class="mini-card"><strong>Prepare</strong><textarea id="speakPlan" placeholder="Write a few words or sentences before you speak..."></textarea></div>
+      <div class="mini-card"><strong data-support-ca="Prepara què diràs" data-support-en="Prepare">Prepare</strong><textarea id="speakPlan" placeholder="Write a few words or sentences before you speak..."></textarea></div>
     </div>
   </div>
   <div class="section-card">
-    <h3>Record</h3>
+    <h3 data-support-ca="Grava i escolta’t" data-support-en="Record">Record</h3>
     <div class="record-box">
       <div class="actions" style="justify-content:flex-start">
-        <button class="btn" id="startRecord" type="button">● Record</button>
-        <button class="btn secondary" id="stopRecord" type="button" disabled>■ Stop</button>
-        <button class="btn secondary" id="downloadWav" type="button" disabled>Download WAV</button>
+        <button class="btn" id="startRecord" type="button" data-support-ca="● Grava" data-support-en="● Record">● Record</button>
+        <button class="btn secondary" id="stopRecord" type="button" disabled data-support-ca="■ Atura" data-support-en="■ Stop">■ Stop</button>
+        <button class="btn secondary" id="downloadWav" type="button" disabled data-support-ca="Descarrega el WAV" data-support-en="Download WAV">Download WAV</button>
       </div>
       <div class="record-status" id="recordStatus">Ready to record.</div>
       <audio id="recordedAudio" controls style="width:100%;display:none"></audio>
     </div>
   </div>
   <div class="section-card">
-    <h3>Transcript</h3>
-    <p class="instruction">With Chrome, a transcript is created automatically while you record. Check it before asking for feedback.</p>
+    <h3 data-support-ca="Revisa la transcripció" data-support-en="Transcript">Transcript</h3>
+    <p class="instruction" data-support-ca="Amb Chrome, la transcripció es crea mentre graves. Escolta la gravació i comprova que el text diu el mateix. Corregeix-lo; si no apareix, escriu què has dit." data-support-en="With Chrome, a transcript is created automatically while you record. Check it before asking for feedback.">With Chrome, a transcript is created automatically while you record. Check it before asking for feedback.</p>
     <textarea id="speechTranscript" placeholder="Your transcript will appear here. You can correct it."></textarea>
   </div>
   <div class="section-card">
-    <h3>Get feedback</h3>
-    <p class="instruction">When you press <strong>Correct with AI</strong>, the WAV will download automatically and ChatGPT will open with the prompt prepared. Attach the WAV and press Send.</p>
-    <div class="actions"><button class="btn" id="prepareSpeakingFeedback" type="button" disabled>Correct with AI ↗</button></div>
+    <h3 data-support-ca="Demana feedback" data-support-en="Get feedback">Get feedback</h3>
+    <p class="instruction" data-support-ca="Prem &lt;strong&gt;Corregeix amb IA&lt;/strong&gt;: es descarrega el WAV i s’obre ChatGPT amb la petició preparada. Adjunta el WAV i prem Envia. Llegeix el perquè de les correccions i torna a practicar." data-support-en="When you press &lt;strong&gt;Correct with AI&lt;/strong&gt;, the WAV will download automatically and ChatGPT will open with the prompt prepared. Attach the WAV and press Send.">When you press <strong>Correct with AI</strong>, the WAV will download automatically and ChatGPT will open with the prompt prepared. Attach the WAV and press Send.</p>
+    <div class="actions"><button class="btn" id="prepareSpeakingFeedback" type="button" disabled data-support-ca="Corregeix amb IA ↗" data-support-en="Correct with AI ↗">Correct with AI ↗</button></div>
     <p class="tiny" id="speakingCopyStatus"></p>
   </div>
-  <div class="result" id="speakResult">Warm-up complete. You are ready for the next Learning Path.</div>
+  <div class="result" id="speakResult" data-support-ca="Has acabat l’activació. Revisa una correcció i prova de dir la frase millorada abans de continuar." data-support-en="Warm-up complete. You are ready for the next Learning Path.">Warm-up complete. You are ready for the next Learning Path.</div>
 </section>
 
 <p class="footer-note">This session is only a warm-up. It does not introduce new vocabulary.</p>
 </main>
 
+<script src="../../shared/js/learning-path-support.js"></script>
 <script>
 const listening=[{"q":"What is the video mainly about?","o":["A morning routine","A school exam","A holiday"],"a":0},{"q":"Which type of action appears in the video?","o":["Getting ready in the morning","Going to bed at school","Having dinner at midnight"],"a":0},{"q":"What drink is part of the morning?","o":["Coffee","Soup","Cola"],"a":0},{"q":"What outdoor activity appears?","o":["Going for a walk","Playing football","Swimming"],"a":0},{"q":"What meal is prepared?","o":["Breakfast","Dinner","Lunch at school"],"a":0},{"q":"What should you focus on in this warm-up?","o":["The main routine actions","Understanding every single word","Writing down new vocabulary"],"a":0}];
 const reading={"text":"<p>Emma has a simple school-day routine. She gets up early, has breakfast and goes to school. She gets home in the afternoon and does her homework. In the evening, she has dinner and watches TV for a short time. She also tries to drink water and get enough sleep.</p>","qs":[["What does Emma do before school?",["Has breakfast","Has dinner","Goes to bed"],0],["When does she get home?",["In the afternoon","At midnight","Before breakfast"],0],["What does she do after she gets home?",["Does homework","Goes to school","Has breakfast"],0],["What does she do in the evening?",["Has dinner","Goes to school","Gets up"],0],["Which healthy habit appears?",["Drinking water","Skipping sleep","No breaks"],0],["Which sentence is the best summary?",["Emma has a normal school-day routine","Emma never goes to school","Emma only talks about food"],0]]};
-const speakTask={"insecure":"Say 3 short sentences about your routine.","safe":"Say 4–5 sentences about your routine and give one reason.","daring":"Say 5 sentences and compare one habit with another person."};
+const speakTask={"insecure":"Digues 3 frases curtes sobre la teva rutina. Prepara I + acció + hora amb el model; canvia els detalls per parlar de tu.","safe":"Say 4–5 sentences about your routine and give one reason.","daring":"Say 5 sentences and compare one habit with another person."};
 const speakModel={"insecure":"I wake up at seven. I have breakfast. I get home at five.","safe":"I wake up at seven and have breakfast before school. I go to school on foot because I live nearby. After school, I get home and do my homework.","daring":"I usually get home at five, whereas my friend gets home earlier. We both do our homework after school, but I go to bed later."};
 const storageKey="gettingStarted2ESO";
 let level=localStorage.getItem(storageKey+"Level")||"insecure";
 const state=JSON.parse(localStorage.getItem(storageKey)||'{"done":{}}');
 
+const supportHints={"l": ["El vídeo tracta d’una rutina del matí, no d’un examen o unes vacances.", "Les accions són preparar-se al matí; no anar a dormir a l’escola.", "Fixa’t en la beguda del matí: coffee.", "Fixa’t en l’activitat a l’exterior: going for a walk.", "El menjar es prepara al matí: breakfast.", "L’objectiu és reconèixer les accions principals, no entendre cada paraula."], "r": ["El text diu has breakfast abans de parlar de l’escola.", "Busca gets home in the afternoon: indica quan arriba a casa.", "Després de gets home, el text diu does her homework.", "In the evening introdueix has dinner.", "El text diu drink water: beure aigua és l’hàbit esmentat.", "El text combina escola, deures, menjar i descans; no parla només de menjar."]};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 
 function save(){localStorage.setItem(storageKey,JSON.stringify(state));localStorage.setItem(storageKey+"Level",level);updateProgress()}
@@ -201,15 +188,15 @@ renderQuestions("#readForm",readData,"r");
 
 function check(data,prefix,resultId,key){
   let score=0;
-  data.forEach((q,i)=>{const c=document.querySelector('input[name="'+prefix+i+'"]:checked');const ok=c&&+c.value===q.a;if(ok)score++;const f=$("#"+prefix+"f"+i);f.textContent=ok?"Correct!":"Try again.";f.className="feedback "+(ok?"ok":"no")});
-  $(resultId).textContent=score+" / "+data.length+" correct";
+  data.forEach((q,i)=>{const c=document.querySelector('input[name="'+prefix+i+'"]:checked');const ok=c&&+c.value===q.a;if(ok)score++;const f=$("#"+prefix+"f"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[q.a],supportHints[prefix][i],prefix==="l");f.className="feedback "+(ok?"ok":"no")});
+  $(resultId).textContent=score+" / "+data.length+(level==="insecure"?" correctes":" correct");
   $(resultId).classList.add("show");
   if(score>=data.length-1)complete(key)
 }
 $("#checkListen").onclick=()=>check(listening,"l","#listenResult","listen");
 $("#checkRead").onclick=()=>check(readData,"r","#readResult","read");
 
-function renderSpeak(){$("#speakPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";$("#speakTask").textContent=speakTask[level];$("#speakModel").textContent=speakModel[level]}
+function renderSpeak(){$("#speakPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";$("#speakTask").textContent=speakTask[level];$("#speakModel").textContent=speakModel[level];learningSupport.apply(level)}
 
 let audioCtx,sourceNode,processor,micStream,pcm=[],recSampleRate=44100,recordBlob=null,recordUrl=null;
 let recognition=null,speechTranscribingActive=false,speechRestartTimer=null,speechFinalText='';
@@ -306,7 +293,7 @@ function speakingPrompt(){
     :'Say 5 sentences and compare one habit with another person.';
   const style=level==='insecure'
     ?'Dona el feedback en català molt fàcil. No facis servir terminologia gramatical tècnica. Menys és més.'
-    :'Dona el feedback en català, clar i breu.';
+    :learningSupport.aiLanguage(level);
   return `IMPORTANT: ENCARA NO DONIS FEEDBACK SI NO HI HA CAP ÀUDIO ADJUNT. Espera que l'usuari adjunti l'àudio. Si aquest missatge arriba abans que l'àudio, respon només: "Adjunta l'àudio i l'escoltaré."
 
 Quan l'àudio estigui adjunt, escolta'l i actua com a professor d'anglès de 2n d'ESO dins de la Learning Situation “My Real Routine”, Learning Path 1 “Getting started”.
