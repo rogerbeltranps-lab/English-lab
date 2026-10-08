@@ -310,11 +310,46 @@
       .grid{grid-template-columns:1fr}
     }
 
+    .menu-toggle{
+  display:none;
+  align-items:center;
+  gap:8px;
+  padding:9px 14px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--surface);
+  color:var(--text);
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+.menu-toggle::after{content:"▾";font-size:.8em}
+nav.menu-open .menu-toggle::after{content:"▴"}
+
     @media(max-width:760px){
-      nav{align-items:flex-start;padding:14px 0}
-      .navlinks{gap:2px}
-      .navlinks > a,.nav-menu > summary{padding:8px 9px}
-      .dropdown{position:fixed;left:16px;right:16px;top:72px;min-width:0}
+      nav{align-items:center;padding:10px 0;min-height:60px}
+      .menu-toggle{display:inline-flex}
+      .navlinks{
+        display:none;
+        position:absolute;
+        top:100%;
+        left:0;
+        right:0;
+        flex-direction:column;
+        align-items:stretch;
+        flex-wrap:nowrap;
+        gap:2px;
+        padding:10px 16px 14px;
+        max-height:calc(100vh - 70px);
+        overflow-y:auto;
+        background:var(--surface);
+        border-bottom:1px solid var(--line);
+        box-shadow:var(--shadow);
+      }
+      nav.menu-open .navlinks{display:flex}
+      .navlinks > a,.nav-menu > summary{padding:12px 12px}
+      .dropdown{position:static;min-width:0;margin:4px 0 6px;box-shadow:none;background:transparent}
+      .ls-dropdown{min-width:0}
     }
 
     @media(max-width:560px){
@@ -338,7 +373,8 @@
     <div class="wrap">
       <nav>
         <a class="brand" href="../index.html">English with Roger</a>
-        <div class="navlinks">
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+        <div class="navlinks" id="site-menu">
           <a href="../index.html">Home</a>
 
           <details class="nav-menu">
@@ -448,6 +484,20 @@
       if(event.target.closest('.nav-menu'))return;
       navMenus.forEach(menu=>menu.open=false);
     });
+      const siteNav=document.querySelector('header nav');
+    const menuToggle=siteNav&&siteNav.querySelector('.menu-toggle');
+    if(menuToggle){
+      menuToggle.addEventListener('click',event=>{
+        event.stopPropagation();
+        const open=siteNav.classList.toggle('menu-open');
+        menuToggle.setAttribute('aria-expanded',open);
+      });
+      document.addEventListener('click',event=>{
+        if(event.target.closest('header nav'))return;
+        siteNav.classList.remove('menu-open');
+        menuToggle.setAttribute('aria-expanded','false');
+      });
+    }
   </script>
 
 </body>
