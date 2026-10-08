@@ -396,6 +396,11 @@
     buttons.forEach(button => {
       button.addEventListener('click', () => openTab(button.dataset.tab));
     });
+
+    const initialTab = location.hash.slice(1);
+    if (initialTab && document.getElementById(initialTab)?.classList.contains('panel')) {
+      openTab(initialTab);
+    }
   </script>
 </body>
 </html>
