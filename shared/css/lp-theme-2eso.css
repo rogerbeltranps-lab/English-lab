@@ -27,3 +27,9 @@
 :root{color-scheme:light}
 .panel textarea,.panel select,.panel input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=hidden]){color:#20312b!important;background-color:#fff!important;caret-color:#20312b}
 .panel textarea::placeholder,.panel input::placeholder{color:#66766f!important;opacity:1}
+
+/* Flashcard buttons: rating row first, then navigation; disabled buttons must look disabled. */
+.flash-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;max-width:420px;margin:12px auto 0!important}
+.flash-actions .btn{width:100%;padding-inline:8px;white-space:nowrap}
+.flash-actions #gotCard{order:1}.flash-actions #againCard{order:2}.flash-actions #prevCard{order:3}.flash-actions #nextCard{order:4}.flash-actions #newCards{order:5;grid-column:1/-1}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;filter:none!important}

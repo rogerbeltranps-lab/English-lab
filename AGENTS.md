@@ -28,6 +28,17 @@ Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
 - Represent alternatives explicitly and naturally; avoid generic slash-splitting, awkward fragments and incomplete expression templates.
 - Tell students to match studied Learning Path expressions even when other English combinations sound natural, and that identical tiles can be used interchangeably. Apply the route-language rules above.
 
+## Flashcards
+- Flashcard practice uses a **random set of up to 10 cards** (all cards if the deck has fewer). Do not make students work through the whole deck.
+- The student **flips** the card, then chooses **Got it** or **Again**. The rating buttons stay disabled until the card is flipped. An **Again** card comes back before the student moves on, and the step is complete when every card in the set is **Got it**.
+- "New set" gives a different random set. The counter keeps the format `Card 6 of 10 · Practising · 5/10 known`; Insecure shows it and the instructions in Catalan.
+- Reuse the existing implementations (`flashcard-set` logic in the vocabulary pages and `shared/js/flashcard-set.js`) instead of writing a new one.
+
+## Answer options
+- **Randomize the answer options, never the questions.** Multiple-choice options and dropdown options are shuffled every time a question is shown, so the correct answer is not always in the same position. Question order stays as written.
+- Use `learningSupport.shuffled()` / `learningSupport.shuffledIndexes()` from `shared/js/learning-path-support.js` (include that file in every page that renders questions). Keep each option's original value so scoring and feedback do not change.
+- Do not change the wording of questions or options when shuffling.
+
 ## Final Product
 - Before working on My Real Routine in either 2ESO or 4ESO, read [its LS guidance](docs/learning-situations/my-real-routine.md).
 - Follow the current LS’s route requirements and submission format.

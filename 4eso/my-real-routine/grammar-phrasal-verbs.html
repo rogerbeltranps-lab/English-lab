@@ -43,6 +43,7 @@
 <section class="panel" id="produce"><div class="panel-head"><div><h2 id="produceTitle"></h2><p class="instruction" id="produceIntro"></p></div><span class="pill">5 / 6</span></div><div class="section-card"><h3>Task / Tasca</h3><p id="productionPrompt"></p><div class="model" id="productionModel"></div><textarea id="productionText"></textarea></div><div class="section-card"><h3>Self-review / Autorevisió</h3><div class="options" id="productionCriteria"></div><div class="actions"><button class="btn" type="button" id="checkProduction"></button></div><p class="feedback" id="productionFeedback" aria-live="polite"></p></div></section>
 <section class="panel" id="selfcheck"><div class="panel-head"><div><h2 id="selfcheckTitle"></h2><p class="instruction" id="selfcheckIntro"></p></div><span class="pill">6 / 6</span></div><div class="section-card"><div class="task-list" id="selfcheckTasks"></div></div><div class="actions"><button class="btn secondary" id="resetRoute" type="button"></button></div></section>
 <p class="footer-note">Your answers and progress are saved separately for each route on this device.</p></main>
+<script src="../../shared/js/learning-path-support.js"></script>
 <script>
 const storagePrefix='s4Grammar';
 const englishLead="Review the Present Simple; in Safe and Daring, add phrasal verbs and practise object and pronoun placement.";
@@ -1005,7 +1006,7 @@ function updateProgress(){const count=steps.filter(k=>routeState().done[k]).leng
 function refreshStep(key){const tasks=course[level][key];routeState().done[key]=tasks.every((t,i)=>routeState().checked[key+':'+i]&&evaluate(t,routeState().answers[key+':'+i]||''));save()}
 function add(tag,parent,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;parent.appendChild(el);return el}
 function renderTasks(key){const parent=$('#'+key+'Tasks');parent.replaceChildren();course[level][key].forEach((task,i)=>{const id=key+':'+i,row=add('div',parent,undefined,'mini-card'),label=add('label',row,(i+1)+'. '+task.prompt);let input;
- if(task.options){input=add('select',row);add('option',input,level==='insecure'?'Tria…':'Choose…').value='';task.options.forEach(option=>add('option',input,option).value=option)}else{input=add('input',row);input.type='text';input.autocomplete='off';input.spellcheck=false}
+ if(task.options){input=add('select',row);add('option',input,level==='insecure'?'Tria…':'Choose…').value='';learningSupport.shuffled(task.options).forEach(option=>add('option',input,option).value=option)}else{input=add('input',row);input.type='text';input.autocomplete='off';input.spellcheck=false}
  input.id=key+'Answer'+i;label.htmlFor=input.id;input.value=routeState().answers[id]||'';if(task.hint)add('p',row,task.hint,'tiny');
  const button=add('button',row,level==='insecure'?'Comprova':'Check','btn small');button.type='button';const result=add('p',row,'','feedback');result.setAttribute('aria-live','polite');
  const check=()=>{routeState().answers[id]=input.value;routeState().checked[id]=true;const feedback=feedbackFor(task,input.value);result.textContent=feedback.text;result.className='feedback '+(feedback.ok?'ok':'no');refreshStep(key)};

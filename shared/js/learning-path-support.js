@@ -7,6 +7,18 @@ var learningSupport = {
       else node.innerHTML = value;
     });
   },
+  // Random order for answer options. Question order is never changed, and option values keep their original index.
+  shuffled(list) {
+    const copy = list.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  },
+  shuffledIndexes(n) {
+    return this.shuffled([...Array(n).keys()]);
+  },
   feedback(level, correct, catalanReason, englishReason) {
     if (correct) return level === 'insecure' ? 'Correcte!' : 'Correct!';
     return level === 'insecure' ? 'Encara no. ' + catalanReason : 'Try again. ' + englishReason;

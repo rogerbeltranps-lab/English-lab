@@ -185,7 +185,7 @@ function renderQuestions(formId,data,prefix){
   const f=$(formId);f.innerHTML="";
   data.forEach((q,i)=>{
     const box=document.createElement("div");box.className="question";
-    box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+q.o.map((o,j)=>'<label class="option"><input type="radio" name="'+prefix+i+'" value="'+j+'"><span>'+o+'</span></label>').join("")+'</div><div class="feedback" id="'+prefix+'f'+i+'"></div>';
+    box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>{const o=q.o[j];return '<label class="option"><input type="radio" name="'+prefix+i+'" value="'+j+'"><span>'+o+'</span></label>'}).join("")+'</div><div class="feedback" id="'+prefix+'f'+i+'"></div>';
     f.appendChild(box)
   })
 }
