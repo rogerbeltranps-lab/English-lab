@@ -52,7 +52,29 @@ textarea{width:100%;min-height:175px;border:1px solid #c7dbd1;border-radius:12px
 .lp-home-link{display:inline-flex;align-items:center;text-decoration:none!important;color:inherit!important;font-weight:850!important;
   white-space:nowrap;padding:6px 8px;border-radius:9px}
 .lp-home-link:hover{background:rgba(255,255,255,.12)}
+
+/* Phone fix: let the title wrap under the links instead of widening the page */
+@media (max-width:760px){
+  .topbar .brand{flex-wrap:wrap!important;row-gap:6px!important}
+  .topbar .brand-title,.topbar .lp-title,.topbar .brand>.lp-title{flex:1 1 150px!important;min-width:0!important;white-space:normal!important}
+}
+html,body{overflow-x:clip}
+@media (max-width:760px){
+  .chip-tooltip{display:none!important}
+  .chip:hover .chip-tooltip,.chip:focus .chip-tooltip{display:block!important;max-width:min(240px,calc(100vw - 60px))}
+  .chips .chip:nth-child(2n) .chip-tooltip{left:auto;right:0}
+}
+
+/* Tablet/small laptop: put the dropdown on its own row before it collides with the title */
+@media (max-width:1180px){
+  .topbar .toprow{flex-wrap:wrap!important;padding:8px 0!important}
+  .topbar .session-jump,.topbar .jump{order:3!important;width:100%!important;margin-left:0!important}
+  .topbar .session-jump label,.topbar .jump label{display:none!important}
+  .topbar .session-jump select,.topbar .jump select{width:100%!important;max-width:none!important}
+  .topbar .progress-shell,.topbar .progress{margin-left:auto!important}
+}
 </style>
+<link rel="stylesheet" href="../../shared/css/lp-theme-2eso.css">
 </head>
 <body>
 <div class="topbar"><div class="wrap toprow">
@@ -271,8 +293,8 @@ function setLevel(x){level=x;cardIndex=0;practiceSet=0;$$('.route').forEach(b=>b
 $$('.route').forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
 $$('.tab').forEach(t=>t.onclick=()=>{$$('.tab,.panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#'+t.dataset.panel).classList.add('active');window.scrollTo({top:$('main').offsetTop-64,behavior:'smooth'})});
 function renderExplore(){const info=levelInfo[level];$('#exploreNote').textContent=info.note;$('#explorePill').textContent=info.label+' route';$('#vocabGroups').innerHTML=cumulativeGroups().map(([cat,items])=>`<article class="vocab-group"><h3>${cat}</h3><div class="chips">${items.map(x=>`<span class="chip" tabindex="0">${x}<span class="chip-tooltip"><b>${ca[x]||'—'}</b>${exampleFor(x)}</span></span>`).join('')}</div></article>`).join('');$('#studySummary').textContent=`${deck().length} expressions. Les tornaràs a veure a les targetes i a les activitats.`}
-$('#finishExplore').onclick=()=>complete('explore');
-function renderCards(){const d=deck();if(cardIndex>=d.length)cardIndex=0;const v=d[cardIndex];$('#flashcard').classList.remove('flipped');$('#cardCategory').textContent=v.category;$('#cardFront').textContent=v.expression;$('#cardBack').textContent=v.ca;$('#cardHint').textContent=v.example;$('#cardCounter').textContent=`Card ${cardIndex+1} of ${d.length} · ${state().known.includes(cardIndex)?'✓ Known':'Practising'}`}
+$('#finishExplore').onclick=()=>{complete('explore');$('#flashcard').scrollIntoView({behavior:'smooth',block:'center'})};
+function renderCards(){const d=deck();if(cardIndex>=d.length)cardIndex=0;const v=d[cardIndex];$('#flashcard').classList.remove('flipped');$('#cardCategory').textContent=v.category;$('#cardFront').textContent=v.expression;$('#cardBack').textContent=v.ca;$('#cardHint').textContent=v.example;$('#cardCounter').textContent=`Card ${cardIndex+1} of ${d.length} · ${state().known.includes(cardIndex)?'✓ Known':'Practising'} · ${state().known.length}/${d.length} known`}
 function moveCard(n){cardIndex=(cardIndex+n+deck().length)%deck().length;renderCards()}$('#flashcard').onclick=()=>$('#flashcard').classList.toggle('flipped');$('#prevCard').onclick=()=>moveCard(-1);$('#nextCard').onclick=()=>moveCard(1);$('#knowCard').onclick=()=>{const s=state();if(!s.known.includes(cardIndex))s.known.push(cardIndex);if(s.known.length>=deck().length)complete('cards');else save();moveCard(1)};
 const matchingRounds={
  "insecure": [
@@ -476,6 +498,19 @@ if(sessionAccessSelect&&sessionAccessGo){
     if(target&&target!=='#') window.location.href=target;
   });
 }
+</script>
+<script src="../../shared/js/section-next.js"></script>
+<script>
+sectionNext.init({level:()=>level,panels:[
+ {id:'vocabulary',done:()=>{const d=state().done;return !!(d.explore&&d.cards)},detail:ca=>{const d=state().done;return sectionNext.list(ca,[[d.explore,'prem «Ja les he explorat ✓»','press “I explored them ✓”'],[d.cards,'marca totes les targetes ('+state().known.length+'/'+deck().length+')','mark every card as known ('+state().known.length+'/'+deck().length+')']])}},
+ {id:'practicePanel',done:()=>{const d=state().done;return !!(d.match&&d.practice&&d.build)},detail:ca=>{const d=state().done;return sectionNext.list(ca,[[d.match,'Relaciona','Match'],[d.practice,'Practica (tots els grups)','Practise (all sets)'],[d.build,'Ordena','Build']])}},
+ {id:'listeningPanel',done:()=>!!state().done.listen,detail:ca=>ca?'Comprova el listening i encerta-ho gairebé tot.':'Check your listening answers (at most one mistake).'},
+ {id:'readingPanel',done:()=>!!state().done.reading,detail:ca=>ca?'Comprova el reading i encerta-ne almenys 5.':'Check your reading answers (at least 5 correct).'},
+ {id:'writing',done:()=>!!state().done.write,detail:ca=>ca?'Escriu el text i prem el botó de correcció.':'Write your text and use the correction button.'}
+]});
+sectionNext.undo({button:document.getElementById('finishExplore'),level:()=>level,isDone:()=>!!state().done.explore,undo:()=>{delete state().done.explore;save()}});
+sectionNext.gateExplore({button:document.getElementById('finishExplore'),container:document.getElementById('vocabGroups'),level:()=>level,isDone:()=>!!state().done.explore});
+sectionNext.final({id:'speaking',level:()=>level,done:()=>!!state().done.speaking,detail:ca=>ca?'Grava el teu àudio i atura la gravació.':'Record your audio and stop the recording.'});
 </script>
 </body>
 </html>

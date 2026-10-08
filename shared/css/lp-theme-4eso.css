@@ -1,0 +1,29 @@
+/* 4ESO My Real Routine palette.
+   Values copied from getting-started.html (the course reference) so every Learning Path looks the same. */
+.topbar{background-color:rgba(35, 71, 119, 0.97)!important;box-shadow:rgba(35, 71, 119, 0.16) 0px 4px 18px 0px!important}
+.topbar .brand-mark,.topbar .logo,.topbar .mark{color:rgb(49, 90, 143)!important}
+.topbar .brand-title small,.topbar .lp-title small{color:rgb(216, 232, 255)!important}
+.topbar .progress-label,.topbar .progress-row{color:rgb(220, 239, 231)!important}
+.topbar .progress-bar,.topbar .bar{background-color:rgb(143, 194, 255)!important}
+.hero{background-image:linear-gradient(135deg, rgb(237, 244, 255) 0%, rgb(247, 249, 253) 60%, rgb(255, 255, 255) 100%)!important;border-bottom-color:rgb(219, 229, 241)!important}
+.hero .eyebrow{background-color:rgb(220, 234, 254)!important;color:rgb(35, 71, 119)!important}
+.hero h1{color:rgb(35, 71, 119)!important}
+.hero .lead{color:rgb(104, 115, 134)!important}
+.route:not(.active){border-color:rgb(219, 229, 241)!important;background-color:rgb(255, 255, 255)!important}
+.route.active{border-color:rgb(49, 95, 159)!important;background-color:rgb(237, 244, 255)!important}
+.route strong{color:rgb(35, 71, 119)!important}
+.route span{color:rgb(104, 115, 134)!important}
+.tab:not(.active){color:rgb(104, 115, 134)!important;border-color:rgb(219, 229, 241)!important;background-color:rgb(255, 255, 255)!important}
+.tab.active{background-color:rgb(49, 95, 159)!important;border-color:rgb(49, 95, 159)!important;color:rgb(255, 255, 255)!important}
+.panel{border-color:rgb(219, 229, 241)!important;box-shadow:rgba(49, 95, 159, 0.1) 0px 14px 38px 0px!important}
+.panel h2{color:rgb(35, 71, 119)!important}
+.panel .instruction{color:rgb(104, 115, 134)!important}
+.panel .section-card{border-color:rgb(219, 229, 241)!important}
+.btn:not(.secondary){background-color:rgb(49, 95, 159)!important}
+.btn.secondary{color:rgb(35, 71, 119)!important;border-color:rgb(219, 229, 241)!important}
+.pill{background-color:rgb(237, 244, 255)!important;color:rgb(35, 71, 119)!important}
+
+/* Writing fields: the pages are always light, so dark system themes must not turn text white on white. */
+:root{color-scheme:light}
+.panel textarea,.panel select,.panel input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=hidden]){color:#172033!important;background-color:#fff!important;caret-color:#172033}
+.panel textarea::placeholder,.panel input::placeholder{color:#687386!important;opacity:1}

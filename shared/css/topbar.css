@@ -383,3 +383,9 @@ header.course-header,
 .ls-dropdown {
   min-width: 250px;
 }
+
+/* Phone fix: let the title wrap under the links instead of widening the page */
+@media (max-width:760px){
+  .topbar .brand{flex-wrap:wrap!important;row-gap:6px!important}
+  .topbar .brand-title,.topbar .lp-title,.topbar .brand>.lp-title{flex:1 1 150px!important;min-width:0!important;white-space:normal!important}
+}

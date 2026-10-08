@@ -172,7 +172,24 @@
 #speak .speaking-card,#speak .recorder-card,#speak .speech-transcript{background:#fbfdff}
 #speak .prompt,#speak .model-part,#speak .model-part:nth-child(even){background:#f3f7fc;border-color:#c5d8ef}
 #speak .recorder-status{padding:10px 12px;border-radius:11px;background:#f4f7fb;color:#5e6f86;border:1px solid var(--line)}
+
+/* Phone fix: let the title wrap under the links instead of widening the page */
+@media (max-width:760px){
+  .topbar .brand{flex-wrap:wrap!important;row-gap:6px!important}
+  .topbar .brand-title,.topbar .lp-title,.topbar .brand>.lp-title{flex:1 1 150px!important;min-width:0!important;white-space:normal!important}
+}
+html,body{overflow-x:clip}
+
+/* Tablet/small laptop: put the dropdown on its own row before it collides with the title */
+@media (max-width:1180px){
+  .topbar .toprow{flex-wrap:wrap!important;padding:8px 0!important}
+  .topbar .session-jump,.topbar .jump{order:3!important;width:100%!important;margin-left:0!important}
+  .topbar .session-jump label,.topbar .jump label{display:none!important}
+  .topbar .session-jump select,.topbar .jump select{width:100%!important;max-width:none!important}
+  .topbar .progress-shell,.topbar .progress{margin-left:auto!important}
+}
 </style>
+<link rel="stylesheet" href="../../shared/css/lp-theme-4eso.css">
 </head>
 <body>
   <div class="topbar"><div class="wrap toprow">
@@ -822,6 +839,19 @@ if(sessionAccessSelect&&sessionAccessGo){
     if(target&&target!=='#') window.location.href=target;
   });
 }
+</script>
+<script src="../../shared/js/section-next.js"></script>
+<script>
+sectionNext.init({level:()=>level,panels:[
+ {id:'cards',done:()=>!!ls().done.cards,detail:ca=>(ca?'Marca totes les targetes com a conegudes (':'Mark every card as known (')+ls().known.length+'/'+levels[level].cards.length+').'},
+ {id:'practice',done:()=>{const d=ls().done;return !!(d.evening&&d.compare&&d.organise)},detail:ca=>{const d=ls().done;return sectionNext.list(ca,[[d.evening,'Completa les expressions','Complete the expressions'],[d.compare,'Compara','Compare'],[d.organise,'Organitza','Organise']])}},
+ {id:'listen',done:()=>!!ls().done.listen,detail:ca=>ca?'Comprova el listening i encerta-ho gairebé tot.':'Check your listening answers (at most one mistake).'},
+ {id:'read',done:()=>!!ls().done.read,detail:ca=>ca?'Comprova el reading i encerta-ho gairebé tot.':'Check your reading answers (at most one mistake).'},
+ {id:'write',done:()=>!!ls().done.write,detail:ca=>ca?'Revisa el text amb els punts de la llista.':'Check your text against the listed points.'}
+]});
+sectionNext.undo({button:document.getElementById('finishWriting'),level:()=>level,isDone:()=>!!ls().done.write,undo:()=>{delete ls().done.write;$('#writeResult').classList.remove('show');save()}});
+sectionNext.undo({button:document.getElementById('finishSpeak'),level:()=>level,isDone:()=>!!ls().done.speak,undo:()=>{delete ls().done.speak;$('#speakResult').classList.remove('show');save()}});
+sectionNext.final({id:'speak',level:()=>level,done:()=>!!ls().done.speak,detail:ca=>ca?'Escriu el pla i prem el botó per comprovar-lo.':'Write your plan and use the button to check it.'});
 </script>
 </body>
 </html>

@@ -15,7 +15,8 @@
 .particle{background:var(--soft2);color:var(--dark);border-radius:6px;padding:2px 5px}
 .object{text-decoration:underline;text-underline-offset:4px}
 @media(max-width:760px){.mini-card input,.mini-card select{min-width:0}}
-</style></head><body>
+</style><link rel="stylesheet" href="../../shared/css/lp-theme-2eso.css">
+</head><body>
 <div class="topbar"><div class="wrap toprow">
   <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← My Real Routine</a><span class="brand-mark">4</span><span class="brand-title">Present Simple<small>2 ESO · My Real Routine · Learning Path 4</small></span></div>
   <div class="session-jump">
@@ -750,4 +751,10 @@ $$('.tab').forEach(b=>b.onclick=()=>{$$('.tab,.panel').forEach(x=>x.classList.re
 $('#productionText').oninput=()=>{routeState().production=$('#productionText').value;routeState().done.produce=false;$('#productionFeedback').textContent='';save()};$('#checkProduction').onclick=checkProduction;
 $('#resetRoute').onclick=()=>{if(confirm(level==='insecure'?'Vols reiniciar només aquesta ruta de gramàtica?':'Reset only this grammar route?')){delete stored[level];render();save()}};
 $('#sessionJump').onchange=e=>{if(e.target.value)location.href=e.target.value};render();
-</script></body></html>
+</script><script src="../../shared/js/section-next.js"></script>
+<script>
+sectionNext.init({level:()=>level,panels:['recognise','controlled','transform','edit','produce'].map(id=>({id,done:()=>!!routeState().done[id],detail:ca=>ca?'Comprova cada resposta fins que totes siguin correctes.':'Check each answer until all are correct.'}))});
+sectionNext.undo({button:document.getElementById('checkProduction'),level:()=>level,isDone:()=>!!routeState().done.produce,undo:()=>{routeState().done.produce=false;document.getElementById('productionFeedback').textContent='';save()}});
+sectionNext.final({id:'selfcheck',level:()=>level,done:()=>!!routeState().done.selfcheck,detail:ca=>ca?'Comprova cada resposta fins que totes siguin correctes.':'Check each answer until all are correct.'});
+</script>
+</body></html>

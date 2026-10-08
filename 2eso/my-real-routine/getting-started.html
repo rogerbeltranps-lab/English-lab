@@ -28,6 +28,7 @@
 #speak .record-box{background:transparent;border:0;padding:0;display:grid;gap:12px}
 #speak .record-status{padding:10px 12px;border-radius:11px;background:#f4f8f6;color:#52665e;border:1px solid var(--line)}
 </style>
+<link rel="stylesheet" href="../../shared/css/lp-theme-2eso.css">
 </head>
 <body>
 <div class="topbar"><div class="wrap toprow">
@@ -355,6 +356,16 @@ if(sessionAccessSelect&&sessionAccessGo){
     if(target&&target!=='#') window.location.href=target;
   });
 }
+</script>
+<script src="../../shared/js/section-next.js"></script>
+<script>
+sectionNext.init({level:()=>level,panels:[
+ {id:'quick',done:()=>!!state.done.quick,detail:ca=>ca?'Prem «Ja he triat ✓».':'Press “Done ✓”.'},
+ {id:'listen',done:()=>!!state.done.listen,detail:ca=>ca?'Comprova el listening i encerta-ho gairebé tot.':'Check your listening answers (at most one mistake).'},
+ {id:'read',done:()=>!!state.done.read,detail:ca=>ca?'Comprova el reading i encerta-ho gairebé tot.':'Check your reading answers (at most one mistake).'}
+]});
+sectionNext.undo({button:document.getElementById('finishQuick'),level:()=>level,isDone:()=>!!state.done.quick,undo:()=>{delete state.done.quick;save();document.getElementById('quickResult').classList.remove('show')}});
+sectionNext.final({id:'speak',level:()=>level,done:()=>!!state.done.speak,detail:ca=>ca?'Grava el teu àudio i atura la gravació.':'Record your audio and stop the recording.'});
 </script>
 </body>
 </html>
