@@ -540,7 +540,7 @@ No inventis errors que no puguis sentir. No facis una nota numèrica.`;
     }
     function openChatGPTWithPrompt(prompt){
       const url='https://chatgpt.com/?prompt='+encodeURIComponent(prompt);
-      const win=window.open(url,'_blank','noopener,noreferrer');
+      const win=window.open(url,'_blank');if(win)win.opener=null;
       return !!win;
     }
 
@@ -819,7 +819,7 @@ ${text}
     // especially when this HTML is opened from file://.
     function sendWritingToChatGPT(prompt){
       const url='https://chatgpt.com/?prompt='+encodeURIComponent(prompt);
-      const win=window.open(url,'_blank','noopener,noreferrer');
+      const win=window.open(url,'_blank');if(win)win.opener=null;
       return !!win;
     }
     function reviewEvening(finish){const text=$('#writingText').value.trim(),result=$('#writingFeedback');result.replaceChildren();result.classList.add('show');addText(result,'h3','4 · Check your writing');if(!text){addText(result,'p',level==='insecure'?'Escriu primer la teva rutina en anglès. Mira les frases practicades i el pla si necessites ajuda.':'Write your routine first. Use the practice sentences and your plan if you need help.');return}const assessment=eveningChecks(text,level);addText(result,'p',level==='insecure'?'Obrint ChatGPT amb el text i les instruccions de la tasca…':'Opening ChatGPT with your writing and the task instructions…');const list=addText(result,'ul','');assessment.checks.forEach(([ok,label])=>addText(list,'li',(ok?'✓ ':'○ ')+label));const prompt=buildAiWritingPrompt(text);const opened=sendWritingToChatGPT(prompt);addText(result,'p',opened?(level==='insecure'?'ChatGPT s’ha obert amb el text. Prem Envia si la petició no s’envia automàticament.':'ChatGPT has opened. With Send to ChatGPT installed, the prompt should be sent automatically.'):(level==='insecure'?'El navegador ha bloquejat la pestanya. Permet finestres emergents per aquesta pàgina i torna-ho a provar.':'The browser blocked the new tab. Allow pop-ups for this page and try again.'),'teacher-check');if(finish){setSessionWriting(text);const pass=assessment.checks.every(x=>x[0]);if(pass)complete('write');else{delete ls().done.write;save()}$('#writeResult').textContent=pass?(level==='insecure'?'L’esborrany compleix els punts comprovats. Utilitza el feedback per revisar les frases.':'Your draft meets the task requirements. Use the AI feedback to make your final corrections.'):(level==='insecure'?'L’esborrany està desat. Revisa els punts amb ○: indiquen què falta. Millora el text abans de tornar a comprovar-lo.':'Your draft is saved. Check the points marked ○ and use the AI feedback to revise it.');$('#writeResult').classList.add('show')}}
