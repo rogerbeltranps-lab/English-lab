@@ -602,13 +602,13 @@ No inventis errors que no puguis sentir. No facis una nota numèrica.`;
       $('#modelParts').replaceChildren();
       if(level==='insecure'){
         const model=[
-          ['🏠 A casa','After school, I get home at ','time','Exemple: 5:00'],
-          ['🍎 Menjar','Then, I eat ','food','Exemple: a snack'],
-          ['📚 Deures','After that, I do my homework at ','homeworkTime','Exemple: 6:00'],
-          ['🌙 Nit','Finally, I wind down with ','relax','Exemple: music'],
-          ['🌙 Dormir','I turn in at ','bedtime','Exemple: 10:00']
+          ['🏠 A casa','After school, I get home at ','time','Pista: una hora'],
+          ['🍎 Menjar','Then, I eat ','food','Pista: comença per «s»'],
+          ['📚 Deures','After that, I do my homework at ','homeworkTime','Pista: una hora'],
+          ['🌙 Nit','Finally, I wind down with ','relax','Pista: comença per «m»'],
+          ['🌙 Dormir','I turn in at ','bedtime','Pista: una hora']
         ];
-        model.forEach(([title,before,name,ph])=>{const card=addText($('#modelParts'),'div','', 'model-part');addText(card,'strong',title,'guide-label');const line=addText(card,'p','', 'model-fill-line');line.appendChild(document.createTextNode(before));const input=document.createElement('input');input.type='text';input.className='mini-fill';input.placeholder=ph.replace('Exemple: ','');input.setAttribute('aria-label',title);line.appendChild(input);line.appendChild(document.createTextNode('.'));addText(card,'small',ph,'cat-label')});
+        model.forEach(([title,before,name,ph])=>{const card=addText($('#modelParts'),'div','', 'model-part');addText(card,'strong',title,'guide-label');const line=addText(card,'p','', 'model-fill-line');line.appendChild(document.createTextNode(before));const input=document.createElement('input');input.type='text';input.className='mini-fill';input.placeholder=ph.includes('«')?ph.match(/«(.)»/)[1]+'…':'hora';input.setAttribute('aria-label',title);line.appendChild(input);line.appendChild(document.createTextNode('.'));addText(card,'small',ph,'cat-label')});
         $('#modelCount').textContent='Completa només els espais. Aquest model t’ajuda a veure l’ordre del text.';
       }else{
         d.parts.forEach(([title,text])=>{const card=addText($('#modelParts'),'div','', 'model-part');addText(card,'strong',title,'guide-label');const p=addText(card,'p','');addHighlightedText(p,text)});
