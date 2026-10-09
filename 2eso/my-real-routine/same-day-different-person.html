@@ -226,7 +226,7 @@ const levels={
 };
 const patterns=[['wake up','wakes up'],['get up','gets up'],['head out','heads out'],['have','has'],['go','goes'],['do','does'],['watch','watches']];
 const supportHints={"l": ["La Mia diu seven: es desperta a les 7:00.", "Get up és sortir del llit: ho fa a les 7:15, després de despertar-se.", "Heads out at eight vol dir que surt a les 8:00.", "Half past four correspon a les 4:30.", "Diu wind down with music: es relaxa amb música.", "Turn in at ten vol dir que va a dormir a les 10:00."], "r": ["El text situa gets home at half past four a la rutina de la Mia.", "El text situa gets home at five a la rutina d’en Leo.", "En Leo mira a short show per relaxar-se.", "La Mia utilitza music per relaxar-se; no confonguis les dues persones.", "En Leo va a dormir abans que la Mia: compara les dues hores.", "Tots dos diuen sometimes sleep in; no passa cada dia."]};
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],shuffle=a=>[...a].sort(()=>Math.random()-.5);
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],shuffle=a=>{const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r};
 let level=localStorage.getItem('s2SameDayLevel')||'insecure',cardIndex=0;
 const state=JSON.parse(localStorage.getItem('s2SameDayState')||'{}');
 function ls(){state[level]=state[level]||{done:{},known:[],speaking:'',plan:[]};return state[level]}

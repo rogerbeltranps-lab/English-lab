@@ -282,7 +282,7 @@ const listening={
  ]
 };
 const supportHints={"l": ["Al principi, Anna vol menjar perquè té gana: hungry.", "Ashley li diu que vagi al supermercat Giant.", "Al supermercat veu lots of fruits and vegetables.", "Fixa’t en Junky, no Healthy: vol ice cream a la secció de congelats.", "Healthy recomana whole wheat bread: pa integral, no donuts.", "Al final compra menjar saludable i una mica de junk food; no tria només un extrem."], "r": ["Every morning acompanya has breakfast: esmorza cada matí.", "Takes a bottle of water indica què porta a l’escola.", "At break time, eats fruit indica l’aliment i el moment.", "On foot vol dir a peu; twice a week indica la freqüència.", "El text diu plays volleyball on Friday.", "In the evening introdueix takes a short break from screens; no utilitza pantalles tota la nit."]};
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],shuffle=a=>[...a].sort(()=>Math.random()-.5);
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],shuffle=a=>{const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r};
 let level=localStorage.getItem('healthyHabitsLevel2ESO')||'insecure',cardIndex=0,selectedMatch=null,matched=0,currentMatchExpressions=[],currentMatchTotal=0,built=[],practiceSet=0,recordBlob=null,recordUrl=null;
 const allState=JSON.parse(localStorage.getItem('healthyHabitsState2ESO')||'{}');
 function state(){const s=allState[level]=allState[level]||{};s.done=s.done||{};s.known=s.known||[];s.practiceSeen=s.practiceSeen||[];return s}
@@ -354,7 +354,7 @@ function renderMatch(){
  const chosen=rounds[index];
  if(!chosen.every(x=>deck().some(v=>v.expression===x[2]))||!isClearMatchRound(chosen))throw new Error('Invalid curated matching round');
  currentMatchTotal=chosen.length;
- const items=chosen.map(([l,r])=>({l,r}));drawMatch(shuffle(items),'#matchLeft','l','left');drawMatch(shuffle(items),'#matchRight','r','right');
+ const items=chosen.map(([l,r])=>({l,r}));const leftOrder=shuffle(items);let rightOrder=shuffle(items),tries=0;while(tries++<50&&leftOrder.filter((x,i)=>currentMatchExpressions.includes(normaliseMatchText(`${x.l} ${rightOrder[i].r}`))).length>1)rightOrder=shuffle(items);drawMatch(leftOrder,'#matchLeft','l','left');drawMatch(rightOrder,'#matchRight','r','right');
 }
 function drawMatch(items,sel,key,side){const el=$(sel);el.innerHTML='';items.forEach(x=>{const b=document.createElement('button');b.className='match-card';b.textContent=x[key];b.dataset.value=x[key];b.onclick=()=>pickMatch(b,side);el.appendChild(b)})}
 function pickMatch(btn,side){if(btn.classList.contains('matched'))return;if(!selectedMatch){selectedMatch={btn,side};btn.classList.add('selected');return}if(selectedMatch.side===side){selectedMatch.btn.classList.remove('selected');selectedMatch={btn,side};btn.classList.add('selected');return}const left=side==='right'?selectedMatch.btn:btn;const right=side==='right'?btn:selectedMatch.btn;const candidate=normaliseMatchText(`${left.dataset.value} ${right.dataset.value}`);if(currentMatchExpressions.includes(candidate)){
