@@ -402,21 +402,21 @@ function addWord(i,j,b){if(built[i].includes(j))return;built[i].push(j);b.classL
 $('#checkBuilders').onclick=()=>{let score=0;levelInfo[level].builders.forEach((s,i)=>{const ans=built[i].map(j=>s[j]).join(' '),correct=s.join(' '),f=$$('.build-item .feedback')[i];f.textContent=learningSupport.order(level,ans===correct,correct);f.className='feedback '+(ans===correct?'ok':'no');if(ans===correct)score++});$('#builderResult').textContent=`${score} / ${levelInfo[level].builders.length} correct`;$('#builderResult').classList.add('show');if(score===levelInfo[level].builders.length)complete('build')};$('#resetBuilders').onclick=renderBuilders;
 
 let guideStep=0,guideDim=false;
-function writeGuideData(){const d=levelInfo[level],ca=level==='insecure';const w=`${d.minWords}–${d.maxWords}`;
-  if(ca)return[
-    {t:'1 Prepara\'t',d:'Mirem el model entre tots i trobem les expressions treballades i els connectors.',q:'Quines expressions treballades veieu al model? Quin connector hi ha?'},
-    {t:'2 Planifica',d:'Escrivim només notes curtes: una acció i una hora per cada apartat.',q:'Quina acció i quina hora posaries a “Menjar i aigua”?'},
-    {t:'3 Escriu',d:`Convertim les notes en frases completes en anglès: ${w} paraules. Mirem la llista de requisits abans de començar.`,q:'Quants requisits té la llista? Els podeu dir amb les vostres paraules?'},
-    {t:'4 Comprova',d:'Repassem la llista i, quan estigueu preparats, premem “Corregeix amb IA”. Llegim el perquè de cada correcció i millorem una frase.',q:'Quina frase millorareu primer?'}];
+function writeGuideData(){const d=levelInfo[level],w=`${d.minWords}–${d.maxWords}`;
+  if(level==='insecure')return[
+    {t:'1 Prepara\'t',d:'Llegeix el model i fixa\'t en les expressions treballades i els connectors. Després mira «Sentence starter» i «Useful language».',q:'Quines expressions treballades veus al model? Quin connector hi ha?'},
+    {t:'2 Planifica',d:'Escriu només notes curtes: una acció i una hora a cada requadre.',q:'Tens una acció i una hora a cada requadre?'},
+    {t:'3 Escriu',d:`Converteix les notes en frases completes en anglès: ${w} paraules. Llegeix la llista de requisits abans de començar.`,q:'Has fet servir he o she i les expressions que demana la llista?'},
+    {t:'4 Comprova',d:'Repassa la llista. Quan estiguis preparat o preparada, prem «Corregeix amb IA», llegeix el perquè de cada correcció i millora una frase.',q:'Quina frase has millorat?'}];
   return[
-    {t:'1 Get ready',d:'Read the model together and spot the studied expressions and connectors.',q:level==='safe'?'Which target expressions and connectors can you find in the model?':'What makes the model work? Which expressions would you reuse?'},
-    {t:'2 Plan',d:'Write short notes only: one idea for each part of the plan.',q:level==='safe'?'What is one action and one reason for the first plan box?':'Which ideas will you compare, and why?'},
-    {t:'3 Write',d:`Turn your notes into full sentences: ${w} words. Check the requirements list before you start.`,q:'Which requirements can you already see in your plan?'},
-    {t:'4 Check',d:'Tick off the checklist, then press “Correct with AI”. Read the explanations and improve one sentence.',q:'Which sentence will you improve first?'}];
+    {t:'1 Get ready',d:'Read the model and spot the studied expressions and connectors. Then look at the sentence starter and useful language.',q:level==='safe'?'Can you find target expressions and connectors in the model?':'What makes the model work? Which expressions will you reuse?'},
+    {t:'2 Plan',d:'Write short notes only: one idea in each plan box.',q:level==='safe'?'Does each box have an action and a reason?':'Which ideas will you compare, and why?'},
+    {t:'3 Write',d:`Turn your notes into full sentences: ${w} words. Check the requirements list as you write.`,q:'Does your text meet every point on the list?'},
+    {t:'4 Check',d:'Tick off the checklist, then press “Correct with AI”. Read the explanations and improve one sentence.',q:'Which sentence did you improve?'}];
 }
 function renderWriteGuide(){const g=writeGuideData(),s=g[guideStep],ca=level==='insecure',st=state();st.guide=st.guide||{};
   const cards=[...document.querySelectorAll('#writing>.section-card:not(.class-guide)')];
-  $('#writeGuide').innerHTML=`<h3>${ca?'Guia per a la classe':'Class guide'}</h3><div class="guide-steps">${g.map((x,i)=>`<button type="button" class="guide-step${i===guideStep?' active':''}${st.guide[i]?' done':''}" data-i="${i}">${x.t}</button>`).join('')}</div><div class="guide-body"><p class="big">${s.t}</p><p>${s.d}</p><p class="guide-ask"><b>${ca?'Pregunta a la classe:':'Ask the class:'}</b> ${s.q}</p></div><div class="actions" style="margin-top:12px"><button type="button" class="btn secondary small" id="guidePrev"${guideStep===0?' disabled':''}>${ca?'Enrere':'Back'}</button><button type="button" class="btn small" id="guideNext">${guideStep===g.length-1?(ca?'Fet':'Done'):(ca?'Fet, següent pas':'Done, next step')}</button><button type="button" class="btn secondary small" id="guideFocus">${guideDim?(ca?'Mostra tots els passos':'Show all steps'):(ca?'Destaca aquest pas':'Highlight this step')}</button></div>`;
+  $('#writeGuide').innerHTML=`<h3>${ca?'Com fer aquesta secció':'How to do this section'}</h3><div class="guide-steps">${g.map((x,i)=>`<button type="button" class="guide-step${i===guideStep?' active':''}${st.guide[i]?' done':''}" data-i="${i}">${x.t}</button>`).join('')}</div><div class="guide-body"><p class="big">${s.t}</p><p>${s.d}</p><p class="guide-ask"><b>${ca?'Comprova-ho tu mateix o mateixa:':'Check yourself:'}</b> ${s.q}</p></div><div class="actions" style="margin-top:12px"><button type="button" class="btn secondary small" id="guidePrev"${guideStep===0?' disabled':''}>${ca?'Enrere':'Back'}</button><button type="button" class="btn small" id="guideNext">${guideStep===g.length-1?(ca?'Fet':'Done'):(ca?'Fet, següent pas':'Done, next step')}</button><button type="button" class="btn secondary small" id="guideFocus">${guideDim?(ca?'Mostra tots els passos':'Show all steps'):(ca?'Centra\'m en aquest pas':'Focus on this step')}</button></div>`;
   cards.forEach((c,i)=>c.classList.toggle('guide-focus',guideDim&&i===guideStep));
   $('#writing').classList.toggle('guide-dim',guideDim);
   $$('#writeGuide .guide-step').forEach(b=>b.onclick=()=>{guideStep=+b.dataset.i;renderWriteGuide();scrollGuideCard()});
