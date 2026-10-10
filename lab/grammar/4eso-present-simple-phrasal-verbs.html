@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#315f9f">
+<link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png">
+<title>4 ESO · Present Simple &amp; Phrasal verbs · Grammar deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Layout: full-screen projector deck in the 4 ESO blue. Top rail of numbered stops, one slide on stage, big prev/next at the bottom.
+   Colour code on every slide: subject, do/does, main verb, -s ending, particle (shaded), object (underlined), frequency word. */
+:root{
+  --bg:#f3f6fb; --surface:#ffffff; --ink:#172033; --muted:#5f6b80; --line:#dbe5f1;
+  --accent:#315f9f; --accent-dark:#234777; --accent-ink:#ffffff; --soft:#edf4ff;
+  --subj:#2457a6; --aux:#a3560f; --verb:#12704e; --end:#b2380f; --end-bg:#ffdccc; --adv:#7236aa; --wh:#a0205e;
+  --part:#234777; --part-bg:#dceafe; --obj:#a0205e;
+  --ok:#17784a; --ok-bg:#d9f1e3; --no:#b3261e; --no-bg:#fbe0dc;
+  --f-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Lexend","Segoe UI",system-ui,sans-serif;
+  --fs:clamp(16px, .85vw + 8px, 26px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1420; --surface:#161f2e; --ink:#e4eaf5; --muted:#9aa8bf; --line:#283548;
+  --accent:#7fa7e6; --accent-dark:#a9c4f0; --accent-ink:#0b1220; --soft:#1b2840;
+  --subj:#86acff; --aux:#f2aa63; --verb:#5fd6a6; --end:#ffb79c; --end-bg:#5a2614; --adv:#c79dff; --wh:#ff8abb;
+  --part:#d6e4ff; --part-bg:#2b3f66; --obj:#ff8abb;
+  --ok:#6fdca4; --ok-bg:#16392a; --no:#ff9b91; --no-bg:#46201c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1420; --surface:#161f2e; --ink:#e4eaf5; --muted:#9aa8bf; --line:#283548;
+  --accent:#7fa7e6; --accent-dark:#a9c4f0; --accent-ink:#0b1220; --soft:#1b2840;
+  --subj:#86acff; --aux:#f2aa63; --verb:#5fd6a6; --end:#ffb79c; --end-bg:#5a2614; --adv:#c79dff; --wh:#ff8abb;
+  --part:#d6e4ff; --part-bg:#2b3f66; --obj:#ff8abb;
+  --ok:#6fdca4; --ok-bg:#16392a; --no:#ff9b91; --no-bg:#46201c; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{height:100%}
+body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:400 var(--fs)/1.5 var(--f-body)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default;opacity:.4}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+a{color:var(--accent)}
+
+/* chrome */
+.top{display:flex;align-items:center;gap:.8em;padding:.45em 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{font:800 1em/1 var(--f-display);white-space:nowrap;letter-spacing:-.01em}
+.brand small{display:block;font:500 .6em/1.4 var(--f-body);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.rail{display:flex;gap:.3em;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none;padding:.15em}
+.rail::-webkit-scrollbar{display:none}
+.rail button{flex:0 0 auto;min-width:2em;height:2em;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font:600 .72em var(--f-body);font-variant-numeric:tabular-nums}
+.rail button.seen{color:var(--ink)}
+.rail button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.back-lab{display:inline-flex;align-items:center;justify-content:center;width:2em;height:2em;border-radius:999px;border:1px solid var(--line);color:var(--accent);text-decoration:none;font-weight:700;flex:0 0 auto}
+.tbtn{border:1px solid var(--line);background:transparent;border-radius:999px;padding:.3em .8em;font:600 .72em var(--f-body);white-space:nowrap}
+.tbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stage{flex:1;overflow:auto;padding-inline:16px}
+.bottom{display:flex;align-items:center;justify-content:space-between;gap:1em;padding:.45em 16px calc(.45em + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
+#where{font-size:.75em;color:var(--muted);text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.navbtn{border:0;border-radius:12px;padding:.5em 1.2em;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+.navbtn.back{background:transparent;color:var(--accent);border:1px solid var(--line)}
+
+/* slides */
+.slide{display:none;max-width:1180px;margin-inline:auto;padding-block:1.3em 2.4em}
+.slide.on{display:block}
+.eyebrow{font-size:.7em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 .3em}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.015em}
+h2{font-size:2.3em;line-height:1.05;font-weight:800;margin-bottom:.4em}
+h3{font-size:1.15em;font-weight:600;margin-bottom:.2em}
+p{margin:0}
+.lead{font-size:1.1em;color:var(--muted);max-width:42em}
+.stack{display:flex;flex-direction:column;gap:1.1em}
+.row{display:flex;flex-wrap:wrap;gap:.6em;align-items:center}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:1.6em;align-items:start}
+.cols>*{min-width:0}
+.cols.even{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+@media (max-width:860px){.cols,.cols.even{grid-template-columns:minmax(0,1fr)}}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8em}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8em}
+@media (max-width:760px){.grid3,.grid2{grid-template-columns:minmax(0,1fr)}}
+
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:.45em 1em;font:600 .82em var(--f-body);text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;color:var(--accent);border-color:var(--line)}
+.yg{display:inline-flex;align-items:center;gap:.4em;border-radius:999px;padding:.3em .8em;font:600 .75em var(--f-body);text-decoration:none;background:var(--ink);color:var(--bg)}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.3em .8em;font:500 .8em var(--f-body);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+[data-k="s"] .chip[aria-pressed="true"]{background:var(--subj);border-color:var(--subj);color:var(--surface)}
+[data-k="v"] .chip[aria-pressed="true"]{background:var(--verb);border-color:var(--verb);color:var(--surface)}
+[data-k="o"] .chip[aria-pressed="true"],[data-k="pos"] .chip[aria-pressed="true"]{background:var(--obj);border-color:var(--obj);color:var(--surface)}
+.chips{display:flex;flex-wrap:wrap;gap:.35em}
+
+/* grammar colours */
+.sent{font:700 1.9em/1.35 var(--f-display);letter-spacing:-.01em;text-wrap:balance}
+.subj{color:var(--subj)} .aux{color:var(--aux)} .verb{color:var(--verb)} .adv{color:var(--adv)} .wh{color:var(--wh)}
+.end{background:var(--end-bg);color:var(--end);border-radius:.15em;padding:0 .05em}
+.part{background:var(--part-bg);color:var(--part);border-radius:.22em;padding:0 .14em}
+.prep{color:var(--part);border-bottom:.09em dashed var(--part);padding:0 .06em}
+.obj{color:var(--obj);text-decoration:underline;text-decoration-thickness:.07em;text-underline-offset:.16em}
+.legend{display:flex;flex-wrap:wrap;gap:.4em 1.1em;font-size:.78em;font-weight:600}
+.legend span{display:inline-flex;align-items:center;gap:.4em}
+.legend i{width:.8em;height:.8em;border-radius:3px;display:inline-block;background:currentColor}
+
+/* rule panels */
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1em 1.2em;display:flex;flex-direction:column;gap:.7em}
+.rule.key{border:2px solid var(--accent)}
+.formula{font:600 1.15em/1.35 var(--f-display);display:flex;flex-wrap:wrap;gap:.2em .45em;align-items:baseline}
+.formula .op{color:var(--muted);font-weight:600}
+.small{font-size:.82em;color:var(--muted)}
+.ca{display:none;background:var(--soft);border-radius:10px;padding:.55em .85em;font-size:.86em}
+.ca::before{content:"CA";font-size:.7em;font-weight:600;letter-spacing:.1em;color:var(--accent);margin-right:.6em}
+:root.ca-on .ca{display:block}
+.tag{font-size:.68em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.why{color:var(--muted);font-size:.95em}
+
+/* cover */
+.cover{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:2em;align-items:center;min-height:62vh}
+.cover>*{min-width:0}
+@media (max-width:860px){.cover{grid-template-columns:minmax(0,1fr);min-height:0}}
+.cover h1{font-size:4.2em;line-height:.95;font-weight:800}
+.cover .sub{font-size:1.05em;color:var(--muted);margin-top:.8em}
+.clockcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.1em 1.3em;display:flex;flex-direction:column;gap:.6em}
+.clockcard .ln{display:flex;gap:.9em;align-items:baseline;font-size:1.05em}
+.clockcard time{font:600 1em var(--f-display);color:var(--muted);font-variant-numeric:tabular-nums;min-width:3.2em}
+.keys{font-size:.75em;color:var(--muted)}
+kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 .35em;background:var(--surface)}
+
+/* reveal cards */
+.board{font:800 2.6em/1.1 var(--f-display);text-align:center;padding:.6em .4em;border:2px dashed var(--line);border-radius:18px;background:var(--surface)}
+.board .arrow{color:var(--muted);font-weight:600}
+.rcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1em 1.1em;display:flex;flex-direction:column;gap:.55em;min-width:0}
+.rcard .big{font:800 1.6em/1.15 var(--f-display)}
+.rcard [data-reveal]{display:none}
+.rcard.open [data-reveal]{display:block}
+.rcard.open{border-color:var(--accent)}
+.answer{background:var(--soft);border-radius:10px;padding:.6em .8em}
+
+/* machine */
+.machine{display:flex;flex-direction:column;gap:.9em}
+.out-wrap{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1em 1.2em;min-height:5.4em;display:flex;flex-direction:column;justify-content:center;gap:.5em}
+.out-wrap.bad{background:var(--no-bg);border-color:var(--no)}
+.out{transition:filter .25s}
+.covered .out,.covered .verdict{filter:blur(.42em);user-select:none}
+.cover-btn{display:none;position:absolute;inset:0;border:0;background:transparent;font:600 .85em var(--f-body);color:var(--ink)}
+.covered .cover-btn{display:flex;align-items:center;justify-content:center}
+.cover-btn span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.4em 1em}
+.verdict{font-size:.88em;font-weight:500}
+.verdict b.g{color:var(--ok)} .verdict b.r{color:var(--no)}
+.ptype{display:inline-block;font:600 .7em var(--f-body);letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:.2em .7em;background:var(--soft);color:var(--accent)}
+.answers{display:flex;flex-wrap:wrap;gap:.5em;align-items:center}
+.answers .sa{font:700 1.25em var(--f-display)}
+.ctrl{display:grid;grid-template-columns:5.6em minmax(0,1fr);gap:.6em;align-items:start}
+.ctrl .lab{font-size:.68em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:.55em}
+@media (max-width:560px){.ctrl{grid-template-columns:minmax(0,1fr)}.ctrl .lab{padding-top:0}}
+
+/* object finder & classify */
+.finder{display:flex;flex-direction:column;gap:.6em}
+.frow{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.6em 1em;display:flex;flex-direction:column;gap:.3em}
+.frow .sent{font-size:1.45em}
+.frow.done{border-color:var(--ok)}
+.word{border:0;background:transparent;padding:0 .06em;border-radius:.2em;font:inherit;color:inherit;letter-spacing:inherit}
+.word:hover{background:var(--soft)}
+.word.objhit{color:var(--obj);text-decoration:underline;text-underline-offset:.16em;background:var(--soft)}
+.word.hit{color:var(--no);text-decoration:line-through;background:var(--no-bg)}
+.word.miss{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-.12em)}75%{transform:translateX(.12em)}}
+.nobj{border:1px dashed var(--muted);background:transparent;border-radius:999px;padding:.15em .7em;font:600 .4em var(--f-body);vertical-align:middle;margin-left:.4em;color:var(--muted)}
+.nobj.right{border-style:solid;border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
+.ffb{font-size:.85em;min-height:1.3em}
+.ffb.good{color:var(--ok)} .ffb.bad{color:var(--no)}
+.ccard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.8em 1em;display:flex;flex-direction:column;gap:.5em;min-width:0}
+.ccard .sent{font-size:1.3em}
+.ccard .row .opt{flex:1 1 9em}
+
+.pparts{display:none;flex-wrap:wrap;gap:.5em;align-items:flex-start}
+.pblock{display:inline-flex;flex-direction:column;align-items:center;gap:.15em;font:700 1.3em var(--f-display)}
+.pblock small{font:600 .45em var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ccard.done .pparts{display:flex}
+.ccard.done .pvhead{display:none}
+/* split test */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6em}
+@media (max-width:700px){.tiles{grid-template-columns:minmax(0,1fr)}}
+.tile{display:flex;justify-content:space-between;align-items:center;gap:.6em;text-align:left;font:700 1.25em/1.3 var(--f-display);padding:.6em .9em;border-radius:14px;border:2px solid var(--line);background:var(--surface)}
+.tile .vote{font:600 .55em var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.tile[aria-pressed="true"]{border-color:var(--accent);background:var(--soft)}
+.tile[aria-pressed="true"] .vote{color:var(--accent)}
+.tile.ok{border-color:var(--ok);background:var(--ok-bg)}
+.tile.no{border-color:var(--no);background:var(--no-bg)}
+.tile.ok .vote{color:var(--ok)} .tile.no .vote{color:var(--no)}
+
+/* traps */
+.trap{display:flex;flex-wrap:wrap;align-items:center;gap:.4em 1em;background:var(--no-bg);border-radius:14px;padding:.7em 1em}
+.trap .sent{font-size:1.35em}
+.trap .mark{font:800 1.5em var(--f-display);color:var(--no)}
+.trap.fixed{background:var(--ok-bg)}
+.trap.fixed .mark{color:var(--ok)}
+.trap .right{display:none}
+.trap.fixed .wrong{display:none}
+.trap.fixed .right{display:block}
+.traps{display:flex;flex-direction:column;gap:.5em}
+
+/* phrasal verb cards */
+.pvgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7em}
+@media (max-width:860px){.pvgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.pvgrid{grid-template-columns:minmax(0,1fr)}}
+.pv{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.7em .9em;display:flex;flex-direction:column;gap:.35em;min-width:0}
+.pv .name{all:unset;cursor:pointer;font:800 1.3em/1.15 var(--f-display)}
+.pv .name:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.pv .mean,.pv .ex{display:none}
+.pv.open .mean,.pv.open .ex{display:block}
+.pv.open{border-color:var(--accent)}
+.pv .mean{font-weight:600}
+.pv .pprep{font-size:.82em;color:var(--muted)}
+.pv .ptype,.rule .ptype{align-self:flex-start}
+.pv .pprep b{color:var(--ink)}
+.pv .ex{font:600 .95em/1.35 var(--f-display);color:var(--muted)}
+.pv .cag{display:none;font-size:.78em;color:var(--accent)}
+:root.ca-on .pv.open .cag{display:block}
+.pv .foot{display:flex;justify-content:space-between;align-items:center;gap:.5em;margin-top:auto;padding-top:.3em}
+
+/* carousels & quiz */
+.car-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.7em;align-items:center;margin-bottom:1em}
+.car-nav{display:flex;gap:.5em;align-items:center}
+.count{font-size:.8em;color:var(--muted);font-variant-numeric:tabular-nums;min-width:3.5em;text-align:center}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.2em 1.4em;display:flex;flex-direction:column;gap:.9em}
+.q-prompt{font:700 2em/1.25 var(--f-display);text-wrap:balance}
+.compact .q-prompt{font-size:1.5em}
+.blank{display:inline-block;min-width:2.6em;border-bottom:.07em solid var(--muted);text-align:center;color:var(--aux)}
+.blank.filled{border-color:var(--ok);color:var(--ok)}
+.opts{display:grid;gap:.6em;grid-template-columns:repeat(auto-fit,minmax(min(100%,13em),1fr))}
+.opt{display:flex;gap:.7em;align-items:center;text-align:left;font-size:1.1em;font-weight:500;padding:.6em .9em;border-radius:14px;border:2px solid var(--line);background:var(--bg)}
+.opt .key{font:800 .8em var(--f-display);width:1.8em;height:1.8em;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--soft);flex:0 0 auto}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.no{border-color:var(--no);background:var(--no-bg);text-decoration:line-through}
+.fb{min-height:1.5em;font-size:1em}
+.fb b.g{color:var(--ok)} .fb b.r{color:var(--no)}
+.teams{display:flex;flex-wrap:wrap;gap:.7em;margin-top:1em}
+.teams.six{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5em;margin:0}
+.teams.six .team{flex:none;min-width:0;flex-wrap:wrap;justify-content:space-between;row-gap:.2em}
+.teams.six .team input{flex:1 1 100%;text-align:center}
+.team{display:flex;align-items:center;gap:.5em;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.4em .6em;flex:1 1 14em}
+.team input{flex:1;min-width:0;border:0;background:transparent;font:600 .9em var(--f-body);color:var(--ink)}
+.team .sc{font:800 1.6em var(--f-display);font-variant-numeric:tabular-nums;min-width:1.4em;text-align:center}
+.team button{width:2em;height:2em;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-weight:700}
+mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
+.ans{color:var(--ok)}
+
+/* sort game */
+.game{display:flex;flex-direction:column;gap:.8em}
+.game .board{font-size:3em}
+.game .opts{grid-template-columns:repeat(auto-fit,minmax(min(100%,11em),1fr))}
+.score{font:800 1.1em var(--f-display);font-variant-numeric:tabular-nums}
+
+/* production */
+.tasks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8em}
+@media (max-width:860px){.tasks{grid-template-columns:minmax(0,1fr)}}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1em 1.1em;display:flex;flex-direction:column;gap:.6em;min-width:0}
+.task .model{font:600 1em/1.4 var(--f-display);background:var(--soft);border-radius:10px;padding:.6em .8em}
+.checks{display:flex;flex-direction:column;gap:.5em}
+.checks label{display:flex;gap:.6em;align-items:flex-start;font-size:.95em}
+.checks input{width:1.2em;height:1.2em;margin-top:.2em;accent-color:var(--accent);flex:0 0 auto}
+.timer{display:flex;flex-wrap:wrap;gap:.6em;align-items:center}
+.timer .t{font:800 2.4em/1 var(--f-display);font-variant-numeric:tabular-nums;min-width:3.2em}
+.timer.up .t{color:var(--no)}
+.detect{counter-reset:d}
+.detect .rcard{counter-increment:d}
+.detect .rcard::before{content:counter(d);font:800 1.6em var(--f-display);color:var(--accent)}
+
+/* category tooltip on hover / touch */
+.gtip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:var(--bg);font:600 14px/1.3 var(--f-body);letter-spacing:.02em;padding:.35em .7em;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);white-space:nowrap;max-width:calc(100vw - 16px)}
+.gtip small{display:block;font-weight:500;opacity:.75}
+.gcat{cursor:help}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="back-lab" href="/English-lab/index.html#lab" title="Back to English Lab" aria-label="Back to English Lab">←</a>
+  <div class="brand">Phrasal verbs<small>4 ESO · My Real Routine</small></div>
+  <nav class="rail" id="rail" aria-label="Slides"></nav>
+  <button class="tbtn" id="caBtn" type="button" aria-pressed="false" title="Show Catalan help (C)">Català</button>
+  <button class="tbtn" id="fsBtn" type="button" title="Full screen (F)">Full screen</button>
+</header>
+
+<main class="stage" id="stage">
+
+<section class="slide" data-title="Phrasal verbs">
+  <div class="cover">
+    <div>
+      <p class="eyebrow">Learning Path 4 · Grammar</p>
+      <h1>Present Simple &amp; Phrasal verbs</h1>
+      <p class="sub">Predict, vote, reveal, test, hear real examples and explain the rule.</p>
+      <div class="legend" style="margin-top:1.2em" aria-label="Colour key"><span class="subj"><i></i>subject</span><span class="aux"><i></i>do / does</span><span class="verb"><i></i>verb</span><span><span class="part">particle</span></span><span><span class="prep">preposition</span></span><span><span class="obj">object</span></span></div>
+      <p class="keys" style="margin-top:1.4em">Move with <kbd>←</kbd> <kbd>→</kbd> or the buttons below · <kbd>C</kbd> Catalan help · <kbd>F</kbd> full screen</p>
+    </div>
+    <div class="clockcard" aria-label="An afternoon routine">
+      <p class="eyebrow">Mia, a busy afternoon</p>
+      <p class="ln"><time>17:00</time><span><span class="subj">She</span> <span class="verb">pick<span class="end">s</span></span> <span class="part">up</span> <span class="obj">the kids</span>.</span></p>
+      <p class="ln"><time>17:30</time><span><span class="subj">She</span> <span class="verb">pick<span class="end">s</span></span> <span class="obj">them</span> <span class="part">up</span>.</span></p>
+      <p class="ln"><time>18:00</time><span><span class="subj">She</span> <span class="verb">get<span class="end">s</span></span> <span class="part">down</span> <span class="prep">to</span> <span class="obj">it</span>.</span></p>
+      <p class="ln"><time>21:00</time><span><span class="subj">She</span> <span class="verb">wind<span class="end">s</span></span> <span class="part">down</span>.</span></p>
+      <p class="ln"><time>22:30</time><span><span class="subj">She</span> <span class="verb">turn<span class="end">s</span></span> <span class="part">in</span>.</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Present Simple review">
+  <p class="eyebrow">Warm-up · Present Simple</p>
+  <h2>The routine system</h2>
+  <div class="cols">
+    <div class="stack">
+      <div class="rule">
+        <div class="formula"><span class="subj">I / you / we / they</span><span class="op">+</span><span class="verb">base verb</span><span class="op">· I work.</span></div>
+        <div class="formula"><span class="subj">he / she / it</span><span class="op">+</span><span class="verb">verb<span class="end">-s</span></span><span class="op">· She work<span class="end">s</span>. He watch<span class="end">es</span> TV.</span></div>
+        <div class="formula"><span class="aux">don’t / doesn’t</span><span class="op">+</span><span class="verb">base verb</span><span class="op">· She doesn’t study at night.</span></div>
+        <div class="formula"><span class="aux">Do / Does</span><span class="op">+</span><span class="subj">subject</span><span class="op">+</span><span class="verb">base verb</span><span class="op">…?</span></div>
+        <p class="small">Short answers: <b>Yes, I do. / No, I don’t. · Yes, she does. / No, she doesn’t.</b></p>
+        <p class="small"><b class="adv">always · usually · often · sometimes · never</b> go before the main verb, but after be: <b>She usually studies after school. She is often tired.</b></p>
+      </div>
+      <p class="ca">Amb <b>he / she / it</b>, afegeix -s o -es. Amb doesn’t, el verb principal no porta -s. <b>Never</b> ja vol dir mai: no afegeixis don’t / doesn’t.</p>
+      <p class="small">Need the full review? <a href="/English-lab/lab/grammar/2eso-present-simple.html" id="psLink">Open the complete Present Simple deck</a>.</p>
+    </div>
+    <div class="stack">
+      <h3>Quick check</h3>
+      <div id="psCheck" class="compact"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Notice first">
+  <p class="eyebrow">1 · Notice first</p>
+  <h2>What changes when we add a small word?</h2>
+  <div class="cols even">
+    <div class="stack">
+      <div class="board">turn <span class="arrow">→</span> turn <span class="part">in</span></div>
+      <div class="rcard" data-card>
+        <p><b>What do you think?</b> Does <i>turn in</i> have the same meaning as <i>turn</i>?</p>
+        <div class="row"><button class="btn" type="button" data-open>Reveal meaning</button><a class="yg" target="_blank" rel="noopener" href="https://youglish.com/pronounce/turn%20in/english/us">▶ Hear “turn in” on YouGlish</a></div>
+        <div class="answer" data-reveal><b>turn in</b> = go to bed. It has nothing to do with turning: the complete combination has its own meaning.</div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="rule">
+        <h3>A phrasal verb = verb + particle</h3>
+        <p class="sent" style="font-size:1.6em"><span class="verb">pick</span> <span class="part">up</span> <span class="obj">the kids</span></p>
+        <p class="small"><b class="verb">Green</b> = verb · <span class="part">shaded</span> = particle · <span class="obj">underlined</span> = object.</p>
+        <p>Learn the meaning <b>and</b> the object pattern together: <span class="verb">wind</span> <span class="part">down</span>, <span class="verb">turn</span> <span class="part">in</span>, <span class="verb">pick</span> <span class="part">up</span>, <span class="verb">put</span> <span class="part">off</span>.</p>
+      </div>
+      <p class="ca">Un phrasal verb és un verb + una partícula. El significat canvia: <b>turn</b> = girar, <b>turn in</b> = anar a dormir.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Literal or idiomatic?">
+  <p class="eyebrow">2 · Prediction</p>
+  <h2>Literal, partly idiomatic or idiomatic?</h2>
+  <p class="lead" style="margin-bottom:1em">Students vote first. Then reveal.</p>
+  <div class="grid3">
+    <div class="rcard" data-card><p class="big"><span class="verb">get</span> <span class="part">up</span></p><p class="small">What do you think?</p><button class="btn ghost" type="button" data-open>Show</button><div class="answer" data-reveal><b>Quite literal.</b> You get out of bed and go up. The meaning is easy to picture.</div></div>
+    <div class="rcard" data-card><p class="big"><span class="verb">head</span> <span class="part">out</span></p><p class="small">What do you think?</p><button class="btn ghost" type="button" data-open>Show</button><div class="answer" data-reveal><b>Partly idiomatic.</b> It means leave / start going somewhere. Optional preposition <span class="prep">for</span> + place: I head out. / I head out <span class="prep">for</span> school.</div></div>
+    <div class="rcard" data-card><p class="big"><span class="verb">turn</span> <span class="part">in</span></p><p class="small">What do you think?</p><button class="btn ghost" type="button" data-open>Show</button><div class="answer" data-reveal><b>Idiomatic.</b> It means go to bed. You can’t guess it from turn + in.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Find the object">
+  <p class="eyebrow">3 · Before separation</p>
+  <h2>What is an object?</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.6fr)">
+    <div class="stack">
+      <div class="rule key">
+        <h3>Quick test: ask WHAT? or WHO?</h3>
+        <p>If the sentence gives you an answer, that answer is often the object.</p>
+        <p class="small">I wake up my brother. → Wake up <b>WHO?</b> → <span class="obj">my brother</span></p>
+        <p class="small">I catch up on emails. → Catch up on <b>WHAT?</b> → <span class="obj">emails</span></p>
+      </div>
+      <p class="small">A time like <b>at ten</b> answers WHEN?, so it is not an object.</p>
+      <p class="ca">L’objecte és la persona o cosa afectada per l’acció. Pregunta <b>WHAT?</b> (què?) o <b>WHO?</b> (qui?). <b>at ten</b> respon WHEN? (quan?), no és objecte.</p>
+    </div>
+    <div class="stack">
+      <p class="small">A student points to the object, you click it. No object? Click <b>No object</b>.</p>
+      <div class="finder" id="finder"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Transitive or intransitive?">
+  <p class="eyebrow">3 · Transitive or intransitive?</p>
+  <h2>Is there an object?</h2>
+  <div class="cols even">
+    <div class="stack">
+      <div class="grid2">
+        <div class="rule"><span class="ptype">Transitive</span><p><b>has an object</b></p><p class="small"><span class="verb">wake</span> <span class="part">up</span> <span class="obj">my brother</span><br><span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> <span class="obj">emails</span><br><span class="verb">pick</span> <span class="part">up</span> <span class="obj">the kids</span></p></div>
+        <div class="rule"><span class="ptype">Intransitive</span><p><b>has no object</b></p><p class="small">We <span class="verb">head</span> <span class="part">out</span> at eight.<br>We <span class="verb">go</span> <span class="part">out</span> on Fridays. I <span class="verb">stay</span> <span class="part">in</span>.<br>I <span class="verb">wind</span> <span class="part">down</span>. I <span class="verb">turn</span> <span class="part">in</span>.</p></div>
+      </div>
+      <div class="rule key">
+        <h3>Two different questions</h3>
+        <p>1. <b>Transitive or intransitive?</b> → Is there an object?</p>
+        <p>2. <b>Separable or inseparable?</b> → If there is an object, where can it go?</p>
+      </div>
+      <p class="ca">Transitiu = té objecte. Intransitiu = no té objecte. Alguns phrasal verbs poden ser les dues coses: <b>I wake up</b> / <b>I wake him up</b>.</p>
+    </div>
+    <div class="stack">
+      <div class="grid2" id="classify"></div>
+      <div class="rcard" data-card>
+        <p><b>wake up</b> appears twice. So what changes?</p>
+        <button class="btn" type="button" data-open>Reveal</button>
+        <div class="answer" data-reveal><b>I wake up at seven.</b> No object → intransitive.<br><b>I wake <span class="obj">him</span> up.</b> him is the object → transitive.<br>The same phrasal verb can be transitive in one sentence and intransitive in another.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="The split test">
+  <p class="eyebrow">4 · The split test</p>
+  <h2>Can we separate it?</h2>
+  <div class="stack">
+    <p class="lead">Which sentences sound possible? Click the ones the class votes for, then check.</p>
+    <div class="tiles" id="tiles"></div>
+    <div class="row"><button class="btn" type="button" id="splitCheck">Check as a class</button><button class="btn ghost" type="button" id="splitReset">Reset</button><p class="fb" id="splitFb" aria-live="polite"></p></div>
+    <div class="grid2" id="splitRule" hidden>
+      <div class="rule"><span class="ptype">Separable</span><p class="sent" style="font-size:1.25em"><span class="verb">wake</span> <span class="part">up</span> <span class="obj">my brother</span> ✓<br><span class="verb">wake</span> <span class="obj">my brother</span> <span class="part">up</span> ✓</p><p class="small">Also <b>pick up</b>, <b>put off</b> and <b>whip up</b>: a noun object can go after the particle or in the middle.</p></div>
+      <div class="rule"><span class="ptype">Inseparable / fixed</span><p class="sent" style="font-size:1.25em"><span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span> <span class="obj">my homework</span> ✓<br><s>get my homework down to</s> ✗</p><p class="small">Also <b>catch up on</b>: keep all the parts together.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Pronoun trap">
+  <p class="eyebrow">5 · Pronoun trap</p>
+  <h2>Now replace the object with it / them</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)">
+    <div class="stack">
+      <div class="rule key">
+        <p><i>him</i> replaces the object <i>my brother</i>. With a <b>separable</b> phrasal verb, an object pronoun goes in the middle:</p>
+        <div class="formula"><span class="verb">verb</span><span class="op">+</span><span class="obj">pronoun</span><span class="op">+</span><span class="part">particle</span></div>
+        <p class="sent" style="font-size:1.3em">I <span class="verb">wake</span> <span class="obj">him</span> <span class="part">up</span>. · I <span class="verb">pick</span> <span class="obj">them</span> <span class="part">up</span>. · I <span class="verb">put</span> <span class="obj">it</span> <span class="part">off</span>.</p>
+        <p class="small"><s>I wake up him.</s> ✗ · <s>I pick up them.</s> ✗</p>
+      </div>
+      <a class="yg" style="align-self:flex-start" target="_blank" rel="noopener" href="https://youglish.com/pronounce/pick%20them%20up/english/us">▶ Hear “pick them up” on YouGlish</a>
+      <p class="ca">Amb un phrasal verb separable, el pronom (<b>it, them, him, her</b>) va <b>al mig</b>: pick <b>them</b> up. Amb un nom, les dues posicions són correctes.</p>
+    </div>
+    <div id="pronQuiz" class="compact"></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Two or three words">
+  <p class="eyebrow">6 · Two or three words</p>
+  <h2>Some phrasal verbs have three parts</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)">
+    <div class="stack">
+      <div class="rule">
+        <span class="ptype">Two parts</span>
+        <div class="formula"><span class="verb">verb</span><span class="op">+</span><span class="part">particle</span></div>
+        <p class="sent" style="font-size:1.3em"><span class="verb">wind</span> <span class="part">down</span> · <span class="verb">pick</span> <span class="part">up</span> · <span class="verb">put</span> <span class="part">off</span></p>
+        <p class="small">Some two-part verbs can add an <b>optional</b> preposition. It is not part of the verb: I head out. / I head out <span class="prep">for</span> school. · I wind down. / I wind down <span class="prep">with</span> music.</p>
+      </div>
+      <div class="rule key">
+        <span class="ptype">Three parts</span>
+        <div class="formula"><span class="verb">verb</span><span class="op">+</span><span class="part">particle</span><span class="op">+</span><span class="prep">preposition</span></div>
+        <p class="sent" style="font-size:1.3em"><span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> · <span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span></p>
+        <p>In these verbs the preposition is <b>always needed</b>, and it always needs an object straight after it: <b>catch up on <span class="obj">emails</span></b>, <b>get down to <span class="obj">it</span></b>. So three-part phrasal verbs always have an object, and you can’t split them.</p>
+      </div>
+      <p class="ca">Alguns phrasal verbs tenen tres paraules: verb + partícula + preposició (<b>catch up on</b>, <b>get down to</b>). La preposició necessita l’objecte just després, per això no es poden separar.</p>
+    </div>
+    <div class="stack">
+      <h3>Does it need a preposition?</h3>
+      <p class="small">Fill the gap with <b>on</b>, <b>to</b> or <b>nothing</b>. The answer labels every part.</p>
+      <div class="grid2" id="parts"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Fixed expressions">
+  <p class="eyebrow">7 · Fixed / inseparable</p>
+  <h2>Keep all the parts together</h2>
+  <div class="cols even">
+    <div class="stack">
+      <div class="rule key">
+        <p><b>catch up on</b> and <b>get down to</b> keep all their parts together. The noun or pronoun follows the complete expression.</p>
+        <p class="sent" style="font-size:1.3em">I <span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> <span class="obj">a show</span>. → I <span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> <span class="obj">it</span>.</p>
+        <p class="sent" style="font-size:1.3em">I <span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span> <span class="obj">my homework</span>. → I <span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span> <span class="obj">it</span>.</p>
+        <p class="small">These three-part expressions have a verb, a particle and a preposition: <span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span>, <span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span>. The preposition needs the object straight after it, so the object can’t go in the middle.</p>
+      </div>
+      <p class="ca">Les expressions fixes no es separen mai: l’objecte (nom o pronom) va al final. <b>I get down to it</b>, no <s>I get it down to</s>.</p>
+    </div>
+    <div class="traps">
+      <div class="trap" data-swap><p class="sent wrong">I <span class="verb">catch</span> <span class="obj">them</span> <span class="part">up</span> <span class="prep">on</span>.</p><p class="sent right">I <span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> <span class="obj">them</span>.</p><span class="mark" aria-hidden="true">✗</span><button class="btn ghost" type="button">Fix it</button></div>
+      <div class="trap" data-swap><p class="sent wrong">I <span class="verb">get</span> <span class="obj">it</span> <span class="part">down</span> <span class="prep">to</span>.</p><p class="sent right">I <span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span> <span class="obj">it</span>.</p><span class="mark" aria-hidden="true">✗</span><button class="btn ghost" type="button">Fix it</button></div>
+      <div class="trap" data-swap><p class="sent wrong">I <span class="verb">catch</span> <span class="obj">emails</span> <span class="part">up</span> <span class="prep">on</span>.</p><p class="sent right">I <span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> <span class="obj">emails</span>.</p><span class="mark" aria-hidden="true">✗</span><button class="btn ghost" type="button">Fix it</button></div>
+      <div class="trap" data-swap><p class="sent wrong">I <span class="verb">get</span> <span class="prep">to</span> <span class="part">down</span> <span class="obj">my homework</span>.</p><p class="sent right">I <span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span> <span class="obj">my homework</span>.</p><span class="mark" aria-hidden="true">✗</span><button class="btn ghost" type="button">Fix it</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Phrasal verb machine">
+  <p class="eyebrow">Practice together</p>
+  <h2>Phrasal verb machine</h2>
+  <div class="stack">
+    <p class="lead">Change the object and its position. The machine tells you if the order works. <b>Random</b> hides the sentence so the class can say it first.</p>
+    <div class="machine" id="pvMachine"></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Compare and explain">
+  <p class="eyebrow">8 · Compare and explain</p>
+  <h2>Same pronoun, different position. Why?</h2>
+  <div class="grid2">
+    <div class="rcard" data-card><p class="big">I <span class="verb">wake</span> <span class="obj">him</span> <span class="part">up</span>. ✓</p><button class="btn ghost" type="button" data-open>Explain</button><div class="answer" data-reveal><b>wake up</b> is separable and <b>him</b> is a pronoun, so the pronoun must go between the verb and the particle.</div></div>
+    <div class="rcard" data-card><p class="big">I <span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> <span class="obj">them</span>. ✓</p><button class="btn ghost" type="button" data-open>Explain</button><div class="answer" data-reveal><b>catch up on</b> is inseparable. The pronoun stays after the complete phrasal verb.</div></div>
+    <div class="rcard" data-card><p class="big">I <span class="verb">put</span> <span class="obj">it</span> <span class="part">off</span>. ✓</p><button class="btn ghost" type="button" data-open>Explain</button><div class="answer" data-reveal><b>put off</b> is separable, so the pronoun goes in the middle.</div></div>
+    <div class="rcard" data-card><p class="big">I <span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span> <span class="obj">it</span>. ✓</p><button class="btn ghost" type="button" data-open>Explain</button><div class="answer" data-reveal><b>get down to</b> is fixed. The pronoun is the same, but its position follows the expression’s pattern. Context does not make an incorrect position acceptable.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Our phrasal verbs">
+  <p class="eyebrow">9 · My Real Routine</p>
+  <h2>Real phrasal verbs from this LS</h2>
+  <div class="stack">
+    <div class="row"><p class="lead" style="flex:1">Ask for the meaning first, then click the verb. YouGlish plays real clips.</p><button class="btn ghost" type="button" id="pvAll">Show all</button></div>
+    <div class="pvgrid" id="pvgrid"></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Sorting game">
+  <p class="eyebrow">10 · Game</p>
+  <h2>Separable, inseparable, or no object?</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
+    <div class="game">
+      <p class="board" id="gamePV">Press Start</p>
+      <div class="opts" id="gameChoices" hidden>
+        <button class="opt" type="button" data-g="sep">Separable</button>
+        <button class="opt" type="button" data-g="insep">Inseparable / fixed</button>
+        <button class="opt" type="button" data-g="none">Usually no object here</button>
+      </div>
+      <p class="fb" id="gameFb" aria-live="polite"></p>
+      <div class="row"><button class="btn" type="button" id="gameNext">Start</button><span class="score" id="gameScore">Score: 0 / 0</span></div>
+    </div>
+    <div class="stack">
+      <p class="small">Play in six teams. Give the point after the team explains the choice.</p>
+      <div class="teams six" id="teams" aria-label="Team scores"></div>
+      <div class="row"><button class="btn ghost" type="button" id="teamsReset">Reset scores</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Quick quiz">
+  <p class="eyebrow">Check · whole class</p>
+  <h2>Quick quiz</h2>
+  <div id="quiz"></div>
+</section>
+
+<section class="slide" data-title="Error hunt">
+  <p class="eyebrow">Edit</p>
+  <h2>Error hunt</h2>
+  <p class="lead" style="margin-bottom:1em">Each sentence puts a phrasal verb or its object in the wrong place. A student points to the wrong words, you click them. Then show the correction.</p>
+  <div id="errors"></div>
+</section>
+
+<section class="slide" data-title="Transform">
+  <p class="eyebrow">Transform</p>
+  <h2>Change one thing</h2>
+  <p class="lead" style="margin-bottom:1em">Change only what the instruction asks. Students say it first, then reveal.</p>
+  <div id="transform"></div>
+</section>
+
+<section class="slide" data-title="Real-English detective">
+  <p class="eyebrow">11 · Real-English detective</p>
+  <h2>Use YouGlish like a linguist</h2>
+  <div class="stack">
+    <p class="lead">Pick one expression. Listen to <b>3 real clips</b>. Students answer:</p>
+    <div class="grid3 detect">
+      <div class="rcard"><p>What words come immediately after the phrasal verb?</p></div>
+      <div class="rcard"><p>Is the object a noun or a pronoun?</p></div>
+      <div class="rcard"><p>Can you hear whether the phrasal verb is separated?</p></div>
+    </div>
+    <div class="row">
+      <a class="yg" target="_blank" rel="noopener" href="https://youglish.com/pronounce/wake%20him%20up/english/us">▶ wake him up</a>
+      <a class="yg" target="_blank" rel="noopener" href="https://youglish.com/pronounce/put%20it%20off/english/us">▶ put it off</a>
+      <a class="yg" target="_blank" rel="noopener" href="https://youglish.com/pronounce/pick%20them%20up/english/us">▶ pick them up</a>
+      <a class="yg" target="_blank" rel="noopener" href="https://youglish.com/pronounce/catch%20up%20on/english/us">▶ catch up on</a>
+      <a class="yg" target="_blank" rel="noopener" href="https://youglish.com/pronounce/get%20down%20to/english/us">▶ get down to</a>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Your turn">
+  <p class="eyebrow">Short production</p>
+  <h2>Your turn: an afternoon routine</h2>
+  <div class="stack">
+    <div class="tasks" id="tasks"></div>
+    <div class="cols" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
+      <div class="rule">
+        <h3>Check before you finish</h3>
+        <div class="checks">
+          <label><input type="checkbox" id="ck1"><span>My Present Simple verbs agree with their subjects (<b class="subj">he / she</b> + <b class="end">-s</b>).</span></label>
+          <label><input type="checkbox" id="ck2"><span>Negatives and questions use <b class="aux">do / does / don’t / doesn’t</b> + a base verb.</span></label>
+          <label><input type="checkbox" id="ck3"><span>My <span class="obj">pronoun</span> goes in the middle of a <b>separable</b> verb: pick <span class="obj">them</span> up.</span></label>
+          <label><input type="checkbox" id="ck4"><span>My <span class="obj">object</span> follows the complete <b>fixed</b> expression: get down to <span class="obj">it</span>.</span></label>
+        </div>
+      </div>
+      <div class="rule">
+        <h3>Writing time</h3>
+        <div class="timer" id="timer">
+          <span class="t" id="tShow">05:00</span>
+          <div class="chips"><button class="chip" type="button" data-min="3">3 min</button><button class="chip" type="button" data-min="5" aria-pressed="true">5 min</button><button class="chip" type="button" data-min="8">8 min</button></div>
+        </div>
+        <div class="row"><button class="btn" type="button" id="tGo">Start</button><button class="btn ghost" type="button" id="tReset">Reset</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Exit ticket">
+  <p class="eyebrow">12 · Exit ticket</p>
+  <h2>Can you explain the rule?</h2>
+  <div class="stack">
+    <div class="board" style="font-size:2em">Why do we say <span class="verb">pick</span> <span class="obj">them</span> <span class="part">up</span><br>but <span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> <span class="obj">them</span>?</div>
+    <div class="rcard" data-card>
+      <button class="btn" type="button" data-open style="align-self:flex-start">Reveal model answer</button>
+      <div class="answer" data-reveal style="font-size:1.15em">Because <b>pick up</b> is separable, so a pronoun goes between the verb and the particle. <b>Catch up on</b> is inseparable, so the pronoun comes after the whole phrasal verb.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="bottom">
+  <button class="navbtn back" id="prev" type="button">← Back</button>
+  <span id="where" aria-live="polite"></span>
+  <button class="navbtn" id="next" type="button">Next →</button>
+</footer>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem('pvDeck.'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('pvDeck.'+k,JSON.stringify(v))}catch(e){}}};
+const ROUTES=['All','Insecure','Safe','Daring'];
+const MK={r:'prep',a:'aux',s:'subj',v:'verb',p:'part',o:'obj',d:'adv',w:'wh'};
+const mk=s=>s.replace(/\{(\w):([^}]*)\}/g,(_,k,t)=>`<span class="${MK[k]}">${t.replace(/\[([^\]]*)\]/g,'<span class="end">$1</span>')}</span>`);
+const pvName=n=>{const[v,p,...r]=n.split(' ');return `<span class="verb">${v}</span> <span class="part">${p}</span>`+(r.length?` <span class="prep">${r.join(' ')}</span>`:'')};
+const yg=q=>`https://youglish.com/pronounce/${encodeURIComponent(q)}/english/us`;
+
+/* ---------- deck ---------- */
+const slides=$$('.slide'),rail=$('#rail'),stage=$('#stage');
+let cur=Math.min(Math.max(0,store.get('slide',0)|0),slides.length-1);
+slides.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.textContent=i+1;b.title=s.dataset.title;b.setAttribute('aria-label',`Slide ${i+1}: ${s.dataset.title}`);b.onclick=()=>go(i);rail.appendChild(b)});
+function go(i){
+  cur=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,j)=>s.classList.toggle('on',j===cur));
+  [...rail.children].forEach((b,j)=>{b.setAttribute('aria-current',String(j===cur));if(j===cur)b.classList.add('seen')});
+  $('#where').textContent=`${cur+1} / ${slides.length} · ${slides[cur].dataset.title}`;
+  $('#prev').disabled=cur===0;$('#next').disabled=cur===slides.length-1;
+  stage.scrollTop=0;
+  const rb=rail.children[cur];if(rb)rail.scrollLeft=rb.offsetLeft-rail.clientWidth/2;
+  store.set('slide',cur);
+}
+$('#prev').onclick=()=>go(cur-1);$('#next').onclick=()=>go(cur+1);
+function setCa(on){document.documentElement.classList.toggle('ca-on',on);$('#caBtn').setAttribute('aria-pressed',String(on));store.set('ca',on)}
+const toggleCa=()=>setCa(!document.documentElement.classList.contains('ca-on'));
+$('#caBtn').onclick=toggleCa;setCa(!!store.get('ca',false));
+function fs(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}}
+$('#fsBtn').onclick=fs;
+document.addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('input,textarea,select'))return;
+  if(e.altKey||e.ctrlKey||e.metaKey)return;
+  const k=e.key;
+  if(k==='ArrowRight'||k==='PageDown'){e.preventDefault();go(cur+1)}
+  else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();go(cur-1)}
+  else if(k==='Home'){go(0)}else if(k==='End'){go(slides.length-1)}
+  else if(k==='c'||k==='C'){toggleCa()}else if(k==='f'||k==='F'){fs()}
+});
+
+/* reveal cards & traps */
+$$('[data-card]').forEach(c=>{const b=$('[data-open]',c);if(b){const t=b.textContent;b.onclick=()=>{const o=c.classList.toggle('open');b.textContent=o?'Hide':t}}});
+$$('[data-swap]').forEach(t=>{const b=$('button',t),m=$('.mark',t);b.onclick=()=>{const f=t.classList.toggle('fixed');m.textContent=f?'✓':'✗';b.textContent=f?'Show the mistake':'Fix it'}});
+
+/* ---------- carousels & quiz cards ---------- */
+function carousel(root,items,render,o={}){
+  let lv=o.noFilter?0:store.get(root.id+'.lv',0),idx=0;
+  root.innerHTML=`<div class="car-head">${o.noFilter?'<span></span>':`<div class="chips" role="group" aria-label="Route">${ROUTES.map((n,i)=>`<button type="button" class="chip" data-lv="${i}">${n}</button>`).join('')}</div>`}<div class="car-nav"><button type="button" class="btn ghost" data-d="-1">Previous</button><span class="count"></span><button type="button" class="btn" data-d="1">Next</button></div></div><div class="card"></div>`;
+  const body=$('.card',root);
+  const list=()=>lv?items.filter(x=>x.lv===lv):items;
+  function draw(){const L=list();idx=(idx%L.length+L.length)%L.length;$$('[data-lv]',root).forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.lv===lv)));$('.count',root).textContent=`${idx+1} / ${L.length}`;body.innerHTML='';render(body,L[idx])}
+  $('.car-head',root).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.lv!==undefined){lv=+b.dataset.lv;idx=0;store.set(root.id+'.lv',lv);draw()}else if(b.dataset.d){idx+=+b.dataset.d;draw()}});
+  draw();
+}
+const promptHTML=(p,fill)=>{const parts=p.split('___');if(parts.length===1)return esc(p);const f=fill?fill.split(' / '):[];return parts.map((s,i)=>esc(s)+(i<parts.length-1?`<span class="blank${fill?' filled':''}">${fill?esc(f[i]||''):'&nbsp;'}</span>`:'')).join('')};
+function quizCard(body,it){
+  body.innerHTML=`${it.lv?`<p class="tag">${ROUTES[it.lv]}</p>`:''}<p class="q-prompt">${promptHTML(it.p)}</p><div class="opts"></div><p class="fb" aria-live="polite"></p><div class="row"><button class="btn ghost" type="button" data-show>Show answer</button></div>`;
+  const opts=$('.opts',body),fb=$('.fb',body),pr=$('.q-prompt',body);
+  const done=()=>{$$('.opt',opts).forEach(x=>{if(x.dataset.o===it.a){x.classList.add('ok');x.classList.remove('no')}});if(it.p.includes('___'))pr.innerHTML=promptHTML(it.p,it.a);fb.innerHTML=`<b class="g">Correct.</b> ${esc(it.why)}`};
+  shuffle(it.o).forEach((o,i)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.dataset.o=o;b.innerHTML=`<span class="key">${'ABCD'[i]}</span><span>${esc(o)}</span>`;
+    b.onclick=()=>{if(o===it.a)done();else{b.classList.add('no');fb.innerHTML='<b class="r">Not quite.</b> Try another answer.'}};opts.appendChild(b)});
+  $('[data-show]',body).onclick=done;
+}
+
+/* Present Simple quick check (Insecure items from the LS page) */
+carousel($('#psCheck'),[
+  {p:'She ___ breakfast.',o:['have','has'],a:'has',why:'With she, have becomes has.'},
+  {p:'He doesn’t ___ at night.',o:['study','studies'],a:'study',why:'After doesn’t, write study with no -s.'},
+  {p:'Does Mia walk to school?',o:['Yes, she do.','Yes, she does.'],a:'Yes, she does.',why:'The question has does, so the answer about Mia has she does.'},
+  {p:'They ___ to school on foot.',o:['go','goes'],a:'go',why:'They takes the base verb go.'},
+  {p:'He ___ his homework.',o:['do','does'],a:'does',why:'With he in the affirmative, do becomes does.'},
+  {p:'___ she have breakfast?',o:['Do','Does'],a:'Does',why:'With she, the question starts with Does.'},
+  {p:'Choose the correct order.',o:['She usually studies after school.','She studies usually after school.'],a:'She usually studies after school.',why:'Usually goes before the verb studies.'}
+],quizCard,{noFilter:true});
+
+/* ---------- two or three parts ---------- */
+const PARTS=[['catch up','on','emails'],['pick up','','the kids'],['get down','to','my homework'],['put off','','my homework'],['catch up','on','a show'],['wake up','','my brother']];
+const PLAB=['verb','particle','preposition'],PCLS=['verb','part','prep'];
+$('#parts').innerHTML=PARTS.map(([pv,pr,o],i)=>{const words=(pv+(pr?' '+pr:'')).split(' ');return `<div class="ccard" data-i="${i}"><p class="sent pvhead">I ${pvName(pv)} <span class="blank">&nbsp;</span> <span class="obj">${o}</span>.</p><div class="pparts">${words.map((w,j)=>`<span class="pblock"><span class="${PCLS[j]}">${w}</span><small>${PLAB[j]}</small></span>`).join('')}<span class="pblock"><span class="obj">${o}</span><small>object</small></span></div><div class="row"><button type="button" class="opt" data-a="on">on</button><button type="button" class="opt" data-a="to">to</button><button type="button" class="opt" data-a="">nothing</button></div></div>`}).join('');
+$('#parts').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;const c=b.closest('.ccard'),it=PARTS[+c.dataset.i];if(b.dataset.a===it[1]){b.classList.add('ok');c.classList.add('done')}else b.classList.add('no')});
+
+/* ---------- object finder ---------- */
+const FIND=[
+  {w:'I wake up my brother.',obj:[3,4],q:'Wake up WHO? → my brother'},
+  {w:'I catch up on emails.',obj:[4],q:'Catch up on WHAT? → emails'},
+  {w:'I pick up the kids after school.',obj:[3,4],q:'Pick up WHO? → the kids'},
+  {w:'I turn in at ten.',obj:null,q:'At ten answers WHEN?, not WHAT? Turn in has no object here.'},
+  {w:'She puts off her homework.',obj:[3,4],q:'Put off WHAT? → her homework'},
+  {w:'We head out at eight.',obj:null,q:'Head out WHAT? No answer. At eight is a time.'}
+];
+FIND.forEach(it=>{
+  const row=document.createElement('div');row.className='frow';
+  row.innerHTML=`<p class="sent">${it.w.split(' ').map((w,i)=>`<button type="button" class="word" data-i="${i}">${esc(w)}</button>`).join(' ')}<button type="button" class="nobj">No object</button></p><p class="ffb" aria-live="polite"></p>`;
+  const fb=$('.ffb',row);
+  row.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    if(b.classList.contains('nobj')){
+      if(!it.obj){b.classList.add('right');row.classList.add('done');fb.className='ffb good';fb.textContent='✓ Intransitive. '+it.q}
+      else{fb.className='ffb bad';fb.textContent='There is an object. Ask WHAT? or WHO?'}
+      return}
+    const i=+b.dataset.i;
+    if(it.obj&&it.obj.includes(i)){it.obj.forEach(j=>$(`.word[data-i="${j}"]`,row).classList.add('objhit'));row.classList.add('done');fb.className='ffb good';fb.textContent='✓ Transitive. '+it.q}
+    else{b.classList.remove('miss');void b.offsetWidth;b.classList.add('miss');fb.className='ffb bad';fb.textContent=it.obj?'Not the object. Ask WHAT? or WHO?':'Is there an object at all?'}
+  });
+  $('#finder').appendChild(row);
+});
+
+/* ---------- classify ---------- */
+const CLASS=[
+  {s:'I put off my homework.',t:1},{s:'We head out at eight.',t:0},
+  {s:'I wake up at seven.',t:0},{s:'I wake him up at seven.',t:1},
+  {s:'I pick up the kids.',t:1},{s:'I wind down with music.',t:0}
+];
+$('#classify').innerHTML=CLASS.map((c,i)=>`<div class="ccard" data-i="${i}"><p class="sent">${esc(c.s)}</p><div class="row"><button type="button" class="opt" data-t="1">Transitive</button><button type="button" class="opt" data-t="0">Intransitive</button></div></div>`).join('');
+$('#classify').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;const c=CLASS[+b.closest('.ccard').dataset.i];b.classList.add(+b.dataset.t===c.t?'ok':'no')});
+
+/* ---------- split test ---------- */
+const SPLIT=[['I wake up my brother.',1],['I wake my brother up.',1],['I get down to my homework.',1],['I get my homework down to.',0],['I pick up the kids.',1],['I pick the kids up.',1],['I catch up on emails.',1],['I catch emails up on.',0]];
+function drawTiles(){$('#tiles').innerHTML=SPLIT.map(([s],i)=>`<button type="button" class="tile" data-i="${i}" aria-pressed="false"><span>${esc(s)}</span><span class="vote">tap if possible</span></button>`).join('');$('#splitRule').hidden=true;$('#splitFb').textContent=''}
+drawTiles();
+$('#tiles').addEventListener('click',e=>{const b=e.target.closest('.tile');if(!b||b.classList.contains('ok')||b.classList.contains('no'))return;const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));$('.vote',b).textContent=on?'possible':'tap if possible'});
+$('#splitCheck').onclick=()=>{let right=0;$$('#tiles .tile').forEach(b=>{const ok=SPLIT[+b.dataset.i][1]===1,v=b.getAttribute('aria-pressed')==='true';if(ok===v)right++;b.classList.add(ok?'ok':'no');$('.vote',b).textContent=ok?'✓ possible':'✗ not possible'});$('#splitFb').innerHTML=right===SPLIT.length?'<b class="g">Exactly.</b> Six are possible and two are not.':`<b class="r">${right} / ${SPLIT.length} right.</b> Look at the two that are not possible.`;$('#splitRule').hidden=false};
+$('#splitReset').onclick=drawTiles;
+
+/* ---------- pronoun quiz ---------- */
+carousel($('#pronQuiz'),[
+  {p:'I wake up my brother → ?',o:['I wake up him.','I wake him up.','Him wake up.'],a:'I wake him up.',why:'Wake up is separable: the pronoun goes in the middle.'},
+  {p:'She picks up the kids → ?',o:['She picks up them.','She picks them up.'],a:'She picks them up.',why:'Them belongs between picks and up.'},
+  {p:'She puts off her homework → ?',o:['She puts off it.','She puts it off.'],a:'She puts it off.',why:'Put off requires an object pronoun between the verb and particle.'},
+  {p:'I whip up dinner → ?',o:['I whip it up.','I whip up it.'],a:'I whip it up.',why:'Whip up is separable, so it goes in the middle.'},
+  {p:'She gets down to her homework → ?',o:['She gets down to it.','She gets it down to.'],a:'She gets down to it.',why:'Get down to is inseparable: the pronoun goes after the whole verb.'},
+  {p:'I catch up on emails → ?',o:['I catch them up on.','I catch up on them.'],a:'I catch up on them.',why:'The pronoun follows the whole fixed expression.'}
+],quizCard,{noFilter:true});
+
+/* ---------- phrasal verb machine ---------- */
+const SUBJ=[
+  {k:'I',third:false,poss:'my',ans:'you'},{k:'you',third:false,poss:'your',ans:'I'},
+  {k:'he',third:true,poss:'his',ans:'he'},{k:'she',third:true,poss:'her',ans:'she'},
+  {k:'we',third:false,poss:'our',ans:'we'},{k:'they',third:false,poss:'their',ans:'they'},
+  {k:'Mia',third:true,poss:'her',ans:'she'},{k:'Leo',third:true,poss:'his',ans:'he'}
+];
+const PV=[
+  {v:'pick',t:'picks',p:'up',ty:'sep',n:'the kids',pr:'them',w:'after school'},
+  {v:'put',t:'puts',p:'off',ty:'sep',n:'{poss} homework',pr:'it',w:'until later'},
+  {v:'whip',t:'whips',p:'up',ty:'sep',n:'dinner',pr:'it',w:'after school'},
+  {v:'wake',t:'wakes',p:'up',ty:'sep',n:'{poss} brother',pr:'him',w:'at seven'},
+  {v:'catch',t:'catches',p:'up on',ty:'fix',n:'emails',pr:'them',w:'before school'},
+  {v:'get',t:'gets',p:'down to',ty:'fix',n:'{poss} homework',pr:'it',w:'after school'},
+  {v:'go',t:'goes',p:'out',ty:'none',w:'on Fridays'},
+  {v:'stay',t:'stays',p:'in',ty:'none',w:'at the weekend'},
+  {v:'eat',t:'eats',p:'out',ty:'none',w:'on Saturdays'},
+  {v:'wind',t:'winds',p:'down',ty:'none',w:'with music'},
+  {v:'turn',t:'turns',p:'in',ty:'none',w:'at ten'},
+  {v:'head',t:'heads',p:'out',ty:'none',w:'at eight'},
+  {v:'sleep',t:'sleeps',p:'in',ty:'none',w:'on Sundays'}
+];
+const TYPE={sep:'Separable',fix:'Fixed · inseparable',none:'No object'};
+function third(V){let i=0;while(i<V.v.length&&V.v[i]===V.t[i])i++;return i===V.t.length?[[V.t]]:[[V.t.slice(0,i)],[V.t.slice(i),'end']]}
+const tk=(c,t)=>({c,parts:[[t]]});
+function buildPV(S,V,f,o,pos){
+  const T=[];
+  const verb=f==='aff'&&S.third?{c:'verb',parts:third(V)}:tk('verb',V.v);
+  const [p0,...pr]=V.p.split(' ');const part=[tk('part',p0)];if(pr.length)part.push(tk('prep',pr.join(' ')));
+  const obj=V.ty==='none'?null:tk('obj',o==='pron'?V.pr:V.n.replace('{poss}',S.poss));
+  const mid=obj&&pos==='mid';
+  const core=obj?(mid?[verb,obj,...part]:[verb,...part,obj]):[verb,...part];
+  let ok=true,why;
+  if(V.ty==='sep'){
+    if(o==='pron'&&!mid){ok=false;why=`${V.pr} is a pronoun, so it must go between ${V.v} and ${V.p}.`}
+    else why=o==='pron'?'Pronoun object of a separable verb: it goes in the middle.':(mid?'Noun object: the middle position works.':'Noun object: after the particle works too.');
+  }else if(V.ty==='fix'){
+    if(mid){ok=false;why=`${V.v} ${V.p} is fixed: keep it together and put the object after it.`}
+    else why='Fixed expression: the object follows the complete expression.';
+  }else why=`No object: “${V.w}” is not an object.`;
+  const time=tk('rest',V.w);
+  let end='.';
+  if(f==='aff')T.push(tk('subj',S.k),...core,time);
+  else if(f==='neg')T.push(tk('subj',S.k),{c:'aux',parts:S.third?[['do'],['es','end'],['n’t']]:[['don’t']]},...core,time);
+  else{end='?';T.push({c:'aux',parts:S.third?[['Do'],['es','end']]:[['Do']]},tk('subj',S.k),...core,time)}
+  const f0=T[0].parts[0];f0[0]=f0[0].charAt(0).toUpperCase()+f0[0].slice(1);
+  return {html:T.map(t=>`<span class="${t.c}">${t.parts.map(([x,k])=>k?`<span class="${k}">${esc(x)}</span>`:esc(x)).join('')}</span>`).join(' ')+end,ok,why};
+}
+(function(){
+  const root=$('#pvMachine');
+  const st={s:6,v:0,f:'aff',o:'noun',pos:'after'};let covered=false,shown='';
+  const chips=(k,list)=>`<div class="chips" data-k="${k}" role="group">${list.map(([v,l])=>`<button type="button" class="chip" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>`;
+  const ctrl=(lab,inner,cls='')=>`<div class="ctrl ${cls}"><span class="lab">${lab}</span>${inner}</div>`;
+  root.innerHTML=`<div class="out-wrap"><p class="sent out" aria-live="polite"></p><p class="verdict"></p><div class="answers"></div><button type="button" class="cover-btn"><span>Say it aloud · click to reveal</span></button></div>`
+    +ctrl('Who?',chips('s',SUBJ.map((x,i)=>[i,x.k])))
+    +ctrl('Form',chips('f',[['aff','+ Affirmative'],['neg','− Negative'],['q','? Question']]))
+    +ctrl('Phrasal verb',chips('v',PV.map((x,i)=>[i,x.v+' '+x.p])))
+    +ctrl('Object',chips('o',[['noun','noun'],['pron','pronoun']]),'oc')
+    +ctrl('Position',chips('pos',[['after','after the particle'],['mid','in the middle']]),'oc')
+    +`<div class="row"><button type="button" class="btn" data-act="rand">Random (hidden)</button><button type="button" class="btn ghost" data-act="cover">Hide sentence</button></div>`;
+  function draw(){
+    const S=SUBJ[st.s],V=PV[st.v],r=buildPV(S,V,st.f,st.o,st.pos);
+    $('.out',root).innerHTML=r.html;
+    $('.verdict',root).innerHTML=`<span class="ptype">${TYPE[V.ty]}</span> ${r.ok?'<b class="g">✓ Correct.</b>':'<b class="r">✗ Not possible.</b>'} ${esc(r.why)}`;
+    $('.out-wrap',root).classList.toggle('bad',!r.ok);
+    $$('.oc',root).forEach(c=>c.hidden=V.ty==='none');
+    const ans=$('.answers',root);
+    if(st.f==='q'){const p=S.ans,t3=p==='he'||p==='she',sp=`<span class="subj">${p}</span>`;
+      const sa={yes:`Yes, ${sp} <span class="aux">${t3?'do<span class="end">es</span>':'do'}</span>.`,no:`No, ${sp} <span class="aux">${t3?'do<span class="end">es</span>n’t':'don’t'}</span>.`};
+      ans.innerHTML=`<button type="button" class="btn ghost" data-sa="yes">Yes…</button><button type="button" class="btn ghost" data-sa="no">No…</button><span class="sa">${shown?sa[shown]:''}</span>`}
+    else ans.innerHTML='';
+    $('.out-wrap',root).classList.toggle('covered',covered);
+    $('[data-act="cover"]',root).textContent=covered?'Show sentence':'Hide sentence';
+    $$('[data-k]',root).forEach(g=>{const k=g.dataset.k;$$('.chip',g).forEach(c=>c.setAttribute('aria-pressed',String(String(st[k])===c.dataset.v)))});
+  }
+  root.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    const g=b.closest('[data-k]');
+    if(g){const k=g.dataset.k;st[k]=(k==='s'||k==='v')?+b.dataset.v:b.dataset.v;if(k==='o')st.pos=st.o==='pron'&&PV[st.v].ty==='sep'?'mid':'after';shown='';draw();return}
+    if(b.classList.contains('cover-btn')){covered=false;draw();return}
+    if(b.dataset.sa){shown=shown===b.dataset.sa?'':b.dataset.sa;draw();return}
+    if(b.dataset.act==='cover'){covered=!covered;draw()}
+    if(b.dataset.act==='rand'){st.s=rnd(SUBJ.length);st.v=rnd(PV.length);st.f=['aff','aff','neg','q'][rnd(4)];st.o=rnd(2)?'pron':'noun';const V=PV[st.v];st.pos=V.ty==='sep'&&(st.o==='pron'||rnd(2))?'mid':'after';shown='';covered=true;draw()}
+  });
+  draw();
+})();
+
+/* ---------- LS phrasal verbs ---------- */
+const PVS=[
+  ['head out','No object','leave / start going somewhere','I {v:head} {p:out} at eight. · I {v:head} {p:out} {r:for} school.','sortir cap a un lloc','head out','<b>+ {r:for} + place</b> · optional'],
+  ['set off','No object','start a journey','I {v:set} {p:off} at seven. · I {v:set} {p:off} {r:for} school.','','set off for','<b>+ {r:for} + place</b> · optional'],
+  ['wind down','No object','relax','I {v:wind} {p:down}. · I {v:wind} {p:down} {r:with} music.','relaxar-se','wind down','<b>+ {r:with} + thing</b> · optional'],
+  ['turn in','No object','go to bed','I {v:turn} {p:in} at ten.','anar a dormir','turn in'],
+  ['sleep in','No object','sleep later than usual','I {v:sleep} {p:in} on Sundays.','dormir fins més tard','sleep in'],
+  ['knock off','Context dependent','finish work','They {v:knock} {p:off} at six.','','knock off work'],
+  ['pick up','Separable','collect someone','I {v:pick} {o:them} {p:up} after school.','','pick them up'],
+  ['put off','Separable','leave something until later','I {v:put} {o:it} {p:off}.','','put it off'],
+  ['wake up','Separable','stop sleeping / make someone stop sleeping','I {v:wake} {p:up} at seven. · I {v:wake} {o:him} {p:up}.','despertar-se / despertar algú','wake him up'],
+  ['whip up','Separable','make food quickly','I {v:whip} {p:up} {o:dinner}. · I {v:whip} {o:it} {p:up}.','','whip up'],
+  ['go out','No object','leave home to have fun','We {v:go} {p:out} on Fridays.','sortir','go out'],
+  ['stay in','No object','stay at home','I {v:stay} {p:in} at the weekend.','quedar-se a casa','stay in'],
+  ['eat out','No object','eat at a restaurant','We {v:eat} {p:out} on Saturdays.','menjar fora','eat out'],
+  ['catch up on','Inseparable','do work you did not have time to do earlier','I {v:catch} {p:up} {r:on} {o:emails}.','','catch up on','<b>{r:on}</b> · always needed'],
+  ['get down to','get down to + noun / -ing','start doing something seriously','I {v:get} {p:down} {r:to} {o:my homework}.','','get down to','<b>{r:to}</b> · always needed']
+];
+$('#pvgrid').innerHTML=PVS.map(([n,pat,m,ex,ca,q,pp])=>{const[vb,...pt]=n.split(' ');return `<div class="pv"><button type="button" class="name">${pvName(n)}</button><span class="ptype">${esc(pat)}</span>${pp?`<span class="pprep">Preposition: ${mk(pp)}</span>`:''}<span class="mean">${esc(m)}</span>${ca?`<span class="cag">${esc(ca)}</span>`:''}<span class="ex">${mk(ex)}</span><div class="foot"><a class="yg" target="_blank" rel="noopener" href="${yg(q)}">▶ YouGlish</a></div></div>`}).join('');
+$('#pvgrid').addEventListener('click',e=>{const b=e.target.closest('.name');if(b)b.closest('.pv').classList.toggle('open')});
+$('#pvAll').onclick=()=>{const all=$$('#pvgrid .pv'),open=all.every(f=>f.classList.contains('open'));all.forEach(f=>f.classList.toggle('open',!open));$('#pvAll').textContent=open?'Show all':'Hide all'};
+
+/* ---------- sorting game ---------- */
+const GAME=[['wake up','sep'],['whip up','sep'],['head out','none'],['catch up on','insep'],['set off','none'],['pick up','sep'],['put off','sep'],['get down to','insep'],['wind down','none'],['turn in','none'],['go out','none'],['stay in','none'],['eat out','none']];
+const GW={sep:'separable: noun in either position, pronoun in the middle.',insep:'inseparable: keep it together, object after it.',none:'usually no object here.'};
+const GNOTE={'head out':'The preposition for is optional: I head out. / I head out for school.','set off':'The preposition for is optional: I set off. / I set off for school.','wind down':'The preposition with is optional: I wind down. / I wind down with music.','catch up on':'The preposition on is always needed: I catch up on emails.','get down to':'The preposition to is always needed: I get down to my homework.'};
+let gq=[],gcur=null,gs=0,gt=0;
+$('#gameNext').onclick=()=>{if(!gq.length)gq=shuffle(GAME);gcur=gq.pop();$('#gamePV').innerHTML=pvName(gcur[0]);$('#gameChoices').hidden=false;$$('#gameChoices .opt').forEach(b=>{b.classList.remove('ok','no');b.disabled=false});$('#gameFb').textContent='';$('#gameNext').textContent='Next'};
+$('#gameChoices').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b||!gcur)return;gt++;const ok=b.dataset.g===gcur[1];if(ok)gs++;$$('#gameChoices .opt').forEach(x=>{x.disabled=true;if(x.dataset.g===gcur[1])x.classList.add('ok')});if(!ok)b.classList.add('no');$('#gameFb').innerHTML=(ok?'<b class="g">Correct!</b> ':'<b class="r">Not quite.</b> ')+esc(gcur[0]+' is '+GW[gcur[1]]+(GNOTE[gcur[0]]?' '+GNOTE[gcur[0]]:''));$('#gameScore').textContent=`Score: ${gs} / ${gt}`;gcur=null});
+const score=[0,0,0,0,0,0];
+$('#teams').innerHTML=score.map((_,t)=>`<div class="team"><input id="team${t}" value="Team ${t+1}" aria-label="Team ${t+1} name"><button type="button" data-team="${t}" data-d="-1" aria-label="Remove a point">−</button><span class="sc" id="sc${t}">0</span><button type="button" data-team="${t}" data-d="1" aria-label="Add a point">+</button></div>`).join('');
+$('#teams').addEventListener('click',e=>{const b=e.target.closest('[data-team]');if(!b)return;const t=+b.dataset.team;score[t]=Math.max(0,score[t]+ +b.dataset.d);$('#sc'+t).textContent=score[t]});
+$('#teamsReset').onclick=()=>{score.fill(0);score.forEach((_,t)=>$('#sc'+t).textContent=0)};
+
+/* ---------- quiz (LS page, all routes) ---------- */
+const QUIZ=[
+  {lv:1,p:'She ___ to school.',o:['go','goes'],a:'goes',why:'With she in the affirmative, use goes.'},
+  {lv:1,p:'They ___ study at night.',o:['don’t','doesn’t'],a:'don’t',why:'They needs don’t + base verb.'},
+  {lv:1,p:'Does he have breakfast? No, he ___.',o:['don’t','doesn’t'],a:'doesn’t',why:'The short answer keeps does and adds the negative.'},
+  {lv:1,p:'Choose the correct sentence.',o:['She doesn’t never watch TV at night.','She never watches TV at night.'],a:'She never watches TV at night.',why:'Never goes before watches and does not need doesn’t.'},
+  {lv:2,p:'Choose the accurate routine.',o:['Mia have breakfast and goes to school.','Mia has breakfast and goes to school.'],a:'Mia has breakfast and goes to school.',why:'Both coordinated verbs agree with Mia.'},
+  {lv:2,p:'Choose the question.',o:['Does Leo gets home at five?','Does Leo get home at five?'],a:'Does Leo get home at five?',why:'Does carries the third-person marking; use get.'},
+  {lv:2,p:'Classify pick up in “I pick up the kids”.',o:['separable','fixed / inseparable','no object'],a:'separable',why:'A noun can appear in pick up the kids or pick the kids up.'},
+  {lv:2,p:'Classify catch up on in “I catch up on emails”.',o:['separable','fixed / inseparable','no object'],a:'fixed / inseparable',why:'Emails follows the full expression catch up on.'},
+  {lv:2,p:'Classify turn in in “I turn in at ten”.',o:['separable','fixed / inseparable','no object'],a:'no object',why:'At ten gives the time; it is not an object affected by turn in.'},
+  {lv:2,p:'Mia and Leo ___ home at five.',o:['get','gets'],a:'get',why:'Two people form a plural subject: use get.'},
+  {lv:2,p:'Mia ___ sleep in on weekdays.',o:['don’t','doesn’t'],a:'doesn’t',why:'A singular third-person subject needs doesn’t.'},
+  {lv:2,p:'Which pair has two correct noun positions?',o:['pick up the kids / pick the kids up','catch up on emails / catch emails up on'],a:'pick up the kids / pick the kids up',why:'A noun object can go in either position with pick up.'},
+  {lv:2,p:'Choose the correct pronoun position.',o:['She puts off it.','She puts it off.'],a:'She puts it off.',why:'Put off requires an object pronoun between the verb and particle.'},
+  {lv:2,p:'Choose the correct fixed pattern.',o:['I get it down to.','I get down to it.'],a:'I get down to it.',why:'Keep get down to together; it follows to.'},
+  {lv:2,p:'I catch ___ emails before work.',o:['up on','on up'],a:'up on',why:'The studied expression is catch up on; both parts precede emails.'},
+  {lv:2,p:'Choose the accurate question.',o:['Does Mia does her homework?','Does Mia do her homework?'],a:'Does Mia do her homework?',why:'The auxiliary is Does; the main verb is do.'},
+  {lv:2,p:'Choose the accurate explanation.',o:['All phrasal verbs can be split.','Noun objects can go in two positions with pick up.'],a:'Noun objects can go in two positions with pick up.',why:'Separable verbs allow either noun position, but pronouns must go in the middle.'},
+  {lv:2,p:'Choose the accurate sentence.',o:['I put my off homework.','I put my homework off.'],a:'I put my homework off.',why:'Put off allows this noun-object position.'},
+  {lv:3,p:'Choose the accurate question.',o:['Why does Leo usually turns in early?','Why does Leo usually turn in early?'],a:'Why does Leo usually turn in early?',why:'Why + does + subject + usually + base verb.'},
+  {lv:3,p:'Which explanation accounts for “I pick them up”?',o:['Every object must go in the middle.','Them is a pronoun object of a separable verb.'],a:'Them is a pronoun object of a separable verb.',why:'Object pronouns must go between pick and up.'},
+  {lv:3,p:'Why is “I catch up on them” correct?',o:['Pronouns always go in the middle.','Catch up on is fixed, so the pronoun follows on.'],a:'Catch up on is fixed, so the pronoun follows on.',why:'Three-part catch up on keeps its parts together.'},
+  {lv:3,p:'What is “at ten” in “I turn in at ten”?',o:['a direct object','a time phrase, not a direct object'],a:'a time phrase, not a direct object',why:'Turn in is intransitive in this routine meaning.'},
+  {lv:3,p:'Choose the accurate negative.',o:['She doesn’t usually sleeps in on weekdays.','She doesn’t usually sleep in on weekdays.'],a:'She doesn’t usually sleep in on weekdays.',why:'Doesn’t + usually + base verb keeps the routine meaning.'},
+  {lv:3,p:'Leo usually ___ his homework before he ___ down.',o:['do / winds','does / wind','does / winds'],a:'does / winds',why:'Both verbs have the singular subject Leo / he.'},
+  {lv:3,p:'Choose both acceptable noun forms.',o:['She puts off her homework / She puts her homework off','She gets down to her homework / She gets her homework down to'],a:'She puts off her homework / She puts her homework off',why:'Put off permits both positions for a noun object.'},
+  {lv:3,p:'Choose the accurate sentence.',o:['She picks up them before she gets down to work.','She picks them up before she gets down to work.'],a:'She picks them up before she gets down to work.',why:'Them goes inside pick up; work follows the fixed expression get down to.'},
+  {lv:3,p:'I get ___ my homework.',o:['down to','to down'],a:'down to',why:'The complete expression is get down to, not get to down.'},
+  {lv:3,p:'Which principle is accurate?',o:['Every phrasal verb allows two object positions.','Pronoun position depends on the verb’s object pattern.'],a:'Pronoun position depends on the verb’s object pattern.',why:'Separable and fixed patterns place pronouns differently.'},
+  {lv:3,p:'Choose the correct reason for “I wind down”.',o:['The object is hidden between wind and down.','In this meaning, the verb needs no object.'],a:'In this meaning, the verb needs no object.',why:'Wind down means relax here and is intransitive.'}
+];
+carousel($('#quiz'),QUIZ,quizCard);
+
+/* ---------- error hunt (LS page) ---------- */
+const EDIT=[
+  {lv:2,w:'I wake up him every morning.',err:[[2,3]],c:'I wake him up every morning.',fix:[2,3],why:'Wake up is separable: the pronoun goes in the middle.'},
+  {lv:2,w:'I always put off it.',err:[[3,4]],c:'I always put it off.',fix:[3,4],why:'Put off is separable: the pronoun goes between put and off.'},
+  {lv:2,w:'She picks up them after school.',err:[[2,3]],c:'She picks them up after school.',fix:[2,3],why:'Pick up is separable, so them must go in the middle.'},
+  {lv:2,w:'I catch them up on.',err:[[2,3,4]],c:'I catch up on them.',fix:[2,3,4],why:'Catch up on is inseparable: the pronoun goes after the whole verb.'},
+  {lv:2,w:'I get my homework down to after school.',err:[[2,3,4,5]],c:'I get down to my homework after school.',fix:[2,3,4,5],why:'Get down to is fixed; the noun follows to.'},
+  {lv:2,w:'I catch emails up on before work.',err:[[2,3,4]],c:'I catch up on emails before work.',fix:[2,3,4],why:'Keep catch up on together before emails.'},
+  {lv:3,w:'I put off it, then I get it down to.',err:[[2,3],[7,8,9]],c:'I put it off, then I get down to it.',fix:[2,3,7,8,9],why:'It belongs inside put off, but after get down to.'},
+  {lv:3,w:'She picks the up kids before she catches emails up on.',err:[[2,3,4],[8,9,10]],c:'She picks the kids up before she catches up on emails.',fix:[2,3,4,8,9,10],why:'Keep the noun phrase the kids together; keep catch up on together. (She picks up the kids… is also correct.)'},
+  {lv:3,w:'I get to down my homework after school.',err:[[2,3]],c:'I get down to my homework after school.',fix:[2,3],why:'The fixed order is get down to, followed by its object.'}
+];
+carousel($('#errors'),EDIT,(body,it)=>{
+  const n=it.err.length,found=new Set();
+  body.innerHTML=`<p class="tag">${ROUTES[it.lv]} · ${n} mistake${n>1?'s':''} to find</p><p class="sent">${it.w.split(' ').map((w,i)=>`<button type="button" class="word" data-i="${i}">${esc(w)}</button>`).join(' ')}</p><p class="fb" aria-live="polite">0 / ${n} found</p><div class="row"><button class="btn ghost" type="button" data-show>Show correction</button></div><div class="stack" data-fix hidden><p class="sent">${it.c.split(' ').map((w,i)=>it.fix.includes(i)?`<mark>${esc(w)}</mark>`:esc(w)).join(' ')}</p><p class="why">${esc(it.why)}</p></div>`;
+  const reveal=()=>{$('[data-fix]',body).hidden=false;$('[data-show]',body).hidden=true};
+  $('.sent',body).addEventListener('click',e=>{const b=e.target.closest('.word');if(!b)return;const i=+b.dataset.i;const g=it.err.findIndex(x=>x.includes(i));
+    if(g>-1){it.err[g].forEach(j=>$(`.word[data-i="${j}"]`,body).classList.add('hit'));found.add(g);$('.fb',body).textContent=`${found.size} / ${n} found`;if(found.size===n)reveal()}
+    else{b.classList.remove('miss');void b.offsetWidth;b.classList.add('miss')}});
+  $('[data-show]',body).onclick=reveal;
+},{noFilter:true});
+
+/* ---------- transform (LS page) ---------- */
+const TRANS=[
+  {lv:1,task:'Change I to she.',s:'I go to school.',a:'She goes to school.',h:'She + goes + to school.',why:'With she, go becomes goes.'},
+  {lv:1,task:'Make it negative.',s:'He has breakfast.',a:'He doesn’t have breakfast.',h:'He + doesn’t + have breakfast.',why:'Use doesn’t + have, not has.'},
+  {lv:1,task:'Make it a question.',s:'She studies after school.',a:'Does she study after school?',h:'Does + she + study…?',why:'Does goes before she; study has no -s.'},
+  {lv:2,task:'Make it negative.',s:'Leo does his homework after school.',a:'Leo doesn’t do his homework after school.',why:'Use doesn’t + do; don’t keep does.'},
+  {lv:2,task:'Ask about the time.',s:'Mia gets home at five.',a:'When does Mia get home?',why:'When + does + Mia + get home; the answer is the time.'},
+  {lv:2,task:'Use the other noun position.',s:'I pick up the kids.',a:'I pick the kids up.',why:'Move the noun between pick and up.'},
+  {lv:2,task:'Replace her homework with it.',s:'She puts off her homework.',a:'She puts it off.',why:'The object pronoun goes between puts and off.'},
+  {lv:2,task:'Replace emails with them.',s:'I catch up on emails.',a:'I catch up on them.',why:'The pronoun follows the whole fixed expression.'},
+  {lv:3,task:'Change they to Mia.',s:'They usually get home and do their homework.',a:'Mia usually gets home and does her homework.',why:'Both verbs change to third person, and their becomes her.'},
+  {lv:3,task:'Make it negative.',s:'Leo always goes to bed early.',a:'Leo doesn’t always go to bed early.',why:'Doesn’t + always + go; this means not on every occasion.'},
+  {lv:3,task:'Rewrite using it.',s:'Although I put off my homework, I get down to my homework later.',a:'Although I put it off, I get down to it later.',why:'Put off takes it in the middle; get down to takes it at the end.'},
+  {lv:3,task:'Use the other noun position.',s:'She picks up the kids before dinner.',a:'She picks the kids up before dinner.',why:'Pick up is separable and the object is a noun phrase.'},
+  {lv:3,task:'Use them.',s:'I catch up on emails before I pick up the kids.',a:'I catch up on them before I pick them up.',why:'Both objects are plural, but each expression has a different placement rule.'},
+  {lv:3,task:'Replace the kids with them.',s:'She usually picks up the kids after school.',a:'She usually picks them up after school.',why:'Move the pronoun between picks and up without moving usually.'}
+];
+carousel($('#transform'),TRANS,(body,it)=>{
+  body.innerHTML=`<p class="tag">${ROUTES[it.lv]}</p><p class="q-prompt" style="font-size:1.3em;color:var(--aux)">${esc(it.task)}</p><p class="sent">${esc(it.s)}</p><div class="row"><button class="btn" type="button" data-rev>Reveal answer</button>${it.h?'<button class="btn ghost" type="button" data-hint>Hint</button>':''}</div><p class="why" data-h hidden>${esc(it.h||'')}</p><div class="stack" data-a hidden><p class="sent ans">${esc(it.a)}</p><p class="why">${esc(it.why)}</p></div>`;
+  $('[data-rev]',body).onclick=()=>{$('[data-a]',body).hidden=false};
+  const h=$('[data-hint]',body);if(h)h.onclick=()=>{$('[data-h]',body).hidden=false};
+});
+
+/* ---------- production (LS page) ---------- */
+const TASKS=[
+  {lv:1,t:'Write two sentences about a person’s routine: one affirmative with usually and one negative with doesn’t.',ca:'Escriu dues frases sobre la rutina d’una persona: una afirmativa amb usually i una negativa amb doesn’t. Mira el model i canvia l’activitat o el moment del dia.',m:'She usually studies after school on weekdays. She doesn’t watch TV at night.'},
+  {lv:2,t:'Write three sentences about an afternoon routine in the Present Simple: a third-person sentence, a negative and a question. Use pick up or put off with a noun, rewrite that object as it / them, and add a sentence with catch up on or get down to.',m:'Mia usually studies after school. She doesn’t put her homework off. Does she pick the kids up before she studies? I put off my homework. I put it off until later. Then I get down to it.'},
+  {lv:3,t:'Write three or four sentences about a busy afternoon. Use a separable verb with a noun and then a pronoun, plus a fixed expression with an object. Finish with a brief explanation of why you placed one pronoun there.',m:'Mia usually studies after school. She doesn’t put her homework off. Does she pick the kids up before she studies? I pick up the kids after school. I pick them up before I get down to my homework. The pronoun them goes between pick and up because pick up is separable.'}
+];
+$('#tasks').innerHTML=TASKS.map(t=>`<div class="task"><p class="tag">${ROUTES[t.lv]}</p><p>${esc(t.t)}</p>${t.ca?`<p class="ca">${esc(t.ca)}</p>`:''}<button class="btn ghost" type="button" data-model>Show model</button><p class="model" hidden>${esc(t.m)}</p></div>`).join('');
+$('#tasks').addEventListener('click',e=>{const b=e.target.closest('[data-model]');if(!b)return;const m=b.nextElementSibling;m.hidden=!m.hidden;b.textContent=m.hidden?'Show model':'Hide model'});
+
+let total=300,left=300,tid=null;
+const fmt=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+function tdraw(){$('#tShow').textContent=left>0?fmt(left):'Time!';$('#timer').classList.toggle('up',left<=0);$('#tGo').textContent=tid?'Pause':(left<total&&left>0?'Resume':'Start')}
+function tstop(){clearInterval(tid);tid=null}
+$('#tGo').onclick=()=>{if(tid){tstop()}else{if(left<=0)left=total;tid=setInterval(()=>{left--;if(left<=0){left=0;tstop()}tdraw()},1000)}tdraw()};
+$('#tReset').onclick=()=>{tstop();left=total;tdraw()};
+$$('[data-min]').forEach(b=>b.onclick=()=>{tstop();total=left=+b.dataset.min*60;$$('[data-min]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));tdraw()});
+tdraw();
+
+/* ---------- category tooltip: hover or tap a coloured word ---------- */
+const CAT={end:['-s ending · he / she / it','terminació -s'],subj:['subject','subjecte'],aux:['auxiliary · do / does','auxiliar'],verb:['verb','verb'],part:['particle','partícula'],prep:['preposition','preposició'],obj:['object','objecte'],adv:['frequency adverb','adverbi de freqüència'],wh:['question word','paraula interrogativa']};
+const CSEL=Object.keys(CAT).map(k=>'.'+k).join(',');
+const tip=document.createElement('div');tip.className='gtip';tip.setAttribute('role','tooltip');tip.hidden=true;document.body.appendChild(tip);
+let tipEl=null;
+function catEl(t){const el=t&&t.closest?t.closest(CSEL):null;if(!el||el.closest('.legend,.chip,.covered,.gtip'))return null;return el}
+function showTip(el){
+  const k=Object.keys(CAT).find(c=>el.classList.contains(c));if(!k)return;
+  tipEl=el;el.classList.add('gcat');
+  const ca=document.documentElement.classList.contains('ca-on');
+  tip.innerHTML=esc(CAT[k][0])+(ca?`<small>${esc(CAT[k][1])}</small>`:'');tip.hidden=false;
+  const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
+  let x=r.left+r.width/2-w/2;x=Math.max(8,Math.min(x,innerWidth-w-8));
+  let y=r.top-h-8;if(y<8)y=r.bottom+8;
+  tip.style.left=x+'px';tip.style.top=y+'px';
+}
+function hideTip(){tip.hidden=true;tipEl=null}
+document.addEventListener('pointerover',e=>{const el=catEl(e.target);if(el){if(el!==tipEl)showTip(el)}else if(e.pointerType==='mouse')hideTip()});
+document.addEventListener('pointerdown',e=>{const el=catEl(e.target);if(el)showTip(el);else hideTip()});
+stage.addEventListener('scroll',hideTip,{passive:true});
+$$('#prev,#next,#rail').forEach(b=>b.addEventListener('click',hideTip));
+document.addEventListener('keydown',hideTip);
+
+go(cur);
+})();
+</script>
+</body></html>
