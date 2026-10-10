@@ -1,0 +1,1104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f6b52">
+<link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png">
+<title>2 ESO · Present Simple · Grammar deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Layout: full-screen projector deck. Top rail of numbered stops, one slide on stage, big prev/next at the bottom.
+   Grammar is colour-coded the same way on every slide: subject, helper (do/does), main verb / be, -s ending, frequency word, question word. */
+:root{
+  --bg:#f2f6f3; --surface:#ffffff; --ink:#1a2a23; --muted:#5a6c64; --line:#d2e0d8;
+  --accent:#1f6b52; --accent-ink:#ffffff; --soft:#e1efe7;
+  --subj:#2457a6; --aux:#a3560f; --verb:#12704e; --end:#b2380f; --end-bg:#ffdccc; --adv:#7236aa; --wh:#a0205e;
+  --ok:#17784a; --ok-bg:#d9f1e3; --no:#b3261e; --no-bg:#fbe0dc;
+  --f-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Lexend","Segoe UI",system-ui,sans-serif;
+  --fs:clamp(16px, .85vw + 8px, 26px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1714; --surface:#17221e; --ink:#e3eee8; --muted:#9bb0a6; --line:#2a3b34;
+  --accent:#5cc79d; --accent-ink:#0b1712; --soft:#1c2f28;
+  --subj:#86acff; --aux:#f2aa63; --verb:#5fd6a6; --end:#ffb79c; --end-bg:#5a2614; --adv:#c79dff; --wh:#ff8abb;
+  --ok:#6fdca4; --ok-bg:#16392a; --no:#ff9b91; --no-bg:#46201c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1714; --surface:#17221e; --ink:#e3eee8; --muted:#9bb0a6; --line:#2a3b34;
+  --accent:#5cc79d; --accent-ink:#0b1712; --soft:#1c2f28;
+  --subj:#86acff; --aux:#f2aa63; --verb:#5fd6a6; --end:#ffb79c; --end-bg:#5a2614; --adv:#c79dff; --wh:#ff8abb;
+  --ok:#6fdca4; --ok-bg:#16392a; --no:#ff9b91; --no-bg:#46201c; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{height:100%}
+body{margin:0;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:400 var(--fs)/1.5 var(--f-body)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default;opacity:.4}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* chrome */
+.top{display:flex;align-items:center;gap:.8em;padding:.45em 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{font:800 1em/1 var(--f-display);white-space:nowrap;letter-spacing:-.01em}
+.brand small{display:block;font:500 .6em/1.4 var(--f-body);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.rail{display:flex;gap:.3em;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none;padding:.15em}
+.rail::-webkit-scrollbar{display:none}
+.rail button{flex:0 0 auto;min-width:2em;height:2em;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font:600 .72em var(--f-body);font-variant-numeric:tabular-nums}
+.rail button.seen{color:var(--ink)}
+.rail button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.back-lab{display:inline-flex;align-items:center;justify-content:center;width:2em;height:2em;border-radius:999px;border:1px solid var(--line);color:var(--accent);text-decoration:none;font-weight:700;flex:0 0 auto}
+.tbtn{border:1px solid var(--line);background:transparent;border-radius:999px;padding:.3em .8em;font:600 .72em var(--f-body);white-space:nowrap}
+.tbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stage{flex:1;overflow:auto;padding-inline:16px}
+.bottom{display:flex;align-items:center;justify-content:space-between;gap:1em;padding:.45em 16px calc(.45em + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
+#where{font-size:.75em;color:var(--muted);text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.navbtn{border:0;border-radius:12px;padding:.5em 1.2em;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+.navbtn.back{background:transparent;color:var(--accent);border:1px solid var(--line)}
+
+/* slides */
+.slide{display:none;max-width:1180px;margin-inline:auto;padding-block:1.3em 2.4em}
+.slide.on{display:block}
+.eyebrow{font-size:.7em;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 .3em}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.015em}
+h2{font-size:2.3em;line-height:1.05;font-weight:800;margin-bottom:.4em}
+h3{font-size:1.15em;font-weight:600;margin-bottom:.2em}
+p{margin:0}
+.lead{font-size:1.1em;color:var(--muted);max-width:40em}
+.stack{display:flex;flex-direction:column;gap:1.1em}
+.row{display:flex;flex-wrap:wrap;gap:.6em;align-items:center}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:1.6em;align-items:start}
+.cols>*{min-width:0}
+@media (max-width:860px){.cols{grid-template-columns:minmax(0,1fr)!important}}
+
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:.45em 1em;font:600 .82em var(--f-body)}
+.btn.ghost{background:transparent;color:var(--accent);border-color:var(--line)}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.3em .8em;font:500 .8em var(--f-body);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+[data-k="s"] .chip[aria-pressed="true"]{background:var(--subj);border-color:var(--subj);color:var(--surface)}
+[data-k="v"] .chip[aria-pressed="true"]{background:var(--verb);border-color:var(--verb);color:var(--surface)}
+[data-k="a"] .chip[aria-pressed="true"]{background:var(--adv);border-color:var(--adv);color:var(--surface)}
+[data-k="wh"] .chip[aria-pressed="true"]{background:var(--wh);border-color:var(--wh);color:var(--surface)}
+.chips{display:flex;flex-wrap:wrap;gap:.35em}
+
+/* grammar colours */
+.sent{font:700 1.9em/1.3 var(--f-display);letter-spacing:-.01em;text-wrap:balance}
+.subj{color:var(--subj)} .aux{color:var(--aux)} .verb{color:var(--verb)} .adv{color:var(--adv)} .wh{color:var(--wh)}
+.end{background:var(--end-bg);color:var(--end);border-radius:.15em;padding:0 .05em}
+.legend{display:flex;flex-wrap:wrap;gap:.4em 1.1em;font-size:.78em;font-weight:600}
+.legend span{display:inline-flex;align-items:center;gap:.4em}
+.legend i{width:.8em;height:.8em;border-radius:3px;display:inline-block;background:currentColor}
+.legend .end i{background:var(--end-bg);outline:2px solid var(--end)}
+
+/* rule panels */
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1em 1.2em;display:flex;flex-direction:column;gap:.7em}
+.formula{font:600 1.15em/1.35 var(--f-display);display:flex;flex-wrap:wrap;gap:.2em .45em;align-items:baseline}
+.formula .op{color:var(--muted);font-weight:600}
+.small{font-size:.82em;color:var(--muted)}
+.ca{display:none;background:var(--soft);border-radius:10px;padding:.55em .85em;font-size:.86em}
+.ca::before{content:"CA";font-size:.7em;font-weight:600;letter-spacing:.1em;color:var(--accent);margin-right:.6em}
+:root.ca-on .ca{display:block}
+.tbl{overflow-x:auto;padding:.4em .6em}
+table.be{border-collapse:collapse;width:100%;font-size:.88em}
+table.be th,table.be td{padding:.5em .45em;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+table.be tr:last-child td{border-bottom:0}
+table.be th{font-size:.75em;letter-spacing:.1em;color:var(--muted);font-weight:600}
+table.be td:first-child{color:var(--subj);font-weight:600}
+
+/* cover */
+.cover{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:2em;align-items:center;min-height:62vh}
+.cover>*{min-width:0}
+@media (max-width:860px){.cover{grid-template-columns:minmax(0,1fr);min-height:0}}
+.cover h1{font-size:4.6em;line-height:.92;font-weight:800}
+.cover .sub{font-size:1.05em;color:var(--muted);margin-top:.8em}
+.clockcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.1em 1.3em;display:flex;flex-direction:column;gap:.6em}
+.clockcard .ln{display:flex;gap:.9em;align-items:baseline;font-size:1.05em}
+.clockcard time{font:600 1em var(--f-display);color:var(--muted);font-variant-numeric:tabular-nums;min-width:3.2em}
+.keys{font-size:.75em;color:var(--muted)}
+kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 .35em;background:var(--surface)}
+
+/* Mia's day */
+.day{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7em}
+@media (max-width:760px){.day{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.moment{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.8em .9em;display:flex;flex-direction:column;gap:.3em;min-width:0}
+.moment time{font:800 1.6em/1 var(--f-display);font-variant-numeric:tabular-nums}
+.moment .cue{color:var(--muted);font-size:.9em}
+.moment .full{display:none;font:600 1em/1.35 var(--f-display)}
+.moment .gl{display:none;font-size:.75em;color:var(--muted)}
+.moment.open{border-color:var(--accent)}
+.moment.open .full{display:block}
+.moment.open .cue{display:none}
+:root.ca-on .moment.open .gl{display:block}
+
+/* machine */
+.machine{display:flex;flex-direction:column;gap:.9em}
+.out-wrap{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1em 1.2em;min-height:5.4em;display:flex;flex-direction:column;justify-content:center;gap:.5em}
+.out{transition:filter .25s}
+.covered .out{filter:blur(.42em);user-select:none}
+.cover-btn{display:none;position:absolute;inset:0;border:0;background:transparent;font:600 .85em var(--f-body);color:var(--ink)}
+.covered .cover-btn{display:flex;align-items:center;justify-content:center}
+.cover-btn span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.4em 1em}
+.note{font-size:.85em;color:var(--no)}
+.answers{display:flex;flex-wrap:wrap;gap:.5em;align-items:center}
+.answers .sa{font:700 1.25em var(--f-display)}
+.saHint{font-size:.78em;color:var(--muted);flex-basis:100%}
+.ctrl{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:.6em;align-items:start}
+.ctrl .lab{font-size:.68em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:.55em}
+@media (max-width:560px){.ctrl{grid-template-columns:minmax(0,1fr)}.ctrl .lab{padding-top:0}}
+
+/* traps */
+.trap{display:flex;flex-wrap:wrap;align-items:center;gap:.4em 1em;background:var(--no-bg);border-radius:14px;padding:.7em 1em}
+.trap .sent{font-size:1.5em}
+.trap .x{display:inline-block;max-width:2em;overflow:hidden;vertical-align:bottom;color:var(--no);text-decoration:line-through;transition:max-width .45s ease,opacity .45s ease}
+.trap .mark{font:800 1.5em var(--f-display);color:var(--no)}
+.trap.fixed{background:var(--ok-bg)}
+.trap.fixed .x{max-width:0;opacity:0}
+.trap.fixed .mark{color:var(--ok)}
+.trap .right{display:none}
+.trap.fixed .wrong{display:none}
+.trap.fixed .right{display:block}
+.traps{display:flex;flex-direction:column;gap:.5em}
+.traps .sent{font-size:1.25em}
+
+/* spelling */
+.spell{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8em}
+@media (max-width:860px){.spell{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:.9em 1em;display:flex;flex-direction:column;gap:.5em;min-width:0}
+.group h3{font-size:1em}
+.flip{border:1px dashed var(--line);background:transparent;border-radius:10px;padding:.35em .6em;text-align:left;font:700 1.35em var(--f-display);display:flex;justify-content:space-between;gap:.4em;align-items:baseline}
+.flip .to{display:none;color:var(--verb)}
+.flip .arr{color:var(--muted);font-weight:600}
+.flip.open{border-style:solid;border-color:var(--verb)}
+.flip.open .to{display:inline}
+.flip:not(.open) .arr{visibility:hidden}
+
+/* frequency */
+.scale{display:flex;flex-direction:column;gap:.35em}
+.scale .bar{display:grid;grid-template-columns:6.5em minmax(0,1fr) 3em;gap:.7em;align-items:center}
+.scale b{font:700 1.1em var(--f-display);color:var(--adv)}
+.scale .track{height:.7em;background:var(--soft);border-radius:999px;overflow:hidden}
+.scale .fill{display:block;height:100%;background:var(--adv);border-radius:999px}
+.scale .pct{font-size:.75em;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.scale .cag{display:none;font-size:.7em;color:var(--muted);grid-column:1/-1;margin-top:-.4em}
+:root.ca-on .scale .cag{display:block}
+.place{display:flex;flex-direction:column;gap:.7em}
+.prow{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.7em 1em;display:flex;flex-direction:column;gap:.35em}
+.prow .sent{font-size:1.5em}
+.pill{display:inline-block;font:700 .8em var(--f-body);color:var(--surface);background:var(--adv);border-radius:999px;padding:.1em .7em;align-self:flex-start}
+.gap{display:inline-block;width:.8em;height:.8em;border-radius:50%;border:2px dashed var(--adv);background:transparent;vertical-align:middle;padding:0;margin:0 .05em}
+.gap:hover{background:var(--adv)}
+.placed{border-radius:.25em;padding:0 .15em;border:0;font:inherit}
+.placed.good{background:var(--ok-bg)}
+.placed.bad{background:var(--no-bg);text-decoration:line-through}
+.pfb{font-size:.85em;min-height:1.3em}
+.pfb.good{color:var(--ok)} .pfb.bad{color:var(--no)}
+
+/* jobs of do */
+.jobs{display:flex;flex-direction:column;gap:.4em}
+.jobs .sent{line-height:2.3}
+.lbl{position:relative;display:inline-block}
+.jobs.show .lbl::after{content:attr(data-label);position:absolute;left:50%;top:100%;transform:translate(-50%,-.25em);font:600 .3em/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;padding:.35em .6em;border-radius:999px;background:currentColor}
+.jobs.show .lbl::before{content:attr(data-label);position:absolute;left:50%;top:100%;transform:translate(-50%,-.25em);font:600 .3em/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;padding:.35em .6em;color:var(--surface);z-index:1}
+
+/* question words */
+.wgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7em}
+@media (max-width:860px){.wgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.wgrid{grid-template-columns:minmax(0,1fr)}}
+.wcard{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.7em .9em;display:flex;flex-direction:column;gap:.25em;min-width:0}
+.wcard b{font:800 1.45em/1.1 var(--f-display);color:var(--wh)}
+.wcard .about{font-size:.8em;color:var(--muted)}
+.wcard .cag{display:none;font-size:.75em;color:var(--accent)}
+:root.ca-on .wcard .cag{display:block}
+.wcard .ex{display:none;font:600 1em/1.35 var(--f-display)}
+.wcard .exa{display:none;font-size:.85em;color:var(--muted)}
+.wcard.open{border-color:var(--wh)}
+.wcard.open .ex,.wcard.open .exa{display:block}
+.chunk{border:0;background:transparent;font:inherit;letter-spacing:inherit;padding:0 .05em;border-bottom:.08em dashed var(--wh);border-radius:.15em .15em 0 0}
+.chunk:hover{background:var(--soft)}
+.chunk.sel{background:var(--soft);border-bottom-style:solid}
+.askpanel{display:flex;flex-direction:column;gap:.6em;border-top:1px solid var(--line);padding-top:.9em}
+.askpanel .out-wrap{min-height:4em}
+.askpanel .sent{font-size:1.6em}
+.whchip{align-self:flex-start;font:800 1.15em var(--f-display);color:var(--surface);background:var(--wh);border-radius:999px;padding:.1em .8em}
+.mean{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7em}
+@media (max-width:700px){.mean{grid-template-columns:minmax(0,1fr)}}
+.mcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.8em 1em;display:flex;flex-direction:column;gap:.45em;min-width:0}
+.mcard .qa{font:700 1.15em/1.35 var(--f-display)}
+.mcard .qa span.a{display:block;color:var(--muted)}
+.mcard .opt{font-size:.85em;padding:.45em .7em}
+
+/* carousels */
+.car-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.7em;align-items:center;margin-bottom:1em}
+.car-nav{display:flex;gap:.5em;align-items:center}
+.count{font-size:.8em;color:var(--muted);font-variant-numeric:tabular-nums;min-width:3.5em;text-align:center}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.2em 1.4em;display:flex;flex-direction:column;gap:.9em}
+.tag{font-size:.68em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.q-prompt{font:700 2.1em/1.25 var(--f-display);text-wrap:balance}
+#bedo .q-prompt{font-size:1.7em}
+.blank{display:inline-block;min-width:2.6em;border-bottom:.07em solid var(--muted);text-align:center;color:var(--aux)}
+.blank.filled{border-color:var(--ok);color:var(--ok)}
+.opts{display:grid;gap:.6em;grid-template-columns:repeat(auto-fit,minmax(min(100%,13em),1fr))}
+.opt{display:flex;gap:.7em;align-items:center;text-align:left;font-size:1.15em;font-weight:500;padding:.65em .9em;border-radius:14px;border:2px solid var(--line);background:var(--bg)}
+.opt .key{font:800 .8em var(--f-display);width:1.8em;height:1.8em;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--soft);flex:0 0 auto}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.no{border-color:var(--no);background:var(--no-bg);text-decoration:line-through}
+.fb{min-height:1.5em;font-size:1em}
+.fb b.g{color:var(--ok)} .fb b.r{color:var(--no)}
+.teams{display:flex;flex-wrap:wrap;gap:.7em;margin-top:1em}
+.team{display:flex;align-items:center;gap:.5em;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.4em .6em;flex:1 1 14em}
+.team input{flex:1;min-width:0;border:0;background:transparent;font:600 .9em var(--f-body);color:var(--ink)}
+.team .sc{font:800 1.6em var(--f-display);font-variant-numeric:tabular-nums;min-width:1.4em;text-align:center}
+.team button{width:2em;height:2em;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-weight:700}
+.word{border:0;background:transparent;padding:0 .06em;border-radius:.2em;font:inherit;color:inherit;letter-spacing:inherit}
+.word:hover{background:var(--soft)}
+.word.hit{color:var(--no);text-decoration:line-through;background:var(--no-bg)}
+.word.miss{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-.12em)}75%{transform:translateX(.12em)}}
+mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
+.ans{color:var(--ok)}
+.why{color:var(--muted);font-size:.95em}
+
+/* production */
+.tasks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8em}
+@media (max-width:860px){.tasks{grid-template-columns:minmax(0,1fr)}}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1em 1.1em;display:flex;flex-direction:column;gap:.6em;min-width:0}
+.task .model{font:600 1em/1.4 var(--f-display);background:var(--soft);border-radius:10px;padding:.6em .8em}
+.checks{display:flex;flex-direction:column;gap:.5em}
+.checks label{display:flex;gap:.6em;align-items:flex-start;font-size:.95em}
+.checks input{width:1.2em;height:1.2em;margin-top:.2em;accent-color:var(--accent);flex:0 0 auto}
+.timer{display:flex;flex-wrap:wrap;gap:.6em;align-items:center}
+.timer .t{font:800 2.4em/1 var(--f-display);font-variant-numeric:tabular-nums;min-width:3.2em}
+.timer.up .t{color:var(--no)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="back-lab" href="/English-lab/index.html#lab" title="Back to English Lab" aria-label="Back to English Lab">←</a>
+  <div class="brand">Present Simple<small>2 ESO · My Real Routine</small></div>
+  <nav class="rail" id="rail" aria-label="Slides"></nav>
+  <button class="tbtn" id="caBtn" type="button" aria-pressed="false" title="Show Catalan help (C)">Català</button>
+  <button class="tbtn" id="fsBtn" type="button" title="Full screen (F)">Full screen</button>
+</header>
+
+<main class="stage" id="stage">
+
+<section class="slide" data-title="Present Simple">
+  <div class="cover">
+    <div>
+      <p class="eyebrow">Learning Path 4 · Grammar</p>
+      <h1>Present Simple</h1>
+      <p class="sub">Talking about routines: things we do again and again, and how things usually are.</p>
+      <p class="keys" style="margin-top:1.6em">Move with <kbd>←</kbd> <kbd>→</kbd> or the buttons below · <kbd>C</kbd> Catalan help · <kbd>F</kbd> full screen</p>
+    </div>
+    <div class="clockcard" aria-label="Mia's school day">
+      <p class="eyebrow">Mia, a school day</p>
+      <p class="ln"><time>07:00</time><span><span class="subj">She</span> <span class="verb">wake<span class="end">s</span></span> up.</span></p>
+      <p class="ln"><time>07:30</time><span><span class="subj">She</span> <span class="verb">is</span> hungry.</span></p>
+      <p class="ln"><time>08:00</time><span><span class="subj">She</span> <span class="adv">usually</span> <span class="verb">walk<span class="end">s</span></span> to school.</span></p>
+      <p class="ln"><time>17:00</time><span><span class="wh">Where</span> <span class="aux">do<span class="end">es</span></span> <span class="subj">she</span> <span class="verb">go</span>?</span></p>
+      <p class="ln"><time>22:00</time><span><span class="aux">Do<span class="end">es</span>n’t</span> <span class="subj">she</span> <span class="verb">go</span> to bed late?</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Mia's day">
+  <p class="eyebrow">What is it for?</p>
+  <h2>Habits and routines</h2>
+  <div class="stack">
+    <p class="lead">We use the Present Simple for things that happen again and again. Ask the class: <b>What does Mia do at…?</b> Then click the card.</p>
+    <p class="ca">El Present Simple descriu hàbits i coses que es repeteixen. <b>I wake up at seven.</b> = Em desperto a les set. <b>She gets home at five.</b> = Arriba a casa a les cinc.</p>
+    <div class="row">
+      <span class="small">Who?</span>
+      <div class="chips" id="daySubj" data-k="s"></div>
+      <button class="btn ghost" type="button" id="dayAll">Show all</button>
+    </div>
+    <div class="day" id="day"></div>
+  </div>
+</section>
+
+<section class="slide" data-title="to be">
+  <p class="eyebrow">The verb to be</p>
+  <h2>am, is, are</h2>
+  <div class="cols">
+    <div class="stack">
+      <div class="rule tbl">
+        <table class="be">
+          <thead><tr><th scope="col"></th><th scope="col">+</th><th scope="col">−</th><th scope="col">?</th></tr></thead>
+          <tbody>
+            <tr><td>I</td><td><span class="verb">am</span> · I<span class="verb">’m</span></td><td>I<span class="verb">’m not</span></td><td><span class="verb">Am</span> I…?</td></tr>
+            <tr><td>he / she / it</td><td><span class="verb">is</span> · she<span class="verb">’s</span></td><td><span class="verb">isn’t</span></td><td><span class="verb">Is</span> she…?</td></tr>
+            <tr><td>you / we / they</td><td><span class="verb">are</span> · they<span class="verb">’re</span></td><td><span class="verb">aren’t</span></td><td><span class="verb">Are</span> you…?</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="rule">
+        <p><b>No do / does with be.</b> In questions, be jumps in front of the subject: <b><span class="verb">Is</span> <span class="subj">she</span> tired?</b></p>
+        <p class="small">Short answers: <b>Yes, I am. / No, I’m not. · Yes, she is. / No, she isn’t.</b> Don’t use the short form in a yes answer: <s>Yes, I’m.</s></p>
+        <p class="small">Age uses be: <b>I’m twelve.</b> not <s>I have twelve years.</s></p>
+      </div>
+      <p class="ca"><b>To be</b> = ser / estar. Serveix per descriure: tired (cansat), at school (a l’escola), twelve (dotze anys). No porta do / does: <b>Is she tired?</b>, no <s>Does she is tired?</s> Edat: <b>I’m twelve</b> (no <s>I have twelve years</s>).</p>
+    </div>
+    <div class="machine" data-machine='{"be":true,"forms":["aff","neg","q"],"s":6,"v":0}'></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Affirmative">
+  <p class="eyebrow">Rule 1 · Affirmative</p>
+  <h2>Who does the action?</h2>
+  <div class="cols">
+    <div class="stack">
+      <div class="rule">
+        <div class="formula"><span class="subj">I / you / we / they</span><span class="op">+</span><span class="verb">base verb</span></div>
+        <p class="sent" style="font-size:1.4em"><span class="subj">I</span> <span class="verb">get</span> up at seven.</p>
+      </div>
+      <div class="rule">
+        <div class="formula"><span class="subj">he / she / it</span><span class="op">+</span><span class="verb">verb<span class="end">-s</span></span></div>
+        <p class="sent" style="font-size:1.4em"><span class="subj">She</span> <span class="verb">get<span class="end">s</span></span> up at seven.</p>
+      </div>
+      <p class="ca">Amb <b>I / you / we / they</b>, utilitza la forma base: <b>I get up.</b> Amb <b>he / she / it</b>, afegeix normalment <b>-s</b>: <b>She gets up.</b></p>
+      <div class="legend" aria-label="Colour key"><span class="subj"><i></i>subject</span><span class="aux"><i></i>do / does</span><span class="verb"><i></i>main verb / be</span><span class="end"><i></i>-s ending</span><span class="adv"><i></i>how often</span><span class="wh"><i></i>question word</span></div>
+    </div>
+    <div class="machine" data-machine='{"forms":["aff"],"s":3,"v":1}'></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Adding -s">
+  <p class="eyebrow">Rule 1 · Spelling</p>
+  <h2>How do we add the -s?</h2>
+  <div class="stack">
+    <p class="lead">Read the verb, ask the class for the <b>he / she / it</b> form, then click to check.</p>
+    <div class="spell" id="spell"></div>
+    <div class="row"><button class="btn ghost" type="button" id="spellAll">Show all</button></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Negatives">
+  <p class="eyebrow">Rule 2 · Negative</p>
+  <h2>don’t and doesn’t</h2>
+  <div class="cols">
+    <div class="stack">
+      <div class="rule">
+        <div class="formula"><span class="subj">I / you / we / they</span><span class="op">+</span><span class="aux">don’t</span><span class="op">+</span><span class="verb">base verb</span></div>
+        <div class="formula"><span class="subj">he / she / it</span><span class="op">+</span><span class="aux">do<span class="end">es</span>n’t</span><span class="op">+</span><span class="verb">base verb</span></div>
+        <p class="small">The <b>-s</b> moves to <b>doesn’t</b>. The main verb has no -s.</p>
+      </div>
+      <div class="trap" data-trap>
+        <p class="sent"><span class="subj">She</span> <span class="aux">do<span class="end">es</span>n’t</span> <span class="verb">get<span class="x">s</span></span> up late.</p>
+        <span class="mark" aria-hidden="true">✗</span>
+        <button class="btn ghost" type="button">Fix it</button>
+      </div>
+      <p class="ca">Amb doesn’t, la marca de tercera persona ja és a l’auxiliar: el verb principal no porta -s.</p>
+    </div>
+    <div class="machine" data-machine='{"forms":["neg"],"s":6,"v":8}'></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Questions">
+  <p class="eyebrow">Rule 3 · Questions and short answers</p>
+  <h2>Do you…? Does she…?</h2>
+  <div class="cols">
+    <div class="stack">
+      <div class="rule">
+        <div class="formula"><span class="aux">Do</span><span class="op">+</span><span class="subj">I / you / we / they</span><span class="op">+</span><span class="verb">base verb</span><span class="op">…?</span></div>
+        <div class="formula"><span class="aux">Do<span class="end">es</span></span><span class="op">+</span><span class="subj">he / she / it</span><span class="op">+</span><span class="verb">base verb</span><span class="op">…?</span></div>
+        <p class="small">Short answers repeat the helper, not the main verb: <b>Yes, she does. / No, she doesn’t.</b></p>
+      </div>
+      <div class="trap" data-trap>
+        <p class="sent"><span class="aux">Do<span class="end">es</span></span> <span class="subj">she</span> <span class="verb">go<span class="x">es</span></span> to school?</p>
+        <span class="mark" aria-hidden="true">✗</span>
+        <button class="btn ghost" type="button">Fix it</button>
+      </div>
+      <p class="ca">Amb <b>does</b>, fes servir <b>go</b>, no <b>goes</b>. Resposta curta: Yes, I do. / No, I don’t. · Yes, she does. / No, she doesn’t.</p>
+    </div>
+    <div class="machine" data-machine='{"forms":["q"],"s":6,"v":2}'></div>
+  </div>
+</section>
+
+<section class="slide" data-title="be or do?">
+  <p class="eyebrow">be or do / does?</p>
+  <h2>Is she…? or Does she…?</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)">
+    <div class="stack">
+      <div class="rule">
+        <div class="formula"><span class="verb">am / is / are</span><span class="op">→ how someone is, where, age</span></div>
+        <p class="small">tired · hungry · at school · late · twelve</p>
+        <div class="formula"><span class="aux">do / does</span><span class="op">→ actions</span></div>
+        <p class="small">get up · have breakfast · go · watch · study</p>
+        <p class="small">Never both together.</p>
+      </div>
+      <div class="traps">
+        <div class="trap" data-swap>
+          <p class="sent wrong"><span class="subj">She</span> <span class="aux">doesn’t</span> <span class="verb">be</span> tired.</p>
+          <p class="sent right"><span class="subj">She</span> <span class="verb">isn’t</span> tired.</p>
+          <span class="mark" aria-hidden="true">✗</span><button class="btn ghost" type="button">Fix it</button>
+        </div>
+        <div class="trap" data-swap>
+          <p class="sent wrong"><span class="aux">Does</span> <span class="subj">she</span> <span class="verb">is</span> at school?</p>
+          <p class="sent right"><span class="verb">Is</span> <span class="subj">she</span> at school?</p>
+          <span class="mark" aria-hidden="true">✗</span><button class="btn ghost" type="button">Fix it</button>
+        </div>
+        <div class="trap" data-swap>
+          <p class="sent wrong"><span class="verb">Is</span> <span class="subj">Leo</span> <span class="verb">get</span> up early?</p>
+          <p class="sent right"><span class="aux">Does</span> <span class="subj">Leo</span> <span class="verb">get</span> up early?</p>
+          <span class="mark" aria-hidden="true">✗</span><button class="btn ghost" type="button">Fix it</button>
+        </div>
+      </div>
+      <p class="ca">Si la frase té <b>am / is / are</b>, no hi posis do / does. Si té un verb d’acció, necessites <b>do / does</b> per a la negativa i la pregunta.</p>
+    </div>
+    <div id="bedo"></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Negative questions">
+  <p class="eyebrow">Rule 3b · Negative questions</p>
+  <h2>Don’t you…? Doesn’t she…?</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)">
+    <div class="stack">
+      <div class="rule">
+        <div class="formula"><span class="aux">Don’t</span><span class="op">+</span><span class="subj">I / you / we / they</span><span class="op">+</span><span class="verb">base verb</span><span class="op">…?</span></div>
+        <div class="formula"><span class="aux">Do<span class="end">es</span>n’t</span><span class="op">+</span><span class="subj">he / she / it</span><span class="op">+</span><span class="verb">base verb</span><span class="op">…?</span></div>
+        <div class="formula"><span class="verb">Isn’t</span> <span class="subj">she</span>…? <span class="op">·</span> <span class="verb">Aren’t</span> <span class="subj">you</span>…? <span class="op">·</span> <span class="verb">Aren’t</span> <span class="subj">I</span>…?</div>
+        <p class="small">Always the short form at the start: <b>Doesn’t she…?</b></p>
+      </div>
+      <div class="rule">
+        <h3>When do we use them?</h3>
+        <p><b>Surprise:</b> <span class="aux">Don’t</span> <span class="subj">you</span> <span class="verb">like</span> pizza? I love it!</p>
+        <p><b>Checking what you think is true:</b> <span class="aux">Doesn’t</span> <span class="subj">Mia</span> <span class="verb">get</span> up at seven?</p>
+        <p><b>Suggestion:</b> <span class="wh">Why</span> <span class="aux">don’t</span> <span class="subj">you</span> <span class="verb">go</span> to bed earlier?</p>
+      </div>
+      <p class="ca">En anglès la resposta depèn dels <b>fets</b>, no de la pregunta. <b>Don’t you have breakfast?</b> — <b>Yes, I do</b> = sí que esmorzo. <b>No, I don’t</b> = no esmorzo. Compte: no diguis <s>Yes, I don’t</s>.</p>
+    </div>
+    <div class="stack">
+      <h3>Answer the facts. What does the answer mean?</h3>
+      <div class="mean" id="mean"></div>
+      <p class="small">Yes = it happens. No = it doesn’t happen. The answers are the same as for normal questions.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Question words">
+  <p class="eyebrow">Wh- questions</p>
+  <h2>Where, when, who, how…</h2>
+  <div class="stack">
+    <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      <div class="rule">
+        <div class="formula"><span class="wh">Question word</span><span class="op">+</span><span class="aux">do / does</span><span class="op">+</span><span class="subj">subject</span><span class="op">+</span><span class="verb">base verb</span><span class="op">…?</span></div>
+        <p class="sent" style="font-size:1.35em"><span class="wh">Where</span> <span class="aux">do<span class="end">es</span></span> <span class="subj">Leo</span> <span class="verb">have</span> lunch?</p>
+      </div>
+      <div class="rule">
+        <div class="formula"><span class="wh">Question word</span><span class="op">+</span><span class="verb">am / is / are</span><span class="op">+</span><span class="subj">subject</span><span class="op">…?</span></div>
+        <p class="sent" style="font-size:1.35em"><span class="wh">Why</span> <span class="verb">is</span> <span class="subj">Leo</span> tired?</p>
+      </div>
+    </div>
+    <p class="small">Remember the order with <b>QASI</b>: <span class="wh">Question word</span> · <span class="aux">Auxiliary</span> · <span class="subj">Subject</span> · <span class="verb">Infinitive (base verb)</span>.</p>
+    <p class="ca">Ordre de la pregunta: <b>paraula interrogativa + do / does + subjecte + verb</b>. No diguis <s>Where Leo has lunch?</s> sinó <b>Where does Leo have lunch?</b></p>
+    <div class="row"><p class="lead" style="flex:1">Ask the class what each word asks about, then click for an example.</p><button class="btn ghost" type="button" id="wAll">Show all</button></div>
+    <div class="wgrid" id="wgrid"></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Ask about it">
+  <p class="eyebrow">Wh- questions · practice</p>
+  <h2>Ask about the dashed part</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)">
+    <div class="stack">
+      <div class="rule">
+        <h3>Who has two patterns</h3>
+        <p class="small"><b>About the subject</b> (the person who does it): no do / does, and the verb keeps the -s.</p>
+        <p class="sent" style="font-size:1.25em"><span class="wh">Who</span> <span class="verb">get<span class="end">s</span></span> up first?</p>
+        <p class="small">Mia does.</p>
+        <p class="small"><b>About another person</b>: do / does + subject, like other questions.</p>
+        <p class="sent" style="font-size:1.25em"><span class="wh">Who</span> <span class="aux">do<span class="end">es</span></span> <span class="subj">Leo</span> <span class="verb">play</span> with?</p>
+        <p class="small">With Mia.</p>
+      </div>
+      <p class="ca">Who subjecte: <b>Who gets up first?</b> (Qui s’aixeca primer?) sense does. Who complement: <b>Who does Leo play with?</b> (Amb qui juga en Leo?) amb does i la preposició al final.</p>
+    </div>
+    <div id="ask"></div>
+  </div>
+</section>
+
+<section class="slide" data-title="How often?">
+  <p class="eyebrow">Rule 4 · Frequency words</p>
+  <h2>always, usually, often, sometimes, never</h2>
+  <div class="cols">
+    <div class="stack">
+      <div class="scale" id="scale"></div>
+      <div class="rule">
+        <div class="formula"><span class="subj">She</span><span class="adv">usually</span><span class="verb">has</span><span class="op">→ before the main verb</span></div>
+        <div class="formula"><span class="subj">She</span><span class="verb">is</span><span class="adv">usually</span><span class="op">→ after be</span></div>
+        <p class="small"><b class="adv">never</b> is already negative: <b>He never sleeps in</b>, not <s>He doesn’t never sleep in</s>.</p>
+      </div>
+      <p class="ca">Van normalment <b>abans del verb principal</b>: She usually has breakfast. Amb <b>be</b>, van <b>després</b>: She is usually tired. <b>Never</b> ja expressa una idea negativa: no cal afegir don’t / doesn’t.</p>
+    </div>
+    <div class="stack">
+      <h3>Where does it go? Click a dot.</h3>
+      <div class="place" id="place"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="Two jobs of do">
+  <p class="eyebrow">Watch out</p>
+  <h2>do can be the action or the helper</h2>
+  <div class="stack">
+    <p class="lead">In <b>do your homework</b>, <b>do</b> is the action. In questions and negatives, we also need <b>do / does</b> as a helper. Sometimes both appear together.</p>
+    <div class="jobs" id="jobs">
+      <p class="sent"><span class="subj">She</span> <span class="lbl verb" data-label="main verb">do<span class="end">es</span></span> her homework.</p>
+      <p class="sent"><span class="lbl aux" data-label="helper">Do<span class="end">es</span></span> <span class="subj">she</span> <span class="lbl verb" data-label="main verb">do</span> her homework?</p>
+      <p class="sent"><span class="subj">She</span> <span class="lbl aux" data-label="helper">do<span class="end">es</span>n’t</span> <span class="lbl verb" data-label="main verb">do</span> her homework.</p>
+    </div>
+    <div class="row"><button class="btn" type="button" id="jobsBtn">Show the jobs</button></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Sentence machine">
+  <p class="eyebrow">Practice together</p>
+  <h2>Sentence machine</h2>
+  <div class="stack">
+    <p class="lead">Press <b>Random</b>: the sentence is hidden. The class says it aloud, then you reveal it. Or build one and change a single piece.</p>
+    <div class="machine" data-machine='{"both":true,"forms":["aff","neg","q","nq"],"adv":true,"wh":true,"s":6,"v":4}'></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Quick quiz">
+  <p class="eyebrow">Check · whole class</p>
+  <h2>Quick quiz</h2>
+  <div id="quiz"></div>
+  <div class="teams" aria-label="Team scores">
+    <div class="team"><input id="teamA" value="Team A" aria-label="Team A name"><button type="button" data-team="0" data-d="-1" aria-label="Remove a point">−</button><span class="sc" id="sc0">0</span><button type="button" data-team="0" data-d="1" aria-label="Add a point">+</button></div>
+    <div class="team"><input id="teamB" value="Team B" aria-label="Team B name"><button type="button" data-team="1" data-d="-1" aria-label="Remove a point">−</button><span class="sc" id="sc1">0</span><button type="button" data-team="1" data-d="1" aria-label="Add a point">+</button></div>
+  </div>
+</section>
+
+<section class="slide" data-title="Error hunt">
+  <p class="eyebrow">Edit</p>
+  <h2>Error hunt</h2>
+  <p class="lead" style="margin-bottom:1em">Each sentence breaks a rule. A student points to the wrong word, you click it. Then show the correction.</p>
+  <div id="errors"></div>
+</section>
+
+<section class="slide" data-title="Transform">
+  <p class="eyebrow">Transform</p>
+  <h2>Change one thing</h2>
+  <p class="lead" style="margin-bottom:1em">Change only what the instruction asks. Students say it first, then reveal.</p>
+  <div id="transform"></div>
+</section>
+
+<section class="slide" data-title="Your turn">
+  <p class="eyebrow">Short production</p>
+  <h2>Your turn: write about a routine</h2>
+  <div class="stack">
+    <div class="tasks" id="tasks"></div>
+    <div class="cols" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
+      <div class="rule">
+        <h3>Check before you finish</h3>
+        <div class="checks">
+          <label><input type="checkbox" id="ck1"><span>With <b class="subj">he / she / it</b>, my affirmative verbs end in <b class="end">-s</b>.</span></label>
+          <label><input type="checkbox" id="ck2"><span>After <b class="aux">do / does / don’t / doesn’t</b>, I use the base verb.</span></label>
+          <label><input type="checkbox" id="ck5"><span>With <b class="verb">am / is / are</b>, I don’t use do / does.</span></label>
+          <label><input type="checkbox" id="ck6"><span>My questions follow <b>QASI</b>: <span class="wh">question word</span> + <span class="aux">do / does</span> + <span class="subj">subject</span> + <span class="verb">verb</span>.</span></label>
+          <label><input type="checkbox" id="ck3"><span>My <b class="adv">frequency word</b> is before the main verb, or after <b>be</b>.</span></label>
+        </div>
+      </div>
+      <div class="rule">
+        <h3>Writing time</h3>
+        <div class="timer" id="timer">
+          <span class="t" id="tShow">05:00</span>
+          <div class="chips"><button class="chip" type="button" data-min="3">3 min</button><button class="chip" type="button" data-min="5" aria-pressed="true">5 min</button><button class="chip" type="button" data-min="8">8 min</button></div>
+        </div>
+        <div class="row"><button class="btn" type="button" id="tGo">Start</button><button class="btn ghost" type="button" id="tReset">Reset</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="bottom">
+  <button class="navbtn back" id="prev" type="button">← Back</button>
+  <span id="where" aria-live="polite"></span>
+  <button class="navbtn" id="next" type="button">Next →</button>
+</footer>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem('psDeck.'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('psDeck.'+k,JSON.stringify(v))}catch(e){}}};
+const ROUTES=['All','Insecure','Safe','Daring'];
+/* tiny markup: {w:Where} {a:do[es]} {s:Leo} {v:have} lunch? */
+const MK={w:'wh',a:'aux',s:'subj',v:'verb',d:'adv'};
+const mk=s=>s.replace(/\{(\w):([^}]*)\}/g,(_,k,t)=>`<span class="${MK[k]}">${t.replace(/\[([^\]]*)\]/g,'<span class="end">$1</span>')}</span>`);
+
+/* ---------- deck ---------- */
+const slides=$$('.slide'),rail=$('#rail'),stage=$('#stage');
+let cur=Math.min(Math.max(0,store.get('slide',0)|0),slides.length-1);
+slides.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.textContent=i+1;b.title=s.dataset.title;b.setAttribute('aria-label',`Slide ${i+1}: ${s.dataset.title}`);b.onclick=()=>go(i);rail.appendChild(b)});
+function go(i){
+  cur=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,j)=>s.classList.toggle('on',j===cur));
+  [...rail.children].forEach((b,j)=>{b.setAttribute('aria-current',String(j===cur));if(j===cur)b.classList.add('seen')});
+  $('#where').textContent=`${cur+1} / ${slides.length} · ${slides[cur].dataset.title}`;
+  $('#prev').disabled=cur===0;$('#next').disabled=cur===slides.length-1;
+  stage.scrollTop=0;
+  const rb=rail.children[cur];if(rb)rail.scrollLeft=rb.offsetLeft-rail.clientWidth/2;
+  store.set('slide',cur);
+}
+$('#prev').onclick=()=>go(cur-1);$('#next').onclick=()=>go(cur+1);
+function setCa(on){document.documentElement.classList.toggle('ca-on',on);$('#caBtn').setAttribute('aria-pressed',String(on));store.set('ca',on)}
+const toggleCa=()=>setCa(!document.documentElement.classList.contains('ca-on'));
+$('#caBtn').onclick=toggleCa;setCa(!!store.get('ca',false));
+function fs(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}}
+$('#fsBtn').onclick=fs;
+document.addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('input,textarea,select'))return;
+  if(e.altKey||e.ctrlKey||e.metaKey)return;
+  const k=e.key;
+  if(k==='ArrowRight'||k==='PageDown'){e.preventDefault();go(cur+1)}
+  else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();go(cur-1)}
+  else if(k==='Home'){go(0)}else if(k==='End'){go(slides.length-1)}
+  else if(k==='c'||k==='C'){toggleCa()}else if(k==='f'||k==='F'){fs()}
+});
+
+/* ---------- grammar engine ---------- */
+const SUBJ=[
+  {k:'I',third:false,poss:'my',ans:'you'},
+  {k:'you',third:false,poss:'your',ans:'I'},
+  {k:'he',third:true,poss:'his',ans:'he'},
+  {k:'she',third:true,poss:'her',ans:'she'},
+  {k:'we',third:false,poss:'our',ans:'we'},
+  {k:'they',third:false,poss:'their',ans:'they'},
+  {k:'Mia',third:true,poss:'her',ans:'she'},
+  {k:'Leo',third:true,poss:'his',ans:'he'},
+  {k:'Mia and Leo',third:false,poss:'their',ans:'they'}
+];
+const PRON=['I','you','he','she','we','they'];
+const VERBS=[
+  {v:'wake',t:'wakes',p:' up',o:'',w:' at seven'},
+  {v:'get',t:'gets',p:' up',o:'',w:' at quarter past seven'},
+  {v:'have',t:'has',irr:1,p:'',o:' breakfast',w:' at half past seven'},
+  {v:'go',t:'goes',p:'',o:' to school on foot',w:' every day'},
+  {v:'get',t:'gets',p:'',o:' home',w:' at five'},
+  {v:'do',t:'does',p:'',o:' {poss} homework',w:' after school'},
+  {v:'watch',t:'watches',p:'',o:' TV',w:' in the evening'},
+  {v:'study',t:'studies',p:'',o:' English',w:' on Mondays'},
+  {v:'sleep',t:'sleeps',p:' in',o:'',w:' on weekends'},
+  {v:'go',t:'goes',p:'',o:' to bed',w:' at ten'}
+];
+const COMPS=['tired','at school','late for school','hungry','in bed','busy on Mondays','happy at the weekend','at home on Sundays'];
+const vLabel=V=>V.v+V.p+V.o.replace(' {poss}','');
+function third(V){
+  if(V.irr)return [[V.t,'end']];
+  let i=0;while(i<V.v.length&&V.v[i]===V.t[i])i++;
+  if(i===V.t.length)return [[V.t]];
+  return [[V.t.slice(0,i)],[V.t.slice(i),'end']];
+}
+const W=w=>({c:'wh',parts:[[w]]});
+function finish(T,note,end){const toks=T.filter(Boolean);const f=toks[0].parts[0];f[0]=f[0].charAt(0).toUpperCase()+f[0].slice(1);return {toks,note,end}}
+/* action verbs */
+function build(S,V,f,a,wh){
+  const o=V.o.replace('{poss}',S.poss);
+  const T=[];let note='',end='.';
+  const subj={c:'subj',parts:[[S.k]]};
+  const adv=a?{c:'adv',parts:[[a]]}:null;
+  const base={c:'verb',parts:[[V.v]]};
+  const v3={c:'verb',parts:S.third?third(V):[[V.v]]};
+  const rest=withTime=>{const s=(V.p+o+(withTime?V.w:'')).trim();return s?{c:'rest',parts:[[s]]}:null};
+  if(f==='aff'){T.push(subj);if(adv)T.push(adv);T.push(v3,rest(true))}
+  else if(f==='neg'){
+    if(a==='never'){T.push(subj,adv,v3,rest(true));note='never is already negative, so no don’t / doesn’t.'}
+    else{
+      const aux={c:'aux',parts:S.third?[['do'],['es','end'],['n’t']]:[['don’t']]};
+      if(a==='sometimes')T.push(subj,adv,aux,base,rest(true));
+      else{T.push(subj,aux);if(adv)T.push(adv);T.push(base,rest(true))}
+    }
+  }else if(f==='q'){
+    end='?';
+    const aux={c:'aux',parts:S.third?[['do'],['es','end']]:[['do']]};
+    if(wh==='how often'){T.push(W(wh),aux,subj,base,rest(false));if(a)note='How often already asks about frequency, so no extra frequency word.'}
+    else if(wh==='when'){T.push(W(wh),aux,subj);if(adv)T.push(adv);T.push(base,rest(false))}
+    else{if(wh==='why')T.push(W(wh));T.push(aux,subj);if(adv)T.push(adv);T.push(base,rest(true))}
+  }else{
+    end='?';
+    const aux={c:'aux',parts:S.third?[['do'],['es','end'],['n’t']]:[['don’t']]};
+    let a2=adv;if(a==='never'){note='Don’t use never in a negative question.';a2=null}
+    if(wh==='why')T.push(W(wh));
+    T.push(aux,subj);if(a2)T.push(a2);T.push(base,rest(true));
+  }
+  return finish(T,note,end);
+}
+/* to be */
+function buildBe(S,C,f,a,form){
+  const short=form==='short',isPron=PRON.includes(S.k);
+  const bf=S.k==='I'?'am':S.third?'is':'are';
+  const T=[];let note='',end='.';
+  const subj={c:'subj',parts:[[S.k]]};
+  const adv=a?{c:'adv',parts:[[a]]}:null;
+  const comp={c:'rest',parts:[[C]]};
+  const SC={am:'’m',is:'’s',are:'’re'},NEG={am:'’m not',is:'isn’t',are:'aren’t'};
+  if(f==='aff'||(f==='neg'&&a==='never')){
+    if(f==='neg')note='never is already negative, so no not / isn’t / aren’t.';
+    T.push(subj,short&&isPron?{c:'verb',glue:1,parts:[[SC[bf]]]}:{c:'verb',parts:[[bf]]});
+    if(adv)T.push(adv);T.push(comp);
+  }else if(f==='neg'){
+    T.push(subj);
+    if(short)T.push(bf==='am'?{c:'verb',glue:1,parts:[['’m not']]}:{c:'verb',parts:[[NEG[bf]]]});
+    else T.push({c:'verb',parts:[[bf+' not']]});
+    if(adv)T.push(adv);T.push(comp);
+  }else{
+    end='?';let a2=adv;
+    if(f==='nq'&&a==='never'){note='Don’t use never in a negative question.';a2=null}
+    if(f==='nq'&&bf==='am')note='With I, the negative question is Aren’t I…?';
+    T.push({c:'verb',parts:[[f==='q'?bf:(bf==='am'?'aren’t':NEG[bf])]]},subj);
+    if(a2)T.push(a2);T.push(comp);
+  }
+  return finish(T,note,end);
+}
+function html(b){
+  return b.toks.map((t,i)=>(i&&!t.glue?' ':'')+`<span class="${t.c}">${t.parts.map(([x,k])=>k?`<span class="${k}">${esc(x)}</span>`:esc(x)).join('')}</span>`).join('')+b.end;
+}
+function shortAns(S,be){
+  const p=S.ans,t3=p==='he'||p==='she',sp=`<span class="subj">${p}</span>`;
+  if(be){const v=p==='I'?'am':t3?'is':'are';
+    return {yes:`Yes, ${sp} <span class="verb">${v}</span>.`,no:p==='I'?`No, ${sp}<span class="verb">’m not</span>.`:`No, ${sp} <span class="verb">${t3?'isn’t':'aren’t'}</span>.`}}
+  return {yes:`Yes, ${sp} <span class="aux">${t3?'do<span class="end">es</span>':'do'}</span>.`,no:`No, ${sp} <span class="aux">${t3?'do<span class="end">es</span>n’t':'don’t'}</span>.`};
+}
+
+/* ---------- machine ---------- */
+const FORMLAB={aff:'+ Affirmative',neg:'− Negative',q:'? Question',nq:'−? Negative question'};
+const ctrl=(lab,inner,cls='')=>`<div class="ctrl ${cls}"><span class="lab">${lab}</span>${inner}</div>`;
+const chips=(k,list)=>`<div class="chips" data-k="${k}" role="group">${list.map(([v,l])=>`<button type="button" class="chip" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>`;
+const isQ=f=>f==='q'||f==='nq';
+function machine(root,opt){
+  const forms=opt.forms;
+  const st={s:opt.s??3,v:opt.v??0,f:forms[0],a:'',wh:'',c:'short',be:opt.be?'1':'0'};
+  let covered=false,shown='';
+  const isBe=()=>st.be==='1';
+  function controls(){
+    const items=isBe()?COMPS.map((x,i)=>[i,x]):VERBS.map((x,i)=>[i,vLabel(x)]);
+    const wantWh=(opt.wh||forms.includes('q')||forms.includes('nq'))&&!isBe();
+    root.innerHTML=`<div class="out-wrap"><p class="sent out" aria-live="polite"></p><p class="note"></p><div class="answers"></div><button type="button" class="cover-btn"><span>Say it aloud · click to reveal</span></button></div>`
+      +(opt.both?ctrl('Verb',chips('be',[['0','action verbs'],['1','to be']])):'')
+      +ctrl('Who?',chips('s',SUBJ.map((x,i)=>[i,x.k])))
+      +(forms.length>1?ctrl('Form',chips('f',forms.map(f=>[f,FORMLAB[f]]))):'')
+      +ctrl(isBe()?'Describe':'Action',chips('v',items))
+      +(opt.adv?ctrl('How often',chips('a',[['','—'],['always','always'],['usually','usually'],['often','often'],['sometimes','sometimes'],['never','never']])):'')
+      +(isBe()?ctrl('Forms',chips('c',[['short','short: I’m, isn’t'],['long','long: I am, is not']])):'')
+      +(wantWh?ctrl('Question word',chips('wh',[['','none (yes / no)'],['when','When…?'],['how often','How often…?'],['why','Why…?']]),'whc'):'')
+      +`<div class="row"><button type="button" class="btn" data-act="rand">Random (hidden)</button><button type="button" class="btn ghost" data-act="cover">Hide sentence</button></div>`;
+  }
+  function draw(){
+    const S=SUBJ[st.s];
+    if(st.f==='nq'&&!['','why'].includes(st.wh))st.wh='';
+    const whc=$('.whc',root);
+    if(whc){whc.hidden=!isQ(st.f);$$('[data-k="wh"] .chip',root).forEach(c=>c.hidden=st.f==='nq'&&!['','why'].includes(c.dataset.v))}
+    const wh=isQ(st.f)&&!isBe()?st.wh:'';
+    const b=isBe()?buildBe(S,COMPS[st.v],st.f,st.a,st.c):build(S,VERBS[st.v],st.f,st.a,wh);
+    $('.out',root).innerHTML=html(b);
+    const note=$('.note',root);note.textContent=b.note;note.hidden=!b.note;
+    const ans=$('.answers',root);
+    if(isQ(st.f)&&!wh){const sa=shortAns(S,isBe());
+      ans.innerHTML=`<button type="button" class="btn ghost" data-sa="yes">Yes…</button><button type="button" class="btn ghost" data-sa="no">No…</button><span class="sa">${shown?sa[shown]:''}</span>${st.f==='nq'?'<span class="saHint">Answer the facts: Yes = it happens. No = it doesn’t.</span>':''}`;
+    }else ans.innerHTML='';
+    $('.out-wrap',root).classList.toggle('covered',covered);
+    $('[data-act="cover"]',root).textContent=covered?'Show sentence':'Hide sentence';
+    $$('[data-k]',root).forEach(g=>{const k=g.dataset.k;$$('.chip',g).forEach(c=>c.setAttribute('aria-pressed',String(String(st[k])===c.dataset.v)))});
+  }
+  root.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b||!root.contains(b))return;
+    const g=b.closest('[data-k]');
+    if(g){const k=g.dataset.k;
+      if(k==='be'){if(st.be!==b.dataset.v){st.be=b.dataset.v;st.v=0;controls()}}
+      else st[k]=(k==='s'||k==='v')?+b.dataset.v:b.dataset.v;
+      shown='';draw();return}
+    if(b.classList.contains('cover-btn')){covered=false;draw();return}
+    if(b.dataset.sa){shown=shown===b.dataset.sa?'':b.dataset.sa;draw();return}
+    if(b.dataset.act==='cover'){covered=!covered;draw()}
+    if(b.dataset.act==='rand'){
+      if(opt.both){const nb=rnd(2)?'1':'0';if(nb!==st.be){st.be=nb;st.v=0;controls()}}
+      const n=isBe()?COMPS.length:VERBS.length;
+      let s,v;do{s=rnd(SUBJ.length);v=rnd(n)}while(s===st.s&&v===st.v);
+      st.s=s;st.v=v;if(forms.length>1)st.f=forms[rnd(forms.length)];
+      if(opt.adv)st.a=['','','always','usually','often','sometimes','never'][rnd(7)];
+      st.wh=(!isBe()&&isQ(st.f))?['','','when','how often','why'][rnd(5)]:'';
+      shown='';covered=true;draw();
+    }
+  });
+  controls();draw();
+}
+$$('[data-machine]').forEach(m=>machine(m,JSON.parse(m.dataset.machine)));
+
+/* ---------- Mia's day ---------- */
+const DAY=[
+  {tm:'07:00',v:'wake',t:'wakes',p:' up',o:'',w:' at seven',ca:'La Mia es desperta a les set.'},
+  {tm:'07:15',v:'get',t:'gets',p:' up',o:'',w:' at quarter past seven',ca:'La Mia s’aixeca a un quart de vuit.'},
+  {tm:'07:30',v:'have',t:'has',irr:1,p:'',o:' breakfast',w:' at half past seven',ca:'La Mia esmorza a dos quarts de vuit.'},
+  {tm:'08:00',v:'go',t:'goes',p:'',o:' to school on foot',w:' at eight',ca:'La Mia va a l’escola a peu a les vuit.'},
+  {tm:'17:00',v:'get',t:'gets',p:'',o:' home',w:' at five',ca:'La Mia arriba a casa a les cinc.'},
+  {tm:'17:30',v:'do',t:'does',p:'',o:' {poss} homework',w:' at half past five',ca:'La Mia fa els deures a dos quarts de sis.'},
+  {tm:'21:00',v:'wind',t:'winds',p:' down',o:' with music',w:' at nine',ca:'La Mia es relaxa amb música a les nou.'},
+  {tm:'22:00',v:'go',t:'goes',p:'',o:' to bed',w:' at ten',ca:'La Mia se’n va a dormir a les deu.'}
+];
+const DAYS=[6,0,7,8];let daySubj=6;const dayOpen=new Set();
+$('#daySubj').innerHTML=DAYS.map(i=>`<button type="button" class="chip" data-v="${i}">${SUBJ[i].k}</button>`).join('');
+function drawDay(){
+  const S=SUBJ[daySubj];
+  $('#day').innerHTML=DAY.map((d,i)=>`<button type="button" class="moment${dayOpen.has(i)?' open':''}" data-i="${i}"><time>${d.tm}</time><span class="cue">${esc(vLabel(d))}</span><span class="full">${html(build(S,d,'aff','',''))}</span>${daySubj===6?`<span class="gl">${esc(d.ca)}</span>`:''}</button>`).join('');
+  $$('#daySubj .chip').forEach(c=>c.setAttribute('aria-pressed',String(+c.dataset.v===daySubj)));
+  $('#dayAll').textContent=dayOpen.size===DAY.length?'Hide all':'Show all';
+}
+$('#day').addEventListener('click',e=>{const b=e.target.closest('.moment');if(!b)return;const i=+b.dataset.i;dayOpen.has(i)?dayOpen.delete(i):dayOpen.add(i);drawDay()});
+$('#daySubj').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;daySubj=+b.dataset.v;drawDay()});
+$('#dayAll').onclick=()=>{if(dayOpen.size===DAY.length)dayOpen.clear();else DAY.forEach((_,i)=>dayOpen.add(i));drawDay()};
+drawDay();
+
+/* ---------- spelling ---------- */
+const SPELL=[
+  ['Most verbs: + s',[['get','gets'],['wake','wakes'],['sleep','sleeps'],['play','plays']]],
+  ['-ch, -sh, -o: + es',[['watch','watches'],['wash','washes'],['go','goes'],['do','does']]],
+  ['consonant + y: y → ies',[['study','studies'],['tidy','tidies'],['hurry','hurries']]],
+  ['Irregular',[['have','has',1]]]
+];
+$('#spell').innerHTML=SPELL.map(([h,list])=>`<div class="group"><h3>${esc(h)}</h3>${list.map(([b,t,irr])=>`<button type="button" class="flip"><span>${b}</span><span class="arr">→</span><span class="to">${html({toks:[{c:'verb',parts:third({v:b,t,irr})}],end:''})}</span></button>`).join('')}</div>`).join('');
+$('#spell').addEventListener('click',e=>{const b=e.target.closest('.flip');if(b)b.classList.toggle('open')});
+$('#spellAll').onclick=()=>{const all=$$('#spell .flip'),open=all.every(f=>f.classList.contains('open'));all.forEach(f=>f.classList.toggle('open',!open));$('#spellAll').textContent=open?'Show all':'Hide all'};
+
+/* ---------- traps ---------- */
+$$('[data-trap],[data-swap]').forEach(t=>{const b=$('button',t),m=$('.mark',t);b.onclick=()=>{const f=t.classList.toggle('fixed');m.textContent=f?'✓':'✗';b.textContent=f?'Show the mistake':'Fix it'}});
+
+/* ---------- negative question meanings ---------- */
+const MEAN=[
+  {q:'{a:Don’t} {s:you} {v:have} breakfast?',a:'Yes, I do.',o:['I have breakfast.','I don’t have breakfast.'],ok:0},
+  {q:'{a:Do[es]n’t} {s:Leo} {v:walk} to school?',a:'No, he doesn’t.',o:['Leo walks to school.','Leo doesn’t walk to school.'],ok:1},
+  {q:'{v:Isn’t} {s:Mia} tired?',a:'Yes, she is.',o:['Mia is tired.','Mia isn’t tired.'],ok:0},
+  {q:'{v:Aren’t} {s:they} at home?',a:'No, they aren’t.',o:['They are at home.','They aren’t at home.'],ok:1}
+];
+$('#mean').innerHTML=MEAN.map((m,i)=>`<div class="mcard" data-i="${i}"><p class="qa">${mk(m.q)}<span class="a">— ${esc(m.a)}</span></p>${m.o.map((o,j)=>`<button type="button" class="opt" data-j="${j}">${esc(o)}</button>`).join('')}</div>`).join('');
+$('#mean').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;const card=b.closest('.mcard'),m=MEAN[+card.dataset.i];b.classList.add(+b.dataset.j===m.ok?'ok':'no')});
+
+/* ---------- question words ---------- */
+const WORDS=[
+  ['What','things and actions','què','{w:What} {a:do} {s:you} {v:have} for breakfast?','Cereal and milk.'],
+  ['What time','the exact time','a quina hora','{w:What time} {a:do[es]} {s:Mia} {v:get} up?','At seven o’clock.'],
+  ['When','the moment or the day','quan','{w:When} {a:do} {s:you} {v:do} your homework?','After school.'],
+  ['Where','places','on','{w:Where} {a:do[es]} {s:Leo} {v:have} lunch?','At school.'],
+  ['Who','people','qui','{w:Who} {a:do} {s:you} {v:walk} to school with?','With my sister.'],
+  ['Why','the reason','per què','{w:Why} {v:is} {s:Leo} tired?','Because he goes to bed late.'],
+  ['How','the way you do it','com','{w:How} {a:do} {s:you} {v:go} to school?','By bus.'],
+  ['How often','frequency','amb quina freqüència','{w:How often} {a:do[es]} {s:Mia} {v:play} sport?','Twice a week.'],
+  ['How old','age','quants anys','{w:How old} {v:is} {s:your brother}?','He’s twelve.']
+];
+$('#wgrid').innerHTML=WORDS.map(([w,ab,ca,q,a])=>`<button type="button" class="wcard"><b>${w}</b><span class="about">asks about ${esc(ab)}</span><span class="cag">${esc(ca)}</span><span class="ex">${mk(q)}</span><span class="exa">${esc(a)}</span></button>`).join('');
+$('#wgrid').addEventListener('click',e=>{const b=e.target.closest('.wcard');if(b)b.classList.toggle('open')});
+$('#wAll').onclick=()=>{const all=$$('#wgrid .wcard'),open=all.every(f=>f.classList.contains('open'));all.forEach(f=>f.classList.toggle('open',!open));$('#wAll').textContent=open?'Show all':'Hide all'};
+
+/* ---------- frequency ---------- */
+const FREQ=[['always',100,'sempre'],['usually',85,'normalment'],['often',65,'sovint'],['sometimes',40,'de vegades'],['never',0,'mai']];
+$('#scale').innerHTML=FREQ.map(([w,p,c])=>`<div class="bar"><b>${w}</b><span class="track"><span class="fill" style="width:${Math.max(p,1.5)}%"></span></span><span class="pct">${p}%</span><span class="cag">${c}</span></div>`).join('');
+const PLACE=[
+  {a:'usually',w:[['She','subj'],['has','verb'],['breakfast'],['at home.']],ok:1,why:'Before the main verb: She usually has breakfast at home.'},
+  {a:'usually',w:[['She','subj'],['is','verb'],['tired'],['after school.']],ok:2,why:'After be: She is usually tired after school.'},
+  {a:'never',w:[['Leo','subj'],['goes','verb'],['to bed'],['late.']],ok:1,why:'Before the main verb. Never is already negative: no doesn’t.'},
+  {a:'usually',w:[['Mia','subj'],['doesn’t','aux'],['sleep in','verb'],['on weekdays.']],ok:2,why:'After doesn’t, before the main verb: Mia doesn’t usually sleep in.'},
+  {a:'always',w:[['Do','aux'],['you','subj'],['have','verb'],['breakfast'],['at home?']],ok:2,why:'After the subject, before the main verb: Do you always have breakfast at home?'}
+];
+function drawPlace(row,it,ch){
+  const s=it.w.map((w,i)=>{let g='';if(i>0){g=ch===i?`<button type="button" class="adv placed ${i===it.ok?'good':'bad'}" data-i="${i}" title="Click to remove">${it.a}</button> `:`<button type="button" class="gap" data-i="${i}" aria-label="Put ${it.a} before ${esc(w[0])}"></button> `}return g+`<span class="${w[1]||''}">${esc(w[0])}</span>`}).join(' ');
+  const fb=ch==null?'':ch===it.ok?`<b>✓</b> ${esc(it.why)}`:'Not there. Try another dot.';
+  row.innerHTML=`<span class="pill">${it.a}</span><p class="sent">${s}</p><p class="pfb ${ch==null?'':ch===it.ok?'good':'bad'}">${fb}</p>`;
+}
+PLACE.forEach(it=>{const row=document.createElement('div');row.className='prow';$('#place').appendChild(row);drawPlace(row,it,null);
+  row.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.i;drawPlace(row,it,b.classList.contains('placed')?null:i)})});
+
+/* ---------- jobs ---------- */
+$('#jobsBtn').onclick=()=>{const on=$('#jobs').classList.toggle('show');$('#jobsBtn').textContent=on?'Hide the jobs':'Show the jobs'};
+
+/* ---------- carousels ---------- */
+function carousel(root,items,render,o={}){
+  let lv=o.noFilter?0:store.get(root.id+'.lv',0),idx=0;
+  root.innerHTML=`<div class="car-head">${o.noFilter?'<span></span>':`<div class="chips" role="group" aria-label="Route">${ROUTES.map((n,i)=>`<button type="button" class="chip" data-lv="${i}">${n}</button>`).join('')}</div>`}<div class="car-nav"><button type="button" class="btn ghost" data-d="-1">Previous</button><span class="count"></span><button type="button" class="btn" data-d="1">Next</button></div></div><div class="card"></div>`;
+  const body=$('.card',root);
+  const list=()=>lv?items.filter(x=>x.lv===lv):items;
+  function draw(){const L=list();idx=(idx%L.length+L.length)%L.length;$$('[data-lv]',root).forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.lv===lv)));$('.count',root).textContent=`${idx+1} / ${L.length}`;body.innerHTML='';render(body,L[idx])}
+  $('.car-head',root).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.lv!==undefined){lv=+b.dataset.lv;idx=0;store.set(root.id+'.lv',lv);draw()}else if(b.dataset.d){idx+=+b.dataset.d;draw()}});
+  draw();
+}
+const promptHTML=(p,fill)=>{const parts=p.split('___');if(parts.length===1)return esc(p);const f=fill?fill.split(' / '):[];return parts.map((s,i)=>esc(s)+(i<parts.length-1?`<span class="blank${fill?' filled':''}">${fill?esc(f[i]||''):'&nbsp;'}</span>`:'')).join('')};
+function quizCard(body,it){
+  body.innerHTML=`${it.lv?`<p class="tag">${ROUTES[it.lv]}</p>`:''}<p class="q-prompt">${promptHTML(it.p)}</p><div class="opts"></div><p class="fb" aria-live="polite"></p><div class="row"><button class="btn ghost" type="button" data-show>Show answer</button></div>`;
+  const opts=$('.opts',body),fb=$('.fb',body),pr=$('.q-prompt',body);
+  const done=()=>{$$('.opt',opts).forEach(x=>{if(x.dataset.o===it.a){x.classList.add('ok');x.classList.remove('no')}});if(it.p.includes('___'))pr.innerHTML=promptHTML(it.p,it.a);fb.innerHTML=`<b class="g">Correct.</b> ${esc(it.why)}`};
+  shuffle(it.o).forEach((o,i)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.dataset.o=o;b.innerHTML=`<span class="key">${'ABCD'[i]}</span><span>${esc(o)}</span>`;
+    b.onclick=()=>{if(o===it.a)done();else{b.classList.add('no');fb.innerHTML='<b class="r">Not quite.</b> Try another answer.'}};opts.appendChild(b)});
+  $('[data-show]',body).onclick=done;
+}
+
+const BEDO=[
+  {p:'___ Mia tired after school?',o:['Is','Does'],a:'Is',why:'Tired describes how she is: use be.'},
+  {p:'___ Mia get up early?',o:['Is','Does'],a:'Does',why:'Get up is an action: use does.'},
+  {p:'Leo ___ at school on Saturdays.',o:['isn’t','doesn’t'],a:'isn’t',why:'At school is a place: use be.'},
+  {p:'Leo ___ go to school on Saturdays.',o:['isn’t','doesn’t'],a:'doesn’t',why:'Go is an action: use doesn’t.'},
+  {p:'___ you hungry?',o:['Are','Do'],a:'Are',why:'Hungry describes how you are: use be.'},
+  {p:'___ you have breakfast at home?',o:['Are','Do'],a:'Do',why:'Have breakfast is an action: use do.'},
+  {p:'Where ___ Mia after school?',o:['is','does'],a:'is',why:'There is no other verb, so be is the verb.'},
+  {p:'Where ___ Mia go after school?',o:['is','does'],a:'does',why:'Go is the action: use does.'},
+  {p:'They ___ late for school.',o:['aren’t','don’t'],a:'aren’t',why:'Late describes them: use be.'},
+  {p:'I ___ like Mondays.',o:['’m not','don’t'],a:'don’t',why:'Like is an action verb: use don’t.'},
+  {p:'___ your brother twelve?',o:['Is','Does'],a:'Is',why:'Age uses be.'},
+  {p:'___ Leo usually happy at the weekend?',o:['Is','Does'],a:'Is',why:'Happy describes him: use be.'}
+];
+carousel($('#bedo'),BEDO,quizCard,{noFilter:true});
+
+const QUIZ=[
+  {lv:1,p:'She ___ breakfast.',o:['have','has'],a:'has',why:'She is third person, so have becomes has.'},
+  {lv:1,p:'He doesn’t ___ late.',o:['get up','gets up'],a:'get up',why:'After doesn’t, use get with no -s.'},
+  {lv:1,p:'Does Mia walk to school?',o:['Yes, she do.','Yes, she does.'],a:'Yes, she does.',why:'The question uses does and Mia is she, so the short answer uses does too.'},
+  {lv:1,p:'I ___ to school on foot.',o:['go','goes'],a:'go',why:'I takes the base form go.'},
+  {lv:1,p:'He ___ his homework after school.',o:['do','does'],a:'does',why:'In the affirmative with he, do becomes does.'},
+  {lv:1,p:'___ she have breakfast?',o:['Do','Does'],a:'Does',why:'She needs Does at the start of the question.'},
+  {lv:1,p:'Choose the correct order.',o:['She usually gets home at five.','She gets usually home at five.'],a:'She usually gets home at five.',why:'Usually goes before gets, the main verb.'},
+  {lv:1,p:'They ___ get up late.',o:['don’t','doesn’t'],a:'don’t',why:'They needs don’t + base verb.'},
+  {lv:1,p:'Does he have breakfast? No, he ___.',o:['don’t','doesn’t'],a:'doesn’t',why:'The short answer matches Does he.'},
+  {lv:1,p:'Choose the correct sentence.',o:['She doesn’t never go to bed late.','She never goes to bed late.'],a:'She never goes to bed late.',why:'Never goes before goes and doesn’t need doesn’t.'},
+  {lv:1,p:'Mia ___ tired.',o:['is','are'],a:'is',why:'Mia is she: she is.'},
+  {lv:1,p:'I ___ at school.',o:['am','is'],a:'am',why:'I always goes with am.'},
+  {lv:1,p:'___ you hungry?',o:['Are','Do'],a:'Are',why:'Hungry describes you: use be, not do.'},
+  {lv:1,p:'___ does Mia get up? At seven.',o:['What time','Where'],a:'What time',why:'The answer is a time.'},
+  {lv:1,p:'___ does Leo have lunch? At school.',o:['Where','When'],a:'Where',why:'The answer is a place.'},
+  {lv:2,p:'Choose the accurate routine.',o:['Mia have breakfast and goes to school.','Mia has breakfast and goes to school.'],a:'Mia has breakfast and goes to school.',why:'Both verbs agree with Mia.'},
+  {lv:2,p:'Choose the question.',o:['Does Leo gets home at five?','Does Leo get home at five?'],a:'Does Leo get home at five?',why:'Does carries the third-person -s, so use get.'},
+  {lv:2,p:'Choose the position of usually.',o:['Leo usually is tired after school.','Leo is usually tired after school.'],a:'Leo is usually tired after school.',why:'Frequency words go after be.'},
+  {lv:2,p:'Mia and Leo ___ home at five.',o:['get','gets'],a:'get',why:'Two people make a plural subject (they): use get.'},
+  {lv:2,p:'Mia ___ sleep in on weekdays.',o:['don’t','doesn’t'],a:'doesn’t',why:'A singular third-person subject needs doesn’t.'},
+  {lv:2,p:'___ they usually have breakfast?',o:['Do','Does'],a:'Do',why:'They needs Do, then the base verb.'},
+  {lv:2,p:'Choose the accurate question.',o:['Does Mia does her homework?','Does Mia do her homework?'],a:'Does Mia do her homework?',why:'The helper is Does; the main verb is do.'},
+  {lv:2,p:'Choose the accurate negative.',o:['They doesn’t have breakfast at school.','They don’t have breakfast at school.'],a:'They don’t have breakfast at school.',why:'They needs don’t + have.'},
+  {lv:2,p:'He never ___ in on weekdays.',o:['sleep','sleeps'],a:'sleeps',why:'Never does not remove the third-person -s.'},
+  {lv:2,p:'They ___ late for school.',o:['isn’t','aren’t'],a:'aren’t',why:'They goes with are: aren’t.'},
+  {lv:2,p:'Is Leo tired? Yes, he ___.',o:['is','’s'],a:'is',why:'No short form in a yes short answer: Yes, he is.'},
+  {lv:2,p:'___ do you go to school? By bus.',o:['How','Who'],a:'How',why:'By bus is the way: How.'},
+  {lv:2,p:'Mia gets up first. Ask about Mia.',o:['Who gets up first?','Who does get up first?'],a:'Who gets up first?',why:'Who is the subject, so no does, and get keeps the -s.'},
+  {lv:2,p:'Don’t you like Mondays? (You like them.)',o:['Yes, I do.','No, I don’t.'],a:'Yes, I do.',why:'Answer the facts: you like them, so Yes, I do.'},
+  {lv:3,p:'Choose the accurate description.',o:['She usually has breakfast and go to school on foot.','She usually has breakfast and goes to school on foot.'],a:'She usually has breakfast and goes to school on foot.',why:'Both verbs agree with she; usually comes before the first main verb.'},
+  {lv:3,p:'Choose the accurate question.',o:['Why does Leo usually turns in early?','Why does Leo usually turn in early?'],a:'Why does Leo usually turn in early?',why:'Why + does + subject + usually + base verb.'},
+  {lv:3,p:'Choose the accurate sentence.',o:['Mia often is tired, but she never skip breakfast.','Mia is often tired, but she never skips breakfast.'],a:'Mia is often tired, but she never skips breakfast.',why:'Often follows is; never comes before skips, which keeps its -s.'},
+  {lv:3,p:'Choose the accurate negative.',o:['She doesn’t usually sleeps in on weekdays.','She doesn’t usually sleep in on weekdays.'],a:'She doesn’t usually sleep in on weekdays.',why:'Doesn’t + usually + base verb.'},
+  {lv:3,p:'Leo usually ___ his homework before he ___ down.',o:['do / winds','does / wind','does / winds'],a:'does / winds',why:'Both verbs have a singular subject: Leo and he.'},
+  {lv:3,p:'Choose the accurate pair.',o:['She do her homework. Does she does her homework?','She does her homework. Does she do her homework?'],a:'She does her homework. Does she do her homework?',why:'Does is the main verb in the statement, but the helper in the question.'},
+  {lv:3,p:'Choose the accurate word order.',o:['She usually is active and walks often home.','She is usually active and often walks home.'],a:'She is usually active and often walks home.',why:'Usually follows be; often comes before walks.'},
+  {lv:3,p:'Choose the accurate question.',o:['Where does Leo goes after school?','Where does Leo go after school?'],a:'Where does Leo go after school?',why:'Question word + does + subject + base verb.'},
+  {lv:3,p:'Choose the accurate question.',o:['Who does live with Mia?','Who lives with Mia?'],a:'Who lives with Mia?',why:'Who is the subject: no does, verb with -s.'},
+  {lv:3,p:'___ you tired? You look tired!',o:['Aren’t','Don’t'],a:'Aren’t',why:'Tired goes with be: Aren’t you tired?'},
+  {lv:3,p:'Doesn’t Mia walk to school? (She takes the bus.)',o:['Yes, she does.','No, she doesn’t.'],a:'No, she doesn’t.',why:'Answer the facts: she doesn’t walk.'},
+  {lv:3,p:'___ I late? (I think I am.)',o:['Amn’t','Aren’t'],a:'Aren’t',why:'With I, the negative question is Aren’t I…?'}
+];
+carousel($('#quiz'),QUIZ,quizCard);
+const score=[0,0];
+$$('[data-team]').forEach(b=>b.onclick=()=>{const t=+b.dataset.team;score[t]=Math.max(0,score[t]+ +b.dataset.d);$('#sc'+t).textContent=score[t]});
+
+/* ---------- ask about it ---------- */
+const ASK=[
+  [['Mia','subj',{w:'Who',q:'{w:Who} {v:get[s]} up at seven?',n:'Who is the subject: no does, and get keeps the -s.'}],['gets up','verb'],['at seven.','',{w:'What time',q:'{w:What time} {a:do[es]} {s:Mia} {v:get} up?',n:'When works too.'}]],
+  [['Leo','subj',{w:'Who',q:'{w:Who} {v:walk[s]} to school every day?'}],['walks','verb'],['to school','',{w:'Where',q:'{w:Where} {a:do[es]} {s:Leo} {v:walk} every day?'}],['every day.','',{w:'How often',q:'{w:How often} {a:do[es]} {s:Leo} {v:walk} to school?'}]],
+  [['Mia and Leo','subj',{w:'Who',q:'{w:Who} {v:[has]} lunch at school?',n:'Who + has, even when the answer is two people.'}],['have lunch','verb'],['at school','',{w:'Where',q:'{w:Where} {a:do} {s:Mia and Leo} {v:have} lunch?'}],['at two.','',{w:'When',q:'{w:When} {a:do} {s:Mia and Leo} {v:have} lunch at school?',n:'What time works too.'}]],
+  [['Leo','subj'],['goes','verb'],['to school','',{w:'Where',q:'{w:Where} {a:do[es]} {s:Leo} {v:go} by bus?'}],['by bus.','',{w:'How',q:'{w:How} {a:do[es]} {s:Leo} {v:go} to school?'}]],
+  [['Mia','subj',{w:'Who',q:'{w:Who} {v:is} at the park after school?'}],['is','verb'],['at the park','',{w:'Where',q:'{w:Where} {v:is} {s:Mia} after school?',n:'With be: question word + is + subject. No does.'}],['after school.','',{w:'When',q:'{w:When} {v:is} {s:Mia} at the park?'}]],
+  [['Leo','subj'],['is','verb'],['tired'],['because he goes to bed late.','',{w:'Why',q:'{w:Why} {v:is} {s:Leo} tired?'}]],
+  [['Mia’s brother','subj'],['is','verb'],['twelve.','',{w:'How old',q:'{w:How old} {v:is} {s:Mia’s brother}?'}]],
+  [['Mia','subj',{w:'Who',q:'{w:Who} {v:watch[es]} a series in the evening?'}],['watches','verb'],['a series','',{w:'What',q:'{w:What} {a:do[es]} {s:Mia} {v:watch} in the evening?'}],['in the evening.','',{w:'When',q:'{w:When} {a:do[es]} {s:Mia} {v:watch} a series?'}]],
+  [['Leo','subj',{w:'Who',q:'{w:Who} {v:play[s]} football with Mia?',n:'Who is the subject: no does.'}],['plays','verb'],['football','',{w:'What',q:'{w:What} {a:do[es]} {s:Leo} {v:play} with Mia?'}],['with Mia.','',{w:'Who',q:'{w:Who} {a:do[es]} {s:Leo} {v:play} football with?',n:'Who asks about the other person: does + subject, and with goes at the end.'}]]
+];
+carousel($('#ask'),ASK,(body,it)=>{
+  body.innerHTML=`<p class="tag">Click a dashed part. The class makes the question.</p><p class="sent">${it.map((c,i)=>c[2]?`<button type="button" class="chunk ${c[1]}" data-i="${i}">${esc(c[0])}</button>`:`<span class="${c[1]}">${esc(c[0])}</span>`).join(' ')}</p><div class="askpanel" hidden></div>`;
+  const panel=$('.askpanel',body);
+  $('.sent',body).addEventListener('click',e=>{const b=e.target.closest('.chunk');if(!b)return;
+    $$('.chunk',body).forEach(x=>x.classList.toggle('sel',x===b));
+    const q=it[+b.dataset.i][2];panel.hidden=false;
+    panel.innerHTML=`<span class="whchip">${esc(q.w)}</span><div class="out-wrap covered"><p class="sent out">${mk(q.q)}</p><button type="button" class="cover-btn"><span>Say the question · click to reveal</span></button></div>${q.n?`<p class="small" data-n hidden>${esc(q.n)}</p>`:''}`;
+    $('.cover-btn',panel).onclick=()=>{$('.out-wrap',panel).classList.remove('covered');const n=$('[data-n]',panel);if(n)n.hidden=false}});
+},{noFilter:true});
+
+/* ---------- error hunt ---------- */
+const EDIT=[
+  {lv:1,w:'She don’t go to school on foot.',err:[[1]],c:'She doesn’t go to school on foot.',fix:[1],why:'She needs doesn’t, not don’t.'},
+  {lv:1,w:'He does his homework never.',err:[[4]],c:'He never does his homework.',fix:[1],why:'Never goes before the verb does. Here does is the main verb.'},
+  {lv:1,w:'She usually is tired.',err:[[1,2]],c:'She is usually tired.',fix:[1,2],why:'With is, usually goes after the verb be.'},
+  {lv:1,w:'She are tired after school.',err:[[1]],c:'She is tired after school.',fix:[1],why:'She goes with is.'},
+  {lv:1,w:'Do you hungry?',err:[[0]],c:'Are you hungry?',fix:[0],why:'Hungry describes you: use be, not do.'},
+  {lv:2,w:'Does she goes to school on foot?',err:[[2]],c:'Does she go to school on foot?',fix:[2],why:'Use go after Does.'},
+  {lv:2,w:'He don’t have breakfast.',err:[[1]],c:'He doesn’t have breakfast.',fix:[1],why:'He needs doesn’t + have.'},
+  {lv:2,w:'She gets usually home at five.',err:[[2]],c:'She usually gets home at five.',fix:[1],why:'Usually goes before gets, not between gets and home.'},
+  {lv:2,w:'Where Mia goes after school?',err:[[1,2]],c:'Where does Mia go after school?',fix:[1,3],why:'Question word + does + subject + base verb.'},
+  {lv:2,w:'She doesn’t be late for school.',err:[[1,2]],c:'She isn’t late for school.',fix:[1],why:'Be never goes with do / does: She isn’t late.'},
+  {lv:3,w:'She usually get home early, but she don’t start her homework immediately.',err:[[2],[7]],c:'She usually gets home early, but she doesn’t start her homework immediately.',fix:[2,7],why:'Use gets in the affirmative and doesn’t + start in the negative.'},
+  {lv:3,w:'How often does Leo watches a film?',err:[[4]],c:'How often does Leo watch a film?',fix:[4],why:'The main verb stays watch after does.'},
+  {lv:3,w:'Mia always is active and never go to bed late.',err:[[1,2],[6]],c:'Mia is always active and never goes to bed late.',fix:[1,2,6],why:'Always follows is; never goes keeps the third-person -s.'},
+  {lv:3,w:'They doesn’t go out on weekdays.',err:[[1]],c:'They don’t go out on weekdays.',fix:[1],why:'They takes don’t, not doesn’t.'},
+  {lv:3,w:'Who does get up first in your family?',err:[[1,2]],c:'Who gets up first in your family?',fix:[1],why:'Who is the subject: no does, and get keeps the -s.'},
+  {lv:3,w:'Why Leo is always tired?',err:[[1,2]],c:'Why is Leo always tired?',fix:[1,2],why:'Question word + be + subject: Why is Leo…?'}
+];
+carousel($('#errors'),EDIT,(body,it)=>{
+  const n=it.err.length,found=new Set();
+  body.innerHTML=`<p class="tag">${ROUTES[it.lv]} · ${n} mistake${n>1?'s':''} to find</p><p class="sent">${it.w.split(' ').map((w,i)=>`<button type="button" class="word" data-i="${i}">${esc(w)}</button>`).join(' ')}</p><p class="fb" aria-live="polite">0 / ${n} found</p><div class="row"><button class="btn ghost" type="button" data-show>Show correction</button></div><div class="stack" data-fix hidden><p class="sent">${it.c.split(' ').map((w,i)=>it.fix.includes(i)?`<mark>${esc(w)}</mark>`:esc(w)).join(' ')}</p><p class="why">${esc(it.why)}</p></div>`;
+  const reveal=()=>{$('[data-fix]',body).hidden=false;$('[data-show]',body).hidden=true};
+  $('.sent',body).addEventListener('click',e=>{const b=e.target.closest('.word');if(!b)return;const i=+b.dataset.i;const g=it.err.findIndex(x=>x.includes(i));
+    if(g>-1){it.err[g].forEach(j=>$(`.word[data-i="${j}"]`,body).classList.add('hit'));found.add(g);$('.fb',body).textContent=`${found.size} / ${n} found`;if(found.size===n)reveal()}
+    else{b.classList.remove('miss');void b.offsetWidth;b.classList.add('miss')}});
+  $('[data-show]',body).onclick=reveal;
+});
+
+/* ---------- transform ---------- */
+const TRANS=[
+  {lv:1,task:'Change I to she.',s:'I go to school.',a:'She goes to school.',h:'She + goes + to school.',why:'With she, go becomes goes.'},
+  {lv:1,task:'Make it negative.',s:'He has breakfast.',a:'He doesn’t have breakfast.',h:'He + doesn’t + have breakfast.',why:'He needs doesn’t + have, not has.'},
+  {lv:1,task:'Make it a question.',s:'She gets home at five.',a:'Does she get home at five?',h:'Does + she + get home at five?',why:'Does goes before she; get stays in the base form.'},
+  {lv:1,task:'Make it negative.',s:'I am tired.',a:'I’m not tired.',h:'I + ’m not + tired.',why:'Be makes the negative with not: I’m not.'},
+  {lv:1,task:'Make it a question.',s:'Leo is at school.',a:'Is Leo at school?',h:'Is + Leo + at school?',why:'With be, is jumps in front of the subject.'},
+  {lv:2,task:'Make it negative.',s:'Leo does his homework after school.',a:'Leo doesn’t do his homework after school.',why:'Use doesn’t + do. Don’t keep does.'},
+  {lv:2,task:'Ask about the time.',s:'Mia gets home at five.',a:'When does Mia get home?',why:'When + does + Mia + get home. The answer is the time.'},
+  {lv:2,task:'Put the words in order.',s:'usually / she / has / breakfast',a:'She usually has breakfast.',why:'Usually goes before the main verb has.'},
+  {lv:2,task:'Give a negative short answer.',s:'Do you go to school on foot?',a:'No, I don’t.',why:'You answer about yourself with I + don’t.'},
+  {lv:2,task:'Ask about the place.',s:'Leo has lunch at school.',a:'Where does Leo have lunch?',why:'Where + does + Leo + have lunch.'},
+  {lv:2,task:'Ask about the person.',s:'Mia gets up first.',a:'Who gets up first?',why:'Who is the subject: no does, and get keeps the -s.'},
+  {lv:2,task:'You are surprised. Make a negative question.',s:'Leo likes Mondays.',a:'Doesn’t Leo like Mondays?',why:'Doesn’t + Leo + base verb.'},
+  {lv:3,task:'Change they to Mia.',s:'They usually get home and do their homework.',a:'Mia usually gets home and does her homework.',why:'Both verbs change to third person, and their becomes her.'},
+  {lv:3,task:'Make it negative.',s:'Leo always goes to bed early.',a:'Leo doesn’t always go to bed early.',why:'Doesn’t + always + go. It means not every time.'},
+  {lv:3,task:'Ask about frequency.',s:'Mia sleeps in on weekends.',a:'How often does Mia sleep in on weekends?',why:'How often + does + subject + base verb.'},
+  {lv:3,task:'Add often in the right place.',s:'She is tired after school.',a:'She is often tired after school.',why:'With be, often follows is.'},
+  {lv:3,task:'Give a positive short answer.',s:'Do Mia and Leo both have breakfast?',a:'Yes, they do.',why:'Two people are they, so use do.'},
+  {lv:3,task:'Ask how.',s:'Mia goes to school by bike.',a:'How does Mia go to school?',why:'How + does + Mia + go.'},
+  {lv:3,task:'Ask why.',s:'Leo is tired because he goes to bed late.',a:'Why is Leo tired?',why:'With be: Why + is + Leo.'},
+  {lv:3,task:'Ask about the other person.',s:'Leo plays football with Mia.',a:'Who does Leo play football with?',why:'Who + does + Leo + play…, and with stays at the end.'}
+];
+carousel($('#transform'),TRANS,(body,it)=>{
+  body.innerHTML=`<p class="tag">${ROUTES[it.lv]}</p><p class="q-prompt" style="font-size:1.3em;color:var(--aux)">${esc(it.task)}</p><p class="sent">${esc(it.s)}</p><div class="row"><button class="btn" type="button" data-rev>Reveal answer</button>${it.h?'<button class="btn ghost" type="button" data-hint>Hint</button>':''}</div><p class="why" data-h hidden>${esc(it.h||'')}</p><div class="stack" data-a hidden><p class="sent ans">${esc(it.a)}</p><p class="why">${esc(it.why)}</p></div>`;
+  $('[data-rev]',body).onclick=()=>{$('[data-a]',body).hidden=false};
+  const h=$('[data-hint]',body);if(h)h.onclick=()=>{$('[data-h]',body).hidden=false};
+});
+
+/* ---------- production ---------- */
+const TASKS=[
+  {lv:1,t:'Write two sentences about a person’s routine: one affirmative with usually and one negative with doesn’t.',ca:'Escriu dues frases sobre la rutina d’una persona. Fes una afirmativa amb usually i una negativa amb doesn’t. Mira el model i canvia l’hora o l’activitat.',m:'She usually gets home at five. She doesn’t go to bed late.'},
+  {lv:2,t:'Write three sentences about Mia’s routine: one affirmative with usually, one negative and one question.',m:'Mia usually gets home at five. She doesn’t sleep in on weekdays. Does she have breakfast at home?'},
+  {lv:3,t:'Write three or four connected sentences comparing Mia’s routine with Leo’s. Include a frequency word, a negative and a question.',m:'Mia usually gets home earlier than Leo, but they both do their homework in the afternoon. Leo doesn’t always wind down with music. Does Mia usually turn in earlier?'}
+];
+$('#tasks').innerHTML=TASKS.map(t=>`<div class="task"><p class="tag">${ROUTES[t.lv]}</p><p>${esc(t.t)}</p>${t.ca?`<p class="ca">${esc(t.ca)}</p>`:''}<button class="btn ghost" type="button" data-model>Show model</button><p class="model" hidden>${esc(t.m)}</p></div>`).join('');
+$('#tasks').addEventListener('click',e=>{const b=e.target.closest('[data-model]');if(!b)return;const m=b.nextElementSibling;m.hidden=!m.hidden;b.textContent=m.hidden?'Show model':'Hide model'});
+
+let total=300,left=300,tid=null;
+const fmt=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+function tdraw(){$('#tShow').textContent=left>0?fmt(left):'Time!';$('#timer').classList.toggle('up',left<=0);$('#tGo').textContent=tid?'Pause':(left<total&&left>0?'Resume':'Start')}
+function tstop(){clearInterval(tid);tid=null}
+$('#tGo').onclick=()=>{if(tid){tstop()}else{if(left<=0)left=total;tid=setInterval(()=>{left--;if(left<=0){left=0;tstop()}tdraw()},1000)}tdraw()};
+$('#tReset').onclick=()=>{tstop();left=total;tdraw()};
+$$('[data-min]').forEach(b=>b.onclick=()=>{tstop();total=left=+b.dataset.min*60;$$('[data-min]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));tdraw()});
+tdraw();
+
+go(cur);
+})();
+</script>
+</body></html>
