@@ -176,6 +176,28 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
 .pblock small{font:600 .45em var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ccard.done .pparts{display:flex}
 .ccard.done .pvhead{display:none}
+/* frequency */
+.scale{display:flex;flex-direction:column;gap:.35em}
+.scale .bar{display:grid;grid-template-columns:6.5em minmax(0,1fr) 3em;gap:.7em;align-items:center}
+.scale b{font:700 1.1em var(--f-display);color:var(--adv)}
+.scale .track{height:.7em;background:var(--soft);border-radius:999px;overflow:hidden}
+.scale .fill{display:block;height:100%;background:var(--adv);border-radius:999px}
+.scale .pct{font-size:.75em;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.scale .cag{display:none;font-size:.7em;color:var(--muted);grid-column:1/-1;margin-top:-.4em}
+:root.ca-on .scale .cag{display:block}
+.place{display:flex;flex-direction:column;gap:.6em}
+.prow{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.6em 1em;display:flex;flex-direction:column;gap:.3em}
+.prow .sent{font-size:1.35em}
+.pill{display:inline-block;font:700 .8em var(--f-body);color:var(--surface);background:var(--adv);border-radius:999px;padding:.1em .7em;align-self:flex-start}
+.gap{display:inline-block;width:.8em;height:.8em;border-radius:50%;border:2px dashed var(--adv);background:transparent;vertical-align:middle;padding:0;margin:0 .05em}
+.gap:hover{background:var(--adv)}
+.placed{border-radius:.25em;padding:0 .15em;border:0;font:inherit}
+.placed.good{background:var(--ok-bg)}
+.placed.bad{background:var(--no-bg);text-decoration:line-through}
+.pfb{font-size:.85em;min-height:1.3em}
+.pfb.good{color:var(--ok)} .pfb.bad{color:var(--no)}
+[data-k="a"] .chip[aria-pressed="true"]{background:var(--adv);border-color:var(--adv);color:var(--surface)}
+
 /* split test */
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6em}
 @media (max-width:700px){.tiles{grid-template-columns:minmax(0,1fr)}}
@@ -492,6 +514,28 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
   </div>
 </section>
 
+<section class="slide" data-title="How often?">
+  <p class="eyebrow">8 · How often?</p>
+  <h2>Frequency words with phrasal verbs</h2>
+  <div class="cols">
+    <div class="stack">
+      <div class="scale" id="scale"></div>
+      <div class="rule key">
+        <div class="formula"><span class="subj">She</span><span class="adv">usually</span><span class="verb">picks</span> <span class="obj">them</span> <span class="part">up</span><span class="op">→ before the whole phrasal verb</span></div>
+        <p class="small">Never between the verb and the particle: <s>She picks usually them up.</s> ✗</p>
+        <div class="formula"><span class="subj">She</span><span class="verb">is</span><span class="adv">often</span><span class="op">tired → after be</span></div>
+        <div class="formula"><span class="subj">I</span><span class="aux">don’t</span><span class="adv">always</span><span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span> <span class="obj">it</span><span class="op">→ after don’t / doesn’t</span></div>
+        <p class="small"><b class="adv">never</b> is already negative: <b>I never put it off</b>, not <s>I don’t never put it off</s>.</p>
+      </div>
+      <p class="ca"><b>always, usually, often, sometimes, never</b> van abans del verb principal (abans de tot el phrasal verb), però després de <b>be</b>. No els posis mai entre el verb i la partícula. <b>Never</b> ja és negatiu: no afegeixis don’t / doesn’t.</p>
+    </div>
+    <div class="stack">
+      <h3>Where does it go? Click a dot.</h3>
+      <div class="place" id="place"></div>
+    </div>
+  </div>
+</section>
+
 <section class="slide" data-title="Phrasal verb machine">
   <p class="eyebrow">Practice together</p>
   <h2>Phrasal verb machine</h2>
@@ -502,7 +546,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
 </section>
 
 <section class="slide" data-title="Compare and explain">
-  <p class="eyebrow">8 · Compare and explain</p>
+  <p class="eyebrow">9 · Compare and explain</p>
   <h2>Same pronoun, different position. Why?</h2>
   <div class="grid2">
     <div class="rcard" data-card><p class="big">I <span class="verb">wake</span> <span class="obj">him</span> <span class="part">up</span>. ✓</p><button class="btn ghost" type="button" data-open>Explain</button><div class="answer" data-reveal><b>wake up</b> is separable and <b>him</b> is a pronoun, so the pronoun must go between the verb and the particle.</div></div>
@@ -513,7 +557,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
 </section>
 
 <section class="slide" data-title="Our phrasal verbs">
-  <p class="eyebrow">9 · My Real Routine</p>
+  <p class="eyebrow">10 · My Real Routine</p>
   <h2>Real phrasal verbs from this LS</h2>
   <div class="stack">
     <div class="row"><p class="lead" style="flex:1">Ask for the meaning first, then click the verb. YouGlish plays real clips.</p><button class="btn ghost" type="button" id="pvAll">Show all</button></div>
@@ -522,7 +566,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
 </section>
 
 <section class="slide" data-title="Sorting game">
-  <p class="eyebrow">10 · Game</p>
+  <p class="eyebrow">11 · Game</p>
   <h2>Separable, inseparable, or no object?</h2>
   <div class="cols" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
     <div class="game">
@@ -564,7 +608,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
 </section>
 
 <section class="slide" data-title="Real-English detective">
-  <p class="eyebrow">11 · Real-English detective</p>
+  <p class="eyebrow">12 · Real-English detective</p>
   <h2>Use YouGlish like a linguist</h2>
   <div class="stack">
     <p class="lead">Pick one expression. Listen to <b>3 real clips</b>. Students answer:</p>
@@ -611,7 +655,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
 </section>
 
 <section class="slide" data-title="Exit ticket">
-  <p class="eyebrow">12 · Exit ticket</p>
+  <p class="eyebrow">13 · Exit ticket</p>
   <h2>Can you explain the rule?</h2>
   <div class="stack">
     <div class="board" style="font-size:2em">Why do we say <span class="verb">pick</span> <span class="obj">them</span> <span class="part">up</span><br>but <span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> <span class="obj">them</span>?</div>
@@ -714,6 +758,27 @@ const PLAB=['verb','particle','preposition'],PCLS=['verb','part','prep'];
 $('#parts').innerHTML=PARTS.map(([pv,pr,o],i)=>{const words=(pv+(pr?' '+pr:'')).split(' ');return `<div class="ccard" data-i="${i}"><p class="sent pvhead">I ${pvName(pv)} <span class="blank">&nbsp;</span> <span class="obj">${o}</span>.</p><div class="pparts">${words.map((w,j)=>`<span class="pblock"><span class="${PCLS[j]}">${w}</span><small>${PLAB[j]}</small></span>`).join('')}<span class="pblock"><span class="obj">${o}</span><small>object</small></span></div><div class="row"><button type="button" class="opt" data-a="on">on</button><button type="button" class="opt" data-a="to">to</button><button type="button" class="opt" data-a="">nothing</button></div></div>`}).join('');
 $('#parts').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;const c=b.closest('.ccard'),it=PARTS[+c.dataset.i];if(b.dataset.a===it[1]){b.classList.add('ok');c.classList.add('done')}else b.classList.add('no')});
 
+/* ---------- frequency ---------- */
+const FREQ=[['always',100,'sempre'],['usually',85,'normalment'],['often',65,'sovint'],['sometimes',40,'de vegades'],['never',0,'mai']];
+$('#scale').innerHTML=FREQ.map(([w,p,c])=>`<div class="bar"><b>${w}</b><span class="track"><span class="fill" style="width:${Math.max(p,1.5)}%"></span></span><span class="pct">${p}%</span><span class="cag">${c}</span></div>`).join('');
+const PLACE=[
+  {a:'usually',w:[['She','subj'],['picks','verb'],['them','obj'],['up','part'],['after school.']],ok:1,why:'Before the whole phrasal verb: She usually picks them up after school.'},
+  {a:'never',w:[['I','subj'],['put','verb'],['it','obj'],['off.','part']],ok:1,why:'Before the verb. Never is already negative: no don’t.'},
+  {a:'often',w:[['Leo','subj'],['catches','verb'],['up','part'],['on','prep'],['messages','obj'],['on the bus.']],ok:1,why:'Before catch up on, not inside it: Leo often catches up on messages on the bus.'},
+  {a:'always',w:[['I','subj'],['don’t','aux'],['get','verb'],['down','part'],['to','prep'],['it','obj'],['straight away.']],ok:2,why:'After don’t, before the main verb: I don’t always get down to it straight away.'},
+  {a:'usually',w:[['We','subj'],['go','verb'],['out','part'],['on Fridays.']],ok:1,why:'Before go, not between go and out: We usually go out on Fridays.'},
+  {a:'often',w:[['She','subj'],['is','verb'],['tired'],['after school.']],ok:2,why:'After be: She is often tired after school.'},
+  {a:'usually',w:[['Does','aux'],['Mia','subj'],['wind','verb'],['down','part'],['with music?']],ok:2,why:'After the subject, before the main verb: Does Mia usually wind down with music?'}
+];
+function drawPlace(row,it,ch){
+  const s=it.w.map((w,i)=>{let g='';if(i>0){g=ch===i?`<button type="button" class="adv placed ${i===it.ok?'good':'bad'}" data-i="${i}" title="Click to remove">${it.a}</button> `:`<button type="button" class="gap" data-i="${i}" aria-label="Put ${it.a} before ${esc(w[0])}"></button> `}return g+`<span class="${w[1]||''}">${esc(w[0])}</span>`}).join(' ');
+  const inside=ch!=null&&['part','prep','obj'].includes((it.w[ch]||[])[1])&&it.w.slice(0,ch).some(x=>x[1]==='verb');
+  const fb=ch==null?'':ch===it.ok?`<b>✓</b> ${esc(it.why)}`:(inside?'Not inside the phrasal verb! The frequency word goes before it.':'Not there. Try another dot.');
+  row.innerHTML=`<span class="pill">${it.a}</span><p class="sent">${s}</p><p class="pfb ${ch==null?'':ch===it.ok?'good':'bad'}">${fb}</p>`;
+}
+PLACE.forEach(it=>{const row=document.createElement('div');row.className='prow';$('#place').appendChild(row);drawPlace(row,it,null);
+  row.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;drawPlace(row,it,b.classList.contains('placed')?null:+b.dataset.i)})});
+
 /* ---------- object finder ---------- */
 const FIND=[
   {w:'I wake up my brother.',obj:[3,4],q:'Wake up WHO? → my brother'},
@@ -792,7 +857,7 @@ const PV=[
 const TYPE={sep:'Separable',fix:'Fixed · inseparable',none:'No object'};
 function third(V){let i=0;while(i<V.v.length&&V.v[i]===V.t[i])i++;return i===V.t.length?[[V.t]]:[[V.t.slice(0,i)],[V.t.slice(i),'end']]}
 const tk=(c,t)=>({c,parts:[[t]]});
-function buildPV(S,V,f,o,pos){
+function buildPV(S,V,f,o,pos,a){
   const T=[];
   const verb=f==='aff'&&S.third?{c:'verb',parts:third(V)}:tk('verb',V.v);
   const [p0,...pr]=V.p.split(' ');const part=[tk('part',p0)];if(pr.length)part.push(tk('prep',pr.join(' ')));
@@ -809,26 +874,30 @@ function buildPV(S,V,f,o,pos){
   }else why=`No object: “${V.w}” is not an object.`;
   const time=tk('rest',V.w);
   let end='.';
-  if(f==='aff')T.push(tk('subj',S.k),...core,time);
-  else if(f==='neg')T.push(tk('subj',S.k),{c:'aux',parts:S.third?[['do'],['es','end'],['n’t']]:[['don’t']]},...core,time);
-  else{end='?';T.push({c:'aux',parts:S.third?[['Do'],['es','end']]:[['Do']]},tk('subj',S.k),...core,time)}
+  const adv=a?[tk('adv',a)]:[];let note='';
+  const verb3=S.third?{c:'verb',parts:third(V)}:tk('verb',V.v);
+  if(f==='aff'||(f==='neg'&&a==='never')){if(f==='neg')note=' Never is already negative, so no don’t / doesn’t.';const c3=core.map(t=>t===verb?verb3:t);T.push(tk('subj',S.k),...adv,...c3,time)}
+  else if(f==='neg'){const aux={c:'aux',parts:S.third?[['do'],['es','end'],['n’t']]:[['don’t']]};if(a==='sometimes')T.push(tk('subj',S.k),...adv,aux,...core,time);else T.push(tk('subj',S.k),aux,...adv,...core,time)}
+  else{end='?';let ad=adv;if(a==='never'){ad=[];note=' Don’t use never in this question.'}T.push({c:'aux',parts:S.third?[['Do'],['es','end']]:[['Do']]},tk('subj',S.k),...ad,...core,time)}
+  why+=note;
   const f0=T[0].parts[0];f0[0]=f0[0].charAt(0).toUpperCase()+f0[0].slice(1);
   return {html:T.map(t=>`<span class="${t.c}">${t.parts.map(([x,k])=>k?`<span class="${k}">${esc(x)}</span>`:esc(x)).join('')}</span>`).join(' ')+end,ok,why};
 }
 (function(){
   const root=$('#pvMachine');
-  const st={s:6,v:0,f:'aff',o:'noun',pos:'after'};let covered=false,shown='';
+  const st={s:6,v:0,f:'aff',o:'noun',pos:'after',a:''};let covered=false,shown='';
   const chips=(k,list)=>`<div class="chips" data-k="${k}" role="group">${list.map(([v,l])=>`<button type="button" class="chip" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>`;
   const ctrl=(lab,inner,cls='')=>`<div class="ctrl ${cls}"><span class="lab">${lab}</span>${inner}</div>`;
   root.innerHTML=`<div class="out-wrap"><p class="sent out" aria-live="polite"></p><p class="verdict"></p><div class="answers"></div><button type="button" class="cover-btn"><span>Say it aloud · click to reveal</span></button></div>`
     +ctrl('Who?',chips('s',SUBJ.map((x,i)=>[i,x.k])))
     +ctrl('Form',chips('f',[['aff','+ Affirmative'],['neg','− Negative'],['q','? Question']]))
     +ctrl('Phrasal verb',chips('v',PV.map((x,i)=>[i,x.v+' '+x.p])))
+    +ctrl('How often',chips('a',[['','—'],['always','always'],['usually','usually'],['often','often'],['sometimes','sometimes'],['never','never']]))
     +ctrl('Object',chips('o',[['noun','noun'],['pron','pronoun']]),'oc')
     +ctrl('Position',chips('pos',[['after','after the particle'],['mid','in the middle']]),'oc')
     +`<div class="row"><button type="button" class="btn" data-act="rand">Random (hidden)</button><button type="button" class="btn ghost" data-act="cover">Hide sentence</button></div>`;
   function draw(){
-    const S=SUBJ[st.s],V=PV[st.v],r=buildPV(S,V,st.f,st.o,st.pos);
+    const S=SUBJ[st.s],V=PV[st.v],r=buildPV(S,V,st.f,st.o,st.pos,st.a);
     $('.out',root).innerHTML=r.html;
     $('.verdict',root).innerHTML=`<span class="ptype">${TYPE[V.ty]}</span> ${r.ok?'<b class="g">✓ Correct.</b>':'<b class="r">✗ Not possible.</b>'} ${esc(r.why)}`;
     $('.out-wrap',root).classList.toggle('bad',!r.ok);
