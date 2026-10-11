@@ -460,22 +460,20 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
 <!-- extra information -->
 <section class="slide" data-title="Extra information">
   <p class="eyebrow">Add extra information</p>
-  <h2>A preposition can add more information</h2>
+  <h2>Common prepositions add more information</h2>
   <div class="cols" style="grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)">
     <div class="stack">
       <div class="pgrid">
         <div class="pinfo"><span class="ptag">at</span><b>+ time</b><p>I <span class="verb">turn</span> <span class="part">in</span> <span class="prep">at</span> ten.</p></div>
         <div class="pinfo"><span class="ptag">on</span><b>+ day</b><p>I <span class="verb">sleep</span> <span class="part">in</span> <span class="prep">on</span> Sundays.</p></div>
-        <div class="pinfo"><span class="ptag">for</span><b>+ place</b><p>I <span class="verb">head</span> <span class="part">out</span> <span class="prep">for</span> school.</p></div>
-        <div class="pinfo"><span class="ptag">with</span><b>+ thing</b><p>I <span class="verb">wind</span> <span class="part">down</span> <span class="prep">with</span> music.</p></div>
         <div class="pinfo"><span class="ptag">by</span><b>+ verb-ing</b><p>I <span class="verb">wind</span> <span class="part">down</span> <span class="prep">by</span> listening to music.</p></div>
       </div>
       <div class="rule key">
-        <p>This part is <b>extra</b>: it says when, where or how. You can take the whole part away (<i>for school</i>) and the sentence is still correct.</p>
-        <p class="sent" style="font-size:1.25em">I <span class="verb">head</span> <span class="part">out</span>. ✓ · I <span class="verb">head</span> <span class="part">out</span> <span class="prep">for</span> school. ✓</p>
-        <p class="small">Different from group 3: in <b>catch up <span class="prep">on</span></b> and <b>get down <span class="prep">to</span></b> the preposition is part of the verb. You can’t take it away.</p>
+        <p>This part is <b>extra</b>: it says when or how. You can take the whole part away (<i>at ten</i>) and the sentence is still correct.</p>
+        <p class="sent" style="font-size:1.25em">I <span class="verb">turn</span> <span class="part">in</span>. ✓ · I <span class="verb">turn</span> <span class="part">in</span> <span class="prep">at</span> ten. ✓</p>
+        <p class="small">You can use these with <b>any</b> phrasal verb. Next slide: some verbs also have their <b>own</b> preposition.</p>
       </div>
-      <p class="ca">Després d’un phrasal verb podem afegir informació amb una preposició: <b>at</b> + hora, <b>on</b> + dia, <b>for</b> + lloc, <b>with</b> + cosa, <b>by</b> + verb-ing. És opcional: es pot treure tota la part (<i>for school</i>).</p>
+      <p class="ca">Després d’un phrasal verb podem afegir informació amb les preposicions de sempre: <b>at</b> + hora, <b>on</b> + dia, <b>by</b> + verb-ing. És opcional: es pot treure tota la part (<i>at ten</i>).</p>
     </div>
     <div class="stack">
       <h3>Which preposition?</h3>
@@ -502,7 +500,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
     <div class="stack">
       <div class="rule">
         <h3>2 · Extra information: any phrasal verb</h3>
-        <p><b>All</b> phrasal verbs, also the ones in box 1, can add more information. Choose the preposition the information needs: <span class="prep">at</span> + time · <span class="prep">on</span> + day · <span class="prep">for</span> + place · <span class="prep">with</span> + thing · <span class="prep">by</span> + verb-ing.</p>
+        <p><b>All</b> phrasal verbs, also the ones in box 1, can add more information with the common prepositions: <span class="prep">at</span> + time · <span class="prep">on</span> + day · <span class="prep">by</span> + verb-ing.</p>
         <p class="sent" style="font-size:1.1em">I <span class="verb">turn</span> <span class="part">in</span> <span class="prep">at</span> ten. · I <span class="verb">turn</span> <span class="part">in</span> <span class="prep">on</span> Sundays.</p>
         <p class="sent" style="font-size:1.1em">I <span class="verb">catch</span> <span class="part">up</span> <span class="prep">on</span> messages <span class="prep">on</span> the bus.</p>
         <p class="sent" style="font-size:1.1em">I <span class="verb">head</span> <span class="part">out</span> <span class="prep">for</span> school <span class="prep">at</span> eight.</p>
@@ -832,8 +830,8 @@ carousel($('#meanQuiz'),MEAN,quizCard);
   btn.onclick=()=>{n=n>=steps.length?0:n+1;steps.forEach((x,i)=>x.classList.toggle('on',i<n));btn.textContent=n>=steps.length?'Start again':`Show step ${n+1}`};})();
 
 /* ---------- extra information: which preposition? ---------- */
-const PFILL=[['I {v:turn} {p:in} ___ ten.','at'],['I {v:head} {p:out} ___ school.','for'],['I {v:wind} {p:down} ___ music.','with'],['I {v:sleep} {p:in} ___ Sundays.','on'],['I {v:wind} {p:down} ___ listening to music.','by'],['We {v:go} {p:out} ___ Fridays.','on'],['I {v:get} {p:up} ___ seven.','at']];
-$('#pfill').innerHTML=PFILL.map(([t,a],i)=>`<div class="prow2" data-i="${i}"><p class="sent">${mk(t).replace('___','<span class="gapw">&nbsp;</span>')}</p><div class="row">${['at','on','for','with','by'].map(o=>`<button type="button" class="opt" data-o="${o}">${o}</button>`).join('')}</div></div>`).join('');
+const PFILL=[['I {v:turn} {p:in} ___ ten.','at'],['I {v:sleep} {p:in} ___ Sundays.','on'],['I {v:wind} {p:down} ___ listening to music.','by'],['We {v:go} {p:out} ___ Fridays.','on'],['I {v:get} {p:up} ___ seven.','at'],['We {v:eat} {p:out} ___ Saturdays.','on'],['I {v:get} {p:down} {r:to} my homework ___ five.','at']];
+$('#pfill').innerHTML=PFILL.map(([t,a],i)=>`<div class="prow2" data-i="${i}"><p class="sent">${mk(t).replace('___','<span class="gapw">&nbsp;</span>')}</p><div class="row">${['at','on','by'].map(o=>`<button type="button" class="opt" data-o="${o}">${o}</button>`).join('')}</div></div>`).join('');
 $('#pfill').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;const row=b.closest('.prow2'),a=PFILL[+row.dataset.i][1];if(b.dataset.o===a){b.classList.add('ok');row.classList.add('done');$('.gapw',row).innerHTML=`<span class="prep">${a}</span>`}else b.classList.add('no')});
 
 /* ---------- object finder ---------- */
