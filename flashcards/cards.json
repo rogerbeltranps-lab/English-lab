@@ -1,0 +1,114 @@
+[
+  {
+    "id": "shopping-cart",
+    "term": "shopping cart",
+    "type": "Vocabulary",
+    "ipa": "/ˈʃɑːpɪŋ kɑːrt/",
+    "definition": "A wheeled cart used to carry groceries; also an online store's virtual basket.",
+    "catalan": "carro de la compra",
+    "structure": "grab / push a shopping cart",
+    "examples": [
+      "Grab a shopping cart before we go in.",
+      "I left the milk in the shopping cart.",
+      "Your items are still in your online shopping cart."
+    ],
+    "tip": "In American English, say cart rather than trolley.",
+    "added": "2026-10-11"
+  },
+  {
+    "id": "visual-output",
+    "term": "visual output",
+    "type": "Vocabulary",
+    "ipa": "/ˈvɪʒuəl ˈaʊtpʊt/",
+    "definition": "The visible result produced by code or software, rather than the source code.",
+    "catalan": "resultat visual; sortida visual",
+    "structure": "see / preview the visual output",
+    "examples": [
+      "I want to see the visual output, not the code.",
+      "The visual output looks different on my phone.",
+      "Can you preview the visual output?"
+    ],
+    "tip": "Output = what a computer produces.",
+    "added": "2026-10-09"
+  },
+  {
+    "id": "toggle",
+    "term": "toggle",
+    "type": "Vocabulary",
+    "ipa": "/ˈtɑːɡəl/",
+    "definition": "A control that switches a setting between two states; as a verb, to switch between them.",
+    "catalan": "interruptor; activar o desactivar",
+    "structure": "toggle something on/off; a toggle switch",
+    "examples": [
+      "Add a dark-mode toggle.",
+      "Toggle the setting off and on again.",
+      "The toggle is at the top of the page."
+    ],
+    "tip": "Picture a light switch.",
+    "added": "2026-10-11"
+  },
+  {
+    "id": "commit",
+    "term": "commit",
+    "type": "Vocabulary",
+    "ipa": "/kəˈmɪt/",
+    "definition": "In Git, to save a snapshot of changes in a local repository; commit is both a noun and a verb.",
+    "catalan": "confirmar canvis; confirmació de canvis",
+    "structure": "commit changes; make a commit",
+    "examples": [
+      "Commit the changes before you leave.",
+      "I made a commit with the new cards.",
+      "A commit doesn't automatically push the changes."
+    ],
+    "tip": "Commit saves the snapshot; push sends it to the remote.",
+    "added": "2026-10-11"
+  },
+  {
+    "id": "push",
+    "term": "push",
+    "type": "Vocabulary",
+    "ipa": "/pʊʃ/",
+    "definition": "In Git, to upload local commits to a remote repository.",
+    "catalan": "pujar els canvis al repositori remot",
+    "structure": "push commits to GitHub; push to main",
+    "examples": [
+      "Push the changes to GitHub.",
+      "I haven't pushed that commit yet.",
+      "Push to the main branch after reviewing."
+    ],
+    "tip": "Push sends commits away from your computer.",
+    "added": "2026-10-11"
+  },
+  {
+    "id": "drop-down",
+    "term": "drop-down menu",
+    "type": "Vocabulary",
+    "ipa": "/ˈdrɑːp daʊn ˌmɛnjuː/",
+    "definition": "A menu that opens to show a list of choices when selected.",
+    "catalan": "menú desplegable",
+    "structure": "open / select from a drop-down menu",
+    "examples": [
+      "Open the drop-down menu.",
+      "Choose your class from the drop-down.",
+      "The menu doesn't open on mobile."
+    ],
+    "tip": "The options drop down from the control.",
+    "added": "2026-10-11"
+  },
+  {
+    "id": "roadmap",
+    "term": "roadmap",
+    "type": "Vocabulary",
+    "ipa": "/ˈroʊdˌmæp/",
+    "definition": "A plan showing the main steps and goals for a project.",
+    "catalan": "full de ruta",
+    "structure": "create / follow a roadmap",
+    "examples": [
+      "We need a roadmap for the app.",
+      "The roadmap shows our next features.",
+      "Let's update the project roadmap."
+    ],
+    "tip": "A roadmap shows where your project is heading.",
+    "added": "2026-10-11"
+  }
+]
