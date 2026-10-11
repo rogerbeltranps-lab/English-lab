@@ -113,7 +113,10 @@ p{margin:0}
 .small{font-size:.82em;color:var(--muted)}
 .ca{display:none;background:var(--soft);border-radius:10px;padding:.55em .85em;font-size:.86em}
 .ca::before{content:"CA";font-size:.7em;font-weight:600;letter-spacing:.1em;color:var(--accent);margin-right:.6em}
-:root.ca-on .ca{display:block}
+:root.ca-on .ca{display:none}
+.l-ca{display:none}
+:root.ca-on .l-ca{display:inline}
+:root.ca-on .l-en{display:none}
 .tag{font-size:.68em;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .why{color:var(--muted);font-size:.95em}
 .answer{background:var(--soft);border-radius:10px;padding:.6em .8em}
@@ -740,6 +743,10 @@ const store={get(k,d){try{const v=localStorage.getItem('pvDeck2.'+k);return v===
 const MK={v:'verb',p:'part',r:'prep',o:'obj'};
 const mk=s=>s.replace(/\{(\w):([^}]*)\}/g,(_,k,t)=>`<span class="${MK[k]}">${t}</span>`);
 const pvName=n=>{const[v,p,...r]=n.split(' ');return `<span class="verb">${v}</span> <span class="part">${p}</span>`+(r.length?` <span class="prep">${r.join(' ')}</span>`:'')};
+const CA={"← Back":"← Enrere","Next →":"Següent →","Full screen":"Pantalla completa","Learning Path 4 · Grammar": "Learning Path 4 · Gramàtica", "A verb + a particle = a new meaning.": "Un verb + una partícula = un significat nou.", "Insecure? Prem <b style=\"color:var(--accent)\">Ajuda en català</b> a dalt per veure explicacions en català.": "<b style=\"color:var(--accent)\">Ajuda en català activada.</b> Els exemples continuen en anglès.", "My afternoon": "La meva tarda", "1 · What is a phrasal verb?": "1 · Què és un phrasal verb?", "Add a particle, get a new meaning": "Afegeix una partícula i tindràs un significat nou", "<b>What does it mean?</b> Guess first, then check.": "<b>Què vol dir?</b> Primer endevina-ho i després comprova-ho.", "= go to bed<br><span class=\"small\">I turn in at ten.</span>": "= anar a dormir<br><span class=\"small\">I turn in at ten.</span>", "= eat at a restaurant<br><span class=\"small\">We eat out on Saturdays.</span>": "= menjar a un restaurant<br><span class=\"small\">We eat out on Saturdays.</span>", "= relax<br><span class=\"small\">I wind down with music.</span>": "= relaxar-se<br><span class=\"small\">I wind down with music.</span>", "A <b>particle</b> is a small word like <span class=\"part\">up</span>, <span class=\"part\">down</span>, <span class=\"part\">in</span>, <span class=\"part\">out</span>, <span class=\"part\">off</span>. The verb and the particle work together as <b>one</b> verb. Learn them together, like one word.": "Una <b>partícula</b> és una paraula petita com <span class=\"part\">up</span>, <span class=\"part\">down</span>, <span class=\"part\">in</span>, <span class=\"part\">out</span>, <span class=\"part\">off</span>. El verb i la partícula funcionen junts com <b>un sol</b> verb. Aprèn-los junts, com si fossin una sola paraula.", "The phrasal verbs of our routine": "Els phrasal verbs de la nostra rutina", "What do they mean? Guess, then click the verb.": "Què volen dir? Endevina-ho i després fes clic al verb.", "Morning": "Matí", "Afternoon": "Tarda", "Evening &amp; weekend": "Vespre i cap de setmana", "Check": "Comprova", "Which phrasal verb is it?": "Quin phrasal verb és?", "Which phrasal verb means…": "Quin phrasal verb vol dir…", "3 · What is an object?": "3 · Què és un objecte?", "The object gets the action": "L’objecte rep l’acció", "who does it?": "qui ho fa?", "the action": "l’acció", "who gets the action?<br><b>= the object</b>": "qui rep l’acció?<br><b>= l’objecte</b>", "Normal verbs have objects too": "Els verbs normals també tenen objecte", "Eat <b>WHAT?</b> → an apple. Call <b>WHO?</b> → my friend.": "Eat <b>WHAT?</b> (què?) → an apple. Call <b>WHO?</b> (a qui?) → my friend.", "An object can be…": "Un objecte pot ser…", "a person: <span class=\"obj\">my brother</span>, <span class=\"obj\">my sister</span>": "una persona: <span class=\"obj\">my brother</span>, <span class=\"obj\">my sister</span>", "a thing: <span class=\"obj\">my homework</span>, <span class=\"obj\">a snack</span>, <span class=\"obj\">messages</span>": "una cosa: <span class=\"obj\">my homework</span>, <span class=\"obj\">a snack</span>, <span class=\"obj\">messages</span>", "a pronoun: <span class=\"obj\">it</span>, <span class=\"obj\">them</span>, <span class=\"obj\">him</span>, <span class=\"obj\">her</span>": "un pronom: <span class=\"obj\">it</span>, <span class=\"obj\">them</span>, <span class=\"obj\">him</span>, <span class=\"obj\">her</span>", "These are NOT objects": "Això NO són objectes", "<b>WHEN?</b> at ten · on Fridays · after school": "<b>WHEN?</b> (quan?) at ten · on Fridays · after school", "<b>WHERE?</b> at home · to school": "<b>WHERE?</b> (on?) at home · to school", "3 · Find the object": "3 · Troba l’objecte", "Does something come after it?": "Hi ha alguna cosa després del verb?", "Ask WHAT? or WHO?": "Pregunta WHAT? (què?) o WHO? (a qui?)", "I pick up… <b>WHO?</b> → <span class=\"obj\">my brother</span>. That is the <b>object</b>.": "I pick up… <b>WHO?</b> → <span class=\"obj\">my brother</span>. Això és l’<b>objecte</b>.", "I turn in… <b>WHAT?</b> → nothing. <b>No object.</b>": "I turn in… <b>WHAT?</b> → res. <b>No hi ha objecte.</b>", "<b>at ten</b> answers WHEN?, so it is not an object.": "<b>at ten</b> respon WHEN? (quan?), per tant no és un objecte.", "Find the object. No object? Choose <b>No object</b>.": "Troba l’objecte. No n’hi ha? Tria <b>No object</b>.", "4 · The big picture": "4 · Visió general", "Our phrasal verbs fit in three groups": "Els nostres phrasal verbs es divideixen en tres grups", "<b>1</b> No object": "<b>1</b> Sense objecte", "Nothing after it": "Res després", "<b>2</b> Can split": "<b>2</b> Es poden separar", "Object in two places": "L’objecte pot anar en dos llocs", "<b>3</b> Three words": "<b>3</b> Tres paraules", "Never split": "No se separen mai", "Nothing after the phrasal verb": "Res després del phrasal verb", "After these verbs we can say <b>when</b> or <b>where</b>, but there is no object.": "Després d’aquests verbs podem dir <b>quan</b> o <b>on</b>, però no hi ha objecte.", "Some can add an extra word (optional)": "Alguns poden afegir una paraula extra (opcional)", "<b>for</b> + place and <b>with</b> + thing are optional: both sentences are correct.": "<b>for</b> + lloc i <b>with</b> + cosa són opcionals: les dues frases són correctes.", "Add extra information": "Afegir informació", "Common prepositions add more information": "Les preposicions comunes afegeixen informació", "+ time": "+ hora", "+ day": "+ dia", "+ verb-ing": "+ verb-ing", "This part is <b>extra</b>: it says when or how. You can take the whole part away (<i>at ten</i>) and the sentence is still correct.": "Aquesta part és <b>extra</b>: diu quan o com. Pots treure tota la part (<i>at ten</i>) i la frase continua sent correcta.", "You can use these with <b>any</b> phrasal verb. Next slide: some verbs also have their <b>own</b> preposition.": "Les pots fer servir amb <b>qualsevol</b> phrasal verb. A la diapositiva següent: alguns verbs també tenen la seva <b>pròpia</b> preposició.", "Which preposition?": "Quina preposició?", "The verb’s own preposition + extra information": "La preposició pròpia del verb + informació extra", "1 · The verb’s own preposition: learn it by heart": "1 · La preposició pròpia del verb: aprèn-la de memòria", "Some phrasal verbs come with their <b>own</b> preposition. There is no rule: learn the verb and its preposition together, as one chunk.": "Alguns phrasal verbs tenen la seva <b>pròpia</b> preposició. No hi ha cap regla: aprèn el verb i la preposició junts, com un bloc.", "<b>Always needed:</b>": "<b>Sempre necessària:</b>", "<b>Optional</b>, but when you add a place or a thing, use this one:": "<b>Opcional</b>, però quan afegeixes un lloc o una cosa, fes servir aquesta:", "2 · Extra information: any phrasal verb": "2 · Informació extra: qualsevol phrasal verb", "<b>All</b> phrasal verbs, also the ones in box 1, can add more information with the common prepositions: <span class=\"prep\">at</span> + time · <span class=\"prep\">on</span> + day · <span class=\"prep\">by</span> + verb-ing.": "<b>Tots</b> els phrasal verbs, també els del requadre 1, poden afegir informació amb les preposicions comunes: <span class=\"prep\">at</span> + hora · <span class=\"prep\">on</span> + dia · <span class=\"prep\">by</span> + verb-ing.", "First the verb’s own preposition (box 1), then the extra information (box 2).": "Primer la preposició pròpia del verb (requadre 1) i després la informació extra (requadre 2).", "The object can go in two places": "L’objecte pot anar en dos llocs", "With a noun: two places ✓": "Amb un nom: dos llocs ✓", "With it / them / him / her: only in the middle": "Amb it / them / him / her: només al mig", "Change the object to it / him / her.": "Canvia l’objecte per it / him / her.", "Three words that never split": "Tres paraules que no se separen mai", "verb + particle + <b>preposition</b>. The object always goes <b>at the end</b>, noun or pronoun.": "verb + partícula + <b>preposició</b>. L’objecte sempre va <b>al final</b>, tant si és un nom com un pronom.", "<b>on</b> and <b>to</b> are always needed here.": "Aquí <b>on</b> i <b>to</b> sempre són necessàries.", "Find the mistake and fix it.": "Troba l’error i corregeix-lo.", "Pronouns always go in the middle": "Els pronoms sempre van al mig", "With <span class=\"obj\">it</span>, <span class=\"obj\">them</span>, <span class=\"obj\">him</span>, <span class=\"obj\">her</span>, the phrasal verb <b>always splits</b>:": "Amb <span class=\"obj\">it</span>, <span class=\"obj\">them</span>, <span class=\"obj\">him</span>, <span class=\"obj\">her</span>, el phrasal verb <b>sempre se separa</b>:", "Which pronoun?": "Quin pronom?", "<b>Careful:</b> three-word verbs never split, not even with a pronoun. The pronoun goes at the end: I <span class=\"verb\">get</span> <span class=\"part\">down</span> <span class=\"prep\">to</span> <span class=\"obj\">it</span>.": "<b>Compte:</b> els verbs de tres paraules no se separen mai, ni tan sols amb un pronom. El pronom va al final: I <span class=\"verb\">get</span> <span class=\"part\">down</span> <span class=\"prep\">to</span> <span class=\"obj\">it</span>.", "5 · Check": "5 · Comprova", "Can we split it?": "Es pot separar?", "Which sentences are possible? Choose, then check.": "Quines frases són possibles? Tria-les i després comprova-ho.", "With <b class=\"subj\">he / she / it</b>, add <b class=\"end\">-s</b> to the <b class=\"verb\">verb</b>, not to the particle.": "Amb <b class=\"subj\">he / she / it</b>, afegeix <b class=\"end\">-s</b> al <b class=\"verb\">verb</b>, no a la partícula.", "<b>Negative:</b> <span class=\"aux\">doesn’t</span> + verb <b>without</b> -s": "<b>Negativa:</b> <span class=\"aux\">doesn’t</span> + verb <b>sense</b> -s", "<b>Question:</b> <span class=\"aux\">Does</span> + he / she + verb <b>without</b> -s": "<b>Pregunta:</b> <span class=\"aux\">Does</span> + he / she + verb <b>sense</b> -s", "Practice": "Pràctica", "Phrasal verb machine": "Màquina de phrasal verbs", "Choose a verb and an object. Move the object. Is it correct?": "Tria un verb i un objecte. Mou l’objecte. És correcte?", "Change the object to it / them / him": "Canvia l’objecte per it / them / him", "Game": "Joc", "Which group is it?": "De quin grup és?", "Say a sentence with the verb to win a point for your team.": "Digues una frase amb el verb per guanyar un punt per al teu equip.", "Edit": "Corregeix", "Error hunt": "Caça d’errors", "The object is in the wrong place. Find the wrong words, then check the correction.": "L’objecte és al lloc equivocat. Troba les paraules incorrectes i després comprova la correcció.", "Write": "Escriu", "Your turn: your afternoon": "Et toca: la teva tarda", "Write 3 sentences about your afternoon.": "Escriu 3 frases sobre la teva tarda.", "Use <b>one phrasal verb from each group</b>:": "Fes servir <b>un phrasal verb de cada grup</b>:", "Extra: in group 2, write the sentence again with it / them / him / her.": "Extra: al grup 2, torna a escriure la frase amb it / them / him / her.", "Check before you finish": "Revisa-ho abans d’acabar", "I used 3 phrasal verbs from our list.": "He fet servir 3 phrasal verbs de la nostra llista.", "Group 2: my pronoun is in the middle (pick <span class=\"obj\">him</span> up).": "Grup 2: el meu pronom és al mig (pick <span class=\"obj\">him</span> up).", "Group 3: my object is at the end (get down to <span class=\"obj\">it</span>).": "Grup 3: el meu objecte és al final (get down to <span class=\"obj\">it</span>).", "Writing time": "Temps per escriure", "Exit ticket": "Tiquet de sortida", "Can you explain it?": "Ho saps explicar?", "<b>pick up</b> can split, so <i>them</i> goes in the middle. <b>catch up on</b> has three words and never splits, so <i>them</i> goes at the end.": "<b>pick up</b> es pot separar, per tant <i>them</i> va al mig. <b>catch up on</b> té tres paraules i no se separa mai, per tant <i>them</i> va al final.", "Show all": "Mostra-ho tot", "Previous": "Anterior", "Next": "Següent", "Show answer": "Mostra la resposta", "Show step 1": "Mostra el pas 1", "No object": "Sense objecte", "Use “him”": "Fes servir “him”", "Use “it”": "Fes servir “it”", "Use “her”": "Fes servir “her”", "Fix it": "Corregeix-ho", "tap if possible": "toca si és possible", "Reset": "Torna a començar", "Who?": "Qui?", "Form": "Forma", "+ Affirmative": "+ Afirmativa", "− Negative": "− Negativa", "? Question": "? Pregunta", "Phrasal verb": "Phrasal verb", "Say it aloud · click to reveal": "Digues-ho en veu alta · fes clic per veure-ho", "Object": "Objecte", "a noun": "un nom", "it / them / him / her": "it / them / him / her (pronom)", "Where?": "On?", "at the end": "al final", "in the middle": "al mig", "Random (hidden)": "A l’atzar (amagat)", "Hide sentence": "Amaga la frase", "Press Start": "Prem Start", "<span class=\"grp g1\"><b>1</b></span>No object": "<span class=\"grp g1\"><b>1</b></span>Sense objecte", "<span class=\"grp g2\"><b>2</b></span>Can split": "<span class=\"grp g2\"><b>2</b></span>Es poden separar", "<span class=\"grp g3\"><b>3</b></span>Three words": "<span class=\"grp g3\"><b>3</b></span>Tres paraules", "Start": "Comença", "Reset scores": "Posa els punts a zero", "1 mistake to find": "1 error per trobar", "Show correction": "Mostra la correcció", "Show model": "Mostra el model", "Show the answer": "Mostra la resposta", "Why do we say <span class=\"verb\">pick</span> <span class=\"obj\">them</span> <span class=\"part\">up</span><br>but <span class=\"verb\">catch</span> <span class=\"part\">up</span> <span class=\"prep\">on</span> <span class=\"obj\">them</span>?": "Per què diem <span class=\"verb\">pick</span> <span class=\"obj\">them</span> <span class=\"part\">up</span><br>però <span class=\"verb\">catch</span> <span class=\"part\">up</span> <span class=\"prep\">on</span> <span class=\"obj\">them</span>?", "Hide all": "Amaga-ho tot", "Hide model": "Amaga el model", "Hide the answer": "Amaga la resposta", "Start again": "Torna a començar", "Show step 2": "Mostra el pas 2", "Show step 3": "Mostra el pas 3", "Show sentence": "Mostra la frase", "Pause": "Pausa", "Resume": "Continua", "Time!": "Temps!", "possible": "possible", "✓ possible": "✓ possible", "✗ not possible": "✗ no és possible"};
+const B=(en,ca)=>`<span class="l-en">${en}</span><span class="l-ca">${ca}</span>`;
+const LSEL='.eyebrow,h2,h3,.sub,.lead,.small,.rule>p:not(.sent):not(.chunks),.gbox>p:not(.sent):not(.list),.ostep small,.pinfo>b,.grp,.checks label>span,.big,.answer,.cahint,button.btn,.nobj,.lab,.board,.cover-btn>span,.vote,#gameChoices .opt,.tag,.daycol h3,.navbtn,.tbtn';
+function localize(root){$$(LSEL,root||document).forEach(el=>{if(el.closest('.l-en,.l-ca')||el.querySelector(':scope>.l-en'))return;const h=el.innerHTML.trim();if(Object.prototype.hasOwnProperty.call(CA,h))el.innerHTML=B(h,CA[h])})}
 const yg=q=>`https://youglish.com/pronounce/${encodeURIComponent(q)}/english/us`;
 
 /* ---------- deck ---------- */
@@ -798,7 +805,7 @@ const DAY=[
 ];
 $('#daygrid').innerHTML=DAY.map(([h,list])=>`<div class="daycol"><h3>${h}</h3>${list.map(([n,m,ex,ca,g])=>`<div class="pv"><button type="button" class="name">${pvName(n)}</button><span class="mean">${esc(m)}</span><span class="cag">${esc(ca)}</span><span class="ex">${mk(ex)}</span><span class="foot"><a class="yg" target="_blank" rel="noopener" href="${yg(n)}">▶ YouGlish</a></span></div>`).join('')}</div>`).join('');
 $('#daygrid').addEventListener('click',e=>{const b=e.target.closest('.name');if(b)b.closest('.pv').classList.toggle('open')});
-$('#pvAll').onclick=()=>{const all=$$('#daygrid .pv'),open=all.every(f=>f.classList.contains('open'));all.forEach(f=>f.classList.toggle('open',!open));$('#pvAll').textContent=open?'Show all':'Hide all'};
+$('#pvAll').onclick=()=>{const all=$$('#daygrid .pv'),open=all.every(f=>f.classList.contains('open'));all.forEach(f=>f.classList.toggle('open',!open));$('#pvAll').innerHTML=open?B('Show all','Mostra-ho tot'):B('Hide all','Amaga-ho tot')};
 
 /* ---------- carousel & quiz card ---------- */
 function carousel(root,items,render){
@@ -812,32 +819,32 @@ function carousel(root,items,render){
 function quizCard(body,it){
   body.innerHTML=`<p class="q-prompt">${it.p}</p><div class="opts"></div><p class="fb" aria-live="polite"></p><div class="row"><button class="btn ghost" type="button" data-show>Show answer</button></div>`;
   const opts=$('.opts',body),fb=$('.fb',body);
-  const done=()=>{$$('.opt',opts).forEach(x=>{if(x.dataset.o===it.a){x.classList.add('ok');x.classList.remove('no')}});fb.innerHTML=`<b class="g">Correct.</b> ${it.why}`};
+  const done=()=>{$$('.opt',opts).forEach(x=>{if(x.dataset.o===it.a){x.classList.add('ok');x.classList.remove('no')}});fb.innerHTML=`<b class="g">${B('Correct.','Correcte.')}</b> ${it.why}`};
   shuffle(it.o).forEach((o,i)=>{const b=document.createElement('button');b.type='button';b.className='opt';b.dataset.o=o;b.innerHTML=`<span class="key">${'ABCD'[i]}</span><span>${esc(o)}</span>`;
-    b.onclick=()=>{if(o===it.a)done();else{b.classList.add('no');fb.innerHTML='<b class="r">Not quite.</b> Try again.'}};opts.appendChild(b)});
+    b.onclick=()=>{if(o===it.a)done();else{b.classList.add('no');fb.innerHTML=`<b class="r">${B('Not quite.','Encara no.')}</b> ${B('Try again.','Torna-ho a provar.')}`}};opts.appendChild(b)});
   $('[data-show]',body).onclick=done;
 }
 
 /* meaning quiz */
 const MEAN=[
-  ['relax at the end of the day','wind down',['turn in','set off']],
-  ['go to bed','turn in',['get up','stay in']],
-  ['sleep later than usual','sleep in',['wake up','wind down']],
-  ['eat at a restaurant','eat out',['go out','whip up']],
-  ['stay at home','stay in',['go out','head out']],
-  ['make food quickly','whip up',['pick up','put off']],
-  ['collect someone','pick up',['put off','catch up on']],
-  ['do it later','put off',['get down to','set off']],
-  ['start doing something seriously','get down to',['catch up on','wake up']],
-  ['do things you didn’t have time for','catch up on',['get down to','pick up']],
-  ['leave home to go somewhere','head out',['get up','stay in']],
-  ['get out of bed','get up',['wake up','turn in']]
-].map(([m,a,o])=>({p:`<span class="small" style="display:block;font-size:.45em;letter-spacing:.08em;text-transform:uppercase">Which phrasal verb means…</span>${esc(m)}`,o:[a,...o],a,why:`${pvName(a)} = ${esc(m)}.`}));
+  ['relax at the end of the day','wind down',['turn in','set off'],'relaxar-se al final del dia'],
+  ['go to bed','turn in',['get up','stay in'],'anar a dormir'],
+  ['sleep later than usual','sleep in',['wake up','wind down'],'dormir fins més tard del normal'],
+  ['eat at a restaurant','eat out',['go out','whip up'],'menjar a un restaurant'],
+  ['stay at home','stay in',['go out','head out'],'quedar-se a casa'],
+  ['make food quickly','whip up',['pick up','put off'],'preparar menjar ràpidament'],
+  ['collect someone','pick up',['put off','catch up on'],'anar a buscar algú'],
+  ['do it later','put off',['get down to','set off'],'deixar-ho per més tard'],
+  ['start doing something seriously','get down to',['catch up on','wake up'],'posar-se a fer alguna cosa de debò'],
+  ['do things you didn’t have time for','catch up on',['get down to','pick up'],'posar-se al dia amb coses que no has tingut temps de fer'],
+  ['leave home to go somewhere','head out',['get up','stay in'],'sortir de casa cap a un lloc'],
+  ['get out of bed','get up',['wake up','turn in'],'llevar-se (sortir del llit)']
+].map(([m,a,o,c])=>({p:`<span class="small" style="display:block;font-size:.45em;letter-spacing:.08em;text-transform:uppercase">${B('Which phrasal verb means…','Quin phrasal verb vol dir…')}</span>${B(esc(m),esc(c))}`,o:[a,...o],a,why:`${pvName(a)} = ${B(esc(m),esc(c))}.`}));
 carousel($('#meanQuiz'),MEAN,quizCard);
 
 /* ---------- what is an object: step reveal ---------- */
 (function(){let n=0;const steps=$$('#osteps .ostep'),btn=$('#ostepBtn');
-  btn.onclick=()=>{n=n>=steps.length?0:n+1;steps.forEach((x,i)=>x.classList.toggle('on',i<n));btn.textContent=n>=steps.length?'Start again':`Show step ${n+1}`};})();
+  btn.onclick=()=>{n=n>=steps.length?0:n+1;steps.forEach((x,i)=>x.classList.toggle('on',i<n));btn.innerHTML=n>=steps.length?B('Start again','Torna a començar'):B(`Show step ${n+1}`,`Mostra el pas ${n+1}`)};})();
 
 /* ---------- extra information: which preposition? ---------- */
 const PFILL=[['I {v:turn} {p:in} ___ ten.','at'],['I {v:sleep} {p:in} ___ Sundays.','on'],['I {v:wind} {p:down} ___ listening to music.','by'],['We {v:go} {p:out} ___ Fridays.','on'],['I {v:get} {p:up} ___ seven.','at'],['We {v:eat} {p:out} ___ Saturdays.','on'],['I {v:get} {p:down} {r:to} my homework ___ five.','at']];
@@ -851,12 +858,12 @@ $('#pfill2').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b
 
 /* ---------- object finder ---------- */
 const FIND=[
-  {w:'I pick up my brother.',obj:[3,4],q:'Pick up WHO? → my brother'},
-  {w:'I turn in at ten.',obj:null,q:'Turn in WHAT? Nothing. At ten is a time.'},
-  {w:'I whip up a snack.',obj:[3,4],q:'Whip up WHAT? → a snack'},
-  {w:'We go out on Fridays.',obj:null,q:'Go out WHAT? Nothing. On Fridays is a time.'},
-  {w:'I catch up on messages.',obj:[4],q:'Catch up on WHAT? → messages'},
-  {w:'I sleep in at the weekend.',obj:null,q:'Sleep in WHAT? Nothing. At the weekend is a time.'}
+  {w:'I pick up my brother.',obj:[3,4],q:'Pick up WHO? → my brother',c:'Pick up WHO? (a qui?) → my brother'},
+  {w:'I turn in at ten.',obj:null,q:'Turn in WHAT? Nothing. At ten is a time.',c:'Turn in WHAT? Res. At ten és una hora.'},
+  {w:'I whip up a snack.',obj:[3,4],q:'Whip up WHAT? → a snack',c:'Whip up WHAT? (què?) → a snack'},
+  {w:'We go out on Fridays.',obj:null,q:'Go out WHAT? Nothing. On Fridays is a time.',c:'Go out WHAT? Res. On Fridays és un moment (quan).'},
+  {w:'I catch up on messages.',obj:[4],q:'Catch up on WHAT? → messages',c:'Catch up on WHAT? (què?) → messages'},
+  {w:'I sleep in at the weekend.',obj:null,q:'Sleep in WHAT? Nothing. At the weekend is a time.',c:'Sleep in WHAT? Res. At the weekend és un moment (quan).'}
 ];
 FIND.forEach(it=>{
   const row=document.createElement('div');row.className='frow';
@@ -865,12 +872,12 @@ FIND.forEach(it=>{
   row.addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b)return;
     if(b.classList.contains('nobj')){
-      if(!it.obj){b.classList.add('right');row.classList.add('done');fb.className='ffb good';fb.textContent='✓ No object. '+it.q}
-      else{fb.className='ffb bad';fb.textContent='There is an object. Ask WHAT? or WHO?'}
+      if(!it.obj){b.classList.add('right');row.classList.add('done');fb.className='ffb good';fb.innerHTML='✓ '+B('No object. '+it.q,'No hi ha objecte. '+it.c)}
+      else{fb.className='ffb bad';fb.innerHTML=B('There is an object. Ask WHAT? or WHO?','Sí que hi ha objecte. Pregunta WHAT? (què?) o WHO? (a qui?)')}
       return}
     const i=+b.dataset.i;
-    if(it.obj&&it.obj.includes(i)){it.obj.forEach(j=>$(`.word[data-i="${j}"]`,row).classList.add('objhit'));row.classList.add('done');fb.className='ffb good';fb.textContent='✓ '+it.q}
-    else{b.classList.remove('miss');void b.offsetWidth;b.classList.add('miss');fb.className='ffb bad';fb.textContent=it.obj?'Not the object. Ask WHAT? or WHO?':'Is there an object at all?'}
+    if(it.obj&&it.obj.includes(i)){it.obj.forEach(j=>$(`.word[data-i="${j}"]`,row).classList.add('objhit'));row.classList.add('done');fb.className='ffb good';fb.innerHTML='✓ '+B(it.q,it.c)}
+    else{b.classList.remove('miss');void b.offsetWidth;b.classList.add('miss');fb.className='ffb bad';fb.innerHTML=it.obj?B('Not the object. Ask WHAT? or WHO?','Això no és l’objecte. Pregunta WHAT? (què?) o WHO? (a qui?)'):B('Is there an object at all?','Segur que hi ha objecte?')}
   });
   $('#finder').appendChild(row);
 });
@@ -895,7 +902,7 @@ const SPLIT=[['I pick up my brother.',1],['I pick my brother up.',1],['I pick hi
 function drawTiles(){$('#tiles').innerHTML=SPLIT.map(([s],i)=>`<button type="button" class="tile" data-i="${i}" aria-pressed="false"><span>${esc(s)}</span><span class="vote">tap if possible</span></button>`).join('');$('#splitFb').textContent=''}
 drawTiles();
 $('#tiles').addEventListener('click',e=>{const b=e.target.closest('.tile');if(!b||b.classList.contains('ok')||b.classList.contains('no'))return;const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));$('.vote',b).textContent=on?'possible':'tap if possible'});
-$('#splitCheck').onclick=()=>{let right=0;$$('#tiles .tile').forEach(b=>{const ok=SPLIT[+b.dataset.i][1]===1,v=b.getAttribute('aria-pressed')==='true';if(ok===v)right++;b.classList.add(ok?'ok':'no');$('.vote',b).textContent=ok?'✓ possible':'✗ not possible'});$('#splitFb').innerHTML=right===SPLIT.length?'<b class="g">Perfect!</b> Six are possible and two are not.':`<b class="r">${right} / ${SPLIT.length} right.</b> Look at the two that are not possible.`};
+$('#splitCheck').onclick=()=>{let right=0;$$('#tiles .tile').forEach(b=>{const ok=SPLIT[+b.dataset.i][1]===1,v=b.getAttribute('aria-pressed')==='true';if(ok===v)right++;b.classList.add(ok?'ok':'no');$('.vote',b).textContent=ok?'✓ possible':'✗ not possible'});$('#splitFb').innerHTML=right===SPLIT.length?`<b class="g">${B('Perfect!','Perfecte!')}</b> ${B('Six are possible and two are not.','Sis són possibles i dues no.')}`:`<b class="r">${right} / ${SPLIT.length} ${B('right.','correctes.')}</b> ${B('Look at the two that are not possible.','Fixa’t en les dues que no són possibles.')}`};
 $('#splitReset').onclick=drawTiles;
 
 /* ---------- he / she / it ---------- */
@@ -914,10 +921,10 @@ $('#splitReset').onclick=drawTiles;
   function draw(){
     const [b,t,rest]=HV[st.v],[sub,th]=SU[st.s];
     const S=`<span class="subj">${sub}</span>`,R=mk(rest);let out,note;
-    if(st.f==='aff'){out=`${S.replace('>'+sub,'>'+sub.charAt(0).toUpperCase()+sub.slice(1))} <span class="verb">${th?third(b,t):b}</span> ${R}.`;note=th?'he / she / it → verb + -s':'I / you / we / they → verb with no -s'}
-    else if(st.f==='neg'){out=`${S.replace('>'+sub,'>'+sub.charAt(0).toUpperCase()+sub.slice(1))} <span class="aux">${th?'do<span class="end">es</span>n’t':'don’t'}</span> <span class="verb">${b}</span> ${R}.`;note=th?'doesn’t + verb with no -s':'don’t + verb'}
-    else{out=`<span class="aux">${th?'Do<span class="end">es</span>':'Do'}</span> ${S} <span class="verb">${b}</span> ${R}?`;note=th?'Does + he / she + verb with no -s':'Do + I / you / we / they + verb'}
-    $('.out',root).innerHTML=out;$('.verdict',root).textContent=note;
+    if(st.f==='aff'){out=`${S.replace('>'+sub,'>'+sub.charAt(0).toUpperCase()+sub.slice(1))} <span class="verb">${th?third(b,t):b}</span> ${R}.`;note=th?B('he / she / it → verb + -s','he / she / it → verb + -s'):B('I / you / we / they → verb with no -s','I / you / we / they → verb sense -s')}
+    else if(st.f==='neg'){out=`${S.replace('>'+sub,'>'+sub.charAt(0).toUpperCase()+sub.slice(1))} <span class="aux">${th?'do<span class="end">es</span>n’t':'don’t'}</span> <span class="verb">${b}</span> ${R}.`;note=th?B('doesn’t + verb with no -s','doesn’t + verb sense -s'):B('don’t + verb','don’t + verb')}
+    else{out=`<span class="aux">${th?'Do<span class="end">es</span>':'Do'}</span> ${S} <span class="verb">${b}</span> ${R}?`;note=th?B('Does + he / she + verb with no -s','Does + he / she + verb sense -s'):B('Do + I / you / we / they + verb','Do + I / you / we / they + verb')}
+    $('.out',root).innerHTML=out;$('.verdict',root).innerHTML=note;
     $$('[data-k]',root).forEach(g=>{const k=g.dataset.k;$$('.chip',g).forEach(c=>c.setAttribute('aria-pressed',String(String(st[k])===c.dataset.v)))});
   }
   root.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const k=b.closest('[data-k]').dataset.k;st[k]=k==='f'?b.dataset.v:+b.dataset.v;draw()});
@@ -939,7 +946,7 @@ const PV=[
   {v:'sleep',p:'in',g:1,w:'at the weekend'},
   {v:'head',p:'out',g:1,w:'for school'}
 ];
-const GN={1:'No object',2:'Can split',3:'Three words'};
+const GN={1:B('No object','Sense objecte'),2:B('Can split','Es pot separar'),3:B('Three words','Tres paraules')};
 function buildPV(V,o,pos){
   const verb=`<span class="verb">${V.v}</span>`;
   const [p0,...pr]=V.p.split(' ');const part=`<span class="part">${p0}</span>`+(pr.length?` <span class="prep">${pr.join(' ')}</span>`:'');
@@ -948,9 +955,9 @@ function buildPV(V,o,pos){
   const core=V.g===1?`${verb} ${part}`:(mid?`${verb} ${obj} ${part}`:`${verb} ${part} ${obj}`);
   const time=V.w.startsWith('for ')||V.w.startsWith('with ')?`<span class="prep">${V.w.split(' ')[0]}</span> ${V.w.split(' ').slice(1).join(' ')}`:V.w;
   let ok=true,why;
-  if(V.g===2){if(o==='pron'&&!mid){ok=false;why=`${V.pr} goes in the middle: ${V.v} ${V.pr} ${p0}.`}else why=o==='pron'?'Pronoun in the middle.':(mid?'Noun in the middle: correct.':'Noun after the particle: correct too.')}
-  else if(V.g===3){if(mid){ok=false;why=`Three words never split: ${V.v} ${V.p} + object.`}else why='Object at the end.'}
-  else why='No object here.';
+  if(V.g===2){if(o==='pron'&&!mid){ok=false;why=B(`${V.pr} goes in the middle: ${V.v} ${V.pr} ${p0}.`,`${V.pr} va al mig: ${V.v} ${V.pr} ${p0}.`)}else why=o==='pron'?B('Pronoun in the middle.','Pronom al mig.'):(mid?B('Noun in the middle: correct.','Nom al mig: correcte.'):B('Noun after the particle: correct too.','Nom després de la partícula: també és correcte.'))}
+  else if(V.g===3){if(mid){ok=false;why=B(`Three words never split: ${V.v} ${V.p} + object.`,`Tres paraules: no se separen mai. ${V.v} ${V.p} + objecte.`)}else why=B('Object at the end.','Objecte al final.')}
+  else why=B('No object here.','Aquí no hi ha objecte.');
   return {html:`I ${core} ${time}.`,ok,why};
 }
 (function(){
@@ -966,11 +973,11 @@ function buildPV(V,o,pos){
   function draw(){
     const V=PV[st.v],r=buildPV(V,st.o,st.pos);
     $('.out',root).innerHTML=r.html;
-    $('.verdict',root).innerHTML=`<span class="grp g${V.g}"><b>${V.g}</b> ${GN[V.g]}</span> ${r.ok?'<b class="g">✓ Correct.</b>':'<b class="r">✗ Not possible.</b>'} ${esc(r.why)}`;
+    $('.verdict',root).innerHTML=`<span class="grp g${V.g}"><b>${V.g}</b> ${GN[V.g]}</span> ${r.ok?`<b class="g">✓ ${B('Correct.','Correcte.')}</b>`:`<b class="r">✗ ${B('Not possible.','No és possible.')}</b>`} ${r.why}`;
     $('.out-wrap',root).classList.toggle('bad',!r.ok);
     $$('.oc',root).forEach(c=>c.hidden=V.g===1);
     $('.out-wrap',root).classList.toggle('covered',covered);
-    $('[data-act="cover"]',root).textContent=covered?'Show sentence':'Hide sentence';
+    $('[data-act="cover"]',root).innerHTML=covered?B('Show sentence','Mostra la frase'):B('Hide sentence','Amaga la frase');
     $$('[data-k]',root).forEach(g=>{const k=g.dataset.k;$$('.chip',g).forEach(c=>c.setAttribute('aria-pressed',String(String(st[k])===c.dataset.v)))});
   }
   root.addEventListener('click',e=>{
@@ -986,20 +993,20 @@ function buildPV(V,o,pos){
 
 /* ---------- pronoun quiz ---------- */
 carousel($('#pronQuiz'),[
-  {p:'I pick up <span class="obj">my brother</span>. → him',o:['I pick him up.','I pick up him.'],a:'I pick him up.',why:'Group 2: him goes in the middle.'},
-  {p:'I put off <span class="obj">my homework</span>. → it',o:['I put it off.','I put off it.'],a:'I put it off.',why:'Group 2: it goes in the middle.'},
-  {p:'I whip up <span class="obj">a snack</span>. → it',o:['I whip it up.','I whip up it.'],a:'I whip it up.',why:'Group 2: it goes in the middle.'},
-  {p:'I wake up <span class="obj">my sister</span>. → her',o:['I wake her up.','I wake up her.'],a:'I wake her up.',why:'Group 2: her goes in the middle.'},
-  {p:'I catch up on <span class="obj">messages</span>. → them',o:['I catch up on them.','I catch them up on.'],a:'I catch up on them.',why:'Group 3: them goes at the end.'},
-  {p:'I get down to <span class="obj">my homework</span>. → it',o:['I get down to it.','I get it down to.'],a:'I get down to it.',why:'Group 3: it goes at the end.'}
+  {p:'I pick up <span class="obj">my brother</span>. → him',o:['I pick him up.','I pick up him.'],a:'I pick him up.',why:B('Group 2: him goes in the middle.','Grup 2: him va al mig.')},
+  {p:'I put off <span class="obj">my homework</span>. → it',o:['I put it off.','I put off it.'],a:'I put it off.',why:B('Group 2: it goes in the middle.','Grup 2: it va al mig.')},
+  {p:'I whip up <span class="obj">a snack</span>. → it',o:['I whip it up.','I whip up it.'],a:'I whip it up.',why:B('Group 2: it goes in the middle.','Grup 2: it va al mig.')},
+  {p:'I wake up <span class="obj">my sister</span>. → her',o:['I wake her up.','I wake up her.'],a:'I wake her up.',why:B('Group 2: her goes in the middle.','Grup 2: her va al mig.')},
+  {p:'I catch up on <span class="obj">messages</span>. → them',o:['I catch up on them.','I catch them up on.'],a:'I catch up on them.',why:B('Group 3: them goes at the end.','Grup 3: them va al final.')},
+  {p:'I get down to <span class="obj">my homework</span>. → it',o:['I get down to it.','I get it down to.'],a:'I get down to it.',why:B('Group 3: it goes at the end.','Grup 3: it va al final.')}
 ],quizCard);
 
 /* ---------- group game ---------- */
 const GAME=[['get up',1],['head out',1],['set off',1],['wind down',1],['turn in',1],['sleep in',1],['go out',1],['stay in',1],['eat out',1],['pick up',2],['put off',2],['whip up',2],['wake up',2],['catch up on',3],['get down to',3]];
 const GEX={'get up':'I get up at seven.','head out':'I head out for school.','set off':'We set off at half past seven.','wind down':'I wind down with music.','turn in':'I turn in at ten.','sleep in':'I sleep in at the weekend.','go out':'We go out on Fridays.','stay in':'I stay in on Sundays.','eat out':'We eat out on Saturdays.','pick up':'I pick him up.','put off':'I put it off.','whip up':'I whip it up.','wake up':'I wake her up. (Also group 1: I wake up at seven.)','catch up on':'I catch up on them.','get down to':'I get down to it.'};
 let gq=[],gcur=null,gs=0,gt=0;
-$('#gameNext').onclick=()=>{if(!gq.length)gq=shuffle(GAME);gcur=gq.pop();$('#gamePV').innerHTML=pvName(gcur[0]);$('#gameChoices').hidden=false;$$('#gameChoices .opt').forEach(b=>{b.classList.remove('ok','no');b.disabled=false});$('#gameFb').textContent='';$('#gameNext').textContent='Next'};
-$('#gameChoices').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b||!gcur)return;gt++;const ok=+b.dataset.g===gcur[1];if(ok)gs++;$$('#gameChoices .opt').forEach(x=>{x.disabled=true;if(+x.dataset.g===gcur[1])x.classList.add('ok')});if(!ok)b.classList.add('no');$('#gameFb').innerHTML=(ok?'<b class="g">Correct!</b> ':'<b class="r">Not quite.</b> ')+`Group ${gcur[1]}: ${esc(GEX[gcur[0]])}`;$('#gameScore').textContent=`Score: ${gs} / ${gt}`;gcur=null});
+$('#gameNext').onclick=()=>{if(!gq.length)gq=shuffle(GAME);gcur=gq.pop();$('#gamePV').innerHTML=pvName(gcur[0]);$('#gameChoices').hidden=false;$$('#gameChoices .opt').forEach(b=>{b.classList.remove('ok','no');b.disabled=false});$('#gameFb').textContent='';$('#gameNext').innerHTML=B('Next','Següent')};
+$('#gameChoices').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b||!gcur)return;gt++;const ok=+b.dataset.g===gcur[1];if(ok)gs++;$$('#gameChoices .opt').forEach(x=>{x.disabled=true;if(+x.dataset.g===gcur[1])x.classList.add('ok')});if(!ok)b.classList.add('no');$('#gameFb').innerHTML=(ok?`<b class="g">${B('Correct!','Correcte!')}</b> `:`<b class="r">${B('Not quite.','Encara no.')}</b> `)+`${B('Group','Grup')} ${gcur[1]}: ${esc(GEX[gcur[0]])}`;$('#gameScore').innerHTML=`${B('Score','Punts')}: ${gs} / ${gt}`;gcur=null});
 const score=[0,0,0,0,0,0];
 $('#teams').innerHTML=score.map((_,t)=>`<div class="team"><input id="team${t}" value="Team ${t+1}" aria-label="Team ${t+1} name"><button type="button" data-team="${t}" data-d="-1" aria-label="Remove a point">−</button><span class="sc" id="sc${t}">0</span><button type="button" data-team="${t}" data-d="1" aria-label="Add a point">+</button></div>`).join('');
 $('#teams').addEventListener('click',e=>{const b=e.target.closest('[data-team]');if(!b)return;const t=+b.dataset.team;score[t]=Math.max(0,score[t]+ +b.dataset.d);$('#sc'+t).textContent=score[t]});
@@ -1007,16 +1014,16 @@ $('#teamsReset').onclick=()=>{score.fill(0);score.forEach((_,t)=>$('#sc'+t).text
 
 /* ---------- error hunt ---------- */
 const EDIT=[
-  {w:'I pick up him at five.',err:[[2,3]],c:'I pick him up at five.',fix:[2,3],why:'Group 2: him goes in the middle.'},
-  {w:'I put off it every day.',err:[[2,3]],c:'I put it off every day.',fix:[2,3],why:'Group 2: it goes in the middle.'},
-  {w:'I wake up her at seven.',err:[[2,3]],c:'I wake her up at seven.',fix:[2,3],why:'Group 2: her goes in the middle.'},
-  {w:'I get it down to after school.',err:[[2,3,4]],c:'I get down to it after school.',fix:[2,3,4],why:'Group 3: three words never split. It goes at the end.'},
-  {w:'I catch messages up on.',err:[[2,3,4]],c:'I catch up on messages.',fix:[2,3,4],why:'Group 3: keep catch up on together.'},
-  {w:'I whip up it after school.',err:[[2,3]],c:'I whip it up after school.',fix:[2,3],why:'Group 2: it goes in the middle.'}
+  {w:'I pick up him at five.',err:[[2,3]],c:'I pick him up at five.',fix:[2,3],why:B('Group 2: him goes in the middle.','Grup 2: him va al mig.')},
+  {w:'I put off it every day.',err:[[2,3]],c:'I put it off every day.',fix:[2,3],why:B('Group 2: it goes in the middle.','Grup 2: it va al mig.')},
+  {w:'I wake up her at seven.',err:[[2,3]],c:'I wake her up at seven.',fix:[2,3],why:B('Group 2: her goes in the middle.','Grup 2: her va al mig.')},
+  {w:'I get it down to after school.',err:[[2,3,4]],c:'I get down to it after school.',fix:[2,3,4],why:B('Group 3: three words never split. It goes at the end.','Grup 3: tres paraules, no se separen mai. It va al final.')},
+  {w:'I catch messages up on.',err:[[2,3,4]],c:'I catch up on messages.',fix:[2,3,4],why:B('Group 3: keep catch up on together.','Grup 3: catch up on va sempre junt.')},
+  {w:'I whip up it after school.',err:[[2,3]],c:'I whip it up after school.',fix:[2,3],why:B('Group 2: it goes in the middle.','Grup 2: it va al mig.')}
 ];
 carousel($('#errors'),EDIT,(body,it)=>{
   const n=it.err.length,found=new Set();
-  body.innerHTML=`<p class="tag">${n} mistake to find</p><p class="sent">${it.w.split(' ').map((w,i)=>`<button type="button" class="word" data-i="${i}">${esc(w)}</button>`).join(' ')}</p><p class="fb" aria-live="polite"></p><div class="row"><button class="btn ghost" type="button" data-show>Show correction</button></div><div class="stack" data-fix hidden><p class="sent">${it.c.split(' ').map((w,i)=>it.fix.includes(i)?`<mark>${esc(w)}</mark>`:esc(w)).join(' ')}</p><p class="why">${esc(it.why)}</p></div>`;
+  body.innerHTML=`<p class="tag">${n} mistake to find</p><p class="sent">${it.w.split(' ').map((w,i)=>`<button type="button" class="word" data-i="${i}">${esc(w)}</button>`).join(' ')}</p><p class="fb" aria-live="polite"></p><div class="row"><button class="btn ghost" type="button" data-show>Show correction</button></div><div class="stack" data-fix hidden><p class="sent">${it.c.split(' ').map((w,i)=>it.fix.includes(i)?`<mark>${esc(w)}</mark>`:esc(w)).join(' ')}</p><p class="why">${it.why}</p></div>`;
   const reveal=()=>{$('[data-fix]',body).hidden=false;$('[data-show]',body).hidden=true};
   $('.sent',body).addEventListener('click',e=>{const b=e.target.closest('.word');if(!b)return;const i=+b.dataset.i;const g=it.err.findIndex(x=>x.includes(i));
     if(g>-1){it.err[g].forEach(j=>$(`.word[data-i="${j}"]`,body).classList.add('hit'));found.add(g);if(found.size===n)reveal()}
@@ -1025,8 +1032,8 @@ carousel($('#errors'),EDIT,(body,it)=>{
 });
 
 /* ---------- your turn & exit ---------- */
-$('#modelBtn').onclick=()=>{const m=$('#model');m.hidden=!m.hidden;$('#modelBtn').textContent=m.hidden?'Show model':'Hide model'};
-$('#exitBtn').onclick=()=>{const o=$('#exit').classList.toggle('open');$('#exitBtn').textContent=o?'Hide the answer':'Show the answer'};
+$('#modelBtn').onclick=()=>{const m=$('#model');m.hidden=!m.hidden;$('#modelBtn').innerHTML=m.hidden?B('Show model','Mostra el model'):B('Hide model','Amaga el model')};
+$('#exitBtn').onclick=()=>{const o=$('#exit').classList.toggle('open');$('#exitBtn').innerHTML=o?B('Hide the answer','Amaga la resposta'):B('Show the answer','Mostra la resposta')};
 let total=300,left=300,tid=null;
 const fmt=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 function tdraw(){$('#tShow').textContent=left>0?fmt(left):'Time!';$('#timer').classList.toggle('up',left<=0);$('#tGo').textContent=tid?'Pause':(left<total&&left>0?'Resume':'Start')}
@@ -1059,6 +1066,8 @@ stage.addEventListener('scroll',hideTip,{passive:true});
 $$('#prev,#next,#rail').forEach(b=>b.addEventListener('click',hideTip));
 document.addEventListener('keydown',hideTip);
 
+localize();
+new MutationObserver(()=>localize(stage)).observe(stage,{childList:true,subtree:true,characterData:true});
 go(cur);
 })();
 </script>
