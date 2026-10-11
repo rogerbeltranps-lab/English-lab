@@ -161,6 +161,14 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
 .pv .ex{font:600 .9em/1.35 var(--f-display);color:var(--muted)}
 .pv .cag{font-size:.78em;color:var(--accent)}
 
+/* object steps */
+.osteps{display:flex;flex-wrap:wrap;gap:.6em 1.4em;align-items:flex-start}
+.ostep{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.2em;visibility:hidden}
+.ostep.on{visibility:visible}
+.ostep .sent{font-size:2em}
+.ostep small{font-size:.75em;color:var(--muted);line-height:1.3}
+.ostep:nth-child(3) small{color:var(--obj)}
+
 /* object finder */
 .finder{display:flex;flex-direction:column;gap:.55em}
 .frow{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.55em 1em;display:flex;flex-direction:column;gap:.25em}
@@ -325,9 +333,47 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
   <div id="meanQuiz"></div>
 </section>
 
+<!-- what is an object -->
+<section class="slide" data-title="What is an object?">
+  <p class="eyebrow">3 · What is an object?</p>
+  <h2>The object gets the action</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
+    <div class="stack">
+      <div class="rule key">
+        <div class="osteps" id="osteps">
+          <div class="ostep"><span class="sent subj">I</span><small>who does it?</small></div>
+          <div class="ostep"><span class="sent"><span class="verb">pick</span> <span class="part">up</span></span><small>the action</small></div>
+          <div class="ostep"><span class="sent obj">my brother</span><small>who gets the action?<br><b>= the object</b></small></div>
+        </div>
+        <button class="btn" type="button" id="ostepBtn" style="align-self:flex-start">Show step 1</button>
+      </div>
+      <div class="rule">
+        <h3>Normal verbs have objects too</h3>
+        <p class="sent" style="font-size:1.25em">I eat <span class="obj">an apple</span>. · I watch <span class="obj">TV</span>. · I call <span class="obj">my friend</span>.</p>
+        <p class="small">Eat <b>WHAT?</b> → an apple. Call <b>WHO?</b> → my friend.</p>
+      </div>
+      <p class="ca">L’objecte (complement directe) és la persona o la cosa que <b>rep l’acció</b>. Per trobar-lo pregunta <b>WHAT?</b> (què?) o <b>WHO?</b> (a qui?). Quan o on (at ten, on Fridays, at home) no són objectes.</p>
+    </div>
+    <div class="stack">
+      <div class="gbox g1" style="background:var(--surface)">
+        <h3>An object can be…</h3>
+        <p>a person: <span class="obj">my brother</span>, <span class="obj">my sister</span></p>
+        <p>a thing: <span class="obj">my homework</span>, <span class="obj">a snack</span>, <span class="obj">messages</span></p>
+        <p>a pronoun: <span class="obj">it</span>, <span class="obj">them</span>, <span class="obj">him</span>, <span class="obj">her</span></p>
+      </div>
+      <div class="gbox" style="background:var(--no-bg);border-color:var(--no)">
+        <h3>These are NOT objects</h3>
+        <p><b>WHEN?</b> at ten · on Fridays · after school</p>
+        <p><b>WHERE?</b> at home · to school</p>
+        <p class="sent" style="font-size:1.15em">I turn in <u style="text-decoration:none;color:var(--muted)">at ten</u>. → no object</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- 5 -->
 <section class="slide" data-title="Object or not?">
-  <p class="eyebrow">3 · Object or no object?</p>
+  <p class="eyebrow">3 · Find the object</p>
   <h2>Does something come after it?</h2>
   <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.6fr)">
     <div class="stack">
@@ -682,6 +728,10 @@ const MEAN=[
   ['get out of bed','get up',['wake up','turn in']]
 ].map(([m,a,o])=>({p:`<span class="small" style="display:block;font-size:.45em;letter-spacing:.08em;text-transform:uppercase">Which phrasal verb means…</span>${esc(m)}`,o:[a,...o],a,why:`${pvName(a)} = ${esc(m)}.`}));
 carousel($('#meanQuiz'),MEAN,quizCard);
+
+/* ---------- what is an object: step reveal ---------- */
+(function(){let n=0;const steps=$$('#osteps .ostep'),btn=$('#ostepBtn');
+  btn.onclick=()=>{n=n>=steps.length?0:n+1;steps.forEach((x,i)=>x.classList.toggle('on',i<n));btn.textContent=n>=steps.length?'Start again':`Show step ${n+1}`};})();
 
 /* ---------- object finder ---------- */
 const FIND=[
