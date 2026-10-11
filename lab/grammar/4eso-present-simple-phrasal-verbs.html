@@ -54,6 +54,13 @@ a{color:var(--accent)}
 .rail button{flex:0 0 auto;min-width:2em;height:2em;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font:600 .72em var(--f-body);font-variant-numeric:tabular-nums}
 .rail button.seen{color:var(--ink)}
 .rail button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.cabtn{display:inline-flex;align-items:center;gap:.5em;border:2px solid var(--accent);background:var(--soft);color:var(--accent);border-radius:999px;padding:.25em .9em .25em .3em;font:600 .78em var(--f-body);white-space:nowrap}
+.cabtn .caroute{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:.1em .6em;font-size:.82em;letter-spacing:.04em}
+.cabtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.cabtn[aria-pressed="true"] .caroute{background:var(--accent-ink);color:var(--accent)}
+.cabtn[aria-pressed="true"] .calab::after{content:" ✓"}
+@media (max-width:620px){.cabtn .caroute{display:none}}
+.cahint{display:block;font-size:.8em;color:var(--muted)}
 .back-lab{display:inline-flex;align-items:center;justify-content:center;width:2em;height:2em;border-radius:999px;border:1px solid var(--line);color:var(--accent);text-decoration:none;font-weight:700;flex:0 0 auto}
 .tbtn{border:1px solid var(--line);background:transparent;border-radius:999px;padding:.3em .8em;font:600 .72em var(--f-body);white-space:nowrap}
 .tbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -286,7 +293,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
   <a class="back-lab" href="/English-lab/index.html#lab" title="Back to English Lab" aria-label="Back to English Lab">←</a>
   <div class="brand">Phrasal verbs<small>4 ESO · My Real Routine</small></div>
   <nav class="rail" id="rail" aria-label="Slides"></nav>
-  <button class="tbtn" id="caBtn" type="button" aria-pressed="false" title="Show Catalan help (C)">Català</button>
+  <button class="cabtn" id="caBtn" type="button" aria-pressed="false" title="Ajuda en català (C)"><span class="caroute">Insecure</span><span class="calab">Ajuda en català</span></button>
   <button class="tbtn" id="fsBtn" type="button" title="Full screen (F)">Full screen</button>
 </header>
 
@@ -300,7 +307,8 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
       <h1>Phrasal verbs</h1>
       <p class="sub">A verb + a particle = a new meaning.</p>
       <p class="eq"><span class="verb">turn</span><span class="op">+</span><span class="part">in</span><span class="op">=</span><span>go to bed</span></p>
-      <div class="legend" style="margin-top:1.2em" aria-label="Colour key"><span class="verb">verb</span><span><span class="part">particle</span></span><span><span class="obj">object</span></span></div>
+      <p class="cahint" style="margin-top:1.4em">Insecure? Prem <b style="color:var(--accent)">Ajuda en català</b> a dalt per veure explicacions en català.</p>
+      <div class="legend" style="margin-top:1em" aria-label="Colour key"><span class="verb">verb</span><span><span class="part">particle</span></span><span><span class="obj">object</span></span></div>
     </div>
     <div class="clockcard" aria-label="An afternoon routine">
       <p class="eyebrow">My afternoon</p>
@@ -486,7 +494,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
 <section class="slide" data-title="Own preposition">
   <p class="eyebrow">Add extra information</p>
   <h2>The verb’s own preposition + extra information</h2>
-  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+  <div class="cols" style="grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)">
     <div class="stack">
       <div class="rule key">
         <h3>1 · The verb’s own preposition: learn it by heart</h3>
@@ -496,8 +504,6 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
         <p class="small"><b>Optional</b>, but when you add a place or a thing, use this one:</p>
         <p class="chunks"><span><span class="verb">head</span> <span class="part">out</span> <span class="prep">for</span> + place</span><span><span class="verb">set</span> <span class="part">off</span> <span class="prep">for</span> + place</span><span><span class="verb">wind</span> <span class="part">down</span> <span class="prep">with</span> + thing</span></p>
       </div>
-    </div>
-    <div class="stack">
       <div class="rule">
         <h3>2 · Extra information: any phrasal verb</h3>
         <p><b>All</b> phrasal verbs, also the ones in box 1, can add more information with the common prepositions: <span class="prep">at</span> + time · <span class="prep">on</span> + day · <span class="prep">by</span> + verb-ing.</p>
@@ -507,6 +513,10 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
         <p class="small">First the verb’s own preposition (box 1), then the extra information (box 2).</p>
       </div>
       <p class="ca">1) Alguns phrasal verbs tenen la seva <b>pròpia</b> preposició: cal aprendre-la de memòria, com un bloc (catch up <b>on</b>, get down <b>to</b>, head out <b>for</b>…). 2) <b>Tots</b> els phrasal verbs, també aquests, poden afegir informació amb la preposició que calgui (at + hora, on + dia…): I catch up on messages <b>on</b> the bus.</p>
+    </div>
+    <div class="stack">
+      <h3>Which preposition?</h3>
+      <div class="pfill" id="pfill2"></div>
     </div>
   </div>
 </section>
@@ -833,6 +843,11 @@ carousel($('#meanQuiz'),MEAN,quizCard);
 const PFILL=[['I {v:turn} {p:in} ___ ten.','at'],['I {v:sleep} {p:in} ___ Sundays.','on'],['I {v:wind} {p:down} ___ listening to music.','by'],['We {v:go} {p:out} ___ Fridays.','on'],['I {v:get} {p:up} ___ seven.','at'],['We {v:eat} {p:out} ___ Saturdays.','on'],['I {v:get} {p:down} {r:to} my homework ___ five.','at']];
 $('#pfill').innerHTML=PFILL.map(([t,a],i)=>`<div class="prow2" data-i="${i}"><p class="sent">${mk(t).replace('___','<span class="gapw">&nbsp;</span>')}</p><div class="row">${['at','on','by'].map(o=>`<button type="button" class="opt" data-o="${o}">${o}</button>`).join('')}</div></div>`).join('');
 $('#pfill').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;const row=b.closest('.prow2'),a=PFILL[+row.dataset.i][1];if(b.dataset.o===a){b.classList.add('ok');row.classList.add('done');$('.gapw',row).innerHTML=`<span class="prep">${a}</span>`}else b.classList.add('no')});
+
+/* own preposition practice */
+const PFILL2=[['I {v:head} {p:out} ___ school.','for'],['We {v:set} {p:off} ___ school at half past seven.','for'],['I {v:wind} {p:down} ___ music.','with'],['I {v:catch} {p:up} ___ messages on the bus.','on'],['I {v:get} {p:down} ___ my homework.','to'],['She {v:catches} {p:up} ___ emails before school.','on'],['I {v:get} {p:down} ___ it after dinner.','to']];
+$('#pfill2').innerHTML=PFILL2.map(([t,a],i)=>`<div class="prow2" data-i="${i}"><p class="sent">${mk(t).replace('___','<span class="gapw">&nbsp;</span>')}</p><div class="row">${['for','with','on','to'].map(o=>`<button type="button" class="opt" data-o="${o}">${o}</button>`).join('')}</div></div>`).join('');
+$('#pfill2').addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;const row=b.closest('.prow2'),a=PFILL2[+row.dataset.i][1];if(b.dataset.o===a){b.classList.add('ok');row.classList.add('done');$('.gapw',row).innerHTML=`<span class="prep">${a}</span>`}else b.classList.add('no')});
 
 /* ---------- object finder ---------- */
 const FIND=[
