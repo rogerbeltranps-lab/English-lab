@@ -481,6 +481,32 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
   </div>
 </section>
 
+<!-- pronouns split -->
+<section class="slide" data-title="Pronouns split it">
+  <span class="grp g2"><b>2</b> Can split</span>
+  <h2 style="margin-top:.3em">Pronouns always go in the middle</h2>
+  <div class="cols" style="grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)">
+    <div class="stack">
+      <div class="rule key">
+        <p>With <span class="obj">it</span>, <span class="obj">them</span>, <span class="obj">him</span>, <span class="obj">her</span>, the phrasal verb <b>always splits</b>:</p>
+        <p class="sent" style="font-size:1.5em"><span class="verb">verb</span> + <span class="obj">pronoun</span> + <span class="part">particle</span></p>
+        <p class="sent" style="font-size:1.4em">I <span class="verb">pick</span> <span class="obj">him</span> <span class="part">up</span>. ✓</p>
+        <p class="sent" style="font-size:1.1em;color:var(--no)"><s>I pick up him.</s> ✗</p>
+      </div>
+      <div class="rule">
+        <h3>Which pronoun?</h3>
+        <p>my brother → <span class="obj">him</span> · my sister → <span class="obj">her</span><br>my homework, a snack → <span class="obj">it</span> · the kids, messages → <span class="obj">them</span></p>
+      </div>
+      <div class="gbox g3">
+        <span class="grp g3"><b>3</b> Three words</span>
+        <p><b>Careful:</b> three-word verbs never split, not even with a pronoun. The pronoun goes at the end: I <span class="verb">get</span> <span class="part">down</span> <span class="prep">to</span> <span class="obj">it</span>.</p>
+      </div>
+      <p class="ca">Amb un pronom (<b>it, them, him, her</b>), els phrasal verbs del grup 2 sempre se separen: <b>pick him up</b>, mai <s>pick up him</s>. Els de tres paraules no se separen mai: <b>get down to it</b>.</p>
+    </div>
+    <div class="stack" id="pronRows"></div>
+  </div>
+</section>
+
 <!-- 10 -->
 <section class="slide" data-title="Can we split it?">
   <p class="eyebrow">5 · Check</p>
@@ -768,6 +794,11 @@ $('#swaps').addEventListener('click',e=>{const b=e.target.closest('button');if(b
 const G3=[['I {v:get} {o:it} {p:down} {r:to}.','I {v:get} {p:down} {r:to} {o:it}.'],['I {v:catch} {o:them} {p:up} {r:on}.','I {v:catch} {p:up} {r:on} {o:them}.'],['I {v:catch} {o:messages} {p:up} {r:on}.','I {v:catch} {p:up} {r:on} {o:messages}.']];
 $('#g3traps').innerHTML='<p class="small">Find the mistake and fix it.</p>'+G3.map(([w,r])=>`<div class="swap"><p class="sent" style="color:var(--no)">${mk(w)} ✗</p><button type="button" class="btn ghost" style="align-self:flex-start">Fix it</button><div data-reveal><p class="sent">${mk(r)} ✓</p></div></div>`).join('');
 $('#g3traps').addEventListener('click',e=>{const b=e.target.closest('button');if(b)b.closest('.swap').classList.toggle('open')});
+
+/* ---------- pronouns split it ---------- */
+const PROWS=[['pick','up','my brother','him'],['wake','up','my sister','her'],['put','off','my homework','it'],['whip','up','a snack','it'],['pick','up','the kids','them']];
+$('#pronRows').innerHTML=PROWS.map(([v,p,n,pr])=>`<div class="swap"><p class="sent">I <span class="verb">${v}</span> <span class="part">${p}</span> <span class="obj">${n}</span>.</p><button type="button" class="btn ghost" style="align-self:flex-start">${esc(n)} → ?</button><div data-reveal><p class="sent">I <span class="verb">${v}</span> <span class="obj">${pr}</span> <span class="part">${p}</span>. ✓</p></div></div>`).join('');
+$('#pronRows').addEventListener('click',e=>{const b=e.target.closest('button');if(b)b.closest('.swap').classList.toggle('open')});
 
 /* ---------- split test ---------- */
 const SPLIT=[['I pick up my brother.',1],['I pick my brother up.',1],['I pick him up.',1],['I pick up him.',0],['I get down to my homework.',1],['I get my homework down to.',0],['I catch up on messages.',1],['I catch up on them.',1]];
