@@ -277,7 +277,6 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
       <p class="sub">A verb + a small word = a new meaning.</p>
       <p class="eq"><span class="verb">turn</span><span class="op">+</span><span class="part">in</span><span class="op">=</span><span>go to bed</span></p>
       <div class="legend" style="margin-top:1.2em" aria-label="Colour key"><span class="verb">verb</span><span><span class="part">small word</span></span><span><span class="obj">object</span></span></div>
-      <p class="keys" style="margin-top:1.2em">Move with <kbd>←</kbd> <kbd>→</kbd> · <kbd>C</kbd> Catalan help · <kbd>F</kbd> full screen · Tap a coloured word to see what it is</p>
     </div>
     <div class="clockcard" aria-label="An afternoon routine">
       <p class="eyebrow">My afternoon</p>
@@ -295,7 +294,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
   <p class="eyebrow">1 · What is a phrasal verb?</p>
   <h2>Add a small word, get a new meaning</h2>
   <div class="stack">
-    <p class="lead">Ask the class: <b>what does it mean?</b> Then click the card.</p>
+    <p class="lead"><b>What does it mean?</b> Guess first, then check.</p>
     <div class="pair">
       <button type="button" class="mcard"><span class="from">turn</span><span class="to"><span class="verb">turn</span> <span class="part">in</span></span><span class="answer" data-reveal>= go to bed<br><span class="small">I turn in at ten.</span></span></button>
       <button type="button" class="mcard"><span class="from">eat</span><span class="to"><span class="verb">eat</span> <span class="part">out</span></span><span class="answer" data-reveal>= eat at a restaurant<br><span class="small">We eat out on Saturdays.</span></span></button>
@@ -314,7 +313,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
   <p class="eyebrow">2 · My Real Routine</p>
   <h2>The phrasal verbs of our routine</h2>
   <div class="stack">
-    <div class="row"><p class="lead" style="flex:1">Ask for the meaning, then click the verb.</p><button class="btn ghost" type="button" id="pvAll">Show all</button></div>
+    <div class="row"><p class="lead" style="flex:1">What do they mean? Guess, then click the verb.</p><button class="btn ghost" type="button" id="pvAll">Show all</button></div>
     <div class="daygrid" id="daygrid"></div>
   </div>
 </section>
@@ -341,7 +340,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
       <p class="ca">L’objecte és la persona o cosa que rep l’acció. Pregunta <b>WHAT?</b> (què?) o <b>WHO?</b> (qui?). Si no hi ha resposta, no hi ha objecte.</p>
     </div>
     <div class="stack">
-      <p class="small">A student points to the object, you click it. No object? Click <b>No object</b>.</p>
+      <p class="small">Find the object. No object? Choose <b>No object</b>.</p>
       <div class="finder" id="finder"></div>
     </div>
   </div>
@@ -411,7 +410,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
       <p class="ca">Amb un nom, l’objecte pot anar després o al mig. Amb un pronom (<b>it, them, him, her</b>), sempre al mig: <b>pick him up</b>.</p>
     </div>
     <div class="stack">
-      <p class="small">Read the sentence, then click to change the object to a pronoun.</p>
+      <p class="small">Change the object to it / him / her.</p>
       <div class="grid2" id="swaps"></div>
     </div>
   </div>
@@ -441,9 +440,9 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
   <p class="eyebrow">5 · Check</p>
   <h2>Can we split it?</h2>
   <div class="stack">
-    <p class="lead">Which sentences are possible? Click the ones the class votes for, then check.</p>
+    <p class="lead">Which sentences are possible? Choose, then check.</p>
     <div class="tiles" id="tiles"></div>
-    <div class="row"><button class="btn" type="button" id="splitCheck">Check as a class</button><button class="btn ghost" type="button" id="splitReset">Reset</button><p class="fb" id="splitFb" aria-live="polite"></p></div>
+    <div class="row"><button class="btn" type="button" id="splitCheck">Check</button><button class="btn ghost" type="button" id="splitReset">Reset</button><p class="fb" id="splitFb" aria-live="polite"></p></div>
   </div>
 </section>
 
@@ -470,10 +469,10 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
 
 <!-- 11 -->
 <section class="slide" data-title="Phrasal verb machine">
-  <p class="eyebrow">Practice together</p>
+  <p class="eyebrow">Practice</p>
   <h2>Phrasal verb machine</h2>
   <div class="stack">
-    <p class="lead">Choose a verb and an object. Move the object. Is it correct? <b>Random</b> hides the sentence so the class can say it first.</p>
+    <p class="lead">Choose a verb and an object. Move the object. Is it correct?</p>
     <div class="machine" id="pvMachine"></div>
   </div>
 </section>
@@ -501,7 +500,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
       <div class="row"><button class="btn" type="button" id="gameNext">Start</button><span class="score" id="gameScore">Score: 0 / 0</span></div>
     </div>
     <div class="stack">
-      <p class="small">Six teams. Give the point after the team says a sentence with the verb.</p>
+      <p class="small">Say a sentence with the verb to win a point for your team.</p>
       <div class="teams" id="teams" aria-label="Team scores"></div>
       <div class="row"><button class="btn ghost" type="button" id="teamsReset">Reset scores</button></div>
     </div>
@@ -512,7 +511,7 @@ mark{background:var(--ok-bg);color:var(--ok);border-radius:.2em;padding:0 .08em}
 <section class="slide" data-title="Error hunt">
   <p class="eyebrow">Edit</p>
   <h2>Error hunt</h2>
-  <p class="lead" style="margin-bottom:1em">The object is in the wrong place. A student points to the wrong words, you click them. Then show the correction.</p>
+  <p class="lead" style="margin-bottom:1em">The object is in the wrong place. Find the wrong words, then check the correction.</p>
   <div id="errors"></div>
 </section>
 
@@ -717,7 +716,7 @@ $('#swaps').addEventListener('click',e=>{const b=e.target.closest('button');if(b
 
 /* ---------- group 3: traps ---------- */
 const G3=[['I {v:get} {o:it} {p:down} {r:to}.','I {v:get} {p:down} {r:to} {o:it}.'],['I {v:catch} {o:them} {p:up} {r:on}.','I {v:catch} {p:up} {r:on} {o:them}.'],['I {v:catch} {o:messages} {p:up} {r:on}.','I {v:catch} {p:up} {r:on} {o:messages}.']];
-$('#g3traps').innerHTML='<p class="small">Fix the mistakes together.</p>'+G3.map(([w,r])=>`<div class="swap"><p class="sent" style="color:var(--no)">${mk(w)} ✗</p><button type="button" class="btn ghost" style="align-self:flex-start">Fix it</button><div data-reveal><p class="sent">${mk(r)} ✓</p></div></div>`).join('');
+$('#g3traps').innerHTML='<p class="small">Find the mistake and fix it.</p>'+G3.map(([w,r])=>`<div class="swap"><p class="sent" style="color:var(--no)">${mk(w)} ✗</p><button type="button" class="btn ghost" style="align-self:flex-start">Fix it</button><div data-reveal><p class="sent">${mk(r)} ✓</p></div></div>`).join('');
 $('#g3traps').addEventListener('click',e=>{const b=e.target.closest('button');if(b)b.closest('.swap').classList.toggle('open')});
 
 /* ---------- split test ---------- */
