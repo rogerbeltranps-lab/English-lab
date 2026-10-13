@@ -1,95 +1,185 @@
 window.finalRubricData = {
-  insecure: {
-    intro: 'Mira què es valora i en quin nivell ets. En aquesta ruta descrius el teu company o companya amb frases clares i l’ordre d’un dia.',
-    note: 'En aquesta ruta no cal comparar amb la teva rutina; no es penalitza que no hi sigui. Sí que cal una reflexió senzilla sobre els hàbits, amb un motiu basat en l’entrevista.',
-    rows: [
-      {name: 'Speaking', sub: 'Explicació oral', pct: 35, cells: [
-        'Presento la rutina del company o companya amb claredat i en ordre; se m’entén fàcilment i només miro les notes per ajudar-me.',
-        'L’explicació és clara i coherent, amb algunes pauses o dependència de les notes.',
-        'S’entén el missatge principal, però les idees estan poc desenvolupades o llegeixo sovint.',
-        'L’explicació és fragmentada o incompleta i costa seguir-la.']},
-      {name: 'Llengua i anàlisi', sub: 'Precisió i reflexió', pct: 20, cells: [
-        'Utilitzo amb precisió la llengua treballada i explico amb un exemple per què la rutina és o no saludable; els errors són puntuals.',
-        'Utilitzo la llengua treballada amb alguns errors; la reflexió és senzilla i té un motiu.',
-        'La llengua és comprensible però limitada; la reflexió és superficial o gairebé no té justificació.',
-        'Els errors dificulten entendre’m o falta la reflexió.']},
-      {name: 'Google Slides', sub: 'Coherència i claredat visual', pct: 15, cells: [
-        'Les diapositives són coherents, llegibles i revisades; les imatges i el text m’ajuden a explicar la rutina.',
-        'Són clares i gairebé completes, amb petits problemes de llengua, text o organització.',
-        'Donen un suport bàsic, però tenen massa text, errors o informació incompleta.',
-        'L’organització, la llegibilitat o les omissions dificulten seguir la presentació.']},
-      {name: 'Planificació i revisió', sub: 'Autonomia i millora', pct: 15, cells: [
-        'Organitzo les notes, preparo i assajo; reviso el vídeo i aplico millores.',
-        'Planifico i reviso el treball i aplico la majoria de millores necessàries.',
-        'La preparació o la revisió és parcial; necessito recordatoris per completar passos importants.',
-        'Hi ha poques evidències de preparació o revisió i queden problemes importants.']},
-      {name: 'Interacció i reflexió', sub: 'Entrevista i justificació', pct: 15, cells: [
-        'Escolto, faig preguntes útils i fonamento la reflexió en dades de l’entrevista, amb respecte.',
-        'Col·laboro en l’entrevista i justifico la reflexió amb informació concreta.',
-        'La interacció és bàsica o la reflexió té poca justificació.',
-        'Participo poc o la reflexió no es basa en informació real.']}
+ "insecure": {
+  "intro": "Mira què es valora i en quin nivell ets. En aquesta ruta descrius el teu company o companya amb frases clares i en ordre.",
+  "note": "En aquesta ruta no cal comparar amb la teva rutina; no afecta la nota. Sí que cal una reflexió senzilla sobre els hàbits del company, amb un motiu basat en l’entrevista.",
+  "rows": [
+   {
+    "name": "Speaking",
+    "sub": "Explicació oral",
+    "pct": 35,
+    "cells": [
+     "Explico la rutina del company o companya en ordre (matí, després de l’escola, vespre) amb almenys 2 idees per a cada moment del dia; se m’entén i només miro les diapositives com a ajuda.",
+     "Segueixo l’ordre matí–després de l’escola–vespre, però només dono 2 idees o menys en algun moment del dia, o llegeixo 1–2 frases senceres.",
+     "No segueixo l’ordre (salto d’un moment del dia a un altre), o llegeixo més de 2 frases senceres; se m’entén el missatge principal.",
+     "Explico només 1 moment del dia, o ho llegeixo tot, o no s’entén què dic."
     ]
-  },
-  safe: {
-    intro: 'Mira què es valora i en quin nivell ets. En aquesta ruta descrius el company o companya i el compares amb tu.',
-    note: 'En aquesta ruta cal comparar la rutina del company o companya amb la teva. La reflexió sobre la salut es justifica amb detalls de les dues rutines, amb llengua precisa i connectors adequats.',
-    rows: [
-      {name: 'Speaking', sub: 'Explicació oral', pct: 35, cells: [
-        'Presento la descripció i la comparació amb claredat i coherència; depenc poc de les notes.',
-        'L’explicació és clara i coherent, amb algunes pauses o dependència de les notes.',
-        'S’entén el missatge principal, però la comparació està poc desenvolupada o llegeixo sovint.',
-        'L’explicació és fragmentada o incompleta i costa seguir-la.']},
-      {name: 'Llengua i anàlisi', sub: 'Precisió i comparació', pct: 20, cells: [
-        'Utilitzo amb precisió la llengua i els connectors treballats per comparar les dues rutines i relaciono els hàbits amb exemples.',
-        'Utilitzo la llengua treballada amb alguns errors; la comparació compleix la ruta, amb algun aspecte poc desenvolupat.',
-        'La llengua és comprensible però limitada; la comparació és superficial o incompleta.',
-        'Els errors dificulten entendre’m o falta la comparació.']},
-      {name: 'Google Slides', sub: 'Coherència i claredat visual', pct: 15, cells: [
-        'Les diapositives són coherents, llegibles i revisades; mostren clarament les dues rutines i la comparació.',
-        'Són clares i gairebé completes, amb petits problemes de llengua, text o organització.',
-        'Donen un suport bàsic, però tenen massa text, errors o la comparació no hi és completa.',
-        'L’organització, la llegibilitat o les omissions dificulten seguir la presentació.']},
-      {name: 'Planificació i revisió', sub: 'Autonomia i millora', pct: 15, cells: [
-        'Organitzo les notes, preparo i assajo; reviso el vídeo i aplico millores amb força autonomia.',
-        'Planifico i reviso el treball i aplico la majoria de millores necessàries.',
-        'La preparació o la revisió és parcial; necessito recordatoris per completar passos importants.',
-        'Hi ha poques evidències de preparació o revisió i queden problemes importants.']},
-      {name: 'Interacció i reflexió', sub: 'Entrevista i justificació', pct: 15, cells: [
-        'Escolto, faig preguntes útils i justifico la reflexió amb dades de l’entrevista i de la meva rutina, amb respecte.',
-        'Col·laboro en l’entrevista i justifico la reflexió amb informació concreta.',
-        'La interacció és bàsica o la reflexió té poca justificació.',
-        'Participo poc o la reflexió no es basa en informació real.']}
+   },
+   {
+    "name": "Llengua i anàlisi",
+    "sub": "Precisió i reflexió",
+    "pct": 20,
+    "cells": [
+     "Faig servir <i>he/she + Present Simple</i> amb com a màxim 1 error i almenys 6 expressions de rutina treballades; dic la reflexió amb <i>I think his/her routine is… because…</i>.",
+     "Faig servir <i>he/she + Present Simple</i> amb 2–3 errors i almenys 4 expressions treballades; la reflexió té <i>because</i>.",
+     "Faig servir <i>he/she + Present Simple</i> amb 4–5 errors, o només 2–3 expressions treballades, o la reflexió no té <i>because</i>.",
+     "Cometo 6 o més errors amb <i>he/she</i> o no utilitzo cap expressió treballada; costa entendre què vull dir."
     ]
-  },
-  daring: {
-    intro: 'Mira què es valora i en quin nivell ets. En aquesta ruta compares les dues rutines amb un raonament propi i evidències.',
-    note: 'En aquesta ruta cal comparar la rutina del company o companya amb la teva, amb un raonament més desenvolupat: evidències de les dues rutines i la teva interpretació. Les millores, si en proposes, han de ser realistes i respectuoses.',
-    rows: [
-      {name: 'Speaking', sub: 'Explicació oral', pct: 35, cells: [
-        'Presento la comparació i el raonament amb claredat, coherència i desenvolupament; depenc molt poc de les notes.',
-        'L’explicació és clara i coherent, amb algunes pauses o dependència de les notes.',
-        'S’entén el missatge principal, però el raonament està poc desenvolupat o llegeixo sovint.',
-        'L’explicació és fragmentada o incompleta i costa seguir-la.']},
-      {name: 'Llengua i anàlisi', sub: 'Precisió i interpretació', pct: 20, cells: [
-        'Utilitzo amb precisió i varietat la llengua treballada; comparo les rutines amb evidències i explico què signifiquen (interpretació).',
-        'Utilitzo la llengua treballada amb alguns errors; la comparació i la interpretació compleixen la ruta, amb algun aspecte poc desenvolupat.',
-        'La llengua és comprensible però limitada; la comparació o la interpretació és superficial o incompleta.',
-        'Els errors dificulten entendre’m o falta bona part de l’anàlisi.']},
-      {name: 'Google Slides', sub: 'Coherència i claredat visual', pct: 15, cells: [
-        'Les diapositives són coherents, llegibles i revisades; selecciono informació i visuals que ajuden a entendre les idees i les evidències.',
-        'Són clares i gairebé completes, amb petits problemes de llengua, text o organització.',
-        'Donen un suport bàsic, però tenen massa text, errors o informació incompleta.',
-        'L’organització, la llegibilitat o les omissions dificulten seguir la presentació.']},
-      {name: 'Planificació i revisió', sub: 'Autonomia i millora', pct: 15, cells: [
-        'Organitzo les notes, preparo i assajo; reviso el vídeo i aplico millores amb autonomia.',
-        'Planifico i reviso el treball i aplico la majoria de millores necessàries.',
-        'La preparació o la revisió és parcial; necessito recordatoris per completar passos importants.',
-        'Hi ha poques evidències de preparació o revisió i queden problemes importants.']},
-      {name: 'Interacció i reflexió', sub: 'Entrevista i justificació', pct: 15, cells: [
-        'Escolto, faig preguntes útils i fonamento una reflexió crítica en dades de les dues rutines; proposo millores realistes i respectuoses.',
-        'Col·laboro en l’entrevista i justifico la reflexió amb informació concreta de les dues rutines.',
-        'La interacció és bàsica o la reflexió té poca justificació i desenvolupament.',
-        'Participo poc o la reflexió no es basa en informació real.']}
+   },
+   {
+    "name": "Google Slides",
+    "sub": "Contingut i suport visual",
+    "pct": 15,
+    "cells": [
+     "Hi ha les 5 diapositives (Títol, Matí, Després de l’escola, Vespre, Reflexió de salut); cada una té frases curtes en anglès (màxim 2 línies) i una imatge o icona. La diapositiva de reflexió diu si la rutina és saludable, en part saludable o poc saludable.",
+     "Hi ha les 5 diapositives, però en 1 d’elles manca la imatge o la icona, o té un paràgraf llarg en lloc de frases curtes.",
+     "Només hi ha 3 de les 5 diapositives, o en 2 o més hi ha paràgrafs llargs o no hi ha cap imatge.",
+     "Només hi ha 2 o menys de les 5 diapositives, o el text és tan petit o llarg que no es pot llegir."
     ]
-  }
+   },
+   {
+    "name": "Planificació i revisió",
+    "sub": "Procés de treball",
+    "pct": 15,
+    "cells": [
+     "Faig les 4 coses: notes amb accions, hores i hàbits del company; un pla escrit per a cada diapositiva; un assaig sense gravar; i miro el vídeo sencer i corregeixo almenys un error sense que ningú m’ho recordi.",
+     "Faig 3 de les 4 coses (notes, pla escrit per a cada diapositiva, assaig sense gravar, vídeo vist sencer amb almenys una correcció); me’n deixo 1.",
+     "Faig només 2 de les 4 coses (notes, pla escrit, assaig sense gravar, vídeo vist sencer amb correcció).",
+     "Faig només 1 de les 4 coses, o cap."
+    ]
+   },
+   {
+    "name": "Interacció i reflexió",
+    "sub": "Entrevista i hàbits saludables",
+    "pct": 15,
+    "cells": [
+     "Les notes tenen accions, hores i hàbits del company; faig preguntes de l’entrevista i dono almenys 1 detall real com a motiu de la valoració (saludable, en part saludable o poc saludable).",
+     "Les notes tenen només 2 de les 3 coses (accions, hores, hàbits), però la valoració té motiu amb almenys 1 detall real.",
+     "La valoració té un motiu general (p. ex. <i>because it is good</i>) que no cita cap detall de l’entrevista.",
+     "No hi ha valoració ni motiu, o parlo del cos o del pes de la persona en lloc dels hàbits."
+    ]
+   }
+  ]
+ },
+ "safe": {
+  "intro": "Mira què es valora i en quin nivell ets. En aquesta ruta descrius el teu company o companya i el compares amb tu.",
+  "note": "En aquesta ruta cal comparar la rutina del company o companya amb la teva, amb semblances i diferències, i explicar causa, contrast i conseqüència. La reflexió valora les dues rutines amb detalls de cadascuna.",
+  "rows": [
+   {
+    "name": "Speaking",
+    "sub": "Explicació oral",
+    "pct": 35,
+    "cells": [
+     "Presento les dues rutines en ordre (matí, després de l’escola, vespre) amb almenys 1 semblança i 1 diferència; se m’entén i només miro les diapositives com a ajuda.",
+     "Presento les dues rutines en ordre amb almenys 1 semblança i 1 diferència, però llegeixo 1–2 frases senceres.",
+     "Presento les dues rutines però dic només semblances o només diferències, o no segueixo l’ordre, o llegeixo més de 2 frases senceres.",
+     "Només explico la rutina del company (no la meva), o ho llegeixo tot, o no s’entén què dic."
+    ]
+   },
+   {
+    "name": "Llengua i anàlisi",
+    "sub": "Precisió i comparació",
+    "pct": 20,
+    "cells": [
+     "Faig servir <i>he/she + Present Simple</i> i <i>I + Present Simple</i> amb com a màxim 1 error, almenys 6 expressions treballades i connectors de causa (<i>because</i>), contrast (<i>but/although</i>) i conseqüència (<i>so</i>), almenys 1 de cada.",
+     "Faig servir el Present Simple amb 2–3 errors, almenys 4 expressions treballades i connectors de 2 dels 3 tipus (causa, contrast, conseqüència).",
+     "Faig servir el Present Simple amb 4–5 errors, o només 2–3 expressions treballades, o connectors d’1 sol tipus.",
+     "Cometo 6 o més errors amb el Present Simple o no utilitzo cap connector; costa entendre què vull dir."
+    ]
+   },
+   {
+    "name": "Google Slides",
+    "sub": "Contingut i suport visual",
+    "pct": 15,
+    "cells": [
+     "Hi ha les 6 diapositives (Títol, Matí, Després de l’escola, Vespre, Reflexió de salut, Comparació); cada una té frases curtes en anglès (màxim 2 línies) i una imatge o icona. La diapositiva de comparació mostra almenys 1 semblança i 1 diferència, i la de reflexió valora les dues rutines.",
+     "Hi ha les 6 diapositives, però en 1 d’elles manca la imatge o la icona, o té un paràgraf llarg en lloc de frases curtes.",
+     "Només hi ha 4 de les 6 diapositives, o en 2 o més hi ha paràgrafs llargs o no hi ha cap imatge.",
+     "Només hi ha 3 o menys de les 6 diapositives, o el text és tan petit o llarg que no es pot llegir."
+    ]
+   },
+   {
+    "name": "Planificació i revisió",
+    "sub": "Procés de treball",
+    "pct": 15,
+    "cells": [
+     "Faig les 4 coses: notes amb accions, hores i hàbits del company i els teus; un pla escrit per a cada diapositiva; un assaig sense gravar; i miro el vídeo sencer i corregeixo almenys un error sense que ningú m’ho recordi.",
+     "Faig 3 de les 4 coses (notes, pla escrit per a cada diapositiva, assaig sense gravar, vídeo vist sencer amb almenys una correcció); me’n deixo 1.",
+     "Faig només 2 de les 4 coses (notes, pla escrit, assaig sense gravar, vídeo vist sencer amb correcció).",
+     "Faig només 1 de les 4 coses, o cap."
+    ]
+   },
+   {
+    "name": "Interacció i reflexió",
+    "sub": "Entrevista i hàbits saludables",
+    "pct": 15,
+    "cells": [
+     "Les notes tenen accions, hores i hàbits del company i els meus; valoro cada rutina (saludable, en part saludable o poc saludable) amb almenys 1 detall de cadascuna.",
+     "Valoro les dues rutines, però amb detalls només d’una de les dues.",
+     "Valoro les dues rutines amb un motiu general que no cita cap detall de l’entrevista ni de la meva rutina.",
+     "No hi ha valoració, o parlo del cos o del pes de la persona en lloc dels hàbits."
+    ]
+   }
+  ]
+ },
+ "daring": {
+  "intro": "Mira què es valora i en quin nivell ets. En aquesta ruta compares les dues rutines, hi aportes evidències i expliques què vol dir cada cosa.",
+  "note": "En aquesta ruta cal comparar la rutina del company o companya amb la teva amb un raonament més desenvolupat: distingeix el que diu l’entrevista (evidència) del que penses tu (interpretació). Si proposes millores, han de ser realistes i respectuoses.",
+  "rows": [
+   {
+    "name": "Speaking",
+    "sub": "Explicació oral",
+    "pct": 35,
+    "cells": [
+     "Desenvolupo la descripció i la comparació (almenys 2 semblances o diferències) en lloc de llistar hàbits aïllats; separo l’evidència de la interpretació; parlo sense llegir.",
+     "Desenvolupo la comparació (almenys 2 semblances o diferències) però no separo l’evidència de la interpretació, o llegeixo 1–2 frases senceres.",
+     "Llisto hàbits aïllats sense relacionar-los, o dic només 1 semblança o diferència, o llegeixo més de 2 frases senceres.",
+     "Només explico la rutina del company (no la meva), o ho llegeixo tot, o no s’entén què dic."
+    ]
+   },
+   {
+    "name": "Llengua i anàlisi",
+    "sub": "Precisió i interpretació",
+    "pct": 20,
+    "cells": [
+     "Faig servir el Present Simple amb com a màxim 1 error, almenys 3 col·locacions o expressions treballades més riques i almenys 3 connectors diferents (p. ex. <i>whereas</i>, <i>although</i>, <i>so</i>, <i>however</i>).",
+     "Faig servir el Present Simple amb 2–3 errors, almenys 2 col·locacions o expressions riques i 2 connectors diferents.",
+     "Faig servir el Present Simple amb 4–5 errors, o només 1 col·locació o expressió rica, o 1 sol connector.",
+     "Cometo 6 o més errors amb el Present Simple o no utilitzo cap connector; costa entendre què vull dir."
+    ]
+   },
+   {
+    "name": "Google Slides",
+    "sub": "Contingut i suport visual",
+    "pct": 15,
+    "cells": [
+     "Hi ha les 6 diapositives (Títol, Matí, Després de l’escola, Vespre, Reflexió de salut, Comparació); cada una té frases curtes en anglès (màxim 2 línies) i una imatge o icona. La diapositiva de comparació mostra almenys 2 semblances o diferències amb la seva evidència, i la de reflexió valora les dues rutines.",
+     "Hi ha les 6 diapositives, però en 1 d’elles manca la imatge o la icona, o té un paràgraf llarg en lloc de frases curtes.",
+     "Només hi ha 4 de les 6 diapositives, o en 2 o més hi ha paràgrafs llargs o no hi ha cap imatge.",
+     "Només hi ha 3 o menys de les 6 diapositives, o el text és tan petit o llarg que no es pot llegir."
+    ]
+   },
+   {
+    "name": "Planificació i revisió",
+    "sub": "Procés de treball",
+    "pct": 15,
+    "cells": [
+     "Faig les 4 coses: notes amb accions, hores i hàbits del company i els teus; un pla escrit per a cada diapositiva; un assaig sense gravar; i miro el vídeo sencer i corregeixo almenys un error sense que ningú m’ho recordi.",
+     "Faig 3 de les 4 coses (notes, pla escrit per a cada diapositiva, assaig sense gravar, vídeo vist sencer amb almenys una correcció); me’n deixo 1.",
+     "Faig només 2 de les 4 coses (notes, pla escrit, assaig sense gravar, vídeo vist sencer amb correcció).",
+     "Faig només 1 de les 4 coses, o cap."
+    ]
+   },
+   {
+    "name": "Interacció i reflexió",
+    "sub": "Entrevista i hàbits saludables",
+    "pct": 15,
+    "cells": [
+     "Les notes tenen accions, hores i hàbits del company i els meus; identifico hàbits saludables i poc saludables a les dues rutines amb evidència de cadascuna i proposo almenys 1 millora realista i respectuosa.",
+     "Identifico hàbits saludables i poc saludables a les dues rutines amb evidència, però no proposo cap millora.",
+     "Valoro les dues rutines però només amb una de les dues evidències, o sense distingir hàbits saludables i poc saludables.",
+     "No hi ha valoració, o parlo del cos o del pes de la persona en lloc dels hàbits."
+    ]
+   }
+  ]
+ }
 };
