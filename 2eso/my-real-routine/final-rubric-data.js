@@ -61,123 +61,175 @@ window.finalRubricData = {
   ]
  },
  "safe": {
-  "intro": "Mira què es valora i en quin nivell ets. En aquesta ruta descrius el teu company o companya amb més detall i en una seqüència clara.",
-  "note": "En aquesta ruta no cal comparar amb la teva rutina; no afecta la nota. Sí que cal una descripció amb més detall i una valoració dels hàbits justificada amb detalls concrets.",
+  "ui": {
+   "lang": "en",
+   "criterion": "Criterion",
+   "levels": [
+    [
+     "Level 4",
+     "Very good"
+    ],
+    [
+     "Level 3",
+     "Good"
+    ],
+    [
+     "Level 2",
+     "Fair"
+    ],
+    [
+     "Level 1",
+     "Developing"
+    ]
+   ],
+   "heading": "Rubric for the {route} route",
+   "label": "Rubric {route}",
+   "req": "Route requirement:",
+   "calc": "<strong>How is the grade calculated?</strong> Each criterion gets a level, which becomes a score: <span class=\"rubric-pill\">Level 4 · 10</span><span class=\"rubric-pill\">Level 3 · 7.5</span><span class=\"rubric-pill\">Level 2 · 5</span><span class=\"rubric-pill\">Level 1 · 2.5</span><span class=\"rubric-pill\">No evidence · 0</span> Then the criterion’s percentage is applied. For example, level 3 in Speaking gives 7.5 out of 10 for that criterion, and that criterion is 35% of the final grade."
+  },
+  "intro": "See what is assessed and which level you are at. In this route you describe your classmate in more detail and in a clear sequence.",
+  "note": "In this route you do not need to compare with your own routine; it does not affect your grade. You do need a more detailed description and a judgment about the habits, supported by specific details.",
   "rows": [
    {
     "name": "Speaking",
-    "sub": "Explicació oral",
+    "sub": "Oral explanation",
     "pct": 35,
     "cells": [
-     "Explico almenys 6 idees sobre la rutina del company o companya en una seqüència clara (matí, després de l’escola, vespre) durant 1–1½ minuts; se m’entén i només miro les diapositives com a ajuda.",
-     "Explico almenys 6 idees en seqüència i se m’entén, però el vídeo dura menys d’1 minut o més d’1½, o llegeixo 1–2 frases senceres.",
-     "Explico 3–5 idees, o no segueixo la seqüència matí–després de l’escola–vespre, o llegeixo més de 2 frases senceres.",
-     "Explico només 1–2 idees, o ho llegeixo tot, o no s’entén què dic."
+     "I explain at least 6 ideas about my classmate’s routine in a clear sequence (morning, after school, evening) in 1–1½ minutes; I am easy to understand and only glance at the slides for support.",
+     "I explain at least 6 ideas in sequence and I am easy to understand, but the video is shorter than 1 minute or longer than 1½, or I read 1–2 full sentences.",
+     "I explain 3–5 ideas, or I do not follow the morning–after school–evening sequence, or I read more than 2 full sentences.",
+     "I explain only 1–2 ideas, or I read everything, or I cannot be understood."
     ]
    },
    {
-    "name": "Llengua",
-    "sub": "Present Simple i expressions",
+    "name": "Language",
+    "sub": "Present Simple & expressions",
     "pct": 20,
     "cells": [
-     "Faig servir <i>he/she + Present Simple</i> amb com a màxim 1 error, almenys 6 expressions de rutina treballades i els connectors <i>because</i> i <i>but</i> o <i>although</i> (almenys 1 de cada).",
-     "Faig servir <i>he/she + Present Simple</i> amb 2–3 errors, almenys 4 expressions treballades i almenys 1 dels connectors <i>because</i>, <i>but</i> o <i>although</i>.",
-     "Faig servir <i>he/she + Present Simple</i> amb 4–5 errors, o només 2–3 expressions treballades, o cap connector.",
-     "Cometo 6 o més errors amb <i>he/she</i> o no utilitzo cap expressió treballada; costa entendre què vull dir."
+     "I use <i>he/she + Present Simple</i> with at most 1 mistake, at least 6 studied routine expressions and the connectors <i>because</i> and <i>but</i> or <i>although</i> (at least 1 of each).",
+     "I use <i>he/she + Present Simple</i> with 2–3 mistakes, at least 4 studied expressions and at least 1 of the connectors <i>because</i>, <i>but</i> or <i>although</i>.",
+     "I use <i>he/she + Present Simple</i> with 4–5 mistakes, or only 2–3 studied expressions, or no connector.",
+     "I make 6 or more mistakes with <i>he/she</i> or use no studied expression; it is hard to understand what I mean."
     ]
    },
    {
     "name": "Google Slides",
-    "sub": "Contingut i suport visual",
+    "sub": "Content & visual support",
     "pct": 15,
     "cells": [
-     "Hi ha les 5 diapositives (Títol, Matí, Després de l’escola, Vespre, Reflexió de salut); cada una té frases curtes en anglès (màxim 2 línies) i una imatge o icona. La diapositiva de reflexió diu si la rutina és saludable, en part saludable o poc saludable i inclou almenys 2 hàbits com a motiu.",
-     "Hi ha les 5 diapositives, però en 1 d’elles manca la imatge o la icona, o té un paràgraf llarg en lloc de frases curtes.",
-     "Només hi ha 3 de les 5 diapositives, o en 2 o més hi ha paràgrafs llargs o no hi ha cap imatge.",
-     "Només hi ha 2 o menys de les 5 diapositives, o el text és tan petit o llarg que no es pot llegir."
+     "All 5 slides are there (Title, Morning, After school, Evening, Health reflection); each has short English sentences (2 lines at most) and an image or icon. The health slide says whether the routine is healthy, partly healthy or not very healthy and gives at least 2 habits as reasons.",
+     "All 5 slides are there, but 1 of them has no image or icon, or has a long paragraph instead of short sentences.",
+     "Only 3 of the 5 slides are there, or 2 or more slides have long paragraphs or no image.",
+     "Only 2 or fewer of the 5 slides are there, or the text is so small or long that it cannot be read."
     ]
    },
    {
-    "name": "Planificació i revisió",
-    "sub": "Procés de treball",
+    "name": "Planning & review",
+    "sub": "Work process",
     "pct": 15,
     "cells": [
-     "Faig les 4 coses: notes amb accions, hores i hàbits del company; un pla escrit per a cada diapositiva; un assaig sense gravar; i miro el vídeo sencer i corregeixo almenys un error.",
-     "Faig 3 de les 4 coses (notes, pla escrit per a cada diapositiva, assaig sense gravar, vídeo vist sencer amb almenys una correcció); me’n deixo 1.",
-     "Faig només 2 de les 4 coses (notes, pla escrit, assaig sense gravar, vídeo vist sencer amb correcció).",
-     "Faig només 1 de les 4 coses, o cap."
+     "I do all 4 things: interview notes with actions, times and habits of your classmate; a written plan for each slide; one rehearsal without recording; and I watch the whole video and fix at least one mistake.",
+     "I do 3 of the 4 things (notes, a written plan for each slide, a rehearsal without recording, watching the whole video and fixing at least one mistake); I skip 1.",
+     "I do only 2 of the 4 things (notes, written plan, rehearsal without recording, watching the whole video and fixing a mistake).",
+     "I do only 1 of the 4 things, or none."
     ]
    },
    {
-    "name": "Entrevista i reflexió",
-    "sub": "Interacció i hàbits saludables",
+    "name": "Interview & reflection",
+    "sub": "Interaction & healthy habits",
     "pct": 15,
     "cells": [
-     "Les notes tenen accions, hores i hàbits del company; dic si la rutina és saludable, en part saludable o poc saludable i ho justifico amb almenys 2 hàbits concrets de l’entrevista (menjar, beure, son, moviment o pantalles).",
-     "La valoració es justifica amb 1 hàbit concret de l’entrevista.",
-     "La valoració té un motiu general (p. ex. <i>because it is good</i>) que no cita cap hàbit de l’entrevista.",
-     "No hi ha valoració ni motiu, o parlo del cos o del pes de la persona en lloc dels hàbits."
+     "My notes include actions, times and habits; I say whether the routine is healthy, partly healthy or not very healthy and support it with at least 2 specific habits from the interview (food, drink, sleep, movement or screens).",
+     "I support my judgment with 1 specific habit from the interview.",
+     "My judgment has a general reason (e.g. <i>because it is good</i>) that does not mention any habit from the interview.",
+     "There is no judgment or reason, or I talk about the person’s body or weight instead of habits."
     ]
    }
   ]
  },
  "daring": {
-  "intro": "Mira què es valora i en quin nivell ets. En aquesta ruta descrius el teu company o companya i el compares amb tu.",
-  "note": "En aquesta ruta cal comparar la rutina del company o companya amb la teva, amb almenys 1 semblança i 1 diferència. La reflexió valora les dues rutines i, si proposes una millora, ha de ser realista i respectuosa.",
+  "ui": {
+   "lang": "en",
+   "criterion": "Criterion",
+   "levels": [
+    [
+     "Level 4",
+     "Very good"
+    ],
+    [
+     "Level 3",
+     "Good"
+    ],
+    [
+     "Level 2",
+     "Fair"
+    ],
+    [
+     "Level 1",
+     "Developing"
+    ]
+   ],
+   "heading": "Rubric for the {route} route",
+   "label": "Rubric {route}",
+   "req": "Route requirement:",
+   "calc": "<strong>How is the grade calculated?</strong> Each criterion gets a level, which becomes a score: <span class=\"rubric-pill\">Level 4 · 10</span><span class=\"rubric-pill\">Level 3 · 7.5</span><span class=\"rubric-pill\">Level 2 · 5</span><span class=\"rubric-pill\">Level 1 · 2.5</span><span class=\"rubric-pill\">No evidence · 0</span> Then the criterion’s percentage is applied. For example, level 3 in Speaking gives 7.5 out of 10 for that criterion, and that criterion is 35% of the final grade."
+  },
+  "intro": "See what is assessed and which level you are at. In this route you describe your classmate’s routine and compare it with yours.",
+  "note": "In this route you must compare your classmate’s routine with your own, with at least 1 similarity and 1 difference. Your reflection judges both routines and, if you suggest an improvement, it must be realistic and respectful.",
   "rows": [
    {
     "name": "Speaking",
-    "sub": "Explicació oral",
+    "sub": "Oral explanation",
     "pct": 35,
     "cells": [
-     "Descric la rutina del company o companya i la comparo amb la meva, amb almenys 1 semblança i 1 diferència, durant 1½–2 minuts; parlo sense llegir i se m’entén bé.",
-     "Descric i comparo amb almenys 1 semblança i 1 diferència i se m’entén, però el vídeo dura menys d’1½ min o més de 2, o llegeixo 1–2 frases senceres.",
-     "Descric el company però només dic 1 semblança o 1 diferència (no totes dues), o llegeixo més de 2 frases senceres.",
-     "No comparo les dues rutines, o ho llegeixo tot, o no s’entén què dic."
+     "I describe my classmate’s routine and compare it with mine, with at least 1 similarity and 1 difference, in 1½–2 minutes; I speak without reading and am easy to understand.",
+     "I describe and compare with at least 1 similarity and 1 difference and I am easy to understand, but the video is shorter than 1½ minutes or longer than 2, or I read 1–2 full sentences.",
+     "I describe my classmate but give only 1 similarity or 1 difference (not both), or I read more than 2 full sentences.",
+     "I do not compare the two routines, or I read everything, or I cannot be understood."
     ]
    },
    {
-    "name": "Llengua",
-    "sub": "Present Simple, expressions i comparació",
+    "name": "Language",
+    "sub": "Present Simple, expressions & comparison",
     "pct": 20,
     "cells": [
-     "Faig servir el Present Simple (<i>he/she</i> i <i>I</i>) amb com a màxim 1 error, almenys 6 expressions de rutina treballades i almenys 2 connectors diferents per comparar (p. ex. <i>whereas</i>, <i>although</i>, <i>however</i>).",
-     "Faig servir el Present Simple amb 2–3 errors, almenys 4 expressions treballades i almenys 1 connector per comparar.",
-     "Faig servir el Present Simple amb 4–5 errors, o només 2–3 expressions treballades, o cap connector per comparar.",
-     "Cometo 6 o més errors amb el Present Simple o no utilitzo cap expressió treballada; costa entendre què vull dir."
+     "I use the Present Simple (<i>he/she</i> and <i>I</i>) with at most 1 mistake, at least 6 studied routine expressions and at least 2 different connectors to compare (e.g. <i>whereas</i>, <i>although</i>, <i>however</i>).",
+     "I use the Present Simple with 2–3 mistakes, at least 4 studied expressions and at least 1 connector to compare.",
+     "I use the Present Simple with 4–5 mistakes, or only 2–3 studied expressions, or no connector to compare.",
+     "I make 6 or more mistakes with the Present Simple or use no studied expression; it is hard to understand what I mean."
     ]
    },
    {
     "name": "Google Slides",
-    "sub": "Contingut i suport visual",
+    "sub": "Content & visual support",
     "pct": 15,
     "cells": [
-     "Hi ha les 6 diapositives (Títol, Matí, Després de l’escola, Vespre, Reflexió de salut, Comparació); cada una té frases curtes en anglès (màxim 2 línies) i una imatge o icona. La diapositiva de comparació mostra almenys 1 semblança i 1 diferència, i la de reflexió valora les dues rutines.",
-     "Hi ha les 6 diapositives, però en 1 d’elles manca la imatge o la icona, o té un paràgraf llarg en lloc de frases curtes.",
-     "Només hi ha 4 de les 6 diapositives, o en 2 o més hi ha paràgrafs llargs o no hi ha cap imatge.",
-     "Només hi ha 3 o menys de les 6 diapositives, o el text és tan petit o llarg que no es pot llegir."
+     "All 6 slides are there (Title, Morning, After school, Evening, Health reflection, Comparison); each has short English sentences (2 lines at most) and an image or icon. The comparison slide shows at least 1 similarity and 1 difference, and the health slide judges both routines.",
+     "All 6 slides are there, but 1 of them has no image or icon, or has a long paragraph instead of short sentences.",
+     "Only 4 of the 6 slides are there, or 2 or more slides have long paragraphs or no image.",
+     "Only 3 or fewer of the 6 slides are there, or the text is so small or long that it cannot be read."
     ]
    },
    {
-    "name": "Planificació i revisió",
-    "sub": "Procés de treball",
+    "name": "Planning & review",
+    "sub": "Work process",
     "pct": 15,
     "cells": [
-     "Faig les 4 coses: notes amb accions, hores i hàbits del company i els teus; un pla escrit per a cada diapositiva; un assaig sense gravar; i miro el vídeo sencer i corregeixo almenys un error sense que ningú m’ho recordi.",
-     "Faig 3 de les 4 coses (notes, pla escrit per a cada diapositiva, assaig sense gravar, vídeo vist sencer amb almenys una correcció); me’n deixo 1.",
-     "Faig només 2 de les 4 coses (notes, pla escrit, assaig sense gravar, vídeo vist sencer amb correcció).",
-     "Faig només 1 de les 4 coses, o cap."
+     "I do all 4 things: interview notes with actions, times and habits of your classmate and your own; a written plan for each slide; one rehearsal without recording; and I watch the whole video and fix at least one mistake without being reminded.",
+     "I do 3 of the 4 things (notes, a written plan for each slide, a rehearsal without recording, watching the whole video and fixing at least one mistake); I skip 1.",
+     "I do only 2 of the 4 things (notes, written plan, rehearsal without recording, watching the whole video and fixing a mistake).",
+     "I do only 1 of the 4 things, or none."
     ]
    },
    {
-    "name": "Entrevista i reflexió",
-    "sub": "Interacció i hàbits saludables",
+    "name": "Interview & reflection",
+    "sub": "Interaction & healthy habits",
     "pct": 15,
     "cells": [
-     "Les notes tenen accions, hores i hàbits del company i els meus; valoro cada rutina (saludable, en part saludable o poc saludable) amb evidències de cadascuna i proposo 1 millora realista i respectuosa.",
-     "Valoro les dues rutines amb evidències de cadascuna, però no proposo cap millora.",
-     "Valoro només una de les dues rutines, o valoro les dues sense citar cap detall de l’entrevista.",
-     "No hi ha valoració, o parlo del cos o del pes de la persona en lloc dels hàbits."
+     "My notes include actions, times and habits of my classmate and mine; I judge each routine (healthy, partly healthy or not very healthy) with evidence from each, and I suggest 1 realistic, respectful improvement.",
+     "I judge both routines with evidence from each, but I do not suggest any improvement.",
+     "I judge only one of the two routines, or I judge both without mentioning any detail from the interview.",
+     "There is no judgment, or I talk about the person’s body or weight instead of habits."
     ]
    }
   ]
