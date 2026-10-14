@@ -109,7 +109,7 @@ function renderQuestion(q,id,points){
 }
 function renderWriting(w){
  const n=35;
- return '<article class="question"><p class="qname"><span class="qnum">35</span>'+escapeHtml(w.title)+' <small>[20 '+t('punts','points')+']</small></p><p>'+escapeHtml(w.instructions)+'</p><label for="essay" class="sr-only">Your writing</label><textarea id="essay" class="writing" placeholder="'+t('Escriu aquí el text en anglès…','Write your text in English here…')+'"></textarea><p class="tiny">'+t('Paraules:','Words:')+' <strong id="wordCount">0</strong> · '+t('Objectiu:','Target:')+' '+w.words[0]+'–'+w.words[1]+' '+t('paraules','words')+'</p></article>';
+ return '<article class="question"><p class="qname"><span class="qnum">35</span>'+escapeHtml(w.title)+' <small>[20 '+t('punts','points')+']</small></p><p>'+escapeHtml(ca()&&w.instructionsCa?w.instructionsCa:w.instructions)+'</p><label for="essay" class="sr-only">Your writing</label><textarea id="essay" class="writing" placeholder="'+t('Escriu aquí el text en anglès…','Write your text in English here…')+'"></textarea><p class="tiny">'+t('Paraules:','Words:')+' <strong id="wordCount">0</strong> · '+t('Objectiu:','Target:')+' '+w.words[0]+'–'+w.words[1]+' '+t('paraules','words')+'</p></article>';
 }
 function showSection(n){
  currentSection=n;
@@ -125,6 +125,7 @@ function checkAnswer(q,answer){
 }
 function correctText(q){return q.type==='mc'?q.opts[q.a]:q.answers.join(' / ');}
 function finish(){
+ if(graded)return;
  const missing=34-allAnswered();
  if(missing&&!confirm(t('Falten '+missing+' preguntes de resposta curta o d’opcions. Vols corregir ara igualment?','You have '+missing+' unanswered questions. Check your answers anyway?')))return;
  graded=true;
@@ -144,6 +145,14 @@ function finish(){
  $('results').classList.add('active');
  document.querySelectorAll('#sectionTabs .step').forEach(b=>b.setAttribute('aria-selected','false'));
  $('sectionTabs').style.display='none';
+ document.querySelectorAll('#examSections .actions').forEach(a=>{
+  if(!a.querySelector('[data-back-to-results]')){
+   const btn=document.createElement('button');
+   btn.className='btn secondary';btn.type='button';btn.dataset.backToResults='yes';
+   btn.textContent=t('← Torna a la nota','← Back to results');
+   a.appendChild(btn);
+  }
+ });
  $('resultsHeading').textContent=t('Correcció de l’examen d’exemple','Sample exam review');
  $('autoScore').textContent=total+' / 80';
  $('scoreDescription').textContent=t('Puntuació automàtica de les preguntes 01–34. El writing (20 punts) s’ha de corregir a part. Aquesta nota és orientativa.','Automatically checked score for questions 01–34. Writing (20 points) requires separate assessment. These results are for practice only.');
@@ -185,12 +194,18 @@ document.addEventListener('click',e=>{
  showSection('next'in btn.dataset?Math.min(i+1,sections.length-1):Math.max(i-1,0));
 });
 document.addEventListener('click',e=>{if(e.target.id==='finishExam')finish();});
+document.addEventListener('click',e=>{
+ if(!e.target.closest('[data-back-to-results]'))return;
+ $('examSections').hidden=true;$('results').classList.add('active');$('sectionTabs').style.display='none';
+ window.scrollTo(0,0);$('results').focus();
+});
+
 $('restart').addEventListener('click',reset);
 $('printResults').addEventListener('click',()=>window.print());
 $('startTimer').addEventListener('click',()=>{
  if(timeUntil!==null)return;
  timeUntil=Date.now()+50*60*1000;
- $('startTimer').disabled=true;$('startTimer').textContent=t('Timer running','Timer running');
+ $('startTimer').disabled=true;$('startTimer').textContent=t('Temporitzador en marxa','Timer running');
  timerId=setInterval(()=>{
   const seconds=Math.max(0,Math.ceil((timeUntil-Date.now())/1000));
   $('time').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
