@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1f6b52">
+<link rel="icon" href="/English-lab/favicon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png">
+<title>2 ESO · My Real Routine · Sample Exam</title>
+<meta name="description" content="35-question practice exam for 2 ESO My Real Routine, with Insecure, Safe and Daring routes.">
+<style>
+:root{--accent:#1f6b52;--dark:#174d3d;--soft:#e9f5ef;--soft2:#d8eee3;--cream:#fbfcf8;--ink:#20312b;--muted:#66766f;--line:#d8e6df;--ok:#176342;--bad:#9c3542;--shadow:0 14px 38px rgba(31,107,82,.10)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit}a{color:var(--accent)}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #eca94b;outline-offset:3px}
+.wrap{width:min(1060px,calc(100% - 30px));margin:auto}.topbar{position:sticky;top:0;z-index:30;background:var(--dark);color:white;box-shadow:0 5px 16px #174d3d24}.toprow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-height:64px;padding:9px 0}.toprow a{color:#fff;text-decoration:none;font-weight:800}.brand-mark{display:inline-grid;place-items:center;background:#fff;color:var(--accent);border-radius:11px;width:36px;height:36px;font-size:18px;font-weight:900}.brand-info{display:flex;align-items:center;gap:10px}.brand-info small{display:block;color:#d4e8ff;font-size:.72rem;font-weight:700}.topright{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:.87rem;font-weight:750}.progress-track{background:#7fbaa4;height:5px;width:125px;overflow:hidden;border-radius:20px}.progress-fill{height:100%;width:0;background:white;transition:width .2s}
+.hero{padding:42px 0 29px;background:linear-gradient(120deg,#e7f4ec,#fbfcf8 64%,#fff);border-bottom:1px solid var(--line)}.eyebrow{display:inline-block;background:var(--soft2);color:var(--dark);border-radius:40px;padding:6px 12px;font-size:.77rem;font-weight:850;letter-spacing:.06em;text-transform:uppercase}h1{font-size:clamp(2.2rem,5.6vw,4rem);line-height:1.07;color:var(--dark);margin:17px 0 10px}h2{color:var(--dark);margin:0 0 10px;font-size:clamp(1.35rem,3.8vw,1.95rem)}h3{color:var(--dark);margin:0 0 5px;font-size:1.06rem}p{margin:8px 0}.lead{font-size:1.06rem;color:var(--muted);max-width:800px}.pillbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.pill{background:#fff;border:1px solid var(--line);color:var(--dark);border-radius:99px;padding:5px 11px;font-size:.83rem;font-weight:800}
+.route-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:24px}.route{background:#fff;border:2px solid var(--line);border-radius:16px;padding:15px 17px;text-align:left;min-height:94px;color:var(--dark)}.route strong{display:block;font-size:1.04rem}.route small{font-size:.81rem;color:var(--muted)}.route[aria-pressed="true"]{border-color:var(--accent);background:var(--soft);box-shadow:0 3px 12px #1f6b5218}
+main{padding:22px 0 50px}.notice{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 15px;margin:0 0 18px;font-size:.91rem;color:var(--muted)}.section-tabs{display:flex;gap:8px;overflow:auto;scrollbar-width:thin;padding:4px 0 12px;position:sticky;top:64px;background:var(--cream);z-index:20}.step{flex:0 0 auto;background:white;color:var(--dark);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:.89rem;font-weight:800}.step[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:white}.step.done:not([aria-selected="true"]){border-color:#87c2ab}
+.panel{display:none;background:#fff;border:1px solid var(--line);padding:clamp(17px,4vw,32px);border-radius:22px;box-shadow:var(--shadow);min-height:290px}.panel.active{display:block}.panel-intro{color:var(--muted);margin-bottom:14px}.section-stats{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}.weight{background:var(--soft);color:var(--dark);padding:6px 12px;border-radius:30px;font-weight:800;font-size:.86rem}.question{padding:18px 0;border-bottom:1px solid var(--line)}.question:last-child{border-bottom:0}.qname{font-weight:800;margin:0 0 10px}.qnum{display:inline-grid;place-items:center;width:33px;height:33px;border-radius:9px;background:var(--soft);color:var(--dark);font-size:.87rem;margin-right:9px}.question small{color:var(--muted);font-weight:750}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.answer{display:flex;align-items:flex-start;gap:9px;padding:11px 12px;background:#fff;border:1px solid var(--line);border-radius:12px;cursor:pointer}.answer:has(input:checked){border-color:var(--accent);background:var(--soft)}.answer input{margin-top:5px;accent-color:var(--accent)}.gap{width:min(470px,100%);border:1px solid #a8bede;border-radius:11px;padding:10px 12px;background:#fff}.result-hint{display:none;margin-top:9px;border-radius:10px;padding:10px 12px;background:#edf7f0;color:#214c39;font-size:.92rem}.question.wrong .result-hint{background:#fff2ee;color:#823645}.question.graded .result-hint{display:block}.question.graded.correct{border-left:4px solid var(--ok);padding-left:12px}.question.graded.wrong{border-left:4px solid var(--bad);padding-left:12px}.question.graded input{pointer-events:none}.reading{background:#f6f9fe;border:1px solid var(--line);padding:17px 20px;border-radius:15px;line-height:1.8;white-space:pre-line}.audio-card{background:var(--soft);border:1px solid #c2e2d0;padding:17px;border-radius:15px;margin:12px 0 17px}.audio-card audio{display:block;width:100%;margin:10px 0}.audio-card details{margin-top:13px}.audio-card summary{cursor:pointer;font-weight:750}.tiny{font-size:.85rem;color:var(--muted)}.writing{width:100%;min-height:250px;resize:vertical;border:1px solid #a8bede;border-radius:14px;padding:16px;line-height:1.7}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.btn{border:1px solid var(--accent);border-radius:12px;padding:11px 18px;background:var(--accent);color:white;font-weight:800}.btn.secondary{background:#fff;color:var(--dark);border-color:var(--line)}.btn:disabled{opacity:.48;cursor:not-allowed}.timer{font-size:.9rem;display:flex;gap:9px;align-items:center;flex-wrap:wrap}.timer strong{font-variant-numeric:tabular-nums}.end{background:var(--soft);border:1px solid var(--line);border-radius:15px;padding:20px}.score{font-size:clamp(1.8rem,5vw,3.2rem);font-weight:850;color:var(--dark);line-height:1.15}.score-description{font-size:.88rem;color:var(--muted);margin:8px 0}.ratings{display:grid;gap:10px;margin-top:12px}.rating{display:grid;grid-template-columns:minmax(0,1fr) 90px;gap:10px;align-items:center}.rating label{font-size:.91rem}.rating select{padding:8px;border:1px solid var(--line);border-radius:10px;background:#fff}.markbox{margin-top:20px;padding:14px 17px;background:white;border:1px solid var(--line);border-radius:12px}.markbox strong{color:var(--dark)}.status{font-weight:720;color:var(--dark)}.review-title{margin-top:20px}.repeat{margin-top:15px}.footer{font-size:.85rem;color:var(--muted);padding:20px 0 30px}.sr-only{position:absolute;width:1px;height:1px;clip:rect(0 0 0 0);overflow:hidden;white-space:nowrap}
+@media(max-width:760px){.route-grid{grid-template-columns:1fr}.choices{grid-template-columns:1fr}.topright{margin-left:0;width:100%;justify-content:space-between}.section-tabs{top:103px}.rating{grid-template-columns:1fr}.pillbar{gap:6px}.hero{padding:24px 0}.panel{border-radius:15px}}
+@media print{.topbar,.route-grid,.section-tabs,.actions,.timer,.footer{display:none!important}.hero{padding:10px 0;background:#fff}.panel{display:block!important;box-shadow:none;border:0;padding:8px 0;min-height:0}.question{break-inside:avoid}.audio-card audio{display:none}.choices{grid-template-columns:1fr 1fr}.result-hint{display:none!important}.answer:has(input:checked){border:2px solid #333}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap toprow"><div class="brand-info"><a href="../../index.html">⌂ Home</a><a href="index.html">← My Real Routine</a><span class="brand-mark">★</span><div><strong>Sample exam</strong><small>2 ESO · My Real Routine</small></div></div><div class="topright"><span id="globalProgress">0 / 35</span><div class="progress-track"><div class="progress-fill" id="globalFill"></div></div><span class="timer"><strong id="time">50:00</strong> <button class="btn secondary" type="button" id="startTimer" style="padding:6px 10px">Start timer</button></span></div></div></div>
+<header class="hero"><div class="wrap"><span class="eyebrow">My Real Routine · practice assessment</span><h1 data-support-ca="Examen d'exemple" data-support-en="Sample exam">Sample exam</h1><p class="lead" data-support-ca="Practica el format de l'examen abans de la prova real. Tria un nivell, escolta l'àudio, respon les preguntes i revisa els errors. No es lliuren ni es guarden les respostes." data-support-en="Practise the exam format before the real assessment. Choose a route, listen to the audio, answer the questions and review your mistakes. Your answers are not submitted or stored.">Practise the exam format before the real assessment. Choose a route, listen to the audio, answer the questions and review your mistakes. Your answers are not submitted or stored.</p><div class="pillbar"><span class="pill">35 questions</span><span class="pill">100 points</span><span class="pill">50 minutes</span><span class="pill">Listening + vocabulary + grammar + reading + writing</span></div><div class="route-grid" role="group" aria-label="Choose an exam route"><button class="route" type="button" data-route="insecure" aria-pressed="true"><strong>Insecure</strong><small>Guided · instructions in Catalan</small></button><button class="route" type="button" data-route="safe" aria-pressed="false"><strong>Safe</strong><small>Applied language · English</small></button><button class="route" type="button" data-route="daring" aria-pressed="false"><strong>Daring</strong><small>More independent · comparison</small></button></div></div></header>
+<main class="wrap">
+<div class="notice" id="routeNotice" aria-live="polite"></div>
+<div class="section-tabs" id="sectionTabs" role="tablist" aria-label="Exam sections"></div>
+<div id="examSections"></div>
+<section class="panel" id="results" tabindex="-1">
+<h2 id="resultsHeading">Review your answers</h2>
+<div class="end"><div class="score" id="autoScore">—</div><p id="scoreDescription" class="score-description"></p><div class="markbox"><h3 id="writingGradeHeading">Writing: self-assessment (optional)</h3><p class="tiny" id="writingGradeDesc"></p><div class="ratings" id="ratings"></div><div id="finalMark" class="status" aria-live="polite"></div></div><div class="actions"><button class="btn" id="printResults" type="button">Print</button><button class="btn secondary" id="restart" type="button">Try again</button></div></div>
+<p class="review-title tiny" id="reviewReminder"></p>
+</section>
+<p class="footer">© Roger Beltran · English Lab · Example exam only, not a live test. No student results are sent to a server.</p>
+</main>
+<script src="../../shared/js/learning-path-support.js"></script>
+<script src="sample-exam-insecure.js"></script>
+<script src="sample-exam-safe.js"></script>
+<script src="sample-exam-daring.js"></script>
+<script>
+'use strict';
+const routeData=window.EnglishLabSampleExam;
+const sections=[
+ {id:'listening',nums:[1,5],points:[2,2,2,2,2],title:{ca:'Comprensió oral',en:'Listening'},intro:{ca:'Escolta l’àudio dues vegades. Després, tria una resposta per pregunta. Les veus i les preguntes són en anglès.',en:'Listen to the recording twice and choose one answer per question.'}},
+ {id:'vocabChoice',nums:[6,13],points:Array(8).fill(2),title:{ca:'Vocabulari amb opcions',en:'Vocabulary · Multiple choice'},intro:{ca:'Tria una única opció per completar les expressions que heu treballat.',en:'Choose the one option that best completes each studied expression.'}},
+ {id:'vocabGap',nums:[14,17],points:Array(4).fill(3),title:{ca:'Vocabulari per completar',en:'Vocabulary · Fill in the gaps'},intro:{ca:'Escriu només la paraula que falta. No cal copiar la frase sencera.',en:'Write only the missing word, not the whole sentence.'}},
+ {id:'grammarChoice',nums:[18,24],points:Array(7).fill(2),title:{ca:'Gramàtica amb opcions',en:'Grammar · Multiple choice'},intro:{ca:'Revisa el subjecte, el verb, els auxiliars i l’ordre de les paraules.',en:'Check subject–verb agreement, auxiliaries, word order and expression patterns.'}},
+ {id:'grammarGap',nums:[25,29],points:[3,3,4,4,4],title:{ca:'Gramàtica per completar',en:'Grammar · Fill in the gaps'},intro:{ca:'Escriu només la paraula o les paraules que falten. Es poden utilitzar contraccions correctes.',en:'Supply only the missing word or words; correct contractions and full forms are accepted.'}},
+ {id:'reading',nums:[30,34],points:Array(5).fill(2),title:{ca:'Comprensió lectora',en:'Reading comprehension'},intro:{ca:'Llegeix el text abans de respondre i busca proves per justificar cada resposta.',en:'Read the text carefully and choose the answer supported by the text.'}},
+ {id:'writing',nums:[35,35],points:[20],title:{ca:'Expressió escrita',en:'Writing'},intro:{ca:'Escriu el text en anglès. Aquesta part no es corregeix automàticament.',en:'Write in English. The writing task cannot be graded automatically.'}}
+];
+const $=(id)=>document.getElementById(id);
+const escapeHtml=s=>String(s).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
+const normalize=s=>String(s??'').trim().toLowerCase().replace(/[’‘]/g,"'").replace(/[.!?]+$/g,'').replace(/\s+/g,' ');
+let route='insecure',graded=false,currentSection=0,timeUntil=null,timerId=null,lastAuto=0,selectedOptions={};
+let userAnswers={insecure:{},safe:{},daring:{}},writingTexts={insecure:'',safe:'',daring:''};
+const ca=()=>route==='insecure';
+const t=(c,e)=>ca()?c:e;
+function qList(){const d=routeData[route];return sections.flatMap(sec=>(d.sections[sec.id]||[]).map((q,i)=>({...q,id:sec.nums[0]+i,sec:sec.id,points:sec.points[i]})));}
+function allAnswered(){return qList().filter(q=>q.type==='mc'||q.type==='gap').filter(q=>{const v=userAnswers[route][q.id];return v!==undefined&&String(v).trim()!=='';}).length;}
+function words(text){return text.trim().split(/\s+/).filter(Boolean).length;}
+function updateProgress(){const done=allAnswered(),write=words(writingTexts[route])>0;const count=done+(write?1:0);$('globalProgress').textContent=count+' / 35';$('globalFill').style.width=(count/35*100)+'%';sections.forEach((sec,i)=>{const button=document.querySelector('[data-step="'+i+'"]');if(button){const total=sec.nums[1]-sec.nums[0]+1;const complete=sec.id==='writing'?write:qList().filter(q=>q.sec===sec.id&&String(userAnswers[route][q.id]??'').trim()!=='').length===total;button.classList.toggle('done',complete);}});}
+function render(){
+ graded=false;
+ const d=routeData[route];if(!d)return;
+ document.querySelectorAll('[data-route]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.route===route)));
+ learningSupport.apply(route);
+ $('routeNotice').textContent=t('És una prova de pràctica, no la prova real. Fes només una ruta. 35 preguntes (100 punts), 50 minuts orientatius. Els primers 80 punts es poden autocorregir; el writing val 20 punts i necessita una valoració humana.','This is a practice exam, not the real test. Complete only one route: 35 questions (100 points), suggested time 50 minutes. The first 80 points are automatically checked; writing is worth 20 points and needs human assessment.') + ' ' + t('Escala orientativa d’aquest exemple: Insecure màxim 6/10, Safe màxim 9/10 i Daring màxim 10/10. No és una norma de la futura prova de 4t.', 'Indicative scale for this example: Insecure maximum 6/10, Safe maximum 9/10 and Daring maximum 10/10. This does not establish the grading rules for the real 2 ESO exam.');
+ $('sectionTabs').innerHTML=sections.map((s,i)=>'<button class="step" data-step="'+i+'" role="tab" aria-controls="panel-'+s.id+'" aria-selected="false" type="button">'+(i+1)+' · '+escapeHtml(s.title[ca()?'ca':'en'])+'</button>').join('');
+ $('examSections').innerHTML=sections.map((s,i)=>renderSection(s,d,i)).join('');
+ document.querySelectorAll('#sectionTabs [data-step]').forEach(b=>b.addEventListener('click',()=>showSection(Number(b.dataset.step))));
+ document.querySelectorAll('.question input').forEach(input=>input.addEventListener('change',()=>{
+  if(graded)return;
+  const id=Number(input.dataset.id);
+  userAnswers[route][id]=input.type==='radio'?Number(input.value):input.value;
+  updateProgress();
+ }));
+ const essay=$('essay');essay.value=writingTexts[route];
+ essay.addEventListener('input',()=>{writingTexts[route]=essay.value;$('wordCount').textContent=words(essay.value);updateProgress();});
+ $('wordCount').textContent=words(essay.value);
+ $('results').classList.remove('active');$('examSections').hidden=false;
+ showSection(0);updateProgress();
+}
+function renderSection(sec,d,index){
+ const items=d.sections[sec.id]||[];
+ const sum=sec.points.reduce((x,y)=>x+y,0);
+ let extras='';
+ if(sec.id==='listening'){
+ extras='<div class="audio-card"><strong>'+t('Àudio de pràctica · Alex','Practice listening · Alex')+'</strong><p class="tiny">'+t('Pots escoltar-lo dues vegades, igual que a l’examen. L’àudio es troba a la mateixa web d’English Lab.','Play it twice, as in the exam. The audio is hosted on this English Lab website.')+'</p><audio controls preload="metadata"><source src="alex-listening.mp3" type="audio/mpeg">'+t('Aquest navegador no pot reproduir àudio.','Your browser cannot play audio.')+'</audio><details id="transcript"><summary>'+t('Mostra la transcripció (ajuda)','Show transcript (study support)')+'</summary><p class="tiny">'+escapeHtml('Hi, I’m Alex. On school days, I wake up at seven, but I get up at ten past seven. First, I get dressed. Then I have breakfast at half past seven. I have cereal and a banana. I walk to school with my friend at eight. We talk on the way. After school, I get home at half past four. I have a snack and take a short break. Then I do my homework at five. In the evening, I have dinner with my family at eight. We talk about our day. After dinner, I listen to music or read. I go to bed at half past ten.')+'</p></details></div>';
+ }
+ if(sec.id==='reading')extras='<div class="reading"><h3>'+escapeHtml(d.readingTitle)+'</h3>'+escapeHtml(d.reading)+'</div>';
+ if(sec.id==='writing')extras='<div class="notice">'+escapeHtml(t('Escriu un text original en anglès. No copiïs els models de les activitats.','Write your own original text in English; do not copy the lesson models.'))+'</div>';
+ const questions=sec.id==='writing'?renderWriting(d.writing):items.map((q,j)=>renderQuestion(q,sec.nums[0]+j,sec.points[j])).join('');
+ return '<section class="panel" id="panel-'+sec.id+'" role="tabpanel" aria-label="'+escapeHtml(sec.title.en)+'"><div class="section-stats"><h2>'+escapeHtml(sec.title[ca()?'ca':'en'])+'</h2><span class="weight">'+sec.nums[0]+'–'+sec.nums[1]+' · '+sum+' '+t('punts','points')+'</span></div><p class="panel-intro">'+escapeHtml(sec.intro[ca()?'ca':'en'])+'</p>'+extras+'<div>'+questions+'</div><div class="actions">'+(index>0?'<button class="btn secondary" type="button" data-prev="'+index+'">'+t('← Anterior','← Previous')+'</button>':'')+(index<sections.length-1?'<button class="btn" type="button" data-next="'+index+'">'+t('Següent →','Next →')+'</button>':'<button class="btn" id="finishExam" type="button">'+t('Acaba i corregeix les respostes →','Finish and check answers →')+'</button>')+'</div></section>';
+}
+function renderQuestion(q,id,points){
+ const answer=userAnswers[route][id],lab='<p class="qname"><span class="qnum">'+String(id).padStart(2,'0')+'</span>'+escapeHtml(q.q)+' <small>['+points+' '+t('punts','points')+']</small></p>';
+ let control='';
+ if(q.type==='mc'){
+   let order=selectedOptions[route+'-'+id];
+   if(!order)order=selectedOptions[route+'-'+id]=learningSupport.shuffledIndexes(q.opts.length);
+   control='<div class="choices">'+order.map(k=>'<label class="answer"><input type="radio" name="q-'+id+'" data-id="'+id+'" value="'+k+'" '+(answer===k?'checked':'')+'><span>'+escapeHtml(q.opts[k])+'</span></label>').join('')+'</div>';
+ }else{
+   control='<label class="sr-only" for="q-'+id+'">'+escapeHtml(q.q)+'</label><input class="gap" id="q-'+id+'" type="text" data-id="'+id+'" autocomplete="off" spellcheck="false" value="'+escapeHtml(answer??'')+'" placeholder="'+t('Paraula o paraules que falten','Missing word or words')+'">';
+ }
+ return '<article class="question" data-q="'+id+'">'+lab+control+'<div class="result-hint" aria-live="polite"></div></article>';
+}
+function renderWriting(w){
+ const n=35;
+ return '<article class="question"><p class="qname"><span class="qnum">35</span>'+escapeHtml(w.title)+' <small>[20 '+t('punts','points')+']</small></p><p>'+escapeHtml(ca()&&w.instructionsCa?w.instructionsCa:w.instructions)+'</p><label for="essay" class="sr-only">Your writing</label><textarea id="essay" class="writing" placeholder="'+t('Escriu aquí el text en anglès…','Write your text in English here…')+'"></textarea><p class="tiny">'+t('Paraules:','Words:')+' <strong id="wordCount">0</strong> · '+t('Objectiu:','Target:')+' '+w.words[0]+'–'+w.words[1]+' '+t('paraules','words')+'</p></article>';
+}
+function showSection(n){
+ currentSection=n;
+ sections.forEach((sec,i)=>{const p=$('panel-'+sec.id);p.classList.toggle('active',i===n);document.querySelector('[data-step="'+i+'"]').setAttribute('aria-selected',String(i===n));});
+ $('results').classList.remove('active');
+ document.querySelectorAll('#examSections audio').forEach(a=>{if(n!==0)a.pause();});
+ if(n<0||n>=sections.length)return;
+ window.scrollTo({top:0,behavior:'instant'});
+}
+function checkAnswer(q,answer){
+ if(q.type==='mc')return Number(answer)===q.a;
+ return q.answers.some(a=>normalize(a)===normalize(answer));
+}
+function correctText(q){return q.type==='mc'?q.opts[q.a]:q.answers.join(' / ');}
+function finish(){
+ if(graded)return;
+ const missing=34-allAnswered();
+ if(missing&&!confirm(t('Falten '+missing+' preguntes de resposta curta o d’opcions. Vols corregir ara igualment?','You have '+missing+' unanswered questions. Check your answers anyway?')))return;
+ graded=true;
+ let total=0;
+ qList().forEach(q=>{
+  const value=userAnswers[route][q.id];
+  const ok=checkAnswer(q,value);
+  if(ok)total+=q.points;
+  const row=document.querySelector('[data-q="'+q.id+'"]');
+  row.classList.add('graded',ok?'correct':'wrong');
+  row.querySelectorAll('input').forEach(x=>x.disabled=true);
+  const hint=row.querySelector('.result-hint');
+  hint.textContent=(ok?t('✓ Correcte.','✓ Correct.'):t('✗ Resposta correcta: ','✗ Correct answer: ')+correctText(q)+'. ')+(ca()?(!ok?(q.sec==='listening'?'Torna a escoltar la informació sobre les hores i les accions.':q.sec==='reading'?'Busca la frase del text que justifica la resposta.':q.sec==='grammarChoice'||q.sec==='grammarGap'?'Revisa la forma i l’ordre de les paraules.':'Repassa l’expressió treballada.'):''):' '+q.why);
+ });
+ lastAuto=total;
+ $('examSections').hidden=true;
+ $('results').classList.add('active');
+ document.querySelectorAll('#sectionTabs .step').forEach(b=>b.setAttribute('aria-selected','false'));
+ $('sectionTabs').style.display='none';
+ document.querySelectorAll('#examSections .actions').forEach(a=>{
+  if(!a.querySelector('[data-back-to-results]')){
+   const btn=document.createElement('button');
+   btn.className='btn secondary';btn.type='button';btn.dataset.backToResults='yes';
+   btn.textContent=t('← Torna a la nota','← Back to results');
+   a.appendChild(btn);
+  }
+ });
+ $('resultsHeading').textContent=t('Correcció de l’examen d’exemple','Sample exam review');
+ $('autoScore').textContent=total+' / 80';
+ $('scoreDescription').textContent=t('Puntuació automàtica de les preguntes 01–34. El writing (20 punts) s’ha de corregir a part. Aquesta nota és orientativa.','Automatically checked score for questions 01–34. Writing (20 points) requires separate assessment. These results are for practice only.');
+ $('writingGradeHeading').textContent=t('Autoavaluació del writing (opcional)','Writing self-assessment (optional)');
+ $('writingGradeDesc').textContent=t('Valora quatre criteris amb 0–5 punts cadascun, o demana que el professor els valori. No és una correcció automàtica.','Rate four areas from 0–5, or ask your teacher to mark the writing. This is not automatic assessment.');
+ const assess=ca()?['Contingut i organització','Present Simple i gramàtica','Vocabulari i expressions','Connectors, coherència i reflexió']:['Content and organisation','Grammar and accuracy','Studied vocabulary and expressions','Connectors, coherence and health reflection'];
+ $('ratings').innerHTML=assess.map((a,i)=>'<div class="rating"><label for="rate-'+i+'">'+(i+1)+'. '+escapeHtml(a)+'</label><select id="rate-'+i+'"><option value="">— / 5</option>'+[0,1,2,3,4,5].map(n=>'<option value="'+n+'">'+n+' / 5</option>').join('')+'</select></div>').join('');
+ document.querySelectorAll('#ratings select').forEach(x=>x.addEventListener('change',updateMark));
+ $('reviewReminder').textContent=t('Per revisar els errors, prem el botó de sota. El transcript del listening i el text del reading continuen accessibles.','Use the button below to review each answer and its explanation. The listening transcript and reading text remain available.');
+ $('reviewReminder').insertAdjacentHTML('afterend','<button class="btn secondary repeat" id="reviewAnswers" type="button">'+t('Revisa les 34 preguntes','Review the 34 answers')+'</button>');
+ $('reviewAnswers').addEventListener('click',()=>{$('examSections').hidden=false;$('sectionTabs').style.display='flex';showSection(0);});
+ updateMark();$('results').focus();window.scrollTo(0,0);
+}
+function updateMark(){
+ const scores=[...document.querySelectorAll('#ratings select')].map(s=>s.value);
+ if(scores.some(s=>s==='')){$('finalMark').textContent=t('Pendent del writing: encara no hi ha nota global sobre 10.','Writing not assessed: no overall grade out of 10 yet.');return;}
+ const writing=scores.reduce((sum,n)=>sum+Number(n),0),all=lastAuto+writing;
+ let grade=all/10;
+ if(route==='insecure'&&all>50)grade=5+(all-50)/50;
+ if(route==='safe')grade=Math.min(grade,9);
+ if(route==='insecure')grade=Math.min(grade,6);
+ $('finalMark').textContent=(ca()?'Punts de pràctica: ':'Practice score: ')+all+'/100 · '+t('Nota orientativa','Indicative grade')+': '+grade.toFixed(2).replace(/\.00$/,'')+'/10. '+t('Autoavaluació: no és una nota oficial.','Self-rated writing: not an official grade.');
+}
+function reset(){
+ const key=route;
+ if(!confirm(t('Vols tornar a començar aquesta ruta? S’esborraran les respostes d’aquesta sessió.','Restart this route? Your answers for this session will be cleared.')))return;
+ userAnswers[key]={};writingTexts[key]='';selectedOptions={};
+ $('sectionTabs').style.display='flex';const old=$('reviewAnswers');if(old)old.remove();render();
+}
+document.querySelectorAll('.route').forEach(btn=>btn.addEventListener('click',()=>{
+ if(route===btn.dataset.route)return;
+ if((allAnswered()||words(writingTexts[route]))&&!confirm(t('Canviar de ruta? Les respostes d’aquesta ruta es conservaran fins que tanquis la pàgina.','Switch route? Your answers will remain available until you close this page.')))return;
+ route=btn.dataset.route;selectedOptions={};const old=$('reviewAnswers');if(old)old.remove();$('sectionTabs').style.display='flex';render();
+}));
+document.addEventListener('click',e=>{
+ const btn=e.target.closest('button[data-next],button[data-prev]');
+ if(!btn)return;
+ const i=Number(btn.dataset.next??btn.dataset.prev);
+ showSection('next'in btn.dataset?Math.min(i+1,sections.length-1):Math.max(i-1,0));
+});
+document.addEventListener('click',e=>{if(e.target.id==='finishExam')finish();});
+document.addEventListener('click',e=>{
+ if(!e.target.closest('[data-back-to-results]'))return;
+ $('examSections').hidden=true;$('results').classList.add('active');$('sectionTabs').style.display='none';
+ window.scrollTo(0,0);$('results').focus();
+});
+
+$('restart').addEventListener('click',reset);
+$('printResults').addEventListener('click',()=>window.print());
+$('startTimer').addEventListener('click',()=>{
+ if(timeUntil!==null)return;
+ timeUntil=Date.now()+50*60*1000;
+ $('startTimer').disabled=true;$('startTimer').textContent=t('Temporitzador en marxa','Timer running');
+ timerId=setInterval(()=>{
+  const seconds=Math.max(0,Math.ceil((timeUntil-Date.now())/1000));
+  $('time').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
+  if(seconds===0){clearInterval(timerId);$('startTimer').textContent=t('Temps acabat','Time is up');$('time').style.color='#ffc06a';}
+ },500);
+});
+render();
+</script>
+</body>
+</html>
