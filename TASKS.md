@@ -1,34 +1,34 @@
-# English Lab — Tasques pendents
+# English Lab — Pending Tasks
 
-Document viu per centralitzar les tasques del repositori. Quan afegim, acabem o descartem una tasca, actualitzarem aquest fitxer.
+This is the repository's living task list. Update it whenever a task is added, completed, or dropped.
 
-**Última actualització:** 14 d'octubre de 2026
+**Last updated:** October 14, 2026
 
-## Pendents
+## Pending
 
-### 1. Adjuntar automàticament el PDF de la rúbrica als esborranys de Gmail
-- **Estat:** Pendent · Per definir la configuració
-- **Prioritat:** Mitjana
-- **Àmbit:** Producte final, 2n i 4t d'ESO
-- **Situació actual:** El botó «Prepare email in Gmail» prepara el missatge, però el PDF s'ha de desar i adjuntar manualment.
-- **Objectiu:** Generar el PDF complet de la rúbrica i crear un esborrany de Gmail amb el destinatari, l'assumpte, el missatge i el PDF ja adjunt. **No enviar cap correu automàticament**; el professor ha de revisar-lo i prémer «Envia».
-- **Tasques:**
-  - [ ] Decidir si es farà servir un compte Gmail personal o el compte corporatiu del centre (possibles restriccions de l'administrador).
-  - [ ] Configurar un projecte Google Cloud, Gmail API i OAuth amb permisos mínims per crear esborranys.
-  - [ ] Implementar una generació fiable del PDF de la rúbrica sense dependre de «Imprimeix / Desa com a PDF».
-  - [ ] Crear l'esborrany amb l'arxiu PDF adjunt, sense enviament automàtic.
-  - [ ] Provar el flux en 2n i 4t d'ESO, inclosos errors d'autorització i dades incompletes.
-  - [ ] Revisar la privadesa de les dades dels alumnes i evitar exposar credencials o tokens al repositori.
-- **Nota:** Per l'ús previst, Gmail API no acostuma a tenir cost directe; la viabilitat dependrà dels permisos OAuth i de la política del compte.
+### 1. Automatically attach assessment rubric PDFs to Gmail drafts
+- **Status:** Pending — configuration to be decided
+- **Priority:** Medium
+- **Scope:** Final Product, 2nd and 4th year of ESO
+- **Current behavior:** The “Prepare email in Gmail” button drafts a message, but the PDF must be saved and attached manually.
+- **Goal:** Generate the complete rubric PDF and create a Gmail draft with the recipient, subject, message, and PDF already attached. **Never send emails automatically**; the teacher reviews each draft and clicks Send.
+- **To do:**
+  - [ ] Decide whether to use a personal Gmail account or the school's account (administrator restrictions may apply).
+  - [ ] Configure Google Cloud, the Gmail API, and OAuth with the minimum permissions needed to create drafts.
+  - [ ] Implement reliable rubric PDF generation without relying on “Print / Save as PDF.”
+  - [ ] Create the draft with the PDF attached, without automatically sending it.
+  - [ ] Test the process for both 2nd and 4th year of ESO, including authorization errors and missing information.
+  - [ ] Review student-data privacy and ensure credentials and tokens are never exposed in the repository.
+- **Note:** The Gmail API typically has no direct cost for this expected usage. Feasibility depends on OAuth permissions and account policies.
 
-## Com mantenir aquesta llista
-- **Pendent:** per fer.
-- **En curs:** s'hi està treballant.
-- **Bloquejada:** cal una decisió, accés o dependència.
-- **Feta:** implementada i comprovada.
+## Task statuses
+- **Pending:** Not started.
+- **In progress:** Currently being worked on.
+- **Blocked:** Waiting on a decision, access, or dependency.
+- **Done:** Implemented and verified.
 
-Quan una tasca s'acabi, moveu-la a «Completades», amb la data i, si és possible, l'enllaç al commit o PR.
+Once a task is complete, move it to **Completed**, recording the date and, where possible, a link to the commit or pull request.
 
-## Completades
+## Completed
 
-_Encara no n'hi ha cap registrada en aquest document._
+_No tasks have been recorded as completed in this document yet._
