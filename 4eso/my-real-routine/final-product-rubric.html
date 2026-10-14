@@ -142,8 +142,7 @@ function prepareEmail(){
  }
  const params=new URLSearchParams({view:'cm',fs:'1',to:recipient,su:subject,body});
  el('mailStatus').textContent=isCatalan?'S’obre Gmail. Adjunta-hi el PDF abans d’enviar.':'Gmail is opening. Attach the saved PDF before sending.';
- const draft=window.open('https://mail.google.com/mail/?'+params.toString(),'_blank','noopener,noreferrer');
- if(!draft){el('mailStatus').textContent=isCatalan?'Si no s’ha obert Gmail, permet les finestres emergents i torna-ho a provar.':'If Gmail did not open, allow pop-ups and try again.';}
+ window.open('https://mail.google.com/mail/?'+params.toString(),'_blank','noopener,noreferrer');
 }
 window.addEventListener('beforeprint',syncPrintView);
 window.addEventListener('afterprint',()=>{document.title=originalPageTitle;});
