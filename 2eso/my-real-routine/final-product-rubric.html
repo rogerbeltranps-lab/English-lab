@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/English-lab/favicon-192.png" type="image/png">
+<title>Final Product Assessment Rubric — 2nd ESO | English Lab</title>
+<meta name="description" content="Interactive assessment rubric for the My Real Routine final product, 2nd ESO.">
+<style>
+:root{--accent:#1f6b52;--dark:#174d3d;--soft:#e9f5ef;--line:#d8e6df;--ink:#21312c;--muted:#596c78}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f7f9fa;color:var(--ink);font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea{font:inherit}
+a{color:var(--accent)}.top{background:var(--dark);padding:14px 0;color:white}.container{width:min(1060px,calc(100% - 28px));margin:auto}.top a{color:white;text-decoration:none;font-weight:750}.top a:focus-visible,.btn:focus-visible,.path:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ffcb5c;outline-offset:3px}
+header{padding:32px 0;background:linear-gradient(110deg,var(--soft),white);border-bottom:1px solid var(--line)}.eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--accent)}h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.1;margin:9px 0;color:var(--dark)}header p{max-width:800px;color:var(--muted);margin:10px 0}main{padding:26px 0 55px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:20px;box-shadow:0 6px 25px #142c3b09}h2{margin:0 0 12px;font-size:1.35rem;color:var(--dark)}h3{margin:0 0 5px;font-size:1.1rem;color:var(--dark)}.muted{color:var(--muted)}
+.paths{display:flex;flex-wrap:wrap;gap:9px}.path{border:2px solid var(--line);border-radius:999px;background:#fff;padding:9px 18px;color:var(--dark);font-weight:800;cursor:pointer}.path[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.route-note{background:var(--soft);padding:13px 16px;border-radius:12px;margin:15px 0 0}.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field label{display:block;font-size:.87rem;font-weight:750;margin-bottom:5px}.field input,.field textarea{width:100%;border-radius:10px;border:1px solid #bccbd2;padding:12px;background:#fff}.field textarea{min-height:110px}.criterion{padding:20px 0;border-top:1px solid var(--line)}.criterion:first-child{border-top:0;padding-top:0}.criterion-title{display:flex;justify-content:space-between;gap:12px;align-items:start}.weight{display:inline-block;border-radius:8px;background:var(--soft);color:var(--dark);font-weight:850;padding:5px 9px;white-space:nowrap}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.option{position:relative;display:block;border:2px solid var(--line);border-radius:13px;padding:13px;cursor:pointer;min-height:100px}.option:has(input:checked){border-color:var(--accent);background:var(--soft)}.option input{accent-color:var(--accent);margin-right:7px}.option strong{font-size:.91rem;color:var(--dark)}.option p{margin:8px 0 0;font-size:.91rem}.no-evidence{font-size:.88rem;margin-top:9px;color:var(--muted)}.no-evidence input{accent-color:var(--accent)}.score{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.score strong{font-size:2.25rem;line-height:1;color:var(--dark)}.score small{font-size:.88rem;color:var(--muted)}.btn{border:0;background:var(--accent);color:white;border-radius:11px;padding:11px 18px;font-weight:800;cursor:pointer}.btn.secondary{color:var(--dark);background:var(--soft)}.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.back{display:inline-block;margin-bottom:8px}footer{text-align:center;color:var(--muted);padding:20px 0 35px;font-size:.84rem}
+@media(max-width:680px){.row,.choices{grid-template-columns:1fr}.card{padding:16px}.option{min-height:0}.score strong{font-size:1.8rem}}
+@media print{body{background:white;font-size:11px}header{padding:12px 0}.top,.controls,.back{display:none!important}main{padding:12px 0}.card{box-shadow:none;break-inside:avoid;margin-bottom:8px;padding:12px}.criterion{break-inside:avoid;padding:10px 0}.choices{gap:5px}.option{padding:8px;min-height:0}.option p{font-size:10px}.path{padding:3px 8px}.score strong{font-size:19px}textarea{border:0!important}}
+</style>
+</head>
+<body>
+<div class="top"><div class="container"><a href="/English-lab/index.html">⌂ English Lab</a> &nbsp; · &nbsp; <a href="final-product.html">← Back to Final Product</a></div></div>
+<header><div class="container"><div class="eyebrow">My Real Routine · 2nd ESO</div><h1>Final Product Assessment Rubric</h1><p>Choose the student's pathway and rate each criterion. The five weighted criteria add up to a mark out of 10.</p></div></header>
+<main class="container">
+<section class="card" aria-label="Pathway"><h2>Choose a pathway</h2><div class="paths" role="group" aria-label="Student pathway"><button class="path" type="button" data-route="insecure" aria-pressed="true">Insecure</button><button class="path" type="button" data-route="safe" aria-pressed="false">Safe</button><button class="path" type="button" data-route="daring" aria-pressed="false">Daring</button></div><p id="intro" class="muted"></p><p class="route-note"><strong>Pathway requirement: </strong><span id="requirement"></span></p><p class="muted" style="font-size:.88rem">The pathway determines the task requirements, not the achievement grade. Compare routines only in pathways that require it.</p></section>
+<section class="card"><h2>Student details</h2><div class="row"><div class="field"><label for="student">Student name</label><input id="student" autocomplete="off" placeholder="Student name"></div><div class="field"><label for="group">Class / group</label><input id="group" autocomplete="off" placeholder="2nd ESO"></div></div></section>
+<section class="card"><div class="score" aria-live="polite"><div><span class="muted">Current weighted mark</span><div><strong id="mark">— / 10</strong></div></div><small id="completed">0 of 5 criteria assessed</small></div><div class="controls"><button type="button" id="print" class="btn">Print / Save as PDF</button><button type="button" id="clear" class="btn secondary">Clear scores</button></div></section>
+<section class="card"><h2>Assessment criteria</h2><p class="muted">Select Level 4, 3, 2, 1 or No evidence (0) for each criterion. Each criterion's weight contributes to the final mark.</p><div id="criteria"></div></section>
+<section class="card"><h2>Teacher feedback</h2><div class="field"><label for="strengths">What went well</label><textarea id="strengths" placeholder="Strengths…"></textarea></div><div class="field" style="margin-top:12px"><label for="next">What to improve next</label><textarea id="next" placeholder="Next steps…"></textarea></div></section>
+</main><footer>English Lab · My Real Routine · 2nd ESO</footer>
+<script src="final-rubric-data.js"></script>
+<script>
+'use strict';
+const englishInsecure={"intro":"Check how your final product is assessed. In the Insecure pathway, describe your classmate using clear, simple sentences.","note":"You do not need to compare your routine with your classmate's. You must judge whether their routine is healthy, partly healthy or not very healthy and give one reason based on a real interview detail.","rows":[["Speaking","Oral presentation",["I explain 4–6 ideas about my classmate's routine in order, for about 45–60 seconds. I speak clearly and use slides as prompts rather than reading full sentences.","I explain 4–6 ideas in order and can be understood, but the recording is outside 45–60 seconds or I read 1–2 complete sentences.","I explain only 2–3 ideas, or the morning–after-school–evening order is unclear, or I read more than 2 complete sentences, though the main message can be understood.","I explain only one idea, read everything, or my message cannot be understood."]],["Language","Present Simple and studied expressions",["I use he/she + Present Simple with no more than one error, and at least four routine expressions we studied.","I use he/she + Present Simple with 2–3 errors and at least three studied expressions.","I use he/she + Present Simple with 4–5 errors, or only 1–2 studied expressions.","I make six or more he/she errors or use no studied expressions, making the message difficult to understand."]],["Google Slides","Content and visual support",["I include all five slides (Title, Morning, After school, Evening, Health reflection). Each has short English text (up to two lines) and a relevant image or icon. The reflection evaluates the routine.","I include all five slides, but one has no image/icon or has a long paragraph instead of short text.","I include only three of the five slides, or two or more have long paragraphs or no image.","I include two or fewer slides, or the text is too small or too long to read."]],["Planning & revision","Working process",["I complete all four steps: interview notes with actions, times and habits; a written speaking plan for each slide; a rehearsal; and reviewing the full video and fixing at least one mistake.","I complete three of the four steps (notes, speaking plan, rehearsal, video review and a correction).","I complete only two of the four steps.","I complete one step or none."]],["Interaction & reflection","Interview and healthy habits",["My notes include actions, times and habits. I explain my judgement with 'I think his/her routine is… because…' and at least one real interview detail.","My notes include only two of these three elements (actions, times, habits), but my health judgement includes a specific interview detail.","I give only a general reason (for example, 'because it is good'), without evidence from the interview.","I give no judgement or reason, or I comment on the person's body or weight instead of habits."]]]};
+const scoreValues=[10,7.5,5,2.5];
+const scoreNames=['Level 4 · Very good','Level 3 · Good','Level 2 · Fair','Level 1 · Developing'];
+let currentRoute='insecure';
+const el=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function getData(){
+ const raw=window.finalRubricData && window.finalRubricData[currentRoute];
+ if(!raw)return null;
+ if(currentRoute!=='insecure')return raw;
+ return {intro:englishInsecure.intro,note:englishInsecure.note,rows:raw.rows.map((r,i)=>({...r,name:englishInsecure.rows[i][0],sub:englishInsecure.rows[i][1],cells:englishInsecure.rows[i][2]}))};
+}
+function updateScore(){
+ let sum=0,done=0;
+ for(let i=0;i<5;i++){
+  const chosen=document.querySelector('input[name="criterion-'+i+'"]:checked');
+  if(chosen){done++;sum+=Number(chosen.value)*Number(document.querySelector('[data-weight="'+i+'"]').dataset.pct)/100;}
+ }
+ el('completed').textContent=done+' of 5 criteria assessed';
+ el('mark').textContent=done===5?sum.toFixed(2).replace(/\.00$/,'')+' / 10':'— / 10';
+}
+function render(){
+ const d=getData();if(!d)return;
+ document.querySelectorAll('.path').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.route===currentRoute)));
+ el('intro').textContent=d.intro;
+ el('requirement').textContent=d.note;
+ el('criteria').innerHTML=d.rows.map((r,i)=>'<section class="criterion"><div class="criterion-title"><div><h3>'+esc(r.name)+'</h3><span class="muted">'+esc(r.sub)+'</span></div><span class="weight" data-weight="'+i+'" data-pct="'+r.pct+'">'+r.pct+'%</span></div><div class="choices">'+r.cells.map((c,j)=>'<label class="option"><input type="radio" name="criterion-'+i+'" value="'+scoreValues[j]+'"><strong>'+scoreNames[j]+'</strong><p>'+c+'</p></label>').join('')+'</div><label class="no-evidence"><input type="radio" name="criterion-'+i+'" value="0"> No evidence · 0</label></section>').join('');
+ updateScore();
+}
+document.querySelectorAll('.path').forEach(b=>b.addEventListener('click',()=>{if(currentRoute!==b.dataset.route){currentRoute=b.dataset.route;render();}}));
+el('criteria').addEventListener('change',updateScore);
+el('print').addEventListener('click',()=>window.print());
+el('clear').addEventListener('click',()=>{el('criteria').querySelectorAll('input:checked').forEach(x=>x.checked=false);updateScore();});
+render();
+</script>
+</body></html>
