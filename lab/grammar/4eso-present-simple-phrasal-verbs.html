@@ -1089,17 +1089,47 @@ carousel($('#errors'),EDIT,(body,it)=>{
 
 /* ---------- practice with the unit vocabulary ---------- */
 const GAPS=[
-  ['I ___ at ten because I need eight hours of sleep.','turn in',['wind down','stay in','eat out']],
-  ['We ___ on Sundays and watch films at home.','stay in',['go out','head out','eat out']],
-  ['After dinner I ___ with music to relax.','wind down',['turn in','set off','sleep in']],
-  ['At five I ___ my brother from school and we walk home.','pick up',['sleep in','wind down','get up']],
-  ['I’m hungry, so I ___ a snack in five minutes.','whip up',['stay in','turn in','go out']],
-  ['We ___ on Saturdays because nobody wants to cook.','eat out',['sleep in','wind down','turn in']],
-  ['At the weekend I don’t need an alarm, so I ___ until nine.','sleep in',['head out','turn in','eat out']],
+  ['My alarm rings at seven, so I ___ and have a shower.','get up',['turn in','eat out','go out']],
+  ['On school days Mia ___ at quarter past six.','gets up',['turns in','eats out','stays in']],
+  ['It’s late and he is still in bed. He must ___ now.','get up',['wind down','stay in','eat out']],
+  ['The alarm rings and I ___. Then I get up.','wake up',['turn in','head out','eat out']],
+  ['I ___ my little brother at seven because he is late.','wake up',['wind down','stay in','turn in']],
+  ['Mia ___ for school at eight.','heads out',['winds down','stays in','turns in']],
   ['It’s time for school. We ___ now.','head out',['wind down','stay in','turn in']],
+  ['We ___ at half past seven to arrive on time.','set off',['stay in','wind down','sleep in']],
+  ['The bus leaves at eight, so Leo ___ before seven.','sets off',['turns in','stays in','eats out']],
+  ['At five I ___ my brother from school and we walk home.','pick up',['sleep in','wind down','get up']],
+  ['Dad ___ my sister from school at four.','picks up',['winds down','sleeps in','turns in']],
+  ['Mum is late, so I ___ the kids from the bus stop.','pick up',['eat out','turn in','stay in']],
+  ['I’m hungry, so I ___ a snack in five minutes.','whip up',['stay in','turn in','go out']],
+  ['Alex ___ a quick dinner when he gets home.','whips up',['winds down','sleeps in','goes out']],
+  ['I’m tired, so I ___ my homework until tomorrow.','put off',['wind down','eat out','sleep in']],
+  ['She ___ her homework every night and then feels stressed.','puts off',['sleeps in','heads out','turns in']],
+  ['No more phone. It’s time to ___ my homework.','get down to',['wind down','eat out','go out']],
+  ['After the snack, Alex ___ his homework.','gets down to',['winds down','goes out','sleeps in']],
+  ['I want to be fast today, so I ___ my project right now.','get down to',['sleep in','stay in','eat out']],
   ['I missed my friends’ messages today, so I ___ them on the bus.','catch up on',['get down to','put off','whip up']],
-  ['No more phone. It’s time to ___ my homework.','get down to',['wind down','eat out','go out']]
-].map(([t,a,o])=>({p:esc(t).replace('___','<span class="gapw">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>'),o:[a,...o],a,why:`${pvName(a)}.`}));
+  ['He ___ his messages on the bus before school.','catches up on',['gets down to','puts off','whips up']],
+  ['I have a free hour, so I ___ the show I missed.','catch up on',['get down to','put off','wake up']],
+  ['After homework I ___ with some music to relax.','wind down',['turn in','set off','sleep in']],
+  ['Mia ___ by listening to a podcast.','winds down',['gets up','heads out','sets off']],
+  ['It was a long day. We ___ on the sofa and do nothing.','wind down',['get up','head out','set off']],
+  ['I ___ at ten because I need eight hours of sleep.','turn in',['wind down','stay in','eat out']],
+  ['Leo ___ early on school nights.','turns in',['gets up','eats out','heads out']],
+  ['I’m very tired tonight, so I ___ early.','turn in',['go out','eat out','set off']],
+  ['We ___ on Fridays to meet our friends in town.','go out',['stay in','turn in','sleep in']],
+  ['Alex ___ with his friends on Saturday nights.','goes out',['stays in','turns in','sleeps in']],
+  ['It’s a lovely evening, so let’s ___ for a walk.','go out',['stay in','turn in','sleep in']],
+  ['We ___ on Sundays and watch films at home.','stay in',['go out','head out','eat out']],
+  ['It’s raining, so Mia ___ and reads a book.','stays in',['goes out','heads out','sets off']],
+  ['I’m ill, so I ___ today and rest.','stay in',['go out','head out','eat out']],
+  ['We ___ on Saturdays because nobody wants to cook.','eat out',['sleep in','wind down','turn in']],
+  ['Alex’s family ___ at a pizza place on Fridays.','eats out',['sleeps in','winds down','turns in']],
+  ['It’s my birthday, so we ___ tonight in a restaurant.','eat out',['stay in','sleep in','wind down']],
+  ['At the weekend I don’t need an alarm, so I ___ until nine.','sleep in',['head out','turn in','eat out']],
+  ['Leo ___ on Sundays and gets up at ten.','sleeps in',['heads out','turns in','eats out']],
+  ['There is no school tomorrow, so I can ___.','sleep in',['set off','head out','get down to']]
+].map(([t,a,o])=>({p:esc(t).replace('___','<span class="gapw">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>'),o:[a,...o],a,why:`${esc(t.replace('___',a))}`}));
 carousel($('#gapQuiz'),GAPS,quizCard);
 
 const FORMS=[
