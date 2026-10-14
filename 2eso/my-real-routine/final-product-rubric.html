@@ -15,6 +15,24 @@ header{padding:32px 0;background:linear-gradient(110deg,var(--soft),white);borde
 .route-note{background:var(--soft);padding:13px 16px;border-radius:12px;margin:15px 0 0}.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field label{display:block;font-size:.87rem;font-weight:750;margin-bottom:5px}.field input,.field textarea{width:100%;border-radius:10px;border:1px solid #bccbd2;padding:12px;background:#fff}.field textarea{min-height:110px}.criterion{padding:20px 0;border-top:1px solid var(--line)}.criterion:first-child{border-top:0;padding-top:0}.criterion-title{display:flex;justify-content:space-between;gap:12px;align-items:start}.weight{display:inline-block;border-radius:8px;background:var(--soft);color:var(--dark);font-weight:850;padding:5px 9px;white-space:nowrap}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.option{position:relative;display:block;border:2px solid var(--line);border-radius:13px;padding:13px;cursor:pointer;min-height:100px}.option:has(input:checked){border-color:var(--accent);background:var(--soft)}.option input{accent-color:var(--accent);margin-right:7px}.option strong{font-size:.91rem;color:var(--dark)}.option p{margin:8px 0 0;font-size:.91rem}.no-evidence{font-size:.88rem;margin-top:9px;color:var(--muted)}.no-evidence input{accent-color:var(--accent)}.score{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.score strong{font-size:2.25rem;line-height:1;color:var(--dark)}.score small{font-size:.88rem;color:var(--muted)}.btn{border:0;background:var(--accent);color:white;border-radius:11px;padding:11px 18px;font-weight:800;cursor:pointer}.btn.secondary{color:var(--dark);background:var(--soft)}.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.back{display:inline-block;margin-bottom:8px}footer{text-align:center;color:var(--muted);padding:20px 0 35px;font-size:.84rem}
 @media(max-width:680px){.row,.choices{grid-template-columns:1fr}.card{padding:16px}.option{min-height:0}.score strong{font-size:1.8rem}}
 @media print{body{background:white;font-size:11px}header{padding:12px 0}.top,.controls,.back{display:none!important}main{padding:12px 0}.card{box-shadow:none;break-inside:avoid;margin-bottom:8px;padding:12px}.criterion{break-inside:avoid;padding:10px 0}.choices{gap:5px}.option{padding:8px;min-height:0}.option p{font-size:10px}.path{padding:3px 8px}.score strong{font-size:19px}textarea{border:0!important}}
+
+/* Assessment delivery: print the entire completed rubric and prepare an email draft. */
+.email-hint{font-size:.88rem;color:var(--muted);margin:12px 0 0;max-width:800px}
+.mail-status{font-weight:700;font-size:.9rem;min-height:1.2em;margin:10px 0 0;color:var(--dark)}
+.print-only,.print-text{display:none}
+@media print{
+  @page{size:A4;margin:12mm}
+  html,body{background:white!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .email-hint,.mail-status,.controls,.top,footer{display:none!important}
+  .card{break-inside:auto!important;page-break-inside:auto!important;box-shadow:none!important}
+  .criterion{break-inside:avoid!important;page-break-inside:avoid!important}
+  .print-only,.print-text{display:block!important;white-space:pre-wrap;overflow-wrap:anywhere}
+  .print-text{margin-top:6px;min-height:1.2em}
+  .field textarea{display:none!important}
+  .path[aria-pressed="false"]{display:none!important}
+  .option:has(input:checked),.no-evidence:has(input:checked){border:2px solid #202020!important;font-weight:600}
+}
+
 </style>
 </head>
 <body>
@@ -22,10 +40,10 @@ header{padding:32px 0;background:linear-gradient(110deg,var(--soft),white);borde
 <header><div class="container"><div class="eyebrow">My Real Routine · 2nd ESO</div><h1>Final Product Assessment Rubric</h1><p>Choose the student's pathway and rate each criterion. The five weighted criteria add up to a mark out of 10.</p></div></header>
 <main class="container">
 <section class="card" aria-label="Pathway"><h2>Choose a pathway</h2><div class="paths" role="group" aria-label="Student pathway"><button class="path" type="button" data-route="insecure" aria-pressed="true">Insecure</button><button class="path" type="button" data-route="safe" aria-pressed="false">Safe</button><button class="path" type="button" data-route="daring" aria-pressed="false">Daring</button></div><p id="intro" class="muted"></p><p class="route-note"><strong>Pathway requirement: </strong><span id="requirement"></span></p><p class="muted" style="font-size:.88rem">The pathway determines the task requirements, not the achievement grade. Compare routines only in pathways that require it.</p></section>
-<section class="card"><h2>Student details</h2><div class="row"><div class="field"><label for="student">Student name</label><input id="student" autocomplete="off" placeholder="Student name"></div><div class="field"><label for="group">Class / group</label><input id="group" autocomplete="off" placeholder="2nd ESO"></div></div></section>
-<section class="card"><div class="score" aria-live="polite"><div><span class="muted">Current weighted mark</span><div><strong id="mark">— / 10</strong></div></div><small id="completed">0 of 5 criteria assessed</small></div><div class="controls"><button type="button" id="print" class="btn">Print / Save as PDF</button><button type="button" id="clear" class="btn secondary">Clear scores</button></div></section>
+<section class="card"><h2>Student details</h2><div class="row"><div class="field"><label for="student">Student name</label><input id="student" autocomplete="off" placeholder="Student name"></div><div class="field"><label for="email">Student email</label><input id="email" type="email" inputmode="email" autocomplete="off" placeholder="student@example.com"></div><div class="field"><label for="group">Class / group</label><input id="group" autocomplete="off" placeholder="2nd ESO"></div></div></section>
+<section class="card"><div class="score" aria-live="polite"><div><span class="muted">Current weighted mark</span><div><strong id="mark">— / 10</strong></div><div class="print-only" id="printRoute">Pathway: Insecure</div></div><small id="completed">0 of 5 criteria assessed</small></div><div class="controls"><button type="button" id="print" class="btn">Print entire rubric / Save PDF</button><button type="button" id="compose" class="btn secondary">Prepare email in Gmail ↗</button><button type="button" id="clear" class="btn secondary">Clear scores</button></div><p class="email-hint">First save the PDF, then prepare the email and <strong>attach the PDF manually in Gmail</strong> before sending. Emails are never sent automatically.</p><p class="mail-status" id="mailStatus" role="status" aria-live="polite" tabindex="-1"></p></section>
 <section class="card"><h2>Assessment criteria</h2><p class="muted">Select Level 4, 3, 2, 1 or No evidence (0) for each criterion. Each criterion's weight contributes to the final mark.</p><div id="criteria"></div></section>
-<section class="card"><h2>Teacher feedback</h2><div class="field"><label for="strengths">What went well</label><textarea id="strengths" placeholder="Strengths…"></textarea></div><div class="field" style="margin-top:12px"><label for="next">What to improve next</label><textarea id="next" placeholder="Next steps…"></textarea></div></section>
+<section class="card"><h2>Teacher feedback</h2><div class="field"><label for="strengths">What went well</label><textarea id="strengths" placeholder="Strengths…"></textarea><div class="print-text" id="strengthsPrint"></div></div><div class="field" style="margin-top:12px"><label for="next">What to improve next</label><textarea id="next" placeholder="Next steps…"></textarea><div class="print-text" id="nextPrint"></div></div></section>
 </main><footer>English Lab · My Real Routine · 2nd ESO</footer>
 <script src="final-rubric-data.js"></script>
 <script>
@@ -61,7 +79,77 @@ function render(){
 }
 document.querySelectorAll('.path').forEach(b=>b.addEventListener('click',()=>{if(currentRoute!==b.dataset.route){currentRoute=b.dataset.route;render();}}));
 el('criteria').addEventListener('change',updateScore);
-el('print').addEventListener('click',()=>window.print());
+
+/* Draft messages contain only the student's results typed in this browser. */
+const originalPageTitle=document.title;
+const courseLabel=document.querySelector('.eyebrow').textContent.replace('My Real Routine · ','');
+function syncPrintView(){
+ el('printRoute').textContent='Pathway: '+currentRoute[0].toUpperCase()+currentRoute.slice(1);
+ el('strengthsPrint').textContent=el('strengths').value.trim()||'—';
+ el('nextPrint').textContent=el('next').value.trim()||'—';
+}
+function preparePrint(){
+ syncPrintView();
+ const safeName=(el('student').value.trim()||'Student').replace(/[^\p{L}\p{N} _-]+/gu,'').trim().replace(/\s+/g,'_').slice(0,42)||'Student';
+ document.title='My_Real_Routine_'+courseLabel.replace(/\s/g,'')+'_'+safeName+'_'+currentRoute;
+ window.print();
+}
+function mailError(message){
+ el('mailStatus').textContent=message;
+ el('mailStatus').focus();
+}
+function prepareEmail(){
+ const isCatalan=currentRoute==='insecure';
+ const name=el('student').value.trim();
+ const recipient=el('email').value.trim();
+ const completed=document.querySelectorAll('#criteria input[type="radio"]:checked').length;
+ if(!name){mailError(isCatalan?'Escriu el nom de l’alumne.':'Please enter the student’s name.');el('student').focus();return;}
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)){mailError(isCatalan?'Escriu un correu electrònic vàlid.':'Please enter a valid student email address.');el('email').focus();return;}
+ if(completed!==5){mailError(isCatalan?'Cal avaluar els cinc criteris abans de preparar el correu.':'Please assess all five criteria before preparing the email.');return;}
+ const firstName=name.split(/\s+/)[0];
+ const score=el('mark').textContent.replace(' / 10','');
+ const routeLabel=currentRoute[0].toUpperCase()+currentRoute.slice(1);
+ const strengths=el('strengths').value.trim();
+ const next=el('next').value.trim();
+ const subject=isCatalan?'Nota del producte final · My Real Routine':'Your final product grade · My Real Routine';
+ let body;
+ if(isCatalan){
+  body=[
+   'Hola '+firstName+',',
+   '',
+   'Aquí tens la teva nota del producte final de My Real Routine ('+courseLabel+', nivell Insecure): '+score+'/10.',
+   '',
+   ...(strengths?['Què has fet bé:',strengths,'']:[]),
+   ...(next?['Què pots millorar:',next,'']:[]),
+   'Al PDF adjunt trobaràs la rúbrica amb els criteris i la teva avaluació.',
+   '',
+   'Salutacions,',
+   'El teu professor d’anglès'
+  ].join('\n');
+ }else{
+  body=[
+   'Hi '+firstName+',',
+   '',
+   'Here is your grade for the My Real Routine final product ('+courseLabel+', '+routeLabel+' pathway): '+score+'/10.',
+   '',
+   ...(strengths?['What you did well:',strengths,'']:[]),
+   ...(next?['What to improve:',next,'']:[]),
+   'Please see the attached PDF for your complete assessment rubric.',
+   '',
+   'Best,',
+   'Your English teacher'
+  ].join('\n');
+ }
+ const params=new URLSearchParams({view:'cm',fs:'1',to:recipient,su:subject,body});
+ el('mailStatus').textContent=isCatalan?'S’obre Gmail. Adjunta-hi el PDF abans d’enviar.':'Gmail is opening. Attach the saved PDF before sending.';
+ const draft=window.open('https://mail.google.com/mail/?'+params.toString(),'_blank','noopener,noreferrer');
+ if(!draft){el('mailStatus').textContent=isCatalan?'Si no s’ha obert Gmail, permet les finestres emergents i torna-ho a provar.':'If Gmail did not open, allow pop-ups and try again.';}
+}
+window.addEventListener('beforeprint',syncPrintView);
+window.addEventListener('afterprint',()=>{document.title=originalPageTitle;});
+
+el('print').addEventListener('click',preparePrint);
+el('compose').addEventListener('click',prepareEmail);
 el('clear').addEventListener('click',()=>{el('criteria').querySelectorAll('input:checked').forEach(x=>x.checked=false);updateScore();});
 render();
 </script>
