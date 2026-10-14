@@ -10,7 +10,8 @@ window.EnglishLabSampleExam.insecure = {
       60,
       80
     ],
-    "instructions": "Write 60–80 words in English about another person's daily routine (a real or invented classmate). Describe morning, after school and evening using he/she + Present Simple, at least four studied routine expressions, a frequency word and a reason. Include a respectful judgement about one healthy habit. No comparison with your routine is required."
+    "instructions": "Write 60–80 words in English about another person's daily routine (a real or invented classmate). Describe morning, after school and evening using he/she + Present Simple, at least four studied routine expressions, a frequency word and a reason. Include a respectful judgement about one healthy habit. No comparison with your routine is required.",
+    "instructionsCa": "Escriu entre 60 i 80 paraules en anglès sobre la rutina d'un company o companya real o inventat. Descriu el matí, després de classe i el vespre amb he/she + Present Simple. Inclou almenys quatre expressions treballades, una expressió de freqüència i una raó. Acaba amb una valoració respectuosa sobre un hàbit saludable. No cal comparar la rutina amb la teva."
   },
   "sections": {
     "listening": [
