@@ -37,16 +37,16 @@ window.finalRubricData = {
     ]
    },
    {
-    "name": "Planificació i revisió",
-    "sub": "Procés de treball",
-    "pct": 15,
-    "cells": [
-     "Faig les 4 coses: notes amb accions, hores i hàbits del company; un pla escrit per a cada diapositiva; un assaig sense gravar; i miro el vídeo sencer i corregeixo almenys un error.",
-     "Faig 3 de les 4 coses (notes, pla escrit per a cada diapositiva, assaig sense gravar, vídeo vist sencer amb almenys una correcció); me’n deixo 1.",
-     "Faig només 2 de les 4 coses (notes, pla escrit, assaig sense gravar, vídeo vist sencer amb correcció).",
-     "Faig només 1 de les 4 coses, o cap."
-    ]
-   },
+  "name": "Pronunciació i entonació",
+  "sub": "Shadowing · pujades i baixades de la veu",
+  "pct": 15,
+  "cells": [
+    "Quan presento, faig pujades i baixades de la veu com als vídeos de <i>shadowing</i>: marco les paraules importants, faig pauses entre idees i baixo la veu en acabar-les. Se m’entén bé gairebé tota la presentació.",
+    "Faig pujades i baixades de la veu en bona part de la presentació, tot i que algunes frases són planes o faig pauses poc naturals. Se m’entén bé.",
+    "La veu és força plana i marco poques paraules importants. Algunes pauses o pujades i baixades no ajuden a seguir les idees, però s’entén el missatge principal.",
+    "Parlo gairebé sempre amb el mateix to, sense pauses clares, o l’entonació i la pronunciació dificulten entendre el missatge."
+  ]
+},
    {
     "name": "Entrevista i reflexió",
     "sub": "Interacció i hàbits saludables",
@@ -124,16 +124,16 @@ window.finalRubricData = {
     ]
    },
    {
-    "name": "Planning & review",
-    "sub": "Work process",
-    "pct": 15,
-    "cells": [
-     "I do all 4 things: interview notes with actions, times and habits of your classmate; a written plan for each slide; one rehearsal without recording; and I watch the whole video and fix at least one mistake.",
-     "I do 3 of the 4 things (notes, a written plan for each slide, a rehearsal without recording, watching the whole video and fixing at least one mistake); I skip 1.",
-     "I do only 2 of the 4 things (notes, written plan, rehearsal without recording, watching the whole video and fixing a mistake).",
-     "I do only 1 of the 4 things, or none."
-    ]
-   },
+  "name": "Pronunciation & intonation",
+  "sub": "Shadowing · pitch, stress and rhythm",
+  "pct": 15,
+  "cells": [
+    "I use natural rises and falls in my voice, stress key words and pause between ideas, as practised in the shadowing videos. My speech is clear and easy to follow throughout.",
+    "I use rises and falls and stress important words in most sentences. A few parts sound flat or have awkward pauses, but my speech is clear.",
+    "My voice is often flat or key words receive little stress. Some pauses interrupt the flow, but the main message is understandable.",
+    "I use almost no pitch variation or clear phrasing, or my pronunciation and intonation make the message difficult to understand."
+  ]
+},
    {
     "name": "Interview & reflection",
     "sub": "Interaction & healthy habits",
@@ -211,16 +211,16 @@ window.finalRubricData = {
     ]
    },
    {
-    "name": "Planning & review",
-    "sub": "Work process",
-    "pct": 15,
-    "cells": [
-     "I do all 4 things: interview notes with actions, times and habits of your classmate and your own; a written plan for each slide; one rehearsal without recording; and I watch the whole video and fix at least one mistake without being reminded.",
-     "I do 3 of the 4 things (notes, a written plan for each slide, a rehearsal without recording, watching the whole video and fixing at least one mistake); I skip 1.",
-     "I do only 2 of the 4 things (notes, written plan, rehearsal without recording, watching the whole video and fixing a mistake).",
-     "I do only 1 of the 4 things, or none."
-    ]
-   },
+  "name": "Pronunciation & intonation",
+  "sub": "Shadowing · expressive pitch, stress and rhythm",
+  "pct": 15,
+  "cells": [
+    "I vary my pitch purposefully, stress words that show similarities and differences, and group ideas with natural pauses, building on the shadowing videos. My rhythm makes the comparison easy to follow.",
+    "I use clear rises and falls, word stress and pauses for most of my presentation. Some comparisons sound flat or less connected, but my message remains clear.",
+    "My intonation is often flat or inconsistent; I rarely stress contrasting ideas, and pauses sometimes interrupt the comparison. The main message is still understandable.",
+    "There is little meaningful variation in pitch, stress or phrasing, or my pronunciation makes the description and comparison difficult to follow."
+  ]
+},
    {
     "name": "Interview & reflection",
     "sub": "Interaction & healthy habits",
