@@ -2181,7 +2181,7 @@ const ROUTE_INFO={
  daring:{short:'Inference and less support',detail:DATA.course===2?'Infer expressions, correct verb forms and compare routines. Some sentence puzzles include extra words.':'Infer meaning and nuance, practise pronoun placement and connectors, and write without a word bank.'}
 };
 const GAMES={
- rosco:{name:'Alphabet Challenge',icon:'rosco',tag:'26 letters',desc:'A full word wheel. Read the clue, find the expression or pass and return.',badges:['3 choices · Catalan instructions','English clues + typed answers','Infer the expression from context']},
+ rosco:{name:'Alphabet Challenge',icon:'rosco',tag:'26 letters',desc:'A full word wheel. Read the clue, find the expression or pass and return.',badges:['Write the answer · Catalan instructions','English clues + typed answers','Infer the expression from context']},
  jeopardy:{name:'Vocabulary Jeopardy',icon:'jeopardy',tag:'4 categories \u00b7 100\u2013500 points',desc:'Choose a category. Take a chance. Build your score one question at a time.',badges:['Two choices + a clear clue','Gaps + guided written answers','Precision, correction + nuance']},
  memory:{name:'Memory Match',icon:'memory',tag:'Find the pairs',desc:'Turn two cards. Connect the language, not just the position.',badges:['Expression \u2194 Catalan meaning','Expression \u2194 English definition','Expression \u2194 contextual gap']},
  scramble:{name:'Sentence Scramble',icon:'scramble',tag:'8 sentences',desc:'Make the pieces work together. Build a sentence you can actually use.',badges:['Chunk tiles + a starting cue','Word tiles + grammar in context','Word tiles + 2 distractors']},
@@ -2221,7 +2221,7 @@ function makeVocabTask(entry,purpose,index,letter=''){
   prompt=r==='daring'?(purpose==='rosco'||purpose==='mystery'?entry.inference:entry.gap):(r==='safe'&&purpose==='mystery'?entry.gap:entry.definition);
   if(r==='insecure'){
    let candidates=bank.map(t=>t.term);if(purpose==='rosco'){const same=candidates.filter(t=>t.includes(letter.toLowerCase()));if(same.length>=3)candidates=same;}
-   options=makeOptions(answer,candidates,3,key);support='';
+   options=purpose==='rosco'?[]:makeOptions(answer,candidates,3,key);support='';
   }else if(purpose==='rush'||(purpose==='mystery'&&r==='safe')){
    // Daring distractors are deliberately close in meaning, not just random words.
    const close=entry.distractors.filter(x=>x!==answer);
@@ -2571,10 +2571,10 @@ function applyScores(){
 // Visual onboarding and plain-language instructions. Learning prompts remain in English.
 const GAME_GUIDES = {
  rosco: {
-  short:['Mira la lletra','Llegeix la pista','Respon o passa'],
+  short:['Mira la lletra','Llegeix la pista','Escriu o passa'],
   desc:'Troba una paraula o expressi\u00f3 anglesa per a cada lletra del rosco.',
-  steps:[['Mira la regla de la lletra','Comen\u00e7a per: la lletra va al principi de la resposta. Cont\u00e9: la lletra apareix dins de la paraula o expressi\u00f3.'],['Llegeix la pista en angl\u00e8s','La lletra tota sola no \u00e9s suficient: la resposta tamb\u00e9 ha de correspondre a la pista.'],['Respon o passa paraula','Si no ho saps, prem Passa paraula. Hi tornarem despr\u00e9s. Un error tanca aquesta lletra; un encert suma 10 punts.']],
-  tips:{insecure:'Tria una de les 3 respostes. Les instruccions s\u00f3n en catal\u00e0, sense pistes que revelin la soluci\u00f3.',safe:'Escriu la paraula o expressi\u00f3 en angl\u00e8s. Pots demanar una pista de lletres, per\u00f2 l\u2019encert valdr\u00e0 5 punts.',daring:'Dedueix l\u2019expressi\u00f3 a partir del context i escriu-la en angl\u00e8s. No hi ha banc de paraules.'}
+  steps:[['Mira la regla de la lletra','Comen\u00e7a per: la lletra va al principi de la resposta. Cont\u00e9: la lletra apareix dins de la paraula o expressi\u00f3.'],['Llegeix la pista en angl\u00e8s','La lletra tota sola no \u00e9s suficient: la resposta tamb\u00e9 ha de correspondre a la pista.'],['Escriu la resposta o passa paraula','Escriu la paraula o expressi\u00f3 en angl\u00e8s. Si no ho saps, prem Passa paraula. Hi tornarem despr\u00e9s. Un error tanca aquesta lletra; un encert suma 10 punts.']],
+  tips:{insecure:'Escriu tu la paraula o expressi\u00f3 en angl\u00e8s. Tens la lletra i la pista, per\u00f2 no hi ha respostes per triar.',safe:'Escriu la paraula o expressi\u00f3 en angl\u00e8s. Pots demanar una pista de lletres, per\u00f2 l\u2019encert valdr\u00e0 5 punts.',daring:'Dedueix l\u2019expressi\u00f3 a partir del context i escriu-la en angl\u00e8s. No hi ha banc de paraules.'}
  },
  jeopardy:{
   short:['Tria una casella','Respon la pregunta','Suma punts'],
