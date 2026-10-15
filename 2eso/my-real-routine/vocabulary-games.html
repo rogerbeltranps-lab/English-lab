@@ -2290,7 +2290,7 @@ function applyRouteLanguage(){
 }
 
 function renderLobby(){
- $('route-grid').innerHTML=Object.entries(ROUTE_INFO).map(([key,r])=>'<button class="route-button" type="button" data-route="'+key+'" aria-pressed="'+(settings.route===key)+'"><span class="route-icon">'+icon(r.icon)+'</span><span lang="'+(key==='insecure'?'ca':'en')+'"><strong>'+ROUTE_NAMES[key]+'</strong><small>'+r.short+'</small></span><span class="check-dot" aria-hidden="true">'+(settings.route===key?'\u2713':'')+'</span></button>').join('');
+ $('route-grid').innerHTML=Object.entries(ROUTE_INFO).map(([key,r])=>'<button class="route-button" type="button" data-route="'+key+'" aria-pressed="'+(settings.route===key)+'"><span lang="'+(key==='insecure'?'ca':'en')+'"><strong>'+ROUTE_NAMES[key]+'</strong><small>'+r.short+'</small></span><span class="check-dot" aria-hidden="true">'+(settings.route===key?'\u2713':'')+'</span></button>').join('');
  $('route-detail').textContent=ROUTE_INFO[settings.route].detail;
  const ri=['insecure','safe','daring'].indexOf(settings.route);
  $('games-grid').innerHTML=Object.entries(GAMES).map(([key,x],i)=>'<article class="game-card" data-game="'+key+'"><div class="game-card-top"><span class="game-card-icon">'+icon(x.icon)+'</span><span class="game-number">JOC / 0'+(i+1)+'</span></div>'+gamePreview(key)+'<h3 lang="en">'+x.name+'</h3><p lang="'+(settings.route==='insecure'?'ca':'en')+'">'+(settings.route==='insecure'?GAME_GUIDES[key].desc:x.desc)+'</p><span class="game-badge">'+x.badges[ri]+'</span><div class="game-card-bottom"><span>'+x.tag+'</span><button class="card-play" data-start="'+key+'" type="button" aria-label="Play '+x.name+', '+ROUTE_NAMES[settings.route]+' route">'+(settings.route==='insecure'?'Juga':'Play')+' →</button></div></article>').join('');
@@ -2582,10 +2582,21 @@ function ruleExamples(){
 }
 function gameHelpHTML(id,launch=false){
  const h=GAME_GUIDES[id],route=launch?settings.route:game.route;
+ if(route!=='insecure'){
+  const steps={
+   rosco:['Read the English clue.','Type the matching expression or pass.','You can return to passed letters later.'],
+   jeopardy:['Pick a category and point value.','Read the question and give your answer.','Earn points for a correct answer.'],
+   memory:['Turn over two cards.','Find each expression and its matching English meaning or context.','Remember the card positions and find all pairs.'],
+   scramble:['Read the task and arrange the words.','Tap words to add or remove them.','Check the word order and use only the words you need.'],
+   rush:['Read the definition or context.','Choose the best expression before time runs out.','Build a streak with correct answers.'],
+   mystery:['Answer questions to uncover parts of the picture.','Use the revealed clues to identify the routine.','Guess the picture to earn bonus points.']
+  };
+  return '<div class="game-help" data-game="'+id+'" lang="en"><div class="help-lead"><div><span class="help-kicker">'+DATA.course+' ESO · '+ROUTE_NAMES[route]+'</span><p>'+GAMES[id].desc+'</p></div></div><ol class="howto-steps">'+steps[id].map((step,i)=>'<li><span class="howto-number">'+(i+1)+'</span><div><p>'+step+'</p></div></li>').join('')+'</ol><div class="route-tip"><strong>Your route · '+ROUTE_NAMES[route]+'</strong><p>'+ROUTE_INFO[route].detail+'</p></div><p class="help-clock">'+((launch?settings.timed:game.timed)?'The timer runs while you play and pauses for help, feedback and breaks.':'There is no countdown. Take your time.')+'</p><div class="help-actions"><button class="primary" type="button" '+(launch?'data-launch="'+id+'"':'data-action="close-modal"')+'>'+(launch?'Got it, play →':'Got it, continue →')+'</button></div></div>';
+ }
  return '<div class="game-help" data-game="'+id+'" lang="ca"><div class="help-lead"><span class="help-game-icon">'+icon(GAMES[id].icon)+'</span><div><span class="help-kicker">'+DATA.course+' ESO \u00b7 '+ROUTE_NAMES[route]+'</span><p>'+h.desc+'</p></div></div>'+(id==='rosco'?ruleExamples():'')+'<ol class="howto-steps">'+h.steps.map((s,i)=>'<li><span class="howto-number">'+(i+1)+'</span><div><strong>'+s[0]+'</strong><p>'+s[1]+'</p></div></li>').join('')+'</ol><div class="route-tip"><strong>La teva ruta \u00b7 '+ROUTE_NAMES[route]+'</strong><p>'+h.tips[route]+'</p></div><p class="help-clock">'+((launch?settings.timed:game.timed)?'El rellotge nom\u00e9s corre mentre jugues: s\u2019atura amb l\u2019ajuda, la pausa i la correcci\u00f3.':'Jugues sense compte enrere. Tens tot el temps que necessitis.')+'</p><div class="help-actions"><button class="primary" type="button" '+(launch?'data-launch="'+id+'"':'data-action="close-modal"')+'>'+(launch?'Entesos, a jugar \u2192':'Entesos, continua \u2192')+'</button></div></div>';
 }
-function showGameIntro(id){if(!GAMES[id])return;updateSettings();openModal('Com s\u2019hi juga? \u00b7 '+GAMES[id].name,gameHelpHTML(id,true));}
-function howtoStrip(id){return '<div class="mini-steps" lang="ca">'+GAME_GUIDES[id].short.map((s,i)=>'<span><b>'+(i+1)+'</b>'+s+'</span>').join('<i aria-hidden="true">\u2192</i>')+'</div>';}
+function showGameIntro(id){if(!GAMES[id])return;updateSettings();openModal((settings.route==='insecure'?'Com s\u2019hi juga?':'How to play')+' · '+GAMES[id].name,gameHelpHTML(id,true));}
+function howtoStrip(id){if(settings.route!=='insecure'){const steps={rosco:['Read clue','Answer or pass','Return later'],jeopardy:['Pick a tile','Answer','Earn points'],memory:['Turn cards','Find a pair','Collect pairs'],scramble:['Build','Check','Improve'],rush:['Read','Choose','Keep going'],mystery:['Answer','Reveal','Guess']};return '<div class="mini-steps" lang="en">'+steps[id].map((s,i)=>'<span><b>'+(i+1)+'</b>'+s+'</span>').join('<i aria-hidden="true">→</i>')+'</div>';}return '<div class="mini-steps" lang="ca">'+GAME_GUIDES[id].short.map((s,i)=>'<span><b>'+(i+1)+'</b>'+s+'</span>').join('<i aria-hidden="true">\u2192</i>')+'</div>';}
 function highlightLetter(answer,letter){
  const i=answer.toLowerCase().indexOf(letter.toLowerCase());
  return i<0?esc(answer):esc(answer.slice(0,i))+'<mark class="answer-letter">'+esc(answer[i])+'</mark>'+esc(answer.slice(i+1));
@@ -2649,7 +2660,7 @@ $('team-count').addEventListener('change',()=>{updateSettings();syncSetup();});
 for(const id of ['player-name','timer-enabled'])$(id).addEventListener('change',updateSettings);
 $('team-names').addEventListener('input',updateSettings);
 $('guide-button').addEventListener('click',()=>openModal('Guia docent \u00b7 '+DATA.course+' ESO',guideHTML()));
- $('game-help-button').addEventListener('click',()=>{if(game)openModal('Com s\u2019hi juga? \u00b7 '+GAMES[game.id].name,gameHelpHTML(game.id));});
+ $('game-help-button').addEventListener('click',()=>{if(game)openModal((settings.route==='insecure'?'Com s\u2019hi juga?':'How to play')+' · '+GAMES[game.id].name,gameHelpHTML(game.id));});
 $('close-modal').addEventListener('click',closeModal);
 $('back-to-lobby').addEventListener('click',()=>{if(game&&!game.ended)confirmAction('Vols sortir de la partida?','Una partida a mig fer no es desa. Per guardar-ne els resultats, prem Acaba i revisa.','confirm-exit','Surt de la partida');else showLobby();});
 $('finish-button').addEventListener('click',()=>confirmAction('Vols acabar i revisar?','Desa el resultat i consulta les respostes correctes, també les de les preguntes que encara no has jugat.','confirm-finish','Acaba i revisa'));
