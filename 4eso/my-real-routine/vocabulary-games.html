@@ -107,12 +107,17 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
 .route-grid .route-icon{display:none!important}
 .route-grid .route-button{gap:12px}
 .route-grid .route-button strong{padding-right:0}
+
+/* Shared-site navigation: a simple Home link instead of duplicate branding. */
+.site-header .home-link{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 15px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--accent-dark);font-size:14px;font-weight:700;text-decoration:none}
+.site-header .home-link:hover{background:var(--soft)}
+.site-header .home-link:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 </style>
 </head>
 <body data-course="4">
 <a class="skip-link" href="#main">Salta al contingut</a>
 <header class="site-header">
-  <a class="brand" href="https://rogerbeltranps-lab.github.io/English-lab/4eso/my-real-routine/index.html" aria-label="English Lab, back to My Real Routine"><span class="brand-mark">EL<span></span></span><span>English Lab<small>with Roger</small></span></a>
+  <a class="home-link" href="../../index.html" aria-label="Back to English Lab home">Home</a>
   <div class="header-actions"><span class="course-pill">4 ESO <span aria-hidden="true">/</span> My Real Routine</span><button class="quiet" id="guide-button" type="button">Guia docent</button><button class="icon-button" id="fullscreen-button" type="button" aria-label="Toggle full screen" title="Full screen"></button></div>
 </header>
 <main id="main" tabindex="-1">
