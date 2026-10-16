@@ -2,7 +2,7 @@
 
 This is the repository's living task list. Update it whenever a task is added, completed, or dropped.
 
-**Last updated:** October 15, 2026
+**Last updated:** October 16, 2026
 
 ## Pending
 
@@ -22,22 +22,24 @@ This is the repository's living task list. Update it whenever a task is added, c
 - **Note:** The Gmail API typically has no direct cost for this expected usage. Feasibility depends on OAuth permissions and account policies.
 
 ### 2. Audit and align vocabulary games with Learning Paths
-- **Status:** Pending — source audit completed October 15, 2026
-- **Priority:** High (student-facing content)
-- **Scope:** `2eso/my-real-routine/vocabulary-games.html` and `4eso/my-real-routine/vocabulary-games.html`; all six games and all three routes
-- **Finding:** The games use hand-maintained JSON vocabulary banks rather than the vocabulary actually introduced in each course's Learning Paths. The 2 ESO file has 41 bank entries; the 4 ESO file has 42. Each route currently has a 26-item Alphabet Challenge, 20 Jeopardy questions and 8 Sentence Scramble items. Alphabet Challenge, Memory Match, Word Rush and Mystery Picture draw from the shared route vocabulary; Jeopardy and Sentence Scramble also require separate review.
-- **Confirmed 2 ESO problems:** `juice`, `snooze`, `pack my bag`, `hang out`, `help out`, `tidy up` and `catch the bus` are set as target answers without being taught as target expressions in the relevant course Learning Paths. Some exact time expressions (e.g. `quarter past`, `quarter to`, `ten to`) are assessed without equivalent explicit vocabulary presentation. Core taught expressions are missing from the games, including `have a shower`, `go for a walk`, `head out for school`, `turn in` and `sleep in`.
-- **Confirmed 4 ESO problems:** Insecure's alphabet contains advanced `bite the bullet`, `catch up on`, `get down to`, `knock off` and `lie in` despite these not being part of its taught Insecure vocabulary. Other game targets such as `juggle commitments`, `quiet time`, `avoid distractions`, `snooze`, `burn out` and `balance responsibilities` are not systematically introduced in the corresponding Vocabulary sections. Core taught words `wake up`, `get up`, `get home`, `turn in` and healthy-habit expressions are absent or underrepresented.
-- **Important distinction:** Some advanced 4 ESO phrases appear in a listening/reading transcript or the grammar session for **Safe** (e.g. `put off`, `catch up on`, `get down to`). Appearance alone does not make them taught vocabulary for **Insecure**. Verify each route against its actual Explore/Study cards and level-specific explanation, not just substring occurrence on a page.
-- **To do:**
-  - [ ] Establish a single curriculum-derived vocabulary inventory for each course and route: LP2, LP3, LP4 grammar where explicitly taught, and LP5 Healthy habits. Record the specific source session and minimum route for every term.
-  - [ ] Make **Insecure** assess only Insecure-taught expressions; **Safe** include the earlier core plus Safe; **Daring** include the previous core plus Daring (cumulative routes).
-  - [ ] Rewrite Alphabet Challenge clue/answer pairs from the taught inventory. **Do not add unrelated vocabulary to fill A–Z**; if 26 authentic letters are unavailable, support a shorter wheel and remove hard-coded `26` from the wheel, navigation and progress.
-  - [ ] Review Memory Match, Word Rush and Mystery Picture together with their shared pool; ensure meanings, context gaps, Catalan translations, picture names and acceptable aliases all match the taught expressions.
-  - [ ] Individually rewrite all 20 Jeopardy questions and 8 Sentence Scramble sentences per route, removing unstudied assessed expressions and any forced/ambiguous answers.
-  - [ ] Ensure each important target expression from the Learning Paths recurs in at least one game, without requiring every minor word to appear in every game.
-  - [ ] Validate all 12 combinations (2 courses × 6 games) for all three routes, including spelling variants, alternate natural answers, scoring, completion and mobile/projector mode; publish only after passing.
-- **Reference:** `Guia mestra de les sessions · English Lab` and `Guia mestra del format Learning Path`: vocabulary should be introduced, contextualised and reused, without arbitrary additional lists.
+- **Status:** In progress — code changes committed; published browser checks still outstanding
+- **Priority:** High (student-facing)
+- **Scope:** All 6 vocabulary games, 3 routes, 2 ESO and 4 ESO.
+- **Completed October 16, 2026:**
+  - [x] Compare the vocabulary-game banks with LP2 Routine expressions, LP3 Same day / Useful expressions, LP4 grammar where taught, and LP5 Healthy habits.
+  - [x] Replace unstudied target answers with expressions actually introduced in the corresponding course and route. Insecure now includes its taught LP3 and Healthy Habits vocabulary.
+  - [x] Keep Safe and Daring cumulative while making each route's Word Wheel balance baseline and extension vocabulary.
+  - [x] Reduce Alphabet Challenge to 22 supported letters rather than adding unrelated words to fill the alphabet; remove hard-coded 26-letter progress and positioning.
+  - [x] Correct Jeopardy (20 prompts per route), Sentence Scramble (8 sentences per route), picture answer sets and the shared pools for Memory Match, Word Rush and Mystery Picture.
+  - [x] Exclude above-route distractors from Word Rush, Mystery Picture and other generated questions.
+  - [x] Validate embedded JSON, JavaScript syntax, question counts, wheel letter matching, option uniqueness and data references for both pages.
+- **Still to verify:**
+  - [ ] Browser smoke test on *published* GitHub Pages for all six games at each route on 2 ESO and 4 ESO, including keyboard/touch, timer, scoring, saving history and finish/retry.
+  - [ ] Confirm mobile layouts and the projector team mode after GitHub Pages deployment.
+- **Files/commits:**
+  - `2eso/my-real-routine/vocabulary-games.html` — latest update [4ae306b](https://github.com/rogerbeltranps-lab/English-lab/commit/4ae306bfc4a1640b1a46d3991954ddd050f0fd74)
+  - `4eso/my-real-routine/vocabulary-games.html` — latest update [68d46e8](https://github.com/rogerbeltranps-lab/English-lab/commit/68d46e88618372b022431d2dcf6cb8ae8ee3c0a3)
+- **Notes:** Both HTML pages have valid embedded game data and parseable JavaScript. GitHub Pages could not be independently retrieved for a live browser test during this session. Keep this ticket open until published verification is complete.
 
 ## Task statuses
 - **Pending:** Not started.
