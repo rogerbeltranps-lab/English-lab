@@ -171,9 +171,9 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "gap": "I ____ when my alarm rings, before I get out of bed.",
       "inference": "My eyes open when the alarm rings, but I am still in bed. Name this action.",
       "distractors": [
-        "get up",
-        "go to bed",
-        "stay up"
+        "have a shower",
+        "have dinner",
+        "read in bed"
       ]
     },
     "get up": {
@@ -184,9 +184,9 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "gap": "I am awake already. Now I ____ and leave my bed.",
       "inference": "I stop lying in bed and stand on the floor. Which routine expression describes this?",
       "distractors": [
-        "wake up",
+        "go to school",
         "go to bed",
-        "wind down"
+        "do homework"
       ]
     },
     "have breakfast": {
@@ -197,35 +197,22 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "gap": "In the morning, I ____: toast and fruit.",
       "inference": "It is my first meal after a night's sleep. What do I do?",
       "distractors": [
-        "have lunch",
-        "have dinner",
-        "do homework"
+        "come home",
+        "watch TV",
+        "always"
       ]
     },
-    "brush my teeth": {
-      "term": "brush my teeth",
-      "ca": "rentar-me les dents",
-      "definition": "Clean my teeth with a toothbrush.",
-      "example": "I brush my teeth after breakfast.",
-      "gap": "I use a toothbrush to ____.",
-      "inference": "I use a toothbrush, not a hairbrush, for this routine. Name the whole expression.",
+    "have a shower": {
+      "term": "have a shower",
+      "ca": "dutxar-se",
+      "definition": "Wash your body in a shower.",
+      "example": "I have a shower before school.",
+      "gap": "Before breakfast, I ____.",
+      "inference": "Wash your body in a shower.",
       "distractors": [
-        "get dressed",
-        "make my bed",
-        "pack my bag"
-      ]
-    },
-    "get dressed": {
-      "term": "get dressed",
-      "ca": "vestir-se",
-      "definition": "Put on the clothes you will wear.",
-      "example": "I get dressed before I leave home.",
-      "gap": "After my shower, I ____ and put on my school clothes.",
-      "inference": "My pyjamas come off and my school clothes go on. Which expression fits?",
-      "distractors": [
-        "wake up",
-        "get up",
-        "go to bed"
+        "get home",
+        "go for a walk",
+        "usually"
       ]
     },
     "go to school": {
@@ -236,35 +223,35 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "gap": "On school days, I ____ to attend my lessons.",
       "inference": "It is a school day, and I leave home to attend lessons. Name the routine, not the transport.",
       "distractors": [
-        "do homework",
-        "have lunch",
-        "hang out"
-      ]
-    },
-    "have lunch": {
-      "term": "have lunch",
-      "ca": "dinar",
-      "definition": "Eat the meal in the middle of the day.",
-      "example": "I have lunch at one o'clock.",
-      "gap": "At midday, I ____ in the school canteen.",
-      "inference": "My morning lessons have finished. I eat my midday meal. What do I do?",
-      "distractors": [
-        "have breakfast",
         "have dinner",
-        "go to bed"
+        "read in bed",
+        "often"
       ]
     },
-    "do homework": {
-      "term": "do homework",
-      "ca": "fer els deures",
-      "definition": "Complete school tasks outside lesson time.",
-      "example": "I do homework after school.",
-      "gap": "At home, I ____ that my teacher has set.",
-      "inference": "My teacher set some exercises to finish at home. Give the usual verb + noun expression.",
+    "come home": {
+      "term": "come home",
+      "ca": "tornar a casa",
+      "definition": "Return to your home.",
+      "example": "I come home after school.",
+      "gap": "I ____ after school.",
+      "inference": "Return to your home.",
       "distractors": [
-        "go to school",
-        "take a break",
-        "hang out"
+        "go to bed",
+        "do homework",
+        "sometimes"
+      ]
+    },
+    "get home": {
+      "term": "get home",
+      "ca": "arribar a casa",
+      "definition": "Arrive at your home.",
+      "example": "I get home at half past four.",
+      "gap": "I ____ at five.",
+      "inference": "Arrive at your home.",
+      "distractors": [
+        "watch TV",
+        "always",
+        "never"
       ]
     },
     "have dinner": {
@@ -275,9 +262,9 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "gap": "In my routine, I ____ with my family at eight in the evening.",
       "inference": "Breakfast is in the morning and lunch is at midday. What is the evening meal routine here?",
       "distractors": [
-        "have breakfast",
-        "have lunch",
-        "get up"
+        "go for a walk",
+        "usually",
+        "go on foot"
       ]
     },
     "go to bed": {
@@ -288,113 +275,61 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "gap": "At the end of my day, I ____ to sleep.",
       "inference": "I finish my evening routine and get into bed to sleep. Which expression fits?",
       "distractors": [
-        "wake up",
-        "get up",
-        "stay up"
-      ]
-    },
-    "after school": {
-      "term": "after school",
-      "ca": "despr\u00e9s de classe",
-      "definition": "When the day's school lessons have finished.",
-      "example": "I play basketball after school.",
-      "gap": "My lessons finish at four. I play basketball ____.",
-      "inference": "I do this once the school day has ended, not during a lesson. Give the time expression.",
-      "distractors": [
-        "in the morning",
-        "before",
-        "at night"
-      ]
-    },
-    "morning": {
-      "term": "morning",
-      "ca": "mat\u00ed",
-      "definition": "The part of the day before midday.",
-      "example": "I have breakfast in the morning.",
-      "gap": "I have breakfast in the ____, before midday.",
-      "inference": "This part of the day begins before lunch and includes my first lessons. Name the part of the day.",
-      "distractors": [
-        "evening",
-        "at night",
-        "after school"
-      ]
-    },
-    "evening": {
-      "term": "evening",
-      "ca": "vespre",
-      "definition": "The part of the day after the afternoon and before bedtime.",
-      "example": "I read in the evening.",
-      "gap": "After the afternoon, I spend the ____ at home before bed.",
-      "inference": "The afternoon has ended, but I have not gone to bed. Name this part of the day.",
-      "distractors": [
-        "morning",
-        "after school",
-        "at night"
-      ]
-    },
-    "at night": {
-      "term": "at night",
-      "ca": "a la nit",
-      "definition": "During the dark part of the day.",
-      "example": "I sleep at night.",
-      "gap": "The sky is dark and most people sleep ____.",
-      "inference": "Complete the whole time expression: We can see the stars ____.",
-      "distractors": [
-        "in the morning",
-        "after school",
-        "every day"
-      ]
-    },
-    "usually": {
-      "term": "usually",
-      "ca": "normalment",
-      "definition": "On most occasions, but not on every occasion.",
-      "example": "I usually walk to school, but sometimes I take the bus.",
-      "gap": "I ____ walk to school: most days, but not every day.",
-      "inference": "Walking is my normal school journey, with a few exceptions. Which frequency adverb best fits?",
-      "distractors": [
-        "always",
-        "sometimes",
-        "never"
-      ]
-    },
-    "often": {
-      "term": "often",
-      "ca": "sovint",
-      "definition": "Many times or on many occasions.",
-      "example": "I often read after dinner.",
-      "gap": "I ____ read after dinner; it happens many times each week.",
-      "inference": "I do this frequently, not just once in a while. Give the adverb meaning frequently.",
-      "distractors": [
-        "never",
-        "sometimes",
-        "always"
-      ]
-    },
-    "sometimes": {
-      "term": "sometimes",
-      "ca": "de vegades",
-      "definition": "On some occasions, but not all the time.",
-      "example": "I sometimes play games after school.",
-      "gap": "I ____ play games: on some days, but not very often.",
-      "inference": "It happens now and then rather than every day. Which frequency adverb fits?",
-      "distractors": [
-        "always",
-        "usually",
-        "never"
-      ]
-    },
-    "never": {
-      "term": "never",
-      "ca": "mai",
-      "definition": "Not on any occasion; zero times.",
-      "example": "I never take the bus; I always walk.",
-      "gap": "I ____ take the bus. I walk on every school day.",
-      "inference": "The number of times I do this is zero. Which frequency adverb expresses that?",
-      "distractors": [
-        "always",
+        "read in bed",
         "often",
-        "sometimes"
+        "make dinner"
+      ]
+    },
+    "watch TV": {
+      "term": "watch TV",
+      "ca": "mirar la televisió",
+      "definition": "Watch television.",
+      "example": "I watch TV after dinner.",
+      "gap": "After dinner, I sometimes ____.",
+      "inference": "Watch television.",
+      "distractors": [
+        "do homework",
+        "sometimes",
+        "listen to the radio"
+      ]
+    },
+    "go for a walk": {
+      "term": "go for a walk",
+      "ca": "anar a passejar",
+      "definition": "Go outside and walk for pleasure.",
+      "example": "I go for a walk on Sundays.",
+      "gap": "At the weekend, I ____ with my family.",
+      "inference": "Go outside and walk for pleasure.",
+      "distractors": [
+        "always",
+        "never",
+        "have a snack"
+      ]
+    },
+    "read in bed": {
+      "term": "read in bed",
+      "ca": "llegir al llit",
+      "definition": "Read a book while in bed.",
+      "example": "I read in bed before sleeping.",
+      "gap": "At night I ____ for ten minutes.",
+      "inference": "Read a book while in bed.",
+      "distractors": [
+        "usually",
+        "go on foot",
+        "every morning"
+      ]
+    },
+    "do homework": {
+      "term": "do homework",
+      "ca": "fer els deures",
+      "definition": "Complete school tasks outside lesson time.",
+      "example": "I do homework after school.",
+      "gap": "At home, I ____ that my teacher has set.",
+      "inference": "My teacher set some exercises to finish at home. Give the usual verb + noun expression.",
+      "distractors": [
+        "often",
+        "make dinner",
+        "walk home"
       ]
     },
     "always": {
@@ -405,308 +340,594 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "gap": "I ____ pack my bag before school, without exception.",
       "inference": "There are no exceptions in this routine. Which frequency adverb is the strongest match?",
       "distractors": [
-        "usually",
-        "often",
-        "sometimes"
+        "sometimes",
+        "listen to the radio",
+        "make the bed"
       ]
     },
-    "quarter past": {
-      "term": "quarter past",
-      "ca": "un quart despr\u00e9s de l'hora",
-      "definition": "Fifteen minutes after an hour.",
-      "example": "School starts at quarter past eight: 8:15.",
-      "gap": "8:15 is ____ eight.",
-      "inference": "The minute hand points to three. Give the two-word phrase before the hour for :15.",
+    "usually": {
+      "term": "usually",
+      "ca": "normalment",
+      "definition": "On most occasions, but not on every occasion.",
+      "example": "I usually walk to school, but sometimes I take the bus.",
+      "gap": "I ____ walk to school: most days, but not every day.",
+      "inference": "Walking is my normal school journey, with a few exceptions. Which frequency adverb best fits?",
       "distractors": [
-        "half past",
-        "before",
-        "after"
+        "never",
+        "have a snack",
+        "run errands"
       ]
     },
-    "half past": {
-      "term": "half past",
-      "ca": "mitja hora despr\u00e9s de l'hora",
-      "definition": "Thirty minutes after an hour.",
-      "example": "I get home at half past four: 4:30.",
-      "gap": "4:30 is ____ four.",
-      "inference": "The minute hand points to six. Give the two-word phrase before the hour for :30.",
+    "often": {
+      "term": "often",
+      "ca": "sovint",
+      "definition": "Many times or on many occasions.",
+      "example": "I often read after dinner.",
+      "gap": "I ____ read after dinner; it happens many times each week.",
+      "inference": "I do this frequently, not just once in a while. Give the adverb meaning frequently.",
       "distractors": [
-        "quarter past",
-        "before",
-        "after"
+        "go on foot",
+        "every morning",
+        "go shopping"
       ]
     },
-    "before": {
-      "term": "before",
-      "ca": "abans de",
-      "definition": "Earlier than something else.",
-      "example": "I pack my bag before I leave home.",
-      "gap": "I pack my bag first and leave home second: I pack it ____ I leave.",
-      "inference": "I finish action A, then start action B. Action A happens ____ action B.",
+    "sometimes": {
+      "term": "sometimes",
+      "ca": "de vegades",
+      "definition": "On some occasions, but not all the time.",
+      "example": "I sometimes play games after school.",
+      "gap": "I ____ play games: on some days, but not very often.",
+      "inference": "It happens now and then rather than every day. Which frequency adverb fits?",
       "distractors": [
-        "after",
-        "after school",
-        "every day"
+        "make dinner",
+        "walk home",
+        "stay in"
       ]
     },
-    "after": {
-      "term": "after",
-      "ca": "despr\u00e9s de",
-      "definition": "Later than something else.",
-      "example": "I brush my teeth after breakfast.",
-      "gap": "Breakfast comes first; I brush my teeth ____ breakfast.",
-      "inference": "Action B comes second. Action B happens ____ action A.",
+    "never": {
+      "term": "never",
+      "ca": "mai",
+      "definition": "Not on any occasion; zero times.",
+      "example": "I never take the bus; I always walk.",
+      "gap": "I ____ take the bus. I walk on every school day.",
+      "inference": "The number of times I do this is zero. Which frequency adverb expresses that?",
       "distractors": [
-        "before",
-        "usually",
-        "never"
+        "listen to the radio",
+        "make the bed",
+        "eat out"
       ]
     },
-    "every day": {
-      "term": "every day",
-      "ca": "cada dia",
-      "definition": "On all seven days of the week.",
-      "example": "I drink water every day.",
-      "gap": "I do it on Monday, Tuesday and all the other days: ____.",
-      "inference": "It happens on all seven days, not only on school days. Give a two-word time expression.",
+    "go on foot": {
+      "term": "go on foot",
+      "ca": "anar a peu",
+      "definition": "Travel somewhere by walking.",
+      "example": "I go to school on foot.",
+      "gap": "I ____ because school is near.",
+      "inference": "Travel somewhere by walking.",
       "distractors": [
-        "after school",
-        "at night",
-        "in the morning"
+        "have a snack",
+        "run errands",
+        "have a chat"
       ]
     },
-    "walk": {
-      "term": "walk",
-      "ca": "caminar; anar a peu",
-      "definition": "Travel on foot instead of using transport.",
-      "example": "I walk to school with a friend.",
-      "gap": "I do not use a bus or bike. I ____ to school.",
-      "inference": "My journey uses my feet, not a vehicle. Give the verb.",
+    "make dinner": {
+      "term": "make dinner",
+      "ca": "preparar el sopar",
+      "definition": "Prepare the evening meal.",
+      "example": "I make dinner with my dad.",
+      "gap": "In the evening, we ____ together.",
+      "inference": "Prepare the evening meal.",
       "distractors": [
-        "catch the bus",
-        "get up",
-        "exercise"
+        "every morning",
+        "go shopping",
+        "get up early"
       ]
     },
-    "exercise": {
-      "term": "exercise",
-      "ca": "fer exercici",
-      "definition": "Do physical activity to move and train your body.",
-      "example": "I exercise by dancing or playing basketball.",
-      "gap": "I ____ when I dance, swim or play basketball.",
-      "inference": "Swimming, dancing and playing basketball are different ways to do this. Give the general verb.",
+    "listen to the radio": {
+      "term": "listen to the radio",
+      "ca": "escoltar la ràdio",
+      "definition": "Listen to programmes or music on the radio.",
+      "example": "I listen to the radio in the morning.",
+      "gap": "Before school, I ____.",
+      "inference": "Listen to programmes or music on the radio.",
       "distractors": [
-        "wind down",
-        "do homework",
-        "get dressed"
+        "walk home",
+        "stay in",
+        "have cereal for breakfast"
       ]
     },
-    "pack my bag": {
-      "term": "pack my bag",
-      "ca": "preparar la motxilla",
-      "definition": "Put the things I need into my bag.",
-      "example": "I pack my bag with books and a pencil case.",
-      "gap": "Before school, I ____ with books and a pencil case.",
-      "inference": "My books and pencil case need to be ready for tomorrow. Which routine puts them together?",
+    "have a snack": {
+      "term": "have a snack",
+      "ca": "berenar / fer un mos",
+      "definition": "Eat a small amount between meals.",
+      "example": "I have a snack when I get home.",
+      "gap": "After school, I ____.",
+      "inference": "Eat a small amount between meals.",
       "distractors": [
-        "make my bed",
-        "tidy up",
-        "do homework"
+        "make the bed",
+        "eat out",
+        "brush your teeth"
       ]
     },
-    "juice": {
-      "term": "juice",
-      "ca": "suc",
-      "definition": "A drink made from fruit or vegetables.",
-      "example": "I sometimes have orange juice at breakfast.",
-      "gap": "The drink made from squeezed oranges is orange ____.",
-      "inference": "The oranges have been squeezed into a drink. Name the drink, not the fruit.",
+    "every morning": {
+      "term": "every morning",
+      "ca": "cada matí",
+      "definition": "Each morning, regularly.",
+      "example": "I have breakfast every morning.",
+      "gap": "I get up early ____.",
+      "inference": "Each morning, regularly.",
       "distractors": [
-        "have breakfast",
-        "drink water",
-        "have lunch"
+        "run errands",
+        "have a chat",
+        "on weekdays"
       ]
     },
-    "read": {
-      "term": "read",
-      "ca": "llegir",
-      "definition": "Look at written words and understand them.",
-      "example": "I read a book before bed.",
-      "gap": "I ____ a story in my book before bed.",
-      "inference": "I follow the words and story on a page. Give the verb.",
+    "walk home": {
+      "term": "walk home",
+      "ca": "tornar a casa caminant",
+      "definition": "Walk from a place back to your home.",
+      "example": "I walk home after school.",
+      "gap": "On Fridays, I ____.",
+      "inference": "Walk from a place back to your home.",
       "distractors": [
-        "write",
-        "walk",
-        "play"
+        "go shopping",
+        "get up early",
+        "straight away"
       ]
     },
-    "snooze": {
-      "term": "snooze",
-      "ca": "fer una becaina; tornar a adormir-se una estona",
-      "definition": "Sleep lightly for a short time, or sleep a little longer after an alarm.",
-      "example": "When my alarm rings, I sometimes snooze for five minutes.",
-      "gap": "My alarm rings, but I ____ for five more minutes.",
-      "inference": "I press the alarm button that lets me sleep briefly again. Which verb names that short extra sleep?",
+    "make the bed": {
+      "term": "make the bed",
+      "ca": "fer el llit",
+      "definition": "Arrange the sheets and covers on a bed.",
+      "example": "I make the bed after getting up.",
+      "gap": "Before school, I ____.",
+      "inference": "Arrange the sheets and covers on a bed.",
       "distractors": [
-        "wake up",
-        "get up",
-        "stay up"
+        "stay in",
+        "have cereal for breakfast",
+        "once a week"
       ]
     },
-    "catch the bus": {
-      "term": "catch the bus",
-      "ca": "agafar l'autob\u00fas",
-      "definition": "Get on a bus in time to travel.",
-      "example": "I catch the bus at the stop near my house.",
-      "gap": "I wait at the bus stop so I can ____ to school.",
-      "inference": "I arrive at the stop in time and get on. Give the bus expression, not a walking routine.",
+    "run errands": {
+      "term": "run errands",
+      "ca": "fer encàrrecs",
+      "definition": "Make short trips to complete everyday tasks.",
+      "example": "I run errands with my mum on Saturdays.",
+      "gap": "On Saturdays, I ____ with my family.",
+      "inference": "Make short trips to complete everyday tasks.",
       "distractors": [
-        "walk",
-        "go to school",
-        "head out"
+        "eat out",
+        "brush your teeth",
+        "turn in"
       ]
     },
-    "hang out": {
-      "term": "hang out",
-      "ca": "passar l'estona",
-      "definition": "Spend relaxed time with other people.",
-      "example": "I hang out with my friends after school.",
-      "gap": "I ____ with my friends when we spend relaxed time together.",
-      "inference": "We meet without a special task or plan and just enjoy being together. Which expression fits?",
+    "go shopping": {
+      "term": "go shopping",
+      "ca": "anar a comprar",
+      "definition": "Go to shops to buy things.",
+      "example": "We go shopping on Saturdays.",
+      "gap": "At the weekend, we ____.",
+      "inference": "Go to shops to buy things.",
       "distractors": [
-        "help out",
-        "do homework",
-        "tidy up"
-      ]
-    },
-    "help out": {
-      "term": "help out",
-      "ca": "donar un cop de m\u00e0",
-      "definition": "Give someone practical help with a task.",
-      "example": "I help out at home by setting the table.",
-      "gap": "I ____ at home when someone needs an extra pair of hands.",
-      "inference": "My family is busy, so I share a small task. Give the phrasal verb meaning give practical help.",
-      "distractors": [
-        "hang out",
-        "stay up",
+        "have a chat",
+        "on weekdays",
         "wind down"
       ]
     },
-    "tidy up": {
-      "term": "tidy up",
-      "ca": "endre\u00e7ar",
-      "definition": "Put things in their correct places to make a space neat.",
-      "example": "I tidy up my room before I go out.",
-      "gap": "Clothes and books are on the floor, so I ____.",
-      "inference": "I put scattered things away rather than clean dirt from them. Which phrasal verb fits?",
+    "stay in": {
+      "term": "stay in",
+      "ca": "quedar-se a casa",
+      "definition": "Remain at home instead of going out.",
+      "example": "I stay in on some evenings.",
+      "gap": "When I am tired, I ____.",
+      "inference": "Remain at home instead of going out.",
       "distractors": [
-        "make my bed",
-        "pack my bag",
-        "help out"
+        "get up early",
+        "straight away",
+        "head out for school"
       ]
     },
-    "stay up": {
-      "term": "stay up",
-      "ca": "quedar-se despert fins tard",
-      "definition": "Remain awake instead of going to bed.",
-      "example": "I sometimes stay up late at the weekend.",
-      "gap": "I ____ late when I do not go to bed at my usual time.",
-      "inference": "Bedtime passes, but I remain awake. Which expression is the opposite of going to bed now?",
+    "eat out": {
+      "term": "eat out",
+      "ca": "menjar fora",
+      "definition": "Have a meal at a restaurant.",
+      "example": "We eat out sometimes.",
+      "gap": "On birthdays, we ____.",
+      "inference": "Have a meal at a restaurant.",
       "distractors": [
-        "wake up",
-        "get up",
-        "go to bed"
+        "have cereal for breakfast",
+        "once a week",
+        "sleep in"
+      ]
+    },
+    "have a chat": {
+      "term": "have a chat",
+      "ca": "xerrar / parlar una estona",
+      "definition": "Talk informally with someone.",
+      "example": "I have a chat with my family.",
+      "gap": "After dinner, we ____.",
+      "inference": "Talk informally with someone.",
+      "distractors": [
+        "brush your teeth",
+        "turn in",
+        "stay hydrated"
+      ]
+    },
+    "get up early": {
+      "term": "get up early",
+      "ca": "llevar-se d'hora",
+      "definition": "Leave your bed earlier than usual.",
+      "example": "I get up early on weekdays.",
+      "gap": "On school days, I ____.",
+      "inference": "Leave your bed earlier than usual.",
+      "distractors": [
+        "on weekdays",
+        "wind down",
+        "take screen breaks"
+      ]
+    },
+    "have cereal for breakfast": {
+      "term": "have cereal for breakfast",
+      "ca": "esmorzar cereals",
+      "definition": "Eat cereal as the morning meal.",
+      "example": "I have cereal for breakfast.",
+      "gap": "On Mondays, I ____.",
+      "inference": "Eat cereal as the morning meal.",
+      "distractors": [
+        "straight away",
+        "head out for school",
+        "cut down on sugary drinks"
+      ]
+    },
+    "brush your teeth": {
+      "term": "brush your teeth",
+      "ca": "rentar-te les dents",
+      "definition": "Clean your teeth using a toothbrush.",
+      "example": "You brush your teeth after eating.",
+      "gap": "After breakfast, ____.",
+      "inference": "Clean your teeth using a toothbrush.",
+      "distractors": [
+        "once a week",
+        "sleep in",
+        "make an effort"
+      ]
+    },
+    "on weekdays": {
+      "term": "on weekdays",
+      "ca": "els dies feiners",
+      "definition": "On Monday through Friday.",
+      "example": "I go to school on weekdays.",
+      "gap": "I usually get up early ____.",
+      "inference": "On Monday through Friday.",
+      "distractors": [
+        "turn in",
+        "stay hydrated",
+        "make a decision"
+      ]
+    },
+    "straight away": {
+      "term": "straight away",
+      "ca": "de seguida",
+      "definition": "Immediately, without waiting.",
+      "example": "I have a snack straight away.",
+      "gap": "When I get home, I start my homework ____.",
+      "inference": "Immediately, without waiting.",
+      "distractors": [
+        "wind down",
+        "take screen breaks",
+        "make progress"
+      ]
+    },
+    "once a week": {
+      "term": "once a week",
+      "ca": "un cop per setmana",
+      "definition": "One time every week.",
+      "example": "I go shopping once a week.",
+      "gap": "I visit my grandparents ____.",
+      "inference": "One time every week.",
+      "distractors": [
+        "head out for school",
+        "cut down on sugary drinks",
+        "do your best"
+      ]
+    },
+    "turn in": {
+      "term": "turn in",
+      "ca": "anar-se'n a dormir",
+      "definition": "Go to bed, especially at night.",
+      "example": "I turn in at ten.",
+      "gap": "When I am tired, I ____.",
+      "inference": "Go to bed, especially at night.",
+      "distractors": [
+        "sleep in",
+        "make an effort",
+        "pay attention"
       ]
     },
     "wind down": {
       "term": "wind down",
       "ca": "relaxar-se progressivament",
-      "definition": "Gradually relax after being busy.",
-      "example": "I wind down by reading quietly after a busy day.",
-      "gap": "After a busy day, I ____ by doing something calm.",
-      "inference": "The day has been busy. I gradually move from activity to relaxation. Which expression fits?",
+      "definition": "Relax slowly after being busy.",
+      "example": "I wind down with music.",
+      "gap": "After homework, I ____.",
+      "inference": "Relax slowly after being busy.",
       "distractors": [
-        "wake up",
-        "get up",
-        "stay up"
+        "stay hydrated",
+        "make a decision",
+        "have a break"
       ]
     },
-    "school": {
-      "term": "school",
-      "ca": "escola; institut",
-      "definition": "The place where students go for lessons.",
-      "example": "My school starts at eight thirty.",
-      "gap": "The place where I go for lessons is my ____.",
-      "inference": "This place has classrooms, teachers and lessons. Give the general word.",
+    "head out for school": {
+      "term": "head out for school",
+      "ca": "sortir cap a l'escola",
+      "definition": "Leave home to go to school.",
+      "example": "I head out for school at eight.",
+      "gap": "After breakfast, I ____.",
+      "inference": "Leave home to go to school.",
       "distractors": [
-        "home",
-        "park",
-        "shop"
+        "take screen breaks",
+        "make progress",
+        "take action"
       ]
     },
-    "take a break": {
-      "term": "take a break",
-      "ca": "fer una pausa",
-      "definition": "Stop an activity for a short rest.",
-      "example": "I take a break between two homework tasks.",
-      "gap": "Between two tasks, I ____ for a short rest.",
-      "inference": "I stop work briefly and intend to return to it, not finish for the whole day. What do I do?",
+    "sleep in": {
+      "term": "sleep in",
+      "ca": "dormir fins tard",
+      "definition": "Stay asleep or in bed longer than usual.",
+      "example": "I sleep in on Sundays.",
+      "gap": "At the weekend, I sometimes ____.",
+      "inference": "Stay asleep or in bed longer than usual.",
       "distractors": [
-        "go to bed",
-        "stay up",
-        "do homework"
+        "cut down on sugary drinks",
+        "do your best",
+        "make a mistake"
       ]
     },
-    "screen time": {
-      "term": "screen time",
-      "ca": "temps de pantalla",
-      "definition": "Time spent using devices with screens.",
-      "example": "I think about my screen time in the evening.",
-      "gap": "Time spent on phones, tablets and computers is ____.",
-      "inference": "I add up the minutes I spend using my phone and computer. What kind of time am I measuring?",
+    "stay hydrated": {
+      "term": "stay hydrated",
+      "ca": "mantenir-se hidratat/da",
+      "definition": "Drink enough water over the day.",
+      "example": "I stay hydrated by drinking water.",
+      "gap": "In summer, I try to ____.",
+      "inference": "Drink enough water over the day.",
       "distractors": [
-        "free time",
-        "bedtime",
-        "break time"
+        "make an effort",
+        "pay attention",
+        "both"
       ]
     },
-    "drink water": {
-      "term": "drink water",
-      "ca": "beure aigua",
-      "definition": "Have water to drink.",
-      "example": "I drink water with my lunch.",
-      "gap": "When I am thirsty, I ____ from my bottle.",
-      "inference": "My bottle contains water rather than juice. Give the verb + noun expression for what I do.",
+    "take screen breaks": {
+      "term": "take screen breaks",
+      "ca": "fer pauses de les pantalles",
+      "definition": "Stop using a screen briefly to rest.",
+      "example": "I take screen breaks after studying.",
+      "gap": "When I use a computer, I ____.",
+      "inference": "Stop using a screen briefly to rest.",
       "distractors": [
-        "have lunch",
-        "have breakfast",
-        "have dinner"
+        "make a decision",
+        "have a break",
+        "although"
+      ]
+    },
+    "cut down on sugary drinks": {
+      "term": "cut down on sugary drinks",
+      "ca": "reduir les begudes ensucrades",
+      "definition": "Drink fewer sugary drinks.",
+      "example": "I cut down on sugary drinks.",
+      "gap": "To improve my habits, I ____.",
+      "inference": "Drink fewer sugary drinks.",
+      "distractors": [
+        "make progress",
+        "take action",
+        "while"
+      ]
+    },
+    "make an effort": {
+      "term": "make an effort",
+      "ca": "fer un esforç",
+      "definition": "Try hard even when something is difficult.",
+      "example": "I make an effort to start homework on time.",
+      "gap": "I ____ to finish early.",
+      "inference": "Try hard even when something is difficult.",
+      "distractors": [
+        "do your best",
+        "make a mistake",
+        "earlier than"
+      ]
+    },
+    "make a decision": {
+      "term": "make a decision",
+      "ca": "prendre una decisió",
+      "definition": "Choose what you will do.",
+      "example": "I make a decision about my evening.",
+      "gap": "Before I start, I ____.",
+      "inference": "Choose what you will do.",
+      "distractors": [
+        "pay attention",
+        "both",
+        "get enough sleep"
+      ]
+    },
+    "make progress": {
+      "term": "make progress",
+      "ca": "progressar",
+      "definition": "Improve a little over time.",
+      "example": "I make progress by practising.",
+      "gap": "When I practise often, I ____.",
+      "inference": "Improve a little over time.",
+      "distractors": [
+        "have a break",
+        "although",
+        "limit screen time"
+      ]
+    },
+    "do your best": {
+      "term": "do your best",
+      "ca": "fer-ho tan bé com puguis",
+      "definition": "Try as hard as you can.",
+      "example": "You do your best in class.",
+      "gap": "Even when it is hard, ____.",
+      "inference": "Try as hard as you can.",
+      "distractors": [
+        "take action",
+        "while",
+        "strike a balance"
       ]
     },
     "pay attention": {
       "term": "pay attention",
-      "ca": "parar atenci\u00f3",
+      "ca": "parar atenció",
       "definition": "Listen or look carefully and focus.",
-      "example": "I pay attention when my partner explains a task.",
-      "gap": "I ____ so I can follow my partner's instructions.",
-      "inference": "My partner is explaining something important. I focus carefully instead of getting distracted. Which expression fits?",
+      "example": "I pay attention to the instructions.",
+      "gap": "When the teacher speaks, I ____.",
+      "inference": "Listen or look carefully and focus.",
       "distractors": [
-        "hang out",
-        "take a break",
-        "wind down"
+        "make a mistake",
+        "earlier than",
+        "stick to a routine"
       ]
     },
-    "make my bed": {
-      "term": "make my bed",
-      "ca": "fer el llit",
-      "definition": "Arrange my sheets and covers neatly after getting up.",
-      "example": "I make my bed after I get up.",
-      "gap": "After sleeping, I ____ by arranging the sheets and covers.",
-      "inference": "I straighten my sheets and blanket. Use the natural English verb, not do.",
+    "have a break": {
+      "term": "have a break",
+      "ca": "fer una pausa",
+      "definition": "Stop an activity for a short rest.",
+      "example": "I have a break after my homework.",
+      "gap": "After studying, I ____.",
+      "inference": "Stop an activity for a short rest.",
       "distractors": [
-        "pack my bag",
-        "tidy up",
+        "both",
+        "get enough sleep",
+        "wake up"
+      ]
+    },
+    "take action": {
+      "term": "take action",
+      "ca": "actuar / prendre mesures",
+      "definition": "Do something to change a situation.",
+      "example": "I take action to improve my routine.",
+      "gap": "When I notice a problem, I ____.",
+      "inference": "Do something to change a situation.",
+      "distractors": [
+        "although",
+        "limit screen time",
+        "get up"
+      ]
+    },
+    "make a mistake": {
+      "term": "make a mistake",
+      "ca": "cometre un error",
+      "definition": "Do something incorrectly.",
+      "example": "I sometimes make a mistake.",
+      "gap": "When I learn something new, I may ____.",
+      "inference": "Do something incorrectly.",
+      "distractors": [
+        "while",
+        "strike a balance",
+        "have breakfast"
+      ]
+    },
+    "both": {
+      "term": "both",
+      "ca": "tots dos / totes dues",
+      "definition": "The two people or things together.",
+      "example": "They both sleep in on Sundays.",
+      "gap": "Mia and Leo ____ enjoy music.",
+      "inference": "The two people or things together.",
+      "distractors": [
+        "earlier than",
+        "stick to a routine",
+        "have a shower"
+      ]
+    },
+    "although": {
+      "term": "although",
+      "ca": "encara que",
+      "definition": "Introduce a contrast between two ideas.",
+      "example": "Although I am tired, I finish homework.",
+      "gap": "____ I feel tired, I go for a walk.",
+      "inference": "Introduce a contrast between two ideas.",
+      "distractors": [
+        "get enough sleep",
+        "wake up",
+        "go to school"
+      ]
+    },
+    "while": {
+      "term": "while",
+      "ca": "mentre que",
+      "definition": "Compare two different actions or habits.",
+      "example": "I walk while my sister takes the bus.",
+      "gap": "I like reading, ____ my brother likes films.",
+      "inference": "Compare two different actions or habits.",
+      "distractors": [
+        "limit screen time",
+        "get up",
+        "come home"
+      ]
+    },
+    "earlier than": {
+      "term": "earlier than",
+      "ca": "més d'hora que",
+      "definition": "Before another time or person.",
+      "example": "Mia gets home earlier than Leo.",
+      "gap": "I wake up ____ my brother.",
+      "inference": "Before another time or person.",
+      "distractors": [
+        "strike a balance",
+        "have breakfast",
+        "get home"
+      ]
+    },
+    "get enough sleep": {
+      "term": "get enough sleep",
+      "ca": "dormir prou",
+      "definition": "Sleep for a sufficient amount of time.",
+      "example": "I get enough sleep on school nights.",
+      "gap": "To feel rested, I try to ____.",
+      "inference": "Sleep for a sufficient amount of time.",
+      "distractors": [
+        "stick to a routine",
+        "have a shower",
+        "have dinner"
+      ]
+    },
+    "limit screen time": {
+      "term": "limit screen time",
+      "ca": "limitar el temps de pantalla",
+      "definition": "Spend less time using screens.",
+      "example": "I limit screen time before bed.",
+      "gap": "In the evening, I ____.",
+      "inference": "Spend less time using screens.",
+      "distractors": [
+        "wake up",
+        "go to school",
         "go to bed"
+      ]
+    },
+    "strike a balance": {
+      "term": "strike a balance",
+      "ca": "trobar un equilibri",
+      "definition": "Find a reasonable balance between things.",
+      "example": "I strike a balance between work and rest.",
+      "gap": "I try to ____ between study and free time.",
+      "inference": "Find a reasonable balance between things.",
+      "distractors": [
+        "get up",
+        "come home",
+        "watch TV"
+      ]
+    },
+    "stick to a routine": {
+      "term": "stick to a routine",
+      "ca": "mantenir una rutina",
+      "definition": "Continue following a planned routine.",
+      "example": "I stick to a routine on weekdays.",
+      "gap": "To be consistent, I ____.",
+      "inference": "Continue following a planned routine.",
+      "distractors": [
+        "have breakfast",
+        "get home",
+        "go for a walk"
       ]
     }
   },
@@ -715,43 +936,39 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "rosco": [
         {
           "letter": "A",
-          "term": "always"
+          "term": "have a shower"
         },
         {
           "letter": "B",
-          "term": "have breakfast"
+          "term": "go to bed"
         },
         {
           "letter": "C",
-          "term": "school"
+          "term": "come home"
         },
         {
           "letter": "D",
-          "term": "get dressed"
-        },
-        {
-          "letter": "E",
-          "term": "evening"
-        },
-        {
-          "letter": "F",
-          "term": "often"
-        },
-        {
-          "letter": "G",
-          "term": "get up"
-        },
-        {
-          "letter": "H",
           "term": "do homework"
         },
         {
-          "letter": "I",
-          "term": "morning"
+          "letter": "E",
+          "term": "every morning"
         },
         {
-          "letter": "J",
-          "term": "juice"
+          "letter": "F",
+          "term": "have breakfast"
+        },
+        {
+          "letter": "G",
+          "term": "get home"
+        },
+        {
+          "letter": "H",
+          "term": "have dinner"
+        },
+        {
+          "letter": "I",
+          "term": "read in bed"
         },
         {
           "letter": "K",
@@ -759,11 +976,11 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "L",
-          "term": "have lunch"
+          "term": "listen to the radio"
         },
         {
           "letter": "M",
-          "term": "make my bed"
+          "term": "make dinner"
         },
         {
           "letter": "N",
@@ -771,19 +988,15 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "O",
-          "term": "go to school"
+          "term": "often"
         },
         {
           "letter": "P",
-          "term": "pack my bag"
-        },
-        {
-          "letter": "Q",
-          "term": "quarter past"
+          "term": "get up"
         },
         {
           "letter": "R",
-          "term": "read"
+          "term": "go for a walk"
         },
         {
           "letter": "S",
@@ -791,7 +1004,7 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "T",
-          "term": "brush my teeth"
+          "term": "go to school"
         },
         {
           "letter": "U",
@@ -799,346 +1012,353 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "V",
-          "term": "have dinner"
+          "term": "watch TV"
         },
         {
           "letter": "W",
-          "term": "walk"
-        },
-        {
-          "letter": "X",
-          "term": "exercise"
+          "term": "walk home"
         },
         {
           "letter": "Y",
-          "term": "every day"
-        },
-        {
-          "letter": "Z",
-          "term": "snooze"
+          "term": "always"
         }
       ],
       "jeopardy": [
         {
-          "prompt": "Which expression means stop sleeping?",
+          "prompt": "Which expression means \"Stop sleeping and become awake.\"?",
           "answer": "wake up",
           "options": [
             "wake up",
-            "get dressed"
+            "go for a walk"
           ],
-          "support": "Deixar de dormir.",
-          "note": "Wake up happens before you get out of bed.",
+          "support": "",
+          "note": "I wake up at seven, but I stay in bed for five minutes.",
           "aliases": []
         },
         {
-          "prompt": "Which expression means put on your clothes?",
-          "answer": "get dressed",
+          "prompt": "Which expression means \"Leave your bed after sleeping.\"?",
+          "answer": "get up",
           "options": [
-            "get dressed",
-            "go to bed"
+            "get up",
+            "make dinner"
           ],
-          "support": "Posar-se la roba.",
-          "note": "Get dressed is a routine expression.",
+          "support": "",
+          "note": "I get up and open the curtains.",
           "aliases": []
         },
         {
-          "prompt": "I eat my first meal of the day. What do I do?",
+          "prompt": "Which expression means \"Eat the first meal of the day.\"?",
           "answer": "have breakfast",
           "options": [
             "have breakfast",
-            "have dinner"
+            "watch TV"
           ],
-          "support": "El primer \u00e0pat del dia.",
-          "note": "We say have breakfast, without a or the in this routine.",
+          "support": "",
+          "note": "I have breakfast before school.",
           "aliases": []
         },
         {
-          "prompt": "I put books into my backpack. What do I do?",
-          "answer": "pack my bag",
+          "prompt": "Which expression means \"Wash your body in a shower.\"?",
+          "answer": "have a shower",
           "options": [
-            "pack my bag",
-            "make my bed"
+            "have a shower",
+            "always"
           ],
-          "support": "Preparar la motxilla.",
-          "note": "Pack + my/your/his/her bag.",
+          "support": "",
+          "note": "I have a shower before school.",
           "aliases": []
         },
         {
-          "prompt": "I use a toothbrush. What do I do?",
-          "answer": "brush my teeth",
+          "prompt": "Which expression means \"Return to your home.\"?",
+          "answer": "come home",
           "options": [
-            "brush my teeth",
-            "brush my hair"
+            "come home",
+            "usually"
           ],
-          "support": "Rentar-se les dents.",
-          "note": "Tooth is singular; teeth is plural.",
+          "support": "",
+          "note": "I come home after school.",
           "aliases": []
         },
         {
-          "prompt": "7:00 is ...",
-          "answer": "seven o'clock",
+          "prompt": "Complete: In my routine, I ____ with my family at eight in the evening.",
+          "answer": "have dinner",
           "options": [
-            "seven o'clock",
-            "half past seven"
+            "have dinner",
+            "often"
           ],
-          "support": "Les set en punt.",
-          "note": "O'clock is used for an exact hour.",
+          "support": "",
+          "note": "I have dinner with my family in the evening.",
           "aliases": []
         },
         {
-          "prompt": "7:15 is ...",
-          "answer": "quarter past seven",
+          "prompt": "Complete: At the end of my day, I ____ to sleep.",
+          "answer": "go to bed",
           "options": [
-            "quarter past seven",
-            "quarter to seven"
+            "go to bed",
+            "sometimes"
           ],
-          "support": "Quinze minuts despr\u00e9s de les set.",
-          "note": "Past means after the hour.",
-          "aliases": [
-            "a quarter past seven"
-          ]
-        },
-        {
-          "prompt": "8:30 is ...",
-          "answer": "half past eight",
-          "options": [
-            "half past eight",
-            "half past seven"
-          ],
-          "support": "Trenta minuts despr\u00e9s de les vuit.",
-          "note": "Half past = :30.",
+          "support": "",
+          "note": "I go to bed at ten on school nights.",
           "aliases": []
         },
         {
-          "prompt": "8:45 is ...",
-          "answer": "quarter to nine",
+          "prompt": "Complete: At the weekend, I ____ with my family.",
+          "answer": "go for a walk",
           "options": [
-            "quarter to nine",
-            "quarter past nine"
+            "go for a walk",
+            "never"
           ],
-          "support": "Falten quinze minuts per a les nou.",
-          "note": "To looks ahead to the next hour.",
-          "aliases": [
-            "a quarter to nine"
-          ]
-        },
-        {
-          "prompt": "7:50 is ...",
-          "answer": "ten to eight",
-          "options": [
-            "ten to eight",
-            "ten past eight"
-          ],
-          "support": "Falten deu minuts per a les vuit.",
-          "note": "Ten to eight = 7:50.",
+          "support": "",
+          "note": "I go for a walk on Sundays.",
           "aliases": []
         },
         {
-          "prompt": "On every occasion: I ____ do it.",
+          "prompt": "Complete: In the evening, we ____ together.",
+          "answer": "make dinner",
+          "options": [
+            "make dinner",
+            "go on foot"
+          ],
+          "support": "",
+          "note": "I make dinner with my dad.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete: After dinner, I sometimes ____.",
+          "answer": "watch TV",
+          "options": [
+            "watch TV",
+            "have a snack"
+          ],
+          "support": "",
+          "note": "I watch TV after dinner.",
+          "aliases": []
+        },
+        {
+          "prompt": "Choose the English for «sempre».",
           "answer": "always",
           "options": [
             "always",
-            "never"
+            "read in bed"
           ],
-          "support": "Sempre.",
-          "note": "Always expresses no exceptions in this statement.",
+          "support": "",
+          "note": "I always pack my bag before school.",
           "aliases": []
         },
         {
-          "prompt": "On most occasions, with a few exceptions:",
+          "prompt": "Choose the English for «normalment».",
           "answer": "usually",
           "options": [
             "usually",
-            "never"
+            "listen to the radio"
           ],
-          "support": "Normalment.",
-          "note": "Usually is not as absolute as always.",
+          "support": "",
+          "note": "I usually walk to school, but sometimes I take the bus.",
           "aliases": []
         },
         {
-          "prompt": "Many times; frequently:",
+          "prompt": "Choose the English for «sovint».",
           "answer": "often",
           "options": [
             "often",
-            "never"
+            "walk home"
           ],
-          "support": "Sovint.",
-          "note": "Often means frequently.",
+          "support": "",
+          "note": "I often read after dinner.",
           "aliases": []
         },
         {
-          "prompt": "On some occasions; now and then:",
+          "prompt": "Choose the English for «de vegades».",
           "answer": "sometimes",
           "options": [
             "sometimes",
-            "always"
+            "wake up"
           ],
-          "support": "De vegades.",
-          "note": "Sometimes is not the same as every day.",
+          "support": "",
+          "note": "I sometimes play games after school.",
           "aliases": []
         },
         {
-          "prompt": "Zero times; not on any occasion:",
+          "prompt": "Choose the English for «mai».",
           "answer": "never",
           "options": [
             "never",
-            "usually"
+            "get up"
           ],
-          "support": "Mai.",
-          "note": "Never already has a negative meaning.",
+          "support": "",
+          "note": "I never take the bus; I always walk.",
           "aliases": []
         },
         {
-          "prompt": "Choose the verb: I ____ homework.",
-          "answer": "do",
+          "prompt": "Complete: I ____ because school is near.",
+          "answer": "go on foot",
           "options": [
-            "do",
-            "make"
+            "go on foot",
+            "have breakfast"
           ],
-          "support": "Fer els deures.",
-          "note": "The natural collocation is do homework.",
+          "support": "",
+          "note": "I go to school on foot.",
           "aliases": []
         },
         {
-          "prompt": "Choose the verb: I ____ to school.",
-          "answer": "go",
+          "prompt": "Complete: After school, I ____.",
+          "answer": "have a snack",
           "options": [
-            "go",
-            "do"
+            "have a snack",
+            "have a shower"
           ],
-          "support": "Anar a l'institut.",
-          "note": "Go to + place.",
+          "support": "",
+          "note": "I have a snack when I get home.",
           "aliases": []
         },
         {
-          "prompt": "Choose the verb: I ____ breakfast.",
-          "answer": "have",
+          "prompt": "Complete: At night I ____ for ten minutes.",
+          "answer": "read in bed",
           "options": [
-            "have",
-            "make up"
+            "read in bed",
+            "come home"
           ],
-          "support": "Esmorzar.",
-          "note": "Have breakfast means eat breakfast.",
+          "support": "",
+          "note": "I read in bed before sleeping.",
           "aliases": []
         },
         {
-          "prompt": "Choose the verb: I ____ my teeth.",
-          "answer": "brush",
+          "prompt": "Complete: Before school, I ____.",
+          "answer": "listen to the radio",
           "options": [
-            "brush",
-            "wash up"
+            "listen to the radio",
+            "have dinner"
           ],
-          "support": "Rentar-me les dents.",
-          "note": "Use brush with teeth.",
+          "support": "",
+          "note": "I listen to the radio in the morning.",
           "aliases": []
         },
         {
-          "prompt": "Choose the correct form: She ____ up at seven.",
-          "answer": "gets",
+          "prompt": "Complete: On Fridays, I ____.",
+          "answer": "walk home",
           "options": [
-            "gets",
-            "get"
+            "walk home",
+            "go to bed"
           ],
-          "support": "Amb she, el verb afirmatiu porta -s.",
-          "note": "She gets up; I get up.",
+          "support": "",
+          "note": "I walk home after school.",
           "aliases": []
         }
       ],
       "scramble": [
         {
           "sentence": "I wake up at seven.",
-          "prompt": "Describe your morning. Begin with I.",
-          "hint": "Em desperto a les set. Mant\u00e9n wake up junt.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
             "I",
-            "wake up",
-            "at seven."
+            "wake",
+            "up",
+            "at",
+            "seven."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "I have breakfast before school.",
-          "prompt": "Describe your first meal. Begin with I.",
-          "hint": "Esmorzo abans de classe.",
+          "sentence": "I have a shower before school.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
             "I",
-            "have breakfast",
-            "before school."
+            "have",
+            "a",
+            "shower",
+            "before",
+            "school."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "She gets up at half past seven.",
-          "prompt": "Describe her morning. Begin with She.",
-          "hint": "Ella es lleva a dos quarts de vuit (7:30).",
+          "sentence": "I have breakfast every morning.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
-            "She",
-            "gets up",
-            "at half past seven."
+            "I",
+            "have",
+            "breakfast",
+            "every",
+            "morning."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "He brushes his teeth after breakfast.",
-          "prompt": "Describe his routine. Begin with He.",
-          "hint": "Ell es renta les dents despr\u00e9s d'esmorzar.",
-          "chunks": [
-            "He",
-            "brushes his teeth",
-            "after breakfast."
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "I usually walk to school.",
-          "prompt": "Put usually before the action. Begin with I.",
-          "hint": "Normalment vaig a l'institut a peu.",
+          "sentence": "I usually go to school on foot.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
             "I",
             "usually",
-            "walk",
-            "to school."
+            "go",
+            "to",
+            "school",
+            "on",
+            "foot."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "She doesn't watch TV before school.",
-          "prompt": "Build a negative routine. Begin with She.",
-          "hint": "Ella no mira la televisi\u00f3 abans de classe.",
+          "sentence": "I come home after school.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
-            "She",
-            "doesn't watch",
+            "I",
+            "come",
+            "home",
+            "after",
+            "school."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "I have a snack at five.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "I",
+            "have",
+            "a",
+            "snack",
+            "at",
+            "five."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "I watch TV after dinner.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "I",
+            "watch",
             "TV",
-            "before school."
+            "after",
+            "dinner."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "Do you do homework after school?",
-          "prompt": "Build a question. Begin with Do.",
-          "hint": "Fas els deures despr\u00e9s de classe?",
+          "sentence": "I go to bed at ten.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
-            "Do you",
-            "do homework",
-            "after school?"
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "I drink water because I am thirsty.",
-          "prompt": "Give a reason. Begin with I drink water.",
-          "hint": "Bec aigua perqu\u00e8 tinc set.",
-          "chunks": [
-            "I drink water",
-            "because",
-            "I am thirsty."
+            "I",
+            "go",
+            "to",
+            "bed",
+            "at",
+            "ten."
           ],
           "extra": [],
           "alternatives": []
@@ -1149,15 +1369,15 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "rosco": [
         {
           "letter": "A",
-          "term": "after school"
+          "term": "always"
         },
         {
           "letter": "B",
-          "term": "before"
+          "term": "brush your teeth"
         },
         {
           "letter": "C",
-          "term": "catch the bus"
+          "term": "come home"
         },
         {
           "letter": "D",
@@ -1165,39 +1385,35 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "E",
-          "term": "every day"
+          "term": "every morning"
         },
         {
           "letter": "F",
-          "term": "often"
+          "term": "go for a walk"
         },
         {
           "letter": "G",
-          "term": "get dressed"
+          "term": "go to school"
         },
         {
           "letter": "H",
-          "term": "hang out"
+          "term": "have a shower"
         },
         {
           "letter": "I",
-          "term": "morning"
-        },
-        {
-          "letter": "J",
-          "term": "juice"
+          "term": "read in bed"
         },
         {
           "letter": "K",
-          "term": "take a break"
+          "term": "have breakfast"
         },
         {
           "letter": "L",
-          "term": "help out"
+          "term": "listen to the radio"
         },
         {
           "letter": "M",
-          "term": "make my bed"
+          "term": "make dinner"
         },
         {
           "letter": "N",
@@ -1205,31 +1421,27 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "O",
-          "term": "go to bed"
+          "term": "often"
         },
         {
           "letter": "P",
-          "term": "pack my bag"
-        },
-        {
-          "letter": "Q",
-          "term": "quarter past"
+          "term": "get up"
         },
         {
           "letter": "R",
-          "term": "brush my teeth"
+          "term": "run errands"
         },
         {
           "letter": "S",
-          "term": "screen time"
+          "term": "sometimes"
         },
         {
           "letter": "T",
-          "term": "tidy up"
+          "term": "turn in"
         },
         {
           "letter": "U",
-          "term": "usually"
+          "term": "wake up"
         },
         {
           "letter": "V",
@@ -1237,315 +1449,297 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "W",
-          "term": "wind down"
-        },
-        {
-          "letter": "X",
-          "term": "exercise"
+          "term": "watch TV"
         },
         {
           "letter": "Y",
-          "term": "stay up"
-        },
-        {
-          "letter": "Z",
-          "term": "snooze"
+          "term": "usually"
         }
       ],
       "jeopardy": [
         {
-          "prompt": "Complete with wake up: She ____ at seven.",
-          "answer": "wakes up",
+          "prompt": "Which expression means: Leave home to go to school.",
+          "answer": "head out for school",
           "options": [],
-          "support": "He/she + -s.",
-          "note": "She wakes up. The particle up does not change.",
+          "support": "",
+          "note": "I head out for school at eight.",
           "aliases": []
         },
         {
-          "prompt": "Complete with get dressed: He ____ before breakfast.",
-          "answer": "gets dressed",
+          "prompt": "Which expression means: Relax slowly after being busy.",
+          "answer": "wind down",
           "options": [],
           "support": "",
-          "note": "Only get changes: gets dressed.",
+          "note": "I wind down with music.",
           "aliases": []
         },
         {
-          "prompt": "Complete with have breakfast: She ____ at home.",
-          "answer": "has breakfast",
+          "prompt": "Which expression means: Go to bed, especially at night.",
+          "answer": "turn in",
           "options": [],
           "support": "",
-          "note": "Have becomes has with she.",
+          "note": "I turn in at ten.",
           "aliases": []
         },
         {
-          "prompt": "Use pack my bag for Leo: Leo ____ at night.",
-          "answer": "packs his bag",
+          "prompt": "Which expression means: Stay asleep or in bed longer than usual.",
+          "answer": "sleep in",
           "options": [],
           "support": "",
-          "note": "Change both the verb and the possessive.",
+          "note": "I sleep in on Sundays.",
           "aliases": []
         },
         {
-          "prompt": "Complete with brush: She ____ her teeth after dinner.",
-          "answer": "brushes",
+          "prompt": "Which expression means: Leave your bed earlier than usual.",
+          "answer": "get up early",
           "options": [],
           "support": "",
-          "note": "Verbs ending in -sh take -es.",
+          "note": "I get up early on weekdays.",
           "aliases": []
         },
         {
-          "prompt": "Write 7:00 in words.",
-          "answer": "seven o'clock",
+          "prompt": "Complete with the studied expression: On Saturdays, I ____ with my family.",
+          "answer": "run errands",
           "options": [],
           "support": "",
-          "note": "For an exact hour, use o'clock.",
+          "note": "I run errands with my mum on Saturdays.",
           "aliases": []
         },
         {
-          "prompt": "Write 7:15 using past.",
-          "answer": "quarter past seven",
+          "prompt": "Complete with the studied expression: After dinner, we ____.",
+          "answer": "have a chat",
           "options": [],
           "support": "",
-          "note": "A quarter is fifteen minutes.",
-          "aliases": [
-            "a quarter past seven"
-          ]
-        },
-        {
-          "prompt": "Complete the preposition: I get up ____ half past seven.",
-          "answer": "at",
-          "options": [],
-          "support": "",
-          "note": "Use at with clock times.",
+          "note": "I have a chat with my family.",
           "aliases": []
         },
         {
-          "prompt": "Write 8:45 using to.",
-          "answer": "quarter to nine",
+          "prompt": "Complete with the studied expression: Before school, I ____.",
+          "answer": "make the bed",
           "options": [],
           "support": "",
-          "note": "It is fifteen minutes before nine.",
-          "aliases": [
-            "a quarter to nine"
-          ]
-        },
-        {
-          "prompt": "Write 7:50 using to.",
-          "answer": "ten to eight",
-          "options": [],
-          "support": "",
-          "note": "It is ten minutes before eight.",
+          "note": "I make the bed after getting up.",
           "aliases": []
         },
         {
-          "prompt": "Complete: I ____ walk to school. I do it every single school day.",
-          "answer": "always",
+          "prompt": "Complete with the studied expression: When I am tired, I ____.",
+          "answer": "stay in",
           "options": [],
           "support": "",
-          "note": "Always expresses every occasion.",
+          "note": "I stay in on some evenings.",
           "aliases": []
         },
         {
-          "prompt": "Put usually in the gap: She ____ has breakfast at home.",
-          "answer": "usually",
+          "prompt": "Complete with the studied expression: On birthdays, we ____.",
+          "answer": "eat out",
           "options": [],
           "support": "",
-          "note": "An adverb of frequency usually goes before the main verb.",
+          "note": "We eat out sometimes.",
           "aliases": []
         },
         {
-          "prompt": "Complete: I am ____ tired after training. Use often.",
-          "answer": "often",
+          "prompt": "Write the English for «els dies feiners».",
+          "answer": "on weekdays",
           "options": [],
           "support": "",
-          "note": "With be, the adverb usually follows the verb.",
+          "note": "I go to school on weekdays.",
           "aliases": []
         },
         {
-          "prompt": "Give the two-word phrase meaning on all seven days of the week.",
-          "answer": "every day",
+          "prompt": "Write the English for «un cop per setmana».",
+          "answer": "once a week",
           "options": [],
           "support": "",
-          "note": "Every day is two words when it means each day.",
+          "note": "I go shopping once a week.",
           "aliases": []
         },
         {
-          "prompt": "Complete with a frequency adverb: I ____ catch the bus; I walk every time.",
-          "answer": "never",
+          "prompt": "Write the English for «de seguida».",
+          "answer": "straight away",
           "options": [],
           "support": "",
-          "note": "Do not add don't before never here.",
+          "note": "I have a snack straight away.",
           "aliases": []
         },
         {
-          "prompt": "Complete: He ____ his homework after school. Use do.",
-          "answer": "does",
+          "prompt": "Write the English for «anar a comprar».",
+          "answer": "go shopping",
           "options": [],
           "support": "",
-          "note": "In an affirmative statement, do becomes does.",
+          "note": "We go shopping on Saturdays.",
           "aliases": []
         },
         {
-          "prompt": "Complete with one word: ____ she walk to school?",
-          "answer": "Does",
+          "prompt": "Write the English for «rentar-te les dents».",
+          "answer": "brush your teeth",
           "options": [],
           "support": "",
-          "note": "Does + she + base verb.",
+          "note": "You brush your teeth after eating.",
           "aliases": []
         },
         {
-          "prompt": "Complete with one word: She doesn't ____ to school. Use walk.",
-          "answer": "walk",
+          "prompt": "Complete the routine with the full expression: In summer, I try to ____.",
+          "answer": "stay hydrated",
           "options": [],
           "support": "",
-          "note": "After doesn't, use the base form.",
+          "note": "I stay hydrated by drinking water.",
           "aliases": []
         },
         {
-          "prompt": "Complete with have: He ____ lunch at school.",
-          "answer": "has",
+          "prompt": "Complete the routine with the full expression: When I use a computer, I ____.",
+          "answer": "take screen breaks",
           "options": [],
           "support": "",
-          "note": "He has; they have.",
+          "note": "I take screen breaks after studying.",
           "aliases": []
         },
         {
-          "prompt": "Correct only the verb: Does she goes to school by bus?",
-          "answer": "go",
+          "prompt": "Complete the routine with the full expression: On Mondays, I ____.",
+          "answer": "have cereal for breakfast",
           "options": [],
           "support": "",
-          "note": "Does already marks the third person; use go.",
+          "note": "I have cereal for breakfast.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the full expression: After school, I ____.",
+          "answer": "have a snack",
+          "options": [],
+          "support": "",
+          "note": "I have a snack when I get home.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the full expression: To improve my habits, I ____.",
+          "answer": "cut down on sugary drinks",
+          "options": [],
+          "support": "",
+          "note": "I cut down on sugary drinks.",
           "aliases": []
         }
       ],
       "scramble": [
         {
-          "sentence": "She usually has breakfast at home.",
-          "prompt": "Begin with She; put usually before has.",
-          "hint": "She + has.",
+          "sentence": "I head out for school at eight.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
-            "She",
-            "usually",
-            "has",
-            "breakfast",
+            "I",
+            "head",
+            "out",
+            "for",
+            "school",
             "at",
-            "home."
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "He catches the bus at quarter past eight.",
-          "prompt": "Begin with He; finish with the time.",
-          "hint": "Use catches with he.",
-          "chunks": [
-            "He",
-            "catches",
-            "the",
-            "bus",
-            "at",
-            "quarter",
-            "past",
             "eight."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "She doesn't do homework before dinner.",
-          "prompt": "Begin with She; put the time phrase last.",
-          "hint": "After doesn't, use do.",
-          "chunks": [
-            "She",
-            "doesn't",
-            "do",
-            "homework",
-            "before",
-            "dinner."
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "Does your friend walk to school every day?",
-          "prompt": "Begin with Does; put every day at the end.",
-          "hint": "Does + subject + base verb.",
-          "chunks": [
-            "Does",
-            "your",
-            "friend",
-            "walk",
-            "to",
-            "school",
-            "every",
-            "day?"
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "I pack my bag before I go to bed.",
-          "prompt": "Begin with I pack my bag; use before.",
-          "hint": "Packing happens first.",
+          "sentence": "I wind down with music after homework.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
             "I",
-            "pack",
-            "my",
-            "bag",
-            "before",
-            "I",
-            "go",
-            "to",
-            "bed."
+            "wind",
+            "down",
+            "with",
+            "music",
+            "after",
+            "homework."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "We sometimes hang out after school.",
-          "prompt": "Begin with We; put sometimes before hang.",
-          "hint": "Hang out stays together here.",
+          "sentence": "I turn in at ten on weekdays.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "I",
+            "turn",
+            "in",
+            "at",
+            "ten",
+            "on",
+            "weekdays."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "I sometimes sleep in at the weekend.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "I",
+            "sometimes",
+            "sleep",
+            "in",
+            "at",
+            "the",
+            "weekend."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "We run errands after breakfast.",
+          "prompt": "Build the studied routine sentence. Begin with \"We\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
             "We",
-            "sometimes",
-            "hang",
-            "out",
+            "run",
+            "errands",
             "after",
+            "breakfast."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "I have a chat with my family.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "I",
+            "have",
+            "a",
+            "chat",
+            "with",
+            "my",
+            "family."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "I make the bed before school.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "I",
+            "make",
+            "the",
+            "bed",
+            "before",
             "school."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "He brushes his teeth and then gets dressed.",
-          "prompt": "Begin with He brushes; put then after and.",
-          "hint": "Both third-person verbs need the correct endings.",
-          "chunks": [
-            "He",
-            "brushes",
-            "his",
-            "teeth",
-            "and",
-            "then",
-            "gets",
-            "dressed."
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "I take a break because I feel tired.",
-          "prompt": "Begin with I take a break; give the reason second.",
-          "hint": "Because introduces the reason.",
+          "sentence": "I take screen breaks when I study.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
             "I",
             "take",
-            "a",
-            "break",
-            "because",
+            "screen",
+            "breaks",
+            "when",
             "I",
-            "feel",
-            "tired."
+            "study."
           ],
           "extra": [],
           "alternatives": []
@@ -1556,55 +1750,51 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "rosco": [
         {
           "letter": "A",
-          "term": "pay attention"
+          "term": "always"
         },
         {
           "letter": "B",
-          "term": "take a break"
+          "term": "brush your teeth"
         },
         {
           "letter": "C",
-          "term": "catch the bus"
+          "term": "come home"
         },
         {
           "letter": "D",
-          "term": "drink water"
+          "term": "do homework"
         },
         {
           "letter": "E",
-          "term": "get dressed"
+          "term": "every morning"
         },
         {
           "letter": "F",
-          "term": "after school"
+          "term": "go for a walk"
         },
         {
           "letter": "G",
-          "term": "go to school"
+          "term": "get up"
         },
         {
           "letter": "H",
-          "term": "hang out"
+          "term": "have a shower"
         },
         {
           "letter": "I",
-          "term": "wind down"
-        },
-        {
-          "letter": "J",
-          "term": "juice"
+          "term": "read in bed"
         },
         {
           "letter": "K",
-          "term": "pack my bag"
+          "term": "have breakfast"
         },
         {
           "letter": "L",
-          "term": "help out"
+          "term": "listen to the radio"
         },
         {
           "letter": "M",
-          "term": "make my bed"
+          "term": "make dinner"
         },
         {
           "letter": "N",
@@ -1612,31 +1802,27 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "O",
-          "term": "do homework"
+          "term": "often"
         },
         {
           "letter": "P",
-          "term": "stay up"
-        },
-        {
-          "letter": "Q",
-          "term": "quarter past"
+          "term": "pay attention"
         },
         {
           "letter": "R",
-          "term": "brush my teeth"
+          "term": "run errands"
         },
         {
           "letter": "S",
-          "term": "screen time"
+          "term": "sometimes"
         },
         {
           "letter": "T",
-          "term": "tidy up"
+          "term": "turn in"
         },
         {
           "letter": "U",
-          "term": "usually"
+          "term": "wake up"
         },
         {
           "letter": "V",
@@ -1644,358 +1830,330 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "W",
-          "term": "walk"
-        },
-        {
-          "letter": "X",
-          "term": "exercise"
+          "term": "watch TV"
         },
         {
           "letter": "Y",
-          "term": "every day"
-        },
-        {
-          "letter": "Z",
-          "term": "snooze"
+          "term": "usually"
         }
       ],
       "jeopardy": [
         {
-          "prompt": "Correct the verb phrase: She wake up at seven. Write only the corrected phrase.",
-          "answer": "wakes up",
+          "prompt": "Which expression means: Try hard even when something is difficult.",
+          "answer": "make an effort",
           "options": [],
           "support": "",
-          "note": "Third-person -s goes on wake, not up.",
+          "note": "I make an effort to start homework on time.",
           "aliases": []
         },
         {
-          "prompt": "Change to she: I pack my bag. Write the complete sentence.",
-          "answer": "She packs her bag.",
+          "prompt": "Which expression means: Choose what you will do.",
+          "answer": "make a decision",
           "options": [],
           "support": "",
-          "note": "Both packs and her must agree with she.",
+          "note": "I make a decision about my evening.",
           "aliases": []
         },
         {
-          "prompt": "Complete: He ____ breakfast, but I do. Use the negative of have.",
-          "answer": "doesn't have",
+          "prompt": "Which expression means: Improve a little over time.",
+          "answer": "make progress",
           "options": [],
           "support": "",
-          "note": "Doesn't + base verb; do refers back to have breakfast.",
-          "aliases": [
-            "does not have"
-          ]
-        },
-        {
-          "prompt": "Correct the whole phrase: do my bed.",
-          "answer": "make my bed",
-          "options": [],
-          "support": "",
-          "note": "Make my bed and do homework use different verbs.",
+          "note": "I make progress by practising.",
           "aliases": []
         },
         {
-          "prompt": "Change to a question: She brushes her teeth after lunch. Write the full question.",
-          "answer": "Does she brush her teeth after lunch?",
+          "prompt": "Which expression means: Try as hard as you can.",
+          "answer": "do your best",
           "options": [],
           "support": "",
-          "note": "Does + subject + base verb.",
+          "note": "You do your best in class.",
           "aliases": []
         },
         {
-          "prompt": "Write the complete time phrase: My first lesson starts ____ 8:15. Replace 8:15 with words too.",
-          "answer": "at quarter past eight",
+          "prompt": "Which expression means: Listen or look carefully and focus.",
+          "answer": "pay attention",
           "options": [],
           "support": "",
-          "note": "Use at plus the time expression.",
-          "aliases": [
-            "at a quarter past eight"
-          ]
-        },
-        {
-          "prompt": "A lesson starts at 8:45. Use quarter and to; write only the time.",
-          "answer": "quarter to nine",
-          "options": [],
-          "support": "",
-          "note": "To refers to the coming hour, nine.",
-          "aliases": [
-            "a quarter to nine"
-          ]
-        },
-        {
-          "prompt": "The bus leaves at 7:50. Write the time using ten and to.",
-          "answer": "ten to eight",
-          "options": [],
-          "support": "",
-          "note": "Do not say ten to seven for 7:50.",
+          "note": "I pay attention to the instructions.",
           "aliases": []
         },
         {
-          "prompt": "Correct the whole time phrase: in the night (for the general routine I sleep ...).",
-          "answer": "at night",
+          "prompt": "Complete with the studied expression: When I notice a problem, I ____.",
+          "answer": "take action",
           "options": [],
           "support": "",
-          "note": "For a general routine, say at night.",
+          "note": "I take action to improve my routine.",
           "aliases": []
         },
         {
-          "prompt": "You leave at 7:40 and arrive twenty minutes later. Write the arrival time in words.",
-          "answer": "eight o'clock",
+          "prompt": "Complete with the studied expression: After studying, I ____.",
+          "answer": "have a break",
           "options": [],
           "support": "",
-          "note": "7:40 plus twenty minutes is 8:00.",
+          "note": "I have a break after my homework.",
           "aliases": []
         },
         {
-          "prompt": "Correct the full sentence, keeping never: She doesn't never walk to school.",
-          "answer": "She never walks to school.",
+          "prompt": "Complete with the studied expression: When I learn something new, I may ____.",
+          "answer": "make a mistake",
           "options": [],
           "support": "",
-          "note": "Never makes the meaning negative without doesn't.",
+          "note": "I sometimes make a mistake.",
           "aliases": []
         },
         {
-          "prompt": "Put usually in its neutral position: She is tired after training. Write the full sentence.",
-          "answer": "She is usually tired after training.",
+          "prompt": "Complete with the studied expression: Mia and Leo ____ enjoy music.",
+          "answer": "both",
           "options": [],
           "support": "",
-          "note": "The adverb follows be.",
+          "note": "They both sleep in on Sundays.",
           "aliases": []
         },
         {
-          "prompt": "Write the two missing words: I play basketball ____ ____. (On all seven days.)",
-          "answer": "every day",
+          "prompt": "Complete with the studied expression: ____ I feel tired, I go for a walk.",
+          "answer": "although",
           "options": [],
           "support": "",
-          "note": "Everyday is an adjective; every day means each day.",
+          "note": "Although I am tired, I finish homework.",
           "aliases": []
         },
         {
-          "prompt": "Complete with ONE word: I ____ walk to school, but I sometimes take the bus. Choose the best fit: always / usually / never.",
-          "answer": "usually",
+          "prompt": "Write the English for «mentre que».",
+          "answer": "while",
           "options": [],
           "support": "",
-          "note": "Sometimes taking the bus rules out always and never.",
+          "note": "I walk while my sister takes the bus.",
           "aliases": []
         },
         {
-          "prompt": "Complete the contrasting pair: I always eat breakfast, but my brother ____ does.",
-          "answer": "never",
+          "prompt": "Write the English for «més d'hora que».",
+          "answer": "earlier than",
           "options": [],
           "support": "",
-          "note": "Never contrasts directly with always here.",
+          "note": "Mia gets home earlier than Leo.",
           "aliases": []
         },
         {
-          "prompt": "Correct the full sentence: She don't do homework after dinner.",
-          "answer": "She doesn't do homework after dinner.",
+          "prompt": "Write the English for «dormir prou».",
+          "answer": "get enough sleep",
           "options": [],
           "support": "",
-          "note": "Doesn't agrees with she; do stays in the base form.",
-          "aliases": [
-            "She does not do homework after dinner."
-          ]
-        },
-        {
-          "prompt": "Write a do/does question for this answer: Yes, he catches the bus. Begin Does he ...?",
-          "answer": "Does he catch the bus?",
-          "options": [],
-          "support": "",
-          "note": "The question needs catch, not catches.",
+          "note": "I get enough sleep on school nights.",
           "aliases": []
         },
         {
-          "prompt": "Complete: My friend ____ to school, but I walk. Use catch the bus.",
-          "answer": "catches the bus",
+          "prompt": "Write the English for «limitar el temps de pantalla».",
+          "answer": "limit screen time",
           "options": [],
           "support": "",
-          "note": "Catch becomes catches with my friend.",
+          "note": "I limit screen time before bed.",
           "aliases": []
         },
         {
-          "prompt": "Rewrite with he: I brush my teeth and make my bed.",
-          "answer": "He brushes his teeth and makes his bed.",
+          "prompt": "Write the English for «trobar un equilibri».",
+          "answer": "strike a balance",
           "options": [],
           "support": "",
-          "note": "Both verbs and both possessives must change.",
+          "note": "I strike a balance between work and rest.",
           "aliases": []
         },
         {
-          "prompt": "Correct both errors: Does she gets up before she have breakfast?",
-          "answer": "Does she get up before she has breakfast?",
+          "prompt": "Complete the routine with the full expression: To be consistent, I ____.",
+          "answer": "stick to a routine",
           "options": [],
           "support": "",
-          "note": "The first verb follows does; the second clause needs has.",
+          "note": "I stick to a routine on weekdays.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the full expression: When I am tired, I ____.",
+          "answer": "turn in",
+          "options": [],
+          "support": "",
+          "note": "I turn in at ten.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the full expression: After breakfast, I ____.",
+          "answer": "head out for school",
+          "options": [],
+          "support": "",
+          "note": "I head out for school at eight.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the full expression: After homework, I ____.",
+          "answer": "wind down",
+          "options": [],
+          "support": "",
+          "note": "I wind down with music.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the full expression: At the weekend, I sometimes ____.",
+          "answer": "sleep in",
+          "options": [],
+          "support": "",
+          "note": "I sleep in on Sundays.",
           "aliases": []
         }
       ],
       "scramble": [
         {
-          "sentence": "She usually walks to school but I catch the bus.",
-          "prompt": "Begin with She; put usually before the first verb. Contrast the routines.",
-          "hint": "",
-          "chunks": [
-            "She",
-            "usually",
-            "walks",
-            "to",
-            "school",
-            "but",
-            "I",
-            "catch",
-            "the",
-            "bus."
-          ],
-          "extra": [
-            "walk",
-            "catches"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "He doesn't stay up late because he has school tomorrow.",
-          "prompt": "Begin with He; give the reason after because.",
-          "hint": "",
-          "chunks": [
-            "He",
-            "doesn't",
-            "stay",
-            "up",
-            "late",
-            "because",
-            "he",
-            "has",
-            "school",
-            "tomorrow."
-          ],
-          "extra": [
-            "stays",
-            "have"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "Does she brush her teeth before she goes to bed?",
-          "prompt": "Begin with Does she brush; ask about the order of these routines.",
-          "hint": "",
-          "chunks": [
-            "Does",
-            "she",
-            "brush",
-            "her",
-            "teeth",
-            "before",
-            "she",
-            "goes",
-            "to",
-            "bed?"
-          ],
-          "extra": [
-            "brushes",
-            "go"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "My brother never has breakfast at school.",
-          "prompt": "Begin with My brother; put never before the action.",
-          "hint": "",
-          "chunks": [
-            "My",
-            "brother",
-            "never",
-            "has",
-            "breakfast",
-            "at",
-            "school."
-          ],
-          "extra": [
-            "doesn't",
-            "have"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "I usually do homework before I hang out with friends.",
-          "prompt": "Begin with I usually do homework; give the later activity second.",
-          "hint": "",
+          "sentence": "I make an effort to finish my homework.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
             "I",
-            "usually",
-            "do",
-            "homework",
-            "before",
-            "I",
-            "hang",
-            "out",
-            "with",
-            "friends."
-          ],
-          "extra": [
             "make",
-            "hanging"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "She gets dressed and then packs her bag.",
-          "prompt": "Begin with She gets dressed; put then directly after and.",
-          "hint": "",
-          "chunks": [
-            "She",
-            "gets",
-            "dressed",
-            "and",
-            "then",
-            "packs",
-            "her",
-            "bag."
+            "an",
+            "effort",
+            "to",
+            "finish",
+            "my",
+            "homework."
           ],
           "extra": [
-            "pack",
-            "his"
+            "tomorrow",
+            "yesterday"
           ],
           "alternatives": []
         },
         {
-          "sentence": "He drinks water because he is thirsty.",
-          "prompt": "Begin with He drinks water; add the reason.",
-          "hint": "",
+          "sentence": "Although I am tired I pay attention in class.",
+          "prompt": "Build the studied routine sentence. Begin with \"Although\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
-            "He",
-            "drinks",
-            "water",
-            "because",
-            "he",
-            "is",
-            "thirsty."
+            "Although",
+            "I",
+            "am",
+            "tired",
+            "I",
+            "pay",
+            "attention",
+            "in",
+            "class."
           ],
           "extra": [
-            "drink",
-            "are"
+            "tomorrow",
+            "yesterday"
           ],
           "alternatives": []
         },
         {
-          "sentence": "I walk every day but my friend usually catches the bus.",
-          "prompt": "Begin with I walk every day; put usually before catches.",
-          "hint": "",
+          "sentence": "I make progress when I practise often.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
           "chunks": [
             "I",
-            "walk",
-            "every",
-            "day",
-            "but",
-            "my",
-            "friend",
-            "usually",
-            "catches",
-            "the",
-            "bus."
+            "make",
+            "progress",
+            "when",
+            "I",
+            "practise",
+            "often."
           ],
           "extra": [
-            "catch",
-            "walks"
+            "tomorrow",
+            "yesterday"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "Mia wakes up earlier than Leo.",
+          "prompt": "Build the studied routine sentence. Begin with \"Mia\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "Mia",
+            "wakes",
+            "up",
+            "earlier",
+            "than",
+            "Leo."
+          ],
+          "extra": [
+            "tomorrow",
+            "yesterday"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "I do my best to stick to a routine.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "I",
+            "do",
+            "my",
+            "best",
+            "to",
+            "stick",
+            "to",
+            "a",
+            "routine."
+          ],
+          "extra": [
+            "tomorrow",
+            "yesterday"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "I have a break after studying.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "I",
+            "have",
+            "a",
+            "break",
+            "after",
+            "studying."
+          ],
+          "extra": [
+            "tomorrow",
+            "yesterday"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "Both students wind down in the evening.",
+          "prompt": "Build the studied routine sentence. Begin with \"Both\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "Both",
+            "students",
+            "wind",
+            "down",
+            "in",
+            "the",
+            "evening."
+          ],
+          "extra": [
+            "tomorrow",
+            "yesterday"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "I limit screen time so I get enough sleep.",
+          "prompt": "Build the studied routine sentence. Begin with \"I\".",
+          "hint": "Use the routine expressions you have practised.",
+          "chunks": [
+            "I",
+            "limit",
+            "screen",
+            "time",
+            "so",
+            "I",
+            "get",
+            "enough",
+            "sleep."
+          ],
+          "extra": [
+            "tomorrow",
+            "yesterday"
           ],
           "alternatives": []
         }
@@ -2003,10 +2161,10 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
     }
   },
   "categories": [
-    "Daily routines",
-    "Time",
-    "Frequency",
-    "Verbs"
+    "Meaning",
+    "Routine context",
+    "Translations",
+    "Use it"
   ],
   "pictures": [
     {
@@ -2160,7 +2318,7 @@ const ROUTE_INFO={
  daring:{short:'Inference and less support',detail:DATA.course===2?'Infer expressions, correct verb forms and compare routines. Some sentence puzzles include extra words.':'Infer meaning and nuance, practise pronoun placement and connectors, and write without a word bank.'}
 };
 const GAMES={
- rosco:{name:'Alphabet Challenge',icon:'rosco',tag:'26 letters',desc:'A full word wheel. Read the clue, find the expression or pass and return.',badges:['Write the answer · Catalan instructions','English clues + typed answers','Infer the expression from context']},
+ rosco:{name:'Alphabet Challenge',icon:'rosco',tag:'A curriculum-based word wheel',desc:'A wheel of studied expressions. Read the clue, find the answer or pass and return.',badges:['Write the answer · Catalan instructions','English clues + typed answers','Infer the expression from context']},
  jeopardy:{name:'Vocabulary Jeopardy',icon:'jeopardy',tag:'4 categories \u00b7 100\u2013500 points',desc:'Choose a category. Take a chance. Build your score one question at a time.',badges:['Two choices + a clear clue','Gaps + guided written answers','Precision, correction + nuance']},
  memory:{name:'Memory Match',icon:'memory',tag:'Find the pairs',desc:'Turn two cards. Connect the language, not just the position.',badges:['Expression \u2194 Catalan meaning','Expression \u2194 English definition','Expression \u2194 contextual gap']},
  scramble:{name:'Sentence Scramble',icon:'scramble',tag:'8 sentences',desc:'Make the pieces work together. Build a sentence you can actually use.',badges:['Chunk tiles + a starting cue','Word tiles + grammar in context','Word tiles + 2 distractors']},
@@ -2266,7 +2424,7 @@ const ENGLISH_UI={
  'Desfés':'Undo','Buida':'Clear','Quina rutina s’amaga?':'Which routine is hidden?',
  'Escriu la rutina en anglès':'Write the routine in English','Endevina la imatge':'Guess the picture',
  'Pots endevinar la imatge una vegada per encert al qüestionari. Si falles, cal un altre encert per tornar-hi.':'You may guess once after each correct answer. If your guess is wrong, answer another question correctly to try again.',
- 'AL PRINCIPI':'AT THE START','DINS DE LA RESPOSTA':'IN THE ANSWER','26 lletres':'26 letters',
+ 'AL PRINCIPI':'AT THE START','DINS DE LA RESPOSTA':'IN THE ANSWER','lletres':'letters',
  'Encert':'Correct','Tancada':'Closed','Hi tornarem':'Come back later','Pista en anglès':'Clue in English',
  'Ajuda:':'Help:','Passa paraula ↷':'Pass ↷','Passar no resta punts.':'Passing costs no points.',
  'Escriu l’expressió, no una explicació. Fes servir la forma base, tret que la pista en demani una altra.':'Write the expression, not an explanation. Use the base form unless the clue requests another form.',
@@ -2366,7 +2524,7 @@ function renderScores(){
 }
 function renderStatus(){
  const id=game.id;let status='',rule='';
- if(id==='rosco'){status=game.letters.filter(x=>['correct','wrong'].includes(x.status)).length+' / 26 answered';rule='Correct +10 \u00b7 pass and return \u00b7 a wrong answer closes the letter';}
+ if(id==='rosco'){status=game.letters.filter(x=>['correct','wrong'].includes(x.status)).length+' / '+game.letters.length+' answered';rule='Correct +10 \u00b7 pass and return \u00b7 a wrong answer closes the letter';}
  if(id==='jeopardy'){status=Object.keys(game.used).length+' / 20 tiles played';rule='Earn the tile value \u00b7 no negative points';}
  if(id==='memory'){status=game.matched.size+' / '+game.pairCount+' pairs \u00b7 '+game.memoryAttempts+' attempts';rule='A matching pair +20 \u00b7 two cards per turn';}
  if(id==='scramble'){status='Sentence '+(game.index+1)+' / '+game.questions.length;rule=game.route==='daring'?'Use only the words you need \u00b7 2 distractors \u00b7 one attempt':'First try +10 \u00b7 a successful retry +5';}
@@ -2439,7 +2597,7 @@ function resolveAnswer(answer,timeout=false){
  addAttempt(t.prompt,timeout?'[time expired]':answer,t.answer,good,points,t.note);
  showFeedback(t,answer,good,points,{timeout});renderGame();focusFeedback();
 }
-function nextLetter(){for(let step=1;step<=26;step++){const i=(game.index+step)%26;if(['pending','passed'].includes(game.letters[i].status))return i;}return -1;}
+function nextLetter(){for(let step=1;step<=game.letters.length;step++){const i=(game.index+step)%game.letters.length;if(['pending','passed'].includes(game.letters[i].status))return i;}return -1;}
 function passLetter(){if(!game||game.id!=='rosco'||game.feedback||game.paused)return;game.letters[game.index].status='passed';const n=nextLetter();if(n<0){finishGame('All letters played');return;}game.index=n;nextTeam();renderGame();focusQuestion();}
 function turnMemoryCard(i){
  if(!game||game.id!=='memory'||game.feedback||game.paused||game.ended)return;const card=game.cards[i];if(!card||game.flipped.includes(i)||game.matched.has(card.pair))return;
@@ -2638,9 +2796,9 @@ function renderRosco(){
  const rule=starts?(game.route==='insecure'?'Comen\u00e7a per ':'Starts with ')+letter:(game.route==='insecure'?'Cont\u00e9 la ':'Contains ')+letter;
  const english=(starts?'Starts with ':'Contains ')+letter;
  const explain=game.route==='insecure'?(starts?'La primera lletra de la resposta ha de ser la '+letter+'.':'La resposta inclou la '+letter+' dins de la paraula o expressi\u00f3; no hi comen\u00e7a.'):(starts?'The answer must begin with '+letter+'.':'The answer contains '+letter+' somewhere inside the word or expression.');
- const nodes=game.letters.map((x,i)=>{const theta=(i/26)*2*Math.PI-Math.PI/2;const xPos=50+44*Math.cos(theta),yPos=50+44*Math.sin(theta);const done=['correct','wrong'].includes(x.status);const mark=x.status==='correct'?'\u2713':x.status==='wrong'?'\u00d7':x.status==='passed'?'\u21b7':'';
+ const nodes=game.letters.map((x,i)=>{const theta=(i/game.letters.length)*2*Math.PI-Math.PI/2;const xPos=50+44*Math.cos(theta),yPos=50+44*Math.sin(theta);const done=['correct','wrong'].includes(x.status);const mark=x.status==='correct'?'\u2713':x.status==='wrong'?'\u00d7':x.status==='passed'?'\u21b7':'';
  return '<button class="letter-node '+(i===game.index?'current ':'')+x.status+'" type="button" style="left:'+xPos.toFixed(2)+'%;top:'+yPos.toFixed(2)+'%" aria-label="Lletra '+x.letter+', '+({pending:'pendent',correct:'encertada',wrong:'tancada',passed:'passada'}[x.status])+(i===game.index?', pregunta actual':'')+'" '+(done||game.feedback?'disabled':'')+' data-letter="'+i+'">'+x.letter+(mark?'<span class="node-mark" aria-hidden="true">'+mark+'</span>':'')+'</button>';}).join('');
- return '<div class="split-game"><div class="wheel-panel"><div class="wheel-heading"><span>ALPHABET CHALLENGE</span><b>26 lletres</b></div><div class="wheel">'+nodes+'<div class="wheel-center '+cls+'"><span class="big-letter">'+letter+'</span><p lang="ca">'+rule+'</p><div class="letter-pattern" aria-hidden="true">'+(starts?'<b>'+letter+'</b><i></i><i></i><i></i>':'<i></i><i></i><b>'+letter+'</b><i></i><i></i>')+'</div><small lang="ca">'+(starts?'AL PRINCIPI':'DINS DE LA RESPOSTA')+'</small></div></div><div class="wheel-legend" lang="ca"><span><i class="legend-dot good"></i>\u2713 Encert</span><span><i class="legend-dot bad"></i>\u00d7 Tancada</span><span><i class="legend-dot pass"></i>\u21b7 Hi tornarem</span></div></div><section class="play-panel"><div class="letter-rule '+cls+'" lang="ca"><span class="rule-letter" aria-hidden="true">'+letter+'</span><div><span class="rule-english" lang="en">'+english+'</span><h2>'+rule+'</h2><p>'+explain+'</p></div></div><p class="question-label" lang="ca">Pista en angl\u00e8s</p><h2 class="question-text" lang="en">'+esc(t.prompt)+'</h2>'+(game.route!=='insecure'&&t.support?'<p class="support-box" lang="ca"><strong>Ajuda:</strong> '+esc(t.support)+'</p>':'')+(game.route==='daring'?'<p class="word-bank" lang="ca">Escriu l\u2019expressi\u00f3, no una explicaci\u00f3. Fes servir la forma base, tret que la pista en demani una altra.</p>':'')+answerHTML(t)+(!game.feedback?'<div class="arena-actions pass-actions"><button class="pass-button" type="button" data-action="pass">Passa paraula \u21b7</button><span lang="ca">Hi tornarem despr\u00e9s.<br>Passar no resta punts.</span></div>':'')+feedbackHTML('Seg\u00fcent lletra \u2192')+'</section></div>';
+ return '<div class="split-game"><div class="wheel-panel"><div class="wheel-heading"><span>ALPHABET CHALLENGE</span><b>'+game.letters.length+' lletres</b></div><div class="wheel">'+nodes+'<div class="wheel-center '+cls+'"><span class="big-letter">'+letter+'</span><p lang="ca">'+rule+'</p><div class="letter-pattern" aria-hidden="true">'+(starts?'<b>'+letter+'</b><i></i><i></i><i></i>':'<i></i><i></i><b>'+letter+'</b><i></i><i></i>')+'</div><small lang="ca">'+(starts?'AL PRINCIPI':'DINS DE LA RESPOSTA')+'</small></div></div><div class="wheel-legend" lang="ca"><span><i class="legend-dot good"></i>\u2713 Encert</span><span><i class="legend-dot bad"></i>\u00d7 Tancada</span><span><i class="legend-dot pass"></i>\u21b7 Hi tornarem</span></div></div><section class="play-panel"><div class="letter-rule '+cls+'" lang="ca"><span class="rule-letter" aria-hidden="true">'+letter+'</span><div><span class="rule-english" lang="en">'+english+'</span><h2>'+rule+'</h2><p>'+explain+'</p></div></div><p class="question-label" lang="ca">Pista en angl\u00e8s</p><h2 class="question-text" lang="en">'+esc(t.prompt)+'</h2>'+(game.route!=='insecure'&&t.support?'<p class="support-box" lang="ca"><strong>Ajuda:</strong> '+esc(t.support)+'</p>':'')+(game.route==='daring'?'<p class="word-bank" lang="ca">Escriu l\u2019expressi\u00f3, no una explicaci\u00f3. Fes servir la forma base, tret que la pista en demani una altra.</p>':'')+answerHTML(t)+(!game.feedback?'<div class="arena-actions pass-actions"><button class="pass-button" type="button" data-action="pass">Passa paraula \u21b7</button><span lang="ca">Hi tornarem despr\u00e9s.<br>Passar no resta punts.</span></div>':'')+feedbackHTML('Seg\u00fcent lletra \u2192')+'</section></div>';
 }
 
 // Delegated events keep all six games keyboard- and touch-friendly after re-rendering.
