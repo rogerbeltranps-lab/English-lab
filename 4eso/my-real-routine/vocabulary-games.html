@@ -2330,7 +2330,7 @@ function makeVocabTask(entry,purpose,index,letter=''){
  const r=game.route,key=purpose+'-'+index,bank=chosenPool();let prompt,answer=entry.term,options=[],support='',aliases=[];
  if(purpose==='rush'&&r==='insecure'){
   prompt='What does \u201c'+entry.term+'\u201d mean?';answer=entry.ca;
-  options=makeOptions(answer,[...entry.distractors.filter(t=>DATA.bank[t]).map(t=>DATA.bank[t].ca),...bank.map(t=>t.ca)],3,key);
+  options=makeOptions(answer,[...entry.distractors.filter(t=>bank.some(e=>e.term===t)).map(t=>DATA.bank[t].ca),...bank.map(t=>t.ca)],3,key);
   support='';
  }else{
   prompt=r==='daring'?(purpose==='rosco'||purpose==='mystery'?entry.inference:entry.gap):(r==='safe'&&purpose==='mystery'?entry.gap:entry.definition);
@@ -2339,7 +2339,7 @@ function makeVocabTask(entry,purpose,index,letter=''){
    options=purpose==='rosco'?[]:makeOptions(answer,candidates,3,key);support='';
   }else if(purpose==='rush'||(purpose==='mystery'&&r==='safe')){
    // Daring distractors are deliberately close in meaning, not just random words.
-   const close=entry.distractors.filter(x=>x!==answer);
+   const close=entry.distractors.filter(x=>x!==answer&&bank.some(e=>e.term===x));
    const distractors=[...new Set([...mix(close,key+'-close'),...mix(bank.map(e=>e.term),key+'-extra')])].filter(x=>x!==answer).slice(0,3);
    options=mix([answer,...distractors],key+'-options');
   }
