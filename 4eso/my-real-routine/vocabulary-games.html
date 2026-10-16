@@ -163,550 +163,784 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
   "course": 4,
   "title": "My Real Routine",
   "bank": {
+    "wake up": {
+      "term": "wake up",
+      "ca": "despertar-se",
+      "definition": "Stop sleeping and become awake.",
+      "example": "I wake up at seven.",
+      "gap": "I ____ at seven, before I get up.",
+      "inference": "Stop sleeping and become awake.",
+      "distractors": [
+        "have breakfast",
+        "go to bed",
+        "often"
+      ]
+    },
+    "get up": {
+      "term": "get up",
+      "ca": "llevar-se",
+      "definition": "Leave your bed after sleeping.",
+      "example": "I get up at a quarter past seven.",
+      "gap": "I ____ after my alarm rings.",
+      "inference": "Leave your bed after sleeping.",
+      "distractors": [
+        "go to school",
+        "watch TV",
+        "sometimes"
+      ]
+    },
+    "have a shower": {
+      "term": "have a shower",
+      "ca": "dutxar-se",
+      "definition": "Wash your body in a shower.",
+      "example": "I have a shower before breakfast.",
+      "gap": "In the morning, I ____.",
+      "inference": "Wash your body in a shower.",
+      "distractors": [
+        "come home",
+        "do homework",
+        "never"
+      ]
+    },
+    "have breakfast": {
+      "term": "have breakfast",
+      "ca": "esmorzar",
+      "definition": "Eat the first meal of the day.",
+      "example": "I have breakfast before school.",
+      "gap": "I ____ at eight.",
+      "inference": "Eat the first meal of the day.",
+      "distractors": [
+        "get home",
+        "always",
+        "go on foot"
+      ]
+    },
+    "go to school": {
+      "term": "go to school",
+      "ca": "anar a l'escola",
+      "definition": "Travel to school.",
+      "example": "I go to school on foot.",
+      "gap": "I ____ from Monday to Friday.",
+      "inference": "Travel to school.",
+      "distractors": [
+        "have dinner",
+        "usually",
+        "have a snack"
+      ]
+    },
+    "come home": {
+      "term": "come home",
+      "ca": "tornar a casa",
+      "definition": "Return to your home.",
+      "example": "I come home after classes.",
+      "gap": "I ____ after school.",
+      "inference": "Return to your home.",
+      "distractors": [
+        "go to bed",
+        "often",
+        "head out for school"
+      ]
+    },
+    "get home": {
+      "term": "get home",
+      "ca": "arribar a casa",
+      "definition": "Arrive at your home.",
+      "example": "I get home at five.",
+      "gap": "I ____ after school.",
+      "inference": "Arrive at your home.",
+      "distractors": [
+        "watch TV",
+        "sometimes",
+        "wind down"
+      ]
+    },
+    "have dinner": {
+      "term": "have dinner",
+      "ca": "sopar",
+      "definition": "Eat the evening meal.",
+      "example": "I have dinner with my family.",
+      "gap": "At eight, we ____.",
+      "inference": "Eat the evening meal.",
+      "distractors": [
+        "do homework",
+        "never",
+        "turn in"
+      ]
+    },
+    "go to bed": {
+      "term": "go to bed",
+      "ca": "anar al llit",
+      "definition": "Go to bed to sleep.",
+      "example": "I go to bed at ten.",
+      "gap": "At ten, I ____.",
+      "inference": "Go to bed to sleep.",
+      "distractors": [
+        "always",
+        "go on foot",
+        "sleep in"
+      ]
+    },
+    "watch TV": {
+      "term": "watch TV",
+      "ca": "mirar la televisió",
+      "definition": "Watch television programmes.",
+      "example": "I watch TV after dinner.",
+      "gap": "In the evening, I sometimes ____.",
+      "inference": "Watch television programmes.",
+      "distractors": [
+        "usually",
+        "have a snack",
+        "stay hydrated"
+      ]
+    },
+    "do homework": {
+      "term": "do homework",
+      "ca": "fer els deures",
+      "definition": "Complete work from your lessons at home.",
+      "example": "I do homework after school.",
+      "gap": "After a short break, I ____.",
+      "inference": "Complete work from your lessons at home.",
+      "distractors": [
+        "often",
+        "head out for school",
+        "get enough sleep"
+      ]
+    },
+    "always": {
+      "term": "always",
+      "ca": "sempre",
+      "definition": "On every occasion.",
+      "example": "I always have breakfast.",
+      "gap": "I ____ do my homework on school days.",
+      "inference": "On every occasion.",
+      "distractors": [
+        "sometimes",
+        "wind down",
+        "be physically active"
+      ]
+    },
+    "usually": {
+      "term": "usually",
+      "ca": "normalment",
+      "definition": "On most occasions.",
+      "example": "I usually walk to school.",
+      "gap": "I ____ go on foot, but sometimes take the bus.",
+      "inference": "On most occasions.",
+      "distractors": [
+        "never",
+        "turn in",
+        "take regular breaks"
+      ]
+    },
+    "often": {
+      "term": "often",
+      "ca": "sovint",
+      "definition": "Many times, but not every time.",
+      "example": "I often have a snack at five.",
+      "gap": "I ____ read in the evening.",
+      "inference": "Many times, but not every time.",
+      "distractors": [
+        "go on foot",
+        "sleep in",
+        "limit screen time"
+      ]
+    },
+    "sometimes": {
+      "term": "sometimes",
+      "ca": "de vegades",
+      "definition": "On some occasions, not always.",
+      "example": "I sometimes watch TV at night.",
+      "gap": "I ____ go to school by bus.",
+      "inference": "On some occasions, not always.",
+      "distractors": [
+        "have a snack",
+        "stay hydrated",
+        "manage stress"
+      ]
+    },
+    "never": {
+      "term": "never",
+      "ca": "mai",
+      "definition": "Not on any occasion.",
+      "example": "I never stay up on school nights.",
+      "gap": "I ____ skip breakfast.",
+      "inference": "Not on any occasion.",
+      "distractors": [
+        "head out for school",
+        "get enough sleep",
+        "get up early"
+      ]
+    },
+    "go on foot": {
+      "term": "go on foot",
+      "ca": "anar a peu",
+      "definition": "Travel somewhere by walking.",
+      "example": "I go to school on foot.",
+      "gap": "My school is near, so I ____.",
+      "inference": "Travel somewhere by walking.",
+      "distractors": [
+        "wind down",
+        "be physically active",
+        "make the bed"
+      ]
+    },
+    "have a snack": {
+      "term": "have a snack",
+      "ca": "berenar / fer un mos",
+      "definition": "Eat a small amount between main meals.",
+      "example": "I have a snack when I get home.",
+      "gap": "When I arrive home, I ____.",
+      "inference": "Eat a small amount between main meals.",
+      "distractors": [
+        "turn in",
+        "take regular breaks",
+        "run errands"
+      ]
+    },
+    "head out for school": {
+      "term": "head out for school",
+      "ca": "sortir cap a l'escola",
+      "definition": "Leave home to go to school.",
+      "example": "I head out for school at eight.",
+      "gap": "After breakfast, I ____.",
+      "inference": "Leave home to go to school.",
+      "distractors": [
+        "sleep in",
+        "limit screen time",
+        "go shopping"
+      ]
+    },
     "wind down": {
       "term": "wind down",
       "ca": "relaxar-se progressivament",
-      "definition": "Gradually relax after a period of work or activity.",
-      "example": "I wind down by reading after a demanding day.",
-      "gap": "After a demanding day, I ____ gradually by listening to calm music.",
-      "inference": "I do not stop work abruptly; I gradually become more relaxed afterwards. Which phrasal verb fits?",
+      "definition": "Gradually relax after a busy day.",
+      "example": "I wind down with a book.",
+      "gap": "After school, I ____ with music.",
+      "inference": "Gradually relax after a busy day.",
       "distractors": [
-        "switch off",
-        "stay up",
+        "stay hydrated",
+        "manage stress",
+        "have a chat"
+      ]
+    },
+    "turn in": {
+      "term": "turn in",
+      "ca": "anar-se'n a dormir",
+      "definition": "Go to bed for the night.",
+      "example": "I turn in at ten.",
+      "gap": "At the end of the day, I ____.",
+      "inference": "Go to bed for the night.",
+      "distractors": [
+        "get enough sleep",
+        "get up early",
+        "stay in"
+      ]
+    },
+    "sleep in": {
+      "term": "sleep in",
+      "ca": "dormir fins més tard",
+      "definition": "Stay asleep or in bed longer than usual.",
+      "example": "I sleep in on Saturdays.",
+      "gap": "On Sundays, I sometimes ____.",
+      "inference": "Stay asleep or in bed longer than usual.",
+      "distractors": [
+        "be physically active",
+        "make the bed",
+        "eat out"
+      ]
+    },
+    "stay hydrated": {
+      "term": "stay hydrated",
+      "ca": "mantenir-se hidratat/da",
+      "definition": "Drink enough water throughout the day.",
+      "example": "I stay hydrated by drinking water.",
+      "gap": "I bring a bottle to ____.",
+      "inference": "Drink enough water throughout the day.",
+      "distractors": [
+        "take regular breaks",
+        "run errands",
+        "put off"
+      ]
+    },
+    "get enough sleep": {
+      "term": "get enough sleep",
+      "ca": "dormir prou",
+      "definition": "Sleep for a sufficient amount of time.",
+      "example": "I get enough sleep on weekdays.",
+      "gap": "I turn in early to ____.",
+      "inference": "Sleep for a sufficient amount of time.",
+      "distractors": [
+        "limit screen time",
+        "go shopping",
+        "pick up"
+      ]
+    },
+    "be physically active": {
+      "term": "be physically active",
+      "ca": "mantenir-se físicament actiu/va",
+      "definition": "Move your body regularly.",
+      "example": "I am physically active after school.",
+      "gap": "I walk to school to ____.",
+      "inference": "Move your body regularly.",
+      "distractors": [
+        "manage stress",
+        "have a chat",
+        "catch up on"
+      ]
+    },
+    "take regular breaks": {
+      "term": "take regular breaks",
+      "ca": "fer pauses regulars",
+      "definition": "Pause your activities at suitable intervals.",
+      "example": "I take regular breaks when studying.",
+      "gap": "When I study, I ____.",
+      "inference": "Pause your activities at suitable intervals.",
+      "distractors": [
+        "get up early",
+        "stay in",
         "get down to"
+      ]
+    },
+    "limit screen time": {
+      "term": "limit screen time",
+      "ca": "limitar el temps de pantalla",
+      "definition": "Reduce how much time you spend looking at screens.",
+      "example": "I limit screen time before bed.",
+      "gap": "I ____ in the evening.",
+      "inference": "Reduce how much time you spend looking at screens.",
+      "distractors": [
+        "make the bed",
+        "eat out",
+        "cut down on sugary drinks"
+      ]
+    },
+    "manage stress": {
+      "term": "manage stress",
+      "ca": "gestionar l'estrès",
+      "definition": "Handle stress using helpful strategies.",
+      "example": "I manage stress by taking breaks.",
+      "gap": "I take breaks to ____.",
+      "inference": "Handle stress using helpful strategies.",
+      "distractors": [
+        "run errands",
+        "put off",
+        "maintain a balanced diet"
+      ]
+    },
+    "get up early": {
+      "term": "get up early",
+      "ca": "llevar-se d'hora",
+      "definition": "Leave bed early in the morning.",
+      "example": "I get up early on weekdays.",
+      "gap": "On school days, I ____.",
+      "inference": "Leave bed early in the morning.",
+      "distractors": [
+        "go shopping",
+        "pick up",
+        "establish a sleep routine"
+      ]
+    },
+    "make the bed": {
+      "term": "make the bed",
+      "ca": "fer el llit",
+      "definition": "Tidy your bed by arranging the covers.",
+      "example": "I make the bed in the morning.",
+      "gap": "Before leaving home, I ____.",
+      "inference": "Tidy your bed by arranging the covers.",
+      "distractors": [
+        "have a chat",
+        "catch up on",
+        "take screen breaks"
+      ]
+    },
+    "run errands": {
+      "term": "run errands",
+      "ca": "fer encàrrecs",
+      "definition": "Make short trips to complete everyday tasks.",
+      "example": "We run errands on Saturdays.",
+      "gap": "At the weekend, we ____.",
+      "inference": "Make short trips to complete everyday tasks.",
+      "distractors": [
+        "stay in",
+        "get down to",
+        "recharge"
+      ]
+    },
+    "go shopping": {
+      "term": "go shopping",
+      "ca": "anar de compres",
+      "definition": "Go to shops to buy things.",
+      "example": "We go shopping at the weekend.",
+      "gap": "On Saturdays, we ____.",
+      "inference": "Go to shops to buy things.",
+      "distractors": [
+        "eat out",
+        "cut down on sugary drinks",
+        "make an effort"
+      ]
+    },
+    "have a chat": {
+      "term": "have a chat",
+      "ca": "xerrar una estona",
+      "definition": "Talk informally with someone.",
+      "example": "I have a chat with my friend.",
+      "gap": "After dinner, we ____.",
+      "inference": "Talk informally with someone.",
+      "distractors": [
+        "put off",
+        "maintain a balanced diet",
+        "pay attention"
+      ]
+    },
+    "stay in": {
+      "term": "stay in",
+      "ca": "quedar-se a casa",
+      "definition": "Remain at home rather than go out.",
+      "example": "I stay in when I need to rest.",
+      "gap": "When I'm tired, I ____.",
+      "inference": "Remain at home rather than go out.",
+      "distractors": [
+        "pick up",
+        "establish a sleep routine",
+        "make a decision"
+      ]
+    },
+    "eat out": {
+      "term": "eat out",
+      "ca": "menjar fora",
+      "definition": "Eat a meal at a café or restaurant.",
+      "example": "We eat out on special occasions.",
+      "gap": "For birthdays, we sometimes ____.",
+      "inference": "Eat a meal at a café or restaurant.",
+      "distractors": [
+        "catch up on",
+        "take screen breaks",
+        "make progress"
       ]
     },
     "put off": {
       "term": "put off",
-      "ca": "ajornar",
-      "definition": "Delay an activity until a later time.",
-      "example": "I try not to put off difficult homework.",
-      "gap": "I ____ difficult tasks when I delay them until tomorrow.",
-      "inference": "The task is still on my list, but I postpone doing it. Name the phrasal verb in its base form.",
+      "ca": "ajornar / deixar per a més tard",
+      "definition": "Delay doing something.",
+      "example": "I put off my homework until later.",
+      "gap": "I should not ____ difficult homework.",
+      "inference": "Delay doing something.",
       "distractors": [
-        "give up",
         "get down to",
-        "catch up on"
+        "recharge",
+        "do your best"
       ]
     },
-    "make an effort": {
-      "term": "make an effort",
-      "ca": "esfor\u00e7ar-se",
-      "definition": "Try hard to do something, even when it is difficult.",
-      "example": "I make an effort to listen carefully.",
-      "gap": "Even when I feel tired, I ____ to contribute to the discussion.",
-      "inference": "It is not easy, but I consciously try hard rather than do the minimum. Name the collocation.",
+    "pick up": {
+      "term": "pick up",
+      "ca": "recollir",
+      "definition": "Collect someone or something.",
+      "example": "I pick up my sister after school.",
+      "gap": "After school, I ____ my sister.",
+      "inference": "Collect someone or something.",
       "distractors": [
-        "take a break",
-        "pay attention",
-        "call it a day"
-      ]
-    },
-    "pay attention": {
-      "term": "pay attention",
-      "ca": "parar atenci\u00f3",
-      "definition": "Focus carefully on what you are hearing or seeing.",
-      "example": "I pay attention to the instructions.",
-      "gap": "I ____ to the instructions so I do not miss a step.",
-      "inference": "My focus is on the explanation rather than the notifications on my phone. Which collocation fits?",
-      "distractors": [
+        "cut down on sugary drinks",
         "make an effort",
-        "take a break",
-        "wind down"
-      ]
-    },
-    "head out": {
-      "term": "head out",
-      "ca": "sortir; marxar",
-      "definition": "Leave a place, often to go somewhere else.",
-      "example": "I head out at eight and walk to the station.",
-      "gap": "I grab my keys and ____ of the house.",
-      "inference": "My keys are in my hand and I leave home. Which phrasal verb describes leaving, without implying a long trip?",
-      "distractors": [
-        "turn in",
-        "lie in",
-        "knock off"
-      ]
-    },
-    "set off": {
-      "term": "set off",
-      "ca": "posar-se en cam\u00ed",
-      "definition": "Begin a journey.",
-      "example": "We set off early to avoid traffic.",
-      "gap": "We ____ on our journey before the roads get busy.",
-      "inference": "The journey begins at six; arriving happens later. Name the phrasal verb for starting the journey.",
-      "distractors": [
-        "catch up on",
-        "turn in",
-        "wind down"
+        "have a break"
       ]
     },
     "catch up on": {
       "term": "catch up on",
       "ca": "posar-se al dia amb",
-      "definition": "Do something you have missed or fallen behind with.",
-      "example": "I catch up on homework after being away.",
-      "gap": "After missing two lessons, I need to ____ the work I missed.",
-      "inference": "I am not moving ahead to new material yet; I am dealing with work I missed. Which expression fits?",
+      "definition": "Do work that you have missed or delayed.",
+      "example": "I catch up on missed work.",
+      "gap": "On Fridays, I ____ missed homework.",
+      "inference": "Do work that you have missed or delayed.",
       "distractors": [
-        "keep up with",
-        "put off",
-        "give up"
+        "maintain a balanced diet",
+        "pay attention",
+        "take action"
       ]
     },
     "get down to": {
       "term": "get down to",
       "ca": "posar-se seriosament a",
-      "definition": "Start giving serious attention to a task.",
-      "example": "I get down to homework after a short break.",
-      "gap": "I stop finding excuses and ____ my homework.",
-      "inference": "Preparation and excuses are over. I now start the real work. Give the complete phrasal verb.",
+      "definition": "Begin working seriously on something.",
+      "example": "I get down to my homework after a break.",
+      "gap": "At five, I ____ my homework.",
+      "inference": "Begin working seriously on something.",
       "distractors": [
-        "put off",
-        "wind down",
-        "knock off"
+        "establish a sleep routine",
+        "make a decision",
+        "make a mistake"
       ]
     },
-    "knock off": {
-      "term": "knock off",
-      "ca": "plegar de treballar, informal",
-      "definition": "Finish working, in informal English.",
-      "example": "My uncle usually knocks off at five.",
-      "gap": "When my shift finishes, I ____ and leave work.",
-      "inference": "Use the informal expression for finishing work, not starting a journey or taking a short break.",
+    "cut down on sugary drinks": {
+      "term": "cut down on sugary drinks",
+      "ca": "reduir les begudes ensucrades",
+      "definition": "Have fewer sugary drinks.",
+      "example": "I cut down on sugary drinks.",
+      "gap": "To improve my routine, I ____.",
+      "inference": "Have fewer sugary drinks.",
       "distractors": [
-        "set off",
-        "get down to",
-        "take a break"
+        "take screen breaks",
+        "make progress",
+        "both"
       ]
     },
-    "rush hour": {
-      "term": "rush hour",
-      "ca": "hora punta",
-      "definition": "The busy time when many people travel to or from work or school.",
-      "example": "The buses are crowded during rush hour.",
-      "gap": "Lots of people travel to work at the same time during ____.",
-      "inference": "The road is congested because many people's work journeys happen together. Name this time period.",
+    "maintain a balanced diet": {
+      "term": "maintain a balanced diet",
+      "ca": "mantenir una alimentació equilibrada",
+      "definition": "Eat a variety of foods in sensible amounts.",
+      "example": "I maintain a balanced diet.",
+      "gap": "I plan different meals to ____.",
+      "inference": "Eat a variety of foods in sensible amounts.",
       "distractors": [
-        "quiet time",
-        "screen time",
-        "free time"
+        "recharge",
+        "do your best",
+        "although"
       ]
     },
-    "hit the road": {
-      "term": "hit the road",
-      "ca": "posar-se en marxa, expressi\u00f3 informal",
-      "definition": "Leave and start a journey, in informal English.",
-      "example": "Our bags are ready, so let's hit the road.",
-      "gap": "The car is packed. It is time to ____ and begin the journey.",
-      "inference": "We are ready to leave by car. Use the informal idiom containing a transport-related noun.",
+    "establish a sleep routine": {
+      "term": "establish a sleep routine",
+      "ca": "establir una rutina de son",
+      "definition": "Create a regular pattern for sleeping.",
+      "example": "I establish a sleep routine.",
+      "gap": "To sleep regularly, I ____.",
+      "inference": "Create a regular pattern for sleeping.",
       "distractors": [
-        "call it a day",
-        "bite the bullet",
-        "make an effort"
+        "make an effort",
+        "have a break",
+        "while"
       ]
     },
-    "bite the bullet": {
-      "term": "bite the bullet",
-      "ca": "afrontar una tasca desagradable amb decisi\u00f3",
-      "definition": "Decide to do something difficult or unpleasant that needs doing.",
-      "example": "I bite the bullet and start the task I have been avoiding.",
-      "gap": "The task is unpleasant but necessary, so I ____ and face it.",
-      "inference": "I have avoided a necessary task for days. Now I accept the difficulty and do it. Which idiom fits?",
+    "take screen breaks": {
+      "term": "take screen breaks",
+      "ca": "fer pauses de les pantalles",
+      "definition": "Pause screen use to rest.",
+      "example": "I take screen breaks after long tasks.",
+      "gap": "While studying online, I ____.",
+      "inference": "Pause screen use to rest.",
       "distractors": [
-        "put off",
-        "give up",
-        "call it a day"
+        "pay attention",
+        "take action",
+        "earlier than"
       ]
     },
-    "call it a day": {
-      "term": "call it a day",
-      "ca": "donar la feina per acabada per avui",
-      "definition": "Decide to stop working because you have done enough for now.",
-      "example": "After finishing the last task, we call it a day.",
-      "gap": "We have done enough for today, so we ____ and stop working.",
-      "inference": "We are not taking a five-minute pause; we decide that today's work is finished. Which idiom fits?",
+    "recharge": {
+      "term": "recharge",
+      "ca": "recuperar energia",
+      "definition": "Rest so that you feel ready again.",
+      "example": "I recharge by reading in the evening.",
+      "gap": "After school, I take a break to ____.",
+      "inference": "Rest so that you feel ready again.",
       "distractors": [
-        "take a break",
-        "get down to",
-        "catch up on"
+        "make a decision",
+        "make a mistake",
+        "build sustainable habits"
       ]
     },
-    "pick up": {
-      "term": "pick up",
-      "ca": "passar a recollir alg\u00fa",
-      "definition": "Collect someone from a place.",
-      "example": "I pick up my little brother after school.",
-      "gap": "I ____ my little brother from school and take him home.",
-      "inference": "My little brother is waiting at school. I go there to collect him. Give the base phrasal verb.",
+    "make an effort": {
+      "term": "make an effort",
+      "ca": "fer un esforç",
+      "definition": "Try hard even when something is difficult.",
+      "example": "I make an effort to start on time.",
+      "gap": "When a task is difficult, I ____.",
+      "inference": "Try hard even when something is difficult.",
       "distractors": [
-        "look after",
-        "head out",
-        "set off"
+        "make progress",
+        "both",
+        "strike a balance between"
       ]
     },
-    "switch off": {
-      "term": "switch off",
-      "ca": "desconnectar mentalment; apagar un aparell",
-      "definition": "Stop thinking about work or worries; also turn a device off.",
-      "example": "At home, I find it hard to switch off and stop thinking about work.",
-      "gap": "Even on holiday, I cannot ____ mentally: I keep thinking about work.",
-      "inference": "Here it is my mind, not a machine: I stop thinking about tasks and worries. Which phrasal verb fits?",
+    "pay attention": {
+      "term": "pay attention",
+      "ca": "parar atenció",
+      "definition": "Focus closely on something.",
+      "example": "I pay attention to the instructions.",
+      "gap": "In class, I ____ to the explanation.",
+      "inference": "Focus closely on something.",
       "distractors": [
-        "turn in",
-        "stay up",
-        "get down to"
+        "do your best",
+        "although",
+        "make conscious choices"
       ]
     },
-    "stay up": {
-      "term": "stay up",
-      "ca": "quedar-se despert fins tard",
-      "definition": "Remain awake instead of going to bed.",
-      "example": "I sometimes stay up late to finish a film.",
-      "gap": "I ____ past my usual bedtime when I keep watching the film.",
-      "inference": "Midnight arrives, and I still have not gone to bed. Name the phrasal verb for remaining awake.",
+    "make a decision": {
+      "term": "make a decision",
+      "ca": "prendre una decisió",
+      "definition": "Choose between possible actions.",
+      "example": "I make a decision about what to do first.",
+      "gap": "Before I start, I ____.",
+      "inference": "Choose between possible actions.",
       "distractors": [
-        "lie in",
-        "turn in",
+        "have a break",
+        "while",
+        "make a realistic adjustment"
+      ]
+    },
+    "make progress": {
+      "term": "make progress",
+      "ca": "progressar",
+      "definition": "Improve over time.",
+      "example": "I make progress with regular practice.",
+      "gap": "I practise each day to ____.",
+      "inference": "Improve over time.",
+      "distractors": [
+        "take action",
+        "earlier than",
         "wake up"
       ]
     },
-    "turn in": {
-      "term": "turn in",
-      "ca": "anar a dormir, informal",
-      "definition": "Go to bed, in informal English.",
-      "example": "I am tired, so I turn in early.",
-      "gap": "I am sleepy, so I ____ and go to bed.",
-      "inference": "In this routine, it does not mean submit homework. Give the informal phrasal verb meaning go to bed.",
+    "do your best": {
+      "term": "do your best",
+      "ca": "fer-ho tan bé com puguis",
+      "definition": "Try as hard as possible.",
+      "example": "You do your best when you practise.",
+      "gap": "Even when it is hard, ____.",
+      "inference": "Try as hard as possible.",
       "distractors": [
-        "stay up",
-        "lie in",
-        "head out"
+        "make a mistake",
+        "build sustainable habits",
+        "get up"
       ]
     },
-    "lie in": {
-      "term": "lie in",
-      "ca": "quedar-se al llit m\u00e9s tard de l'habitual",
-      "definition": "Stay in bed later than usual in the morning.",
-      "example": "On Sunday, I sometimes lie in until nine.",
-      "gap": "On a free morning, I ____ instead of getting out of bed at my usual time.",
-      "inference": "It is morning, not late evening. I remain in bed later than usual. Which expression fits?",
-      "distractors": [
-        "stay up",
-        "turn in",
-        "head out"
-      ]
-    },
-    "juggle commitments": {
-      "term": "juggle commitments",
-      "ca": "compaginar diversos compromisos",
-      "definition": "Manage several responsibilities that compete for your time.",
-      "example": "I juggle commitments such as school, sport and helping at home.",
-      "gap": "I ____ when school, training and family tasks all need my time.",
-      "inference": "Several responsibilities compete for the same afternoon. Give the collocation with the idea of keeping several things in the air.",
-      "distractors": [
-        "put off",
-        "call it a day",
-        "take a break"
-      ]
-    },
-    "quiet time": {
-      "term": "quiet time",
-      "ca": "estona de tranquil\u00b7litat",
-      "definition": "A period without much noise or activity.",
-      "example": "I enjoy some quiet time after school.",
-      "gap": "After a noisy day, I enjoy some ____ without music or notifications.",
-      "inference": "Nothing needs to happen during this peaceful, low-noise period. Give the two-word noun phrase.",
-      "distractors": [
-        "rush hour",
-        "screen time",
-        "exercise"
-      ]
-    },
-    "avoid distractions": {
-      "term": "avoid distractions",
-      "ca": "evitar distraccions",
-      "definition": "Keep away from things that interrupt your focus.",
-      "example": "I avoid distractions by silencing unnecessary alerts.",
-      "gap": "I ____ by silencing notifications while I study.",
-      "inference": "I remove interruptions before they pull my attention away. Give the verb + plural noun phrase.",
-      "distractors": [
-        "pay attention",
-        "make an effort",
-        "stay up"
-      ]
-    },
-    "exercise": {
-      "term": "exercise",
-      "ca": "fer exercici",
-      "definition": "Do physical activity to move or train the body.",
-      "example": "I exercise by swimming and dancing.",
-      "gap": "Swimming and dancing are two ways I ____.",
-      "inference": "Do not name a specific sport. Give the general verb for doing physical activity.",
-      "distractors": [
-        "wind down",
-        "lie in",
-        "turn in"
-      ]
-    },
-    "snooze": {
-      "term": "snooze",
-      "ca": "dormitar; tornar a dormir breument",
-      "definition": "Sleep lightly or for a short extra period.",
-      "example": "I sometimes snooze for five minutes after the alarm.",
-      "gap": "After the alarm, I ____ for five more minutes rather than get up.",
-      "inference": "I press the alarm button for a little extra sleep, not a full morning in bed. Which verb fits?",
-      "distractors": [
-        "lie in",
-        "stay up",
-        "head out"
-      ]
-    },
-    "look after": {
-      "term": "look after",
-      "ca": "tenir cura de",
-      "definition": "Take care of someone or something.",
-      "example": "I look after my younger cousin on Fridays.",
-      "gap": "I ____ my younger cousin by keeping them safe and helping them.",
-      "inference": "I am responsible for another person's care, not just collecting them from a place. Which phrasal verb fits?",
-      "distractors": [
-        "pick up",
-        "keep up with",
-        "head out"
-      ]
-    },
-    "keep up with": {
-      "term": "keep up with",
-      "ca": "seguir el ritme de; no quedar enrere",
-      "definition": "Stay at the required pace without falling behind.",
-      "example": "I keep up with homework by doing a little each day.",
-      "gap": "I do a little daily so I can ____ the work and avoid falling behind.",
-      "inference": "I am maintaining the required pace, not recovering work I already missed. Which expression fits?",
-      "distractors": [
-        "catch up on",
-        "fall behind",
-        "put off"
-      ]
-    },
-    "cut down on": {
-      "term": "cut down on",
-      "ca": "reduir el consum o la freq\u00fc\u00e8ncia de",
-      "definition": "Reduce how much of something you use or do.",
-      "example": "I want to cut down on late-night scrolling.",
-      "gap": "I want to scroll less, not stop completely, so I will ____ it.",
-      "inference": "The aim is a reduction, not total abandonment. Give the complete phrasal verb.",
-      "distractors": [
-        "give up",
-        "run out of",
-        "keep up with"
-      ]
-    },
-    "run out of": {
-      "term": "run out of",
-      "ca": "quedar-se sense",
-      "definition": "Use all of something so none is left.",
-      "example": "I sometimes run out of time before the bus leaves.",
-      "gap": "I ____ time when there is none left to finish the task.",
-      "inference": "My remaining supply reaches zero. Give the phrasal verb that comes before time or money.",
-      "distractors": [
-        "cut down on",
-        "catch up on",
-        "get down to"
-      ]
-    },
-    "take a break": {
-      "term": "take a break",
+    "have a break": {
+      "term": "have a break",
       "ca": "fer una pausa",
-      "definition": "Stop briefly to rest before continuing.",
-      "example": "I take a break between study sessions.",
-      "gap": "I ____ for a few minutes, then return to the same task.",
-      "inference": "I plan to return to the task soon; today's work is not finished. Which expression fits?",
+      "definition": "Stop work briefly to rest.",
+      "example": "I have a break after homework.",
+      "gap": "After studying, I ____.",
+      "inference": "Stop work briefly to rest.",
       "distractors": [
-        "call it a day",
-        "give up",
-        "knock off"
+        "both",
+        "strike a balance between",
+        "have a shower"
       ]
     },
-    "plan ahead": {
-      "term": "plan ahead",
-      "ca": "planificar amb antelaci\u00f3",
-      "definition": "Make arrangements before you need them.",
-      "example": "I plan ahead by packing my bag the night before.",
-      "gap": "I ____ by checking tomorrow's timetable tonight.",
-      "inference": "I deal with tomorrow's needs before tomorrow arrives. Which expression fits?",
+    "take action": {
+      "term": "take action",
+      "ca": "actuar / prendre mesures",
+      "definition": "Do something to improve a situation.",
+      "example": "I take action when I need to change my habits.",
+      "gap": "When a plan doesn't work, I ____.",
+      "inference": "Do something to improve a situation.",
       "distractors": [
-        "put off",
-        "run late",
-        "fall behind"
+        "although",
+        "make conscious choices",
+        "have breakfast"
       ]
     },
-    "balance responsibilities": {
-      "term": "balance responsibilities",
-      "ca": "equilibrar responsabilitats",
-      "definition": "Give suitable time and attention to different duties.",
-      "example": "I try to balance responsibilities at school and at home.",
-      "gap": "I ____ by giving both schoolwork and home duties suitable attention.",
-      "inference": "School and home both matter; neither should take all my attention. Use the collocation beginning with balance.",
+    "make a mistake": {
+      "term": "make a mistake",
+      "ca": "cometre un error",
+      "definition": "Do something incorrectly.",
+      "example": "I sometimes make a mistake.",
+      "gap": "When I learn new things, I may ____.",
+      "inference": "Do something incorrectly.",
       "distractors": [
-        "avoid distractions",
-        "make an effort",
-        "call it a day"
+        "while",
+        "make a realistic adjustment",
+        "go to school"
       ]
     },
-    "build a habit": {
-      "term": "build a habit",
-      "ca": "crear un h\u00e0bit",
-      "definition": "Develop a repeated behaviour over time.",
-      "example": "I build a habit by repeating a small action regularly.",
-      "gap": "I ____ when a small action becomes part of my regular routine.",
-      "inference": "One action today is not enough: regular repetition develops a lasting routine. Which collocation fits?",
+    "both": {
+      "term": "both",
+      "ca": "tots dos / totes dues",
+      "definition": "The two people together.",
+      "example": "They both like to read.",
+      "gap": "Mia and Leo ____ sleep in on Sundays.",
+      "inference": "The two people together.",
       "distractors": [
-        "take a break",
-        "put off",
-        "give up"
+        "earlier than",
+        "wake up",
+        "come home"
       ]
     },
-    "stick to": {
-      "term": "stick to",
-      "ca": "mantenir-se fidel a; complir",
-      "definition": "Continue following a plan or rule.",
-      "example": "I stick to my study plan even when I feel distracted.",
-      "gap": "Once I choose a realistic plan, I try to ____ it.",
-      "inference": "The plan is already made. The challenge is continuing to follow it. Which phrasal verb fits?",
+    "although": {
+      "term": "although",
+      "ca": "encara que / tot i que",
+      "definition": "Introduce a contrast between two facts.",
+      "example": "Although I am tired, I do homework.",
+      "gap": "____ I am tired, I finish my work.",
+      "inference": "Introduce a contrast between two facts.",
       "distractors": [
-        "give up",
-        "put off",
-        "run out of"
+        "build sustainable habits",
+        "get up",
+        "get home"
       ]
     },
-    "burn out": {
-      "term": "burn out",
-      "ca": "esgotar-se per estr\u00e8s continuat",
-      "definition": "Become exhausted after a long period of excessive pressure.",
-      "example": "The story describes a student who fears they will burn out after months of pressure.",
-      "gap": "In the story, months of constant pressure make the student fear they will ____.",
-      "inference": "In this fictional account, exhaustion builds over months of pressure; it is not just feeling sleepy tonight. Which expression fits?",
+    "while": {
+      "term": "while",
+      "ca": "mentre que",
+      "definition": "Contrast two people's routines.",
+      "example": "I walk while my friend takes the bus.",
+      "gap": "I study in the evening, ____ she studies in the morning.",
+      "inference": "Contrast two people's routines.",
       "distractors": [
-        "turn in",
-        "wind down",
-        "take a break"
+        "strike a balance between",
+        "have a shower",
+        "have dinner"
       ]
     },
-    "run late": {
-      "term": "run late",
-      "ca": "anar tard",
-      "definition": "Be behind schedule.",
-      "example": "I run late when I miss my first bus.",
-      "gap": "I ____ when I am behind schedule for my appointment.",
-      "inference": "My appointment has not moved, but my journey is taking longer than planned. Which expression fits?",
+    "earlier than": {
+      "term": "earlier than",
+      "ca": "més d'hora que",
+      "definition": "Before another person or time.",
+      "example": "Mia gets home earlier than Leo.",
+      "gap": "I turn in ____ my brother.",
+      "inference": "Before another person or time.",
       "distractors": [
-        "set off",
-        "plan ahead",
-        "head out"
+        "make conscious choices",
+        "have breakfast",
+        "go to bed"
       ]
     },
-    "give up": {
-      "term": "give up",
-      "ca": "deixar de fer; abandonar",
-      "definition": "Stop an activity or stop trying.",
-      "example": "I do not want to give up learning the guitar.",
-      "gap": "Unlike reducing an activity, to ____ means to stop it or stop trying.",
-      "inference": "The person abandons the activity, rather than doing it less often. Which phrasal verb fits?",
+    "build sustainable habits": {
+      "term": "build sustainable habits",
+      "ca": "crear hàbits sostenibles",
+      "definition": "Develop realistic habits that can last.",
+      "example": "I build sustainable habits slowly.",
+      "gap": "Small changes help me ____.",
+      "inference": "Develop realistic habits that can last.",
       "distractors": [
-        "cut down on",
-        "put off",
-        "take a break"
+        "make a realistic adjustment",
+        "go to school",
+        "watch TV"
       ]
     },
-    "tidy up": {
-      "term": "tidy up",
-      "ca": "endre\u00e7ar",
-      "definition": "Put scattered things back in their proper places.",
-      "example": "I tidy up my desk before I start.",
-      "gap": "I ____ my desk by putting the scattered books away.",
-      "inference": "The task is arranging things neatly, not washing away dirt. Which phrasal verb fits?",
+    "strike a balance between": {
+      "term": "strike a balance between",
+      "ca": "trobar un equilibri entre",
+      "definition": "Find a reasonable balance across activities.",
+      "example": "I strike a balance between work and rest.",
+      "gap": "I try to ____ school and free time.",
+      "inference": "Find a reasonable balance across activities.",
       "distractors": [
-        "pick up",
-        "look after",
-        "get down to"
+        "wake up",
+        "come home",
+        "do homework"
       ]
     },
-    "eat out": {
-      "term": "eat out",
-      "ca": "menjar fora de casa",
-      "definition": "Have a meal at a restaurant rather than at home.",
-      "example": "We sometimes eat out on Friday.",
-      "gap": "We ____ when we have dinner at a restaurant rather than at home.",
-      "inference": "The meal is in a restaurant, not simply outdoors. Which phrasal verb fits?",
+    "make conscious choices": {
+      "term": "make conscious choices",
+      "ca": "prendre decisions conscients",
+      "definition": "Choose thoughtfully rather than automatically.",
+      "example": "I make conscious choices about my screen use.",
+      "gap": "I ____ about when I use my phone.",
+      "inference": "Choose thoughtfully rather than automatically.",
       "distractors": [
-        "head out",
-        "set off",
-        "knock off"
+        "get up",
+        "get home",
+        "always"
       ]
     },
-    "fall behind": {
-      "term": "fall behind",
-      "ca": "quedar-se enrere",
-      "definition": "Fail to stay at the required pace.",
-      "example": "I ask for help when I start to fall behind.",
-      "gap": "I ____ when the class moves faster than I can manage.",
-      "inference": "I used to match the class pace. Now the unfinished work is growing. Which phrasal verb fits?",
+    "make a realistic adjustment": {
+      "term": "make a realistic adjustment",
+      "ca": "fer un canvi realista",
+      "definition": "Make a small practical change that can work.",
+      "example": "I make a realistic adjustment to my routine.",
+      "gap": "I ____ when a plan is too demanding.",
+      "inference": "Make a small practical change that can work.",
       "distractors": [
-        "keep up with",
-        "catch up on",
-        "get down to"
-      ]
-    },
-    "get ready": {
-      "term": "get ready",
-      "ca": "preparar-se",
-      "definition": "Prepare yourself for an activity.",
-      "example": "I get ready before I leave for school.",
-      "gap": "I ____ by getting dressed and checking my bag.",
-      "inference": "I am preparing myself, but I have not left home yet. Which expression fits?",
-      "distractors": [
-        "head out",
-        "set off",
-        "knock off"
-      ]
-    },
-    "work out": {
-      "term": "work out",
-      "ca": "entrenar-se; fer exercici",
-      "definition": "Do a session of physical exercise.",
-      "example": "I work out at the sports centre.",
-      "gap": "At the sports centre, I ____ with a short exercise session.",
-      "inference": "Here it is not solving a problem: it means doing a session of exercise. Which phrasal verb fits?",
-      "distractors": [
-        "get down to",
-        "wind down",
-        "lie in"
-      ]
-    },
-    "make time for": {
-      "term": "make time for",
-      "ca": "reservar temps per a",
-      "definition": "Arrange to have time for someone or something.",
-      "example": "I make time for my friends even in a busy week.",
-      "gap": "Even in a busy week, I ____ my friends by keeping Friday free.",
-      "inference": "Free time does not just appear; I deliberately reserve some for people who matter to me. Which expression fits?",
-      "distractors": [
-        "run out of",
-        "put off",
-        "fall behind"
-      ]
-    },
-    "unwind": {
-      "term": "unwind",
-      "ca": "relaxar-se",
-      "definition": "Relax after tension or work.",
-      "example": "I unwind with a quiet walk after work.",
-      "gap": "I ____ after work by doing something relaxing.",
-      "inference": "Give ONE word, beginning with U, meaning relax after being tense or busy.",
-      "distractors": [
-        "stay up",
-        "work out",
-        "run late"
+        "have a shower",
+        "have dinner",
+        "usually"
       ]
     }
   },
@@ -715,428 +949,429 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "rosco": [
         {
           "letter": "A",
-          "term": "pay attention"
+          "term": "always"
         },
         {
           "letter": "B",
-          "term": "bite the bullet"
+          "term": "have breakfast"
         },
         {
           "letter": "C",
-          "term": "catch up on"
+          "term": "come home"
         },
         {
           "letter": "D",
-          "term": "get down to"
+          "term": "have dinner"
         },
         {
           "letter": "E",
-          "term": "make an effort"
+          "term": "get home"
         },
         {
           "letter": "F",
-          "term": "set off"
+          "term": "often"
         },
         {
           "letter": "G",
-          "term": "get ready"
+          "term": "get up"
         },
         {
           "letter": "H",
-          "term": "head out"
+          "term": "have a shower"
         },
         {
           "letter": "I",
-          "term": "hit the road"
-        },
-        {
-          "letter": "J",
-          "term": "juggle commitments"
+          "term": "sometimes"
         },
         {
           "letter": "K",
-          "term": "knock off"
+          "term": "wake up"
         },
         {
           "letter": "L",
-          "term": "lie in"
+          "term": "sleep in"
         },
         {
           "letter": "M",
-          "term": "make time for"
+          "term": "manage stress"
         },
         {
           "letter": "N",
-          "term": "turn in"
+          "term": "never"
         },
         {
           "letter": "O",
-          "term": "put off"
+          "term": "go on foot"
         },
         {
           "letter": "P",
-          "term": "pick up"
-        },
-        {
-          "letter": "Q",
-          "term": "quiet time"
+          "term": "get enough sleep"
         },
         {
           "letter": "R",
-          "term": "rush hour"
+          "term": "take regular breaks"
         },
         {
           "letter": "S",
-          "term": "switch off"
+          "term": "go to school"
         },
         {
           "letter": "T",
-          "term": "take a break"
+          "term": "turn in"
         },
         {
           "letter": "U",
-          "term": "unwind"
+          "term": "usually"
         },
         {
           "letter": "V",
-          "term": "avoid distractions"
+          "term": "watch TV"
         },
         {
           "letter": "W",
           "term": "wind down"
         },
         {
-          "letter": "X",
-          "term": "exercise"
-        },
-        {
           "letter": "Y",
-          "term": "stay up"
-        },
-        {
-          "letter": "Z",
-          "term": "snooze"
+          "term": "stay hydrated"
         }
       ],
       "jeopardy": [
         {
-          "prompt": "After work I wind down. What does wind down mean?",
-          "answer": "gradually relax",
+          "prompt": "Which expression means: Stop sleeping and become awake.",
+          "answer": "wake up",
           "options": [
-            "gradually relax",
-            "start rushing"
+            "wake up",
+            "go to school"
           ],
-          "support": "Relaxar-se progressivament.",
-          "note": "Wind down describes a gradual move towards relaxation.",
+          "support": "",
+          "note": "I wake up at seven.",
           "aliases": []
         },
         {
-          "prompt": "I put off the task. What do I do?",
-          "answer": "delay it",
+          "prompt": "Which expression means: Leave your bed after sleeping.",
+          "answer": "get up",
           "options": [
-            "delay it",
-            "finish it early"
+            "get up",
+            "wind down"
           ],
-          "support": "Ajornar una tasca.",
-          "note": "Put off means postpone, not abandon completely.",
+          "support": "",
+          "note": "I get up at a quarter past seven.",
           "aliases": []
         },
         {
-          "prompt": "I catch up on missed work. What do I do?",
-          "answer": "do work I missed",
+          "prompt": "Which expression means: Eat the first meal of the day.",
+          "answer": "have breakfast",
           "options": [
-            "do work I missed",
-            "avoid all work"
+            "have breakfast",
+            "always"
           ],
-          "support": "Posar-se al dia amb la feina pendent.",
-          "note": "Catch up on is about a gap that already exists.",
+          "support": "",
+          "note": "I have breakfast before school.",
           "aliases": []
         },
         {
-          "prompt": "I get down to homework. What do I do?",
-          "answer": "start working seriously",
+          "prompt": "Which expression means: Wash your body in a shower.",
+          "answer": "have a shower",
           "options": [
-            "start working seriously",
-            "stop for the night"
+            "have a shower",
+            "usually"
           ],
-          "support": "Posar-se seriosament amb una tasca.",
-          "note": "Keep the full pattern: get down to + task.",
+          "support": "",
+          "note": "I have a shower before breakfast.",
           "aliases": []
         },
         {
-          "prompt": "We call it a day. What do we decide?",
-          "answer": "stop work for today",
+          "prompt": "Which expression means: Arrive at your home.",
+          "answer": "get home",
           "options": [
-            "stop work for today",
-            "start a long journey"
+            "get home",
+            "often"
           ],
-          "support": "Donar la feina per acabada per avui.",
-          "note": "This is more final than taking a short break.",
+          "support": "",
+          "note": "I get home at five.",
           "aliases": []
         },
         {
-          "prompt": "Choose: ____ attention.",
-          "answer": "pay",
+          "prompt": "Complete with the studied expression: At eight, we ____.",
+          "answer": "have dinner",
           "options": [
-            "pay",
-            "make"
+            "have dinner",
+            "sometimes"
           ],
-          "support": "Parar atenci\u00f3.",
-          "note": "Pay attention to something.",
+          "support": "",
+          "note": "I have dinner with my family.",
           "aliases": []
         },
         {
-          "prompt": "Choose: ____ an effort.",
-          "answer": "make",
+          "prompt": "Complete with the studied expression: At ten, I ____.",
+          "answer": "go to bed",
           "options": [
-            "make",
-            "do"
+            "go to bed",
+            "never"
           ],
-          "support": "Esfor\u00e7ar-se.",
-          "note": "The collocation is make an effort.",
+          "support": "",
+          "note": "I go to bed at ten.",
           "aliases": []
         },
         {
-          "prompt": "Choose: ____ a break.",
-          "answer": "take",
+          "prompt": "Complete with the studied expression: In the evening, I sometimes ____.",
+          "answer": "watch TV",
           "options": [
-            "take",
-            "make"
+            "watch TV",
+            "stay hydrated"
           ],
-          "support": "Fer una pausa.",
-          "note": "Take a break means stop briefly to rest.",
+          "support": "",
+          "note": "I watch TV after dinner.",
           "aliases": []
         },
         {
-          "prompt": "Busy travel time is ____ hour.",
-          "answer": "rush",
+          "prompt": "Complete with the studied expression: I ____ from Monday to Friday.",
+          "answer": "go to school",
           "options": [
-            "rush",
-            "fast"
+            "go to school",
+            "get enough sleep"
           ],
-          "support": "Hora punta.",
-          "note": "Rush hour is a fixed expression.",
+          "support": "",
+          "note": "I go to school on foot.",
           "aliases": []
         },
         {
-          "prompt": "Face a necessary but unpleasant task: ____ the bullet.",
-          "answer": "bite",
+          "prompt": "Complete with the studied expression: After school, I ____ with music.",
+          "answer": "wind down",
           "options": [
-            "bite",
-            "eat"
+            "wind down",
+            "limit screen time"
           ],
-          "support": "Afrontar una tasca que costa.",
-          "note": "Bite the bullet is an idiom, not a literal action here.",
+          "support": "",
+          "note": "I wind down with a book.",
           "aliases": []
         },
         {
-          "prompt": "What does exercise mean here?",
-          "answer": "do physical activity",
+          "prompt": "Give the English for «sempre».",
+          "answer": "always",
           "options": [
-            "do physical activity",
-            "check your messages"
+            "always",
+            "take regular breaks"
           ],
-          "support": "Fer activitat f\u00edsica.",
-          "note": "Here exercise is a verb.",
+          "support": "",
+          "note": "I always have breakfast.",
           "aliases": []
         },
         {
-          "prompt": "Some quiet time is a period with ...",
-          "answer": "little noise or activity",
+          "prompt": "Give the English for «normalment».",
+          "answer": "usually",
           "options": [
-            "little noise or activity",
-            "lots of traffic"
+            "usually",
+            "turn in"
           ],
-          "support": "Una estona de tranquil\u00b7litat.",
-          "note": "Quiet time and rush hour refer to very different situations.",
+          "support": "",
+          "note": "I usually walk to school.",
           "aliases": []
         },
         {
-          "prompt": "Cut down on scrolling means ...",
-          "answer": "scroll less",
+          "prompt": "Give the English for «sovint».",
+          "answer": "often",
           "options": [
-            "scroll less",
-            "never use a phone again"
+            "often",
+            "wake up"
           ],
-          "support": "Reduir no \u00e9s eliminar del tot.",
-          "note": "Cut down on means reduce, not necessarily stop.",
+          "support": "",
+          "note": "I often have a snack at five.",
           "aliases": []
         },
         {
-          "prompt": "To wind down before bed is to ...",
-          "answer": "gradually relax",
+          "prompt": "Give the English for «de vegades».",
+          "answer": "sometimes",
           "options": [
-            "gradually relax",
-            "get busier"
+            "sometimes",
+            "get up"
           ],
-          "support": "Relaxar-se abans d'anar a dormir.",
-          "note": "Focus on the routine described, not judgments about a person.",
+          "support": "",
+          "note": "I sometimes watch TV at night.",
           "aliases": []
         },
         {
-          "prompt": "I stop studying briefly, then continue. I ...",
-          "answer": "take a break",
+          "prompt": "Give the English for «mai».",
+          "answer": "never",
           "options": [
-            "take a break",
-            "call it a day"
+            "never",
+            "have breakfast"
           ],
-          "support": "Una pausa, no el final de la feina.",
-          "note": "A break has an expected return.",
+          "support": "",
+          "note": "I never stay up on school nights.",
           "aliases": []
         },
         {
-          "prompt": "I grab my keys and head out. I ...",
-          "answer": "leave home",
+          "prompt": "Complete the routine with the correct full expression: I bring a bottle to ____.",
+          "answer": "stay hydrated",
           "options": [
-            "leave home",
+            "stay hydrated",
+            "have a shower"
+          ],
+          "support": "",
+          "note": "I stay hydrated by drinking water.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the correct full expression: I turn in early to ____.",
+          "answer": "get enough sleep",
+          "options": [
+            "get enough sleep",
+            "get home"
+          ],
+          "support": "",
+          "note": "I get enough sleep on weekdays.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the correct full expression: I ____ in the evening.",
+          "answer": "limit screen time",
+          "options": [
+            "limit screen time",
+            "have dinner"
+          ],
+          "support": "",
+          "note": "I limit screen time before bed.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the correct full expression: When I study, I ____.",
+          "answer": "take regular breaks",
+          "options": [
+            "take regular breaks",
             "go to bed"
           ],
-          "support": "Sortir de casa.",
-          "note": "Head out describes leaving.",
+          "support": "",
+          "note": "I take regular breaks when studying.",
           "aliases": []
         },
         {
-          "prompt": "We set off at six. We ...",
-          "answer": "begin our journey",
+          "prompt": "Complete the routine with the correct full expression: At the end of the day, I ____.",
+          "answer": "turn in",
           "options": [
-            "begin our journey",
-            "arrive at our destination"
+            "turn in",
+            "watch TV"
           ],
-          "support": "Comen\u00e7ar el trajecte.",
-          "note": "Set off is the start, not the arrival.",
-          "aliases": []
-        },
-        {
-          "prompt": "I turn in early. In this bedtime context, I ...",
-          "answer": "go to bed early",
-          "options": [
-            "go to bed early",
-            "submit an assignment"
-          ],
-          "support": "En aquest context, anar a dormir.",
-          "note": "Context decides the meaning of turn in.",
-          "aliases": []
-        },
-        {
-          "prompt": "I lie in on Sunday. I ...",
-          "answer": "stay in bed later in the morning",
-          "options": [
-            "stay in bed later in the morning",
-            "stay awake late at night"
-          ],
-          "support": "Quedar-se al llit al mat\u00ed.",
-          "note": "Lie in and stay up happen at different ends of the night.",
-          "aliases": []
-        },
-        {
-          "prompt": "My aunt knocks off at five. In this work context, she ...",
-          "answer": "finishes work",
-          "options": [
-            "finishes work",
-            "begins a journey"
-          ],
-          "support": "Plegar de treballar.",
-          "note": "Knock off is informal in this meaning.",
+          "support": "",
+          "note": "I turn in at ten.",
           "aliases": []
         }
       ],
       "scramble": [
         {
-          "sentence": "I wind down after school.",
-          "prompt": "Begin with I; describe relaxing.",
-          "hint": "Em relaxo progressivament despr\u00e9s de classe.",
+          "sentence": "I wake up at seven.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
             "I",
-            "wind down",
-            "after school."
+            "wake",
+            "up",
+            "at",
+            "seven."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "I pay attention to the instructions.",
-          "prompt": "Begin with I; describe focusing.",
-          "hint": "Paro atenci\u00f3 a les instruccions.",
+          "sentence": "I have a shower before breakfast.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
             "I",
-            "pay attention",
-            "to the instructions."
+            "have",
+            "a",
+            "shower",
+            "before",
+            "breakfast."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "She makes an effort every day.",
-          "prompt": "Begin with She; finish with the time phrase.",
-          "hint": "Ella s'esfor\u00e7a cada dia.",
-          "chunks": [
-            "She",
-            "makes an effort",
-            "every day."
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "I put it off until tomorrow.",
-          "prompt": "Begin with I; use the pronoun between put and off.",
-          "hint": "Ho ajorno fins dem\u00e0.",
+          "sentence": "I get home after school.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
             "I",
-            "put",
-            "it",
-            "off",
-            "until tomorrow."
+            "get",
+            "home",
+            "after",
+            "school."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "We set off early because the roads get busy.",
-          "prompt": "Begin with We set off; add the reason second.",
-          "hint": "Sortim aviat perqu\u00e8 les carreteres s'omplen.",
+          "sentence": "I wind down with music.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
-            "We set off",
-            "early",
-            "because",
-            "the roads get busy."
+            "I",
+            "wind",
+            "down",
+            "with",
+            "music."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "I take a break and then get down to work.",
-          "prompt": "Begin with I take a break; put then after and.",
-          "hint": "Faig una pausa i despr\u00e9s em poso a treballar.",
+          "sentence": "I usually have dinner at eight.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
-            "I take a break",
-            "and then",
-            "get down to work."
+            "I",
+            "usually",
+            "have",
+            "dinner",
+            "at",
+            "eight."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "He doesn't stay up on school nights.",
-          "prompt": "Begin with He; build a negative routine.",
-          "hint": "Ell no es queda despert fins tard quan l'endem\u00e0 hi ha classe.",
+          "sentence": "I turn in at ten.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
-            "He",
-            "doesn't stay up",
-            "on school nights."
+            "I",
+            "turn",
+            "in",
+            "at",
+            "ten."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "I am tired so I turn in early.",
-          "prompt": "Begin with I am tired; give the consequence second.",
-          "hint": "Estic cansat, aix\u00ed que me'n vaig a dormir aviat.",
+          "sentence": "I take regular breaks when I study.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
-            "I am tired",
-            "so",
-            "I turn in",
-            "early."
+            "I",
+            "take",
+            "regular",
+            "breaks",
+            "when",
+            "I",
+            "study."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "I limit screen time before bed.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "I",
+            "limit",
+            "screen",
+            "time",
+            "before",
+            "bed."
           ],
           "extra": [],
           "alternatives": []
@@ -1147,59 +1382,55 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "rosco": [
         {
           "letter": "A",
-          "term": "plan ahead"
+          "term": "always"
         },
         {
           "letter": "B",
-          "term": "build a habit"
+          "term": "have breakfast"
         },
         {
           "letter": "C",
-          "term": "cut down on"
+          "term": "catch up on"
         },
         {
           "letter": "D",
-          "term": "get down to"
+          "term": "do homework"
         },
         {
           "letter": "E",
-          "term": "make an effort"
+          "term": "eat out"
         },
         {
           "letter": "F",
-          "term": "fall behind"
+          "term": "often"
         },
         {
           "letter": "G",
-          "term": "give up"
+          "term": "get down to"
         },
         {
           "letter": "H",
-          "term": "head out"
+          "term": "have a chat"
         },
         {
           "letter": "I",
-          "term": "stick to"
-        },
-        {
-          "letter": "J",
-          "term": "juggle commitments"
+          "term": "pick up"
         },
         {
           "letter": "K",
-          "term": "keep up with"
+          "term": "wake up"
         },
         {
           "letter": "L",
-          "term": "look after"
+          "term": "sleep in"
         },
         {
           "letter": "M",
-          "term": "make time for"
+          "term": "make the bed"
         },
         {
           "letter": "N",
-          "term": "run out of"
+          "term": "never"
         },
         {
           "letter": "O",
@@ -1207,314 +1438,241 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "P",
-          "term": "pay attention"
-        },
-        {
-          "letter": "Q",
-          "term": "quiet time"
+          "term": "get up"
         },
         {
           "letter": "R",
-          "term": "rush hour"
+          "term": "run errands"
         },
         {
           "letter": "S",
-          "term": "set off"
+          "term": "stay in"
         },
         {
           "letter": "T",
-          "term": "turn in"
+          "term": "take screen breaks"
         },
         {
           "letter": "U",
-          "term": "burn out"
+          "term": "cut down on sugary drinks"
         },
         {
           "letter": "V",
-          "term": "avoid distractions"
+          "term": "have dinner"
         },
         {
           "letter": "W",
           "term": "wind down"
         },
         {
-          "letter": "X",
-          "term": "exercise"
-        },
-        {
           "letter": "Y",
-          "term": "call it a day"
-        },
-        {
-          "letter": "Z",
-          "term": "snooze"
+          "term": "usually"
         }
       ],
       "jeopardy": [
         {
-          "prompt": "Use a phrasal verb: After work, I ____ by listening to calm music.",
-          "answer": "wind down",
+          "prompt": "Which expression means: Delay doing something.",
+          "answer": "put off",
           "options": [],
           "support": "",
-          "note": "Wind down suggests gradual relaxation.",
+          "note": "I put off my homework until later.",
           "aliases": []
         },
         {
-          "prompt": "Complete: I should start now instead of ____ it ____. Write the two missing words in order.",
-          "answer": "putting off",
+          "prompt": "Which expression means: Collect someone or something.",
+          "answer": "pick up",
           "options": [],
           "support": "",
-          "note": "After instead of, use an -ing form; the pronoun stays between the parts.",
+          "note": "I pick up my sister after school.",
           "aliases": []
         },
         {
-          "prompt": "Complete: After missing class, I need to ____ the work I missed.",
+          "prompt": "Which expression means: Do work that you have missed or delayed.",
           "answer": "catch up on",
           "options": [],
           "support": "",
-          "note": "Use all three words: catch up on.",
+          "note": "I catch up on missed work.",
           "aliases": []
         },
         {
-          "prompt": "Complete: Once I sit down, I ____ my homework and work seriously.",
+          "prompt": "Which expression means: Begin working seriously on something.",
           "answer": "get down to",
           "options": [],
           "support": "",
-          "note": "Get down to + noun or -ing form.",
+          "note": "I get down to my homework after a break.",
           "aliases": []
         },
         {
-          "prompt": "We have done enough for today. Complete: Let's ____.",
-          "answer": "call it a day",
+          "prompt": "Which expression means: Gradually relax after a busy day.",
+          "answer": "wind down",
           "options": [],
           "support": "",
-          "note": "This idiom means stop work for today.",
+          "note": "I wind down with a book.",
           "aliases": []
         },
         {
-          "prompt": "Complete: Please ____ attention to the instructions.",
-          "answer": "pay",
+          "prompt": "Complete with the studied expression: At the weekend, we ____.",
+          "answer": "run errands",
           "options": [],
           "support": "",
-          "note": "Pay attention to, not make attention.",
+          "note": "We run errands on Saturdays.",
           "aliases": []
         },
         {
-          "prompt": "Complete: She ____ an effort to include everyone. Use make.",
-          "answer": "makes",
+          "prompt": "Complete with the studied expression: For birthdays, we sometimes ____.",
+          "answer": "eat out",
           "options": [],
           "support": "",
-          "note": "Make an effort; the subject she needs makes.",
+          "note": "We eat out on special occasions.",
           "aliases": []
         },
         {
-          "prompt": "Complete: Between tasks, I ____ a short break.",
-          "answer": "take",
+          "prompt": "Complete with the studied expression: Before leaving home, I ____.",
+          "answer": "make the bed",
           "options": [],
           "support": "",
-          "note": "Take a break is a common collocation.",
+          "note": "I make the bed in the morning.",
           "aliases": []
         },
         {
-          "prompt": "What two-word expression means the busy commuting period?",
-          "answer": "rush hour",
+          "prompt": "Complete with the studied expression: After dinner, we ____.",
+          "answer": "have a chat",
           "options": [],
           "support": "",
-          "note": "Rush hour is a noun phrase.",
+          "note": "I have a chat with my friend.",
           "aliases": []
         },
         {
-          "prompt": "Name the idiom: face an unpleasant but necessary task rather than avoid it.",
-          "answer": "bite the bullet",
+          "prompt": "Complete with the studied expression: When I'm tired, I ____.",
+          "answer": "stay in",
           "options": [],
           "support": "",
-          "note": "An idiom has a meaning beyond its individual words.",
+          "note": "I stay in when I need to rest.",
           "aliases": []
         },
         {
-          "prompt": "Use a three-word phrasal verb meaning reduce: I want to ____ late-night scrolling.",
-          "answer": "cut down on",
+          "prompt": "Give the English for «establir una rutina de son».",
+          "answer": "establish a sleep routine",
           "options": [],
           "support": "",
-          "note": "Reduction is different from stopping completely.",
+          "note": "I establish a sleep routine.",
           "aliases": []
         },
         {
-          "prompt": "Complete: I ____ ahead by checking tomorrow's timetable tonight.",
-          "answer": "plan",
+          "prompt": "Give the English for «mantenir una alimentació equilibrada».",
+          "answer": "maintain a balanced diet",
           "options": [],
           "support": "",
-          "note": "Plan ahead means make arrangements in advance.",
+          "note": "I maintain a balanced diet.",
           "aliases": []
         },
         {
-          "prompt": "Name the two-word phrase for a period without much noise or activity.",
-          "answer": "quiet time",
+          "prompt": "Give the English for «reduir les begudes ensucrades».",
+          "answer": "cut down on sugary drinks",
           "options": [],
           "support": "",
-          "note": "A quiet period can be described without judging a person's choices.",
+          "note": "I cut down on sugary drinks.",
           "aliases": []
         },
         {
-          "prompt": "Complete: I silence alerts to ____ distractions.",
-          "answer": "avoid",
+          "prompt": "Give the English for «fer pauses de les pantalles».",
+          "answer": "take screen breaks",
           "options": [],
           "support": "",
-          "note": "Avoid distractions describes preventing interruptions.",
+          "note": "I take screen breaks after long tasks.",
           "aliases": []
         },
         {
-          "prompt": "Complete: I ____ to my realistic study plan. Use the verb meaning continue to follow.",
-          "answer": "stick",
+          "prompt": "Give the English for «recuperar energia».",
+          "answer": "recharge",
           "options": [],
           "support": "",
-          "note": "Stick to a plan; keep the preposition to.",
+          "note": "I recharge by reading in the evening.",
           "aliases": []
         },
         {
-          "prompt": "My shift finishes at five. Use the informal phrasal verb: I ____ at five.",
-          "answer": "knock off",
+          "prompt": "Complete the routine with the correct full expression: On school days, I ____.",
+          "answer": "get up early",
           "options": [],
           "support": "",
-          "note": "In this context, knock off means finish work.",
+          "note": "I get up early on weekdays.",
           "aliases": []
         },
         {
-          "prompt": "Complete: I ____ late when my bus is delayed. Use the usual collocation.",
-          "answer": "run",
+          "prompt": "Complete the routine with the correct full expression: On Saturdays, we ____.",
+          "answer": "go shopping",
           "options": [],
           "support": "",
-          "note": "Run late = be behind schedule.",
+          "note": "We go shopping at the weekend.",
           "aliases": []
         },
         {
-          "prompt": "It is morning and I stay in bed longer than usual. Name the phrasal verb.",
-          "answer": "lie in",
+          "prompt": "Complete the routine with the correct full expression: On Sundays, I sometimes ____.",
+          "answer": "sleep in",
           "options": [],
           "support": "",
-          "note": "Do not confuse lie in with stay up.",
+          "note": "I sleep in on Saturdays.",
           "aliases": []
         },
         {
-          "prompt": "I reserve Friday for friends despite a busy week. Complete: I ____ my friends.",
-          "answer": "make time for",
+          "prompt": "Complete the routine with the correct full expression: After breakfast, I ____.",
+          "answer": "head out for school",
           "options": [],
           "support": "",
-          "note": "The complete expression includes for.",
+          "note": "I head out for school at eight.",
           "aliases": []
         },
         {
-          "prompt": "I maintain the class pace, rather than recover missed work. Complete: I ____ the homework.",
-          "answer": "keep up with",
+          "prompt": "Complete the routine with the correct full expression: I turn in early to ____.",
+          "answer": "get enough sleep",
           "options": [],
           "support": "",
-          "note": "Keep up with prevents a gap; catch up on closes an existing gap.",
+          "note": "I get enough sleep on weekdays.",
           "aliases": []
         }
       ],
       "scramble": [
         {
-          "sentence": "I wind down after dinner because my day is busy.",
-          "prompt": "Begin with I wind down; give the reason after because.",
-          "hint": "Wind down stays together.",
+          "sentence": "I put off my homework until tomorrow.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
             "I",
-            "wind",
-            "down",
-            "after",
-            "dinner",
-            "because",
+            "put",
+            "off",
             "my",
-            "day",
-            "is",
-            "busy."
+            "homework",
+            "until",
+            "tomorrow."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "She doesn't put it off until the weekend.",
-          "prompt": "Begin with She; put the pronoun between the two parts of the phrasal verb.",
-          "hint": "Put it off, not put off it.",
+          "sentence": "She picks her sister up after school.",
+          "prompt": "Build this studied routine sentence. Begin with \"She\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
             "She",
-            "doesn't",
-            "put",
-            "it",
-            "off",
-            "until",
-            "the",
-            "weekend."
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "I walk to school whereas my friend catches the bus.",
-          "prompt": "Begin with I walk; compare the routines with whereas.",
-          "hint": "Whereas marks contrast.",
-          "chunks": [
-            "I",
-            "walk",
-            "to",
-            "school",
-            "whereas",
-            "my",
-            "friend",
-            "catches",
-            "the",
-            "bus."
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "Although I feel tired I get down to my homework.",
-          "prompt": "Begin with Although I feel tired; put the action second.",
-          "hint": "Punctuation is ignored when checking this tile sentence.",
-          "chunks": [
-            "Although",
-            "I",
-            "feel",
-            "tired",
-            "I",
-            "get",
-            "down",
-            "to",
-            "my",
-            "homework."
-          ],
-          "extra": [],
-          "alternatives": []
-        },
-        {
-          "sentence": "He picks his sister up after school.",
-          "prompt": "Begin with He; finish with after school.",
-          "hint": "A noun object can go in two positions.",
-          "chunks": [
-            "He",
             "picks",
-            "his",
+            "her",
             "sister",
             "up",
             "after",
             "school."
           ],
           "extra": [],
-          "alternatives": [
-            "He picks up his sister after school."
-          ]
+          "alternatives": []
         },
         {
-          "sentence": "I catch up on the work I missed.",
-          "prompt": "Begin with I catch; keep the full phrasal verb together.",
-          "hint": "Catch up on + object.",
+          "sentence": "I catch up on work I missed.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
             "I",
             "catch",
             "up",
             "on",
-            "the",
             "work",
             "I",
             "missed."
@@ -1523,39 +1681,78 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
           "alternatives": []
         },
         {
-          "sentence": "We plan ahead so we have time for our friends.",
-          "prompt": "Begin with We plan ahead; introduce the consequence with so.",
-          "hint": "So introduces a result.",
+          "sentence": "I get down to homework after a break.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
-            "We",
-            "plan",
-            "ahead",
-            "so",
-            "we",
-            "have",
-            "time",
-            "for",
-            "our",
-            "friends."
+            "I",
+            "get",
+            "down",
+            "to",
+            "homework",
+            "after",
+            "a",
+            "break."
           ],
           "extra": [],
           "alternatives": []
         },
         {
-          "sentence": "She pays attention because she wants to follow the instructions.",
-          "prompt": "Begin with She pays attention; give the reason second.",
-          "hint": "She pays and she wants.",
+          "sentence": "I make the bed before school.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
-            "She",
-            "pays",
-            "attention",
-            "because",
-            "she",
-            "wants",
-            "to",
-            "follow",
+            "I",
+            "make",
             "the",
-            "instructions."
+            "bed",
+            "before",
+            "school."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "We run errands at the weekend.",
+          "prompt": "Build this studied routine sentence. Begin with \"We\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "We",
+            "run",
+            "errands",
+            "at",
+            "the",
+            "weekend."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "I take screen breaks when I study.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "I",
+            "take",
+            "screen",
+            "breaks",
+            "when",
+            "I",
+            "study."
+          ],
+          "extra": [],
+          "alternatives": []
+        },
+        {
+          "sentence": "I wind down after dinner.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "I",
+            "wind",
+            "down",
+            "after",
+            "dinner."
           ],
           "extra": [],
           "alternatives": []
@@ -1566,19 +1763,19 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
       "rosco": [
         {
           "letter": "A",
-          "term": "balance responsibilities"
+          "term": "make a realistic adjustment"
         },
         {
           "letter": "B",
-          "term": "bite the bullet"
+          "term": "build sustainable habits"
         },
         {
           "letter": "C",
-          "term": "catch up on"
+          "term": "make conscious choices"
         },
         {
           "letter": "D",
-          "term": "get down to"
+          "term": "do your best"
         },
         {
           "letter": "E",
@@ -1586,429 +1783,387 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
         },
         {
           "letter": "F",
-          "term": "fall behind"
+          "term": "often"
         },
         {
           "letter": "G",
-          "term": "give up"
+          "term": "get down to"
         },
         {
           "letter": "H",
-          "term": "hit the road"
+          "term": "have a break"
         },
         {
           "letter": "I",
-          "term": "stick to"
-        },
-        {
-          "letter": "J",
-          "term": "juggle commitments"
+          "term": "make a decision"
         },
         {
           "letter": "K",
-          "term": "knock off"
+          "term": "wake up"
         },
         {
           "letter": "L",
-          "term": "look after"
+          "term": "sleep in"
         },
         {
           "letter": "M",
-          "term": "make time for"
+          "term": "make progress"
         },
         {
           "letter": "N",
-          "term": "run out of"
+          "term": "never"
         },
         {
           "letter": "O",
-          "term": "put off"
+          "term": "both"
         },
         {
           "letter": "P",
-          "term": "plan ahead"
-        },
-        {
-          "letter": "Q",
-          "term": "quiet time"
+          "term": "pay attention"
         },
         {
           "letter": "R",
-          "term": "run late"
+          "term": "strike a balance between"
         },
         {
           "letter": "S",
-          "term": "set off"
+          "term": "sometimes"
         },
         {
           "letter": "T",
-          "term": "take a break"
+          "term": "take action"
         },
         {
           "letter": "U",
-          "term": "burn out"
+          "term": "usually"
         },
         {
           "letter": "V",
-          "term": "avoid distractions"
+          "term": "have dinner"
         },
         {
           "letter": "W",
-          "term": "wind down"
-        },
-        {
-          "letter": "X",
-          "term": "exercise"
+          "term": "while"
         },
         {
           "letter": "Y",
-          "term": "call it a day"
-        },
-        {
-          "letter": "Z",
-          "term": "snooze"
+          "term": "stay hydrated"
         }
       ],
       "jeopardy": [
         {
-          "prompt": "Replace the object with it: I put off the task. Write only the new verb phrase.",
-          "answer": "put it off",
-          "options": [],
-          "support": "",
-          "note": "With separable put off, an object pronoun goes between the verb and particle.",
-          "aliases": []
-        },
-        {
-          "prompt": "Correct only the verb phrase: I catch it up on after class.",
-          "answer": "catch up on it",
-          "options": [],
-          "support": "",
-          "note": "Catch up on is not separated by its object.",
-          "aliases": []
-        },
-        {
-          "prompt": "Correct only the verb phrase: I get down it to after lunch.",
-          "answer": "get down to it",
-          "options": [],
-          "support": "",
-          "note": "Get down to stays together before its object.",
-          "aliases": []
-        },
-        {
-          "prompt": "Replace my sister with her: I pick up my sister. Write only the new verb phrase.",
-          "answer": "pick her up",
-          "options": [],
-          "support": "",
-          "note": "With this separable phrasal verb, her goes in the middle.",
-          "aliases": []
-        },
-        {
-          "prompt": "Complete the contrast: We will pause for five minutes, not stop work for today; we will ____ rather than call it a day.",
-          "answer": "take a break",
-          "options": [],
-          "support": "",
-          "note": "A temporary pause and finishing for the day are not the same.",
-          "aliases": []
-        },
-        {
-          "prompt": "Correct only the collocation: do an effort.",
+          "prompt": "Which expression means: Try hard even when something is difficult.",
           "answer": "make an effort",
           "options": [],
           "support": "",
-          "note": "Effort collocates with make in this expression.",
+          "note": "I make an effort to start on time.",
           "aliases": []
         },
         {
-          "prompt": "Supply the missing preposition: pay attention ____ the explanation.",
-          "answer": "to",
+          "prompt": "Which expression means: Focus closely on something.",
+          "answer": "pay attention",
           "options": [],
           "support": "",
-          "note": "The full pattern is pay attention to something.",
+          "note": "I pay attention to the instructions.",
           "aliases": []
         },
         {
-          "prompt": "I deliberately reserve Friday for my friends. Give the three-word expression meaning reserve time for.",
-          "answer": "make time for",
+          "prompt": "Which expression means: Choose between possible actions.",
+          "answer": "make a decision",
           "options": [],
           "support": "",
-          "note": "Make time for includes its preposition.",
+          "note": "I make a decision about what to do first.",
           "aliases": []
         },
         {
-          "prompt": "Complete with the three-word phrase: I used to be behind, but now I do a little daily to ____ new assignments.",
-          "answer": "keep up with",
+          "prompt": "Which expression means: Improve over time.",
+          "answer": "make progress",
           "options": [],
           "support": "",
-          "note": "New assignments require maintaining the pace, not catching up on an old backlog.",
+          "note": "I make progress with regular practice.",
           "aliases": []
         },
         {
-          "prompt": "Give the three-word idiom: accept the discomfort and finally face a necessary task.",
-          "answer": "bite the bullet",
+          "prompt": "Which expression means: Try as hard as possible.",
+          "answer": "do your best",
           "options": [],
           "support": "",
-          "note": "The figurative meaning involves facing something unpleasant.",
+          "note": "You do your best when you practise.",
           "aliases": []
         },
         {
-          "prompt": "Choose the precise phrasal verb: reduce scrolling, but do not stop completely.",
-          "answer": "cut down on",
+          "prompt": "Complete with the studied expression: After studying, I ____.",
+          "answer": "have a break",
           "options": [],
           "support": "",
-          "note": "Give up would mean stop rather than reduce.",
+          "note": "I have a break after homework.",
           "aliases": []
         },
         {
-          "prompt": "Complete the whole verb phrase: I want to follow this plan consistently; I want to ____ it.",
-          "answer": "stick to",
+          "prompt": "Complete with the studied expression: When I learn new things, I may ____.",
+          "answer": "make a mistake",
           "options": [],
           "support": "",
-          "note": "Stick to describes continuing with an existing plan.",
+          "note": "I sometimes make a mistake.",
           "aliases": []
         },
         {
-          "prompt": "Silencing notifications prevents interruptions. Give the expression, beginning with avoid.",
-          "answer": "avoid distractions",
+          "prompt": "Complete with the studied expression: When a plan doesn't work, I ____.",
+          "answer": "take action",
           "options": [],
           "support": "",
-          "note": "Avoiding distractions is about removing interruptions, not blaming the person.",
+          "note": "I take action when I need to change my habits.",
           "aliases": []
         },
         {
-          "prompt": "In a fictional account, pressure builds for months and the character becomes exhausted. Give the two-word expression, not a diagnosis.",
-          "answer": "burn out",
+          "prompt": "Complete with the studied expression: ____ I am tired, I finish my work.",
+          "answer": "although",
           "options": [],
           "support": "",
-          "note": "This is vocabulary interpretation of a fictional account, not a clinical assessment.",
+          "note": "Although I am tired, I do homework.",
           "aliases": []
         },
         {
-          "prompt": "Complete: To ____ means to develop a repeated behaviour over time, not do something once. Use build.",
-          "answer": "build a habit",
+          "prompt": "Complete with the studied expression: I study in the evening, ____ she studies in the morning.",
+          "answer": "while",
           "options": [],
           "support": "",
-          "note": "A habit involves repetition.",
+          "note": "I walk while my friend takes the bus.",
           "aliases": []
         },
         {
-          "prompt": "Compare meanings: I stay up on Saturday but lie in on Sunday. Which expression refers to the morning?",
-          "answer": "lie in",
+          "prompt": "Give the English for «tots dos / totes dues».",
+          "answer": "both",
           "options": [],
           "support": "",
-          "note": "Stay up concerns remaining awake at night; lie in concerns staying in bed in the morning.",
+          "note": "They both like to read.",
           "aliases": []
         },
         {
-          "prompt": "Choose the connector: ____ I am tired, I finish the short task. Use although or because.",
-          "answer": "Although",
+          "prompt": "Give the English for «més d'hora que».",
+          "answer": "earlier than",
           "options": [],
           "support": "",
-          "note": "Although marks the contrast between tiredness and completing the task.",
+          "note": "Mia gets home earlier than Leo.",
           "aliases": []
         },
         {
-          "prompt": "Choose the connector for contrast: I walk to school, ____ my friend takes the bus. Use whereas or so.",
-          "answer": "whereas",
+          "prompt": "Give the English for «crear hàbits sostenibles».",
+          "answer": "build sustainable habits",
           "options": [],
           "support": "",
-          "note": "Whereas compares contrasting routines; so expresses a consequence.",
+          "note": "I build sustainable habits slowly.",
           "aliases": []
         },
         {
-          "prompt": "Complete the consequence connector: I missed the bus. ____, I arrived late. Use a three-word connector beginning with As.",
-          "answer": "As a result",
+          "prompt": "Give the English for «trobar un equilibri entre».",
+          "answer": "strike a balance between",
           "options": [],
           "support": "",
-          "note": "The event in the second sentence is a consequence.",
+          "note": "I strike a balance between work and rest.",
           "aliases": []
         },
         {
-          "prompt": "Explain the distinction with the missing phrase: I have already fallen behind, so I need to ____ the work I missed, not merely keep up with new work.",
+          "prompt": "Give the English for «prendre decisions conscients».",
+          "answer": "make conscious choices",
+          "options": [],
+          "support": "",
+          "note": "I make conscious choices about my screen use.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the correct full expression: I ____ when a plan is too demanding.",
+          "answer": "make a realistic adjustment",
+          "options": [],
+          "support": "",
+          "note": "I make a realistic adjustment to my routine.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the correct full expression: I should not ____ difficult homework.",
+          "answer": "put off",
+          "options": [],
+          "support": "",
+          "note": "I put off my homework until later.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the correct full expression: On Fridays, I ____ missed homework.",
           "answer": "catch up on",
           "options": [],
           "support": "",
-          "note": "Catch up on closes an existing gap; keep up with maintains the current pace.",
+          "note": "I catch up on missed work.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the correct full expression: At five, I ____ my homework.",
+          "answer": "get down to",
+          "options": [],
+          "support": "",
+          "note": "I get down to my homework after a break.",
+          "aliases": []
+        },
+        {
+          "prompt": "Complete the routine with the correct full expression: I ____ in the evening.",
+          "answer": "limit screen time",
+          "options": [],
+          "support": "",
+          "note": "I limit screen time before bed.",
           "aliases": []
         }
       ],
       "scramble": [
         {
-          "sentence": "I don't put it off because the deadline is tomorrow.",
-          "prompt": "Begin with I; keep it inside the separable phrasal verb. Give the reason second.",
-          "hint": "",
+          "sentence": "I make an effort to pay attention.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
             "I",
-            "don't",
-            "put",
-            "it",
-            "off",
-            "because",
-            "the",
-            "deadline",
-            "is",
-            "tomorrow."
+            "make",
+            "an",
+            "effort",
+            "to",
+            "pay",
+            "attention."
           ],
           "extra": [
-            "does",
-            "to"
+            "yesterday",
+            "never"
           ],
           "alternatives": []
         },
         {
-          "sentence": "Although I feel tired I get down to my homework.",
-          "prompt": "Begin with Although I feel tired; use the complete fixed phrasal verb.",
-          "hint": "",
+          "sentence": "Although I feel tired I do my best.",
+          "prompt": "Build this studied routine sentence. Begin with \"Although\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
           "chunks": [
             "Although",
             "I",
             "feel",
             "tired",
             "I",
-            "get",
+            "do",
+            "my",
+            "best."
+          ],
+          "extra": [
+            "yesterday",
+            "never"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "I make progress when I practise regularly.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "I",
+            "make",
+            "progress",
+            "when",
+            "I",
+            "practise",
+            "regularly."
+          ],
+          "extra": [
+            "yesterday",
+            "never"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "Mia gets home earlier than Leo.",
+          "prompt": "Build this studied routine sentence. Begin with \"Mia\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "Mia",
+            "gets",
+            "home",
+            "earlier",
+            "than",
+            "Leo."
+          ],
+          "extra": [
+            "yesterday",
+            "never"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "Both students wind down in the evening.",
+          "prompt": "Build this studied routine sentence. Begin with \"Both\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "Both",
+            "students",
+            "wind",
             "down",
+            "in",
+            "the",
+            "evening."
+          ],
+          "extra": [
+            "yesterday",
+            "never"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "I strike a balance between work and rest.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "I",
+            "strike",
+            "a",
+            "balance",
+            "between",
+            "work",
+            "and",
+            "rest."
+          ],
+          "extra": [
+            "yesterday",
+            "never"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "I make conscious choices about screen time.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "I",
+            "make",
+            "conscious",
+            "choices",
+            "about",
+            "screen",
+            "time."
+          ],
+          "extra": [
+            "yesterday",
+            "never"
+          ],
+          "alternatives": []
+        },
+        {
+          "sentence": "I make a realistic adjustment to my routine.",
+          "prompt": "Build this studied routine sentence. Begin with \"I\".",
+          "hint": "Use the phrasal verb or expression in the correct order.",
+          "chunks": [
+            "I",
+            "make",
+            "a",
+            "realistic",
+            "adjustment",
             "to",
             "my",
-            "homework."
+            "routine."
           ],
           "extra": [
-            "on",
-            "getting"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "My friend stays up late whereas I turn in early.",
-          "prompt": "Begin with My friend; contrast the routines with whereas.",
-          "hint": "",
-          "chunks": [
-            "My",
-            "friend",
-            "stays",
-            "up",
-            "late",
-            "whereas",
-            "I",
-            "turn",
-            "in",
-            "early."
-          ],
-          "extra": [
-            "stay",
-            "turns"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "She picks her up before she heads out.",
-          "prompt": "Begin with She picks; refer to another person with her.",
-          "hint": "",
-          "chunks": [
-            "She",
-            "picks",
-            "her",
-            "up",
-            "before",
-            "she",
-            "heads",
-            "out."
-          ],
-          "extra": [
-            "picking",
-            "head"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "I keep up with new work so I rarely fall behind.",
-          "prompt": "Begin with I keep; describe maintaining the pace and its result.",
-          "hint": "",
-          "chunks": [
-            "I",
-            "keep",
-            "up",
-            "with",
-            "new",
-            "work",
-            "so",
-            "I",
-            "rarely",
-            "fall",
-            "behind."
-          ],
-          "extra": [
-            "on",
-            "catches"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "I cut down on scrolling rather than give it up completely.",
-          "prompt": "Begin with I cut; contrast reducing with stopping completely.",
-          "hint": "",
-          "chunks": [
-            "I",
-            "cut",
-            "down",
-            "on",
-            "scrolling",
-            "rather",
-            "than",
-            "give",
-            "it",
-            "up",
-            "completely."
-          ],
-          "extra": [
-            "off",
-            "giving"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "He makes an effort to stick to his plan although he feels distracted.",
-          "prompt": "Begin with He makes an effort; put the although clause last.",
-          "hint": "",
-          "chunks": [
-            "He",
-            "makes",
-            "an",
-            "effort",
-            "to",
-            "stick",
-            "to",
-            "his",
-            "plan",
-            "although",
-            "he",
-            "feels",
-            "distracted."
-          ],
-          "extra": [
-            "do",
-            "feel"
-          ],
-          "alternatives": []
-        },
-        {
-          "sentence": "We missed the bus and as a result we arrived late.",
-          "prompt": "Begin with We missed the bus; use and as a result for the consequence.",
-          "hint": "",
-          "chunks": [
-            "We",
-            "missed",
-            "the",
-            "bus",
-            "and",
-            "as",
-            "a",
-            "result",
-            "we",
-            "arrived",
-            "late."
-          ],
-          "extra": [
-            "because",
-            "whereas"
+            "yesterday",
+            "never"
           ],
           "alternatives": []
         }
@@ -2016,52 +2171,12 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
     }
   },
   "categories": [
-    "Phrasal verbs",
-    "Collocations",
-    "Healthy habits",
-    "Meaning in context"
+    "Meaning",
+    "Routine context",
+    "Translation",
+    "Use it"
   ],
   "pictures": [
-    {
-      "id": "screenbreak",
-      "answer": "taking a screen break",
-      "aliases": [
-        "take a screen break",
-        "screen break",
-        "taking a break from screens",
-        "take a break from screens",
-        "taking a break",
-        "take a break",
-        "stretching",
-        "a screen break"
-      ],
-      "hint": "A short pause away from a digital task.",
-      "clues": [
-        "A desk and a computer are nearby.",
-        "The person is no longer using the computer.",
-        "The person is stretching away from the desk."
-      ],
-      "transfer": "Explain a realistic situation where you might take a screen break. Use because or so."
-    },
-    {
-      "id": "planning",
-      "answer": "planning ahead",
-      "aliases": [
-        "plan ahead",
-        "planning",
-        "preparing for tomorrow",
-        "getting ready for tomorrow",
-        "organising the week",
-        "organizing the week"
-      ],
-      "hint": "Preparing now for a later day.",
-      "clues": [
-        "There is a calendar on the wall.",
-        "A notebook has tasks marked in boxes.",
-        "A bag is ready beside a weekly plan."
-      ],
-      "transfer": "Compare preparing ahead with putting things off. Use whereas or although."
-    },
     {
       "id": "hydration",
       "answer": "drinking water",
@@ -2181,12 +2296,12 @@ const ROUTE_INFO={
  daring:{short:'Inference and less support',detail:DATA.course===2?'Infer expressions, correct verb forms and compare routines. Some sentence puzzles include extra words.':'Infer meaning and nuance, practise pronoun placement and connectors, and write without a word bank.'}
 };
 const GAMES={
- rosco:{name:'Alphabet Challenge',icon:'rosco',tag:'26 letters',desc:'A full word wheel. Read the clue, find the expression or pass and return.',badges:['Write the answer · Catalan instructions','English clues + typed answers','Infer the expression from context']},
+ rosco:{name:'Alphabet Challenge',icon:'rosco',tag:'A curriculum-based word wheel',desc:'A wheel of studied expressions. Read the clue, find the answer or pass and return.',badges:['Write the answer · Catalan instructions','English clues + typed answers','Infer the expression from context']},
  jeopardy:{name:'Vocabulary Jeopardy',icon:'jeopardy',tag:'4 categories \u00b7 100\u2013500 points',desc:'Choose a category. Take a chance. Build your score one question at a time.',badges:['Two choices + a clear clue','Gaps + guided written answers','Precision, correction + nuance']},
  memory:{name:'Memory Match',icon:'memory',tag:'Find the pairs',desc:'Turn two cards. Connect the language, not just the position.',badges:['Expression \u2194 Catalan meaning','Expression \u2194 English definition','Expression \u2194 contextual gap']},
  scramble:{name:'Sentence Scramble',icon:'scramble',tag:'8 sentences',desc:'Make the pieces work together. Build a sentence you can actually use.',badges:['Chunk tiles + a starting cue','Word tiles + grammar in context','Word tiles + 2 distractors']},
  rush:{name:'Word Rush',icon:'rush',tag:'12 quick decisions',desc:'Think fast, choose carefully. Find the meaning before the clock runs out.',badges:['3 meanings · Catalan instructions','4 expressions from a definition','4 close choices in context']},
- mystery:{name:'Mystery Picture',icon:'mystery',tag:'9 hidden tiles \u00b7 4 scenes',desc:'Earn a glimpse with each answer. Name the routine behind the picture.',badges:['Guided quiz + picture choices','Context gaps + a written guess','Infer, write + explain aloud']}
+ mystery:{name:'Mystery Picture',icon:'mystery',tag:'9 hidden tiles \u00b7 2 scenes',desc:'Earn a glimpse with each answer. Name the routine behind the picture.',badges:['Guided quiz + picture choices','Context gaps + a written guess','Infer, write + explain aloud']}
 };
 let storageOK=true;
 function load(key,fallback){try{return JSON.parse(localStorage.getItem(STORE+key))??fallback;}catch(e){storageOK=false;return fallback;}}
@@ -2287,7 +2402,7 @@ const ENGLISH_UI={
  'Desfés':'Undo','Buida':'Clear','Quina rutina s’amaga?':'Which routine is hidden?',
  'Escriu la rutina en anglès':'Write the routine in English','Endevina la imatge':'Guess the picture',
  'Pots endevinar la imatge una vegada per encert al qüestionari. Si falles, cal un altre encert per tornar-hi.':'You may guess once after each correct answer. If your guess is wrong, answer another question correctly to try again.',
- 'AL PRINCIPI':'AT THE START','DINS DE LA RESPOSTA':'IN THE ANSWER','26 lletres':'26 letters',
+ 'AL PRINCIPI':'AT THE START','DINS DE LA RESPOSTA':'IN THE ANSWER','lletres':'letters',
  'Encert':'Correct','Tancada':'Closed','Hi tornarem':'Come back later','Pista en anglès':'Clue in English',
  'Ajuda:':'Help:','Passa paraula ↷':'Pass ↷','Passar no resta punts.':'Passing costs no points.',
  'Escriu l’expressió, no una explicació. Fes servir la forma base, tret que la pista en demani una altra.':'Write the expression, not an explanation. Use the base form unless the clue requests another form.',
@@ -2387,7 +2502,7 @@ function renderScores(){
 }
 function renderStatus(){
  const id=game.id;let status='',rule='';
- if(id==='rosco'){status=game.letters.filter(x=>['correct','wrong'].includes(x.status)).length+' / 26 answered';rule='Correct +10 \u00b7 pass and return \u00b7 a wrong answer closes the letter';}
+ if(id==='rosco'){status=game.letters.filter(x=>['correct','wrong'].includes(x.status)).length+' / '+game.letters.length+' answered';rule='Correct +10 \u00b7 pass and return \u00b7 a wrong answer closes the letter';}
  if(id==='jeopardy'){status=Object.keys(game.used).length+' / 20 tiles played';rule='Earn the tile value \u00b7 no negative points';}
  if(id==='memory'){status=game.matched.size+' / '+game.pairCount+' pairs \u00b7 '+game.memoryAttempts+' attempts';rule='A matching pair +20 \u00b7 two cards per turn';}
  if(id==='scramble'){status='Sentence '+(game.index+1)+' / '+game.questions.length;rule=game.route==='daring'?'Use only the words you need \u00b7 2 distractors \u00b7 one attempt':'First try +10 \u00b7 a successful retry +5';}
@@ -2460,7 +2575,7 @@ function resolveAnswer(answer,timeout=false){
  addAttempt(t.prompt,timeout?'[time expired]':answer,t.answer,good,points,t.note);
  showFeedback(t,answer,good,points,{timeout});renderGame();focusFeedback();
 }
-function nextLetter(){for(let step=1;step<=26;step++){const i=(game.index+step)%26;if(['pending','passed'].includes(game.letters[i].status))return i;}return -1;}
+function nextLetter(){for(let step=1;step<=game.letters.length;step++){const i=(game.index+step)%game.letters.length;if(['pending','passed'].includes(game.letters[i].status))return i;}return -1;}
 function passLetter(){if(!game||game.id!=='rosco'||game.feedback||game.paused)return;game.letters[game.index].status='passed';const n=nextLetter();if(n<0){finishGame('All letters played');return;}game.index=n;nextTeam();renderGame();focusQuestion();}
 function turnMemoryCard(i){
  if(!game||game.id!=='memory'||game.feedback||game.paused||game.ended)return;const card=game.cards[i];if(!card||game.flipped.includes(i)||game.matched.has(card.pair))return;
@@ -2659,9 +2774,9 @@ function renderRosco(){
  const rule=starts?(game.route==='insecure'?'Comen\u00e7a per ':'Starts with ')+letter:(game.route==='insecure'?'Cont\u00e9 la ':'Contains ')+letter;
  const english=(starts?'Starts with ':'Contains ')+letter;
  const explain=game.route==='insecure'?(starts?'La primera lletra de la resposta ha de ser la '+letter+'.':'La resposta inclou la '+letter+' dins de la paraula o expressi\u00f3; no hi comen\u00e7a.'):(starts?'The answer must begin with '+letter+'.':'The answer contains '+letter+' somewhere inside the word or expression.');
- const nodes=game.letters.map((x,i)=>{const theta=(i/26)*2*Math.PI-Math.PI/2;const xPos=50+44*Math.cos(theta),yPos=50+44*Math.sin(theta);const done=['correct','wrong'].includes(x.status);const mark=x.status==='correct'?'\u2713':x.status==='wrong'?'\u00d7':x.status==='passed'?'\u21b7':'';
+ const nodes=game.letters.map((x,i)=>{const theta=(i/game.letters.length)*2*Math.PI-Math.PI/2;const xPos=50+44*Math.cos(theta),yPos=50+44*Math.sin(theta);const done=['correct','wrong'].includes(x.status);const mark=x.status==='correct'?'\u2713':x.status==='wrong'?'\u00d7':x.status==='passed'?'\u21b7':'';
  return '<button class="letter-node '+(i===game.index?'current ':'')+x.status+'" type="button" style="left:'+xPos.toFixed(2)+'%;top:'+yPos.toFixed(2)+'%" aria-label="Lletra '+x.letter+', '+({pending:'pendent',correct:'encertada',wrong:'tancada',passed:'passada'}[x.status])+(i===game.index?', pregunta actual':'')+'" '+(done||game.feedback?'disabled':'')+' data-letter="'+i+'">'+x.letter+(mark?'<span class="node-mark" aria-hidden="true">'+mark+'</span>':'')+'</button>';}).join('');
- return '<div class="split-game"><div class="wheel-panel"><div class="wheel-heading"><span>ALPHABET CHALLENGE</span><b>26 lletres</b></div><div class="wheel">'+nodes+'<div class="wheel-center '+cls+'"><span class="big-letter">'+letter+'</span><p lang="ca">'+rule+'</p><div class="letter-pattern" aria-hidden="true">'+(starts?'<b>'+letter+'</b><i></i><i></i><i></i>':'<i></i><i></i><b>'+letter+'</b><i></i><i></i>')+'</div><small lang="ca">'+(starts?'AL PRINCIPI':'DINS DE LA RESPOSTA')+'</small></div></div><div class="wheel-legend" lang="ca"><span><i class="legend-dot good"></i>\u2713 Encert</span><span><i class="legend-dot bad"></i>\u00d7 Tancada</span><span><i class="legend-dot pass"></i>\u21b7 Hi tornarem</span></div></div><section class="play-panel"><div class="letter-rule '+cls+'" lang="ca"><span class="rule-letter" aria-hidden="true">'+letter+'</span><div><span class="rule-english" lang="en">'+english+'</span><h2>'+rule+'</h2><p>'+explain+'</p></div></div><p class="question-label" lang="ca">Pista en angl\u00e8s</p><h2 class="question-text" lang="en">'+esc(t.prompt)+'</h2>'+(game.route!=='insecure'&&t.support?'<p class="support-box" lang="ca"><strong>Ajuda:</strong> '+esc(t.support)+'</p>':'')+(game.route==='daring'?'<p class="word-bank" lang="ca">Escriu l\u2019expressi\u00f3, no una explicaci\u00f3. Fes servir la forma base, tret que la pista en demani una altra.</p>':'')+answerHTML(t)+(!game.feedback?'<div class="arena-actions pass-actions"><button class="pass-button" type="button" data-action="pass">Passa paraula \u21b7</button><span lang="ca">Hi tornarem despr\u00e9s.<br>Passar no resta punts.</span></div>':'')+feedbackHTML('Seg\u00fcent lletra \u2192')+'</section></div>';
+ return '<div class="split-game"><div class="wheel-panel"><div class="wheel-heading"><span>ALPHABET CHALLENGE</span><b>'+game.letters.length+' lletres</b></div><div class="wheel">'+nodes+'<div class="wheel-center '+cls+'"><span class="big-letter">'+letter+'</span><p lang="ca">'+rule+'</p><div class="letter-pattern" aria-hidden="true">'+(starts?'<b>'+letter+'</b><i></i><i></i><i></i>':'<i></i><i></i><b>'+letter+'</b><i></i><i></i>')+'</div><small lang="ca">'+(starts?'AL PRINCIPI':'DINS DE LA RESPOSTA')+'</small></div></div><div class="wheel-legend" lang="ca"><span><i class="legend-dot good"></i>\u2713 Encert</span><span><i class="legend-dot bad"></i>\u00d7 Tancada</span><span><i class="legend-dot pass"></i>\u21b7 Hi tornarem</span></div></div><section class="play-panel"><div class="letter-rule '+cls+'" lang="ca"><span class="rule-letter" aria-hidden="true">'+letter+'</span><div><span class="rule-english" lang="en">'+english+'</span><h2>'+rule+'</h2><p>'+explain+'</p></div></div><p class="question-label" lang="ca">Pista en angl\u00e8s</p><h2 class="question-text" lang="en">'+esc(t.prompt)+'</h2>'+(game.route!=='insecure'&&t.support?'<p class="support-box" lang="ca"><strong>Ajuda:</strong> '+esc(t.support)+'</p>':'')+(game.route==='daring'?'<p class="word-bank" lang="ca">Escriu l\u2019expressi\u00f3, no una explicaci\u00f3. Fes servir la forma base, tret que la pista en demani una altra.</p>':'')+answerHTML(t)+(!game.feedback?'<div class="arena-actions pass-actions"><button class="pass-button" type="button" data-action="pass">Passa paraula \u21b7</button><span lang="ca">Hi tornarem despr\u00e9s.<br>Passar no resta punts.</span></div>':'')+feedbackHTML('Seg\u00fcent lletra \u2192')+'</section></div>';
 }
 
 // Delegated events keep all six games keyboard- and touch-friendly after re-rendering.
