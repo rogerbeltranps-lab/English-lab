@@ -235,7 +235,15 @@
     }
 
     .lab-icon{font-size:1.6rem;margin-bottom:14px}
+    .lab-card-button{display:block;width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer}
+    .lab-card-button .lab-icon{display:block}
+    .lab-card-title{display:block;margin:0 0 8px;font-size:1.25rem;font-weight:700}
+    .lab-card-description{display:block;color:var(--muted);line-height:1.5}
+    .lab-card-button:focus-visible,.lab-back:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+    .lab-overview[hidden],.lab-submenu[hidden]{display:none}
+    .lab-back{border:1px solid var(--line);border-radius:12px;background:var(--accent-soft);color:var(--accent);padding:11px 14px;font-weight:800;cursor:pointer}
     .lab-section{margin-top:36px;padding-top:28px;border-top:1px solid var(--line)}
+    .lab-section-submenu{margin-top:18px;padding-top:0;border-top:0}
     .lab-section-title{margin:0 0 6px;font-size:1.5rem;letter-spacing:-.02em}
     .lab-section-lead{margin:0 0 18px;color:var(--muted)}
     a.lab-card{display:block}
@@ -379,14 +387,30 @@
           <p>Quick practice spaces that we can connect later to the activities you already have.</p>
         </div>
 
-        <div class="lab-grid">
+        <div class="lab-overview" id="labOverview">
+          <div class="lab-grid">
           <article class="lab-card"><div class="lab-icon">🎧</div><h3>Shadowing</h3><p>Listen, repeat and improve rhythm and pronunciation.</p></article>
           <article class="lab-card"><div class="lab-icon">🧩</div><h3>Sentence Builder</h3><p>Build accurate sentences before using them freely.</p></article>
           <article class="lab-card"><div class="lab-icon">🃏</div><h3>Word Cards</h3><p>Review useful vocabulary, chunks and expressions.</p></article>
           <article class="lab-card"><div class="lab-icon">🎵</div><h3>Listening</h3><p>Short listening activities and matching practice.</p></article>
+          <button type="button" class="lab-card lab-card-button" data-lab-menu="games" aria-controls="labGamesMenu">
+            <span class="lab-icon" aria-hidden="true">🎲</span>
+            <span class="lab-card-title">Games</span>
+            <span class="lab-card-description">Vocabulary games for each course and Learning Situation.</span>
+            <span class="arrow">Open games →</span>
+          </button>
+          <button type="button" class="lab-card lab-card-button" data-lab-menu="grammar" aria-controls="labGrammarMenu">
+            <span class="lab-icon" aria-hidden="true">📘</span>
+            <span class="lab-card-title">Grammar</span>
+            <span class="lab-card-description">Interactive grammar activities for each Learning Situation.</span>
+            <span class="arrow">Open grammar →</span>
+          </button>
+          </div>
         </div>
 
-        <div class="lab-section" id="lab-games">
+        <div class="lab-submenu" id="labGamesMenu" hidden>
+          <button type="button" class="lab-back" data-lab-back>← Back to English Lab</button>
+          <div class="lab-section lab-section-submenu" id="lab-games">
           <h3 class="lab-section-title">Games</h3>
           <p class="lab-section-lead">Choose your course and Learning Situation. Each set includes six vocabulary games with Insecure, Safe and Daring routes.</p>
           <div class="lab-grid">
@@ -403,9 +427,12 @@
               <span class="arrow">Play 4 ESO games →</span>
             </a>
           </div>
+          </div>
         </div>
 
-        <div class="lab-section">
+        <div class="lab-submenu" id="labGrammarMenu" hidden>
+          <button type="button" class="lab-back" data-lab-back>← Back to English Lab</button>
+          <div class="lab-section lab-section-submenu" id="lab-grammar">
           <h3 class="lab-section-title">Grammar of the LSs</h3>
           <p class="lab-section-lead">Interactive grammar presentations for each Learning Situation.</p>
           <div class="lab-grid">
@@ -422,6 +449,7 @@
               <span class="arrow">Open grammar →</span>
             </a>
           </div>
+          </div>
         </div>
       </section>
     </main>
@@ -431,18 +459,42 @@
     const buttons = document.querySelectorAll('.tab-btn');
     const panels = document.querySelectorAll('.panel');
 
+    const labOverview = document.getElementById('labOverview');
+    const labMenus = {
+      games: document.getElementById('labGamesMenu'),
+      grammar: document.getElementById('labGrammarMenu')
+    };
+
+    function showLabMenu(menu){
+      labOverview.hidden = Boolean(menu);
+      Object.entries(labMenus).forEach(([name, element]) => {
+        element.hidden = name !== menu;
+      });
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
     function openTab(id){
       panels.forEach(panel => panel.classList.toggle('active', panel.id === id));
       buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === id));
+      if (id === 'lab') showLabMenu(null);
       window.scrollTo({top:0, behavior:'smooth'});
     }
 
     buttons.forEach(button => {
       button.addEventListener('click', () => openTab(button.dataset.tab));
     });
+    document.querySelectorAll('[data-lab-menu]').forEach(button => {
+      button.addEventListener('click', () => showLabMenu(button.dataset.labMenu));
+    });
+    document.querySelectorAll('[data-lab-back]').forEach(button => {
+      button.addEventListener('click', () => showLabMenu(null));
+    });
 
     const initialTab = location.hash.slice(1);
-    if (initialTab && document.getElementById(initialTab)?.classList.contains('panel')) {
+    if (initialTab === 'lab-games' || initialTab === 'lab-grammar') {
+      openTab('lab');
+      showLabMenu(initialTab === 'lab-games' ? 'games' : 'grammar');
+    } else if (initialTab && document.getElementById(initialTab)?.classList.contains('panel')) {
       openTab(initialTab);
     }
   </script>
