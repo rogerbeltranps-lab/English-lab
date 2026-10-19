@@ -18,10 +18,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "Which statement is accurate?",
         "opts": [
-          "Alex gets up immediately at seven.",
+          "Alex gets up before breakfast but wakes up later.",
           "Alex wakes up before he gets up.",
-          "Alex has breakfast before waking up.",
-          "Alex wakes up after breakfast."
+          "Alex wakes up ten minutes after he gets up.",
+          "Alex wakes up just before leaving for school."
         ],
         "a": 1,
         "why": "He wakes at 7:00 and gets up at 7:10."
@@ -42,9 +42,9 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "What happens just before homework?",
         "opts": [
-          "He goes to bed.",
-          "He reads a book.",
-          "He has dinner.",
+          "He eats breakfast.",
+          "He gets dressed.",
+          "He walks home from school.",
           "He has a snack and a short break."
         ],
         "a": 3,
@@ -80,21 +80,21 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "I need to buy food and collect a parcel. I have to ___.",
         "opts": [
-          "make the bed",
+          "do the shopping",
           "run errands",
-          "turn in",
-          "sleep in"
+          "make the bed",
+          "have a chat"
         ],
         "a": 1,
         "why": "Run errands = do several practical jobs."
       },
       {
         "type": "mc",
-        "q": "I don't want to do my homework now. I might ___.",
+        "q": "I decide not to start my homework yet; instead, I ___ until tomorrow.",
         "opts": [
-          "catch it up",
           "pick it up",
-          "get it down to",
+          "catch up on it",
+          "get down to it",
           "put it off"
         ],
         "a": 3,
@@ -102,72 +102,72 @@ window.EnglishLabSampleExam.safe = {
       },
       {
         "type": "mc",
-        "q": "My dad collects me from school. He ___.",
+        "q": "Which sentence places the pronoun correctly when someone collects me from school?",
         "opts": [
-          "picks me up",
-          "picks up me",
-          "picks on me up",
-          "picks me on"
+          "My dad picks me up after school.",
+          "My dad picks up me after school.",
+          "My dad pick me up after school.",
+          "My dad picks me up after schools."
         ],
         "a": 0,
         "why": "Pick me up: the pronoun sits between pick and up."
       },
       {
         "type": "mc",
-        "q": "I watch two episodes I missed. I ___.",
+        "q": "Which sentence correctly uses 'catch up on' with a pronoun?",
         "opts": [
-          "get down it to",
-          "catch it up on",
-          "catch up on them",
-          "put on them off"
+          "I catch them up on at the weekend.",
+          "I catch up them on at the weekend.",
+          "I catch up on them at the weekend.",
+          "I catch on up them at the weekend."
         ],
         "a": 2,
         "why": "Catch up on + object, never split it."
       },
       {
         "type": "mc",
-        "q": "I start working seriously. I ___.",
+        "q": "Which sentence uses 'get down to' correctly?",
         "opts": [
-          "get down to it",
-          "get it down to",
-          "get down it to",
-          "pick it up"
+          "I get down to it after my break.",
+          "I get it down to after my break.",
+          "I get down it to after my break.",
+          "I get down to after it my break."
         ],
         "a": 0,
         "why": "Get down to + noun/pronoun."
       },
       {
         "type": "mc",
-        "q": "Before sleeping, I relax by reading. I ___.",
+        "q": "Which phrase specifically means to relax by reading before sleeping?",
         "opts": [
-          "get up by reading",
+          "get ready for bed by reading",
           "wind down by reading",
-          "turn in with reading",
-          "head out to reading"
+          "catch up on reading",
+          "get down to reading"
         ],
         "a": 1,
         "why": "Wind down by + -ing."
       },
       {
         "type": "mc",
-        "q": "I want fewer sugary drinks. I want to ___.",
+        "q": "Which phrasal verb means 'reduce' rather than 'stop completely'?",
         "opts": [
-          "put up drinks",
-          "get home with drinks",
-          "have a late night",
-          "cut down on sugary drinks"
+          "run out of",
+          "stock up on",
+          "cut out",
+          "cut down on"
         ],
         "a": 3,
-        "why": "Cut down on = reduce consumption."
+        "why": "Cut down on means reduce; cut out means stop completely."
       },
       {
         "type": "mc",
-        "q": "What do we say about doing housework?",
+        "q": "Which sentence uses the collocation for washing clothes?",
         "opts": [
-          "make the washing",
-          "make the housework",
-          "do the washing",
-          "take the housework"
+          "I make the washing on Sundays.",
+          "I do the housework on Sundays.",
+          "I do the washing on Sundays.",
+          "I take the washing on Sundays."
         ],
         "a": 2,
         "why": "Do the washing is the collocation taught."
@@ -226,8 +226,8 @@ window.EnglishLabSampleExam.safe = {
         "opts": [
           "She puts off it.",
           "She puts it off.",
-          "She puts to it off.",
-          "She put it offs."
+          "She put it off.",
+          "She puts it of."
         ],
         "a": 1,
         "why": "Separable phrasal verb: put it off."
@@ -239,7 +239,7 @@ window.EnglishLabSampleExam.safe = {
           "We catch them up on.",
           "We catch up them on.",
           "We catch up on them.",
-          "We catch on up them."
+          "We catch up on they."
         ],
         "a": 2,
         "why": "Catch up on + object."
@@ -285,9 +285,9 @@ window.EnglishLabSampleExam.safe = {
         "q": "Choose correct adverb placement.",
         "opts": [
           "She is always late and usually has breakfast.",
-          "She always is late and has usually breakfast.",
-          "She late is always and has breakfast usually.",
-          "She is late always and breakfast usually has."
+          "She always is late and usually has breakfast.",
+          "She is always late and has usually breakfast.",
+          "She is late always and usually has breakfast."
         ],
         "a": 0,
         "why": "Always after is, usually before has."
@@ -342,9 +342,9 @@ window.EnglishLabSampleExam.safe = {
         "q": "Why does Maya carry water?",
         "opts": [
           "To stay hydrated.",
-          "To play sport.",
-          "To avoid homework.",
-          "To buy a snack."
+          "To prepare for a long bus journey.",
+          "To have something to drink with her snack.",
+          "To avoid buying a drink after school."
         ],
         "a": 0,
         "why": "The purpose is stated explicitly."
@@ -353,10 +353,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "What does she do before starting homework?",
         "opts": [
-          "She watches two episodes.",
+          "She watches a series.",
           "She goes shopping.",
           "She looks after her brother.",
-          "She turns in."
+          "She prepares dinner."
         ],
         "a": 2,
         "why": "She looks after her brother for half an hour."
@@ -365,10 +365,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "What does she do when her phone interrupts homework?",
         "opts": [
-          "She puts homework off.",
+          "She decides to finish homework later.",
           "She puts her phone away.",
-          "She catches up on a series.",
-          "She runs errands."
+          "She switches off her laptop.",
+          "She watches a short episode."
         ],
         "a": 1,
         "why": "She puts the phone away rather than putting off homework."
@@ -377,9 +377,9 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "Which activity happens at the weekend?",
         "opts": [
-          "She always takes the train.",
-          "She turns in at noon.",
-          "She walks to school.",
+          "She helps her brother with homework.",
+          "She spends time reading.",
+          "She walks to school with friends.",
           "She runs errands and does the shopping."
         ],
         "a": 3,
@@ -389,10 +389,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "Which statement is supported?",
         "opts": [
-          "Maya avoids all screens.",
-          "Maya never has a snack.",
+          "Maya goes straight to bed after school.",
+          "Maya always watches a series before dinner.",
           "Maya uses screens but takes breaks.",
-          "Maya never rests."
+          "Maya does all her shopping on weekdays."
         ],
         "a": 2,
         "why": "She sometimes catches up on a series and takes breaks."
