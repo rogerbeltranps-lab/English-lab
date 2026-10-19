@@ -102,39 +102,39 @@ window.EnglishLabSampleExam.safe = {
       },
       {
         "type": "mc",
-        "q": "Which sentence places the pronoun correctly when someone collects me from school?",
+        "q": "My dad collects me from school. He ___.",
         "opts": [
-          "My dad picks me up after school.",
-          "My dad picks up me after school.",
-          "My dad pick me up after school.",
-          "My dad picks me up after schools."
+          "picks me up",
+          "drops me off",
+          "looks after me",
+          "takes me out"
         ],
         "a": 0,
-        "why": "Pick me up: the pronoun sits between pick and up."
+        "why": "Pick someone up = collect them from a place."
       },
       {
         "type": "mc",
-        "q": "Which sentence correctly uses 'catch up on' with a pronoun?",
+        "q": "I watch episodes I missed. This weekend, I will ___.",
         "opts": [
-          "I catch them up on at the weekend.",
-          "I catch up them on at the weekend.",
-          "I catch up on them at the weekend.",
-          "I catch on up them at the weekend."
+          "pick them up",
+          "put them off",
+          "catch up on them",
+          "look after them"
         ],
         "a": 2,
-        "why": "Catch up on + object, never split it."
+        "why": "Catch up on them = watch the missed episodes."
       },
       {
         "type": "mc",
-        "q": "Which sentence uses 'get down to' correctly?",
+        "q": "I am ready to begin my homework seriously. I ___.",
         "opts": [
-          "I get down to it after my break.",
-          "I get it down to after my break.",
-          "I get down it to after my break.",
-          "I get down to after it my break."
+          "get down to it",
+          "catch up on it",
+          "put it off",
+          "look after it"
         ],
         "a": 0,
-        "why": "Get down to + noun/pronoun."
+        "why": "Get down to it = begin work seriously."
       },
       {
         "type": "mc",
@@ -162,15 +162,15 @@ window.EnglishLabSampleExam.safe = {
       },
       {
         "type": "mc",
-        "q": "Which sentence uses the collocation for washing clothes?",
+        "q": "Which sentence specifically means washing clothes?",
         "opts": [
-          "I make the washing on Sundays.",
+          "I make the bed on Sundays.",
           "I do the housework on Sundays.",
           "I do the washing on Sundays.",
-          "I take the washing on Sundays."
+          "I do the shopping on Sundays."
         ],
         "a": 2,
-        "why": "Do the washing is the collocation taught."
+        "why": "Do the washing = wash clothes."
       }
     ],
     "vocabGap": [
