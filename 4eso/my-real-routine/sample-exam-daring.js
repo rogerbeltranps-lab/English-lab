@@ -18,10 +18,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which statement distinguishes two different morning actions?",
         "opts": [
-          "Alex gets up and wakes up at exactly the same time.",
-          "Alex goes to school before waking up.",
+          "Alex wakes up at seven and gets up fifteen minutes later.",
+          "Alex gets up ten minutes before leaving home.",
           "Alex wakes up at seven but gets up ten minutes later.",
-          "Alex gets up before he wakes up."
+          "Alex wakes up at half past seven and gets up immediately."
         ],
         "a": 2,
         "why": "Waking up and getting up happen 10 minutes apart."
@@ -42,9 +42,9 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which comparison of Alex's evening timings is accurate?",
         "opts": [
-          "Alex turns in before dinner.",
-          "Dinner and bedtime happen simultaneously.",
-          "Alex goes to bed before reading.",
+          "Alex goes to bed ninety minutes after dinner.",
+          "Alex reads only after he has gone to bed.",
+          "Alex has dinner one hour before going to bed.",
           "Alex goes to bed two and a half hours after dinner."
         ],
         "a": 3,
@@ -54,10 +54,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which inference about Alex's school journey is warranted?",
         "opts": [
-          "He probably travels with his parents.",
+          "He walks with his friend but they do not talk.",
           "He uses travel time to talk with a friend.",
-          "He always takes the bus in bad weather.",
-          "He avoids walking every day."
+          "He has a longer journey than his friend.",
+          "He usually meets his friend only after school."
         ],
         "a": 1,
         "why": "He says he walks with a friend and they talk on the way."
@@ -66,10 +66,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which conclusion is justified by the recording?",
         "opts": [
-          "He never has any free time.",
-          "He does homework after going to bed.",
+          "Alex spends the entire evening studying.",
+          "Alex listens to music while doing his homework.",
           "His school-day routine includes a break before homework and some quiet evening activities.",
-          "He says he limits screen time to twenty minutes."
+          "Alex prefers reading to listening to music."
         ],
         "a": 2,
         "why": "The audio mentions a break and music or reading, but no precise screen limits."
@@ -80,9 +80,9 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "When I try to combine schoolwork, rest and activity, I try to ___.",
         "opts": [
-          "take an argument",
-          "pay a decision",
-          "have progress",
+          "make progress",
+          "make a decision",
+          "take action",
           "strike a balance"
         ],
         "a": 3,
@@ -93,9 +93,9 @@ window.EnglishLabSampleExam.daring = {
         "q": "Which collocation is correct?",
         "opts": [
           "make progress",
-          "do progress",
-          "take progress",
-          "pay progress"
+          "make an effort",
+          "have a break",
+          "take a risk"
         ],
         "a": 0,
         "why": "Make progress is the studied expression."
@@ -106,8 +106,8 @@ window.EnglishLabSampleExam.daring = {
         "opts": [
           "I put off it until Sunday.",
           "I put it off until Sunday.",
-          "I put off until it Sunday.",
-          "I put it until off Sunday."
+          "I put it of until Sunday.",
+          "I puts it off until Sunday."
         ],
         "a": 1,
         "why": "The pronoun goes between put and off."
@@ -116,10 +116,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which three-part expression is correctly formed?",
         "opts": [
-          "She gets it down to before dinner.",
+          "She gets down to them after school.",
           "She gets down it to after school.",
           "She gets down to it after school.",
-          "She gets it to down after school."
+          "She gets it down to after school."
         ],
         "a": 2,
         "why": "Get down to it is inseparable."
@@ -129,9 +129,9 @@ window.EnglishLabSampleExam.daring = {
         "q": "Which collocation means to become interested?",
         "opts": [
           "take an interest in",
-          "do an interest in",
-          "make an interest on",
-          "pay interest for"
+          "pay attention to",
+          "make an effort to",
+          "have a look at"
         ],
         "a": 0,
         "why": "Take an interest in sth."
@@ -140,9 +140,9 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "We concentrate on instructions. We ___.",
         "opts": [
-          "take a compliment",
-          "do attention",
-          "make attention",
+          "take notes",
+          "have a look",
+          "make an effort",
           "pay attention"
         ],
         "a": 3,
@@ -155,7 +155,7 @@ window.EnglishLabSampleExam.daring = {
           "get down to it",
           "call it a day",
           "run errands",
-          "get up"
+          "have a break"
         ],
         "a": 1,
         "why": "Call it a day = stop working."
@@ -214,9 +214,9 @@ window.EnglishLabSampleExam.daring = {
         "q": "Which sentence keeps agreement correct across a contrast?",
         "opts": [
           "She gets up early, whereas I wake up later.",
-          "She get up early, whereas I wakes up later.",
+          "She get up early, whereas I wake up later.",
           "She gets up early, whereas I wakes up later.",
-          "She getting up early, whereas I wake later."
+          "She gets up early, whereas I waking up later."
         ],
         "a": 0,
         "why": "She gets, I wake."
@@ -225,22 +225,22 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which phrasal-verb pair has correct pronoun positions?",
         "opts": [
-          "put off it / catch them up on",
-          "put it off / catch them up on",
+          "put off it / catch up on them",
+          "put it off / catch up them on",
           "put it off / catch up on them",
-          "put off it / catch up them on"
+          "put off it / catch them up on"
         ],
         "a": 2,
         "why": "Put it off; catch up on them."
       },
       {
         "type": "mc",
-        "q": "Which sentence explains a CONSEQUENCE?",
+        "q": "Which sentence explicitly presents a consequence rather than a cause or contrast?",
         "opts": [
           "She takes a break although she is busy.",
           "She takes a break because she is tired.",
           "She takes a break whereas he works.",
-          "She takes screen breaks; as a result, she returns to work with a pause between tasks."
+          "She takes screen breaks; as a result, she can divide her work into shorter sessions."
         ],
         "a": 3,
         "why": "As a result introduces a consequence; do not infer medical results."
@@ -285,8 +285,8 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which contrast is grammatically correct?",
         "opts": [
-          "Both students walk, however one taking a bus.",
-          "Although both students walks, they use different times.",
+          "Both students take breaks, however one taking them more often.",
+          "Although both students walks, their journeys differ.",
           "Whereas she gets home earlier, he get home later.",
           "Both students have dinner early, but only one takes screen breaks."
         ],
@@ -354,10 +354,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Why does Noel get home later?",
         "opts": [
-          "He goes shopping every day.",
-          "He always misses the bus.",
+          "He makes a stop at the shops on his way home.",
+          "He starts school later than Ari.",
           "His bus takes a longer route.",
-          "He stays for extra lessons."
+          "He waits for his sister before catching the bus."
         ],
         "a": 2,
         "why": "Longer bus route is explicitly given."
@@ -367,9 +367,9 @@ window.EnglishLabSampleExam.daring = {
         "q": "Which habit is Ari planning to change?",
         "opts": [
           "Working on screens for long periods without a break.",
-          "Drinking water at school.",
-          "Getting enough sleep.",
-          "Eating a balanced meal."
+          "Taking screen breaks while doing homework.",
+          "Having a snack before starting work.",
+          "Getting home later than expected."
         ],
         "a": 0,
         "why": "Ari already has several healthy habits; the specific issue is continuous screen work."
@@ -378,9 +378,9 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "What can we conclude about their routines?",
         "opts": [
-          "All healthy habits need the same timetable.",
-          "They have exactly the same school transport.",
-          "Noel never does homework.",
+          "Their different transport choices cause their different sleep habits.",
+          "Both students get home at the same time but rest differently.",
+          "Ari and Noel have no habits in common.",
           "Shared healthy habits can coexist with different routines."
         ],
         "a": 3,
@@ -390,10 +390,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which interpretation avoids overstating the evidence?",
         "opts": [
-          "Two short breaks will definitely improve Ari's grades.",
+          "Ari is certain that two breaks will raise her grades.",
           "The break plan responds to a specific routine and may support a better balance.",
-          "Ari's current routine is unhealthy in every respect.",
-          "Noel is healthier because he uses the bus."
+          "Ari plans to give up laptop work completely.",
+          "The text says the breaks will eliminate tiredness."
         ],
         "a": 1,
         "why": "The passage says the plan does not guarantee a result."
