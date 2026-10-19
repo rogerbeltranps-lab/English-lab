@@ -126,7 +126,7 @@ window.EnglishLabSampleExam.daring = {
       },
       {
         "type": "mc",
-        "q": "I decide to get more sleep. I ___ to go to bed earlier.",
+        "q": "Which expression means making a firm choice?",
         "opts": [
           "make a change",
           "make an excuse",
@@ -162,7 +162,7 @@ window.EnglishLabSampleExam.daring = {
       },
       {
         "type": "mc",
-        "q": "Which expression describes something you can actually do to improve a habit?",
+        "q": "Which expression means making a small, practical change to a habit?",
         "opts": [
           "make an excuse",
           "make a realistic adjustment",
