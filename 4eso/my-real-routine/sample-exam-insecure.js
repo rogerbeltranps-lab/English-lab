@@ -21,8 +21,8 @@ window.EnglishLabSampleExam.insecure = {
         "opts": [
           "At seven.",
           "At ten past seven.",
-          "At half past seven.",
-          "At eight."
+          "At quarter past seven.",
+          "At half past seven."
         ],
         "a": 1,
         "why": "He wakes up at 7:00 but gets up at 7:10."
@@ -32,9 +32,9 @@ window.EnglishLabSampleExam.insecure = {
         "q": "What does Alex have for breakfast?",
         "opts": [
           "Cereal and a banana.",
-          "Bread and eggs.",
-          "Only a cup of tea.",
-          "Fruit and rice."
+          "Cereal and yoghurt.",
+          "Toast and a banana.",
+          "Cereal and an apple."
         ],
         "a": 0,
         "why": "He has cereal and a banana."
@@ -55,10 +55,10 @@ window.EnglishLabSampleExam.insecure = {
         "type": "mc",
         "q": "When does Alex do his homework?",
         "opts": [
-          "At four.",
+          "At half past four.",
           "At five.",
-          "At eight.",
-          "At half past ten."
+          "At half past five.",
+          "At quarter past five."
         ],
         "a": 1,
         "why": "He does homework at 5:00."
@@ -67,9 +67,9 @@ window.EnglishLabSampleExam.insecure = {
         "type": "mc",
         "q": "What does Alex sometimes do after dinner?",
         "opts": [
-          "He has breakfast.",
-          "He goes shopping.",
-          "He goes to school.",
+          "He watches a film.",
+          "He calls a friend.",
+          "He finishes homework.",
           "He listens to music or reads."
         ],
         "a": 3,
@@ -115,12 +115,12 @@ window.EnglishLabSampleExam.insecure = {
       },
       {
         "type": "mc",
-        "q": "Which one refers to a healthy sleep habit?",
+        "q": "Which habit most directly supports a regular sleep schedule?",
         "opts": [
-          "Use screens all night.",
-          "Never rest.",
-          "Skip sleep.",
-          "Get enough sleep."
+          "Have a balanced meal.",
+          "Take short screen breaks.",
+          "Drink enough water.",
+          "Get enough sleep by going to bed at a sensible time."
         ],
         "a": 3,
         "why": "Enough sleep is a healthy habit."
@@ -163,11 +163,11 @@ window.EnglishLabSampleExam.insecure = {
       },
       {
         "type": "mc",
-        "q": "We want to have enough water each day. We want to ___.",
+        "q": "Which expression means keeping your body supplied with enough water?",
         "opts": [
           "stay in",
           "sleep in",
-          "watch TV",
+          "wind down",
           "stay hydrated"
         ],
         "a": 3,
@@ -211,12 +211,12 @@ window.EnglishLabSampleExam.insecure = {
     "grammarChoice": [
       {
         "type": "mc",
-        "q": "My brother ___ breakfast at seven.",
+        "q": "My brother ___ breakfast at seven every morning.",
         "opts": [
           "have",
           "has",
-          "having",
-          "haves"
+          "had",
+          "having"
         ],
         "a": 1,
         "why": "He has: third-person singular."
@@ -247,7 +247,7 @@ window.EnglishLabSampleExam.insecure = {
       },
       {
         "type": "mc",
-        "q": "He usually ___ home before dinner.",
+        "q": "He usually ___ home before dinner on school days.",
         "opts": [
           "get",
           "getting",
@@ -263,8 +263,8 @@ window.EnglishLabSampleExam.insecure = {
         "opts": [
           "She drinks usually water.",
           "She usually drinks water.",
-          "She drinks water usually always.",
-          "Usually she water drinks."
+          "She drinks water always.",
+          "She usually water drinks."
         ],
         "a": 1,
         "why": "Usually appears before the main verb."
@@ -345,8 +345,8 @@ window.EnglishLabSampleExam.insecure = {
         "opts": [
           "At seven.",
           "At quarter to seven.",
-          "At eight.",
-          "At four."
+          "At quarter past seven.",
+          "At half past seven."
         ],
         "a": 0,
         "why": "She wakes at 6:45, then gets up at 7:00."
@@ -367,10 +367,10 @@ window.EnglishLabSampleExam.insecure = {
         "type": "mc",
         "q": "How often does she go for a walk?",
         "opts": [
-          "Every day.",
+          "Three times a week.",
           "Twice a week.",
-          "Once a month.",
-          "Never."
+          "Once a week.",
+          "Every weekend."
         ],
         "a": 1,
         "why": "On Tuesdays and Thursdays."
@@ -379,9 +379,9 @@ window.EnglishLabSampleExam.insecure = {
         "type": "mc",
         "q": "Why does she go for a walk?",
         "opts": [
-          "To catch a train.",
-          "To make dinner.",
-          "To watch TV.",
+          "To spend more time with her sister.",
+          "To get ready for school.",
+          "To help her sleep earlier.",
           "Because she wants to be active."
         ],
         "a": 3,
@@ -392,9 +392,9 @@ window.EnglishLabSampleExam.insecure = {
         "q": "When does she turn in?",
         "opts": [
           "At ten.",
-          "At eight.",
-          "At midnight.",
-          "At seven."
+          "At half past nine.",
+          "At half past ten.",
+          "At quarter past ten."
         ],
         "a": 0,
         "why": "She turns in at ten."
