@@ -18,10 +18,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "What does Alex do just after he gets home?",
         "opts": [
-          "He makes dinner.",
+          "He starts his homework.",
           "He has a snack and a break.",
-          "He goes to bed.",
-          "He heads out for school."
+          "He watches TV.",
+          "He listens to music."
         ],
         "a": 1,
         "why": "Alex gets home at 4:30, then has a snack and a short break."
@@ -31,9 +31,9 @@ window.EnglishLabSampleExam.safe = {
         "q": "How much time passes between breakfast and leaving for school?",
         "opts": [
           "Fifteen minutes.",
-          "One hour.",
+          "Forty-five minutes.",
           "Half an hour.",
-          "Two hours."
+          "One hour."
         ],
         "a": 2,
         "why": "Breakfast at 7:30 and school walk at 8:00."
@@ -43,9 +43,9 @@ window.EnglishLabSampleExam.safe = {
         "q": "When does Alex start his homework?",
         "opts": [
           "After a short break.",
-          "Straight after waking up.",
-          "After dinner.",
-          "At nine in the evening."
+          "As soon as he gets home.",
+          "After having dinner.",
+          "Immediately after his snack."
         ],
         "a": 0,
         "why": "He takes a short break before homework at 5:00."
@@ -54,9 +54,9 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "Which activity is mentioned in Alex's evening?",
         "opts": [
-          "Running errands.",
-          "Doing the ironing.",
-          "Going shopping.",
+          "Talking with friends.",
+          "Watching a film.",
+          "Playing a game.",
           "Reading or listening to music."
         ],
         "a": 3,
@@ -66,10 +66,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "Which statement about Alex is correct?",
         "opts": [
-          "He goes to bed before dinner.",
+          "He gets up at eight.",
           "He walks to school with a friend.",
-          "He never eats breakfast.",
-          "He makes dinner at five."
+          "He has breakfast after school.",
+          "He does his homework before he gets home."
         ],
         "a": 1,
         "why": "He walks to school with his friend at eight."
@@ -92,10 +92,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "I buy food and pick up a parcel. I ___.",
         "opts": [
-          "do my best",
-          "make the bed",
+          "go shopping",
+          "do housework",
           "run errands",
-          "have dinner"
+          "do the washing"
         ],
         "a": 2,
         "why": "Run errands = do small practical tasks."
@@ -114,12 +114,12 @@ window.EnglishLabSampleExam.safe = {
       },
       {
         "type": "mc",
-        "q": "Which expression means 'fer la compra'?",
+        "q": "Which sentence uses the expression for buying the family's regular groceries?",
         "opts": [
-          "make the shopping",
-          "take shopping",
-          "have shopping",
-          "do the shopping"
+          "We go shopping for new shoes.",
+          "We run errands after school.",
+          "We make the bed before breakfast.",
+          "We do the shopping at the supermarket."
         ],
         "a": 3,
         "why": "Do the shopping."
@@ -138,36 +138,36 @@ window.EnglishLabSampleExam.safe = {
       },
       {
         "type": "mc",
-        "q": "Which helps someone who spends a long time using a screen?",
+        "q": "Which habit specifically helps someone avoid uninterrupted screen time?",
         "opts": [
-          "Never take breaks.",
-          "Have a late night.",
+          "Drink water during the day.",
+          "Get enough sleep at night.",
           "Take screen breaks.",
-          "Skip breakfast."
+          "Go for a walk after school."
         ],
         "a": 2,
         "why": "Screen breaks are an appropriate habit."
       },
       {
         "type": "mc",
-        "q": "I want to drink fewer sugary drinks. I want to ___.",
+        "q": "Which phrase means to reduce, rather than completely stop, sugary drinks?",
         "opts": [
           "cut down on sugary drinks",
-          "turn in sugary drinks",
-          "get home sugary drinks",
-          "run errands sugary drinks"
+          "cut out sugary drinks",
+          "run out of sugary drinks",
+          "stock up on sugary drinks"
         ],
         "a": 0,
         "why": "Cut down on = reduce."
       },
       {
         "type": "mc",
-        "q": "He gets home ___ half past five.",
+        "q": "Which sentence says he arrives home at exactly 5:30?",
         "opts": [
-          "on",
-          "by",
-          "for",
-          "at"
+          "He gets home after half past five.",
+          "He gets home by half past five.",
+          "He gets home around half past five.",
+          "He gets home at half past five."
         ],
         "a": 3,
         "why": "Get home at + time."
@@ -239,7 +239,7 @@ window.EnglishLabSampleExam.safe = {
           "have",
           "has",
           "having",
-          "haves"
+          "had"
         ],
         "a": 0,
         "why": "Does + base verb."
@@ -250,7 +250,7 @@ window.EnglishLabSampleExam.safe = {
         "opts": [
           "She doesn't goes shopping.",
           "She don't go shopping.",
-          "She not goes shopping.",
+          "She doesn't going shopping.",
           "She doesn't go shopping."
         ],
         "a": 3,
@@ -272,10 +272,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "Which sentence has correct adverb position?",
         "opts": [
-          "He always is tired.",
-          "He often tired is.",
+          "He often is tired.",
+          "He is tired often.",
           "He is often tired.",
-          "He is tired often always."
+          "He often tired is."
         ],
         "a": 2,
         "why": "Be + frequency adverb."
@@ -286,8 +286,8 @@ window.EnglishLabSampleExam.safe = {
         "opts": [
           "No, they don't.",
           "No, they doesn't.",
-          "No, they aren't.",
-          "No, they not."
+          "No, they didn't.",
+          "No, they aren't."
         ],
         "a": 0,
         "why": "No, they don't."
@@ -342,9 +342,9 @@ window.EnglishLabSampleExam.safe = {
         "q": "What does Leo do before heading out for school?",
         "opts": [
           "He brushes his teeth and makes the bed.",
-          "He orders a takeaway.",
-          "He plays video games.",
-          "He takes a nap."
+          "He has a snack and reads.",
+          "He checks his phone and goes out.",
+          "He packs a bag and meets his cousin."
         ],
         "a": 0,
         "why": "Brushes teeth and makes bed."
@@ -353,10 +353,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "When does he walk to school?",
         "opts": [
-          "Every day.",
+          "On Mondays.",
           "On Fridays.",
           "On Tuesdays.",
-          "Only on Sundays."
+          "At the weekend."
         ],
         "a": 1,
         "why": "He walks with his cousin on Fridays."
@@ -365,10 +365,10 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "What happens straight after Leo gets home?",
         "opts": [
-          "He goes to bed.",
+          "He does his homework.",
           "He watches a film.",
           "He has a snack.",
-          "He goes shopping."
+          "He runs errands."
         ],
         "a": 2,
         "why": "He has a snack straight away."
@@ -377,9 +377,9 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "Which activity does Leo sometimes do with his mum?",
         "opts": [
-          "Take the train.",
-          "Go to the cinema.",
-          "Have breakfast at school.",
+          "Make dinner together.",
+          "Go to the cinema together.",
+          "Take a walk together.",
           "Run errands and do the shopping."
         ],
         "a": 3,
@@ -389,9 +389,9 @@ window.EnglishLabSampleExam.safe = {
         "type": "mc",
         "q": "Which statement about Leo's routine is supported?",
         "opts": [
-          "He has no healthy habits.",
-          "He never does his homework.",
-          "He always watches films before bed.",
+          "He walks to school every weekday.",
+          "He always goes to bed late.",
+          "He never takes breaks from screens.",
           "He sometimes sleeps in on weekends."
         ],
         "a": 3,
