@@ -20,9 +20,9 @@ window.EnglishLabSampleExam.insecure = {
         "q": "What time does Alex wake up?",
         "opts": [
           "At seven.",
-          "At eight.",
+          "At ten past seven.",
           "At half past seven.",
-          "At ten."
+          "At eight."
         ],
         "a": 0,
         "why": "He wakes up at seven."
@@ -31,10 +31,10 @@ window.EnglishLabSampleExam.insecure = {
         "type": "mc",
         "q": "What does Alex have for breakfast?",
         "opts": [
-          "Toast and eggs.",
+          "Cereal and toast.",
           "Cereal and a banana.",
-          "A sandwich.",
-          "Rice."
+          "Toast and a banana.",
+          "Yoghurt and a banana."
         ],
         "a": 1,
         "why": "He has cereal and a banana."
@@ -57,7 +57,7 @@ window.EnglishLabSampleExam.insecure = {
         "opts": [
           "At four.",
           "At five.",
-          "At eight.",
+          "At half past five.",
           "At half past four."
         ],
         "a": 3,
@@ -68,8 +68,8 @@ window.EnglishLabSampleExam.insecure = {
         "q": "When does Alex go to bed?",
         "opts": [
           "At half past ten.",
-          "At nine.",
-          "At seven.",
+          "At ten.",
+          "At half past nine.",
           "At eleven."
         ],
         "a": 0,
@@ -81,10 +81,10 @@ window.EnglishLabSampleExam.insecure = {
         "type": "mc",
         "q": "What does 'wind down' mean?",
         "opts": [
-          "Leave home.",
+          "Go straight to sleep.",
           "Relax after a busy day.",
-          "Get up early.",
-          "Go shopping."
+          "Take a break before starting work.",
+          "Spend the evening outside."
         ],
         "a": 1,
         "why": "Wind down vol dir relaxar-se."
@@ -115,12 +115,12 @@ window.EnglishLabSampleExam.insecure = {
       },
       {
         "type": "mc",
-        "q": "We usually ___ breakfast at seven.",
+        "q": "Which expression means 'esmorzar' (eat your morning meal)?",
         "opts": [
-          "do",
-          "make",
-          "go",
-          "have"
+          "prepare breakfast",
+          "skip breakfast",
+          "make breakfast",
+          "have breakfast"
         ],
         "a": 3,
         "why": "Have breakfast és l’expressió treballada."
@@ -139,12 +139,12 @@ window.EnglishLabSampleExam.insecure = {
       },
       {
         "type": "mc",
-        "q": "Which action helps you get enough sleep?",
+        "q": "Which habit directly supports a regular sleep routine?",
         "opts": [
-          "Use screens all night.",
-          "Go to bed at four.",
-          "Turn in at a sensible time.",
-          "Never rest."
+          "Go for a walk after school.",
+          "Drink water during the day.",
+          "Turn in at a regular time.",
+          "Eat a balanced lunch."
         ],
         "a": 2,
         "why": "Turn in means go to bed."
@@ -163,12 +163,12 @@ window.EnglishLabSampleExam.insecure = {
       },
       {
         "type": "mc",
-        "q": "Which sentence mentions a healthy habit?",
+        "q": "Which sentence describes a habit that supports hydration?",
         "opts": [
-          "She never drinks water.",
-          "She stays up every night.",
-          "She has no time to rest.",
-          "She drinks water every day."
+          "She walks to school most days.",
+          "She takes short screen breaks.",
+          "She gets enough sleep.",
+          "She drinks water throughout the day."
         ],
         "a": 3,
         "why": "Drinking water is a healthy habit."
@@ -211,24 +211,24 @@ window.EnglishLabSampleExam.insecure = {
     "grammarChoice": [
       {
         "type": "mc",
-        "q": "My friend ___ up at seven.",
+        "q": "My friend ___ up at seven every school day.",
         "opts": [
           "wake",
           "wakes",
-          "waking",
-          "wakess"
+          "woke",
+          "waking"
         ],
         "a": 1,
         "why": "He/she wakes up."
       },
       {
         "type": "mc",
-        "q": "They ___ to school by bus.",
+        "q": "They ___ to school by bus every morning.",
         "opts": [
           "goes",
           "going",
           "go",
-          "gos"
+          "went"
         ],
         "a": 2,
         "why": "They go: plural subject."
@@ -271,12 +271,12 @@ window.EnglishLabSampleExam.insecure = {
       },
       {
         "type": "mc",
-        "q": "He ___ tired after school.",
+        "q": "Which sentence puts the frequency word in the usual position?",
         "opts": [
-          "often is",
-          "is often",
-          "often are",
-          "be often"
+          "He often is tired after school.",
+          "He is often tired after school.",
+          "He is tired often after school.",
+          "He is tired after school often."
         ],
         "a": 1,
         "why": "The frequency adverb follows is."
@@ -356,9 +356,9 @@ window.EnglishLabSampleExam.insecure = {
         "q": "When does Noa get home?",
         "opts": [
           "At four.",
-          "At seven.",
-          "At eight.",
-          "At nine."
+          "At half past four.",
+          "At quarter past four.",
+          "At five."
         ],
         "a": 0,
         "why": "She gets home at four."
@@ -367,9 +367,9 @@ window.EnglishLabSampleExam.insecure = {
         "type": "mc",
         "q": "How often does Noa go for a walk?",
         "opts": [
-          "Every day.",
-          "Never.",
-          "Once a month.",
+          "Three times a week.",
+          "Once a week.",
+          "On alternate weekends.",
           "Twice a week."
         ],
         "a": 3,
@@ -379,10 +379,10 @@ window.EnglishLabSampleExam.insecure = {
         "type": "mc",
         "q": "What does Noa do after dinner?",
         "opts": [
-          "She goes to school.",
+          "She reads in bed.",
           "She listens to music.",
-          "She has breakfast.",
-          "She goes shopping."
+          "She watches a film.",
+          "She goes for a walk."
         ],
         "a": 1,
         "why": "She listens to music to wind down."
@@ -391,10 +391,10 @@ window.EnglishLabSampleExam.insecure = {
         "type": "mc",
         "q": "Why does Noa turn in at half past nine?",
         "opts": [
-          "To play a game.",
-          "To walk to school.",
+          "To have more time for homework.",
+          "To get up earlier than her brother.",
           "To get enough sleep.",
-          "To go shopping."
+          "To have time for breakfast."
         ],
         "a": 2,
         "why": "The text explicitly says to get enough sleep."
