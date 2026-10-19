@@ -90,7 +90,7 @@ window.EnglishLabSampleExam.daring = {
       },
       {
         "type": "mc",
-        "q": "Which collocation is correct?",
+        "q": "Which collocation means to improve gradually?",
         "opts": [
           "make progress",
           "make an effort",
@@ -116,7 +116,7 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which three-part expression is correctly formed?",
         "opts": [
-          "She gets down to them after school.",
+          "She gets down to after school it.",
           "She gets down it to after school.",
           "She gets down to it after school.",
           "She gets it down to after school."
