@@ -102,12 +102,12 @@ window.EnglishLabSampleExam.daring = {
       },
       {
         "type": "mc",
-        "q": "I delay the task until Sunday. I ___.",
+        "q": "Which sentence means that I postpone the task until Sunday?",
         "opts": [
-          "catch up on it by Sunday",
-          "put it off until Sunday",
-          "get down to it on Sunday",
-          "pick it up on Sunday"
+          "I catch up on it by Sunday.",
+          "I put it off until Sunday.",
+          "I get down to it on Sunday.",
+          "I pick it up on Sunday."
         ],
         "a": 1,
         "why": "Put it off means postpone the task; the pronoun goes between put and off."
