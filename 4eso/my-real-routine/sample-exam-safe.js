@@ -222,7 +222,7 @@ window.EnglishLabSampleExam.safe = {
       },
       {
         "type": "mc",
-        "q": "Which phrasal-verb pronoun pattern is correct?",
+        "q": "Which sentence uses 'put off' correctly in the Present Simple with the pronoun 'it'?",
         "opts": [
           "She puts off it.",
           "She puts it off.",
@@ -230,7 +230,7 @@ window.EnglishLabSampleExam.safe = {
           "She puts it of."
         ],
         "a": 1,
-        "why": "Separable phrasal verb: put it off."
+        "why": "She puts it off is Present Simple third-person singular with the pronoun between verb and particle."
       },
       {
         "type": "mc",
