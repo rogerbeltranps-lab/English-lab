@@ -211,7 +211,7 @@ window.EnglishLabSampleExam.insecure = {
     "grammarChoice": [
       {
         "type": "mc",
-        "q": "My brother ___ breakfast at seven every morning.",
+        "q": "My brother ___ breakfast at seven every morning these days.",
         "opts": [
           "have",
           "has",
