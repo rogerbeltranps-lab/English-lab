@@ -102,27 +102,27 @@ window.EnglishLabSampleExam.daring = {
       },
       {
         "type": "mc",
-        "q": "Which sentence uses a separable phrasal verb correctly?",
+        "q": "I delay the task until Sunday. I ___.",
         "opts": [
-          "I put off it until Sunday.",
-          "I put it off until Sunday.",
-          "I put it of until Sunday.",
-          "I puts it off until Sunday."
+          "catch up on it by Sunday",
+          "put it off until Sunday",
+          "get down to it on Sunday",
+          "pick it up on Sunday"
         ],
         "a": 1,
-        "why": "The pronoun goes between put and off."
+        "why": "Put it off means postpone the task; the pronoun goes between put and off."
       },
       {
         "type": "mc",
-        "q": "Which three-part expression is correctly formed?",
+        "q": "Which expression means to begin a task seriously?",
         "opts": [
-          "She gets down to after school it.",
-          "She gets down it to after school.",
-          "She gets down to it after school.",
-          "She gets it down to after school."
+          "get around to it",
+          "put it off",
+          "get down to it",
+          "catch up on it"
         ],
         "a": 2,
-        "why": "Get down to it is inseparable."
+        "why": "Get down to it = begin the task seriously."
       },
       {
         "type": "mc",
@@ -259,15 +259,15 @@ window.EnglishLabSampleExam.daring = {
       },
       {
         "type": "mc",
-        "q": "Which phrase describes the action immediately after finishing a task?",
+        "q": "Which sentence says that winding down happens only once the homework is complete?",
         "opts": [
           "After finishing homework, I wind down.",
-          "After finish homework, I wind down.",
-          "After finished homework, I wind down.",
-          "After to finish homework, I wind down."
+          "Before finishing homework, I wind down.",
+          "While finishing homework, I wind down.",
+          "Instead of finishing homework, I wind down."
         ],
         "a": 0,
-        "why": "After + verb-ing."
+        "why": "After finishing signals that homework comes first and relaxation follows."
       },
       {
         "type": "mc",
