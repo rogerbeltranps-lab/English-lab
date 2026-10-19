@@ -30,10 +30,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which order is supported by the recording?",
         "opts": [
-          "Homework, then snack, then school.",
+          "School, breakfast, homework, snack.",
           "Breakfast, school, snack, homework.",
-          "School, bedtime, homework.",
-          "Homework before breakfast."
+          "Breakfast, snack, school, homework.",
+          "School, breakfast, snack, homework."
         ],
         "a": 1,
         "why": "Breakfast is followed by school; snack before homework."
@@ -54,9 +54,9 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which conclusion is supported without guessing?",
         "opts": [
-          "Alex always spends two hours on screens.",
-          "Alex never has breaks.",
-          "Alex walks alone to school.",
+          "He regularly meets his friend at school.",
+          "He sometimes studies before breakfast.",
+          "He usually travels by public transport.",
           "Alex includes a short break after school."
         ],
         "a": 3,
@@ -66,10 +66,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "What can we say about his evening?",
         "opts": [
-          "He stays out until midnight.",
+          "He normally eats dinner at half past eight.",
           "He has dinner at eight and goes to bed at ten thirty.",
-          "He does homework after bedtime.",
-          "He watches TV all night."
+          "He goes to bed shortly after dinner.",
+          "He finishes homework at half past ten."
         ],
         "a": 1,
         "why": "Dinner at 8:00, bed 10:30."
@@ -80,10 +80,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "I make time for work, rest and activity. I try to ___.",
         "opts": [
-          "do a mistake",
-          "pay a decision",
+          "make a change",
+          "make progress",
           "strike a balance",
-          "take an argument"
+          "take a risk"
         ],
         "a": 2,
         "why": "Strike a balance."
@@ -93,20 +93,20 @@ window.EnglishLabSampleExam.daring = {
         "q": "Which collocation means 'improve gradually'?",
         "opts": [
           "make progress",
-          "do progress",
-          "take progress",
-          "pay progress"
+          "make a decision",
+          "do your best",
+          "take action"
         ],
         "a": 0,
         "why": "Make progress."
       },
       {
         "type": "mc",
-        "q": "We listen carefully in class. We ___.",
+        "q": "Which expression means to concentrate on what someone says?",
         "opts": [
-          "make attention",
-          "have attention",
-          "take attention",
+          "have a chat",
+          "have a look",
+          "take a break",
           "pay attention"
         ],
         "a": 3,
@@ -116,10 +116,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "I try hard to change one habit. I ___.",
         "opts": [
-          "do an effort",
+          "take a break",
           "make an effort",
-          "have an effort",
-          "pay an effort"
+          "make a choice",
+          "make a mistake"
         ],
         "a": 1,
         "why": "Make an effort."
@@ -128,33 +128,33 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "I decide to get more sleep. I ___ to go to bed earlier.",
         "opts": [
-          "do a decision",
-          "take a decision off",
+          "make a change",
+          "make an excuse",
           "make a decision",
-          "have progress"
+          "make a comment"
         ],
         "a": 2,
         "why": "Make a decision."
       },
       {
         "type": "mc",
-        "q": "Which expression means 'esforçar-se al màxim'?",
+        "q": "Which 'do' expression means 'esforçar-se al màxim'?",
         "opts": [
           "do your best",
-          "make your best",
-          "have your best",
-          "pay your best"
+          "do your homework",
+          "do the shopping",
+          "do some work"
         ],
         "a": 0,
         "why": "Do your best."
       },
       {
         "type": "mc",
-        "q": "After working for a long time, I ___ before dinner.",
+        "q": "Which 'have' expression means to stop briefly and rest?",
         "opts": [
-          "pay a break",
-          "make a break",
-          "do a break",
+          "have a chat",
+          "have a look",
+          "have a party",
           "have a break"
         ],
         "a": 3,
@@ -166,8 +166,8 @@ window.EnglishLabSampleExam.daring = {
         "opts": [
           "make an excuse",
           "make a realistic adjustment",
-          "pay a habit",
-          "have an argument"
+          "make a comment",
+          "make an arrangement"
         ],
         "a": 1,
         "why": "A realistic adjustment is a practical change."
@@ -214,9 +214,9 @@ window.EnglishLabSampleExam.daring = {
         "q": "Which option has correct singular and plural forms?",
         "opts": [
           "She goes home, whereas I walk to school.",
-          "She go home, whereas I walks to school.",
-          "She going home, whereas I walks to school.",
-          "She goes home, whereas I walks to school."
+          "She go home, whereas I walk to school.",
+          "She goes home, whereas I walks to school.",
+          "She goes home, whereas I walking to school."
         ],
         "a": 0,
         "why": "She goes; I walk."
@@ -262,9 +262,9 @@ window.EnglishLabSampleExam.daring = {
         "q": "Which option is grammatically correct?",
         "opts": [
           "He doesn't watch TV, but she watches a film.",
-          "He doesn't watches TV, but she watch a film.",
+          "He doesn't watches TV, but she watches a film.",
           "He don't watch TV, but she watches a film.",
-          "He doesn't watches TV, but she watches a film."
+          "He doesn't watch TV, but she watch a film."
         ],
         "a": 0,
         "why": "Doesn't watch; she watches."
@@ -273,10 +273,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which sentence uses 'both' correctly?",
         "opts": [
-          "Both walks to school every day.",
+          "Both student walk to school.",
           "Both students walks to school.",
           "Both students walk to school.",
-          "Both student walk to school."
+          "Both students walking to school."
         ],
         "a": 2,
         "why": "Both students + plural verb."
@@ -287,8 +287,8 @@ window.EnglishLabSampleExam.daring = {
         "opts": [
           "She gets up more early than me.",
           "She gets up earlier than me.",
-          "She gets up earlier that me.",
-          "She gets up early that me."
+          "She gets up earlier then me.",
+          "She gets up the earliest than me."
         ],
         "a": 1,
         "why": "Earlier than."
@@ -354,10 +354,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "What is the difference between their afternoon routines?",
         "opts": [
-          "Nora has a break before homework and Ben after.",
+          "Nora takes a break after homework; Ben takes one before.",
           "Nora starts homework immediately; Ben has a break first.",
-          "Both put off their homework until dinner.",
-          "Neither does homework."
+          "Nora works after dinner; Ben works before dinner.",
+          "Nora and Ben both take a break before homework."
         ],
         "a": 1,
         "why": "Nora homework first, Ben break first."
@@ -378,10 +378,10 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Why is Nora's plan described as realistic?",
         "opts": [
-          "It adds short breaks without changing everything else.",
-          "It guarantees better grades.",
-          "It makes her take the train.",
-          "It stops all homework."
+          "It changes one specific screen habit while keeping the rest of her routine.",
+          "It lets her finish all her homework before school.",
+          "It replaces her laptop work with a new activity.",
+          "It requires her to change her whole timetable."
         ],
         "a": 0,
         "why": "It changes one relevant habit."
@@ -390,9 +390,9 @@ window.EnglishLabSampleExam.daring = {
         "type": "mc",
         "q": "Which conclusion is best supported?",
         "opts": [
-          "Only one routine can include healthy habits.",
-          "A change always produces immediate results.",
-          "Having different routines means having no shared habits.",
+          "Their routines are identical because both stay healthy.",
+          "Their routines differ mainly in what they eat.",
+          "Both routines are healthy in exactly the same way.",
           "Different routines can share healthy habits, and a small adjustment may help."
         ],
         "a": 3,
