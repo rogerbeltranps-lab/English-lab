@@ -44,7 +44,7 @@ function push(){
       await setDoc(doc(db,"students",user.uid),{name:user.displayName||"",email:user.email,updated:serverTimestamp()},{merge:true});
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
       const a=window.EL_CATALOG&&actId&&EL_CATALOG.find(x=>x.id===actId);
-      if(a&&a.graded)await setDoc(doc(db,"students",user.uid,"results",resKey(actId)),resultPayload(a),{merge:true});
+      if(a&&a.graded&&!a.manual)await setDoc(doc(db,"students",user.uid,"results",resKey(actId)),resultPayload(a),{merge:true});
     }catch(e){console.warn("sync",e)}
   },1500);
 }

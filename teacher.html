@@ -5,7 +5,7 @@
 <div id="app" hidden>
 <div class="box"><h2>Estat de les LS i activitats avaluables</h2><p class="muted">Oculta: els alumnes no hi poden fer res · Oberta: practiquen i es desa el progrés · Tancada: només consulten el que van fer i el feedback. Les activitats <b>avaluables</b> només les poden fer quan les habilites aquí; les que no avaluen sempre estan disponibles.</p><div id="lsbox"></div></div>
 <div class="box"><h2>Peticions de canvi de nivell</h2><div id="reqs" class="muted">Cap petició pendent.</div></div>
-<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: punts (1 per acció feta). Clica una cel·la per afegir feedback opcional.</p>
+<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: punts (1 per acció feta). El producte final el puntues tu a mà. Clica una cel·la per afegir feedback opcional.</p>
 <select id="lssel"></select><div style="overflow:auto;margin-top:8px"><table id="res"></table></div></div></div>
 <script src="shared/js/el-catalog.js"></script>
 <script type="module">
@@ -16,7 +16,7 @@ EL_LS.forEach(l=>$("#lssel").add(new Option(l.title,l.id)));
 async function drawLs(){let h="";
   for(const l of EL_LS){const info=await ELCloud.lsInfo(l.id),st=info.status;
     h+=`<div style="margin:10px 0"><b>${l.title}</b> `+["hidden","open","closed"].map(s=>`<button class="${s===st?"":"g"} ${s===st?"on":""}" data-ls="${l.id}" data-s="${s}">${{hidden:"Oculta",open:"Oberta",closed:"Tancada"}[s]}</button>`).join(" ");
-    h+=cat.filter(a=>a.ls===l.id&&a.graded).map(a=>`<label><input type="checkbox" data-ls="${l.id}" data-a="${a.id}" ${info.enabled.includes(a.id)?"checked":""}> Habilitada: ${a.title} (${a.points} punts) ${a.criteria.map(c=>`<span class="pill">${c}</span>`).join(" ")}${a.mode==="once"?" <span class='muted'>(una vegada)</span>":""}</label>`).join("")+"</div>"}
+    h+=cat.filter(a=>a.ls===l.id&&a.graded).map(a=>`<label><input type="checkbox" data-ls="${l.id}" data-a="${a.id}" ${info.enabled.includes(a.id)?"checked":""}> Habilitada: ${a.title} ${a.manual?"(la puntues tu · lliurament pel Classroom)":"("+a.points+" punts)"} ${a.criteria.map(c=>`<span class="pill">${c}</span>`).join(" ")}${a.mode==="once"?" <span class='muted'>(una vegada)</span>":""}</label>`).join("")+"</div>"}
   $("#lsbox").innerHTML=h;
   $("#lsbox").querySelectorAll("button").forEach(b=>b.onclick=async()=>{if(b.dataset.s==="closed"&&!confirm("Tancar la LS: els alumnes ja no podran modificar res. Continuar?"))return;await setDoc(doc(db(),"ls",b.dataset.ls),{status:b.dataset.s,updated:serverTimestamp()},{merge:true});drawLs()});
   $("#lsbox").querySelectorAll("input").forEach(i=>i.onchange=async()=>{const ls=i.dataset.ls,set=new Set((await ELCloud.lsInfo(ls)).enabled);i.checked?set.add(i.dataset.a):set.delete(i.dataset.a);await setDoc(doc(db(),"ls",ls),{enabled:[...set],updated:serverTimestamp()},{merge:true})});
@@ -33,13 +33,15 @@ async function results(){
   const students=await getDocs(collection(db(),"students")),rs={},lv={};
   (await getDocs(collectionGroup(db(),"results"))).forEach(r=>{const uid=r.ref.parent.parent.id;(rs[uid]=rs[uid]||{})[r.data().activity]=r.data()});
   (await getDocs(collectionGroup(db(),"levels"))).forEach(l=>{if(l.id===ls)lv[l.ref.parent.parent.id]=l.data().level});
-  let h="<tr><th>Alumne</th><th>Nivell</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?"<br><small>/"+a.points+"</small>":"<br><small>(no avalua)</small>"}</th>`).join("")+"<th>Total</th></tr>";
+  let h="<tr><th>Alumne</th><th>Nivell</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?(a.manual?"<br><small>manual</small>":"<br><small>/"+a.points+"</small>"):"<br><small>(no avalua)</small>"}</th>`).join("")+"<th>Total</th></tr>";
   students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&x&&x.max){ts+=x.score||0;tm+=x.max}});
-    h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td><td>${esc(lv[s.id]||"–")}</td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(a.graded?(x.score||0)+"/"+a.points:"")+(x.locked?" ✔":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+`<td><b>${tm?ts+"/"+tm:"–"}</b></td></tr>`});
+    h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td><td>${esc(lv[s.id]||"–")}</td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(a.manual?(x.max?x.score+"/"+x.max:""):a.graded?(x.score||0)+"/"+a.points:"")+(x.locked?" ✔":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+`<td><b>${tm?ts+"/"+tm:"–"}</b></td></tr>`});
   $("#res").innerHTML=h;
   $("#res").querySelectorAll("td.c").forEach(td=>td.onclick=async()=>{const ref=doc(db(),"students",td.dataset.u,"results",td.dataset.a.replace("/","__")),s=await getDoc(ref),o=s.exists()?s.data():{};
+    const a=cat.find(x=>x.id===td.dataset.a),extra={};
+    if(a.manual){const mx=prompt("Nota màxima d'aquest producte final:",o.max??10);if(mx===null)return;const sc=prompt("Nota de l'alumne (sobre "+mx+"):",o.score??"");if(sc===null)return;if(sc!==""&&!isNaN(+sc)&&!isNaN(+mx)){extra.score=+sc;extra.max=+mx}}
     const fb=prompt("Feedback opcional per a l'alumne:",o.feedback??"");if(fb===null)return;
-    await setDoc(ref,{ls,activity:td.dataset.a,feedback:fb,updated:serverTimestamp()},{merge:true});results()});}
+    await setDoc(ref,Object.assign({ls,activity:td.dataset.a,feedback:fb,updated:serverTimestamp()},extra),{merge:true});results()});}
 $("#lssel").onchange=results;
 ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u))return;$("#app").hidden=false;$("#msg").textContent="Hola, "+(u.displayName||u.email)+".";await drawLs();await requests();await results()});
 </script></body></html>
