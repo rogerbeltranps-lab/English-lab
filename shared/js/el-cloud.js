@@ -10,7 +10,7 @@ const ROOT=new URL("../../",import.meta.url);
 
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let user=null,timer=null,syncing=false,frozen=false,myLevel=null;
+let publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isStudent=u=>!!u&&(u.email||"").toLowerCase().endsWith("@"+DOMAIN);
@@ -37,7 +37,7 @@ async function pull(){
 }
 function resultPayload(a,extra){const sc=elPoints(a);return Object.assign({ls:lsId,activity:a.id,score:sc,max:a.points,done:sc,updated:serverTimestamp()},extra||{})}
 function push(){
-  if(!user||!isStudent(user)||syncing||frozen||!lsId)return;
+  if(!user||!isStudent(user)||syncing||frozen||!lsId||publicLs)return;
   clearTimeout(timer);
   timer=setTimeout(async()=>{
     try{
@@ -106,6 +106,7 @@ async function requestLevel(u){
 async function gate(u){
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
+  if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
   if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){block("Entra amb el compte del col·le","Per fer les activitats cal iniciar sessió amb el teu compte @"+DOMAIN+" (botó de baix a la dreta).");return}
   if(st==="hidden"){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}

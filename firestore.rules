@@ -7,7 +7,7 @@ service cloud.firestore {
 
     // LS release state: hidden | open | closed (written by the teacher only)
     match /ls/{id} {
-      allow read: if signedIn() || isTeacher();
+      allow read: if true;
       allow write: if isTeacher();
     }
     match /assignments/{day} {

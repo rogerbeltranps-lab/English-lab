@@ -19,7 +19,7 @@ ELCloud.onUser(async u=>{
     let lvl="";try{const l=await getDoc(doc(db,"students",u.uid,"levels",ls.id));if(l.exists())lvl=l.data().level}catch(e){}
     const items=EL_CATALOG.filter(a=>a.ls===ls.id);
     let ts=0,tm=0;items.forEach(a=>{const r=results[a.id];if(a.graded&&r&&r.max){ts+=r.score||0;tm+=r.max}});
-    html+=`<h2>${ls.title} ${lvl?`<span class="pill">${lvl}</span>`:""}${st==="closed"?'<span class="pill o">tancada · només consulta</span>':st==="hidden"?'<span class="pill o">oculta (només tu la veus)</span>':""}</h2>`;
+    html+=`<h2>${ls.title} ${lvl?`<span class="pill">${lvl}</span>`:""}${st==="closed"?'<span class="pill o">tancada · només consulta</span>':st==="hidden"?'<span class="pill o">oculta (només tu la veus)</span>':st==="public"?'<span class="pill o">accés lliure · no puntua</span>':""}</h2>`;
     html+=items.map(a=>{const r=results[a.id]||{},can=st==="closed"||!a.graded||info.enabled.includes(a.id)||ELCloud.isTeacher(u);
       const pts=a.manual?(r.max?` · nota ${r.score}/${r.max}`:" · es lliura pel Classroom i la puntua el professor"):a.graded?` · ${r.score||0}/${a.points} punts`:"";
       return `<div class="card"><div><b>${a.title}</b><div>${a.criteria.map(c=>`<span class="pill">${c}</span>`).join("")}${a.graded?"":'<span class="pill o">'+(a.inClass?"a classe · no avalua":"per practicar · no avalua")+'</span>'}${a.mode==="once"?'<span class="pill o">una sola vegada</span>':""}<span class="muted">${r.locked?"entregada":""}${pts}${a.graded&&!can?" · el professor la habilitarà":""}</span></div>${r.feedback?`<div class="fb"><b>Feedback:</b> ${esc(r.feedback)}</div>`:""}</div><a class="go ${can?"":"off"}" href="${a.path}">${st==="closed"?"Revisa":"Obre"}</a></div>`}).join("");
