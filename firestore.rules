@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@ietramuntana[.]cat'); }
-    function isTeacher() { return request.auth != null && request.auth.token.email in ['roger.beltranps@gmail.com']; }
+    function isTeacher() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email in ['roger.beltranps@gmail.com']; }
     function lsOpen(ls) { return exists(/databases/$(database)/documents/ls/$(ls)) && get(/databases/$(database)/documents/ls/$(ls)).data.status == 'open'; }
 
     // LS release state: hidden | open | closed (written by the teacher only)

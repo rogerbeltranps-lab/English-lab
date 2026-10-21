@@ -62,7 +62,9 @@ async function login(){
   const r=await signInWithPopup(auth,p);
   if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Cal entrar amb el compte @"+DOMAIN+".")}
 }
-const logout=()=>signOut(auth);
+// Shared school computers: never leak one student's local progress into another account.
+const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))};
+const logout=async()=>{await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");location.reload()};
 
 function banner(text,color,btn){
   const b=document.createElement("div");b.id="el-banner";
@@ -126,6 +128,7 @@ await loadCatalog();
 
 onAuthStateChanged(auth,async u=>{
   user=u;draw(u);
+  if(u&&isStudent(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){if(prev!==null&&prev!==u.uid)wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
   try{await gate(u)}catch(e){console.warn("gate",e)}
   listeners.forEach(f=>f(u));
 });
