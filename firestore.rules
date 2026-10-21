@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@ietramuntana[.]cat'); }
+    function isTeacher() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email in ['roger.beltranps@gmail.com']; }
+    function lsOpen(ls) { return exists(/databases/$(database)/documents/ls/$(ls)) && get(/databases/$(database)/documents/ls/$(ls)).data.status == 'open'; }
+
+    // LS release state: hidden | open | closed (written by the teacher only)
+    match /ls/{id} {
+      allow read: if true;
+      allow write: if isTeacher();
+    }
+    match /assignments/{day} {
+      allow read: if signedIn() || isTeacher();
+      allow write: if isTeacher();
+    }
+    match /students/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+      allow read: if isTeacher();
+
+      // progress is writable only while that LS is open
+      match /progress/{ls} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+        allow write: if signedIn() && request.auth.uid == uid && lsOpen(ls);
+      }
+      // route (level): the student picks it once; later changes are only a request the teacher accepts
+      match /levels/{ls} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['level','updated'])
+          && request.resource.data.level in ['insecure','safe','daring'];
+        allow update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['request','requestedAt'])
+          && request.resource.data.request in ['insecure','safe','daring'];
+        allow write: if isTeacher();
+      }
+      // results: students cannot touch feedback, nor edit a locked (submitted) result
+      match /results/{rid} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && lsOpen(request.resource.data.ls)
+          && (resource == null || resource.data.get('locked', false) == false)
+          && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','updated','parts','score','max']);
+        allow write: if isTeacher();
+      }
+    }
+    match /{path=**}/results/{rid} {
+      allow read: if isTeacher();
+    }
+    match /{path=**}/levels/{ls} {
+      allow read: if isTeacher();
+    }
+    match /{path=**}/progress/{ls} {
+      allow read: if isTeacher();
+    }
+  }
+}

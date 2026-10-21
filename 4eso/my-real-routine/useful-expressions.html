@@ -856,5 +856,6 @@ sectionNext.undo({button:document.getElementById('finishWriting'),level:()=>leve
 sectionNext.undo({button:document.getElementById('finishSpeak'),level:()=>level,isDone:()=>!!ls().done.speak,undo:()=>{delete ls().done.speak;$('#speakResult').classList.remove('show');save()}});
 sectionNext.final({id:'speak',level:()=>level,done:()=>!!ls().done.speak,detail:ca=>ca?'Escriu el pla i prem el botó per comprovar-lo.':'Write your plan and use the button to check it.'});
 </script>
+<script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

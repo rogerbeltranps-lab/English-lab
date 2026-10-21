@@ -1030,4 +1030,5 @@ sectionNext.init({level:()=>level,panels:['recognise','controlled','transform','
 sectionNext.undo({button:document.getElementById('checkProduction'),level:()=>level,isDone:()=>!!routeState().done.produce,undo:()=>{routeState().done.produce=false;document.getElementById('productionFeedback').textContent='';save()}});
 sectionNext.final({id:'selfcheck',level:()=>level,done:()=>!!routeState().done.selfcheck,detail:ca=>ca?'Comprova cada resposta fins que totes siguin correctes.':'Check each answer until all are correct.'});
 </script>
+<script type="module" src="../../shared/js/el-cloud.js"></script>
 </body></html>
