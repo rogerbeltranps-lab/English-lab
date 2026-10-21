@@ -34,8 +34,8 @@ async function results(){
   const ls=$("#lssel").value,acts=cat.filter(a=>a.ls===ls);
   const students=await getDocs(collection(db(),"students")),rs={};
   (await getDocs(collectionGroup(db(),"results"))).forEach(r=>{const uid=r.ref.parent.parent.id;(rs[uid]=rs[uid]||{})[r.data().activity]=r.data()});
-  let h="<tr><th>Alumne</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?"":"<br><small>(no avalua)</small>"}</th>`).join("")+"</tr>";
-  students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(x.done||0)+(x.locked?" ✔":"")+(x.max?"<br><b>"+x.score+"/"+x.max+"</b>":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+"</tr>"});
+  let h="<tr><th>Alumne</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?"":"<br><small>(no avalua)</small>"}</th>`).join("")+"<th>Total</th></tr>";
+  students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&x&&x.max){ts+=x.score;tm+=x.max}});h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(x.done||0)+(x.locked?" ✔":"")+(x.max?"<br><b>"+x.score+"/"+x.max+"</b>":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+"<td><b>"+(tm?ts+"/"+tm:"–")+"</b></td></tr>"});
   $("#res").innerHTML=h;
   $("#res").querySelectorAll("td.c").forEach(td=>td.onclick=async()=>{const ref=doc(db(),"students",td.dataset.u,"results",td.dataset.a.replace("/","__")),s=await getDoc(ref),o=s.exists()?s.data():{};
     const fb=prompt("Feedback opcional per a l'alumne:",o.feedback??"");if(fb===null)return;

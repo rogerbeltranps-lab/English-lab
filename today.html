@@ -20,8 +20,9 @@ ELCloud.onUser(async u=>{
     any=true;
     const items=EL_CATALOG.filter(a=>a.ls===ls.id&&(st==="closed"||!ids||ids.includes(a.id)));
     html+=`<h2>${ls.title} ${st==="closed"?'<span class="pill o">tancada · només consulta</span>':st==="hidden"?'<span class="pill o">oculta (només tu la veus)</span>':""}</h2>`;
+    let ts=0,tm=0;items.forEach(a=>{const r=results[a.id];if(a.graded&&r&&r.max){ts+=r.score;tm+=r.max}});
     html+=items.map(a=>{const r=results[a.id]||{};let d=0;a.keys.forEach(k=>d+=elDone(localStorage.getItem(k)));d=Math.max(d,r.done||0);
-      return `<div class="card"><div><b>${a.title}</b><div>${a.criteria.map(c=>`<span class="pill">${c}</span>`).join("")}${a.graded?"":'<span class="pill o">només practicar</span>'}${a.mode==="once"?'<span class="pill o">una sola vegada</span>':""}<span class="muted">${r.locked?"entregada":d?d+" passos fets":"per començar"}${r.max?" · "+r.score+"/"+r.max:""}</span></div>${r.feedback?`<div class="fb"><b>Feedback:</b> ${esc(r.feedback)}</div>`:""}</div><a class="go" href="${a.path}">${st==="closed"?"Revisa":"Obre"}</a></div>`}).join("");
+      return `<div class="card"><div><b>${a.title}</b><div>${a.criteria.map(c=>`<span class="pill">${c}</span>`).join("")}${a.graded?"":'<span class="pill o">'+(a.inClass?"a classe · no avalua":"només practicar")+'</span>'}${a.mode==="once"?'<span class="pill o">una sola vegada</span>':""}<span class="muted">${r.locked?"entregada":d?d+" passos fets":"per començar"}${r.max?" · "+r.score+"/"+r.max:""}</span></div>${r.feedback?`<div class="fb"><b>Feedback:</b> ${esc(r.feedback)}</div>`:""}</div><a class="go" href="${a.path}">${st==="closed"?"Revisa":"Obre"}</a></div>`}).join("")+(tm?'<div class="card"><b>Total '+ls.title+'</b><b>'+ts+' / '+tm+'</b></div>':"");
   }
   $("#sub").textContent=any?(ids?"Activitats assignades pel professor per avui. "+note:"Avui no hi ha selecció: pots fer totes les de les LS obertes."):"Encara no hi ha cap LS oberta. El professor t'avisarà quan puguis començar.";
   $("#list").innerHTML=html;
