@@ -17,7 +17,7 @@ window.EL_CATALOG=(function(){
     A("2eso","getting-started.html","Getting started (warm-up)",["3.1"],["gettingStarted2ESO"],4,{graded:false}),
     A("2eso","a-day-in-my-life.html","A day in my life",["3.1","5.1"],["lp2StateV2"],10),
     A("2eso","same-day-different-person.html","Same day, different person",["3.1","5.1"],["s2SameDayState"],5),
-    A("2eso","present-simple-grammar.html","Present simple grammar",["5.1"],[],0,{graded:false,inClass:true}),
+    A("2eso","present-simple-grammar.html","Present simple grammar",["5.1"],["s2GrammarState"],5),
     A("2eso","healthy-habits.html","Healthy habits",["3.1","5.1"],["healthyHabitsState2ESO"],10),
     A("2eso","vocabulary-games.html","Vocabulary games",["5.1"],[],0,{graded:false,inClass:true}),
     A("2eso","final-product.html","Final product",["3.1","3.2","3.3","5.1"],["finalProduct2ESO"],0,{manual:true}),
