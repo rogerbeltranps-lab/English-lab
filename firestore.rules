@@ -23,6 +23,17 @@ service cloud.firestore {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow write: if signedIn() && request.auth.uid == uid && lsOpen(ls);
       }
+      // route (level): the student picks it once; later changes are only a request the teacher accepts
+      match /levels/{ls} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['level','updated'])
+          && request.resource.data.level in ['insecure','safe','daring'];
+        allow update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['request','requestedAt'])
+          && request.resource.data.request in ['insecure','safe','daring'];
+        allow write: if isTeacher();
+      }
       // results: students cannot touch feedback, nor edit a locked (submitted) result
       match /results/{rid} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
@@ -34,6 +45,9 @@ service cloud.firestore {
       }
     }
     match /{path=**}/results/{rid} {
+      allow read: if isTeacher();
+    }
+    match /{path=**}/levels/{ls} {
       allow read: if isTeacher();
     }
     match /{path=**}/progress/{ls} {
