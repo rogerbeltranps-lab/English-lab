@@ -24,7 +24,7 @@ window.EL_CATALOG=(function(){
     A("4eso","getting-started.html","Getting started (warm-up)",["3.1"],["gettingStarted4ESO"],4,{graded:false}),
     A("4eso","a-day-in-real-life.html","A day in real life",["3.1","5.1"],["lp2StateV2_4ESO"],10),
     A("4eso","useful-expressions.html","Useful expressions",["3.1","5.1"],["s3Real4State"],5),
-    A("4eso","grammar-phrasal-verbs.html","Grammar: phrasal verbs",["5.1"],[],0,{graded:false,inClass:true}),
+    A("4eso","grammar-phrasal-verbs.html","Grammar: phrasal verbs",["5.1"],["s4GrammarState"],5),
     A("4eso","healthy-habits.html","Healthy habits",["3.1","5.2"],["healthyHabitsState4ESO"],10),
     A("4eso","vocabulary-games.html","Vocabulary games",["5.1"],[],0,{graded:false,inClass:true}),
     A("4eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","5.2"],["finalProduct4ESO"],0,{manual:true})
