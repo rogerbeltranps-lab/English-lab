@@ -23,13 +23,13 @@ service cloud.firestore {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow write: if signedIn() && request.auth.uid == uid && lsOpen(ls);
       }
-      // results: students cannot touch score/feedback, nor edit a locked (submitted) result
+      // results: students cannot touch feedback, nor edit a locked (submitted) result
       match /results/{rid} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow create, update: if signedIn() && request.auth.uid == uid
           && lsOpen(request.resource.data.ls)
           && (resource == null || resource.data.get('locked', false) == false)
-          && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','updated']);
+          && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','updated','parts','score','max']);
         allow write: if isTeacher();
       }
     }

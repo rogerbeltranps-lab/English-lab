@@ -41,12 +41,22 @@ function push(){
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
       if(window.EL_CATALOG&&actId){const a=EL_CATALOG.find(x=>x.id===actId);
         if(a&&a.graded){let d=0;a.keys.forEach(k=>d+=elDone(localStorage.getItem(k)));
-          await setDoc(doc(db,"students",user.uid,"results",resKey(actId)),{ls:lsId,activity:actId,done:d,updated:serverTimestamp()},{merge:true})}}
+          await setDoc(doc(db,"students",user.uid,"results",resKey(actId)),resultPayload(d),{merge:true})}}
     }catch(e){console.warn("sync",e)}
   },1500);
 }
 Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.test(k))return;origSet.call(this,k,v);if(this===localStorage&&!SKIP.test(k))push()};
 
+// Automatic scoring: result elements (id ends in "Result") that print "N / M ..." are tracked; best score per part is kept.
+let parts={};
+const tally=()=>{let sc=0,mx=0;for(const k in parts){sc+=parts[k].s;mx+=parts[k].m}return {score:sc,max:mx}};
+function resultPayload(d){return Object.assign({ls:lsId,activity:actId,done:d,parts,updated:serverTimestamp()},tally())}
+function watchScores(){
+  const scan=()=>{let ch=false;document.querySelectorAll('[id$="Result"]').forEach(e=>{const t=(e.textContent||"").match(/([0-9]+) *[/] *([0-9]+)/);if(!t)return;const s=+t[1],mx=+t[2];if(!mx)return;
+      const p=parts[e.id];if(!p||s>p.s||mx!==p.m&&s/mx>p.s/p.m){parts[e.id]={s,m:mx};ch=true}});
+    if(ch)push()};
+  new MutationObserver(scan).observe(document.body,{childList:true,subtree:true,characterData:true});
+}
 async function login(){
   const p=new GoogleAuthProvider();p.setCustomParameters({hd:DOMAIN,prompt:"select_account"});
   const r=await signInWithPopup(auth,p);
@@ -82,6 +92,9 @@ async function gate(u){
   await pull();
   if(st==="closed"){freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
   const a=EL_CATALOG.find(x=>x.id===actId);
+  const rd=await getDoc(doc(db,"students",u.uid,"results",resKey(actId))).catch(()=>null);
+  if(rd&&rd.exists()&&rd.data().parts)parts=rd.data().parts;
+  if(a&&a.graded)watchScores();
   if(a&&a.mode==="once"){
     const r=await getDoc(doc(db,"students",u.uid,"results",resKey(actId))).catch(()=>null);
     if(r&&r.exists()&&r.data().locked){freeze();banner("Activitat entregada: ja no es pot modificar.","#92400e");return}
@@ -89,7 +102,7 @@ async function gate(u){
       if(!confirm("Un cop entregada no la podràs tornar a fer ni modificar. Vols entregar-la?"))return;
       let d=0;a.keys.forEach(k=>d+=elDone(localStorage.getItem(k)));
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
-      await setDoc(doc(db,"students",u.uid,"results",resKey(actId)),{ls:lsId,activity:actId,done:d,locked:true,updated:serverTimestamp()},{merge:true});
+      await setDoc(doc(db,"students",u.uid,"results",resKey(actId)),Object.assign(resultPayload(d),{locked:true}),{merge:true});
       location.reload()}});
   }
 }

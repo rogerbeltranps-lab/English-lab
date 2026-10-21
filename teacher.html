@@ -9,7 +9,7 @@
 <p><button class="g" id="all">Marca/desmarca totes</button> <span class="muted">Filtra per criteri: </span><select id="crit"><option value="">tots</option></select></p>
 <div id="checks"></div>
 <p><button id="save">Desa assignació</button> <button class="g" id="clear">Esborra (tot assignat)</button> <span id="saved" class="muted"></span></p></div>
-<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: passos fets. Clica una cel·la per posar nota i feedback (l'alumne el veu sempre).</p>
+<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: passos fets i puntuació automàtica (p. ex. 4/8). Clica una cel·la si vols afegir feedback opcional.</p>
 <select id="lssel"></select><div style="overflow:auto;margin-top:8px"><table id="res"></table></div></div></div>
 <script src="shared/js/el-catalog.js"></script>
 <script type="module">
@@ -35,11 +35,11 @@ async function results(){
   const students=await getDocs(collection(db(),"students")),rs={};
   (await getDocs(collectionGroup(db(),"results"))).forEach(r=>{const uid=r.ref.parent.parent.id;(rs[uid]=rs[uid]||{})[r.data().activity]=r.data()});
   let h="<tr><th>Alumne</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?"":"<br><small>(no avalua)</small>"}</th>`).join("")+"</tr>";
-  students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(x.done||0)+(x.locked?" ✔":"")+(x.score!=null?"<br><b>"+esc(x.score)+"</b>":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+"</tr>"});
+  students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(x.done||0)+(x.locked?" ✔":"")+(x.max?"<br><b>"+x.score+"/"+x.max+"</b>":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+"</tr>"});
   $("#res").innerHTML=h;
   $("#res").querySelectorAll("td.c").forEach(td=>td.onclick=async()=>{const ref=doc(db(),"students",td.dataset.u,"results",td.dataset.a.replace("/","__")),s=await getDoc(ref),o=s.exists()?s.data():{};
-    const score=prompt("Nota (buit = sense nota):",o.score??"");if(score===null)return;const fb=prompt("Feedback per a l'alumne:",o.feedback??"");if(fb===null)return;
-    await setDoc(ref,{ls,activity:td.dataset.a,score:score===""?null:score,feedback:fb,updated:serverTimestamp()},{merge:true});results()});}
+    const fb=prompt("Feedback opcional per a l'alumne:",o.feedback??"");if(fb===null)return;
+    await setDoc(ref,{ls,activity:td.dataset.a,feedback:fb,updated:serverTimestamp()},{merge:true});results()});}
 $("#lssel").onchange=results;
 ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u))return;$("#app").hidden=false;$("#msg").textContent="Hola, "+(u.displayName||u.email)+".";await drawLs();await loadDay();await results()});
 </script></body></html>
