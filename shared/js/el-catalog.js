@@ -2,7 +2,7 @@
 // Criteria are an editorial PROPOSAL from docs/learning-situations/my-real-routine/*.md; pending Roger's approval.
 // points: number of actions in the activity; each completed action = 1 point.
 // graded:false = not evaluated (warm-up, or in-class games/theory presentations: inClass:true) - always free to practise.
-// graded:true  = evaluated; students can only do it once the teacher enables it.
+// graded:true  = evaluated; enabled by the teacher and can be done ONCE (submit locks it), unless manual.
 // manual:true = scored by the teacher (not by counting actions); delivered through Google Classroom, not in this site.
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 window.EL_LEVELS=[{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes."}];
@@ -12,7 +12,7 @@ window.EL_LS=[
 ];
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";
-  const A=(course,file,title,criteria,keys,points,o)=>Object.assign({id:course+"/"+file.replace(".html",""),ls:course+"-my-real-routine",course,path:base(course)+file,title,criteria,keys,points,mode:"practice",graded:true},o||{});
+  const A=(course,file,title,criteria,keys,points,o)=>(a=>(a.mode=a.mode||(a.graded&&!a.manual?"once":"practice"),a))(Object.assign({id:course+"/"+file.replace(".html",""),ls:course+"-my-real-routine",course,path:base(course)+file,title,criteria,keys,points,graded:true},o||{}));
   return [
     A("2eso","getting-started.html","Getting started (warm-up)",["3.1"],["gettingStarted2ESO"],4,{graded:false}),
     A("2eso","a-day-in-my-life.html","A day in my life",["3.1","5.1"],["lp2StateV2"],10),
