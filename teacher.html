@@ -1,33 +1,45 @@
 <!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tauler del professor · English Lab</title>
-<style>body{font:15px system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:10px 0}label{display:block;margin:3px 0}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #e2e8f0;padding:4px 8px;text-align:center}th:first-child,td:first-child{text-align:left}button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer}.pill{font-size:11px;background:#ecfdf5;color:#065f46;border-radius:999px;padding:1px 6px}.muted{color:#64748b}</style></head><body>
+<style>body{font:15px system-ui,sans-serif;max-width:1100px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:10px 0}label{display:block;margin:3px 0}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #e2e8f0;padding:4px 8px;text-align:center}th:first-child,td:first-child{text-align:left}td.c{cursor:pointer}td.c:hover{background:#ecfdf5}button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer}button.g{background:#e2e8f0;color:#0f172a}button.on{outline:2px solid #0f766e}.pill{font-size:11px;background:#ecfdf5;color:#065f46;border-radius:999px;padding:1px 6px}.muted{color:#64748b}</style></head><body>
 <h1>Tauler del professor</h1><p class="muted" id="msg">Entra amb el teu compte de professor (botó de baix a la dreta).</p>
 <div id="app" hidden>
-<div class="box"><h2>Assigna activitats</h2>
+<div class="box"><h2>Estat de les LS</h2><p class="muted">Oculta: els alumnes no hi poden fer res · Oberta: fan activitats i es desa el progrés · Tancada: només consulten el que van fer i el feedback.</p><div id="lsbox"></div></div>
+<div class="box"><h2>Assigna activitats del dia</h2>
 <p>Dia: <input type="date" id="day"> Nota per als alumnes: <input id="note" size="30"></p>
-<p><button id="all">Marca/desmarca totes</button> <span class="muted">Filtra per criteri: </span><select id="crit"><option value="">tots</option></select></p>
+<p><button class="g" id="all">Marca/desmarca totes</button> <span class="muted">Filtra per criteri: </span><select id="crit"><option value="">tots</option></select></p>
 <div id="checks"></div>
-<p><button id="save">Desa assignació</button> <button id="clear">Esborra (tot assignat)</button> <span id="saved" class="muted"></span></p></div>
-<div class="box"><h2>Resultats per alumne</h2><div style="overflow:auto"><table id="res"></table></div></div></div>
+<p><button id="save">Desa assignació</button> <button class="g" id="clear">Esborra (tot assignat)</button> <span id="saved" class="muted"></span></p></div>
+<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: passos fets. Clica una cel·la per posar nota i feedback (l'alumne el veu sempre).</p>
+<select id="lssel"></select><div style="overflow:auto;margin-top:8px"><table id="res"></table></div></div></div>
 <script src="shared/js/el-catalog.js"></script>
 <script type="module">
 import "./shared/js/el-cloud.js";
-import {doc,getDoc,setDoc,deleteDoc,getDocs,collection} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-const $=s=>document.querySelector(s),db=()=>ELCloud.db,cat=EL_CATALOG;
+import {doc,getDoc,setDoc,deleteDoc,getDocs,collection,collectionGroup,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const $=s=>document.querySelector(s),db=()=>ELCloud.db,cat=EL_CATALOG,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 $("#day").value=elToday();
 [...new Set(cat.flatMap(a=>a.criteria))].sort().forEach(c=>$("#crit").add(new Option("CE"+c[0]+" · "+c,c)));
-function drawChecks(sel){const f=$("#crit").value;$("#checks").innerHTML=cat.filter(a=>!f||a.criteria.includes(f)).map(a=>`<label><input type="checkbox" value="${a.id}" ${sel.has(a.id)?"checked":""}> ${a.course.toUpperCase()} · ${a.title} ${a.criteria.map(c=>`<span class="pill">${c}</span>`).join(" ")}</label>`).join("")}
+EL_LS.forEach(l=>$("#lssel").add(new Option(l.title,l.id)));
+async function drawLs(){let h="";for(const l of EL_LS){const st=await ELCloud.lsStatus(l.id);h+=`<p><b>${l.title}</b> `+["hidden","open","closed"].map(s=>`<button class="${s===st?"":"g"} ${s===st?"on":""}" data-ls="${l.id}" data-s="${s}">${{hidden:"Oculta",open:"Oberta",closed:"Tancada"}[s]}</button>`).join(" ")+"</p>"}
+  $("#lsbox").innerHTML=h;$("#lsbox").querySelectorAll("button").forEach(b=>b.onclick=async()=>{if(b.dataset.s==="closed"&&!confirm("Tancar la LS: els alumnes ja no podran modificar res. Continuar?"))return;await setDoc(doc(db(),"ls",b.dataset.ls),{status:b.dataset.s,updated:serverTimestamp()},{merge:true});drawLs()})}
+function drawChecks(sel){const f=$("#crit").value;$("#checks").innerHTML=cat.filter(a=>!f||a.criteria.includes(f)).map(a=>`<label><input type="checkbox" value="${a.id}" ${sel.has(a.id)?"checked":""}> ${a.course.toUpperCase()} · ${a.title} ${a.criteria.map(c=>`<span class="pill">${c}</span>`).join(" ")}${a.graded?"":" <span class='muted'>(només practicar)</span>"}${a.mode==="once"?" <span class='muted'>(una vegada)</span>":""}</label>`).join("")}
 const selected=()=>new Set([...document.querySelectorAll("#checks input:checked")].map(i=>i.value));
 let cur=new Set();
 async function loadDay(){const s=await getDoc(doc(db(),"assignments",$("#day").value));cur=new Set(s.exists()?s.data().items:[]);$("#note").value=s.exists()?s.data().note||"":"";drawChecks(cur);$("#saved").textContent=s.exists()?"Assignació existent carregada":"Sense assignació: els alumnes veuen totes"}
 $("#day").onchange=loadDay;
-$("#crit").onchange=()=>{selected().forEach(i=>cur.add(i));document.querySelectorAll("#checks input:not(:checked)").forEach(i=>cur.delete(i.value));drawChecks(cur)};
+$("#crit").onchange=()=>{const vis=new Set([...document.querySelectorAll("#checks input")].map(i=>i.value));[...cur].filter(i=>vis.has(i)).forEach(i=>cur.delete(i));selected().forEach(i=>cur.add(i));drawChecks(cur)};
 $("#all").onclick=()=>{const b=[...document.querySelectorAll("#checks input")],on=b.some(i=>!i.checked);b.forEach(i=>i.checked=on)};
 $("#save").onclick=async()=>{const vis=new Set([...document.querySelectorAll("#checks input")].map(i=>i.value));const items=[...new Set([...cur].filter(i=>!vis.has(i)).concat([...selected()]))];await setDoc(doc(db(),"assignments",$("#day").value),{items,note:$("#note").value});cur=new Set(items);$("#saved").textContent="Desat ("+items.length+" activitats)"};
 $("#clear").onclick=async()=>{await deleteDoc(doc(db(),"assignments",$("#day").value));await loadDay()};
-async function results(){const snap=await getDocs(collection(db(),"students"));
-  let h="<tr><th>Alumne</th>"+cat.map(a=>`<th title="${a.criteria.join(', ')}">${a.course.toUpperCase()}<br>${a.title}</th>`).join("")+"<th>Últim</th></tr>";
-  snap.forEach(s=>{const d=s.data(),data=d.data||{};h+=`<tr><td>${d.name||d.email}<br><span class="muted">${d.email}</span></td>`+cat.map(a=>{let n=0;a.keys.forEach(k=>n+=elDone(data[k]));return `<td>${n||"–"}</td>`}).join("")+`<td>${d.updated?d.updated.toDate().toLocaleString("ca"):""}</td></tr>`});
-  $("#res").innerHTML=h}
-ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u)){return}$("#app").hidden=false;$("#msg").textContent="Hola, "+(u.displayName||u.email)+". Els números són passos completats per activitat.";await loadDay();await results()});
+async function results(){
+  const ls=$("#lssel").value,acts=cat.filter(a=>a.ls===ls);
+  const students=await getDocs(collection(db(),"students")),rs={};
+  (await getDocs(collectionGroup(db(),"results"))).forEach(r=>{const uid=r.ref.parent.parent.id;(rs[uid]=rs[uid]||{})[r.data().activity]=r.data()});
+  let h="<tr><th>Alumne</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?"":"<br><small>(no avalua)</small>"}</th>`).join("")+"</tr>";
+  students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(x.done||0)+(x.locked?" ✔":"")+(x.score!=null?"<br><b>"+esc(x.score)+"</b>":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+"</tr>"});
+  $("#res").innerHTML=h;
+  $("#res").querySelectorAll("td.c").forEach(td=>td.onclick=async()=>{const ref=doc(db(),"students",td.dataset.u,"results",td.dataset.a.replace("/","__")),s=await getDoc(ref),o=s.exists()?s.data():{};
+    const score=prompt("Nota (buit = sense nota):",o.score??"");if(score===null)return;const fb=prompt("Feedback per a l'alumne:",o.feedback??"");if(fb===null)return;
+    await setDoc(ref,{ls,activity:td.dataset.a,score:score===""?null:score,feedback:fb,updated:serverTimestamp()},{merge:true});results()});}
+$("#lssel").onchange=results;
+ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u))return;$("#app").hidden=false;$("#msg").textContent="Hola, "+(u.displayName||u.email)+".";await drawLs();await loadDay();await results()});
 </script></body></html>

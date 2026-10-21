@@ -1,18 +1,29 @@
 <!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Avui · English Lab</title>
-<style>body{font:16px system-ui,sans-serif;max-width:720px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1{font-size:1.5rem}.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:10px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}.pill{font-size:12px;background:#ecfdf5;color:#065f46;border-radius:999px;padding:2px 8px;margin-right:4px}a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:6px 12px}.muted{color:#64748b;font-size:14px}</style></head><body>
-<h1>Activitats d'avui</h1><p class="muted" id="sub">Carregant…</p><div id="list"></div>
+<style>body{font:16px system-ui,sans-serif;max-width:720px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1{font-size:1.5rem}h2{font-size:1.15rem;margin-top:1.4em}.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:10px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}.pill{font-size:12px;background:#ecfdf5;color:#065f46;border-radius:999px;padding:2px 8px;margin-right:4px}.pill.o{background:#eff6ff;color:#1d4ed8}a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:6px 12px;white-space:nowrap}.muted{color:#64748b;font-size:14px}.fb{background:#fffbeb;border-radius:8px;padding:6px 10px;margin-top:6px;font-size:14px}</style></head><body>
+<h1>Les meves activitats</h1><p class="muted" id="sub">Carregant…</p><div id="list"></div>
 <script src="shared/js/el-catalog.js"></script>
 <script type="module">
 import "./shared/js/el-cloud.js";
 import {doc,getDoc,getDocs,collection} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-const $=s=>document.querySelector(s);
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 ELCloud.onUser(async u=>{
   if(!u){$("#sub").textContent="Entra amb el compte del col·le (botó de baix a la dreta) per veure les teves activitats.";$("#list").innerHTML="";return}
-  let ids=null,note="";
-  try{const s=await getDoc(doc(ELCloud.db,"assignments",elToday()));if(s.exists()){ids=s.data().items;note=s.data().note||""}}catch(e){}
-  const all=!ids,items=EL_CATALOG.filter(a=>all||ids.includes(a.id));
-  $("#sub").textContent=(all?"Avui no hi ha selecció: pots fer totes les activitats. ":"Activitats assignades pel professor per avui. ")+note;
-  $("#list").innerHTML=items.map(a=>{let d=0;a.keys.forEach(k=>d+=elDone(localStorage.getItem(k)));return `<div class="card"><div><b>${a.course.toUpperCase()} · ${a.title}</b><div>${a.criteria.map(c=>`<span class="pill">${c}</span>`).join("")}<span class="muted">${d?d+" passos fets":"per començar"}</span></div></div><a class="go" href="${a.path}">Obre</a></div>`}).join("");
+  const db=ELCloud.db;let ids=null,note="";
+  try{const s=await getDoc(doc(db,"assignments",elToday()));if(s.exists()){ids=s.data().items;note=s.data().note||""}}catch(e){}
+  const results={};
+  try{(await getDocs(collection(db,"students",u.uid,"results"))).forEach(r=>results[r.data().activity]=r.data())}catch(e){}
+  let html="",any=false;
+  for(const ls of EL_LS){
+    const st=await ELCloud.lsStatus(ls.id);
+    if(st==="hidden"&&!ELCloud.isTeacher(u))continue;
+    any=true;
+    const items=EL_CATALOG.filter(a=>a.ls===ls.id&&(st==="closed"||!ids||ids.includes(a.id)));
+    html+=`<h2>${ls.title} ${st==="closed"?'<span class="pill o">tancada · només consulta</span>':st==="hidden"?'<span class="pill o">oculta (només tu la veus)</span>':""}</h2>`;
+    html+=items.map(a=>{const r=results[a.id]||{};let d=0;a.keys.forEach(k=>d+=elDone(localStorage.getItem(k)));d=Math.max(d,r.done||0);
+      return `<div class="card"><div><b>${a.title}</b><div>${a.criteria.map(c=>`<span class="pill">${c}</span>`).join("")}${a.graded?"":'<span class="pill o">només practicar</span>'}${a.mode==="once"?'<span class="pill o">una sola vegada</span>':""}<span class="muted">${r.locked?"entregada":d?d+" passos fets":"per començar"}${r.score!=null?" · nota "+esc(r.score):""}</span></div>${r.feedback?`<div class="fb"><b>Feedback:</b> ${esc(r.feedback)}</div>`:""}</div><a class="go" href="${a.path}">${st==="closed"?"Revisa":"Obre"}</a></div>`}).join("");
+  }
+  $("#sub").textContent=any?(ids?"Activitats assignades pel professor per avui. "+note:"Avui no hi ha selecció: pots fer totes les de les LS obertes."):"Encara no hi ha cap LS oberta. El professor t'avisarà quan puguis començar.";
+  $("#list").innerHTML=html;
 });
 </script></body></html>
