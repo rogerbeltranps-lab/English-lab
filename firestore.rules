@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@ietramuntana[.]cat'); }
+    function isTeacher() { return request.auth != null && request.auth.token.email in ['roger.beltranps@gmail.com']; }
+    match /students/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+      allow read: if isTeacher();
+      match /results/{rid} {
+        allow read, write: if signedIn() && request.auth.uid == uid;
+        allow read: if isTeacher();
+      }
+    }
+    match /assignments/{day} {
+      allow read: if signedIn() || isTeacher();
+      allow write: if isTeacher();
+    }
+    match /{path=**}/results/{rid} {
+      allow read: if isTeacher();
+    }
+  }
+}

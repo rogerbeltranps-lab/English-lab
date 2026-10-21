@@ -1,0 +1,33 @@
+<!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tauler del professor · English Lab</title>
+<style>body{font:15px system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:10px 0}label{display:block;margin:3px 0}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #e2e8f0;padding:4px 8px;text-align:center}th:first-child,td:first-child{text-align:left}button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer}.pill{font-size:11px;background:#ecfdf5;color:#065f46;border-radius:999px;padding:1px 6px}.muted{color:#64748b}</style></head><body>
+<h1>Tauler del professor</h1><p class="muted" id="msg">Entra amb el teu compte de professor (botó de baix a la dreta).</p>
+<div id="app" hidden>
+<div class="box"><h2>Assigna activitats</h2>
+<p>Dia: <input type="date" id="day"> Nota per als alumnes: <input id="note" size="30"></p>
+<p><button id="all">Marca/desmarca totes</button> <span class="muted">Filtra per criteri: </span><select id="crit"><option value="">tots</option></select></p>
+<div id="checks"></div>
+<p><button id="save">Desa assignació</button> <button id="clear">Esborra (tot assignat)</button> <span id="saved" class="muted"></span></p></div>
+<div class="box"><h2>Resultats per alumne</h2><div style="overflow:auto"><table id="res"></table></div></div></div>
+<script src="shared/js/el-catalog.js"></script>
+<script type="module">
+import "./shared/js/el-cloud.js";
+import {doc,getDoc,setDoc,deleteDoc,getDocs,collection} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const $=s=>document.querySelector(s),db=()=>ELCloud.db,cat=EL_CATALOG;
+$("#day").value=elToday();
+[...new Set(cat.flatMap(a=>a.criteria))].sort().forEach(c=>$("#crit").add(new Option("CE"+c[0]+" · "+c,c)));
+function drawChecks(sel){const f=$("#crit").value;$("#checks").innerHTML=cat.filter(a=>!f||a.criteria.includes(f)).map(a=>`<label><input type="checkbox" value="${a.id}" ${sel.has(a.id)?"checked":""}> ${a.course.toUpperCase()} · ${a.title} ${a.criteria.map(c=>`<span class="pill">${c}</span>`).join(" ")}</label>`).join("")}
+const selected=()=>new Set([...document.querySelectorAll("#checks input:checked")].map(i=>i.value));
+let cur=new Set();
+async function loadDay(){const s=await getDoc(doc(db(),"assignments",$("#day").value));cur=new Set(s.exists()?s.data().items:[]);$("#note").value=s.exists()?s.data().note||"":"";drawChecks(cur);$("#saved").textContent=s.exists()?"Assignació existent carregada":"Sense assignació: els alumnes veuen totes"}
+$("#day").onchange=loadDay;
+$("#crit").onchange=()=>{selected().forEach(i=>cur.add(i));document.querySelectorAll("#checks input:not(:checked)").forEach(i=>cur.delete(i.value));drawChecks(cur)};
+$("#all").onclick=()=>{const b=[...document.querySelectorAll("#checks input")],on=b.some(i=>!i.checked);b.forEach(i=>i.checked=on)};
+$("#save").onclick=async()=>{const vis=new Set([...document.querySelectorAll("#checks input")].map(i=>i.value));const items=[...new Set([...cur].filter(i=>!vis.has(i)).concat([...selected()]))];await setDoc(doc(db(),"assignments",$("#day").value),{items,note:$("#note").value});cur=new Set(items);$("#saved").textContent="Desat ("+items.length+" activitats)"};
+$("#clear").onclick=async()=>{await deleteDoc(doc(db(),"assignments",$("#day").value));await loadDay()};
+async function results(){const snap=await getDocs(collection(db(),"students"));
+  let h="<tr><th>Alumne</th>"+cat.map(a=>`<th title="${a.criteria.join(', ')}">${a.course.toUpperCase()}<br>${a.title}</th>`).join("")+"<th>Últim</th></tr>";
+  snap.forEach(s=>{const d=s.data(),data=d.data||{};h+=`<tr><td>${d.name||d.email}<br><span class="muted">${d.email}</span></td>`+cat.map(a=>{let n=0;a.keys.forEach(k=>n+=elDone(data[k]));return `<td>${n||"–"}</td>`}).join("")+`<td>${d.updated?d.updated.toDate().toLocaleString("ca"):""}</td></tr>`});
+  $("#res").innerHTML=h}
+ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u)){return}$("#app").hidden=false;$("#msg").textContent="Hola, "+(u.displayName||u.email)+". Els números són passos completats per activitat.";await loadDay();await results()});
+</script></body></html>

@@ -1,0 +1,18 @@
+<!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Avui · English Lab</title>
+<style>body{font:16px system-ui,sans-serif;max-width:720px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1{font-size:1.5rem}.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:10px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}.pill{font-size:12px;background:#ecfdf5;color:#065f46;border-radius:999px;padding:2px 8px;margin-right:4px}a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:6px 12px}.muted{color:#64748b;font-size:14px}</style></head><body>
+<h1>Activitats d'avui</h1><p class="muted" id="sub">Carregant…</p><div id="list"></div>
+<script src="shared/js/el-catalog.js"></script>
+<script type="module">
+import "./shared/js/el-cloud.js";
+import {doc,getDoc,getDocs,collection} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const $=s=>document.querySelector(s);
+ELCloud.onUser(async u=>{
+  if(!u){$("#sub").textContent="Entra amb el compte del col·le (botó de baix a la dreta) per veure les teves activitats.";$("#list").innerHTML="";return}
+  let ids=null,note="";
+  try{const s=await getDoc(doc(ELCloud.db,"assignments",elToday()));if(s.exists()){ids=s.data().items;note=s.data().note||""}}catch(e){}
+  const all=!ids,items=EL_CATALOG.filter(a=>all||ids.includes(a.id));
+  $("#sub").textContent=(all?"Avui no hi ha selecció: pots fer totes les activitats. ":"Activitats assignades pel professor per avui. ")+note;
+  $("#list").innerHTML=items.map(a=>{let d=0;a.keys.forEach(k=>d+=elDone(localStorage.getItem(k)));return `<div class="card"><div><b>${a.course.toUpperCase()} · ${a.title}</b><div>${a.criteria.map(c=>`<span class="pill">${c}</span>`).join("")}<span class="muted">${d?d+" passos fets":"per començar"}</span></div></div><a class="go" href="${a.path}">Obre</a></div>`}).join("");
+});
+</script></body></html>

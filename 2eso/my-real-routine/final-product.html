@@ -307,5 +307,6 @@ sectionNext.init({level:()=>level,panels:[['interview','interview'],['notes','no
 [['[data-complete="interview"]','interview'],['[data-complete="notes"]','notes'],['#finishSite','slides'],['[data-complete="prepare"]','prepare'],['#finishRecording','record'],['#finishReview','review'],['#finishFinal','submit']].forEach(([sel,key])=>sectionNext.undo({button:document.querySelector(sel),level:()=>level,isDone:()=>!!state.done[key],undo:()=>{delete state.done[key];$$('.result').forEach(x=>x.classList.remove('show'));save()}}));
 sectionNext.final({id:'submit',level:()=>level,done:()=>!!state.done.submit,detail:ca=>ca?'Completa les comprovacions i confirma el lliurament.':'Complete the checks and confirm the submission.'});
 </script>
+<script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>
