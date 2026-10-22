@@ -63,7 +63,7 @@ function banner(text,color,btn){
   const b=document.createElement("div");b.id="el-banner";
   b.style.cssText="position:sticky;top:0;z-index:9998;padding:8px 14px;font:14px system-ui,sans-serif;text-align:center;background:"+color+";color:#fff";
   b.textContent=text+" ";
-  if(btn){const x=document.createElement("button");x.textContent=btn.t;x.onclick=btn.f;x.style.cssText="margin-left:8px;border:0;border-radius:6px;padding:3px 10px;cursor:pointer";b.append(x)}
+  for(const bt of [].concat(btn||[])){const x=document.createElement("button");x.textContent=bt.t;x.onclick=bt.f;x.style.cssText="margin-left:8px;border:0;border-radius:6px;padding:3px 10px;cursor:pointer";b.append(x)}
   document.body.prepend(b);
 }
 function freeze(){
@@ -119,14 +119,28 @@ async function gate(u){
   applyLevel(lvl);
   if(a&&a.graded&&!info.enabled.includes(actId)){block("Aquesta activitat avaluable encara no està habilitada","El professor t'avisarà a classe quan toqui fer-la.");return}
   if(a&&a.mode==="once"){
-    const r=await getDoc(doc(db,"students",u.uid,"results",resKey(actId))).catch(()=>null);
-    if(r&&r.exists()&&r.data().locked){freeze();banner("Activitat entregada: ja no es pot modificar.","#92400e");return}
-    banner("Aquesta activitat només es pot fer una vegada.","#1d4ed8",{t:"Entrega-la",f:async()=>{
-      if(!confirm("Un cop entregada no la podràs tornar a fer ni modificar. Vols entregar-la?"))return;
+    const rref=doc(db,"students",u.uid,"results",resKey(actId));
+    const r=await getDoc(rref).catch(()=>null),rd=r&&r.exists()?r.data():{};
+    if(rd.locked){freeze();banner("Activitat entregada: ja no es pot modificar.","#92400e");return}
+    const submit=async()=>{if(!confirm("Un cop entregada no la podràs tornar a fer ni modificar. Vols entregar-la?"))return;
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
-      await setDoc(doc(db,"students",u.uid,"results",resKey(actId)),resultPayload(a,{locked:true}),{merge:true});
+      await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});location.reload()};
+    if(rd.markedDone)banner("Has marcat aquesta activitat com a feta, però encara no l'has entregada.","#15803d",[{t:"Entrega-la",f:submit},{t:"Desmarca",f:async()=>{await setDoc(rref,{markedDone:false,updated:serverTimestamp()},{merge:true});location.reload()}}]);
+    else banner("Aquesta activitat només es pot entregar una vegada. Quan acabis, marca-la com a feta.","#1d4ed8",{t:"Marca com a feta",f:async()=>{
+      await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
+      await setDoc(rref,resultPayload(a,{markedDone:true}),{merge:true});
+      if(confirm("Activitat marcada com a feta. Vols entregar-la ara? (Un cop entregada ja no es podrà modificar.)"))await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});
       location.reload()}});
   }
+}
+
+// Submit (lock) an activity from any page, using the progress saved in the cloud.
+async function submitActivity(a){
+  const u=user;if(!u||!isStudent(u))return false;
+  const p=await getDoc(doc(db,"students",u.uid,"progress",a.ls)).catch(()=>null),data=p&&p.exists()?p.data().data||{}:{};
+  const sc=elPoints(a,k=>data[k]);
+  await setDoc(doc(db,"students",u.uid,"results",resKey(a.id)),{ls:a.ls,activity:a.id,score:sc,max:a.points,done:sc,locked:true,markedDone:true,updated:serverTimestamp()},{merge:true});
+  return true;
 }
 
 function bar(){
@@ -155,4 +169,4 @@ onAuthStateChanged(auth,async u=>{
   listeners.forEach(f=>f(u));
 });
 
-window.ELCloud={auth,db,login,logout,isTeacher,isStudent,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isStudent,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};

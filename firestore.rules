@@ -40,7 +40,7 @@ service cloud.firestore {
         allow create, update: if signedIn() && request.auth.uid == uid
           && lsOpen(request.resource.data.ls)
           && (resource == null || resource.data.get('locked', false) == false)
-          && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','updated','parts','score','max']);
+          && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','markedDone','updated','parts','score','max']);
         allow write: if isTeacher();
       }
     }
