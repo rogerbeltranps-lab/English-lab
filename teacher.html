@@ -7,7 +7,7 @@
 <div class="box"><h2>Estat de les LS i activitats avaluables</h2><p class="muted">1) Tria l'estat de cada LS. 2) Si és Oberta, decideix quines activitats avaluables poden fer ara els alumnes.</p><div id="lsbox"></div></div>
 <div class="box"><h2>Peticions de canvi de nivell</h2><div id="reqs" class="muted">Cap petició pendent.</div></div>
 <div class="box"><h2>Nota per criteri d'avaluació</h2><p class="muted">Suma dels punts de les activitats avaluables vinculades a cada criteri (els criteris són una proposta pendent de revisar). El producte final entra amb la nota que hi posis.</p><div style="overflow:auto"><table id="crit"></table></div></div>
-<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: punts (1 per acció feta). El producte final el puntues tu a mà. Clica una cel·la per afegir feedback opcional.</p>
+<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: punts (1 per acció feta). El producte final el puntues tu a mà. Clica una cel·la per afegir feedback o, si està entregada, per permetre que l'alumne la torni a entregar.</p>
 <select id="lssel"></select><div style="overflow:auto;margin-top:8px"><table id="res"></table></div></div></div>
 <script src="shared/js/el-catalog.js"></script>
 <script type="module">
@@ -49,6 +49,7 @@ async function results(){
   students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};ch+="<tr><td>"+esc(d.name||d.email)+"</td>"+crits.map(c=>{let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){ts+=x.score||0;tm+=x.max}});if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return '<td><b style="color:'+col+'">'+ts+"/"+tm+"</b><br><small>"+Math.round(p)+"%</small></td>"}).join("")+"</tr>"});
   $("#crit").innerHTML=ch;
   $("#res").querySelectorAll("td.c").forEach(td=>td.onclick=async()=>{const ref=doc(db(),"students",td.dataset.u,"results",td.dataset.a.replace("/","__")),s=await getDoc(ref),o=s.exists()?s.data():{};
+    if(o.locked&&confirm("Aquesta activitat ja està ENTREGADA. Vols permetre que l'alumne la torni a fer i entregar? (Es conserva el seu progrés; haurà de tornar-la a marcar com a feta.) Acceptar = reobrir · Cancel·lar = només afegir feedback")){await setDoc(ref,{locked:false,markedDone:false,reopenedAt:serverTimestamp(),updated:serverTimestamp()},{merge:true});results();return}
     const a=cat.find(x=>x.id===td.dataset.a),extra={};
     if(a.manual){const mx=prompt("Nota màxima d'aquest producte final:",o.max??10);if(mx===null)return;const sc=prompt("Nota de l'alumne (sobre "+mx+"):",o.score??"");if(sc===null)return;if(sc!==""&&!isNaN(+sc)&&!isNaN(+mx)){extra.score=+sc;extra.max=+mx}}
     const fb=prompt("Feedback opcional per a l'alumne:",o.feedback??"");if(fb===null)return;
