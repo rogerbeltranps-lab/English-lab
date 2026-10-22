@@ -36,3 +36,21 @@ window.elDone=function(str,skip){skip=skip||[];const s=new Set();try{(function w
 // Points of an activity from the current localStorage (capped at the activity's total).
 window.elPoints=function(a,get){const g=get||(k=>localStorage.getItem(k));let n=0;a.keys.forEach(k=>n+=elDone(g(k),a.skip));return Math.min(n,a.points)};
 window.elToday=function(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+
+// Actions (steps) inside each activity, as recorded in the "done" maps. 'note' = not scored.
+window.EL_ACTIONS={
+  "2eso/getting-started":["quick","listen","read","speak"],"4eso/getting-started":["quick","listen","read","speak"],
+  "2eso/a-day-in-my-life":["explore","cards","words","match","practice","listen","reading","build","write","speaking"],
+  "2eso/healthy-habits":["explore","cards","words","match","practice","listen","reading","build","write","speaking"],
+  "4eso/a-day-in-real-life":["explore","cards","words","match","practice","listen","reading","build","write","speaking"],
+  "4eso/healthy-habits":["explore","cards","words","match","practice","listen","reading","build","write","speaking"],
+  "2eso/same-day-different-person":["cards","forms","match","speak","write"],
+  "4eso/useful-expressions":["cards","evening","organise","speak","write"],
+  "2eso/present-simple-grammar":["recognise","controlled","transform","edit","selfcheck"],
+  "4eso/grammar-phrasal-verbs":["recognise","controlled","transform","edit","selfcheck"],
+  "2eso/final-product":["notes","prepare","record","submit"],"4eso/final-product":["notes","prepare","record","submit"]
+};
+// PROPOSAL (pending review): which action gives evidence for which criterion. Other actions are language practice.
+window.EL_EVIDENCE={speaking:["3.1"],speak:["3.1"],record:["3.1"],write:["5.1"],build:["5.1"],prepare:["5.1"],notes:["5.1"]};
+// Set of completed action keys in a synced state string.
+window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof o==="object"){for(const k in o){if(k==="done"&&o[k]&&typeof o[k]==="object"){for(const d in o[k])if(o[k][d])s.add(d)}else w(o[k])}}})(JSON.parse(str))}catch(e){}return s};

@@ -7,6 +7,7 @@
 <div class="box"><h2>LS status and graded activities</h2><p class="muted">1) Choose the status of each LS. 2) If it is Open, decide which graded activities students can do now.</p><div id="lsbox"></div></div>
 <div class="box"><h2>Route change requests</h2><div id="reqs" class="muted">No pending requests.</div></div>
 <div class="box"><h2>Result per assessment criterion</h2><p class="muted">Sum of the points of the graded activities linked to each criterion (the criteria are a proposal pending review). The final product counts with the mark you enter.</p><div style="overflow:auto"><table id="crit"></table></div></div>
+<div class="box"><h2>Learning path detail</h2><p class="muted">Pick a learning path to see its actions, each student's progress and the related assessment criteria. Which action gives evidence for which criterion is a proposal pending your review.</p><select id="actsel"></select><div id="lpinfo" style="margin:8px 0"></div><div style="overflow:auto"><table id="lp"></table></div></div>
 <div class="box"><h2>Results per student</h2><p class="muted">Each cell: points (1 per completed action). You mark the final product by hand. Click a cell to add feedback or, if it is submitted, to allow the student to resubmit.</p>
 <select id="lssel"></select><div style="overflow:auto;margin-top:8px"><table id="res"></table></div></div></div>
 <script src="shared/js/el-catalog.js"></script>
@@ -40,10 +41,10 @@ async function results(){
   const students=await getDocs(collection(db(),"students")),rs={},lv={};
   (await getDocs(collectionGroup(db(),"results"))).forEach(r=>{const uid=r.ref.parent.parent.id;(rs[uid]=rs[uid]||{})[r.data().activity]=r.data()});
   (await getDocs(collectionGroup(db(),"levels"))).forEach(l=>{if(l.id===ls)lv[l.ref.parent.parent.id]=l.data().level});
-  let h="<tr><th>Student</th><th>Route</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?(a.manual?"<br><small>manual mark</small>":"<br><small>/"+a.points+"</small>"):"<br><small>(not graded)</small>"}</th>`).join("")+"<th>Total</th></tr>";
+  let h="<tr><th>Student</th><th>Route</th>"+acts.map(a=>`<th class="lpcol" data-act="${a.id}" style="cursor:pointer;text-decoration:underline dotted" title="Criteria: ${a.criteria.join(', ')} · click for the detail">${a.title}${a.graded?(a.manual?"<br><small>manual mark</small>":"<br><small>/"+a.points+"</small>"):"<br><small>(not graded)</small>"}</th>`).join("")+"<th>Total</th></tr>";
   students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&x&&x.max){ts+=x.score||0;tm+=x.max}});
     h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td><td>${esc(lv[s.id]||"–")}</td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(a.manual?(x.max?x.score+"/"+x.max:""):a.graded?(x.score||0)+"/"+a.points:"")+(x.locked?" ✔ submitted":x.markedDone?" 🟡 done":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+`<td><b>${tm?ts+"/"+tm:"–"}</b></td></tr>`});
-  $("#res").innerHTML=h;
+  $("#res").innerHTML=h;$("#res").querySelectorAll("th.lpcol").forEach(th=>th.onclick=()=>{$("#actsel").value=th.dataset.act;detail();$("#lp").scrollIntoView({behavior:"smooth"})});
   const crits=[...new Set(acts.flatMap(a=>a.criteria))].sort();
   let ch="<tr><th>Student</th>"+crits.map(c=>"<th>CE"+c[0]+" · "+c+"</th>").join("")+"</tr>";
   students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};ch+="<tr><td>"+esc(d.name||d.email)+"</td>"+crits.map(c=>{let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){ts+=x.score||0;tm+=x.max}});if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return '<td><b style="color:'+col+'">'+ts+"/"+tm+"</b><br><small>"+Math.round(p)+"%</small></td>"}).join("")+"</tr>"});
@@ -54,6 +55,20 @@ async function results(){
     if(a.manual){const mx=prompt("Maximum mark for this final product:",o.max??10);if(mx===null)return;const sc=prompt("Student mark (out of "+mx+"):",o.score??"");if(sc===null)return;if(sc!==""&&!isNaN(+sc)&&!isNaN(+mx)){extra.score=+sc;extra.max=+mx}}
     const fb=prompt("Optional feedback for the student:",o.feedback??"");if(fb===null)return;
     await setDoc(ref,Object.assign({ls,activity:td.dataset.a,feedback:fb,updated:serverTimestamp()},extra),{merge:true});results()});}
-$("#lssel").onchange=results;
-ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u))return;$("#app").hidden=false;$("#msg").textContent="Hello, "+(u.displayName||u.email)+".";await drawLs();await requests();await results()});
+function fillActs(){const ls=$("#lssel").value;$("#actsel").innerHTML="";cat.filter(a=>a.ls===ls).forEach(a=>$("#actsel").add(new Option(a.title+(a.graded?"":" (not graded)"),a.id)))}
+async function detail(){
+  const a=cat.find(x=>x.id===$("#actsel").value);if(!a)return;
+  const students=await getDocs(collection(db(),"students")),prog={},rs={},lv={};
+  (await getDocs(collectionGroup(db(),"progress"))).forEach(p=>{if(p.id===a.ls)prog[p.ref.parent.parent.id]=p.data().data||{}});
+  (await getDocs(collectionGroup(db(),"results"))).forEach(r=>{if(r.data().activity===a.id)rs[r.ref.parent.parent.id]=r.data()});
+  (await getDocs(collectionGroup(db(),"levels"))).forEach(l=>{if(l.id===a.ls)lv[l.ref.parent.parent.id]=l.data().level});
+  const acts=EL_ACTIONS[a.id]||[],skip=a.skip||[];
+  $("#lpinfo").innerHTML="<b>"+esc(a.title)+"</b> · criteria: "+a.criteria.map(c=>'<span class="pill">'+c+"</span>").join(" ")+" · "+(a.graded?(a.manual?"you mark it":a.points+" points"):"not graded");
+  let h="<tr><th>Student</th><th>Route</th>"+acts.map(k=>"<th>"+k+"<br><small>"+(skip.includes(k)?"not scored":(EL_EVIDENCE[k]||[]).map(c=>"→ "+c).join(" ")||"language practice")+"</small></th>").join("")+"<th>Result</th></tr>";
+  students.forEach(s=>{const d=s.data(),st=new Set();a.keys.forEach(k=>elDoneSet((prog[s.id]||{})[k]).forEach(x=>st.add(x)));const x=rs[s.id]||{};
+    h+="<tr><td>"+esc(d.name||d.email)+"</td><td>"+esc(lv[s.id]||"–")+"</td>"+acts.map(k=>"<td>"+(st.has(k)?"✔":"–")+"</td>").join("")+"<td><b>"+(a.graded&&x.max?x.score+"/"+x.max:"–")+"</b>"+(x.locked?" ✔ submitted":x.markedDone?" 🟡 done":"")+"</td></tr>"});
+  $("#lp").innerHTML=h}
+$("#actsel").onchange=detail;
+$("#lssel").onchange=()=>{fillActs();results();detail()};
+ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u))return;$("#app").hidden=false;$("#msg").textContent="Hello, "+(u.displayName||u.email)+".";await drawLs();await requests();fillActs();await results();await detail()});
 </script></body></html>
