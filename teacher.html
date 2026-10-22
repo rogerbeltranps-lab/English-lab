@@ -1,13 +1,13 @@
-<!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tauler del professor · English Lab</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teacher dashboard · English Lab</title>
 <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
 <style>body{font:15px system-ui,sans-serif;max-width:1100px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:10px 0}label{display:block;margin:3px 0}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #e2e8f0;padding:4px 8px;text-align:center}th:first-child,td:first-child{text-align:left}td.c{cursor:pointer}td.c:hover{background:#ecfdf5}button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer}button.g{background:#e2e8f0;color:#0f172a}button.on{outline:2px solid #0f766e}.pill{font-size:11px;background:#ecfdf5;color:#065f46;border-radius:999px;padding:1px 6px}.muted{color:#64748b}.lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.lshead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;font-weight:400;margin-top:2px}button.opt.sel{font-weight:600}.tick{font-size:16px}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}</style></head><body>
-<h1>Tauler del professor</h1><p class="muted" id="msg">Entra amb el teu compte de professor (botó de baix a la dreta).</p>
+<h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
-<div class="box"><h2>Estat de les LS i activitats avaluables</h2><p class="muted">1) Tria l'estat de cada LS. 2) Si és Oberta, decideix quines activitats avaluables poden fer ara els alumnes.</p><div id="lsbox"></div></div>
-<div class="box"><h2>Peticions de canvi de nivell</h2><div id="reqs" class="muted">Cap petició pendent.</div></div>
-<div class="box"><h2>Nota per criteri d'avaluació</h2><p class="muted">Suma dels punts de les activitats avaluables vinculades a cada criteri (els criteris són una proposta pendent de revisar). El producte final entra amb la nota que hi posis.</p><div style="overflow:auto"><table id="crit"></table></div></div>
-<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: punts (1 per acció feta). El producte final el puntues tu a mà. Clica una cel·la per afegir feedback o, si està entregada, per permetre que l'alumne la torni a entregar.</p>
+<div class="box"><h2>LS status and graded activities</h2><p class="muted">1) Choose the status of each LS. 2) If it is Open, decide which graded activities students can do now.</p><div id="lsbox"></div></div>
+<div class="box"><h2>Route change requests</h2><div id="reqs" class="muted">No pending requests.</div></div>
+<div class="box"><h2>Result per assessment criterion</h2><p class="muted">Sum of the points of the graded activities linked to each criterion (the criteria are a proposal pending review). The final product counts with the mark you enter.</p><div style="overflow:auto"><table id="crit"></table></div></div>
+<div class="box"><h2>Results per student</h2><p class="muted">Each cell: points (1 per completed action). You mark the final product by hand. Click a cell to add feedback or, if it is submitted, to allow the student to resubmit.</p>
 <select id="lssel"></select><div style="overflow:auto;margin-top:8px"><table id="res"></table></div></div></div>
 <script src="shared/js/el-catalog.js"></script>
 <script type="module">
@@ -15,23 +15,23 @@ import "./shared/js/el-cloud.js";
 import {doc,getDoc,setDoc,getDocs,collection,collectionGroup,serverTimestamp,deleteField} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const $=s=>document.querySelector(s),db=()=>ELCloud.db,cat=EL_CATALOG,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 EL_LS.forEach(l=>$("#lssel").add(new Option(l.title,l.id)));
-const LS_INFO={hidden:["Oculta","Els alumnes no hi poden fer res."],open:["Oberta","Els alumnes practiquen i es desa el seu progrés; les avaluables només si les habilites."],closed:["Tancada","Els alumnes només consulten el que van fer i el feedback."],public:["Pública","Accés lliure com abans: sense login ni puntuació."]};
+const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved; graded activities only if you enable them."],closed:["Closed","Students can only review what they did and the feedback."],public:["Public","Free access as before: no login and no scoring."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309",public:"#2563eb"};
 async function drawLs(){let h="";
   for(const l of EL_LS){const info=await ELCloud.lsInfo(l.id),st=info.status,acts=cat.filter(a=>a.ls===l.id);
-    h+=`<div class="lscard"><div class="lshead"><b>${l.title}</b><span class="badge" style="background:${STCOL[st]}">Estat actual: ${LS_INFO[st][0].toUpperCase()}</span></div><p class="muted">${LS_INFO[st][1]}</p><div class="opts">`;
+    h+=`<div class="lscard"><div class="lshead"><b>${l.title}</b><span class="badge" style="background:${STCOL[st]}">Current status: ${LS_INFO[st][0].toUpperCase()}</span></div><p class="muted">${LS_INFO[st][1]}</p><div class="opts">`;
     h+=["hidden","open","closed","public"].map(s=>`<button class="opt ${s===st?"sel":""}" data-ls="${l.id}" data-s="${s}" style="${s===st?"border-color:"+STCOL[s]+";background:"+STCOL[s]+"1a":""}"><span class="tick">${s===st?"✔":"○"}</span> <b>${LS_INFO[s][0]}</b><small>${LS_INFO[s][1]}</small></button>`).join("")+`</div>`;
-    h+=`<h3>Activitats avaluables ${st==="open"?"":'<span class="muted">(només tenen efecte quan la LS és Oberta)</span>'}</h3><table class="acts"><tr><th>Activitat</th><th>Punts</th><th>Els alumnes la poden fer?</th></tr>`;
-    h+=acts.filter(a=>a.graded).map(a=>{const on=info.enabled.includes(a.id);return `<tr><td>${a.title} ${a.criteria.map(c=>`<span class="pill">${c}</span>`).join(" ")}${a.mode==="once"?' <span class="muted">(una vegada)</span>':""}</td><td>${a.manual?"la puntues tu":a.points}</td><td><button class="tog ${on?"yes":"no"}" data-ls="${l.id}" data-a="${a.id}" data-on="${on?1:0}">${on?"✔ SÍ, habilitada":"✖ NO habilitada"}</button></td></tr>`}).join("")+`</table>`;
-    h+=`<p class="muted">Sempre disponibles (no avaluen): ${acts.filter(a=>!a.graded).map(a=>a.title).join(" · ")||"–"}</p></div>`}
+    h+=`<h3>Graded activities ${st==="open"?"":'<span class="muted">(only take effect when the LS is Open)</span>'}</h3><table class="acts"><tr><th>Activity</th><th>Points</th><th>Can students do it?</th></tr>`;
+    h+=acts.filter(a=>a.graded).map(a=>{const on=info.enabled.includes(a.id);return `<tr><td>${a.title} ${a.criteria.map(c=>`<span class="pill">${c}</span>`).join(" ")}${a.mode==="once"?' <span class="muted">(once only)</span>':""}</td><td>${a.manual?"you mark it":a.points}</td><td><button class="tog ${on?"yes":"no"}" data-ls="${l.id}" data-a="${a.id}" data-on="${on?1:0}">${on?"✔ YES, enabled":"✖ NOT enabled"}</button></td></tr>`}).join("")+`</table>`;
+    h+=`<p class="muted">Always available (not graded): ${acts.filter(a=>!a.graded).map(a=>a.title).join(" · ")||"–"}</p></div>`}
   $("#lsbox").innerHTML=h;
-  $("#lsbox").querySelectorAll("button.opt").forEach(b=>b.onclick=async()=>{if(b.dataset.s==="closed"&&!confirm("Tancar la LS: els alumnes ja no podran modificar res. Continuar?"))return;await setDoc(doc(db(),"ls",b.dataset.ls),{status:b.dataset.s,updated:serverTimestamp()},{merge:true});drawLs()});
+  $("#lsbox").querySelectorAll("button.opt").forEach(b=>b.onclick=async()=>{if(b.dataset.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;await setDoc(doc(db(),"ls",b.dataset.ls),{status:b.dataset.s,updated:serverTimestamp()},{merge:true});drawLs()});
   $("#lsbox").querySelectorAll("button.tog").forEach(b=>b.onclick=async()=>{const ls=b.dataset.ls,set=new Set((await ELCloud.lsInfo(ls)).enabled);b.dataset.on==="1"?set.delete(b.dataset.a):set.add(b.dataset.a);await setDoc(doc(db(),"ls",ls),{enabled:[...set],updated:serverTimestamp()},{merge:true});drawLs()});
 }
 async function requests(){
   const names={};(await getDocs(collection(db(),"students"))).forEach(s=>names[s.id]=s.data());
   const out=[];(await getDocs(collectionGroup(db(),"levels"))).forEach(l=>{const d=l.data();if(d.request){const uid=l.ref.parent.parent.id;out.push({uid,ls:l.id,from:d.level,to:d.request})}});
-  $("#reqs").innerHTML=out.length?out.map((r,i)=>`<p>${esc((names[r.uid]||{}).name||(names[r.uid]||{}).email||r.uid)} · ${esc(r.ls)}: ${esc(r.from||"–")} → <b>${esc(r.to)}</b> <button data-i="${i}" data-y="1">Accepta</button> <button class="g" data-i="${i}">Rebutja</button></p>`).join(""):"Cap petició pendent.";
+  $("#reqs").innerHTML=out.length?out.map((r,i)=>`<p>${esc((names[r.uid]||{}).name||(names[r.uid]||{}).email||r.uid)} · ${esc(r.ls)}: ${esc(r.from||"–")} → <b>${esc(r.to)}</b> <button data-i="${i}" data-y="1">Accept</button> <button class="g" data-i="${i}">Reject</button></p>`).join(""):"No pending requests.";
   $("#reqs").querySelectorAll("button").forEach(b=>b.onclick=async()=>{const r=out[b.dataset.i],ref=doc(db(),"students",r.uid,"levels",r.ls);
     await setDoc(ref,b.dataset.y?{level:r.to,request:deleteField(),updated:serverTimestamp()}:{request:deleteField()},{merge:true});requests()});
 }
@@ -40,20 +40,20 @@ async function results(){
   const students=await getDocs(collection(db(),"students")),rs={},lv={};
   (await getDocs(collectionGroup(db(),"results"))).forEach(r=>{const uid=r.ref.parent.parent.id;(rs[uid]=rs[uid]||{})[r.data().activity]=r.data()});
   (await getDocs(collectionGroup(db(),"levels"))).forEach(l=>{if(l.id===ls)lv[l.ref.parent.parent.id]=l.data().level});
-  let h="<tr><th>Alumne</th><th>Nivell</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?(a.manual?"<br><small>manual</small>":"<br><small>/"+a.points+"</small>"):"<br><small>(no avalua)</small>"}</th>`).join("")+"<th>Total</th></tr>";
+  let h="<tr><th>Student</th><th>Route</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?(a.manual?"<br><small>manual mark</small>":"<br><small>/"+a.points+"</small>"):"<br><small>(not graded)</small>"}</th>`).join("")+"<th>Total</th></tr>";
   students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&x&&x.max){ts+=x.score||0;tm+=x.max}});
-    h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td><td>${esc(lv[s.id]||"–")}</td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(a.manual?(x.max?x.score+"/"+x.max:""):a.graded?(x.score||0)+"/"+a.points:"")+(x.locked?" ✔ entregada":x.markedDone?" 🟡 feta":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+`<td><b>${tm?ts+"/"+tm:"–"}</b></td></tr>`});
+    h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td><td>${esc(lv[s.id]||"–")}</td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(a.manual?(x.max?x.score+"/"+x.max:""):a.graded?(x.score||0)+"/"+a.points:"")+(x.locked?" ✔ submitted":x.markedDone?" 🟡 done":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+`<td><b>${tm?ts+"/"+tm:"–"}</b></td></tr>`});
   $("#res").innerHTML=h;
   const crits=[...new Set(acts.flatMap(a=>a.criteria))].sort();
-  let ch="<tr><th>Alumne</th>"+crits.map(c=>"<th>CE"+c[0]+" · "+c+"</th>").join("")+"</tr>";
+  let ch="<tr><th>Student</th>"+crits.map(c=>"<th>CE"+c[0]+" · "+c+"</th>").join("")+"</tr>";
   students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};ch+="<tr><td>"+esc(d.name||d.email)+"</td>"+crits.map(c=>{let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){ts+=x.score||0;tm+=x.max}});if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return '<td><b style="color:'+col+'">'+ts+"/"+tm+"</b><br><small>"+Math.round(p)+"%</small></td>"}).join("")+"</tr>"});
   $("#crit").innerHTML=ch;
   $("#res").querySelectorAll("td.c").forEach(td=>td.onclick=async()=>{const ref=doc(db(),"students",td.dataset.u,"results",td.dataset.a.replace("/","__")),s=await getDoc(ref),o=s.exists()?s.data():{};
-    if(o.locked&&confirm("Aquesta activitat ja està ENTREGADA. Vols permetre que l'alumne la torni a fer i entregar? (Es conserva el seu progrés; haurà de tornar-la a marcar com a feta.) Acceptar = reobrir · Cancel·lar = només afegir feedback")){await setDoc(ref,{locked:false,markedDone:false,reopenedAt:serverTimestamp(),updated:serverTimestamp()},{merge:true});results();return}
+    if(o.locked&&confirm("This activity is already SUBMITTED. Allow the student to redo and resubmit it? (Their progress is kept; they will have to mark it as done again.) OK = reopen · Cancel = only add feedback")){await setDoc(ref,{locked:false,markedDone:false,reopenedAt:serverTimestamp(),updated:serverTimestamp()},{merge:true});results();return}
     const a=cat.find(x=>x.id===td.dataset.a),extra={};
-    if(a.manual){const mx=prompt("Nota màxima d'aquest producte final:",o.max??10);if(mx===null)return;const sc=prompt("Nota de l'alumne (sobre "+mx+"):",o.score??"");if(sc===null)return;if(sc!==""&&!isNaN(+sc)&&!isNaN(+mx)){extra.score=+sc;extra.max=+mx}}
-    const fb=prompt("Feedback opcional per a l'alumne:",o.feedback??"");if(fb===null)return;
+    if(a.manual){const mx=prompt("Maximum mark for this final product:",o.max??10);if(mx===null)return;const sc=prompt("Student mark (out of "+mx+"):",o.score??"");if(sc===null)return;if(sc!==""&&!isNaN(+sc)&&!isNaN(+mx)){extra.score=+sc;extra.max=+mx}}
+    const fb=prompt("Optional feedback for the student:",o.feedback??"");if(fb===null)return;
     await setDoc(ref,Object.assign({ls,activity:td.dataset.a,feedback:fb,updated:serverTimestamp()},extra),{merge:true});results()});}
 $("#lssel").onchange=results;
-ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u))return;$("#app").hidden=false;$("#msg").textContent="Hola, "+(u.displayName||u.email)+".";await drawLs();await requests();await results()});
+ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u))return;$("#app").hidden=false;$("#msg").textContent="Hello, "+(u.displayName||u.email)+".";await drawLs();await requests();await results()});
 </script></body></html>

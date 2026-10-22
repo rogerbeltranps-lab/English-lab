@@ -76,7 +76,7 @@ function overlay(html){
   o.style.cssText="position:fixed;inset:0;z-index:10000;background:#f8fafc;display:grid;place-items:center;font:16px system-ui,sans-serif;text-align:center;padding:20px;overflow:auto";
   o.innerHTML=html;document.body.append(o);return o;
 }
-const todayLink='<p><a href="'+new URL("today.html",ROOT).href+'">Torna a les meves activitats</a></p>';
+const todayLink='<p><a href="'+new URL("today.html",ROOT).href+'">Back to my activities</a></p>';
 const block=(title,msg)=>overlay('<div><h1>'+title+'</h1><p>'+msg+'</p>'+todayLink+'</div>');
 
 function chooseLevel(u){
@@ -108,7 +108,7 @@ async function gate(u){
   const info=await lsInfo(lsId),st=info.status;
   if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
   if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
-  if(!u||!isStudent(u)){block("Entra amb el compte del col·le","Per fer les activitats cal iniciar sessió amb el teu compte @"+DOMAIN+" (botó de baix a la dreta).");return}
+  if(!u||!isStudent(u)){block("Sign in with your school account","To do the activities you need to sign in with your @"+DOMAIN+" account (button at the bottom right).");return}
   if(st==="hidden"){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
   if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   const a=EL_CATALOG.find(x=>x.id===actId);
@@ -155,11 +155,11 @@ function bar(){
   document.body.appendChild(el);
   return u=>{el.innerHTML="";
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
-    if(!u)el.append("Sense sessió ",b("Entra amb el compte del col·le",login));
+    if(!u)el.append("Not signed in ",b("Sign in with your school account",login));
     else{el.append(u.displayName||u.email," ");
-      const a=document.createElement("a");a.textContent=isTeacher(u)?"Tauler":"Les meves activitats";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
-      if(isStudent(u)&&lsId)el.append(b("Canvi de nivell",()=>requestLevel(u))," ");
-      el.append(b("Surt",logout))}};
+      const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
+      if(isStudent(u)&&lsId)el.append(b("Change route",()=>requestLevel(u))," ");
+      el.append(b("Sign out",logout))}};
 }
 let draw=()=>{};
 const start=()=>{draw=bar();draw(user)};
