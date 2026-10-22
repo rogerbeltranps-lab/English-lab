@@ -23,15 +23,29 @@ var learningSupport = {
     if (correct) return level === 'insecure' ? 'Correcte!' : 'Correct!';
     return level === 'insecure' ? 'Encara no. ' + catalanReason : 'Try again. ' + englishReason;
   },
+  // Wrong answers never repeat the correct option: they only point back to the clue.
   evidence(level, correct, selected, answer, hint, listening) {
     if (!selected) return level === 'insecure' ? 'Tria una resposta abans de comprovar.' : 'Choose an answer before checking.';
-    return this.feedback(level, correct, hint || 'Busca la informació que justifica «' + answer + '».',
-      (listening ? 'Listen' : 'Read') + ' for the evidence supporting “' + answer + '”, rather than a plausible answer from your own routine.');
-  },
-  order(level, correct, model) {
     return this.feedback(level, correct,
-      'Comença per qui fa l’acció, després el verb i els detalls. Compara la teva frase amb el model: ' + model,
-      'Check subject → verb → details against the model: ' + model);
+      hint || (listening ? 'Escolta l’àudio una altra vegada i fixa’t en el detall exacte que demana la pregunta.' : 'Torna a llegir el text, busca la frase que respon la pregunta i compara-la amb cada opció.'),
+      listening ? 'Listen again and focus on the exact detail the question asks about, then compare it with each option.'
+        : 'Re-read the text, find the sentence that answers the question and compare it with each option.');
+  },
+  // attempt and model are arrays of words/chunks; the model sentence is never shown.
+  order(level, correct, attempt, model) {
+    const ca = level === 'insecure';
+    let reason;
+    if (attempt.length < model.length) {
+      reason = ca ? 'Encara no has fet servir totes les paraules.' : 'You have not used all the words yet.';
+    } else {
+      let ok = 0;
+      while (ok < model.length && attempt[ok] === model[ok]) ok++;
+      reason = ok === 0
+        ? (ca ? 'La primera paraula no és la correcta: comença per qui fa l’acció.' : 'The first word is not right: start with who does the action.')
+        : (ca ? 'Les ' + ok + ' primeres paraules són al seu lloc; revisa a partir de la paraula ' + (ok + 1) + '.'
+              : 'The first ' + ok + ' word' + (ok > 1 ? 's are' : ' is') + ' in the right place; check from word ' + (ok + 1) + ' onwards.');
+    }
+    return this.feedback(level, correct, reason + ' Recorda: qui + verb + detalls.', reason + ' Remember: subject → verb → details.');
   },
   missing(level, boxes) {
     const labels = boxes.filter(box => !box.checked).map(box => box.closest('label').textContent.trim());
