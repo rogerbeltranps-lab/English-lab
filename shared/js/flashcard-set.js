@@ -1,6 +1,6 @@
 /* Flashcard practice with a small random set (up to 10 cards).
    The student flips a card, then chooses "Got it" or "Again". "Again" cards come back before the student
-   moves on to anything else, and the step is complete when every card in the set is "Got it".
+   moves on to anything else, and the step is complete when every card in the set is "Got it", or when the student chooses "Skip the rest".
    Cards are arrays: [front, meaning, icon, back]. */
 var flashcardSet = {
   size: 10,
@@ -29,6 +29,7 @@ var flashcardSet = {
     $('#prevCard').onclick = () => self.move(-1);
     $('#nextCard').onclick = () => self.move(1);
     $('#newCards').onclick = () => { self.newSet(); self.render(); };
+    $('#skipCards').onclick = () => { config.complete(); self.render(); };
     self.render();
   },
   newSet() {
@@ -74,6 +75,7 @@ var flashcardSet = {
     $('#gotCard').textContent = ca ? 'Ho sé ✓' : 'Got it ✓';
     $('#againCard').textContent = ca ? 'Un altre cop ↻' : 'Again ↻';
     $('#newCards').textContent = ca ? 'Nou conjunt ↻' : 'New set ↻';
+    $('#skipCards').textContent = ca ? 'Continua sense acabar →' : 'Skip the rest →';
     this.updateButtons();
   }
 };
