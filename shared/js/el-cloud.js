@@ -10,7 +10,7 @@ const ROOT=new URL("../../",import.meta.url);
 
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
+let noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isStudent=u=>!!u&&(u.email||"").toLowerCase().endsWith("@"+DOMAIN);
@@ -37,7 +37,7 @@ async function pull(){
 }
 function resultPayload(a,extra){const sc=elPoints(a);return Object.assign({ls:lsId,activity:a.id,score:sc,max:a.points,done:sc,updated:serverTimestamp()},extra||{})}
 function push(){
-  if(!user||!isStudent(user)||syncing||frozen||!lsId||publicLs)return;
+  if(!user||!isStudent(user)||syncing||frozen||!lsId||publicLs||noSync)return;
   clearTimeout(timer);
   timer=setTimeout(async()=>{
     try{
@@ -110,7 +110,7 @@ async function gate(u){
   if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){block("Entra amb el compte del col·le","Per fer les activitats cal iniciar sessió amb el teu compte @"+DOMAIN+" (botó de baix a la dreta).");return}
   if(st==="hidden"){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
-  await pull();
+  if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   const a=EL_CATALOG.find(x=>x.id===actId);
   const ld=await getDoc(levelRef(u.uid,lsId)).catch(()=>null);
   let lvl=ld&&ld.exists()?ld.data().level:null;
@@ -121,7 +121,11 @@ async function gate(u){
   if(a&&a.mode==="once"){
     const rref=doc(db,"students",u.uid,"results",resKey(actId));
     const r=await getDoc(rref).catch(()=>null),rd=r&&r.exists()?r.data():{};
-    if(rd.locked){freeze();banner("Activitat entregada: ja no es pot modificar.","#92400e");return}
+    if(rd.locked){
+      noSync=true;const pk="el_practice_"+actId;
+      if(localStorage.getItem(pk)==="1"){banner("Mode pràctica: pots fer l'activitat de nou, però no s'enviarà ni canviarà la teva nota.","#7c3aed",{t:"Surt de la pràctica",f:()=>{origSet.call(localStorage,pk,"0");location.reload()}});return}
+      banner("Activitat entregada. Pots consultar-la i, si vols, tornar-la a fer per practicar (no s'enviarà de nou).","#92400e",{t:"Practica de nou",f:()=>{a.keys.forEach(k=>localStorage.removeItem(k));origSet.call(localStorage,pk,"1");location.reload()}});
+      freeze();return}
     const submit=async()=>{if(!confirm("Un cop entregada no la podràs tornar a fer ni modificar. Vols entregar-la?"))return;
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
       await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});location.reload()};
