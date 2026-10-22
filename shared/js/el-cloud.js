@@ -118,6 +118,8 @@ async function gate(u){
   if(!lvl)lvl=await chooseLevel(u);
   applyLevel(lvl);
   if(a&&a.graded&&!info.enabled.includes(actId)){block("Aquesta activitat avaluable encara no està habilitada","El professor t'avisarà a classe quan toqui fer-la.");return}
+  const ca=lvl==="insecure";
+  if(a&&a.manual&&a.graded)banner(ca?"Aquesta activitat és per entregar a través del Google Classroom.":"This activity is to be submitted through Google Classroom.","#1d4ed8");
   if(a&&a.mode==="once"){
     const rref=doc(db,"students",u.uid,"results",resKey(actId));
     const r=await getDoc(rref).catch(()=>null),rd=r&&r.exists()?r.data():{};
@@ -126,14 +128,14 @@ async function gate(u){
       if(localStorage.getItem(pk)==="1"){banner("Mode pràctica: pots fer l'activitat de nou, però no s'enviarà ni canviarà la teva nota.","#7c3aed",{t:"Surt de la pràctica",f:()=>{origSet.call(localStorage,pk,"0");location.reload()}});return}
       banner("Activitat entregada. Pots consultar-la i, si vols, tornar-la a fer per practicar (no s'enviarà de nou).","#92400e",{t:"Practica de nou",f:()=>{a.keys.forEach(k=>localStorage.removeItem(k));origSet.call(localStorage,pk,"1");location.reload()}});
       freeze();return}
-    const submit=async()=>{if(!confirm("Un cop entregada no la podràs tornar a fer ni modificar. Vols entregar-la?"))return;
+    const submit=async()=>{if(!confirm(ca?"Un cop entregada, la nota queda fixada (podràs practicar-la de nou, però no s'enviarà). Vols entregar-la?":"Once submitted, your result is fixed (you can practise it again, but it will not be sent). Submit it?"))return;
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
       await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});location.reload()};
-    if(rd.markedDone)banner("Has marcat aquesta activitat com a feta, però encara no l'has entregada.","#15803d",[{t:"Entrega-la",f:submit},{t:"Desmarca",f:async()=>{await setDoc(rref,{markedDone:false,updated:serverTimestamp()},{merge:true});location.reload()}}]);
-    else banner("Aquesta activitat només es pot entregar una vegada. Quan acabis, marca-la com a feta.","#1d4ed8",{t:"Marca com a feta",f:async()=>{
+    if(rd.markedDone)banner((ca?"Aquesta activitat és per entregar. L'has marcada com a feta, però encara no l'has entregada.":"This activity is to be submitted. You have marked it as done but not submitted it yet."),"#15803d",[{t:ca?"Entrega-la":"Submit",f:submit},{t:ca?"Desmarca":"Unmark",f:async()=>{await setDoc(rref,{markedDone:false,updated:serverTimestamp()},{merge:true});location.reload()}}]);
+    else banner((ca?"Aquesta activitat és per entregar (només una vegada). Quan acabis, marca-la com a feta.":"This activity is to be submitted (only once). When you finish, mark it as done."),"#1d4ed8",{t:ca?"Marca com a feta":"Mark as done",f:async()=>{
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
       await setDoc(rref,resultPayload(a,{markedDone:true}),{merge:true});
-      if(confirm("Activitat marcada com a feta. Vols entregar-la ara? (Un cop entregada ja no es podrà modificar.)"))await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});
+      if(confirm(ca?"Activitat marcada com a feta. Vols entregar-la ara? (La nota quedarà fixada.)":"Activity marked as done. Do you want to submit it now? (Your result will be fixed.)"))await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});
       location.reload()}});
   }
 }

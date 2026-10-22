@@ -3,7 +3,7 @@
 // points: number of actions in the activity; each completed action = 1 point.
 // graded:false = not evaluated (warm-up, or in-class games/theory presentations: inClass:true) - always free to practise.
 // graded:true  = evaluated; enabled by the teacher and can be done ONCE (submit locks it), unless manual.
-// skip: done-keys not scored (LP writings are practised but not corrected yet; AI feedback only).
+// skip: done-keys not scored (LP writings are practised but not corrected yet; "match" is vocabulary review, not submittable).
 // manual:true = scored by the teacher (not by counting actions); delivered through Google Classroom, not in this site.
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 window.EL_LEVELS=[{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes."}];
@@ -16,17 +16,17 @@ window.EL_CATALOG=(function(){
   const A=(course,file,title,criteria,keys,points,o)=>(a=>(a.mode=a.mode||(a.graded&&!a.manual?"once":"practice"),a))(Object.assign({id:course+"/"+file.replace(".html",""),ls:course+"-my-real-routine",course,path:base(course)+file,title,criteria,keys,points,graded:true},o||{}));
   return [
     A("2eso","getting-started.html","Getting started (warm-up)",["3.1"],["gettingStarted2ESO"],4,{graded:false}),
-    A("2eso","a-day-in-my-life.html","A day in my life",["3.1","5.1"],["lp2StateV2"],9,{skip:["write"]}),
-    A("2eso","same-day-different-person.html","Same day, different person",["3.1","5.1"],["s2SameDayState"],4,{skip:["write"]}),
+    A("2eso","a-day-in-my-life.html","A day in my life",["3.1","5.1"],["lp2StateV2"],8,{skip:["write","match"]}),
+    A("2eso","same-day-different-person.html","Same day, different person",["3.1","5.1"],["s2SameDayState"],3,{skip:["write","match"]}),
     A("2eso","present-simple-grammar.html","Present simple grammar",["5.1"],["s2GrammarState"],5),
-    A("2eso","healthy-habits.html","Healthy habits",["3.1","5.1"],["healthyHabitsState2ESO"],9,{skip:["write"]}),
+    A("2eso","healthy-habits.html","Healthy habits",["3.1","5.1"],["healthyHabitsState2ESO"],8,{skip:["write","match"]}),
     A("2eso","vocabulary-games.html","Vocabulary games",["5.1"],[],0,{graded:false,inClass:true}),
     A("2eso","final-product.html","Final product",["3.1","3.2","3.3","5.1"],["finalProduct2ESO"],0,{manual:true}),
     A("4eso","getting-started.html","Getting started (warm-up)",["3.1"],["gettingStarted4ESO"],4,{graded:false}),
-    A("4eso","a-day-in-real-life.html","A day in real life",["3.1","5.1"],["lp2StateV2_4ESO"],9,{skip:["write"]}),
+    A("4eso","a-day-in-real-life.html","A day in real life",["3.1","5.1"],["lp2StateV2_4ESO"],8,{skip:["write","match"]}),
     A("4eso","useful-expressions.html","Useful expressions",["3.1","5.1"],["s3Real4State"],4,{skip:["write"]}),
     A("4eso","grammar-phrasal-verbs.html","Grammar: phrasal verbs",["5.1"],["s4GrammarState"],5),
-    A("4eso","healthy-habits.html","Healthy habits",["3.1","5.2"],["healthyHabitsState4ESO"],9,{skip:["write"]}),
+    A("4eso","healthy-habits.html","Healthy habits",["3.1","5.2"],["healthyHabitsState4ESO"],8,{skip:["write","match"]}),
     A("4eso","vocabulary-games.html","Vocabulary games",["5.1"],[],0,{graded:false,inClass:true}),
     A("4eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","5.2"],["finalProduct4ESO"],0,{manual:true})
   ];
