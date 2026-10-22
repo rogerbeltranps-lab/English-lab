@@ -51,7 +51,7 @@ function push(){
 Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.test(k))return;origSet.call(this,k,v);if(this===localStorage&&!SKIP.test(k))push()};
 
 async function login(){
-  const p=new GoogleAuthProvider();p.setCustomParameters({hd:DOMAIN,prompt:"select_account"});
+  const p=new GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
   const r=await signInWithPopup(auth,p);
   if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Cal entrar amb el compte @"+DOMAIN+".")}
 }
