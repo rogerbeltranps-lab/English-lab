@@ -9,7 +9,8 @@
 window.EL_LEVELS=[{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes."}];
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine"},
-  {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine"}
+  {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine"},
+  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations"}
 ];
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";
@@ -28,7 +29,8 @@ window.EL_CATALOG=(function(){
     A("4eso","grammar-phrasal-verbs.html","Grammar: phrasal verbs",["5.1"],["s4GrammarState"],5),
     A("4eso","healthy-habits.html","Healthy habits",["3.1","5.2"],["healthyHabitsState4ESO"],9,{skip:["write"]}),
     A("4eso","vocabulary-games.html","Vocabulary games",["5.1"],[],0,{graded:false,inClass:true}),
-    A("4eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","5.2"],["finalProduct4ESO"],0,{manual:true})
+    A("4eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","5.2"],["finalProduct4ESO"],0,{manual:true}),
+    A("4eso","getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["2.1","3.1"],["ls2GettingStarted4ESO"],4,{graded:false,ls:"4eso-seasons-and-celebrations",path:"4eso/seasons-and-celebrations/getting-started.html"})
   ];
 })();
 // Number of distinct completed actions (truthy keys inside any "done" map) in a synced localStorage state string.
