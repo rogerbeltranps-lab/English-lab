@@ -19,7 +19,7 @@ const isStudent=u=>!!u&&(u.email||"").toLowerCase().endsWith("@"+DOMAIN);
 const relPath=location.pathname.replace(/^.*?\/((2|4)eso\/.*)$/,"$1");
 const m=relPath.match(/^((2|4)eso)\/([^/]+)\//);
 const lsId=m?m[1]+"-"+m[3]:null;
-const actId=m?m[1]+"/"+relPath.split("/").pop().replace(".html",""):null;
+let actId=m?m[1]+"/"+relPath.split("/").pop().replace(".html",""):null;
 const resKey=a=>a.replace("/","__");
 
 const snapshot=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))o[k]=localStorage.getItem(k)}return o};
@@ -35,7 +35,7 @@ async function pull(){
     for(const k in cloud){if(localStorage.getItem(k)!==cloud[k])origSet.call(localStorage,k,cloud[k])}
     syncing=false}
 }
-function resultPayload(a,extra){const sc=elPoints(a);return Object.assign({ls:lsId,activity:a.id,score:sc,max:a.points,done:sc,updated:serverTimestamp()},extra||{})}
+function resultPayload(a,extra){const sc=elPoints(a),parts=typeof window.EL_RESULT_PARTS==="function"?window.EL_RESULT_PARTS():null;return Object.assign({ls:lsId,activity:a.id,score:sc,max:a.points,done:sc,updated:serverTimestamp()},parts?{parts}:{},extra||{})}
 function push(){
   if(!user||!isStudent(user)||syncing||frozen||!lsId||publicLs)return;
   clearTimeout(timer);
@@ -147,6 +147,8 @@ document.readyState==="loading"?document.addEventListener("DOMContentLoaded",sta
 
 function loadCatalog(){return window.EL_CATALOG?Promise.resolve():new Promise(r=>{const s=document.createElement("script");s.src=new URL("shared/js/el-catalog.js",ROOT).href;s.onload=r;s.onerror=r;document.head.append(s)})}
 await loadCatalog();
+// Activities are matched by path, so pages with the same file name in different LSs keep separate results.
+const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=byPath.id;
 
 onAuthStateChanged(auth,async u=>{
   user=u;draw(u);

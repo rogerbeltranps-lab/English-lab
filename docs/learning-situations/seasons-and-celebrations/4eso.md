@@ -1,6 +1,6 @@
 # 4ESO · Seasons & Celebrations (LS2): activity content
 
-**Draft for review (23 Oct 2026).** Built from the LS2 section of *Learning Situations 4t ESO* (Roger Beltran, 21 Oct 2026) and the approved organization proposal. Nothing here is implemented until Roger approves it. Final Product, vocabulary and grammar come from the programme. Texts, scripts and question items are new drafts.
+**Approved by Roger on 23 Oct 2026.** Implementation notes: Learning Path 1 uses a real Halloween video and Learning Path 2 adds a real BBC video about Diwali (Roger asked for real listenings mixed with ElevenLabs ones); the respectful-wording and note-taking tasks in Research it right are multiple choice on every route. Built from the LS2 section of *Learning Situations 4t ESO* (Roger Beltran, 21 Oct 2026) and the approved organization proposal. Nothing here is implemented until Roger approves it. Final Product, vocabulary and grammar come from the programme. Texts, scripts and question items are new drafts.
 
 ## 0. Rules that apply to every page
 
@@ -754,6 +754,6 @@ Insecure keeps Catalan guidance at every step, with English examples linking sou
 
 ## Open points
 
-1. **Audio.** The three listening scripts (LP0, LP2, LP4) and the sample-exam announcement need recordings. How did you make the LS1 MP3s? I can't produce natural voices from this environment.
+1. **Audio.** Listenings mix real videos with ElevenLabs recordings of the scripts (Roger, 23 Oct 2026). The scripted MP3s are still to be generated.
 2. **Written texts are already saved.** The site syncs each student's whole page state to Firestore, and that includes their writing. So showing product pieces on your dashboard only reads data that is already stored. It doesn't add new data collection.
 3. Head teacher's name in the model email (*Ms Puig*) is invented: tell me if you prefer the real one or a neutral "Dear Head Teacher".

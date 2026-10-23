@@ -1,0 +1,8 @@
+# Seasons & Celebrations guidance (4 ESO, LS2)
+
+- Content: [4ESO course overview](seasons-and-celebrations/4eso.md), approved by Roger on 23 Oct 2026. The overview numbers the Learning Paths LP0–LP5; on the site they are Learning Paths 1–6, plus 7 (Final product).
+- Pages: `4eso/seasons-and-celebrations/`. Learning Paths 2–6, the checkpoints, the final product, the sample exam and Reflect are thin shells; their content is in `data/<page>.js` and `ls2-engine.js` renders it (recall, vocabulary + flashcards + practice, multiple choice, typed grammar, writing with AI feedback, forms, checklists, speaking). Learning Path 1 (`getting-started.html`) is a standalone page.
+- Effective-learning rules used everywhere: a recall warm-up with no notes opens each Learning Path; earlier vocabulary comes back in the flashcard deck and the recall items; auto-corrected steps complete at 80 %; typed answers show the answer only after a second wrong try; every Learning Path ends with a product piece saved for the Final Product page.
+- **Listenings:** mix real, level-appropriate videos (Learning Path 1: Fun Easy English "Halloween"; Learning Path 2: BBC / British Council "Happy Diwali") with scripted listenings generated with ElevenLabs (`audio/*.mp3`, scripts in the data files). Until an MP3 exists, the page reads the script with the browser's voices.
+- Recall checkpoints count by completion; the first attempt (score and date) is sent to the dashboard as `parts.first`.
+- Activity ids in `el-catalog.js` start with `4eso/ls2-`, and `el-cloud.js` matches pages by path, so they never clash with My Real Routine pages of the same name.

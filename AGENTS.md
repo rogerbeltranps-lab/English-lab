@@ -41,6 +41,7 @@ Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
 
 ## Final Product
 - Before working on My Real Routine in either 2ESO or 4ESO, read [its LS guidance](docs/learning-situations/my-real-routine.md).
+- Before working on 4ESO Seasons & Celebrations, read [its LS guidance](docs/learning-situations/seasons-and-celebrations.md).
 - Follow the current LS’s route requirements and submission format.
 - Required task elements must be explicit and must not be added to routes that do not require them. Language criteria support the task rather than obscure it.
 
