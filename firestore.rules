@@ -41,15 +41,6 @@ service cloud.firestore {
           && request.resource.data.request in ['insecure','safe','daring'];
         allow write: if isTeacher();
       }
-      // help: "I have a problem" messages; the student only creates them, the teacher replies and marks them solved
-      match /help/{hid} {
-        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
-        allow create: if signedIn() && request.auth.uid == uid
-          && request.resource.data.keys().hasOnly(['ls','activity','text','status','created'])
-          && request.resource.data.status == 'open'
-          && request.resource.data.text is string && request.resource.data.text.size() <= 2000;
-        allow write: if isTeacher();
-      }
       // results: students cannot touch feedback, nor edit a locked (submitted) result
       match /results/{rid} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
@@ -59,9 +50,6 @@ service cloud.firestore {
           && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','markedDone','updated','parts','score','max']);
         allow write: if isTeacher();
       }
-    }
-    match /{path=**}/help/{hid} {
-      allow read: if isTeacher();
     }
     match /{path=**}/results/{rid} {
       allow read: if isTeacher();

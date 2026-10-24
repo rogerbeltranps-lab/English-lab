@@ -3,13 +3,12 @@
 <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
 <style>body{font:16px system-ui,sans-serif;max-width:760px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1{font-size:1.5rem}h2{font-size:1.15rem;margin-top:1.4em}.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:10px 0;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.pill{display:inline-block;font-size:12px;font-weight:600;background:#ecfdf5;color:#065f46;border-radius:999px;padding:2px 8px;margin:1px 4px 1px 0}.pill.o{background:#eff6ff;color:#1d4ed8;font-weight:400}
 .ce1{background:#fce7f3;color:#9d174d}.ce2{background:#dcfce7;color:#166534}.ce3{background:#e0f2fe;color:#075985}.ce4{background:#ede9fe;color:#5b21b6}.ce5{background:#ffedd5;color:#9a3412}.ce6{background:#fef9c3;color:#854d0e}.ceC{background:#e2e8f0;color:#334155}
-a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:6px 12px;white-space:nowrap}a.go.off{background:#94a3b8;pointer-events:none}.muted{color:#64748b;font-size:14px}.fb{background:#fffbeb;border-radius:8px;padding:6px 10px;margin-top:6px;font-size:14px}.bar{position:relative;height:18px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin:6px 0 2px}.bar>i{display:block;height:100%;border-radius:999px;transition:width .6s,background .3s}.bar>u{position:absolute;top:0;bottom:0;width:1px;background:#fff9}.tot{display:block}.act{display:flex;flex-direction:column;gap:6px;align-items:stretch;text-align:center}button{font:inherit;font-size:14px;border:0;border-radius:8px;padding:6px 12px;cursor:pointer}button.sub{background:#15803d;color:#fff}button.help{background:#fff;color:#b91c1c;border:1px solid #fca5a5}
+a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:6px 12px;white-space:nowrap}a.go.off{background:#94a3b8;pointer-events:none}.muted{color:#64748b;font-size:14px}.fb{background:#fffbeb;border-radius:8px;padding:6px 10px;margin-top:6px;font-size:14px}.bar{position:relative;height:18px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin:6px 0 2px}.bar>i{display:block;height:100%;border-radius:999px;transition:width .6s,background .3s}.bar>u{position:absolute;top:0;bottom:0;width:1px;background:#fff9}.tot{display:block}.act{display:flex;flex-direction:column;gap:6px;align-items:stretch;text-align:center}button{font:inherit;font-size:14px;border:0;border-radius:8px;padding:6px 12px;cursor:pointer}button.sub{background:#15803d;color:#fff}
 details.steps{margin-top:6px;font-size:14px}details.steps summary{cursor:pointer;color:#0f766e}ul.st{list-style:none;padding:0;margin:6px 0}ul.st li{display:flex;gap:8px;align-items:center;padding:2px 0;border-bottom:1px dashed #e2e8f0}ul.st li b{width:18px;color:#16a34a}ul.st li.no b{color:#cbd5e1}ul.st li span.k{flex:1}
 table.cr{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:12px;overflow:hidden}table.cr td,table.cr th{border-bottom:1px solid #e2e8f0;padding:6px 8px;text-align:left}table.cr .bar{height:10px;margin:0}
-.helpbox{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:10px 14px;margin:10px 0}.helpbox p{margin:.4em 0}.ok{color:#15803d}
-dialog{border:0;border-radius:14px;padding:16px 18px;max-width:480px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}dialog textarea{width:100%;min-height:110px;box-sizing:border-box;font:inherit}dialog .row{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}</style></head><body>
+.hand{background:#f8fafc;border-radius:8px;padding:6px 10px;margin:6px 0;font-size:14px}.hand p{margin:.3em 0}.ans{background:#ecfdf5;border-radius:8px;padding:6px 10px;margin-top:4px}
+</style></head><body>
 <h1>Les meves activitats</h1><p class="muted" id="sub">Carregant…</p><div id="list"></div>
-<dialog id="dlg"><h3 style="margin-top:0">Tinc un problema</h3><p class="muted" id="hwhat"></p><textarea id="htext" placeholder="Explica què et passa: què estaves fent, què no funciona o què no entens."></textarea><div class="row"><button style="background:#e2e8f0" data-do="close">Cancel·la</button><button class="sub" data-do="send">Envia al professor</button></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
 <script type="module">
 // Demo mode: a page that defines window.EL_DEMO_STUDENT before this script gets sample data and no Firebase.
@@ -18,17 +17,16 @@ if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gs
 const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pill=c=>`<span class="pill ce${c[0]}">${c}</span>`,LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name]));
 const stepCrit=(a,k)=>(((window.EL_STEP_CRITERIA||{})[a.id]||{})[k]||EL_EVIDENCE[k]||[]);
-let U=null,D=null,helpFor=null;
+let U=null,D=null;
 
-// D = {me:{group}, rs:{activity:result}, lv:{ls:{level}}, pg:{ls:data}, ls:{id:{status,enabled}}, hp:[{id,ls,activity,text,status,reply}]}
+// D = {me:{group}, rs:{activity:result}, lv:{ls:{level}}, pg:{ls:data}, ls:{id:{status,enabled}}}
 async function load(u){
   if(DEMO)return DEMO;
-  const db=ELCloud.db,D={me:{},rs:{},lv:{},pg:{},ls:{},hp:[]},q=async(p,f)=>{try{(await F.getDocs(F.collection(db,...p))).forEach(f)}catch(e){}};
+  const db=ELCloud.db,D={me:{},rs:{},lv:{},pg:{},ls:{}},q=async(p,f)=>{try{(await F.getDocs(F.collection(db,...p))).forEach(f)}catch(e){}};
   try{const s=await F.getDoc(F.doc(db,"students",u.uid));if(s.exists())D.me=s.data()}catch(e){}
   await q(["students",u.uid,"results"],r=>D.rs[r.data().activity]=r.data());
   await q(["students",u.uid,"levels"],l=>D.lv[l.id]=l.data());
   await q(["students",u.uid,"progress"],p=>D.pg[p.id]=p.data().data||{});
-  await q(["students",u.uid,"help"],h=>D.hp.push(Object.assign({id:h.id},h.data())));
   for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
   return D;
 }
@@ -37,8 +35,6 @@ const teacher=()=>!DEMO&&ELCloud.isTeacher(U);
 
 function render(){
   const g=EL_GROUPS.find(x=>x.id===D.me.group),pend=[];let html="",any=false;const crit={};
-  const open=D.hp.filter(h=>h.status!=="solved"),answered=D.hp.filter(h=>h.status==="solved").slice(-3);
-  if(D.hp.length)html+=`<div class="helpbox"><b>Els teus missatges al professor</b>${open.map(h=>`<p>⏳ <b>${esc(title(h.activity))}</b>: ${esc(h.text)} <span class="muted">(pendent)</span></p>`).join("")}${answered.map(h=>`<p class="ok">✔ <b>${esc(title(h.activity))}</b>: ${esc(h.text)}${h.reply?`<br><span style="color:#0f172a">💬 ${esc(h.reply)}</span>`:""}</p>`).join("")}</div>`;
   for(const ls of [...EL_LS].sort((a,b)=>((D.ls[b.id]||{}).status==="open")-((D.ls[a.id]||{}).status==="open"))){ // open LS first
     const info=D.ls[ls.id]||{status:"hidden",enabled:[]},st=info.status;
     if(st==="hidden"&&!teacher())continue;
@@ -50,17 +46,16 @@ function render(){
     html+=`<h2>${ls.title} ${lvl?`<span class="pill">${LV[lvl]}</span>`:""}${st==="closed"?'<span class="pill o">tancada · només consulta</span>':st==="hidden"?'<span class="pill o">oculta (només tu la veus)</span>':st==="public"?'<span class="pill o">accés lliure · no puntua</span>':""}</h2>`;
     html+=items.map(a=>{const r=D.rs[a.id]||{},can=st==="closed"||!a.graded||info.enabled.includes(a.id)||teacher(),d=doneSet(a),steps=EL_ACTIONS[a.id]||[],n=steps.filter(k=>d.has(k)).length;
       const pts=a.manual?(r.max?` · nota ${r.score}/${r.max}`:" · es lliura pel Classroom i la puntua el professor"):a.graded?` · ${r.score||0}/${a.points} punts`:"";
-      const hp=D.hp.find(h=>h.activity===a.id&&h.status!=="solved");
       return `<div class="card"><div style="flex:1"><b>${a.title}</b><div>${a.criteria.map(pill).join("")}${a.graded?"":'<span class="pill o">'+(a.inClass?"a classe · no avalua":"per practicar · no avalua")+'</span>'}${a.mode==="once"?'<span class="pill o">una sola vegada</span>':""}<span class="muted">${r.locked?"entregada":r.markedDone?"marcada com a feta, sense entregar":""}${pts}${a.graded&&!can?" · el professor la habilitarà":""}</span></div>`
         +(steps.length?`<details class="steps"><summary>Passos fets: ${n} de ${steps.length}</summary><ul class="st">${steps.map(k=>`<li class="${d.has(k)?"":"no"}"><b>${d.has(k)?"✔":"○"}</b><span class="k">${k}${(a.skip||[]).includes(k)?' <span class="muted">(no puntua)</span>':""}</span>${stepCrit(a,k).map(pill).join("")}</li>`).join("")}</ul></details>`:"")
-        +(r.feedback?`<div class="fb"><b>Feedback:</b> ${esc(r.feedback)}</div>`:"")+(hp?`<div class="muted">⏳ Has enviat un problema al professor.</div>`:"")+`</div>`
-        +`<div class="act"><a class="go ${can?"":"off"}" href="${a.path}">${st==="closed"?"Revisa":"Obre"}</a>${a.graded&&!a.manual&&st==="open"&&can&&!r.locked?`<button class="sub" data-do="submit" data-a="${a.id}">Entrega</button>`:""}<button class="help" data-do="help" data-a="${a.id}" title="Explica al professor què et passa">Tinc un problema</button></div></div>`}).join("");
+        +(r.feedback?`<div class="fb"><b>Feedback:</b> ${esc(r.feedback)}</div>`:"")+(a.steps?selfAssessment(a,r):"")+`</div>`
+        +`<div class="act"><a class="go ${can?"":"off"}" href="${a.path}">${st==="closed"?"Revisa":"Obre"}</a>${a.graded&&!a.manual&&st==="open"&&can&&!r.locked?`<button class="sub" data-do="submit" data-a="${a.id}">Entrega</button>`:""}</div></div>`}).join("");
     if(tm){const p=ts/tm*100;
       html+=`<div class="card tot"><div style="display:flex;justify-content:space-between"><b>Total ${ls.title}</b><b>${ts} / ${tm} (${Math.round(p)}%)</b></div><div class="bar"><i data-w="${p}" style="width:0;background:${col(p)}"></i><u style="left:50%"></u><u style="left:75%"></u><u style="left:90%"></u></div><span class="muted">Verd al 50% · blau al 75% · lila al 90%. El percentatge es calcula amb les activitats que has fet.</span></div>`}
   }
   const cs=Object.values(crit);
   if(cs.length)html+=`<h2>Els meus resultats per criteri d'avaluació</h2><p class="muted">Els mateixos que veu el professor: la suma de punts de les activitats avaluables lligades a cada criteri.</p><table class="cr"><tr><th>Criteri</th><th>Punts</th><th style="width:40%"></th></tr>${cs.map(x=>{const p=x.s/x.m*100;return `<tr><td>${pill(x.c)}<span class="muted">${x.ls.replace(/^\w+ · /,"")}</span></td><td><b>${x.s}/${x.m}</b> (${Math.round(p)}%)</td><td><div class="bar"><i data-w="${p}" style="width:0;background:${col(p)}"></i></div></td></tr>`}).join("")}</table>`;
-  $("#sub").textContent=(g?g.name+" · ":"")+(any?"Pots practicar quan vulguis. El professor et dirà a classe quan fer les activitats avaluables. Si alguna cosa no et funciona, prem «Tinc un problema».":"Encara no hi ha cap LS oberta. El professor t'avisarà quan puguis començar.");
+  $("#sub").textContent=(g?g.name+" · ":"")+(any?"Pots practicar quan vulguis. El professor et dirà a classe quan fer les activitats avaluables.":"Encara no hi ha cap LS oberta. El professor t'avisarà quan puguis començar.");
   $("#list").innerHTML=(pend.length?`<div class="card" style="background:#f0fdf4;border-color:#86efac"><div><b>Tens ${pend.length} activitat${pend.length>1?"s":""} marcada${pend.length>1?"es":""} com a feta${pend.length>1?"s":""} sense entregar:</b><div class="muted">${pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">Entrega-les</button></div>`:"")+html;
   S.pend=pend;
   requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll(".bar>i").forEach(i=>i.style.width=i.dataset.w+"%")));
@@ -68,16 +63,15 @@ function render(){
 const S={pend:[]},col=p=>p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";
 const title=id=>(EL_CATALOG.find(a=>a.id===id)||{}).title||id;
 async function submitMany(list){if(!confirm("Entregar: "+list.map(a=>a.title).join(", ")+"? Un cop entregades ja no es podran modificar."))return;if(DEMO)return alert("Vista prèvia: no s'entrega res.");for(const a of list)await ELCloud.submitActivity(a);location.reload()}
-async function sendHelp(){
-  const t=$("#htext").value.trim(),a=helpFor;if(!t)return;
-  const o={ls:a.ls,activity:a.id,text:t.slice(0,2000),status:"open"};
-  if(DEMO)D.hp.push(Object.assign({id:"d"+Date.now()},o));
-  else await F.addDoc(F.collection(ELCloud.db,"students",U.uid,"help"),Object.assign(o,{created:F.serverTimestamp()}));
-  $("#dlg").close();if(!DEMO)D=await load(U);render();alert("Enviat. El professor ho veurà al seu tauler.");
+// Final product: the student's hand-ins with their self-assessment, comment and the teacher's answer (results.replies[step]).
+function selfAssessment(a,r){
+  let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
+  const rp=r.replies||{},done=a.steps.filter(([id])=>sp[id]);if(!done.length)return "";
+  return `<details class="steps" ${done.some(([id])=>rp[id])?"open":""}><summary>Les meves autoavaluacions: ${done.length} de ${a.steps.length}</summary>`+done.map(([id,t])=>{const x=sp[id];
+    return `<div class="hand"><b>${esc(t)}</b>${x.avg!=null?` · autoavaluació ${x.avg}/4`:""}${x.comment?`<p>El meu comentari: ${esc(x.comment)}</p>`:""}${rp[id]?`<div class="ans">💬 <b>Resposta del professor:</b> ${esc(rp[id])}</div>`:x.comment?'<p class="muted">El professor encara no t\'ha respost.</p>':""}</div>`}).join("")+"</details>";
 }
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t)return;const a=EL_CATALOG.find(x=>x.id===t.dataset.a);
-  ({submit:()=>submitMany([a]),suball:()=>submitMany(S.pend),close:()=>$("#dlg").close(),send:sendHelp,
-    help:()=>{helpFor=a;$("#hwhat").textContent=a.title;$("#htext").value="";$("#dlg").showModal()}})[t.dataset.do]?.()});
+  ({submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[t.dataset.do]?.()});
 
 if(DEMO){U={uid:"demo"};D=DEMO;render()}
 else ELCloud.onUser(async u=>{U=u;
