@@ -142,15 +142,13 @@ function render(){
     +`<div class="box">${fold("settings","LS status and graded activities",lsSettings(ls))}</div>`+rosterBox();
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
 }
-function todo(studs,ls,list){   // studs: signed-in students only
+function todo(studs,ls,list){   // studs: signed-in students only. Only final product items and route requests; submissions without feedback are not listed (Roger, 2026-10-24)
   const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
   studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>out.push(`✉️ <b>${name(s)}</b> commented on <b>${esc(t)}</b> (${esc(a.title)}): “${esc(handedIn(s.uid,a)[id].comment)}” <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button>`))));
   studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
-    if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(l.level)} → ${route(l.request)} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Reject</button>`);
-    list.filter(a=>a.graded&&!a.manual).forEach(a=>{const x=(S.D.rs[s.uid]||{})[a.id];
-      if(x&&x.locked&&!x.feedback)out.push(`📤 <b>${name(s)}</b> submitted <b>${a.title}</b> (${x.score||0}/${a.points}) · no feedback yet <button class="g" data-do="cell" data-u="${s.uid}" data-a="${a.id}">Open</button>`)})});
+    if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(l.level)} → ${route(l.request)} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Reject</button>`)});
   const fp=list.find(a=>a.manual),nm=fp?studs.filter(s=>!((S.D.rs[s.uid]||{})[fp.id]||{}).max).length:0;
-  return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no route requests and every submitted activity has feedback.</p>')
+  return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer and no route requests.</p>')
     +(fp&&nm?`<p class="muted">📝 ${nm} student${nm>1?"s":""} without a final product mark (click their Final product score to mark it).</p>`:"");
 }
 function progress(studs,list){
