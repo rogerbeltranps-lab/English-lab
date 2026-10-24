@@ -1,6 +1,6 @@
 # LS2 · Final product: groups, tasks and assessment
 
-Status: **approved by Roger on 24 Oct 2026 and built; revised the same day for the new programme** (branch `ls2-new-criteria`: new parts, script in step 3, three sources for Safe and Daring, rubric with one row per LS criterion; weights waiting for Roger's OK). Page: `4eso/seasons-and-celebrations/celebration-day-proposal.html` (steps 0–5, feedback to another group, Rubric tab from `final-rubric-data.js`). Decisions on the open questions: weights as in section 5, video 2–3 minutes with shorter parts (Insecure 40–60 s, Safe and Daring 35–45 s), pronunciation was assessed inside "My part" until the revised programme dropped 3.1.
+Status: **approved by Roger on 24 Oct 2026 and built; revised the same day for the new programme** (branch `ls2-new-criteria`: new parts, script in step 3, three sources for Safe and Daring, rubric with one row per LS criterion; weights approved with the LS grading plan, section 5). Page: `4eso/seasons-and-celebrations/celebration-day-proposal.html` (steps 0–5, feedback to another group, Rubric tab from `final-rubric-data.js`). Decisions on the open questions: weights as in section 5, video 2–3 minutes with shorter parts (Insecure 40–60 s, Safe and Daring 35–45 s), pronunciation was assessed inside "My part" until the revised programme dropped 3.1.
 
 ## 1. Groups
 
@@ -31,7 +31,7 @@ The dashboard shows, per student and step: done or not, the self-assessment aver
 
 - The self-assessment does **not** change the mark by itself: it shows the teacher how each student sees their own work, and the gap between self-assessment and teacher assessment is discussed in Reflect.
 - A student who has not handed in steps 1 and 2 records their part only after doing so.
-- Steps 0–5 together are row 9 (*My process evidence*), and they are what the teacher uses to adjust group rows for a student who did not contribute.
+- Steps 0–5 together are row 5 (*My process evidence*), and they are what the teacher uses to adjust group rows for a student who did not contribute.
 
 ## 3. What the group makes together
 
@@ -54,39 +54,42 @@ In a group of 3 (Safe and Daring), Part 4 is shared: each member adds one of its
 
 ## 5. How it is marked
 
-| Row | Criteria | Who gets the mark | Weight |
+Approved by Roger on 24 Oct 2026 with the LS grading plan ([grading.md](grading.md)). The final product is **25 % of the LS mark and fully individual**; the content rows are still marked here, but they count in the LS's "other competences" block (20 %).
+
+| Row | Criteria | Who gets the mark | Counts in |
 | --- | --- | --- | --- |
-| 1. My part of the pitch | 3.2 | individual | 25 % |
-| 2. My formal email | 5.1 | individual | 15 % |
-| 3. Welcome actions in my email | CC1 1.3 | individual | 5 % |
-| 4. Research & credits | 4.2, 6.1 | group | 10 % |
-| 5. What it means and why it belongs at school | 1.1 | group | 5 % |
-| 6. Local link and inclusion | 1.2 | group | 10 % |
-| 7. Stereotypes | CC3 3.2 | group | 10 % |
-| 8. Teamwork (peer assessment) | 3.2 | individual | 10 % |
-| 9. My process evidence | 3.2, 4.2, 6.1 | individual | 10 % |
+| 1. My part of the pitch | 3.2 | individual | Final product, 40 % |
+| 2. My formal email | 5.1 | individual | Final product, 35 % |
+| 3. My source (step 1: reliable or not, two reasons) | 4.2 | individual | Final product, 15 % |
+| 4. Teamwork (peer assessment) | 3.2 | individual | Final product, 5 % |
+| 5. My process evidence (steps 0–5) | 3.2 | individual | Final product, 5 % |
+| 6. Welcome actions in my email | CC1 1.3 | individual | Other competences |
+| 7. Research sheet | 6.1 | group | Other competences |
+| 8. What it means and why it belongs at school | 1.1 | group | Other competences |
+| 9. Local link and inclusion | 1.2 | group | Other competences |
+| 10. Stereotypes | CC3 3.2 | group | Other competences |
 
-Revised 24 Oct 2026 (proposed, waiting for Roger's OK): one row per LS criterion. Before: my part 25 (3.1) · email 20 · research 10 (with 6.2) · respect & inclusion 10 (1.1–1.3, CC1 1.3) · event plan 15 (CE2 emprenedora 2.3) · teamwork 10 · process 10. The event plan row goes because CE2 2.3 is no longer in LS2; the plan is now assessed through the pitch (3.2, 1.2) and the email (5.1, CC1 1.3).
+Before (24 Oct, proposed): one weighted rubric of nine rows (part 25, email 15, welcome 5, research 10, meaning 5, local link 10, stereotypes 10, teamwork 10, process 10), where the group rows made 35 % of the final product mark.
 
-- Individual 65 %, group 35 %. Row 9: Level 4 = every step handed in on time, specific, in the student's own words, with an honest self-assessment; Level 3 = every step, one late or very general; Level 2 = one or two steps missing; Level 1 = most steps missing. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0.
-- Rows 1–7 use the **route rubric** of the group (section 7).
-- **Safety net:** if peer assessment and the teacher's observation show that a student did not contribute to the group product, the teacher lowers that student's group rows (4–7) by one level. Nobody loses marks for a teammate's part or email.
+- Row 5: Level 4 = every step handed in on time, specific, in the student's own words, with an honest self-assessment; Level 3 = every step, one late or very general; Level 2 = one or two steps missing; Level 1 = most steps missing. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0 (Level 1 = NA, 2 = AS, 3 = AN, 4 = AE).
+- Rows use the **route rubric** of the group (section 7).
+- **Safety net:** if peer assessment and the teacher's observation show that a student did not contribute to the group product, the teacher lowers that student's group rows (7–10) by one level. Nobody loses marks for a teammate's part or email.
 
 ## 6. Peer assessment
 
-**a) Inside the group: teamwork (marked, row 8).** After submitting, each student rates every teammate, and themselves, from 1 to 4 on three statements, anonymously:
+**a) Inside the group: teamwork (marked, row 4).** After submitting, each student rates every teammate, and themselves, from 1 to 4 on three statements, anonymously:
 
 1. Did their part of the research and the plan on time.
 2. Listened to others and helped the group decide.
 3. Helped the group to improve the slides and the video.
 
-The average of the teammates' ratings (self-rating not counted) gives the level for row 8. The self-rating is compared with it in Reflect. If the ratings and the teacher's observation disagree a lot, the teacher decides.
+The average of the teammates' ratings (self-rating not counted) gives the level for row 4. The self-rating is compared with it in Reflect. If the ratings and the teacher's observation disagree a lot, the teacher decides.
 
-**b) Between groups: feedback on the draft (not marked).** In the class before the deadline, each group watches another group's draft video and fills in a short form: two things that work and one thing to improve, using the rubric rows 4–7 and "every member speaks, face and slides visible". The group uses it to fix the video before submitting.
+**b) Between groups: feedback on the draft (not marked).** In the class before the deadline, each group watches another group's draft video and fills in a short form: two things that work and one thing to improve, using the rubric rows 7–10 and "every member speaks, face and slides visible". The group uses it to fix the video before submitting.
 
 ## 7. Rubrics by route
 
 The level descriptors are in `4eso/seasons-and-celebrations/final-rubric-data.js` (Rubric tab of the final product page; Insecure in Catalan, Safe and Daring in English). They follow the indicators in [indicators.md](indicators.md): Level 1 = NA, Level 2 = AS, Level 3 = AN, Level 4 = AE.
 
 - The indicators are the same for every route. What changes is the task and the help: Insecure has the templates, Catalan guidance, two sources and 40–60 s parts; Safe and Daring have three sources and 35–45 s parts; Daring adds argued parts, an estimated cost, reasons for the welcome actions and the head teacher's concern.
-- Rows 3–7 (welcome actions, research, meaning, local link, stereotypes) are shared by Safe and Daring; rows 1 and 2 have route-specific descriptors.
+- Rows 3–10 (my source, teamwork, process, welcome actions, research, meaning, local link, stereotypes) are shared by Safe and Daring; rows 1 and 2 have route-specific descriptors. Each row shows on the page whether it counts in the final product (its %) or in the other competences.

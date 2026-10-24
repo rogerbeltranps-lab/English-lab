@@ -76,6 +76,12 @@ All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the
 - Follow the current LS’s route requirements and submission format.
 - Required task elements must be explicit and must not be added to routes that do not require them. Language criteria support the task rather than obscure it.
 
+## Assessment and grading
+- **Every LS criterion ends with a degree** (NA, AS, AN, AE) that the teacher can justify with its indicators (`indicators.md` of the LS) and a piece of work. The level comes first; the mark is worked out from it. Each LS documents its evidence per criterion in a `grading.md`; worked example: [4ESO LS2](docs/4eso/ls2-seasons-and-celebrations/grading.md), also in Roger's reference doc *Worked example: from competence to LS criterion*.
+- **LS mark (Roger, 24 Oct 2026):** final exam 35 % · final product 25 % · grammar and vocabulary activities 20 % · other competences 20 %, recorded from every activity. Key competences are the communicative skills (CE2 Listening, CE3 Speaking, CE4 Reading, CE5 Writing): assessed in the exam and the final product. The other competences (CE1, CE6–CE10, transversal) form the 20 % block.
+- **Collecting the data:** the site records completion and first tries automatically; the teacher gives one-click levels only at a few planned moments, on work already read for feedback or a mark. Scores alone never set the degree of a criterion whose indicators describe a task. With two pieces of evidence the later one weighs more; the dashboard suggests, the teacher confirms.
+- **Scale:** NA 2.5 · AS 5 · AN 7.5 · AE 10 · no evidence 0. Mark to level: under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.
+
 ## Content-first workflow
 - Read the applicable LS guidance and current course overview (containing all three routes). Implement only content explicitly approved by the user; website content and extracted drafts are not automatically approved. Preserve previously agreed requirements and the last approved content separately from proposed revisions. Flag missing information or contradictions and resolve them with the user before implementing the affected part. Technical and layout decisions may follow existing project rules, but agents must not invent or change pedagogical content during implementation.
 
