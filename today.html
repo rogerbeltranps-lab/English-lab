@@ -31,7 +31,7 @@ async function load(u){
   return D;
 }
 const doneSet=a=>{const p=D.pg[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
-const teacher=()=>!DEMO&&ELCloud.isTeacher(U);
+const teacher=()=>!DEMO&&(ELCloud.isTeacher(U)||ELCloud.isTester(U));   // teacher and testers see every LS
 
 function render(){
   const g=EL_GROUPS.find(x=>x.id===D.me.group),pend=[];let html="",any=false;const crit={};

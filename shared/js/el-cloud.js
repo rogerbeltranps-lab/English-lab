@@ -6,7 +6,9 @@ import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstati
 
 const CONFIG={apiKey:"AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE",authDomain:"english-lab-ietm.firebaseapp.com",projectId:"english-lab-ietm",storageBucket:"english-lab-ietm.firebasestorage.app",messagingSenderId:"100211300058",appId:"1:100211300058:web:aff85bd00c3a877e7af7e3"};
 // Schools whose Google accounts can sign in as students. Add a new school by adding its domain here AND in firestore.rules.
-const DOMAINS=["ietramuntana.cat"],TEACHERS=["roger.beltranps@gmail.com"],SKIP=/^(el_|firebase|debug)/;
+const DOMAINS=["ietramuntana.cat"],TEACHERS=["roger.beltranps@gmail.com"],
+// Testers sign in as students but can open every page and every LS, including hidden ones and graded activities not enabled yet. Also in firestore.rules.
+TESTERS=["roger.beltran@ietramuntana.cat"],SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
 
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
@@ -14,6 +16,7 @@ const origSet=Storage.prototype.setItem;
 let myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
+const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
 const isStudent=u=>!!u&&DOMAINS.some(d=>(u.email||"").toLowerCase().endsWith("@"+d));
 
 // Which activity / LS is this page?
@@ -55,7 +58,7 @@ async function login(){
   const p=new GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
   const r=await signInWithPopup(auth,p);
   if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Sign in with your school account (@"+DOMAINS.join(", @")+").");return}
-  if(isStudent(r.user)&&!onBoard)location.href=BOARD;   // students always start on their board
+  if(isStudent(r.user)&&!isTester(r.user)&&!onBoard)location.href=BOARD;   // students always start on their board
 }
 // Shared school computers: never leak one student's local progress into another account.
 const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))};
@@ -122,7 +125,7 @@ async function requestLevel(u){
 const BOARD=new URL("today.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname);
 const courseOf=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
 async function gate(u){
-  if(isStudent(u)&&!lsId&&!onBoard){
+  if(isStudent(u)&&!isTester(u)&&!lsId&&!onBoard){
     const c=relPath.match(/^((2|4)eso)\/(index\.html)?$/);
     if(!(c&&c[1]===courseOf(myGroup))){location.replace(BOARD);return}
   }
@@ -131,8 +134,10 @@ async function gate(u){
   if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
   if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){block("Sign in with your school account","To do the activities you need to sign in with your school account (@"+DOMAINS.join(", @")+") (button at the bottom right).");return}
-  if(!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block("Aquesta LS no és del teu grup","Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.");return}
-  if(st==="hidden"){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
+  const tester=isTester(u);
+  if(tester)banner("Compte de prova: veus totes les LS i activitats.","#7c3aed");
+  if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block("Aquesta LS no és del teu grup","Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.");return}
+  if(st==="hidden"&&!tester){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
   if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   const a=EL_CATALOG.find(x=>x.id===actId);
   const ld=await getDoc(levelRef(u.uid,lsId)).catch(()=>null);
@@ -140,7 +145,7 @@ async function gate(u){
   if(st==="closed"){if(lvl)applyLevel(lvl);freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
   if(!lvl)lvl=await chooseLevel(u);
   applyLevel(lvl);
-  if(a&&a.graded&&!info.enabled.includes(actId)){block("Aquesta activitat avaluable encara no està habilitada","El professor t'avisarà a classe quan toqui fer-la.");return}
+  if(a&&a.graded&&!tester&&!info.enabled.includes(actId)){block("Aquesta activitat avaluable encara no està habilitada","El professor t'avisarà a classe quan toqui fer-la.");return}
   const ca=lvl==="insecure";
   if(a&&a.manual&&a.graded)banner(ca?"Aquesta activitat és per entregar a través del Google Classroom.":"This activity is to be submitted through Google Classroom.","#1d4ed8");
   if(a&&a.mode==="once"){
@@ -201,4 +206,4 @@ onAuthStateChanged(auth,async u=>{
   listeners.forEach(f=>f(u));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isStudent,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};

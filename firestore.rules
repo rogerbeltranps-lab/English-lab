@@ -2,6 +2,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@(ietramuntana[.]cat)$'); }  // add schools: (ietramuntana[.]cat|newschool[.]cat) and in shared/js/el-cloud.js DOMAINS
+    // testers: school accounts that work as students but reach every LS (also in shared/js/el-cloud.js TESTERS)
+    function isTester() { return signedIn() && request.auth.token.email in ['roger.beltran@ietramuntana.cat']; }
     function isTeacher() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email in ['roger.beltranps@gmail.com']; }
     // LS assigned to the student's group: ls/{id}.groups, or every group when the field is missing
     function lsForMe(ls, uid) { return !('groups' in get(/databases/$(database)/documents/ls/$(ls)).data) || get(/databases/$(database)/documents/students/$(uid)).data.get('group', '') in get(/databases/$(database)/documents/ls/$(ls)).data.groups; }
@@ -30,7 +32,7 @@ service cloud.firestore {
       // progress is writable only while that LS is open
       match /progress/{ls} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
-        allow write: if signedIn() && request.auth.uid == uid && lsOpen(ls) && lsForMe(ls, uid);
+        allow write: if signedIn() && request.auth.uid == uid && ((lsOpen(ls) && lsForMe(ls, uid)) || isTester());
       }
       // route (level): the student picks it once; later changes are only a request the teacher accepts
       match /levels/{ls} {
@@ -47,7 +49,7 @@ service cloud.firestore {
       match /results/{rid} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow create, update: if signedIn() && request.auth.uid == uid
-          && lsOpen(request.resource.data.ls) && lsForMe(request.resource.data.ls, uid)
+          && ((lsOpen(request.resource.data.ls) && lsForMe(request.resource.data.ls, uid)) || isTester())
           && (resource == null || resource.data.get('locked', false) == false)
           && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','markedDone','updated','parts','score','max']);
         allow write: if isTeacher();
