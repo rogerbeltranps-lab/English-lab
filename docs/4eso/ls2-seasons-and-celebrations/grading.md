@@ -73,7 +73,7 @@ Levels to marks: NA 2.5 · AS 5 · AN 7.5 · AE 10 · no evidence 0. Marks to le
 
 ## 6. What the site needs (dashboard: English Lab project)
 
-`teacher.html` belongs to the English Lab project (root AGENTS.md), so these are requests for it:
+`teacher.html` belongs to the English Lab project (root AGENTS.md), so these were requests for it. **Built on 25 Oct 2026** (data in `shared/js/el-grading.js`, how it works in the root AGENTS.md, Teacher dashboard):
 
 1. **Level buttons:** in the hand-in / mark dialog, NA · AS · AN · AE per criterion of that step, with the indicator text on hover; saved per student, activity, step and criterion (for example `results/{activity}.levels[step][criterion]`).
 2. **First try:** save the first-try score of vocabulary practice, grammar, mixed practice and register steps (as checkpoints already do with `parts.first`), plus whether each step was done by its session deadline (`shared/js/el-plan.js`).

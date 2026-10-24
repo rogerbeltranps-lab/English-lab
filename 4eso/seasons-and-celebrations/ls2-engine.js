@@ -33,7 +33,11 @@ var LS2 = (function () {
   const words = s => (String(s).trim().match(/\S+/g) || []).length;
 
   function save() { localStorage.setItem(LP.key, JSON.stringify(state)); localStorage.setItem(LP.key + 'Level', level); progress(); }
-  function complete(k) { if (!state.done[k]) { state.done[k] = true; save(); } else progress(); }
+  // doneAt[k]: when the step was first completed; tries[k]: the first check of an auto-corrected step. The teacher dashboard
+  // uses them for the grammar and vocabulary block (first try + done by the session deadline in el-plan.js).
+  function complete(k) { if (!state.done[k]) { state.done[k] = true; stamp(k); save(); } else progress(); }
+  function stamp(k) { state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = new Date().toISOString(); }
+  function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) { state.tries[k] = { score, max, level, date: new Date().toISOString() }; save(); } }
   function steps() { return LP.panels.flatMap(p => p.type === 'info' ? [] : p.type === 'vocab' ? (p.practice ? ['cards', 'practice'] : ['cards']) : [p.id]); }
   function progress() {
     const s = steps(), n = s.filter(k => state.done[k]).length;
@@ -122,7 +126,7 @@ var LS2 = (function () {
       if (p.practice) {
         const items = forLevel(p.practice);
         $('#vocabPractice').innerHTML = typedHtml(items, 'vp');
-        $('#vocabCheck').onclick = () => { const s = checkTyped(items, 'vp'), ok = s >= need(items.length); result($('#vocabResult'), s, items.length, ok); if (ok) complete('practice'); };
+        $('#vocabCheck').onclick = () => { const s = checkTyped(items, 'vp'); firstTry('practice', s, items.length); const ok = s >= need(items.length); result($('#vocabResult'), s, items.length, ok); if (ok) complete('practice'); };
       }
     }
   });
@@ -201,6 +205,7 @@ var LS2 = (function () {
             : learningSupport.evidence(level, ok, c, q.o[0], ca() ? q.h : null, !!(p.media && (p.media.audio || p.media.youtube)));
           fb.className = 'feedback ' + (ok ? 'ok' : 'no');
         });
+        firstTry(p.id, score, items.length);
         const ok = score >= need(items.length);
         result($('#' + p.id + 'Result'), score, items.length, ok);
         if (ok) complete(p.id);
@@ -214,7 +219,7 @@ var LS2 = (function () {
     bind() {
       const items = forLevel(p.items);
       $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id);
-      $('#' + p.id + 'Check').onclick = () => { const s = checkTyped(items, p.id), ok = s >= need(items.length); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok) complete(p.id); };
+      $('#' + p.id + 'Check').onclick = () => { const s = checkTyped(items, p.id); firstTry(p.id, s, items.length); const ok = s >= need(items.length); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok) complete(p.id); };
     }
   });
 
@@ -322,7 +327,7 @@ var LS2 = (function () {
           peers: p.peers ? peers.map(d => ({ name: d.name.trim(), r: ps.map((s, i) => ({ s, v: d.r[i] })) })) : undefined, comment: (draft.comment || '').trim(), date: new Date().toISOString() };
         // A step can also be a product piece (the research card): it then appears on the final product page too.
         if (p.product) saveProduct(p.product, state.steps[key].f.filter(f => f.v).map(f => f.l + ': ' + f.v).join('\n'));
-        state.done[key] = true; save();
+        state.done[key] = true; stamp(key); save();
         msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Entregat ✓ El professor ho veurà al seu tauler.' : 'Handed in ✓ Your teacher will see it on the dashboard.') + (p.product ? (ca() ? ' També la trobaràs a la pàgina del producte final.' : ' You will also find it on the final product page.') : '');
       };
     }

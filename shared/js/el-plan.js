@@ -1,6 +1,7 @@
 // Teaching calendar per LS, shown on the teacher dashboard. Edit the rows here when the plan changes.
 // term: rows start a new term block when it changes. assess: what that term's mark is built from.
 // groups: one column per class group; each row lists that group's dated sessions (one per line).
+// due: last session of each activity per group (same order as groups), YYYY-MM-DD; "done on time" on the dashboard means done by the end of that day.
 window.EL_PLAN={
   "4eso-seasons-and-celebrations":{
     note:"Starts 26 Oct 2026. 4ESO-A: Mon 8:30 · Wed 12:00 · Fri 13:00. 4ESO-B: Mon 15:00 · Tue 9:30 · Wed 10:30. Term 1 ends on 20 Nov, so the exam is in term 1 and the final product is in term 2 (its mark goes into the term 2 report). LP = Learning Path.",
@@ -9,6 +10,15 @@ window.EL_PLAN={
       2:{title:"Term 2 · Final product",assess:"Final product (25 %: my part, email, my source, teamwork, process) + other competences (20 %: LP4 research card and the final product content rows) · criteria 3.2, 5.1, 4.2 · 6.1, 1.1, 1.2, CC1 1.3, CC3 3.2 · the LS2 mark closes here"}
     },
     groups:["4ESO-A","4ESO-B"],
+    due:{
+      "4eso/ls2-celebrations-around-the-world":["2026-11-02","2026-10-28"],
+      "4eso/ls2-recall-checkpoint-1":["2026-11-02","2026-11-02"],
+      "4eso/ls2-where-traditions-come-from":["2026-11-06","2026-11-03"],
+      "4eso/ls2-plan-the-day":["2026-11-11","2026-11-09"],
+      "4eso/ls2-write-to-the-head-teacher":["2026-11-16","2026-11-11"],
+      "4eso/ls2-recall-checkpoint-4":["2026-11-16","2026-11-16"],
+      "4eso/ls2-research-it-right":["2026-11-25","2026-11-24"]
+    },
     rows:[
       {term:1,when:"Week 1 · 26–30 Oct",g:[
         "Mon 26 · LP1 Getting started\nWed 28 · LP2 Celebrations around the world (1/2)",
