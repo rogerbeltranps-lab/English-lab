@@ -74,6 +74,10 @@ All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the
 - Follow the current LS’s route requirements and submission format.
 - Required task elements must be explicit and must not be added to routes that do not require them. Language criteria support the task rather than obscure it.
 
+## Teacher dashboard
+- `teacher.html` is for Roger only and is written in **English** (the route-language rules apply to student pages, not to it).
+- Its "Teaching plan" box shows each LS's week-by-week calendar from `shared/js/el-plan.js` (one entry per LS id, with terms, assessment per term and calendar notes). Update that file when a plan changes; school dates are in Roger's 2026–27 calendar (term 1 ends 20 Nov, term 2 ends 26 Feb).
+
 ## Content-first workflow
 - Read the applicable LS guidance and current course overview (containing all three routes). Implement only content explicitly approved by the user; website content and extracted drafts are not automatically approved. Preserve previously agreed requirements and the last approved content separately from proposed revisions. Flag missing information or contradictions and resolve them with the user before implementing the affected part. Technical and layout decisions may follow existing project rules, but agents must not invent or change pedagogical content during implementation.
 

@@ -18,6 +18,7 @@ Newest first. One line per decision; update a line instead of adding a contradic
 
 | Date | Decision |
 | --- | --- |
+| 2026-10-24 | Calendar (3 classes a week from 26 Oct): Learning Paths 1–3, 5, 6, checkpoint 1, checkpoint 4 + sample exam and the exam (about 18–19 Nov) in term 1; Research it right, the final product (deadline 11 Dec) and Reflect in term 2, where the final product mark goes. Checkpoints 2 and 3 are optional homework. Week by week in `shared/js/el-plan.js` (teacher dashboard). |
 | 2026-10-24 | Activities are linked to criteria by the skill each step practises (reading 4.1, listening 2.1, speaking 3.1, writing 5.1) plus the integrated competences its content targets; see [assessment-criteria.md](assessment-criteria.md). Proposed label fixes await Roger's approval. |
 | 2026-10-24 | Getting Started: the origins video (Halloween + Castanyada, ElevenLabs voices, normal and slow copies with subtitles) is the listening; *Autumn in two places* became a reading with one chat per route. |
 | 2026-10-24 | LS2 landing page follows the LS1 structure, with learning objectives and assessment criteria from the programme. No percentages in "What counts" until Roger gives them. |
