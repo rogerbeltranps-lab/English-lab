@@ -47,6 +47,11 @@ html,body{overflow-x:clip}
   .chip:hover .chip-tooltip,.chip:focus .chip-tooltip{display:block!important;max-width:min(240px,calc(100vw - 60px))}
   .chips .chip:nth-child(2n) .chip-tooltip{left:auto;right:0}
 }
+.chat{display:flex;flex-direction:column;gap:9px;margin:14px 0 20px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#f7f9fd}
+.msg{max-width:82%;padding:10px 14px;border-radius:16px;line-height:1.55;background:#fff;border:1px solid var(--line)}
+.msg b{display:block;font-size:.8rem;color:var(--dark);margin-bottom:2px}
+.msg.josh{align-self:flex-end;background:#dceafe;border-color:#c5dafa}
+@media(max-width:560px){.msg{max-width:92%}}
 </style>
 <link rel="stylesheet" href="../../shared/css/lp-theme-4eso.css">
 </head>
@@ -59,7 +64,7 @@ html,body{overflow-x:clip}
         <option value="getting-started.html" selected>1 · Getting started</option><option value="celebrations-around-the-world.html">2 · Celebrations around the world</option><option value="where-traditions-come-from.html">3 · Where traditions come from</option><option value="research-it-right.html">4 · Research it right</option><option value="plan-the-day.html">5 · Plan the day</option><option value="write-to-the-head-teacher.html">6 · Write to the head teacher</option><option value="celebration-day-proposal.html">7 · Final product</option><option value="recall-checkpoint-1.html">Recall checkpoint 1</option><option value="recall-checkpoint-2.html">Recall checkpoint 2</option><option value="recall-checkpoint-3.html">Recall checkpoint 3</option><option value="recall-checkpoint-4.html">Recall checkpoint 4</option><option value="sample-exam.html">Sample exam</option><option value="reflect.html">Reflect</option>
       </select>
     </div>
-    <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 4</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
+    <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 5</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
 </div></div>
 
 <header class="hero"><div class="wrap">
@@ -77,8 +82,9 @@ html,body{overflow-x:clip}
 <nav class="tabs" aria-label="Warm-up sections">
   <button class="tab active" data-panel="recall">1 Recall</button>
   <button class="tab" data-panel="words">2 Autumn words</button>
-  <button class="tab" data-panel="listen">3 Listening</button>
-  <button class="tab" data-panel="speak">4 Speaking</button>
+  <button class="tab" data-panel="read">3 Reading</button>
+  <button class="tab" data-panel="listen">4 Listening</button>
+  <button class="tab" data-panel="speak">5 Speaking</button>
 </nav>
 
 <section class="panel active" id="recall">
@@ -95,6 +101,16 @@ html,body{overflow-x:clip}
     <div id="practiceList"></div>
     <div class="actions"><button class="btn" id="checkPractice" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button></div>
     <div class="result" id="practiceResult"></div></div>
+</section>
+
+<section class="panel" id="read">
+  <div class="panel-head"><div><h2>Reading: Autumn in two places</h2><p class="instruction" data-support-ca="Llegeix el xat entre la Núria (Catalunya) i en Josh (Manchester) una vegada per entendre de què parlen. Després llegeix les preguntes i busca al text la frase que respon cada una. Necessites un 80 % per completar el pas." data-support-en="Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.">Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.</p></div><span class="pill" id="readPill">80 %</span></div>
+  <div class="section-card">
+    <div class="chat" id="readText"></div>
+    <form id="readForm"></form>
+    <div class="actions"><button class="btn" id="checkRead" type="button" data-support-ca="Comprova el reading" data-support-en="Check reading">Check reading</button></div>
+    <div class="result" id="readResult"></div>
+  </div>
 </section>
 
 <section class="panel" id="listen">
@@ -192,6 +208,74 @@ const practice=[
  {r:"safe",q:"On a cold night, our living room feels warm and ___.",a:["cosy","cozy"]},
  {r:"safe",q:"We go to the farm to ___ fruit.",a:["pick"]}
 ];
+// Reading (one chat per route, AGENTS.md). Options: first one is correct; order is shuffled on screen.
+const readingChat={
+ insecure:[
+  ["Núria","Hi Josh! How's the weather in Manchester?"],
+  ["Josh","Hi Núria! It's cold and rainy. The mornings are very cold, and there was frost (ice) on the cars today!"],
+  ["Núria","Frost? Here it's mild. It's sunny in the afternoon, but the mornings are cool and foggy."],
+  ["Josh","Lucky you! The clocks went back last weekend, so it gets dark very early now, at half past four."],
+  ["Núria","Wow! Here the days get shorter too."],
+  ["Josh","What do you do in autumn?"],
+  ["Núria","It's harvest time, so there's a lot of seasonal food. Last Sunday I went to the forest with my dad. We picked mushrooms."],
+  ["Josh","Nice! We picked apples at a farm."],
+  ["Núria","On 31 October we celebrate the Castanyada. We roast chestnuts and sweet potatoes, and we eat panellets. Panellets are little sweets with almonds and pine nuts. At school, a teacher dresses up as a castanyera, an old woman who sells chestnuts."],
+  ["Josh","Delicious! We have Halloween on the same night. Children wear costumes and go trick or treating. My little brother is going to be a skeleton. He's very excited!"],
+  ["Núria","Do you carve pumpkins?"],
+  ["Josh","Yes, every year. My mum makes pumpkin soup with the inside. And you? Do you wear costumes?"],
+  ["Núria","Some people do. But for me the Castanyada is about family. We eat together at my grandparents' house. It's cosy and relaxed."],
+  ["Josh","Nice! I love autumn. The leaves change colour and fall from the trees."],
+  ["Núria","Me too. Autumn is my favourite season!"]
+ ],
+ safe:[
+  ["Núria","Hi Josh! How's the weather in Manchester?"],
+  ["Josh","Hi Núria! Cold and rainy, as usual. It's really chilly in the mornings, and there was frost on the cars today. It feels like winter already!"],
+  ["Núria","Frost already? Here it's still quite mild. It's sunny in the afternoon, but the mornings are cool and foggy."],
+  ["Josh","Lucky you! And the clocks went back last weekend, so it gets dark really early now, at about half past four."],
+  ["Núria","Half past four? Wow! Here the days get shorter too, but it's not that bad."],
+  ["Josh","So what do you do in autumn?"],
+  ["Núria","It's harvest time here, so there's lots of seasonal food. Last Sunday I went to the forest with my dad to pick mushrooms."],
+  ["Josh","Nice! We went to a farm to pick apples, and my mum made an apple pie."],
+  ["Núria","And on the thirty-first of October we celebrate the Castanyada. We roast chestnuts and sweet potatoes, and we eat panellets. They're little sweets made with nuts, like almonds and pine nuts. At school, a teacher always dresses up as a castanyera, an old woman who sells roasted chestnuts."],
+  ["Josh","Sounds delicious! We have Halloween on the same night. Kids dress up in costumes and go trick or treating. My little brother is going as a skeleton this year. He's so excited!"],
+  ["Núria","Do you carve pumpkins?"],
+  ["Josh","Yes, every year. My mum always makes pumpkin soup with the inside. But my brother gets scared of the pumpkin faces in the dark! What about you? Do you dress up?"],
+  ["Núria","Some people do now. But for me the Castanyada is about family. We eat together at my grandparents' house. It's cosy and relaxed, and I feel grateful for that. I'm proud of our tradition."],
+  ["Josh","That's really nice. I love autumn. The leaves change colour, and when the leaves fall from the trees, the parks look amazing."],
+  ["Núria","Me too. Autumn is my favourite season. Happy Halloween, Josh!"],
+  ["Josh","Happy Castanyada! Save me some panellets!"]
+ ],
+ daring:[
+  ["Núria","Hi Josh! How's the weather in Manchester these days?"],
+  ["Josh","Hi Núria! Cold and rainy, as usual. It's been really chilly in the mornings, and there was frost on the cars today, which is early even for Manchester. It feels like winter already!"],
+  ["Núria","Frost already? Here it's still surprisingly mild. It's sunny in the afternoon, although the mornings are cool and foggy."],
+  ["Josh","Lucky you! Since the clocks went back last weekend, it gets dark really early, at about half past four. By the time I get home from school, it's almost night."],
+  ["Núria","Half past four? Wow! Here the days are getting shorter too, but it's not that bad."],
+  ["Josh","So what do you usually do in autumn?"],
+  ["Núria","It's harvest time here, so there's lots of seasonal food. Last Sunday I went to the forest with my dad to pick mushrooms, which is something my family has done for generations."],
+  ["Josh","Nice! We went to a farm to pick apples, and my mum made an apple pie."],
+  ["Núria","And on the thirty-first of October we celebrate the Castanyada, which is held the night before All Saints' Day. We roast chestnuts and sweet potatoes and eat panellets, little sweets made with nuts, like almonds and pine nuts. At school, a teacher always dresses up as a castanyera, an old woman who sells roasted chestnuts."],
+  ["Josh","Sounds delicious! We have Halloween on the same night. Kids dress up in costumes and go trick or treating, although some people say it has become too commercialised. My little brother is going as a skeleton this year, and he's so excited!"],
+  ["Núria","Do you carve pumpkins?"],
+  ["Josh","Yes, every year. My mum always makes pumpkin soup with the inside, so nothing is wasted. What about you? Do you dress up?"],
+  ["Núria","Some people do now, especially younger kids, because Halloween has become popular here too. But for me the Castanyada is about family. We eat together at my grandparents' house, and it's cosy and relaxed. I feel grateful for those evenings, and I'm proud that we keep the tradition alive."],
+  ["Josh","That's really nice. I love autumn too. The leaves change colour, and when they fall from the trees, the parks look amazing."],
+  ["Núria","Me too. Autumn is definitely my favourite season. Happy Halloween, Josh!"],
+  ["Josh","Happy Castanyada! Save me some panellets!"]
+ ]
+};
+const readingQs=[
+ {r:"insecure",q:"What's the weather like in Manchester?",o:["cold and rainy","sunny and warm","foggy and mild"],h:"Llegeix el primer missatge d'en Josh."},
+ {r:"insecure",q:"What was on the cars in Manchester this morning?",o:["frost","snow","leaves"],h:"Busca què hi havia «on the cars»."},
+ {r:"insecure",q:"When does it get dark in Manchester?",o:["at about 4.30","at about 6.30","at about 8.00"],h:"Busca «half past four»: quina hora és?"},
+ {r:"insecure",q:"What did Núria do last Sunday?",o:["She picked mushrooms in the forest.","She picked apples at a farm.","She roasted chestnuts."],h:"Busca «Last Sunday» al missatge de la Núria."},
+ {r:"insecure",q:"What are panellets?",o:["sweets with almonds and pine nuts","roasted sweet potatoes","a kind of soup"],h:"Busca «little sweets»."},
+ {r:"insecure",q:"What does Josh's mum make?",o:["pumpkin soup","panellets","roasted chestnuts"],h:"Busca «My mum…» al missatge d'en Josh."},
+ {r:"insecure",q:"For Núria, the Castanyada is mainly about…",o:["family","costumes","fireworks"],h:"Busca «for me the Castanyada is about…»."},
+ {r:"safe",q:"Why does it get dark so early in Manchester now?",o:["The clocks went back.","It's always foggy.","The weather is bad."],h:""},
+ {r:"safe",q:"True or false: nobody in Catalonia dresses up at the end of October.",o:["False: some people do now.","True: nobody dresses up."],h:""},
+ {r:"daring",q:"What does Núria's last part show?",o:["She prefers a family tradition to costumes.","She thinks Halloween is bad.","She doesn't like autumn."],h:""}
+];
 // Listening (real video). Options: first one is correct; order is shuffled on screen.
 const listening=[
  {r:"insecure",q:"What is the video about?",o:["An American holiday: Halloween","Christmas in the UK","A school trip"],h:"Escolta el títol i les primeres frases: de quina festa parla?"},
@@ -218,10 +302,10 @@ const storageKey="ls2GettingStarted4ESO";
 let level=localStorage.getItem(storageKey+"Level")||"insecure";
 const state=Object.assign({done:{},choices:[]},JSON.parse(localStorage.getItem(storageKey)||"{}"));
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const STEPS=["recall","words","listen","speak"];
+const STEPS=["recall","words","read","listen","speak"];
 function save(){localStorage.setItem(storageKey,JSON.stringify(state));localStorage.setItem(storageKey+"Level",level);updateProgress()}
 function complete(k){state.done[k]=true;save()}
-function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / 4";$("#progressBar").style.width=(n/4*100)+"%"}
+function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / "+STEPS.length;$("#progressBar").style.width=(n/STEPS.length*100)+"%"}
 const ca=()=>level==="insecure";
 const need=n=>Math.ceil(n*0.8);
 
@@ -252,6 +336,16 @@ function renderWords(){
 }
 $("#checkPractice").onclick=()=>{const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(s>=need(practiceItems.length))complete("words")};
 
+let readItems=[];
+function renderRead(){
+  $("#readText").innerHTML=readingChat[level].map(([w,t])=>'<div class="msg '+w.toLowerCase()+'"><b>'+w+'</b>'+t+'</div>').join("");
+  readItems=forLevel(readingQs,level);const f=$("#readForm");f.innerHTML="";
+  readItems.forEach((q,i)=>{const box=document.createElement("div");box.className="question";
+    box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="rd'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="rdf'+i+'"></div>';f.appendChild(box)});
+  $("#readResult").classList.remove("show");
+}
+$("#checkRead").onclick=()=>{let score=0;readItems.forEach((q,i)=>{const c=document.querySelector('input[name="rd'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#rdf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,false);f.className="feedback "+(ok?"ok":"no")});
+  const n=readItems.length;$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(score>=need(n))complete("read")};
 let listenItems=[];
 function renderListen(){
   listenItems=forLevel(listening,level);const f=$("#listenForm");f.innerHTML="";
@@ -269,7 +363,7 @@ function renderChoices(){
   box.innerHTML='<h3>'+(ca()?"Quines celebracions t'agradaria explorar?":"Which celebrations would you like to explore?")+'</h3><p class="instruction">'+(ca()?"Tria'n tres. El teu grup en triarà una a la setmana 3.":"Choose three. Your group will choose one in week 3.")+'</p><div class="choice-grid">'+celebrations.map(c=>'<button type="button" class="choice'+(state.choices.includes(c)?" selected":"")+'" data-c="'+c+'">'+c+'</button>').join("")+'</div>';
   box.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{const c=b.dataset.c,i=state.choices.indexOf(c);if(i>=0)state.choices.splice(i,1);else if(state.choices.length<3)state.choices.push(c);save();renderChoices()});
 }
-function renderAll(){renderRecall();renderWords();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);updateProgress()}
+function renderAll(){renderRecall();renderWords();renderRead();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);updateProgress()}
 function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));save();renderAll()}
 $$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
 $$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");window.scrollTo({top:document.querySelector("main").offsetTop-64,behavior:"smooth"})});
@@ -419,6 +513,7 @@ if(sessionJump){sessionJump.addEventListener('change',()=>{const target=sessionJ
 sectionNext.init({level:()=>level,panels:[
  {id:'recall',done:()=>!!state.done.recall,detail:ca=>ca?'Prem «Comprova» al recall.':'Press “Check” in the recall quiz.'},
  {id:'words',done:()=>!!state.done.words,detail:ca=>ca?'Encerta almenys el 80 % de les frases.':'Get at least 80 % of the sentences right.'},
+ {id:'read',done:()=>!!state.done.read,detail:ca=>ca?'Encerta almenys el 80 % del reading.':'Get at least 80 % of the reading right.'},
  {id:'listen',done:()=>!!state.done.listen,detail:ca=>ca?'Encerta almenys el 80 % del listening.':'Get at least 80 % of the listening right.'}
 ]});
 sectionNext.final({id:'speak',level:()=>level,done:()=>!!state.done.speak,detail:ca=>ca?'Grava el teu àudio i atura la gravació.':'Record your audio and stop the recording.'});

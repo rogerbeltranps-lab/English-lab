@@ -35,7 +35,7 @@ window.EL_CATALOG=(function(){
       const L=(file,title,criteria,key,points,o)=>A("4eso",file,title,criteria,[key],points,Object.assign({id:"4eso/ls2-"+file.replace(".html",""),ls:"4eso-seasons-and-celebrations",path:"4eso/seasons-and-celebrations/"+file},o||{}));
       const C={mode:"practice"};
       return [
-        L("getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["2.1","3.1"],"ls2GettingStarted4ESO",4,{graded:false}),
+        L("getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["4.1","2.1","3.1"],"ls2GettingStarted4ESO",5,{graded:false}),
         L("celebrations-around-the-world.html","Celebrations around the world",["2.1","3.1","4.1","5.1"],"ls2Celebrations4ESO",8,{skip:["write"]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1"],"ls2Checkpoint14ESO",1,C),
         L("where-traditions-come-from.html","Where traditions come from",["1.1","2.1","3.1","5.1"],"ls2Traditions4ESO",7,{skip:["write"]}),
