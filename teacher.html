@@ -15,7 +15,7 @@ td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px 
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}
-details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}</style></head><body>
+details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>summary{font-size:.9rem;font-weight:600;color:#475569}tr.away td{color:#94a3b8;background:#f8fafc}.tag{font-size:11px;font-weight:600;background:#e2e8f0;color:#475569;border-radius:999px;padding:1px 6px;margin-left:4px}label.btn{background:#0f766e;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 8px}.form input,.form select{width:100%;box-sizing:border-box}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
 <div class="tabs" id="tabs"></div>
@@ -31,14 +31,16 @@ const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),resKey=a=>a.replace("/","__");
-const S={g:GR[0].id,route:"all",ls:null,folded:new Set(),D:null};
+const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(),D:null,P:{}};   // P: people on screen (see people())
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved; graded activities only if you enable them."],closed:["Closed","Students can only review what they did and the feedback."],public:["Public","Free access as before: no login and no scoring."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309",public:"#2563eb"};
 
-// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}}
+// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}, ro:{id:{email,group,surname1,surname2,first,tutor}}}
+// ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
 async function load(){
-  if(DEMO)return DEMO;
-  const D={st:{},rs:{},lv:{},pg:{},ls:{}},up=r=>r.ref.parent.parent.id;
+  if(DEMO){DEMO.ro=DEMO.ro||{};return DEMO}
+  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{}},up=r=>r.ref.parent.parent.id;
+  try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
   (await F.getDocs(F.collection(db(),"students"))).forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()));
   (await F.getDocs(F.collectionGroup(db(),"results"))).forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data());
   (await F.getDocs(F.collectionGroup(db(),"levels"))).forEach(l=>(D.lv[up(l)]=D.lv[up(l)]||{})[l.id]=l.data());
@@ -51,7 +53,16 @@ async function load(){
 const sub=o=>Object.assign(o,{updated:DEMO?Date.now():F.serverTimestamp()});
 const put=(path,o)=>DEMO?null:F.setDoc(F.doc(db(),...path),sub(o),{merge:true});
 const api={
-  setGroup:(u,g)=>DEMO?S.D.st[u].group=g:put(["students",u],{group:g}),
+  setGroup:(u,g)=>{const s=S.P[u],ps=[];   // the list's group decides; the student's own doc copies it
+    if(s.ro)ps.push(DEMO?S.D.ro[s.rid].group=g:put(["roster",s.rid],{group:g}));
+    if(!s.away)ps.push(DEMO?S.D.st[u].group=g:put(["students",u],{group:g}));
+    return Promise.all(ps)},
+  saveRo:(id,o,old,uid)=>{if(DEMO){if(old&&old!==id)delete S.D.ro[old];S.D.ro[id]=o;if(uid)S.D.st[uid].group=o.group;return}
+    const ps=[put(["roster",id],o)];if(old&&old!==id)ps.push(F.deleteDoc(F.doc(db(),"roster",old)));if(uid)ps.push(put(["students",uid],{group:o.group}));return Promise.all(ps)},
+  delRo:id=>DEMO?delete S.D.ro[id]:F.deleteDoc(F.doc(db(),"roster",id)),
+  importRoster:async out=>{const gone=Object.keys(S.D.ro).filter(id=>!out[id]);if(DEMO){S.D.ro=out;return}   // replaces the whole list
+    const ops=[...Object.entries(out).map(([id,o])=>b=>b.set(F.doc(db(),"roster",id),sub(Object.assign({},o)))),...gone.map(id=>b=>b.delete(F.doc(db(),"roster",id)))];
+    for(let i=0;i<ops.length;i+=400){const b=F.writeBatch(db());ops.slice(i,i+400).forEach(f=>f(b));await b.commit()}},
   setLevel:(u,ls,level)=>{if(DEMO){const l=((S.D.lv[u]=S.D.lv[u]||{})[ls]=S.D.lv[u][ls]||{});l.level=level;delete l.request;return}return put(["students",u,"levels",ls],{level,request:F.deleteField()})},
   reject:(u,ls)=>DEMO?delete S.D.lv[u][ls].request:put(["students",u,"levels",ls],{request:F.deleteField()}),
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
@@ -59,10 +70,24 @@ const api={
   // answer to a final-product step: results/{activity}.replies[step]; the student sees it on their page
   reply:(u,a,step,text)=>{if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{}),x=(r[a.id]=r[a.id]||{ls:a.ls,activity:a.id});(x.replies=x.replies||{})[step]=text;return}return put(["students",u,"results",resKey(a.id)],{ls:a.ls,activity:a.id,replies:{[step]:text}})}
 };
-async function act(p){await p;if(!DEMO)S.D=await load();render()}
+async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save: "+e.message)}if(!DEMO)S.D=await load();render()}
 
 // ---- helpers
-const name=s=>esc(s.name||s.email||s.uid);
+const fullName=s=>s.ro&&s.ro.surname1?[s.ro.surname1,s.ro.surname2].filter(Boolean).join(" ")+", "+s.ro.first:s.name||s.email||s.uid;
+const name=s=>esc(fullName(s));
+const norm=x=>String(x??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const listed=()=>Object.keys(S.D.ro).length>0,isTester=s=>!DEMO&&ELCloud.isTester(s);
+// Everyone on the student list (s.ro; s.away until they first sign in) and everyone who signed in. With a list, its group decides:
+// signed-in students who are not on it (except testers) have no group and cannot sign in any more.
+function people(){
+  const D=S.D,P={},seen=new Set();
+  Object.values(D.st).forEach(s=>{const e=(s.email||"").toLowerCase(),ro=D.ro[e];if(ro)seen.add(e);
+    P[s.uid]=Object.assign({},s,{ro,rid:ro?e:null,tester:isTester(s),group:ro?ro.group:listed()&&!isTester(s)?null:s.group})});
+  Object.entries(D.ro).forEach(([id,ro])=>{if(!seen.has(id))P["ro:"+id]={uid:"ro:"+id,rid:id,email:ro.email||"",ro,group:ro.group,away:true}});
+  return P;
+}
+// Folded sections remember whether they are open across re-renders
+const fold=(k,title,html,cls="",force)=>`<details data-k="${k}" class="${cls}" ${S.open.has(k)||force?"open":""}><summary>${title}</summary>${html}</details>`;
 let COURSE=null;   // course of the group on screen: criteria texts depend on it
 const pill=c=>`<span class="pill ce${c[0]}" data-do="crit" data-c="${c}" tabindex="0" title="${esc(elCompetence(c)+" · "+c+": "+(elCriterion(COURSE,c)||"–"))}">${c}</span>`;
 const route=l=>l?`<span class="route r-${l}">${LV[l]||l}</span>`:'<span class="route r-none">–</span>';
@@ -75,7 +100,8 @@ const pts=a=>a.graded?(a.manual?"teacher mark":a.points+" pts"):"not graded";
 const handedIn=(u,a)=>{try{return JSON.parse(((S.D.pg[u]||{})[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){return {}}};
 const unanswered=(u,a)=>{if(!a.steps)return [];const h=handedIn(u,a),rp=((S.D.rs[u]||{})[a.id]||{}).replies||{};return a.steps.filter(([id])=>h[id]&&h[id].comment&&!rp[id])};
 const actTitle=id=>(cat.find(a=>a.id===id)||{}).title||id;
-const byName=(x,y)=>(x.name||x.email||"").localeCompare(y.name||y.email||"");
+const sortKey=s=>s.ro&&s.ro.surname1?[s.ro.surname1,s.ro.surname2||"",s.ro.first||""]:[s.name||s.email||"","",""];
+const byName=(x,y)=>{const a=sortKey(x),b=sortKey(y);for(let i=0;i<3;i++){const c=a[i].localeCompare(b[i],"ca",{sensitivity:"base"});if(c)return c}return 0};   // by first surname
 function cell(u,a){ // text + class of an activity's score cell
   const x=(S.D.rs[u]||{})[a.id],d=doneSet(u,a);
   let t,c="";
@@ -91,29 +117,32 @@ function cell(u,a){ // text + class of an activity's score cell
 
 // ---- views
 function render(){
-  const D=S.D,studs=Object.values(D.st),n=g=>studs.filter(s=>(s.group||"none")===g).length;
-  $("#tabs").innerHTML=GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}">${g.name}<small>${n(g.id)}</small></button>`).join("")
-    +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">No group<small>${n("none")}</small></button>`:"")
+  const D=S.D;S.P=people();
+  const studs=Object.values(S.P),inGr=g=>studs.filter(s=>(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
+  $("#tabs").innerHTML=GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
+    +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
     +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
-  if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group).sort(byName));return}
+  if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group).sort(byName))+rosterBox();return}
   const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);COURSE=grp.course;
   const mine=l=>elLsForGroup(l,D.ls[l.id],S.g);
   if(!lss.some(l=>l.id===S.ls))S.ls=(lss.filter(l=>mine(l)&&(D.ls[l.id]||{}).status==="open").pop()||lss.filter(mine).pop()||lss[lss.length-1]).id; // latest open LS assigned to the group
   const ls=S.ls,list=acts(ls),inG=studs.filter(s=>s.group===S.g).sort(byName);
-  const shown=inG.filter(s=>S.route==="all"||(level(s.uid,ls)||"none")===S.route);
+  const tutors=[...new Set(inG.map(s=>s.ro&&s.ro.tutor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ca"));if(!tutors.includes(S.tutor))S.tutor="all";
+  const shown=inG.filter(s=>(S.route==="all"||(level(s.uid,ls)||"none")===S.route)&&(S.tutor==="all"||s.ro&&s.ro.tutor===S.tutor));
   const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${l.title}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}</select> `:`<b>${lss[0].title}</b>${mine(lss[0])?"":" <small class=\"muted\">(not assigned to this group)</small>"} `)
-    +`<span class="muted">· Route:</span> `+["all","insecure","safe","daring","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"Not chosen":LV[r]}</button>`).join("");
+    +`<span class="muted">· Route:</span> `+["all","insecure","safe","daring","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"Not chosen":LV[r]}</button>`).join("")
+    +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"");
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
-    +`<div class="box"><h2>To do</h2>${todo(inG,ls,list)}</div>`
-    +((window.EL_PLAN||{})[ls]?`<div class="box"><details><summary>Teaching plan</summary>${plan(EL_PLAN[ls],grp)}</details></div>`:"")
-    +`<div class="box"><h2>Learning paths and activities</h2><p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer.</p>
-      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"?" yet. Students choose their group the first time they sign in.":" with this route.")+"</p>"}</div>`
-    +`<div class="box"><h2>Assessment criteria in this LS</h2><p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}</div>`
-    +`<div class="box"><h2>Result per assessment criterion</h2><p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}</div>`
-    +`<div class="box"><details><summary>LS status and graded activities</summary>${lsSettings(ls)}</details></div>`;
+    +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`
+    +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
+    +`<div class="box"><h2>Learning paths and activities</h2>${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
+      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}</div>`
+    +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
+    +`<div class="box">${fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`
+    +`<div class="box">${fold("settings","LS status and graded activities",lsSettings(ls))}</div>`+rosterBox();
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
 }
-function todo(studs,ls,list){
+function todo(studs,ls,list){   // studs: signed-in students only
   const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
   studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>out.push(`✉️ <b>${name(s)}</b> commented on <b>${esc(t)}</b> (${esc(a.title)}): “${esc(handedIn(s.uid,a)[id].comment)}” <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button>`))));
   studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
@@ -132,9 +161,11 @@ function progress(studs,list){
       h2+=steps(a).map((k,i)=>`<th class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")+`<th class="sc">Score</th>`}
     else h1+=`<th class="lp first"${rs} data-do="fold" data-a="${a.id}">${head}</th>`});
   h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
-  let b="";
+  let b="";const cols=list.reduce((n,a)=>n+(open(a)?steps(a).length+1:1),0);
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
-    b+=`<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td><td>${route(level(s.uid,S.ls))}</td>`;
+    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}</td>`;
+    if(s.away){b+=`<tr class="away">${who}<td>${route()}</td><td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
+    b+=`<tr>${who}<td>${route(level(s.uid,S.ls))}</td>`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
       if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("");
       b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}">${c.t}</td>`;
@@ -145,7 +176,7 @@ function progress(studs,list){
 function criteria(studs,list){
   const crits=[...new Set(list.flatMap(a=>a.criteria))].sort();
   let h=`<table><thead><tr><th class="stu">Student</th>`+crits.map(c=>`<th>${pill(c)}<br><small>${esc(elCompetence(c))}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(c)).map(a=>a.title).join(" · ")}</small></th>`).join("")+"</tr></thead><tbody>";
-  studs.forEach(s=>{const r=S.D.rs[s.uid]||{};h+=`<tr><td class="stu">${name(s)}</td>`+crits.map(c=>{let ts=0,tm=0;list.forEach(a=>{const x=r[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){ts+=x.score||0;tm+=x.max}});
+  studs.forEach(s=>{const r=S.D.rs[s.uid]||{};h+=`<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td>`+crits.map(c=>{let ts=0,tm=0;list.forEach(a=>{const x=r[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){ts+=x.score||0;tm+=x.max}});
     if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return `<td><b style="color:${col}">${ts}/${tm}</b><br><small>${Math.round(p)}%</small></td>`}).join("")+"</tr>"});
   return h+"</tbody></table>";
 }
@@ -186,21 +217,60 @@ function handIns(u,a){
 }
 const groupSel=(u,g)=>`<select data-do="group" data-u="${u}"><option value="">– choose –</option>${GR.map(x=>`<option value="${x.id}" ${x.id===g?"selected":""}>${x.name}</option>`).join("")}</select>`;
 function noGroup(studs){
+  if(listed())return `<div class="box"><h2>Signed in, not on the student list</h2><p class="muted">They signed in before the list was imported and can no longer sign in. Add them to the list if they are your students; their work is kept.</p>`
+    +(studs.length?`<table><tbody>${studs.map(s=>`<tr><td class="stu">${name(s)}<br><small class="muted">${esc(s.email)}</small></td><td><button data-do="stu" data-u="${s.uid}">Add to the list</button></td></tr>`).join("")}</tbody></table>`:'<p class="muted">Nobody.</p>')+"</div>";
   return `<div class="box"><h2>Students without a group</h2><p class="muted">They signed in before choosing a group. Assign one and they move to that group's tab.</p>`
     +(studs.length?`<table><tbody>${studs.map(s=>`<tr><td class="stu">${name(s)}<br><small class="muted">${esc(s.email)}</small></td><td>${groupSel(s.uid,"")}</td></tr>`).join("")}</tbody></table>`:'<p class="muted">Everyone has a group.</p>')+"</div>";
 }
+// ---- student list (roster): import from Excel, add, edit, remove
+function rosterBox(){
+  const ro=Object.values(S.D.ro),noMail=ro.filter(r=>!r.email);
+  const body=(S.D.roErr?'<p><b>The student list could not be read.</b> Publish the Firestore rules (<code>firebase deploy --only firestore:rules</code>) and reload.</p>':"")
+    +`<p class="muted">${ro.length?`<b>${ro.length} students</b>: `+GR.map(g=>g.name+" "+ro.filter(r=>r.group===g.id).length).join(" · ")+".":"No student list yet."} Only students on this list (and the tester account) can sign in, and the list sets their group. It is stored in Firebase, never in the website's repository.</p>`
+    +(noMail.length?`<p>Without an email, so they cannot sign in yet: ${noMail.map(r=>esc(fullName({ro:r}))).join(" · ")}. Click the name in the table to add it.</p>`:"")
+    +`<div class="bar"><label class="btn">Import from Excel<input type="file" accept=".xlsx,.xls,.csv" data-do="import" hidden></label><button class="g" data-do="addstu">Add a student</button></div>`
+    +`<p class="muted">The Excel needs one sheet per group (named 2ESOA or 2ESO A…) or a Group column, and the columns Correu, Cognom 1, Cognom 2, Nom and Tutor/a. Importing replaces the whole list.</p>`;
+  return `<div class="box">${fold("roster","Student list",body,"",!ro.length||S.D.roErr)}</div>`;
+}
+const loadXLSX=()=>window.XLSX?Promise.resolve():new Promise((ok,ko)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";s.onload=ok;s.onerror=()=>ko(new Error("the Excel reader did not load"));document.head.append(s)});
+async function importList(file){
+  await loadXLSX();
+  const wb=XLSX.read(await file.arrayBuffer()),gid=x=>(GR.find(g=>norm(g.id)===norm(x)||norm(g.name)===norm(x))||{}).id;
+  const col=(r,...hs)=>{const k=Object.keys(r).find(k=>hs.includes(norm(k)));return k?String(r[k]).replace(/\s+/g," ").trim():""};
+  const out={};let skipped=0;
+  wb.SheetNames.forEach(sn=>XLSX.utils.sheet_to_json(wb.Sheets[sn],{defval:""}).forEach(r=>{
+    const o={email:col(r,"correu","email","mail","correualumnat").toLowerCase(),surname1:col(r,"cognom1","surname1"),surname2:col(r,"cognom2","surname2"),first:col(r,"nom","firstname","name"),tutor:col(r,"tutora","tutor"),group:gid(col(r,"grup","group"))||gid(sn)};
+    if(!o.email&&!o.surname1&&!o.first)return;
+    if(!o.group){skipped++;return}
+    out[o.email||"pending-"+norm(o.surname1+o.surname2+o.first)]=o}));
+  const ids=Object.keys(out),pend=ids.filter(id=>!out[id].email),gone=Object.keys(S.D.ro).filter(id=>!out[id]);
+  if(!ids.length){dlg('<h3>Import the student list</h3><p>No students found. Check the sheet names (2ESOA…) and the column names.</p>');return}
+  S.imp=out;
+  dlg(`<h3>Import the student list</h3><p><b>${ids.length} students</b>: ${GR.map(g=>g.name+" "+ids.filter(id=>out[id].group===g.id).length).join(" · ")}</p>`
+    +(pend.length?`<p>Without an email (they appear on the dashboard but cannot sign in yet): ${pend.map(id=>esc(fullName({ro:out[id]}))).join(" · ")}</p>`:"")
+    +(skipped?`<p class="muted">${skipped} rows skipped: no group (sheet name or Group column).</p>`:"")
+    +(gone.length?`<p>${gone.length} students on the current list are not in this file and will be removed: ${gone.slice(0,12).map(id=>esc(fullName({ro:S.D.ro[id]}))).join(" · ")}${gone.length>12?" …":""}</p>`:"")
+    +`<div class="row"><button data-do="impok">Import</button></div>`);
+}
+function roForm(s){const r=s.ro||{email:s.email||"",first:s.name||"",group:s.group||S.g};
+  const f=(k,l,v)=>`<label>${l}<input id="ro-${k}" value="${esc(v||"")}"></label>`;
+  return `<div class="form">${f("email","Email",r.email)}${f("surname1","Surname 1",r.surname1)}${f("surname2","Surname 2",r.surname2)}${f("first","First name",r.first)}${f("tutor","Tutor",r.tutor)}<label>Group<select id="ro-group">${GR.map(x=>`<option value="${x.id}" ${x.id===r.group?"selected":""}>${x.name}</option>`).join("")}</select></label></div>`
+    +`<div class="row">${s.ro?`<button class="g" data-do="rodel" data-u="${s.uid}">Remove from the list</button>`:""}<button data-do="rosave" data-u="${s.uid||""}">${s.ro?"Save":"Add to the list"}</button></div>`}
 
 // ---- panels
 function dlg(html){$("#dlgc").innerHTML=html+`<div class="row"><button class="g" data-do="close">Close</button></div>`;if(!$("#dlg").open)$("#dlg").showModal()}
 function stuPanel(u){
-  const s=S.D.st[u],ls=S.ls,l=level(u,ls);
-  dlg(`<h3>${name(s)}</h3><p class="muted">${esc(s.email)}</p>
+  const s=S.P[u],ls=S.ls,l=level(u,ls),lsT=(EL_LS.find(x=>x.id===ls)||{}).title;
+  const info=[s.email?esc(s.email):"<b>No email yet</b>: cannot sign in",s.ro&&s.ro.tutor?"Tutor: "+esc(s.ro.tutor):"",s.away?"not signed in yet":"",s.tester?"tester account":"",listed()&&!s.ro&&!s.tester?"<b>not on the student list</b>: cannot sign in":""].filter(Boolean).join(" · ");
+  const entry=s.tester?"":`<details data-k="roform" ${s.ro&&s.email?"":"open"}><summary style="font-size:1rem">${s.ro?"Edit the list entry":"Add to the student list"}</summary>${roForm(s)}</details>`;
+  if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
+  dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>
     <label>Group</label>${groupSel(u,s.group)}
-    <label>Route in ${EL_LS.find(x=>x.id===ls).title}</label><select data-do="setroute" data-u="${u}"><option value="">– not chosen –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${x.name}</option>`).join("")}</select>
-    <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`);
+    <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– not chosen –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${x.name}</option>`).join("")}</select>
+    <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`+entry);
 }
 function cellPanel(u,id){
-  const s=S.D.st[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
+  const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
   const state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${x.score||0}/${a.points}`:""}</p>`
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th></tr></thead><tbody>${steps(a).map(k=>`<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td></tr>`).join("")}</tbody></table>`:"")
@@ -212,7 +282,15 @@ function cellPanel(u,id){
 
 // ---- events
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
-  ({tab:()=>{S.g=k.g;render()},route:()=>{S.route=k.r;render()},reload:()=>act(),
+  ({tab:()=>{S.g=k.g;S.tutor="all";render()},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),
+    addstu:()=>dlg("<h3>Add a student</h3>"+roForm({})),impok:()=>{$("#dlg").close();act(api.importRoster(S.imp))},
+    rosave:()=>{const v=f=>$("#ro-"+f).value.replace(/\s+/g," ").trim(),o={email:v("email").toLowerCase(),surname1:v("surname1"),surname2:v("surname2"),first:v("first"),tutor:v("tutor"),group:$("#ro-group").value};
+      if(o.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.email))return alert("Check the email.");
+      if(!o.email&&!o.surname1&&!o.first)return;
+      const s=u?S.P[u]:null,old=s&&s.ro?s.rid:null,id=o.email||(old&&old.startsWith("pending-")?old:"pending-"+norm(o.surname1+o.surname2+o.first));
+      if(S.D.ro[id]&&id!==old)return alert("This student is already on the list.");
+      $("#dlg").close();act(api.saveRo(id,o,old,s&&!s.away?s.uid:null))},
+    rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     acc:()=>act(api.setLevel(u,S.ls,k.to)),rej:()=>act(api.reject(u,S.ls)),
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
@@ -223,7 +301,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     assign:()=>{const l=EL_LS.find(x=>x.id===S.ls),info=S.D.ls[S.ls],set=new Set(lsGroups(S.ls).filter(g=>elLsForGroup(l,info,g.id)).map(g=>g.id));set.has(k.g)?set.delete(k.g):set.add(k.g);act(api.ls(S.ls,{groups:[...set]}))},
     enable:()=>{const set=new Set(S.D.ls[S.ls].enabled);set.has(k.a)?set.delete(k.a):set.add(k.a);act(api.ls(S.ls,{enabled:[...set]}))}
   })[k.do]?.()});
+document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);
 document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
+  if(k.do==="import"&&t.files[0])importList(t.files[0]).catch(x=>alert("Could not read the file: "+x.message)).finally(()=>t.value="");
   if(k.do==="ls"){S.ls=t.value;render()}
   if(k.do==="group"&&t.value)act(api.setGroup(k.u,t.value)).then(()=>$("#dlg").open&&stuPanel(k.u));
   if(k.do==="setroute"&&t.value)act(api.setLevel(k.u,S.ls,t.value)).then(()=>stuPanel(k.u))});
