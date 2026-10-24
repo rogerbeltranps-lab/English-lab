@@ -1,6 +1,6 @@
 # 4ESO · Seasons & Celebrations (LS2): activity content
 
-**Approved by Roger on 23 Oct 2026.** **24 Oct 2026:** Roger approved one reading text per route (Insecure and Daring versions added to the data files; the original texts are the Safe versions) with one new Daring question per reading, and the new Learning Path 1 video script below. Implementation notes: Learning Path 1 uses a real Halloween video and Learning Path 2 adds a real BBC video about Diwali (Roger asked for real listenings mixed with ElevenLabs ones); the respectful-wording and note-taking tasks in Research it right are multiple choice on every route. Built from the LS2 section of *Learning Situations 4t ESO* (Roger Beltran, 21 Oct 2026) and the approved organization proposal. Nothing here is implemented until Roger approves it. Final Product, vocabulary and grammar come from the programme. Texts, scripts and question items are new drafts.
+**Approved by Roger on 23 Oct 2026.** **24 Oct 2026:** Roger approved one reading text per route (Insecure and Daring versions added to the data files; the original texts are the Safe versions) with one new Daring question per reading, the Getting Started reading *Autumn in two places* and the origins video *Where do Halloween and the Castanyada come from?* (both below). Implementation notes: Learning Path 1 uses a real Halloween video and Learning Path 2 adds a real BBC video about Diwali (Roger asked for real listenings mixed with ElevenLabs ones); the respectful-wording and note-taking tasks in Research it right are multiple choice on every route. Built from the LS2 section of *Learning Situations 4t ESO* (Roger Beltran, 21 Oct 2026) and the approved organization proposal. Nothing here is implemented until Roger approves it. Final Product, vocabulary and grammar come from the programme. Texts, scripts and question items are new drafts.
 
 ## 0. Rules that apply to every page
 
@@ -16,7 +16,7 @@
 
 ## LP0 · Getting started: Castanyada & Halloween
 
-*Week 1 · warm-up, not graded · 4 steps: recall, words, listening, speaking + choice*
+*Week 1 · warm-up, not graded · 5 steps: recall, words, reading, listening, speaking + choice*
 
 ### Recall: what do you remember from My Real Routine?
 
@@ -56,26 +56,26 @@
 13. [S] On a cold night, our living room feels warm and ___. → *cosy*
 14. [S] We go to the farm to ___ fruit. → *pick*
 
-### Listening: *Autumn in two places* (illustrated video, about 2 min 15 s)
+### Reading: *Autumn in two places* (chat between Núria and Josh)
 
-*Revised and approved by Roger on 24 Oct 2026: it replaces the real Halloween video as the main listening. The Fun Easy English video stays as an optional extra with no questions. Pitched at Safe level for every route (AGENTS.md). Words in bold pop up on screen with a picture; italics are receptive only. Versions: no subtitles, subtitles, and slower for Insecure. Audio with ElevenLabs only when Roger gives permission for that generation.*
+*Approved by Roger on 24 Oct 2026: first written as a video script, then turned into a reading so the listening step can use the origins video below. One text per route (AGENTS.md): the Safe text is the approved script; the Insecure (about 250 words) and Daring (about 390 words) versions are in `readingChat` in `getting-started.html`. Questions are cumulative and answerable from every text that shows them. Insecure gets Catalan hints.*
 
-> **Núria:** Hi Josh! Can you hear me? How's the weather in Manchester?
-> **Josh:** Hi Núria! Cold and **rainy**, as usual. It's really **chilly** in the mornings, and there was **frost** on the cars today. It feels like **winter** already!
-> **Núria:** Frost already? Here it's still quite **mild**. It's **sunny** in the afternoon, but the mornings are **cool** and **foggy**.
-> **Josh:** Lucky you! And **the clocks went back** last weekend, so **it gets dark** really **early** now, at about half past four.
-> **Núria:** Half past four? Wow! Here **the days get shorter** too, but it's not that bad.
+> **Núria:** Hi Josh! How's the weather in Manchester?
+> **Josh:** Hi Núria! Cold and rainy, as usual. It's really chilly in the mornings, and there was frost on the cars today. It feels like winter already!
+> **Núria:** Frost already? Here it's still quite mild. It's sunny in the afternoon, but the mornings are cool and foggy.
+> **Josh:** Lucky you! And the clocks went back last weekend, so it gets dark really early now, at about half past four.
+> **Núria:** Half past four? Wow! Here the days get shorter too, but it's not that bad.
 > **Josh:** So what do you do in autumn?
-> **Núria:** It's **harvest** time here, so there's lots of **seasonal** food. Last Sunday I went to the forest with my dad to pick **mushrooms**.
-> **Josh:** Nice! We went to a farm to **pick apples**, and my mum made an apple pie.
-> **Núria:** And on the thirty-first of October we celebrate the Castanyada. We roast **chestnuts** and **sweet potatoes**, and we eat *panellets*. They're little sweets made with **nuts**, like almonds and pine nuts. At school, a teacher always dresses up as a *castanyera*, an old woman who sells roasted chestnuts.
-> **Josh:** Sounds delicious! We have Halloween on the same night. Kids dress up in costumes and go *trick or treating*. My little brother is going as a skeleton this year. He's so **excited**!
-> **Núria:** Do you *carve pumpkins*?
-> **Josh:** Yes, every year. My mum always makes **pumpkin** soup with the inside. But my brother gets **scared** of the pumpkin faces in the dark! What about you? Do you dress up?
-> **Núria:** Some people do now. But for me the Castanyada is about family. We eat together at my grandparents' house. It's **cosy** and **relaxed**, and I feel **grateful** for that. I'm **proud** of our tradition.
-> **Josh:** That's really nice. I love autumn. **The leaves change colour**, and when **the leaves fall** from the **trees**, the parks look amazing.
-> **Núria:** Me too. **Autumn** is my favourite season. Happy Halloween, Josh!
-> **Josh:** **Happy** Castanyada! Save me some panellets!
+> **Núria:** It's harvest time here, so there's lots of seasonal food. Last Sunday I went to the forest with my dad to pick mushrooms.
+> **Josh:** Nice! We went to a farm to pick apples, and my mum made an apple pie.
+> **Núria:** And on the thirty-first of October we celebrate the Castanyada. We roast chestnuts and sweet potatoes, and we eat panellets. They're little sweets made with nuts, like almonds and pine nuts. At school, a teacher always dresses up as a castanyera, an old woman who sells roasted chestnuts.
+> **Josh:** Sounds delicious! We have Halloween on the same night. Kids dress up in costumes and go trick or treating. My little brother is going as a skeleton this year. He's so excited!
+> **Núria:** Do you carve pumpkins?
+> **Josh:** Yes, every year. My mum always makes pumpkin soup with the inside. But my brother gets scared of the pumpkin faces in the dark! What about you? Do you dress up?
+> **Núria:** Some people do now. But for me the Castanyada is about family. We eat together at my grandparents' house. It's cosy and relaxed, and I feel grateful for that. I'm proud of our tradition.
+> **Josh:** That's really nice. I love autumn. The leaves change colour, and when the leaves fall from the trees, the parks look amazing.
+> **Núria:** Me too. Autumn is my favourite season. Happy Halloween, Josh!
+> **Josh:** Happy Castanyada! Save me some panellets!
 
 1. [I] What's the weather like in Manchester? **cold and rainy** / sunny and warm / foggy and mild
 2. [I] What was on the cars in Manchester this morning? **frost** / snow / leaves
@@ -85,8 +85,35 @@
 6. [I] What does Josh's mum make? **pumpkin soup** / panellets / roasted chestnuts
 7. [I] For Núria, the Castanyada is mainly about… **family** / costumes / fireworks
 8. [S] Why does it get dark so early in Manchester now? **The clocks went back.** / It's always foggy. / The weather is bad.
-9. [S] True or false: nobody in Catalonia dresses up at the end of October. **False** (some people do now, and a teacher dresses up as a castanyera)
+9. [S] True or false: nobody in Catalonia dresses up at the end of October. **False: some people do now.**
 10. [D] What does Núria's last part show? **She prefers a family tradition to costumes.** / She thinks Halloween is bad. / She doesn't like autumn.
+
+### Listening: *Where do Halloween and the Castanyada come from?* (illustrated video, about 1 min 45 s)
+
+*Approved by Roger on 24 Oct 2026. Replaces the real Halloween video as the main listening (that video stays as an optional extra with no questions). Safe level for every route, a slower copy for Insecure, WebVTT subtitles. Voices: Emma and Sam, as in the Learning Path 3 podcast; lines 1–6 reuse the podcast audio.*
+
+> **Emma:** Welcome back to Culture Bites. Today: where do two famous autumn celebrations come from? Let's start with Halloween.
+> **Sam:** Halloween comes from an old Celtic festival called Samhain. It took place in Ireland and Scotland more than two thousand years ago, at the end of the harvest and the start of winter.
+> **Emma:** And people believed that on that night, the spirits of the dead came back.
+> **Sam:** Exactly. So people used to light bonfires and wear masks to hide from the spirits. And here's a surprise: they didn't use pumpkins. They used to carve turnips!
+> **Emma:** Turnips? So where do the pumpkins come from?
+> **Sam:** In the 1800s, many Irish people moved to the United States. Pumpkins were bigger and easier to carve, so the tradition changed.
+> **Emma:** Now let's go to Catalonia. On the same night, the thirty-first of October, many families celebrate the Castanyada.
+> **Sam:** It's the night before All Saints' Day, on the first of November. On that day, many people visit the cemetery and remember family members who have died.
+> **Emma:** So where do the chestnuts come from?
+> **Sam:** People say that, a long time ago, bell ringers rang the church bells all night for the dead. They ate roasted chestnuts to keep warm and get energy.
+> **Emma:** And chestnuts and sweet potatoes are autumn food. It's harvest time, so they're easy to find.
+> **Sam:** Then there are panellets: little round sweets made with almonds, sugar and pine nuts. Many families make them at home together.
+> **Emma:** And in the streets you can see castanyeres, women who sell roasted chestnuts in paper cones. At school, someone often dresses up as one.
+> **Sam:** So both celebrations happen on the same night, and both are about the dead and the end of the harvest. But they feel very different!
+
+1. [I] Where does Halloween come from? **an old Celtic festival called Samhain** / an American film / a Catalan tradition
+2. [I] What did people carve before pumpkins? **turnips** / apples / chestnuts
+3. [I] What day is the day after the Castanyada? **All Saints' Day** / Christmas Day / New Year's Day
+4. [I] In the traditional story, why did the bell ringers eat chestnuts? **to keep warm and get energy** / to sell them in the street / because they were sweet
+5. [I] What are panellets made with? **almonds, sugar and pine nuts** / chestnuts and honey / pumpkin and chocolate
+6. [S] What do both celebrations have in common? **They take place on the same night and are about the dead and the end of the harvest.** / They both use pumpkins. / They both come from the USA.
+7. [D] Why do the two celebrations "feel very different"? **Halloween is about costumes and scary fun, and the Castanyada is about family and food.** / Only Halloween remembers the dead. / The Castanyada is a new tradition.
 
 ### Speaking mini-challenge (record, transcript, AI feedback)
 
