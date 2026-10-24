@@ -41,6 +41,7 @@ All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the
 - Mix real, level-appropriate listenings with generated ones. Never call a paid generation service (for example ElevenLabs) or spend its credits without the user's explicit permission for that specific generation. An approved script is not permission to generate.
 - **Generated audio files:** MP3s live in the LS folder's `audio/` (for example `4eso/seasons-and-celebrations/audio/culture-bites-origins.mp3`) and are referenced from the LS data as `media.audio`. The slow version for Insecure sits next to it with a `-slow` suffix (`culture-bites-origins-slow.mp3`).
 - **ElevenLabs settings:** model `eleven_multilingual_v2`, one call per script line (one premade voice per character), lines joined with 0.45 s pauses and loudness-normalised (`loudnorm=I=-16:TP=-1.5`, mono, 96 kbps). Keep the same voice for a character across an LS; each LS's `AGENTS.md` lists its voices.
+- **Choosing voices for new audio:** shortlist 3–4 well-rated ElevenLabs Voice Library voices per character (right accent and age, educational or conversational use case, high usage count) and send the user their free preview clips; generate only after the user picks. Existing recordings keep their voices.
 - **Slow versions are always made locally, never with a second paid generation:** apply ffmpeg `atempo=0.85` to the same line clips and join them with 0.9 s pauses.
 
 ## Grammar
