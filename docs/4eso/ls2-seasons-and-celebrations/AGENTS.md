@@ -3,7 +3,7 @@
 Read the [root AGENTS.md](../../../AGENTS.md) first; this file adds what is specific to this LS.
 
 - **Content:** [overview.md](overview.md), approved by Roger on 23 Oct 2026 (later approvals are dated in it). The overview numbers the Learning Paths LP0–LP5; on the site they are Learning Paths 1–6, plus 7 (Final product). Programme: [LS2 in the 4ESO programme](../programme.md#ls2--4eso--seasons--celebrations).
-- **Final product rubric:** [final-rubric.md](final-rubric.md) (draft until Roger approves).
+- **Final product rubric:** [final-product-assessment.md](final-product-assessment.md): groups, who presents what, individual and group marks, peer assessment and rubrics (draft until Roger approves).
 - **Activities and criteria:** [assessment-criteria.md](assessment-criteria.md) maps each activity to the LS2 assessment criteria.
 - **Pages:** `4eso/seasons-and-celebrations/`. Learning Paths 2–6, the checkpoints, the final product, the sample exam and Reflect are thin shells; their content is in `data/<page>.js` and `ls2-engine.js` renders it (recall, vocabulary + flashcards + practice, multiple choice, typed grammar, writing with AI feedback, forms, checklists, speaking). Learning Path 1 (`getting-started.html`) is a standalone page with five steps: recall, words, reading (*Autumn in two places*, one chat per route), listening (origins video; the real Halloween video stays there until the origins video is published) and speaking.
 - **Effective-learning rules used everywhere:** a recall warm-up with no notes opens each Learning Path; earlier vocabulary comes back in the flashcard deck and the recall items; auto-corrected steps complete at 80 %; typed answers show the answer only after a second wrong try; every Learning Path ends with a product piece saved for the Final Product page.
@@ -19,7 +19,8 @@ Newest first. One line per decision; update a line instead of adding a contradic
 
 | Date | Decision |
 | --- | --- |
-| 2026-10-24 | Final product route requirements now ask every route for evidence of CC1 1.3 and CE2 2.3 at its level (Insecure: time + person per activity, one welcome idea; Safe: one inclusive decision; Daring: estimated cost). Rubric draft in [final-rubric.md](final-rubric.md), awaiting approval. |
+| 2026-10-24 | Final product groups are same-route (Roger), formed by the teacher; individual marks for each student's part of the pitch and email, group marks for research, inclusion and plan, plus peer-assessed teamwork. Details in [final-product-assessment.md](final-product-assessment.md), draft. |
+| 2026-10-24 | Final product route requirements now ask every route for evidence of CC1 1.3 and CE2 2.3 at its level (Insecure: time + person per activity, one welcome idea; Safe: one inclusive decision; Daring: estimated cost). Rubric draft in [final-product-assessment.md](final-product-assessment.md), awaiting approval. |
 | 2026-10-24 | Final product tags in `el-catalog.js` now match its "What counts" box: 1.1–1.3, 3.1, 3.2, 4.2, 5.1, 6.1, 6.2, CC1 1.3, CE2 2.3 (approved by Roger). |
 | 2026-10-24 | Calendar (3 classes a week from 26 Oct): Learning Paths 1–3, 5, 6, checkpoint 1, checkpoint 4 + sample exam and the exam (about 18–19 Nov) in term 1; Research it right, the final product (deadline 11 Dec) and Reflect in term 2, where the final product mark goes. Checkpoints 2 and 3 are optional homework. Week by week in `shared/js/el-plan.js` (teacher dashboard). |
 | 2026-10-24 | Activities are linked to criteria by the skill each step practises (reading 4.1, listening 2.1, speaking 3.1, writing 5.1) plus the integrated competences its content targets; see [assessment-criteria.md](assessment-criteria.md). Proposed label fixes await Roger's approval. |
