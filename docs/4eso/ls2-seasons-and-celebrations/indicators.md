@@ -1,6 +1,6 @@
 # 4ESO · LS2 · Achievement indicators (NA · AS · AN · AE)
 
-**24 Oct 2026.** Step 5 of Roger's method (*Worked example: from competence to LS criterion*): for each LS assessment criterion, four indicators that say how well the objective has been achieved. Steps 1–4 (competence, Decret criterion, LS objective, LS criterion) are in the [programme](../programme.md#ls2--4eso--seasons--celebrations). Written by Claude from the revised programme; **waiting for Roger's approval**.
+**24 Oct 2026.** Step 5 of Roger's method (*Worked example: from competence to LS criterion*): for each LS assessment criterion, four indicators that say how well the objective has been achieved. Steps 1–4 (competence, Decret criterion, LS objective, LS criterion) are in the [programme](../programme.md#ls2--4eso--seasons--celebrations). Written by Claude from the revised programme; live with PR #54 (merged 24 Oct 2026 at Roger's go-ahead). How these marks add up to the LS2 grade is being planned separately.
 
 - **How the levels differ:** the help the student needs (model, template, checklist, a second viewing), the complexity of what they do, and its quality.
 - **One set for all routes.** Routes change the task and the help (Catalan guidance, templates, two or three sources, part length), not the indicators.

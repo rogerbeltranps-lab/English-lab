@@ -1,6 +1,6 @@
 # 4ESO · LS2 Seasons & Celebrations · Competences, criteria and activities
 
-**24 Oct 2026, revised programme.** This is the state of the branch `ls2-new-criteria` (not live until Roger approves): the criteria tags in `shared/js/el-catalog.js`, the term 1 exam, and the final product rubric (`4eso/seasons-and-celebrations/final-rubric-data.js`). Official criterion texts are in the [programme](../programme.md#ls2--4eso--seasons--celebrations); the evidence behind each link is in [assessment-criteria.md](assessment-criteria.md) and the indicators in [indicators.md](indicators.md).
+**24 Oct 2026, revised programme.** This is what is live since PR #54 (merged 24 Oct 2026): the criteria tags in `shared/js/el-catalog.js`, the term 1 exam, and the final product rubric (`4eso/seasons-and-celebrations/final-rubric-data.js`). Official criterion texts are in the [programme](../programme.md#ls2--4eso--seasons--celebrations); the evidence behind each link is in [assessment-criteria.md](assessment-criteria.md) and the indicators in [indicators.md](indicators.md).
 
 ## 1. Grid
 

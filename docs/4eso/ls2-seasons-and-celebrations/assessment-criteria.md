@@ -1,6 +1,6 @@
 # 4ESO · LS2 · Activities and assessment criteria
 
-**24 Oct 2026, revised programme.** How each activity is linked to the ten LS2 assessment criteria of the [programme](../programme.md#ls2--4eso--seasons--celebrations) (revised 24 Oct 2026). The indicators for each criterion are in [indicators.md](indicators.md). This mapping is on the branch `ls2-new-criteria` and **waits for Roger's approval before it goes live**.
+**24 Oct 2026, revised programme.** How each activity is linked to the ten LS2 assessment criteria of the [programme](../programme.md#ls2--4eso--seasons--celebrations) (revised 24 Oct 2026). The indicators for each criterion are in [indicators.md](indicators.md). This mapping is live (PR #54, merged 24 Oct 2026 with Roger's go-ahead).
 
 Learning Paths are numbered as on the site: LP1 = Getting started, LP7 = Final product.
 
