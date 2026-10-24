@@ -1,0 +1,151 @@
+/* LS2 · Recall checkpoint 3 (approved content). The first attempt is sent to the teacher dashboard as parts.first. */
+window.LP = {
+ "key": "ls2Checkpoint34ESO",
+ "n": "C3",
+ "title": "Recall checkpoint 3",
+ "panels": [
+  {
+   "id": "check",
+   "type": "recall",
+   "tab": "Checkpoint",
+   "title": {
+    "ca": "Checkpoint 3: LS1 and Learning Paths 1–5",
+    "en": "Checkpoint 3: LS1 and Learning Paths 1–5"
+   },
+   "pill": {
+    "ca": "Sense apunts · 5–8 min",
+    "en": "No notes · 5–8 min"
+   },
+   "intro": {
+    "ca": "Respon sense apunts ni ajuda. Compta haver-lo fet, no la nota: el professor només mira el primer intent per saber què recordeu. Després llegeix el feedback i repassa el que has fallat.",
+    "en": "Answer with no notes or help. Doing it counts, not the score: your teacher only looks at your first attempt to see what the class remembers. Then read the feedback and review what you missed."
+   },
+   "items": [
+    {
+     "r": "insecure",
+     "q": "\"We need music.\" \"I ___ bring my speaker.\"",
+     "a": [
+      "will",
+      "'ll"
+     ],
+     "ca": "Repassa: LP5.",
+     "en": "Review: LP5."
+    },
+    {
+     "r": "insecure",
+     "q": "___ ___ ___ food and music.",
+     "a": [
+      "there will be"
+     ],
+     "ca": "Repassa: LP5.",
+     "en": "Review: LP5."
+    },
+    {
+     "r": "insecure",
+     "q": "We ___ ___ ___ decorate the hall. (plan)",
+     "a": [
+      "are going to",
+      "'re going to"
+     ],
+     "ca": "Repassa: LP5.",
+     "en": "Review: LP5."
+    },
+    {
+     "r": "insecure",
+     "q": "Find each fact in at least ___ sources.",
+     "a": [
+      "two",
+      "2"
+     ],
+     "ca": "Repassa: LP4.",
+     "en": "Review: LP4."
+    },
+    {
+     "r": "insecure",
+     "q": "Diwali is the festival of ___.",
+     "a": [
+      "lights"
+     ],
+     "ca": "Repassa: LP2.",
+     "en": "Review: LP2."
+    },
+    {
+     "r": "insecure",
+     "q": "My dad ___ (not / work) on Sundays.",
+     "a": [
+      "doesn't work",
+      "does not work"
+     ],
+     "ca": "Repassa: LS1.",
+     "en": "Review: LS1."
+    },
+    {
+     "r": "insecure",
+     "q": "We visit our relatives ___ Christmas.",
+     "a": [
+      "at"
+     ],
+     "ca": "Repassa: LP2.",
+     "en": "Review: LP2."
+    },
+    {
+     "r": "insecure",
+     "q": "People roast ___ at the Castanyada.",
+     "a": [
+      "chestnuts"
+     ],
+     "ca": "Repassa: LP1.",
+     "en": "Review: LP1."
+    },
+    {
+     "r": "safe",
+     "q": "We ___ ___ (meet) the head teacher on Monday.",
+     "a": [
+      "are meeting",
+      "'re meeting"
+     ],
+     "ca": "Repassa: LP5.",
+     "en": "Review: LP5."
+    },
+    {
+     "r": "safe",
+     "q": "The event ___ (start) at 10.00.",
+     "a": [
+      "starts"
+     ],
+     "ca": "Repassa: LP5.",
+     "en": "Review: LP5."
+    },
+    {
+     "r": "safe",
+     "q": "The first Thanksgiving ___ (take) place in 1621.",
+     "a": [
+      "took"
+     ],
+     "ca": "Repassa: LP3.",
+     "en": "Review: LP3."
+    },
+    {
+     "r": "daring",
+     "q": "Gifts ___ ___ (exchange) at midnight.",
+     "a": [
+      "are exchanged"
+     ],
+     "ca": "Repassa: LP2.",
+     "en": "Review: LP2."
+    },
+    {
+     "r": "daring",
+     "q": "\"We'll use the gym.\" Decision, arrangement or timetable?",
+     "a": [
+      "decision",
+      "a decision"
+     ],
+     "ca": "Repassa: LP5.",
+     "en": "Review: LP5."
+    }
+   ]
+  }
+ ]
+};
+window.EL_RESULT_PARTS = () => { const f = (LS2.state.first || {})[LS2.level]; return f ? { first: f } : {}; };

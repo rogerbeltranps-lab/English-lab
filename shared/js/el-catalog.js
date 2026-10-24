@@ -30,7 +30,26 @@ window.EL_CATALOG=(function(){
     A("4eso","healthy-habits.html","Healthy habits",["3.1","5.2"],["healthyHabitsState4ESO"],9,{skip:["write"]}),
     A("4eso","vocabulary-games.html","Vocabulary games",["5.1"],[],0,{graded:false,inClass:true}),
     A("4eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","5.2"],["finalProduct4ESO"],0,{manual:true}),
-    A("4eso","getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["2.1","3.1"],["ls2GettingStarted4ESO"],4,{graded:false,ls:"4eso-seasons-and-celebrations",path:"4eso/seasons-and-celebrations/getting-started.html"})
+    ...(function(){
+      // LS2: ids carry the LS so they never clash with My Real Routine pages of the same name.
+      const L=(file,title,criteria,key,points,o)=>A("4eso",file,title,criteria,[key],points,Object.assign({id:"4eso/ls2-"+file.replace(".html",""),ls:"4eso-seasons-and-celebrations",path:"4eso/seasons-and-celebrations/"+file},o||{}));
+      const C={mode:"practice"};
+      return [
+        L("getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["2.1","3.1"],"ls2GettingStarted4ESO",4,{graded:false}),
+        L("celebrations-around-the-world.html","Celebrations around the world",["2.1","3.1","4.1","5.1"],"ls2Celebrations4ESO",8,{skip:["write"]}),
+        L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1"],"ls2Checkpoint14ESO",1,C),
+        L("where-traditions-come-from.html","Where traditions come from",["1.1","2.1","3.1","5.1"],"ls2Traditions4ESO",7,{skip:["write"]}),
+        L("research-it-right.html","Research it right",["1.2","4.2","6.1","6.2"],"ls2Research4ESO",7),
+        L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1"],"ls2Checkpoint24ESO",1,C),
+        L("plan-the-day.html","Plan the day",["2.1","3.1","5.1"],"ls2Plan4ESO",7,{skip:["write"]}),
+        L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1"],"ls2Checkpoint34ESO",1,C),
+        L("write-to-the-head-teacher.html","Write to the head teacher",["3.2","4.1","5.1"],"ls2Email4ESO",7,{skip:["write"]}),
+        L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1"],"ls2Checkpoint44ESO",1,C),
+        L("sample-exam.html","Sample exam",["2.1","4.1","5.1"],"ls2SampleExam4ESO",4,{graded:false}),
+        L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.3","3.1","3.2","5.1","6.2"],"ls2FinalProduct4ESO",0,{manual:true}),
+        L("reflect.html","Reflect",["3.1"],"ls2Reflect4ESO",1,{graded:false})
+      ];
+    })()
   ];
 })();
 // Number of distinct completed actions (truthy keys inside any "done" map) in a synced localStorage state string.

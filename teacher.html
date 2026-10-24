@@ -6,7 +6,7 @@
 <div id="app" hidden>
 <div class="box"><h2>Estat de les LS i activitats avaluables</h2><p class="muted">Oculta: els alumnes no hi poden fer res · Oberta: practiquen i es desa el progrés · Tancada: només consulten el que van fer i el feedback · Pública: accés lliure com abans, sense login ni puntuació. Les activitats <b>avaluables</b> només les poden fer quan les habilites aquí; les que no avaluen sempre estan disponibles.</p><div id="lsbox"></div></div>
 <div class="box"><h2>Peticions de canvi de nivell</h2><div id="reqs" class="muted">Cap petició pendent.</div></div>
-<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: punts (1 per acció feta). El producte final el puntues tu a mà. Clica una cel·la per afegir feedback opcional.</p>
+<div class="box"><h2>Resultats per alumne</h2><p class="muted">Cada cel·la: punts (1 per acció feta). Als recall checkpoints, «1r intent» és la nota del primer intent (no compta per a la nota). El producte final el puntues tu a mà. Clica una cel·la per afegir feedback opcional.</p>
 <select id="lssel"></select><div style="overflow:auto;margin-top:8px"><table id="res"></table></div></div></div>
 <script src="shared/js/el-catalog.js"></script>
 <script type="module">
@@ -36,7 +36,7 @@ async function results(){
   (await getDocs(collectionGroup(db(),"levels"))).forEach(l=>{if(l.id===ls)lv[l.ref.parent.parent.id]=l.data().level});
   let h="<tr><th>Alumne</th><th>Nivell</th>"+acts.map(a=>`<th title="${a.criteria.join(', ')}">${a.title}${a.graded?(a.manual?"<br><small>manual</small>":"<br><small>/"+a.points+"</small>"):"<br><small>(no avalua)</small>"}</th>`).join("")+"<th>Total</th></tr>";
   students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&x&&x.max){ts+=x.score||0;tm+=x.max}});
-    h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td><td>${esc(lv[s.id]||"–")}</td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(a.manual?(x.max?x.score+"/"+x.max:""):a.graded?(x.score||0)+"/"+a.points:"")+(x.locked?" ✔":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+`<td><b>${tm?ts+"/"+tm:"–"}</b></td></tr>`});
+    h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td><td>${esc(lv[s.id]||"–")}</td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(a.manual?(x.max?x.score+"/"+x.max:""):a.graded?(x.score||0)+"/"+a.points:"")+(x.parts&&x.parts.first?`<br><small title="Primer intent del checkpoint">1r intent: ${x.parts.first.score}/${x.parts.first.max}</small>`:"")+(x.locked?" ✔":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+`<td><b>${tm?ts+"/"+tm:"–"}</b></td></tr>`});
   $("#res").innerHTML=h;
   $("#res").querySelectorAll("td.c").forEach(td=>td.onclick=async()=>{const ref=doc(db(),"students",td.dataset.u,"results",td.dataset.a.replace("/","__")),s=await getDoc(ref),o=s.exists()?s.data():{};
     const a=cat.find(x=>x.id===td.dataset.a),extra={};
