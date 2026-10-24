@@ -1,6 +1,6 @@
 # 4ESO · LS2 Seasons & Celebrations · Competences, criteria and activities
 
-**24 Oct 2026, after PR #44.** This is the state of the site: the criteria tags in `shared/js/el-catalog.js`, the term 1 exam, and the final product rubric (`4eso/seasons-and-celebrations/final-rubric-data.js`). Official criterion texts are in the [programme](../programme.md#ls2--4eso--seasons--celebrations). For the evidence behind each link, see [assessment-criteria.md](assessment-criteria.md).
+**24 Oct 2026, revised programme.** This is what is live since PR #54 (merged 24 Oct 2026): the criteria tags in `shared/js/el-catalog.js`, the term 1 exam, and the final product rubric (`4eso/seasons-and-celebrations/final-rubric-data.js`). Official criterion texts are in the [programme](../programme.md#ls2--4eso--seasons--celebrations); the evidence behind each link is in [assessment-criteria.md](assessment-criteria.md) and the indicators in [indicators.md](indicators.md).
 
 ## 1. Grid
 
@@ -8,19 +8,16 @@
 
 | Competence | Criterion | LP1 Getting started | LP2 Celebrations around the world | LP3 Where traditions come from | LP4 Research it right | LP5 Plan the day | LP6 Write to the head teacher | Recall checkpoints 1–4 | Sample exam | Exam | Final product |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CE1 Intercultural awareness | 1.1 Value cultural diversity | | | ✓ | | | | | | | ✓ |
-| | 1.2 Respectful participation, no stereotypes | | | | ✓ | | | | | | ✓ |
-| | 1.3 Defend and appreciate diversity | | | | | | | | | | ✓ |
-| CE2 Listening | 2.1 Main ideas and relevant information | ○ | ✓ | ✓ | | ✓ | | | ○ | ✓ | |
-| CE3 Speaking | 3.1 Structured, coherent oral texts | ○ | ✓ | ✓ | | ✓ | | | | | ✓ |
-| | 3.2 Plan, produce, review and cooperate | | | | | | ✓ | | | | ✓ |
-| CE4 Reading | 4.1 Understand and interpret texts | ○ | ✓ | | | | ✓ | ○ | ○ | ✓ | |
-| | 4.2 Assess content and reliability | | | | ✓ | | | | | | ✓ |
+| CE4 Reading | 4.1 Understand and interpret texts | ○ | ✓ (reading log) | | | | ✓ | ○ | ○ | ✓ | |
+| | 4.2 Assess content and reliability | | | | ✓ (card) | | | | | | ✓ |
+| CE2 Listening | 2.2 Interpret and value spoken texts | ○ | ✓ | ✓ (listening chart) | | ✓ | | | ○ | ✓ | |
+| CE3 Speaking | 3.2 Plan, produce, review and cooperate | | ○ | ○ | | ○ | ○ | | | | ✓ |
 | CE5 Writing | 5.1 Write clear, coherent texts | | ✓ | ✓ | | ✓ | ✓ | ○ | ○ | ✓ | ✓ |
-| CE6 Research | 6.1 Search, select and contrast sources | | | | ✓ | | | | | | ✓ |
-| | 6.2 Communicate research, credit sources | | | | ✓ | | | | | | ✓ |
-| CC1 Citizenship (transversal) | 1.3 Propose actions for living together | | | | | | | | | | ✓ |
-| CE2 Entrepreneurship (transversal) | 2.3 Design the idea with its resources | | | | | | | | | | ✓ |
+| CE1 Intercultural awareness | 1.1 Value cultural diversity | | ○ | | | | | | | | ✓ |
+| | 1.2 Respectful participation, links between cultures | | | ○ | ✓ | | | | | | ✓ |
+| CE6 Research | 6.1 Search, select and contrast sources | | | | ✓ (card) | | | | | | ✓ |
+| CC1 Citizenship (transversal) | 1.3 Propose actions for living together | | | | | ○ | ○ | | | | ✓ |
+| CC3 Citizenship (transversal) | 3.2 Overcome stereotypes and prejudice | | | | ✓ (card) | | | | | | ✓ |
 
 Reflect (14 Dec) is not linked to any criterion: it is self-regulation (learning to learn).
 
@@ -28,23 +25,20 @@ Reflect (14 Dec) is not linked to any criterion: it is self-regulation (learning
 
 | Competence | Criterion | Term 1 (to 20 Nov): Learning Paths + exam | Term 2 (23 Nov–11 Dec): final product |
 | --- | --- | --- | --- |
-| CE1 | 1.1 | LP3 | Rubric row "Respect & inclusion" (group, 10 %) |
-| | 1.2 | — | LP4 (term 2, week 5) · "Respect & inclusion" |
-| | 1.3 | — | "Respect & inclusion" |
-| CE2 | 2.1 | LP2, LP3, LP5 · exam listening | — |
-| CE3 | 3.1 | LP2, LP3, LP5 (speaking steps) | "My part of the video", includes pronunciation (individual, 25 %) |
-| | 3.2 | LP6 (draft → feedback → final email) | "Teamwork" (peer ratings, 10 %) · "My process evidence" (steps 0–5, 10 %) |
-| CE4 | 4.1 | LP2, LP6 · exam reading | — |
-| | 4.2 | — | LP4 · "Research & credits" (group, 10 %) · step 1 *My source* |
-| CE5 | 5.1 | LP2, LP3, LP5, LP6 · exam writing | "My email" (individual, 20 %) |
-| CE6 | 6.1 | — | LP4 · "Research & credits" · step 1 *My source* |
-| | 6.2 | — | LP4 · "Research & credits" |
-| CC1 | 1.3 | — | "Respect & inclusion" · step 2 *My contribution* ("our plan includes everyone") |
-| CE2 emprenedora | 2.3 | — | "Event plan" (group, 15 %) · step 2 *My contribution* |
+| CE4 | 4.1 | LP2 reading log, LP6 · exam reading | — |
+| | 4.2 | — | LP4 card · "Research & credits" (group, 10 %) · step 1 *My source* |
+| CE2 | 2.2 | LP2, LP3 listening chart, LP5 · exam listening | — |
+| CE3 | 3.2 | LP2, LP3, LP5, LP6 speaking (practice) | "My part of the video" (individual, 25 %) · "Teamwork" (10 %) · "My process evidence" (10 %) |
+| CE5 | 5.1 | LP2, LP3, LP5, LP6 · exam writing | "My email" (individual, 15 %) |
+| CE1 | 1.1 | LP2 speaking (practice) | "What it means and why it belongs at school" (group, 5 %) |
+| | 1.2 | LP3 (practice) | LP4 · "Local link and inclusion" (group, 10 %) |
+| CE6 | 6.1 | — | LP4 card · "Research & credits" · step 1 *My source* |
+| CC1 | 1.3 | LP5 plan, LP6 email (practice) | "Welcome actions" in the email (individual, 5 %) |
+| CC3 | 3.2 | — | LP4 card · "Stereotypes" (group, 10 %) |
 
 Recall checkpoints (4.1, 5.1) give formative evidence only: they count by completion, and the teacher sees the first-attempt score.
 
 ## 3. Notes
 
-- Three extra links in [assessment-criteria.md](assessment-criteria.md) were never approved, so they are not on the site: LP4 → 4.1, LP5 → CE2 2.3, LP6 → 3.1.
-- Final product weights: my part 25 · my email 20 · research 10 · inclusion 10 · event plan 15 · teamwork 10 · process evidence 10. Same-route groups. See [final-product-assessment.md](final-product-assessment.md).
+- Final product weights (proposed, waiting for Roger's OK): my part 25 · my email 15 · welcome actions 5 · research 10 · meaning 5 · local link 10 · stereotypes 10 · teamwork 10 · process evidence 10. Individual 65 %, group 35 %. See [final-product-assessment.md](final-product-assessment.md).
+- Exam formats: Roger (24 Oct) decides later; the first exam is fine for now. Using the reading log and listening chart formats in the exam is still the recommendation.

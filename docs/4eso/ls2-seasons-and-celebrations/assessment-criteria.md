@@ -1,72 +1,61 @@
 # 4ESO · LS2 · Activities and assessment criteria
 
-**24 Oct 2026.** How each activity is linked to the LS2 assessment criteria in the [programme](../programme.md#ls2--4eso--seasons--celebrations). The "Linked now" column is what `shared/js/el-catalog.js` says; "What the steps show" is the evidence each page's steps actually give. **The proposed fixes below are waiting for Roger's approval.** When they are approved, update the catalogue and this file together.
+**24 Oct 2026, revised programme.** How each activity is linked to the ten LS2 assessment criteria of the [programme](../programme.md#ls2--4eso--seasons--celebrations) (revised 24 Oct 2026). The indicators for each criterion are in [indicators.md](indicators.md). This mapping is live (PR #54, merged 24 Oct 2026 with Roger's go-ahead).
 
-## How the link works
+Learning Paths are numbered as on the site: LP1 = Getting started, LP7 = Final product.
 
-- An activity's criteria come from **the skill its steps make students use**: Reading → 4.1, Listening → 2.1, Speaking → 3.1, Writing → 5.1. Research steps add 4.2, 6.1 and 6.2; steps on respect and comparing cultures add CE1 (1.1–1.3); the event plan adds CE2 emprenedora 2.3.
-- The criteria are labels in `el-catalog.js`, shown on the teacher page next to each activity. Points are counted per activity; nothing is calculated per criterion yet.
+## The ten LS2 criteria
+
+| Criterion | Objective | Task the LS criterion names | Where it is assessed |
+| --- | --- | --- | --- |
+| 4.1 Reading | O1 | Reading log on two texts: what, when, where, main customs, two words inferred from context | LP2 step "Reading log"; exam |
+| 2.2 Listening | O1 | Listening chart on two short videos: what each speaker values, and the words, tone or images that show it | LP3 step "Listening chart"; exam |
+| 4.2 Assessing sources | O2 | Each source rated reliable or not with two reasons; the most trusted one | LP4 research card; final product step 1 |
+| 6.1 Research | O2 | Research sheet: two sources (Safe and Daring: three), key information from each, where they agree or differ, full reference | LP4 research card; final product |
+| 3.2 Speaking | O3 | Plans, rehearses and records the group pitch; explains their part from a revised script | Final product step 3 and video |
+| 1.1 Intercultural | O3 | What the celebration means for the people who celebrate it and why it belongs at school | Final product pitch, part 1 |
+| 1.2 Intercultural | O4 | A link with a local celebration (Safe and Daring: similarities and differences) and one inclusive decision | Final product pitch |
+| CC3 3.2 Citizenship | O4 | One stereotype named in the pitch, why it is unfair, how the plan avoids it | LP4 research card; final product pitch |
+| 5.1 Writing | O5 | Individual formal email: purpose, plan, request; future forms, relative clauses | LP6; final product email |
+| CC1 1.3 Citizenship | O5 | At least two concrete actions in the email so every student and family feels welcome | LP5 plan; LP6 email; final product email |
+
+No longer in LS2: 2.1, 3.1, 1.3, 6.2 and CE2 emprenedora 2.3. Speaking steps in the Learning Paths now practise the pitch (3.2).
 
 ## Activity by activity
 
-| Activity | Steps that give evidence | Linked now | What the steps show |
-| --- | --- | --- | --- |
-| Getting started (not graded) | Reading chat · origins video · speaking | 4.1, 2.1, 3.1 | 4.1, 2.1, 3.1 |
-| LP1 Celebrations around the world | Reading · Diwali listening · Piece 1 · speaking | 2.1, 3.1, 4.1, 5.1 | 2.1, 3.1, 4.1, 5.1 |
-| LP2 Where traditions come from | Culture Bites listening · Piece 2 · speaking: compare | 1.1, 2.1, 3.1, 5.1 | 1.1, 2.1, 3.1, 5.1 |
-| LP3 Research it right | Reading · sources · information, not belief · notes · credits · Piece 3 | 1.2, 4.2, 6.1, 6.2 | **4.1**, 1.2, 4.2, 6.1, 6.2 |
-| LP4 Plan the day | Council listening · Piece 4 event plan · speaking: planning meeting | 2.1, 3.1, 5.1 | 2.1, 3.1, 5.1, **CE2 emprenedora 2.3** |
-| LP5 Write to the head teacher | Model email reading · register · Piece 5 email · pitch rehearsal | 3.2, 4.1, 5.1 | 3.2, 4.1, 5.1, **3.1** |
-| Recall checkpoints 1–4 | Vocabulary and grammar recall, no text | 4.1, 5.1 formative (fixed 24 Oct 2026) | **4.1, 5.1 as formative evidence** (the sabers recalled, used in written sentences) |
-| Sample exam (not graded) | Reading · listening · grammar · writing | 2.1, 4.1, 5.1 | 2.1, 4.1, 5.1 |
-| Final product | Group video pitch · research and credits · event plan · individual email | 1.1, 1.2, 1.3, 3.1, 3.2, 4.2, 5.1, 6.1, 6.2, CC1 1.3, CE2 2.3 (fixed 24 Oct 2026) | 1.1, 1.2, 1.3, 3.1, 3.2, 4.2, 5.1, 6.1, 6.2, CC1 1.3, CE2 2.3 |
-| Reflect (not graded) | Written self-assessment | none (fixed 24 Oct 2026) | **none** (self-regulation, not speaking) |
+| Activity | Criteria (catalogue) | Steps that give the evidence |
+| --- | --- | --- |
+| LP1 Getting started (not graded) | 4.1, 2.2 | read → 4.1 · listen → 2.2 · speak (practice) |
+| LP2 Celebrations around the world | 4.1, 2.2, 5.1, 3.2, 1.1 | read → 4.1 · **log → 4.1** · listen → 2.2 · write (not scored) → 5.1 · speak → 3.2, 1.1 |
+| Recall checkpoints 1–4 | 4.1, 5.1 (formative) | check |
+| LP3 Where traditions come from | 2.2, 5.1, 1.2, 3.2 | listen → 2.2 · **chart → 2.2** · write (not scored) → 5.1, 1.2 · speak → 3.2, 1.2 |
+| LP4 Research it right | 4.2, 6.1, 1.2, CC3 3.2 | read → 4.2 · sources → 4.2 · respect → 1.2, CC3 3.2 · notes → 6.1 · credit → 6.1 · **card → 4.2, 6.1, CC3 3.2** |
+| LP5 Plan the day | 2.2, 5.1, 3.2, CC1 1.3 | listen → 2.2 · write (not scored) → 5.1, CC1 1.3 · speak → 3.2 |
+| LP6 Write to the head teacher | 4.1, 5.1, 3.2, CC1 1.3 | read → 4.1 · register → 5.1 · write (not scored) → 5.1, CC1 1.3 · speak → 3.2 |
+| Sample exam (not graded) | 2.2, 4.1, 5.1 | read → 4.1 · listen → 2.2 · write → 5.1 |
+| LP7 Final product | 1.1, 1.2, 3.2, 4.2, 5.1, 6.1, CC1 1.3, CC3 3.2 | video → 3.2, 1.1, 1.2, CC3 3.2 · email → 5.1, CC1 1.3 · hand-in steps 0–5 · rubric ([final-product-assessment.md](final-product-assessment.md)) |
+| Reflect (not graded) | none | reflect |
+
+The new steps **log** (LP2), **chart** (LP3) and **card** (LP4) are hand-ins: fields, a short self-assessment and an optional comment. The teacher sees them on the dashboard (catalogue `steps`) and can answer. The LP4 card is also piece 3 of the final product.
 
 ## Criterion by criterion
 
 | Criterion | Graded activities | Practice only |
 | --- | --- | --- |
-| 4.1 Reading | LP1, LP3, LP5 | Getting started, sample exam |
-| 4.2 Assessing sources | LP3, final product | |
-| 2.1 Listening | LP1, LP2, LP4 | Getting started, sample exam |
-| 3.1 Speaking | LP1, LP2, LP4, LP5, final product | Getting started |
-| 3.2 Planning and reviewing texts | LP5, final product | |
-| 5.1 Writing | LP1, LP2, LP4, LP5, final product | Sample exam |
-| 1.1 Valuing diversity | LP2, final product | |
-| 1.2 Respect, no stereotypes | LP3, final product | |
-| 1.3 Defending diversity | Final product only | |
-| 6.1 Searching and contrasting sources | LP3, final product | |
-| 6.2 Communicating research, credits | LP3, final product | |
-| CC1 1.3 Inclusive actions | Final product only | |
-| CE2 emprenedora 2.3 Designing with resources | LP4, final product | |
+| 4.1 | LP2, LP6, exam | LP1, sample exam, checkpoints (formative) |
+| 2.2 | LP3, LP5, exam | LP1, LP2 listening, sample exam |
+| 4.2 | LP4, final product | |
+| 6.1 | LP4, final product | |
+| 3.2 | Final product | LP2, LP3, LP5, LP6 speaking |
+| 1.1 | Final product | LP2 speaking |
+| 1.2 | LP4, final product | LP3 writing and speaking |
+| CC3 3.2 | LP4, final product | |
+| 5.1 | LP6 piece 5, final product email | LP2, LP3, LP5 writing; checkpoints (formative) |
+| CC1 1.3 | Final product email | LP5 plan, LP6 email |
 
-## Step by step (teacher dashboard)
+## Terms
 
-`EL_STEP_CRITERIA` in `el-catalog.js` gives each step its criterion by the rule above; the dashboard shows it under each step. Steps not listed (recall, vocabulary, grammar) are language practice.
+- **Term 1** (LP1–LP3, LP5, LP6, checkpoints, exam on 18/20 Nov): 4.1, 2.2, 5.1 in the exam and the Learning Paths; 3.2, 1.1, 1.2 and CC1 1.3 as Learning Path practice.
+- **Term 2** (LP4 and the final product): 3.2, 5.1, 4.2, 6.1, 1.1, 1.2, CC1 1.3, CC3 3.2.
 
-| Activity | Steps and criteria |
-| --- | --- |
-| Getting started: Castanyada & Halloween (warm-up) | recall · words · read → 4.1 · listen → 2.1 · speak → 3.1 |
-| Celebrations around the world | recall · cards · practice · read → 4.1 · listen → 2.1 · grammar · mixed · write (not scored, 5.1) · speak → 3.1 |
-| Recall checkpoint 1 | check → 4.1, 5.1 (formative) |
-| Where traditions come from | recall · cards · practice · listen → 2.1 · grammar · mixed · write (not scored, 5.1) · speak → 3.1 |
-| Research it right | recall · read → 4.1 · sources → 4.2, 6.1 · respect → 1.2 · notes → 6.1 · credit → 6.2 · card → 6.2 |
-| Recall checkpoint 2 | check → 4.1, 5.1 (formative) |
-| Plan the day | recall · cards · practice · listen → 2.1 · grammar · mixed · write (not scored, 5.1, CE2 2.3) · speak → 3.1 |
-| Recall checkpoint 3 | check → 4.1, 5.1 (formative) |
-| Write to the head teacher | recall · cards · practice · read → 4.1 · register → 3.2 · grammar · write (not scored, 5.1) · speak → 3.1 |
-| Recall checkpoint 4 | check → 4.1, 5.1 (formative) |
-| Sample exam | read → 4.1 · listen → 2.1 · grammar · write → 5.1 |
-| Final product: Celebration Day Proposal | video → 3.1, 3.2 · email → 5.1 · submit |
-| Reflect | reflect |
-
-## Proposed fixes (labels only, waiting for approval)
-
-1. LP3: add 4.1 (its first step is a graded reading).
-2. LP4: add CE2 emprenedora 2.3 (Piece 4 is the timetable, roles and materials).
-3. LP5: add 3.1 (its last step is a spoken pitch rehearsal).
-4. Recall checkpoints: remove 4.1 (vocabulary and grammar from memory, no text to interpret).
-5. Final product: add 6.1, 4.2, 1.1, 1.2, CC1 1.3 and CE2 emprenedora 2.3 (the LS2 page already says they count).
-6. Reflect: remove 3.1 (written self-assessment).
-
-Open questions for Roger: marks per criterion on the teacher page; earlier evidence for 1.3 and CC1 1.3 before the final product.
+Exam formats: Roger (24 Oct) decides later; the first exam is fine for now. Recommendation: use the same reading log and listening chart formats in the exam.

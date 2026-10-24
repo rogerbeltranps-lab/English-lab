@@ -71,6 +71,25 @@ window.LP = {
         { r: 'daring', q: 'Why does Emma mention a “day of mourning”?', o: ['to show that not everybody sees the story in the same way', 'to say Thanksgiving is sad for everyone', 'to explain the turkey'] },
         { r: 'daring', q: 'Complete from the podcast: “People ___ light bonfires and wear masks.”', o: ['used to', 'use to', 'are used to'] }
       ] },
+    // LS criterion 2.2: a listening chart on two short videos of young people describing how they celebrate (what each speaker values, and the words, tone or images that show it).
+    // Videos: illustrated, voices generated with ElevenLabs v3 (Roger chose this, 24 Oct 2026); normal + slow copy + WebVTT. The teacher sees the chart on the dashboard.
+    { id: 'chart', type: 'step', tab: { ca: 'Graella d’escolta', en: 'Listening chart' }, title: { ca: 'Graella d’escolta: què és important per a ells?', en: 'Listening chart: what matters to them?' }, pill: { ca: 'Ho veu el professor', en: 'Your teacher sees it' },
+      intro: { ca: 'Mira cada vídeo dues vegades. La primera, per saber quina festa és. La segona, per descobrir què és important per a cada persona i com ho notes.', en: 'Watch each video twice: first to find the celebration, then to find what matters to each speaker and how you can tell.' },
+      html: { ca: '<div class="model"><strong>Valors per triar:</strong> la família · compartir menjar · la fe o les creences · recordar el passat · la comunitat · la llum i l’esperança · divertir-se · ajudar els altres</div><p class="tiny">Pista: fixa’t en les paraules que repeteixen, en el to de veu (content, emocionat, seriós) i en les imatges.</p>',
+        en: '<p class="tiny">Listen for the words they repeat, their tone of voice (excited, proud, calm, serious) and what the images show.</p>' },
+      media: { videos: [{ base: 'video/mei-lunar-new-year', title: 'Video 1 · Mei: Lunar New Year' }, { base: 'video/noah-hanukkah', title: 'Video 2 · Noah: Hanukkah' }], videoCredit: 'Illustrated videos made for English Lab. Voices generated with ElevenLabs.' },
+      fields: [
+        { id: 'v1', label: { ca: 'Vídeo 1 (Mei): què és important per a ella? (tria un valor de la llista)', en: 'Video 1 (Mei): what does she value? Say it in your own words.' }, rows: 2 },
+        { id: 'e1', label: { ca: 'Vídeo 1: una paraula o frase del vídeo que ho mostra', en: 'Video 1: the evidence: a phrase from the video, and the tone or the images that show it' }, rows: 2 },
+        { id: 'v2', label: { ca: 'Vídeo 2 (Noah): què és important per a ell? (tria un valor de la llista)', en: 'Video 2 (Noah): what does he value? Say it in your own words.' }, rows: 2 },
+        { id: 'e2', label: { ca: 'Vídeo 2: una paraula o frase del vídeo que ho mostra', en: 'Video 2: the evidence: a phrase from the video, and the tone or the images that show it' }, rows: 2 },
+        { r: 'daring', id: 'cmp', label: 'Compare Mei and Noah: what do they both value, and how are they different (words, tone, images)?', rows: 3 }
+      ],
+      rate: {
+        insecure: ['He mirat cada vídeo dues vegades', 'He triat un valor per a cada persona', 'He copiat una paraula o frase que ho demostra'],
+        safe: ['I watched each video twice', 'I explained what each speaker values', 'I backed it up with their words, tone or images'],
+        daring: ['I watched each video twice', 'I explained what each speaker values with precise evidence', 'I compared the two speakers']
+      } },
     { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Connectors, orígens i comparacions', en: 'Origins, relatives and comparing' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [

@@ -5,8 +5,8 @@ window.EL_PLAN={
   "4eso-seasons-and-celebrations":{
     note:"Starts 26 Oct 2026. 4ESO-A: Mon 8:30 · Wed 12:00 · Fri 13:00. 4ESO-B: Mon 15:00 · Tue 9:30 · Wed 10:30. Term 1 ends on 20 Nov, so the exam is in term 1 and the final product is in term 2 (its mark goes into the term 2 report). LP = Learning Path.",
     terms:{
-      1:{title:"Term 1 · Learning Paths and exam",assess:"Exam + Learning Path work · criteria 2.1, 4.1, 5.1, 3.1, 1.1"},
-      2:{title:"Term 2 · Final product",assess:"Final product (group pitch + individual email) · criteria 1.2–1.3, 3.1–3.2, 4.2, 6.1–6.2, CC1 1.3, CE2 2.3"}
+      1:{title:"Term 1 · Learning Paths and exam",assess:"Exam + Learning Path work · criteria 4.1, 2.2, 5.1 (exam and Learning Paths) · 3.2, 1.1, 1.2, CC1 1.3 (Learning Paths)"},
+      2:{title:"Term 2 · Final product",assess:"Final product (group pitch + individual email) and LP4 research card · criteria 3.2, 5.1, 4.2, 6.1, 1.1, 1.2, CC1 1.3, CC3 3.2"}
     },
     groups:["4ESO-A","4ESO-B"],
     rows:[
