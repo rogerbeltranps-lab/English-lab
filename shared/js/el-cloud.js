@@ -5,7 +5,8 @@ import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} f
 import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const CONFIG={apiKey:"AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE",authDomain:"english-lab-ietm.firebaseapp.com",projectId:"english-lab-ietm",storageBucket:"english-lab-ietm.firebasestorage.app",messagingSenderId:"100211300058",appId:"1:100211300058:web:aff85bd00c3a877e7af7e3"};
-const DOMAIN="ietramuntana.cat",TEACHERS=["roger.beltranps@gmail.com"],SKIP=/^(el_|firebase|debug)/;
+// Schools whose Google accounts can sign in as students. Add a new school by adding its domain here AND in firestore.rules.
+const DOMAINS=["ietramuntana.cat"],TEACHERS=["roger.beltranps@gmail.com"],SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
 
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
@@ -13,7 +14,7 @@ const origSet=Storage.prototype.setItem;
 let noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
-const isStudent=u=>!!u&&(u.email||"").toLowerCase().endsWith("@"+DOMAIN);
+const isStudent=u=>!!u&&DOMAINS.some(d=>(u.email||"").toLowerCase().endsWith("@"+d));
 
 // Which activity / LS is this page?
 const relPath=location.pathname.replace(/^.*?\/((2|4)eso\/.*)$/,"$1");
@@ -53,7 +54,7 @@ Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.te
 async function login(){
   const p=new GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
   const r=await signInWithPopup(auth,p);
-  if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Cal entrar amb el compte @"+DOMAIN+".")}
+  if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Sign in with your school account (@"+DOMAINS.join(", @")+").")}
 }
 // Shared school computers: never leak one student's local progress into another account.
 const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))};
@@ -108,7 +109,7 @@ async function gate(u){
   const info=await lsInfo(lsId),st=info.status;
   if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
   if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
-  if(!u||!isStudent(u)){block("Sign in with your school account","To do the activities you need to sign in with your @"+DOMAIN+" account (button at the bottom right).");return}
+  if(!u||!isStudent(u)){block("Sign in with your school account","To do the activities you need to sign in with your school account (@"+DOMAINS.join(", @")+") (button at the bottom right).");return}
   if(st==="hidden"){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
   if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   const a=EL_CATALOG.find(x=>x.id===actId);

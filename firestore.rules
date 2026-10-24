@@ -1,7 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@ietramuntana[.]cat'); }
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@(ietramuntana[.]cat)$'); }  // add schools: (ietramuntana[.]cat|newschool[.]cat) and in shared/js/el-cloud.js DOMAINS
     function isTeacher() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email in ['roger.beltranps@gmail.com']; }
     function lsOpen(ls) { return exists(/databases/$(database)/documents/ls/$(ls)) && get(/databases/$(database)/documents/ls/$(ls)).data.status == 'open'; }
 
