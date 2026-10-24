@@ -76,6 +76,7 @@ All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the
 
 ## Teacher dashboard
 - `teacher.html` is for Roger only and is written in **English** (the route-language rules apply to student pages, not to it).
+- A catalogue activity with `steps` (e.g. the LS2 final product) gets a "Final product steps" table: per student and step, the hand-in, self-assessment average and comment, read from the student's synced progress doc.
 - Its "Teaching plan" box shows each LS's week-by-week calendar from `shared/js/el-plan.js` (one entry per LS id, with terms, assessment per term and calendar notes). Update that file when a plan changes; school dates are in Roger's 2026–27 calendar (term 1 ends 20 Nov, term 2 ends 26 Feb).
 
 ## Content-first workflow

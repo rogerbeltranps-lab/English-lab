@@ -5,6 +5,7 @@
 // graded:true  = evaluated; enabled by the teacher and can be done ONCE (submit locks it), unless manual.
 // skip: done-keys not scored (LP writings are practised but not corrected yet; AI feedback only).
 // manual:true = scored by the teacher (not by counting actions); delivered through Google Classroom, not in this site.
+// steps: final-product steps (id, title) whose hand-ins (state.steps in the page's key) the dashboard shows; pieces: product-pieces key.
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 window.EL_LEVELS=[{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes."}];
 window.EL_LS=[
@@ -46,7 +47,7 @@ window.EL_CATALOG=(function(){
         L("write-to-the-head-teacher.html","Write to the head teacher",["3.2","4.1","5.1"],"ls2Email4ESO",7,{skip:["write"]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1"],"ls2Checkpoint44ESO",1,C),
         L("sample-exam.html","Sample exam",["2.1","4.1","5.1"],"ls2SampleExam4ESO",4,{graded:false}),
-        L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","1.3","3.1","3.2","4.2","5.1","6.1","6.2","CC1 1.3","CE2 2.3"],"ls2FinalProduct4ESO",0,{manual:true}),
+        L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","1.3","3.1","3.2","4.2","5.1","6.1","6.2","CC1 1.3","CE2 2.3"],"ls2FinalProduct4ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
         L("reflect.html","Reflect",["3.1"],"ls2Reflect4ESO",1,{graded:false})
       ];
     })()

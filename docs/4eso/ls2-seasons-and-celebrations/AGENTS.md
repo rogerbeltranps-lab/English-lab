@@ -19,6 +19,7 @@ Newest first. One line per decision; update a line instead of adding a contradic
 
 | Date | Decision |
 | --- | --- |
+| 2026-10-24 | Final product page: steps 0–5 (+ feedback to another group) use the engine's `step` panel type: individual task fields, self-assessment 1–4 per statement, optional comment, optional teammate ratings. Hand-ins are saved in `state.steps` of `ls2FinalProduct4ESO`; the teacher dashboard ("Final product steps") reads them from the synced progress doc. Self-assessment does not change the mark by itself. |
 | 2026-10-24 | Final product groups are same-route (Roger), formed by the teacher; individual marks for each student's part of the pitch and email, group marks for research, inclusion and plan, plus peer-assessed teamwork. Details in [final-product-assessment.md](final-product-assessment.md), draft. |
 | 2026-10-24 | Final product route requirements now ask every route for evidence of CC1 1.3 and CE2 2.3 at its level (Insecure: time + person per activity, one welcome idea; Safe: one inclusive decision; Daring: estimated cost). Rubric draft in [final-product-assessment.md](final-product-assessment.md), awaiting approval. |
 | 2026-10-24 | Final product tags in `el-catalog.js` now match its "What counts" box: 1.1–1.3, 3.1, 3.2, 4.2, 5.1, 6.1, 6.2, CC1 1.3, CE2 2.3 (approved by Roger). |

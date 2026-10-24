@@ -1,6 +1,6 @@
 # LS2 · Final product: groups, tasks and assessment · DRAFT
 
-Status: **proposal, 24 Oct 2026, awaiting Roger's approval.** Not on the site yet. Once approved: route texts and checklists in `4eso/seasons-and-celebrations/data/celebration-day-proposal.js`, rubrics in `final-rubric-data.js` with the shared renderer `shared/js/final-rubric.js` (as in LS1; Insecure in Catalan), peer assessment as a new step on the Final Product page.
+Status: **24 Oct 2026.** Approved by Roger and built: same-route groups, the individual task + self-assessment + comment at every step (section 2), shown on the teacher dashboard, and the teammate ratings. Still a proposal: weights, rubric descriptors, video length, pronunciation row (open questions at the end). Not on the site yet. Once approved: route texts and checklists in `4eso/seasons-and-celebrations/data/celebration-day-proposal.js`, rubrics in `final-rubric-data.js` with the shared renderer `shared/js/final-rubric.js` (as in LS1; Insecure in Catalan), peer assessment as a new step on the Final Product page.
 
 ## 1. Groups
 
