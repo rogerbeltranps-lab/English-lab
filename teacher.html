@@ -34,10 +34,11 @@ const S={g:GR[0].id,route:"all",ls:null,folded:new Set(),D:null};
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved; graded activities only if you enable them."],closed:["Closed","Students can only review what they did and the feedback."],public:["Public","Free access as before: no login and no scoring."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309",public:"#2563eb"};
 
-// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}}
+// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}, hp:{uid:[{id,ls,activity,text,status,reply}]}}
 async function load(){
   if(DEMO)return DEMO;
-  const D={st:{},rs:{},lv:{},pg:{},ls:{}},up=r=>r.ref.parent.parent.id;
+  const D={st:{},rs:{},lv:{},pg:{},ls:{},hp:{}},up=r=>r.ref.parent.parent.id;
+  (await F.getDocs(F.collectionGroup(db(),"help"))).forEach(h=>(D.hp[up(h)]=D.hp[up(h)]||[]).push(Object.assign({id:h.id},h.data())));
   (await F.getDocs(F.collection(db(),"students"))).forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()));
   (await F.getDocs(F.collectionGroup(db(),"results"))).forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data());
   (await F.getDocs(F.collectionGroup(db(),"levels"))).forEach(l=>(D.lv[up(l)]=D.lv[up(l)]||{})[l.id]=l.data());
@@ -54,7 +55,8 @@ const api={
   setLevel:(u,ls,level)=>{if(DEMO){const l=((S.D.lv[u]=S.D.lv[u]||{})[ls]=S.D.lv[u][ls]||{});l.level=level;delete l.request;return}return put(["students",u,"levels",ls],{level,request:F.deleteField()})},
   reject:(u,ls)=>DEMO?delete S.D.lv[u][ls].request:put(["students",u,"levels",ls],{request:F.deleteField()}),
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
-  ls:(id,o)=>DEMO?Object.assign(S.D.ls[id],o):put(["ls",id],o)
+  ls:(id,o)=>DEMO?Object.assign(S.D.ls[id],o):put(["ls",id],o),
+  help:(u,id,o)=>DEMO?Object.assign(S.D.hp[u].find(h=>h.id===id),o):put(["students",u,"help",id],o)
 };
 async function act(p){await p;if(!DEMO)S.D=await load();render()}
 
@@ -68,6 +70,8 @@ const steps=a=>EL_ACTIONS[a.id]||[];
 const doneSet=(u,a)=>{const p=(S.D.pg[u]||{})[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
 const stepCrit=(a,k)=>(a.skip||[]).includes(k)?'<small class="muted">not scored</small>':((((window.EL_STEP_CRITERIA||{})[a.id]||{})[k]||EL_EVIDENCE[k]||[]).map(pill).join("")||'<small class="muted" title="Language practice: no criterion linked">–</small>');
 const pts=a=>a.graded?(a.manual?"teacher mark":a.points+" pts"):"not graded";
+const openHelp=u=>((S.D.hp||{})[u]||[]).filter(h=>h.status!=="solved");
+const actTitle=id=>(cat.find(a=>a.id===id)||{}).title||id;
 const byName=(x,y)=>(x.name||x.email||"").localeCompare(y.name||y.email||"");
 function cell(u,a){ // text + class of an activity's score cell
   const x=(S.D.rs[u]||{})[a.id],d=doneSet(u,a);
@@ -77,6 +81,7 @@ function cell(u,a){ // text + class of an activity's score cell
   else{const n=steps(a).filter(k=>d.has(k)).length;t=steps(a).length?n+"/"+steps(a).length:"–";c="na"}
   if(x&&x.locked){t+=" ✔";c="sub"}else if(x&&x.markedDone){t+=" 🟡";c="mark"}
   if(x&&x.feedback)t+=" 💬";
+  if(openHelp(u).some(h=>h.activity===a.id))t+=" 🆘";
   if(x&&x.parts&&x.parts.first)t+=`<br><small title="First attempt (does not count)">1st try ${x.parts.first.score}/${x.parts.first.max}</small>`;
   return {t,c};
 }
@@ -97,14 +102,15 @@ function render(){
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
     +`<div class="box"><h2>To do</h2>${todo(inG,ls,list)}</div>`
     +((window.EL_PLAN||{})[ls]?`<div class="box"><details><summary>Teaching plan</summary>${plan(EL_PLAN[ls])}</details></div>`:"")
-    +`<div class="box"><h2>Learning paths and activities</h2><p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback.</p>
+    +`<div class="box"><h2>Learning paths and activities</h2><p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · 🆘 the student reported a problem.</p>
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"?" yet. Students choose their group the first time they sign in.":" with this route.")+"</p>"}</div>`
     +`<div class="box"><h2>Result per assessment criterion</h2><p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}</div>`
     +`<div class="box"><details><summary>LS status and graded activities</summary>${lsSettings(ls)}</details></div>`;
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
 }
 function todo(studs,ls,list){
-  const out=[];
+  const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
+  studs.forEach(s=>openHelp(s.uid).filter(h=>(EL_LS.find(l=>l.id===h.ls)||{}).course===course).forEach(h=>out.push(`🆘 <b>${name(s)}</b> has a problem with <b>${esc(actTitle(h.activity))}</b>: “${esc(h.text)}” <button data-do="helpopen" data-u="${s.uid}" data-h="${h.id}">Reply</button>`)));
   studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
     if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(l.level)} → ${route(l.request)} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Reject</button>`);
     list.filter(a=>a.graded&&!a.manual).forEach(a=>{const x=(S.D.rs[s.uid]||{})[a.id];
@@ -173,7 +179,13 @@ function stuPanel(u){
   dlg(`<h3>${name(s)}</h3><p class="muted">${esc(s.email)}</p>
     <label>Group</label>${groupSel(u,s.group)}
     <label>Route in ${EL_LS.find(x=>x.id===ls).title}</label><select data-do="setroute" data-u="${u}"><option value="">– not chosen –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${x.name}</option>`).join("")}</select>
-    <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`);
+    <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`
+    +((S.D.hp[u]||[]).length?`<label>Problems reported</label>${S.D.hp[u].map(h=>`<p>${h.status==="solved"?"✔":"🆘"} <b>${esc(actTitle(h.activity))}</b>: ${esc(h.text)}${h.reply?`<br><small class="muted">Your reply: ${esc(h.reply)}</small>`:""} ${h.status==="solved"?"":`<button class="g" data-do="helpopen" data-u="${u}" data-h="${h.id}">Reply</button>`}</p>`).join("")}`:""));
+}
+function helpPanel(u,id){
+  const s=S.D.st[u],h=S.D.hp[u].find(x=>x.id===id);
+  dlg(`<h3>🆘 ${name(s)}</h3><p class="muted">${esc(actTitle(h.activity))}</p><p>“${esc(h.text)}”</p><label>Your reply (the student sees it on their page)</label><textarea id="hrep">${esc(h.reply||"")}</textarea>
+    <div class="row"><button data-do="helpsave" data-u="${u}" data-h="${id}">Save and mark as solved</button></div>`);
 }
 function cellPanel(u,id){
   const s=S.D.st[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
@@ -192,6 +204,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     acc:()=>act(api.setLevel(u,S.ls,k.to)),rej:()=>act(api.reject(u,S.ls)),
     stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
+    helpopen:()=>helpPanel(u,k.h),helpsave:()=>{const o={status:"solved",reply:$("#hrep").value,solvedAt:DEMO?Date.now():F.serverTimestamp()};$("#dlg").close();act(api.help(u,k.h,o))},
     save:()=>{const o={feedback:$("#ffb").value};if(a.manual){const sc=$("#fsc").value,mx=$("#fmx").value;if(sc!==""&&mx!==""&&!isNaN(+sc)&&!isNaN(+mx)){o.score=+sc;o.max=+mx}}$("#dlg").close();act(api.result(u,a,o))},
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
     status:()=>{if(k.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;act(api.ls(S.ls,{status:k.s}))},
