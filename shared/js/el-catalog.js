@@ -46,7 +46,7 @@ window.EL_CATALOG=(function(){
         L("write-to-the-head-teacher.html","Write to the head teacher",["3.2","4.1","5.1"],"ls2Email4ESO",7,{skip:["write"]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1"],"ls2Checkpoint44ESO",1,C),
         L("sample-exam.html","Sample exam",["2.1","4.1","5.1"],"ls2SampleExam4ESO",4,{graded:false}),
-        L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.3","3.1","3.2","5.1","6.2"],"ls2FinalProduct4ESO",0,{manual:true}),
+        L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","1.3","3.1","3.2","4.2","5.1","6.1","6.2","CC1 1.3","CE2 2.3"],"ls2FinalProduct4ESO",0,{manual:true}),
         L("reflect.html","Reflect",["3.1"],"ls2Reflect4ESO",1,{graded:false})
       ];
     })()
