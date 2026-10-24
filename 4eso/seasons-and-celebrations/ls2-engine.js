@@ -134,6 +134,7 @@ var LS2 = (function () {
     if (m.youtube) h += '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' + m.youtube + '" title="' + esc(m.title || 'Video') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>' +
       '<div class="actions"><a class="btn secondary" href="https://www.youtube.com/watch?v=' + m.youtube + '" target="_blank" rel="noopener">Open on YouTube ↗</a></div>' + (m.credit ? '<p class="tiny">' + m.credit + '</p>' : '');
     if (m.audio) h += '<div class="audio-card"><strong>' + esc(m.title || 'Listening') + '</strong><audio class="audio-player" id="' + p.id + 'Audio" controls preload="none" src="' + m.audio + '"></audio>' +
+      (ca() ? '<div class="audio-row" id="' + p.id + 'Speed" hidden><button class="btn secondary" type="button" id="' + p.id + 'Slow">Versió més lenta</button></div>' : '') +
       '<div class="audio-row" id="' + p.id + 'Tts" hidden><button class="btn secondary" type="button" id="' + p.id + 'Speak">▶ ' + (ca() ? 'Escolta (veu de l’ordinador)' : 'Listen (computer voice)') + '</button><button class="btn secondary" type="button" id="' + p.id + 'Stop">■ Stop</button><span class="audio-status">' + (ca() ? 'L’àudio definitiu arribarà aviat.' : 'The final recording is coming soon.') + '</span></div></div>';
     return h;
   }
@@ -144,6 +145,17 @@ var LS2 = (function () {
     fetch(m.audio, { method: 'HEAD' }).then(r => { if (!r.ok) throw 0; }).catch(() => {
       $('#' + p.id + 'Audio').hidden = true; $('#' + p.id + 'Tts').hidden = false;
     });
+    // Insecure can switch to the slower copy (same audio, made with ffmpeg) when it exists.
+    const slowBtn = $('#' + p.id + 'Slow');
+    if (slowBtn) {
+      const slow = m.audio.replace(/\.mp3$/, '-slow.mp3');
+      fetch(slow, { method: 'HEAD' }).then(r => { if (r.ok) $('#' + p.id + 'Speed').hidden = false; }).catch(() => {});
+      slowBtn.onclick = () => {
+        const a = $('#' + p.id + 'Audio'), toSlow = !a.src.endsWith('-slow.mp3');
+        a.src = toSlow ? slow : m.audio;
+        slowBtn.textContent = toSlow ? 'Velocitat normal' : 'Versió més lenta';
+      };
+    }
     $('#' + p.id + 'Speak').onclick = () => {
       const synth = window.speechSynthesis; if (!synth) return;
       synth.cancel();
