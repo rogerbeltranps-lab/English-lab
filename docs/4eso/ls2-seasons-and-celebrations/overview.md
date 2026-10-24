@@ -752,9 +752,9 @@ Choose a celebration → Research (2+ sources) → Notes → Plan the event → 
 
 In groups of 3–4, design a respectful celebration day at school around one tradition. Submit a **2–3 minute group video with Google Slides, every member speaking with their face visible in picture-in-picture**, plus an **individual formal email** to the head teacher proposing the event.
 
-- **Insecure:** describe one celebration in short, supported sentences: what, when, where, three customs, one food or symbol. Plan three activities for the day. Email: guided template with gaps.
-- **Safe:** describe the celebration and compare it with a local one: similarities and differences. Explain its origin briefly. Plan the day with a timetable, roles and materials. Email: a full formal email in paragraphs.
-- **Daring:** explain the origin, meaning and how the tradition has changed over time. Justify every choice so the event is inclusive and avoids stereotypes or caricature costumes. Anticipate one concern from the head teacher and answer it in the email.
+- **Insecure:** describe one celebration in short, supported sentences: what, when, where, three customs, one food or symbol. Plan three activities for the day, each with a time and who does it, and give one idea so everyone feels welcome (added 24 Oct 2026, Roger). Email: guided template with gaps.
+- **Safe:** describe the celebration and compare it with a local one: similarities and differences. Explain its origin briefly. Plan the day with a timetable, roles and materials, and explain at least one decision that makes the event inclusive (added 24 Oct 2026, Roger). Email: a full formal email in paragraphs.
+- **Daring:** explain the origin, meaning and how the tradition has changed over time. Plan the day with a timetable, roles, materials and an estimated cost (added 24 Oct 2026, Roger). Justify every choice so the event is inclusive and avoids stereotypes or caricature costumes. Anticipate one concern from the head teacher and answer it in the email.
 
 Insecure keeps Catalan guidance at every step, with English examples linking source → notes → slide → spoken sentence → email sentence.
 

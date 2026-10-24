@@ -38,7 +38,7 @@ function render(){
   for(const ls of [...EL_LS].sort((a,b)=>((D.ls[b.id]||{}).status==="open")-((D.ls[a.id]||{}).status==="open"))){ // open LS first
     const info=D.ls[ls.id]||{status:"hidden",enabled:[]},st=info.status;
     if(st==="hidden"&&!teacher())continue;
-    if(g&&g.course!==ls.course&&!teacher())continue;   // only the student's own course
+    if(!teacher()&&!elLsForGroup(ls,info,D.me.group))continue;   // only the LSs assigned to the student's group
     any=true;
     const lvl=(D.lv[ls.id]||{}).level,items=EL_CATALOG.filter(a=>a.ls===ls.id);let ts=0,tm=0;
     items.forEach(a=>{const r=D.rs[a.id]||{};if(a.graded&&!a.manual&&r.markedDone&&!r.locked&&st==="open")pend.push(a);

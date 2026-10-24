@@ -5,10 +5,13 @@
 // graded:true  = evaluated; enabled by the teacher and can be done ONCE (submit locks it), unless manual.
 // skip: done-keys not scored (LP writings are practised but not corrected yet; "match" is vocabulary review, not submittable).
 // manual:true = scored by the teacher (not by counting actions); delivered through Google Classroom, not in this site.
+// steps: final-product steps (id, title) whose hand-ins (state.steps in the page's key) the dashboard shows; pieces: product-pieces key.
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 window.EL_LEVELS=[{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes."}];
 // Class groups. The student picks one the first time they sign in; the teacher can change it in the dashboard.
 window.EL_GROUPS=[{id:"2ESOA",course:"2eso",name:"2ESO A"},{id:"2ESOB",course:"2eso",name:"2ESO B"},{id:"4ESOA",course:"4eso",name:"4ESO A"},{id:"4ESOB",course:"4eso",name:"4ESO B"}];
+// Is an LS assigned to a group? ls/{id}.groups lists the groups (set in the teacher dashboard); without it, every group of the LS's course.
+window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=>x.id===gid);if(!g||!ls)return false;return info&&Array.isArray(info.groups)?info.groups.includes(gid):g.course===ls.course};
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine"},
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine"},
@@ -39,17 +42,17 @@ window.EL_CATALOG=(function(){
       return [
         L("getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["4.1","2.1","3.1"],"ls2GettingStarted4ESO",5,{graded:false}),
         L("celebrations-around-the-world.html","Celebrations around the world",["2.1","3.1","4.1","5.1"],"ls2Celebrations4ESO",8,{skip:["write"]}),
-        L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1"],"ls2Checkpoint14ESO",1,C),
+        L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint14ESO",1,C),
         L("where-traditions-come-from.html","Where traditions come from",["1.1","2.1","3.1","5.1"],"ls2Traditions4ESO",7,{skip:["write"]}),
         L("research-it-right.html","Research it right",["1.2","4.2","6.1","6.2"],"ls2Research4ESO",7),
-        L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1"],"ls2Checkpoint24ESO",1,C),
+        L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1","5.1"],"ls2Checkpoint24ESO",1,C),
         L("plan-the-day.html","Plan the day",["2.1","3.1","5.1"],"ls2Plan4ESO",7,{skip:["write"]}),
-        L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1"],"ls2Checkpoint34ESO",1,C),
+        L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint34ESO",1,C),
         L("write-to-the-head-teacher.html","Write to the head teacher",["3.2","4.1","5.1"],"ls2Email4ESO",7,{skip:["write"]}),
-        L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1"],"ls2Checkpoint44ESO",1,C),
+        L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint44ESO",1,C),
         L("sample-exam.html","Sample exam",["2.1","4.1","5.1"],"ls2SampleExam4ESO",4,{graded:false}),
-        L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.3","3.1","3.2","5.1","6.2"],"ls2FinalProduct4ESO",0,{manual:true}),
-        L("reflect.html","Reflect",["3.1"],"ls2Reflect4ESO",1,{graded:false})
+        L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","1.3","3.1","3.2","4.2","5.1","6.1","6.2","CC1 1.3","CE2 2.3"],"ls2FinalProduct4ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
+        L("reflect.html","Reflect",[],"ls2Reflect4ESO",1,{graded:false})
       ];
     })()
   ];
@@ -80,7 +83,7 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
 // LS2 4ESO Seasons & Celebrations: steps per page (as ls2-engine.js records them) and the criterion each step gives evidence for,
 // by the skill it practises (docs/4eso/ls2-seasons-and-celebrations/assessment-criteria.md). Recall, vocabulary and grammar steps are language practice.
 (function(){
-  const LP=["recall","cards","practice"],ck={check:[]};
+  const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]};
   Object.assign(window.EL_ACTIONS,{
     "4eso/ls2-getting-started":["recall","words","read","listen","speak"],
     "4eso/ls2-celebrations-around-the-world":[...LP,"read","listen","grammar","mixed","write","speak"],

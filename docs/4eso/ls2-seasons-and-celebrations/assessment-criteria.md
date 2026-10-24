@@ -17,10 +17,10 @@
 | LP3 Research it right | Reading · sources · information, not belief · notes · credits · Piece 3 | 1.2, 4.2, 6.1, 6.2 | **4.1**, 1.2, 4.2, 6.1, 6.2 |
 | LP4 Plan the day | Council listening · Piece 4 event plan · speaking: planning meeting | 2.1, 3.1, 5.1 | 2.1, 3.1, 5.1, **CE2 emprenedora 2.3** |
 | LP5 Write to the head teacher | Model email reading · register · Piece 5 email · pitch rehearsal | 3.2, 4.1, 5.1 | 3.2, 4.1, 5.1, **3.1** |
-| Recall checkpoints 1–4 | Vocabulary and grammar recall, no text | 4.1 | **none** (language knowledge, the Sabers) |
+| Recall checkpoints 1–4 | Vocabulary and grammar recall, no text | 4.1, 5.1 formative (fixed 24 Oct 2026) | **4.1, 5.1 as formative evidence** (the sabers recalled, used in written sentences) |
 | Sample exam (not graded) | Reading · listening · grammar · writing | 2.1, 4.1, 5.1 | 2.1, 4.1, 5.1 |
-| Final product | Group video pitch · research and credits · event plan · individual email | 1.3, 3.1, 3.2, 5.1, 6.2 | 1.3, 3.1, 3.2, 5.1, 6.2, **6.1, 4.2, 1.1, 1.2, CC1 1.3, CE2 emprenedora 2.3** |
-| Reflect (not graded) | Written self-assessment | 3.1 | **none** (self-regulation, not speaking) |
+| Final product | Group video pitch · research and credits · event plan · individual email | 1.1, 1.2, 1.3, 3.1, 3.2, 4.2, 5.1, 6.1, 6.2, CC1 1.3, CE2 2.3 (fixed 24 Oct 2026) | 1.1, 1.2, 1.3, 3.1, 3.2, 4.2, 5.1, 6.1, 6.2, CC1 1.3, CE2 2.3 |
+| Reflect (not graded) | Written self-assessment | none (fixed 24 Oct 2026) | **none** (self-regulation, not speaking) |
 
 ## Criterion by criterion
 
@@ -48,14 +48,14 @@
 | --- | --- |
 | Getting started: Castanyada & Halloween (warm-up) | recall · words · read → 4.1 · listen → 2.1 · speak → 3.1 |
 | Celebrations around the world | recall · cards · practice · read → 4.1 · listen → 2.1 · grammar · mixed · write (not scored, 5.1) · speak → 3.1 |
-| Recall checkpoint 1 | check |
+| Recall checkpoint 1 | check → 4.1, 5.1 (formative) |
 | Where traditions come from | recall · cards · practice · listen → 2.1 · grammar · mixed · write (not scored, 5.1) · speak → 3.1 |
 | Research it right | recall · read → 4.1 · sources → 4.2, 6.1 · respect → 1.2 · notes → 6.1 · credit → 6.2 · card → 6.2 |
-| Recall checkpoint 2 | check |
+| Recall checkpoint 2 | check → 4.1, 5.1 (formative) |
 | Plan the day | recall · cards · practice · listen → 2.1 · grammar · mixed · write (not scored, 5.1, CE2 2.3) · speak → 3.1 |
-| Recall checkpoint 3 | check |
+| Recall checkpoint 3 | check → 4.1, 5.1 (formative) |
 | Write to the head teacher | recall · cards · practice · read → 4.1 · register → 3.2 · grammar · write (not scored, 5.1) · speak → 3.1 |
-| Recall checkpoint 4 | check |
+| Recall checkpoint 4 | check → 4.1, 5.1 (formative) |
 | Sample exam | read → 4.1 · listen → 2.1 · grammar · write → 5.1 |
 | Final product: Celebration Day Proposal | video → 3.1, 3.2 · email → 5.1 · submit |
 | Reflect | reflect |

@@ -11,7 +11,7 @@ const ROOT=new URL("../../",import.meta.url);
 
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
+let myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isStudent=u=>!!u&&DOMAINS.some(d=>(u.email||"").toLowerCase().endsWith("@"+d));
@@ -27,7 +27,7 @@ const snapshot=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=lo
 const progressRef=()=>doc(db,"students",user.uid,"progress",lsId);
 const levelRef=(uid,ls)=>doc(db,"students",uid,"levels",ls);
 
-async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:s.data().status||"hidden",enabled:s.data().enabled||[]}:{status:"hidden",enabled:[]}}catch(e){return {status:"hidden",enabled:[]}}}
+async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:s.data().status||"hidden",enabled:s.data().enabled||[],groups:s.data().groups||null}:{status:"hidden",enabled:[],groups:null}}catch(e){return {status:"hidden",enabled:[]}}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
 async function pull(){
@@ -54,7 +54,8 @@ Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.te
 async function login(){
   const p=new GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
   const r=await signInWithPopup(auth,p);
-  if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Sign in with your school account (@"+DOMAINS.join(", @")+").")}
+  if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Sign in with your school account (@"+DOMAINS.join(", @")+").");return}
+  if(isStudent(r.user)&&!onBoard)location.href=BOARD;   // students always start on their board
 }
 // Shared school computers: never leak one student's local progress into another account.
 const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))};
@@ -77,7 +78,7 @@ function overlay(html){
   o.style.cssText="position:fixed;inset:0;z-index:10000;background:#f8fafc;display:grid;place-items:center;font:16px system-ui,sans-serif;text-align:center;padding:20px;overflow:auto";
   o.innerHTML=html;document.body.append(o);return o;
 }
-const todayLink='<p><a href="'+new URL("today.html",ROOT).href+'">Back to my activities</a></p>';
+const todayLink='<p><a href="'+new URL("today.html",ROOT).href+'">Torna al meu tauler</a></p>';
 const block=(title,msg)=>overlay('<div><h1>'+title+'</h1><p>'+msg+'</p>'+todayLink+'</div>');
 
 function chooseLevel(u){
@@ -92,7 +93,8 @@ function chooseLevel(u){
 // Class group: asked once, on the first sign-in; afterwards only the teacher changes it.
 async function ensureGroup(u){
   const s=await getDoc(doc(db,"students",u.uid)).catch(()=>null);
-  if(!window.EL_GROUPS||(s&&s.exists()&&s.data().group))return;
+  if(!window.EL_GROUPS)return null;
+  if(s&&s.exists()&&s.data().group)return s.data().group;
   return new Promise(res=>{
     const o=overlay('<div style="max-width:520px"><h1>Tria el teu grup</h1><p>Només ho hauràs de fer una vegada. Si t\'equivoques, avisa el professor.</p><div id="el-gr"></div></div>');
     EL_GROUPS.forEach(g=>{const b=document.createElement("button");b.innerHTML="<b>"+g.name+"</b>";
@@ -116,12 +118,20 @@ async function requestLevel(u){
   alert("Petició enviada al professor.");
 }
 
+// Students only use their board, their own course page and the LSs assigned to their group.
+const BOARD=new URL("today.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname);
+const courseOf=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
 async function gate(u){
+  if(isStudent(u)&&!lsId&&!onBoard){
+    const c=relPath.match(/^((2|4)eso)\/(index\.html)?$/);
+    if(!(c&&c[1]===courseOf(myGroup))){location.replace(BOARD);return}
+  }
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
   if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
   if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){block("Sign in with your school account","To do the activities you need to sign in with your school account (@"+DOMAINS.join(", @")+") (button at the bottom right).");return}
+  if(!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block("Aquesta LS no és del teu grup","Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.");return}
   if(st==="hidden"){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
   if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   const a=EL_CATALOG.find(x=>x.id===actId);
@@ -186,7 +196,7 @@ const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=b
 onAuthStateChanged(auth,async u=>{
   user=u;draw(u);
   if(u&&isStudent(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){if(prev!==null&&prev!==u.uid)wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
-  if(u&&isStudent(u))try{await ensureGroup(u)}catch(e){console.warn("group",e)}
+  if(u&&isStudent(u))try{myGroup=await ensureGroup(u)}catch(e){console.warn("group",e)}
   try{await gate(u)}catch(e){console.warn("gate",e)}
   listeners.forEach(f=>f(u));
 });
