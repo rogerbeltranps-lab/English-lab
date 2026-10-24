@@ -4,10 +4,32 @@
   "start_url": "/English-lab/",
   "scope": "/English-lab/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2f7fd8",
+  "background_color": "#238be0",
+  "theme_color": "#238be0",
   "icons": [
-    {"src": "/English-lab/favicon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "/English-lab/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+    {
+      "src": "/English-lab/android-chrome-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/English-lab/android-chrome-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/English-lab/android-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/English-lab/android-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
