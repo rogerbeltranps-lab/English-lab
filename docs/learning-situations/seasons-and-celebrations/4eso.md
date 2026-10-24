@@ -1,6 +1,6 @@
 # 4ESO · Seasons & Celebrations (LS2): activity content
 
-**Approved by Roger on 23 Oct 2026.** Implementation notes: Learning Path 1 uses a real Halloween video and Learning Path 2 adds a real BBC video about Diwali (Roger asked for real listenings mixed with ElevenLabs ones); the respectful-wording and note-taking tasks in Research it right are multiple choice on every route. Built from the LS2 section of *Learning Situations 4t ESO* (Roger Beltran, 21 Oct 2026) and the approved organization proposal. Nothing here is implemented until Roger approves it. Final Product, vocabulary and grammar come from the programme. Texts, scripts and question items are new drafts.
+**Approved by Roger on 23 Oct 2026.** **24 Oct 2026:** Roger approved one reading text per route (Insecure and Daring versions added to the data files; the original texts are the Safe versions) with one new Daring question per reading, and the new Learning Path 1 video script below. Implementation notes: Learning Path 1 uses a real Halloween video and Learning Path 2 adds a real BBC video about Diwali (Roger asked for real listenings mixed with ElevenLabs ones); the respectful-wording and note-taking tasks in Research it right are multiple choice on every route. Built from the LS2 section of *Learning Situations 4t ESO* (Roger Beltran, 21 Oct 2026) and the approved organization proposal. Nothing here is implemented until Roger approves it. Final Product, vocabulary and grammar come from the programme. Texts, scripts and question items are new drafts.
 
 ## 0. Rules that apply to every page
 
@@ -56,28 +56,37 @@
 13. [S] On a cold night, our living room feels warm and ___. → *cosy*
 14. [S] We go to the farm to ___ fruit. → *pick*
 
-### Listening: *Autumn in two places* (video call, about 1 min 30 s)
+### Listening: *Autumn in two places* (illustrated video, about 2 min 15 s)
 
-> **Núria:** Hi Josh! How's the weather in Manchester?
-> **Josh:** Cold and rainy, as usual! The clocks went back last weekend, so it gets dark really early now, at about half past four.
-> **Núria:** Here it's still quite mild. It's sunny in the afternoon, but the mornings are cool and foggy.
-> **Josh:** Lucky you! What do you do at the end of October?
-> **Núria:** We celebrate the Castanyada on the thirty-first. We roast chestnuts and sweet potatoes, and we eat panellets. They're little sweets made with almonds and pine nuts.
-> **Josh:** Sounds delicious. We have Halloween on the same night. Kids dress up in costumes and go trick or treating. My little brother is going as a skeleton this year.
-> **Núria:** Do you carve pumpkins?
-> **Josh:** Yes, every year. My mum always makes pumpkin soup with the inside. What about you? Do you dress up?
-> **Núria:** Some people do now, but for me the Castanyada is about family. We eat together at my grandparents' house. It's cosy and relaxed.
-> **Josh:** That's nice. I love autumn. The leaves change colour and the parks look amazing.
-> **Núria:** Me too. It's my favourite season.
+*Revised and approved by Roger on 24 Oct 2026: it replaces the real Halloween video as the main listening. The Fun Easy English video stays as an optional extra with no questions. Pitched at Safe level for every route (AGENTS.md). Words in bold pop up on screen with a picture; italics are receptive only. Versions: no subtitles, subtitles, and slower for Insecure. Audio with ElevenLabs only when Roger gives permission for that generation.*
+
+> **Núria:** Hi Josh! Can you hear me? How's the weather in Manchester?
+> **Josh:** Hi Núria! Cold and **rainy**, as usual. It's really **chilly** in the mornings, and there was **frost** on the cars today. It feels like **winter** already!
+> **Núria:** Frost already? Here it's still quite **mild**. It's **sunny** in the afternoon, but the mornings are **cool** and **foggy**.
+> **Josh:** Lucky you! And **the clocks went back** last weekend, so **it gets dark** really **early** now, at about half past four.
+> **Núria:** Half past four? Wow! Here **the days get shorter** too, but it's not that bad.
+> **Josh:** So what do you do in autumn?
+> **Núria:** It's **harvest** time here, so there's lots of **seasonal** food. Last Sunday I went to the forest with my dad to pick **mushrooms**.
+> **Josh:** Nice! We went to a farm to **pick apples**, and my mum made an apple pie.
+> **Núria:** And on the thirty-first of October we celebrate the Castanyada. We roast **chestnuts** and **sweet potatoes**, and we eat *panellets*. They're little sweets made with **nuts**, like almonds and pine nuts. At school, a teacher always dresses up as a *castanyera*, an old woman who sells roasted chestnuts.
+> **Josh:** Sounds delicious! We have Halloween on the same night. Kids dress up in costumes and go *trick or treating*. My little brother is going as a skeleton this year. He's so **excited**!
+> **Núria:** Do you *carve pumpkins*?
+> **Josh:** Yes, every year. My mum always makes **pumpkin** soup with the inside. But my brother gets **scared** of the pumpkin faces in the dark! What about you? Do you dress up?
+> **Núria:** Some people do now. But for me the Castanyada is about family. We eat together at my grandparents' house. It's **cosy** and **relaxed**, and I feel **grateful** for that. I'm **proud** of our tradition.
+> **Josh:** That's really nice. I love autumn. **The leaves change colour**, and when **the leaves fall** from the **trees**, the parks look amazing.
+> **Núria:** Me too. **Autumn** is my favourite season. Happy Halloween, Josh!
+> **Josh:** **Happy** Castanyada! Save me some panellets!
 
 1. [I] What's the weather like in Manchester? **cold and rainy** / sunny and warm / foggy and mild
-2. [I] When does it get dark in Manchester? **at about 4.30** / at about 6.30 / at about 8.00
-3. [I] What are panellets? **sweets with almonds and pine nuts** / roasted sweet potatoes / a kind of soup
-4. [I] What does Josh's mum make? **pumpkin soup** / panellets / roasted chestnuts
-5. [I] For Núria, the Castanyada is mainly about… **family** / costumes / fireworks
-6. [S] Why does it get dark so early in Manchester now? **The clocks went back.** / It's always foggy. / It's winter.
-7. [S] True or false: nobody in Catalonia dresses up at the end of October. **False** (some people do now)
-8. [D] What does Núria's last part show? **She prefers a family tradition to costumes.** / She thinks Halloween is bad. / She doesn't like autumn.
+2. [I] What was on the cars in Manchester this morning? **frost** / snow / leaves
+3. [I] When does it get dark in Manchester? **at about 4.30** / at about 6.30 / at about 8.00
+4. [I] What did Núria do last Sunday? **She picked mushrooms in the forest.** / She picked apples at a farm. / She roasted chestnuts.
+5. [I] What are panellets? **sweets with almonds and pine nuts** / roasted sweet potatoes / a kind of soup
+6. [I] What does Josh's mum make? **pumpkin soup** / panellets / roasted chestnuts
+7. [I] For Núria, the Castanyada is mainly about… **family** / costumes / fireworks
+8. [S] Why does it get dark so early in Manchester now? **The clocks went back.** / It's always foggy. / The weather is bad.
+9. [S] True or false: nobody in Catalonia dresses up at the end of October. **False** (some people do now, and a teacher dresses up as a castanyera)
+10. [D] What does Núria's last part show? **She prefers a family tradition to costumes.** / She thinks Halloween is bad. / She doesn't like autumn.
 
 ### Speaking mini-challenge (record, transcript, AI feedback)
 
