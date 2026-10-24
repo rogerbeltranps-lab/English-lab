@@ -4,6 +4,7 @@ Read the [root AGENTS.md](../../../AGENTS.md) first; this file adds what is spec
 
 - **Content:** [overview.md](overview.md) (draft for review; website extracts are not automatically approved). The 2ESO teaching programme is still to come from Roger; it will be saved as `docs/2eso/programme.md`.
 - **Pages:** `2eso/my-real-routine/`.
+- **Activities and criteria:** [assessment-criteria.md](assessment-criteria.md) maps each activity step to the LS1 assessment criteria (proposal).
 
 ## Final Product
 

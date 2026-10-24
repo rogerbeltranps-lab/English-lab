@@ -4,6 +4,7 @@ Read the [root AGENTS.md](../../../AGENTS.md) first; this file adds what is spec
 
 - **Content:** [overview.md](overview.md) (draft for review; website extracts are not automatically approved). Programme: [LS1 in the 4ESO programme](../programme.md#ls1--4eso--my-real-routine).
 - **Pages:** `4eso/my-real-routine/`.
+- **Activities and criteria:** [assessment-criteria.md](assessment-criteria.md) maps each activity step to the LS1 assessment criteria (proposal).
 
 ## Final Product
 

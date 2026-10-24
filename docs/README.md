@@ -12,6 +12,7 @@ docs/
     ls1-my-real-routine/
       AGENTS.md                  rules and dated decisions for this LS
       overview.md                the course content (three routes)
+      assessment-criteria.md     activities mapped to the assessment criteria
     ls2-seasons-and-celebrations/
       AGENTS.md
       overview.md
@@ -21,6 +22,7 @@ docs/
     ls1-my-real-routine/
       AGENTS.md
       overview.md
+      assessment-criteria.md     activities mapped to the assessment criteria
   archive/                       old drafts, for reference only
 ```
 
