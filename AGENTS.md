@@ -15,10 +15,11 @@ Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
 - **English remains the target language** for vocabulary, listening/reading input, model sentences, interview questions where appropriate, slide content and student production. Do not translate these into Catalan when adding scaffolding.
 - Reuse route-aware support such as `shared/js/learning-path-support.js` where appropriate; verify language updates correctly when switching routes.
 
-## Levels, listenings and videos
+## Levels, listenings, videos and readings
 - Each route has the level agreed in the course's teaching programme. **4ESO:** Insecure = A2 / A2+ with support, Safe = B1, Daring = B1 / B1+. Content marked as a B1+ extension goes only to Daring. For other courses, use the levels in that course's programme and ask the user if they are missing.
 - **Listenings and videos are pitched at the Safe level**, and every route hears the same input. Do not write separate scripts per route.
 - **The activities around that input adapt to each route's level:** questions, tasks, support, hints and the language of instructions. Insecure gets easier questions, support in Catalan and, where possible, a slower version of the audio. Daring gets the more demanding questions (inference, comparison, opinion).
+- **Reading texts are different: they vary by route.** Each route reads a version written at its own level (for 4ESO: A2 / A2+ for Insecure, B1 for Safe, B1 / B1+ for Daring), on the same topic and with the same key information, so the whole class can share the content. Adapt length, sentence complexity, vocabulary and grammar to the level; the questions follow the route's text.
 - Mix real, level-appropriate listenings with generated ones. Never call a paid generation service (for example ElevenLabs) or spend its credits without the user's explicit permission for that specific generation. An approved script is not permission to generate.
 
 ## Grammar
