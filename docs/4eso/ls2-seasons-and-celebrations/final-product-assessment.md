@@ -1,6 +1,6 @@
 # LS2 · Final product: groups, tasks and assessment
 
-Status: **approved by Roger on 24 Oct 2026 and built; revised the same day for the new programme** (branch `ls2-new-criteria`: new parts, script in step 3, three sources for Safe and Daring, rubric with one row per LS criterion; weights waiting for Roger's OK). Page: `4eso/seasons-and-celebrations/celebration-day-proposal.html` (steps 0–5, feedback to another group, Rubric tab from `final-rubric-data.js`). Decisions on the open questions: weights as in section 5, video 2–3 minutes with shorter parts (Insecure 40–60 s, Safe and Daring 35–45 s), pronunciation was assessed inside "My part" until the revised programme dropped 3.1.
+Status: **approved by Roger on 24 Oct 2026 and built; revised the same day for the new programme** (PR #54, live since 24 Oct: new parts, script in step 3, three sources for Safe and Daring, rubric with one row per LS criterion; weights waiting for Roger's OK). Page: `4eso/seasons-and-celebrations/celebration-day-proposal.html` (steps 0–5, feedback to another group, Rubric tab from `final-rubric-data.js`). Decisions on the open questions: weights as in section 5, video 2–3 minutes with shorter parts (Insecure 40–60 s, Safe and Daring 35–45 s), pronunciation was assessed inside "My part" until the revised programme dropped 3.1.
 
 ## 1. Groups
 

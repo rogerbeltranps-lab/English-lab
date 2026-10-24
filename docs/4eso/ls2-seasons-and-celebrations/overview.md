@@ -191,7 +191,7 @@ Matching: the route's studied expressions (existing matching rules). Gap-fill:
 
 ### Reading log (LS criterion 4.1, hand-in the teacher sees)
 
-*Added 24 Oct 2026 for the revised programme (branch `ls2-new-criteria`, waiting for Roger's approval).*
+*Added 24 Oct 2026 for the revised programme (PR #54, live since 24 Oct 2026).*
 
 After the reading, students log two of the four celebrations: what, when and where · the main customs (2–3) · two words they worked out from context, with the clue in the text. **Insecure** logs Diwali and Lunar New Year with Catalan labels; **Safe and Daring** choose the two texts; **Daring** adds why one custom matters to the people who celebrate it (an inference). Model on the page: Hanukkah (*Jewish festival · December · eight nights · at home · one more candle every night · food cooked in oil · menorah = a candle holder, clue: "families light one more candle on a menorah"*). Self-assessment: short notes in my own words · main customs, not small details · two words from context.
 
@@ -307,7 +307,7 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 
 ### Listening chart (LS criterion 2.2, hand-in the teacher sees)
 
-*Added 24 Oct 2026 for the revised programme (branch `ls2-new-criteria`, waiting for Roger's approval).*
+*Added 24 Oct 2026 for the revised programme (PR #54, live since 24 Oct 2026).*
 
 Two illustrated videos made for English Lab ("How I celebrate"), each with a slower version (85 %) and English subtitles, in `4eso/seasons-and-celebrations/video/`: **Mei** (15, Manchester) on Lunar New Year, about 59 s (slow 71 s), and **Noah** (16, London) on Hanukkah, about 62 s (slow 74 s). Voices: ElevenLabs v3, Emilia (Mei) and Asher (Noah), picked by Roger. Values they show: Mei, family and being together, good luck, community (the dragon dance), and that not every family celebrates the same way; Noah, remembering the past, faith and tradition, family, light and hope. For each speaker: what they value, and the words, tone or images that show it. **Insecure** picks the value from a list in Catalan (family · sharing food · faith or beliefs · remembering the past · community · light and hope · having fun · helping others) and copies one word or phrase; **Daring** also compares the two speakers. Self-assessment: watched each video twice · named what each speaker values · backed it up with words, tone or images.
 
@@ -442,7 +442,7 @@ Put the parts in order: **"Title of the page", Website or author, Year.** Exampl
 
 ### Product piece 3: research card (filled in with the group, handed in individually)
 
-*Added 24 Oct 2026 for the revised programme (branch `ls2-new-criteria`, waiting for Roger's approval).* The card is now a hand-in the teacher sees (LS criteria 4.2, 6.1, CC3 3.2) and is still saved as piece 3.
+*Added 24 Oct 2026 for the revised programme (PR #54, live since 24 Oct 2026).* The card is now a hand-in the teacher sees (LS criteria 4.2, 6.1, CC3 3.2) and is still saved as piece 3.
 
 | Field | Insecure | Safe | Daring |
 | --- | --- | --- | --- |
@@ -769,7 +769,7 @@ Insecure answers the [I] items (8) · Safe [I] + [S] (11) · Daring all (13).
 
 ## Final Product: Celebration Day Proposal (from the programme)
 
-**Revised 24 Oct 2026 (programme revised the same day; branch `ls2-new-criteria`, waiting for Roger's approval).** Every route now says what the celebration means for the people who celebrate it and why it belongs at school (1.1), names one stereotype, why it is unfair and how the plan avoids it (CC3 3.2), and puts two welcome actions in the email (CC1 1.3). Insecure also says one thing in common with a local celebration (1.2). Safe and Daring groups use three sources and every route rates its sources with two reasons (4.2, 6.1). Step 3 asks for a script, what changed after the rehearsal and key notes (3.2). Parts, steps and rubric: [final-product-assessment.md](final-product-assessment.md); indicators: [indicators.md](indicators.md).
+**Revised 24 Oct 2026 (programme revised the same day; PR #54, live since 24 Oct 2026).** Every route now says what the celebration means for the people who celebrate it and why it belongs at school (1.1), names one stereotype, why it is unfair and how the plan avoids it (CC3 3.2), and puts two welcome actions in the email (CC1 1.3). Insecure also says one thing in common with a local celebration (1.2). Safe and Daring groups use three sources and every route rates its sources with two reasons (4.2, 6.1). Step 3 asks for a script, what changed after the rehearsal and key notes (3.2). Parts, steps and rubric: [final-product-assessment.md](final-product-assessment.md); indicators: [indicators.md](indicators.md).
 
 Choose a celebration → Research (Insecure 2 sources; Safe and Daring 3) → Notes → Plan the event → Google Slides → Record group pitch → Write formal email → Review → Submit.
 

@@ -67,7 +67,7 @@ const api={
   reject:(u,ls)=>DEMO?delete S.D.lv[u][ls].request:put(["students",u,"levels",ls],{request:F.deleteField()}),
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
   ls:(id,o)=>DEMO?Object.assign(S.D.ls[id],o):put(["ls",id],o),
-  // answer to a hand-in step (final product, reading log, listening chart, research card): results/{activity}.replies[step]; the student sees it on their page
+  // answer to a final-product step: results/{activity}.replies[step]; the student sees it on their page
   reply:(u,a,step,text)=>{if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{}),x=(r[a.id]=r[a.id]||{ls:a.ls,activity:a.id});(x.replies=x.replies||{})[step]=text;return}return put(["students",u,"results",resKey(a.id)],{ls:a.ls,activity:a.id,replies:{[step]:text}})}
 };
 async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save: "+e.message)}if(!DEMO)S.D=await load();render()}
@@ -135,7 +135,7 @@ function render(){
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
-    +`<div class="box"><h2>Learning paths and activities</h2>${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a student’s comment on a hand-in waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
+    +`<div class="box"><h2>Learning paths and activities</h2>${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
     +`<div class="box">${fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`
@@ -200,7 +200,7 @@ function plan(p,grp){let t=0; // week-by-week calendar from shared/js/el-plan.js
   const what=r=>r.g?(gi>=0?esc(r.g[gi]):p.groups.map((x,i)=>`<b>${esc(x)}</b>\n`+esc(r.g[i]||"")).join("\n")):esc(r.what);
   return `<p class="muted">${esc(p.note)}</p><table class="plan"><tr><th>When</th><th>${gi>=0?esc(grp.name):"What"}</th><th>Calendar</th></tr>`+p.rows.map(r=>{let h="";if(r.term!==t){t=r.term;const T=p.terms[t]||{};h=`<tr class="t"><td colspan="3">${esc(T.title)}<br><small class="muted">Assessment: ${esc(T.assess)}</small></td></tr>`}
     return h+`<tr><td>${esc(r.when)}</td><td style="white-space:pre-line">${what(r)}</td><td class="muted">${esc(r.note||"")}</td></tr>`}).join("")+`</table>${p.extra?`<p class="muted">${esc(p.extra)}</p>`:""}`}
-// Hand-ins (catalogue `steps`: final product steps, LP2 reading log, LP3 listening chart, LP4 research card): saved by the page in state.steps of its progress key; pieces in a.pieces.
+// Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},rp=((S.D.rs[u]||{})[a.id]||{}).replies||{};
   return `<label>Hand-ins and self-assessment</label>`+a.steps.map(([id,title])=>{const x=sp[id];if(!x)return `<details><summary class="muted">${esc(title)} · not handed in</summary></details>`;
