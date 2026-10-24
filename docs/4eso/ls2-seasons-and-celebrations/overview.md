@@ -732,7 +732,8 @@ Insecure answers the [I] items (8) · Safe [I] + [S] (11) · Daring all (13).
 
 - **Vocabulary games** (in class, not graded): the existing six games with the LS2 route vocabulary, cumulative across LPs. Only studied expressions are accepted (existing rules).
 - **Flashcards:** one deck per route with all LS2 vocabulary, each card showing which LP it comes from.
-- **Sample exam** (week 8, practice, same format as LS1):
+- **Sample exam** (approved by Roger on 24 Oct 2026, replacing the shorter draft below): LS1 format, 35 questions per route, taken the session before the real exam as a diagnostic. The approved items are in `4eso/seasons-and-celebrations/data/sample-exam-insecure.js`, `-safe.js` and `-daring.js`. Earlier draft, kept for reference:
+- **Sample exam, earlier draft** (week 8, practice, same format as LS1):
   - **Reading:** *Two winter traditions*
 
     > In Catalonia, many families have a Caga Tió at Christmas. It is a small log with a face, a red hat and a blanket. From 8 December, children "feed" it every night and keep it warm. On Christmas Eve or Christmas Day, they hit it with sticks and sing a song, and the log "gives" them sweets and small presents.
