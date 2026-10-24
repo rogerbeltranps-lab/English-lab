@@ -89,6 +89,18 @@ function chooseLevel(u){
       o.querySelector("#el-lv").append(b)});
   });
 }
+// Class group: asked once, on the first sign-in; afterwards only the teacher changes it.
+async function ensureGroup(u){
+  const s=await getDoc(doc(db,"students",u.uid)).catch(()=>null);
+  if(!window.EL_GROUPS||(s&&s.exists()&&s.data().group))return;
+  return new Promise(res=>{
+    const o=overlay('<div style="max-width:520px"><h1>Tria el teu grup</h1><p>Només ho hauràs de fer una vegada. Si t\'equivoques, avisa el professor.</p><div id="el-gr"></div></div>');
+    EL_GROUPS.forEach(g=>{const b=document.createElement("button");b.innerHTML="<b>"+g.name+"</b>";
+      b.style.cssText="display:block;width:100%;margin:10px 0;padding:12px;border:2px solid #0f766e;background:#fff;border-radius:12px;cursor:pointer;font:inherit";
+      b.onclick=async()=>{if(!confirm("Ets de "+g.name+"?"))return;await setDoc(doc(db,"students",u.uid),{group:g.id,name:u.displayName||"",email:u.email,updated:serverTimestamp()},{merge:true});o.remove();res(g.id)};
+      o.querySelector("#el-gr").append(b)});
+  });
+}
 function applyLevel(lvl){
   myLevel=lvl;
   const btns=[...document.querySelectorAll(".route[data-level]")];
@@ -172,6 +184,7 @@ await loadCatalog();
 onAuthStateChanged(auth,async u=>{
   user=u;draw(u);
   if(u&&isStudent(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){if(prev!==null&&prev!==u.uid)wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
+  if(u&&isStudent(u))try{await ensureGroup(u)}catch(e){console.warn("group",e)}
   try{await gate(u)}catch(e){console.warn("gate",e)}
   listeners.forEach(f=>f(u));
 });

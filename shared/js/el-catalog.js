@@ -7,6 +7,8 @@
 // manual:true = scored by the teacher (not by counting actions); delivered through Google Classroom, not in this site.
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 window.EL_LEVELS=[{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes."}];
+// Class groups. The student picks one the first time they sign in; the teacher can change it in the dashboard.
+window.EL_GROUPS=[{id:"2ESOA",course:"2eso",name:"2ESO A"},{id:"2ESOB",course:"2eso",name:"2ESO B"},{id:"4ESOA",course:"4eso",name:"4ESO A"},{id:"4ESOB",course:"4eso",name:"4ESO B"}];
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine"},
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine"}

@@ -15,8 +15,15 @@ service cloud.firestore {
       allow write: if isTeacher();
     }
     match /students/{uid} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
-      allow read: if isTeacher();
+      // class group: the student sets it once (first sign-in); after that only the teacher changes it
+      allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.get('group', '2ESOA') in ['2ESOA','2ESOB','4ESOA','4ESOB'];
+      allow update: if signedIn() && request.auth.uid == uid
+        && (resource.data.get('group', null) == null
+              ? request.resource.data.get('group', '2ESOA') in ['2ESOA','2ESOB','4ESOA','4ESOB']
+              : request.resource.data.get('group', null) == resource.data.group);
+      allow write: if isTeacher();
 
       // progress is writable only while that LS is open
       match /progress/{ls} {

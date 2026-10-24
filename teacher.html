@@ -1,74 +1,189 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Teacher dashboard · English Lab</title>
 <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
-<style>body{font:15px system-ui,sans-serif;max-width:1100px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:10px 0}label{display:block;margin:3px 0}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid #e2e8f0;padding:4px 8px;text-align:center}th:first-child,td:first-child{text-align:left}td.c{cursor:pointer}td.c:hover{background:#ecfdf5}button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer}button.g{background:#e2e8f0;color:#0f172a}button.on{outline:2px solid #0f766e}.pill{font-size:11px;background:#ecfdf5;color:#065f46;border-radius:999px;padding:1px 6px}.muted{color:#64748b}.lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.lshead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;font-weight:400;margin-top:2px}button.opt.sel{font-weight:600}.tick{font-size:16px}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}</style></head><body>
+<style>body{font:15px system-ui,sans-serif;max-width:1400px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}h2{font-size:1.15rem}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:12px 0}.muted{color:#64748b}small{font-weight:400}
+button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}a[data-do]{color:#0f766e;cursor:pointer;text-decoration:underline dotted}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.tab{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;padding:8px 16px;font-weight:600}.tab small{color:#64748b;margin-left:4px}.tab.c2eso.on{background:#16a34a;border-color:#16a34a;color:#fff}.tab.c4eso.on{background:#2563eb;border-color:#2563eb;color:#fff}.tab.cnone.on{background:#64748b;border-color:#64748b;color:#fff}.tab.on small{color:#fff}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}
+.pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 6px;margin:1px}.ce3{background:#e0f2fe;color:#075985}.ce5{background:#ffedd5;color:#9a3412}
+.route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-daring{background:#ede9fe;color:#5b21b6}.r-none{color:#94a3b8}
+.wrap{overflow:auto;max-height:75vh;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
+thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;vertical-align:top}thead tr+tr th{top:var(--h1,52px)}.stu{position:sticky;left:0;z-index:1;text-align:left;min-width:150px;white-space:nowrap}thead .stu{z-index:3}
+th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#cbd5e1}.first{border-left:3px solid #94a3b8}th.ac{font-weight:500;min-width:44px}.skip{color:#94a3b8;background:#f8fafc}td.ac{color:#16a34a;font-weight:700}
+td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px solid #0f766e;outline-offset:-2px}td.sub{background:#dcfce7}td.mark{background:#fef9c3}td.na{color:#94a3b8;font-weight:400}
+ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
+dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
+.lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}
+details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
-<div class="box"><h2>LS status and graded activities</h2><p class="muted">1) Choose the status of each LS. 2) If it is Open, decide which graded activities students can do now.</p><div id="lsbox"></div></div>
-<div class="box"><h2>Route change requests</h2><div id="reqs" class="muted">No pending requests.</div></div>
-<div class="box"><h2>Result per assessment criterion</h2><p class="muted">Sum of the points of the graded activities linked to each criterion (the criteria are a proposal pending review). The final product counts with the mark you enter.</p><div style="overflow:auto"><table id="crit"></table></div></div>
-<div class="box"><h2>Learning path detail</h2><p class="muted">Pick a learning path to see its actions, each student's progress and the related assessment criteria. Which action gives evidence for which criterion is a proposal pending your review.</p><select id="actsel"></select><div id="lpinfo" style="margin:8px 0"></div><div style="overflow:auto"><table id="lp"></table></div></div>
-<div class="box"><h2>Results per student</h2><p class="muted">Each cell: points (1 per completed action). You mark the final product by hand. Click a cell to add feedback or, if it is submitted, to allow the student to resubmit.</p>
-<select id="lssel"></select><div style="overflow:auto;margin-top:8px"><table id="res"></table></div></div></div>
+<div class="tabs" id="tabs"></div>
+<div id="main"></div>
+</div>
+<dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
 <script type="module">
-import "./shared/js/el-cloud.js";
-import {doc,getDoc,setDoc,getDocs,collection,collectionGroup,serverTimestamp,deleteField} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-const $=s=>document.querySelector(s),db=()=>ELCloud.db,cat=EL_CATALOG,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-EL_LS.forEach(l=>$("#lssel").add(new Option(l.title,l.id)));
+// Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
+const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
+if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
+const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),resKey=a=>a.replace("/","__");
+const S={g:GR[0].id,route:"all",ls:null,folded:new Set(),D:null};
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved; graded activities only if you enable them."],closed:["Closed","Students can only review what they did and the feedback."],public:["Public","Free access as before: no login and no scoring."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309",public:"#2563eb"};
-async function drawLs(){let h="";
-  for(const l of EL_LS){const info=await ELCloud.lsInfo(l.id),st=info.status,acts=cat.filter(a=>a.ls===l.id);
-    h+=`<div class="lscard"><div class="lshead"><b>${l.title}</b><span class="badge" style="background:${STCOL[st]}">Current status: ${LS_INFO[st][0].toUpperCase()}</span></div><p class="muted">${LS_INFO[st][1]}</p><div class="opts">`;
-    h+=["hidden","open","closed","public"].map(s=>`<button class="opt ${s===st?"sel":""}" data-ls="${l.id}" data-s="${s}" style="${s===st?"border-color:"+STCOL[s]+";background:"+STCOL[s]+"1a":""}"><span class="tick">${s===st?"✔":"○"}</span> <b>${LS_INFO[s][0]}</b><small>${LS_INFO[s][1]}</small></button>`).join("")+`</div>`;
-    h+=`<h3>Graded activities ${st==="open"?"":'<span class="muted">(only take effect when the LS is Open)</span>'}</h3><table class="acts"><tr><th>Activity</th><th>Points</th><th>Can students do it?</th></tr>`;
-    h+=acts.filter(a=>a.graded).map(a=>{const on=info.enabled.includes(a.id);return `<tr><td>${a.title} ${a.criteria.map(c=>`<span class="pill">${c}</span>`).join(" ")}${a.mode==="once"?' <span class="muted">(once only)</span>':""}</td><td>${a.manual?"you mark it":a.points}</td><td><button class="tog ${on?"yes":"no"}" data-ls="${l.id}" data-a="${a.id}" data-on="${on?1:0}">${on?"✔ YES, enabled":"✖ NOT enabled"}</button></td></tr>`}).join("")+`</table>`;
-    h+=`<p class="muted">Always available (not graded): ${acts.filter(a=>!a.graded).map(a=>a.title).join(" · ")||"–"}</p></div>`}
-  $("#lsbox").innerHTML=h;
-  $("#lsbox").querySelectorAll("button.opt").forEach(b=>b.onclick=async()=>{if(b.dataset.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;await setDoc(doc(db(),"ls",b.dataset.ls),{status:b.dataset.s,updated:serverTimestamp()},{merge:true});drawLs()});
-  $("#lsbox").querySelectorAll("button.tog").forEach(b=>b.onclick=async()=>{const ls=b.dataset.ls,set=new Set((await ELCloud.lsInfo(ls)).enabled);b.dataset.on==="1"?set.delete(b.dataset.a):set.add(b.dataset.a);await setDoc(doc(db(),"ls",ls),{enabled:[...set],updated:serverTimestamp()},{merge:true});drawLs()});
+
+// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}}
+async function load(){
+  if(DEMO)return DEMO;
+  const D={st:{},rs:{},lv:{},pg:{},ls:{}},up=r=>r.ref.parent.parent.id;
+  (await F.getDocs(F.collection(db(),"students"))).forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()));
+  (await F.getDocs(F.collectionGroup(db(),"results"))).forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data());
+  (await F.getDocs(F.collectionGroup(db(),"levels"))).forEach(l=>(D.lv[up(l)]=D.lv[up(l)]||{})[l.id]=l.data());
+  (await F.getDocs(F.collectionGroup(db(),"progress"))).forEach(p=>(D.pg[up(p)]=D.pg[up(p)]||{})[p.id]=p.data().data||{});
+  for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
+  // students who only have results/progress (no profile yet) still appear, without a group
+  Object.keys(Object.assign({},D.rs,D.pg,D.lv)).forEach(u=>D.st[u]=D.st[u]||{uid:u,name:"",email:u});
+  return D;
 }
-async function requests(){
-  const names={};(await getDocs(collection(db(),"students"))).forEach(s=>names[s.id]=s.data());
-  const out=[];(await getDocs(collectionGroup(db(),"levels"))).forEach(l=>{const d=l.data();if(d.request){const uid=l.ref.parent.parent.id;out.push({uid,ls:l.id,from:d.level,to:d.request})}});
-  $("#reqs").innerHTML=out.length?out.map((r,i)=>`<p>${esc((names[r.uid]||{}).name||(names[r.uid]||{}).email||r.uid)} · ${esc(r.ls)}: ${esc(r.from||"–")} → <b>${esc(r.to)}</b> <button data-i="${i}" data-y="1">Accept</button> <button class="g" data-i="${i}">Reject</button></p>`).join(""):"No pending requests.";
-  $("#reqs").querySelectorAll("button").forEach(b=>b.onclick=async()=>{const r=out[b.dataset.i],ref=doc(db(),"students",r.uid,"levels",r.ls);
-    await setDoc(ref,b.dataset.y?{level:r.to,request:deleteField(),updated:serverTimestamp()}:{request:deleteField()},{merge:true});requests()});
+const sub=o=>Object.assign(o,{updated:DEMO?Date.now():F.serverTimestamp()});
+const put=(path,o)=>DEMO?null:F.setDoc(F.doc(db(),...path),sub(o),{merge:true});
+const api={
+  setGroup:(u,g)=>DEMO?S.D.st[u].group=g:put(["students",u],{group:g}),
+  setLevel:(u,ls,level)=>{if(DEMO){const l=((S.D.lv[u]=S.D.lv[u]||{})[ls]=S.D.lv[u][ls]||{});l.level=level;delete l.request;return}return put(["students",u,"levels",ls],{level,request:F.deleteField()})},
+  reject:(u,ls)=>DEMO?delete S.D.lv[u][ls].request:put(["students",u,"levels",ls],{request:F.deleteField()}),
+  result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
+  ls:(id,o)=>DEMO?Object.assign(S.D.ls[id],o):put(["ls",id],o)
+};
+async function act(p){await p;if(!DEMO)S.D=await load();render()}
+
+// ---- helpers
+const name=s=>esc(s.name||s.email||s.uid);
+const pill=c=>`<span class="pill ce${c[0]}">${c}</span>`;
+const route=l=>l?`<span class="route r-${l}">${LV[l]||l}</span>`:'<span class="route r-none">–</span>';
+const level=(u,ls)=>((S.D.lv[u]||{})[ls]||{}).level;
+const acts=ls=>cat.filter(a=>a.ls===ls);
+const steps=a=>EL_ACTIONS[a.id]||[];
+const doneSet=(u,a)=>{const p=(S.D.pg[u]||{})[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
+const stepCrit=(a,k)=>(a.skip||[]).includes(k)?'<small class="muted">not scored</small>':((EL_EVIDENCE[k]||[]).map(pill).join("")||'<small class="muted">practice</small>');
+const pts=a=>a.graded?(a.manual?"teacher mark":a.points+" pts"):"not graded";
+const byName=(x,y)=>(x.name||x.email||"").localeCompare(y.name||y.email||"");
+function cell(u,a){ // text + class of an activity's score cell
+  const x=(S.D.rs[u]||{})[a.id],d=doneSet(u,a);
+  let t,c="";
+  if(a.manual)t=x&&x.max?x.score+"/"+x.max:"–";
+  else if(a.graded)t=x?(x.score||0)+"/"+a.points:"–";
+  else{const n=steps(a).filter(k=>d.has(k)).length;t=steps(a).length?n+"/"+steps(a).length:"–";c="na"}
+  if(x&&x.locked){t+=" ✔";c="sub"}else if(x&&x.markedDone){t+=" 🟡";c="mark"}
+  if(x&&x.feedback)t+=" 💬";
+  return {t,c};
 }
-async function results(){
-  const ls=$("#lssel").value,acts=cat.filter(a=>a.ls===ls);
-  const students=await getDocs(collection(db(),"students")),rs={},lv={};
-  (await getDocs(collectionGroup(db(),"results"))).forEach(r=>{const uid=r.ref.parent.parent.id;(rs[uid]=rs[uid]||{})[r.data().activity]=r.data()});
-  (await getDocs(collectionGroup(db(),"levels"))).forEach(l=>{if(l.id===ls)lv[l.ref.parent.parent.id]=l.data().level});
-  let h="<tr><th>Student</th><th>Route</th>"+acts.map(a=>`<th class="lpcol" data-act="${a.id}" style="cursor:pointer;text-decoration:underline dotted" title="Criteria: ${a.criteria.join(', ')} · click for the detail">${a.title}${a.graded?(a.manual?"<br><small>manual mark</small>":"<br><small>/"+a.points+"</small>"):"<br><small>(not graded)</small>"}</th>`).join("")+"<th>Total</th></tr>";
-  students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&x&&x.max){ts+=x.score||0;tm+=x.max}});
-    h+=`<tr><td>${esc(d.name||d.email)}<br><span class="muted">${esc(d.email)}</span></td><td>${esc(lv[s.id]||"–")}</td>`+acts.map(a=>{const x=r[a.id];return `<td class="c" data-u="${s.id}" data-a="${a.id}">${x?(a.manual?(x.max?x.score+"/"+x.max:""):a.graded?(x.score||0)+"/"+a.points:"")+(x.locked?" ✔ submitted":x.markedDone?" 🟡 done":"")+(x.feedback?" 💬":""):"–"}</td>`}).join("")+`<td><b>${tm?ts+"/"+tm:"–"}</b></td></tr>`});
-  $("#res").innerHTML=h;$("#res").querySelectorAll("th.lpcol").forEach(th=>th.onclick=()=>{$("#actsel").value=th.dataset.act;detail();$("#lp").scrollIntoView({behavior:"smooth"})});
-  const crits=[...new Set(acts.flatMap(a=>a.criteria))].sort();
-  let ch="<tr><th>Student</th>"+crits.map(c=>"<th>CE"+c[0]+" · "+c+"</th>").join("")+"</tr>";
-  students.forEach(s=>{const d=s.data(),r=rs[s.id]||{};ch+="<tr><td>"+esc(d.name||d.email)+"</td>"+crits.map(c=>{let ts=0,tm=0;acts.forEach(a=>{const x=r[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){ts+=x.score||0;tm+=x.max}});if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return '<td><b style="color:'+col+'">'+ts+"/"+tm+"</b><br><small>"+Math.round(p)+"%</small></td>"}).join("")+"</tr>"});
-  $("#crit").innerHTML=ch;
-  $("#res").querySelectorAll("td.c").forEach(td=>td.onclick=async()=>{const ref=doc(db(),"students",td.dataset.u,"results",td.dataset.a.replace("/","__")),s=await getDoc(ref),o=s.exists()?s.data():{};
-    if(o.locked&&confirm("This activity is already SUBMITTED. Allow the student to redo and resubmit it? (Their progress is kept; they will have to mark it as done again.) OK = reopen · Cancel = only add feedback")){await setDoc(ref,{locked:false,markedDone:false,reopenedAt:serverTimestamp(),updated:serverTimestamp()},{merge:true});results();return}
-    const a=cat.find(x=>x.id===td.dataset.a),extra={};
-    if(a.manual){const mx=prompt("Maximum mark for this final product:",o.max??10);if(mx===null)return;const sc=prompt("Student mark (out of "+mx+"):",o.score??"");if(sc===null)return;if(sc!==""&&!isNaN(+sc)&&!isNaN(+mx)){extra.score=+sc;extra.max=+mx}}
-    const fb=prompt("Optional feedback for the student:",o.feedback??"");if(fb===null)return;
-    await setDoc(ref,Object.assign({ls,activity:td.dataset.a,feedback:fb,updated:serverTimestamp()},extra),{merge:true});results()});}
-function fillActs(){const ls=$("#lssel").value;$("#actsel").innerHTML="";cat.filter(a=>a.ls===ls).forEach(a=>$("#actsel").add(new Option(a.title+(a.graded?"":" (not graded)"),a.id)))}
-async function detail(){
-  const a=cat.find(x=>x.id===$("#actsel").value);if(!a)return;
-  const students=await getDocs(collection(db(),"students")),prog={},rs={},lv={};
-  (await getDocs(collectionGroup(db(),"progress"))).forEach(p=>{if(p.id===a.ls)prog[p.ref.parent.parent.id]=p.data().data||{}});
-  (await getDocs(collectionGroup(db(),"results"))).forEach(r=>{if(r.data().activity===a.id)rs[r.ref.parent.parent.id]=r.data()});
-  (await getDocs(collectionGroup(db(),"levels"))).forEach(l=>{if(l.id===a.ls)lv[l.ref.parent.parent.id]=l.data().level});
-  const acts=EL_ACTIONS[a.id]||[],skip=a.skip||[];
-  $("#lpinfo").innerHTML="<b>"+esc(a.title)+"</b> · criteria: "+a.criteria.map(c=>'<span class="pill">'+c+"</span>").join(" ")+" · "+(a.graded?(a.manual?"you mark it":a.points+" points"):"not graded");
-  let h="<tr><th>Student</th><th>Route</th>"+acts.map(k=>"<th>"+k+"<br><small>"+(skip.includes(k)?"not scored":(EL_EVIDENCE[k]||[]).map(c=>"→ "+c).join(" ")||"language practice")+"</small></th>").join("")+"<th>Result</th></tr>";
-  students.forEach(s=>{const d=s.data(),st=new Set();a.keys.forEach(k=>elDoneSet((prog[s.id]||{})[k]).forEach(x=>st.add(x)));const x=rs[s.id]||{};
-    h+="<tr><td>"+esc(d.name||d.email)+"</td><td>"+esc(lv[s.id]||"–")+"</td>"+acts.map(k=>"<td>"+(st.has(k)?"✔":"–")+"</td>").join("")+"<td><b>"+(a.graded&&x.max?x.score+"/"+x.max:"–")+"</b>"+(x.locked?" ✔ submitted":x.markedDone?" 🟡 done":"")+"</td></tr>"});
-  $("#lp").innerHTML=h}
-$("#actsel").onchange=detail;
-$("#lssel").onchange=()=>{fillActs();results();detail()};
-ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u))return;$("#app").hidden=false;$("#msg").textContent="Hello, "+(u.displayName||u.email)+".";await drawLs();await requests();fillActs();await results();await detail()});
+
+// ---- views
+function render(){
+  const D=S.D,studs=Object.values(D.st),n=g=>studs.filter(s=>(s.group||"none")===g).length;
+  $("#tabs").innerHTML=GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}">${g.name}<small>${n(g.id)}</small></button>`).join("")
+    +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">No group<small>${n("none")}</small></button>`:"")
+    +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
+  if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group).sort(byName));return}
+  const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);
+  if(!lss.some(l=>l.id===S.ls))S.ls=lss[0].id;
+  const ls=S.ls,list=acts(ls),inG=studs.filter(s=>s.group===S.g).sort(byName);
+  const shown=inG.filter(s=>S.route==="all"||(level(s.uid,ls)||"none")===S.route);
+  const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${l.title}</option>`).join("")}</select> `:`<b>${lss[0].title}</b> `)
+    +`<span class="muted">· Route:</span> `+["all","insecure","safe","daring","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"Not chosen":LV[r]}</button>`).join("");
+  $("#main").innerHTML=`<div class="bar">${filters}</div>`
+    +`<div class="box"><h2>To do</h2>${todo(inG,ls,list)}</div>`
+    +`<div class="box"><h2>Learning paths and activities</h2><p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review). Click a score to see the detail, give feedback or mark it. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback.</p>
+      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"?" yet. Students choose their group the first time they sign in.":" with this route.")+"</p>"}</div>`
+    +`<div class="box"><h2>Result per assessment criterion</h2><p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}</div>`
+    +`<div class="box"><details><summary>LS status and graded activities</summary>${lsSettings(ls)}</details></div>`;
+  const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
+}
+function todo(studs,ls,list){
+  const out=[];
+  studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
+    if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(l.level)} → ${route(l.request)} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Reject</button>`);
+    list.filter(a=>a.graded&&!a.manual).forEach(a=>{const x=(S.D.rs[s.uid]||{})[a.id];
+      if(x&&x.locked&&!x.feedback)out.push(`📤 <b>${name(s)}</b> submitted <b>${a.title}</b> (${x.score||0}/${a.points}) · no feedback yet <button class="g" data-do="cell" data-u="${s.uid}" data-a="${a.id}">Open</button>`)})});
+  const fp=list.find(a=>a.manual),nm=fp?studs.filter(s=>!((S.D.rs[s.uid]||{})[fp.id]||{}).max).length:0;
+  return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no route requests and every submitted activity has feedback.</p>')
+    +(fp&&nm?`<p class="muted">📝 ${nm} student${nm>1?"s":""} without a final product mark (click their Final product score to mark it).</p>`:"");
+}
+function progress(studs,list){
+  const open=a=>!S.folded.has(a.id)&&steps(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
+  let h1=`<tr><th class="stu"${rs}>Student</th><th${rs}>Route</th>`,h2="<tr>";
+  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${a.title}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${pts(a)}</small>`;
+    if(open(a)){h1+=`<th class="lp first" colspan="${steps(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
+      h2+=steps(a).map((k,i)=>`<th class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")+`<th class="sc">Score</th>`}
+    else h1+=`<th class="lp first"${rs} data-do="fold" data-a="${a.id}">${head}</th>`});
+  h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
+  let b="";
+  studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
+    b+=`<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td><td>${route(level(s.uid,S.ls))}</td>`;
+    list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
+      if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("");
+      b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}">${c.t}</td>`;
+      if(a.graded&&x&&x.max){ts+=x.score||0;tm+=x.max}});
+    b+=`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td></tr>`});
+  return `<table><thead>${h1}${any?h2:""}</thead><tbody>${b}</tbody></table>`;
+}
+function criteria(studs,list){
+  const crits=[...new Set(list.flatMap(a=>a.criteria))].sort();
+  let h=`<table><thead><tr><th class="stu">Student</th>`+crits.map(c=>`<th>${pill(c)}<br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(c)).map(a=>a.title).join(" · ")}</small></th>`).join("")+"</tr></thead><tbody>";
+  studs.forEach(s=>{const r=S.D.rs[s.uid]||{};h+=`<tr><td class="stu">${name(s)}</td>`+crits.map(c=>{let ts=0,tm=0;list.forEach(a=>{const x=r[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){ts+=x.score||0;tm+=x.max}});
+    if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return `<td><b style="color:${col}">${ts}/${tm}</b><br><small>${Math.round(p)}%</small></td>`}).join("")+"</tr>"});
+  return h+"</tbody></table>";
+}
+function lsSettings(id){
+  const info=S.D.ls[id]||{status:"hidden",enabled:[]},st=info.status,list=acts(id);
+  return `<div class="lscard"><span class="badge" style="background:${STCOL[st]}">Current status: ${LS_INFO[st][0].toUpperCase()}</span><p class="muted">${LS_INFO[st][1]}</p><div class="opts">`
+    +["hidden","open","closed","public"].map(s=>`<button class="opt ${s===st?"sel":""}" data-do="status" data-s="${s}" style="${s===st?"border-color:"+STCOL[s]+";background:"+STCOL[s]+"1a":""}">${s===st?"✔":"○"} <b>${LS_INFO[s][0]}</b><small>${LS_INFO[s][1]}</small></button>`).join("")+`</div>`
+    +`<h3>Graded activities ${st==="open"?"":'<small class="muted">(only take effect when the LS is Open)</small>'}</h3><table class="acts"><tr><th>Activity</th><th>Points</th><th>Can students do it?</th></tr>`
+    +list.filter(a=>a.graded).map(a=>{const on=info.enabled.includes(a.id);return `<tr><td>${a.title} ${a.criteria.map(pill).join("")}${a.mode==="once"?' <small class="muted">(once only)</small>':""}</td><td>${a.manual?"you mark it":a.points}</td><td><button class="tog ${on?"yes":"no"}" data-do="enable" data-a="${a.id}">${on?"✔ YES, enabled":"✖ NOT enabled"}</button></td></tr>`}).join("")+`</table>`
+    +`<p class="muted">Always available (not graded): ${list.filter(a=>!a.graded).map(a=>a.title).join(" · ")||"–"}</p></div><p class="muted">Each group sees the same LS status; it applies to the whole course.</p>`;
+}
+const groupSel=(u,g)=>`<select data-do="group" data-u="${u}"><option value="">– choose –</option>${GR.map(x=>`<option value="${x.id}" ${x.id===g?"selected":""}>${x.name}</option>`).join("")}</select>`;
+function noGroup(studs){
+  return `<div class="box"><h2>Students without a group</h2><p class="muted">They signed in before choosing a group. Assign one and they move to that group's tab.</p>`
+    +(studs.length?`<table><tbody>${studs.map(s=>`<tr><td class="stu">${name(s)}<br><small class="muted">${esc(s.email)}</small></td><td>${groupSel(s.uid,"")}</td></tr>`).join("")}</tbody></table>`:'<p class="muted">Everyone has a group.</p>')+"</div>";
+}
+
+// ---- panels
+function dlg(html){$("#dlgc").innerHTML=html+`<div class="row"><button class="g" data-do="close">Close</button></div>`;if(!$("#dlg").open)$("#dlg").showModal()}
+function stuPanel(u){
+  const s=S.D.st[u],ls=S.ls,l=level(u,ls);
+  dlg(`<h3>${name(s)}</h3><p class="muted">${esc(s.email)}</p>
+    <label>Group</label>${groupSel(u,s.group)}
+    <label>Route in ${EL_LS.find(x=>x.id===ls).title}</label><select data-do="setroute" data-u="${u}"><option value="">– not chosen –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${x.name}</option>`).join("")}</select>
+    <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`);
+}
+function cellPanel(u,id){
+  const s=S.D.st[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
+  const state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
+  dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${x.score||0}/${a.points}`:""}</p>`
+    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th></tr></thead><tbody>${steps(a).map(k=>`<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td></tr>`).join("")}</tbody></table>`:"")
+    +(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
+    +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea>`
+    +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`);
+}
+
+// ---- events
+document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
+  ({tab:()=>{S.g=k.g;render()},route:()=>{S.route=k.r;render()},reload:()=>act(),
+    fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
+    acc:()=>act(api.setLevel(u,S.ls,k.to)),rej:()=>act(api.reject(u,S.ls)),
+    stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
+    save:()=>{const o={feedback:$("#ffb").value};if(a.manual){const sc=$("#fsc").value,mx=$("#fmx").value;if(sc!==""&&mx!==""&&!isNaN(+sc)&&!isNaN(+mx)){o.score=+sc;o.max=+mx}}$("#dlg").close();act(api.result(u,a,o))},
+    reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
+    status:()=>{if(k.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;act(api.ls(S.ls,{status:k.s}))},
+    enable:()=>{const set=new Set(S.D.ls[S.ls].enabled);set.has(k.a)?set.delete(k.a):set.add(k.a);act(api.ls(S.ls,{enabled:[...set]}))}
+  })[k.do]?.()});
+document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
+  if(k.do==="ls"){S.ls=t.value;render()}
+  if(k.do==="group"&&t.value)act(api.setGroup(k.u,t.value)).then(()=>$("#dlg").open&&stuPanel(k.u));
+  if(k.do==="setroute"&&t.value)act(api.setLevel(k.u,S.ls,t.value)).then(()=>stuPanel(k.u))});
+
+const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;S.D=await load();render()};
+if(DEMO)start("Preview with sample students: nothing is saved.");
+else ELCloud.onUser(u=>{if(u&&ELCloud.isTeacher(u))start("Hello, "+(u.displayName||u.email)+".")});
 </script></body></html>

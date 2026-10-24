@@ -47,6 +47,13 @@ Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
 ## Content-first workflow
 - Read the applicable LS guidance and current course overview (containing all three routes). Implement only content explicitly approved by the user; website content and extracted drafts are not automatically approved. Preserve previously agreed requirements and the last approved content separately from proposed revisions. Flag missing information or contradictions and resolve them with the user before implementing the affected part. Technical and layout decisions may follow existing project rules, but agents must not invent or change pedagogical content during implementation. See [My Real Routine's review workflow](docs/learning-situations/my-real-routine.md#content-review-and-approval).
 
+## Teacher dashboard (`teacher.html`)
+- Organised by **class group**: 2ESO A, 2ESO B, 4ESO A, 4ESO B (`EL_GROUPS` in `shared/js/el-catalog.js`). The student picks the group once, on the first sign-in (`ensureGroup` in `el-cloud.js`, stored as `students/{uid}.group`); afterwards only the teacher changes it (`firestore.rules`). Students without a group appear under "No group".
+- Every learning path and activity is linked to assessment criteria. The mapping lives in `el-catalog.js` (`criteria` per learning path, `EL_EVIDENCE` per activity) and is documented in [the LS guidance](docs/learning-situations/my-real-routine.md#assessment-criteria-per-activity-proposal-pending-review). Keep both in sync when adding a learning path or LS.
+- Layout per group: To do (route requests, submissions without feedback, unmarked final products) → learning paths × activities table (foldable per learning path, criteria in the headers) → result per criterion → LS settings (folded). Marks and feedback are edited in a dialog, not in `prompt()`.
+- Preview without Firebase: define `window.EL_DEMO_DATA` (same shape as `load()` returns) before the module script; nothing is saved.
+- Changing `firestore.rules` needs `firebase deploy --only firestore:rules` when the change is merged.
+
 ## Verification and repository hygiene
 - Check affected routes, route switching, interactive feedback and progress. For matching changes, verify duplicate interchangeability, alternatives, round completion and route coverage.
 - Check changed JavaScript syntax and run `git diff --check`. Use isolated browser automation when available; do not require macOS App Management or broader system permissions. Report programmatic-only verification honestly when browser automation is unavailable.

@@ -25,3 +25,33 @@ Review and explicitly approve the relevant course overview or named sections bef
 ## Archive
 
 The [detailed overview](../archive/my-real-routine/overview.md) and [2ESO session pilot](../archive/my-real-routine/2eso/a-day-in-my-life.md) are historical, unapproved drafts, retained for reference rather than active implementation guidance.
+
+## Assessment criteria per activity (proposal pending review)
+
+Source of truth: `shared/js/el-catalog.js` (`EL_CATALOG[].criteria` per learning path, `EL_EVIDENCE` per activity). The teacher dashboard shows this mapping in the table headers. Activities without a criterion are language practice.
+
+### 2ESO
+
+| Learning path | Criteria | Graded | Activities and the criterion each gives evidence for |
+| --- | --- | --- | --- |
+| Getting started (warm-up) | 3.1 | no | quick · listen · read · speak → 3.1 |
+| A day in my life | 3.1, 5.1 | 8 pts, once | explore · cards · words · match (not scored) · practice · listen · reading · build → 5.1 · write (not scored) · speaking → 3.1 |
+| Same day, different person | 3.1, 5.1 | 3 pts, once | cards · forms · match (not scored) · speak → 3.1 · write (not scored) |
+| Present simple grammar | 5.1 | 5 pts, once | recognise · controlled · transform · edit · selfcheck |
+| Healthy habits | 3.1, 5.1 | 8 pts, once | explore · cards · words · match (not scored) · practice · listen · reading · build → 5.1 · write (not scored) · speaking → 3.1 |
+| Vocabulary games | 5.1 | no (in class) | – |
+| Final product | 3.1, 3.2, 3.3, 5.1 | teacher mark | notes → 5.1 · prepare → 5.1 · record → 3.1 · submit |
+
+### 4ESO
+
+| Learning path | Criteria | Graded | Activities and the criterion each gives evidence for |
+| --- | --- | --- | --- |
+| Getting started (warm-up) | 3.1 | no | quick · listen · read · speak → 3.1 |
+| A day in real life | 3.1, 5.1 | 8 pts, once | explore · cards · words · match (not scored) · practice · listen · reading · build → 5.1 · write (not scored) · speaking → 3.1 |
+| Useful expressions | 3.1, 5.1 | 4 pts, once | cards · evening · organise · speak → 3.1 · write (not scored) |
+| Grammar: phrasal verbs | 5.1 | 5 pts, once | recognise · controlled · transform · edit · selfcheck |
+| Healthy habits | 3.1, 5.2 | 8 pts, once | explore · cards · words · match (not scored) · practice · listen · reading · build → 5.1 · write (not scored) · speaking → 3.1 |
+| Vocabulary games | 5.1 | no (in class) | – |
+| Final product | 3.1, 3.2, 3.3, 5.1, 5.2 | teacher mark | notes → 5.1 · prepare → 5.1 · record → 3.1 · submit |
+
+Open points: 4ESO Healthy habits is linked to 5.2 but its *build* activity points to 5.1; grammar, listening and reading activities have no criterion yet.
