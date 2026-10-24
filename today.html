@@ -38,13 +38,14 @@ async function load(u){
   const db=ELCloud.db,D={me:{},rs:{},lv:{},pg:{},ls:{}},q=async(p,f)=>{try{(await F.getDocs(F.collection(db,...p))).forEach(f)}catch(e){}};
   try{const s=await F.getDoc(F.doc(db,"students",u.uid));if(s.exists())D.me=s.data()}catch(e){}
   D.me.name=D.me.name||u.displayName||u.email;
+  if(ELCloud.viewGroup())D.me.group=ELCloud.viewGroup();   // tester in the student view of a group
   await q(["students",u.uid,"results"],r=>D.rs[r.data().activity]=r.data());
   await q(["students",u.uid,"levels"],l=>D.lv[l.id]=l.data());
   await q(["students",u.uid,"progress"],p=>D.pg[p.id]=p.data().data||{});
   for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
   return D;
 }
-const all=()=>!DEMO&&(ELCloud.isTeacher(U)||ELCloud.isTester(U));   // teacher and testers see every LS
+const all=()=>!DEMO&&(ELCloud.isTeacher(U)||(ELCloud.isTester(U)&&!ELCloud.viewGroup()));   // teacher and testers see every LS (not in a group's student view)
 const doneSet=a=>{const p=D.pg[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
 const canDo=(a,info)=>info.status==="closed"||!a.graded||info.enabled.includes(a.id)||all();
 function cell(a){

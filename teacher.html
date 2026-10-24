@@ -118,15 +118,15 @@ function cell(u,a){ // text + class of an activity's score cell
 // ---- views
 function render(){
   const D=S.D;S.P=people();
-  const studs=Object.values(S.P),inGr=g=>studs.filter(s=>(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
+  const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
   $("#tabs").innerHTML=GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
     +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
-  if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group).sort(byName))+rosterBox();return}
+  if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+rosterBox();return}
   const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);COURSE=grp.course;
   const mine=l=>elLsForGroup(l,D.ls[l.id],S.g);
   if(!lss.some(l=>l.id===S.ls))S.ls=(lss.filter(l=>mine(l)&&(D.ls[l.id]||{}).status==="open").pop()||lss.filter(mine).pop()||lss[lss.length-1]).id; // latest open LS assigned to the group
-  const ls=S.ls,list=acts(ls),inG=studs.filter(s=>s.group===S.g).sort(byName);
+  const ls=S.ls,list=acts(ls),inG=studs.filter(s=>s.group===S.g||s.tester).sort(byName);   // the tester account shows in every group
   const tutors=[...new Set(inG.map(s=>s.ro&&s.ro.tutor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ca"));if(!tutors.includes(S.tutor))S.tutor="all";
   const shown=inG.filter(s=>(S.route==="all"||(level(s.uid,ls)||"none")===S.route)&&(S.tutor==="all"||s.ro&&s.ro.tutor===S.tutor));
   const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${l.title}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}</select> `:`<b>${lss[0].title}</b>${mine(lss[0])?"":" <small class=\"muted\">(not assigned to this group)</small>"} `)
