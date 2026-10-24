@@ -60,6 +60,25 @@ window.LP = {
         { r: 'daring', q: 'Notice the form: “Lunar New Year ___ in China…”', o: ['is celebrated', 'celebrates', 'is celebrating'] },
         { r: 'daring', q: 'Why is food cooked in oil eaten at Hanukkah?', o: ['because of an old story about oil that burned for eight days', 'because oil is cheap in December', 'because doughnuts are a symbol of light'] }
       ] },
+    // LS criterion 4.1: a reading log on two of the four texts (what, when, where, main customs, two words inferred from context). The teacher sees it on the dashboard.
+    { id: 'log', type: 'step', tab: { ca: 'Registre de lectura', en: 'Reading log' }, title: { ca: 'Registre de lectura: dues celebracions', en: 'Reading log: two celebrations' }, pill: { ca: 'Ho veu el professor', en: 'Your teacher sees it' },
+      intro: { ca: 'Torna a llegir el text i omple el registre de <strong>Diwali</strong> i de <strong>Lunar New Year</strong>. Escriu notes curtes amb les teves paraules, no frases copiades.', en: 'Read the text again and log <strong>two of the four celebrations</strong> (you choose). Write short notes in your own words, not copied sentences.' },
+      html: { ca: '<div class="model"><strong>Exemple (Hanukkah):</strong> festa jueva · desembre · 8 nits · a casa, amb la família<br><strong>Costums:</strong> encenen una espelma més cada nit · mengen menjar fet amb oli<br><strong>Paraula:</strong> <em>menorah</em> = un canelobre per a espelmes. Pista: el text diu “a special candle holder”.</div>',
+        en: '<div class="model"><strong>Model (Hanukkah):</strong> Jewish festival · December · eight nights · at home, with the family<br><strong>Customs:</strong> one more candle every night · food cooked in oil<br><strong>Word:</strong> <em>menorah</em> = a candle holder. Clue: “families light one more candle on a menorah”.</div>' },
+      fields: [
+        { id: 'w1', label: { ca: 'Diwali: què és, quan i on', en: 'Text 1: which celebration? What is it, when and where?' }, rows: 2 },
+        { id: 'c1', label: { ca: 'Diwali: els costums principals (2–3)', en: 'Text 1: the main customs (2–3)' }, rows: 2 },
+        { id: 'w2', label: { ca: 'Lunar New Year: què és, quan i on', en: 'Text 2: which celebration? What is it, when and where?' }, rows: 2 },
+        { id: 'c2', label: { ca: 'Lunar New Year: els costums principals (2–3)', en: 'Text 2: the main customs (2–3)' }, rows: 2 },
+        { id: 'v1', label: { ca: 'Paraula 1 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 1 you worked out from context: the word, what it means and the clue in the text' }, rows: 2 },
+        { id: 'v2', label: { ca: 'Paraula 2 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 2 you worked out from context: the word, what it means and the clue in the text' }, rows: 2 },
+        { r: 'daring', id: 'why', label: 'Why does one of these customs matter to the people who celebrate it? (The text does not say it directly: explain how you know.)', rows: 2 }
+      ],
+      rate: {
+        insecure: ['He escrit notes curtes amb les meves paraules', 'He triat els costums principals, no detalls petits', 'He entès dues paraules pel context'],
+        safe: ['My notes are short and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context'],
+        daring: ['My notes are short and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context and can explain the clue']
+      } },
     { id: 'listen', type: 'mc', tab: 'Listening', title: { ca: 'Listening real: Happy Diwali', en: 'Real listening: Happy Diwali' }, pill: { ca: 'Vídeo real · BBC', en: 'Real video · BBC' },
       intro: { ca: 'Vídeo real de la BBC (British Council). Mira’l una vegada per la idea general i una altra per als detalls. No cal entendre totes les paraules.', en: 'A real BBC video (British Council). Watch once for the general idea and again for the details. You don’t need every word.' },
       media: { youtube: 'kjIPGD_WcEY', title: 'Happy Diwali', credit: 'Video: “Happy Diwali”, BBC / British Council LearnEnglish Kids.' },

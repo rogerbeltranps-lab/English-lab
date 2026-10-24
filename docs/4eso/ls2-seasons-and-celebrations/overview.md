@@ -189,6 +189,12 @@ Matching: the route's studied expressions (existing matching rules). Gap-fill:
 9. [D] For many people, what do the lights of Diwali represent? **good winning over evil** / the start of winter / a family's wealth
 10. [D] Notice: copy the phrase that says what people *do to* Lunar New Year: "Lunar New Year ___ ___ in China…" → *is celebrated*
 
+### Reading log (LS criterion 4.1, hand-in the teacher sees)
+
+*Added 24 Oct 2026 for the revised programme (branch `ls2-new-criteria`, waiting for Roger's approval).*
+
+After the reading, students log two of the four celebrations: what, when and where · the main customs (2–3) · two words they worked out from context, with the clue in the text. **Insecure** logs Diwali and Lunar New Year with Catalan labels; **Safe and Daring** choose the two texts; **Daring** adds why one custom matters to the people who celebrate it (an inference). Model on the page: Hanukkah (*Jewish festival · December · eight nights · at home · one more candle every night · food cooked in oil · menorah = a candle holder, clue: "families light one more candle on a menorah"*). Self-assessment: short notes in my own words · main customs, not small details · two words from context.
+
 ### Grammar: Present Simple for customs, *It is celebrated / takes place / is held*, on / in / at
 
 Worked example (Insecure in Catalan): we use the Present Simple for customs that happen every year: *People decorate their houses. Children dress up. We don't work on 25 December.* Fixed chunks (learnt as chunks, no passive explanation for Insecure): *It is celebrated on… · It takes place in… · It is held in…* **on** + date or day (*on 31 October, on New Year's Eve*) · **in** + month or season (*in November, in winter*) · **at** + festival time or *night* (*at Christmas, at night*).
@@ -298,6 +304,12 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 8. [S] What do the two celebrations have in common? **Both started as harvest festivals.** / Both come from Ireland. / Both are religious.
 9. [D] Why does Emma mention a "day of mourning"? **to show that not everybody sees the story in the same way** / to say Thanksgiving is sad for everyone / to explain the turkey
 10. [D] Complete from the podcast: People ___ ___ light bonfires and wear masks. → *used to*
+
+### Listening chart (LS criterion 2.2, hand-in the teacher sees)
+
+*Added 24 Oct 2026 for the revised programme (branch `ls2-new-criteria`, waiting for Roger's approval).*
+
+Two short videos of young people explaining how they celebrate a festival (to be made: Roger's decision; until then the step shows the BBC Diwali video from LP1). For each speaker: what they value, and the words, tone or images that show it. **Insecure** picks the value from a list in Catalan (family · sharing food · faith or beliefs · remembering the past · community · light and hope · having fun · helping others) and copies one word or phrase; **Daring** also compares the two speakers. Self-assessment: watched each video twice · named what each speaker values · backed it up with words, tone or images.
 
 ### Grammar
 
@@ -428,19 +440,25 @@ Each card: choose and give the reason (feedback explains).
 
 Put the parts in order: **"Title of the page", Website or author, Year.** Example: *"The Castanyada", Catalan culture website, 2025.*
 
-### Product piece 3: research card (filled in with the group, saved individually)
+### Product piece 3: research card (filled in with the group, handed in individually)
+
+*Added 24 Oct 2026 for the revised programme (branch `ls2-new-criteria`, waiting for Roger's approval).* The card is now a hand-in the teacher sees (LS criteria 4.2, 6.1, CC3 3.2) and is still saved as piece 3.
 
 | Field | Insecure | Safe | Daring |
 | --- | --- | --- | --- |
-| Celebration, what and when | ✓ | ✓ | ✓ |
+| Celebration, what, when and where | ✓ | ✓ | ✓ |
 | Three customs | ✓ | ✓ | ✓ |
 | One food or symbol | ✓ | ✓ | ✓ |
 | Origin (one fact) | | ✓ | ✓ |
 | Comparison with a local celebration | | ✓ | ✓ |
 | How it has changed; how to present it inclusively | | | ✓ |
-| Source 1 and Source 2 (credit lines) | ✓ | ✓ | ✓ |
+| Sources 1 and 2: credit line, key information, reliable or not with two reasons | ✓ | ✓ | ✓ |
+| Source 3: the same | | ✓ | ✓ |
+| Where the sources agree or differ (one point) | ✓ | ✓ | ✓ |
+| The source they trust most, and why | ✓ | ✓ | ✓ |
+| One stereotype about the people who celebrate it: why it is unfair, how the group will avoid it | ✓ | ✓ | ✓ |
 
-Checklist: every fact appears in two sources · notes, not copied sentences · religious meanings as information.
+Models on the page: *Reliable: a national museum wrote it to inform, and it was updated in 2025.* · *Some people think ___. This is unfair because ___. On our day, we will ___.* Self-assessment: every fact in two sources · notes, not copied sentences · two reasons for each source · religious meanings as information · why the stereotype is unfair.
 
 ---
 
@@ -547,6 +565,7 @@ Choose the form and the reason (decision now · plan · arrangement · timetable
 - **Insecure:** three activities, the time, the place and who does what, plus a list of materials. Frame: *The event is going to take place in… There will be… We're going to… I'll…*
 - **Safe (100–130 words + table):** timetable (Present Simple), roles (*going to*), materials, arrangements (Present Continuous) and one prediction (*will*).
 - **Daring (140–180 words + table):** the Safe plan plus estimated cost and who pays (resources), why the event is inclusive (*although, on the other hand*), and one possible problem with a plan B.
+- **All routes (added 24 Oct 2026, revised programme, CC1 1.3):** two concrete actions so every student and family feels welcome (Daring: each with a reason). Insecure frame adds *To make everyone feel welcome, we will ___ and ___.*
 
 ### Speaking: *Planning meeting*
 
@@ -650,6 +669,8 @@ Choose the form and the reason (decision now · plan · arrangement · timetable
 
 Checklist (all): formal greeting and ending · purpose in the first sentence · date, place and activities · at least one request · no contractions or informal words.
 
+**Added 24 Oct 2026 (revised programme, CC1 1.3):** the task and the checklist ask for two concrete actions so every student and family feels welcome (Daring: with reasons); the Insecure template adds *To make everyone feel welcome, we will ___ and ___.* The model email now has two welcome actions (each stall explains the customs in simple words, so students who do not celebrate the festivals can join in; families are invited), and the reading adds the question *What will they do so that everyone feels welcome?*
+
 ### Speaking: *Rehearse your part of the pitch*
 
 Record your part of the group pitch: **Insecure 30–45 s · Safe 45–60 s · Daring 60–90 s**, then check it against the Final Product checklist.
@@ -746,9 +767,11 @@ Insecure answers the [I] items (8) · Safe [I] + [S] (11) · Daring all (13).
 
 ---
 
-## Final Product: Celebration Day Proposal (from the programme, unchanged)
+## Final Product: Celebration Day Proposal (from the programme)
 
-Choose a celebration → Research (2+ sources) → Notes → Plan the event → Google Slides → Record group pitch → Write formal email → Review → Submit.
+**Revised 24 Oct 2026 (programme revised the same day; branch `ls2-new-criteria`, waiting for Roger's approval).** Every route now says what the celebration means for the people who celebrate it and why it belongs at school (1.1), names one stereotype, why it is unfair and how the plan avoids it (CC3 3.2), and puts two welcome actions in the email (CC1 1.3). Insecure also says one thing in common with a local celebration (1.2). Safe and Daring groups use three sources and every route rates its sources with two reasons (4.2, 6.1). Step 3 asks for a script, what changed after the rehearsal and key notes (3.2). Parts, steps and rubric: [final-product-assessment.md](final-product-assessment.md); indicators: [indicators.md](indicators.md).
+
+Choose a celebration → Research (Insecure 2 sources; Safe and Daring 3) → Notes → Plan the event → Google Slides → Record group pitch → Write formal email → Review → Submit.
 
 In groups of 3–4, design a respectful celebration day at school around one tradition. Submit a **2–3 minute group video with Google Slides, every member speaking with their face visible in picture-in-picture**, plus an **individual formal email** to the head teacher proposing the event.
 
@@ -777,8 +800,8 @@ Insecure keeps Catalan guidance at every step, with English examples linking sou
 | Page | Steps / points | Graded |
 | --- | --- | --- |
 | LP0 Getting started | 4 | no (warm-up) |
-| LP1 Celebrations around the world | 9 | yes, once |
-| LP2 Where traditions come from | 9 | yes, once |
+| LP1 Celebrations around the world | 9 (with the reading log; writing not scored) | yes, once |
+| LP2 Where traditions come from | 8 (with the listening chart; writing not scored) | yes, once |
 | LP3 Research it right | 7 | yes, once |
 | LP4 Plan the day | 9 | yes, once |
 | LP5 Write to the head teacher | 9 | yes, once |

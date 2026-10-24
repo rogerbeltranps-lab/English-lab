@@ -8,31 +8,31 @@
 
 Proposta de 6 Learning Situations per a 4t d'ESO, dues per trimestre, que cobreixen tots els sabers de gramàtica i lèxic marcats per a 4t als mapes verticals. LS1 conserva el títol i el producte final; LS2 parteix de la proposta *Seasons & Celebrations*.
 
-Revisió del 24 d'octubre de 2026: cada objectiu es vincula a un sol criteri per competència, cada criteri oficial té el seu criteri de la LS, i els criteris i les transversals segueixen els dos documents mare. Els indicadors d'assoliment es faran a part.
+Revisió del 24 d'octubre de 2026: cada objectiu es vincula a un sol criteri per competència, cada criteri oficial té el seu criteri de la LS, i els criteris i les transversals segueixen els dos documents mare. Els indicadors d'assoliment es faran a part. Les transversals que s'avaluen es despleguen a l'apartat 2 com les competències d'anglès, amb les quals comparteixen objectiu, i tenen el seu criteri de la LS.
 
 ## Índex
 
 **1.** [Com llegir aquest document](#com-llegir-aquest-document) [2](#com-llegir-aquest-document)
 
-**2.** [Taula resum de les LS i comprovació de cobertura](#taula-resum-de-les-ls) [3](#taula-resum-de-les-ls)
+**2.** [Taula resum de les LS i comprovació de cobertura](#taula-resum-de-les-ls) [4](#taula-resum-de-les-ls)
 
-**3.** [LS1 · My Real Routine](#ls1-4eso-my-real-routine) [5](#ls1-4eso-my-real-routine)
+**3.** [LS1 · My Real Routine](#ls1-4eso-my-real-routine) [7](#ls1-4eso-my-real-routine)
 
-**4.** [LS2 · Seasons & Celebrations](#ls2-4eso-seasons-celebrations) [9](#ls2-4eso-seasons-celebrations)
+**4.** [LS2 · Seasons & Celebrations](#ls2-4eso-seasons-celebrations) [12](#ls2-4eso-seasons-celebrations)
 
-**5.** [LS3 · Moments That Shaped Us](#ls3-4eso-moments-that-shaped-us) [13](#ls3-4eso-moments-that-shaped-us)
+**5.** [LS3 · Moments That Shaped Us](#ls3-4eso-moments-that-shaped-us) [18](#ls3-4eso-moments-that-shaped-us)
 
-**6.** [LS4 · Fact or Fake?](#ls4-4eso-fact-or-fake) [17](#ls4-4eso-fact-or-fake)
+**6.** [LS4 · Fact or Fake?](#ls4-4eso-fact-or-fake) [23](#ls4-4eso-fact-or-fake)
 
-**7.** [LS5 · Small Changes, Big Impact](#ls5-4eso-small-changes-big-impact) [21](#ls5-4eso-small-changes-big-impact)
+**7.** [LS5 · Small Changes, Big Impact](#ls5-4eso-small-changes-big-impact) [28](#ls5-4eso-small-changes-big-impact)
 
-**8.** [LS6 · My Next Step](#ls6-4eso-my-next-step) [25](#ls6-4eso-my-next-step)
+**8.** [LS6 · My Next Step](#ls6-4eso-my-next-step) [33](#ls6-4eso-my-next-step)
 
-**9.** [Gramàtica de 4t ESO per LS](#gramàtica-de-4t-eso-per-ls) [29](#gramàtica-de-4t-eso-per-ls)
+**9.** [Gramàtica de 4t ESO per LS](#gramàtica-de-4t-eso-per-ls) [38](#gramàtica-de-4t-eso-per-ls)
 
-**10.** [Lèxic de 4t ESO per LS](#lèxic-de-4t-eso-per-ls) [31](#lèxic-de-4t-eso-per-ls)
+**10.** [Lèxic de 4t ESO per LS](#lèxic-de-4t-eso-per-ls) [40](#lèxic-de-4t-eso-per-ls)
 
-**11.** [Fonts](#fonts) [33](#fonts)
+**11.** [Fonts](#fonts) [42](#fonts)
 
 Cada LS segueix la mateixa estructura: 1. Learning objectives · 2. Competències específiques i criteris d'avaluació · 3. Final Product · 4. Sabers: Vocabulary · 5. Sabers: Grammar · 6. Competències transversals.
 
@@ -48,19 +48,19 @@ Cada LS segueix la mateixa estructura: 1. Learning objectives · 2. Competèncie
 
 **Distribució per cursos.** Els criteris de 4t segueixen el [<u>document mare de competències i criteris</u>](https://claude.ai/artifact/TVVFmoCkKkvgwEXjzS65YF): tots els criteris de Reading, Listening, Speaking i Writing i, de les competències integrades, l'1.1, l'1.2, el 6.1, el 6.2, el 7.2, el 8.1, el 9.2 i el 10.1. Els altres criteris de les competències integrades (1.3, 6.3, 7.1, 8.2, 9.1, 9.3 i 10.2) es treballen a 3r.
 
-**Objectius d'aprenentatge.** Cada objectiu segueix l'estructura CAPACITAT + SABER + FINALITAT: un verb de capacitat (equivalent anglès dels verbs de la taula de referència, sobretot dels nivells aplicar, analitzar, avaluar i crear), el saber que es treballa i la finalitat o situació en què es farà servir. Cada objectiu (O1, O2…) es vincula a un sol criteri de cada competència: pot tocar dues competències, però amb un criteri cadascuna. Entre parèntesis, la competència i el criteri que concreta.
+**Objectius d'aprenentatge.** Cada objectiu segueix l'estructura CAPACITAT + SABER + FINALITAT: un verb de capacitat (equivalent anglès dels verbs de la taula de referència, sobretot dels nivells aplicar, analitzar, avaluar i crear), el saber que es treballa i la finalitat o situació en què es farà servir. Cada objectiu (O1, O2…) es vincula a un sol criteri de cada competència: pot tocar dues competències, però amb un criteri cadascuna. Entre parèntesis, la competència i el criteri que concreta; si una transversal avaluada comparteix l'objectiu, també hi surt, per exemple (CE3 · 3.3 + CPSAA 3 · 3.1).
 
-**Criteris de la LS.** A l'apartat 2, sota cada criteri oficial hi ha el criteri de la LS que l'avalua (*LS criterion*), amb l'estructura ACCIÓ + SABER + CONTEXT: diu quina tasca o producte s'avalua i en quines condicions, i de quin objectiu surt. El criteri oficial continua sent el referent de l'avaluació. Els indicadors d'assoliment (NA, AS, AN, AE) es faran a part a partir d'aquests criteris. Procés complet: [<u>de la competència als indicadors</u>](https://claude.ai/artifact/RLZP7UdTgREkiT7MJgCFAR).
+**Com es llegeix l'apartat 2: els passos 1–4.** Cada competència de la LS es desplega en quatre passos numerats, com al [<u>procés de la competència als indicadors</u>](https://claude.ai/artifact/RLZP7UdTgREkiT7MJgCFAR): **1 · Competència específica** i **2 · Criteri d'avaluació**, copiats literalment del Decret 175/2022; **3 · LS learning objective**, l'objectiu de l'apartat 1 que concreta aquell criteri (CAPACITAT + SABER + FINALITAT), i **4 · LS assessment criterion**, escrit en anglès amb l'estructura ACCIÓ + SABER + CONTEXT, que diu quina tasca o producte s'avalua i en quines condicions. Quan dues competències comparteixen un objectiu, el pas 3 ho indica, per exemple *(O2, compartit amb CPSAA 3 · 3.1)*. Després de les habilitats comunicatives i les competències integrades, un tercer bloc hi desplega les competències transversals que s'avaluen, amb els mateixos passos. El criteri oficial continua sent el referent de l'avaluació. El pas 5, els indicadors d'assoliment (NA, AS, AN, AE) de cada criteri de la LS, es farà en elaborar cada LS.
 
-**Competències transversals.** Codis i criteris d'avaluació de 3r i 4t d'ESO dels documents de l'XTEC sobre competències transversals, copiats literalment: competència ciutadana (CC1–CC4), competència personal, social i d'aprendre a aprendre (CPSAA 1–CPSAA 5), competència digital (CD1–CD5) i competència emprenedora (CE1–CE3). Per distingir les CE de la competència emprenedora de les CE d'anglès, sempre s'hi afegeix *emprenedora*. A cada LS, la línia *Evidència* és una proposta de com es treballa el criteri i no forma part del text oficial; entre parèntesis hi ha l'objectiu d'on surt i el tipus de vincle amb l'anglès.
+**Competències transversals.** Codis i criteris d'avaluació de 3r i 4t d'ESO dels documents de l'XTEC sobre competències transversals, copiats literalment: competència ciutadana (CC1–CC4), competència personal, social i d'aprendre a aprendre (CPSAA 1–CPSAA 5), competència digital (CD1–CD5) i competència emprenedora (CE1–CE3). Per distingir les CE de la competència emprenedora de les CE d'anglès, sempre s'hi afegeix *emprenedora*. Les transversals que s'avaluen es despleguen a l'apartat 2 de cada LS, en el bloc *Competències transversals*, amb els mateixos passos que l'anglès: **1 · Competència específica** i **2 · Criteri d'avaluació**, copiats literalment de l'XTEC; **3 · LS learning objective**, l'objectiu que comparteixen amb una competència d'anglès, i **4 · LS assessment criterion**, la tasca amb què s'avaluen. Només hi surten les que s'avaluen: una LS en treballa més, però les que no s'avaluen no hi consten. L'apartat 6 en fa el resum. Entre parèntesis, el tipus de vincle amb l'anglès segons el document mare.
 
-**Tria de les transversals.** Es fa amb el [<u>document mare de transversals</u>](https://claude.ai/artifact/7BW5UHDcYWi7zT9Ny526wE): columna de 3r i 4t, dues competències per LS, un sol criteri per competència i almenys una amb vincle directe amb l'anglès. Quan el vincle és possible, és perquè el tema o el producte de la LS ho permet.
+**Tria de les transversals.** Es fa amb el [<u>document mare de transversals</u>](https://claude.ai/artifact/7BW5UHDcYWi7zT9Ny526wE): columna de 3r i 4t, dues competències per LS, un sol criteri per competència i almenys una amb vincle directe amb l'anglès. Quan el vincle és possible, és perquè el tema o el producte de la LS ho permet. Cada una comparteix un objectiu diferent de la LS amb una sola competència d'anglès i s'avalua amb la tasca del pas 4.
 
 ## Taula resum de les LS
 
 Sis LS, unes 5–6 setmanes cadascuna. Totes acaben en un producte final amb tres rutes (Insecure / Safe / Daring).
 
-| **LS**                              | **Temporització**           | **Producte final**                                                                                           | **Lèxic principal**                                                                                                  | **Gramàtica principal**                                                                                       | **Transversals (XTEC)**               |
+| **LS**                              | **Temporització**           | **Producte final**                                                                                           | **Lèxic principal**                                                                                                  | **Gramàtica principal**                                                                                       | **Transversals avaluades (XTEC)**     |
 |-------------------------------------|-----------------------------|--------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|---------------------------------------|
 | **LS1 · My Real Routine**           | Setembre – octubre          | Vídeo amb Google Slides (PiP): presentar la rutina d'un company i reflexió sobre hàbits saludables           | Rutines i hàbits, salut i son, canvis d'hàbits, phrasal verbs, idioms, col·locacions make/do/have/take/pay           | be / have got, Present Simple, freqüència, phrasal verbs (ordre de l'objecte), connectors de contrast i causa | CPSAA 2 (2.1) · CPSAA 3 (3.1)         |
 | **LS2 · Seasons & Celebrations**    | Finals d'octubre – desembre | Proposta de *Celebration Day* per a l'escola: vídeo-pitch en grup + correu formal individual a la direcció   | Estacions i temps, celebracions i tradicions, organitzar un esdeveniment, cultures, correu formal, verb + preposició | Futurs (will, going to, Present Continuous), relatives, Present Simple per a costums, used to per als orígens | CC1 (1.3) · CC3 (3.2)                 |
@@ -94,7 +94,32 @@ Sis LS, unes 5–6 setmanes cadascuna. Totes acaben en un producte final amb tre
 | CE10 · Comunicació ètica     | —         | —         | —       | 10.1      | 10.1      | —         |
 | **Criteris per LS**          | 6         | 8         | 6       | 7         | 7         | 6         |
 
-Transversals treballades, amb un criteri per competència: CPSAA 1, 2, 3, 4 i 5 · CC1, CC3 i CC4 · CD1 · CE1 i CE2 emprenedora. No queden focalitzades CC2, CD2–CD5 ni CE3 emprenedora. CD2 es treballa de fet en tots els vídeos (criteri 2.2: «Crear i editar produccions digitals avançades de manera autònoma en tasques pròpies del context escolar.») i es podria afegir si vols.
+- **Competències transversals:** cada LS n'avalua dues, amb un sol criteri per competència i un objectiu compartit amb l'anglès; entre parèntesis, l'objectiu i la competència d'anglès amb què el comparteix. No s'avaluen CC2, CD2–CD5 ni CE3 emprenedora. CD2 es treballa en tots els vídeos (criteri 2.2: «Crear i editar produccions digitals avançades de manera autònoma en tasques pròpies del context escolar.»), però no s'avalua.
+
+| **Competència transversal**                              | **LS1**       | **LS2**       | **LS3**       | **LS4**       | **LS5**       | **LS6**       |
+|----------------------------------------------------------|---------------|---------------|---------------|---------------|---------------|---------------|
+| **Competència ciutadana**                                |               |               |               |               |               |               |
+| CC1                                                      | —             | 1.3 (O5, CE5) | 1.2 (O5, CE7) | —             | —             | —             |
+| CC2                                                      | —             | —             | —             | —             | —             | —             |
+| CC3                                                      | —             | 3.2 (O4, CE1) | —             | —             | —             | —             |
+| CC4                                                      | —             | —             | —             | —             | 4.2 (O1, CE4) | —             |
+| **Competència personal, social i d’aprendre a aprendre** |               |               |               |               |               |               |
+| CPSAA 1                                                  | —             | —             | 1.1 (O4, CE3) | —             | —             | —             |
+| CPSAA 2                                                  | 2.1 (O3, CE3) | —             | —             | —             | —             | —             |
+| CPSAA 3                                                  | 3.1 (O2, CE3) | —             | —             | —             | —             | —             |
+| CPSAA 4                                                  | —             | —             | —             | 4.4 (O5, CE3) | —             | —             |
+| CPSAA 5                                                  | —             | —             | —             | —             | —             | 5.1 (O5, CE9) |
+| **Competència digital**                                  |               |               |               |               |               |               |
+| CD1                                                      | —             | —             | —             | 1.2 (O3, CE6) | —             | —             |
+| CD2                                                      | —             | —             | —             | —             | —             | —             |
+| CD3                                                      | —             | —             | —             | —             | —             | —             |
+| CD4                                                      | —             | —             | —             | —             | —             | —             |
+| CD5                                                      | —             | —             | —             | —             | —             | —             |
+| **Competència emprenedora**                              |               |               |               |               |               |               |
+| CE1 emprenedora                                          | —             | —             | —             | —             | 1.3 (O5, CE5) | —             |
+| CE2 emprenedora                                          | —             | —             | —             | —             | —             | 2.1 (O4, CE3) |
+| CE3 emprenedora                                          | —             | —             | —             | —             | —             | —             |
+| **Transversals per LS**                                  | 2             | 2             | 2             | 2             | 2             | 2             |
 
 ## LS1 · 4ESO · My Real Routine
 
@@ -104,9 +129,9 @@ Transversals treballades, amb un criteri per competència: CPSAA 1, 2, 3, 4 i 5 
 
 - **O1 · Interpret** short articles, posts and interviews about real teenagers' routines, separating facts from opinions, in order to extract reliable information about how people really live. (CE4 · 4.1 + CE2 · 2.1)
 
-- **O2 · Apply** question forms and respectful interaction strategies in an interview with a classmate, in order to gather real details about their routine. (CE3 · 3.3)
+- **O2 · Apply** question forms and respectful interaction strategies in an interview with a classmate, in order to gather real details about their routine. (CE3 · 3.3 + CPSAA 3 · 3.1)
 
-- **O3 · Describe** a classmate's routine, commuting and daily responsibilities using Present Simple, be / have got, frequency adverbs, phrasal verbs and connectors of cause, contrast and consequence, in order to present it in a recorded video and reflect on how healthy it is. (CE3 · 3.1)
+- **O3 · Describe** a classmate's routine, commuting and daily responsibilities using Present Simple, be / have got, frequency adverbs, phrasal verbs and connectors of cause, contrast and consequence, in order to present it in a recorded video and reflect on how healthy it is. (CE3 · 3.1 + CPSAA 2 · 2.1)
 
 - **O4 · Plan**, write and revise the notes and slides of the presentation, in order to produce a clear, coherent and original multimodal text. (CE5 · 5.2)
 
@@ -120,11 +145,15 @@ Transversals treballades, amb un criteri per competència: CPSAA 1, 2, 3, 4 i 5 
 
 <!-- -->
 
-- 4.1 Comprendre i interpretar el sentit global, l’estructura, la informació més rellevant i la intenció de l’emissor de textos escrits i multimodals de certa complexitat, que responguin a diferents propòsits de lectura, realitzant les inferències necessàries.
+- **1 · Competència específica:** Comprendre, interpretar i analitzar, amb sentit crític i diferents propòsits de lectura, textos escrits i multimodals reconeixent el sentit global i les idees principals i secundàries, identificant la intenció de l’emissor, reflexionant sobre el contingut i la forma i avaluant-ne la qualitat i fiabilitat, per tal de construir coneixement i donar resposta a necessitats i interessos comunicatius diversos.
+
+- **2 · Criteri d'avaluació 4.1:** Comprendre i interpretar el sentit global, l’estructura, la informació més rellevant i la intenció de l’emissor de textos escrits i multimodals de certa complexitat, que responguin a diferents propòsits de lectura, realitzant les inferències necessàries.
 
 <!-- -->
 
-- *LS criterion (O1):* Completes a reading worksheet on two texts about teenagers' routines, noting the main idea, at least three relevant details and the writer's purpose, and marking which statements are facts and which are opinions.
+- **3 · LS learning objective (O1, compartit amb CE2 · 2.1):** Interpret short articles, posts and interviews about real teenagers' routines, separating facts from opinions, in order to extract reliable information about how people really live.
+
+- **4 · LS assessment criterion:** Completes a reading worksheet on two texts about teenagers' routines, noting the main idea, at least three relevant details and the writer's purpose, and marking which statements are facts and which are opinions.
 
 <!-- -->
 
@@ -132,11 +161,15 @@ Transversals treballades, amb un criteri per competència: CPSAA 1, 2, 3, 4 i 5 
 
 <!-- -->
 
-- 2.1 Extreure i analitzar el sentit global i les idees principals, i seleccionar informació pertinent de textos orals i multimodals sobre temes quotidians, de rellevància personal o d’interès públic propers a la seva experiència expressats de manera clara i en la llengua estàndard a través de diversos suports.
+- **1 · Competència específica:** Comprendre i interpretar textos orals i multimodals, en la llengua estàndard, recollint el sentit general i la informació més rellevant, la seva forma i el seu contingut, per construir coneixement, formar-se opinió i eixamplar les possibilitats de gaudi i lleure.
+
+- **2 · Criteri d'avaluació 2.1:** Extreure i analitzar el sentit global i les idees principals, i seleccionar informació pertinent de textos orals i multimodals sobre temes quotidians, de rellevància personal o d’interès públic propers a la seva experiència expressats de manera clara i en la llengua estàndard a través de diversos suports.
 
 <!-- -->
 
-- *LS criterion (O1):* Completes a listening chart while watching two short interviews or vlogs about daily routines, noting each speaker's main idea and the times, activities and habits they mention.
+- **3 · LS learning objective (O1, compartit amb CE4 · 4.1):** Interpret short articles, posts and interviews about real teenagers' routines, separating facts from opinions, in order to extract reliable information about how people really live.
+
+- **4 · LS assessment criterion:** Completes a listening chart while watching two short interviews or vlogs about daily routines, noting each speaker's main idea and the times, activities and habits they mention.
 
 <!-- -->
 
@@ -144,19 +177,25 @@ Transversals treballades, amb un criteri per competència: CPSAA 1, 2, 3, 4 i 5 
 
 <!-- -->
 
-- 3.1 Expressar oralment textos senzills, estructurats, comprensibles, coherents i adequats a la situació comunicativa sobre temes quotidians, de rellevància personal o d’interès públic proper a la seva experiència, per tal de descriure, narrar, argumentar i informar, en diferents suports, utilitzant recursos verbals i no verbals, així com estratègies de planificació, control, compensació i cooperació.
+- **1 · Competència específica:** Produir textos orals i multimodals amb coherència, claredat i registre adequats, atenent les convencions pròpies dels diferents gèneres discursius, i participar en interaccions orals variades, amb autonomia, per expressar idees, sentiments i conceptes, construir coneixement i establir vincles personals.
+
+- **2 · Criteri d'avaluació 3.1:** Expressar oralment textos senzills, estructurats, comprensibles, coherents i adequats a la situació comunicativa sobre temes quotidians, de rellevància personal o d’interès públic proper a la seva experiència, per tal de descriure, narrar, argumentar i informar, en diferents suports, utilitzant recursos verbals i no verbals, així com estratègies de planificació, control, compensació i cooperació.
 
 <!-- -->
 
-- *LS criterion (O3):* Presents the classmate's real routine in a video with Google Slides and their face in picture-in-picture, describing the day in order with Present Simple, frequency adverbs and phrasal verbs, and ends with a reflection on healthy habits based on a detail from the interview (Safe and Daring also compare it with their own routine).
+- **3 · LS learning objective (O3, compartit amb CPSAA 2 · 2.1):** Describe a classmate's routine, commuting and daily responsibilities using Present Simple, be / have got, frequency adverbs, phrasal verbs and connectors of cause, contrast and consequence, in order to present it in a recorded video and reflect on how healthy it is.
+
+- **4 · LS assessment criterion:** Presents the classmate's real routine in a video with Google Slides and their face in picture-in-picture, describing the day in order with Present Simple, frequency adverbs and phrasal verbs, and ends with a reflection on healthy habits based on a detail from the interview (Safe and Daring also compare it with their own routine).
 
 <!-- -->
 
-- 3.3 Participar i col·laborar activament, a través de diversos suports, en situacions interactives sobre temes quotidians, de rellevància personal o d’interès públic propers a la seva experiència, mostrant iniciativa, empatia i respecte per la cortesia lingüística i l’etiqueta digital, així com per les diferents necessitats, idees, inquietuds, iniciatives i motivacions dels interlocutors.
+- **2 · Criteri d'avaluació 3.3:** Participar i col·laborar activament, a través de diversos suports, en situacions interactives sobre temes quotidians, de rellevància personal o d’interès públic propers a la seva experiència, mostrant iniciativa, empatia i respecte per la cortesia lingüística i l’etiqueta digital, així com per les diferents necessitats, idees, inquietuds, iniciatives i motivacions dels interlocutors.
 
 <!-- -->
 
-- *LS criterion (O2):* Interviews a classmate about their routine with prepared questions (wh- questions, yes / no questions, How often…?), asks at least two follow-up questions, listens actively and respects turns and privacy, and records the answers in interview notes.
+- **3 · LS learning objective (O2, compartit amb CPSAA 3 · 3.1):** Apply question forms and respectful interaction strategies in an interview with a classmate, in order to gather real details about their routine.
+
+- **4 · LS assessment criterion:** Interviews a classmate about their routine with prepared questions (wh- questions, yes / no questions, How often…?), asks at least two follow-up questions, listens actively and respects turns and privacy, and records the answers in interview notes.
 
 <!-- -->
 
@@ -164,11 +203,15 @@ Transversals treballades, amb un criteri per competència: CPSAA 1, 2, 3, 4 i 5 
 
 <!-- -->
 
-- 5.2 Aplicar coneixements i estratègies per a planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o del lector potencial a qui s’adreça el text.
+- **1 · Competència específica:** Produir textos escrits i multimodals amb adequació, coherència i cohesió, aplicant estratègies elementals de planificació, redacció, revisió, correcció i edició, amb regulació dels iguals i autoregulació progressivament autònoma, i atenent les convencions pròpies del gènere discursiu triat, per construir coneixement i donar resposta de manera informada, eficaç i creativa a demandes comunicatives concretes.
+
+- **2 · Criteri d'avaluació 5.2:** Aplicar coneixements i estratègies per a planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o del lector potencial a qui s’adreça el text.
 
 <!-- -->
 
-- *LS criterion (O4):* Plans the presentation from the interview notes with an outline, writes the slide text in key words and short linked sentences, and revises a first draft with the shared checklist before recording.
+- **3 · LS learning objective (O4):** Plan, write and revise the notes and slides of the presentation, in order to produce a clear, coherent and original multimodal text.
+
+- **4 · LS assessment criterion:** Plans the presentation from the interview notes with an outline, writes the slide text in key words and short linked sentences, and revises a first draft with the shared checklist before recording.
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -176,11 +219,47 @@ Transversals treballades, amb un criteri per competència: CPSAA 1, 2, 3, 4 i 5 
 
 <!-- -->
 
-- 9.2 Utilitzar de forma creativa estratègies i coneixements de millora de la pròpia capacitat de comunicar i d’aprendre la llengua estrangera, amb suport d’altres participants i de suports analògics i digitals.
+- **1 · Competència específica:** Ampliar i usar els repertoris lingüístics personals entre diferents llengües, reflexionant de manera crítica sobre el seu funcionament i prenent consciència de les estratègies i coneixements propis, per millorar la resposta a necessitats comunicatives concretes.
+
+- **2 · Criteri d'avaluació 9.2:** Utilitzar de forma creativa estratègies i coneixements de millora de la pròpia capacitat de comunicar i d’aprendre la llengua estrangera, amb suport d’altres participants i de suports analògics i digitals.
 
 <!-- -->
 
-- *LS criterion (O5):* Rehearses using at least two improvement strategies (a recorded practice audio, a partner's feedback, a pronunciation tool or the checklist) and notes in a short self-assessment what they changed thanks to them.
+- **3 · LS learning objective (O5):** Use rehearsal, peer feedback and recordings of their own voice as improvement strategies, in order to speak more clearly and confidently in the final video.
+
+- **4 · LS assessment criterion:** Rehearses using at least two improvement strategies (a recorded practice audio, a partner's feedback, a pronunciation tool or the checklist) and notes in a short self-assessment what they changed thanks to them.
+
+**COMPETÈNCIES TRANSVERSALS**
+
+- **CPSAA 2 · Competència personal, social i d’aprendre a aprendre** (vincle possible)
+
+<!-- -->
+
+- **1 · Competència específica:** Conèixer els riscos per a la salut relacionats amb factors socials, per consolidar hàbits de vida saludable en el terreny físic i mental.
+
+- **2 · Criteri d'avaluació 2.1:** Consolidar, en la vida quotidiana, els hàbits de vida saludable, fent-ne propostes de millora justificades i amb sentit crític mitjançant el treball en grup i la retroacció.
+
+<!-- -->
+
+- **3 · LS learning objective (O3, compartit amb CE3 · 3.1):** Describe a classmate's routine, commuting and daily responsibilities using Present Simple, be / have got, frequency adverbs, phrasal verbs and connectors of cause, contrast and consequence, in order to present it in a recorded video and reflect on how healthy it is.
+
+- **4 · LS assessment criterion:** Ends the video with at least one justified proposal to improve a habit in the classmate's routine (sleep, screens, rest or physical activity), improved with a partner's feedback, and always talks about habits, never about bodies.
+
+<!-- -->
+
+- **CPSAA 3 · Competència personal, social i d’aprendre a aprendre** (vincle directe)
+
+<!-- -->
+
+- **1 · Competència específica:** Comprendre proactivament les perspectives i les experiències dels altres i incorporar-les al seu aprenentatge per participar en el treball en grup distribuint i acceptant tasques i responsabilitats de manera equitativa i emprant estratègies cooperatives.
+
+- **2 · Criteri d'avaluació 3.1:** Emprendre accions, de forma proactiva, que mostrin comprensió i respecte per les emocions, perspectives i experiències dels altres valorant la diversitat mitjançant estratègies de comunicació efectiva, activa i empàtica.
+
+<!-- -->
+
+- **3 · LS learning objective (O2, compartit amb CE3 · 3.3):** Apply question forms and respectful interaction strategies in an interview with a classmate, in order to gather real details about their routine.
+
+- **4 · LS assessment criterion:** In the interview, shows understanding and respect for the classmate's experiences and feelings through active, empathetic listening (follow-up questions, no judging comments, respect for what they prefer not to share), and later describes their routine faithfully, without exaggerating or mocking it.
 
 Routes vary support, complexity and independence; they use the same course criterion band.
 
@@ -302,23 +381,11 @@ Insecure retains Catalan guidance at every step, with English examples linking i
 
 ### 6. Competències transversals
 
-- **CPSAA 2** · Competència personal, social i d’aprendre a aprendre
+Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb els mateixos passos que les competències d'anglès:
 
-<!-- -->
+- **CPSAA 2 · 2.1**: objectiu O3, compartit amb CE3 · 3.1.
 
-- 2.1. Consolidar, en la vida quotidiana, els hàbits de vida saludable, fent-ne propostes de millora justificades i amb sentit crític mitjançant el treball en grup i la retroacció.
-
-- *Evidència (O3, vincle possible pel tema de la LS):* la reflexió sobre hàbits del producte final (son, pantalles, descans, activitat), sempre sobre hàbits i mai sobre cossos.
-
-<!-- -->
-
-- **CPSAA 3** · Competència personal, social i d’aprendre a aprendre
-
-<!-- -->
-
-- 3.1. Emprendre accions, de forma proactiva, que mostrin comprensió i respecte per les emocions, perspectives i experiències dels altres valorant la diversitat mitjançant estratègies de comunicació efectiva, activa i empàtica.
-
-- *Evidència (O2, vincle directe):* l’entrevista al company, amb preguntes respectuoses i una descripció fidel del que ha dit.
+- **CPSAA 3 · 3.1**: objectiu O2, compartit amb CE3 · 3.3.
 
 ## LS2 · 4ESO · Seasons & Celebrations
 
@@ -332,9 +399,9 @@ Insecure retains Catalan guidance at every step, with English examples linking i
 
 - **O3 · Explain** the customs, dates and origins of a celebration and what it means for the people who celebrate it, using Present Simple, “it is celebrated / it takes place”, Past Simple and used to, in order to present it to an audience that does not know it. (CE3 · 3.2 + CE1 · 1.1)
 
-- **O4 · Compare** the chosen celebration with a local one, building links between cultures and rejecting stereotypes, in order to make the school event inclusive. Deeper in Safe and Daring. (CE1 · 1.2)
+- **O4 · Compare** the chosen celebration with a local one, building links between cultures and rejecting stereotypes, in order to make the school event inclusive. Deeper in Safe and Daring. (CE1 · 1.2 + CC3 · 3.2)
 
-- **O5 · Plan** a school celebration day using future forms (going to, will, Present Continuous) and relative clauses, in order to propose it to the head teacher in a formal email. (CE5 · 5.1)
+- **O5 · Plan** a school celebration day using future forms (going to, will, Present Continuous) and relative clauses, in order to propose it to the head teacher in a formal email. (CE5 · 5.1 + CC1 · 1.3)
 
 ### 2. Competències específiques i criteris d'avaluació
 
@@ -344,19 +411,25 @@ Insecure retains Catalan guidance at every step, with English examples linking i
 
 <!-- -->
 
-- 4.1 Comprendre i interpretar el sentit global, l’estructura, la informació més rellevant i la intenció de l’emissor de textos escrits i multimodals de certa complexitat, que responguin a diferents propòsits de lectura, realitzant les inferències necessàries.
+- **1 · Competència específica:** Comprendre, interpretar i analitzar, amb sentit crític i diferents propòsits de lectura, textos escrits i multimodals reconeixent el sentit global i les idees principals i secundàries, identificant la intenció de l’emissor, reflexionant sobre el contingut i la forma i avaluant-ne la qualitat i fiabilitat, per tal de construir coneixement i donar resposta a necessitats i interessos comunicatius diversos.
+
+- **2 · Criteri d'avaluació 4.1:** Comprendre i interpretar el sentit global, l’estructura, la informació més rellevant i la intenció de l’emissor de textos escrits i multimodals de certa complexitat, que responguin a diferents propòsits de lectura, realitzant les inferències necessàries.
 
 <!-- -->
 
-- *LS criterion (O1):* Completes a reading log on two texts about celebrations, noting what, when and where each one takes place, its main customs and two words whose meaning they inferred from context.
+- **3 · LS learning objective (O1, compartit amb CE2 · 2.2):** Interpret written and spoken texts about seasons, traditions and celebrations (articles, short videos, people explaining how they celebrate), identifying main ideas, details and meaning from context, in order to build the background knowledge the project needs.
+
+- **4 · LS assessment criterion:** Completes a reading log on two texts about celebrations, noting what, when and where each one takes place, its main customs and two words whose meaning they inferred from context.
 
 <!-- -->
 
-- 4.2 Valorar críticament el contingut i la forma de textos de certa complexitat, avaluant-ne la qualitat, la fiabilitat i la idoneïtat de canal utilitzat, així com l’eficàcia dels procediments lingüístics emprats.
+- **2 · Criteri d'avaluació 4.2:** Valorar críticament el contingut i la forma de textos de certa complexitat, avaluant-ne la qualitat, la fiabilitat i la idoneïtat de canal utilitzat, així com l’eficàcia dels procediments lingüístics emprats.
 
 <!-- -->
 
-- *LS criterion (O2):* Rates each source in the research sheet as reliable or not with at least two reasons (author, date, purpose, type of website or channel) and says which one they trust most.
+- **3 · LS learning objective (O2, compartit amb CE6 · 6.1):** Check information about the chosen celebration in at least two sources, assessing their reliability and crediting them, in order to communicate accurate and respectful content.
+
+- **4 · LS assessment criterion:** Rates each source in the research sheet as reliable or not with at least two reasons (author, date, purpose, type of website or channel) and says which one they trust most.
 
 <!-- -->
 
@@ -364,11 +437,15 @@ Insecure retains Catalan guidance at every step, with English examples linking i
 
 <!-- -->
 
-- 2.2 Interpretar i valorar el contingut i els trets discursius de textos progressivament més complexos propis dels àmbits de les relacions interpersonals, dels mitjans de comunicació social i de l’aprenentatge, i també de textos literaris adequats al nivell de maduresa de l’alumnat.
+- **1 · Competència específica:** Comprendre i interpretar textos orals i multimodals, en la llengua estàndard, recollint el sentit general i la informació més rellevant, la seva forma i el seu contingut, per construir coneixement, formar-se opinió i eixamplar les possibilitats de gaudi i lleure.
+
+- **2 · Criteri d'avaluació 2.2:** Interpretar i valorar el contingut i els trets discursius de textos progressivament més complexos propis dels àmbits de les relacions interpersonals, dels mitjans de comunicació social i de l’aprenentatge, i també de textos literaris adequats al nivell de maduresa de l’alumnat.
 
 <!-- -->
 
-- *LS criterion (O1):* After watching two short videos of people describing how they celebrate a festival, explains in a listening chart what each speaker values about it and which words, tone or images show it.
+- **3 · LS learning objective (O1, compartit amb CE4 · 4.1):** Interpret written and spoken texts about seasons, traditions and celebrations (articles, short videos, people explaining how they celebrate), identifying main ideas, details and meaning from context, in order to build the background knowledge the project needs.
+
+- **4 · LS assessment criterion:** After watching two short videos of people describing how they celebrate a festival, explains in a listening chart what each speaker values about it and which words, tone or images show it.
 
 <!-- -->
 
@@ -376,11 +453,15 @@ Insecure retains Catalan guidance at every step, with English examples linking i
 
 <!-- -->
 
-- 3.2 Aplicar coneixements i estratègies per planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o el destinatari del text.
+- **1 · Competència específica:** Produir textos orals i multimodals amb coherència, claredat i registre adequats, atenent les convencions pròpies dels diferents gèneres discursius, i participar en interaccions orals variades, amb autonomia, per expressar idees, sentiments i conceptes, construir coneixement i establir vincles personals.
+
+- **2 · Criteri d'avaluació 3.2:** Aplicar coneixements i estratègies per planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o el destinatari del text.
 
 <!-- -->
 
-- *LS criterion (O3):* Plans, rehearses and records the 2–3 minute group video pitch with the group, sharing out the parts, and explains their part of the celebration (what, when, where, customs, origin) from a script revised so that an audience that does not know it can follow it.
+- **3 · LS learning objective (O3, compartit amb CE1 · 1.1):** Explain the customs, dates and origins of a celebration and what it means for the people who celebrate it, using Present Simple, “it is celebrated / it takes place”, Past Simple and used to, in order to present it to an audience that does not know it.
+
+- **4 · LS assessment criterion:** Plans, rehearses and records the 2–3 minute group video pitch with the group, sharing out the parts, and explains their part of the celebration (what, when, where, customs, origin) from a script revised so that an audience that does not know it can follow it.
 
 <!-- -->
 
@@ -388,11 +469,15 @@ Insecure retains Catalan guidance at every step, with English examples linking i
 
 <!-- -->
 
-- 5.1 Redactar i difondre textos d’extensió mitjana amb acceptable claredat, coherència, cohesió, correcció i adequació a la situació comunicativa proposada, a la tipologia textual i a les eines analògiques i digitals utilitzades, sobre assumptes quotidians, de rellevància personal o d’interès públic pròxims a la seva experiència, respectant la propietat intel·lectual i evitant el plagi.
+- **1 · Competència específica:** Produir textos escrits i multimodals amb adequació, coherència i cohesió, aplicant estratègies elementals de planificació, redacció, revisió, correcció i edició, amb regulació dels iguals i autoregulació progressivament autònoma, i atenent les convencions pròpies del gènere discursiu triat, per construir coneixement i donar resposta de manera informada, eficaç i creativa a demandes comunicatives concretes.
+
+- **2 · Criteri d'avaluació 5.1:** Redactar i difondre textos d’extensió mitjana amb acceptable claredat, coherència, cohesió, correcció i adequació a la situació comunicativa proposada, a la tipologia textual i a les eines analògiques i digitals utilitzades, sobre assumptes quotidians, de rellevància personal o d’interès públic pròxims a la seva experiència, respectant la propietat intel·lectual i evitant el plagi.
 
 <!-- -->
 
-- *LS criterion (O5):* Writes an individual formal email to the head teacher (Insecure: guided template) that states the purpose, describes the plan and makes a request, using future forms, relative clauses and the conventions of a formal email.
+- **3 · LS learning objective (O5, compartit amb CC1 · 1.3):** Plan a school celebration day using future forms (going to, will, Present Continuous) and relative clauses, in order to propose it to the head teacher in a formal email.
+
+- **4 · LS assessment criterion:** Writes an individual formal email to the head teacher (Insecure: guided template) that states the purpose, describes the plan and makes a request, using future forms, relative clauses and the conventions of a formal email.
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -400,19 +485,25 @@ Insecure retains Catalan guidance at every step, with English examples linking i
 
 <!-- -->
 
-- 1.1 Valorar críticament la diversitat lingüística, cultural i artística pròpia de països on es parla la llengua estrangera, en relació amb els drets humans, i adequar-se a aquesta diversitat, tot afavorint el desenvolupament d’una cultura compartida i una ciutadania compromesa amb la sostenibilitat i els valors democràtics.
+- **1 · Competència específica:** Descriure i valorar la diversitat lingüística i cultural a partir del reconeixement de les llengües de l’alumnat i la realitat plurilingüe, pluricultural i intercultural, per afavorir la transferència lingüística, identificar i rebutjar estereotips i prejudicis lingüístics i valorar aquesta diversitat com a font de riquesa cultural.
+
+- **2 · Criteri d'avaluació 1.1:** Valorar críticament la diversitat lingüística, cultural i artística pròpia de països on es parla la llengua estrangera, en relació amb els drets humans, i adequar-se a aquesta diversitat, tot afavorint el desenvolupament d’una cultura compartida i una ciutadania compromesa amb la sostenibilitat i els valors democràtics.
 
 <!-- -->
 
-- *LS criterion (O3):* Explains in the pitch what the celebration means for the people who celebrate it and why it deserves a place at school, with at least one argument about respect for cultural diversity.
+- **3 · LS learning objective (O3, compartit amb CE3 · 3.2):** Explain the customs, dates and origins of a celebration and what it means for the people who celebrate it, using Present Simple, “it is celebrated / it takes place”, Past Simple and used to, in order to present it to an audience that does not know it.
+
+- **4 · LS assessment criterion:** Explains in the pitch what the celebration means for the people who celebrate it and why it deserves a place at school, with at least one argument about respect for cultural diversity.
 
 <!-- -->
 
-- 1.2 Participar de manera adequada, empàtica i respectuosa en situacions interculturals, construint vincles entre les diferents llengües i cultures, rebutjant qualsevol tipus de discriminació, prejudici i estereotip en contextos comunicatius quotidians, i proposant vies de solució a aquells factors socioculturals que dificulten la comunicació.
+- **2 · Criteri d'avaluació 1.2:** Participar de manera adequada, empàtica i respectuosa en situacions interculturals, construint vincles entre les diferents llengües i cultures, rebutjant qualsevol tipus de discriminació, prejudici i estereotip en contextos comunicatius quotidians, i proposant vies de solució a aquells factors socioculturals que dificulten la comunicació.
 
 <!-- -->
 
-- *LS criterion (O4):* Shows in the pitch at least one link between the chosen celebration and a local one (Safe and Daring: similarities and differences) and proposes at least one decision that makes the day inclusive and avoids stereotypes or caricature costumes.
+- **3 · LS learning objective (O4, compartit amb CC3 · 3.2):** Compare the chosen celebration with a local one, building links between cultures and rejecting stereotypes, in order to make the school event inclusive. Deeper in Safe and Daring.
+
+- **4 · LS assessment criterion:** Shows in the pitch at least one link between the chosen celebration and a local one (Safe and Daring: similarities and differences) and proposes at least one decision that makes the day inclusive and avoids stereotypes or caricature costumes.
 
 <!-- -->
 
@@ -420,11 +511,47 @@ Insecure retains Catalan guidance at every step, with English examples linking i
 
 <!-- -->
 
-- 6.1 Aplicar estratègies de cerca d’informació (localització, selecció i contrast), en diferents fonts, incloses les digitals, calibrant-ne la fiabilitat i pertinència en funció dels objectius de lectura, sobre temes d’interès acadèmic, personal, ecològic i social, de forma autònoma, a la xarxa i a la biblioteca, valorant críticament el resultat de la cerca.
+- **1 · Competència específica:** Cercar, seleccionar i contrastar informació procedent de diferents fonts de manera progressivament autònoma, avaluant-ne la fiabilitat i pertinència en funció dels objectius de lectura i evitant els riscos de manipulació i desinformació, i integrar-la i transformar-la en coneixement, per comunicar-la, adoptant un punt de vista crític, personal i respectuós amb la propietat intel·lectual.
+
+- **2 · Criteri d'avaluació 6.1:** Aplicar estratègies de cerca d’informació (localització, selecció i contrast), en diferents fonts, incloses les digitals, calibrant-ne la fiabilitat i pertinència en funció dels objectius de lectura, sobre temes d’interès acadèmic, personal, ecològic i social, de forma autònoma, a la xarxa i a la biblioteca, valorant críticament el resultat de la cerca.
 
 <!-- -->
 
-- *LS criterion (O2):* Fills in a research sheet on the chosen celebration with at least two sources (Safe and Daring: three), noting the key information from each source, where they agree or differ, and the full reference.
+- **3 · LS learning objective (O2, compartit amb CE4 · 4.2):** Check information about the chosen celebration in at least two sources, assessing their reliability and crediting them, in order to communicate accurate and respectful content.
+
+- **4 · LS assessment criterion:** Fills in a research sheet on the chosen celebration with at least two sources (Safe and Daring: three), noting the key information from each source, where they agree or differ, and the full reference.
+
+**COMPETÈNCIES TRANSVERSALS**
+
+- **CC1 · Competència ciutadana** (vincle directe)
+
+<!-- -->
+
+- **1 · Competència específica:** Analitzar i comprendre idees relatives a la dimensió social i ciutadana de la seva pròpia identitat, així com als fets socials, històrics i normatius que la determinen, demostrant respecte per les normes, empatia, equitat i esperit constructiu en la interacció amb els altres en diferents contextos socioinstitucionals.
+
+- **2 · Criteri d'avaluació 1.3:** Proposar accions que promoguin relacions de convivència amb totes les persones i grups socials, tant de l’entorn proper com de l’àmbit global.
+
+<!-- -->
+
+- **3 · LS learning objective (O5, compartit amb CE5 · 5.1):** Plan a school celebration day using future forms (going to, will, Present Continuous) and relative clauses, in order to propose it to the head teacher in a formal email.
+
+- **4 · LS assessment criterion:** Includes in the email to the head teacher at least two concrete actions that help every student and family feel welcome on the celebration day (for example, explaining the customs, inviting families or offering an alternative to those who do not celebrate it).
+
+<!-- -->
+
+- **CC3 · Competència ciutadana** (vincle directe)
+
+<!-- -->
+
+- **1 · Competència específica:** Analitzar i comprendre problemes ètics fonamentals i d’actualitat, considerant críticament els valors propis i aliens, i desenvolupant els seus propis judicis per afrontar la controvèrsia moral amb actitud dialogant, argumentativa, respectuosa i oposada a qualsevol tipus de discriminació o violència —incloent-hi la violència masclista, LGTBI-fòbica, racista o capacitista— o fonamentalisme ideològic.
+
+- **2 · Criteri d'avaluació 3.2:** Adoptar un paper actiu i compromès en la lluita per la superació d’estereotips i prejudicis, perquè totes les persones puguin desenvolupar les seves aspiracions.
+
+<!-- -->
+
+- **3 · LS learning objective (O4, compartit amb CE1 · 1.2):** Compare the chosen celebration with a local one, building links between cultures and rejecting stereotypes, in order to make the school event inclusive. Deeper in Safe and Daring.
+
+- **4 · LS assessment criterion:** Names in the pitch at least one stereotype or prejudice about the people who celebrate the festival, explains why it is unfair and shows how the group's plan avoids it (respectful images and words, no caricature costumes).
 
 Routes vary support, complexity and independence; they use the same course criterion band.
 
@@ -534,23 +661,11 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 ### 6. Competències transversals
 
-- **CC1** · Competència ciutadana
+Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb els mateixos passos que les competències d'anglès:
 
-<!-- -->
+- **CC1 · 1.3**: objectiu O5, compartit amb CE5 · 5.1.
 
-- 1.3. Proposar accions que promoguin relacions de convivència amb totes les persones i grups socials, tant de l’entorn proper com de l’àmbit global.
-
-- *Evidència (O4 i O5, vincle directe):* les decisions perquè l’acte sigui inclusiu i la proposta a la direcció.
-
-<!-- -->
-
-- **CC3** · Competència ciutadana
-
-<!-- -->
-
-- 3.2. Adoptar un paper actiu i compromès en la lluita per la superació d’estereotips i prejudicis, perquè totes les persones puguin desenvolupar les seves aspiracions.
-
-- *Evidència (O4, vincle directe):* la comparació amb una celebració local i les decisions per evitar estereotips i disfresses caricaturesques.
+- **CC3 · 3.2**: objectiu O4, compartit amb CE1 · 1.2.
 
 ## LS3 · 4ESO · Moments That Shaped Us
 
@@ -564,9 +679,9 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 - **O3 · Plan** and write the script and storyboard of the video, organising the events with sequencers and past tenses, in order to prepare a clear and coherent narrative. (CE5 · 5.2)
 
-- **O4 · Narrate** the turning point of the person's life with past tenses (Past Simple, Past Continuous, Past Perfect), sequencers and precise words for feelings, in order to tell the story in a narrated video. (CE3 · 3.1)
+- **O4 · Narrate** the turning point of the person's life with past tenses (Past Simple, Past Continuous, Past Perfect), sequencers and precise words for feelings, in order to tell the story in a narrated video. (CE3 · 3.1 + CPSAA 1 · 1.1)
 
-- **O5 · Relate** the story and a reading about change to their own life, in order to share how change shapes people. Deeper in Safe and Daring. (CE7 · 7.2)
+- **O5 · Relate** the story and a reading about change to their own life, in order to share how change shapes people. Deeper in Safe and Daring. (CE7 · 7.2 + CC1 · 1.2)
 
 ### 2. Competències específiques i criteris d'avaluació
 
@@ -576,11 +691,15 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 4.1 Comprendre i interpretar el sentit global, l’estructura, la informació més rellevant i la intenció de l’emissor de textos escrits i multimodals de certa complexitat, que responguin a diferents propòsits de lectura, realitzant les inferències necessàries.
+- **1 · Competència específica:** Comprendre, interpretar i analitzar, amb sentit crític i diferents propòsits de lectura, textos escrits i multimodals reconeixent el sentit global i les idees principals i secundàries, identificant la intenció de l’emissor, reflexionant sobre el contingut i la forma i avaluant-ne la qualitat i fiabilitat, per tal de construir coneixement i donar resposta a necessitats i interessos comunicatius diversos.
+
+- **2 · Criteri d'avaluació 4.1:** Comprendre i interpretar el sentit global, l’estructura, la informació més rellevant i la intenció de l’emissor de textos escrits i multimodals de certa complexitat, que responguin a diferents propòsits de lectura, realitzant les inferències necessàries.
 
 <!-- -->
 
-- *LS criterion (O1):* Reads a short biography or memoir extract and completes a timeline of the turning point with the main events, the narrator's feelings and one inference about why the moment mattered.
+- **3 · LS learning objective (O1, compartit amb CE2 · 2.2):** Interpret spoken and written life stories (podcast and interview extracts, short biographies), identifying the sequence of events, the feelings and the speaker's point of view, in order to understand how people experience change.
+
+- **4 · LS assessment criterion:** Reads a short biography or memoir extract and completes a timeline of the turning point with the main events, the narrator's feelings and one inference about why the moment mattered.
 
 <!-- -->
 
@@ -588,11 +707,15 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 2.2 Interpretar i valorar el contingut i els trets discursius de textos progressivament més complexos propis dels àmbits de les relacions interpersonals, dels mitjans de comunicació social i de l’aprenentatge, i també de textos literaris adequats al nivell de maduresa de l’alumnat.
+- **1 · Competència específica:** Comprendre i interpretar textos orals i multimodals, en la llengua estàndard, recollint el sentit general i la informació més rellevant, la seva forma i el seu contingut, per construir coneixement, formar-se opinió i eixamplar les possibilitats de gaudi i lleure.
+
+- **2 · Criteri d'avaluació 2.2:** Interpretar i valorar el contingut i els trets discursius de textos progressivament més complexos propis dels àmbits de les relacions interpersonals, dels mitjans de comunicació social i de l’aprenentatge, i també de textos literaris adequats al nivell de maduresa de l’alumnat.
 
 <!-- -->
 
-- *LS criterion (O1):* Listens to two life-story extracts (podcast or interview video) and, in a listening chart, orders the key events, names the speaker's feelings and explains how their words or tone show what the moment meant to them.
+- **3 · LS learning objective (O1, compartit amb CE4 · 4.1):** Interpret spoken and written life stories (podcast and interview extracts, short biographies), identifying the sequence of events, the feelings and the speaker's point of view, in order to understand how people experience change.
+
+- **4 · LS assessment criterion:** Listens to two life-story extracts (podcast or interview video) and, in a listening chart, orders the key events, names the speaker's feelings and explains how their words or tone show what the moment meant to them.
 
 <!-- -->
 
@@ -600,11 +723,15 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 3.1 Expressar oralment textos senzills, estructurats, comprensibles, coherents i adequats a la situació comunicativa sobre temes quotidians, de rellevància personal o d’interès públic proper a la seva experiència, per tal de descriure, narrar, argumentar i informar, en diferents suports, utilitzant recursos verbals i no verbals, així com estratègies de planificació, control, compensació i cooperació.
+- **1 · Competència específica:** Produir textos orals i multimodals amb coherència, claredat i registre adequats, atenent les convencions pròpies dels diferents gèneres discursius, i participar en interaccions orals variades, amb autonomia, per expressar idees, sentiments i conceptes, construir coneixement i establir vincles personals.
+
+- **2 · Criteri d'avaluació 3.1:** Expressar oralment textos senzills, estructurats, comprensibles, coherents i adequats a la situació comunicativa sobre temes quotidians, de rellevància personal o d’interès públic proper a la seva experiència, per tal de descriure, narrar, argumentar i informar, en diferents suports, utilitzant recursos verbals i no verbals, així com estratègies de planificació, control, compensació i cooperació.
 
 <!-- -->
 
-- *LS criterion (O4):* Narrates the story in a 2–3 minute video with Google Slides and their face in picture-in-picture, in a clear order, with past tenses, sequencers and words for feelings, speaking from notes rather than reading the script.
+- **3 · LS learning objective (O4, compartit amb CPSAA 1 · 1.1):** Narrate the turning point of the person's life with past tenses (Past Simple, Past Continuous, Past Perfect), sequencers and precise words for feelings, in order to tell the story in a narrated video.
+
+- **4 · LS assessment criterion:** Narrates the story in a 2–3 minute video with Google Slides and their face in picture-in-picture, in a clear order, with past tenses, sequencers and words for feelings, speaking from notes rather than reading the script.
 
 <!-- -->
 
@@ -612,11 +739,15 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 5.2 Aplicar coneixements i estratègies per a planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o del lector potencial a qui s’adreça el text.
+- **1 · Competència específica:** Produir textos escrits i multimodals amb adequació, coherència i cohesió, aplicant estratègies elementals de planificació, redacció, revisió, correcció i edició, amb regulació dels iguals i autoregulació progressivament autònoma, i atenent les convencions pròpies del gènere discursiu triat, per construir coneixement i donar resposta de manera informada, eficaç i creativa a demandes comunicatives concretes.
+
+- **2 · Criteri d'avaluació 5.2:** Aplicar coneixements i estratègies per a planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o del lector potencial a qui s’adreça el text.
 
 <!-- -->
 
-- *LS criterion (O3):* Plans the story in a storyboard (one slide per moment) and writes the narration script with past tenses and sequencers, revising a first draft with a partner's feedback and the checklist.
+- **3 · LS learning objective (O3):** Plan and write the script and storyboard of the video, organising the events with sequencers and past tenses, in order to prepare a clear and coherent narrative.
+
+- **4 · LS assessment criterion:** Plans the story in a storyboard (one slide per moment) and writes the narration script with past tenses and sequencers, revising a first draft with a partner's feedback and the checklist.
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -624,11 +755,15 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 7.2 Compartir l’experiència de lectura en suports diversos tot relacionant el sentit de l’obra amb la pròpia experiència biogràfica, lectora i cultural.
+- **1 · Competència específica:** Seleccionar i llegir de manera autònoma obres diverses com a font de plaer i coneixement, configurant un itinerari lector que s’enriqueixi progressivament pel que fa a diversitat, complexitat i qualitat de les obres, i compartir experiències de lectura per construir la pròpia identitat lectora i gaudir de la dimensió social de la lectura.
+
+- **2 · Criteri d'avaluació 7.2:** Compartir l’experiència de lectura en suports diversos tot relacionant el sentit de l’obra amb la pròpia experiència biogràfica, lectora i cultural.
 
 <!-- -->
 
-- *LS criterion (O5):* In the reflection part of the video, shares a reading about change chosen from the class selection (a short story, a graded-reader chapter, a poem or a song) and relates it to the interviewee's story and to their own experience (Insecure: one connection; Safe and Daring: two or more, with examples).
+- **3 · LS learning objective (O5, compartit amb CC1 · 1.2):** Relate the story and a reading about change to their own life, in order to share how change shapes people. Deeper in Safe and Daring.
+
+- **4 · LS assessment criterion:** In the reflection part of the video, shares a reading about change chosen from the class selection (a short story, a graded-reader chapter, a poem or a song) and relates it to the interviewee's story and to their own experience (Insecure: one connection; Safe and Daring: two or more, with examples).
 
 <!-- -->
 
@@ -636,11 +771,47 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 8.1 Inferir i explicar textos, conceptes i comunicacions breus i senzilles en situacions de diversitat lingüística, social i cultural, mostrant respecte i empatia per les i els interlocutors i per les llengües emprades, i participant en la solució de problemes d’intercomprensió i d’entesa en l’entorn.
+- **1 · Competència específica:** Mediar entre diferents llengües, fent servir estratègies i coneixements senzills orientats a explicar conceptes o simplificar missatges, per transmetre informació de manera eficaç, clara i responsable.
+
+- **2 · Criteri d'avaluació 8.1:** Inferir i explicar textos, conceptes i comunicacions breus i senzilles en situacions de diversitat lingüística, social i cultural, mostrant respecte i empatia per les i els interlocutors i per les llengües emprades, i participant en la solució de problemes d’intercomprensió i d’entesa en l’entorn.
 
 <!-- -->
 
-- *LS criterion (O2):* Turns the interview notes (taken in any language) into English notes and explains the story to a classmate who does not know the person, simplifying difficult ideas, rephrasing when the classmate does not understand and respecting what the interviewee chose to share.
+- **3 · LS learning objective (O2):** Explain in English a story heard in Catalan or Spanish, simplifying and reformulating it, in order to make it understandable to an audience that does not know the person.
+
+- **4 · LS assessment criterion:** Turns the interview notes (taken in any language) into English notes and explains the story to a classmate who does not know the person, simplifying difficult ideas, rephrasing when the classmate does not understand and respecting what the interviewee chose to share.
+
+**COMPETÈNCIES TRANSVERSALS**
+
+- **CC1 · Competència ciutadana** (vincle directe)
+
+<!-- -->
+
+- **1 · Competència específica:** Analitzar i comprendre idees relatives a la dimensió social i ciutadana de la seva pròpia identitat, així com als fets socials, històrics i normatius que la determinen, demostrant respecte per les normes, empatia, equitat i esperit constructiu en la interacció amb els altres en diferents contextos socioinstitucionals.
+
+- **2 · Criteri d'avaluació 1.2:** Avaluar els processos de construcció de la identitat individual i col·lectiva, a través de la implementació de pràctiques i estratègies que promouen la reflexió crítica sobre els reptes i conflictes socials, des d’una comprensió sistèmica i global.
+
+<!-- -->
+
+- **3 · LS learning objective (O5, compartit amb CE7 · 7.2):** Relate the story and a reading about change to their own life, in order to share how change shapes people. Deeper in Safe and Daring.
+
+- **4 · LS assessment criterion:** In the reflection, explains how the turning point changed the interviewee's identity (what they believe, value or do differently) and compares it with how their own identity is being shaped by the groups they belong to (family, friends, school or town).
+
+<!-- -->
+
+- **CPSAA 1 · Competència personal, social i d’aprendre a aprendre** (vincle possible)
+
+<!-- -->
+
+- **1 · Competència específica:** Regular i expressar les seves emocions enfortint l’optimisme, la resiliència, l’autoeficàcia i la recerca de propòsit i motivació cap a l’aprenentatge per gestionar els reptes i canvis i harmonitzar-los amb els seus propis objectius.
+
+- **2 · Criteri d'avaluació 1.1:** Analitzar la gestió de les emocions en les relacions amb els altres dins el context educatiu i social.
+
+<!-- -->
+
+- **3 · LS learning objective (O4, compartit amb CE3 · 3.1):** Narrate the turning point of the person's life with past tenses (Past Simple, Past Continuous, Past Perfect), sequencers and precise words for feelings, in order to tell the story in a narrated video.
+
+- **4 · LS assessment criterion:** In the narrated video, explains how the interviewee felt at the turning point and how they managed those emotions with the people around them (who helped, what they did, what they would do differently), using precise words for feelings.
 
 Routes vary support, complexity and independence; they use the same course criterion band.
 
@@ -740,23 +911,11 @@ Insecure retains Catalan guidance at every step, with English examples linking q
 
 ### 6. Competències transversals
 
-- **CC1** · Competència ciutadana
+Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb els mateixos passos que les competències d'anglès:
 
-<!-- -->
+- **CC1 · 1.2**: objectiu O5, compartit amb CE7 · 7.2.
 
-- 1.2. Avaluar els processos de construcció de la identitat individual i col·lectiva, a través de la implementació de pràctiques i estratègies que promouen la reflexió crítica sobre els reptes i conflictes socials, des d’una comprensió sistèmica i global.
-
-- *Evidència (O5, vincle directe):* la reflexió sobre com el moment va marcar la identitat de la persona i què en diu de la pròpia.
-
-<!-- -->
-
-- **CPSAA 1** · Competència personal, social i d’aprendre a aprendre
-
-<!-- -->
-
-- 1.1. Analitzar la gestió de les emocions en les relacions amb els altres dins el context educatiu i social.
-
-- *Evidència (O1 i O4, vincle possible pel tema de la LS):* l’anàlisi de com la persona entrevistada va gestionar les emocions en un moment de canvi.
+- **CPSAA 1 · 1.1**: objectiu O4, compartit amb CE3 · 3.1.
 
 ## LS4 · 4ESO · Fact or Fake?
 
@@ -768,11 +927,11 @@ Insecure retains Catalan guidance at every step, with English examples linking q
 
 - **O2 · Apply** listening strategies to short news clips and viral videos (inferring meaning, interpreting images, sound and editing), in order to judge whether what they hear can be trusted. (CE2 · 2.3)
 
-- **O3 · Contrast** a viral claim with at least three sources using verification strategies (lateral reading, reverse image search), in order to reach a verdict based on evidence. (CE6 · 6.1)
+- **O3 · Contrast** a viral claim with at least three sources using verification strategies (lateral reading, reverse image search), in order to reach a verdict based on evidence. (CE6 · 6.1 + CD1 · 1.2)
 
 - **O4 · Write** a fact-check report (headline, claim, verdict, evidence, sources) using reported speech, reporting verbs and the passive, in order to inform readers responsibly. (CE5 · 5.1 + CE6 · 6.2)
 
-- **O5 · Present** the verdict in a newsflash video, using modals of deduction and may / might to explain how the content was made, in order to help the audience share information responsibly. Daring also explains why the claim spread. (CE3 · 3.1)
+- **O5 · Present** the verdict in a newsflash video, using modals of deduction and may / might to explain how the content was made, in order to help the audience share information responsibly. Daring also explains why the claim spread. (CE3 · 3.1 + CPSAA 4 · 4.4)
 
 ### 2. Competències específiques i criteris d'avaluació
 
@@ -782,11 +941,15 @@ Insecure retains Catalan guidance at every step, with English examples linking q
 
 <!-- -->
 
-- 4.2 Valorar críticament el contingut i la forma de textos de certa complexitat, avaluant-ne la qualitat, la fiabilitat i la idoneïtat de canal utilitzat, així com l’eficàcia dels procediments lingüístics emprats.
+- **1 · Competència específica:** Comprendre, interpretar i analitzar, amb sentit crític i diferents propòsits de lectura, textos escrits i multimodals reconeixent el sentit global i les idees principals i secundàries, identificant la intenció de l’emissor, reflexionant sobre el contingut i la forma i avaluant-ne la qualitat i fiabilitat, per tal de construir coneixement i donar resposta a necessitats i interessos comunicatius diversos.
+
+- **2 · Criteri d'avaluació 4.2:** Valorar críticament el contingut i la forma de textos de certa complexitat, avaluant-ne la qualitat, la fiabilitat i la idoneïtat de canal utilitzat, així com l’eficàcia dels procediments lingüístics emprats.
 
 <!-- -->
 
-- *LS criterion (O1):* In a “spot the fake” activity with four posts or headlines, rates each one as reliable, misleading or false and justifies it with two clues about content, form, source or channel.
+- **3 · LS learning objective (O1, compartit amb CE10 · 10.1):** Analyse news, posts and headlines critically (content, form, source and channel), in order to detect misleading or manipulative content.
+
+- **4 · LS assessment criterion:** In a “spot the fake” activity with four posts or headlines, rates each one as reliable, misleading or false and justifies it with two clues about content, form, source or channel.
 
 <!-- -->
 
@@ -794,11 +957,15 @@ Insecure retains Catalan guidance at every step, with English examples linking q
 
 <!-- -->
 
-- 2.3 Seleccionar, organitzar i aplicar les estratègies i els coneixements més adequats en cada situació comunicativa per comprendre el sentit general, la informació essencial i els detalls més rellevants dels textos; inferir significats i interpretar elements no verbals, i cercar, seleccionar i gestionar informació veraç.
+- **1 · Competència específica:** Comprendre i interpretar textos orals i multimodals, en la llengua estàndard, recollint el sentit general i la informació més rellevant, la seva forma i el seu contingut, per construir coneixement, formar-se opinió i eixamplar les possibilitats de gaudi i lleure.
+
+- **2 · Criteri d'avaluació 2.3:** Seleccionar, organitzar i aplicar les estratègies i els coneixements més adequats en cada situació comunicativa per comprendre el sentit general, la informació essencial i els detalls més rellevants dels textos; inferir significats i interpretar elements no verbals, i cercar, seleccionar i gestionar informació veraç.
 
 <!-- -->
 
-- *LS criterion (O2):* Watches two short news clips or viral videos and notes in a listening sheet the claim, the essential information, two relevant details and the visual or sound cues (editing, music, captions) that make the clip more or less believable.
+- **3 · LS learning objective (O2):** Apply listening strategies to short news clips and viral videos (inferring meaning, interpreting images, sound and editing), in order to judge whether what they hear can be trusted.
+
+- **4 · LS assessment criterion:** Watches two short news clips or viral videos and notes in a listening sheet the claim, the essential information, two relevant details and the visual or sound cues (editing, music, captions) that make the clip more or less believable.
 
 <!-- -->
 
@@ -806,11 +973,15 @@ Insecure retains Catalan guidance at every step, with English examples linking q
 
 <!-- -->
 
-- 3.1 Expressar oralment textos senzills, estructurats, comprensibles, coherents i adequats a la situació comunicativa sobre temes quotidians, de rellevància personal o d’interès públic proper a la seva experiència, per tal de descriure, narrar, argumentar i informar, en diferents suports, utilitzant recursos verbals i no verbals, així com estratègies de planificació, control, compensació i cooperació.
+- **1 · Competència específica:** Produir textos orals i multimodals amb coherència, claredat i registre adequats, atenent les convencions pròpies dels diferents gèneres discursius, i participar en interaccions orals variades, amb autonomia, per expressar idees, sentiments i conceptes, construir coneixement i establir vincles personals.
+
+- **2 · Criteri d'avaluació 3.1:** Expressar oralment textos senzills, estructurats, comprensibles, coherents i adequats a la situació comunicativa sobre temes quotidians, de rellevància personal o d’interès públic proper a la seva experiència, per tal de descriure, narrar, argumentar i informar, en diferents suports, utilitzant recursos verbals i no verbals, així com estratègies de planificació, control, compensació i cooperació.
 
 <!-- -->
 
-- *LS criterion (O5):* Presents a 60–90 second newsflash with Google Slides and their face in picture-in-picture, stating the claim and the verdict, explaining the evidence with modals of deduction (it can't be…, it must have been edited, it might be…) and ending with one tip for responsible sharing.
+- **3 · LS learning objective (O5, compartit amb CPSAA 4 · 4.4):** Present the verdict in a newsflash video, using modals of deduction and may / might to explain how the content was made, in order to help the audience share information responsibly. Daring also explains why the claim spread.
+
+- **4 · LS assessment criterion:** Presents a 60–90 second newsflash with Google Slides and their face in picture-in-picture, stating the claim and the verdict, explaining the evidence with modals of deduction (it can't be…, it must have been edited, it might be…) and ending with one tip for responsible sharing.
 
 <!-- -->
 
@@ -818,11 +989,15 @@ Insecure retains Catalan guidance at every step, with English examples linking q
 
 <!-- -->
 
-- 5.1 Redactar i difondre textos d’extensió mitjana amb acceptable claredat, coherència, cohesió, correcció i adequació a la situació comunicativa proposada, a la tipologia textual i a les eines analògiques i digitals utilitzades, sobre assumptes quotidians, de rellevància personal o d’interès públic pròxims a la seva experiència, respectant la propietat intel·lectual i evitant el plagi.
+- **1 · Competència específica:** Produir textos escrits i multimodals amb adequació, coherència i cohesió, aplicant estratègies elementals de planificació, redacció, revisió, correcció i edició, amb regulació dels iguals i autoregulació progressivament autònoma, i atenent les convencions pròpies del gènere discursiu triat, per construir coneixement i donar resposta de manera informada, eficaç i creativa a demandes comunicatives concretes.
+
+- **2 · Criteri d'avaluació 5.1:** Redactar i difondre textos d’extensió mitjana amb acceptable claredat, coherència, cohesió, correcció i adequació a la situació comunicativa proposada, a la tipologia textual i a les eines analògiques i digitals utilitzades, sobre assumptes quotidians, de rellevància personal o d’interès públic pròxims a la seva experiència, respectant la propietat intel·lectual i evitant el plagi.
 
 <!-- -->
 
-- *LS criterion (O4):* Writes the fact-check report with a headline, the claim, a verdict (True / Misleading / False) and the evidence, reporting what the sources say with reported speech, reporting verbs and the passive.
+- **3 · LS learning objective (O4, compartit amb CE6 · 6.2):** Write a fact-check report (headline, claim, verdict, evidence, sources) using reported speech, reporting verbs and the passive, in order to inform readers responsibly.
+
+- **4 · LS assessment criterion:** Writes the fact-check report with a headline, the claim, a verdict (True / Misleading / False) and the evidence, reporting what the sources say with reported speech, reporting verbs and the passive.
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -830,19 +1005,25 @@ Insecure retains Catalan guidance at every step, with English examples linking q
 
 <!-- -->
 
-- 6.1 Aplicar estratègies de cerca d’informació (localització, selecció i contrast), en diferents fonts, incloses les digitals, calibrant-ne la fiabilitat i pertinència en funció dels objectius de lectura, sobre temes d’interès acadèmic, personal, ecològic i social, de forma autònoma, a la xarxa i a la biblioteca, valorant críticament el resultat de la cerca.
+- **1 · Competència específica:** Cercar, seleccionar i contrastar informació procedent de diferents fonts de manera progressivament autònoma, avaluant-ne la fiabilitat i pertinència en funció dels objectius de lectura i evitant els riscos de manipulació i desinformació, i integrar-la i transformar-la en coneixement, per comunicar-la, adoptant un punt de vista crític, personal i respectuós amb la propietat intel·lectual.
+
+- **2 · Criteri d'avaluació 6.1:** Aplicar estratègies de cerca d’informació (localització, selecció i contrast), en diferents fonts, incloses les digitals, calibrant-ne la fiabilitat i pertinència en funció dels objectius de lectura, sobre temes d’interès acadèmic, personal, ecològic i social, de forma autònoma, a la xarxa i a la biblioteca, valorant críticament el resultat de la cerca.
 
 <!-- -->
 
-- *LS criterion (O3):* Records in an evidence log at least three sources on the claim (Insecure: two from the guided bank), the verification strategy used for each one and what each source says, and reaches a verdict that matches the evidence.
+- **3 · LS learning objective (O3, compartit amb CD1 · 1.2):** Contrast a viral claim with at least three sources using verification strategies (lateral reading, reverse image search), in order to reach a verdict based on evidence.
+
+- **4 · LS assessment criterion:** Records in an evidence log at least three sources on the claim (Insecure: two from the guided bank), the verification strategy used for each one and what each source says, and reaches a verdict that matches the evidence.
 
 <!-- -->
 
-- 6.2 Elaborar treballs d’investigació i comunicar de forma creativa i respectant els drets de la propietat intel·lectual, els resultats d’un procés d’investigació, individual o grupal, organitzant la informació, integrant-la en esquemes propis i reelaborant-la, i adoptant un punt de vista crític i respectuós amb els principis de propietat intel·lectual, sobre temes d’interès acadèmic, personal, ecològic i social, que incloguin els objectius de desenvolupament sostenible.
+- **2 · Criteri d'avaluació 6.2:** Elaborar treballs d’investigació i comunicar de forma creativa i respectant els drets de la propietat intel·lectual, els resultats d’un procés d’investigació, individual o grupal, organitzant la informació, integrant-la en esquemes propis i reelaborant-la, i adoptant un punt de vista crític i respectuós amb els principis de propietat intel·lectual, sobre temes d’interès acadèmic, personal, ecològic i social, que incloguin els objectius de desenvolupament sostenible.
 
 <!-- -->
 
-- *LS criterion (O4):* Reorganises the information from the evidence log in their own words, without copying from the sources, and credits every source in the report's source list.
+- **3 · LS learning objective (O4, compartit amb CE5 · 5.1):** Write a fact-check report (headline, claim, verdict, evidence, sources) using reported speech, reporting verbs and the passive, in order to inform readers responsibly.
+
+- **4 · LS assessment criterion:** Reorganises the information from the evidence log in their own words, without copying from the sources, and credits every source in the report's source list.
 
 <!-- -->
 
@@ -850,11 +1031,47 @@ Insecure retains Catalan guidance at every step, with English examples linking q
 
 <!-- -->
 
-- 10.1 Identificar i rebutjar els usos discriminatoris de la llengua, els abusos de poder a través de la paraula i els usos manipuladors del llenguatge a partir de la reflexió i l’anàlisi dels elements lingüístics, textuals i discursius utilitzats, així com dels elements no verbals de la comunicació.
+- **1 · Competència específica:** Posar al servei de la convivència democràtica, la resolució dialogada dels conflictes i la igualtat de drets de totes les persones, les pròpies pràctiques comunicatives, utilitzant un llenguatge no discriminatori i desterrant els abusos de poder a través de la paraula, per afavorir un ús eficaç, ètic i democràtic del llenguatge.
+
+- **2 · Criteri d'avaluació 10.1:** Identificar i rebutjar els usos discriminatoris de la llengua, els abusos de poder a través de la paraula i els usos manipuladors del llenguatge a partir de la reflexió i l’anàlisi dels elements lingüístics, textuals i discursius utilitzats, així com dels elements no verbals de la comunicació.
 
 <!-- -->
 
-- *LS criterion (O1):* Identifies in the posts of the “spot the fake” activity at least two manipulative or discriminatory uses of language (clickbait, exaggeration, loaded words, labels for groups of people) and rewrites one of them in neutral language.
+- **3 · LS learning objective (O1, compartit amb CE4 · 4.2):** Analyse news, posts and headlines critically (content, form, source and channel), in order to detect misleading or manipulative content.
+
+- **4 · LS assessment criterion:** Identifies in the posts of the “spot the fake” activity at least two manipulative or discriminatory uses of language (clickbait, exaggeration, loaded words, labels for groups of people) and rewrites one of them in neutral language.
+
+**COMPETÈNCIES TRANSVERSALS**
+
+- **CD1 · Competència digital** (vincle directe)
+
+<!-- -->
+
+- **1 · Competència específica:** Fer cerques avançades a Internet atenent a criteris de validesa, qualitat, actualitat i fiabilitat, seleccionant-les de manera crítica i arxivant-les per recuperar, referenciar i reutilitzar aquestes recerques respecte a la propietat intel·lectual.
+
+- **2 · Criteri d'avaluació 1.2:** Seleccionar, de manera autònoma, la informació trobada amb actitud crítica a partir de la verificació realitzada en relació amb el repte plantejat.
+
+<!-- -->
+
+- **3 · LS learning objective (O3, compartit amb CE6 · 6.1):** Contrast a viral claim with at least three sources using verification strategies (lateral reading, reverse image search), in order to reach a verdict based on evidence.
+
+- **4 · LS assessment criterion:** Keeps a source log for the viral claim with at least three sources, marks which ones they keep after checking them (author, date, original image or data) and explains in one sentence why they discarded the others.
+
+<!-- -->
+
+- **CPSAA 4 · Competència personal, social i d’aprendre a aprendre** (vincle directe)
+
+<!-- -->
+
+- **1 · Competència específica:** Fer autoavaluacions sobre el propi procés d’aprenentatge, buscant fonts fiables per validar, sustentar i contrastar la informació i per obtenir conclusions rellevants.
+
+- **2 · Criteri d'avaluació 4.4:** Argumentar amb criteri si una informació rebuda és certa o no, en les tasques i els treballs d’investigació de l’aula.
+
+<!-- -->
+
+- **3 · LS learning objective (O5, compartit amb CE3 · 3.1):** Present the verdict in a newsflash video, using modals of deduction and may / might to explain how the content was made, in order to help the audience share information responsibly. Daring also explains why the claim spread.
+
+- **4 · LS assessment criterion:** In the newsflash, states whether the claim is true, false or misleading and supports the verdict with at least two pieces of evidence from the fact-check, explaining how they know the content was made or changed.
 
 Routes vary support, complexity and independence; they use the same course criterion band.
 
@@ -946,23 +1163,11 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 ### 6. Competències transversals
 
-- **CD1** · Competència digital
+Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb els mateixos passos que les competències d'anglès:
 
-<!-- -->
+- **CD1 · 1.2**: objectiu O3, compartit amb CE6 · 6.1.
 
-- 1.2. Seleccionar, de manera autònoma, la informació trobada amb actitud crítica a partir de la verificació realitzada en relació amb el repte plantejat.
-
-- *Evidència (O3, vincle directe):* el registre de fonts i la selecció de la informació després de verificar-la.
-
-<!-- -->
-
-- **CPSAA 4** · Competència personal, social i d’aprendre a aprendre
-
-<!-- -->
-
-- 4.4. Argumentar amb criteri si una informació rebuda és certa o no, en les tasques i els treballs d’investigació de l’aula.
-
-- *Evidència (O4 i O5, vincle directe):* el veredicte argumentat del fact-check i del newsflash.
+- **CPSAA 4 · 4.4**: objectiu O5, compartit amb CE3 · 3.1.
 
 ## LS5 · 4ESO · Small Changes, Big Impact
 
@@ -970,7 +1175,7 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 ### 1. Learning objectives
 
-- **O1 · Identify** a real environmental problem in the school or town from short texts and infographics with data, in order to justify the need for a change. (CE4 · 4.1)
+- **O1 · Identify** a real environmental problem in the school or town from short texts and infographics with data, in order to justify the need for a change. (CE4 · 4.1 + CC4 · 4.2)
 
 - **O2 · Detect** greenwashing and manipulative language in ads and campaign messages, in order to avoid dishonest arguments in their proposal and in the debate. (CE10 · 10.1)
 
@@ -978,7 +1183,7 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 - **O4 · Debate** the proposals in a Town Hall, understanding the other groups' arguments and using language to agree, disagree, ask for clarification and answer counterarguments, in order to reach a consensus respectfully. (CE3 · 3.4 + CE2 · 2.1)
 
-- **O5 · Write** an individual reflection on the debate and the chosen proposal, in order to explain their final position and what they learned from other groups. (CE5 · 5.1)
+- **O5 · Write** an individual reflection on the debate and the chosen proposal, in order to explain their final position and what they learned from other groups. (CE5 · 5.1 + CE1 emprenedora · 1.3)
 
 ### 2. Competències específiques i criteris d'avaluació
 
@@ -988,11 +1193,15 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 4.1 Comprendre i interpretar el sentit global, l’estructura, la informació més rellevant i la intenció de l’emissor de textos escrits i multimodals de certa complexitat, que responguin a diferents propòsits de lectura, realitzant les inferències necessàries.
+- **1 · Competència específica:** Comprendre, interpretar i analitzar, amb sentit crític i diferents propòsits de lectura, textos escrits i multimodals reconeixent el sentit global i les idees principals i secundàries, identificant la intenció de l’emissor, reflexionant sobre el contingut i la forma i avaluant-ne la qualitat i fiabilitat, per tal de construir coneixement i donar resposta a necessitats i interessos comunicatius diversos.
+
+- **2 · Criteri d'avaluació 4.1:** Comprendre i interpretar el sentit global, l’estructura, la informació més rellevant i la intenció de l’emissor de textos escrits i multimodals de certa complexitat, que responguin a diferents propòsits de lectura, realitzant les inferències necessàries.
 
 <!-- -->
 
-- *LS criterion (O1):* Reads two short texts or infographics about the chosen problem (waste, transport, energy, water or food) and notes in a problem sheet the main idea, two pieces of data and the causes the author points out.
+- **3 · LS learning objective (O1, compartit amb CC4 · 4.2):** Identify a real environmental problem in the school or town from short texts and infographics with data, in order to justify the need for a change.
+
+- **4 · LS assessment criterion:** Reads two short texts or infographics about the chosen problem (waste, transport, energy, water or food) and notes in a problem sheet the main idea, two pieces of data and the causes the author points out.
 
 <!-- -->
 
@@ -1000,11 +1209,15 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 2.1 Extreure i analitzar el sentit global i les idees principals, i seleccionar informació pertinent de textos orals i multimodals sobre temes quotidians, de rellevància personal o d’interès públic propers a la seva experiència expressats de manera clara i en la llengua estàndard a través de diversos suports.
+- **1 · Competència específica:** Comprendre i interpretar textos orals i multimodals, en la llengua estàndard, recollint el sentit general i la informació més rellevant, la seva forma i el seu contingut, per construir coneixement, formar-se opinió i eixamplar les possibilitats de gaudi i lleure.
+
+- **2 · Criteri d'avaluació 2.1:** Extreure i analitzar el sentit global i les idees principals, i seleccionar informació pertinent de textos orals i multimodals sobre temes quotidians, de rellevància personal o d’interès públic propers a la seva experiència expressats de manera clara i en la llengua estàndard a través de diversos suports.
 
 <!-- -->
 
-- *LS criterion (O4):* Notes in a debate grid the main idea and one key argument of each other group's proposal and uses at least one of them in their answer or their vote.
+- **3 · LS learning objective (O4, compartit amb CE3 · 3.4):** Debate the proposals in a Town Hall, understanding the other groups' arguments and using language to agree, disagree, ask for clarification and answer counterarguments, in order to reach a consensus respectfully.
+
+- **4 · LS assessment criterion:** Notes in a debate grid the main idea and one key argument of each other group's proposal and uses at least one of them in their answer or their vote.
 
 <!-- -->
 
@@ -1012,19 +1225,25 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 3.2 Aplicar coneixements i estratègies per planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o el destinatari del text.
+- **1 · Competència específica:** Produir textos orals i multimodals amb coherència, claredat i registre adequats, atenent les convencions pròpies dels diferents gèneres discursius, i participar en interaccions orals variades, amb autonomia, per expressar idees, sentiments i conceptes, construir coneixement i establir vincles personals.
+
+- **2 · Criteri d'avaluació 3.2:** Aplicar coneixements i estratègies per planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o el destinatari del text.
 
 <!-- -->
 
-- *LS criterion (O3):* Plans, rehearses and records the 2–3 minute group pitch with the group (Google Slides, every member visible in picture-in-picture), sharing out the parts and revising the script so that the solution is compared with another option (Insecure: one solution and one reason) using conditionals, modals and comparatives.
+- **3 · LS learning objective (O3, compartit amb CE6 · 6.2):** Justify the group's solution against other options using research data, conditionals (zero, first, second), modals and comparatives, in order to persuade the class in a recorded group pitch.
+
+- **4 · LS assessment criterion:** Plans, rehearses and records the 2–3 minute group pitch with the group (Google Slides, every member visible in picture-in-picture), sharing out the parts and revising the script so that the solution is compared with another option (Insecure: one solution and one reason) using conditionals, modals and comparatives.
 
 <!-- -->
 
-- 3.4 Utilitzar estratègies adequades per iniciar, mantenir i acabar la comunicació, prendre i cedir la paraula, sol·licitar i formular aclariments i explicacions, reformular, comparar i contrastar, resumir, col·laborar, debatre, resoldre problemes i gestionar situacions compromeses.
+- **2 · Criteri d'avaluació 3.4:** Utilitzar estratègies adequades per iniciar, mantenir i acabar la comunicació, prendre i cedir la paraula, sol·licitar i formular aclariments i explicacions, reformular, comparar i contrastar, resumir, col·laborar, debatre, resoldre problemes i gestionar situacions compromeses.
 
 <!-- -->
 
-- *LS criterion (O4):* In the live Town Hall debate, takes and gives the floor, asks for clarification, answers at least one counterargument (Insecure: uses the agree / disagree cards and asks one question) and helps to reach the final consensus vote.
+- **3 · LS learning objective (O4, compartit amb CE2 · 2.1):** Debate the proposals in a Town Hall, understanding the other groups' arguments and using language to agree, disagree, ask for clarification and answer counterarguments, in order to reach a consensus respectfully.
+
+- **4 · LS assessment criterion:** In the live Town Hall debate, takes and gives the floor, asks for clarification, answers at least one counterargument (Insecure: uses the agree / disagree cards and asks one question) and helps to reach the final consensus vote.
 
 <!-- -->
 
@@ -1032,11 +1251,15 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 5.1 Redactar i difondre textos d’extensió mitjana amb acceptable claredat, coherència, cohesió, correcció i adequació a la situació comunicativa proposada, a la tipologia textual i a les eines analògiques i digitals utilitzades, sobre assumptes quotidians, de rellevància personal o d’interès públic pròxims a la seva experiència, respectant la propietat intel·lectual i evitant el plagi.
+- **1 · Competència específica:** Produir textos escrits i multimodals amb adequació, coherència i cohesió, aplicant estratègies elementals de planificació, redacció, revisió, correcció i edició, amb regulació dels iguals i autoregulació progressivament autònoma, i atenent les convencions pròpies del gènere discursiu triat, per construir coneixement i donar resposta de manera informada, eficaç i creativa a demandes comunicatives concretes.
+
+- **2 · Criteri d'avaluació 5.1:** Redactar i difondre textos d’extensió mitjana amb acceptable claredat, coherència, cohesió, correcció i adequació a la situació comunicativa proposada, a la tipologia textual i a les eines analògiques i digitals utilitzades, sobre assumptes quotidians, de rellevància personal o d’interès públic pròxims a la seva experiència, respectant la propietat intel·lectual i evitant el plagi.
 
 <!-- -->
 
-- *LS criterion (O5):* Writes an individual reflection in paragraphs (final position, reasons, what they learned from another group) with concession connectors (although, even though, despite) and the vocabulary of the LS.
+- **3 · LS learning objective (O5, compartit amb CE1 emprenedora · 1.3):** Write an individual reflection on the debate and the chosen proposal, in order to explain their final position and what they learned from other groups.
+
+- **4 · LS assessment criterion:** Writes an individual reflection in paragraphs (final position, reasons, what they learned from another group) with concession connectors (although, even though, despite) and the vocabulary of the LS.
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -1044,11 +1267,15 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 6.2 Elaborar treballs d’investigació i comunicar de forma creativa i respectant els drets de la propietat intel·lectual, els resultats d’un procés d’investigació, individual o grupal, organitzant la informació, integrant-la en esquemes propis i reelaborant-la, i adoptant un punt de vista crític i respectuós amb els principis de propietat intel·lectual, sobre temes d’interès acadèmic, personal, ecològic i social, que incloguin els objectius de desenvolupament sostenible.
+- **1 · Competència específica:** Cercar, seleccionar i contrastar informació procedent de diferents fonts de manera progressivament autònoma, avaluant-ne la fiabilitat i pertinència en funció dels objectius de lectura i evitant els riscos de manipulació i desinformació, i integrar-la i transformar-la en coneixement, per comunicar-la, adoptant un punt de vista crític, personal i respectuós amb la propietat intel·lectual.
+
+- **2 · Criteri d'avaluació 6.2:** Elaborar treballs d’investigació i comunicar de forma creativa i respectant els drets de la propietat intel·lectual, els resultats d’un procés d’investigació, individual o grupal, organitzant la informació, integrant-la en esquemes propis i reelaborant-la, i adoptant un punt de vista crític i respectuós amb els principis de propietat intel·lectual, sobre temes d’interès acadèmic, personal, ecològic i social, que incloguin els objectius de desenvolupament sostenible.
 
 <!-- -->
 
-- *LS criterion (O3):* Presents the results of the group's research in the pitch, organised in their own outline (problem, data, solution, expected impact), linked to one Sustainable Development Goal and with the sources credited on the last slide.
+- **3 · LS learning objective (O3, compartit amb CE3 · 3.2):** Justify the group's solution against other options using research data, conditionals (zero, first, second), modals and comparatives, in order to persuade the class in a recorded group pitch.
+
+- **4 · LS assessment criterion:** Presents the results of the group's research in the pitch, organised in their own outline (problem, data, solution, expected impact), linked to one Sustainable Development Goal and with the sources credited on the last slide.
 
 <!-- -->
 
@@ -1056,11 +1283,47 @@ Insecure retains Catalan guidance at every step, with English examples linking s
 
 <!-- -->
 
-- 10.1 Identificar i rebutjar els usos discriminatoris de la llengua, els abusos de poder a través de la paraula i els usos manipuladors del llenguatge a partir de la reflexió i l’anàlisi dels elements lingüístics, textuals i discursius utilitzats, així com dels elements no verbals de la comunicació.
+- **1 · Competència específica:** Posar al servei de la convivència democràtica, la resolució dialogada dels conflictes i la igualtat de drets de totes les persones, les pròpies pràctiques comunicatives, utilitzant un llenguatge no discriminatori i desterrant els abusos de poder a través de la paraula, per afavorir un ús eficaç, ètic i democràtic del llenguatge.
+
+- **2 · Criteri d'avaluació 10.1:** Identificar i rebutjar els usos discriminatoris de la llengua, els abusos de poder a través de la paraula i els usos manipuladors del llenguatge a partir de la reflexió i l’anàlisi dels elements lingüístics, textuals i discursius utilitzats, així com dels elements no verbals de la comunicació.
 
 <!-- -->
 
-- *LS criterion (O2):* Analyses two ads or campaign claims about the environment, identifies at least two greenwashing techniques (vague words, misleading images, exaggerated or hidden data) and explains why an argument based on them is not valid.
+- **3 · LS learning objective (O2):** Detect greenwashing and manipulative language in ads and campaign messages, in order to avoid dishonest arguments in their proposal and in the debate.
+
+- **4 · LS assessment criterion:** Analyses two ads or campaign claims about the environment, identifies at least two greenwashing techniques (vague words, misleading images, exaggerated or hidden data) and explains why an argument based on them is not valid.
+
+**COMPETÈNCIES TRANSVERSALS**
+
+- **CC4 · Competència ciutadana** (vincle directe)
+
+<!-- -->
+
+- **1 · Competència específica:** Interpretar les relacions sistèmiques d’interdependència, ecodependència i interconnexió entre actuacions locals i globals i adoptar, conscientment i motivadament, un estil de vida sostenible i ecosocialment responsable.
+
+- **2 · Criteri d'avaluació 4.2:** Proporcionar arguments sobre el risc per a la salut i la sostenibilitat ambiental de determinades pràctiques, comportaments i hàbits, contrastant informacions fiables, objectives i amb una base científica vàlida.
+
+<!-- -->
+
+- **3 · LS learning objective (O1, compartit amb CE4 · 4.1):** Identify a real environmental problem in the school or town from short texts and infographics with data, in order to justify the need for a change.
+
+- **4 · LS assessment criterion:** Completes a problem sheet on the chosen practice with at least two risks for health or the environment, each backed by data from a reliable source (Safe and Daring: contrasting two sources), and uses them to argue why a change is needed.
+
+<!-- -->
+
+- **CE1 emprenedora · Competència emprenedora** (vincle possible)
+
+<!-- -->
+
+- **1 · Competència específica:** Analitzar necessitats i oportunitats i afrontar reptes amb sentit crític, fent balanç de la seva sostenibilitat i valorant l’impacte que puguin suposar en l’entorn, per presentar idees i solucions innovadores, ètiques i sostenibles dirigides a crear valor en l’àmbit personal, social, cultural i econòmic.
+
+- **2 · Criteri d'avaluació 1.3:** Justificar la idea escollida de forma metòdica i argumentada, basada en criteris ètics i de viabilitat que tingui en compte el desenvolupament sostenible de l’entorn.
+
+<!-- -->
+
+- **3 · LS learning objective (O5, compartit amb CE5 · 5.1):** Write an individual reflection on the debate and the chosen proposal, in order to explain their final position and what they learned from other groups.
+
+- **4 · LS assessment criterion:** In the individual reflection, justifies the proposal chosen in the Town Hall with at least one ethical reason and one feasibility reason (cost, time, who can carry it out) and explains how it makes the school or town more sustainable.
 
 Routes vary support, complexity and independence; they use the same course criterion band.
 
@@ -1152,23 +1415,11 @@ Insecure retains Catalan guidance at every step, with English examples linking d
 
 ### 6. Competències transversals
 
-- **CC4** · Competència ciutadana
+Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb els mateixos passos que les competències d'anglès:
 
-<!-- -->
+- **CC4 · 4.2**: objectiu O1, compartit amb CE4 · 4.1.
 
-- 4.2. Proporcionar arguments sobre el risc per a la salut i la sostenibilitat ambiental de determinades pràctiques, comportaments i hàbits, contrastant informacions fiables, objectives i amb una base científica vàlida.
-
-- *Evidència (O3, vincle directe):* els arguments del pitch de grup, amb dades fiables sobre el risc de la pràctica triada.
-
-<!-- -->
-
-- **CE1 emprenedora** · Competència emprenedora
-
-<!-- -->
-
-- 1.3. Justificar la idea escollida de forma metòdica i argumentada, basada en criteris ètics i de viabilitat que tingui en compte el desenvolupament sostenible de l’entorn.
-
-- *Evidència (O3, vincle possible pel producte de la LS):* la justificació de la solució triada amb criteris ètics i de viabilitat.
+- **CE1 emprenedora · 1.3**: objectiu O5, compartit amb CE5 · 5.1.
 
 ## LS6 · 4ESO · My Next Step
 
@@ -1182,9 +1433,9 @@ Insecure retains Catalan guidance at every step, with English examples linking d
 
 - **O3 · Apply** polite interaction strategies (indirect questions, question tags, requests for clarification), in order to take part in a mock interview in both roles. (CE3 · 3.4)
 
-- **O4 · Justify** their suitability for the opportunity with examples from their own experience, in order to answer interview questions convincingly. Deeper in Safe and Daring. (CE3 · 3.1)
+- **O4 · Justify** their suitability for the opportunity with examples from their own experience, in order to answer interview questions convincingly. Deeper in Safe and Daring. (CE3 · 3.1 + CE2 emprenedora · 2.1)
 
-- **O5 · Use** rehearsal, recorded practice and a partner's feedback as improvement strategies, in order to perform better in the interview and plan how to keep learning English. (CE9 · 9.2)
+- **O5 · Use** rehearsal, recorded practice and a partner's feedback as improvement strategies, in order to perform better in the interview and plan how to keep learning English. (CE9 · 9.2 + CPSAA 5 · 5.1)
 
 ### 2. Competències específiques i criteris d'avaluació
 
@@ -1194,11 +1445,15 @@ Insecure retains Catalan guidance at every step, with English examples linking d
 
 <!-- -->
 
-- 4.2 Valorar críticament el contingut i la forma de textos de certa complexitat, avaluant-ne la qualitat, la fiabilitat i la idoneïtat de canal utilitzat, així com l’eficàcia dels procediments lingüístics emprats.
+- **1 · Competència específica:** Comprendre, interpretar i analitzar, amb sentit crític i diferents propòsits de lectura, textos escrits i multimodals reconeixent el sentit global i les idees principals i secundàries, identificant la intenció de l’emissor, reflexionant sobre el contingut i la forma i avaluant-ne la qualitat i fiabilitat, per tal de construir coneixement i donar resposta a necessitats i interessos comunicatius diversos.
+
+- **2 · Criteri d'avaluació 4.2:** Valorar críticament el contingut i la forma de textos de certa complexitat, avaluant-ne la qualitat, la fiabilitat i la idoneïtat de canal utilitzat, així com l’eficàcia dels procediments lingüístics emprats.
 
 <!-- -->
 
-- *LS criterion (O1):* Compares two or three adverts in a chart (requirements, conditions, deadline, contact) and justifies which opportunity they choose and why it is reliable and suitable for them.
+- **3 · LS learning objective (O1, compartit amb CE2 · 2.1):** Evaluate real adverts and short videos about opportunities after 4t (school programmes, vocational courses, summer jobs, volunteering, exchanges), comparing requirements and conditions and checking their reliability, in order to choose the one that suits them best.
+
+- **4 · LS assessment criterion:** Compares two or three adverts in a chart (requirements, conditions, deadline, contact) and justifies which opportunity they choose and why it is reliable and suitable for them.
 
 <!-- -->
 
@@ -1206,11 +1461,15 @@ Insecure retains Catalan guidance at every step, with English examples linking d
 
 <!-- -->
 
-- 2.1 Extreure i analitzar el sentit global i les idees principals, i seleccionar informació pertinent de textos orals i multimodals sobre temes quotidians, de rellevància personal o d’interès públic propers a la seva experiència expressats de manera clara i en la llengua estàndard a través de diversos suports.
+- **1 · Competència específica:** Comprendre i interpretar textos orals i multimodals, en la llengua estàndard, recollint el sentit general i la informació més rellevant, la seva forma i el seu contingut, per construir coneixement, formar-se opinió i eixamplar les possibilitats de gaudi i lleure.
+
+- **2 · Criteri d'avaluació 2.1:** Extreure i analitzar el sentit global i les idees principals, i seleccionar informació pertinent de textos orals i multimodals sobre temes quotidians, de rellevància personal o d’interès públic propers a la seva experiència expressats de manera clara i en la llengua estàndard a través de diversos suports.
 
 <!-- -->
 
-- *LS criterion (O1):* Watches an open-day video or a programme presentation and notes in the same chart the main idea and the information relevant to them (requirements, dates, what students do).
+- **3 · LS learning objective (O1, compartit amb CE4 · 4.2):** Evaluate real adverts and short videos about opportunities after 4t (school programmes, vocational courses, summer jobs, volunteering, exchanges), comparing requirements and conditions and checking their reliability, in order to choose the one that suits them best.
+
+- **4 · LS assessment criterion:** Watches an open-day video or a programme presentation and notes in the same chart the main idea and the information relevant to them (requirements, dates, what students do).
 
 <!-- -->
 
@@ -1218,19 +1477,25 @@ Insecure retains Catalan guidance at every step, with English examples linking d
 
 <!-- -->
 
-- 3.1 Expressar oralment textos senzills, estructurats, comprensibles, coherents i adequats a la situació comunicativa sobre temes quotidians, de rellevància personal o d’interès públic proper a la seva experiència, per tal de descriure, narrar, argumentar i informar, en diferents suports, utilitzant recursos verbals i no verbals, així com estratègies de planificació, control, compensació i cooperació.
+- **1 · Competència específica:** Produir textos orals i multimodals amb coherència, claredat i registre adequats, atenent les convencions pròpies dels diferents gèneres discursius, i participar en interaccions orals variades, amb autonomia, per expressar idees, sentiments i conceptes, construir coneixement i establir vincles personals.
+
+- **2 · Criteri d'avaluació 3.1:** Expressar oralment textos senzills, estructurats, comprensibles, coherents i adequats a la situació comunicativa sobre temes quotidians, de rellevància personal o d’interès públic proper a la seva experiència, per tal de descriure, narrar, argumentar i informar, en diferents suports, utilitzant recursos verbals i no verbals, així com estratègies de planificació, control, compensació i cooperació.
 
 <!-- -->
 
-- *LS criterion (O4):* As candidate, answers the interview questions with examples from their own experience (Safe and Daring: situation, action, result) that show why they suit the opportunity.
+- **3 · LS learning objective (O4, compartit amb CE2 emprenedora · 2.1):** Justify their suitability for the opportunity with examples from their own experience, in order to answer interview questions convincingly. Deeper in Safe and Daring.
+
+- **4 · LS assessment criterion:** As candidate, answers the interview questions with examples from their own experience (Safe and Daring: situation, action, result) that show why they suit the opportunity.
 
 <!-- -->
 
-- 3.4 Utilitzar estratègies adequades per iniciar, mantenir i acabar la comunicació, prendre i cedir la paraula, sol·licitar i formular aclariments i explicacions, reformular, comparar i contrastar, resumir, col·laborar, debatre, resoldre problemes i gestionar situacions compromeses.
+- **2 · Criteri d'avaluació 3.4:** Utilitzar estratègies adequades per iniciar, mantenir i acabar la comunicació, prendre i cedir la paraula, sol·licitar i formular aclariments i explicacions, reformular, comparar i contrastar, resumir, col·laborar, debatre, resoldre problemes i gestionar situacions compromeses.
 
 <!-- -->
 
-- *LS criterion (O3):* In the 4–5 minute recorded mock interview in pairs, opens and closes the conversation politely; as interviewer, asks at least three questions including indirect questions and question tags; as candidate, asks for clarification when needed and asks two questions about the opportunity.
+- **3 · LS learning objective (O3):** Apply polite interaction strategies (indirect questions, question tags, requests for clarification), in order to take part in a mock interview in both roles.
+
+- **4 · LS assessment criterion:** In the 4–5 minute recorded mock interview in pairs, opens and closes the conversation politely; as interviewer, asks at least three questions including indirect questions and question tags; as candidate, asks for clarification when needed and asks two questions about the opportunity.
 
 <!-- -->
 
@@ -1238,11 +1503,15 @@ Insecure retains Catalan guidance at every step, with English examples linking d
 
 <!-- -->
 
-- 5.2 Aplicar coneixements i estratègies per a planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o del lector potencial a qui s’adreça el text.
+- **1 · Competència específica:** Produir textos escrits i multimodals amb adequació, coherència i cohesió, aplicant estratègies elementals de planificació, redacció, revisió, correcció i edició, amb regulació dels iguals i autoregulació progressivament autònoma, i atenent les convencions pròpies del gènere discursiu triat, per construir coneixement i donar resposta de manera informada, eficaç i creativa a demandes comunicatives concretes.
+
+- **2 · Criteri d'avaluació 5.2:** Aplicar coneixements i estratègies per a planificar, produir, revisar i cooperar en l’elaboració de textos coherents, cohesionats i adequats a les intencions comunicatives, les característiques contextuals, els aspectes socioculturals i la tipologia textual, usant els recursos físics o digitals més adequats en funció de la tasca i de les necessitats de l’audiència o del lector potencial a qui s’adreça el text.
 
 <!-- -->
 
-- *LS criterion (O2):* Plans the email from a personal profile (studies, skills, experience, goals), writes it in paragraphs with a formal register (Insecure: guided template) and revises it with a checklist of the advert's requirements before sending it.
+- **3 · LS learning objective (O2):** Write a formal application email adapted to the reader and to the requirements of the advert, describing studies, skills, experiences and goals with verb patterns (want / hope to, enjoy + -ing) and Present Perfect, in order to apply for the opportunity.
+
+- **4 · LS assessment criterion:** Plans the email from a personal profile (studies, skills, experience, goals), writes it in paragraphs with a formal register (Insecure: guided template) and revises it with a checklist of the advert's requirements before sending it.
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -1250,11 +1519,47 @@ Insecure retains Catalan guidance at every step, with English examples linking d
 
 <!-- -->
 
-- 9.2 Utilitzar de forma creativa estratègies i coneixements de millora de la pròpia capacitat de comunicar i d’aprendre la llengua estrangera, amb suport d’altres participants i de suports analògics i digitals.
+- **1 · Competència específica:** Ampliar i usar els repertoris lingüístics personals entre diferents llengües, reflexionant de manera crítica sobre el seu funcionament i prenent consciència de les estratègies i coneixements propis, per millorar la resposta a necessitats comunicatives concretes.
+
+- **2 · Criteri d'avaluació 9.2:** Utilitzar de forma creativa estratègies i coneixements de millora de la pròpia capacitat de comunicar i d’aprendre la llengua estrangera, amb suport d’altres participants i de suports analògics i digitals.
 
 <!-- -->
 
-- *LS criterion (O5):* Rehearses the interview at least once with a partner using a recorded practice or the feedback checklist, and writes in the portfolio two strategies that helped them improve and how they will use them next year.
+- **3 · LS learning objective (O5, compartit amb CPSAA 5 · 5.1):** Use rehearsal, recorded practice and a partner's feedback as improvement strategies, in order to perform better in the interview and plan how to keep learning English.
+
+- **4 · LS assessment criterion:** Rehearses the interview at least once with a partner using a recorded practice or the feedback checklist, and writes in the portfolio two strategies that helped them improve and how they will use them next year.
+
+**COMPETÈNCIES TRANSVERSALS**
+
+- **CPSAA 5 · Competència personal, social i d’aprendre a aprendre** (vincle directe)
+
+<!-- -->
+
+- **1 · Competència específica:** Planificar objectius a mitjà termini i desenvolupar processos metacognitius de retroacció per aprendre dels propis errors en el procés de construcció de coneixement.
+
+- **2 · Criteri d'avaluació 5.1:** Mostrar, a través de diferents mitjans i de manera autònoma, l’apropiació i diferenciació dels objectius d’aprenentatge a mitjà i llarg termini.
+
+<!-- -->
+
+- **3 · LS learning objective (O5, compartit amb CE9 · 9.2):** Use rehearsal, recorded practice and a partner's feedback as improvement strategies, in order to perform better in the interview and plan how to keep learning English.
+
+- **4 · LS assessment criterion:** Writes in the end-of-stage portfolio one learning goal for English for next year and one for the longer term, and says how each one connects with the chosen opportunity and how they will work towards it.
+
+<!-- -->
+
+- **CE2 emprenedora · Competència emprenedora** (vincle possible)
+
+<!-- -->
+
+- **1 · Competència específica:** Avaluar les fortaleses i debilitats pròpies fent ús d’estratègies d’autoconeixement i autoeficàcia, comprendre els elements fonamentals de l’economia i les finances i aplicar coneixements econòmics i financers a activitats i situacions concretes, utilitzant habilitats que afavoreixin el treball col·laboratiu i en equip, per reunir i optimitzar els recursos necessaris que portin a l’acció una experiència emprenedora de valor.
+
+- **2 · Criteri d'avaluació 2.1:** Justificar les pròpies fortaleses i habilitats que exigeix el repte, per tal de conèixer-se millor i saber-ho identificar amb les característiques d’una persona emprenedora.
+
+<!-- -->
+
+- **3 · LS learning objective (O4, compartit amb CE3 · 3.1):** Justify their suitability for the opportunity with examples from their own experience, in order to answer interview questions convincingly. Deeper in Safe and Daring.
+
+- **4 · LS assessment criterion:** In the mock interview, names at least two strengths or skills that the opportunity requires, backs each one with an example from their own experience and says which of them also describe an entrepreneurial person (initiative, perseverance, teamwork).
 
 Routes vary support, complexity and independence; they use the same course criterion band.
 
@@ -1287,6 +1592,8 @@ Insecure retains Catalan guidance at every step, with English examples linking a
 - Plans: next year; in the future; I want to…; I'd like to…; I'm going to…
 
 - Interview chunks: Nice to meet you. Thank you for having me. Could you repeat that, please? Thank you for your time.
+
+- Formal email (R from LS2): Dear Sir or Madam / Dear Ms …; I am writing to apply for…; I look forward to hearing from you; Yours sincerely / Yours faithfully; Best regards
 
 **Safe — additions**
 
@@ -1352,23 +1659,11 @@ Insecure retains Catalan guidance at every step, with English examples linking a
 
 ### 6. Competències transversals
 
-- **CPSAA 5** · Competència personal, social i d’aprendre a aprendre
+Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb els mateixos passos que les competències d'anglès:
 
-<!-- -->
+- **CPSAA 5 · 5.1**: objectiu O5, compartit amb CE9 · 9.2.
 
-- 5.1. Mostrar, a través de diferents mitjans i de manera autònoma, l’apropiació i diferenciació dels objectius d’aprenentatge a mitjà i llarg termini.
-
-- *Evidència (O5, vincle directe):* els objectius del perfil personal i el portfoli de final d’etapa.
-
-<!-- -->
-
-- **CE2 emprenedora** · Competència emprenedora
-
-<!-- -->
-
-- 2.1. Justificar les pròpies fortaleses i habilitats que exigeix el repte, per tal de conèixer-se millor i saber-ho identificar amb les característiques d’una persona emprenedora.
-
-- *Evidència (O2 i O4, vincle possible pel producte de la LS):* el correu de candidatura i les respostes de l’entrevista sobre les pròpies fortaleses.
+- **CE2 emprenedora · 2.1**: objectiu O4, compartit amb CE3 · 3.1.
 
 ## Gramàtica de 4t ESO per LS
 

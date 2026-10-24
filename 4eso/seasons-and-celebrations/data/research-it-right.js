@@ -62,18 +62,36 @@ window.LP = {
         { q: 'Which credit line is in the right order?', o: ['"Diwali", Encyclopedia website, 2024.', '2024, Diwali, Encyclopedia website.', 'Encyclopedia website 2024 "Diwali"'] },
         { q: 'Which credit line is complete?', o: ['"Thanksgiving history", History museum website, 2025.', '"Thanksgiving history".', 'I found it on the internet.'] }
       ] },
-    { id: 'card', type: 'form', product: 3, tab: { ca: 'Fitxa', en: 'Card' }, title: { ca: 'Peça 3: fitxa de recerca', en: 'Piece 3: research card' },
-      intro: { ca: 'Omple-la amb el teu grup i desa-la individualment. Notes curtes amb paraules clau.', en: 'Fill it in with your group and save it individually. Short notes with key words.' },
+    // Piece 3 and the evidence for LS criteria 4.2 (rating each source with two reasons), 6.1 (key information per source, where they agree or differ, full credit lines)
+    // and CC3 3.2 (one stereotype, why it is unfair, how to avoid it). A step, so the teacher sees it; it is also saved as piece 3 of the final product.
+    { id: 'card', type: 'step', product: 3, tab: { ca: 'Fitxa', en: 'Card' }, title: { ca: 'Peça 3: fitxa de recerca', en: 'Piece 3: research card' }, pill: { ca: 'Ho veu el professor', en: 'Your teacher sees it' },
+      intro: { ca: 'Omple-la amb el teu grup i entrega-la individualment. Notes curtes amb paraules clau. Necessites <strong>dues fonts</strong>.', en: 'Fill it in with your group and hand it in individually. Short notes with key words. You need <strong>three sources</strong>.' },
+      html: { ca: '<div class="model"><strong>És fiable?</strong> Fes-te les quatre preguntes del text: qui l’ha escrita, de quan és, per què l’han escrita (informar, vendre, entretenir) i on es publica.<br><strong>Exemple:</strong> <em>Fiable: és d’un museu i és del 2025.</em> · <em>Cal comprovar-ho: és d’una botiga i vol vendre disfresses.</em></div><div class="model"><strong>Estereotip:</strong> <em>Some people think ___. This is unfair because ___. On our day, we will ___.</em></div>',
+        en: '<div class="model"><strong>Is it reliable?</strong> Use the four questions from the text: who wrote it, when, why (to inform, to sell, to entertain) and where it is published.<br><strong>Model:</strong> <em>Reliable: a national museum wrote it to inform, and it was updated in 2025.</em> · <em>Check it: a shop wrote it to sell costumes, and there is no author.</em></div><div class="model"><strong>Stereotype:</strong> <em>Some people think ___. This is unfair because ___. On our day, we will ___.</em></div>' },
       fields: [
-        { id: 'what', label: { ca: 'Celebració: què és i quan', en: 'Celebration: what and when' }, ph: 'e.g. Diwali · festival of lights · Oct / Nov' },
-        { id: 'customs', label: { ca: 'Tres costums', en: 'Three customs' } },
-        { id: 'food', label: { ca: 'Un menjar o símbol', en: 'One food or symbol' } },
-        { r: 'safe', id: 'origin', label: 'Origin (one fact)' },
-        { r: 'safe', id: 'compare', label: 'Comparison with a local celebration' },
-        { r: 'daring', id: 'change', label: 'How it has changed · how to present it inclusively' },
-        { id: 's1', label: { ca: 'Font 1 (crèdit)', en: 'Source 1 (credit line)' }, ph: '"Title", website or author, year.' },
-        { id: 's2', label: { ca: 'Font 2 (crèdit)', en: 'Source 2 (credit line)' }, ph: '"Title", website or author, year.' }
+        { id: 'what', label: { ca: 'Celebració: què és, quan i on', en: 'Celebration: what, when and where' }, ph: 'e.g. Diwali · festival of lights · Oct / Nov · India and worldwide', rows: 2 },
+        { id: 'customs', label: { ca: 'Tres costums', en: 'Three customs' }, rows: 2 },
+        { id: 'food', label: { ca: 'Un menjar o símbol', en: 'One food or symbol' }, rows: 1 },
+        { r: 'safe', id: 'origin', label: 'Origin (one fact)', rows: 2 },
+        { r: 'safe', id: 'compare', label: 'Comparison with a local celebration', rows: 2 },
+        { r: 'daring', id: 'change', label: 'How it has changed · how to present it inclusively', rows: 2 },
+        { id: 's1', label: { ca: 'Font 1: referència', en: 'Source 1: credit line' }, ph: '"Title", website or author, year.', rows: 1 },
+        { id: 'k1', label: { ca: 'Font 1: la informació clau (notes)', en: 'Source 1: key information (notes)' }, rows: 2 },
+        { id: 'r1', label: { ca: 'Font 1: és fiable o cal comprovar-ho? Dues raons', en: 'Source 1: reliable or not? Two reasons' }, rows: 2 },
+        { id: 's2', label: { ca: 'Font 2: referència', en: 'Source 2: credit line' }, ph: '"Title", website or author, year.', rows: 1 },
+        { id: 'k2', label: { ca: 'Font 2: la informació clau (notes)', en: 'Source 2: key information (notes)' }, rows: 2 },
+        { id: 'r2', label: { ca: 'Font 2: és fiable o cal comprovar-ho? Dues raons', en: 'Source 2: reliable or not? Two reasons' }, rows: 2 },
+        { r: 'safe', id: 's3', label: 'Source 3: credit line', ph: '"Title", website or author, year.', rows: 1 },
+        { r: 'safe', id: 'k3', label: 'Source 3: key information (notes)', rows: 2 },
+        { r: 'safe', id: 'r3', label: 'Source 3: reliable or not? Two reasons', rows: 2 },
+        { id: 'agree', label: { ca: 'En què coincideixen les fonts? En què són diferents? (una cosa)', en: 'Where do your sources agree, and where do they differ? (one point at least)' }, rows: 2 },
+        { id: 'trust', label: { ca: 'De quina font et refies més, i per què?', en: 'Which source do you trust most, and why?' }, rows: 2 },
+        { id: 'stereo', label: { ca: 'Un estereotip sobre la gent que ho celebra: per què és injust i com l’evitarem el nostre dia', en: 'One stereotype about the people who celebrate it: why it is unfair, and how your group will avoid it' }, rows: 3 }
       ],
-      checklist: { insecure: ['Cada dada surt a dues fonts', 'Notes amb paraules clau, no frases copiades', 'Els significats religiosos com a informació'], safe: ['Every fact is in two sources', 'Notes, not copied sentences', 'Religious meanings as information'], daring: ['Every fact is in two sources', 'Notes, not copied sentences', 'Religious meanings as information', 'No stereotypes'] } }
+      rate: {
+        insecure: ['Cada dada surt a dues fonts', 'Notes amb paraules clau, no frases copiades', 'Dono dues raons per a cada font', 'Els significats religiosos com a informació', 'Explico per què l’estereotip és injust'],
+        safe: ['Every fact is in two sources', 'Notes, not copied sentences', 'Two reasons for each source', 'Religious meanings as information', 'I explain why the stereotype is unfair'],
+        daring: ['Every fact is in two sources, and I say which source wins when they disagree', 'Notes, not copied sentences', 'Two precise reasons for each source (author, date, purpose, channel)', 'Religious meanings as information', 'I explain why the stereotype is unfair and how our plan avoids it']
+      } }
   ]
 };
