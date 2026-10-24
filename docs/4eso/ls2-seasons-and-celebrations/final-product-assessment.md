@@ -7,17 +7,34 @@ Status: **proposal, 24 Oct 2026, awaiting Roger's approval.** Not on the site ye
 - **Same-route groups** (Roger, 24 Oct 2026): every group is Insecure, Safe or Daring, and the whole product follows that route's requirements and rubric.
 - **The teacher forms the groups** inside each route, not friends' choice, so pairs that do not work well can be separated.
 - Size: Insecure groups of 3; Safe and Daring groups of 3–4. If a route has too few students for a group, those students join the nearest route's group and keep their own route for their part and email.
-- Formed in the first final-product class (week 5, 23–27 Nov), when the group chooses its celebration.
+- Formed in **week 2 (2–6 Nov)**, before Learning Path 3, and the group chooses its celebration then. Pieces 2, 4 and 5 in the Learning Paths are about the group's celebration, so the groups must exist before them even though the final product itself is made in term 2.
 - Support for Insecure groups: slide template, sentence frames for every part, Catalan guidance on the page, and a short check-in with the teacher every class.
 
-## 2. What the group makes together
+## 2. What each student hands in first: the preparation dossier
+
+Before the group records the video, every student submits an **individual preparation dossier** on the Final Product page (one submission, then locked). It pushes everyone to do the Learning Path work, and it is the evidence of each student's own contribution.
+
+| Piece | From | What the student pastes or completes |
+| --- | --- | --- |
+| 1 · Description of a celebration | Learning Path 2 | Final version of the text |
+| 2 · Our celebration | Learning Path 3 | Final version of the text |
+| 3 · Research card | Learning Path 4 | Their copy of the group's card, with the two credit lines |
+| 4 · Event plan | Learning Path 5 | Their version of the plan (route fields) |
+| 5 · Email draft | Learning Path 6 | The draft before AI feedback |
+| For pieces 1, 2 and 5 | — | One sentence: *What I changed after the feedback, and why* |
+
+- The pieces saved in each Learning Path appear already filled in, so the student only reviews them; a missing piece must be written or pasted before submitting.
+- The teacher sees the dossier on the dashboard (the texts are already synced; only a view is added).
+- Deadline: the class before the recording (about 4 Dec). A student without a dossier records their part after handing it in.
+
+## 3. What the group makes together
 
 1. **Research card** (route fields as in Learning Path 4, piece 3), with two sources and credit lines.
 2. **Event plan** for a school celebration day, at the route's level.
 3. **Google Slides:** one or two slides per part, short text and images, credits on the last slide.
 4. **Video:** every member presents their part, face and slides visible. Each part lasts what Learning Path 6 already says (Insecure 30–45 s, Safe 45–60 s, Daring 60–90 s).
 
-## 3. Who presents what (each student owns one part)
+## 4. Who presents what (each student owns one part)
 
 | Route | Part 1 | Part 2 | Part 3 | Part 4 (groups of 4) |
 | --- | --- | --- | --- | --- |
@@ -29,22 +46,23 @@ In a group of 3 (Safe and Daring), Part 4 is shared: each member adds one of its
 
 **Every student also writes the individual formal email** to the head teacher: Insecure guided template · Safe four paragraphs · Daring four paragraphs plus one concern of the head teacher answered.
 
-## 4. How it is marked
+## 5. How it is marked
 
 | Row | Criteria | Who gets the mark | Weight |
 | --- | --- | --- | --- |
-| 1. My part of the pitch | 3.1 | individual | 30 % |
-| 2. My formal email | 5.1 | individual | 25 % |
+| 1. My part of the pitch | 3.1 | individual | 25 % |
+| 2. My formal email | 5.1 | individual | 20 % |
 | 3. Research & credits | 4.2, 6.1, 6.2 | group | 10 % |
 | 4. Respect & inclusion | 1.1–1.3, CC1 1.3 | group | 10 % |
 | 5. Event plan | CE2 emprenedora 2.3 | group | 15 % |
 | 6. Teamwork (peer assessment) | 3.2 | individual | 10 % |
+| 7. Preparation dossier | 3.2, 5.1 | individual | 10 % |
 
-- Individual 65 %, group 35 %. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0.
-- All rows use the **route rubric** of the group (section 6).
+- Individual 65 %, group 35 %. Row 7: Level 4 = all five pieces, complete, with a real change after feedback; Level 3 = all five, one incomplete or changes not explained; Level 2 = three or four pieces; Level 1 = one or two pieces. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0.
+- Rows 1–5 use the **route rubric** of the group (section 7).
 - **Safety net:** if peer assessment and the teacher's observation show that a student did not contribute to the group product, the teacher lowers that student's group rows (3–5) by one level. Nobody loses marks for a teammate's part or email.
 
-## 5. Peer assessment
+## 6. Peer assessment
 
 **a) Inside the group: teamwork (marked, row 6).** After submitting, each student rates every teammate, and themselves, from 1 to 4 on three statements, anonymously:
 
@@ -56,7 +74,7 @@ The average of the teammates' ratings (self-rating not counted) gives the level 
 
 **b) Between groups: feedback on the draft (not marked).** In the class before the deadline, each group watches another group's draft video and fills in a short form: two things that work and one thing to improve, using the rubric rows 3–5 and "every member speaks, face and slides visible". The group uses it to fix the video before submitting.
 
-## 6. Rubrics by route
+## 7. Rubrics by route
 
 ### Insecure
 
@@ -91,5 +109,5 @@ The average of the teammates' ratings (self-rating not counted) gives the level 
 ## Open questions for Roger
 
 1. Video length: with the part times from Learning Path 6, an Insecure video lasts about 2 minutes, Safe 3–4 and Daring 4–5. Keep those times, or shorten the parts so every video fits 2–3 minutes as the programme says?
-2. Weights: individual 65 % (pitch 30, email 25, teamwork 10) and group 35 % (research 10, inclusion 10, plan 15)?
+2. Weights: individual 65 % (pitch 25, email 20, teamwork 10, dossier 10) and group 35 % (research 10, inclusion 10, plan 15)?
 3. Pronunciation (shadowing) as its own row, as in LS1, or inside "My part"?
