@@ -79,6 +79,15 @@ All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the
 ## Content-first workflow
 - Read the applicable LS guidance and current course overview (containing all three routes). Implement only content explicitly approved by the user; website content and extracted drafts are not automatically approved. Preserve previously agreed requirements and the last approved content separately from proposed revisions. Flag missing information or contradictions and resolve them with the user before implementing the affected part. Technical and layout decisions may follow existing project rules, but agents must not invent or change pedagogical content during implementation.
 
+## Teacher dashboard (`teacher.html`)
+- `teacher.html` is for Roger only, written in **English**, and is maintained by the **English Lab project** (site code). The LS project must not edit it; ask the English Lab project for dashboard changes.
+- Organised by **class group**: 2ESO A, 2ESO B, 4ESO A, 4ESO B (`EL_GROUPS` in `shared/js/el-catalog.js`). The student picks the group once, on the first sign-in (`ensureGroup` in `el-cloud.js`, stored as `students/{uid}.group`); afterwards only the teacher changes it (`firestore.rules`). Students without a group appear under "No group".
+- Per group and LS (the course's latest open LS by default): To do (route requests, submissions without feedback, unmarked final products) → teaching plan (folded) → learning paths × steps table (foldable per learning path) → result per criterion → LS settings (folded). Marks, feedback, reopening and final-product hand-ins are in a dialog, not in `prompt()`.
+- **Every step shows its assessment criterion.** Learning-path criteria are `criteria` in `el-catalog.js`; step criteria are `EL_STEP_CRITERIA[activity][step]`, falling back to `EL_EVIDENCE[step]`; steps come from `EL_ACTIONS`. Each LS documents the map in its `assessment-criteria.md`. When you add or change a learning path, update `EL_ACTIONS`, the step criteria and that file together.
+- Teaching plan: `shared/js/el-plan.js` (`EL_PLAN[ls]`). Final-product hand-ins: catalogue `steps` + `pieces`, read from the student's synced progress doc. Recall checkpoints show the first try (`parts.first`) next to the score.
+- Preview without Firebase: define `window.EL_DEMO_DATA` (same shape as `load()` returns) before the module script; nothing is saved.
+- Changing `firestore.rules` needs `firebase deploy --only firestore:rules` when the change is merged.
+
 ## Verification and repository hygiene
 - Check affected routes, route switching, interactive feedback and progress. For matching changes, verify duplicate interchangeability, alternatives, round completion and route coverage.
 - Check changed JavaScript syntax and run `git diff --check`. Use isolated browser automation when available; do not require macOS App Management or broader system permissions. Report programmatic-only verification honestly when browser automation is unavailable.

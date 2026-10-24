@@ -5,15 +5,16 @@ import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} f
 import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const CONFIG={apiKey:"AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE",authDomain:"english-lab-ietm.firebaseapp.com",projectId:"english-lab-ietm",storageBucket:"english-lab-ietm.firebasestorage.app",messagingSenderId:"100211300058",appId:"1:100211300058:web:aff85bd00c3a877e7af7e3"};
-const DOMAIN="ietramuntana.cat",TEACHERS=["roger.beltranps@gmail.com"],SKIP=/^(el_|firebase|debug)/;
+// Schools whose Google accounts can sign in as students. Add a new school by adding its domain here AND in firestore.rules.
+const DOMAINS=["ietramuntana.cat"],TEACHERS=["roger.beltranps@gmail.com"],SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
 
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
+let noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
-const isStudent=u=>!!u&&(u.email||"").toLowerCase().endsWith("@"+DOMAIN);
+const isStudent=u=>!!u&&DOMAINS.some(d=>(u.email||"").toLowerCase().endsWith("@"+d));
 
 // Which activity / LS is this page?
 const relPath=location.pathname.replace(/^.*?\/((2|4)eso\/.*)$/,"$1");
@@ -37,7 +38,7 @@ async function pull(){
 }
 function resultPayload(a,extra){const sc=elPoints(a),parts=typeof window.EL_RESULT_PARTS==="function"?window.EL_RESULT_PARTS():null;return Object.assign({ls:lsId,activity:a.id,score:sc,max:a.points,done:sc,updated:serverTimestamp()},parts?{parts}:{},extra||{})}
 function push(){
-  if(!user||!isStudent(user)||syncing||frozen||!lsId||publicLs)return;
+  if(!user||!isStudent(user)||syncing||frozen||!lsId||publicLs||noSync)return;
   clearTimeout(timer);
   timer=setTimeout(async()=>{
     try{
@@ -53,7 +54,7 @@ Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.te
 async function login(){
   const p=new GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
   const r=await signInWithPopup(auth,p);
-  if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Cal entrar amb el compte @"+DOMAIN+".")}
+  if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Sign in with your school account (@"+DOMAINS.join(", @")+").")}
 }
 // Shared school computers: never leak one student's local progress into another account.
 const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))};
@@ -63,7 +64,7 @@ function banner(text,color,btn){
   const b=document.createElement("div");b.id="el-banner";
   b.style.cssText="position:sticky;top:0;z-index:9998;padding:8px 14px;font:14px system-ui,sans-serif;text-align:center;background:"+color+";color:#fff";
   b.textContent=text+" ";
-  if(btn){const x=document.createElement("button");x.textContent=btn.t;x.onclick=btn.f;x.style.cssText="margin-left:8px;border:0;border-radius:6px;padding:3px 10px;cursor:pointer";b.append(x)}
+  for(const bt of [].concat(btn||[])){const x=document.createElement("button");x.textContent=bt.t;x.onclick=bt.f;x.style.cssText="margin-left:8px;border:0;border-radius:6px;padding:3px 10px;cursor:pointer";b.append(x)}
   document.body.prepend(b);
 }
 function freeze(){
@@ -76,7 +77,7 @@ function overlay(html){
   o.style.cssText="position:fixed;inset:0;z-index:10000;background:#f8fafc;display:grid;place-items:center;font:16px system-ui,sans-serif;text-align:center;padding:20px;overflow:auto";
   o.innerHTML=html;document.body.append(o);return o;
 }
-const todayLink='<p><a href="'+new URL("today.html",ROOT).href+'">Torna a les meves activitats</a></p>';
+const todayLink='<p><a href="'+new URL("today.html",ROOT).href+'">Back to my activities</a></p>';
 const block=(title,msg)=>overlay('<div><h1>'+title+'</h1><p>'+msg+'</p>'+todayLink+'</div>');
 
 function chooseLevel(u){
@@ -86,6 +87,18 @@ function chooseLevel(u){
       b.style.cssText="display:block;width:100%;margin:10px 0;padding:12px;border:2px solid #0f766e;background:#fff;border-radius:12px;cursor:pointer;font:inherit";
       b.onclick=async()=>{if(!confirm("Triar el nivell "+l.name+"?"))return;await setDoc(levelRef(u.uid,lsId),{level:l.id,updated:serverTimestamp()});o.remove();res(l.id)};
       o.querySelector("#el-lv").append(b)});
+  });
+}
+// Class group: asked once, on the first sign-in; afterwards only the teacher changes it.
+async function ensureGroup(u){
+  const s=await getDoc(doc(db,"students",u.uid)).catch(()=>null);
+  if(!window.EL_GROUPS||(s&&s.exists()&&s.data().group))return;
+  return new Promise(res=>{
+    const o=overlay('<div style="max-width:520px"><h1>Tria el teu grup</h1><p>Només ho hauràs de fer una vegada. Si t\'equivoques, avisa el professor.</p><div id="el-gr"></div></div>');
+    EL_GROUPS.forEach(g=>{const b=document.createElement("button");b.innerHTML="<b>"+g.name+"</b>";
+      b.style.cssText="display:block;width:100%;margin:10px 0;padding:12px;border:2px solid #0f766e;background:#fff;border-radius:12px;cursor:pointer;font:inherit";
+      b.onclick=async()=>{if(!confirm("Ets de "+g.name+"?"))return;await setDoc(doc(db,"students",u.uid),{group:g.id,name:u.displayName||"",email:u.email,updated:serverTimestamp()},{merge:true});o.remove();res(g.id)};
+      o.querySelector("#el-gr").append(b)});
   });
 }
 function applyLevel(lvl){
@@ -108,9 +121,9 @@ async function gate(u){
   const info=await lsInfo(lsId),st=info.status;
   if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
   if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
-  if(!u||!isStudent(u)){block("Entra amb el compte del col·le","Per fer les activitats cal iniciar sessió amb el teu compte @"+DOMAIN+" (botó de baix a la dreta).");return}
+  if(!u||!isStudent(u)){block("Sign in with your school account","To do the activities you need to sign in with your school account (@"+DOMAINS.join(", @")+") (button at the bottom right).");return}
   if(st==="hidden"){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
-  await pull();
+  if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   const a=EL_CATALOG.find(x=>x.id===actId);
   const ld=await getDoc(levelRef(u.uid,lsId)).catch(()=>null);
   let lvl=ld&&ld.exists()?ld.data().level:null;
@@ -118,15 +131,35 @@ async function gate(u){
   if(!lvl)lvl=await chooseLevel(u);
   applyLevel(lvl);
   if(a&&a.graded&&!info.enabled.includes(actId)){block("Aquesta activitat avaluable encara no està habilitada","El professor t'avisarà a classe quan toqui fer-la.");return}
+  const ca=lvl==="insecure";
+  if(a&&a.manual&&a.graded)banner(ca?"Aquesta activitat és per entregar a través del Google Classroom.":"This activity is to be submitted through Google Classroom.","#1d4ed8");
   if(a&&a.mode==="once"){
-    const r=await getDoc(doc(db,"students",u.uid,"results",resKey(actId))).catch(()=>null);
-    if(r&&r.exists()&&r.data().locked){freeze();banner("Activitat entregada: ja no es pot modificar.","#92400e");return}
-    banner("Aquesta activitat només es pot fer una vegada.","#1d4ed8",{t:"Entrega-la",f:async()=>{
-      if(!confirm("Un cop entregada no la podràs tornar a fer ni modificar. Vols entregar-la?"))return;
+    const rref=doc(db,"students",u.uid,"results",resKey(actId));
+    const r=await getDoc(rref).catch(()=>null),rd=r&&r.exists()?r.data():{};
+    if(rd.locked){
+      noSync=true;const pk="el_practice_"+actId;
+      if(localStorage.getItem(pk)==="1"){banner("Mode pràctica: pots fer l'activitat de nou, però no s'enviarà ni canviarà la teva nota.","#7c3aed",{t:"Surt de la pràctica",f:()=>{origSet.call(localStorage,pk,"0");location.reload()}});return}
+      banner("Activitat entregada. Pots consultar-la i, si vols, tornar-la a fer per practicar (no s'enviarà de nou).","#92400e",{t:"Practica de nou",f:()=>{a.keys.forEach(k=>localStorage.removeItem(k));origSet.call(localStorage,pk,"1");location.reload()}});
+      freeze();return}
+    const submit=async()=>{if(!confirm(ca?"Un cop entregada, la nota queda fixada (podràs practicar-la de nou, però no s'enviarà). Vols entregar-la?":"Once submitted, your result is fixed (you can practise it again, but it will not be sent). Submit it?"))return;
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
-      await setDoc(doc(db,"students",u.uid,"results",resKey(actId)),resultPayload(a,{locked:true}),{merge:true});
+      await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});location.reload()};
+    if(rd.markedDone)banner((ca?"Aquesta activitat és per entregar. L'has marcada com a feta, però encara no l'has entregada.":"This activity is to be submitted. You have marked it as done but not submitted it yet."),"#15803d",[{t:ca?"Entrega-la":"Submit",f:submit},{t:ca?"Desmarca":"Unmark",f:async()=>{await setDoc(rref,{markedDone:false,updated:serverTimestamp()},{merge:true});location.reload()}}]);
+    else banner((ca?"Aquesta activitat és per entregar (només una vegada). Quan acabis, marca-la com a feta.":"This activity is to be submitted (only once). When you finish, mark it as done."),"#1d4ed8",{t:ca?"Marca com a feta":"Mark as done",f:async()=>{
+      await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
+      await setDoc(rref,resultPayload(a,{markedDone:true}),{merge:true});
+      if(confirm(ca?"Activitat marcada com a feta. Vols entregar-la ara? (La nota quedarà fixada.)":"Activity marked as done. Do you want to submit it now? (Your result will be fixed.)"))await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});
       location.reload()}});
   }
+}
+
+// Submit (lock) an activity from any page, using the progress saved in the cloud.
+async function submitActivity(a){
+  const u=user;if(!u||!isStudent(u))return false;
+  const p=await getDoc(doc(db,"students",u.uid,"progress",a.ls)).catch(()=>null),data=p&&p.exists()?p.data().data||{}:{};
+  const sc=elPoints(a,k=>data[k]);
+  await setDoc(doc(db,"students",u.uid,"results",resKey(a.id)),{ls:a.ls,activity:a.id,score:sc,max:a.points,done:sc,locked:true,markedDone:true,updated:serverTimestamp()},{merge:true});
+  return true;
 }
 
 function bar(){
@@ -135,11 +168,11 @@ function bar(){
   document.body.appendChild(el);
   return u=>{el.innerHTML="";
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
-    if(!u)el.append("Sense sessió ",b("Entra amb el compte del col·le",login));
+    if(!u)el.append("Not signed in ",b("Sign in with your school account",login));
     else{el.append(u.displayName||u.email," ");
-      const a=document.createElement("a");a.textContent=isTeacher(u)?"Tauler":"Les meves activitats";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
-      if(isStudent(u)&&lsId)el.append(b("Canvi de nivell",()=>requestLevel(u))," ");
-      el.append(b("Surt",logout))}};
+      const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
+      if(isStudent(u)&&lsId)el.append(b("Change route",()=>requestLevel(u))," ");
+      el.append(b("Sign out",logout))}};
 }
 let draw=()=>{};
 const start=()=>{draw=bar();draw(user)};
@@ -153,8 +186,9 @@ const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=b
 onAuthStateChanged(auth,async u=>{
   user=u;draw(u);
   if(u&&isStudent(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){if(prev!==null&&prev!==u.uid)wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
+  if(u&&isStudent(u))try{await ensureGroup(u)}catch(e){console.warn("group",e)}
   try{await gate(u)}catch(e){console.warn("gate",e)}
   listeners.forEach(f=>f(u));
 });
 
-window.ELCloud={auth,db,login,logout,isTeacher,isStudent,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isStudent,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};

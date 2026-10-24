@@ -1,7 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@ietramuntana[.]cat'); }
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@(ietramuntana[.]cat)$'); }  // add schools: (ietramuntana[.]cat|newschool[.]cat) and in shared/js/el-cloud.js DOMAINS
     function isTeacher() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email in ['roger.beltranps@gmail.com']; }
     function lsOpen(ls) { return exists(/databases/$(database)/documents/ls/$(ls)) && get(/databases/$(database)/documents/ls/$(ls)).data.status == 'open'; }
 
@@ -15,8 +15,15 @@ service cloud.firestore {
       allow write: if isTeacher();
     }
     match /students/{uid} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
-      allow read: if isTeacher();
+      // class group: the student sets it once (first sign-in); after that only the teacher changes it
+      allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.get('group', '2ESOA') in ['2ESOA','2ESOB','4ESOA','4ESOB'];
+      allow update: if signedIn() && request.auth.uid == uid
+        && (resource.data.get('group', null) == null
+              ? request.resource.data.get('group', '2ESOA') in ['2ESOA','2ESOB','4ESOA','4ESOB']
+              : request.resource.data.get('group', null) == resource.data.group);
+      allow write: if isTeacher();
 
       // progress is writable only while that LS is open
       match /progress/{ls} {
@@ -40,7 +47,7 @@ service cloud.firestore {
         allow create, update: if signedIn() && request.auth.uid == uid
           && lsOpen(request.resource.data.ls)
           && (resource == null || resource.data.get('locked', false) == false)
-          && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','updated','parts','score','max']);
+          && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','markedDone','updated','parts','score','max']);
         allow write: if isTeacher();
       }
     }

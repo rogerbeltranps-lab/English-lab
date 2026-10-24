@@ -40,6 +40,26 @@
 | CC1 1.3 Inclusive actions | Final product only | |
 | CE2 emprenedora 2.3 Designing with resources | LP4, final product | |
 
+## Step by step (teacher dashboard)
+
+`EL_STEP_CRITERIA` in `el-catalog.js` gives each step its criterion by the rule above; the dashboard shows it under each step. Steps not listed (recall, vocabulary, grammar) are language practice.
+
+| Activity | Steps and criteria |
+| --- | --- |
+| Getting started: Castanyada & Halloween (warm-up) | recall · words · read → 4.1 · listen → 2.1 · speak → 3.1 |
+| Celebrations around the world | recall · cards · practice · read → 4.1 · listen → 2.1 · grammar · mixed · write (not scored, 5.1) · speak → 3.1 |
+| Recall checkpoint 1 | check |
+| Where traditions come from | recall · cards · practice · listen → 2.1 · grammar · mixed · write (not scored, 5.1) · speak → 3.1 |
+| Research it right | recall · read → 4.1 · sources → 4.2, 6.1 · respect → 1.2 · notes → 6.1 · credit → 6.2 · card → 6.2 |
+| Recall checkpoint 2 | check |
+| Plan the day | recall · cards · practice · listen → 2.1 · grammar · mixed · write (not scored, 5.1, CE2 2.3) · speak → 3.1 |
+| Recall checkpoint 3 | check |
+| Write to the head teacher | recall · cards · practice · read → 4.1 · register → 3.2 · grammar · write (not scored, 5.1) · speak → 3.1 |
+| Recall checkpoint 4 | check |
+| Sample exam | read → 4.1 · listen → 2.1 · grammar · write → 5.1 |
+| Final product: Celebration Day Proposal | video → 3.1, 3.2 · email → 5.1 · submit |
+| Reflect | reflect |
+
 ## Proposed fixes (labels only, waiting for approval)
 
 1. LP3: add 4.1 (its first step is a graded reading).
