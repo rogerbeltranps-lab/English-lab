@@ -15,7 +15,7 @@ td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px 
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}
-details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}</style></head><body>
+details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
 <div class="tabs" id="tabs"></div>
@@ -23,6 +23,7 @@ details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}</style></head>
 </div>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
+<script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script type="module">
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
@@ -62,7 +63,8 @@ async function act(p){await p;if(!DEMO)S.D=await load();render()}
 
 // ---- helpers
 const name=s=>esc(s.name||s.email||s.uid);
-const pill=c=>`<span class="pill ce${c[0]}">${c}</span>`;
+let COURSE=null;   // course of the group on screen: criteria texts depend on it
+const pill=c=>`<span class="pill ce${c[0]}" data-do="crit" data-c="${c}" tabindex="0" title="${esc(elCompetence(c)+" · "+c+": "+(elCriterion(COURSE,c)||"–"))}">${c}</span>`;
 const route=l=>l?`<span class="route r-${l}">${LV[l]||l}</span>`:'<span class="route r-none">–</span>';
 const level=(u,ls)=>((S.D.lv[u]||{})[ls]||{}).level;
 const acts=ls=>cat.filter(a=>a.ls===ls);
@@ -94,7 +96,7 @@ function render(){
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">No group<small>${n("none")}</small></button>`:"")
     +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
   if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group).sort(byName));return}
-  const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);
+  const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);COURSE=grp.course;
   const mine=l=>elLsForGroup(l,D.ls[l.id],S.g);
   if(!lss.some(l=>l.id===S.ls))S.ls=(lss.filter(l=>mine(l)&&(D.ls[l.id]||{}).status==="open").pop()||lss.filter(mine).pop()||lss[lss.length-1]).id; // latest open LS assigned to the group
   const ls=S.ls,list=acts(ls),inG=studs.filter(s=>s.group===S.g).sort(byName);
@@ -106,6 +108,7 @@ function render(){
     +((window.EL_PLAN||{})[ls]?`<div class="box"><details><summary>Teaching plan</summary>${plan(EL_PLAN[ls],grp)}</details></div>`:"")
     +`<div class="box"><h2>Learning paths and activities</h2><p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer.</p>
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"?" yet. Students choose their group the first time they sign in.":" with this route.")+"</p>"}</div>`
+    +`<div class="box"><h2>Assessment criteria in this LS</h2><p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}</div>`
     +`<div class="box"><h2>Result per assessment criterion</h2><p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}</div>`
     +`<div class="box"><details><summary>LS status and graded activities</summary>${lsSettings(ls)}</details></div>`;
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
@@ -141,12 +144,19 @@ function progress(studs,list){
 }
 function criteria(studs,list){
   const crits=[...new Set(list.flatMap(a=>a.criteria))].sort();
-  let h=`<table><thead><tr><th class="stu">Student</th>`+crits.map(c=>`<th>${pill(c)}<br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(c)).map(a=>a.title).join(" · ")}</small></th>`).join("")+"</tr></thead><tbody>";
+  let h=`<table><thead><tr><th class="stu">Student</th>`+crits.map(c=>`<th>${pill(c)}<br><small>${esc(elCompetence(c))}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(c)).map(a=>a.title).join(" · ")}</small></th>`).join("")+"</tr></thead><tbody>";
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};h+=`<tr><td class="stu">${name(s)}</td>`+crits.map(c=>{let ts=0,tm=0;list.forEach(a=>{const x=r[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){ts+=x.score||0;tm+=x.max}});
     if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return `<td><b style="color:${col}">${ts}/${tm}</b><br><small>${Math.round(p)}%</small></td>`}).join("")+"</tr>"});
   return h+"</tbody></table>";
 }
 const lsGroups=id=>GR.filter(g=>g.course===(EL_LS.find(l=>l.id===id)||{}).course);
+// Criteria of the LS with their text, and the detail of one criterion
+function legend(list){const cs=[...new Set(list.flatMap(a=>a.criteria))].sort();
+  return `<table class="legend"><tbody>${cs.map(c=>`<tr><td>${pill(c)}</td><td><b>${esc(elCompetence(c))}</b><br>${esc(elCriterion(COURSE,c)||"–")}</td></tr>`).join("")}</tbody></table>`}
+function critPanel(c){
+  const list=acts(S.ls),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+k));
+  dlg(`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterion(COURSE,c)||"No text yet for this course.")}</p><label>Learning paths linked to it</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>Activities that give evidence</label><p>${st.map(esc).join(" · ")||"–"}</p>`);
+}
 function lsSettings(id){
   const info=S.D.ls[id]||{status:"hidden",enabled:[]},st=info.status,list=acts(id);
   return `<div class="lscard"><span class="badge" style="background:${STCOL[st]}">Current status: ${LS_INFO[st][0].toUpperCase()}</span><p class="muted">${LS_INFO[st][1]}</p><div class="opts">`
@@ -205,7 +215,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
   ({tab:()=>{S.g=k.g;render()},route:()=>{S.route=k.r;render()},reload:()=>act(),
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     acc:()=>act(api.setLevel(u,S.ls,k.to)),rej:()=>act(api.reject(u,S.ls)),
-    stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
+    crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
     replysave:()=>{const v=$("#rp-"+k.s).value.trim();if(!v)return;act(api.reply(u,a,k.s,v)).then(()=>cellPanel(u,a.id))},
     save:()=>{const o={feedback:$("#ffb").value};if(a.manual){const sc=$("#fsc").value,mx=$("#fmx").value;if(sc!==""&&mx!==""&&!isNaN(+sc)&&!isNaN(+mx)){o.score=+sc;o.max=+mx}}$("#dlg").close();act(api.result(u,a,o))},
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
