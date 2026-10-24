@@ -58,4 +58,4 @@ The new steps **log** (LP2), **chart** (LP3) and **card** (LP4) are hand-ins: fi
 - **Term 1** (LP1–LP3, LP5, LP6, checkpoints, exam on 18/20 Nov): 4.1, 2.2, 5.1 in the exam and the Learning Paths; 3.2, 1.1, 1.2 and CC1 1.3 as Learning Path practice.
 - **Term 2** (LP4 and the final product): 3.2, 5.1, 4.2, 6.1, 1.1, 1.2, CC1 1.3, CC3 3.2.
 
-Open question for Roger: whether the term 1 exam uses the same reading log and listening chart formats (recommended).
+Exam formats: Roger (24 Oct) decides later; the first exam is fine for now. Recommendation: use the same reading log and listening chart formats in the exam.

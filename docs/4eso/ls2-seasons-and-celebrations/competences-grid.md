@@ -41,4 +41,4 @@ Recall checkpoints (4.1, 5.1) give formative evidence only: they count by comple
 ## 3. Notes
 
 - Final product weights (proposed, waiting for Roger's OK): my part 25 · my email 15 · welcome actions 5 · research 10 · meaning 5 · local link 10 · stereotypes 10 · teamwork 10 · process evidence 10. Individual 65 %, group 35 %. See [final-product-assessment.md](final-product-assessment.md).
-- The term 1 exam should use the same task formats as 4.1 and 2.2 (reading log, listening chart): open question for Roger.
+- Exam formats: Roger (24 Oct) decides later; the first exam is fine for now. Using the reading log and listening chart formats in the exam is still the recommendation.
