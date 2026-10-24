@@ -16,7 +16,16 @@ Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
 - Reuse route-aware support such as `shared/js/learning-path-support.js` where appropriate; verify language updates correctly when switching routes.
 
 ## Levels, listenings, videos and readings
-- Each route has the level agreed in the course's teaching programme. **4ESO:** Insecure = A2 / A2+ with support, Safe = B1, Daring = B1 / B1+. Content marked as a B1+ extension goes only to Daring. For other courses, use the levels in that course's programme and ask the user if they are missing.
+- Each route has the level agreed in the levels document of the teaching programme:
+
+  | Course | Year horizon | Insecure | Safe | Daring |
+  | --- | --- | --- | --- | --- |
+  | 1ESO | A1 consolidated; starting A2 tasks | A1 with a lot of support | A1 consolidated | A1+ / early A2 |
+  | 2ESO | Functional A2 | A1+ / early A2 with scaffolding | Functional A2 | A2+ / emerging B1 |
+  | 3ESO | More autonomous A2; towards B1 | A2 with support | More autonomous A2 | Emerging B1 |
+  | 4ESO | B1 as the final horizon | A2 / A2+ with support | Indicative B1 | B1 / B1+ |
+
+  Content marked as an extension of the next level (for example B1+ in 4ESO) goes only to Daring. This school year the site covers **2ESO and 4ESO** only.
 - **Listenings and videos are pitched at the Safe level**, and every route hears the same input. Do not write separate scripts per route.
 - **The activities around that input adapt to each route's level:** questions, tasks, support, hints and the language of instructions. Insecure gets easier questions, support in Catalan and, where possible, a slower version of the audio. Daring gets the more demanding questions (inference, comparison, opinion).
 - **Reading texts are different: they vary by route.** Each route reads a version written at its own level (for 4ESO: A2 / A2+ for Insecure, B1 for Safe, B1 / B1+ for Daring), on the same topic and with the same key information, so the whole class can share the content. Adapt length, sentence complexity, vocabulary and grammar to the level; the questions follow the route's text.
