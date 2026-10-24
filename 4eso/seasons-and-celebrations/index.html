@@ -1,91 +1,822 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#315f9f">
-<title>4 ESO · Seasons &amp; Celebrations</title>
-<link rel="stylesheet" href="../../shared/css/layout.css">
-<link rel="stylesheet" href="../../shared/css/topbar.css">
-<link rel="stylesheet" href="../../shared/css/activities.css">
-<style>
-:root{--accent:#315f9f;--dark:#234777;--soft:#edf4ff;--soft2:#dceafe;--cream:#f7f9fd;--ink:#172033;--muted:#687386;--line:#dbe5f1;--shadow:0 14px 38px rgba(49,95,159,.10)}
-.btn{border:0;border-radius:12px;padding:10px 15px;font-weight:800;background:var(--accent);color:#fff;text-decoration:none;display:inline-block}
-.lp-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
-.lp{display:block;border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:#fff;color:var(--ink);text-decoration:none}
-a.lp:hover{border-color:var(--accent);background:var(--soft)}
-.lp .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--soft2);color:var(--dark);font-weight:850;margin-right:8px}
-.lp strong{color:var(--dark)}
-.lp p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
-.lp.soon{opacity:.6}
-.lp .tag{float:right;font-size:.75rem;font-weight:800;color:var(--dark);background:var(--soft);border-radius:999px;padding:2px 8px}
-.route-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px}
-.route-card{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fff}
-.route-card strong{color:var(--dark)}
-.route-card p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
-ul.plain{margin:8px 0 0;padding-left:20px;color:var(--ink)}
-@media(max-width:760px){.lp-list,.route-grid{grid-template-columns:1fr}}
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4 ESO · Seasons &amp; Celebrations</title>
+  <style>
+    :root{
+      --bg:#f7f8fa;
+      --surface:#ffffff;
+      --text:#172033;
+      --muted:#687180;
+      --line:#e3e7ed;
+      --accent:#6d86ad;
+      --accent-dark:#506c98;
+      --accent-soft:#eef3fa;
+      --shadow:0 14px 36px rgba(35,50,76,.07);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.5
+    }
+
+    a{color:inherit;text-decoration:none}
+
+    .wrap{
+      width:min(1120px,calc(100% - 32px));
+      margin:auto
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(247,248,250,.96);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line)
+    }
+
+    nav{
+      min-height:70px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px
+    }
+
+    .brand{font-weight:800;letter-spacing:-.03em;white-space:nowrap}
+
+    .navlinks{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:6px;
+      flex-wrap:wrap
+    }
+
+    .navlinks > a,
+    .nav-menu > summary{
+      padding:9px 12px;
+      border-radius:12px;
+      color:var(--muted);
+      font-weight:650;
+      cursor:pointer;
+      list-style:none;
+      user-select:none
+    }
+
+    .nav-menu > summary::-webkit-details-marker{display:none}
+
+    .navlinks > a:hover,
+    .nav-menu > summary:hover,
+    .nav-menu[open] > summary{
+      background:var(--surface);
+      color:var(--text)
+    }
+
+    .nav-menu{position:relative}
+
+    .nav-menu > summary::after{
+      content:" ▾";
+      font-size:.74em
+    }
+
+    .dropdown{
+      position:absolute;
+      top:calc(100% + 8px);
+      right:0;
+      min-width:220px;
+      padding:8px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:var(--surface);
+      box-shadow:var(--shadow)
+    }
+
+    .dropdown a,
+    .dropdown .disabled{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:10px 11px;
+      border-radius:10px;
+      font-size:.94rem
+    }
+
+    .dropdown a:hover{
+      background:var(--accent-soft);
+      color:var(--accent-dark)
+    }
+
+    .dropdown a.current{
+      background:var(--accent-soft);
+      color:var(--accent-dark);
+      font-weight:800
+    }
+
+    .dropdown .disabled{
+      color:#a1a8ae;
+      cursor:default
+    }
+
+    .soon{
+      font-size:.72rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.04em
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:40px;
+      align-items:center;
+      padding:62px 0 34px
+    }
+
+    .eyebrow{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:var(--accent-dark);
+      font-size:.8rem;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      margin-bottom:18px
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(3rem,7vw,5.4rem);
+      line-height:.96;
+      letter-spacing:-.055em
+    }
+
+    .hero p{
+      margin:22px 0 0;
+      max-width:660px;
+      color:var(--muted);
+      font-size:1.06rem
+    }
+
+    .hero-card{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:30px;
+      box-shadow:var(--shadow)
+    }
+
+    .hero-card .kicker{
+      font-size:.78rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--accent-dark)
+    }
+
+    .hero-card h2{
+      margin:10px 0 8px;
+      font-size:1.8rem;
+      letter-spacing:-.04em
+    }
+
+    .hero-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:.96rem
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      padding:14px 0 28px;
+      scrollbar-width:none
+    }
+
+    .tabs::-webkit-scrollbar{display:none}
+
+    .tabbtn{
+      border:1px solid var(--line);
+      background:var(--surface);
+      padding:11px 15px;
+      border-radius:14px;
+      font:inherit;
+      font-weight:700;
+      color:var(--muted);
+      cursor:pointer;
+      white-space:nowrap;
+      transition:.2s ease
+    }
+
+    .tabs label.tabbtn{display:inline-block}
+    .tabbtn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 6px 18px rgba(35,50,76,.06)
+    }
+
+    .tabbtn.active{
+      background:var(--accent-soft);
+      border-color:#d4ddea;
+      color:var(--accent-dark)
+    }
+
+    .panel{
+      display:none;
+      padding-bottom:60px
+    }
+
+    .panel.active{display:none}
+
+    .tab-radio{
+      position:absolute;
+      opacity:0;
+      pointer-events:none
+    }
+
+    #tab-overview:checked ~ .tabs label[for="tab-overview"],
+    #tab-learning-path:checked ~ .tabs label[for="tab-learning-path"],
+    #tab-language:checked ~ .tabs label[for="tab-language"],
+    #tab-final:checked ~ .tabs label[for="tab-final"]{
+      background:var(--accent-soft);
+      border-color:var(--accent);
+      color:var(--accent-dark)
+    }
+
+    #tab-overview:checked ~ #overview,
+    #tab-learning-path:checked ~ #learning-path,
+    #tab-language:checked ~ #language,
+    #tab-final:checked ~ #final{
+      display:block
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px
+    }
+
+    .card{
+      display:block;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:24px;
+      box-shadow:0 5px 18px rgba(35,50,76,.03);
+      cursor:pointer;
+      transition:.2s ease;
+      min-height:250px
+    }
+
+    .card:hover{
+      transform:translateY(-3px);
+      box-shadow:var(--shadow);
+      border-color:#cfd9e8
+    }
+
+    .card:focus-visible{
+      outline:3px solid var(--accent-soft);
+      outline-offset:3px
+    }
+
+    .num{
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      background:var(--accent-soft);
+      color:var(--accent-dark);
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      margin-bottom:20px
+    }
+
+    .card h3{
+      margin:0 0 8px;
+      font-size:1.22rem;
+      letter-spacing:-.03em
+    }
+
+    .card p{
+      margin:0;
+      color:var(--muted)
+    }
+
+    .card .link{
+      display:inline-block;
+      margin-top:18px;
+      color:var(--accent-dark);
+      font-weight:800
+    }
+
+    .overview{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px
+    }
+
+    .bigcard{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:28px
+    }
+
+    .bigcard h2{
+      margin:0 0 10px;
+      font-size:1.7rem;
+      letter-spacing:-.04em
+    }
+
+    .bigcard p{color:var(--muted)}
+
+    .checklist{
+      padding:0;
+      margin:18px 0 0;
+      list-style:none
+    }
+
+    .checklist li{
+      padding:9px 0;
+      border-bottom:1px solid var(--line);
+      color:var(--muted)
+    }
+
+    .checklist li:last-child{border-bottom:0}
+
+    footer{
+      border-top:1px solid var(--line);
+      padding:28px 0 34px;
+      color:var(--muted);
+      font-size:.9rem
+    }
+
+
+    .curriculum-card{margin-top:20px}
+    .challenge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+    .route-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+    .route-box h3{margin:8px 0 8px}
+    .route-box p{color:var(--muted)}
+    .route-box ul{margin:14px 0 0;padding-left:20px;color:var(--muted)}
+    .route-box li{margin:6px 0}
+    .route-tag{display:inline-block;padding:6px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dark);font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+    .daring-box{border-color:var(--accent)}
+    .assessment-box{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+    .assessment-box h3{margin:0 0 14px;font-size:1.3rem}
+    .assessment-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .assessment-grid>div{background:var(--accent-soft);border-radius:14px;padding:14px}
+    .assessment-grid strong{display:block;color:var(--accent-dark);margin-bottom:6px}
+    .assessment-grid span{display:block;color:var(--muted);font-size:.88rem}
+    .assessment-note{margin:16px 0 0;color:var(--muted);font-size:.92rem}
+
+    .menu-toggle{
+  display:none;
+  align-items:center;
+  gap:8px;
+  padding:9px 14px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--surface);
+  color:var(--text);
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+.menu-toggle::after{content:"▾";font-size:.8em}
+nav.menu-open .menu-toggle::after{content:"▴"}
+
+    @media(max-width:820px){
+      .hero{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr}
+      .overview{grid-template-columns:1fr}
+      .challenge-grid{grid-template-columns:1fr}
+      .assessment-grid{grid-template-columns:1fr}
+      nav{align-items:center;padding:10px 0;min-height:60px}
+      .menu-toggle{display:inline-flex}
+      .navlinks{
+        display:none;
+        position:absolute;
+        top:100%;
+        left:0;
+        right:0;
+        flex-direction:column;
+        align-items:stretch;
+        flex-wrap:nowrap;
+        gap:2px;
+        padding:10px 16px 14px;
+        max-height:calc(100vh - 70px);
+        overflow-y:auto;
+        background:var(--surface);
+        border-bottom:1px solid var(--line);
+        box-shadow:var(--shadow);
+      }
+      nav.menu-open .navlinks{display:flex}
+      .navlinks > a,.nav-menu > summary{padding:12px 12px}
+      .dropdown{position:static;min-width:0;margin:4px 0 6px;box-shadow:none;background:transparent}
+      .ls-dropdown{min-width:0}
+    }
+  
+.course-group{padding:7px 8px;border-bottom:1px solid var(--line)}
+.course-group:last-child{border-bottom:0}
+.course-link,.ls-link{display:block!important;border-radius:10px;padding:9px 10px!important}
+.course-link{font-weight:850}
+.ls-link{font-size:.92rem;padding-left:18px!important}
+.muted-group{display:grid;gap:3px}
+.ls-dropdown{min-width:250px}
+
+    /* Keep the optional sample exam visible on the opening Overview screen. */
+    /* Compact, equal-sized practice links, together under the LS introduction. */
+    .hero-quick-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:500px;margin-top:16px}
+    .hero-quick-links .sample-exam-hero-link{display:flex;align-items:center;justify-content:space-between;min-width:0;min-height:58px;margin:0;padding:10px 12px;gap:8px;background:var(--accent-dark);color:#fff;border:1px solid var(--accent-dark);border-radius:11px;text-decoration:none;box-shadow:0 4px 14px rgba(30,50,60,.12);transition:transform .15s,box-shadow .15s}
+    .hero-quick-links .sample-exam-hero-link:hover{color:#fff;transform:translateY(-2px);box-shadow:0 7px 18px rgba(30,50,60,.17)}
+    .hero-quick-links .sample-exam-hero-link:focus-visible{outline:3px solid #f7bf60;outline-offset:3px}
+    .hero-quick-links .sample-exam-hero-link strong{display:block;font-size:.85rem;line-height:1.25;font-weight:800}
+    .hero-quick-links .sample-exam-hero-link small{display:block;font-size:.7rem;line-height:1.3;font-weight:550;color:#eef5ff;margin-top:4px}
+    .hero-quick-links .hero-link-arrow{font-size:1.05rem;line-height:1;flex-shrink:0}
+    @media(max-width:420px){.hero-quick-links{grid-template-columns:1fr;max-width:280px}.hero-quick-links .sample-exam-hero-link{min-height:52px}}
 </style>
-<link rel="stylesheet" href="../../shared/css/lp-theme-4eso.css">
 </head>
+
 <body>
-<div class="topbar"><div class="wrap toprow">
-  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="../index.html">← 4 ESO</a><span class="brand-mark">2</span><span class="brand-title">Seasons &amp; Celebrations<small>4 ESO · Learning Situation 2</small></span></div>
-</div></div>
+  <header>
+    <div class="wrap">
+      <nav>
+        <a class="brand" href="../../index.html">English with Roger</a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+        <div class="navlinks" id="site-menu">
+          <a href="../../index.html">Home</a>
+          <details class="nav-menu">
+            <summary>Learning Situations</summary>
+            <div class="dropdown ls-dropdown">
+              <div class="course-group">
+                <a class="course-link" href="../../2eso/index.html">2 ESO</a>
+                <a class="ls-link" href="../../2eso/my-real-routine/index.html">↳ My Real Routine</a>
+              </div>
+              <div class="course-group">
+                <a class="course-link current" href="../../4eso/index.html">4 ESO <span>✓</span></a>
+                <a class="ls-link" href="../my-real-routine/index.html">↳ My Real Routine</a>
+                <a class="ls-link current" href="index.html">↳ Seasons &amp; Celebrations</a>
+              </div>
+              <div class="course-group muted-group">
+                <span class="disabled">1 ESO <span class="soon">Soon</span></span>
+                <span class="disabled">3 ESO <span class="soon">Soon</span></span>
+                <span class="disabled">1 BATX <span class="soon">Soon</span></span>
+                
+              <div class="course-group">
+                <a class="course-link" href="../../2btx/biologia/metabolisme/">2 BATX</a>
+                <a class="ls-link" href="../../2btx/biologia/metabolisme/">↳ Biologia · Metabolisme</a>
+              </div>
+              </div>
+            </div>
+          </details>
+          <a href="../../index.html?v=2#lab">English Lab</a>
+        </div>
+      </nav>
+    </div>
+  </header>
 
-<header class="hero"><div class="wrap">
-  <span class="eyebrow">Learning Situation 2 · End of October – December</span>
-  <h1>Seasons &amp; Celebrations</h1>
-  <p class="lead">Why do we celebrate, and what can celebrations tell us about people, places and the natural world?</p>
-</div></header>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <span class="eyebrow">4 ESO · Learning Situation 2 · End of October – December</span>
+        <h1>Seasons &amp; Celebrations</h1>
+        <p class="intro">En Insecure trobaràs instruccions i ajuda en català: observa els models i practica pas a pas. L’anglès és la llengua dels textos i de la teva producció. Safe redueix l’ajuda i Daring demana més autonomia. Segueix els Learning Paths en ordre: cada un acaba amb una peça que faràs servir al producte final.</p>
+        <p>Why do we celebrate, and what can celebrations tell us about people, places and the natural world?</p>
+        <div class="hero-quick-links" aria-label="Extra practice">
+          <a class="sample-exam-hero-link" href="sample-exam.html" aria-label="Open the LS2 sample exam">
+            <span><strong>Sample Exam</strong><small>Reading, listening, grammar · 3 routes</small></span>
+            <span class="hero-link-arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="sample-exam-hero-link" href="reflect.html" aria-label="Open Reflect">
+            <span><strong>Reflect</strong><small>Your progress and one goal</small></span>
+            <span class="hero-link-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
 
-<main class="wrap">
-<section class="panel active">
-  <div class="panel-head"><div><h2>The challenge: a Celebration Day for our school</h2><p class="instruction">In groups of 3–4, design a respectful celebration day at school around one tradition. Record a 2–3 minute video pitch with Google Slides (everyone speaks, face and slides visible together) and write a formal email to the head teacher proposing the event.</p></div><span class="pill">Final product</span></div>
-  <div class="route-grid">
-    <div class="route-card"><strong>Insecure</strong><p>Describe one celebration: what, when, where, three customs, one food or symbol. Plan three activities. Guided email template.</p></div>
-    <div class="route-card"><strong>Safe</strong><p>Describe it and compare it with a local celebration. Explain its origin. Plan the day with a timetable, roles and materials. Full formal email.</p></div>
-    <div class="route-card"><strong>Daring</strong><p>Explain origin, meaning and change over time. Justify an inclusive event without stereotypes. Answer one concern from the head teacher in the email.</p></div>
-  </div>
-</section>
+      <aside class="hero-card">
+        <div class="kicker">Your challenge</div>
+        <h2>A Celebration Day for our school</h2>
+        <p>In groups of 3–4, design a respectful celebration day at school around one tradition. Record a 2–3 minute video pitch with Google Slides (everyone speaks, faces and slides visible together) and write a formal email to the head teacher proposing the event.</p>
+      </aside>
+    </section>
 
-<section class="panel active">
-  <div class="panel-head"><div><h2>Learning Paths</h2><p class="instruction">Each Learning Path starts with a short recall quiz (no notes!) and ends with a piece you will use in the final product.</p></div></div>
-  <div class="lp-list">
-    <a class="lp" href="getting-started.html"><span class="tag">Week 1</span><span class="n">1</span><strong>Getting started: Castanyada &amp; Halloween</strong><p>Remember LS1, seasons and autumn words, a real listening and a short speaking task.</p></a>
-    <a class="lp" href="celebrations-around-the-world.html"><span class="tag">Weeks 1–2</span><span class="n">2</span><strong>Celebrations around the world</strong><p>Customs, dates and symbols. Present Simple, “it is celebrated / takes place”. Real BBC video about Diwali.</p></a>
-    <a class="lp" href="where-traditions-come-from.html"><span class="tag">Week 3</span><span class="n">3</span><strong>Where traditions come from</strong><p>Origins of Halloween and Thanksgiving, comparing cultures. Past Simple, used to, relative clauses.</p></a>
-    <a class="lp" href="research-it-right.html"><span class="tag">Week 4</span><span class="n">4</span><strong>Research it right</strong><p>Reliable sources, respectful wording, notes and credits. Your group’s research card.</p></a>
-    <a class="lp" href="plan-the-day.html"><span class="tag">Week 5</span><span class="n">5</span><strong>Plan the day</strong><p>Future forms and event planning. Your event plan.</p></a>
-    <a class="lp" href="write-to-the-head-teacher.html"><span class="tag">Week 6</span><span class="n">6</span><strong>Write to the head teacher</strong><p>A formal email proposing your event, and pitch rehearsal.</p></a>
-    <a class="lp" href="celebration-day-proposal.html"><span class="tag">Weeks 7–8</span><span class="n">7</span><strong>Final product: Celebration Day Proposal</strong><p>Group video pitch + individual formal email, built from your saved pieces.</p></a>
-  </div>
-</section>
+    <input class="tab-radio" type="radio" name="ls-tab" id="tab-overview" checked>
+    <input class="tab-radio" type="radio" name="ls-tab" id="tab-learning-path">
+    <input class="tab-radio" type="radio" name="ls-tab" id="tab-language">
+    <input class="tab-radio" type="radio" name="ls-tab" id="tab-final">
 
-<section class="panel active">
-  <div class="panel-head"><div><h2>Recall checkpoints and review</h2><p class="instruction">Short quizzes with no notes. Your teacher will tell you when to do them.</p></div></div>
-  <div class="lp-list">
-    <a class="lp" href="recall-checkpoint-1.html"><span class="tag">Week 2</span><span class="n">C1</span><strong>Recall checkpoint 1</strong><p>LS1, Getting started and Celebrations around the world.</p></a>
-    <a class="lp" href="recall-checkpoint-2.html"><span class="tag">Week 4</span><span class="n">C2</span><strong>Recall checkpoint 2</strong><p>LS1 and Learning Paths 1–3.</p></a>
-    <a class="lp" href="recall-checkpoint-3.html"><span class="tag">Week 6</span><span class="n">C3</span><strong>Recall checkpoint 3</strong><p>LS1 and Learning Paths 1–5.</p></a>
-    <a class="lp" href="recall-checkpoint-4.html"><span class="tag">Week 8</span><span class="n">C4</span><strong>Recall checkpoint 4</strong><p>Everything in this Learning Situation.</p></a>
-    <a class="lp" href="sample-exam.html"><span class="tag">Week 8</span><span class="n">E</span><strong>Sample exam</strong><p>Reading, listening, grammar and writing practice.</p></a>
-    <a class="lp" href="reflect.html"><span class="tag">Week 8</span><span class="n">R</span><strong>Reflect</strong><p>What did you learn, what helped you, and one goal for LS3.</p></a>
-  </div>
-</section>
+    <div class="tabs">
+      <label class="tabbtn" for="tab-overview">Overview</label>
+      <label class="tabbtn" for="tab-learning-path">Learning Path</label>
+      <label class="tabbtn" for="tab-language">Language &amp; Knowledge</label>
+      <label class="tabbtn" for="tab-final">Final Product</label>
+    </div>
 
-<section class="panel active">
-  <div class="panel-head"><div><h2>How we learn in this Learning Situation</h2></div></div>
-  <ul class="plain">
-    <li><strong>Remember before you look:</strong> every Learning Path opens with a recall quiz without notes. Trying to remember is what makes you learn.</li>
-    <li><strong>Again and again:</strong> words and grammar come back in later Learning Paths and in weekly recall checkpoints.</li>
-    <li><strong>Mix it up:</strong> practice mixes new and old language, so you learn to choose the right form.</li>
-    <li><strong>Feedback and a second try:</strong> a step is done when you get 80 % right, so read the feedback and try again.</li>
-    <li><strong>Build your product step by step:</strong> each Learning Path gives you one piece of your final product.</li>
-  </ul>
-</section>
-</main>
+    <section class="panel" id="overview">
+      <div class="overview">
+        <article class="bigcard">
+          <h2>What will you learn?</h2>
+          <p>Learning objectives of this Learning Situation:</p>
+          <ul class="checklist">
+            <li><strong>Interpret</strong> written, spoken and multimodal texts about seasons, traditions and celebrations, identifying main ideas, details and meaning from context, in order to build the background knowledge the project needs. (CE2, CE4)</li>
+            <li><strong>Check</strong> information about a celebration in at least two reliable sources and credit them, in order to communicate accurate and respectful content. (CE6)</li>
+            <li><strong>Describe</strong> the customs, dates and origins of a celebration using Present Simple, “it is celebrated / it takes place”, Past Simple and used to, in order to explain it to an audience that does not know it. (CE1, CE3)</li>
+            <li><strong>Compare</strong> the chosen celebration with a local one, valuing diversity and rejecting stereotypes, in order to propose an inclusive school event. Safe and Daring. (CE1)</li>
+            <li><strong>Plan</strong> a school celebration day using future forms (going to, will, Present Continuous) and relative clauses, in order to propose it to the head teacher in a formal email. (CE5)</li>
+          </ul>
+        </article>
+
+        <article class="bigcard">
+          <h2>How will we work?</h2>
+          <p>Read &amp; notice → Practise words → Listen &amp; compare → Research → Create &amp; share → Reflect.</p>
+          <ul class="checklist">
+            <li><strong>Remember before you look:</strong> every Learning Path opens with a recall quiz without notes.</li>
+            <li><strong>Again and again:</strong> words and grammar come back in later Learning Paths and in weekly recall checkpoints.</li>
+            <li><strong>Mix it up:</strong> practice mixes new and old language, so you learn to choose the right form.</li>
+            <li><strong>Feedback and a second try:</strong> a step is done when you get 80 % right.</li>
+            <li><strong>Build your product step by step:</strong> each Learning Path gives you one piece of your final product.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="overview">
+        <article class="bigcard curriculum-card">
+          <h2>Curriculum competences</h2>
+          <p>This Learning Situation develops the Catalan curriculum for Foreign Language (Decree 175/2022). The four communication skills are worked in every LS; this one also integrates intercultural awareness and research.</p>
+          <ul class="checklist">
+            <li><strong>CE4 · Reading:</strong> understand and interpret texts about traditions and judge how reliable they are.</li>
+            <li><strong>CE2 · Listening:</strong> get the main ideas and relevant details from spoken and multimodal texts.</li>
+            <li><strong>CE3 · Speaking:</strong> present a celebration and an event plan in a clear, structured video pitch.</li>
+            <li><strong>CE5 · Writing:</strong> write a formal email proposing the event, respecting intellectual property.</li>
+            <li><strong>CE1 · Intercultural awareness:</strong> value cultural diversity and reject prejudice and stereotypes.</li>
+            <li><strong>CE6 · Research &amp; information:</strong> search, select and contrast sources, and credit them.</li>
+            <li><strong>Citizenship (CC1) and entrepreneurship (CE2):</strong> propose an inclusive event and design it with the resources it needs.</li>
+          </ul>
+        </article>
+
+        <article class="bigcard curriculum-card">
+          <h2>How the challenge is assessed</h2>
+          <p>The final product is connected directly to these assessment criteria:</p>
+          <ul class="checklist">
+            <li><strong>4.1:</strong> understand and interpret the overall meaning, structure, key information and purpose of written and multimodal texts, making inferences.</li>
+            <li><strong>4.2:</strong> critically assess the content, quality and reliability of texts and sources.</li>
+            <li><strong>2.1:</strong> extract the main ideas and relevant information from spoken and multimodal texts.</li>
+            <li><strong>3.1:</strong> produce a structured, coherent oral text to describe, inform and argue, using planning and cooperation strategies.</li>
+            <li><strong>3.2:</strong> plan, produce, review and cooperate on the group presentation using appropriate digital resources.</li>
+            <li><strong>5.1:</strong> write and send a clear, coherent and appropriate formal email of medium length, avoiding plagiarism.</li>
+            <li><strong>1.1–1.3:</strong> value cultural diversity, take part respectfully in intercultural situations and reject discrimination, prejudice and stereotypes.</li>
+            <li><strong>6.1–6.2:</strong> search and contrast information in reliable sources and communicate the results creatively, respecting intellectual property.</li>
+            <li><strong>CC1 1.3 · CE2 emprenedora 2.3:</strong> propose actions that promote inclusion, and design the event with the material and human resources it needs.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="learning-path">
+      <div class="grid">
+
+        <a class="card step-card" href="getting-started.html" data-step="Getting started: Castanyada &amp; Halloween">
+          <div class="num">1</div>
+          <h3>Getting started: Castanyada &amp; Halloween</h3>
+          <p><strong>Week 1.</strong> Remember LS1, autumn words, the story of two celebrations and a short speaking task.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="celebrations-around-the-world.html" data-step="Celebrations around the world">
+          <div class="num">2</div>
+          <h3>Celebrations around the world</h3>
+          <p><strong>Weeks 1–2.</strong> Customs, dates and symbols. Present Simple and “it is celebrated / takes place”. Real BBC video about Diwali.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="where-traditions-come-from.html" data-step="Where traditions come from">
+          <div class="num">3</div>
+          <h3>Where traditions come from</h3>
+          <p><strong>Week 3.</strong> Origins of Halloween and Thanksgiving, comparing cultures. Past Simple, used to and relative clauses.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="research-it-right.html" data-step="Research it right">
+          <div class="num">4</div>
+          <h3>Research it right</h3>
+          <p><strong>Week 4.</strong> Reliable sources, respectful wording, notes and credits. Your group’s research card.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="plan-the-day.html" data-step="Plan the day">
+          <div class="num">5</div>
+          <h3>Plan the day</h3>
+          <p><strong>Week 5.</strong> Future forms and event planning. Your event plan.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="write-to-the-head-teacher.html" data-step="Write to the head teacher">
+          <div class="num">6</div>
+          <h3>Write to the head teacher</h3>
+          <p><strong>Week 6.</strong> A formal email proposing your event, and pitch rehearsal.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="celebration-day-proposal.html" data-step="Final product: Celebration Day Proposal">
+          <div class="num">7</div>
+          <h3>Final product: Celebration Day Proposal</h3>
+          <p><strong>Weeks 7–8.</strong> Group video pitch + individual formal email, built from your saved pieces.</p>
+          <span class="link">Open →</span>
+        </a>
+      </div>
+      <h2 style="margin:28px 0 6px">Recall checkpoints and review</h2>
+      <p style="color:var(--muted);margin:0 0 6px">Short quizzes with no notes. Your teacher will tell you when to do them.</p>
+      <div class="grid">
+
+        <a class="card step-card" href="recall-checkpoint-1.html" data-step="Recall checkpoint 1">
+          <div class="num">C1</div>
+          <h3>Recall checkpoint 1</h3>
+          <p><strong>Week 2.</strong> LS1, Getting started and Celebrations around the world.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="recall-checkpoint-2.html" data-step="Recall checkpoint 2">
+          <div class="num">C2</div>
+          <h3>Recall checkpoint 2</h3>
+          <p><strong>Week 4.</strong> LS1 and Learning Paths 1–3.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="recall-checkpoint-3.html" data-step="Recall checkpoint 3">
+          <div class="num">C3</div>
+          <h3>Recall checkpoint 3</h3>
+          <p><strong>Week 6.</strong> LS1 and Learning Paths 1–5.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="recall-checkpoint-4.html" data-step="Recall checkpoint 4">
+          <div class="num">C4</div>
+          <h3>Recall checkpoint 4</h3>
+          <p><strong>Week 8.</strong> Everything in this Learning Situation.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="sample-exam.html" data-step="Sample exam">
+          <div class="num">E</div>
+          <h3>Sample exam</h3>
+          <p><strong>Week 8.</strong> Reading, listening, grammar and writing practice.</p>
+          <span class="link">Open →</span>
+        </a>
+
+        <a class="card step-card" href="reflect.html" data-step="Reflect">
+          <div class="num">R</div>
+          <h3>Reflect</h3>
+          <p><strong>Week 8.</strong> What did you learn, what helped you, and one goal for LS3.</p>
+          <span class="link">Open →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="panel" id="language">
+      <div class="overview">
+        <article class="bigcard">
+          <h2>Grammar &amp; discourse</h2>
+          <ul class="checklist">
+            <li>Present Simple for customs; <em>It is celebrated on… / It takes place in…</em></li>
+            <li>Prepositions of time: on 31 October, in November, at Christmas</li>
+            <li>Future forms: going to, will, Present Continuous, Present Simple for timetables</li>
+            <li>Origins: Past Simple and used to (Safe, Daring)</li>
+            <li>Relative clauses: which / that, who, where, when (Safe, Daring)</li>
+            <li>Comparing: both… and, whereas, while, however, similar to, different from</li>
+            <li>Formal requests: Could we…? Would it be possible to…?</li>
+            <li>Daring: non-defining relative clauses, Present Simple passive, look forward to + -ing, although / even though</li>
+          </ul>
+        </article>
+
+        <article class="bigcard">
+          <h2>Vocabulary &amp; expressions</h2>
+          <ul class="checklist">
+            <li>Seasons, weather and seasonal food: frost, chilly, harvest, chestnuts…</li>
+            <li>Celebrations and customs: festival, tradition, decorations, dress up, light candles…</li>
+            <li>Dates and time: on the night before, once a year, ordinal dates</li>
+            <li>Feelings: excited, grateful, proud…</li>
+            <li>Traditions (Safe): get together, pass down, mark an occasion, exchange gifts</li>
+            <li>Event planning (Safe): set up, run a stall, be held, send invitations</li>
+            <li>Formal email: I am writing to propose… / I look forward to hearing from you</li>
+            <li>Meaning, identity and change (Daring): heritage, commemorate, keep a tradition alive, stereotype, inclusive</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="final">
+      <div class="bigcard">
+        <span class="eyebrow">Final challenge</span>
+        <h2>Celebration Day Proposal</h2>
+        <p><a class="card-link" href="celebration-day-proposal.html">Open the Final Product Learning Path →</a></p>
+        <p>In groups of 3–4, design a respectful celebration day at school around one tradition. Submit a 2–3 minute group video with Google Slides, every member speaking with their face visible in picture-in-picture, plus an individual formal email to the head teacher proposing the event.</p>
+      </div>
+
+      <div class="challenge-grid">
+        <article class="route-box">
+          <span class="route-tag">Insecure</span>
+          <h3>Presenta una celebració</h3>
+          <p>Descriu una celebració amb frases curtes i amb ajuda: què és, quan i on se celebra, tres costums i un menjar o símbol. Planifica tres activitats per al dia. Escriu el correu amb la plantilla guiada (Dear… / I am writing to… / We would like to… / Yours sincerely).</p>
+          <ul>
+            <li>font → notes → diapositiva → frase oral → frase del correu, amb exemples en anglès</li>
+            <li>Present Simple i <em>It is celebrated on… / It takes place in…</em></li>
+            <li>dues fonts citades a l’última diapositiva</li>
+            <li>tots parlen i es veuen la cara i les diapositives</li>
+          </ul>
+        </article>
+        <article class="route-box">
+          <span class="route-tag">Safe</span>
+          <h3>Compare and plan</h3>
+          <p><strong>Main task:</strong> Describe the celebration and compare it with a local one: similarities and differences. Explain its origin briefly.</p>
+          <p><strong>Plan:</strong> A timetable, roles and materials for the day.</p>
+          <p><strong>Email:</strong> A full formal email in paragraphs (purpose, plan, request, closing).</p>
+          <strong>Supporting criteria</strong>
+          <ul>
+            <li>similarities and differences</li>
+            <li>Past Simple and used to for the origin</li>
+            <li>future forms for the plan</li>
+            <li>polite formal requests</li>
+          </ul>
+        </article>
+        <article class="route-box daring-box">
+          <span class="route-tag">Daring</span>
+          <h3>Explain, justify and persuade</h3>
+          <p><strong>Main task:</strong> Explain the origin, meaning and how the tradition has changed over time.</p>
+          <p><strong>Inclusion:</strong> Justify every choice so the event is inclusive and avoids stereotypes or caricature costumes.</p>
+          <p><strong>Email:</strong> Anticipate one concern from the head teacher and answer it.</p>
+          <strong>Supporting criteria</strong>
+          <ul>
+            <li>developed explanation of change over time</li>
+            <li>justified, inclusive choices</li>
+            <li>formal register (I would be grateful if…)</li>
+            <li>concession and contrast: although, on the other hand</li>
+          </ul>
+        </article>
+      </div>
+
+      <p class="assessment-note">Choose a celebration → Research (2+ sources) → Notes → Plan the event → Google Slides → Record group pitch → Write formal email → Review → Submit on Google Classroom. Religious meanings are presented as information, not as belief; each group chooses which tradition it presents.</p>
+      <div class="assessment-box">
+        <h3>What counts in the final assessment?</h3>
+        <div class="assessment-grid">
+          <div><strong>Group video pitch</strong><span>Structured, coherent and clear; every member speaks; faces and slides visible · CE3.1, CE3.2</span></div>
+          <div><strong>Research &amp; credits</strong><span>Accurate information from at least two reliable sources, credited · CE6.1, CE6.2, CE4.2</span></div>
+          <div><strong>Respect &amp; inclusion</strong><span>Diversity valued, no stereotypes; comparison with a local celebration in Safe and Daring · CE1.1–1.3, CC1 1.3</span></div>
+          <div><strong>Event plan</strong><span>Realistic activities, timetable, roles and materials · CE2 emprenedora 2.3</span></div>
+          <div><strong>Individual formal email</strong><span>Format, register, organisation and accuracy; your route’s task · CE5.1</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">English with Roger · 4 ESO · Seasons &amp; Celebrations</div>
+  </footer>
+
+  <script>
+    const navMenus = [...document.querySelectorAll('.nav-menu')];
+
+    navMenus.forEach(menu => {
+      menu.addEventListener('toggle', () => {
+        if (!menu.open) return;
+        navMenus.forEach(other => {
+          if (other !== menu) other.open = false;
+        });
+      });
+    });
+
+    document.addEventListener('click', event => {
+      if (event.target.closest('.nav-menu')) return;
+      navMenus.forEach(menu => menu.open = false);
+    });
+
+      const siteNav=document.querySelector('header nav');
+    const menuToggle=siteNav&&siteNav.querySelector('.menu-toggle');
+    if(menuToggle){
+      menuToggle.addEventListener('click',event=>{
+        event.stopPropagation();
+        const open=siteNav.classList.toggle('menu-open');
+        menuToggle.setAttribute('aria-expanded',open);
+      });
+      document.addEventListener('click',event=>{
+        if(event.target.closest('header nav'))return;
+        siteNav.classList.remove('menu-open');
+        menuToggle.setAttribute('aria-expanded','false');
+      });
+    }
+  </script>
 <script src="../../shared/js/el-catalog.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
