@@ -12,19 +12,26 @@ Status: **proposal, 24 Oct 2026, awaiting Roger's approval.** Not on the site ye
 
 ## 2. Individual evidence during the team work
 
-The group works as a team, but every student hands in **short individual tasks at each stage** on the Final Product page, so the teacher can see what each person is doing. Each one is saved and visible on the dashboard (the texts are already synced; only a view is added).
+The group works as a team, but at **each step** every student hands in, on the Final Product page:
 
-| When | Individual task | Evidence of |
-| --- | --- | --- |
-| Before the team work | Pieces 1–5 from the Learning Paths, already filled in (a missing one must be written or pasted), plus one sentence for pieces 1, 2 and 5: *what I changed after the feedback, and why* | Learning Path work done |
-| Week 5 · research | **My source:** each student finds one source, pastes 3–5 notes in their own words and its credit line | 4.2, 6.1 |
-| Week 6 · plan and slides | **My contribution:** my role in the event, the activity or part of the plan I prepared, and the text of my slide(s) | CE2 2.3, 3.2 |
-| Week 6–7 · rehearsal | **My part:** key notes for my part (not a script to read) and a self-check against the route checklist after the first rehearsal | 3.1, 3.2 |
-| End of every team class (2 min) | **Team log:** what I did today · what I will do next · one problem and how we solved it | teamwork, 3.2 |
-| After submitting | **Reflection and peer assessment:** my contribution, what I would do differently, and the ratings of my teammates (section 6) | 3.2, CC1 1.3 |
+1. a **short individual task** (the evidence of what they did),
+2. a **self-assessment**: 3–4 statements, each rated *1 Not yet · 2 Partly · 3 Mostly · 4 Fully*,
+3. an optional **comment for the teacher**: *Anything you want to tell me? A problem you or your group faced?*
 
-- A student who has not handed in *My source* and *My contribution* records their part only after doing so.
-- These tasks are marked together as row 7 (*My process evidence*), and they are what the teacher uses to adjust group rows for a student who did not contribute.
+The dashboard shows, per student and step: done or not, the self-assessment average (e.g. 3.3 / 4) and a 💬 when there is a comment; clicking opens the task text, the ratings and the comment. The texts are already synced; only the view is new. Insecure sees the statements in Catalan.
+
+| Step | Individual task | Self-assessment statements | Evidence of |
+| --- | --- | --- | --- |
+| 0 · Before the team work | Pieces 1–5 from the Learning Paths, already filled in (a missing one must be written or pasted), plus *what I changed after the feedback, and why* for pieces 1, 2 and 5 | I have all five pieces · I improved my texts after the feedback · I know what my group's celebration is about | Learning Path work done |
+| 1 · Research (week 5) | **My source:** one source, 3–5 notes in my own words, its credit line | My source is reliable (I know who wrote it and why) · My notes are in my own words · My credit line is complete · Religious meanings are written as information | 4.2, 6.1 |
+| 2 · Plan and slides (week 6) | **My contribution:** my role, the activity or part of the plan I prepared, the text of my slide(s) | I did my part on time · My activity is realistic for school · My slide has short text and an image · Our plan includes everyone | CE2 2.3, 3.2, CC1 1.3 |
+| 3 · Rehearsal (weeks 6–7) | **My part:** key notes (not a script) after the first rehearsal | I cover all the content of my part · I can say it without reading · I use the LS grammar of my route · It fits my time (route seconds) | 3.1, 3.2 |
+| 4 · Email (week 7) | **My email:** submitted on Classroom; here only the self-check | The route email checklist items (format, paragraphs, request, register; Daring: the concern answered) | 5.1 |
+| 5 · After submitting | **Reflection** and the peer assessment of my teammates (section 6) | I did my share of the work · I listened and helped the group decide · I helped to improve the slides and the video | 3.2 |
+
+- The self-assessment does **not** change the mark by itself: it shows the teacher how each student sees their own work, and the gap between self-assessment and teacher assessment is discussed in Reflect.
+- A student who has not handed in steps 1 and 2 records their part only after doing so.
+- Steps 0–5 together are row 7 (*My process evidence*), and they are what the teacher uses to adjust group rows for a student who did not contribute.
 
 ## 3. What the group makes together
 
@@ -57,7 +64,7 @@ In a group of 3 (Safe and Daring), Part 4 is shared: each member adds one of its
 | 6. Teamwork (peer assessment) | 3.2 | individual | 10 % |
 | 7. My process evidence | 3.2, 4.2, 6.1 | individual | 10 % |
 
-- Individual 65 %, group 35 %. Row 7: Level 4 = every task handed in on time, specific and in the student's own words; Level 3 = every task, one late or very general; Level 2 = one or two tasks missing; Level 1 = most tasks missing. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0.
+- Individual 65 %, group 35 %. Row 7: Level 4 = every step handed in on time, specific, in the student's own words, with an honest self-assessment; Level 3 = every step, one late or very general; Level 2 = one or two steps missing; Level 1 = most steps missing. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0.
 - Rows 1–5 use the **route rubric** of the group (section 7).
 - **Safety net:** if peer assessment and the teacher's observation show that a student did not contribute to the group product, the teacher lowers that student's group rows (3–5) by one level. Nobody loses marks for a teammate's part or email.
 
