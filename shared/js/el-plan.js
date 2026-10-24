@@ -1,22 +1,45 @@
 // Teaching calendar per LS, shown on the teacher dashboard. Edit the rows here when the plan changes.
 // term: rows start a new term block when it changes. assess: what that term's mark is built from.
+// groups: one column per class group; each row lists that group's dated sessions (one per line).
 window.EL_PLAN={
   "4eso-seasons-and-celebrations":{
-    note:"3 classes a week, starting 26 Oct 2026. Term 1 ends on 20 Nov, so the exam is in term 1 and the final product moves to term 2 (its mark goes into the term 2 report).",
+    note:"Starts 26 Oct 2026. 4ESO-A: Mon 8:30 · Wed 12:00 · Fri 13:00. 4ESO-B: Mon 15:00 · Tue 9:30 · Wed 10:30. Term 1 ends on 20 Nov, so the exam is in term 1 and the final product is in term 2 (its mark goes into the term 2 report). LP = Learning Path.",
     terms:{
       1:{title:"Term 1 · Learning Paths and exam",assess:"Exam + Learning Path work · criteria 2.1, 4.1, 5.1, 3.1, 1.1"},
       2:{title:"Term 2 · Final product",assess:"Final product (group pitch + individual email) · criteria 1.2–1.3, 3.1–3.2, 4.2, 6.1–6.2, CC1 1.3, CE2 2.3"}
     },
+    groups:["4ESO-A","4ESO-B"],
     rows:[
-      {term:1,when:"Week 1 · 26–29 Oct",what:"Learning Path 1: Getting started (Castanyada & Halloween, school celebration on 29 Oct) · start Learning Path 2: Celebrations around the world",note:"30 Oct: no school"},
-      {term:1,when:"Week 2 · 2–6 Nov",what:"Finish Celebrations around the world · Recall checkpoint 1 (5-minute warm-up) · form same-route groups and choose the celebration · Learning Path 3: Where traditions come from"},
-      {term:1,when:"Week 3 · 9–13 Nov",what:"Learning Path 5: Plan the day · Learning Path 6: Write to the head teacher"},
-      {term:1,when:"Week 4 · 16–20 Nov",what:"Recall checkpoint 4 + Sample exam (the class before the exam) · EXAM (about 18–19 Nov) · one spare class to catch up",note:"20 Nov: term 1 ends"},
-      {term:2,when:"Week 5 · 23–27 Nov",what:"Learning Path 4: Research it right (research card with the group)",note:"Self-assessment week"},
-      {term:2,when:"Week 6 · 30 Nov–4 Dec",what:"Final product: event plan and Google Slides · each step: individual task + self-assessment + comment (on the dashboard)"},
-      {term:2,when:"Week 7 · 9–11 Dec",what:"Final product: record the group pitch and write the individual formal email · deliver on Google Classroom by 11 Dec",note:"7–8 Dec: no school"},
-      {term:2,when:"Next class after 11 Dec",what:"Reflect · feedback on the final product",note:"15–18 Dec: projecte propi (all hours)"}
+      {term:1,when:"Week 1 · 26–30 Oct",g:[
+        "Mon 26 · LP1 Getting started\nWed 28 · LP2 Celebrations around the world (1/2)",
+        "Mon 26 · LP1 Getting started\nTue 27 · LP2 Celebrations around the world (1/2)\nWed 28 · LP2 (2/2)"],
+        note:"29 Oct: Castanyada/Halloween at school · 30 Oct: no school"},
+      {term:1,when:"Week 2 · 2–6 Nov",g:[
+        "Mon 2 · LP2 (2/2) · Recall checkpoint 1 (5 min)\nWed 4 · Form same-route groups, choose the celebration · LP3 Where traditions come from (1/2)\nFri 6 · LP3 (2/2)",
+        "Mon 2 · Recall checkpoint 1 (5 min) · form same-route groups, choose the celebration · LP3 Where traditions come from (1/2)\nTue 3 · LP3 (2/2)\nWed 4 · LP5 Plan the day (1/2)"]},
+      {term:1,when:"Week 3 · 9–13 Nov",g:[
+        "Mon 9 · LP5 Plan the day (1/2)\nWed 11 · LP5 (2/2)\nFri 13 · LP6 Write to the head teacher (1/2)",
+        "Mon 9 · LP5 (2/2)\nTue 10 · LP6 Write to the head teacher (1/2)\nWed 11 · LP6 (2/2)"]},
+      {term:1,when:"Week 4 · 16–20 Nov",g:[
+        "Mon 16 · LP6 (2/2) · Recall checkpoint 4\nWed 18 · Sample exam\nFri 20 · EXAM",
+        "Mon 16 · Catch-up · Recall checkpoint 4\nTue 17 · Sample exam\nWed 18 · EXAM"],
+        note:"20 Nov: term 1 ends"},
+      {term:2,when:"Week 5 · 23–27 Nov",g:[
+        "Mon 23 · LP4 Research it right (1/2) · Step 0 My pieces\nWed 25 · LP4 (2/2) · Step 1 My source\nFri 27 · Event plan · Step 2 My contribution",
+        "Mon 23 · LP4 Research it right (1/2) · Step 0 My pieces\nTue 24 · LP4 (2/2) · Step 1 My source\nWed 25 · Event plan · Step 2 My contribution"],
+        note:"Self-assessment week"},
+      {term:2,when:"Week 6 · 30 Nov–4 Dec",g:[
+        "Mon 30 · Google Slides\nWed 2 · Rehearse the parts · Step 3 My part\nFri 4 · Record the draft video",
+        "Mon 30 · Google Slides\nTue 1 · Rehearse the parts · Step 3 My part\nWed 2 · Record the draft video"]},
+      {term:2,when:"Week 7 · 7–11 Dec",g:[
+        "Wed 9 · Feedback to another group · fix the video · Step 4 My email\nFri 11 · Submit on Classroom (deadline)",
+        "Wed 9 · Feedback to another group · fix the video · Step 4 My email\nSubmit on Classroom by Fri 11 (deadline)"],
+        note:"7–8 Dec: no school"},
+      {term:2,when:"Week 8 · 14 Dec",g:[
+        "Mon 14 · Step 5 Teamwork · Reflect",
+        "Mon 14 · Step 5 Teamwork · Reflect"],
+        note:"15–18 Dec: projecte propi (all hours) · 22 Dec–7 Jan: holidays"}
     ],
-    extra:"Recall checkpoints 2 and 3 are optional homework."
+    extra:"Recall checkpoints 2 and 3 are optional homework. 4ESO-A has 11 classes before the exam and 4ESO-B has 12, so only 4ESO-B gets a catch-up class."
   }
 };

@@ -1,6 +1,6 @@
 # LS2 · Final product: groups, tasks and assessment · DRAFT
 
-Status: **24 Oct 2026.** Approved by Roger and built: same-route groups, the individual task + self-assessment + comment at every step (section 2), shown on the teacher dashboard, and the teammate ratings. Still a proposal: weights, rubric descriptors, video length, pronunciation row (open questions at the end). Not on the site yet. Once approved: route texts and checklists in `4eso/seasons-and-celebrations/data/celebration-day-proposal.js`, rubrics in `final-rubric-data.js` with the shared renderer `shared/js/final-rubric.js` (as in LS1; Insecure in Catalan), peer assessment as a new step on the Final Product page.
+Status: **approved by Roger on 24 Oct 2026 and built.** Page: `4eso/seasons-and-celebrations/celebration-day-proposal.html` (steps 0–5, feedback to another group, Rubric tab from `final-rubric-data.js`). Decisions on the open questions: weights as in section 5, video 2–3 minutes with shorter parts (Insecure 40–60 s, Safe and Daring 35–45 s), pronunciation assessed inside "My part".
 
 ## 1. Groups
 
@@ -38,7 +38,7 @@ The dashboard shows, per student and step: done or not, the self-assessment aver
 1. **Research card** (route fields as in Learning Path 4, piece 3), with two sources and credit lines.
 2. **Event plan** for a school celebration day, at the route's level.
 3. **Google Slides:** one or two slides per part, short text and images, credits on the last slide.
-4. **Video:** every member presents their part, face and slides visible. Each part lasts what Learning Path 6 already says (Insecure 30–45 s, Safe 45–60 s, Daring 60–90 s).
+4. **Video:** every member presents their part, face and slides visible. The video lasts 2–3 minutes: each part lasts 40–60 s in Insecure groups and 35–45 s in Safe and Daring groups.
 
 ## 4. Who presents what (each student owns one part)
 
@@ -111,9 +111,3 @@ The average of the teammates' ratings (self-rating not counted) gives the level 
 | 3. Research & credits | Facts from 2 or more reliable sources, contrasted and evaluated (who wrote it, why), summarised in our own words, all credited. | Reliable and credited, but not evaluated. | One unreliable source, or one credit missing. | No credits, or copied text. |
 | 4. Respect & inclusion | Every choice (activities, food, clothes, music) justified as inclusive; beliefs as information; fair comparison with a local celebration; we explain how we avoid stereotypes. | Most choices justified; respectful throughout. | Few justifications, or one generalisation. | Stereotypes, mocking or caricature costumes. |
 | 5. Event plan | Timetable, roles, materials and a realistic estimated cost (items and amounts). | All four, one incomplete or the cost has no items. | One of the four missing. | Only a list of ideas, no plan. |
-
-## Open questions for Roger
-
-1. Video length: with the part times from Learning Path 6, an Insecure video lasts about 2 minutes, Safe 3–4 and Daring 4–5. Keep those times, or shorten the parts so every video fits 2–3 minutes as the programme says?
-2. Weights: individual 65 % (pitch 25, email 20, teamwork 10, process evidence 10) and group 35 % (research 10, inclusion 10, plan 15)?
-3. Pronunciation (shadowing) as its own row, as in LS1, or inside "My part"?

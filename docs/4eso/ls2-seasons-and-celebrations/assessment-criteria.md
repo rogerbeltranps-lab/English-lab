@@ -17,10 +17,10 @@
 | LP3 Research it right | Reading · sources · information, not belief · notes · credits · Piece 3 | 1.2, 4.2, 6.1, 6.2 | **4.1**, 1.2, 4.2, 6.1, 6.2 |
 | LP4 Plan the day | Council listening · Piece 4 event plan · speaking: planning meeting | 2.1, 3.1, 5.1 | 2.1, 3.1, 5.1, **CE2 emprenedora 2.3** |
 | LP5 Write to the head teacher | Model email reading · register · Piece 5 email · pitch rehearsal | 3.2, 4.1, 5.1 | 3.2, 4.1, 5.1, **3.1** |
-| Recall checkpoints 1–4 | Vocabulary and grammar recall, no text | 4.1 | **4.1, 5.1 as formative evidence** (the sabers recalled, used in written sentences) |
+| Recall checkpoints 1–4 | Vocabulary and grammar recall, no text | 4.1, 5.1 formative (fixed 24 Oct 2026) | **4.1, 5.1 as formative evidence** (the sabers recalled, used in written sentences) |
 | Sample exam (not graded) | Reading · listening · grammar · writing | 2.1, 4.1, 5.1 | 2.1, 4.1, 5.1 |
 | Final product | Group video pitch · research and credits · event plan · individual email | 1.1, 1.2, 1.3, 3.1, 3.2, 4.2, 5.1, 6.1, 6.2, CC1 1.3, CE2 2.3 (fixed 24 Oct 2026) | 1.1, 1.2, 1.3, 3.1, 3.2, 4.2, 5.1, 6.1, 6.2, CC1 1.3, CE2 2.3 |
-| Reflect (not graded) | Written self-assessment | 3.1 | **none** (self-regulation, not speaking) |
+| Reflect (not graded) | Written self-assessment | none (fixed 24 Oct 2026) | **none** (self-regulation, not speaking) |
 
 ## Criterion by criterion
 

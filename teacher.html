@@ -69,9 +69,9 @@ async function steps(){
 $("#stepsel").onchange=steps;
 EL_LS.filter(l=>EL_PLAN[l.id]).forEach(l=>$("#plansel").add(new Option(l.title,l.id)));
 $("#plansel").value=EL_LS.filter(l=>EL_PLAN[l.id]).map(l=>l.id).pop()||"";
-function plan(){const p=EL_PLAN[$("#plansel").value];if(!p){$("#planbox").innerHTML='<p class="muted">No plan for this LS yet.</p>';return}let t=0;
-  $("#planbox").innerHTML=`<p class="muted">${esc(p.note)}</p><table id="plan"><tr><th>When</th><th>What</th><th>Calendar</th></tr>`+p.rows.map(r=>{let h="";if(r.term!==t){t=r.term;const T=p.terms[t]||{};h=`<tr class="t"><td colspan="3">${esc(T.title)}<br><small class="muted">Assessment: ${esc(T.assess)}</small></td></tr>`}
-    return h+`<tr><td>${esc(r.when)}</td><td>${esc(r.what)}</td><td class="muted">${esc(r.note||"")}</td></tr>`}).join("")+`</table>${p.extra?`<p class="muted">${esc(p.extra)}</p>`:""}`}
+function plan(){const p=EL_PLAN[$("#plansel").value];if(!p){$("#planbox").innerHTML='<p class="muted">No plan for this LS yet.</p>';return}let t=0;const G=p.groups||["What"];
+  $("#planbox").innerHTML=`<p class="muted">${esc(p.note)}</p><table id="plan"><tr><th>When</th>${G.map(g=>`<th>${esc(g)}</th>`).join("")}<th>Calendar</th></tr>`+p.rows.map(r=>{let h="";if(r.term!==t){t=r.term;const T=p.terms[t]||{};h=`<tr class="t"><td colspan="${G.length+2}">${esc(T.title)}<br><small class="muted">Assessment: ${esc(T.assess)}</small></td></tr>`}
+    return h+`<tr><td>${esc(r.when)}</td>${(r.g||[r.what]).map(x=>`<td>${esc(x).replace(/\n/g,"<br>")}</td>`).join("")}<td class="muted">${esc(r.note||"")}</td></tr>`}).join("")+`</table>${p.extra?`<p class="muted">${esc(p.extra)}</p>`:""}`}
 $("#plansel").onchange=plan;
 ELCloud.onUser(async u=>{if(!u||!ELCloud.isTeacher(u))return;$("#app").hidden=false;plan();$("#msg").textContent="Hello, "+(u.displayName||u.email)+".";await drawLs();await requests();await results();await steps()});
 </script></body></html>
