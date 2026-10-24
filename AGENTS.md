@@ -2,8 +2,14 @@
 
 Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
 
+## Shared source of truth
+- This file is shared by Roger's two Claude projects: the LS project (Learning Situations, content design) and the English Lab project (site code and fixes). Before working on any Learning Situation, `git pull` and read it.
+- When a task makes a technical decision (page structure, file locations, levels per route, how activities, progress or submission work, audio and video rules), write it here in the right section and commit and push it in the same task. Keep entries short and concrete, and update or remove outdated ones instead of adding duplicates.
+- LS design docs live in the repo under `docs/learning-situations/<ls-name>/` (with a short guidance file `docs/learning-situations/<ls-name>.md`), not only in a project's shared folder, so both projects can read them.
+
 ## Start from working examples
 - Before implementing a page or feature, inspect the closest successful page in the repository and reuse its structure, styles and interaction patterns where appropriate.
+- **LS landing page (`<ls>/index.html`):** follow `4eso/my-real-routine/index.html`: hero with the challenge card and quick links, then the tabs Overview (learning objectives, how we work, curriculum competences, assessment criteria from the programme), Learning Path, Language & Knowledge and Final Product (route boxes and "What counts in the final assessment?").
 - Use each course’s `my-real-routine/getting-started.html` as the shell/topbar reference. Reuse `shared/css/layout.css`, `topbar.css`, `activities.css` and existing shared helpers rather than creating a new visual system.
 - Keep the existing course palettes: **2ESO green**, **4ESO blue**. Copy the reference page’s exact theme variables, tinted backgrounds, borders, shadows, typography and card treatment; do not approximate colours.
 - Preserve responsive layouts, navigation, scoring, feedback and route-specific progress unless the requested change requires otherwise. Keep edits focused.
@@ -29,6 +35,8 @@ Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
 - **Listenings and videos are pitched at the Safe level**, and every route hears the same input. Do not write separate scripts per route.
 - **The activities around that input adapt to each route's level:** questions, tasks, support, hints and the language of instructions. Insecure gets easier questions, support in Catalan and, where possible, a slower version of the audio. Daring gets the more demanding questions (inference, comparison, opinion).
 - **Reading texts are different: they vary by route.** Each route reads a version written at its own level (for 4ESO: A2 / A2+ for Insecure, B1 for Safe, B1 / B1+ for Daring), on the same topic and with the same key information, so the whole class can share the content. Adapt length, sentence complexity, vocabulary and grammar to the level; the questions follow the route's text.
+- **Per-route readings in code:** in pages built with `ls2-engine.js`, `media.text` is a string or `{insecure, safe, daring}`; standalone pages keep one text per route in a `readingData` / `readingChat` object keyed by level. Questions stay cumulative (`r:`), so every question a route sees must be answerable from that route's text.
+- **Scripted videos:** one MP4 at Safe level plus a slower copy for Insecure, stored next to the page in `video/`, with WebVTT subtitles (`.vtt`) that students switch on after a first viewing. The slow copy is made locally with ffmpeg (`atempo=0.85`, longer pauses), never with a second paid generation. Scripts are recorded in the LS docs before production.
 - Mix real, level-appropriate listenings with generated ones. Never call a paid generation service (for example ElevenLabs) or spend its credits without the user's explicit permission for that specific generation. An approved script is not permission to generate.
 - **Generated audio files:** MP3s live in the LS folder's `audio/` (for example `4eso/seasons-and-celebrations/audio/culture-bites-origins.mp3`) and are referenced from the LS data as `media.audio`. The slow version for Insecure sits next to it with a `-slow` suffix (`culture-bites-origins-slow.mp3`).
 - **ElevenLabs settings:** model `eleven_multilingual_v2`, one call per script line (one premade voice per character), lines joined with 0.45 s pauses and loudness-normalised (`loudnorm=I=-16:TP=-1.5`, mono, 96 kbps). Keep the same voice for a character across an LS (LS2: Emma = Alice, Sam = George, Laia = Jessica, Omar = Liam, radio presenter = Daniel).
