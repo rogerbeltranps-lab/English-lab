@@ -1,4 +1,4 @@
-/* LS2 · Reflect (week 8, not graded). Shows the student's first-attempt checkpoint scores saved on this device. */
+/* LS2 · Reflect (14 Dec, after the final product; not graded). Shows the student's first-attempt checkpoint scores saved on this device. */
 (function () {
   const scores = level => {
     const ca = level === 'insecure';
@@ -17,7 +17,7 @@
         intro: { ca: 'Respon amb sinceritat: això no puntua.', en: 'Answer honestly: this is not marked.' },
         fields: [
           { id: 'can', label: { ca: 'Puntua’t de l’1 al 4 en cada objectiu: entendre textos sobre celebracions · descriure costums i orígens · comparar celebracions · comprovar fonts · planificar un acte i escriure un correu formal.', en: 'Rate yourself 1–4 on each objective: understand texts about celebrations · describe customs and origins · compare celebrations · check sources · plan an event and write a formal email.' } },
-          { id: 'improve', label: { ca: 'Mirant els checkpoints de la setmana 2 a la 8, què has millorat més?', en: 'Looking at your checkpoints from week 2 to week 8, what improved most?' } },
+          { id: 'improve', label: { ca: 'Mirant els teus checkpoints, què has millorat més?', en: 'Looking at your checkpoints, what improved most?' } },
           { id: 'helped', label: { ca: 'Què t’ha ajudat més: els recalls sense apunts, les targetes, la pràctica barrejada, el feedback amb IA o el treball en grup? Per què?', en: 'What helped you most: recall quizzes, flashcards, mixed practice, AI feedback or group work? Why?' } },
           { id: 'goal', label: { ca: 'Un objectiu per a la LS3', en: 'One goal for LS3' } }
         ],
