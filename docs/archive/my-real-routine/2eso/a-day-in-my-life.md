@@ -1,13 +1,13 @@
 # 2ESO · My Real Routine · A day in my life — archived pilot
 
-Historical extraction, not the active teaching overview or approved content. See the [concise 2ESO overview](../../../learning-situations/my-real-routine/2eso.md).
+Historical extraction, not the active teaching overview or approved content. See the [concise 2ESO overview](../../../2eso/ls1-my-real-routine/overview.md).
 
 ## Status, scope and sources
 
 - Status: **extracted draft 1 — not approved**. All three routes are in this one course/session document.
 - Last explicitly approved session content: **none recorded**. The existing website is a source for review, not evidence of approval.
 - Extracted on 2026-10-07 from the current working tree, preserving existing user changes. The source is not assumed to match a deployed version.
-- [General project rules](../../../../AGENTS.md) and [LS overview, preserved Final Product requirements and approval workflow](../../../learning-situations/my-real-routine.md) remain applicable. This pilot does not change them.
+- [General project rules](../../../../AGENTS.md) and [LS overview, preserved Final Product requirements and approval workflow](../../../2eso/ls1-my-real-routine/AGENTS.md) remain applicable. This pilot does not change them.
 - Primary source: [2eso/my-real-routine/a-day-in-my-life.html](../../../../2eso/my-real-routine/a-day-in-my-life.html), including its inline datasets, generated examples and activity handlers.
 - Feedback/language source: [shared/js/learning-path-support.js](../../../../shared/js/learning-path-support.js).
 - Context: [Getting started](../../../../2eso/my-real-routine/getting-started.html), [2ESO overview](../../../../2eso/my-real-routine/index.html), [2ESO Final Product](../../../../2eso/my-real-routine/final-product.html).

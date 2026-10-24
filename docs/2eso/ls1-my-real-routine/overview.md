@@ -1,6 +1,6 @@
 # 2ESO · My Real Routine
 
-**Draft for review.** Existing Final Product requirements are retained; website extracts are not automatically approved. [Shared LS guidance](../my-real-routine.md).
+**Draft for review.** Existing Final Product requirements are retained; website extracts are not automatically approved. [LS rules and decisions](AGENTS.md).
 
 ## 1. Learning objectives
 
@@ -103,4 +103,4 @@ Retains Insecure and Safe forms; applies them independently in longer, connected
 
 **Essential decisions pending:** approve the extracted content and competency selection; clarify the intended full wording of slash-labelled vocabulary alternatives. The previous comprehension-competency proposals remain unapproved in the archive.
 
-Sources: [course website](../../../2eso/my-real-routine/index.html), its vocabulary and grammar pages, and the [preserved LS requirements](../my-real-routine.md#final-product).
+Sources: [course website](../../../2eso/my-real-routine/index.html), its vocabulary and grammar pages, and the [preserved LS requirements](AGENTS.md#final-product).

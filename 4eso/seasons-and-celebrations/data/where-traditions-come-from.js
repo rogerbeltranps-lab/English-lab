@@ -1,4 +1,4 @@
-/* LS2 · Learning Path 3 · Where traditions come from (approved content, docs/learning-situations/seasons-and-celebrations/4eso.md) */
+/* LS2 · Learning Path 3 · Where traditions come from (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
   key: 'ls2Traditions4ESO', n: 3, title: 'Where traditions come from',
   panels: [

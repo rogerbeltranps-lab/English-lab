@@ -1,4 +1,4 @@
-/* LS2 · Learning Path 2 · Celebrations around the world (approved content, docs/learning-situations/seasons-and-celebrations/4eso.md) */
+/* LS2 · Learning Path 2 · Celebrations around the world (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
   key: 'ls2Celebrations4ESO', n: 2, title: 'Celebrations around the world',
   panels: [

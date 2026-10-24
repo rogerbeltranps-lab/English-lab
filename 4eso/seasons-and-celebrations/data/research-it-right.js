@@ -1,4 +1,4 @@
-/* LS2 · Learning Path 4 · Research it right (approved content, docs/learning-situations/seasons-and-celebrations/4eso.md) */
+/* LS2 · Learning Path 4 · Research it right (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
   key: 'ls2Research4ESO', n: 4, title: 'Research it right',
   panels: [

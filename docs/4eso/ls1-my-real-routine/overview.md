@@ -1,6 +1,6 @@
 # 4ESO · My Real Routine
 
-**Draft for review.** Existing Final Product requirements are retained; website extracts are not automatically approved. [Shared LS guidance](../my-real-routine.md).
+**Draft for review.** Existing Final Product requirements are retained; website extracts are not automatically approved. [LS rules and decisions](AGENTS.md).
 
 ## 1. Learning objectives
 
@@ -111,4 +111,4 @@ Retains Safe grammar and develops independent, precise use:
 
 **Essential decisions pending:** approve the extracted content and competency selection; confirm the Past Simple scope in Insecure, since the grammar page is Present Simple-only but Useful Expressions teaches the contrast. Clarify slash-labelled vocabulary alternatives before changing their wording.
 
-Sources: [course website](../../../4eso/my-real-routine/index.html), its vocabulary and grammar pages, and the [preserved LS requirements](../my-real-routine.md#final-product).
+Sources: [course website](../../../4eso/my-real-routine/index.html), its vocabulary and grammar pages, and the [preserved LS requirements](AGENTS.md#final-product).

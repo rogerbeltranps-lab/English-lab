@@ -1,5 +1,5 @@
 // Activity catalogue used by pages, the student page and the teacher dashboard.
-// Criteria are an editorial PROPOSAL from docs/learning-situations/my-real-routine/*.md; pending Roger's approval.
+// Criteria are an editorial PROPOSAL from docs/*/ls1-my-real-routine/overview.md; pending Roger's approval.
 // points: number of actions in the activity; each completed action = 1 point.
 // graded:false = not evaluated (warm-up, or in-class games/theory presentations: inClass:true) - always free to practise.
 // graded:true  = evaluated; enabled by the teacher and can be done ONCE (submit locks it), unless manual.

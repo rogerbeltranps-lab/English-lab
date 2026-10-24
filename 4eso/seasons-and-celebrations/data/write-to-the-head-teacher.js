@@ -1,4 +1,4 @@
-/* LS2 · Learning Path 6 · Write to the head teacher (approved content, docs/learning-situations/seasons-and-celebrations/4eso.md) */
+/* LS2 · Learning Path 6 · Write to the head teacher (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
   key: 'ls2Email4ESO', n: 6, title: 'Write to the head teacher',
   panels: [
