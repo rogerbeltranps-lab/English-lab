@@ -1,6 +1,6 @@
 # My Real Routine guidance — archived draft
 
-Historical draft, not the current teaching overview or approved content. Use the [current LS guidance](../../learning-situations/my-real-routine.md) and its two course overviews.
+Historical draft, not the current teaching overview or approved content. Use the [docs map](../../README.md) and each course's My Real Routine folder.
 
 ## Status and provenance
 

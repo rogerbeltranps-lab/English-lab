@@ -1,11 +1,12 @@
 # English Lab project guidance
 
-Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
+All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the code structure: [roadmap](docs/general/roadmap.md). Pending site tasks: [tasks](docs/general/tasks.md).
 
 ## Shared source of truth
 - This file is shared by Roger's two Claude projects: the LS project (Learning Situations, content design) and the English Lab project (site code and fixes). Before working on any Learning Situation, `git pull` and read it.
 - When a task makes a technical decision (page structure, file locations, levels per route, how activities, progress or submission work, audio and video rules), write it here in the right section and commit and push it in the same task. Keep entries short and concrete, and update or remove outdated ones instead of adding duplicates.
-- LS design docs live in the repo under `docs/learning-situations/<ls-name>/` (with a short guidance file `docs/learning-situations/<ls-name>.md`), not only in a project's shared folder, so both projects can read them.
+- Docs are organised by course, then by LS: `docs/<course>/programme.md` (Roger's teaching programme) and `docs/<course>/ls<n>-<name>/` with `AGENTS.md` (rules for that LS plus a dated decision log) and `overview.md` (the approved content). Generic docs are in `docs/general/`. They live in the repo, not only in a project's shared folder, so both projects can read them.
+- Decisions that apply to every LS go in this file; decisions for one LS go in that LS's `AGENTS.md`.
 
 ## Start from working examples
 - Before implementing a page or feature, inspect the closest successful page in the repository and reuse its structure, styles and interaction patterns where appropriate.
@@ -39,7 +40,7 @@ Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
 - **Scripted videos:** one MP4 at Safe level plus a slower copy for Insecure, stored next to the page in `video/`, with WebVTT subtitles (`.vtt`) that students switch on after a first viewing. The slow copy is made locally with ffmpeg (`atempo=0.85`, longer pauses), never with a second paid generation. Scripts are recorded in the LS docs before production.
 - Mix real, level-appropriate listenings with generated ones. Never call a paid generation service (for example ElevenLabs) or spend its credits without the user's explicit permission for that specific generation. An approved script is not permission to generate.
 - **Generated audio files:** MP3s live in the LS folder's `audio/` (for example `4eso/seasons-and-celebrations/audio/culture-bites-origins.mp3`) and are referenced from the LS data as `media.audio`. The slow version for Insecure sits next to it with a `-slow` suffix (`culture-bites-origins-slow.mp3`).
-- **ElevenLabs settings:** model `eleven_multilingual_v2`, one call per script line (one premade voice per character), lines joined with 0.45 s pauses and loudness-normalised (`loudnorm=I=-16:TP=-1.5`, mono, 96 kbps). Keep the same voice for a character across an LS (LS2: Emma = Alice, Sam = George, Laia = Jessica, Omar = Liam, radio presenter = Daniel).
+- **ElevenLabs settings:** model `eleven_multilingual_v2`, one call per script line (one premade voice per character), lines joined with 0.45 s pauses and loudness-normalised (`loudnorm=I=-16:TP=-1.5`, mono, 96 kbps). Keep the same voice for a character across an LS; each LS's `AGENTS.md` lists its voices.
 - **Slow versions are always made locally, never with a second paid generation:** apply ffmpeg `atempo=0.85` to the same line clips and join them with 0.9 s pauses.
 
 ## Grammar
@@ -67,13 +68,14 @@ Planned clean-up of the code structure: see [the roadmap](docs/roadmap.md).
 - Do not change the wording of questions or options when shuffling.
 
 ## Final Product
-- Before working on My Real Routine in either 2ESO or 4ESO, read [its LS guidance](docs/learning-situations/my-real-routine.md).
-- Before working on 4ESO Seasons & Celebrations, read [its LS guidance](docs/learning-situations/seasons-and-celebrations.md).
+- Before working on an LS, read its `AGENTS.md`:
+  - 4ESO: [LS1 My Real Routine](docs/4eso/ls1-my-real-routine/AGENTS.md) · [LS2 Seasons & Celebrations](docs/4eso/ls2-seasons-and-celebrations/AGENTS.md)
+  - 2ESO: [LS1 My Real Routine](docs/2eso/ls1-my-real-routine/AGENTS.md)
 - Follow the current LS’s route requirements and submission format.
 - Required task elements must be explicit and must not be added to routes that do not require them. Language criteria support the task rather than obscure it.
 
 ## Content-first workflow
-- Read the applicable LS guidance and current course overview (containing all three routes). Implement only content explicitly approved by the user; website content and extracted drafts are not automatically approved. Preserve previously agreed requirements and the last approved content separately from proposed revisions. Flag missing information or contradictions and resolve them with the user before implementing the affected part. Technical and layout decisions may follow existing project rules, but agents must not invent or change pedagogical content during implementation. See [My Real Routine's review workflow](docs/learning-situations/my-real-routine.md#content-review-and-approval).
+- Read the applicable LS guidance and current course overview (containing all three routes). Implement only content explicitly approved by the user; website content and extracted drafts are not automatically approved. Preserve previously agreed requirements and the last approved content separately from proposed revisions. Flag missing information or contradictions and resolve them with the user before implementing the affected part. Technical and layout decisions may follow existing project rules, but agents must not invent or change pedagogical content during implementation.
 
 ## Verification and repository hygiene
 - Check affected routes, route switching, interactive feedback and progress. For matching changes, verify duplicate interchangeability, alternatives, round completion and route coverage.
