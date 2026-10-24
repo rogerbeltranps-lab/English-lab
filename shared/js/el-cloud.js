@@ -17,7 +17,15 @@ let myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
+// Testers can switch to the student view of one group (bottom bar): the site then behaves as for a listed student of that group.
+// Kept in this browser only (el_view), so it needs no rules change; "" = tester view, everything open.
+const viewGroup=u=>{if(!isTester(u))return null;const g=localStorage.getItem("el_view");return (window.EL_GROUPS||[]).some(x=>x.id===g)?g:null};
+const seesAll=u=>isTester(u)&&!viewGroup(u);
 const isStudent=u=>!!u&&DOMAINS.some(d=>(u.email||"").toLowerCase().endsWith("@"+d));
+// Student list (roster/{email}, imported by the teacher in the dashboard): only listed school accounts (and testers) can use the site, and the list sets their group.
+// null = not on the list; undefined = the list could not be read (then the site behaves as before the list existed).
+const onRoster=async u=>{try{const s=await getDoc(doc(db,"roster",(u.email||"").toLowerCase()));return s.exists()?s.data():null}catch(e){console.warn("roster",e);return undefined}};
+let myRoster;
 
 // Which activity / LS is this page?
 const relPath=location.pathname.replace(/^.*?\/((2|4)eso\/.*)$/,"$1");
@@ -58,7 +66,13 @@ async function login(){
   const p=new GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
   const r=await signInWithPopup(auth,p);
   if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Sign in with your school account (@"+DOMAINS.join(", @")+").");return}
-  if(isStudent(r.user)&&!isTester(r.user)&&!onBoard)location.href=BOARD;   // students always start on their board
+  if(isStudent(r.user)&&!isTester(r.user)&&(await onRoster(r.user))===null)return;   // refused in onAuthStateChanged
+  if(isStudent(r.user)&&!seesAll(r.user)&&!onBoard)location.href=BOARD;   // students always start on their board
+}
+async function refuse(u){
+  const mail=u.email;await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");
+  const o=overlay('<div style="max-width:520px"><h1>Aquest compte no pot entrar</h1><p><b></b> no és a la llista d\'alumnes d\'English Lab. Entra amb el teu correu de l\'institut o parla amb el professor.</p><p><button style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit">Entra amb un altre compte</button></p></div>');
+  o.style.zIndex=10001;o.querySelector("b").textContent=mail;o.querySelector("button").onclick=()=>{o.remove();login()};
 }
 // Shared school computers: never leak one student's local progress into another account.
 const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))};
@@ -93,11 +107,16 @@ function chooseLevel(u){
       o.querySelector("#el-lv").append(b)});
   });
 }
-// Class group: asked once, on the first sign-in; afterwards only the teacher changes it.
+// Class group: listed students get the group of the student list (copied to students/{uid}.group, which the pages read).
+// Testers, and everyone while the list cannot be read, choose it once on the first sign-in; afterwards only the teacher changes it.
 async function ensureGroup(u){
-  const s=await getDoc(doc(db,"students",u.uid)).catch(()=>null);
+  const s=await getDoc(doc(db,"students",u.uid)).catch(()=>null),cur=s&&s.exists()?s.data().group:null;
   if(!window.EL_GROUPS)return null;
-  if(s&&s.exists()&&s.data().group)return s.data().group;
+  if(myRoster&&myRoster.group){
+    if(cur!==myRoster.group)await setDoc(doc(db,"students",u.uid),{group:myRoster.group,name:u.displayName||"",email:u.email,updated:serverTimestamp()},{merge:true});
+    return myRoster.group;
+  }
+  if(cur)return cur;
   return new Promise(res=>{
     const o=overlay('<div style="max-width:520px"><h1>Tria el teu grup</h1><p>Només ho hauràs de fer una vegada. Si t\'equivoques, avisa el professor.</p><div id="el-gr"></div></div>');
     EL_GROUPS.forEach(g=>{const b=document.createElement("button");b.innerHTML="<b>"+g.name+"</b>";
@@ -125,7 +144,7 @@ async function requestLevel(u){
 const BOARD=new URL("today.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname);
 const courseOf=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
 async function gate(u){
-  if(isStudent(u)&&!isTester(u)&&!lsId&&!onBoard){
+  if(isStudent(u)&&!seesAll(u)&&!lsId&&!onBoard){
     const c=relPath.match(/^((2|4)eso)\/(index\.html)?$/);
     if(!(c&&c[1]===courseOf(myGroup))){location.replace(BOARD);return}
   }
@@ -134,8 +153,9 @@ async function gate(u){
   if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
   if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){block("Sign in with your school account","To do the activities you need to sign in with your school account (@"+DOMAINS.join(", @")+") (button at the bottom right).");return}
-  const tester=isTester(u);
+  const tester=seesAll(u),vg=viewGroup(u);
   if(tester)banner("Compte de prova: veus totes les LS i activitats.","#7c3aed");
+  if(vg)banner("Compte de prova · vista d'alumne de "+EL_GROUPS.find(x=>x.id===vg).name+": veus el que veu aquest grup.","#7c3aed",{t:"Torna a veure-ho tot",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}});
   if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block("Aquesta LS no és del teu grup","Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.");return}
   if(st==="hidden"&&!tester){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
   if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
@@ -187,6 +207,9 @@ function bar(){
     else{el.append(u.displayName||u.email," ");
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
       if(isStudent(u)&&lsId)el.append(b("Change route",()=>requestLevel(u))," ");
+      if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
+        s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
+        s.value=viewGroup(u)||"";s.onchange=()=>{origSet.call(localStorage,"el_view",s.value);location.reload()};el.append(s," ")}
       el.append(b("Sign out",logout))}};
 }
 let draw=()=>{};
@@ -201,9 +224,11 @@ const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=b
 onAuthStateChanged(auth,async u=>{
   user=u;draw(u);
   if(u&&isStudent(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){if(prev!==null&&prev!==u.uid)wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
-  if(u&&isStudent(u))try{myGroup=await ensureGroup(u)}catch(e){console.warn("group",e)}
+  myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
+  if(myRoster===null){await refuse(u);return}
+  if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
   try{await gate(u)}catch(e){console.warn("gate",e)}
   listeners.forEach(f=>f(u));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,viewGroup:()=>viewGroup(user),lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
