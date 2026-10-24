@@ -13,7 +13,7 @@ window.EL_PLAN={
       {term:1,when:"Week 3 · 9–13 Nov",what:"Learning Path 5: Plan the day · Learning Path 6: Write to the head teacher"},
       {term:1,when:"Week 4 · 16–20 Nov",what:"Recall checkpoint 4 + Sample exam (the class before the exam) · EXAM (about 18–19 Nov) · one spare class to catch up",note:"20 Nov: term 1 ends"},
       {term:2,when:"Week 5 · 23–27 Nov",what:"Learning Path 4: Research it right (research card with the group)",note:"Self-assessment week"},
-      {term:2,when:"Week 6 · 30 Nov–4 Dec",what:"Final product: event plan and Google Slides · individual preparation dossier due (about 4 Dec)"},
+      {term:2,when:"Week 6 · 30 Nov–4 Dec",what:"Final product: event plan and Google Slides · individual tasks: My source, My contribution, team log every class"},
       {term:2,when:"Week 7 · 9–11 Dec",what:"Final product: record the group pitch and write the individual formal email · deliver on Google Classroom by 11 Dec",note:"7–8 Dec: no school"},
       {term:2,when:"Next class after 11 Dec",what:"Reflect · feedback on the final product",note:"15–18 Dec: projecte propi (all hours)"}
     ],

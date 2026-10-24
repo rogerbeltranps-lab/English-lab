@@ -10,22 +10,21 @@ Status: **proposal, 24 Oct 2026, awaiting Roger's approval.** Not on the site ye
 - Formed in **week 2 (2–6 Nov)**, before Learning Path 3, and the group chooses its celebration then. Pieces 2, 4 and 5 in the Learning Paths are about the group's celebration, so the groups must exist before them even though the final product itself is made in term 2.
 - Support for Insecure groups: slide template, sentence frames for every part, Catalan guidance on the page, and a short check-in with the teacher every class.
 
-## 2. What each student hands in first: the preparation dossier
+## 2. Individual evidence during the team work
 
-Before the group records the video, every student submits an **individual preparation dossier** on the Final Product page (one submission, then locked). It pushes everyone to do the Learning Path work, and it is the evidence of each student's own contribution.
+The group works as a team, but every student hands in **short individual tasks at each stage** on the Final Product page, so the teacher can see what each person is doing. Each one is saved and visible on the dashboard (the texts are already synced; only a view is added).
 
-| Piece | From | What the student pastes or completes |
+| When | Individual task | Evidence of |
 | --- | --- | --- |
-| 1 · Description of a celebration | Learning Path 2 | Final version of the text |
-| 2 · Our celebration | Learning Path 3 | Final version of the text |
-| 3 · Research card | Learning Path 4 | Their copy of the group's card, with the two credit lines |
-| 4 · Event plan | Learning Path 5 | Their version of the plan (route fields) |
-| 5 · Email draft | Learning Path 6 | The draft before AI feedback |
-| For pieces 1, 2 and 5 | — | One sentence: *What I changed after the feedback, and why* |
+| Before the team work | Pieces 1–5 from the Learning Paths, already filled in (a missing one must be written or pasted), plus one sentence for pieces 1, 2 and 5: *what I changed after the feedback, and why* | Learning Path work done |
+| Week 5 · research | **My source:** each student finds one source, pastes 3–5 notes in their own words and its credit line | 4.2, 6.1 |
+| Week 6 · plan and slides | **My contribution:** my role in the event, the activity or part of the plan I prepared, and the text of my slide(s) | CE2 2.3, 3.2 |
+| Week 6–7 · rehearsal | **My part:** key notes for my part (not a script to read) and a self-check against the route checklist after the first rehearsal | 3.1, 3.2 |
+| End of every team class (2 min) | **Team log:** what I did today · what I will do next · one problem and how we solved it | teamwork, 3.2 |
+| After submitting | **Reflection and peer assessment:** my contribution, what I would do differently, and the ratings of my teammates (section 6) | 3.2, CC1 1.3 |
 
-- The pieces saved in each Learning Path appear already filled in, so the student only reviews them; a missing piece must be written or pasted before submitting.
-- The teacher sees the dossier on the dashboard (the texts are already synced; only a view is added).
-- Deadline: the class before the recording (about 4 Dec). A student without a dossier records their part after handing it in.
+- A student who has not handed in *My source* and *My contribution* records their part only after doing so.
+- These tasks are marked together as row 7 (*My process evidence*), and they are what the teacher uses to adjust group rows for a student who did not contribute.
 
 ## 3. What the group makes together
 
@@ -56,9 +55,9 @@ In a group of 3 (Safe and Daring), Part 4 is shared: each member adds one of its
 | 4. Respect & inclusion | 1.1–1.3, CC1 1.3 | group | 10 % |
 | 5. Event plan | CE2 emprenedora 2.3 | group | 15 % |
 | 6. Teamwork (peer assessment) | 3.2 | individual | 10 % |
-| 7. Preparation dossier | 3.2, 5.1 | individual | 10 % |
+| 7. My process evidence | 3.2, 4.2, 6.1 | individual | 10 % |
 
-- Individual 65 %, group 35 %. Row 7: Level 4 = all five pieces, complete, with a real change after feedback; Level 3 = all five, one incomplete or changes not explained; Level 2 = three or four pieces; Level 1 = one or two pieces. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0.
+- Individual 65 %, group 35 %. Row 7: Level 4 = every task handed in on time, specific and in the student's own words; Level 3 = every task, one late or very general; Level 2 = one or two tasks missing; Level 1 = most tasks missing. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0.
 - Rows 1–5 use the **route rubric** of the group (section 7).
 - **Safety net:** if peer assessment and the teacher's observation show that a student did not contribute to the group product, the teacher lowers that student's group rows (3–5) by one level. Nobody loses marks for a teammate's part or email.
 
@@ -109,5 +108,5 @@ The average of the teammates' ratings (self-rating not counted) gives the level 
 ## Open questions for Roger
 
 1. Video length: with the part times from Learning Path 6, an Insecure video lasts about 2 minutes, Safe 3–4 and Daring 4–5. Keep those times, or shorten the parts so every video fits 2–3 minutes as the programme says?
-2. Weights: individual 65 % (pitch 25, email 20, teamwork 10, dossier 10) and group 35 % (research 10, inclusion 10, plan 15)?
+2. Weights: individual 65 % (pitch 25, email 20, teamwork 10, process evidence 10) and group 35 % (research 10, inclusion 10, plan 15)?
 3. Pronunciation (shadowing) as its own row, as in LS1, or inside "My part"?
