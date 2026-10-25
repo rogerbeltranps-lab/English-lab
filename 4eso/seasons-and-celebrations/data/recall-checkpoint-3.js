@@ -9,8 +9,8 @@ window.LP = {
    "type": "recall",
    "tab": "Checkpoint",
    "title": {
-    "ca": "Checkpoint 3: LS1 and Learning Paths 1–5",
-    "en": "Checkpoint 3: LS1 and Learning Paths 1–5"
+    "ca": "Checkpoint 3: LS1 and Learning Paths 1–3 and 5",
+    "en": "Checkpoint 3: LS1 and Learning Paths 1–3 and 5"
    },
    "pill": {
     "ca": "Sense apunts · 5–8 min",
@@ -52,13 +52,12 @@ window.LP = {
     },
     {
      "r": "insecure",
-     "q": "Find each fact in at least ___ sources.",
+     "q": "In the past, people in Ireland ___ (carve) turnips.",
      "a": [
-      "two",
-      "2"
+      "carved"
      ],
-     "ca": "Repassa: LP4.",
-     "en": "Review: LP4."
+     "ca": "Repassa: LP3.",
+     "en": "Review: LP3."
     },
     {
      "r": "insecure",
