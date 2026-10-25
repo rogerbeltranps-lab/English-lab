@@ -15,7 +15,7 @@ dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 3
 <style>/* Menu as on Home and English Lab: side menu on a computer, top menu on a phone */
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
 .brand{font-weight:800;letter-spacing:-.03em;font-size:1.1rem;padding:0 10px}.nvs{display:flex;flex-direction:column;gap:8px}.nv{color:#667085;text-decoration:none;padding:12px 14px;border-radius:14px;font-weight:700}.nv:hover{background:#eaf0ff;color:#3157d5}.nv.on{background:#3157d5;color:#fff}.nv.sub{padding:8px 14px 8px 26px;font-weight:600;font-size:14px}
-.page{min-width:0;max-width:1400px;padding:16px}.mtabs{display:none}
+.page{min-width:0;max-width:1400px;padding:16px}.mtabs{display:none}.lsgo h2{margin:0 0 10px}.lsgo .row{display:flex;gap:10px;flex-wrap:wrap}.lsgo a.go{font-size:16px;padding:10px 18px;border-radius:12px}
 @media (max-width:980px){.app{grid-template-columns:1fr}.side{display:none}.mtabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}.mtabs .nv{white-space:nowrap;background:#fff;border:1px solid #e5e7eb}.mtabs .nv.on{background:#3157d5;color:#fff;border-color:#3157d5}.mtabs .nv.sub{padding:12px 14px;font-weight:700}}</style>
 <nav class="mtabs nvs-m" aria-label="Menú"></nav>
 <div class="app"><aside class="side"><div class="brand">English with Roger</div><nav class="nvs" aria-label="Menú"></nav></aside>
@@ -68,13 +68,16 @@ function cell(a){
 
 // Menu: my board, my course page with its LSs (the ones I can open) and English Lab. The teacher and testers get both courses.
 const COURSES={"2eso":"2 ESO","4eso":"4 ESO"};
+const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName=l=>esc(l.title.replace(/^\S+ · /,""));
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
   const html=`<a class="nv on" href="today.html" aria-current="page">Les meves activitats</a>`
-    +cs.map(c=>`<a class="nv" href="${c}/index.html">El meu curs · ${COURSES[c]}</a>`+lss.filter(l=>l.course===c).map(l=>`<a class="nv sub" href="${c}/${l.id.slice(c.length+1)}/index.html">${esc(l.title.replace(/^\S+ · /,""))}</a>`).join("")).join("")
+    +cs.map(c=>`<a class="nv" href="${c}/index.html">El meu curs · ${COURSES[c]}</a>`+lss.filter(l=>l.course===c).map(l=>`<a class="nv sub" href="${lsHref(l)}">${lsName(l)}</a>`).join("")).join("")
     +`<a class="nv" href="lab/">English Lab</a>`;
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
+// "Go to my Learning Situations": one big button per LS the student can open (open LS first).
+const lsGo=lss=>lss.length?`<div class="box lsgo"><h2>Les meves Learning Situations</h2><div class="row">${lss.map(l=>`<a class="go" href="${lsHref(l)}">Ves a ${lsName(l)} →</a>`).join("")}</div></div>`:"";
 function render(){
   const g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lss=[...EL_LS].filter(l=>{const i=D.ls[l.id]||{status:"hidden"};return all()||(i.status!=="hidden"&&elLsForGroup(l,i,D.me.group))})
@@ -83,7 +86,7 @@ function render(){
   // The course the student clicked on Home (el_pick): if it is not theirs, say which one is.
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.note=`Has triat ${COURSES[pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`;
-  $("#note").innerHTML=S.note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(S.note)}</div>`:"";
+  $("#note").innerHTML=(S.note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(S.note)}</div>`:"")+lsGo(lss);
   $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?"Pots practicar quan vulguis. El professor et dirà a classe quan fer les activitats avaluables.":"Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.");
   if(!lss.length){$("#main").innerHTML="";return}
   if(!lss.some(l=>l.id===S.ls))S.ls=lss[0].id;
