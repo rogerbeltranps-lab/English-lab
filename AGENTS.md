@@ -1,6 +1,6 @@
 # English Lab project guidance
 
-All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the code structure: [roadmap](docs/general/roadmap.md). Pending site tasks: [tasks](docs/general/tasks.md).
+All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the code structure: [roadmap](docs/general/roadmap.md). Pending site tasks: [tasks](docs/general/tasks.md). **Building a new LS:** follow the [new LS playbook](docs/general/new-ls-playbook.md) (checklist in order, with 4ESO LS2 as the model).
 
 ## Shared source of truth
 - This file is shared by Roger's two Claude projects: the LS project (Learning Situations, content design) and the English Lab project (site code and fixes). Before working on any Learning Situation, `git pull` and read it.

@@ -7,6 +7,7 @@ docs/
   general/                       not tied to a course or LS
     roadmap.md                   planned clean-up of the code structure
     tasks.md                     living list of pending site tasks
+    new-ls-playbook.md           checklist for building a new LS, in order (model: 4ESO LS2)
   4eso/
     programme.md                 Roger's 4ESO teaching programme (all 6 LS)
     ls1-my-real-routine/
@@ -30,4 +31,4 @@ docs/
   archive/                       old drafts, for reference only
 ```
 
-**For each new LS:** create `docs/<course>/ls<n>-<name>/` with an `AGENTS.md` (rules for that LS plus a dated decision log) and an `overview.md` (the approved content). Decisions that apply to every LS go in the root AGENTS.md; decisions for one LS go in its own AGENTS.md.
+**For each new LS:** follow [general/new-ls-playbook.md](general/new-ls-playbook.md). In short: create `docs/<course>/ls<n>-<name>/` with an `AGENTS.md` (rules for that LS plus a dated decision log) and an `overview.md` (the approved content). Decisions that apply to every LS go in the root AGENTS.md; decisions for one LS go in its own AGENTS.md.
