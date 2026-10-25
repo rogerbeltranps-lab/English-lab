@@ -9,9 +9,10 @@ window.elDegreeDown=l=>l?EL_DEGREES[Math.max(0,EL_DEGREES.indexOf(l)-1)]:l;
 window.EL_GRADING={
   // LS1 My Real Routine, 2ESO and 4ESO (Roger, 25 Oct 2026): done in class and redesigned for next year, so this year only the final
   // exam and the final product count. only: the student board shows just these two. fp.mark: the final product is the teacher's mark
-  // (score out of max in its dialog), not levels. Weights 50/50 until Roger sets them; one exam section until he gives the marks.
+  // (score out of max in its dialog), not levels. Weights 50/50 (confirmed by Roger, 25 Oct 2026). Exam sections from his Exam A: a
+  // section is [key, name, max]; 100 internal points, so the exam mark is points / 10 (the dashboard divides the sum by the sum of maxes).
   ...(function(){const e=c=>({blocks:[{id:"exam",name:"Final exam",w:50},{id:"fp",name:"Final product",w:50}],only:true,
-    exam:{sections:[["exam","Exam"]],max:10},fp:{a:c+"/final-product",mark:true}});
+    exam:{sections:[["listening","Listening",10],["reading","Reading",10],["vocabulary","Vocabulary",28],["grammar","Grammar",32],["writing","Writing",20]],max:10},fp:{a:c+"/final-product",mark:true}});
     return {"2eso-my-real-routine":e("2eso"),"4eso-my-real-routine":e("4eso")}})(),
   // 4ESO LS2: docs/4eso/ls2-seasons-and-celebrations/grading.md (approved by Roger, 24 Oct 2026); indicators from its indicators.md
   "4eso-seasons-and-celebrations":(function(){
