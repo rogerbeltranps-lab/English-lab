@@ -42,7 +42,7 @@ window.EL_GRADING={
       // Marking PDF per round (final-product-assessment.md section 8): the rubric rows come from the LS's rubric data by round, group and video
       // (peers: the teammates' average goes next to that row; process: the process summary); answers = hand-ins [activity, step, {rate: also the self-check}].
       marking:{rubric:"4eso/seasons-and-celebrations/final-rubric-data.js",process:["prep","source","contribution","part","email","team"],afterDue:["team"],
-        rounds:{1:{name:"Round 1 · Research and plan",note:"Research card and steps 0–2, My source, and the research sheet per group",answers:[[LP4,"card"],[FP,"prep"],[FP,"source"],[FP,"contribution"]]},
+        rounds:{1:{name:"Round 1 · Research and plan",note:"Research card and steps 0–2: My source and My research card, per student",answers:[[LP4,"card"],[FP,"prep"],[FP,"source"],[FP,"contribution"]]},
           2:{name:"Round 2 · Video, email and teamwork",note:"Steps 3–5 with the full email, teamwork received and the process, and a video sheet per group",answers:[[FP,"part"],[FP,"email",{rate:true}],[FP,"team"]],peers:"team",process:true}}},
       // 60 % first-try accuracy + 40 % done by the session deadline (EL_PLAN[ls].due). optional: counted only if it raises the accuracy.
       gv:{first:60,onTime:40,
