@@ -23,14 +23,17 @@
     a{text-decoration:none;color:inherit}
     [hidden]{display:none!important}
 
-    .top{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:14px 28px;background:#fff;border-bottom:1px solid var(--line)}
-    .brand{font-weight:800;letter-spacing:-.03em;font-size:1.1rem}
-    .top nav{display:flex;gap:8px}
-    .top nav a{padding:9px 14px;border-radius:14px;color:var(--muted);font-weight:700}
-    .top nav a:hover{background:var(--accent-soft);color:var(--accent)}
-    .top nav a.active{background:var(--accent);color:#fff}
+    /* Menu as on the home page: side menu on a computer, top menu on a phone */
+    .app{min-height:100vh;display:grid;grid-template-columns:240px 1fr}
+    .sidebar{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid var(--line);padding:24px 18px;display:flex;flex-direction:column;gap:24px}
+    .brand{font-weight:800;letter-spacing:-.03em;font-size:1.1rem;padding:0 10px}
+    .nav-tabs{display:flex;flex-direction:column;gap:8px}
+    .tab-btn{border:0;background:transparent;color:var(--muted);text-align:left;padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:700;transition:.2s ease}
+    .tab-btn:hover{background:var(--accent-soft);color:var(--accent)}
+    .tab-btn.active{background:var(--accent);color:#fff}
+    .mobile-tabs{display:none}
 
-    .content{padding:28px;display:flex;justify-content:center}
+    .content{min-width:0;padding:28px;display:flex;justify-content:center;align-items:flex-start}
     .panel{width:min(1180px,100%);background:var(--surface);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);padding:38px}
     .eyebrow{display:inline-block;padding:8px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:800;font-size:.84rem;margin-bottom:18px}
     .panel-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:26px}
@@ -77,7 +80,11 @@
     a.lab-card{display:block}
 
     @media (max-width:980px){
-      .top{padding:12px 14px}
+      .app{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .mobile-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+      .mobile-tabs .tab-btn{white-space:nowrap;background:#fff;border:1px solid var(--line)}
+      .mobile-tabs .tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
       .content{padding:14px}
       .panel{padding:24px}
       .panel-head{flex-direction:column;align-items:start}
@@ -91,13 +98,24 @@
   </style>
 </head>
 <body>
-  <header class="top">
+  <!-- Same menu as the home page; Courses and Learning Situations ([data-private]) only for the teacher and the tester -->
+  <nav class="mobile-tabs">
+    <a class="tab-btn" href="../index.html">Home</a>
+    <a class="tab-btn" href="../index.html#courses" data-private hidden>Courses</a>
+    <a class="tab-btn" href="../index.html#learning" data-private hidden>Learning Situations</a>
+    <a class="tab-btn active" href="./" aria-current="page">English Lab</a>
+  </nav>
+
+  <div class="app">
+  <aside class="sidebar">
     <a class="brand" href="../index.html">English with Roger</a>
-    <nav>
-      <a href="../index.html">Home</a>
-      <a class="active" href="./" aria-current="page">English Lab</a>
+    <nav class="nav-tabs">
+      <a class="tab-btn" href="../index.html">Home</a>
+      <a class="tab-btn" href="../index.html#courses" data-private hidden>Courses</a>
+      <a class="tab-btn" href="../index.html#learning" data-private hidden>Learning Situations</a>
+      <a class="tab-btn active" href="./" aria-current="page">English Lab</a>
     </nav>
-  </header>
+  </aside>
 
   <main class="content">
     <section class="panel">
@@ -190,6 +208,7 @@
       </div>
     </section>
   </main>
+  </div>
 
   <script type="module">
     // English Lab: a signed-out visitor chooses a level and signs in here (el-cloud keeps students on this page after sign-in).
@@ -216,6 +235,7 @@
 
     function render(){
       const inside = signedIn(user), canSwitch = inside && switches(user);
+      document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !canSwitch; });
       if (inside && !canSwitch) {   // a student (or the tester in a group's view): their own course
         const g = (window.EL_GROUPS || []).find(x => x.id === C().group());
         if (g && LEVELS[g.course]) level = g.course;
