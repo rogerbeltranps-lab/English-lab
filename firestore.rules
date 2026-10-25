@@ -47,15 +47,17 @@ service cloud.firestore {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow write: if signedIn() && request.auth.uid == uid && ((lsOpen(ls) && lsForMe(ls, uid)) || isTester());
       }
-      // route (level): the student picks it once; later changes are only a request the teacher accepts
+      // route (level): the student picks it once; later changes are only a request (with an optional reason) the teacher accepts or declines.
+      // The teacher can also set it directly at any time.
       match /levels/{ls} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow create: if signedIn() && request.auth.uid == uid
           && request.resource.data.keys().hasOnly(['level','updated'])
           && request.resource.data.level in ['insecure','safe','daring'];
         allow update: if signedIn() && request.auth.uid == uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['request','requestedAt'])
-          && request.resource.data.request in ['insecure','safe','daring'];
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['request','requestedAt','reason'])
+          && request.resource.data.request in ['insecure','safe','daring']
+          && request.resource.data.get('reason', '') is string && request.resource.data.get('reason', '').size() <= 300;
         allow write: if isTeacher();
       }
       // results: students cannot touch feedback, nor edit a locked (submitted) result

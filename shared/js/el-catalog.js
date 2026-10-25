@@ -7,7 +7,7 @@
 // manual:true = scored by the teacher (not by counting actions); delivered through Google Classroom, not in this site.
 // steps: final-product steps (id, title) whose hand-ins (state.steps in the page's key) the dashboard shows; pieces: product-pieces key.
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
-window.EL_LEVELS=[{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes."}];
+window.EL_LEVELS=[{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català).",en:"I need a lot of support and guidance (instructions in Catalan)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès).",en:"I feel confident with a little support (instructions in English)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes.",en:"I want the challenge: more independence and less help."}];
 // Class groups. The student picks one the first time they sign in; the teacher can change it in the dashboard.
 window.EL_GROUPS=[{id:"2ESOA",course:"2eso",name:"2ESO A"},{id:"2ESOB",course:"2eso",name:"2ESO B"},{id:"4ESOA",course:"4eso",name:"4ESO A"},{id:"4ESOB",course:"4eso",name:"4ESO B"}];
 // Is an LS assigned to a group? ls/{id}.groups lists the groups (set in the teacher dashboard); without it, every group of the LS's course.
