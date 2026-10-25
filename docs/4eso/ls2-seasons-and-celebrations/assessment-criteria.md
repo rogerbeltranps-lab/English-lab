@@ -58,4 +58,4 @@ The new steps **log** (LP2), **chart** (LP3) and **card** (LP4) are hand-ins: fi
 - **Term 1** (LP1–LP3, LP5, LP6, checkpoints, exam on 18/20 Nov): 4.1, 2.2, 5.1 in the exam and the Learning Paths; 3.2, 1.1, 1.2 and CC1 1.3 as Learning Path practice.
 - **Term 2** (LP4 and the final product): 3.2, 5.1, 4.2, 6.1, 1.1, 1.2, CC1 1.3, CC3 3.2.
 
-Exam format (approved by Roger, 25 Oct 2026): Google Form with a listening chart (2.2), a reading log (4.1) and a formal email (5.1) besides the auto-marked items; the sample exam mirrors it. Details in the [decision log](AGENTS.md#decision-log).
+Exam format (approved by Roger, 25 Oct 2026): Google Form, everything multiple choice or short gaps except the formal email (5.1); the listening chart (2.2) and the reading log (4.1) are five multiple-choice questions each, so the exam gives 2.2 and 4.1 scores, and only the email gets a level. The sample exam mirrors it. Details in the [decision log](AGENTS.md#decision-log).
