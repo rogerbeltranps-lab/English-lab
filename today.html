@@ -112,7 +112,7 @@ function render(){
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
-  $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links)+pointsBox();
+  $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links)+`<div id="ptbox">${pointsBox()}</div>`;
   $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("Pots practicar quan vulguis. El professor et dirà a classe quan fer les activitats avaluables.","You can practise whenever you want. Your teacher will tell you in class when to do the graded activities."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
   if(!lss.length){$("#main").innerHTML="";return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
@@ -141,13 +141,18 @@ function pointsBox(){
     +(rank?`<small class="muted">${t("Els equips aquest trimestre","The teams this term")}</small>${rank}`:"")+(past.length?`<p class="muted">${past.join(" · ")}</p>`:"")
     +`<details class="all"><summary>${t("Com funciona","How it works")}</summary><ul class="ptrules">${elPointsRules().map(r=>`<li>${r.icon} ${EN?r.en:r.ca}</li>`).join("")}</ul></details></div>`}
 // Live class (Roger, 25 Oct 2026): while the teacher presents with my group chosen (live/{group}, every minute), a link to follow the
-// presentation on this device (?live={group}); while the buzzers are open (buzz/{group}), the buzzer for my team (shared/js/el-buzz.js).
+// presentation on this device (?live={group}); while the buzzers are open (buzz/{group}), the buzzer for my team (shared/js/el-buzz.js);
+// my team points as they change.
 let LIVE=null;
 function liveBox(){const x=LIVE,ms=x&&x.at&&(x.at.toMillis?x.at.toMillis():+x.at);if(!x||!x.on||!ms||Date.now()-ms>10*60e3||!D.me.group)return "";
   return `<div class="pend live"><div><b>📺 ${t("Ara hi ha una presentació a classe","Your class is on a presentation now")}</b><div class="muted">${esc(x.title||"")}</div></div><a class="go" href="${esc(x.deck)}?live=${esc(D.me.group)}">${t("Segueix-la en aquest dispositiu","Follow it on this device")} →</a></div>`}
 async function goLive(){
   if(DEMO||!D.me.group||goLive.on)return;goLive.on=true;const db=ELCloud.db,g=D.me.group,redraw=()=>{const n=$("#live");if(n)n.innerHTML=liveBox()};
   F.onSnapshot(F.doc(db,"live",g),x=>{LIVE=x.exists()?x.data():null;redraw()},e=>console.warn("live",e));setInterval(redraw,60e3);
+  // my points and the teams' scores change during the class (✓ Right · +1): show them at once
+  const ptDraw=()=>{const n=$("#ptbox");if(n)n.innerHTML=pointsBox()};
+  F.onSnapshot(F.doc(db,"points",(U.email||"").toLowerCase()),x=>{if(x.exists()){D.pt=x.data();ptDraw()}},e=>console.warn("points",e));
+  F.onSnapshot(F.doc(db,"teams",g),x=>{if(x.exists()){D.tm=x.data();ptDraw()}},e=>console.warn("teams",e));
   const team=(D.pt||{}).team,list=(D.tm||{}).list||[];
   if(team&&list.some(x=>x.id===team))try{const {buzzer}=await import("./shared/js/el-buzz.js");buzzer({S:F,db,group:g,team,names:Object.fromEntries(list.map(x=>[x.id,x.name])),t,el:$("#buzz")})}catch(e){console.warn("buzz",e)}
 }

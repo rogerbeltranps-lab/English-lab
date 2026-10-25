@@ -17,6 +17,8 @@ export function buzzer({S,db,group,team,names,t,el}){
   let z=null,busy=false,mine=null;   // mine: the round (q) this device won
   const draw=()=>{
     el.hidden=!(z&&z.open);if(el.hidden)return;
+    const bar=document.getElementById("el-cloud-bar");   // the site's bottom bar (sign out) stays on top: keep the text above it
+    el.style.paddingBottom=bar&&bar.offsetHeight?`calc(${bar.offsetHeight+18}px + env(safe-area-inset-bottom,0px))`:"";
     const w=z.winner&&z.winner.team,out=(z.out||[]).includes(team);
     el.innerHTML=w?(w===team?`<p class="bzmsg win">🎉 ${mine===z.q?t("Has estat el primer!","You were first!"):t("El teu equip ha estat el primer!","Your team was first!")} ${name(team)}, ${t("responeu!","answer!")}</p>`
         :`<p class="bzmsg">⏱ ${t(`${name(w)} ha estat el primer.`,`${name(w)} was first.`)}</p><small>${t("Escolta la resposta.","Listen to their answer.")}</small>`)
