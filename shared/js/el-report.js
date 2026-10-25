@@ -47,7 +47,7 @@ export function report({en,save}){
   d.style.cssText="border:0;border-radius:14px;padding:16px 18px;max-width:480px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004;font:15px system-ui,sans-serif;color:#0f172a;background:#fff";
   d.innerHTML='<h3 style="margin:0 0 6px"></h3><p data-i style="margin:0 0 8px;color:#475569"></p><div data-k></div>'
     +'<textarea maxlength="1000" rows="4" style="width:100%;box-sizing:border-box;font:inherit;padding:6px;border:1px solid #cbd5e1;border-radius:8px;margin-top:8px"></textarea>'
-    +'<p data-n style="margin:2px 0 0;color:#64748b;font-size:13px;text-align:right"></p><p data-w style="margin:6px 0 0;color:#64748b;font-size:13px"></p>'
+    +'<p data-n style="margin:2px 0 0;color:#64748b;font-size:13px;text-align:right"></p><p data-w style="margin:6px 0 0;color:#64748b;font-size:13px"></p><p data-e role="alert" style="margin:6px 0 0;color:#b91c1c;font-size:14px;font-weight:600" hidden></p>'
     +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button data-x></button><button data-ok></button></div>';
   const $=s=>d.querySelector(s),ta=$("textarea"),ok=$("[data-ok]"),x=$("[data-x]");
   $("h3").textContent="⚠️ "+t("Avisa d'un problema","Report a problem");
@@ -60,15 +60,17 @@ export function report({en,save}){
   const n=$("[data-n]"),count=()=>n.textContent=ta.value.length+" / 1000";ta.oninput=count;count();
   x.style.cssText=bs+"background:#e2e8f0;color:#0f172a";x.textContent=t("Cancel·la","Cancel");x.onclick=()=>d.close();
   ok.style.cssText=bs+"background:#b45309;color:#fff";ok.textContent=t("Envia","Send");
+  const err=m=>{const e=$("[data-e]");e.textContent=m;e.hidden=!m};
+  d.addEventListener("change",()=>err(""));
   ok.onclick=async()=>{
     const kind=(d.querySelector("input[name=el-rep]:checked")||{}).value,text=ta.value.trim();
-    if(!kind){alert(t("Tria quin tipus de problema és.","Choose what kind of problem it is."));return}
-    if(kind==="other"&&!text){alert(t("Explica breument què passa.","Explain briefly what is happening."));ta.focus();return}
+    if(!kind){err(t("Tria quin tipus de problema és.","Choose what kind of problem it is."));return}
+    if(kind==="other"&&!text){err(t("Explica breument què passa.","Explain briefly what is happening."));ta.focus();return}
     ok.disabled=true;
     try{await save(Object.assign({kind,text},ctx));
       d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=t("Gràcies! El professor ja té el teu avís.","Thank you! Your teacher has your report.");
       const c=document.createElement("button");c.style.cssText=bs+"background:#0f766e;color:#fff";c.textContent="OK";c.onclick=()=>d.close();d.append(m,c);c.focus()}
-    catch(e){console.warn("problem report",e);ok.disabled=false;alert(t("No s'ha pogut enviar. Torna-ho a provar més tard o digues-ho al professor a classe.","It could not be sent. Please try again later or tell your teacher in class."))}};
+    catch(e){console.warn("problem report",e);ok.disabled=false;err(t("No s'ha pogut enviar. Torna-ho a provar més tard o digues-ho al professor a classe.","It could not be sent. Please try again later or tell your teacher in class."))}};
   d.addEventListener("close",()=>d.remove());
   document.body.append(d);d.showModal();
 }
