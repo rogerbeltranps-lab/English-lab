@@ -17,8 +17,8 @@ window.LP = {
     "en": "No notes · 5–8 min"
    },
    "intro": {
-    "ca": "Respon sense apunts ni ajuda. Compta haver-lo fet, no la nota: el professor només mira el primer intent per saber què recordeu. Després llegeix el feedback i repassa el que has fallat.",
-    "en": "Answer with no notes or help. Doing it counts, not the score: your teacher only looks at your first attempt to see what the class remembers. Then read the feedback and review what you missed."
+    "ca": "Respon sense apunts ni ajuda. El primer intent compta per a la nota: fes-ho tan bé com puguis. Després llegeix el feedback i repassa el que has fallat.",
+    "en": "Answer with no notes or help. Your first try counts for your mark, so do your best. Then read the feedback and review what you missed."
    },
    "items": [
     {
