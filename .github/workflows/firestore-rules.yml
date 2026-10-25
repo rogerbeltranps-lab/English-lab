@@ -1,0 +1,40 @@
+# Publishes firestore.rules to Firebase (project english-lab-ietm) whenever a merge
+# to main changes them, or on demand from the Actions tab ("Run workflow").
+name: Publish Firestore rules
+
+on:
+  push:
+    branches: [main]
+    paths: [firestore.rules]
+  workflow_dispatch:
+
+concurrency:
+  group: firestore-rules
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Firebase credentials
+        run: |
+          if [ -z "$SERVICE_ACCOUNT" ]; then
+            echo "::error::Missing the secret FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM"
+            exit 1
+          fi
+          printf '%s' "$SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+      - name: Publish the rules
+        run: npx --yes firebase-tools@15.34.0 deploy --only firestore:rules --project english-lab-ietm --non-interactive
+      - name: Remove the key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/sa.json"
