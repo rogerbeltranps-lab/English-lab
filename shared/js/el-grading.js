@@ -7,6 +7,12 @@ window.EL_DEGREE_MARK={NA:2.5,AS:5,AN:7.5,AE:10};
 window.elDegree=m=>m==null||isNaN(m)?null:m<5?"NA":m<7?"AS":m<9?"AN":"AE";
 window.elDegreeDown=l=>l?EL_DEGREES[Math.max(0,EL_DEGREES.indexOf(l)-1)]:l;
 window.EL_GRADING={
+  // LS1 My Real Routine, 2ESO and 4ESO (Roger, 25 Oct 2026): done in class and redesigned for next year, so this year only the final
+  // exam and the final product count. only: the student board shows just these two. fp.mark: the final product is the teacher's mark
+  // (score out of max in its dialog), not levels. Weights 50/50 until Roger sets them; one exam section until he gives the marks.
+  ...(function(){const e=c=>({blocks:[{id:"exam",name:"Final exam",w:50},{id:"fp",name:"Final product",w:50}],only:true,
+    exam:{sections:[["exam","Exam"]],max:10},fp:{a:c+"/final-product",mark:true}});
+    return {"2eso-my-real-routine":e("2eso"),"4eso-my-real-routine":e("4eso")}})(),
   // 4ESO LS2: docs/4eso/ls2-seasons-and-celebrations/grading.md (approved by Roger, 24 Oct 2026); indicators from its indicators.md
   "4eso-seasons-and-celebrations":(function(){
     const LP2="4eso/ls2-celebrations-around-the-world",LP3="4eso/ls2-where-traditions-come-from",LP4="4eso/ls2-research-it-right",

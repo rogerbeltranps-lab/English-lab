@@ -26,6 +26,7 @@ dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 3
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-criteria.js"></script>
+<script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
 <script type="module">
@@ -99,12 +100,13 @@ function render(){
     .sort((a,b)=>((D.ls[b.id]||{}).status==="open")-((D.ls[a.id]||{}).status==="open"));   // open LS first
   if(lss.length&&!lss.some(l=>l.id===S.ls))S.ls=lss[0].id;
   setLang();
-  nav(g,lss);
+  const links=all()?lss:lss.filter(l=>!only(l.id));   // no links to an LS that only shows its grade
+  nav(g,links);
   // The course the student clicked on Home (el_pick): if it is not theirs, say which one is.
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
-  $("#note").innerHTML=(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(lss);
+  $("#note").innerHTML=(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links);
   $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("Pots practicar quan vulguis. El professor et dirà a classe quan fer les activitats avaluables.","You can practise whenever you want. Your teacher will tell you in class when to do the graded activities."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
   if(!lss.length){$("#main").innerHTML="";return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
@@ -114,9 +116,22 @@ function render(){
   $("#main").innerHTML=lateBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
     +`<div class="bar">${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${l.title}</button>`).join("")} <span class="muted">· ${t("El teu nivell:","Your level:")}</span> ${route((D.lv[ls.id]||{}).level)}${routeAsk(ls.id,st)} ${stTag}</div>`
     +weekBox(ls,info)
-    +`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
-    +(S.view==="sum"?summary(list):lpView(list,info));
+    +(only(ls.id)?onlyView(ls.id):`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
+    +(S.view==="sum"?summary(list):lpView(list,info)));
 }
+// LS1 (Roger, 25 Oct 2026): only the final exam and the final product count, so the board shows just the LS grade (EL_GRADING[ls].only),
+// with no learning paths and no links to the LS pages, so students do not go back to the activities.
+const only=id=>((window.EL_GRADING||{})[id]||{}).only;
+const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")};
+// Exam: results/{ls}__assessment, sections[k] = {score, max} written by the teacher (sum of scores / sum of maxes × 10). Final product: the teacher's mark.
+function onlyView(id){const g=EL_GRADING[id],e=g.exam,sc=(D.rs[id+"/assessment"]||{}).sections||{},got=e.sections.filter(([k])=>sc[k]&&sc[k].score!=null),fp=D.rs[g.fp.a]||{};
+  const m=got.reduce((n,[k])=>n+(+(sc[k].max||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null,prod=fp.max?(fp.score||0)/fp.max*10:null;
+  const val={exam,fp:prod},total=exam!=null&&prod!=null?g.blocks.reduce((n,b)=>n+val[b.id]*b.w,0)/g.blocks.reduce((n,b)=>n+b.w,0):null;
+  const name={exam:t("Examen final","Final exam"),fp:t("Producte final","Final product")},big=v=>`<b style="font-size:1.3rem;color:${v==null?"#94a3b8":col(v*10)}">${v==null?"–":f1(v)+" / 10"}</b>`;
+  return `<div class="box"><h2>${t("Nota de la LS","LS grade")}</h2><p class="muted">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><table class="legend"><tbody>`
+    +g.blocks.map(b=>`<tr><td><b>${name[b.id]}</b> <small class="muted">${b.w} %</small></td><td>${big(val[b.id])}${val[b.id]==null?`<br><small class="muted">${t("encara no hi ha nota","no mark yet")}</small>`:""}</td></tr>`).join("")
+    +`<tr><td><b>${t("Nota de la LS","LS mark")}</b></td><td>${big(total)}</td></tr></tbody></table>`
+    +(fp.feedback?`<p style="margin:10px 0 4px;font-weight:600">${t("Feedback del producte final","Final product feedback")}</p><div class="fb">${esc(fp.feedback)}</div>`:"")+`</div>`}
 // Week plan and reminders (Roger, 25 Oct 2026), from the teacher's plan in el-plan.js (shared/js/el-week.js): this week's classes,
 // the activities due this week, the exam day and the whole plan, for the student's group; past-due activities not done are reminded on top.
 // "Done" = submitted or marked as done, or every scored step done. The final product is handed in on Classroom, so it is listed but never reminded.

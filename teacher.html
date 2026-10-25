@@ -161,11 +161,12 @@ function otherCrit(u,c){const g=G();
   const teacher=avg((g.teacher[c]||[]).map(([id,k])=>lvMark(lvOf(u,id,k,c))));
   return {auto,teacher,mark:wavg([[auto,1],[teacher,1]])}}
 const otherBlock=u=>avg(G().other.map(c=>otherCrit(u,c).mark));
-const fpBlock=u=>{const f=G().fp;return wavg(f.rows.map(r=>[lvMark(lvOf(u,f.a,r.step,r.c)),r.w]))};
+const fpBlock=u=>{const f=G().fp;if(f.mark){const x=res(u,f.a);return x.max?(x.score||0)/x.max*10:S.zero?0:null}return wavg(f.rows.map(r=>[lvMark(lvOf(u,f.a,r.step,r.c)),r.w]))};
 function examBlock(u){const e=G().exam,x=res(u,asId(S.ls)).sections||{};let s=0,m=0,any=false;
   e.sections.forEach(([k])=>{const y=x[k];if(y&&y.score!=null){s+=+y.score;m+=+(y.max||e.max);any=true}else if(S.zero)m+=e.max});
   return any?s/m*10:S.zero?0:null}
-function grade(s){const B={exam:examBlock(s.uid),fp:fpBlock(s.uid),gv:gvBlock(s.uid,s.group),other:otherBlock(s.uid)};
+const hasBlock=id=>G().blocks.some(b=>b.id===id),hasTeams=()=>(G().moments||[]).some(m=>m.group);   // LS1 has only the exam and the final product
+function grade(s){const B={exam:examBlock(s.uid),fp:fpBlock(s.uid),gv:hasBlock("gv")?gvBlock(s.uid,s.group):{},other:hasBlock("other")?otherBlock(s.uid):null};
   return {B,total:wavg(G().blocks.map(b=>[b.id==="gv"?B.gv.mark:B[b.id],b.w]))}}
 // Suggested degree of one criterion from its evidence (grading.md section 3): each later piece weighs `later` times the one before;
 // for levelOnly criteria (4.1, 2.2) an exam score never sets the degree without a teacher level.
@@ -180,7 +181,7 @@ const lvBtns=(attrs,cur,c)=>{const ind=((G()||{}).ind||{})[c]||[];return EL_DEGR
 const teamOf=(u,id)=>res(u,id).team||"";
 const teamMates=(id,team,g)=>team?Object.values(S.P).filter(s=>!s.away&&!s.tester&&s.group===g&&teamOf(s.uid,id)===team):[];
 // Level rows of an activity's dialog (moments of el-grading.js), and the final product group rows
-function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=g.moments.filter(m=>m.a===a.id);if(!ms.length)return "";
+function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=(g.moments||[]).filter(m=>m.a===a.id);if(!ms.length)return "";
   const x=res(u,a.id),row=(m,c)=>`<tr><td>${esc(m.name)}</td><td>${cpill(c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${a.id}" data-s="${m.step}" data-c="${c}"`,((x.levels||{})[m.step]||{})[c],c)}</td></tr>`;
   let h=`<label>Levels <small class="muted">(hover a level to read its indicator; click it again to clear)</small></label><table class="lvt"><tbody>${ms.filter(m=>!m.group).flatMap(m=>m.c.map(c=>row(m,c))).join("")}</tbody></table>`;
   const gm=ms.find(m=>m.group);if(!gm)return h;
@@ -212,12 +213,13 @@ function render(){
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
-    +`<div class="box"><h2>Learning paths and activities</h2>${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time or to answer a route request (🔁).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
-      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}</div>`
+    +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
+    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time or to answer a route request (🔁).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
+      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
-    +(G()?gradeBox(shown):"")
-    +`<div class="box">${G()?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
-      :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`
+    +(G()&&!G().only?gradeBox(shown):"")
+    +(G()&&G().only?"":`<div class="box">${G()&&G().evidence?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
+      :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`)
     +`<div class="box">${fold("settings","LS status and graded activities",lsSettings(ls))}</div>`+rosterBox();
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
 }
@@ -260,17 +262,18 @@ function criteria(studs,list){
 // LS grade per group: the blocks of el-grading.js (exam, final product, grammar and vocabulary, other competences) and the weighted total
 function gradeBox(studs){
   const g=G(),fpA=g.fp.a,blk=id=>g.blocks.find(b=>b.id===id);
-  const head=`<tr><th class="stu">Student</th><th>Route</th><th>Group</th>${g.blocks.map(b=>`<th>${esc(b.name)}<br><small class="muted">${b.w} %</small></th>`).join("")}<th class="first">LS mark</th></tr>`;
+  const tm=hasTeams(),head=`<tr><th class="stu">Student</th><th>Route</th>${tm?"<th>Group</th>":""}${g.blocks.map(b=>`<th>${esc(b.name)}<br><small class="muted">${b.w} %</small></th>`).join("")}<th class="first">LS mark</th></tr>`;
   const body=studs.map(s=>{const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td>`;
-    if(s.away)return `<tr class="away">${who}<td>${route()}</td><td colspan="${g.blocks.length+2}" style="text-align:left">Not signed in yet</td></tr>`;
-    const {B,total}=grade(s),o=g.other.map(c=>{const x=otherCrit(s.uid,c);return c+": "+f1(x.mark)+" (auto "+f1(x.auto)+" · levels "+f1(x.teacher)+")"}).join("\n");
-    const tip={exam:"Exam sections, score out of max (click to enter)",fp:g.fp.rows.map(r=>r.name+" "+r.w+" %: "+(lvOf(s.uid,fpA,r.step,r.c)||"–")).join("\n"),
-      gv:`First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %`,other:o};
+    if(s.away)return `<tr class="away">${who}<td>${route()}</td><td colspan="${g.blocks.length+(tm?2:1)}" style="text-align:left">Not signed in yet</td></tr>`;
+    const {B,total}=grade(s),o=(g.other||[]).map(c=>{const x=otherCrit(s.uid,c);return c+": "+f1(x.mark)+" (auto "+f1(x.auto)+" · levels "+f1(x.teacher)+")"}).join("\n");
+    const tip={exam:"Exam sections, score out of max (click to enter)",fp:g.fp.mark?"Your mark in the final product dialog":g.fp.rows.map(r=>r.name+" "+r.w+" %: "+(lvOf(s.uid,fpA,r.step,r.c)||"–")).join("\n"),
+      gv:g.gv?`First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %`:"",other:o};
     const val={exam:B.exam,fp:B.fp,gv:B.gv.mark,other:B.other};
-    return `<tr>${who}${rtCell(s.uid)}<td><small>${esc(teamOf(s.uid,fpA))||"–"}</small></td>`
+    return `<tr>${who}${rtCell(s.uid)}${tm?`<td><small>${esc(teamOf(s.uid,fpA))||"–"}</small></td>`:""}`
       +g.blocks.map(b=>`<td class="gr" data-do="grade" data-u="${s.uid}" title="${esc(tip[b.id])}">${f1(val[b.id])}</td>`).join("")
       +`<td class="first gr tot" data-do="grade" data-u="${s.uid}">${f1(total)} ${deg(elDegree(total))}</td></tr>`}).join("");
-  const key=`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: first-try accuracy of vocabulary practice, grammar, mixed practice, register, recall warm-ups and checkpoints (optional ones only if they raise it) ${g.gv.first} % + done by its session deadline (teaching plan) ${g.gv.onTime} %. Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
+  const key=g.only?`<p class="muted">Marks out of 10. Only the final exam and the final product count in this LS (Roger, 25 Oct 2026): its learning paths are practice. Exam: sum of section scores ÷ sum of maxes; enter it below or by clicking a mark. Final product: the mark you give in its dialog (click a student's mark here, then "Open the final product").</p>`
+    :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: first-try accuracy of vocabulary practice, grammar, mixed practice, register, recall warm-ups and checkpoints (optional ones only if they raise it) ${g.gv.first} % + done by its session deadline (teaching plan) ${g.gv.onTime} %. Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
   return `<div class="box"><h2>LS grade</h2><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1" title="As in the grading plan: missing work counts 0 until it is handed in">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0" title="Mark so far: only what is done or assessed counts">not counted yet</button></div>`
     +fold("gradekey","How it is worked out",key,"key")
     +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`:"")
@@ -278,9 +281,9 @@ function gradeBox(studs){
 }
 function examTable(studs){const e=G().exam,id=asId(S.ls);
   if(!studs.length)return '<p class="muted">No signed-in students.</p>';
-  return `<p class="muted">Score and maximum for each section (empty = not entered), and the writing level (${e.level.c}). Levels save on click; marks with the button.</p><div class="wrap"><table><thead><tr><th class="stu">Student</th>${e.sections.map(([,n])=>`<th>${n}</th>`).join("")}<th>Writing level ${pill(e.level.c)}</th></tr></thead><tbody>`
+  return `<p class="muted">Score and maximum for each section (empty = not entered)${e.level?`, and the writing level (${e.level.c}). Levels save on click; marks with the button.`:". Save them with the button."}</p><div class="wrap"><table><thead><tr><th class="stu">Student</th>${e.sections.map(([,n])=>`<th>${n}</th>`).join("")}${e.level?`<th>Writing level ${pill(e.level.c)}</th>`:""}</tr></thead><tbody>`
     +studs.map(s=>{const x=res(s.uid,id),sc=x.sections||{};return `<tr><td class="stu">${name(s)}</td>`+e.sections.map(([k])=>`<td><input class="ex" data-ex="${s.uid}" data-k="${k}" data-f="score" type="number" step="0.25" style="width:52px" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${s.uid}" data-k="${k}" data-f="max" type="number" style="width:44px" value="${sc[k]&&sc[k].max!=null?sc[k].max:e.max}"></td>`).join("")
-      +`<td>${lvBtns(`data-do="lv" data-u="${s.uid}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td></tr>`}).join("")
+      +(e.level?`<td>${lvBtns(`data-do="lv" data-u="${s.uid}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td>`:"")+`</tr>`}).join("")
     +`</tbody></table></div><div class="row" style="justify-content:flex-start;margin-top:6px"><button data-do="examsave">Save exam marks</button></div>`}
 // Exam marks typed in a table or a dialog: only rows that changed are written
 function saveExam(scope){const id=asId(S.ls),by={};
@@ -409,18 +412,18 @@ function again(){const d=$("#dlg"),c=$("#dlgc");if(!d.open||!redraw)return;const
 function gradePanel(u){redraw=()=>gradePanel(u);
   const s=S.P[u],g=G(),{B,total}=grade(s),id=asId(S.ls),x=res(u,id),sc=x.sections||{},e=g.exam,fpA=g.fp.a;
   const row=(l,v,extra)=>`<tr><td style="text-align:left">${l}</td><td>${v}</td><td style="text-align:left"><small class="muted">${extra||""}</small></td></tr>`;
-  const gvRows=[...g.gv.items.map(i=>[...i,0]),...g.gv.optional.map(i=>[...i,1])].map(([a,k,opt])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
+  const gvRows=!g.gv?"":[...g.gv.items.map(i=>[...i,0]),...g.gv.optional.map(i=>[...i,1])].map(([a,k,opt])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
     return row(stepName(a,k)+(opt?' <small class="muted">(optional'+(B.gv.used.includes(a)?", counts":"")+")</small>":""),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===0?" late":""):""))}).join("");
   const blk=(id,title,mark,body)=>`<details data-k="gp-${id}" ${S.open.has("gp-"+id)?"open":""}><summary style="font-size:1rem">${title} · <b>${f1(mark)}</b></summary>${body}</details>`;
-  dlg(`<h3>${name(s)} · LS grade</h3><p class="muted">${route(level(u,S.ls))} · Group: ${esc(teamOf(u,fpA))||"–"} · Missing work ${S.zero?"counts 0":"not counted yet"}</p>`
+  dlg(`<h3>${name(s)} · LS grade</h3><p class="muted">${route(level(u,S.ls))}${hasTeams()?" · Group: "+(esc(teamOf(u,fpA))||"–"):""} · Missing work ${S.zero?"counts 0":"not counted yet"}</p>`
     +`<p><b>LS mark: ${f1(total)} ${deg(elDegree(total))}</b> <small class="muted">${g.blocks.map(b=>b.name+" "+b.w+" %").join(" · ")}</small></p>`
-    +blk("exam",`Final exam (${g.blocks.find(b=>b.id==="exam").w} %)`,B.exam,`<table class="lvt"><tbody>${e.sections.map(([k,n])=>`<tr><td>${n}</td><td><input class="ex" data-ex="${u}" data-k="${k}" data-f="score" type="number" step="0.25" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${u}" data-k="${k}" data-f="max" type="number" value="${sc[k]&&sc[k].max!=null?sc[k].max:e.max}"></td></tr>`).join("")}<tr><td>Writing level ${pill(e.level.c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td></tr></tbody></table><div class="row" style="justify-content:flex-start;margin-top:4px"><button data-do="examsave1">Save exam marks</button></div>`)
-    +blk("fp",`Final product (${g.blocks.find(b=>b.id==="fp").w} %)`,B.fp,`<table><tbody>${g.fp.rows.map(r=>row(esc(r.name)+" "+cpill(r.c),deg(lvOf(u,fpA,r.step,r.c)),r.w+" %")).join("")}</tbody></table><p class="muted">Give these levels in the final product dialog. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open it</a></p>`)
-    +blk("gv",`Grammar and vocabulary (${g.blocks.find(b=>b.id==="gv").w} %)`,B.gv.mark,`<p class="muted">First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %</p><table><thead><tr><th style="text-align:left">Step</th><th>First try</th><th style="text-align:left">Done</th></tr></thead><tbody>${gvRows}</tbody></table>`)
-    +blk("other",`Other competences (${g.blocks.find(b=>b.id==="other").w} %)`,B.other,`<table><thead><tr><th>Criterion</th><th>Steps (auto)</th><th>Levels</th><th>Mark</th></tr></thead><tbody>${g.other.map(c=>{const o=otherCrit(u,c);
+    +blk("exam",`Final exam (${g.blocks.find(b=>b.id==="exam").w} %)`,B.exam,`<table class="lvt"><tbody>${e.sections.map(([k,n])=>`<tr><td>${n}</td><td><input class="ex" data-ex="${u}" data-k="${k}" data-f="score" type="number" step="0.25" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${u}" data-k="${k}" data-f="max" type="number" value="${sc[k]&&sc[k].max!=null?sc[k].max:e.max}"></td></tr>`).join("")}${e.level?`<tr><td>Writing level ${pill(e.level.c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td></tr>`:""}</tbody></table><div class="row" style="justify-content:flex-start;margin-top:4px"><button data-do="examsave1">Save exam marks</button></div>`)
+    +blk("fp",`Final product (${g.blocks.find(b=>b.id==="fp").w} %)`,B.fp,g.fp.mark?`<p class="muted">Your mark: ${res(u,fpA).max?res(u,fpA).score+"/"+res(u,fpA).max:"not given yet"}. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open the final product</a> to mark it.</p>`:`<table><tbody>${g.fp.rows.map(r=>row(esc(r.name)+" "+cpill(r.c),deg(lvOf(u,fpA,r.step,r.c)),r.w+" %")).join("")}</tbody></table><p class="muted">Give these levels in the final product dialog. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open it</a></p>`)
+    +(!g.gv?"":blk("gv",`Grammar and vocabulary (${g.blocks.find(b=>b.id==="gv").w} %)`,B.gv.mark,`<p class="muted">First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %</p><table><thead><tr><th style="text-align:left">Step</th><th>First try</th><th style="text-align:left">Done</th></tr></thead><tbody>${gvRows}</tbody></table>`))
+    +(!g.other?"":blk("other",`Other competences (${g.blocks.find(b=>b.id==="other").w} %)`,B.other,`<table><thead><tr><th>Criterion</th><th>Steps (auto)</th><th>Levels</th><th>Mark</th></tr></thead><tbody>${g.other.map(c=>{const o=otherCrit(u,c);
       const at=(g.auto[c]||[]).map(([a,k,f])=>stepName(a,k)+": "+(f?(firstOf(u,a,k)?"first try "+firstOf(u,a,k).score+"/"+firstOf(u,a,k).max:"–"):doneAt(u,a,k)?"done":"not done")).join("\n"),
         tt=(g.teacher[c]||[]).map(([a,k])=>stepName(a,k)+": "+(lvOf(u,a,k,c)||"–")).join("\n");
-      return `<tr><td>${pill(c)}</td><td title="${esc(at)}">${f1(o.auto)}</td><td title="${esc(tt)}">${f1(o.teacher)}</td><td><b>${f1(o.mark)}</b></td></tr>`}).join("")}</tbody></table><p class="muted">Hover a number to see its steps or levels.</p>`),true);
+      return `<tr><td>${pill(c)}</td><td title="${esc(at)}">${f1(o.auto)}</td><td title="${esc(tt)}">${f1(o.teacher)}</td><td><b>${f1(o.mark)}</b></td></tr>`}).join("")}</tbody></table><p class="muted">Hover a number to see its steps or levels.</p>`)),true);
 }
 // One criterion of one student: evidence, suggestion and the confirmed degree
 function degPanel(u,c){redraw=()=>degPanel(u,c);
@@ -451,7 +454,7 @@ function stuPanel(u){redraw=null;
 }
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
-  const gx=!!G()&&a.ls===S.ls,state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
+  const gx=!!G()&&!G().only&&a.ls===S.ls,state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${x.score||0}/${a.points}`:""}</p>`
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.steps?handIns(u,a):"")
