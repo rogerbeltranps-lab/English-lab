@@ -4,7 +4,7 @@
 <style>body{font:15px system-ui,sans-serif;max-width:1400px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}h2{font-size:1.15rem}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:12px 0}.muted{color:#64748b}small{font-weight:400}
 button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}a[data-do]{color:#0f766e;cursor:pointer;text-decoration:underline dotted}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.tab{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;padding:8px 16px;font-weight:600}.tab small{color:#64748b;margin-left:4px}.tab.c2eso.on{background:#16a34a;border-color:#16a34a;color:#fff}.tab.c4eso.on{background:#2563eb;border-color:#2563eb;color:#fff}.tab.cnone.on{background:#64748b;border-color:#64748b;color:#fff}.tab.on small{color:#fff}
-.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}a.lsgo{background:#0f766e;color:#fff;border-radius:8px;padding:4px 12px;font-size:14px;font-weight:600;text-decoration:none}a.lsgo:hover{background:#115e59}
 .pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 6px;margin:1px}.ce1{background:#fce7f3;color:#9d174d}.ce2{background:#dcfce7;color:#166534}.ce3{background:#e0f2fe;color:#075985}.ce4{background:#ede9fe;color:#5b21b6}.ce5{background:#ffedd5;color:#9a3412}.ce6{background:#fef9c3;color:#854d0e}.ceC{background:#e2e8f0;color:#334155}
 table.plan td,table.plan th{text-align:left;vertical-align:top}table.plan tr.t td{background:#f1f5f9;font-weight:700}table.plan tr.now td{background:#ecfdf5}
 .tab.cplan.on{background:#0f172a;border-color:#0f172a;color:#fff}.tp{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}.tpc{border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;background:#fff}.tpc.c2eso{border-top:4px solid #16a34a}.tpc.c4eso{border-top:4px solid #2563eb}.tpc h3{margin:0 0 4px}
@@ -207,6 +207,7 @@ function render(){
   const tutors=[...new Set(inG.map(s=>s.ro&&s.ro.tutor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ca"));if(!tutors.includes(S.tutor))S.tutor="all";
   const shown=inG.filter(s=>(S.route==="all"||(level(s.uid,ls)||"none")===S.route)&&(S.tutor==="all"||s.ro&&s.ro.tutor===S.tutor));
   const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${l.title}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}</select> `:`<b>${lss[0].title}</b>${mine(lss[0])?"":" <small class=\"muted\">(not assigned to this group)</small>"} `)
+    +`<a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a> `
     +`<span class="muted">· Route:</span> `+["all","insecure","safe","daring","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"Not chosen":LV[r]}</button>`).join("")
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"");
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
@@ -300,6 +301,7 @@ function degrees(studs){const g=G(),cs=[...g.key,...g.other];
     const f=(res(s.uid,asId(S.ls)).final||{})[c],sg=suggest(s.uid,c),t=sg.mark==null?"no suggestion yet":"suggested "+sg.level+" ("+f1(sg.mark)+")";
     return `<td class="gr ${cl}" data-do="deg" data-u="${s.uid}" data-c="${esc(c)}" title="${esc(t)}">${f?deg(f)+" ✓":sg.mark==null?"–":deg(sg.level,true)+`<br><small class="muted">${f1(sg.mark)}</small>`}</td>`}).join("")+"</tr>"});
   return h+"</tbody></table>"}
+const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`;   // same path as the student board's LS buttons
 const lsGroups=id=>GR.filter(g=>g.course===(EL_LS.find(l=>l.id===id)||{}).course);
 // Criteria of the LS with their text, and the detail of one criterion
 function legend(list){const cs=[...new Set(list.flatMap(a=>a.criteria))].sort();
