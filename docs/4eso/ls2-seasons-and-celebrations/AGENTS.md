@@ -13,7 +13,7 @@ Read the [root AGENTS.md](../../../AGENTS.md) first; this file adds what is spec
 - **Readings:** one text per route in every reading (Learning Paths 1, 2, 4, 6 and the sample exam), as in the root rule.
 - **Exam listenings** (eleven_v3, voices chosen by Claude at Roger's request, 25 Oct 2026; ~3,950 credits): sample exam `audio/sample-exam-new-year.mp3` (+ `-slow`): Callum = Lewis (Scottish, `gUbIduqGzBP438teh4ZA`; his lines slowed locally to 0.85 because they came out at ~190 words a minute), Yuki = Tonia (`ui11Rd52NKH2DbWlcbvw`). The real exam's recording (Charlotte `6fZce9LFNG3iEITDfqZZ`, Leo Moreno `3l9iCMrNSRR0w51JvFB0`) is only in project files `ls2/exam/audio/`, with clips, gen.py and build.py.
 - **ElevenLabs voices for this LS** (Voice Library, model `eleven_v3` with audio tags; chosen by Roger, mixed accents): Emma = Amelia (British, `ZF6FPAbjXT4488VcRRnw`), Sam = Julian (British, `9IzcwKmvwJcw58h3KnlH`), Laia = Zara (American, `jqcCZkN6Knx8BJ5TBdYR`), Omar = Finn (American, `vBKc2FfBKJfcZNyEt1n6`), radio presenter = Clyde (British, `wyWA56cQNU2KqUW4eCsI`). Tagged scripts and per-line clips: project files `ls2/audio-v3/`.
-- Recall checkpoints count by completion; the first attempt (score and date) is sent to the dashboard as `parts.first`.
+- Recall checkpoints: the first attempt (score and date) is sent to the dashboard as `parts.first` and counts in the grammar and vocabulary block (checkpoints 1 and 4; 2 and 3 only if they raise it, see `grading.md`). The page tells students so (Roger, 25 Oct 2026); never say the score does not count.
 - Activity ids in `el-catalog.js` start with `4eso/ls2-`, and `el-cloud.js` matches pages by path, so they never clash with My Real Routine pages of the same name.
 
 ## Decision log
