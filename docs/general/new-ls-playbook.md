@@ -1,140 +1,92 @@
-# Playbook: building a new Learning Situation
+# How we build a Learning Situation
 
-How to build a new LS from Roger's programme to a live, gradable LS, in order. It is the process we followed for **4ESO LS2 Seasons & Celebrations** (Oct 2026, PRs #33–#74), with the steps we had to redo turned into decisions taken at the start.
+**The model is 4ESO LS2 *Seasons & Celebrations*.** When Roger says LS2 is finished, every new LS copies it. If Roger later changes something in LS2, the change goes into LS2, into this checklist and into the rules (`AGENTS.md`) at the same time, so the model is always LS2 as it is now. A change only becomes an exception if Roger says it is for one LS only.
 
-**Reference model:** 4ESO LS2. Docs in [docs/4eso/ls2-seasons-and-celebrations/](../4eso/ls2-seasons-and-celebrations/AGENTS.md), pages in `4eso/seasons-and-celebrations/`, private files (exam, audio sources, Word documents) in the LS project's shared folder `ls2/`. When a step below says "as in LS2", open that file and copy its structure.
+Roger does not have to answer anything in advance. For a new LS we copy LS2, and Claude only asks about what is different.
 
-**How to use it:** copy the checklist into the new LS's `AGENTS.md` (or a working note) and tick it as you go. Each phase ends with Roger's approval before the next one is built. The rules themselves live in the [root AGENTS.md](../../AGENTS.md); this playbook only says *when* each one applies.
+Parts 1–4 are for Roger, in plain language. Part 5 is the technical version for Claude.
 
----
-
-## Phase 0 · Kick-off: decide these up front
-
-Ask Roger these questions in **one** message (or decision card) before writing any content. Each one cost us a rebuild in LS2 when it was decided late.
-
-| # | Decide | Default (from LS2) | What happened in LS2 |
-| --- | --- | --- | --- |
-| 0.1 | Is the programme section for this LS **final** (objectives, criteria, competences, vocabulary, grammar, final product)? | Roger confirms the version and date. | The revised programme (24 Oct) changed the criteria after the LS was built: activities, rubric and catalogue were redone (PR #54). |
-| 0.2 | Route levels | Root AGENTS.md table (4ESO: A2/A2+ · B1 · B1/B1+; 2ESO: A1+/A2 · A2 · A2+/B1). | Levels were written down only after the first build (PRs #35–#37). |
-| 0.3 | Readings per route, listenings and videos at Safe | One reading text per route; one recording at Safe for all; questions adapt per route. | Readings were first one text for all and had to be rewritten per route (PRs #36, #38). |
-| 0.4 | Which listenings are real and which are generated | At least one real, level-appropriate video per LS; the rest scripted with ElevenLabs. | Mix agreed after the first draft. |
-| 0.5 | ElevenLabs budget and model | `eleven_v3` with audio tags; voices picked by Roger from free previews; credits estimated per script; Roger's OK for each generation. | First recordings used v2 without tags and sounded flat: all redone with v3 (PRs #48, #51, #52). |
-| 0.6 | Indicators (NA · AS · AN · AE) for every LS criterion, and which task gives evidence for each | Every criterion has at least one task with a piece of work the teacher can level. | Indicators and the "every criterion has its task" check came after the build (PR #54). |
-| 0.7 | Grading weights | Exam 35 · final product 25 · grammar and vocabulary 20 · other competences 20 (or, like LS1, only exam + final product). | Agreed after the activities were built (PR #60). |
-| 0.8 | Exam format | Roger's Word format (*Exam A* model), Google Form in quiz mode per route, /100, everything multiple choice or short gaps except the writing; sample exam on the site in the same format, taken the session before. | Exam and sample exam were rebuilt twice (PRs #70, #72). |
-| 0.9 | Final product marking | Groups of the same route; **only the video is marked in groups**; marked in **two rounds** (midway + after submitting) with a marking PDF per round; written pieces that are marked are pasted in the step. | Rounds, individual research card and pasted email came late (PR #71). |
-| 0.10 | Calendar | Dated sessions per group, exam day per group, due date per activity, term in which each mark goes (school calendar in project memory). | Plan was redone when the time plan arrived (PRs #44, #68). |
-| 0.11 | Study summary | Vocabulary + grammar summary per route as a PDF on the student board, and a teacher Word with all three routes. | Asked for at the end (PR #74). |
-| 0.12 | Who builds what | LS project: content, LS pages, data, docs. English Lab project: `teacher.html` and site-wide code. Briefs for the English Lab project are written early. | Dashboard requests (marking PDF, level buttons) waited on a paste-ready brief. |
-
-Write the answers in the new LS's `AGENTS.md` decision log (Phase 1).
+**Key:** 👤 Roger decides or approves · 🤖 Claude does it
 
 ---
 
-## Phase 1 · Set up the docs
+## 1. What a new LS copies from LS2
 
-- [ ] `git pull`; read the root `AGENTS.md`, `docs/README.md` and the reference LS's `AGENTS.md`.
-- [ ] Create `docs/<course>/ls<n>-<name>/` with `AGENTS.md` (rules + dated decision log, as in LS2) and an empty `overview.md`.
-- [ ] Add the folder to the map in `docs/README.md` and the link to the "Final Product" list in the root `AGENTS.md`.
-- [ ] Record the Phase 0 answers in the decision log.
-- [ ] Create the project-files folder `ls<n>/` (private: exam, audio sources, Word files).
+These are already decided. A new LS keeps them unless Roger says otherwise.
 
-## Phase 2 · Design and approve the content
-
-- [ ] **Organisation proposal** (doc for Roger): learning paths, what each one practises, recall checkpoints, groups week, final product steps, rough calendar.
-- [ ] Roger approves the organisation.
-- [ ] **`overview.md`**: every page with its items, tagged per route ([I] all · [S] Safe and Daring · [D] Daring only), as in LS2. Includes section 0 "Rules that apply to every page" (recall warm-up, 80 % accuracy rule, mixed practice, flashcards, a product piece at the end of each learning path).
-- [ ] Readings written **three times** (one per route, same key information) plus one extra Daring question.
-- [ ] Listening and video scripts at Safe, with questions per route.
-- [ ] Check every text and script against the route levels.
-- [ ] Roger approves `overview.md` (date it at the top). Nothing is built before this.
-
-## Phase 3 · Align activities with the criteria
-
-- [ ] `assessment-criteria.md`: each activity and step mapped to the LS criteria (by the skill it practises plus the competences its content targets).
-- [ ] `competences-grid.md`: competences × activities, and when each criterion gets its mark.
-- [ ] `indicators.md`: NA · AS · AN · AE indicators for each LS criterion (Roger's method).
-- [ ] Check: **every LS criterion has a task** whose piece of work can be levelled with its indicators. Add or change tasks where one is missing.
-- [ ] Roger approves.
-
-## Phase 4 · Build the pages
-
-- [ ] LS landing page `<ls>/index.html` following `4eso/my-real-routine/index.html` (tabs Overview, Learning Path, Language & Knowledge, Final Product); objectives and criteria from the programme.
-- [ ] Learning paths, recall checkpoints, final product, sample exam and Reflect: thin shells + `data/<page>.js` rendered by the LS engine (`ls2-engine.js` in LS2).
-- [ ] Per-route readings in data (`media.text` = `{insecure, safe, daring}`).
-- [ ] Route language: Insecure in Catalan, Safe and Daring in English; English stays the target language.
-- [ ] Answer options shuffled, flashcards as the shared set, matching rules from the root `AGENTS.md`.
-- [ ] Catalogue: activities in `shared/js/el-catalog.js` (`<course>/ls<n>-…` ids), `EL_ACTIONS`, step criteria, points; `EL_LS` entry.
-- [ ] Publishing: card on the home and course pages, link in every Learning Situations dropdown.
-- [ ] Check routes, route switching, feedback and progress; `git diff --check`; JS syntax.
-
-## Phase 5 · Listenings and videos
-
-- [ ] Choose the real videos (level-appropriate; questions general if the video could not be watched, and tell Roger).
-- [ ] For each scripted listening: show Roger the **tagged v3 script** and the estimated credits.
-- [ ] Shortlist 3–4 Voice Library voices per character; send Roger the **free previews**; he picks.
-- [ ] **Ask "OK to generate this audio now?"** and wait for his OK for that specific generation.
-- [ ] Generate one call per line, join with 0.45 s pauses, loudness-normalise; keep line clips in project files.
-- [ ] Make the **slow copy for Insecure locally** (ffmpeg `atempo=0.85`, 0.9 s pauses). Never a second paid generation.
-- [ ] Videos: MP4 (720p H.264) + `-slow.mp4` + `.vtt` subtitles + poster, in the LS `video/` folder.
-- [ ] Record voices (with ids) and credits used in the LS `AGENTS.md`.
-
-## Phase 6 · Final product and rubric
-
-- [ ] `final-product-assessment.md`: groups (same route), individual evidence, what the group makes, who presents what, how it is marked, peer assessment, rubric per route, marking rounds.
-- [ ] Final product page: steps with fields, self-assessment per statement, optional comment, teammate ratings (engine `step` panels).
-- [ ] `final-rubric-data.js`: one row per criterion with `round`, `group` (video rows only) and `video`; descriptors from `indicators.md`.
-- [ ] Word rubric (teacher guide + student rubric per route, Insecure in Catalan + video marking sheets) in project files, built from `final-rubric-data.js`.
-- [ ] Marking PDF per round: confirm the dashboard can produce it (English Lab project).
-- [ ] Roger approves rubric weights.
-
-## Phase 7 · Grading plan and teacher dashboard
-
-- [ ] `grading.md`: the LS mark, evidence per criterion, the two halves of "other competences", how levels are collected (the few one-click moments), what the dashboard needs, terms. As in LS2.
-- [ ] Roger approves.
-- [ ] `EL_GRADING[ls]` entry in `shared/js/el-grading.js` (weights, level moments, rows, evidence, indicators copied from `indicators.md`).
-- [ ] Brief for the English Lab project for anything `teacher.html` needs (paste-ready, in project files).
-
-## Phase 8 · Calendar and time plan
-
-- [ ] `EL_PLAN[ls]` in `shared/js/el-plan.js`: terms, dated sessions per group, `exam` per group, `from` per week, `due` per activity.
-- [ ] Check against the school calendar (days off, evaluation dates, exam weeks).
-
-## Phase 9 · Exam and sample exam
-
-- [ ] Exam proposal (sections, points, criteria, timing) → Roger approves.
-- [ ] Exam content in project files only (`ls<n>/exam/`: data source, Word in Roger's format + separate key, scripts). **The repo is public: no real exam content in it.**
-- [ ] Exam listening: same audio rules as Phase 5 (Roger's OK per generation); **no slow copy** for exams.
-- [ ] Sample exam on the site: same format, numbering and points, new texts, covers all the LS grammar and vocabulary, ChatGPT guide mark for the writing with the warning.
-- [ ] Google Forms: created **closed**, opened on the exam day (how they are built is Roger's call).
-
-## Phase 10 · Study summary
-
-- [ ] Teacher Word (map + all three routes) and one student PDF per route from the learning-path data (LS2 build scripts in project files `ls2/grammar-vocabulary/build/`).
-- [ ] PDFs in `<ls>/downloads/`, `study` field in `EL_LS` so the board shows the route's PDF.
-- [ ] Rebuild them whenever a learning path's vocabulary or grammar changes.
-
-## Phase 11 · Go live
-
-- [ ] PRs merged at Roger's OK (retarget stacked PRs to `main` once their base is merged).
-- [ ] Roger opens the LS in `teacher.html` (LS settings: state and groups) and enables graded activities when due.
-- [ ] Test as the tester account in the student view of each group.
-
-## Phase 12 · Keep the records
-
-Do this in every phase, not at the end:
-
-- [ ] Each decision as one dated line in the LS `AGENTS.md` decision log; generic rules in the root `AGENTS.md`. Update lines instead of adding contradicting ones.
-- [ ] Approved content dated in `overview.md`.
-- [ ] Project memory updated with where things live (project files paths, threads, open points).
-
----
-
-## Definition of done (files, as in LS2)
-
-| Where | Files |
+| Topic | How LS2 does it |
 | --- | --- |
-| `docs/<course>/ls<n>-<name>/` | `AGENTS.md`, `overview.md`, `assessment-criteria.md`, `competences-grid.md`, `indicators.md`, `final-product-assessment.md`, `grading.md` |
-| `<course>/<ls>/` | `index.html`, learning path pages, recall checkpoints, final product, sample exam, Reflect, `data/*.js`, `final-rubric-data.js`, `audio/`, `video/`, `downloads/` |
-| `shared/js/` | entries in `el-catalog.js`, `el-plan.js`, `el-grading.js`; criteria texts regenerated in `el-criteria.js` if the programme changed |
-| Project files `ls<n>/` (private) | audio sources and clips, exam (Word, key, data, audio), Word rubric, grammar and vocabulary Word, dashboard briefs |
+| Routes and levels | Three routes: Insecure, Safe and Daring, each at the level of the programme (4ESO: A2/A2+ with support · B1 · B1/B1+). Insecure instructions and help are in Catalan; Safe and Daring are in English. |
+| Readings | Each route reads its own version of the text, at its level, with the same key information. |
+| Listenings and videos | One recording for everyone, at the Safe level. Questions and help change by route. Real videos are mixed with recorded ones. |
+| Recorded audio (ElevenLabs) | Claude shows the script with its expression tags and the cost in credits, then sends free voice previews. Roger picks the voices and gives his OK for each recording. The slower copy for Insecure is always made for free. |
+| Each learning path | Recall warm-up with no notes, vocabulary and flashcards, practice (done at 80 %), grammar, mixed practice, reading or listening, and a piece of writing or speaking that is saved for the final product. |
+| Recall checkpoints | Short reviews every two weeks. They count when they are done, and the first try is recorded. |
+| Criteria | Every assessment criterion has at least one activity that gives evidence for it, and four levels (NA · AS · AN · AE) with indicators. |
+| LS mark | Exam 35 % · final product 25 % · grammar and vocabulary activities 20 % · other competences 20 %. |
+| Final product | Groups from the same route. Only the video is marked as a group; everything else is marked per student. Marked in two rounds, midway and at the end, with a marking PDF for each round. Rubric per route in Word. |
+| Exam | A Word exam in Roger's format with a separate key, used to make a Google Form per route. It is marked out of 100, and everything is multiple choice or short gaps except the writing. Exam texts and audio are kept private, never on the site. |
+| Sample exam | On the site, in the same format, taken the session before the exam so students know what to study. |
+| Study summary | A vocabulary and grammar PDF for each route, which students download from their board, and a Word copy for Roger. |
+| Calendar | Dated sessions for each group, the exam day and a due date for each activity, shown on the dashboard and the student board. |
+
+## 2. The steps, in order
+
+Each step ends with Roger's OK before the next one starts.
+
+1. **Programme.** 👤 Roger confirms that the LS section of the programme is final: objectives, criteria, competences, vocabulary, grammar and final product. 👤 Roger says anything that should be different from LS2.
+2. **Plan.** 🤖 Claude proposes the organisation: learning paths, checkpoints, when groups are formed, final product steps and a rough calendar. 👤 Roger approves it.
+3. **Content.** 🤖 Claude writes all the content for the three routes in one document: texts, questions and scripts. 👤 Roger approves it. Nothing goes on the site before this.
+4. **Criteria check.** 🤖 Claude shows which activity gives evidence for each criterion, with the indicators for each level. 👤 Roger approves it.
+5. **Site.** 🤖 Claude builds the LS pages. 👤 Roger tries them with the tester account.
+6. **Audio and videos.** 🤖 Claude sends the tagged scripts, the cost and the voice previews. 👤 Roger picks the voices and says OK for each recording. 🤖 Claude makes the slow copies for free.
+7. **Final product.** 🤖 Claude prepares the steps, groups, rubric per route (Word) and the two marking rounds. 👤 Roger approves the rubric and its weights.
+8. **Grading.** 🤖 Claude prepares the LS mark and the few moments when Roger clicks a level on the dashboard. 👤 Roger approves it. Changes to the dashboard are made by the English Lab project, so Roger may need to paste a message there.
+9. **Calendar.** 🤖 Claude dates every session, the exam day and the due dates for each group. 👤 Roger checks it on the dashboard's time plan.
+10. **Exam.** 🤖 Claude proposes the exam, then makes the Word exam, the key and the audio (private) and the sample exam on the site. 👤 Roger approves it and reviews the Word files.
+11. **Study summary.** 🤖 Claude makes the PDF for each route and the Word copy. 👤 Roger checks them.
+12. **Go live.** 👤 Roger says "ok merge". 👤 In the dashboard, Roger opens the LS for his groups and turns on graded activities when they are due.
+
+In every step, 🤖 Claude writes each decision down in the rules files (`AGENTS.md`), so both Claude projects work from the same information.
+
+## 3. When Roger changes something later
+
+- 👤 Roger asks for a change in LS2, for example a new way to mark the final product.
+- 🤖 Claude changes LS2, updates Part 1 or Part 2 of this checklist and the rules, all in the same pull request.
+- From then on, every new LS copies the new version. If the change is meant for one LS only, Roger says so and it stays out of the model.
+
+## 4. What Roger has when an LS is finished
+
+- The LS on the site for the three routes, with learning paths, checkpoints, the final product, the sample exam and Reflect.
+- On the dashboard: the plan and dates, every student's work, the level buttons and the LS mark.
+- On the student board: the week plan, late reminders and the study summary PDF.
+- In the project files (Word): the criteria and indicators, the final product rubric, the exam and its key, and the vocabulary and grammar summary.
+
+---
+
+## 5. Technical notes for Claude
+
+Read the [root AGENTS.md](../../AGENTS.md) and the [LS2 AGENTS.md](../4eso/ls2-seasons-and-celebrations/AGENTS.md) first; they hold the rules. This part says where each step leaves its files, as in LS2.
+
+**Keeping the model alive:** when a change to LS2 alters something in Part 1 or Part 2, update this file in the same PR. A rule that applies to every LS also goes in the root `AGENTS.md`.
+
+| Step | Where it goes (LS2 example) |
+| --- | --- |
+| 1 Programme | `docs/<course>/programme.md` (regenerate `shared/js/el-criteria.js` with `node tools/gen-criteria.js .` if it changes); new folder `docs/<course>/ls<n>-<name>/` with `AGENTS.md` (rules + dated decision log) and `overview.md`; add it to `docs/README.md` and the root `AGENTS.md` LS list; project-files folder `ls<n>/` for private files |
+| 2–3 Plan and content | `overview.md`, dated when approved, items tagged [I] / [S] / [D], section 0 "Rules that apply to every page" |
+| 4 Criteria | `assessment-criteria.md`, `competences-grid.md`, `indicators.md` |
+| 5 Site | `<course>/<ls>/index.html` (as `4eso/my-real-routine/index.html`), thin page shells + `data/<page>.js` rendered by the engine (`ls2-engine.js`), per-route `media.text`; `shared/js/el-catalog.js` (activities, `EL_ACTIONS`, step criteria, points, `EL_LS`); LS card on the home and course pages and in every LS dropdown |
+| 6 Audio and video | `<ls>/audio/*.mp3` + `-slow.mp3`; `<ls>/video/*.mp4` + `-slow.mp4` + `.vtt` + poster; scripts, clips and build scripts in project files; voices and credits in the LS `AGENTS.md` |
+| 7 Final product | `final-product-assessment.md`; final product page with engine `step` panels; `<ls>/final-rubric-data.js` (`round`, `group`, `video` per row); Word rubric in project files built from it |
+| 8 Grading | `grading.md`; `EL_GRADING[ls]` in `shared/js/el-grading.js`; paste-ready brief in project files for `teacher.html` changes (English Lab project) |
+| 9 Calendar | `EL_PLAN[ls]` in `shared/js/el-plan.js` (`groups`, `g`, `exam`, `from`, `due`) |
+| 10 Exam | Project files only, never in the public repo: `ls<n>/exam/` (data, `make-docx.js`, Word + key, audio with no slow copy); sample exam page + `data/sample-exam.js` on the site |
+| 11 Study summary | `<ls>/downloads/ls<n>-vocabulary-grammar-{route}.pdf`, `study` in `EL_LS`; build scripts as in project files `ls2/grammar-vocabulary/build/` |
+| 12 Go live | PRs merged at Roger's OK; retarget stacked PRs to `main` once their base is merged |
+
+**Lessons from LS2:**
+- Confirm the programme is final before building. The revised programme forced a rebuild in PR #54.
+- Write readings per route from the start. They were rewritten in PRs #36 and #38.
+- Record with `eleven_v3` and tags from the start. The v2 recordings were redone in PRs #51 and #52.
+- Agree the exam format before writing the exam. It was rebuilt in PRs #70 and #72.
+- Plan the marking rounds before the final product page. They were added late in PR #71.

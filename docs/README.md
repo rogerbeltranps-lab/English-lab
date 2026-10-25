@@ -7,7 +7,7 @@ docs/
   general/                       not tied to a course or LS
     roadmap.md                   planned clean-up of the code structure
     tasks.md                     living list of pending site tasks
-    new-ls-playbook.md           checklist for building a new LS, in order (model: 4ESO LS2)
+    new-ls-playbook.md           how we build a new LS: checklist for Roger + technical notes (model: 4ESO LS2)
   4eso/
     programme.md                 Roger's 4ESO teaching programme (all 6 LS)
     ls1-my-real-routine/
