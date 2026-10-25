@@ -65,8 +65,9 @@ const api={
   importRoster:async out=>{const gone=Object.keys(S.D.ro).filter(id=>!out[id]);if(DEMO){S.D.ro=out;return}   // replaces the whole list
     const ops=[...Object.entries(out).map(([id,o])=>b=>b.set(F.doc(db(),"roster",id),sub(Object.assign({},o)))),...gone.map(id=>b=>b.delete(F.doc(db(),"roster",id)))];
     for(let i=0;i<ops.length;i+=400){const b=F.writeBatch(db());ops.slice(i,i+400).forEach(f=>f(b));await b.commit()}},
-  setLevel:(u,ls,level)=>{if(DEMO){const l=((S.D.lv[u]=S.D.lv[u]||{})[ls]=S.D.lv[u][ls]||{});l.level=level;delete l.request;return}return put(["students",u,"levels",ls],{level,request:F.deleteField()})},
-  reject:(u,ls)=>DEMO?delete S.D.lv[u][ls].request:put(["students",u,"levels",ls],{request:F.deleteField()}),
+  // route: setting it (directly or by accepting a request) clears any request; declining keeps the route and tells the student (declined)
+  setLevel:(u,ls,level)=>{if(DEMO){const l=((S.D.lv[u]=S.D.lv[u]||{})[ls]=S.D.lv[u][ls]||{});l.level=level;delete l.request;delete l.reason;delete l.declined;return}return put(["students",u,"levels",ls],{level,request:F.deleteField(),reason:F.deleteField(),declined:F.deleteField()})},
+  reject:(u,ls)=>{const l=S.D.lv[u][ls],to=l.request;if(DEMO){delete l.request;delete l.reason;l.declined=to;return}return put(["students",u,"levels",ls],{request:F.deleteField(),reason:F.deleteField(),declined:to,declinedAt:F.serverTimestamp()})},
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
   ls:(id,o)=>DEMO?Object.assign(S.D.ls[id],o):put(["ls",id],o),
   // answer to a final-product step: results/{activity}.replies[step]; the student sees it on their page
@@ -206,7 +207,7 @@ function render(){
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
-    +`<div class="box"><h2>Learning paths and activities</h2>${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
+    +`<div class="box"><h2>Learning paths and activities</h2>${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time or to answer a route request (🔁).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
     +(G()?gradeBox(shown):"")
@@ -219,7 +220,7 @@ function todo(studs,ls,list){   // studs: signed-in students only. Only final pr
   const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
   studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>out.push(`✉️ <b>${name(s)}</b> commented on <b>${esc(t)}</b> (${esc(a.title)}): “${esc(handedIn(s.uid,a)[id].comment)}” <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button>`))));
   studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
-    if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(l.level)} → ${route(l.request)} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Reject</button>`)});
+    if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(l.level)} → ${route(l.request)}${l.reason?` · “${esc(l.reason)}”`:""} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Decline</button>`)});
   const fp=list.find(a=>a.manual),nm=fp?studs.filter(s=>!((S.D.rs[s.uid]||{})[fp.id]||{}).max).length:0;
   return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer and no route requests.</p>')
     +(fp&&nm?`<p class="muted">📝 ${nm} student${nm>1?"s":""} without a final product mark (click their Final product score to mark it).</p>`:"");
@@ -236,7 +237,7 @@ function progress(studs,list){
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
     const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}</td>`;
     if(s.away){b+=`<tr class="away">${who}<td>${route()}</td><td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
-    b+=`<tr>${who}<td>${route(level(s.uid,S.ls))}</td>`;
+    b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
       if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("");
       b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}">${c.t}</td>`;
@@ -261,7 +262,7 @@ function gradeBox(studs){
     const tip={exam:"Exam sections, score out of max (click to enter)",fp:g.fp.rows.map(r=>r.name+" "+r.w+" %: "+(lvOf(s.uid,fpA,r.step,r.c)||"–")).join("\n"),
       gv:`First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %`,other:o};
     const val={exam:B.exam,fp:B.fp,gv:B.gv.mark,other:B.other};
-    return `<tr>${who}<td>${route(level(s.uid,S.ls))}</td><td><small>${esc(teamOf(s.uid,fpA))||"–"}</small></td>`
+    return `<tr>${who}${rtCell(s.uid)}<td><small>${esc(teamOf(s.uid,fpA))||"–"}</small></td>`
       +g.blocks.map(b=>`<td class="gr" data-do="grade" data-u="${s.uid}" title="${esc(tip[b.id])}">${f1(val[b.id])}</td>`).join("")
       +`<td class="first gr tot" data-do="grade" data-u="${s.uid}">${f1(total)} ${deg(elDegree(total))}</td></tr>`}).join("");
   const key=`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: first-try accuracy of vocabulary practice, grammar, mixed practice, register, recall warm-ups and checkpoints (optional ones only if they raise it) ${g.gv.first} % + done by its session deadline (teaching plan) ${g.gv.onTime} %. Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
@@ -397,6 +398,16 @@ function degPanel(u,c){redraw=()=>degPanel(u,c);
     +`<p>Suggested: ${sg.mark==null?'<span class="muted">not enough evidence yet'+(G().evidence[c].levelOnly?" (needs a teacher level: an exam score alone never sets it)":"")+"</span>":deg(sg.level)+" ("+f1(sg.mark)+")"}</p>`
     +`<label>Degree</label>${lvBtns(`data-do="fin" data-u="${u}" data-c="${esc(c)}"`,f,c)} ${sg.mark!=null&&!f?`<button class="g" data-do="fin" data-u="${u}" data-c="${esc(c)}" data-l="${sg.level}">Confirm ${sg.level}</button>`:""}<p class="muted">${f?"Confirmed. Click it again to go back to the suggestion.":"Not confirmed yet."}</p>`);
 }
+// Route cell: click to set the student's route in this LS at any time, or to answer their request (🔁).
+const rtCell=u=>{const l=(S.D.lv[u]||{})[S.ls]||{};return `<td class="gr" data-do="rt" data-u="${u}" title="${l.request?"Asks for "+(LV[l.request]||l.request)+" · click to answer":"Click to set the route"}">${route(l.level)}${l.request?" 🔁":""}</td>`};
+function rtPanel(u){redraw=null;
+  const s=S.P[u],l=(S.D.lv[u]||{})[S.ls]||{},lsT=(EL_LS.find(x=>x.id===S.ls)||{}).title;
+  dlg(`<h3>${name(s)} · Route</h3><p class="muted">${esc(lsT)} · now ${route(l.level)}</p>`
+    +(l.request?`<div class="hand">🔁 Asks to change to ${route(l.request)}${l.reason?`<p>“${esc(l.reason)}”</p>`:'<p class="muted">No reason given.</p>'}<button data-do="acc" data-u="${u}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${u}">Decline</button></div>`
+      :l.declined?`<p class="muted">You declined their last request (${LV[l.declined]||esc(l.declined)}).</p>`:"")
+    +`<label>Set the route</label><div class="bar">${EL_LEVELS.map(x=>`<button class="${x.id===l.level?"":"g"}" data-do="setrt" data-u="${u}" data-r="${x.id}" ${x.id===l.level?"disabled":""}>${x.name}</button>`).join("")}</div>`
+    +`<p class="muted">Saved at once and clears any request. The student gets it the next time they open the LS or their board.</p>`);
+}
 function stuPanel(u){redraw=null;
   const s=S.P[u],ls=S.ls,l=level(u,ls),lsT=(EL_LS.find(x=>x.id===ls)||{}).title;
   const info=[s.email?esc(s.email):"<b>No email yet</b>: cannot sign in",s.ro&&s.ro.tutor?"Tutor: "+esc(s.ro.tutor):"",s.away?"not signed in yet":"",s.tester?"tester account":"",listed()&&!s.ro&&!s.tester?"<b>not on the student list</b>: cannot sign in":""].filter(Boolean).join(" · ");
@@ -431,7 +442,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       $("#dlg").close();act(api.saveRo(id,o,old,s&&!s.away?s.uid:null))},
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
-    acc:()=>act(api.setLevel(u,S.ls,k.to)),rej:()=>act(api.reject(u,S.ls)),
+    acc:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.to))},rej:()=>{$("#dlg").close();act(api.reject(u,S.ls))},
+    rt:()=>rtPanel(u),setrt:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.r))},
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
     // assessment: one click saves and redraws
     grade:()=>gradePanel(u),deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
