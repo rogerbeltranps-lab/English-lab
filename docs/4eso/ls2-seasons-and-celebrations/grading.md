@@ -79,7 +79,7 @@ Levels to marks: NA 2.5 · AS 5 · AN 7.5 · AE 10 · no evidence 0. Marks to le
 2. **First try:** save the first-try score of vocabulary practice, grammar, mixed practice and register steps (as checkpoints already do with `parts.first`), plus whether each step was done by its session deadline (`shared/js/el-plan.js`).
 3. **Exam marks:** a field per exam section (listening, reading, vocabulary, grammar, writing) and the writing level.
 4. **LS grade view per group:** four columns (exam 35, final product 25, grammar and vocabulary 20, other competences 20) and the weighted total; and the "result per criterion" table showing the suggested degree per criterion with its evidence, which the teacher can confirm or change.
-5. **Marking PDF per round** (requested 25 Oct 2026, not built yet): a button per class group and round that prints every student's answers for that round with the rubric rows of the round; see final-product-assessment.md section 8.
+5. **Marking PDF per round** (requested 25 Oct 2026, **built on 25 Oct 2026**: "📄 Marking PDF" on each group tab, `marking` in `el-grading.js`): a button per class group and round that prints every student's answers for that round with the rubric rows of the round; see final-product-assessment.md section 8.
 
 ## 7. Terms
 

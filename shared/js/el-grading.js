@@ -39,6 +39,11 @@ window.EL_GRADING={
         {a:FP,step:"group",name:"Group rows (the video)",c:["1.1","1.2","CC3 3.2"],group:true}
       ],
       fp:{a:FP,rows:[{step:"part",c:"3.2",name:"My part",w:40},{step:"email",c:"5.1",name:"My email",w:35},{step:"source",c:"4.2",name:"My source",w:15},{step:"team",c:"teamwork",name:"Teamwork",w:5},{step:"process",c:"process",name:"Process",w:5}]},
+      // Marking PDF per round (final-product-assessment.md section 8): the rubric rows come from the LS's rubric data by round, group and video
+      // (peers: the teammates' average goes next to that row; process: the process summary); answers = hand-ins [activity, step, {rate: also the self-check}].
+      marking:{rubric:"4eso/seasons-and-celebrations/final-rubric-data.js",process:["prep","source","contribution","part","email","team"],afterDue:["team"],
+        rounds:{1:{name:"Round 1 · Research and plan",note:"Research card and steps 0–2: My source and My research card, per student",answers:[[LP4,"card"],[FP,"prep"],[FP,"source"],[FP,"contribution"]]},
+          2:{name:"Round 2 · Video, email and teamwork",note:"Steps 3–5 with the full email, teamwork received and the process, and a video sheet per group",answers:[[FP,"part"],[FP,"email",{rate:true}],[FP,"team"]],peers:"team",process:true}}},
       // 60 % first-try accuracy + 40 % done by the session deadline (EL_PLAN[ls].due). optional: counted only if it raises the accuracy.
       gv:{first:60,onTime:40,
         items:[[LP2,"recall"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"recall"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"recall"],

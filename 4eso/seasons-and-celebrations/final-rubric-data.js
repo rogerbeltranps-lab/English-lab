@@ -5,7 +5,8 @@
    the other rows are still marked here but count in the LS's "other competences" block (20 %), so their pct is a label. Same-route groups.
    Only the video is marked in groups (Roger, 25 Oct 2026): every group row is a video row; the research card is marked per student.
    round: when the teacher marks the row (Roger, 25 Oct 2026): 1 = after step 2 (research and plan), 2 = after submitting (video, email,
-   teamwork, process). The board's marking PDF reads round, group and video from here (docs/4eso/ls2-seasons-and-celebrations/final-product-assessment.md). */
+   teamwork, process). The dashboard's marking PDF (teacher.html) reads round, group and video from here, and puts the teammates' average next to
+   the `peers` row and the process summary next to the `process` row (docs/4eso/ls2-seasons-and-celebrations/final-product-assessment.md). */
 (function () {
   const en = {
     lang: 'en', criterion: 'Criterion',
@@ -47,12 +48,12 @@
     'We name a stereotype, explain why it is unfair and point to a concrete choice in our plan that avoids it.',
     'We name one stereotype in a simple sentence with help (<i>Some people think…</i>) and say our plan avoids it, without saying why it is unfair.',
     'No stereotype named, or the pitch repeats one (images, words, costumes).'] };
-  const teamEn = { name: 'Teamwork', sub: 'Your teammates’ ratings (3.2)', pct: 5, round: 2, cells: [
+  const teamEn = { name: 'Teamwork', sub: 'Your teammates’ ratings (3.2)', pct: 5, round: 2, peers: true, cells: [
     'My teammates rate me 3.5–4 on average: I did my part on time, listened and helped to improve the work.',
     'My teammates rate me 2.5–3.4 on average.',
     'My teammates rate me 1.5–2.4 on average.',
     'My teammates rate me below 1.5, or I did not take part in the group work.'] };
-  const processEn = { name: 'My process evidence', sub: 'Steps 0–5 on this page (3.2)', pct: 5, round: 2, cells: [
+  const processEn = { name: 'My process evidence', sub: 'Steps 0–5 on this page (3.2)', pct: 5, round: 2, process: true, cells: [
     'Every step handed in on time, specific and in my own words, with an honest self-assessment.',
     'Every step handed in; one is late or very general.',
     'One or two steps are missing.',
@@ -84,12 +85,12 @@
           'Valoro bé la meva font amb dues raons adequades (qui l’ha escrit, quan, per a què, on es publica) i explico per què el grup es refia més d’una font.',
           'Valoro la meva font amb una o dues raons copiades de la llista (qui l’ha escrit, quan) i dic de quina font ens refiem més.',
           'No dono raons, o dic que una font clarament poc fiable (el blog d’una botiga, un missatge anònim) és fiable, fins i tot amb la llista.'] },
-        { name: 'Treball en equip', sub: 'Valoració dels companys (3.2)', pct: 5, round: 2, cells: [
+        { name: 'Treball en equip', sub: 'Valoració dels companys (3.2)', pct: 5, round: 2, peers: true, cells: [
           'Els companys em valoren de mitjana 3,5–4: he fet la meva part a temps, he escoltat i he ajudat a millorar la feina.',
           'Els companys em valoren de mitjana 2,5–3,4.',
           'Els companys em valoren de mitjana 1,5–2,4.',
           'Els companys em valoren per sota d’1,5, o no he participat en la feina del grup.'] },
-        { name: 'Les meves evidències', sub: 'Passos 0–5 d’aquesta pàgina (3.2)', pct: 5, round: 2, cells: [
+        { name: 'Les meves evidències', sub: 'Passos 0–5 d’aquesta pàgina (3.2)', pct: 5, round: 2, process: true, cells: [
           'He entregat tots els passos a temps, concrets i amb les meves paraules, amb una autoavaluació sincera.',
           'He entregat tots els passos; un és tard o molt general.',
           'Falten un o dos passos.',
