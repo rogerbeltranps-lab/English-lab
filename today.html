@@ -18,7 +18,7 @@ dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 3
 <style>/* Menu as on Home and English Lab: side menu on a computer, top menu on a phone */
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
 .brand{font-weight:800;letter-spacing:-.03em;font-size:1.1rem;padding:0 10px}.nvs{display:flex;flex-direction:column;gap:8px}.nv{color:#667085;text-decoration:none;padding:12px 14px;border-radius:14px;font-weight:700}.nv:hover{background:#eaf0ff;color:#3157d5}.nv.on{background:#3157d5;color:#fff}.nv.sub{padding:8px 14px 8px 26px;font-weight:600;font-size:14px}
-.page{min-width:0;max-width:1400px;padding:16px}.mtabs{display:none}.lsgo h2{margin:0 0 10px}.lsgo .row{display:flex;gap:10px;flex-wrap:wrap}.lsgo a.go{font-size:16px;padding:10px 18px;border-radius:12px}
+.page{min-width:0;max-width:1400px;padding:16px}.mtabs{display:none}.lsgo h2{margin:0 0 10px}.study{background:#f0fdf4;border-color:#bbf7d0}.study p{margin:4px 0 8px}.study .row{display:flex;gap:8px;flex-wrap:wrap}.lsgo .row{display:flex;gap:10px;flex-wrap:wrap}.lsgo a.go{font-size:16px;padding:10px 18px;border-radius:12px}
 @media (max-width:980px){.app{grid-template-columns:1fr}.side{display:none}.mtabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}.mtabs .nv{white-space:nowrap;background:#fff;border:1px solid #e5e7eb}.mtabs .nv.on{background:#3157d5;color:#fff;border-color:#3157d5}.mtabs .nv.sub{padding:12px 14px;font-weight:700}}</style>
 <nav class="mtabs nvs-m" aria-label="Menú"></nav>
 <div class="app"><aside class="side"><div class="brand">English with Roger</div><nav class="nvs" aria-label="Menú"></nav></aside>
@@ -115,10 +115,14 @@ function render(){
   const n=S.pend.length;
   $("#main").innerHTML=lateBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
     +`<div class="bar">${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${l.title}</button>`).join("")} <span class="muted">· ${t("El teu nivell:","Your level:")}</span> ${route((D.lv[ls.id]||{}).level)}${routeAsk(ls.id,st)} ${stTag}</div>`
-    +weekBox(ls,info)
+    +studyBox(ls)+weekBox(ls,info)
     +(only(ls.id)?onlyView(ls.id):`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
     +(S.view==="sum"?summary(list):lpView(list,info)));
 }
+// Vocabulary and grammar summary (Roger, 25 Oct 2026): an optional PDF per route; a student gets only their route's, the teacher and testers all three.
+function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=(D.lv[ls.id]||{}).level,a=r=>`<a class="go" href="${ls.study}${r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
+  if(!all()&&!lv)return "";
+  return `<div class="box study"><b>📚 ${t("Descarrega el resum del vocabulari i la gramàtica per estudiar-los!","Download the summary of the vocabulary and grammar to study them!")}</b><p class="muted">${t("Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. És opcional: fes-lo servir si et va bé.","All the vocabulary and then all the grammar of your route, with the explanations and practice. It is optional: use it if it helps you.")}</p><div class="row">${all()?EL_LEVELS.map(x=>a(x.id)).join(""):a(lv)}</div></div>`}
 // LS1 (Roger, 25 Oct 2026): only the final exam and the final product count, so the board shows just the LS grade (EL_GRADING[ls].only),
 // with no learning paths and no links to the LS pages, so students do not go back to the activities.
 const only=id=>((window.EL_GRADING||{})[id]||{}).only;
