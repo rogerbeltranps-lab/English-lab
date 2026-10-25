@@ -18,7 +18,8 @@ ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}
 details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>summary{font-size:.9rem;font-weight:600;color:#475569}tr.away td{color:#94a3b8;background:#f8fafc}.tag{font-size:11px;font-weight:600;background:#e2e8f0;color:#475569;border-radius:999px;padding:1px 6px;margin-left:4px}label.btn{background:#0f766e;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 8px}.form input,.form select{width:100%;box-sizing:border-box}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}
-button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6px;padding:2px 7px;margin:1px;font-size:12px;font-weight:600}button.lv.on{color:#fff}td.gr{cursor:pointer;white-space:nowrap}td.gr:hover{outline:2px solid #0f766e;outline-offset:-2px}.sug{color:#64748b;font-style:italic}.deg{font-weight:700}td.tot{font-weight:700}.dlg input.ex{width:56px}table.lvt td{text-align:left}</style></head><body>
+button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6px;padding:2px 7px;margin:1px;font-size:12px;font-weight:600}button.lv.on{color:#fff}td.gr{cursor:pointer;white-space:nowrap}td.gr:hover{outline:2px solid #0f766e;outline-offset:-2px}.sug{color:#64748b;font-style:italic}.deg{font-weight:700}td.tot{font-weight:700}.dlg input.ex{width:56px}table.lvt td{text-align:left}
+.ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
 <div class="tabs" id="tabs"></div>
@@ -30,22 +31,26 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-grading.js"></script>
+<script src="shared/js/el-points.js"></script>
 <script type="module">
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),resKey=a=>a.replace("/","__");
-const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(),D:null,P:{},zero:true};   // P: people on screen (see people()); zero: missing work counts 0 in the LS grade
+const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(),D:null,P:{},zero:true,term:elTerm()};   // P: people on screen (see people()); zero: missing work counts 0 in the LS grade; term: of the team points
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved; graded activities only if you enable them."],closed:["Closed","Students can only review what they did and the feedback."],public:["Public","Free access as before: no login and no scoring."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309",public:"#2563eb"};
 
-// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}, ro:{id:{email,group,surname1,surname2,first,tutor}}}
+// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}, ro:{id:{email,group,surname1,surname2,first,tutor}},
+//               pt:{id:{team,t1,t2,t3}}, tm:{group:{list,score,best}}}
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
+// pt, tm = team points (points/{same id as the list}, teams/{group}; shared/js/el-points.js).
 async function load(){
-  if(DEMO){DEMO.ro=DEMO.ro||{};return DEMO}
-  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{}},up=r=>r.ref.parent.parent.id;
+  if(DEMO){DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};return DEMO}
+  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{}},up=r=>r.ref.parent.parent.id;
   try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
+  try{(await F.getDocs(F.collection(db(),"points"))).forEach(p=>D.pt[p.id]=p.data());(await F.getDocs(F.collection(db(),"teams"))).forEach(t=>D.tm[t.id]=t.data())}catch(e){D.ptErr=true;console.warn("points",e)}
   (await F.getDocs(F.collection(db(),"students"))).forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()));
   (await F.getDocs(F.collectionGroup(db(),"results"))).forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data());
   (await F.getDocs(F.collectionGroup(db(),"levels"))).forEach(l=>(D.lv[up(l)]=D.lv[up(l)]||{})[l.id]=l.data());
@@ -62,8 +67,10 @@ const api={
     if(s.ro)ps.push(DEMO?S.D.ro[s.rid].group=g:put(["roster",s.rid],{group:g}));
     if(!s.away)ps.push(DEMO?S.D.st[u].group=g:put(["students",u],{group:g}));
     return Promise.all(ps)},
-  saveRo:(id,o,old,uid)=>{if(DEMO){if(old&&old!==id)delete S.D.ro[old];S.D.ro[id]=o;if(uid)S.D.st[uid].group=o.group;return}
-    const ps=[put(["roster",id],o)];if(old&&old!==id)ps.push(F.deleteDoc(F.doc(db(),"roster",old)));if(uid)ps.push(put(["students",uid],{group:o.group}));return Promise.all(ps)},
+  saveRo:(id,o,old,uid)=>{const po=old&&old!==id&&S.D.pt[old];   // a new id (an email for a pending student) takes the team points along
+    if(DEMO){if(old&&old!==id)delete S.D.ro[old];S.D.ro[id]=o;if(uid)S.D.st[uid].group=o.group;if(po){S.D.pt[id]=po;delete S.D.pt[old]}return}
+    const ps=[put(["roster",id],o)];if(old&&old!==id)ps.push(F.deleteDoc(F.doc(db(),"roster",old)));if(uid)ps.push(put(["students",uid],{group:o.group}));
+    if(po)ps.push(put(["points",id],Object.assign({},po)),F.deleteDoc(F.doc(db(),"points",old)));return Promise.all(ps)},
   delRo:id=>DEMO?delete S.D.ro[id]:F.deleteDoc(F.doc(db(),"roster",id)),
   importRoster:async out=>{const gone=Object.keys(S.D.ro).filter(id=>!out[id]);if(DEMO){S.D.ro=out;return}   // replaces the whole list
     const ops=[...Object.entries(out).map(([id,o])=>b=>b.set(F.doc(db(),"roster",id),sub(Object.assign({},o)))),...gone.map(id=>b=>b.delete(F.doc(db(),"roster",id)))];
@@ -220,6 +227,7 @@ function render(){
     +(G()&&!G().only?gradeBox(shown):"")
     +(G()&&G().only?"":`<div class="box">${G()&&G().evidence?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
       :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`)
+    +pointsBox(S.g)
     +`<div class="box">${fold("settings","LS status and graded activities",lsSettings(ls))}</div>`+rosterBox();
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
 }
@@ -231,6 +239,34 @@ function todo(studs,ls,list){   // studs: signed-in students only. Only final pr
   const fp=list.find(a=>a.manual),nm=fp?studs.filter(s=>!((S.D.rs[s.uid]||{})[fp.id]||{}).max).length:0;
   return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer and no route requests.</p>')
     +(fp&&nm?`<p class="muted">📝 ${nm} student${nm>1?"s":""} without a final product mark (click their Final product score to mark it).</p>`:"");
+}
+// ---- team points (shared/js/el-points.js; root AGENTS.md "Team points"): the group's teams and each student's points per term.
+// The class presentations add the points (signed in, with the group chosen); here the teacher makes the teams, puts each student in one
+// and corrects one student's points (an absent student, a mistake). A change also saves the group's best of the term
+// (teams/{group}.best), which the student board needs for the bonus.
+const pkey=s=>s.rid||(s.email||"").toLowerCase(),ptOf=s=>S.D.pt[pkey(s)]||{},ptOn=s=>+ptOf(s)[S.term]||0;
+const ptStuds=g=>Object.values(S.P).filter(s=>s.group===g&&!s.tester&&pkey(s)).sort(byName);
+const ptBest=g=>Math.max(0,...ptStuds(g).map(ptOn));
+const pt={
+  team:(k,id)=>{const p=(S.D.pt[k]=S.D.pt[k]||{});if(id)p.team=id;else delete p.team;return put(["points",k],{team:id||(DEMO?null:F.deleteField())})},
+  list:(g,list)=>{(S.D.tm[g]=S.D.tm[g]||{}).list=list;return put(["teams",g],{list})},
+  add:(k,g,d)=>{const p=(S.D.pt[k]=S.D.pt[k]||{}),term=S.term;p[term]=Math.max(0,(+p[term]||0)+d);const best=ptBest(g),t=(S.D.tm[g]=S.D.tm[g]||{});t.best=Object.assign({},t.best,{[term]:best});
+    if(DEMO)return null;const b=F.writeBatch(db());b.set(F.doc(db(),"points",k),sub({[term]:F.increment(d)}),{merge:true});b.set(F.doc(db(),"teams",g),sub({best:{[term]:best}}),{merge:true});return b.commit()}
+};
+function pointsBox(g){
+  const studs=ptStuds(g),term=S.term,tm=S.D.tm[g]||{},list=tm.list||[],best=ptBest(g),now=elTerm(),free=studs.filter(s=>!list.some(t=>t.id===ptOf(s).team)).length;
+  const terms=EL_TERMS.map(t=>`<button class="chip ${t.id===term?"on":""}" data-do="ptterm" data-t="${t.id}">${t.en}${t.id===now?" · now":""}</button>`).join("");
+  const teams=list.map(t=>{const n=studs.filter(s=>ptOf(s).team===t.id).length,sc=((tm.score||{})[term]||{})[t.id]||0;
+    return `<span class="ptteam"><input value="${esc(t.name)}" data-do="ptname" data-id="${esc(t.id)}" aria-label="Team name" maxlength="30"><small class="muted">${n} student${n===1?"":"s"} · ${sc} on the presentations</small><button class="g" data-do="ptdel" data-id="${esc(t.id)}" title="Remove this team">✕</button></span>`}).join("");
+  const sel=s=>`<select data-do="pteam" data-k="${esc(pkey(s))}" aria-label="Team"><option value="">–</option>${list.map(t=>`<option value="${esc(t.id)}" ${ptOf(s).team===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}</select>`;
+  const rows=studs.map(s=>{const p=ptOn(s),k=esc(pkey(s));return `<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td><td>${sel(s)}</td><td class="ptn"><button class="lv" data-do="ptadd" data-k="${k}" data-d="-1" ${p>0?"":"disabled"} aria-label="Remove a point">−</button> <b>${p}</b> <button class="lv" data-do="ptadd" data-k="${k}" data-d="1" aria-label="Add a point">+</button></td><td><b>+${elNum(elBonus(p,best))}</b></td></tr>`}).join("");
+  const body=(S.D.ptErr?'<p><b>The team points could not be read.</b> Publish the Firestore rules (they publish when the change reaches main) and reload.</p>':"")
+    +`<p class="muted">Points from the class presentations: open 🏆 Teams there, signed in with this account, and choose ${esc(GR.find(x=>x.id===g).name)}; every + gives a point to each member of the team. Bonus on the term grade = ${elNum(EL_POINTS_BONUS)} × the student's points ÷ the best student's points in the group (${best} in ${elTermName(term)}), so it only adds; every term starts at 0. A change here (an absent student, a mistake) is for that student only. Students see their team, their points and their bonus on their board.</p>`
+    +`<div class="bar"><span class="muted">Term:</span> ${terms}</div>`
+    +`<div class="bar"><span class="muted">Teams:</span> ${teams||'<span class="muted">none yet.</span>'} <button data-do="ptnew">+ Add a team</button></div>`
+    +(studs.length?`<div class="ptwrap"><table class="pts"><thead><tr><th class="stu">Student</th><th>Team</th><th>Points</th><th>Bonus</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<p class="muted">No students in this group.</p>')
+    +(list.length&&free?`<p class="muted">${free} student${free===1?"":"s"} without a team.</p>`:"");
+  return `<div class="box">${fold("points",`Team points <small class="muted">· ${elTermName(term)} · best ${best}</small>`,body)}</div>`;
 }
 function progress(studs,list){
   const open=a=>!S.folded.has(a.id)&&steps(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
@@ -495,6 +531,11 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
     status:()=>{if(k.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;act(api.ls(S.ls,{status:k.s}))},
     assign:()=>{const l=EL_LS.find(x=>x.id===S.ls),info=S.D.ls[S.ls],set=new Set(lsGroups(S.ls).filter(g=>elLsForGroup(l,info,g.id)).map(g=>g.id));set.has(k.g)?set.delete(k.g):set.add(k.g);act(api.ls(S.ls,{groups:[...set]}))},
+    ptterm:()=>{S.term=k.t;render()},ptadd:()=>quick(pt.add(k.k,S.g,+k.d)),
+    ptnew:()=>{const list=[...((S.D.tm[S.g]||{}).list||[])],n=Math.max(0,...list.map(x=>+x.id.split("-").pop()||0))+1;list.push({id:S.g+"-"+n,name:"Team "+n});quick(pt.list(S.g,list))},
+    ptdel:()=>{const list=(S.D.tm[S.g]||{}).list||[],x=list.find(y=>y.id===k.id),ms=ptStuds(S.g).filter(s=>ptOf(s).team===k.id);
+      if(!x||!confirm(`Remove ${x.name}?`+(ms.length?` Its ${ms.length} student${ms.length===1?"":"s"} will have no team; their points stay.`:"")))return;
+      quick([pt.list(S.g,list.filter(y=>y.id!==k.id)),...ms.map(s=>pt.team(pkey(s),""))])},
     enable:()=>{const set=new Set(S.D.ls[S.ls].enabled);set.has(k.a)?set.delete(k.a):set.add(k.a);act(api.ls(S.ls,{enabled:[...set]}))}
   })[k.do]?.()});
 $("#dlg").addEventListener("close",()=>redraw=null);
@@ -503,6 +544,8 @@ document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
   if(k.do==="import"&&t.files[0])importList(t.files[0]).catch(x=>alert("Could not read the file: "+x.message)).finally(()=>t.value="");
   if(k.do==="ls"){S.ls=t.value;render()}
   if(k.do==="group"&&t.value)act(api.setGroup(k.u,t.value)).then(()=>$("#dlg").open&&stuPanel(k.u));
+  if(k.do==="pteam")quick(pt.team(k.k,t.value));
+  if(k.do==="ptname"){const v=t.value.replace(/\s+/g," ").trim().slice(0,30);quick(pt.list(S.g,((S.D.tm[S.g]||{}).list||[]).map(x=>x.id===k.id?Object.assign({},x,{name:v||x.name}):x)))}
   if(k.do==="setroute"&&t.value)act(api.setLevel(k.u,S.ls,t.value)).then(()=>stuPanel(k.u))});
 
 const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;S.D=await load();render()};

@@ -1,9 +1,9 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function school() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@(ietramuntana[.]cat)$'); }  // add schools: (ietramuntana[.]cat|newschool[.]cat) and in shared/js/el-cloud.js DOMAINS
+    function school() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@(ietramuntana[.]cat)$'); }  // add schools: (ietramuntana[.]cat|newschool[.]cat) and in shared/js/el-firebase.js DOMAINS
     function myEmail() { return request.auth.token.email.lower(); }
-    // testers: school accounts that work as students but reach every LS (also in shared/js/el-cloud.js TESTERS)
+    // testers: school accounts that work as students but reach every LS (also in shared/js/el-firebase.js TESTERS)
     function isTester() { return school() && myEmail() in ['roger.beltran@ietramuntana.cat']; }
     // students: only school accounts on the teacher's student list (roster/{email}), plus testers
     function roster() { return /databases/$(database)/documents/roster/$(myEmail()); }
@@ -26,6 +26,17 @@ service cloud.firestore {
     // student list: doc id = school email in lower case; {group, surname1, surname2, first, tutor, email}. Written only by the teacher (dashboard import).
     match /roster/{email} {
       allow read: if isTeacher() || (school() && email == myEmail());
+      allow write: if isTeacher();
+    }
+    // team points (shared/js/el-points.js): points/{email in lower case} = {team, t1, t2, t3}, written by the teacher (class presentations
+    // and dashboard); each student reads their own. teams/{group} = {list, score, best}: team names and scores, no personal data,
+    // so the group's students read it.
+    match /points/{email} {
+      allow read: if isTeacher() || (school() && email == myEmail());
+      allow write: if isTeacher();
+    }
+    match /teams/{group} {
+      allow read: if isTeacher() || (signedIn() && (isTester() || rosterGroup() == group));
       allow write: if isTeacher();
     }
     match /students/{uid} {

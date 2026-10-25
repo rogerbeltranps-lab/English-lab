@@ -239,19 +239,14 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
 .pick label{font-size:.8em;color:var(--muted);display:flex;gap:.5em;align-items:center}
 .pick input{width:4em;font:600 1em var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.2em .4em}
 
-/* timer and team points */
+/* timer */
 .tpill{position:fixed;z-index:40;right:max(16px,env(safe-area-inset-right,0px));bottom:5em;display:flex;flex-wrap:wrap;gap:.4em .5em;align-items:center;justify-content:flex-end;max-width:calc(100vw - 32px);background:var(--surface);border:2px solid var(--accent);border-radius:18px;padding:.45em .7em;box-shadow:0 8px 24px rgba(0,0,0,.14)}
 .tpill .t{font:800 2.3em/1 var(--f-display);font-variant-numeric:tabular-nums;min-width:2.6em;text-align:center}
 .tpill.up{border-color:var(--no)}
 .tpill.up .t{color:var(--no);animation:pop .5s}
-.tpill .chip,.team button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:.2em .6em;font:600 .7em var(--f-body)}
+.tpill .chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:.2em .6em;font:600 .7em var(--f-body)}
 .tpill .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.teambar{display:flex;gap:.5em;align-items:center;padding:.4em max(16px,env(safe-area-inset-right,0px)) .4em max(16px,env(safe-area-inset-left,0px));background:var(--surface);border-top:1px solid var(--line);overflow-x:auto}
-.team{display:flex;align-items:center;gap:.35em;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:.25em .5em;flex:1 1 0;min-width:9.5em}
-.team input{flex:1;min-width:0;border:0;background:transparent;font:600 .8em var(--f-body);color:var(--ink)}
-.team .sc{font:800 1.5em var(--f-display);font-variant-numeric:tabular-nums;min-width:1.3em;text-align:center}
-.team button{width:2em;height:2em;padding:0;border-radius:50%;font-size:.8em}
-.teambar select{font:600 .75em var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.2em}
+/* the team points strip (#teambar) is styled by shared/js/el-deck-points.js */
 
 /* category tooltip */
 .gtip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:var(--bg);font:600 14px/1.3 var(--f-body);letter-spacing:.02em;padding:.35em .7em;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);white-space:nowrap;max-width:calc(100vw - 16px)}
@@ -313,6 +308,9 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
     </div>
   </div>
 </section>
+
+<!-- team points: the reminder every presentation shows (filled by shared/js/el-deck-points.js) -->
+<section class="slide" data-el-points data-title="Team points"></section>
 
 <!-- customs = Present Simple -->
 <section class="slide" data-title="Which form fits?">
@@ -559,7 +557,7 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
 
 </main>
 
-<div class="teambar" id="teambar" hidden aria-label="Team points"></div>
+<div class="teambar" id="teambar" data-course="4eso" hidden aria-label="Team points"></div>
 <footer class="bottom">
   <button class="navbtn back" id="prev" type="button" data-ca="← Enrere">← Back</button>
   <div class="mid">
@@ -595,6 +593,8 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
 </div>
 
 <script src="../../shared/js/learning-path-support.js"></script>
+<script src="../../shared/js/el-points.js"></script>
+<script src="../../shared/js/el-deck-points.js"></script>
 <script>
 (function(){
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -751,7 +751,7 @@ stage.addEventListener('click',e=>{
   const c=e.target.closest('.xcard[data-open]');
   if(c&&!c.closest('.later')){const t=st[cur];if(+c.dataset.open<=t.b)return;if(t.man.has(c))t.man.delete(c);else t.man.add(c);apply(cur);return}
   const g=e.target.closest('.go321');
-  if(g){if(g.dataset.timer)showTimer(+g.dataset.timer,true);else if(g.hasAttribute('data-pick'))openPick();else if(g.hasAttribute('data-teams'))toggleTeams(true);else countdown(g.dataset.say)}
+  if(g){if(g.dataset.timer)showTimer(+g.dataset.timer,true);else if(g.hasAttribute('data-pick'))openPick();else if(g.hasAttribute('data-teams'))ELDeckPoints.toggle(true);else countdown(g.dataset.say)}
 });
 
 /* ---------- Catalan, full screen, keys ---------- */
@@ -825,25 +825,7 @@ $$('#tpill [data-sec]').forEach(c=>c.onclick=()=>showTimer(+c.dataset.sec,false)
 $('#timerBtn').onclick=()=>$('#tpill').hidden?showTimer(total,false):closeTimer();
 addEventListener('resize',()=>{if(!$('#tpill').hidden)placeTimer()});
 
-/* ---------- team points ---------- */
-const teams=store.get('teams',null)||{n:4,names:[],score:[0,0,0,0,0,0]};
-function drawTeams(){
-  const bar=$('#teambar');
-  bar.innerHTML=[...Array(teams.n).keys()].map(t=>`<div class="team"><input id="teamName${t}" value="${esc(teams.names[t]||'Team '+(t+1))}" aria-label="Team ${t+1} name"><button type="button" data-team="${t}" data-d="-1" aria-label="Remove a point">−</button><span class="sc">${teams.score[t]||0}</span><button type="button" data-team="${t}" data-d="1" aria-label="Add a point">+</button></div>`).join('')
-    +`<select id="teamCount" aria-label="Number of teams">${[2,3,4,5,6].map(n=>`<option value="${n}"${n===teams.n?' selected':''}>${n}</option>`).join('')}</select><button type="button" class="tool" id="teamsZero">${B('Reset','Zero')}</button>`;
-}
-function toggleTeams(on){const bar=$('#teambar');bar.hidden=on===undefined?!bar.hidden:!on;$('#teamsBtn').setAttribute('aria-pressed',String(!bar.hidden));store.set('teamsOn',!bar.hidden);if(!$('#tpill').hidden)placeTimer()}
-$('#teambar').addEventListener('click',e=>{
-  const b=e.target.closest('[data-team]');
-  if(b){const t=+b.dataset.team;teams.score[t]=Math.max(0,(teams.score[t]||0)+ +b.dataset.d);b.parentNode.querySelector('.sc').textContent=teams.score[t];store.set('teams',teams)}
-  if(e.target.closest('#teamsZero')){teams.score=[0,0,0,0,0,0];store.set('teams',teams);drawTeams()}
-});
-$('#teambar').addEventListener('change',e=>{
-  if(e.target.id==='teamCount'){teams.n=+e.target.value;store.set('teams',teams);drawTeams();if(!$('#tpill').hidden)placeTimer()}
-  else if(e.target.id&&e.target.id.startsWith('teamName')){teams.names[+e.target.id.slice(8)]=e.target.value;store.set('teams',teams)}
-});
-$('#teamsBtn').onclick=()=>toggleTeams();
-drawTeams();toggleTeams(!!store.get('teamsOn',false));
+/* team points: shared/js/el-deck-points.js (the 🏆 Teams strip, saved for the class group when the teacher is signed in) */
 
 /* ---------- category tooltip: hover or tap a coloured word ---------- */
 const CAT={end:['-s for he / she / it','terminació -s'],subj:['subject','subjecte'],aux:['do / does · am / is / are','auxiliar'],verb:['verb','verb'],chunk:['fixed chunk: learn it as one block','frase fixa: aprèn-la com un bloc'],pon:['preposition of time','preposició de temps'],pin:['preposition of time','preposició de temps'],pat:['preposition of time','preposició de temps']};
