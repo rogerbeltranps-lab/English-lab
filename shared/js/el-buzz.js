@@ -11,13 +11,13 @@ const css=`.elbz{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;
 .elbz button.bz:active{transform:translateY(6px);box-shadow:0 2px 0 #991b1b}
 .elbz button.bz:disabled{opacity:.6;cursor:default}
 .elbz .bzsnd{position:absolute;top:8px;right:max(10px,env(safe-area-inset-right,0px));width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:18px;cursor:pointer}
-.elbz .bzmsg{font-size:19px;font-weight:800}.elbz .bzmsg.win{color:#fde047}.elbz small{color:#cbd5e1;font-weight:500}`;
+.elbz .bzmsg{font-size:19px;font-weight:800;padding-inline:44px}.elbz .bzmsg.win{color:#fde047}.elbz small{color:#cbd5e1;font-weight:500}`;
 export function buzzer({S,db,group,team,names,t,el}){
   if(!document.getElementById("el-buzz-css")){const st=document.createElement("style");st.id="el-buzz-css";st.textContent=css;document.head.append(st)}
   el.classList.add("elbz");el.hidden=true;
   const ref=S.doc(db,"buzz",group),name=id=>String(names[id]||id).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   let z=null,busy=false,mine=null,first=true;   // mine: the round (q) this device won
-  const snd=n=>window.ELSound&&ELSound.play(n),sndBtn=()=>window.ELSound?`<button type="button" class="bzsnd" aria-label="${ELSound.on()?t("So activat","Sound on"):t("So desactivat","Sound off")}" title="${ELSound.on()?t("So activat","Sound on"):t("So desactivat","Sound off")}">${ELSound.on()?"🔊":"🔇"}</button>`:"";
+  const snd=n=>window.ELSound&&ELSound.play(n),sndBtn=()=>window.ELSound?`<button type="button" class="bzsnd" aria-label="${ELSound.on()?"Sound on":"Sound off"}" title="${ELSound.on()?"Sound on":"Sound off"}">${ELSound.on()?"🔊":"🔇"}</button>`:"";
   const draw=()=>{
     el.hidden=!(z&&z.open);if(el.hidden)return;
     const bar=document.getElementById("el-cloud-bar");   // the site's bottom bar (sign out) stays on top: keep the text above it
