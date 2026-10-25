@@ -36,9 +36,11 @@ var LS2 = (function () {
   function save() { localStorage.setItem(LP.key, JSON.stringify(state)); localStorage.setItem(LP.key + 'Level', level); progress(); }
   // doneAt[k]: when the step was first completed; tries[k]: the first check of an auto-corrected step. The teacher dashboard
   // uses them for the grammar and vocabulary block (first try + done by the session deadline in el-plan.js).
+  // last[k]: the latest check, shown on the dashboard next to the first try (never counted).
   function complete(k) { if (!state.done[k]) { state.done[k] = true; stamp(k); save(); } else progress(); }
   function stamp(k) { state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = new Date().toISOString(); }
-  function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) { state.tries[k] = { score, max, level, date: new Date().toISOString() }; save(); } }
+  function lastTry(k, score, max) { state.last = state.last || {}; state.last[k] = { score, max, level, date: new Date().toISOString() }; }
+  function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) state.tries[k] = { score, max, level, date: new Date().toISOString() }; lastTry(k, score, max); save(); }
   function steps() { return LP.panels.flatMap(p => p.type === 'info' || p.type === 'summary' ? [] : p.type === 'vocab' ? (p.practice ? ['cards', 'practice'] : ['cards']) : [p.id]); }
   function progress() {
     const s = steps(), n = s.filter(k => state.done[k]).length;
@@ -95,6 +97,7 @@ var LS2 = (function () {
         const s = checkTyped(items, p.id, true);
         state.first = state.first || {};
         if (!state.first[level]) state.first[level] = { score: s, max: items.length, date: new Date().toISOString() };
+        lastTry(p.id, s, items.length); save();
         const el = $('#' + p.id + 'Result');
         el.textContent = s + ' / ' + items.length + (ca() ? ' correctes · Pas completat ✓ Llegeix el feedback de les que has fallat.' : ' correct · Step complete ✓ Read the feedback for the ones you missed.');
         el.classList.add('show');

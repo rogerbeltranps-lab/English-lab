@@ -141,7 +141,14 @@ const deg=(l,sug)=>l?`<span class="deg ${sug?"sug":""}" style="${sug?"":"color:"
 function lvOf(u,id,step,c){const x=res(u,id),l=((x.levels||{})[step]||{})[c];return step==="group"&&(x.down||{})[c]?elDegreeDown(l):l}
 // first try of an auto-corrected step (tries, saved by the page); recall warm-ups and checkpoints keep theirs in `first` (per route)
 function firstOf(u,id,step){const a=byId(id);if(!a)return null;const st=pstate(u,a),t=(st.tries||{})[step];if(t)return t;
-  if(step==="recall"||step==="check"){const f=st.first||{};return f[level(u,a.ls)]||Object.values(f)[0]||(res(u,id).parts||{}).first||null}return null}
+  if(step==="recall"||step==="check"){const f=st.first||st.recall||{};return f[level(u,a.ls)]||Object.values(f)[0]||(res(u,id).parts||{}).first||null}return null}
+// latest check of a step (`last`, saved by LS2 pages): shown next to the first try, never counted
+const lastOf=(u,id,step)=>{const a=byId(id);return a?(pstate(u,a).last||{})[step]||null:null};
+const trySc=t=>t.score+"/"+t.max,same=(f,l)=>!f||!l||(f.score===l.score&&f.max===l.max);
+// step cell: first try → latest ("1/8 → 7/8"), one score when they are the same
+function tryCell(u,id,k){const f=firstOf(u,id,k),l=lastOf(u,id,k);if(!f&&!l)return "";
+  const tip=(f?"First try "+trySc(f)+"":"")+(l?(f?" · ":"")+"latest "+trySc(l)+(l.date?" on "+ymd(l.date):""):"");
+  return `<br><small title="${tip}">${same(f,l)?trySc(f||l):trySc(f)+" → "+trySc(l)}</small>`}
 const doneAt=(u,id,step)=>{const a=byId(id),st=a?pstate(u,a):{};return st.done&&st.done[step]?((st.doneAt||{})[step]||true):null};
 const ymd=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 function dueOf(id,g){const p=(window.EL_PLAN||{})[S.ls],gr=GR.find(x=>x.id===g);if(!p||!p.due||!p.due[id]||!gr)return null;
@@ -246,7 +253,7 @@ function progress(studs,list){
     if(s.away){b+=`<tr class="away">${who}<td>${route()}</td><td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
     b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
-      if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("");
+      if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}${tryCell(s.uid,a.id,k)}</td>`).join("");
       b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}">${c.t}</td>`;
       if(a.graded&&x&&x.max){ts+=x.score||0;tm+=x.max}});
     b+=`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td></tr>`});
@@ -456,7 +463,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
   const gx=!!G()&&!G().only&&a.ls===S.ls,state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${x.score||0}/${a.points}`:""}</p>`
-    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
+    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.steps?handIns(u,a):"")
     +levelRows(u,a)
     +(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
