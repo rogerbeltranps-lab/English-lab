@@ -1,5 +1,6 @@
 // English Lab cloud: Google sign-in (school domain), per-LS progress sync, LS release gate,
 // route (level) choice, teacher-enabled graded activities, once-only activities, points per completed action.
+import "./el-copyright.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
