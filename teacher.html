@@ -82,7 +82,10 @@ function patch(u,id,o){o=Object.assign({ls:S.ls,activity:id},o);const r=(S.D.rs[
 function quick(ps){Promise.all([].concat(ps)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});render();again()}
 
 // ---- helpers
-const fullName=s=>s.ro&&s.ro.surname1?[s.ro.surname1,s.ro.surname2].filter(Boolean).join(" ")+", "+s.ro.first:s.name||s.email||s.uid;
+// The tester is not on the student list, so its Google name ("Roger Beltran Porres") would not follow "Surname1 Surname2, First"
+const TESTER_NAME={surname1:"Beltran",surname2:"Porres",first:"Roger"};
+const nameOf=s=>s.ro&&s.ro.surname1?s.ro:s.tester?TESTER_NAME:null;
+const fullName=s=>{const n=nameOf(s);return n?[n.surname1,n.surname2].filter(Boolean).join(" ")+", "+n.first:s.name||s.email||s.uid};
 const name=s=>esc(fullName(s));
 const norm=x=>String(x??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
 const listed=()=>Object.keys(S.D.ro).length>0,isTester=s=>!DEMO&&ELCloud.isTester(s);
@@ -109,7 +112,7 @@ const pts=a=>a.graded?(a.manual?"teacher mark":a.points+" pts"):"not graded";
 const handedIn=(u,a)=>{try{return JSON.parse(((S.D.pg[u]||{})[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){return {}}};
 const unanswered=(u,a)=>{if(!a.steps)return [];const h=handedIn(u,a),rp=((S.D.rs[u]||{})[a.id]||{}).replies||{};return a.steps.filter(([id])=>h[id]&&h[id].comment&&!rp[id])};
 const actTitle=id=>(cat.find(a=>a.id===id)||{}).title||id;
-const sortKey=s=>s.ro&&s.ro.surname1?[s.ro.surname1,s.ro.surname2||"",s.ro.first||""]:[s.name||s.email||"","",""];
+const sortKey=s=>{const n=nameOf(s);return n?[n.surname1,n.surname2||"",n.first||""]:[s.name||s.email||"","",""]};
 const byName=(x,y)=>{const a=sortKey(x),b=sortKey(y);for(let i=0;i<3;i++){const c=a[i].localeCompare(b[i],"ca",{sensitivity:"base"});if(c)return c}return 0};   // by first surname
 function cell(u,a){ // text + class of an activity's score cell
   const x=(S.D.rs[u]||{})[a.id],d=doneSet(u,a);
