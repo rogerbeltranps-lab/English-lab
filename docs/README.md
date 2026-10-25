@@ -32,3 +32,10 @@ docs/
 ```
 
 **For each new LS:** follow [general/new-ls-playbook.md](general/new-ls-playbook.md). In short: create `docs/<course>/ls<n>-<name>/` with an `AGENTS.md` (rules for that LS plus a dated decision log) and an `overview.md` (the approved content). Decisions that apply to every LS go in the root AGENTS.md; decisions for one LS go in its own AGENTS.md.
+
+## Reference documents
+
+Roger's reference documents, the ones every new LS follows. Word copies are in the LS project's files, folder `reference/`.
+
+- [How we build a Learning Situation](general/new-ls-playbook.md): the checklist for a new LS, with 4ESO LS2 as the model.
+- [Worked example: from competence to LS criterion](https://claude.ai/artifact/RLZP7UdTgREkiT7MJgCFAR): how a competence becomes an LS criterion with its indicators, plus the 4ESO LS2 assessment example.
