@@ -423,8 +423,8 @@ var LS2 = (function () {
   const ptsOf = (p, q) => q.p || (q.o ? p.pts[0] : p.pts[1]);
   const maxOf = p => p.type === 'quiz' ? forLevel(p.items).reduce((t, q) => t + ptsOf(p, q), 0) : p.max;
   const ptsWord = n => n + ' ' + (ca() ? (n === 1 ? 'punt' : 'punts') : (n === 1 ? 'point' : 'points'));
-  const aiWarning = () => ca() ? '⚠️ ChatGPT es pot equivocar: la seva nota només és orientativa. A l’examen real, el quadre, el log i el correu els corregeix el professorat.'
-    : '⚠️ ChatGPT can make mistakes: its mark is only a guide. In the real exam, your teacher marks the chart, the log and the email.';
+  const aiWarning = () => ca() ? '⚠️ ChatGPT es pot equivocar: la seva nota només és orientativa. A l’examen real, el correu el corregeix el professorat.'
+    : '⚠️ ChatGPT can make mistakes: its mark is only a guide. In the real exam, your teacher marks the email.';
   // Multiple choice ({q, o}: first option right, shown shuffled) and gaps ({q, a}) in one list, each with its points.
   R.quiz = p => ({
     html: '<div class="section-card">' + mediaHtml(p) + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button></div><div class="result" id="' + p.id + 'Result"></div></div>',
@@ -461,7 +461,7 @@ var LS2 = (function () {
       };
     }
   });
-  // An open task (listening chart, reading log, email): the student writes, then ChatGPT gives feedback and an orientative mark
+  // An open task (for example the sample exam's email): the student writes, then ChatGPT gives feedback and an orientative mark
   // with the criterion's levels; the student can note that mark for the summary.
   function markPrompt(p, text) {
     const lv = { insecure: 'Insecure (A2 / A2+, amb suport)', safe: 'Safe (B1)', daring: 'Daring (B1 / B1+)' }[level];
