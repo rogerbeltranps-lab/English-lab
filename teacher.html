@@ -6,7 +6,9 @@ button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.tab{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;padding:8px 16px;font-weight:600}.tab small{color:#64748b;margin-left:4px}.tab.c2eso.on{background:#16a34a;border-color:#16a34a;color:#fff}.tab.c4eso.on{background:#2563eb;border-color:#2563eb;color:#fff}.tab.cnone.on{background:#64748b;border-color:#64748b;color:#fff}.tab.on small{color:#fff}
 .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}
 .pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 6px;margin:1px}.ce1{background:#fce7f3;color:#9d174d}.ce2{background:#dcfce7;color:#166534}.ce3{background:#e0f2fe;color:#075985}.ce4{background:#ede9fe;color:#5b21b6}.ce5{background:#ffedd5;color:#9a3412}.ce6{background:#fef9c3;color:#854d0e}.ceC{background:#e2e8f0;color:#334155}
-table.plan td,table.plan th{text-align:left;vertical-align:top}table.plan tr.t td{background:#f1f5f9;font-weight:700}.hand{background:#f8fafc;border-radius:8px;padding:4px 10px;margin:4px 0;white-space:pre-wrap}.hand p{margin:.3em 0}
+table.plan td,table.plan th{text-align:left;vertical-align:top}table.plan tr.t td{background:#f1f5f9;font-weight:700}table.plan tr.now td{background:#ecfdf5}
+.tab.cplan.on{background:#0f172a;border-color:#0f172a;color:#fff}.tp{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}.tpc{border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;background:#fff}.tpc.c2eso{border-top:4px solid #16a34a}.tpc.c4eso{border-top:4px solid #2563eb}.tpc h3{margin:0 0 4px}
+.exam{display:inline-block;background:#fef2f2;color:#991b1b;border-radius:10px;padding:4px 10px;font-weight:700;margin:4px 0}.exam.past{background:#f1f5f9;color:#475569}.wk{margin:8px 0}.wk b{display:block}.wk .s{white-space:pre-line}.wk .n{color:#b45309;font-size:13px}ul.due{margin:4px 0;padding-left:18px}ul.due li{margin:3px 0}.late{color:#b91c1c;font-weight:600}.hand{background:#f8fafc;border-radius:8px;padding:4px 10px;margin:4px 0;white-space:pre-wrap}.hand p{margin:.3em 0}
 .route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-daring{background:#ede9fe;color:#5b21b6}.r-none{color:#94a3b8}
 .wrap{overflow:auto;max-height:75vh;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
 thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;vertical-align:top}thead tr+tr th{top:var(--h1,52px)}.stu{position:sticky;left:0;z-index:1;text-align:left;min-width:150px;white-space:nowrap}thead .stu{z-index:3}
@@ -26,6 +28,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
+<script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-grading.js"></script>
 <script type="module">
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
@@ -191,9 +194,10 @@ function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=g.mome
 function render(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
-  $("#tabs").innerHTML=GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
+  $("#tabs").innerHTML=`<button class="tab cplan ${S.g==="plan"?"on":""}" data-do="tab" data-g="plan" title="Exam day and this week's plan in every group">📅 Time plan</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
     +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
+  if(S.g==="plan"){$("#main").innerHTML=overview();return}
   if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+rosterBox();return}
   const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);COURSE=grp.course;
   const mine=l=>elLsForGroup(l,D.ls[l.id],S.g);
@@ -205,6 +209,7 @@ function render(){
     +`<span class="muted">· Route:</span> `+["all","insecure","safe","daring","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"Not chosen":LV[r]}</button>`).join("")
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"");
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
+    +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +`<div class="box"><h2>Learning paths and activities</h2>${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time or to answer a route request (🔁).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
@@ -309,11 +314,37 @@ function lsSettings(id){
     +list.filter(a=>a.graded).map(a=>{const on=info.enabled.includes(a.id);return `<tr><td>${a.title} ${a.criteria.map(pill).join("")}${a.mode==="once"?' <small class="muted">(once only)</small>':""}</td><td>${a.manual?"you mark it":a.points}</td><td><button class="tog ${on?"yes":"no"}" data-do="enable" data-a="${a.id}">${on?"✔ YES, enabled":"✖ NOT enabled"}</button></td></tr>`}).join("")+`</table>`
     +`<p class="muted">Always available (not graded): ${list.filter(a=>!a.graded).map(a=>a.title).join(" · ")||"–"}</p></div><p class="muted">Each group sees the same LS status; it applies to the whole course.</p>`;
 }
-function plan(p,grp){let t=0; // week-by-week calendar from shared/js/el-plan.js; with groups, the selected group's column
-  const key=x=>String(x).replace(/[^a-z0-9]/gi,"").toLowerCase(),gi=(p.groups||[]).findIndex(x=>key(x)===key(grp.name));
+function plan(p,grp){let t=0; // week-by-week calendar from shared/js/el-plan.js; with groups, the selected group's column; this week in green
+  const gi=ELWeek.col(p,grp.id),now=ELWeek.row(p);
   const what=r=>r.g?(gi>=0?esc(r.g[gi]):p.groups.map((x,i)=>`<b>${esc(x)}</b>\n`+esc(r.g[i]||"")).join("\n")):esc(r.what);
-  return `<p class="muted">${esc(p.note)}</p><table class="plan"><tr><th>When</th><th>${gi>=0?esc(grp.name):"What"}</th><th>Calendar</th></tr>`+p.rows.map(r=>{let h="";if(r.term!==t){t=r.term;const T=p.terms[t]||{};h=`<tr class="t"><td colspan="3">${esc(T.title)}<br><small class="muted">Assessment: ${esc(T.assess)}</small></td></tr>`}
-    return h+`<tr><td>${esc(r.when)}</td><td style="white-space:pre-line">${what(r)}</td><td class="muted">${esc(r.note||"")}</td></tr>`}).join("")+`</table>${p.extra?`<p class="muted">${esc(p.extra)}</p>`:""}`}
+  return `<p class="muted">${esc(p.note)}</p><table class="plan"><tr><th>When</th><th>${gi>=0?esc(grp.name):"What"}</th><th>Calendar</th></tr>`+p.rows.map((r,i)=>{let h="";if(r.term!==t){t=r.term;const T=p.terms[t]||{};h=`<tr class="t"><td colspan="3">${esc(T.title)}<br><small class="muted">Assessment: ${esc(T.assess)}</small></td></tr>`}
+    return h+`<tr class="${i===now?"now":""}"><td>${esc(r.when)}${i===now?"<br><small><b>this week</b></small>":""}</td><td style="white-space:pre-line">${what(r)}</td><td class="muted">${esc(r.note||"")}</td></tr>`}).join("")+`</table>${p.extra?`<p class="muted">${esc(p.extra)}</p>`:""}`}
+// ---- time plan (el-plan.js through el-week.js): exam day, this week and next week, per group; the overview tab shows every group
+const isDone=(u,a)=>{const x=(S.D.rs[u]||{})[a.id]||{};if(x.locked||x.markedDone)return true;const req=steps(a).filter(k=>!(a.skip||[]).includes(k));if(!req.length)return false;const d=doneSet(u,a);return req.every(k=>d.has(k))};
+const examTag=d=>{if(!d)return "";const n=ELWeek.days(ELWeek.today(),d);return `<span class="exam ${n<0?"past":""}">📝 Exam: ${ELWeek.date(d)}${n>1?` · in ${n} days`:n===1?" · tomorrow":n===0?" · today":" · done"}</span>`};
+function weekRow(p,gi,i,title){const r=p.rows[i];if(!r)return "";
+  return `<div class="wk"><b>${title} · ${esc(r.when)}</b><div class="s">${esc(r.g?r.g[gi]||"":r.what||"")}</div>${r.note?`<div class="n">${esc(r.note)}</div>`:""}</div>`}
+// this week and next week; before the plan starts, its first week; after it ends, a line
+function weeks(p,gi){const i=ELWeek.row(p),sp=ELWeek.span(p),t=ELWeek.today();
+  if(i>=0)return weekRow(p,gi,i,"This week")+weekRow(p,gi,i+1,"Next week");
+  if(t<sp[0])return `<p class="muted">Starts on ${ELWeek.date(sp[0])}.</p>`+weekRow(p,gi,0,"First week");
+  const nx=p.rows.findIndex(r=>r.from>t);   // a week with no row (holidays) inside the plan
+  return nx>=0?`<p class="muted">No classes planned this week.</p>`+weekRow(p,gi,nx,"Next"):`<p class="muted">This plan ended on ${ELWeek.date(sp[1])}.</p>`}
+// Group tab: the time plan of the LS on screen, with how many students have done each activity due this week or before
+function timeBox(ls,grp,studs){const p=(window.EL_PLAN||{})[ls],gi=ELWeek.col(p,grp.id);
+  if(!p||gi<0)return `<div class="box"><h2>Time plan</h2><p class="muted">No time plan for ${esc(grp.name)} in this LS yet. Add it to <code>shared/js/el-plan.js</code> (groups, exam, due and the weeks with their <code>from</code> date).</p></div>`;
+  const t=ELWeek.today(),i=ELWeek.row(p),end=i>=0?ELWeek.add(p.rows[i].from,6):t;
+  const due=Object.keys(p.due||{}).map(id=>[byId(id),ELWeek.due(p,id,gi)]).filter(([a,d])=>a&&d&&d<=end&&!a.manual).sort((x,y)=>x[1]<y[1]?-1:1);
+  const li=([a,d])=>{const no=studs.filter(s=>!isDone(s.uid,a)),past=d<t;
+    return `<li>${esc(a.title)} · due ${ELWeek.date(d)} · ${studs.length-no.length}/${studs.length} done${no.length&&past?` <span class="late" title="${esc(no.map(fullName).join(" · "))}">${no.length} late</span>`:""}</li>`};
+  return `<div class="box"><h2>Time plan · ${esc(grp.name)}</h2>${examTag(ELWeek.exam(p,gi))}${weeks(p,gi)}`
+    +(due.length&&studs.length?`<b>Activities due up to the end of this week</b> <small class="muted">(signed-in students; hover “late” for the names)</small><ul class="due">${due.map(li).join("")}</ul>`:"")
+    +`<p class="muted">The whole plan is in “Teaching plan” below. Students see this week, their exam day and reminders of late activities on their board.</p></div>`}
+function overview(){
+  return `<div class="box"><h2>Time plan · all groups</h2><p class="muted">Today is ${ELWeek.date(ELWeek.today())}. Exam day and what to do this week and next week in every group, from <code>shared/js/el-plan.js</code>. Open a group for its whole plan and who is late.</p><div class="tp">`
+    +GR.map(g=>{const x=ELWeek.now(g.id),l=x&&EL_LS.find(y=>y.id===x.ls);
+      return `<div class="tpc c${g.course}"><h3>${esc(g.name)}</h3>`+(x?`<div class="muted">${esc(l?l.title:x.ls)}</div>${examTag(ELWeek.exam(x.p,x.gi))}${weeks(x.p,x.gi)}<button class="g" data-do="tab" data-g="${g.id}" data-ls="${x.ls}">Open ${esc(g.name)}</button>`
+        :`<p class="muted">No time plan yet. When the plan of this course's LS is ready, add it to <code>shared/js/el-plan.js</code> and it appears here.</p>`)+`</div>`}).join("")+`</div></div>`}
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},rp=((S.D.rs[u]||{})[a.id]||{}).replies||{};
@@ -432,7 +463,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
 
 // ---- events
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
-  ({tab:()=>{S.g=k.g;S.tutor="all";render()},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),
+  ({tab:()=>{S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();if(k.ls)scrollTo(0,0)},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),
     addstu:()=>dlg("<h3>Add a student</h3>"+roForm({})),impok:()=>{$("#dlg").close();act(api.importRoster(S.imp))},
     rosave:()=>{const v=f=>$("#ro-"+f).value.replace(/\s+/g," ").trim(),o={email:v("email").toLowerCase(),surname1:v("surname1"),surname2:v("surname2"),first:v("first"),tutor:v("tutor"),group:$("#ro-group").value};
       if(o.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.email))return alert("Check the email.");
