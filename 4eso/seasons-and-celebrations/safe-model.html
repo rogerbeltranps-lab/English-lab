@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4 ESO · Safe model final product · Seasons &amp; Celebrations</title>
+<link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
+<meta name="theme-color" content="#173b70">
+<!-- LS2 model final product for the Safe route: a fictional group's Google Slides and speaking script. Opened from the first section of celebration-day-proposal.html. -->
+<style>
+:root{--accent:#275eaa;--dark:#173b70;--soft:#e9f1ff;--soft2:#c5d9fa;--contrast:#e0edff;--ink:#172434;--muted:#596576;--paper:#f6f8fb;--radius:22px}
+*{box-sizing:border-box}html,body{margin:0}body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink);line-height:1.45}
+button{font:inherit}a{color:inherit}button:focus-visible,a:focus-visible{outline:3px solid #e7aa3a;outline-offset:3px}
+.topbar{background:var(--dark);color:#fff;display:flex;gap:20px;justify-content:space-between;align-items:center;padding:12px max(24px,calc((100vw - 1220px)/2));min-height:70px}
+.back{font-size:.92rem;font-weight:700;text-decoration:none;opacity:.95}.back:hover{text-decoration:underline}
+.page-title{text-align:center;font-weight:800;font-size:1rem}.page-title small{display:block;font-weight:500;font-size:.75rem;opacity:.8}
+.page-count{font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}
+main{padding:20px 16px 30px}.intro{max-width:1160px;margin:0 auto 12px;display:flex;justify-content:space-between;align-items:center;gap:14px;color:var(--muted);font-size:.85rem}.intro strong{color:var(--dark)}
+.stage{max-width:1160px;margin:auto;position:relative;aspect-ratio:16/9;border-radius:var(--radius);box-shadow:0 15px 45px rgba(18,37,56,.13);overflow:hidden;background:#fff}
+.slide{position:absolute;inset:0;background:radial-gradient(ellipse at 105% -5%,var(--contrast),transparent 48%),#fff;overflow:hidden}.slide[hidden]{display:none}
+.slide-inner{position:relative;display:flex;flex-direction:column;height:100%;padding:clamp(22px,3.1vw,46px);isolation:isolate}.slide-inner>*:not(.slide-watermark){position:relative;z-index:1}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px}.slide-label{font-weight:800;font-size:clamp(.78rem,1.1vw,.94rem);color:var(--accent);letter-spacing:.035em}.level-pill{font-size:clamp(.65rem,1vw,.81rem);font-weight:850;padding:6px 11px;border-radius:100px;background:var(--soft);color:var(--dark);white-space:nowrap}
+.slide-layout{display:grid;grid-template-columns:1fr 25%;align-items:center;gap:30px;flex:1;min-height:0}.story .small-label{font-size:clamp(.68rem,.92vw,.9rem);color:var(--accent);font-weight:800;letter-spacing:.13em;margin:0 0 12px}
+.story h2{font-size:clamp(2rem,4.8vw,4.6rem);line-height:1.02;letter-spacing:-.052em;margin:0;max-width:780px;color:var(--dark);text-wrap:balance}
+.story .lead{font-size:clamp(1rem,1.72vw,1.55rem);color:var(--muted);margin:17px 0 0}
+.hero-visual{width:min(100%,195px);aspect-ratio:1;margin:auto;border-radius:35%;display:flex;justify-content:center;align-items:center;flex-direction:column;background:var(--soft);transform:rotate(-7deg);border:3px solid var(--soft2);box-shadow:18px 18px 0 rgba(110,144,194,.09)}
+.hero-visual span{font-size:clamp(3rem,7vw,6.7rem);line-height:1;transform:rotate(7deg)}.hero-visual small{margin-top:12px;color:var(--dark);font-weight:800;transform:rotate(7deg)}
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-content:stretch}.card-grid.two{grid-template-columns:repeat(2,1fr)}
+.info-card{background:#fff;border:2px solid var(--soft2);border-radius:19px;padding:clamp(14px,1.9vw,23px);min-height:clamp(110px,13.3vw,165px);box-shadow:0 5px 15px rgba(23,45,70,.03)}
+.card-icon{font-size:clamp(1.45rem,2.7vw,2.5rem);display:block;line-height:1.05}.info-card h3{color:var(--dark);font-size:clamp(.95rem,1.42vw,1.45rem);margin:10px 0 4px;line-height:1.1}.info-card p{font-size:clamp(.78rem,1.18vw,1.05rem);color:var(--muted);margin:0}
+.takeaway{border-radius:15px;background:var(--soft);padding:clamp(12px,1.7vw,17px) clamp(14px,2vw,22px);display:flex;align-items:center;gap:12px;margin-top:14px;color:var(--dark);font-size:clamp(.82rem,1.2vw,1.1rem);font-weight:690}.takeaway p{margin:0}.takeaway-icon{font-size:1.3em}
+.slide-watermark{position:absolute;right:18px;bottom:-48px;font-size:14rem;color:var(--soft);font-weight:900;line-height:1;z-index:0;pointer-events:none}
+.controls{display:flex;justify-content:space-between;align-items:center;max-width:1160px;margin:14px auto 0;gap:10px;flex-wrap:wrap}
+.control-group{display:flex;gap:8px;align-items:center}.btn{border:1px solid var(--soft2);color:var(--dark);background:#fff;padding:10px 16px;border-radius:11px;cursor:pointer;font-weight:750}.btn:hover{background:var(--soft)}.btn.primary{color:white;background:var(--accent);border-color:var(--accent)}.btn.primary:hover{background:var(--dark)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.pips{display:flex;gap:7px;align-items:center;justify-content:center}.pip{width:10px;height:10px;border-radius:99px;background:#ced6df;display:inline-block}.pip.active{width:27px;background:var(--accent)}
+.notes-wrap{max-width:1160px;margin:18px auto 0}.notes{background:#fff;border:1px solid #dce2eb;border-radius:15px;padding:18px 22px;box-shadow:0 5px 22px rgba(23,45,70,.06)}.notes h2{font-size:.98rem;margin:0 0 8px;color:var(--dark)}.notes p{margin:0;color:var(--ink);max-width:850px;line-height:1.65}
+.foot{max-width:1160px;margin:24px auto 0;color:var(--muted);font-size:.82rem}.foot strong{color:var(--dark)}
+:fullscreen{background:var(--dark)}:fullscreen .slide-inner{padding:clamp(30px,4vw,70px)}:fullscreen .story h2{font-size:clamp(2rem,5vw,6rem)}
+@media(max-width:760px){.topbar{padding:11px 15px;gap:8px}.back{font-size:.8rem}.page-title{font-size:.8rem}.page-count{font-size:.85rem}.intro{align-items:flex-start;flex-direction:column;gap:3px}.stage{aspect-ratio:auto;min-height:700px;border-radius:18px}.slide{overflow-y:auto}.slide-inner{min-height:700px;padding:20px}.slide-layout{grid-template-columns:1fr auto;gap:10px;flex:0 0 auto;min-height:155px}.story h2{font-size:clamp(1.85rem,7vw,3rem)}.story .lead{font-size:1rem;margin-top:8px}.story .small-label{margin-bottom:8px}.hero-visual{width:72px;min-width:72px}.hero-visual span{font-size:2.4rem}.hero-visual small{display:none}.card-grid,.card-grid.two{grid-template-columns:1fr;gap:8px;margin-top:18px}.info-card{min-height:0;display:grid;grid-template-columns:44px 1fr;column-gap:7px;padding:12px}.card-icon{grid-row:span 2;font-size:1.8rem}.info-card h3{font-size:1rem;margin:0}.info-card p{font-size:.92rem}.takeaway{margin-top:10px;font-size:.88rem}.slide-watermark{display:none}.controls{justify-content:center}.control-group{justify-content:center}.pips{order:-1;width:100%}}
+@media(prefers-reduced-motion:no-preference){.slide:not([hidden]) .slide-inner{animation:appear .22s ease-out}@keyframes appear{from{opacity:.7;transform:translateY(5px)}to{opacity:1;transform:none}}}
+
+/* Fullscreen presentation: include slide, controls and speaking script. */
+.presentation-shell:fullscreen{display:flex;flex-direction:column;width:100vw;height:100dvh;max-height:100dvh;gap:10px;padding:12px 18px;background:var(--dark);overflow:hidden}
+.presentation-shell:fullscreen .stage{flex:1 1 auto;min-height:0;width:100%;max-width:none;aspect-ratio:auto;border-radius:12px;box-shadow:none}
+.presentation-shell:fullscreen .controls{flex:0 0 auto;width:100%;max-width:none;margin:0;justify-content:space-between;color:white}
+.presentation-shell:fullscreen .notes-wrap{flex:0 1 auto;min-height:0;overflow:auto;width:100%;max-width:none;margin:0}
+.presentation-shell:fullscreen .notes-wrap:has(.notes[hidden]){display:none}
+.presentation-shell:fullscreen .notes{padding:12px 18px;box-shadow:none}
+.presentation-shell:fullscreen .notes p{max-width:none}
+.presentation-shell:fullscreen .slide-inner{padding:clamp(18px,3vw,48px)}
+.presentation-shell:fullscreen .story h2{font-size:clamp(1.7rem,4.3vw,5rem)}
+.presentation-shell:fullscreen .btn{padding:9px 13px}
+@media(max-width:760px){.presentation-shell:fullscreen{padding:8px;gap:7px}.presentation-shell:fullscreen .stage{min-height:0}.presentation-shell:fullscreen .slide{overflow:auto}.presentation-shell:fullscreen .slide-inner{height:auto;min-height:100%;padding:15px}.presentation-shell:fullscreen .controls{flex-wrap:wrap;gap:6px}.presentation-shell:fullscreen .pips{order:0;width:auto}.presentation-shell:fullscreen .notes-wrap{max-height:32dvh}.presentation-shell:fullscreen .btn{padding:8px 9px;font-size:.85rem}}
+@media print{@page{size:landscape;margin:0}body{background:white}.topbar,.intro,.controls,.notes-wrap,.foot{display:none!important}main{padding:0}.stage{aspect-ratio:auto;box-shadow:none;max-width:none;overflow:visible}.slide,.slide[hidden]{display:block!important;position:relative;width:100%;height:100vh;page-break-after:always;break-after:page;overflow:hidden}.slide-inner{padding:3.5vw}.hero-visual{max-width:160px}.story h2{font-size:4vw}.info-card p{font-size:1.2vw}}
+</style>
+<script src="../../shared/js/el-copyright.js" defer></script>
+</head>
+<body>
+<header class="topbar"><a class="back" href="celebration-day-proposal.html">← Final product</a><div class="page-title">4 ESO · Safe model <small>Seasons &amp; Celebrations · Model final product</small></div><div class="page-count" id="pageCount" aria-live="polite">1 / 6</div></header>
+<main><div class="intro"><span><strong>Fictional example:</strong> A group of 4: the slide text is brief. Open “Speaking script” to see what each member says (35–45 seconds each). <strong>Group:</strong> Marc, Aya, Júlia and Biel.</span><span>Use ← → keys or the buttons to change slides.</span></div>
+<div class="presentation-shell" id="presentationShell"><div class="stage" id="stage" role="region" aria-label="Safe model presentation"><section class="slide" aria-roledescription="slide" aria-label="Slide 1 of 6: Lucia: light in the dark" data-index="0">
+    <div class="slide-inner"><div class="topline"><span class="slide-label">Our celebration</span><span class="level-pill">SAFE · 4 ESO</span></div>
+      <div class="slide-layout">
+        <div class="story"><p class="small-label">CELEBRATION DAY PROPOSAL</p><h2>Lucia: light in the dark</h2><p class="lead">A Lucia Morning at our school</p></div>
+        <div class="hero-visual"><span aria-hidden="true">🕯️</span><small>Marc · Aya · Júlia · Biel</small></div>
+      </div>
+      <div class="card-grid"><article class="info-card"><span class="card-icon" aria-hidden="true">📜</span><h3>Origin</h3><p>Then and now</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">↔️</span><h3>Here and there</h3><p>Lucia and Santa Llúcia</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">🗓️</span><h3>Our day</h3><p>Plan, roles, inclusion</p></article></div>
+      <div class="takeaway"><span class="takeaway-icon" aria-hidden="true">✦</span><p>St Lucia’s Day · Sweden · 13 December</p></div>
+      <span class="slide-watermark" aria-hidden="true">01</span>
+    </div></section>
+<section class="slide" aria-roledescription="slide" aria-label="Slide 2 of 6: Where Lucia comes from" hidden data-index="1">
+    <div class="slide-inner"><div class="topline"><span class="slide-label">01 · Origin and meaning</span><span class="level-pill">SAFE · 4 ESO</span></div>
+      <div class="slide-layout">
+        <div class="story"><p class="small-label">PART 1 · MARC</p><h2>Where Lucia comes from</h2><p class="lead">A saint, a long night and a lot of light</p></div>
+        <div class="hero-visual"><span aria-hidden="true">📜</span></div>
+      </div>
+      <div class="card-grid"><article class="info-card"><span class="card-icon" aria-hidden="true">⛪</span><h3>A saint</h3><p>Lucy lived in Sicily about 1,700 years ago.</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">🌑</span><h3>A long night</h3><p>13 December used to be the longest night in Sweden.</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">✨</span><h3>Today</h3><p>Light, hope and the start of Christmas.</p></article></div>
+      <div class="takeaway"><span class="takeaway-icon" aria-hidden="true">✦</span><p>Why at our school? It brings everyone together on a dark winter morning.</p></div>
+      <span class="slide-watermark" aria-hidden="true">02</span>
+    </div></section>
+<section class="slide" aria-roledescription="slide" aria-label="Slide 3 of 6: Lucia and Santa Llúcia" hidden data-index="2">
+    <div class="slide-inner"><div class="topline"><span class="slide-label">02 · Here and there</span><span class="level-pill">SAFE · 4 ESO</span></div>
+      <div class="slide-layout">
+        <div class="story"><p class="small-label">PART 2 · AYA</p><h2>Lucia and Santa Llúcia</h2><p class="lead">Same day, same saint, different customs</p></div>
+        <div class="hero-visual"><span aria-hidden="true">↔️</span></div>
+      </div>
+      <div class="card-grid two"><article class="info-card"><span class="card-icon" aria-hidden="true">🤝</span><h3>Similarities</h3><p>Same day and same saint · the start of the Christmas season</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">🔀</span><h3>Differences</h3><p>Sweden: a procession and songs at dawn · Catalonia: the Santa Llúcia fair in Barcelona</p></article></div>
+      <div class="takeaway"><span class="takeaway-icon" aria-hidden="true">✦</span><p>Swedish families share saffron buns, while here people buy figures for the nativity scene.</p></div>
+      <span class="slide-watermark" aria-hidden="true">03</span>
+    </div></section>
+<section class="slide" aria-roledescription="slide" aria-label="Slide 4 of 6: Our Lucia Morning" hidden data-index="3">
+    <div class="slide-inner"><div class="topline"><span class="slide-label">03 · Our day</span><span class="level-pill">SAFE · 4 ESO</span></div>
+      <div class="slide-layout">
+        <div class="story"><p class="small-label">PART 3 · JÚLIA</p><h2>Our Lucia Morning</h2><p class="lead">Friday 11 December · school hall</p></div>
+        <div class="hero-visual"><span aria-hidden="true">🗓️</span></div>
+      </div>
+      <div class="card-grid"><article class="info-card"><span class="card-icon" aria-hidden="true">🕘</span><h3>9:00</h3><p>Procession and song</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">✂️</span><h3>9:30–10:30</h3><p>Workshops: stars, crowns, Swedish words</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">☕</span><h3>10:30</h3><p>“Fika”: buns and hot chocolate · 11:00 quiz</p></article></div>
+      <div class="takeaway"><span class="takeaway-icon" aria-hidden="true">✦</span><p>13 December is a Sunday, so we will celebrate it on Friday.</p></div>
+      <span class="slide-watermark" aria-hidden="true">04</span>
+    </div></section>
+<section class="slide" aria-roledescription="slide" aria-label="Slide 5 of 6: Who does what?" hidden data-index="4">
+    <div class="slide-inner"><div class="topline"><span class="slide-label">04 · Roles and inclusion</span><span class="level-pill">SAFE · 4 ESO</span></div>
+      <div class="slide-layout">
+        <div class="story"><p class="small-label">PART 4 · BIEL</p><h2>Who does what?</h2><p class="lead">Roles, materials and an inclusive plan</p></div>
+        <div class="hero-visual"><span aria-hidden="true">🧩</span></div>
+      </div>
+      <div class="card-grid"><article class="info-card"><span class="card-icon" aria-hidden="true">👥</span><h3>Roles</h3><p>Marc and Aya: procession · Júlia: workshops · Biel: buns</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">🧺</span><h3>Materials</h3><p>White T-shirts, battery candles, paper, saffron</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">🌍</span><h3>For everyone</h3><p>Anyone can be Lucia · buns without gluten</p></article></div>
+      <div class="takeaway"><span class="takeaway-icon" aria-hidden="true">✦</span><p>Stereotype we avoid: “Lucia is always a blond girl”. We will choose Lucia by lottery.</p></div>
+      <span class="slide-watermark" aria-hidden="true">05</span>
+    </div></section>
+<section class="slide" aria-roledescription="slide" aria-label="Slide 6 of 6: Where we found the information" hidden data-index="5">
+    <div class="slide-inner"><div class="topline"><span class="slide-label">Sources</span><span class="level-pill">SAFE · 4 ESO</span></div>
+      <div class="slide-layout">
+        <div class="story"><p class="small-label">OUR SOURCES</p><h2>Where we found the information</h2><p class="lead">Three sources</p></div>
+        <div class="hero-visual"><span aria-hidden="true">🔎</span></div>
+      </div>
+      <div class="card-grid"><article class="info-card"><span class="card-icon" aria-hidden="true">🌐</span><h3>sweden.se</h3><p>Official website of Sweden · page “Lucia” · visited 20/11/2026</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">📘</span><h3>Britannica</h3><p>Encyclopedia · “St. Lucy’s Day” · visited 20/11/2026</p></article><article class="info-card"><span class="card-icon" aria-hidden="true">🏛️</span><h3>barcelona.cat</h3><p>Barcelona City Council · page about the Fira de Santa Llúcia · visited 22/11/2026</p></article></div>
+      <div class="takeaway"><span class="takeaway-icon" aria-hidden="true">✦</span><p>We checked each fact in at least two sources.</p></div>
+      <span class="slide-watermark" aria-hidden="true">06</span>
+    </div></section></div>
+<div class="controls"><div class="control-group"><button type="button" class="btn" id="prev" aria-label="Previous slide">← Previous</button><button type="button" class="btn primary" id="next" aria-label="Next slide">Next →</button></div><div class="pips" id="pips" aria-label="Slide progress"></div><div class="control-group"><button type="button" class="btn" id="notesToggle" aria-expanded="false" aria-controls="notes">Speaking script ▾</button><button type="button" class="btn" id="fullScreen">⛶ Full screen</button></div></div>
+<div class="notes-wrap"><section id="notes" class="notes" hidden><h2>What each member says (speaking script)</h2><p id="notesText"></p></section></div>
+</div>
+<div class="foot"><strong>Important:</strong> This is a fictional example. Your final product is a 2–3 minute group video in which every member speaks with their face visible together with the slides. Do your own research on your own celebration: do not copy this model. The individual formal email has its own model in Learning Path 6.</div>
+</main>
+<script>
+(()=>{"use strict";const notes=["All together: Hi, we’re Marc, Aya, Júlia and Biel. Our group chose St Lucia’s Day, and we’d like to propose a Lucia Morning at our school.", "Marc: St Lucia’s Day is celebrated in Sweden on the thirteenth of December. Lucy was a young Christian woman who lived in Sicily about 1,700 years ago. In the old calendar, the thirteenth of December used to be the longest night of the year in Sweden, and people used to stay awake with candles and food. Today, for the people who celebrate it, Lucia means light and hope in the darkest season. It belongs at our school because it brings everyone together on a dark winter morning.", "Aya: I’m Aya, and I’m going to compare Lucia with a celebration here. In Catalonia, we celebrate Santa Llúcia on the same day, and both celebrations remember the same saint. In both places, it’s the start of the Christmas season. However, the customs are quite different. In Sweden, children walk in a procession and sing in the early morning, while here people go to the Santa Llúcia fair in Barcelona to buy figures for the nativity scene.", "Júlia: I’m Júlia. Our Lucia Morning will take place on Friday the eleventh of December, because the thirteenth is a Sunday. It’s going to start at nine o’clock in the school hall with a short procession and a song. From half past nine to half past ten, there will be three workshops: paper stars, Lucia crowns and a few Swedish words. At break time, we’re going to share saffron buns and hot chocolate, like a Swedish “fika”, and at eleven we’ll finish with a quiz.", "Biel: I’m Biel. Marc and Aya are going to organise the procession, Júlia will run the workshops, and I’ll make the buns with the cooking club. We need white T-shirts, battery candles, paper and saffron. Anyone can take part as Lucia or as a helper, and we’ll make buns without gluten too. There’s a stereotype that Lucia is always a blond girl. It’s unfair, because people in Sweden look very different. That’s why we’ll choose our Lucia by lottery from all the volunteers. Thank you for listening!", "(Nobody reads this slide aloud: it shows the three sources the group used.)"];const slides=[...document.querySelectorAll(".slide")],count=slides.length;let active=0;
+</script>
+</body>
+</html>
