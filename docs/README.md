@@ -20,6 +20,7 @@ docs/
       competences-grid.md        competences × activities, and when each criterion is marked
       final-product-assessment.md  groups, parts, steps, marks and rubric of the final product
       indicators.md              NA / AS / AN / AE indicators per LS criterion
+      grading.md                 LS mark, evidence per criterion and how levels are collected
   2eso/
     programme.md                 (to come from Roger)
     ls1-my-real-routine/

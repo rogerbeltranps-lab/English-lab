@@ -15,7 +15,8 @@ td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px 
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}
-details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>summary{font-size:.9rem;font-weight:600;color:#475569}tr.away td{color:#94a3b8;background:#f8fafc}.tag{font-size:11px;font-weight:600;background:#e2e8f0;color:#475569;border-radius:999px;padding:1px 6px;margin-left:4px}label.btn{background:#0f766e;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 8px}.form input,.form select{width:100%;box-sizing:border-box}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}</style></head><body>
+details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>summary{font-size:.9rem;font-weight:600;color:#475569}tr.away td{color:#94a3b8;background:#f8fafc}.tag{font-size:11px;font-weight:600;background:#e2e8f0;color:#475569;border-radius:999px;padding:1px 6px;margin-left:4px}label.btn{background:#0f766e;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 8px}.form input,.form select{width:100%;box-sizing:border-box}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}
+button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6px;padding:2px 7px;margin:1px;font-size:12px;font-weight:600}button.lv.on{color:#fff}td.gr{cursor:pointer;white-space:nowrap}td.gr:hover{outline:2px solid #0f766e;outline-offset:-2px}.sug{color:#64748b;font-style:italic}.deg{font-weight:700}td.tot{font-weight:700}.dlg input.ex{width:56px}table.lvt td{text-align:left}</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
 <div class="tabs" id="tabs"></div>
@@ -25,13 +26,14 @@ details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>sum
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
+<script src="shared/js/el-grading.js"></script>
 <script type="module">
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),resKey=a=>a.replace("/","__");
-const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(),D:null,P:{}};   // P: people on screen (see people())
+const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(),D:null,P:{},zero:true};   // P: people on screen (see people()); zero: missing work counts 0 in the LS grade
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved; graded activities only if you enable them."],closed:["Closed","Students can only review what they did and the feedback."],public:["Public","Free access as before: no login and no scoring."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309",public:"#2563eb"};
 
@@ -71,6 +73,12 @@ const api={
   reply:(u,a,step,text)=>{if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{}),x=(r[a.id]=r[a.id]||{ls:a.ls,activity:a.id});(x.replies=x.replies||{})[step]=text;return}return put(["students",u,"results",resKey(a.id)],{ls:a.ls,activity:a.id,replies:{[step]:text}})}
 };
 async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save: "+e.message)}if(!DEMO)S.D=await load();render()}
+// One-click assessment (levels, groups, exam marks, confirmed degrees): merged into results/{id} at once and on screen without reloading.
+// null deletes a field. id is an activity id, or the LS's own record (asId: exam marks, exam writing level, confirmed degrees).
+const deep=(t,o)=>{for(const k in o){const v=o[k];if(v===null)delete t[k];else if(v&&typeof v==="object"&&!Array.isArray(v)){t[k]=t[k]&&typeof t[k]==="object"?t[k]:{};deep(t[k],v)}else t[k]=v}return t};
+const fsv=o=>{const r={};for(const k in o){const v=o[k];r[k]=v===null?F.deleteField():v&&typeof v==="object"&&!Array.isArray(v)?fsv(v):v}return r};
+function patch(u,id,o){o=Object.assign({ls:S.ls,activity:id},o);const r=(S.D.rs[u]=S.D.rs[u]||{});deep(r[id]=r[id]||{},o);return DEMO?Promise.resolve():put(["students",u,"results",resKey(id)],fsv(o))}
+function quick(ps){Promise.all([].concat(ps)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});render();again()}
 
 // ---- helpers
 const fullName=s=>s.ro&&s.ro.surname1?[s.ro.surname1,s.ro.surname2].filter(Boolean).join(" ")+", "+s.ro.first:s.name||s.email||s.uid;
@@ -115,6 +123,66 @@ function cell(u,a){ // text + class of an activity's score cell
   return {t,c};
 }
 
+// ---- assessment and grading (shared/js/el-grading.js; root AGENTS.md "Assessment and grading")
+const G=()=>(window.EL_GRADING||{})[S.ls],asId=ls=>ls+"/assessment",byId=id=>cat.find(a=>a.id===id);
+const LVCOL={NA:"#94a3b8",AS:"#16a34a",AN:"#2563eb",AE:"#8b5cf6"},lvMark=l=>l?EL_DEGREE_MARK[l]:null,f1=m=>m==null?"–":(Math.round(m*10)/10).toString();
+const res=(u,id)=>(S.D.rs[u]||{})[id]||{};
+const pstate=(u,a)=>{try{return JSON.parse(((S.D.pg[u]||{})[a.ls]||{})[a.keys[0]]||"{}")}catch(e){return {}}};
+const cpill=c=>(G()||{}).names&&G().names[c]?`<span class="tag">${esc(G().names[c])}</span>`:pill(c);
+const deg=(l,sug)=>l?`<span class="deg ${sug?"sug":""}" style="${sug?"":"color:"+LVCOL[l]}">${l}${sug?"?":""}</span>`:"–";
+// teacher level of one criterion at one moment; group rows come one level down for a student who did not contribute
+function lvOf(u,id,step,c){const x=res(u,id),l=((x.levels||{})[step]||{})[c];return step==="group"&&(x.down||{})[c]?elDegreeDown(l):l}
+// first try of an auto-corrected step (tries, saved by the page); recall warm-ups and checkpoints keep theirs in `first` (per route)
+function firstOf(u,id,step){const a=byId(id);if(!a)return null;const st=pstate(u,a),t=(st.tries||{})[step];if(t)return t;
+  if(step==="recall"||step==="check"){const f=st.first||{};return f[level(u,a.ls)]||Object.values(f)[0]||(res(u,id).parts||{}).first||null}return null}
+const doneAt=(u,id,step)=>{const a=byId(id),st=a?pstate(u,a):{};return st.done&&st.done[step]?((st.doneAt||{})[step]||true):null};
+const ymd=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+function dueOf(id,g){const p=(window.EL_PLAN||{})[S.ls],gr=GR.find(x=>x.id===g);if(!p||!p.due||!p.due[id]||!gr)return null;
+  const key=x=>String(x).replace(/[^a-z0-9]/gi,"").toLowerCase(),i=(p.groups||[]).findIndex(x=>key(x)===key(gr.name));return i>=0?p.due[id][i]:null}
+// 1 done by the end of its session day, 0 late, null not done, undefined no deadline (not counted)
+function onTime(u,id,step,g){const due=dueOf(id,g);if(!due)return undefined;const d=doneAt(u,id,step);return d==null?null:d===true||ymd(d)<=due?1:0}
+// Averages: missing values (null) count 0 or are left out, as the "Missing work" switch says
+const avg=vs=>{vs=vs.map(v=>v==null?(S.zero?0:null):v).filter(v=>v!=null);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null};
+const wavg=ps=>{let s=0,w=0;ps.forEach(([v,x])=>{if(v==null){if(!S.zero)return;v=0}s+=v*x;w+=x});return w?s/w:null};
+const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).title||id)+" · "+k;
+function gvBlock(u,g){const v=G().gv,acc=v.items.map(([id,k])=>pct(firstOf(u,id,k))),used=[];let A=avg(acc);
+  v.optional.forEach(([id,k])=>{const x=pct(firstOf(u,id,k));if(x==null)return;const B=avg([...acc,x]);if(A==null||B>A){acc.push(x);A=B;used.push(id)}});   // only if it raises the mark
+  const T=avg(v.items.map(([id,k])=>onTime(u,id,k,g)).filter(x=>x!==undefined).map(x=>x==null?x:x*10));
+  return {mark:wavg([[A,v.first],[T,v.onTime]]),acc:A,onTime:T,used}}
+function otherCrit(u,c){const g=G();
+  const auto=avg((g.auto[c]||[]).map(([id,k,first])=>first?pct(firstOf(u,id,k)):doneAt(u,id,k)?10:null));
+  const teacher=avg((g.teacher[c]||[]).map(([id,k])=>lvMark(lvOf(u,id,k,c))));
+  return {auto,teacher,mark:wavg([[auto,1],[teacher,1]])}}
+const otherBlock=u=>avg(G().other.map(c=>otherCrit(u,c).mark));
+const fpBlock=u=>{const f=G().fp;return wavg(f.rows.map(r=>[lvMark(lvOf(u,f.a,r.step,r.c)),r.w]))};
+function examBlock(u){const e=G().exam,x=res(u,asId(S.ls)).sections||{};let s=0,m=0,any=false;
+  e.sections.forEach(([k])=>{const y=x[k];if(y&&y.score!=null){s+=+y.score;m+=+(y.max||e.max);any=true}else if(S.zero)m+=e.max});
+  return any?s/m*10:S.zero?0:null}
+function grade(s){const B={exam:examBlock(s.uid),fp:fpBlock(s.uid),gv:gvBlock(s.uid,s.group),other:otherBlock(s.uid)};
+  return {B,total:wavg(G().blocks.map(b=>[b.id==="gv"?B.gv.mark:B[b.id],b.w]))}}
+// Suggested degree of one criterion from its evidence (grading.md section 3): each later piece weighs `later` times the one before;
+// for levelOnly criteria (4.1, 2.2) an exam score never sets the degree without a teacher level.
+function suggest(u,c){const g=G(),ev=g.evidence[c];if(!ev)return null;let w=1,sw=0,sv=0,lv=false;
+  const items=ev.e.map(e=>{let v=null,label,isLv=false;
+    if(Array.isArray(e)){const id=e[0]==="exam"?asId(S.ls):e[0],l=lvOf(u,id,e[1],c);label=e[0]==="exam"?"Exam · "+e[1]:stepName(id,e[1]);v=lvMark(l);isLv=true;label+=": "+(l||"no level yet")}
+    else{const y=(res(u,asId(S.ls)).sections||{})[e.exam];v=y&&y.score!=null?y.score/(y.max||g.exam.max)*10:null;label="Exam · "+e.exam+" (score): "+(v==null?"not entered":f1(v)+"/10")}
+    if(v!=null){sv+=v*w;sw+=w;if(isLv)lv=true}w*=g.later;return label});
+  return {items,mark:sw&&(!ev.levelOnly||lv)?sv/sw:null,get level(){return elDegree(this.mark)}}}
+// NA · AS · AN · AE buttons; the indicator of each level on hover
+const lvBtns=(attrs,cur,c)=>{const ind=((G()||{}).ind||{})[c]||[];return EL_DEGREES.map((l,i)=>`<button class="lv ${cur===l?"on":""}" data-l="${l}" ${attrs} title="${esc(l+": "+(ind[i]||""))}" style="${cur===l?"background:"+LVCOL[l]+";border-color:"+LVCOL[l]:""}">${l}</button>`).join("")};
+const teamOf=(u,id)=>res(u,id).team||"";
+const teamMates=(id,team,g)=>team?Object.values(S.P).filter(s=>!s.away&&!s.tester&&s.group===g&&teamOf(s.uid,id)===team):[];
+// Level rows of an activity's dialog (moments of el-grading.js), and the final product group rows
+function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=g.moments.filter(m=>m.a===a.id);if(!ms.length)return "";
+  const x=res(u,a.id),row=(m,c)=>`<tr><td>${esc(m.name)}</td><td>${cpill(c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${a.id}" data-s="${m.step}" data-c="${c}"`,((x.levels||{})[m.step]||{})[c],c)}</td></tr>`;
+  let h=`<label>Levels <small class="muted">(hover a level to read its indicator; click it again to clear)</small></label><table class="lvt"><tbody>${ms.filter(m=>!m.group).flatMap(m=>m.c.map(c=>row(m,c))).join("")}</tbody></table>`;
+  const gm=ms.find(m=>m.group);if(!gm)return h;
+  const s=S.P[u],team=teamOf(u,a.id),mates=teamMates(a.id,team,s.group),teams=[...new Set(Object.values(S.P).filter(p=>!p.away&&p.group===s.group).map(p=>teamOf(p.uid,a.id)).filter(Boolean))].sort();
+  h+=`<label>Final product group</label><input id="team" list="teams" value="${esc(team)}" placeholder="for example Diwali"><datalist id="teams">${teams.map(t=>`<option value="${esc(t)}">`).join("")}</datalist> <button class="g" data-do="team" data-u="${u}" data-a="${a.id}">Save group</button>`
+    +(team?`<p class="muted">${mates.map(name).join(" · ")}</p><label>${esc(gm.name)} <small class="muted">(given once for the whole group, copied to each member)</small></label><table class="lvt"><tbody>`
+      +gm.c.map(c=>{const gl=((x.levels||{}).group||{})[c],dn=!!(x.down||{})[c];return `<tr><td>${cpill(c)}</td><td>${lvBtns(`data-do="glv" data-u="${u}" data-a="${a.id}" data-c="${c}"`,gl,c)}</td><td><label style="margin:0;font-weight:400"><input type="checkbox" data-do="down" data-u="${u}" data-a="${a.id}" data-c="${c}" ${dn?"checked":""}> one level down for this student${dn&&gl?" ("+elDegreeDown(gl)+")":""}</label></td></tr>`}).join("")+`</tbody></table>`:'<p class="muted">Give the group a name (the same for every member) to give the group rows.</p>');
+  return h}
+
 // ---- views
 function render(){
   const D=S.D;S.P=people();
@@ -138,7 +206,9 @@ function render(){
     +`<div class="box"><h2>Learning paths and activities</h2>${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
-    +`<div class="box">${fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`
+    +(G()?gradeBox(shown):"")
+    +`<div class="box">${G()?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
+      :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`
     +`<div class="box">${fold("settings","LS status and graded activities",lsSettings(ls))}</div>`+rosterBox();
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
 }
@@ -178,11 +248,51 @@ function criteria(studs,list){
     if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return `<td><b style="color:${col}">${ts}/${tm}</b><br><small>${Math.round(p)}%</small></td>`}).join("")+"</tr>"});
   return h+"</tbody></table>";
 }
+// LS grade per group: the blocks of el-grading.js (exam, final product, grammar and vocabulary, other competences) and the weighted total
+function gradeBox(studs){
+  const g=G(),fpA=g.fp.a,blk=id=>g.blocks.find(b=>b.id===id);
+  const head=`<tr><th class="stu">Student</th><th>Route</th><th>Group</th>${g.blocks.map(b=>`<th>${esc(b.name)}<br><small class="muted">${b.w} %</small></th>`).join("")}<th class="first">LS mark</th></tr>`;
+  const body=studs.map(s=>{const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td>`;
+    if(s.away)return `<tr class="away">${who}<td>${route()}</td><td colspan="${g.blocks.length+2}" style="text-align:left">Not signed in yet</td></tr>`;
+    const {B,total}=grade(s),o=g.other.map(c=>{const x=otherCrit(s.uid,c);return c+": "+f1(x.mark)+" (auto "+f1(x.auto)+" · levels "+f1(x.teacher)+")"}).join("\n");
+    const tip={exam:"Exam sections, score out of max (click to enter)",fp:g.fp.rows.map(r=>r.name+" "+r.w+" %: "+(lvOf(s.uid,fpA,r.step,r.c)||"–")).join("\n"),
+      gv:`First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %`,other:o};
+    const val={exam:B.exam,fp:B.fp,gv:B.gv.mark,other:B.other};
+    return `<tr>${who}<td>${route(level(s.uid,S.ls))}</td><td><small>${esc(teamOf(s.uid,fpA))||"–"}</small></td>`
+      +g.blocks.map(b=>`<td class="gr" data-do="grade" data-u="${s.uid}" title="${esc(tip[b.id])}">${f1(val[b.id])}</td>`).join("")
+      +`<td class="first gr tot" data-do="grade" data-u="${s.uid}">${f1(total)} ${deg(elDegree(total))}</td></tr>`}).join("");
+  const key=`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: first-try accuracy of vocabulary practice, grammar, mixed practice, register, recall warm-ups and checkpoints (optional ones only if they raise it) ${g.gv.first} % + done by its session deadline (teaching plan) ${g.gv.onTime} %. Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
+  return `<div class="box"><h2>LS grade</h2><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1" title="As in the grading plan: missing work counts 0 until it is handed in">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0" title="Mark so far: only what is done or assessed counts">not counted yet</button></div>`
+    +fold("gradekey","How it is worked out",key,"key")
+    +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`:"")
+    +fold("exam","Exam marks",examTable(studs.filter(s=>!s.away)))+`</div>`;
+}
+function examTable(studs){const e=G().exam,id=asId(S.ls);
+  if(!studs.length)return '<p class="muted">No signed-in students.</p>';
+  return `<p class="muted">Score and maximum for each section (empty = not entered), and the writing level (${e.level.c}). Levels save on click; marks with the button.</p><div class="wrap"><table><thead><tr><th class="stu">Student</th>${e.sections.map(([,n])=>`<th>${n}</th>`).join("")}<th>Writing level ${pill(e.level.c)}</th></tr></thead><tbody>`
+    +studs.map(s=>{const x=res(s.uid,id),sc=x.sections||{};return `<tr><td class="stu">${name(s)}</td>`+e.sections.map(([k])=>`<td><input class="ex" data-ex="${s.uid}" data-k="${k}" data-f="score" type="number" step="0.25" style="width:52px" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${s.uid}" data-k="${k}" data-f="max" type="number" style="width:44px" value="${sc[k]&&sc[k].max!=null?sc[k].max:e.max}"></td>`).join("")
+      +`<td>${lvBtns(`data-do="lv" data-u="${s.uid}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td></tr>`}).join("")
+    +`</tbody></table></div><div class="row" style="justify-content:flex-start;margin-top:6px"><button data-do="examsave">Save exam marks</button></div>`}
+// Exam marks typed in a table or a dialog: only rows that changed are written
+function saveExam(scope){const id=asId(S.ls),by={};
+  scope.querySelectorAll("input[data-ex]").forEach(i=>{const k=i.dataset;((by[k.ex]=by[k.ex]||{})[k.k]=by[k.ex][k.k]||{})[k.f]=i.value.trim()});
+  const ps=[];Object.entries(by).forEach(([u,secs])=>{const cur=res(u,id).sections||{},o={};
+    Object.entries(secs).forEach(([k,v])=>{const sc=v.score===""?null:+v.score,mx=v.max===""?G().exam.max:+v.max;if(isNaN(sc)||isNaN(mx))return;const c=cur[k]||{};
+      if(sc==null){if(c.score!=null)o[k]=null}else if(c.score!==sc||(c.max??G().exam.max)!==mx)o[k]={score:sc,max:mx}});
+    if(Object.keys(o).length)ps.push(patch(u,id,{sections:o}))});
+  return ps}
+// Degree per criterion: confirmed (results/{ls}/assessment .final) or suggested
+function degrees(studs){const g=G(),cs=[...g.key,...g.other];
+  let h=`<table><thead><tr><th class="stu">Student</th>${cs.map((c,i)=>`<th class="${i===g.key.length?"first":""}">${pill(c)}<br><small class="muted">${i<g.key.length?"key":"other"}</small></th>`).join("")}</tr></thead><tbody>`;
+  studs.forEach(s=>{h+=`<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td>`+cs.map((c,i)=>{const cl=i===g.key.length?"first":"";if(s.away)return `<td class="${cl}">–</td>`;
+    const f=(res(s.uid,asId(S.ls)).final||{})[c],sg=suggest(s.uid,c),t=sg.mark==null?"no suggestion yet":"suggested "+sg.level+" ("+f1(sg.mark)+")";
+    return `<td class="gr ${cl}" data-do="deg" data-u="${s.uid}" data-c="${esc(c)}" title="${esc(t)}">${f?deg(f)+" ✓":sg.mark==null?"–":deg(sg.level,true)+`<br><small class="muted">${f1(sg.mark)}</small>`}</td>`}).join("")+"</tr>"});
+  return h+"</tbody></table>"}
 const lsGroups=id=>GR.filter(g=>g.course===(EL_LS.find(l=>l.id===id)||{}).course);
 // Criteria of the LS with their text, and the detail of one criterion
 function legend(list){const cs=[...new Set(list.flatMap(a=>a.criteria))].sort();
   return `<table class="legend"><tbody>${cs.map(c=>`<tr><td>${pill(c)}</td><td><b>${esc(elCompetence(c))}</b><br>${esc(elCriterion(COURSE,c)||"–")}</td></tr>`).join("")}</tbody></table>`}
-function critPanel(c){
+function critPanel(c){redraw=null;
   const list=acts(S.ls),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+k));
   dlg(`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterion(COURSE,c)||"No text yet for this course.")}</p><label>Learning paths linked to it</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>Activities that give evidence</label><p>${st.map(esc).join(" · ")||"–"}</p>`);
 }
@@ -256,8 +366,35 @@ function roForm(s){const r=s.ro||{email:s.email||"",first:s.name||"",group:s.gro
     +`<div class="row">${s.ro?`<button class="g" data-do="rodel" data-u="${s.uid}">Remove from the list</button>`:""}<button data-do="rosave" data-u="${s.uid||""}">${s.ro?"Save":"Add to the list"}</button></div>`}
 
 // ---- panels
-function dlg(html){$("#dlgc").innerHTML=html+`<div class="row"><button class="g" data-do="close">Close</button></div>`;if(!$("#dlg").open)$("#dlg").showModal()}
-function stuPanel(u){
+function dlg(html,wide){$("#dlg").style.maxWidth=wide?"820px":"";$("#dlgc").innerHTML=html+`<div class="row"><button class="g" data-do="close">Close</button></div>`;if(!$("#dlg").open)$("#dlg").showModal()}
+let redraw=null;   // the open assessment dialog, drawn again after a one-click change (typed text, open sections and scroll are kept)
+function again(){const d=$("#dlg"),c=$("#dlgc");if(!d.open||!redraw)return;const f=()=>[...c.querySelectorAll("textarea,input:not([type=checkbox])")],vals=f().map(e=>e.value),op=[...c.querySelectorAll("details")].map(x=>x.open),top=d.scrollTop;
+  redraw();const now=f();if(now.length===vals.length)now.forEach((e,i)=>e.value=vals[i]);[...c.querySelectorAll("details")].forEach((x,i)=>{if(op[i]!=null)x.open=op[i]});d.scrollTop=top}
+// A student's LS grade, block by block, with the exam marks
+function gradePanel(u){redraw=()=>gradePanel(u);
+  const s=S.P[u],g=G(),{B,total}=grade(s),id=asId(S.ls),x=res(u,id),sc=x.sections||{},e=g.exam,fpA=g.fp.a;
+  const row=(l,v,extra)=>`<tr><td style="text-align:left">${l}</td><td>${v}</td><td style="text-align:left"><small class="muted">${extra||""}</small></td></tr>`;
+  const gvRows=[...g.gv.items.map(i=>[...i,0]),...g.gv.optional.map(i=>[...i,1])].map(([a,k,opt])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
+    return row(stepName(a,k)+(opt?' <small class="muted">(optional'+(B.gv.used.includes(a)?", counts":"")+")</small>":""),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===0?" late":""):""))}).join("");
+  const blk=(id,title,mark,body)=>`<details data-k="gp-${id}" ${S.open.has("gp-"+id)?"open":""}><summary style="font-size:1rem">${title} · <b>${f1(mark)}</b></summary>${body}</details>`;
+  dlg(`<h3>${name(s)} · LS grade</h3><p class="muted">${route(level(u,S.ls))} · Group: ${esc(teamOf(u,fpA))||"–"} · Missing work ${S.zero?"counts 0":"not counted yet"}</p>`
+    +`<p><b>LS mark: ${f1(total)} ${deg(elDegree(total))}</b> <small class="muted">${g.blocks.map(b=>b.name+" "+b.w+" %").join(" · ")}</small></p>`
+    +blk("exam",`Final exam (${g.blocks.find(b=>b.id==="exam").w} %)`,B.exam,`<table class="lvt"><tbody>${e.sections.map(([k,n])=>`<tr><td>${n}</td><td><input class="ex" data-ex="${u}" data-k="${k}" data-f="score" type="number" step="0.25" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${u}" data-k="${k}" data-f="max" type="number" value="${sc[k]&&sc[k].max!=null?sc[k].max:e.max}"></td></tr>`).join("")}<tr><td>Writing level ${pill(e.level.c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td></tr></tbody></table><div class="row" style="justify-content:flex-start;margin-top:4px"><button data-do="examsave1">Save exam marks</button></div>`)
+    +blk("fp",`Final product (${g.blocks.find(b=>b.id==="fp").w} %)`,B.fp,`<table><tbody>${g.fp.rows.map(r=>row(esc(r.name)+" "+cpill(r.c),deg(lvOf(u,fpA,r.step,r.c)),r.w+" %")).join("")}</tbody></table><p class="muted">Give these levels in the final product dialog. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open it</a></p>`)
+    +blk("gv",`Grammar and vocabulary (${g.blocks.find(b=>b.id==="gv").w} %)`,B.gv.mark,`<p class="muted">First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %</p><table><thead><tr><th style="text-align:left">Step</th><th>First try</th><th style="text-align:left">Done</th></tr></thead><tbody>${gvRows}</tbody></table>`)
+    +blk("other",`Other competences (${g.blocks.find(b=>b.id==="other").w} %)`,B.other,`<table><thead><tr><th>Criterion</th><th>Steps (auto)</th><th>Levels</th><th>Mark</th></tr></thead><tbody>${g.other.map(c=>{const o=otherCrit(u,c);
+      const at=(g.auto[c]||[]).map(([a,k,f])=>stepName(a,k)+": "+(f?(firstOf(u,a,k)?"first try "+firstOf(u,a,k).score+"/"+firstOf(u,a,k).max:"–"):doneAt(u,a,k)?"done":"not done")).join("\n"),
+        tt=(g.teacher[c]||[]).map(([a,k])=>stepName(a,k)+": "+(lvOf(u,a,k,c)||"–")).join("\n");
+      return `<tr><td>${pill(c)}</td><td title="${esc(at)}">${f1(o.auto)}</td><td title="${esc(tt)}">${f1(o.teacher)}</td><td><b>${f1(o.mark)}</b></td></tr>`}).join("")}</tbody></table><p class="muted">Hover a number to see its steps or levels.</p>`),true);
+}
+// One criterion of one student: evidence, suggestion and the confirmed degree
+function degPanel(u,c){redraw=()=>degPanel(u,c);
+  const s=S.P[u],sg=suggest(u,c),f=(res(u,asId(S.ls)).final||{})[c];
+  dlg(`<h3>${pill(c)} ${esc(elCompetence(c))} · ${name(s)}</h3><p class="muted">${esc(elCriterion(COURSE,c)||"")}</p><label>Evidence (earlier first)</label><ul>${sg.items.map(i=>`<li>${i}</li>`).join("")}</ul>`
+    +`<p>Suggested: ${sg.mark==null?'<span class="muted">not enough evidence yet'+(G().evidence[c].levelOnly?" (needs a teacher level: an exam score alone never sets it)":"")+"</span>":deg(sg.level)+" ("+f1(sg.mark)+")"}</p>`
+    +`<label>Degree</label>${lvBtns(`data-do="fin" data-u="${u}" data-c="${esc(c)}"`,f,c)} ${sg.mark!=null&&!f?`<button class="g" data-do="fin" data-u="${u}" data-c="${esc(c)}" data-l="${sg.level}">Confirm ${sg.level}</button>`:""}<p class="muted">${f?"Confirmed. Click it again to go back to the suggestion.":"Not confirmed yet."}</p>`);
+}
+function stuPanel(u){redraw=null;
   const s=S.P[u],ls=S.ls,l=level(u,ls),lsT=(EL_LS.find(x=>x.id===ls)||{}).title;
   const info=[s.email?esc(s.email):"<b>No email yet</b>: cannot sign in",s.ro&&s.ro.tutor?"Tutor: "+esc(s.ro.tutor):"",s.away?"not signed in yet":"",s.tester?"tester account":"",listed()&&!s.ro&&!s.tester?"<b>not on the student list</b>: cannot sign in":""].filter(Boolean).join(" · ");
   const entry=s.tester?"":`<details data-k="roform" ${s.ro&&s.email?"":"open"}><summary style="font-size:1rem">${s.ro?"Edit the list entry":"Add to the student list"}</summary>${roForm(s)}</details>`;
@@ -267,12 +404,13 @@ function stuPanel(u){
     <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– not chosen –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${x.name}</option>`).join("")}</select>
     <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`+entry);
 }
-function cellPanel(u,id){
+function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
-  const state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
+  const gx=!!G()&&a.ls===S.ls,state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${x.score||0}/${a.points}`:""}</p>`
-    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th></tr></thead><tbody>${steps(a).map(k=>`<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td></tr>`).join("")}</tbody></table>`:"")
+    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.steps?handIns(u,a):"")
+    +levelRows(u,a)
     +(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
     +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea>`
     +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`);
@@ -292,6 +430,17 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     acc:()=>act(api.setLevel(u,S.ls,k.to)),rej:()=>act(api.reject(u,S.ls)),
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
+    // assessment: one click saves and redraws
+    grade:()=>gradePanel(u),deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
+    lv:()=>{const cur=((res(u,k.a).levels||{})[k.s]||{})[k.c];quick(patch(u,k.a,{levels:{[k.s]:{[k.c]:cur===k.l?null:k.l}}}))},
+    glv:()=>{const cur=((res(u,k.a).levels||{}).group||{})[k.c],v=cur===k.l?null:k.l,ms=teamMates(k.a,teamOf(u,k.a),S.P[u].group);if(!ms.some(m=>m.uid===u))ms.push(S.P[u]);
+      quick(ms.map(m=>patch(m.uid,k.a,{levels:{group:{[k.c]:v}}})))},
+    down:()=>quick(patch(u,k.a,{down:{[k.c]:t.checked?true:null}})),
+    team:()=>{const v=$("#team").value.replace(/\s+/g," ").trim();if(v===teamOf(u,k.a))return;
+      const mate=teamMates(k.a,v,S.P[u].group).find(m=>m.uid!==u&&(res(m.uid,k.a).levels||{}).group);   // a new member gets the group's levels
+      quick(patch(u,k.a,{team:v||null,levels:{group:mate?Object.assign({},res(mate.uid,k.a).levels.group):null}}))},
+    fin:()=>{const id=asId(S.ls),cur=(res(u,id).final||{})[k.c];quick(patch(u,id,{final:{[k.c]:cur===k.l?null:k.l}}))},
+    examsave:()=>quick(saveExam($("#main"))),examsave1:()=>quick(saveExam($("#dlgc"))),
     replysave:()=>{const v=$("#rp-"+k.s).value.trim();if(!v)return;act(api.reply(u,a,k.s,v)).then(()=>cellPanel(u,a.id))},
     save:()=>{const o={feedback:$("#ffb").value};if(a.manual){const sc=$("#fsc").value,mx=$("#fmx").value;if(sc!==""&&mx!==""&&!isNaN(+sc)&&!isNaN(+mx)){o.score=+sc;o.max=+mx}}$("#dlg").close();act(api.result(u,a,o))},
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
@@ -299,6 +448,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     assign:()=>{const l=EL_LS.find(x=>x.id===S.ls),info=S.D.ls[S.ls],set=new Set(lsGroups(S.ls).filter(g=>elLsForGroup(l,info,g.id)).map(g=>g.id));set.has(k.g)?set.delete(k.g):set.add(k.g);act(api.ls(S.ls,{groups:[...set]}))},
     enable:()=>{const set=new Set(S.D.ls[S.ls].enabled);set.has(k.a)?set.delete(k.a):set.add(k.a);act(api.ls(S.ls,{enabled:[...set]}))}
   })[k.do]?.()});
+$("#dlg").addEventListener("close",()=>redraw=null);
 document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);
 document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
   if(k.do==="import"&&t.files[0])importList(t.files[0]).catch(x=>alert("Could not read the file: "+x.message)).finally(()=>t.value="");

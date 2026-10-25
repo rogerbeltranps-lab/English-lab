@@ -17,7 +17,7 @@ var finalRubric = {
       return '<th scope="col"><span class="level-num">' + l[0] + '</span><span class="level-name">' + l[1] + '</span></th>';
     }).join('') + '</tr>';
     var rows = data.rows.map(function (r) {
-      return '<tr><th scope="row">' + r.name + '<small>' + r.sub + '</small><span class="percent">' + r.pct + '%</span></th>' +
+      return '<tr><th scope="row">' + r.name + '<small>' + r.sub + '</small><span class="percent">' + (typeof r.pct === 'number' ? r.pct + '%' : r.pct) + '</span></th>' +
         r.cells.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>';
     }).join('');
     host.innerHTML =
