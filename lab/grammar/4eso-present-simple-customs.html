@@ -246,7 +246,8 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
 .tpill.up .t{color:var(--no);animation:pop .5s}
 .tpill .chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:.2em .6em;font:600 .7em var(--f-body)}
 .tpill .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-/* the team points strip (#teambar) is styled by shared/js/el-deck-points.js */
+/* the team points strip (#teambar) and the live view are styled by shared/js/el-deck-points.js */
+.deck-live .navbtn,.deck-live .tools,.deck-live .rail{visibility:hidden}
 
 /* category tooltip */
 .gtip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:var(--bg);font:600 14px/1.3 var(--f-body);letter-spacing:.02em;padding:.35em .7em;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.18);white-space:nowrap;max-width:calc(100vw - 16px)}
@@ -557,7 +558,7 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
 
 </main>
 
-<div class="teambar" id="teambar" data-course="4eso" hidden aria-label="Team points"></div>
+<div class="teambar" id="teambar" data-course="4eso" data-ls="4eso-seasons-and-celebrations" hidden aria-label="Team points"></div>
 <footer class="bottom">
   <button class="navbtn back" id="prev" type="button" data-ca="← Enrere">← Back</button>
   <div class="mid">
@@ -673,16 +674,17 @@ $('#exit').innerHTML=EXIT.map(([s,a,en,ca],i)=>`<button type="button" class="xca
 /* Catalan help: [data-ca] holds the Catalan version of an English instruction */
 $$('[data-ca]').forEach(el=>{el.innerHTML=B(el.innerHTML.trim(),el.getAttribute('data-ca'))});
 
-/* polls: fill the gap with the right option, number the options for finger votes */
+/* polls: fill the gap with the right option, number the options for finger votes; data-i = original position (live view) */
+$$('.opts').forEach(b=>$$('.opt',b).forEach((o,i)=>{o.dataset.i=i}));
 $$('.poll').forEach(p=>{
   const ok=$('.opt[data-ok]',p);
   $$('.opt',p).forEach(o=>{o.innerHTML=`<span class="key"></span><span>${o.innerHTML}</span>`});
   $$('.gap>.fill',p).forEach(f=>{if(!f.innerHTML&&ok)f.innerHTML=ok.lastElementChild.innerHTML});
 });
 function setupPolls(s){
-  $$('.opts',s).forEach(box=>{
-    const opts=$$('.opt',box);
-    (box.hasAttribute('data-fixed')?opts:shuffled(opts)).forEach((o,i)=>{box.appendChild(o);$('.key',o).textContent=i+1;o.setAttribute('aria-pressed','false')});
+  $$('.opts',s).forEach((box,n)=>{
+    const opts=$$('.opt',box),o=live&&live.order&&live.order[n];   // following the class: the teacher's order, so 1 2 3 match the projector
+    (o?o.map(i=>opts.find(x=>+x.dataset.i===i)).filter(Boolean):box.hasAttribute('data-fixed')?opts:shuffled(opts)).forEach((o,i)=>{box.appendChild(o);$('.key',o).textContent=i+1;o.setAttribute('aria-pressed','false')});
   });
 }
 function markPoll(p,on){$$('.opt',p).forEach(o=>{const ok=o.hasAttribute('data-ok'),picked=o.getAttribute('aria-pressed')==='true';o.classList.toggle('ok',on&&ok);o.classList.toggle('no',on&&!ok&&picked);o.classList.toggle('dim',on&&!ok&&!picked)})}
@@ -692,7 +694,8 @@ const slides=$$('.slide'),rail=$('#rail'),stage=$('#stage');
 slides.forEach(s=>{const n=new Set();$$('[data-step],[data-open],[data-until]',s).forEach(el=>['step','open','until'].forEach(k=>{if(el.dataset[k])n.add(+el.dataset[k])}));s._beats=[...n].sort((a,b)=>a-b)});
 const st=slides.map(()=>({b:0,man:new Set()}));
 let cur=Math.min(Math.max(0,store.get('slide',0)|0),slides.length-1);
-slides.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.textContent=i+1;b.title=s.dataset.title;b.setAttribute('aria-label',`Slide ${i+1}: ${s.dataset.title}`);b.onclick=()=>go(i);rail.appendChild(b)});
+let live=null;   // a student following the class: the teacher's latest step (see "live" below)
+slides.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.textContent=i+1;b.title=s.dataset.title;b.setAttribute('aria-label',`Slide ${i+1}: ${s.dataset.title}`);b.onclick=()=>live||go(i);rail.appendChild(b)});
 
 function apply(i){
   const s=slides[i],{b,man}=st[i];
@@ -703,6 +706,7 @@ function apply(i){
   const nx=$$('.xcard[data-open]',s).filter(el=>!el.classList.contains('open')&&!el.closest('.later,.gone')).sort((x,y)=>x.dataset.open-y.dataset.open)[0];
   if(nx)nx.classList.add('now');
   nav();
+  dispatchEvent(new CustomEvent('deckstep',{detail:info()}));
 }
 const changes=(i,n)=>{const s=slides[i];return !!$(`[data-step="${n}"],[data-until="${n}"]`,s)||$$(`[data-open="${n}"]`,s).some(el=>!st[i].man.has(el))};
 const nextBeat=i=>slides[i]._beats.find(n=>n>st[i].b&&changes(i,n));
@@ -742,14 +746,14 @@ function back(){
   if(t.b>0){const l=slides[cur]._beats.filter(n=>n<t.b);t.b=l.length?l[l.length-1]:0;t.man.forEach(el=>{if(+el.dataset.open>t.b)t.man.delete(el)});apply(cur)}
   else if(cur>0)go(cur-1,true);
 }
-$('#prev').onclick=back;$('#next').onclick=next;
+$('#prev').onclick=()=>live||back();$('#next').onclick=()=>live||next();
 
 /* clicks inside slides: vote on a poll option, open a card */
 stage.addEventListener('click',e=>{
   const o=e.target.closest('.opt');
   if(o){const p=o.closest('.poll'),on=o.getAttribute('aria-pressed')!=='true';$$('.opt',p).forEach(x=>x.setAttribute('aria-pressed','false'));o.setAttribute('aria-pressed',String(on));if(p.classList.contains('open'))markPoll(p,true);return}
   const c=e.target.closest('.xcard[data-open]');
-  if(c&&!c.closest('.later')){const t=st[cur];if(+c.dataset.open<=t.b)return;if(t.man.has(c))t.man.delete(c);else t.man.add(c);apply(cur);return}
+  if(c&&!c.closest('.later')&&!live){const t=st[cur];if(+c.dataset.open<=t.b)return;if(t.man.has(c))t.man.delete(c);else t.man.add(c);apply(cur);return}
   const g=e.target.closest('.go321');
   if(g){if(g.dataset.timer)showTimer(+g.dataset.timer,true);else if(g.hasAttribute('data-pick'))openPick();else if(g.hasAttribute('data-teams'))ELDeckPoints.toggle(true);else countdown(g.dataset.say)}
 });
@@ -764,6 +768,7 @@ document.addEventListener('keydown',e=>{
   if(e.target.closest&&e.target.closest('input,textarea,select'))return;
   if(e.altKey||e.ctrlKey||e.metaKey)return;
   const k=e.key;
+  if(live&&k!=='c'&&k!=='C'&&k!=='f'&&k!=='F')return;   // following the class: only Catalan and full screen
   if(!$('#pick').hidden){if(k==='Escape'||k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();closePick()}else if(k==='r'||k==='R')pickOne();return}
   if(!$('#cd').hidden&&k==='Escape'){stopCd();return}
   if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();next()}
@@ -847,6 +852,19 @@ document.addEventListener('pointerover',e=>{const el=catEl(e.target);if(el){if(e
 document.addEventListener('pointerdown',e=>{const el=catEl(e.target);if(el)showTip(el);else hideTip()});
 stage.addEventListener('scroll',hideTip,{passive:true});
 document.addEventListener('keydown',hideTip);
+
+/* ---------- live: students follow the teacher's screen (shared/js/el-deck-points.js) ---------- */
+// Every step announces where the deck is (deckstep: slide, step, cards opened by hand, answer order). A student following the class
+// gets the same view with ELDeck.show(state); their own navigation is off until ELDeck.show(null). live is declared with the deck state above.
+function info(){const s=slides[cur],op=$$('[data-open]',s);return {slide:cur,step:st[cur].b,man:op.map((el,k)=>st[cur].man.has(el)?k:-1).filter(k=>k>=0),order:$$('.opts',s).map(b=>$$('.opt',b).map(o=>+o.dataset.i))}}
+function show(x){
+  const was=live;live=x;document.documentElement.classList.toggle('deck-live',!!x);if(!x){nav();return}
+  const same=was&&was.slide===x.slide&&JSON.stringify(was.order)===JSON.stringify(x.order)&&x.slide===cur;
+  if(!same)go(x.slide);
+  const op=$$('[data-open]',slides[cur]);st[cur].b=x.step;st[cur].man=new Set((x.man||[]).map(k=>op[k]).filter(Boolean));apply(cur);
+  if(same&&was.step!==x.step)reveal($(`[data-step="${x.step}"],[data-open="${x.step}"]`,slides[cur]));   // not on the teacher's every-minute signal
+}
+window.ELDeck={info,show,setCa};
 
 setCa(!!store.get('ca',false));
 go(cur);

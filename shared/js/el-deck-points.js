@@ -5,7 +5,12 @@
 // Signed out, the strip is a plain scoreboard kept in this browser. Signed in with the teacher's account and a class group
 // chosen, its teams come from the dashboard (Team points) and every + or − is saved at once for each member of the team
 // (points/{email}.{term}) and for the team (teams/{group}.score.{term}.{team}), with the group's best (teams/{group}.best.{term}).
-// The deck's own script opens the strip with ELDeckPoints.toggle(true) (.go321[data-teams]) and re-places its timer on resize.
+// Buzzer (Roger, 25 Oct 2026): with a group chosen, 🔔 Buzz (or B) opens the buzzers on the students' boards (today.html); the first
+// student to press wins the turn for their team and the presentation says "Lions, answer!". See the buzzer section below.
+// Live view (Roger, 25 Oct 2026): the teacher's screen also publishes its slide and step (live/{group}); a student opens the deck with
+// ?live={group} (link on their board) and their device follows it, with the buzzer below and Catalan help for Insecure (data-ls).
+// The deck's own script opens the strip with ELDeckPoints.toggle(true) (.go321[data-teams]) and re-places its timer on resize;
+// it announces every step (deckstep) and follows with ELDeck.show(state) (window.ELDeck: info, show, setCa).
 (function(){
 const SRC=document.currentScript.src,FB="https://www.gstatic.com/firebasejs/10.14.1/";
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -25,15 +30,29 @@ css.textContent=`
 .teambar select{font:600 .75em var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.2em}
 .tstat{font-size:.7em;color:var(--muted);white-space:nowrap}.tstat.no{color:var(--no)}.tstat a{color:var(--accent)}
 @keyframes elDeckBump{from{transform:scale(1.7)}to{transform:scale(1)}}
-.ptrule{display:flex;gap:.7em;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.55em .9em;min-width:0}
+@keyframes elBuzzPop{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+.elbuzz{position:fixed;z-index:45;left:16px;right:16px;margin-inline:auto;width:fit-content;top:4.2em;display:flex;align-items:center;gap:.6em;flex-wrap:wrap;justify-content:center;background:var(--surface);color:var(--ink);border:2px solid var(--accent);border-radius:999px;padding:.35em .5em .35em 1em;box-shadow:0 8px 24px rgba(0,0,0,.2);font:600 .9em var(--f-body)}
+.elbuzz.win{top:50%;transform:translateY(-50%);flex-direction:column;border-radius:28px;border-width:3px;padding:1.2em 2em;gap:.9em}
+.elbuzz .who{margin:0;font:800 min(3.2em,11vw)/1.1 var(--f-display);text-align:center;text-wrap:balance;animation:elBuzzPop .4s ease-out}
+.elbuzz .bzrow{display:flex;gap:.5em;flex-wrap:wrap;justify-content:center}
+.elbuzz button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:.35em .9em;font:600 .85em var(--f-body)}
+.elbuzz button.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}.elbuzz button.no{background:var(--no-bg);color:var(--no);border-color:var(--no)}
+.elbuzz small{color:var(--muted);font-weight:500}
+.elbuzz .dot{width:.7em;height:.7em;border-radius:50%;background:var(--no);animation:elBuzzPulse 1s ease-in-out infinite}
+@keyframes elBuzzPulse{50%{opacity:.25}}
+.deck-live .teambar{display:none!important}
+.ellive{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.2em .5em;font:600 .75em/1.25 var(--f-body);color:var(--accent);text-align:center;min-width:0}
+.ellive a{color:var(--accent)}.ellive button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:.2em .7em;font:600 1em var(--f-body)}
+.ptrule{display:flex;gap:.7em;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.45em .9em;min-width:0}
 .ptrule .ico{font-size:1.4em;line-height:1.1;flex:0 0 auto}.ptrule b{display:block}
-@media (prefers-reduced-motion: reduce){.team .sc.bump{animation:none}}`;
+@media (prefers-reduced-motion: reduce){.team .sc.bump,.elbuzz .who,.elbuzz .dot{animation:none}}`;
 document.head.appendChild(css);
 
-/* ---------- reminder slide: the rules, then a quick check with new numbers every time ---------- */
-const EX=[[12,15],[8,16],[12,20],[14,20],[9,10],[6,15],[15,25],[16,20]];
+/* ---------- reminder slide: the rules, then a quick check with new numbers every day ---------- */
+// By the date, not at random, so the projector and the students following on their devices show the same numbers.
+const EX=[[12,15],[8,16],[12,20],[14,20],[9,10],[6,15],[15,25],[16,20]],today=new Date();
 $$(".slide[data-el-points]").forEach(s=>{
-  const [m,b]=EX[Math.floor(Math.random()*EX.length)],x=elBonus(m,b),N=n=>elNum(n,"en"),C=n=>elNum(n,"ca"),opt=(n,ok)=>`<button type="button" class="opt"${ok?" data-ok":""} data-ca="+${C(n)}">+${N(n)}</button>`;
+  const [m,b]=EX[(today.getFullYear()*372+today.getMonth()*31+today.getDate())%EX.length],x=elBonus(m,b),N=n=>elNum(n,"en"),C=n=>elNum(n,"ca"),opt=(n,ok)=>`<button type="button" class="opt"${ok?" data-ok":""} data-ca="+${C(n)}">+${N(n)}</button>`;
   s.dataset.title=s.dataset.title||"Team points";
   s.innerHTML=`<p class="eyebrow" data-ca="Cada classe · Punts d’equip">Every class · Team points</p>
   <h2 data-ca="Avui el teu equip pot guanyar punts">Your team can win points today</h2>
@@ -70,7 +89,7 @@ function draw(){
   else if(!cloudOn)h=[...Array(local.n).keys()].map(t=>`<div class="team"><input id="teamName${t}" value="${esc(local.names[t]||"Team "+(t+1))}" aria-label="Team ${t+1} name"><button type="button" data-team="${t}" data-d="-1" aria-label="Remove a point">−</button><span class="sc">${local.score[t]||0}</span><button type="button" data-team="${t}" data-d="1" aria-label="Add a point">+</button></div>`).join("");
   const sel=T.teacher?`<select id="teamGroup" aria-label="Class group the points are saved for" title="Class group the points are saved for"><option value="">Not saved</option>${groups().map(g=>`<option value="${g.id}"${g.id===T.group?" selected":""}>☁ ${esc(g.name)}</option>`).join("")}</select>`:"";
   const stat=T.msg?`<span class="tstat no">${T.msg}</span>`
-    :D?`<span class="tstat" title="Saved for every member of the team">${B(elTermName(D.term,"en"),elTermName(D.term,"ca"))} · ${B("best","millor")} ${Math.max(0,...Object.values(D.pts))}</span><button type="button" class="tool" id="teamsReload" title="Load the teams again">↻</button>`
+    :D?(D.list.length?`<button type="button" class="tool" id="buzzOpen" title="Open the buzzers on the students' boards (B)">🔔 ${B("Buzz","Polsador")}</button>`:"")+`<span class="tstat" title="Saved for every member of the team">${B(elTermName(D.term,"en"),elTermName(D.term,"ca"))} · ${B("best","millor")} ${Math.max(0,...Object.values(D.pts))}</span><button type="button" class="tool" id="teamsReload" title="Load the teams again">↻</button>`
     :T.teacher?"":`<button type="button" class="tool" id="teamsSignIn" title="Sign in with the teacher's account to save the points for a class group">☁ ${B("Save points","Desa els punts")}</button>`;
   const ctl=cloudOn?"":`<select id="teamCount" aria-label="Number of teams">${[2,3,4,5,6].map(n=>`<option value="${n}"${n===local.n?" selected":""}>${n}</option>`).join("")}</select><button type="button" class="tool" id="teamsZero">${B("Reset","Zero")}</button>`;
   bar.innerHTML=h+`<span class="tctl">${sel}${ctl}${stat}</span>`;
@@ -91,7 +110,7 @@ function cloud(){
     const cfg=new URL("el-firebase.js",SRC).href,cat=new URL("el-catalog.js",SRC).href;   // first, so a bad address fails before any import starts
     const [{initializeApp,getApps},A,S,C]=await Promise.all([import(FB+"firebase-app.js"),import(FB+"firebase-auth.js"),import(FB+"firebase-firestore.js"),import(cfg),window.EL_GROUPS?0:loadScript(cat)]);
     const app=getApps()[0]||initializeApp(C.CONFIG),fb={A,S,auth:A.getAuth(app),db:S.getFirestore(app)};
-    A.onAuthStateChanged(fb.auth,u=>{T.user=u;T.teacher=!!u&&C.TEACHERS.includes((u.email||"").toLowerCase());if(T.teacher&&T.group)load();else draw()});
+    A.onAuthStateChanged(fb.auth,u=>{T.user=u;T.teacher=!!u&&C.TEACHERS.includes((u.email||"").toLowerCase());if(T.teacher&&T.group)load();else{listen("");draw()}if(LIVE)joinLive(u)});
     return fb;
   })().catch(e=>{console.warn("team points",e);T.fb=null;return null});
 }
@@ -106,7 +125,7 @@ async function load(){
     const P={};pt.forEach(d=>P[d.id]=d.data());
     const t=tm.exists()?tm.data():{},list=t.list||[],members=Object.fromEntries(list.map(x=>[x.id,[]])),pts={};
     keys.forEach(k=>{const p=P[k]||{};pts[k]=+p[term]||0;if(members[p.team])members[p.team].push(k)});
-    T.data={g,term,list,score:Object.assign({},(t.score||{})[term]),members,pts};T.msg="";
+    T.data={g,term,list,score:Object.assign({},(t.score||{})[term]),members,pts};T.msg="";listen(g);
   }catch(e){console.warn("team points",e);T.msg="⚠ Could not load the teams: "+esc(e.message)}
   draw();
 }
@@ -125,6 +144,51 @@ async function award(id,d){
 }
 const bump=id=>{const b=bar.querySelector(`[data-team="${CSS.escape(String(id))}"]`),sc=b&&b.parentNode.querySelector(".sc");if(sc){sc.classList.remove("bump");void sc.offsetWidth;sc.classList.add("bump")}};
 
+/* ---------- live: the teacher's screen publishes where it is ---------- */
+// live/{group} = {on, deck (path), title, slide, step, man, order, at}: written at every step and every minute while a group is chosen.
+let liveT=null,beat=null;
+addEventListener("deckstep",()=>{if(ready())sendLive()});
+function sendLive(){clearTimeout(liveT);liveT=setTimeout(async()=>{
+  const fb=await cloud();if(!fb||!ready()||!window.ELDeck)return;
+  try{await fb.S.setDoc(fb.S.doc(fb.db,"live",T.group),Object.assign({on:true,deck:location.pathname,title:document.title},ELDeck.info(),{at:fb.S.serverTimestamp()}))}catch(e){console.warn("live",e)}},150)}
+async function liveOff(g){const fb=await cloud();if(fb)fb.S.setDoc(fb.S.doc(fb.db,"live",g),{on:false,at:fb.S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}
+addEventListener("pagehide",()=>{if(T.live)liveOff(T.live)});
+
+/* ---------- buzzer: the students' boards buzz, the first team answers ---------- */
+// buzz/{group} = {open, q, out:[team], winner:{team, at} or null}. The teacher opens a question here; a student's board sets the
+// winner once (firestore.rules: their own team, while open and nobody has, not a team that is out). Then ✓ gives the team +1 and
+// closes, ✗ leaves that team out of this question and opens the buzzers again for the others, and Close ends it.
+const bz=document.createElement("div");bz.className="elbuzz";bz.hidden=true;bz.setAttribute("aria-live","assertive");document.body.append(bz);
+let unsub=null;
+function listen(g){
+  if(unsub)unsub();unsub=null;T.buzz=null;drawBuzz();clearInterval(beat);beat=null;
+  if(T.live&&T.live!==g)liveOff(T.live);T.live=g||null;if(!g)return;
+  sendLive();beat=setInterval(sendLive,60e3);   // every minute too, so the students' boards know the class is still on
+  cloud().then(fb=>{if(!fb||T.group!==g)return;
+    unsub=fb.S.onSnapshot(fb.S.doc(fb.db,"buzz",g),s=>{const was=T.buzz&&T.buzz.winner;T.buzz=s.exists()?s.data():null;if(T.buzz&&T.buzz.open&&T.buzz.winner&&!was)ding();drawBuzz()},e=>console.warn("buzz",e))});
+}
+const tname=id=>esc(((T.data&&T.data.list.find(x=>x.id===id))||{}).name||id);
+function drawBuzz(){
+  const z=T.buzz;bz.hidden=!(ready()&&z&&z.open);if(bz.hidden)return;
+  bz.classList.toggle("win",!!z.winner);
+  bz.innerHTML=z.winner?`<p class="who">🔔 ${B(tname(z.winner.team)+", answer!",tname(z.winner.team)+", responeu!")}</p><div class="bzrow"><button type="button" class="ok" data-bz="right">✓ ${B("Right · +1","Correcte · +1")}</button><button type="button" class="no" data-bz="wrong">✗ ${B("Wrong · another team","Incorrecte · un altre equip")}</button><button type="button" data-bz="close">${B("Close","Tanca")}</button></div>`
+    :`<span class="dot" aria-hidden="true"></span><span>${B("Buzzers open: press 🔔 on your board!","Polsadors oberts: premeu 🔔 al vostre tauler!")}</span>${(z.out||[]).length?`<small>${B("Out:","Fora:")} ${z.out.map(tname).join(", ")}</small>`:""}<button type="button" data-bz="close">${B("Close","Tanca")}</button>`;
+}
+function ding(){try{const a=new (window.AudioContext||window.webkitAudioContext)();[880,1320].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.frequency.value=f;g.gain.setValueAtTime(.2,a.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+i*.12+.25);o.connect(g).connect(a.destination);o.start(a.currentTime+i*.12);o.stop(a.currentTime+i*.12+.25)})}catch(e){}}
+async function buzzSet(o,merge=true){
+  const fb=await cloud();if(!fb||!T.group)return;
+  try{await fb.S.setDoc(fb.S.doc(fb.db,"buzz",T.group),Object.assign(o,{updated:fb.S.serverTimestamp()}),{merge})}catch(e){console.warn("buzz",e);T.msg="⚠ Buzzer: "+esc(e.message);draw()}
+}
+const openBuzz=()=>ready()&&T.data.list.length?buzzSet({open:true,q:Date.now(),out:[],winner:null},false):null;
+bz.addEventListener("click",e=>{
+  const a=e.target.closest("[data-bz]"),z=T.buzz;if(!a||!z)return;const w=z.winner&&z.winner.team;
+  if(a.dataset.bz==="right"){if(w)award(w,1);buzzSet({open:false})}
+  else if(a.dataset.bz==="wrong"){const out=[...new Set([...(z.out||[]),w].filter(Boolean))];   // nobody left to buzz: close
+    buzzSet({out,winner:null,open:T.data.list.some(t=>!out.includes(t.id)&&(T.data.members[t.id]||[]).length)})}
+  else buzzSet({open:false});
+});
+document.addEventListener("keydown",e=>{if((e.key==="b"||e.key==="B")&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&!(e.target.closest&&e.target.closest("input,textarea,select")))openBuzz()});
+
 bar.addEventListener("click",async e=>{
   const b=e.target.closest("[data-team]");
   if(b){const d=+b.dataset.d;
@@ -132,17 +196,51 @@ bar.addEventListener("click",async e=>{
     const t=+b.dataset.team;local.score[t]=Math.max(0,(local.score[t]||0)+d);b.parentNode.querySelector(".sc").textContent=local.score[t];store.set("teams",local);if(d>0)bump(t);return}
   if(e.target.closest("#teamsZero")){local.score=[0,0,0,0,0,0];store.set("teams",local);draw()}
   if(e.target.closest("#teamsReload"))load();
+  if(e.target.closest("#buzzOpen"))openBuzz();
   if(e.target.closest("#teamsSignIn")){const fb=await cloud();if(!fb)return;
     try{const p=new fb.A.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});await fb.A.signInWithPopup(fb.auth,p)}catch(x){console.warn("sign in",x)}
     if(!T.teacher&&T.user){T.msg=B("Only the teacher's account saves points.","Només el compte del professor desa punts.");draw()}}
 });
 bar.addEventListener("change",e=>{
   const id=e.target.id;
-  if(id==="teamGroup"){T.group=e.target.value;T.msg="";store.set("group",T.group?{g:T.group,at:Date.now()}:null);T.group?load():draw()}
+  if(id==="teamGroup"){T.group=e.target.value;T.msg="";store.set("group",T.group?{g:T.group,at:Date.now()}:null);listen("");T.group?load():draw()}
   else if(id==="teamCount"){local.n=+e.target.value;store.set("teams",local);draw()}
   else if(id.startsWith("teamName")){local.names[+id.slice(8)]=e.target.value;store.set("teams",local)}
 });
 if(btn)btn.addEventListener("click",()=>toggle());
+/* ---------- a student follows the class: ?live={group} ---------- */
+// The device shows the teacher's slide and step (ELDeck.show), turns the Catalan help on for an Insecure student (their route in the
+// deck's LS, #teambar data-ls) and shows the buzzer (el-buzz.js) when the student has a team. "Stop following" lets them look around.
+const LIVE=(new URLSearchParams(location.search).get("live")||"").replace(/[^\w-]/g,"");
+const lv=document.createElement("span");lv.className="ellive";lv.setAttribute("aria-live","polite");
+let liveStop=null,buzzStop=null,paused=false,lastLive=null;
+const fresh=at=>{const ms=at&&(at.toMillis?at.toMillis():+at);return !!ms&&Date.now()-ms<10*60e3};
+function liveDraw(){
+  const x=lastLive,on=x&&x.on&&fresh(x.at),here=on&&x.deck===location.pathname;
+  if(window.ELDeck)ELDeck.show(here&&!paused?x:null);
+  lv.innerHTML=!on?`📺 ${B("The class presentation is not on now.","Ara no hi ha cap presentació a classe.")}`
+    :!here?`📺 ${B("Your class is on another presentation:","La classe és en una altra presentació:")} <a href="${esc(x.deck)}?live=${LIVE}">${x.title?esc(x.title):B("open it","obre-la")}</a>`
+    :paused?`<button type="button" data-live="1">📺 ${B("Follow again","Torna a seguir")}</button>`
+    :`📺 ${B("Following the class","Segueixes la classe")} <button type="button" data-live="0">${B("Stop","Atura")}</button>`;
+}
+lv.addEventListener("click",e=>{const b=e.target.closest("[data-live]");if(b){paused=b.dataset.live==="0";liveDraw()}});
+async function joinLive(u){
+  if(liveStop)liveStop();if(buzzStop)buzzStop();liveStop=buzzStop=null;
+  ($(".bottom .mid")||document.body).append(lv);
+  if(!u||T.teacher){lv.innerHTML=T.teacher?"":`📺 ${B("Sign in with your school account (bottom right) to follow the class.","Entra amb el compte de l’institut per seguir la classe.")}`;if(!u)lv.append(signInBtn());return}
+  const fb=await cloud();if(!fb)return;const {S,db}=fb,em=(u.email||"").toLowerCase();
+  if(bar.dataset.ls)S.getDoc(S.doc(db,"students",u.uid,"levels",bar.dataset.ls)).then(l=>{if(l.exists()&&l.data().level==="insecure"&&window.ELDeck)ELDeck.setCa(true)}).catch(()=>{});   // Catalan for Insecure
+  liveStop=S.onSnapshot(S.doc(db,"live",LIVE),s=>{lastLive=s.exists()?s.data():null;liveDraw()},e=>{console.warn("live",e);lv.innerHTML=`📺 ${B("You cannot follow this class.","No pots seguir aquesta classe.")}`});
+  try{const [p,t,{buzzer}]=await Promise.all([S.getDoc(S.doc(db,"points",em)),S.getDoc(S.doc(db,"teams",LIVE)),import(new URL("el-buzz.js",SRC).href)]);
+    const team=p.exists()&&p.data().team,list=(t.exists()&&t.data().list)||[];
+    if(team&&list.some(x=>x.id===team)){const el=$("#elBuzzLive")||document.body.appendChild(Object.assign(document.createElement("div"),{id:"elBuzzLive"}));
+      buzzStop=buzzer({S,db,group:LIVE,team,names:Object.fromEntries(list.map(x=>[x.id,x.name])),t:(ca,en)=>B(en,ca),el})}
+  }catch(e){console.warn("buzz",e)}
+}
+function signInBtn(){const b=document.createElement("button");b.type="button";b.innerHTML=B("Sign in","Entra");
+  b.onclick=async()=>{const fb=await cloud();if(!fb)return;try{const p=new fb.A.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});await fb.A.signInWithPopup(fb.auth,p)}catch(x){console.warn("sign in",x)}};return b}
+if(LIVE){cloud();setInterval(()=>{if(lastLive)liveDraw()},60e3)}   // the class ends: no new minute from the teacher
+
 draw();toggle(!!store.get("teamsOn",false));
 window.ELDeckPoints={toggle};
 })();
