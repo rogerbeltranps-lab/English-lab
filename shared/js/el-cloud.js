@@ -97,6 +97,12 @@ function overlay(html){
 }
 const todayLink='<p><a href="'+new URL("today.html",ROOT).href+'">Torna al meu tauler</a></p>';
 const block=(title,msg)=>overlay('<div><h1>'+title+'</h1><p>'+msg+'</p>'+todayLink+'</div>');
+// Signed-out visitors on an LS page: the sign-in button sits in the overlay itself; it goes away once someone signs in.
+let signInO=null;
+function signInBlock(){
+  signInO=overlay('<div style="max-width:520px"><h1>Sign in with your school account</h1><p>To do the activities you need to sign in with your school account (@'+DOMAINS.join(", @")+').</p><p><button style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit">Sign in with your school account</button></p></div>');
+  signInO.querySelector("button").onclick=login;
+}
 
 function chooseLevel(u){
   return new Promise(res=>{
@@ -152,7 +158,7 @@ async function gate(u){
   const info=await lsInfo(lsId),st=info.status;
   if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
   if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
-  if(!u||!isStudent(u)){block("Sign in with your school account","To do the activities you need to sign in with your school account (@"+DOMAINS.join(", @")+") (button at the bottom right).");return}
+  if(!u||!isStudent(u)){signInBlock();return}
   const tester=seesAll(u),vg=viewGroup(u);
   if(tester)banner("Compte de prova: veus totes les LS i activitats.","#7c3aed");
   if(vg)banner("Compte de prova · vista d'alumne de "+EL_GROUPS.find(x=>x.id===vg).name+": veus el que veu aquest grup.","#7c3aed",{t:"Torna a veure-ho tot",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}});
@@ -199,7 +205,7 @@ async function submitActivity(a){
 
 function bar(){
   const el=document.createElement("div");el.id="el-cloud-bar";
-  el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:9999;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;font:13px system-ui,sans-serif;box-shadow:0 2px 8px #0002;display:flex;gap:8px;align-items:center";
+  el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:10002;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;font:13px system-ui,sans-serif;box-shadow:0 2px 8px #0002;display:flex;gap:8px;align-items:center";
   document.body.appendChild(el);
   return u=>{el.innerHTML="";
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
@@ -223,6 +229,7 @@ const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=b
 
 onAuthStateChanged(auth,async u=>{
   user=u;draw(u);
+  if(u&&signInO){signInO.remove();signInO=null}
   if(u&&isStudent(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){if(prev!==null&&prev!==u.uid)wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
