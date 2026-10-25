@@ -19,6 +19,12 @@ dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 3
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}
 details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>summary{font-size:.9rem;font-weight:600;color:#475569}tr.away td{color:#94a3b8;background:#f8fafc}.tag{font-size:11px;font-weight:600;background:#e2e8f0;color:#475569;border-radius:999px;padding:1px 6px;margin-left:4px}label.btn{background:#0f766e;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 8px}.form input,.form select{width:100%;box-sizing:border-box}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}
 button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6px;padding:2px 7px;margin:1px;font-size:12px;font-weight:600}button.lv.on{color:#fff}td.gr{cursor:pointer;white-space:nowrap}td.gr:hover{outline:2px solid #0f766e;outline-offset:-2px}.sug{color:#64748b;font-style:italic}.deg{font-weight:700}td.tot{font-weight:700}.dlg input.ex{width:56px}table.lvt td{text-align:left}
+#pdf{display:none}body.pdfmode{max-width:none;background:#e2e8f0}body.pdfmode>*:not(#pdf){display:none!important}body.pdfmode #pdf{display:block}
+.pdfbar{position:sticky;top:0;z-index:5;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;margin:0 auto 12px;max-width:210mm;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#pdf .pg{background:#fff;max-width:210mm;margin:0 auto 16px;padding:14mm 12mm;box-sizing:border-box;box-shadow:0 2px 10px #0002;font-size:13px}#pdf .top{font-size:11px;color:#64748b;margin:0 0 4px;border-bottom:1px solid #e2e8f0;padding-bottom:4px}#pdf h2{margin:.2em 0}#pdf h3{font-size:1rem;margin:12px 0 4px}#pdf h4{margin:0 0 4px;font-size:.95rem}
+#pdf .ans{border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;margin:8px 0}#pdf .ans p{margin:.3em 0;break-inside:avoid}#pdf .v{white-space:pre-wrap}#pdf ul.rate{margin:2px 0;padding-left:18px}
+#pdf table{border-collapse:collapse;width:100%;font-size:11px}#pdf th,#pdf td{position:static;border:1px solid #94a3b8;padding:4px 5px;text-align:left;vertical-align:top;background:#fff}#pdf thead th{background:#f1f5f9}#pdf table.rb{table-layout:fixed}#pdf td.rn,#pdf table.rb th:first-child{width:20%}#pdf tr{break-inside:avoid}#pdf .tick{font-size:15px;line-height:1}#pdf .note{margin-top:4px;color:#0f766e}#pdf .cmt{margin-top:14px;break-inside:avoid}#pdf .cmt .line{border-bottom:1px solid #94a3b8;height:26px}
+@page{size:A4;margin:12mm}@media print{body.pdfmode{background:#fff;padding:0;margin:0}.pdfbar{display:none!important}#pdf .pg{box-shadow:none;margin:0;padding:0;max-width:none;break-before:page}#pdf .pg:first-of-type{break-before:auto}}</style></head><body>
 .ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
@@ -26,6 +32,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <div id="main"></div>
 </div>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
+<div id="pdf"></div>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
@@ -223,7 +230,8 @@ function render(){
   const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${l.title}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}</select> `:`<b>${lss[0].title}</b>${mine(lss[0])?"":" <small class=\"muted\">(not assigned to this group)</small>"} `)
     +`<a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a> `
     +`<span class="muted">· Route:</span> `+["all","insecure","safe","daring","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"Not chosen":LV[r]}</button>`).join("")
-    +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"");
+    +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"")
+    +(G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`
@@ -509,6 +517,73 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
     +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`);
 }
 
+// ---- marking PDF per round (EL_GRADING[ls].marking; root AGENTS.md "Teacher dashboard"): a print view with every student's answers for one
+// round of the final product and the rubric rows of that round (round, group, video in the LS's rubric data), as each route sees them. Saves nothing.
+const RUB={};   // rubric data per file, loaded the first time it is needed (a preview may define window.finalRubricData already)
+const loadRubric=p=>RUB[p]?Promise.resolve(RUB[p]):DEMO&&window.finalRubricData?Promise.resolve(RUB[p]=window.finalRubricData)
+  :new Promise((ok,ko)=>{const s=document.createElement("script");s.src=p;s.onload=()=>ok(RUB[p]=window.finalRubricData);s.onerror=()=>ko(new Error("the rubric did not load"));document.head.append(s)});
+const day=d=>new Date(d).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+const LVN=[["Level 4","Very good"],["Level 3","Good"],["Level 2","Fair"],["Level 1","Developing"]];
+const peerLevel=v=>v>=3.5?"Level 4":v>=2.5?"Level 3":v>=1.5?"Level 2":"Level 1";
+// Teammates' names are typed by students: a rating goes to the only member whose first name or full name it matches (case and accents ignored)
+function whoIs(typed,ms){const t=norm(typed);if(!t)return null;
+  const first=s=>{const n=nameOf(s);return n?n.first||"":(s.name||"").split(" ")[0]};
+  const keys=s=>{const n=nameOf(s);return n?[n.first,n.first+n.surname1,n.first+n.surname1+n.surname2,n.surname1+n.surname2+n.first].map(norm):[norm(s.name)]};
+  const one=f=>{const c=ms.filter(f);return c.length===1?c[0]:null};
+  return one(s=>keys(s).includes(t))||one(s=>norm(first(s).split(" ")[0])===t)||one(s=>{const f=norm(first(s).split(" ")[0]);return !!f&&t.startsWith(f)})}
+// Ratings each member received from the others in their hand-in of `step`; ratings that match no member are listed on the group page
+function peerRatings(ms,a,step){const got={},odd=[];
+  ms.forEach(m=>((handedIn(m.uid,a)[step]||{}).peers||[]).forEach(p=>{const vs=(p.r||[]).map(x=>+x.v).filter(v=>v>0);if(!vs.length)return;
+    const v=vs.reduce((x,y)=>x+y,0)/vs.length,to=whoIs(p.name,ms.filter(x=>x.uid!==m.uid));to?(got[to.uid]=got[to.uid]||[]).push(v):odd.push({name:p.name,by:m,v})}));
+  return {got,odd}}
+// Steps 0–5: handed in, on time (by the final product's due date; afterDue steps come after submitting) and self-assessment
+function procRows(s,fp){const m=G().marking,h=handedIn(s.uid,fp),due=dueOf(fp.id,S.g);
+  return m.process.map(k=>{const x=h[k],after=(m.afterDue||[]).includes(k);return {k,x,after,t:(fp.steps.find(y=>y[0]===k)||[])[1]||k,ok:x&&due&&!after?ymd(x.date)<=due:null}})}
+function procTable(s,fp){const due=dueOf(fp.id,S.g);
+  return `<div class="ans"><h4>Process summary <small class="muted">(steps 0–5${due?" · due "+day(due):""})</small></h4><table><thead><tr><th>Step</th><th>Handed in</th><th>On time</th><th>Self-assessment</th></tr></thead><tbody>`
+    +procRows(s,fp).map(p=>`<tr><td>${esc(p.t)}</td><td>${p.x?"✓ "+day(p.x.date):"–"}</td><td>${p.ok==null?p.x&&p.after?"after submitting":"–":p.ok?"✓":"late"}</td><td>${p.x&&p.x.avg!=null?p.x.avg+"/4":"–"}</td></tr>`).join("")+`</tbody></table></div>`}
+const procLine=(s,fp)=>{const ps=procRows(s,fp),n=ps.filter(p=>p.x).length,late=ps.filter(p=>p.ok===false).length;return `Handed in ${n}/${ps.length}${late?` · ${late} late`:""} (process summary above)`};
+// One hand-in: every field with its line breaks, the self-assessment average (o.rate: also the self-check) and the student's comment
+function answer(s,a,k,o,fp){const x=handedIn(s.uid,a)[k],t=(a.steps.find(y=>y[0]===k)||[])[1]||k,title=a.id===fp.id?"Step "+t:a.title+" · "+t;
+  if(!x)return `<div class="ans"><h4>${esc(title)}</h4><p class="muted">Not handed in yet.</p></div>`;
+  return `<div class="ans"><h4>${esc(title)} <small class="muted">· handed in ${day(x.date)}${x.avg!=null?" · self-assessment "+x.avg+"/4":""}</small></h4>`
+    +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br><span class="v">${f.v?esc(f.v):'<span class="muted">(empty)</span>'}</span></p>`).join("")
+    +(o.rate&&(x.rate||[]).length?`<p><b>Self-check</b></p><ul class="rate">${x.rate.map(q=>`<li>${q.v}/4 · ${esc(q.s)}</li>`).join("")}</ul>`:"")
+    +(x.comment?`<p><b>Comment to you:</b> ${esc(x.comment)}</p>`:"")+`</div>`}
+// Rubric rows quoted from the route's rubric (Insecure in Catalan), four tick boxes per row. items: [row, who, note]
+const rubricTable=items=>items.length?`<table class="rb"><thead><tr><th>Criterion</th>${LVN.map(([a,b])=>`<th>${a} · ${b}</th>`).join("")}</tr></thead><tbody>`
+  +items.map(([w,who,note])=>`<tr><td class="rn"><b>${w.name}</b>${who?`<br><b>${who}</b>`:""}<br><small>${w.sub||""}</small><br><span class="tag">${typeof w.pct==="number"?w.pct+" %":esc(w.pct||"")}</span>${w.group?' <span class="tag">Group</span>':""}${note?`<div class="note">${note}</div>`:""}</td>${w.cells.map(c=>`<td><span class="tick">☐</span> ${c}</td>`).join("")}</tr>`).join("")+`</tbody></table>`:"";
+function pdfAsk(){redraw=null;
+  dlg(`<h3>📄 Marking PDF · ${esc(GR.find(g=>g.id===S.g).name)}</h3><p class="muted">Every student's answers for one round of the final product, with the rubric rows of that round as each group's route sees them. It opens a print view: save it as a PDF or print it. Nothing is saved, and the answers stay in this browser.</p><div class="opts">`
+    +Object.entries(G().marking.rounds).map(([r,x])=>`<button class="opt" data-do="pdf" data-r="${r}"><b>${esc(x.name)}</b><small>${esc(x.note||"")}</small></button>`).join("")+`</div>`)}
+// One section per final product group (results/{fp}.team; students without a group last): the group page, then one page per student
+function pdfGroup(t,ms,r,R,data,fp,top){
+  const cnt={};ms.forEach(s=>{const l=level(s.uid,S.ls);if(l)cnt[l]=(cnt[l]||0)+1});
+  const gr=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||null,rub=l=>data[l]||data.safe;   // same-route groups: the route most members have
+  const pr=R.peers&&t?peerRatings(ms,fp,R.peers):null;let h="";
+  if(t){const rows=rub(gr).rows,gw=rows.filter(w=>w.round==r&&w.group),vw=rows.filter(w=>w.round==r&&w.video&&!w.group);
+    if(gw.length||vw.length)h+=`<section class="pg"><p class="top">${top}</p><h2>Group: ${esc(t)} ${route(gr)}</h2><p>${ms.map(s=>name(s)+(Object.keys(cnt).length>1?" "+route(level(s.uid,S.ls)):"")).join(" · ")}</p>`
+      +`<h3>${vw.length?'Video sheet <small class="muted">(rubric only: watch the video on Classroom)</small>':"Group rows"}</h3>`+rubricTable([...ms.flatMap(s=>vw.map(w=>[w,name(s)])),...gw.map(w=>[w])])
+      +(pr&&pr.odd.length?`<h3>Teammates' ratings that match no member</h3><ul>${pr.odd.map(o=>`<li>“${esc(o.name)}”, rated by ${name(o.by)}: ${f1(o.v)}</li>`).join("")}</ul>`:"")+`</section>`}
+  ms.forEach(s=>{const own=level(s.uid,S.ls),l=own||gr,got=pr?pr.got[s.uid]||[]:[],pv=got.length?got.reduce((a,b)=>a+b,0)/got.length:null;
+    const note=w=>w.peers?(!t?"No final product group: teammates' ratings cannot be matched.":pv==null?"No teammates' ratings received yet.":`Teammates' average: <b>${f1(pv)}</b> (${got.length} rating${got.length>1?"s":""}) → <b>${peerLevel(pv)}</b>`):w.process&&R.process?procLine(s,fp):"";
+    h+=`<section class="pg"><p class="top">${top}</p><h2>${name(s)}</h2><p class="muted">${t?"Group: "+esc(t):"No final product group"} · ${route(own)}${own?"":" (route not chosen: "+(LV[l]||"Safe")+" rubric)"}</p>`
+      +R.answers.map(([id,k,o])=>answer(s,byId(id),k,o||{},fp)).join("")+(R.process?procTable(s,fp):"")
+      +`<h3>Rubric</h3>`+rubricTable(rub(l).rows.filter(w=>w.round==r&&!w.group&&!w.video).map(w=>[w,"",note(w)]))
+      +`<div class="cmt"><b>Comment</b><div class="line"></div><div class="line"></div></div></section>`});
+  return h}
+async function markingPdf(r){
+  const g=G(),R=g.marking.rounds[r],fp=byId(g.fp.a),grp=GR.find(x=>x.id===S.g);let data;
+  try{data=await loadRubric(g.marking.rubric)}catch(e){alert("Could not open the marking PDF: "+e.message);return}
+  const all=Object.values(S.P).filter(s=>s.group===S.g||s.tester),away=all.filter(s=>s.away);
+  const has=s=>teamOf(s.uid,fp.id)||R.answers.some(([id,k])=>handedIn(s.uid,byId(id))[k]);   // the tester only with something to mark
+  const studs=all.filter(s=>!s.away&&(!s.tester||has(s))).sort(byName),teams=[...new Set(studs.map(s=>teamOf(s.uid,fp.id)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ca"));
+  const top=`${esc(grp.name)} · ${esc((EL_LS.find(l=>l.id===S.ls)||{}).title)} · ${esc(fp.title)} · <b>${esc(R.name)}</b>`;
+  const pages=[...teams.map(t=>[t,studs.filter(s=>teamOf(s.uid,fp.id)===t)]),["",studs.filter(s=>!teamOf(s.uid,fp.id))]].filter(([,ms])=>ms.length).map(([t,ms])=>pdfGroup(t,ms,r,R,data,fp,top)).join("");
+  $("#pdf").innerHTML=`<div class="pdfbar"><button data-do="pdfprint">🖨️ Print / save as PDF</button><button class="g" data-do="pdfback">← Back to the dashboard</button><span class="muted">${teams.length} group${teams.length===1?"":"s"} · ${studs.length} student${studs.length===1?"":"s"}${away.length?` · not included (not signed in yet): ${away.map(name).join(" · ")}`:""}. In the print dialog choose A4 and “Save as PDF”.</span></div>`
+    +(pages||`<section class="pg"><p>No signed-in students in ${esc(grp.name)} yet.</p></section>`);
+  document.body.classList.add("pdfmode");scrollTo(0,0);setTimeout(()=>print(),300)}
+
 // ---- events
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
   ({tab:()=>{S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();if(k.ls)scrollTo(0,0)},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),
@@ -524,6 +599,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     acc:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.to))},rej:()=>{$("#dlg").close();act(api.reject(u,S.ls))},
     rt:()=>rtPanel(u),setrt:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.r))},
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
+    pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
     grade:()=>gradePanel(u),deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
     lv:()=>{const cur=((res(u,k.a).levels||{})[k.s]||{})[k.c];quick(patch(u,k.a,{levels:{[k.s]:{[k.c]:cur===k.l?null:k.l}}}))},
