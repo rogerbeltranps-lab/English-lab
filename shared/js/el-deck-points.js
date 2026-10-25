@@ -55,6 +55,8 @@ css.textContent=`
 .elch button.on{border-color:var(--accent);background:var(--soft)}
 .mych{display:block;width:max-content;margin-top:.4em;border-radius:999px;padding:.1em .65em;font:700 .78em/1.4 var(--f-body);background:var(--soft);color:var(--accent);border:1px solid var(--accent)}
 .mych.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}.mych.no{background:var(--no-bg);color:var(--no);border-color:var(--no)}
+.cbm{display:none}:root.el-cb .cbm{display:inline-flex}:root.el-cb .ask:has(.cbm)>.mode:not(.cbm){display:none}   /* Chromebook mode */
+:root.deck-live .go321{display:none}   /* following: 3 · 2 · 1, the timer and the random number are the teacher's */
 @media (prefers-reduced-motion: reduce){.team .sc.bump,.elbuzz .who,.elbuzz .dot{animation:none}}`;
 document.head.appendChild(css);
 
@@ -104,7 +106,7 @@ function draw(){
     :T.teacher?"":`<button type="button" class="tool" id="teamsSignIn" title="Sign in with the teacher's account to save the points for a class group">☁ ${B("Save points","Desa els punts")}</button>`;
   const ctl=cloudOn?"":`<select id="teamCount" aria-label="Number of teams">${[2,3,4,5,6].map(n=>`<option value="${n}"${n===local.n?" selected":""}>${n}</option>`).join("")}</select><button type="button" class="tool" id="teamsZero">${B("Reset","Zero")}</button>`;
   bar.innerHTML=h+`<span class="tctl">${sel}${ctl}${stat}</span>`;
-  resized();
+  resized();cbMode();
 }
 function toggle(on){
   bar.hidden=on===undefined?!bar.hidden:!on;
@@ -188,7 +190,7 @@ function drawBuzz(){
   const z=T.buzz;bz.hidden=!(ready()&&z&&z.open);if(bz.hidden)return;
   bz.classList.toggle("win",!!z.winner);
   bz.innerHTML=z.winner?`<p class="who">🔔 ${B(tname(z.winner.team)+", answer!",tname(z.winner.team)+", responeu!")}</p><div class="bzrow"><button type="button" class="ok" data-bz="right">✓ ${B("Right · +1","Correcte · +1")}</button><button type="button" class="no" data-bz="wrong">✗ ${B("Wrong · another team","Incorrecte · un altre equip")}</button><button type="button" data-bz="close">${B("Close","Tanca")}</button></div>`
-    :`<span class="dot" aria-hidden="true"></span><span>${B("Buzzers open: press 🔔 on your board!","Polsadors oberts: premeu 🔔 al vostre tauler!")}</span>${(z.out||[]).length?`<small>${B("Out:","Fora:")} ${z.out.map(tname).join(", ")}</small>`:""}<button type="button" data-bz="close">${B("Close","Tanca")}</button>`;
+    :`<span class="dot" aria-hidden="true"></span><span>${B("Buzzers open: press 🔔 on your Chromebook!","Polsadors oberts: premeu 🔔 al Chromebook!")}</span>${(z.out||[]).length?`<small>${B("Out:","Fora:")} ${z.out.map(tname).join(", ")}</small>`:""}<button type="button" data-bz="close">${B("Close","Tanca")}</button>`;
 }
 const snd=n=>window.ELSound&&ELSound.play(n);   // shared/js/el-sound.js
 async function buzzSet(o,merge=true){
@@ -263,6 +265,22 @@ addEventListener("deckstep",()=>{if(chFor&&chFor.classList.contains("open"))choo
 let Q=null,mySid=0;   // the student's answers doc while following
 addEventListener("deckanswer",e=>{if(!Q||!mySid||paused)return;
   Q.S.setDoc(Q.ref,{sid:mySid,a:{[e.detail.q]:e.detail.v},at:Q.S.serverTimestamp()},{merge:true}).catch(x=>console.warn("answer",x))});
+// Chromebook mode (Roger, 25 Oct 2026: "it says fingers up; shouldn't it work with the Chromebooks: they buzz, and the system shows who
+// answers?"). Once students have joined (teacher) or while following (student), a question's finger code becomes "💻 Tap your answer"
+// and its 3 · 2 · 1 button becomes "3 · 2 · 1 · 🔔 Buzz!": the deck's countdown then opens the buzzers (ELDeckPoints.buzz), and the
+// projector and the Chromebooks show which team answers. Only for slides with questions students can answer (data-q).
+function canBuzz(){return !!(ready()&&T.data.list.length&&T.ans&&T.ans.n>0&&$(".slide.on [data-q]"))}   // on this slide
+function cbMode(){   // also called by the strip's first draw, before the consts below exist: no following() here
+  const on=T.teacher?!!(ready()&&T.ans&&T.ans.n>0):document.documentElement.classList.contains("deck-live"),buzz=T.teacher&&on&&T.data.list.length>0;
+  document.documentElement.classList.toggle("el-cb",on);
+  if(!on&&!$(".cbm"))return;
+  $$(".slide .ask").forEach(a=>{
+    const go=$$('.go321[data-say="fingers"],.go321[data-say="thumbs"]',a),sl=a.closest(".slide");if(!go.length||!$("[data-q]",sl))return;
+    if(!$(".cbm",a)){const m=document.createElement("span");m.className="mode cbm";
+      m.innerHTML=$("[data-ch]",sl)?B("💻 Tap a card, then your answer","💻 Toca una targeta i tria la resposta"):B("💻 Tap your answer on your Chromebook","💻 Toca la resposta al Chromebook");a.prepend(m)}
+    go.forEach(g=>{if(g.dataset.orig===undefined)g.dataset.orig=g.innerHTML;g.innerHTML=buzz?B("3 · 2 · 1 · 🔔 Buzz!","3 · 2 · 1 · 🔔 Premeu!"):g.dataset.orig});
+  });
+}
 async function joinQuiz(x){   // the teacher's session: keep my answers if I come back to the same one, start empty for a new one
   if(!Q||!x.sid||x.sid===mySid)return;mySid=x.sid;
   try{const d=await Q.S.getDoc(Q.ref);if(d.exists()&&d.data().sid===mySid)return;
@@ -280,6 +298,7 @@ function liveDraw(){
   const x=lastLive,on=x&&x.on&&fresh(x.at),here=on&&x.deck===location.pathname;
   if(window.ELDeck)ELDeck.show(here&&!paused?x:null);
   if(here)joinQuiz(x);
+  cbMode();
   lv.innerHTML=!on?`📺 ${B("The class presentation is not on now.","Ara no hi ha cap presentació a classe.")}`
     :!here?`📺 ${B("Your class is on another presentation:","La classe és en una altra presentació:")} <a href="${esc(x.deck)}?live=${LIVE}">${x.title?esc(x.title):B("open it","obre-la")}</a>`
     :paused?`<button type="button" data-live="1">📺 ${B("Follow again","Torna a seguir")}</button>`
@@ -304,5 +323,5 @@ function signInBtn(){const b=document.createElement("button");b.type="button";b.
 if(LIVE){cloud();setInterval(()=>{if(lastLive)liveDraw()},60e3)}   // the class ends: no new minute from the teacher
 
 draw();toggle(!!store.get("teamsOn",false));
-window.ELDeckPoints={toggle};
+window.ELDeckPoints={toggle,canBuzz,buzz:openBuzz};
 })();

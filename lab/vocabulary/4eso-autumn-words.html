@@ -784,14 +784,16 @@ $('#sndBtn').onclick=toggleSnd;drawSnd();
 function speak(w){try{const u=new SpeechSynthesisUtterance(w);u.lang='en-GB';u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 
 /* ---------- 3 · 2 · 1 · Show! ---------- */
-const SAY={fingers:['✋ Fingers up!','✋ Amunt els dits!'],thumbs:['👍 👎 Thumbs!','👍 👎 Polzes!'],write:['✏️ Show your answer!','✏️ Ensenya la resposta!']};
+const SAY={fingers:['✋ Fingers up!','✋ Amunt els dits!'],thumbs:['👍 👎 Thumbs!','👍 👎 Polzes!'],write:['✏️ Show your answer!','✏️ Ensenya la resposta!'],buzz:['🔔 Buzz now!','🔔 Premeu ara!']};
 let cdT=[];
 function stopCd(){cdT.forEach(clearTimeout);cdT=[];$('#cd').hidden=true}
 function countdown(mode){
-  stopCd();const cd=$('#cd'),say=SAY[mode]||SAY.fingers;cd.hidden=false;
+  // Chromebook mode (students have joined, shared/js/el-deck-points.js): they tapped their answer; at "Buzz now!" the buzzers open
+  const buzz=(mode==='fingers'||mode==='thumbs')&&!!window.ELDeckPoints&&!!ELDeckPoints.canBuzz&&ELDeckPoints.canBuzz();
+  stopCd();const cd=$('#cd'),say=buzz?SAY.buzz:SAY[mode]||SAY.fingers;cd.hidden=false;
   [3,2,1].forEach((n,i)=>cdT.push(setTimeout(()=>{cd.innerHTML=`<span class="cd-num">${n}</span>`;snd('tick')},i*800)));
-  cdT.push(setTimeout(()=>{cd.innerHTML=`<span class="cd-go">${B(say[0],say[1])}</span>`;snd('go')},2400));
-  cdT.push(setTimeout(stopCd,4200));
+  cdT.push(setTimeout(()=>{cd.innerHTML=`<span class="cd-go">${B(say[0],say[1])}</span>`;if(buzz)ELDeckPoints.buzz();else snd('go')},2400));
+  cdT.push(setTimeout(stopCd,buzz?3300:4200));   // out of the way of "Tigers, answer!"
 }
 $('#cd').onclick=stopCd;
 
