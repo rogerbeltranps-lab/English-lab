@@ -88,7 +88,8 @@ function toggle(on){
 const loadScript=src=>new Promise(r=>{const s=document.createElement("script");s.src=src;s.onload=s.onerror=r;document.head.append(s)});
 function cloud(){
   return T.fb=T.fb||(async()=>{
-    const [{initializeApp,getApps},A,S,C]=await Promise.all([import(FB+"firebase-app.js"),import(FB+"firebase-auth.js"),import(FB+"firebase-firestore.js"),import(new URL("el-firebase.js",SRC).href),window.EL_GROUPS?0:loadScript(new URL("el-catalog.js",SRC).href)]);
+    const cfg=new URL("el-firebase.js",SRC).href,cat=new URL("el-catalog.js",SRC).href;   // first, so a bad address fails before any import starts
+    const [{initializeApp,getApps},A,S,C]=await Promise.all([import(FB+"firebase-app.js"),import(FB+"firebase-auth.js"),import(FB+"firebase-firestore.js"),import(cfg),window.EL_GROUPS?0:loadScript(cat)]);
     const app=getApps()[0]||initializeApp(C.CONFIG),fb={A,S,auth:A.getAuth(app),db:S.getFirestore(app)};
     A.onAuthStateChanged(fb.auth,u=>{T.user=u;T.teacher=!!u&&C.TEACHERS.includes((u.email||"").toLowerCase());if(T.teacher&&T.group)load();else draw()});
     return fb;
