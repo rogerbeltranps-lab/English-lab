@@ -52,7 +52,7 @@ window.EL_CATALOG=(function(){
         L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint34ESO",1,C),
         L("write-to-the-head-teacher.html","Write to the head teacher",["4.1","5.1","3.2","CC1 1.3"],"ls2Email4ESO",7,{skip:["write"]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint44ESO",1,C),
-        L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam4ESO",4,{graded:false}),
+        L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam4ESO",7,{graded:false}),
         L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","3.2","4.2","5.1","6.1","CC1 1.3","CC3 3.2"],"ls2FinalProduct4ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect4ESO",1,{graded:false})
       ];
@@ -94,7 +94,7 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
     "4eso/ls2-plan-the-day":[...LP,"listen","grammar","mixed","write","speak"],
     "4eso/ls2-write-to-the-head-teacher":[...LP,"read","register","grammar","write","speak"],
     "4eso/ls2-recall-checkpoint-1":["check"],"4eso/ls2-recall-checkpoint-2":["check"],"4eso/ls2-recall-checkpoint-3":["check"],"4eso/ls2-recall-checkpoint-4":["check"],
-    "4eso/ls2-sample-exam":["read","listen","grammar","write"],
+    "4eso/ls2-sample-exam":["listen","chart","read","log","vocab","grammar","write"],
     "4eso/ls2-celebration-day-proposal":["video","email","submit"],
     "4eso/ls2-reflect":["reflect"]
   });
@@ -107,7 +107,7 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
     "4eso/ls2-plan-the-day":{listen:["2.2"],write:["5.1","CC1 1.3"],speak:["3.2"]},
     "4eso/ls2-write-to-the-head-teacher":{read:["4.1"],register:["5.1"],write:["5.1","CC1 1.3"],speak:["3.2"]},
     "4eso/ls2-recall-checkpoint-1":ck,"4eso/ls2-recall-checkpoint-2":ck,"4eso/ls2-recall-checkpoint-3":ck,"4eso/ls2-recall-checkpoint-4":ck,
-    "4eso/ls2-sample-exam":{read:["4.1"],listen:["2.2"],write:["5.1"]},
+    "4eso/ls2-sample-exam":{listen:["2.2"],chart:["2.2"],read:["4.1"],log:["4.1"],write:["5.1"]},
     "4eso/ls2-celebration-day-proposal":{video:["3.2","1.1","1.2","CC3 3.2"],email:["5.1","CC1 1.3"],submit:[]},
     "4eso/ls2-reflect":{reflect:[]}
   };

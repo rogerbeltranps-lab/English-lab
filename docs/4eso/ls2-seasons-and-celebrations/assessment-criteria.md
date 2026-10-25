@@ -32,7 +32,7 @@ No longer in LS2: 2.1, 3.1, 1.3, 6.2 and CE2 emprenedora 2.3. Speaking steps in 
 | LP4 Research it right | 4.2, 6.1, 1.2, CC3 3.2 | read → 4.2 · sources → 4.2 · respect → 1.2, CC3 3.2 · notes → 6.1 · credit → 6.1 · **card → 4.2, 6.1, CC3 3.2** |
 | LP5 Plan the day | 2.2, 5.1, 3.2, CC1 1.3 | listen → 2.2 · write (not scored) → 5.1, CC1 1.3 · speak → 3.2 |
 | LP6 Write to the head teacher | 4.1, 5.1, 3.2, CC1 1.3 | read → 4.1 · register → 5.1 · write (not scored) → 5.1, CC1 1.3 · speak → 3.2 |
-| Sample exam (not graded) | 2.2, 4.1, 5.1 | read → 4.1 · listen → 2.2 · write → 5.1 |
+| Sample exam (not graded) | 2.2, 4.1, 5.1 | listen, chart → 2.2 · read, log → 4.1 · vocab · grammar · write → 5.1 |
 | LP7 Final product | 1.1, 1.2, 3.2, 4.2, 5.1, 6.1, CC1 1.3, CC3 3.2 | video → 3.2, 1.1, 1.2, CC3 3.2 · email → 5.1, CC1 1.3 · hand-in steps 0–5 · rubric ([final-product-assessment.md](final-product-assessment.md)) |
 | Reflect (not graded) | none | reflect |
 
@@ -58,4 +58,4 @@ The new steps **log** (LP2), **chart** (LP3) and **card** (LP4) are hand-ins: fi
 - **Term 1** (LP1–LP3, LP5, LP6, checkpoints, exam on 18/20 Nov): 4.1, 2.2, 5.1 in the exam and the Learning Paths; 3.2, 1.1, 1.2 and CC1 1.3 as Learning Path practice.
 - **Term 2** (LP4 and the final product): 3.2, 5.1, 4.2, 6.1, 1.1, 1.2, CC1 1.3, CC3 3.2.
 
-Exam formats: Roger (24 Oct) decides later; the first exam is fine for now. Recommendation: use the same reading log and listening chart formats in the exam.
+Exam format (approved by Roger, 25 Oct 2026): Google Form with a listening chart (2.2), a reading log (4.1) and a formal email (5.1) besides the auto-marked items; the sample exam mirrors it. Details in the [decision log](AGENTS.md#decision-log).
