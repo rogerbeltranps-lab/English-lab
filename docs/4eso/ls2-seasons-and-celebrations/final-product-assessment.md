@@ -1,6 +1,6 @@
 # LS2 · Final product: groups, tasks and assessment
 
-Status: **approved by Roger on 24 Oct 2026 and built; revised the same day for the new programme** (PR #54, live since 24 Oct: new parts, script in step 3, three sources for Safe and Daring, rubric with one row per LS criterion; weights approved with the LS grading plan, section 5). Page: `4eso/seasons-and-celebrations/celebration-day-proposal.html` (steps 0–5, feedback to another group, Rubric tab from `final-rubric-data.js`). Decisions on the open questions: weights as in section 5, video 2–3 minutes with shorter parts (Insecure 40–60 s, Safe and Daring 35–45 s), pronunciation was assessed inside "My part" until the revised programme dropped 3.1.
+Status: **approved by Roger on 24 Oct 2026 and built; revised the same day for the new programme** (PR #54, live since 24 Oct: new parts, script in step 3, three sources for Safe and Daring, rubric with one row per LS criterion; weights approved with the LS grading plan, section 5). Page: `4eso/seasons-and-celebrations/celebration-day-proposal.html` (steps 0–5, feedback to another group, Rubric tab from `final-rubric-data.js`). Decisions on the open questions: weights as in section 5, video 2–3 minutes with shorter parts (Insecure 40–60 s, Safe and Daring 35–45 s), pronunciation was assessed inside "My part" until the revised programme dropped 3.1. **Marked in two rounds with a marking PDF per round** (Roger, 25 Oct 2026, section 8; the email is now pasted in step 4).
 
 ## 1. Groups
 
@@ -22,11 +22,11 @@ The dashboard shows, per student and step: done or not, the self-assessment aver
 
 | Step | Individual task | Self-assessment statements | Evidence of |
 | --- | --- | --- | --- |
-| 0 · Before the team work | Pieces 1–5 from the Learning Paths, already filled in (a missing one must be written or pasted), plus *what I changed after the feedback, and why* for pieces 1, 2 and 5 | I have all five pieces · I improved my texts after the feedback · I know what my group's celebration is about | Learning Path work done |
+| 0 · Before the team work (due with step 2: piece 3 is the LP4 research card) | Pieces 1–5 from the Learning Paths, already filled in (a missing one must be written or pasted), plus *what I changed after the feedback, and why* for pieces 1, 2 and 5 | I have all five pieces · I improved my texts after the feedback · I know what my group's celebration is about | Learning Path work done |
 | 1 · Research (week 5) | **My source:** one source, 3–5 notes in my own words, its credit line, and reliable or not with two reasons (every route). The group reaches two sources (Insecure) or three (Safe and Daring) | I give two reasons why my source is reliable or not · My notes are in my own words · My credit line is complete · Religious meanings are written as information | 4.2, 6.1 |
 | 2 · Plan and slides (week 6) | **My contribution:** my role, the activity or part of the plan I prepared, the text of my slide(s) | I did my part on time · My activity is realistic for school · My slide has short text and an image · Our plan includes everyone | 3.2, 1.2 |
 | 3 · Rehearsal (weeks 6–7) | **My part:** my script, what I changed after the rehearsal so the audience can follow, and key notes for the recording | I cover all the content of my part · I revised my script after the rehearsal · I can say it without reading · I use the LS grammar of my route · It fits my time (route seconds) | 3.2 |
-| 4 · Email (week 7) | **My email:** submitted on Classroom; here only the self-check | The route email checklist items (format, paragraphs, two welcome actions, request, register; Daring: the concern answered) | 5.1, CC1 1.3 |
+| 4 · Email (week 7) | **My email:** the final version pasted here (it goes into the marking PDF; Classroom is only for the video), plus the self-check | The route email checklist items (format, paragraphs, two welcome actions, request, register; Daring: the concern answered) | 5.1, CC1 1.3 |
 | 5 · After submitting | **Reflection** and the peer assessment of my teammates (section 6) | I did my share of the work · I listened and helped the group decide · I helped to improve the slides and the video | 3.2 |
 
 - The self-assessment does **not** change the mark by itself: it shows the teacher how each student sees their own work, and the gap between self-assessment and teacher assessment is discussed in Reflect.
@@ -35,7 +35,7 @@ The dashboard shows, per student and step: done or not, the self-assessment aver
 
 ## 3. What the group makes together
 
-1. **Research card** (Learning Path 4, piece 3): key information, reliable or not with two reasons and the credit line for each source (Insecure two, Safe and Daring three), where the sources agree or differ, the most trusted one, and one stereotype to avoid.
+1. **Research card** (Learning Path 4, piece 3): the group shares its sources, but every student hands in their own card, and it is marked per student (row 7). It has key information, reliable or not with two reasons and the credit line for each source (Insecure two, Safe and Daring three), where the sources agree or differ, the most trusted one, and one stereotype to avoid.
 2. **Event plan** for a school celebration day, at the route's level.
 3. **Google Slides:** one or two slides per part, short text and images, credits on the last slide.
 4. **Video:** every member presents their part, face and slides visible. The video lasts 2–3 minutes: each part lasts 40–60 s in Insecure groups and 35–45 s in Safe and Daring groups.
@@ -54,26 +54,26 @@ In a group of 3 (Safe and Daring), Part 4 is shared: each member adds one of its
 
 ## 5. How it is marked
 
-Approved by Roger on 24 Oct 2026 with the LS grading plan ([grading.md](grading.md)). The final product is **25 % of the LS mark and fully individual**; the content rows are still marked here, but they count in the LS's "other competences" block (20 %).
+Approved by Roger on 24 Oct 2026 with the LS grading plan ([grading.md](grading.md)). The final product is **25 % of the LS mark and fully individual**; the content rows are still marked here, but they count in the LS's "other competences" block (20 %). **Only the video is marked in groups** (Roger, 25 Oct 2026): rows 8–10 are judged on the video and given once per group; everything else, the research card included, is marked per student.
 
-| Row | Criteria | Who gets the mark | Counts in |
-| --- | --- | --- | --- |
-| 1. My part of the pitch | 3.2 | individual | Final product, 40 % |
-| 2. My formal email | 5.1 | individual | Final product, 35 % |
-| 3. My source (step 1: reliable or not, two reasons) | 4.2 | individual | Final product, 15 % |
-| 4. Teamwork (peer assessment) | 3.2 | individual | Final product, 5 % |
-| 5. My process evidence (steps 0–5) | 3.2 | individual | Final product, 5 % |
-| 6. Welcome actions in my email | CC1 1.3 | individual | Other competences |
-| 7. Research sheet | 6.1 | group | Other competences |
-| 8. What it means and why it belongs at school | 1.1 | group | Other competences |
-| 9. Local link and inclusion | 1.2 | group | Other competences |
-| 10. Stereotypes | CC3 3.2 | group | Other competences |
+| Row | Criteria | Who gets the mark | Counts in | Marked in |
+| --- | --- | --- | --- | --- |
+| 1. My part of the pitch | 3.2 | individual | Final product, 40 % | Round 2 (video) |
+| 2. My formal email | 5.1 | individual | Final product, 35 % | Round 2 |
+| 3. My source (step 1: reliable or not, two reasons) | 4.2 | individual | Final product, 15 % | Round 1 |
+| 4. Teamwork (peer assessment) | 3.2 | individual | Final product, 5 % | Round 2 |
+| 5. My process evidence (steps 0–5) | 3.2 | individual | Final product, 5 % | Round 2 |
+| 6. Welcome actions in my email | CC1 1.3 | individual | Other competences | Round 2 |
+| 7. My research card (LP4 piece 3) | 6.1 | individual | Other competences | Round 1 |
+| 8. What it means and why it belongs at school | 1.1 | group | Other competences | Round 2 (video) |
+| 9. Local link and inclusion | 1.2 | group | Other competences | Round 2 (video) |
+| 10. Stereotypes | CC3 3.2 | group | Other competences | Round 2 (video) |
 
 Before (24 Oct, proposed): one weighted rubric of nine rows (part 25, email 15, welcome 5, research 10, meaning 5, local link 10, stereotypes 10, teamwork 10, process 10), where the group rows made 35 % of the final product mark.
 
 - Row 5: Level 4 = every step handed in on time, specific, in the student's own words, with an honest self-assessment; Level 3 = every step, one late or very general; Level 2 = one or two steps missing; Level 1 = most steps missing. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0 (Level 1 = NA, 2 = AS, 3 = AN, 4 = AE).
 - Rows use the **route rubric** of the group (section 7).
-- **Safety net:** if peer assessment and the teacher's observation show that a student did not contribute to the group product, the teacher lowers that student's group rows (7–10) by one level. Nobody loses marks for a teammate's part or email.
+- **Safety net:** if peer assessment and the teacher's observation show that a student did not contribute to the video, the teacher lowers that student's group rows (8–10) by one level. Nobody loses marks for a teammate's part or email.
 
 ## 6. Peer assessment
 
@@ -85,7 +85,7 @@ Before (24 Oct, proposed): one weighted rubric of nine rows (part 25, email 15, 
 
 The average of the teammates' ratings (self-rating not counted) gives the level for row 4. The self-rating is compared with it in Reflect. If the ratings and the teacher's observation disagree a lot, the teacher decides.
 
-**b) Between groups: feedback on the draft (not marked).** In the class before the deadline, each group watches another group's draft video and fills in a short form: two things that work and one thing to improve, using the rubric rows 7–10 and "every member speaks, face and slides visible". The group uses it to fix the video before submitting.
+**b) Between groups: feedback on the draft (not marked).** In the class before the deadline, each group watches another group's draft video and fills in a short form: two things that work and one thing to improve, using the rubric rows 8–10 and "every member speaks, face and slides visible". The group uses it to fix the video before submitting.
 
 ## 7. Rubrics by route
 
@@ -93,3 +93,17 @@ The level descriptors are in `4eso/seasons-and-celebrations/final-rubric-data.js
 
 - The indicators are the same for every route. What changes is the task and the help: Insecure has the templates, Catalan guidance, two sources and 40–60 s parts; Safe and Daring have three sources and 35–45 s parts; Daring adds argued parts, an estimated cost, reasons for the welcome actions and the head teacher's concern.
 - Rows 3–10 (my source, teamwork, process, welcome actions, research, meaning, local link, stereotypes) are shared by Safe and Daring; rows 1 and 2 have route-specific descriptors. Each row shows on the page whether it counts in the final product (its %) or in the other competences.
+
+## 8. Marking in two rounds (Roger, 25 Oct 2026)
+
+Roger marks the final product twice, each time with the rubric rows of that round and a PDF with every student's answers, generated from the teacher's dashboard when he wants to mark. The round of each row is `round` in `final-rubric-data.js` (shown on the Rubric tab); `group: true` marks the group rows and `video: true` the rows judged on the video; only video rows are group rows.
+
+| Round | When | Evidence in the PDF (per student) | Rows | Why then |
+| --- | --- | --- | --- | --- |
+| **1 · Research and plan** | After step 2 (4ESO-A Fri 27 Nov, 4ESO-B Wed 25 Nov); feedback back before the rehearsal (Wed 2 / Tue 1 Dec) | LP4 research card (piece 3), step 0 (what I changed), step 1 (my source), step 2 (my contribution: role, part of the plan, slide text) | 3 My source · 7 My research card (both individual) | The research is finished, and comments on the plan (inclusive decision, stereotype) still reach the slides and the script. The LP4 card levels (4.2, 6.1, CC3 3.2) can be given from the same pages. |
+| **2 · Video, email and teamwork** | After submitting (Fri 11 Dec) and step 5 (Mon 14 Dec) | Step 3 (my script and what I changed), step 4 (**the email**, pasted in full, and its self-check), step 5 (what I contributed, the teammates' ratings received), steps 0–5 summary (done, date, on time, self-assessment average) | Individual: 2 My email · 6 Welcome actions · 4 Teamwork · 5 Process. **Video** (rubric only, one sheet per group, watched on Classroom): 1 My part for each member · 8 Meaning · 9 Local link and inclusion · 10 Stereotypes | Everything is finished; the video needs no answers in the PDF, only the rubric. |
+
+- The PDF quotes each group's route rubric as the students see it (Insecure in Catalan), with four tick boxes per row, so it can be marked on paper or on a tablet; the levels are then entered with the level buttons as now.
+- Students who hand in a step late appear in the next PDF they are part of; nothing is lost.
+- Step 0 needs piece 3, which students finish in LP4 (2/2), so it is due with step 2, not on Mon 23 Nov.
+- The dashboard button is a request to the English Lab project (it maintains `teacher.html`); brief: `/mnt/project-files/ls2/assessment/marking-pdf-brief.md` (project files).

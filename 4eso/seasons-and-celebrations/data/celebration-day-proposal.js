@@ -1,4 +1,5 @@
-/* LS2 · Final product: Celebration Day Proposal (from the LS2 programme). Delivered through Google Classroom and marked by the teacher. */
+/* LS2 · Final product: Celebration Day Proposal (from the LS2 programme). The video goes to Google Classroom; the email is pasted in step 4,
+   so it is in the teacher's marking PDF. Marked by the teacher in two rounds (docs/4eso/ls2-seasons-and-celebrations/final-product-assessment.md). */
 (function () {
   const pieceNames = { 1: 'Piece 1 · Description', 2: 'Piece 2 · Our celebration', 3: 'Piece 3 · Research card', 4: 'Piece 4 · Event plan', 5: 'Piece 5 · Email' };
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -77,7 +78,10 @@
           daring: ['2–3 minutes', 'Every member speaks', 'Faces and slides visible together (picture-in-picture)', 'Origin, meaning and change over time', 'Why it belongs at school (respect for cultural diversity)', 'Comparison with a local celebration', 'Timetable, roles, materials and an estimated cost', 'Every choice is justified so the event is inclusive', 'One stereotype: why it is unfair and how our choices challenge it; no caricature costumes', 'Three sources credited on the last slide', 'Clear voice']
         } },
       { id: 'email', type: 'step', tab: { ca: 'Pas 4 · El meu correu', en: 'Step 4 · My email' }, title: { ca: 'El meu correu formal', en: 'My formal email' },
-        intro: { ca: 'El correu l’entregues al Classroom. Aquí només t’autoavalues abans d’entregar-lo.', en: 'You submit the email on Classroom. Here you only assess it before you submit it.' },
+        intro: { ca: 'Enganxa aquí la versió final del teu correu: el professor el corregeix des d’aquí. Abans d’entregar-lo, autoavalua’l.', en: 'Paste the final version of your email here: your teacher marks it from here. Before you hand it in, assess it.' },
+        fields: [
+          { id: 'email', label: { ca: 'El meu correu a la direcció (versió final)', en: 'My email to the head teacher (final version)' }, rows: 14 }
+        ],
         rate: {
           insecure: ['Salutació i comiat formals (Dear… / Yours sincerely)', 'Primera frase: per què escric', 'Data, lloc i activitats', 'Dues accions perquè tothom s’hi senti benvingut', 'Almenys una petició', 'Sense contraccions ni paraules informals'],
           safe: ['Formal greeting and ending', 'Paragraphs: purpose, plan, request, closing', 'Two concrete actions so every student and family feels welcome', 'At least one polite request (Could we…? / Would it be possible…?)', 'No contractions or informal words'],
@@ -95,12 +99,12 @@
           safe: ['Everyone speaks; faces and slides are visible', 'Three sources are credited', 'The celebration is presented with respect', 'They name a stereotype and show how they avoid it', 'The plan of the day is clear'],
           daring: ['Everyone speaks; faces and slides are visible', 'Three sources are credited', 'The celebration is presented with respect', 'They name a stereotype and show how they avoid it', 'The plan of the day is clear']
         } },
-      { id: 'submit', type: 'checklist', tab: { ca: 'Entrega', en: 'Submit' }, title: { ca: 'Entrega al Classroom', en: 'Submit on Classroom' },
-        intro: { ca: 'El producte final s’entrega al Google Classroom i el puntua el professor.', en: 'The final product is submitted on Google Classroom and marked by your teacher.' },
+      { id: 'submit', type: 'checklist', tab: { ca: 'Entrega', en: 'Submit' }, title: { ca: 'Entrega el producte final', en: 'Submit the final product' },
+        intro: { ca: 'El vídeo s’entrega al Google Classroom i el correu, al pas 4 d’aquesta pàgina. El professor ho puntua.', en: 'The video goes to Google Classroom and the email to step 4 on this page. Your teacher marks them.' },
         items: {
-          insecure: ['He pujat el vídeo del grup (o l’enllaç) al Classroom', 'He pujat el meu correu individual al Classroom'],
-          safe: ['I have uploaded the group video (or its link) to Classroom', 'I have uploaded my individual email to Classroom'],
-          daring: ['I have uploaded the group video (or its link) to Classroom', 'I have uploaded my individual email to Classroom']
+          insecure: ['He pujat el vídeo del grup (o l’enllaç) al Classroom', 'He enganxat el meu correu final al pas 4'],
+          safe: ['I have uploaded the group video (or its link) to Classroom', 'I have pasted my final email in step 4'],
+          daring: ['I have uploaded the group video (or its link) to Classroom', 'I have pasted my final email in step 4']
         } },
       { id: 'team', type: 'step', tab: { ca: 'Pas 5 · Treball en equip', en: 'Step 5 · Teamwork' }, title: { ca: 'Treball en equip: reflexió i valoració dels companys', en: 'Teamwork: reflection and rating your teammates' },
         intro: { ca: 'Després d’entregar. Només el professor veu les teves respostes.', en: 'After you submit. Only your teacher sees your answers.' },
