@@ -228,25 +228,17 @@
       gap:20px;
     }
 
-    .lab-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:18px;
-    }
-
-    .lab-icon{font-size:1.6rem;margin-bottom:14px}
-    .lab-card-button{display:block;width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer}
-    .lab-card-button .lab-icon{display:block}
-    .lab-card-title{display:block;margin:0 0 8px;font-size:1.25rem;font-weight:700}
-    .lab-card-description{display:block;color:var(--muted);line-height:1.5}
-    .lab-card-button:focus-visible,.lab-back:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
-    .lab-overview[hidden],.lab-submenu[hidden]{display:none}
-    .lab-back{border:1px solid var(--line);border-radius:12px;background:var(--accent-soft);color:var(--accent);padding:11px 14px;font-weight:800;cursor:pointer}
-    .lab-section{margin-top:36px;padding-top:28px;border-top:1px solid var(--line)}
-    .lab-section-submenu{margin-top:18px;padding-top:0;border-top:0}
-    .lab-section-title{margin:0 0 6px;font-size:1.5rem;letter-spacing:-.02em}
-    .lab-section-lead{margin:0 0 18px;color:var(--muted)}
-    a.lab-card{display:block}
+    /* Home course buttons: each in its course palette (2ESO green, 4ESO blue, as in <course>/index.html) */
+    .course-pick{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
+    .course-btn{display:flex;flex-direction:column;gap:4px;min-width:190px;padding:18px 24px;border-radius:20px;color:#fff;box-shadow:var(--shadow);transition:.2s ease}
+    .course-btn:hover{transform:translateY(-3px)}
+    .course-btn:focus-visible{outline:3px solid var(--text);outline-offset:3px}
+    .course-btn strong{font-size:1.8rem;letter-spacing:-.04em}
+    .course-btn span{font-size:.9rem;font-weight:700;opacity:.9}
+    .course-btn.c2eso{background:#557c68}
+    .course-btn.c4eso{background:#55769f}
+    .pick-note{margin:14px 0 0;color:var(--muted);font-size:.92rem}
+    [hidden]{display:none!important}
 
     .mobile-tabs{display:none}
 
@@ -271,11 +263,11 @@
       .mobile-tabs .tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
       .home-grid{grid-template-columns:1fr;min-height:auto}
       .course-strip{grid-template-columns:repeat(2,1fr)}
-      .lab-grid{grid-template-columns:repeat(2,1fr)}
     }
 
     @media (max-width:620px){
-      .course-strip,.ls-grid,.lab-grid{grid-template-columns:1fr}
+      .course-strip,.ls-grid{grid-template-columns:1fr}
+      .course-btn{flex:1;min-width:0}
       .panel{padding:20px}
       h1{font-size:3rem}
       .intro-card{min-height:340px}
@@ -286,10 +278,9 @@
 <body>
   <div class="mobile-tabs">
     <button class="tab-btn active" data-tab="home">Home</button>
-    <button class="tab-btn" data-tab="courses">Courses</button>
-    <button class="tab-btn" data-tab="learning">Learning Situations</button>
-
-    <button class="tab-btn" data-tab="lab">English Lab</button>
+    <button class="tab-btn" data-tab="courses" data-private hidden>Courses</button>
+    <button class="tab-btn" data-tab="learning" data-private hidden>Learning Situations</button>
+    <a class="tab-btn" href="lab/">English Lab</a>
   </div>
 
   <div class="app">
@@ -297,10 +288,9 @@
       <div class="brand">English with Roger</div>
       <nav class="nav-tabs">
         <button class="tab-btn active" data-tab="home">Home</button>
-        <button class="tab-btn" data-tab="courses">Courses</button>
-        <button class="tab-btn" data-tab="learning">Learning Situations</button>
-
-    <button class="tab-btn" data-tab="lab">English Lab</button>
+        <button class="tab-btn" data-tab="courses" data-private hidden>Courses</button>
+        <button class="tab-btn" data-tab="learning" data-private hidden>Learning Situations</button>
+        <a class="tab-btn" href="lab/">English Lab</a>
       </nav>
       <div class="sidebar-note">Choose a section. The page changes here without scrolling down through everything.</div>
     </aside>
@@ -311,7 +301,12 @@
           <div>
             <span class="eyebrow">Learn · Practise · Create</span>
             <h1>Make your English real.</h1>
-            <p class="lead">Welcome to my English website. Here students can move directly between courses, Learning Situations and English Lab activities without navigating through a long page.</p>
+            <p class="lead">Welcome to my English website. Choose your course and sign in with your school account to open your activities.</p>
+            <div class="course-pick">
+              <a class="course-btn c2eso" href="2eso/index.html" data-course="2eso"><strong>2 ESO</strong><span>Sign in →</span></a>
+              <a class="course-btn c4eso" href="4eso/index.html" data-course="4eso"><strong>4 ESO</strong><span>Sign in →</span></a>
+            </div>
+            <p class="pick-note">Use your school account (@ietramuntana.cat).</p>
           </div>
 
           <aside class="intro-card">
@@ -383,128 +378,46 @@
           </a>
         </div>
       </section>
-
-      <section class="panel" id="lab">
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">Practice</span>
-            <h2>English Lab</h2>
-          </div>
-          <p>Quick practice spaces that we can connect later to the activities you already have.</p>
-        </div>
-
-        <div class="lab-overview" id="labOverview">
-          <div class="lab-grid">
-          <article class="lab-card"><div class="lab-icon">🎧</div><h3>Shadowing</h3><p>Listen, repeat and improve rhythm and pronunciation.</p></article>
-          <article class="lab-card"><div class="lab-icon">🧩</div><h3>Sentence Builder</h3><p>Build accurate sentences before using them freely.</p></article>
-          <article class="lab-card"><div class="lab-icon">🃏</div><h3>Word Cards</h3><p>Review useful vocabulary, chunks and expressions.</p></article>
-          <article class="lab-card"><div class="lab-icon">🎵</div><h3>Listening</h3><p>Short listening activities and matching practice.</p></article>
-          <button type="button" class="lab-card lab-card-button" data-lab-menu="games" aria-controls="labGamesMenu">
-            <span class="lab-icon" aria-hidden="true">🎲</span>
-            <span class="lab-card-title">Games</span>
-            <span class="lab-card-description">Vocabulary games for each course and Learning Situation.</span>
-            <span class="arrow">Open games →</span>
-          </button>
-          <button type="button" class="lab-card lab-card-button" data-lab-menu="grammar" aria-controls="labGrammarMenu">
-            <span class="lab-icon" aria-hidden="true">📘</span>
-            <span class="lab-card-title">Grammar</span>
-            <span class="lab-card-description">Interactive grammar activities for each Learning Situation.</span>
-            <span class="arrow">Open grammar →</span>
-          </button>
-          </div>
-        </div>
-
-        <div class="lab-submenu" id="labGamesMenu" hidden>
-          <button type="button" class="lab-back" data-lab-back>← Back to English Lab</button>
-          <div class="lab-section lab-section-submenu" id="lab-games">
-          <h3 class="lab-section-title">Games</h3>
-          <p class="lab-section-lead">Choose your course and Learning Situation. Each set includes six vocabulary games with Insecure, Safe and Daring routes.</p>
-          <div class="lab-grid">
-            <a class="lab-card" href="2eso/my-real-routine/vocabulary-games.html">
-              <span class="badge">2 ESO · My Real Routine</span>
-              <h3>Vocabulary Games</h3>
-              <p>Practise everyday routines and useful expressions.</p>
-              <span class="arrow">Play 2 ESO games →</span>
-            </a>
-            <a class="lab-card" href="4eso/my-real-routine/vocabulary-games.html">
-              <span class="badge">4 ESO · My Real Routine</span>
-              <h3>Vocabulary Games</h3>
-              <p>Challenge yourself with phrasal verbs, natural expressions and routines.</p>
-              <span class="arrow">Play 4 ESO games →</span>
-            </a>
-          </div>
-          </div>
-        </div>
-
-        <div class="lab-submenu" id="labGrammarMenu" hidden>
-          <button type="button" class="lab-back" data-lab-back>← Back to English Lab</button>
-          <div class="lab-section lab-section-submenu" id="lab-grammar">
-          <h3 class="lab-section-title">Grammar of the LSs</h3>
-          <p class="lab-section-lead">Interactive grammar presentations for each Learning Situation.</p>
-          <div class="lab-grid">
-            <a class="lab-card" href="lab/grammar/2eso-present-simple.html">
-              <span class="badge">2 ESO · My Real Routine</span>
-              <h3>Present Simple</h3>
-              <p>To be, affirmative, negative, questions, negative questions, question words and frequency adverbs.</p>
-              <span class="arrow">Open grammar →</span>
-            </a>
-            <a class="lab-card" href="lab/grammar/4eso-present-simple-phrasal-verbs.html">
-              <span class="badge">4 ESO · My Real Routine</span>
-              <h3>Phrasal verbs</h3>
-              <p>The phrasal verbs of the LS in three groups, where the object goes, and he / she / it.</p>
-              <span class="arrow">Open grammar →</span>
-            </a>
-          </div>
-          </div>
-        </div>
-      </section>
     </main>
   </div>
 
-  <script>
-    const buttons = document.querySelectorAll('.tab-btn');
+  <script type="module">
+    // English Lab has its own page (lab/), where students choose their level and sign in; old links still work.
+    const initialTab = location.hash.slice(1);
+    if (/^lab(-games|-grammar)?$/.test(initialTab)) location.replace('lab/' + (initialTab === 'lab' ? '' : '#' + initialTab.slice(4)));
+
+    const buttons = document.querySelectorAll('.tab-btn[data-tab]');
     const panels = document.querySelectorAll('.panel');
 
-    const labOverview = document.getElementById('labOverview');
-    const labMenus = {
-      games: document.getElementById('labGamesMenu'),
-      grammar: document.getElementById('labGrammarMenu')
-    };
-
-    function showLabMenu(menu){
-      labOverview.hidden = Boolean(menu);
-      Object.entries(labMenus).forEach(([name, element]) => {
-        element.hidden = name !== menu;
-      });
-      window.scrollTo({top:0, behavior:'smooth'});
-    }
-
+    // Courses and Learning Situations ([data-private]) are only for the teacher and the tester; visitors see Home only.
     function openTab(id){
+      const btn = document.querySelector('.tab-btn[data-tab="' + id + '"]');
+      if (!btn || btn.hidden) id = 'home';
       panels.forEach(panel => panel.classList.toggle('active', panel.id === id));
       buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === id));
-      if (id === 'lab') showLabMenu(null);
       window.scrollTo({top:0, behavior:'smooth'});
     }
 
     buttons.forEach(button => {
       button.addEventListener('click', () => openTab(button.dataset.tab));
     });
-    document.querySelectorAll('[data-lab-menu]').forEach(button => {
-      button.addEventListener('click', () => showLabMenu(button.dataset.labMenu));
-    });
-    document.querySelectorAll('[data-lab-back]').forEach(button => {
-      button.addEventListener('click', () => showLabMenu(null));
+
+    // 2 ESO / 4 ESO: a signed-out visitor signs in here, and el-cloud then takes the student to their board.
+    // Before el-cloud has loaded, the link opens the course page, which asks for sign-in too.
+    document.querySelectorAll('.course-btn').forEach(link => {
+      link.addEventListener('click', event => {
+        if (window.ELCloud && !ELCloud.user) { event.preventDefault(); ELCloud.login(); }
+      });
     });
 
-    const initialTab = location.hash.slice(1);
-    if (initialTab === 'lab-games' || initialTab === 'lab-grammar') {
-      openTab('lab');
-      showLabMenu(initialTab === 'lab-games' ? 'games' : 'grammar');
-    } else if (initialTab && document.getElementById(initialTab)?.classList.contains('panel')) {
-      openTab(initialTab);
-    }
+    await import('./shared/js/el-cloud.js');
+    // Students never stay on this page (el-cloud sends them to their board), so only the teacher and the tester get here signed in.
+    ELCloud.onUser(u => {
+      const all = ELCloud.isTeacher(u) || (ELCloud.isTester(u) && !ELCloud.viewGroup());
+      document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !all; });
+      if (all && initialTab) openTab(initialTab);
+    });
   </script>
-<script type="module" src="shared/js/el-cloud.js"></script>
 </body>
 </html>
 

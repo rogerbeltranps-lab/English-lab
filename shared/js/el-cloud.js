@@ -67,7 +67,7 @@ async function login(){
   const r=await signInWithPopup(auth,p);
   if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Sign in with your school account (@"+DOMAINS.join(", @")+").");return}
   if(isStudent(r.user)&&!isTester(r.user)&&(await onRoster(r.user))===null)return;   // refused in onAuthStateChanged
-  if(isStudent(r.user)&&!seesAll(r.user)&&!onBoard)location.href=BOARD;   // students always start on their board
+  if(isStudent(r.user)&&!seesAll(r.user)&&!onBoard&&!onLab)location.href=BOARD;   // students always start on their board (English Lab keeps them there)
 }
 async function refuse(u){
   const mail=u.email;await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");
@@ -146,12 +146,13 @@ async function requestLevel(u){
   alert("Petició enviada al professor.");
 }
 
-// Students only use their board, their own course page and the LSs assigned to their group.
-const BOARD=new URL("today.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname);
+// Students only use their board, English Lab, their own course page and the LSs assigned to their group.
+const BOARD=new URL("today.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html)?$/.test(location.pathname);
 const courseOf=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
 async function gate(u){
-  if(isStudent(u)&&!seesAll(u)&&!lsId&&!onBoard){
-    const c=relPath.match(/^((2|4)eso)\/(index\.html)?$/);
+  const c=relPath.match(/^((2|4)eso)\/(index\.html)?$/);
+  if(!u&&c){signInBlock();return}   // course pages are for signed-in users only
+  if(isStudent(u)&&!seesAll(u)&&!lsId&&!onBoard&&!onLab){
     if(!(c&&c[1]===courseOf(myGroup))){location.replace(BOARD);return}
   }
   if(!lsId||!window.EL_CATALOG)return;
@@ -212,6 +213,7 @@ function bar(){
     if(!u)el.append("Not signed in ",b("Sign in with your school account",login));
     else{el.append(u.displayName||u.email," ");
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
+      if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)&&lsId)el.append(b("Change route",()=>requestLevel(u))," ");
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
@@ -238,4 +240,4 @@ onAuthStateChanged(auth,async u=>{
   listeners.forEach(f=>f(u));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,viewGroup:()=>viewGroup(user),lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
