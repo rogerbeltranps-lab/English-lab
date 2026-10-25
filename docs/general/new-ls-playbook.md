@@ -24,6 +24,7 @@ These are already decided. A new LS keeps them unless Roger says otherwise.
 | Recall checkpoints | Short reviews every two weeks. They count when they are done, and the first try is recorded. |
 | Criteria | Every assessment criterion has at least one activity that gives evidence for it, and four levels (NA · AS · AN · AE) with indicators. |
 | LS mark | Exam 35 % · final product 25 % · grammar and vocabulary activities 20 % · other competences 20 %. |
+| LS page and final product page | The LS page's Final Product tab is only a short card with an "Open the final product →" button. Everything about the final product is on the final product page: it opens with a model final product for the student's route, then what the route must do and what counts, then the steps and the rubric. |
 | Final product | Groups from the same route. Only the video is marked as a group; everything else is marked per student. Marked in two rounds, midway and at the end, with a marking PDF for each round. Rubric per route in Word. |
 | Exam | A Word exam in Roger's format with a separate key, used to make a Google Form per route. It is marked out of 100, and everything is multiple choice or short gaps except the writing. Exam texts and audio are kept private, never on the site. |
 | Sample exam | On the site, in the same format, taken the session before the exam so students know what to study. |
@@ -40,7 +41,7 @@ Each step ends with Roger's OK before the next one starts.
 4. **Criteria check.** 🤖 Claude shows which activity gives evidence for each criterion, with the indicators for each level. 👤 Roger approves it.
 5. **Site.** 🤖 Claude builds the LS pages. 👤 Roger tries them with the tester account.
 6. **Audio and videos.** 🤖 Claude sends the tagged scripts, the cost and the voice previews. 👤 Roger picks the voices and says OK for each recording. 🤖 Claude makes the slow copies for free.
-7. **Final product.** 🤖 Claude prepares the steps, groups, rubric per route (Word) and the two marking rounds. 👤 Roger approves the rubric and its weights.
+7. **Final product.** 🤖 Claude prepares the final product page: a model final product for each route, the task, the steps, the groups, the rubric per route (Word) and the two marking rounds. 👤 Roger approves the models, the rubric and its weights.
 8. **Grading.** 🤖 Claude prepares the LS mark and the few moments when Roger clicks a level on the dashboard. 👤 Roger approves it. Changes to the dashboard are made by the English Lab project, so Roger may need to paste a message there.
 9. **Calendar.** 🤖 Claude dates every session, the exam day and the due dates for each group. 👤 Roger checks it on the dashboard's time plan.
 10. **Exam.** 🤖 Claude proposes the exam, then makes the Word exam, the key and the audio (private) and the sample exam on the site. 👤 Roger approves it and reviews the Word files.
@@ -75,9 +76,9 @@ Read the [root AGENTS.md](../../AGENTS.md) and the [LS2 AGENTS.md](../4eso/ls2-s
 | 1 Programme | `docs/<course>/programme.md` (regenerate `shared/js/el-criteria.js` with `node tools/gen-criteria.js .` if it changes); new folder `docs/<course>/ls<n>-<name>/` with `AGENTS.md` (rules + dated decision log) and `overview.md`; add it to `docs/README.md` and the root `AGENTS.md` LS list; project-files folder `ls<n>/` for private files |
 | 2–3 Plan and content | `overview.md`, dated when approved, items tagged [I] / [S] / [D], section 0 "Rules that apply to every page" |
 | 4 Criteria | `assessment-criteria.md`, `competences-grid.md`, `indicators.md` |
-| 5 Site | `<course>/<ls>/index.html` (as `4eso/my-real-routine/index.html`), thin page shells + `data/<page>.js` rendered by the engine (`ls2-engine.js`), per-route `media.text`; `shared/js/el-catalog.js` (activities, `EL_ACTIONS`, step criteria, points, `EL_LS`); LS card on the home and course pages and in every LS dropdown |
+| 5 Site | `<course>/<ls>/index.html` (as `4eso/my-real-routine/index.html`), thin page shells + `data/<page>.js` rendered by the engine (`ls2-engine.js`), per-route `media.text`; `shared/js/el-catalog.js` (activities, `EL_ACTIONS`, step criteria, points, `EL_LS`); LS card on the home and course pages and in every LS dropdown; the LS page's Final Product tab is only a short card + "Open the final product →" (root `AGENTS.md`, LS landing page) |
 | 6 Audio and video | `<ls>/audio/*.mp3` + `-slow.mp3`; `<ls>/video/*.mp4` + `-slow.mp4` + `.vtt` + poster; scripts, clips and build scripts in project files; voices and credits in the LS `AGENTS.md` |
-| 7 Final product | `final-product-assessment.md`; final product page with engine `step` panels; `<ls>/final-rubric-data.js` (`round`, `group`, `video` per row); Word rubric in project files built from it |
+| 7 Final product | `final-product-assessment.md`; one final product page with everything on it: "See a model final product" first (the route's model), then the route task and "What counts", then the engine `step` panels; `<ls>/final-rubric-data.js` (`round`, `group`, `video` per row); Word rubric in project files built from it |
 | 8 Grading | `grading.md`; `EL_GRADING[ls]` in `shared/js/el-grading.js`; paste-ready brief in project files for `teacher.html` changes (English Lab project) |
 | 9 Calendar | `EL_PLAN[ls]` in `shared/js/el-plan.js` (`groups`, `g`, `exam`, `from`, `due`) |
 | 10 Exam | Project files only, never in the public repo: `ls<n>/exam/` (data, `make-docx.js`, Word + key, audio with no slow copy); sample exam page + `data/sample-exam.js` on the site |
