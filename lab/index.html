@@ -153,6 +153,12 @@
             <span class="lab-card-description">Vocabulary games for each Learning Situation.</span>
             <span class="arrow">Open games →</span>
           </button>
+          <button type="button" class="lab-card lab-card-button" data-level="4eso" data-lab-menu="vocab" aria-controls="labVocabMenu">
+            <span class="lab-icon" aria-hidden="true">🍂</span>
+            <span class="lab-card-title">Vocabulary</span>
+            <span class="lab-card-description">Class presentations that introduce the words of each Learning Situation.</span>
+            <span class="arrow">Open vocabulary →</span>
+          </button>
           <button type="button" class="lab-card lab-card-button" data-lab-menu="grammar" aria-controls="labGrammarMenu">
             <span class="lab-icon" aria-hidden="true">📘</span>
             <span class="lab-card-title">Grammar</span>
@@ -184,6 +190,22 @@
           </div>
         </div>
 
+        <div class="lab-submenu" id="labVocabMenu" hidden>
+          <button type="button" class="lab-back" data-lab-back>← Back to English Lab</button>
+          <div class="lab-section">
+          <h2 class="lab-section-title">Vocabulary of the LSs</h2>
+          <p class="lab-section-lead">Class presentations that introduce the words of each Learning Situation: the class guesses first.</p>
+          <div class="lab-grid">
+            <a class="lab-card" data-level="4eso" href="vocabulary/4eso-autumn-words.html">
+              <span class="badge">4 ESO · Seasons &amp; Celebrations</span>
+              <h3>Autumn words</h3>
+              <p>Seasons, weather, autumn food and nature, and feelings, with how to say each word.</p>
+              <span class="arrow">Open vocabulary →</span>
+            </a>
+          </div>
+          </div>
+        </div>
+
         <div class="lab-submenu" id="labGrammarMenu" hidden>
           <button type="button" class="lab-back" data-lab-back>← Back to English Lab</button>
           <div class="lab-section">
@@ -200,6 +222,12 @@
               <span class="badge">4 ESO · My Real Routine</span>
               <h3>Phrasal verbs</h3>
               <p>The phrasal verbs of the LS in three groups, where the object goes, and he / she / it.</p>
+              <span class="arrow">Open grammar →</span>
+            </a>
+            <a class="lab-card" data-level="4eso" href="grammar/4eso-present-simple-customs.html">
+              <span class="badge">4 ESO · Seasons &amp; Celebrations</span>
+              <h3>Customs &amp; dates</h3>
+              <p>Present Simple for customs, It is celebrated / takes place / is held, and on / in / at. The class answers first.</p>
               <span class="arrow">Open grammar →</span>
             </a>
           </div>
@@ -219,7 +247,7 @@
     const read = () => { try { return LEVELS[localStorage.getItem(KEY)] ? localStorage.getItem(KEY) : null } catch (e) { return null } };
     let level = read(), user = null;
 
-    const labMenus = {games: $('labGamesMenu'), grammar: $('labGrammarMenu')};
+    const labMenus = {games: $('labGamesMenu'), vocab: $('labVocabMenu'), grammar: $('labGrammarMenu')};
     function showLabMenu(menu){
       $('labOverview').hidden = Boolean(menu);
       Object.entries(labMenus).forEach(([name, element]) => { element.hidden = name !== menu; });
