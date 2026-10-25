@@ -26,4 +26,5 @@ Newest first. One line per decision; update a line instead of adding a contradic
 
 | Date | Decision |
 | --- | --- |
+| 2026-10-25 | This school year only the final exam and the final product count (Roger): LS1 was done in class and will be redesigned for next year. Its learning paths are `graded:false` in `el-catalog.js` (practice; saved results stay in Firestore), and `EL_GRADING["4eso-my-real-routine"]` has only the exam (one mark out of 10 until Roger gives the sections) and the final product (the teacher's mark), 50/50 until Roger sets the weights. The student board shows only the LS grade (no learning paths, no links to the LS pages, so students do not go back to the activities); the dashboard shows the LS grade first with the learning paths folded. |
 | 2026-10-24 | Docs moved to `docs/4eso/ls1-my-real-routine/`; the 2ESO version of this LS has its own folder in `docs/2eso/`. |
