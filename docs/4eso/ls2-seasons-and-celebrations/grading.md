@@ -64,8 +64,8 @@ The indicators are not ticked one by one: each row of indicators.md is a four-le
 | LP3 listening chart | 1 | 2.2 |
 | LP4 research card | 3 | 4.2, 6.1, CC3 3.2 |
 | Exam: writing | 1 | 5.1 |
-| Final product: my part, my email, my source, welcome actions | 4 | 3.2, 5.1, 4.2, CC1 1.3 |
-| Final product group rows (once per group) | 4 per group | 1.1, 1.2, 6.1, CC3 3.2 |
+| Final product round 1 (after step 2): my source, my research sheet | 2 | 4.2 · 6.1 |
+| Final product round 2 (after submitting): my part, my email, welcome actions; meaning, local link, stereotypes once per group (on the video) | 3 + 3 per group | 3.2, 5.1, CC1 1.3 · 1.1, 1.2, CC3 3.2 |
 
 About 330 clicks for a class of 25 over six weeks. Not levelled: LP writing pieces (AI feedback), LP speaking practice, self-assessment (shown next to the teacher's level, never counted).
 
@@ -79,7 +79,8 @@ Levels to marks: NA 2.5 · AS 5 · AN 7.5 · AE 10 · no evidence 0. Marks to le
 2. **First try:** save the first-try score of vocabulary practice, grammar, mixed practice and register steps (as checkpoints already do with `parts.first`), plus whether each step was done by its session deadline (`shared/js/el-plan.js`).
 3. **Exam marks:** a field per exam section (listening, reading, vocabulary, grammar, writing) and the writing level.
 4. **LS grade view per group:** four columns (exam 35, final product 25, grammar and vocabulary 20, other competences 20) and the weighted total; and the "result per criterion" table showing the suggested degree per criterion with its evidence, which the teacher can confirm or change.
+5. **Marking PDF per round** (requested 25 Oct 2026, not built yet): a button per class group and round that prints every student's answers for that round with the rubric rows of the round; see final-product-assessment.md section 8.
 
 ## 7. Terms
 
-Term 1 (evaluation sessions 2 and 9 Dec): exam, grammar and vocabulary, LP evidence. The final product (deadline 11 Dec) closes the LS2 mark in term 2.
+Term 1 (evaluation sessions 2 and 9 Dec): exam, grammar and vocabulary, LP evidence. The final product (deadline 11 Dec) closes the LS2 mark in term 2. It is marked in two rounds (Roger, 25 Oct 2026): round 1 after step 2 (my source, research sheet), round 2 after submitting (video, email, teamwork, process), each with a marking PDF of every student's answers ([final-product-assessment.md](final-product-assessment.md#8-marking-in-two-rounds-roger-25-oct-2026)).
