@@ -406,7 +406,7 @@
     // Before el-cloud has loaded, the link opens the course page, which asks for sign-in too.
     document.querySelectorAll('.course-btn').forEach(link => {
       link.addEventListener('click', event => {
-        if (window.ELCloud && !ELCloud.user) { event.preventDefault(); ELCloud.login(); }
+        if (window.ELCloud && !ELCloud.user) { event.preventDefault(); try { localStorage.setItem("el_pick", link.dataset.course); } catch (e) {} ELCloud.login(); }
       });
     });
 

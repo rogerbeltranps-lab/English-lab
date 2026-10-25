@@ -19,7 +19,7 @@ dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 3
 @media (max-width:980px){.app{grid-template-columns:1fr}.side{display:none}.mtabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}.mtabs .nv{white-space:nowrap;background:#fff;border:1px solid #e5e7eb}.mtabs .nv.on{background:#3157d5;color:#fff;border-color:#3157d5}.mtabs .nv.sub{padding:12px 14px;font-weight:700}}</style>
 <nav class="mtabs nvs-m" aria-label="Menú"></nav>
 <div class="app"><aside class="side"><div class="brand">English with Roger</div><nav class="nvs" aria-label="Menú"></nav></aside>
-<div class="page"><h1>Les meves activitats</h1><p class="muted" id="sub">Carregant…</p><div id="main"></div></div></div>
+<div class="page"><h1>Les meves activitats</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-criteria.js"></script>
@@ -80,6 +80,10 @@ function render(){
   const lss=[...EL_LS].filter(l=>{const i=D.ls[l.id]||{status:"hidden"};return all()||(i.status!=="hidden"&&elLsForGroup(l,i,D.me.group))})
     .sort((a,b)=>((D.ls[b.id]||{}).status==="open")-((D.ls[a.id]||{}).status==="open"));   // open LS first
   nav(g,lss);
+  // The course the student clicked on Home (el_pick): if it is not theirs, say which one is.
+  let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
+  if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.note=`Has triat ${COURSES[pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`;
+  $("#note").innerHTML=S.note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(S.note)}</div>`:"";
   $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?"Pots practicar quan vulguis. El professor et dirà a classe quan fer les activitats avaluables.":"Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.");
   if(!lss.length){$("#main").innerHTML="";return}
   if(!lss.some(l=>l.id===S.ls))S.ls=lss[0].id;
