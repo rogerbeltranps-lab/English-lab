@@ -18,6 +18,7 @@
 .topbar .session-jump label,.topbar .jump label{color:#dce8f8!important}
 .topbar .progress-label,.topbar .progress-row{color:#dcefe7!important}
 .topbar .progress-bar,.topbar .bar{background:#8fc2ff!important}
+.deck-link{display:inline-flex;align-items:center;gap:12px;margin:4px 10px 18px 0;padding:12px 18px 12px 12px;border-radius:14px;background:var(--accent);color:#fff;text-decoration:none;box-shadow:var(--shadow);max-width:100%}.deck-link:hover{background:var(--dark)}.deck-link:focus-visible{outline:3px solid var(--dark);outline-offset:3px}.deck-link-icon{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.18);flex:0 0 auto;font-size:.9rem}.deck-link strong{display:block;font-weight:800}.deck-link small{display:block;opacity:.85;font-size:.85rem}
 .warm-note{margin-top:14px;padding:11px 13px;background:#fff;border:1px solid var(--line);border-radius:13px;color:var(--muted);font-size:.92rem}
 .choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
 .choice{border:1px solid var(--line);background:#fff;border-radius:13px;padding:13px;text-align:left;color:var(--ink);font-weight:700}
@@ -72,6 +73,7 @@ html,body{overflow-x:clip}
   <span class="eyebrow">Learning Path 1 · Warm-up</span>
   <h1>Getting started: Castanyada &amp; Halloween</h1>
   <p class="lead">Remember what you learnt in My Real Routine, learn autumn words, listen to a real video about Halloween and talk about autumn where you live.</p>
+  <a class="deck-link" href="/English-lab/lab/vocabulary/4eso-autumn-words.html?from=/English-lab/4eso/seasons-and-celebrations/getting-started.html"><span class="deck-link-icon" aria-hidden="true">▶</span><span><strong>Autumn words · class presentation</strong><small>Interactive slides we use in class</small></span></a>
   <div class="warm-note"><strong>Remember before you look.</strong> Start with the recall quiz without notes: trying to remember is what makes you learn.</div>
   <div class="routes">
     <button class="route active" data-level="insecure"><strong>Insecure</strong><span>Clear answers · strong support</span></button>
@@ -311,7 +313,9 @@ const state=Object.assign({done:{},choices:[]},JSON.parse(localStorage.getItem(s
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const STEPS=["recall","words","read","listen","speak"];
 function save(){localStorage.setItem(storageKey,JSON.stringify(state));localStorage.setItem(storageKey+"Level",level);updateProgress()}
-function complete(k){state.done[k]=true;save()}
+function complete(k){if(!state.done[k]){state.done[k]=true;state.doneAt=state.doneAt||{};state.doneAt[k]=new Date().toISOString()}save()}
+// tries[k]: first check of a step; last[k]: latest check (the teacher dashboard shows both; recall keeps its first try in first[route])
+function attempt(k,score,max){const t={score,max,level,date:new Date().toISOString()};state.tries=state.tries||{};if(k!=="recall"&&!state.tries[k])state.tries[k]=t;state.last=state.last||{};state.last[k]=t;save()}
 function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / "+STEPS.length;$("#progressBar").style.width=(n/STEPS.length*100)+"%"}
 const ca=()=>level==="insecure";
 const need=n=>Math.ceil(n*0.8);
@@ -334,14 +338,14 @@ function checkTyped(items,prefix,result,key,explain){
 let recallItems=[],practiceItems=[];
 function renderRecall(){recallItems=forLevel(recall,level);renderTyped("#recallList",recallItems,"rc");$("#recallResult").classList.remove("show")}
 // Recall is low stakes: done when submitted, whatever the score.
-$("#checkRecall").onclick=()=>{const s=checkTyped(recallItems,"rc","#recallResult",null,true);state.recall=state.recall||{};if(state.recall[level]===undefined)state.recall[level]={score:s,max:recallItems.length,date:new Date().toISOString()};$("#recallResult").textContent=s+" / "+recallItems.length+(ca()?" correctes · Pas completat ✓ Llegeix el feedback de les que has fallat.":" correct · Step complete ✓ Read the feedback for the ones you missed.");complete("recall")};
+$("#checkRecall").onclick=()=>{const s=checkTyped(recallItems,"rc","#recallResult",null,true);state.first=Object.assign({},state.recall,state.first);if(!state.first[level])state.first[level]={score:s,max:recallItems.length,date:new Date().toISOString()};attempt("recall",s,recallItems.length);$("#recallResult").textContent=s+" / "+recallItems.length+(ca()?" correctes · Pas completat ✓ Llegeix el feedback de les que has fallat.":" correct · Step complete ✓ Read the feedback for the ones you missed.");complete("recall")};
 
 function renderWords(){
   $("#wordsPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";
   $("#vocabGroups").innerHTML=forLevel(vocab,level).map(g=>'<article class="vocab-group"><h3>'+g.g+'</h3><div class="chips">'+g.items.map(x=>'<span class="chip" tabindex="0">'+x[0]+'<span class="chip-tooltip"><b>'+x[1]+'</b>'+x[2]+'</span></span>').join("")+'</div></article>').join("");
   practiceItems=forLevel(practice,level);renderTyped("#practiceList",practiceItems,"pr");$("#practiceResult").classList.remove("show");
 }
-$("#checkPractice").onclick=()=>{const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(s>=need(practiceItems.length))complete("words")};
+$("#checkPractice").onclick=()=>{const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);attempt("words",s,practiceItems.length);if(s>=need(practiceItems.length))complete("words")};
 
 let readItems=[];
 function renderRead(){
@@ -352,7 +356,7 @@ function renderRead(){
   $("#readResult").classList.remove("show");
 }
 $("#checkRead").onclick=()=>{let score=0;readItems.forEach((q,i)=>{const c=document.querySelector('input[name="rd'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#rdf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,false);f.className="feedback "+(ok?"ok":"no")});
-  const n=readItems.length;$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(score>=need(n))complete("read")};
+  const n=readItems.length;attempt("read",score,n);$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(score>=need(n))complete("read")};
 let listenItems=[];
 function renderListen(){
   listenItems=forLevel(listening,level);const f=$("#listenForm");f.innerHTML="";
@@ -361,7 +365,7 @@ function renderListen(){
   $("#listenResult").classList.remove("show");
 }
 $("#checkListen").onclick=()=>{let score=0;listenItems.forEach((q,i)=>{const c=document.querySelector('input[name="l'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#lf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,true);f.className="feedback "+(ok?"ok":"no")});
-  const n=listenItems.length;$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(score>=need(n))complete("listen")};
+  const n=listenItems.length;attempt("listen",score,n);$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(score>=need(n))complete("listen")};
 
 function renderSpeak(){$("#speakPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";$("#speakTask").textContent=speakTask[level];$("#speakModel").textContent=speakModel[level]}
 function renderChoices(){

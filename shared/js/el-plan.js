@@ -3,6 +3,7 @@
 // groups: one column per class group; each row lists that group's dated sessions (one per line).
 // due: last session of each activity per group (same order as groups), YYYY-MM-DD; "done on time" on the dashboard means done by the end of that day.
 //   The student board lists each activity in the week of its due date and reminds the student when it is past and not done.
+// optional: optional activities (homework) per group, same shape as due; the floating to-do list (el-todo.js) shows them on that day, never late.
 // exam: exam day per group (same order as groups), YYYY-MM-DD. from: Monday of each row's week, YYYY-MM-DD (finds "this week").
 // A new plan (for example 2 ESO LS2) is one more entry with these fields; groups use the names "2ESO-A", "2ESO-B"…
 window.EL_PLAN={
@@ -26,6 +27,10 @@ window.EL_PLAN={
       "4eso/ls2-research-it-right":["2026-11-25","2026-11-24"],
       "4eso/ls2-celebration-day-proposal":["2026-12-11","2026-12-11"],
       "4eso/ls2-reflect":["2026-12-14","2026-12-14"]
+    },
+    optional:{
+      "4eso/ls2-recall-checkpoint-2":["2026-11-06","2026-11-03"],
+      "4eso/ls2-recall-checkpoint-3":["2026-11-11","2026-11-09"]
     },
     rows:[
       {term:1,from:"2026-10-26",when:"Week 1 · 26–30 Oct",g:[
