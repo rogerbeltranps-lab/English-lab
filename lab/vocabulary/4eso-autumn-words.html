@@ -299,14 +299,6 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
       <p class="cahint" data-ca="<b style='color:var(--accent)'>Ajuda en català activada.</b> Les paraules continuen en anglès.">Insecure? Prem <b style="color:var(--accent)">Ajuda en català</b> a dalt per veure les instruccions en català.</p>
     </div>
     <div class="stack">
-      <div class="modes" aria-label="How you answer">
-        <p class="mcell"><span class="ico" aria-hidden="true">✋</span><span data-ca="<b>Dits</b>Mostra 1, 2, 3 o 4 dits."><b>Fingers</b>Show 1, 2, 3 or 4 fingers.</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">💻</span><span data-ca="<b>Chromebook</b>Entra des del Learning Path i toca la resposta."><b>Chromebook</b>Join from the Learning Path and tap your answer.</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">👍</span><span data-ca="<b>Polzes</b>Amunt = correcte · avall = incorrecte."><b>Thumbs</b>Up = right · down = wrong.</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">💬</span><span data-ca="<b>Parla amb la parella</b>Explica-ho al company o companya."><b>Turn and talk</b>Tell your partner.</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">🎲</span><span data-ca="<b>Número a l’atzar</b>Pot respondre qualsevol: estigues a punt!"><b>Random number</b>Anyone can answer: be ready!</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">🏆</span><span data-ca="<b>Equips</b>Punts per a cada equip que l’encerta."><b>Teams</b>Points for every team that gets it right.</span></p>
-      </div>
       <div class="rule key" data-step="1" data-label="Warm-up question" data-lca="Pregunta d’escalfament">
         <div class="ask"><span class="mode" data-ca="💬 Parla amb la parella · 30 s">💬 Turn and talk · 30 s</span><button type="button" class="go321" data-timer="30" data-ca="⏱ Comença 30 s">⏱ Start 30 s</button></div>
         <p class="big">What is autumn like where you live?</p>
@@ -326,8 +318,8 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
   <h2 data-ca="Quina estació és?">Which season is it?</h2>
   <div class="stack">
     <div class="ask"><span class="mode" data-ca="✋ 1 = spring · 2 = summer · 3 = autumn · 4 = winter">✋ 1 = spring · 2 = summer · 3 = autumn · 4 = winter</span><button type="button" class="go321" data-say="fingers" data-ca="3 · 2 · 1 · Ja!">3 · 2 · 1 · Show!</button></div>
-    <div class="grid3" id="seasons"></div>
-    <div class="rule key" data-step="7" data-label="The four seasons" data-lca="Les quatre estacions">
+    <div class="grid2" id="seasons"></div>
+    <div class="rule key" data-step="5" data-label="The four seasons" data-lca="Les quatre estacions">
       <div class="seasons">
         <p class="sbox ss"><b>🌸 spring</b><span>March · April · May</span></p>
         <p class="sbox su"><b>☀️ summer</b><span>June · July · August</span></p>
@@ -578,9 +570,7 @@ const SEAS=[
   ['🌸','Flowers grow and the trees get new leaves.',0,'After the cold, everything grows again.','Després del fred, tot torna a créixer.'],
   ['🍂','The leaves change colour and fall.',2,'autumn (UK) = fall (US): the leaves fall!','autumn al Regne Unit = fall als EUA: les fulles cauen!'],
   ['☀️','It’s hot and sunny, and there’s no school.',1,'The hottest season: the holidays.','L’estació més calorosa: les vacances.'],
-  ['❄️','It’s very cold and it gets dark early.',3,'The coldest season, with the shortest days.','L’estació més freda, amb els dies més curts.'],
-  ['🌰','We roast chestnuts at the Castanyada.',2,'The Castanyada is on 31 October: autumn.','La Castanyada és el 31 d’octubre: tardor.'],
-  ['🌾','Farmers collect the harvest: grapes and apples.',2,'harvest = collita: autumn is harvest time.','harvest = collita: la tardor és temps de collita.']
+  ['❄️','It’s very cold and it gets dark early.',3,'The coldest season, with the shortest days.','L’estació més freda, amb els dies més curts.']
 ];
 $('#seasons').innerHTML=SEAS.map(([emo,s,k,en,ca],i)=>`<button type="button" class="xcard" data-open="${i+1}" data-ch="${SEASON.join('|')}" data-chca="${SEASON.map((x,j)=>`${x} · ${SCA[j]}`).join('|')}" data-okv="${k}"><span class="qrow"><span class="emo" aria-hidden="true">${emo}</span><span class="sent">${esc(s)}</span></span><span class="ans tagline">${wd(SEASON[k],SCA[k],SCL[k])} · ${B(esc(en),esc(ca))}</span></button>`).join('');
 
@@ -648,9 +638,7 @@ $('#safewall').innerHTML=[...SAFE.map(r=>[r[0],r[3],r[4]]),['🍏','pick fruit',
 const ODD=[
   [['pumpkin','sunny','cloudy','windy'],'pumpkin','carbassa','Pumpkin is food; the others are weather.','Pumpkin és menjar; les altres són temps.'],
   [['harvest','spring','autumn','winter'],'harvest','collita','Harvest isn’t a season.','Harvest no és una estació.'],
-  [['foggy','excited','proud','grateful'],'foggy','amb boira','Foggy is weather; the others are feelings.','Foggy és temps; les altres són sentiments.'],
-  [['relaxed','chestnuts','mushrooms','apples'],'relaxed','relaxat/da','Relaxed is a feeling; the others are food.','Relaxed és un sentiment; les altres són menjar.'],
-  [['rainy','leaves','trees','flowers'],'rainy','plujós','Rainy is weather; the others are nature.','Rainy és temps; les altres són natura.']
+  [['foggy','excited','proud','grateful'],'foggy','amb boira','Foggy is weather; the others are feelings.','Foggy és temps; les altres són sentiments.']
 ];
 $('#odd').innerHTML=run(ODD.map(([o,w,ca,en,cen])=>['',`Which word doesn’t belong?`,o,w,ca,en,cen]));
 
@@ -670,7 +658,7 @@ $$('.poll').forEach(p=>{
 });
 function setupPolls(s){
   $$('.opts',s).forEach((box,n)=>{
-    const opts=$$('.opt',box),o=live&&live.order&&live.order[n];   // following the class: the teacher's order, so 1 2 3 match the projector
+    const opts=$$('.opt',box),o=live&&live.order&&live.order[n]!=null?String(live.order[n]).split(',').map(Number):null;   // following the class: the teacher's order, so 1 2 3 match the projector
     (o?o.map(i=>opts.find(x=>+x.dataset.i===i)).filter(Boolean):box.hasAttribute('data-fixed')?opts:shuffled(opts)).forEach((o,i)=>{box.appendChild(o);$('.key',o).textContent=i+1;o.setAttribute('aria-pressed','false')});
   });
 }
@@ -840,7 +828,7 @@ addEventListener('resize',()=>{if(!$('#tpill').hidden)placeTimer()});
 /* ---------- live: students follow the teacher's screen (shared/js/el-deck-points.js) ---------- */
 // Every step announces where the deck is (deckstep: slide, step, cards opened by hand, answer order). A student following the class
 // gets the same view with ELDeck.show(state); their own navigation is off until ELDeck.show(null). live is declared with the deck state above.
-function info(){const s=slides[cur],op=$$('[data-open]',s);return {slide:cur,step:st[cur].b,man:op.map((el,k)=>st[cur].man.has(el)?k:-1).filter(k=>k>=0),order:$$('.opts',s).map(b=>$$('.opt',b).map(o=>+o.dataset.i))}}
+function info(){const s=slides[cur],op=$$('[data-open]',s);return {slide:cur,step:st[cur].b,man:op.map((el,k)=>st[cur].man.has(el)?k:-1).filter(k=>k>=0),order:$$('.opts',s).map(b=>$$('.opt',b).map(o=>o.dataset.i).join(','))}}   // strings: Firestore has no nested arrays
 function show(x){
   const was=live;live=x;document.documentElement.classList.toggle('deck-live',!!x);if(!x){nav();return}
   const same=was&&was.slide===x.slide&&JSON.stringify(was.order)===JSON.stringify(x.order)&&x.slide===cur;

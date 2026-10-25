@@ -152,10 +152,14 @@ async function goLive(){
   F.onSnapshot(F.doc(db,"live",g),x=>{LIVE=x.exists()?x.data():null;redraw()},e=>console.warn("live",e));setInterval(redraw,60e3);
   // my points and the teams' scores change during the class (✓ Right · +1): show them at once
   const ptDraw=()=>{const n=$("#ptbox");if(n)n.innerHTML=pointsBox()};
-  F.onSnapshot(F.doc(db,"points",(U.email||"").toLowerCase()),x=>{if(x.exists()){D.pt=x.data();ptDraw()}},e=>console.warn("points",e));
-  F.onSnapshot(F.doc(db,"teams",g),x=>{if(x.exists()){D.tm=x.data();ptDraw()}},e=>console.warn("teams",e));
-  const team=(D.pt||{}).team,list=(D.tm||{}).list||[];
-  if(team&&list.some(x=>x.id===team))try{const {buzzer}=await import("./shared/js/el-buzz.js");buzzer({S:F,db,group:g,team,names:Object.fromEntries(list.map(x=>[x.id,x.name])),t,el:$("#buzz")})}catch(e){console.warn("buzz",e)}
+  // the buzzer for my team (shared/js/el-buzz.js), made again if my team or the teams change during the class
+  let buzzKey="",buzzStop=null;
+  const setBuzz=async()=>{const team=(D.pt||{}).team,list=(D.tm||{}).list||[],ok=team&&list.some(x=>x.id===team),key=ok?team+"|"+list.map(x=>x.id+x.name).join():"";
+    if(key===buzzKey)return;buzzKey=key;if(buzzStop){buzzStop();buzzStop=null}if(!ok)return;
+    try{const {buzzer}=await import("./shared/js/el-buzz.js");if(key!==buzzKey)return;buzzStop=buzzer({S:F,db,group:g,team,names:Object.fromEntries(list.map(x=>[x.id,x.name])),t,el:$("#buzz")})}catch(e){console.warn("buzz",e)}};
+  F.onSnapshot(F.doc(db,"points",(U.email||"").toLowerCase()),x=>{D.pt=x.exists()?x.data():null;ptDraw();setBuzz()},e=>console.warn("points",e));
+  F.onSnapshot(F.doc(db,"teams",g),x=>{D.tm=x.exists()?x.data():null;ptDraw();setBuzz()},e=>console.warn("teams",e));
+  setBuzz();
 }
 // Vocabulary and grammar summary (Roger, 25 Oct 2026): an optional PDF per route; a student gets only their route's, the teacher and testers all three.
 function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=(D.lv[ls.id]||{}).level,a=r=>`<a class="go" href="${ls.study}${r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
