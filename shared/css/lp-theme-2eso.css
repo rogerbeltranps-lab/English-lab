@@ -33,5 +33,5 @@
 .flash-actions .btn{width:100%;padding-inline:8px;white-space:nowrap}
 .flash-actions #gotCard{order:1}.flash-actions #againCard{order:2}.flash-actions #prevCard{order:3}.flash-actions #nextCard{order:4}.flash-actions #newCards{order:5;grid-column:1/-1}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;filter:none!important}
-/* The Learning Path selector repeated the page title, so it stays hidden. The select is kept in the page as the Learning Path order for the "continue to the next Learning Path" button (section-next.js). */
-.topbar .toprow .session-jump{display:none!important}
+/* Learning Path pages: the selector already names the current Learning Path, so the title next to it is hidden (Roger, 25 Oct 2026). */
+.topbar .toprow:has(.session-jump) :is(.brand-mark,.brand-title){display:none!important}
