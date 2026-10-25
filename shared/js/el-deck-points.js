@@ -90,7 +90,8 @@ const local=store.get("teams",null)||{n:4,names:[],score:[0,0,0,0,0,0]};
 // T.data: that group's teams this term {g, term, list, score:{team:n}, members:{team:[email]}, pts:{email:n}}.
 // T.sid: this class session (the time the group was chosen), so the students' answers start empty every class; T.ans: their answers.
 const T={fb:null,user:null,teacher:false,group:"",data:null,msg:"",sid:0,ans:null};
-{const g=store.get("group",null);if(g&&g.g&&Date.now()-g.at<3*3600e3){T.group=g.g;T.sid=g.at}}
+{const g=store.get("group",null);if(g&&g.g&&Date.now()-g.at<3*3600e3){T.group=g.g;T.sid=g.deck===location.pathname?g.at:Date.now();   // another deck in the same lesson: a new session, so the answers start empty
+  if(T.sid!==g.at)store.set("group",{g:g.g,at:T.sid,deck:location.pathname})}}
 const ready=()=>T.teacher&&T.group&&T.data&&T.data.g===T.group;
 const resized=()=>dispatchEvent(new Event("resize"));
 const groups=()=>(window.EL_GROUPS||[]).filter(g=>!bar.dataset.course||g.course===bar.dataset.course);
@@ -102,7 +103,7 @@ function draw(){
   else if(!cloudOn)h=[...Array(local.n).keys()].map(t=>`<div class="team"><input id="teamName${t}" value="${esc(local.names[t]||"Team "+(t+1))}" aria-label="Team ${t+1} name"><button type="button" data-team="${t}" data-d="-1" aria-label="Remove a point">−</button><span class="sc">${local.score[t]||0}</span><button type="button" data-team="${t}" data-d="1" aria-label="Add a point">+</button></div>`).join("");
   const sel=T.teacher?`<select id="teamGroup" aria-label="Class group the points are saved for" title="Class group the points are saved for"><option value="">Not saved</option>${groups().map(g=>`<option value="${g.id}"${g.id===T.group?" selected":""}>☁ ${esc(g.name)}</option>`).join("")}</select>`:"";
   const stat=T.msg?`<span class="tstat no">${T.msg}</span>`
-    :D?(T.ans?`<span class="tstat" title="Students following this presentation on their device">📡 ${T.ans.n} ${B("joined","connectats")}</span>`:"")+(D.list.length?`<button type="button" class="tool" id="buzzOpen" title="Open the buzzers on the students' boards (B)">🔔 ${B("Buzz","Polsador")}</button>`:"")+`<span class="tstat" title="Saved for every member of the team">${B(elTermName(D.term,"en"),elTermName(D.term,"ca"))} · ${B("best","millor")} ${Math.max(0,...Object.values(D.pts))}</span><button type="button" class="tool" id="teamsReload" title="Load the teams again">↻</button>`
+    :D?(T.ans?`<span class="tstat" title="Students following this presentation on their device">📡 <span id="ansN">${T.ans.n}</span> ${B("joined","connectats")}</span>`:"")+(D.list.length?`<button type="button" class="tool" id="buzzOpen" title="Open the buzzers on the students' boards (B)">🔔 ${B("Buzz","Polsador")}</button>`:"")+`<span class="tstat" title="Saved for every member of the team">${B(elTermName(D.term,"en"),elTermName(D.term,"ca"))} · ${B("best","millor")} ${Math.max(0,...Object.values(D.pts))}</span><button type="button" class="tool" id="teamsReload" title="Load the teams again">↻</button>`
     :T.teacher?"":`<button type="button" class="tool" id="teamsSignIn" title="Sign in with the teacher's account to save the points for a class group">☁ ${B("Save points","Desa els punts")}</button>`;
   const ctl=cloudOn?"":`<select id="teamCount" aria-label="Number of teams">${[2,3,4,5,6].map(n=>`<option value="${n}"${n===local.n?" selected":""}>${n}</option>`).join("")}</select><button type="button" class="tool" id="teamsZero">${B("Reset","Zero")}</button>`;
   bar.innerHTML=h+`<span class="tctl">${sel}${ctl}${stat}</span>`;
@@ -180,7 +181,7 @@ function listen(g){
   cloud().then(fb=>{if(!fb||T.group!==g)return;
     ansUnsub=fb.S.onSnapshot(fb.S.collection(fb.db,"live",g,"answers"),qs=>{const R={};let n=0;
       qs.forEach(d=>{const x=d.data();if(x.sid!==T.sid)return;n++;Object.entries(x.a||{}).forEach(([q,v])=>{if(v>=0)(R[q]=R[q]||{})[v]=(R[q][v]||0)+1})});
-      T.ans={R,n};drawAns();draw()},e=>console.warn("answers",e));
+      const had=T.ans;T.ans={R,n};drawAns();const c=$("#ansN",bar);if(had&&c){c.textContent=n;cbMode()}else draw()},e=>console.warn("answers",e));   // a tap only updates the count
     let first=true;   // no sound for the state the page finds when it opens
     unsub=fb.S.onSnapshot(fb.S.doc(fb.db,"buzz",g),s=>{const was=T.buzz||{};T.buzz=s.exists()?s.data():null;const z=T.buzz||{};
       if(!first){if(z.open&&z.winner&&!was.winner)snd("first");else if(z.open&&!was.open)snd("open")}first=false;drawBuzz()},e=>console.warn("buzz",e))});
@@ -221,7 +222,7 @@ bar.addEventListener("click",async e=>{
 });
 bar.addEventListener("change",e=>{
   const id=e.target.id;
-  if(id==="teamGroup"){T.group=e.target.value;T.msg="";T.sid=Date.now();store.set("group",T.group?{g:T.group,at:T.sid}:null);listen("");T.group?load():draw()}
+  if(id==="teamGroup"){T.group=e.target.value;T.msg="";T.sid=Date.now();store.set("group",T.group?{g:T.group,at:T.sid,deck:location.pathname}:null);listen("");T.group?load():draw()}
   else if(id==="teamCount"){local.n=+e.target.value;store.set("teams",local);draw()}
   else if(id.startsWith("teamName")){local.names[+id.slice(8)]=e.target.value;store.set("teams",local)}
 });
@@ -282,9 +283,9 @@ function cbMode(){   // also called by the strip's first draw, before the consts
   });
 }
 async function joinQuiz(x){   // the teacher's session: keep my answers if I come back to the same one, start empty for a new one
-  if(!Q||!x.sid||x.sid===mySid)return;mySid=x.sid;
-  try{const d=await Q.S.getDoc(Q.ref);if(d.exists()&&d.data().sid===mySid)return;
-    await Q.S.setDoc(Q.ref,{sid:mySid,a:{},at:Q.S.serverTimestamp()})}catch(e){console.warn("answer",e)}
+  if(!Q||!x.sid||x.sid===mySid||x.sid===joinQuiz.pending)return;const sid=joinQuiz.pending=x.sid;
+  try{const d=await Q.S.getDoc(Q.ref);if(!(d.exists()&&d.data().sid===sid))await Q.S.setDoc(Q.ref,{sid,a:{},at:Q.S.serverTimestamp()})}catch(e){console.warn("answer",e)}
+  if(joinQuiz.pending===sid)mySid=sid;   // answers are saved only from here, so the reset cannot wipe one
 }
 
 /* ---------- a student follows the class: ?live={group} ---------- */
@@ -292,10 +293,11 @@ async function joinQuiz(x){   // the teacher's session: keep my answers if I com
 // deck's LS, #teambar data-ls) and shows the buzzer (el-buzz.js) when the student has a team. "Stop following" lets them look around.
 const LIVE=(new URLSearchParams(location.search).get("live")||"").replace(/[^\w-]/g,"");
 const lv=document.createElement("span");lv.className="ellive";lv.setAttribute("aria-live","polite");
-let liveStop=null,buzzStop=null,paused=false,lastLive=null;
+let liveStop=null,buzzStop=null,ptStop=null,tmStop=null,paused=false,lastLive=null,liveGen=0;
 const fresh=at=>{const ms=at&&(at.toMillis?at.toMillis():+at);return !!ms&&Date.now()-ms<10*60e3};
+const sameDeck=p=>String(p||"").toLowerCase()===location.pathname.toLowerCase();   // the teacher's deck is this page (whatever the case of the address)
 function liveDraw(){
-  const x=lastLive,on=x&&x.on&&fresh(x.at),here=on&&x.deck===location.pathname;
+  const x=lastLive,on=x&&x.on&&fresh(x.at),here=on&&sameDeck(x.deck);
   if(window.ELDeck)ELDeck.show(here&&!paused?x:null);
   if(here)joinQuiz(x);
   cbMode();
@@ -306,16 +308,20 @@ function liveDraw(){
 }
 lv.addEventListener("click",e=>{const b=e.target.closest("[data-live]");if(b){paused=b.dataset.live==="0";liveDraw()}});
 async function joinLive(u){
-  if(liveStop)liveStop();if(buzzStop)buzzStop();liveStop=buzzStop=null;
+  const gen=++liveGen;[liveStop,buzzStop,ptStop,tmStop].forEach(f=>f&&f());liveStop=buzzStop=ptStop=tmStop=null;Q=null;mySid=0;joinQuiz.pending=0;
   ($(".bottom .mid")||document.body).append(lv);
   if(!u||T.teacher){lv.innerHTML=T.teacher?"":`📺 ${B("Sign in with your school account (bottom right) to follow the class.","Entra amb el compte de l’institut per seguir la classe.")}`;if(!u)lv.append(signInBtn());return}
-  const fb=await cloud();if(!fb)return;const {S,db}=fb,em=(u.email||"").toLowerCase();Q={S,ref:S.doc(db,"live",LIVE,"answers",em)};mySid=0;
+  const fb=await cloud();if(!fb||gen!==liveGen)return;const {S,db}=fb,em=(u.email||"").toLowerCase();Q={S,ref:S.doc(db,"live",LIVE,"answers",em)};
   if(bar.dataset.ls)S.getDoc(S.doc(db,"students",u.uid,"levels",bar.dataset.ls)).then(l=>{if(l.exists()&&l.data().level==="insecure"&&window.ELDeck)ELDeck.setCa(true)}).catch(()=>{});   // Catalan for Insecure
   liveStop=S.onSnapshot(S.doc(db,"live",LIVE),s=>{lastLive=s.exists()?s.data():null;liveDraw()},e=>{console.warn("live",e);lv.innerHTML=`📺 ${B("You cannot follow this class.","No pots seguir aquesta classe.")}`});
-  try{const [p,t,{buzzer}]=await Promise.all([S.getDoc(S.doc(db,"points",em)),S.getDoc(S.doc(db,"teams",LIVE)),import(new URL("el-buzz.js",SRC).href)]);
-    const team=p.exists()&&p.data().team,list=(t.exists()&&t.data().list)||[];
-    if(team&&list.some(x=>x.id===team)){const el=$("#elBuzzLive")||document.body.appendChild(Object.assign(document.createElement("div"),{id:"elBuzzLive"}));
-      buzzStop=buzzer({S,db,group:LIVE,team,names:Object.fromEntries(list.map(x=>[x.id,x.name])),t:(ca,en)=>B(en,ca),el})}
+  // the buzzer for my team, from points/{email} and teams/{group} as they change (a team given during the class counts too)
+  try{const {buzzer}=await import(new URL("el-buzz.js",SRC).href);if(gen!==liveGen)return;let pt=null,tm=null,cur="";
+    const setBuzz=()=>{const team=pt&&pt.team,list=(tm&&tm.list)||[],ok=team&&list.some(x=>x.id===team),key=ok?team+"|"+list.map(x=>x.id+x.name).join():"";
+      if(key===cur)return;cur=key;if(buzzStop){buzzStop();buzzStop=null}if(!ok)return;
+      const el=$("#elBuzzLive")||document.body.appendChild(Object.assign(document.createElement("div"),{id:"elBuzzLive"}));
+      buzzStop=buzzer({S,db,group:LIVE,team,names:Object.fromEntries(list.map(x=>[x.id,x.name])),t:(ca,en)=>B(en,ca),el})};
+    ptStop=S.onSnapshot(S.doc(db,"points",em),p=>{pt=p.exists()?p.data():null;setBuzz()},e=>console.warn("points",e));
+    tmStop=S.onSnapshot(S.doc(db,"teams",LIVE),x=>{tm=x.exists()?x.data():null;setBuzz()},e=>console.warn("teams",e));
   }catch(e){console.warn("buzz",e)}
 }
 function signInBtn(){const b=document.createElement("button");b.type="button";b.innerHTML=B("Sign in","Entra");

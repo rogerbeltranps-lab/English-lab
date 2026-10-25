@@ -29,7 +29,7 @@ export function buzzer({S,db,group,team,names,t,el}){
       :`<button type="button" class="bz"${busy?" disabled":""}>🔔 ${t("PREM!","BUZZ!")}</button><small>${t("El teu equip:","Your team:")} ${name(team)} · ${t("el primer equip a prémer respon","the first team to buzz answers")}</small>`;
     el.insertAdjacentHTML("beforeend",sndBtn());
   };
-  el.addEventListener("click",async e=>{
+  const onClick=async e=>{
     if(e.target.closest(".bzsnd")){ELSound.set(!ELSound.on());draw();return}
     if(!e.target.closest("button.bz")||busy)return;busy=true;snd("press");draw();
     const q=z&&z.q;
@@ -39,8 +39,10 @@ export function buzzer({S,db,group,team,names,t,el}){
       if(won){mine=q;try{navigator.vibrate&&navigator.vibrate(150)}catch(x){}}
     }catch(x){console.warn("buzz",x)}
     busy=false;draw();
-  });
-  return S.onSnapshot(ref,s=>{const was=z&&z.winner;z=s.exists()?s.data():null;
+  };
+  el.addEventListener("click",onClick);
+  const stop=S.onSnapshot(ref,s=>{const was=z&&z.winner;z=s.exists()?s.data():null;
     if(!first&&z&&z.open&&z.winner&&!was&&z.winner.team===team)snd("win");   // my team was first
     first=false;draw()},e=>console.warn("buzz",e));
+  return ()=>{stop();el.removeEventListener("click",onClick);el.hidden=true};
 }

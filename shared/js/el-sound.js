@@ -8,7 +8,7 @@
 (function(){
   let ctx=null;
   const on=()=>{try{return localStorage.getItem("el_sound")!=="off"}catch(e){return true}};
-  const set=v=>{try{localStorage.setItem("el_sound",v?"on":"off")}catch(e){}};
+  const set=v=>{try{localStorage.setItem("el_sound",v?"on":"off")}catch(e){}if(v)ac()};   // 🔇→🔊 is a tap: start the audio now
   const ac=()=>{
     if(!ctx){const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;try{ctx=new A()}catch(e){return null}}
     if(ctx.state==="suspended")ctx.resume().catch(()=>{});

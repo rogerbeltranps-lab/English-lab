@@ -10,7 +10,7 @@ const ROOT=new URL("../../",import.meta.url);
 
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let stopJoin=null,myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
+let stopJoin=null,joinGen=0,myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
@@ -254,8 +254,8 @@ onAuthStateChanged(auth,async u=>{
   menuLink(u);
   listeners.forEach(f=>f(u));
   // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
-  if(stopJoin){stopJoin();stopJoin=null}
-  if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
+  if(stopJoin){stopJoin();stopJoin=null}const jg=++joinGen;
+  if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
 window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};

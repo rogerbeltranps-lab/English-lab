@@ -292,14 +292,6 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
       <p class="cahint" data-ca="<b style='color:var(--accent)'>Ajuda en català activada.</b> Els exemples continuen en anglès.">Insecure? Prem <b style="color:var(--accent)">Ajuda en català</b> a dalt per veure les instruccions en català.</p>
     </div>
     <div class="stack">
-      <div class="modes" aria-label="How you answer">
-        <p class="mcell"><span class="ico" aria-hidden="true">✋</span><span data-ca="<b>Dits</b>Mostra 1, 2 o 3 dits."><b>Fingers</b>Show 1, 2 or 3 fingers.</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">👍</span><span data-ca="<b>Polzes</b>Amunt = correcte · avall = incorrecte."><b>Thumbs</b>Up = right · down = wrong.</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">✏️</span><span data-ca="<b>Escriu-ho</b>En un paper o una pissarreta."><b>Write it</b>On paper or a mini-whiteboard.</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">💬</span><span data-ca="<b>Parla amb la parella</b>Explica-ho al company o companya."><b>Turn and talk</b>Tell your partner.</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">🎲</span><span data-ca="<b>Número a l’atzar</b>Pot respondre qualsevol: estigues a punt!"><b>Random number</b>Anyone can answer: be ready!</span></p>
-        <p class="mcell"><span class="ico" aria-hidden="true">🏆</span><span data-ca="<b>Equips</b>Punts per a cada equip que l’encerta."><b>Teams</b>Points for every team that gets it right.</span></p>
-      </div>
       <div class="rule key" data-step="1" data-label="Warm-up question" data-lca="Pregunta d’escalfament">
         <div class="ask"><span class="mode" data-ca="💬 Parla amb la parella · 30 s">💬 Turn and talk · 30 s</span><button type="button" class="go321" data-timer="30" data-ca="⏱ Comença 30 s">⏱ Start 30 s</button></div>
         <p class="big">What happens at the Castanyada?</p>
@@ -640,7 +632,7 @@ $('#tcards').innerHTML=TIME.map(([t,p],i)=>`<button type="button" class="xcard t
 
 /* quick fire: one card at a time, two steps each (show, reveal) */
 const PW={on:['A date or day → on.','Data o dia → on.'],in:['A month or season → in.','Mes o estació → in.'],at:['at + festival time, night or clock time.','at + període de festa, la nit o l’hora.']};
-const QF=[['The Castanyada is held ___ 31 October.','on'],['Diwali takes place ___ autumn.','in'],['We visit our relatives ___ Christmas.','at'],['People light candles ___ night.','at'],['Hanukkah usually takes place ___ December.','in'],['___ New Year’s Eve, families get together for a big reunion dinner.','On'],['The parade starts ___ ten o’clock.','at'],['Diwali is celebrated ___ October or November.','in'],['We don’t go to school ___ 25 December.','on']];
+const QF=[['The Castanyada is held ___ 31 October.','on'],['Diwali takes place ___ autumn.','in'],['We visit our relatives ___ Christmas.','at'],['People light candles ___ night.','at'],['Hanukkah usually takes place ___ December.','in'],['We don’t go to school ___ 25 December.','on']];
 $('#qf').innerHTML=QF.map(([s,a],i)=>{const p=a.toLowerCase(),last=i===QF.length-1;
   return `<div class="poll" ${i?`data-step="${2*i}" data-label="Next sentence" data-lca="Següent frase"`:''} data-open="${2*i+1}"${last?'':` data-until="${2*i+2}"`}><p class="cnt">${i+1} / ${QF.length}</p><p class="q">${withGap(s,`<span class="p${p}">${a}</span>`)}</p><div class="opts" data-fixed>${['on','in','at'].map(o=>`<button type="button" class="opt"${o===p?' data-ok':''}>${o}</button>`).join('')}</div><p class="why ans"><b class="g">${a}.</b> ${B(PW[p][0],PW[p][1])}</p></div>`}).join('');
 
@@ -685,7 +677,7 @@ $$('.poll').forEach(p=>{
 });
 function setupPolls(s){
   $$('.opts',s).forEach((box,n)=>{
-    const opts=$$('.opt',box),o=live&&live.order&&live.order[n];   // following the class: the teacher's order, so 1 2 3 match the projector
+    const opts=$$('.opt',box),o=live&&live.order&&live.order[n]!=null?String(live.order[n]).split(',').map(Number):null;   // following the class: the teacher's order, so 1 2 3 match the projector
     (o?o.map(i=>opts.find(x=>+x.dataset.i===i)).filter(Boolean):box.hasAttribute('data-fixed')?opts:shuffled(opts)).forEach((o,i)=>{box.appendChild(o);$('.key',o).textContent=i+1;o.setAttribute('aria-pressed','false')});
   });
 }
@@ -871,7 +863,7 @@ document.addEventListener('keydown',hideTip);
 /* ---------- live: students follow the teacher's screen (shared/js/el-deck-points.js) ---------- */
 // Every step announces where the deck is (deckstep: slide, step, cards opened by hand, answer order). A student following the class
 // gets the same view with ELDeck.show(state); their own navigation is off until ELDeck.show(null). live is declared with the deck state above.
-function info(){const s=slides[cur],op=$$('[data-open]',s);return {slide:cur,step:st[cur].b,man:op.map((el,k)=>st[cur].man.has(el)?k:-1).filter(k=>k>=0),order:$$('.opts',s).map(b=>$$('.opt',b).map(o=>+o.dataset.i))}}
+function info(){const s=slides[cur],op=$$('[data-open]',s);return {slide:cur,step:st[cur].b,man:op.map((el,k)=>st[cur].man.has(el)?k:-1).filter(k=>k>=0),order:$$('.opts',s).map(b=>$$('.opt',b).map(o=>o.dataset.i).join(','))}}   // strings: Firestore has no nested arrays
 function show(x){
   const was=live;live=x;document.documentElement.classList.toggle('deck-live',!!x);if(!x){nav();return}
   const same=was&&was.slide===x.slide&&JSON.stringify(was.order)===JSON.stringify(x.order)&&x.slide===cur;

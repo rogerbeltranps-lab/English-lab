@@ -16,7 +16,7 @@ export function liveJoin({db,group}){
   let x=null;
   const draw=()=>{
     const ms=x&&x.at&&(x.at.toMillis?x.at.toMillis():+x.at),on=!!(x&&x.on&&ms&&Date.now()-ms<10*60e3);
-    links.forEach(l=>{const live=on&&x.deck===l.path;l.a.classList.toggle("el-live",live);
+    links.forEach(l=>{const live=on&&String(x.deck||"").toLowerCase()===l.path.toLowerCase();l.a.classList.toggle("el-live",live);
       if(live){l.a.href=`${x.deck}?live=${encodeURIComponent(group)}&from=${encodeURIComponent(location.pathname)}`;
         l.a.innerHTML=`<span class="deck-link-icon" aria-hidden="true">📺</span><span><strong>Join the class now</strong><small>${esc(x.title||"")} · Entra a la classe</small></span>`}
       else if(l.a.getAttribute("href")!==l.href){l.a.setAttribute("href",l.href);l.a.innerHTML=l.html}});

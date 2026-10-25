@@ -21,5 +21,4 @@ window.elPointsRules=function(){const en=elNum(EL_POINTS_BONUS,"en"),ca=elNum(EL
   {icon:"🏆",en:"<b>Right answer: +1 point.</b> Every member of the team gets it.",ca:"<b>Resposta correcta: +1 punt.</b> El rep cada membre de l’equip."},
   {icon:"🔔",en:"<b>Tap, then buzz.</b> After 3 · 2 · 1, the first team to press 🔔 answers.",ca:"<b>Toca i prem.</b> Al 3 · 2 · 1, respon el primer equip que prem 🔔."},
   {icon:"📱",en:"<b>See them on your board.</b> “My activities” shows your team and your points.",ca:"<b>Mira’ls al teu tauler.</b> “Les meves activitats” mostra el teu equip i els teus punts."},
-  {icon:"📈",en:`<b>Up to +${en} on your term grade.</b> The best team gets +${en}, the others their share.`,ca:`<b>Fins a +${ca} a la nota del trimestre.</b> El millor equip té +${ca}, els altres la part que els toca.`},
-  {icon:"🔄",en:"<b>It only adds.</b> It never lowers your grade, and every term starts at 0.",ca:"<b>Només suma.</b> Mai no et baixa la nota, i cada trimestre comença de 0."}]};
+  {icon:"📈",en:`<b>Up to +${en} on your term grade.</b> The best team gets +${en}, the others their share. It only adds.`,ca:`<b>Fins a +${ca} a la nota del trimestre.</b> El millor equip té +${ca}, els altres la part que els toca. Només suma.`}]};
