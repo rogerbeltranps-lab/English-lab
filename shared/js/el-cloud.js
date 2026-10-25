@@ -158,11 +158,11 @@ async function gate(u){
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
   if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
-  if(isTeacher(u)){banner("Mode professor · LS "+lsId+": "+st,"#475569");return}
+  if(isTeacher(u)){banner("Teacher mode · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){signInBlock();return}
   const tester=seesAll(u),vg=viewGroup(u);
-  if(tester)banner("Compte de prova: veus totes les LS i activitats.","#7c3aed");
-  if(vg)banner("Compte de prova · vista d'alumne de "+EL_GROUPS.find(x=>x.id===vg).name+": veus el que veu aquest grup.","#7c3aed",{t:"Torna a veure-ho tot",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}});
+  if(tester)banner("Test account: you see every LS and activity.","#7c3aed");
+  if(vg)banner("Test account · student view of "+EL_GROUPS.find(x=>x.id===vg).name+": you see what this group sees.","#7c3aed",{t:"See everything again",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}});
   if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block("Aquesta LS no és del teu grup","Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.");return}
   if(st==="hidden"&&!tester){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
   if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
