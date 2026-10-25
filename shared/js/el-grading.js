@@ -24,17 +24,19 @@ window.EL_GRADING={
       // Exam: a mark per section (score out of max) and the writing level. Exam mark = sum of scores / sum of maxes × 10.
       exam:{sections:[["listening","Listening"],["reading","Reading"],["vocabulary","Vocabulary"],["grammar","Grammar"],["writing","Writing"]],max:10,level:{step:"writing",c:"5.1"}},
       // Where the teacher gives one-click levels: activity + step + criteria. group: given once per final-product group and copied to each member.
+      // Only the video is marked in groups (Roger, 25 Oct 2026): the research card (6.1) is a level per student in round 1.
       // c may be a pseudo criterion with its own indicators (teamwork, process). The final product rows are in the final product dialog.
       moments:[
         {a:LP2,step:"log",name:"Reading log",c:["4.1"]},
         {a:LP3,step:"chart",name:"Listening chart",c:["2.2"]},
         {a:LP4,step:"card",name:"Research card",c:["4.2","6.1","CC3 3.2"]},
         {a:FP,step:"source",name:"1 · My source",c:["4.2"]},
+        {a:FP,step:"research",name:"My research card (LP4 piece 3)",c:["6.1"]},
         {a:FP,step:"part",name:"3 · My part of the pitch",c:["3.2"]},
         {a:FP,step:"email",name:"4 · My email",c:["5.1","CC1 1.3"]},
         {a:FP,step:"team",name:"Teamwork (teammates' ratings)",c:["teamwork"]},
         {a:FP,step:"process",name:"My process evidence (steps 0–5)",c:["process"]},
-        {a:FP,step:"group",name:"Group rows",c:["6.1","1.1","1.2","CC3 3.2"],group:true}
+        {a:FP,step:"group",name:"Group rows (the video)",c:["1.1","1.2","CC3 3.2"],group:true}
       ],
       fp:{a:FP,rows:[{step:"part",c:"3.2",name:"My part",w:40},{step:"email",c:"5.1",name:"My email",w:35},{step:"source",c:"4.2",name:"My source",w:15},{step:"team",c:"teamwork",name:"Teamwork",w:5},{step:"process",c:"process",name:"Process",w:5}]},
       // Marking PDF per round (final-product-assessment.md section 8): the rubric rows come from the LS's rubric data by round, group and video
@@ -55,7 +57,7 @@ window.EL_GRADING={
         "CC1 1.3":[[LP5,"write"],[LP6,"write"]],
         "CC3 3.2":[[LP4,"respect",1]]
       },
-      teacher:{"1.1":[[FP,"group"]],"1.2":[[FP,"group"]],"6.1":[[LP4,"card"],[FP,"group"]],"CC1 1.3":[[FP,"email"]],"CC3 3.2":[[LP4,"card"],[FP,"group"]]},
+      teacher:{"1.1":[[FP,"group"]],"1.2":[[FP,"group"]],"6.1":[[LP4,"card"],[FP,"research"]],"CC1 1.3":[[FP,"email"]],"CC3 3.2":[[LP4,"card"],[FP,"group"]]},
       // Evidence per criterion for the suggested degree, earlier first: a later piece weighs `later` times the one before it.
       // [a,step] = teacher level; {exam:"reading"} = exam section mark. levelOnly: a score never sets the degree alone.
       later:2,
@@ -63,7 +65,7 @@ window.EL_GRADING={
         "4.1":{e:[[LP2,"log"],{exam:"reading"}],levelOnly:true},
         "2.2":{e:[[LP3,"chart"],{exam:"listening"}],levelOnly:true},
         "4.2":{e:[[LP4,"card"],[FP,"source"]]},
-        "6.1":{e:[[LP4,"card"],[FP,"group"]]},
+        "6.1":{e:[[LP4,"card"],[FP,"research"]]},
         "3.2":{e:[[FP,"part"]]},
         "5.1":{e:[["exam","writing"],[FP,"email"]]},
         "1.1":{e:[[FP,"group"]]},

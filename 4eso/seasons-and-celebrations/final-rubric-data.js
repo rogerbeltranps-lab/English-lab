@@ -3,6 +3,7 @@
    docs/4eso/ls2-seasons-and-celebrations/indicators.md (NA = Level 1, AS = 2, AN = 3, AE = 4). Weights approved by Roger on 24 Oct 2026
    (docs/4eso/ls2-seasons-and-celebrations/grading.md): rows 1–5 are individual and make the final product mark (25 % of the LS);
    the other rows are still marked here but count in the LS's "other competences" block (20 %), so their pct is a label. Same-route groups.
+   Only the video is marked in groups (Roger, 25 Oct 2026): every group row is a video row; the research card is marked per student.
    round: when the teacher marks the row (Roger, 25 Oct 2026): 1 = after step 2 (research and plan), 2 = after submitting (video, email,
    teamwork, process). The dashboard's marking PDF (teacher.html) reads round, group and video from here, and puts the teammates' average next to
    the `peers` row and the process summary next to the `process` row (docs/4eso/ls2-seasons-and-celebrations/final-product-assessment.md). */
@@ -12,7 +13,7 @@
     levels: [['Level 4', 'Very good'], ['Level 3', 'Good'], ['Level 2', 'Fair'], ['Level 1', 'Developing']],
     heading: 'Rubric for the {route} route', label: 'Rubric {route}', req: 'Route requirement:',
     rounds: { 1: 'Round 1 · after step 2', 2: 'Round 2 · after you submit' },
-    calc: '<strong>When is it marked?</strong> Your teacher marks the final product in two rounds: <strong>round 1</strong> after step 2 (your source and the research sheet), with feedback before the rehearsal, and <strong>round 2</strong> after you submit (the video, your email, teamwork and your process). <strong>How is the grade calculated?</strong> Each row gets a level, which becomes a score: <span class="rubric-pill">Level 4 · 10</span><span class="rubric-pill">Level 3 · 7.5</span><span class="rubric-pill">Level 2 · 5</span><span class="rubric-pill">Level 1 · 2.5</span><span class="rubric-pill">No evidence · 0</span> The rows with a percentage make your final product mark (25 % of the LS mark), and they are all yours. The rows marked “Other competences” count in that part of the LS mark (20 %). Rows marked “Group” are shared by your group; if you did not contribute to the group work, your teacher can lower your group rows by one level.'
+    calc: '<strong>When is it marked?</strong> Your teacher marks the final product in two rounds: <strong>round 1</strong> after step 2 (your source and your research card), with feedback before the rehearsal, and <strong>round 2</strong> after you submit (the video, your email, teamwork and your process). <strong>How is the grade calculated?</strong> Each row gets a level, which becomes a score: <span class="rubric-pill">Level 4 · 10</span><span class="rubric-pill">Level 3 · 7.5</span><span class="rubric-pill">Level 2 · 5</span><span class="rubric-pill">Level 1 · 2.5</span><span class="rubric-pill">No evidence · 0</span> The rows with a percentage make your final product mark (25 % of the LS mark), and they are all yours. The rows marked “Other competences” count in that part of the LS mark (20 %). Rows marked “Group” are judged on the video and shared by your group; if you did not contribute to the group work, your teacher can lower your group rows by one level.'
   };
   // Label shown instead of a percentage on rows that count in the LS's "other competences" block, not in the final product mark.
   const OTHER = 'Other competences', ALTRES = 'Altres competències';
@@ -27,9 +28,9 @@
     'Two concrete, realistic actions for students and families (explaining the customs, inviting families, an alternative for those who do not celebrate it).',
     'One concrete action, or two very general ones close to the model.',
     'No concrete action, or only a vague one (<i>everybody can come</i>).'] };
-  const researchEn = { name: 'Research sheet', sub: 'Group (6.1)', pct: OTHER, round: 1, group: true, cells: [
+  const researchEn = { name: 'My research card', sub: 'LP4 piece 3, my own card (6.1)', pct: OTHER, round: 1, cells: [
     'Varied, well-chosen sources and organised notes; precise reliability reasons, including purpose and channel; an accurate comparison, and a disagreement resolved by choosing the more reliable source; all three credited.',
-    'Three sources with key information in our own words, full credit lines, two relevant reasons for each source, the most trusted one explained, and one point where they agree or differ.',
+    'Three sources with key information in my own words, full credit lines, two relevant reasons for each source, the most trusted one explained, and one point where they agree or differ.',
     'Three sources with key information, with help; reasons copied from the checklist; credits partly complete; agreement or difference missing or vague.',
     'Fewer than three sources, copied notes, no credits or reasons, or wrong information.'] };
   const meaningEn = { name: 'What it means and why it belongs at school', sub: 'Group (1.1)', pct: OTHER, round: 2, group: true, video: true, cells: [
@@ -66,7 +67,7 @@
         levels: [['Nivell 4', 'Molt bé'], ['Nivell 3', 'Bé'], ['Nivell 2', 'Suficient'], ['Nivell 1', 'En procés']],
         heading: 'Rúbrica de la ruta {route}', label: 'Rúbrica {route}', req: 'Requisit de ruta:',
         rounds: { 1: '1a correcció · després del pas 2', 2: '2a correcció · després d’entregar' },
-        calc: '<strong>Quan es corregeix?</strong> El professor corregeix el producte final en dues vegades: la <strong>1a correcció</strong>, després del pas 2 (la teva font i la fitxa de recerca), amb comentaris abans de l’assaig, i la <strong>2a correcció</strong>, després d’entregar (el vídeo, el correu, el treball en equip i les evidències). <strong>Com es calcula la nota?</strong> Cada fila rep un nivell, que es converteix en una puntuació: <span class="rubric-pill">Nivell 4 · 10</span><span class="rubric-pill">Nivell 3 · 7,5</span><span class="rubric-pill">Nivell 2 · 5</span><span class="rubric-pill">Nivell 1 · 2,5</span><span class="rubric-pill">Sense evidència · 0</span> Les files amb percentatge fan la nota del producte final (el 25 % de la nota de la LS) i són totes teves. Les files marcades amb “Altres competències” compten en aquesta part de la nota de la LS (el 20 %). Les files marcades amb “Grup” són del grup; si no has col·laborat en la feina del grup, el professor pot baixar un nivell les teves files de grup.'
+        calc: '<strong>Quan es corregeix?</strong> El professor corregeix el producte final en dues vegades: la <strong>1a correcció</strong>, després del pas 2 (la teva font i la teva fitxa de recerca), amb comentaris abans de l’assaig, i la <strong>2a correcció</strong>, després d’entregar (el vídeo, el correu, el treball en equip i les evidències). <strong>Com es calcula la nota?</strong> Cada fila rep un nivell, que es converteix en una puntuació: <span class="rubric-pill">Nivell 4 · 10</span><span class="rubric-pill">Nivell 3 · 7,5</span><span class="rubric-pill">Nivell 2 · 5</span><span class="rubric-pill">Nivell 1 · 2,5</span><span class="rubric-pill">Sense evidència · 0</span> Les files amb percentatge fan la nota del producte final (el 25 % de la nota de la LS) i són totes teves. Les files marcades amb “Altres competències” compten en aquesta part de la nota de la LS (el 20 %). Les files marcades amb “Grup” es valoren al vídeo i són del grup; si no has col·laborat en la feina del grup, el professor pot baixar un nivell les teves files de grup.'
       },
       rows: [
         { name: 'La meva part del vídeo', sub: 'Planificar, assajar i gravar en grup (3.2)', pct: 40, round: 2, video: true, cells: [
@@ -99,10 +100,10 @@
           'Dues accions concretes i realistes per als alumnes i les famílies (explicar els costums, convidar les famílies, una alternativa per a qui no ho celebra).',
           'Una acció concreta, o dues de molt generals copiades del model.',
           'Cap acció concreta, o només una idea vaga (<i>everybody can come</i>).'] },
-        { name: 'Fitxa de recerca', sub: 'Grup (6.1)', pct: ALTRES, round: 1, group: true, cells: [
-          'Fonts ben triades i notes ordenades; raons precises de per què cada font és fiable (qui, quan, per què, on es publica); si dues fonts no coincideixen, triem la més fiable; les dues fonts citades completes.',
-          'Dues fonts amb la informació clau amb paraules nostres, referències completes, dues raons per a cada font, la font de què ens refiem més, i una cosa en què coincideixen o són diferents.',
-          'Dues fonts amb la informació clau, amb ajuda; raons copiades de la llista; una referència incompleta, o no comparem les fonts.',
+        { name: 'La meva fitxa de recerca', sub: 'Peça 3 del LP4, la meva fitxa (6.1)', pct: ALTRES, round: 1, cells: [
+          'Fonts ben triades i notes ordenades; raons precises de per què cada font és fiable (qui, quan, per què, on es publica); si dues fonts no coincideixen, trio la més fiable; les dues fonts citades completes.',
+          'Dues fonts amb la informació clau amb paraules meves, referències completes, dues raons per a cada font, la font de què em refio més, i una cosa en què coincideixen o són diferents.',
+          'Dues fonts amb la informació clau, amb ajuda; raons copiades de la llista; una referència incompleta, o no comparo les fonts.',
           'Menys de dues fonts, notes copiades, sense referències ni raons, o informació incorrecta.'] },
         { name: 'Què significa i per què a l’escola', sub: 'Grup (1.1)', pct: ALTRES, round: 2, group: true, video: true, cells: [
           'Expliquem el significat amb matisos (no tothom ho celebra igual, o ha canviat) i argumentem bé per què ha de ser a l’escola, lligant-ho al respecte per la diversitat.',

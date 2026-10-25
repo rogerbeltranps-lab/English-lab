@@ -1,10 +1,11 @@
 /* LS2 · Sample exam (practice, not graded): the same format and points as the real exam (Google Forms, approved by Roger on 25 Oct 2026),
-   so students know the points of every section. Auto-marked sections show points (first try = the exam score); the chart, the log and the
-   email get feedback and a guide mark from ChatGPT with the criterion's levels (ChatGPT can make mistakes; in the exam the teacher marks them).
-   Each route has its own list of items (same number per route). Out of 100: listening 10 + chart 10, reading 10 + log 10,
-   vocabulary 15, grammar 15, writing 30. Approved by Roger on 25 Oct 2026. Numbered 1–35 like the real exam; multiple choice has four options (the first is the right one; the engine shuffles). */
+   so students know the points of every section. Everything except the email is multiple choice or a short gap and is marked automatically
+   (first try = the exam score); the email gets feedback and a guide mark from ChatGPT with the 5.1 levels (ChatGPT can make mistakes; in the
+   exam the teacher marks it). Each route has its own list of items (same number per route). Out of 100: listening 10 + listening chart 10,
+   reading 10 + reading log 10 (the chart and the log are 5 multiple-choice questions each since Roger's change of 25 Oct 2026), vocabulary 15,
+   grammar 15, writing 30. Numbered 1–43 like the real exam; multiple choice has four options (the first is the right one; the engine shuffles). */
 (function () {
-const L10 = [3, 5, 8, 10], L30 = [8, 15, 23, 30];
+const L30 = [8, 15, 23, 30];
 const SCRIPT = [
   ['Callum', '[cheerful] Hi, I’m Callum, from Edinburgh in Scotland. In Scotland, New Year’s Eve is called Hogmanay, and for us it’s bigger than Christmas! There’s a huge street party in the city centre, with concerts and fireworks over the castle at midnight. It’s usually freezing, so you wear about three jumpers. [laughs]'],
   ['Callum', 'Then everyone holds hands and sings an old song, “Auld Lang Syne”. [laughs] Nobody knows all the words! It’s a song about old friends and remembering the good times. After midnight, we go “first-footing”: you visit your neighbours and you’re the first person to walk into their house in the new year.'],
@@ -19,14 +20,6 @@ const TEXTS = {
   daring: '<p>In Catalonia, many families have a Caga Tió at Christmas, a tradition which is thought to date back to old winter celebrations in the countryside. It is a small log with a face, a red hat and a blanket. From 8 December, children “feed” it every night and keep it warm. On Christmas Eve or Christmas Day, they hit it with sticks while they sing a traditional song, and the log “gives” them sweets and small presents.</p><p>In the UK and many other countries, children have an Advent calendar, which counts down the days until Christmas. It has 24 small doors, and children open one every day from 1 December. Behind each door there is a picture or a piece of chocolate. Advent calendars used to have only pictures, but today many contain chocolate, small toys or even beauty products for adults. Some people think this shows how commercialised Christmas has become, while others say it simply shows that traditions evolve.</p>'
 };
 const scriptText = SCRIPT.map(l => l[0] + ': ' + l[1].replace(/\[[^\]]+\]\s*/g, '')).join('\n');
-const L41 = ['The log is unfinished or mostly wrong: facts missing for one text, whole sentences copied, no word inferred.',
-  'Both texts logged with what, when, where and two customs, close to the text and often copied; the word’s meaning partly right.',
-  'Both texts logged accurately in short notes of their own, main customs chosen over minor details; the word inferred correctly from the context.',
-  'Accurate, concise log in their own words; adds an idea that needs inference (why a custom matters) and explains how the context showed the word’s meaning.'];
-const L22 = ['Chart missing, or it lists only facts (dates, food) and no values.',
-  'Names one thing each speaker values (Insecure: from the list) and copies one word or phrase that shows it.',
-  'Explains in their own words what each speaker values, with a phrase from the recording and a note on the tone.',
-  'Explains the values with precise evidence from words and tone, and compares the two speakers: what they share and how they differ.'];
 const L51 = ['Unfinished or not understandable; no clear purpose or request, or informal, even with the template.',
   'Purpose, plan and request present, close to the template or model; future forms mostly correct; errors that do not block meaning; mostly formal.',
   'Clear paragraphs (purpose, plan, request, closing), formal register, future forms and a relative clause used correctly; adapts the model.',
@@ -38,11 +31,11 @@ window.LP = {
   panels: [
     { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és l’examen', en: 'How the exam works' },
       html: { ca: '<p>Aquest examen d’exemple té <strong>el mateix format i els mateixos punts que l’examen real</strong> (que faràs amb un Google Forms). 55 minuts, sense apunts.</p>' +
-        '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody><tr><td>1 Listening: 5 preguntes (2 punts cada una) + listening chart (10)</td><td style="text-align:right">20</td></tr><tr><td>2 Reading: 5 preguntes (2 punts cada una) + reading log (10)</td><td style="text-align:right">20</td></tr><tr><td>3 Vocabulary: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>4 Grammar: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>5 Writing: un correu formal</td><td style="text-align:right">30</td></tr><tr><td><strong>Total</strong></td><td style="text-align:right"><strong>100</strong></td></tr></tbody></table>' +
-        '<p>Les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El quadre, el log i el correu els corregeix <strong>ChatGPT</strong> amb els criteris de l’examen i et dona una nota orientativa. Al final, a <em>La meva nota</em>, veuràs el total.</p><p class="warm-note">⚠️ ChatGPT es pot equivocar: la seva nota només és orientativa. A l’examen real, el quadre, el log i el correu els corregeix el professorat.</p>',
+        '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody><tr><td>1 Listening: 5 preguntes + listening chart, 5 preguntes (2 punts cada una)</td><td style="text-align:right">20</td></tr><tr><td>2 Reading: 5 preguntes + reading log, 5 preguntes (2 punts cada una)</td><td style="text-align:right">20</td></tr><tr><td>3 Vocabulary: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>4 Grammar: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>5 Writing: un correu formal</td><td style="text-align:right">30</td></tr><tr><td><strong>Total</strong></td><td style="text-align:right"><strong>100</strong></td></tr></tbody></table>' +
+        '<p>Totes les preguntes es corregeixen soles: el <strong>primer intent</strong> és la teva nota, com a l’examen. El correu el corregeix <strong>ChatGPT</strong> amb els criteris de l’examen i et dona una nota orientativa. Al final, a <em>La meva nota</em>, veuràs el total.</p><p class="warm-note">⚠️ ChatGPT es pot equivocar: la seva nota només és orientativa. A l’examen real, el correu el corregeix el professorat.</p>',
         en: '<p>This sample exam has <strong>the same format and the same points as the real exam</strong> (which you will do in a Google Form). 55 minutes, no notes.</p>' +
-        '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody><tr><td>1 Listening: 5 questions (2 points each) + listening chart (10)</td><td style="text-align:right">20</td></tr><tr><td>2 Reading: 5 questions (2 points each) + reading log (10)</td><td style="text-align:right">20</td></tr><tr><td>3 Vocabulary: 7 multiple choice (1 point) + 4 gaps (2 points)</td><td style="text-align:right">15</td></tr><tr><td>4 Grammar: 7 multiple choice (1 point) + 4 gaps (2 points)</td><td style="text-align:right">15</td></tr><tr><td>5 Writing: a formal email</td><td style="text-align:right">30</td></tr><tr><td><strong>Total</strong></td><td style="text-align:right"><strong>100</strong></td></tr></tbody></table>' +
-        '<p>Questions are marked automatically: your <strong>first try</strong> is your score, as in the exam. The chart, the log and the email are marked by <strong>ChatGPT</strong> with the exam criteria, which gives you a guide mark. At the end, <em>My score</em> shows your total.</p><p class="warm-note">⚠️ ChatGPT can make mistakes: its mark is only a guide. In the real exam, your teacher marks the chart, the log and the email.</p>' } },
+        '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody><tr><td>1 Listening: 5 questions + listening chart, 5 questions (2 points each)</td><td style="text-align:right">20</td></tr><tr><td>2 Reading: 5 questions + reading log, 5 questions (2 points each)</td><td style="text-align:right">20</td></tr><tr><td>3 Vocabulary: 7 multiple choice (1 point) + 4 gaps (2 points)</td><td style="text-align:right">15</td></tr><tr><td>4 Grammar: 7 multiple choice (1 point) + 4 gaps (2 points)</td><td style="text-align:right">15</td></tr><tr><td>5 Writing: a formal email</td><td style="text-align:right">30</td></tr><tr><td><strong>Total</strong></td><td style="text-align:right"><strong>100</strong></td></tr></tbody></table>' +
+        '<p>All the questions are marked automatically: your <strong>first try</strong> is your score, as in the exam. The email is marked by <strong>ChatGPT</strong> with the exam criteria, which gives you a guide mark. At the end, <em>My score</em> shows your total.</p><p class="warm-note">⚠️ ChatGPT can make mistakes: its mark is only a guide. In the real exam, your teacher marks the email.</p>' } },
 
     { id: 'listen', type: 'quiz', tab: 'Listening', title: 'Listening: Two New Years', pts: [2, 2], start: 1,
       intro: { ca: 'Escolta dues vegades el Callum i la Yuki, que parlen del seu Cap d’Any, i respon.', en: 'Listen twice to Callum and Yuki talking about their New Year, and answer.' },
@@ -70,16 +63,34 @@ window.LP = {
           { q: 'What does Yuki mean by “you leave the problems of the old year behind”?', o: ['New Year is a fresh start.', 'Her family moves house every year.', 'Problems are only for adults.', 'You should forget your old friends.'] }
         ] } },
 
-    { id: 'chart', type: 'marked', tab: 'Listening chart', title: '6. Listening chart', max: 10, criterion: '2.2 (listening chart)', levels: L22, levelPts: L10,
-      intro: { ca: 'Torna a escoltar si cal. Què valora cada persona i com ho saps?', en: 'Listen again if you need to. What does each speaker value, and how do you know?' },
-      media: AUDIO, source: scriptText, sourceLabel: 'Transcript of the recording',
-      task: { insecure: 'Per a cada persona: (1) què és el més important per a ella? Tria de la llista: A. sentir que tothom és una gran família · B. començar de nou i donar les gràcies a la família · C. els regals · D. la música i els concerts. (2) Copia una paraula o frase en anglès que ho mostri.',
-        safe: 'For each speaker, write in your own words what they value most, copy one phrase from the recording that shows it, and add a note on their tone of voice.',
-        daring: 'For each speaker, explain what they value most, with evidence from their words and their tone of voice. Then write one or two sentences comparing them: what they share and how they differ.' },
-      template: { insecure: 'Callum: lletra ___ · frase: "..."\nYuki: lletra ___ · frase: "..."', safe: 'Callum values… · Phrase: "…" · Tone: …\nYuki values… · Phrase: "…" · Tone: …', daring: 'Callum: values… · Evidence (words + tone): …\nYuki: values… · Evidence (words + tone): …\nComparison: Both… whereas…' },
-      min: { insecure: 8, safe: 20, daring: 40 } },
+    { id: 'chart', type: 'quiz', tab: 'Listening chart', title: 'Listening chart', pts: [2, 2], start: 6,
+      intro: { ca: 'Torna a escoltar si cal. Què valora cada persona i com ho saps? Pensa en les seves paraules i en el seu to de veu.', en: 'Listen again if you need to. What does each speaker value, and how do you know? Think about their words and their tone of voice.' },
+      media: AUDIO,
+      items: {
+        insecure: [
+          { q: 'What does Callum love most about Hogmanay?', o: ['being together with his neighbours', 'the presents', 'the cold weather', 'the cake'] },
+          { q: 'Which words from the recording show it?', o: ['“The whole street feels like one big family.”', '“It’s usually freezing.”', '“Nobody knows all the words!”', '“They gave me a huge slice of cake.”'] },
+          { q: 'What is New Year about for Yuki?', o: ['starting again and thanking her family', 'a big street party', 'getting money in envelopes', 'eating long noodles'] },
+          { q: 'Which words from the recording show it?', o: ['“For me, New Year is about starting again.”', '“Children get money in small envelopes.”', '“In the evening we eat long noodles.”', '“Schools and many offices close for several days.”'] },
+          { q: 'How does Yuki sound?', o: ['calm', 'angry', 'very excited', 'scared'] }
+        ],
+        safe: [
+          { q: 'What does Callum value most about Hogmanay?', o: ['the feeling of community with his neighbours', 'the concerts in the city centre', 'the presents he gets', 'the fireworks over the castle'] },
+          { q: 'Which phrase from the recording shows what Callum values?', o: ['“The whole street feels like one big family.”', '“It’s usually freezing, so you wear about three jumpers.”', '“Nobody knows all the words!”', '“There’s a huge street party in the city centre.”'] },
+          { q: 'What does Yuki value most about New Year?', o: ['a fresh start and thanking her family', 'the money children get in envelopes', 'the long noodles', 'sending cards to her teachers'] },
+          { q: 'Which phrase from the recording shows what Yuki values?', o: ['“You leave the problems of the old year behind.”', '“Children get money in small envelopes.”', '“They all arrive on the same morning.”', '“Schools and many offices close for several days.”'] },
+          { q: 'How is Callum’s tone different from Yuki’s?', o: ['Callum sounds cheerful and laughs; Yuki sounds calm and quiet.', 'Callum sounds sad; Yuki sounds excited.', 'Both sound angry.', 'Callum sounds bored; Yuki sounds nervous.'] }
+        ],
+        daring: [
+          { q: 'Which detail best shows how much neighbours matter at Hogmanay?', o: ['After midnight, people visit their neighbours to be the first visitor of the year.', 'There are fireworks over the castle at midnight.', 'People wear about three jumpers because it is freezing.', 'There are concerts in the city centre.'] },
+          { q: 'Which detail best shows that Yuki values her family?', o: ['She says New Year is a time to thank your family for everything.', 'She says schools close for several days.', 'She says the temple bells ring 108 times.', 'She says the cards all arrive on the same morning.'] },
+          { q: 'How does Callum’s tone support what he says?', o: ['He laughs and sounds cheerful, which matches the party he describes.', 'He sounds calm and serious, which shows Hogmanay is a quiet holiday.', 'He sounds nervous, which shows he is afraid of the cold.', 'He sounds bored, which shows he prefers Christmas.'] },
+          { q: 'What do Callum and Yuki have in common?', o: ['For both, New Year is about the people around them: neighbours for Callum, family for Yuki.', 'Both celebrate with a big street party.', 'Both get money in small envelopes.', 'Both think New Year is less important than Christmas.'] },
+          { q: 'Which detail best supports Yuki’s idea of a fresh start?', o: ['Her family cleans the whole house on 31 December.', 'Children get money in small envelopes.', 'Schools and offices close for several days.', 'Her mother and grandmother cook for days.'] }
+        ]
+      } },
 
-    { id: 'read', type: 'quiz', tab: 'Reading', title: 'Reading: Two winter traditions', pts: [2, 2], start: 7,
+    { id: 'read', type: 'quiz', tab: 'Reading', title: 'Reading: Two winter traditions', pts: [2, 2], start: 11,
       intro: { ca: 'Llegeix el text i respon, sense apunts.', en: 'Read and answer, without notes.' },
       media: { text: TEXTS },
       items: {
@@ -105,16 +116,34 @@ window.LP = {
           { q: 'Which tradition has changed more over time, according to the text?', o: ['the Advent calendar', 'the Caga Tió', 'both equally', 'neither of them'] }
         ] } },
 
-    { id: 'log', type: 'marked', tab: 'Reading log', title: '12. Reading log', max: 10, criterion: '4.1 (reading log)', levels: L41, levelPts: L10,
-      intro: { ca: 'Pots tornar a mirar el text a la pestanya Reading.', en: 'You can look at the text again in the Reading tab.' },
-      source: TEXTS, sourceLabel: 'The two texts the student read',
-      task: { insecure: 'Per a cada tradició escriu notes curtes en anglès: What? · When? · Where? · Two customs. Després: què vol dir "blanket"? Quines paraules del text t’hi han ajudat?',
-        safe: 'For each tradition, write short notes in your own words: what, when, where and the two main customs. Then explain what "log" means and which words helped you.',
-        daring: 'For each tradition, write concise notes in your own words: what, when, where and the two main customs. Add one idea that is not stated directly: why one custom matters to the people who celebrate it. Then explain what "counts down" means and how the context shows it.' },
-      template: { insecure: 'Text 1 · What: … · When: … · Where: … · Customs: 1 … 2 …\nText 2 · What: … · When: … · Where: … · Customs: 1 … 2 …\nWord: "blanket" = … (helped: "…")', safe: 'Tradition 1 · What: … · When: … · Where: … · Main customs: 1 … 2 …\nTradition 2 · What: … · When: … · Where: … · Main customs: 1 … 2 …\nWord: "log" = … (context: "…")', daring: 'Tradition 1 · What / When / Where: … · Main customs: …\nTradition 2 · What / When / Where: … · Main customs: …\nWhy it matters: …\nWord: "counts down" = … (context: …)' },
-      min: { insecure: 20, safe: 30, daring: 50 } },
+    { id: 'log', type: 'quiz', tab: 'Reading log', title: 'Reading log', pts: [2, 2], start: 16,
+      intro: { ca: 'Tria la nota correcta per a cada tradició, després els costums i el significat d’una paraula. Pots tornar a mirar el text.', en: 'Choose the correct note for each tradition, then the main customs and the meaning of a word from its context. You can look at the text again.' },
+      media: { text: TEXTS },
+      items: {
+        insecure: [
+          { q: 'Which is the correct note about the Caga Tió?', o: ['What: a log with a face · When: from 8 December to Christmas · Where: Catalonia', 'What: a log with a face · When: from 1 December to Christmas · Where: Catalonia', 'What: a calendar with doors · When: from 8 December to Christmas · Where: Catalonia', 'What: a log with a face · When: from 8 December to Christmas · Where: the UK'] },
+          { q: 'Which is the correct note about the Advent calendar?', o: ['What: a calendar with 24 small doors · When: from 1 December · Where: the UK and other countries', 'What: a calendar with 24 small doors · When: from 8 December · Where: the UK and other countries', 'What: a calendar with 8 small doors · When: from 1 December · Where: the UK and other countries', 'What: a calendar with 24 small doors · When: from 1 December · Where: only in Catalonia'] },
+          { q: 'Which of these is a custom of the Caga Tió?', o: ['Children “feed” it every night.', 'Children open a small door every day.', 'Children find chocolate behind a door.', 'Children send it a card.'] },
+          { q: 'Which of these is a custom of the Advent calendar?', o: ['Children open one door every day.', 'Children feed it every night.', 'Children keep it warm with a blanket.', 'Children hit it with sticks.'] },
+          { q: 'The Caga Tió has “a red hat and a blanket”, and children keep it warm. What is a “blanket”?', o: ['a piece of cloth that keeps you warm', 'a kind of sweet', 'a small door', 'a stick'] }
+        ],
+        safe: [
+          { q: 'Which is the correct note about the Caga Tió?', o: ['What: a log with a face that “gives” sweets · When: from 8 December to Christmas · Where: Catalonia', 'What: a log with a face that “gives” sweets · When: from 1 December to Christmas · Where: Catalonia', 'What: a log with a face that “gives” sweets · When: from 8 December to Christmas · Where: the UK', 'What: a calendar with 24 small doors · When: from 8 December to Christmas · Where: Catalonia'] },
+          { q: 'Which is the correct note about the Advent calendar?', o: ['What: a calendar with 24 small doors · When: from 1 December · Where: the UK and many other countries', 'What: a calendar with 24 small doors · When: from 8 December · Where: the UK and many other countries', 'What: a calendar with 12 small doors · When: from 1 December · Where: the UK and many other countries', 'What: a calendar with 24 small doors · When: from 1 December · Where: only in Catalonia'] },
+          { q: 'Which are the two main customs of the Caga Tió?', o: ['feeding it every night and hitting it with sticks while singing', 'opening a door every day and eating chocolate', 'giving it presents and sending cards', 'decorating it with lights and hiding it'] },
+          { q: 'Which are the two main customs of the Advent calendar?', o: ['opening one door every day and finding a picture or chocolate', 'feeding it and keeping it warm', 'hitting it with sticks and singing a song', 'giving it to a neighbour and cleaning the house'] },
+          { q: 'In the text, what is a “log”?', o: ['a piece of a tree', 'a small door', 'a kind of chocolate', 'a red hat'] }
+        ],
+        daring: [
+          { q: 'Which is the most accurate note about the Caga Tió?', o: ['What: a log that “gives” children sweets, probably from old winter celebrations · When: from 8 December to Christmas · Where: Catalonia', 'What: a log that “gives” children sweets, invented in the UK · When: from 8 December to Christmas · Where: Catalonia', 'What: a log that “gives” children sweets, probably from old winter celebrations · When: only on 8 December · Where: Catalonia', 'What: a log that “gives” adults beauty products · When: from 8 December to Christmas · Where: Catalonia'] },
+          { q: 'Which is the most accurate note about the Advent calendar?', o: ['What: a calendar that counts down to Christmas, now often commercial · When: from 1 December · Where: the UK and many other countries', 'What: a calendar that counts down to Christmas, now with only pictures · When: from 1 December · Where: the UK and many other countries', 'What: a calendar that counts down to Christmas, now often commercial · When: from 8 December · Where: the UK and many other countries', 'What: a calendar that counts down to the New Year, now often commercial · When: from 1 December · Where: the UK and many other countries'] },
+          { q: 'Which are the two main customs of the Caga Tió?', o: ['feeding and warming the log every night, then hitting it with sticks while singing', 'opening a door every day and finding a picture', 'carrying the log around the village in a parade', 'buying beauty products for adults'] },
+          { q: 'Which are the main customs of the Advent calendar?', o: ['opening one door a day from 1 December and finding a picture or a treat', 'feeding it every night and keeping it warm', 'hitting it with sticks while singing', 'hiding it until Christmas Eve'] },
+          { q: 'The text says the log “gives” children sweets. Why is “gives” in quotation marks?', o: ['Because the log can’t really give anything: adults put the sweets there.', 'Because it is a Catalan word.', 'Because the children give the sweets to the log.', 'Because the sweets are a secret from the adults.'] }
+        ]
+      } },
 
-    { id: 'vocab', type: 'quiz', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari', en: 'Vocabulary' }, pts: [1, 2], start: 13,
+    { id: 'vocab', type: 'quiz', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari', en: 'Vocabulary' }, pts: [1, 2], start: 21,
       intro: { ca: 'Tria l’opció correcta (1 punt) i escriu la paraula que falta (2 punts).', en: 'Choose the right option (1 point), then write the missing word (2 points).' },
       items: {
         insecure: [
@@ -157,7 +186,7 @@ window.LP = {
           { q: 'We need to c_______ the needs of every family.', a: ['consider'] }
         ] } },
 
-    { id: 'grammar', type: 'quiz', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Gramàtica', en: 'Grammar' }, pts: [1, 2], start: 24,
+    { id: 'grammar', type: 'quiz', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Gramàtica', en: 'Grammar' }, pts: [1, 2], start: 32,
       intro: { ca: 'Tria l’opció correcta (1 punt) i escriu la forma que falta (2 punts). Pots fer servir contraccions.', en: 'Choose the right option (1 point), then write the missing words (2 points). Contractions are accepted.' },
       items: {
         insecure: [
@@ -200,7 +229,7 @@ window.LP = {
           { q: 'Hogmanay is the night ___ people go first-footing.', a: ['when'] }
         ] } },
 
-    { id: 'write', type: 'marked', tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: '35. Escriptura: un correu formal', en: '35. Writing: a formal email' }, max: 30, criterion: '5.1 (formal email)', levels: L51, levelPts: L30,
+    { id: 'write', type: 'marked', tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: '43. Escriptura: un correu formal', en: '43. Writing: a formal email' }, max: 30, criterion: '5.1 (formal email)', levels: L51, levelPts: L30,
       intro: { ca: 'Escriu sense apunts, com a l’examen.', en: 'Write without notes, as in the exam.' },
       source: 'The community centre in the student’s town is preparing an International New Year evening for families on Friday 8 January. The class wants to run an activity about a New Year tradition from another country. The email is to Mr Jordi Serra, the director of the community centre.', sourceLabel: 'Situation',
       task: { insecure: 'El centre cívic del teu poble prepara una vetllada internacional de Cap d’Any per a famílies el divendres 8 de gener. Escriu un correu formal (60–80 paraules) a Mr Jordi Serra, el director, per proposar una activitat sobre una tradició de Cap d’Any d’un altre país. Completa la plantilla: per què escrius, quina tradició i quina activitat, dues coses que hi haurà (There will be… / We are going to…) i una petició (Could you…?).\nParaules útils: activity · tradition · New Year · decorations · special food · music · a table · the hall',

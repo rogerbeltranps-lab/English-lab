@@ -35,7 +35,7 @@ The dashboard shows, per student and step: done or not, the self-assessment aver
 
 ## 3. What the group makes together
 
-1. **Research card** (Learning Path 4, piece 3): key information, reliable or not with two reasons and the credit line for each source (Insecure two, Safe and Daring three), where the sources agree or differ, the most trusted one, and one stereotype to avoid.
+1. **Research card** (Learning Path 4, piece 3): the group shares its sources, but every student hands in their own card, and it is marked per student (row 7). It has key information, reliable or not with two reasons and the credit line for each source (Insecure two, Safe and Daring three), where the sources agree or differ, the most trusted one, and one stereotype to avoid.
 2. **Event plan** for a school celebration day, at the route's level.
 3. **Google Slides:** one or two slides per part, short text and images, credits on the last slide.
 4. **Video:** every member presents their part, face and slides visible. The video lasts 2–3 minutes: each part lasts 40–60 s in Insecure groups and 35–45 s in Safe and Daring groups.
@@ -54,7 +54,7 @@ In a group of 3 (Safe and Daring), Part 4 is shared: each member adds one of its
 
 ## 5. How it is marked
 
-Approved by Roger on 24 Oct 2026 with the LS grading plan ([grading.md](grading.md)). The final product is **25 % of the LS mark and fully individual**; the content rows are still marked here, but they count in the LS's "other competences" block (20 %).
+Approved by Roger on 24 Oct 2026 with the LS grading plan ([grading.md](grading.md)). The final product is **25 % of the LS mark and fully individual**; the content rows are still marked here, but they count in the LS's "other competences" block (20 %). **Only the video is marked in groups** (Roger, 25 Oct 2026): rows 8–10 are judged on the video and given once per group; everything else, the research card included, is marked per student.
 
 | Row | Criteria | Who gets the mark | Counts in | Marked in |
 | --- | --- | --- | --- | --- |
@@ -64,7 +64,7 @@ Approved by Roger on 24 Oct 2026 with the LS grading plan ([grading.md](grading.
 | 4. Teamwork (peer assessment) | 3.2 | individual | Final product, 5 % | Round 2 |
 | 5. My process evidence (steps 0–5) | 3.2 | individual | Final product, 5 % | Round 2 |
 | 6. Welcome actions in my email | CC1 1.3 | individual | Other competences | Round 2 |
-| 7. Research sheet | 6.1 | group | Other competences | Round 1 |
+| 7. My research card (LP4 piece 3) | 6.1 | individual | Other competences | Round 1 |
 | 8. What it means and why it belongs at school | 1.1 | group | Other competences | Round 2 (video) |
 | 9. Local link and inclusion | 1.2 | group | Other competences | Round 2 (video) |
 | 10. Stereotypes | CC3 3.2 | group | Other competences | Round 2 (video) |
@@ -73,7 +73,7 @@ Before (24 Oct, proposed): one weighted rubric of nine rows (part 25, email 15, 
 
 - Row 5: Level 4 = every step handed in on time, specific, in the student's own words, with an honest self-assessment; Level 3 = every step, one late or very general; Level 2 = one or two steps missing; Level 1 = most steps missing. Same scale as LS1: Level 4 = 10 · 3 = 7.5 · 2 = 5 · 1 = 2.5 · no evidence = 0 (Level 1 = NA, 2 = AS, 3 = AN, 4 = AE).
 - Rows use the **route rubric** of the group (section 7).
-- **Safety net:** if peer assessment and the teacher's observation show that a student did not contribute to the group product, the teacher lowers that student's group rows (7–10) by one level. Nobody loses marks for a teammate's part or email.
+- **Safety net:** if peer assessment and the teacher's observation show that a student did not contribute to the video, the teacher lowers that student's group rows (8–10) by one level. Nobody loses marks for a teammate's part or email.
 
 ## 6. Peer assessment
 
@@ -85,7 +85,7 @@ Before (24 Oct, proposed): one weighted rubric of nine rows (part 25, email 15, 
 
 The average of the teammates' ratings (self-rating not counted) gives the level for row 4. The self-rating is compared with it in Reflect. If the ratings and the teacher's observation disagree a lot, the teacher decides.
 
-**b) Between groups: feedback on the draft (not marked).** In the class before the deadline, each group watches another group's draft video and fills in a short form: two things that work and one thing to improve, using the rubric rows 7–10 and "every member speaks, face and slides visible". The group uses it to fix the video before submitting.
+**b) Between groups: feedback on the draft (not marked).** In the class before the deadline, each group watches another group's draft video and fills in a short form: two things that work and one thing to improve, using the rubric rows 8–10 and "every member speaks, face and slides visible". The group uses it to fix the video before submitting.
 
 ## 7. Rubrics by route
 
@@ -96,11 +96,11 @@ The level descriptors are in `4eso/seasons-and-celebrations/final-rubric-data.js
 
 ## 8. Marking in two rounds (Roger, 25 Oct 2026)
 
-Roger marks the final product twice, each time with the rubric rows of that round and a PDF with every student's answers, generated from the teacher's dashboard when he wants to mark. The round of each row is `round` in `final-rubric-data.js` (shown on the Rubric tab); `group: true` marks the group rows and `video: true` the rows judged on the video.
+Roger marks the final product twice, each time with the rubric rows of that round and a PDF with every student's answers, generated from the teacher's dashboard when he wants to mark. The round of each row is `round` in `final-rubric-data.js` (shown on the Rubric tab); `group: true` marks the group rows and `video: true` the rows judged on the video; only video rows are group rows.
 
 | Round | When | Evidence in the PDF (per student) | Rows | Why then |
 | --- | --- | --- | --- | --- |
-| **1 · Research and plan** | After step 2 (4ESO-A Fri 27 Nov, 4ESO-B Wed 25 Nov); feedback back before the rehearsal (Wed 2 / Tue 1 Dec) | LP4 research card (piece 3), step 0 (what I changed), step 1 (my source), step 2 (my contribution: role, part of the plan, slide text) | 3 My source (individual) · 7 Research sheet (group, once per group) | The research is finished, and comments on the plan (inclusive decision, stereotype) still reach the slides and the script. The LP4 card levels (4.2, 6.1, CC3 3.2) can be given from the same pages. |
+| **1 · Research and plan** | After step 2 (4ESO-A Fri 27 Nov, 4ESO-B Wed 25 Nov); feedback back before the rehearsal (Wed 2 / Tue 1 Dec) | LP4 research card (piece 3), step 0 (what I changed), step 1 (my source), step 2 (my contribution: role, part of the plan, slide text) | 3 My source · 7 My research card (both individual) | The research is finished, and comments on the plan (inclusive decision, stereotype) still reach the slides and the script. The LP4 card levels (4.2, 6.1, CC3 3.2) can be given from the same pages. |
 | **2 · Video, email and teamwork** | After submitting (Fri 11 Dec) and step 5 (Mon 14 Dec) | Step 3 (my script and what I changed), step 4 (**the email**, pasted in full, and its self-check), step 5 (what I contributed, the teammates' ratings received), steps 0–5 summary (done, date, on time, self-assessment average) | Individual: 2 My email · 6 Welcome actions · 4 Teamwork · 5 Process. **Video** (rubric only, one sheet per group, watched on Classroom): 1 My part for each member · 8 Meaning · 9 Local link and inclusion · 10 Stereotypes | Everything is finished; the video needs no answers in the PDF, only the rubric. |
 
 - The PDF quotes each group's route rubric as the students see it (Insecure in Catalan), with four tick boxes per row, so it can be marked on paper or on a tablet; the levels are then entered with the level buttons as now.

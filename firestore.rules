@@ -1,14 +1,15 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function school() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@(ietramuntana[.]cat)$'); }  // add schools: (ietramuntana[.]cat|newschool[.]cat) and in shared/js/el-cloud.js DOMAINS
+    function school() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email.matches('.*@(ietramuntana[.]cat)$'); }  // add schools: (ietramuntana[.]cat|newschool[.]cat) and in shared/js/el-firebase.js DOMAINS
     function myEmail() { return request.auth.token.email.lower(); }
-    // testers: school accounts that work as students but reach every LS (also in shared/js/el-cloud.js TESTERS)
+    // testers: school accounts that work as students but reach every LS (also in shared/js/el-firebase.js TESTERS)
     function isTester() { return school() && myEmail() in ['roger.beltran@ietramuntana.cat']; }
     // students: only school accounts on the teacher's student list (roster/{email}), plus testers
     function roster() { return /databases/$(database)/documents/roster/$(myEmail()); }
     function signedIn() { return school() && (isTester() || exists(roster())); }
     function rosterGroup() { return get(roster()).data.group; }
+    function inGroup(group) { return signedIn() && (isTester() || rosterGroup() == group); }   // a student of that class group, or a tester
     function isTeacher() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email in ['roger.beltranps@gmail.com']; }
     // LS assigned to the student's group (the group of the student list): ls/{id}.groups, or every group when the field is missing
     function lsForMe(ls, uid) { return !('groups' in get(/databases/$(database)/documents/ls/$(ls)).data) || rosterGroup() in get(/databases/$(database)/documents/ls/$(ls)).data.groups; }
@@ -27,6 +28,45 @@ service cloud.firestore {
     match /roster/{email} {
       allow read: if isTeacher() || (school() && email == myEmail());
       allow write: if isTeacher();
+    }
+    // team points (shared/js/el-points.js): points/{email in lower case} = {team, t1, t2, t3}, written by the teacher (class presentations
+    // and dashboard); each student reads their own. teams/{group} = {list, score, best}: team names and scores, no personal data,
+    // so the group's students read it.
+    match /points/{email} {
+      allow read: if isTeacher() || (school() && email == myEmail());
+      allow write: if isTeacher();
+    }
+    match /teams/{group} {
+      allow read: if isTeacher() || inGroup(group);
+      allow write: if isTeacher();
+    }
+    // live class (shared/js/el-deck-points.js): live/{group} = where the teacher's presentation is (slide, step); buzz/{group} = {open, q, out, winner}.
+    // Only the teacher writes them; a student of the group reads them and can buzz once: set the winner while the buzzers are open and nobody
+    // has won, for their own team (points/{email}.team), not for a team that is out of this question, at the server's time.
+    match /live/{group} {
+      allow read: if isTeacher() || inGroup(group);
+      allow write: if isTeacher();
+    }
+    // class quiz: live/{group}/answers/{email} = {sid, a:{question: value}, at}. Each student of the group writes their own answers
+    // while following the presentation and reads them back (to keep them when they come back to the same class); only the teacher
+    // reads everyone's (the projector shows the counts).
+    match /live/{group}/answers/{email} {
+      allow read, write: if isTeacher();
+      allow get: if school() && email == myEmail();
+      allow create, update: if signedIn() && !isTester() && rosterGroup() == group && email == myEmail()
+        && request.resource.data.keys().hasOnly(['sid', 'a', 'at'])
+        && request.resource.data.sid is number && request.resource.data.a is map && request.resource.data.a.size() <= 300;
+    }
+    match /buzz/{group} {
+      allow read: if isTeacher() || inGroup(group);
+      allow write: if isTeacher();
+      allow update: if signedIn() && !isTester() && rosterGroup() == group
+        && resource.data.open == true && resource.data.get('winner', null) == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['winner'])
+        && request.resource.data.winner.keys().hasOnly(['team', 'at'])
+        && request.resource.data.winner.at == request.time
+        && request.resource.data.winner.team == get(/databases/$(database)/documents/points/$(myEmail())).data.team
+        && !(request.resource.data.winner.team in resource.data.get('out', []));
     }
     match /students/{uid} {
       // class group: listed students copy the group of the student list; testers set it once (first sign-in); after that only the teacher changes it
