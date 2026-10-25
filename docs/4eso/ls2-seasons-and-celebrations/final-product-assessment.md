@@ -106,4 +106,4 @@ Roger marks the final product twice, each time with the rubric rows of that roun
 - The PDF quotes each group's route rubric as the students see it (Insecure in Catalan), with four tick boxes per row, so it can be marked on paper or on a tablet; the levels are then entered with the level buttons as now.
 - Students who hand in a step late appear in the next PDF they are part of; nothing is lost.
 - Step 0 needs piece 3, which students finish in LP4 (2/2), so it is due with step 2, not on Mon 23 Nov.
-- The dashboard button is a request to the English Lab project (it maintains `teacher.html`); brief: `/mnt/project-files/ls2/assessment/marking-pdf-brief.md` (project files).
+- The dashboard button is built (English Lab project, 25 Oct 2026): "📄 Marking PDF" on each group tab of `teacher.html`, configured in `shared/js/el-grading.js` (`marking`); how it works is in the root `AGENTS.md`, Teacher dashboard. Brief: `/mnt/project-files/ls2/assessment/marking-pdf-brief.md` (project files).
