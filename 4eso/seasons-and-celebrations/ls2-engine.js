@@ -36,9 +36,11 @@ var LS2 = (function () {
   function save() { localStorage.setItem(LP.key, JSON.stringify(state)); localStorage.setItem(LP.key + 'Level', level); progress(); }
   // doneAt[k]: when the step was first completed; tries[k]: the first check of an auto-corrected step. The teacher dashboard
   // uses them for the grammar and vocabulary block (first try + done by the session deadline in el-plan.js).
+  // last[k]: the latest check, shown on the dashboard next to the first try (never counted).
   function complete(k) { if (!state.done[k]) { state.done[k] = true; stamp(k); save(); } else progress(); }
   function stamp(k) { state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = new Date().toISOString(); }
-  function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) { state.tries[k] = { score, max, level, date: new Date().toISOString() }; save(); } }
+  function lastTry(k, score, max) { state.last = state.last || {}; state.last[k] = { score, max, level, date: new Date().toISOString() }; }
+  function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) state.tries[k] = { score, max, level, date: new Date().toISOString() }; lastTry(k, score, max); save(); }
   function steps() { return LP.panels.flatMap(p => p.type === 'info' || p.type === 'summary' ? [] : p.type === 'vocab' ? (p.practice ? ['cards', 'practice'] : ['cards']) : [p.id]); }
   function progress() {
     const s = steps(), n = s.filter(k => state.done[k]).length;
@@ -50,6 +52,21 @@ var LS2 = (function () {
     let all = {}; try { all = JSON.parse(localStorage.getItem(PRODUCTS) || '{}'); } catch (e) {}
     all[piece] = { level, text, date: new Date().toISOString() };
     localStorage.setItem(PRODUCTS, JSON.stringify(all));
+  }
+
+  /* ---------- steps that count for the mark (EL_GRADING gv: first try + done on time) ---------- */
+  // The note tells students the rules before they start: only the first try counts, retries are practice, the due date counts too.
+  function countsNote(step) {
+    const g = ((window.EL_GRADING || {})['4eso-seasons-and-celebrations'] || {}).gv, id = '4eso/ls2-' + location.pathname.split('/').pop().replace('.html', '');
+    if (!g) return '';
+    const has = list => list.some(([a, k]) => a === id && k === step);
+    if (has(g.items)) return '<p class="counts-note">' + (ca()
+      ? '⭐ <strong>Això compta per a la nota.</strong> Només compta el primer intent: fes-ho tu sol/a i sense apunts. Després ho pots repetir per practicar, però la nota no canvia. També compta acabar-ho abans de la data límit: mira «El meu pla setmanal» al teu tauler.'
+      : '⭐ <strong>This counts for your mark.</strong> Only your first try counts, so do it on your own, without notes. You can repeat it later to practise, but your mark won’t change. Finishing it by its due date also counts: check “My week plan” on your board.') + '</p>';
+    if (has(g.optional)) return '<p class="counts-note">' + (ca()
+      ? '⭐ <strong>Opcional.</strong> Només compta per a la nota si el primer intent la millora. Fes-ho tu sol/a i sense apunts; repetir-ho després és pràctica.'
+      : '⭐ <strong>Optional.</strong> It only counts for your mark if your first try raises it. Do it on your own, without notes; repeating it later is practice.') + '</p>';
+    return '';
   }
 
   /* ---------- typed answers (recall, practice, grammar) ---------- */
@@ -95,6 +112,7 @@ var LS2 = (function () {
         const s = checkTyped(items, p.id, true);
         state.first = state.first || {};
         if (!state.first[level]) state.first[level] = { score: s, max: items.length, date: new Date().toISOString() };
+        lastTry(p.id, s, items.length); save();
         const el = $('#' + p.id + 'Result');
         el.textContent = s + ' / ' + items.length + (ca() ? ' correctes · Pas completat ✓ Llegeix el feedback de les que has fallat.' : ' correct · Step complete ✓ Read the feedback for the ones you missed.');
         el.classList.add('show');
@@ -109,7 +127,7 @@ var LS2 = (function () {
       '<div class="section-card"><h3>' + (ca() ? 'Targetes' : 'Study cards') + '</h3><p class="instruction">' + (ca() ? 'Digues l’expressió en veu alta i intenta recordar què vol dir. Després gira la targeta.' : 'Say the expression aloud and try to remember its meaning. Then turn the card.') + '</p>' +
       '<div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardIcon"></div><strong id="cardFront"></strong><p>' + (ca() ? 'Clica per girar la targeta' : 'Click to turn the card') + '</p></div><div class="face back"><div class="label">Català + example</div><strong id="cardMeaning"></strong><p id="cardBack"></p></div></div></div>' +
       '<div class="counter" id="cardCounter"></div><div class="flash-actions"><button class="btn secondary" id="prevCard" type="button">← ' + (ca() ? 'Anterior' : 'Previous') + '</button><button class="btn" id="gotCard" type="button"></button><button class="btn secondary" id="againCard" type="button"></button><button class="btn secondary" id="nextCard" type="button">' + (ca() ? 'Següent' : 'Next') + ' →</button><button class="btn secondary" id="newCards" type="button"></button><button class="btn secondary" id="skipCards" type="button"></button></div><p class="instruction" id="cardNote"></p></div>' +
-      (p.practice ? '<div class="section-card"><h3>' + (ca() ? 'Completa les frases' : 'Complete the sentences') + '</h3><div id="vocabPractice"></div><div class="actions"><button class="btn" type="button" id="vocabCheck">' + (ca() ? 'Comprova' : 'Check') + '</button></div><div class="result" id="vocabResult"></div></div>' : ''),
+      (p.practice ? '<div class="section-card"><h3>' + (ca() ? 'Completa les frases' : 'Complete the sentences') + '</h3>' + countsNote('practice') + '<div id="vocabPractice"></div><div class="actions"><button class="btn" type="button" id="vocabCheck">' + (ca() ? 'Comprova' : 'Check') + '</button></div><div class="result" id="vocabResult"></div></div>' : ''),
     bind() {
       const groups = forLevel(p.groups);
       $('#vocabGroups').innerHTML = groups.map(g => '<article class="vocab-group"><h3>' + g.g + '</h3><div class="chips">' + g.items.map(x => '<span class="chip" tabindex="0">' + x[0] + '<span class="chip-tooltip"><b>' + x[1] + '</b>' + x[2] + '</span></span>').join('') + '</div></article>').join('');
@@ -527,7 +545,7 @@ var LS2 = (function () {
   function render() {
     const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
     $('#lp').innerHTML = '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
-      LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p></div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
+      LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + (p.type === 'vocab' ? '' : countsNote(p.id)) + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
       '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
     LP.panels.forEach(p => p._r.bind());
@@ -543,6 +561,7 @@ var LS2 = (function () {
     sectionNext.final({ id: last.id, level: () => level, done: () => stepDone(last), detail: c => c ? 'Completa l’última activitat.' : 'Finish the last activity.' });
   }
   function init(config) {
+    if (!document.getElementById('countsNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="countsNoteCss">.counts-note{margin:10px 0 0;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
     LP = config;
     level = localStorage.getItem(LP.key + 'Level') || 'insecure';
     try { state = JSON.parse(localStorage.getItem(LP.key) || '{}'); } catch (e) { state = {}; }

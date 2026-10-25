@@ -1,19 +1,17 @@
 // English Lab cloud: Google sign-in (school domain), per-LS progress sync, LS release gate,
 // route (level) choice, teacher-enabled graded activities, once-only activities, points per completed action.
+import "./el-copyright.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
 
-const CONFIG={apiKey:"AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE",authDomain:"english-lab-ietm.firebaseapp.com",projectId:"english-lab-ietm",storageBucket:"english-lab-ietm.firebasestorage.app",messagingSenderId:"100211300058",appId:"1:100211300058:web:aff85bd00c3a877e7af7e3"};
-// Schools whose Google accounts can sign in as students. Add a new school by adding its domain here AND in firestore.rules.
-const DOMAINS=["ietramuntana.cat"],TEACHERS=["roger.beltranps@gmail.com"],
-// Testers sign in as students but can open every page and every LS, including hidden ones and graded activities not enabled yet. Also in firestore.rules.
-TESTERS=["roger.beltran@ietramuntana.cat"],SKIP=/^(el_|firebase|debug)/;
+const SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
 
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
+let stopJoin=null,joinGen=0,myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
@@ -67,7 +65,10 @@ async function login(){
   const r=await signInWithPopup(auth,p);
   if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Sign in with your school account (@"+DOMAINS.join(", @")+").");return}
   if(isStudent(r.user)&&!isTester(r.user)&&(await onRoster(r.user))===null)return;   // refused in onAuthStateChanged
-  if(isStudent(r.user)&&!seesAll(r.user)&&!onBoard&&!onLab)location.href=BOARD;   // students always start on their board (English Lab keeps them there)
+  // Right after signing in: students (testers too) go to their board, except on English Lab, where they stay to use it;
+  // the teacher goes from Home to the dashboard and stays on any other page (to preview it).
+  if(isStudent(r.user)&&!onBoard&&!onLab)location.href=BOARD;
+  else if(isTeacher(r.user)&&onHome)location.href=DASH;
 }
 async function refuse(u){
   const mail=u.email;await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");
@@ -147,7 +148,8 @@ async function requestLevel(u){
 }
 
 // Students only use their board, English Lab, their own course page and the LSs assigned to their group.
-const BOARD=new URL("today.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html)?$/.test(location.pathname);
+const BOARD=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html)?$/.test(location.pathname),
+  onHome=[ROOT.pathname,ROOT.pathname+"index.html"].includes(location.pathname),onDash=/\/teacher\.html$/.test(location.pathname);
 const courseOf=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
 async function gate(u){
   const c=relPath.match(/^((2|4)eso)\/(index\.html)?$/);
@@ -220,6 +222,18 @@ function bar(){
         s.value=viewGroup(u)||"";s.onchange=()=>{origSet.call(localStorage,"el_view",s.value);location.reload()};el.append(s," ")}
       el.append(b("Sign out",logout))}};
 }
+// Every page's own menu gets a link to the board ("My activities") for a signed-in student, or to the dashboard for the teacher,
+// next to its Home link: header menu (course and LS pages), side and phone menus (Home, English Lab), top bar of activity pages.
+function menuLink(u){
+  document.querySelectorAll("[data-el-board]").forEach(e=>e.remove());
+  if(!u||onBoard||onDash||!(isStudent(u)||isTeacher(u)))return;
+  const teach=isTeacher(u),txt=teach?"Dashboard":myLevel==="insecure"?"Les meves activitats":"My activities";
+  const add=(home,cls,icon)=>{if(!home)return;const a=document.createElement("a");a.dataset.elBoard="";a.className=cls;a.href=teach?DASH:BOARD;a.textContent=icon+txt;home.after(a)};
+  document.querySelectorAll(".navlinks").forEach(n=>add(n.querySelector(":scope>a"),"",""));
+  document.querySelectorAll(".nav-tabs,.mobile-tabs").forEach(n=>add(n.querySelector(":scope>.tab-btn"),"tab-btn",""));
+  document.querySelectorAll(".lp-home-link").forEach(h=>add(h,"lp-home-link","☰ "));
+  document.querySelectorAll(".site-header .home-link").forEach(h=>add(h,"home-link",""));
+}
 let draw=()=>{};
 const start=()=>{draw=bar();draw(user)};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start):start();
@@ -236,8 +250,15 @@ onAuthStateChanged(auth,async u=>{
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
+  menuLink(u);   // again after gate, which knows the route (the label follows its language)
   try{await gate(u)}catch(e){console.warn("gate",e)}
+  menuLink(u);
+  // Floating weekly to-do list for students (and testers) on every page that loads this file (shared/js/el-todo.js).
+  if(u&&isStudent(u)&&myGroup&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:u,group:myGroup,root:ROOT,lsId,seesAll:seesAll(u)})).catch(e=>console.warn("todo",e));
   listeners.forEach(f=>f(u));
+  // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
+  if(stopJoin){stopJoin();stopJoin=null}const jg=++joinGen;
+  if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
 window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
