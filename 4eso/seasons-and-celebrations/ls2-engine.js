@@ -7,16 +7,16 @@ var LS2 = (function () {
   const PAGES = [
     ['getting-started.html', '1 · Getting started'],
     ['celebrations-around-the-world.html', '2 · Celebrations around the world'],
+    ['recall-checkpoint-1.html', 'Recall checkpoint 1'],
     ['where-traditions-come-from.html', '3 · Where traditions come from'],
+    ['recall-checkpoint-2.html', 'Recall checkpoint 2'],
     ['research-it-right.html', '4 · Research it right'],
     ['plan-the-day.html', '5 · Plan the day'],
-    ['write-to-the-head-teacher.html', '6 · Write to the head teacher'],
-    ['celebration-day-proposal.html', '7 · Final product'],
-    ['recall-checkpoint-1.html', 'Recall checkpoint 1'],
-    ['recall-checkpoint-2.html', 'Recall checkpoint 2'],
     ['recall-checkpoint-3.html', 'Recall checkpoint 3'],
+    ['write-to-the-head-teacher.html', '6 · Write to the head teacher'],
     ['recall-checkpoint-4.html', 'Recall checkpoint 4'],
     ['sample-exam.html', 'Sample exam'],
+    ['celebration-day-proposal.html', '7 · Final product'],
     ['reflect.html', 'Reflect']
   ];
   const PRODUCTS = 'ls2Products4ESO';
