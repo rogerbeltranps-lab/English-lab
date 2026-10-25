@@ -45,6 +45,16 @@ css.textContent=`
 .ellive a{color:var(--accent);display:inline-block;padding:.45em .2em}.ellive button{min-height:36px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:.3em .9em;font:600 1em var(--f-body);touch-action:manipulation}   /* big enough to tap on a touch screen */
 .ptrule{display:flex;gap:.7em;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.45em .9em;min-width:0}
 .ptrule .ico{font-size:1.4em;line-height:1.1;flex:0 0 auto}.ptrule b{display:block}
+[data-q]{position:relative;-webkit-tap-highlight-color:transparent}[data-q] .opt{position:relative}
+.qres{position:absolute;top:-.75em;right:-.4em;z-index:2;background:var(--ink);color:var(--bg);border-radius:999px;padding:.15em .65em;font:700 .72em/1.35 var(--f-body);box-shadow:0 2px 8px rgba(0,0,0,.2);white-space:nowrap;pointer-events:none}
+.qres.ok{background:var(--ok);color:#fff}
+.opt .ocnt{position:absolute;top:-.6em;right:-.5em;background:var(--ink);color:var(--bg);border-radius:999px;min-width:1.7em;padding:.05em .45em;font:700 .75em/1.45 var(--f-body);text-align:center;font-variant-numeric:tabular-nums}
+.elch{position:fixed;z-index:70;display:flex;flex-wrap:wrap;gap:.5em;padding:.55em;background:var(--surface);border:2px solid var(--accent);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.28);max-width:calc(100vw - 24px)}
+.elch[hidden]{display:none}
+.elch button{min-height:48px;min-width:4.6em;padding:.3em .9em;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:700 1.05em var(--f-body);cursor:pointer;touch-action:manipulation}
+.elch button.on{border-color:var(--accent);background:var(--soft)}
+.mych{display:block;width:max-content;margin-top:.4em;border-radius:999px;padding:.1em .65em;font:700 .78em/1.4 var(--f-body);background:var(--soft);color:var(--accent);border:1px solid var(--accent)}
+.mych.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}.mych.no{background:var(--no-bg);color:var(--no);border-color:var(--no)}
 @media (prefers-reduced-motion: reduce){.team .sc.bump,.elbuzz .who,.elbuzz .dot{animation:none}}`;
 document.head.appendChild(css);
 
@@ -76,8 +86,9 @@ if(!bar)return;
 const local=store.get("teams",null)||{n:4,names:[],score:[0,0,0,0,0,0]};
 // T.group: the class group the points are saved for (remembered for 3 hours, one lesson, so the next class starts unsaved);
 // T.data: that group's teams this term {g, term, list, score:{team:n}, members:{team:[email]}, pts:{email:n}}.
-const T={fb:null,user:null,teacher:false,group:"",data:null,msg:""};
-{const g=store.get("group",null);if(g&&g.g&&Date.now()-g.at<3*3600e3)T.group=g.g}
+// T.sid: this class session (the time the group was chosen), so the students' answers start empty every class; T.ans: their answers.
+const T={fb:null,user:null,teacher:false,group:"",data:null,msg:"",sid:0,ans:null};
+{const g=store.get("group",null);if(g&&g.g&&Date.now()-g.at<3*3600e3){T.group=g.g;T.sid=g.at}}
 const ready=()=>T.teacher&&T.group&&T.data&&T.data.g===T.group;
 const resized=()=>dispatchEvent(new Event("resize"));
 const groups=()=>(window.EL_GROUPS||[]).filter(g=>!bar.dataset.course||g.course===bar.dataset.course);
@@ -89,7 +100,7 @@ function draw(){
   else if(!cloudOn)h=[...Array(local.n).keys()].map(t=>`<div class="team"><input id="teamName${t}" value="${esc(local.names[t]||"Team "+(t+1))}" aria-label="Team ${t+1} name"><button type="button" data-team="${t}" data-d="-1" aria-label="Remove a point">−</button><span class="sc">${local.score[t]||0}</span><button type="button" data-team="${t}" data-d="1" aria-label="Add a point">+</button></div>`).join("");
   const sel=T.teacher?`<select id="teamGroup" aria-label="Class group the points are saved for" title="Class group the points are saved for"><option value="">Not saved</option>${groups().map(g=>`<option value="${g.id}"${g.id===T.group?" selected":""}>☁ ${esc(g.name)}</option>`).join("")}</select>`:"";
   const stat=T.msg?`<span class="tstat no">${T.msg}</span>`
-    :D?(D.list.length?`<button type="button" class="tool" id="buzzOpen" title="Open the buzzers on the students' boards (B)">🔔 ${B("Buzz","Polsador")}</button>`:"")+`<span class="tstat" title="Saved for every member of the team">${B(elTermName(D.term,"en"),elTermName(D.term,"ca"))} · ${B("best","millor")} ${Math.max(0,...Object.values(D.pts))}</span><button type="button" class="tool" id="teamsReload" title="Load the teams again">↻</button>`
+    :D?(T.ans?`<span class="tstat" title="Students following this presentation on their device">📡 ${T.ans.n} ${B("joined","connectats")}</span>`:"")+(D.list.length?`<button type="button" class="tool" id="buzzOpen" title="Open the buzzers on the students' boards (B)">🔔 ${B("Buzz","Polsador")}</button>`:"")+`<span class="tstat" title="Saved for every member of the team">${B(elTermName(D.term,"en"),elTermName(D.term,"ca"))} · ${B("best","millor")} ${Math.max(0,...Object.values(D.pts))}</span><button type="button" class="tool" id="teamsReload" title="Load the teams again">↻</button>`
     :T.teacher?"":`<button type="button" class="tool" id="teamsSignIn" title="Sign in with the teacher's account to save the points for a class group">☁ ${B("Save points","Desa els punts")}</button>`;
   const ctl=cloudOn?"":`<select id="teamCount" aria-label="Number of teams">${[2,3,4,5,6].map(n=>`<option value="${n}"${n===local.n?" selected":""}>${n}</option>`).join("")}</select><button type="button" class="tool" id="teamsZero">${B("Reset","Zero")}</button>`;
   bar.innerHTML=h+`<span class="tctl">${sel}${ctl}${stat}</span>`;
@@ -147,10 +158,10 @@ const bump=id=>{const b=bar.querySelector(`[data-team="${CSS.escape(String(id))}
 /* ---------- live: the teacher's screen publishes where it is ---------- */
 // live/{group} = {on, deck (path), title, slide, step, man, order, at}: written at every step and every minute while a group is chosen.
 let liveT=null,beat=null;
-addEventListener("deckstep",()=>{if(ready())sendLive()});
+addEventListener("deckstep",()=>{if(ready())sendLive();drawAns()});
 function sendLive(){clearTimeout(liveT);liveT=setTimeout(async()=>{
   const fb=await cloud();if(!fb||!ready()||!window.ELDeck)return;
-  try{await fb.S.setDoc(fb.S.doc(fb.db,"live",T.group),Object.assign({on:true,deck:location.pathname,title:document.title},ELDeck.info(),{at:fb.S.serverTimestamp()}))}catch(e){console.warn("live",e)}},150)}
+  try{await fb.S.setDoc(fb.S.doc(fb.db,"live",T.group),Object.assign({on:true,deck:location.pathname,title:document.title,sid:T.sid},ELDeck.info(),{at:fb.S.serverTimestamp()}))}catch(e){console.warn("live",e)}},150)}
 async function liveOff(g){const fb=await cloud();if(fb)fb.S.setDoc(fb.S.doc(fb.db,"live",g),{on:false,at:fb.S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}
 addEventListener("pagehide",()=>{if(T.live)liveOff(T.live)});
 
@@ -159,12 +170,15 @@ addEventListener("pagehide",()=>{if(T.live)liveOff(T.live)});
 // winner once (firestore.rules: their own team, while open and nobody has, not a team that is out). Then ✓ gives the team +1 and
 // closes, ✗ leaves that team out of this question and opens the buzzers again for the others, and Close ends it.
 const bz=document.createElement("div");bz.className="elbuzz";bz.hidden=true;bz.setAttribute("aria-live","assertive");document.body.append(bz);
-let unsub=null;
+let unsub=null,ansUnsub=null;
 function listen(g){
-  if(unsub)unsub();unsub=null;T.buzz=null;drawBuzz();clearInterval(beat);beat=null;
+  if(unsub)unsub();unsub=null;T.buzz=null;drawBuzz();clearInterval(beat);beat=null;if(ansUnsub)ansUnsub();ansUnsub=null;T.ans=null;drawAns();
   if(T.live&&T.live!==g)liveOff(T.live);T.live=g||null;if(!g)return;
   sendLive();beat=setInterval(sendLive,60e3);   // every minute too, so the students' boards know the class is still on
   cloud().then(fb=>{if(!fb||T.group!==g)return;
+    ansUnsub=fb.S.onSnapshot(fb.S.collection(fb.db,"live",g,"answers"),qs=>{const R={};let n=0;
+      qs.forEach(d=>{const x=d.data();if(x.sid!==T.sid)return;n++;Object.entries(x.a||{}).forEach(([q,v])=>{if(v>=0)(R[q]=R[q]||{})[v]=(R[q][v]||0)+1})});
+      T.ans={R,n};drawAns();draw()},e=>console.warn("answers",e));
     let first=true;   // no sound for the state the page finds when it opens
     unsub=fb.S.onSnapshot(fb.S.doc(fb.db,"buzz",g),s=>{const was=T.buzz||{};T.buzz=s.exists()?s.data():null;const z=T.buzz||{};
       if(!first){if(z.open&&z.winner&&!was.winner)snd("first");else if(z.open&&!was.open)snd("open")}first=false;drawBuzz()},e=>console.warn("buzz",e))});
@@ -205,11 +219,56 @@ bar.addEventListener("click",async e=>{
 });
 bar.addEventListener("change",e=>{
   const id=e.target.id;
-  if(id==="teamGroup"){T.group=e.target.value;T.msg="";store.set("group",T.group?{g:T.group,at:Date.now()}:null);listen("");T.group?load():draw()}
+  if(id==="teamGroup"){T.group=e.target.value;T.msg="";T.sid=Date.now();store.set("group",T.group?{g:T.group,at:T.sid}:null);listen("");T.group?load():draw()}
   else if(id==="teamCount"){local.n=+e.target.value;store.set("teams",local);draw()}
   else if(id.startsWith("teamName")){local.names[+id.slice(8)]=e.target.value;store.set("teams",local)}
 });
 if(btn)btn.addEventListener("click",()=>toggle());
+/* ---------- class quiz: students answer on their device, the projector counts ---------- */
+// live/{group}/answers/{email} = {sid, a:{question: value}, at}: written by each student following the class (firestore.rules: their
+// own, in their own group); sid = the teacher's session, so a new class starts empty. The deck marks each question with data-q and the
+// right value with data-okv (a poll: the option's data-i; a card with choices, data-ch "a|b|c": the choice's position).
+// The projector shows how many answered (✋ 12 / 18) and, once the answer is shown, how many were right and what each option got.
+function drawAns(){
+  $$(".qres,.ocnt").forEach(e=>e.remove());
+  const A=T.ans;if(!A||!ready()||LIVE)return;
+  $$("[data-q]").forEach(el=>{const c=A.R[el.dataset.q]||{},n=Object.values(c).reduce((a,b)=>a+b,0),open=el.classList.contains("open");if(!n)return;
+    const b=document.createElement("span");b.className="qres"+(open?" ok":"");b.textContent=open?`✓ ${c[el.dataset.okv]||0} / ${n}`:`✋ ${n} / ${A.n}`;el.append(b);
+    if(open)$$(".opt",el).forEach(o=>{const k=document.createElement("span");k.className="ocnt";k.textContent=c[o.dataset.i]||0;o.append(k)})});
+}
+// A student following: a card with choices opens a chooser (a poll's options are the deck's own buttons); each answer is saved, and
+// once the teacher shows the answer the card says whether theirs was right.
+const chooser=document.createElement("div");chooser.className="elch";chooser.hidden=true;chooser.setAttribute("role","group");document.body.append(chooser);
+let chFor=null;
+const chLabels=el=>(document.documentElement.classList.contains("ca-on")&&el.dataset.chca||el.dataset.ch||"").split("|");
+const following=()=>document.documentElement.classList.contains("deck-live");
+document.addEventListener("click",e=>{
+  if(!following()){chooser.hidden=true;return}
+  const b=e.target.closest(".elch button");
+  if(b){const el=chFor;chooser.hidden=true;if(!el||el.classList.contains("open"))return;el.dataset.mine=b.dataset.v;markMine();
+    dispatchEvent(new CustomEvent("deckanswer",{detail:{q:el.dataset.q,v:+b.dataset.v}}));return}
+  const c=e.target.closest("[data-ch][data-q]");
+  if(!c||c.classList.contains("open")||c.closest(".later,.gone")){if(!e.target.closest(".elch"))chooser.hidden=true;return}
+  chFor=c;chooser.innerHTML=chLabels(c).map((l,i)=>`<button type="button" data-v="${i}" class="${String(i)===c.dataset.mine?"on":""}">${esc(l)}</button>`).join("");
+  chooser.hidden=false;const r=c.getBoundingClientRect(),w=chooser.offsetWidth,h=chooser.offsetHeight;
+  chooser.style.left=Math.max(12,Math.min(innerWidth-w-12,r.left+r.width/2-w/2))+"px";
+  chooser.style.top=(r.bottom+8+h<innerHeight-12?r.bottom+8:Math.max(12,r.top-h-8))+"px";
+},true);
+function markMine(){
+  $$("[data-ch][data-mine]").forEach(el=>{let m=$(".mych",el);if(!m){m=document.createElement("span");m.className="mych";el.append(m)}
+    const open=el.classList.contains("open"),ok=el.dataset.mine===el.dataset.okv,l=chLabels(el)[+el.dataset.mine];
+    m.className="mych"+(open?(ok?" ok":" no"):"");m.textContent=(open?(ok?"✓ ":"✗ "):"")+(document.documentElement.classList.contains("ca-on")?"Tu: ":"You: ")+l});
+}
+addEventListener("deckstep",()=>{if(chFor&&chFor.classList.contains("open"))chooser.hidden=true;markMine()});
+let Q=null,mySid=0;   // the student's answers doc while following
+addEventListener("deckanswer",e=>{if(!Q||!mySid||paused)return;
+  Q.S.setDoc(Q.ref,{sid:mySid,a:{[e.detail.q]:e.detail.v},at:Q.S.serverTimestamp()},{merge:true}).catch(x=>console.warn("answer",x))});
+async function joinQuiz(x){   // the teacher's session: keep my answers if I come back to the same one, start empty for a new one
+  if(!Q||!x.sid||x.sid===mySid)return;mySid=x.sid;
+  try{const d=await Q.S.getDoc(Q.ref);if(d.exists()&&d.data().sid===mySid)return;
+    await Q.S.setDoc(Q.ref,{sid:mySid,a:{},at:Q.S.serverTimestamp()})}catch(e){console.warn("answer",e)}
+}
+
 /* ---------- a student follows the class: ?live={group} ---------- */
 // The device shows the teacher's slide and step (ELDeck.show), turns the Catalan help on for an Insecure student (their route in the
 // deck's LS, #teambar data-ls) and shows the buzzer (el-buzz.js) when the student has a team. "Stop following" lets them look around.
@@ -220,6 +279,7 @@ const fresh=at=>{const ms=at&&(at.toMillis?at.toMillis():+at);return !!ms&&Date.
 function liveDraw(){
   const x=lastLive,on=x&&x.on&&fresh(x.at),here=on&&x.deck===location.pathname;
   if(window.ELDeck)ELDeck.show(here&&!paused?x:null);
+  if(here)joinQuiz(x);
   lv.innerHTML=!on?`📺 ${B("The class presentation is not on now.","Ara no hi ha cap presentació a classe.")}`
     :!here?`📺 ${B("Your class is on another presentation:","La classe és en una altra presentació:")} <a href="${esc(x.deck)}?live=${LIVE}">${x.title?esc(x.title):B("open it","obre-la")}</a>`
     :paused?`<button type="button" data-live="1">📺 ${B("Follow again","Torna a seguir")}</button>`
@@ -230,7 +290,7 @@ async function joinLive(u){
   if(liveStop)liveStop();if(buzzStop)buzzStop();liveStop=buzzStop=null;
   ($(".bottom .mid")||document.body).append(lv);
   if(!u||T.teacher){lv.innerHTML=T.teacher?"":`📺 ${B("Sign in with your school account (bottom right) to follow the class.","Entra amb el compte de l’institut per seguir la classe.")}`;if(!u)lv.append(signInBtn());return}
-  const fb=await cloud();if(!fb)return;const {S,db}=fb,em=(u.email||"").toLowerCase();
+  const fb=await cloud();if(!fb)return;const {S,db}=fb,em=(u.email||"").toLowerCase();Q={S,ref:S.doc(db,"live",LIVE,"answers",em)};mySid=0;
   if(bar.dataset.ls)S.getDoc(S.doc(db,"students",u.uid,"levels",bar.dataset.ls)).then(l=>{if(l.exists()&&l.data().level==="insecure"&&window.ELDeck)ELDeck.setCa(true)}).catch(()=>{});   // Catalan for Insecure
   liveStop=S.onSnapshot(S.doc(db,"live",LIVE),s=>{lastLive=s.exists()?s.data():null;liveDraw()},e=>{console.warn("live",e);lv.innerHTML=`📺 ${B("You cannot follow this class.","No pots seguir aquesta classe.")}`});
   try{const [p,t,{buzzer}]=await Promise.all([S.getDoc(S.doc(db,"points",em)),S.getDoc(S.doc(db,"teams",LIVE)),import(new URL("el-buzz.js",SRC).href)]);

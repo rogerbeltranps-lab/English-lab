@@ -621,7 +621,7 @@ const SFX=[
   ['A student','dress','es','up as a castanyera.','a student = he or she · dress → dresses','a student = he o she · dress → dresses'],
   ['Families','exchange','','gifts at Diwali.','families = they','families = they']
 ];
-$('#sfx').innerHTML=SFX.map(([s,v,e,r,en,ca],i)=>`<button type="button" class="xcard" data-open="${i+1}"><span class="sent"><span class="subj">${esc(s)}</span> <span class="verb vs">${v}${gap(e?`<span class="end">${e}</span>`:'',e?'sx':'sx none')}</span> ${esc(r)}</span><span class="ans tagline">${e?`<span class="plus">+ -${e}</span>`:B('no -s','sense -s')} · ${B(esc(en),esc(ca))}</span></button>`).join('');
+$('#sfx').innerHTML=SFX.map(([s,v,e,r,en,ca],i)=>`<button type="button" class="xcard" data-open="${i+1}" data-ch="-s|no -s" data-chca="-s|sense -s" data-okv="${e?0:1}"><span class="sent"><span class="subj">${esc(s)}</span> <span class="verb vs">${v}${gap(e?`<span class="end">${e}</span>`:'',e?'sx':'sx none')}</span> ${esc(r)}</span><span class="ans tagline">${e?`<span class="plus">+ -${e}</span>`:B('no -s','sense -s')} · ${B(esc(en),esc(ca))}</span></button>`).join('');
 
 /* right or wrong: sentence, right?, correction, why (en, ca) */
 const RW=[
@@ -632,11 +632,11 @@ const RW=[
   ['Hanukkah is take place in December.',0,'Hanukkah {c:takes place} in December.','takes place has no “is”.','takes place no porta «is».'],
   ['Diwali takes place in autumn.',1,'','Diwali = it → takes place.','Diwali = it → takes place.']
 ];
-$('#rw').innerHTML=RW.map(([s,ok,fix,en,ca],i)=>`<button type="button" class="xcard rwcard ${ok?'right':'wrong'}" data-open="${i+1}"><span class="sent">${esc(s)}</span><span class="ans verdict">${ok?`<b>✓ ${B('Right.','Correcte.')}</b>`:`<b>✗ ${B('Wrong.','Incorrecte.')}</b>`} ${B(esc(en),esc(ca))}</span>${fix?`<span class="ans fix">→ ${mk(esc(fix))}</span>`:''}</button>`).join('');
+$('#rw').innerHTML=RW.map(([s,ok,fix,en,ca],i)=>`<button type="button" class="xcard rwcard ${ok?'right':'wrong'}" data-open="${i+1}" data-ch="👍 Right|👎 Wrong" data-chca="👍 Correcte|👎 Incorrecte" data-okv="${ok?0:1}"><span class="sent">${esc(s)}</span><span class="ans verdict">${ok?`<b>✓ ${B('Right.','Correcte.')}</b>`:`<b>✗ ${B('Wrong.','Incorrecte.')}</b>`} ${B(esc(en),esc(ca))}</span>${fix?`<span class="ans fix">→ ${mk(esc(fix))}</span>`:''}</button>`).join('');
 
 /* on / in / at cards */
 const TIME=[['31 October','on'],['November','in'],['Christmas','at'],['winter','in'],['New Year’s Eve','on'],['night','at'],['autumn','in'],['25 December','on'],['ten o’clock','at']];
-$('#tcards').innerHTML=TIME.map(([t,p],i)=>`<button type="button" class="xcard tcard" data-open="${i+1}" data-p="${p}"><span class="sent">${gap(`<span class="p${p}">${p}</span>`)} <span class="vs">${esc(t)}</span></span></button>`).join('');
+$('#tcards').innerHTML=TIME.map(([t,p],i)=>`<button type="button" class="xcard tcard" data-open="${i+1}" data-p="${p}" data-ch="on|in|at" data-chca="on|in|at" data-okv="${['on','in','at'].indexOf(p)}"><span class="sent">${gap(`<span class="p${p}">${p}</span>`)} <span class="vs">${esc(t)}</span></span></button>`).join('');
 
 /* quick fire: one card at a time, two steps each (show, reveal) */
 const PW={on:['A date or day → on.','Data o dia → on.'],in:['A month or season → in.','Mes o estació → in.'],at:['at + festival time, night or clock time.','at + període de festa, la nit o l’hora.']};
@@ -695,6 +695,9 @@ function markPoll(p,on){$$('.opt',p).forEach(o=>{const ok=o.hasAttribute('data-o
 const slides=$$('.slide'),rail=$('#rail'),stage=$('#stage');
 slides.forEach(s=>{const n=new Set();$$('[data-step],[data-open],[data-until]',s).forEach(el=>['step','open','until'].forEach(k=>{if(el.dataset[k])n.add(+el.dataset[k])}));s._beats=[...n].sort((a,b)=>a-b)});
 const st=slides.map(()=>({b:0,man:new Set()}));
+/* class quiz (shared/js/el-deck-points.js): every question a student can answer on their device while following the class gets
+   data-q; a poll's value is the option's data-i, a card's (data-ch: its choices) the choice's position; data-okv is the right one */
+slides.forEach((s,i)=>$$('.poll,[data-ch]',s).filter(el=>el.hasAttribute('data-ch')||$('.opts',el)).forEach((el,k)=>{el.dataset.q=`s${i}q${k}`;const ok=$('.opt[data-ok]',el);if(ok)el.dataset.okv=ok.dataset.i}));
 let cur=Math.min(Math.max(0,store.get('slide',0)|0),slides.length-1);
 let live=null;   // a student following the class: the teacher's latest step (see "live" below)
 slides.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.textContent=i+1;b.title=s.dataset.title;b.setAttribute('aria-label',`Slide ${i+1}: ${s.dataset.title}`);b.onclick=()=>live||go(i);rail.appendChild(b)});
@@ -753,7 +756,9 @@ $('#prev').onclick=()=>live||back();$('#next').onclick=()=>live||next();
 /* clicks inside slides: vote on a poll option, open a card */
 stage.addEventListener('click',e=>{
   const o=e.target.closest('.opt');
-  if(o){const p=o.closest('.poll'),on=o.getAttribute('aria-pressed')!=='true';$$('.opt',p).forEach(x=>x.setAttribute('aria-pressed','false'));o.setAttribute('aria-pressed',String(on));if(p.classList.contains('open'))markPoll(p,true);return}
+  if(o){const p=o.closest('.poll'),on=o.getAttribute('aria-pressed')!=='true';if(live&&p.classList.contains('open'))return;   // following: the answer is out
+    $$('.opt',p).forEach(x=>x.setAttribute('aria-pressed','false'));o.setAttribute('aria-pressed',String(on));if(p.classList.contains('open'))markPoll(p,true);
+    if(live&&p.dataset.q)dispatchEvent(new CustomEvent('deckanswer',{detail:{q:p.dataset.q,v:on?+o.dataset.i:-1}}));return}
   const c=e.target.closest('.xcard[data-open]');
   if(c&&!c.closest('.later')&&!live){const t=st[cur];if(+c.dataset.open<=t.b)return;if(t.man.has(c))t.man.delete(c);else t.man.add(c);apply(cur);return}
   const g=e.target.closest('.go321');
