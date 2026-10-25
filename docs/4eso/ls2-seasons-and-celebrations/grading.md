@@ -12,7 +12,7 @@ Key competences (Roger's *Progressió de les competències d'anglès*, 01 Habili
 
 | Block | Weight | What it measures | Evidence | How it is marked |
 | --- | --- | --- | --- | --- |
-| Final exam | 35 % | 4.1, 2.2, 5.1, grammar and vocabulary | The exam (format decided later; the first sample exam format is fine) | Exam score out of 10 |
+| Final exam | 35 % | 4.1, 2.2, 5.1, grammar and vocabulary | Google Form, out of 100 (approved 25 Oct 2026): listening 20 (incl. listening chart 10), reading 20 (incl. reading log 10), vocabulary 15, grammar 15, writing 30 | Exam score out of 10; the chart, the log and the email also give the 2.2, 4.1 and 5.1 levels |
 | Final product | 25 % | 3.2, 5.1, 4.2, individual only | My part of the pitch 40 · my email 35 · my source 15 · teamwork 5 · my process evidence 5 | Rubric levels |
 | Grammar and vocabulary | 20 % | Language practice | Vocabulary practice, grammar, mixed practice (LP2, LP3, LP5, LP6), LP6 register step, recall warm-ups, checkpoints 1 and 4 (2 and 3 only if they raise the mark) | Automatic: 60 % first-try accuracy + 40 % completed by the session deadline |
 | Other competences | 20 % | 1.1, 1.2, 6.1, CC1 1.3, CC3 3.2 | Every activity linked to them + the final product content rows | Per criterion: half automatic, half teacher levels; the block is the average of the five |
@@ -39,7 +39,7 @@ Key-skill Learning Path hand-ins add no marks of their own; the LP2 reading log 
 Rules:
 
 - Where there are two pieces of evidence, the later one weighs more. The dashboard suggests the degree; the teacher confirms or changes it.
-- A percentage of right answers never sets the degree for 4.1 or 2.2 on its own: their indicators describe a task (reading log, listening chart). Recommendation for when Roger decides the exam format: include a short reading log and listening chart.
+- A percentage of right answers never sets the degree for 4.1 or 2.2 on its own: their indicators describe a task (reading log, listening chart). The exam includes a short reading log and listening chart (approved 25 Oct 2026), each levelled by the teacher.
 - 1.1 and 1.2 rest on group evidence; it becomes an individual degree through peer assessment and the teacher's observation (safety net: one level less for a student who did not contribute). Option not yet decided: also level 1.1 on the final email.
 
 ## 4. Other competences: the two halves
@@ -63,11 +63,11 @@ The indicators are not ticked one by one: each row of indicators.md is a four-le
 | LP2 reading log | 1 | 4.1 |
 | LP3 listening chart | 1 | 2.2 |
 | LP4 research card | 3 | 4.2, 6.1, CC3 3.2 |
-| Exam writing | 1 | 5.1 |
+| Exam: listening chart, reading log, writing | 3 | 2.2, 4.1, 5.1 |
 | Final product: my part, my email, my source, welcome actions | 4 | 3.2, 5.1, 4.2, CC1 1.3 |
 | Final product group rows (once per group) | 4 per group | 1.1, 1.2, 6.1, CC3 3.2 |
 
-About 280 clicks for a class of 25 over six weeks (+2 per student if the exam includes a reading log and a listening chart). Not levelled: LP writing pieces (AI feedback), LP speaking practice, self-assessment (shown next to the teacher's level, never counted).
+About 330 clicks for a class of 25 over six weeks. Not levelled: LP writing pieces (AI feedback), LP speaking practice, self-assessment (shown next to the teacher's level, never counted).
 
 Levels to marks: NA 2.5 · AS 5 · AN 7.5 · AE 10 · no evidence 0. Marks to levels for the report: under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.
 

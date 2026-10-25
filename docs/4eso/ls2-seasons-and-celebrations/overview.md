@@ -753,17 +753,12 @@ Insecure answers the [I] items (8) · Safe [I] + [S] (11) · Daring all (13).
 
 - **Vocabulary games** (in class, not graded): the existing six games with the LS2 route vocabulary, cumulative across LPs. Only studied expressions are accepted (existing rules).
 - **Flashcards:** one deck per route with all LS2 vocabulary, each card showing which LP it comes from.
-- **Sample exam** (week 8, practice, same format as LS1):
+- **Sample exam** (practice, the session before the exam; **rebuilt 25 Oct 2026 in the format of the real exam**, which Roger approved that day): listening *Two New Years* (Callum, Hogmanay; Yuki, Japanese New Year; Safe level, one recording for all routes) with 5 questions and a listening chart · the reading *Two winter traditions* below (approved texts, one per route) with 5 questions and a reading log · vocabulary and grammar (7 multiple choice + 4 gaps each, all LS2 language) · a formal email to the community centre. Out of 100 like the exam, points shown on every section and item; the chart, the log and the email get a guide mark from ChatGPT with the 2.2, 4.1 and 5.1 levels and a warning that ChatGPT can make mistakes. Items and tasks: `4eso/seasons-and-celebrations/data/sample-exam.js` (new items await Roger's review). The real exam is in Google Forms and is not stored in the repo.
   - **Reading:** *Two winter traditions*
 
     > In Catalonia, many families have a Caga Tió at Christmas. It is a small log with a face, a red hat and a blanket. From 8 December, children "feed" it every night and keep it warm. On Christmas Eve or Christmas Day, they hit it with sticks and sing a song, and the log "gives" them sweets and small presents.
     >
     > In the UK and many other countries, children have an Advent calendar. It has 24 small doors, and children open one every day from 1 December. Behind each door there is a picture or a piece of chocolate. Advent calendars used to have only pictures, but today many have chocolate or small toys.
-
-    Questions: [I] When do children start feeding the Caga Tió? *8 December* · What do children do on Christmas Eve or Christmas Day? *hit it and sing a song* · How many doors does an Advent calendar have? *24* · [S] What did Advent calendars use to have? *only pictures* · Name one similarity between the two traditions. *both start in December / both give children sweets* · [D] Which tradition has changed more over time, according to the text? *the Advent calendar*
-  - **Listening:** a 1-minute radio announcement for a winter fair (timetable, *there will be*, *will*), 6 questions. Script to be written with the page.
-  - **Grammar:** 10 mixed items, new examples of the forms in checkpoints 1–4.
-  - **Writing:** Insecure, describe a winter celebration (60–80 words) · Safe, compare it with another (100–130) · Daring, explain how it has changed (140–180).
 
 ---
 

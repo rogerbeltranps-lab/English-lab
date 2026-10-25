@@ -25,7 +25,8 @@ var LS2 = (function () {
   const ca = () => level === 'insecure';
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca() ? (o.ca || o.en) : (o.en || o.ca));
   const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : o.safe != null && level === 'daring' ? o.safe : o.insecure);
-  const forLevel = items => (items || []).filter(x => ROUTES.indexOf(x.r || 'insecure') <= ROUTES.indexOf(level));
+  // A list is cumulative (r: tags); an object keyed by route gives each route its own list (the sample exam: same number of items per route).
+  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'insecure') <= ROUTES.indexOf(level)) : (items[level] || []);
   const need = n => Math.ceil(n * 0.8);
   const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -38,7 +39,7 @@ var LS2 = (function () {
   function complete(k) { if (!state.done[k]) { state.done[k] = true; stamp(k); save(); } else progress(); }
   function stamp(k) { state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = new Date().toISOString(); }
   function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) { state.tries[k] = { score, max, level, date: new Date().toISOString() }; save(); } }
-  function steps() { return LP.panels.flatMap(p => p.type === 'info' ? [] : p.type === 'vocab' ? (p.practice ? ['cards', 'practice'] : ['cards']) : [p.id]); }
+  function steps() { return LP.panels.flatMap(p => p.type === 'info' || p.type === 'summary' ? [] : p.type === 'vocab' ? (p.practice ? ['cards', 'practice'] : ['cards']) : [p.id]); }
   function progress() {
     const s = steps(), n = s.filter(k => state.done[k]).length;
     $('#progressLabel').textContent = cap(level);
@@ -418,6 +419,110 @@ var LS2 = (function () {
     }
   });
 
+  /* ---------- sample exam: points per item, tasks marked by ChatGPT, score summary ---------- */
+  const ptsOf = (p, q) => q.p || (q.o ? p.pts[0] : p.pts[1]);
+  const maxOf = p => p.type === 'quiz' ? forLevel(p.items).reduce((t, q) => t + ptsOf(p, q), 0) : p.max;
+  const ptsWord = n => n + ' ' + (ca() ? (n === 1 ? 'punt' : 'punts') : (n === 1 ? 'point' : 'points'));
+  const aiWarning = () => ca() ? '⚠️ ChatGPT es pot equivocar: la seva nota només és orientativa. A l’examen real, el quadre, el log i el correu els corregeix el professorat.'
+    : '⚠️ ChatGPT can make mistakes: its mark is only a guide. In the real exam, your teacher marks the chart, the log and the email.';
+  // Multiple choice ({q, o}: first option right, shown shuffled) and gaps ({q, a}) in one list, each with its points.
+  R.quiz = p => ({
+    html: '<div class="section-card">' + mediaHtml(p) + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button></div><div class="result" id="' + p.id + 'Result"></div></div>',
+    bind() {
+      bindAudio(p);
+      const items = forLevel(p.items), start = p.start || 1;
+      $('#' + p.id + 'List').innerHTML = items.map((q, i) => '<div class="question"><p class="q-title">' + (start + i) + '. ' + q.q + ' <small>[' + ptsWord(ptsOf(p, q)) + ']</small></p>' +
+        (q.o ? '<div class="options">' + learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + p.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') + '</div>'
+             : '<input type="text" class="typed" id="' + p.id + i + '" autocomplete="off" autocapitalize="off" spellcheck="false">') +
+        '<div class="feedback" id="' + p.id + 'f' + i + '"></div></div>').join('');
+      $('#' + p.id + 'Check').onclick = () => {
+        let right = 0, pts = 0;
+        items.forEach((q, i) => {
+          const fb = $('#' + p.id + 'f' + i);
+          let ok;
+          if (q.o) {
+            const c = document.querySelector('input[name="' + p.id + i + '"]:checked'); ok = !!c && +c.value === 0;
+            fb.textContent = learningSupport.evidence(level, ok, c, q.o[0], null, !!(p.media && p.media.audio));
+          } else {
+            const v = norm($('#' + p.id + i).value), key = p.id + i; ok = q.a.some(a => norm(a) === v);
+            if (!ok && v) tries[key] = (tries[key] || 0) + 1;
+            fb.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!') : !v ? (ca() ? 'Escriu una resposta.' : 'Type an answer.')
+              : (ca() ? 'Encara no. ' : 'Not yet. ') + (tries[key] >= 2 ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(q.a[0]) + '</strong>' : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
+          }
+          fb.className = 'feedback ' + (ok ? 'ok' : 'no');
+          if (ok) { right++; pts += ptsOf(p, q); }
+        });
+        const tk = p.id + '_' + level;
+        firstTry(tk, pts, maxOf(p));
+        const done = right >= need(items.length);
+        result($('#' + p.id + 'Result'), right, items.length, done, ' · ' + pts + ' / ' + ptsWord(maxOf(p)) + (ca() ? ' (primer intent: ' : ' (first try: ') + state.tries[tk].score + ')');
+        if (done) complete(p.id);
+        if (LP.onScore) LP.onScore();
+      };
+    }
+  });
+  // An open task (listening chart, reading log, email): the student writes, then ChatGPT gives feedback and an orientative mark
+  // with the criterion's levels; the student can note that mark for the summary.
+  function markPrompt(p, text) {
+    const lv = { insecure: 'Insecure (A2 / A2+, amb suport)', safe: 'Safe (B1)', daring: 'Daring (B1 / B1+)' }[level];
+    const src = byLevel(p.source || '');
+    return (ca() ? 'Actua com a professor d’anglès de 4t d’ESO. És l’EXAMEN D’EXEMPLE (pràctica) de la Learning Situation “Seasons & Celebrations”.' : 'Act as a 4 ESO English teacher. This is the SAMPLE EXAM (practice) of the Learning Situation “Seasons & Celebrations”.') +
+      '\n\nRoute / level: ' + lv + '.\nTask (' + p.max + ' points): ' + byLevel(p.task).replace(/<[^>]+>/g, '') +
+      (src ? '\n\n' + (p.sourceLabel || 'Source') + ':\n"""\n' + src.replace(/<[^>]+>/g, ' ').replace(/\s+\n/g, '\n') + '\n"""' : '') +
+      '\n\nStudent’s answer:\n"""\n' + text + '\n"""\n\n' +
+      'Mark it with the four levels of criterion ' + p.criterion + ':\n' + ['NA', 'AS', 'AN', 'AE'].map((l, i) => l + ' (' + p.levelPts[i] + ' points): ' + p.levels[i]).join('\n') +
+      '\nBlank, not in English or off task: 0 points.\n\n' + learningSupport.aiLanguage(level) +
+      ' Do not rewrite the whole answer. Reply only with these parts:\n1. 📊 Level and mark: "Level: AN · ' + p.levelPts[2] + '/' + p.max + '", and one sentence saying which description fits and why.\n2. ✅ Two things done well.\n3. 🔧 Up to 4 important problems: quote the words, explain why briefly, give a better version.\n4. 🎯 One thing to do to reach the next level.\n5. ⚠️ End with one line: this mark is only a guide, AI can make mistakes, and in the real exam the teacher marks it.';
+  }
+  R.marked = p => ({
+    html: '<div class="section-card">' + mediaHtml(p) + '<h3>' + (ca() ? 'La tasca' : 'Your task') + ' <small>[' + ptsWord(p.max) + ']</small></h3><p class="instruction" id="' + p.id + 'Task"></p>' +
+      '<textarea id="' + p.id + 'Text" rows="9"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
+      '<div class="section-card"><h3>' + (ca() ? 'Feedback i nota orientativa' : 'Feedback and a guide mark') + '</h3><p class="instruction">' + (ca() ? 'Prem el botó: s’obre ChatGPT amb la teva resposta i els criteris de correcció. Et dirà el nivell (NA, AS, AN, AE), els punts i què has de millorar.' : 'Press the button: ChatGPT opens with your answer and the marking criteria. It tells you the level (NA, AS, AN, AE), the points and what to improve.') + '</p>' +
+      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (ca() ? 'Desa i corregeix amb ChatGPT ↗' : 'Save and mark with ChatGPT ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
+      '<label class="field"><strong>' + (ca() ? 'Punts que t’ha donat ChatGPT (de ' + p.max + ')' : 'Points ChatGPT gave you (out of ' + p.max + ')') + '</strong><input type="number" class="typed" id="' + p.id + 'Pts" min="0" max="' + p.max + '" step="1" style="max-width:120px"></label>' +
+      '<p class="warm-note">' + aiWarning() + '</p></div>',
+    bind() {
+      bindAudio(p);
+      const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level, min = byLevel(p.min);
+      state.texts = state.texts || {}; state.ai = state.ai || {};
+      ta.value = state.texts[key] || ''; ta.placeholder = byLevel(p.template || '');
+      $('#' + p.id + 'Task').innerHTML = byLevel(p.task).replace(/\n/g, '<br>');
+      const count = () => { $('#' + p.id + 'Count').textContent = words(ta.value) + ' ' + (ca() ? 'paraules' : 'words') + (min ? ' · ' + (ca() ? 'mínim ' : 'minimum ') + min : ''); };
+      ta.oninput = () => { state.texts[key] = ta.value; save(); count(); };
+      count();
+      const pts = $('#' + p.id + 'Pts'), k = p.id + '_' + level;
+      pts.value = state.ai[k] != null ? state.ai[k] : '';
+      pts.oninput = () => { const v = pts.value === '' ? null : Math.max(0, Math.min(p.max, Math.round(+pts.value))); if (v == null) delete state.ai[k]; else state.ai[k] = v; save(); if (LP.onScore) LP.onScore(); };
+      $('#' + p.id + 'Ai').onclick = () => {
+        const msg = $('#' + p.id + 'Msg');
+        if (words(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.'; return; }
+        window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(markPrompt(p, ta.value.trim())), '_blank', 'noopener,noreferrer');
+        msg.className = 'feedback ok';
+        msg.textContent = ca() ? 'Desat ✓ S’ha obert ChatGPT. Apunta aquí sota els punts que et doni i llegeix què has de millorar.' : 'Saved ✓ ChatGPT has opened. Note the points it gives you below and read what to improve.';
+        complete(p.id);
+      };
+    }
+  });
+  // My score: auto-marked sections (first try, as in the exam) + the guide marks noted from ChatGPT.
+  R.summary = p => ({
+    html: '<div class="section-card"><div id="' + p.id + 'Table"></div><p class="warm-note">' + aiWarning() + '</p></div>',
+    bind() {
+      const draw = () => {
+        let got = 0, max = 0, missing = false;
+        const rows = LP.panels.filter(x => x.type === 'quiz' || x.type === 'marked').map(x => {
+          const m = maxOf(x), t = x.type === 'quiz' ? (state.tries || {})[x.id + '_' + level] : null, a = x.type === 'marked' ? (state.ai || {})[x.id + '_' + level] : null;
+          const v = x.type === 'quiz' ? (t ? t.score : null) : (a != null ? a : null);
+          max += m; if (v == null) missing = true; else got += v;
+          return '<tr><td>' + tx(x.tab) + (x.type === 'marked' ? ' <small>(ChatGPT)</small>' : '') + '</td><td style="text-align:right">' + (v == null ? '–' : v) + ' / ' + m + '</td></tr>';
+        });
+        $('#' + p.id + 'Table').innerHTML = '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody>' + rows.join('') +
+          '<tr><td><strong>Total</strong></td><td style="text-align:right"><strong>' + got + ' / ' + max + '</strong> · ' + (Math.round(got / max * 100) / 10) + ' / 10</td></tr></tbody></table>' +
+          (missing ? '<p class="tiny">' + (ca() ? '– = encara no ho has fet (o no has apuntat els punts de ChatGPT).' : '– = not done yet (or ChatGPT’s points not noted).') + '</p>' : '');
+      };
+      LP.onScore = draw; draw();
+    }
+  });
+
   /* ---------- page ---------- */
   function render() {
     const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
@@ -430,7 +535,7 @@ var LS2 = (function () {
     initNext();
     progress();
   }
-  function stepDone(p) { return p.type === 'info' ? true : p.type === 'vocab' ? !!state.done.cards && (!p.practice || !!state.done.practice) : !!state.done[p.id]; }
+  function stepDone(p) { return p.type === 'info' || p.type === 'summary' ? true : p.type === 'vocab' ? !!state.done.cards && (!p.practice || !!state.done.practice) : !!state.done[p.id]; }
   function initNext() {
     $$('.section-next').forEach(e => e.remove());
     const last = LP.panels[LP.panels.length - 1];
