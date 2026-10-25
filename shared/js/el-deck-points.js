@@ -42,7 +42,7 @@ css.textContent=`
 @keyframes elBuzzPulse{50%{opacity:.25}}
 .deck-live .teambar{display:none!important}
 .ellive{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.2em .5em;font:600 .75em/1.25 var(--f-body);color:var(--accent);text-align:center;min-width:0}
-.ellive a{color:var(--accent)}.ellive button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:.2em .7em;font:600 1em var(--f-body)}
+.ellive a{color:var(--accent);display:inline-block;padding:.45em .2em}.ellive button{min-height:36px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:.3em .9em;font:600 1em var(--f-body);touch-action:manipulation}   /* big enough to tap on a touch screen */
 .ptrule{display:flex;gap:.7em;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.45em .9em;min-width:0}
 .ptrule .ico{font-size:1.4em;line-height:1.1;flex:0 0 auto}.ptrule b{display:block}
 @media (prefers-reduced-motion: reduce){.team .sc.bump,.elbuzz .who,.elbuzz .dot{animation:none}}`;
@@ -165,7 +165,9 @@ function listen(g){
   if(T.live&&T.live!==g)liveOff(T.live);T.live=g||null;if(!g)return;
   sendLive();beat=setInterval(sendLive,60e3);   // every minute too, so the students' boards know the class is still on
   cloud().then(fb=>{if(!fb||T.group!==g)return;
-    unsub=fb.S.onSnapshot(fb.S.doc(fb.db,"buzz",g),s=>{const was=T.buzz&&T.buzz.winner;T.buzz=s.exists()?s.data():null;if(T.buzz&&T.buzz.open&&T.buzz.winner&&!was)ding();drawBuzz()},e=>console.warn("buzz",e))});
+    let first=true;   // no sound for the state the page finds when it opens
+    unsub=fb.S.onSnapshot(fb.S.doc(fb.db,"buzz",g),s=>{const was=T.buzz||{};T.buzz=s.exists()?s.data():null;const z=T.buzz||{};
+      if(!first){if(z.open&&z.winner&&!was.winner)snd("first");else if(z.open&&!was.open)snd("open")}first=false;drawBuzz()},e=>console.warn("buzz",e))});
 }
 const tname=id=>esc(((T.data&&T.data.list.find(x=>x.id===id))||{}).name||id);
 function drawBuzz(){
@@ -174,7 +176,7 @@ function drawBuzz(){
   bz.innerHTML=z.winner?`<p class="who">🔔 ${B(tname(z.winner.team)+", answer!",tname(z.winner.team)+", responeu!")}</p><div class="bzrow"><button type="button" class="ok" data-bz="right">✓ ${B("Right · +1","Correcte · +1")}</button><button type="button" class="no" data-bz="wrong">✗ ${B("Wrong · another team","Incorrecte · un altre equip")}</button><button type="button" data-bz="close">${B("Close","Tanca")}</button></div>`
     :`<span class="dot" aria-hidden="true"></span><span>${B("Buzzers open: press 🔔 on your board!","Polsadors oberts: premeu 🔔 al vostre tauler!")}</span>${(z.out||[]).length?`<small>${B("Out:","Fora:")} ${z.out.map(tname).join(", ")}</small>`:""}<button type="button" data-bz="close">${B("Close","Tanca")}</button>`;
 }
-function ding(){try{const a=new (window.AudioContext||window.webkitAudioContext)();[880,1320].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.frequency.value=f;g.gain.setValueAtTime(.2,a.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+i*.12+.25);o.connect(g).connect(a.destination);o.start(a.currentTime+i*.12);o.stop(a.currentTime+i*.12+.25)})}catch(e){}}
+const snd=n=>window.ELSound&&ELSound.play(n);   // shared/js/el-sound.js
 async function buzzSet(o,merge=true){
   const fb=await cloud();if(!fb||!T.group)return;
   try{await fb.S.setDoc(fb.S.doc(fb.db,"buzz",T.group),Object.assign(o,{updated:fb.S.serverTimestamp()}),{merge})}catch(e){console.warn("buzz",e);T.msg="⚠ Buzzer: "+esc(e.message);draw()}
@@ -182,8 +184,8 @@ async function buzzSet(o,merge=true){
 const openBuzz=()=>ready()&&T.data.list.length?buzzSet({open:true,q:Date.now(),out:[],winner:null},false):null;
 bz.addEventListener("click",e=>{
   const a=e.target.closest("[data-bz]"),z=T.buzz;if(!a||!z)return;const w=z.winner&&z.winner.team;
-  if(a.dataset.bz==="right"){if(w)award(w,1);buzzSet({open:false})}
-  else if(a.dataset.bz==="wrong"){const out=[...new Set([...(z.out||[]),w].filter(Boolean))];   // nobody left to buzz: close
+  if(a.dataset.bz==="right"){snd("right");if(w)award(w,1);buzzSet({open:false})}
+  else if(a.dataset.bz==="wrong"){snd("wrong");const out=[...new Set([...(z.out||[]),w].filter(Boolean))];   // nobody left to buzz: close
     buzzSet({out,winner:null,open:T.data.list.some(t=>!out.includes(t.id)&&(T.data.members[t.id]||[]).length)})}
   else buzzSet({open:false});
 });
@@ -191,7 +193,7 @@ document.addEventListener("keydown",e=>{if((e.key==="b"||e.key==="B")&&!e.altKey
 
 bar.addEventListener("click",async e=>{
   const b=e.target.closest("[data-team]");
-  if(b){const d=+b.dataset.d;
+  if(b){const d=+b.dataset.d;if(d>0)snd("point");
     if(ready())return award(b.dataset.team,d);
     const t=+b.dataset.team;local.score[t]=Math.max(0,(local.score[t]||0)+d);b.parentNode.querySelector(".sc").textContent=local.score[t];store.set("teams",local);if(d>0)bump(t);return}
   if(e.target.closest("#teamsZero")){local.score=[0,0,0,0,0,0];store.set("teams",local);draw()}

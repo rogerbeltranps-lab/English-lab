@@ -566,6 +566,7 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
       <button class="tool" id="pickBtn" type="button" title="Random number (R)">🎲<span class="tl" data-ca=" Número"> Number</span></button>
       <button class="tool" id="timerBtn" type="button" title="Timer (T)" aria-pressed="false">⏱<span class="tl" data-ca=" Temps"> Timer</span></button>
       <button class="tool" id="teamsBtn" type="button" title="Team points" aria-pressed="false">🏆<span class="tl" data-ca=" Equips"> Teams</span></button>
+      <button class="tool" id="sndBtn" type="button" title="Sound effects on (M)">🔊<span class="tl" data-ca=" So"> Sound</span></button>
     </div>
     <span id="where" aria-live="polite"></span>
   </div>
@@ -594,6 +595,7 @@ kbd{font:600 .9em var(--f-body);border:1px solid var(--line);border-bottom-width
 </div>
 
 <script src="../../shared/js/learning-path-support.js"></script>
+<script src="../../shared/js/el-sound.js"></script>
 <script src="../../shared/js/el-points.js"></script>
 <script src="../../shared/js/el-deck-points.js"></script>
 <script>
@@ -778,7 +780,13 @@ document.addEventListener('keydown',e=>{
   else if(k==='r'||k==='R'){openPick()}
   else if(k==='t'||k==='T'){$('#tpill').hidden?showTimer(total,false):closeTimer()}
   else if(k==='s'||k==='S'){const g=$('.go321[data-say]',slides[cur]);countdown(g?g.dataset.say:'fingers')}
+  else if(k==='m'||k==='M'){toggleSnd()}
 });
+/* sound effects (shared/js/el-sound.js): countdown, random number, timer, team points, buzzer; 🔊 / M mutes them in this browser */
+const snd=n=>window.ELSound&&ELSound.play(n);
+function drawSnd(){const b=$('#sndBtn'),on=!window.ELSound||ELSound.on();b.title=on?'Sound effects on (M)':'Sound effects off (M)';b.firstChild.textContent=on?'🔊':'🔇'}
+function toggleSnd(){if(!window.ELSound)return;ELSound.set(!ELSound.on());drawSnd()}
+$('#sndBtn').onclick=toggleSnd;drawSnd();
 
 /* ---------- 3 · 2 · 1 · Show! ---------- */
 const SAY={fingers:['✋ Fingers up!','✋ Amunt els dits!'],thumbs:['👍 👎 Thumbs!','👍 👎 Polzes!'],write:['✏️ Show your answer!','✏️ Ensenya la resposta!']};
@@ -786,8 +794,8 @@ let cdT=[];
 function stopCd(){cdT.forEach(clearTimeout);cdT=[];$('#cd').hidden=true}
 function countdown(mode){
   stopCd();const cd=$('#cd'),say=SAY[mode]||SAY.fingers;cd.hidden=false;
-  [3,2,1].forEach((n,i)=>cdT.push(setTimeout(()=>{cd.innerHTML=`<span class="cd-num">${n}</span>`},i*800)));
-  cdT.push(setTimeout(()=>{cd.innerHTML=`<span class="cd-go">${B(say[0],say[1])}</span>`},2400));
+  [3,2,1].forEach((n,i)=>cdT.push(setTimeout(()=>{cd.innerHTML=`<span class="cd-num">${n}</span>`;snd('tick')},i*800)));
+  cdT.push(setTimeout(()=>{cd.innerHTML=`<span class="cd-go">${B(say[0],say[1])}</span>`;snd('go')},2400));
   cdT.push(setTimeout(stopCd,4200));
 }
 $('#cd').onclick=stopCd;
@@ -799,7 +807,7 @@ function pickInfo(){$('#pickLeft').innerHTML=Array.isArray(left)?B(`${left.lengt
 function pickOne(){
   if(!Array.isArray(left)||!left.length)left=shuffled([...Array(size).keys()].map(n=>n+1));
   const n=left.pop();store.set('left',left);
-  const el=$('#pickNum');el.textContent=n;el.style.animation='none';void el.offsetWidth;el.style.animation='pop .5s ease-out';pickInfo();
+  const el=$('#pickNum');el.textContent=n;el.style.animation='none';void el.offsetWidth;el.style.animation='pop .5s ease-out';pickInfo();snd('pick');
 }
 function openPick(){$('#pick').hidden=false;pickOne();$('#pickAgain').focus()}
 function closePick(){$('#pick').hidden=true}
@@ -811,7 +819,7 @@ $('#pickN').onchange=()=>{size=Math.min(40,Math.max(2,+$('#pickN').value|0));$('
 /* ---------- timer ---------- */
 let total=30,remain=30,tid=null;
 const fmt=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=660;g.gain.setValueAtTime(.18,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.9);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.9)}catch(e){}}
+function beep(){snd('time')}
 function tdraw(){
   $('#tShow').innerHTML=remain>0?fmt(remain):B('Time!','Temps!');
   $('#tpill').classList.toggle('up',remain<=0);
