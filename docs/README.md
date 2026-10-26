@@ -23,11 +23,19 @@ docs/
       indicators.md              NA / AS / AN / AE indicators per LS criterion
       grading.md                 LS mark, evidence per criterion and how levels are collected
   2eso/
-    programme.md                 (to come from Roger)
+    programme.md                 Roger's 2ESO teaching programme (Learning Situations 2n ESO, 21 Oct 2026, rev. 24 Oct)
     ls1-my-real-routine/
       AGENTS.md
       overview.md
       assessment-criteria.md     activities mapped to the assessment criteria
+    ls2-free-time-live/
+      AGENTS.md                  rules, how it was built from 4ESO LS2, and the dated decision log
+      overview.md                the course content (three routes)
+      assessment-criteria.md     activities mapped to the eight LS criteria
+      competences-grid.md        competences × activities, and when each criterion is marked
+      final-product-assessment.md  the individual Free Time Vlog: routes, steps, marks, two rounds
+      indicators.md              NA / AS / AN / AE indicators per LS criterion (generated from el-grading.js)
+      grading.md                 LS mark, evidence per criterion and how levels are collected
   archive/                       old drafts, for reference only
 ```
 

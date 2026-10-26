@@ -90,5 +90,65 @@ window.EL_GRADING={
       },
       names:{teamwork:"Teamwork",process:"Process evidence"}
     };
+  })(),
+  // 2ESO LS2 Free Time, Live!: docs/2eso/ls2-free-time-live/grading.md (same blocks as 4ESO LS2; individual vlog, so no teamwork row); indicators from its indicators.md
+  "2eso-free-time-live":(function(){
+    const LP2="2eso/ls2-what-are-they-doing",LP3="2eso/ls2-now-or-usually",LP4="2eso/ls2-check-the-source",
+      LP5="2eso/ls2-likes-and-screen-tips",LP6="2eso/ls2-write-your-vlog-script",FP="2eso/ls2-free-time-vlog",CP=n=>"2eso/ls2-recall-checkpoint-"+n;
+    return {
+      blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar and vocabulary",w:20},{id:"other",name:"Other competences",w:20}],
+      key:["4.1","4.2","2.2","3.2","5.1"],      // key competences (CE2–CE5): exam and final product
+      other:["6.2","CD2 2.2","CD4 4.5"],        // the 20 % block
+      exam:{sections:[["listening","Listening"],["reading","Reading"],["vocabulary","Vocabulary"],["grammar","Grammar"],["writing","Writing"]],max:10,level:{step:"writing",c:"5.1"}},
+      // One-click levels per student; the vlog is individual, so there are no group moments. "edit" (step 4) is where the vlog itself is marked (3.2, CD2 2.2).
+      moments:[
+        {a:LP2,step:"log",name:"Reading log",c:["4.1"]},
+        {a:LP3,step:"chart",name:"Listening chart",c:["2.2"]},
+        {a:LP4,step:"factfile",name:"Fact file",c:["4.2","6.2"]},
+        {a:FP,step:"source",name:"1 · My source",c:["4.2"]},
+        {a:FP,step:"factfile",name:"My fact file and credits (LP4 piece 3 + last slide)",c:["6.2"]},
+        {a:FP,step:"script",name:"3 · My script and slides",c:["5.1"]},
+        {a:FP,step:"edit",name:"4 · My vlog (video) and editing",c:["3.2","CD2 2.2"]},
+        {a:FP,step:"tips",name:"5 · My screen tips",c:["CD4 4.5"]},
+        {a:FP,step:"process",name:"My process evidence (steps 0–5)",c:["process"]}
+      ],
+      fp:{a:FP,rows:[{step:"edit",c:"3.2",name:"My vlog",w:40},{step:"script",c:"5.1",name:"My script and slides",w:30},{step:"source",c:"4.2",name:"My source",w:15},{step:"process",c:"process",name:"Process",w:15}]},
+      marking:{rubric:"2eso/free-time-live/final-rubric-data.js",process:["prep","source","slides","script","edit","tips"],afterDue:["tips"],
+        rounds:{1:{name:"Round 1 · Source and fact file",note:"Fact file and steps 0–2: My source and My fact file, per student",answers:[[LP4,"factfile"],[FP,"prep"],[FP,"source"],[FP,"slides"]]},
+          2:{name:"Round 2 · Vlog, script, editing and tip",note:"Steps 3–5 with the full script, the editing log and the tip, plus the process; the video is watched on Classroom",answers:[[FP,"script",{rate:true}],[FP,"edit",{rate:true}],[FP,"tips"]],process:true}}},
+      gv:{first:60,onTime:40,
+        items:[[LP2,"recall"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"recall"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"recall"],[LP4,"practice"],
+          [LP5,"recall"],[LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"recall"],[LP6,"practice"],[LP6,"grammar"],[CP(1),"check"],[CP(4),"check"]],
+        optional:[[CP(2),"check"],[CP(3),"check"]]},
+      auto:{
+        "6.2":[[LP4,"credit",1],[LP4,"factfile"]],
+        "CD2 2.2":[[FP,"slides"],[FP,"edit"]],
+        "CD4 4.5":[[LP5,"write"],[LP5,"speak"],[FP,"tips"]]
+      },
+      teacher:{"6.2":[[LP4,"factfile"],[FP,"factfile"]],"CD2 2.2":[[FP,"edit"]],"CD4 4.5":[[FP,"tips"]]},
+      later:2,
+      evidence:{
+        "4.1":{e:[[LP2,"log"],{exam:"reading"}],levelOnly:true},
+        "2.2":{e:[[LP3,"chart"],{exam:"listening"}],levelOnly:true},
+        "4.2":{e:[[LP4,"factfile"],[FP,"source"]]},
+        "6.2":{e:[[LP4,"factfile"],[FP,"factfile"]]},
+        "3.2":{e:[[FP,"edit"]]},
+        "5.1":{e:[["exam","writing"],[FP,"script"]]},
+        "CD2 2.2":{e:[[FP,"edit"]]},
+        "CD4 4.5":{e:[[FP,"tips"]]}
+      },
+      ind:{
+        "4.1":["The log is unfinished or mostly wrong, even with the model: what people are doing is missing for one text, sentences copied, no purpose given.","Both texts logged with what people are doing, where and when and what they usually do, close to the model and often copied; the purpose named for at least one text.","Both texts logged accurately in short notes of their own, with the purpose of each text and a word from the text that shows it.","Accurate, concise log without help; infers a new word from context and compares how the two texts use language."],
+        "4.2":["No reasons, or an obviously unreliable page (a shop, an anonymous video) rated as reliable, even with the checklist.","Each page rated with one reason, or with reasons copied from the checklist without looking at the page; one page chosen.","Both pages rated correctly with two relevant reasons from the checklist (author, date, purpose, type of website); the better one chosen.","Rates the pages on their own with precise reasons, including the purpose (selling, getting views, informing) and the type of website, and explains the choice."],
+        "2.2":["Chart missing, or only the place is given, even after a second viewing with subtitles.","For each vlogger, what they are doing now or what they usually do, plus one detail, with subtitles or a second viewing.","For each vlogger, what they are doing now, what they usually do and two details (place, clothes or weather), using the images and key words.","Complete chart with precise details, says which words or images helped, and compares the two vloggers."],
+        "3.2":["Does not record the vlog, or reads a text the audience cannot follow; face and slides not visible.","Records the vlog with guidance and covers the basic content (where, what people are doing, likes), but the contrast now / usually is weak, reads parts, or changed nothing after the first recording.","Plans and records the vlog with Slides and face in picture-in-picture; contrasts now (Present Continuous) and usually (Present Simple); improves one part after watching the first recording; only glances at the notes.","A fluent, well-structured vlog with a good rhythm; the contrast is clear and natural; improves more than one part on their own; 1.5–2 minutes."],
+        "5.1":["Unfinished or not understandable; no clear parts, even with the template; no time expressions or tips.","The parts are there, close to the template or model; Present Continuous and Present Simple mostly correct; errors that do not block meaning; the tips are imperatives.","The seven parts of the model, adapted: time expressions, like / love / hate + -ing and tips with imperatives used correctly; at most 2–3 errors; short slide text.","A clear, well-linked script beyond the model (and, but, because, so; Daring: a temporary situation and an opinion), few errors, corrected on their own."],
+        "6.2":["Fewer than four facts, copied sentences, no credits, or wrong information.","Four facts with help, partly copied; a credit line incomplete, or a photo without a credit.","Four facts in key words from the required sources (Insecure: one given source; Safe and Daring: two), with full credit lines; photos and sources credited on the last slide.","Four accurate facts in their own words from well-chosen sources that they compared; everything credited completely, on their own."],
+        "CD2 2.2":["No editing: mistakes and long pauses are left, or the photos do not match the script.","Records with guidance; one mistake or long pause is left, or a photo is not with its part of the script.","Records with Slides and face in picture-in-picture, cuts at least one mistake or long pause, and places each photo with its caption and its script part.","Records and edits on their own: no mistakes or long pauses left, good rhythm, every photo with its caption and its part."],
+        "CD4 4.5":["No tips, or tips that are not about screens.","Two or three general tips, close to the model, without saying which one they will apply.","Tips with imperatives that prevent addictive habits (time limits, breaks, no phone before sleeping; Insecure two, Safe three, Daring three with a reason), and the one they will apply.","Three tips with reasons that prevent addictive habits, and explains the one they are applying and how it is going."],
+        process:["Most steps are missing.","One or two steps are missing.","Every step handed in; one is late or very general.","Every step handed in on time, specific and in their own words, with an honest self-assessment."]
+      },
+      names:{process:"Process evidence"}
+    };
   })()
 };

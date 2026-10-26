@@ -1,0 +1,120 @@
+/* 2 ESO · LS2 Free Time, Live! · Learning Path 6 · Write your vlog script (LS criterion 5.1: the script and the slide text, following a model) */
+window.LP = {
+  key: 'ls2Script2ESO', n: 6, title: 'Write your vlog script',
+  panels: [
+    { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 3 i 5', en: 'Recall: Learning Paths 3 and 5' }, pill: { ca: 'Sense apunts', en: 'No notes' },
+      intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
+      items: [
+        { q: 'I love ___ (skate).', a: ['skating'] },
+        { q: 'Tip: ___ a break every 30 minutes.', a: ['take'] },
+        { q: 'Tip: ___ use your phone in bed.', a: ["don't", 'do not'] },
+        { q: 'I usually go to the park, but today I ___ (stay) at home.', a: ['am staying', "'m staying"], ca: 'today → ara.', en: 'today → now.' },
+        { q: 'At the ___ she’s training for a show.', a: ['moment'] },
+        { q: 'Switch ___ your phone at night.', a: ['off'] },
+        { q: 'She hates ___ (lose).', a: ['losing'] },
+        { r: 'safe', q: 'Set a time ___ of one hour.', a: ['limit'] },
+        { r: 'safe', q: 'I ___ (want) a new helmet. (state verb)', a: ['want'] },
+        { r: 'daring', q: 'Go outside ___ of watching videos.', a: ['instead'] },
+        { r: 'daring', q: 'This week my cousin ___ (stay) with us.', a: ['is staying', "'s staying"] }
+      ] },
+    { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Paraules per al vlog', en: 'Words for your vlog' },
+      intro: { ca: 'Explora, practica amb les targetes (amb repàs de tota la LS) i completa les frases (80 %).', en: 'Explore, practise with the cards (with review from the whole LS) and complete the sentences (80 %).' },
+      receptive: 'subscribers · livestream · highlights',
+      groups: [
+        { g: 'Vlog phrases', items: [['Hi everyone!', 'Hola a tothom!', 'Hi everyone, welcome to my vlog!'], ['welcome to my vlog', 'benvinguts al meu vlog', 'Welcome to my vlog about climbing.'], ['today I’m at…', 'avui soc a…', 'Today I’m at the sports hall.'], ['in this photo…', 'en aquesta foto…', 'In this photo, we’re training.'], ['see you next time!', 'fins a la pròxima!', 'That’s all. See you next time!'], ['thanks for watching', 'gràcies per mirar-ho', 'Thanks for watching!']] },
+        { r: 'safe', g: 'Hobbies and commitment (Safe)', items: [['join a club', 'apuntar-se a un club', 'I want to join a dance club.'], ['train hard', 'entrenar fort', 'We train hard before a tournament.'], ['practise every day', 'practicar cada dia', 'She practises every day.'], ['get better at', 'millorar en', 'I’m getting better at skating.'], ['be good at', 'ser bo en', 'He’s good at drawing.'], ['spend time + -ing', 'passar temps fent', 'I spend time drawing at night.']] },
+        { r: 'daring', g: 'Opinions with state verbs (Daring)', items: [['I think (that)…', 'crec que…', 'I think skating is the best sport.'], ['I believe…', 'crec…', 'I believe everyone can learn.'], ['I prefer… to…', 'prefereixo… a…', 'I prefer the park to the sports hall.'], ['it means…', 'vol dir…', 'For me, climbing means freedom.'], ['I don’t need…', 'no necessito…', 'I don’t need expensive kit.']] }
+      ],
+      review: [
+        { g: 'Learning Paths 1–5', items: [['go cycling', 'anar amb bici', 'I go cycling on Sundays.'], ['helmet', 'casc', 'Wear a helmet.'], ['It’s windy', 'fa vent', 'It’s windy today.'], ['right now', 'ara mateix', 'Right now I’m filming.'], ['record a video', 'gravar un vídeo', 'I’m recording a video.'], ['take a break', 'fes una pausa', 'Take a break!']] },
+        { r: 'safe', g: 'Learning Paths 1–5', items: [['a tournament', 'un torneig', 'We’re in a tournament.'], ['upload a video', 'pujar un vídeo', 'We upload a video on Sundays.'], ['set a time limit', 'posa un límit de temps', 'Set a time limit.']] },
+        { r: 'daring', g: 'Learning Paths 1–5', items: [['the crowd', 'el públic', 'The crowd is cheering.'], ['a reliable source', 'una font fiable', 'Use a reliable source.'], ['instead of', 'en lloc de', 'Go outside instead of playing online.']] }
+      ],
+      practice: [
+        { q: 'Hi ___! Welcome to my vlog. (tothom)', a: ['everyone', 'everybody'] },
+        { q: '___ I’m at the skate park. (avui)', a: ['today'] },
+        { q: 'In this ___, my friends are skating. (foto)', a: ['photo', 'picture'] },
+        { q: 'That’s all! See you next ___! (fins a la pròxima)', a: ['time', 'week'] },
+        { q: 'Thanks for ___! (mirar-ho)', a: ['watching'] },
+        { q: 'I ___ time drawing every evening. (passar)', a: ['spend'] },
+        { r: 'safe', q: 'I want to ___ a climbing club.', a: ['join'] },
+        { r: 'safe', q: 'We train ___ before a tournament. (fort)', a: ['hard'] },
+        { r: 'safe', q: 'I’m getting ___ at skating: I don’t fall now!', a: ['better'] },
+        { r: 'daring', q: 'I ___ the park to the sports hall. (preferir)', a: ['prefer'] },
+        { r: 'daring', q: 'For me, climbing ___ freedom. (voler dir)', a: ['means'] }
+      ] },
+    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: a model vlog script', pill: '80 %',
+      intro: { ca: 'Llegeix el guió del vlog de la Noa. Fixa’t en les parts: salutació, ara, normalment, la foto, m’agrada, consells, crèdits i comiat.', en: 'Read Noa’s vlog script. Notice its parts: greeting, now, usually, the photo, likes, tips, credits and goodbye.' },
+      media: { text: {
+        insecure: '<p><strong>Slide 1 · Hi!</strong><br>Hi everyone! I’m Noa and this is my vlog about climbing.</p><p><strong>Slide 2 · Now</strong><br>Today I’m at the climbing wall. It’s cold outside, but it’s warm here. I’m wearing a T-shirt and climbing shoes. My friend Nil is climbing the red route.</p><p><strong>Slide 3 · Usually</strong><br>I usually climb on Saturday mornings. I train with my club.</p><p><strong>Slide 4 · Photo</strong><br>In this photo, we’re at a competition. Nil is climbing and we’re cheering.</p><p><strong>Slide 5 · I like…</strong><br>I love climbing because it’s like a puzzle. I don’t like falling!</p><p><strong>Slide 6 · Tips</strong><br>Two tips: take a break after thirty minutes on a screen. Don’t use your phone in bed.</p><p><strong>Slide 7 · Credits</strong><br>Photos: me and Climb Up Club. Facts: "Climbing", Encyclopedia website, 2026.<br>Thanks for watching! See you next time!</p>',
+        safe: '<p><strong>Slide 1 · Hi!</strong><br>Hi everyone! I’m Noa and welcome to my vlog about climbing.</p><p><strong>Slide 2 · Live now</strong><br>Today I’m at the climbing wall in my town. It’s cold and windy outside, about five degrees, but it’s nice and warm in here. I’m wearing a T-shirt, shorts and climbing shoes. Right now my friend Nil is climbing the red route, the hardest one, and the others are cheering.</p><p><strong>Slide 3 · Usually</strong><br>I usually climb on Saturday mornings with my club, and we always finish with a game. I practise twice a week because I want to get better.</p><p><strong>Slide 4 · Photo</strong><br>In this photo, we’re at the regional competition. Nil is climbing and we’re cheering. It’s a great memory!</p><p><strong>Slide 5 · I like…</strong><br>I love climbing because every route is like a puzzle, and I like meeting new people at the wall. I hate falling, but you learn from it.</p><p><strong>Slide 6 · Screen tips</strong><br>I watch climbing videos, but here are three tips: set a time limit of one hour. Take a break every thirty minutes. And don’t use your phone in bed: keep it out of your bedroom.</p><p><strong>Slide 7 · Credits</strong><br>Photos: me and Climb Up Club. Facts: "Climbing", Encyclopedia website, 2026.<br>Thanks for watching! See you next time!</p>',
+        daring: '<p><strong>Slide 1 · Hi!</strong><br>Hi everyone! I’m Noa and welcome to my vlog about climbing, my favourite hobby.</p><p><strong>Slide 2 · Live now</strong><br>Today I’m at the climbing wall in my town. It’s cold and windy outside, about five degrees, but it’s nice and warm in here. I’m wearing a T-shirt, shorts and climbing shoes, because you don’t need expensive kit. Right now my friend Nil is climbing the red route, the hardest one, and the others are cheering him on.</p><p><strong>Slide 3 · Usually</strong><br>I usually climb on Saturday mornings with my club, and we always finish with a game. This month I’m training three times a week, because the regional competition is in December and I want to get better.</p><p><strong>Slide 4 · Facts</strong><br>Did you know? Climbing is an Olympic sport since 2021, and there are three types: speed, bouldering and lead. I think bouldering is the most fun, because the routes are short and you don’t need a rope.</p><p><strong>Slide 5 · I like…</strong><br>I love climbing because every route is like a puzzle, and I like meeting new people at the wall. I hate falling, but I believe you learn more from a fall than from an easy route.</p><p><strong>Slide 6 · Screen tips</strong><br>I watch climbing videos, but here are my tips: set a time limit of one hour, because one hour is enough. Take a break every thirty minutes, so your eyes can rest. And keep your phone out of your bedroom, because the light keeps you awake. That’s the one I’m going to apply.</p><p><strong>Slide 7 · Credits</strong><br>Photos: me and Climb Up Club. Facts: "Climbing", Encyclopedia website, 2026; "Sport climbing", Olympics website, 2025.<br>Thanks for watching! See you next time!</p>'
+      } },
+      items: [
+        { q: 'What is Noa’s vlog about?', o: ['climbing', 'skating', 'basketball'], h: 'Mira la diapositiva 1.' },
+        { q: 'Where is Noa today?', o: ['at the climbing wall', 'at a competition', 'at home'], h: 'Mira la diapositiva 2.' },
+        { q: 'What is Nil doing right now?', o: ['climbing the red route', 'cheering', 'taking a photo'], h: 'Busca “Nil is…”.' },
+        { q: 'When does Noa usually climb?', o: ['on Saturday mornings', 'every evening', 'on Sundays'], h: 'Mira la diapositiva “Usually”.' },
+        { q: 'Why does Noa love climbing?', o: ['because it’s like a puzzle', 'because it’s easy', 'because it’s cheap'], h: 'Busca “I love climbing because…”.' },
+        { q: 'Which slide has the sources and the photo credits?', o: ['the last slide', 'the first slide', 'the “Now” slide'], h: 'Mira l’última diapositiva.' },
+        { r: 'safe', q: 'Why does Noa practise twice a week?', o: ['because she wants to get better', 'because the club is free', 'because her friends do it'] },
+        { r: 'safe', q: 'Which of these is one of Noa’s screen tips?', o: ['Set a time limit of one hour.', 'Watch climbing videos in bed.', 'Buy expensive kit.'] },
+        { r: 'daring', q: 'What is temporary in Noa’s routine this month?', o: ['She’s training three times a week.', 'She climbs on Saturday mornings.', 'She wears climbing shoes.'] },
+        { r: 'daring', q: 'Which tip is Noa going to apply?', o: ['keeping her phone out of her bedroom', 'setting a time limit', 'taking a break every thirty minutes'] }
+      ] },
+    { id: 'parts', type: 'mc', tab: { ca: 'Parts del guió', en: 'Script parts' }, title: { ca: 'Quina part del vlog és?', en: 'Which part of the vlog is it?' }, pill: '80 %',
+      intro: { ca: 'Un bon guió té parts clares. Per a cada frase, tria a quina part va.', en: 'A good script has clear parts. For each sentence, choose the part it belongs to.' },
+      items: [
+        { q: '“Hi everyone! I’m Pau and welcome to my vlog about basketball.”', o: ['Greeting (slide 1)', 'Now (slide 2)', 'Credits (last slide)'] },
+        { q: '“Right now I’m at the sports hall and my team is warming up.”', o: ['Now (slide 2)', 'Usually (slide 3)', 'Tips (slide 6)'] },
+        { q: '“I usually train on Tuesdays and Thursdays.”', o: ['Usually (slide 3)', 'Now (slide 2)', 'Photo (slide 4)'] },
+        { q: '“In this photo, we’re celebrating a win!”', o: ['Photo (slide 4)', 'Credits (last slide)', 'Greeting (slide 1)'] },
+        { q: '“I love playing because I like being in a team.”', o: ['I like… (slide 5)', 'Now (slide 2)', 'Credits (last slide)'] },
+        { q: '“Switch off your phone one hour before you sleep.”', o: ['Tips (slide 6)', 'Usually (slide 3)', 'Photo (slide 4)'] },
+        { q: '“Photos: me and my dad. Facts: "Basketball", Encyclopedia website, 2026.”', o: ['Credits (last slide)', 'Greeting (slide 1)', 'Now (slide 2)'] },
+        { r: 'safe', q: 'Which slide text is best? (short text, one idea)', o: ['Usually: Tuesdays and Thursdays · club · 2 hours', 'I usually train on Tuesdays and Thursdays with my club for two hours and we always finish with a game and then we go home.', 'Usually'] },
+        { r: 'daring', q: 'Which sentence links two parts of the script well?', o: ['“That’s what I do every week. But today is different!”', '“Now. Usually.”', '“Photo. Slide four.”'] }
+      ] },
+    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Repàs: les formes del vlog', en: 'Review: the forms of the vlog' }, pill: '80 %',
+      intro: { ca: 'Tot el que necessites per al guió: Present Continuous (ara), Present Simple (normalment), like + -ing, imperatius i expressions de temps.', en: 'Everything you need for the script: Present Continuous (now), Present Simple (usually), like + -ing, imperatives and time expressions.' },
+      explain: [
+        { ca: '<strong>El guió del vlog en quatre formes:</strong> ara → <em>I’m / she’s / they’re + -ing</em> (<em>Today I’m at…, Nil is climbing</em>) · normalment → Present Simple (<em>I usually climb on Saturdays</em>) · gustos → <em>love / like / hate + -ing</em> · consells → imperatius (<em>Take a break. Don’t…</em>). Expressions de temps: <em>today, right now, at the moment · usually, on Saturday mornings, twice a week</em>.', en: '<strong>The vlog script in four forms:</strong> now → <em>I’m / she’s / they’re + -ing</em> (<em>Today I’m at…, Nil is climbing</em>) · usually → Present Simple (<em>I usually climb on Saturdays</em>) · likes → <em>love / like / hate + -ing</em> · tips → imperatives (<em>Take a break. Don’t…</em>). Time expressions: <em>today, right now, at the moment · usually, on Saturday mornings, twice a week</em>.' },
+        { r: 'safe', en: '<strong>Linking sentences:</strong> <em>and</em> (adds), <em>but</em> (contrast), <em>because</em> (reason), <em>so</em> (result): <em>I love climbing because it’s like a puzzle, so I train twice a week.</em>' },
+        { r: 'daring', en: '<strong>Longer descriptions:</strong> join ideas with <em>and, but, because, so</em>, add a temporary situation (<em>This month I’m…</em>) and an opinion with a state verb (<em>I think…, I believe…, I prefer… to…</em>).' }
+      ],
+      items: [
+        { q: 'Today I ___ (be) at the skate park.', a: ['am', "'m"], ca: 'Today I am at…', en: 'Today I am at…' },
+        { q: 'Right now my friends ___ (skate).', a: ['are skating', "'re skating"], ca: 'right now → ara.', en: 'right now → now.' },
+        { q: 'I usually ___ (come) here on Saturdays.', a: ['come'], ca: 'usually → hàbit.', en: 'usually → habit.' },
+        { q: 'My sister ___ (not / come) with me: she hates skating.', a: ["doesn't come", 'does not come'], ca: 'Hàbit negatiu 3a persona.', en: 'Habit, third person negative.' },
+        { q: 'I love ___ (skate) because it’s fast.', a: ['skating'], ca: 'love + -ing.', en: 'love + -ing.' },
+        { q: 'In this photo, we ___ (wear) helmets.', a: ['are wearing', "'re wearing"], ca: 'A la foto → ara.', en: 'In the photo → now.' },
+        { q: 'Tip: ___ a break every thirty minutes.', a: ['take'], ca: 'Imperatiu.', en: 'Imperative.' },
+        { q: 'Tip: ___ use your phone in bed.', a: ["don't", 'do not'], ca: 'Imperatiu negatiu.', en: 'Negative imperative.' },
+        { q: 'It’s cold ___ (avui), so I’m wearing a jacket.', a: ['today'], ca: 'Expressió de temps.', en: 'Time expression.' },
+        { q: 'I train ___ a week: on Tuesdays and Thursdays. (dos cops)', a: ['twice'], ca: 'Freqüència.', en: 'Frequency.' },
+        { q: 'Write the -ing form: run → ___', a: ['running'] },
+        { q: 'Do you like ___ (watch) basketball?', a: ['watching'] },
+        { r: 'safe', q: 'I love climbing ___ it’s like a puzzle.', a: ['because'], en: 'Reason.' },
+        { r: 'safe', q: 'I want to get better, ___ I practise twice a week.', a: ['so'], en: 'Result.' },
+        { r: 'safe', q: 'I hate falling, ___ you learn from it.', a: ['but'], en: 'Contrast.' },
+        { r: 'safe', q: 'I ___ (want) to join a climbing club. (state verb)', a: ['want'], en: 'State verb: Present Simple.' },
+        { r: 'safe', q: 'I’m getting ___ at skating. (millor)', a: ['better'], en: 'get better at.' },
+        { r: 'daring', q: 'This month I ___ (train) three times a week for the competition.', a: ['am training', "'m training"], en: 'Temporary situation.' },
+        { r: 'daring', q: 'I ___ (think) bouldering is the most fun. (opinion)', a: ['think'], en: 'Opinion: no continuous.' },
+        { r: 'daring', q: 'I prefer the park ___ the sports hall.', a: ['to'], en: 'prefer A to B.' },
+        { r: 'daring', q: 'Join: “It’s cold. I’m wearing a jacket.” (result) → It’s cold, ___ I’m wearing a jacket.', a: ['so'], en: 'so = result.' },
+        { r: 'daring', q: 'For me, climbing ___ (mean) freedom.', a: ['means'], en: 'State verb, third person.' }
+      ] },
+    { id: 'write', type: 'writing', product: 5, tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: 'Peça 5: el guió del meu vlog', en: 'Piece 5: my vlog script' },
+      intro: { ca: 'Ajunta les peces 1, 2 i 4 i escriu el guió complet del teu vlog, diapositiva per diapositiva, seguint el model de la Noa. És el text que diràs al vídeo.', en: 'Put pieces 1, 2 and 4 together and write the full script of your vlog, slide by slide, following Noa’s model. This is the text you will say in the video.' },
+      task: { insecure: 'Escriu el guió (90–120 paraules) amb aquestes parts, una per diapositiva: 1 salutació · 2 ara (on ets, quin temps fa, què està fent la gent, què portes) · 3 normalment · 4 una foto (<em>In this photo, they’re… / They usually…</em>) · 5 m’agrada / no m’agrada · 6 dos consells de pantalla · 7 crèdits (fotos i font) i comiat. Fes servir expressions de temps (<em>today, right now, usually, on Saturdays</em>).', safe: 'Write the script (130–170 words) with one part per slide: 1 greeting · 2 live now (where, weather, what people are doing, clothes or kit) · 3 usually · 4 a photo · 5 likes and dislikes (love / like / hate + -ing) · 6 three screen tips with imperatives · 7 credits (photos and sources) and goodbye. Use time expressions and link sentences with <em>and, but, because, so</em>.', daring: 'Write the script (170–220 words) with one part per slide: 1 greeting · 2 live now · 3 usually, plus a temporary situation this month · 4 facts from your source (short research section) · 5 likes and dislikes with an opinion (<em>I think…, I prefer… to…</em>) · 6 three screen tips with a reason each, and the one you will apply · 7 credits (photos and two sources) and goodbye. Link your sentences with <em>and, but, because, so</em>.' },
+      frame: { insecure: '<strong>Pauta:</strong> Hi everyone! I’m ___ and this is my vlog about ___. · Today I’m at ___. It’s ___. ___ is ___-ing. I’m wearing ___. · I usually ___ on ___. · In this photo, ___ are ___-ing. They usually ___. · I love ___-ing because ___. I don’t like ___-ing. · Two tips: ___. Don’t ___. · Photos: ___. Facts: "___", ___, 2026. Thanks for watching!' },
+      min: { insecure: 90, safe: 130, daring: 170 },
+      checklist: { insecure: ['Set parts, una per diapositiva', 'Present Continuous per a “ara” i la foto', 'Present Simple per a “normalment”', 'love / like / hate + -ing', 'Dos consells amb imperatius', 'Crèdits de les fotos i de la font'], safe: ['Seven parts, one per slide', 'Present Continuous for now and the photo; Present Simple for usually', 'love / like / hate + -ing', 'Three screen tips with imperatives', 'Time expressions and and / but / because / so', 'Credits for photos and sources'], daring: ['Seven parts, one per slide', 'Now vs usually, plus a temporary situation', 'Facts from your source, in your own words', 'Opinions with state verbs', 'Three tips with reasons, and the one you will apply', 'Credits for photos and two sources'] } },
+    { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Speaking: assaja el guió', en: 'Speaking: rehearse your script' },
+      intro: { ca: 'Grava el teu guió com si gravessis el vlog. Mira les notes, no llegeixis. Després escolta’t: què canviaries?', en: 'Record your script as if you were recording the vlog. Use notes; don’t read. Then listen: what would you change?' },
+      task: { insecure: 'Digues les parts 1, 2 i 3 del teu guió (salutació, ara, normalment) en 30–45 segons.', safe: 'Say your whole script in 60–90 seconds, with a clear voice and a pause between slides.', daring: 'Say your whole script in 90–120 seconds, with a clear voice, a pause between slides and a link between parts (“But today is different!”).' },
+      model: { insecure: 'Hi everyone! I’m Noa and this is my vlog about climbing. Today I’m at the climbing wall. It’s cold outside. My friend Nil is climbing. I usually climb on Saturday mornings.', safe: 'Hi everyone! I’m Noa and welcome to my vlog about climbing. Today I’m at the climbing wall. It’s cold and windy outside, but it’s warm in here. Right now Nil is climbing the red route and we’re cheering. I usually climb on Saturday mornings with my club…', daring: 'Hi everyone! I’m Noa and welcome to my vlog about climbing, my favourite hobby. Today I’m at the climbing wall, and it’s freezing outside, but in here it’s warm. Right now Nil is climbing the red route and we’re cheering him on. That’s what we do every Saturday. But this month is different: I’m training three times a week, because the competition is in December…' } }
+  ]
+};

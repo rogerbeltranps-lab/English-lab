@@ -18,7 +18,8 @@ window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine"},
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine"},
-  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-"}
+  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-"},
+  {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-"}
 ];
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";
@@ -56,6 +57,26 @@ window.EL_CATALOG=(function(){
         L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam4ESO",7,{graded:false}),
         L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","3.2","4.2","5.1","6.1","CC1 1.3","CC3 3.2"],"ls2FinalProduct4ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect4ESO",1,{graded:false})
+      ];
+    })(),
+    ...(function(){
+      // 2ESO LS2 Free Time, Live! (built from the 4ESO LS2 model; docs/2eso/ls2-free-time-live/). Individual vlog, so no group steps.
+      const L=(file,title,criteria,key,points,o)=>A("2eso",file,title,criteria,[key],points,Object.assign({id:"2eso/ls2-"+file.replace(".html",""),ls:"2eso-free-time-live",path:"2eso/free-time-live/"+file},o||{}));
+      const C={mode:"practice"};
+      return [
+        L("getting-started.html","Getting started: what do you do in your free time? (warm-up)",["4.1","2.2"],"ls2GettingStarted2ESO",6,{graded:false}),
+        L("what-are-they-doing.html","What are they doing?",["4.1","2.2","5.1","3.2"],"ls2Doing2ESO",9,{skip:["write"],steps:[["log","Reading log"]]}),
+        L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint12ESO",1,C),
+        L("now-or-usually.html","Now or usually?",["2.2","5.1","3.2"],"ls2NowUsually2ESO",8,{skip:["write"],steps:[["chart","Listening chart"]]}),
+        L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1","5.1"],"ls2Checkpoint22ESO",1,C),
+        L("check-the-source.html","Check the source",["4.2","6.2"],"ls2Source2ESO",7,{steps:[["factfile","Fact file"]]}),
+        L("likes-and-screen-tips.html","Likes and screen tips",["2.2","5.1","3.2","CD4 4.5"],"ls2Tips2ESO",8,{skip:["write"]}),
+        L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint32ESO",1,C),
+        L("write-your-vlog-script.html","Write your vlog script",["4.1","5.1","3.2"],"ls2Script2ESO",8,{skip:["write"]}),
+        L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint42ESO",1,C),
+        L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam2ESO",7,{graded:false}),
+        L("free-time-vlog.html","Final product: Free Time Vlog",["3.2","4.2","5.1","6.2","CD2 2.2","CD4 4.5"],"ls2FinalProduct2ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["slides","2 · My slides"],["script","3 · My script"],["edit","4 · Record and edit"],["feedback","Feedback for my buddy"],["tips","5 · My tip"]],pieces:"ls2Products2ESO"}),
+        L("reflect.html","Reflect",[],"ls2Reflect2ESO",1,{graded:false})
       ];
     })()
   ];
@@ -112,4 +133,32 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
     "4eso/ls2-celebration-day-proposal":{video:["3.2","1.1","1.2","CC3 3.2"],email:["5.1","CC1 1.3"],submit:[]},
     "4eso/ls2-reflect":{reflect:[]}
   };
+})();
+// LS2 2ESO Free Time, Live!: steps per page and the criterion each step gives evidence for (docs/2eso/ls2-free-time-live/assessment-criteria.md).
+(function(){
+  const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]};
+  Object.assign(window.EL_ACTIONS,{
+    "2eso/ls2-getting-started":[...LP,"read","listen","speak"],
+    "2eso/ls2-what-are-they-doing":[...LP,"read","log","listen","grammar","mixed","write","speak"],
+    "2eso/ls2-now-or-usually":[...LP,"listen","chart","grammar","mixed","write","speak"],
+    "2eso/ls2-check-the-source":[...LP,"read","sources","credit","factfile"],
+    "2eso/ls2-likes-and-screen-tips":[...LP,"listen","grammar","mixed","write","speak"],
+    "2eso/ls2-write-your-vlog-script":[...LP,"read","parts","grammar","write","speak"],
+    "2eso/ls2-recall-checkpoint-1":["check"],"2eso/ls2-recall-checkpoint-2":["check"],"2eso/ls2-recall-checkpoint-3":["check"],"2eso/ls2-recall-checkpoint-4":["check"],
+    "2eso/ls2-sample-exam":["listen","chart","read","log","vocab","grammar","write"],
+    "2eso/ls2-free-time-vlog":["video","submit"],
+    "2eso/ls2-reflect":["reflect"]
+  });
+  Object.assign(window.EL_STEP_CRITERIA,{
+    "2eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
+    "2eso/ls2-what-are-they-doing":{read:["4.1"],log:["4.1"],listen:["2.2"],write:["5.1"],speak:["3.2"]},
+    "2eso/ls2-now-or-usually":{listen:["2.2"],chart:["2.2"],write:["5.1"],speak:["3.2"]},
+    "2eso/ls2-check-the-source":{read:["4.2"],sources:["4.2"],credit:["6.2"],factfile:["4.2","6.2"]},
+    "2eso/ls2-likes-and-screen-tips":{listen:["2.2"],write:["5.1","CD4 4.5"],speak:["3.2","CD4 4.5"]},
+    "2eso/ls2-write-your-vlog-script":{read:["4.1"],parts:["5.1"],write:["5.1"],speak:["3.2"]},
+    "2eso/ls2-recall-checkpoint-1":ck,"2eso/ls2-recall-checkpoint-2":ck,"2eso/ls2-recall-checkpoint-3":ck,"2eso/ls2-recall-checkpoint-4":ck,
+    "2eso/ls2-sample-exam":{listen:["2.2"],chart:["2.2"],read:["4.1"],log:["4.1"],write:["5.1"]},
+    "2eso/ls2-free-time-vlog":{video:["3.2","CD2 2.2"],submit:[]},
+    "2eso/ls2-reflect":{reflect:[]}
+  });
 })();
