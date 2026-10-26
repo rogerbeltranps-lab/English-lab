@@ -27,6 +27,7 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 <div class="page"><h1>Les meves activitats</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
+<script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-plan.js"></script>
@@ -77,7 +78,7 @@ function setLang(){
 }
 const doneSet=a=>{const p=D.pg[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
 // a step of a section the teacher has not opened yet for the group (elSecLocked; a vocabulary section holds the cards and practice steps)
-const secOff=(a,info,k)=>{if(info.status==="closed"||all())return false;const off=elSecLocked(a,info,D.me.group);return off.includes(k)||((k==="cards"||k==="practice")&&off.includes("vocab"))};
+const secOff=(a,info,k)=>{if(info.status==="closed"||all())return false;const off=elSecLockedFor(a,info,D.me.group,doneSet(a));return off.includes(k)||((k==="cards"||k==="practice")&&off.includes("vocab"))};
 // learning paths the teacher has opened for the group (elLpOpen in el-catalog.js); a closed LS can be reviewed
 const canDo=(a,info)=>info.status==="closed"||all()||elLpOpen(a,info,D.me.group);
 function cell(a){
@@ -121,7 +122,7 @@ function render(){
   S.pend=[];lss.forEach(l=>EL_CATALOG.filter(a=>a.ls===l.id).forEach(a=>{const r=D.rs[a.id]||{};if(a.graded&&!a.manual&&r.markedDone&&!r.locked&&(D.ls[l.id]||{}).status==="open")S.pend.push(a)}));
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
   const n=S.pend.length;
-  $("#main").innerHTML=lateBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
+  $("#main").innerHTML=lateBox(lss)+secBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
     +`<div class="bar">${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${l.title}</button>`).join("")} <span class="muted">· ${t("El teu nivell:","Your level:")}</span> ${route(elRouteOf(D.lv,ls.id).level)}${routeNote(ls.id)} ${stTag}</div>`
     +studyBox(ls)+weekBox(ls,info)
     +(only(ls.id)?onlyView(ls.id):`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
@@ -176,6 +177,14 @@ function onlyView(id){const g=EL_GRADING[id],e=g.exam,sc=(D.rs[id+"/assessment"]
 // "Done" = submitted or marked as done, or every scored step done. The final product is handed in on Classroom, so it is listed but never reminded.
 const isDone=a=>{const x=D.rs[a.id]||{};if(x.locked||x.markedDone)return true;const req=steps(a).filter(k=>!(a.skip||[]).includes(k)),d=doneSet(a);return req.length>0&&req.every(k=>d.has(k))};
 const lang=()=>EN?"en":"ca",when=d=>ELWeek.date(d,lang());
+// Sections the teacher has opened in a learning path and the student has not finished (elSecPending; Roger, 26 Oct 2026: they stay
+// on the to-do list until they finish them). The link opens that section's tab.
+function secBox(lss){const rows=[];
+  lss.forEach(l=>{const info=D.ls[l.id]||{status:"hidden",enabled:[]};if(info.status!=="open")return;
+    EL_CATALOG.filter(a=>a.ls===l.id&&canDo(a,info)).forEach(a=>elSecPending(a,info,D.me.group,doneSet(a)).forEach(([id,name])=>rows.push([a,id,name])))});
+  if(!rows.length)return "";
+  return `<div class="pend"><div><b>📌 ${t("Seccions per acabar:","Sections to finish:")}</b><ul>`
+    +rows.map(([a,id,name])=>`<li>${esc(a.title.split(/[:(]/)[0].trim())} · ${esc(name)} <a class="go" href="${a.path}#${id}">${t("Obre","Open")}</a></li>`).join("")+`</ul></div></div>`}
 function lateBox(lss){const today=ELWeek.today(),late=[];
   lss.forEach(l=>{const info=D.ls[l.id]||{status:"hidden",enabled:[]},p=(window.EL_PLAN||{})[l.id],gi=ELWeek.col(p,D.me.group);if(info.status!=="open"||gi<0)return;
     Object.keys(p.due||{}).forEach(id=>{const a=EL_CATALOG.find(x=>x.id===id),d=ELWeek.due(p,id,gi);if(a&&d&&d<today&&!a.manual&&canDo(a,info)&&!isDone(a))late.push([a,d])})});
