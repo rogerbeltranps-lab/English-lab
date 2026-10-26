@@ -274,6 +274,6 @@ document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(
 
 if(DEMO){U={uid:"demo"};D=DEMO;render()}
 else ELCloud.onUser(async u=>{U=u;
-  if(!u){nav(null,[]);$("#sub").textContent="Entra amb el compte del col·le (botó de baix a la dreta) per veure les teves activitats. · Sign in with your school account (button at the bottom right) to see your activities.";$("#main").innerHTML="";return}
+  if(!u){nav(null,[]);$("#sub").textContent="Entra amb el teu correu de l’institut i la contrasenya (botó de baix a la dreta) per veure les teves activitats. · Sign in with your school email and password (button at the bottom right) to see your activities.";$("#main").innerHTML="";return}
   D=await load(u);render();goLive()});
 </script></body></html>

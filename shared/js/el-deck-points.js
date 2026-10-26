@@ -310,7 +310,7 @@ lv.addEventListener("click",e=>{const b=e.target.closest("[data-live]");if(b){pa
 async function joinLive(u){
   const gen=++liveGen;[liveStop,buzzStop,ptStop,tmStop].forEach(f=>f&&f());liveStop=buzzStop=ptStop=tmStop=null;Q=null;mySid=0;joinQuiz.pending=0;
   ($(".bottom .mid")||document.body).append(lv);
-  if(!u||T.teacher){lv.innerHTML=T.teacher?"":`📺 ${B("Sign in with your school account (bottom right) to follow the class.","Entra amb el compte de l’institut per seguir la classe.")}`;if(!u)lv.append(signInBtn());return}
+  if(!u||T.teacher){lv.innerHTML=T.teacher?"":`📺 ${B("Sign in with your school email and password to follow the class.","Entra amb el correu de l’institut i la contrasenya per seguir la classe.")}`;if(!u)lv.append(signInBtn());return}
   const fb=await cloud();if(!fb||gen!==liveGen)return;const {S,db}=fb,em=(u.email||"").toLowerCase();Q={S,ref:S.doc(db,"live",LIVE,"answers",em)};
   if(bar.dataset.ls)S.getDoc(S.doc(db,"students",u.uid,"levels",bar.dataset.ls)).then(l=>{if(l.exists()&&l.data().level==="insecure"&&window.ELDeck)ELDeck.setCa(true)}).catch(()=>{});   // Catalan for Insecure
   liveStop=S.onSnapshot(S.doc(db,"live",LIVE),s=>{lastLive=s.exists()?s.data():null;liveDraw()},e=>{console.warn("live",e);lv.innerHTML=`📺 ${B("You cannot follow this class.","No pots seguir aquesta classe.")}`});
@@ -325,7 +325,8 @@ async function joinLive(u){
   }catch(e){console.warn("buzz",e)}
 }
 function signInBtn(){const b=document.createElement("button");b.type="button";b.innerHTML=B("Sign in","Entra");
-  b.onclick=async()=>{const fb=await cloud();if(!fb)return;try{const p=new fb.A.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});await fb.A.signInWithPopup(fb.auth,p)}catch(x){console.warn("sign in",x)}};return b}
+  b.onclick=async()=>{const fb=await cloud();if(!fb)return;   // school email + password (el-signin.js)
+    try{const [{signIn},C]=await Promise.all([import(new URL("el-signin.js",SRC).href),import(new URL("el-firebase.js",SRC).href)]);await signIn({auth:fb.auth,A:fb.A,domain:C.DOMAINS[0]})}catch(x){console.warn("sign in",x)}};return b}
 if(LIVE){cloud();setInterval(()=>{if(lastLive)liveDraw()},60e3)}   // the class ends: no new minute from the teacher
 
 draw();toggle(!!store.get("teamsOn",false));

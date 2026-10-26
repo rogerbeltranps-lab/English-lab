@@ -1,14 +1,16 @@
-// English Lab cloud: Google sign-in (school domain), per-LS progress sync, LS release gate,
+// English Lab cloud: sign-in (students: school email + password; teacher: Google; el-signin.js), per-LS progress sync, LS release gate,
 // route (level) choice, teacher-enabled graded activities, once-only activities, points per completed action.
 import "./el-copyright.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {signIn} from "./el-signin.js";
 import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
 
 const SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
 
+const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
 let stopJoin=null,joinGen=0,myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
@@ -61,18 +63,17 @@ function push(){
 Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.test(k))return;origSet.call(this,k,v);if(this===localStorage&&!SKIP.test(k))push()};
 
 async function login(){
-  const p=new GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
-  const r=await signInWithPopup(auth,p);
-  if(!isStudent(r.user)&&!isTeacher(r.user)){await signOut(auth);alert("Sign in with your school account (@"+DOMAINS.join(", @")+").");return}
-  if(isStudent(r.user)&&!isTester(r.user)&&(await onRoster(r.user))===null)return;   // refused in onAuthStateChanged
+  const u=await signIn({auth,A,domain:DOMAINS[0]});if(!u)return;
+  if(!isStudent(u)&&!isTeacher(u)){await signOut(auth);alert("Sign in with your school email (@"+DOMAINS.join(", @")+").");return}
+  if(isStudent(u)&&!isTester(u)&&(await onRoster(u))===null)return;   // refused in onAuthStateChanged
   // Right after signing in: students (testers too) go to their board, except on English Lab, where they stay to use it;
   // the teacher goes from Home to the dashboard and stays on any other page (to preview it).
-  if(isStudent(r.user)&&!onBoard&&!onLab)location.href=BOARD;
-  else if(isTeacher(r.user)&&onHome)location.href=DASH;
+  if(isStudent(u)&&!onBoard&&!onLab)location.href=BOARD;
+  else if(isTeacher(u)&&onHome)location.href=DASH;
 }
 async function refuse(u){
   const mail=u.email;await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");
-  const o=overlay('<div style="max-width:520px"><h1>Aquest compte no pot entrar</h1><p><b></b> no és a la llista d\'alumnes d\'English Lab. Entra amb el teu correu de l\'institut o parla amb el professor.</p><p><button style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit">Entra amb un altre compte</button></p></div>');
+  const o=overlay('<div style="max-width:520px"><h1>Aquest compte no pot entrar</h1><p><b></b> no és a la llista d\'alumnes d\'English Lab. Entra amb el teu correu de l\'institut i la contrasenya que t\'ha donat el professor, o parla amb ell.</p><p><button style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit">Entra amb un altre compte</button></p></div>');
   o.style.zIndex=10001;o.querySelector("b").textContent=mail;o.querySelector("button").onclick=()=>{o.remove();login()};
 }
 // Shared school computers: never leak one student's local progress into another account.
@@ -101,7 +102,7 @@ const block=(title,msg)=>overlay('<div><h1>'+title+'</h1><p>'+msg+'</p>'+todayLi
 // Signed-out visitors on an LS page: the sign-in button sits in the overlay itself; it goes away once someone signs in.
 let signInO=null;
 function signInBlock(){
-  signInO=overlay('<div style="max-width:520px"><h1>Sign in with your school account</h1><p>To do the activities you need to sign in with your school account (@'+DOMAINS.join(", @")+').</p><p><button style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit">Sign in with your school account</button></p></div>');
+  signInO=overlay('<div style="max-width:520px"><h1>Sign in</h1><p>To do the activities you need to sign in with your school email (@'+DOMAINS.join(", @")+') and the password your teacher gave you.</p><p><button style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit">Sign in</button></p></div>');
   signInO.querySelector("button").onclick=login;
 }
 
@@ -212,7 +213,7 @@ function bar(){
   document.body.appendChild(el);
   return u=>{el.innerHTML="";
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
-    if(!u)el.append("Not signed in ",b("Sign in with your school account",login));
+    if(!u)el.append("Not signed in ",b("Sign in",login));
     else{el.append(u.displayName||u.email," ");
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
