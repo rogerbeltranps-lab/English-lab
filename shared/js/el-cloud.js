@@ -234,6 +234,19 @@ function menuLink(u){
   document.querySelectorAll(".lp-home-link").forEach(h=>add(h,"lp-home-link","☰ "));
   document.querySelectorAll(".site-header .home-link").forEach(h=>add(h,"home-link",""));
 }
+// Vocabulary and grammar summary on the LS page (Roger, 26 Oct 2026): the "Language & Knowledge" tab has an empty card ([data-el-study]);
+// for an LS with `study` in EL_LS it gets the student's route PDF (nothing until they have a route), the teacher and testers all three.
+function studyCard(u){
+  const el=document.querySelector("[data-el-study]"),ls=(window.EL_LS||[]).find(x=>x.id===lsId);
+  if(!el||!ls||!ls.study||!u)return;
+  const every=isTeacher(u)||seesAll(u),lv=myLevel,ca=!every&&lv==="insecure";
+  if(!every&&!lv)return;
+  const a=r=>'<a href="'+new URL(ls.study+r+".pdf",ROOT).href+'" download style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📥 '+(ca?"Descarrega el resum":"Download the summary")+(every?" · "+EL_LEVELS.find(x=>x.id===r).name:"")+" (PDF)</a>";
+  el.innerHTML="<h2>📚 "+(ca?"Resum del vocabulari i la gramàtica":"Vocabulary and grammar summary")+"</h2><p>"
+    +(ca?"Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. Descarrega'l quan vulguis per estudiar. És opcional: fes-lo servir si et va bé.":"All the vocabulary and then all the grammar of your route, with the explanations and practice. Download it whenever you want to study. It is optional: use it if it helps you.")
+    +"</p><p>"+(every?EL_LEVELS.map(x=>a(x.id)).join(""):a(lv))+"</p>";
+  el.hidden=false;
+}
 let draw=()=>{};
 const start=()=>{draw=bar();draw(user)};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start):start();
@@ -253,6 +266,7 @@ onAuthStateChanged(auth,async u=>{
   menuLink(u);   // again after gate, which knows the route (the label follows its language)
   try{await gate(u)}catch(e){console.warn("gate",e)}
   menuLink(u);
+  studyCard(u);
   // Floating weekly to-do list for students (and testers) on every page that loads this file (shared/js/el-todo.js).
   if(u&&isStudent(u)&&myGroup&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:u,group:myGroup,root:ROOT,lsId,seesAll:seesAll(u)})).catch(e=>console.warn("todo",e));
   listeners.forEach(f=>f(u));
