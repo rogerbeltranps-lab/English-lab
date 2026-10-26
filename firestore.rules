@@ -28,6 +28,10 @@ service cloud.firestore {
     match /teacherPlan/{group} {
       allow read, write: if isTeacher();
     }
+    // The teacher's dashboard settings (routes: the LS1 exam cut-offs per course): only the teacher
+    match /settings/{id} {
+      allow read, write: if isTeacher();
+    }
     match /assignments/{day} {
       allow read: if signedIn() || isTeacher();
       allow write: if isTeacher();
@@ -45,7 +49,7 @@ service cloud.firestore {
         && shortText(request.resource.data.get('title', null), 200) && shortText(request.resource.data.get('section', null), 200)
         && shortText(request.resource.data.get('ls', null), 80) && shortText(request.resource.data.get('activity', null), 120)
         && shortText(request.resource.data.get('device', null), 100)
-        && request.resource.data.get('route', null) in [null, 'insecure', 'safe', 'daring']
+        && request.resource.data.get('route', null) in [null, 'beginners', 'insecure', 'safe', 'daring']
         && request.resource.data.get('group', null) in [null, '2ESOA', '2ESOB', '4ESOA', '4ESOB']
         && request.resource.data.get('errors', []) is list && request.resource.data.get('errors', []).size() <= 5
         && request.resource.data.get('shot', null) in [null, 'page', 'file']
@@ -126,17 +130,9 @@ service cloud.firestore {
         allow create, update: if signedIn() && request.auth.uid == uid
           && ((lsOpen(ls) && lsForMe(ls, uid) && !progressChanged().hasAny(lockedFor(ls, 'lockedKeys'))) || isTester());
       }
-      // route (level): the student picks it once; later changes are only a request (with an optional reason) the teacher accepts or declines.
-      // The teacher can also set it directly at any time.
+      // route (level): only the teacher sets it (Roger, 26 Oct 2026: from the LS1 exam mark); students read it, never choose or ask.
       match /levels/{ls} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
-        allow create: if signedIn() && request.auth.uid == uid
-          && request.resource.data.keys().hasOnly(['level','updated'])
-          && request.resource.data.level in ['insecure','safe','daring'];
-        allow update: if signedIn() && request.auth.uid == uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['request','requestedAt','reason'])
-          && request.resource.data.request in ['insecure','safe','daring']
-          && request.resource.data.get('reason', '') is string && request.resource.data.get('reason', '').size() <= 300;
         allow write: if isTeacher();
       }
       // results: students cannot touch feedback, nor edit a locked (submitted) result

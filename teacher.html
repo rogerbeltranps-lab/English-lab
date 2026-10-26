@@ -60,6 +60,7 @@ async function load(){
   try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
   try{(await F.getDocs(F.collection(db(),"points"))).forEach(p=>D.pt[p.id]=p.data());(await F.getDocs(F.collection(db(),"teams"))).forEach(t=>D.tm[t.id]=t.data())}catch(e){D.ptErr=true;console.warn("points",e)}
   try{(await F.getDocs(F.collection(db(),"teacherPlan"))).forEach(t=>D.tk[t.id]=t.data())}catch(e){console.warn("teacherPlan",e)}
+  try{const c=await F.getDoc(F.doc(db(),"settings","routes"));if(c.exists())D.cuts=c.data()}catch(e){console.warn("settings",e)}
   try{(await F.getDocs(F.collection(db(),"problems"))).forEach(x=>D.pb.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("problems",e)}
   (await F.getDocs(F.collection(db(),"students"))).forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()));
   (await F.getDocs(F.collectionGroup(db(),"results"))).forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data());
@@ -88,6 +89,10 @@ const api={
     for(let i=0;i<ops.length;i+=400){const b=F.writeBatch(db());ops.slice(i,i+400).forEach(f=>f(b));await b.commit()}},
   // route: setting it (directly or by accepting a request) clears any request; declining keeps the route and tells the student (declined)
   setLevel:(u,ls,level)=>{if(DEMO){const l=((S.D.lv[u]=S.D.lv[u]||{})[ls]=S.D.lv[u][ls]||{});l.level=level;delete l.request;delete l.reason;delete l.declined;return}return put(["students",u,"levels",ls],{level,request:F.deleteField(),reason:F.deleteField(),declined:F.deleteField()})},
+  // routes from the LS1 exam: several students at once (same fields as setLevel); cut-offs per course in settings/routes
+  setLevels:(ls,pairs)=>{if(DEMO){pairs.forEach(([u,l])=>api.setLevel(u,ls,l));return}const b=F.writeBatch(db());
+    pairs.forEach(([u,level])=>b.set(F.doc(db(),"students",u,"levels",ls),sub({level,request:F.deleteField(),reason:F.deleteField(),declined:F.deleteField()}),{merge:true}));return b.commit()},
+  cuts:(c,o)=>{(S.D.cuts=S.D.cuts||{})[c]=o;return put(["settings","routes"],{[c]:o})},
   reject:(u,ls)=>{const l=S.D.lv[u][ls],to=l.request;if(DEMO){delete l.request;delete l.reason;l.declined=to;return}return put(["students",u,"levels",ls],{request:F.deleteField(),reason:F.deleteField(),declined:to,declinedAt:F.serverTimestamp()})},
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
   ls:(id,o)=>DEMO?Object.assign(S.D.ls[id],o):put(["ls",id],o),
@@ -132,7 +137,8 @@ const fold=(k,title,html,cls="",force)=>`<details data-k="${k}" class="${cls}" $
 let COURSE=null;   // course of the group on screen: criteria texts depend on it
 const pill=c=>`<span class="pill ce${c[0]}" data-do="crit" data-c="${c}" tabindex="0" title="${esc(elCompetence(c)+" · "+c+": "+(elCriterion(COURSE,c)||"–"))}">${c}</span>`;
 const route=l=>l?`<span class="route r-${l}">${LV[l]||l}</span>`:'<span class="route r-none">–</span>';
-const level=(u,ls)=>((S.D.lv[u]||{})[ls]||{}).level;
+// A student's route in an LS: its own, or carried over from an earlier LS of the course (elRouteOf in el-catalog.js)
+const level=(u,ls)=>elRouteOf(S.D.lv[u],ls).level;
 const acts=ls=>cat.filter(a=>a.ls===ls);
 const steps=a=>EL_ACTIONS[a.id]||[];
 const doneSet=(u,a)=>{const p=(S.D.pg[u]||{})[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
@@ -185,10 +191,12 @@ function onTime(u,id,step,g){const due=dueOf(id,g);if(!due)return undefined;cons
 const avg=vs=>{vs=vs.map(v=>v==null?(S.zero?0:null):v).filter(v=>v!=null);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null};
 const wavg=ps=>{let s=0,w=0;ps.forEach(([v,x])=>{if(v==null){if(!S.zero)return;v=0}s+=v*x;w+=x});return w?s/w:null};
 const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).title||id)+" · "+k;
-function gvBlock(u,g){const v=G().gv,acc=v.items.map(([id,k])=>pct(firstOf(u,id,k))),used=[];let A=avg(acc);
-  v.optional.forEach(([id,k])=>{const x=pct(firstOf(u,id,k));if(x==null)return;const B=avg([...acc,x]);if(A==null||B>A){acc.push(x);A=B;used.push(id)}});   // only if it raises the mark
-  const T=avg(v.items.map(([id,k])=>onTime(u,id,k,g)).filter(x=>x!==undefined).map(x=>x==null?x:x*10));
-  return {mark:wavg([[A,v.first],[T,v.onTime]]),acc:A,onTime:T,used}}
+// Grammar and vocabulary: weighted parts (EL_GRADING[ls].gv.parts). first: the average first-try score of those steps (checkpoints, recall
+// warm-ups: delayed retrieval); time: the share of those steps done by their session deadline (teaching plan), out of 10.
+function gvBlock(u,g){const parts=G().gv.parts.map(p=>({...p,v:p.first?avg(p.first.map(([id,k])=>pct(firstOf(u,id,k))))
+    :avg(p.time.map(([id,k])=>onTime(u,id,k,g)).filter(x=>x!==undefined).map(x=>x==null?x:x*10))}));
+  return {mark:wavg(parts.map(p=>[p.v,p.w])),parts}}
+const gvSum=B=>(B.gv.parts||[]).map(p=>p.name+" "+f1(p.v)+" × "+p.w+" %").join(" + ");
 function otherCrit(u,c){const g=G();
   const auto=avg((g.auto[c]||[]).map(([id,k,first])=>first?pct(firstOf(u,id,k)):doneAt(u,id,k)?10:null));
   const teacher=avg((g.teacher[c]||[]).map(([id,k])=>lvMark(lvOf(u,id,k,c))));
@@ -259,7 +267,7 @@ function render(){
   const shown=inG.filter(s=>(S.route==="all"||(level(s.uid,ls)||"none")===S.route)&&(S.tutor==="all"||s.ro&&s.ro.tutor===S.tutor));
   const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${l.title}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}</select> `:`<b>${lss[0].title}</b>${mine(lss[0])?"":" <small class=\"muted\">(not assigned to this group)</small>"} `)
     +`<a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a> `
-    +`<span class="muted">· Route:</span> `+["all","beginners","insecure","safe","daring","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"Not chosen":LV[r]}</button>`).join("")
+    +`<span class="muted">· Route:</span> `+["all","beginners","insecure","safe","daring","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"No route":LV[r]}</button>`).join("")
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"")
     +(G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
@@ -267,9 +275,10 @@ function render(){
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
     +lpBox(ls,grp)
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`+pbBox()
+    +routesBox(grp,inG.filter(s=>!s.tester))
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
-    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time or to answer a route request (🔁).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
+    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time (↩ = carried over from an earlier LS; set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
     +(G()&&!G().only?gradeBox(shown):"")
@@ -279,7 +288,41 @@ function render(){
     +`<div class="box">${fold("settings","LS status and groups",lsSettings(ls))}</div>`+rosterBox();
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
 }
-function todo(studs,ls,list){   // studs: signed-in students only. Only final product items and route requests; submissions without feedback are not listed (Roger, 2026-10-24)
+// ---- routes from the LS1 exam (Roger, 26 Oct 2026): the teacher sets every route; students no longer choose or ask for one.
+// The course's first LS with an exam in EL_GRADING is the source: its exam mark (sum of scores ÷ sum of maxes × 10, as on the LS
+// grade) gives a suggested route with the course's cut-offs (EL_ROUTE_CUTS, or settings/routes once changed here). Roger checks the
+// preview, can change any row or leave it out, and applies it to one LS; later LSs take that route until he changes it (elRouteOf).
+const cutsOf=c=>Object.assign({},EL_ROUTE_CUTS[c],(S.D.cuts||{})[c]);
+const srcLs=c=>EL_LS.find(l=>l.course===c&&((window.EL_GRADING||{})[l.id]||{}).exam);
+function examMark(u,ls){const e=EL_GRADING[ls].exam,x=res(u,asId(ls)).sections||{};let s=0,m=0,n=0;
+  e.sections.forEach(([k,,mx])=>{const y=x[k];if(y&&y.score!=null){s+=+y.score;m+=+(y.max||mx||e.max);n++}});
+  return m?{mark:s/m*10,n,of:e.sections.length}:null}
+function rtRows(c,src,to,studs){const cu=cutsOf(c);S.rtPick=S.rtPick||{};S.rtOn=S.rtOn||{};
+  return studs.filter(s=>!s.away).map(s=>{const ex=examMark(s.uid,src.id),sug=ex?elRouteFromMark(ex.mark,cu):null,now=elRouteOf(S.D.lv[s.uid],to),
+    mine=S.rtPick[s.uid]!==undefined,pick=mine?S.rtPick[s.uid]:sug,
+    // ticked by default when the route changes and the exam is complete (or Roger picked the route himself)
+    on=!!pick&&(S.rtOn[s.uid]!==undefined?S.rtOn[s.uid]:pick!==now.level&&(mine||!!ex&&ex.n===ex.of));
+    return {s,ex,sug,now,pick,on}})}
+function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.filter(l=>l.course===c&&l.id!==src.id):[];if(!later.length)return "";
+  if(!later.some(l=>l.id===S.rtTo))S.rtTo=later.some(l=>l.id===S.ls)?S.ls:later[later.length-1].id;
+  const to=S.rtTo,cu=cutsOf(c),def=EL_ROUTE_CUTS[c],rows=rtRows(c,src,to,studs),away=studs.filter(s=>s.away),n=rows.filter(r=>r.on).length;
+  const cnt={};rows.forEach(r=>{const k=r.ex?r.sug:"none";cnt[k]=(cnt[k]||0)+1});
+  const inp=k=>`<input type="number" step="0.1" min="0" max="10" data-do="cut" data-k="${k}" value="${cu[k]}" style="width:58px">`;
+  const sel=r=>`<select data-do="rtpick" data-u="${r.s.uid}"><option value="">–</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===r.pick?"selected":""}>${x.name}</option>`).join("")}</select>`;
+  const body=`<p class="muted">Each student's ${lsName(src.id)} exam mark gives a route with these cut-offs. Check the list, change any route or untick a student, then apply it to one LS. Later LSs keep that route until you change it (↩ in the Route column), and you can still change one student's route by clicking their Route cell. Their work so far is kept.</p>`
+    +`<div class="bar"><b>Cut-offs (${c==="2eso"?"2 ESO":"4 ESO"}, mark out of 10):</b> ${route("beginners")} under ${inp("beginners")} · ${route("insecure")} under ${inp("insecure")} · ${route("safe")} under ${inp("safe")} · ${route("daring")} from ${f1(cu.safe)}`
+    +(["beginners","insecure","safe"].some(k=>cu[k]!==def[k])?` <button class="g" data-do="cutdef">Back to ${def.beginners} · ${def.insecure} · ${def.safe}</button>`:"")+`</div>`
+    +`<p>${["beginners","insecure","safe","daring"].map(k=>`${route(k)} ${cnt[k]||0}`).join(" · ")}${cnt.none?` · <span class="muted">no exam mark: ${cnt.none}</span>`:""}</p>`
+    +`<div class="bar"><label for="rtto" style="font-weight:600">Apply to</label><select id="rtto" data-do="rtto">${later.map(l=>`<option value="${l.id}" ${l.id===to?"selected":""}>${esc(l.title)}</option>`).join("")}</select>`
+    +`<button data-do="rtapply" ${n?"":"disabled"}>Apply ${n} change${n===1?"":"s"}</button></div>`
+    +(rows.length?`<div class="wrap"><table><thead><tr><th>Apply</th><th class="stu">Student</th><th>${lsName(src.id)} exam</th><th>Now in ${lsName(to)}</th><th>New route</th></tr></thead><tbody>`
+      +rows.map(r=>{const ex=r.ex?f1(r.ex.mark)+(r.ex.n<r.ex.of?` <small class="muted" title="Only these sections are entered: the mark may change">(${r.ex.n}/${r.ex.of} sections)</small>`:""):'<span class="muted">no mark</span>';
+        const carried=r.now.level&&r.now.from!==to,same=r.pick&&r.pick===r.now.level;
+        return `<tr><td><input type="checkbox" data-do="rton" data-u="${r.s.uid}" ${r.on?"checked":""} ${r.pick?"":"disabled"}></td><td class="stu">${name(r.s)}</td><td>${ex}</td><td>${route(r.now.level)}${carried?" ↩":""}</td><td>${sel(r)}${r.pick&&r.pick!==r.sug&&r.ex?' <small class="muted" title="Changed by you">✎</small>':""}${same?' <small class="muted">same</small>':""}</td></tr>`}).join("")
+      +`</tbody></table></div>`:'<p class="muted">No signed-in students in this group yet.</p>')
+    +(away.length?`<p class="muted">Not signed in yet (a route can be set once they sign in): ${away.map(name).join(" · ")}</p>`:"");
+  return `<div class="box">${fold("routes","🧭 Routes from the LS1 exam",body)}</div>`}
+function todo(studs,ls,list){   // studs: signed-in students only. Only final product items and route requests left from before 26 Oct 2026 (students cannot ask any more); submissions without feedback are not listed (Roger, 2026-10-24)
   const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
   studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>out.push(`✉️ <b>${name(s)}</b> commented on <b>${esc(t)}</b> (${esc(a.title)}): “${esc(handedIn(s.uid,a)[id].comment)}” <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button>`))));
   studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
@@ -287,7 +330,7 @@ function todo(studs,ls,list){   // studs: signed-in students only. Only final pr
   const np=S.D.pb.filter(x=>!x.fixed).length;
   if(np)out.push(`⚠️ ${np} open problem report${np>1?"s":""} from students (all groups) <button data-do="pbopen">Read</button>`);
   const fp=list.find(a=>a.manual),nm=fp?studs.filter(s=>!((S.D.rs[s.uid]||{})[fp.id]||{}).max).length:0;
-  return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer, no route requests and no open problem reports.</p>')
+  return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer and no open problem reports.</p>')
     +(fp&&nm?`<p class="muted">📝 ${nm} student${nm>1?"s":""} without a final product mark (click their Final product score to mark it).</p>`:"");
 }
 // ---- team points (shared/js/el-points.js; root AGENTS.md "Team points"): the group's teams and each student's points per term.
@@ -353,13 +396,13 @@ function gradeBox(studs){
     if(s.away)return `<tr class="away">${who}<td>${route()}</td><td colspan="${g.blocks.length+(tm?2:1)}" style="text-align:left">Not signed in yet</td></tr>`;
     const {B,total}=grade(s),o=(g.other||[]).map(c=>{const x=otherCrit(s.uid,c);return c+": "+f1(x.mark)+" (auto "+f1(x.auto)+" · levels "+f1(x.teacher)+")"}).join("\n");
     const tip={exam:"Exam sections, score out of max (click to enter)",fp:g.fp.mark?"Your mark in the final product dialog":g.fp.rows.map(r=>r.name+" "+r.w+" %: "+(lvOf(s.uid,fpA,r.step,r.c)||"–")).join("\n"),
-      gv:g.gv?`First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %`:"",other:o};
+      gv:g.gv?gvSum(B):"",other:o};
     const val={exam:B.exam,fp:B.fp,gv:B.gv.mark,other:B.other};
     return `<tr>${who}${rtCell(s.uid)}${tm?`<td><small>${esc(teamOf(s.uid,fpA))||"–"}</small></td>`:""}`
       +g.blocks.map(b=>`<td class="gr" data-do="grade" data-u="${s.uid}" title="${esc(tip[b.id])}">${f1(val[b.id])}</td>`).join("")
       +`<td class="first gr tot" data-do="grade" data-u="${s.uid}">${f1(total)} ${deg(elDegree(total))}</td></tr>`}).join("");
   const key=g.only?`<p class="muted">Marks out of 10. Only the final exam and the final product count in this LS (Roger, 25 Oct 2026): its learning paths are practice. Exam: sum of section scores ÷ sum of maxes; enter it below or by clicking a mark. Final product: the mark you give in its dialog (click a student's mark here, then "Open the final product").</p>`
-    :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: first-try accuracy of vocabulary practice, grammar, mixed practice, register, recall warm-ups and checkpoints (optional ones only if they raise it) ${g.gv.first} % + done by its session deadline (teaching plan) ${g.gv.onTime} %. Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
+    :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: ${g.gv.parts.map(p=>p.name.toLowerCase()+" "+p.w+" %").join(" + ")} (accuracy only from delayed retrieval; practice, grammar and mixed practice count as done by the session deadline in the teaching plan). Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
   return `<div class="box"><h2>LS grade</h2><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1" title="As in the grading plan: missing work counts 0 until it is handed in">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0" title="Mark so far: only what is done or assessed counts">not counted yet</button></div>`
     +fold("gradekey","How it is worked out",key,"key")
     +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`:"")
@@ -536,14 +579,14 @@ function again(){const d=$("#dlg"),c=$("#dlgc");if(!d.open||!redraw)return;const
 function gradePanel(u){redraw=()=>gradePanel(u);
   const s=S.P[u],g=G(),{B,total}=grade(s),id=asId(S.ls),x=res(u,id),sc=x.sections||{},e=g.exam,fpA=g.fp.a;
   const row=(l,v,extra)=>`<tr><td style="text-align:left">${l}</td><td>${v}</td><td style="text-align:left"><small class="muted">${extra||""}</small></td></tr>`;
-  const gvRows=!g.gv?"":[...g.gv.items.map(i=>[...i,0]),...g.gv.optional.map(i=>[...i,1])].map(([a,k,opt])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
-    return row(stepName(a,k)+(opt?' <small class="muted">(optional'+(B.gv.used.includes(a)?", counts":"")+")</small>":""),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===0?" late":""):""))}).join("");
+  const gvRows=!g.gv?"":g.gv.parts.map(p=>`<tr><th colspan="3" style="text-align:left">${esc(p.name)} · ${p.w} % · <b>${f1((B.gv.parts.find(x=>x.id===p.id)||{}).v)}</b></th></tr>`+(p.first||p.time).map(([a,k])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
+    return row(stepName(a,k),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===0?" late":""):""))}).join("")).join("");
   const blk=(id,title,mark,body)=>`<details data-k="gp-${id}" ${S.open.has("gp-"+id)?"open":""}><summary style="font-size:1rem">${title} · <b>${f1(mark)}</b></summary>${body}</details>`;
   dlg(`<h3>${name(s)} · LS grade</h3><p class="muted">${route(level(u,S.ls))}${hasTeams()?" · Group: "+(esc(teamOf(u,fpA))||"–"):""} · Missing work ${S.zero?"counts 0":"not counted yet"}</p>`
     +`<p><b>LS mark: ${f1(total)} ${deg(elDegree(total))}</b> <small class="muted">${g.blocks.map(b=>b.name+" "+b.w+" %").join(" · ")}</small></p>`
     +blk("exam",`Final exam (${g.blocks.find(b=>b.id==="exam").w} %)`,B.exam,`<table class="lvt"><tbody>${e.sections.map(([k,n])=>`<tr><td>${n}</td><td><input class="ex" data-ex="${u}" data-k="${k}" data-f="score" type="number" step="0.25" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${u}" data-k="${k}" data-f="max" type="number" value="${sc[k]&&sc[k].max!=null?sc[k].max:secMax(e,k)}"></td></tr>`).join("")}${e.level?`<tr><td>Writing level ${pill(e.level.c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td></tr>`:""}</tbody></table><div class="row" style="justify-content:flex-start;margin-top:4px"><button data-do="examsave1">Save exam marks</button></div>`)
     +blk("fp",`Final product (${g.blocks.find(b=>b.id==="fp").w} %)`,B.fp,g.fp.mark?`<p class="muted">Your mark: ${res(u,fpA).max?res(u,fpA).score+"/"+res(u,fpA).max:"not given yet"}. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open the final product</a> to mark it.</p>`:`<table><tbody>${g.fp.rows.map(r=>row(esc(r.name)+" "+cpill(r.c),deg(lvOf(u,fpA,r.step,r.c)),r.w+" %")).join("")}</tbody></table><p class="muted">Give these levels in the final product dialog. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open it</a></p>`)
-    +(!g.gv?"":blk("gv",`Grammar and vocabulary (${g.blocks.find(b=>b.id==="gv").w} %)`,B.gv.mark,`<p class="muted">First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %</p><table><thead><tr><th style="text-align:left">Step</th><th>First try</th><th style="text-align:left">Done</th></tr></thead><tbody>${gvRows}</tbody></table>`))
+    +(!g.gv?"":blk("gv",`Grammar and vocabulary (${g.blocks.find(b=>b.id==="gv").w} %)`,B.gv.mark,`<p class="muted">${gvSum(B)}</p><table><thead><tr><th style="text-align:left">Step</th><th>First try</th><th style="text-align:left">Done</th></tr></thead><tbody>${gvRows}</tbody></table>`))
     +(!g.other?"":blk("other",`Other competences (${g.blocks.find(b=>b.id==="other").w} %)`,B.other,`<table><thead><tr><th>Criterion</th><th>Steps (auto)</th><th>Levels</th><th>Mark</th></tr></thead><tbody>${g.other.map(c=>{const o=otherCrit(u,c);
       const at=(g.auto[c]||[]).map(([a,k,f])=>stepName(a,k)+": "+(f?(firstOf(u,a,k)?"first try "+firstOf(u,a,k).score+"/"+firstOf(u,a,k).max:"–"):doneAt(u,a,k)?"done":"not done")).join("\n"),
         tt=(g.teacher[c]||[]).map(([a,k])=>stepName(a,k)+": "+(lvOf(u,a,k,c)||"–")).join("\n");
@@ -557,14 +600,18 @@ function degPanel(u,c){redraw=()=>degPanel(u,c);
     +`<label>Degree</label>${lvBtns(`data-do="fin" data-u="${u}" data-c="${esc(c)}"`,f,c)} ${sg.mark!=null&&!f?`<button class="g" data-do="fin" data-u="${u}" data-c="${esc(c)}" data-l="${sg.level}">Confirm ${sg.level}</button>`:""}<p class="muted">${f?"Confirmed. Click it again to go back to the suggestion.":"Not confirmed yet."}</p>`);
 }
 // Route cell: click to set the student's route in this LS at any time, or to answer their request (🔁).
-const rtCell=u=>{const l=(S.D.lv[u]||{})[S.ls]||{};return `<td class="gr" data-do="rt" data-u="${u}" title="${l.request?"Asks for "+(LV[l.request]||l.request)+" · click to answer":"Click to set the route"}">${route(l.level)}${l.request?" 🔁":""}</td>`};
+// ↩: no route of its own in this LS, so the one from an earlier LS applies (the student sees that one).
+const lsName=id=>esc(((EL_LS.find(x=>x.id===id)||{}).title||id).replace(/^\S+ · /,""));
+const rtCell=u=>{const l=(S.D.lv[u]||{})[S.ls]||{},r=elRouteOf(S.D.lv[u],S.ls),carried=r.level&&r.from!==S.ls;
+  return `<td class="gr" data-do="rt" data-u="${u}" title="${l.request?"Asks for "+(LV[l.request]||l.request)+" · click to answer":carried?"Carried over from "+lsName(r.from)+" · click to set it for this LS":"Click to set the route"}">${route(r.level)}${carried?" ↩":""}${l.request?" 🔁":""}</td>`};
 function rtPanel(u){redraw=null;
   const s=S.P[u],l=(S.D.lv[u]||{})[S.ls]||{},lsT=(EL_LS.find(x=>x.id===S.ls)||{}).title;
-  dlg(`<h3>${name(s)} · Route</h3><p class="muted">${esc(lsT)} · now ${route(l.level)}</p>`
+  const r=elRouteOf(S.D.lv[u],S.ls),carried=r.level&&r.from!==S.ls;
+  dlg(`<h3>${name(s)} · Route</h3><p class="muted">${esc(lsT)} · now ${route(r.level)}${carried?" ↩ carried over from "+lsName(r.from):""}</p>`
     +(l.request?`<div class="hand">🔁 Asks to change to ${route(l.request)}${l.reason?`<p>“${esc(l.reason)}”</p>`:'<p class="muted">No reason given.</p>'}<button data-do="acc" data-u="${u}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${u}">Decline</button></div>`
       :l.declined?`<p class="muted">You declined their last request (${LV[l.declined]||esc(l.declined)}).</p>`:"")
     +`<label>Set the route</label><div class="bar">${EL_LEVELS.map(x=>`<button class="${x.id===l.level?"":"g"}" data-do="setrt" data-u="${u}" data-r="${x.id}" ${x.id===l.level?"disabled":""}>${x.name}</button>`).join("")}</div>`
-    +`<p class="muted">Saved at once and clears any request. The student gets it the next time they open the LS or their board.</p>`);
+    +`<p class="muted">Saved at once for this LS (later LSs take it too until you change it). The student gets it the next time they open the LS or their board.</p>`);
 }
 function stuPanel(u){redraw=null;
   const s=S.P[u],ls=S.ls,l=level(u,ls),lsT=(EL_LS.find(x=>x.id===ls)||{}).title;
@@ -573,7 +620,7 @@ function stuPanel(u){redraw=null;
   if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
   dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>
     <label>Group</label>${groupSel(u,s.group)}
-    <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– not chosen –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${x.name}</option>`).join("")}</select>
+    <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– none –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${x.name}</option>`).join("")}</select>
     <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`+entry);
 }
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
@@ -677,7 +724,12 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       catch(e){console.warn("shot",e);$("#pbimg").textContent="The screenshot could not be loaded: "+e.message}},
     pbfix:()=>act(api.pbFix(k.id,!!k.v)),pbdel:()=>{if(confirm("Delete this problem report?"))act(api.pbDel(k.id))},
     acc:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.to))},rej:()=>{$("#dlg").close();act(api.reject(u,S.ls))},
-    rt:()=>rtPanel(u),setrt:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.r))},
+    rt:()=>rtPanel(u),
+    rton:()=>{S.rtOn[u]=t.checked;render()},
+    cutdef:()=>quick(api.cuts(GR.find(g=>g.id===S.g).course,Object.assign({},EL_ROUTE_CUTS[GR.find(g=>g.id===S.g).course]))),
+    rtapply:()=>{const c=GR.find(g=>g.id===S.g).course,src=srcLs(c),to=S.rtTo,ps=rtRows(c,src,to,Object.values(S.P).filter(s=>s.group===S.g&&!s.tester)).filter(r=>r.on).map(r=>[r.s.uid,r.pick]);
+      if(!ps.length||!confirm(`Set the route of ${ps.length} student${ps.length===1?"":"s"} in ${EL_LS.find(l=>l.id===to).title}? Their work so far is kept.`))return;
+      S.rtPick={};S.rtOn={};act(api.setLevels(to,ps))},setrt:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.r))},
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
@@ -713,6 +765,10 @@ document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
   if(k.do==="group"&&t.value)act(api.setGroup(k.u,t.value)).then(()=>$("#dlg").open&&stuPanel(k.u));
   if(k.do==="pteam")quick(pt.team(k.k,t.value));
   if(k.do==="ptname"){const v=t.value.replace(/\s+/g," ").trim().slice(0,30);quick(pt.list(S.g,((S.D.tm[S.g]||{}).list||[]).map(x=>x.id===k.id?Object.assign({},x,{name:v||x.name}):x)))}
+  if(k.do==="rtto"){S.rtTo=t.value;S.rtPick={};S.rtOn={};render()}
+  if(k.do==="rtpick"){S.rtPick[k.u]=t.value;delete S.rtOn[k.u];render()}
+  if(k.do==="cut"){const c=GR.find(g=>g.id===S.g).course,o=cutsOf(c),v=+t.value;if(t.value===""||isNaN(v)||v<0||v>10)return render();o[k.k]=v;
+    if(!(o.beginners<=o.insecure&&o.insecure<=o.safe)){alert("The cut-offs must go up: Beginners ≤ Insecure ≤ Safe.");return render()}quick(api.cuts(c,o))}
   if(k.do==="setroute"&&t.value)act(api.setLevel(k.u,S.ls,t.value)).then(()=>stuPanel(k.u))});
 
 const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;S.D=await load();render()};
