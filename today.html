@@ -5,7 +5,7 @@
 button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}button.sub{background:#15803d}a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:4px 10px;font-size:13px;white-space:nowrap;display:inline-block}a.go.off{background:#94a3b8;pointer-events:none}
 .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}
 .pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 6px;margin:1px}.ce1{background:#fce7f3;color:#9d174d}.ce2{background:#dcfce7;color:#166534}.ce3{background:#e0f2fe;color:#075985}.ce4{background:#ede9fe;color:#5b21b6}.ce5{background:#ffedd5;color:#9a3412}.ce6{background:#fef9c3;color:#854d0e}.ceC{background:#e2e8f0;color:#334155}.tag{font-size:12px;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:1px 8px}
-.route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-daring{background:#ede9fe;color:#5b21b6}
+.route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-beginners{background:#ffe4e6;color:#9f1239}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-daring{background:#ede9fe;color:#5b21b6}
 .wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
 thead th{background:#f1f5f9;vertical-align:top}.stu{position:sticky;left:0;z-index:1;text-align:left;min-width:120px;white-space:nowrap}thead .stu{z-index:3}
 th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#cbd5e1}.first{border-left:3px solid #94a3b8}th.ac{font-weight:500;min-width:44px}.skip{color:#94a3b8;background:#f8fafc}td.ac{color:#16a34a;font-weight:700}
@@ -71,7 +71,7 @@ async function load(u){
 const all=()=>!DEMO&&(ELCloud.isTeacher(U)||(ELCloud.isTester(U)&&!ELCloud.viewGroup()));   // teacher and testers see every LS (not in a group's student view)
 function setLang(){
   const lv=(D.lv[S.ls]||{}).level||(Object.values(D.lv).find(x=>x&&x.level)||{}).level;
-  EN=all()||(!!lv&&lv!=="insecure");
+  EN=all()||(!!lv&&!elCa(lv));
   document.documentElement.lang=EN?"en":"ca";
   document.title=t("Les meves activitats","My activities")+" · English Lab";
   $("h1").textContent=t("Les meves activitats","My activities");
@@ -162,9 +162,9 @@ async function goLive(){
   setBuzz();
 }
 // Vocabulary and grammar summary (Roger, 25 Oct 2026): an optional PDF per route; a student gets only their route's, the teacher and testers all three.
-function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=(D.lv[ls.id]||{}).level,a=r=>`<a class="go" href="${ls.study}${r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
+function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=(D.lv[ls.id]||{}).level,a=r=>`<a class="go" href="${ls.study}${r==="beginners"?"insecure":r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
   if(!all()&&!lv)return "";
-  return `<div class="box study"><b>📚 ${t("Descarrega el resum del vocabulari i la gramàtica per estudiar-los!","Download the summary of the vocabulary and grammar to study them!")}</b><p class="muted">${t("Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. És opcional: fes-lo servir si et va bé.","All the vocabulary and then all the grammar of your route, with the explanations and practice. It is optional: use it if it helps you.")}</p><div class="row">${all()?EL_LEVELS.map(x=>a(x.id)).join(""):a(lv)}</div></div>`}
+  return `<div class="box study"><b>📚 ${t("Descarrega el resum del vocabulari i la gramàtica per estudiar-los!","Download the summary of the vocabulary and grammar to study them!")}</b><p class="muted">${t("Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. És opcional: fes-lo servir si et va bé.","All the vocabulary and then all the grammar of your route, with the explanations and practice. It is optional: use it if it helps you.")}</p><div class="row">${all()?EL_LEVELS.filter(x=>x.id!=="beginners").map(x=>a(x.id)).join(""):a(lv)}</div></div>`}
 // LS1 (Roger, 25 Oct 2026): only the final exam and the final product count, so the board shows just the LS grade (EL_GRADING[ls].only),
 // with no learning paths and no links to the LS pages, so students do not go back to the activities.
 const only=id=>((window.EL_GRADING||{})[id]||{}).only;
@@ -212,7 +212,7 @@ function routeAsk(ls,st){const l=D.lv[ls]||{};if(st==="closed")return "";
   return (l.declined?` <span class="tag no">${t(`El professor no ha acceptat el canvi a ${LV[l.declined]||esc(l.declined)}`,`Your teacher declined the change to ${LV[l.declined]||esc(l.declined)}`)}</span>`:"")+` <button class="g" data-do="ask">${t("Demana canviar de ruta","Ask to change route")}</button>`}
 function askPanel(){const ls=EL_LS.find(x=>x.id===S.ls),l=D.lv[S.ls]||{};S.want=l.request||null;
   $("#dlgc").innerHTML=`<h3>${t("Demana canviar de ruta","Ask to change route")}</h3><p class="muted">${esc(ls.title)} · ${t("Ara fas","Your route now:")} ${route(l.level)}. ${t("El professor ho haurà d'acceptar.","Your teacher has to accept it.")}</p>`
-    +`<label>${t("A quina ruta vols canviar?","Which route do you want?")}</label><div class="opts">${EL_LEVELS.filter(x=>x.id!==l.level).map(x=>`<button class="opt ${x.id===S.want?"on":""}" data-do="want" data-r="${x.id}"><b>${x.name}</b><br><small>${esc(EN?x.en:x.ca)}</small></button>`).join("")}</div>`
+    +`<label>${t("A quina ruta vols canviar?","Which route do you want?")}</label><div class="opts">${EL_LEVELS.filter(x=>x.id!==l.level&&x.pick!==false).map(x=>`<button class="opt ${x.id===S.want?"on":""}" data-do="want" data-r="${x.id}"><b>${x.name}</b><br><small>${esc(EN?x.en:x.ca)}</small></button>`).join("")}</div>`
     +`<label for="why">${t("Per què? (opcional)","Why? (optional)")}</label><textarea id="why" maxlength="300">${esc(l.reason||"")}</textarea>`
     +`<div class="row"><button class="g" data-do="close">${t("Cancel·la","Cancel")}</button><button class="sub" data-do="send" ${S.want?"":"disabled"}>${t("Envia la petició","Send the request")}</button></div>`;
   if(!$("#dlg").open)$("#dlg").showModal();

@@ -27,7 +27,7 @@ export async function start({db,user,group,root,lsId,seesAll}){
   const st=(info&&info.status)||"hidden",enabled=(info&&info.enabled)||[];
   if(!seesAll&&st!=="open")return;
   const rs={};try{(await getDocs(collection(db,"students",user.uid,"results"))).forEach(d=>rs[d.data().activity||d.id.replace("__","/")]=d.data())}catch(e){}
-  const ca=!seesAll&&lv&&lv.level==="insecure",lang=ca?"ca":"en",t=(c,e)=>ca?c:e;
+  const ca=!seesAll&&lv&&(lv.level==="insecure"||lv.level==="beginners"),lang=ca?"ca":"en",t=(c,e)=>ca?c:e;
   const acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls);
   // On a page of this LS the local progress is the freshest; elsewhere the synced copy.
   const prog=k=>lsId===ls?store.get(k):((pg&&pg.data)||{})[k];

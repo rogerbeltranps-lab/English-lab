@@ -3,7 +3,8 @@
    Routes are cumulative: an item with r:"safe" is shown to Safe and Daring. Auto-corrected steps
    complete at 80 % (rounded up); the recall warm-up completes when submitted and keeps the first attempt. */
 var LS2 = (function () {
-  const ROUTES = ['insecure', 'safe', 'daring'];
+  // Beginners (A1) sits below Insecure: it sees every untagged item and, where a text or list has no 'beginners' version, the Insecure one.
+  const ROUTES = ['beginners', 'insecure', 'safe', 'daring'];
   const PAGES = [
     ['getting-started.html', '1 · Getting started'],
     ['celebrations-around-the-world.html', '2 · Celebrations around the world'],
@@ -22,11 +23,11 @@ var LS2 = (function () {
   const PRODUCTS = 'ls2Products4ESO';
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
   let LP, level, state;
-  const ca = () => level === 'insecure';
+  const ca = () => level === 'insecure' || level === 'beginners';
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca() ? (o.ca || o.en) : (o.en || o.ca));
-  const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : o.safe != null && level === 'daring' ? o.safe : o.insecure);
+  const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : o.safe != null && level === 'daring' ? o.safe : o.insecure);   // beginners → insecure
   // A list is cumulative (r: tags); an object keyed by route gives each route its own list (the sample exam: same number of items per route).
-  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'insecure') <= ROUTES.indexOf(level)) : (items[level] || []);
+  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level)) : (items[level] || (level === 'beginners' ? items.insecure : null) || []);
   const need = n => Math.ceil(n * 0.8);
   const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -482,7 +483,7 @@ var LS2 = (function () {
   // An open task (for example the sample exam's email): the student writes, then ChatGPT gives feedback and an orientative mark
   // with the criterion's levels; the student can note that mark for the summary.
   function markPrompt(p, text) {
-    const lv = { insecure: 'Insecure (A2 / A2+, amb suport)', safe: 'Safe (B1)', daring: 'Daring (B1 / B1+)' }[level];
+    const lv = { beginners: 'Beginners (A1, amb molt suport)', insecure: 'Insecure (A2 / A2+, amb suport)', safe: 'Safe (B1)', daring: 'Daring (B1 / B1+)' }[level];
     const src = byLevel(p.source || '');
     return (ca() ? 'Actua com a professor d’anglès de 4t d’ESO. És l’EXAMEN D’EXEMPLE (pràctica) de la Learning Situation “Seasons & Celebrations”.' : 'Act as a 4 ESO English teacher. This is the SAMPLE EXAM (practice) of the Learning Situation “Seasons & Celebrations”.') +
       '\n\nRoute / level: ' + lv + '.\nTask (' + p.max + ' points): ' + byLevel(p.task).replace(/<[^>]+>/g, '') +
@@ -564,6 +565,7 @@ var LS2 = (function () {
     if (!document.getElementById('countsNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="countsNoteCss">.counts-note{margin:10px 0 0;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
     LP = config;
     level = localStorage.getItem(LP.key + 'Level') || 'insecure';
+    if (ROUTES.indexOf(level) < 0) level = 'insecure';
     try { state = JSON.parse(localStorage.getItem(LP.key) || '{}'); } catch (e) { state = {}; }
     state.done = state.done || {};
     const sel = $('#sessionJump');

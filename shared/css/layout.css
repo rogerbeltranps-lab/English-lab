@@ -75,10 +75,10 @@ h1 {
   font-size: 1.05rem;
 }
 
-/* Route Tiers (Insecure / Safe / Daring) */
+/* Route Tiers (Beginners / Insecure / Safe / Daring); the student sees only their own button */
 .routes {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   margin-top: 22px;
 }

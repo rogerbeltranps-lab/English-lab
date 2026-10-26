@@ -19,7 +19,8 @@ All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the
 - Preserve responsive layouts, navigation, scoring, feedback and route-specific progress unless the requested change requires otherwise. Keep edits focused.
 
 ## Route language and scaffolding
-- **Insecure:** pedagogical instructions, explanations, strategy tips, checklists, step-by-step guidance and corrective feedback are in **Catalan**. Use clear scaffolding and worked examples; explain briefly what went wrong and what to notice.
+- **Beginners (Roger, 26 Oct 2026):** a fourth route, A1, below Insecure, for students starting almost from zero. Everything Insecure gets in Catalan, plus heavier scaffolding: a short core word list per LS practised with spaced retrieval (flashcards and recall every session), readings of 60–100 words built from that list at 95–98 % known words with Catalan hover glosses, multiple choice or matching instead of open answers, the slow audio copy with English subtitles from the first viewing, sentence frames with gaps and a word bank, the same final product with fewer requirements, feedback as a Catalan hint and a second try, and a short "how did I do it?" box. Same listenings and videos as everyone, mixed pairs in class (not Beginners with Beginners). Marked on the same NA–AE scale against CEFR A1 can-do statements. **Only the teacher sets it** (`pick:false` in `EL_LEVELS`: students cannot choose or request it; `firestore.rules` unchanged, the teacher may write any route). **In code:** `elCa(level)` (`el-catalog.js`) says whether a route reads Catalan; LS2 engines order routes `beginners < insecure < safe < daring`, an untagged item is for every route, and a text, list or rubric with no `beginners` version falls back to `insecure` (`byLevel`, `forLevel`, `final-rubric.js`, the marking PDF, the study PDF). Every LS2 Learning Path page has a Beginners route button (students only see their own). LS1 pages have no Beginners version: `applyLevel` shows them the Insecure one. New LS content adds `beginners` keys where the A1 version differs (readings, questions, tasks, rubric), designed in the LS project.
+- **Insecure (and Beginners):** pedagogical instructions, explanations, strategy tips, checklists, step-by-step guidance and corrective feedback are in **Catalan**. Use clear scaffolding and worked examples; explain briefly what went wrong and what to notice.
 - **Safe:** instructions and explanations are in **English**. Catalan may appear only as limited vocabulary support, such as hover/focus meanings.
 - **Daring:** English-first, with greater learner autonomy and less scaffolding.
 - **English remains the target language** for vocabulary, listening/reading input, model sentences, interview questions where appropriate, slide content and student production. Do not translate these into Catalan when adding scaffolding.
@@ -28,18 +29,18 @@ All docs are mapped in [docs/README.md](docs/README.md). Planned clean-up of the
 ## Levels, listenings, videos and readings
 - Each route has the level agreed in the levels document of the teaching programme:
 
-  | Course | Year horizon | Insecure | Safe | Daring |
-  | --- | --- | --- | --- | --- |
-  | 1ESO | A1 consolidated; starting A2 tasks | A1 with a lot of support | A1 consolidated | A1+ / early A2 |
-  | 2ESO | Functional A2 | A1+ / early A2 with scaffolding | Functional A2 | A2+ / emerging B1 |
-  | 3ESO | More autonomous A2; towards B1 | A2 with support | More autonomous A2 | Emerging B1 |
-  | 4ESO | B1 as the final horizon | A2 / A2+ with support | Indicative B1 | B1 / B1+ |
+  | Course | Year horizon | Beginners | Insecure | Safe | Daring |
+  | --- | --- | --- | --- | --- | --- |
+  | 1ESO | A1 consolidated; starting A2 tasks | Pre-A1 / A1 with a lot of support | A1 with a lot of support | A1 consolidated | A1+ / early A2 |
+  | 2ESO | Functional A2 | A1 with a lot of support | A1+ / early A2 with scaffolding | Functional A2 | A2+ / emerging B1 |
+  | 3ESO | More autonomous A2; towards B1 | A1 with a lot of support | A2 with support | More autonomous A2 | Emerging B1 |
+  | 4ESO | B1 as the final horizon | A1 with a lot of support | A2 / A2+ with support | Indicative B1 | B1 / B1+ |
 
   Content marked as an extension of the next level (for example B1+ in 4ESO) goes only to Daring. This school year the site covers **2ESO and 4ESO** only.
 - **Listenings and videos are pitched at the Safe level**, and every route hears the same input. Do not write separate scripts per route.
-- **The activities around that input adapt to each route's level:** questions, tasks, support, hints and the language of instructions. Insecure gets easier questions, support in Catalan and, where possible, a slower version of the audio. Daring gets the more demanding questions (inference, comparison, opinion).
+- **The activities around that input adapt to each route's level:** questions, tasks, support, hints and the language of instructions. Insecure gets easier questions, support in Catalan and, where possible, a slower version of the audio; Beginners gets the slow copy with subtitles from the first viewing and multiple choice or matching only. Daring gets the more demanding questions (inference, comparison, opinion).
 - **Reading texts are different: they vary by route.** Each route reads a version written at its own level (for 4ESO: A2 / A2+ for Insecure, B1 for Safe, B1 / B1+ for Daring), on the same topic and with the same key information, so the whole class can share the content. Adapt length, sentence complexity, vocabulary and grammar to the level; the questions follow the route's text.
-- **Per-route readings in code:** in pages built with `ls2-engine.js`, `media.text` is a string or `{insecure, safe, daring}`; standalone pages keep one text per route in a `readingData` / `readingChat` object keyed by level. Questions stay cumulative (`r:`), so every question a route sees must be answerable from that route's text.
+- **Per-route readings in code:** in pages built with `ls2-engine.js`, `media.text` is a string or `{beginners, insecure, safe, daring}` (`beginners` optional: without it Beginners reads the Insecure text); standalone pages keep one text per route in a `readingData` / `readingChat` object keyed by level. Questions stay cumulative (`r:`), so every question a route sees must be answerable from that route's text.
 - **Scripted videos:** one MP4 at Safe level plus a slower copy for Insecure, stored next to the page in `video/`, with WebVTT subtitles (`.vtt`) that students switch on after a first viewing. The slow copy is made locally with ffmpeg (`atempo=0.85`, longer pauses), never with a second paid generation. Scripts are recorded in the LS docs before production.
 - Mix real, level-appropriate listenings with generated ones. Never call a paid generation service (for example ElevenLabs) or spend its credits without the user's explicit permission for that specific generation. An approved script is not permission to generate.
 - **Generated audio files:** MP3s live in the LS folder's `audio/` (for example `4eso/seasons-and-celebrations/audio/culture-bites-origins.mp3`) and are referenced from the LS data as `media.audio`. The slow version for Insecure sits next to it with a `-slow` suffix (`culture-bites-origins-slow.mp3`).
