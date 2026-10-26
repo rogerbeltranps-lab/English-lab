@@ -579,13 +579,38 @@ var LS2 = (function () {
   });
 
   /* ---------- page ---------- */
+  /* Plan and review (research audit, Roger 26 Oct 2026: metacognition): a one-line goal before the Learning Path and two short answers
+     after it, saved in state.plan / state.review (per route) and shown to the teacher in the activity dialog. Never a step, never marked. */
+  const reflective = () => LP.panels.some(p => p.id === 'recall');
+  function planCard() {
+    if (!reflective()) return '';
+    return '<div class="section-card plan-card"><h3>🎯 ' + (ca() ? 'El meu objectiu' : 'My goal') + '</h3><p class="instruction">' + (ca() ? 'Abans de començar: pensa en el teu últim recall o checkpoint. Què vols millorar en aquest Learning Path?' : 'Before you start: think about your last recall or checkpoint. What do you want to get better at in this Learning Path?') + '</p>' +
+      '<input type="text" class="typed" id="lpGoal" maxlength="200" placeholder="' + (ca() ? 'Per exemple: recordar les paraules noves sense mirar.' : 'For example: remember the new words without looking.') + '"></div>';
+  }
+  function reviewCard() {
+    if (!reflective()) return '';
+    return '<div class="section-card plan-card"><h3>🔁 ' + (ca() ? 'Com m’ha anat' : 'How did it go?') + '</h3>' +
+      '<label class="field"><strong>' + (ca() ? 'Què m’ha ajudat més?' : 'What helped me most?') + '</strong><input type="text" class="typed" id="lpHelped" maxlength="200"></label>' +
+      '<label class="field"><strong>' + (ca() ? 'Què he de repassar?' : 'What do I need to review?') + '</strong><input type="text" class="typed" id="lpReview" maxlength="200"></label>' +
+      '<p class="tiny" id="lpReviewMsg"></p></div>';
+  }
+  function bindPlan() {
+    if (!reflective()) return;
+    state.plan = state.plan || {}; state.review = state.review || {};
+    const g = $('#lpGoal'), h = $('#lpHelped'), r = $('#lpReview'), rv = state.review[level] || {};
+    g.value = state.plan[level] || ''; h.value = rv.helped || ''; r.value = rv.review || '';
+    g.onchange = () => { state.plan[level] = g.value.trim(); save(); };
+    const keep = () => { state.review[level] = { helped: h.value.trim(), review: r.value.trim(), at: new Date().toISOString() }; save(); $('#lpReviewMsg').textContent = ca() ? 'Desat ✓' : 'Saved ✓'; };
+    h.onchange = keep; r.onchange = keep;
+  }
   function render() {
     const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
-    $('#lp').innerHTML = trackNote() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
+    $('#lp').innerHTML = trackNote() + planCard() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
       LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
-      '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
+      reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
     LP.panels.forEach(p => p._r.bind());
+    bindPlan();
     $$('.tab').forEach(t => t.onclick = () => { $$('.tab,.panel').forEach(x => x.classList.remove('active')); t.classList.add('active'); $('#' + t.dataset.panel).classList.add('active'); window.scrollTo({ top: $('#lp').offsetTop - 64, behavior: 'smooth' }); });
     initNext();
     progress();
