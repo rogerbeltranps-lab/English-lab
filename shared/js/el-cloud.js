@@ -15,7 +15,7 @@ const ROOT=new URL("../../",import.meta.url);
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let stopJoin=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false;
+let stopJoin=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false,pulled=false;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
@@ -45,11 +45,15 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:lsSt(s.data().status),enabled:s.data().enabled||[],groups:s.data().groups||null,open:s.data().open||{},secLocked:s.data().secLocked||{}}:{status:"hidden",enabled:[],groups:null,open:{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
+// Any key the pull changes marks the page stale, not only this activity's: the final product reads every product piece and Reflect
+// reads the checkpoints, so they must reload too to show the student's saved answers (Roger, 26 Oct 2026: answers always come back).
 async function pull(){
   const s=await getDoc(progressRef()).catch(()=>null);
-  if(s&&s.exists()){const cloud=s.data().data||{},a=window.EL_CATALOG&&EL_CATALOG.find(x=>x.id===actId),mine=k=>!!a&&a.keys.some(x=>k.startsWith(x));syncing=true;
-    for(const k in cloud){if(localStorage.getItem(k)!==cloud[k]){origSet.call(localStorage,k,cloud[k]);if(mine(k))stale=true}}
+  if(s&&s.exists()){const cloud=s.data().data||{};syncing=true;
+    const d=dirty();
+    for(const k in cloud){if(d[k]&&localStorage.getItem(k)!=null)continue;if(localStorage.getItem(k)!==cloud[k]){origSet.call(localStorage,k,cloud[k]);stale=true}}
     syncing=false}
+  pulled=true;
 }
 // The page's own script read localStorage before this file knew whose it is. After a wipe (another account) or a pull that
 // changed it, reload once so the page shows this student's progress, not the old one, and never saves the old one back
@@ -60,19 +64,35 @@ function reloadIfStale(){
   sessionStorage.setItem("el_reload",location.pathname);frozen=true;location.reload();return true;
 }
 function resultPayload(a,extra){const sc=elPoints(a),parts=typeof window.EL_RESULT_PARTS==="function"?window.EL_RESULT_PARTS():null;return Object.assign({ls:lsId,activity:a.id,score:sc,max:a.points,done:sc,updated:serverTimestamp()},parts?{parts}:{},extra||{})}
+// Nothing is sent before this page has pulled the student's progress: a save made while signing in (a slow connection) would
+// otherwise send this browser's older copy over the answers saved from another device.
 function push(){
-  if(!user||!isStudent(user)||syncing||frozen||!lsId||noSync)return;
+  if(!user||!isStudent(user)||syncing||frozen||!lsId||noSync||!pulled)return;
   clearTimeout(timer);
-  timer=setTimeout(async()=>{
-    try{
-      await setDoc(doc(db,"students",user.uid),{name:user.displayName||"",email:user.email,updated:serverTimestamp()},{merge:true});
-      await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
-      const a=window.EL_CATALOG&&actId&&EL_CATALOG.find(x=>x.id===actId);
-      if(a&&a.graded&&!a.manual)await setDoc(doc(db,"students",user.uid,"results",resKey(actId)),resultPayload(a),{merge:true});
-    }catch(e){console.warn("sync",e)}
-  },1500);
+  timer=setTimeout(send,1500);
 }
-Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.test(k))return;origSet.call(this,k,v);if(this===localStorage&&!SKIP.test(k))push()};
+async function send(){
+  timer=null;
+  try{
+    const snap=snapshot();
+    await setDoc(doc(db,"students",user.uid),{name:user.displayName||"",email:user.email,updated:serverTimestamp()},{merge:true});
+    await setDoc(progressRef(),{data:snap,updated:serverTimestamp()},{merge:true});
+    // saved: these keys are no longer newer here than in the cloud (keys of a locked learning path can never be sent)
+    const d=dirty();for(const k in d)if(snap[k]===localStorage.getItem(k)||lockedKeys.includes(k))delete d[k];setDirty(d);
+    const a=window.EL_CATALOG&&actId&&EL_CATALOG.find(x=>x.id===actId);
+    if(a&&a.graded&&!a.manual)await setDoc(doc(db,"students",user.uid,"results",resKey(actId)),resultPayload(a),{merge:true});
+  }catch(e){console.warn("sync",e)}
+}
+// Leaving the page (a presentation link, the board…) sends what is waiting at once instead of 1.5 s later.
+addEventListener("pagehide",()=>{if(timer){clearTimeout(timer);send()}});
+// Keys saved in this browser but not in the cloud yet (el_dirty). pull() never overwrites them with the older cloud copy: a student
+// typed the recall, opened the Autumn words presentation within a second and came back to an empty page, because the save had not
+// reached the cloud and the next page's pull put the old copy back (problem report, 4ESO B, 26 Oct 2026). The gate's push sends them.
+const DIRTY="el_dirty";
+const dirty=()=>{try{return JSON.parse(localStorage.getItem(DIRTY)||"{}")||{}}catch(e){return {}}};
+const setDirty=d=>origSet.call(localStorage,DIRTY,JSON.stringify(d));
+Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.test(k))return;origSet.call(this,k,v);
+  if(this===localStorage&&!SKIP.test(k)){if(!syncing){const d=dirty();if(!d[k]){d[k]=1;setDirty(d)}}push()}};
 
 async function login(){
   // The dashboard is the teacher's page: its Sign in goes straight to Google (the students' window is for every other page).
@@ -96,7 +116,7 @@ async function refuse(u){
   o.style.zIndex=10001;o.querySelector("b").textContent=mail;o.querySelector("button").onclick=()=>{o.remove();login()};
 }
 // Shared school computers: never leak one student's local progress into another account.
-const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k));if(ks.length)stale=true};
+const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k));localStorage.removeItem(DIRTY);if(ks.length)stale=true};
 const logout=async()=>{await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");location.reload()};
 
 function banner(text,color,btn){
@@ -106,9 +126,11 @@ function banner(text,color,btn){
   for(const bt of [].concat(btn||[])){const x=document.createElement("button");x.textContent=bt.t;x.onclick=bt.f;x.style.cssText="margin-left:8px;border:0;border-radius:6px;padding:3px 10px;cursor:pointer";b.append(x)}
   document.body.prepend(b);
 }
+// Read-only page: answers stay visible, nothing can be changed or saved (Check, Do it again, Save… are off too; tabs, the
+// next-section buttons and the video speed buttons still work).
 function freeze(){
   frozen=true;
-  const lock=()=>document.querySelectorAll("main input,main textarea,main select,main .opt,main [draggable]").forEach(e=>{e.disabled=true;e.style.pointerEvents="none"});
+  const lock=()=>document.querySelectorAll("main input,main textarea,main select,main .opt,main [draggable],main .actions button:not([data-vs])").forEach(e=>{if(e.closest(".section-next"))return;e.disabled=true;e.style.pointerEvents="none"});
   lock();new MutationObserver(lock).observe(document.body,{childList:true,subtree:true});
 }
 function overlay(html){
@@ -175,7 +197,7 @@ async function gate(u){
   if(st==="hidden"&&!tester){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
   if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   if(reloadIfStale())return;
-  const a=EL_CATALOG.find(x=>x.id===actId);
+  const a=EL_CATALOG.find(x=>x.id===actId),saved=hasWork(a);   // before applyLevel, whose route click saves an empty state
   // The route of this LS, or the one carried over from an earlier LS (elRouteOf). With none yet, a student works on the Insecure
   // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
   const lvs={};try{(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){console.warn("levels",e)}
@@ -186,10 +208,13 @@ async function gate(u){
   // Students are never told which activities are assessed (Roger, 26 Oct 2026), so this message does not say it either.
   const ca=elCa(lvl);
   // Learning paths open per group (elLpOpen in el-catalog.js): a locked one shows a block and saves nothing.
+  // Students always see their own answers (Roger, 26 Oct 2026): with saved work it opens read-only instead of the block.
+  if(a&&!tester&&!elLpOpen(a,info,myGroup)&&saved){freeze();banner(ca?"Aquesta activitat ara està tancada: pots veure les teves respostes, però no canviar-les.":"This activity is closed for now: you can see your answers, but not change them.","#92400e");return}
   if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.");return}
   if(a&&!tester)lockSections(elSecLocked(a,info,myGroup),ca);
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
   const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));
+  if(cp&&saved){freeze();banner(ca?"Per continuar aquesta activitat, primer acaba el "+cp.title+". Mentrestant pots veure les teves respostes.":"To go on with this activity, first finish "+cp.title+". Meanwhile you can see your answers.","#92400e",{t:(ca?"Obre el ":"Open ")+cp.title+" →",f:()=>{location.href=new URL(cp.path,ROOT).href}});return}
   if(cp){const o=overlay('<div style="max-width:520px"><h1></h1><p></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:10px 18px;text-decoration:none;font-weight:700"></a></p>'+todayLink+'</div>');
     o.querySelector("h1").textContent=ca?"Primer fes el "+cp.title:"First do "+cp.title;
     o.querySelector("p").textContent=ca?"Per continuar, primer has d'acabar el "+cp.title+". Fes-lo sense apunts.":"To go on, first finish "+cp.title+". Do it without notes.";
@@ -216,6 +241,11 @@ async function gate(u){
   // Work left in this browser that the cloud does not have yet (for example done while the LS was still "public") reaches the cloud now.
   push();
 }
+
+// Has the student saved anything in this activity? An LS2 page's state counts only with a value in it ({"done":{}} is what
+// opening the page with a route click leaves).
+const full=x=>x!=null&&x!==""&&x!==false&&(typeof x!=="object"||Object.values(x).some(full));
+function hasWork(a){return !!a&&a.keys.some(k=>{const v=localStorage.getItem(k);if(!v)return false;try{return full(JSON.parse(v))}catch(e){return true}})}
 
 // Sections of this learning path the teacher has not opened yet for the group (elSecLocked in el-catalog.js): their tab shows 🔒 and
 // does not open (section-next buttons click tabs too), and their panel shows a note instead of its activities. Pages re-render their

@@ -97,9 +97,11 @@ var LS2 = (function () {
   /* ---------- answers and feedback stay (Roger, 26 Oct 2026) ---------- */
   // What a student typed or chose, with its feedback, is back when they return to the page (state.ans[id], synced like the rest),
   // until they press "Do it again" next to Check. A restore shows the feedback again without counting a try.
-  function keep(id, prefix, v) { state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => k.startsWith(prefix))) }; save(); }
+  // Answers not checked yet stay too (state.typing[id_route], saved as the student types or chooses), so leaving the page for a
+  // presentation or a game loses nothing (problem report, 26 Oct 2026).
+  function keep(id, prefix, v) { state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => k.startsWith(prefix))) }; if (state.typing) delete state.typing[id + '_' + level]; save(); }
   function kept(id) { const a = state.ans && state.ans[id]; if (a) Object.assign(tries, a.tries || {}); return a ? a.v : null; }
-  function forget(id, prefix) { if (state.ans) delete state.ans[id]; Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
+  function forget(id, prefix) { if (state.ans) delete state.ans[id]; if (state.typing) delete state.typing[id + '_' + level]; Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
   const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + (ca() ? 'Torna-ho a fer' : 'Do it again') + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
   function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); }
@@ -108,7 +110,8 @@ var LS2 = (function () {
   function stays(id, prefix, listId, items, check) {
     $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix)); };
     $('#' + id + 'Again').onclick = () => { forget(id, prefix); clearStep(id, listId); };
-    const v = kept(id); if (v) { fill(items, prefix, v); check(false); }
+    $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
+    const v = kept(id), t = (state.typing || {})[id + '_' + level]; if (v) { fill(items, prefix, v); check(false); } else if (t) fill(items, prefix, t);
   }
 
   /* ---------- panels ---------- */
@@ -459,6 +462,11 @@ var LS2 = (function () {
       $('#spTask').innerHTML = byLevel(p.task); $('#spModel').innerHTML = byLevel(p.model);
       // the transcript of the version sent for feedback is the draft; the improved recording's transcript is the final version
       const spKey = p.id + '_' + level, showRevision = bindRevision(p.id, spKey, () => $('#speechTranscript').value.trim());
+      // the plan and the transcript stay too (state.speak[key]); a recording itself is never saved
+      state.speak = state.speak || {}; const sp = state.speak[spKey] = state.speak[spKey] || {};
+      const keepSp = () => { sp.plan = $('#spPlan').value; sp.tr = $('#speechTranscript').value; save(); };
+      $('#spPlan').value = sp.plan || ''; $('#speechTranscript').value = sp.tr || '';
+      $('#spPlan').oninput = keepSp; $('#speechTranscript').oninput = keepSp;
       $('#startRecord').onclick = async () => {
         try {
           micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -477,6 +485,7 @@ var LS2 = (function () {
         $('#recordedAudio').src = recUrl; $('#recordedAudio').style.display = 'block';
         $('#downloadWav').disabled = false; $('#spAi').disabled = false; $('#startRecord').disabled = false; $('#stopRecord').disabled = true; processor = null;
         $('#recordStatus').textContent = ca() ? 'Gravació a punt. Escolta-la abans de demanar feedback.' : 'Recording ready. Listen to it before asking for feedback.';
+        setTimeout(keepSp, 1500);   // the last words of the automatic transcript arrive after Stop
       };
       $('#downloadWav').onclick = downloadWav;
       $('#spAi').onclick = () => {
@@ -485,7 +494,7 @@ var LS2 = (function () {
           (tr ? 'Transcripció automàtica de suport (pot contenir errors):\n"' + tr + '"\n\nPrimer escolta l’àudio i dona prioritat al que realment s’hi sent.' : 'No hi ha transcripció automàtica. Escolta l’àudio abans de donar feedback.') +
           '\n\n' + learningSupport.aiLanguage(level) + ' No posis nota numèrica. Respon només amb aquests apartats:\n1. 📝 Transcripció\n2. ✅ Què ha fet bé — una o dues coses concretes.\n3. 🔧 Què ha de corregir — màxim 2 errors importants, amb la frase correcta.\n4. 🗣️ Pronunciació — un sol problema clar, si n’hi ha.\n5. 📋 Instruccions — si ha complert la tasca.\n6. 🎯 Un següent pas.';
         const win = window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(prompt), '_blank', 'noopener,noreferrer');
-        downloadWav(); keepDraft(spKey, tr); showRevision();
+        downloadWav(); keepSp(); keepDraft(spKey, tr); showRevision();
         $('#spStatus').textContent = win ? (ca() ? '✓ WAV descarregat · ChatGPT obert. Adjunta el WAV i prem Envia.' : '✓ WAV downloaded · ChatGPT opened. Attach the WAV and press Send.') : (ca() ? 'El navegador ha bloquejat la pestanya. Permet les finestres emergents.' : 'The browser blocked the tab. Allow pop-ups and try again.');
       };
     }
