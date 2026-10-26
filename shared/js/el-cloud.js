@@ -5,7 +5,7 @@ import "./el-route-names.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {signIn} from "./el-signin.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,collection,writeBatch,serverTimestamp,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,doc,getDoc,getDocs,setDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
 import {report} from "./el-report.js";
 
@@ -366,6 +366,10 @@ onAuthStateChanged(auth,async u=>{
   menuLink(u);
   studyCard(u);
   if(myLevel)draw(u);   // the route is known now: the Problem button speaks its language
+  // The teacher's answer to the student's problem reports (marked fixed, or a thank-you when deleted): a card, once (shared/js/el-reply.js).
+  if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
+    load:async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())),
+    done:id=>deleteDoc(doc(db,"problemReplies",id))})).catch(e=>console.warn("replies",e));
   // Floating weekly to-do list for students (and testers) on every page that loads this file (shared/js/el-todo.js).
   if(u&&isStudent(u)&&myGroup&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:u,group:myGroup,root:ROOT,lsId,seesAll:seesAll(u)})).catch(e=>console.warn("todo",e));
   // The teacher's 🔔 in the bottom bar: open problem reports from all groups, live, on every page (shared/js/el-bell.js).
