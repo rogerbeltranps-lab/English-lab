@@ -43,6 +43,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <script src="shared/js/el-points.js"></script>
 <script src="shared/js/el-items.js"></script>
 <script type="module">
+import {replyText} from "./shared/js/el-reply.js";
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
@@ -58,7 +59,7 @@ const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
 // pt, tm = team points (points/{same id as the list}, teams/{group}; shared/js/el-points.js).
 async function load(){
-  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];return DEMO}
+  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};return DEMO}
   const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[]},up=r=>r.ref.parent.parent.id;
   try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
   try{(await F.getDocs(F.collection(db(),"points"))).forEach(p=>D.pt[p.id]=p.data());(await F.getDocs(F.collection(db(),"teams"))).forEach(t=>D.tm[t.id]=t.data())}catch(e){D.ptErr=true;console.warn("points",e)}
@@ -108,9 +109,12 @@ const api={
     const op=[...new Set([...(((i.secOpened||{})[g]||{})[k]||[]),...(EL_SECTIONS[aid]||[]).map(x=>x[0]).filter(x=>!ids.includes(x))])];
     if(DEMO){for(const [f,v] of [["secLocked",ids],["secOpened",op]]){const m=(i[f]=Object.assign({},i[f]));m[g]=Object.assign({},m[g],{[k]:v})}return}
     return put(["ls",id],{secLocked:{[g]:{[k]:ids}},secOpened:{[g]:{[k]:op}}})},
-  pbFix:(id,v)=>DEMO?S.D.pb.find(x=>x.id===id).fixed=v:put(["problems",id],{fixed:v}),
-  pbDel:id=>{const x=S.D.pb.find(y=>y.id===id);if(DEMO){S.D.pb=S.D.pb.filter(y=>y!==x);return}
-    const b=F.writeBatch(db());b.delete(F.doc(db(),"problems",id));if(x&&x.shot)b.delete(F.doc(db(),"problemShots",id));return b.commit()},
+  // marking a report as fixed tells the student (problemReplies/{same id}, kind "fixed"); reopening takes the note back if it is still unread
+  pbFix:(id,v)=>{const x=S.D.pb.find(y=>y.id===id);if(DEMO){x.fixed=v;v?S.D.replies[id]=pbReply(x,"fixed"):delete S.D.replies[id];return}
+    const b=F.writeBatch(db()),r=F.doc(db(),"problemReplies",id);b.set(F.doc(db(),"problems",id),{fixed:v},{merge:true});v?b.set(r,pbReply(x,"fixed")):b.delete(r);return b.commit()},
+  // deleting an open report can send the student a thank-you (kind "thanks"); a fixed one keeps its "fixed" note
+  pbDel:(id,thanks)=>{const x=S.D.pb.find(y=>y.id===id),ty=thanks&&x&&!x.fixed;if(DEMO){S.D.pb=S.D.pb.filter(y=>y!==x);if(ty)S.D.replies[id]=pbReply(x,"thanks");return}
+    const b=F.writeBatch(db());b.delete(F.doc(db(),"problems",id));if(x&&x.shot)b.delete(F.doc(db(),"problemShots",id));if(ty)b.set(F.doc(db(),"problemReplies",id),pbReply(x,"thanks"));return b.commit()},
   pbLoad:async()=>{if(DEMO)return;const L=[];(await F.getDocs(F.collection(db(),"problems"))).forEach(x=>L.push(Object.assign({id:x.id},x.data())));S.D.pb=L},
   // the screenshot of a report is loaded only when the teacher opens it (problemShots/{same id})
   pbShot:async id=>DEMO?((DEMO.shots||{})[id]||null):((await F.getDoc(F.doc(db(),"problemShots",id))).data()||{}).img||null,
@@ -575,10 +579,13 @@ function pbBox(){
     <small class="muted">${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.route?" · "+route(x.route):""}<br>
     ${x.page?"📍 "+(/^[\w./-]+(#.*)?$/.test(x.page)?`<a href="${esc(x.page)}" target="_blank">${esc(where)}</a>`:esc(where)):""}${x.device?" · "+esc(x.device):""}</small>
     ${(x.errors||[]).length?`<details><summary>Errors the page logged (${x.errors.length})</summary>${x.errors.map(e=>`<code>${esc(e)}</code>`).join("")}</details>`:""}
-    <div>${x.fixed?"":`<button data-do="pbclaude" data-id="${esc(x.id)}" title="Start a Claude session to fix it, with everything in this report">🤖 Fix with Claude</button> `}${x.shot?`<button data-do="pbshot" data-id="${esc(x.id)}">📷 Screenshot</button> `:""}<button class="g" data-do="pbfix" data-id="${esc(x.id)}" data-v="${x.fixed?"":"1"}">${x.fixed?"Reopen":"Mark as fixed"}</button> <button class="g" data-do="pbdel" data-id="${esc(x.id)}">Delete</button></div></li>`};
+    <div>${x.fixed?"":`<button data-do="pbclaude" data-id="${esc(x.id)}" title="Start a Claude session to fix it, with everything in this report">🤖 Fix with Claude</button> `}${x.shot?`<button data-do="pbshot" data-id="${esc(x.id)}">📷 Screenshot</button> `:""}<button class="g" data-do="pbfix" data-id="${esc(x.id)}" data-v="${x.fixed?"":"1"}" title="${x.fixed?"Open it again (an unread ✅ note to the student is taken back)":"The student gets a ✅ note saying it is fixed, the next time they open a page"}">${x.fixed?"Reopen":"✅ Mark as fixed"}</button> <button class="g" data-do="pbdel" data-id="${esc(x.id)}">Delete</button></div></li>`};
   return `<div class="box" id="probs">${fold("probs",`⚠️ Problem reports <small class="muted">${np?`<b>${np} open</b> · `:""}${L.length} in total</small>`,
-    `<p class="muted">Students (and the tester) send them with ⚠️ Problem in the bottom bar of any page. Each report says where the student was (page and the section on screen), their route and device, and the last errors the page logged (for example an audio file that did not load). 🤖 Fix with Claude starts a Claude session with the whole report. The 🔔 in the bottom bar of every page counts the open ones.</p>`+(L.length?`<ul class="pbl">${L.map(li).join("")}</ul>`:'<p class="muted">No problem reports.</p>'))}</div>`;
+    `<p class="muted">Students (and the tester) send them with ⚠️ Problem in the bottom bar of any page. Each report says where the student was (page and the section on screen), their route and device, and the last errors the page logged (for example an audio file that did not load). 🤖 Fix with Claude starts a Claude session with the whole report. ✅ Mark as fixed sends the student a note that it is fixed; Delete can send them a thank-you instead. The 🔔 in the bottom bar of every page counts the open ones.</p>`+(L.length?`<ul class="pbl">${L.map(li).join("")}</ul>`:'<p class="muted">No problem reports.</p>'))}</div>`;
 }
+// The note the student gets (shared/js/el-reply.js writes the words): in the language of the route the report was sent with.
+const pbReply=(x,kind)=>({uid:x.uid,kind,what:x.kind||"other",text:String(x.text||"").slice(0,300),where:String(x.section||x.title||"").slice(0,200),en:!!x.route&&!elCa(x.route),created:DEMO?new Date():F.serverTimestamp()});
+const pbNote=(x,kind)=>{const r=replyText(pbReply(x,kind),!!x.route&&!elCa(x.route));return `<div style="border:2px solid ${kind==="fixed"?"#16a34a":"#7c3aed"};border-radius:12px;padding:8px 12px;margin:8px 0"><b>${esc(r.title)}</b><br>${esc(r.body)}</div>`};
 // "🤖 Fix with Claude" (Roger, 26 Oct 2026): a prompt with everything in the report. Claude Desktop opens a new Claude Code session with it
 // (claude://code/new?q=…&folder=…, the prompt is only filled in, never sent); the English Lab project has no link that starts a thread,
 // so the other button copies the prompt and opens the project chat, where Roger pastes it.
@@ -796,7 +803,11 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     pbclaude:()=>pbClaude(k.id),
     pbcopy:async()=>{const txt=$("#pbq").value;let ok=true;try{await navigator.clipboard.writeText(txt)}catch(e){ok=false;$("#pbq").select()}
       $("#pbmsg").textContent=ok?"Copied. Paste it in the English Lab project chat (it opened in a new tab) to start a thread.":"Could not copy: the text is selected, press Ctrl+C.";open(PB_PROJECT,"_blank","noopener")},
-    pbfix:()=>act(api.pbFix(k.id,!!k.v)),pbdel:()=>{if(confirm("Delete this problem report?"))act(api.pbDel(k.id))},
+    pbfix:()=>act(api.pbFix(k.id,!!k.v)),pbdel:()=>{const x=S.D.pb.find(y=>y.id===k.id);if(!x)return;
+      dlg(x.fixed?`<h3>Delete this report?</h3><p class="muted">It is marked as fixed and the student was told. Nothing else is sent.</p><div class="row" style="justify-content:flex-start"><button data-do="pbdelok" data-id="${esc(x.id)}">Delete</button></div>`
+        :`<h3>Delete this report?</h3><p class="muted">Deleting it means you checked it and the site is right. You can send ${esc(x.name||"the student")} a thank-you note; they see it once, the next time they open a page:</p>${pbNote(x,"thanks")}
+        <div class="row" style="justify-content:flex-start"><button data-do="pbdelok" data-id="${esc(x.id)}" data-t="1">💌 Delete and thank the student</button><button class="g" data-do="pbdelok" data-id="${esc(x.id)}">Delete without a message</button></div>`)},
+    pbdelok:()=>{$("#dlg").close();act(api.pbDel(k.id,!!k.t))},
     acc:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.to))},rej:()=>{$("#dlg").close();act(api.reject(u,S.ls))},
     rt:()=>rtPanel(u),
     rton:()=>{S.rtOn[u]=t.checked;render()},
