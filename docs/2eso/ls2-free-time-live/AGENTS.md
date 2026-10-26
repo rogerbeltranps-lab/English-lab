@@ -20,6 +20,7 @@ Newest first. One line per decision; update a line instead of adding a contradic
 
 | Date | Decision |
 | --- | --- |
+| 2026-10-26 | **Checkpoints are not singled out** (Roger): same as 4ESO LS2, students only read the general continuous-assessment note, checkpoints 2 and 3 are “homework”, and each checkpoint must be done to open the activities after it (root `AGENTS.md`). |
 | 2026-10-26 | **Teacher checklist and tips** (Roger): per-session teaching tips for this LS are `tips` in `EL_PLAN["2eso-free-time-live"]`, shown under each session on the dashboard checklist (rule in the root AGENTS.md). |
 | 2026-10-26 | **Summary always on the LS page** (Roger: students download it whenever they want): besides the board box, the *Language & Knowledge* tab of the LS page has a card with the student's own route PDF (teacher and testers: all three), filled by `el-cloud.js`. Copyright checked: original content only (built from this LS's pages), no textbook material or images, © line on every page. |
 | 2026-10-26 | *(Claude)* **Exam listening** *Two vlogs: Maya and Ben* (music festival, karate tournament; 1 min 40 s, Charlotte + Leo Moreno), readings *Pol at the lake* + *Winter Skate Day* web page; writing 43 = a vlog script (Insecure 60–80 words with a scaffold box, Safe 90–120, Daring 120–160). Exams Fri 20 Nov for both groups. Word files in project files `ls2-2eso/exam/`. |
