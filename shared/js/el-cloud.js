@@ -71,7 +71,8 @@ function push(){
 Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.test(k))return;origSet.call(this,k,v);if(this===localStorage&&!SKIP.test(k))push()};
 
 async function login(){
-  const u=await signIn({auth,A,domain:DOMAINS[0]});if(!u)return;
+  // The dashboard is the teacher's page: its Sign in goes straight to Google (the students' window is for every other page).
+  const u=onDash?await teacherLogin():await signIn({auth,A,domain:DOMAINS[0]});if(!u)return;
   // Google is only for the teacher (Roger, 26 Oct 2026): any other account that comes in through the Google link is signed out.
   const google=(u.providerData||[]).some(p=>p.providerId==="google.com")&&!(u.providerData||[]).some(p=>p.providerId==="password");
   if(!isTeacher(u)&&(google||!isStudent(u))){await signOut(auth);alert(google&&isStudent(u)?"Google sign-in is only for the teacher. Sign in with your school email and your password. · Entra amb el correu de l'institut i la teva contrasenya.":"Sign in with your school email (@"+DOMAINS.join(", @")+").");return}
@@ -80,6 +81,10 @@ async function login(){
   // the teacher goes from Home to the dashboard and stays on any other page (to preview it).
   if(isStudent(u)&&!onBoard&&!onLab)location.href=BOARD;
   else if(isTeacher(u)&&onHome)location.href=DASH;
+}
+async function teacherLogin(){
+  const p=new A.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
+  try{return (await A.signInWithPopup(auth,p)).user}catch(x){if(x&&x.code!=="auth/popup-closed-by-user")console.warn("sign in",x);return null}
 }
 async function refuse(u){
   const mail=u.email;await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");
