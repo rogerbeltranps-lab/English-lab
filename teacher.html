@@ -18,7 +18,7 @@ ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}
 details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>summary{font-size:.9rem;font-weight:600;color:#475569}tr.away td{color:#94a3b8;background:#f8fafc}.tag{font-size:11px;font-weight:600;background:#e2e8f0;color:#475569;border-radius:999px;padding:1px 6px;margin-left:4px}label.btn{background:#0f766e;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 8px}.form input,.form select{width:100%;box-sizing:border-box}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}
-button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6px;padding:2px 7px;margin:1px;font-size:12px;font-weight:600}button.lv.on{color:#fff}td.gr{cursor:pointer;white-space:nowrap}td.gr:hover{outline:2px solid #0f766e;outline-offset:-2px}.sug{color:#64748b;font-style:italic}.deg{font-weight:700}td.tot{font-weight:700}.dlg input.ex{width:56px}table.lvt td{text-align:left}
+button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6px;padding:2px 7px;margin:1px;font-size:12px;font-weight:600}button.lv.on{color:#fff}td.gr{cursor:pointer;white-space:nowrap}td.gr:hover{outline:2px solid #0f766e;outline-offset:-2px}.sug{color:#64748b;font-style:italic}.deg{font-weight:700}td.tot{font-weight:700}.dlg input.ex{width:56px}table.lvt td{text-align:left}ul.pbl{list-style:none;padding:0;margin:6px 0}ul.pbl li{margin:10px 0;border-left:3px solid #b45309;padding-left:10px}ul.pbl li.fixed{border-color:#cbd5e1;color:#64748b}ul.pbl details>summary{font-size:13px;font-weight:600;color:#475569}ul.pbl code{font-size:12px;display:block;white-space:pre-wrap}
 #pdf{display:none}body.pdfmode{max-width:none;background:#e2e8f0}body.pdfmode>*:not(#pdf){display:none!important}body.pdfmode #pdf{display:block}
 .pdfbar{position:sticky;top:0;z-index:5;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;margin:0 auto 12px;max-width:210mm;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #pdf .pg{background:#fff;max-width:210mm;margin:0 auto 16px;padding:14mm 12mm;box-sizing:border-box;box-shadow:0 2px 10px #0002;font-size:13px}#pdf .top{font-size:11px;color:#64748b;margin:0 0 4px;border-bottom:1px solid #e2e8f0;padding-bottom:4px}#pdf h2{margin:.2em 0}#pdf h3{font-size:1rem;margin:12px 0 4px}#pdf h4{margin:0 0 4px;font-size:.95rem}
@@ -51,14 +51,16 @@ const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309",public:"#2563eb"};
 
 // ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}, ro:{id:{email,group,surname1,surname2,first,tutor}},
 //               pt:{id:{team,t1,t2,t3}}, tm:{group:{list,score,best}}, tk:{group:{ticks:{"ls|session line":true}}} (the teacher's time plan checklist)}
+// pb = problem reports from students (problems/{id}: uid, email, name, group, ls, activity, route, page, title, section, kind, text, errors, device, created, fixed), sent with "⚠️ Problem" in the bottom bar.
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
 // pt, tm = team points (points/{same id as the list}, teams/{group}; shared/js/el-points.js).
 async function load(){
-  if(DEMO){DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};return DEMO}
-  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{}},up=r=>r.ref.parent.parent.id;
+  if(DEMO){DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];return DEMO}
+  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[]},up=r=>r.ref.parent.parent.id;
   try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
   try{(await F.getDocs(F.collection(db(),"points"))).forEach(p=>D.pt[p.id]=p.data());(await F.getDocs(F.collection(db(),"teams"))).forEach(t=>D.tm[t.id]=t.data())}catch(e){D.ptErr=true;console.warn("points",e)}
   try{(await F.getDocs(F.collection(db(),"teacherPlan"))).forEach(t=>D.tk[t.id]=t.data())}catch(e){console.warn("teacherPlan",e)}
+  try{(await F.getDocs(F.collection(db(),"problems"))).forEach(x=>D.pb.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("problems",e)}
   (await F.getDocs(F.collection(db(),"students"))).forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()));
   (await F.getDocs(F.collectionGroup(db(),"results"))).forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data());
   (await F.getDocs(F.collectionGroup(db(),"levels"))).forEach(l=>(D.lv[up(l)]=D.lv[up(l)]||{})[l.id]=l.data());
@@ -89,6 +91,11 @@ const api={
   reject:(u,ls)=>{const l=S.D.lv[u][ls],to=l.request;if(DEMO){delete l.request;delete l.reason;l.declined=to;return}return put(["students",u,"levels",ls],{request:F.deleteField(),reason:F.deleteField(),declined:to,declinedAt:F.serverTimestamp()})},
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
   ls:(id,o)=>DEMO?Object.assign(S.D.ls[id],o):put(["ls",id],o),
+  pbFix:(id,v)=>DEMO?S.D.pb.find(x=>x.id===id).fixed=v:put(["problems",id],{fixed:v}),
+  pbDel:id=>{const x=S.D.pb.find(y=>y.id===id);if(DEMO){S.D.pb=S.D.pb.filter(y=>y!==x);return}
+    const b=F.writeBatch(db());b.delete(F.doc(db(),"problems",id));if(x&&x.shot)b.delete(F.doc(db(),"problemShots",id));return b.commit()},
+  // the screenshot of a report is loaded only when the teacher opens it (problemShots/{same id})
+  pbShot:async id=>DEMO?((DEMO.shots||{})[id]||null):((await F.getDoc(F.doc(db(),"problemShots",id))).data()||{}).img||null,
   // answer to a final-product step: results/{activity}.replies[step]; the student sees it on their page
   reply:(u,a,step,text)=>{if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{}),x=(r[a.id]=r[a.id]||{ls:a.ls,activity:a.id});(x.replies=x.replies||{})[step]=text;return}return put(["students",u,"results",resKey(a.id)],{ls:a.ls,activity:a.id,replies:{[step]:text}})}
 };
@@ -221,8 +228,8 @@ function render(){
   $("#tabs").innerHTML=`<button class="tab cplan ${S.g==="plan"?"on":""}" data-do="tab" data-g="plan" title="Exam day and this week's plan in every group">📅 Time plan</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
     +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
-  if(S.g==="plan"){$("#main").innerHTML=overview();return}
-  if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+rosterBox();return}
+  if(S.g==="plan"){$("#main").innerHTML=pbBox()+overview();return}
+  if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+pbBox()+rosterBox();return}
   const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);COURSE=grp.course;
   const mine=l=>elLsForGroup(l,D.ls[l.id],S.g);
   if(!lss.some(l=>l.id===S.ls))S.ls=(lss.filter(l=>mine(l)&&(D.ls[l.id]||{}).status==="open").pop()||lss.filter(mine).pop()||lss[lss.length-1]).id; // latest open LS assigned to the group
@@ -236,7 +243,7 @@ function render(){
     +(G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
-    +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`
+    +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`+pbBox()
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
     +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time or to answer a route request (🔁).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
@@ -254,8 +261,10 @@ function todo(studs,ls,list){   // studs: signed-in students only. Only final pr
   studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>out.push(`✉️ <b>${name(s)}</b> commented on <b>${esc(t)}</b> (${esc(a.title)}): “${esc(handedIn(s.uid,a)[id].comment)}” <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button>`))));
   studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
     if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(l.level)} → ${route(l.request)}${l.reason?` · “${esc(l.reason)}”`:""} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Decline</button>`)});
+  const np=S.D.pb.filter(x=>!x.fixed).length;
+  if(np)out.push(`⚠️ ${np} open problem report${np>1?"s":""} from students (all groups) <button data-do="pbopen">Read</button>`);
   const fp=list.find(a=>a.manual),nm=fp?studs.filter(s=>!((S.D.rs[s.uid]||{})[fp.id]||{}).max).length:0;
-  return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer and no route requests.</p>')
+  return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer, no route requests and no open problem reports.</p>')
     +(fp&&nm?`<p class="muted">📝 ${nm} student${nm>1?"s":""} without a final product mark (click their Final product score to mark it).</p>`:"");
 }
 // ---- team points (shared/js/el-points.js; root AGENTS.md "Team points"): the group's teams and each student's points per term.
@@ -447,6 +456,21 @@ function noGroup(studs){
   return `<div class="box"><h2>Students without a group</h2><p class="muted">They signed in before choosing a group. Assign one and they move to that group's tab.</p>`
     +(studs.length?`<table><tbody>${studs.map(s=>`<tr><td class="stu">${name(s)}<br><small class="muted">${esc(s.email)}</small></td><td>${groupSel(s.uid,"")}</td></tr>`).join("")}</tbody></table>`:'<p class="muted">Everyone has a group.</p>')+"</div>";
 }
+// Problem reports from students (all groups): open ones first, then newest first. Fixed ones stay until you delete them.
+const PB_KIND={media:"🔊 An audio or a video does not play",stuck:"⛔ Cannot go on / a button does not work",marking:"❌ A correct answer is marked wrong",display:"🖥️ The page looks wrong or does not load",other:"❓ Something else"};
+const pbWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.created)):null;
+function pbBox(){
+  const L=[...S.D.pb].sort((a,b)=>(!!a.fixed-!!b.fixed)||((pbWhen(b)||0)-(pbWhen(a)||0))),np=L.filter(x=>!x.fixed).length;
+  const who=x=>S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email),gr=x=>(GR.find(g=>g.id===x.group)||{}).name;
+  const li=x=>{const w=pbWhen(x),where=[x.title||x.page,x.section].filter(Boolean).join(" › ");
+    return `<li class="${x.fixed?"fixed":""}"><b>${esc(PB_KIND[x.kind]||x.kind)}</b>${x.fixed?' <span class="tag">Fixed</span>':""}${x.text?`<div class="hand">${esc(x.text)}</div>`:""}
+    <small class="muted">${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.route?" · "+route(x.route):""}<br>
+    ${x.page?"📍 "+(/^[\w./-]+(#.*)?$/.test(x.page)?`<a href="${esc(x.page)}" target="_blank">${esc(where)}</a>`:esc(where)):""}${x.device?" · "+esc(x.device):""}</small>
+    ${(x.errors||[]).length?`<details><summary>Errors the page logged (${x.errors.length})</summary>${x.errors.map(e=>`<code>${esc(e)}</code>`).join("")}</details>`:""}
+    <div>${x.shot?`<button data-do="pbshot" data-id="${esc(x.id)}">📷 Screenshot</button> `:""}<button class="g" data-do="pbfix" data-id="${esc(x.id)}" data-v="${x.fixed?"":"1"}">${x.fixed?"Reopen":"Mark as fixed"}</button> <button class="g" data-do="pbdel" data-id="${esc(x.id)}">Delete</button></div></li>`};
+  return `<div class="box" id="probs">${fold("probs",`⚠️ Problem reports <small class="muted">${np?`<b>${np} open</b> · `:""}${L.length} in total</small>`,
+    `<p class="muted">Students (and the tester) send them with ⚠️ Problem in the bottom bar of any page. Each report says where the student was (page and the section on screen), their route and device, and the last errors the page logged (for example an audio file that did not load).</p>`+(L.length?`<ul class="pbl">${L.map(li).join("")}</ul>`:'<p class="muted">No problem reports.</p>'))}</div>`;
+}
 // ---- student list (roster): import from Excel, add, edit, remove
 function rosterBox(){
   const ro=Object.values(S.D.ro),noMail=ro.filter(r=>!r.email);
@@ -624,6 +648,13 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       $("#dlg").close();act(api.saveRo(id,o,old,s&&!s.away?s.uid:null))},
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
+    pbopen:()=>{S.open.add("probs");render();$("#probs").scrollIntoView({behavior:"smooth"})},
+    pbshot:async()=>{const x=S.D.pb.find(y=>y.id===k.id)||{},cap=x.shot==="page"?"Captured by the page when the student pressed “Capture this screen” (it can look slightly different from the real screen; videos and embedded content may be blank).":"An image the student chose or pasted.";
+      dlg(`<h3>📷 Screenshot</h3><p class="muted">${esc(PB_KIND[x.kind]||"")} · ${esc([x.title||x.page,x.section].filter(Boolean).join(" › "))}</p><p id="pbimg">Loading…</p>`,true);
+      try{const img=await api.pbShot(k.id),ok=typeof img==="string"&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(img);
+        $("#pbimg").innerHTML=ok?`<img src="${img}" alt="Screenshot from the student" title="Click to see it full size" onclick="this.style.maxWidth=this.style.maxWidth==='none'?'100%':'none'" style="max-width:100%;cursor:zoom-in;border:1px solid #cbd5e1;border-radius:8px"><br><small class="muted">${cap}</small>`:"The screenshot could not be found."}
+      catch(e){console.warn("shot",e);$("#pbimg").textContent="The screenshot could not be loaded: "+e.message}},
+    pbfix:()=>act(api.pbFix(k.id,!!k.v)),pbdel:()=>{if(confirm("Delete this problem report?"))act(api.pbDel(k.id))},
     acc:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.to))},rej:()=>{$("#dlg").close();act(api.reject(u,S.ls))},
     rt:()=>rtPanel(u),setrt:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.r))},
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),

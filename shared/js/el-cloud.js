@@ -4,8 +4,9 @@ import "./el-copyright.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {signIn} from "./el-signin.js";
-import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,doc,getDoc,setDoc,collection,writeBatch,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
+import {report} from "./el-report.js";
 
 const SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
@@ -214,6 +215,16 @@ async function submitActivity(a){
   return true;
 }
 
+// Problem reports (bottom bar "⚠️ Problema / Problem"): problems/{id}, read only by the teacher in the dashboard.
+// Catalan for Insecure and with no route; English for Safe and Daring (LS pages: the route; the board: its own language).
+const repEn=()=>myLevel?myLevel!=="insecure":onBoard&&document.documentElement.lang==="en";
+// A screenshot goes in its own document (problemShots/{same id}), so the dashboard loads it only when the teacher opens it.
+const reportProblem=u=>report({en:repEn(),save:o=>{
+  const {shot,shotFrom}=o,ref=doc(collection(db,"problems")),b=writeBatch(db);delete o.shot;delete o.shotFrom;
+  b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,ls:lsId,activity:actId,route:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()}));
+  if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
+  return b.commit()}});
+
 function bar(){
   const el=document.createElement("div");el.id="el-cloud-bar";
   el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:10002;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;font:13px system-ui,sans-serif;box-shadow:0 2px 8px #0002;display:flex;gap:8px;align-items:center";
@@ -225,6 +236,7 @@ function bar(){
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)&&lsId)el.append(b("Change route",()=>requestLevel(u))," ");
+      if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
         s.value=viewGroup(u)||"";s.onchange=()=>{origSet.call(localStorage,"el_view",s.value);location.reload()};el.append(s," ")}
@@ -258,6 +270,7 @@ function studyCard(u){
 let draw=()=>{};
 const start=()=>{draw=bar();draw(user)};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start):start();
+new MutationObserver(()=>draw(user)).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});   // the board picks its language after loading
 
 function loadCatalog(){return window.EL_CATALOG?Promise.resolve():new Promise(r=>{const s=document.createElement("script");s.src=new URL("shared/js/el-catalog.js",ROOT).href;s.onload=r;s.onerror=r;document.head.append(s)})}
 await loadCatalog();
@@ -275,6 +288,7 @@ onAuthStateChanged(auth,async u=>{
   try{await gate(u)}catch(e){console.warn("gate",e)}
   menuLink(u);
   studyCard(u);
+  if(myLevel)draw(u);   // the route is known now: the Problem button speaks its language
   // Floating weekly to-do list for students (and testers) on every page that loads this file (shared/js/el-todo.js).
   if(u&&isStudent(u)&&myGroup&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:u,group:myGroup,root:ROOT,lsId,seesAll:seesAll(u)})).catch(e=>console.warn("todo",e));
   listeners.forEach(f=>f(u));
