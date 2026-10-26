@@ -20,6 +20,7 @@ Newest first. One line per decision; update a line instead of adding a contradic
 
 | Date | Decision |
 | --- | --- |
+| 2026-10-26 | **Grammar and vocabulary from delayed retrieval** (Roger, research audit): as 4ESO LS2, checkpoints 1–4 50 % · recall warm-ups 25 % · practice done on time 25 %; checkpoints 2 and 3 have due dates and count. |
 | 2026-10-26 | **Checkpoints are not singled out** (Roger): same as 4ESO LS2, students only read the general continuous-assessment note, checkpoints 2 and 3 are “homework”, and each checkpoint must be done to open the activities after it (root `AGENTS.md`). |
 | 2026-10-26 | **Teacher checklist and tips** (Roger): per-session teaching tips for this LS are `tips` in `EL_PLAN["2eso-free-time-live"]`, shown under each session on the dashboard checklist (rule in the root AGENTS.md). |
 | 2026-10-26 | **Summary always on the LS page** (Roger: students download it whenever they want): besides the board box, the *Language & Knowledge* tab of the LS page has a card with the student's own route PDF (teacher and testers: all three), filled by `el-cloud.js`. Copyright checked: original content only (built from this LS's pages), no textbook material or images, © line on every page. |

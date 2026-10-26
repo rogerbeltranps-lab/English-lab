@@ -55,6 +55,7 @@ Grammar and vocabulary decks for the projector are in the English Lab menu: [lab
 Roger's reference documents, the ones every new LS follows. Word copies are in the LS project's files, folder `reference/`.
 
 - [How we build a Learning Situation](general/new-ls-playbook.md): the checklist for a new LS, with 4ESO LS2 as the model.
+- [Research audit brief](general/research-audit-brief.md): the changes Roger approved after the research audit (26 Oct 2026): what the site builds and what the LS project designs.
 - [Worked example: from competence to LS criterion](https://claude.ai/artifact/RLZP7UdTgREkiT7MJgCFAR): how a competence becomes an LS criterion with its indicators, plus the 4ESO LS2 assessment example.
 
 ## Docs map (for building the site)
