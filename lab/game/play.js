@@ -21,8 +21,8 @@ const gameOn=()=>!!(x&&x.game&&x.on&&fresh(x.at));
 const score=()=>Object.entries((x&&x.keys)||{}).filter(([i,ok])=>mine[i]===ok).length;
 const first=()=>((user&&user.displayName)||"").split(" ")[0]||(user&&user.email||"").split("@")[0];
 
-const top=()=>`<div class="top"><span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>
-  <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button>${!gameOn()||x.phase==="end"?`<a class="btn ghost" href="${esc(FROM)}">Leave</a>`:""}</div>`;
+const top=()=>`<div class="top">${!gameOn()||x.phase==="end"?`<a class="btn go" href="${esc(FROM)}">← Back</a>`:""}<span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>${user?`<span class="pill" title="${esc(user.email)}">👤 ${esc(first())}</span>`:""}
+  <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`;
 const page=(h,cls)=>{app$.innerHTML=top()+`<div class="main"><div class="center ${cls||""}"><div>${h}</div></div></div>`};
 
 function draw(){
@@ -31,11 +31,11 @@ function draw(){
   if(!group)return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>You are not on a class list yet. Ask your teacher.</p></div>`);
   if(!gameOn())return page(`<div class="emo pop">⏳</div><p class="big">${x&&x.game&&x.phase==="end"?"The game is over":"Waiting for your teacher…"}</p><p class="mid">The game opens here by itself.</p>`);
   const ph=x.phase,i=String(x.i),q=x.q||{},n=(q.opts||[]).length;
-  if(ph==="lobby")return page(`<div class="emo pop">🎉</div><p class="big">You're in, ${esc(first())}!</p><p class="mid">Look for your name on the board.</p>${tester?'<p class="note">Test account: your answers are not saved.</p>':""}`);
+  if(ph==="lobby")return page(`<div class="emo pop">🎉</div><p class="big">You're in, ${esc(first())}!</p><p class="mid">Look for your name on the board.</p>`);
   if(ph==="theory")return page(`<div class="emo pop">${pic(x.th&&x.th.img)||"👀"}</div><p class="big">Look at the board</p><p class="mid">${md(x.th&&x.th.title)}</p>`);
   if(ph==="end"){const s=score(),t=x.qt||0;
     if(shown!==x.sid+":end"){shown=x.sid+":end";G.fx("fanfare");if(s>0)G.confetti()}
-    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p><p><a class="btn go" href="${esc(FROM)}">Back</a></p>`)}
+    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p>`)}
   if(ph==="q"&&mine[i]==null){
     app$.innerHTML=top()+`<div class="main"><div class="card qcard slidein">${md(q.text)}</div>
       <div class="tiles${n===2?" two":""}">${(q.opts||[]).map((o,k)=>`<button class="tile t${k}" data-v="${k}"><span class="shp s${k}"></span><span class="tx">${md(o)}</span></button>`).join("")}</div></div>`;return}
@@ -53,7 +53,7 @@ app$.addEventListener("click",async e=>{
   const t=e.target.closest(".tile[data-v]");
   if(t&&gameOn()&&x.phase==="q"){const i=String(x.i),v=+t.dataset.v;if(mine[i]!=null)return;
     mine[i]=v;G.fx("tap");draw();
-    if(ref&&mySid===x.sid&&!tester)S.setDoc(ref,{sid:x.sid,a:{[i]:v},at:S.serverTimestamp()},{merge:true}).catch(err=>console.warn("answer",err));
+    if(ref&&mySid===x.sid)S.setDoc(ref,{sid:x.sid,a:{[i]:v},at:S.serverTimestamp()},{merge:true}).catch(err=>console.warn("answer",err));
     return}
   const b=e.target.closest("[data-do]");if(!b)return;
   if(b.dataset.do==="mute"){G.sound(!G.sound());draw()}
@@ -65,7 +65,7 @@ async function join(){
   if(!ref||!gameOn()||x.sid===mySid||join.busy===x.sid)return;const sid=join.busy=x.sid;
   try{const d=await S.getDoc(ref);
     if(d.exists()&&d.data().sid===sid)mine=Object.assign({},d.data().a);
-    else{mine={};if(!tester)await S.setDoc(ref,{sid,a:{},at:S.serverTimestamp()})}
+    else{mine={};await S.setDoc(ref,{sid,a:{},at:S.serverTimestamp()})}
   }catch(e){console.warn("join",e);mine={}}
   if(join.busy===sid){mySid=sid;draw()}
 }
