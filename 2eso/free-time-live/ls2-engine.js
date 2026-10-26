@@ -43,6 +43,13 @@ var LS2 = (function () {
   function stamp(k) { state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = new Date().toISOString(); }
   function lastTry(k, score, max) { state.last = state.last || {}; state.last[k] = { score, max, level, date: new Date().toISOString() }; }
   function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) state.tries[k] = { score, max, level, date: new Date().toISOString() }; lastTry(k, score, max); save(); }
+  // items[panel_route]: every question of a panel's first counted check, kept once per route, for the dashboard's Question analysis
+  // (Roger, 26 Oct 2026). q: the question's place in the page's list (in the route's own list when the page gives one per route),
+  // ok: 1 right / 0 wrong, a: what was typed or the option chosen (0 = the right one). Students never see it.
+  function firstItems(id, src, items, got) {
+    state.items = state.items || {}; const k = id + '_' + level; if (state.items[k]) return;
+    state.items[k] = { level, date: new Date().toISOString(), q: items.map((it, i) => Array.isArray(src) ? src.indexOf(it) : i), ok: got.map(g => g[0] ? 1 : 0), a: got.map(g => g[1]) }; save();
+  }
   function steps() { return LP.panels.flatMap(p => p.type === 'info' || p.type === 'summary' ? [] : p.type === 'vocab' ? (p.practice ? ['cards', 'practice'] : ['cards']) : [p.id]); }
   function progress() {
     const s = steps(), n = s.filter(k => state.done[k]).length;
@@ -72,10 +79,14 @@ var LS2 = (function () {
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>').join('');
   }
   // reveal: true shows the answer at once (recall); otherwise the answer appears after the second wrong try.
+  // got: [right, what was typed] per question of the last check (firstItems)
+  let got = [];
+  const typedAs = el => String(el.value || '').trim().slice(0, 40);
   function checkTyped(items, prefix, reveal, count) {
-    let score = 0;
+    let score = 0; got = [];
     items.forEach((it, i) => {
       const v = norm($('#' + prefix + i).value), ok = it.a.some(a => norm(a) === v), f = $('#' + prefix + 'f' + i);
+      got.push([ok, typedAs($('#' + prefix + i))]);
       const key = prefix + i;
       if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
       const why = ca() ? (it.ca || it.en || '') : (it.en || it.ca || '');
@@ -125,6 +136,7 @@ var LS2 = (function () {
       stays(p.id, p.id, p.id + 'List', items, count => {
         const s = checkTyped(items, p.id, true, count);
         if (count) {
+          firstItems(p.id, p.items, items, got);
           state.first = state.first || {};
           if (!state.first[level]) state.first[level] = { score: s, max: items.length, date: new Date().toISOString() };
           lastTry(p.id, s, items.length); save();
@@ -161,7 +173,7 @@ var LS2 = (function () {
       if (p.practice) {
         const items = forLevel(p.practice);
         $('#vocabPractice').innerHTML = typedHtml(items, 'vp');
-        stays('vocab', 'vp', 'vocabPractice', items, count => { const s = checkTyped(items, 'vp', false, count); if (count) firstTry('practice', s, items.length); const ok = s >= need(items.length); result($('#vocabResult'), s, items.length, ok); if (ok && count) complete('practice'); });
+        stays('vocab', 'vp', 'vocabPractice', items, count => { const s = checkTyped(items, 'vp', false, count); if (count) { firstTry('practice', s, items.length); firstItems('vocab', p.practice, items, got); } const ok = s >= need(items.length); result($('#vocabResult'), s, items.length, ok); if (ok && count) complete('practice'); });
       }
     }
   });
@@ -232,15 +244,15 @@ var LS2 = (function () {
         learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + p.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') +
         '</div><div class="feedback" id="' + p.id + 'f' + i + '"></div></div>').join('');
       stays(p.id, p.id, p.id + 'Form', items, count => {
-        let score = 0;
+        let score = 0; const g = [];
         items.forEach((q, i) => {
           const c = document.querySelector('input[name="' + p.id + i + '"]:checked'), ok = !!c && +c.value === 0, fb = $('#' + p.id + 'f' + i);
-          if (ok) score++;
+          if (ok) score++; g.push([ok, c ? +c.value : null]);
           fb.textContent = q.ex && c ? (ok ? (ca() ? 'Correcte! ' : 'Correct! ') : (ca() ? 'Encara no. ' : 'Not yet. ')) + tx(q.ex)
             : learningSupport.evidence(level, ok, c, q.o[0], ca() ? q.h : null, !!(p.media && (p.media.audio || p.media.youtube)));
           fb.className = 'feedback ' + (ok ? 'ok' : 'no');
         });
-        if (count) firstTry(p.id, score, items.length);
+        if (count) { firstTry(p.id, score, items.length); firstItems(p.id, p.items, items, g); }
         const ok = score >= need(items.length);
         result($('#' + p.id + 'Result'), score, items.length, ok);
         if (ok && count) complete(p.id);
@@ -254,7 +266,7 @@ var LS2 = (function () {
     bind() {
       const items = forLevel(p.items);
       $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id);
-      stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) firstTry(p.id, s, items.length); const ok = s >= need(items.length); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok && count) complete(p.id); });
+      stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = s >= need(items.length); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok && count) complete(p.id); });
     }
   });
 
@@ -518,15 +530,15 @@ var LS2 = (function () {
              : '<input type="text" class="typed" id="' + p.id + i + '" autocomplete="off" autocapitalize="off" spellcheck="false">') +
         '<div class="feedback" id="' + p.id + 'f' + i + '"></div></div>').join('');
       stays(p.id, p.id, p.id + 'List', items, count => {
-        let right = 0, pts = 0;
+        let right = 0, pts = 0; const g = [];
         items.forEach((q, i) => {
           const fb = $('#' + p.id + 'f' + i);
           let ok;
           if (q.o) {
-            const c = document.querySelector('input[name="' + p.id + i + '"]:checked'); ok = !!c && +c.value === 0;
+            const c = document.querySelector('input[name="' + p.id + i + '"]:checked'); ok = !!c && +c.value === 0; g.push([ok, c ? +c.value : null]);
             fb.textContent = learningSupport.evidence(level, ok, c, q.o[0], null, !!(p.media && p.media.audio));
           } else {
-            const v = norm($('#' + p.id + i).value), key = p.id + i; ok = q.a.some(a => norm(a) === v);
+            const v = norm($('#' + p.id + i).value), key = p.id + i; ok = q.a.some(a => norm(a) === v); g.push([ok, typedAs($('#' + p.id + i))]);
             if (!ok && v && count) tries[key] = (tries[key] || 0) + 1;
             fb.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!') : !v ? (ca() ? 'Escriu una resposta.' : 'Type an answer.')
               : (ca() ? 'Encara no. ' : 'Not yet. ') + (tries[key] >= 2 ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(q.a[0]) + '</strong>' : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
@@ -535,7 +547,7 @@ var LS2 = (function () {
           if (ok) { right++; pts += ptsOf(p, q); }
         });
         const tk = p.id + '_' + level;
-        if (count) firstTry(tk, pts, maxOf(p));
+        if (count) { firstTry(tk, pts, maxOf(p)); firstItems(p.id, p.items, items, g); }
         const done = right >= need(items.length);
         result($('#' + p.id + 'Result'), right, items.length, done, ' · ' + pts + ' / ' + ptsWord(maxOf(p)) + (ca() ? ' (primer intent: ' : ' (first try: ') + ((state.tries || {})[tk] || {}).score + ')');
         if (done && count) complete(p.id);
