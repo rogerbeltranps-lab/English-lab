@@ -142,7 +142,7 @@ function draw(){
     const list=window.EL_GAMES||[];
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game.</p><div class="picks">${list.map(d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(d.title)}<br><small style="opacity:.7">${esc(d.course==="2eso"?"2 ESO":"4 ESO")}${d.ls?" · "+esc(d.ls):""}</small></span></button>`).join("")||"<p>No games yet.</p>"}</div><p><a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.phase==="pick"||!H.g){
-    const gs=(window.EL_GROUPS||[]).filter(g=>!H.deck.course||g.course===H.deck.course);
+    const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(H.deck.title)}</h1><p class="sub">${slides().length} slides · ${qList().length} questions. Start the game for a group: its students are taken into it.</p>
       <div class="picks">${gs.map(g=>`<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}</button>`).join("")}</div>
       <p><button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}

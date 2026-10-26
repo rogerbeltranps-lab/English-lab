@@ -359,6 +359,7 @@ onAuthStateChanged(auth,async u=>{
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
   gamePush(u);
+  document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u));   // teacher-only links (e.g. a class game on its learning path)
   menuLink(u);   // again after gate, which knows the route (the label follows its language)
   try{await gate(u)}catch(e){console.warn("gate",e)}
   if(reloadIfStale())return;   // wiped on a page without progress sync
