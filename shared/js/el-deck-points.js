@@ -20,7 +20,9 @@ const store={get(k,d){try{const v=localStorage.getItem("elDeck."+k);return v===n
 
 const css=document.createElement("style");
 css.textContent=`
-.teambar{display:flex;gap:.5em;align-items:center;padding:.4em max(16px,env(safe-area-inset-right,0px)) .4em max(16px,env(safe-area-inset-left,0px));background:var(--surface);border-top:1px solid var(--line);overflow-x:auto}
+.teambar{padding:.4em max(16px,env(safe-area-inset-right,0px)) .4em max(16px,env(safe-area-inset-left,0px));background:var(--surface);border-top:1px solid var(--line)}
+.trow{display:flex;gap:.5em;align-items:center;overflow-x:auto}
+.who{font-size:.6em;line-height:1.2;color:var(--muted);margin-top:.2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .team{display:flex;align-items:center;gap:.35em;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:.25em .5em;flex:1 1 0;min-width:9.5em}
 .team input,.team .tn{flex:1;min-width:0;border:0;background:transparent;font:600 .8em var(--f-body);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .team .sc{font:800 1.5em var(--f-display);font-variant-numeric:tabular-nums;min-width:1.3em;text-align:center}
@@ -106,7 +108,8 @@ function draw(){
     :D?(T.ans?`<span class="tstat" title="Students following this presentation on their device">📡 <span id="ansN">${T.ans.n}</span> ${B("joined","connectats")}</span>`:"")+(D.list.length?`<button type="button" class="tool" id="buzzOpen" title="Open the buzzers on the students' boards (B)">🔔 ${B("Buzz","Polsador")}</button>`:"")+`<span class="tstat" title="Saved for every member of the team">${B(elTermName(D.term,"en"),elTermName(D.term,"ca"))} · ${B("best","millor")} ${Math.max(0,...Object.values(D.pts))}</span><button type="button" class="tool" id="teamsReload" title="Load the teams again">↻</button>`
     :T.teacher?"":`<button type="button" class="tool" id="teamsSignIn" title="Sign in with the teacher's account to save the points for a class group">☁ ${B("Save points","Desa els punts")}</button>`;
   const ctl=cloudOn?"":`<select id="teamCount" aria-label="Number of teams">${[2,3,4,5,6].map(n=>`<option value="${n}"${n===local.n?" selected":""}>${n}</option>`).join("")}</select><button type="button" class="tool" id="teamsZero">${B("Reset","Zero")}</button>`;
-  bar.innerHTML=h+`<span class="tctl">${sel}${ctl}${stat}</span>`;
+  const who=T.ans?T.ans.who:[];
+  bar.innerHTML=`<div class="trow">${h}<span class="tctl">${sel}${ctl}${stat}</span></div>`+(T.ans?`<div class="who" id="ansWho" title="Students following this presentation on their device"${who.length?"":" hidden"}>${esc(who.join(" · "))}</div>`:"");
   resized();cbMode();
 }
 function toggle(on){
@@ -179,9 +182,10 @@ function listen(g){
   if(T.live&&T.live!==g)liveOff(T.live);T.live=g||null;if(!g)return;
   sendLive();beat=setInterval(sendLive,60e3);   // every minute too, so the students' boards know the class is still on
   cloud().then(fb=>{if(!fb||T.group!==g)return;
-    ansUnsub=fb.S.onSnapshot(fb.S.collection(fb.db,"live",g,"answers"),qs=>{const R={};let n=0;
-      qs.forEach(d=>{const x=d.data();if(x.sid!==T.sid)return;n++;Object.entries(x.a||{}).forEach(([q,v])=>{if(v>=0)(R[q]=R[q]||{})[v]=(R[q][v]||0)+1})});
-      const had=T.ans;T.ans={R,n};drawAns();const c=$("#ansN",bar);if(had&&c){c.textContent=n;cbMode()}else draw()},e=>console.warn("answers",e));   // a tap only updates the count
+    ansUnsub=fb.S.onSnapshot(fb.S.collection(fb.db,"live",g,"answers"),qs=>{const R={},who=[];let n=0;
+      qs.forEach(d=>{const x=d.data();if(x.sid!==T.sid)return;n++;who.push(d.id.split("@")[0]);Object.entries(x.a||{}).forEach(([q,v])=>{if(v>=0)(R[q]=R[q]||{})[v]=(R[q][v]||0)+1})});
+      who.sort();const had=T.ans;T.ans={R,n,who};drawAns();const c=$("#ansN",bar),w=$("#ansWho",bar);
+      if(had&&c&&w){c.textContent=n;w.textContent=who.join(" · ");w.hidden=!who.length;cbMode();resized()}else draw()},e=>console.warn("answers",e));   // a tap only updates the count
     let first=true;   // no sound for the state the page finds when it opens
     unsub=fb.S.onSnapshot(fb.S.doc(fb.db,"buzz",g),s=>{const was=T.buzz||{};T.buzz=s.exists()?s.data():null;const z=T.buzz||{};
       if(!first){if(z.open&&z.winner&&!was.winner)snd("first");else if(z.open&&!was.open)snd("open")}first=false;drawBuzz()},e=>console.warn("buzz",e))});
