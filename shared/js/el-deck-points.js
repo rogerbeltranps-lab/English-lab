@@ -79,13 +79,14 @@ $$(".slide[data-el-points]").forEach(s=>{
 /* ---------- the class strip (teacher) ---------- */
 const bar=$("#teambar"),btn=$("#teamsBtn");
 if(!bar)return;
-// T.group: the class group the class is on (remembered for 3 hours, one lesson, so the next class starts off); T.data: that group's
+// T.group: the class group the class is on (kept for this tab only, so a reload goes on with the class and no other tab or later visit
+// starts broadcasting by itself: Roger, 26 Oct 2026, an old tab kept the class on); T.data: that group's
 // students and points this term {g, term, keys, pts:{email:n}}. T.sid: this class session (the time the group was chosen), so the
 // students' answers start empty every class; T.ans: their answers {A:{email:{q:v}}, R:{q:{v:n}}, n, who}; T.aw: {q:[email]} awarded.
 const T={fb:null,user:null,teacher:false,group:"",data:null,msg:"",sid:0,ans:null,aw:{}};
-{const g=store.get("group",null);if(g&&g.g&&Date.now()-g.at<3*3600e3){T.group=g.g;T.sid=g.deck===location.pathname?g.at:Date.now();   // another deck in the same lesson: a new session, so the answers start empty
-  if(T.sid!==g.at)store.set("group",{g:g.g,at:T.sid,deck:location.pathname})}
-  const aw=store.get("aw",null);if(aw&&aw.sid===T.sid)T.aw=aw.q||{}}
+const tab={get(k,d){try{const v=sessionStorage.getItem("elDeck."+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{sessionStorage.setItem("elDeck."+k,JSON.stringify(v))}catch(e){}}};
+{const g=tab.get("group",null);if(g&&g.g&&g.deck===location.pathname&&Date.now()-g.at<3*3600e3){T.group=g.g;T.sid=g.at}
+  const aw=tab.get("aw",null);if(aw&&aw.sid===T.sid)T.aw=aw.q||{}}
 const ready=()=>T.teacher&&T.group&&T.data&&T.data.g===T.group;
 const resized=()=>dispatchEvent(new Event("resize"));
 const groups=()=>(window.EL_GROUPS||[]).filter(g=>!bar.dataset.course||g.course===bar.dataset.course);
@@ -141,7 +142,7 @@ async function awardOpen(){
   $$("[data-q].open").forEach(el=>{const q=el.dataset.q,ok=String(el.dataset.okv),aw=T.aw[q]=T.aw[q]||[];
     Object.entries(T.ans.A).forEach(([em,a])=>{if(String(a[q])===ok&&!aw.includes(em)){aw.push(em);hit.push(em)}})});
   if(!hit.length)return;
-  store.set("aw",{sid:T.sid,q:T.aw});
+  tab.set("aw",{sid:T.sid,q:T.aw});
   hit.forEach(em=>D.pts[em]=(D.pts[em]||0)+1);const b=$("#ptBest",bar);if(b)b.textContent=best();
   try{const {S,db}=await cloud(),w=S.writeBatch(db),now=S.serverTimestamp();
     hit.forEach(em=>w.set(S.doc(db,"points",em),{[D.term]:S.increment(1),updated:now},{merge:true}));
@@ -179,7 +180,7 @@ bar.addEventListener("click",async e=>{
 });
 bar.addEventListener("change",e=>{
   if(e.target.id!=="teamGroup")return;
-  T.group=e.target.value;T.msg="";T.sid=Date.now();T.aw={};store.set("group",T.group?{g:T.group,at:T.sid,deck:location.pathname}:null);listen("");T.group?load():draw();
+  T.group=e.target.value;T.msg="";T.sid=Date.now();T.aw={};tab.set("group",T.group?{g:T.group,at:T.sid,deck:location.pathname}:null);listen("");T.group?load():draw();
 });
 if(btn)btn.addEventListener("click",()=>toggle());
 
@@ -194,7 +195,8 @@ function drawAns(){
     const b=document.createElement("span");b.className="qres"+(open?" ok":"");b.textContent=open?`✓ ${c[el.dataset.okv]||0} / ${n}`:`✋ ${n} / ${A.n}`;el.append(b);
     if(open)$$(".opt",el).forEach(o=>{const k=document.createElement("span");k.className="ocnt";k.textContent=c[o.dataset.i]||0;o.append(k)})});
 }
-// The player (a student following): the current slide's questions, each with its options as big buttons, over the slides. A poll
+// The player (a student following): one question at a time, the next one the teacher will reveal on this slide, with its options as big
+// buttons, over the slides; above it, how they did in the one just revealed (Roger, 26 Oct 2026: a whole slide of cards was too much). A poll
 // (data-q with .opt buttons) or a card with choices (data-ch "a|b|c"); the answer is saved when tapped; once the teacher shows the
 // answer, theirs turns green or red and the board has the reason. A slide without a question: "Look at the board".
 const player=document.createElement("div");player.className="elplay";player.hidden=true;player.innerHTML='<div class="pc"><p class="st"></p><div class="pb"></div></div>';document.body.append(player);   // .st: the status line (lv); .pb: the questions
@@ -206,13 +208,14 @@ function playerDraw(){
   player.hidden=false;player.style.bottom=(($(".bottom")||{}).offsetHeight||0)+(bar.hidden?0:bar.offsetHeight)+"px";
   const pb=$(".pb",player),s=following()&&lastLive&&lastLive.on&&sameDeck(lastLive.deck)&&$(".slide.on");
   if(!s){pb.innerHTML="";return}
-  const qs=$$("[data-q]",s).filter(el=>!el.closest(".later,.gone"));
-  pb.innerHTML=`<h2>${esc(s.dataset.title||document.title)}</h2>`+(!qs.length?`<p class="wait">${B("👀 Look at the board","👀 Mira la pissarra")}</p>`
-    :qs.map(el=>{const open=el.classList.contains("open"),mine=el.dataset.mine,ok=String(el.dataset.okv);
-      const q=el.dataset.ch?inner(el,".ans"):($(".q",el)?inner($(".q",el),".ans"):""),
-        opts=el.dataset.ch?chLabels(el).map((l,i)=>({v:String(i),h:esc(l)})):$$(".opt",el).map(o=>({v:o.dataset.i,h:inner(o,".ocnt")}));
-      return `<div class="pq" data-pq="${esc(el.dataset.q)}"><p class="q">${q}</p><div class="po">${opts.map(o=>`<button type="button" data-v="${o.v}" class="${open?(o.v===ok?"ok":o.v===mine?"no":""):(o.v===mine?"on":"")}"${open?" disabled":""}>${o.h}</button>`).join("")}</div>`+
-        (open?`<p class="pr ${mine==null?"":mine===ok?"ok":"no"}">${mine==null?B("No answer.","Sense resposta."):mine===ok?B("✓ Right!","✓ Correcte!"):B("✗ Not this time.","✗ Aquesta vegada no.")} ${B("Look at the board.","Mira la pissarra.")}</p>`:"")+`</div>`}).join(""));
+  const all=$$("[data-q]",s).filter(el=>!el.closest(".later")),isOpen=el=>el.classList.contains("open");
+  const cur=all.find(el=>!isOpen(el)&&!el.closest(".gone")),done=all.filter(isOpen),last=done[done.length-1];
+  const res=el=>{const mine=el.dataset.mine,ok=String(el.dataset.okv);
+    return `<p class="pr ${mine==null?"":mine===ok?"ok":"no"}">${mine==null?B("No answer.","Sense resposta."):mine===ok?B("✓ Right!","✓ Correcte!"):B("✗ Not this time.","✗ Aquesta vegada no.")} ${B("Look at the board.","Mira la pissarra.")}</p>`};
+  const ask=el=>{const mine=el.dataset.mine,q=el.dataset.ch?inner(el,".ans"):($(".q",el)?inner($(".q",el),".ans"):""),
+      opts=el.dataset.ch?chLabels(el).map((l,i)=>({v:String(i),h:esc(l)})):$$(".opt",el).map(o=>({v:o.dataset.i,h:inner(o,".ocnt")}));
+    return `<div class="pq" data-pq="${esc(el.dataset.q)}"><p class="q">${q}</p><div class="po">${opts.map(o=>`<button type="button" data-v="${o.v}" class="${o.v===mine?"on":""}">${o.h}</button>`).join("")}</div></div>`};
+  pb.innerHTML=`<h2>${esc(s.dataset.title||document.title)}</h2>`+(last?res(last):"")+(cur?ask(cur):last?"":`<p class="wait">${B("👀 Look at the board","👀 Mira la pissarra")}</p>`);
 }
 player.addEventListener("click",e=>{
   const b=e.target.closest(".po button");if(!b||b.disabled)return;
