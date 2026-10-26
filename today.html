@@ -52,7 +52,7 @@ const pts=a=>a.graded?(a.manual?t("nota del professor","teacher's mark"):a.point
 const col=p=>p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";
 const S={ls:null,view:"lp",pend:[]};let U=null,D=null;   // view: lp = one grid per learning path · sum = summary of my criteria
 
-// D = {me:{name,group}, rs:{activity:result}, lv:{ls:{level}}, pg:{ls:data}, ls:{id:{status,enabled,groups,open}}, pt:{team,t1,t2,t3}, tm:{list,score,best}}
+// D = {me:{name,group}, rs:{activity:result}, lv:{ls:{level}}, pg:{ls:data}, ls:{id:{status,enabled,groups,open,secLocked}}, pt:{team,t1,t2,t3}, tm:{list,score,best}}
 async function load(u){
   if(DEMO)return DEMO;
   const db=ELCloud.db,D={me:{},rs:{},lv:{},pg:{},ls:{}},q=async(p,f)=>{try{(await F.getDocs(F.collection(db,...p))).forEach(f)}catch(e){}};
@@ -76,6 +76,8 @@ function setLang(){
   $("h1").textContent=t("Les meves activitats","My activities");
 }
 const doneSet=a=>{const p=D.pg[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
+// a step of a section the teacher has not opened yet for the group (elSecLocked; a vocabulary section holds the cards and practice steps)
+const secOff=(a,info,k)=>{if(info.status==="closed"||all())return false;const off=elSecLocked(a,info,D.me.group);return off.includes(k)||((k==="cards"||k==="practice")&&off.includes("vocab"))};
 // learning paths the teacher has opened for the group (elLpOpen in el-catalog.js); a closed LS can be reviewed
 const canDo=(a,info)=>info.status==="closed"||all()||elLpOpen(a,info,D.me.group);
 function cell(a){
@@ -210,7 +212,7 @@ function lpGrid(a,info){
   // a recall checkpoint before it not done yet: closed until it is (el-catalog.js elCheckpointMissing; the page itself blocks too)
   const cp=!all()&&info.status!=="closed"&&canDo(a,info)&&elCheckpointMissing(a,doneSet,x=>canDo(x,info)),can=canDo(a,info)&&!cp;   // a locked one says "not open yet"
   return `<div class="box lpbox"><div class="lphead"><div><h2>${a.title}</h2>${a.criteria.map(pill).join("")} <small class="muted">· ${pts(a)}${a.mode==="once"?t(" · una sola vegada"," · only once"):""}${cp?t(` · 🔒 primer fes el ${cp.title}`,` · 🔒 first do ${cp.title}`):!can?t(" · 🔒 encara no està oberta"," · 🔒 not open yet"):""}</small></div><a class="go ${can?"":"off"}" href="${a.path}">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`
-    +`<div class="wrap"><table><thead><tr>${steps(a).map((k,i)=>`<th class="ac ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")}<th class="sc first">${t("Punts","Points")}</th></tr></thead>`
+    +`<div class="wrap"><table><thead><tr>${steps(a).map((k,i)=>`<th class="ac ${(a.skip||[]).includes(k)?"skip":""}"${secOff(a,info,k)?` title="${t("Encara no està oberta","Not open yet")}"`:""}>${secOff(a,info,k)?"🔒 ":""}${k}<br>${stepCrit(a,k)}</th>`).join("")}<th class="sc first">${t("Punts","Points")}</th></tr></thead>`
     +`<tbody><tr>${steps(a).map(k=>`<td class="ac ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("")}<td class="sc ${c.c} first" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr></tbody></table></div>`
     +(steps(a).length?`<small class="muted">${t(`${n} de ${steps(a).length} activitats fetes`,`${n} of ${steps(a).length} activities done`)}</small>`:"")+legend(gridCrits(a))+`</div>`;
 }
