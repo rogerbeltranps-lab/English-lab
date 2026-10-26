@@ -7,7 +7,8 @@ button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px
 .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}a.lsgo{background:#0f766e;color:#fff;border-radius:8px;padding:4px 12px;font-size:14px;font-weight:600;text-decoration:none}a.lsgo:hover{background:#115e59}
 .pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 6px;margin:1px}.ce1{background:#fce7f3;color:#9d174d}.ce2{background:#dcfce7;color:#166534}.ce3{background:#e0f2fe;color:#075985}.ce4{background:#ede9fe;color:#5b21b6}.ce5{background:#ffedd5;color:#9a3412}.ce6{background:#fef9c3;color:#854d0e}.ceC{background:#e2e8f0;color:#334155}
 table.plan td,table.plan th{text-align:left;vertical-align:top}table.plan tr.t td{background:#f1f5f9;font-weight:700}table.plan tr.now td{background:#ecfdf5}
-.tab.cplan.on{background:#0f172a;border-color:#0f172a;color:#fff}.tp{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}.tpc{border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;background:#fff}.tpc.c2eso{border-top:4px solid #16a34a}.tpc.c4eso{border-top:4px solid #2563eb}.tpc h3{margin:0 0 4px}
+table.qa td.ql,table.qa th.ql{text-align:left;max-width:440px;white-space:normal}table.qa td{vertical-align:top;white-space:nowrap}.qwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px}.tp>*{min-width:0}tr.qa-area td{border-top:2px solid #94a3b8}.qp{border-radius:999px;padding:0 6px;font-weight:700;font-size:12px}.tpc ol,.tpc ul{padding-left:20px;margin:4px 0}.tpc li{margin:3px 0}
+.tab.cplan.on{background:#0f172a;border-color:#0f172a;color:#fff}.tp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:12px}.tpc{border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;background:#fff}.tpc.c2eso{border-top:4px solid #16a34a}.tpc.c4eso{border-top:4px solid #2563eb}.tpc h3{margin:0 0 4px}
 .exam{display:inline-block;background:#fef2f2;color:#991b1b;border-radius:10px;padding:4px 10px;font-weight:700;margin:4px 0}.exam.past{background:#f1f5f9;color:#475569}.wk{margin:8px 0}.wk b{display:block}.wk .s{white-space:pre-line}label.ck{display:flex;gap:8px;align-items:flex-start;padding:3px 4px;border-radius:6px;cursor:pointer}label.ck:hover{background:#f1f5f9}label.ck input{margin-top:3px;flex:none;width:16px;height:16px}label.ck.on span{color:#64748b;text-decoration:line-through}label.ck.today{background:#ecfdf5}ul.tips{margin:0 0 4px 28px;padding:0;list-style:none;font-size:13px;color:#475569}ul.tips li{margin:2px 0}.behind{color:#b45309;font-size:13px;margin:4px 0}.wkbar .chip.past{color:#94a3b8}.wkbar .chip small{margin-left:4px}.wk .n{color:#b45309;font-size:13px}ul.due{margin:4px 0;padding-left:18px}ul.due li{margin:3px 0}.late{color:#b91c1c;font-weight:600}.hand{background:#f8fafc;border-radius:8px;padding:4px 10px;margin:4px 0;white-space:pre-wrap}.hand p{margin:.3em 0}
 .route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-beginners{background:#ffe4e6;color:#9f1239}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-daring{background:#ede9fe;color:#5b21b6}.r-none{color:#94a3b8}
 .wrap{overflow:auto;max-height:75vh;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
@@ -40,6 +41,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-points.js"></script>
+<script src="shared/js/el-items.js"></script>
 <script type="module">
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
@@ -260,10 +262,12 @@ function lsWarn(ls,grp,assigned){
 function render(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
-  $("#tabs").innerHTML=`<button class="tab cplan ${S.g==="plan"?"on":""}" data-do="tab" data-g="plan" title="Exam day and this week's plan in every group">📅 Time plan</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
+  $("#tabs").innerHTML=`<button class="tab cplan ${S.g==="plan"?"on":""}" data-do="tab" data-g="plan" title="Exam day and this week's plan in every group">📅 Time plan</button>`
+    +`<button class="tab cplan ${S.g==="qa"?"on":""}" data-do="tab" data-g="qa" title="Which questions students answer well or badly the first time, by route and group">🔎 Questions</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
     +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
   if(S.g==="plan"){$("#main").innerHTML=pbBox()+overview();return}
+  if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
   if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+pbBox()+rosterBox();return}
   const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);COURSE=grp.course;
   const mine=l=>elLsForGroup(l,D.ls[l.id],S.g);
@@ -275,6 +279,7 @@ function render(){
     +`<a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a> `
     +`<span class="muted">· Route:</span> `+["all","beginners","insecure","safe","daring","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"No route":LV[r]}</button>`).join("")
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"")
+    +(G()&&!G().only?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:"")
     +(G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
     +lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
@@ -293,6 +298,20 @@ function render(){
     +pointsBox(S.g)
     +`<div class="box">${fold("settings","LS status and groups",lsSettings(ls))}</div>`+rosterBox();
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
+}
+// ---- question analysis (Roger, 26 Oct 2026: "spot the questions that are better answered and the ones that are more difficult… by
+// levels… understand my students' needs"): the first try of every question of an LS by route and group (shared/js/el-items.js).
+// LS1 (only: true) saves no answers per question, so it is not offered.
+const QA={};S.qa={ls:null,g:"all",f:{act:"all",area:"all",sort:"hard",all:false}};
+function qaTab(){
+  const lss=EL_LS.filter(l=>!((window.EL_GRADING||{})[l.id]||{}).only);
+  if(!lss.some(l=>l.id===S.qa.ls))S.qa.ls=(lss.filter(l=>(S.D.ls[l.id]||{}).status==="open").pop()||lss[lss.length-1]).id;
+  const ls=EL_LS.find(l=>l.id===S.qa.ls),groups=GR.filter(g=>g.course===ls.course),B=QA[ls.id];
+  if(S.qa.g!=="all"&&!groups.some(g=>g.id===S.qa.g))S.qa.g="all";
+  if(!B){ELItems.bank(ls.id,acts(ls.id)).then(b=>{QA[ls.id]=b;if(S.g==="qa")render()});return `<div class="box"><h2>🔎 Question analysis</h2><p class="muted">Loading the questions…</p></div>`}
+  const studs=Object.values(S.P).filter(s=>!s.away&&!s.tester&&groups.some(g=>g.id===s.group)&&(S.qa.g==="all"||s.group===S.qa.g)).map(s=>({uid:s.uid,group:s.group,name:fullName(s)}));
+  const qs=ELItems.collect(B,studs,pstate,u=>level(u,ls.id));
+  return ELItems.view({ls:ls.id,lss,groups,gsel:S.qa.g,f:S.qa.f,LV,B,qs,studs,rec:ELItems.routesOf(B,studs,pstate)});
 }
 // ---- routes from the LS1 exam (Roger, 26 Oct 2026): the teacher sets every route; students no longer choose or ask for one.
 // The course's first LS with an exam in EL_GRADING is the source: its exam mark (sum of scores ÷ sum of maxes × 10, as on the LS
@@ -745,6 +764,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       if(!ps.length||!confirm(`Set the route of ${ps.length} student${ps.length===1?"":"s"} in ${EL_LS.find(l=>l.id===to).title}? Their work so far is kept.`))return;
       S.rtPick={};S.rtOn={};act(api.setLevels(to,ps))},setrt:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.r))},
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
+    qa:()=>{if(k.f==="g")S.qa.g=k.v;else if(k.f==="all")S.qa.f.all=true;else{S.qa.f[k.f]=k.v;S.qa.f.all=false}render()},
+    qago:()=>{S.qa.ls=S.ls;S.qa.g=S.g;S.g="qa";render();scrollTo(0,0)},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
     grade:()=>gradePanel(u),deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
@@ -775,6 +796,8 @@ document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.datase
 document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
   if(k.do==="import"&&t.files[0])importList(t.files[0]).catch(x=>alert("Could not read the file: "+x.message)).finally(()=>t.value="");
   if(k.do==="ls"){S.ls=t.value;render()}
+  if(k.do==="qals"){S.qa.ls=t.value;S.qa.g="all";S.qa.f.act="all";render()}
+  if(k.do==="qaf"){S.qa.f[k.f]=t.value;S.qa.f.all=false;render()}
   if(k.do==="group"&&t.value)act(api.setGroup(k.u,t.value)).then(()=>$("#dlg").open&&stuPanel(k.u));
   if(k.do==="rtto"){S.rtTo=t.value;S.rtPick={};S.rtOn={};render()}
   if(k.do==="rtpick"){S.rtPick[k.u]=t.value;delete S.rtOn[k.u];render()}
