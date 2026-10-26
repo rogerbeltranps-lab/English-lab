@@ -124,7 +124,7 @@
           <span class="eyebrow">Practice</span>
           <h1>English Lab</h1>
         </div>
-        <p id="lead">Choose your level, then sign in with your school account.</p>
+        <p id="lead">Choose your level, then sign in with your school email and password.</p>
       </div>
 
       <!-- Signed-out visitors choose a level and sign in; the teacher and the tester use it to switch level. Students get their own course. -->
@@ -134,8 +134,8 @@
       </div>
 
       <div class="signin" id="signin" hidden>
-        <p>To open English Lab you need to sign in with your school account (@ietramuntana.cat).</p>
-        <button type="button" id="signinBtn">Sign in with your school account</button>
+        <p>To open English Lab you need to sign in with your school email (@ietramuntana.cat) and the password your teacher gave you.</p>
+        <button type="button" id="signinBtn">Sign in</button>
       </div>
 
       <div class="lab" id="lab" hidden>
@@ -274,7 +274,7 @@
       document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('on', b.dataset.level === level));
       $('signin').hidden = inside || !level;
       $('lab').hidden = !inside;
-      $('lead').textContent = !inside ? 'Choose your level, then sign in with your school account.'
+      $('lead').textContent = !inside ? 'Choose your level, then sign in with your school email and password.'
         : canSwitch ? 'Teacher view: choose a level to see its English Lab.' : 'Practice activities for your course.';
       if (!inside) return;
       $('levelTag').textContent = LEVELS[level];
