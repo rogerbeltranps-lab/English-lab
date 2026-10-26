@@ -215,6 +215,14 @@ function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=(g.mom
   return h}
 
 // ---- views
+// Why students' work may not reach this table (Roger, 26 Oct 2026: 4ESO A worked in a Public LS assigned only to 4ESO B, and nothing was saved).
+function lsWarn(ls,grp,assigned){
+  const st=(S.D.ls[ls]||{}).status||"hidden",w=[];
+  if(st==="public")w.push("This LS is <b>Public</b>: students use it without their account and <b>nothing they do is saved</b>, so it never appears here. Set it to <b>Open</b> in “LS status and graded activities” (below) to save their work.");
+  if(st==="hidden")w.push("This LS is <b>Hidden</b>: students cannot open it.");
+  if(!assigned)w.push("This LS is <b>not assigned to "+grp.name+"</b>: its students cannot open it while it is Open. Turn "+grp.name+" on in “Groups that can use it” (below).");
+  return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
+}
 function render(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
@@ -235,6 +243,7 @@ function render(){
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"")
     +(G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
+    +lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")

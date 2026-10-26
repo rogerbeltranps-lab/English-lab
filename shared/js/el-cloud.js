@@ -175,7 +175,9 @@ async function gate(u){
   }
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
-  if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
+  if(st==="public"){publicLs=true;   // free access, no login, nothing is saved or scored
+    if(isStudent(u))banner("Free practice: this LS does not save your work, and it will not appear on your board. · Pràctica lliure: aquesta LS no desa la teva feina i no sortirà al teu tauler.","#2563eb");
+    return}
   if(isTeacher(u)){banner("Teacher mode · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){signInBlock();return}
   const tester=seesAll(u),vg=viewGroup(u);
@@ -212,6 +214,8 @@ async function gate(u){
       if(confirm(ca?"Activitat marcada com a feta. Vols entregar-la ara? (La nota quedarà fixada.)":"Activity marked as done. Do you want to submit it now? (Your result will be fixed.)"))await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});
       location.reload()}});
   }
+  // Work done in this browser while the LS was not saving it (Public, or before the route) reaches the cloud now, not only at the next change.
+  push();
 }
 
 // Submit (lock) an activity from any page, using the progress saved in the cloud.
