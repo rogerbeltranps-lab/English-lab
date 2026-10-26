@@ -22,7 +22,7 @@ window.LP = {
    },
    "items": [
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "She ___ (watch) TV after dinner.",
      "a": [
       "watches"
@@ -58,7 +58,7 @@ window.LP = {
      "en": "Review: LP1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Hanukkah ___ (last) eight nights.",
      "a": [
       "lasts"
@@ -67,7 +67,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "We give and get ___ at Christmas.",
      "a": [
       "presents",
@@ -77,7 +77,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "The fireworks are ___ night.",
      "a": [
       "at"

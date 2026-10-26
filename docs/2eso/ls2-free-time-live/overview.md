@@ -89,3 +89,14 @@ See [final-product-assessment.md](final-product-assessment.md). The page opens w
 ## Reflect
 
 Reads the four checkpoints' first tries and asks five reflection questions (what I can do now, what was hard, my best piece, my route, the screen tip I applied and how it is going).
+
+## Beginners route (A1), added 26 Oct 2026
+
+Beginners sits below Insecure (AGENTS.md, "Beginners"). Everything untagged in the data files is for every route; items tagged `r: 'insecure'` start at Insecure; a text, task, frame, list or rubric with no `beginners` key falls back to the Insecure one. What Beginners gets in this LS:
+
+- **Readings of 60–100 words with a Catalan word line** (`media.text.beginners`): the two Saturday posts (LP1), the Climb Up Club post and the Fun Run page (LP2), the "can you trust this page?" text (LP4), Noa's model script (LP6) and the sample-exam texts. Every question Beginners sees is answerable from its text.
+- **Fewer, easier questions:** 5–6 recall items per page (the LS1 ones and the core words), 5 reading and 5 listening questions with the Catalan hints, grammar with affirmative forms and -ing spelling only (negatives, questions, short answers and state verbs start at Insecure), easy mixed-practice items.
+- **Lighter steps:** reading log on text A only plus where/when of text B (LP2); listening chart on Mei's video only (LP3); fact file with two facts from the given source (LP4), each with its own Catalan self-assessment.
+- **Writing and speaking:** frames with fewer gaps and a word bank (piece 1 35–50 words, piece 2 40–55, piece 4 35–50, script 60–80), speaking 15–30 s with a short model.
+- **Final product:** a Beginners paragraph and requirements list on the task tab (seven short slides from the frame, one *is / are + -ing* and one *usually* sentence, two facts, two tips from the model, 1–1.5 minutes), checklists and self-assessments; its own rubric (`finalRubricData.beginners`: vlog, script, fact file and tips rows; source, process and editing shared with Insecure). The model page is the Insecure one for now.
+- **Checkpoints:** 5–6 items tagged `beginners` each (checkpoint 1: 5, 2: 5, 3: 6, 4: 6). **Sample exam:** `items.beginners` for every section (same number of items as the other routes) and a script template with a word bank (40–60 words).

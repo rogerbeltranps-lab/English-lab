@@ -15,6 +15,7 @@ const SCRIPT = [
   ['Yuki', 'We also send New Year cards to our friends and teachers, and they all arrive on the same morning. [softly] For me, New Year is about starting again. You leave the problems of the old year behind, and you thank your family for everything.']
 ];
 const TEXTS = {
+  beginners: '<p>In Catalonia, many families have a Caga Tió at Christmas. It is a small log (a piece of a tree) with a face, a red hat and a blanket. From 8 December, children “feed” it every night. On Christmas Day, they hit it with sticks and sing a song. Then the log “gives” them sweets and small presents.</p><p>In the UK, children have an Advent calendar. It has 24 small doors. Children open one door every day from 1 December. Behind each door there is a picture or a piece of chocolate.</p>',
   insecure: '<p>In Catalonia, many families have a Caga Tió at Christmas. It is a small log (a piece of a tree) with a face, a red hat and a blanket. From 8 December, children “feed” it every night and keep it warm. On Christmas Eve or Christmas Day, they hit it with sticks and sing a song. Then the log “gives” them sweets and small presents.</p><p>In the UK and other countries, children have an Advent calendar. It has 24 small doors. Children open one door every day from 1 December. Behind each door there is a picture or a piece of chocolate.</p>',
   safe: '<p>In Catalonia, many families have a Caga Tió at Christmas. It is a small log with a face, a red hat and a blanket. From 8 December, children “feed” it every night and keep it warm. On Christmas Eve or Christmas Day, they hit it with sticks and sing a song, and the log “gives” them sweets and small presents.</p><p>In the UK and many other countries, children have an Advent calendar. It has 24 small doors, and children open one every day from 1 December. Behind each door there is a picture or a piece of chocolate. Advent calendars used to have only pictures, but today many have chocolate or small toys.</p>',
   daring: '<p>In Catalonia, many families have a Caga Tió at Christmas, a tradition which is thought to date back to old winter celebrations in the countryside. It is a small log with a face, a red hat and a blanket. From 8 December, children “feed” it every night and keep it warm. On Christmas Eve or Christmas Day, they hit it with sticks while they sing a traditional song, and the log “gives” them sweets and small presents.</p><p>In the UK and many other countries, children have an Advent calendar, which counts down the days until Christmas. It has 24 small doors, and children open one every day from 1 December. Behind each door there is a picture or a piece of chocolate. Advent calendars used to have only pictures, but today many contain chocolate, small toys or even beauty products for adults. Some people think this shows how commercialised Christmas has become, while others say it simply shows that traditions evolve.</p>'
@@ -41,6 +42,13 @@ window.LP = {
       intro: { ca: 'Escolta dues vegades el Callum i la Yuki, que parlen del seu Cap d’Any, i respon.', en: 'Listen twice to Callum and Yuki talking about their New Year, and answer.' },
       media: AUDIO,
       items: {
+        beginners: [
+          { q: 'Where is Callum from?', o: ['Scotland', 'England', 'Japan', 'Ireland'] },
+          { q: 'What is Hogmanay?', o: ['New Year’s Eve in Scotland', 'Christmas in Scotland', 'a Scottish song', 'a Scottish dance'] },
+          { q: 'What is the weather like at Hogmanay?', o: ['very cold', 'very hot', 'rainy', 'sunny'] },
+          { q: 'What does Yuki’s family do on 31 December?', o: ['They clean the house.', 'They have a street party.', 'They visit the neighbours.', 'They go to the beach.'] },
+          { q: 'What do children get at New Year in Japan?', o: ['money in small envelopes', 'shortbread', 'new clothes', 'a new phone'] }
+        ],
         insecure: [
           { q: 'Where is Callum from?', o: ['Edinburgh, in Scotland', 'London, in England', 'Osaka, in Japan', 'Dublin, in Ireland'] },
           { q: 'What is Hogmanay?', o: ['New Year’s Eve in Scotland', 'Christmas in Scotland', 'a Scottish song', 'a Scottish dance'] },
@@ -67,6 +75,13 @@ window.LP = {
       intro: { ca: 'Torna a escoltar si cal. Què valora cada persona i com ho saps? Pensa en les seves paraules i en el seu to de veu.', en: 'Listen again if you need to. What does each speaker value, and how do you know? Think about their words and their tone of voice.' },
       media: AUDIO,
       items: {
+        beginners: [
+          { q: 'What does Callum love most about Hogmanay?', o: ['being with his neighbours', 'the presents', 'the cold weather', 'the cake'] },
+          { q: 'Which words show it?', o: ['“The whole street feels like one big family.”', '“It’s usually freezing.”', '“Nobody knows all the words!”', '“They gave me a huge slice of cake.”'] },
+          { q: 'What is New Year about for Yuki?', o: ['starting again and her family', 'a big street party', 'money', 'noodles'] },
+          { q: 'Which words show it?', o: ['“For me, New Year is about starting again.”', '“Children get money in small envelopes.”', '“In the evening we eat long noodles.”', '“Schools and many offices close.”'] },
+          { q: 'How does Yuki sound?', o: ['calm', 'angry', 'very excited', 'scared'] }
+        ],
         insecure: [
           { q: 'What does Callum love most about Hogmanay?', o: ['being together with his neighbours', 'the presents', 'the cold weather', 'the cake'] },
           { q: 'Which words from the recording show it?', o: ['“The whole street feels like one big family.”', '“It’s usually freezing.”', '“Nobody knows all the words!”', '“They gave me a huge slice of cake.”'] },
@@ -94,6 +109,13 @@ window.LP = {
       intro: { ca: 'Llegeix el text i respon, sense apunts.', en: 'Read and answer, without notes.' },
       media: { text: TEXTS },
       items: {
+        beginners: [
+          { q: 'When do children start feeding the Caga Tió?', o: ['on 8 December', 'on 1 December', 'on Christmas Day', 'on 6 January'] },
+          { q: 'What does the Caga Tió wear?', o: ['a red hat and a blanket', 'a mask', 'a costume', 'a scarf and gloves'] },
+          { q: 'What do children do on Christmas Day?', o: ['They hit it with sticks and sing a song.', 'They open 24 doors.', 'They give it presents.', 'They take it to school.'] },
+          { q: 'How many doors does an Advent calendar have?', o: ['24', '8', '12', '31'] },
+          { q: 'What is behind each door?', o: ['a picture or a piece of chocolate', 'a small log', 'a song', 'a candle'] }
+        ],
         insecure: [
           { q: 'When do children start feeding the Caga Tió?', o: ['on 8 December', 'on 1 December', 'on Christmas Eve', 'on 6 January'] },
           { q: 'What do children do on Christmas Eve or Christmas Day?', o: ['They hit it with sticks and sing a song.', 'They open 24 doors.', 'They give it presents.', 'They take it to school.'] },
@@ -120,6 +142,13 @@ window.LP = {
       intro: { ca: 'Tria la nota correcta per a cada tradició, després els costums i el significat d’una paraula. Pots tornar a mirar el text.', en: 'Choose the correct note for each tradition, then the main customs and the meaning of a word from its context. You can look at the text again.' },
       media: { text: TEXTS },
       items: {
+        beginners: [
+          { q: 'Which is the correct note about the Caga Tió?', o: ['What: a log with a face · When: from 8 December · Where: Catalonia', 'What: a log with a face · When: from 1 December · Where: Catalonia', 'What: a calendar with doors · When: from 8 December · Where: Catalonia', 'What: a log with a face · When: from 8 December · Where: the UK'] },
+          { q: 'Which is the correct note about the Advent calendar?', o: ['What: a calendar with 24 doors · When: from 1 December · Where: the UK', 'What: a calendar with 24 doors · When: from 8 December · Where: the UK', 'What: a calendar with 8 doors · When: from 1 December · Where: the UK', 'What: a calendar with 24 doors · When: from 1 December · Where: Catalonia'] },
+          { q: 'Which of these is a custom of the Caga Tió?', o: ['Children “feed” it every night.', 'Children open a small door every day.', 'Children find chocolate behind a door.', 'Children send it a card.'] },
+          { q: 'Which of these is a custom of the Advent calendar?', o: ['Children open one door every day.', 'Children feed it every night.', 'Children keep it warm with a blanket.', 'Children hit it with sticks.'] },
+          { q: 'The Caga Tió has “a red hat and a blanket”. What is a “blanket”?', o: ['a piece of cloth that keeps you warm', 'a kind of sweet', 'a small door', 'a stick'] }
+        ],
         insecure: [
           { q: 'Which is the correct note about the Caga Tió?', o: ['What: a log with a face · When: from 8 December to Christmas · Where: Catalonia', 'What: a log with a face · When: from 1 December to Christmas · Where: Catalonia', 'What: a calendar with doors · When: from 8 December to Christmas · Where: Catalonia', 'What: a log with a face · When: from 8 December to Christmas · Where: the UK'] },
           { q: 'Which is the correct note about the Advent calendar?', o: ['What: a calendar with 24 small doors · When: from 1 December · Where: the UK and other countries', 'What: a calendar with 24 small doors · When: from 8 December · Where: the UK and other countries', 'What: a calendar with 8 small doors · When: from 1 December · Where: the UK and other countries', 'What: a calendar with 24 small doors · When: from 1 December · Where: only in Catalonia'] },
@@ -146,6 +175,19 @@ window.LP = {
     { id: 'vocab', type: 'quiz', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari', en: 'Vocabulary' }, pts: [1, 2], start: 21,
       intro: { ca: 'Tria l’opció correcta (1 punt) i escriu la paraula que falta (2 punts).', en: 'Choose the right option (1 point), then write the missing word (2 points).' },
       items: {
+        beginners: [
+          { q: 'It’s ___ today: take an umbrella.', o: ['rainy', 'sunny', 'hot', 'dry'] },
+          { q: 'At the Castanyada we eat roasted ___.', o: ['chestnuts', 'oranges', 'flowers', 'candles'] },
+          { q: 'At Christmas we ___ the house with lights.', o: ['decorate', 'dance', 'sing', 'cook'] },
+          { q: 'I feel ___ before a party: I love parties!', o: ['excited', 'cold', 'windy', 'old'] },
+          { q: 'On Christmas Day we have a special ___ with all the family.', o: ['meal', 'mask', 'parade', 'leaf'] },
+          { q: 'Children ___ up as witches at Halloween.', o: ['dress', 'sing', 'cook', 'eat'] },
+          { q: 'Dear Mr Serra, We would ___ to organise a party.', o: ['like', 'enjoy', 'mind', 'make'] },
+          { q: 'At Carnival, people wear a c______ and a mask.', a: ['costume'] },
+          { q: 'At night there are f________ in the sky: boom!', a: ['fireworks'] },
+          { q: 'At Hanukkah, families light c______.', a: ['candles'] },
+          { q: 'At Christmas we give and get p_______.', a: ['presents'] }
+        ],
         insecure: [
           { q: 'It’s ___ today: take an umbrella.', o: ['rainy', 'sunny', 'mild', 'dry'] },
           { q: 'At the Castanyada we eat roasted ___.', o: ['chestnuts', 'oranges', 'flowers', 'candles'] },
@@ -189,6 +231,19 @@ window.LP = {
     { id: 'grammar', type: 'quiz', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Gramàtica', en: 'Grammar' }, pts: [1, 2], start: 32,
       intro: { ca: 'Tria l’opció correcta (1 punt) i escriu la forma que falta (2 punts). Pots fer servir contraccions.', en: 'Choose the right option (1 point), then write the missing words (2 points). Contractions are accepted.' },
       items: {
+        beginners: [
+          { q: 'People ___ chestnuts at the Castanyada.', o: ['eat', 'eats', 'are eat', 'eating'] },
+          { q: 'My sister ___ TV every day.', o: ['watches', 'watch', 'is watch', 'watching'] },
+          { q: 'Diwali takes place ___ autumn.', o: ['in', 'on', 'at', 'to'] },
+          { q: 'We watch the fireworks ___ night.', o: ['at', 'in', 'on', 'to'] },
+          { q: 'Christmas is ___ 25 December.', o: ['on', 'in', 'at', 'for'] },
+          { q: '“It’s cold in here.” “I ___ close the window.”', o: ['’ll', '’m going', 'am', 'do'] },
+          { q: 'First, we clean the house. ___, we decorate it.', o: ['Then', 'Because', 'But', 'Or'] },
+          { q: 'We ___ ___ ___ (visit) our grandparents at Christmas. It’s our plan.', a: ['are going to visit', '’re going to visit', "'re going to visit"] },
+          { q: 'The Caga Tió ___ (give) children sweets.', a: ['gives'] },
+          { q: 'There ___ ___ music and food at the party.', a: ['will be'] },
+          { q: 'We would ___ to organise a party.', a: ['like'] }
+        ],
         insecure: [
           { q: 'People ___ chestnuts at the Castanyada.', o: ['eat', 'eats', 'are eat', 'eating'] },
           { q: 'My sister ___ like Halloween.', o: ['doesn’t', 'don’t', 'isn’t', 'not'] },
@@ -232,11 +287,12 @@ window.LP = {
     { id: 'write', type: 'marked', tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: '43. Escriptura: un correu formal', en: '43. Writing: a formal email' }, max: 30, criterion: '5.1 (formal email)', levels: L51, levelPts: L30,
       intro: { ca: 'Escriu sense apunts, com a l’examen.', en: 'Write without notes, as in the exam.' },
       source: 'The community centre in the student’s town is preparing an International New Year evening for families on Friday 8 January. The class wants to run an activity about a New Year tradition from another country. The email is to Mr Jordi Serra, the director of the community centre.', sourceLabel: 'Situation',
-      task: { insecure: 'El centre cívic del teu poble prepara una vetllada internacional de Cap d’Any per a famílies el divendres 8 de gener. Escriu un correu formal (60–80 paraules) a Mr Jordi Serra, el director, per proposar una activitat sobre una tradició de Cap d’Any d’un altre país. Completa la plantilla: per què escrius, quina tradició i quina activitat, dues coses que hi haurà (There will be… / We are going to…) i una petició (Could you…?).\nParaules útils: activity · tradition · New Year · decorations · special food · music · a table · the hall',
+      task: { beginners: 'El centre cívic del teu poble prepara una vetllada internacional de Cap d’Any per a famílies el divendres 8 de gener. Completa la plantilla del correu (40–60 paraules) a Mr Jordi Serra, el director, per proposar una activitat sobre una tradició de Cap d’Any d’un altre país: per què escrius, quina tradició, dues coses que hi haurà (There will be…) i una petició (Could we…?).\nBanc de paraules: New Year · Scotland · Japan · a song · a dance · special food · decorations · music · a table · the hall',
+        insecure: 'El centre cívic del teu poble prepara una vetllada internacional de Cap d’Any per a famílies el divendres 8 de gener. Escriu un correu formal (60–80 paraules) a Mr Jordi Serra, el director, per proposar una activitat sobre una tradició de Cap d’Any d’un altre país. Completa la plantilla: per què escrius, quina tradició i quina activitat, dues coses que hi haurà (There will be… / We are going to…) i una petició (Could you…?).\nParaules útils: activity · tradition · New Year · decorations · special food · music · a table · the hall',
         safe: 'The community centre in your town is preparing an International New Year evening for families on Friday 8 January. Write a formal email (100–130 words) to Mr Jordi Serra, the director, proposing an activity about a New Year tradition from another country. Write it in paragraphs: why you are writing, your plan (which tradition, what families will do, using future forms), one request, and a formal closing. Use at least one relative clause (who / which / where).',
         daring: 'The community centre in your town is preparing an International New Year evening for families on Friday 8 January. Write a formal email (140–180 words) to Mr Jordi Serra, the director, proposing an activity about a New Year tradition from another country. Write it in paragraphs: why you are writing, your plan (which tradition, what families will do and why it matters), one polite request, and a formal closing. Mr Serra is worried that the hall is small and the evening could be too crowded: answer this concern in your email.' },
-      template: { insecure: 'Dear Mr Serra,\nI am writing to …\nWe would like to …\nThere will be … We are going to …\nCould you …?\nI look forward to hearing from you.\nYours sincerely,\n…', safe: 'Dear Mr Serra,\n\nI am writing to propose…', daring: 'Dear Mr Serra,\n\nI am writing to propose…' },
-      min: { insecure: 60, safe: 100, daring: 140 } },
+      template: { beginners: 'Dear Mr Serra,\nI am writing to propose an activity about …\nWe would like to …\nThere will be … and …\nCould we use …?\nI look forward to hearing from you.\nYours sincerely,\n…', insecure: 'Dear Mr Serra,\nI am writing to …\nWe would like to …\nThere will be … We are going to …\nCould you …?\nI look forward to hearing from you.\nYours sincerely,\n…', safe: 'Dear Mr Serra,\n\nI am writing to propose…', daring: 'Dear Mr Serra,\n\nI am writing to propose…' },
+      min: { beginners: 40, insecure: 60, safe: 100, daring: 140 } },
 
     { id: 'score', type: 'summary', tab: { ca: 'La meva nota', en: 'My score' }, title: { ca: 'La meva nota', en: 'My score' },
       intro: { ca: 'Primer intent de cada secció i les notes de ChatGPT que has apuntat.', en: 'Your first try in each section and the ChatGPT marks you noted.' } }

@@ -9,8 +9,8 @@ window.LP = {
         { q: 'Small oil lamps at Diwali: ___', a: ['diyas'] },
         { q: 'The Castanyada is held ___ 31 October.', a: ['on'], ca: 'Data → on.', en: 'Date → on.' },
         { q: 'Children ___ (dress) up at Halloween.', a: ['dress'] },
-        { q: 'At Lunar New Year, families ___ together for a big reunion dinner.', a: ['get'] },
-        { q: 'Not hot, not cold: ___', a: ['mild'] },
+        { r: 'insecure', q: 'At Lunar New Year, families ___ together for a big reunion dinner.', a: ['get'] },
+        { r: 'insecure', q: 'Not hot, not cold: ___', a: ['mild'] },
         { r: 'safe', q: 'Families ___ gifts at Diwali.', a: ['exchange'] },
         { r: 'safe', q: 'The opposite of religious: ___', a: ['secular'] },
         { r: 'daring', q: 'People exchange gifts. → Gifts ___ ___.', a: ['are exchanged'] },
@@ -32,8 +32,11 @@ window.LP = {
         { r: 'daring', g: 'Learning Path 2', items: [['heritage', 'herència cultural', 'Our cultural heritage.']] }
       ],
       practice: [
-        { q: '25/12 → on the ___ of December', a: ['twenty-fifth', 'twenty fifth', '25th'] },
-        { q: '1/11 → on the ___ of November', a: ['first', '1st'] },
+        { q: 'Thanksgiving is ___ November.', a: ['in'] },
+        { q: 'We celebrate the Castanyada ___ 31 October.', a: ['on'] },
+        { q: 'We get together ___ Christmas.', a: ['at'] },
+        { r: 'insecure', q: '25/12 → on the ___ of December', a: ['twenty-fifth', 'twenty fifth', '25th'] },
+        { r: 'insecure', q: '1/11 → on the ___ of November', a: ['first', '1st'] },
         { q: 'We celebrate it ___ a year, in spring.', a: ['once'] },
         { q: 'The Castanyada is on the night ___ All Saints’ Day.', a: ['before'] },
         { r: 'safe', q: 'Diwali is ___ from Christmas in many ways.', a: ['different'] },
@@ -63,7 +66,7 @@ window.LP = {
         { q: 'Where did Samhain take place?', o: ['Ireland and Scotland', 'the United States', 'England'], h: 'Escolta el principi: on va començar Samhain?' },
         { q: 'What did people use to carve?', o: ['turnips', 'pumpkins', 'apples'], h: 'És una sorpresa: no eren carbasses.' },
         { q: 'Why did the tradition change in the USA?', o: ['Pumpkins were bigger and easier to carve.', 'Turnips were expensive.', 'People didn’t like turnips.'], h: 'Escolta què diu de les carbasses: com eren?' },
-        { q: 'When is Thanksgiving this year?', o: ['26 November', '21 November', '1 December'], h: 'Escolta “this year that’s the…”.' },
+        { r: 'insecure', q: 'When is Thanksgiving this year?', o: ['26 November', '21 November', '1 December'], h: 'Escolta “this year that’s the…”.' },
         { q: 'How long did the 1621 feast last?', o: ['three days', 'one day', 'a week'], h: 'Escolta “It lasted…”.' },
         { q: 'What do many families eat at Thanksgiving?', o: ['turkey', 'chestnuts', 'pumpkin soup'], h: 'Escolta “a big meal, usually with…”.' },
         { r: 'safe', q: 'When did Thanksgiving become a national holiday?', o: ['1863', '1621', '1800'] },
@@ -81,11 +84,12 @@ window.LP = {
       fields: [
         { id: 'v1', label: { ca: 'Vídeo 1 (Mei): què és important per a ella? (tria un valor de la llista)', en: 'Video 1 (Mei): what does she value? Say it in your own words.' }, rows: 2 },
         { id: 'e1', label: { ca: 'Vídeo 1: una paraula o frase del vídeo que ho mostra', en: 'Video 1: the evidence: a phrase from the video, and the tone or the images that show it' }, rows: 2 },
-        { id: 'v2', label: { ca: 'Vídeo 2 (Noah): què és important per a ell? (tria un valor de la llista)', en: 'Video 2 (Noah): what does he value? Say it in your own words.' }, rows: 2 },
-        { id: 'e2', label: { ca: 'Vídeo 2: una paraula o frase del vídeo que ho mostra', en: 'Video 2: the evidence: a phrase from the video, and the tone or the images that show it' }, rows: 2 },
+        { r: 'insecure', id: 'v2', label: { ca: 'Vídeo 2 (Noah): què és important per a ell? (tria un valor de la llista)', en: 'Video 2 (Noah): what does he value? Say it in your own words.' }, rows: 2 },
+        { r: 'insecure', id: 'e2', label: { ca: 'Vídeo 2: una paraula o frase del vídeo que ho mostra', en: 'Video 2: the evidence: a phrase from the video, and the tone or the images that show it' }, rows: 2 },
         { r: 'daring', id: 'cmp', label: 'Compare Mei and Noah: what do they both value, and how are they different (words, tone, images)?', rows: 3 }
       ],
       rate: {
+        beginners: ['He mirat el vídeo de la Mei dues vegades', 'He triat un valor de la llista', 'He copiat una paraula o frase que ho mostra'],
         insecure: ['He mirat cada vídeo dues vegades', 'He triat un valor per a cada persona', 'He copiat una paraula o frase que ho demostra'],
         safe: ['I watched each video twice', 'I explained what each speaker values', 'I backed it up with their words, tone or images'],
         daring: ['I watched each video twice', 'I explained what each speaker values with precise evidence', 'I compared the two speakers']
@@ -127,6 +131,9 @@ window.LP = {
       items: [
         { q: 'We celebrate it ___ 26 November.', a: ['on'] },
         { q: 'She ___ (love) the parade.', a: ['loves'] },
+        { q: 'My brother ___ (like) the fireworks.', a: ['likes'] },
+        { q: 'I love Christmas ___ we eat together.', a: ['because'] },
+        { q: 'First, we clean the house. ___, we decorate it.', a: ['then', 'after that'] },
         { r: 'safe', q: 'In 1863, Lincoln ___ Thanksgiving official. (used to make / made)', a: ['made'], en: 'One finished event in 1863.' },
         { r: 'safe', q: 'My grandparents ___ ___ roast chestnuts in the street. (used to / use to)', a: ['used to'], en: 'Affirmative: used to.' },
         { r: 'safe', q: 'That’s the shop ___ sells panellets.', a: ['which', 'that'] },
@@ -135,13 +142,13 @@ window.LP = {
       ] },
     { id: 'write', type: 'writing', product: 2, tab: { ca: 'Escriptura', en: 'Writing' }, title: { ca: 'Peça 2: la nostra celebració', en: 'Piece 2: our celebration' },
       intro: { ca: 'Escriu sobre la celebració que ha triat el teu grup. És la segona peça del producte final.', en: 'Write about your group’s celebration. This is the second piece of your final product.' },
-      task: { insecure: 'Explica la celebració del teu grup (60–80 paraules): què és, quan és (data amb ordinal), tres costums, un menjar o símbol i per què t’agrada. Fes servir <em>First / Then / Finally</em> i <em>because</em>. Afegeix una cosa que t’interessa o que respectes d’aquesta celebració.', safe: 'Compare your group’s celebration with a local one (100–130 words): two similarities, two differences (both… and, whereas, similar to, different from) and one sentence about its origin (Past Simple / used to).', daring: 'Write about your group’s celebration (140–180 words): its origin, meaning and how it has changed over time (used to, keep a tradition alive, commercialised, evolve), a comparison with a local celebration, and one sentence on how to present it without stereotypes.' },
-      frame: { insecure: '<strong>Pauta:</strong> ___ is celebrated on the ___ of ___. First, people ___. Then, ___. Finally, ___. We eat ___. I like it because ___. I find it interesting that ___.' },
-      min: { insecure: 60, safe: 100, daring: 140 },
-      checklist: { insecure: ['Data amb ordinal (the twenty-fifth…)', 'First / Then / Finally', 'because', 'Tres costums i un menjar o símbol', 'Una cosa que m’interessa o respecto'], safe: ['Two similarities with both… and / similar to', 'Two differences with whereas / different from', 'One origin sentence (Past Simple or used to)', 'At least one relative clause'], daring: ['Origin and meaning', 'How it has changed (used to, evolve…)', 'Comparison with a local celebration', 'A non-defining relative clause', 'How to avoid stereotypes'] } },
+      task: { beginners: 'Explica la celebració del teu grup (40–55 paraules) amb la pauta: què és, quan és, tres costums amb <em>First / Then / Finally</em>, un menjar i per què t’agrada (<em>because</em>).<br><strong>Banc de paraules:</strong> decorate · light candles · dress up · sing · dance · eat together · fireworks · presents · lights · colourful · fun', insecure: 'Explica la celebració del teu grup (60–80 paraules): què és, quan és (data amb ordinal), tres costums, un menjar o símbol i per què t’agrada. Fes servir <em>First / Then / Finally</em> i <em>because</em>. Afegeix una cosa que t’interessa o que respectes d’aquesta celebració.', safe: 'Compare your group’s celebration with a local one (100–130 words): two similarities, two differences (both… and, whereas, similar to, different from) and one sentence about its origin (Past Simple / used to).', daring: 'Write about your group’s celebration (140–180 words): its origin, meaning and how it has changed over time (used to, keep a tradition alive, commercialised, evolve), a comparison with a local celebration, and one sentence on how to present it without stereotypes.' },
+      frame: { beginners: '<strong>Pauta:</strong> ___ is celebrated on / in ___. First, people ___. Then, they ___. Finally, families ___. We eat ___. I like it because ___.', insecure: '<strong>Pauta:</strong> ___ is celebrated on the ___ of ___. First, people ___. Then, ___. Finally, ___. We eat ___. I like it because ___. I find it interesting that ___.' },
+      min: { beginners: 40, insecure: 60, safe: 100, daring: 140 },
+      checklist: { beginners: ['It is celebrated on / in…', 'First / Then / Finally', 'because', 'Un menjar'], insecure: ['Data amb ordinal (the twenty-fifth…)', 'First / Then / Finally', 'because', 'Tres costums i un menjar o símbol', 'Una cosa que m’interessa o respecto'], safe: ['Two similarities with both… and / similar to', 'Two differences with whereas / different from', 'One origin sentence (Past Simple or used to)', 'At least one relative clause'], daring: ['Origin and meaning', 'How it has changed (used to, evolve…)', 'Comparison with a local celebration', 'A non-defining relative clause', 'How to avoid stereotypes'] } },
     { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Speaking: compara-ho', en: 'Speaking: compare' },
       intro: { ca: 'Grava’t parlant de la celebració del teu grup. Mira les notes, no llegeixis.', en: 'Record yourself talking about your group’s celebration. Use notes; don’t read.' },
-      task: { insecure: 'Digues quatre frases sobre la celebració del teu grup amb connectors (30–45 segons).', safe: 'Compare your group’s celebration with a local celebration (60–90 s).', daring: 'Compare your group’s celebration with a local one and explain how it has changed over time (90–120 s).' },
-      model: { insecure: 'Diwali is celebrated in October or November. First, people clean their homes. Then, they light diyas. Finally, families share sweets. I like it because it is colourful.', safe: 'Both Diwali and Christmas are festivals of light, and families exchange gifts in both. However, Diwali lasts five days, whereas Christmas is mainly one or two days. Diwali is a very old festival which comes from India.', daring: 'Diwali, which is a very old festival, is similar to Christmas because both use light as a symbol. In the past, families used to make all their sweets at home, whereas today many people buy them, so it has become more commercialised. Even so, families keep the tradition alive.' } }
+      task: { beginners: 'Digues tres frases sobre la celebració del teu grup amb First / Then / Finally (20–30 segons). Fes servir el model.', insecure: 'Digues quatre frases sobre la celebració del teu grup amb connectors (30–45 segons).', safe: 'Compare your group’s celebration with a local celebration (60–90 s).', daring: 'Compare your group’s celebration with a local one and explain how it has changed over time (90–120 s).' },
+      model: { beginners: 'Diwali is celebrated in October or November. First, people clean their houses. Then, they light lamps. Finally, families eat sweets. I like it because it is colourful.', insecure: 'Diwali is celebrated in October or November. First, people clean their homes. Then, they light diyas. Finally, families share sweets. I like it because it is colourful.', safe: 'Both Diwali and Christmas are festivals of light, and families exchange gifts in both. However, Diwali lasts five days, whereas Christmas is mainly one or two days. Diwali is a very old festival which comes from India.', daring: 'Diwali, which is a very old festival, is similar to Christmas because both use light as a symbol. In the past, families used to make all their sweets at home, whereas today many people buy them, so it has become more commercialised. Even so, families keep the tradition alive.' } }
   ]
 };

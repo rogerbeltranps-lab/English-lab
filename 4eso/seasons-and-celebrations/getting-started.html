@@ -178,17 +178,20 @@ html,body{overflow-x:clip}
 
 <script src="../../shared/js/learning-path-support.js"></script>
 <script>
-const ROUTES=["insecure","safe","daring"];
-const forLevel=(items,lvl)=>items.filter(x=>ROUTES.indexOf(x.r)<=ROUTES.indexOf(lvl));
+// Beginners (A1) sits below Insecure: an item with r:"beginners" is shown to every route; items without r default to beginners.
+const ROUTES=["beginners","insecure","safe","daring"];
+const forLevel=(items,lvl)=>items.filter(x=>ROUTES.indexOf(x.r||"beginners")<=ROUTES.indexOf(lvl));
 const norm=s=>String(s||"").toLowerCase().replace(/[’‘]/g,"'").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
 // Recall (LS1). r = first route that does the item (cumulative).
 const recall=[
- {r:"insecure",q:"She ___ (get) up at seven every day.",a:["gets"],ca:"Amb he / she / it, el Present Simple porta -s."},
+ {r:"beginners",q:"She ___ (get) up at seven every day.",a:["gets"],ca:"Amb he / she / it, el Present Simple porta -s."},
+ {r:"beginners",q:"He ___ (go) to school by bus.",a:["goes"],ca:"he → goes (go + -es)."},
+ {r:"beginners",q:"I have breakfast ___ seven o'clock.",a:["at"],ca:"Hora → at."},
  {r:"insecure",q:"___ he walk to school? — Yes, he does.",a:["does"],ca:"Pregunta amb he: Does + subjecte + verb."},
  {r:"insecure",q:"Write the sentence with <em>always</em>: I am late.",a:["i am always late","i'm always late"],ca:"Els adverbis de freqüència van després del verb be."},
  {r:"insecure",q:"I'm tired. I'm going to turn ___ early tonight.",a:["in"],ca:"turn in = anar a dormir."},
  {r:"insecure",q:"We ___ (not / have) breakfast at school.",a:["don't have","do not have"],ca:"Negativa amb we: don't + verb."},
- {r:"insecure",q:"First, I get up. ___, I have a shower.",a:["then","after that"],ca:"Seqüència: First, Then / After that, Finally."},
+ {r:"beginners",q:"First, I get up. ___, I have a shower.",a:["then","after that"],ca:"Seqüència: First, Then / After that, Finally."},
  {r:"safe",q:"I pick up my sister. → I pick ___ ___.",a:["her up"],en:"With a pronoun, it goes between the verb and the particle: pick her up."},
  {r:"safe",q:"I've got homework. I need to get down ___ ___.",a:["to it"],en:"get down to is a fixed three-part expression: get down to it."},
  {r:"daring",q:"<em>make</em> or <em>do</em>? ___ an effort",a:["make"],en:"make an effort (MAKE group)."},
@@ -196,22 +199,22 @@ const recall=[
 ];
 // Vocabulary: [expression, Catalan, example]
 const vocab=[
- {r:"insecure",g:"Seasons & weather",items:[["spring","primavera","Flowers grow in spring."],["summer","estiu","It's hot in summer."],["autumn (UK) / fall (US)","tardor","Autumn is my favourite season."],["winter","hivern","It's cold in winter."],["sunny","assolellat","It's sunny today."],["cloudy","ennuvolat","It's cloudy and grey."],["windy","ventós","It's windy by the sea."],["rainy","plujós","Take an umbrella: it's rainy."],["foggy","amb boira","It's foggy in the morning."],["cold","fred","It's very cold in January."],["cool","fresc","The mornings are cool."],["mild","suau, temperat","Autumn here is mild."],["warm","càlid, calent","It's warm in the afternoon."],["the days get shorter / longer","els dies s'escurcen / s'allarguen","In autumn the days get shorter."],["leaves change colour","les fulles canvien de color","In October the leaves change colour."],["leaves fall","les fulles cauen","Leaves fall in November."]]},
- {r:"insecure",g:"Seasonal food & nature",items:[["chestnuts","castanyes","We roast chestnuts."],["sweet potatoes","moniatos","Sweet potatoes are delicious."],["pumpkins","carbasses","People carve pumpkins at Halloween."],["mushrooms","bolets","We pick mushrooms in the forest."],["apples","pomes","Apples are an autumn fruit."],["oranges","taronges","Oranges are a winter fruit."],["nuts","fruits secs","Panellets have nuts."],["harvest","collita","The harvest is in autumn."],["trees","arbres","The trees lose their leaves."],["plants","plantes","Plants grow in spring."],["flowers","flors","There are flowers in spring."]]},
- {r:"insecure",g:"Feelings",items:[["excited","il·lusionat/da","I'm excited about the party."],["happy","content/a","I'm happy at Christmas."],["grateful","agraït/da","I'm grateful for my family."],["proud","orgullós/osa","I'm proud of our tradition."],["scared","espantat/da","I'm scared of ghosts!"],["relaxed","relaxat/da","I feel relaxed at home."]]},
+ {r:"beginners",g:"Seasons & weather",items:[["spring","primavera","Flowers grow in spring."],["summer","estiu","It's hot in summer."],["autumn (UK) / fall (US)","tardor","Autumn is my favourite season."],["winter","hivern","It's cold in winter."],["sunny","assolellat","It's sunny today."],["cloudy","ennuvolat","It's cloudy and grey."],["windy","ventós","It's windy by the sea."],["rainy","plujós","Take an umbrella: it's rainy."],["foggy","amb boira","It's foggy in the morning."],["cold","fred","It's very cold in January."],["cool","fresc","The mornings are cool."],["mild","suau, temperat","Autumn here is mild."],["warm","càlid, calent","It's warm in the afternoon."],["the days get shorter / longer","els dies s'escurcen / s'allarguen","In autumn the days get shorter."],["leaves change colour","les fulles canvien de color","In October the leaves change colour."],["leaves fall","les fulles cauen","Leaves fall in November."]]},
+ {r:"beginners",g:"Seasonal food & nature",items:[["chestnuts","castanyes","We roast chestnuts."],["sweet potatoes","moniatos","Sweet potatoes are delicious."],["pumpkins","carbasses","People carve pumpkins at Halloween."],["mushrooms","bolets","We pick mushrooms in the forest."],["apples","pomes","Apples are an autumn fruit."],["oranges","taronges","Oranges are a winter fruit."],["nuts","fruits secs","Panellets have nuts."],["harvest","collita","The harvest is in autumn."],["trees","arbres","The trees lose their leaves."],["plants","plantes","Plants grow in spring."],["flowers","flors","There are flowers in spring."]]},
+ {r:"beginners",g:"Feelings",items:[["excited","il·lusionat/da","I'm excited about the party."],["happy","content/a","I'm happy at Christmas."],["grateful","agraït/da","I'm grateful for my family."],["proud","orgullós/osa","I'm proud of our tradition."],["scared","espantat/da","I'm scared of ghosts!"],["relaxed","relaxat/da","I feel relaxed at home."]]},
  {r:"safe",g:"Seasons & nature (Safe)",items:[["seasonal","de temporada","Chestnuts are seasonal food."],["crop","collita, conreu","Rice is an important crop."],["pick fruit","collir fruita","We pick fruit in September."],["frost","gebre, glaçada","There's frost on the car."],["chilly","fresquet, fred","It's chilly: wear a jumper."],["cosy","acollidor","Our living room is cosy."],["it gets dark early","es fa fosc aviat","In winter it gets dark early."],["the clocks go back","es retarda el rellotge","The clocks go back in October."]]}
 ];
 const practice=[
- {r:"insecure",q:"In autumn the days get ___.",a:["shorter"]},
+ {r:"beginners",q:"In autumn the days get ___.",a:["shorter"]},
  {r:"insecure",q:"Leaves ___ from the trees in November.",a:["fall"]},
- {r:"insecure",q:"It's ___ today. Take an umbrella.",a:["rainy"]},
- {r:"insecure",q:"At the Castanyada we roast ___.",a:["chestnuts"]},
- {r:"insecure",q:"At Halloween people carve ___.",a:["pumpkins"]},
+ {r:"beginners",q:"It's ___ today. Take an umbrella.",a:["rainy"]},
+ {r:"beginners",q:"At the Castanyada we roast ___.",a:["chestnuts"]},
+ {r:"beginners",q:"At Halloween people carve ___.",a:["pumpkins"]},
  {r:"insecure",q:"It isn't hot or cold. It's ___.",a:["mild"]},
  {r:"insecure",q:"I can't see the road. It's very ___.",a:["foggy"]},
  {r:"insecure",q:"Farmers collect the crops at ___ time.",a:["harvest"]},
  {r:"insecure",q:"I feel ___ the night before a big party.",a:["excited"]},
- {r:"insecure",q:"___ (UK) / fall (US) is my favourite season.",a:["autumn"]},
+ {r:"beginners",q:"___ (UK) / fall (US) is my favourite season.",a:["autumn"]},
  {r:"safe",q:"The clocks go ___ in late October.",a:["back"]},
  {r:"safe",q:"In winter it gets dark ___.",a:["early"]},
  {r:"safe",q:"It's ___ outside. Wear a jumper.",a:["chilly","cold","cool"]},
@@ -220,6 +223,17 @@ const practice=[
 ];
 // Reading (one chat per route, AGENTS.md). Options: first one is correct; order is shuffled on screen.
 const readingChat={
+ beginners:[
+  ["Núria","Hi Josh! How's the weather in Manchester?"],
+  ["Josh","Hi Núria! It's cold and rainy. It gets dark at half past four."],
+  ["Núria","Here it's mild. It's sunny in the afternoon."],
+  ["Josh","What do you do in autumn?"],
+  ["Núria","On 31 October we celebrate the Castanyada. We eat chestnuts and panellets. Panellets are small sweets with almonds and pine nuts."],
+  ["Josh","We have Halloween on the same night. Children wear costumes. My brother is going to be a skeleton. My mum makes pumpkin soup."],
+  ["Núria","For me, the Castanyada is about family. We eat together at my grandparents' house."],
+  ["Josh","Nice! I love autumn. The leaves change colour."],
+  ["Núria","Me too! Autumn is my favourite season."]
+ ],
  insecure:[
   ["Núria","Hi Josh! How's the weather in Manchester?"],
   ["Josh","Hi Núria! It's cold and rainy. The mornings are very cold, and there was frost (ice) on the cars today!"],
@@ -275,33 +289,35 @@ const readingChat={
  ]
 };
 const readingQs=[
- {r:"insecure",q:"What's the weather like in Manchester?",o:["cold and rainy","sunny and warm","foggy and mild"],h:"Llegeix el primer missatge d'en Josh."},
+ {r:"beginners",q:"What's the weather like in Manchester?",o:["cold and rainy","sunny and warm","foggy and mild"],h:"Llegeix el primer missatge d'en Josh."},
  {r:"insecure",q:"What was on the cars in Manchester this morning?",o:["frost","snow","leaves"],h:"Busca què hi havia «on the cars»."},
- {r:"insecure",q:"When does it get dark in Manchester?",o:["at about 4.30","at about 6.30","at about 8.00"],h:"Busca «half past four»: quina hora és?"},
+ {r:"beginners",q:"When does it get dark in Manchester?",o:["at about 4.30","at about 6.30","at about 8.00"],h:"Busca «half past four»: quina hora és?"},
  {r:"insecure",q:"What did Núria do last Sunday?",o:["She picked mushrooms in the forest.","She picked apples at a farm.","She roasted chestnuts."],h:"Busca «Last Sunday» al missatge de la Núria."},
- {r:"insecure",q:"What are panellets?",o:["sweets with almonds and pine nuts","roasted sweet potatoes","a kind of soup"],h:"Busca «little sweets»."},
- {r:"insecure",q:"What does Josh's mum make?",o:["pumpkin soup","panellets","roasted chestnuts"],h:"Busca «My mum…» al missatge d'en Josh."},
- {r:"insecure",q:"For Núria, the Castanyada is mainly about…",o:["family","costumes","fireworks"],h:"Busca «for me the Castanyada is about…»."},
+ {r:"beginners",q:"What are panellets?",o:["sweets with almonds and pine nuts","roasted sweet potatoes","a kind of soup"],h:"Busca «little sweets»."},
+ {r:"beginners",q:"What does Josh's mum make?",o:["pumpkin soup","panellets","roasted chestnuts"],h:"Busca «My mum…» al missatge d'en Josh."},
+ {r:"beginners",q:"For Núria, the Castanyada is mainly about…",o:["family","costumes","fireworks"],h:"Busca «for me the Castanyada is about…»."},
  {r:"safe",q:"Why does it get dark so early in Manchester now?",o:["The clocks went back.","It's always foggy.","The weather is bad."],h:""},
  {r:"safe",q:"True or false: nobody in Catalonia dresses up at the end of October.",o:["False: some people do now.","True: nobody dresses up."],h:""},
  {r:"daring",q:"What does Núria's last part show?",o:["She prefers a family tradition to costumes.","She thinks Halloween is bad.","She doesn't like autumn."],h:""}
 ];
-// Listening (origins video, Safe level for every route). Options: first one is correct; order is shuffled on screen.
+// Listening (origins video, Safe level for every route; Beginners answers the same five with Catalan hints and the slower copy). Options: first one is correct; order is shuffled on screen.
 const listening=[
- {r:"insecure",q:"Where does Halloween come from?",o:["an old Celtic festival called Samhain","an American film","a Catalan tradition"],h:"Escolta el principi: de quina festa antiga ve?"},
- {r:"insecure",q:"What did people carve before pumpkins?",o:["turnips","apples","chestnuts"],h:"És una sorpresa: no eren carbasses."},
- {r:"insecure",q:"What day is the day after the Castanyada?",o:["All Saints' Day","Christmas Day","New Year's Day"],h:"Escolta què passa l'1 de novembre."},
- {r:"insecure",q:"In the traditional story, why did the bell ringers eat chestnuts?",o:["to keep warm and get energy","to sell them in the street","because they were sweet"],h:"Escolta la història dels campaners: per què menjaven castanyes?"},
- {r:"insecure",q:"What are panellets made with?",o:["almonds, sugar and pine nuts","chestnuts and honey","pumpkin and chocolate"],h:"Escolta els tres ingredients."},
+ {r:"beginners",q:"Where does Halloween come from?",o:["an old Celtic festival called Samhain","an American film","a Catalan tradition"],h:"Escolta el principi: de quina festa antiga ve?"},
+ {r:"beginners",q:"What did people carve before pumpkins?",o:["turnips","apples","chestnuts"],h:"És una sorpresa: no eren carbasses."},
+ {r:"beginners",q:"What day is the day after the Castanyada?",o:["All Saints' Day","Christmas Day","New Year's Day"],h:"Escolta què passa l'1 de novembre."},
+ {r:"beginners",q:"In the traditional story, why did the bell ringers eat chestnuts?",o:["to keep warm and get energy","to sell them in the street","because they were sweet"],h:"Escolta la història dels campaners: per què menjaven castanyes?"},
+ {r:"beginners",q:"What are panellets made with?",o:["almonds, sugar and pine nuts","chestnuts and honey","pumpkin and chocolate"],h:"Escolta els tres ingredients."},
  {r:"safe",q:"What do both celebrations have in common?",o:["They take place on the same night and are about the dead and the end of the harvest.","They both use pumpkins.","They both come from the USA."],h:""},
  {r:"daring",q:"Why do the two celebrations “feel very different”?",o:["Halloween is about costumes and scary fun, and the Castanyada is about family and food.","Only Halloween remembers the dead.","The Castanyada is a new tradition."],h:""}
 ];
 const speakTask={
+ beginners:"Parla de la tardor on vius (20–30 segons) amb el model: el temps, un menjar i què fas el 31 d'octubre. Canvia només les paraules que calgui.",
  insecure:"Parla de la tardor on vius (30–45 segons): el temps, el menjar i com celebres el final d'octubre. Fes servir el model i canvia els detalls.",
  safe:"Talk about autumn where you live (45–60 s): the weather, the food and how you celebrate the end of October. Compare autumn with another season or another country.",
  daring:"Talk about autumn where you live (60–90 s): the weather, the food and how you celebrate the end of October. Explain how the celebration has changed in your family."
 };
 const speakModel={
+ beginners:"In autumn, it is cool and rainy. We eat chestnuts. On 31 October, we celebrate the Castanyada. I feel happy.",
  insecure:"In autumn, it is cool and rainy. The days get shorter. On 31 October, we celebrate the Castanyada. We eat chestnuts and panellets. I feel happy because my family eats together.",
  safe:"In autumn, it's mild and a bit foggy in the mornings, whereas in summer it's very hot. The clocks go back and it gets dark early. On 31 October we celebrate the Castanyada: we roast chestnuts and eat panellets at my grandparents' house. In the UK, they celebrate Halloween on the same night.",
  daring:"Autumn here is mild, but the evenings get chilly and it gets dark early after the clocks go back. On 31 October my family celebrates the Castanyada with chestnuts, sweet potatoes and panellets. When my parents were young, nobody dressed up, but now many children wear Halloween costumes too, so the celebration has changed: it mixes both traditions."
@@ -318,7 +334,7 @@ function complete(k){if(!state.done[k]){state.done[k]=true;state.doneAt=state.do
 // tries[k]: first check of a step; last[k]: latest check (the teacher dashboard shows both; recall keeps its first try in first[route])
 function attempt(k,score,max){const t={score,max,level,date:new Date().toISOString()};state.tries=state.tries||{};if(k!=="recall"&&!state.tries[k])state.tries[k]=t;state.last=state.last||{};state.last[k]=t;save()}
 function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / "+STEPS.length;$("#progressBar").style.width=(n/STEPS.length*100)+"%"}
-const ca=()=>level==="insecure";
+const ca=()=>level==="insecure"||level==="beginners";
 const need=n=>Math.ceil(n*0.8);
 
 // Typed items (recall + practice)
@@ -350,7 +366,8 @@ $("#checkPractice").onclick=()=>{const s=checkTyped(practiceItems,"pr","#practic
 
 let readItems=[];
 function renderRead(){
-  $("#readText").innerHTML=readingChat[level].map(([w,t])=>'<div class="msg '+w.toLowerCase()+'"><b>'+w+'</b>'+t+'</div>').join("");
+  const chat=readingChat[level]||readingChat.insecure;
+  $("#readText").innerHTML=(level==="beginners"?'<p class="tiny" style="margin:0 0 10px"><strong>Paraules:</strong> mild = suau · dark = fosc · sweets = dolços · costumes = disfresses · skeleton = esquelet · leaves = fulles</p>':"")+chat.map(([w,t])=>'<div class="msg '+w.toLowerCase()+'"><b>'+w+'</b>'+t+'</div>').join("");
   readItems=forLevel(readingQs,level);const f=$("#readForm");f.innerHTML="";
   readItems.forEach((q,i)=>{const box=document.createElement("div");box.className="question";
     box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="rd'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="rdf'+i+'"></div>';f.appendChild(box)});
@@ -378,7 +395,7 @@ function renderChoices(){
 function setVideo(slow){const v=$("#originsVideo");if(!v)return;const base="video/halloween-castanyada"+(slow?"-slow":"");if(v.dataset.base===base)return;v.dataset.base=base;
   v.querySelector("source").src=base+".mp4";v.querySelector("track").src=base+".vtt";v.load();$("#vidSlow").classList.toggle("active",slow);$("#vidNormal").classList.toggle("active",!slow)}
 $("#vidNormal").onclick=()=>setVideo(false);$("#vidSlow").onclick=()=>setVideo(true);
-function renderAll(){setVideo(level==="insecure");renderRecall();renderWords();renderRead();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);updateProgress()}
+function renderAll(){setVideo(ca());renderRecall();renderWords();renderRead();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);updateProgress()}
 function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));save();renderAll()}
 $$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
 $$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");window.scrollTo({top:document.querySelector("main").offsetTop-64,behavior:"smooth"})});

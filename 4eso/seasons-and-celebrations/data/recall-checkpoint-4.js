@@ -22,7 +22,7 @@ window.LP = {
    },
    "items": [
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Formal ending: Yours ___",
      "a": [
       "sincerely"
@@ -31,7 +31,7 @@ window.LP = {
      "en": "Review: LP6."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "We would ___ to organise a celebration day.",
      "a": [
       "like"
@@ -40,7 +40,7 @@ window.LP = {
      "en": "Review: LP6."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "I am writing ___ propose a celebration day.",
      "a": [
       "to"
@@ -58,7 +58,7 @@ window.LP = {
      "en": "Review: LP1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "___ will be four stalls.",
      "a": [
       "there"
@@ -67,7 +67,7 @@ window.LP = {
      "en": "Review: LP5."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Hanukkah usually takes place ___ December.",
      "a": [
       "in"
@@ -76,7 +76,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "She ___ (go) to bed at eleven.",
      "a": [
       "goes"

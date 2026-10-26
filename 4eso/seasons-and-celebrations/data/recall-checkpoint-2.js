@@ -31,7 +31,7 @@ window.LP = {
      "en": "Review: LP3."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Children ___ up in costumes at Halloween.",
      "a": [
       "dress"
@@ -49,7 +49,7 @@ window.LP = {
      "en": "Review: LS1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "The days get ___ in winter.",
      "a": [
       "shorter"
@@ -58,7 +58,7 @@ window.LP = {
      "en": "Review: LP1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "I like the Castanyada ___ we eat together.",
      "a": [
       "because"
@@ -67,7 +67,7 @@ window.LP = {
      "en": "Review: LP3."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "The Castanyada takes place ___ 31 October.",
      "a": [
       "on"
@@ -85,7 +85,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "___, we clean the house. Then we decorate it.",
      "a": [
       "first"

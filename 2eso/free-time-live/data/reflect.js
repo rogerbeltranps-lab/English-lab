@@ -1,7 +1,7 @@
 /* 2 ESO · LS2 Free Time, Live! · Reflect (after the final product; not graded). Shows the student's first-attempt checkpoint scores saved on this device. */
 (function () {
   const scores = level => {
-    const ca = level === 'insecure';
+    const ca = level === 'insecure' || level === 'beginners';
     const rows = [1, 2, 3, 4].map(n => {
       let s = {}; try { s = JSON.parse(localStorage.getItem('ls2Checkpoint' + n + '2ESO') || '{}'); } catch (e) {}
       const f = (s.first || {})[level];

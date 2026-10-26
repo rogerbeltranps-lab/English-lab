@@ -22,7 +22,7 @@ window.LP = {
    },
    "items": [
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "I ___ to music on the bus. (escoltar)",
      "a": [
       "listen"
@@ -31,7 +31,7 @@ window.LP = {
      "en": "Review: LP1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "It’s 30 degrees. It’s very ___. (calor)",
      "a": [
       "hot"
@@ -49,7 +49,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Write the -ing form: dance → ___",
      "a": [
       "dancing"
@@ -58,7 +58,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "I usually ___ (play) football on Saturdays.",
      "a": [
       "play"
@@ -67,7 +67,7 @@ window.LP = {
      "en": "Review: LP3."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Today I ___ (play) basketball.",
      "a": [
       "am playing",
