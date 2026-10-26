@@ -64,7 +64,9 @@ Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.te
 
 async function login(){
   const u=await signIn({auth,A,domain:DOMAINS[0]});if(!u)return;
-  if(!isStudent(u)&&!isTeacher(u)){await signOut(auth);alert("Sign in with your school email (@"+DOMAINS.join(", @")+").");return}
+  // Google is only for the teacher (Roger, 26 Oct 2026): any other account that comes in through the Google link is signed out.
+  const google=(u.providerData||[]).some(p=>p.providerId==="google.com")&&!(u.providerData||[]).some(p=>p.providerId==="password");
+  if(!isTeacher(u)&&(google||!isStudent(u))){await signOut(auth);alert(google&&isStudent(u)?"Google sign-in is only for the teacher. Sign in with your school email and your password. · Entra amb el correu de l'institut i la teva contrasenya.":"Sign in with your school email (@"+DOMAINS.join(", @")+").");return}
   if(isStudent(u)&&!isTester(u)&&(await onRoster(u))===null)return;   // refused in onAuthStateChanged
   // Right after signing in: students (testers too) go to their board, except on English Lab, where they stay to use it;
   // the teacher goes from Home to the dashboard and stays on any other page (to preview it).
