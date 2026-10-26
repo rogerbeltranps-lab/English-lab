@@ -65,7 +65,7 @@ const loadH2c=()=>h2c||(h2c=new Promise((ok,no)=>{if(window.html2canvas)return o
 async function pageShot(skip){
   const html2canvas=await loadH2c(),w=innerWidth,h=innerHeight;
   const c=await html2canvas(document.body,{x:scrollX,y:scrollY,scrollX:0,scrollY:0,width:w,height:h,windowWidth:w,windowHeight:h,   // the part on screen (scrollX/Y 0: crop by x/y)
-    scale:Math.min(devicePixelRatio||1,1280/w),useCORS:true,logging:false,backgroundColor:"#ffffff",ignoreElements:el=>el===skip});
+    scale:Math.min(devicePixelRatio||1,1280/w),useCORS:true,logging:false,backgroundColor:"#ffffff",ignoreElements:el=>el===skip||el.id==="el-cloud-bar"});   // the bottom bar would come out in the wrong place
   return jpeg(c,c.width,c.height);
 }
 
