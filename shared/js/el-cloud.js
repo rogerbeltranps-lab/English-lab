@@ -183,8 +183,15 @@ async function gate(u){
   if(st==="closed"){if(lvl)applyLevel(lvl);freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
   if(!lvl)lvl=await chooseLevel(u);
   applyLevel(lvl);
-  if(a&&a.graded&&!tester&&!info.enabled.includes(actId)){block("Aquesta activitat avaluable encara no està habilitada","El professor t'avisarà a classe quan toqui fer-la.");return}
+  // Students are never told which activities are assessed (Roger, 26 Oct 2026), so this message does not say it either.
+  if(a&&a.graded&&!tester&&!info.enabled.includes(actId)){block("Aquesta activitat encara no està oberta","El professor t'avisarà a classe quan toqui fer-la.");return}
   const ca=lvl==="insecure";
+  // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
+  const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>info.enabled.includes(x.id));
+  if(cp){const o=overlay('<div style="max-width:520px"><h1></h1><p></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:10px 18px;text-decoration:none;font-weight:700"></a></p>'+todayLink+'</div>');
+    o.querySelector("h1").textContent=ca?"Primer fes el "+cp.title:"First do "+cp.title;
+    o.querySelector("p").textContent=ca?"Per continuar, primer has d'acabar el "+cp.title+". Fes-lo sense apunts.":"To go on, first finish "+cp.title+". Do it without notes.";
+    const go=o.querySelector("a.go");go.href=new URL(cp.path,ROOT).href;go.textContent=(ca?"Obre el ":"Open ")+cp.title+" →";return}
   if(a&&a.manual&&a.graded)banner(ca?"Aquesta activitat és per entregar a través del Google Classroom.":"This activity is to be submitted through Google Classroom.","#1d4ed8");
   if(a&&a.mode==="once"){
     const rref=doc(db,"students",u.uid,"results",resKey(actId));

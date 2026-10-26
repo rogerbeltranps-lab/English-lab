@@ -85,7 +85,6 @@ function cell(a){
   else{const n=steps(a).filter(k=>d.has(k)).length;v=steps(a).length?n+"/"+steps(a).length:"–";c="na"}
   if(x&&x.locked){v+=" ✔";c="sub"}else if(x&&x.markedDone){v+=" 🟡";c="mark"}
   if(x&&x.feedback)v+=" 💬";
-  if(x&&x.parts&&x.parts.first)v+=`<br><small>${t("1r intent","1st try")} ${x.parts.first.score}/${x.parts.first.max}</small>`;
   return {t:v,c};
 }
 
@@ -114,7 +113,7 @@ function render(){
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
   $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links)+`<div id="ptbox">${pointsBox()}</div>`;
-  $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("Pots practicar quan vulguis. El professor et dirà a classe quan fer les activitats avaluables.","You can practise whenever you want. Your teacher will tell you in class when to do the graded activities."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
+  $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("El professor fa el seguiment de totes les activitats que fas. Algunes s'avaluaran i seran la teva avaluació contínua, que és una part de la nota.","Your teacher keeps track of all the activities you do. Some of them will be assessed and make up your continuous assessment, which is part of your mark."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
   if(!lss.length){$("#main").innerHTML="";return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
   S.pend=[];lss.forEach(l=>EL_CATALOG.filter(a=>a.ls===l.id).forEach(a=>{const r=D.rs[a.id]||{};if(a.graded&&!a.manual&&r.markedDone&&!r.locked&&(D.ls[l.id]||{}).status==="open")S.pend.push(a)}));
@@ -227,8 +226,10 @@ function lpView(list,info){return ""
 }
 // One grid per learning path: its steps as columns (with their criterion), a row of ✔ and the score.
 function lpGrid(a,info){
-  const d=doneSet(a),c=cell(a),can=canDo(a,info),n=steps(a).filter(k=>d.has(k)).length;
-  return `<div class="box lpbox"><div class="lphead"><div><h2>${a.title}</h2>${a.criteria.map(pill).join("")} <small class="muted">· ${pts(a)}${a.mode==="once"?t(" · una sola vegada"," · only once"):""}${a.graded&&!can?t(" · el professor l'habilitarà"," · your teacher will enable it"):""}</small></div><a class="go ${can?"":"off"}" href="${a.path}">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`
+  const d=doneSet(a),c=cell(a),n=steps(a).filter(k=>d.has(k)).length;
+  // a recall checkpoint before it not done yet: closed until it is (el-catalog.js elCheckpointMissing; the page itself blocks too)
+  const cp=!all()&&info.status!=="closed"&&elCheckpointMissing(a,doneSet,x=>canDo(x,info)),can=canDo(a,info)&&!cp;
+  return `<div class="box lpbox"><div class="lphead"><div><h2>${a.title}</h2>${a.criteria.map(pill).join("")} <small class="muted">· ${pts(a)}${a.mode==="once"?t(" · una sola vegada"," · only once"):""}${cp?t(` · 🔒 primer fes el ${cp.title}`,` · 🔒 first do ${cp.title}`):a.graded&&!can?t(" · el professor l'habilitarà"," · your teacher will enable it"):""}</small></div><a class="go ${can?"":"off"}" href="${a.path}">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`
     +`<div class="wrap"><table><thead><tr>${steps(a).map((k,i)=>`<th class="ac ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")}<th class="sc first">${t("Punts","Points")}</th></tr></thead>`
     +`<tbody><tr>${steps(a).map(k=>`<td class="ac ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("")}<td class="sc ${c.c} first" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr></tbody></table></div>`
     +(steps(a).length?`<small class="muted">${t(`${n} de ${steps(a).length} activitats fetes`,`${n} of ${steps(a).length} activities done`)}</small>`:"")+legend(gridCrits(a))+`</div>`;
