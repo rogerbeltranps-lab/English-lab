@@ -259,6 +259,8 @@ const fresh=at=>{const ms=at&&(at.toMillis?at.toMillis():+at);return !!ms&&Date.
 const sameDeck=p=>String(p||"").toLowerCase()===location.pathname.toLowerCase();   // the teacher's deck is this page (whatever the case of the address)
 function liveDraw(){
   const x=lastLive,on=x&&x.on&&fresh(x.at),here=on&&sameDeck(x.deck);
+  // the teacher started a class game (lab/game) for this group: a student following goes into it
+  if(on&&x.game&&x.phase!=="end"&&!T.teacher&&T.user){location.href=new URL("../../lab/game/play.html",SRC).href+"?g="+encodeURIComponent(liveGroup)+"&from="+encodeURIComponent(location.pathname+location.search);return}
   if(window.ELDeck)ELDeck.show(T.teacher?null:here?x:LOCK);
   if(here)joinQuiz(x);
   cbMode();
