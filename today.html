@@ -25,7 +25,6 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 <nav class="mtabs nvs-m" aria-label="Menú"></nav>
 <div class="app"><aside class="side"><div class="brand">English with Roger</div><nav class="nvs" aria-label="Menú"></nav></aside>
 <div class="page"><h1>Les meves activitats</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
-<div id="buzz"></div>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-criteria.js"></script>
@@ -126,40 +125,32 @@ function render(){
     +(only(ls.id)?onlyView(ls.id):`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
     +(S.view==="sum"?summary(list):lpView(list,info)));
 }
-// Team points (Roger, 25 Oct 2026; shared/js/el-points.js): my team and my points this term from the class presentations, the bonus
-// they add to my term grade so far (up to EL_POINTS_BONUS, in proportion to the best student of my group), the teams' scores and the rules.
+// Points (Roger, 25–26 Oct 2026; shared/js/el-points.js): my points this term from the class presentations and the bonus they add to
+// my term grade so far (up to EL_POINTS_BONUS, in proportion to the best student of my group), and the rules.
 function pointsBox(){
-  const p=D.pt||{},tm=D.tm||{},list=tm.list||[],team=list.find(x=>x.id===p.team),bestOf=id=>Math.max(+(tm.best||{})[id]||0,+p[id]||0);
-  if(!list.length&&!EL_TERMS.some(x=>+p[x.id]>0))return "";   // no teams in my group and no points yet
-  const L=lang(),term=elTerm(),mine=+p[term]||0,best=bestOf(term),bonus=elBonus(mine,best),sc=(tm.score||{})[term]||{};
+  const p=D.pt||{},tm=D.tm||{},bestOf=id=>Math.max(+(tm.best||{})[id]||0,+p[id]||0);
+  if(!EL_TERMS.some(x=>+p[x.id]>0)&&!bestOf(elTerm()))return "";   // no points in my group yet
+  const L=lang(),term=elTerm(),mine=+p[term]||0,best=bestOf(term),bonus=elBonus(mine,best);
   const past=EL_TERMS.filter(x=>x.id<term&&+p[x.id]>0).map(x=>`${elTermName(x.id,L)}: ${p[x.id]} ${t("punts","points")} → +${elNum(elBonus(+p[x.id],bestOf(x.id)),L)}`);
-  const rank=list.length>1?`<ol class="ptrank">${[...list].sort((a,b)=>(sc[b.id]||0)-(sc[a.id]||0)).map(x=>`<li class="${x.id===p.team?"me":""}">${esc(x.name)} · <b>${sc[x.id]||0}</b></li>`).join("")}</ol>`:"";
-  return `<div class="box"><h2>🏆 ${t("Punts d'equip","Team points")} <small class="muted">· ${elTermName(term,L)}</small></h2>`
-    +`<div class="ptgrid"><div><small class="muted">${t("El meu equip","My team")}</small><b>${team?esc(team.name):`<span class="muted">${t("encara cap","none yet")}</span>`}</b></div><div><small class="muted">${t("Els meus punts","My points")}</small><b>${mine}</b></div>`
+  return `<div class="box"><h2>🏆 ${t("Els meus punts","My points")} <small class="muted">· ${elTermName(term,L)}</small></h2>`
+    +`<div class="ptgrid"><div><small class="muted">${t("Els meus punts","My points")}</small><b>${mine}</b></div>`
     +`<div><small class="muted">${t("Bonus a la nota del trimestre","Bonus on my term grade")}</small><b>+${elNum(bonus,L)} <small class="muted">${t("de","of")} +${elNum(EL_POINTS_BONUS,L)}</small></b></div></div>`
     +`<div class="ptbar" aria-hidden="true"><span style="width:${Math.round(bonus/EL_POINTS_BONUS*100)}%"></span></div>`
-    +`<p class="muted">${best?t(`La puntuació més alta de la classe aquest trimestre: ${best} punts. `,`The top score in your class this term: ${best} points. `):""}${t("Respon bé a classe amb el teu equip per sumar-ne més!","Answer well in class with your team to get more!")}</p>`
-    +(rank?`<small class="muted">${t("Els equips aquest trimestre","The teams this term")}</small>${rank}`:"")+(past.length?`<p class="muted">${past.join(" · ")}</p>`:"")
+    +`<p class="muted">${best?t(`La puntuació més alta de la classe aquest trimestre: ${best} punts. `,`The top score in your class this term: ${best} points. `):""}${t("Respon bé a classe per sumar-ne més!","Answer well in class to get more!")}</p>`
+    +(past.length?`<p class="muted">${past.join(" · ")}</p>`:"")
     +`<details class="all"><summary>${t("Com funciona","How it works")}</summary><ul class="ptrules">${elPointsRules().map(r=>`<li>${r.icon} ${EN?r.en:r.ca}</li>`).join("")}</ul></details></div>`}
-// Live class (Roger, 25 Oct 2026): while the teacher presents with my group chosen (live/{group}, every minute), a link to follow the
-// presentation on this device (?live={group}); while the buzzers are open (buzz/{group}), the buzzer for my team (shared/js/el-buzz.js);
-// my team points as they change.
+// Live class (Roger, 25 Oct 2026): while the teacher presents to my group (live/{group}, every minute), a link to join the
+// presentation on this device (?live={group}); my points as they change.
 let LIVE=null;
 function liveBox(){const x=LIVE,ms=x&&x.at&&(x.at.toMillis?x.at.toMillis():+x.at);if(!x||!x.on||!ms||Date.now()-ms>10*60e3||!D.me.group)return "";
-  return `<div class="pend live"><div><b>📺 ${t("Ara hi ha una presentació a classe","Your class is on a presentation now")}</b><div class="muted">${esc(x.title||"")}</div></div><a class="go" href="${esc(x.deck)}?live=${esc(D.me.group)}">${t("Segueix-la en aquest dispositiu","Follow it on this device")} →</a></div>`}
+  return `<div class="pend live"><div><b>📺 ${t("Ara hi ha una presentació a classe","Your class is on a presentation now")}</b><div class="muted">${esc(x.title||"")}</div></div><a class="go" href="${esc(x.deck)}?live=${esc(D.me.group)}">${t("Entra a la classe","Join the class")} →</a></div>`}
 async function goLive(){
   if(DEMO||!D.me.group||goLive.on)return;goLive.on=true;const db=ELCloud.db,g=D.me.group,redraw=()=>{const n=$("#live");if(n)n.innerHTML=liveBox()};
   F.onSnapshot(F.doc(db,"live",g),x=>{LIVE=x.exists()?x.data():null;redraw()},e=>console.warn("live",e));setInterval(redraw,60e3);
   // my points and the teams' scores change during the class (✓ Right · +1): show them at once
   const ptDraw=()=>{const n=$("#ptbox");if(n)n.innerHTML=pointsBox()};
-  // the buzzer for my team (shared/js/el-buzz.js), made again if my team or the teams change during the class
-  let buzzKey="",buzzStop=null;
-  const setBuzz=async()=>{const team=(D.pt||{}).team,list=(D.tm||{}).list||[],ok=team&&list.some(x=>x.id===team),key=ok?team+"|"+list.map(x=>x.id+x.name).join():"";
-    if(key===buzzKey)return;buzzKey=key;if(buzzStop){buzzStop();buzzStop=null}if(!ok)return;
-    try{const {buzzer}=await import("./shared/js/el-buzz.js");if(key!==buzzKey)return;buzzStop=buzzer({S:F,db,group:g,team,names:Object.fromEntries(list.map(x=>[x.id,x.name])),t,el:$("#buzz")})}catch(e){console.warn("buzz",e)}};
-  F.onSnapshot(F.doc(db,"points",(U.email||"").toLowerCase()),x=>{D.pt=x.exists()?x.data():null;ptDraw();setBuzz()},e=>console.warn("points",e));
-  F.onSnapshot(F.doc(db,"teams",g),x=>{D.tm=x.exists()?x.data():null;ptDraw();setBuzz()},e=>console.warn("teams",e));
-  setBuzz();
+  F.onSnapshot(F.doc(db,"points",(U.email||"").toLowerCase()),x=>{D.pt=x.exists()?x.data():null;ptDraw()},e=>console.warn("points",e));
+  F.onSnapshot(F.doc(db,"teams",g),x=>{D.tm=x.exists()?x.data():null;ptDraw()},e=>console.warn("teams",e));
 }
 // Vocabulary and grammar summary (Roger, 25 Oct 2026): an optional PDF per route; a student gets only their route's, the teacher and testers all three.
 function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=elRouteOf(D.lv,ls.id).level,a=r=>`<a class="go" href="${ls.study}${r==="beginners"?"insecure":r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
