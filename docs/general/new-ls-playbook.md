@@ -84,7 +84,7 @@ Read the [root AGENTS.md](../../AGENTS.md) and the [LS2 AGENTS.md](../4eso/ls2-s
 | 8 Grading | `grading.md`; `EL_GRADING[ls]` in `shared/js/el-grading.js` (with `marking` for the marking PDF per round); paste-ready brief in project files for `teacher.html` changes (English Lab project) |
 | 9 Calendar | `EL_PLAN[ls]` in `shared/js/el-plan.js` (`groups`, `g`, `exam`, `from`, `due`, `optional`); session lines written as `Mon 2 · LP2 Title (1/2) · …` so the "My week" list finds the days and activities |
 | 10 Exam | Project files only, never in the public repo: `ls<n>/exam/` (data, `make-docx.js`, Word + key, audio with no slow copy); sample exam page + `data/sample-exam.js` on the site |
-| 11 Study summary | `<ls>/downloads/ls<n>-vocabulary-grammar-{route}.pdf`, `study` in `EL_LS`; build scripts as in project files `ls2/grammar-vocabulary/build/`; stamp every PDF with `python3 tools/stamp-copyright.py`, and give student Word files the copyright footer |
+| 11 Study summary | `<ls>/downloads/ls<n>-vocabulary-grammar-{route}.pdf`, `study` in `EL_LS` (the board box and the `data-el-study` card in the LS page's Language & Knowledge tab show it); build scripts as in project files `ls2/grammar-vocabulary/build/`; stamp every PDF with `python3 tools/stamp-copyright.py`, and give student Word files the copyright footer |
 | 12 Go live | PRs merged at Roger's OK; retarget stacked PRs to `main` once their base is merged |
 
 **Lessons from LS2:**
