@@ -12,9 +12,9 @@ Everything Roger needs to teach and assess each course, in one place. Pick the c
 | LS design (content, routes, assessment) | `docs/<course>/ls<n>-<name>/` |
 | Final product rubric | `final-product-assessment.md` in the LS docs folder; the rubric students see is on the final product page |
 | Practice exam | the LS site folder, `sample-exam.html` |
-| Real exams and answer keys | **Google Drive > Exams**, not in this repo (the repo is public, so students could read them) |
+| Real exams and answer keys | **Google Drive > Feina > Teacher Studio**, in each LS's `Exam` folder, not in this repo (the repo is public, so students could read them) |
 
-Site links below open the live site (sign in as teacher). Doc links open the file here on GitHub.
+Site links below open the live site (sign in as teacher). Doc links open the file here on GitHub. Roger's private Drive copy (Word programmes, exams, keys, audios, Google Forms scripts, competences, levels) is in **Teacher Studio**, sorted the same way: [00 Start here](https://docs.google.com/document/d/1kuMQEnjr3Am-7CbF7-OgooFLIVk7yb_PbydK_6ZzhKI/edit) links every folder.
 
 ## 4 ESO
 
@@ -29,7 +29,7 @@ Site links below open the live site (sign in as teacher). Doc links open the fil
 | LS5 · Small Changes, Big Impact | [section](4eso/programme.md#ls5--4eso--small-changes-big-impact) | not designed yet | | | |
 | LS6 · My Next Step | [section](4eso/programme.md#ls6--4eso--my-next-step) | not designed yet | | | |
 
-**Real exams:** [Drive > Exams > 4t ESO](https://drive.google.com/drive/folders/14zhDCb1TRxsChS2jx3YxoVFyyjq5CXFt). LS1: models A–C, answer key, answers and writings sheet, listening. LS2: model A, teacher key, listening (normal and slow).
+**Drive (private):** [Teacher Studio > 4 ESO](https://drive.google.com/drive/folders/1y2iq0BLOXrT88pyNF8jmzEL03NvXBuy3). LS1 [exam](https://drive.google.com/drive/folders/11nozTJCVpyFR_fHT3ziKTx99iH7ogEXg): models A–C, answer key, answers and writings sheet, listening. LS2 [exam](https://drive.google.com/drive/folders/109b7yMdGhT-en8-qEvh1nBG1QMSKXap8): model A, teacher key, listening (normal and slow); also Summaries, Final product (rubrics, marking PDFs) and Assessment.
 
 ## 2 ESO
 
@@ -44,7 +44,7 @@ Site links below open the live site (sign in as teacher). Doc links open the fil
 | LS5 · Best Places Around | [section](2eso/programme.md#ls5--2eso--best-places-around) | not designed yet | | | |
 | LS6 · Let's Plan It! | [section](2eso/programme.md#ls6--2eso--lets-plan-it) | not designed yet | | | |
 
-**Real exams:** [Drive > Exams > 2n ESO](https://drive.google.com/drive/folders/16_Z1LpFAruCFbMMECutOwPQiBuwXs_WZ). LS1: models A–D, teaching guide, listening. LS2: no exam yet (the LS2 folder holds copies of the LS1 files).
+**Drive (private):** [Teacher Studio > 2 ESO](https://drive.google.com/drive/folders/1iOoI2EOZvuffpov-V7HZ6j4vS5THtAXS). LS1 [exam](https://drive.google.com/drive/folders/1-8ROhQUGMtBF3uqQTV8gK0Hbeq0TzZS_): models A–D, teaching guide, listening, Google Forms script. LS2: no exam yet.
 
 ## Class presentations
 
