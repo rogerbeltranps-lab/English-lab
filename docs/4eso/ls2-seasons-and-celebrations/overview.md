@@ -806,6 +806,17 @@ Insecure keeps Catalan guidance at every step, with English examples linking sou
 | Final Product | manual | yes, Classroom |
 | Reflect | 1 | no |
 
+## Beginners route (A1), added 26 Oct 2026
+
+Beginners sits below Insecure (AGENTS.md, "Beginners"). Everything untagged in the data files is for every route; items tagged `r: 'insecure'` start at Insecure. What Beginners gets in this LS:
+
+- **Readings:** its own 60–100-word version with a Catalan word line (`media.text.beginners`, `readingChat.beginners` in Getting started): the four celebrations, the "check it" text, the model email, the sample-exam text. Every question Beginners sees is answerable from its text.
+- **Questions:** fewer, with the Catalan hints: recall 3–4 items, grammar only affirmative forms and on / in / at (negatives and questions start at Insecure), mixed practice with easy items, listenings the same five questions as Insecure.
+- **Steps:** reading log on one celebration and one word, listening chart on one video (Mei), research card with one source (no comparison of sources), each with its own Catalan self-assessment.
+- **Writing and speaking:** frames with fewer gaps and a word bank; piece 1 35–50 words, piece 2 40–55, plan 30–40, email a filled template (35+ words); speaking 20–35 s with a four-sentence model.
+- **Final product:** 4–5 frame sentences per person (what, when, where, two customs, one food), one thing in common with a local celebration, two activities with a time, a stereotype with *Some people think…*, one source per person; its own rubric (`finalRubricData.beginners`: video, email and research-card rows; the other rows are Insecure's). The model page is the Insecure one for now.
+- **Checkpoints:** 4–6 items per checkpoint tagged `beginners`; **sample exam:** its own `items.beginners` lists (same number of items per section) and an email template with a word bank.
+
 ## Open points
 
 1. **Audio.** Listenings mix real videos with ElevenLabs recordings of the scripts (Roger, 23 Oct 2026). The scripted MP3s are still to be generated.

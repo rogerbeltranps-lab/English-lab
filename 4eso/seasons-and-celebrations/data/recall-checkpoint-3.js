@@ -22,7 +22,7 @@ window.LP = {
    },
    "items": [
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "\"We need music.\" \"I ___ bring my speaker.\"",
      "a": [
       "will",
@@ -32,7 +32,7 @@ window.LP = {
      "en": "Review: LP5."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "___ ___ ___ food and music.",
      "a": [
       "there will be"
@@ -41,7 +41,7 @@ window.LP = {
      "en": "Review: LP5."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "We ___ ___ ___ decorate the hall. (plan)",
      "a": [
       "are going to",
@@ -60,7 +60,7 @@ window.LP = {
      "en": "Review: LP3."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Diwali is the festival of ___.",
      "a": [
       "lights"
@@ -79,7 +79,7 @@ window.LP = {
      "en": "Review: LS1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "We visit our relatives ___ Christmas.",
      "a": [
       "at"
@@ -88,7 +88,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "People roast ___ at the Castanyada.",
      "a": [
       "chestnuts"

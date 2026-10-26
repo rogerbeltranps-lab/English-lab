@@ -159,4 +159,30 @@
       ]
     }
   };
+  // Beginners (A1, 26 Oct 2026): the Insecure rubric with its own video, email and research-card rows (fewer requirements, same levels).
+  const ins = window.finalRubricData.insecure;
+  window.finalRubricData.beginners = {
+    ui: ins.ui,
+    intro: 'Mira què es valora i en quin nivell ets. Ets a la ruta Beginners (A1): presentes una part curta del vídeo (30–45 segons) amb la pauta i escrius el correu amb la plantilla emplenada.',
+    note: 'Descriviu una celebració amb 4–5 frases de la pauta (què, quan, on, dos costums, un menjar), una cosa que té en comú amb una celebració local i dues activitats per al dia amb l’hora; un estereotip amb Some people think… i com l’eviteu. Una font per persona. Correu: la plantilla emplenada amb el banc de paraules i una acció de benvinguda.',
+    rows: [
+      { name: 'La meva part del vídeo', sub: 'Planificar, assajar i gravar en grup (3.2)', pct: 40, round: 2, video: true, cells: [
+        'Assajo amb el grup; dic la meva part sencera (4–5 frases de la pauta) de manera clara i sense llegir, i afegeixo una frase meva; he millorat el guió després de l’assaig; 30–45 segons.',
+        'He assajat amb el grup; dic les frases de la pauta de la meva part de manera clara, mirant només les notes; he canviat una cosa del guió després de l’assaig.',
+        'Gravo la meva part amb el grup i dic 2–3 frases de la pauta amb ajuda; en llegeixo trossos o em falta una dada (quan, on o un costum).',
+        'No preparo ni gravo la meva part, o llegeixo un text que no s’entén; no participo a la planificació.'] },
+      { name: 'El meu correu', sub: 'Correu formal (5.1)', pct: 35, round: 2, cells: [
+        'La plantilla completa i una o dues frases meves; salutació i comiat formals; la data, el lloc, dues coses que hi haurà, una acció de benvinguda i una petició (<i>Could we…?</i>); pocs errors.',
+        'La plantilla completa amb el banc de paraules: Dear…, per què escric, la data, el lloc, què hi haurà (<i>There will be…</i>), una acció de benvinguda, una petició i Yours sincerely; com a màxim 3–4 errors que no impedeixen entendre’l.',
+        'La plantilla gairebé completa: falta una part (la petició, l’acció de benvinguda o la data) o hi ha errors que fan difícil entendre una frase.',
+        'La plantilla sense omplir o amb la meitat dels buits buits; no s’entén per què escric; o és informal (<i>Hi</i>, <i>bye</i>).'] },
+      ins.rows[2], ins.rows[3], ins.rows[4], ins.rows[5],
+      { name: 'La meva fitxa de recerca', sub: 'Peça 3 del LP4, la meva fitxa (6.1)', pct: ALTRES, round: 1, cells: [
+        'Una font ben triada, notes ordenades amb les meves paraules, la referència completa i dues raons precises de per què és fiable (qui, quan, per a què, on es publica).',
+        'Una font amb la informació clau amb paraules meves, la referència completa i dues raons per dir si és fiable.',
+        'Una font amb la informació clau, amb ajuda; una raó copiada de la llista; la referència incompleta.',
+        'Cap font, notes copiades, sense referència ni raons, o informació incorrecta.'] },
+      ins.rows[7], ins.rows[8], ins.rows[9]
+    ]
+  };
 })();
