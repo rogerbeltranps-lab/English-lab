@@ -125,4 +125,35 @@
       ]
     }
   };
+  // Beginners (A1, 26 Oct 2026): its own vlog, script, fact-file and tips rows (fewer requirements); source, process and editing shared with Insecure.
+  const ins = window.finalRubricData.insecure;
+  window.finalRubricData.beginners = {
+    ui: ins.ui,
+    intro: ins.intro,
+    note: 'Presenta la teva afició amb fotos i frases molt curtes seguint la pauta: una frase amb is / are + -ing i una amb usually; dues dades de la font donada; dos consells de pantalla del model; crèdits a l’última diapositiva; es veuen la cara i les diapositives; 1–1,5 minuts.',
+    rows: [
+      { name: 'El meu vlog', sub: 'Planificar, gravar i revisar (3.2)', pct: 40, round: 2, video: true, cells: [
+        'Un vlog clar d’1–1,5 minuts amb frases pròpies més enllà de la pauta; dic què fa la gent ara (is / are + -ing) i què fa normalment (usually); he millorat una part pel meu compte després de la primera gravació; només miro les notes.',
+        'He gravat el vlog amb les diapositives i la meva cara; dic amb les frases de la pauta on soc, què està fent una persona i què faig normalment; he millorat una part després de mirar la primera gravació; miro les notes de tant en tant.',
+        'He gravat el vlog amb ajuda i dic on soc i què m’agrada, però llegeixo la pauta o no he canviat res després de la primera gravació.',
+        'No gravo el vlog, o no s’entén; no es veuen la cara i les diapositives.'] },
+      { name: 'El meu guió i les diapositives', sub: 'Guió i text de les diapositives (5.1)', pct: 30, round: 2, cells: [
+        'Les set parts amb frases pròpies, no només la pauta; pocs errors; diapositives amb poc text i un peu a cada foto.',
+        'Les set parts de la pauta amb les meves paraules als buits: una frase amb is / are + -ing, una amb usually, I love / I don’t like + -ing i dos consells; errors que no impedeixen entendre’l; diapositives amb poc text.',
+        'Hi ha la majoria de parts de la pauta; falta la frase d’“ara” o la de “normalment”, o un consell.',
+        'Incomplet o no s’entén; sense parts clares.'] },
+      ins.rows[2], ins.rows[3],
+      { name: 'La meva fitxa de dades i els crèdits', sub: 'Peça 3 del LP4 i l’última diapositiva (6.2)', pct: ALTRES, round: 1, cells: [
+        'Dues dades o més correctes amb les meves paraules; les fotos i la font citades completes a l’última diapositiva, pel meu compte.',
+        'Dues dades en paraules clau de la font donada, amb la referència completa; les fotos i la font citades a l’última diapositiva.',
+        'Dues dades amb ajuda, en part copiades; la referència incompleta, o una foto sense crèdit.',
+        'Menys de dues dades, frases copiades, sense crèdits, o informació incorrecta.'] },
+      ins.rows[5],
+      { name: 'Consells de pantalla', sub: 'Al vlog i al pas 5 (CD4 4.5)', pct: ALTRES, round: 2, cells: [
+        'Dos consells amb les meves paraules que eviten hàbits addictius, i explico quin aplico i com va.',
+        'Dos consells amb imperatius (poden ser del model) que eviten hàbits addictius (pauses, temps límit, sense mòbil al llit) i dic quin aplicaré.',
+        'Un consell, o dos copiats sense entendre’ls, sense dir quin aplicaré.',
+        'Cap consell, o consells que no parlen de pantalles.'] }
+    ]
+  };
 })();

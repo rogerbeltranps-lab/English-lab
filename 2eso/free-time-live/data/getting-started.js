@@ -6,12 +6,12 @@ window.LP = {
       intro: { ca: 'Escriu les respostes sense mirar res. Si falles, llegeix el feedback: així s’aprèn.', en: 'Type the answers without looking. If you miss one, read the feedback: that is how you learn.' },
       items: [
         { q: 'She ___ (get) up at seven every day.', a: ['gets'], ca: 'Present Simple, 3a persona: -s.', en: 'Present Simple, third person: -s.' },
-        { q: '___ he walk to school? — Yes, he does.', a: ['does'], ca: 'Pregunta amb he/she/it: Does.', en: 'Question with he/she/it: Does.' },
-        { q: 'We ___ (not / have) lunch at school.', a: ["don't have", 'do not have'], ca: 'Negativa amb we: don’t.', en: 'Negative with we: don’t.' },
+        { r: 'insecure', q: '___ he walk to school? — Yes, he does.', a: ['does'], ca: 'Pregunta amb he/she/it: Does.', en: 'Question with he/she/it: Does.' },
+        { r: 'insecure', q: 'We ___ (not / have) lunch at school.', a: ["don't have", 'do not have'], ca: 'Negativa amb we: don’t.', en: 'Negative with we: don’t.' },
         { q: 'I ___ (be) thirteen years old.', a: ['am', "'m"], ca: 'Verb be: I am.', en: 'Verb be: I am.' },
         { q: 'My sister ___ got a bike.', a: ['has'], ca: 'have got, 3a persona: has got.', en: 'have got, third person: has got.' },
         { q: 'I ___ go to bed late. (never / 0 %)', a: ['never'], ca: 'Adverbi de freqüència: 0 % = never.', en: 'Frequency adverb: 0 % = never.' },
-        { q: 'First, I get up. ___, I have a shower. (després)', a: ['then', 'after that', 'next'], ca: 'Seqüència: Then / After that.', en: 'Sequence: Then / After that.' },
+        { r: 'insecure', q: 'First, I get up. ___, I have a shower. (després)', a: ['then', 'after that', 'next'], ca: 'Seqüència: Then / After that.', en: 'Sequence: Then / After that.' },
         { q: 'I go to school ___ Monday to Friday.', a: ['from'], ca: 'from… to…', en: 'from… to…' },
         { r: 'safe', q: 'What time ___ you get up at the weekend?', a: ['do'], en: 'Question with you: do.' },
         { r: 'safe', q: 'He ___ (study) in the evening, but not at night.', a: ['studies'], en: 'Spelling: consonant + y → -ies.' },
@@ -35,14 +35,14 @@ window.LP = {
       practice: [
         { q: 'I ___ football with my friends on Saturdays. (jugar)', a: ['play'] },
         { q: 'We go ___ in the sea in August. (nedar)', a: ['swimming'] },
-        { q: 'My brother ___ karate twice a week. (fer)', a: ['does'] },
-        { q: 'She plays ___ guitar in her room. (article)', a: ['the'] },
+        { r: 'insecure', q: 'My brother ___ karate twice a week. (fer)', a: ['does'] },
+        { r: 'insecure', q: 'She plays ___ guitar in her room. (article)', a: ['the'] },
         { q: 'I like to ___ comics at night. (llegir)', a: ['read'] },
         { q: 'We ___ friends in the square after school. (quedar amb)', a: ['meet'] },
         { q: 'They go ___ at the skate park. (patinar)', a: ['skating'] },
         { q: 'I ___ to music on the bus. (escoltar)', a: ['listen'] },
-        { q: 'My sister ___ pictures of animals. (dibuixar)', a: ['draws'] },
-        { q: 'We go ___ the park after lunch.', a: ['to'] },
+        { r: 'insecure', q: 'My sister ___ pictures of animals. (dibuixar)', a: ['draws'] },
+        { r: 'insecure', q: 'We go ___ the park after lunch.', a: ['to'] },
         { r: 'safe', q: 'I go cycling ___ a week: on Saturday and Sunday.', a: ['twice'] },
         { r: 'safe', q: 'I don’t play football during the week, only ___ the weekend.', a: ['at'] },
         { r: 'daring', q: 'He is very good ___ basketball.', a: ['at'] },
@@ -51,6 +51,7 @@ window.LP = {
     { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Two posts from Saturday', pill: '80 %',
       intro: { ca: 'Llegeix dos missatges d’un grup de classe. Fixa’t en què fan normalment i en què fan avui.', en: 'Read two posts from a class group chat. Notice what people usually do and what they are doing today.' },
       media: { text: {
+        beginners: '<p><strong>Post 1 · Marta, 10:30</strong><br>Hi! I’m at the skate park. ☀️ It’s sunny. I’m here with Pol and Aina. Pol is skating. Aina is taking photos. I usually come here on Saturdays. Today there is a competition at 12. Come and watch!</p><p><strong>Post 2 · Hugo, 16:45</strong><br>Hi! I’m at home. ☔ It’s raining. No football today. I usually play football on Saturdays. Now I’m playing video games with my brother. Boring!</p><p class="tiny"><strong>Paraules:</strong> skate park = parc d’skate · taking photos = fent fotos · competition = competició · raining = plou · boring = avorrit</p>',
         insecure: '<p><strong>Post 1 · Marta, 10:30</strong><br>Good morning from the skate park! ☀️ It’s sunny today. I’m here with Pol and Aina. Pol is skating and Aina is taking photos. I usually come on Saturdays, but today is special: there is a competition at 12! Come and watch us!</p><p><strong>Post 2 · Hugo, 16:45</strong><br>Hi! I’m at home. It’s raining now, so no football today. ☔ I usually play football on Saturday afternoons. Now I’m playing video games with my brother and we’re listening to music. Boring day!</p>',
         safe: '<p><strong>Post 1 · Marta, 10:30</strong><br>Good morning from the skate park! ☀️ It’s sunny and a bit windy today. I’m here with Pol and Aina. Pol is skating on the big ramp and Aina is taking photos for our club channel. I usually come here on Saturday mornings to practise, but today is special: there is a competition at 12 o’clock and lots of people are watching. Come and support us!</p><p><strong>Post 2 · Hugo, 16:45</strong><br>Hi everyone! I’m at home. It’s raining now, so there is no football today. ☔ I usually play football on Saturday afternoons and then I meet my friends in the square. Right now I’m playing video games with my brother and we’re listening to music. What are you doing? Send photos!</p>',
         daring: '<p><strong>Post 1 · Marta, 10:30</strong><br>Good morning from the skate park! ☀️ It’s sunny and a bit windy today, perfect for skating. I’m here with Pol and Aina. Pol is skating on the big ramp and Aina is taking photos for our club channel, because we’re uploading a video tonight. I usually come here on Saturday mornings to practise, but today is special: there is a competition at 12 o’clock and lots of people are already watching. Come and support us, we need fans!</p><p><strong>Post 2 · Hugo, 16:45</strong><br>Hi everyone! I’m at home, and I’m not happy. It’s raining now, so there is no football today. ☔ I usually play football on Saturday afternoons and then I meet my friends in the square. Right now I’m playing video games with my brother and we’re listening to music, which is fine, but I prefer the football pitch. What are you doing? Send photos, I need ideas!</p>'
@@ -61,7 +62,7 @@ window.LP = {
         { q: 'What is the weather like at the skate park?', o: ['sunny', 'rainy', 'cold'], h: 'Busca el sol ☀️.' },
         { q: 'When does Marta usually go to the skate park?', o: ['on Saturdays', 'on Sundays', 'every day'], h: 'Busca “usually”.' },
         { q: 'What is Hugo doing now?', o: ['playing video games', 'playing football', 'meeting his friends'], h: 'Busca “Now I’m…”.' },
-        { q: 'Why is there no football today?', o: ['It’s raining.', 'It’s sunny.', 'Hugo is tired.'], h: 'Mira el ☔.' },
+        { r: 'insecure', q: 'Why is there no football today?', o: ['It’s raining.', 'It’s sunny.', 'Hugo is tired.'], h: 'Mira el ☔.' },
         { r: 'safe', q: 'Why is Aina taking photos?', o: ['for the club channel', 'for her family', 'for the school'] },
         { r: 'safe', q: 'What does Hugo usually do after football?', o: ['He meets his friends in the square.', 'He plays video games.', 'He goes to the skate park.'] },
         { r: 'daring', q: 'Why does Marta say “we need fans”?', o: ['She wants people to come and support them at the competition.', 'The skate park is empty.', 'She is selling tickets.'] },
@@ -84,7 +85,7 @@ window.LP = {
         { q: 'What does Omar usually do on Saturday mornings?', o: ['He goes swimming.', 'He plays basketball.', 'He draws comics.'], h: 'Escolta “I usually…”.' },
         { q: 'Why isn’t he swimming today?', o: ['The pool is closed.', 'It’s raining.', 'He is tired.'], h: 'Escolta “today the pool…”.' },
         { q: 'What is Laia doing?', o: ['drawing a comic', 'playing the guitar', 'walking in the park'], h: 'Escolta “I’m at home. I’m…”.' },
-        { q: 'What time do they meet?', o: ['at half past twelve', 'at twelve', 'at half past one'], h: 'Escolta “half past…”.' },
+        { r: 'insecure', q: 'What time do they meet?', o: ['at half past twelve', 'at twelve', 'at half past one'], h: 'Escolta “half past…”.' },
         { r: 'safe', q: 'Why isn’t Laia going to the park?', o: ['It’s raining.', 'She has homework.', 'The park is closed.'] },
         { r: 'safe', q: 'What is the comic about?', o: ['a cat who plays the guitar', 'a dog who plays basketball', 'a cat who swims'] },
         { r: 'daring', q: 'Why does Laia ask “Where are you?” at the start?', o: ['because it is very noisy', 'because Omar is late', 'because she can’t find the square'] },
@@ -92,7 +93,7 @@ window.LP = {
       ] },
     { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Speaking: el meu temps lliure', en: 'Speaking: my free time' },
       intro: { ca: 'Grava’t parlant del teu temps lliure. Mira les notes, no llegeixis.', en: 'Record yourself talking about your free time. Use notes; don’t read.' },
-      task: { insecure: 'Digues quatre frases: dues activitats que fas en el teu temps lliure, quan les fas i una que no fas mai (20–30 segons).', safe: 'Say what you do in your free time, how often and with whom, and one thing you never do (30–45 seconds).', daring: 'Describe your free time: what you do, how often, what you are good at and why you like it, and one thing you never do (45–60 seconds).' },
-      model: { insecure: 'In my free time I play basketball. I play on Saturday mornings. I also listen to music. I never do yoga.', safe: 'In my free time I go skating twice a week with my cousin, and at the weekend I meet my friends in the square. I sometimes draw comics at night. I never play video games on school days.', daring: 'I spend a lot of my free time playing the guitar: I practise every day because I want to join a band. I’m quite good at it now. At the weekend I go cycling with my dad, and I never get up late, even on Sundays!' } }
+      task: { beginners: 'Digues tres frases amb el model: dues activitats que fas en el teu temps lliure i una que no fas mai (15–25 segons). Canvia només les paraules que calgui.', insecure: 'Digues quatre frases: dues activitats que fas en el teu temps lliure, quan les fas i una que no fas mai (20–30 segons).', safe: 'Say what you do in your free time, how often and with whom, and one thing you never do (30–45 seconds).', daring: 'Describe your free time: what you do, how often, what you are good at and why you like it, and one thing you never do (45–60 seconds).' },
+      model: { beginners: 'In my free time I play football. I listen to music. I never do karate.', insecure: 'In my free time I play basketball. I play on Saturday mornings. I also listen to music. I never do yoga.', safe: 'In my free time I go skating twice a week with my cousin, and at the weekend I meet my friends in the square. I sometimes draw comics at night. I never play video games on school days.', daring: 'I spend a lot of my free time playing the guitar: I practise every day because I want to join a band. I’m quite good at it now. At the weekend I go cycling with my dad, and I never get up late, even on Sundays!' } }
   ]
 };

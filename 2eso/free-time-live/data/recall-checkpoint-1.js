@@ -22,7 +22,7 @@ window.LP = {
    },
    "items": [
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "She ___ (get) up at seven every day.",
      "a": [
       "gets"
@@ -40,7 +40,7 @@ window.LP = {
      "en": "Review: LS1 / LP1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "We go ___ at the skate park. (patinar)",
      "a": [
       "skating"
@@ -58,7 +58,7 @@ window.LP = {
      "en": "Review: LP1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Look! Pol ___ (skate) on the ramp.",
      "a": [
       "is skating",
@@ -68,7 +68,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Write the -ing form: swim → ___",
      "a": [
       "swimming"
@@ -88,7 +88,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "On your bike, always wear a ___. (casc)",
      "a": [
       "helmet"

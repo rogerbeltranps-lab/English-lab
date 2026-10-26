@@ -31,7 +31,7 @@ window.LP = {
      "en": "Review: LP1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "They ___ (wear) green T-shirts today.",
      "a": [
       "are wearing",
@@ -41,7 +41,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Look! It ___ (snow).",
      "a": [
       "is snowing",
@@ -51,7 +51,7 @@ window.LP = {
      "en": "Review: LP3."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "She usually ___ (go) skating on Sundays.",
      "a": [
       "goes"
@@ -60,7 +60,7 @@ window.LP = {
      "en": "Review: LP3."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "I love ___ (skate).",
      "a": [
       "skating"
@@ -78,7 +78,7 @@ window.LP = {
      "en": "Review: LP5."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Tip: ___ a break every 30 minutes.",
      "a": [
       "take"
@@ -87,7 +87,7 @@ window.LP = {
      "en": "Review: LP5."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Tip: ___ use your phone in bed.",
      "a": [
       "don't",

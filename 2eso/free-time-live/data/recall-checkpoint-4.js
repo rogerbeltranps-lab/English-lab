@@ -31,7 +31,7 @@ window.LP = {
      "en": "Review: LP1."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "It’s ___: the clouds are grey. (ennuvolat)",
      "a": [
       "cloudy"
@@ -40,7 +40,7 @@ window.LP = {
      "en": "Review: LP2."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Right now I ___ (record) a video.",
      "a": [
       "am recording",
@@ -50,7 +50,7 @@ window.LP = {
      "en": "Review: LP3."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "I usually ___ (come) here on Saturdays.",
      "a": [
       "come"
@@ -59,7 +59,7 @@ window.LP = {
      "en": "Review: LP3."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Do you like ___ (read) comics?",
      "a": [
       "reading"
@@ -77,7 +77,7 @@ window.LP = {
      "en": "Review: LP5."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Hi ___! Welcome to my vlog. (tothom)",
      "a": [
       "everyone",
@@ -87,7 +87,7 @@ window.LP = {
      "en": "Review: LP6."
     },
     {
-     "r": "insecure",
+     "r": "beginners",
      "q": "Thanks for ___! (mirar-ho)",
      "a": [
       "watching"
