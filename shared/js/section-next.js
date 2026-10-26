@@ -16,7 +16,7 @@ var sectionNext = {
       panel.appendChild(card);
       const button = card.querySelector('button'), message = card.querySelector('.feedback');
       const nextTab = tabs[order.indexOf(next)];
-      const ca = () => config.level() === 'insecure';
+      const ca = () => /^(insecure|beginners)$/.test(config.level());
       button.addEventListener('click', () => {
         if (cfg.done()) {
           message.textContent = '';
@@ -55,7 +55,7 @@ var sectionNext = {
     undo.className = 'btn secondary';
     config.button.insertAdjacentElement('afterend', undo);
     const sync = () => {
-      undo.textContent = config.level() === 'insecure' ? 'Desfés ↺' : 'Undo ↺';
+      undo.textContent = /^(insecure|beginners)$/.test(config.level()) ? 'Desfés ↺' : 'Undo ↺';
       undo.hidden = !config.isDone();
     };
     undo.addEventListener('click', () => { config.undo(); setTimeout(sync, 0); });
@@ -76,7 +76,7 @@ var sectionNext = {
       const seen = chips.filter(c => c.classList.contains('seen')).length;
       const all = chips.length > 0 && seen === chips.length;
       button.disabled = !all;
-      note.textContent = all ? '' : (config.level() === 'insecure'
+      note.textContent = all ? '' : (/^(insecure|beginners)$/.test(config.level())
         ? 'Passa el ratolí per sobre de cada expressió (o toca-la al mòbil) per veure’n el significat: ' + seen + '/' + chips.length
         : 'Hover over (or tap) every expression to see its meaning: ' + seen + '/' + chips.length);
     };
@@ -103,7 +103,7 @@ var sectionNext = {
     const here = options.findIndex(o => o.value === location.pathname.split('/').pop());
     const target = options[here + 1] ? options[here + 1].value : 'index.html';
     const hasNext = !!options[here + 1];
-    const ca = () => config.level() === 'insecure';
+    const ca = () => /^(insecure|beginners)$/.test(config.level());
     const card = document.createElement('div');
     card.className = 'section-card section-next';
     card.innerHTML = '<div class="actions"><button class="btn main" type="button"></button></div><p class="feedback no" aria-live="polite"></p>' +
