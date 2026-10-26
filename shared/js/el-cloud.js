@@ -316,6 +316,18 @@ function menuLink(u){
   document.querySelectorAll(".lp-home-link").forEach(h=>add(h,"lp-home-link","☰ "));
   document.querySelectorAll(".site-header .home-link").forEach(h=>add(h,"home-link",""));
 }
+// Learning Situations dropdown (.ls-dropdown, course and LS pages): a student, and the tester in a group's view, sees only their own
+// course with the LSs assigned to their group that are not hidden; the other courses and the "Soon" ones go (Roger, 26 Oct 2026).
+async function lsMenu(u){
+  const dds=document.querySelectorAll(".ls-dropdown");
+  if(!dds.length||!u||!isStudent(u)||seesAll(u)||!myGroup)return;
+  const course=courseOf(myGroup),home=new URL(course+"/",ROOT).href,norm=h=>new URL(h,location.href).href.replace(/index\.html$/,""),ok={};
+  await Promise.all((window.EL_LS||[]).filter(l=>l.course===course).map(async l=>{const i=await lsInfo(l.id);
+    ok[new URL(l.id.replace(course+"-",course+"/")+"/",ROOT).href]=i.status!=="hidden"&&elLsForGroup(l,i,myGroup)}));
+  dds.forEach(dd=>dd.querySelectorAll(".course-group").forEach(g=>{const c=g.querySelector(":scope>.course-link");
+    if(g.classList.contains("muted-group")||!c||norm(c.getAttribute("href"))!==home){g.remove();return}
+    g.querySelectorAll(".ls-link").forEach(a=>{if(!ok[norm(a.getAttribute("href"))])a.remove()})}));
+}
 // Vocabulary and grammar summary on the LS page (Roger, 26 Oct 2026): the "Language & Knowledge" tab has an empty card ([data-el-study]);
 // for an LS with `study` in EL_LS it gets the student's route PDF (nothing until they have a route), the teacher and testers all three.
 function studyCard(u){
@@ -359,6 +371,7 @@ onAuthStateChanged(auth,async u=>{
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
   gamePush(u);
+  lsMenu(u).catch(e=>console.warn("ls menu",e));
   document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u));   // teacher-only links (e.g. a class game on its learning path)
   menuLink(u);   // again after gate, which knows the route (the label follows its language)
   try{await gate(u)}catch(e){console.warn("gate",e)}
