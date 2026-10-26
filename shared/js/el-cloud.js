@@ -14,7 +14,7 @@ const ROOT=new URL("../../",import.meta.url);
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let stopJoin=null,joinGen=0,myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null;
+let stopJoin=null,joinGen=0,myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
@@ -39,18 +39,28 @@ const snapshot=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=lo
 const progressRef=()=>doc(db,"students",user.uid,"progress",lsId);
 const levelRef=(uid,ls)=>doc(db,"students",uid,"levels",ls);
 
-async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:s.data().status||"hidden",enabled:s.data().enabled||[],groups:s.data().groups||null}:{status:"hidden",enabled:[],groups:null}}catch(e){return {status:"hidden",enabled:[]}}}
+// "public" (free access, nothing saved) was removed when students got their own password (Roger, 26 Oct 2026): an LS still stored as public is open.
+const lsSt=s=>s==="public"?"open":s||"hidden";
+async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:lsSt(s.data().status),enabled:s.data().enabled||[],groups:s.data().groups||null}:{status:"hidden",enabled:[],groups:null}}catch(e){return {status:"hidden",enabled:[]}}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
 async function pull(){
   const s=await getDoc(progressRef()).catch(()=>null);
-  if(s&&s.exists()){const cloud=s.data().data||{};syncing=true;
-    for(const k in cloud){if(localStorage.getItem(k)!==cloud[k])origSet.call(localStorage,k,cloud[k])}
+  if(s&&s.exists()){const cloud=s.data().data||{},a=window.EL_CATALOG&&EL_CATALOG.find(x=>x.id===actId),mine=k=>!!a&&a.keys.some(x=>k.startsWith(x));syncing=true;
+    for(const k in cloud){if(localStorage.getItem(k)!==cloud[k]){origSet.call(localStorage,k,cloud[k]);if(mine(k))stale=true}}
     syncing=false}
+}
+// The page's own script read localStorage before this file knew whose it is. After a wipe (another account) or a pull that
+// changed it, reload once so the page shows this student's progress, not the old one, and never saves the old one back
+// (a Daring student saw "2 / 5" from someone else's steps, Roger 26 Oct 2026). Returns true when it reloads.
+function reloadIfStale(){
+  const again=sessionStorage.getItem("el_reload")===location.pathname;sessionStorage.removeItem("el_reload");
+  if(!stale||again){stale=false;return false}   // once only, never a loop
+  sessionStorage.setItem("el_reload",location.pathname);frozen=true;location.reload();return true;
 }
 function resultPayload(a,extra){const sc=elPoints(a),parts=typeof window.EL_RESULT_PARTS==="function"?window.EL_RESULT_PARTS():null;return Object.assign({ls:lsId,activity:a.id,score:sc,max:a.points,done:sc,updated:serverTimestamp()},parts?{parts}:{},extra||{})}
 function push(){
-  if(!user||!isStudent(user)||syncing||frozen||!lsId||publicLs||noSync)return;
+  if(!user||!isStudent(user)||syncing||frozen||!lsId||noSync)return;
   clearTimeout(timer);
   timer=setTimeout(async()=>{
     try{
@@ -85,7 +95,7 @@ async function refuse(u){
   o.style.zIndex=10001;o.querySelector("b").textContent=mail;o.querySelector("button").onclick=()=>{o.remove();login()};
 }
 // Shared school computers: never leak one student's local progress into another account.
-const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))};
+const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k));if(ks.length)stale=true};
 const logout=async()=>{await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");location.reload()};
 
 function banner(text,color,btn){
@@ -169,7 +179,6 @@ async function gate(u){
   }
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
-  if(st==="public"){publicLs=true;return}   // free access, no login, nothing is saved or scored
   if(isTeacher(u)){banner("Teacher mode · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){signInBlock();return}
   const tester=seesAll(u),vg=viewGroup(u);
@@ -178,6 +187,7 @@ async function gate(u){
   if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block("Aquesta LS no és del teu grup","Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.");return}
   if(st==="hidden"&&!tester){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
   if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
+  if(reloadIfStale())return;
   const a=EL_CATALOG.find(x=>x.id===actId);
   const ld=await getDoc(levelRef(u.uid,lsId)).catch(()=>null);
   let lvl=ld&&ld.exists()?ld.data().level:null;
@@ -212,6 +222,8 @@ async function gate(u){
       if(confirm(ca?"Activitat marcada com a feta. Vols entregar-la ara? (La nota quedarà fixada.)":"Activity marked as done. Do you want to submit it now? (Your result will be fixed.)"))await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});
       location.reload()}});
   }
+  // Work left in this browser that the cloud does not have yet (for example done while the LS was still "public") reaches the cloud now.
+  push();
 }
 
 // Submit (lock) an activity from any page, using the progress saved in the cloud.
@@ -288,12 +300,15 @@ const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=b
 onAuthStateChanged(auth,async u=>{
   user=u;draw(u);
   if(u&&signInO){signInO.remove();signInO=null}
-  if(u&&isStudent(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){if(prev!==null&&prev!==u.uid)wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
+  // A student's first sign-in on this browser starts clean too: what is there was done by the teacher, a signed-out visitor or
+  // another student, and this student's own work comes back from the cloud (pull).
+  if(u&&isStudent(u)){const prev=localStorage.getItem("el_uid");if(prev!==u.uid){wipeLocal();origSet.call(localStorage,"el_uid",u.uid)}}
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
   menuLink(u);   // again after gate, which knows the route (the label follows its language)
   try{await gate(u)}catch(e){console.warn("gate",e)}
+  if(reloadIfStale())return;   // wiped on a page without progress sync
   menuLink(u);
   studyCard(u);
   if(myLevel)draw(u);   // the route is known now: the Problem button speaks its language

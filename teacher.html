@@ -46,8 +46,8 @@ if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gs
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),resKey=a=>a.replace("/","__");
 const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(),D:null,P:{},zero:true,term:elTerm(),wk:null,tips:(()=>{try{return localStorage.getItem("el_t_tips")!=="off"}catch(e){return true}})()};   // P: people on screen (see people()); zero: missing work counts 0 in the LS grade; term: of the team points
-const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved; graded activities only if you enable them."],closed:["Closed","Students can only review what they did and the feedback."],public:["Public","Free access as before: no login and no scoring."]};
-const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309",public:"#2563eb"};
+const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved; graded activities only if you enable them."],closed:["Closed","Students can only review what they did and the feedback."]};
+const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 
 // ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}, ro:{id:{email,group,surname1,surname2,first,tutor}},
 //               pt:{id:{team,t1,t2,t3}}, tm:{group:{list,score,best}}, tk:{group:{ticks:{"ls|session line":true}}} (the teacher's time plan checklist)}
@@ -55,7 +55,7 @@ const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309",public:"#2563eb"};
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
 // pt, tm = team points (points/{same id as the list}, teams/{group}; shared/js/el-points.js).
 async function load(){
-  if(DEMO){DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];return DEMO}
+  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];return DEMO}
   const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[]},up=r=>r.ref.parent.parent.id;
   try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
   try{(await F.getDocs(F.collection(db(),"points"))).forEach(p=>D.pt[p.id]=p.data());(await F.getDocs(F.collection(db(),"teams"))).forEach(t=>D.tm[t.id]=t.data())}catch(e){D.ptErr=true;console.warn("points",e)}
@@ -223,6 +223,13 @@ function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=(g.mom
   return h}
 
 // ---- views
+// Why students' work may not reach this table (Roger, 26 Oct 2026: 4ESO A worked in an LS assigned only to 4ESO B, and nothing was saved).
+function lsWarn(ls,grp,assigned){
+  const st=(S.D.ls[ls]||{}).status||"hidden",w=[];
+  if(st==="hidden")w.push("This LS is <b>Hidden</b>: students cannot open it.");
+  if(!assigned)w.push("This LS is <b>not assigned to "+grp.name+"</b>: its students cannot open it. Turn "+grp.name+" on in “Groups that can use it” (below).");
+  return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
+}
 function render(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
@@ -243,6 +250,7 @@ function render(){
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"")
     +(G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
+    +lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`+pbBox()
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
@@ -376,7 +384,7 @@ function critPanel(c){redraw=null;
 function lsSettings(id){
   const info=S.D.ls[id]||{status:"hidden",enabled:[]},st=info.status,list=acts(id);
   return `<div class="lscard"><span class="badge" style="background:${STCOL[st]}">Current status: ${LS_INFO[st][0].toUpperCase()}</span><p class="muted">${LS_INFO[st][1]}</p><div class="opts">`
-    +["hidden","open","closed","public"].map(s=>`<button class="opt ${s===st?"sel":""}" data-do="status" data-s="${s}" style="${s===st?"border-color:"+STCOL[s]+";background:"+STCOL[s]+"1a":""}">${s===st?"✔":"○"} <b>${LS_INFO[s][0]}</b><small>${LS_INFO[s][1]}</small></button>`).join("")+`</div>`
+    +["hidden","open","closed"].map(s=>`<button class="opt ${s===st?"sel":""}" data-do="status" data-s="${s}" style="${s===st?"border-color:"+STCOL[s]+";background:"+STCOL[s]+"1a":""}">${s===st?"✔":"○"} <b>${LS_INFO[s][0]}</b><small>${LS_INFO[s][1]}</small></button>`).join("")+`</div>`
     +`<h3>Groups that can use it</h3><div class="bar">${lsGroups(id).map(g=>{const on=elLsForGroup(EL_LS.find(l=>l.id===id),info,g.id);return `<button class="tog ${on?"yes":"no"}" data-do="assign" data-g="${g.id}">${on?"✔ ":"✖ "}${g.name}</button>`}).join("")}</div><p class="muted">Students only see, on their board, the LSs assigned to their group, and cannot open the others.</p>`
     +`<h3>Graded activities ${st==="open"?"":'<small class="muted">(only take effect when the LS is Open)</small>'}</h3><table class="acts"><tr><th>Activity</th><th>Points</th><th>Can students do it?</th></tr>`
     +list.filter(a=>a.graded).map(a=>{const on=info.enabled.includes(a.id);return `<tr><td>${a.title} ${a.criteria.map(pill).join("")}${a.mode==="once"?' <small class="muted">(once only)</small>':""}</td><td>${a.manual?"you mark it":a.points}</td><td><button class="tog ${on?"yes":"no"}" data-do="enable" data-a="${a.id}">${on?"✔ YES, enabled":"✖ NOT enabled"}</button></td></tr>`}).join("")+`</table>`
