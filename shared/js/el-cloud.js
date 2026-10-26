@@ -1,6 +1,7 @@
 // English Lab cloud: sign-in (students: school email + password; teacher: Google; el-signin.js), per-LS progress sync, LS release gate,
 // route (set by the teacher), teacher-enabled graded activities, once-only activities, points per completed action.
 import "./el-copyright.js";
+import "./el-route-names.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {signIn} from "./el-signin.js";

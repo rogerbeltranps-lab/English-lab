@@ -26,6 +26,10 @@ All docs are mapped in [docs/README.md](docs/README.md), which is also Roger's *
 - **English remains the target language** for vocabulary, listening/reading input, model sentences, interview questions where appropriate, slide content and student production. Do not translate these into Catalan when adding scaffolding.
 - Reuse route-aware support such as `shared/js/learning-path-support.js` where appropriate; verify language updates correctly when switching routes.
 
+## Route names students see
+- **Students see Starter · Base · Core · Plus (Roger, 26 Oct 2026, research audit)** for Beginners · Insecure · Safe · Daring. Code ids, data keys (`r:'insecure'`), docs, rubrics' source and Roger's dashboard keep the old names; the dashboard shows both ("Safe · Core", `EL_LEVELS[].student`).
+- `shared/js/el-route-names.js` relabels whole capitalised route words in visible text, titles, aria-labels and placeholders on every student page, including re-renders. `el-cloud.js` imports it; a page without `el-cloud.js` adds `<script src="…/shared/js/el-route-names.js" defer></script>` next to `el-copyright.js`. Keep writing the old names in content; never capitalise "Safe", "Daring", "Insecure" or "Beginners" as ordinary English words in student content (write "safe" lowercase), or they get relabelled.
+
 ## Levels, listenings, videos and readings
 - Each route has the level agreed in the levels document of the teaching programme:
 
