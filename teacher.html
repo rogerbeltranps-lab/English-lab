@@ -488,6 +488,18 @@ function overview(){const t=ELWeek.today(),all=[...new Set(GR.flatMap(g=>ELWeek.
     return `<div class="tpc c${g.course}"><h3>${esc(g.name)}</h3><div class="muted">${esc(l?l.title:x.ls)}</div>${examTag(ELWeek.exam(x.p,x.gi))}${behindTag(Object.assign({gid:g.id},x))}${body}<button class="g" data-do="tab" data-g="${g.id}" data-ls="${x.ls}">Open ${esc(g.name)}</button></div>`};
   return `<div class="box"><h2>Time plan · all groups</h2><p class="muted">Today is ${ELWeek.date(t)}. Your checklist: tick each session when you have taught it (saved with your account). Pick a week to plan ahead; the 💡 tips come from the LS docs. Plans are in <code>shared/js/el-plan.js</code>; open a group for its whole plan and who is late.</p>`
     +`<div class="bar wkbar">${chips}</div><div class="tp">${GR.map(card).join("")}</div></div>`}
+// Writing and speaking revisions (LS2 engine, research audit 26 Oct 2026): state.drafts[key] = the first version sent for AI feedback
+// (speaking: its transcript), state.finals[key] = {text, changed, at} the improved version; key = step + "_" + route. Older texts
+// saved before drafts were kept (state.texts) appear on their own.
+function revisions(u,a){const st=pstate(u,a),dr=st.drafts||{},fi=st.finals||{},tx=st.texts||{};
+  const keys=[...new Set([...Object.keys(dr),...Object.keys(fi),...Object.keys(tx).filter(k=>!dr[k])])];if(!keys.length)return "";
+  const when=x=>x&&x.at?` <small class="muted">${ymd(x.at)}</small>`:"",para=t=>`<p style="white-space:pre-wrap">${esc(t)||'<span class="muted">(empty)</span>'}</p>`;
+  return `<label>Writing and speaking</label>`+keys.map(k=>{const [step,rt]=[k.replace(/_[a-z]+$/,""),(k.match(/_([a-z]+)$/)||[])[1]],d=dr[k],f=fi[k];
+    const sum=f?"✓ final version"+(d?" · draft kept":""):d?"draft only, no final version yet":"text";
+    return `<details><summary>${esc(step)}${rt?` <small class="muted">(${esc(LV[rt]||rt)})</small>`:""} · ${sum}</summary><div class="hand">`
+      +(d?`<p><b>Draft</b>${when(d)}</p>${para(d.text)}`:"")
+      +(f?`<p><b>Final version</b>${when(f)}</p>${para(f.text)}<p><b>What I changed:</b> ${esc(f.changed)}</p>`:"")
+      +(!d&&!f?para(tx[k]):"")+`</div></details>`}).join("")}
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},rp=((S.D.rs[u]||{})[a.id]||{}).replies||{};
@@ -617,6 +629,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${x.score||0}/${a.points}`:""}</p>`
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.steps?handIns(u,a):"")
+    +revisions(u,a)
     +levelRows(u,a)
     +(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
     +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea>`

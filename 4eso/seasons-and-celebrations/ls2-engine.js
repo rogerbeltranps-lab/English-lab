@@ -236,6 +236,44 @@ var LS2 = (function () {
     }
   });
 
+  /* Revision counts (research audit, Roger 26 Oct 2026): the first version sent for feedback is kept as the draft (state.drafts[key]);
+     the step completes only when the student saves an improved final version (state.finals[key]) with a line on what they changed.
+     The teacher sees draft, final version and that line in the activity dialog; the student sees their own draft here. */
+  const revWords = s => (String(s || '').trim().match(/\S+/g) || []).length;
+  function keepDraft(key, text) {
+    state.drafts = state.drafts || {};
+    if (state.drafts[key]) return false;
+    state.drafts[key] = { text, at: new Date().toISOString() }; save(); return true;
+  }
+  function revisionHtml(id) {
+    return '<div class="section-card" id="' + id + 'Rev" hidden><h3>' + (ca() ? 'La teva versió final' : 'Your final version') + '</h3>' +
+      '<details class="draft-box"><summary>' + (ca() ? 'El teu primer esborrany' : 'Your first draft') + '</summary><p class="model" id="' + id + 'Draft" style="white-space:pre-wrap;font-weight:400"></p></details>' +
+      '<p class="instruction">' + (ca() ? 'Millora la teva versió amb el feedback. Després explica en una frase què has canviat i desa-la: és la que compta i la que faràs servir al producte final.' : 'Improve your version with the feedback. Then say in one sentence what you changed and save it: this is the version that counts and the one you will use in the final product.') + '</p>' +
+      '<label class="field"><strong>' + (ca() ? 'Què he canviat' : 'What I changed') + '</strong><input type="text" class="typed" id="' + id + 'Changed" maxlength="300" placeholder="' + (ca() ? 'Per exemple: he corregit els verbs amb -s i he afegit un costum.' : 'For example: I corrected the -s verbs and added one more custom.') + '"></label>' +
+      '<div class="actions"><button class="btn" type="button" id="' + id + 'Final">' + (ca() ? 'Desa la versió final' : 'Save my final version') + '</button></div><p class="feedback" id="' + id + 'FinalMsg"></p></div>';
+  }
+  // getText(): the current version; onFinal(text): extra work when the final version is saved (the product piece). Returns show().
+  function bindRevision(id, key, getText, onFinal) {
+    const box = $('#' + id + 'Rev'), ch = $('#' + id + 'Changed'), msg = $('#' + id + 'FinalMsg');
+    state.finals = state.finals || {};
+    const show = () => {
+      const d = (state.drafts || {})[key]; if (!d) return;
+      box.hidden = false; $('#' + id + 'Draft').textContent = d.text || (ca() ? '(buit)' : '(empty)');
+      const f = state.finals[key];
+      if (f) { ch.value = f.changed; msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Versió final desada el ' : 'Final version saved on ') + new Date(f.at).toLocaleDateString() + (ca() ? '. Si la tornes a millorar, desa-la una altra vegada.' : '. If you improve it again, save it again.'); }
+    };
+    $('#' + id + 'Final').onclick = () => {
+      const d = (state.drafts || {})[key], text = getText();
+      if (!d) return;
+      if (d.text && text.replace(/\s+/g, ' ') === String(d.text).replace(/\s+/g, ' ')) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és igual que l’esborrany: aplica almenys una millora del feedback.' : 'It is still the same as your draft: make at least one improvement from the feedback.'; return; }
+      if (revWords(ch.value) < 3) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Explica en una frase què has canviat (almenys 3 paraules).' : 'Say in one sentence what you changed (at least 3 words).'; ch.focus(); return; }
+      state.finals[key] = { text, changed: ch.value.trim(), at: new Date().toISOString() };
+      if (onFinal) onFinal(text);
+      save(); complete(id); show();
+    };
+    show();
+    return show;
+  }
   function aiPrompt(p, text) {
     return 'Actua com a professor d’anglès de 4t d’ESO. Learning Situation “Seasons & Celebrations”, Learning Path ' + LP.n + ' “' + LP.title + '”.\n\nNivell: ' + cap(level) + '.\nTasca: ' + byLevel(p.task).replace(/<[^>]+>/g, '') +
       '\n\nText de l’alumne:\n"""\n' + text + '\n"""\n\n' + learningSupport.aiLanguage(level) +
@@ -247,7 +285,7 @@ var LS2 = (function () {
       '<div class="model" id="' + p.id + 'Frame" hidden></div><textarea id="' + p.id + 'Text" placeholder="Write here…"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Revisa abans d’enviar' : 'Check before you send') + '</h3><div class="options" id="' + p.id + 'List"></div>' +
       '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (ca() ? 'Desa i corregeix amb IA ↗' : 'Save and correct with AI ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
-      '<p class="instruction">' + (ca() ? 'Llegeix el feedback, millora el text aquí mateix i torna a desar-lo: la versió desada és la que faràs servir al producte final.' : 'Read the feedback, improve your text here and save it again: the saved version is the one you will use in the final product.') + '</p></div>',
+      '</div>' + revisionHtml(p.id),
     bind() {
       const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level;
       state.texts = state.texts || {};
@@ -267,10 +305,13 @@ var LS2 = (function () {
         if (boxes.some(b => !b.checked)) { msg.className = 'feedback no'; msg.textContent = learningSupport.missing(level, boxes); return; }
         window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(aiPrompt(p, ta.value.trim())), '_blank', 'noopener,noreferrer');
         if (p.product) saveProduct(p.product, ta.value.trim());
+        const first = keepDraft(key, ta.value.trim());
         msg.className = 'feedback ok';
-        msg.textContent = ca() ? 'Desat ✓ S’ha obert ChatGPT amb el teu text. Llegeix el perquè de cada correcció i millora el text.' : 'Saved ✓ ChatGPT has opened with your text. Read each explanation and improve your text.';
-        complete(p.id);
+        msg.textContent = first ? (ca() ? 'Esborrany desat ✓ S’ha obert ChatGPT amb el teu text. Llegeix el perquè de cada correcció, millora el text aquí mateix i desa la versió final a sota.' : 'Draft saved ✓ ChatGPT has opened with your text. Read each explanation, improve your text here and save your final version below.')
+          : (ca() ? 'S’ha obert ChatGPT amb la teva nova versió.' : 'ChatGPT has opened with your new version.');
+        showRevision();
       };
+      const showRevision = bindRevision(p.id, key, () => ta.value.trim(), text => { if (p.product) saveProduct(p.product, text); });
     }
   });
 
@@ -395,9 +436,11 @@ var LS2 = (function () {
     html: '<div class="section-card"><h3>' + (ca() ? 'La tasca' : 'Your task') + '</h3><p class="instruction" id="spTask"></p><div class="speak-support"><div class="mini-card"><strong>Model</strong><div class="model" id="spModel"></div></div><div class="mini-card"><strong>' + (ca() ? 'Prepara què diràs' : 'Prepare') + '</strong><textarea id="spPlan" placeholder="Key words or short sentences…"></textarea></div></div></div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Grava i escolta’t' : 'Record') + '</h3><div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="startRecord">● ' + (ca() ? 'Grava' : 'Record') + '</button><button class="btn secondary" type="button" id="stopRecord" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button><button class="btn secondary" type="button" id="downloadWav" disabled>' + (ca() ? 'Descarrega el WAV' : 'Download WAV') + '</button></div><div class="record-status" id="recordStatus">' + (ca() ? 'A punt per gravar.' : 'Ready to record.') + '</div><audio id="recordedAudio" controls style="width:100%;display:none"></audio></div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Revisa la transcripció' : 'Transcript') + '</h3><p class="instruction">' + (ca() ? 'Amb Chrome, la transcripció es crea mentre graves. Corregeix-la perquè digui el que has dit.' : 'With Chrome, a transcript is created while you record. Correct it so it matches what you said.') + '</p><textarea id="speechTranscript" placeholder="Your transcript will appear here."></textarea></div>' +
-      '<div class="section-card"><h3>' + (ca() ? 'Demana feedback' : 'Get feedback') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Corregeix amb IA</strong>: es descarrega el WAV i s’obre ChatGPT. Adjunta el WAV i prem Envia. Després torna a gravar la versió millorada.' : 'Press <strong>Correct with AI</strong>: the WAV downloads and ChatGPT opens. Attach the WAV and press Send. Then record an improved version.') + '</p><div class="actions"><button class="btn" type="button" id="spAi" disabled>' + (ca() ? 'Corregeix amb IA ↗' : 'Correct with AI ↗') + '</button></div><p class="tiny" id="spStatus"></p></div>',
+      '<div class="section-card"><h3>' + (ca() ? 'Demana feedback' : 'Get feedback') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Corregeix amb IA</strong>: es descarrega el WAV i s’obre ChatGPT. Adjunta el WAV i prem Envia. Després torna a gravar la versió millorada.' : 'Press <strong>Correct with AI</strong>: the WAV downloads and ChatGPT opens. Attach the WAV and press Send. Then record an improved version.') + '</p><div class="actions"><button class="btn" type="button" id="spAi" disabled>' + (ca() ? 'Corregeix amb IA ↗' : 'Correct with AI ↗') + '</button></div><p class="tiny" id="spStatus"></p></div>' + revisionHtml(p.id),
     bind() {
       $('#spTask').innerHTML = byLevel(p.task); $('#spModel').innerHTML = byLevel(p.model);
+      // the transcript of the version sent for feedback is the draft; the improved recording's transcript is the final version
+      const spKey = p.id + '_' + level, showRevision = bindRevision(p.id, spKey, () => $('#speechTranscript').value.trim());
       $('#startRecord').onclick = async () => {
         try {
           micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -416,7 +459,6 @@ var LS2 = (function () {
         $('#recordedAudio').src = recUrl; $('#recordedAudio').style.display = 'block';
         $('#downloadWav').disabled = false; $('#spAi').disabled = false; $('#startRecord').disabled = false; $('#stopRecord').disabled = true; processor = null;
         $('#recordStatus').textContent = ca() ? 'Gravació a punt. Escolta-la abans de demanar feedback.' : 'Recording ready. Listen to it before asking for feedback.';
-        complete(p.id);
       };
       $('#downloadWav').onclick = downloadWav;
       $('#spAi').onclick = () => {
@@ -425,7 +467,7 @@ var LS2 = (function () {
           (tr ? 'Transcripció automàtica de suport (pot contenir errors):\n"' + tr + '"\n\nPrimer escolta l’àudio i dona prioritat al que realment s’hi sent.' : 'No hi ha transcripció automàtica. Escolta l’àudio abans de donar feedback.') +
           '\n\n' + learningSupport.aiLanguage(level) + ' No posis nota numèrica. Respon només amb aquests apartats:\n1. 📝 Transcripció\n2. ✅ Què ha fet bé — una o dues coses concretes.\n3. 🔧 Què ha de corregir — màxim 2 errors importants, amb la frase correcta.\n4. 🗣️ Pronunciació — un sol problema clar, si n’hi ha.\n5. 📋 Instruccions — si ha complert la tasca.\n6. 🎯 Un següent pas.';
         const win = window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(prompt), '_blank', 'noopener,noreferrer');
-        downloadWav();
+        downloadWav(); keepDraft(spKey, tr); showRevision();
         $('#spStatus').textContent = win ? (ca() ? '✓ WAV descarregat · ChatGPT obert. Adjunta el WAV i prem Envia.' : '✓ WAV downloaded · ChatGPT opened. Attach the WAV and press Send.') : (ca() ? 'El navegador ha bloquejat la pestanya. Permet les finestres emergents.' : 'The browser blocked the tab. Allow pop-ups and try again.');
       };
     }

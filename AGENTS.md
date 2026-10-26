@@ -48,6 +48,9 @@ All docs are mapped in [docs/README.md](docs/README.md), which is also Roger's *
 - **Choosing voices for new audio:** shortlist 3–4 well-rated ElevenLabs Voice Library voices per character (right accent and age, educational or conversational use case, high usage count) and send the user their free preview clips; generate only after the user picks. Existing recordings keep their voices.
 - **Slow versions are always made locally, never with a second paid generation:** apply ffmpeg `atempo=0.85` to the same line clips and join them with 0.9 s pauses.
 
+## Writing and speaking revisions
+- **Revision counts (Roger, 26 Oct 2026, research audit):** in LS2 engine pages (`ls2-engine.js`), the first version a student sends for AI feedback is kept as the draft (`state.drafts[step_route] = {text, at}`; speaking: the transcript of that recording). The step completes only when they save an improved final version with a line on what they changed (`state.finals[step_route] = {text, changed, at}`; it must differ from the draft, and the line needs 3+ words). The final version is the product piece. The student sees their draft above the final version; the teacher sees draft, final version and "What I changed" in the activity dialog (`revisions` in `teacher.html`). Catalan for Insecure and Beginners.
+
 ## Grammar
 - Grammar content is specific to each Learning Situation. Do not assume the same grammar across future Learning Situations.
 - Follow the grammar requirements defined for the current LS.
