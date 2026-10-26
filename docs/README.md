@@ -14,7 +14,7 @@ Everything Roger needs to teach and assess each course, in one place. Pick the c
 | Practice exam | the LS site folder, `sample-exam.html` |
 | Real exams and answer keys | **Google Drive > Feina > Teacher Studio**, in each LS's `Exam` folder, not in this repo (the repo is public, so students could read them) |
 
-Site links below open the live site (sign in as teacher). Doc links open the file here on GitHub. Roger's private Drive copy (Word programmes, exams, keys, audios, Google Forms scripts, competences, levels) is in **Teacher Studio**, sorted the same way: [00 Start here](https://docs.google.com/document/d/1nJ9d1Geg6jy3j9oI0Ns2N0dZ7EkpTBwiapL6ENl7JdY/edit) links every folder.
+Site links below open the live site (sign in as teacher). Doc links open the file here on GitHub. Roger's private Drive copy (Word programmes, exams, keys, audios, LS listenings, assessment docs and rubrics, Google Forms scripts, competences, levels, the Lexora word list) is in **Teacher Studio**, sorted the same way: [00 Start here](https://docs.google.com/document/d/1MpFihiaZ6fxDEVAncAWsZ6RxfwqC4l2D9rZtBVwihsA/edit) links every folder.
 
 ## 4 ESO
 
@@ -29,7 +29,7 @@ Site links below open the live site (sign in as teacher). Doc links open the fil
 | LS5 · Small Changes, Big Impact | [section](4eso/programme.md#ls5--4eso--small-changes-big-impact) | not designed yet | | | |
 | LS6 · My Next Step | [section](4eso/programme.md#ls6--4eso--my-next-step) | not designed yet | | | |
 
-**Drive (private):** [Teacher Studio > 02_Cursos > 4 ESO](https://drive.google.com/drive/folders/1y2iq0BLOXrT88pyNF8jmzEL03NvXBuy3). LS1 [exam](https://drive.google.com/drive/folders/11nozTJCVpyFR_fHT3ziKTx99iH7ogEXg): models A–C, answer key, answers and writings sheet, listening. LS2 [exam](https://drive.google.com/drive/folders/109b7yMdGhT-en8-qEvh1nBG1QMSKXap8): model A, teacher key, listening (normal and slow); also Summaries, Final product (rubrics, marking PDFs) and Assessment.
+**Drive (private):** [Teacher Studio > 02_Cursos > 4 ESO](https://drive.google.com/drive/folders/1y2iq0BLOXrT88pyNF8jmzEL03NvXBuy3). LS1: [exam](https://drive.google.com/drive/folders/11nozTJCVpyFR_fHT3ziKTx99iH7ogEXg) (models A–C, answer key, answers and writings sheet, listening) · [Listenings](https://drive.google.com/drive/folders/1RnVg9Kn6Yoo_A01TVB7DKgdFJlrQJ8JD) · [Assessment](https://drive.google.com/drive/folders/1Gd6En1xb_QMcGzOSyBH7tgN4Hz12FUi7) · [Final product](https://drive.google.com/drive/folders/1eQ5cJOgkZjiaFtibZROyhbWbS_B9posB) (rubric, all routes). LS2: [exam](https://drive.google.com/drive/folders/109b7yMdGhT-en8-qEvh1nBG1QMSKXap8) (model A, teacher key, listening normal and slow) · [Listenings](https://drive.google.com/drive/folders/1n72zbK2G3wassYQVU7kfthxLR4nqKfLn) · [Summaries](https://drive.google.com/drive/folders/1yRvAF3G0hbVrzRemuLgbheurCn9lfN3r) · [Assessment](https://drive.google.com/drive/folders/1Q6GXcy74w9xO4sRpMvUrM5iang7nFdAM) (criteria, competences grid, indicators, grading) · [Final product](https://drive.google.com/drive/folders/1eMWpkvRHeGWMGxNMV6lxMXrQ8guAPomP) (final product doc, rubric, marking PDFs).
 
 ## 2 ESO
 
@@ -44,7 +44,7 @@ Site links below open the live site (sign in as teacher). Doc links open the fil
 | LS5 · Best Places Around | [section](2eso/programme.md#ls5--2eso--best-places-around) | not designed yet | | | |
 | LS6 · Let's Plan It! | [section](2eso/programme.md#ls6--2eso--lets-plan-it) | not designed yet | | | |
 
-**Drive (private):** [Teacher Studio > 02_Cursos > 2 ESO](https://drive.google.com/drive/folders/1iOoI2EOZvuffpov-V7HZ6j4vS5THtAXS). LS1 [exam](https://drive.google.com/drive/folders/1-8ROhQUGMtBF3uqQTV8gK0Hbeq0TzZS_): models A–D, teaching guide, listening, Google Forms script. LS2: no exam yet.
+**Drive (private):** [Teacher Studio > 02_Cursos > 2 ESO](https://drive.google.com/drive/folders/1iOoI2EOZvuffpov-V7HZ6j4vS5THtAXS). LS1: [exam](https://drive.google.com/drive/folders/1-8ROhQUGMtBF3uqQTV8gK0Hbeq0TzZS_) (models A–D, teaching guide, listening, Google Forms script) · [Listenings](https://drive.google.com/drive/folders/1bY3LTSArSLCWPnVzcG9EMEL1HS6Qakjr) · [Assessment](https://drive.google.com/drive/folders/1gRMYaBjVpXYbAnEyOvprW879qZ0SIpDv) · [Final product](https://drive.google.com/drive/folders/1MivbQWyXH_ClzjPC-ve6ymm40DsM7V9i) (rubric, all routes). LS2: no exam yet · [Listenings](https://drive.google.com/drive/folders/1yeYG8UVWqvtSLQ04DwBVrJjDjwYCm04g) · [Summaries](https://drive.google.com/drive/folders/1ROPrQa2V8NM47BKuULEj1LwPtDjrBG12) · [Assessment](https://drive.google.com/drive/folders/1B-SjMW7cr8u9KOiFKXhzYr07DQq9UuQf) (criteria, competences grid, indicators, grading) · [Final product](https://drive.google.com/drive/folders/1B9JbICgxjoZ6rJjRXctjBw20ZDWctdij) (the Free Time Vlog, rubric).
 
 ## Class presentations
 

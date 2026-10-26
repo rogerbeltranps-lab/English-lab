@@ -1,10 +1,10 @@
 // English Lab cloud: sign-in (students: school email + password; teacher: Google; el-signin.js), per-LS progress sync, LS release gate,
-// route (level) choice, teacher-enabled graded activities, once-only activities, points per completed action.
+// route (set by the teacher), teacher-enabled graded activities, once-only activities, points per completed action.
 import "./el-copyright.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {signIn} from "./el-signin.js";
-import {getFirestore,doc,getDoc,setDoc,collection,writeBatch,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,doc,getDoc,getDocs,setDoc,collection,writeBatch,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
 import {report} from "./el-report.js";
 
@@ -37,7 +37,6 @@ const resKey=a=>a.replace("/","__");
 
 const snapshot=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))o[k]=localStorage.getItem(k)}return o};
 const progressRef=()=>doc(db,"students",user.uid,"progress",lsId);
-const levelRef=(uid,ls)=>doc(db,"students",uid,"levels",ls);
 
 // "public" (free access, nothing saved) was removed when students got their own password (Roger, 26 Oct 2026): an LS still stored as public is open.
 const lsSt=s=>s==="public"?"open":s||"hidden";
@@ -124,15 +123,6 @@ function signInBlock(){
   signInO.querySelector("button").onclick=login;
 }
 
-function chooseLevel(u){
-  return new Promise(res=>{
-    const o=overlay('<div style="max-width:520px"><h1>Tria el teu nivell</h1><p>Aquesta tria és per a tota la situació d\'aprenentatge. Si després vols canviar-la, hauràs de demanar-ho al professor.</p><div id="el-lv"></div></div>');
-    EL_LEVELS.filter(l=>l.pick!==false).forEach(l=>{const b=document.createElement("button");b.innerHTML="<b>"+l.name+"</b><br><small>"+l.ca+"</small>";
-      b.style.cssText="display:block;width:100%;margin:10px 0;padding:12px;border:2px solid #0f766e;background:#fff;border-radius:12px;cursor:pointer;font:inherit";
-      b.onclick=async()=>{if(!confirm("Triar el nivell "+l.name+"?"))return;await setDoc(levelRef(u.uid,lsId),{level:l.id,updated:serverTimestamp()});o.remove();res(l.id)};
-      o.querySelector("#el-lv").append(b)});
-  });
-}
 // Class group: listed students get the group of the student list (copied to students/{uid}.group, which the pages read).
 // Testers, and everyone while the list cannot be read, choose it once on the first sign-in; afterwards only the teacher changes it.
 async function ensureGroup(u){
@@ -151,22 +141,16 @@ async function ensureGroup(u){
       o.querySelector("#el-gr").append(b)});
   });
 }
-function applyLevel(lvl){
+// Routes are set by the teacher only (Roger, 26 Oct 2026: from the LS1 exam mark); students no longer choose or ask for one.
+// A student sees only their route's button. Testers keep every route button to try them all (their route, if any, opens first).
+function applyLevel(lvl,all){
   myLevel=lvl;
   const btns=[...document.querySelectorAll(".route[data-level]")];
   // A page without a Beginners button (LS1) shows the Insecure version: Beginners content falls back to Insecure.
   const mine=btns.find(b=>b.dataset.level===lvl)||(lvl==="beginners"?btns.find(b=>b.dataset.level==="insecure"):null);
   if(mine&&!mine.classList.contains("active"))mine.click();
-  btns.forEach(b=>{if(b!==mine)b.style.display="none"});
+  if(!all)btns.forEach(b=>{if(b!==mine)b.style.display="none"});
 }
-async function requestLevel(u){
-  const opts=EL_LEVELS.filter(l=>l.pick!==false).map(l=>l.id).join(", ");
-  const want=prompt("A quin nivell vols canviar? ("+opts+")\nEl professor ho haurà d'acceptar.");
-  if(!want||!EL_LEVELS.some(l=>l.pick!==false&&l.id===want.trim().toLowerCase()))return;
-  await setDoc(levelRef(u.uid,lsId),{request:want.trim().toLowerCase(),requestedAt:serverTimestamp()},{merge:true});
-  alert("Petició enviada al professor.");
-}
-
 // Students only use their board, English Lab, their own course page and the LSs assigned to their group.
 const BOARD=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html)?$/.test(location.pathname),
   onHome=[ROOT.pathname,ROOT.pathname+"index.html"].includes(location.pathname),onDash=/\/teacher\.html$/.test(location.pathname);
@@ -189,11 +173,13 @@ async function gate(u){
   if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   if(reloadIfStale())return;
   const a=EL_CATALOG.find(x=>x.id===actId);
-  const ld=await getDoc(levelRef(u.uid,lsId)).catch(()=>null);
-  let lvl=ld&&ld.exists()?ld.data().level:null;
-  if(st==="closed"){if(lvl)applyLevel(lvl);freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
-  if(!lvl)lvl=await chooseLevel(u);
-  applyLevel(lvl);
+  // The route of this LS, or the one carried over from an earlier LS (elRouteOf). With none yet, a student works on the Insecure
+  // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
+  const lvs={};try{(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){console.warn("levels",e)}
+  let lvl=elRouteOf(lvs,lsId).level;
+  if(!lvl&&!tester){lvl="insecure";banner("Encara no tens nivell: el professor te'l posarà a partir de l'examen de la primera LS. De moment fas la ruta Insecure.","#0369a1")}
+  if(lvl||tester)applyLevel(lvl,tester);
+  if(st==="closed"){freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
   // Students are never told which activities are assessed (Roger, 26 Oct 2026), so this message does not say it either.
   if(a&&a.graded&&!tester&&!info.enabled.includes(actId)){block("Aquesta activitat encara no està oberta","El professor t'avisarà a classe quan toqui fer-la.");return}
   const ca=elCa(lvl);
@@ -255,7 +241,6 @@ function bar(){
     else{el.append(u.displayName||u.email," ");
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
-      if(isStudent(u)&&lsId)el.append(b("Change route",()=>requestLevel(u))," ");
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
