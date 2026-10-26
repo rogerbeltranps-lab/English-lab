@@ -29,7 +29,7 @@ Site links below open the live site (sign in as teacher). Doc links open the fil
 | LS5 · Small Changes, Big Impact | [section](4eso/programme.md#ls5--4eso--small-changes-big-impact) | not designed yet | | | |
 | LS6 · My Next Step | [section](4eso/programme.md#ls6--4eso--my-next-step) | not designed yet | | | |
 
-**Drive (private):** [Teacher Studio > 4 ESO](https://drive.google.com/drive/folders/1y2iq0BLOXrT88pyNF8jmzEL03NvXBuy3). LS1 [exam](https://drive.google.com/drive/folders/11nozTJCVpyFR_fHT3ziKTx99iH7ogEXg): models A–C, answer key, answers and writings sheet, listening. LS2 [exam](https://drive.google.com/drive/folders/109b7yMdGhT-en8-qEvh1nBG1QMSKXap8): model A, teacher key, listening (normal and slow); also Summaries, Final product (rubrics, marking PDFs) and Assessment.
+**Drive (private):** [Teacher Studio > 02_Cursos > 4 ESO](https://drive.google.com/drive/folders/1y2iq0BLOXrT88pyNF8jmzEL03NvXBuy3). LS1 [exam](https://drive.google.com/drive/folders/11nozTJCVpyFR_fHT3ziKTx99iH7ogEXg): models A–C, answer key, answers and writings sheet, listening. LS2 [exam](https://drive.google.com/drive/folders/109b7yMdGhT-en8-qEvh1nBG1QMSKXap8): model A, teacher key, listening (normal and slow); also Summaries, Final product (rubrics, marking PDFs) and Assessment.
 
 ## 2 ESO
 
@@ -44,7 +44,7 @@ Site links below open the live site (sign in as teacher). Doc links open the fil
 | LS5 · Best Places Around | [section](2eso/programme.md#ls5--2eso--best-places-around) | not designed yet | | | |
 | LS6 · Let's Plan It! | [section](2eso/programme.md#ls6--2eso--lets-plan-it) | not designed yet | | | |
 
-**Drive (private):** [Teacher Studio > 2 ESO](https://drive.google.com/drive/folders/1iOoI2EOZvuffpov-V7HZ6j4vS5THtAXS). LS1 [exam](https://drive.google.com/drive/folders/1-8ROhQUGMtBF3uqQTV8gK0Hbeq0TzZS_): models A–D, teaching guide, listening, Google Forms script. LS2: no exam yet.
+**Drive (private):** [Teacher Studio > 02_Cursos > 2 ESO](https://drive.google.com/drive/folders/1iOoI2EOZvuffpov-V7HZ6j4vS5THtAXS). LS1 [exam](https://drive.google.com/drive/folders/1-8ROhQUGMtBF3uqQTV8gK0Hbeq0TzZS_): models A–D, teaching guide, listening, Google Forms script. LS2: no exam yet.
 
 ## Class presentations
 
