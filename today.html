@@ -5,7 +5,7 @@
 button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}button.sub{background:#15803d}a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:4px 10px;font-size:13px;white-space:nowrap;display:inline-block}a.go.off{background:#94a3b8;pointer-events:none}
 .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}
 .pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 6px;margin:1px}.ce1{background:#fce7f3;color:#9d174d}.ce2{background:#dcfce7;color:#166534}.ce3{background:#e0f2fe;color:#075985}.ce4{background:#ede9fe;color:#5b21b6}.ce5{background:#ffedd5;color:#9a3412}.ce6{background:#fef9c3;color:#854d0e}.ceC{background:#e2e8f0;color:#334155}.tag{font-size:12px;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:1px 8px}
-.route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-daring{background:#ede9fe;color:#5b21b6}
+.route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-beginners{background:#ffe4e6;color:#9f1239}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-daring{background:#ede9fe;color:#5b21b6}
 .wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
 thead th{background:#f1f5f9;vertical-align:top}.stu{position:sticky;left:0;z-index:1;text-align:left;min-width:120px;white-space:nowrap}thead .stu{z-index:3}
 th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#cbd5e1}.first{border-left:3px solid #94a3b8}th.ac{font-weight:500;min-width:44px}.skip{color:#94a3b8;background:#f8fafc}td.ac{color:#16a34a;font-weight:700}
@@ -71,7 +71,7 @@ async function load(u){
 const all=()=>!DEMO&&(ELCloud.isTeacher(U)||(ELCloud.isTester(U)&&!ELCloud.viewGroup()));   // teacher and testers see every LS (not in a group's student view)
 function setLang(){
   const lv=(D.lv[S.ls]||{}).level||(Object.values(D.lv).find(x=>x&&x.level)||{}).level;
-  EN=all()||(!!lv&&lv!=="insecure");
+  EN=all()||(!!lv&&!elCa(lv));
   document.documentElement.lang=EN?"en":"ca";
   document.title=t("Les meves activitats","My activities")+" · English Lab";
   $("h1").textContent=t("Les meves activitats","My activities");
@@ -85,7 +85,6 @@ function cell(a){
   else{const n=steps(a).filter(k=>d.has(k)).length;v=steps(a).length?n+"/"+steps(a).length:"–";c="na"}
   if(x&&x.locked){v+=" ✔";c="sub"}else if(x&&x.markedDone){v+=" 🟡";c="mark"}
   if(x&&x.feedback)v+=" 💬";
-  if(x&&x.parts&&x.parts.first)v+=`<br><small>${t("1r intent","1st try")} ${x.parts.first.score}/${x.parts.first.max}</small>`;
   return {t:v,c};
 }
 
@@ -114,7 +113,7 @@ function render(){
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
   $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links)+`<div id="ptbox">${pointsBox()}</div>`;
-  $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("Pots practicar quan vulguis. El professor et dirà a classe quan fer les activitats avaluables.","You can practise whenever you want. Your teacher will tell you in class when to do the graded activities."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
+  $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("El professor fa el seguiment de totes les activitats que fas. Algunes s'avaluaran i seran la teva avaluació contínua, que és una part de la nota.","Your teacher keeps track of all the activities you do. Some of them will be assessed and make up your continuous assessment, which is part of your mark."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
   if(!lss.length){$("#main").innerHTML="";return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
   S.pend=[];lss.forEach(l=>EL_CATALOG.filter(a=>a.ls===l.id).forEach(a=>{const r=D.rs[a.id]||{};if(a.graded&&!a.manual&&r.markedDone&&!r.locked&&(D.ls[l.id]||{}).status==="open")S.pend.push(a)}));
@@ -162,16 +161,16 @@ async function goLive(){
   setBuzz();
 }
 // Vocabulary and grammar summary (Roger, 25 Oct 2026): an optional PDF per route; a student gets only their route's, the teacher and testers all three.
-function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=(D.lv[ls.id]||{}).level,a=r=>`<a class="go" href="${ls.study}${r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
+function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=(D.lv[ls.id]||{}).level,a=r=>`<a class="go" href="${ls.study}${r==="beginners"?"insecure":r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
   if(!all()&&!lv)return "";
-  return `<div class="box study"><b>📚 ${t("Descarrega el resum del vocabulari i la gramàtica per estudiar-los!","Download the summary of the vocabulary and grammar to study them!")}</b><p class="muted">${t("Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. És opcional: fes-lo servir si et va bé.","All the vocabulary and then all the grammar of your route, with the explanations and practice. It is optional: use it if it helps you.")}</p><div class="row">${all()?EL_LEVELS.map(x=>a(x.id)).join(""):a(lv)}</div></div>`}
+  return `<div class="box study"><b>📚 ${t("Descarrega el resum del vocabulari i la gramàtica per estudiar-los!","Download the summary of the vocabulary and grammar to study them!")}</b><p class="muted">${t("Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. És opcional: fes-lo servir si et va bé.","All the vocabulary and then all the grammar of your route, with the explanations and practice. It is optional: use it if it helps you.")}</p><div class="row">${all()?EL_LEVELS.filter(x=>x.id!=="beginners").map(x=>a(x.id)).join(""):a(lv)}</div></div>`}
 // LS1 (Roger, 25 Oct 2026): only the final exam and the final product count, so the board shows just the LS grade (EL_GRADING[ls].only),
 // with no learning paths and no links to the LS pages, so students do not go back to the activities.
 const only=id=>((window.EL_GRADING||{})[id]||{}).only;
 const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")};
 // Exam: results/{ls}__assessment, sections[k] = {score, max} written by the teacher (sum of scores / sum of maxes × 10). Final product: the teacher's mark.
 function onlyView(id){const g=EL_GRADING[id],e=g.exam,sc=(D.rs[id+"/assessment"]||{}).sections||{},got=e.sections.filter(([k])=>sc[k]&&sc[k].score!=null),fp=D.rs[g.fp.a]||{};
-  const m=got.reduce((n,[k])=>n+(+(sc[k].max||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null,prod=fp.max?(fp.score||0)/fp.max*10:null;
+  const m=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null,prod=fp.max?(fp.score||0)/fp.max*10:null;
   const val={exam,fp:prod},total=exam!=null&&prod!=null?g.blocks.reduce((n,b)=>n+val[b.id]*b.w,0)/g.blocks.reduce((n,b)=>n+b.w,0):null;
   const name={exam:t("Examen final","Final exam"),fp:t("Producte final","Final product")},big=v=>`<b style="font-size:1.3rem;color:${v==null?"#94a3b8":col(v*10)}">${v==null?"–":f1(v)+" / 10"}</b>`;
   return `<div class="box"><h2>${t("Nota de la LS","LS grade")}</h2><p class="muted">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><table class="legend"><tbody>`
@@ -212,7 +211,7 @@ function routeAsk(ls,st){const l=D.lv[ls]||{};if(st==="closed")return "";
   return (l.declined?` <span class="tag no">${t(`El professor no ha acceptat el canvi a ${LV[l.declined]||esc(l.declined)}`,`Your teacher declined the change to ${LV[l.declined]||esc(l.declined)}`)}</span>`:"")+` <button class="g" data-do="ask">${t("Demana canviar de ruta","Ask to change route")}</button>`}
 function askPanel(){const ls=EL_LS.find(x=>x.id===S.ls),l=D.lv[S.ls]||{};S.want=l.request||null;
   $("#dlgc").innerHTML=`<h3>${t("Demana canviar de ruta","Ask to change route")}</h3><p class="muted">${esc(ls.title)} · ${t("Ara fas","Your route now:")} ${route(l.level)}. ${t("El professor ho haurà d'acceptar.","Your teacher has to accept it.")}</p>`
-    +`<label>${t("A quina ruta vols canviar?","Which route do you want?")}</label><div class="opts">${EL_LEVELS.filter(x=>x.id!==l.level).map(x=>`<button class="opt ${x.id===S.want?"on":""}" data-do="want" data-r="${x.id}"><b>${x.name}</b><br><small>${esc(EN?x.en:x.ca)}</small></button>`).join("")}</div>`
+    +`<label>${t("A quina ruta vols canviar?","Which route do you want?")}</label><div class="opts">${EL_LEVELS.filter(x=>x.id!==l.level&&x.pick!==false).map(x=>`<button class="opt ${x.id===S.want?"on":""}" data-do="want" data-r="${x.id}"><b>${x.name}</b><br><small>${esc(EN?x.en:x.ca)}</small></button>`).join("")}</div>`
     +`<label for="why">${t("Per què? (opcional)","Why? (optional)")}</label><textarea id="why" maxlength="300">${esc(l.reason||"")}</textarea>`
     +`<div class="row"><button class="g" data-do="close">${t("Cancel·la","Cancel")}</button><button class="sub" data-do="send" ${S.want?"":"disabled"}>${t("Envia la petició","Send the request")}</button></div>`;
   if(!$("#dlg").open)$("#dlg").showModal();
@@ -227,8 +226,10 @@ function lpView(list,info){return ""
 }
 // One grid per learning path: its steps as columns (with their criterion), a row of ✔ and the score.
 function lpGrid(a,info){
-  const d=doneSet(a),c=cell(a),can=canDo(a,info),n=steps(a).filter(k=>d.has(k)).length;
-  return `<div class="box lpbox"><div class="lphead"><div><h2>${a.title}</h2>${a.criteria.map(pill).join("")} <small class="muted">· ${pts(a)}${a.mode==="once"?t(" · una sola vegada"," · only once"):""}${a.graded&&!can?t(" · el professor l'habilitarà"," · your teacher will enable it"):""}</small></div><a class="go ${can?"":"off"}" href="${a.path}">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`
+  const d=doneSet(a),c=cell(a),n=steps(a).filter(k=>d.has(k)).length;
+  // a recall checkpoint before it not done yet: closed until it is (el-catalog.js elCheckpointMissing; the page itself blocks too)
+  const cp=!all()&&info.status!=="closed"&&elCheckpointMissing(a,doneSet,x=>canDo(x,info)),can=canDo(a,info)&&!cp;
+  return `<div class="box lpbox"><div class="lphead"><div><h2>${a.title}</h2>${a.criteria.map(pill).join("")} <small class="muted">· ${pts(a)}${a.mode==="once"?t(" · una sola vegada"," · only once"):""}${cp?t(` · 🔒 primer fes el ${cp.title}`,` · 🔒 first do ${cp.title}`):a.graded&&!can?t(" · el professor l'habilitarà"," · your teacher will enable it"):""}</small></div><a class="go ${can?"":"off"}" href="${a.path}">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`
     +`<div class="wrap"><table><thead><tr>${steps(a).map((k,i)=>`<th class="ac ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")}<th class="sc first">${t("Punts","Points")}</th></tr></thead>`
     +`<tbody><tr>${steps(a).map(k=>`<td class="ac ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("")}<td class="sc ${c.c} first" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr></tbody></table></div>`
     +(steps(a).length?`<small class="muted">${t(`${n} de ${steps(a).length} activitats fetes`,`${n} of ${steps(a).length} activities done`)}</small>`:"")+legend(gridCrits(a))+`</div>`;

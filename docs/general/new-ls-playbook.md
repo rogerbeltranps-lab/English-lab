@@ -22,7 +22,7 @@ These are already decided. A new LS keeps them unless Roger says otherwise.
 | Recorded audio (ElevenLabs) | Claude shows the script with its expression tags and the cost in credits, then sends free voice previews. Roger picks the voices and gives his OK for each recording. The slower copy for Insecure is always made for free. |
 | Each learning path | Recall warm-up with no notes, vocabulary and flashcards, practice (done at 80 %), grammar, mixed practice, reading or listening, and a piece of writing or speaking that is saved for the final product. |
 | Class presentations | New vocabulary and grammar are introduced in class with a presentation on the projector that asks before it explains: the class guesses each new word first, then sees it, hears it and gets its Catalan meaning. Teams win points (a bonus of up to +0.5 on the term grade), with a buzzer and a class quiz on the students' Chromebooks. Each presentation is linked from its learning path and listed in English Lab. |
-| Recall checkpoints | Short reviews every two weeks. On the LS page and in the learning path menu each checkpoint sits right after the learning path it reviews (not grouped at the bottom), and it only asks about learning paths done before it. They count when they are done, and the first try is recorded. |
+| Recall checkpoints | Short reviews every two weeks. On the LS page and in the learning path menu each checkpoint sits right after the learning path it reviews (not grouped at the bottom), and it only asks about learning paths done before it. They count when they are done, and the first try is recorded. Students must finish each checkpoint to open what comes after it (`checkpoint:true` in the catalogue, in the same order as the LS page), and they are never told which activities are assessed: only the general continuous-assessment note (root `AGENTS.md`, 26 Oct 2026). |
 | Criteria | Every assessment criterion has at least one activity that gives evidence for it, and four levels (NA · AS · AN · AE) with indicators. |
 | LS mark | Exam 35 % · final product 25 % · grammar and vocabulary activities 20 % · other competences 20 %. |
 | LS page and final product page | The LS page's Final Product tab is only a short card with an "Open the final product →" button. Everything about the final product is on the final product page: it opens with a model final product for the student's route, then what the route must do and what counts, then the steps and the rubric. |
@@ -31,7 +31,7 @@ These are already decided. A new LS keeps them unless Roger says otherwise.
 | Sample exam | On the site, in the same format, taken the session before the exam so students know what to study. |
 | Study summary | A vocabulary and grammar PDF for each route, which students download from their board, and a Word copy for Roger. |
 | Copyright | Everything students can download or print carries the line "© (year) Roger Beltran · English Lab · All rights reserved". |
-| Calendar | Dated sessions for each group, the exam day and a due date for each activity, shown on the dashboard and the student board. Students also have a "My week" button on every page with what to do, what is late and the optional homework. |
+| Calendar | Dated sessions for each group, the exam day and a due date for each activity, shown on the dashboard and the student board. Students also have a "My week" button on every page with what to do, what is late and the homework. |
 
 ## 2. The steps, in order
 

@@ -4,8 +4,9 @@ import "./el-copyright.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {signIn} from "./el-signin.js";
-import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,doc,getDoc,setDoc,collection,writeBatch,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
+import {report} from "./el-report.js";
 
 const SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
@@ -126,7 +127,7 @@ function signInBlock(){
 function chooseLevel(u){
   return new Promise(res=>{
     const o=overlay('<div style="max-width:520px"><h1>Tria el teu nivell</h1><p>Aquesta tria és per a tota la situació d\'aprenentatge. Si després vols canviar-la, hauràs de demanar-ho al professor.</p><div id="el-lv"></div></div>');
-    EL_LEVELS.forEach(l=>{const b=document.createElement("button");b.innerHTML="<b>"+l.name+"</b><br><small>"+l.ca+"</small>";
+    EL_LEVELS.filter(l=>l.pick!==false).forEach(l=>{const b=document.createElement("button");b.innerHTML="<b>"+l.name+"</b><br><small>"+l.ca+"</small>";
       b.style.cssText="display:block;width:100%;margin:10px 0;padding:12px;border:2px solid #0f766e;background:#fff;border-radius:12px;cursor:pointer;font:inherit";
       b.onclick=async()=>{if(!confirm("Triar el nivell "+l.name+"?"))return;await setDoc(levelRef(u.uid,lsId),{level:l.id,updated:serverTimestamp()});o.remove();res(l.id)};
       o.querySelector("#el-lv").append(b)});
@@ -153,14 +154,15 @@ async function ensureGroup(u){
 function applyLevel(lvl){
   myLevel=lvl;
   const btns=[...document.querySelectorAll(".route[data-level]")];
-  const mine=btns.find(b=>b.dataset.level===lvl);
+  // A page without a Beginners button (LS1) shows the Insecure version: Beginners content falls back to Insecure.
+  const mine=btns.find(b=>b.dataset.level===lvl)||(lvl==="beginners"?btns.find(b=>b.dataset.level==="insecure"):null);
   if(mine&&!mine.classList.contains("active"))mine.click();
   btns.forEach(b=>{if(b!==mine)b.style.display="none"});
 }
 async function requestLevel(u){
-  const opts=EL_LEVELS.map(l=>l.id).join(", ");
+  const opts=EL_LEVELS.filter(l=>l.pick!==false).map(l=>l.id).join(", ");
   const want=prompt("A quin nivell vols canviar? ("+opts+")\nEl professor ho haurà d'acceptar.");
-  if(!want||!EL_LEVELS.some(l=>l.id===want.trim().toLowerCase()))return;
+  if(!want||!EL_LEVELS.some(l=>l.pick!==false&&l.id===want.trim().toLowerCase()))return;
   await setDoc(levelRef(u.uid,lsId),{request:want.trim().toLowerCase(),requestedAt:serverTimestamp()},{merge:true});
   alert("Petició enviada al professor.");
 }
@@ -192,8 +194,15 @@ async function gate(u){
   if(st==="closed"){if(lvl)applyLevel(lvl);freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
   if(!lvl)lvl=await chooseLevel(u);
   applyLevel(lvl);
-  if(a&&a.graded&&!tester&&!info.enabled.includes(actId)){block("Aquesta activitat avaluable encara no està habilitada","El professor t'avisarà a classe quan toqui fer-la.");return}
-  const ca=lvl==="insecure";
+  // Students are never told which activities are assessed (Roger, 26 Oct 2026), so this message does not say it either.
+  if(a&&a.graded&&!tester&&!info.enabled.includes(actId)){block("Aquesta activitat encara no està oberta","El professor t'avisarà a classe quan toqui fer-la.");return}
+  const ca=elCa(lvl);
+  // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
+  const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>info.enabled.includes(x.id));
+  if(cp){const o=overlay('<div style="max-width:520px"><h1></h1><p></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:10px 18px;text-decoration:none;font-weight:700"></a></p>'+todayLink+'</div>');
+    o.querySelector("h1").textContent=ca?"Primer fes el "+cp.title:"First do "+cp.title;
+    o.querySelector("p").textContent=ca?"Per continuar, primer has d'acabar el "+cp.title+". Fes-lo sense apunts.":"To go on, first finish "+cp.title+". Do it without notes.";
+    const go=o.querySelector("a.go");go.href=new URL(cp.path,ROOT).href;go.textContent=(ca?"Obre el ":"Open ")+cp.title+" →";return}
   if(a&&a.manual&&a.graded)banner(ca?"Aquesta activitat és per entregar a través del Google Classroom.":"This activity is to be submitted through Google Classroom.","#1d4ed8");
   if(a&&a.mode==="once"){
     const rref=doc(db,"students",u.uid,"results",resKey(actId));
@@ -226,6 +235,16 @@ async function submitActivity(a){
   return true;
 }
 
+// Problem reports (bottom bar "⚠️ Problema / Problem"): problems/{id}, read only by the teacher in the dashboard.
+// Catalan for Insecure and with no route; English for Safe and Daring (LS pages: the route; the board: its own language).
+const repEn=()=>myLevel?!elCa(myLevel):onBoard&&document.documentElement.lang==="en";
+// A screenshot goes in its own document (problemShots/{same id}), so the dashboard loads it only when the teacher opens it.
+const reportProblem=u=>report({en:repEn(),save:o=>{
+  const {shot,shotFrom}=o,ref=doc(collection(db,"problems")),b=writeBatch(db);delete o.shot;delete o.shotFrom;
+  b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,ls:lsId,activity:actId,route:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()}));
+  if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
+  return b.commit()}});
+
 function bar(){
   const el=document.createElement("div");el.id="el-cloud-bar";
   el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:10002;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;font:13px system-ui,sans-serif;box-shadow:0 2px 8px #0002;display:flex;gap:8px;align-items:center";
@@ -237,6 +256,7 @@ function bar(){
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)&&lsId)el.append(b("Change route",()=>requestLevel(u))," ");
+      if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
         s.value=viewGroup(u)||"";s.onchange=()=>{origSet.call(localStorage,"el_view",s.value);location.reload()};el.append(s," ")}
@@ -247,7 +267,7 @@ function bar(){
 function menuLink(u){
   document.querySelectorAll("[data-el-board]").forEach(e=>e.remove());
   if(!u||onBoard||onDash||!(isStudent(u)||isTeacher(u)))return;
-  const teach=isTeacher(u),txt=teach?"Dashboard":myLevel==="insecure"?"Les meves activitats":"My activities";
+  const teach=isTeacher(u),txt=teach?"Dashboard":elCa(myLevel)?"Les meves activitats":"My activities";
   const add=(home,cls,icon)=>{if(!home)return;const a=document.createElement("a");a.dataset.elBoard="";a.className=cls;a.href=teach?DASH:BOARD;a.textContent=icon+txt;home.after(a)};
   document.querySelectorAll(".navlinks").forEach(n=>add(n.querySelector(":scope>a"),"",""));
   document.querySelectorAll(".nav-tabs,.mobile-tabs").forEach(n=>add(n.querySelector(":scope>.tab-btn"),"tab-btn",""));
@@ -259,17 +279,18 @@ function menuLink(u){
 function studyCard(u){
   const el=document.querySelector("[data-el-study]"),ls=(window.EL_LS||[]).find(x=>x.id===lsId);
   if(!el||!ls||!ls.study||!u)return;
-  const every=isTeacher(u)||seesAll(u),lv=myLevel,ca=!every&&lv==="insecure";
+  const every=isTeacher(u)||seesAll(u),lv=myLevel,ca=!every&&elCa(lv);
   if(!every&&!lv)return;
   const a=r=>'<a href="'+new URL(ls.study+r+".pdf",ROOT).href+'" download style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📥 '+(ca?"Descarrega el resum":"Download the summary")+(every?" · "+EL_LEVELS.find(x=>x.id===r).name:"")+" (PDF)</a>";
   el.innerHTML="<h2>📚 "+(ca?"Resum del vocabulari i la gramàtica":"Vocabulary and grammar summary")+"</h2><p>"
     +(ca?"Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. Descarrega'l quan vulguis per estudiar. És opcional: fes-lo servir si et va bé.":"All the vocabulary and then all the grammar of your route, with the explanations and practice. Download it whenever you want to study. It is optional: use it if it helps you.")
-    +"</p><p>"+(every?EL_LEVELS.map(x=>a(x.id)).join(""):a(lv))+"</p>";
+    +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="beginners").map(x=>a(x.id)).join(""):a(lv==="beginners"?"insecure":lv))+"</p>";
   el.hidden=false;
 }
 let draw=()=>{};
 const start=()=>{draw=bar();draw(user)};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start):start();
+new MutationObserver(()=>draw(user)).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});   // the board picks its language after loading
 
 function loadCatalog(){return window.EL_CATALOG?Promise.resolve():new Promise(r=>{const s=document.createElement("script");s.src=new URL("shared/js/el-catalog.js",ROOT).href;s.onload=r;s.onerror=r;document.head.append(s)})}
 await loadCatalog();
@@ -290,6 +311,7 @@ onAuthStateChanged(auth,async u=>{
   if(reloadIfStale())return;   // wiped on a page without progress sync
   menuLink(u);
   studyCard(u);
+  if(myLevel)draw(u);   // the route is known now: the Problem button speaks its language
   // Floating weekly to-do list for students (and testers) on every page that loads this file (shared/js/el-todo.js).
   if(u&&isStudent(u)&&myGroup&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:u,group:myGroup,root:ROOT,lsId,seesAll:seesAll(u)})).catch(e=>console.warn("todo",e));
   listeners.forEach(f=>f(u));

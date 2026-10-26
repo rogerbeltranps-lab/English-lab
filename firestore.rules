@@ -28,6 +28,36 @@ service cloud.firestore {
       allow read: if signedIn() || isTeacher();
       allow write: if isTeacher();
     }
+    // problem reports (the "Problem" button in the bottom bar): signed-in students and testers send them with where they happened; only the teacher reads, marks or deletes them
+    function shortText(v, n) { return v == null || (v is string && v.size() <= n); }
+    match /problems/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid','email','name','group','ls','activity','route','page','title','section','kind','text','errors','device','shot','created'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == myEmail()
+        && request.resource.data.kind in ['media','stuck','marking','display','other']
+        && request.resource.data.text is string && request.resource.data.text.size() <= 1000
+        && shortText(request.resource.data.get('name', null), 200) && shortText(request.resource.data.get('page', null), 300)
+        && shortText(request.resource.data.get('title', null), 200) && shortText(request.resource.data.get('section', null), 200)
+        && shortText(request.resource.data.get('ls', null), 80) && shortText(request.resource.data.get('activity', null), 120)
+        && shortText(request.resource.data.get('device', null), 100)
+        && request.resource.data.get('route', null) in [null, 'insecure', 'safe', 'daring']
+        && request.resource.data.get('group', null) in [null, '2ESOA', '2ESOB', '4ESOA', '4ESOB']
+        && request.resource.data.get('errors', []) is list && request.resource.data.get('errors', []).size() <= 5
+        && request.resource.data.get('shot', null) in [null, 'page', 'file']
+        && request.resource.data.created == request.time;
+      allow read, update, delete: if isTeacher();
+    }
+    // the screenshot of a problem report (same id), written in the same batch as the report: a JPEG data URL, read only by the teacher
+    match /problemShots/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid','img','created'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.img is string && request.resource.data.img.size() <= 900000
+        && request.resource.data.created == request.time
+        && getAfter(/databases/$(database)/documents/problems/$(id)).data.uid == request.auth.uid;
+      allow read, delete: if isTeacher();
+    }
     // student list: doc id = school email in lower case; {group, surname1, surname2, first, tutor, email}. Written only by the teacher (dashboard import).
     match /roster/{email} {
       allow read: if isTeacher() || (school() && email == myEmail());

@@ -2,7 +2,8 @@
 // (board, course page, LS pages, activities, English Lab). It opens this week's class days of the student's group,
 // from the teaching plan in el-plan.js (through el-week.js): per day, the activities worked on or due that day
 // (✔ Done / To do / Late, with Open), what else happens in class, the exam day and late work from earlier weeks.
-// Optional activities (`optional` in el-plan.js, same shape as `due`) show as optional homework and are never late.
+// Optional activities (`optional` in el-plan.js, same shape as `due`) show as homework and are never late (students are not told
+// they are optional or how they count: Roger, 26 Oct 2026; checkpoints open the next Learning Path anyway).
 // Loaded by el-cloud.js for students and testers: start({db,user,group,root,lsId,seesAll}). Catalan for Insecure.
 import {doc,getDoc,collection,getDocs} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
@@ -27,7 +28,7 @@ export async function start({db,user,group,root,lsId,seesAll}){
   const st=(info&&info.status)==="public"?"open":(info&&info.status)||"hidden",enabled=(info&&info.enabled)||[];
   if(!seesAll&&st!=="open")return;
   const rs={};try{(await getDocs(collection(db,"students",user.uid,"results"))).forEach(d=>rs[d.data().activity||d.id.replace("__","/")]=d.data())}catch(e){}
-  const ca=!seesAll&&lv&&lv.level==="insecure",lang=ca?"ca":"en",t=(c,e)=>ca?c:e;
+  const ca=!seesAll&&lv&&(lv.level==="insecure"||lv.level==="beginners"),lang=ca?"ca":"en",t=(c,e)=>ca?c:e;
   const acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls);
   // On a page of this LS the local progress is the freshest; elsewhere the synced copy.
   const prog=k=>lsId===ls?store.get(k):((pg&&pg.data)||{})[k];
@@ -62,12 +63,12 @@ export async function start({db,user,group,root,lsId,seesAll}){
     if(a.manual)return `<span class="tg">${t("al Classroom","on Classroom")}</span>`;
     if(isDone(a))return `<span class="ok">✔ ${t("Fet","Done")}</span>`;
     if(!canDo(a))return `<span class="tg">${t("el professor l'obrirà","your teacher will open it")}</span>`;
-    if(it.optional)return `<span class="tg">${t("opcional · deures","optional homework")}</span>`;
+    if(it.optional)return `<span class="tg">${t("deures","homework")}</span>`;
     if(it.due&&it.due<today)return `<span class="lt">${t("Endarrerida","Late")}</span>`;
     return it.part&&it.due!==d?"":`<span class="td">${t("Per fer","To do")}</span>`}
   const href=a=>new URL(a.path,root).href;
   const item=(it,d)=>{const a=it.a,done=!a.manual&&isDone(a);
-    return `<li class="${done?"dn":""}"><span class="ck">${done?"✅":it.optional?"➕":"⬜"}</span><span class="tt">${esc(a.title.split(/[:(]/)[0].trim())}${it.part?` <small>(${it.part})</small>`:""}</span>${status(it,d)}${done||!canDo(a)?"":`<a href="${href(a)}">${t("Obre","Open")}</a>`}</li>`};
+    return `<li class="${done?"dn":""}"><span class="ck">${done?"✅":"⬜"}</span><span class="tt">${esc(a.title.split(/[:(]/)[0].trim())}${it.part?` <small>(${it.part})</small>`:""}</span>${status(it,d)}${done||!canDo(a)?"":`<a href="${href(a)}">${t("Obre","Open")}</a>`}</li>`};
 
   function counts(){const {days}=week(),from=p.rows[i].from;let n=lateOnes(from).length;
     Object.entries(days).forEach(([d,dd])=>dd.items.forEach(it=>{if(it.due===d&&!it.optional&&!it.a.manual&&canDo(it.a)&&!isDone(it.a))n++}));return n}

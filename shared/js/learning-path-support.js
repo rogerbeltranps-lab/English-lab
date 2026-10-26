@@ -2,7 +2,7 @@
 var learningSupport = {
   apply(level) {
     document.querySelectorAll('[data-support-ca]').forEach(node => {
-      const value = node.getAttribute(level === 'insecure' ? 'data-support-ca' : 'data-support-en');
+      const value = node.getAttribute((level === 'insecure' || level === 'beginners') ? 'data-support-ca' : 'data-support-en');
       if (node.hasAttribute('data-support-placeholder')) node.setAttribute('placeholder', value);
       else node.innerHTML = value;
     });
@@ -20,12 +20,12 @@ var learningSupport = {
     return this.shuffled([...Array(n).keys()]);
   },
   feedback(level, correct, catalanReason, englishReason) {
-    if (correct) return level === 'insecure' ? 'Correcte!' : 'Correct!';
-    return level === 'insecure' ? 'Encara no. ' + catalanReason : 'Try again. ' + englishReason;
+    if (correct) return (level === 'insecure' || level === 'beginners') ? 'Correcte!' : 'Correct!';
+    return (level === 'insecure' || level === 'beginners') ? 'Encara no. ' + catalanReason : 'Try again. ' + englishReason;
   },
   // Wrong answers never repeat the correct option: they only point back to the clue.
   evidence(level, correct, selected, answer, hint, listening) {
-    if (!selected) return level === 'insecure' ? 'Tria una resposta abans de comprovar.' : 'Choose an answer before checking.';
+    if (!selected) return (level === 'insecure' || level === 'beginners') ? 'Tria una resposta abans de comprovar.' : 'Choose an answer before checking.';
     return this.feedback(level, correct,
       hint || (listening ? 'Escolta l’àudio una altra vegada i fixa’t en el detall exacte que demana la pregunta.' : 'Torna a llegir el text, busca la frase que respon la pregunta i compara-la amb cada opció.'),
       listening ? 'Listen again and focus on the exact detail the question asks about, then compare it with each option.'
@@ -33,7 +33,7 @@ var learningSupport = {
   },
   // attempt and model are arrays of words/chunks; the model sentence is never shown.
   order(level, correct, attempt, model) {
-    const ca = level === 'insecure';
+    const ca = (level === 'insecure' || level === 'beginners');
     let reason;
     if (attempt.length < model.length) {
       reason = ca ? 'Encara no has fet servir totes les paraules.' : 'You have not used all the words yet.';
@@ -49,11 +49,11 @@ var learningSupport = {
   },
   missing(level, boxes) {
     const labels = boxes.filter(box => !box.checked).map(box => box.closest('label').textContent.trim());
-    return (level === 'insecure' ? 'Encara falta revisar: ' : 'Still to review: ') + labels.join(' · ') +
-      (level === 'insecure' ? '. Revisa la presentació o el vídeo i marca cada punt només quan l’hagis comprovat.' : '. Check your presentation or video before ticking each point.');
+    return ((level === 'insecure' || level === 'beginners') ? 'Encara falta revisar: ' : 'Still to review: ') + labels.join(' · ') +
+      ((level === 'insecure' || level === 'beginners') ? '. Revisa la presentació o el vídeo i marca cada punt només quan l’hagis comprovat.' : '. Check your presentation or video before ticking each point.');
   },
   aiLanguage(level) {
-    return level === 'insecure'
+    return (level === 'insecure' || level === 'beginners')
       ? 'Dona les instruccions, els títols i el feedback en català fàcil. Explica cada correcció amb una raó curta i un exemple en anglès. Mantén el text corregit en anglès.'
       : level === 'safe'
         ? 'Give headings and feedback in clear, simple English. Add a short Catalan clarification only for an essential difficult point. Keep examples and corrected production in English.'

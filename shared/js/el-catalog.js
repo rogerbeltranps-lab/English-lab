@@ -9,8 +9,10 @@
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 // LS1 My Real Routine (Roger, 25 Oct 2026): done in class and redesigned for next year; only the exam and the final product count,
 // so its learning paths are graded:false (practice). Results already saved stay in Firestore.
-window.EL_LEVELS=[{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català).",en:"I need a lot of support and guidance (instructions in Catalan)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès).",en:"I feel confident with a little support (instructions in English)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes.",en:"I want the challenge: more independence and less help."}];
+// Beginners (Roger, 26 Oct 2026): A1, below Insecure, Catalan with heavy scaffolding; only the teacher sets it (pick:false hides it from the student's choice and requests).
+window.EL_LEVELS=[{id:"beginners",name:"Beginners",pick:false,ca:"Començo des de zero: molt suport, passos curts i instruccions en català.",en:"I am starting from zero: a lot of support, short steps and instructions in Catalan."},{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català).",en:"I need a lot of support and guidance (instructions in Catalan)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès).",en:"I feel confident with a little support (instructions in English)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes.",en:"I want the challenge: more independence and less help."}];
 // Class groups. The student picks one the first time they sign in; the teacher can change it in the dashboard.
+window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructions in Catalan
 window.EL_GROUPS=[{id:"2ESOA",course:"2eso",name:"2ESO A"},{id:"2ESOB",course:"2eso",name:"2ESO B"},{id:"4ESOA",course:"4eso",name:"4ESO A"},{id:"4ESOB",course:"4eso",name:"4ESO B"}];
 // Is an LS assigned to a group? ls/{id}.groups lists the groups (set in the teacher dashboard); without it, every group of the LS's course.
 window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=>x.id===gid);if(!g||!ls)return false;return info&&Array.isArray(info.groups)?info.groups.includes(gid):g.course===ls.course};
@@ -42,14 +44,14 @@ window.EL_CATALOG=(function(){
     ...(function(){
       // LS2: ids carry the LS so they never clash with My Real Routine pages of the same name.
       const L=(file,title,criteria,key,points,o)=>A("4eso",file,title,criteria,[key],points,Object.assign({id:"4eso/ls2-"+file.replace(".html",""),ls:"4eso-seasons-and-celebrations",path:"4eso/seasons-and-celebrations/"+file},o||{}));
-      const C={mode:"practice"};
+      const C={mode:"practice",checkpoint:true};   // recall checkpoint: opens the way to what comes after it (elCheckpointMissing)
       return [
         L("getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["4.1","2.2"],"ls2GettingStarted4ESO",5,{graded:false}),
         L("celebrations-around-the-world.html","Celebrations around the world",["4.1","2.2","5.1","3.2","1.1"],"ls2Celebrations4ESO",9,{skip:["write"],steps:[["log","Reading log"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint14ESO",1,C),
         L("where-traditions-come-from.html","Where traditions come from",["2.2","5.1","1.2","3.2"],"ls2Traditions4ESO",8,{skip:["write"],steps:[["chart","Listening chart"]]}),
-        L("research-it-right.html","Research it right",["4.2","6.1","1.2","CC3 3.2"],"ls2Research4ESO",7,{steps:[["card","Research card"]]}),
         L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1","5.1"],"ls2Checkpoint24ESO",1,C),
+        L("research-it-right.html","Research it right",["4.2","6.1","1.2","CC3 3.2"],"ls2Research4ESO",7,{steps:[["card","Research card"]]}),
         L("plan-the-day.html","Plan the day",["2.2","5.1","3.2","CC1 1.3"],"ls2Plan4ESO",7,{skip:["write"]}),
         L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint34ESO",1,C),
         L("write-to-the-head-teacher.html","Write to the head teacher",["4.1","5.1","3.2","CC1 1.3"],"ls2Email4ESO",7,{skip:["write"]}),
@@ -62,7 +64,7 @@ window.EL_CATALOG=(function(){
     ...(function(){
       // 2ESO LS2 Free Time, Live! (built from the 4ESO LS2 model; docs/2eso/ls2-free-time-live/). Individual vlog, so no group steps.
       const L=(file,title,criteria,key,points,o)=>A("2eso",file,title,criteria,[key],points,Object.assign({id:"2eso/ls2-"+file.replace(".html",""),ls:"2eso-free-time-live",path:"2eso/free-time-live/"+file},o||{}));
-      const C={mode:"practice"};
+      const C={mode:"practice",checkpoint:true};   // recall checkpoint: opens the way to what comes after it (elCheckpointMissing)
       return [
         L("getting-started.html","Getting started: what do you do in your free time? (warm-up)",["4.1","2.2"],"ls2GettingStarted2ESO",6,{graded:false}),
         L("what-are-they-doing.html","What are they doing?",["4.1","2.2","5.1","3.2"],"ls2Doing2ESO",9,{skip:["write"],steps:[["log","Reading log"]]}),
@@ -104,6 +106,11 @@ window.EL_ACTIONS={
 window.EL_EVIDENCE={speaking:["3.1"],speak:["3.1"],record:["3.1"],write:["5.1"],build:["5.1"],prepare:["5.1"],notes:["5.1"]};
 // Set of completed action keys in a synced state string.
 window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof o==="object"){for(const k in o){if(k==="done"&&o[k]&&typeof o[k]==="object"){for(const d in o[k])if(o[k][d])s.add(d)}else w(o[k])}}})(JSON.parse(str))}catch(e){}return s};
+// Recall checkpoints open the way (Roger, 26 Oct 2026): an activity that comes after a checkpoint in its LS (catalogue order = LS page
+// order) opens only when every earlier checkpoint is done. Only checkpoints the student can do count (enabled(x)), so a checkpoint the
+// teacher has not enabled yet never blocks; the final product (manual) is never blocked. done(x) = Set of the student's done steps of x.
+window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;const list=(window.EL_CATALOG||[]).filter(x=>x.ls===a.ls),i=list.indexOf(a);
+  return i<0?null:list.slice(0,i).find(x=>x.checkpoint&&enabled(x)&&!(window.EL_ACTIONS[x.id]||["check"]).every(k=>done(x).has(k)))||null};
 // LS2 4ESO Seasons & Celebrations: steps per page (as ls2-engine.js records them) and the criterion each step gives evidence for,
 // by the skill it practises (docs/4eso/ls2-seasons-and-celebrations/assessment-criteria.md). Recall, vocabulary and grammar steps are language practice.
 (function(){

@@ -56,7 +56,7 @@ var flashcardSet = {
     const level = this.config.level();
     if (!this.cards.length || level !== this.lastLevel) { this.lastLevel = level; this.newSet(); }
     if (this.index >= this.cards.length) this.index = 0;
-    const v = this.cards[this.index], n = this.cards.length, ca = level === 'insecure';
+    const v = this.cards[this.index], n = this.cards.length, ca = level === 'insecure' || level === 'beginners';
     $('#flashcard').classList.remove('flipped');
     $('#cardIcon').textContent = v[2];
     $('#cardFront').textContent = v[0];
