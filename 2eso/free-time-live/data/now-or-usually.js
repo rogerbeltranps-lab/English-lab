@@ -21,6 +21,7 @@ window.LP = {
     { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Ara o normalment: expressions de temps', en: 'Now or usually: time expressions' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'livestream · subscribers · highlights',
+      core: { insecure: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer'], safe: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'go to a concert', 'watch a match', 'temperature'], daring: ['now', 'right now', 'at the moment', 'this weekend', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'watch a match', 'temperature', 'know', 'need', 'want', 'prefer', 'believe', 'understand', 'mean'] },
       groups: [
         { g: 'Now (Present Continuous)', items: [['now', 'ara', 'I’m at home now.'], ['right now', 'ara mateix', 'Right now I’m watching a match.'], ['at the moment', 'en aquest moment', 'At the moment she’s training.'], ['today', 'avui', 'Today we’re playing inside.'], ['this weekend', 'aquest cap de setmana', 'This weekend I’m going to a concert.'], ['Look! / Listen!', 'Mira! / Escolta!', 'Look! It’s snowing!']] },
         { g: 'Usually (Present Simple)', items: [['usually', 'normalment', 'I usually play on Saturdays.'], ['on Saturday mornings', 'els dissabtes al matí', 'We train on Saturday mornings.'], ['every weekend', 'cada cap de setmana', 'He goes cycling every weekend.'], ['always / never', 'sempre / mai', 'She never gets up late.'], ['in winter / in summer', 'a l’hivern / a l’estiu', 'In winter we go skating.']] },
@@ -50,6 +51,7 @@ window.LP = {
     { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Mei’s Saturday vlog', pill: { ca: 'Vídeo · 80 %', en: 'Video · 80 %' },
       intro: { ca: 'Mira el vlog de la Mei una vegada per saber on és. Després llegeix les preguntes i torna’l a mirar. A la ruta Insecure pots triar la versió més lenta.', en: 'Watch Mei’s vlog once to find out where she is. Then read the questions and watch again.' },
       media: { videos: [{ base: 'video/mei-ice-rink', title: 'Video 1 · Mei: Saturday at the ice rink' }], videoCredit: 'Illustrated video made for English Lab. Voice generated with ElevenLabs.' },
+      chunks: ['I\'m wearing a woolly hat', 'I usually come here', 'I\'m training for the Christmas show'],
       items: [
         { q: 'Where is Mei?', o: ['at the ice rink in the town square', 'at the swimming pool', 'at school'], h: 'Escolta “Right now I’m at…”.' },
         { q: 'What is the weather like?', o: ['cold and cloudy', 'hot and sunny', 'rainy'], h: 'Escolta “It’s December, so…”.' },
@@ -67,6 +69,7 @@ window.LP = {
       intro: { ca: 'Mira els dos vlogs dues vegades (a la ruta Beginners, només el vídeo 1). La primera, per saber on és cada persona. La segona, per omplir la graella: què està fent ara, què fa normalment i dos detalls (lloc, roba o temps). Fes servir les imatges, les paraules clau i el context.', en: 'Watch both vlogs twice: first to find out where each vlogger is, then to fill in the chart: what they are doing now, what they usually do and two details (place, clothes or weather). Use the images, the key words and the context.' },
       html: { ca: '<div class="model"><strong>Pistes:</strong> <em>Right now / today / this weekend</em> = ara · <em>usually / on Sunday mornings</em> = normalment. Mira les imatges: la roba i el temps també hi surten.</div>', en: '<p class="tiny">Listen for <em>right now / today / this weekend</em> (now) and <em>usually / on Sunday mornings</em> (habit). The images show the clothes and the weather too.</p>' },
       media: { videos: [{ base: 'video/mei-ice-rink', title: 'Video 1 · Mei: Saturday at the ice rink' }, { base: 'video/noah-bike-park', title: 'Video 2 · Noah: at the bike park' }], videoCredit: 'Illustrated videos made for English Lab. Voices generated with ElevenLabs.' },
+      chunks: ['Leo is winning, as usual', 'I usually ride here', 'I\'m filming a race'],
       fields: [
         { id: 'm1', label: { ca: 'Vídeo 1 (Mei): què està fent ara?', en: 'Video 1 (Mei): what is she doing now?' }, ph: 'She’s…', rows: 1 },
         { id: 'm2', label: { ca: 'Vídeo 1 (Mei): què fa normalment?', en: 'Video 1 (Mei): what does she usually do?' }, ph: 'She usually…', rows: 1 },

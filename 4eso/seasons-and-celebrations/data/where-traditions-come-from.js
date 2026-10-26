@@ -19,6 +19,7 @@ window.LP = {
     { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Dates, comparar i canviar', en: 'Dates, comparing and change' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'pilgrims · feast · harvest festival',
+      core: { insecure: ['on 31 October', 'in November', 'at Christmas', 'at night', 'every year', 'once a year', 'the night before', 'the first', 'the twenty-fifth'], safe: ['on 31 October', 'in November', 'at Christmas', 'every year', 'once a year', 'the night before', 'the first', 'the twenty-fifth', 'both… and…', 'similar to', 'different from', 'whereas', 'in the same way', 'unlike', 'travel home for the holidays', 'the town square', 'the community centre', 'crowded streets'], daring: ['once a year', 'the night before', 'both… and…', 'similar to', 'different from', 'whereas', 'unlike', 'commercialised', 'consumerism', 'keep a tradition alive', 'die out', 'evolve', 'adapt', 'date back to', 'stereotype', 'inclusive', 'take something for granted', 'contribute to', 'depend on', 'be associated with'] },
       groups: [
         { g: 'Dates & time', items: [['on 31 October', 'el 31 d’octubre', 'The Castanyada is on 31 October.'], ['in November', 'al novembre', 'Thanksgiving is in November.'], ['at Christmas', 'per Nadal', 'We get together at Christmas.'], ['at night', 'a la nit', 'The fireworks are at night.'], ['every year', 'cada any', 'We celebrate it every year.'], ['once a year', 'un cop l’any', 'It happens once a year.'], ['the night before', 'la nit abans', 'We decorate the night before.'], ['the first', 'el primer (dia 1)', 'on the first of November'], ['the twenty-fifth', 'el vint-i-cinc', 'on the twenty-fifth of December']] },
         { r: 'safe', g: 'Comparing cultures (Safe)', items: [['both… and…', 'tant… com…', 'Both Diwali and Hanukkah use lights.'], ['similar to', 'semblant a', 'It’s similar to a harvest festival.'], ['different from', 'diferent de', 'It’s different from Christmas.'], ['whereas', 'mentre que', 'Halloween is about costumes, whereas the Castanyada is about family.'], ['in the same way', 'de la mateixa manera', 'In the same way, we eat together.'], ['unlike', 'a diferència de', 'Unlike Hanukkah, Diwali lasts five days.']] },
@@ -62,6 +63,7 @@ window.LP = {
         ['Emma', 'It’s important to remember that not everybody sees the story in the same way. For some Native Americans, it is a day of mourning, a day to remember what they lost.'],
         ['Sam', 'So both celebrations started as harvest festivals, but they have changed a lot over time.'],
         ['Emma', 'That’s all for today. Happy holidays!']] },
+      chunks: ['They used to carve turnips', 'on the fourth Thursday of November', 'who lived in the area'],
       items: [
         { q: 'Where did Samhain take place?', o: ['Ireland and Scotland', 'the United States', 'England'], h: 'Escolta el principi: on va començar Samhain?' },
         { q: 'What did people use to carve?', o: ['turnips', 'pumpkins', 'apples'], h: 'És una sorpresa: no eren carbasses.' },
@@ -81,6 +83,7 @@ window.LP = {
       html: { ca: '<div class="model"><strong>Valors per triar:</strong> la família · compartir menjar · la fe o les creences · recordar el passat · la comunitat · la llum i l’esperança · divertir-se · ajudar els altres</div><p class="tiny">Pista: fixa’t en les paraules que repeteixen, en el to de veu (content, emocionat, seriós) i en les imatges.</p>',
         en: '<p class="tiny">Listen for the words they repeat, their tone of voice (excited, proud, calm, serious) and what the images show.</p>' },
       media: { videos: [{ base: 'video/mei-lunar-new-year', title: 'Video 1 · Mei: Lunar New Year' }, { base: 'video/noah-hanukkah', title: 'Video 2 · Noah: Hanukkah' }], videoCredit: 'Illustrated videos made for English Lab. Voices generated with ElevenLabs.' },
+      chunks: ['we light one more candle', 'It lasts eight nights', 'starting the year with good luck'],
       fields: [
         { id: 'v1', label: { ca: 'Vídeo 1 (Mei): què és important per a ella? (tria un valor de la llista)', en: 'Video 1 (Mei): what does she value? Say it in your own words.' }, rows: 2 },
         { id: 'e1', label: { ca: 'Vídeo 1: una paraula o frase del vídeo que ho mostra', en: 'Video 1: the evidence: a phrase from the video, and the tone or the images that show it' }, rows: 2 },
