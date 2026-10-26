@@ -93,3 +93,10 @@ Read the [root AGENTS.md](../../AGENTS.md) and the [LS2 AGENTS.md](../4eso/ls2-s
 - Record with `eleven_v3` and tags from the start. The v2 recordings were redone in PRs #51 and #52.
 - Agree the exam format before writing the exam. It was rebuilt in PRs #70 and #72.
 - Plan the marking rounds before the final product page. They were added late in PR #71.
+
+**First copy: 2ESO LS2 *Free Time, Live!* (25–26 Oct 2026).** Built in one pass from this playbook under Roger's standing permission (decisions listed for him in its [AGENTS.md](../2eso/ls2-free-time-live/AGENTS.md)). What the copy showed:
+- The whole LS can run on the engine, Learning Path 1 included: no bespoke first page is needed.
+- The build scripts in project files are reusable as they are, with a new data folder: `ls2-2eso/audio-v3/` (gen3.py, build.py), `ls2-2eso/listening-chart/pipeline/` (scenes.py, render.js, build.py: only the scenes, palette and brand change), `ls2-2eso/final-product-models/` (models.py, build.py), `ls2-2eso/exam/` (exam-data.js, make-docx.js: the writing section is the only part tied to the task), `ls2-2eso/grammar-vocabulary/build/` (dump.js reads the data files, build.py).
+- `tools/gen-criteria.js` parses both programmes; a new course programme only needs the same four-step bullets per criterion.
+- An individual final product needs no group or peer rows: every rubric row is per student and the marking rounds stay the same.
+- Expect about 6,500 ElevenLabs credits for an LS with four listenings, two short videos and an exam recording.

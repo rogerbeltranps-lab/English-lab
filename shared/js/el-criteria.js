@@ -1,14 +1,34 @@
 // Assessment criteria texts shown on the teacher dashboard and the student board (hover or tap a criterion, and the legend).
 // 4ESO: copied literally from docs/4eso/programme.md (Decret 175/2022, 3r i 4t; transversal criteria from XTEC).
-// 2ESO: brief summaries from docs/2eso/ls1-my-real-routine/overview.md until the 2ESO programme arrives.
-// Regenerate with "node tools/gen-criteria.js ." when the programme changes; do not edit the wording by hand.
-window.EL_COMPETENCES={"1":"CE1 · Interculturalitat","2":"CE2 · Listening","3":"CE3 · Speaking","4":"CE4 · Reading","5":"CE5 · Writing","6":"CE6 · Recerca i informació","7":"CE7 · Lectura personal","8":"CE8 · Mediació","9":"CE9 · Autoregulació","10":"CE10 · Comunicació ètica","CC1":"CC1 · Competència ciutadana","CC3":"CC3 · Competència ciutadana","CC4":"CC4 · Competència ciutadana","CE1":"CE1 · Competència emprenedora","CE2":"CE2 · Competència emprenedora"};
+// 2ESO: copied literally from docs/2eso/programme.md (Decret 175/2022, 1r i 2n; transversal criteria from XTEC).
+// Regenerate with "node tools/gen-criteria.js ." when a programme changes; do not edit the wording by hand.
+window.EL_COMPETENCES={"1":"CE1 · Interculturalitat","2":"CE2 · Listening","3":"CE3 · Speaking","4":"CE4 · Reading","5":"CE5 · Writing","6":"CE6 · Recerca i informació","7":"CE7 · Lectura personal","8":"CE8 · Mediació","9":"CE9 · Autoregulació","10":"CE10 · Comunicació ètica","CC1":"CC1 · Competència ciutadana","CC2":"CC2 · Competència ciutadana","CC3":"CC3 · Competència ciutadana","CC4":"CC4 · Competència ciutadana","CD1":"CD1 · Competència digital","CD2":"CD2 · Competència digital","CD3":"CD3 · Competència digital","CD4":"CD4 · Competència digital","CE1":"CE1 · Competència emprenedora","CE2":"CE2 · Competència emprenedora"};
 window.EL_CRITERIA={
   "2eso":{
-   "3.1": "Textos orals breus, senzills, estructurats i comprensibles.",
-   "3.2": "Planificació, producció i revisió guiades.",
-   "3.3": "Interacció breu i respectuosa amb un company.",
-   "5.1": "Textos breus, clars i coherents seguint pautes; suport escrit de Google Slides."
+   "1.2": "Participar de manera empàtica i respectuosa en situacions interculturals, construint vincles entre les diferents llengües i cultures, rebutjant qualsevol tipus de discriminació, prejudici i estereotip en contextos comunicatius quotidians.",
+   "1.3": "Aplicar, de forma guiada, estratègies per explicar i apreciar la diversitat lingüística, cultural i artística.",
+   "10.2": "Utilitzar estratègies per a la resolució dialogada dels conflictes i la recerca de consensos tant en l'àmbit personal com educatiu i social.",
+   "2.1": "Interpretar i analitzar el sentit global i la informació específica i explícita de textos orals i multimodals breus i senzills sobre temes freqüents i quotidians, de rellevància personal i pròxims a la seva experiència, propis dels àmbits de les relacions interpersonals, de l'aprenentatge, dels mitjans de comunicació i de la ficció, expressats de forma clara i en la llengua estàndard a través de diversos suports.",
+   "2.2": "Seleccionar, organitzar i aplicar de manera guiada les estratègies i els coneixements més adequats en situacions comunicatives quotidianes per comprendre el sentit general, la informació essencial i els detalls més rellevants dels textos; interpretar elements no verbals, i cercar i seleccionar informació.",
+   "3.1": "Expressar oralment textos breus, senzills, estructurats, comprensibles i adequats a la situació comunicativa sobre temes quotidians i freqüents, de rellevància per a l'alumnat, per tal de descriure, narrar i informar sobre temes concrets, en diferents suports, utilitzant de forma guiada recursos verbals i no verbals, així com estratègies de planificació i control de la producció.",
+   "3.2": "Aplicar de forma guiada coneixements i estratègies per planificar, produir i revisar textos comprensibles, coherents i adequats a les intencions comunicatives, les característiques contextuals i la tipologia textual, amb ajuda dels recursos físics o digitals més adequats en funció de la tasca i les necessitats de cada moment, tenint en compte el destinatari del text.",
+   "3.3": "Participar en situacions interactives breus i senzilles sobre temes quotidians, de rellevància personal i pròxims a la seva experiència, a través de diversos suports, utilitzant recursos com ara la repetició, el ritme pausat o el llenguatge no verbal, i mostrant empatia i respecte per la cortesia lingüística i l'etiqueta digital, així com per les diferents necessitats, idees, inquietuds, iniciatives i motivacions dels interlocutors.",
+   "3.4": "Utilitzar, de forma guiada i en entorns propers, estratègies adequades per iniciar, mantenir i acabar la comunicació, prendre i cedir la paraula, sol·licitar i formular aclariments i explicacions.",
+   "4.1": "Comprendre i interpretar el sentit global, l'estructura, la informació més rellevant i la intenció de l'emissor de textos escrits i multimodals senzills de diferents àmbits que responguin a diferents propòsits de lectura, realitzant les inferències necessàries.",
+   "4.2": "Valorar la forma i el contingut de textos senzills avaluant-ne la qualitat, la fiabilitat i la idoneïtat de canal utilitzat, així com l'eficàcia dels procediments comunicatius emprats.",
+   "5.1": "Organitzar i redactar textos breus i comprensibles, amb claredat, coherència, cohesió i adequació a la situació comunicativa proposada, seguint pautes establertes, a través d'eines analògiques i digitals, sobre assumptes quotidians i freqüents, de rellevància per a l'alumnat i pròxims a la seva experiència.",
+   "5.2": "Aplicar de forma guiada coneixements i estratègies per planificar, produir i revisar textos comprensibles, coherents i adequats a les intencions comunicatives, les característiques contextuals i la tipologia textual, usant, de manera progressivament autònoma, els recursos físics o digitals més adequats en funció de la tasca i les necessitats de cada moment, tenint en compte la persona a qui va dirigit el text.",
+   "6.2": "Elaborar treballs d'investigació i comunicar de forma creativa i respectant els drets de la propietat intel·lectual, els resultats d'un procés d'investigació individual o grupal, organitzant la informació, integrant-la en esquemes propis i reelaborant-la, i adoptant un punt de vista crític i respectuós amb els principis de propietat intel·lectual, sobre temes d'interès acadèmic, personal, ecològic i social, que incloguin els Objectius de desenvolupament sostenible.",
+   "7.2": "Compartir l'experiència de lectura en suports diversos tot relacionant el sentit de l'obra amb la pròpia experiència biogràfica i lectora.",
+   "8.1": "Inferir i explicar textos, conceptes i comunicacions breus i senzilles en situacions de diversitat lingüística, social i cultural, mostrant respecte i empatia per les i els interlocutors i per les llengües emprades, i interès per participar en la solució de problemes d'intercomprensió i d'entesa en l'entorn proper.",
+   "9.2": "Utilitzar i diferenciar els coneixements i estratègies de millora de la pròpia capacitat de comunicar i d'aprendre la llengua estrangera, amb suport d'altres participants i de suports analògics i digitals.",
+   "CC1 1.2": "Valorar críticament els processos de construcció de la pròpia identitat, reflexionant sobre les diferències, les semblances i les interdependències que ens vinculen amb persones i col·lectius de l'entorn i de l'àmbit global.",
+   "CC2 2.2": "Participar activament en l'organització i desenvolupament de projectes de l'entorn que integrin la capacitat per treballar en equip, la presa de decisions consensuades, la comunicació efectiva i la resolució de problemes.",
+   "CD2 2.1": "Seleccionar i configurar l'eina i el format més adequat en la creació de continguts digitals, en funció de la tasca i de les seves necessitats, de manera guiada.",
+   "CD2 2.2": "Crear i editar produccions digitals avançades de manera guiada en tasques pròpies del context escolar.",
+   "CD3 3.3": "Publicar creacions digitals a la xarxa restringida de manera reflexiva i responsable, tenint en compte la visibilitat que tindrà.",
+   "CD4 4.5": "Preveure conductes addictives de manera autònoma, en l'ús de les tecnologies.",
+   "CE3 3.3": "Reflexionar de manera individual i grupal sobre el procés realitzat i el producte final obtingut, introduint propostes de millora i saber-ho comunicar formalment i en públic."
   },
   "4eso":{
    "1.1": "Valorar críticament la diversitat lingüística, cultural i artística pròpia de països on es parla la llengua estrangera, en relació amb els drets humans, i adequar-se a aquesta diversitat, tot afavorint el desenvolupament d’una cultura compartida i una ciutadania compromesa amb la sostenibilitat i els valors democràtics.",
@@ -38,6 +58,6 @@ window.EL_CRITERIA={
    "CE2 2.1": "Justificar les pròpies fortaleses i habilitats que exigeix el repte, per tal de conèixer-se millor i saber-ho identificar amb les característiques d’una persona emprenedora."
   }
 };
-// Competence label of a criterion code: "3.1" → "CE3 · Speaking", "CC1 1.3" → "CC1 · Competència ciutadana".
-window.elCompetence=function(c){const t=String(c).match(/^(CC\d|CE\d) /);return window.EL_COMPETENCES[t?t[1]:String(c).split(".")[0]]||""};
+// Competence label of a criterion code: "3.1" → "CE3 · Speaking", "CC1 1.3" → "CC1 · Competència ciutadana", "CD2 2.2" → "CD2 · Competència digital".
+window.elCompetence=function(c){const t=String(c).match(/^(CC\d|CD\d|CE\d) /);return window.EL_COMPETENCES[t?t[1]:String(c).split(".")[0]]||""};
 window.elCriterion=function(course,c){return (window.EL_CRITERIA[course]||{})[c]||""};
