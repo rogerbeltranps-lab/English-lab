@@ -70,7 +70,7 @@ async function load(u){
 }
 const all=()=>!DEMO&&(ELCloud.isTeacher(U)||(ELCloud.isTester(U)&&!ELCloud.viewGroup()));   // teacher and testers see every LS (not in a group's student view)
 function setLang(){
-  const lv=(D.lv[S.ls]||{}).level||(Object.values(D.lv).find(x=>x&&x.level)||{}).level;
+  const lv=elRouteOf(D.lv,S.ls).level||(Object.values(D.lv).find(x=>x&&x.level)||{}).level;
   EN=all()||(!!lv&&!elCa(lv));
   document.documentElement.lang=EN?"en":"ca";
   document.title=t("Les meves activitats","My activities")+" · English Lab";
@@ -120,7 +120,7 @@ function render(){
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
   const n=S.pend.length;
   $("#main").innerHTML=lateBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
-    +`<div class="bar">${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${l.title}</button>`).join("")} <span class="muted">· ${t("El teu nivell:","Your level:")}</span> ${route((D.lv[ls.id]||{}).level)}${routeAsk(ls.id,st)} ${stTag}</div>`
+    +`<div class="bar">${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${l.title}</button>`).join("")} <span class="muted">· ${t("El teu nivell:","Your level:")}</span> ${route(elRouteOf(D.lv,ls.id).level)}${routeNote(ls.id)} ${stTag}</div>`
     +studyBox(ls)+weekBox(ls,info)
     +(only(ls.id)?onlyView(ls.id):`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
     +(S.view==="sum"?summary(list):lpView(list,info)));
@@ -161,7 +161,7 @@ async function goLive(){
   setBuzz();
 }
 // Vocabulary and grammar summary (Roger, 25 Oct 2026): an optional PDF per route; a student gets only their route's, the teacher and testers all three.
-function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=(D.lv[ls.id]||{}).level,a=r=>`<a class="go" href="${ls.study}${r==="beginners"?"insecure":r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
+function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=elRouteOf(D.lv,ls.id).level,a=r=>`<a class="go" href="${ls.study}${r==="beginners"?"insecure":r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
   if(!all()&&!lv)return "";
   return `<div class="box study"><b>📚 ${t("Descarrega el resum del vocabulari i la gramàtica per estudiar-los!","Download the summary of the vocabulary and grammar to study them!")}</b><p class="muted">${t("Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. És opcional: fes-lo servir si et va bé.","All the vocabulary and then all the grammar of your route, with the explanations and practice. It is optional: use it if it helps you.")}</p><div class="row">${all()?EL_LEVELS.filter(x=>x.id!=="beginners").map(x=>a(x.id)).join(""):a(lv)}</div></div>`}
 // LS1 (Roger, 25 Oct 2026): only the final exam and the final product count, so the board shows just the LS grade (EL_GRADING[ls].only),
@@ -203,23 +203,11 @@ function weekBox(ls,info){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.
   const main=i>=0?weekHtml(p,gi,i,info,t("Aquesta setmana","This week")+" · "+wk(i),true):nx>=0?weekHtml(p,gi,nx,info,(nx===0?t("Comencem","We start"):t("Propera setmana","Next week"))+" · "+wk(nx),true):`<p class="muted">${t("El pla d'aquesta LS ja s'ha acabat.","The plan of this LS is over.")}</p>`;
   return `<div class="box wkbox"><h2>${t("El meu pla setmanal","My week plan")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Què fem a classe i què has de fer cada setmana. Si un dia no pots venir, mira-ho aquí.","What we do in class and what you have to do every week. If you miss a class, check it here.")}</p>${exam}${main}`
     +`<details class="all"><summary>${t("Tot el pla de la LS","The whole LS plan")}</summary>${p.rows.map((r,k)=>weekHtml(p,gi,k,info,wk(k),k===i)).join("")}</details></div>`}
-// Route change (Roger, 25 Oct 2026): the student asks for another route with an optional reason (levels/{ls}.request, .reason);
-// the teacher accepts, declines (.declined) or sets the route directly on the dashboard. The first route is still chosen on the LS page.
-function routeAsk(ls,st){const l=D.lv[ls]||{};if(st==="closed")return "";
-  if(!l.level)return ` <small class="muted">${t("Triaràs la ruta quan obris la LS.","You choose your route when you open the LS.")}</small>`;
-  if(l.request)return ` <span class="tag">${t("Has demanat","You asked for")} ${LV[l.request]||esc(l.request)} · ${t("pendent","pending")}</span> <button class="g" data-do="ask">${t("Canvia la petició","Change the request")}</button>`;
-  return (l.declined?` <span class="tag no">${t(`El professor no ha acceptat el canvi a ${LV[l.declined]||esc(l.declined)}`,`Your teacher declined the change to ${LV[l.declined]||esc(l.declined)}`)}</span>`:"")+` <button class="g" data-do="ask">${t("Demana canviar de ruta","Ask to change route")}</button>`}
-function askPanel(){const ls=EL_LS.find(x=>x.id===S.ls),l=D.lv[S.ls]||{};S.want=l.request||null;
-  $("#dlgc").innerHTML=`<h3>${t("Demana canviar de ruta","Ask to change route")}</h3><p class="muted">${esc(ls.title)} · ${t("Ara fas","Your route now:")} ${route(l.level)}. ${t("El professor ho haurà d'acceptar.","Your teacher has to accept it.")}</p>`
-    +`<label>${t("A quina ruta vols canviar?","Which route do you want?")}</label><div class="opts">${EL_LEVELS.filter(x=>x.id!==l.level&&x.pick!==false).map(x=>`<button class="opt ${x.id===S.want?"on":""}" data-do="want" data-r="${x.id}"><b>${x.name}</b><br><small>${esc(EN?x.en:x.ca)}</small></button>`).join("")}</div>`
-    +`<label for="why">${t("Per què? (opcional)","Why? (optional)")}</label><textarea id="why" maxlength="300">${esc(l.reason||"")}</textarea>`
-    +`<div class="row"><button class="g" data-do="close">${t("Cancel·la","Cancel")}</button><button class="sub" data-do="send" ${S.want?"":"disabled"}>${t("Envia la petició","Send the request")}</button></div>`;
-  if(!$("#dlg").open)$("#dlg").showModal();
-}
-function want(r){S.want=r;document.querySelectorAll("button.opt").forEach(b=>b.classList.toggle("on",b.dataset.r===r));$('[data-do="send"]').disabled=false}
-async function sendAsk(){if(!S.want)return;const reason=$("#why").value.replace(/\s+/g," ").trim().slice(0,300);
-  if(!DEMO)try{await F.setDoc(F.doc(ELCloud.db,"students",U.uid,"levels",S.ls),{request:S.want,reason,requestedAt:F.serverTimestamp()},{merge:true})}catch(e){return alert(t("No s'ha pogut enviar la petició: ","Could not send the request: ")+e.message)}
-  D.lv[S.ls]=Object.assign(D.lv[S.ls]||{},{request:S.want,reason});$("#dlg").close();render()}
+// Routes (Roger, 26 Oct 2026): the teacher sets every student's route from the LS1 exam mark; students no longer choose or ask for one.
+// A route carries over to later LSs until the teacher changes it (elRouteOf in el-catalog.js).
+function routeNote(ls){if(all())return "";
+  return elRouteOf(D.lv,ls).level?` <small class="muted">${t("· el posa el professor","· set by your teacher")}</small>`
+    :` <small class="muted">${t("Encara no en tens: el professor te'l posarà a partir de l'examen de la LS1. De moment fas la ruta Insecure.","You don't have one yet: your teacher will set it from your LS1 exam. For now you do the Insecure route.")}</small>`}
 function lpView(list,info){return ""
     +`<p class="muted">${t("Cada learning path té la seva graella: les activitats amb el criteri d'avaluació que treballen (– vol dir pràctica de llengua) i la teva puntuació. Clica la puntuació per veure'n el detall, el feedback i entregar-la. ✔ entregada · 🟡 marcada com a feta, sense entregar · 💬 té feedback.","Each learning path has its own grid: the activities with the assessment criterion they work on (– means language practice) and your score. Click the score to see the details and the feedback, and to submit it. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback.")}</p>`
     +list.map(a=>lpGrid(a,info)).join("")+total(list);
@@ -271,7 +259,7 @@ function detail(id){
 }
 async function submitMany(list){if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
-  ({ls:()=>{S.ls=k.ls;render()},view:()=>{S.view=k.v;render()},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:askPanel,want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
+  ({ls:()=>{S.ls=k.ls;render()},view:()=>{S.view=k.v;render()},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
 if(DEMO){U={uid:"demo"};D=DEMO;render()}
 else ELCloud.onUser(async u=>{U=u;
