@@ -85,7 +85,7 @@ async function award(i){
   H.aw[i]=hit;H.keys[i]=ok;keep();
   if(!hit.length)return;
   hit.forEach(em=>H.pts[em]=(H.pts[em]||0)+1);
-  const best=Math.max(0,...Object.values(H.pts));
+  const best=Math.max(0,...Object.keys(H.names).map(em=>H.pts[em]||0));   // students on the list only: a tester's points never set the best
   try{const w=S.writeBatch(db),now=S.serverTimestamp();
     hit.forEach(em=>w.set(S.doc(db,"points",em),{[H.term]:S.increment(1),updated:now},{merge:true}));
     w.set(S.doc(db,"teams",H.g),{best:{[H.term]:best},updated:now},{merge:true});

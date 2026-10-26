@@ -91,11 +91,12 @@ service cloud.firestore {
     }
     // class quiz: live/{group}/answers/{email} = {sid, a:{question: value}, at}. Each student of the group writes their own answers
     // while following the presentation and reads them back (to keep them when they come back to the same class); only the teacher
-    // reads everyone's (the projector shows the counts).
+    // reads everyone's (the projector shows the counts). Testers answer too (Roger, 26 Oct 2026: to see the game and the bonus work
+    // with his school account); their points never count for the group's best (lab/game/host.js, el-deck-points.js use the student list).
     match /live/{group}/answers/{email} {
       allow read, write: if isTeacher();
       allow get: if school() && email == myEmail();
-      allow create, update: if signedIn() && !isTester() && rosterGroup() == group && email == myEmail()
+      allow create, update: if inGroup(group) && email == myEmail()
         && request.resource.data.keys().hasOnly(['sid', 'a', 'at'])
         && request.resource.data.sid is number && request.resource.data.a is map && request.resource.data.a.size() <= 300;
     }
