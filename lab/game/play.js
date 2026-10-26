@@ -21,8 +21,8 @@ const gameOn=()=>!!(x&&x.game&&x.on&&fresh(x.at));
 const score=()=>Object.entries((x&&x.keys)||{}).filter(([i,ok])=>mine[i]===ok).length;
 const first=()=>((user&&user.displayName)||"").split(" ")[0]||(user&&user.email||"").split("@")[0];
 
-const top=()=>`<div class="top"><span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>${user?`<span class="pill" title="${esc(user.email)}">👤 ${esc(first())}</span>`:""}
-  <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button>${!gameOn()||x.phase==="end"?`<a class="btn ghost" href="${esc(FROM)}">Leave</a>`:""}</div>`;
+const top=()=>`<div class="top">${!gameOn()||x.phase==="end"?`<a class="btn go" href="${esc(FROM)}">← Back</a>`:""}<span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>${user?`<span class="pill" title="${esc(user.email)}">👤 ${esc(first())}</span>`:""}
+  <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`;
 const page=(h,cls)=>{app$.innerHTML=top()+`<div class="main"><div class="center ${cls||""}"><div>${h}</div></div></div>`};
 
 function draw(){
@@ -35,7 +35,7 @@ function draw(){
   if(ph==="theory")return page(`<div class="emo pop">${pic(x.th&&x.th.img)||"👀"}</div><p class="big">Look at the board</p><p class="mid">${md(x.th&&x.th.title)}</p>`);
   if(ph==="end"){const s=score(),t=x.qt||0;
     if(shown!==x.sid+":end"){shown=x.sid+":end";G.fx("fanfare");if(s>0)G.confetti()}
-    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p><p><a class="btn go" href="${esc(FROM)}">Back</a></p>`)}
+    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p>`)}
   if(ph==="q"&&mine[i]==null){
     app$.innerHTML=top()+`<div class="main"><div class="card qcard slidein">${md(q.text)}</div>
       <div class="tiles${n===2?" two":""}">${(q.opts||[]).map((o,k)=>`<button class="tile t${k}" data-v="${k}"><span class="shp s${k}"></span><span class="tx">${md(o)}</span></button>`).join("")}</div></div>`;return}
