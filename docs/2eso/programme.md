@@ -1,10 +1,10 @@
-> Roger's teaching programme for 2ESO (*Learning Situations 2n ESO*, 21 Oct 2026, revised 24 Oct 2026), converted from his Word document. It is the source for every 2ESO LS: objectives, criteria, Final Product, vocabulary, grammar and transversal competences. Do not edit it; record LS decisions in each LS folder's `AGENTS.md`.
+> Roger's teaching programme for 2ESO (*Learning Situations 2n ESO*, 21 Oct 2026, revised 24 Oct 2026), converted from his Word document, with the Beginners (A1) route added on 26 Oct 2026 (approved by Roger). It is the source for every 2ESO LS: objectives, criteria, Final Product, vocabulary, grammar and transversal competences. Do not edit it; record LS decisions in each LS folder's `AGENTS.md`.
 
 **ENGLISH LAB / LEARNING SITUATIONS**
 
 # 2n ESO · Learning Situations
 
-21 d'octubre de 2026, revisat el 24 d'octubre · Roger Beltran
+21 d'octubre de 2026, revisat el 24 d'octubre, ruta Beginners del 26 d'octubre · Roger Beltran
 
 ## Índex
 
@@ -28,7 +28,9 @@
 
 **10.** [Lèxic de 2n ESO per LS](#lèxic-de-2n-eso-per-ls) [37](#lèxic-de-2n-eso-per-ls)
 
-**11.** [Fonts](#fonts) [39](#fonts)
+**11.** [Resum de gramàtica i lèxic · ruta Beginners (A1)](#resum-de-gramàtica-i-lèxic-ruta-beginners-a1)
+
+**12.** [Fonts](#fonts) [39](#fonts)
 
 Cada LS segueix la mateixa estructura: 1. Learning objectives · 2. Competències específiques i criteris d'avaluació · 3. Final Product · 4. Sabers: Vocabulary · 5. Sabers: Grammar · 6. Competències transversals. La versió Word porta el número de pàgina de cada secció.
 
@@ -40,7 +42,9 @@ Revisió del 24 d'octubre de 2026: cada objectiu es vincula a un sol criteri per
 
 **Fonts.** Mapa vertical de gramàtica, mapa vertical de lèxic, document de nivells i matriu de competències d'anglès (documents del projecte), la LS1 original de Roger i el document de les LS de 4t com a model de format.
 
-**Nivell de cada ruta a 2n** (document de nivells): Insecure = A1+ / A2 inicial amb bastides · Safe = A2 funcional · Daring = A2+ / B1 emergent. Insecure treballa sempre amb models, marcs de frase i orientació en català.
+**Nivell de cada ruta a 2n** (document de nivells): Beginners = A1 (ruta assignada només pel professor) · Insecure = A1+ / A2 inicial amb bastides · Safe = A2 funcional · Daring = A2+ / B1 emergent. Insecure treballa sempre amb models, marcs de frase i orientació en català.
+
+**Ruta Beginners (afegida el 26 d'octubre de 2026).** Quarta ruta, per sota d'Insecure, per a l'alumnat que comença gairebé de zero (A1 del MECR). La ruta la fixa només el professor: l'alumne no la pot triar ni demanar. Mateixa LS, mateixos grups i mateix producte final que la resta, amb menys requisits: 4–6 frases amb marcs de frase i banc de paraules, instruccions i pistes en català, lectures de 60–100 paraules amb el 95–98 % de paraules conegudes i glosses en català, vídeos amb subtítols en anglès des del primer visionat, una llista nuclear de 25–40 paraules per LS amb repàs espaiat, i la mateixa escala NA–AE jutjada amb els can-dos A1. Mentre una LS no té contingut Beginners propi, el web mostra el contingut Insecure. El capítol «Resum de gramàtica i lèxic · ruta Beginners» recull què produeix la ruta a cada LS. LS1, ja acabada, no tindrà contingut Beginners al web aquest curs.
 
 **Mapes verticals.** Els mapes de gramàtica i de lèxic es respecten per cursos: tot el que marquen per a 2n és en alguna LS, i les LS no introdueixen res que els mapes situïn a 3r o 4t. Dins de 2n, l'ordre segueix les LS: la columna de 2n dels dos mapes indica ara la LS en lloc de la unitat, i hi consten com a R els sabers de 1r que les LS recuperen. Les columnes de 1r i 3r només porten el curs i la lletra, sense unitats, fins que es programin les LS d'aquests cursos.
 
@@ -58,7 +62,7 @@ Revisió del 24 d'octubre de 2026: cada objectiu es vincula a un sol criteri per
 
 ## Taula resum de les LS
 
-Sis LS, unes 5--6 setmanes cadascuna. Totes acaben en un vídeo amb Google Slides i la cara visible en picture-in-picture, amb tres rutes (Insecure / Safe / Daring).
+Sis LS, unes 5--6 setmanes cadascuna. Totes acaben en un vídeo amb Google Slides i la cara visible en picture-in-picture, amb quatre rutes (Beginners / Insecure / Safe / Daring).
 
   ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   **LS**                               **Temporització**               **Producte final**                                                                                                              **Lèxic principal**                                                                                                                  **Gramàtica principal**                                                                                            **Transversals avaluades (XTEC)**
@@ -264,7 +268,7 @@ Sis LS, unes 5--6 setmanes cadascuna. Totes acaben en un vídeo amb Google Slide
 
 - **4 · LS assessment criterion:** Before recording, chooses and sets up, with the teacher's guidance, a Google Slides layout suited to a video (key words and photos, little text) and the picture-in-picture recording (camera, microphone, face visible), and checks them in a short test recording.
 
-Routes vary support, complexity and independence; they use the same course criteria (1r i 2n).
+Routes vary support, complexity and independence; they use the same course criteria (1r i 2n). Beginners (A1) is assessed with the same criteria and attainment degrees on the A1 version of each task (see the Beginners summary chapter).
 
 ### 3. Final Product
 
@@ -272,19 +276,37 @@ Interview → Notes → Google Slides → Prepare → Record presentation → Re
 
 Submit a video with Google Slides, your face visible in picture-in-picture and a clear voice. WAV/audio is for short Speaking practice, not the Final Product.
 
+- **Beginners:** Ask the classmate four fixed questions from a question card and describe the classmate in 4–5 frame sentences (This is … / He gets up at … / She goes to school by … / After school he …). Healthy-habits reflection: one sentence with a frame (… is good because …).
+
 - **Insecure:** Interview and describe a classmate in short, supported sentences. No comparison with your own routine. Healthy-habits reflection: guided judgment and a simple reason using a real interview detail.
 
 - **Safe:** Describe the classmate in more detail and a clear sequence. No required comparison with your own routine. Healthy-habits reflection: justify the judgment with specific habits.
 
 - **Daring:** Describe the classmate and compare both routines: similarities and differences. Healthy-habits reflection: reflect on both routines with evidence; develop the reasoning and suggest respectful, realistic improvements where appropriate.
 
-Insecure retains Catalan guidance at every step, with English examples linking interview answer → notes → slide content → spoken sentence → healthy-habit reflection. Discuss habits, not bodies or weight.
+Beginners and Insecure retain Catalan guidance at every step, with English examples linking interview answer → notes → slide content → spoken sentence → healthy-habit reflection. Discuss habits, not bodies or weight.
 
 ### 4. Sabers: Vocabulary
 
-*Cumulative: Safe retains Insecure and adds; Daring retains both and adds.* Based on the original LS1 lists, without the items that the vertical maps place in 3r or 4t (*cut down on*, *stick to*, *strike a balance*, *although*, *however*, *whereas*, *as a result*).
+*Cumulative: Insecure retains Beginners and adds; Safe retains both and adds; Daring retains all three and adds.* Based on the original LS1 lists, without the items that the vertical maps place in 3r or 4t (*cut down on*, *stick to*, *strike a balance*, *although*, *however*, *whereas*, *as a result*).
 
-**Insecure --- foundation**
+**Beginners --- core**
+
+- Daily routine: get up; have a shower; have breakfast; go to school; have lunch; do homework; have dinner; watch TV; go to bed
+
+- Time: at seven o'clock; at half past eight; in the morning / afternoon; at night; every day
+
+- Transport: by bus; by car; on foot
+
+- School (R): Maths; English; PE; on Mondays
+
+- Frequency: always; sometimes; never
+
+- Healthy habits: drink water; eat fruit; sleep; play sport
+
+- Question card: What time do you get up? How do you go to school? What do you do after school? Do you play sport?
+
+**Insecure --- foundation** *(retains Beginners and adds)*
 
 - Morning: wake up; get up; go to the bathroom; have a shower; get dressed; have breakfast; listen to the radio
 
@@ -336,7 +358,21 @@ Insecure retains Catalan guidance at every step, with English examples linking i
 
 ### 5. Sabers: Grammar
 
-**Insecure**
+**Beginners**
+
+- This is + nom i be: This is Marc. He's twelve.
+
+- have got: She's got a brother.
+
+- Present Simple afirmatiu de 3a persona dins de marcs: gets up, goes, has, watches.
+
+- Freqüència: always, sometimes, never abans del verb.
+
+- at / on / in com a chunks: at seven, on Mondays, in the morning.
+
+- Connexió: and, then. Negativa i preguntes només amb la targeta.
+
+**Insecure** *(retains Beginners and adds)*
 
 - be i have got (R) per presentar el company: She's thirteen. She's got two brothers. Has she got a pet?
 
@@ -444,7 +480,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **3 · LS learning objective (O4, compartit amb CD4 · 4.5):** Create a vlog script and slides with time expressions, likes and dislikes and screen-use tips with imperatives, in order to present a hobby or an event and promote a healthy use of screens.
 
-- **4 · LS assessment criterion:** Writes the vlog script and the slide text following a model, with time expressions, likes and dislikes (like / love / hate + -ing) and screen-use tips with imperatives (Insecure: two tips; Safe: three; Daring: three with a reason).
+- **4 · LS assessment criterion:** Writes the vlog script and the slide text following a model, with time expressions, likes and dislikes (like / love / hate + -ing) and screen-use tips with imperatives (Beginners: two tips from the model; Insecure: two tips; Safe: three; Daring: three with a reason).
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -456,7 +492,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **3 · LS learning objective (O2, compartit amb CE4 · 4.2):** Evaluate whether online sources about the chosen hobby or event are reliable and suitable, and organise the information in a fact file that credits them, in order to use accurate content in the vlog.
 
-- **4 · LS assessment criterion:** Organises the information about the hobby or event in their own fact file (Insecure: four facts from one given source; Safe and Daring: two sources) and credits the photos and sources on the last slide of the vlog.
+- **4 · LS assessment criterion:** Organises the information about the hobby or event in their own fact file (Beginners: two facts from one given source; Insecure: four facts from one given source; Safe and Daring: two sources) and credits the photos and sources on the last slide of the vlog.
 
 **COMPETÈNCIES TRANSVERSALS**
 
@@ -480,7 +516,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **4 · LS assessment criterion:** Includes in the vlog screen-use tips that help to prevent addictive habits with technology (time limits, breaks, no phone before sleeping) and says which one they will apply to their own screen use.
 
-Routes vary support, complexity and independence; they use the same course criteria (1r i 2n).
+Routes vary support, complexity and independence; they use the same course criteria (1r i 2n). Beginners (A1) is assessed with the same criteria and attainment degrees on the A1 version of each task (see the Beginners summary chapter).
 
 ### 3. Final Product: Free Time Vlog
 
@@ -488,19 +524,35 @@ Choose a hobby or an event → Research → Script → Google Slides → Record 
 
 Submit a video with Google Slides, your face visible in picture-in-picture and a clear voice. Audio alone is only for Speaking practice. On the last slide, credit the photos and sources you used.
 
+- **Beginners:** Present a hobby with three photos: for each photo say what the people are doing with a frame (In this photo, they're playing …) and add one sentence about what you usually do (I usually … on Saturdays). Add one screen-use tip (Take a break.).
+
 - **Insecure:** Present a hobby or an event with photos: say what people are doing in each photo and what they usually do, in short, supported sentences. Add two screen-use tips with imperatives.
 
 - **Safe:** Present the hobby or event "live", contrasting what usually happens with what is happening now; include the weather and the clothes or equipment. Add three screen-use tips.
 
 - **Daring:** Present the hobby or event with a short research section and its source, explain a temporary situation (This month I'm training for...), give opinions with state verbs and justify the screen-use tips.
 
-Insecure keeps Catalan guidance and a model vlog with sentence frames (In this photo, they're... / They usually...).
+Beginners and Insecure keep Catalan guidance and a model vlog with sentence frames (In this photo, they're... / They usually...).
 
 ### 4. Sabers: Vocabulary
 
-*Cumulative: Safe retains Insecure and adds; Daring retains both and adds.*
+*Cumulative: Insecure retains Beginners and adds; Safe retains both and adds; Daring retains all three and adds.*
 
-**Insecure --- foundation**
+**Beginners --- core**
+
+- Free-time activities: play football / basketball / video games; go swimming; dance; draw; read; listen to music; meet friends; go to the park
+
+- Clothes & kit: T-shirt; trainers; shorts; cap
+
+- Weather: It's sunny / cold / hot; It's raining
+
+- Time: now; today; on Saturdays; at the weekend
+
+- Likes (R): I like / I love / I don't like + -ing
+
+- Media: watch videos; take photos; chat with friends
+
+**Insecure --- foundation** *(retains Beginners and adds)*
 
 - Free-time activities: play football / basketball / video games; go swimming / skating / cycling; do karate / gymnastics / yoga; play the guitar / the piano; dance; draw; read comics; listen to music; meet friends; go to the park
 
@@ -536,7 +588,21 @@ Insecure keeps Catalan guidance and a model vlog with sentence frames (In this p
 
 ### 5. Sabers: Grammar
 
-**Insecure**
+**Beginners**
+
+- Present Continuous afirmatiu dins de marcs: In this photo, they're playing football. She's dancing.
+
+- Ortografia de -ing de cinc verbs freqüents: play → playing, dance → dancing, swim → swimming, run → running, read → reading.
+
+- Present Simple amb I usually…: I usually play football on Saturdays.
+
+- like / love + -ing: I love swimming.
+
+- Imperatius per al consell: Take a break. Don't play in bed.
+
+- Negativa i preguntes del Present Continuous només receptives.
+
+**Insecure** *(retains Beginners and adds)*
 
 - Present Continuous per a accions ara: am / is / are + -ing. Afirmativa, negativa (I'm not playing) i preguntes (Are you watching the match? --- Yes, I am. What are they doing?).
 
@@ -620,7 +686,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **3 · LS learning objective (O2, compartit amb CPSAA 1 · 1.1):** Narrate an incident or a memorable experience using the Past Simple, the Past Continuous, when / while and -ed / -ing adjectives, in order to share it in a narrated video with slides.
 
-- **4 · LS assessment criterion:** Narrates the incident or experience in a video with Google Slides and their face in picture-in-picture, with a beginning, a middle and an end, the Past Simple, at least one I was ... when ... sentence and -ed / -ing adjectives for feelings (Insecure: 6--8 sentences with a story frame).
+- **4 · LS assessment criterion:** Narrates the incident or experience in a video with Google Slides and their face in picture-in-picture, with a beginning, a middle and an end, the Past Simple, at least one I was ... when ... sentence and -ed / -ing adjectives for feelings (Beginners and Insecure: 6--8 sentences with a story frame).
 
 - **2 · Criteri d'avaluació 3.3:** Participar en situacions interactives breus i senzilles sobre temes quotidians, de rellevància personal i pròxims a la seva experiència, a través de diversos suports, utilitzant recursos com ara la repetició, el ritme pausat o el llenguatge no verbal, i mostrant empatia i respecte per la cortesia lingüística i l'etiqueta digital, així com per les diferents necessitats, idees, inquietuds, iniciatives i motivacions dels interlocutors.
 
@@ -636,7 +702,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **3 · LS learning objective (O4):** Write the story with a story map and sequencers, checking false friends and confusing pairs with Catalan and Spanish, in order to produce a clear, well-ordered text for the slides.
 
-- **4 · LS assessment criterion:** Writes the story following the story map (Insecure: a guided frame), with sequencers (first, then, after that, in the end) and when / while, and checks at least two false friends or confusing pairs before passing it to the slides.
+- **4 · LS assessment criterion:** Writes the story following the story map (Beginners and Insecure: a guided frame), with sequencers (first, then, after that, in the end) and when / while, and checks at least two false friends or confusing pairs before passing it to the slides.
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -672,7 +738,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **4 · LS assessment criterion:** When a partner tells their story, listens without interrupting or judging, reacts with interest (Really? What happened next?) and asks at least one question about how they felt (Safe and Daring: two).
 
-Routes vary support, complexity and independence; they use the same course criteria (1r i 2n).
+Routes vary support, complexity and independence; they use the same course criteria (1r i 2n). Beginners (A1) is assessed with the same criteria and attainment degrees on the A1 version of each task (see the Beginners summary chapter).
 
 ### 3. Final Product: Story Video
 
@@ -680,19 +746,37 @@ Plan → Draft → Peer feedback → Google Slides → Record → Review → Sub
 
 Submit a video with Google Slides, your face visible in picture-in-picture and a clear voice. The story can be real or invented. Add one slide about the graded reader or short story you chose. Before recording, tell your story to a partner, who reacts and asks questions.
 
+- **Beginners:** Tell a short story in 4–5 frame sentences with a story map (Last …, I went to …. I was with …. Suddenly, …. I was scared / happy.). Use the list of eight past forms.
+
 - **Insecure:** Narrate an incident in 6--8 sentences with a story frame: when, where, what happened (Past Simple) and how you felt (-ed adjectives). Include one sentence with *I was ... when ...*.
 
 - **Safe:** Narrate with a beginning, a middle and an end: background with the Past Continuous, when / while, sequencers and -ed / -ing feelings.
 
 - **Daring:** Narrate a longer story with varied connectors, adverbs of manner and indefinite or reflexive pronouns, with a twist or surprise at the end. Link it to the graded reader.
 
-Insecure keeps Catalan guidance and a story map (When? Where? What happened? How did you feel?).
+Beginners and Insecure keep Catalan guidance and a story map (When? Where? What happened? How did you feel?).
 
 ### 4. Sabers: Vocabulary
 
-*Cumulative: Safe retains Insecure and adds; Daring retains both and adds.*
+*Cumulative: Insecure retains Beginners and adds; Safe retains both and adds; Daring retains all three and adds.*
 
-**Insecure --- foundation**
+**Beginners --- core**
+
+- Past time: yesterday; last weekend; last summer; two years ago
+
+- Holidays (R): go on holiday; go to the beach; visit; take photos
+
+- Incidents: get lost; miss the bus; lose; find; fall
+
+- Feelings: happy; sad; scared; surprised; tired
+
+- Sequencers: first; then; suddenly; finally
+
+- Reacting: Wow! Oh no!
+
+- Past forms (list of eight): was / were; went; had; saw; got; came; fell; lost
+
+**Insecure --- foundation** *(retains Beginners and adds)*
 
 - Past time expressions: yesterday; last weekend / summer / year; two years ago; on my birthday
 
@@ -736,7 +820,19 @@ Insecure keeps Catalan guidance and a story map (When? Where? What happened? How
 
 ### 5. Sabers: Grammar
 
-**Insecure**
+**Beginners**
+
+- Past Simple afirmatiu amb la llista de 8 irregulars i regulars amb -ed (walked, stayed, visited).
+
+- was / were i there was: It was dark. There was a dog.
+
+- I was + adjectiu -ed: I was scared.
+
+- Seqüència: first, then, suddenly, finally; and.
+
+- Negativa, preguntes amb did i Past Continuous només receptius (apareixen al model).
+
+**Insecure** *(retains Beginners and adds)*
 
 - Past Simple (C): regulars amb -ed (walked, stayed, studied, stopped) i irregulars freqüents (went, had, saw, got, came, fell, broke, lost). Pronunciació de -ed: /t/, /d/, /ɪd/.
 
@@ -844,7 +940,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **3 · LS learning objective (O2, compartit amb CPSAA 2 · 2.2):** Apply should, must, have to, can and quantifiers (much / many, too much, enough) in the text of the guide, in order to give clear advice and rules about food, sleep and breaks.
 
-- **4 · LS assessment criterion:** Writes the text of the guide following a model, with advice (should / shouldn't), rules (must / have to / don't have to) and quantities (much / many, too much, enough) about food, sleep or breaks (Insecure: five tips and a healthy daily menu).
+- **4 · LS assessment criterion:** Writes the text of the guide following a model, with advice (should / shouldn't), rules (must / have to / don't have to) and quantities (much / many, too much, enough) about food, sleep or breaks (Beginners and Insecure: five tips and a healthy daily menu).
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -880,7 +976,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **4 · LS assessment criterion:** Before sharing the guide with 1r students on the school's restricted platform, checks with a short list that it shows no personal data or images of people without permission and that the sources are credited, and chooses who will be able to see it.
 
-Routes vary support, complexity and independence; they use the same course criteria (1r i 2n).
+Routes vary support, complexity and independence; they use the same course criteria (1r i 2n). Beginners (A1) is assessed with the same criteria and attainment degrees on the A1 version of each task (see the Beginners summary chapter).
 
 ### 3. Final Product: Feel Good Guide
 
@@ -888,19 +984,33 @@ Choose a topic → Read and mediate → Plan → Google Slides → Record → Re
 
 Submit a video with Google Slides, your face visible in picture-in-picture and a clear voice. Audience: 1r ESO students.
 
+- **Beginners:** Give three tips with frames (You should … / Don't …) about food, sleep or breaks, and show a simple healthy menu (breakfast, lunch, dinner) with the word bank and quantities (a glass of water, a piece of fruit).
+
 - **Insecure:** Give five tips about food, sleep or breaks with should / shouldn't and imperatives, and show a healthy daily menu with quantities.
 
 - **Safe:** Present a guide with advice, rules (must / have to / don't have to) and quantities (much / many, too much, enough), plus what to do with a cold or a headache. Include one piece of school health information mediated into English.
 
 - **Daring:** Present a complete guide that justifies each piece of advice (because / so), contrasts mustn't and don't have to, includes a mediated text and adds a sustainable-food tip (local food, tap water).
 
-Insecure keeps Catalan guidance and sentence frames (You should... / Don't...). Discuss habits, not bodies or weight.
+Beginners and Insecure keep Catalan guidance and sentence frames (You should... / Don't...). Discuss habits, not bodies or weight.
 
 ### 4. Sabers: Vocabulary
 
-*Cumulative: Safe retains Insecure and adds; Daring retains both and adds.*
+*Cumulative: Insecure retains Beginners and adds; Safe retains both and adds; Daring retains all three and adds.*
 
-**Insecure --- foundation**
+**Beginners --- core**
+
+- Food & drink: fruit; vegetables; bread; rice; fish; meat; eggs; milk; water; juice; sweets; crisps
+
+- Quantities (R): a bottle of; a glass of; a piece of; a bowl of
+
+- Body: head; stomach; I've got a headache / a cold
+
+- Habits: sleep; drink water; eat fruit; play sport; take a break
+
+- Advice: You should…; You shouldn't…; Don't…
+
+**Insecure --- foundation** *(retains Beginners and adds)*
 
 - Food & drink: fruit; vegetables; bread; rice; pasta; fish; meat; eggs; milk; cheese; water; juice; sweets; crisps; fizzy drinks
 
@@ -934,7 +1044,19 @@ Insecure keeps Catalan guidance and sentence frames (You should... / Don't...). 
 
 ### 5. Sabers: Grammar
 
-**Insecure**
+**Beginners**
+
+- should / shouldn't + verb base: You should drink water.
+
+- Imperatius: Eat fruit. Don't skip breakfast.
+
+- I've got + malaltia com a chunk: I've got a headache.
+
+- a / an i some: an apple, some bread, some fruit.
+
+- have to, must i How much / How many només receptius.
+
+**Insecure** *(retains Beginners and adds)*
 
 - should / shouldn't + verb base (consell): You should drink more water.
 
@@ -1028,7 +1150,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **3 · LS learning objective (O3, compartit amb CE6 · 6.2):** Organise a small research task about both towns into their own comparison table and write and revise the slide text from it, in order to support the recommendations of the video.
 
-- **4 · LS assessment criterion:** Writes the slide text from the comparison table with comparatives, superlatives and as ... as (Insecure: comparatives and there is / there are), and revises a first draft with the shared checklist before recording.
+- **4 · LS assessment criterion:** Writes the slide text from the comparison table with comparatives, superlatives and as ... as (Beginners and Insecure: comparatives and there is / there are), and revises a first draft with the shared checklist before recording.
 
 **COMPETÈNCIES INTEGRADES**
 
@@ -1056,7 +1178,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **3 · LS learning objective (O3, compartit amb CE5 · 5.2):** Organise a small research task about both towns into their own comparison table and write and revise the slide text from it, in order to support the recommendations of the video.
 
-- **4 · LS assessment criterion:** Organises the information from at least two sources (Insecure: one given source) in their own comparison table by categories (places, nature, transport, money) and credits the sources and photos on the last slide.
+- **4 · LS assessment criterion:** Organises the information from at least two sources (Beginners and Insecure: one given source) in their own comparison table by categories (places, nature, transport, money) and credits the sources and photos on the last slide.
 
 **COMPETÈNCIES TRANSVERSALS**
 
@@ -1068,7 +1190,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **3 · LS learning objective (O2, compartit amb CE1 · 1.2):** Analyse similarities and differences between their town and the English-speaking town, building links between both and avoiding stereotypes, in order to show respect for cultural diversity.
 
-- **4 · LS assessment criterion:** In the video guide, names at least two similarities and two differences between their town and the English-speaking town (Insecure: one and one), explains one thing that connects them (a shared tradition, tourism, trade or a common problem) and says what their own town adds to who they are, without stereotypes.
+- **4 · LS assessment criterion:** In the video guide, names at least two similarities and two differences between their town and the English-speaking town (Beginners and Insecure: one and one), explains one thing that connects them (a shared tradition, tourism, trade or a common problem) and says what their own town adds to who they are, without stereotypes.
 
 - **CPSAA 4 · Competència personal, social i d'aprendre a aprendre** (vincle directe)
 
@@ -1080,7 +1202,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **4 · LS assessment criterion:** In the comparison table, marks which information about both towns is a fact (data from a source) and which is an opinion (reviews, ads), and in the video supports each recommendation with at least one fact from a source they consider reliable.
 
-Routes vary support, complexity and independence; they use the same course criteria (1r i 2n).
+Routes vary support, complexity and independence; they use the same course criteria (1r i 2n). Beginners (A1) is assessed with the same criteria and attainment degrees on the A1 version of each task (see the Beginners summary chapter).
 
 ### 3. Final Product: Best Places Around Video Guide
 
@@ -1088,19 +1210,35 @@ Research → Comparison table → Google Slides → Record → Review → Submit
 
 Submit a video with Google Slides, your face visible in picture-in-picture and a clear voice. Add one slide about a linguistic, cultural or artistic feature of the English-speaking town (a word, a festival, a song or a building) and, on the last slide, credit the photos and sources you used.
 
+- **Beginners:** Compare your town with one English-speaking town in 4–5 frame sentences (… is bigger than …. There is a … in …. There are more … in ….). Add one recommendation (You should visit …).
+
 - **Insecure:** Compare your town with an English-speaking town in 6--8 sentences: places, transport and prices (comparatives, there is / there are). Add one recommendation.
 
 - **Safe:** Compare by categories (places, nature, transport, money) with comparatives, superlatives and as ... as. Recommend the best places with should and explain how to get to one of them.
 
 - **Daring:** Compare with evidence from your research, use *one of the + superlative* and give their opinion about a common idea. Identify one need of your own town and propose an improvement, and question a stereotype.
 
-Insecure keeps Catalan guidance and a comparison table with sentence frames (... is bigger than... / There are more... in...).
+Beginners and Insecure keep Catalan guidance and a comparison table with sentence frames (... is bigger than... / There are more... in...).
 
 ### 4. Sabers: Vocabulary
 
-*Cumulative: Safe retains Insecure and adds; Daring retains both and adds.*
+*Cumulative: Insecure retains Beginners and adds; Safe retains both and adds; Daring retains all three and adds.*
 
-**Insecure --- foundation**
+**Beginners --- core**
+
+- Places in town (R): park; square; museum; cinema; shopping centre; market; beach; station; school
+
+- Nature: river; mountain; forest; beach
+
+- Transport: bus; train; bike; on foot
+
+- Adjectives: big / small; old / new; quiet / noisy; clean / dirty; beautiful; cheap / expensive
+
+- Countries (R): the UK; Ireland; the USA; Australia; Spain
+
+- Opinion: I like … because…
+
+**Insecure --- foundation** *(retains Beginners and adds)*
 
 - Places in town (R): park; square; museum; library; cinema; shopping centre; market; sports centre; station; beach; castle; hospital
 
@@ -1144,7 +1282,19 @@ Insecure keeps Catalan guidance and a comparison table with sentence frames (...
 
 ### 5. Sabers: Grammar
 
-**Insecure**
+**Beginners**
+
+- Comparatius curts amb -er + than, amb una llista tancada: bigger, smaller, older, cheaper, quieter.
+
+- there is / there are + a / some: There is a market. There are some parks.
+
+- Preposicions de lloc: in, near, next to.
+
+- Recomanació: You should visit…
+
+- Superlatius i more + adjectiu només receptius.
+
+**Insecure** *(retains Beginners and adds)*
 
 - Comparatius d'adjectius curts (-er: bigger, cheaper; big → bigger, busy → busier) i llargs (more + adjectiu).
 
@@ -1290,7 +1440,7 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 
 - **4 · LS assessment criterion:** In the end-of-year reflection, reflects individually and with the group on how they planned the trip and on the final video, writes two improvement proposals and presents them briefly to the class.
 
-Routes vary support, complexity and independence; they use the same course criteria (1r i 2n).
+Routes vary support, complexity and independence; they use the same course criteria (1r i 2n). Beginners (A1) is assessed with the same criteria and attainment degrees on the A1 version of each task (see the Beginners summary chapter).
 
 ### 3. Final Product: Trip Proposal & Class Vote
 
@@ -1298,19 +1448,33 @@ Group planning → Research → Itinerary and budget → Google Slides → Recor
 
 Submit a group video with Google Slides. Each member presents one part with their face visible in picture-in-picture and a clear voice. The class watches the videos and votes for one trip.
 
+- **Beginners:** Present a day-trip plan in 4–5 frame sentences with going to (We're going to go to …. We're going to leave at …. We're going to go by …. It costs …) and one alternative with a fixed frame (If it rains, we'll go to the museum).
+
 - **Insecure:** Present a day-trip plan with going to (where, when, how and what), the price and one alternative (If it rains, we'll...).
 
 - **Safe:** Present an itinerary with times (Present Continuous for arrangements), transport and budget, will / going to, time clauses and two alternatives with the first conditional.
 
 - **Daring:** Present a persuasive plan that compares two options, with the budget per person, as soon as / when clauses and first conditional questions and negatives. Lead the group negotiation.
 
-Insecure keeps Catalan guidance and a planning template (Where? When? How? How much? If...).
+Beginners and Insecure keep Catalan guidance and a planning template (Where? When? How? How much? If...).
 
 ### 4. Sabers: Vocabulary
 
-*Cumulative: Safe retains Insecure and adds; Daring retains both and adds.*
+*Cumulative: Insecure retains Beginners and adds; Safe retains both and adds; Daring retains all three and adds.*
 
-**Insecure --- foundation**
+**Beginners --- core**
+
+- Trip activities: visit a museum; go to the beach; go to a theme park; have a picnic; buy souvenirs
+
+- Transport: take the train / the bus; arrive; leave; ticket
+
+- Dates (R): tomorrow; next week; on Friday; at 9 a.m.; in June
+
+- Weather (R): sunny; rainy; cold; hot
+
+- Making plans: Let's…; Good idea!; I'd like to…
+
+**Insecure --- foundation** *(retains Beginners and adds)*
 
 - Trip activities: go sightseeing; visit a museum; go to a theme park; have a picnic; go hiking; go kayaking; go to the beach; buy souvenirs
 
@@ -1344,7 +1508,19 @@ Insecure keeps Catalan guidance and a planning template (Where? When? How? How m
 
 ### 5. Sabers: Grammar
 
-**Insecure**
+**Beginners**
+
+- be going to afirmatiu dins de marcs: We're going to visit the aquarium.
+
+- It costs + preu: It costs ten euros.
+
+- will només dins de la frase feta: If it rains, we'll go to the museum.
+
+- Let's + verb: Let's go to the beach.
+
+- at / on / in per a dates com a chunks: at nine, on Friday, in June.
+
+**Insecure** *(retains Beginners and adds)*
 
 - be going to per als plans: We're going to visit the aquarium.
 
@@ -1381,6 +1557,8 @@ Les transversals que s'avaluen en aquesta LS es despleguen a l'apartat 2, amb el
 ## Gramàtica de 2n ESO per LS
 
 Aquesta taula coincideix amb la columna de 2n del mapa vertical de gramàtica, actualitzada per LS el 21 d'octubre de 2026. Els 37 sabers que el mapa marca per a 2n tenen LS assignada; tres d'aquests són R nous perquè les LS els recuperen de 1r: imperatius, like / love / hate + -ing i peticions i ofertes. I = introduir · C = consolidar · R = recuperar · --- = no és focus. Entre parèntesis, les rutes que el produeixen quan no són totes (S = Safe, D = Daring).
+
+*Ruta Beginners: no té columna pròpia. A cada LS produeix només el subconjunt A1 que recull el capítol «Resum de gramàtica i lèxic · ruta Beginners»; la resta de sabers de la fila els treballa de manera receptiva (els llegeix o els sent al model) o no els treballa.*
 
   -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   **Saber**                                                                         **MCER**   **LS1**                **LS2**                        **LS3**                 **LS4**   **LS5**   **LS6**
@@ -1477,6 +1655,8 @@ Aquesta taula coincideix amb la columna de 2n del mapa vertical de gramàtica, a
 ## Lèxic de 2n ESO per LS
 
 Aquesta taula coincideix amb la columna de 2n del mapa vertical de lèxic, actualitzada per LS el 21 d'octubre de 2026. Els 42 àmbits i chunks que el mapa marca per a 2n tenen LS assignada; cinc d'aquests són R nous de 1r que les LS fan servir al banc productiu: hora i dates, escola i horaris, països i nacionalitats, indicacions i paraules compostes. Mateixa llegenda que la taula de gramàtica. La taula marca el banc productiu; el receptiu de cada LS (*Shared reading/listening*) pot anar més enllà.
+
+*Ruta Beginners: no té columna pròpia. A cada LS produeix només el subconjunt A1 que recull el capítol «Resum de gramàtica i lèxic · ruta Beginners»; la resta de sabers de la fila els treballa de manera receptiva (els llegeix o els sent al model) o no els treballa.*
 
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   **Saber**                                                                             **MCER**   **LS1**         **LS2**      **LS3**   **LS4**   **LS5**       **LS6**
@@ -1575,6 +1755,235 @@ Aquesta taula coincideix amb la columna de 2n del mapa vertical de lèxic, actua
 
   Opinar, mostrar acord i desacord (agree with, on the one hand)                        A2--B1     ---             ---          ---       ---       I: opinar     ---
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Resum de gramàtica i lèxic · ruta Beginners (A1)
+
+Aquest capítol recull, per a cada LS, què produeix l'alumnat de la ruta Beginners: el producte final reduït, el lèxic nucli (25–40 paraules o chunks) i la gramàtica A1 que fa servir en marcs de frase. Tot el que no hi consta és receptiu (apareix al model, a la lectura o al vídeo) o no es treballa en aquesta ruta.
+
+**Principis de la ruta** (base: EEF, MECR Volum Complementari A1, recerca sobre lèxic i retroalimentació)
+
+- Mateixa LS i mateix producte final que la resta, amb menys requisits: 4–6 frases, marcs de frase i banc de paraules; parelles mixtes, no un grup a part.
+
+- Lèxic: llista nuclear curta per LS, repassada amb recuperació espaiada (flashcards i Match) al llarg de la LS i a la següent.
+
+- Lectures de 60–100 paraules amb el 95–98 % de paraules conegudes i glosses en català en passar el ratolí; qüestions de resposta tancada.
+
+- Vídeos i àudios: el mateix input que la resta (pitched at Safe), amb subtítols en anglès des del primer visionat i una còpia lenta quan n'hi ha.
+
+- Gramàtica: només formes afirmatives en marcs i chunks fixos; negatives, preguntes i formes complexes queden receptives, excepte les preguntes d'una targeta fixa.
+
+- Instruccions, pistes i retroalimentació en català, amb una pista i un segon intent abans de la solució; caixa «Com ho he fet» al final de cada Learning Path.
+
+- Avaluació: els mateixos criteris i la mateixa escala NA–AE, jutjada amb els can-dos A1 sobre la versió A1 de la tasca; la ruta la fixa només el professor.
+
+- Gramàtica A1 transversal a totes les LS: be, have got, Present Simple afirmatiu, there is / there are, can, imperatius, marcs amb going to i would like to, connectors and / then / because.
+
+### LS1 · 2ESO · My Real Routine (Beginners)
+
+**Producte final (Beginners)**
+
+Descripció d'un company en 4–5 frases amb marcs, a partir de 4 preguntes fixes, i una frase de reflexió. En anglès: Ask the classmate four fixed questions from a question card and describe the classmate in 4–5 frame sentences (This is … / He gets up at … / She goes to school by … / After school he …). Healthy-habits reflection: one sentence with a frame (… is good because …).
+
+**Lèxic nucli**
+
+- Daily routine: get up; have a shower; have breakfast; go to school; have lunch; do homework; have dinner; watch TV; go to bed
+
+- Time: at seven o'clock; at half past eight; in the morning / afternoon; at night; every day
+
+- Transport: by bus; by car; on foot
+
+- School (R): Maths; English; PE; on Mondays
+
+- Frequency: always; sometimes; never
+
+- Healthy habits: drink water; eat fruit; sleep; play sport
+
+- Question card: What time do you get up? How do you go to school? What do you do after school? Do you play sport?
+
+**Gramàtica A1 (en marcs de frase)**
+
+- This is + nom i be: This is Marc. He's twelve.
+
+- have got: She's got a brother.
+
+- Present Simple afirmatiu de 3a persona dins de marcs: gets up, goes, has, watches.
+
+- Freqüència: always, sometimes, never abans del verb.
+
+- at / on / in com a chunks: at seven, on Mondays, in the morning.
+
+- Connexió: and, then. Negativa i preguntes només amb la targeta.
+
+### LS2 · 2ESO · Free Time, Live! (Beginners)
+
+**Producte final (Beginners)**
+
+Una afició amb tres fotos: què fan a cada foto, què faig normalment i un consell de pantalles. En anglès: Present a hobby with three photos: for each photo say what the people are doing with a frame (In this photo, they're playing …) and add one sentence about what you usually do (I usually … on Saturdays). Add one screen-use tip (Take a break.).
+
+**Lèxic nucli**
+
+- Free-time activities: play football / basketball / video games; go swimming; dance; draw; read; listen to music; meet friends; go to the park
+
+- Clothes & kit: T-shirt; trainers; shorts; cap
+
+- Weather: It's sunny / cold / hot; It's raining
+
+- Time: now; today; on Saturdays; at the weekend
+
+- Likes (R): I like / I love / I don't like + -ing
+
+- Media: watch videos; take photos; chat with friends
+
+**Gramàtica A1 (en marcs de frase)**
+
+- Present Continuous afirmatiu dins de marcs: In this photo, they're playing football. She's dancing.
+
+- Ortografia de -ing de cinc verbs freqüents: play → playing, dance → dancing, swim → swimming, run → running, read → reading.
+
+- Present Simple amb I usually…: I usually play football on Saturdays.
+
+- like / love + -ing: I love swimming.
+
+- Imperatius per al consell: Take a break. Don't play in bed.
+
+- Negativa i preguntes del Present Continuous només receptives.
+
+### LS3 · 2ESO · A Day I'll Never Forget (Beginners)
+
+**Producte final (Beginners)**
+
+Història curta en 4–5 frases amb mapa d'història i una llista de 8 formes de passat. En anglès: Tell a short story in 4–5 frame sentences with a story map (Last …, I went to …. I was with …. Suddenly, …. I was scared / happy.). Use the list of eight past forms.
+
+**Lèxic nucli**
+
+- Past time: yesterday; last weekend; last summer; two years ago
+
+- Holidays (R): go on holiday; go to the beach; visit; take photos
+
+- Incidents: get lost; miss the bus; lose; find; fall
+
+- Feelings: happy; sad; scared; surprised; tired
+
+- Sequencers: first; then; suddenly; finally
+
+- Reacting: Wow! Oh no!
+
+- Past forms (list of eight): was / were; went; had; saw; got; came; fell; lost
+
+**Gramàtica A1 (en marcs de frase)**
+
+- Past Simple afirmatiu amb la llista de 8 irregulars i regulars amb -ed (walked, stayed, visited).
+
+- was / were i there was: It was dark. There was a dog.
+
+- I was + adjectiu -ed: I was scared.
+
+- Seqüència: first, then, suddenly, finally; and.
+
+- Negativa, preguntes amb did i Past Continuous només receptius (apareixen al model).
+
+### LS4 · 2ESO · Feel Good Guide (Beginners)
+
+**Producte final (Beginners)**
+
+Tres consells amb marcs i un menú saludable senzill amb quantitats. En anglès: Give three tips with frames (You should … / Don't …) about food, sleep or breaks, and show a simple healthy menu (breakfast, lunch, dinner) with the word bank and quantities (a glass of water, a piece of fruit).
+
+**Lèxic nucli**
+
+- Food & drink: fruit; vegetables; bread; rice; fish; meat; eggs; milk; water; juice; sweets; crisps
+
+- Quantities (R): a bottle of; a glass of; a piece of; a bowl of
+
+- Body: head; stomach; I've got a headache / a cold
+
+- Habits: sleep; drink water; eat fruit; play sport; take a break
+
+- Advice: You should…; You shouldn't…; Don't…
+
+**Gramàtica A1 (en marcs de frase)**
+
+- should / shouldn't + verb base: You should drink water.
+
+- Imperatius: Eat fruit. Don't skip breakfast.
+
+- I've got + malaltia com a chunk: I've got a headache.
+
+- a / an i some: an apple, some bread, some fruit.
+
+- have to, must i How much / How many només receptius.
+
+### LS5 · 2ESO · Best Places Around (Beginners)
+
+**Producte final (Beginners)**
+
+Comparació de dues ciutats en 4–5 frases amb comparatius curts i there is / there are, i una recomanació. En anglès: Compare your town with one English-speaking town in 4–5 frame sentences (… is bigger than …. There is a … in …. There are more … in ….). Add one recommendation (You should visit …).
+
+**Lèxic nucli**
+
+- Places in town (R): park; square; museum; cinema; shopping centre; market; beach; station; school
+
+- Nature: river; mountain; forest; beach
+
+- Transport: bus; train; bike; on foot
+
+- Adjectives: big / small; old / new; quiet / noisy; clean / dirty; beautiful; cheap / expensive
+
+- Countries (R): the UK; Ireland; the USA; Australia; Spain
+
+- Opinion: I like … because…
+
+**Gramàtica A1 (en marcs de frase)**
+
+- Comparatius curts amb -er + than, amb una llista tancada: bigger, smaller, older, cheaper, quieter.
+
+- there is / there are + a / some: There is a market. There are some parks.
+
+- Preposicions de lloc: in, near, next to.
+
+- Recomanació: You should visit…
+
+- Superlatius i more + adjectiu només receptius.
+
+### LS6 · 2ESO · Let's Plan It! (Beginners)
+
+**Producte final (Beginners)**
+
+Pla d'una excursió en 4–5 frases amb going to, el preu i una alternativa amb una frase feta. En anglès: Present a day-trip plan in 4–5 frame sentences with going to (We're going to go to …. We're going to leave at …. We're going to go by …. It costs …) and one alternative with a fixed frame (If it rains, we'll go to the museum).
+
+**Lèxic nucli**
+
+- Trip activities: visit a museum; go to the beach; go to a theme park; have a picnic; buy souvenirs
+
+- Transport: take the train / the bus; arrive; leave; ticket
+
+- Dates (R): tomorrow; next week; on Friday; at 9 a.m.; in June
+
+- Weather (R): sunny; rainy; cold; hot
+
+- Making plans: Let's…; Good idea!; I'd like to…
+
+**Gramàtica A1 (en marcs de frase)**
+
+- be going to afirmatiu dins de marcs: We're going to visit the aquarium.
+
+- It costs + preu: It costs ten euros.
+
+- will només dins de la frase feta: If it rains, we'll go to the museum.
+
+- Let's + verb: Let's go to the beach.
+
+- at / on / in per a dates com a chunks: at nine, on Friday, in June.
+
+### Visió de conjunt
+
+| **LS** | **Producte final Beginners** | **Gramàtica A1** | **Àmbits de lèxic nucli** |
+|---|---|---|---|
+| LS1 · My Real Routine | Descripció d'un company en 4–5 frases amb marcs, a partir de 4 preguntes fixes, i una frase de reflexió. | This is + nom i be; have got; Present Simple afirmatiu de 3a persona dins de marcs; Freqüència; at / on / in com a chunks; Connexió | Daily routine; Time; Transport; School (R); Frequency; Healthy habits; Question card |
+| LS2 · Free Time, Live! | Una afició amb tres fotos: què fan a cada foto, què faig normalment i un consell de pantalles. | Present Continuous afirmatiu dins de marcs; Ortografia de -ing de cinc verbs freqüents; Present Simple amb I usually…; like / love + -ing; Imperatius per al consell; Negativa i preguntes del Present Continuous només receptives. | Free-time activities; Clothes & kit; Weather; Time; Likes (R); Media |
+| LS3 · A Day I'll Never Forget | Història curta en 4–5 frases amb mapa d'història i una llista de 8 formes de passat. | Past Simple afirmatiu amb la llista de 8 irregulars i regulars amb -ed; was / were i there was; I was + adjectiu -ed; Seqüència | Past time; Holidays (R); Incidents; Feelings; Sequencers; Reacting; Past forms (list of eight) |
+| LS4 · Feel Good Guide | Tres consells amb marcs i un menú saludable senzill amb quantitats. | should / shouldn't + verb base; Imperatius; I've got + malaltia com a chunk; a / an i some | Food & drink; Quantities (R); Body; Habits; Advice |
+| LS5 · Best Places Around | Comparació de dues ciutats en 4–5 frases amb comparatius curts i there is / there are, i una recomanació. | Comparatius curts amb -er + than, amb una llista tancada; there is / there are + a / some; Preposicions de lloc; Recomanació | Places in town (R); Nature; Transport; Adjectives; Countries (R); Opinion |
+| LS6 · Let's Plan It! | Pla d'una excursió en 4–5 frases amb going to, el preu i una alternativa amb una frase feta. | be going to afirmatiu dins de marcs; It costs + preu; will només dins de la frase feta; Let's + verb; at / on / in per a dates com a chunks | Trip activities; Transport; Dates (R); Weather (R); Making plans |
 
 ## Fonts
 
