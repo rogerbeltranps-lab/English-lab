@@ -45,7 +45,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),resKey=a=>a.replace("/","__");
+const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name+(l.student?" · "+l.student:"")])),resKey=a=>a.replace("/","__");  // LV: "Safe · Core", students see the second name (el-route-names.js)
 const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(["lpopen"]),D:null,P:{},zero:true,term:elTerm(),wk:null,tips:(()=>{try{return localStorage.getItem("el_t_tips")!=="off"}catch(e){return true}})()};   // P: people on screen (see people()); zero: missing work counts 0 in the LS grade; term: of the team points
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved, in the learning paths you open for their group."],closed:["Closed","Students can only review what they did and the feedback."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
@@ -314,7 +314,7 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
   const to=S.rtTo,cu=cutsOf(c),def=EL_ROUTE_CUTS[c],rows=rtRows(c,src,to,studs),away=studs.filter(s=>s.away),n=rows.filter(r=>r.on).length;
   const cnt={};rows.forEach(r=>{const k=r.ex?r.sug:"none";cnt[k]=(cnt[k]||0)+1});
   const inp=k=>`<input type="number" step="0.1" min="0" max="10" data-do="cut" data-k="${k}" value="${cu[k]}" style="width:58px">`;
-  const sel=r=>`<select data-do="rtpick" data-u="${r.s.uid}"><option value="">–</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===r.pick?"selected":""}>${x.name}</option>`).join("")}</select>`;
+  const sel=r=>`<select data-do="rtpick" data-u="${r.s.uid}"><option value="">–</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===r.pick?"selected":""}>${LV[x.id]}</option>`).join("")}</select>`;
   const body=`<p class="muted">Each student's ${lsName(src.id)} exam mark gives a route with these cut-offs. Check the list, change any route or untick a student, then apply it to one LS. Later LSs keep that route until you change it (↩ in the Route column), and you can still change one student's route by clicking their Route cell. Their work so far is kept.</p>`
     +`<div class="bar"><b>Cut-offs (${c==="2eso"?"2 ESO":"4 ESO"}, mark out of 10):</b> ${route("beginners")} under ${inp("beginners")} · ${route("insecure")} under ${inp("insecure")} · ${route("safe")} under ${inp("safe")} · ${route("daring")} from ${f1(cu.safe)}`
     +(["beginners","insecure","safe"].some(k=>cu[k]!==def[k])?` <button class="g" data-do="cutdef">Back to ${def.beginners} · ${def.insecure} · ${def.safe}</button>`:"")+`</div>`
@@ -498,6 +498,21 @@ function overview(){const t=ELWeek.today(),all=[...new Set(GR.flatMap(g=>ELWeek.
     return `<div class="tpc c${g.course}"><h3>${esc(g.name)}</h3><div class="muted">${esc(l?l.title:x.ls)}</div>${examTag(ELWeek.exam(x.p,x.gi))}${behindTag(Object.assign({gid:g.id},x))}${body}<button class="g" data-do="tab" data-g="${g.id}" data-ls="${x.ls}">Open ${esc(g.name)}</button></div>`};
   return `<div class="box"><h2>Time plan · all groups</h2><p class="muted">Today is ${ELWeek.date(t)}. Your checklist: tick each session when you have taught it (saved with your account). Pick a week to plan ahead; the 💡 tips come from the LS docs. Plans are in <code>shared/js/el-plan.js</code>; open a group for its whole plan and who is late.</p>`
     +`<div class="bar wkbar">${chips}</div><div class="tp">${GR.map(card).join("")}</div></div>`}
+// Writing and speaking revisions (LS2 engine, research audit 26 Oct 2026): state.drafts[key] = the first version sent for AI feedback
+// (speaking: its transcript), state.finals[key] = {text, changed, at} the improved version; key = step + "_" + route. Older texts
+// saved before drafts were kept (state.texts) appear on their own.
+function revisions(u,a){const st=pstate(u,a),dr=st.drafts||{},fi=st.finals||{},tx=st.texts||{};
+  // goal before the Learning Path and the two review answers after it (state.plan / state.review, per route)
+  const pl=Object.entries(st.plan||{}).filter(([,v])=>v),rv=Object.entries(st.review||{}).filter(([,v])=>v&&(v.helped||v.review));
+  const refl=pl.length||rv.length?`<label>Goal and review</label><div class="hand">${pl.map(([r,v])=>`<p>🎯 <b>Goal</b>${pl.length>1?" ("+esc(LV[r]||r)+")":""}: ${esc(v)}</p>`).join("")}${rv.map(([r,v])=>`<p>🔁 <b>Helped most:</b> ${esc(v.helped)||"–"} · <b>To review:</b> ${esc(v.review)||"–"}</p>`).join("")}</div>`:"";
+  const keys=[...new Set([...Object.keys(dr),...Object.keys(fi),...Object.keys(tx).filter(k=>!dr[k])])];if(!keys.length)return refl;
+  const when=x=>x&&x.at?` <small class="muted">${ymd(x.at)}</small>`:"",para=t=>`<p style="white-space:pre-wrap">${esc(t)||'<span class="muted">(empty)</span>'}</p>`;
+  return `<label>Writing and speaking</label>`+keys.map(k=>{const [step,rt]=[k.replace(/_[a-z]+$/,""),(k.match(/_([a-z]+)$/)||[])[1]],d=dr[k],f=fi[k];
+    const sum=f?"✓ final version"+(d?" · draft kept":""):d?"draft only, no final version yet":"text";
+    return `<details><summary>${esc(step)}${rt?` <small class="muted">(${esc(LV[rt]||rt)})</small>`:""} · ${sum}</summary><div class="hand">`
+      +(d?`<p><b>Draft</b>${when(d)}</p>${para(d.text)}`:"")
+      +(f?`<p><b>Final version</b>${when(f)}</p>${para(f.text)}<p><b>What I changed:</b> ${esc(f.changed)}</p>`:"")
+      +(!d&&!f?para(tx[k]):"")+`</div></details>`}).join("")+refl}
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},rp=((S.D.rs[u]||{})[a.id]||{}).replies||{};
@@ -608,7 +623,7 @@ function rtPanel(u){redraw=null;
   dlg(`<h3>${name(s)} · Route</h3><p class="muted">${esc(lsT)} · now ${route(r.level)}${carried?" ↩ carried over from "+lsName(r.from):""}</p>`
     +(l.request?`<div class="hand">🔁 Asks to change to ${route(l.request)}${l.reason?`<p>“${esc(l.reason)}”</p>`:'<p class="muted">No reason given.</p>'}<button data-do="acc" data-u="${u}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${u}">Decline</button></div>`
       :l.declined?`<p class="muted">You declined their last request (${LV[l.declined]||esc(l.declined)}).</p>`:"")
-    +`<label>Set the route</label><div class="bar">${EL_LEVELS.map(x=>`<button class="${x.id===l.level?"":"g"}" data-do="setrt" data-u="${u}" data-r="${x.id}" ${x.id===l.level?"disabled":""}>${x.name}</button>`).join("")}</div>`
+    +`<label>Set the route</label><div class="bar">${EL_LEVELS.map(x=>`<button class="${x.id===l.level?"":"g"}" data-do="setrt" data-u="${u}" data-r="${x.id}" ${x.id===l.level?"disabled":""}>${LV[x.id]}</button>`).join("")}</div>`
     +`<p class="muted">Saved at once for this LS (later LSs take it too until you change it). The student gets it the next time they open the LS or their board.</p>`);
 }
 function stuPanel(u){redraw=null;
@@ -618,7 +633,7 @@ function stuPanel(u){redraw=null;
   if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
   dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>
     <label>Group</label>${groupSel(u,s.group)}
-    <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– none –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${x.name}</option>`).join("")}</select>
+    <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– none –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${LV[x.id]}</option>`).join("")}</select>
     <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`+entry);
 }
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
@@ -627,6 +642,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${x.score||0}/${a.points}`:""}</p>`
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.steps?handIns(u,a):"")
+    +revisions(u,a)
     +levelRows(u,a)
     +(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
     +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea>`

@@ -26,6 +26,10 @@ All docs are mapped in [docs/README.md](docs/README.md), which is also Roger's *
 - **English remains the target language** for vocabulary, listening/reading input, model sentences, interview questions where appropriate, slide content and student production. Do not translate these into Catalan when adding scaffolding.
 - Reuse route-aware support such as `shared/js/learning-path-support.js` where appropriate; verify language updates correctly when switching routes.
 
+## Route names students see
+- **Students see Starter · Base · Core · Plus (Roger, 26 Oct 2026, research audit)** for Beginners · Insecure · Safe · Daring. Code ids, data keys (`r:'insecure'`), docs, rubrics' source and Roger's dashboard keep the old names; the dashboard shows both ("Safe · Core", `EL_LEVELS[].student`).
+- `shared/js/el-route-names.js` relabels whole capitalised route words in visible text, titles, aria-labels and placeholders on every student page, including re-renders. `el-cloud.js` imports it; a page without `el-cloud.js` adds `<script src="…/shared/js/el-route-names.js" defer></script>` next to `el-copyright.js`. Keep writing the old names in content; never capitalise "Safe", "Daring", "Insecure" or "Beginners" as ordinary English words in student content (write "safe" lowercase), or they get relabelled.
+
 ## Levels, listenings, videos and readings
 - Each route has the level agreed in the levels document of the teaching programme:
 
@@ -47,6 +51,10 @@ All docs are mapped in [docs/README.md](docs/README.md), which is also Roger's *
 - **ElevenLabs settings:** for new audio use the expressive model `eleven_v3` with audio tags in the script (`[excited]`, `[surprised]`, `[laughs]`…), shown to the user before generating; recordings made before 24 Oct 2026 used `eleven_multilingual_v2` without tags. One call per script line (one voice per character), lines joined with 0.45 s pauses and loudness-normalised (`loudnorm=I=-16:TP=-1.5`, mono, 96 kbps). Keep the same voice for a character across an LS; each LS's `AGENTS.md` lists its voices.
 - **Choosing voices for new audio:** shortlist 3–4 well-rated ElevenLabs Voice Library voices per character (right accent and age, educational or conversational use case, high usage count) and send the user their free preview clips; generate only after the user picks. Existing recordings keep their voices.
 - **Slow versions are always made locally, never with a second paid generation:** apply ffmpeg `atempo=0.85` to the same line clips and join them with 0.9 s pauses.
+
+## Writing and speaking revisions
+- **Revision counts (Roger, 26 Oct 2026, research audit):** in LS2 engine pages (`ls2-engine.js`), the first version a student sends for AI feedback is kept as the draft (`state.drafts[step_route] = {text, at}`; speaking: the transcript of that recording). The step completes only when they save an improved final version with a line on what they changed (`state.finals[step_route] = {text, changed, at}`; it must differ from the draft, and the line needs 3+ words). The final version is the product piece. The student sees their draft above the final version; the teacher sees draft, final version and "What I changed" in the activity dialog (`revisions` in `teacher.html`). Catalan for Insecure and Beginners.
+- **Goal and review (Roger, 26 Oct 2026, research audit):** every LS2 engine Learning Path (pages with a `recall` panel) opens with a one-line "My goal" card and ends with "How did it go?" (what helped most, what to review), saved as `state.plan[route]` and `state.review[route]`, never a step and never marked; the teacher reads them in the activity dialog.
 
 ## Grammar
 - Grammar content is specific to each Learning Situation. Do not assume the same grammar across future Learning Situations.

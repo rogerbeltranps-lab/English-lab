@@ -7,10 +7,10 @@
 | # | Change | Status |
 | --- | --- | --- |
 | 1 | Grammar and vocabulary block from delayed retrieval: checkpoints 50 % · recall warm-ups 25 % · practice done on time 25 %; all four checkpoints count and have due dates | Built (this PR) |
-| 2 | Revision counts: draft 1 kept, improved version, a "What I changed" line, both on the dashboard and on the student's page; the same for speaking transcripts | To do |
-| 3 | Catalan-to-English flashcard mode for the core words; a one-minute plan and review in each Learning Path | To do (needs the core words below) |
+| 2 | Revision counts: draft 1 kept, improved version, a "What I changed" line, both on the dashboard and on the student's page; the same for speaking transcripts | Built (PR 2) |
+| 3 | Catalan-to-English flashcard mode for the core words; a one-minute plan and review in each Learning Path | Plan and review built (PR 2); flashcards to do (need the core words below) |
 | 4 | Listening cycle: prediction, a check between the two listens, a micro-dictation of 2–3 chunks; subtitles from the first viewing for Insecure and Beginners | To do (needs the chunks below) |
-| 5 | Neutral route names on student pages (code ids stay) | To do (Roger picks the names) |
+| 5 | Neutral route names on student pages (code ids stay): Starter · Base · Core · Plus | Built (with PR 2) |
 
 ## Content changes (LS project)
 
