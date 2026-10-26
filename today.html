@@ -170,7 +170,7 @@ const only=id=>((window.EL_GRADING||{})[id]||{}).only;
 const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")};
 // Exam: results/{ls}__assessment, sections[k] = {score, max} written by the teacher (sum of scores / sum of maxes × 10). Final product: the teacher's mark.
 function onlyView(id){const g=EL_GRADING[id],e=g.exam,sc=(D.rs[id+"/assessment"]||{}).sections||{},got=e.sections.filter(([k])=>sc[k]&&sc[k].score!=null),fp=D.rs[g.fp.a]||{};
-  const m=got.reduce((n,[k])=>n+(+(sc[k].max||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null,prod=fp.max?(fp.score||0)/fp.max*10:null;
+  const m=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null,prod=fp.max?(fp.score||0)/fp.max*10:null;
   const val={exam,fp:prod},total=exam!=null&&prod!=null?g.blocks.reduce((n,b)=>n+val[b.id]*b.w,0)/g.blocks.reduce((n,b)=>n+b.w,0):null;
   const name={exam:t("Examen final","Final exam"),fp:t("Producte final","Final product")},big=v=>`<b style="font-size:1.3rem;color:${v==null?"#94a3b8":col(v*10)}">${v==null?"–":f1(v)+" / 10"}</b>`;
   return `<div class="box"><h2>${t("Nota de la LS","LS grade")}</h2><p class="muted">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><table class="legend"><tbody>`
