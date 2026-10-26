@@ -2,4 +2,5 @@
 // deck file plus a line here. course: 2eso or 4eso (the groups the board offers).
 window.EL_GAMES=[
   {id:"4eso-customs-dates",title:"Customs, origins & festive words",course:"4eso",emoji:"🎃",ls:"Seasons & Celebrations · Safe"},
+  {id:"2eso-free-time",title:"Free-time words & how often",course:"2eso",emoji:"🛹",ls:"Free Time, Live! · Safe"},
 ];
