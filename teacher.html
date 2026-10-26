@@ -16,7 +16,7 @@ th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#c
 td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px solid #0f766e;outline-offset:-2px}td.sub{background:#dcfce7}td.mark{background:#fef9c3}td.na{color:#94a3b8;font-weight:400}
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
-.lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}
+.lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}button.sec{background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-size:13px}button.sec.off{background:#e2e8f0;color:#475569;border-color:#cbd5e1}button.secall{background:none;color:#0f766e;padding:2px 6px;font-size:12px;text-decoration:underline}
 details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>summary{font-size:.9rem;font-weight:600;color:#475569}tr.away td{color:#94a3b8;background:#f8fafc}.tag{font-size:11px;font-weight:600;background:#e2e8f0;color:#475569;border-radius:999px;padding:1px 6px;margin-left:4px}label.btn{background:#0f766e;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 8px}.form input,.form select{width:100%;box-sizing:border-box}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}
 button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6px;padding:2px 7px;margin:1px;font-size:12px;font-weight:600}button.lv.on{color:#fff}td.gr{cursor:pointer;white-space:nowrap}td.gr:hover{outline:2px solid #0f766e;outline-offset:-2px}.sug{color:#64748b;font-style:italic}.deg{font-weight:700}td.tot{font-weight:700}.dlg input.ex{width:56px}table.lvt td{text-align:left}ul.pbl{list-style:none;padding:0;margin:6px 0}ul.pbl li{margin:10px 0;border-left:3px solid #b45309;padding-left:10px}ul.pbl li.fixed{border-color:#cbd5e1;color:#64748b}ul.pbl details>summary{font-size:13px;font-weight:600;color:#475569}ul.pbl code{font-size:12px;display:block;white-space:pre-wrap}
 #pdf{display:none}body.pdfmode{max-width:none;background:#e2e8f0}body.pdfmode>*:not(#pdf){display:none!important}body.pdfmode #pdf{display:block}
@@ -34,6 +34,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <div id="pdf"></div>
 <script src="shared/js/el-catalog.js"></script>
+<script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
@@ -49,7 +50,7 @@ const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Se
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved, in the learning paths you open for their group."],closed:["Closed","Students can only review what they did and the feedback."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 
-// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled,groups,open}}, ro:{id:{email,group,surname1,surname2,first,tutor}},
+// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled,groups,open,secLocked}}, ro:{id:{email,group,surname1,surname2,first,tutor}},
 //               pt:{id:{team,t1,t2,t3}}, tm:{group:{list,score,best}}, tk:{group:{ticks:{"ls|session line":true}}} (the teacher's time plan checklist)}
 // pb = problem reports from students (problems/{id}: uid, email, name, group, ls, activity, route, page, title, section, kind, text, errors, device, created, fixed), sent with "⚠️ Problem" in the bottom bar.
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
@@ -99,6 +100,9 @@ const api={
   // learning paths open for one group (ls/{id}.open[group]) and what firestore.rules check (locked, lockedKeys: elLpLocks in el-catalog.js)
   lpOpen:(id,g,ids)=>{const L=elLpLocks(id,ids),o={open:{[g]:ids},locked:{[g]:L.locked},lockedKeys:{[g]:L.lockedKeys}};
     if(DEMO){const i=S.D.ls[id]=S.D.ls[id]||{status:"hidden",enabled:[]};for(const f in o)i[f]=Object.assign({},i[f],o[f]);return}return put(["ls",id],o)},
+  // sections of one learning path locked for one group: ls/{id}.secLocked[group][activity] (elSecLocked in el-catalog.js)
+  secLock:(id,g,aid,ids)=>{const k=resKey(aid);if(DEMO){const i=S.D.ls[id]=S.D.ls[id]||{status:"hidden",enabled:[]},m=(i.secLocked=Object.assign({},i.secLocked));m[g]=Object.assign({},m[g],{[k]:ids});return}
+    return put(["ls",id],{secLocked:{[g]:{[k]:ids}}})},
   pbFix:(id,v)=>DEMO?S.D.pb.find(x=>x.id===id).fixed=v:put(["problems",id],{fixed:v}),
   pbDel:id=>{const x=S.D.pb.find(y=>y.id===id);if(DEMO){S.D.pb=S.D.pb.filter(y=>y!==x);return}
     const b=F.writeBatch(db());b.delete(F.doc(db(),"problems",id));if(x&&x.shot)b.delete(F.doc(db(),"problemShots",id));return b.commit()},
@@ -239,9 +243,11 @@ function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=(g.mom
 // Locked for the group on screen (ls/{id}.open[group]; elLpOpen in el-catalog.js). Students see a locked one as "not open yet" and save nothing in it.
 function lpBox(ls,grp){
   const info=S.D.ls[ls]||{},list=acts(ls),set=Array.isArray((info.open||{})[grp.id]),n=list.filter(a=>elLpOpen(a,info,grp.id)).length;
-  const body=`<p class="muted">${grp.name} can only do the open ones. A locked learning path shows “not open yet” on the student's board and page, and nothing is saved in it. Open each recall checkpoint together with the learning path after it (a locked checkpoint does not block the next one). It works while the LS is Open.${set?"":` <b>Not set for ${grp.name} yet:</b> practice activities are open and graded ones only if they were enabled before; your first click saves the list for this group.`}</p>`
-    +`<table class="acts"><tr><th>Learning path</th><th>${grp.name}</th></tr>`+list.map(a=>{const on=elLpOpen(a,info,grp.id);
-      return `<tr><td>${esc(a.title)} ${a.criteria.map(pill).join("")}${a.checkpoint?' <small class="muted">(checkpoint)</small>':a.graded?"":' <small class="muted">(practice)</small>'}</td><td><button class="tog ${on?"yes":"no"}" data-do="lp" data-a="${a.id}">${on?"✔ Open":"🔒 Locked"}</button></td></tr>`}).join("")+`</table>`
+  const body=`<p class="muted">${grp.name} can only do the open ones. A locked learning path shows “not open yet” on the student's board and page, and nothing is saved in it. Open each recall checkpoint together with the learning path after it (a locked checkpoint does not block the next one). Under “Sections” you can also open the tabs inside a learning path one by one as you teach: a locked section shows 🔒 on its tab and its activities stay hidden. It works while the LS is Open.${set?"":` <b>Not set for ${grp.name} yet:</b> practice activities are open and graded ones only if they were enabled before; your first click saves the list for this group.`}</p>`
+    +`<table class="acts"><tr><th>Learning path</th><th>Sections</th><th>${grp.name}</th></tr>`+list.map(a=>{const on=elLpOpen(a,info,grp.id),secs=(window.EL_SECTIONS||{})[a.id]||[],off=elSecLocked(a,info,grp.id);
+      const sec=secs.length?secs.map(([id,t])=>`<button class="sec ${off.includes(id)?"off":""}" data-do="sec" data-a="${a.id}" data-p="${id}" title="${off.includes(id)?"Locked: click to open it":"Open: click to lock it"}">${off.includes(id)?"🔒":"✔"} ${esc(t)}</button>`).join("")
+        +` <button class="secall" data-do="secset" data-a="${a.id}" data-v="1">open all</button><button class="secall" data-do="secset" data-a="${a.id}" data-v="0">lock all</button>`:'<small class="muted">–</small>';
+      return `<tr><td>${esc(a.title)} ${a.criteria.map(pill).join("")}${a.checkpoint?' <small class="muted">(checkpoint)</small>':a.graded?"":' <small class="muted">(practice)</small>'}</td><td style="text-align:left">${sec}</td><td><button class="tog ${on?"yes":"no"}" data-do="lp" data-a="${a.id}">${on?"✔ Open":"🔒 Locked"}</button></td></tr>`}).join("")+`</table>`
     +`<div class="bar"><button data-do="lpset" data-v="1">✔ Open all</button><button class="g" data-do="lpset" data-v="0">🔒 Lock all</button></div>`;
   return `<div class="box">${fold("lpopen",`🔓 Learning paths open for ${grp.name} <small class="muted">· ${n} of ${list.length} open</small>`,body)}</div>`;
 }
@@ -759,7 +765,10 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     ptterm:()=>{S.term=k.t;render()},ptadd:()=>quick(pt.add(k.k,S.g,+k.d)),
     lp:()=>{const info=S.D.ls[S.ls],open=new Set(acts(S.ls).filter(a=>elLpOpen(a,info,S.g)).map(a=>a.id));open.has(k.a)?open.delete(k.a):open.add(k.a);
       act(api.lpOpen(S.ls,S.g,acts(S.ls).filter(a=>open.has(a.id)).map(a=>a.id)))},
-    lpset:()=>act(api.lpOpen(S.ls,S.g,k.v==="1"?acts(S.ls).map(a=>a.id):[]))
+    lpset:()=>act(api.lpOpen(S.ls,S.g,k.v==="1"?acts(S.ls).map(a=>a.id):[])),
+    sec:()=>{const a=byId(k.a),off=new Set(elSecLocked(a,S.D.ls[S.ls],S.g));off.has(k.p)?off.delete(k.p):off.add(k.p);
+      act(api.secLock(S.ls,S.g,a.id,(EL_SECTIONS[a.id]||[]).map(x=>x[0]).filter(id=>off.has(id))))},
+    secset:()=>act(api.secLock(S.ls,S.g,k.a,k.v==="1"?[]:(EL_SECTIONS[k.a]||[]).map(x=>x[0])))
   })[k.do]?.()});
 $("#dlg").addEventListener("close",()=>redraw=null);
 document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);

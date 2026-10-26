@@ -42,7 +42,7 @@ const progressRef=()=>doc(db,"students",user.uid,"progress",lsId);
 
 // "public" (free access, nothing saved) was removed when students got their own password (Roger, 26 Oct 2026): an LS still stored as public is open.
 const lsSt=s=>s==="public"?"open":s||"hidden";
-async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:lsSt(s.data().status),enabled:s.data().enabled||[],groups:s.data().groups||null,open:s.data().open||{}}:{status:"hidden",enabled:[],groups:null,open:{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
+async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:lsSt(s.data().status),enabled:s.data().enabled||[],groups:s.data().groups||null,open:s.data().open||{},secLocked:s.data().secLocked||{}}:{status:"hidden",enabled:[],groups:null,open:{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
 async function pull(){
@@ -187,6 +187,7 @@ async function gate(u){
   const ca=elCa(lvl);
   // Learning paths open per group (elLpOpen in el-catalog.js): a locked one shows a block and saves nothing.
   if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.");return}
+  if(a&&!tester)lockSections(elSecLocked(a,info,myGroup),ca);
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
   const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));
   if(cp){const o=overlay('<div style="max-width:520px"><h1></h1><p></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:10px 18px;text-decoration:none;font-weight:700"></a></p>'+todayLink+'</div>');
@@ -214,6 +215,21 @@ async function gate(u){
   }
   // Work left in this browser that the cloud does not have yet (for example done while the LS was still "public") reaches the cloud now.
   push();
+}
+
+// Sections of this learning path the teacher has not opened yet for the group (elSecLocked in el-catalog.js): their tab shows 🔒 and
+// does not open (section-next buttons click tabs too), and their panel shows a note instead of its activities. Pages re-render their
+// tabs (LS2 engine), so it is applied again on every change.
+function lockSections(ids,ca){
+  if(!ids.length)return;
+  const note=ca?"🔒 Aquesta secció encara no està oberta. El professor l'obrirà a classe quan toqui fer-la.":"🔒 This section is not open yet. Your teacher will open it in class when it is time to do it.";
+  const st=document.createElement("style");st.textContent=".panel.el-sec-off>:not(.el-sec-note){display:none!important}.tab.el-sec-off{opacity:.55;cursor:not-allowed}.el-sec-note{padding:28px 12px;text-align:center;font-weight:700;color:#475569}";document.head.append(st);
+  document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest(".tab[data-panel]");if(t&&ids.includes(t.dataset.panel)){e.preventDefault();e.stopImmediatePropagation()}},true);
+  const apply=()=>{
+    document.querySelectorAll(".tab[data-panel]").forEach(t=>{if(!ids.includes(t.dataset.panel)||t.classList.contains("el-sec-off"))return;t.classList.add("el-sec-off");t.title=note;t.prepend("🔒 ")});
+    ids.forEach(id=>{const p=document.getElementById(id);if(!p||!p.classList.contains("panel")||p.querySelector(":scope>.el-sec-note"))return;
+      p.classList.add("el-sec-off");const n=document.createElement("div");n.className="el-sec-note";n.textContent=note;p.prepend(n)})};
+  apply();new MutationObserver(apply).observe(document.body,{childList:true,subtree:true});
 }
 
 // Submit (lock) an activity from any page, using the progress saved in the cloud.
