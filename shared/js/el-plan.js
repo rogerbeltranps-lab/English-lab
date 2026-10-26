@@ -10,13 +10,13 @@
 // A new plan (for example 2 ESO LS2) is one more entry with these fields; groups use the names "2ESO-A", "2ESO-B"…
 window.EL_PLAN={
   "4eso-seasons-and-celebrations":{
-    note:"Starts 26 Oct 2026. 4ESO-A: Mon 8:30 · Wed 12:00 · Fri 13:00. 4ESO-B: Mon 15:00 · Tue 9:30 · Wed 10:30. Term 1 ends on 20 Nov, so the exam is in term 1 and the final product is in term 2 (its mark goes into the term 2 report). LP = Learning Path.",
+    note:"Starts 26 Oct 2026. 4ESO-A: Mon 8:30 · Wed 12:00 · Fri 13:00. 4ESO-B: Mon 15:00 · Tue 9:30 · Wed 10:30. Term 1 ends on 20 Nov; the exam is on Mon 23 Nov for both groups and its mark stays in the term 1 block. The final product starts the week after the exam (30 Nov) and its mark goes into the term 2 report. LP = Learning Path.",
     terms:{
       1:{title:"Term 1 · Learning Paths and exam",assess:"Exam (35 %) + grammar and vocabulary activities (20 %, automatic) · criteria 4.1, 2.2, 5.1 (exam, LP2 reading log, LP3 listening chart) · other competences start from the Learning Paths (docs/4eso/ls2-seasons-and-celebrations/grading.md)"},
       2:{title:"Term 2 · Final product",assess:"Final product (25 %: my part, email, my source, teamwork, process) + other competences (20 %: LP4 research card and the final product content rows) · criteria 3.2, 5.1, 4.2 · 6.1, 1.1, 1.2, CC1 1.3, CC3 3.2 · marked in two rounds: round 1 after step 2 (my source, research sheet), round 2 after submitting (video, email, teamwork, process) · the LS2 mark closes here"}
     },
     groups:["4ESO-A","4ESO-B"],
-    exam:["2026-11-20","2026-11-18"],
+    exam:["2026-11-23","2026-11-23"],
     due:{
       "4eso/ls2-getting-started":["2026-10-26","2026-10-26"],
       "4eso/ls2-celebrations-around-the-world":["2026-11-02","2026-10-28"],
@@ -27,44 +27,46 @@ window.EL_PLAN={
       "4eso/ls2-recall-checkpoint-2":["2026-11-06","2026-11-03"],
       "4eso/ls2-recall-checkpoint-3":["2026-11-11","2026-11-09"],
       "4eso/ls2-recall-checkpoint-4":["2026-11-16","2026-11-16"],
-      "4eso/ls2-sample-exam":["2026-11-18","2026-11-17"],
-      "4eso/ls2-research-it-right":["2026-11-25","2026-11-24"],
-      "4eso/ls2-celebration-day-proposal":["2026-12-11","2026-12-11"],
-      "4eso/ls2-reflect":["2026-12-14","2026-12-14"]
+      "4eso/ls2-sample-exam":["2026-11-20","2026-11-17"],
+      "4eso/ls2-research-it-right":["2026-11-27","2026-11-25"],
+      "4eso/ls2-celebration-day-proposal":["2026-12-11","2026-12-14"],
+      "4eso/ls2-reflect":["2026-12-14","2026-12-15"]
     },
     rows:[
       {term:1,from:"2026-10-26",when:"Week 1 · 26–30 Oct",g:[
         "Mon 26 · LP1 Getting started\nWed 28 · LP2 Celebrations around the world (1/2)",
-        "Mon 26 · LP1 Getting started\nTue 27 · LP2 Celebrations around the world (1/2)\nWed 28 · LP2 (2/2)"],
+        "Mon 26 · LP1 Getting started\nTue 27 · LP2 Celebrations around the world (1/2) · self-study\nWed 28 · LP2 (2/2)"],
         note:"29 Oct: Castanyada/Halloween at school · 30 Oct: no school"},
       {term:1,from:"2026-11-02",when:"Week 2 · 2–6 Nov",g:[
-        "Mon 2 · LP2 (2/2) · Recall checkpoint 1 (5 min)\nWed 4 · Form same-route groups, choose the celebration · LP3 Where traditions come from (1/2)\nFri 6 · LP3 (2/2)",
-        "Mon 2 · Recall checkpoint 1 (5 min) · form same-route groups, choose the celebration · LP3 Where traditions come from (1/2)\nTue 3 · LP3 (2/2)\nWed 4 · LP5 Plan the day (1/2)"]},
+        "Mon 2 · Recall checkpoint 1 (5 min) · LP2 (2/2)\nWed 4 · LP3 Where traditions come from (1/2) · self-study\nFri 6 · Form same-route groups, choose the celebration · LP3 (2/2)",
+        "Mon 2 · Recall checkpoint 1 (5 min) · form same-route groups, choose the celebration · LP3 Where traditions come from (1/2)\nTue 3 · LP3 (2/2)\nWed 4 · LP5 Plan the day (1/2) · self-study"]},
       {term:1,from:"2026-11-09",when:"Week 3 · 9–13 Nov",g:[
         "Mon 9 · LP5 Plan the day (1/2)\nWed 11 · LP5 (2/2)\nFri 13 · LP6 Write to the head teacher (1/2)",
         "Mon 9 · LP5 (2/2)\nTue 10 · LP6 Write to the head teacher (1/2)\nWed 11 · LP6 (2/2)"]},
       {term:1,from:"2026-11-16",when:"Week 4 · 16–20 Nov",g:[
-        "Mon 16 · LP6 (2/2) · Recall checkpoint 4\nWed 18 · Sample exam\nFri 20 · EXAM",
-        "Mon 16 · Catch-up · Recall checkpoint 4\nTue 17 · Sample exam\nWed 18 · EXAM"],
-        note:"20 Nov: term 1 ends"},
+        "Mon 16 · LP6 (2/2) · Recall checkpoint 4\nWed 18 · Catch-up and review\nFri 20 · Sample exam",
+        "Mon 16 · Recall checkpoint 4 · Catch-up\nTue 17 · Sample exam\nWed 18 · Review the sample exam"],
+        note:"20 Nov: term 1 ends · the exam is on Mon 23 Nov"},
       {term:2,from:"2026-11-23",when:"Week 5 · 23–27 Nov",g:[
-        "Mon 23 · LP4 Research it right (1/2)\nWed 25 · LP4 (2/2) · Step 1 My source\nFri 27 · Event plan · Step 0 My pieces · Step 2 My contribution · Round 1 marking",
-        "Mon 23 · LP4 Research it right (1/2)\nTue 24 · LP4 (2/2) · Step 1 My source\nWed 25 · Event plan · Step 0 My pieces · Step 2 My contribution · Round 1 marking"],
-        note:"Self-assessment week · Step 0 needs piece 3 (LP4 research card), so it is due with step 2 · Round 1 (my source, research sheet): marking PDF from the dashboard, feedback before the rehearsal"},
+        "Mon 23 · EXAM\nWed 25 · LP4 Research it right (1/2)\nFri 27 · LP4 (2/2) · Step 1 My source",
+        "Mon 23 · EXAM\nTue 24 · LP4 Research it right (1/2) · self-study\nWed 25 · LP4 (2/2) · Step 1 My source"],
+        note:"Mon 23: LS2 exam (its mark is in the term 1 block) · Self-assessment week · LP4 gives piece 3 (research card), which step 0 needs next week"},
       {term:2,from:"2026-11-30",when:"Week 6 · 30 Nov–4 Dec",g:[
-        "Mon 30 · Google Slides\nWed 2 · Rehearse the parts · Step 3 My part\nFri 4 · Record the draft video",
-        "Mon 30 · Google Slides\nTue 1 · Rehearse the parts · Step 3 My part\nWed 2 · Record the draft video"]},
+        "Mon 30 · Event plan · Step 0 My pieces · Step 2 My contribution · Round 1 marking\nWed 2 · Google Slides\nFri 4 · Rehearse the parts · Step 3 My part",
+        "Mon 30 · Event plan · Step 0 My pieces · Step 2 My contribution · Round 1 marking\nTue 1 · Google Slides\nWed 2 · Rehearse the parts · Step 3 My part"],
+        note:"The final product starts the week after the exam · Round 1 (my source, research sheet): marking PDF from the dashboard, feedback before the rehearsal"},
       {term:2,from:"2026-12-07",when:"Week 7 · 7–11 Dec",g:[
-        "Wed 9 · Feedback to another group · fix the video · Step 4 My email\nFri 11 · Submit on Classroom (deadline)",
-        "Wed 9 · Feedback to another group · fix the video · Step 4 My email\nSubmit on Classroom by Fri 11 (deadline)"],
+        "Wed 9 · Record the draft video\nFri 11 · Feedback to another group · fix the video · Step 4 My email · Submit on Classroom (deadline)",
+        "Wed 9 · Record the draft video"],
         note:"7–8 Dec: no school"},
       {term:2,from:"2026-12-14",when:"Week 8 · 14 Dec",g:[
         "Mon 14 · Step 5 Teamwork · Reflect · Round 2 marking",
-        "Mon 14 · Step 5 Teamwork · Reflect · Round 2 marking"],
+        "Mon 14 · Feedback to another group · fix the video · Step 4 My email · Submit on Classroom (deadline)\nHomework by Tue 15 · Step 5 Teamwork · Reflect · Round 2 marking"],
         note:"Round 2 (video, email, teamwork, process): marking PDF from the dashboard, video watched on Classroom · 15–18 Dec: projecte propi (all hours) · 22 Dec–7 Jan: holidays"}
     ],
-    extra:"Recall checkpoints 2 and 3 are homework (or the first 5 minutes of a class) and, like 1 and 4, count with their first try. Students need every checkpoint to open the next Learning Path (enable it with the Learning Path). 4ESO-A has 11 classes before the exam and 4ESO-B has 12, so only 4ESO-B gets a catch-up class.",
+    extra:"Recall checkpoints 2 and 3 are homework (or the first 5 minutes of a class) and, like 1 and 4, count with their first try. Students need every checkpoint to open the next Learning Path (enable it with the Learning Path). The exam is on Mon 23 Nov for both groups, so both get a catch-up class. “Self-study” classes fall on the teacher's medical appointments: students work on the Learning Path on their own with the substitute and finish it as homework. 4ESO-B has five final product classes (4ESO-A six), so its teamwork and Reflect are homework.",
     tips:[
+      ["self-study","You are away (medical appointment): leave the substitute the Learning Path link. Students work on their own and finish it as homework for the next class. Nothing that needs you (checkpoints, groups, sample exam, rehearsals) is planned on these days."],
       ["LP1 Getting started","Start with the recall warm-up (My Real Routine) with no notes and before any review. Play the origins video for everyone; Insecure students can switch to the slow copy. End with “Which celebrations would you like to explore?”: you use the answers to form the groups next week."],
       ["LP2 Celebrations around the world","Practice, grammar and mixed practice count only as done on time, so let them retry freely; accuracy comes from the warm-ups and checkpoints. The reading has one text per route. The reading log is a hand-in: give it a level (NA · AS · AN · AE) on the dashboard, because it is the only level for 4.1 (the exam gives a score)."],
       ["LP2 (2/2)","Finish the grammar (It is celebrated / takes place / is held, on · in · at) and product piece 1. Level the LP2 reading logs this week while they are fresh."],
@@ -88,7 +90,8 @@ window.EL_PLAN={
       ["Rehearse the parts","Each part lasts 40–60 s (Insecure) or 35–45 s (Safe and Daring); the video 2–3 minutes. Step 3: their script, what they changed after the rehearsal and key notes."],
       ["Record the draft video","Every member presents their own part, with face and slides visible."],
       ["Step 4 My email","They paste the final email in step 4 so it reaches the round 2 marking PDF; Classroom is only for the video."],
-      ["Submit on Classroom","Deadline Fri 11 Dec: remind them the day before and check who has not submitted on Classroom."],
+      ["Submit on Classroom","Deadline today (4ESO-A Fri 11 Dec, 4ESO-B Mon 14 Dec): remind them the class before and check who has not submitted on Classroom."],
+      ["Review the sample exam","Go through the common mistakes from the sample exam; the exam is on Mon 23."],
       ["Step 5 Teamwork","Peer assessment of each teammate: use it, with what you saw, to give one level less on the group rows to a student who did not contribute."],
       ["Reflect","Reflect reads their four checkpoint first tries. Talk about the gap between their self-assessment and your levels."],
       ["Round 2 marking","Round 2 marking PDF: the video rows once per group (watch it on Classroom), then my part, email, teamwork and process per student."]
@@ -103,7 +106,7 @@ window.EL_PLAN={
     groups:["2ESO-A","2ESO-B"],
     exam:["2026-11-20","2026-11-20"],
     due:{
-      "2eso/ls2-getting-started":["2026-10-27","2026-10-27"],
+      "2eso/ls2-getting-started":["2026-10-27","2026-11-03"],
       "2eso/ls2-what-are-they-doing":["2026-11-03","2026-11-03"],
       "2eso/ls2-recall-checkpoint-1":["2026-11-03","2026-11-03"],
       "2eso/ls2-now-or-usually":["2026-11-06","2026-11-06"],
@@ -120,7 +123,7 @@ window.EL_PLAN={
     rows:[
       {term:1,from:"2026-10-26",when:"Week 1 · 26–30 Oct",g:[
         "Tue 27 · LP1 Getting started\nThu 29 · LP2 What are they doing? (1/2)",
-        "Tue 27 · LP1 Getting started\nThu 29 · LP2 What are they doing? (1/2)"],
+        "Tue 27 · LP1 Getting started · self-study\nThu 29 · LP2 What are they doing? (1/2) · self-study\nHomework by Tue 3 · finish LP1 and LP2 (1/2)"],
         note:"29 Oct: Castanyada/Halloween at school · 30 Oct: no school"},
       {term:1,from:"2026-11-02",when:"Week 2 · 2–6 Nov",g:[
         "Tue 3 · LP2 (2/2) · Recall checkpoint 1 (5 min) · pair the vlog buddies (same route), choose the hobby or event\nThu 5 · LP3 Now or usually? (1/2)\nFri 6 · LP3 (2/2)",
@@ -133,8 +136,8 @@ window.EL_PLAN={
         "Tue 17 · LP6 (2/2) · Recall checkpoint 4\nThu 19 · Sample exam\nFri 20 · EXAM"],
         note:"20 Nov: term 1 ends"},
       {term:2,from:"2026-11-23",when:"Week 5 · 23–27 Nov",g:[
-        "Tue 24 · LP4 Check the source (1/2)\nThu 26 · LP4 (2/2) · Fact file · Step 1 My source\nFri 27 · Step 0 My pieces · Step 2 My slides · Round 1 marking",
-        "Tue 24 · LP4 Check the source (1/2)\nThu 26 · LP4 (2/2) · Fact file · Step 1 My source\nFri 27 · Step 0 My pieces · Step 2 My slides · Round 1 marking"],
+        "Tue 24 · LP4 Check the source (1/2) · self-study\nThu 26 · LP4 (2/2) · Fact file · Step 1 My source\nFri 27 · Step 0 My pieces · Step 2 My slides · Round 1 marking",
+        "Tue 24 · LP4 Check the source (1/2) · self-study\nThu 26 · LP4 (2/2) · Fact file · Step 1 My source · self-study\nFri 27 · Step 0 My pieces · Step 2 My slides · Round 1 marking"],
         note:"Self-assessment week · Step 0 needs piece 3 (LP4 fact file), so it is due with step 2 · Round 1 (my source, fact file): marking PDF from the dashboard, feedback before recording"},
       {term:2,from:"2026-11-30",when:"Week 6 · 30 Nov–4 Dec",g:[
         "Tue 1 · Google Slides (photos, captions)\nThu 3 · Rehearse with the vlog buddy · Step 3 My script\nFri 4 · Record the first version",
@@ -144,8 +147,9 @@ window.EL_PLAN={
         "Thu 10 · Feedback for the vlog buddy · edit the video · Step 4 Record and edit · Submit on Classroom (deadline)\nFri 11 · Step 5 My tip · Reflect"],
         note:"7–8 Dec: no school · Round 2 (vlog, script, editing, tip, process): marking PDF from the dashboard during 14–18 Dec (projecte propi, no English classes), video watched on Classroom · 22 Dec–7 Jan: holidays"}
     ],
-    extra:"Recall checkpoints 2 and 3 are homework (or the first 5 minutes of a class) and, like 1 and 4, count with their first try. Students need every checkpoint to open the next Learning Path (enable it with the Learning Path). Both groups have 11 classes before the exam, as 4ESO-A.",
+    extra:"Recall checkpoints 2 and 3 are homework (or the first 5 minutes of a class) and, like 1 and 4, count with their first try. Students need every checkpoint to open the next Learning Path (enable it with the Learning Path). Both groups have 11 classes before the exam. “Self-study” classes fall on the teacher's medical appointments: students work on the Learning Path on their own with the substitute and finish it as homework. 2ESO-B starts the LS with two self-study classes: take a few minutes on Tue 3 Nov for doubts, after checkpoint 1.",
     tips:[
+      ["self-study","You are away (medical appointment): leave the substitute the Learning Path link. Students work on their own and finish it as homework for the next class. Nothing that needs you (checkpoints, groups, sample exam, rehearsals) is planned on these days."],
       ["LP1 Getting started","Start with the recall warm-up (My Real Routine: routine verbs, Present Simple) with no notes. Warm-ups and checkpoints count with their first try (students are not told); practice only needs to be done on time. “Where are you?” is at Safe level for everyone; Insecure has the slow copy."],
       ["LP2 What are they doing?","Present Continuous with clothes, kit and weather. The reading log is a hand-in: give it a level (NA · AS · AN · AE) on the dashboard, because it is the only level for 4.1 (the exam gives a score)."],
       ["LP2 (2/2)","Finish the grammar (-ing spelling, short answers) and product piece 1, “In this photo…”. Level the reading logs this week."],
