@@ -24,7 +24,7 @@ export async function start({db,user,group,root,lsId,seesAll}){
   if(i<0)return;   // the plan is over
   const get=async path=>{const s=await getDoc(doc(db,...path)).catch(()=>null);return s&&s.exists()?s.data():null};
   const [info,lv,pg]=await Promise.all([get(["ls",ls]),get(["students",user.uid,"levels",ls]),get(["students",user.uid,"progress",ls])]);
-  const st=(info&&info.status)||"hidden",enabled=(info&&info.enabled)||[];
+  const st=(info&&info.status)==="public"?"open":(info&&info.status)||"hidden",enabled=(info&&info.enabled)||[];
   if(!seesAll&&st!=="open")return;
   const rs={};try{(await getDocs(collection(db,"students",user.uid,"results"))).forEach(d=>rs[d.data().activity||d.id.replace("__","/")]=d.data())}catch(e){}
   const ca=!seesAll&&lv&&lv.level==="insecure",lang=ca?"ca":"en",t=(c,e)=>ca?c:e;

@@ -13,7 +13,7 @@ service cloud.firestore {
     function isTeacher() { return request.auth != null && request.auth.token.email_verified == true && request.auth.token.email in ['roger.beltranps@gmail.com']; }
     // LS assigned to the student's group (the group of the student list): ls/{id}.groups, or every group when the field is missing
     function lsForMe(ls, uid) { return !('groups' in get(/databases/$(database)/documents/ls/$(ls)).data) || rosterGroup() in get(/databases/$(database)/documents/ls/$(ls)).data.groups; }
-    function lsOpen(ls) { return exists(/databases/$(database)/documents/ls/$(ls)) && get(/databases/$(database)/documents/ls/$(ls)).data.status == 'open'; }
+    function lsOpen(ls) { return exists(/databases/$(database)/documents/ls/$(ls)) && get(/databases/$(database)/documents/ls/$(ls)).data.status in ['open', 'public']; }   // 'public' was removed from the dashboard (26 Oct 2026); a stored one counts as open
 
     // LS release state: hidden | open | closed (written by the teacher only)
     match /ls/{id} {

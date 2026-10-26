@@ -13,7 +13,7 @@ const ROOT=new URL("../../",import.meta.url);
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let stopJoin=null,joinGen=0,myGroup=null,noSync=false,publicLs=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false;
+let stopJoin=null,joinGen=0,myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
@@ -38,7 +38,9 @@ const snapshot=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=lo
 const progressRef=()=>doc(db,"students",user.uid,"progress",lsId);
 const levelRef=(uid,ls)=>doc(db,"students",uid,"levels",ls);
 
-async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:s.data().status||"hidden",enabled:s.data().enabled||[],groups:s.data().groups||null}:{status:"hidden",enabled:[],groups:null}}catch(e){return {status:"hidden",enabled:[]}}}
+// "public" (free access, nothing saved) was removed when students got their own password (Roger, 26 Oct 2026): an LS still stored as public is open.
+const lsSt=s=>s==="public"?"open":s||"hidden";
+async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:lsSt(s.data().status),enabled:s.data().enabled||[],groups:s.data().groups||null}:{status:"hidden",enabled:[],groups:null}}catch(e){return {status:"hidden",enabled:[]}}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
 async function pull(){
@@ -57,7 +59,7 @@ function reloadIfStale(){
 }
 function resultPayload(a,extra){const sc=elPoints(a),parts=typeof window.EL_RESULT_PARTS==="function"?window.EL_RESULT_PARTS():null;return Object.assign({ls:lsId,activity:a.id,score:sc,max:a.points,done:sc,updated:serverTimestamp()},parts?{parts}:{},extra||{})}
 function push(){
-  if(!user||!isStudent(user)||syncing||frozen||!lsId||publicLs||noSync)return;
+  if(!user||!isStudent(user)||syncing||frozen||!lsId||noSync)return;
   clearTimeout(timer);
   timer=setTimeout(async()=>{
     try{
@@ -175,9 +177,6 @@ async function gate(u){
   }
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
-  if(st==="public"){publicLs=true;   // free access, no login, nothing is saved or scored
-    if(isStudent(u))banner("Free practice: this LS does not save your work, and it will not appear on your board. · Pràctica lliure: aquesta LS no desa la teva feina i no sortirà al teu tauler.","#2563eb");
-    return}
   if(isTeacher(u)){banner("Teacher mode · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){signInBlock();return}
   const tester=seesAll(u),vg=viewGroup(u);
@@ -214,7 +213,7 @@ async function gate(u){
       if(confirm(ca?"Activitat marcada com a feta. Vols entregar-la ara? (La nota quedarà fixada.)":"Activity marked as done. Do you want to submit it now? (Your result will be fixed.)"))await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});
       location.reload()}});
   }
-  // Work done in this browser while the LS was not saving it (Public, or before the route) reaches the cloud now, not only at the next change.
+  // Work left in this browser that the cloud does not have yet (for example done while the LS was still "public") reaches the cloud now.
   push();
 }
 
