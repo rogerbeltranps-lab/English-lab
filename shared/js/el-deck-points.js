@@ -316,7 +316,9 @@ async function joinLive(u){
   ($(".bottom .mid")||document.body).append(lv);
   if(!u||T.teacher){lv.innerHTML=T.teacher?"":`📺 ${B("Sign in with your school email and password to follow the class.","Entra amb el correu de l’institut i la contrasenya per seguir la classe.")}`;if(!u)lv.append(signInBtn());return}
   const fb=await cloud();if(!fb||gen!==liveGen)return;const {S,db}=fb,em=(u.email||"").toLowerCase();Q={S,ref:S.doc(db,"live",LIVE,"answers",em)};
-  if(bar.dataset.ls)S.getDoc(S.doc(db,"students",u.uid,"levels",bar.dataset.ls)).then(l=>{if(l.exists()&&(l.data().level==="insecure"||l.data().level==="beginners")&&window.ELDeck)ELDeck.setCa(true)}).catch(()=>{});   // Catalan for Insecure
+  // Catalan for Insecure and Beginners: the route of this LS, or the one carried over from an earlier LS (elRouteOf in el-catalog.js)
+  if(bar.dataset.ls)S.getDocs(S.collection(db,"students",u.uid,"levels")).then(qs=>{const m={},ls=bar.dataset.ls;qs.forEach(d=>m[d.id]=d.data());
+    const l=window.elRouteOf?elRouteOf(m,ls).level:(m[ls]||{}).level;if((l==="insecure"||l==="beginners")&&window.ELDeck)ELDeck.setCa(true)}).catch(()=>{});
   liveStop=S.onSnapshot(S.doc(db,"live",LIVE),s=>{lastLive=s.exists()?s.data():null;liveDraw()},e=>{console.warn("live",e);lv.innerHTML=`📺 ${B("You cannot follow this class.","No pots seguir aquesta classe.")}`});
   // the buzzer for my team, from points/{email} and teams/{group} as they change (a team given during the class counts too)
   try{const {buzzer}=await import(new URL("el-buzz.js",SRC).href);if(gen!==liveGen)return;let pt=null,tm=null,cur="";

@@ -9,10 +9,20 @@
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 // LS1 My Real Routine (Roger, 25 Oct 2026): done in class and redesigned for next year; only the exam and the final product count,
 // so its learning paths are graded:false (practice). Results already saved stay in Firestore.
-// Beginners (Roger, 26 Oct 2026): A1, below Insecure, Catalan with heavy scaffolding; only the teacher sets it (pick:false hides it from the student's choice and requests).
+// Beginners (Roger, 26 Oct 2026): A1, below Insecure, Catalan with heavy scaffolding; only the teacher sets it (pick:false). Since 26 Oct 2026 the teacher sets every route.
 window.EL_LEVELS=[{id:"beginners",name:"Beginners",pick:false,ca:"Començo des de zero: molt suport, passos curts i instruccions en català.",en:"I am starting from zero: a lot of support, short steps and instructions in Catalan."},{id:"insecure",name:"Insecure",ca:"Necessito molt suport i pautes (instruccions en català).",en:"I need a lot of support and guidance (instructions in Catalan)."},{id:"safe",name:"Safe",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès).",en:"I feel confident with a little support (instructions in English)."},{id:"daring",name:"Daring",ca:"Vull el repte: més autonomia i menys ajudes.",en:"I want the challenge: more independence and less help."}];
 // Class groups. The student picks one the first time they sign in; the teacher can change it in the dashboard.
 window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructions in Catalan
+// The student's route in an LS. Only the teacher sets routes (Roger, 26 Oct 2026: from the LS1 exam mark, on the dashboard). An LS with
+// no route of its own takes the latest route set in an earlier LS of the same course (EL_LS order), so a route carries over to every
+// later LS until the teacher changes it. lv = {lsId: {level}}. Returns {level, from}: from = the LS whose route it is (null: no route yet).
+window.elRouteOf=function(lv,ls){lv=lv||{};const L=window.EL_LS||[],me=L.find(x=>x.id===ls),own=(lv[ls]||{}).level;if(own)return {level:own,from:ls};
+  if(me)for(let i=L.indexOf(me)-1;i>=0;i--){const x=L[i];if(x.course===me.course&&(lv[x.id]||{}).level)return {level:lv[x.id].level,from:x.id}}
+  return {level:null,from:null}};
+// Route from the LS1 exam mark (out of 10), default cut-offs per course: under beginners → Beginners, under insecure → Insecure,
+// under safe → Safe, otherwise Daring. Roger can change them on the dashboard (settings/routes in Firestore overrides these).
+window.EL_ROUTE_CUTS={"2eso":{beginners:3,insecure:5,safe:7.5},"4eso":{beginners:3,insecure:5,safe:7.5}};
+window.elRouteFromMark=(m,c)=>m==null||isNaN(m)?null:m<c.beginners?"beginners":m<c.insecure?"insecure":m<c.safe?"safe":"daring";
 window.EL_GROUPS=[{id:"2ESOA",course:"2eso",name:"2ESO A"},{id:"2ESOB",course:"2eso",name:"2ESO B"},{id:"4ESOA",course:"4eso",name:"4ESO A"},{id:"4ESOB",course:"4eso",name:"4ESO B"}];
 // Is an LS assigned to a group? ls/{id}.groups lists the groups (set in the teacher dashboard); without it, every group of the LS's course.
 window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=>x.id===gid);if(!g||!ls)return false;return info&&Array.isArray(info.groups)?info.groups.includes(gid):g.course===ls.course};
