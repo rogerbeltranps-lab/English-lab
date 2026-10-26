@@ -45,11 +45,11 @@ const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),resKey=a=>a.replace("/","__");
-const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(),D:null,P:{},zero:true,term:elTerm(),wk:null,tips:(()=>{try{return localStorage.getItem("el_t_tips")!=="off"}catch(e){return true}})()};   // P: people on screen (see people()); zero: missing work counts 0 in the LS grade; term: of the team points
-const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved; graded activities only if you enable them."],closed:["Closed","Students can only review what they did and the feedback."]};
+const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(["lpopen"]),D:null,P:{},zero:true,term:elTerm(),wk:null,tips:(()=>{try{return localStorage.getItem("el_t_tips")!=="off"}catch(e){return true}})()};   // P: people on screen (see people()); zero: missing work counts 0 in the LS grade; term: of the team points
+const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved, in the learning paths you open for their group."],closed:["Closed","Students can only review what they did and the feedback."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 
-// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled}}, ro:{id:{email,group,surname1,surname2,first,tutor}},
+// ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled,groups,open}}, ro:{id:{email,group,surname1,surname2,first,tutor}},
 //               pt:{id:{team,t1,t2,t3}}, tm:{group:{list,score,best}}, tk:{group:{ticks:{"ls|session line":true}}} (the teacher's time plan checklist)}
 // pb = problem reports from students (problems/{id}: uid, email, name, group, ls, activity, route, page, title, section, kind, text, errors, device, created, fixed), sent with "⚠️ Problem" in the bottom bar.
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
@@ -91,6 +91,9 @@ const api={
   reject:(u,ls)=>{const l=S.D.lv[u][ls],to=l.request;if(DEMO){delete l.request;delete l.reason;l.declined=to;return}return put(["students",u,"levels",ls],{request:F.deleteField(),reason:F.deleteField(),declined:to,declinedAt:F.serverTimestamp()})},
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
   ls:(id,o)=>DEMO?Object.assign(S.D.ls[id],o):put(["ls",id],o),
+  // learning paths open for one group (ls/{id}.open[group]) and what firestore.rules check (locked, lockedKeys: elLpLocks in el-catalog.js)
+  lpOpen:(id,g,ids)=>{const L=elLpLocks(id,ids),o={open:{[g]:ids},locked:{[g]:L.locked},lockedKeys:{[g]:L.lockedKeys}};
+    if(DEMO){const i=S.D.ls[id]=S.D.ls[id]||{status:"hidden",enabled:[]};for(const f in o)i[f]=Object.assign({},i[f],o[f]);return}return put(["ls",id],o)},
   pbFix:(id,v)=>DEMO?S.D.pb.find(x=>x.id===id).fixed=v:put(["problems",id],{fixed:v}),
   pbDel:id=>{const x=S.D.pb.find(y=>y.id===id);if(DEMO){S.D.pb=S.D.pb.filter(y=>y!==x);return}
     const b=F.writeBatch(db());b.delete(F.doc(db(),"problems",id));if(x&&x.shot)b.delete(F.doc(db(),"problemShots",id));return b.commit()},
@@ -224,6 +227,16 @@ function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=(g.mom
 
 // ---- views
 // Why students' work may not reach this table (Roger, 26 Oct 2026: 4ESO A worked in an LS assigned only to 4ESO B, and nothing was saved).
+// Learning paths open per group (Roger, 26 Oct 2026: "so they don't do them before I ask"): every activity of the LS is Open or
+// Locked for the group on screen (ls/{id}.open[group]; elLpOpen in el-catalog.js). Students see a locked one as "not open yet" and save nothing in it.
+function lpBox(ls,grp){
+  const info=S.D.ls[ls]||{},list=acts(ls),set=Array.isArray((info.open||{})[grp.id]),n=list.filter(a=>elLpOpen(a,info,grp.id)).length;
+  const body=`<p class="muted">${grp.name} can only do the open ones. A locked learning path shows “not open yet” on the student's board and page, and nothing is saved in it. Open each recall checkpoint together with the learning path after it (a locked checkpoint does not block the next one). It works while the LS is Open.${set?"":` <b>Not set for ${grp.name} yet:</b> practice activities are open and graded ones only if they were enabled before; your first click saves the list for this group.`}</p>`
+    +`<table class="acts"><tr><th>Learning path</th><th>${grp.name}</th></tr>`+list.map(a=>{const on=elLpOpen(a,info,grp.id);
+      return `<tr><td>${esc(a.title)} ${a.criteria.map(pill).join("")}${a.checkpoint?' <small class="muted">(checkpoint)</small>':a.graded?"":' <small class="muted">(practice)</small>'}</td><td><button class="tog ${on?"yes":"no"}" data-do="lp" data-a="${a.id}">${on?"✔ Open":"🔒 Locked"}</button></td></tr>`}).join("")+`</table>`
+    +`<div class="bar"><button data-do="lpset" data-v="1">✔ Open all</button><button class="g" data-do="lpset" data-v="0">🔒 Lock all</button></div>`;
+  return `<div class="box">${fold("lpopen",`🔓 Learning paths open for ${grp.name} <small class="muted">· ${n} of ${list.length} open</small>`,body)}</div>`;
+}
 function lsWarn(ls,grp,assigned){
   const st=(S.D.ls[ls]||{}).status||"hidden",w=[];
   if(st==="hidden")w.push("This LS is <b>Hidden</b>: students cannot open it.");
@@ -252,6 +265,7 @@ function render(){
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
     +lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
+    +lpBox(ls,grp)
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`+pbBox()
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
@@ -262,7 +276,7 @@ function render(){
     +(G()&&G().only?"":`<div class="box">${G()&&G().evidence?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
       :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`)
     +pointsBox(S.g)
-    +`<div class="box">${fold("settings","LS status and graded activities",lsSettings(ls))}</div>`+rosterBox();
+    +`<div class="box">${fold("settings","LS status and groups",lsSettings(ls))}</div>`+rosterBox();
   const h=document.querySelector("thead tr");if(h)document.querySelector(".wrap").style.setProperty("--h1",h.offsetHeight+"px");
 }
 function todo(studs,ls,list){   // studs: signed-in students only. Only final product items and route requests; submissions without feedback are not listed (Roger, 2026-10-24)
@@ -307,7 +321,7 @@ function pointsBox(g){
 function progress(studs,list){
   const open=a=>!S.folded.has(a.id)&&steps(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
   let h1=`<tr><th class="stu"${rs}>Student</th><th${rs}>Route</th>`,h2="<tr>";
-  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${a.title}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${pts(a)}</small>`;
+  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${pts(a)}</small>`;
     if(open(a)){h1+=`<th class="lp first" colspan="${steps(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
       h2+=steps(a).map((k,i)=>`<th class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")+`<th class="sc">Score</th>`}
     else h1+=`<th class="lp first"${rs} data-do="fold" data-a="${a.id}">${head}</th>`});
@@ -382,13 +396,11 @@ function critPanel(c){redraw=null;
   dlg(`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterion(COURSE,c)||"No text yet for this course.")}</p><label>Learning paths linked to it</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>Activities that give evidence</label><p>${st.map(esc).join(" · ")||"–"}</p>`);
 }
 function lsSettings(id){
-  const info=S.D.ls[id]||{status:"hidden",enabled:[]},st=info.status,list=acts(id);
+  const info=S.D.ls[id]||{status:"hidden",enabled:[]},st=info.status;
   return `<div class="lscard"><span class="badge" style="background:${STCOL[st]}">Current status: ${LS_INFO[st][0].toUpperCase()}</span><p class="muted">${LS_INFO[st][1]}</p><div class="opts">`
     +["hidden","open","closed"].map(s=>`<button class="opt ${s===st?"sel":""}" data-do="status" data-s="${s}" style="${s===st?"border-color:"+STCOL[s]+";background:"+STCOL[s]+"1a":""}">${s===st?"✔":"○"} <b>${LS_INFO[s][0]}</b><small>${LS_INFO[s][1]}</small></button>`).join("")+`</div>`
     +`<h3>Groups that can use it</h3><div class="bar">${lsGroups(id).map(g=>{const on=elLsForGroup(EL_LS.find(l=>l.id===id),info,g.id);return `<button class="tog ${on?"yes":"no"}" data-do="assign" data-g="${g.id}">${on?"✔ ":"✖ "}${g.name}</button>`}).join("")}</div><p class="muted">Students only see, on their board, the LSs assigned to their group, and cannot open the others.</p>`
-    +`<h3>Graded activities ${st==="open"?"":'<small class="muted">(only take effect when the LS is Open)</small>'}</h3><table class="acts"><tr><th>Activity</th><th>Points</th><th>Can students do it?</th></tr>`
-    +list.filter(a=>a.graded).map(a=>{const on=info.enabled.includes(a.id);return `<tr><td>${a.title} ${a.criteria.map(pill).join("")}${a.mode==="once"?' <small class="muted">(once only)</small>':""}</td><td>${a.manual?"you mark it":a.points}</td><td><button class="tog ${on?"yes":"no"}" data-do="enable" data-a="${a.id}">${on?"✔ YES, enabled":"✖ NOT enabled"}</button></td></tr>`}).join("")+`</table>`
-    +`<p class="muted">Always available (not graded): ${list.filter(a=>!a.graded).map(a=>a.title).join(" · ")||"–"}</p></div><p class="muted">Each group sees the same LS status; it applies to the whole course.</p>`;
+    +`<p class="muted">Which learning paths each group can do: “🔓 Learning paths open for …” at the top of the group's tab.</p></div><p class="muted">Each group sees the same LS status; it applies to the whole course.</p>`;
 }
 function plan(p,grp){let t=0; // week-by-week calendar from shared/js/el-plan.js; with groups, the selected group's column; this week in green
   const gi=ELWeek.col(p,grp.id),now=ELWeek.row(p);
@@ -689,7 +701,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     ptdel:()=>{const list=(S.D.tm[S.g]||{}).list||[],x=list.find(y=>y.id===k.id),ms=ptStuds(S.g).filter(s=>ptOf(s).team===k.id);
       if(!x||!confirm(`Remove ${x.name}?`+(ms.length?` Its ${ms.length} student${ms.length===1?"":"s"} will have no team; their points stay.`:"")))return;
       quick([pt.list(S.g,list.filter(y=>y.id!==k.id)),...ms.map(s=>pt.team(pkey(s),""))])},
-    enable:()=>{const set=new Set(S.D.ls[S.ls].enabled);set.has(k.a)?set.delete(k.a):set.add(k.a);act(api.ls(S.ls,{enabled:[...set]}))}
+    lp:()=>{const info=S.D.ls[S.ls],open=new Set(acts(S.ls).filter(a=>elLpOpen(a,info,S.g)).map(a=>a.id));open.has(k.a)?open.delete(k.a):open.add(k.a);
+      act(api.lpOpen(S.ls,S.g,acts(S.ls).filter(a=>open.has(a.id)).map(a=>a.id)))},
+    lpset:()=>act(api.lpOpen(S.ls,S.g,k.v==="1"?acts(S.ls).map(a=>a.id):[]))
   })[k.do]?.()});
 $("#dlg").addEventListener("close",()=>redraw=null);
 document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);

@@ -14,6 +14,10 @@ service cloud.firestore {
     // LS assigned to the student's group (the group of the student list): ls/{id}.groups, or every group when the field is missing
     function lsForMe(ls, uid) { return !('groups' in get(/databases/$(database)/documents/ls/$(ls)).data) || rosterGroup() in get(/databases/$(database)/documents/ls/$(ls)).data.groups; }
     function lsOpen(ls) { return exists(/databases/$(database)/documents/ls/$(ls)) && get(/databases/$(database)/documents/ls/$(ls)).data.status in ['open', 'public']; }   // 'public' was removed from the dashboard (26 Oct 2026); a stored one counts as open
+    // learning paths the teacher has locked for the student's group (dashboard; elLpLocks in shared/js/el-catalog.js): ls/{id}.locked[group] = activity ids,
+    // ls/{id}.lockedKeys[group] = the progress keys they save. A group without the lists has nothing locked here.
+    function lockedFor(ls, field) { return get(/databases/$(database)/documents/ls/$(ls)).data.get(field, {}).get(rosterGroup(), []); }
+    function progressChanged() { return request.resource.data.get('data', {}).diff(resource == null ? {} : resource.data.get('data', {})).affectedKeys(); }
 
     // LS release state: hidden | open | closed (written by the teacher only)
     match /ls/{id} {
@@ -116,10 +120,11 @@ service cloud.firestore {
                   : request.resource.data.get('group', null) == rosterGroup()));
       allow write: if isTeacher();
 
-      // progress is writable only while that LS is open
+      // progress is writable only while that LS is open, and never in a learning path locked for the student's group
       match /progress/{ls} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
-        allow write: if signedIn() && request.auth.uid == uid && ((lsOpen(ls) && lsForMe(ls, uid)) || isTester());
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && ((lsOpen(ls) && lsForMe(ls, uid) && !progressChanged().hasAny(lockedFor(ls, 'lockedKeys'))) || isTester());
       }
       // route (level): the student picks it once; later changes are only a request (with an optional reason) the teacher accepts or declines.
       // The teacher can also set it directly at any time.
@@ -138,7 +143,8 @@ service cloud.firestore {
       match /results/{rid} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow create, update: if signedIn() && request.auth.uid == uid
-          && ((lsOpen(request.resource.data.ls) && lsForMe(request.resource.data.ls, uid)) || isTester())
+          && ((lsOpen(request.resource.data.ls) && lsForMe(request.resource.data.ls, uid)
+                && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'locked'))) || isTester())
           && (resource == null || resource.data.get('locked', false) == false)
           && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','markedDone','updated','parts','score','max']);
         allow write: if isTeacher();
