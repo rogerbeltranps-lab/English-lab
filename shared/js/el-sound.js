@@ -1,7 +1,7 @@
 // Sound effects (Roger, 25 Oct 2026) for the class presentations, the team points and the buzzer. Made with the Web Audio API,
 // so there are no sound files to load. ELSound.play(name) plays one; ELSound.on() says whether sound is on in this browser and
 // ELSound.set(on) switches it (kept as el_sound, so a mute lasts). Browsers play sound only after a tap or a key on the page,
-// so the first tap or key unlocks it. Used by the presentations (el-deck-points.js and the deck's own tools) and el-buzz.js.
+// so the first tap or key unlocks it. Used by the presentations (the deck's own tools).
 //   open  the buzzers open            first  a team buzzed first (buzzer + bell)   right  ✓ Right · +1     wrong  ✗ Wrong
 //   point a team gets +1 on the strip  press  a student presses the buzzer          win    my team was first
 //   tick  3 · 2 · 1                    go     Show!                                 pick   a random number   time  the timer ends

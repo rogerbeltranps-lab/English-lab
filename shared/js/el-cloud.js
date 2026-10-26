@@ -1,5 +1,5 @@
 // English Lab cloud: sign-in (students: school email + password; teacher: Google; el-signin.js), per-LS progress sync, LS release gate,
-// route (set by the teacher), teacher-enabled graded activities, once-only activities, points per completed action.
+// route (set by the teacher), learning paths the teacher opens per group, once-only activities, points per completed action.
 import "./el-copyright.js";
 import "./el-route-names.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -15,7 +15,7 @@ const ROOT=new URL("../../",import.meta.url);
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let stopJoin=null,joinGen=0,myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false;
+let stopJoin=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
@@ -36,12 +36,13 @@ const lsId=m?m[1]+"-"+m[3]:null;
 let actId=m?m[1]+"/"+relPath.split("/").pop().replace(".html",""):null;
 const resKey=a=>a.replace("/","__");
 
-const snapshot=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))o[k]=localStorage.getItem(k)}return o};
+// Keys of learning paths locked for the student's group are never sent (firestore.rules refuses them; the cloud copy stays as it is).
+const snapshot=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k)&&!lockedKeys.includes(k))o[k]=localStorage.getItem(k)}return o};
 const progressRef=()=>doc(db,"students",user.uid,"progress",lsId);
 
 // "public" (free access, nothing saved) was removed when students got their own password (Roger, 26 Oct 2026): an LS still stored as public is open.
 const lsSt=s=>s==="public"?"open":s||"hidden";
-async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:lsSt(s.data().status),enabled:s.data().enabled||[],groups:s.data().groups||null}:{status:"hidden",enabled:[],groups:null}}catch(e){return {status:"hidden",enabled:[]}}}
+async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:lsSt(s.data().status),enabled:s.data().enabled||[],groups:s.data().groups||null,open:s.data().open||{}}:{status:"hidden",enabled:[],groups:null,open:{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
 async function pull(){
@@ -164,6 +165,7 @@ async function gate(u){
   }
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
+  if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
   if(isTeacher(u)){banner("Teacher mode · LS "+lsId+": "+st,"#475569");return}
   if(!u||!isStudent(u)){signInBlock();return}
   const tester=seesAll(u),vg=viewGroup(u);
@@ -182,10 +184,11 @@ async function gate(u){
   if(lvl||tester)applyLevel(lvl,tester);
   if(st==="closed"){freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
   // Students are never told which activities are assessed (Roger, 26 Oct 2026), so this message does not say it either.
-  if(a&&a.graded&&!tester&&!info.enabled.includes(actId)){block("Aquesta activitat encara no està oberta","El professor t'avisarà a classe quan toqui fer-la.");return}
   const ca=elCa(lvl);
+  // Learning paths open per group (elLpOpen in el-catalog.js): a locked one shows a block and saves nothing.
+  if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.");return}
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
-  const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>info.enabled.includes(x.id));
+  const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));
   if(cp){const o=overlay('<div style="max-width:520px"><h1></h1><p></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:10px 18px;text-decoration:none;font-weight:700"></a></p>'+todayLink+'</div>');
     o.querySelector("h1").textContent=ca?"Primer fes el "+cp.title:"First do "+cp.title;
     o.querySelector("p").textContent=ca?"Per continuar, primer has d'acabar el "+cp.title+". Fes-lo sense apunts.":"To go on, first finish "+cp.title+". Do it without notes.";
