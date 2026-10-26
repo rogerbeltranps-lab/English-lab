@@ -182,10 +182,12 @@ function onTime(u,id,step,g){const due=dueOf(id,g);if(!due)return undefined;cons
 const avg=vs=>{vs=vs.map(v=>v==null?(S.zero?0:null):v).filter(v=>v!=null);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null};
 const wavg=ps=>{let s=0,w=0;ps.forEach(([v,x])=>{if(v==null){if(!S.zero)return;v=0}s+=v*x;w+=x});return w?s/w:null};
 const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).title||id)+" · "+k;
-function gvBlock(u,g){const v=G().gv,acc=v.items.map(([id,k])=>pct(firstOf(u,id,k))),used=[];let A=avg(acc);
-  v.optional.forEach(([id,k])=>{const x=pct(firstOf(u,id,k));if(x==null)return;const B=avg([...acc,x]);if(A==null||B>A){acc.push(x);A=B;used.push(id)}});   // only if it raises the mark
-  const T=avg(v.items.map(([id,k])=>onTime(u,id,k,g)).filter(x=>x!==undefined).map(x=>x==null?x:x*10));
-  return {mark:wavg([[A,v.first],[T,v.onTime]]),acc:A,onTime:T,used}}
+// Grammar and vocabulary: weighted parts (EL_GRADING[ls].gv.parts). first: the average first-try score of those steps (checkpoints, recall
+// warm-ups: delayed retrieval); time: the share of those steps done by their session deadline (teaching plan), out of 10.
+function gvBlock(u,g){const parts=G().gv.parts.map(p=>({...p,v:p.first?avg(p.first.map(([id,k])=>pct(firstOf(u,id,k))))
+    :avg(p.time.map(([id,k])=>onTime(u,id,k,g)).filter(x=>x!==undefined).map(x=>x==null?x:x*10))}));
+  return {mark:wavg(parts.map(p=>[p.v,p.w])),parts}}
+const gvSum=B=>(B.gv.parts||[]).map(p=>p.name+" "+f1(p.v)+" × "+p.w+" %").join(" + ");
 function otherCrit(u,c){const g=G();
   const auto=avg((g.auto[c]||[]).map(([id,k,first])=>first?pct(firstOf(u,id,k)):doneAt(u,id,k)?10:null));
   const teacher=avg((g.teacher[c]||[]).map(([id,k])=>lvMark(lvOf(u,id,k,c))));
@@ -339,13 +341,13 @@ function gradeBox(studs){
     if(s.away)return `<tr class="away">${who}<td>${route()}</td><td colspan="${g.blocks.length+(tm?2:1)}" style="text-align:left">Not signed in yet</td></tr>`;
     const {B,total}=grade(s),o=(g.other||[]).map(c=>{const x=otherCrit(s.uid,c);return c+": "+f1(x.mark)+" (auto "+f1(x.auto)+" · levels "+f1(x.teacher)+")"}).join("\n");
     const tip={exam:"Exam sections, score out of max (click to enter)",fp:g.fp.mark?"Your mark in the final product dialog":g.fp.rows.map(r=>r.name+" "+r.w+" %: "+(lvOf(s.uid,fpA,r.step,r.c)||"–")).join("\n"),
-      gv:g.gv?`First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %`:"",other:o};
+      gv:g.gv?gvSum(B):"",other:o};
     const val={exam:B.exam,fp:B.fp,gv:B.gv.mark,other:B.other};
     return `<tr>${who}${rtCell(s.uid)}${tm?`<td><small>${esc(teamOf(s.uid,fpA))||"–"}</small></td>`:""}`
       +g.blocks.map(b=>`<td class="gr" data-do="grade" data-u="${s.uid}" title="${esc(tip[b.id])}">${f1(val[b.id])}</td>`).join("")
       +`<td class="first gr tot" data-do="grade" data-u="${s.uid}">${f1(total)} ${deg(elDegree(total))}</td></tr>`}).join("");
   const key=g.only?`<p class="muted">Marks out of 10. Only the final exam and the final product count in this LS (Roger, 25 Oct 2026): its learning paths are practice. Exam: sum of section scores ÷ sum of maxes; enter it below or by clicking a mark. Final product: the mark you give in its dialog (click a student's mark here, then "Open the final product").</p>`
-    :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: first-try accuracy of vocabulary practice, grammar, mixed practice, register, recall warm-ups and checkpoints (optional ones only if they raise it) ${g.gv.first} % + done by its session deadline (teaching plan) ${g.gv.onTime} %. Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
+    :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: ${g.gv.parts.map(p=>p.name.toLowerCase()+" "+p.w+" %").join(" + ")} (accuracy only from delayed retrieval; practice, grammar and mixed practice count as done by the session deadline in the teaching plan). Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
   return `<div class="box"><h2>LS grade</h2><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1" title="As in the grading plan: missing work counts 0 until it is handed in">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0" title="Mark so far: only what is done or assessed counts">not counted yet</button></div>`
     +fold("gradekey","How it is worked out",key,"key")
     +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`:"")
@@ -524,14 +526,14 @@ function again(){const d=$("#dlg"),c=$("#dlgc");if(!d.open||!redraw)return;const
 function gradePanel(u){redraw=()=>gradePanel(u);
   const s=S.P[u],g=G(),{B,total}=grade(s),id=asId(S.ls),x=res(u,id),sc=x.sections||{},e=g.exam,fpA=g.fp.a;
   const row=(l,v,extra)=>`<tr><td style="text-align:left">${l}</td><td>${v}</td><td style="text-align:left"><small class="muted">${extra||""}</small></td></tr>`;
-  const gvRows=!g.gv?"":[...g.gv.items.map(i=>[...i,0]),...g.gv.optional.map(i=>[...i,1])].map(([a,k,opt])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
-    return row(stepName(a,k)+(opt?' <small class="muted">(optional'+(B.gv.used.includes(a)?", counts":"")+")</small>":""),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===0?" late":""):""))}).join("");
+  const gvRows=!g.gv?"":g.gv.parts.map(p=>`<tr><th colspan="3" style="text-align:left">${esc(p.name)} · ${p.w} % · <b>${f1((B.gv.parts.find(x=>x.id===p.id)||{}).v)}</b></th></tr>`+(p.first||p.time).map(([a,k])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
+    return row(stepName(a,k),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===0?" late":""):""))}).join("")).join("");
   const blk=(id,title,mark,body)=>`<details data-k="gp-${id}" ${S.open.has("gp-"+id)?"open":""}><summary style="font-size:1rem">${title} · <b>${f1(mark)}</b></summary>${body}</details>`;
   dlg(`<h3>${name(s)} · LS grade</h3><p class="muted">${route(level(u,S.ls))}${hasTeams()?" · Group: "+(esc(teamOf(u,fpA))||"–"):""} · Missing work ${S.zero?"counts 0":"not counted yet"}</p>`
     +`<p><b>LS mark: ${f1(total)} ${deg(elDegree(total))}</b> <small class="muted">${g.blocks.map(b=>b.name+" "+b.w+" %").join(" · ")}</small></p>`
     +blk("exam",`Final exam (${g.blocks.find(b=>b.id==="exam").w} %)`,B.exam,`<table class="lvt"><tbody>${e.sections.map(([k,n])=>`<tr><td>${n}</td><td><input class="ex" data-ex="${u}" data-k="${k}" data-f="score" type="number" step="0.25" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${u}" data-k="${k}" data-f="max" type="number" value="${sc[k]&&sc[k].max!=null?sc[k].max:secMax(e,k)}"></td></tr>`).join("")}${e.level?`<tr><td>Writing level ${pill(e.level.c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td></tr>`:""}</tbody></table><div class="row" style="justify-content:flex-start;margin-top:4px"><button data-do="examsave1">Save exam marks</button></div>`)
     +blk("fp",`Final product (${g.blocks.find(b=>b.id==="fp").w} %)`,B.fp,g.fp.mark?`<p class="muted">Your mark: ${res(u,fpA).max?res(u,fpA).score+"/"+res(u,fpA).max:"not given yet"}. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open the final product</a> to mark it.</p>`:`<table><tbody>${g.fp.rows.map(r=>row(esc(r.name)+" "+cpill(r.c),deg(lvOf(u,fpA,r.step,r.c)),r.w+" %")).join("")}</tbody></table><p class="muted">Give these levels in the final product dialog. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open it</a></p>`)
-    +(!g.gv?"":blk("gv",`Grammar and vocabulary (${g.blocks.find(b=>b.id==="gv").w} %)`,B.gv.mark,`<p class="muted">First try ${f1(B.gv.acc)} × ${g.gv.first} % + on time ${f1(B.gv.onTime)} × ${g.gv.onTime} %</p><table><thead><tr><th style="text-align:left">Step</th><th>First try</th><th style="text-align:left">Done</th></tr></thead><tbody>${gvRows}</tbody></table>`))
+    +(!g.gv?"":blk("gv",`Grammar and vocabulary (${g.blocks.find(b=>b.id==="gv").w} %)`,B.gv.mark,`<p class="muted">${gvSum(B)}</p><table><thead><tr><th style="text-align:left">Step</th><th>First try</th><th style="text-align:left">Done</th></tr></thead><tbody>${gvRows}</tbody></table>`))
     +(!g.other?"":blk("other",`Other competences (${g.blocks.find(b=>b.id==="other").w} %)`,B.other,`<table><thead><tr><th>Criterion</th><th>Steps (auto)</th><th>Levels</th><th>Mark</th></tr></thead><tbody>${g.other.map(c=>{const o=otherCrit(u,c);
       const at=(g.auto[c]||[]).map(([a,k,f])=>stepName(a,k)+": "+(f?(firstOf(u,a,k)?"first try "+firstOf(u,a,k).score+"/"+firstOf(u,a,k).max:"–"):doneAt(u,a,k)?"done":"not done")).join("\n"),
         tt=(g.teacher[c]||[]).map(([a,k])=>stepName(a,k)+": "+(lvOf(u,a,k,c)||"–")).join("\n");

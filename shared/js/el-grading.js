@@ -45,11 +45,13 @@ window.EL_GRADING={
       marking:{rubric:"4eso/seasons-and-celebrations/final-rubric-data.js",process:["prep","source","contribution","part","email","team"],afterDue:["team"],
         rounds:{1:{name:"Round 1 · Research and plan",note:"Research card and steps 0–2: My source and My research card, per student",answers:[[LP4,"card"],[FP,"prep"],[FP,"source"],[FP,"contribution"]]},
           2:{name:"Round 2 · Video, email and teamwork",note:"Steps 3–5 with the full email, teamwork received and the process, and a video sheet per group",answers:[[FP,"part"],[FP,"email",{rate:true}],[FP,"team"]],peers:"team",process:true}}},
-      // 60 % first-try accuracy + 40 % done by the session deadline (EL_PLAN[ls].due). optional: counted only if it raises the accuracy.
-      gv:{first:60,onTime:40,
-        items:[[LP2,"recall"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"recall"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"recall"],
-          [LP5,"recall"],[LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"recall"],[LP6,"practice"],[LP6,"grammar"],[LP6,"register"],[CP(1),"check"],[CP(4),"check"]],
-        optional:[[CP(2),"check"],[CP(3),"check"]]},
+      // Accuracy only from delayed retrieval (research audit, Roger 26 Oct 2026): first try of the four checkpoints and of the recall warm-ups
+      // (they ask about earlier Learning Paths). Practice, grammar and mixed practice count only as done by the session deadline (EL_PLAN[ls].due).
+      gv:{parts:[
+        {id:"cp",name:"Recall checkpoints (first try)",w:50,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
+        {id:"warm",name:"Recall warm-ups (first try)",w:25,first:[[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
+        {id:"time",name:"Practice done on time",w:25,time:[[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],
+          [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"],[LP6,"register"]]}]},
       // Other competences: per criterion, half automatic (linked steps done; first:true = counts its first-try score) and half teacher levels (average).
       auto:{
         "1.1":[[LP2,"speak"]],
@@ -117,10 +119,11 @@ window.EL_GRADING={
       marking:{rubric:"2eso/free-time-live/final-rubric-data.js",process:["prep","source","slides","script","edit","tips"],afterDue:["tips"],
         rounds:{1:{name:"Round 1 · Source and fact file",note:"Fact file and steps 0–2: My source and My fact file, per student",answers:[[LP4,"factfile"],[FP,"prep"],[FP,"source"],[FP,"slides"]]},
           2:{name:"Round 2 · Vlog, script, editing and tip",note:"Steps 3–5 with the full script, the editing log and the tip, plus the process; the video is watched on Classroom",answers:[[FP,"script",{rate:true}],[FP,"edit",{rate:true}],[FP,"tips"]],process:true}}},
-      gv:{first:60,onTime:40,
-        items:[[LP2,"recall"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"recall"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"recall"],[LP4,"practice"],
-          [LP5,"recall"],[LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"recall"],[LP6,"practice"],[LP6,"grammar"],[CP(1),"check"],[CP(4),"check"]],
-        optional:[[CP(2),"check"],[CP(3),"check"]]},
+      gv:{parts:[
+        {id:"cp",name:"Recall checkpoints (first try)",w:50,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
+        {id:"warm",name:"Recall warm-ups (first try)",w:25,first:[[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
+        {id:"time",name:"Practice done on time",w:25,time:[[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"practice"],
+          [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"]]}]},
       auto:{
         "6.2":[[LP4,"credit",1],[LP4,"factfile"]],
         "CD2 2.2":[[FP,"slides"],[FP,"edit"]],
