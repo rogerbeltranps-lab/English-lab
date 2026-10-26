@@ -122,9 +122,21 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
 // locked[group] (activity ids, for results) and lockedKeys[group] (their saved keys, for progress; key + "Level" is the route the page keeps).
 window.elLpOpen=function(a,info,gid){const o=info&&info.open&&info.open[gid];return Array.isArray(o)?o.includes(a.id):!a.graded||((info&&info.enabled)||[]).includes(a.id)};
 // Sections inside a learning path (Roger, 26 Oct 2026: "even in the learning path, I want to open these sections as I teach"): the section
-// tabs the teacher has locked for a group, ls/{id}.secLocked[group][activity id with "/" as "__"] = panel ids (EL_SECTIONS in el-sections.js).
-// None listed = every section open. The page hides them (el-cloud.js lockSections); the saved state is one JSON per page, so the rules cannot check them.
-window.elSecLocked=function(a,info,gid){const g=info&&info.secLocked&&info.secLocked[gid];return (g&&g[a.id.replace("/","__")])||[]};
+// tabs the teacher has locked for a group, ls/{id}.secLocked[group][activity id with "/" as "__"] = panel ids (EL_SECTIONS in el-sections.js),
+// and the ones opened at some point, ls/{id}.secOpened[group][same key]. None locked = every section open. A locked section is read-only
+// on the page (el-cloud.js lockSections): students see it with their saved answers. The saved state is one JSON per page, so the rules cannot check them.
+const secKey=a=>a.id.replace("/","__"),secOf=(info,f,gid,a)=>{const g=info&&info[f]&&info[f][gid];return g&&g[secKey(a)]};
+window.elSecLocked=function(a,info,gid){return secOf(info,"secLocked",gid,a)||[]};
+// Steps a section holds (EL_ACTIONS keys): its panel id, or the cards and practice steps for a vocabulary section; none for info panels.
+window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
+const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
+// Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
+// again stays open for a student who has not finished it; it is read-only for everyone else. done = Set of the student's done steps.
+window.elSecLockedFor=function(a,info,gid,done){const op=secOf(info,"secOpened",gid,a)||[];return elSecLocked(a,info,gid).filter(id=>!(op.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done)))};
+// Sections still to finish (the to-do list): only in a learning path where the teacher uses the section switches, a section that is open
+// or was opened before, holds steps and has some not done. Returns [[panel id, name]].
+window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk))return [];const op=secOf(info,"secOpened",gid,a)||[];
+  return ((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>(!lk.includes(id)||op.includes(id))&&elSecSteps(a,id).length&&!secDone(a,id,done))};
 window.elLpLocks=function(ls,open){const shut=(window.EL_CATALOG||[]).filter(a=>a.ls===ls&&!open.includes(a.id));
   return {locked:shut.map(a=>a.id),lockedKeys:shut.flatMap(a=>a.keys.flatMap(k=>[k,k+"Level"]))}};
 // Recall checkpoints open the way (Roger, 26 Oct 2026): an activity that comes after a checkpoint in its LS (catalogue order = LS page

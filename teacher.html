@@ -100,9 +100,12 @@ const api={
   // learning paths open for one group (ls/{id}.open[group]) and what firestore.rules check (locked, lockedKeys: elLpLocks in el-catalog.js)
   lpOpen:(id,g,ids)=>{const L=elLpLocks(id,ids),o={open:{[g]:ids},locked:{[g]:L.locked},lockedKeys:{[g]:L.lockedKeys}};
     if(DEMO){const i=S.D.ls[id]=S.D.ls[id]||{status:"hidden",enabled:[]};for(const f in o)i[f]=Object.assign({},i[f],o[f]);return}return put(["ls",id],o)},
-  // sections of one learning path locked for one group: ls/{id}.secLocked[group][activity] (elSecLocked in el-catalog.js)
-  secLock:(id,g,aid,ids)=>{const k=resKey(aid);if(DEMO){const i=S.D.ls[id]=S.D.ls[id]||{status:"hidden",enabled:[]},m=(i.secLocked=Object.assign({},i.secLocked));m[g]=Object.assign({},m[g],{[k]:ids});return}
-    return put(["ls",id],{secLocked:{[g]:{[k]:ids}}})},
+  // sections of one learning path locked for one group: ls/{id}.secLocked[group][activity], and every section opened so far for it,
+  // secOpened[group][activity] (an opened section stays on the to-do of students who have not finished it: elSecLockedFor, elSecPending)
+  secLock:(id,g,aid,ids)=>{const k=resKey(aid),i=S.D.ls[id]=S.D.ls[id]||{status:"hidden",enabled:[]},a=byId(aid);
+    const op=[...new Set([...(((i.secOpened||{})[g]||{})[k]||[]),...(EL_SECTIONS[aid]||[]).map(x=>x[0]).filter(x=>!ids.includes(x))])];
+    if(DEMO){for(const [f,v] of [["secLocked",ids],["secOpened",op]]){const m=(i[f]=Object.assign({},i[f]));m[g]=Object.assign({},m[g],{[k]:v})}return}
+    return put(["ls",id],{secLocked:{[g]:{[k]:ids}},secOpened:{[g]:{[k]:op}}})},
   pbFix:(id,v)=>DEMO?S.D.pb.find(x=>x.id===id).fixed=v:put(["problems",id],{fixed:v}),
   pbDel:id=>{const x=S.D.pb.find(y=>y.id===id);if(DEMO){S.D.pb=S.D.pb.filter(y=>y!==x);return}
     const b=F.writeBatch(db());b.delete(F.doc(db(),"problems",id));if(x&&x.shot)b.delete(F.doc(db(),"problemShots",id));return b.commit()},
@@ -243,9 +246,10 @@ function levelRows(u,a){const g=G();if(!g||a.ls!==S.ls)return "";const ms=(g.mom
 // Locked for the group on screen (ls/{id}.open[group]; elLpOpen in el-catalog.js). Students see a locked one as "not open yet" and save nothing in it.
 function lpBox(ls,grp){
   const info=S.D.ls[ls]||{},list=acts(ls),set=Array.isArray((info.open||{})[grp.id]),n=list.filter(a=>elLpOpen(a,info,grp.id)).length;
-  const body=`<p class="muted">${grp.name} can only do the open ones. A locked learning path shows “not open yet” on the student's board and page, and nothing is saved in it. Open each recall checkpoint together with the learning path after it (a locked checkpoint does not block the next one). Under “Sections” you can also open the tabs inside a learning path one by one as you teach: a locked section shows 🔒 on its tab and its activities stay hidden. It works while the LS is Open.${set?"":` <b>Not set for ${grp.name} yet:</b> practice activities are open and graded ones only if they were enabled before; your first click saves the list for this group.`}</p>`
+  const body=`<p class="muted">${grp.name} can only do the open ones. A locked learning path shows “not open yet” on the student's board and page, and nothing is saved in it. Open each recall checkpoint together with the learning path after it (a locked checkpoint does not block the next one). Under “Sections” you can also open the tabs inside a learning path one by one as you teach: students see a locked section read-only, with their saved answers. A section you have opened stays on the to-do list of every student who has not finished it, and they can still do it after you lock it again. It works while the LS is Open.${set?"":` <b>Not set for ${grp.name} yet:</b> practice activities are open and graded ones only if they were enabled before; your first click saves the list for this group.`}</p>`
     +`<table class="acts"><tr><th>Learning path</th><th>Sections</th><th>${grp.name}</th></tr>`+list.map(a=>{const on=elLpOpen(a,info,grp.id),secs=(window.EL_SECTIONS||{})[a.id]||[],off=elSecLocked(a,info,grp.id);
-      const sec=secs.length?secs.map(([id,t])=>`<button class="sec ${off.includes(id)?"off":""}" data-do="sec" data-a="${a.id}" data-p="${id}" title="${off.includes(id)?"Locked: click to open it":"Open: click to lock it"}">${off.includes(id)?"🔒":"✔"} ${esc(t)}</button>`).join("")
+      const was=((((info.secOpened||{})[grp.id])||{})[a.id.replace("/","__")])||[];
+      const sec=secs.length?secs.map(([id,t])=>`<button class="sec ${off.includes(id)?"off":""}" data-do="sec" data-a="${a.id}" data-p="${id}" title="${off.includes(id)?(was.includes(id)&&elSecSteps(a,id).length?"Locked (opened before): read-only for students who finished it; students who have not finished it can still do it. Click to open it":"Locked: students see it read-only. Click to open it"):"Open: click to lock it"}">${off.includes(id)?"🔒":"✔"} ${esc(t)}</button>`).join("")
         +` <button class="secall" data-do="secset" data-a="${a.id}" data-v="1">open all</button><button class="secall" data-do="secset" data-a="${a.id}" data-v="0">lock all</button>`:'<small class="muted">–</small>';
       return `<tr><td>${esc(a.title)} ${a.criteria.map(pill).join("")}${a.checkpoint?' <small class="muted">(checkpoint)</small>':a.graded?"":' <small class="muted">(practice)</small>'}</td><td style="text-align:left">${sec}</td><td><button class="tog ${on?"yes":"no"}" data-do="lp" data-a="${a.id}">${on?"✔ Open":"🔒 Locked"}</button></td></tr>`}).join("")+`</table>`
     +`<div class="bar"><button data-do="lpset" data-v="1">✔ Open all</button><button class="g" data-do="lpset" data-v="0">🔒 Lock all</button></div>`;
