@@ -20,6 +20,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isTeacher();
     }
+    // The teacher's own checklist of the time plan (ticked sessions per group): only the teacher
+    match /teacherPlan/{group} {
+      allow read, write: if isTeacher();
+    }
     match /assignments/{day} {
       allow read: if signedIn() || isTeacher();
       allow write: if isTeacher();
