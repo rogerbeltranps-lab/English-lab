@@ -14,7 +14,7 @@ Everything Roger needs to teach and assess each course, in one place. Pick the c
 | Practice exam | the LS site folder, `sample-exam.html` |
 | Real exams and answer keys | **Google Drive > Feina > Teacher Studio**, in each LS's `Exam` folder, not in this repo (the repo is public, so students could read them) |
 
-Site links below open the live site (sign in as teacher). Doc links open the file here on GitHub. Roger's private Drive copy (Word programmes, exams, keys, audios, LS listenings, assessment docs and rubrics, Google Forms scripts, competences, levels, the Lexora word list) is in **Teacher Studio**, sorted the same way: [00 Start here](https://docs.google.com/document/d/1nJ9d1Geg6jy3j9oI0Ns2N0dZ7EkpTBwiapL6ENl7JdY/edit) links every folder.
+Site links below open the live site (sign in as teacher). Doc links open the file here on GitHub. Roger's private Drive copy (Word programmes, exams, keys, audios, LS listenings, assessment docs and rubrics, Google Forms scripts, competences, levels, the Lexora word list) is in **Teacher Studio**, sorted the same way: [00 Start here](https://docs.google.com/document/d/1MpFihiaZ6fxDEVAncAWsZ6RxfwqC4l2D9rZtBVwihsA/edit) links every folder.
 
 ## 4 ESO
 
