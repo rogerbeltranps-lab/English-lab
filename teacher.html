@@ -319,8 +319,8 @@ function qaTab(){
   if(S.qa.g!=="all"&&!groups.some(g=>g.id===S.qa.g))S.qa.g="all";
   if(!B){ELItems.bank(ls.id,acts(ls.id)).then(b=>{QA[ls.id]=b;if(S.g==="qa")render()});return `<div class="box"><h2>🔎 Question analysis</h2><p class="muted">Loading the questions…</p></div>`}
   const studs=Object.values(S.P).filter(s=>!s.away&&!s.tester&&groups.some(g=>g.id===s.group)&&(S.qa.g==="all"||s.group===S.qa.g)).map(s=>({uid:s.uid,group:s.group,name:fullName(s)}));
-  const qs=ELItems.collect(B,studs,pstate,u=>level(u,ls.id));
-  return ELItems.view({ls:ls.id,lss,groups,gsel:S.qa.g,f:S.qa.f,LV,B,qs,studs,rec:ELItems.routesOf(B,studs,pstate)});
+  const all=acts(ls.id),qs=ELItems.collect(B,studs,pstate,u=>level(u,ls.id),all,a=>((window.EL_SECTIONS||{})[a.id]||[]).filter(([k])=>steps(a).includes(k)));
+  return ELItems.view({ls:ls.id,lss,groups,gsel:S.qa.g,f:S.qa.f,LV,B,qs,studs,rec:ELItems.routesOf(all,studs,pstate)});
 }
 // ---- routes from the LS1 exam (Roger, 26 Oct 2026): the teacher sets every route; students no longer choose or ask for one.
 // The course's first LS with an exam in EL_GRADING is the source: its exam mark (sum of scores ÷ sum of maxes × 10, as on the LS
