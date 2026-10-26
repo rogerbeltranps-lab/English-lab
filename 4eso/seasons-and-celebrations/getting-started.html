@@ -191,9 +191,9 @@ const recall=[
  {r:"insecure",q:"Write the sentence with <em>always</em>: I am late.",a:["i am always late","i'm always late"],ca:"Els adverbis de freqüència van després del verb be."},
  {r:"insecure",q:"I'm tired. I'm going to turn ___ early tonight.",a:["in"],ca:"turn in = anar a dormir."},
  {r:"insecure",q:"We ___ (not / have) breakfast at school.",a:["don't have","do not have"],ca:"Negativa amb we: don't + verb."},
- {r:"beginners",q:"First, I get up. ___, I have a shower.",a:["then","after that"],ca:"Seqüència: First, Then / After that, Finally."},
+ {r:"beginners",q:"First, I get up. ___, I have a shower.",a:["then","after that","next"],ca:"Seqüència: First, Then / After that / Next, Finally."},
  {r:"safe",q:"I pick up my sister. → I pick ___ ___.",a:["her up"],en:"With a pronoun, it goes between the verb and the particle: pick her up."},
- {r:"safe",q:"I've got homework. I need to get down ___ ___.",a:["to it"],en:"get down to is a fixed three-part expression: get down to it."},
+ {r:"safe",q:"I've got homework. I need to get down ___ ___.",a:["to it","to work","to business"],en:"get down to is a three-part phrasal verb: get down to it (it = homework) or get down to work."},
  {r:"daring",q:"<em>make</em> or <em>do</em>? ___ an effort",a:["make"],en:"make an effort (MAKE group)."},
  {r:"daring",q:"After ___ (whip) up dinner, I get down to work.",a:["whipping"],en:"After + verb-ing."}
 ];
@@ -207,16 +207,16 @@ const vocab=[
 const practice=[
  {r:"beginners",q:"In autumn the days get ___.",a:["shorter"]},
  {r:"insecure",q:"Leaves ___ from the trees in November.",a:["fall"]},
- {r:"beginners",q:"It's ___ today. Take an umbrella.",a:["rainy"]},
- {r:"beginners",q:"At the Castanyada we roast ___.",a:["chestnuts"]},
+ {r:"beginners",q:"It's ___ today. Take an umbrella.",a:["rainy","raining"]},
+ {r:"beginners",q:"At the Castanyada we roast ___.",a:["chestnuts","sweet potatoes"]},
  {r:"beginners",q:"At Halloween people carve ___.",a:["pumpkins"]},
  {r:"insecure",q:"It isn't hot or cold. It's ___.",a:["mild"]},
  {r:"insecure",q:"I can't see the road. It's very ___.",a:["foggy"]},
  {r:"insecure",q:"Farmers collect the crops at ___ time.",a:["harvest"]},
- {r:"insecure",q:"I feel ___ the night before a big party.",a:["excited"]},
+ {r:"insecure",q:"I feel ___ the night before a big party.",a:["excited","happy","nervous"]},
  {r:"beginners",q:"___ (UK) / fall (US) is my favourite season.",a:["autumn"]},
  {r:"safe",q:"The clocks go ___ in late October.",a:["back"]},
- {r:"safe",q:"In winter it gets dark ___.",a:["early"]},
+ {r:"safe",q:"In winter it gets dark ___.",a:["early","earlier"]},
  {r:"safe",q:"It's ___ outside. Wear a jumper.",a:["chilly","cold","cool"]},
  {r:"safe",q:"On a cold night, our living room feels warm and ___.",a:["cosy","cozy"]},
  {r:"safe",q:"We go to the farm to ___ fruit.",a:["pick"]}
@@ -338,9 +338,13 @@ const ca=()=>level==="insecure"||level==="beginners";
 const need=n=>Math.ceil(n*0.8);
 // Answers and feedback stay (Roger, 26 Oct 2026): a checked step keeps its answers (state.ans[step] = {l: route, v: answers}) and shows
 // its feedback again on every visit, without counting another try, until the student presses "Do it again" next to Check.
-function keepAns(k,v){state.ans=state.ans||{};state.ans[k]={l:level,v};save()}
+// Answers not checked yet stay too (state.typing[step], saved as the student types or chooses): a student typed the recall,
+// opened the Autumn words presentation and came back to an empty page (problem report, 26 Oct 2026).
+function keepAns(k,v){state.ans=state.ans||{};state.ans[k]={l:level,v};if(state.typing)delete state.typing[k];save()}
 function kept(k){const a=state.ans&&state.ans[k];return a&&a.l===level?a.v:null}
-function again(k,render){if(state.ans)delete state.ans[k];save();render()}
+function keepTyping(k,v){state.typing=state.typing||{};state.typing[k]={l:level,v};save()}
+function typing(k){const a=state.typing&&state.typing[k];return a&&a.l===level?a.v:null}
+function again(k,render){if(state.ans)delete state.ans[k];if(state.typing)delete state.typing[k];save();render()}
 const typedVals=(items,prefix)=>items.map((_,i)=>$("#"+prefix+i).value);
 const radioVals=(items,name)=>items.map((_,i)=>{const c=document.querySelector('input[name="'+name+i+'"]:checked');return c?c.value:null});
 function fillTyped(items,prefix,v){items.forEach((_,i)=>{$("#"+prefix+i).value=v[i]||""})}
@@ -362,7 +366,8 @@ function checkTyped(items,prefix,result,key,explain){
   return score;
 }
 let recallItems=[],practiceItems=[];
-function renderRecall(){recallItems=forLevel(recall,level);renderTyped("#recallList",recallItems,"rc");$("#recallResult").classList.remove("show");const v=kept("recall");if(v){fillTyped(recallItems,"rc",v);doRecall(false)}}
+function renderRecall(){recallItems=forLevel(recall,level);renderTyped("#recallList",recallItems,"rc");$("#recallResult").classList.remove("show");const v=kept("recall"),t=typing("recall");if(v){fillTyped(recallItems,"rc",v);doRecall(false)}else if(t)fillTyped(recallItems,"rc",t)}
+$("#recallList").oninput=()=>keepTyping("recall",typedVals(recallItems,"rc"));
 // Recall is low stakes: done when submitted, whatever the score. count=false only shows the kept answers again.
 function doRecall(count){const s=checkTyped(recallItems,"rc","#recallResult",null,true);if(count){state.first=Object.assign({},state.recall,state.first);if(!state.first[level])state.first[level]={score:s,max:recallItems.length,date:new Date().toISOString()};attempt("recall",s,recallItems.length)}$("#recallResult").textContent=s+" / "+recallItems.length+(ca()?" correctes · Pas completat ✓ Llegeix el feedback de les que has fallat.":" correct · Step complete ✓ Read the feedback for the ones you missed.");if(count)complete("recall")}
 $("#checkRecall").onclick=()=>{doRecall(true);keepAns("recall",typedVals(recallItems,"rc"))};
@@ -372,8 +377,9 @@ function renderWords(){
   $("#wordsPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";
   $("#vocabGroups").innerHTML=forLevel(vocab,level).map(g=>'<article class="vocab-group"><h3>'+g.g+'</h3><div class="chips">'+g.items.map(x=>'<span class="chip" tabindex="0">'+x[0]+'<span class="chip-tooltip"><b>'+x[1]+'</b>'+x[2]+'</span></span>').join("")+'</div></article>').join("");
   practiceItems=forLevel(practice,level);renderTyped("#practiceList",practiceItems,"pr");$("#practiceResult").classList.remove("show");
-  const v=kept("words");if(v){fillTyped(practiceItems,"pr",v);doPractice(false)}
+  const v=kept("words"),t=typing("words");if(v){fillTyped(practiceItems,"pr",v);doPractice(false)}else if(t)fillTyped(practiceItems,"pr",t);
 }
+$("#practiceList").oninput=()=>keepTyping("words",typedVals(practiceItems,"pr"));
 function doPractice(count){const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(count){attempt("words",s,practiceItems.length);if(s>=need(practiceItems.length))complete("words")}}
 $("#checkPractice").onclick=()=>{doPractice(true);keepAns("words",typedVals(practiceItems,"pr"))};
 $("#againPractice").onclick=()=>again("words",renderWords);
@@ -386,8 +392,9 @@ function renderRead(){
   readItems.forEach((q,i)=>{const box=document.createElement("div");box.className="question";
     box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="rd'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="rdf'+i+'"></div>';f.appendChild(box)});
   $("#readResult").classList.remove("show");
-  const v=kept("read");if(v){fillRadio(readItems,"rd",v);doRead(false)}
+  const v=kept("read"),t=typing("read");if(v){fillRadio(readItems,"rd",v);doRead(false)}else if(t)fillRadio(readItems,"rd",t);
 }
+$("#readForm").onchange=()=>keepTyping("read",radioVals(readItems,"rd"));
 function doRead(count){let score=0;readItems.forEach((q,i)=>{const c=document.querySelector('input[name="rd'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#rdf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,false);f.className="feedback "+(ok?"ok":"no")});
   const n=readItems.length;if(count)attempt("read",score,n);$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(count&&score>=need(n))complete("read")}
 $("#checkRead").onclick=()=>{doRead(true);keepAns("read",radioVals(readItems,"rd"))};
@@ -398,8 +405,9 @@ function renderListen(){
   listenItems.forEach((q,i)=>{const box=document.createElement("div");box.className="question";
     box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="l'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="lf'+i+'"></div>';f.appendChild(box)});
   $("#listenResult").classList.remove("show");
-  const v=kept("listen");if(v){fillRadio(listenItems,"l",v);doListen(false)}
+  const v=kept("listen"),t=typing("listen");if(v){fillRadio(listenItems,"l",v);doListen(false)}else if(t)fillRadio(listenItems,"l",t);
 }
+$("#listenForm").onchange=()=>keepTyping("listen",radioVals(listenItems,"l"));
 function doListen(count){let score=0;listenItems.forEach((q,i)=>{const c=document.querySelector('input[name="l'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#lf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,true);f.className="feedback "+(ok?"ok":"no")});
   const n=listenItems.length;if(count)attempt("listen",score,n);$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(count&&score>=need(n))complete("listen")}
 $("#checkListen").onclick=()=>{doListen(true);keepAns("listen",radioVals(listenItems,"l"))};
