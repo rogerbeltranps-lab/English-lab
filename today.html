@@ -52,7 +52,7 @@ const pts=a=>a.graded?(a.manual?t("nota del professor","teacher's mark"):a.point
 const col=p=>p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";
 const S={ls:null,view:"lp",pend:[]};let U=null,D=null;   // view: lp = one grid per learning path · sum = summary of my criteria
 
-// D = {me:{name,group}, rs:{activity:result}, lv:{ls:{level}}, pg:{ls:data}, ls:{id:{status,enabled,groups}}, pt:{team,t1,t2,t3}, tm:{list,score,best}}
+// D = {me:{name,group}, rs:{activity:result}, lv:{ls:{level}}, pg:{ls:data}, ls:{id:{status,enabled,groups,open}}, pt:{team,t1,t2,t3}, tm:{list,score,best}}
 async function load(u){
   if(DEMO)return DEMO;
   const db=ELCloud.db,D={me:{},rs:{},lv:{},pg:{},ls:{}},q=async(p,f)=>{try{(await F.getDocs(F.collection(db,...p))).forEach(f)}catch(e){}};
@@ -76,7 +76,8 @@ function setLang(){
   $("h1").textContent=t("Les meves activitats","My activities");
 }
 const doneSet=a=>{const p=D.pg[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
-const canDo=(a,info)=>info.status==="closed"||!a.graded||info.enabled.includes(a.id)||all();
+// learning paths the teacher has opened for the group (elLpOpen in el-catalog.js); a closed LS can be reviewed
+const canDo=(a,info)=>info.status==="closed"||all()||elLpOpen(a,info,D.me.group);
 function cell(a){
   const x=D.rs[a.id],d=doneSet(a);let v,c="";
   if(a.manual)v=x&&x.max?x.score+"/"+x.max:"–";
@@ -182,7 +183,7 @@ function lateBox(lss){const today=ELWeek.today(),late=[];
 function dueList(p,gi,i,info){const today=ELWeek.today(),ds=ELWeek.dueIn(p,gi,i).map(([id,d])=>[EL_CATALOG.find(x=>x.id===id),d]).filter(([a])=>a);
   if(!ds.length)return "";
   return `<ul class="due">${ds.map(([a,d])=>{const can=canDo(a,info),done=!a.manual&&isDone(a);
-    const st=a.manual?`<span class="tag">${t("es lliura al Classroom","handed in on Classroom")}</span>`:done?`<span class="ok">✔ ${t("Fet","Done")}</span>`:!can?`<small class="muted">${t("el professor l'habilitarà","your teacher will enable it")}</small>`:d<today?`<span class="lt">${t("Endarrerida","Late")}</span>`:`<span class="td">${t("Pendent","To do")}</span>`;
+    const st=a.manual?`<span class="tag">${t("es lliura al Classroom","handed in on Classroom")}</span>`:done?`<span class="ok">✔ ${t("Fet","Done")}</span>`:!can?`<small class="muted">🔒 ${t("encara no està oberta","not open yet")}</small>`:d<today?`<span class="lt">${t("Endarrerida","Late")}</span>`:`<span class="td">${t("Pendent","To do")}</span>`;
     return `<li><span>${esc(a.title)} <small class="muted">· ${t("fins al","by")} ${when(d)}</small></span>${st}${done?"":` <a class="go ${can?"":"off"}" href="${a.path}">${t("Obre","Open")}</a>`}</li>`}).join("")}</ul>`}
 function weekHtml(p,gi,i,info,title,now){const r=p.rows[i];if(!r)return "";const due=dueList(p,gi,i,info);
   return `<div class="wk ${now?"now":""}"><b>${title}</b> <small class="muted">${ELWeek.week(r,lang())}</small><div><small class="muted">${t("A classe:","In class:")}</small></div><div class="s">${esc(ELWeek.line(r.g?r.g[gi]||"":r.what||"",lang()))}</div>${r.note?`<div class="n">${esc(r.note)}</div>`:""}`
@@ -207,8 +208,8 @@ function lpView(list,info){return ""
 function lpGrid(a,info){
   const d=doneSet(a),c=cell(a),n=steps(a).filter(k=>d.has(k)).length;
   // a recall checkpoint before it not done yet: closed until it is (el-catalog.js elCheckpointMissing; the page itself blocks too)
-  const cp=!all()&&info.status!=="closed"&&elCheckpointMissing(a,doneSet,x=>canDo(x,info)),can=canDo(a,info)&&!cp;
-  return `<div class="box lpbox"><div class="lphead"><div><h2>${a.title}</h2>${a.criteria.map(pill).join("")} <small class="muted">· ${pts(a)}${a.mode==="once"?t(" · una sola vegada"," · only once"):""}${cp?t(` · 🔒 primer fes el ${cp.title}`,` · 🔒 first do ${cp.title}`):a.graded&&!can?t(" · el professor l'habilitarà"," · your teacher will enable it"):""}</small></div><a class="go ${can?"":"off"}" href="${a.path}">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`
+  const cp=!all()&&info.status!=="closed"&&canDo(a,info)&&elCheckpointMissing(a,doneSet,x=>canDo(x,info)),can=canDo(a,info)&&!cp;   // a locked one says "not open yet"
+  return `<div class="box lpbox"><div class="lphead"><div><h2>${a.title}</h2>${a.criteria.map(pill).join("")} <small class="muted">· ${pts(a)}${a.mode==="once"?t(" · una sola vegada"," · only once"):""}${cp?t(` · 🔒 primer fes el ${cp.title}`,` · 🔒 first do ${cp.title}`):!can?t(" · 🔒 encara no està oberta"," · 🔒 not open yet"):""}</small></div><a class="go ${can?"":"off"}" href="${a.path}">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`
     +`<div class="wrap"><table><thead><tr>${steps(a).map((k,i)=>`<th class="ac ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")}<th class="sc first">${t("Punts","Points")}</th></tr></thead>`
     +`<tbody><tr>${steps(a).map(k=>`<td class="ac ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("")}<td class="sc ${c.c} first" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr></tbody></table></div>`
     +(steps(a).length?`<small class="muted">${t(`${n} de ${steps(a).length} activitats fetes`,`${n} of ${steps(a).length} activities done`)}</small>`:"")+legend(gridCrits(a))+`</div>`;

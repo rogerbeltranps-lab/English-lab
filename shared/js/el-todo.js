@@ -26,7 +26,7 @@ export async function start({db,user,group,root,lsId,seesAll}){
   const get=async path=>{const s=await getDoc(doc(db,...path)).catch(()=>null);return s&&s.exists()?s.data():null};
   const lvs={};try{(await getDocs(collection(db,"students",user.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){}
   const [info,pg]=await Promise.all([get(["ls",ls]),get(["students",user.uid,"progress",ls])]),lv=window.elRouteOf?elRouteOf(lvs,ls):lvs[ls];   // carried over from an earlier LS
-  const st=(info&&info.status)==="public"?"open":(info&&info.status)||"hidden",enabled=(info&&info.enabled)||[];
+  const st=(info&&info.status)==="public"?"open":(info&&info.status)||"hidden";
   if(!seesAll&&st!=="open")return;
   const rs={};try{(await getDocs(collection(db,"students",user.uid,"results"))).forEach(d=>rs[d.data().activity||d.id.replace("__","/")]=d.data())}catch(e){}
   const ca=!seesAll&&(!lv||!lv.level||lv.level==="insecure"||lv.level==="beginners"),lang=ca?"ca":"en",t=(c,e)=>ca?c:e;   // no route yet: the Insecure version, in Catalan
@@ -36,7 +36,7 @@ export async function start({db,user,group,root,lsId,seesAll}){
   const isDone=a=>{const r=rs[a.id]||{};if(r.locked||r.markedDone)return true;
     const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));
     const req=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));return req.length>0&&req.every(k=>d.has(k))};
-  const canDo=a=>seesAll||!a.graded||enabled.includes(a.id);
+  const canDo=a=>seesAll||window.elLpOpen(a,info,group);   // learning paths the teacher has opened for the group
   const opt=id=>p.optional&&p.optional[id]&&p.optional[id][gi]||null;
   // "LP3" in a session line → the activity named next to it somewhere in the plan ("LP3 Where traditions come from")
   const lp={};p.rows.forEach(r=>(r.g?r.g[gi]||"":r.what||"").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(m,n,name)=>{const a=acts.find(a=>short(a.title).startsWith(name.trim().toLowerCase())||name.trim().toLowerCase().startsWith(short(a.title)));if(a)lp[n]=a}));
