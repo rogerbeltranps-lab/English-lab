@@ -1,0 +1,63 @@
+/* English Lab class game (Roger, 26 Oct 2026): the look shared by the board (host.html, the projector) and the player (play.html, each
+   student's Chromebook). Bright like a Kahoot or a Blooket: a purple stage with floating shapes, four coloured answer tiles, each with
+   its own shape (▲ ◆ ● ■), so a student can match the board and their screen by colour or by shape. */
+:root{
+  --stage:#3d1d8f; --stage2:#6a2fd1; --ink:#1d1640; --card:#ffffff; --muted:#6b6290;
+  --c0:#e8384f; --c1:#2f7de1; --c2:#d99a00; --c3:#2ea84a;   /* red ▲ · blue ◆ · gold ● · green ■ */
+  --ok:#2ea84a; --no:#e8384f; --gold:#ffc83d;
+  --f:"Fredoka","Nunito","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:500 18px/1.35 var(--f);color:#fff;background:radial-gradient(120% 90% at 20% 0%,var(--stage2),var(--stage) 60%,#2a1266);overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
+button{font:inherit;cursor:pointer;touch-action:manipulation}
+[hidden]{display:none!important}
+
+/* floating shapes behind everything */
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bgfx i{position:absolute;bottom:-120px;width:70px;height:70px;opacity:.13;background:#fff;animation:floatUp linear infinite}
+.bgfx i:nth-child(4n+1){clip-path:polygon(50% 0,100% 100%,0 100%)}
+.bgfx i:nth-child(4n+2){transform:rotate(45deg);border-radius:6px}
+.bgfx i:nth-child(4n+3){border-radius:50%}
+.bgfx i:nth-child(4n){border-radius:8px}
+@keyframes floatUp{to{transform:translateY(-130vh) rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.bgfx i{animation:none;display:none}}
+
+.app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
+
+/* shapes */
+.shp{display:inline-block;width:1em;height:1em;background:#fff;flex:0 0 auto}
+.shp.s0{clip-path:polygon(50% 4%,98% 94%,2% 94%)}
+.shp.s1{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.shp.s2{border-radius:50%}
+.shp.s3{border-radius:12%;transform:scale(.88)}
+
+/* answer tiles */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{position:relative;display:flex;align-items:center;gap:.6em;min-height:84px;padding:.5em .9em;border:0;border-radius:14px;color:#fff;text-align:left;font-weight:700;
+  box-shadow:inset 0 -6px 0 rgba(0,0,0,.22);text-shadow:0 2px 0 rgba(0,0,0,.18);transition:transform .12s,opacity .3s,filter .3s}
+.tile.t0{background:var(--c0)}.tile.t1{background:var(--c1)}.tile.t2{background:var(--c2)}.tile.t3{background:var(--c3)}
+.tile .shp{font-size:1.5em}
+.tile .tx{flex:1;min-width:0;overflow-wrap:anywhere}
+.tile.dim{opacity:.28;filter:grayscale(.4)}
+.tile .mark{font-size:1.6em;line-height:1}
+
+.btn{border:0;border-radius:12px;padding:.55em 1.2em;font-weight:700;color:var(--ink);background:#fff;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+.btn:active{transform:translateY(2px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+.btn.go{background:var(--gold)}.btn.ghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:none}
+.btn:disabled{opacity:.5;cursor:default}
+
+.card{background:var(--card);color:var(--ink);border-radius:18px;box-shadow:0 8px 0 rgba(0,0,0,.18)}
+.pic{display:grid;place-items:center;line-height:1}
+.pic img{max-width:100%;max-height:100%;object-fit:contain;border-radius:14px}
+b.k{color:#7a32e0}
+.gap{display:inline-block;min-width:3.2em;border-bottom:.12em solid currentColor;margin:0 .15em}
+
+.pop{animation:pop .45s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+.slidein{animation:slidein .4s ease-out both}
+@keyframes slidein{from{transform:translateY(24px);opacity:0}}
+@media (prefers-reduced-motion: reduce){.pop,.slidein{animation:none}}
+
+canvas.confetti{position:fixed;inset:0;z-index:50;pointer-events:none;width:100%;height:100%}

@@ -349,13 +349,20 @@ const pt={
   add:(k,g,d)=>{const p=(S.D.pt[k]=S.D.pt[k]||{}),term=S.term;p[term]=Math.max(0,(+p[term]||0)+d);const best=ptBest(g),t=(S.D.tm[g]=S.D.tm[g]||{});t.best=Object.assign({},t.best,{[term]:best});
     if(DEMO)return null;const b=F.writeBatch(db());b.set(F.doc(db(),"points",k),sub({[term]:F.increment(d)}),{merge:true});b.set(F.doc(db(),"teams",g),sub({best:{[term]:best}}),{merge:true});return b.commit()}
 };
+// Export: the group's points and bonuses this term as a CSV (semicolons and decimal commas, so a Catalan spreadsheet opens it as numbers).
+function ptCsv(g){
+  const studs=ptStuds(g),best=ptBest(g),q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const rows=[["Student","Email","Points","Bonus"]].concat(studs.map(s=>{const p=ptOn(s);return [fullName(s),s.email||"",p,elNum(elBonus(p,best),"ca")]}));
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+rows.map(r=>r.map(q).join(";")).join("\r\n")],{type:"text/csv"}));
+  a.download=`points-${g}-${S.term}.csv`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5e3);
+}
 function pointsBox(g){
   const studs=ptStuds(g),term=S.term,best=ptBest(g),now=elTerm();
   const terms=EL_TERMS.map(t=>`<button class="chip ${t.id===term?"on":""}" data-do="ptterm" data-t="${t.id}">${t.en}${t.id===now?" · now":""}</button>`).join("");
   const rows=studs.map(s=>{const p=ptOn(s),k=esc(pkey(s));return `<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td><td class="ptn"><button class="lv" data-do="ptadd" data-k="${k}" data-d="-1" ${p>0?"":"disabled"} aria-label="Remove a point">−</button> <b>${p}</b> <button class="lv" data-do="ptadd" data-k="${k}" data-d="1" aria-label="Add a point">+</button></td><td><b>+${elNum(elBonus(p,best))}</b></td></tr>`}).join("");
   const body=(S.D.ptErr?'<p><b>The team points could not be read.</b> Publish the Firestore rules (they publish when the change reaches main) and reload.</p>':"")
-    +`<p class="muted">Points from the class presentations: open 📡 Class there, signed in with this account, and start the class for ${esc(GR.find(x=>x.id===g).name)}; students join from the Learning Path and every right answer they tap is +1. Bonus on the term grade = ${elNum(EL_POINTS_BONUS)} × the student's points ÷ the best student's points in the group (${best} in ${elTermName(term)}), so it only adds; every term starts at 0. A change here (an absent student, a mistake) is for that student only. Students see their points and their bonus on their board.</p>`
-    +`<div class="bar"><span class="muted">Term:</span> ${terms}</div>`
+    +`<p class="muted">Points from the <a href="lab/game/host.html" target="_blank">🎮 class games</a> (choose a game and the group: its signed-in students are taken into it) and the class presentations: open 📡 Class there, signed in with this account, and start the class for ${esc(GR.find(x=>x.id===g).name)}; students join from the Learning Path and every right answer they tap is +1. Bonus on the term grade = ${elNum(EL_POINTS_BONUS)} × the student's points ÷ the best student's points in the group (${best} in ${elTermName(term)}), so it only adds; every term starts at 0. A change here (an absent student, a mistake) is for that student only. Students see their points and their bonus on their board.</p>`
+    +`<div class="bar"><span class="muted">Term:</span> ${terms}${studs.length?` <button class="chip" data-do="ptcsv" title="Download this group's points and bonuses (CSV, opens in a spreadsheet)">⬇ Export</button>`:""}</div>`
     +(studs.length?`<div class="ptwrap"><table class="pts"><thead><tr><th class="stu">Student</th><th>Points</th><th>Bonus</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<p class="muted">No students in this group.</p>');
   return `<div class="box">${fold("points",`Points <small class="muted">· ${elTermName(term)} · best ${best}</small>`,body)}</div>`;
 }
@@ -762,7 +769,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
     status:()=>{if(k.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;act(api.ls(S.ls,{status:k.s}))},
     assign:()=>{const l=EL_LS.find(x=>x.id===S.ls),info=S.D.ls[S.ls],set=new Set(lsGroups(S.ls).filter(g=>elLsForGroup(l,info,g.id)).map(g=>g.id));set.has(k.g)?set.delete(k.g):set.add(k.g);act(api.ls(S.ls,{groups:[...set]}))},
-    ptterm:()=>{S.term=k.t;render()},ptadd:()=>quick(pt.add(k.k,S.g,+k.d)),
+    ptterm:()=>{S.term=k.t;render()},ptcsv:()=>ptCsv(S.g),ptadd:()=>quick(pt.add(k.k,S.g,+k.d)),
     lp:()=>{const info=S.D.ls[S.ls],open=new Set(acts(S.ls).filter(a=>elLpOpen(a,info,S.g)).map(a=>a.id));open.has(k.a)?open.delete(k.a):open.add(k.a);
       act(api.lpOpen(S.ls,S.g,acts(S.ls).filter(a=>open.has(a.id)).map(a=>a.id)))},
     lpset:()=>act(api.lpOpen(S.ls,S.g,k.v==="1"?acts(S.ls).map(a=>a.id):[])),

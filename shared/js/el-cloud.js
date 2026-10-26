@@ -5,7 +5,7 @@ import "./el-route-names.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {signIn} from "./el-signin.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,collection,writeBatch,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,doc,getDoc,getDocs,setDoc,collection,writeBatch,serverTimestamp,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
 import {report} from "./el-report.js";
 
@@ -15,7 +15,7 @@ const ROOT=new URL("../../",import.meta.url);
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let stopJoin=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false;
+let stopJoin=null,stopGame=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
@@ -297,6 +297,16 @@ const start=()=>{draw=bar();draw(user)};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start):start();
 new MutationObserver(()=>draw(user)).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});   // the board picks its language after loading
 
+// Class game (lab/game, Roger 26 Oct 2026): while the teacher's board runs a game for the student's group (live/{group}, host.js), a
+// signed-in student is taken into it (lab/game/play.html) from whatever page they are on, and goes back here with the player's Leave.
+const GAME=new URL("lab/game/play.html",ROOT),onGame=location.pathname===GAME.pathname;
+function gamePush(u){
+  if(stopGame){stopGame();stopGame=null}
+  if(!u||!isStudent(u)||!myGroup||onGame)return;
+  stopGame=onSnapshot(doc(db,"live",myGroup),s=>{const x=s.exists()?s.data():null,ms=x&&x.at&&x.at.toMillis?x.at.toMillis():0;
+    if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)}},
+    e=>console.warn("game",e));
+}
 function loadCatalog(){return window.EL_CATALOG?Promise.resolve():new Promise(r=>{const s=document.createElement("script");s.src=new URL("shared/js/el-catalog.js",ROOT).href;s.onload=r;s.onerror=r;document.head.append(s)})}
 await loadCatalog();
 // Activities are matched by path, so pages with the same file name in different LSs keep separate results.
@@ -311,6 +321,7 @@ onAuthStateChanged(auth,async u=>{
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
+  gamePush(u);
   menuLink(u);   // again after gate, which knows the route (the label follows its language)
   try{await gate(u)}catch(e){console.warn("gate",e)}
   if(reloadIfStale())return;   // wiped on a page without progress sync
