@@ -115,7 +115,8 @@ function render(){
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
-  $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links)+`<div id="ptbox">${pointsBox()}</div>`;
+  $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+pickBox()+lsGo(links)+`<div id="ptbox">${pointsBox()}</div>`;
+  if(!S.asked&&pickBox()){S.asked=true;setTimeout(pickPanel,0)}   // the first time: open the route choice by itself
   $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("El professor fa el seguiment de totes les activitats que fas. Algunes s'avaluaran i seran la teva avaluació contínua, que és una part de la nota.","Your teacher keeps track of all the activities you do. Some of them will be assessed and make up your continuous assessment, which is part of your mark."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
   if(!lss.length){$("#main").innerHTML="";return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
@@ -206,11 +207,29 @@ function weekBox(ls,info){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.
   const main=i>=0?weekHtml(p,gi,i,info,t("Aquesta setmana","This week")+" · "+wk(i),true):nx>=0?weekHtml(p,gi,nx,info,(nx===0?t("Comencem","We start"):t("Propera setmana","Next week"))+" · "+wk(nx),true):`<p class="muted">${t("El pla d'aquesta LS ja s'ha acabat.","The plan of this LS is over.")}</p>`;
   return `<div class="box wkbox"><h2>${t("El meu pla setmanal","My week plan")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Què fem a classe i què has de fer cada setmana. Si un dia no pots venir, mira-ho aquí.","What we do in class and what you have to do every week. If you miss a class, check it here.")}</p>${exam}${main}`
     +`<details class="all"><summary>${t("Tot el pla de la LS","The whole LS plan")}</summary>${p.rows.map((r,k)=>weekHtml(p,gi,k,info,wk(k),k===i)).join("")}</details></div>`}
-// Routes (Roger, 26 Oct 2026): the teacher sets every student's route from the LS1 exam mark; students no longer choose or ask for one.
-// A route carries over to later LSs until the teacher changes it (elRouteOf in el-catalog.js).
+// Routes (Roger, 26 Oct 2026): the teacher sets every student's route from the LS1 exam mark. A route carries over to later LSs until
+// the teacher changes it (elRouteOf in el-catalog.js). 2 ESO students with no route choose one here (elCanPickRoute): Base, Core or Plus,
+// and can change it until the teacher sets a route; then it is locked.
+const myCourse=()=>(EL_GROUPS.find(x=>x.id===D.me.group)||{}).course;
+const canPick=()=>!all()&&elCanPickRoute(D.lv,myCourse());
 function routeNote(ls){if(all())return "";
-  return elRouteOf(D.lv,ls).level?` <small class="muted">${t("· el posa el professor","· set by your teacher")}</small>`
-    :` <small class="muted">${t("Encara no en tens: el professor te'l posarà a partir de l'examen de la LS1. De moment fas la ruta Insecure.","You don't have one yet: your teacher will set it from your LS1 exam. For now you do the Insecure route.")}</small>`}
+  const r=elRouteOf(D.lv,ls),mine=(EL_LS.find(l=>l.id===ls)||{}).course===myCourse()&&canPick();
+  if(r.level&&r.own)return ` <small class="muted">${t("· l'has triat tu","· your own choice")}</small>${mine?` <button class="g" data-do="pick">${t("Canvia-la","Change it")}</button>`:""}`;
+  if(r.level)return ` <small class="muted">${t("· el posa el professor","· set by your teacher")}</small>`;
+  if(mine)return ` <button data-do="pick">${t("Tria la teva ruta","Choose your route")}</button>`;
+  return ` <small class="muted">${t("Encara no en tens: el professor te'l posarà a partir de l'examen de la LS1. De moment fas la ruta Insecure.","You don't have one yet: your teacher will set it from your LS1 exam. For now you do the Insecure route.")}</small>`}
+// No route yet and allowed to choose: a box at the top, and the choice opens by itself once when the board loads.
+function pickBox(){if(!canPick()||elRouteOf(D.lv,elPickLs(myCourse())).level)return "";
+  return `<div class="pend" style="background:#eff6ff;border-color:#93c5fd"><div><b>🧭 ${t("Tria la teva ruta","Choose your route")}</b><div class="muted">${t("Encara no tens ruta. Tria com vols treballar les activitats: la pots canviar fins que el professor te'n posi una.","You don't have a route yet. Choose how you want to work: you can change it until your teacher sets one.")}</div></div><button data-do="pick">${t("Tria-la","Choose it")}</button></div>`}
+function pickPanel(){const c=myCourse(),cur=elRouteOf(D.lv,elPickLs(c));S.want=cur.own?cur.level:null;
+  $("#dlgc").innerHTML=`<h3>${t("Tria la teva ruta","Choose your route")}</h3><p class="muted">${t("Totes les rutes fan la mateixa LS: canvia l'ajuda que tens i la dificultat. La pots canviar fins que el professor te'n posi una; després ja no la podràs canviar.","Every route does the same LS: what changes is the help you get and how hard it is. You can change it until your teacher sets one; after that you can't change it.")}</p>`
+    +`<div class="opts">${EL_LEVELS.filter(x=>x.pick!==false).map(x=>`<button class="opt ${x.id===S.want?"on":""}" data-do="want" data-r="${x.id}"><b>${x.name}</b><br><small>${esc(EN?x.en:x.ca)}</small></button>`).join("")}</div>`
+    +`<div class="row"><button class="g" data-do="close">${t("Cancel·la","Cancel")}</button><button class="sub" data-do="savepick" disabled>${t("Desa","Save")}</button></div>`;
+  if(!$("#dlg").open)$("#dlg").showModal()}
+function want(r){S.want=r;document.querySelectorAll("button.opt").forEach(b=>b.classList.toggle("on",b.dataset.r===r));$('[data-do="savepick"]').disabled=false}
+async function savePick(){const ls=elPickLs(myCourse());if(!S.want||!ls||!canPick())return;
+  if(!DEMO)try{await F.setDoc(F.doc(ELCloud.db,"students",U.uid,"levels",ls),{level:S.want,by:"student",updated:F.serverTimestamp()})}catch(e){return alert(t("No s'ha pogut desar la ruta: ","Could not save the route: ")+e.message)}
+  D.lv[ls]={level:S.want,by:"student"};$("#dlg").close();render()}
 function lpView(list,info){return ""
     +`<p class="muted">${t("Cada learning path té la seva graella: les activitats amb el criteri d'avaluació que treballen (– vol dir pràctica de llengua) i la teva puntuació. Clica la puntuació per veure'n el detall, el feedback i entregar-la. ✔ entregada · 🟡 marcada com a feta, sense entregar · 💬 té feedback.","Each learning path has its own grid: the activities with the assessment criterion they work on (– means language practice) and your score. Click the score to see the details and the feedback, and to submit it. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback.")}</p>`
     +list.map(a=>lpGrid(a,info)).join("")+total(list);
@@ -262,7 +281,7 @@ function detail(id){
 }
 async function submitMany(list){if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
-  ({ls:()=>{S.ls=k.ls;render()},view:()=>{S.view=k.v;render()},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
+  ({ls:()=>{S.ls=k.ls;render()},view:()=>{S.view=k.v;render()},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),pick:pickPanel,want:()=>want(k.r),savepick:savePick,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
 if(DEMO){U={uid:"demo"};D=DEMO;render()}
 else ELCloud.onUser(async u=>{U=u;

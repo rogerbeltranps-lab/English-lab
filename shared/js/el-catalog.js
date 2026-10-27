@@ -9,16 +9,26 @@
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 // LS1 My Real Routine (Roger, 25 Oct 2026): done in class and redesigned for next year; only the exam and the final product count,
 // so its learning paths are graded:false (practice). Results already saved stay in Firestore.
-// Beginners (Roger, 26 Oct 2026): A1, below Insecure, Catalan with heavy scaffolding; only the teacher sets it (pick:false). Since 26 Oct 2026 the teacher sets every route.
+// Beginners (Roger, 26 Oct 2026): A1, below Insecure, Catalan with heavy scaffolding; only the teacher sets it (pick:false). Since 26 Oct 2026 the teacher sets every route; 2 ESO students without one choose it themselves (elCanPickRoute).
 window.EL_LEVELS=[{id:"beginners",name:"Beginners",student:"Starter",pick:false,ca:"Començo des de zero: molt suport, passos curts i instruccions en català.",en:"I am starting from zero: a lot of support, short steps and instructions in Catalan."},{id:"insecure",name:"Insecure",student:"Base",ca:"Necessito molt suport i pautes (instruccions en català).",en:"I need a lot of support and guidance (instructions in Catalan)."},{id:"safe",name:"Safe",student:"Core",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès).",en:"I feel confident with a little support (instructions in English)."},{id:"daring",name:"Daring",student:"Plus",ca:"Vull el repte: més autonomia i menys ajudes.",en:"I want the challenge: more independence and less help."}];
 // Class groups. The student picks one the first time they sign in; the teacher can change it in the dashboard.
 window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructions in Catalan
-// The student's route in an LS. Only the teacher sets routes (Roger, 26 Oct 2026: from the LS1 exam mark, on the dashboard). An LS with
+// The student's route in an LS. The teacher sets routes (Roger, 26 Oct 2026: from the LS1 exam mark, on the dashboard). An LS with
 // no route of its own takes the latest route set in an earlier LS of the same course (EL_LS order), so a route carries over to every
-// later LS until the teacher changes it. lv = {lsId: {level}}. Returns {level, from}: from = the LS whose route it is (null: no route yet).
-window.elRouteOf=function(lv,ls){lv=lv||{};const L=window.EL_LS||[],me=L.find(x=>x.id===ls),own=(lv[ls]||{}).level;if(own)return {level:own,from:ls};
-  if(me)for(let i=L.indexOf(me)-1;i>=0;i--){const x=L[i];if(x.course===me.course&&(lv[x.id]||{}).level)return {level:lv[x.id].level,from:x.id}}
-  return {level:null,from:null}};
+// later LS until the teacher changes it. lv = {lsId: {level, by}}. Returns {level, from, own}: from = the LS whose route it is (null: no
+// route yet); own = the student chose it (by:"student", see elCanPickRoute). A route the teacher set, in any LS of the course, wins over it.
+window.elRouteOf=function(lv,ls){lv=lv||{};const L=window.EL_LS||[],me=L.find(x=>x.id===ls),
+    chain=[ls].concat(me?L.slice(0,L.indexOf(me)).reverse().filter(x=>x.course===me.course).map(x=>x.id):[]),
+    find=(ids,mine)=>{for(const id of ids){const l=lv[id]||{};if(l.level&&(l.by==="student")===mine)return {level:l.level,from:id,own:mine}}return null},
+    later=me?L.slice(L.indexOf(me)+1).filter(x=>x.course===me.course).map(x=>x.id):[];   // a route the teacher set later also replaces the student's choice
+  const own=find(chain,true);return find(chain,false)||own&&(find(later,false)||own)||{level:null,from:null,own:false}};
+// Students choose their first route (Roger, 26 Oct 2026, 2 ESO only): while the teacher has not set a route in any LS of the course, the
+// student picks one (Base, Core or Plus: EL_LEVELS without pick:false) on the board or the LS page and can change it; it is saved as
+// levels/{first LS of the course} = {level, by:"student"} so it carries over. Once the teacher sets a route, the choice is locked
+// (firestore.rules: a student writes only their own by:"student" docs of a 2eso LS).
+window.EL_ROUTE_PICK=["2eso"];
+window.elPickLs=c=>((window.EL_LS||[]).find(x=>x.course===c)||{}).id;
+window.elCanPickRoute=(lv,c)=>(window.EL_ROUTE_PICK||[]).includes(c)&&!(window.EL_LS||[]).some(x=>{const l=(lv||{})[x.id]||{};return x.course===c&&l.level&&l.by!=="student"});
 // Route from the LS1 exam mark (out of 10), default cut-offs per course: under beginners → Beginners, under insecure → Insecure,
 // under safe → Safe, otherwise Daring. Roger can change them on the dashboard (settings/routes in Firestore overrides these).
 window.EL_ROUTE_CUTS={"2eso":{beginners:3,insecure:5,safe:7.5},"4eso":{beginners:3,insecure:5,safe:7.5}};
