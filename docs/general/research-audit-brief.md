@@ -8,8 +8,8 @@
 | --- | --- | --- |
 | 1 | Grammar and vocabulary block from delayed retrieval: checkpoints 50 % · recall warm-ups 25 % · practice done on time 25 %; all four checkpoints count and have due dates | Built (this PR) |
 | 2 | Revision counts: draft 1 kept, improved version, a "What I changed" line, both on the dashboard and on the student's page; the same for speaking transcripts | Built (PR 2) |
-| 3 | Catalan-to-English flashcard mode for the core words; a one-minute plan and review in each Learning Path | Plan and review built (PR 2); flashcards to do. Core words ready for both LS2s (`core` in each vocab panel, content item 1) |
-| 4 | Listening cycle: prediction, a check between the two listens, a micro-dictation of 2–3 chunks; subtitles from the first viewing for Insecure and Beginners | To do. Chunks ready for both LS2s (`chunks` in each listening panel, content item 2) |
+| 3 | Catalan-to-English flashcard mode for the core words; a one-minute plan and review in each Learning Path | Built: plan and review (#110, #128); Català → English study cards on the core words (`core` in each vocab panel, content item 1) |
+| 4 | Listening cycle: prediction, a check between the two listens, a micro-dictation of 2–3 chunks; subtitles from the first viewing for Insecure and Beginners | Micro-dictation built on every listening with `chunks` (content item 2); prediction and the check between listens still to do |
 | 5 | Neutral route names on student pages (code ids stay): Starter · Base · Core · Plus | Built (with PR 2) |
 
 ## Content changes (LS project)
