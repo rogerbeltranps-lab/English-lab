@@ -32,7 +32,7 @@
 @media(max-width:760px){.choice-grid,.speak-support{grid-template-columns:1fr}}
 /* Speaking surfaces follow the course reference; keep layout and controls unchanged. */
 #speak .section-card,#speak .mini-card{background:#fbfdff}
-.ca-card{max-width:560px;margin:10px auto;padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--cream);text-align:center}.ca-card strong{display:block;font-size:1.5rem;color:var(--dark)}.ca-card .tiny{margin:6px 0 0}#caCards .ca-row{justify-content:center;flex-wrap:wrap}#caCards .ca-row .typed{flex:1 1 220px}#caMsg,#caCount{text-align:center}
+
 .cycle-box{margin:12px 0;padding:12px 14px;border:1px dashed var(--line);border-radius:13px;background:#fbfdff}.cycle-box .instruction{margin:6px 0}.cycle-box .typed{width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit}
 .track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}
 .plan-card .typed{width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit}
@@ -188,6 +188,7 @@ html,body{overflow-x:clip}
 </main>
 
 <script src="../../shared/js/learning-path-support.js"></script>
+<script src="../../shared/js/flashcard-set.js"></script>
 <script src="data/getting-started.js"></script>
 <script>
 // Beginners (A1) sits below Insecure: an item with r:"beginners" is shown to every route; items without r default to beginners.
@@ -337,21 +338,35 @@ function renderPlan(){
 // (ls2-engine.js R.vocab cards in "Català → English" and dictHtml/bindDict), from window.LP's core list (words panel) and chunks (listen panel).
 // Practice only: not steps, not marked; dictation answers in state.dict.listen.
 const lpPanel=id=>(window.LP.panels||[]).find(x=>x.id===id)||{};
-let caDeck=[],caAt=0;
+// Study cards, the same as R.vocab in ls2-engine.js (flashcard-set.js): English → Català or Català → English (state.cardDir), the
+// Català → English deck from the core words. Practice here (not one of this page's steps).
+function cardDeck(){
+  const all=forLevel(vocab,level).flatMap(g=>g.items.map(x=>[x[0],x[1],g.g,x[2]]));
+  if(state.cardDir!=="ca")return all;
+  const c=lpPanel("words").core||{},list=c[level]||(level==="beginners"?c.insecure:level==="daring"?c.safe:null)||[],core=new Set(list.map(norm));
+  const rev=all.map(x=>[x[1],x[0],x[2],x[3]]),pick=rev.filter(x=>core.has(norm(x[1])));return pick.length?pick:rev;
+}
 function renderCaCards(){
-  const all=forLevel(vocab,level).flatMap(g=>g.items.map(x=>[x[1],x[0],g.g,x[2]])),c=lpPanel("words").core||{};
-  const list=c[level]||(level==="beginners"?c.insecure:level==="daring"?c.safe:null)||[],core=new Set(list.map(norm));
-  const pick=all.filter(x=>core.has(norm(x[1])));caDeck=(pick.length?pick:all).sort(()=>Math.random()-.5);caAt=0;
-  $("#caCards").innerHTML='<h3>'+(ca()?'Targetes: català → anglès':'Cards: Catalan → English')+'</h3><p class="instruction">'+(ca()?'Llegeix la paraula en català, escriu-la en anglès i comprova-ho.':'Read the Catalan, type the English and check.')+'</p>'
-    +'<div class="ca-card"><div class="tiny" id="caGroup"></div><strong id="caFront"></strong><p id="caBack" hidden></p></div>'
-    +'<div class="actions ca-row"><input type="text" class="typed" id="caType" autocomplete="off" autocapitalize="off" spellcheck="false" style="max-width:320px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit" placeholder="'+(ca()?'Escriu la paraula en anglès':'Type the English')+'"><button class="btn" type="button" id="caCheck">'+(ca()?'Comprova':'Check')+'</button><button class="btn secondary" type="button" id="caNext">'+(ca()?'Següent':'Next')+' →</button></div><p class="feedback" id="caMsg"></p><p class="tiny" id="caCount"></p>';
-  const show=()=>{const v=caDeck[caAt];$("#caGroup").textContent=v[2];$("#caFront").textContent=v[0];$("#caBack").hidden=true;$("#caType").value="";$("#caMsg").textContent="";$("#caCount").textContent=(ca()?'Targeta ':'Card ')+(caAt+1)+(ca()?' de ':' of ')+caDeck.length};
-  const check=()=>{const v=caDeck[caAt],t=norm($("#caType").value),ok=!!t&&String(v[1]).split(/\s*[\/,;]\s*/).some(a=>norm(a.replace(/\([^)]*\)/g,""))===t||norm(a)===t);
-    $("#caBack").hidden=false;$("#caBack").innerHTML='<b>'+v[1]+'</b><br>'+(v[3]||"");$("#caMsg").className="feedback "+(ok?"ok":"no");
-    $("#caMsg").textContent=ok?(ca()?"Correcte!":"Correct!"):(ca()?"Compara-la amb la resposta i torna-la a dir en veu alta.":"Compare it with the answer and say it aloud again.")};
-  $("#caCheck").onclick=check;$("#caType").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();check()}};
-  $("#caNext").onclick=()=>{caAt=(caAt+1)%caDeck.length;show()};
-  if(caDeck.length)show();else $("#caCards").hidden=true;
+  const c=state.cardDir==="ca";
+  $("#caCards").innerHTML='<h3>'+(ca()?'Targetes':'Study cards')+'</h3>'
+    +'<div class="actions dir-toggle" role="group"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>'
+    +'<p class="instruction">'+(c?(ca()?'Llegeix la paraula en català, escriu-la o digues-la en anglès i després gira la targeta per comprovar-ho.':'Read the Catalan, type or say the English, then turn the card to check.'):(ca()?'Digues l’expressió en veu alta i intenta recordar què vol dir. Després gira la targeta.':'Say the expression aloud and try to remember its meaning. Then turn the card.'))+'</p>'
+    +'<div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardIcon"></div><strong id="cardFront"></strong><p>'+(ca()?'Clica per girar la targeta':'Click to turn the card')+'</p></div><div class="face back"><div class="label">'+(c?'English + example':'Català + example')+'</div><strong id="cardMeaning"></strong><p id="cardBack"></p></div></div></div>'
+    +(c?'<div class="actions"><input type="text" class="typed" id="cardType" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1 1 220px;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit" placeholder="'+(ca()?'Escriu la paraula en anglès':'Type the English')+'"><button class="btn" type="button" id="cardTypeCheck">'+(ca()?'Comprova i gira':'Check and turn')+'</button></div><p class="feedback" id="cardTypeMsg"></p>':'')
+    +'<div class="counter" id="cardCounter"></div><div class="flash-actions"><button class="btn secondary" id="prevCard" type="button">← '+(ca()?'Anterior':'Previous')+'</button><button class="btn" id="gotCard" type="button"></button><button class="btn secondary" id="againCard" type="button"></button><button class="btn secondary" id="nextCard" type="button">'+(ca()?'Següent':'Next')+' →</button><button class="btn secondary" id="newCards" type="button"></button><button class="btn secondary" id="skipCards" type="button"></button></div><p class="instruction" id="cardNote"></p>';
+  $$(".dir-toggle [data-dir]").forEach(b=>{const on=b.dataset.dir===(c?"ca":"en");b.classList.toggle("secondary",!on);b.setAttribute("aria-pressed",on);b.onclick=()=>{state.cardDir=b.dataset.dir;save();renderCaCards()}});
+  $("#flashcard").onclick=()=>$("#flashcard").classList.toggle("flipped");
+  $("#flashcard").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#flashcard").classList.toggle("flipped")}};
+  window.renderCards=function(){};flashcardSet.cards=[];flashcardSet.lastLevel=null;flashcardSet.config=null;
+  flashcardSet.init({cards:cardDeck,level:()=>level,complete:()=>{state.cardsDone=true;save()},isDone:()=>!!state.cardsDone});
+  if(c){
+    const check=()=>{const card=flashcardSet.cards[flashcardSet.index];if(!card)return;const v=norm($("#cardType").value),ok=!!v&&String(card[1]).split(/\s*[\/,;]\s*/).some(a=>norm(a.replace(/\([^)]*\)/g,""))===v||norm(a)===v);
+      $("#cardTypeMsg").className="feedback "+(ok?"ok":"no");
+      $("#cardTypeMsg").textContent=!v?(ca()?"Escriu-la o digues-la en veu alta i gira la targeta.":"Type it, or say it aloud and turn the card."):ok?(ca()?"Correcte! Tria «Ho sé».":"Correct! Choose “Got it”."):(ca()?"Compara-la amb la targeta. Si no la sabies, tria «Un altre cop».":"Compare it with the card. If you didn’t know it, choose “Again”.");
+      $("#flashcard").classList.add("flipped")};
+    $("#cardTypeCheck").onclick=check;$("#cardType").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();check()}};
+    new MutationObserver(()=>{if(!$("#flashcard").classList.contains("flipped")){$("#cardType").value="";$("#cardTypeMsg").textContent=""}}).observe($("#flashcard"),{attributes:true,attributeFilter:["class"]});
+  }
 }
 function renderDict(){
   const chunks=lpPanel("listen").chunks||[];if(!chunks.length){$("#gsDict").innerHTML="";return}
