@@ -33,6 +33,7 @@
 /* Speaking surfaces follow the course reference; keep layout and controls unchanged. */
 #speak .section-card,#speak .mini-card{background:#fbfdff}
 .ca-card{max-width:520px;margin:10px 0;padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--cream);text-align:center}.ca-card strong{display:block;font-size:1.5rem;color:var(--dark)}.ca-card .tiny{margin:6px 0 0}
+.cycle-box{margin:12px 0;padding:12px 14px;border:1px dashed var(--line);border-radius:13px;background:#fbfdff}.cycle-box .instruction{margin:6px 0}.cycle-box .typed{width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit}
 .track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}
 .plan-card .typed{width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit}
 .plan-card .field{display:block;margin:12px 0}.plan-card .field strong{display:block;color:var(--dark);margin-bottom:6px}
@@ -126,12 +127,14 @@ html,body{overflow-x:clip}
 <section class="panel" id="listen">
   <div class="panel-head"><div><h2>Listening: Where do Halloween and the Castanyada come from?</h2><p class="instruction" data-support-ca="Mira el vídeo una vegada sense subtítols per entendre la idea general. Després llegeix les preguntes, activa els subtítols (CC) i mira'l una altra vegada per buscar els detalls. Pots triar la versió lenta." data-support-en="Watch once without subtitles for the general idea. Then read the questions, turn on subtitles (CC) and watch again for the details.">Watch once without subtitles for the general idea. Then read the questions, turn on subtitles (CC) and watch again for the details.</p></div><span class="pill">Video · 2 min</span></div>
   <div class="section-card">
+    <div id="gsPredict"></div>
     <div class="actions" role="group" aria-label="Video speed"><button class="btn secondary" type="button" id="vidNormal">Normal speed</button><button class="btn secondary" type="button" id="vidSlow" data-support-ca="Versió lenta" data-support-en="Slower version">Slower version</button></div>
     <video id="originsVideo" controls preload="metadata" playsinline style="width:100%;border-radius:14px;margin:12px 0;background:#000" poster="video/halloween-castanyada-poster.jpg">
       <source src="video/halloween-castanyada.mp4" type="video/mp4">
       <track kind="subtitles" srclang="en" label="English" src="video/halloween-castanyada.vtt">
     </video>
     <p class="tiny" style="color:var(--muted)">Illustrated video made for English Lab. Voices generated with ElevenLabs.</p>
+    <div id="gsGist"></div>
     <form id="listenForm"></form>
     <div class="actions"><button class="btn" id="checkListen" type="button" data-support-ca="Comprova el listening" data-support-en="Check listening">Check listening</button> <button class="btn secondary" id="againListen" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
     <div class="result" id="listenResult"></div>
@@ -361,7 +364,20 @@ function renderDict(){
   $("#gsDCheck").onclick=()=>{state.dict.listen=chunks.map((c,i)=>{const v=$("#gsD"+i).value,ok=norm(v)===norm(c),f=$("#gsDf"+i);f.className="feedback "+(ok?"ok":"no");
     f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(ca()?"Era: ":"It was: ")+"<strong>"+c+"</strong>"+(ca()?". Compara-ho paraula per paraula.":". Compare it word by word.");return v});save()};
 }
-function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderRecall();renderWords();renderRead();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);updateProgress()}
+// Listening cycle (research audit, Roger 27 Oct 2026): a copy of ls2-engine.js predictHtml/gistHtml/bindCycle; saved in state.cycle.listen.
+function renderCycle(){
+  $("#gsPredict").innerHTML='<div class="cycle-box"><strong>🔮 '+(ca()?'Abans d’escoltar':'Before you listen')+'</strong><p class="instruction">'+(ca()?'Llegeix el títol i les preguntes. Escriu 2 o 3 paraules o idees que creus que sentiràs.':'Read the title and the questions. Write 2 or 3 words or ideas you think you will hear.')+'</p><input type="text" class="typed" id="gsPred" maxlength="160" placeholder="'+(ca()?'Per exemple: un lloc, una persona, un dia':'For example: a place, a person, a day')+'"></div>';
+  $("#gsGist").innerHTML='<div class="cycle-box"><strong>👂 '+(ca()?'Després de la primera escolta':'After the first listen')+'</strong><p class="instruction">'+(ca()?'Escolta una vegada sense mirar les preguntes. De què parla? Escriu una frase.':'Listen once without looking at the questions. What is it about? Write one sentence.')+'</p><input type="text" class="typed" id="gsGistIn" maxlength="200">'
+    +'<p class="instruction" style="margin-top:10px">'+(ca()?'Has sentit les paraules que havies predit?':'Did you hear the words you predicted?')+'</p><div class="actions" role="group">'
+    +[["all",ca()?"Totes":"All of them"],["some",ca()?"Algunes":"Some"],["none",ca()?"Cap":"None"]].map(([v,t])=>'<button class="btn secondary" type="button" data-heard="'+v+'">'+t+'</button>').join("")+'</div>'
+    +'<p class="instruction" style="margin-top:10px"><strong>'+(ca()?'Ara torna a escoltar per als detalls i respon les preguntes.':'Now listen again for the details and answer the questions.')+'</strong></p></div>';
+  state.cycle=state.cycle||{};const c=state.cycle.listen=state.cycle.listen||{},pr=$("#gsPred"),g=$("#gsGistIn"),hb=$$("[data-heard]");
+  const mark=()=>hb.forEach(b=>{const on=b.dataset.heard===c.heard;b.classList.toggle("secondary",!on);b.setAttribute("aria-pressed",on)});
+  pr.value=c.predict||"";g.value=c.gist||"";mark();
+  pr.onchange=()=>{c.predict=pr.value.trim();save()};g.onchange=()=>{c.gist=g.value.trim();save()};
+  hb.forEach(b=>b.onclick=()=>{c.heard=b.dataset.heard;save();mark()});
+}
+function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderCycle();renderRecall();renderWords();renderRead();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);updateProgress()}
 function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));save();renderAll()}
 $$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
 $$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");window.scrollTo({top:document.querySelector("main").offsetTop-64,behavior:"smooth"})});
