@@ -32,6 +32,7 @@
 @media(max-width:760px){.choice-grid,.speak-support{grid-template-columns:1fr}}
 /* Speaking surfaces follow the course reference; keep layout and controls unchanged. */
 #speak .section-card,#speak .mini-card{background:#fbfdff}
+.ca-card{max-width:520px;margin:10px 0;padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--cream);text-align:center}.ca-card strong{display:block;font-size:1.5rem;color:var(--dark)}.ca-card .tiny{margin:6px 0 0}
 .track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}
 .plan-card .typed{width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit}
 .plan-card .field{display:block;margin:12px 0}.plan-card .field strong{display:block;color:var(--dark);margin-bottom:6px}
@@ -105,6 +106,7 @@ html,body{overflow-x:clip}
 <section class="panel" id="words">
   <div class="panel-head"><div><h2>Autumn words</h2><p class="instruction" data-support-ca="Passa el ratolí (o toca) cada paraula per veure què vol dir. Després completa les frases: necessites un 80 % per completar el pas." data-support-en="Hover over (or tap) each word to see its meaning. Then complete the sentences: you need 80 % to complete the step.">Hover over (or tap) each word to see its meaning. Then complete the sentences: you need 80 % to complete the step.</p></div><span class="pill" id="wordsPill"></span></div>
   <div class="section-card"><div class="vocab-groups" id="vocabGroups"></div></div>
+  <div class="section-card" id="caCards"></div>
   <div class="section-card"><h3 data-support-ca="Completa les frases" data-support-en="Complete the sentences">Complete the sentences</h3>
     <div id="practiceList"></div>
     <div class="actions"><button class="btn" id="checkPractice" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againPractice" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
@@ -133,6 +135,7 @@ html,body{overflow-x:clip}
     <form id="listenForm"></form>
     <div class="actions"><button class="btn" id="checkListen" type="button" data-support-ca="Comprova el listening" data-support-en="Check listening">Check listening</button> <button class="btn secondary" id="againListen" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
     <div class="result" id="listenResult"></div>
+    <div id="gsDict"></div>
     <details style="margin-top:18px"><summary style="cursor:pointer;font-weight:700" data-support-ca="Extra opcional: un vídeo real sobre Halloween" data-support-en="Optional extra: a real video about Halloween">Optional extra: a real video about Halloween</summary>
       <div style="position:relative;padding-top:56.25%;margin:16px 0;border-radius:14px;overflow:hidden;background:#000">
         <iframe src="https://www.youtube-nocookie.com/embed/XUkX2itQchM" title="American holidays: Halloween" style="position:absolute;inset:0;width:100%;height:100%" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -327,7 +330,38 @@ function renderPlan(){
   const keep=()=>{state.review[level]={helped:h.value.trim(),review:r.value.trim(),at:new Date().toISOString()};save();$("#lpReviewMsg").textContent=ca()?"Desat ✓":"Saved ✓"};
   h.onchange=keep;r.onchange=keep;
 }
-function renderAll(){setVideo(ca());renderPlan();renderRecall();renderWords();renderRead();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);updateProgress()}
+// Català → English cards and micro-dictation (research audit, Roger 26 Oct 2026): the same activities as on the LS2 engine pages
+// (ls2-engine.js R.vocab cards in "Català → English" and dictHtml/bindDict), from window.LP's core list (words panel) and chunks (listen panel).
+// Practice only: not steps, not marked; dictation answers in state.dict.listen.
+const lpPanel=id=>(window.LP.panels||[]).find(x=>x.id===id)||{};
+let caDeck=[],caAt=0;
+function renderCaCards(){
+  const all=forLevel(vocab,level).flatMap(g=>g.items.map(x=>[x[1],x[0],g.g,x[2]])),c=lpPanel("words").core||{};
+  const list=c[level]||(level==="beginners"?c.insecure:level==="daring"?c.safe:null)||[],core=new Set(list.map(norm));
+  const pick=all.filter(x=>core.has(norm(x[1])));caDeck=(pick.length?pick:all).sort(()=>Math.random()-.5);caAt=0;
+  $("#caCards").innerHTML='<h3>'+(ca()?'Targetes: català → anglès':'Cards: Catalan → English')+'</h3><p class="instruction">'+(ca()?'Llegeix la paraula en català, escriu-la en anglès i comprova-ho.':'Read the Catalan, type the English and check.')+'</p>'
+    +'<div class="ca-card"><div class="tiny" id="caGroup"></div><strong id="caFront"></strong><p id="caBack" hidden></p></div>'
+    +'<div class="actions"><input type="text" class="typed" id="caType" autocomplete="off" autocapitalize="off" spellcheck="false" style="max-width:300px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit" placeholder="'+(ca()?'Escriu la paraula en anglès':'Type the English')+'"><button class="btn" type="button" id="caCheck">'+(ca()?'Comprova':'Check')+'</button><button class="btn secondary" type="button" id="caNext">'+(ca()?'Següent':'Next')+' →</button></div><p class="feedback" id="caMsg"></p><p class="tiny" id="caCount"></p>';
+  const show=()=>{const v=caDeck[caAt];$("#caGroup").textContent=v[2];$("#caFront").textContent=v[0];$("#caBack").hidden=true;$("#caType").value="";$("#caMsg").textContent="";$("#caCount").textContent=(ca()?'Targeta ':'Card ')+(caAt+1)+(ca()?' de ':' of ')+caDeck.length};
+  const check=()=>{const v=caDeck[caAt],t=norm($("#caType").value),ok=!!t&&String(v[1]).split(/\s*[\/,;]\s*/).some(a=>norm(a.replace(/\([^)]*\)/g,""))===t||norm(a)===t);
+    $("#caBack").hidden=false;$("#caBack").innerHTML='<b>'+v[1]+'</b><br>'+(v[3]||"");$("#caMsg").className="feedback "+(ok?"ok":"no");
+    $("#caMsg").textContent=ok?(ca()?"Correcte!":"Correct!"):(ca()?"Compara-la amb la resposta i torna-la a dir en veu alta.":"Compare it with the answer and say it aloud again.")};
+  $("#caCheck").onclick=check;$("#caType").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();check()}};
+  $("#caNext").onclick=()=>{caAt=(caAt+1)%caDeck.length;show()};
+  if(caDeck.length)show();else $("#caCards").hidden=true;
+}
+function renderDict(){
+  const chunks=lpPanel("listen").chunks||[];if(!chunks.length){$("#gsDict").innerHTML="";return}
+  $("#gsDict").innerHTML='<h3 style="margin-top:22px">✍️ '+(ca()?'Microdictat':'Micro-dictation')+'</h3><p class="instruction">'+(ca()?'Escolta cada fragment del listening (pots repetir-lo) i escriu-lo exactament.':'Listen to each bit from the listening (you can play it again) and write it exactly.')+'</p>'
+    +chunks.map((c,i)=>'<div class="question"><div class="actions"><button class="btn secondary" type="button" data-say="'+i+'">▶ '+(ca()?'Escolta':'Listen')+' '+(i+1)+'</button><button class="btn secondary" type="button" data-slow="'+i+'">🐢 '+(ca()?'Més a poc a poc':'Slower')+'</button></div><input type="text" class="typed" id="gsD'+i+'" autocomplete="off" autocapitalize="off" spellcheck="false" style="width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit"><div class="feedback" id="gsDf'+i+'"></div></div>').join("")
+    +'<div class="actions"><button class="btn" type="button" id="gsDCheck">'+(ca()?'Comprova':'Check')+'</button></div>';
+  const say=(t,rate)=>{const s=window.speechSynthesis;if(!s)return;s.cancel();const u=new SpeechSynthesisUtterance(t),v=s.getVoices().find(x=>/^en(-|_)GB/i.test(x.lang))||s.getVoices().find(x=>/^en(-|_)/i.test(x.lang));u.lang="en-GB";if(v)u.voice=v;u.rate=rate;s.speak(u)};
+  state.dict=state.dict||{};const kept=state.dict.listen||[];
+  chunks.forEach((c,i)=>{$('[data-say="'+i+'"]').onclick=()=>say(c,.9);$('[data-slow="'+i+'"]').onclick=()=>say(c,.6);$("#gsD"+i).value=kept[i]||""});
+  $("#gsDCheck").onclick=()=>{state.dict.listen=chunks.map((c,i)=>{const v=$("#gsD"+i).value,ok=norm(v)===norm(c),f=$("#gsDf"+i);f.className="feedback "+(ok?"ok":"no");
+    f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(ca()?"Era: ":"It was: ")+"<strong>"+c+"</strong>"+(ca()?". Compara-ho paraula per paraula.":". Compare it word by word.");return v});save()};
+}
+function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderRecall();renderWords();renderRead();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);updateProgress()}
 function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));save();renderAll()}
 $$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
 $$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");window.scrollTo({top:document.querySelector("main").offsetTop-64,behavior:"smooth"})});

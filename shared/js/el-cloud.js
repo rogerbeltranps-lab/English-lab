@@ -165,7 +165,21 @@ async function ensureGroup(u){
       o.querySelector("#el-gr").append(b)});
   });
 }
-// Routes are set by the teacher only (Roger, 26 Oct 2026: from the LS1 exam mark); students no longer choose or ask for one.
+// 2 ESO students with no route choose one (Roger, 26 Oct 2026; elCanPickRoute in el-catalog.js): Base, Core or Plus, saved in the first
+// LS of the course as by:"student" so it carries over. They can change it on their board until the teacher sets a route. null: not saved.
+function chooseRoute(u,course){
+  return new Promise(res=>{
+    const o=overlay('<div style="max-width:520px"><h1>Tria la teva ruta</h1><p>Tria com vols treballar les activitats. La pots canviar a <b>Les meves activitats</b> fins que el professor te\'n posi una; després ja no la podràs canviar.</p><div id="el-lv"></div></div>');
+    EL_LEVELS.filter(l=>l.pick!==false).forEach(l=>{const b=document.createElement("button");b.innerHTML="<b>"+l.name+"</b><br><small>"+l.ca+"</small>";
+      b.style.cssText="display:block;width:100%;margin:10px 0;padding:12px;border:2px solid #0f766e;background:#fff;border-radius:12px;cursor:pointer;font:inherit";
+      b.onclick=async()=>{if(!confirm("Vols fer la ruta "+(l.student||l.name)+"?"))return;
+        try{await setDoc(doc(db,"students",u.uid,"levels",elPickLs(course)),{level:l.id,by:"student",updated:serverTimestamp()})}
+        catch(e){alert("No s'ha pogut desar la ruta: "+e.message);o.remove();res(null);return}
+        o.remove();res(l.id)};
+      o.querySelector("#el-lv").append(b)});
+  });
+}
+// Routes are set by the teacher (Roger, 26 Oct 2026: from the LS1 exam mark); 2 ESO students with none choose their own (chooseRoute).
 // A student sees only their route's button. Testers keep every route button to try them all (their route, if any, opens first).
 function applyLevel(lvl,all){
   myLevel=lvl;
@@ -201,7 +215,10 @@ async function gate(u){
   // The route of this LS, or the one carried over from an earlier LS (elRouteOf). With none yet, a student works on the Insecure
   // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
   const lvs={};try{(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){console.warn("levels",e)}
-  let lvl=elRouteOf(lvs,lsId).level;
+  const rt=elRouteOf(lvs,lsId),course=(EL_LS.find(l=>l.id===lsId)||{}).course,canPick=!tester&&elCanPickRoute(lvs,course);
+  let lvl=rt.level;
+  if(!lvl&&canPick&&st!=="closed")lvl=await chooseRoute(u,course);
+  else if(rt.own&&canPick)banner("Aquesta ruta l'has triat tu. La pots canviar a Les meves activitats fins que el professor te'n posi una.","#0369a1");
   if(!lvl&&!tester){lvl="insecure";banner("Encara no tens nivell: el professor te'l posarà a partir de l'examen de la primera LS. De moment fas la ruta Insecure.","#0369a1")}
   if(lvl||tester)applyLevel(lvl,tester);
   if(st==="closed"){freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}

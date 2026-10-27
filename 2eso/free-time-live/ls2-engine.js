@@ -268,7 +268,7 @@ var LS2 = (function () {
     };
     $('#' + p.id + 'Stop').onclick = () => window.speechSynthesis && speechSynthesis.cancel();
   }
-  /* Micro-dictation (research audit, Roger 26 Oct 2026): after the questions of a listening, 2–3 short chunks of its script (p.chunks,
+  /* Micro-dictation (research audit, Roger 26 Oct 2026): after the questions of a listening (or a listening chart step), 2–3 short chunks of its script (p.chunks,
      chosen in the LS project) are said with the browser's English voice and the student writes them. Practice: not a step, not marked;
      the answers stay in state.dict[panel]. Without p.chunks nothing is shown. */
   function dictHtml(p) {
@@ -435,13 +435,13 @@ var LS2 = (function () {
   // (+ optional teammate ratings). Handing in stores state.steps[id]; the teacher dashboard reads it.
   const SCALE = { ca: ['Encara no', 'En part', 'Gairebé del tot', 'Del tot'], en: ['Not yet', 'Partly', 'Mostly', 'Fully'] };
   R.step = p => ({
-    html: '<div class="section-card">' + (p.html ? (typeof p.html === 'function' ? p.html(level) : tx(p.html)) : '') + mediaHtml(p) + '<div id="' + p.id + 'Fields"></div></div>' +
+    html: '<div class="section-card">' + (p.html ? (typeof p.html === 'function' ? p.html(level) : tx(p.html)) : '') + mediaHtml(p) + '<div id="' + p.id + 'Fields"></div></div>' + dictHtml(p) +
       (p.rate ? '<div class="section-card"><h3>' + (ca() ? 'Autoavaluació' : 'Self-assessment') + '</h3><p class="instruction">' + (ca() ? 'Puntua’t amb sinceritat: 1 ' + SCALE.ca[0] + ' · 2 ' + SCALE.ca[1] + ' · 3 ' + SCALE.ca[2] + ' · 4 ' + SCALE.ca[3] + '.' : 'Be honest: 1 ' + SCALE.en[0] + ' · 2 ' + SCALE.en[1] + ' · 3 ' + SCALE.en[2] + ' · 4 ' + SCALE.en[3] + '.') + '</p><div id="' + p.id + 'Rate"></div></div>' : '') +
       (p.peers ? '<div class="section-card"><h3>' + (ca() ? 'Els meus companys' : 'My teammates') + '</h3><p class="instruction">' + tx(p.peersIntro) + '</p><div id="' + p.id + 'Peers"></div></div>' : '') +
       '<div class="section-card"><label class="field"><strong>' + (ca() ? 'Vols dir alguna cosa al professor? Un problema que hàgiu tingut? (opcional)' : 'Anything you want to tell your teacher? A problem you or your group faced? (optional)') + '</strong><textarea id="' + p.id + 'Comment" rows="3"></textarea></label>' +
       '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Send">' + (ca() ? 'Entrega aquest pas' : 'Hand in this step') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>',
     bind() {
-      bindAudio(p);
+      bindAudio(p); bindDict(p);
       state.steps = state.steps || {};
       const key = p.id, draft = (state.stepDraft = state.stepDraft || {})[key] = state.stepDraft[key] || { f: p.product && state.form ? Object.assign({}, state.form) : {}, rate: [], peers: [] };
       const fields = forLevel(p.fields), stm = byLevel(p.rate) || [];

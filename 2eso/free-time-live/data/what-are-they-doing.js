@@ -20,6 +20,7 @@ window.LP = {
     { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Roba, equipament i temps', en: 'Clothes, kit and weather' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'crowd · half-time · highlights',
+      core: { insecure: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'cap', 'helmet', 'wear a uniform', 'wear a costume', 'It’s sunny', 'It’s cloudy', 'It’s windy', 'It’s cold', 'It’s hot', 'It’s raining', 'It’s snowing'], safe: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'helmet', 'wear a uniform', 'It’s sunny', 'It’s cold', 'It’s raining', 'It’s snowing', 'a concert', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'foggy', 'freezing', 'What’s the weather like?', 'degrees'], daring: ['trainers', 'tracksuit', 'helmet', 'wear a uniform', 'It’s raining', 'It’s snowing', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'freezing', 'What’s the weather like?', 'degrees', 'the crowd', 'cheer', 'warm up', 'take part in'] },
       groups: [
         { g: 'Clothes & kit', items: [['T-shirt', 'samarreta', 'He’s wearing a red T-shirt.'], ['trainers', 'bambes', 'I need new trainers for running.'], ['tracksuit', 'xandall', 'She’s wearing a blue tracksuit.'], ['shorts', 'pantalons curts', 'They’re playing in shorts.'], ['cap', 'gorra', 'Put on a cap: it’s sunny.'], ['helmet', 'casc', 'Always wear a helmet on your bike.'], ['wear a uniform', 'portar uniforme', 'The team wears a white uniform.'], ['wear a costume', 'portar una disfressa', 'At the fair, people wear costumes.']] },
         { g: 'Weather', items: [['It’s sunny', 'fa sol', 'It’s sunny, so we’re at the beach.'], ['It’s cloudy', 'està ennuvolat', 'It’s cloudy but it isn’t cold.'], ['It’s windy', 'fa vent', 'It’s windy: perfect for kites.'], ['It’s cold', 'fa fred', 'It’s cold. Wear a jacket.'], ['It’s hot', 'fa calor', 'It’s hot today: 30 degrees!'], ['It’s raining', 'plou', 'It’s raining, so the match is cancelled.'], ['It’s snowing', 'neva', 'Look! It’s snowing!']] },
@@ -101,6 +102,7 @@ window.LP = {
         ['Emma', 'Marc usually plays as a defender, but today he’s playing as a forward. And it’s working!'],
         ['Sam', 'Now the Green Team has the ball. Their captain, Júlia, is passing to number four… she’s shooting… and she misses. The Blue Team is winning, six to two.'],
         ['Emma', 'What a match! It’s half-time now. The players are drinking water and the coach is talking to the team. We’ll be back in ten minutes. Don’t go away!']] },
+      chunks: ['the crowd is cheering', 'wearing green T-shirts and black shorts', 'It’s cold and rainy outside'],
       items: [
         { q: 'Where are Emma and Sam?', o: ['at the sports hall', 'at the skate park', 'at the swimming pool'], h: 'Escolta el principi: “We’re at the…”.' },
         { q: 'What is the Blue Team wearing?', o: ['a white uniform', 'green T-shirts', 'black shorts'], h: 'Escolta “The Blue Team is wearing…”.' },

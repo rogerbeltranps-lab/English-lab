@@ -131,8 +131,10 @@ const listening=[
 ];
 window.LP={key:"ls2GettingStarted4ESO",title:"Getting started",panels:[
  {id:"recall",type:"recall",tab:"Recall",title:"Recall",items:recall},
- {id:"words",type:"typed",area:"Vocabulary",tab:"Autumn words",title:"Autumn words",items:practice},
+ {id:"words",type:"typed",area:"Vocabulary",tab:"Autumn words",title:"Autumn words",items:practice,
+  core:{insecure:["spring","summer","autumn (UK) / fall (US)","winter","sunny","cloudy","windy","rainy","cold","warm","the days get shorter / longer","leaves fall","chestnuts","sweet potatoes","pumpkins","harvest","excited","grateful","proud","scared"],safe:["autumn (UK) / fall (US)","winter","foggy","mild","the days get shorter / longer","leaves change colour","chestnuts","sweet potatoes","pumpkins","harvest","grateful","proud","seasonal","crop","pick fruit","frost","chilly","cosy","it gets dark early","the clocks go back"],daring:["autumn (UK) / fall (US)","winter","foggy","mild","the days get shorter / longer","leaves change colour","chestnuts","sweet potatoes","pumpkins","harvest","grateful","proud","seasonal","crop","pick fruit","frost","chilly","cosy","it gets dark early","the clocks go back"]}},
  {id:"read",type:"mc",media:{text:true},tab:"Reading",title:"Reading: The autumn chat",items:readingQs},
- {id:"listen",type:"mc",media:{videos:true},tab:"Listening",title:"Listening: Halloween and the Castanyada",items:listening},
+ {id:"listen",type:"mc",media:{videos:true},tab:"Listening",title:"Listening: Halloween and the Castanyada",items:listening,
+  chunks:["at the end of the harvest","sweet potatoes are autumn food","on the first of November"]},
  {id:"speak",type:"speaking",tab:"Speaking"}
 ]};
