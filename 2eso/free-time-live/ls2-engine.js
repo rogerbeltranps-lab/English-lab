@@ -268,6 +268,34 @@ var LS2 = (function () {
     };
     $('#' + p.id + 'Stop').onclick = () => window.speechSynthesis && speechSynthesis.cancel();
   }
+  /* Listening cycle (research audit, Roger 27 Oct 2026): every listening (audio, YouTube or video) opens with a prediction and has a gist
+     check between the first and the second listen; the questions are the second, detailed listen and the dictation (below) the third.
+     Generic prompts, so no LS content is needed. Practice: not a step, not marked; saved in state.cycle[panel]. */
+  const isListening = p => !!(p.media && (p.media.audio || p.media.youtube || p.media.videos));
+  function predictHtml(p) {
+    if (!isListening(p)) return '';
+    return '<div class="cycle-box"><strong>🔮 ' + (ca() ? 'Abans d’escoltar' : 'Before you listen') + '</strong><p class="instruction">' + (ca() ? 'Llegeix el títol i les preguntes. Escriu 2 o 3 paraules o idees que creus que sentiràs.' : 'Read the title and the questions. Write 2 or 3 words or ideas you think you will hear.') + '</p>' +
+      '<input type="text" class="typed" id="' + p.id + 'Predict" maxlength="160" placeholder="' + (ca() ? 'Per exemple: un lloc, una persona, un dia' : 'For example: a place, a person, a day') + '"></div>';
+  }
+  function gistHtml(p) {
+    if (!isListening(p)) return '';
+    return '<div class="cycle-box"><strong>👂 ' + (ca() ? 'Després de la primera escolta' : 'After the first listen') + '</strong><p class="instruction">' + (ca() ? 'Escolta una vegada sense mirar les preguntes. De què parla? Escriu una frase.' : 'Listen once without looking at the questions. What is it about? Write one sentence.') + '</p>' +
+      '<input type="text" class="typed" id="' + p.id + 'Gist" maxlength="200">' +
+      '<p class="instruction" style="margin-top:10px">' + (ca() ? 'Has sentit les paraules que havies predit?' : 'Did you hear the words you predicted?') + '</p><div class="actions" role="group">' +
+      [['all', ca() ? 'Totes' : 'All of them'], ['some', ca() ? 'Algunes' : 'Some'], ['none', ca() ? 'Cap' : 'None']].map(([v, t]) => '<button class="btn secondary" type="button" data-heard="' + p.id + '" data-v="' + v + '">' + t + '</button>').join('') + '</div>' +
+      '<p class="instruction" style="margin-top:10px"><strong>' + (ca() ? 'Ara torna a escoltar per als detalls i respon les preguntes.' : 'Now listen again for the details and answer the questions.') + '</strong></p></div>';
+  }
+  function bindCycle(p) {
+    if (!isListening(p)) return;
+    if (!document.getElementById('cycleCss')) document.head.insertAdjacentHTML('beforeend', '<style id="cycleCss">.cycle-box{margin:12px 0;padding:12px 14px;border:1px dashed var(--line);border-radius:13px;background:#fbfdff}.cycle-box .instruction{margin:6px 0}.cycle-box .typed{width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit}</style>');
+    state.cycle = state.cycle || {}; const c = state.cycle[p.id] = state.cycle[p.id] || {};
+    const pr = $('#' + p.id + 'Predict'), g = $('#' + p.id + 'Gist'), heard = $$('[data-heard="' + p.id + '"]');
+    const mark = () => heard.forEach(b => { const on = b.dataset.v === c.heard; b.classList.toggle('secondary', !on); b.setAttribute('aria-pressed', on); });
+    pr.value = c.predict || ''; g.value = c.gist || ''; mark();
+    pr.onchange = () => { c.predict = pr.value.trim(); save(); };
+    g.onchange = () => { c.gist = g.value.trim(); save(); };
+    heard.forEach(b => b.onclick = () => { c.heard = b.dataset.v; save(); mark(); });
+  }
   /* Micro-dictation (research audit, Roger 26 Oct 2026): after the questions of a listening (or a listening chart step), 2–3 short chunks of its script (p.chunks,
      chosen in the LS project) are said with the browser's English voice and the student writes them. Practice: not a step, not marked;
      the answers stay in state.dict[panel]. Without p.chunks nothing is shown. */
@@ -298,9 +326,9 @@ var LS2 = (function () {
     };
   }
   R.mc = p => ({
-    html: '<div class="section-card">' + mediaHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
+    html: '<div class="section-card">' + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
     bind() {
-      bindAudio(p); bindDict(p);
+      bindAudio(p); bindCycle(p); bindDict(p);
       const items = forLevel(p.items), f = $('#' + p.id + 'Form');
       f.innerHTML = items.map((q, i) => '<div class="question"><p class="q-title">' + (i + 1) + '. ' + q.q + '</p><div class="options">' +
         learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + p.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') +
@@ -435,13 +463,13 @@ var LS2 = (function () {
   // (+ optional teammate ratings). Handing in stores state.steps[id]; the teacher dashboard reads it.
   const SCALE = { ca: ['Encara no', 'En part', 'Gairebé del tot', 'Del tot'], en: ['Not yet', 'Partly', 'Mostly', 'Fully'] };
   R.step = p => ({
-    html: '<div class="section-card">' + (p.html ? (typeof p.html === 'function' ? p.html(level) : tx(p.html)) : '') + mediaHtml(p) + '<div id="' + p.id + 'Fields"></div></div>' + dictHtml(p) +
+    html: '<div class="section-card">' + (p.html ? (typeof p.html === 'function' ? p.html(level) : tx(p.html)) : '') + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<div id="' + p.id + 'Fields"></div></div>' + dictHtml(p) +
       (p.rate ? '<div class="section-card"><h3>' + (ca() ? 'Autoavaluació' : 'Self-assessment') + '</h3><p class="instruction">' + (ca() ? 'Puntua’t amb sinceritat: 1 ' + SCALE.ca[0] + ' · 2 ' + SCALE.ca[1] + ' · 3 ' + SCALE.ca[2] + ' · 4 ' + SCALE.ca[3] + '.' : 'Be honest: 1 ' + SCALE.en[0] + ' · 2 ' + SCALE.en[1] + ' · 3 ' + SCALE.en[2] + ' · 4 ' + SCALE.en[3] + '.') + '</p><div id="' + p.id + 'Rate"></div></div>' : '') +
       (p.peers ? '<div class="section-card"><h3>' + (ca() ? 'Els meus companys' : 'My teammates') + '</h3><p class="instruction">' + tx(p.peersIntro) + '</p><div id="' + p.id + 'Peers"></div></div>' : '') +
       '<div class="section-card"><label class="field"><strong>' + (ca() ? 'Vols dir alguna cosa al professor? Un problema que hàgiu tingut? (opcional)' : 'Anything you want to tell your teacher? A problem you or your group faced? (optional)') + '</strong><textarea id="' + p.id + 'Comment" rows="3"></textarea></label>' +
       '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Send">' + (ca() ? 'Entrega aquest pas' : 'Hand in this step') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>',
     bind() {
-      bindAudio(p); bindDict(p);
+      bindAudio(p); bindCycle(p); bindDict(p);
       state.steps = state.steps || {};
       const key = p.id, draft = (state.stepDraft = state.stepDraft || {})[key] = state.stepDraft[key] || { f: p.product && state.form ? Object.assign({}, state.form) : {}, rate: [], peers: [] };
       const fields = forLevel(p.fields), stm = byLevel(p.rate) || [];
