@@ -107,7 +107,8 @@ function render(){
   const g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lss=[...EL_LS].filter(l=>{const i=D.ls[l.id]||{status:"hidden"};return all()||(i.status!=="hidden"&&elLsForGroup(l,i,D.me.group))})
     .sort((a,b)=>((D.ls[b.id]||{}).status==="open")-((D.ls[a.id]||{}).status==="open"));   // open LS first
-  if(lss.length&&!lss.some(l=>l.id===S.ls))S.ls=lss[0].id;
+  // the board opens on the group's current LS by the time plan (ELWeek.now; Roger, 27 Oct 2026), else the first open one
+  if(lss.length&&!lss.some(l=>l.id===S.ls))S.ls=(lss.find(l=>l.id===(ELWeek.now(D.me.group)||{}).ls)||lss[0]).id;
   setLang();
   const links=all()?lss:lss.filter(l=>!only(l.id));   // no links to an LS that only shows its grade
   nav(g,links);
