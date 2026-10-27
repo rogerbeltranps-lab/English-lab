@@ -21,6 +21,7 @@ window.LP = {
     { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Activitats de temps lliure', en: 'Free-time activities' },
       intro: { ca: 'Explora les paraules, practica amb les targetes i completa les frases (80 %).', en: 'Explore the words, practise with the cards and complete the sentences (80 %).' },
       receptive: 'livestream · subscribers · highlights · fans',
+      core: { insecure: ['play football', 'play basketball', 'play video games', 'play the guitar', 'play the piano', 'go swimming', 'go skating', 'go cycling', 'go to the park', 'do karate', 'do gymnastics', 'do yoga', 'dance', 'draw', 'read comics', 'listen to music', 'meet friends'], safe: ['play football', 'play basketball', 'play video games', 'play the guitar', 'go swimming', 'go skating', 'go cycling', 'do karate', 'do gymnastics', 'do yoga', 'dance', 'draw', 'read comics', 'listen to music', 'meet friends', 'once a week', 'twice a week', 'every day', 'at the weekend', 'in my free time'], daring: ['play football', 'play video games', 'play the guitar', 'go swimming', 'go skating', 'go cycling', 'do karate', 'do yoga', 'draw', 'read comics', 'listen to music', 'meet friends', 'once a week', 'twice a week', 'at the weekend', 'in my free time', 'be good at', 'spend time + -ing', 'join a club', 'practise'] },
       groups: [
         { g: 'play + sport / game', items: [['play football', 'jugar a futbol', 'I play football on Saturday mornings.'], ['play basketball', 'jugar a bàsquet', 'We play basketball at the park.'], ['play video games', 'jugar a videojocs', 'He plays video games after dinner.'], ['play the guitar', 'tocar la guitarra', 'She plays the guitar in a band.'], ['play the piano', 'tocar el piano', 'My cousin plays the piano very well.']] },
         { g: 'go + -ing', items: [['go swimming', 'anar a nedar', 'We go swimming in summer.'], ['go skating', 'anar a patinar', 'They go skating at the skate park.'], ['go cycling', 'anar amb bici', 'I go cycling with my dad.'], ['go to the park', 'anar al parc', 'We go to the park after school.']] },
@@ -79,6 +80,7 @@ window.LP = {
         ['Omar', 'A cat who plays the guitar? I want to see it! Listen, the match finishes at twelve. Do you want to meet in the square at half past twelve?'],
         ['Laia', 'Perfect. I’ll bring the comic. See you there!'],
         ['Omar', 'See you!']] },
+      chunks: ['My sister is playing basketball', 'I usually go swimming', 'I’m drawing a comic'],
       items: [
         { q: 'Where is Omar?', o: ['at the sports centre', 'at the swimming pool', 'at home'], h: 'Escolta la primera resposta de l’Omar.' },
         { q: 'What is his sister doing?', o: ['playing basketball', 'swimming', 'drawing'], h: 'Escolta “My sister is…”.' },
