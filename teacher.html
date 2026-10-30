@@ -19,6 +19,7 @@ td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px 
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}button.sec{background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-size:13px}button.sec.off{background:#e2e8f0;color:#475569;border-color:#cbd5e1}button.secall{background:none;color:#0f766e;padding:2px 6px;font-size:12px;text-decoration:underline}
+.ycards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:10px;margin:8px 0}.ycard{border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;background:#f8fafc}.ycard ul{margin:6px 0;padding-left:18px}.ycard li{margin:2px 0}.yfree{border-style:dashed;background:#fff}.yterm.ynow{border:2px solid #0f766e}.cbar{display:flex;height:26px;border-radius:8px;overflow:hidden;margin:6px 0 4px;background:#e2e8f0}.cbar span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;border-right:1px solid #fff}.cbar span:last-child{border-right:0}.clegend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:#475569;margin-bottom:6px}.clegend i,i.cdot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>summary{font-size:.9rem;font-weight:600;color:#475569}tr.away td{color:#94a3b8;background:#f8fafc}.tag{font-size:11px;font-weight:600;background:#e2e8f0;color:#475569;border-radius:999px;padding:1px 6px;margin-left:4px}label.btn,a.btn{background:#0f766e;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;text-decoration:none}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 8px}.form input,.form select{width:100%;box-sizing:border-box}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}
 button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6px;padding:2px 7px;margin:1px;font-size:12px;font-weight:600}button.lv.on{color:#fff}td.gr{cursor:pointer;white-space:nowrap}td.gr:hover{outline:2px solid #0f766e;outline-offset:-2px}.sug{color:#64748b;font-style:italic}.deg{font-weight:700}td.tot{font-weight:700}.dlg input.ex{width:56px}table.lvt td{text-align:left}ul.pbl{list-style:none;padding:0;margin:6px 0}ul.pbl li{margin:10px 0;border-left:3px solid #b45309;padding-left:10px}ul.pbl li.fixed{border-color:#cbd5e1;color:#64748b}ul.pbl details>summary{font-size:13px;font-weight:600;color:#475569}ul.pbl code{font-size:12px;display:block;white-space:pre-wrap}
 #pdf{display:none}body.pdfmode{max-width:none;background:#e2e8f0}body.pdfmode>*:not(#pdf){display:none!important}body.pdfmode #pdf{display:block}
@@ -62,9 +63,9 @@ const LAST=(()=>{try{return JSON.parse(localStorage.getItem("el_t_last"))||{}}ca
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
   else if(gOf(LAST.g)||["plan","qa","mat","none"].includes(LAST.g))S.g=LAST.g;
-  if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3)S.ls=LAST.ls;   // render() swaps an LS of another course for the group's current one
+  if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   if(q.has("course")||q.has("ls")||q.has("g"))history.replaceState(null,"",location.pathname+location.hash)})();
-const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
+const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,year:!!S.year,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved, in the learning paths you open for their group."],closed:["Closed","Students can only review what they did and the feedback."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 
@@ -318,12 +319,13 @@ function render0(){
   const ls=S.ls,list=acts(ls),inG=studs.filter(s=>s.group===S.g||s.tester).sort(byName);   // the tester account shows in every group
   const tutors=[...new Set(inG.map(s=>s.ro&&s.ro.tutor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ca"));if(!tutors.includes(S.tutor))S.tutor="all";
   const shown=inG.filter(s=>(S.route==="all"||(level(s.uid,ls)||"none")===S.route)&&(S.tutor==="all"||s.ro&&s.ro.tutor===S.tutor));
-  const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${lsLabel(l)}${((D.ls[l.id]||{}).status||"hidden")==="hidden"?" (Hidden)":""}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}</select> `:`<b>${lsLabel(lss[0])}</b>${mine(lss[0])?"":" <small class=\"muted\">(not assigned to this group)</small>"} `)
-    +`<a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a> `
+  const filters=`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls&&!S.year?"selected":""}>${lsLabel(l)}${((D.ls[l.id]||{}).status||"hidden")==="hidden"?" (Hidden)":""}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}<option disabled>──────────</option><option value="${YEAR}" ${S.year?"selected":""}>📆 Whole school year (by terms)</option></select> `
+    +(S.year?"":`<a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a> `)
     +`<span class="muted">· Route:</span> `+["all","beginners","insecure","safe","daring","native","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"No route":LV[r]}</button>`).join("")
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"")
-    +(G()&&!G().only?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:"")
-    +(G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
+    +(G()&&!G().only&&!S.year?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:"")
+    +(G()&&G().marking&&!S.year?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
+  if(S.year){$("#main").innerHTML=`<div class="bar">${filters}</div>`+yearView(grp,shown);return}
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
     +lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
@@ -505,12 +507,125 @@ function gradeBox(studs){
     return `<tr>${who}${rtCell(s.uid)}${tm?`<td><small>${esc(teamOf(s.uid,fpA))||"–"}</small></td>`:""}`
       +g.blocks.map(b=>`<td class="gr" data-do="grade" data-u="${s.uid}" title="${esc(tip[b.id])}">${f1(val[b.id])}${b.id==="exam"&&exVer(s.uid)?"<br>"+route(exVer(s.uid))+(exVerOff(s.uid)?' <span title="Exam version differs from the current route">⚠️</span>':""):""}</td>`).join("")
       +`<td class="first gr tot" data-do="grade" data-u="${s.uid}">${f1(total)} ${deg(elDegree(total))}</td></tr>`}).join("");
-  const key=g.only?`<p class="muted">Marks out of 10. Only the final exam and the final product count in this LS (Roger, 25 Oct 2026): its learning paths are practice. Exam: sum of section scores ÷ sum of maxes; enter it below or by clicking a mark. Final product: the mark you give in its dialog (click a student's mark here, then "Open the final product").</p>`
+  const key=g.only?`<p class="muted">Marks out of 10. Only the final exam (${g.blocks.find(b=>b.id==="exam").w} %) and the final product (${g.blocks.find(b=>b.id==="fp").w} %) count in this LS: its learning paths are practice. Exam: sum of section scores ÷ sum of maxes; enter it below or by clicking a mark. Final product: the mark you give in its dialog (click a student's mark here, then "Open the final product").</p>`
     :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: ${g.gv.parts.map(p=>p.name.toLowerCase()+" "+p.w+" %").join(" + ")} (accuracy only from delayed retrieval; practice, grammar and mixed practice count as done by the session deadline in the teaching plan). Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
   return `<div class="box"><h2>LS grade</h2><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1" title="As in the grading plan: missing work counts 0 until it is handed in">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0" title="Mark so far: only what is done or assessed counts">not counted yet</button></div>`
     +fold("gradekey","How it is worked out",key,"key")
     +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`:"")
     +fold("exam","Exam marks",examTable(studs.filter(s=>!s.away)))+`</div>`;
+}
+// ---- Whole school year by terms (Roger, 30 Oct 2026: "an option to see all the school year by terms … (2 LS per each) that update as I
+// create the LS and the items to assess"). "📆 Whole school year" in the LS dropdown. Nothing here names an LS: the course's LSs come from
+// EL_LS, LS n is in term ceil(n/2) (or `term` in its EL_LS entry), and its assessed items are the blocks of EL_GRADING[ls] with their weights.
+// Each item counts in the term of its date in the group's EL_PLAN[ls] column (exam day; the last due day of the activities the block reads),
+// or in EL_PLAN[ls].report[block] when the plan says so (4ESO LS2: the exam on 23 Nov stays in term 1), else in its LS's term.
+// Marks by competence (Roger, 30 Oct 2026: "the mark of the term must be an average between criteria … each criterion is connected to a
+// specific competence … taking into account the proportion of each competence"): each item is split into pieces, one per criterion, and a
+// piece's weight is its share of the LS mark (exam: section points; final product: rubric rows or its criteria; grammar and vocabulary: the
+// criteria of its steps; other competences: one share each), so every LS weighs 100 and a competence worked in two LSs counts twice.
+// Competence mark = its pieces weighted; term and year mark = the competences weighted by their share (= every piece weighted). A degree the
+// teacher confirmed in an LS (final[criterion]) replaces that criterion's marks in that LS. Pieces with no competence (process, teamwork) are
+// left out. An item whose day has not come yet (no day: its LS is Hidden) never counts 0.
+const YEAR="__year",withLs=(ls,f)=>{const o=S.ls;S.ls=ls;try{return f()}finally{S.ls=o}};
+const withS=(k,v,f)=>{const o=S[k];S[k]=v;try{return f()}finally{S[k]=o}};
+const lsTerm=l=>Math.min(EL_TERMS.length,l.term||Math.ceil((EL_LS.filter(x=>x.course===l.course).indexOf(l)+1)/2));
+const termOf=d=>EL_TERMS.findIndex(t=>t.id===elTerm(d))+1;
+// competence of a criterion: "5.1" → "5" (CE5), "CD2 2.2" → "CD2"; null for process, teamwork…
+const compOf=c=>{const t=String(c).match(/^(CC\d|CD\d|CE\d) /);return t?t[1]:/^\d+\.\d/.test(c)?String(c).split(".")[0]:null};
+const compName=k=>(EL_COMPETENCES[k]||k),compShort=k=>compName(k).replace(/ · Competència /," ").replace(" · "," ");
+const COMPCOL={"1":"#db2777","2":"#16a34a","3":"#0284c7","4":"#7c3aed","5":"#ea580c","6":"#ca8a04","7":"#0d9488","8":"#4f46e5","9":"#be123c","10":"#65a30d"};
+const compCol=k=>COMPCOL[k]||(/^CD/.test(k)?["#0891b2","#0e7490","#155e75","#164e63"]:/^CC/.test(k)?["#475569","#334155","#64748b","#1e293b"]:["#a16207","#854d0e"])[(+k.slice(2)||1)-1]||"#64748b";
+const compSort=(a,b)=>{const n=k=>/^\d/.test(k)?+k:100+k.charCodeAt(1)*10+(+k.slice(2)||0);return n(a)-n(b)};
+function lsItems(l,gid){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)return [];
+  const p=(window.EL_PLAN||{})[l.id],gi=p?ELWeek.col(p,gid):-1,rep=(p&&p.report)||{},last=ids=>gi<0?null:[...new Set(ids)].map(id=>ELWeek.due(p,id,gi)).filter(Boolean).sort().pop()||null;
+  const ids={fp:[g.fp&&g.fp.a],gv:g.gv?g.gv.parts.flatMap(x=>(x.first||x.time||[]).map(y=>y[0])):[],
+    other:(g.other||[]).flatMap(c=>[...((g.auto||{})[c]||[]),...((g.teacher||{})[c]||[])].map(y=>y[0]))};
+  const its=g.blocks.map(b=>{const date=b.id==="exam"?(gi>=0?ELWeek.exam(p,gi):null):last((ids[b.id]||[]).filter(Boolean));
+    const it={l,g,b,date,term:+rep[b.id]||(date?termOf(date):lsTerm(l))};it.pcs=pieces(it);return it});
+  return S.yShare==="plan"?its:byWork(l,its)}
+// "By how much it is worked" (Roger, 30 Oct 2026: "is it true that we do so little listening?"): each competence's share of an LS is how many
+// steps of its activities work on its criteria (EL_STEP_CRITERIA; a step with two criteria counts half for each), so listening, practised
+// in every learning path, weighs what it is worked and not only its exam section. Only the competences the LS assesses share its 100; the
+// pieces keep their proportions inside their competence. An LS whose activities have no step criteria (LS1) keeps the grading plan shares.
+function lsWork(l){const n={};let any=false;cat.filter(a=>a.ls===l.id).forEach(a=>{const sc=(window.EL_STEP_CRITERIA||{})[a.id];if(!sc)return;any=true;
+  Object.values(sc).forEach(cs=>cs.forEach(c=>{const k=compOf(c);if(k)n[k]=(n[k]||0)+1/cs.length}))});return any?n:null}
+function byWork(l,its){const wk=lsWork(l);if(!wk)return its;const pw={};its.forEach(it=>it.pcs.forEach(p=>{const k=compOf(p.c);if(k)pw[k]=(pw[k]||0)+p.w}));
+  const ks=Object.keys(pw).filter(k=>wk[k]),tw=ks.reduce((a,k)=>a+wk[k],0),tot=Object.values(pw).reduce((a,x)=>a+x,0);if(!tw)return its;
+  its.forEach(it=>it.pcs.forEach(p=>{const k=compOf(p.c);if(k)p.w=wk[k]?p.w/pw[k]*wk[k]/tw*tot:0}));return its}
+// criteria shares of the grammar and vocabulary block: the criteria of its steps (EL_STEP_CRITERIA), each step counted once
+function gvShares(g){const n={};if(g.gv)g.gv.parts.forEach(p=>(p.first||p.time||[]).forEach(([id,k])=>((((window.EL_STEP_CRITERIA||{})[id]||{})[k])||[]).forEach(c=>n[c]=(n[c]||0)+1)));return n}
+const spread=(cs,w,m,n)=>cs.length?cs.map(c=>({c,w:w/cs.length,m,n})):[{c:null,w,m,n}];
+// pieces of one item: [{c, w, m(student)}], weights adding up to the block weight; m is worked out inside the item's LS
+function pieces(it){const g=it.g,b=it.b,w=b.w,shares=o=>{const t=Object.values(o).reduce((a,x)=>a+x,0);return Object.entries(o).map(([c,n])=>({c,w:w*n/t}))};
+  if(b.id==="exam"){const e=g.exam,tot=e.sections.reduce((a,[k])=>a+secMax(e,k),0),gvc=Object.keys(gvShares(g));
+    return e.sections.flatMap(([k,sn,,cs])=>{cs=cs||Object.keys(g.evidence||{}).filter(c=>g.evidence[c].e.some(x=>x&&(x.exam===k||(x[0]==="exam"&&x[1]===k))));
+      if(!cs.length&&e.level&&e.level.step===k)cs=[e.level.c];if(!cs.length)cs=gvc;   // vocabulary and grammar sections with no criteria: as the grammar and vocabulary block
+      return spread(cs,w*secMax(e,k)/tot,s=>{const y=(res(s.uid,asId(it.l.id)).sections||{})[k];return y&&y.score!=null?y.score/(y.max||secMax(e,k))*10:S.zero?0:null},sn)})}
+  if(b.id==="fp"){const f=g.fp;if(f.mark)return spread((byId(f.a)||{}).criteria||[],w,s=>fpBlock(s.uid));
+    const tot=f.rows.reduce((a,r)=>a+r.w,0);return f.rows.map(r=>({c:r.c,w:w*r.w/tot,n:r.name,m:s=>{const v=lvMark(lvOf(s.uid,f.a,r.step,r.c));return v==null&&S.zero?0:v}}))}
+  if(b.id==="gv"){const sh=shares(gvShares(g));return (sh.length?sh:[{c:null,w}]).map(x=>Object.assign(x,{m:s=>gvBlock(s.uid,s.group).mark}))}
+  if(b.id==="other")return spread(g.other||[],w,null).map(x=>Object.assign(x,{m:s=>otherCrit(s.uid,x.c).mark}));
+  return [{c:null,w,m:()=>null}]}
+// a student's marks: one row per piece {it, c, k (competence), w, m}; "Missing work counts 0" only once the item's day has passed
+function marksOf(s,items){const today=ELWeek.today(),out=[];
+  items.forEach(it=>{const z=S.zero&&(it.date?it.date<today:((S.D.ls[it.l.id]||{}).status||"hidden")!=="hidden"),fin=res(s.uid,asId(it.l.id)).final||{};
+    withLs(it.l.id,()=>withS("zero",z,()=>it.pcs.forEach(p=>{const k=compOf(p.c);if(!k)return;
+      out.push({it,c:p.c,k,w:p.w,n:p.n,m:s.away?null:fin[p.c]?lvMark(fin[p.c]):p.m(s)})})))});
+  return out}
+// competences of some pieces: {k: {w (share), m (mark or null)}}, and the overall mark (competences weighted by the share counted so far)
+function byComp(rows){const o={};rows.forEach(r=>{const x=o[r.k]=o[r.k]||{w:0,sw:0,sm:0};x.w+=r.w;if(r.m!=null){x.sw+=r.w;x.sm+=r.m*r.w}});
+  let sw=0,sm=0;Object.values(o).forEach(x=>{x.m=x.sw?x.sm/x.sw:null;if(x.m!=null){sw+=x.sw;sm+=x.m*x.sw}});return {c:o,mark:sw?sm/sw:null}}
+const shareOf=items=>{const o={};items.forEach(it=>it.pcs.forEach(p=>{const k=compOf(p.c);if(k)o[k]=(o[k]||0)+p.w}));return o};
+// the coloured bar: each competence takes the width of its share; avg (optional) = group mark per competence, shown in the legend
+function compBar(share,avg){const ks=Object.keys(share).sort(compSort),t=ks.reduce((a,k)=>a+share[k],0);if(!t)return "";
+  const pc=k=>share[k]/t*100,lab=k=>`${compName(k)}: ${Math.round(pc(k))} %${avg&&avg[k]!=null?" · group "+f1(avg[k]):""}`;
+  return `<div class="cbar">${ks.map(k=>`<span style="width:${pc(k)}%;background:${compCol(k)}" title="${esc(lab(k))}">${pc(k)>=8?esc(compShort(k).split(" ")[0])+" "+Math.round(pc(k))+"%":""}</span>`).join("")}</div>`
+    +`<div class="clegend">${ks.map(k=>`<span><i style="background:${compCol(k)}"></i>${esc(lab(k))}</span>`).join("")}</div>`}
+const termBonus=(s,t,best)=>withS("term",t.id,()=>s.away||!pkey(s)?null:ptGets(s,best,ptMiss(s)));
+function yearView(grp,studs){
+  if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()))}   // the current term starts unfolded
+  const lss=EL_LS.filter(l=>l.course===grp.course),items=lss.flatMap(l=>lsItems(l,grp.id)),now=termOf(ELWeek.today()),live=studs.filter(s=>!s.away);
+  const R={};studs.forEach(s=>R[s.uid]=marksOf(s,items));S.yR={R,items};
+  const grpAvg=f=>{const o={};live.forEach(s=>{const c=byComp(R[s.uid].filter(f)).c;for(const k in c)if(c[k].m!=null)(o[k]=o[k]||[]).push(c[k].m)});
+    for(const k in o)o[k]=o[k].reduce((a,b)=>a+b,0)/o[k].length;return o};
+  const st=l=>{const x=(S.D.ls[l.id]||{}).status||"hidden";return `<span class="badge" style="background:${STCOL[x]}">${LS_INFO[x][0]}</span>`};
+  const when=it=>it.date?(it.b.id==="exam"?"📝 ":"due ")+ELWeek.date(it.date):"";
+  const away=n=>s=>`<tr class="away"><td class="stu">${name(s)}</td><td colspan="${n}" style="text-align:left">Not signed in yet</td></tr>`;
+  const ccell=(s,f,k,scope)=>{const x=byComp(R[s.uid].filter(f)).c[k];return `<td class="gr" data-do="ycomp" data-u="${s.uid}" data-s="${scope}" data-k="${k}" title="Click for its criteria and items">${f1(x&&x.m)}</td>`};
+  const table=(f,scope,extra)=>{const share=shareOf(items.filter(it=>f({it}))),ks=Object.keys(share).sort(compSort),tot=ks.reduce((a,k)=>a+share[k],0);
+    if(!ks.length||!studs.length)return "";
+    return `<div class="wrap"><table><thead><tr><th class="stu">Student</th>${ks.map((k,j)=>`<th class="${j?"":"first"}" title="${esc(compName(k))}"><i class="cdot" style="background:${compCol(k)}"></i> ${esc(compShort(k))}<br><small class="muted">${Math.round(share[k]/tot*100)} %</small></th>`).join("")}${extra.head}</tr></thead><tbody>`
+      +studs.map(s=>s.away?away(ks.length+extra.n)(s):`<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td>${ks.map((k,j)=>ccell(s,f,k,scope).replace('class="gr"',`class="gr ${j?"":"first"}"`)).join("")}${extra.row(s)}</tr>`).join("")+`</tbody></table></div>`};
+  const terms=EL_TERMS.map((t,i)=>{const n=i+1,mine=lss.filter(l=>lsTerm(l)===n),its=items.filter(it=>it.term===n),from=its.filter(it=>lsTerm(it.l)!==n),f=r=>r.it.term===n;
+    const free=Array.from({length:Math.max(0,2-mine.length)},(_,j)=>(n-1)*2+mine.length+j+1).filter(k=>k>lss.length);
+    const span=(i?"from "+ELWeek.date(ELWeek.add(EL_TERMS[i-1].end,1)):"")+(t.end?(i?" to ":"until ")+ELWeek.date(t.end):" to the end of the year");
+    const card=l=>{const li=items.filter(it=>it.l===l);
+      return `<div class="ycard"><b>${lsLabel(l)}</b> ${st(l)} <a data-do="yls" data-ls="${l.id}" title="Open this LS on the dashboard">open ↗</a>`
+        +(li.length?compBar(shareOf(li))+`<ul>${li.map(it=>`<li>${esc(it.b.name)} <b>${it.b.w} %</b> <small class="muted">${when(it)}</small>${it.term!==n?` <span class="tag">→ ${esc(EL_TERMS[it.term-1]?EL_TERMS[it.term-1].en:"Term "+it.term)}</span>`:""}</li>`).join("")}</ul>`
+          :`<p class="muted">No assessed items yet: they appear here when its grading plan is added.</p>`)+`</div>`};
+    const cards=mine.map(card).join("")+free.map(k=>`<div class="ycard yfree"><b>LS${k}</b><p class="muted">Not created yet: it appears here when it is added.</p></div>`).join("")
+      +(from.length?`<div class="ycard"><b>From earlier LSs</b><ul>${from.map(it=>`<li>${lsLabel(it.l).replace(/ · .*/,"")} · ${esc(it.b.name)} <b>${it.b.w} %</b> <small class="muted">${when(it)}</small></li>`).join("")}</ul></div>`:"");
+    const best=withS("term",t.id,()=>ptBestOk(grp.id)),pts=n<=now,ga=avg(live.map(s=>byComp(R[s.uid].filter(f)).mark).filter(v=>v!=null));
+    const extra={n:pts?2:1,head:`<th class="first">${esc(t.en)} mark</th>${pts?`<th title="Points bonus of this term (Points box): only with all the work done">+ Points</th>`:""}`,
+      row:s=>{const m=byComp(R[s.uid].filter(f)).mark,b=pts?termBonus(s,t,best):null;return `<td class="first tot"><b>${f1(m)}</b> ${deg(elDegree(m))}</td>${pts?`<td>${b?"+"+elNum(b,"en"):b===0?"0":"–"}</td>`:""}`}};
+    const head=`${esc(t.en)} <small class="muted">· ${span}${n===now?" · now":n<now?" · ended":""}${ga==null?"":" · group average "+f1(ga)}</small>`;
+    const body=(its.length?`<h3>Competences in ${esc(t.en)}</h3>${compBar(shareOf(its),grpAvg(f))}`:"")+`<div class="ycards">${cards}</div>`
+      +(its.length?table(r=>f(r),"t"+n,extra):`<p class="muted">Nothing assessed in this term yet.</p>`);
+    return `<div class="box yterm ${n===now?"ynow":""}">${fold("yt"+n,head,body)}</div>`}).join("");
+  const tn=EL_TERMS.map((t,i)=>i+1).filter(n=>items.some(it=>it.term===n));
+  const yextra={n:tn.length+1,head:tn.map((n,j)=>`<th class="${j?"":"first"}">${esc(EL_TERMS[n-1].en)}</th>`).join("")+`<th class="first">Year mark</th>`,
+    row:s=>tn.map((n,j)=>`<td class="${j?"":"first"}">${f1(byComp(R[s.uid].filter(r=>r.it.term===n)).mark)}</td>`).join("")+(y=>`<td class="first tot"><b>${f1(y)}</b> ${deg(elDegree(y))}</td>`)(byComp(R[s.uid]).mark)};
+  const summary=!items.length?"":`<div class="box"><h2>Whole year · ${esc(grp.name)}</h2>${compBar(shareOf(items),grpAvg(()=>true))}${table(()=>true,"y",yextra)}</div>`;
+  const key=`<p class="muted">Each term shows its two LSs (LS1–LS2 in ${esc(EL_TERMS[0].en)}, LS3–LS4 in the next one…). A new LS appears in its slot as soon as it is added to the site, and its items as soon as its grading plan is added. An item counts in the term of its date in the time plan (exam day, last due day of its activities), so an LS can give items to the next term (→).</p>`
+    +`<p class="muted"><b>By competence.</b> Every item is split among the criteria it assesses, and each criterion belongs to a competence. <b>By how much it is worked</b> (default): a competence's share of an LS is how many steps of the LS activities work on its criteria, among the competences the LS assesses (LS1 has no step criteria, so it uses the grading plan). <b>By the grading plan</b>: its criteria's weight in the LS mark (exam sections by their points, final product rubric rows by their weight, grammar and vocabulary by the criteria of its steps, other competences equally). Either way each LS weighs 100, a competence assessed in two LSs counts twice, and the competence worked more in an LS counts more. The coloured bars show each competence's share in the LS, the term and the year. <b>Competence mark</b>: its criteria weighted; a degree you confirmed in “Result per assessment criterion” replaces the marks of that criterion in that LS. <b>Term mark</b> and <b>year mark</b>: the competences weighted by their share. Process and teamwork rows have no competence, so they are left out. An item whose day has not come yet (or, with no date, in an LS that is still Hidden) is not counted; after that, missing work counts 0 or is left out as the switch says. Click a mark to see its criteria and items.</p>`;
+  return `<div class="box"><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0">not counted yet</button> <span class="muted">· Share of each competence:</span> <button class="chip ${S.yShare==="plan"?"":"on"}" data-do="yshare" data-v="work" title="How many steps of the LS activities work on its criteria">by how much it is worked</button><button class="chip ${S.yShare==="plan"?"on":""}" data-do="yshare" data-v="plan" title="Its criteria's weight in the LS mark (grading plan)">by the grading plan</button></div>${fold("ykey","How it is worked out",key,"key")}</div>`
+    +terms+summary;
+}
+// One competence of one student in a term ("t1"…) or the year ("y"): its criteria and the items they come from
+function compPanel(u,scope,k){redraw=null;const {R}=S.yR||{},s=S.P[u];if(!R||!R[u])return;
+  const rows=R[u].filter(r=>r.k===k&&(scope==="y"||"t"+r.it.term===scope)),x=byComp(rows).c[k]||{},cs=[...new Set(rows.map(r=>r.c))];
+  dlg(`<h3>${name(s)} · ${esc(compName(k))}</h3><p class="muted">${scope==="y"?"Whole year":esc(EL_TERMS[+scope.slice(1)-1].en)} · mark <b>${f1(x.m)}</b> ${deg(elDegree(x.m))}</p>`
+    +cs.map(c=>{const rc=rows.filter(r=>r.c===c),m=byComp(rc).c[k];return `<h4 style="margin:10px 0 4px">${pill(c)} ${f1(m&&m.m)}</h4><table><tbody>${rc.map(r=>`<tr><td style="text-align:left">${lsLabel(r.it.l).replace(/ · .*/,"")} · ${esc(r.it.b.name)}${r.n?" · "+esc(r.n):""}</td><td>${f1(r.m)}</td><td><small class="muted">weight ${+r.w.toFixed(1)}</small></td></tr>`).join("")}</tbody></table>`}).join(""));
 }
 // Which exam version a student took (Roger, 30 Oct 2026): results/{ls}__assessment .version = insecure|safe|daring, imported with the
 // marks (tools/exam-marks) or chosen here; it saves on change.
@@ -936,7 +1051,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     qago:()=>{S.qa.ls=S.ls;S.qa.g=S.g;S.g="qa";render();scrollTo(0,0)},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
-    grade:()=>gradePanel(u),deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
+    grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},ycomp:()=>compPanel(u,k.s,k.k),yshare:()=>{S.yShare=k.v;render()},yls:()=>{S.year=false;S.ls=k.ls;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
     lv:()=>{const cur=((res(u,k.a).levels||{})[k.s]||{})[k.c];quick(patch(u,k.a,{levels:{[k.s]:{[k.c]:cur===k.l?null:k.l}}}))},
     glv:()=>{const cur=((res(u,k.a).levels||{}).group||{})[k.c],v=cur===k.l?null:k.l,ms=teamMates(k.a,teamOf(u,k.a),S.P[u].group);if(!ms.some(m=>m.uid===u))ms.push(S.P[u]);
       quick(ms.map(m=>patch(m.uid,k.a,{levels:{group:{[k.c]:v}}})))},
@@ -963,7 +1078,7 @@ $("#dlg").addEventListener("close",()=>redraw=null);
 document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);
 document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
   if(k.do==="import"&&t.files[0])importList(t.files[0]).catch(x=>alert("Could not read the file: "+x.message)).finally(()=>t.value="");
-  if(k.do==="ls"){S.ls=t.value;render()}
+  if(k.do==="ls"){S.year=t.value===YEAR;if(!S.year)S.ls=t.value;render()}
   if(k.do==="qals"){S.qa.ls=t.value;S.qa.g="all";S.qa.f.act="all";render()}
   if(k.do==="qaf"){S.qa.f[k.f]=t.value;S.qa.f.all=false;render()}
   if(k.do==="group"&&t.value)act(api.setGroup(k.u,t.value)).then(()=>$("#dlg").open&&stuPanel(k.u));
