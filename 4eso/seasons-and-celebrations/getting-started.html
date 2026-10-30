@@ -18,7 +18,6 @@
 .topbar .session-jump label,.topbar .jump label{color:#dce8f8!important}
 .topbar .progress-label,.topbar .progress-row{color:#dcefe7!important}
 .topbar .progress-bar,.topbar .bar{background:#8fc2ff!important}
-.deck-link{display:inline-flex;align-items:center;gap:12px;margin:4px 10px 18px 0;padding:12px 18px 12px 12px;border-radius:14px;background:var(--accent);color:#fff;text-decoration:none;box-shadow:var(--shadow);max-width:100%}.deck-link:hover{background:var(--dark)}.deck-link:focus-visible{outline:3px solid var(--dark);outline-offset:3px}.deck-link-icon{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.18);flex:0 0 auto;font-size:.9rem}.deck-link strong{display:block;font-weight:800}.deck-link small{display:block;opacity:.85;font-size:.85rem}
 .warm-note{margin-top:14px;padding:11px 13px;background:#fff;border:1px solid var(--line);border-radius:13px;color:var(--muted);font-size:.92rem}
 .choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
 .choice{border:1px solid var(--line);background:#fff;border-radius:13px;padding:13px;text-align:left;color:var(--ink);font-weight:700}
@@ -78,7 +77,7 @@ html,body{overflow-x:clip}
   <span class="eyebrow">Learning Path 1 · Warm-up</span>
   <h1>Getting started: Castanyada &amp; Halloween</h1>
   <p class="lead">Remember what you learnt in My Real Routine, learn autumn words, listen to a real video about Halloween and talk about autumn where you live.</p>
-  <a class="deck-link" href="/English-lab/lab/vocabulary/4eso-autumn-words.html?from=/English-lab/4eso/seasons-and-celebrations/getting-started.html"><span class="deck-link-icon" aria-hidden="true">▶</span><span><strong>Autumn words · class presentation</strong><small>Interactive slides we use in class</small></span></a>
+  <p data-el-teacher hidden><a href="../../lab/game/host.html?deck=4eso-autumn-words" style="display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:14px;background:#3d1d8f;color:#fff;font-weight:800;text-decoration:none">🎮 Start the class game: Autumn words, choose it, write it <small style="font-weight:600;opacity:.8">· teacher only</small></a></p>
   <div class="warm-note"><strong>Remember before you look.</strong> Start with the recall quiz without notes: trying to remember is what makes you learn.</div>
   <div class="routes">
     <button class="route" data-level="beginners"><strong>Beginners</strong><span>Passos molt curts · molt suport</span></button>
@@ -231,7 +230,7 @@ const need=n=>Math.ceil(n*0.8);
 // Answers and feedback stay (Roger, 26 Oct 2026): a checked step keeps its answers (state.ans[step] = {l: route, v: answers}) and shows
 // its feedback again on every visit, without counting another try, until the student presses "Do it again" next to Check.
 // Answers not checked yet stay too (state.typing[step], saved as the student types or chooses): a student typed the recall,
-// opened the Autumn words presentation and came back to an empty page (problem report, 26 Oct 2026).
+// opened another page and came back to an empty page (problem report, 26 Oct 2026).
 function keepAns(k,v){state.ans=state.ans||{};state.ans[k]={l:level,v};if(state.typing)delete state.typing[k];save()}
 function kept(k){const a=state.ans&&state.ans[k];return a&&a.l===level?a.v:null}
 function keepTyping(k,v){state.typing=state.typing||{};state.typing[k]={l:level,v};save()}
