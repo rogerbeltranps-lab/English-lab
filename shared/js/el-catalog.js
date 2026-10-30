@@ -92,7 +92,7 @@ window.EL_CATALOG=(function(){
       const C={mode:"practice",checkpoint:true};   // recall checkpoint: opens the way to what comes after it (elCheckpointMissing)
       return [
         L("getting-started.html","Getting started: what do you do in your free time? (warm-up)",["4.1","2.2"],"ls2GettingStarted2ESO",6,{graded:false}),
-        L("what-are-they-doing.html","What are they doing?",["4.1","2.2","5.1","3.2"],"ls2Doing2ESO",9,{skip:["write"],steps:[["log","Reading log"]]}),
+        L("what-are-they-doing.html","What are they doing?",["4.1","2.2","5.1","3.2"],"ls2Doing2ESO",11,{skip:["write"],steps:[["log","Reading log"],["talk","Talk"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint12ESO",1,C),
         L("now-or-usually.html","Now or usually?",["2.2","5.1","3.2"],"ls2NowUsually2ESO",9,{skip:["write"],steps:[["chart","Listening chart"],["talk","Talk"]]}),
         L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1","5.1"],"ls2Checkpoint22ESO",1,C),
@@ -177,7 +177,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
   });
   // Revised programme (24 Oct 2026): 2.1, 3.1, 6.2 and CE2 2.3 are no longer LS2 criteria, so speaking steps practise the pitch (3.2).
   // Four skills (Roger, 30 Oct 2026): Use of English steps heard (practice and grammar, "listen and complete") give 2.2 + 5.1; said steps ("say it") and Talk give 3.2.
-  // Cards (LP3–LP6): the card asks the student to say the word aloud before turning it, so they give 4.1 + 3.2 (Roger, 30 Oct 2026: LP1 and LP2 stay as they were).
+  // Cards (4 ESO LP3–LP6, 2 ESO LP2–LP6): the card asks the student to say the word aloud before turning it, so they give 4.1 + 3.2 (Roger, 30 Oct 2026: paths students had started stay as they were).
   const LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"];
   window.EL_STEP_CRITERIA={
     "4eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
@@ -197,7 +197,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
   const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]},LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"];
   Object.assign(window.EL_ACTIONS,{
     "2eso/ls2-getting-started":[...LP,"read","listen","speak"],
-    "2eso/ls2-what-are-they-doing":[...LP,"read","log","listen","grammar","mixed","write","speak"],
+    "2eso/ls2-what-are-they-doing":[...LP,"read","log","listen","again","grammar","mixed","write","speak","talk"],
     "2eso/ls2-now-or-usually":[...LP,"listen","chart","grammar","mixed","write","speak","talk"],
     "2eso/ls2-check-the-source":[...LP,"read","sources","credit","again","talk","factfile"],
     "2eso/ls2-likes-and-screen-tips":[...LP,"listen","again","grammar","mixed","write","speak","talk"],
@@ -209,7 +209,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
   });
   Object.assign(window.EL_STEP_CRITERIA,{
     "2eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
-    "2eso/ls2-what-are-they-doing":{read:["4.1"],log:["4.1"],listen:["2.2"],write:["5.1"],speak:["3.2"]},
+    "2eso/ls2-what-are-they-doing":{cards:RS,read:["4.1"],log:["4.1"],listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-now-or-usually":{cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-check-the-source":{cards:RS,read:["4.2"],sources:["4.2"],credit:["6.2"],practice:LW,again:["2.2"],talk:S,factfile:["4.2","6.2"]},
     "2eso/ls2-likes-and-screen-tips":{cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CD4 4.5"],speak:["3.2","CD4 4.5"],talk:S},
