@@ -1,9 +1,10 @@
-// Route names students see (Roger, 26 Oct 2026, research audit): Starter · Base · Core · Plus instead of Beginners · Insecure · Safe · Daring.
-// Code ids, data, docs and the teacher dashboard keep the old names (the dashboard shows both). Rather than edit every page, this script
-// relabels whole, capitalised words in the visible text, titles, aria-labels and placeholders, now and whenever a page re-renders.
-// Loaded by el-cloud.js and, on pages without it, next to el-copyright.js. Never on teacher.html.
+// Route names (Roger, 26 Oct 2026, research audit; 30 Oct 2026: "no need for old names in the app any more"): the app shows only
+// Starter · Base · Core · Plus · Pro, never Beginners · Insecure · Safe · Daring · Native. Code ids, data and docs keep the old names.
+// Rather than edit every page and every text (plans, rubrics, tips), this script relabels whole, capitalised words in the visible text,
+// titles, aria-labels and placeholders, now and whenever a page re-renders. Loaded by el-cloud.js, by teacher.html and, on pages
+// without el-cloud.js, next to el-copyright.js.
 (function () {
-  if (window.EL_ROUTE_RENAME || /\/teacher\.html$/.test(location.pathname)) return;
+  if (window.EL_ROUTE_RENAME) return;
   const MAP = window.EL_ROUTE_RENAME = { Beginners: 'Starter', Insecure: 'Base', Safe: 'Core', Daring: 'Plus', Native: 'Pro' };
   // Native (Roger, 30 Oct 2026) → Pro, but never in "Native American(s)" (LP3 content).
   const RE = /\b(Beginners|Insecure|Safe|Daring|Native(?! Americans?\b))\b/g, TEST = /\b(Beginners|Insecure|Safe|Daring|Native(?! Americans?\b))\b/;

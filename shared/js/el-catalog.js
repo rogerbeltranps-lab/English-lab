@@ -12,7 +12,9 @@
 // Beginners (Roger, 26 Oct 2026): A1, below Insecure, Catalan with heavy scaffolding; only the teacher sets it (pick:false). Since 26 Oct 2026 the teacher sets every route; 2 ESO students without one choose it themselves (elCanPickRoute).
 // Native (Roger, 30 Oct 2026): above Daring, for a native speaker preparing Cambridge C2 Proficiency (4 ESO); only the teacher sets it. Pages
 // without Native content show the Daring version (applyLevel in el-cloud.js, ls2-engine.js).
-window.EL_LEVELS=[{id:"beginners",name:"Beginners",student:"Starter",pick:false,ca:"Començo des de zero: molt suport, passos curts i instruccions en català.",en:"I am starting from zero: a lot of support, short steps and instructions in Catalan."},{id:"insecure",name:"Insecure",student:"Base",ca:"Necessito molt suport i pautes (instruccions en català).",en:"I need a lot of support and guidance (instructions in Catalan)."},{id:"safe",name:"Safe",student:"Core",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès).",en:"I feel confident with a little support (instructions in English)."},{id:"daring",name:"Daring",student:"Plus",ca:"Vull el repte: més autonomia i menys ajudes.",en:"I want the challenge: more independence and less help."},{id:"native",name:"Native",student:"Pro",pick:false,ca:"Parlo anglès com a llengua materna i em preparo per al C2 Proficiency de Cambridge.",en:"English is my first language and I am preparing for Cambridge C2 Proficiency."}];
+// Level names (Roger, 30 Oct 2026: "no need for old names in the app any more"): the app shows only Starter · Base · Core · Plus · Pro,
+// teacher dashboard included. The ids (beginners, insecure, safe, daring, native) stay in the code, the data and the docs.
+window.EL_LEVELS=[{id:"beginners",name:"Starter",student:"Starter",pick:false,ca:"Començo des de zero: molt suport, passos curts i instruccions en català.",en:"I am starting from zero: a lot of support, short steps and instructions in Catalan."},{id:"insecure",name:"Base",student:"Base",ca:"Necessito molt suport i pautes (instruccions en català).",en:"I need a lot of support and guidance (instructions in Catalan)."},{id:"safe",name:"Core",student:"Core",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès).",en:"I feel confident with a little support (instructions in English)."},{id:"daring",name:"Plus",student:"Plus",ca:"Vull el repte: més autonomia i menys ajudes.",en:"I want the challenge: more independence and less help."},{id:"native",name:"Pro",student:"Pro",pick:false,ca:"Parlo anglès com a llengua materna i em preparo per al C2 Proficiency de Cambridge.",en:"English is my first language and I am preparing for Cambridge C2 Proficiency."}];
 // Class groups. The student picks one the first time they sign in; the teacher can change it in the dashboard.
 window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructions in Catalan
 // The student's route in an LS. The teacher sets routes (Roger, 26 Oct 2026: from the LS1 exam mark, on the dashboard). An LS with
@@ -31,9 +33,10 @@ window.elRouteOf=function(lv,ls){lv=lv||{};const L=window.EL_LS||[],me=L.find(x=
 window.EL_ROUTE_PICK=["2eso"];
 window.elPickLs=c=>((window.EL_LS||[]).find(x=>x.course===c)||{}).id;
 window.elCanPickRoute=(lv,c)=>(window.EL_ROUTE_PICK||[]).includes(c)&&!(window.EL_LS||[]).some(x=>{const l=(lv||{})[x.id]||{};return x.course===c&&l.level&&l.by!=="student"});
-// Route from the LS1 exam mark (out of 10), default cut-offs per course: under beginners → Beginners, under insecure → Insecure,
-// under safe → Safe, otherwise Daring. Roger can change them on the dashboard (settings/routes in Firestore overrides these).
-window.EL_ROUTE_CUTS={"2eso":{beginners:3,insecure:5,safe:7.5},"4eso":{beginners:3,insecure:5,safe:7.5}};
+// Route from the LS1 exam mark (out of 10), default cut-offs per course: under beginners → Starter, under insecure → Base,
+// under safe → Core, otherwise Plus (Roger, 30 Oct 2026: under 3 Starter, 3 to under 6 Base, 6 to under 8 Core, 8 or more Plus).
+// Roger can change them on the dashboard (settings/routes in Firestore overrides these). Pro is never given by a mark.
+window.EL_ROUTE_CUTS={"2eso":{beginners:3,insecure:6,safe:8},"4eso":{beginners:3,insecure:6,safe:8}};
 window.elRouteFromMark=(m,c)=>m==null||isNaN(m)?null:m<c.beginners?"beginners":m<c.insecure?"insecure":m<c.safe?"safe":"daring";
 window.EL_GROUPS=[{id:"2ESOA",course:"2eso",name:"2ESO A"},{id:"2ESOB",course:"2eso",name:"2ESO B"},{id:"4ESOA",course:"4eso",name:"4ESO A"},{id:"4ESOB",course:"4eso",name:"4ESO B"}];
 // Is an LS assigned to a group? ls/{id}.groups lists the groups (set in the teacher dashboard); without it, every group of the LS's course.
