@@ -20,4 +20,17 @@ window.elNum=(n,lang)=>{const s=String(Math.round(n*100)/100);return lang==="ca"
 window.elPointsRules=function(){const en=elNum(EL_POINTS_BONUS,"en"),ca=elNum(EL_POINTS_BONUS,"ca");return [
   {icon:"💻",en:"<b>Right answer: +1 point.</b> Tap it on your Chromebook before 3 · 2 · 1.",ca:"<b>Resposta correcta: +1 punt.</b> Toca-la al Chromebook abans del 3 · 2 · 1."},
   {icon:"📱",en:"<b>Join from the Learning Path.</b> “My activities” shows your points.",ca:"<b>Entra des del Learning Path.</b> “Les meves activitats” mostra els teus punts."},
-  {icon:"📈",en:`<b>Up to +${en} on your term grade.</b> The best student gets +${en}, the others in proportion. It only adds.`,ca:`<b>Fins a +${ca} a la nota del trimestre.</b> El millor de la classe té +${ca}, els altres en proporció. Només suma.`}]};
+  {icon:"📈",en:`<b>Up to +${en} on your term grade,</b> only with all your activities done. The best student gets +${en}, the others in proportion.`,ca:`<b>Fins a +${ca} a la nota del trimestre,</b> només amb totes les activitats fetes. El millor de la classe té +${ca}, els altres en proporció.`}]};
+// All the work done (Roger, 30 Oct 2026: "qui no ha fet tot, no opta als punts extres"): a student gets the bonus of a term only with
+// every activity of that term done. Counted: each activity of the group's time plans (EL_PLAN due) whose due day is in the term and
+// already past, in an LS that is not Hidden, open for the group (elLpOpen) and with no section still locked by the teacher; the final
+// product (manual) and optional homework never count. Done late still counts as done. isDone(activity) is the page's own check.
+// Returns the missing ones as [[activity, due day]], oldest first.
+window.elTermSpan=id=>{const i=EL_TERMS.findIndex(t=>t.id===id);return [i>0?EL_TERMS[i-1].end:"",EL_TERMS[i]&&EL_TERMS[i].end||"9999-12-31"]};
+window.elMissing=function(gid,term,isDone,infoOf){
+  const [from,to]=elTermSpan(term),today=ELWeek.today(),out=[];
+  ELWeek.plans(gid).forEach(x=>{const info=infoOf(x.ls)||{status:"hidden"};if(info.status==="hidden")return;
+    Object.keys(x.p.due||{}).forEach(id=>{const a=(window.EL_CATALOG||[]).find(y=>y.id===id),d=ELWeek.due(x.p,id,x.gi);
+      if(!a||!d||a.manual||d<=from||d>to||d>=today||!elLpOpen(a,info,gid)||elSecLocked(a,info,gid).length)return;
+      if(!isDone(a))out.push([a,d])})});
+  return out.sort((a,b)=>a[1]<b[1]?-1:1)};
