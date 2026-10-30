@@ -18,7 +18,7 @@ window.EL_SECTIONS={
   "4eso/ls2-celebration-day-proposal":[["task","The task"],["rubric","Rubric"],["prep","Step 0 · My pieces"],["source","Step 1 · My source"],["contribution","Step 2 · My contribution"],["part","Step 3 · My part"],["video","Video"],["email","Step 4 · My email"],["feedback","Feedback for another group"],["submit","Submit"],["team","Step 5 · Teamwork"]],
   "4eso/ls2-reflect":[["scores","My checkpoints"],["reflect","Reflection"]],
   "2eso/ls2-getting-started":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["listen","Listening"],["speak","Speaking"]],
-  "2eso/ls2-what-are-they-doing":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["log","Reading log"],["listen","Listening"],["again","Listen again"],["grammar","Grammar"],["mixed","Mixed"],["write","Writing"],["speak","Speaking"],["talk","Talk"]],
+  "2eso/ls2-what-are-they-doing":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["log","Reading log"],["listen","Listening"],["grammar","Grammar"],["mixed","Mixed"],["write","Writing"],["speak","Speaking"]],
   "2eso/ls2-now-or-usually":[["recall","Recall"],["vocab","Vocabulary"],["listen","Listening"],["chart","Listening chart"],["grammar","Grammar"],["mixed","Mixed"],["write","Writing"],["speak","Speaking"],["talk","Talk"]],
   "2eso/ls2-check-the-source":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["sources","Sources"],["credit","Credits"],["again","Listen to a source"],["talk","Talk"],["factfile","Fact file"]],
   "2eso/ls2-likes-and-screen-tips":[["recall","Recall"],["vocab","Vocabulary"],["listen","Listening"],["again","Listen again"],["grammar","Grammar"],["mixed","Mixed"],["write","Writing"],["speak","Speaking"],["talk","Talk"]],
