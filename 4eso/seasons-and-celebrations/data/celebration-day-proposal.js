@@ -12,8 +12,8 @@
   };
   // First section of the final product: the model final product for the student's route (a fictional group's slides and script).
   const modelBox = level => {
-    // Beginners opens the Insecure model (no Beginners model page yet).
-    const ca = level === 'insecure' || level === 'beginners', R = level === 'beginners' ? 'Beginners (model Insecure)' : level[0].toUpperCase() + level.slice(1), page = (level === 'beginners' ? 'insecure' : level) + '-model.html';
+    // Beginners opens the Insecure model and Native the Daring one (no model pages of their own yet).
+    const ca = level === 'insecure' || level === 'beginners', R = level === 'beginners' ? 'Beginners (model Insecure)' : level === 'native' ? 'Native (model Daring)' : level[0].toUpperCase() + level.slice(1), page = (level === 'beginners' ? 'insecure' : level === 'native' ? 'daring' : level) + '-model.html';
     return '<div class="model" style="margin-bottom:16px"><h3 style="margin-top:0">' + (ca ? 'Mira un model de producte final · ' : 'See a model final product · ') + R + '</h3><p>' +
       (ca ? 'Un grup inventat presenta la seva proposta: diapositives i el que diu cada membre. Fes-lo servir per tenir idees; no el copiïs.' : 'A fictional group presents its proposal: the slides and what each member says. Use it for ideas; do not copy it.') +
       '</p><a class="btn" href="' + page + '" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none">' + (ca ? '▶ Obre el model ↗' : '▶ Open the model ↗') + '</a></div>';

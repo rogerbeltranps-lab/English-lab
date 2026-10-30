@@ -4,7 +4,9 @@
    complete at 80 % (rounded up); the recall warm-up completes when submitted and keeps the first attempt. */
 var LS2 = (function () {
   // Beginners (A1) sits below Insecure: it sees every untagged item and, where a text or list has no 'beginners' version, the Insecure one.
-  const ROUTES = ['beginners', 'insecure', 'safe', 'daring'];
+  // Native (Roger, 30 Oct 2026): above Daring, for a native speaker preparing Cambridge C2 Proficiency; only the teacher sets it. A page's
+  // LP.native (data/native/<page>.js) replaces whole panels by id with C2 tasks; anything it does not replace is the Daring version.
+  const ROUTES = ['beginners', 'insecure', 'safe', 'daring', 'native'];
   const PAGES = [
     ['getting-started.html', '1 · Getting started'],
     ['celebrations-around-the-world.html', '2 · Celebrations around the world'],
@@ -25,9 +27,9 @@ var LS2 = (function () {
   let LP, level, state;
   const ca = () => level === 'insecure' || level === 'beginners';
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca() ? (o.ca || o.en) : (o.en || o.ca));
-  const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : o.safe != null && level === 'daring' ? o.safe : o.insecure);   // beginners → insecure
+  const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : level === 'native' && o.daring != null ? o.daring : o.safe != null && (level === 'daring' || level === 'native') ? o.safe : o.insecure);   // beginners → insecure, native → daring
   // A list is cumulative (r: tags); an object keyed by route gives each route its own list (the sample exam: same number of items per route).
-  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level)) : (items[level] || (level === 'beginners' ? items.insecure : null) || []);
+  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level)) : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
   const need = n => Math.ceil(n * 0.8);
   const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -152,7 +154,7 @@ var LS2 = (function () {
     html: '<div class="section-card"><h3>' + (ca() ? 'Explora' : 'Explore') + '</h3><div class="vocab-groups" id="vocabGroups"></div>' +
       (p.receptive ? '<p class="tiny">' + (ca() ? 'Paraules que sentiràs o llegiràs (no cal aprendre-les): ' : 'Words you will hear or read (no need to learn them): ') + p.receptive + '</p>' : '') + '</div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Targetes' : 'Study cards') + '</h3>' +
-      '<div class="actions dir-toggle" role="group" aria-label="' + (ca() ? 'Direcció de les targetes' : 'Card direction') + '"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>' +
+      '<div class="actions dir-toggle" role="group"' + (level === 'native' ? ' hidden' : '') + ' aria-label="' + (ca() ? 'Direcció de les targetes' : 'Card direction') + '"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>' +
       '<p class="instruction" id="cardHow"></p>' +
       '<div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardIcon"></div><strong id="cardFront"></strong><p>' + (ca() ? 'Clica per girar la targeta' : 'Click to turn the card') + '</p></div><div class="face back"><div class="label" id="cardBackLabel">Català + example</div><strong id="cardMeaning"></strong><p id="cardBack"></p></div></div></div>' +
       '<div class="actions" id="cardTypeRow" hidden><input type="text" class="typed" id="cardType" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="' + (ca() ? 'Escriu la paraula en anglès' : 'Type the English') + '"><button class="btn" type="button" id="cardTypeCheck">' + (ca() ? 'Comprova i gira' : 'Check and turn') + '</button></div><p class="feedback" id="cardTypeMsg"></p>' +
@@ -164,7 +166,7 @@ var LS2 = (function () {
       /* Catalan → English (research audit, Roger 26 Oct 2026): the card shows the Catalan, the student types (or says) the English, then turns it.
          It uses the core words of the panel (p.core: a list of English words, or one list per route) and, until the LS project marks them,
          every word of the Learning Path. state.cardDir remembers the direction. */
-      const dir = () => state.cardDir === 'ca' ? 'ca' : 'en';
+      const dir = () => state.cardDir === 'ca' && level !== 'native' ? 'ca' : 'en';   // Native: word → meaning only
       const coreSet = () => { const c = p.core; if (!c) return null; const l = Array.isArray(c) ? c : forLevel(c); return l.length ? new Set(l.map(norm)) : null; };
       const deck = () => {
         if (dir() === 'ca') {
@@ -181,7 +183,7 @@ var LS2 = (function () {
         $$('.dir-toggle [data-dir]').forEach(b => { const on = b.dataset.dir === dir(); b.classList.toggle('secondary', !on); b.setAttribute('aria-pressed', on); });
         $('#cardHow').textContent = c ? (ca() ? 'Llegeix la paraula en català, escriu-la o digues-la en anglès i després gira la targeta per comprovar-ho.' : 'Read the Catalan, type or say the English, then turn the card to check.')
           : (ca() ? 'Digues l’expressió en veu alta i intenta recordar què vol dir. Després gira la targeta.' : 'Say the expression aloud and try to remember its meaning. Then turn the card.');
-        $('#cardBackLabel').textContent = c ? 'English + example' : 'Català + example';
+        $('#cardBackLabel').textContent = c ? 'English + example' : level === 'native' ? 'Meaning + example' : 'Català + example';
         $('#cardTypeRow').hidden = !c; $('#cardType').value = ''; $('#cardTypeMsg').textContent = '';
       };
       const typedCheck = () => {
@@ -398,6 +400,8 @@ var LS2 = (function () {
     return show;
   }
   function aiPrompt(p, text) {
+    if (level === 'native') return 'Act as an experienced Cambridge C2 Proficiency (CPE) writing examiner. The writer is a native English speaker aged 15–16 preparing for the exam. Learning Situation “Seasons & Celebrations”, Learning Path ' + LP.n + ' “' + LP.title + '”.\n\nTask: ' + byLevel(p.task).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() +
+      '\n\nCandidate’s answer:\n"""\n' + text + '\n"""\n\nAssess it with the four Cambridge C2 writing subscales (Content, Communicative Achievement, Organisation, Language), 0–5 each, with one sentence of evidence for each mark. Native speakers often lose marks for task achievement, register and organisation rather than accuracy, so be demanding there. Do not rewrite the whole text. Reply only with:\n1. 📊 The four marks with evidence.\n2. ✅ Two real strengths.\n3. 🔧 Up to 4 changes that would raise the mark: quote the words, say why, give a C2 alternative.\n4. 🎯 One focus for the final version.';
     return 'Actua com a professor d’anglès de 4t d’ESO. Learning Situation “Seasons & Celebrations”, Learning Path ' + LP.n + ' “' + LP.title + '”.\n\nNivell: ' + cap(level) + '.\nTasca: ' + byLevel(p.task).replace(/<[^>]+>/g, '') +
       '\n\nText de l’alumne:\n"""\n' + text + '\n"""\n\n' + learningSupport.aiLanguage(level) +
       ' No reescriguis tot el text i no posis nota numèrica. Respon només amb aquests apartats:\n1. ✅ Què has fet bé — dues coses concretes.\n2. 🔧 Errors importants — màxim 4; per a cada un, copia la frase, explica el perquè breument i dona la versió correcta.\n3. 📋 Tasca — digues si compleix cada punt de la tasca.\n4. 🎯 Un següent pas — una millora concreta per a la versió final.';
@@ -555,6 +559,38 @@ var LS2 = (function () {
   }
   function stopSR() { srActive = false; if (srTimer) clearTimeout(srTimer); try { if (recognition) recognition.stop(); } catch (e) {} }
   function downloadWav() { if (!recUrl) return; const a = document.createElement('a'); a.href = recUrl; a.download = 'ls2-lp' + LP.n + '-' + level + '.wav'; document.body.appendChild(a); a.click(); a.remove(); }
+  /* Speaking plan (Native, Roger 30 Oct 2026: "no recording… ask them how would you organise a question like that, what comes to mind
+     first, what's the best… and teach learning strategies"): an exam question, the student's written plan (first ideas, the best ones
+     and why, the order), then a model plan and the strategy to compare with. Handed in like a step (state.steps[id]). */
+  R.plan = p => ({
+    html: '<div class="section-card"><h3>The question</h3><div class="model" id="' + p.id + 'Q"></div>' + (p.part ? '<p class="tiny">' + p.part + '</p>' : '') + '</div>' +
+      '<div class="section-card"><h3>🧭 Strategy</h3><div id="' + p.id + 'Tip"></div></div>' +
+      '<div class="section-card"><h3>Your plan</h3><p class="instruction">Write notes, not full sentences: this is the thinking you would do in the exam’s preparation time.</p><div id="' + p.id + 'Fields"></div>' +
+      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Send">Compare with a model plan</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>' +
+      '<div class="section-card" id="' + p.id + 'ModelBox" hidden><h3>A model plan</h3><div id="' + p.id + 'Model"></div>' +
+      '<label class="field"><strong>What would you change in your plan now? (one sentence)</strong><input type="text" class="typed" id="' + p.id + 'Change" maxlength="300"></label></div>',
+    bind() {
+      state.steps = state.steps || {}; const key = p.id, d = (state.stepDraft = state.stepDraft || {})[key] = state.stepDraft[key] || { f: {} };
+      $('#' + key + 'Q').innerHTML = p.question; $('#' + key + 'Tip').innerHTML = p.tip; $('#' + key + 'Model').innerHTML = p.modelPlan;
+      $('#' + key + 'Fields').innerHTML = p.fields.map(f => '<label class="field"><strong>' + f.label + '</strong><textarea data-f="' + f.id + '" rows="' + (f.rows || 3) + '" placeholder="' + esc(f.ph || '') + '"></textarea></label>').join('');
+      $$('#' + key + 'Fields textarea').forEach(t => { t.value = d.f[t.dataset.f] || ''; t.oninput = () => { d.f[t.dataset.f] = t.value; save(); }; });
+      const ch = $('#' + key + 'Change'), msg = $('#' + key + 'Msg');
+      ch.value = d.change || '';
+      const hand = () => {
+        state.steps[key] = { level, title: tx(p.title), f: p.fields.map(f => ({ l: f.label, v: (d.f[f.id] || '').trim() })).concat(d.change ? [{ l: 'What I would change after the model', v: d.change }] : []), rate: [], avg: null, comment: '', date: new Date().toISOString() };
+        state.done[key] = true; stamp(key); save();
+      };
+      ch.oninput = () => { d.change = ch.value.trim(); if (state.steps[key]) hand(); else save(); };
+      const open = () => { $('#' + key + 'ModelBox').hidden = false; msg.className = 'feedback ok'; msg.textContent = 'Handed in ✓ Compare your plan with the model below. Your teacher sees your plan on the dashboard.'; };
+      if (state.steps[key]) open();
+      $('#' + key + 'Send').onclick = () => {
+        const empty = p.fields.filter(f => words(d.f[f.id] || '') < 3);
+        if (empty.length) { msg.className = 'feedback no'; msg.textContent = 'Write at least a few words in: ' + empty.map(f => f.label).join(' · '); return; }
+        hand(); open();
+      };
+    }
+  });
+
   R.speaking = p => ({
     html: '<div class="section-card"><h3>' + (ca() ? 'La tasca' : 'Your task') + '</h3><p class="instruction" id="spTask"></p><div class="speak-support"><div class="mini-card"><strong>Model</strong><div class="model" id="spModel"></div></div><div class="mini-card"><strong>' + (ca() ? 'Prepara què diràs' : 'Prepare') + '</strong><textarea id="spPlan" placeholder="Key words or short sentences…"></textarea></div></div></div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Grava i escolta’t' : 'Record') + '</h3><div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="startRecord">● ' + (ca() ? 'Grava' : 'Record') + '</button><button class="btn secondary" type="button" id="stopRecord" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button><button class="btn secondary" type="button" id="downloadWav" disabled>' + (ca() ? 'Descarrega el WAV' : 'Download WAV') + '</button></div><div class="record-status" id="recordStatus">' + (ca() ? 'A punt per gravar.' : 'Ready to record.') + '</div><audio id="recordedAudio" controls style="width:100%;display:none"></audio></div>' +
@@ -647,7 +683,7 @@ var LS2 = (function () {
   // An open task (for example the sample exam's email): the student writes, then ChatGPT gives feedback and an orientative mark
   // with the criterion's levels; the student can note that mark for the summary.
   function markPrompt(p, text) {
-    const lv = { beginners: 'Beginners (A1, amb molt suport)', insecure: 'Insecure (A2 / A2+, amb suport)', safe: 'Safe (B1)', daring: 'Daring (B1 / B1+)' }[level];
+    const lv = { beginners: 'Beginners (A1, amb molt suport)', insecure: 'Insecure (A2 / A2+, amb suport)', safe: 'Safe (B1)', daring: 'Daring (B1 / B1+)', native: 'Native (C2 Proficiency)' }[level];
     const src = byLevel(p.source || '');
     return (ca() ? 'Actua com a professor d’anglès de 4t d’ESO. És l’EXAMEN D’EXEMPLE (pràctica) de la Learning Situation “Seasons & Celebrations”.' : 'Act as a 4 ESO English teacher. This is the SAMPLE EXAM (practice) of the Learning Situation “Seasons & Celebrations”.') +
       '\n\nRoute / level: ' + lv + '.\nTask (' + p.max + ' points): ' + byLevel(p.task).replace(/<[^>]+>/g, '') +
@@ -750,16 +786,19 @@ var LS2 = (function () {
     sectionNext.init({ level: () => level, panels: LP.panels.slice(0, -1).map(p => ({ id: p.id, done: () => stepDone(p), detail: c => c ? 'Completa les activitats d’aquesta secció (80 % on es corregeix).' : 'Finish this section’s activities (80 % where they are corrected).' })) });
     sectionNext.final({ id: last.id, level: () => level, done: () => stepDone(last), detail: c => c ? 'Completa l’última activitat.' : 'Finish the last activity.' });
   }
+  // Native: LP.native = { panelId: panel } replaces that panel (same id, so progress, checkpoints and locks work as for every route).
+  function usePanels() { LP.panels = level === 'native' && LP.native ? LP.base.map(p => LP.native[p.id] ? Object.assign({}, LP.native[p.id], { id: p.id }) : p) : LP.base; }
   function init(config) {
     if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
-    LP = config;
+    LP = config; LP.base = LP.base || LP.panels;
     level = localStorage.getItem(LP.key + 'Level') || 'insecure';
     if (ROUTES.indexOf(level) < 0) level = 'insecure';
+    usePanels();
     try { state = JSON.parse(localStorage.getItem(LP.key) || '{}'); } catch (e) { state = {}; }
     state.done = state.done || {};
     const sel = $('#sessionJump');
     if (sel) { const here = location.pathname.split('/').pop(); sel.innerHTML = PAGES.map(([f, t]) => '<option value="' + f + '"' + (f === here ? ' selected' : '') + '>' + t + '</option>').join(''); sel.onchange = () => { location.href = sel.value; }; }
-    $$('.route').forEach(b => { b.classList.toggle('active', b.dataset.level === level); b.onclick = () => { level = b.dataset.level; $$('.route').forEach(x => x.classList.toggle('active', x === b)); save(); render(); learningSupport.apply(level); }; });
+    $$('.route').forEach(b => { b.classList.toggle('active', b.dataset.level === level); b.onclick = () => { level = b.dataset.level; usePanels(); $$('.route').forEach(x => x.classList.toggle('active', x === b)); save(); render(); learningSupport.apply(level); }; });
     render();
     learningSupport.apply(level);
   }

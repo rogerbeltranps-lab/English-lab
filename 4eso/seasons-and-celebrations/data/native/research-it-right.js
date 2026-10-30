@@ -1,0 +1,60 @@
+/* LS2 · Learning Path 4 · Native route (C2 Proficiency, Roger 30 Oct 2026). Replaces panels by id; others (credit, card) are the Daring version. */
+window.LP.native = {
+  recall: { type: 'recall', tab: 'Recall', title: 'Recall: Learning Paths 2 and 3', pill: 'No notes',
+    intro: 'Type the answers without looking.',
+    items: [
+      { q: 'Halloween is thought to ___ originated in Ireland. (1 word)', a: ['have'], en: 'Perfect infinitive: to have originated.' },
+      { q: 'Pumpkins soon ___ turnips. (took the place of)', a: ['supplanted'] },
+      { q: 'The custom fell into ___ after the war.', a: ['disuse'] },
+      { q: 'A custom presented as ancient but actually recent: an ___ tradition.', a: ['invented'] },
+      { q: 'It was ___ in 1863 that Thanksgiving became official. (1 word)', a: ['only', 'not until'], en: 'It was only in… that…' },
+      { q: 'Their ___ (WILLING) to embrace new customs surprised everyone.', a: ['willingness'] },
+      { q: 'The tradition is on the ___ of disappearing.', a: ['verge', 'brink'] },
+      { q: 'We pushed the ___ out for my grandmother’s birthday.', a: ['boat'] }
+    ] },
+
+  read: { type: 'mc', tab: 'Reading', title: 'Reading: The pagan origins myth machine', pill: '80 %',
+    intro: 'A C2 Proficiency-style text (Reading and Use of English, Part 5). Read it all once, then answer. Pay attention to the writer’s attitude and to what phrases refer to.',
+    media: { text: '<p><strong>The pagan origins myth machine</strong></p>' +
+      '<p>Every December, a familiar genre of article resurfaces. Christmas, we are told, is “really” a pagan festival in disguise: the date was stolen from the Roman Saturnalia, the tree from Germanic tree-worship, the whole thing a thin Christian coat of paint over something older and, by implication, more authentic. The articles are shared widely, partly because they flatter the reader with the sense of having seen through an official story.</p>' +
+      '<p>The trouble is that much of this is, at best, unproven. Historians who work on the period point out that the earliest sources linking 25 December to Christ’s birth do not mention Saturnalia at all, and that the decorated indoor tree is documented only from the sixteenth century onwards, some fifteen hundred years after the Germanic practices it is supposed to have absorbed. Some connections are plausible; others rest on nothing firmer than resemblance. Two things looking alike, as any researcher learns early, does not mean that one came from the other.</p>' +
+      '<p>How, then, do such claims acquire the status of common knowledge? Part of the answer is circular reporting. A popular website repeats a claim from a nineteenth-century writer whose own source was speculation; a newspaper cites the website; an encyclopedia entry cites the newspaper; and the website, updated, now cites the encyclopedia. Each step lends the claim a little more apparent authority, and none of them involves anybody checking the original evidence.</p>' +
+      '<p>None of this means that the opposite view, that Christmas is pure and untouched, is correct. Festivals borrow; that much is not in dispute. The point is narrower and more useful: a confident claim about origins should prompt the question “says who, and based on what?” before it is repeated. It is a question that serves the student researching a school project as well as it serves the professional historian, and one that is asked far less often than it should be.</p>' },
+    items: [
+      { q: 'According to the first paragraph, why are “pagan origins” articles so widely shared?', o: ['They make readers feel they know something others have missed.', 'They are written by well-known historians.', 'They are published by religious organisations.', 'They are short and easy to read.'] },
+      { q: 'What is the writer’s attitude to the claim that Christmas was “stolen” from Saturnalia?', o: ['It is presented confidently but lacks evidence.', 'It is definitely false.', 'It is the best explanation available.', 'It is offensive to Christians.'] },
+      { q: 'The example of the decorated tree is used to show that…', o: ['there is a long gap between the supposed source and the first evidence', 'Germanic tribes invented Christmas trees', 'the tree is the oldest Christmas custom', 'historians disagree about the date of Christmas'] },
+      { q: '“Two things looking alike… does not mean that one came from the other” expresses a principle about…', o: ['the difference between similarity and cause', 'the importance of pictures as evidence', 'how festivals copy each other', 'why historians distrust the internet'] },
+      { q: 'What does “circular reporting” mean in the third paragraph?', o: ['sources citing each other so that a claim seems better supported than it is', 'news that is repeated every year at the same time', 'reports that are shared in a circle of friends', 'information that changes each time it is repeated'] },
+      { q: 'In the last paragraph, the writer’s point is described as “narrower and more useful” because it…', o: ['gives a practical habit rather than a conclusion about Christmas', 'proves that Christmas is purely Christian', 'focuses only on professional historians', 'avoids any discussion of borrowing'] },
+      { q: 'Which best describes the overall purpose of the text?', o: ['to encourage readers to question origin claims before repeating them', 'to prove that Christmas has no pagan elements', 'to criticise newspapers for their coverage of religion', 'to explain the history of Saturnalia'] }
+    ] },
+
+  sources: { type: 'mc', tab: 'Sources', title: 'Evaluating sources at C2: what exactly can it tell you?', pill: '80 %',
+    intro: 'At this level the question is rarely “reliable or not?” but “reliable for what?”. Choose the best judgement and read the explanation.',
+    items: [
+      { q: 'A national museum’s web page on Diwali, written by a named curator in 2025. You want to know how Diwali is celebrated in Leicester today.', o: ['Good for general background; check a local or community source for Leicester specifically.', 'Perfect: museums are always the best source.', 'Not reliable: it is not about Leicester.', 'Not usable: curators are not neutral.'], ex: 'Reliability depends on the question. A strong general source may still not answer a specific, local question.' },
+      { q: 'A Wikipedia article with 45 footnotes on the history of Halloween.', o: ['A useful map: follow the footnotes to the sources it cites.', 'Reliable: it has a lot of footnotes.', 'Never acceptable in research.', 'Reliable only if it has pictures.'], ex: 'Use it for lateral reading: the footnotes lead you to the sources you can actually cite.' },
+      { q: 'A diary written by a Pilgrim in 1621 describing the harvest feast.', o: ['A primary source: valuable evidence of one person’s view, not the whole story.', 'The most objective source possible, because it was there.', 'Useless because it is old.', 'A secondary source, because it was printed later.'], ex: 'Primary sources are evidence, but they carry their author’s position. Who is missing from this account?' },
+      { q: 'Three websites say the same thing about the origin of the Caga Tió, but none gives a source.', o: ['Check whether they are copying each other before treating it as confirmed.', 'Confirmed: three sources agree.', 'False: agreement without sources means it is a myth.', 'Reliable if the websites look professional.'], ex: 'Agreement can be circular reporting, as in the text.' },
+      { q: 'A university press article on Lunar New Year migration, published in 2012.', o: ['Trustworthy for the trends it studied, but figures are likely out of date.', 'Unreliable: anything over five years old is wrong.', 'Perfect: academic sources do not age.', 'Unreliable because universities have an agenda.'], ex: 'Currency matters for numbers and dates; less for history and analysis.' },
+      { q: 'A travel company blog: “Experience the ancient magic of Diwali, unchanged for 5,000 years!”', o: ['Its purpose is to sell; the claim about age is marketing and needs checking.', 'Reliable: travel companies know the destinations.', 'Reliable about dates but not about history.', 'It must be true or it would be illegal to publish.'], ex: '“Unchanged for 5,000 years” is the kind of claim the reading text warns about.' }
+    ] },
+
+  respect: { type: 'mc', tab: 'Framing', title: 'Framing: precise, respectful, not exotic', pill: '80 %',
+    intro: 'C2 writing about cultures needs precision: who believes what, without exaggerating, generalising or making people sound strange. Choose the best version.',
+    items: [
+      { q: 'Which sentence frames a belief most accurately?', o: ['For many Hindus, the lamps symbolise the triumph of light over darkness.', 'The lamps make light triumph over darkness.', 'Hindus believe the lamps magically defeat evil.', 'Everyone in India believes in the power of the lamps.'], ex: 'Attribute the belief (for many…), use “symbolise”, avoid “everyone” and “magically”.' },
+      { q: 'Which avoids exoticising?', o: ['Families gather for a reunion dinner that may last several hours.', 'The mysterious Orient celebrates its strange New Year rituals.', 'Exotic dragons dance through the colourful streets of the East.', 'The Chinese have a bizarre custom of giving money.'], ex: 'Describe what people do in neutral, specific terms; words like “mysterious”, “bizarre” and “exotic” place the reader outside looking in.' },
+      { q: 'Which hedges a contested historical claim appropriately?', o: ['The custom is often said to have pagan roots, although the evidence is limited.', 'The custom is pagan.', 'The custom is obviously pagan, as everyone knows.', 'Some people think stuff about pagan roots.'], ex: 'Report the claim, then qualify it: hedging is precise, not vague.' },
+      { q: 'Which sentence about Thanksgiving represents more than one perspective fairly?', o: ['For many Americans it is a day of family and gratitude; for some Native American communities it is a National Day of Mourning.', 'Thanksgiving is a happy day for everybody.', 'Thanksgiving is a terrible holiday.', 'Native Americans are against the holiday.'], ex: 'Name both perspectives and the groups precisely; avoid speaking for a whole people.' }
+    ] },
+
+  notes: { type: 'mc', tab: 'Paraphrase', title: 'Paraphrase, not patchwriting', pill: '80 %',
+    intro: '“Patchwriting” means changing a few words of a source but keeping its structure. Examiners and teachers treat it like copying. Choose the genuine paraphrase.',
+    items: [
+      { q: 'Source: “Each step lends the claim a little more apparent authority, and none of them involves anybody checking the original evidence.”', o: ['As a claim passes from source to source, it looks increasingly credible, although nobody has gone back to the evidence.', 'Each stage gives the claim a bit more apparent authority, and none of them involves someone checking the first evidence.', 'Every step lends a claim authority and nobody checks.', 'The claim has more authority at each step.'], ex: 'The second option is patchwriting: same structure, a few synonyms. The first restructures the idea.' },
+      { q: 'Source: “Festivals borrow; that much is not in dispute.”', o: ['It is widely accepted that celebrations take elements from one another.', 'Festivals borrow, and this is not in dispute.', 'Festivals borrow things; this is not disputed much.', 'Borrowing is a festival thing.'], ex: 'Change the structure and the key words, keep the meaning (including how certain it is).' },
+      { q: 'Source: “Some connections are plausible; others rest on nothing firmer than resemblance.”', o: ['While a few links may be genuine, others are based merely on the fact that two things look alike.', 'Some connections are plausible and others rest on resemblance only.', 'All the connections are just resemblance.', 'Some connections are plausible; others are firmer than resemblance.'], ex: 'The first keeps both halves of the contrast and changes the wording and structure; the third changes the meaning.' }
+    ] }
+};
