@@ -153,12 +153,6 @@
             <span class="lab-card-description">Vocabulary games for each Learning Situation.</span>
             <span class="arrow">Open games →</span>
           </button>
-          <button type="button" class="lab-card lab-card-button" data-level="4eso" data-lab-menu="vocab" aria-controls="labVocabMenu">
-            <span class="lab-icon" aria-hidden="true">🍂</span>
-            <span class="lab-card-title">Vocabulary</span>
-            <span class="lab-card-description">Class presentations that introduce the words of each Learning Situation.</span>
-            <span class="arrow">Open vocabulary →</span>
-          </button>
           <button type="button" class="lab-card lab-card-button" data-lab-menu="grammar" aria-controls="labGrammarMenu">
             <span class="lab-icon" aria-hidden="true">📘</span>
             <span class="lab-card-title">Grammar</span>
@@ -185,22 +179,6 @@
               <h3>Vocabulary Games</h3>
               <p>Challenge yourself with phrasal verbs, natural expressions and routines.</p>
               <span class="arrow">Play 4 ESO games →</span>
-            </a>
-          </div>
-          </div>
-        </div>
-
-        <div class="lab-submenu" id="labVocabMenu" hidden>
-          <button type="button" class="lab-back" data-lab-back>← Back to English Lab</button>
-          <div class="lab-section">
-          <h2 class="lab-section-title">Vocabulary of the LSs</h2>
-          <p class="lab-section-lead">Class presentations that introduce the words of each Learning Situation: the class guesses first.</p>
-          <div class="lab-grid">
-            <a class="lab-card" data-level="4eso" href="vocabulary/4eso-autumn-words.html">
-              <span class="badge">4 ESO · Seasons &amp; Celebrations</span>
-              <h3>Autumn words</h3>
-              <p>Seasons, weather, autumn food and nature, and feelings, with how to say each word.</p>
-              <span class="arrow">Open vocabulary →</span>
             </a>
           </div>
           </div>
@@ -247,7 +225,7 @@
     const read = () => { try { return LEVELS[localStorage.getItem(KEY)] ? localStorage.getItem(KEY) : null } catch (e) { return null } };
     let level = read(), user = null;
 
-    const labMenus = {games: $('labGamesMenu'), vocab: $('labVocabMenu'), grammar: $('labGrammarMenu')};
+    const labMenus = {games: $('labGamesMenu'), grammar: $('labGrammarMenu')};
     function showLabMenu(menu){
       $('labOverview').hidden = Boolean(menu);
       Object.entries(labMenus).forEach(([name, element]) => { element.hidden = name !== menu; });
