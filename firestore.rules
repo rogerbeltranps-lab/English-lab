@@ -136,16 +136,16 @@ service cloud.firestore {
         allow create, update: if signedIn() && request.auth.uid == uid
           && ((lsOpen(ls) && lsForMe(ls, uid) && !progressChanged().hasAny(lockedFor(ls, 'lockedKeys'))) || isTester());
       }
-      // route (level): the teacher sets it (Roger, 26 Oct 2026: from the LS1 exam mark). 2 ESO (Roger, 26 Oct 2026): a student with no
-      // route chooses one (Base, Core, Plus) and can change it, as by:"student"; a doc the teacher wrote (no by) is locked for the student.
+      // route (level): only the teacher sets it (Roger, 26 Oct 2026: from the LS1 exam mark; 30 Oct 2026: students never choose one).
+      // A student can only ask for another route from their board: request (any route but Pro), an optional reason and requestedAt.
+      // They never touch level, by, declined or the notice fields; the teacher accepts (sets the route) or declines on the dashboard.
       match /levels/{ls} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
-        allow create, update: if signedIn() && request.auth.uid == uid && ls.matches('2eso-.*')
-          && (isTester() || rosterGroup() in ['2ESOA', '2ESOB'])
-          && (resource == null || resource.data.get('by', null) == 'student')
-          && request.resource.data.keys().hasOnly(['level','by','updated'])
-          && request.resource.data.by == 'student'
-          && request.resource.data.level in ['insecure','safe','daring'];
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && ((lsOpen(ls) && lsForMe(ls, uid)) || isTester())
+          && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['request','reason','requestedAt'])
+          && request.resource.data.request in ['beginners','insecure','safe','daring']
+          && request.resource.data.get('reason', '') is string && request.resource.data.get('reason', '').size() <= 300;
         allow write: if isTeacher();
       }
       // results: students cannot touch feedback, nor edit a locked (submitted) result
