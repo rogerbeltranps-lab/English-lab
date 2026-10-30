@@ -80,6 +80,7 @@ All docs are mapped in [docs/README.md](docs/README.md), which is also Roger's *
 - Grammar content is specific to each Learning Situation. Do not assume the same grammar across future Learning Situations.
 - Follow the grammar requirements defined for the current LS.
 - Differentiate routes mainly through scaffolding, complexity, amount of support and learner independence.
+- **Grammar that comes back (Roger, 30 Oct 2026, after 4 ESO LS2 LP2 repeated the LS1 Present Simple drills for every route):** when an LS recovers a grammar point an earlier LS already taught (an R in the programme's grammar table), the basic drills of the old form go only to Starter and Base (Beginners, Insecure: items with no `r:` or `r:'insecure'`). Core and Plus (Safe, Daring) start from the new use or a contrast with what they know (4 ESO LS2: customs with *It is celebrated / takes place*, Present Simple vs Present Continuous, the passive), with at most one or two quick checks of the old form. A Learning Path never gives Core and Plus more old-form items than new ones. Paths students have already started stay as they are.
 
 ## Vocabulary and matching
 - Vocabulary reference: `2eso/my-real-routine/a-day-in-my-life.html`. Reuse thematic groups (`.vocab-group`), compact expression pills (`.chip`) and hover **and keyboard-focus** support (`.chip-tooltip`) showing a Catalan meaning plus an English example. Adapt through the existing course palette.
