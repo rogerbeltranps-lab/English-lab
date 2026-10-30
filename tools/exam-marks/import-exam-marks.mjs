@@ -4,7 +4,7 @@
 //   node tools/exam-marks/import-exam-marks.mjs <file.csv outside the repo> <ls id, e.g. 4eso-my-real-routine> [--apply]
 // Without --apply it only prints what would change. CSV: a header row with `email` and one column per section key of
 // EL_GRADING[ls].exam (shared/js/el-grading.js); other columns are ignored, an empty cell leaves that section as it is. Section keys the
-// LS no longer has (4ESO LS1 "writing" before it was split by criterion) are removed. The maximum is the section's own.
+// LS no longer has (LS1 "writing", "vocabulary", "grammar" before they were split by criterion) are removed. The maximum is the section's own.
 // A student who never signed in gets their profile (email and the student list's group), so the dashboard lists the marks under them.
 // The CSV holds personal data: keep it outside the repo (e.g. C:\Developer\dades-alumnes).
 import fs from "node:fs";
