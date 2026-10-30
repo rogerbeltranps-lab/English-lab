@@ -58,12 +58,18 @@ table.vocab .grp td{font-weight:700;background:#eef1f4}
 .is-key .gap.filled{min-width:0;padding:0 4px}
 .is-key .opt.right{outline:2px solid #b3261e;border-radius:4px;padding:0 3px}
 img{max-width:100%}
+body.locked>*:not(#gate){display:none!important}
+#gate{display:none;max-width:420px;margin:60px auto;padding:20px;background:#fff;border:1px solid #c5ced5;border-radius:12px;font:15px/1.5 Arial,Helvetica,sans-serif;text-align:center}
+body.locked #gate{display:block}
+#gate button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #1f5f8b;background:#1f5f8b;color:#fff;cursor:pointer}
 </style>
 </head>
-<body>
+<body class="locked">
+<div id="gate"></div>
 <div class="toolbar"><button type="button" onclick="print()">🖨 Print</button></div>
 <main id="sheet">Loading…</main>
 <script src="../js/lp-worksheet.js"></script>
 <script src="../js/el-copyright.js"></script>
+<script type="module" src="teacher-gate.js"></script>
 </body>
 </html>

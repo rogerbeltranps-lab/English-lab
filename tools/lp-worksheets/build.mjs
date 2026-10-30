@@ -29,6 +29,7 @@ const page = await browser.newPage();
 async function pdf(ls, lp, route, key, file) {
   await page.goto(`http://localhost:${port}/English-lab/shared/print/worksheet.html?ls=${ls}&lp=${lp}&route=${route}${key ? '&key=1' : ''}`);
   await page.waitForSelector('body[data-ready]');
+  await page.evaluate(() => document.body.classList.remove('locked'));   // the teacher gate (shared/print/teacher-gate.js) stays shut here: no sign-in
   if (await page.getAttribute('body', 'data-ready') !== '1') throw new Error('failed: ' + ls + ' ' + lp);
   await page.pdf({ path: file, format: 'A4', printBackground: true, preferCSSPageSize: true });
 }

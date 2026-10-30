@@ -19,9 +19,14 @@ h2{margin:0 0 10px;font-size:1.15rem}
 .row a{font-size:.85rem;text-decoration:none;color:var(--accent);border:1px solid var(--line);border-radius:99px;padding:3px 10px;white-space:nowrap}
 .row a.key{color:#b3261e}
 .row a:hover{background:#f6f8fa}
+body.locked>*:not(#gate){display:none!important}
+#gate{display:none;max-width:420px;margin:60px auto;padding:20px;background:#fff;border:1px solid #c5ced5;border-radius:12px;font:15px/1.5 Arial,Helvetica,sans-serif;text-align:center}
+body.locked #gate{display:block}
+#gate button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #1f5f8b;background:#1f5f8b;color:#fff;cursor:pointer}
 </style>
 </head>
-<body>
+<body class="locked">
+<div id="gate"></div>
 <main>
 <h1>Paper worksheets</h1>
 <p class="lead">For students who cannot use a computer: the same activities as the Learning Path, on paper, for each route, with the listening transcripts at the end. Open one and press 🖨 Print (or Ctrl+P). The answer key shows the answers in red.</p>
@@ -34,5 +39,6 @@ document.getElementById('list').innerHTML=Object.entries(window.LP_PRINT).map(([
   '<div class="row"><b>'+t+'</b>'+R.map(([r,n])=>'<a href="worksheet.html?ls='+ls+'&lp='+lp+'&route='+r+'" target="_blank">'+r[0].toUpperCase()+r.slice(1)+' · '+n+'</a>').join('')+
   R.map(([r])=>'<a class="key" href="worksheet.html?ls='+ls+'&lp='+lp+'&route='+r+'&key=1" target="_blank">Key '+r[0].toUpperCase()+r.slice(1)+'</a>').join('')+'</div>').join('')+'</section>').join('');
 </script>
+<script type="module" src="teacher-gate.js"></script>
 </body>
 </html>
