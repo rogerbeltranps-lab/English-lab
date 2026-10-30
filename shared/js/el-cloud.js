@@ -192,6 +192,9 @@ function applyLevel(lvl,all){
 // Students only use their board, English Lab, their own course page and the LSs assigned to their group.
 const BOARD=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html)?$/.test(location.pathname),
   onHome=[ROOT.pathname,ROOT.pathname+"index.html"].includes(location.pathname),onDash=/\/teacher\.html$/.test(location.pathname);
+// The teacher's Dashboard link says which course (and LS) this page is in, so the dashboard opens on it (teacher.html, el_t_last).
+const dashHere=(()=>{const c=relPath.match(/^((2|4)eso)\//);if(!c)return DASH;const u=new URL(DASH);u.searchParams.set("course",c[1]);
+  if(lsId)u.searchParams.set("ls",lsId);return u.href})();
 const courseOf=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
 async function gate(u){
   const c=relPath.match(/^((2|4)eso)\/(index\.html)?$/);
@@ -312,7 +315,7 @@ function bar(){
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
     if(!u)el.append("Not signed in ",b("Sign in",login));
     else{el.append(u.displayName||u.email," ");
-      const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=new URL(isTeacher(u)?"teacher.html":"today.html",ROOT).href;el.append(a," ");
+      const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
@@ -327,7 +330,7 @@ function menuLink(u){
   document.querySelectorAll("[data-el-board]").forEach(e=>e.remove());
   if(!u||onBoard||onDash||!(isStudent(u)||isTeacher(u)))return;
   const teach=isTeacher(u),txt=teach?"Dashboard":elCa(myLevel)?"Les meves activitats":"My activities";
-  const add=(home,cls,icon)=>{if(!home)return;const a=document.createElement("a");a.dataset.elBoard="";a.className=cls;a.href=teach?DASH:BOARD;a.textContent=icon+txt;home.after(a)};
+  const add=(home,cls,icon)=>{if(!home)return;const a=document.createElement("a");a.dataset.elBoard="";a.className=cls;a.href=teach?dashHere:BOARD;a.textContent=icon+txt;home.after(a)};
   document.querySelectorAll(".navlinks").forEach(n=>add(n.querySelector(":scope>a"),"",""));
   document.querySelectorAll(".nav-tabs,.mobile-tabs").forEach(n=>add(n.querySelector(":scope>.tab-btn"),"tab-btn",""));
   document.querySelectorAll(".lp-home-link").forEach(h=>add(h,"lp-home-link","☰ "));
