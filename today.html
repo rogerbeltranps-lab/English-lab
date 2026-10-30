@@ -112,7 +112,8 @@ function render(){
   if(S.ls==null&&!S.url){S.url=true;const p=new URLSearchParams(location.search).get("ls");if(p&&lss.some(l=>l.id===p))S.ls=p}
   if(lss.length&&!lss.some(l=>l.id===S.ls))S.ls=(lss.find(l=>l.id===(ELWeek.now(D.me.group)||{}).ls)||lss[0]).id;
   setLang();
-  const links=all()?lss:lss.filter(l=>!only(l.id));   // no links to an LS that only shows its grade
+  // every LS gets its button and menu link, also one whose board shows only its grade (LS1), so students can revise its pages (Roger, 30 Oct 2026)
+  const links=lss;
   nav(g,links);
   // The course the student clicked on Home (el_pick): if it is not theirs, say which one is.
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
@@ -172,7 +173,7 @@ function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=elRouteOf(D.l
   if(!all()&&!lv)return "";
   return `<div class="box study"><b>📚 ${t("Descarrega el resum del vocabulari i la gramàtica per estudiar-los!","Download the summary of the vocabulary and grammar to study them!")}</b><p class="muted">${t("Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. És opcional: fes-lo servir si et va bé.","All the vocabulary and then all the grammar of your route, with the explanations and practice. It is optional: use it if it helps you.")}</p><div class="row">${all()?EL_LEVELS.filter(x=>x.id!=="beginners"&&(x.id!=="native"||ls.pro)).map(x=>a(x.id)).join(""):a(lv)}</div></div>`}
 // LS1 (Roger, 25 Oct 2026): only the final exam and the final product count, so the board shows just the LS grade (EL_GRADING[ls].only),
-// with no learning paths and no links to the LS pages, so students do not go back to the activities.
+// with no learning paths. It keeps its "Go to" button and menu link (Roger, 30 Oct 2026) so students can revise its pages.
 const only=id=>((window.EL_GRADING||{})[id]||{}).only;
 const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")};
 // Exam broken down (Roger, 30 Oct 2026): the points of each section and the exam per criterion (elExamByCrit), when the LS's sections
