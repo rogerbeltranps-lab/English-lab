@@ -47,6 +47,7 @@ Tell Claude: "Make a class game for [course] [learning situation], [learning pat
 | Autumn words: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP1 Getting started (choose and write questions alternate; replaces the Autumn words slides) |
 | Free-time words & how often | 2 ESO | LS2 Free Time, Live!, LP1 Getting started |
 | What are they doing? Choose it, write it | 2 ESO | LS2 Free Time, Live!, LP2 What are they doing? (choose and write questions alternate) |
+| Now or usually? Choose it, write it | 2 ESO | LS2 Free Time, Live!, LP3 Now or usually? (choose and write questions alternate) |
 | Celebrations around the world: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP2 Celebrations around the world (choose and write questions alternate) |
 | Where traditions come from: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from (choose and write questions alternate) |
 
