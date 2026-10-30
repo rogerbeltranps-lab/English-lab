@@ -129,12 +129,25 @@ const listening=[
  {r:"safe",q:"What do both celebrations have in common?",o:["They take place on the same night and are about the dead and the end of the harvest.","They both use pumpkins.","They both come from the USA."],h:""},
  {r:"daring",q:"Why do the two celebrations “feel very different”?",o:["Halloween is about costumes and scary fun, and the Castanyada is about family and food.","Only Halloween remembers the dead.","The Castanyada is a new tradition."],h:""}
 ];
+// Speaking: task and model per route (also printed on the paper worksheet, shared/js/lp-worksheet.js).
+const speakTask={
+ beginners:"Parla de la tardor on vius (20–30 segons) amb el model: el temps, un menjar i què fas el 31 d'octubre. Canvia només les paraules que calgui.",
+ insecure:"Parla de la tardor on vius (30–45 segons): el temps, el menjar i com celebres el final d'octubre. Fes servir el model i canvia els detalls.",
+ safe:"Talk about autumn where you live (45–60 s): the weather, the food and how you celebrate the end of October. Compare autumn with another season or another country.",
+ daring:"Talk about autumn where you live (60–90 s): the weather, the food and how you celebrate the end of October. Explain how the celebration has changed in your family."
+};
+const speakModel={
+ beginners:"In autumn, it is cool and rainy. We eat chestnuts. On 31 October, we celebrate the Castanyada. I feel happy.",
+ insecure:"In autumn, it is cool and rainy. The days get shorter. On 31 October, we celebrate the Castanyada. We eat chestnuts and panellets. I feel happy because my family eats together.",
+ safe:"In autumn, it's mild and a bit foggy in the mornings, whereas in summer it's very hot. The clocks go back and it gets dark early. On 31 October we celebrate the Castanyada: we roast chestnuts and eat panellets at my grandparents' house. In the UK, they celebrate Halloween on the same night.",
+ daring:"Autumn here is mild, but the evenings get chilly and it gets dark early after the clocks go back. On 31 October my family celebrates the Castanyada with chestnuts, sweet potatoes and panellets. When my parents were young, nobody dressed up, but now many children wear Halloween costumes too, so the celebration has changed: it mixes both traditions."
+};
 window.LP={key:"ls2GettingStarted4ESO",title:"Getting started",panels:[
  {id:"recall",type:"recall",tab:"Recall",title:"Recall",items:recall},
- {id:"words",type:"typed",area:"Vocabulary",tab:"Autumn words",title:"Autumn words",items:practice,
+ {id:"words",type:"typed",area:"Vocabulary",tab:"Autumn words",title:"Autumn words",items:practice,groups:vocab,
   core:{insecure:["spring","summer","autumn (UK) / fall (US)","winter","sunny","cloudy","windy","rainy","cold","warm","the days get shorter / longer","leaves fall","chestnuts","sweet potatoes","pumpkins","harvest","excited","grateful","proud","scared"],safe:["autumn (UK) / fall (US)","winter","foggy","mild","the days get shorter / longer","leaves change colour","chestnuts","sweet potatoes","pumpkins","harvest","grateful","proud","seasonal","crop","pick fruit","frost","chilly","cosy","it gets dark early","the clocks go back"],daring:["autumn (UK) / fall (US)","winter","foggy","mild","the days get shorter / longer","leaves change colour","chestnuts","sweet potatoes","pumpkins","harvest","grateful","proud","seasonal","crop","pick fruit","frost","chilly","cosy","it gets dark early","the clocks go back"]}},
  {id:"read",type:"mc",media:{text:true},tab:"Reading",title:"Reading: The autumn chat",items:readingQs},
  {id:"listen",type:"mc",media:{videos:true},tab:"Listening",title:"Listening: Halloween and the Castanyada",items:listening,
   chunks:["at the end of the harvest","sweet potatoes are autumn food","on the first of November"]},
- {id:"speak",type:"speaking",tab:"Speaking"}
+ {id:"speak",type:"speaking",tab:"Speaking",task:speakTask,model:speakModel}
 ]};

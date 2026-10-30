@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Paper worksheets</title>
+<link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
+<style>
+:root{--ink:#1d2830;--muted:#5f6b73;--line:#c5ced5;--bg:#eef1f4;--card:#fff;--accent:#1f5f8b}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Arial,Helvetica,sans-serif}
+main{max-width:900px;margin:0 auto;padding:20px 16px 40px}
+h1{margin:0 0 4px;font-size:1.6rem}
+.lead{color:var(--muted);margin:0 0 18px}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 16px}
+h2{margin:0 0 10px;font-size:1.15rem}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:7px 0;border-top:1px solid #e3e8ec}
+.row b{flex:1 1 220px}
+.row a{font-size:.85rem;text-decoration:none;color:var(--accent);border:1px solid var(--line);border-radius:99px;padding:3px 10px;white-space:nowrap}
+.row a.key{color:#b3261e}
+.row a:hover{background:#f6f8fa}
+</style>
+</head>
+<body>
+<main>
+<h1>Paper worksheets</h1>
+<p class="lead">For students who cannot use a computer: the same activities as the Learning Path, on paper, for each route, with the listening transcripts at the end. Open one and press 🖨 Print (or Ctrl+P). The answer key shows the answers in red.</p>
+<div id="list"></div>
+</main>
+<script src="lp-list.js"></script>
+<script>
+const R=[['beginners','Starter'],['insecure','Base'],['safe','Core'],['daring','Plus']];
+document.getElementById('list').innerHTML=Object.entries(window.LP_PRINT).map(([ls,v])=>'<section><h2>'+v.title+'</h2>'+v.lps.map(([lp,t])=>
+  '<div class="row"><b>'+t+'</b>'+R.map(([r,n])=>'<a href="worksheet.html?ls='+ls+'&lp='+lp+'&route='+r+'" target="_blank">'+r[0].toUpperCase()+r.slice(1)+' · '+n+'</a>').join('')+
+  R.map(([r])=>'<a class="key" href="worksheet.html?ls='+ls+'&lp='+lp+'&route='+r+'&key=1" target="_blank">Key '+r[0].toUpperCase()+r.slice(1)+'</a>').join('')+'</div>').join('')+'</section>').join('');
+</script>
+</body>
+</html>
