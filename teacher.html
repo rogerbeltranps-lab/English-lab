@@ -313,7 +313,7 @@ function render0(){
   const ls=S.ls,list=acts(ls),inG=studs.filter(s=>s.group===S.g||s.tester).sort(byName);   // the tester account shows in every group
   const tutors=[...new Set(inG.map(s=>s.ro&&s.ro.tutor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ca"));if(!tutors.includes(S.tutor))S.tutor="all";
   const shown=inG.filter(s=>(S.route==="all"||(level(s.uid,ls)||"none")===S.route)&&(S.tutor==="all"||s.ro&&s.ro.tutor===S.tutor));
-  const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${l.title}${((D.ls[l.id]||{}).status||"hidden")==="hidden"?" (Hidden)":""}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}</select> `:`<b>${lss[0].title}</b>${mine(lss[0])?"":" <small class=\"muted\">(not assigned to this group)</small>"} `)
+  const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${lsLabel(l)}${((D.ls[l.id]||{}).status||"hidden")==="hidden"?" (Hidden)":""}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}</select> `:`<b>${lsLabel(lss[0])}</b>${mine(lss[0])?"":" <small class=\"muted\">(not assigned to this group)</small>"} `)
     +`<a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a> `
     +`<span class="muted">· Route:</span> `+["all","beginners","insecure","safe","daring","native","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"No route":LV[r]}</button>`).join("")
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"")
@@ -396,7 +396,7 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
     +`<div class="bar"><b>Cut-offs (${c==="2eso"?"2 ESO":"4 ESO"}, mark out of 10):</b> ${route("beginners")} under ${inp("beginners")} · ${route("insecure")} under ${inp("insecure")} · ${route("safe")} under ${inp("safe")} · ${route("daring")} from ${f1(cu.safe)}`
     +(["beginners","insecure","safe"].some(k=>cu[k]!==def[k])?` <button class="g" data-do="cutdef">Back to ${def.beginners} · ${def.insecure} · ${def.safe}</button>`:"")+`</div>`
     +`<p>${["beginners","insecure","safe","daring"].map(k=>`${route(k)} ${cnt[k]||0}`).join(" · ")}${cnt.none?` · <span class="muted">no exam mark: ${cnt.none}</span>`:""}</p>`
-    +`<div class="bar"><label for="rtto" style="font-weight:600">Apply to</label><select id="rtto" data-do="rtto">${later.map(l=>`<option value="${l.id}" ${l.id===to?"selected":""}>${esc(l.title)}</option>`).join("")}</select>`
+    +`<div class="bar"><label for="rtto" style="font-weight:600">Apply to</label><select id="rtto" data-do="rtto">${later.map(l=>`<option value="${l.id}" ${l.id===to?"selected":""}>${lsLabel(l)}</option>`).join("")}</select>`
     +`<button data-do="rtapply" ${n?"":"disabled"}>Apply ${n} change${n===1?"":"s"}</button></div>`
     +(rows.length?`<div class="wrap"><table><thead><tr><th>Apply</th><th class="stu">Student</th><th>${lsName(src.id)} exam</th><th>Now in ${lsName(to)}</th><th>New route</th></tr></thead><tbody>`
       +rows.map(r=>{const ex=r.ex?f1(r.ex.mark)+(r.ex.n<r.ex.of?` <small class="muted" title="Only these sections are entered: the mark may change">(${r.ex.n}/${r.ex.of} sections)</small>`:""):'<span class="muted">no mark</span>';
@@ -779,6 +779,8 @@ function degPanel(u,c){redraw=()=>degPanel(u,c);
 // ↩: no route of its own in this LS, so the one from an earlier LS applies (the student sees that one).
 // ✋: the student chose it (2 ESO, elCanPickRoute); setting a route here locks it.
 const lsName=id=>esc(((EL_LS.find(x=>x.id===id)||{}).title||id).replace(/^\S+ · /,""));
+// "LS1 · My Real Routine": numbered per course, as in the students' LS menu (Roger, 30 Oct 2026)
+const lsLabel=l=>"LS"+(EL_LS.filter(x=>x.course===l.course).indexOf(l)+1)+" · "+lsName(l.id);
 const rtCell=u=>{const l=(S.D.lv[u]||{})[S.ls]||{},r=elRouteOf(S.D.lv[u],S.ls),carried=r.level&&r.from!==S.ls;
   return `<td class="gr" data-do="rt" data-u="${u}" title="${l.request?"Asks for "+(LV[l.request]||l.request)+" · click to answer":(r.own?"Chosen by the student (they can change it until you set it) · ":"")+(carried?"Carried over from "+lsName(r.from)+" · click to set it for this LS":"Click to set the route")}">${route(r.level)}${r.own?" ✋":""}${carried?" ↩":""}${l.request?" 🔁":""}</td>`};
 function rtPanel(u){redraw=null;
