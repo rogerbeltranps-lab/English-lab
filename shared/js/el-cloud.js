@@ -376,6 +376,10 @@ onAuthStateChanged(auth,async u=>{
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
+  // A route the teacher set on the student list before their first sign-in (roster/{email}.route = {level, ls}, teacher.html listRoute):
+  // saved as their route in that LS, with the level notice fields, if they have none there yet (firestore.rules checks it matches the list).
+  const lr=myRoster&&myRoster.route;
+  if(lr&&lr.level&&lr.ls)try{const ref=doc(db,"students",u.uid,"levels",lr.ls);if(!(await getDoc(ref)).exists())await setDoc(ref,{level:lr.level,changed:serverTimestamp(),was:null,why:null})}catch(e){console.warn("route from the list",e)}
   gamePush(u);
   lsMenu(u).catch(e=>console.warn("ls menu",e));
   document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u));   // teacher-only links (e.g. a class game on its learning path)

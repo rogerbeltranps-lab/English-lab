@@ -104,7 +104,8 @@ const api={
     const ps=[put(["roster",id],o)];if(old&&old!==id)ps.push(F.deleteDoc(F.doc(db(),"roster",old)));if(uid)ps.push(put(["students",uid],{group:o.group}));
     if(po)ps.push(put(["points",id],Object.assign({},po)),F.deleteDoc(F.doc(db(),"points",old)));return Promise.all(ps)},
   delRo:id=>DEMO?delete S.D.ro[id]:F.deleteDoc(F.doc(db(),"roster",id)),
-  importRoster:async out=>{const gone=Object.keys(S.D.ro).filter(id=>!out[id]);if(DEMO){S.D.ro=out;return}   // replaces the whole list
+  importRoster:async out=>{Object.entries(out).forEach(([id,o])=>{const r=(S.D.ro[id]||{}).route;if(r&&!o.route)o.route=r});   // keeps a route set for the first sign-in (listRoute)
+    const gone=Object.keys(S.D.ro).filter(id=>!out[id]);if(DEMO){S.D.ro=out;return}   // replaces the whole list
     const ops=[...Object.entries(out).map(([id,o])=>b=>b.set(F.doc(db(),"roster",id),sub(Object.assign({},o)))),...gone.map(id=>b=>b.delete(F.doc(db(),"roster",id)))];
     for(let i=0;i<ops.length;i+=400){const b=F.writeBatch(db());ops.slice(i,i+400).forEach(f=>f(b));await b.commit()}},
   // route: setting it (directly or by accepting a request) clears any request; declining keeps the route and tells the student (declined).
@@ -117,6 +118,9 @@ const api={
   // routes from the LS1 exam: several students at once (same fields as setLevel); cut-offs per course in settings/routes
   setLevels:(ls,pairs,why)=>{if(DEMO){pairs.forEach(([u,l])=>api.setLevel(u,ls,l,why));return}const b=F.writeBatch(db());
     pairs.forEach(([u,level])=>b.set(F.doc(db(),"students",u,"levels",ls),sub(Object.assign(api.lvFields(u,ls,level,why),{by:F.deleteField(),request:F.deleteField(),reason:F.deleteField(),declined:F.deleteField()})),{merge:true}));return b.commit()},
+  // a route for a student who has not signed in yet (Roger, 30 Oct 2026): roster/{id}.route = {level, ls}; el-cloud.js saves it as their
+  // route in that LS (with the level notice) the first time they sign in, if they have none there yet. null clears it.
+  listRoute:(rid,level,ls)=>{const v=level?{level,ls}:null;if(DEMO){if(v)S.D.ro[rid].route=v;else delete S.D.ro[rid].route;return}return put(["roster",rid],{route:v||F.deleteField()})},
   cuts:(c,o)=>{(S.D.cuts=S.D.cuts||{})[c]=o;return put(["settings","routes"],{[c]:o})},
   reject:(u,ls)=>{const l=S.D.lv[u][ls],to=l.request;if(DEMO){delete l.request;delete l.reason;l.declined=to;return}return put(["students",u,"levels",ls],{request:F.deleteField(),reason:F.deleteField(),declined:to,declinedAt:F.serverTimestamp()})},
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
@@ -415,7 +419,7 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
         const carried=r.now.level&&r.now.from!==to,same=r.pick&&r.pick===r.now.level;
         return `<tr><td><input type="checkbox" data-do="rton" data-u="${r.s.uid}" ${r.on?"checked":""} ${r.pick?"":"disabled"}></td><td class="stu">${name(r.s)}</td><td>${ex}</td><td>${route(r.now.level)}${carried?" ↩":""}</td><td>${sel(r)}${r.pick&&r.pick!==r.sug&&r.ex?(r.pick==="native"&&r.now.level==="native"&&S.rtPick[r.s.uid]===undefined?' <small class="muted" title="Pro is never given by a mark: pick another route to change it">Pro kept</small>':' <small class="muted" title="Changed by you">✎</small>'):""}${same?' <small class="muted">same</small>':""}</td></tr>`}).join("")
       +`</tbody></table></div>`:'<p class="muted">No signed-in students in this group yet.</p>')
-    +(away.length?`<p class="muted">Not signed in yet (a route can be set once they sign in): ${away.map(name).join(" · ")}</p>`:"");
+    +(away.length?`<p class="muted">Not signed in yet (click their Route cell in the grid to set the route they get when they first sign in): ${away.map(name).join(" · ")}</p>`:"");
   return `<div class="box">${fold("routes","🧭 Routes from the LS1 exam",body)}</div>`}
 function todo(studs,ls,list){   // studs: signed-in students only. Final product items and route requests from the students' boards (Roger, 30 Oct 2026); submissions without feedback are not listed (Roger, 2026-10-24)
   const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
@@ -479,7 +483,7 @@ function progress(studs,list){
   let b="";const cols=list.reduce((n,a)=>n+(open(a)?steps(a).length+1:1),0);
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
     const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}</td>`;
-    if(s.away){b+=`<tr class="away">${who}<td>${route()}</td><td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
+    if(s.away){b+=`<tr class="away">${who}${awayRt(s)}<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
     b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
       if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}${tryCell(s.uid,a.id,k)}</td>`).join("");
@@ -929,6 +933,13 @@ const rtCell=u=>{const l=(S.D.lv[u]||{})[S.ls]||{},r=elRouteOf(S.D.lv[u],S.ls),c
 function toldLine(u,ls){const l=(S.D.lv[u]||{})[ls]||{},ms=l.changed&&l.changed.toMillis?l.changed.toMillis():0;if(!ms||!l.level)return "";
   const c=(EL_LS.find(x=>x.id===ls)||{}).course,seen=(((S.D.st[u]||{}).levelSeen)||{})[c]||0;
   return `<p class="muted">🔔 Notice sent ${new Date(ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}: ${route(l.level)}${l.was&&l.was!==l.level?" (before: "+(LV[l.was]||esc(l.was))+")":""} · ${seen>=ms?"seen ✓":"not seen yet"}</p>`}
+// Route cell of a student who has not signed in yet: click to set the route they get at their first sign-in (⏳ = waiting for it).
+const awayRt=s=>{const r=s.ro&&s.ro.route;if(!s.ro||!s.email)return `<td>${route()}</td>`;
+  return `<td class="gr" data-do="rtlist" data-u="${s.uid}" title="${r?"Applied when they first sign in · click to change":"Click to set the route they get when they first sign in"}">${r?route(r.level)+" ⏳":route()}</td>`};
+function rtListPanel(u){redraw=null;const s=S.P[u],r=s.ro.route,lsT=(EL_LS.find(x=>x.id===S.ls)||{}).title;
+  dlg(`<h3>${name(s)} · Route</h3><p class="muted">Not signed in yet.${r?` Waiting: ${route(r.level)} in ${lsName(r.ls)}.`:""}</p>`
+    +`<label>Route when they first sign in</label><div class="bar">${EL_LEVELS.map(x=>`<button class="${r&&x.id===r.level?"":"g"}" data-do="setlist" data-u="${u}" data-r="${x.id}" ${r&&x.id===r.level?"disabled":""}>${LV[x.id]}</button>`).join("")}${r?` <button class="g" data-do="setlist" data-u="${u}" data-r="">Clear</button>`:""}</div>`
+    +`<p class="muted">Saved on the student list. The first time they sign in it becomes their route in ${esc(lsT)} (later LSs take it too until you change it), and they get the notice with their level.</p>`)}
 function rtPanel(u){redraw=null;
   const s=S.P[u],l=(S.D.lv[u]||{})[S.ls]||{},lsT=(EL_LS.find(x=>x.id===S.ls)||{}).title;
   const r=elRouteOf(S.D.lv[u],S.ls),carried=r.level&&r.from!==S.ls;
@@ -1057,7 +1068,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
         <div class="row" style="justify-content:flex-start"><button data-do="pbdelok" data-id="${esc(x.id)}" data-t="1">💌 Delete and thank the student</button><button class="g" data-do="pbdelok" data-id="${esc(x.id)}">Delete without a message</button></div>`)},
     pbdelok:()=>{$("#dlg").close();act(api.pbDel(k.id,!!k.t))},
     acc:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.to))},rej:()=>{$("#dlg").close();act(api.reject(u,S.ls))},
-    rt:()=>rtPanel(u),
+    rt:()=>rtPanel(u),rtlist:()=>rtListPanel(u),setlist:()=>{$("#dlg").close();act(api.listRoute(S.P[u].rid,k.r||null,S.ls))},
     rton:()=>{S.rtOn[u]=t.checked;render()},
     cutdef:()=>quick(api.cuts(GR.find(g=>g.id===S.g).course,Object.assign({},EL_ROUTE_CUTS[GR.find(g=>g.id===S.g).course]))),
     rtapply:()=>{const c=GR.find(g=>g.id===S.g).course,src=srcLs(c),to=S.rtTo,ps=rtRows(c,src,to,Object.values(S.P).filter(s=>s.group===S.g&&!s.tester)).filter(r=>r.on).map(r=>[r.s.uid,r.pick]);
