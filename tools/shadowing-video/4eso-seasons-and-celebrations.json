@@ -31,14 +31,6 @@
    "pause": 3.9
   },
   {
-   "speaker": "Laia",
-   "text": "Where's it going to take place?",
-   "src": "audio/student-council-meeting.mp3",
-   "start": 22.19,
-   "end": 24.33,
-   "pause": 3.5
-  },
-  {
    "speaker": "Omar",
    "text": "There will be four stalls, one for each festival.",
    "src": "audio/student-council-meeting.mp3",
@@ -128,14 +120,6 @@
   },
   {
    "speaker": "Sam",
-   "text": "It lasted three days.",
-   "src": "audio/culture-bites-origins.mp3",
-   "start": 72.31,
-   "end": 74.15,
-   "pause": 3.6
-  },
-  {
-   "speaker": "Sam",
    "text": "Many people say what they are grateful for.",
    "src": "audio/culture-bites-origins.mp3",
    "start": 88.91,
@@ -149,6 +133,28 @@
    "start": 82.99,
    "end": 86.65,
    "pause": 5.7
+  }
+ ],
+ "examples": [
+  {
+   "speaker": "Emma",
+   "text": "That's all for today.",
+   "marks": "That's **all** for to**day**.",
+   "tip": "Strong words are louder and longer. Copy them!",
+   "src": "audio/culture-bites-origins.mp3",
+   "start": 110.01,
+   "end": 111.42,
+   "pause": 3.0
+  },
+  {
+   "speaker": "Omar",
+   "text": "I'll call him tonight.",
+   "marks": "I'll ==call‿him== tonight.",
+   "tip": "Some words join together, with no pause between them.",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 38.7,
+   "end": 39.69,
+   "pause": 3.0
   }
  ]
 }
