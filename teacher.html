@@ -19,6 +19,7 @@ td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px 
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}button.sec{background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-size:13px}button.sec.off{background:#e2e8f0;color:#475569;border-color:#cbd5e1}button.secall{background:none;color:#0f766e;padding:2px 6px;font-size:12px;text-decoration:underline}
+.ycards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:10px;margin:8px 0}.ycard{border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;background:#f8fafc}.ycard ul{margin:6px 0;padding-left:18px}.ycard li{margin:2px 0}.yfree{border-style:dashed;background:#fff}.yterm.ynow{border:2px solid #0f766e}table.ytab thead tr:first-child th{white-space:nowrap}table.ytab thead tr+tr th{top:var(--h1y,27px)}
 details>summary{cursor:pointer;font-weight:700;font-size:1.15rem}details.key>summary{font-size:.9rem;font-weight:600;color:#475569}tr.away td{color:#94a3b8;background:#f8fafc}.tag{font-size:11px;font-weight:600;background:#e2e8f0;color:#475569;border-radius:999px;padding:1px 6px;margin-left:4px}label.btn,a.btn{background:#0f766e;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;text-decoration:none}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px 8px}.form input,.form select{width:100%;box-sizing:border-box}.pill{cursor:pointer}.pill:hover,.pill:focus{outline:2px solid #0f766e;outline-offset:1px}table.legend{width:100%}table.legend td{text-align:left;vertical-align:top}table.legend td:first-child{white-space:nowrap}
 button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6px;padding:2px 7px;margin:1px;font-size:12px;font-weight:600}button.lv.on{color:#fff}td.gr{cursor:pointer;white-space:nowrap}td.gr:hover{outline:2px solid #0f766e;outline-offset:-2px}.sug{color:#64748b;font-style:italic}.deg{font-weight:700}td.tot{font-weight:700}.dlg input.ex{width:56px}table.lvt td{text-align:left}ul.pbl{list-style:none;padding:0;margin:6px 0}ul.pbl li{margin:10px 0;border-left:3px solid #b45309;padding-left:10px}ul.pbl li.fixed{border-color:#cbd5e1;color:#64748b}ul.pbl details>summary{font-size:13px;font-weight:600;color:#475569}ul.pbl code{font-size:12px;display:block;white-space:pre-wrap}
 #pdf{display:none}body.pdfmode{max-width:none;background:#e2e8f0}body.pdfmode>*:not(#pdf){display:none!important}body.pdfmode #pdf{display:block}
@@ -61,9 +62,9 @@ const LAST=(()=>{try{return JSON.parse(localStorage.getItem("el_t_last"))||{}}ca
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
   else if(gOf(LAST.g)||["plan","qa","mat","none"].includes(LAST.g))S.g=LAST.g;
-  if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3)S.ls=LAST.ls;   // render() swaps an LS of another course for the group's current one
+  if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   if(q.has("course")||q.has("ls")||q.has("g"))history.replaceState(null,"",location.pathname+location.hash)})();
-const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
+const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,year:!!S.year,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved, in the learning paths you open for their group."],closed:["Closed","Students can only review what they did and the feedback."]};
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 
@@ -313,12 +314,14 @@ function render0(){
   const ls=S.ls,list=acts(ls),inG=studs.filter(s=>s.group===S.g||s.tester).sort(byName);   // the tester account shows in every group
   const tutors=[...new Set(inG.map(s=>s.ro&&s.ro.tutor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ca"));if(!tutors.includes(S.tutor))S.tutor="all";
   const shown=inG.filter(s=>(S.route==="all"||(level(s.uid,ls)||"none")===S.route)&&(S.tutor==="all"||s.ro&&s.ro.tutor===S.tutor));
-  const filters=(lss.length>1?`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls?"selected":""}>${lsLabel(l)}${((D.ls[l.id]||{}).status||"hidden")==="hidden"?" (Hidden)":""}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}</select> `:`<b>${lsLabel(lss[0])}</b>${mine(lss[0])?"":" <small class=\"muted\">(not assigned to this group)</small>"} `)
-    +`<a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a> `
+  const filters=`<select data-do="ls">${lss.map(l=>`<option value="${l.id}" ${l.id===ls&&!S.year?"selected":""}>${lsLabel(l)}${((D.ls[l.id]||{}).status||"hidden")==="hidden"?" (Hidden)":""}${mine(l)?"":" (not assigned to this group)"}</option>`).join("")}<option disabled>──────────</option><option value="${YEAR}" ${S.year?"selected":""}>📆 Whole school year (by terms)</option></select> `
+    +(S.year?"":`<a class="lsgo" href="${lsHref(EL_LS.find(l=>l.id===ls))}" target="_blank" rel="noopener" title="Open this LS's page in a new tab">Open LS ↗</a> `)
     +`<span class="muted">· Route:</span> `+["all","beginners","insecure","safe","daring","native","none"].map(r=>`<button class="chip ${S.route===r?"on":""}" data-do="route" data-r="${r}">${r==="all"?"All":r==="none"?"No route":LV[r]}</button>`).join("")
     +(tutors.length?` <span class="muted">· Tutor:</span> `+["all",...tutors].map(t=>`<button class="chip ${S.tutor===t?"on":""}" data-do="tutor" data-t="${esc(t)}">${t==="all"?"All":esc(t)}</button>`).join(""):"")
-    +(G()&&!G().only?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:"")
-    +(G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
+    +(G()&&!G().only&&!S.year?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:"")
+    +(G()&&G().marking&&!S.year?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:"");
+  if(S.year){$("#main").innerHTML=`<div class="bar">${filters}</div>`+yearView(grp,shown);
+    document.querySelectorAll("table.ytab").forEach(x=>{const h=x.querySelector("thead tr").offsetHeight;if(h)x.style.setProperty("--h1y",h+"px")});return}
   $("#main").innerHTML=`<div class="bar">${filters}</div>`
     +lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
@@ -502,6 +505,65 @@ function gradeBox(studs){
     +fold("gradekey","How it is worked out",key,"key")
     +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`:"")
     +fold("exam","Exam marks",examTable(studs.filter(s=>!s.away)))+`</div>`;
+}
+// ---- Whole school year by terms (Roger, 30 Oct 2026: "an option to see all the school year by terms … (2 LS per each) that update as I
+// create the LS and the items to assess"). "📆 Whole school year" in the LS dropdown. Nothing here names an LS: the course's LSs come from
+// EL_LS, LS n is in term ceil(n/2) (or `term` in its EL_LS entry), and its assessed items are the blocks of EL_GRADING[ls] with their weights.
+// Each item counts in the term of its date in the group's EL_PLAN[ls] column (exam day; the last due day of the activities the block reads),
+// or in EL_PLAN[ls].report[block] when the plan says so (4ESO LS2: the exam on 23 Nov stays in term 1), else in its LS's term.
+// Term mark = all the items counted in that term, each weighted by its block weight (every LS weighs 100 over the year);
+// year mark = the same over every item = the average of the LS marks. An item whose day has not come yet (no day: its LS is Hidden) never counts 0.
+const YEAR="__year",withLs=(ls,f)=>{const o=S.ls;S.ls=ls;try{return f()}finally{S.ls=o}};
+const withS=(k,v,f)=>{const o=S[k];S[k]=v;try{return f()}finally{S[k]=o}};
+const lsTerm=l=>Math.min(EL_TERMS.length,l.term||Math.ceil((EL_LS.filter(x=>x.course===l.course).indexOf(l)+1)/2));
+const termOf=d=>EL_TERMS.findIndex(t=>t.id===elTerm(d))+1;
+const wsum=ps=>{let s=0,w=0;ps.forEach(([v,x])=>{if(v!=null){s+=v*x;w+=x}});return w?s/w:null};   // null = not counted (already decided per item)
+function lsItems(l,gid){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)return [];
+  const p=(window.EL_PLAN||{})[l.id],gi=p?ELWeek.col(p,gid):-1,rep=(p&&p.report)||{},last=ids=>gi<0?null:[...new Set(ids)].map(id=>ELWeek.due(p,id,gi)).filter(Boolean).sort().pop()||null;
+  const ids={fp:[g.fp&&g.fp.a],gv:g.gv?g.gv.parts.flatMap(x=>(x.first||x.time||[]).map(y=>y[0])):[],
+    other:(g.other||[]).flatMap(c=>[...((g.auto||{})[c]||[]),...((g.teacher||{})[c]||[])].map(y=>y[0]))};
+  return g.blocks.map(b=>{const date=b.id==="exam"?(gi>=0?ELWeek.exam(p,gi):null):last((ids[b.id]||[]).filter(Boolean));
+    return {l,b,date,term:+rep[b.id]||(date?termOf(date):lsTerm(l))}})}
+// one item's mark for a student: "Missing work counts 0" only once its day has passed; with no day in a plan, once its LS is not Hidden
+function itemMark(s,it){if(s.away)return null;
+  return withLs(it.l.id,()=>withS("zero",S.zero&&(it.date?it.date<ELWeek.today():((S.D.ls[it.l.id]||{}).status||"hidden")!=="hidden"),()=>({exam:()=>examBlock(s.uid),fp:()=>fpBlock(s.uid),
+    gv:()=>gvBlock(s.uid,s.group).mark,other:()=>otherBlock(s.uid)})[it.b.id]?.()??null))}
+const termBonus=(s,t,best)=>withS("term",t.id,()=>s.away||!pkey(s)?null:ptGets(s,best,ptMiss(s)));
+function yearView(grp,studs){
+  if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()))}   // the current term starts unfolded
+  const lss=EL_LS.filter(l=>l.course===grp.course),items=lss.flatMap(l=>lsItems(l,grp.id)),now=termOf(ELWeek.today()),today=ELWeek.today();
+  const M={};studs.forEach(s=>M[s.uid]=items.map(it=>itemMark(s,it)));
+  const mk=(s,its)=>wsum(its.map(it=>[M[s.uid][items.indexOf(it)],it.b.w]));
+  const cellOf=(s,v,ls)=>`<td class="gr" data-do="ygrade" data-u="${s.uid}" data-ls="${ls}" title="Click for the LS grade">${f1(v)}</td>`;
+  const st=l=>{const x=(S.D.ls[l.id]||{}).status||"hidden";return `<span class="badge" style="background:${STCOL[x]}">${LS_INFO[x][0]}</span>`};
+  const when=it=>it.date?(it.b.id==="exam"?"📝 ":"due ")+ELWeek.date(it.date):"";
+  const terms=EL_TERMS.map((t,i)=>{const n=i+1,mine=lss.filter(l=>lsTerm(l)===n),its=items.filter(it=>it.term===n),from=its.filter(it=>lsTerm(it.l)!==n);
+    const free=Array.from({length:Math.max(0,2-mine.length)},(_,j)=>(n-1)*2+mine.length+j+1).filter(k=>k>lss.length);
+    const span=(i?"from "+ELWeek.date(ELWeek.add(EL_TERMS[i-1].end,1)):"")+(t.end?(i?" to ":"until ")+ELWeek.date(t.end):" to the end of the year");
+    const card=l=>{const li=items.filter(it=>it.l===l);
+      return `<div class="ycard"><b>${lsLabel(l)}</b> ${st(l)} <a data-do="yls" data-ls="${l.id}" title="Open this LS on the dashboard">open ↗</a>`
+        +(li.length?`<ul>${li.map(it=>`<li>${esc(it.b.name)} <b>${it.b.w} %</b> <small class="muted">${when(it)}</small>${it.term!==n?` <span class="tag">→ ${esc(EL_TERMS[it.term-1]?EL_TERMS[it.term-1].en:"Term "+it.term)}</span>`:""}</li>`).join("")}</ul>`
+          :`<p class="muted">No assessed items yet: they appear here when its grading plan is added.</p>`)+`</div>`};
+    const cards=mine.map(card).join("")+free.map(k=>`<div class="ycard yfree"><b>LS${k}</b><p class="muted">Not created yet: it appears here when it is added.</p></div>`).join("")
+      +(from.length?`<div class="ycard"><b>From earlier LSs</b><ul>${from.map(it=>`<li>${lsLabel(it.l).replace(/ · .*/,"")} · ${esc(it.b.name)} <b>${it.b.w} %</b> <small class="muted">${when(it)}</small></li>`).join("")}</ul></div>`:"");
+    const by=[...new Set(its.map(it=>it.l))],best=withS("term",t.id,()=>ptBestOk(grp.id)),pts=n<=now;
+    const table=!its.length||!studs.length?"":`<div class="wrap"><table class="ytab"><thead><tr><th class="stu" rowspan="2">Student</th>${by.map(l=>`<th colspan="${its.filter(it=>it.l===l).length}" class="first">${lsLabel(l)}</th>`).join("")}<th class="first" rowspan="2">${esc(t.en)} mark</th>${pts?`<th rowspan="2" title="Points bonus of this term (Points box): only with all the work done">+ Points</th>`:""}</tr>`
+      +`<tr>${by.map(l=>its.filter(it=>it.l===l).map((it,j)=>`<th class="${j?"":"first"}">${esc(it.b.name)}<br><small class="muted">${it.b.w} %${it.date?" · "+ELWeek.date(it.date):""}</small></th>`).join("")).join("")}</tr></thead><tbody>`
+      +studs.map(s=>{const b=pts?termBonus(s,t,best):null,m=mk(s,its);
+        if(s.away)return `<tr class="away"><td class="stu">${name(s)}</td><td colspan="${its.length+(pts?2:1)}" style="text-align:left">Not signed in yet</td></tr>`;
+        return `<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td>${by.map(l=>its.filter(it=>it.l===l).map((it,j)=>{const v=M[s.uid][items.indexOf(it)];
+          return `<td class="gr ${j?"":"first"}" data-do="ygrade" data-u="${s.uid}" data-ls="${l.id}" title="${esc(it.date&&it.date>=today&&v==null?"Not yet: "+when(it):"Click for the "+lsLabel(l).replace(/ · .*/,"")+" grade")}">${f1(v)}</td>`}).join("")).join("")}`
+          +`<td class="first tot"><b>${f1(m)}</b> ${deg(elDegree(m))}</td>${pts?`<td>${b?"+"+elNum(b,"en"):b===0?"0":"–"}</td>`:""}</tr>`}).join("")+`</tbody></table></div>`;
+    const head=`${esc(t.en)} <small class="muted">· ${span}${n===now?" · now":n<now?" · ended":""}${(ga=>ga==null?"":" · group average "+f1(ga))(avg(studs.filter(s=>!s.away).map(s=>mk(s,its)).filter(v=>v!=null)))}</small>`;
+    return `<div class="box yterm ${n===now?"ynow":""}">${fold("yt"+n,head,`<div class="ycards">${cards}</div>${table||(its.length?"":`<p class="muted">Nothing assessed in this term yet.</p>`)}`,"")}</div>`}).join("");
+  const graded=lss.filter(l=>items.some(it=>it.l===l)),tn=EL_TERMS.map((t,i)=>i+1).filter(n=>items.some(it=>it.term===n));
+  const summary=!studs.length||!items.length?"":`<div class="box"><h2>Whole year · ${esc(grp.name)}</h2><div class="wrap"><table><thead><tr><th class="stu">Student</th>${graded.map(l=>`<th>${lsLabel(l)}</th>`).join("")}${tn.map((n,j)=>`<th class="${j?"":"first"}">${esc(EL_TERMS[n-1].en)}</th>`).join("")}<th class="first">Year mark</th></tr></thead><tbody>`
+    +studs.map(s=>{if(s.away)return `<tr class="away"><td class="stu">${name(s)}</td><td colspan="${graded.length+tn.length+1}" style="text-align:left">Not signed in yet</td></tr>`;
+      const y=mk(s,items);return `<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td>${graded.map(l=>cellOf(s,mk(s,items.filter(it=>it.l===l)),l.id)).join("")}`
+        +tn.map((n,j)=>`<td class="${j?"":"first"}">${f1(mk(s,items.filter(it=>it.term===n)))}</td>`).join("")+`<td class="first tot"><b>${f1(y)}</b> ${deg(elDegree(y))}</td></tr>`}).join("")+`</tbody></table></div></div>`;
+  const key=`<p class="muted">Each term shows its two LSs (LS1–LS2 in ${esc(EL_TERMS[0].en)}, LS3–LS4 in the next one…) with the items assessed in them and their weight in the LS. A new LS appears in its slot as soon as it is added to the site, and its items as soon as its grading plan is added. An item counts in the term of its date in the time plan (exam day, last due day of its activities), so an LS can give items to the next term (→). <b>Term mark</b>: the items counted in the term, each with its weight in its LS. <b>Year mark</b>: every item of the year, which is the average of the LS marks. An item whose day has not come yet (or, with no date, in an LS that is still Hidden) is not counted; after that, missing work counts 0 or is left out as the switch says. Marks out of 10; click one to open that LS's grade for the student.</p>`;
+  return `<div class="box"><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0">not counted yet</button></div>${fold("ykey","How it is worked out",key,"key")}</div>`
+    +terms+summary;
 }
 // Which exam version a student took (Roger, 30 Oct 2026): results/{ls}__assessment .version = insecure|safe|daring, imported with the
 // marks (tools/exam-marks) or chosen here; it saves on change.
@@ -922,7 +984,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     qago:()=>{S.qa.ls=S.ls;S.qa.g=S.g;S.g="qa";render();scrollTo(0,0)},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
-    grade:()=>gradePanel(u),deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
+    grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},yls:()=>{S.year=false;S.ls=k.ls;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
     lv:()=>{const cur=((res(u,k.a).levels||{})[k.s]||{})[k.c];quick(patch(u,k.a,{levels:{[k.s]:{[k.c]:cur===k.l?null:k.l}}}))},
     glv:()=>{const cur=((res(u,k.a).levels||{}).group||{})[k.c],v=cur===k.l?null:k.l,ms=teamMates(k.a,teamOf(u,k.a),S.P[u].group);if(!ms.some(m=>m.uid===u))ms.push(S.P[u]);
       quick(ms.map(m=>patch(m.uid,k.a,{levels:{group:{[k.c]:v}}})))},
@@ -949,7 +1011,7 @@ $("#dlg").addEventListener("close",()=>redraw=null);
 document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);
 document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
   if(k.do==="import"&&t.files[0])importList(t.files[0]).catch(x=>alert("Could not read the file: "+x.message)).finally(()=>t.value="");
-  if(k.do==="ls"){S.ls=t.value;render()}
+  if(k.do==="ls"){S.year=t.value===YEAR;if(!S.year)S.ls=t.value;render()}
   if(k.do==="qals"){S.qa.ls=t.value;S.qa.g="all";S.qa.f.act="all";render()}
   if(k.do==="qaf"){S.qa.f[k.f]=t.value;S.qa.f.all=false;render()}
   if(k.do==="group"&&t.value)act(api.setGroup(k.u,t.value)).then(()=>$("#dlg").open&&stuPanel(k.u));
