@@ -22,6 +22,10 @@ window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructio
 // later LS until the teacher changes it. lv = {lsId: {level, by}}. Returns {level, from, own}: from = the LS whose route it is (null: no
 // route yet); own = a route a 2 ESO student chose before 30 Oct 2026 (by:"student"; it still counts but is not shown as theirs, and
 // students can no longer write it). A route the teacher set, in any LS of the course, wins over it.
+// A hand-in comment that only says "no problem" (no, none, res, cap problema...) needs no answer (Roger, 30 Oct 2026)
+window.elNoComment=function(c){const t=String(c||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z' ]+/g," ").replace(/\s+/g," ").trim().replace(/ (thanks|thank you|gracies|gracias)$/,"");
+  return !t||/^(no|nope|none|nothing|nada|res|cap|ninguno|no comment|all good|ok|okay|fine|everything (is )?(ok|fine)|tot be|todo bien)$/.test(t)
+    ||/^(no|i (do not|don't|dont) have|i have no|i had no|we (do not|don't|dont) have|we have no|we had no|no tinc|no tenim|no he tingut|no hem tingut|no tengo|no tenemos|no he tenido|no hemos tenido|cap|ningun|ninguno)( any| cap| ningun| ninguno)? (problem(s|a|es|as)?|questions?|dubtes?|dudas?|comments?|comentaris?|comentarios?)( at all)?$/.test(t)};
 window.elRouteOf=function(lv,ls){lv=lv||{};const L=window.EL_LS||[],me=L.find(x=>x.id===ls),
     chain=[ls].concat(me?L.slice(0,L.indexOf(me)).reverse().filter(x=>x.course===me.course).map(x=>x.id):[]),
     find=(ids,mine)=>{for(const id of ids){const l=lv[id]||{};if(l.level&&(l.by==="student")===mine)return {level:l.level,from:id,own:mine}}return null},
