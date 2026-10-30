@@ -345,18 +345,18 @@ async function lsMenu(u){
     if(g.classList.contains("muted-group")||!c||norm(c.getAttribute("href"))!==home){g.remove();return}
     g.querySelectorAll(".ls-link").forEach(a=>{if(!ok[norm(a.getAttribute("href"))])a.remove()})}));
 }
-// Vocabulary and grammar summary on the LS page (Roger, 26 Oct 2026): the "Language & Knowledge" tab has an empty card ([data-el-study]);
-// for an LS with `study` in EL_LS it gets the student's route PDF (nothing until they have a route), the teacher and testers all three.
+// Vocabulary and grammar summary on the LS page (Roger, 26 Oct 2026): the Overview tab (the LS homepage, Roger 30 Oct 2026) and the
+// "Language & Knowledge" tab have an empty card ([data-el-study]); for an LS with `study` in EL_LS they get the student's route PDF
+// (no route yet = Insecure, as on the pages), the teacher and testers all three.
 function studyCard(u){
-  const el=document.querySelector("[data-el-study]"),ls=(window.EL_LS||[]).find(x=>x.id===lsId);
-  if(!el||!ls||!ls.study||!u)return;
-  const every=isTeacher(u)||seesAll(u),lv=myLevel,ca=!every&&elCa(lv);
-  if(!every&&!lv)return;
+  const els=document.querySelectorAll("[data-el-study]"),ls=(window.EL_LS||[]).find(x=>x.id===lsId);
+  if(!els.length||!ls||!ls.study||!u)return;
+  const every=isTeacher(u)||seesAll(u),lv=myLevel||"insecure",ca=!every&&elCa(lv);
   const a=r=>'<a href="'+new URL(ls.study+r+".pdf",ROOT).href+'" download style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📥 '+(ca?"Descarrega el resum":"Download the summary")+(every?" · "+EL_LEVELS.find(x=>x.id===r).name:"")+" (PDF)</a>";
-  el.innerHTML="<h2>📚 "+(ca?"Resum del vocabulari i la gramàtica":"Vocabulary and grammar summary")+"</h2><p>"
+  const html="<h2>📚 "+(ca?"Resum del vocabulari i la gramàtica":"Vocabulary and grammar summary")+"</h2><p>"
     +(ca?"Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. Descarrega'l quan vulguis per estudiar. És opcional: fes-lo servir si et va bé.":"All the vocabulary and then all the grammar of your route, with the explanations and practice. Download it whenever you want to study. It is optional: use it if it helps you.")
     +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="beginners").map(x=>a(x.id)).join(""):a(lv==="beginners"?"insecure":lv))+"</p>";
-  el.hidden=false;
+  els.forEach(el=>{el.innerHTML=html;el.hidden=false});
 }
 let draw=()=>{};
 const start=()=>{draw=bar();draw(user)};
