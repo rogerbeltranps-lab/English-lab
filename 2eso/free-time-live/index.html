@@ -445,6 +445,7 @@ nav.menu-open .menu-toggle::after{content:"▴"}
     .hero-quick-links .sample-exam-hero-link:focus-visible{outline:3px solid #f7bf60;outline-offset:3px}
     .hero-quick-links .sample-exam-hero-link strong{display:block;font-size:.85rem;line-height:1.25;font-weight:800}
     .hero-quick-links .sample-exam-hero-link small{display:block;font-size:.7rem;line-height:1.3;font-weight:550;color:#eef5ff;margin-top:4px}
+    .hero-quick-links [data-el-teacher][hidden]{display:none}
     .hero-quick-links .hero-link-arrow{font-size:1.05rem;line-height:1;flex-shrink:0}
     @media(max-width:420px){.hero-quick-links{grid-template-columns:1fr;max-width:280px}.hero-quick-links .sample-exam-hero-link{min-height:52px}}
 </style>
@@ -504,6 +505,10 @@ nav.menu-open .menu-toggle::after{content:"▴"}
           <a class="sample-exam-hero-link" href="reflect.html" aria-label="Open Reflect">
             <span><strong>Reflect</strong><small>Your progress and one goal</small></span>
             <span class="hero-link-arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="sample-exam-hero-link" href="../../shared/print/index.html" data-el-teacher hidden aria-label="Open the paper worksheets (teacher only)">
+            <span><strong>Paper worksheets</strong><small>Teacher only · print per route + keys</small></span>
+            <span class="hero-link-arrow" aria-hidden="true">🖨</span>
           </a>
         </div>
       </div>
