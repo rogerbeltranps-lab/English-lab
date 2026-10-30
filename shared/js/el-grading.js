@@ -6,6 +6,8 @@ window.EL_DEGREES=["NA","AS","AN","AE"];
 window.EL_DEGREE_MARK={NA:2.5,AS:5,AN:7.5,AE:10};
 window.elDegree=m=>m==null||isNaN(m)?null:m<5?"NA":m<7?"AS":m<9?"AN":"AE";
 window.elDegreeDown=l=>l?EL_DEGREES[Math.max(0,EL_DEGREES.indexOf(l)-1)]:l;
+// Sections that count for more than one criterion (named in the notes under the criteria, e.g. "Vocabulary (4.1, 5.1)").
+window.elExamShared=e=>e.sections.filter(x=>(x[3]||[]).length>1).map(x=>x[1]+" ("+x[3].join(", ")+")");
 // Exam score per criterion: each section counts for every criterion it carries ([key, name, max, criteria]), so a section shared by two
 // criteria (4ESO LS1 vocabulary: 4.1 and 5.1) counts in both. sc = results/{ls}/assessment .sections. Returns [{c, score, max, n, of}]
 // in the order the criteria first appear; score and max only from the sections entered (n of `of`); [] when no section has criteria.
@@ -23,7 +25,11 @@ window.EL_GRADING={
   // is evidence for both 4.1 and 5.1, so a criterion score (elExamByCrit) is not a share of the exam mark: the exam mark stays points / 10.
   ...(function(){const e=(c,sections)=>({blocks:[{id:"exam",name:"Final exam",w:50},{id:"fp",name:"Final product",w:50}],only:true,
     exam:{sections,max:10},fp:{a:c+"/final-product",mark:true}});
-    return {"2eso-my-real-routine":e("2eso",[["listening","Listening",10],["reading","Reading",10],["vocabulary","Vocabulary",28],["grammar","Grammar",32],["writing","Writing",20]]),
+    // 2ESO (Roger, 30 Oct 2026): its exam cover gives criteria per item type: vocabulary choose 4.1, complete 5.1; grammar choose 5.1 and 4.1,
+    // complete 5.1; writing as in 4ESO. So vocabulary (28) and grammar (32) are split into their choose and complete parts.
+    return {"2eso-my-real-routine":e("2eso",[["listening","Listening",10,["2.1"]],["reading","Reading",10,["4.1"]],["vchoose","Vocabulary · choose",16,["4.1"]],["vcomplete","Vocabulary · complete",12,["5.1"]],
+        ["gchoose","Grammar · choose",14,["5.1","4.1"]],["gcomplete","Grammar · complete",18,["5.1"]],
+        ["wtask","Writing · task",8,["5.1"]],["wgrammar","Writing · grammar",4,["5.1"]],["wvocab","Writing · vocabulary",4,["5.1"]],["worg","Writing · organisation",4,["5.2"]]]),
       "4eso-my-real-routine":e("4eso",[["listening","Listening",10,["2.1"]],["reading","Reading",10,["4.1"]],["vocabulary","Vocabulary",28,["4.1","5.1"]],["grammar","Grammar",32,["5.1"]],
         ["wtask","Writing · task",8,["5.1"]],["wgrammar","Writing · grammar",4,["5.1"]],["wvocab","Writing · vocabulary",4,["5.1"]],["worg","Writing · organisation",4,["5.2"]]])}})(),
   // 4ESO LS2: docs/4eso/ls2-seasons-and-celebrations/grading.md (approved by Roger, 24 Oct 2026); indicators from its indicators.md
