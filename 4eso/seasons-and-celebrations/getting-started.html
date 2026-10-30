@@ -83,7 +83,8 @@ html,body{overflow-x:clip}
     <button class="route" data-level="beginners"><strong>Beginners</strong><span>Passos molt curts · molt suport</span></button>
     <button class="route active" data-level="insecure"><strong>Insecure</strong><span>Clear answers · strong support</span></button>
     <button class="route" data-level="safe"><strong>Safe</strong><span>Compare · connect ideas</span></button>
-    <button class="route" data-level="daring"><strong>Daring</strong><span>Develop · explain change</span></button></div>
+    <button class="route" data-level="daring"><strong>Daring</strong><span>Develop · explain change</span></button>
+    <button class="route" data-level="native"><strong>Native</strong><span>C2 Proficiency · native level</span></button></div>
 </div></header>
 
 <main class="wrap">
@@ -189,9 +190,12 @@ html,body{overflow-x:clip}
 <script src="../../shared/js/learning-path-support.js"></script>
 <script src="../../shared/js/flashcard-set.js"></script>
 <script src="data/getting-started.js"></script>
+<script src="data/native/getting-started.js"></script>
 <script>
 // Beginners (A1) sits below Insecure: an item with r:"beginners" is shown to every route; items without r default to beginners.
-const ROUTES=["beginners","insecure","safe","daring"];
+const ROUTES=["beginners","insecure","safe","daring","native"];
+// Native (Roger, 30 Oct 2026: C2 Proficiency): its own lists in data/native/getting-started.js (window.GS_NATIVE); speaking is a written plan.
+const N=()=>level==="native"&&!!window.GS_NATIVE,nat=(k,base)=>N()?GS_NATIVE[k]:base;
 const forLevel=(items,lvl)=>items.filter(x=>ROUTES.indexOf(x.r||"beginners")<=ROUTES.indexOf(lvl));
 const norm=s=>String(s||"").toLowerCase().replace(/[’‘]/g,"'").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
 // The questions (recall, vocab, practice, readingChat, readingQs, listening) and the speaking task and model (speakTask, speakModel) are in data/getting-started.js.
@@ -245,29 +249,29 @@ function checkTyped(items,prefix,result,key,explain){
   return score;
 }
 let recallItems=[],practiceItems=[];
-function renderRecall(){recallItems=forLevel(recall,level);renderTyped("#recallList",recallItems,"rc");$("#recallResult").classList.remove("show");const v=kept("recall"),t=typing("recall");if(v){fillTyped(recallItems,"rc",v);doRecall(false)}else if(t)fillTyped(recallItems,"rc",t)}
+function renderRecall(){recallItems=forLevel(nat("recall",recall),level);renderTyped("#recallList",recallItems,"rc");$("#recallResult").classList.remove("show");const v=kept("recall"),t=typing("recall");if(v){fillTyped(recallItems,"rc",v);doRecall(false)}else if(t)fillTyped(recallItems,"rc",t)}
 $("#recallList").oninput=()=>keepTyping("recall",typedVals(recallItems,"rc"));
 // Recall is low stakes: done when submitted, whatever the score. count=false only shows the kept answers again.
-function doRecall(count){const s=checkTyped(recallItems,"rc","#recallResult",null,true);if(count){firstItems("recall",recall,recallItems,gotTyped(recallItems,"rc"));state.first=Object.assign({},state.recall,state.first);if(!state.first[level])state.first[level]={score:s,max:recallItems.length,date:new Date().toISOString()};attempt("recall",s,recallItems.length)}$("#recallResult").textContent=s+" / "+recallItems.length+(ca()?" correctes · Pas completat ✓ Llegeix el feedback de les que has fallat.":" correct · Step complete ✓ Read the feedback for the ones you missed.");if(count)complete("recall")}
+function doRecall(count){const s=checkTyped(recallItems,"rc","#recallResult",null,true);if(count){firstItems("recall",nat("recall",recall),recallItems,gotTyped(recallItems,"rc"));state.first=Object.assign({},state.recall,state.first);if(!state.first[level])state.first[level]={score:s,max:recallItems.length,date:new Date().toISOString()};attempt("recall",s,recallItems.length)}$("#recallResult").textContent=s+" / "+recallItems.length+(ca()?" correctes · Pas completat ✓ Llegeix el feedback de les que has fallat.":" correct · Step complete ✓ Read the feedback for the ones you missed.");if(count)complete("recall")}
 $("#checkRecall").onclick=()=>{doRecall(true);keepAns("recall",typedVals(recallItems,"rc"))};
 $("#againRecall").onclick=()=>again("recall",renderRecall);
 
 function renderWords(){
   $("#wordsPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";
-  $("#vocabGroups").innerHTML=forLevel(vocab,level).map(g=>'<article class="vocab-group"><h3>'+g.g+'</h3><div class="chips">'+g.items.map(x=>'<span class="chip" tabindex="0">'+x[0]+'<span class="chip-tooltip"><b>'+x[1]+'</b>'+x[2]+'</span></span>').join("")+'</div></article>').join("");
-  practiceItems=forLevel(practice,level);renderTyped("#practiceList",practiceItems,"pr");$("#practiceResult").classList.remove("show");
+  $("#vocabGroups").innerHTML=forLevel(nat("vocab",vocab),level).map(g=>'<article class="vocab-group"><h3>'+g.g+'</h3><div class="chips">'+g.items.map(x=>'<span class="chip" tabindex="0">'+x[0]+'<span class="chip-tooltip"><b>'+x[1]+'</b>'+x[2]+'</span></span>').join("")+'</div></article>').join("");
+  practiceItems=forLevel(nat("practice",practice),level);renderTyped("#practiceList",practiceItems,"pr");$("#practiceResult").classList.remove("show");
   const v=kept("words"),t=typing("words");if(v){fillTyped(practiceItems,"pr",v);doPractice(false)}else if(t)fillTyped(practiceItems,"pr",t);
 }
 $("#practiceList").oninput=()=>keepTyping("words",typedVals(practiceItems,"pr"));
-function doPractice(count){const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(count){firstItems("words",practice,practiceItems,gotTyped(practiceItems,"pr"));attempt("words",s,practiceItems.length);if(s>=need(practiceItems.length))complete("words")}}
+function doPractice(count){const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(count){firstItems("words",nat("practice",practice),practiceItems,gotTyped(practiceItems,"pr"));attempt("words",s,practiceItems.length);if(s>=need(practiceItems.length))complete("words")}}
 $("#checkPractice").onclick=()=>{doPractice(true);keepAns("words",typedVals(practiceItems,"pr"))};
 $("#againPractice").onclick=()=>again("words",renderWords);
 
 let readItems=[];
 function renderRead(){
   const chat=readingChat[level]||readingChat.insecure;
-  $("#readText").innerHTML=(level==="beginners"?'<p class="tiny" style="margin:0 0 10px"><strong>Paraules:</strong> mild = suau · dark = fosc · sweets = dolços · costumes = disfresses · skeleton = esquelet · leaves = fulles</p>':"")+chat.map(([w,t])=>'<div class="msg '+w.toLowerCase()+'"><b>'+w+'</b>'+t+'</div>').join("");
-  readItems=forLevel(readingQs,level);const f=$("#readForm");f.innerHTML="";
+  if(N())$("#readText").innerHTML=GS_NATIVE.readingHtml;else $("#readText").innerHTML=(level==="beginners"?'<p class="tiny" style="margin:0 0 10px"><strong>Paraules:</strong> mild = suau · dark = fosc · sweets = dolços · costumes = disfresses · skeleton = esquelet · leaves = fulles</p>':"")+chat.map(([w,t])=>'<div class="msg '+w.toLowerCase()+'"><b>'+w+'</b>'+t+'</div>').join("");
+  readItems=forLevel(nat("readingQs",readingQs),level);const f=$("#readForm");f.innerHTML="";
   readItems.forEach((q,i)=>{const box=document.createElement("div");box.className="question";
     box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="rd'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="rdf'+i+'"></div>';f.appendChild(box)});
   $("#readResult").classList.remove("show");
@@ -275,12 +279,12 @@ function renderRead(){
 }
 $("#readForm").onchange=()=>keepTyping("read",radioVals(readItems,"rd"));
 function doRead(count){let score=0;readItems.forEach((q,i)=>{const c=document.querySelector('input[name="rd'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#rdf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,false);f.className="feedback "+(ok?"ok":"no")});
-  const n=readItems.length;if(count){firstItems("read",readingQs,readItems,gotRadio(readItems,"rd"));attempt("read",score,n)}$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(count&&score>=need(n))complete("read")}
+  const n=readItems.length;if(count){firstItems("read",nat("readingQs",readingQs),readItems,gotRadio(readItems,"rd"));attempt("read",score,n)}$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(count&&score>=need(n))complete("read")}
 $("#checkRead").onclick=()=>{doRead(true);keepAns("read",radioVals(readItems,"rd"))};
 $("#againRead").onclick=()=>again("read",renderRead);
 let listenItems=[];
 function renderListen(){
-  listenItems=forLevel(listening,level);const f=$("#listenForm");f.innerHTML="";
+  listenItems=forLevel(nat("listening",listening),level);const f=$("#listenForm");f.innerHTML="";
   listenItems.forEach((q,i)=>{const box=document.createElement("div");box.className="question";
     box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="l'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="lf'+i+'"></div>';f.appendChild(box)});
   $("#listenResult").classList.remove("show");
@@ -288,11 +292,31 @@ function renderListen(){
 }
 $("#listenForm").onchange=()=>keepTyping("listen",radioVals(listenItems,"l"));
 function doListen(count){let score=0;listenItems.forEach((q,i)=>{const c=document.querySelector('input[name="l'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#lf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,true);f.className="feedback "+(ok?"ok":"no")});
-  const n=listenItems.length;if(count){firstItems("listen",listening,listenItems,gotRadio(listenItems,"l"));attempt("listen",score,n)}$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(count&&score>=need(n))complete("listen")}
+  const n=listenItems.length;if(count){firstItems("listen",nat("listening",listening),listenItems,gotRadio(listenItems,"l"));attempt("listen",score,n)}$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(count&&score>=need(n))complete("listen")}
 $("#checkListen").onclick=()=>{doListen(true);keepAns("listen",radioVals(listenItems,"l"))};
 $("#againListen").onclick=()=>again("listen",renderListen);
 
-function renderSpeak(){$("#speakPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";$("#speakTask").textContent=speakTask[level];$("#speakModel").textContent=speakModel[level]}
+function renderSpeak(){$("#speakPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";
+  // Native: no recording (Roger, 30 Oct 2026). The recording cards are hidden and a written plan takes their place (as R.plan in ls2-engine.js).
+  const cards=[...$("#speak").querySelectorAll(":scope > .section-card")].filter(x=>x.id!=="choiceBox"&&x.id!=="nativePlan");
+  cards.forEach(x=>x.hidden=N());let box=$("#nativePlan");
+  if(!N()){if(box)box.remove();$("#speakTask").textContent=speakTask[level];$("#speakModel").textContent=speakModel[level];return}
+  const P=GS_NATIVE.speak,esc=t=>String(t||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  if(!box){box=document.createElement("div");box.id="nativePlan";cards[0].before(box)}
+  box.innerHTML='<div class="section-card"><h3>The question</h3><div class="model">'+P.question+'</div></div><div class="section-card"><h3>🧭 Strategy</h3>'+P.tip+'</div>'
+    +'<div class="section-card"><h3>Your plan</h3><p class="instruction">Write notes, not full sentences: this is the thinking you would do in the exam’s preparation time.</p>'
+    +P.fields.map(f=>'<label class="field"><strong>'+f.label+'</strong><textarea data-f="'+f.id+'" rows="'+(f.rows||3)+'"></textarea></label>').join("")
+    +'<div class="actions"><button class="btn" type="button" id="npSend">Compare with a model plan</button></div><p class="feedback" id="npMsg"></p></div>'
+    +'<div class="section-card" id="npModel" hidden><h3>A model plan</h3>'+P.modelPlan+'<label class="field"><strong>What would you change in your plan now? (one sentence)</strong><input type="text" class="typed" id="npChange" maxlength="300"></label></div>';
+  const d=state.speakPlan=state.speakPlan||{f:{}},ta=[...box.querySelectorAll("textarea")];
+  ta.forEach(t=>{t.value=d.f[t.dataset.f]||"";t.oninput=()=>{d.f[t.dataset.f]=t.value;save()}});$("#npChange").value=d.change||"";
+  const hand=()=>{state.steps=state.steps||{};state.steps.speak={level,title:"Speaking plan",f:P.fields.map(f=>({l:f.label,v:(d.f[f.id]||"").trim()})).concat(d.change?[{l:"What I would change after the model",v:d.change}]:[]),rate:[],avg:null,comment:"",date:new Date().toISOString()};complete("speak")};
+  const open=()=>{$("#npModel").hidden=false;$("#npMsg").className="feedback ok";$("#npMsg").textContent="Handed in ✓ Compare your plan with the model below. Your teacher sees your plan on the dashboard.";$("#speakResult").classList.add("show")};
+  $("#npChange").oninput=()=>{d.change=$("#npChange").value.trim();if(state.steps&&state.steps.speak)hand();else save()};
+  if(state.steps&&state.steps.speak&&state.steps.speak.level==="native")open();
+  $("#npSend").onclick=()=>{const empty=P.fields.filter(f=>((d.f[f.id]||"").trim().match(/\S+/g)||[]).length<3);
+    if(empty.length){$("#npMsg").className="feedback no";$("#npMsg").textContent="Write at least a few words in: "+empty.map(f=>f.label).join(" · ");return}hand();open()};
+}
 function renderChoices(){
   let box=$("#choiceBox");
   if(!box){box=document.createElement("div");box.className="section-card";box.id="choiceBox";$("#speak").insertBefore(box,$("#speakResult"))}
@@ -328,17 +352,17 @@ const lpPanel=id=>(window.LP.panels||[]).find(x=>x.id===id)||{};
 // Study cards, the same as R.vocab in ls2-engine.js (flashcard-set.js): English → Català or Català → English (state.cardDir), the
 // Català → English deck from the core words. Practice here (not one of this page's steps).
 function cardDeck(){
-  const all=forLevel(vocab,level).flatMap(g=>g.items.map(x=>[x[0],x[1],g.g,x[2]]));
-  if(state.cardDir!=="ca")return all;
+  const all=forLevel(nat("vocab",vocab),level).flatMap(g=>g.items.map(x=>[x[0],x[1],g.g,x[2]]));
+  if(state.cardDir!=="ca"||N())return all;   // Native: word → meaning only
   const c=lpPanel("words").core||{},list=c[level]||(level==="beginners"?c.insecure:level==="daring"?c.safe:null)||[],core=new Set(list.map(norm));
   const rev=all.map(x=>[x[1],x[0],x[2],x[3]]),pick=rev.filter(x=>core.has(norm(x[1])));return pick.length?pick:rev;
 }
 function renderCaCards(){
-  const c=state.cardDir==="ca";
+  const c=state.cardDir==="ca"&&!N();
   $("#caCards").innerHTML='<h3>'+(ca()?'Targetes':'Study cards')+'</h3>'
-    +'<div class="actions dir-toggle" role="group"><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>'
+    +'<div class="actions dir-toggle" role="group"'+(N()?' hidden':'')+'><button class="btn secondary" type="button" data-dir="en">English → Català</button><button class="btn secondary" type="button" data-dir="ca">Català → English</button></div>'
     +'<p class="instruction">'+(c?(ca()?'Llegeix la paraula en català, escriu-la o digues-la en anglès i després gira la targeta per comprovar-ho.':'Read the Catalan, type or say the English, then turn the card to check.'):(ca()?'Digues l’expressió en veu alta i intenta recordar què vol dir. Després gira la targeta.':'Say the expression aloud and try to remember its meaning. Then turn the card.'))+'</p>'
-    +'<div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardIcon"></div><strong id="cardFront"></strong><p>'+(ca()?'Clica per girar la targeta':'Click to turn the card')+'</p></div><div class="face back"><div class="label">'+(c?'English + example':'Català + example')+'</div><strong id="cardMeaning"></strong><p id="cardBack"></p></div></div></div>'
+    +'<div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardIcon"></div><strong id="cardFront"></strong><p>'+(ca()?'Clica per girar la targeta':'Click to turn the card')+'</p></div><div class="face back"><div class="label">'+(c?'English + example':N()?'Meaning + example':'Català + example')+'</div><strong id="cardMeaning"></strong><p id="cardBack"></p></div></div></div>'
     +(c?'<div class="actions"><input type="text" class="typed" id="cardType" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1 1 220px;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit" placeholder="'+(ca()?'Escriu la paraula en anglès':'Type the English')+'"><button class="btn" type="button" id="cardTypeCheck">'+(ca()?'Comprova i gira':'Check and turn')+'</button></div><p class="feedback" id="cardTypeMsg"></p>':'')
     +'<div class="counter" id="cardCounter"></div><div class="flash-actions"><button class="btn secondary" id="prevCard" type="button">← '+(ca()?'Anterior':'Previous')+'</button><button class="btn" id="gotCard" type="button"></button><button class="btn secondary" id="againCard" type="button"></button><button class="btn secondary" id="nextCard" type="button">'+(ca()?'Següent':'Next')+' →</button><button class="btn secondary" id="newCards" type="button"></button><button class="btn secondary" id="skipCards" type="button"></button></div><p class="instruction" id="cardNote"></p>';
   $$(".dir-toggle [data-dir]").forEach(b=>{const on=b.dataset.dir===(c?"ca":"en");b.classList.toggle("secondary",!on);b.setAttribute("aria-pressed",on);b.onclick=()=>{state.cardDir=b.dataset.dir;save();renderCaCards()}});
@@ -379,7 +403,7 @@ function renderCycle(){
   pr.onchange=()=>{c.predict=pr.value.trim();save()};g.onchange=()=>{c.gist=g.value.trim();save()};
   hb.forEach(b=>b.onclick=()=>{c.heard=b.dataset.heard;save();mark()});
 }
-function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderCycle();renderRecall();renderWords();renderRead();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);updateProgress()}
+function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderCycle();renderRecall();renderWords();renderRead();renderListen();renderSpeak();renderChoices();learningSupport.apply(level);if(N())$("#speak .panel-head .instruction").textContent="Plan a C2 Proficiency long turn in writing: no recording.";updateProgress()}
 function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));save();renderAll()}
 $$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
 $$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");window.scrollTo({top:document.querySelector("main").offsetTop-64,behavior:"smooth"})});
