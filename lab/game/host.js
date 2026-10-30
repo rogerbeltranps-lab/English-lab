@@ -21,6 +21,15 @@ const G=window.ELGame,{esc,md,pic}=G,$=s=>document.querySelector(s);
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
 const app$=$("#app");G.bg();
 const URLP=new URLSearchParams(location.search);
+// The Learning Path the teacher came from (Roger, 30 Oct 2026): ?from= on the page's Start button, else the page that linked here
+// (not the dashboard, which has its own button). Kept in this tab, so it survives choosing another game, a reload and the end.
+const BACK=(()=>{
+  const lp=u=>{try{const x=new URL(u,location.href);return x.origin===location.origin&&!/\/lab\/game\//.test(x.pathname)&&!/\/teacher\.html$/.test(x.pathname)?x.pathname+x.search:""}catch(e){return ""}};
+  const fromDash=/\/teacher\.html/.test(document.referrer);
+  let b=lp(URLP.get("from")||"")||(fromDash?"":lp(document.referrer));
+  try{if(b||fromDash)sessionStorage.setItem("elGameBack",b);else b=sessionStorage.getItem("elGameBack")||""}catch(e){}
+  return b})();
+const backBtn=()=>BACK?`<a class="btn ghost" href="${esc(BACK)}">← Learning Path</a> `:"";
 const tab={get(){try{return JSON.parse(sessionStorage.getItem("elGame")||"null")}catch(e){return null}},set(v){try{sessionStorage.setItem("elGame",JSON.stringify(v))}catch(e){}}};
 
 // H: the game on this board. deckId, deck (the deck file's content), g (group), sid (this game: the time it started), i (slide; -1 lobby),
@@ -147,12 +156,12 @@ function draw(){
   if(!H.teacher){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>🎮 Class game</h2><p>This is the teacher's board. When your teacher starts a game, it opens by itself on your screen.</p><p><a class="btn go" href="play.html">Go to the game screen</a> <button class="btn" data-do="signout">Sign out</button></p></div></div>`;return}
   if(!H.deck){
     const list=window.EL_GAMES||[];
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game.</p><div class="picks">${list.map(d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(d.title)}<br><small style="opacity:.7">${esc(d.course==="2eso"?"2 ESO":"4 ESO")}${d.ls?" · "+esc(d.ls):""}</small></span></button>`).join("")||"<p>No games yet.</p>"}</div><p><a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game.</p><div class="picks">${list.map(d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(d.title)}<br><small style="opacity:.7">${esc(d.course==="2eso"?"2 ESO":"4 ESO")}${d.ls?" · "+esc(d.ls):""}</small></span></button>`).join("")||"<p>No games yet.</p>"}</div><p>${backBtn()}<a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.phase==="pick"||!H.g){
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(H.deck.title)}</h1><p class="sub">${slides().length} slides · ${qList().length} questions. Start the game for a group: its students are taken into it.</p>
       <div class="picks">${gs.map(g=>`<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}</button>`).join("")}</div>
-      <p><button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
+      <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
   if(H.phase==="lobby"){
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
@@ -168,7 +177,7 @@ function draw(){
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <h1 class="logo pop">🏁 Well done!</h1><p class="sub">${tot?`The class got <b>${Math.round(right/tot*100)} %</b> right.`:""} Every right answer is +1 point.</p>
       ${rank.length?"":`<p class="card msg" style="margin:1em auto">No right answers this time. Next time!</p>`}<div class="podium"${rank.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm">${esc(nameOf(x.em))}<br><span class="sc">${x.n} right</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
-      <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button></p></div></div></div>`;return}
+      <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> ${backBtn()}</p></div></div></div>`;return}
   if(!isQ(s)){
     app$.innerHTML=top()+`<div class="main"><div class="card theory slidein"><div class="pic">${pic(s.img)}</div><div><h2>${md(s.theory)}</h2>${(s.lines||[]).map(l=>`<p>${md(l)}</p>`).join("")}</div></div>
       <div style="text-align:right"><button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}
