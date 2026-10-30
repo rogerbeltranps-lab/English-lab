@@ -7,6 +7,8 @@
 // exam: exam day per group (same order as groups), YYYY-MM-DD. from: Monday of each row's week, YYYY-MM-DD (finds "this week").
 // tips: teaching tips for the teacher's checklist (dashboard Time plan tab, never shown to students): [text, tip]; the tip appears under
 //   every session line that contains the text (for example "LP2 (2/2)" or "Recall checkpoint 1"). Short, practical, taken from the LS docs.
+// report: term whose report each grade block of EL_GRADING[ls] goes in ({exam:1,gv:1,fp:2,other:2}), as in `terms`. Without it, the
+//   dashboard's whole-year view uses the block's date (exam day, last due day of its activities; term ends: EL_TERMS in el-points.js).
 // A new plan (for example 2 ESO LS2) is one more entry with these fields; groups use the names "2ESO-A", "2ESO-B"…
 window.EL_PLAN={
   "4eso-seasons-and-celebrations":{
@@ -17,6 +19,7 @@ window.EL_PLAN={
     },
     groups:["4ESO-A","4ESO-B"],
     exam:["2026-11-23","2026-11-23"],
+    report:{exam:1,gv:1,fp:2,other:2},   // as in terms above; the exam is on 23 Nov, after term 1 ends, but its mark is in the term 1 report (Roger, 27 Oct 2026)
     due:{
       "4eso/ls2-getting-started":["2026-10-26","2026-10-26"],
       "4eso/ls2-celebrations-around-the-world":["2026-11-02","2026-10-28"],
@@ -105,6 +108,7 @@ window.EL_PLAN={
     },
     groups:["2ESO-A","2ESO-B"],
     exam:["2026-11-20","2026-11-20"],
+    report:{exam:1,gv:1,fp:2,other:2},   // as in terms above
     due:{
       "2eso/ls2-getting-started":["2026-10-27","2026-11-03"],
       "2eso/ls2-what-are-they-doing":["2026-11-03","2026-11-03"],

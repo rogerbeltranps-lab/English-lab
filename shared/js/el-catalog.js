@@ -214,3 +214,8 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
     "2eso/ls2-reflect":{reflect:[]}
   });
 })();
+// Use of English is reading and writing (Roger, 30 Oct 2026: "the vocabulary sections of the learning path count as reading and writing alike,
+// since they read and then practise by writing, completing sentences or choosing an option"): in every activity with step criteria, a
+// vocabulary or grammar step with none of its own (recall, words, cards, practice, grammar, mixed, vocab) gives evidence for 4.1 and 5.1.
+(function(){const UOE=["recall","words","cards","practice","grammar","mixed","vocab"];
+  Object.keys(window.EL_STEP_CRITERIA).forEach(id=>{const sc=window.EL_STEP_CRITERIA[id];(window.EL_ACTIONS[id]||[]).forEach(k=>{if(UOE.includes(k)&&!sc[k])sc[k]=["4.1","5.1"]})})})();

@@ -18,12 +18,13 @@ window.elExamByCrit=function(e,sc){const out={};sc=sc||{};
 window.EL_GRADING={
   // LS1 My Real Routine, 2ESO and 4ESO (Roger, 25 Oct 2026): done in class and redesigned for next year, so this year only the final
   // exam and the final product count. only: the student board shows just these two. fp.mark: the final product is the teacher's mark
-  // (score out of max in its dialog), not levels. Weights 50/50 (confirmed by Roger, 25 Oct 2026). Exam sections from his Exam A: a
+  // (score out of max in its dialog), not levels. Weights exam 75 · final product 25 (Roger, 30 Oct 2026: "the final product should count only
+  // 25 %" in every LS; it was 50/50 from 25 Oct). Exam sections from his Exam A: a
   // section is [key, name, max, criteria]; 100 internal points, so the exam mark is points / 10 (the dashboard divides the sum by the sum of maxes).
   // 4ESO (Roger, 30 Oct 2026: "exams broken down by criteria"): criteria as on the exam (Models A–D) and his "Notes per criteri" sheet;
   // the writing is split into its rubric rows (C1 task 8, C2 grammar 4, C3 vocabulary 4 → 5.1; C4 organisation 4 → 5.2). Vocabulary
   // is evidence for both 4.1 and 5.1, so a criterion score (elExamByCrit) is not a share of the exam mark: the exam mark stays points / 10.
-  ...(function(){const e=(c,sections)=>({blocks:[{id:"exam",name:"Final exam",w:50},{id:"fp",name:"Final product",w:50}],only:true,
+  ...(function(){const e=(c,sections)=>({blocks:[{id:"exam",name:"Final exam",w:75},{id:"fp",name:"Final product",w:25}],only:true,
     exam:{sections,max:10},fp:{a:c+"/final-product",mark:true}});
     // 2ESO (Roger, 30 Oct 2026): its exam cover gives criteria per item type: vocabulary choose 4.1, complete 5.1; grammar choose 5.1 and 4.1,
     // complete 5.1; writing as in 4ESO. So vocabulary (28) and grammar (32) are split into their choose and complete parts.
@@ -41,7 +42,9 @@ window.EL_GRADING={
       key:["4.1","4.2","2.2","3.2","5.1"],          // key competences (CE2–CE5): exam and final product
       other:["1.1","1.2","6.1","CC1 1.3","CC3 3.2"], // the 20 % block
       // Exam: a mark per section (score out of max) and the writing level. Exam mark = sum of scores / sum of maxes × 10.
-      exam:{sections:[["listening","Listening"],["reading","Reading"],["vocabulary","Vocabulary"],["grammar","Grammar"],["writing","Writing"]],max:10,level:{step:"writing",c:"5.1"}},
+      // Use of English (vocabulary, grammar) counts for reading and writing alike, 4.1 and 5.1, in both LS2s (Roger, 30 Oct 2026:
+      // “even though students see that section as Use of English … the competences are reading and writing”).
+      exam:{sections:[["listening","Listening",10,["2.2"]],["reading","Reading",10,["4.1"]],["vocabulary","Vocabulary",10,["4.1","5.1"]],["grammar","Grammar",10,["4.1","5.1"]],["writing","Writing",10,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},
       // Where the teacher gives one-click levels: activity + step + criteria. group: given once per final-product group and copied to each member.
       // Only the video is marked in groups (Roger, 25 Oct 2026): the research card (6.1) is a level per student in round 1.
       // c may be a pseudo criterion with its own indicators (teamwork, process). The final product rows are in the final product dialog.
@@ -120,7 +123,7 @@ window.EL_GRADING={
       blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar and vocabulary",w:20},{id:"other",name:"Other competences",w:20}],
       key:["4.1","4.2","2.2","3.2","5.1"],      // key competences (CE2–CE5): exam and final product
       other:["6.2","CD2 2.2","CD4 4.5"],        // the 20 % block
-      exam:{sections:[["listening","Listening"],["reading","Reading"],["vocabulary","Vocabulary"],["grammar","Grammar"],["writing","Writing"]],max:10,level:{step:"writing",c:"5.1"}},
+      exam:{sections:[["listening","Listening",10,["2.2"]],["reading","Reading",10,["4.1"]],["vocabulary","Vocabulary",10,["4.1","5.1"]],["grammar","Grammar",10,["4.1","5.1"]],["writing","Writing",10,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},
       // One-click levels per student; the vlog is individual, so there are no group moments. "edit" (step 4) is where the vlog itself is marked (3.2, CD2 2.2).
       moments:[
         {a:LP2,step:"log",name:"Reading log",c:["4.1"]},
