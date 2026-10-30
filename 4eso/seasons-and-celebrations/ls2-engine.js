@@ -787,7 +787,13 @@ var LS2 = (function () {
     sectionNext.final({ id: last.id, level: () => level, done: () => stepDone(last), detail: c => c ? 'Completa l’última activitat.' : 'Finish the last activity.' });
   }
   // Native: LP.native = { panelId: panel } replaces that panel (same id, so progress, checkpoints and locks work as for every route).
-  function usePanels() { LP.panels = level === 'native' && LP.native ? LP.base.map(p => LP.native[p.id] ? Object.assign({}, LP.native[p.id], { id: p.id }) : p) : LP.base; }
+  // A native panel whose id is not in the page and has after: '<panel id>' is added after that panel (Pro extras such as the real video;
+  // not in EL_ACTIONS, so it never changes the dashboard's progress).
+  function usePanels() {
+    if (level !== 'native' || !LP.native) { LP.panels = LP.base; return; }
+    const N = LP.native, extra = Object.keys(N).filter(k => N[k].after && !LP.base.some(p => p.id === k)), as = (k, p) => Object.assign({}, N[k], { id: k });
+    LP.panels = LP.base.flatMap(p => [N[p.id] ? as(p.id) : p].concat(extra.filter(k => N[k].after === p.id).map(k => as(k))));
+  }
   function init(config) {
     if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
     LP = config; LP.base = LP.base || LP.panels;
