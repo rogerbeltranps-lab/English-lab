@@ -37,6 +37,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <div id="pdf"></div>
 <script src="shared/js/el-catalog.js"></script>
+<script src="shared/js/el-route-names.js" defer></script>
 <script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
@@ -52,7 +53,7 @@ import {replyText} from "./shared/js/el-reply.js";
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name+(l.student?" · "+l.student:"")])),resKey=a=>a.replace("/","__");  // LV: "Safe · Core", students see the second name (el-route-names.js)
+const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),resKey=a=>a.replace("/","__");  // LV: Starter · Base · Core · Plus · Pro (Roger, 30 Oct 2026: only the new names, here too)
 const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(["lpopen"]),D:null,P:{},zero:true,term:elTerm(),wk:null,tips:(()=>{try{return localStorage.getItem("el_t_tips")!=="off"}catch(e){return true}})()};   // P: people on screen (see people()); zero: missing work counts 0 in the LS grade; term: of the team points
 // Back to where you were (Roger, 30 Oct 2026: "si vaig al dashboard, vull anar al curs del dashboard d'on vinc"): the last tab is remembered (el_t_last),
 // and a link from a course, LS or game page (?course=, ?ls=, ?g=; el-cloud.js and lab/game/host.js) opens a group of that course, the one used last.
@@ -108,10 +109,14 @@ const api={
     for(let i=0;i<ops.length;i+=400){const b=F.writeBatch(db());ops.slice(i,i+400).forEach(f=>f(b));await b.commit()}},
   // route: setting it (directly or by accepting a request) clears any request; declining keeps the route and tells the student (declined).
   // It also clears by:"student" (a 2 ESO student's own choice, elCanPickRoute), so the student can no longer change it.
-  setLevel:(u,ls,level)=>{if(DEMO){const l=((S.D.lv[u]=S.D.lv[u]||{})[ls]=S.D.lv[u][ls]||{});l.level=level;delete l.by;delete l.request;delete l.reason;delete l.declined;return}return put(["students",u,"levels",ls],{level,by:F.deleteField(),request:F.deleteField(),reason:F.deleteField(),declined:F.deleteField()})},
+  // Every route the teacher sets tells the student (Roger, 30 Oct 2026: "if I ever change a level students need to receive a notification"):
+  // changed = when, was = the route they had in that LS before (elRouteOf, carry-over included), why = "exam" when it comes from the LS1
+  // exam box. The student's card (shared/js/el-level-notice.js) shows it once.
+  lvFields:(u,ls,level,why)=>({level,changed:DEMO?{toMillis:()=>Date.now()}:F.serverTimestamp(),was:elRouteOf(S.D.lv[u],ls).level||null,why:why||null}),
+  setLevel:(u,ls,level,why)=>{const o=api.lvFields(u,ls,level,why);if(DEMO){const l=((S.D.lv[u]=S.D.lv[u]||{})[ls]=S.D.lv[u][ls]||{});Object.assign(l,o);delete l.by;delete l.request;delete l.reason;delete l.declined;return}return put(["students",u,"levels",ls],Object.assign(o,{by:F.deleteField(),request:F.deleteField(),reason:F.deleteField(),declined:F.deleteField()}))},
   // routes from the LS1 exam: several students at once (same fields as setLevel); cut-offs per course in settings/routes
-  setLevels:(ls,pairs)=>{if(DEMO){pairs.forEach(([u,l])=>api.setLevel(u,ls,l));return}const b=F.writeBatch(db());
-    pairs.forEach(([u,level])=>b.set(F.doc(db(),"students",u,"levels",ls),sub({level,by:F.deleteField(),request:F.deleteField(),reason:F.deleteField(),declined:F.deleteField()}),{merge:true}));return b.commit()},
+  setLevels:(ls,pairs,why)=>{if(DEMO){pairs.forEach(([u,l])=>api.setLevel(u,ls,l,why));return}const b=F.writeBatch(db());
+    pairs.forEach(([u,level])=>b.set(F.doc(db(),"students",u,"levels",ls),sub(Object.assign(api.lvFields(u,ls,level,why),{by:F.deleteField(),request:F.deleteField(),reason:F.deleteField(),declined:F.deleteField()})),{merge:true}));return b.commit()},
   cuts:(c,o)=>{(S.D.cuts=S.D.cuts||{})[c]=o;return put(["settings","routes"],{[c]:o})},
   reject:(u,ls)=>{const l=S.D.lv[u][ls],to=l.request;if(DEMO){delete l.request;delete l.reason;l.declined=to;return}return put(["students",u,"levels",ls],{request:F.deleteField(),reason:F.deleteField(),declined:to,declinedAt:F.serverTimestamp()})},
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
@@ -384,9 +389,11 @@ function examMark(u,ls){const e=EL_GRADING[ls].exam,x=res(u,asId(ls)).sections||
   return m?{mark:s/m*10,n,of:e.sections.length}:null}
 function rtRows(c,src,to,studs){const cu=cutsOf(c);S.rtPick=S.rtPick||{};S.rtOn=S.rtOn||{};
   return studs.filter(s=>!s.away).map(s=>{const ex=examMark(s.uid,src.id),sug=ex?elRouteFromMark(ex.mark,cu):null,now=elRouteOf(S.D.lv[s.uid],to),
-    mine=S.rtPick[s.uid]!==undefined,pick=mine?S.rtPick[s.uid]:sug,
-    // ticked by default when the route changes and the exam is complete (or Roger picked the route himself)
-    on=!!pick&&(S.rtOn[s.uid]!==undefined?S.rtOn[s.uid]:(pick!==now.level||now.own)&&(mine||!!ex&&ex.n===ex.of));   // a student's own choice (✋) is applied even when it matches, to lock it
+    // Pro (native speaker) is never given by a mark: a Pro student keeps Pro unless Roger picks another route (Roger, 30 Oct 2026)
+    pro=now.level==="native"&&!now.own,mine=S.rtPick[s.uid]!==undefined,pick=mine?S.rtPick[s.uid]:pro&&sug?"native":sug,
+    // ticked by default when the route changes and the exam is complete (or Roger picked the route himself); "Tick everyone" (S.rtAll)
+    // also ticks the ones that stay the same, so every student with a mark is told their level
+    on=!!pick&&(S.rtOn[s.uid]!==undefined?S.rtOn[s.uid]:(S.rtAll||pick!==now.level||now.own)&&(mine||!!ex&&ex.n===ex.of));   // a student's own choice (✋) is applied even when it matches, to lock it
     return {s,ex,sug,now,pick,on}})}
 function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.filter(l=>l.course===c&&l.id!==src.id):[];if(!later.length)return "";
   if(!later.some(l=>l.id===S.rtTo))S.rtTo=later.some(l=>l.id===S.ls)?S.ls:later[later.length-1].id;
@@ -399,11 +406,13 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
     +(["beginners","insecure","safe"].some(k=>cu[k]!==def[k])?` <button class="g" data-do="cutdef">Back to ${def.beginners} · ${def.insecure} · ${def.safe}</button>`:"")+`</div>`
     +`<p>${["beginners","insecure","safe","daring"].map(k=>`${route(k)} ${cnt[k]||0}`).join(" · ")}${cnt.none?` · <span class="muted">no exam mark: ${cnt.none}</span>`:""}</p>`
     +`<div class="bar"><label for="rtto" style="font-weight:600">Apply to</label><select id="rtto" data-do="rtto">${later.map(l=>`<option value="${l.id}" ${l.id===to?"selected":""}>${lsLabel(l)}</option>`).join("")}</select>`
-    +`<button data-do="rtapply" ${n?"":"disabled"}>Apply ${n} change${n===1?"":"s"}</button></div>`
+    +`<button data-do="rtapply" ${n?"":"disabled"}>Apply and notify ${n} student${n===1?"":"s"}</button>`
+    +`<button class="g" data-do="rtall" title="Also tick the students whose route stays the same, so they are told their level too">${S.rtAll?"Tick only the changes":"Tick everyone with an exam mark"}</button></div>`
+    +`<p class="muted">Each student you apply a route to gets a notice with their level the next time they open their board or any page of the site (🔔 in their window shows whether they have seen it).</p>`
     +(rows.length?`<div class="wrap"><table><thead><tr><th>Apply</th><th class="stu">Student</th><th>${lsName(src.id)} exam</th><th>Now in ${lsName(to)}</th><th>New route</th></tr></thead><tbody>`
       +rows.map(r=>{const ex=r.ex?f1(r.ex.mark)+(r.ex.n<r.ex.of?` <small class="muted" title="Only these sections are entered: the mark may change">(${r.ex.n}/${r.ex.of} sections)</small>`:""):'<span class="muted">no mark</span>';
         const carried=r.now.level&&r.now.from!==to,same=r.pick&&r.pick===r.now.level;
-        return `<tr><td><input type="checkbox" data-do="rton" data-u="${r.s.uid}" ${r.on?"checked":""} ${r.pick?"":"disabled"}></td><td class="stu">${name(r.s)}</td><td>${ex}</td><td>${route(r.now.level)}${r.now.own?" ✋":""}${carried?" ↩":""}</td><td>${sel(r)}${r.pick&&r.pick!==r.sug&&r.ex?' <small class="muted" title="Changed by you">✎</small>':""}${same?' <small class="muted">same</small>':""}</td></tr>`}).join("")
+        return `<tr><td><input type="checkbox" data-do="rton" data-u="${r.s.uid}" ${r.on?"checked":""} ${r.pick?"":"disabled"}></td><td class="stu">${name(r.s)}</td><td>${ex}</td><td>${route(r.now.level)}${r.now.own?" ✋":""}${carried?" ↩":""}</td><td>${sel(r)}${r.pick&&r.pick!==r.sug&&r.ex?(r.pick==="native"&&r.now.level==="native"&&S.rtPick[r.s.uid]===undefined?' <small class="muted" title="Pro is never given by a mark: pick another route to change it">Pro kept</small>':' <small class="muted" title="Changed by you">✎</small>'):""}${same?' <small class="muted">same</small>':""}</td></tr>`}).join("")
       +`</tbody></table></div>`:'<p class="muted">No signed-in students in this group yet.</p>')
     +(away.length?`<p class="muted">Not signed in yet (a route can be set once they sign in): ${away.map(name).join(" · ")}</p>`:"");
   return `<div class="box">${fold("routes","🧭 Routes from the LS1 exam",body)}</div>`}
@@ -899,6 +908,10 @@ const lsName=id=>esc(((EL_LS.find(x=>x.id===id)||{}).title||id).replace(/^\S+ ·
 const lsLabel=l=>"LS"+(EL_LS.filter(x=>x.course===l.course).indexOf(l)+1)+" · "+lsName(l.id);
 const rtCell=u=>{const l=(S.D.lv[u]||{})[S.ls]||{},r=elRouteOf(S.D.lv[u],S.ls),carried=r.level&&r.from!==S.ls;
   return `<td class="gr" data-do="rt" data-u="${u}" title="${l.request?"Asks for "+(LV[l.request]||l.request)+" · click to answer":(r.own?"Chosen by the student (they can change it until you set it) · ":"")+(carried?"Carried over from "+lsName(r.from)+" · click to set it for this LS":"Click to set the route")}">${route(r.level)}${r.own?" ✋":""}${carried?" ↩":""}${l.request?" 🔁":""}</td>`};
+// the notice a route change sends (el-level-notice.js): when, and whether the student has seen it (students/{uid}.levelSeen[course])
+function toldLine(u,ls){const l=(S.D.lv[u]||{})[ls]||{},ms=l.changed&&l.changed.toMillis?l.changed.toMillis():0;if(!ms||!l.level)return "";
+  const c=(EL_LS.find(x=>x.id===ls)||{}).course,seen=(((S.D.st[u]||{}).levelSeen)||{})[c]||0;
+  return `<p class="muted">🔔 Notice sent ${new Date(ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}: ${route(l.level)}${l.was&&l.was!==l.level?" (before: "+(LV[l.was]||esc(l.was))+")":""} · ${seen>=ms?"seen ✓":"not seen yet"}</p>`}
 function rtPanel(u){redraw=null;
   const s=S.P[u],l=(S.D.lv[u]||{})[S.ls]||{},lsT=(EL_LS.find(x=>x.id===S.ls)||{}).title;
   const r=elRouteOf(S.D.lv[u],S.ls),carried=r.level&&r.from!==S.ls;
@@ -906,7 +919,7 @@ function rtPanel(u){redraw=null;
     +(l.request?`<div class="hand">🔁 Asks to change to ${route(l.request)}${l.reason?`<p>“${esc(l.reason)}”</p>`:'<p class="muted">No reason given.</p>'}<button data-do="acc" data-u="${u}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${u}">Decline</button></div>`
       :l.declined?`<p class="muted">You declined their last request (${LV[l.declined]||esc(l.declined)}).</p>`:"")
     +`<label>Set the route</label><div class="bar">${EL_LEVELS.map(x=>`<button class="${x.id===l.level?"":"g"}" data-do="setrt" data-u="${u}" data-r="${x.id}" ${x.id===l.level?"disabled":""}>${LV[x.id]}</button>`).join("")}</div>`
-    +`<p class="muted">Saved at once for this LS (later LSs take it too until you change it). The student gets it the next time they open the LS or their board.</p>`);
+    +`<p class="muted">Saved at once for this LS (later LSs take it too until you change it). The student gets it, with a notice telling them their new level, the next time they open the LS or their board.</p>`+toldLine(u,S.ls));
 }
 function stuPanel(u){redraw=null;
   const s=S.P[u],ls=S.ls,l=level(u,ls),lsT=(EL_LS.find(x=>x.id===ls)||{}).title;
@@ -915,7 +928,7 @@ function stuPanel(u){redraw=null;
   if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
   dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>
     <label>Group</label>${groupSel(u,s.group)}
-    <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– none –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${LV[x.id]}</option>`).join("")}</select>
+    <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– none –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${LV[x.id]}</option>`).join("")}</select>${toldLine(u,ls)}
     <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`+entry);
 }
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
@@ -1031,8 +1044,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     rton:()=>{S.rtOn[u]=t.checked;render()},
     cutdef:()=>quick(api.cuts(GR.find(g=>g.id===S.g).course,Object.assign({},EL_ROUTE_CUTS[GR.find(g=>g.id===S.g).course]))),
     rtapply:()=>{const c=GR.find(g=>g.id===S.g).course,src=srcLs(c),to=S.rtTo,ps=rtRows(c,src,to,Object.values(S.P).filter(s=>s.group===S.g&&!s.tester)).filter(r=>r.on).map(r=>[r.s.uid,r.pick]);
-      if(!ps.length||!confirm(`Set the route of ${ps.length} student${ps.length===1?"":"s"} in ${EL_LS.find(l=>l.id===to).title}? Their work so far is kept.`))return;
-      S.rtPick={};S.rtOn={};act(api.setLevels(to,ps))},setrt:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.r))},
+      if(!ps.length||!confirm(`Set the route of ${ps.length} student${ps.length===1?"":"s"} in ${EL_LS.find(l=>l.id===to).title} and send each one a notice with their level? Their work so far is kept.`))return;
+      S.rtPick={};S.rtOn={};S.rtAll=false;act(api.setLevels(to,ps,"exam"))},rtall:()=>{S.rtAll=!S.rtAll;S.rtOn={};render()},setrt:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.r))},
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
     qa:()=>{if(k.f==="g")S.qa.g=k.v;else if(k.f==="all")S.qa.f.all=true;else{S.qa.f[k.f]=k.v;S.qa.f.all=false}render()},
     qago:()=>{S.qa.ls=S.ls;S.qa.g=S.g;S.g="qa";render();scrollTo(0,0)},
@@ -1072,7 +1085,7 @@ document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
   if(k.do==="rtto"){S.rtTo=t.value;S.rtPick={};S.rtOn={};render()}
   if(k.do==="rtpick"){S.rtPick[k.u]=t.value;delete S.rtOn[k.u];render()}
   if(k.do==="cut"){const c=GR.find(g=>g.id===S.g).course,o=cutsOf(c),v=+t.value;if(t.value===""||isNaN(v)||v<0||v>10)return render();o[k.k]=v;
-    if(!(o.beginners<=o.insecure&&o.insecure<=o.safe)){alert("The cut-offs must go up: Beginners ≤ Insecure ≤ Safe.");return render()}quick(api.cuts(c,o))}
+    if(!(o.beginners<=o.insecure&&o.insecure<=o.safe)){alert("The cut-offs must go up: Starter ≤ Base ≤ Core.");return render()}quick(api.cuts(c,o))}
   if(k.do==="setroute"&&t.value)act(api.setLevel(k.u,S.ls,t.value)).then(()=>stuPanel(k.u))});
 
 // the teacher's 🔔 (shared/js/el-bell.js): "Open them in the dashboard" lands on #probs, or sends el-probs on this page; the list is reloaded

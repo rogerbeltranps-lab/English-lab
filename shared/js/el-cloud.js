@@ -413,6 +413,11 @@ onAuthStateChanged(auth,async u=>{
       seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().examSeen||{}},
       save:(ls,v)=>setDoc(doc(db,"students",u.uid),{examSeen:{[ls]:v}},{merge:true}),
       visible:async ls=>{const i=await lsInfo(ls);return i.status!=="hidden"&&elLsForGroup((window.EL_LS||[]).find(x=>x.id===ls),i,myGroup)}})).catch(e=>console.warn("exam notice",e));
+  // "Your level": a card once each time the teacher sets the student's route (shared/js/el-level-notice.js).
+  if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-level-notice"))import("./el-level-notice.js").then(m=>m.levelNotice({course:courseOf(myGroup),
+    lv:async()=>{const o={};(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>o[d.id]=d.data());return o},
+    seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().levelSeen||{}},
+    save:(c,ms)=>setDoc(doc(db,"students",u.uid),{levelSeen:{[c]:ms}},{merge:true})})).catch(e=>console.warn("level notice",e));
   // Floating weekly to-do list for students (and testers) on every page that loads this file (shared/js/el-todo.js).
   if(u&&isStudent(u)&&myGroup&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:u,group:myGroup,root:ROOT,lsId,seesAll:seesAll(u)})).catch(e=>console.warn("todo",e));
   // The teacher's 🔔 in the bottom bar: open problem reports from all groups, live, on every page (shared/js/el-bell.js).
