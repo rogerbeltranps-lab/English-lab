@@ -170,6 +170,13 @@ function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=elRouteOf(D.l
 // with no learning paths and no links to the LS pages, so students do not go back to the activities.
 const only=id=>((window.EL_GRADING||{})[id]||{}).only;
 const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")};
+// Exam broken down (Roger, 30 Oct 2026): the points of each section and the exam per criterion (elExamByCrit), when the LS's sections
+// carry criteria; nothing until the teacher has entered a section.
+function examByCrit(e,sc){const by=elExamByCrit(e,sc).filter(o=>o.n),pts=n=>f1(+(+n).toFixed(2));if(!by.length)return "";
+  return `<details style="margin-top:10px"><summary style="font-weight:600;cursor:pointer">${t("L'examen per criteris","Your exam by criteria")}</summary>`
+    +`<table class="legend"><tbody>${by.map(o=>`<tr><td><b>${o.c}</b> <small class="muted">${esc(elCompetence(o.c))}</small><br><small class="muted">${e.sections.filter(x=>(x[3]||[]).includes(o.c)).map(x=>x[1]).join(" + ")}</small></td><td><b style="color:${col(o.score/o.max*100)}">${f1(o.score/o.max*10)} / 10</b><br><small class="muted">${pts(o.score)} / ${o.max} ${t("punts","points")}</small></td></tr>`).join("")}</tbody></table>`
+    +`<p class="muted" style="margin:6px 0">${t("Punts per apartat","Points per section")}: ${e.sections.filter(([k])=>sc[k]&&sc[k].score!=null).map(([k,n,mx])=>`${n} ${pts(sc[k].score)}/${sc[k].max||mx}`).join(" · ")}</p>`
+    +`<p class="muted" style="margin:0">${t("El vocabulari compta per a dos criteris (4.1 i 5.1). La nota de l'examen és el total de punts ÷ 10.","Vocabulary counts for two criteria (4.1 and 5.1). Your exam mark is all your points ÷ 10.")}</p></details>`}
 // Exam: results/{ls}__assessment, sections[k] = {score, max} written by the teacher (sum of scores / sum of maxes × 10). Final product: the teacher's mark.
 function onlyView(id){const g=EL_GRADING[id],e=g.exam,sc=(D.rs[id+"/assessment"]||{}).sections||{},got=e.sections.filter(([k])=>sc[k]&&sc[k].score!=null),fp=D.rs[g.fp.a]||{};
   const m=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null,prod=fp.max?(fp.score||0)/fp.max*10:null;
@@ -177,7 +184,7 @@ function onlyView(id){const g=EL_GRADING[id],e=g.exam,sc=(D.rs[id+"/assessment"]
   const name={exam:t("Examen final","Final exam"),fp:t("Producte final","Final product")},big=v=>`<b style="font-size:1.3rem;color:${v==null?"#94a3b8":col(v*10)}">${v==null?"–":f1(v)+" / 10"}</b>`;
   return `<div class="box"><h2>${t("Nota de la LS","LS grade")}</h2><p class="muted">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><table class="legend"><tbody>`
     +g.blocks.map(b=>`<tr><td><b>${name[b.id]}</b> <small class="muted">${b.w} %</small></td><td>${big(val[b.id])}${val[b.id]==null?`<br><small class="muted">${t("encara no hi ha nota","no mark yet")}</small>`:""}</td></tr>`).join("")
-    +`<tr><td><b>${t("Nota de la LS","LS mark")}</b></td><td>${big(total)}</td></tr></tbody></table>`
+    +`<tr><td><b>${t("Nota de la LS","LS mark")}</b></td><td>${big(total)}</td></tr></tbody></table>`+examByCrit(e,sc)
     +(fp.feedback?`<p style="margin:10px 0 4px;font-weight:600">${t("Feedback del producte final","Final product feedback")}</p><div class="fb">${esc(fp.feedback)}</div>`:"")+`</div>`}
 // Week plan and reminders (Roger, 25 Oct 2026), from the teacher's plan in el-plan.js (shared/js/el-week.js): this week's classes,
 // the activities due this week, the exam day and the whole plan, for the student's group; past-due activities not done are reminded on top.
