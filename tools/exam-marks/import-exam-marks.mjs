@@ -5,6 +5,7 @@
 // Without --apply it only prints what would change. CSV: a header row with `email` and one column per section key of
 // EL_GRADING[ls].exam (shared/js/el-grading.js); other columns are ignored, an empty cell leaves that section as it is. Section keys the
 // LS no longer has (LS1 "writing", "vocabulary", "grammar" before they were split by criterion) are removed. The maximum is the section's own.
+// An optional `version` column (insecure, safe or daring) records which exam version the student took (.version, shown on the dashboard).
 // A student who never signed in gets their profile (email and the student list's group), so the dashboard lists the marks under them.
 // The CSV holds personal data: keep it outside the repo (e.g. C:\Developer\dades-alumnes).
 import fs from "node:fs";
@@ -55,15 +56,17 @@ for(const row of rows){const email=(row.email||"").toLowerCase();if(!email)conti
   const cs=cur?.fields?.sections?.mapValue?.fields||{},want={},drop=Object.keys(cs).filter(k=>!keys.includes(k));
   keys.forEach(k=>{if(row[k]==null||row[k]==="")return;const sc=+row[k];if(isNaN(sc))throw new Error(email+": "+k+" is not a number");
     const c=cs[k]?.mapValue?.fields||{};if(num(c.score)!==sc||num(c.max)!==maxOf(k))want[k]={score:sc,max:maxOf(k)}});
+  const ver=(row.version||"").toLowerCase(),newVer=ver&&ver!==str(cur?.fields?.version)?ver:null;
+  if(ver&&!["insecure","safe","daring"].includes(ver))throw new Error(email+": version must be insecure, safe or daring, not "+row.version);
   const show=k=>{const c=cs[k]?.mapValue?.fields;return c?num(c.score)+"/"+num(c.max):"–"};
-  if(!Object.keys(want).length&&!drop.length){same++;console.log("= "+email+": already up to date");continue}
-  console.log((apply?"✓ ":"→ ")+email+" ("+str(ro.fields?.group)+"): "+Object.entries(want).map(([k,v])=>k+" "+show(k)+" → "+v.score+"/"+v.max).join(", ")+(drop.length?" · remove "+drop.map(k=>k+" "+show(k)).join(", "):""));
+  if(!Object.keys(want).length&&!drop.length&&!newVer){same++;console.log("= "+email+": already up to date");continue}
+  console.log((apply?"✓ ":"→ ")+email+" ("+str(ro.fields?.group)+"): "+Object.entries(want).map(([k,v])=>k+" "+show(k)+" → "+v.score+"/"+v.max).join(", ")+(drop.length?" · remove "+drop.map(k=>k+" "+show(k)).join(", "):"")+(newVer?" · version "+(str(cur?.fields?.version)||"–")+" → "+newVer:""));
   changed++;if(!apply)continue;
   const prof=await api("GET",DOCS+"students/"+u.localId,null,true);
   if(!prof){console.log("   (no profile yet: created with the list's group)");
     await api("PATCH",DOCS+"students/"+u.localId+"?"+mask(["email","group","name"]),{fields:{email:val(email),group:ro.fields.group,name:val("")}})}
-  const paths=["ls","activity","updated",...Object.keys(want).map(k=>"sections."+k),...drop.map(k=>"sections."+k)];
-  await api("PATCH",DOCS+"students/"+u.localId+"/results/"+id+"?"+mask(paths),{fields:{ls:val(ls),activity:val(ls+"/assessment"),updated:{timestampValue:new Date().toISOString()},
+  const paths=["ls","activity","updated",...Object.keys(want).map(k=>"sections."+k),...drop.map(k=>"sections."+k),...(newVer?["version"]:[])];
+  await api("PATCH",DOCS+"students/"+u.localId+"/results/"+id+"?"+mask(paths),{fields:{ls:val(ls),activity:val(ls+"/assessment"),updated:{timestampValue:new Date().toISOString()},...(newVer?{version:val(newVer)}:{}),
     sections:{mapValue:{fields:Object.fromEntries(Object.entries(want).map(([k,v])=>[k,{mapValue:{fields:{score:val(v.score),max:val(v.max)}}}]))}}}});
 }
 console.log(`\n${apply?"Written":"Would write"}: ${changed} · already up to date: ${same} · skipped: ${skipped}${apply?"":"\nNothing written: run again with --apply."}`);
