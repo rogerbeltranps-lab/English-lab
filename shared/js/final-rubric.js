@@ -1,6 +1,6 @@
 /* Final-product rubric renderer. Data lives next to each course (final-rubric-data.js). */
 var finalRubric = {
-  routeNames: {beginners: 'Beginners', insecure: 'Insecure', safe: 'Safe', daring: 'Daring'},
+  routeNames: {beginners: 'Beginners', insecure: 'Insecure', safe: 'Safe', daring: 'Daring', native: 'Native'},
   ui: {
     lang: 'ca', criterion: 'Criteri',
     levels: [['Nivell 4', 'Molt bé'], ['Nivell 3', 'Bé'], ['Nivell 2', 'Suficient'], ['Nivell 1', 'En procés']],
@@ -9,7 +9,7 @@ var finalRubric = {
   },
   render: function (route) {
     var host = document.getElementById('rubricHost');
-    var D = window.finalRubricData || {}, data = D[route] || (route === 'beginners' ? D.insecure : null);   // Beginners: its own rubric when the LS has one, else Insecure's
+    var D = window.finalRubricData || {}, data = D[route] || (route === 'beginners' ? D.insecure : route === 'native' ? D.daring : null);   // Beginners: its own rubric when the LS has one, else Insecure's
     if (!host || !data) return;
     var ui = data.ui || this.ui, name = this.routeNames[route];
     host.lang = ui.lang;

@@ -4,8 +4,9 @@
 // Loaded by el-cloud.js and, on pages without it, next to el-copyright.js. Never on teacher.html.
 (function () {
   if (window.EL_ROUTE_RENAME || /\/teacher\.html$/.test(location.pathname)) return;
-  const MAP = window.EL_ROUTE_RENAME = { Beginners: 'Starter', Insecure: 'Base', Safe: 'Core', Daring: 'Plus' };
-  const RE = /\b(Beginners|Insecure|Safe|Daring)\b/g, TEST = /\b(Beginners|Insecure|Safe|Daring)\b/;
+  const MAP = window.EL_ROUTE_RENAME = { Beginners: 'Starter', Insecure: 'Base', Safe: 'Core', Daring: 'Plus', Native: 'Pro' };
+  // Native (Roger, 30 Oct 2026) → Pro, but never in "Native American(s)" (LP3 content).
+  const RE = /\b(Beginners|Insecure|Safe|Daring|Native(?! Americans?\b))\b/g, TEST = /\b(Beginners|Insecure|Safe|Daring|Native(?! Americans?\b))\b/;
   const SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1, NOSCRIPT: 1, CODE: 1 };
   const swap = s => s.replace(RE, m => MAP[m]);
   const ATTRS = ['title', 'aria-label', 'placeholder', 'alt'];

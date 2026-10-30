@@ -185,7 +185,8 @@ function applyLevel(lvl,all){
   myLevel=lvl;
   const btns=[...document.querySelectorAll(".route[data-level]")];
   // A page without a Beginners button (LS1) shows the Insecure version: Beginners content falls back to Insecure.
-  const mine=btns.find(b=>b.dataset.level===lvl)||(lvl==="beginners"?btns.find(b=>b.dataset.level==="insecure"):null);
+  // A page without a Native button shows the Daring version.
+  const mine=btns.find(b=>b.dataset.level===lvl)||(lvl==="beginners"?btns.find(b=>b.dataset.level==="insecure"):lvl==="native"?btns.find(b=>b.dataset.level==="daring"):null);
   if(mine&&!mine.classList.contains("active"))mine.click();
   if(!all)btns.forEach(b=>{if(b!==mine)b.style.display="none"});
 }
@@ -358,7 +359,7 @@ function studyCard(u){
   const a=r=>'<a href="'+new URL(ls.study+r+".pdf",ROOT).href+'" download style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📥 '+(ca?"Descarrega el resum":"Download the summary")+(every?" · "+EL_LEVELS.find(x=>x.id===r).name:"")+" (PDF)</a>";
   el.innerHTML="<h2>📚 "+(ca?"Resum del vocabulari i la gramàtica":"Vocabulary and grammar summary")+"</h2><p>"
     +(ca?"Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. Descarrega'l quan vulguis per estudiar. És opcional: fes-lo servir si et va bé.":"All the vocabulary and then all the grammar of your route, with the explanations and practice. Download it whenever you want to study. It is optional: use it if it helps you.")
-    +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="beginners").map(x=>a(x.id)).join(""):a(lv==="beginners"?"insecure":lv))+"</p>";
+    +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="beginners"&&x.id!=="native").map(x=>a(x.id)).join(""):a(lv==="beginners"?"insecure":lv==="native"?"daring":lv))+"</p>";
   el.hidden=false;
 }
 let draw=()=>{};

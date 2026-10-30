@@ -185,4 +185,24 @@
       ins.rows[7], ins.rows[8], ins.rows[9]
     ]
   };
+// Native (C2 Proficiency, Roger 30 Oct 2026): the Daring rubric with its own video and email rows, written on the four Cambridge C2
+  // writing subscales (Content, Communicative Achievement, Organisation, Language) and mapped onto the same NA–AE levels.
+  const dar = window.finalRubricData.daring;
+  window.finalRubricData.native = {
+    ui: dar.ui,
+    intro: 'See what is assessed and which level you are at. You are on the Native route (C2 Proficiency): the same final product as your group, judged against C2 Proficiency standards.',
+    note: 'Your part of the video is the most demanding one in the group: the meaning of the celebration and why it belongs at school, argued with nuance for an audience that does not know it. Your email is the formal letter from Learning Path 6 (280–320 words) and is marked on the four Cambridge C2 writing scales: Content, Communicative Achievement, Organisation and Language.',
+    rows: [
+      { name: 'My part of the video', sub: 'Plan, rehearse and record with the group (3.2) · C2 standard', pct: 40, round: 2, video: true, cells: [
+        'I help to lead the group; my part develops a clear position with nuance (a concession and a turn), is perfectly adapted to the audience, flows naturally from and into the next speaker, and uses precise, idiomatic language without reading; 35–45 s.',
+        'My part is fluent and well organised, with a clear point, a reason and an example; register suits the audience; I use some C2 language naturally (emphasis, hedging); I glance at my notes only.',
+        'My part is fluent but descriptive rather than argued, or too long for the audience; it relies on everyday language; I read parts of it.',
+        'I did not prepare or record my part, or it is unplanned and hard for the audience to follow.'] },
+      { name: 'My email', sub: 'Formal letter (5.1) · Cambridge C2 writing scales', pct: 35, round: 2, cells: [
+        'Content: every point fully developed, concerns answered convincingly · Communicative achievement: persuasive without being pushy, register flawless · Organisation: seamless, varied cohesion · Language: precise, sophisticated and natural (inversion, formal conditionals, collocation).',
+        'All points covered and developed · consistent formal register that holds the reader’s attention · clearly organised with varied linking · a wide range of vocabulary and structures with only occasional slips.',
+        'Points covered but some underdeveloped · register mostly right but slips into informal or over-formal · organisation clear but mechanical · good control, with a limited range for C2.',
+        'Task only partly achieved, register wrong for a head teacher, ideas listed rather than organised, or under 240 words.'] }
+    ].concat(dar.rows.slice(2))
+  };
 })();
