@@ -44,8 +44,8 @@ Tell Claude: "Make a class game for [course] [learning situation], [learning pat
 
 | Game | Course | Learning path |
 |---|---|---|
-| Customs, origins & festive words | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from |
 | Free-time words & how often | 2 ESO | LS2 Free Time, Live!, LP1 Getting started |
 | What are they doing? Choose it, write it | 2 ESO | LS2 Free Time, Live!, LP2 What are they doing? (choose and write questions alternate) |
+| Celebrations around the world: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP2 Celebrations around the world (choose and write questions alternate) |
 
 One known limit: the deck files are public on the site, so a student who knows the address could read the answers. Nothing on the student side links to them.
