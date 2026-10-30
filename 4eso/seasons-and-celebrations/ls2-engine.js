@@ -1125,14 +1125,53 @@ var LS2 = (function () {
     const keep = () => { state.review[level] = { helped: h.value.trim(), review: r.value.trim(), at: new Date().toISOString() }; save(); $('#lpReviewMsg').textContent = ca() ? 'Desat ✓' : 'Saved ✓'; };
     h.onchange = keep; r.onchange = keep;
   }
+  /* Study guide (EXAMPLE, Roger 30 Oct 2026): LP.study[route] from data/study/<page>.js, a folded card above the steps with
+     evidence-based tips, a spaced plan and practice in the format of the next checkpoint and the final exam, each with its answer key.
+     Practice only: never a step, never saved or sent to the dashboard. */
+  const guide = () => LP.study && (LP.study[level] || null);
+  function studyCard() {
+    const g = guide(); if (!g) return '';
+    const q = (b, i, q) => '<div class="question"><p class="q-title">' + (i + 1) + '. ' + q.q + (b.pts ? ' <small>[' + ptsWord(q.o ? b.pts[0] : b.pts[1]) + ']</small>' : '') + '</p>' +
+      (q.o ? '<div class="options">' + learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + b.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') + '</div>'
+           : '<input type="text" class="typed" id="' + b.id + i + '" autocomplete="off" autocapitalize="off" spellcheck="false">') + '<div class="feedback" id="' + b.id + 'f' + i + '"></div></div>';
+    return '<details class="section-card study-card"><summary><span>📚 ' + g.title + '</span><small>' + (ca() ? 'Obre la guia' : 'Open the guide') + '</small></summary>' +
+      '<p class="instruction">' + g.intro + '</p>' +
+      '<h3>' + (ca() ? 'Com estudiar' : 'How to study') + '</h3><div class="study-tips">' + g.tips.map(t => '<div class="mini-card"><strong>' + t[0] + ' ' + t[1] + '</strong><p>' + t[2] + '</p><p class="tiny">' + t[3] + '</p></div>').join('') + '</div>' +
+      '<h3>' + (ca() ? 'El meu pla' : 'My plan') + '</h3><ol class="study-plan">' + g.plan.map(r => '<li><strong>' + r[0] + '</strong> · ' + r[1] + '</li>').join('') + '</ol>' +
+      '<h3>' + (ca() ? 'Què et trobaràs' : 'What comes up') + '</h3><div class="model">' + g.coming + '</div>' +
+      g.practice.map(b => '<div class="study-block" id="' + b.id + '"><div class="panel-head"><div><h3>' + b.title + '</h3><p class="instruction">' + b.intro + '</p></div>' + (b.pill ? '<span class="pill">' + b.pill + '</span>' : '') + '</div>' +
+        (b.audio ? '<audio controls preload="none" src="' + b.audio + '" style="width:100%;margin:6px 0 10px"></audio>' : '') + (b.text ? '<div class="reading">' + b.text + '</div>' : '') +
+        b.items.map((x, i) => q(b, i, x)).join('') +
+        '<div class="actions"><button class="btn" type="button" data-study-check="' + b.id + '">' + (ca() ? 'Comprova' : 'Check') + '</button><button class="btn secondary" type="button" data-study-key="' + b.id + '">' + (ca() ? 'Mostra les solucions' : 'Show the answer key') + '</button></div>' +
+        '<div class="result" id="' + b.id + 'Result"></div><ol class="study-key" id="' + b.id + 'Key" hidden>' + b.items.map(x => '<li><strong>' + esc(x.o ? x.o[0] : x.a[0]) + '</strong>' + (x.why ? ' · ' + x.why : '') + '</li>').join('') + '</ol></div>').join('') +
+      '</details>';
+  }
+  function bindStudy() {
+    const g = guide(); if (!g) return;
+    g.practice.forEach(b => {
+      $('[data-study-check="' + b.id + '"]').onclick = () => {
+        let right = 0, pts = 0, max = 0;
+        b.items.forEach((x, i) => {
+          const fb = $('#' + b.id + 'f' + i), w = b.pts ? (x.o ? b.pts[0] : b.pts[1]) : 1; let ok;
+          if (x.o) { const c = document.querySelector('input[name="' + b.id + i + '"]:checked'); ok = !!c && +c.value === 0; }
+          else ok = x.a.some(a => norm(a) === norm($('#' + b.id + i).value));
+          fb.textContent = ok ? (ca() ? 'Correcte!' : 'Correct!') : (ca() ? 'Encara no: mira les solucions.' : 'Not yet: check the answer key.');
+          fb.className = 'feedback ' + (ok ? 'ok' : 'no'); max += w; if (ok) { right++; pts += w; }
+        });
+        const r = $('#' + b.id + 'Result'); r.textContent = right + ' / ' + b.items.length + (b.pts ? ' · ' + pts + ' / ' + ptsWord(max) : ''); r.classList.add('show');
+      };
+      $('[data-study-key="' + b.id + '"]').onclick = () => { const k = $('#' + b.id + 'Key'); k.hidden = !k.hidden; };
+    });
+  }
   function render() {
     const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
-    $('#lp').innerHTML = trackNote() + planCard() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
+    $('#lp').innerHTML = trackNote() + planCard() + studyCard() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
       LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
       reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
     LP.panels.forEach(p => p._r.bind());
     bindPlan();
+    bindStudy();
     $$('.tab').forEach(t => t.onclick = () => { $$('.tab,.panel').forEach(x => x.classList.remove('active')); t.classList.add('active'); $('#' + t.dataset.panel).classList.add('active'); window.scrollTo({ top: $('#lp').offsetTop - 64, behavior: 'smooth' }); });
     initNext();
     progress();
@@ -1153,7 +1192,7 @@ var LS2 = (function () {
     LP.panels = LP.base.flatMap(p => [N[p.id] ? as(p.id) : p].concat(extra.filter(k => N[k].after === p.id).map(k => as(k))));
   }
   function init(config) {
-    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
+    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.study-card summary{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;font-weight:800;color:var(--dark);font-size:1.05rem}.study-card summary small{color:var(--muted);font-weight:600}.study-card[open] summary small{display:none}.study-card .model{font-weight:500;line-height:1.6}.study-card h3{margin:18px 0 8px;color:var(--dark)}.study-tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}.study-tips p{margin:6px 0 0}.study-plan{margin:0;padding-left:20px;line-height:1.6}.study-block{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}.study-key{margin:10px 0 0;padding:12px 12px 12px 32px;background:#f3f8ff;border:1px solid var(--line);border-radius:12px;line-height:1.6}.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
     LP = config; LP.base = LP.base || LP.panels;
     level = localStorage.getItem(LP.key + 'Level') || 'insecure';
     if (ROUTES.indexOf(level) < 0) level = 'insecure';
