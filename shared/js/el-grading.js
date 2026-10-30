@@ -18,12 +18,13 @@ window.elExamByCrit=function(e,sc){const out={};sc=sc||{};
 window.EL_GRADING={
   // LS1 My Real Routine, 2ESO and 4ESO (Roger, 25 Oct 2026): done in class and redesigned for next year, so this year only the final
   // exam and the final product count. only: the student board shows just these two. fp.mark: the final product is the teacher's mark
-  // (score out of max in its dialog), not levels. Weights 50/50 (confirmed by Roger, 25 Oct 2026). Exam sections from his Exam A: a
+  // (score out of max in its dialog), not levels. Weights exam 75 · final product 25 (Roger, 30 Oct 2026: "the final product should count only
+  // 25 %" in every LS; it was 50/50 from 25 Oct). Exam sections from his Exam A: a
   // section is [key, name, max, criteria]; 100 internal points, so the exam mark is points / 10 (the dashboard divides the sum by the sum of maxes).
   // 4ESO (Roger, 30 Oct 2026: "exams broken down by criteria"): criteria as on the exam (Models A–D) and his "Notes per criteri" sheet;
   // the writing is split into its rubric rows (C1 task 8, C2 grammar 4, C3 vocabulary 4 → 5.1; C4 organisation 4 → 5.2). Vocabulary
   // is evidence for both 4.1 and 5.1, so a criterion score (elExamByCrit) is not a share of the exam mark: the exam mark stays points / 10.
-  ...(function(){const e=(c,sections)=>({blocks:[{id:"exam",name:"Final exam",w:50},{id:"fp",name:"Final product",w:50}],only:true,
+  ...(function(){const e=(c,sections)=>({blocks:[{id:"exam",name:"Final exam",w:75},{id:"fp",name:"Final product",w:25}],only:true,
     exam:{sections,max:10},fp:{a:c+"/final-product",mark:true}});
     // 2ESO (Roger, 30 Oct 2026): its exam cover gives criteria per item type: vocabulary choose 4.1, complete 5.1; grammar choose 5.1 and 4.1,
     // complete 5.1; writing as in 4ESO. So vocabulary (28) and grammar (32) are split into their choose and complete parts.
