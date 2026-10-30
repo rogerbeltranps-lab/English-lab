@@ -152,14 +152,47 @@ function totalSecs() {
   const bar = (P) => `[0:v]split[bg][m];[m]crop=${BAR.x}:${BAR.h}:0:${BAR.y}[left];color=c=${T.accent}:s=${BAR.w}x${BAR.h}:r=${FPS}[fill];` +
     `[bg][fill]overlay=x='${BAR.x - BAR.w}+${BAR.w}*t/${P}':y=${BAR.y}:shortest=1[v1];[v1][left]overlay=0:${BAR.y}`;
   const turn = (P) => ['-i', chime, '-af', `apad=whole_dur=${P}`];
-  INTRO.forEach((d, i) => still(`i${i}`, d, silence(d), null, `i${i}`));
+  // Optional spoken intro: spec.voice names the narrator's clips (in voice.dir) for each intro slide.
+  const VO = spec.voice;
+  const len = (f) => parseFloat(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString());
+  const norm = {};
+  const voice = (id) => {
+    if (id === 'chime') return chime;
+    if (!norm[id]) {
+      norm[id] = path.join(work, `vo-${id}.wav`);
+      ff(['-i', path.join(ROOT, VO.dir, id + '.mp3'), '-af', 'loudnorm=I=-16:TP=-1.5', ...AF, norm[id]]);
+    }
+    return norm[id];
+  };
+  // Joins files and silences ({sil: seconds}) into one wav.
+  const seq = (parts, name) => {
+    const f = path.join(work, name + '.wav'), ins = [], labels = [];
+    parts.forEach((p, k) => {
+      if (typeof p === 'object') ins.push('-f', 'lavfi', '-t', String(p.sil), '-i', 'anullsrc=r=44100:cl=mono');
+      else ins.push('-i', p);
+      labels.push(`[${k}]aresample=44100,aformat=channel_layouts=mono[a${k}]`);
+    });
+    ff([...ins, '-filter_complex', labels.join(';') + ';' + parts.map((_, k) => `[a${k}]`).join('') + `concat=n=${parts.length}:v=0:a=1`, ...AF, f]);
+    return f;
+  };
+  const spoken = (img, ids, minDur) => {
+    const f = seq([{ sil: 0.5 }, ...ids.flatMap((id) => (id === 'chime' ? [{ sil: 0.3 }, chime, { sil: 0.3 }] : [voice(id)])), { sil: 1.2 }], img + '-vo');
+    const d = Math.max(minDur, len(f));
+    still(img, d, ['-i', f, '-af', `apad=whole_dur=${d}`], null, img);
+  };
+  if (VO) ['what', 'how', 'tips'].forEach((k, i) => spoken(`i${i}`, VO[k], 5));
+  else INTRO.forEach((d, i) => still(`i${i}`, d, silence(d), null, `i${i}`));
   (spec.examples || []).forEach((it, i) => {
-    const clip = cut(it, `e${i}`), twice = path.join(work, `e${i}x2.wav`);
-    ff(['-i', clip, '-i', clip, '-filter_complex', `[0]apad=pad_dur=${GAP}[a];[a][1]concat=n=2:v=0:a=1`, ...AF, twice]);
-    still(`e${i}a`, 2 * play(it) + GAP, ['-i', twice], null, `e${i}a`);
-    still(`e${i}b`, it.pause, turn(it.pause), bar(it.pause), `e${i}b`);
+    const clip = cut(it, `e${i}`);
+    const twice = seq([...(VO ? [{ sil: 0.4 }, ...VO.examples[i].map(voice), { sil: 0.3 }] : []), clip, { sil: GAP }, clip], `e${i}x2`);
+    still(`e${i}a`, len(twice), ['-i', twice], null, `e${i}a`);
+    if (VO) {
+      const cue = seq([...VO.try.map(voice), { sil: 0.15 }, chime], `e${i}cue`), P = len(cue) + it.pause;
+      still(`e${i}b`, P, ['-i', cue, '-af', `apad=whole_dur=${P}`], bar(P), `e${i}b`);
+    } else still(`e${i}b`, it.pause, turn(it.pause), bar(it.pause), `e${i}b`);
   });
-  still('ready', READY, silence(READY), null, 'ready');
+  if (VO) spoken('ready', VO.ready, READY);
+  else still('ready', READY, silence(READY), null, 'ready');
   spec.items.forEach((it, i) => {
     const clip = cut(it, `c${i}`), P = it.pause;
     still(`s${i}a`, play(it), ['-i', clip], null, `s${i}a`);
