@@ -347,7 +347,7 @@ function matTab(){
         +games.map(g=>`<tr><td>${esc(g.emoji||"")} ${esc(g.title)}</td><td>${esc(g.ls||"")}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
       +lss.map(l=>{const k=l.id.replace("-","/"),w=(window.LP_PRINT||{})[k];
         return `<h3>📄 ${esc(l.title)}</h3>`
-          +(l.study?`<p>Study PDF (vocabulary and grammar): ${R.slice(1).map(([r,n])=>a(l.study+r+".pdf",cap(r)+" · "+n,"chip")).join(" ")} <span class="muted">(Beginners uses Insecure)</span></p>`:"")
+          +(l.study?`<p>Study PDF (vocabulary and grammar): ${R.slice(1).concat(l.pro?[["native","Pro"]]:[]).map(([r,n])=>a(l.study+r+".pdf",cap(r)+" · "+n,"chip")).join(" ")} <span class="muted">(Beginners uses Insecure)</span></p>`:"")
           +(w?`<div class="qwrap"><table class="mat"><tr><th>Paper worksheet</th>${R.map(([r,n])=>`<th>${cap(r)}<br><small>${n}</small></th>`).join("")}<th>Answer key</th></tr>`
             +w.lps.map(([lp,t])=>{const u="shared/print/worksheet.html?ls="+k+"&lp="+lp+"&route=";
               return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r])=>a(u+r+"&key=1",cap(r)[0],"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
