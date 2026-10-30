@@ -26,7 +26,7 @@ Kahoot-style games for class (Roger, 26 Oct 2026). The board runs on the project
 A game is only content: the engine is not changed for a new game.
 
 - A deck file `lab/game/decks/<course>-<topic>.js` (course is `2eso` or `4eso`).
-- One line in `lab/game/decks/index.js`: id, title, course, emoji and learning situation.
+- One line in `lab/game/decks/index.js`: id, title, course, emoji, learning situation and learning path. The board lists the games by course, then by learning situation and learning path.
 - The Start button on the learning path page.
 
 In the deck, slides go in order:
@@ -47,6 +47,7 @@ Tell Claude: "Make a class game for [course] [learning situation], [learning pat
 | Autumn words: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP1 Getting started (choose and write questions alternate; replaces the Autumn words slides) |
 | Free-time words & how often | 2 ESO | LS2 Free Time, Live!, LP1 Getting started |
 | What are they doing? Choose it, write it | 2 ESO | LS2 Free Time, Live!, LP2 What are they doing? (choose and write questions alternate) |
+| Now or usually? Choose it, write it | 2 ESO | LS2 Free Time, Live!, LP3 Now or usually? (choose and write questions alternate) |
 | Celebrations around the world: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP2 Celebrations around the world (choose and write questions alternate) |
 | Where traditions come from: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from (choose and write questions alternate) |
 

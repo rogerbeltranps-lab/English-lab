@@ -292,7 +292,7 @@ function lsWarn(ls,grp,assigned){
   return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
 }
 function render(){
-  render0();keepLast()}
+  render0();keepLast();ptSync()}
 function render0(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
@@ -348,10 +348,10 @@ function matTab(){
   const R=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],cap=r=>r[0].toUpperCase()+r.slice(1);
   const a=(href,t,c)=>`<a href="${href}" target="_blank" rel="noopener"${c?` class="${c}"`:""}>${t}</a>`;
   return [["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
-    const games=(window.EL_GAMES||[]).filter(g=>g.course===c),lss=EL_LS.filter(l=>l.course===c);
+    const games=(window.EL_GAMES||[]).filter(g=>g.course===c).sort((x,y)=>((x.ls||"")+(x.lp||"")).localeCompare((y.ls||"")+(y.lp||""),"en",{numeric:true})),lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
-      +`<h3>🎮 Class games</h3>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation</th><th></th></tr>`
-        +games.map(g=>`<tr><td>${esc(g.emoji||"")} ${esc(g.title)}</td><td>${esc(g.ls||"")}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
+      +`<h3>🎮 Class games</h3>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation · Learning Path</th><th></th></tr>`
+        +games.map(g=>`<tr><td>${esc(g.emoji||"")} ${esc(g.title)}</td><td>${esc(g.ls||"")}${g.lp?" · "+esc(g.lp):""}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
       +lss.map(l=>{const k=l.id.replace("-","/"),w=(window.LP_PRINT||{})[k];
         return `<h3>📄 ${esc(l.title)}</h3>`
           +(l.study?`<p>Study PDF (vocabulary and grammar): ${R.slice(1).concat(l.pro?[["native","Pro"]]:[]).map(([r,n])=>a(l.study+r+".pdf",cap(r)+" · "+n,"chip")).join(" ")} <span class="muted">(Beginners uses Insecure)</span></p>`:"")
@@ -424,30 +424,37 @@ const ptStuds=g=>Object.values(S.P).filter(s=>s.group===g&&!s.tester&&pkey(s)).s
 const ptBest=g=>Math.max(0,...ptStuds(g).map(ptOn));
 // activities of the term missing for the bonus (elMissing in el-points.js; Roger, 30 Oct 2026: without all the work done, no bonus)
 const ptMiss=s=>s.uid?elMissing(s.group,S.term,a=>isDone(s.uid,a),ls=>S.D.ls[ls]):null,ptGets=(s,best,m)=>m&&m.length?0:elBonus(ptOn(s),best);
+// The bonus is in proportion to the best student with all the work done (Roger, 30 Oct 2026), not the best of everyone. The dashboard
+// works it out (only it sees every student's work) and keeps it in teams/{group}.bestOk.{term} for the student board; it rewrites it
+// whenever it renders and the value has changed, so it follows new work, new due days and point changes.
+const ptOk=s=>{const m=ptMiss(s);return !!m&&!m.length},ptBestOk=g=>Math.max(0,...ptStuds(g).filter(ptOk).map(ptOn));
+function ptSync(){if(S.term!==elTerm()||S.D.ptErr)return;const term=S.term;
+  GR.forEach(g=>{const v=ptBestOk(g.id),t=(S.D.tm[g.id]=S.D.tm[g.id]||{});if((t.bestOk||{})[term]===v)return;
+    t.bestOk=Object.assign({},t.bestOk,{[term]:v});const w=put(["teams",g.id],{bestOk:{[term]:v}});if(w)w.catch(e=>console.warn("bestOk",e))})}
 const pt={
   add:(k,g,d)=>{const p=(S.D.pt[k]=S.D.pt[k]||{}),term=S.term;p[term]=Math.max(0,(+p[term]||0)+d);const best=ptBest(g),t=(S.D.tm[g]=S.D.tm[g]||{});t.best=Object.assign({},t.best,{[term]:best});
     if(DEMO)return null;const b=F.writeBatch(db());b.set(F.doc(db(),"points",k),sub({[term]:F.increment(d)}),{merge:true});b.set(F.doc(db(),"teams",g),sub({best:{[term]:best}}),{merge:true});return b.commit()}
 };
 // Export: the group's points and bonuses this term as a CSV (semicolons and decimal commas, so a Catalan spreadsheet opens it as numbers).
 function ptCsv(g){
-  const studs=ptStuds(g),best=ptBest(g),q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const studs=ptStuds(g),best=ptBestOk(g),q=v=>'"'+String(v).replace(/"/g,'""')+'"';
   const rows=[["Student","Email","Points","All work done","Missing","Bonus"]].concat(studs.map(s=>{const p=ptOn(s),m=ptMiss(s);
     return [fullName(s),s.email||"",p,!m?"not signed in":m.length?"no":"yes",(m||[]).map(([a])=>a.title).join(" · "),elNum(ptGets(s,best,m),"ca")]}));
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+rows.map(r=>r.map(q).join(";")).join("\r\n")],{type:"text/csv"}));
   a.download=`points-${g}-${S.term}.csv`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5e3);
 }
 function pointsBox(g){
-  const studs=ptStuds(g),term=S.term,best=ptBest(g),now=elTerm();
+  const studs=ptStuds(g),term=S.term,best=ptBestOk(g),top=ptBest(g),now=elTerm();
   const terms=EL_TERMS.map(t=>`<button class="chip ${t.id===term?"on":""}" data-do="ptterm" data-t="${t.id}">${t.en}${t.id===now?" · now":""}</button>`).join("");
   let ok=0;
   const work=m=>!m?'<span class="muted" title="Not signed in yet: no work saved">–</span>':m.length?`<span class="late" title="${esc(m.map(([a,d])=>a.title+" · due "+ELWeek.date(d)).join("\n"))}">✗ ${m.length} missing</span>`:(ok++,'<span class="ptok">✓ All done</span>');
   const rows=studs.map(s=>{const p=ptOn(s),k=esc(pkey(s)),m=ptMiss(s),b=elBonus(p,best);return `<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td><td class="ptn"><button class="lv" data-do="ptadd" data-k="${k}" data-d="-1" ${p>0?"":"disabled"} aria-label="Remove a point">−</button> <b>${p}</b> <button class="lv" data-do="ptadd" data-k="${k}" data-d="1" aria-label="Add a point">+</button></td><td>${work(m)}</td><td>${m&&m.length&&b?`<s class="muted" title="No bonus until all the work is done">+${elNum(b)}</s> <b>+0</b>`:`<b>+${elNum(ptGets(s,best,m))}</b>`}</td></tr>`}).join("");
   const body=(S.D.ptErr?'<p><b>The team points could not be read.</b> Publish the Firestore rules (they publish when the change reaches main) and reload.</p>':"")
-    +`<p class="muted">Points from the <a href="lab/game/host.html" target="_blank">🎮 class games</a> (choose a game and the group: its signed-in students are taken into it) and the class presentations: open 📡 Class there, signed in with this account, and start the class for ${esc(GR.find(x=>x.id===g).name)}; students join from the Learning Path and every right answer they tap is +1. Bonus on the term grade = ${elNum(EL_POINTS_BONUS)} × the student's points ÷ the best student's points in the group (${best} in ${elTermName(term)}), so it only adds; every term starts at 0. A change here (an absent student, a mistake) is for that student only. Students see their points and their bonus on their board.</p>`
+    +`<p class="muted">Points from the <a href="lab/game/host.html" target="_blank">🎮 class games</a> (choose a game and the group: its signed-in students are taken into it) and the class presentations: open 📡 Class there, signed in with this account, and start the class for ${esc(GR.find(x=>x.id===g).name)}; students join from the Learning Path and every right answer they tap is +1. Bonus on the term grade = ${elNum(EL_POINTS_BONUS)} × the student's points ÷ the points of the best student in the group with all the work done (${best} in ${elTermName(term)}; the top score of everyone is ${top}), so it only adds; every term starts at 0. A change here (an absent student, a mistake) is for that student only. Students see their points and their bonus on their board.</p>`
     +`<p class="muted"><b>All the work done:</b> only a student who has done every activity due so far this term gets the bonus (activities of the time plan whose due day is past, in learning paths you opened for the group; done late still counts; the final product and homework do not). Hover “missing” for the list. Students see the same on their board.</p>`
     +`<div class="bar"><span class="muted">Term:</span> ${terms}${studs.length?` <button class="chip" data-do="ptcsv" title="Download this group's points and bonuses (CSV, opens in a spreadsheet)">⬇ Export</button>`:""}</div>`
     +(studs.length?`<div class="ptwrap"><table class="pts"><thead><tr><th class="stu">Student</th><th>Points</th><th>All work</th><th>Bonus</th></tr></thead><tbody>${rows}</tbody></table></div><p class="muted">${ok} of ${studs.length} with all the work done in ${elTermName(term)}.</p>`:'<p class="muted">No students in this group.</p>');
-  return `<div class="box">${fold("points",`Points <small class="muted">· ${elTermName(term)} · best ${best}</small>`,body)}</div>`;
+  return `<div class="box">${fold("points",`Points <small class="muted">· ${elTermName(term)} · best with all the work done ${best}</small>`,body)}</div>`;
 }
 function progress(studs,list){
   const open=a=>!S.folded.has(a.id)&&steps(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
@@ -487,7 +494,7 @@ function gradeBox(studs){
       gv:g.gv?gvSum(B):"",other:o};
     const val={exam:B.exam,fp:B.fp,gv:B.gv.mark,other:B.other};
     return `<tr>${who}${rtCell(s.uid)}${tm?`<td><small>${esc(teamOf(s.uid,fpA))||"–"}</small></td>`:""}`
-      +g.blocks.map(b=>`<td class="gr" data-do="grade" data-u="${s.uid}" title="${esc(tip[b.id])}">${f1(val[b.id])}</td>`).join("")
+      +g.blocks.map(b=>`<td class="gr" data-do="grade" data-u="${s.uid}" title="${esc(tip[b.id])}">${f1(val[b.id])}${b.id==="exam"&&exVer(s.uid)?"<br>"+route(exVer(s.uid)):""}</td>`).join("")
       +`<td class="first gr tot" data-do="grade" data-u="${s.uid}">${f1(total)} ${deg(elDegree(total))}</td></tr>`}).join("");
   const key=g.only?`<p class="muted">Marks out of 10. Only the final exam and the final product count in this LS (Roger, 25 Oct 2026): its learning paths are practice. Exam: sum of section scores ÷ sum of maxes; enter it below or by clicking a mark. Final product: the mark you give in its dialog (click a student's mark here, then "Open the final product").</p>`
     :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: ${g.gv.parts.map(p=>p.name.toLowerCase()+" "+p.w+" %").join(" + ")} (accuracy only from delayed retrieval; practice, grammar and mixed practice count as done by the session deadline in the teaching plan). Other competences: for each of ${g.other.join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average. Group: the final product group (set it in the final product dialog).</p>`;
@@ -496,10 +503,14 @@ function gradeBox(studs){
     +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`:"")
     +fold("exam","Exam marks",examTable(studs.filter(s=>!s.away)))+`</div>`;
 }
+// Which exam version a student took (Roger, 30 Oct 2026): results/{ls}__assessment .version = insecure|safe|daring, imported with the
+// marks (tools/exam-marks) or chosen here; it saves on change.
+const EXV=["insecure","safe","daring"],exVer=u=>res(u,asId(S.ls)).version||"",
+  exVerSel=u=>`<select data-exver="${u}" title="Exam version this student took"><option value="">–</option>${EXV.map(v=>`<option value="${v}" ${exVer(u)===v?"selected":""}>${esc(LV[v]||v)}</option>`).join("")}</select>`;
 function examTable(studs){const e=G().exam,id=asId(S.ls),cr=exCrits(e);
   if(!studs.length)return '<p class="muted">No signed-in students.</p>';
-  return `<p class="muted">Score and maximum for each section (empty = not entered)${e.level?`, and the writing level (${e.level.c}). Levels save on click; marks with the button.`:". Save them with the button."}</p>${cr.length?`<p class="muted">The last columns are the exam per criterion (mark out of 10; hover for the points), worked out as you type. A score cannot go above its maximum. ${elExamShared(e).length?"Shared sections count for each of their criteria: "+esc(elExamShared(e).join(", "))+". ":""}The exam mark is all the points ÷ 10.</p>`:""}<div class="wrap"><table><thead><tr><th class="stu">Student</th>${e.sections.map(([,n,,cs])=>`<th>${n}${cs?"<br>"+secPills(cs):""}</th>`).join("")}${e.level?`<th>Writing level ${pill(e.level.c)}</th>`:""}${cr.map(c=>`<th class="first">${pill(c)}<br><small class="muted">/10</small></th>`).join("")}${cr.length?'<th class="first">Exam<br><small class="muted">/10</small></th>':""}</tr></thead><tbody>`
-    +studs.map(s=>{const x=res(s.uid,id),sc=x.sections||{},bc=elExamByCrit(e,sc),em=examMark(s.uid,S.ls);return `<tr data-exrow="${s.uid}"><td class="stu">${name(s)}</td>`+e.sections.map(([k])=>`<td><input class="ex" data-ex="${s.uid}" data-k="${k}" data-f="score" type="number" step="0.25" min="0" max="${secMax(e,k)}" style="width:52px" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${s.uid}" data-k="${k}" data-f="max" type="number" style="width:44px" value="${sc[k]&&sc[k].max!=null?sc[k].max:secMax(e,k)}"></td>`).join("")
+  return `<p class="muted">Score and maximum for each section (empty = not entered)${e.level?`, and the writing level (${e.level.c}). Levels save on click; marks save by themselves when you leave a box.`:". Marks save by themselves when you leave a box (✓ saved next to the name)."}</p>${cr.length?`<p class="muted">The last columns are the exam per criterion (mark out of 10; hover for the points), worked out as you type. A score cannot go above its maximum. ${elExamShared(e).length?"Shared sections count for each of their criteria: "+esc(elExamShared(e).join(", "))+". ":""}The exam mark is all the points ÷ 10.</p>`:""}<div class="wrap"><table><thead><tr><th class="stu">Student</th><th>Exam version</th>${e.sections.map(([,n,,cs])=>`<th>${n}${cs?"<br>"+secPills(cs):""}</th>`).join("")}${e.level?`<th>Writing level ${pill(e.level.c)}</th>`:""}${cr.map(c=>`<th class="first">${pill(c)}<br><small class="muted">/10</small></th>`).join("")}${cr.length?'<th class="first">Exam<br><small class="muted">/10</small></th>':""}</tr></thead><tbody>`
+    +studs.map(s=>{const x=res(s.uid,id),sc=x.sections||{},bc=elExamByCrit(e,sc),em=examMark(s.uid,S.ls);return `<tr data-exrow="${s.uid}"><td class="stu">${name(s)} <small data-exst></small></td><td>${exVerSel(s.uid)}</td>`+e.sections.map(([k])=>`<td><input class="ex" data-ex="${s.uid}" data-k="${k}" data-f="score" type="number" step="0.25" min="0" max="${secMax(e,k)}" style="width:52px" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${s.uid}" data-k="${k}" data-f="max" type="number" style="width:44px" value="${sc[k]&&sc[k].max!=null?sc[k].max:secMax(e,k)}"></td>`).join("")
       +(e.level?`<td>${lvBtns(`data-do="lv" data-u="${s.uid}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td>`:"")
       +cr.map(c=>{const o=bc.find(y=>y.c===c);return `<td class="first" data-cr="${c}" title="${esc(critPts(o))}"><b>${f1(critMark(o))}</b></td>`}).join("")+(cr.length?`<td class="first" data-cr="exam"><b>${f1(em&&em.mark)}</b></td>`:"")+`</tr>`}).join("")
     +`</tbody></table></div><div class="row" style="justify-content:flex-start;margin-top:6px"><button data-do="examsave">Save exam marks</button></div>`}
@@ -514,7 +525,7 @@ function saveExam(scope){const id=asId(S.ls),by={},bad=[];
   if(bad.length)alert("Not saved, a score is above its maximum (or below 0):\n"+bad.join("\n"));
   return ps}
 // Exam marks as they are typed (Roger, 30 Oct 2026): a score is kept between 0 and its section's maximum, and the criteria, the exam
-// mark and (in the grade dialog) the LS mark are worked out at once from the typed values; saving still needs the button.
+// mark and (in the grade dialog) the LS mark are worked out at once from the typed values; autoSaveExam writes them when the box is left.
 function liveExam(t){const u=t.dataset.ex,scope=t.closest("[data-exrow]")||$("#dlgc");if(!u||!G()||!G().exam)return;
   if(t.dataset.f==="score"&&t.value!==""){const mx=+(scope.querySelector(`input[data-ex="${u}"][data-k="${t.dataset.k}"][data-f="max"]`)||{}).value||secMax(G().exam,t.dataset.k),v=+t.value;
     if(v>mx||v<0){t.value=v>mx?mx:0;t.classList.add("over");t.title=v>mx?"The maximum is "+mx:"A score cannot be below 0";setTimeout(()=>t.classList.remove("over"),1500)}}
@@ -528,7 +539,21 @@ function liveExam(t){const u=t.dataset.ex,scope=t.closest("[data-exrow]")||$("#d
     if(L("crit"))L("crit").innerHTML=critTable(e,sc);
     if(L("exam")||L("ls")){const {B,total}=grade(S.P[u]);if(L("exam"))L("exam").textContent=f1(B.exam);if(L("ls"))L("ls").innerHTML=`${f1(total)} ${deg(elDegree(total))}`}}
   finally{if(had)r[id]=old;else delete r[id]}}
-document.addEventListener("input",e=>{if(e.target.matches("input.ex[data-ex]"))liveExam(e.target)});
+document.addEventListener("input",e=>{if(e.target.matches("input.ex[data-ex]")){liveExam(e.target);exDirty.add(e.target.dataset.ex);exState(e.target,"not saved yet","#b45309")}});
+// Exam marks save by themselves (Roger, 30 Oct 2026: marks typed in the table showed on the dashboard but were never saved, so the student
+// board said "no mark yet"): a changed box is written when it is left; the button stays. Leaving the page with marks not saved asks first.
+const exDirty=new Set(),exState=(t,txt,c)=>{const n=(t.closest("[data-exrow]")||$("#dlgc")).querySelector("[data-exst]");if(n){n.textContent=txt;n.style.color=c}};
+function autoSaveExam(t){const u=t.dataset.ex;if(!u||!G()||!G().exam)return;
+  const ps=saveExam(t.closest("[data-exrow]")||$("#dlgc"));if(!ps.length){if(exDirty.delete(u))exState(t,"","");return}
+  exState(t,"saving…","#64748b");
+  Promise.all(ps).then(()=>{exDirty.delete(u);exState(t,"✓ saved","#15803d");
+    setTimeout(()=>{if(!document.activeElement||document.activeElement===document.body){render();again()}},0)},   // the LS grade table catches up (not while typing or clicking)
+    e=>{console.warn(e);exState(t,"not saved","#b91c1c");alert("Could not save: "+e.message)})}
+document.addEventListener("change",e=>{if(e.target.matches("input.ex[data-ex]"))autoSaveExam(e.target);
+  if(e.target.matches("select[data-exver]")){const t=e.target,u=t.dataset.exver;if(t.closest("[data-exrow]"))exState(t,"saving…","#64748b");
+    patch(u,asId(S.ls),{version:t.value||null}).then(()=>{if(t.closest("[data-exrow]"))exState(t,"✓ saved","#15803d");setTimeout(()=>{if(!document.activeElement||document.activeElement===document.body){render();again()}},0)},
+      er=>{console.warn(er);alert("Could not save: "+er.message)})}});
+window.addEventListener("beforeunload",e=>{if(exDirty.size){e.preventDefault();e.returnValue=""}});
 // Degree per criterion: confirmed (results/{ls}/assessment .final) or suggested
 function degrees(studs){const g=G(),cs=[...g.key,...g.other];
   let h=`<table><thead><tr><th class="stu">Student</th>${cs.map((c,i)=>`<th class="${i===g.key.length?"first":""}">${pill(c)}<br><small class="muted">${i<g.key.length?"key":"other"}</small></th>`).join("")}</tr></thead><tbody>`;
@@ -735,7 +760,7 @@ function gradePanel(u){redraw=()=>gradePanel(u);
   const blk=(id,title,mark,body)=>`<details data-k="gp-${id}" ${S.open.has("gp-"+id)?"open":""}><summary style="font-size:1rem">${title} · <b data-live="${id}">${f1(mark)}</b></summary>${body}</details>`;
   dlg(`<h3>${name(s)} · LS grade</h3><p class="muted">${route(level(u,S.ls))}${hasTeams()?" · Group: "+(esc(teamOf(u,fpA))||"–"):""} · Missing work ${S.zero?"counts 0":"not counted yet"}</p>`
     +`<p><b>LS mark: <span data-live="ls">${f1(total)} ${deg(elDegree(total))}</span></b> <small class="muted">${g.blocks.map(b=>b.name+" "+b.w+" %").join(" · ")}</small></p>`
-    +blk("exam",`Final exam (${g.blocks.find(b=>b.id==="exam").w} %)`,B.exam,`<table class="lvt"><tbody>${e.sections.map(([k,n,,cs])=>`<tr><td>${n}${cs?" "+secPills(cs):""}</td><td><input class="ex" data-ex="${u}" data-k="${k}" data-f="score" type="number" step="0.25" min="0" max="${secMax(e,k)}" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${u}" data-k="${k}" data-f="max" type="number" value="${sc[k]&&sc[k].max!=null?sc[k].max:secMax(e,k)}"></td></tr>`).join("")}${e.level?`<tr><td>Writing level ${pill(e.level.c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td></tr>`:""}</tbody></table><div class="row" style="justify-content:flex-start;margin-top:4px"><button data-do="examsave1">Save exam marks</button></div>${exCrits(e).length?`<h4>By criterion</h4><div data-live="crit">${critTable(e,sc)}</div>`:""}`)
+    +blk("exam",`Final exam (${g.blocks.find(b=>b.id==="exam").w} %)`,B.exam,`<table class="lvt"><tbody><tr><td>Exam version</td><td>${exVerSel(u)}</td></tr>${e.sections.map(([k,n,,cs])=>`<tr><td>${n}${cs?" "+secPills(cs):""}</td><td><input class="ex" data-ex="${u}" data-k="${k}" data-f="score" type="number" step="0.25" min="0" max="${secMax(e,k)}" value="${sc[k]&&sc[k].score!=null?sc[k].score:""}"> / <input class="ex" data-ex="${u}" data-k="${k}" data-f="max" type="number" value="${sc[k]&&sc[k].max!=null?sc[k].max:secMax(e,k)}"></td></tr>`).join("")}${e.level?`<tr><td>Writing level ${pill(e.level.c)}</td><td>${lvBtns(`data-do="lv" data-u="${u}" data-a="${id}" data-s="${e.level.step}" data-c="${e.level.c}"`,((x.levels||{})[e.level.step]||{})[e.level.c],e.level.c)}</td></tr>`:""}</tbody></table><div class="row" style="justify-content:flex-start;margin-top:4px"><button data-do="examsave1">Save exam marks</button> <small data-exst></small></div>${exCrits(e).length?`<h4>By criterion</h4><div data-live="crit">${critTable(e,sc)}</div>`:""}`)
     +blk("fp",`Final product (${g.blocks.find(b=>b.id==="fp").w} %)`,B.fp,g.fp.mark?`<p class="muted">Your mark: ${res(u,fpA).max?res(u,fpA).score+"/"+res(u,fpA).max:"not given yet"}. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open the final product</a> to mark it.</p>`:`<table><tbody>${g.fp.rows.map(r=>row(esc(r.name)+" "+cpill(r.c),deg(lvOf(u,fpA,r.step,r.c)),r.w+" %")).join("")}</tbody></table><p class="muted">Give these levels in the final product dialog. <a data-do="cell" data-u="${u}" data-a="${fpA}">Open it</a></p>`)
     +(!g.gv?"":blk("gv",`Grammar and vocabulary (${g.blocks.find(b=>b.id==="gv").w} %)`,B.gv.mark,`<p class="muted">${gvSum(B)}</p><table><thead><tr><th style="text-align:left">Step</th><th>First try</th><th style="text-align:left">Done</th></tr></thead><tbody>${gvRows}</tbody></table>`))
     +(!g.other?"":blk("other",`Other competences (${g.blocks.find(b=>b.id==="other").w} %)`,B.other,`<table><thead><tr><th>Criterion</th><th>Steps (auto)</th><th>Levels</th><th>Mark</th></tr></thead><tbody>${g.other.map(c=>{const o=otherCrit(u,c);
@@ -904,7 +929,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       const mate=teamMates(k.a,v,S.P[u].group).find(m=>m.uid!==u&&(res(m.uid,k.a).levels||{}).group);   // a new member gets the group's levels
       quick(patch(u,k.a,{team:v||null,levels:{group:mate?Object.assign({},res(mate.uid,k.a).levels.group):null}}))},
     fin:()=>{const id=asId(S.ls),cur=(res(u,id).final||{})[k.c];quick(patch(u,id,{final:{[k.c]:cur===k.l?null:k.l}}))},
-    examsave:()=>quick(saveExam($("#main"))),examsave1:()=>quick(saveExam($("#dlgc"))),
+    examsave:()=>{quick(saveExam($("#main")));exDirty.clear()},examsave1:()=>{quick(saveExam($("#dlgc")));exDirty.clear()},
     replysave:()=>{const v=$("#rp-"+k.s).value.trim();if(!v)return;act(api.reply(u,a,k.s,v)).then(()=>cellPanel(u,a.id))},
     save:()=>{const o={feedback:$("#ffb").value};if(a.manual){const sc=$("#fsc").value,mx=$("#fmx").value;if(sc!==""&&mx!==""&&!isNaN(+sc)&&!isNaN(+mx)){o.score=+sc;o.max=+mx}}$("#dlg").close();act(api.result(u,a,o))},
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},

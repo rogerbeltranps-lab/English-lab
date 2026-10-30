@@ -136,10 +136,13 @@ function render(){
 // Points (Roger, 25–26 Oct 2026; shared/js/el-points.js): my points this term from the class presentations and the bonus they add to
 // my term grade so far (up to EL_POINTS_BONUS, in proportion to the best student of my group), and the rules.
 function pointsBox(){
-  const p=D.pt||{},tm=D.tm||{},bestOf=id=>Math.max(+(tm.best||{})[id]||0,+p[id]||0);
+  // best = the best student of my group with all the work done (teams/{group}.bestOk, kept by the dashboard; Roger, 30 Oct 2026),
+  // or the best of everyone while the dashboard has not saved it yet
+  const p=D.pt||{},tm=D.tm||{},ok=tm.bestOk||{},bestOf=id=>Math.max(ok[id]!=null?+ok[id]:+(tm.best||{})[id]||0,+p[id]||0);
+  const missOf=id=>all()?[]:elMissing(D.me.group,id,isDone,ls=>D.ls[ls]);
   if(!EL_TERMS.some(x=>+p[x.id]>0)&&!bestOf(elTerm()))return "";   // no points in my group yet
-  const L=lang(),term=elTerm(),mine=+p[term]||0,best=bestOf(term),miss=all()?[]:elMissing(D.me.group,term,isDone,ls=>D.ls[ls]),bonus=miss.length?0:elBonus(mine,best);
-  const past=EL_TERMS.filter(x=>x.id<term&&+p[x.id]>0).map(x=>`${elTermName(x.id,L)}: ${p[x.id]} ${t("punts","points")} → +${elNum(elBonus(+p[x.id],bestOf(x.id)),L)}`);
+  const L=lang(),term=elTerm(),mine=+p[term]||0,best=bestOf(term),miss=missOf(term),bonus=miss.length?0:elBonus(mine,best);
+  const past=EL_TERMS.filter(x=>x.id<term&&+p[x.id]>0).map(x=>`${elTermName(x.id,L)}: ${p[x.id]} ${t("punts","points")} → +${elNum(missOf(x.id).length?0:elBonus(+p[x.id],bestOf(x.id)),L)}`);
   return `<div class="box"><h2>🏆 ${t("Els meus punts","My points")} <small class="muted">· ${elTermName(term,L)}</small></h2>`
     +`<div class="ptgrid"><div><small class="muted">${t("Els meus punts","My points")}</small><b>${mine}</b></div>`
     +`<div><small class="muted">${t("Bonus a la nota del trimestre","Bonus on my term grade")}</small><b>+${elNum(bonus,L)} <small class="muted">${t("de","of")} +${elNum(EL_POINTS_BONUS,L)}</small></b></div>`
@@ -149,7 +152,7 @@ function pointsBox(){
     +(miss.length?`<div class="ptmiss">⏳ <b>${t("Sense tota la feina feta no tens el bonus.","No bonus without all your work done.")}</b> ${t(`Fes aquestes activitats i recuperes el teu +${elNum(elBonus(mine,best),L)}:`,`Do these activities and you get your +${elNum(elBonus(mine,best),L)} back:`)}<ul>`
       +miss.map(([a,d])=>`<li>${esc(a.title)} · <span class="muted">${t("calia fer-la el","due on")} ${when(d)}</span> <a class="go" href="${a.path}">${t("Fes-la ara","Do it now")}</a></li>`).join("")+`</ul></div>`
       :`<p class="ptok">✓ ${t("Has fet totes les activitats d'aquest trimestre: el bonus compta.","You have done all the activities of this term: your bonus counts.")}</p>`)
-    +`<p class="muted">${best?t(`La puntuació més alta de la classe aquest trimestre: ${best} punts. `,`The top score in your class this term: ${best} points. `):""}${t("Respon bé a classe per sumar-ne més!","Answer well in class to get more!")}</p>`
+    +`<p class="muted">${best?t(`La puntuació més alta de la classe amb tota la feina feta: ${best} punts. `,`The top score in your class with all the work done: ${best} points. `):""}${t("Respon bé a classe per sumar-ne més!","Answer well in class to get more!")}</p>`
     +(past.length?`<p class="muted">${past.join(" · ")}</p>`:"")
     +`<details class="all"><summary>${t("Com funciona","How it works")}</summary><ul class="ptrules">${elPointsRules().map(r=>`<li>${r.icon} ${EN?r.en:r.ca}</li>`).join("")}</ul></details></div>`}
 // Live class (Roger, 25 Oct 2026): while the teacher presents to my group (live/{group}, every minute), a link to join the
