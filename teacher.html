@@ -348,10 +348,10 @@ function matTab(){
   const R=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],cap=r=>r[0].toUpperCase()+r.slice(1);
   const a=(href,t,c)=>`<a href="${href}" target="_blank" rel="noopener"${c?` class="${c}"`:""}>${t}</a>`;
   return [["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
-    const games=(window.EL_GAMES||[]).filter(g=>g.course===c),lss=EL_LS.filter(l=>l.course===c);
+    const games=(window.EL_GAMES||[]).filter(g=>g.course===c).sort((x,y)=>((x.ls||"")+(x.lp||"")).localeCompare((y.ls||"")+(y.lp||""),"en",{numeric:true})),lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
-      +`<h3>🎮 Class games</h3>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation</th><th></th></tr>`
-        +games.map(g=>`<tr><td>${esc(g.emoji||"")} ${esc(g.title)}</td><td>${esc(g.ls||"")}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
+      +`<h3>🎮 Class games</h3>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation · Learning Path</th><th></th></tr>`
+        +games.map(g=>`<tr><td>${esc(g.emoji||"")} ${esc(g.title)}</td><td>${esc(g.ls||"")}${g.lp?" · "+esc(g.lp):""}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
       +lss.map(l=>{const k=l.id.replace("-","/"),w=(window.LP_PRINT||{})[k];
         return `<h3>📄 ${esc(l.title)}</h3>`
           +(l.study?`<p>Study PDF (vocabulary and grammar): ${R.slice(1).concat(l.pro?[["native","Pro"]]:[]).map(([r,n])=>a(l.study+r+".pdf",cap(r)+" · "+n,"chip")).join(" ")} <span class="muted">(Beginners uses Insecure)</span></p>`:"")

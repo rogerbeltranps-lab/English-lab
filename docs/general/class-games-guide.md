@@ -26,7 +26,7 @@ Kahoot-style games for class (Roger, 26 Oct 2026). The board runs on the project
 A game is only content: the engine is not changed for a new game.
 
 - A deck file `lab/game/decks/<course>-<topic>.js` (course is `2eso` or `4eso`).
-- One line in `lab/game/decks/index.js`: id, title, course, emoji and learning situation.
+- One line in `lab/game/decks/index.js`: id, title, course, emoji, learning situation and learning path. The board lists the games by course, then by learning situation and learning path.
 - The Start button on the learning path page.
 
 In the deck, slides go in order:
