@@ -93,6 +93,16 @@ window.LP = {
         { r: 'daring', q: 'Why does Mei say “Look!” to her viewers?', o: ['to make them feel they are there with her', 'because she can’t see her brother', 'to start a new topic'] },
         { r: 'daring', q: 'Which idea could you copy for your vlog script?', o: ['Say what is happening behind you, then compare it with what you usually do.', 'Read a list of facts without a greeting.', 'Talk only about the weather.'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Noah: Saturday at the bike park', en: 'Shadowing · Noah: Saturday at the bike park' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Noah: Saturday at the bike park', video: true, poster: 'video/noah-bike-park-poster.jpg', src: 'video/noah-bike-park.mp4', slow: 'video/noah-bike-park-slow.mp4', t: [0.7, 38.21], ts: [0.7, 46.22], lines: [
+        ['Noah', 'Hey, what\'s up? I\'m Noah, and today I\'m at the bike park with my friends.'],
+        ['Noah', 'It\'s Saturday morning, it\'s sunny and really windy, so it\'s perfect for riding.'],
+        ['Noah', 'I\'m wearing my helmet, gloves and my old blue tracksuit, because the park is full of mud.'],
+        ['Noah', 'Behind me, Leo and Sara are racing down the hill. Leo is winning, as usual!'],
+        ['Noah', 'I usually ride here with my dad on Sunday mornings, and we go slowly.'],
+        ['Noah', 'But this weekend I\'m filming a race for our club channel, so I\'m not riding, I\'m holding the camera.'],
+        ['Noah', 'Next week I\'m racing too. Wish me luck!']] } },
     { id: 'grammar', type: 'typed', mode: 'say', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Repàs: les formes del vlog', en: 'Review: the forms of the vlog' }, pill: '80 %',
       intro: { ca: 'Tot el que necessites per al guió: Present Continuous (ara), Present Simple (normalment), like + -ing, imperatius i expressions de temps.', en: 'Everything you need for the script: Present Continuous (now), Present Simple (usually), like + -ing, imperatives and time expressions.' },
       explain: [

@@ -87,6 +87,12 @@ window.LP = {
         { r: 'daring', q: 'Noah uses a screen today. How is it different from watching videos alone?', o: ['He films outside with his friends.', 'He watches races on his phone.', 'He plays a racing game at home.'] },
         { r: 'daring', q: 'Which tip from Screen Smart does Noah’s Saturday follow best?', o: ['Go outside.', 'Switch off your phone before bed.', 'Set a time limit.'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Screen Smart (School Radio)', en: 'Shadowing · Screen Smart (School Radio)' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Screen Smart (School Radio)', src: 'audio/screen-smart.mp3', slow: 'audio/screen-smart-slow.mp3', t: [26.95, 61.39], ts: [32.35, 73.46], lines: [
+        ['Presenter', 'Tip number one: take a break. After thirty minutes on a screen, stop for five minutes. Stand up, look out of the window, drink some water.'],
+        ['Presenter', 'Tip number two: set a time limit. Decide how long you want to play, for example one hour, and use the timer on your phone. When it rings, stop.'],
+        ['Presenter', 'Tip number three: switch off your phone one hour before you go to sleep, and keep it out of your bedroom. The light from the screen tells your brain that it is still daytime, so you don’t sleep well.']] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'like + -ing i imperatius', en: 'like + -ing and imperatives' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [

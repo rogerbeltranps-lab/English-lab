@@ -108,6 +108,12 @@ window.LP = {
         { r: 'daring', q: 'Why is a live radio report good for some facts but not for others?', o: ['It’s good for what is happening now, but it mixes facts and opinions and the match isn’t finished.', 'It’s never good because the reporters are students.', 'It’s good for everything because it’s live.'] },
         { r: 'daring', q: 'What do you need to add to use this report in your fact file?', o: ['the name of the source and the date', 'the reporters’ favourite team', 'nothing: radio doesn’t need a credit'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Live from the sports hall', en: 'Shadowing · Live from the sports hall' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Live from the sports hall', src: 'audio/live-from-the-sports-hall.mp3', slow: 'audio/live-from-the-sports-hall-slow.mp3', t: [37.04, 69.96], ts: [42.83, 80.96], lines: [
+        ['Sam', 'And the match is starting! Number seven, Marc, has the ball. He’s running… he’s jumping… and he scores! Two points for the Blue Team!'],
+        ['Emma', 'Marc usually plays as a defender, but today he’s playing as a forward. And it’s working!'],
+        ['Sam', 'Now the Green Team has the ball. Their captain, Júlia, is passing to number four… she’s shooting… and she misses. The Blue Team is winning, six to two.']] } },
     { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: d’on ho has tret?', en: 'Talk: where did you find it?' },
       intro: { ca: 'El teu company de vlog et pregunta per la font de la teva fitxa.', en: 'Your vlog buddy asks you about the source for your fact file.' },
       task: { beginners: 'Respon amb frases curtes: el nom de la web, qui l’ha escrit i si és fiable.', insecure: 'Respon amb frases completes sobre la teva font: el nom, qui l’ha escrit, la data i si és fiable.', safe: 'Answer about your real source. Give reasons: who wrote it, when, and one fact you found.', daring: 'Answer about your real source, give reasons and say how you checked a fact in a second source.' },

@@ -103,6 +103,18 @@ window.LP = {
         { r: 'daring', q: 'Which request to the head teacher does the meeting suggest?', o: ['permission to use the hall and the gym', 'money for a new band', 'a whole week without classes'] },
         { r: 'daring', q: '“We’re sending them on Wednesday.” Which is the best formal version for the email?', o: ['The invitations will be sent on Wednesday.', 'We’re gonna send them Wednesday.', 'Invitations on Wednesday, OK?'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Student council meeting', en: 'Shadowing · Student council meeting' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Student council meeting', src: 'audio/student-council-meeting.mp3', slow: 'audio/student-council-meeting-slow.mp3', t: [34.75, 70.19], ts: [43.75, 88.17], lines: [
+        ['Laia', 'Great. And music?'],
+        ['Omar', 'My cousin plays in a band. I’ll call him tonight.'],
+        ['Laia', 'Perfect. Who’s going to put up the decorations?'],
+        ['Omar', 'Class 4B is going to make paper lanterns in Art.'],
+        ['Laia', 'And the invitations?'],
+        ['Omar', 'We’re sending them on Wednesday. We’re going to invite families and the primary school.'],
+        ['Laia', 'OK. One problem: the hall is small. What if it rains and everyone is inside?'],
+        ['Omar', 'Don’t worry. We’ll use the gym too.'],
+        ['Laia', 'Good idea. I think it’ll be the best day of the term!']] } },
     { id: 'grammar', type: 'typed', mode: 'say', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Peticions educades', en: 'Polite requests' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa.', en: 'Read how it works and complete.' },
       explain: [

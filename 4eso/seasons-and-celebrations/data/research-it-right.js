@@ -92,6 +92,13 @@ window.LP = {
         { r: 'daring', q: 'Which words show that the speaker is reporting a belief, not a fact?', o: ['“people believed that…”', '“It took place in Ireland…”', '“It lasted three days.”'] },
         { r: 'daring', q: 'What would you need to credit this podcast on your card?', o: ['its name, the episode and the date you listened', 'only the speakers’ first names', 'nothing: audio sources don’t need credits'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Culture Bites: the story behind two autumn celebrations', en: 'Shadowing · Culture Bites: the story behind two autumn celebrations' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Culture Bites: the story behind two autumn celebrations', src: 'audio/culture-bites-origins.mp3', slow: 'audio/culture-bites-origins-slow.mp3', t: [0, 37.87], ts: [0, 45.52], lines: [
+        ['Emma', 'Welcome back to Culture Bites. Today: where do two famous autumn celebrations come from? Let’s start with Halloween.'],
+        ['Sam', 'Halloween comes from an old Celtic festival called Samhain. It took place in Ireland and Scotland more than two thousand years ago, at the end of the harvest and the start of winter.'],
+        ['Emma', 'And people believed that on that night, the spirits of the dead came back.'],
+        ['Sam', 'Exactly. So people used to light bonfires and wear masks to hide from the spirits. And here’s a surprise: they didn’t use pumpkins. They used to carve turnips!']] } },
     { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: és fiable?', en: 'Talk: can we trust it?' },
       intro: { ca: 'Un company et pregunta per la font que has trobat per a la fitxa de recerca.', en: 'A teammate asks you about the source you found for your research card.' },
       task: { beginners: 'Respon amb frases curtes: on l’has trobat, qui l’ha escrit i si és fiable.', insecure: 'Respon amb frases completes sobre la teva font: on és, qui l’ha escrit, de quan és i si és fiable.', safe: 'Answer each question about your real source. Give reasons: who wrote it, when, and how you checked the facts.', daring: 'Answer about your real source with reasons and evidence, and explain what you do when two sources disagree.' },
