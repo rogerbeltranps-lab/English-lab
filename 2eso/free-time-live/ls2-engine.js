@@ -73,10 +73,63 @@ var LS2 = (function () {
 
   /* ---------- typed answers (recall, practice, grammar) ---------- */
   const tries = {};
-  function typedHtml(items, prefix) {
-    return items.map((it, i) => '<div class="question"><p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' +
-      '<input type="text" class="typed" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+  /* Four skills (Roger, 30 Oct 2026: “work the 4 communicative competences equally”): Use of English practice can also be heard or said.
+     mode 'listen' (listen and complete): the browser's English voice says the sentence with a beep for the gap; the student types the missing
+     words and opens the written sentence only if they need it. mode 'say' (say it): the student reads the sentence and says it whole; speech
+     recognition fills the box when it hears an accepted answer. Without speech recognition, after a mic error or two misses, the box can be typed in. */
+  const SRC = () => window.SpeechRecognition || window.webkitSpeechRecognition;
+  const voiceEn = () => { const s = window.speechSynthesis; if (!s) return null; const v = s.getVoices(); return v.find(x => /^en(-|_)GB/i.test(x.lang)) || v.find(x => /^en(-|_)/i.test(x.lang)) || null; };
+  const spoken = q => String(q).replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').replace(/→/g, '. ').replace(/[“”]/g, '').replace(/\s+/g, ' ').trim();
+  const cue = q => (String(q).replace(/<[^>]+>/g, '').match(/\([^)]*\)/g) || []).join(' ');
+  let sayTok = 0, utt = [], bctx = null;
+  function beep(done) { try { bctx = bctx || new (window.AudioContext || window.webkitAudioContext)(); const o = bctx.createOscillator(), g = bctx.createGain(); o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(bctx.destination); o.start(); setTimeout(() => { o.stop(); done && done(); }, 450); } catch (e) { done && done(); } }
+  // Says text (or a gapped sentence, with a beep for each gap) in order; a newer call stops an older one.
+  function sayLine(q, rate, onend) {
+    const s = window.speechSynthesis; if (!s) { if (onend) onend(); return; } s.cancel(); const tok = ++sayTok;
+    const seq = String(q).replace(/<[^>]+>/g, '').split(/_{2,}(?:[\s/]*_{2,})*/).flatMap((t, i) => i ? [null, t] : [t]).filter(t => t === null || /[A-Za-z0-9]/.test(spoken(t)));
+    let i = 0; utt = [];
+    const next = () => { if (tok !== sayTok) return; if (i >= seq.length) { if (onend) onend(); return; } const t = seq[i++]; if (t === null) return beep(next);
+      // a browser without English voices may never fire 'end': a watchdog moves on after the time the line needs
+      const u = new SpeechSynthesisUtterance(spoken(t)), v = voiceEn(); let once = false; const go = () => { if (!once) { once = true; next(); } };
+      u.lang = 'en-GB'; if (v) u.voice = v; u.rate = rate || 0.95; u.onend = u.onerror = go; utt.push(u); s.speak(u);
+      setTimeout(go, 1500 + spoken(t).split(' ').length * 450 / (rate || 0.95)); };
+    next();
+  }
+  const modeHow = m => m === 'listen' ? (ca() ? 'Prem ▶, escolta la frase i escriu el que falta on sents el xiulet. Obre la frase només si ho necessites.' : 'Press ▶, listen to the sentence and type what is missing where you hear the beep. Open the sentence only if you need it.')
+    : m === 'say' ? (ca() ? 'Llegeix la frase, prem 🎤 i digues-la sencera en veu alta, amb el que falta. Si l’ordinador no t’entén dues vegades, la pots escriure.' : 'Read the sentence, press 🎤 and say the whole sentence aloud, with what is missing. If the computer doesn’t understand you twice, you can type it.') : '';
+  function typedHtml(items, prefix, mode) {
+    return items.map((it, i) => '<div class="question">' + (mode === 'listen'
+        ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
+          '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
+        : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (mode === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
+      '<input type="text" class="typed" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (mode === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : '') + '>' +
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>').join('');
+  }
+  const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
+  // the accepted answer the student said (in any recognition alternative), or null
+  const saidAnswer = (alts, answers) => { const heard = alts.map(expand); return answers.find(a => { const x = expand(a); return x.trim() && heard.some(h => h.includes(x)); }) || null; };
+  function bindModes(items, prefix, mode) {
+    if (mode === 'listen') items.forEach((it, i) => {
+      $('[data-hear="' + prefix + i + '"]').onclick = () => sayLine(it.q, 0.9);
+      $('[data-hear-slow="' + prefix + i + '"]').onclick = () => sayLine(it.q, 0.65);
+    });
+    const SR = SRC(); if (mode !== 'say' || !SR) return;
+    items.forEach((it, i) => {
+      const b = $('[data-mic="' + prefix + i + '"]'), box = $('#' + prefix + i), h = $('#' + prefix + 'h' + i), k = prefix + i + 'say';
+      b.onclick = () => {
+        let r; try { r = new SR(); } catch (e) { box.readOnly = false; return; }
+        r.lang = 'en-GB'; r.interimResults = false; r.maxAlternatives = 5; b.disabled = true; h.textContent = ca() ? 'T’escolto…' : 'Listening…';
+        r.onresult = e => {
+          const alts = Array.from(e.results[0]).map(x => x.transcript), hit = saidAnswer(alts, it.a), said = (ca() ? 'He sentit: ' : 'I heard: ') + '“' + alts[0] + '”';
+          if (hit) { box.value = hit; h.textContent = said + ' ✓'; box.dispatchEvent(new Event('input', { bubbles: true })); return; }
+          tries[k] = (tries[k] || 0) + 1; if (tries[k] >= 2) box.readOnly = false;
+          h.textContent = said + '. ' + (tries[k] >= 2 ? (ca() ? 'Pots escriure-ho a la casella.' : 'You can type it in the box.') : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
+        };
+        r.onerror = () => { box.readOnly = false; h.textContent = ca() ? 'No t’he sentit. Torna-ho a provar o escriu-ho.' : 'I couldn’t hear you. Try again or type it.'; };
+        r.onend = () => { b.disabled = false; if (h.textContent === 'T’escolto…' || h.textContent === 'Listening…') h.textContent = ''; };
+        try { r.start(); } catch (e) { b.disabled = false; box.readOnly = false; }
+      };
+    });
   }
   // reveal: true shows the answer at once (recall); otherwise the answer appears after the second wrong try.
   // got: [right, what was typed] per question of the last check (firstItems)
@@ -158,7 +211,7 @@ var LS2 = (function () {
       '<div class="flashcard" id="flashcard" tabindex="0"><div class="flash-inner"><div class="face front"><div class="label" id="cardIcon"></div><strong id="cardFront"></strong><p>' + (ca() ? 'Clica per girar la targeta' : 'Click to turn the card') + '</p></div><div class="face back"><div class="label" id="cardBackLabel">Català + example</div><strong id="cardMeaning"></strong><p id="cardBack"></p></div></div></div>' +
       '<div class="actions" id="cardTypeRow" hidden><input type="text" class="typed" id="cardType" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="' + (ca() ? 'Escriu la paraula en anglès' : 'Type the English') + '"><button class="btn" type="button" id="cardTypeCheck">' + (ca() ? 'Comprova i gira' : 'Check and turn') + '</button></div><p class="feedback" id="cardTypeMsg"></p>' +
       '<div class="counter" id="cardCounter"></div><div class="flash-actions"><button class="btn secondary" id="prevCard" type="button">← ' + (ca() ? 'Anterior' : 'Previous') + '</button><button class="btn" id="gotCard" type="button"></button><button class="btn secondary" id="againCard" type="button"></button><button class="btn secondary" id="nextCard" type="button">' + (ca() ? 'Següent' : 'Next') + ' →</button><button class="btn secondary" id="newCards" type="button"></button><button class="btn secondary" id="skipCards" type="button"></button></div><p class="instruction" id="cardNote"></p></div>' +
-      (p.practice ? '<div class="section-card"><h3>' + (ca() ? 'Completa les frases' : 'Complete the sentences') + '</h3>' + '<div id="vocabPractice"></div><div class="actions"><button class="btn" type="button" id="vocabCheck">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn('vocab') + '</div><div class="result" id="vocabResult"></div></div>' : ''),
+      (p.practice ? '<div class="section-card"><h3>' + (p.practiceMode === 'listen' ? (ca() ? 'Escolta i completa' : 'Listen and complete') : (ca() ? 'Completa les frases' : 'Complete the sentences')) + '</h3>' + (p.practiceMode ? '<p class="instruction">' + modeHow(p.practiceMode) + '</p>' : '') + '<div id="vocabPractice"></div><div class="actions"><button class="btn" type="button" id="vocabCheck">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn('vocab') + '</div><div class="result" id="vocabResult"></div></div>' : ''),
     bind() {
       const groups = forLevel(p.groups);
       $('#vocabGroups').innerHTML = groups.map(g => '<article class="vocab-group"><h3>' + g.g + '</h3><div class="chips">' + g.items.map(x => '<span class="chip" tabindex="0">' + x[0] + '<span class="chip-tooltip"><b>' + x[1] + '</b>' + x[2] + '</span></span>').join('') + '</div></article>').join('');
@@ -205,7 +258,7 @@ var LS2 = (function () {
       $('#cardType').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); typedCheck(); } };
       if (p.practice) {
         const items = forLevel(p.practice);
-        $('#vocabPractice').innerHTML = typedHtml(items, 'vp');
+        $('#vocabPractice').innerHTML = typedHtml(items, 'vp', p.practiceMode); bindModes(items, 'vp', p.practiceMode);
         stays('vocab', 'vp', 'vocabPractice', items, count => { const s = checkTyped(items, 'vp', false, count); if (count) { firstTry('practice', s, items.length); firstItems('vocab', p.practice, items, got); } const ok = s >= need(items.length); result($('#vocabResult'), s, items.length, ok); if (ok && count) complete('practice'); });
       }
     }
@@ -352,10 +405,10 @@ var LS2 = (function () {
 
   R.typed = p => ({
     html: (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
-      '<div class="section-card"><div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
+      '<div class="section-card">' + (p.mode ? '<p class="instruction">' + modeHow(p.mode) + '</p>' : '') + '<div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
     bind() {
       const items = forLevel(p.items);
-      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id);
+      $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode); bindModes(items, p.id, p.mode);
       stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = s >= need(items.length); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok && count) complete(p.id); });
     }
   });
@@ -530,7 +583,7 @@ var LS2 = (function () {
   });
 
   /* ---------- speaking (recording code from the 4 ESO course reference) ---------- */
-  let audioCtx, sourceNode, processor, micStream, pcm = [], recRate = 44100, recBlob = null, recUrl = null, recognition = null, srActive = false, srTimer = null, srFinal = '';
+  let srBox = null, audioCtx, sourceNode, processor, micStream, pcm = [], recRate = 44100, recBlob = null, recUrl = null, recognition = null, srActive = false, srTimer = null, srFinal = '';
   function encodeWav(buffers, rate) {
     const len = buffers.reduce((n, a) => n + a.length, 0), samples = new Float32Array(len); let o = 0;
     buffers.forEach(a => { samples.set(a, o); o += a.length; });
@@ -547,7 +600,7 @@ var LS2 = (function () {
       if (!srActive) return;
       try {
         recognition = new SR(); recognition.lang = 'en-US'; recognition.continuous = true; recognition.interimResults = true;
-        recognition.onresult = e => { let interim = ''; for (let i = e.resultIndex; i < e.results.length; i++) { const t = e.results[i][0].transcript; if (e.results[i].isFinal) srFinal += t.trim() + ' '; else interim += t; } $('#speechTranscript').value = (srFinal + interim).trim(); };
+        recognition.onresult = e => { let interim = ''; for (let i = e.resultIndex; i < e.results.length; i++) { const t = e.results[i][0].transcript; if (e.results[i].isFinal) srFinal += t.trim() + ' '; else interim += t; } (srBox || $('#speechTranscript')).value = (srFinal + interim).trim(); };
         recognition.onend = () => { if (srActive) srTimer = setTimeout(launch, 180); };
         recognition.start();
       } catch (e) { if (srActive) srTimer = setTimeout(launch, 250); }
@@ -576,7 +629,7 @@ var LS2 = (function () {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
           sourceNode = audioCtx.createMediaStreamSource(micStream); processor = audioCtx.createScriptProcessor(4096, 1, 1); pcm = [];
           processor.onaudioprocess = e => pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
-          sourceNode.connect(processor); processor.connect(audioCtx.destination); startSR();
+          sourceNode.connect(processor); processor.connect(audioCtx.destination); srBox = null; startSR();
           $('#recordStatus').textContent = ca() ? 'Gravant… parla ara.' : 'Recording… speak now.';
           $('#startRecord').disabled = true; $('#stopRecord').disabled = false; $('#downloadWav').disabled = true; $('#spAi').disabled = true;
         } catch (e) { $('#recordStatus').textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Dona permís i torna-ho a provar.' : 'Microphone access was not available. Allow it and try again.'; }
@@ -602,6 +655,105 @@ var LS2 = (function () {
       };
     }
   });
+
+  /* Talk (four skills, Roger 30 Oct 2026): a spoken interaction for self-study. The browser's English voice asks the partner's questions
+     (p.partner: [{q, ca}], cumulative by route like items) one by one with time to answer while the student is recorded; the transcript is
+     made only while the student answers. Then AI feedback and a hand-in like a step (state.steps[id], read on the dashboard), done when the
+     transcript has p.min words (per route). Safe and Daring hear each question before they can read it. Native (Pro): no recording (Roger),
+     a written plan for each question instead. */
+  R.talk = p => {
+    const id = p.id, nat = level === 'native';
+    return {
+      html: '<div class="section-card"><h3>' + (ca() ? 'La conversa' : 'The conversation') + '</h3><p class="instruction" id="' + id + 'Task"></p>' +
+        '<ol id="' + id + 'Qs" style="margin:8px 0 12px;padding-left:22px;line-height:2"></ol>' +
+        '<details class="draft-box"><summary>' + (ca() ? 'Mira un model (després d’intentar-ho)' : 'See a model (after you try)') + '</summary><div class="model" id="' + id + 'Model"></div></details></div>' +
+        (nat ? '<div class="section-card"><h3>Your plan</h3><p class="instruction">No recording on your route: for each question, write the ideas you would use and how you would develop them (notes, not full sentences).</p><div id="' + id + 'Notes"></div></div>'
+          : '<div class="section-card"><h3>' + (ca() ? 'Parla' : 'Talk') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Comença</strong>: es grava la conversa i l’ordinador et fa les preguntes una a una, amb temps per respondre. Respon en veu alta amb frases completes i afegeix-hi algun detall. Millor amb auriculars.' : 'Press <strong>Start</strong>: the recording starts and the computer asks you the questions one by one, with time to answer. Answer out loud in full sentences and add a detail. Headphones help.') + '</p>' +
+          '<div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="' + id + 'Start">● ' + (ca() ? 'Comença' : 'Start') + '</button><button class="btn secondary" type="button" id="' + id + 'Stop" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button><button class="btn secondary" type="button" id="' + id + 'Wav" disabled>' + (ca() ? 'Descarrega el WAV' : 'Download WAV') + '</button></div>' +
+          '<div class="record-status" id="' + id + 'Status">' + (ca() ? 'A punt.' : 'Ready.') + '</div><audio id="' + id + 'Audio" controls style="width:100%;display:none"></audio></div>' +
+          '<div class="section-card"><h3>' + (ca() ? 'Revisa la transcripció' : 'Transcript') + '</h3><p class="instruction">' + (ca() ? 'Amb Chrome, les teves respostes s’escriuen mentre parles. Corregeix-les perquè diguin el que has dit.' : 'With Chrome, your answers are written down while you speak. Correct them so they match what you said.') + '</p><textarea id="' + id + 'Tr" placeholder="Your answers will appear here."></textarea>' +
+          '<p class="instruction">' + (ca() ? 'Prem <strong>Feedback amb IA</strong>: es descarrega el WAV i s’obre ChatGPT. Adjunta el WAV i prem Envia. Si vols, torna a fer la conversa millor.' : 'Press <strong>AI feedback</strong>: the WAV downloads and ChatGPT opens. Attach the WAV and press Send. You can do the conversation again, better.') + '</p>' +
+          '<div class="actions"><button class="btn secondary" type="button" id="' + id + 'Ai" disabled>' + (ca() ? 'Feedback amb IA ↗' : 'AI feedback ↗') + '</button></div><p class="tiny" id="' + id + 'AiMsg"></p></div>') +
+        '<div class="section-card"><div class="actions"><button class="btn" type="button" id="' + id + 'Send">' + (ca() ? 'Entrega la conversa' : 'Hand in the conversation') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
+      bind() {
+        const qs = forLevel(p.partner), key = id + '_' + level, wait = (p.wait || { beginners: 12, insecure: 12, safe: 16, daring: 20 })[level] || 16;
+        state.steps = state.steps || {}; state.speak = state.speak || {}; const sp = state.speak[key] = state.speak[key] || {};
+        $('#' + id + 'Task').innerHTML = byLevel(p.task); $('#' + id + 'Model').innerHTML = byLevel(p.model);
+        $('#' + id + 'Qs').innerHTML = qs.map((q, i) => '<li><button class="btn secondary" type="button" data-tq="' + id + i + '" aria-label="Listen">▶</button> ' +
+          (ca() ? q.q + (q.ca ? ' <span class="tiny">(' + q.ca + ')</span>' : '') : '<details style="display:inline-block;vertical-align:middle"><summary>' + 'Show the question' + '</summary>' + q.q + '</details>') + '</li>').join('');
+        qs.forEach((q, i) => { $('[data-tq="' + id + i + '"]').onclick = () => sayLine(q.q, ca() ? 0.85 : 0.95); });
+        const msg = $('#' + id + 'Msg'), min = (p.min || { beginners: 15, insecure: 25, safe: 50, daring: 70, native: 40 })[level] || 30;
+        const text = () => nat ? qs.map((q, i) => q.q + ' — ' + ((sp.notes || [])[i] || '').trim()).join('\n') : (sp.tr || '').trim();
+        if (nat) {
+          sp.notes = sp.notes || [];
+          $('#' + id + 'Notes').innerHTML = qs.map((q, i) => '<label class="field"><strong>' + q.q + '</strong><textarea data-n="' + i + '" rows="2"></textarea></label>').join('');
+          $$('#' + id + 'Notes textarea').forEach(t => { t.value = sp.notes[+t.dataset.n] || ''; t.oninput = () => { sp.notes[+t.dataset.n] = t.value; save(); }; });
+        } else {
+          const tr = $('#' + id + 'Tr'), st = $('#' + id + 'Status'), btn = n => $('#' + id + n);
+          tr.value = sp.tr || ''; tr.oninput = () => { sp.tr = tr.value; save(); };
+          // speech recognition only while the student answers, so the computer's questions are not written down
+          let rec = null, timer = null, run = 0;
+          const listen = on => {
+            try { if (rec) rec.stop(); } catch (e) {} rec = null; const SR = SRC(); if (!on || !SR) return;
+            const base = tr.value.trim() ? tr.value.trim() + ' ' : ''; let fin = '';
+            try { rec = new SR(); rec.lang = 'en-GB'; rec.continuous = true; rec.interimResults = true;
+              rec.onresult = e => { let inter = ''; for (let k = e.resultIndex; k < e.results.length; k++) { const t = e.results[k][0].transcript; if (e.results[k].isFinal) fin += t.trim() + ' '; else inter += t; } tr.value = (base + fin + inter).trim(); sp.tr = tr.value; save(); };
+              rec.start(); } catch (e) {}
+          };
+          const stop = async () => {
+            run++; clearTimeout(timer); sayTok++; if (window.speechSynthesis) speechSynthesis.cancel(); listen(false);
+            if (!processor) return;
+            processor.disconnect(); sourceNode.disconnect(); micStream.getTracks().forEach(t => t.stop()); await audioCtx.close(); processor = null;
+            recBlob = encodeWav(pcm, recRate); if (recUrl) URL.revokeObjectURL(recUrl); recUrl = URL.createObjectURL(recBlob);
+            const a = $('#' + id + 'Audio'); a.src = recUrl; a.style.display = 'block';
+            btn('Start').disabled = false; btn('Stop').disabled = true; btn('Wav').disabled = false; btn('Ai').disabled = false;
+            st.textContent = ca() ? 'Gravació a punt. Escolta-la, revisa la transcripció i demana feedback.' : 'Recording ready. Listen to it, check the transcript and ask for feedback.';
+          };
+          btn('Start').onclick = async () => {
+            try {
+              micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+              audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
+              sourceNode = audioCtx.createMediaStreamSource(micStream); processor = audioCtx.createScriptProcessor(4096, 1, 1); pcm = [];
+              processor.onaudioprocess = e => pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+              sourceNode.connect(processor); processor.connect(audioCtx.destination);
+            } catch (e) { st.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Dona permís i torna-ho a provar.' : 'Microphone access was not available. Allow it and try again.'; return; }
+            btn('Start').disabled = true; btn('Stop').disabled = false; btn('Wav').disabled = true; btn('Ai').disabled = true;
+            if (tr.value.trim()) { tr.value = ''; sp.tr = ''; save(); }
+            const me = ++run; let i = 0;
+            const next = () => {
+              if (me !== run) return; listen(false);
+              if (i >= qs.length) { stop(); return; }
+              const q = qs[i++]; st.textContent = (ca() ? 'Pregunta ' : 'Question ') + i + ' / ' + qs.length + ' 🔊';
+              sayLine(q.q, ca() ? 0.85 : 0.95, () => {
+                if (me !== run) return; listen(true); let left = wait;
+                const tick = () => { if (me !== run) return; st.textContent = (ca() ? 'Respon ara… ' : 'Answer now… ') + left + ' s · ' + (ca() ? 'pregunta ' : 'question ') + i + ' / ' + qs.length; if (left-- <= 0) return next(); timer = setTimeout(tick, 1000); };
+                tick();
+              });
+            };
+            next();
+          };
+          btn('Stop').onclick = stop;
+          btn('Wav').onclick = downloadWav;
+          btn('Ai').onclick = () => {
+            const prompt = 'IMPORTANT: ENCARA NO DONIS FEEDBACK SI NO HI HA CAP ÀUDIO ADJUNT. Si aquest missatge arriba abans que l’àudio, respon només: "Adjunta l’àudio i l’escoltaré."\n\nQuan l’àudio estigui adjunt, escolta’l i actua com a professor d’anglès de 2n d’ESO dins de la Learning Situation “Free Time, Live!”, Learning Path ' + LP.n + ' “' + LP.title + '”.\n\nÉs una conversa: l’ordinador fa les preguntes i l’alumne respon.\nNivell: ' + cap(level) + '.\nTasca: ' + byLevel(p.task).replace(/<[^>]+>/g, '') + '\nPreguntes: ' + qs.map((q, i) => (i + 1) + '. ' + q.q).join(' ') + '\n\n' +
+              (tr.value.trim() ? 'Transcripció automàtica de les respostes (pot contenir errors):\n"' + tr.value.trim() + '"\n\nDona prioritat al que realment se sent a l’àudio.' : 'No hi ha transcripció automàtica. Escolta l’àudio abans de donar feedback.') +
+              '\n\n' + learningSupport.aiLanguage(level) + ' No posis nota numèrica. Respon només amb aquests apartats:\n1. ✅ Què ha fet bé — una o dues coses concretes.\n2. 🔧 Què ha de corregir — màxim 2 errors importants, amb la frase correcta.\n3. 💬 Interacció — si respon a cada pregunta, amb frases completes i algun detall.\n4. 🗣️ Pronunciació — un sol problema clar, si n’hi ha.\n5. 🎯 Un següent pas.';
+            const win = window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(prompt), '_blank', 'noopener,noreferrer');
+            downloadWav();
+            $('#' + id + 'AiMsg').textContent = win ? (ca() ? '✓ WAV descarregat · ChatGPT obert. Adjunta el WAV i prem Envia.' : '✓ WAV downloaded · ChatGPT opened. Attach the WAV and press Send.') : (ca() ? 'El navegador ha bloquejat la pestanya. Permet les finestres emergents.' : 'The browser blocked the tab. Allow pop-ups and try again.');
+          };
+        }
+        if (state.steps[id] && state.done[id]) { msg.className = 'feedback ok'; msg.textContent = (ca() ? 'Entregada el ' : 'Handed in on ') + new Date(state.steps[id].date).toLocaleDateString() + (ca() ? '. Si la tornes a fer, entrega-la una altra vegada.' : '. If you do it again, hand it in again.'); }
+        $('#' + id + 'Send').onclick = () => {
+          const n = nat ? words((sp.notes || []).join(' ')) : words(sp.tr || '');
+          if (n < min) { msg.className = 'feedback no'; msg.textContent = nat ? 'Write a few ideas for every question (at least ' + min + ' words in all).' : ca() ? 'La transcripció té ' + n + ' paraules: respon totes les preguntes (almenys ' + min + ' paraules). Si Chrome no l’ha escrita, escriu el que has dit.' : 'Your transcript has ' + n + ' words: answer every question (at least ' + min + ' words). If Chrome didn’t write it, type what you said.'; return; }
+          state.steps[id] = { level, title: tx(p.title), f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+          complete(id); save();
+          msg.className = 'feedback ok'; msg.textContent = ca() ? 'Entregada ✓ El professor ho veurà al seu tauler.' : 'Handed in ✓ Your teacher will see it on the dashboard.';
+        };
+      }
+    };
+  };
 
   /* ---------- sample exam: points per item, tasks marked by ChatGPT, score summary ---------- */
   const ptsOf = (p, q) => q.p || (q.o ? p.pts[0] : p.pts[1]);

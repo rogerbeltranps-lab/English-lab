@@ -63,6 +63,48 @@ window.LP = {
         { q: 'Which credit line is in the right order?', o: ['"Diwali", Encyclopedia website, 2024.', '2024, Diwali, Encyclopedia website.', 'Encyclopedia website 2024 "Diwali"'] },
         { q: 'Which credit line is complete?', o: ['"Thanksgiving history", History museum website, 2025.', '"Thanksgiving history".', 'I found it on the internet.'] }
       ] },
+    { id: 'again', type: 'mc', tab: { ca: 'Escolta una font', en: 'Listen to a source' }, title: { ca: 'Escolta: un pòdcast també és una font', en: 'Listen: a podcast is a source too' }, pill: { ca: 'Pòdcast · 80 %', en: 'Podcast · 80 %' },
+      intro: { ca: 'Escolta el pòdcast de l’LP3 com un investigador: quins fets dona, quins comprovaries i com parla de les creences.', en: 'Listen to the LP3 podcast like a researcher: what facts does it give, which ones would you check, and how does it talk about beliefs?' },
+      media: { audio: 'audio/culture-bites-origins.mp3', title: 'Culture Bites: the story behind two autumn celebrations', script: [
+        ['Emma', 'Welcome back to Culture Bites. Today: where do two famous autumn celebrations come from? Let’s start with Halloween.'],
+        ['Sam', 'Halloween comes from an old Celtic festival called Samhain. It took place in Ireland and Scotland more than two thousand years ago, at the end of the harvest and the start of winter.'],
+        ['Emma', 'And people believed that on that night, the spirits of the dead came back.'],
+        ['Sam', 'Exactly. So people used to light bonfires and wear masks to hide from the spirits. And here’s a surprise: they didn’t use pumpkins. They used to carve turnips!'],
+        ['Emma', 'Turnips? So where do the pumpkins come from?'],
+        ['Sam', 'In the 1800s, many Irish people moved to the United States. Pumpkins were bigger and easier to carve, so the tradition changed.'],
+        ['Emma', 'Now, Thanksgiving. It takes place on the fourth Thursday of November, and this year that’s the twenty-sixth.'],
+        ['Sam', 'The story usually starts in 1621. A group of English settlers, the Pilgrims, had a harvest feast with the Wampanoag people, who lived in the area. It lasted three days.'],
+        ['Emma', 'But it didn’t become a national holiday until 1863, when President Abraham Lincoln made it official.'],
+        ['Sam', 'Today families travel home, get together and share a big meal, usually with turkey. Many people say what they are grateful for.'],
+        ['Emma', 'It’s important to remember that not everybody sees the story in the same way. For some Native Americans, it is a day of mourning, a day to remember what they lost.'],
+        ['Sam', 'So both celebrations started as harvest festivals, but they have changed a lot over time.'],
+        ['Emma', 'That’s all for today. Happy holidays!']] },
+      chunks: ['It lasted three days', 'not everybody sees the story in the same way'],
+      items: [
+        { q: 'What kind of source is Culture Bites?', o: ['a podcast', 'a newspaper', 'an encyclopedia'], h: 'Escolta el principi: “Welcome back to…”.' },
+        { q: 'Which of these is a fact you can check?', o: ['Thanksgiving became a national holiday in 1863.', 'Thanksgiving is the best celebration.', 'Pumpkins are more fun than turnips.'], h: 'Un fet té dades que es poden comprovar.' },
+        { q: 'How long did the 1621 harvest feast last?', o: ['three days', 'one day', 'a week'], h: 'Escolta “It lasted…”.' },
+        { q: 'Who made Thanksgiving a national holiday?', o: ['President Abraham Lincoln', 'the Pilgrims', 'the Wampanoag people'], h: 'Escolta l’any 1863.' },
+        { q: 'For some Native Americans, Thanksgiving is…', o: ['a day of mourning', 'a day of shopping', 'a harvest festival'], h: 'Escolta “For some Native Americans…”.' },
+        { r: 'insecure', q: 'What did people use to carve before pumpkins?', o: ['turnips', 'potatoes', 'apples'], h: 'Escolta “they didn’t use pumpkins”.' },
+        { r: 'safe', q: 'How does Emma talk about the Thanksgiving story?', o: ['She says not everybody sees it in the same way.', 'She says only one version is true.', 'She says the story is not important.'] },
+        { r: 'safe', q: 'You want to write “Samhain took place more than two thousand years ago” on your card. What should you do?', o: ['Check it in a second reliable source.', 'Copy it: a podcast is always right.', 'Leave it out: old facts can’t be checked.'] },
+        { r: 'daring', q: 'Which words show that the speaker is reporting a belief, not a fact?', o: ['“people believed that…”', '“It took place in Ireland…”', '“It lasted three days.”'] },
+        { r: 'daring', q: 'What would you need to credit this podcast on your card?', o: ['its name, the episode and the date you listened', 'only the speakers’ first names', 'nothing: audio sources don’t need credits'] }
+      ] },
+    { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: és fiable?', en: 'Talk: can we trust it?' },
+      intro: { ca: 'Un company et pregunta per la font que has trobat per a la fitxa de recerca.', en: 'A teammate asks you about the source you found for your research card.' },
+      task: { beginners: 'Respon amb frases curtes: on l’has trobat, qui l’ha escrit i si és fiable.', insecure: 'Respon amb frases completes sobre la teva font: on és, qui l’ha escrit, de quan és i si és fiable.', safe: 'Answer each question about your real source. Give reasons: who wrote it, when, and how you checked the facts.', daring: 'Answer about your real source with reasons and evidence, and explain what you do when two sources disagree.' },
+      partner: [
+        { q: 'Where did you find your information?', ca: 'On has trobat la informació?' },
+        { q: 'Who wrote it?', ca: 'Qui l’ha escrit?' },
+        { q: 'Is it reliable? Why?', ca: 'És fiable? Per què?' },
+        { r: 'insecure', q: 'When was it written?', ca: 'Quan es va escriure?' },
+        { r: 'safe', q: 'Did you check the facts in a second source?' },
+        { r: 'safe', q: 'How do you write about people’s beliefs with respect?' },
+        { r: 'daring', q: 'What do you do if two sources say different things?' }
+      ],
+      model: { beginners: 'I found it on the BBC website. A journalist wrote it. Yes, it is reliable.', insecure: 'I found it on the BBC website. A journalist wrote it. It is from 2024. I think it is reliable because the BBC is a big news website.', safe: 'I found it on Britannica, an online encyclopedia. An expert wrote it and it was updated in 2024. I think it’s reliable because it gives dates and its own sources. I checked the date of the festival on a second website and it was the same. When I write about beliefs, I say “many people believe…”, not “it is true”.', daring: 'I found it on Britannica, an online encyclopedia. It was written by a historian and updated in 2024, so it’s recent and the author is an expert. I checked the main date on a museum website and they agreed. When I write about beliefs, I use phrases like “for many Hindus” or “people believe”, so I don’t present a belief as a fact. If two sources disagree, I look for a third, more official one, and if they still disagree, I write “some sources say…” and give both.' } },
     // Piece 3 and the evidence for LS criteria 4.2 (rating each source with two reasons), 6.1 (key information per source, where they agree or differ, full credit lines)
     // and CC3 3.2 (one stereotype, why it is unfair, how to avoid it). A step, so the teacher sees it; it is also saved as piece 3 of the final product.
     { id: 'card', type: 'step', product: 3, tab: { ca: 'Fitxa', en: 'Card' }, title: { ca: 'Peça 3: fitxa de recerca', en: 'Piece 3: research card' }, pill: { ca: 'Ho veu el professor', en: 'Your teacher sees it' },

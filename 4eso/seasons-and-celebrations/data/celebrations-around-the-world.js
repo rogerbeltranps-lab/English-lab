@@ -14,7 +14,7 @@ window.LP = {
         { r: 'safe', q: 'The clocks go ___ in October.', a: ['back'] },
         { r: 'safe', q: 'It’s ___ today. Wear a jumper.', a: ['chilly', 'cold', 'cool'] }
       ] },
-    { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari de celebracions', en: 'Celebration vocabulary' },
+    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari de celebracions', en: 'Celebration vocabulary' },
       intro: { ca: 'Explora cada expressió, practica amb les targetes i completa les frases (80 %).', en: 'Explore each expression, practise with the cards and complete the sentences (80 %).' },
       receptive: 'menorah · diyas (oil lamps) · lanterns · reunion dinner · Advent calendar · Caga Tió',
       core: { insecure: ['celebration', 'festival', 'holiday', 'tradition', 'custom', 'parade', 'fireworks', 'lights', 'candles', 'decorations', 'present / gift', 'costume', 'special meal', 'relatives', 'celebrate', 'decorate', 'dress up', 'give / get presents', 'visit relatives', 'light candles'], safe: ['tradition', 'custom', 'parade', 'fireworks', 'decorations', 'relatives', 'celebrate', 'dress up', 'light candles', 'gather', 'get together', 'take part in', 'look forward to', 'pass down', 'share a meal', 'exchange gifts', 'meaningful', 'traditional', 'religious', 'crowded'], daring: ['tradition', 'custom', 'celebrate', 'take part in', 'look forward to', 'pass down', 'mark an occasion', 'exchange gifts', 'meaningful', 'religious', 'secular', 'belonging', 'heritage', 'roots', 'community', 'ritual', 'gratitude', 'commemorate', 'honour the dead / ancestors', 'the festive season'] },
@@ -94,7 +94,23 @@ window.LP = {
         { r: 'safe', q: 'What does Diwali celebrate, according to the video?', o: ['good over evil and light over darkness', 'the end of the school year', 'the harvest of apples'] },
         { r: 'daring', q: 'Which idea from the video also appears in the reading text?', o: ['Families share food and exchange gifts.', 'Children get red envelopes.', 'People play with a dreidel.'] }
       ] },
-    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple per a costums · on / in / at', en: 'Present Simple for customs · on / in / at' }, pill: '80 %',
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: costums de la Castanyada', en: 'Listen again: Castanyada customs' }, pill: { ca: 'Vídeo · 80 %', en: 'Video · 80 %' },
+      intro: { ca: 'Ja vas veure aquest vídeo a l’LP1. Ara escolta’l per als costums: què fa la gent i quan.', en: 'You watched this video in LP1. Now listen for the customs: what people do and when.' },
+      media: { videos: [{ base: 'video/halloween-castanyada', title: 'Culture Bites: Halloween and the Castanyada' }], videoCredit: 'Illustrated video made for English Lab. Voices generated with ElevenLabs.' },
+      chunks: ['many families celebrate the Castanyada', 'Many families make them at home together'],
+      items: [
+        { q: 'When do many families celebrate the Castanyada?', o: ['on the thirty-first of October', 'on the first of November', 'at the end of December'], h: 'Escolta “On the same night…”.' },
+        { q: 'What do many people do on All Saints’ Day?', o: ['They visit the cemetery.', 'They carve turnips.', 'They light bonfires.'], h: 'Escolta “On that day, many people…”.' },
+        { q: 'Why did the bell ringers eat roasted chestnuts?', o: ['to keep warm and get energy', 'because they were cheap', 'to remember the dead'], h: 'Escolta “They ate roasted chestnuts to…”.' },
+        { q: 'What are panellets made with?', o: ['almonds, sugar and pine nuts', 'chestnuts and sweet potatoes', 'flour, eggs and chocolate'], h: 'Escolta la part de les postres.' },
+        { q: 'Who sells roasted chestnuts in the streets?', o: ['castanyeres', 'bell ringers', 'children in costumes'], h: 'Escolta “women who sell roasted chestnuts”.' },
+        { r: 'insecure', q: 'Where do many families make panellets?', o: ['at home', 'at school', 'in the street'], h: 'Escolta “Many families make them…”.' },
+        { r: 'safe', q: 'Where did people use to celebrate Samhain?', o: ['in Ireland and Scotland', 'in the United States', 'in Catalonia'] },
+        { r: 'safe', q: 'Which sentence describes a custom today, with the Present Simple?', o: ['Many families make panellets at home.', 'People used to carve turnips.', 'Many Irish people moved to the United States.'] },
+        { r: 'daring', q: 'What do the two celebrations have in common, according to Sam?', o: ['They are about the dead and the end of the harvest.', 'They both use pumpkins and turnips.', 'They both started in the 1800s.'] },
+        { r: 'daring', q: '“At school, someone often dresses up as one.” What does “one” refer to?', o: ['a castanyera', 'a bell ringer', 'a spirit'] }
+      ] },
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple per a costums · on / in / at', en: 'Present Simple for customs · on / in / at' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa les frases. Si falles dues vegades, et mostrarem la resposta.', en: 'Read how it works and complete the sentences. After two wrong tries you will see the answer.' },
       explain: [
         { ca: 'Fem servir el <strong>Present Simple</strong> per parlar de costums que es repeteixen cada any: <em>People decorate their houses. Children dress up. We don’t work on 25 December.</em>', en: 'We use the <strong>Present Simple</strong> for customs that happen every year: <em>People decorate their houses. Children dress up. We don’t work on 25 December.</em>' },
@@ -119,7 +135,7 @@ window.LP = {
         { r: 'daring', q: 'People exchange gifts at midnight. → Gifts ___ ___ at midnight.', a: ['are exchanged'], en: 'are + past participle.' },
         { r: 'daring', q: 'They don’t sell chestnuts in summer. → Chestnuts ___ ___ ___ in summer.', a: ["aren't sold", 'are not sold'], en: 'Negative passive: aren’t + past participle.' }
       ] },
-    { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada (LS1 + LS2)', en: 'Mixed practice (LS1 + LS2)' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada (LS1 + LS2)', en: 'Mixed practice (LS1 + LS2)' }, pill: '80 %',
       intro: { ca: 'Aquí es barregen coses noves i de la LS1: primer pensa quina forma necessites.', en: 'New and LS1 language mixed: first decide which form you need.' },
       items: [
         { q: 'The parade starts ___ ten o’clock.', a: ['at'], ca: 'Hora → at.', en: 'Clock time → at.' },
@@ -144,6 +160,19 @@ window.LP = {
     { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Speaking: un visitant et pregunta', en: 'Speaking: a visitor asks you' },
       intro: { ca: 'Grava l’explicació de la mateixa celebració. Fes servir les notes, no llegeixis el text.', en: 'Record your explanation of the same celebration. Use notes; don’t read your text.' },
       task: { beginners: 'Explica la teva celebració a un visitant (25–35 segons) amb la pauta: què és, quan, dos costums, un menjar i com et sents. Fes servir el model i canvia les paraules.', insecure: 'Explica la teva celebració a un visitant (45–60 segons) amb la pauta: què és, quan, tres costums, un menjar i com et sents.', safe: 'Explain your celebration to a visitor (60–90 s) and answer: Why is it important to you?', daring: 'Explain your celebration to a visitor (90–120 s), including its meaning, and answer: Why is it important to you?' },
-      model: { beginners: 'The Castanyada is celebrated on 31 October. Families eat together. We eat chestnuts and panellets. I feel happy.', insecure: 'The Castanyada is celebrated on 31 October. Families get together. We roast chestnuts and eat panellets. Some children dress up. I feel happy because we eat together.', safe: 'The Castanyada is a traditional, family-friendly celebration. It takes place on 31 October. People roast chestnuts and sweet potatoes and share a meal. It is important to me because my grandparents pass the recipes down to us.', daring: 'The Castanyada, a local celebration, is held on 31 October, the night before All Saints’ Day. Chestnuts are roasted and panellets are shared. For many families it is about belonging and honouring older generations, so it matters to me because it connects me to my roots.' } }
+      model: { beginners: 'The Castanyada is celebrated on 31 October. Families eat together. We eat chestnuts and panellets. I feel happy.', insecure: 'The Castanyada is celebrated on 31 October. Families get together. We roast chestnuts and eat panellets. Some children dress up. I feel happy because we eat together.', safe: 'The Castanyada is a traditional, family-friendly celebration. It takes place on 31 October. People roast chestnuts and sweet potatoes and share a meal. It is important to me because my grandparents pass the recipes down to us.', daring: 'The Castanyada, a local celebration, is held on 31 October, the night before All Saints’ Day. Chestnuts are roasted and panellets are shared. For many families it is about belonging and honouring older generations, so it matters to me because it connects me to my roots.' } },
+    { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: una estudiant d’intercanvi', en: 'Talk: an exchange student' },
+      intro: { ca: 'La Priya, una estudiant d’intercanvi de l’Índia, et pregunta per les celebracions d’aquí. Respon-li.', en: 'Priya, an exchange student from India, asks you about celebrations here. Answer her questions.' },
+      task: { beginners: 'Respon amb frases curtes (It is on… / People… / I like…). Fes servir el model i canvia les paraules.', insecure: 'Respon amb frases completes i el Present Simple (People… / We usually…). Afegeix un detall a cada resposta.', safe: 'Answer each question in two or three sentences. Use the Present Simple for customs, on / in / at for dates, and add a personal detail.', daring: 'Answer each question in detail: customs, dates and how it feels. When she talks about Diwali, compare it with your celebration.' },
+      partner: [
+        { q: 'Hi! What’s your favourite celebration here?', ca: 'Quina és la teva celebració preferida?' },
+        { q: 'When is it?', ca: 'Quan és?' },
+        { q: 'What do people do on that day?', ca: 'Què fa la gent aquell dia?' },
+        { r: 'insecure', q: 'What do you eat?', ca: 'Què mengeu?' },
+        { r: 'safe', q: 'How do you usually celebrate it with your family or friends?' },
+        { r: 'safe', q: 'Why do you like it?' },
+        { r: 'daring', q: 'In India we celebrate Diwali with lamps and fireworks. Is your celebration similar or different?' }
+      ],
+      model: { beginners: 'My favourite celebration is the Castanyada. It is on the 31st of October. People eat chestnuts. I like it.', insecure: 'My favourite celebration is the Castanyada. It is on the 31st of October. People eat roasted chestnuts and panellets. We eat chestnuts and sweet potatoes at home.', safe: 'My favourite celebration here is Sant Joan. It’s on the night of the 23rd of June. People light bonfires and set off fireworks. We usually have dinner with friends on the beach and eat coca. I like it because it’s the start of summer and we stay up late.', daring: 'My favourite celebration here is Sant Joan, on the night of the 23rd of June. People light bonfires and set off fireworks, and many families have dinner outside and eat coca. We usually go to the beach with friends and stay up until very late. I love it because it feels like the start of summer. It’s similar to Diwali because both are about light, but Diwali lasts five days and is a religious festival for many people, while Sant Joan is one night and feels more like a big summer party.' } }
   ]
 };

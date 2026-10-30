@@ -17,7 +17,7 @@ window.LP = {
         { r: 'daring', q: 'This month I ___ (train) for a race.', a: ['am training', "'m training"] },
         { r: 'daring', q: 'I ___ (prefer) skating to cycling.', a: ['prefer'] }
       ] },
-    { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Tecnologia i pantalles', en: 'Technology and screens' },
+    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Tecnologia i pantalles', en: 'Technology and screens' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'livestream · subscribers · highlights',
       core: { insecure: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message'], safe: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message', 'upload a video', 'follow a channel', 'download an app', 'search online', 'check a website', 'screen time', 'social media'], daring: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message', 'upload a video', 'follow a channel', 'download an app', 'search online', 'check a website', 'screen time', 'social media', 'a reliable source', 'the author', 'up to date', 'an advert', 'credit a source'] },
@@ -85,6 +85,42 @@ window.LP = {
         { q: 'Which is the right way to credit a photo you did not take?', o: ['Photo: Marta Vila (Climb Up Club).', 'No credit: it is only a photo.', 'Photo: me.'] },
         { r: 'safe', q: 'Where do the credits go in your vlog?', o: ['on the last slide', 'on the first slide', 'nowhere'] }
       ] },
+    { id: 'again', type: 'mc', tab: { ca: 'Escolta una font', en: 'Listen to a source' }, title: { ca: 'Escolta: fets o opinions?', en: 'Listen: facts or opinions?' }, pill: { ca: 'Ràdio · 80 %', en: 'Radio · 80 %' },
+      intro: { ca: 'Escolta la ràdio de l’LP2 com un investigador: qui parla, quins fets dona i què és opinió.', en: 'Listen to the LP2 radio like a researcher: who is speaking, what facts do they give and what is opinion?' },
+      media: { audio: 'audio/live-from-the-sports-hall.mp3', title: 'Live from the sports hall', script: [
+        ['Emma', '[excited] Hello and welcome to School Radio! We’re at the sports hall and the big match is starting: the Blue Team against the Green Team. Sam, what’s happening?'],
+        ['Sam', 'Well, Emma, the Blue Team is wearing their new white uniform and the Green Team is wearing green T-shirts and black shorts. The players are warming up and the crowd is cheering. It’s very noisy in here!'],
+        ['Emma', 'It’s cold and rainy outside, but inside it’s hot. There are about two hundred students watching. [laughs] Some of them are eating sandwiches!'],
+        ['Sam', 'And the match is starting! Number seven, Marc, has the ball. He’s running… he’s jumping… and he scores! Two points for the Blue Team!'],
+        ['Emma', 'Marc usually plays as a defender, but today he’s playing as a forward. And it’s working!'],
+        ['Sam', 'Now the Green Team has the ball. Their captain, Júlia, is passing to number four… she’s shooting… and she misses. The Blue Team is winning, six to two.'],
+        ['Emma', 'What a match! It’s half-time now. The players are drinking water and the coach is talking to the team. We’ll be back in ten minutes. Don’t go away!']] },
+      chunks: ['There are about two hundred students watching', 'The Blue Team is winning'],
+      items: [
+        { q: 'Who is speaking?', o: ['two reporters from School Radio', 'two players', 'the coach'], h: 'Escolta el principi: “welcome to…”.' },
+        { q: 'Where are they?', o: ['at the sports hall', 'at the park', 'in the radio studio'], h: 'Escolta “We’re at the…”.' },
+        { q: 'Which one is a fact?', o: ['The Blue Team is winning six to two.', 'What a match!', 'It’s working!'], h: 'Un fet es pot comprovar, per exemple un resultat.' },
+        { q: 'Which one is an opinion?', o: ['What a match!', 'It’s half-time now.', 'Marc has the ball.'], h: 'Una opinió diu què pensa algú.' },
+        { q: 'How many students are watching?', o: ['about two hundred', 'about twenty', 'about two thousand'], h: 'Escolta “There are about…”.' },
+        { r: 'insecure', q: 'Is this a good source for what is happening in the match?', o: ['Yes: the reporters are there and see it live.', 'No: radio is never right.', 'No: they don’t talk about the match.'], h: 'Pensa: on són els periodistes?' },
+        { r: 'safe', q: 'Why does Emma say “about two hundred students”?', o: ['She didn’t count them exactly.', 'There are exactly two hundred.', 'She has no idea of the number.'] },
+        { r: 'safe', q: 'You want to put the final score in your fact file. What should you do?', o: ['Check it in another source: the match isn’t finished.', 'Write six to two: it’s the final score.', 'Never write scores in a fact file.'] },
+        { r: 'daring', q: 'Why is a live radio report good for some facts but not for others?', o: ['It’s good for what is happening now, but it mixes facts and opinions and the match isn’t finished.', 'It’s never good because the reporters are students.', 'It’s good for everything because it’s live.'] },
+        { r: 'daring', q: 'What do you need to add to use this report in your fact file?', o: ['the name of the source and the date', 'the reporters’ favourite team', 'nothing: radio doesn’t need a credit'] }
+      ] },
+    { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: d’on ho has tret?', en: 'Talk: where did you find it?' },
+      intro: { ca: 'El teu company de vlog et pregunta per la font de la teva fitxa.', en: 'Your vlog buddy asks you about the source for your fact file.' },
+      task: { beginners: 'Respon amb frases curtes: el nom de la web, qui l’ha escrit i si és fiable.', insecure: 'Respon amb frases completes sobre la teva font: el nom, qui l’ha escrit, la data i si és fiable.', safe: 'Answer about your real source. Give reasons: who wrote it, when, and one fact you found.', daring: 'Answer about your real source, give reasons and say how you checked a fact in a second source.' },
+      partner: [
+        { q: 'Which website did you use?', ca: 'Quina web has fet servir?' },
+        { q: 'Who wrote it?', ca: 'Qui l’ha escrit?' },
+        { q: 'Is it a good source? Why?', ca: 'És una bona font? Per què?' },
+        { r: 'insecure', q: 'Is the information new or old?', ca: 'La informació és nova o vella?' },
+        { r: 'safe', q: 'What is one interesting fact from your source?' },
+        { r: 'safe', q: 'How are you going to credit it in your vlog?' },
+        { r: 'daring', q: 'Did you check that fact on another website?' }
+      ],
+      model: { beginners: 'I used the Encyclopedia website. An expert wrote it. Yes, it is a good source.', insecure: 'I used the Encyclopedia website. An expert wrote it. The information is from 2025. I think it is a good source because it gives dates and names.', safe: 'I used an online encyclopedia about skateboarding. An expert wrote the article and it’s from 2025, so it’s quite new. It’s a good source because it has dates, names and its own sources. One interesting fact is that skateboarding started in California in the 1950s. I’m going to write the name of the website and the date on my last slide.', daring: 'I used an online encyclopedia article about skateboarding. It was written by a sports journalist and updated in 2025, so it’s recent. I think it’s reliable because it gives dates and links to its sources, and it doesn’t try to sell anything. One interesting fact is that skateboarding started in California in the 1950s, when surfers wanted to “surf” on the street. I checked it on a second website, the Olympics page, and it said the same. I’ll credit both on my last slide.' } },
     // Piece 3 and the evidence for LS criteria 4.2 (two pages rated with two reasons, one chosen) and 6.2 (fact file: Insecure four facts from one given source;
     // Safe and Daring two sources; photos and sources credited). A step, so the teacher sees it; also saved as piece 3 of the final product.
     { id: 'factfile', type: 'step', product: 3, tab: { ca: 'Fitxa', en: 'Fact file' }, title: { ca: 'Peça 3: la meva fitxa de dades', en: 'Piece 3: my fact file' }, pill: { ca: 'Ho veu el professor', en: 'Your teacher sees it' },
