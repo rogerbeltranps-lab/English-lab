@@ -526,16 +526,22 @@ function gradeBox(studs){
 // Competence mark = its pieces weighted; term and year mark = the competences weighted by their share (= every piece weighted). A degree the
 // teacher confirmed in an LS (final[criterion]) replaces that criterion's marks in that LS. Pieces with no competence (process, teamwork) are
 // left out. An item whose day has not come yet (no day: its LS is Hidden) never counts 0.
+// Transversal competences (CC, CD, CPSAA, entrepreneurial CE n; Roger, 30 Oct 2026) are not part of the English mark: they are left out of the
+// shares, the bars and the term and year marks, and shown apart with their own marks. Year mark (continuous assessment, same day): each
+// competence's year mark is its term marks weighted by the term number (×1, ×2, ×3), only terms with a mark for it; the year mark is the
+// competences weighted by their share of the year.
 const YEAR="__year",withLs=(ls,f)=>{const o=S.ls;S.ls=ls;try{return f()}finally{S.ls=o}};
 const withS=(k,v,f)=>{const o=S[k];S[k]=v;try{return f()}finally{S[k]=o}};
 const lsTerm=l=>Math.min(EL_TERMS.length,l.term||Math.ceil((EL_LS.filter(x=>x.course===l.course).indexOf(l)+1)/2));
 const termOf=d=>EL_TERMS.findIndex(t=>t.id===elTerm(d))+1;
-// competence of a criterion: "5.1" → "5" (CE5), "CD2 2.2" → "CD2"; null for process, teamwork…
-const compOf=c=>{const t=String(c).match(/^(CC\d|CD\d|CE\d) /);return t?t[1]:/^\d+\.\d/.test(c)?String(c).split(".")[0]:null};
-const compName=k=>(EL_COMPETENCES[k]||k),compShort=k=>compName(k).replace(/ · Competència /," ").replace(" · "," ");
+// competence of a criterion: "5.1" → "5" (English CE5), "CD2 2.2" → "CD2", "CPSAA 5 5.4" → "CPSAA 5", "CE3 3.3" → "CE3" (entrepreneurial,
+// never English CE3); null for process, teamwork… isTr: a transversal competence (any key that is not a plain number)
+const compOf=c=>{c=String(c);const t=c.match(/^(.+?)\s+\d+\.\d+$/);return t?t[1]:/^\d+\.\d/.test(c)?c.split(".")[0]:null},isTr=k=>!/^\d+$/.test(k);
+const TRN={CC:"Competència ciutadana",CD:"Competència digital",CE:"Competència emprenedora",CPSAA:"Competència personal, social i d'aprendre a aprendre"};
+const compName=k=>isTr(k)?(k.match(/^[A-Z]+/)||[""])[0]in TRN?k+" · "+TRN[k.match(/^[A-Z]+/)[0]]:k:(EL_COMPETENCES[k]||k),compShort=k=>compName(k).replace(/ · Competència /," ").replace(" · "," ");
 const COMPCOL={"1":"#db2777","2":"#16a34a","3":"#0284c7","4":"#7c3aed","5":"#ea580c","6":"#ca8a04","7":"#0d9488","8":"#4f46e5","9":"#be123c","10":"#65a30d"};
 const compCol=k=>COMPCOL[k]||(/^CD/.test(k)?["#0891b2","#0e7490","#155e75","#164e63"]:/^CC/.test(k)?["#475569","#334155","#64748b","#1e293b"]:["#a16207","#854d0e"])[(+k.slice(2)||1)-1]||"#64748b";
-const compSort=(a,b)=>{const n=k=>/^\d/.test(k)?+k:100+k.charCodeAt(1)*10+(+k.slice(2)||0);return n(a)-n(b)};
+const compSort=(a,b)=>{const n=k=>/^\d/.test(k)?+k:100;return n(a)-n(b)||String(a).localeCompare(String(b),"en",{numeric:true})};
 function lsItems(l,gid){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)return [];
   const p=(window.EL_PLAN||{})[l.id],gi=p?ELWeek.col(p,gid):-1,rep=(p&&p.report)||{},last=ids=>gi<0?null:[...new Set(ids)].map(id=>ELWeek.due(p,id,gi)).filter(Boolean).sort().pop()||null;
   const ids={fp:[g.fp&&g.fp.a],gv:g.gv?g.gv.parts.flatMap(x=>(x.first||x.time||[]).map(y=>y[0])):[],
@@ -548,10 +554,10 @@ function lsItems(l,gid){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)r
 // in every learning path, weighs what it is worked and not only its exam section. Only the competences the LS assesses share its 100; the
 // pieces keep their proportions inside their competence. An LS whose activities have no step criteria (LS1) keeps the grading plan shares.
 function lsWork(l){const n={};let any=false;cat.filter(a=>a.ls===l.id).forEach(a=>{const sc=(window.EL_STEP_CRITERIA||{})[a.id];if(!sc)return;any=true;
-  Object.values(sc).forEach(cs=>cs.forEach(c=>{const k=compOf(c);if(k)n[k]=(n[k]||0)+1/cs.length}))});return any?n:null}
-function byWork(l,its){const wk=lsWork(l);if(!wk)return its;const pw={};its.forEach(it=>it.pcs.forEach(p=>{const k=compOf(p.c);if(k)pw[k]=(pw[k]||0)+p.w}));
+  Object.values(sc).forEach(cs=>{const en=cs.filter(c=>{const k=compOf(c);return k&&!isTr(k)});en.forEach(c=>{const k=compOf(c);n[k]=(n[k]||0)+1/en.length})})});return any?n:null}
+function byWork(l,its){const wk=lsWork(l);if(!wk)return its;const pw={};its.forEach(it=>it.pcs.forEach(p=>{const k=compOf(p.c);if(k&&!isTr(k))pw[k]=(pw[k]||0)+p.w}));
   const ks=Object.keys(pw).filter(k=>wk[k]),tw=ks.reduce((a,k)=>a+wk[k],0),tot=Object.values(pw).reduce((a,x)=>a+x,0);if(!tw)return its;
-  its.forEach(it=>it.pcs.forEach(p=>{const k=compOf(p.c);if(k)p.w=wk[k]?p.w/pw[k]*wk[k]/tw*tot:0}));return its}
+  its.forEach(it=>it.pcs.forEach(p=>{const k=compOf(p.c);if(k&&!isTr(k))p.w=wk[k]?p.w/pw[k]*wk[k]/tw*tot:0}));return its}
 // criteria shares of the grammar and vocabulary block: the criteria of its steps (EL_STEP_CRITERIA), each step counted once
 function gvShares(g){const n={};if(g.gv)g.gv.parts.forEach(p=>(p.first||p.time||[]).forEach(([id,k])=>((((window.EL_STEP_CRITERIA||{})[id]||{})[k])||[]).forEach(c=>n[c]=(n[c]||0)+1)));return n}
 const spread=(cs,w,m,n)=>cs.length?cs.map(c=>({c,w:w/cs.length,m,n})):[{c:null,w,m,n}];
@@ -570,12 +576,17 @@ function pieces(it){const g=it.g,b=it.b,w=b.w,shares=o=>{const t=Object.values(o
 function marksOf(s,items){const today=ELWeek.today(),out=[];
   items.forEach(it=>{const z=S.zero&&(it.date?it.date<today:((S.D.ls[it.l.id]||{}).status||"hidden")!=="hidden"),fin=res(s.uid,asId(it.l.id)).final||{};
     withLs(it.l.id,()=>withS("zero",z,()=>it.pcs.forEach(p=>{const k=compOf(p.c);if(!k)return;
-      out.push({it,c:p.c,k,w:p.w,n:p.n,m:s.away?null:fin[p.c]?lvMark(fin[p.c]):p.m(s)})})))});
+      out.push({it,c:p.c,k,tr:isTr(k),w:p.w,n:p.n,m:s.away?null:fin[p.c]?lvMark(fin[p.c]):p.m(s)})})))});
   return out}
 // competences of some pieces: {k: {w (share), m (mark or null)}}, and the overall mark (competences weighted by the share counted so far)
 function byComp(rows){const o={};rows.forEach(r=>{const x=o[r.k]=o[r.k]||{w:0,sw:0,sm:0};x.w+=r.w;if(r.m!=null){x.sw+=r.w;x.sm+=r.m*r.w}});
   let sw=0,sm=0;Object.values(o).forEach(x=>{x.m=x.sw?x.sm/x.sw:null;if(x.m!=null){sw+=x.sw;sm+=x.m*x.sw}});return {c:o,mark:sw?sm/sw:null}}
-const shareOf=items=>{const o={};items.forEach(it=>it.pcs.forEach(p=>{const k=compOf(p.c);if(k)o[k]=(o[k]||0)+p.w}));return o};
+const shareOf=items=>{const o={};items.forEach(it=>it.pcs.forEach(p=>{const k=compOf(p.c);if(k&&!isTr(k))o[k]=(o[k]||0)+p.w}));return o};   // English competences only
+// the year: each competence's term marks weighted by the term number (only terms with a mark for it); its share is that of the whole year
+function yearOf(rows){const o=byComp(rows).c,ts=[...new Set(rows.map(r=>r.it.term))];let sw=0,sm=0;
+  for(const k in o){const x=o[k],tm=ts.map(n=>[n,(byComp(rows.filter(r=>r.k===k&&r.it.term===n)).c[k]||{}).m]).filter(([,m])=>m!=null);
+    x.terms=tm;const tw=tm.reduce((a,[n])=>a+n,0);x.m=tw?tm.reduce((a,[n,m])=>a+n*m,0)/tw:null;if(x.m!=null){sw+=x.sw;sm+=x.m*x.sw}}
+  return {c:o,mark:sw?sm/sw:null}}
 // the coloured bar: each competence takes the width of its share; avg (optional) = group mark per competence, shown in the legend
 function compBar(share,avg){const ks=Object.keys(share).sort(compSort),t=ks.reduce((a,k)=>a+share[k],0);if(!t)return "";
   const pc=k=>share[k]/t*100,lab=k=>`${compName(k)}: ${Math.round(pc(k))} %${avg&&avg[k]!=null?" · group "+f1(avg[k]):""}`;
@@ -585,17 +596,22 @@ const termBonus=(s,t,best)=>withS("term",t.id,()=>s.away||!pkey(s)?null:ptGets(s
 function yearView(grp,studs){
   if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()))}   // the current term starts unfolded
   const lss=EL_LS.filter(l=>l.course===grp.course),items=lss.flatMap(l=>lsItems(l,grp.id)),now=termOf(ELWeek.today()),live=studs.filter(s=>!s.away);
-  const R={};studs.forEach(s=>R[s.uid]=marksOf(s,items));S.yR={R,items};
-  const grpAvg=f=>{const o={};live.forEach(s=>{const c=byComp(R[s.uid].filter(f)).c;for(const k in c)if(c[k].m!=null)(o[k]=o[k]||[]).push(c[k].m)});
+  const R={},TR={};studs.forEach(s=>{const all=marksOf(s,items);R[s.uid]=all.filter(r=>!r.tr);TR[s.uid]=all.filter(r=>r.tr)});S.yR={R,TR,items};
+  const agg=scope=>scope==="y"?yearOf:byComp;
+  const grpAvg=(f,scope)=>{const o={};live.forEach(s=>{const c=agg(scope)(R[s.uid].filter(f)).c;for(const k in c)if(c[k].m!=null)(o[k]=o[k]||[]).push(c[k].m)});
     for(const k in o)o[k]=o[k].reduce((a,b)=>a+b,0)/o[k].length;return o};
   const st=l=>{const x=(S.D.ls[l.id]||{}).status||"hidden";return `<span class="badge" style="background:${STCOL[x]}">${LS_INFO[x][0]}</span>`};
   const when=it=>it.date?(it.b.id==="exam"?"📝 ":"due ")+ELWeek.date(it.date):"";
   const away=n=>s=>`<tr class="away"><td class="stu">${name(s)}</td><td colspan="${n}" style="text-align:left">Not signed in yet</td></tr>`;
-  const ccell=(s,f,k,scope)=>{const x=byComp(R[s.uid].filter(f)).c[k];return `<td class="gr" data-do="ycomp" data-u="${s.uid}" data-s="${scope}" data-k="${k}" title="Click for its criteria and items">${f1(x&&x.m)}</td>`};
+  const ccell=(s,f,k,scope,tr)=>{const x=agg(scope)((tr?TR:R)[s.uid].filter(f)).c[k];return `<td class="gr" data-do="ycomp" data-u="${s.uid}" data-s="${scope}" data-k="${k}" title="Click for its criteria and items">${f1(x&&x.m)}</td>`};
   const table=(f,scope,extra)=>{const share=shareOf(items.filter(it=>f({it}))),ks=Object.keys(share).sort(compSort),tot=ks.reduce((a,k)=>a+share[k],0);
     if(!ks.length||!studs.length)return "";
     return `<div class="wrap"><table><thead><tr><th class="stu">Student</th>${ks.map((k,j)=>`<th class="${j?"":"first"}" title="${esc(compName(k))}"><i class="cdot" style="background:${compCol(k)}"></i> ${esc(compShort(k))}<br><small class="muted">${Math.round(share[k]/tot*100)} %</small></th>`).join("")}${extra.head}</tr></thead><tbody>`
       +studs.map(s=>s.away?away(ks.length+extra.n)(s):`<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td>${ks.map((k,j)=>ccell(s,f,k,scope).replace('class="gr"',`class="gr ${j?"":"first"}"`)).join("")}${extra.row(s)}</tr>`).join("")+`</tbody></table></div>`};
+  // transversal competences of some pieces, apart: their own marks, not in the English mark
+  const trTable=(f,scope)=>{const ks=[...new Set(studs.flatMap(s=>(TR[s.uid]||[]).filter(f).map(r=>r.k)))].sort(compSort);if(!ks.length||!studs.length)return "";
+    return fold("ytr"+scope,`Transversal competences <small class="muted">· not in the English mark</small>`,`<div class="wrap"><table><thead><tr><th class="stu">Student</th>${ks.map((k,j)=>`<th class="${j?"":"first"}" title="${esc(compName(k))}">${esc(compShort(k))}</th>`).join("")}</tr></thead><tbody>`
+      +studs.map(s=>s.away?away(ks.length)(s):`<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td>${ks.map((k,j)=>ccell(s,f,k,scope,1).replace('data-k=','data-tr="1" data-k=').replace('class="gr"',`class="gr ${j?"":"first"}"`)).join("")}</tr>`).join("")+`</tbody></table></div>`,"key")};
   const terms=EL_TERMS.map((t,i)=>{const n=i+1,mine=lss.filter(l=>lsTerm(l)===n),its=items.filter(it=>it.term===n),from=its.filter(it=>lsTerm(it.l)!==n),f=r=>r.it.term===n;
     const free=Array.from({length:Math.max(0,2-mine.length)},(_,j)=>(n-1)*2+mine.length+j+1).filter(k=>k>lss.length);
     const span=(i?"from "+ELWeek.date(ELWeek.add(EL_TERMS[i-1].end,1)):"")+(t.end?(i?" to ":"until ")+ELWeek.date(t.end):" to the end of the year");
@@ -610,21 +626,22 @@ function yearView(grp,studs){
       row:s=>{const m=byComp(R[s.uid].filter(f)).mark,b=pts?termBonus(s,t,best):null;return `<td class="first tot"><b>${f1(m)}</b> ${deg(elDegree(m))}</td>${pts?`<td>${b?"+"+elNum(b,"en"):b===0?"0":"–"}</td>`:""}`}};
     const head=`${esc(t.en)} <small class="muted">· ${span}${n===now?" · now":n<now?" · ended":""}${ga==null?"":" · group average "+f1(ga)}</small>`;
     const body=(its.length?`<h3>Competences in ${esc(t.en)}</h3>${compBar(shareOf(its),grpAvg(f))}`:"")+`<div class="ycards">${cards}</div>`
-      +(its.length?table(r=>f(r),"t"+n,extra):`<p class="muted">Nothing assessed in this term yet.</p>`);
+      +(its.length?table(r=>f(r),"t"+n,extra)+trTable(f,"t"+n):`<p class="muted">Nothing assessed in this term yet.</p>`);
     return `<div class="box yterm ${n===now?"ynow":""}">${fold("yt"+n,head,body)}</div>`}).join("");
   const tn=EL_TERMS.map((t,i)=>i+1).filter(n=>items.some(it=>it.term===n));
   const yextra={n:tn.length+1,head:tn.map((n,j)=>`<th class="${j?"":"first"}">${esc(EL_TERMS[n-1].en)}</th>`).join("")+`<th class="first">Year mark</th>`,
-    row:s=>tn.map((n,j)=>`<td class="${j?"":"first"}">${f1(byComp(R[s.uid].filter(r=>r.it.term===n)).mark)}</td>`).join("")+(y=>`<td class="first tot"><b>${f1(y)}</b> ${deg(elDegree(y))}</td>`)(byComp(R[s.uid]).mark)};
-  const summary=!items.length?"":`<div class="box"><h2>Whole year · ${esc(grp.name)}</h2>${compBar(shareOf(items),grpAvg(()=>true))}${table(()=>true,"y",yextra)}</div>`;
+    row:s=>tn.map((n,j)=>`<td class="${j?"":"first"}">${f1(byComp(R[s.uid].filter(r=>r.it.term===n)).mark)}</td>`).join("")+(y=>`<td class="first tot"><b>${f1(y)}</b> ${deg(elDegree(y))}</td>`)(yearOf(R[s.uid]).mark)};
+  const summary=!items.length?"":`<div class="box"><h2>Whole year · ${esc(grp.name)}</h2>${compBar(shareOf(items),grpAvg(()=>true,"y"))}${table(()=>true,"y",yextra)}${trTable(()=>true,"y")}</div>`;
   const key=`<p class="muted">Each term shows its two LSs (LS1–LS2 in ${esc(EL_TERMS[0].en)}, LS3–LS4 in the next one…). A new LS appears in its slot as soon as it is added to the site, and its items as soon as its grading plan is added. An item counts in the term of its date in the time plan (exam day, last due day of its activities), so an LS can give items to the next term (→).</p>`
-    +`<p class="muted"><b>By competence.</b> Every item is split among the criteria it assesses, and each criterion belongs to a competence. <b>By how much it is worked</b> (default): a competence's share of an LS is how many steps of the LS activities work on its criteria, among the competences the LS assesses (LS1 has no step criteria, so it uses the grading plan). <b>By the grading plan</b>: its criteria's weight in the LS mark (exam sections by their points, final product rubric rows by their weight, grammar and vocabulary by the criteria of its steps, other competences equally). Either way each LS weighs 100, a competence assessed in two LSs counts twice, and the competence worked more in an LS counts more. The coloured bars show each competence's share in the LS, the term and the year. <b>Competence mark</b>: its criteria weighted; a degree you confirmed in “Result per assessment criterion” replaces the marks of that criterion in that LS. <b>Term mark</b> and <b>year mark</b>: the competences weighted by their share. Process and teamwork rows have no competence, so they are left out. An item whose day has not come yet (or, with no date, in an LS that is still Hidden) is not counted; after that, missing work counts 0 or is left out as the switch says. Click a mark to see its criteria and items.</p>`;
+    +`<p class="muted"><b>By competence.</b> Every item is split among the criteria it assesses, and each criterion belongs to a competence. <b>By how much it is worked</b> (default): a competence's share of an LS is how many steps of the LS activities work on its criteria, among the competences the LS assesses (LS1 has no step criteria, so it uses the grading plan). <b>By the grading plan</b>: its criteria's weight in the LS mark (exam sections by their points, final product rubric rows by their weight, grammar and vocabulary by the criteria of its steps, other competences equally). Either way each LS weighs 100, a competence assessed in two LSs counts twice, and the competence worked more in an LS counts more. The coloured bars show each competence's share in the LS, the term and the year. <b>Competence mark</b>: its criteria weighted; a degree you confirmed in “Result per assessment criterion” replaces the marks of that criterion in that LS. <b>Term mark</b>: the competences weighted by their share. <b>Year mark</b> (continuous assessment): each competence's year mark is its term marks weighted by the term number (Term 1 ×1, Term 2 ×2, Term 3 ×3), only the terms with a mark for it, so a competence assessed in one term keeps that mark and the four communicative competences show where the student ends up; then the competences are weighted by their share of the year. <b>Transversal competences</b> (CC, CD, CPSAA, entrepreneurial) are not part of the English mark: they are left out of the shares, bars and marks and shown apart with their own marks. Process and teamwork rows have no competence, so they are left out. An item whose day has not come yet (or, with no date, in an LS that is still Hidden) is not counted; after that, missing work counts 0 or is left out as the switch says. Click a mark to see its criteria and items.</p>`;
   return `<div class="box"><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0">not counted yet</button> <span class="muted">· Share of each competence:</span> <button class="chip ${S.yShare==="plan"?"":"on"}" data-do="yshare" data-v="work" title="How many steps of the LS activities work on its criteria">by how much it is worked</button><button class="chip ${S.yShare==="plan"?"on":""}" data-do="yshare" data-v="plan" title="Its criteria's weight in the LS mark (grading plan)">by the grading plan</button></div>${fold("ykey","How it is worked out",key,"key")}</div>`
     +terms+summary;
 }
 // One competence of one student in a term ("t1"…) or the year ("y"): its criteria and the items they come from
-function compPanel(u,scope,k){redraw=null;const {R}=S.yR||{},s=S.P[u];if(!R||!R[u])return;
-  const rows=R[u].filter(r=>r.k===k&&(scope==="y"||"t"+r.it.term===scope)),x=byComp(rows).c[k]||{},cs=[...new Set(rows.map(r=>r.c))];
-  dlg(`<h3>${name(s)} · ${esc(compName(k))}</h3><p class="muted">${scope==="y"?"Whole year":esc(EL_TERMS[+scope.slice(1)-1].en)} · mark <b>${f1(x.m)}</b> ${deg(elDegree(x.m))}</p>`
+function compPanel(u,scope,k,tr){redraw=null;const {R,TR}=S.yR||{},s=S.P[u],src=tr?TR:R;if(!src||!src[u])return;
+  const rows=src[u].filter(r=>r.k===k&&(scope==="y"||"t"+r.it.term===scope)),x=(scope==="y"?yearOf:byComp)(rows).c[k]||{},cs=[...new Set(rows.map(r=>r.c))];
+  const terms=scope==="y"&&x.terms&&x.terms.length?`<p class="muted">Year mark = ${x.terms.map(([n,m])=>`${esc(EL_TERMS[n-1].en)} ${f1(m)} × ${n}`).join(" + ")}, ÷ ${x.terms.reduce((a,[n])=>a+n,0)}</p>`:"";
+  dlg(`<h3>${name(s)} · ${esc(compName(k))}</h3><p class="muted">${scope==="y"?"Whole year":esc(EL_TERMS[+scope.slice(1)-1].en)} · mark <b>${f1(x.m)}</b> ${deg(elDegree(x.m))}${tr?" · not in the English mark":""}</p>${terms}`
     +cs.map(c=>{const rc=rows.filter(r=>r.c===c),m=byComp(rc).c[k];return `<h4 style="margin:10px 0 4px">${pill(c)} ${f1(m&&m.m)}</h4><table><tbody>${rc.map(r=>`<tr><td style="text-align:left">${lsLabel(r.it.l).replace(/ · .*/,"")} · ${esc(r.it.b.name)}${r.n?" · "+esc(r.n):""}</td><td>${f1(r.m)}</td><td><small class="muted">weight ${+r.w.toFixed(1)}</small></td></tr>`).join("")}</tbody></table>`}).join(""));
 }
 // Which exam version a student took (Roger, 30 Oct 2026): results/{ls}__assessment .version = insecure|safe|daring, imported with the
@@ -1051,7 +1068,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     qago:()=>{S.qa.ls=S.ls;S.qa.g=S.g;S.g="qa";render();scrollTo(0,0)},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
-    grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},ycomp:()=>compPanel(u,k.s,k.k),yshare:()=>{S.yShare=k.v;render()},yls:()=>{S.year=false;S.ls=k.ls;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
+    grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},ycomp:()=>compPanel(u,k.s,k.k,k.tr==="1"),yshare:()=>{S.yShare=k.v;render()},yls:()=>{S.year=false;S.ls=k.ls;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},
     lv:()=>{const cur=((res(u,k.a).levels||{})[k.s]||{})[k.c];quick(patch(u,k.a,{levels:{[k.s]:{[k.c]:cur===k.l?null:k.l}}}))},
     glv:()=>{const cur=((res(u,k.a).levels||{}).group||{})[k.c],v=cur===k.l?null:k.l,ms=teamMates(k.a,teamOf(u,k.a),S.P[u].group);if(!ms.some(m=>m.uid===u))ms.push(S.P[u]);
       quick(ms.map(m=>patch(m.uid,k.a,{levels:{group:{[k.c]:v}}})))},
