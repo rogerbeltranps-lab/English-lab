@@ -20,6 +20,7 @@ Newest first. One line per decision; update a line instead of adding a contradic
 
 | Date | Decision |
 | --- | --- |
+| 2026-10-30 | **Four skills worked equally** (Roger, “very important”; exams unchanged): practice heard (*Listen and complete*) in LP1–LP6 and grammar heard in LP2, LP3, LP5, mixed practice said (*Say it*; LP6: grammar), a *Talk* step in LP2–LP6 and a *Listen again* step in LP2 (“Where are you?”, what they are doing), LP4 (sports hall radio, facts or opinions), LP5 (Noah’s vlog) and LP6 (Mei’s vlog, how a vlog starts and ends), all on existing recordings. Shares among CE2–CE5 went from 13 · 7 · 43 · 38 % to 23 · 21 · 27 · 29 %. Content in [overview.md](overview.md#four-skills-30-oct-2026), rules in the root `AGENTS.md`. |
 | 2026-10-26 | **Core words and dictation chunks** (Roger, research audit items 1–2): `core` per route on every vocabulary panel and `chunks` on every listening panel; choices listed in the research audit brief. *(Claude)* In LP3 the listening (Mei's video) and the chart (Noah's lines) have different chunks; the sample exam has none. |
 | 2026-10-26 | **Grammar and vocabulary from delayed retrieval** (Roger, research audit): as 4ESO LS2, checkpoints 1–4 50 % · recall warm-ups 25 % · practice done on time 25 %; checkpoints 2 and 3 have due dates and count. |
 | 2026-10-26 | **Checkpoints are not singled out** (Roger): same as 4ESO LS2, students only read the general continuous-assessment note, checkpoints 2 and 3 are “homework”, and each checkpoint must be done to open the activities after it (root `AGENTS.md`). |

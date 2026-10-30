@@ -106,6 +106,11 @@
   R.speaking = p => '<div class="box"><b>' + T('La tasca', 'Your task') + '</b><div>' + byLevel(p.task) + '</div></div>' +
     (p.model ? '<div class="box model"><b>Model</b><div>' + byLevel(p.model) + '</div></div>' : '') +
     '<p><b>' + T('Escriu què diràs', 'Write what you will say') + '</b> · ' + T('Després llegeix-ho en veu alta tres vegades i digues-ho al professor.', 'Then read it aloud three times and say it to your teacher.') + '</p>' + lines(8);
+  // Talk (four skills, 30 Oct 2026): on paper the partner's questions are written; the student notes the answers, then says them to a classmate.
+  R.talk = p => '<div class="box"><b>' + T('La tasca', 'Your task') + '</b><div>' + byLevel(p.task) + '</div></div>' +
+    '<ol class="items">' + forLevel(p.partner).map(x => '<li><b>' + x.q + '</b>' + (ca && x.ca ? ' <small>(' + x.ca + ')</small>' : '') + lines(2) + '</li>').join('') + '</ol>' +
+    '<p><b>' + T('Després', 'Then') + '</b> · ' + T('Fes la conversa en veu alta amb un company: ell pregunta i tu respons, i després al revés.', 'Have the conversation aloud with a classmate: they ask and you answer, then swap.') + '</p>' +
+    (p.model ? '<div class="box model"><b>Model</b><div>' + byLevel(p.model) + '</div></div>' : '');
   const ptsOf = (p, it) => it.p || (it.o ? p.pts[0] : p.pts[1]);
   const ptsWord = n => n + ' ' + (ca ? (n === 1 ? 'punt' : 'punts') : (n === 1 ? 'point' : 'points'));
   R.quiz = p => {

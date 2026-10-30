@@ -16,7 +16,7 @@ window.LP = {
         { r: 'daring', q: 'People exchange gifts. → Gifts ___ ___.', a: ['are exchanged'] },
         { r: 'daring', q: 'To remember and honour an important event: to c___', a: ['commemorate'] }
       ] },
-    { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Dates, comparar i canviar', en: 'Dates, comparing and change' },
+    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Dates, comparar i canviar', en: 'Dates, comparing and change' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'pilgrims · feast · harvest festival',
       core: { insecure: ['on 31 October', 'in November', 'at Christmas', 'at night', 'every year', 'once a year', 'the night before', 'the first', 'the twenty-fifth'], safe: ['on 31 October', 'in November', 'at Christmas', 'every year', 'once a year', 'the night before', 'the first', 'the twenty-fifth', 'both… and…', 'similar to', 'different from', 'whereas', 'in the same way', 'unlike', 'travel home for the holidays', 'the town square', 'the community centre', 'crowded streets'], daring: ['once a year', 'the night before', 'both… and…', 'similar to', 'different from', 'whereas', 'unlike', 'commercialised', 'consumerism', 'keep a tradition alive', 'die out', 'evolve', 'adapt', 'date back to', 'stereotype', 'inclusive', 'take something for granted', 'contribute to', 'depend on', 'be associated with'] },
@@ -97,7 +97,7 @@ window.LP = {
         safe: ['I watched each video twice', 'I explained what each speaker values', 'I backed it up with their words, tone or images'],
         daring: ['I watched each video twice', 'I explained what each speaker values with precise evidence', 'I compared the two speakers']
       } },
-    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Connectors, orígens i comparacions', en: 'Origins, relatives and comparing' }, pill: '80 %',
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Connectors, orígens i comparacions', en: 'Origins, relatives and comparing' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>Connectors:</strong> First, Then, Finally per ordenar; and, also per afegir; but per contrastar; because per donar una raó.', en: '<strong>Connectors:</strong> First, Then, Finally; and, also, but, because.' },
@@ -129,7 +129,7 @@ window.LP = {
         { r: 'daring', q: 'Many families love the feast. ___, some Native Americans see it as a day of mourning. (3 words)', a: ['on the other hand'], en: 'Contrast between two sentences.' },
         { r: 'daring', q: 'Correct the word: “Diwali, that is celebrated in autumn, is known as the festival of lights.” → ___', a: ['which'], en: 'Non-defining relatives never use that.' }
       ] },
-    { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: '80 %',
       intro: { ca: 'Barreja de formes: decideix primer quina necessites.', en: 'Mixed forms: decide which one you need first.' },
       items: [
         { q: 'We celebrate it ___ 26 November.', a: ['on'] },
@@ -152,6 +152,19 @@ window.LP = {
     { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Speaking: compara-ho', en: 'Speaking: compare' },
       intro: { ca: 'Grava’t parlant de la celebració del teu grup. Mira les notes, no llegeixis.', en: 'Record yourself talking about your group’s celebration. Use notes; don’t read.' },
       task: { beginners: 'Digues tres frases sobre la celebració del teu grup amb First / Then / Finally (20–30 segons). Fes servir el model.', insecure: 'Digues quatre frases sobre la celebració del teu grup amb connectors (30–45 segons).', safe: 'Compare your group’s celebration with a local celebration (60–90 s).', daring: 'Compare your group’s celebration with a local one and explain how it has changed over time (90–120 s).' },
-      model: { beginners: 'Diwali is celebrated in October or November. First, people clean their houses. Then, they light lamps. Finally, families eat sweets. I like it because it is colourful.', insecure: 'Diwali is celebrated in October or November. First, people clean their homes. Then, they light diyas. Finally, families share sweets. I like it because it is colourful.', safe: 'Both Diwali and Christmas are festivals of light, and families exchange gifts in both. However, Diwali lasts five days, whereas Christmas is mainly one or two days. Diwali is a very old festival which comes from India.', daring: 'Diwali, which is a very old festival, is similar to Christmas because both use light as a symbol. In the past, families used to make all their sweets at home, whereas today many people buy them, so it has become more commercialised. Even so, families keep the tradition alive.' } }
+      model: { beginners: 'Diwali is celebrated in October or November. First, people clean their houses. Then, they light lamps. Finally, families eat sweets. I like it because it is colourful.', insecure: 'Diwali is celebrated in October or November. First, people clean their homes. Then, they light diyas. Finally, families share sweets. I like it because it is colourful.', safe: 'Both Diwali and Christmas are festivals of light, and families exchange gifts in both. However, Diwali lasts five days, whereas Christmas is mainly one or two days. Diwali is a very old festival which comes from India.', daring: 'Diwali, which is a very old festival, is similar to Christmas because both use light as a symbol. In the past, families used to make all their sweets at home, whereas today many people buy them, so it has become more commercialised. Even so, families keep the tradition alive.' } },
+    { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: d’on ve?', en: 'Talk: where does it come from?' },
+      intro: { ca: 'Un company del grup et fa preguntes sobre la celebració que investigueu.', en: 'A teammate asks you about the celebration your group is researching.' },
+      task: { beginners: 'Respon amb frases curtes: el nom, quan és i dos costums. Fes servir el model.', insecure: 'Respon amb frases completes. Fes servir It comes from… / People used to… / Now people…', safe: 'Answer in two or three sentences each. Use used to, a relative clause (who / which / where) and a comparison (older than, more… than).', daring: 'Answer in detail. Compare the past and the present, give your opinion and contrast ideas with although or while.' },
+      partner: [
+        { q: 'Which celebration is your group researching?', ca: 'Quina celebració investigueu?' },
+        { q: 'When do people celebrate it?', ca: 'Quan la celebra la gent?' },
+        { q: 'What do people do?', ca: 'Què fa la gent?' },
+        { r: 'insecure', q: 'Where does it come from?', ca: 'D’on ve?' },
+        { r: 'safe', q: 'What did people use to do in the past?' },
+        { r: 'safe', q: 'Is it older than Halloween?' },
+        { r: 'daring', q: 'How has it changed, and do you think the change is good?' }
+      ],
+      model: { beginners: 'We are researching Hanukkah. It is in December. People light candles. They eat latkes.', insecure: 'We are researching Hanukkah. It is in December and it lasts eight nights. People light candles on the menorah and eat latkes. It comes from an old story in Jerusalem.', safe: 'Our group is researching Hanukkah, the Jewish festival of lights. It usually takes place in December and lasts eight nights. Families light one more candle every evening and eat food cooked in oil, like latkes. It comes from a story about the Temple in Jerusalem, which is more than two thousand years old, so it’s older than Halloween.', daring: 'We’re researching Hanukkah, which is the Jewish festival of lights. It lasts eight nights, usually in December. Families light one more candle on the menorah every evening, and grandparents often tell the old story of the oil that burned for eight days in Jerusalem. It’s about two thousand years old, so it’s older than Halloween. Although the story is very old, some things have changed: now there are big public menorahs in city squares, and many families give presents. I think that’s good, because more people learn about it.' } }
   ]
 };

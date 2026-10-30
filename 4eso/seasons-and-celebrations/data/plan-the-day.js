@@ -16,7 +16,7 @@ window.LP = {
         { r: 'daring', q: 'People carve pumpkins. → Pumpkins ___ ___.', a: ['are carved'] },
         { r: 'daring', q: '___ it is commercialised, it’s still fun.', a: ['although', 'even though'] }
       ] },
-    { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Organitzar un esdeveniment', en: 'Planning an event' },
+    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Organitzar un esdeveniment', en: 'Planning an event' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       core: { insecure: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people'], safe: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people', 'organise', 'set up', 'put up posters / decorations', 'send invitations', 'make a timetable', 'run a stall / workshop', 'take place', 'be held', 'book a band / a room'], daring: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people', 'organise', 'set up', 'put up posters / decorations', 'send invitations', 'make a timetable', 'run a stall / workshop', 'take place', 'be held', 'book a band / a room'] },
       groups: [
@@ -71,7 +71,23 @@ window.LP = {
         { r: 'daring', q: '“I’ll call him tonight.” This is…', o: ['a decision made now', 'an arrangement', 'a timetable'] },
         { r: 'daring', q: '“We’re sending them on Wednesday.” This is…', o: ['an arrangement', 'a prediction', 'a decision made now'] }
       ] },
-    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Formes de futur', en: 'Future forms' }, pill: '80 %',
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: com es prepara una celebració', en: 'Listen again: getting ready for a celebration' }, pill: { ca: 'Vídeo · 80 %', en: 'Video · 80 %' },
+      intro: { ca: 'Escolta la Mei de l’LP3: com es prepara la seva família i qui fa què. T’ajudarà a planificar el vostre dia.', en: 'Listen to Mei from LP3: how does her family get ready, and who does what? It will help you plan your day.' },
+      media: { videos: [{ base: 'video/mei-lunar-new-year', title: 'Mei: Lunar New Year' }], videoCredit: 'Illustrated video made for English Lab. Voices generated with ElevenLabs.' },
+      chunks: ['we clean the whole flat', 'We make dumplings together'],
+      items: [
+        { q: 'What does Mei’s family do a few days before?', o: ['They clean the whole flat.', 'They buy new clothes.', 'They send invitations.'], h: 'Escolta “A few days before…”.' },
+        { q: 'Who comes from Liverpool?', o: ['her grandparents', 'her cousins', 'her brother'], h: 'Escolta “On New Year’s Eve…”.' },
+        { q: 'What do they make together?', o: ['dumplings', 'lanterns', 'posters'], h: 'Escolta la part del sopar.' },
+        { q: 'What do the children get?', o: ['red envelopes with money', 'new toys', 'sweets'], h: 'Escolta “Then the children get…”.' },
+        { q: 'Where do they watch the dragon dance?', o: ['in Chinatown', 'in the school hall', 'at home'], h: 'Escolta “we go to…”.' },
+        { r: 'insecure', q: 'What is the best moment for Mei?', o: ['making dumplings together', 'the dragon dance', 'cleaning the flat'], h: 'Escolta “For me, that’s the best moment”.' },
+        { r: 'safe', q: 'Why do they clean the flat?', o: ['to sweep away bad luck', 'because guests are coming', 'because it’s a family rule'] },
+        { r: 'safe', q: 'Which idea from Mei could make your event feel welcoming?', o: ['an activity everyone does together, like making food', 'a long talk about history', 'a quiz with prizes only for the winners'] },
+        { r: 'daring', q: '“Not every family celebrates it in the same way.” Why is this useful for your event plan?', o: ['It reminds you to show customs without saying everyone does them.', 'It means you should not include Lunar New Year.', 'It shows that the customs are not real.'] },
+        { r: 'daring', q: '“Nobody is looking at their phone.” What does Mei mean?', o: ['Everyone is really together and enjoying it.', 'Phones are not allowed at dinner.', 'She has lost her phone.'] }
+      ] },
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Formes de futur', en: 'Future forms' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>going to</strong> per a plans que ja tens (<em>We’re going to decorate the hall.</em>) · <strong>will</strong> per a decisions que prens ara i ofertes (<em>I’ll bring the music.</em>) · <strong>There will be</strong> + nom (<em>There will be music and food.</em>).', en: '<strong>going to</strong> for plans you already have (<em>We’re going to decorate the hall.</em>) · <strong>will</strong> for decisions made now and offers (<em>I’ll bring the music.</em>) · <strong>There will be</strong> + noun (<em>There will be music and food.</em>).' },
@@ -92,7 +108,7 @@ window.LP = {
         { r: 'safe', q: 'The bus ___ (leave) at 8.15 tomorrow.', a: ['leaves'], en: 'Timetable → Present Simple.' },
         { r: 'safe', q: 'We ___ ___ (perform) a dance at 12. We booked the hall yesterday.', a: ['are performing', "'re performing"], en: 'Arrangement → Present Continuous.' }
       ] },
-    { id: 'mixed', type: 'typed', tab: { ca: 'Quin futur?', en: 'Which future?' }, title: { ca: 'Quin futur? (barrejat)', en: 'Which future? (mixed)' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Quin futur?', en: 'Which future?' }, title: { ca: 'Quin futur? (barrejat)', en: 'Which future? (mixed)' }, pill: '80 %',
       intro: { ca: 'Pensa per què: decisió ara, pla, oferta…', en: 'Think why: decision now, plan, arrangement, timetable or prediction.' },
       items: [
         { q: '“The printer doesn’t work.” “OK, I ___ ask the office.”', a: ['will', "'ll"], ca: 'Decisió ara.', en: 'Decision now.' },
@@ -113,6 +129,19 @@ window.LP = {
     { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Speaking: reunió de planificació', en: 'Speaking: planning meeting' },
       intro: { ca: 'Grava’t explicant el pla.', en: 'Record yourself presenting the plan.' },
       task: { beginners: 'Digues tres frases del pla amb el model (20–30 segons).', insecure: 'Explica quatre frases del pla (30–45 segons).', safe: 'Present the plan (60–90 s).', daring: 'Present the plan and answer two “What if…?” questions: What if it rains? · What if some families don’t celebrate this? · What if there’s no money? (90–120 s)' },
-      model: { beginners: 'The event is going to take place in the school hall. There will be music and food. I’ll bring the music.', insecure: 'The event is going to take place in the school hall. There will be music and food. Our class is going to make lanterns. I’ll bring the music.', safe: 'Our Lights of the World Day is on Friday 11 December. It starts at ten and finishes at half past one. Class 4B is going to make the decorations, and we’re meeting the head teacher on Monday. I think everyone will enjoy it.', daring: 'If it rains, we’ll use the gym as well as the hall. Although some families don’t celebrate these festivals, the day is about learning, not belief, so everyone can take part. On the other hand, money is limited, so each stall will cost less than twenty euros.' } }
+      model: { beginners: 'The event is going to take place in the school hall. There will be music and food. I’ll bring the music.', insecure: 'The event is going to take place in the school hall. There will be music and food. Our class is going to make lanterns. I’ll bring the music.', safe: 'Our Lights of the World Day is on Friday 11 December. It starts at ten and finishes at half past one. Class 4B is going to make the decorations, and we’re meeting the head teacher on Monday. I think everyone will enjoy it.', daring: 'If it rains, we’ll use the gym as well as the hall. Although some families don’t celebrate these festivals, the day is about learning, not belief, so everyone can take part. On the other hand, money is limited, so each stall will cost less than twenty euros.' } },
+    { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: reunió de planificació', en: 'Talk: planning meeting' },
+      intro: { ca: 'Una companya del consell d’alumnes et fa preguntes sobre el pla del vostre dia de celebració.', en: 'A student council member asks you about your celebration day plan.' },
+      task: { beginners: 'Respon amb frases curtes amb going to i will (We are going to… / I will…). Fes servir el model.', insecure: 'Respon amb frases completes: going to per als plans i will per a les decisions i les ofertes.', safe: 'Answer with the right future form: going to for plans, the Present Continuous for arrangements, the Present Simple for the timetable and will for decisions and predictions.', daring: 'Answer with all the future forms, and when there is a problem, offer a solution (If it rains, we’ll…).' },
+      partner: [
+        { q: 'What are we going to do on the day?', ca: 'Què farem aquell dia?' },
+        { q: 'Where is it going to take place?', ca: 'On serà?' },
+        { q: 'We need music. Who can bring it?', ca: 'Necessitem música. Qui la pot portar?' },
+        { r: 'insecure', q: 'What time does it start?', ca: 'A quina hora comença?' },
+        { r: 'safe', q: 'When are we meeting the head teacher?' },
+        { r: 'safe', q: 'How can we make everyone feel welcome?' },
+        { r: 'daring', q: 'What if it rains and the hall is too small?' }
+      ],
+      model: { beginners: 'We are going to have music and food. It is going to take place in the school hall. I will bring the music.', insecure: 'We are going to have four stalls, music and food. It is going to take place in the school hall. I’ll bring the music. It starts at ten o’clock.', safe: 'We’re going to have four stalls, one for each festival, with music, food and a lantern workshop. It’s going to take place in the school hall. I’ll bring my speaker and make a playlist. We’re meeting the head teacher on Monday at nine. To make everyone welcome, we’ll explain each custom with a short sign and invite all the families.', daring: 'We’re going to set up four stalls, one for each festival of light, and there will be music, food and a lantern workshop. It’s going to take place in the school hall, and the event starts at ten. I’ll ask my cousin’s band, and if they can’t come, I’ll make a playlist. We’re meeting the head teacher on Monday morning. To make everyone feel welcome, we’ll explain that not every family celebrates the same way. And if it rains, we’ll open the gym too, so nobody feels crowded.' } }
   ]
 };

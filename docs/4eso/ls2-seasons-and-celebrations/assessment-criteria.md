@@ -38,6 +38,8 @@ No longer in LS2: 2.1, 3.1, 1.3, 6.2 and CE2 emprenedora 2.3. Speaking steps in 
 
 The new steps **log** (LP2), **chart** (LP3) and **card** (LP4) are hand-ins: fields, a short self-assessment and an optional comment. The teacher sees them on the dashboard (catalogue `steps`) and can answer. The LP4 card is also piece 3 of the final product.
 
+**Four skills (Roger, 30 Oct 2026).** Since 30 Oct the learning paths also have: *Listen again* (`again` → 2.2) in LP2, LP4, LP5 and LP6; *Talk* (`talk` → 3.2, a hand-in the teacher sees) in LP2–LP6; practice and grammar heard (*Listen and complete* → 2.2, 5.1) and mixed practice said (*Say it* → 3.2; LP6: grammar said). The LP1 speaking now counts for 3.2. Other vocabulary and grammar steps count for 4.1 and 5.1 (Use of English is reading and writing).
+
 ## Criterion by criterion
 
 | Criterion | Graded activities | Practice only |

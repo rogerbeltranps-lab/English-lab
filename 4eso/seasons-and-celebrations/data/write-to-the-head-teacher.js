@@ -16,7 +16,7 @@ window.LP = {
         { r: 'daring', q: '“We’re sending them on Wednesday.” Arrangement or decision?', a: ['arrangement', 'an arrangement'] },
         { r: 'daring', q: 'Lincoln, ___ was president in 1863, made Thanksgiving official.', a: ['who'] }
       ] },
-    { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Llenguatge del correu formal', en: 'Formal email language' },
+    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Llenguatge del correu formal', en: 'Formal email language' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       core: { insecure: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely'], safe: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely', 'Dear Mr / Ms…', 'I am writing to propose…', 'Our plan includes…', 'Could we use…?', 'Please let us know if…', 'I look forward to hearing from you', 'Kind regards'], daring: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely', 'Dear Mr / Ms…', 'I am writing to propose…', 'Our plan includes…', 'Could we use…?', 'Please let us know if…', 'I look forward to hearing from you', 'Kind regards', 'request', 'propose', 'ensure', 'appreciate', 'consider', 'I would be grateful if you could…', 'We would appreciate the opportunity to…'] },
       groups: [
@@ -70,7 +70,40 @@ window.LP = {
         { r: 'safe', q: 'Tell us if you need more stuff.', o: ['Please let us know if you need more information.', 'Tell us if you want more stuff.', 'Need more stuff? Tell us.'] },
         { r: 'daring', q: 'Answer before Friday, OK?', o: ['I would be grateful if you could reply before Friday.', 'Reply before Friday, OK?', 'You must answer before Friday.'] }
       ] },
-    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Peticions educades', en: 'Polite requests' }, pill: '80 %',
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: els fets per al correu', en: 'Listen again: the facts for your email' }, pill: { ca: 'Àudio · 80 %', en: 'Audio · 80 %' },
+      intro: { ca: 'Escolta la reunió de l’LP5 i comprova els fets que la directora necessita saber. Els faràs servir al correu.', en: 'Listen to the LP5 meeting and check the facts the head teacher needs. You will use them in your email.' },
+      media: { audio: 'audio/student-council-meeting.mp3', title: 'Student council meeting', script: [
+        ['Laia', 'OK, everyone. We’re meeting the head teacher on Monday, so we need a plan today.'],
+        ['Omar', 'Right. The event is going to be about festivals of light: Diwali, Hanukkah, Lunar New Year and Christmas.'],
+        ['Laia', 'Good. When is it?'],
+        ['Omar', 'It’s on Friday the eleventh of December. School finishes at two, so the event starts at ten and finishes at one thirty.'],
+        ['Laia', 'Where’s it going to take place?'],
+        ['Omar', 'In the school hall. There will be four stalls, one for each festival.'],
+        ['Laia', 'What about food?'],
+        ['Omar', 'I’ll ask the families. I think a lot of parents will help.'],
+        ['Laia', 'Great. And music?'],
+        ['Omar', 'My cousin plays in a band. I’ll call him tonight.'],
+        ['Laia', 'Perfect. Who’s going to put up the decorations?'],
+        ['Omar', 'Class 4B is going to make paper lanterns in Art.'],
+        ['Laia', 'And the invitations?'],
+        ['Omar', 'We’re sending them on Wednesday. We’re going to invite families and the primary school.'],
+        ['Laia', 'OK. One problem: the hall is small. What if it rains and everyone is inside?'],
+        ['Omar', 'Don’t worry. We’ll use the gym too.'],
+        ['Laia', 'Good idea. I think it’ll be the best day of the term!']] },
+      chunks: ['the event starts at ten', 'We’ll use the gym too'],
+      items: [
+        { q: 'The head teacher needs the date. When is the event?', o: ['Friday 11 December', 'Monday 11 December', 'Wednesday 9 December'], h: 'Escolta “It’s on Friday…”.' },
+        { q: 'What time does it start and finish?', o: ['10.00 to 13.30', '9.00 to 14.00', '10.30 to 13.00'], h: 'Escolta “starts at ten and finishes at…”.' },
+        { q: 'Where will it take place?', o: ['in the school hall', 'in the playground', 'in the library'], h: 'Escolta “Where’s it going to take place?”.' },
+        { q: 'Who will help with the food?', o: ['the families', 'the head teacher', 'the band'], h: 'Escolta “What about food?”.' },
+        { q: 'Who are they going to invite?', o: ['families and the primary school', 'only students', 'the town council'], h: 'Escolta la part de les invitacions.' },
+        { r: 'insecure', q: 'What is their plan if it rains?', o: ['use the gym too', 'cancel the event', 'go outside'], h: 'Escolta “What if it rains…?”.' },
+        { r: 'safe', q: 'Why do they need a plan for rain?', o: ['The hall is small if everyone is inside.', 'The gym is closed in December.', 'The stalls are outside.'] },
+        { r: 'safe', q: 'Which sentence from the meeting is too informal for your email?', o: ['“Don’t worry.”', '“There will be four stalls.”', '“The event starts at ten.”'] },
+        { r: 'daring', q: 'Which request to the head teacher does the meeting suggest?', o: ['permission to use the hall and the gym', 'money for a new band', 'a whole week without classes'] },
+        { r: 'daring', q: '“We’re sending them on Wednesday.” Which is the best formal version for the email?', o: ['The invitations will be sent on Wednesday.', 'We’re gonna send them Wednesday.', 'Invitations on Wednesday, OK?'] }
+      ] },
+    { id: 'grammar', type: 'typed', mode: 'say', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Peticions educades', en: 'Polite requests' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa.', en: 'Read how it works and complete.' },
       explain: [
         { ca: '<strong>would like to</strong> + verb per demanar amb educació: <em>We would like to organise…</em>', en: '<strong>would like to</strong> + verb: <em>We would like to organise…</em>' },
@@ -96,6 +129,19 @@ window.LP = {
     { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Assaja la teva part del pitch', en: 'Rehearse your part of the pitch' },
       intro: { ca: 'Grava la teva part del vídeo del grup i revisa-la amb la llista del producte final.', en: 'Record your part of the group video and check it against the final product checklist.' },
       task: { beginners: 'Grava la teva part del pitch (30–45 segons) amb el model.', insecure: 'Grava la teva part del pitch (40–60 segons).', safe: 'Record your part of the group pitch (35–45 s).', daring: 'Record your part of the group pitch (35–45 s).' },
-      model: { beginners: 'Hello! Our celebration is Diwali. It is celebrated in October or November. People light lamps. There will be music and food.', insecure: 'Hello! Our celebration is Diwali. It is celebrated in October or November. There will be four stalls and music. We would like to invite families.', safe: 'Our proposal is a Lights of the World Day on Friday 11 December. It starts at ten in the school hall. There will be four stalls, and Class 4B is going to make lanterns. We think it will help everyone learn about other cultures.', daring: 'We would like to propose a Lights of the World Day. Although not every family celebrates these festivals, the day is about learning, not belief, so everyone is welcome. We have checked every fact in two reliable sources, and we will ensure that no costume turns a culture into a stereotype.' } }
+      model: { beginners: 'Hello! Our celebration is Diwali. It is celebrated in October or November. People light lamps. There will be music and food.', insecure: 'Hello! Our celebration is Diwali. It is celebrated in October or November. There will be four stalls and music. We would like to invite families.', safe: 'Our proposal is a Lights of the World Day on Friday 11 December. It starts at ten in the school hall. There will be four stalls, and Class 4B is going to make lanterns. We think it will help everyone learn about other cultures.', daring: 'We would like to propose a Lights of the World Day. Although not every family celebrates these festivals, the day is about learning, not belief, so everyone is welcome. We have checked every fact in two reliable sources, and we will ensure that no costume turns a culture into a stereotype.' } },
+    { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: la directora pregunta', en: 'Talk: the head teacher asks' },
+      intro: { ca: 'La directora ha llegit el vostre correu i et fa preguntes. Respon amb un to educat i formal.', en: 'The head teacher has read your email and asks you some questions. Answer politely and formally.' },
+      task: { beginners: 'Respon amb frases curtes i educades. Fes servir el model.', insecure: 'Respon amb frases completes i educades (We would like… / Could we…?).', safe: 'Answer politely and formally. Use would like, could and will, and give a reason for each request.', daring: 'Answer politely and persuasively: give reasons, offer solutions and thank her at the end.' },
+      partner: [
+        { q: 'Good morning. What would you like to organise?', ca: 'Què us agradaria organitzar?' },
+        { q: 'When would you like to do it?', ca: 'Quan ho voldríeu fer?' },
+        { q: 'What do you need from the school?', ca: 'Què necessiteu de l’escola?' },
+        { r: 'insecure', q: 'Who is going to help you?', ca: 'Qui us ajudarà?' },
+        { r: 'safe', q: 'Why is it a good idea for the whole school?' },
+        { r: 'safe', q: 'How will you make sure everyone feels welcome?' },
+        { r: 'daring', q: 'What will you do if not many families come?' }
+      ],
+      model: { beginners: 'Good morning. We would like to organise a celebration day. It is on Friday 11 December. Could we use the school hall, please?', insecure: 'Good morning. We would like to organise a Lights of the World Day. We would like to do it on Friday 11 December. Could we use the school hall, please? The families are going to help with the food.', safe: 'Good morning. We would like to organise a Lights of the World Day with four stalls about festivals of light. We’d like to do it on Friday 11 December, from ten to half past one. Could we use the school hall and, if it rains, the gym? It’s a good idea because students will learn about other cultures. We’ll explain each custom with respect, so everyone feels welcome.', daring: 'Good morning, and thank you for reading our email. We would like to organise a Lights of the World Day, with four stalls about Diwali, Hanukkah, Lunar New Year and Christmas. We’d like to hold it on Friday 11 December, from ten to half past one, so it doesn’t affect afternoon classes. Could we use the school hall, and the gym as well if it rains? It would help students learn about the cultures in our own school. If not many families come, we’ll film the stalls and share the video with the families who couldn’t come. Thank you very much for your time.' } }
   ]
 };
