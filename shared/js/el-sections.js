@@ -9,7 +9,7 @@ window.EL_SECTIONS={
   "4eso/useful-expressions":[["cards","Vocabulary"],["practice","Practice"],["listen","Listening"],["read","Reading"],["write","Writing"],["speak","Speaking"]],
   "4eso/healthy-habits":[["vocabulary","Vocabulary"],["practicePanel","Practice"],["listeningPanel","Listening"],["readingPanel","Reading"],["writing","Writing"],["speaking","Speaking"]],
   "4eso/ls2-getting-started":[["recall","Recall"],["words","Autumn words"],["read","Reading"],["listen","Listening"],["speak","Speaking"]],
-  "4eso/ls2-celebrations-around-the-world":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["log","Reading log"],["listen","Listening"],["again","Listen again"],["grammar","Grammar"],["mixed","Mixed"],["write","Writing"],["speak","Speaking"],["talk","Talk"]],
+  "4eso/ls2-celebrations-around-the-world":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["log","Reading log"],["listen","Listening"],["grammar","Grammar"],["mixed","Mixed"],["write","Writing"],["speak","Speaking"]],
   "4eso/ls2-where-traditions-come-from":[["recall","Recall"],["vocab","Vocabulary"],["listen","Listening"],["chart","Listening chart"],["grammar","Grammar"],["mixed","Mixed"],["write","Writing"],["speak","Speaking"],["talk","Talk"]],
   "4eso/ls2-research-it-right":[["recall","Recall"],["read","Reading"],["sources","Sources"],["respect","Respect"],["notes","Notes"],["credit","Credits"],["again","Listen to a source"],["talk","Talk"],["card","Card"]],
   "4eso/ls2-plan-the-day":[["recall","Recall"],["vocab","Vocabulary"],["listen","Listening"],["again","Listen again"],["grammar","Grammar"],["mixed","Which future?"],["write","The plan"],["speak","Speaking"],["talk","Talk"]],
