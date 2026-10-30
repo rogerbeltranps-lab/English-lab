@@ -2,6 +2,8 @@
 //   md(text)        a deck's text as HTML: **word** is highlighted, ___ is a gap (everything else is escaped)
 //   pic(img)        a picture: an emoji, or an image file (a path or https address)
 //   shuffle(n,seed) the order of n options for one question of one game (the same on every reload)
+//   norm(text)      a written answer made comparable: lower case, straight apostrophes, single spaces, no full stop at the end
+//   right(text,ok)  whether a written answer is one of the accepted answers ok (already normalised, as the board publishes them)
 //   music(name)     background music, made with the Web Audio API (no files): "lobby", "think" or "" (stop); only the board plays it
 //   fx(name)        a sound effect: join, tap, next, reveal, right, wrong, fanfare, drum
 //   sound(on)       sound on or off in this browser (kept as el_game_sound); sound() says which
@@ -11,6 +13,8 @@
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b class="k">$1</b>').replace(/_{3,}/g,'<span class="gap"></span>');
 const pic=s=>!s?"":/^(https?:|\.{0,2}\/)|\.(png|jpe?g|gif|svg|webp)$/i.test(s)?`<img src="${esc(s)}" alt="">`:esc(s);
+const norm=s=>String(s??"").toLowerCase().replace(/[\u2018\u2019\u02bc`´]/g,"'").replace(/\s+/g," ").trim().replace(/[.!?]+$/,"").trim();
+const right=(s,ok)=>s!=null&&Array.isArray(ok)&&ok.includes(norm(s));
 function shuffle(n,seed){   // seeded Fisher–Yates (mulberry32)
   let a=[...Array(n).keys()],t=(+seed||1)>>>0;
   const r=()=>{t=(t+0x6D2B79F5)>>>0;let x=Math.imul(t^(t>>>15),1|t);x=(x+Math.imul(x^(x>>>7),61|x))^x;return ((x^(x>>>14))>>>0)/4294967296};
@@ -103,5 +107,5 @@ function bg(){const d=document.createElement("div");d.className="bgfx";d.setAttr
   d.innerHTML=Array.from({length:14},(_,i)=>`<i style="left:${(i*7.3+3)%100}%;width:${40+(i*17)%70}px;height:${40+(i*17)%70}px;animation-duration:${14+(i*5)%16}s;animation-delay:-${(i*3.7)%18}s"></i>`).join("");
   document.body.prepend(d)}
 
-window.ELGame={esc,md,pic,shuffle,music,fx,sound,confetti,bg};
+window.ELGame={esc,md,pic,norm,right,shuffle,music,fx,sound,confetti,bg};
 })();

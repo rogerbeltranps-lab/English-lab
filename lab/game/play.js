@@ -2,7 +2,8 @@
 // the teacher starts a game for their group (el-cloud.js, el-deck-points.js), with ?g={group}&from={the page they were on}. It follows
 // live/{group} (written by the board, host.js) and shows only what the student needs: the question and its options as four coloured
 // tiles; one tap is their answer (live/{group}/answers/{email}, firestore.rules: their own); once the teacher shows the answer, a green
-// or red screen. No deck file is loaded here, so the answers are never on a student's device before the teacher shows them.
+// or red screen. A written question (q.write, Roger 30 Oct 2026) shows a box instead of the tiles: the student types the missing words
+// and sends them once; the board checks them. No deck file is loaded here, so the answers are never on a student's device before the teacher shows them.
 // Sounds only for the student's own taps and results; the music plays on the board.
 import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -14,11 +15,11 @@ const G=window.ELGame,{esc,md,pic}=G;
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
 const app$=document.getElementById("app");G.bg();
 const P=new URLSearchParams(location.search),FROM=(P.get("from")||"").startsWith("/")?P.get("from"):new URL("../../today.html",location.href).pathname;
-let user=null,group=(P.get("g")||"").replace(/[^\w-]/g,""),x=null,ref=null,mySid=0,mine={},tester=false,stop=null,shown="";
+let user=null,group=(P.get("g")||"").replace(/[^\w-]/g,""),x=null,ref=null,mySid=0,mine={},tester=false,stop=null,shown="",draft={k:"",v:""};
 
 const fresh=at=>{const ms=at&&(at.toMillis?at.toMillis():+at);return !!ms&&Date.now()-ms<10*60e3};
 const gameOn=()=>!!(x&&x.game&&x.on&&fresh(x.at));
-const score=()=>Object.entries((x&&x.keys)||{}).filter(([i,ok])=>mine[i]===ok).length;
+const score=()=>Object.entries((x&&x.keys)||{}).filter(([i,ok])=>Array.isArray(ok)?G.right(mine[i],ok):mine[i]===ok).length;
 const first=()=>((user&&user.displayName)||"").split(" ")[0]||(user&&user.email||"").split("@")[0];
 
 const top=()=>`<div class="top">${!gameOn()||x.phase==="end"?`<a class="btn go" href="${esc(FROM)}">← Back</a>`:""}<span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>${user?`<span class="pill" title="${esc(user.email)}">👤 ${esc(first())}</span>`:""}
@@ -36,11 +37,24 @@ function draw(){
   if(ph==="end"){const s=score(),t=x.qt||0;
     if(shown!==x.sid+":end"){shown=x.sid+":end";G.fx("fanfare");if(s>0)G.confetti()}
     return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p>`)}
+  if(ph==="q"&&q.write&&mine[i]==null){const k=x.sid+":"+i,v=draft.k===k?draft.v:"";
+    app$.innerHTML=top()+`<div class="main"><div class="card qcard slidein">${md(q.text)}</div>
+      <form class="wform slidein" data-k="${esc(k)}"><label for="wa">✏️ Write the missing words <span class="note">Escriu només les paraules que falten</span></label>
+        <input id="wa" type="text" maxlength="60" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" value="${esc(v)}">
+        <button class="btn go" type="submit">Send ✓</button></form></div>`;
+    const inp=document.getElementById("wa");inp.focus();inp.setSelectionRange(v.length,v.length);return}
+  if(ph==="q"&&q.write){
+    return page(`<span class="chosen typed pop">${esc(mine[i])}</span><p class="big">Answer sent!</p><p class="mid dots"><span></span><span></span><span></span></p><p class="mid">Wait for the others.</p>`)}
   if(ph==="q"&&mine[i]==null){
     app$.innerHTML=top()+`<div class="main"><div class="card qcard slidein">${md(q.text)}</div>
       <div class="tiles${n===2?" two":""}">${(q.opts||[]).map((o,k)=>`<button class="tile t${k}" data-v="${k}"><span class="shp s${k}"></span><span class="tx">${md(o)}</span></button>`).join("")}</div></div>`;return}
   if(ph==="q"){const k=mine[i];
     return page(`<span class="chosen pop" style="background:var(--c${k})"><span class="shp s${k}"></span>${md((q.opts||[])[k])}</span><p class="big">Answer sent!</p><p class="mid dots"><span></span><span></span><span></span></p><p class="mid">Wait for the others.</p>`)}
+  if(ph==="reveal"&&q.write){const k=mine[i],right=G.right(k,(x.keys||{})[i]),key=x.sid+":"+i;
+    if(shown!==key){shown=key;G.fx(k==null?"":right?"right":"wrong")}
+    app$.innerHTML=top()+`<div class="res ${k==null?"none":right?"ok":"no"}"><div class="pop"><div class="mark">${k==null?"⏰":right?"✓":"✗"}</div>
+      <p class="big">${k==null?"No answer":right?"Correct! +1":"Not this time"}</p>
+      ${right?"":`${k==null?"":`<p class="mid">You wrote: <s>${esc(k)}</s></p>`}<p class="mid">The answer: <b>${esc(x.ok)}</b></p>`}<p class="mid">Look at the board.</p></div></div>`;return}
   if(ph==="reveal"){const k=mine[i],ok=x.ok,right=k===ok,key=x.sid+":"+i;
     if(shown!==key){shown=key;G.fx(k==null?"":right?"right":"wrong")}
     app$.innerHTML=top()+`<div class="res ${k==null?"none":right?"ok":"no"}"><div class="pop"><div class="mark">${k==null?"⏰":right?"✓":"✗"}</div>
@@ -49,6 +63,14 @@ function draw(){
   page(`<p class="big">Look at the board</p>`);
 }
 
+function send(v){   // a written answer, once
+  if(!gameOn()||x.phase!=="q"||!(x.q&&x.q.write))return;const i=String(x.i);v=String(v||"").replace(/\s+/g," ").trim().slice(0,60);
+  if(!v||mine[i]!=null)return;
+  mine[i]=v;draft={k:"",v:""};G.fx("tap");draw();
+  if(ref&&mySid===x.sid)S.setDoc(ref,{sid:x.sid,a:{[i]:v},at:S.serverTimestamp()},{merge:true}).catch(err=>console.warn("answer",err));
+}
+app$.addEventListener("submit",e=>{e.preventDefault();const f=e.target.closest(".wform");if(f)send(f.querySelector("input").value)});
+app$.addEventListener("input",e=>{const f=e.target.closest(".wform");if(f)draft={k:f.dataset.k,v:e.target.value}});   // a redraw keeps what they typed
 app$.addEventListener("click",async e=>{
   const t=e.target.closest(".tile[data-v]");
   if(t&&gameOn()&&x.phase==="q"){const i=String(x.i),v=+t.dataset.v;if(mine[i]!=null)return;

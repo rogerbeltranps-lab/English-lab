@@ -3,4 +3,5 @@
 window.EL_GAMES=[
   {id:"4eso-customs-dates",title:"Customs, origins & festive words",course:"4eso",emoji:"🎃",ls:"Seasons & Celebrations · Safe"},
   {id:"2eso-free-time",title:"Free-time words & how often",course:"2eso",emoji:"🛹",ls:"Free Time, Live! · Safe"},
+  {id:"2eso-present-continuous",title:"What are they doing? Choose it, write it",course:"2eso",emoji:"✏️",ls:"Free Time, Live! · Safe"},
 ];

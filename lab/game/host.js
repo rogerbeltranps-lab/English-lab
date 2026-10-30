@@ -3,10 +3,14 @@
 // writes it, the group's students read it), and every signed-in student of the group is taken into the player (play.html) from any page
 // (el-cloud.js, el-deck-points.js). The student's device only ever gets the question and the options in the shown order; the right one
 // arrives once the teacher shows it. Students answer in live/{group}/answers/{email} = {sid, a:{slide: option}, at} (rules: their own).
+// A written question (deck {q, write:[accepted answers]}, Roger 30 Oct 2026): students type the missing words instead (a:{slide: text});
+// the board checks them with ELGame.norm when it shows the answer, and shows the wrong answers (no names) to talk about them.
 // When the answer is shown, every student who tapped the right one gets +1 in points/{email}.{term} and the group's best goes to
 // teams/{group}.best.{term}, the same points as the class presentations (el-points.js: bonus up to +0.5, in proportion to the best).
-//   live/{group} = {on, game:true, deck, title, sid, at, phase: lobby | theory | q | reveal | end, i, qn, qt, keys:{slide: right option},
-//                   q:{text, img, opts} (a question), th:{title, img} (a theory slide), ok (the right option, once shown)}
+//   live/{group} = {on, game:true, deck, title, sid, at, phase: lobby | theory | q | reveal | end, i, qn, qt,
+//                   keys:{slide: right option | [accepted answers, normalised] for a written one},
+//                   q:{text, img, opts} (a question) or q:{text, img, write:true} (a written one), th:{title, img} (a theory slide),
+//                   ok (once shown: the right option, or the answer to show for a written one)}
 // The board keeps its place in this tab (sessionStorage), so a reload goes on with the same game.
 import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -30,6 +34,8 @@ const keep=()=>tab.set(H.sid?{deckId:H.deckId,g:H.g,sid:H.sid,i:H.i,phase:H.phas
 const slides=()=>H.deck?H.deck.slides:[];
 const cur=()=>slides()[H.i];
 const isQ=s=>!!(s&&s.q);
+const isW=s=>!!(s&&s.q&&s.write);   // a written question
+const accepted=i=>slides()[i].write.map(G.norm);
 const qList=()=>slides().map((s,i)=>isQ(s)?i:-1).filter(i=>i>=0);
 const order=i=>{const s=slides()[i];return s.keep?[...s.options.keys()]:G.shuffle(s.options.length,H.sid+i*7919)};   // order[k] = the deck's option shown k-th
 const okAt=i=>order(i).indexOf(0);   // the deck's first option is the right one
@@ -52,8 +58,9 @@ function live(){
   const s=cur(),qs=qList(),base={on:true,game:true,deck:location.pathname,title:H.deck.title,sid:H.sid,phase:H.phase==="show"?(isQ(s)?"q":"theory"):H.phase,
     i:H.i,qn:qs.indexOf(H.i)+1,qt:qs.length,keys:H.keys,at:S.serverTimestamp()};
   if(s&&H.phase!=="end"&&H.phase!=="lobby"){
-    if(isQ(s))base.q={text:s.q,img:s.img||"",opts:order(H.i).map(k=>s.options[k])};else base.th={title:s.theory||"",img:s.img||""};
-    if(H.phase==="reveal")base.ok=okAt(H.i);
+    if(isW(s))base.q={text:s.q,img:s.img||"",write:true};
+    else if(isQ(s))base.q={text:s.q,img:s.img||"",opts:order(H.i).map(k=>s.options[k])};else base.th={title:s.theory||"",img:s.img||""};
+    if(H.phase==="reveal")base.ok=isW(s)?s.write[0]:okAt(H.i);
   }
   S.setDoc(S.doc(db,"live",H.g),base).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()});
 }
@@ -79,9 +86,9 @@ async function startGroup(){
   clearInterval(liveBeat);liveBeat=setInterval(live,60e3);   // every minute too: the students' devices know the game is still on
   live();draw();
 }
-// The answer is shown: everyone who tapped the right one gets +1 (once per slide and game; late taps after this don't count).
+// The answer is shown: everyone who tapped the right one (or wrote an accepted answer) gets +1 (once per slide and game; late taps after this don't count).
 async function award(i){
-  if(H.aw[i])return;const ok=okAt(i),hit=Object.entries(H.players).filter(([,a])=>a[i]===ok).map(([em])=>em);
+  if(H.aw[i])return;const w=isW(slides()[i]),ok=w?accepted(i):okAt(i),hit=Object.entries(H.players).filter(([,a])=>w?G.right(a[i],ok):a[i]===ok).map(([em])=>em);
   H.aw[i]=hit;H.keys[i]=ok;keep();
   if(!hit.length)return;
   hit.forEach(em=>H.pts[em]=(H.pts[em]||0)+1);
@@ -128,7 +135,7 @@ function endGame(){
 /* ---------- screens ---------- */
 const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1;
   return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">🎮 ${Object.keys(H.players).length}</span>
-  ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`Question ${qn} / ${qs.length}`:"Theory"}</span>`:""}<span class="sp"></span>
+  ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}`:"Theory"}</span>`:""}<span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}
   <button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
   <button class="btn ghost" data-do="end" title="End the game for everyone">■ End</button></div>`};
@@ -165,7 +172,21 @@ function draw(){
   if(!isQ(s)){
     app$.innerHTML=top()+`<div class="main"><div class="card theory slidein"><div class="pic">${pic(s.img)}</div><div><h2>${md(s.theory)}</h2>${(s.lines||[]).map(l=>`<p>${md(l)}</p>`).join("")}</div></div>
       <div style="text-align:right"><button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}
-  const rev=H.phase==="reveal",n=answered(H.i).length,o=order(H.i),ok=okAt(H.i);
+  const rev=H.phase==="reveal",n=answered(H.i).length;
+  if(isW(s)){
+    const ok=accepted(H.i),wrong={};
+    answered(H.i).forEach(a=>{if(!G.right(a[H.i],ok)){const t=G.norm(a[H.i]);wrong[t]=(wrong[t]||0)+1}});
+    const top6=Object.entries(wrong).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,6);
+    const also=s.write.slice(1).filter(t=>!t.startsWith("'"));   // other full forms (a contraction alone like 's cheering is accepted, not shown)
+    app$.innerHTML=top()+`<div class="main"><div class="card qcard slidein">${md(s.q)}</div><div class="mid">
+      <div class="stat">${rev?`<b>${(H.aw[H.i]||[]).length}</b>right`:`<b>${n}</b>answer${n===1?"":"s"}${P.length?` / ${P.length}`:""}`}</div><div class="pic pop">${pic(s.img)}</div>
+      <div style="text-align:center">${rev?`<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button>`:`<button class="btn go" data-do="reveal">Show answer<span class="kbd">Space</span></button>`}</div></div>
+      ${rev&&s.why?`<div class="card why pop">💡 ${md(s.why)}</div>`:""}
+      ${rev?`<div class="wans pop"><span class="mark">✓</span><span>${esc(s.write[0])}${also.length?`<small>also: ${also.map(esc).join(" · ")}</small>`:""}</span></div>
+        ${top6.length?`<div class="wrongs"><span>Wrong answers:</span>${top6.map(([t,c])=>`<span class="w">${esc(t||"…")}${c>1?` <b>×${c}</b>`:""}</span>`).join("")}</div>`:""}`
+      :`<div class="wask">✏️ Write the missing words on your Chromebook</div>`}</div>`;
+    return}
+  const o=order(H.i),ok=okAt(H.i);
   let middle;
   if(rev){const c=o.map((_,k)=>answered(H.i).filter(a=>a[H.i]===k).length),mx=Math.max(1,...c);
     middle=`<div class="stat"><b>${(H.aw[H.i]||[]).length}</b>right</div>

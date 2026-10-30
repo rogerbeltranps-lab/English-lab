@@ -33,6 +33,14 @@
 .card.msg{max-width:30em;padding:1.2em 1.6em}.card.msg h2{margin:.1em 0 .4em;color:#5b21b6}
 .note{font-size:14px;opacity:.85}
 .center .btn.go{font-size:clamp(20px,2.2vw,28px);padding:.5em 1.6em}
+/* a written question */
+.wform{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center}
+.wform label{font-size:clamp(20px,2.4vw,30px);font-weight:700}.wform label .note{display:block;font-weight:500}
+.wform input{width:min(100%,640px);font:700 clamp(24px,3vw,40px) var(--f);padding:.4em .6em;border:0;border-radius:14px;color:var(--ink);text-align:center;user-select:text;box-shadow:inset 0 -5px 0 rgba(0,0,0,.15)}
+.wform input:focus{outline:4px solid var(--gold);outline-offset:2px}
+.wform .btn{font-size:clamp(20px,2.4vw,30px);padding:.45em 1.6em}
+.chosen.typed{background:#fff;color:var(--ink)}
+.res s{opacity:.9}
 </style></head>
 <body class="play"><div class="app" id="app"><div class="center"><p>Loading…</p></div></div>
 <script src="game.js"></script>
