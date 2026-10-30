@@ -1,0 +1,123 @@
+{
+ "course": "4eso",
+ "ls": "LS1 My Real Routine",
+ "intro": "LS1 has no Pro pages on the site: this is a C2 extension of the same topics (routines, useful expressions, phrasal verbs, healthy habits), for revision and for the exam.",
+ "order": "Learning Path 1 (a warm-up) and Learning Path 6 (the final product) have no new vocabulary or grammar.",
+ "gintro": "One C2 grammar point per Learning Path, with practice in the style of C2 Proficiency key word transformations (3–8 words, including the word in CAPITALS) and open cloze.",
+ "lps": [
+  {"n": 2, "title": "A day in real life", "vocab": [
+   {"name": "Routine and time", "items": [
+    ["a creature of habit", "someone who always does the same things in the same way", "My dad is a creature of habit: same breakfast every day."],
+    ["like clockwork", "happening regularly and exactly as planned", "The 7.42 bus arrives like clockwork."],
+    ["the daily grind", "the boring, tiring routine of work or school", "By Thursday the daily grind starts to wear me down."],
+    ["to be stuck in a rut", "to be in a boring situation that never changes", "I felt stuck in a rut, so I joined the climbing club."],
+    ["at the crack of dawn", "very early in the morning", "Bakers start work at the crack of dawn."],
+    ["to burn the midnight oil", "to work or study late into the night", "I burnt the midnight oil before the exam."],
+    ["to cram (something) in", "to fit a lot of activities into a short time", "We crammed in three museums in one afternoon."],
+    ["to fritter away (time)", "to waste time on unimportant things", "I frittered away the evening on my phone."],
+    ["to while away (the hours)", "to spend time pleasantly when there is nothing else to do", "We whiled away the afternoon playing cards."]]},
+   {"name": "Collocations", "items": [
+    ["a gruelling schedule", "an extremely tiring timetable", "Athletes keep a gruelling training schedule."],
+    ["to keep regular hours", "to go to bed and get up at the same times", "Keeping regular hours helps you sleep better."],
+    ["to snatch (a bite / some sleep)", "to get a little of something quickly, when you can", "I snatched a sandwich between classes."],
+    ["a hectic pace", "a very busy, fast rhythm", "I can't keep up this hectic pace much longer."],
+    ["to be pressed for time", "to have very little time", "Sorry, I'm a bit pressed for time today."]]}],
+   "grammar": [{"title": "Habits at C2: always, will / would, tend to, used to", "how": [
+    "<strong>Present continuous + always / constantly / forever</strong> for a habit that annoys you: <em>He's always borrowing my charger.</em>",
+    "<strong>will / would</strong> for typical, characteristic behaviour (present / past): <em>She'll sit there for hours. · As a child I would spend every summer at the beach.</em> Stressed <em>WILL</em> shows irritation: <em>He WILL leave his socks on the floor.</em>",
+    "<strong>tend to / be prone to / be inclined to</strong> for general tendencies: <em>Teenagers tend to go to bed late. · I'm prone to oversleeping on Mondays.</em>",
+    "<strong>used to + infinitive</strong> (past habit, now finished) vs <strong>be / get used to + -ing</strong> (be / become accustomed): <em>I used to walk to school. · I'm used to getting up early. · I'm getting used to the new timetable.</em>",
+    "<strong>Exam tip:</strong> would is not possible for past states: <em>I used to have</em> (not <em>would have</em>) <em>long hair.</em>"],
+    "practice": [
+     ["My brother leaves his things everywhere, which drives me mad. ALWAYS → My brother ___ his things everywhere.", "is always leaving", "Present continuous + always for an annoying habit."],
+     ["When I was little, my grandmother read to me every night. WOULD → When I was little, my grandmother ___ every night.", "would read to me", "would for a repeated past action."],
+     ["Teenagers generally go to bed later than adults. TEND → Teenagers ___ bed later than adults.", "tend to go to", "tend to + infinitive."],
+     ["Getting up at six is no longer hard for me. USED → I ___ up at six.", "am used to getting / have got used to getting", "be / get used to + -ing."],
+     ["I had a long journey to school in primary, but not any more. USED → I ___ a long journey to school in primary.", "used to have", "Past state: used to, not would."],
+     ["I often oversleep on Mondays. PRONE → I ___ on Mondays.", "am prone to oversleeping", "be prone to + -ing."],
+     ["Open cloze: She ___ sit by the window for hours, just watching the street. (characteristic behaviour)", "will", "will for typical present behaviour."],
+     ["Open cloze: It took me months to get used ___ the new timetable.", "to", "get used to (+ noun / -ing)."]]}]},
+  {"n": 3, "title": "Useful expressions", "vocab": [
+   {"name": "Phrasal verbs: the day", "items": [
+    ["to drag yourself out of bed", "to get up with great difficulty", "On Mondays I have to drag myself out of bed."],
+    ["to lie in", "to stay in bed later than usual", "On Sundays I lie in until ten."],
+    ["to turn in", "to go to bed", "I'm shattered: I'm going to turn in."],
+    ["to nod off / to doze off", "to fall asleep without meaning to", "I nodded off during the film."],
+    ["to wind down", "to relax gradually after activity or stress", "Reading helps me wind down before bed."],
+    ["to squeeze in", "to manage to fit something into a busy timetable", "Can you squeeze in a quick coffee?"],
+    ["to get round to", "to finally do something you have been meaning to do", "I never got round to answering her message."],
+    ["to knuckle down", "to start working hard and seriously", "With exams next week, it's time to knuckle down."]]},
+   {"name": "Idioms", "items": [
+    ["to call it a day", "to stop working for the day", "We've done enough: let's call it a day."],
+    ["to bite the bullet", "to do something unpleasant that you have been avoiding", "I bit the bullet and started my project."],
+    ["to hit the ground running", "to start something with energy and speed", "After the holidays I want to hit the ground running."],
+    ["to be on the go", "to be very busy and active all the time", "I've been on the go since seven this morning."],
+    ["a night owl / an early bird", "someone who is most active late at night / early in the morning", "I'm a night owl: I can't think before ten."]]}],
+   "grammar": [{"title": "Discourse at C2: concession and contrast", "how": [
+    "<strong>Much as / Although / While</strong> + clause: <em>Much as I love weekends, I find them hard to organise.</em>",
+    "<strong>albeit</strong> + adjective / adverb / phrase (= although): <em>a useful, albeit tiring, routine.</em>",
+    "<strong>Despite / In spite of / Notwithstanding</strong> + noun or -ing: <em>Despite going to bed early, I felt exhausted.</em> (never <em>despite of</em>)",
+    "<strong>Adjective / adverb + as / though + subject + verb</strong>: <em>Tired as I was, I finished my homework.</em>",
+    "<strong>Linking two sentences:</strong> <em>That said, … · Even so, … · Be that as it may, … · Nevertheless, …</em>"],
+    "practice": [
+     ["Although I love weekends, I find them hard to organise. MUCH → ___ weekends, I find them hard to organise.", "Much as I love", "Much as + clause."],
+     ["I was very tired, but I finished my homework. AS → Tired ___ , I finished my homework.", "as I was", "Adjective + as + subject + verb."],
+     ["I went to bed early, but I still felt exhausted. DESPITE → ___ to bed early, I still felt exhausted.", "Despite going / Despite having gone", "Despite + -ing."],
+     ["It's a useful routine, although it's tiring. ALBEIT → It's a useful, ___ , routine.", "albeit tiring", "albeit + adjective."],
+     ["Open cloze: In spite ___ the noise, I slept well.", "of", "in spite of + noun."],
+     ["Open cloze: The plan is ambitious. That ___ , it's worth trying.", "said", "That said = however."],
+     ["Open cloze: Hard ___ she tried, she couldn't wake up before nine.", "as / though", "Adverb + as / though + subject + verb."],
+     ["Open cloze: Be that as it ___ , we still have to finish by Friday.", "may", "Fixed phrase: be that as it may."]]}]},
+  {"n": 4, "title": "Present Simple & Phrasal verbs", "vocab": [
+   {"name": "Phrasal verbs with nuance", "items": [
+    ["to fall behind (with)", "to fail to keep up with work or a schedule", "I fell behind with my reading when I was ill."],
+    ["to keep up with", "to move or learn at the same speed as others", "It's hard to keep up with all my subjects."],
+    ["to cut down on", "to reduce the amount of something", "I'm trying to cut down on screen time."],
+    ["to cut out", "to stop eating or doing something completely", "She cut out fizzy drinks."],
+    ["to come down with", "to start to suffer from an illness", "I came down with flu the day before the trip."],
+    ["to burn out", "to become exhausted from working too hard", "If you never rest, you'll burn out."],
+    ["to bounce back", "to recover quickly after a problem", "She bounced back after a bad first term."],
+    ["to put up with", "to accept something annoying without complaining", "I can't put up with the noise any longer."],
+    ["to face up to", "to accept and deal with a difficult situation", "You need to face up to the problem."]]}],
+   "grammar": [{"title": "Present tenses at C2: stative verbs and the present perfect continuous", "how": [
+    "<strong>Stative verbs with two meanings:</strong> <em>I think it's late</em> (opinion) vs <em>I'm thinking of joining a gym</em> (considering). Also <em>have, see, taste, appear, be</em>: <em>He's being difficult</em> (behaving, temporarily).",
+    "<strong>Present perfect continuous</strong> for an activity with visible results or for emphasis on duration: <em>I've been revising all afternoon, so I'm shattered.</em>",
+    "<strong>Present simple for scheduled events</strong> and in time clauses about the future: <em>The train leaves at 7.15. · I'll call you when I get home.</em>",
+    "<strong>Phrasal verbs:</strong> with a pronoun object, separable verbs must be split: <em>turn it off</em> (not <em>turn off it</em>); three-part verbs never split: <em>put up with it</em>."],
+    "practice": [
+     ["I am considering joining the climbing club. THINKING → I ___ the climbing club.", "am thinking of joining / am thinking about joining", "think (dynamic) = consider."],
+     ["He is behaving very rudely today. BEING → He ___ today.", "is being very rude", "be in the continuous = behaving."],
+     ["I started revising at two and I'm still doing it. BEEN → I ___ two o'clock.", "have been revising since", "Present perfect continuous + since."],
+     ["I can't tolerate this noise any longer. PUT → I can't ___ this noise any longer.", "put up with", "Three-part phrasal verb, never split."],
+     ["Open cloze: Switch the TV off, please. → Switch ___ off, please. (pronoun)", "it", "Pronoun between verb and particle."],
+     ["Open cloze: I'll text you as soon as I ___ home. (arrive)", "get", "Present simple in future time clauses."],
+     ["I'm trying to eat less sugar. CUT → I'm trying to ___ sugar.", "cut down on", "cut down on = reduce."],
+     ["She recovered quickly after a bad start. BOUNCED → She ___ after a bad start.", "bounced back quickly", "bounce back = recover."]]}]},
+  {"n": 5, "title": "Healthy habits", "vocab": [
+   {"name": "Health and well-being", "items": [
+    ["sedentary", "involving a lot of sitting and little exercise", "A sedentary lifestyle is bad for your heart."],
+    ["sleep deprivation", "not getting enough sleep over a period of time", "Sleep deprivation affects concentration."],
+    ["to be glued to (a screen)", "to look at something constantly", "He's glued to his phone all evening."],
+    ["in moderation", "in reasonable, not excessive, amounts", "Sweets are fine in moderation."],
+    ["wholesome", "good for your health or your well-being", "a wholesome breakfast"],
+    ["to take its toll (on)", "to have a gradual harmful effect", "Late nights took their toll on my grades."],
+    ["to stave off", "to stop something bad from happening for a time", "A short walk staves off the afternoon slump."],
+    ["well-being", "the state of being healthy and happy", "Exercise improves mental well-being."],
+    ["to recharge your batteries", "to rest so that you have energy again", "A weekend in the mountains recharges my batteries."]]}],
+   "grammar": [{"title": "Advice and hypothesis at C2", "how": [
+    "<strong>It's (high / about) time + past simple</strong>: <em>It's high time you went to bed.</em>",
+    "<strong>would rather + past simple</strong> (someone else): <em>I'd rather you didn't eat in my room.</em>",
+    "<strong>Inverted conditionals</strong> (formal): <em>Were you to sleep more, you'd feel better. · Had I known, I'd have gone to bed earlier. · Should you feel unwell, rest.</em>",
+    "<strong>Formal advice:</strong> <em>You'd be well advised to… · It might be worth + -ing… · If I were in your shoes, I'd…</em>",
+    "<strong>But for / Without</strong> + noun = if it were not for: <em>But for my alarm, I'd never get up.</em>"],
+    "practice": [
+     ["You should go to bed now; it's late. TIME → It's ___ to bed.", "high time you went / about time you went", "It's high time + past simple."],
+     ["If you slept more, you'd feel better. WERE → ___ more, you'd feel better.", "Were you to sleep", "Inverted second conditional."],
+     ["If I had known about the test, I would have revised. HAD → ___ about the test, I would have revised.", "Had I known", "Inverted third conditional."],
+     ["I'd prefer you not to use your phone at dinner. RATHER → I'd ___ your phone at dinner.", "rather you did not use / rather you didn't use", "would rather + past simple."],
+     ["If it weren't for my alarm, I'd never get up. BUT → ___ alarm, I'd never get up.", "But for my", "But for + noun."],
+     ["It would be a good idea for you to cut down on caffeine. ADVISED → You'd ___ down on caffeine.", "be well advised to cut", "be well advised to + infinitive."],
+     ["Open cloze: It might be worth ___ (try) a new routine.", "trying", "worth + -ing."],
+     ["Open cloze: If I ___ in your shoes, I'd talk to the coach.", "were", "If I were…"]]}]}
+ ]
+}

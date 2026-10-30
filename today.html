@@ -108,6 +108,8 @@ function render(){
   const lss=[...EL_LS].filter(l=>{const i=D.ls[l.id]||{status:"hidden"};return all()||(i.status!=="hidden"&&elLsForGroup(l,i,D.me.group))})
     .sort((a,b)=>((D.ls[b.id]||{}).status==="open")-((D.ls[a.id]||{}).status==="open"));   // open LS first
   // the board opens on the group's current LS by the time plan (ELWeek.now; Roger, 27 Oct 2026), else the first open one
+  // ?ls=…#exam: the "exam results are ready" card (el-exam-notice.js) opens the board on that LS with the exam by criteria open
+  if(S.ls==null&&!S.url){S.url=true;const p=new URLSearchParams(location.search).get("ls");if(p&&lss.some(l=>l.id===p))S.ls=p}
   if(lss.length&&!lss.some(l=>l.id===S.ls))S.ls=(lss.find(l=>l.id===(ELWeek.now(D.me.group)||{}).ls)||lss[0]).id;
   setLang();
   const links=all()?lss:lss.filter(l=>!only(l.id));   // no links to an LS that only shows its grade
@@ -163,9 +165,9 @@ async function goLive(){
   F.onSnapshot(F.doc(db,"teams",g),x=>{D.tm=x.exists()?x.data():null;ptDraw()},e=>console.warn("teams",e));
 }
 // Vocabulary and grammar summary (Roger, 25 Oct 2026): an optional PDF per route; a student gets only their route's, the teacher and testers all three.
-function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=elRouteOf(D.lv,ls.id).level,a=r=>`<a class="go" href="${ls.study}${r==="beginners"?"insecure":r==="native"?"daring":r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
+function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=elRouteOf(D.lv,ls.id).level,a=r=>`<a class="go" href="${ls.study}${r==="beginners"?"insecure":r==="native"&&!ls.pro?"daring":r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
   if(!all()&&!lv)return "";
-  return `<div class="box study"><b>📚 ${t("Descarrega el resum del vocabulari i la gramàtica per estudiar-los!","Download the summary of the vocabulary and grammar to study them!")}</b><p class="muted">${t("Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. És opcional: fes-lo servir si et va bé.","All the vocabulary and then all the grammar of your route, with the explanations and practice. It is optional: use it if it helps you.")}</p><div class="row">${all()?EL_LEVELS.filter(x=>x.id!=="beginners"&&x.id!=="native").map(x=>a(x.id)).join(""):a(lv)}</div></div>`}
+  return `<div class="box study"><b>📚 ${t("Descarrega el resum del vocabulari i la gramàtica per estudiar-los!","Download the summary of the vocabulary and grammar to study them!")}</b><p class="muted">${t("Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. És opcional: fes-lo servir si et va bé.","All the vocabulary and then all the grammar of your route, with the explanations and practice. It is optional: use it if it helps you.")}</p><div class="row">${all()?EL_LEVELS.filter(x=>x.id!=="beginners"&&(x.id!=="native"||ls.pro)).map(x=>a(x.id)).join(""):a(lv)}</div></div>`}
 // LS1 (Roger, 25 Oct 2026): only the final exam and the final product count, so the board shows just the LS grade (EL_GRADING[ls].only),
 // with no learning paths and no links to the LS pages, so students do not go back to the activities.
 const only=id=>((window.EL_GRADING||{})[id]||{}).only;
@@ -173,7 +175,7 @@ const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")}
 // Exam broken down (Roger, 30 Oct 2026): the points of each section and the exam per criterion (elExamByCrit), when the LS's sections
 // carry criteria; nothing until the teacher has entered a section.
 function examByCrit(e,sc){const by=elExamByCrit(e,sc).filter(o=>o.n),pts=n=>f1(+(+n).toFixed(2));if(!by.length)return "";
-  return `<details style="margin-top:10px"><summary style="font-weight:600;cursor:pointer">${t("L'examen per criteris","Your exam by criteria")}</summary>`
+  return `<details style="margin-top:10px"${location.hash==="#exam"?" open":""}><summary style="font-weight:600;cursor:pointer">${t("L'examen per criteris","Your exam by criteria")}</summary>`
     +`<table class="legend"><tbody>${by.map(o=>`<tr><td><b>${o.c}</b> <small class="muted">${esc(elCompetence(o.c))}</small><br><small class="muted">${e.sections.filter(x=>(x[3]||[]).includes(o.c)).map(x=>x[1]).join(" + ")}</small></td><td><b style="color:${col(o.score/o.max*100)}">${f1(o.score/o.max*10)} / 10</b><br><small class="muted">${pts(o.score)} / ${o.max} ${t("punts","points")}</small></td></tr>`).join("")}</tbody></table>`
     +`<p class="muted" style="margin:6px 0">${t("Punts per apartat","Points per section")}: ${e.sections.filter(([k])=>sc[k]&&sc[k].score!=null).map(([k,n,mx])=>`${n} ${pts(sc[k].score)}/${sc[k].max||mx}`).join(" · ")}</p>`
     +`<p class="muted" style="margin:0">${elExamShared(e).length?t("Aquests apartats compten per a dos criteris: ","These sections count for two criteria: ")+esc(elExamShared(e).join(", "))+". ":""}${t("La nota de l'examen és el total de punts ÷ 10.","Your exam mark is all your points ÷ 10.")}</p></details>`}
@@ -182,7 +184,7 @@ function onlyView(id){const g=EL_GRADING[id],e=g.exam,sc=(D.rs[id+"/assessment"]
   const m=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null,prod=fp.max?(fp.score||0)/fp.max*10:null;
   const val={exam,fp:prod},total=exam!=null&&prod!=null?g.blocks.reduce((n,b)=>n+val[b.id]*b.w,0)/g.blocks.reduce((n,b)=>n+b.w,0):null;
   const name={exam:t("Examen final","Final exam"),fp:t("Producte final","Final product")},big=v=>`<b style="font-size:1.3rem;color:${v==null?"#94a3b8":col(v*10)}">${v==null?"–":f1(v)+" / 10"}</b>`;
-  return `<div class="box"><h2>${t("Nota de la LS","LS grade")}</h2><p class="muted">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><table class="legend"><tbody>`
+  return `<div class="box" id="exam"><h2>${t("Nota de la LS","LS grade")}</h2><p class="muted">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><table class="legend"><tbody>`
     +g.blocks.map(b=>`<tr><td><b>${name[b.id]}</b> <small class="muted">${b.w} %</small></td><td>${big(val[b.id])}${val[b.id]==null?`<br><small class="muted">${t("encara no hi ha nota","no mark yet")}</small>`:""}</td></tr>`).join("")
     +`<tr><td><b>${t("Nota de la LS","LS mark")}</b></td><td>${big(total)}</td></tr></tbody></table>`+examByCrit(e,sc)
     +(fp.feedback?`<p style="margin:10px 0 4px;font-weight:600">${t("Feedback del producte final","Final product feedback")}</p><div class="fb">${esc(fp.feedback)}</div>`:"")+`</div>`}
@@ -299,5 +301,5 @@ document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(
 if(DEMO){U={uid:"demo"};D=DEMO;render()}
 else ELCloud.onUser(async u=>{U=u;
   if(!u){nav(null,[]);$("#sub").textContent="Entra amb el teu correu de l’institut i la contrasenya (botó de baix a la dreta) per veure les teves activitats. · Sign in with your school email and password (button at the bottom right) to see your activities.";$("#main").innerHTML="";return}
-  D=await load(u);render();goLive()});
+  D=await load(u);render();goLive();if(location.hash==="#exam")setTimeout(()=>document.getElementById("exam")?.scrollIntoView({block:"start"}),0)});
 </script></body></html>
