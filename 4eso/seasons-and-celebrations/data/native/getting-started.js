@@ -89,3 +89,21 @@ window.GS_NATIVE = {
       '<p><strong>Phrases:</strong> <em>Up to a point… · It rather depends on… · Take…, for example. · That said,… · What it comes down to is…</em></p>'
   }
 };
+
+// Pro extra (Roger, 30 Oct 2026: real native-speed videos on the Learning Path's topic): shown under the listening, not a step.
+window.GS_NATIVE.video = {
+  heading: 'Real video: the mystery of autumn colours',
+  intro: 'A real popular-science video at native speed (PBS Terra), with a presenter, two forest scientists and people in the street. Watch it once for the main idea, then answer. Several questions test what the speakers imply, not only what they say.',
+  youtube: 'mPbU2XqIloE', title: 'There’s One Thing About Fall Colors Scientists Can’t Explain',
+  credit: 'Video: “There’s One Thing About Fall Colors Scientists Can’t Explain”, PBS Terra (YouTube).',
+  items: [
+    { q: 'Why does the presenter mention “leaf peepers”?', o: ['To show that autumn colour brings a lot of money into the region', 'To make fun of tourists', 'To introduce the scientists', 'To explain how leaves are studied'], ex: 'Leaf peepers (autumn-colour tourists) bring billions of dollars a year into New England.' },
+    { q: 'What does the presenter mean when he says that, technically, leaves don’t change colour?', o: ['The yellows and oranges were in the leaf all along, hidden by the green chlorophyll.', 'The colours are an optical illusion caused by autumn light.', 'Only red leaves really change colour.', 'Leaves die before they change colour.'], ex: 'Colder days make the tree break chlorophyll down, which reveals the pigments it was masking.' },
+    { q: 'Why does the scientist call red leaves “counterintuitive”?', o: ['The tree spends energy making a new pigment in leaves it is about to lose.', 'Red is the rarest colour in nature.', 'Red leaves fall earlier than yellow ones.', 'Red pigment stops the leaf photosynthesising.'], ex: 'Reds are made fresh in the cold, in dying leaves.' },
+    { q: 'What might the red pigment do, according to the video?', o: ['Act as a sunscreen (and perhaps keep insects away) while the tree recovers nutrients from the leaf.', 'Keep the leaf warm on cold nights.', 'Attract birds that spread the tree’s seeds.', 'Store sugar for the winter.'], ex: 'A trade-off: spend some energy to salvage more nitrogen and phosphorus before the leaf drops.' },
+    { q: 'How is the Vermont foliage survey carried out?', o: ['Observers estimate the percentage of colour and leaf drop by eye and agree on a figure.', 'Satellites measure the colour every day.', 'Leaves are collected and analysed in a laboratory.', 'Tourists send in photographs.'], ex: 'It has been done by eye for over 30 years.' },
+    { q: 'What change has the survey found, and why?', o: ['Autumn colour comes a little later, because temperature cues have become less predictable.', 'Colours are brighter, because there is more sun.', 'Leaves fall earlier, because days are shorter.', 'There is no change at all.'], ex: 'Day length is the same, but warming makes temperature cues unpredictable.' },
+    { q: 'Which weather gives the most spectacular colour?', o: ['Bright, dry days and cool nights that stay above freezing', 'Heavy rain followed by a hard frost', 'Hot days and warm nights', 'A long drought'], ex: 'More wet weather is “the wrong recipe”; extreme drought or heat dulls the colour.' },
+    { q: 'How would you describe the tone of the ending?', o: ['Concerned but reassuring: the changes will take decades, so there is time to act.', 'Alarmist: the forests will soon disappear.', 'Dismissive of climate change.', 'Strictly neutral, with no opinion.'], ex: 'He stresses that change will be slow enough to get climate change under control, then signs off cosily.' }
+  ]
+};
