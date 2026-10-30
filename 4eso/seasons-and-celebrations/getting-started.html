@@ -195,19 +195,7 @@ html,body{overflow-x:clip}
 const ROUTES=["beginners","insecure","safe","daring"];
 const forLevel=(items,lvl)=>items.filter(x=>ROUTES.indexOf(x.r||"beginners")<=ROUTES.indexOf(lvl));
 const norm=s=>String(s||"").toLowerCase().replace(/[’‘]/g,"'").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
-// The questions (recall, vocab, practice, readingChat, readingQs, listening) are in data/getting-started.js.
-const speakTask={
- beginners:"Parla de la tardor on vius (20–30 segons) amb el model: el temps, un menjar i què fas el 31 d'octubre. Canvia només les paraules que calgui.",
- insecure:"Parla de la tardor on vius (30–45 segons): el temps, el menjar i com celebres el final d'octubre. Fes servir el model i canvia els detalls.",
- safe:"Talk about autumn where you live (45–60 s): the weather, the food and how you celebrate the end of October. Compare autumn with another season or another country.",
- daring:"Talk about autumn where you live (60–90 s): the weather, the food and how you celebrate the end of October. Explain how the celebration has changed in your family."
-};
-const speakModel={
- beginners:"In autumn, it is cool and rainy. We eat chestnuts. On 31 October, we celebrate the Castanyada. I feel happy.",
- insecure:"In autumn, it is cool and rainy. The days get shorter. On 31 October, we celebrate the Castanyada. We eat chestnuts and panellets. I feel happy because my family eats together.",
- safe:"In autumn, it's mild and a bit foggy in the mornings, whereas in summer it's very hot. The clocks go back and it gets dark early. On 31 October we celebrate the Castanyada: we roast chestnuts and eat panellets at my grandparents' house. In the UK, they celebrate Halloween on the same night.",
- daring:"Autumn here is mild, but the evenings get chilly and it gets dark early after the clocks go back. On 31 October my family celebrates the Castanyada with chestnuts, sweet potatoes and panellets. When my parents were young, nobody dressed up, but now many children wear Halloween costumes too, so the celebration has changed: it mixes both traditions."
-};
+// The questions (recall, vocab, practice, readingChat, readingQs, listening) and the speaking task and model (speakTask, speakModel) are in data/getting-started.js.
 const celebrations=["Castanyada","Halloween","Diwali","Thanksgiving","Hanukkah","Christmas","Lunar New Year","A local festa major","Other"];
 
 const storageKey="ls2GettingStarted4ESO";
