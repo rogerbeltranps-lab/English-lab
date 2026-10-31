@@ -1,12 +1,12 @@
 {
  "l01": [
   {
-   "img": "r3-00-home.png"
+   "img": "r4-00-home.png"
   }
  ],
  "l02": [
   {
-   "img": "r3-00-home.png",
+   "img": "r4-00-home.png",
    "view": [
     380,
     560,
@@ -22,7 +22,7 @@
    "margin": 0.25
   },
   {
-   "img": "r3-01-signin.png",
+   "img": "r4-01-signin.png",
    "on": "Sign in",
    "view": [
     676,
@@ -39,7 +39,7 @@
    "on_ca": "Entra amb"
   },
   {
-   "img": "r3-01-signin.png",
+   "img": "r4-01-signin.png",
    "on": "Forgot",
    "view": [
     676,
@@ -58,7 +58,7 @@
  ],
  "l03": [
   {
-   "img": "r3-10-board.png",
+   "img": "r4-10-board.png",
    "hl": [
     26,
     106,
@@ -67,18 +67,18 @@
    ]
   },
   {
-   "img": "r3-03-board-ca.png",
+   "img": "r4-03-board-ca.png",
    "on": "If your route",
    "hl": [
-    380,
-    30,
-    380,
-    70
+    376,
+    36,
+    364,
+    68
    ],
    "on_ca": "Si la teva ruta"
   },
   {
-   "img": "r3-03-board-ca.png",
+   "img": "r4-03-board-ca.png",
    "on": "your board is in Catalan",
    "view": [
     384,
@@ -87,10 +87,10 @@
     140
    ],
    "hl": [
-    1166,
-    494,
-    74,
-    30
+    1114,
+    478,
+    152,
+    36
    ],
    "margin": 0.1,
    "on_ca": "el tauler és en català"
@@ -98,7 +98,7 @@
  ],
  "l04": [
   {
-   "img": "r3-10-board.png",
+   "img": "r4-10-board.png",
    "from": [
     0,
     0,
@@ -122,7 +122,7 @@
  ],
  "l05": [
   {
-   "img": "r3-10-board.png",
+   "img": "r4-10-board.png",
    "from": [
     0,
     0,
@@ -144,7 +144,7 @@
    "margin": 0.04
   },
   {
-   "img": "r3-10-board.png",
+   "img": "r4-10-board.png",
    "on": "If you do all",
    "view": [
     384,
@@ -164,7 +164,7 @@
  ],
  "l06": [
   {
-   "img": "r3-10-board.png",
+   "img": "r4-10-board.png",
    "from": [
     0,
     0,
@@ -180,7 +180,7 @@
    "margin": 0.2
   },
   {
-   "img": "r3-10-board.png",
+   "img": "r4-10-board.png",
    "on": "Click",
    "view": [
     384,
@@ -200,7 +200,7 @@
  ],
  "l07": [
   {
-   "img": "r3-11-join-the-class.png",
+   "img": "r4-11-join-the-class.png",
    "view": [
     384,
     180,
@@ -210,7 +210,7 @@
    "margin": 0.15
   },
   {
-   "img": "r3-11-join-the-class.png",
+   "img": "r4-11-join-the-class.png",
    "on": "Join the class",
    "view": [
     384,
@@ -254,7 +254,7 @@
  ],
  "l08": [
   {
-   "img": "r3-12-route-line.png",
+   "img": "r4-12-route-line.png",
    "view": [
     300,
     300,
@@ -262,15 +262,51 @@
     330
    ],
    "hl": [
-    990,
+    984,
     456,
-    350,
+    442,
     38
    ],
    "margin": 0
   },
   {
-   "img": "r3-12-route-line.png",
+   "img": "r4-26-routes.png",
+   "on": "Starter",
+   "on_ca": "Starter",
+   "view": [
+    140,
+    440,
+    1640,
+    300
+   ],
+   "hl": [
+    150,
+    540,
+    1620,
+    150
+   ],
+   "margin": 0.02
+  },
+  {
+   "img": "r4-12-level-notice.png",
+   "on": "Your teacher sets",
+   "on_ca": "La posa",
+   "view": [
+    380,
+    0,
+    1160,
+    640
+   ],
+   "hl": [
+    628,
+    22,
+    664,
+    330
+   ],
+   "margin": 0
+  },
+  {
+   "img": "r4-12-route-line.png",
    "on": "Click Ask",
    "view": [
     300,
@@ -279,16 +315,16 @@
     330
    ],
    "hl": [
-    1350,
+    1430,
     452,
-    220,
+    222,
     44
    ],
    "margin": 0,
    "on_ca": "Clica Demana"
   },
   {
-   "img": "r3-14-ask-route-filled.png",
+   "img": "r4-14-ask-route-filled.png",
    "on": "choose one",
    "view": [
     570,
@@ -305,7 +341,7 @@
    "on_ca": "tria'n una"
   },
   {
-   "img": "r3-14-ask-route-filled.png",
+   "img": "r4-14-ask-route-filled.png",
    "on": "say why",
    "view": [
     570,
@@ -322,7 +358,7 @@
    "on_ca": "explica per què"
   },
   {
-   "img": "r3-14-ask-route-filled.png",
+   "img": "r4-14-ask-route-filled.png",
    "on": "and send it",
    "view": [
     570,
@@ -341,47 +377,66 @@
  ],
  "l09": [
   {
-   "img": "r3-15-week-plan.png",
+   "img": "r4-15-week-plan.png",
    "view": [
     384,
     90,
     1512,
-    490
+    720
    ],
    "hl": [
-    400,
-    264,
-    1476,
-    240
+    406,
+    496,
+    1468,
+    258
    ],
-   "margin": 0.03
+   "margin": 0.02
   },
   {
-   "img": "r3-15-week-plan.png",
-   "on": "the date of the exam",
+   "img": "r4-15-week-plan.png",
+   "on": "what you have to do",
+   "on_ca": "què has de fer",
    "view": [
     384,
     90,
     1512,
-    490
+    720
    ],
    "hl": [
     408,
-    210,
-    384,
-    44
+    272,
+    1466,
+    214
    ],
-   "margin": 0.03,
-   "on_ca": "la data de l'examen"
+   "margin": 0.02
   },
   {
-   "img": "r3-15-week-plan.png",
-   "on": "If you miss",
+   "img": "r4-15-week-plan.png",
+   "on": "the date of the exam",
+   "on_ca": "la data de l'examen",
    "view": [
     384,
     90,
     1512,
-    490
+    720
+   ],
+   "hl": [
+    408,
+    212,
+    392,
+    42
+   ],
+   "margin": 0.02
+  },
+  {
+   "img": "r4-15-week-plan.png",
+   "on": "If you miss",
+   "on_ca": "Si no has pogut",
+   "view": [
+    384,
+    90,
+    1512,
+    720
    ],
    "hl": [
     404,
@@ -389,13 +444,30 @@
     900,
     36
    ],
-   "margin": 0.03,
-   "on_ca": "Si no has pogut"
+   "margin": 0.02
+  },
+  {
+   "img": "r4-15-week-plan.png",
+   "on": "check it here",
+   "on_ca": "mira-ho aquí",
+   "view": [
+    384,
+    90,
+    1512,
+    720
+   ],
+   "hl": [
+    420,
+    434,
+    324,
+    40
+   ],
+   "margin": 0.02
   }
  ],
  "l10": [
   {
-   "img": "r3-10-board.png",
+   "img": "r4-10-board.png",
    "view": [
     1200,
     700,
@@ -411,30 +483,30 @@
    "margin": 0.1
   },
   {
-   "img": "r3-16-my-week.png",
+   "img": "r4-16-my-week.png",
    "on": "Click it",
    "view": [
     1100,
-    520,
+    230,
     820,
-    560
+    720
    ],
    "hl": [
     1364,
-    548,
+    250,
     540,
-    374
+    672
    ],
-   "margin": 0.04,
+   "margin": 0.02,
    "on_ca": "Clica'l"
   }
  ],
  "l11": [
   {
-   "img": "r3-17-lp-grid.png"
+   "img": "r4-17-lp-grid.png"
   },
   {
-   "img": "r3-17-lp-grid.png",
+   "img": "r4-17-lp-grid.png",
    "on": "with their activities",
    "hl": [
     384,
@@ -445,7 +517,7 @@
    "on_ca": "amb les activitats"
   },
   {
-   "img": "r3-17-lp-grid.png",
+   "img": "r4-17-lp-grid.png",
    "on": "A green Open",
    "hl": [
     1794,
@@ -456,7 +528,7 @@
    "on_ca": "Un botó verd"
   },
   {
-   "img": "r3-17-lp-grid.png",
+   "img": "r4-17-lp-grid.png",
    "on": "A grey one",
    "hl": [
     1794,
@@ -469,7 +541,7 @@
  ],
  "l12": [
   {
-   "img": "r3-19-criteria.png",
+   "img": "r4-19-criteria.png",
    "hl": [
     596,
     64,
@@ -478,7 +550,7 @@
    ]
   },
   {
-   "img": "r3-19-criteria.png",
+   "img": "r4-19-criteria.png",
    "on": "how you are doing",
    "hl": [
     384,
@@ -491,7 +563,7 @@
  ],
  "l13": [
   {
-   "img": "r3-10-board.png",
+   "img": "r4-10-board.png",
    "view": [
     0,
     0,
@@ -508,7 +580,7 @@
  ],
  "l14": [
   {
-   "img": "r3-30-ls.png",
+   "img": "r4-30-ls.png",
    "hl": [
     1060,
     30,
@@ -517,7 +589,7 @@
    ]
   },
   {
-   "img": "r3-31-ls-menu.png",
+   "img": "r4-31-ls-menu.png",
    "on": "Click Learning",
    "hl": [
     1190,
@@ -535,14 +607,14 @@
  ],
  "l15": [
   {
-   "img": "r3-30-ls.png"
+   "img": "r4-30-ls.png"
   },
   {
-   "img": "r3-30-ls.png",
+   "img": "r4-30-ls.png",
    "on": "you see your challenge",
    "hl": [
     1150,
-    362,
+    414,
     650,
     440
    ],
@@ -551,7 +623,7 @@
  ],
  "l16": [
   {
-   "img": "r3-32-ls-tab-overview.png",
+   "img": "r4-32-ls-tab-overview.png",
    "hl": [
     120,
     180,
@@ -560,7 +632,7 @@
    ]
   },
   {
-   "img": "r3-32-ls-tab-overview.png",
+   "img": "r4-32-ls-tab-overview.png",
    "on": "what you will learn",
    "hl": [
     120,
@@ -571,7 +643,7 @@
    "on_ca": "què aprendràs"
   },
   {
-   "img": "r3-32-ls-tab-learning-path.png",
+   "img": "r4-32-ls-tab-learning-path.png",
    "on": "the learning paths",
    "hl": [
     290,
@@ -582,7 +654,7 @@
    "on_ca": "els learning paths"
   },
   {
-   "img": "r3-32-ls-tab-language.png",
+   "img": "r4-32-ls-tab-language.png",
    "on": "the language you need",
    "hl": [
     508,
@@ -593,7 +665,7 @@
    "on_ca": "la llengua"
   },
   {
-   "img": "r3-32-ls-tab-final.png",
+   "img": "r4-32-ls-tab-final.png",
    "on": "and the final product",
    "hl": [
     850,
@@ -604,7 +676,7 @@
    "on_ca": "i el producte final"
   },
   {
-   "img": "r3-30-ls.png",
+   "img": "r4-30-ls.png",
    "on": "Here you also have",
    "view": [
     60,
@@ -624,10 +696,10 @@
  ],
  "l17": [
   {
-   "img": "r3-40-lp-top.png"
+   "img": "r4-40-lp-top.png"
   },
   {
-   "img": "r3-40-lp-top.png",
+   "img": "r4-40-lp-top.png",
    "on": "The top bar",
    "hl": [
     150,
@@ -638,7 +710,7 @@
    "on_ca": "La barra de dalt"
   },
   {
-   "img": "r3-40-lp-top.png",
+   "img": "r4-40-lp-top.png",
    "on": "Use the list",
    "hl": [
     150,
@@ -651,7 +723,7 @@
  ],
  "l18": [
   {
-   "img": "r3-41-lp-tabs.png",
+   "img": "r4-41-lp-tabs.png",
    "hl": [
     150,
     240,
@@ -660,7 +732,7 @@
    ]
   },
   {
-   "img": "r3-42-lp-reading.png",
+   "img": "r4-42-lp-reading.png",
    "on": "read the short instruction",
    "view": [
     100,
@@ -669,10 +741,10 @@
     500
    ],
    "hl": [
-    198,
+    196,
     464,
-    1104,
-    42
+    1000,
+    44
    ],
    "margin": 0.03,
    "on_ca": "llegeix primer"
@@ -680,7 +752,7 @@
  ],
  "l19": [
   {
-   "img": "r3-42-lp-reading.png",
+   "img": "r4-42-lp-reading.png",
    "view": [
     960,
     340,
@@ -696,7 +768,7 @@
    "margin": 0.15
   },
   {
-   "img": "r3-44-lp-bottom.png",
+   "img": "r4-44-lp-bottom.png",
    "on": "Your answers save",
    "view": [
     300,
@@ -716,7 +788,7 @@
  ],
  "l20": [
   {
-   "img": "r3-40-lp-top.png",
+   "img": "r4-40-lp-top.png",
    "view": [
     100,
     780,
@@ -734,7 +806,7 @@
  ],
  "l21": [
   {
-   "img": "r3-40-lp-top.png",
+   "img": "r4-40-lp-top.png",
    "view": [
     360,
     0,
@@ -750,7 +822,7 @@
    "margin": 0.1
   },
   {
-   "img": "r3-40-lp-top.png",
+   "img": "r4-40-lp-top.png",
    "on": "click Mark as done",
    "view": [
     360,
@@ -768,7 +840,7 @@
    "on_ca": "clica Marca"
   },
   {
-   "img": "r3-18-result-window.png",
+   "img": "r4-18-result-window.png",
    "on": "and then submit",
    "view": [
     570,
@@ -788,7 +860,7 @@
  ],
  "l27": [
   {
-   "img": "r3-20-correction-card.png",
+   "img": "r4-20-correction-card.png",
    "view": [
     600,
     10,
@@ -804,7 +876,7 @@
    "margin": 0.15
   },
   {
-   "img": "r3-20-correction-card.png",
+   "img": "r4-20-correction-card.png",
    "on": "Click it",
    "view": [
     600,
@@ -822,7 +894,7 @@
    "on_ca": "Clica'l"
   },
   {
-   "img": "r3-45-lp-correction.png",
+   "img": "r4-45-lp-correction.png",
    "on": "read the correction",
    "view": [
     100,
@@ -842,7 +914,7 @@
  ],
  "l22": [
   {
-   "img": "r3-32-ls-tab-learning-path.png",
+   "img": "r4-32-ls-tab-learning-path.png",
    "hl": [
     1258,
     300,
@@ -851,7 +923,7 @@
    ]
   },
   {
-   "img": "r3-61-checkpoint-rules.png",
+   "img": "r4-61-checkpoint-rules.png",
    "on": "Read the rules",
    "view": [
     100,
@@ -869,7 +941,7 @@
    "on_ca": "Llegeix les normes"
   },
   {
-   "img": "r3-61-checkpoint-rules.png",
+   "img": "r4-61-checkpoint-rules.png",
    "on": "tick the box",
    "view": [
     100,
@@ -887,7 +959,7 @@
    "on_ca": "marca la casella"
   },
   {
-   "img": "r3-61-checkpoint-rules.png",
+   "img": "r4-61-checkpoint-rules.png",
    "on": "You see one question",
    "view": [
     100,
@@ -905,7 +977,7 @@
    "on_ca": "Veus una pregunta"
   },
   {
-   "img": "r3-61-checkpoint-rules.png",
+   "img": "r4-61-checkpoint-rules.png",
    "on": "Don't leave",
    "view": [
     100,
@@ -925,7 +997,7 @@
  ],
  "l23": [
   {
-   "img": "r3-60-not-open.png",
+   "img": "r4-60-not-open.png",
    "hl": [
     340,
     440,
@@ -936,7 +1008,7 @@
  ],
  "l24": [
   {
-   "img": "r3-40-lp-top.png",
+   "img": "r4-40-lp-top.png",
    "view": [
     1100,
     760,
@@ -944,15 +1016,15 @@
     320
    ],
    "hl": [
-    1638,
-    1016,
-    134,
-    42
+    1522,
+    1013,
+    142,
+    44
    ],
    "margin": 0.1
   },
   {
-   "img": "r3-51-problem-filled.png",
+   "img": "r4-51-problem-filled.png",
    "on": "Choose what happened",
    "view": [
     600,
@@ -970,7 +1042,7 @@
    "on_ca": "Tria què"
   },
   {
-   "img": "r3-51-problem-filled.png",
+   "img": "r4-51-problem-filled.png",
    "on": "explain it",
    "view": [
     600,
@@ -988,7 +1060,7 @@
    "on_ca": "explica-ho"
   },
   {
-   "img": "r3-51-problem-filled.png",
+   "img": "r4-51-problem-filled.png",
    "on": "add a screenshot",
    "view": [
     600,
@@ -1006,7 +1078,7 @@
    "on_ca": "afegeix-hi"
   },
   {
-   "img": "r3-51-problem-filled.png",
+   "img": "r4-51-problem-filled.png",
    "on": "Your teacher will see",
    "view": [
     600,
@@ -1026,38 +1098,38 @@
  ],
  "l25": [
   {
-   "img": "r3-70-english-lab.png",
+   "img": "r4-70-english-lab.png",
    "hl": [
-    380,
-    376,
-    1360,
-    296
+    456,
+    372,
+    1372,
+    392
    ]
   },
   {
-   "img": "r3-70-english-lab.png",
+   "img": "r4-70-english-lab.png",
    "on": "and grammar",
    "hl": [
-    726,
-    700,
-    320,
-    380
+    804,
+    788,
+    324,
+    292
    ],
    "on_ca": "i gramàtica"
   },
   {
-   "img": "r3-70-english-lab.png",
+   "img": "r4-70-english-lab.png",
    "on": "vocabulary games",
    "hl": [
-    380,
-    700,
-    320,
-    380
+    456,
+    788,
+    324,
+    292
    ],
    "on_ca": "jocs de vocabulari"
   },
   {
-   "img": "r3-71-games-menu.png",
+   "img": "r4-71-games-menu.png",
    "on": "for each Learning",
    "view": [
     300,
@@ -1066,18 +1138,30 @@
     620
    ],
    "hl": [
-    460,
-    540,
-    330,
-    440
+    456,
+    536,
+    640,
+    446
    ],
    "margin": 0.03,
    "on_ca": "per a cada Learning"
   },
   {
-   "img": "r3-72-vocabulary-games.png",
+   "img": "r4-72-vocabulary-games-ls2.png",
+   "on": "Situation",
+   "on_ca": "Situation"
+  },
+  {
+   "img": "r4-73-practice.png",
    "on": "Use it",
-   "on_ca": "Fes-la servir"
+   "on_ca": "Fes-la servir",
+   "view": [
+    420,
+    560,
+    1000,
+    520
+   ],
+   "margin": 0
   }
  ],
  "l26": [
@@ -1088,23 +1172,23 @@
  ],
  "l28": [
   {
-   "img": "r3-15-week-plan.png",
+   "img": "r4-15-week-plan.png",
    "view": [
     384,
     90,
     1512,
-    490
+    720
    ],
    "hl": [
     404,
-    534,
+    766,
     222,
     36
    ],
-   "margin": 0.03
+   "margin": 0.02
   },
   {
-   "img": "r3-15-whole-ls-plan.png",
+   "img": "r4-15-whole-ls-plan.png",
    "on": "to see every week",
    "view": [
     380,
@@ -1116,7 +1200,7 @@
    "on_ca": "per veure totes"
   },
   {
-   "img": "r3-15-whole-ls-plan.png",
+   "img": "r4-15-whole-ls-plan.png",
    "on": "what we do in class",
    "view": [
     380,
@@ -1134,7 +1218,7 @@
    "on_ca": "què fem a classe"
   },
   {
-   "img": "r3-15-whole-ls-plan.png",
+   "img": "r4-15-whole-ls-plan.png",
    "on": "and the activities",
    "view": [
     380,
@@ -1154,7 +1238,7 @@
  ],
  "l29": [
   {
-   "img": "r3-12-route-line.png",
+   "img": "r4-12-route-line.png",
    "view": [
     384,
     440,
@@ -1170,7 +1254,7 @@
    "margin": 0
   },
   {
-   "img": "r3-12-route-line.png",
+   "img": "r4-12-route-line.png",
    "on": "click Download",
    "view": [
     384,
