@@ -460,7 +460,7 @@ const QA={};S.qa={ls:null,g:"all",f:{act:"all",area:"all",sort:"hard",all:false}
 // "How English Lab works" videos (Roger, 31 Oct 2026: "the teachers video on the teachers board and the students' on theirs, and the
 // students' video also on the teachers board"): tools/site-video builds them; the student ones are also on the student board (today.html).
 // [title, file, shown]: an entry shows once its video is in the repo.
-const HOW_VIDEOS=[["👩‍🏫 For teachers: how the dashboard works","video/how-the-dashboard-works.mp4",false],
+const HOW_VIDEOS=[["👩‍🏫 For teachers: how the dashboard works","video/how-the-dashboard-works.mp4",true],
   ["🎓 For students, in English (Amelia)","video/how-english-lab-works.mp4",true],["🎓 For students, in Catalan (Julian)","video/how-english-lab-works-ca.mp4",true]];
 function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Short videos made from the real site. The student ones are also on the student board.</p>`
   +HOW_VIDEOS.filter(v=>v[2]).map(([t,href])=>`<p>${esc(t)}: ${a(href,"Watch →","btn")}</p>`).join("")+`</div>`}
@@ -479,7 +479,7 @@ function matTab(){
           +(w?`<p>🗣 Shadowing at the start of the class: ${a("shared/shadow/index.html?ls="+k,"Open on the projector →","btn")} <span class="muted">(the same clips as the Shadowing step of each Learning Path)</span></p>`:"")
           +(w?`<div class="qwrap"><table class="mat"><tr><th>Paper worksheet</th>${R.map(([r,n])=>`<th>${cap(r)}<br><small>${n}</small></th>`).join("")}<th>Answer key</th></tr>`
             +w.lps.map(([lp,t])=>{const u="shared/print/worksheet.html?ls="+k+"&lp="+lp+"&route=";
-              return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r])=>a(u+r+"&key=1",cap(r)[0],"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
+              return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r])=>a(u+r+"&key=1",cap(r),"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
             :`<p class="muted">No paper worksheets for this LS.</p>`)}).join("")
       +`</div>`}).join("");
 }

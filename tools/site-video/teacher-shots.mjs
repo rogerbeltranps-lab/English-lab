@@ -4,7 +4,7 @@ export async function shots(page, OUT) {
   const note = (s) => console.log(s);
   const shot = async (name) => { await page.waitForTimeout(450); await page.screenshot({ path: path.join(OUT, 't-' + name + '.png') }); note('shot t-' + name); };
   const step = async (label, fn) => { try { await fn(); } catch (e) { note('SKIPPED ' + label + ': ' + e.message.split('\n')[0]); } };
-  const clean = () => page.evaluate(() => { const m = document.getElementById('msg'); if (m) m.textContent = 'Signed in as the teacher.'; });
+  const clean = () => page.evaluate(() => { const m = document.getElementById('msg'); if (m) m.textContent = 'Signed in as the teacher.'; document.activeElement?.blur?.(); });
   const tab = async (g) => { await page.locator(`#tabs [data-g="${g}"]`).first().click(); await page.waitForTimeout(700); await clean(); };
   const top = (sel, off = 20) => page.locator(sel).first().evaluate((e, o) => window.scrollTo(0, e.getBoundingClientRect().top + window.scrollY - o), off);
   const open = async (k) => { const d = page.locator(`details[data-k="${k}"]`).first(); if (!(await d.evaluate((e) => e.open))) await d.locator('summary').first().click(); await page.waitForTimeout(500); };
@@ -21,13 +21,17 @@ export async function shots(page, OUT) {
   await step('problems', async () => { await open('probs'); await top('#probs', 10); await shot('14-problems'); });
   await step('suggestions', async () => { await open('sugg'); await top('#sugg', 10); await shot('15-suggestions'); });
   await step('routes', async () => { await open('routes'); await top('details[data-k="routes"]', 10); await shot('16-routes'); });
-  await step('grid', async () => { await top('#main .box:has(h2:text("Learning paths and activities"))', 10); await shot('17-grid'); });
+  await step('grid', async () => {
+    await page.locator('th.lp').first().click({ position: { x: 12, y: 10 } }); await page.waitForTimeout(500); await page.keyboard.press('Escape');   // fold Getting started so the graded path's score shows
+    await top('#main .box:has(h2:text("Learning paths and activities"))', 10); await shot('17-grid'); });
   await step('cell dialog', async () => {
     const c = page.locator('td.sc.sub[data-do="cell"]').first();
     await c.scrollIntoViewIfNeeded(); await c.click(); await page.waitForSelector('#dlg[open]'); await page.waitForTimeout(500); await shot('18-cell');
+    await step('hand-in open', async () => { await page.locator('#dlg details summary', { hasText: 'Reading log' }).first().click(); await page.waitForTimeout(400);
+      await page.locator('#dlg details[open]').first().evaluate((e) => e.scrollIntoView({ block: 'start' })); await shot('18-cell-handin'); });
     await page.keyboard.press('Escape'); await page.waitForTimeout(300);
   });
-  await step('LS grade', async () => { await top('#main .box:has(h2:text("LS grade"))', 10); await shot('19-grade'); });
+  await step('LS grade', async () => { await page.mouse.move(2, 2); await clean(); await top('#main .box:has(h2:text("LS grade"))', 10); await shot('19-grade'); });
   await step('exam marks', async () => { await open('exam'); await top('details[data-k="exam"]', 10); await shot('20-exam'); });
   await step('points', async () => { await open('points'); await top('details[data-k="points"]', 10); await shot('21-points'); });
   await step('year view', async () => {

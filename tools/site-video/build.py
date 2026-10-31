@@ -3,7 +3,8 @@
 ElevenLabs, made by voice.mjs) and script.json (the English and Catalan text of each line) + shots.json (what each line shows).
 No subtitles: one video in English and one in Catalan (Roger, 31 Oct 2026), so the screen fills the frame.
 
-Usage: python3 tools/site-video/build.py OUT.mp4 [--lang ca] [--voice DIR] [--stills DIR]
+Usage: python3 tools/site-video/build.py OUT.mp4 [--set teacher] [--lang ca] [--voice DIR] [--stills DIR]
+  --set teacher: the teacher video (script-teacher.json, shots-teacher.json, voice-teacher; dashboard screens from teacher-demo.mjs)
   --lang ca: the Catalan version (Catalan text and cards; a shot's "on_ca" word, else the same place in the line as its "on")
   --voice: folder of the mp3s next to this file (default voice for English, voice-ca for Catalan)
   --stills: one picture per shot, to check the framing
@@ -19,7 +20,9 @@ CAP = os.path.join(HERE, 'captures')
 def arg(name, default=None):
     return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else default
 LANG = arg('--lang', 'en')
-VOICE = os.path.join(HERE, arg('--voice', 'voice' if LANG == 'en' else 'voice-ca'))
+SET = arg('--set', 'students')
+TEACH = SET == 'teacher'
+VOICE = os.path.join(HERE, arg('--voice', 'voice-teacher' if TEACH else 'voice' if LANG == 'en' else 'voice-ca'))
 W, H, FPS = 1280, 720, 30
 T = {'accent': '#30578c', 'ink': '#181e2f', 'title': '#253b66', 'muted': '#626f82', 'bg1': '#eef3fd', 'bg2': '#f6f8fd', 'soft': '#e3ebf8'}
 HL = (245, 158, 11)                     # highlight frame colour (amber)
@@ -27,8 +30,8 @@ FONTS = '/usr/share/fonts/opentype/inter/'
 def font(w, s): return ImageFont.truetype(FONTS + {'r': 'Inter-Regular', 'm': 'Inter-Medium', 's': 'Inter-SemiBold', 'b': 'Inter-Bold', 'x': 'Inter-ExtraBold'}[w] + '.otf', s)
 def rgb(h): return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
 
-script = json.load(open(os.path.join(HERE, 'script.json')))
-shots = json.load(open(os.path.join(HERE, 'shots.json')))
+script = json.load(open(os.path.join(HERE, 'script-teacher.json' if TEACH else 'script.json')))
+shots = json.load(open(os.path.join(HERE, 'shots-teacher.json' if TEACH else 'shots.json')))
 GAP, CARD, TITLE, END = 0.55, 1.7, 3.2, 1.2
 SCENE_CA = {'Sign in': 'Entrar', 'Your board': 'El teu tauler', 'Your route': 'La teva ruta', 'Your week': 'La teva setmana',
             'Learning paths': 'Els learning paths', 'The menu': 'El menú', 'A Learning Situation': 'Una Learning Situation',
@@ -55,7 +58,7 @@ def brand(d):
     d.rounded_rectangle((56, 36, 92, 72), 9, fill=rgb(T['accent']))
     d.polygon([(68, 45), (82, 54), (68, 63)], fill='white')
     d.text((106, 41), 'English Lab', font=font('b', 21), fill=rgb(T['title']))
-    tag = 'Com funciona la web' if LANG == 'ca' else 'How the website works'
+    tag = 'For teachers' if TEACH else 'Com funciona la web' if LANG == 'ca' else 'How the website works'
     d.text((W - 56 - d.textlength(tag, font=font('s', 16)), 45), tag, font=font('s', 16), fill=rgb(T['muted']))
 
 def card(lines, sub=None, big=56, chip=None, items=None):
@@ -188,8 +191,8 @@ def dur(path):
 
 segs, t, last_scene = [], 0.0, None      # (start, length, kind, data)
 CA = LANG == 'ca'
-segs.append((t, TITLE, 'card', {'img': 'card:' + json.dumps({'lines': ['Com funciona English Lab' if CA else 'How English Lab works'], 'big': 58,
-                                                             'chip': "English Lab · 2n i 4t d'ESO" if CA else 'English Lab · 2 ESO and 4 ESO'})}))
+segs.append((t, TITLE, 'card', {'img': 'card:' + json.dumps({'lines': ['How the dashboard works' if TEACH else 'Com funciona English Lab' if CA else 'How English Lab works'], 'big': 58,
+                                                             'chip': 'English Lab · for teachers' if TEACH else "English Lab · 2n i 4t d'ESO" if CA else 'English Lab · 2 ESO and 4 ESO'})}))
 t += TITLE
 scenes = []
 for l in script['lines']:

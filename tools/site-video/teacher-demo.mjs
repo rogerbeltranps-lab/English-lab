@@ -55,11 +55,18 @@ for (const g of global.EL_GROUPS) {
     for (const a of CAT.filter((x) => x.ls === LS2[c] && OPEN[c].includes(x.id) && !x.checkpoint)) {
       const st = ACT[a.id] || [], k = Math.min(st.length, Math.floor((skill + rnd() * 0.6) * st.length)), done = {};
       st.slice(0, k).forEach((s) => (done[s] = true));
-      pg[a.keys[0]] = JSON.stringify({ done });
+      // first try and latest check of each step done (score out of max), and the reading log handed in
+      const tries = {}, last = {}, steps = {};
+      st.slice(0, k).forEach((s) => { const m = 4 + Math.floor(rnd() * 7), f = Math.round(m * Math.min(1, skill * 0.8 + rnd() * 0.3));
+        tries[s] = { score: f, max: m }; last[s] = { score: Math.min(m, f + Math.floor(rnd() * 3)), max: m, date: Date.now() - 86400e3 }; });
+      if (done.log) steps.log = { f: [{ l: 'Text 1: which celebration? What is it, when and where?', v: 'Diwali. Festival of lights, in October or November, in India. It lasts five days.' },
+        { l: 'Text 1: the main customs', v: 'People clean and decorate their houses with lamps. Families visit relatives and share sweets.' }], date: Date.now() - 86400e3 };
+      pg[a.keys[0]] = JSON.stringify({ done, tries, last, steps });
       if (a.graded && k) {
         const r = { ls: a.ls, activity: a.id, score: Math.round(a.points * Math.min(1, skill * 0.7 + rnd() * 0.4) * k / st.length) };
         if (k === st.length) { if (rnd() < 0.7) r.locked = true; else r.markedDone = true; }
         if (r.locked && rnd() < 0.3) r.feedback = 'Well done! Check the prepositions: on 31 October, in November.';
+        if (done.log && rnd() < 0.6) r.levels = { log: { '4.1': pick(['AS', 'AN', 'AN', 'AE']) } };
         D.rs[uid][a.id] = r;
       }
     }
