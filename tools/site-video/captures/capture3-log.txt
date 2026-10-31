@@ -30,3 +30,5 @@ shot r3-51-problem-filled.png
 shot r3-60-not-open.png
 shot r3-61-checkpoint-rules.png
 shot r3-70-english-lab.png
+shot r3-71-games-menu.png
+shot r3-72-vocabulary-games.png
