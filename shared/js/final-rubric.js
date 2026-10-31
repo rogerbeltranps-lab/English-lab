@@ -5,7 +5,7 @@ var finalRubric = {
     lang: 'ca', criterion: 'Criteri',
     levels: [['Nivell 4', 'Molt bé'], ['Nivell 3', 'Bé'], ['Nivell 2', 'Suficient'], ['Nivell 1', 'En procés']],
     heading: 'Rúbrica de la ruta {route}', label: 'Rúbrica {route}', req: 'Requisit de ruta:',
-    calc: '<strong>Com es calcula la nota?</strong> Cada criteri rep un nivell, que es converteix en una puntuació: <span class="rubric-pill">Nivell 4 · 10</span><span class="rubric-pill">Nivell 3 · 7,5</span><span class="rubric-pill">Nivell 2 · 5</span><span class="rubric-pill">Nivell 1 · 2,5</span><span class="rubric-pill">Sense evidència · 0</span> Després s’hi aplica el percentatge del criteri. Per exemple, un nivell 3 a Speaking aporta 7,5 sobre 10 en aquest criteri, i aquest criteri compta el 35% de la nota final.'
+    calc: '<strong>Com es calcula la nota?</strong> Cada criteri rep un nivell, que es converteix en una puntuació: <span class="rubric-pill">Nivell 4 · 10</span><span class="rubric-pill">Nivell 3 · 7,5</span><span class="rubric-pill">Nivell 2 · 5</span><span class="rubric-pill">Nivell 1 · 2,5</span><span class="rubric-pill">Sense evidència · 0</span> Després s’hi aplica el percentatge del criteri. Per exemple, un nivell 3 en un criteri aporta 7,5 sobre 10 en aquest criteri, i compta el percentatge que hi ha sota el seu nom.'
   },
   render: function (route) {
     var host = document.getElementById('rubricHost');
