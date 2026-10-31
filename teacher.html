@@ -466,9 +466,9 @@ function mkSheet(m,grp){const a=byId(m.a),g=G(),studs=mkTodo(m,grp),codes=ELMark
   return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]])),n:studs.length}}
 function mkPanel(aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step),grp=GR.find(g=>g.id===S.g);if(!m||!grp)return;
   const sh=mkSheet(m,grp);S.mk={m,grp,sh,rows:null};
-  dlg(`<h3>🤖 Marking sheet · ${esc(m.name)}</h3><p class="muted">${esc(grp.name)} · ${esc(actTitle(aid))} · ${m.c.map(pill).join(" ")} · ${sh.n} hand-in${sh.n===1?"":"s"} without a level. Students appear as codes, never names.</p>`
+  dlg(`<h3>🤖 Marking sheet · ${esc(m.name)}</h3><p class="muted">${esc(grp.name)} · ${esc(actTitle(aid))} · ${m.c.map(pill).join(" ")} · ${sh.n} hand-in${sh.n===1?"":"s"} without a level. Students appear as codes, never names.</p><p class="muted">Claude marks these hand-ins from the cloud every week and saves the levels; you only check the possible copies. Use this sheet if you ever want to mark a group yourself.</p>`
     +(sh.n?`<label>1 · The sheet</label><textarea id="mksheet" readonly style="min-height:160px;font:12px/1.4 ui-monospace,monospace">${esc(sh.text)}</textarea>
-      <div class="row" style="justify-content:flex-start"><button data-do="mkcopy">📋 Copy</button><button class="g" data-do="mkdown">⬇ Download</button><button class="g" data-do="mkgpt">ChatGPT ↗</button> <small id="mkst" class="muted"></small></div>
+      <div class="row" style="justify-content:flex-start"><button data-do="mkcopy">📋 Copy</button><button class="g" data-do="mkdown">⬇ Download</button> <small id="mkst" class="muted"></small></div>
       <label>2 · The marks <small class="muted">(paste the answer, or upload it as a .txt file)</small></label><textarea id="mkin" style="min-height:110px;font:12px/1.4 ui-monospace,monospace" placeholder="${ELMark.V} | ${esc(m.a)} | ${esc(m.step)} | ${esc(grp.name)}&#10;S-… | ${esc(m.c.map(c=>c+"=AN").join("; "))} | …&#10;END"></textarea>
       <div class="row" style="justify-content:flex-start"><input type="file" id="mkfile" accept=".txt,.md,.csv,text/plain"><button data-do="mkcheck">Check</button></div><div id="mkprev"></div>`
       :`<p>Every hand-in of this step already has a level.</p>`),true);
@@ -1115,9 +1115,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),cpok:()=>cpDone(true),cpredo:()=>cpDone(false),
     mkcopy:()=>{const v=$("#mksheet").value;navigator.clipboard.writeText(v).then(()=>$("#mkst").textContent="✓ Copied",()=>{$("#mksheet").select();$("#mkst").textContent="Press Ctrl+C"})},
     mkdown:()=>mkDown(),
-    mkgpt:()=>{const k=S.mk,full=k.sh.text,u="https://chatgpt.com/?prompt=",short=u+encodeURIComponent(full);
-      if(short.length<7000){open(short,"_blank","noopener");$("#mkst").textContent="✓ ChatGPT opened with the sheet";return}
-      mkDown();open(u+encodeURIComponent("Mark the attached marking sheet. Follow its instructions and reply only in its ANSWER FORMAT."),"_blank","noopener");$("#mkst").textContent="The sheet is long: it downloaded. Attach it in ChatGPT and press Send"},wk:()=>{S.wk=k.w;S.g="plan";render()},
+    wk:()=>{S.wk=k.w;S.g="plan";render()},
     tips:()=>{S.tips=!S.tips;try{localStorage.setItem("el_t_tips",S.tips?"on":"off")}catch(e){}render()},
     addstu:()=>dlg("<h3>Add a student</h3>"+roForm({})),impok:()=>{$("#dlg").close();act(api.importRoster(S.imp))},
     rosave:()=>{const v=f=>$("#ro-"+f).value.replace(/\s+/g," ").trim(),o={email:v("email").toLowerCase(),surname1:v("surname1"),surname2:v("surname2"),first:v("first"),tutor:v("tutor"),group:$("#ro-group").value};
