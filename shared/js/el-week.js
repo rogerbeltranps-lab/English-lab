@@ -28,6 +28,31 @@
     // activities due in week row i: [[activity id, date]] by date
     dueIn:(p,gi,i)=>{const r=p.rows[i];if(!r||!r.from)return [];const e=add(r.from,6);
       return Object.keys(p.due||{}).map(id=>[id,due(p,id,gi)]).filter(([,d])=>d&&r.from<=d&&d<=e).sort((a,b)=>a[1]<b[1]?-1:1)},
+    // Homework and self-study (Roger, 31 Oct 2026: "they should see their homework … if I miss a class, they should also know what
+    // they have to do"): from the session lines of a group, [{kind, date, set, text}] by date. kind "hw" = a line
+    // "Homework by Tue 10 · …" (date = that day, set = the class just before it), "self" = a class line marked "· self-study"
+    // (the teacher is away), "exam" = the exam day. The student board, My week, the dashboard and the calendar feeds use it.
+    tasks(p,gi){const out=[];if(!p||gi<0)return out;
+      const at=(from,dn,n)=>{for(let k=0;k<21;k++){const s=add(from,k),d=day(s);if(d.getDate()===n&&DAYS.en[d.getDay()]===dn)return s}return null};
+      let last=null;
+      (p.rows||[]).forEach(r=>{if(!r.from)return;String((r.g?r.g[gi]:r.what)||"").split("\n").forEach(raw=>{const ln=raw.trim();
+        let m=ln.match(/^Homework by (Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}) · (.+)$/);
+        if(m){const d=at(r.from,m[1],+m[2]);if(d)out.push({kind:"hw",date:d,set:last,text:m[3]});return}
+        m=ln.match(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}) · (.+)$/);if(!m)return;
+        const d=at(r.from,m[1],+m[2]);if(!d)return;last=d;
+        if(/· self-study\b/.test(m[3]))out.push({kind:"self",date:d,set:null,text:m[3].replace(/\s*· self-study\b/,"").trim()})})});
+      const ex=p.exam&&p.exam[gi];if(ex)out.push({kind:"exam",date:ex,set:null,text:"Exam"});
+      return out.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0)},
+    // homework and self-study classes still ahead (date >= from, by default today), within `days` days
+    upcoming(p,gi,from,days){from=from||today();const to=add(from,days==null?14:days);return this.tasks(p,gi).filter(x=>x.kind!=="exam"&&x.date>=from&&x.date<=to)},
+    // calendar feed of a group (tools/gen-calendar.js writes calendar/<group id>.ics from this file): the .ics link and the link
+    // that subscribes a Google Calendar to it once, so every later homework appears by itself
+    calendar(gid,root){const ics=new URL("calendar/"+String(gid).toLowerCase()+".ics",root||location.href).href;
+      return {ics,google:"https://calendar.google.com/calendar/r?cid="+encodeURIComponent(ics.replace(/^https?:/,"webcal:"))}},
+    // one homework or self-study item as text for students ("by Tue 10 Nov · …", Catalan for Starter and Base)
+    taskText(x,lang){const ca=L(lang)==="ca";
+      return x.kind==="self"?(ca?"Classe pel teu compte":"Class on your own")+" ("+this.date(x.date,lang)+") · "+x.text+" · "+(ca?"treballa amb auriculars i acaba-ho a casa":"work with headphones and finish it at home")
+        :(ca?"Per al ":"By ")+this.date(x.date,lang)+" · "+x.text},
     // "Fri 20 Nov" · "dv. 20 nov."
     date:(s,lang)=>{const d=day(s),l=L(lang);return DAYS[l][d.getDay()]+" "+d.getDate()+" "+MON[l][d.getMonth()]},
     // "26–30 Oct" · "30 Nov–4 Dec" (Monday to Friday)
