@@ -262,7 +262,7 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 - [S] **Comparing cultures:** both… and…; similar to; different from; whereas; in the same way; unlike
 - [S] **Places & travel:** travel home for the holidays; the town square; the community centre; the school hall; crowded streets
 - [D] **Change & debate:** commercialised; consumerism; keep a tradition alive; die out; evolve; adapt; reinvent; date back to; cultural appropriation; stereotype; inclusive; take something for granted
-- [D] **Verb + preposition:** contribute to; depend on; come from; be known for; be associated with
+- [S] **Verb + preposition:** contribute to; depend on; come from; be known for; be associated with (Safe since 31 Oct 2026: the programme gives verb + preposition to Safe and Daring)
 - Receptive: pilgrims; feast; harvest festival
 
 ### Practice (80 %)
@@ -276,7 +276,7 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 7. [S] At Christmas the ___ streets are full of people. → *crowded*
 8. [D] Halloween ___ back to an old Celtic festival. → *dates*
 9. [D] Some people think Christmas is too ___: it's all about buying things. → *commercialised*
-10. [D] Spain is known ___ its summer festivals. → *for*
+10. [S] Spain is known ___ its summer festivals. → *for*
 
 ### Listening: *The story behind two autumn celebrations* (podcast, about 2 min 30 s)
 
@@ -547,6 +547,14 @@ Worked example (Insecure in Catalan): **going to** for plans you already have (*
 12. The bus ___ (leave) at 8.15 tomorrow. → *leaves*
 13. We ___ (perform) a dance at 12. We booked the hall yesterday. → *are performing*
 
+**[D] Add (31 Oct 2026, the programme's "contrast of futures in one plan"):** one plan, five futures: decided before → *going to* · arranged with someone → Present Continuous · on the programme → Present Simple · decided now or offered → *will* · predicted: *will* for an opinion, *going to* when you can see it coming.
+
+14. Look at those dark clouds! It ___ (rain) before the parade. → *is going to rain*
+15. The head teacher has said yes: we ___ (use) the hall on Friday. → *are using*
+16. The doors ___ (open) at 9.30, and the event finishes at 13.00. → *open*
+17. "Nobody has a speaker." "Don't worry, I ___ (bring) mine." → *'ll bring*
+18. Correct it: "We will meet the head teacher on Monday at 9. It's in her diary." → *are meeting*
+
 ### Which future? (interleaved, [S][D]; [I] does items 1–4)
 
 Choose the form and the reason (decision now · plan · arrangement · timetable · prediction).
@@ -558,7 +566,10 @@ Choose the form and the reason (decision now · plan · arrangement · timetable
 5. The concert ___ at 12.30, according to the programme. → *starts*: timetable
 6. We ___ our grandparents on Sunday. We've already bought the train tickets. → *are visiting*: arrangement
 7. I'm sure the families ___ the food. → *will enjoy*: prediction
-8. [D] Write five sentences about your event, one with each form, and label them.
+8. [D] We ___ (raise) money for a charity. We decided it last week. → *are going to raise*: plan
+9. [D] The band ___ (play) at 11.00. It's on the programme. → *plays*: timetable
+
+The Daring plan (product piece 4) uses at least four future forms, each for the right reason (replaces "write five labelled sentences", 31 Oct 2026).
 
 ### Writing → product piece 4: *Our event plan*
 
@@ -822,3 +833,14 @@ Beginners sits below Insecure (AGENTS.md, "Beginners"). Everything untagged in t
 1. **Audio.** Listenings mix real videos with ElevenLabs recordings of the scripts (Roger, 23 Oct 2026). The scripted MP3s are still to be generated.
 2. **Written texts are already saved.** The site syncs each student's whole page state to Firestore, and that includes their writing. So showing product pieces on your dashboard only reads data that is already stored. It doesn't add new data collection.
 3. Head teacher's name in the model email (*Ms Puig*) is invented: tell me if you prefer the real one or a neutral "Dear Head Teacher".
+
+## Four skills (30 Oct 2026)
+
+Roger (30 Oct 2026, “very important”): the learning paths work listening, speaking, reading and writing equally; the exam and the sample exam do not change. The full texts (questions, options, hints, tasks and models per route) are in the data files (`4eso/seasons-and-celebrations/data/<page>.js`, panels `again` and `talk`). No new audio was generated: every *Listen again* uses a recording the LS already has.
+
+- **LP1 and LP2 stay exactly as they were** (Roger, 30 Oct 2026: students had already started them), so the changes are in LP3 to LP6 only, within their planned classes (`el-plan.js`).
+- **Use of English heard or said:** practice and grammar are *Listen and complete* in LP3 and LP5 (LP6: practice only); mixed practice is *Say it* in LP3 and LP5, and the LP6 grammar (polite requests) is *Say it*. The study cards already ask students to say each word aloud before turning the card, so from LP3 on they count as reading and speaking.
+- **LP3 Where traditions come from.** *Talk: where does it come from?*: a teammate asks about the group’s celebration: which one, when, what people do (+ origin; Safe: what people used to do, is it older than Halloween; Daring: how it has changed and whether that is good).
+- **LP4 Research it right.** *Listen: a podcast is a source too* (the LP3 Culture Bites podcast; source type, a fact you can check, dates, the Native American view; Safe: reporting beliefs with respect, checking in a second source; Daring: belief words, crediting a podcast). *Talk: can we trust it?*: where you found your information, who wrote it, is it reliable (+ date; Safe: second source, beliefs with respect; Daring: two sources that disagree).
+- **LP5 Plan the day.** *Listen again: getting ready for a celebration* (Mei’s Lunar New Year video from LP3; preparations and who does what; Safe/Daring: a welcoming idea for the event, “not every family celebrates it in the same way”). *Talk: planning meeting*: what we are going to do, where, who brings the music (+ start time; Safe: meeting the head teacher, making everyone welcome; Daring: what if it rains).
+- **LP6 Write to the head teacher.** *Listen again: the facts for your email* (the LP5 council meeting; date, times, place, food, guests, rain plan; Safe/Daring: informal phrases to avoid, the request, a formal version). *Talk: the head teacher asks*: what you want to organise, when, what you need (+ who helps; Safe: why it is good for the school, making everyone welcome; Daring: what if not many families come).

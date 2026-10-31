@@ -1,6 +1,6 @@
 /* 2 ESO · LS2 Free Time, Live! · Learning Path 2 · What are they doing? (Present Continuous; reading log = LS criterion 4.1) */
 window.LP = {
-  key: 'ls2Doing2ESO', n: 2, title: 'What are they doing?',
+  key: 'ls2Doing2ESO', n: 2, starter: true, title: 'What are they doing?',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Path 1', en: 'Recall: Learning Path 1' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -17,10 +17,10 @@ window.LP = {
         { r: 'daring', q: 'She is very good ___ drawing.', a: ['at'] },
         { r: 'daring', q: 'I ___ a lot of time playing the guitar. (passar)', a: ['spend'] }
       ] },
-    { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Roba, equipament i temps', en: 'Clothes, kit and weather' },
+    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Roba, equipament i temps', en: 'Clothes, kit and weather' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'crowd · half-time · highlights',
-      core: { insecure: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'cap', 'helmet', 'wear a uniform', 'wear a costume', 'It’s sunny', 'It’s cloudy', 'It’s windy', 'It’s cold', 'It’s hot', 'It’s raining', 'It’s snowing'], safe: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'helmet', 'wear a uniform', 'It’s sunny', 'It’s cold', 'It’s raining', 'It’s snowing', 'a concert', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'foggy', 'freezing', 'What’s the weather like?', 'degrees'], daring: ['trainers', 'tracksuit', 'helmet', 'wear a uniform', 'It’s raining', 'It’s snowing', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'freezing', 'What’s the weather like?', 'degrees', 'the crowd', 'cheer', 'warm up', 'take part in'] },
+      core: { beginners: ['T-shirt', 'trainers', 'shorts', 'cap', 'It’s sunny', 'It’s cold', 'It’s hot', 'It’s raining'], insecure: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'cap', 'helmet', 'wear a uniform', 'wear a costume', 'It’s sunny', 'It’s cloudy', 'It’s windy', 'It’s cold', 'It’s hot', 'It’s raining', 'It’s snowing'], safe: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'helmet', 'wear a uniform', 'It’s sunny', 'It’s cold', 'It’s raining', 'It’s snowing', 'a concert', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'foggy', 'freezing', 'What’s the weather like?', 'degrees'], daring: ['trainers', 'tracksuit', 'helmet', 'wear a uniform', 'It’s raining', 'It’s snowing', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'freezing', 'What’s the weather like?', 'degrees', 'the crowd', 'cheer', 'warm up', 'take part in'] },
       groups: [
         { g: 'Clothes & kit', items: [['T-shirt', 'samarreta', 'He’s wearing a red T-shirt.'], ['trainers', 'bambes', 'I need new trainers for running.'], ['tracksuit', 'xandall', 'She’s wearing a blue tracksuit.'], ['shorts', 'pantalons curts', 'They’re playing in shorts.'], ['cap', 'gorra', 'Put on a cap: it’s sunny.'], ['helmet', 'casc', 'Always wear a helmet on your bike.'], ['wear a uniform', 'portar uniforme', 'The team wears a white uniform.'], ['wear a costume', 'portar una disfressa', 'At the fair, people wear costumes.']] },
         { g: 'Weather', items: [['It’s sunny', 'fa sol', 'It’s sunny, so we’re at the beach.'], ['It’s cloudy', 'està ennuvolat', 'It’s cloudy but it isn’t cold.'], ['It’s windy', 'fa vent', 'It’s windy: perfect for kites.'], ['It’s cold', 'fa fred', 'It’s cold. Wear a jacket.'], ['It’s hot', 'fa calor', 'It’s hot today: 30 degrees!'], ['It’s raining', 'plou', 'It’s raining, so the match is cancelled.'], ['It’s snowing', 'neva', 'Look! It’s snowing!']] },
@@ -115,7 +115,37 @@ window.LP = {
         { r: 'daring', q: 'Why does Emma say “And it’s working!”?', o: ['Marc is playing in a new position and he is scoring.', 'The radio is working again.', 'The coach is working hard.'] },
         { r: 'daring', q: 'Which sentence describes something happening now?', o: ['“The players are drinking water.”', '“Marc usually plays as a defender.”', '“We’ll be back in ten minutes.”'] }
       ] },
-    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: 'Present Continuous', pill: '80 %',
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: què estan fent?', en: 'Listen again: what are they doing?' }, pill: { ca: 'Àudio · 80 %', en: 'Audio · 80 %' },
+      intro: { ca: 'Ja vas escoltar aquesta trucada a l’LP1. Ara escolta què està fent cada persona ara mateix.', en: 'You heard this phone call in LP1. Now listen for what each person is doing right now.' },
+      media: { audio: 'audio/where-are-you.mp3', title: 'Where are you?', script: [
+        ['Laia', '[cheerful] Hi Omar! Where are you? It’s really noisy.'],
+        ['Omar', 'Hi Laia! I’m at the sports centre. My sister is playing basketball and I’m watching the match. She’s playing really well!'],
+        ['Laia', 'Oh, nice! Do you go every Saturday?'],
+        ['Omar', 'No, not every Saturday. I usually go swimming on Saturday mornings, but today the pool is closed. What about you? What are you doing?'],
+        ['Laia', '[laughs] I’m at home. I’m drawing a comic about a cat who plays the guitar. And it’s raining, so I’m not going to the park.'],
+        ['Omar', 'A cat who plays the guitar? I want to see it! Listen, the match finishes at twelve. Do you want to meet in the square at half past twelve?'],
+        ['Laia', 'Perfect. I’ll bring the comic. See you there!'],
+        ['Omar', 'See you!']] },
+      chunks: ['I’m watching the match', 'I’m drawing a comic'],
+      items: [
+        { q: 'Where is Omar?', o: ['at the sports centre', 'at home', 'in the square'], h: 'Escolta “I’m at the…”.' },
+        { q: 'What is Omar’s sister doing?', o: ['She’s playing basketball.', 'She’s swimming.', 'She’s watching a film.'], h: 'Escolta “My sister is…”.' },
+        { q: 'What is Omar doing?', o: ['He’s watching the match.', 'He’s playing basketball.', 'He’s drawing.'], h: 'Escolta “and I’m…”.' },
+        { q: 'What is Laia doing?', o: ['She’s drawing a comic.', 'She’s playing the guitar.', 'She’s going to the park.'], h: 'Escolta “I’m at home. I’m…”.' },
+        { q: 'What’s the weather like where Laia is?', o: ['It’s raining.', 'It’s sunny.', 'It’s snowing.'], h: 'Escolta “And it’s…”.' },
+        { r: 'insecure', q: 'Where are they meeting at half past twelve?', o: ['in the square', 'at the sports centre', 'at Laia’s house'], h: 'Escolta “Do you want to meet in…”.' },
+        { r: 'safe', q: 'What does Omar usually do on Saturday mornings?', o: ['He goes swimming.', 'He plays basketball.', 'He draws comics.'] },
+        { r: 'safe', q: 'Why isn’t Omar swimming today?', o: ['The pool is closed.', 'He’s ill.', 'It’s raining.'] },
+        { r: 'daring', q: 'Laia says “It’s really noisy.” Why?', o: ['Omar is watching a basketball match at the sports centre.', 'Laia is playing the guitar.', 'Omar is in the square with friends.'] },
+        { r: 'daring', q: 'Which sentence is about now, not about a habit?', o: ['My sister is playing basketball.', 'I usually go swimming.', 'Do you go every Saturday?'] }
+      ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Live from the sports hall (Emma and Sam)', en: 'Shadowing · Live from the sports hall (Emma and Sam)' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Live from the sports hall (Emma and Sam)', src: 'audio/live-from-the-sports-hall.mp3', slow: 'audio/live-from-the-sports-hall-slow.mp3', t: [0.38, 36.41], ts: [0.38, 42.22], lines: [
+        ['Emma', 'Hello and welcome to School Radio! We’re at the sports hall and the big match is starting: the Blue Team against the Green Team. Sam, what’s happening?'],
+        ['Sam', 'Well, Emma, the Blue Team is wearing their new white uniform and the Green Team is wearing green T-shirts and black shorts. The players are warming up and the crowd is cheering. It’s very noisy in here!'],
+        ['Emma', 'It’s cold and rainy outside, but inside it’s hot. There are about two hundred students watching. Some of them are eating sandwiches!']] } },
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: 'Present Continuous', pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>Present Continuous = am / is / are + verb-ing.</strong> Per a accions que passen <em>ara</em>. <em>I am (I’m) playing · She is (She’s) skating · They are (They’re) watching.</em> Negativa: <em>I’m not playing · He isn’t playing · We aren’t playing.</em> Pregunta: <em>Are you playing? Is she skating? What are they doing?</em> Resposta curta: <em>Yes, I am. / No, she isn’t.</em>', en: '<strong>Present Continuous = am / is / are + verb-ing</strong>, for actions happening <em>now</em>. <em>I’m playing · She’s skating · They’re watching.</em> Negative: <em>I’m not playing · He isn’t playing · We aren’t playing.</em> Questions: <em>Are you playing? Is she skating? What are they doing?</em> Short answers: <em>Yes, I am. / No, she isn’t.</em>' },
@@ -149,7 +179,7 @@ window.LP = {
         { r: 'daring', q: 'Correct the mistake: “They are runing in the park.” → ___', a: ['running'], en: 'Double the n.' },
         { r: 'daring', q: 'Twenty teams ___ (take) part in the tournament this weekend.', a: ['are taking', "'re taking"], en: 'Plural subject: are taking.' }
       ] },
-    { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada: ara o normalment?', en: 'Mixed practice: now or usually?' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada: ara o normalment?', en: 'Mixed practice: now or usually?' }, pill: '80 %',
       intro: { ca: 'Barreja de formes: decideix si la frase parla d’ara (Present Continuous) o d’un hàbit (Present Simple).', en: 'Mixed forms: decide if the sentence is about now (Present Continuous) or a habit (Present Simple).' },
       items: [
         { q: 'I usually ___ (play) football on Saturdays.', a: ['play'], ca: 'usually → hàbit → Present Simple.', en: 'usually → habit → Present Simple.' },
@@ -174,6 +204,19 @@ window.LP = {
     { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Speaking: descriu la foto', en: 'Speaking: describe the photo' },
       intro: { ca: 'Mira la teva foto i grava’t descrivint-la. Mira les notes, no llegeixis.', en: 'Look at your photo and record yourself describing it. Use notes; don’t read.' },
       task: { beginners: 'Digues tres frases sobre la foto amb el model: on sou, quin temps fa i què està fent una persona (15–25 segons).', insecure: 'Digues quatre frases sobre la foto: on sou, quin temps fa, què està fent la gent i què porteu (20–30 segons).', safe: 'Describe your photo live, as in a vlog: where you are, the weather, what people are doing and wearing, and what you usually do there (30–45 s).', daring: 'Describe your photo live, as in a vlog, and add why the moment is special and what you usually do there (45–60 s).' },
-      model: { beginners: 'In this photo, we’re at the park. It’s sunny. My friend is playing football.', insecure: 'In this photo, we’re at the park. It’s sunny. My friends are playing football and I’m taking the photo. We’re wearing T-shirts.', safe: 'Hi everyone! In this photo, I’m at the skate park with Pol. It’s cloudy but it isn’t cold. Pol is skating and I’m filming. We’re wearing helmets, of course. We usually come here on Saturday mornings.', daring: 'Hi everyone! In this photo, I’m at the sports hall and the crowd is cheering, because my sister is playing in the final. She’s wearing the white uniform, number seven. It’s a special day: she usually plays as a defender, but today she’s scoring all the points!' } }
+      model: { beginners: 'In this photo, we’re at the park. It’s sunny. My friend is playing football.', insecure: 'In this photo, we’re at the park. It’s sunny. My friends are playing football and I’m taking the photo. We’re wearing T-shirts.', safe: 'Hi everyone! In this photo, I’m at the skate park with Pol. It’s cloudy but it isn’t cold. Pol is skating and I’m filming. We’re wearing helmets, of course. We usually come here on Saturday mornings.', daring: 'Hi everyone! In this photo, I’m at the sports hall and the crowd is cheering, because my sister is playing in the final. She’s wearing the white uniform, number seven. It’s a special day: she usually plays as a defender, but today she’s scoring all the points!' } },
+    { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: videotrucada', en: 'Talk: video call' },
+      intro: { ca: 'Un amic et fa una videotrucada un dissabte. Respon les seves preguntes.', en: 'A friend video-calls you on a Saturday. Answer the questions.' },
+      task: { beginners: 'Respon amb frases curtes amb el Present Continuous (I’m … -ing). Fes servir el model i canvia les paraules.', insecure: 'Respon amb frases completes amb el Present Continuous i afegeix un detall: on ets, amb qui, quin temps fa.', safe: 'Answer in two or three sentences each. Use the Present Continuous for now and describe what is happening around you.', daring: 'Answer in detail. Describe what is happening around you, and compare it with what you usually do on Saturdays.' },
+      partner: [
+        { q: 'Hi! Where are you?', ca: 'On ets?' },
+        { q: 'What are you doing right now?', ca: 'Què estàs fent ara mateix?' },
+        { q: 'Who are you with?', ca: 'Amb qui ets?' },
+        { r: 'insecure', q: 'What’s the weather like?', ca: 'Quin temps fa?' },
+        { r: 'safe', q: 'What are the people around you doing?' },
+        { r: 'safe', q: 'What are you wearing today?' },
+        { r: 'daring', q: 'Is this what you usually do on Saturdays?' }
+      ],
+      model: { beginners: 'I’m at the park. I’m playing football. I’m with my friends.', insecure: 'I’m at the park. I’m playing football with my friends. I’m with Pau and Martina. It’s sunny but cold.', safe: 'Hi! I’m at the park near my house. Right now I’m playing football with my friends, and we’re winning! I’m with Pau and Martina. Some children are riding their bikes and a man is walking his dog. I’m wearing my blue tracksuit.', daring: 'Hi! I’m at the park near my house and I’m playing football with Pau and Martina. We’re winning three to one! Around me, some kids are riding their bikes and an old man is feeding the pigeons. It’s sunny but really cold, so I’m wearing my blue tracksuit and gloves. It isn’t what I usually do: on Saturdays I usually go swimming, but today the pool is closed.' } }
   ]
 };

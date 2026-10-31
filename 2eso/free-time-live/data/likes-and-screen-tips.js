@@ -1,6 +1,6 @@
 /* 2 ESO · LS2 Free Time, Live! · Learning Path 5 · Likes and screen tips (like / love / hate + -ing, imperatives; CD4 4.5 screen-use tips) */
 window.LP = {
-  key: 'ls2Tips2ESO', n: 5, title: 'Likes and screen tips',
+  key: 'ls2Tips2ESO', n: 5, starter: true, title: 'Likes and screen tips',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2 i 3', en: 'Recall: Learning Paths 2 and 3' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -18,9 +18,9 @@ window.LP = {
         { r: 'daring', q: 'Be quiet! I ___ (think) about my next video.', a: ['am thinking', "'m thinking"] },
         { r: 'daring', q: 'I ___ skating to cycling. (preferir)', a: ['prefer'] }
       ] },
-    { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'M’agrada, no m’agrada i consells de pantalla', en: 'Likes, dislikes and screen tips' },
+    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'M’agrada, no m’agrada i consells de pantalla', en: 'Likes, dislikes and screen tips' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
-      core: { insecure: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside'], safe: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well'], daring: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well', 'addictive', 'concentrate', 'instead of', 'a habit', 'healthy / unhealthy'] },
+      core: { beginners: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'my favourite', 'take a break', 'switch off your phone', 'go outside'], insecure: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside'], safe: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well'], daring: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well', 'addictive', 'concentrate', 'instead of', 'a habit', 'healthy / unhealthy'] },
       groups: [
         { g: 'Likes and dislikes (+ -ing)', items: [['I love + -ing', 'm’encanta', 'I love skating.'], ['I like + -ing', 'm’agrada', 'I like drawing comics.'], ['I don’t like + -ing', 'no m’agrada', 'I don’t like getting up early.'], ['I hate + -ing', 'odio', 'I hate losing!'], ['I don’t mind + -ing', 'no m’importa', 'I don’t mind training in the rain.'], ['my favourite', 'el meu preferit', 'Skating is my favourite hobby.']] },
         { g: 'Screen tips (imperatives)', items: [['take a break', 'fes una pausa', 'Take a break every 30 minutes.'], ['switch off your phone', 'apaga el mòbil', 'Switch off your phone at night.'], ['put your phone away', 'guarda el mòbil', 'Put your phone away at dinner.'], ['don’t use your phone in bed', 'no facis servir el mòbil al llit', 'Don’t use your phone in bed.'], ['go outside', 'surt a fora', 'Go outside and play!']] },
@@ -71,7 +71,29 @@ window.LP = {
         { r: 'daring', q: 'Why does the presenter say “That’s more than twenty-four hours a week”?', o: ['to show that three and a half hours a day is a lot', 'to say that a week has 24 hours', 'to explain the timer'] },
         { r: 'daring', q: 'Which sentence from the programme is an imperative?', o: ['“Put your phone away and enjoy the afternoon!”', '“The average is three and a half hours a day.”', '“I hate feeling tired in the morning.”'] }
       ] },
-    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'like + -ing i imperatius', en: 'like + -ing and imperatives' }, pill: '80 %',
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: el dissabte del Noah', en: 'Listen again: Noah’s Saturday' }, pill: { ca: 'Vídeo · 80 %', en: 'Video · 80 %' },
+      intro: { ca: 'Mira el vlog del Noah de l’LP3. Ara fixa’t en el que li agrada, el que fa normalment i com fa servir la càmera.', en: 'Watch Noah’s vlog from LP3 again. Now notice what he likes, what he usually does and how he uses the camera.' },
+      media: { videos: [{ base: 'video/noah-bike-park', title: 'Noah: Saturday at the bike park' }], videoCredit: 'Illustrated video made for English Lab. Voices generated with ElevenLabs.' },
+      chunks: ['it’s perfect for riding', 'I’m holding the camera'],
+      items: [
+        { q: 'Where is Noah?', o: ['at the bike park', 'at the ice rink', 'at the sports hall'], h: 'Escolta “today I’m at the…”.' },
+        { q: 'Who is he with?', o: ['his friends', 'his dad', 'his sister'], h: 'Escolta “with my…”.' },
+        { q: 'What’s the weather like?', o: ['sunny and windy', 'cold and cloudy', 'rainy'], h: 'Escolta “it’s sunny and…”.' },
+        { q: 'Who does Noah usually ride with on Sunday mornings?', o: ['his dad', 'Leo', 'Sara'], h: 'Escolta “I usually ride here with…”.' },
+        { q: 'What is Noah doing today?', o: ['He’s filming a race.', 'He’s racing.', 'He’s fixing his bike.'], h: 'Escolta “But this weekend I’m…”.' },
+        { r: 'insecure', q: 'Why is he wearing his old tracksuit?', o: ['The park is full of mud.', 'It’s very cold.', 'It’s his club’s uniform.'], h: 'Escolta “because the park is…”.' },
+        { r: 'safe', q: 'Who is the video for?', o: ['the club channel', 'his teacher', 'his grandparents'] },
+        { r: 'safe', q: '“It’s perfect for riding.” How does Noah feel about the weather?', o: ['He likes it.', 'He hates it.', 'He doesn’t mind it.'] },
+        { r: 'daring', q: 'Noah uses a screen today. How is it different from watching videos alone?', o: ['He films outside with his friends.', 'He watches races on his phone.', 'He plays a racing game at home.'] },
+        { r: 'daring', q: 'Which tip from Screen Smart does Noah’s Saturday follow best?', o: ['Go outside.', 'Switch off your phone before bed.', 'Set a time limit.'] }
+      ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Screen Smart (School Radio)', en: 'Shadowing · Screen Smart (School Radio)' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Screen Smart (School Radio)', src: 'audio/screen-smart.mp3', slow: 'audio/screen-smart-slow.mp3', t: [26.95, 61.39], ts: [32.35, 73.46], lines: [
+        ['Presenter', 'Tip number one: take a break. After thirty minutes on a screen, stop for five minutes. Stand up, look out of the window, drink some water.'],
+        ['Presenter', 'Tip number two: set a time limit. Decide how long you want to play, for example one hour, and use the timer on your phone. When it rings, stop.'],
+        ['Presenter', 'Tip number three: switch off your phone one hour before you go to sleep, and keep it out of your bedroom. The light from the screen tells your brain that it is still daytime, so you don’t sleep well.']] } },
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'like + -ing i imperatius', en: 'like + -ing and imperatives' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>like / love / hate / don’t mind + verb-ing:</strong> <em>I love skating. She hates losing. We don’t like getting up early.</em> Pregunta: <em>Do you like playing online?</em> La mateixa ortografia de -ing que al Present Continuous (<em>swimming, dancing</em>).', en: '<strong>like / love / hate / don’t mind + verb-ing:</strong> <em>I love skating. She hates losing. We don’t like getting up early.</em> Question: <em>Do you like playing online?</em> Same -ing spelling as the Present Continuous (<em>swimming, dancing</em>).' },
@@ -102,7 +124,7 @@ window.LP = {
         { r: 'daring', q: 'One hour of games a day is ___: you don’t need more. (suficient)', a: ['enough'], en: 'enough after the adjective or alone.' },
         { r: 'daring', q: 'Correct the mistake: “Don’t to use your phone in bed.” → ___ use your phone in bed.', a: ["don't", 'do not'], en: 'Don’t + base verb, no “to”.' }
       ] },
-    { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: '80 %',
       intro: { ca: 'Barreja de formes: -ing després de like, Present Continuous, Present Simple o imperatiu?', en: 'Mixed forms: -ing after like, Present Continuous, Present Simple or imperative?' },
       items: [
         { q: 'I love dancing, and right now I ___ (dance) in my room!', a: ['am dancing', "'m dancing"], ca: 'right now → am dancing.', en: 'right now → am dancing.' },
@@ -126,6 +148,19 @@ window.LP = {
     { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Speaking: els meus consells', en: 'Speaking: my tips' },
       intro: { ca: 'Grava’t donant els teus consells com en un vlog. Mira les notes, no llegeixis.', en: 'Record yourself giving your tips as in a vlog. Use notes; don’t read.' },
       task: { beginners: 'Digues què t’agrada (una frase) i dos consells de pantalla amb el model (15–25 segons).', insecure: 'Digues què t’agrada de la teva afició (dues frases) i dos consells de pantalla amb imperatius (20–30 segons).', safe: 'Say what you love and hate about your hobby and give three screen tips with imperatives (30–45 s).', daring: 'Say what you love and hate about your hobby, give three screen tips with a reason each, and say which one you are going to apply (45–60 s).' },
-      model: { beginners: 'I love playing basketball. Two tips: take a break. Don’t use your phone in bed.', insecure: 'I love playing basketball. I don’t like losing! Two tips: take a break every thirty minutes. Don’t use your phone in bed.', safe: 'I love climbing because every route is different, and I like watching climbing videos. But I hate feeling tired in the morning. So: set a time limit for videos, take a break every thirty minutes, and switch off your phone one hour before you sleep.', daring: 'I love cycling because I can go anywhere, but I hate checking my phone every five minutes: it’s a bad habit. So here are my tips: turn off notifications when you study, so you can concentrate. Set a time limit for games, because one hour is enough. And keep your phone out of your bedroom. That’s the tip I’m going to apply this week!' } }
+      model: { beginners: 'I love playing basketball. Two tips: take a break. Don’t use your phone in bed.', insecure: 'I love playing basketball. I don’t like losing! Two tips: take a break every thirty minutes. Don’t use your phone in bed.', safe: 'I love climbing because every route is different, and I like watching climbing videos. But I hate feeling tired in the morning. So: set a time limit for videos, take a break every thirty minutes, and switch off your phone one hour before you sleep.', daring: 'I love cycling because I can go anywhere, but I hate checking my phone every five minutes: it’s a bad habit. So here are my tips: turn off notifications when you study, so you can concentrate. Set a time limit for games, because one hour is enough. And keep your phone out of your bedroom. That’s the tip I’m going to apply this week!' } },
+    { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: temps lliure i pantalles', en: 'Talk: free time and screens' },
+      intro: { ca: 'Una periodista de la ràdio de l’escola et fa una entrevista sobre el temps lliure i les pantalles.', en: 'A School Radio reporter interviews you about free time and screens.' },
+      task: { beginners: 'Respon amb frases curtes: I love / like / don’t like + -ing.', insecure: 'Respon amb frases completes: love / like / don’t mind / hate + -ing. Dona un consell amb You should…', safe: 'Answer in two or three sentences each. Use love / enjoy / don’t mind / can’t stand + -ing and how often, and give a tip with should.', daring: 'Answer in detail: give your opinion with reasons, a useful tip, and compare your screen time with the school average (three and a half hours a day).' },
+      partner: [
+        { q: 'What do you love doing in your free time?', ca: 'Què t’encanta fer en el temps lliure?' },
+        { q: 'What do you hate doing?', ca: 'Què odies fer?' },
+        { q: 'How much time do you spend on screens every day?', ca: 'Quant de temps passes davant de pantalles cada dia?' },
+        { r: 'insecure', q: 'What’s your best screen tip?', ca: 'Quin és el teu millor consell sobre pantalles?' },
+        { r: 'safe', q: 'Do you switch off your phone before you go to sleep?' },
+        { r: 'safe', q: 'What do you enjoy doing outside?' },
+        { r: 'daring', q: 'Is three and a half hours a day too much? Why?' }
+      ],
+      model: { beginners: 'I love playing football. I don’t like tidying my room. I spend two hours on screens.', insecure: 'I love playing football with my friends. I hate tidying my room. I spend about two hours a day on screens. You should take a break after thirty minutes.', safe: 'I love playing football and I enjoy drawing comics. I can’t stand getting up early on Saturdays! I spend about two hours a day on screens, mostly watching videos. I don’t switch off my phone before bed, but I should. I enjoy skating in the park with my friends.', daring: 'I love playing football and I really enjoy drawing comics, because I can invent stories. I can’t stand tidying my room. I spend about two hours a day on screens, which is less than the school average, but at weekends it’s more. I think three and a half hours is too much, because you have less time for friends and sport, and you sleep worse. My tip is: leave your phone in the kitchen at night.' } }
   ]
 };

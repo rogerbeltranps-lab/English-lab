@@ -1,6 +1,6 @@
 /* 2 ESO · LS2 Free Time, Live! · Learning Path 3 · Now or usually? (Present Simple vs Present Continuous; listening chart = LS criterion 2.2) */
 window.LP = {
-  key: 'ls2NowUsually2ESO', n: 3, title: 'Now or usually?',
+  key: 'ls2NowUsually2ESO', n: 3, starter: true, title: 'Now or usually?',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 1 i 2', en: 'Recall: Learning Paths 1 and 2' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -18,10 +18,10 @@ window.LP = {
         { r: 'daring', q: 'The ___ is cheering: 500 people!', a: ['crowd'] },
         { r: 'daring', q: 'Correct: “She’s studing.” → She’s ___.', a: ['studying'] }
       ] },
-    { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Ara o normalment: expressions de temps', en: 'Now or usually: time expressions' },
+    { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Ara o normalment: expressions de temps', en: 'Now or usually: time expressions' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'livestream · subscribers · highlights',
-      core: { insecure: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer'], safe: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'go to a concert', 'watch a match', 'temperature'], daring: ['now', 'right now', 'at the moment', 'this weekend', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'watch a match', 'temperature', 'know', 'need', 'want', 'prefer', 'believe', 'understand', 'mean'] },
+      core: { beginners: ['now', 'right now', 'today', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never'], insecure: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer'], safe: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'go to a concert', 'watch a match', 'temperature'], daring: ['now', 'right now', 'at the moment', 'this weekend', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'watch a match', 'temperature', 'know', 'need', 'want', 'prefer', 'believe', 'understand', 'mean'] },
       groups: [
         { g: 'Now (Present Continuous)', items: [['now', 'ara', 'I’m at home now.'], ['right now', 'ara mateix', 'Right now I’m watching a match.'], ['at the moment', 'en aquest moment', 'At the moment she’s training.'], ['today', 'avui', 'Today we’re playing inside.'], ['this weekend', 'aquest cap de setmana', 'This weekend I’m going to a concert.'], ['Look! / Listen!', 'Mira! / Escolta!', 'Look! It’s snowing!']] },
         { g: 'Usually (Present Simple)', items: [['usually', 'normalment', 'I usually play on Saturdays.'], ['on Saturday mornings', 'els dissabtes al matí', 'We train on Saturday mornings.'], ['every weekend', 'cada cap de setmana', 'He goes cycling every weekend.'], ['always / never', 'sempre / mai', 'She never gets up late.'], ['in winter / in summer', 'a l’hivern / a l’estiu', 'In winter we go skating.']] },
@@ -86,7 +86,16 @@ window.LP = {
         safe: ['I watched each video twice', 'I wrote what each vlogger is doing now and usually does', 'I wrote two details per video and said which words or images helped me'],
         daring: ['I watched each video twice', 'I wrote what each vlogger is doing now and usually does, with precise details', 'I compared the two vloggers']
       } },
-    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple o Present Continuous?', en: 'Present Simple or Present Continuous?' }, pill: '80 %',
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Mei: Saturday at the ice rink', en: 'Shadowing · Mei: Saturday at the ice rink' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Mei: Saturday at the ice rink', video: true, poster: 'video/mei-ice-rink-poster.jpg', src: 'video/mei-ice-rink.mp4', slow: 'video/mei-ice-rink-slow.mp4', t: [0.7, 28.35], ts: [0.7, 34.3], lines: [
+        ['Mei', 'Hi everyone, I\'m Mei, and welcome to my Saturday vlog!'],
+        ['Mei', 'Right now I\'m at the ice rink in the town square.'],
+        ['Mei', 'It\'s December, so it\'s really cold, about three degrees, and it\'s cloudy.'],
+        ['Mei', 'I\'m wearing a woolly hat, gloves and a big red jacket.'],
+        ['Mei', 'Look! My brother Kai is skating behind me, and he\'s falling… again!'],
+        ['Mei', 'I usually come here on Sunday afternoons with my family, just for fun.']] } },
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple o Present Continuous?', en: 'Present Simple or Present Continuous?' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>Present Simple</strong> = hàbits i coses que passen sempre: <em>I usually play on Saturdays. She goes skating every Sunday.</em> Marcadors: <em>usually, always, never, every day, on Saturdays, in winter</em>.<br><strong>Present Continuous</strong> = ara: <em>Today I’m playing inside. Look! She’s skating.</em> Marcadors: <em>now, right now, at the moment, today, this weekend, Look!, Listen!</em>', en: '<strong>Present Simple</strong> = habits and things that are always true: <em>I usually play on Saturdays. She goes skating every Sunday.</em> Markers: <em>usually, always, never, every day, on Saturdays, in winter</em>.<br><strong>Present Continuous</strong> = now: <em>Today I’m playing inside. Look! She’s skating.</em> Markers: <em>now, right now, at the moment, today, this weekend, Look!, Listen!</em>' },
@@ -119,7 +128,7 @@ window.LP = {
         { r: 'daring', q: 'Be quiet, please! I ___ (think) about my next video.', a: ['am thinking', "'m thinking"], en: 'An activity now: I’m thinking about…' },
         { r: 'daring', q: 'Correct the mistake: “Leo is knowing all the routes in the park.” → Leo ___ all the routes.', a: ['knows'], en: 'know is a state verb.' }
       ] },
-    { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: '80 %',
       intro: { ca: 'Barreja de formes de les LS1 i LS2: decideix primer quina necessites.', en: 'Mixed forms from LS1 and LS2: decide which one you need first.' },
       items: [
         { q: 'She ___ (have) got a new bike.', a: ['has'] },
@@ -143,6 +152,19 @@ window.LP = {
     { id: 'speak', type: 'speaking', tab: 'Speaking', title: { ca: 'Speaking: en directe', en: 'Speaking: live!' },
       intro: { ca: 'Grava’t com si fos un vlog en directe. Mira les notes, no llegeixis.', en: 'Record yourself as if it were a live vlog. Use notes; don’t read.' },
       task: { beginners: 'Digues on ets, quin temps fa, què fas normalment i què està passant avui (tres o quatre frases amb el model, 20–30 segons).', insecure: 'Digues on ets, quin temps fa, què fas normalment i què està passant avui (quatre o cinc frases, 25–35 segons).', safe: 'Report live: where you are, the weather, what you usually do there and what is happening right now; say one thing you want or need (40–60 s).', daring: 'Report live and add a temporary situation this month and why today is special; use at least one state verb (60–90 s).' },
-      model: { beginners: 'Hi! I’m at the park. It’s sunny. I usually play football here. Today I’m watching my friends.', insecure: 'Hi! I’m at the park. It’s sunny. I usually play football here. Today I’m not playing: I’m watching my friends.', safe: 'Hi everyone! Right now I’m at the ice rink. It’s really cold, about three degrees. I usually come here on Sunday afternoons with my family, but today I’m training for a show, so I’m practising my turns. I need a hot drink!', daring: 'Hey, what’s up? I’m at the bike park and it’s sunny and windy, perfect for riding. I usually ride here with my dad on Sunday mornings, but this month I’m training for a race, so I come every day. Right now I’m not riding: I’m filming my friends, because we want a video for our channel. I think Leo is winning again!' } }
+      model: { beginners: 'Hi! I’m at the park. It’s sunny. I usually play football here. Today I’m watching my friends.', insecure: 'Hi! I’m at the park. It’s sunny. I usually play football here. Today I’m not playing: I’m watching my friends.', safe: 'Hi everyone! Right now I’m at the ice rink. It’s really cold, about three degrees. I usually come here on Sunday afternoons with my family, but today I’m training for a show, so I’m practising my turns. I need a hot drink!', daring: 'Hey, what’s up? I’m at the bike park and it’s sunny and windy, perfect for riding. I usually ride here with my dad on Sunday mornings, but this month I’m training for a race, so I come every day. Right now I’m not riding: I’m filming my friends, because we want a video for our channel. I think Leo is winning again!' } },
+    { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: ara o normalment?', en: 'Talk: now or usually?' },
+      intro: { ca: 'Un company de classe et pregunta pel teu cap de setmana.', en: 'A classmate asks you about your weekend.' },
+      task: { beginners: 'Respon amb frases curtes: I usually… / This weekend I’m…', insecure: 'Respon amb frases completes: el Present Simple per al que fas normalment i el Present Continuous per al que fas aquest cap de setmana.', safe: 'Answer in two or three sentences. Contrast what you usually do with what you are doing this weekend: usually, every…, today, this weekend.', daring: 'Answer in detail, contrast habits and now, and explain why this weekend is different.' },
+      partner: [
+        { q: 'What do you usually do on Saturdays?', ca: 'Què fas normalment els dissabtes?' },
+        { q: 'What are you doing this weekend?', ca: 'Què fas aquest cap de setmana?' },
+        { q: 'Do you usually do sport?', ca: 'Fas esport normalment?' },
+        { r: 'insecure', q: 'Who do you usually go out with?', ca: 'Amb qui surts normalment?' },
+        { r: 'safe', q: 'How often do you see your friends?' },
+        { r: 'safe', q: 'Why is this weekend different?' },
+        { r: 'daring', q: 'Which do you prefer, your usual weekend or this one? Why?' }
+      ],
+      model: { beginners: 'I usually play basketball on Saturdays. This weekend I’m visiting my grandmother. Yes, I play basketball.', insecure: 'I usually play basketball on Saturday mornings. This weekend I’m visiting my grandmother in Girona. Yes, I do sport three times a week. I usually go out with my cousins.', safe: 'I usually play basketball on Saturday mornings and then I meet my friends in the square. But this weekend I’m visiting my grandmother in Girona, because it’s her birthday. I see my friends every day at school and almost every weekend.', daring: 'On Saturdays I usually have a basketball match in the morning, and in the afternoon I hang out with my friends in the square. This weekend is different: I’m not playing, because I’m visiting my grandmother in Girona for her eightieth birthday. My cousins are coming too, and we’re cooking a big lunch. I prefer my usual weekend because I love the matches, but this one is special.' } }
   ]
 };

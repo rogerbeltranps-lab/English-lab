@@ -14,7 +14,7 @@
   const ca = level === 'insecure' || level === 'beginners';
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
   const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : o.safe != null && level === 'daring' ? o.safe : o.insecure);
-  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level)) : (items[level] || (level === 'beginners' ? items.insecure : null) || []);
+  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level) && (!x.only || x.only.includes(level))) : (items[level] || (level === 'beginners' ? items.insecure : null) || []);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const T = (c, e) => ca ? c : e;
   const transcripts = [];
@@ -106,6 +106,14 @@
   R.speaking = p => '<div class="box"><b>' + T('La tasca', 'Your task') + '</b><div>' + byLevel(p.task) + '</div></div>' +
     (p.model ? '<div class="box model"><b>Model</b><div>' + byLevel(p.model) + '</div></div>' : '') +
     '<p><b>' + T('Escriu què diràs', 'Write what you will say') + '</b> · ' + T('Després llegeix-ho en veu alta tres vegades i digues-ho al professor.', 'Then read it aloud three times and say it to your teacher.') + '</p>' + lines(8);
+  // Talk (four skills, 30 Oct 2026): on paper the partner's questions are written; the student notes the answers, then says them to a classmate.
+  R.talk = p => '<div class="box"><b>' + T('La tasca', 'Your task') + '</b><div>' + byLevel(p.task) + '</div></div>' +
+    '<ol class="items">' + forLevel(p.partner).map(x => '<li><b>' + x.q + '</b>' + (ca && x.ca ? ' <small>(' + x.ca + ')</small>' : '') + lines(2) + '</li>').join('') + '</ol>' +
+    '<p><b>' + T('Després', 'Then') + '</b> · ' + T('Fes la conversa en veu alta amb un company: ell pregunta i tu respons, i després al revés.', 'Have the conversation aloud with a classmate: they ask and you answer, then swap.') + '</p>' +
+    (p.model ? '<div class="box model"><b>Model</b><div>' + byLevel(p.model) + '</div></div>' : '');
+  // Shadowing (30 Oct 2026): on paper, the part of the script; the teacher plays the clip and the student reads along, then repeats just behind the voice.
+  R.shadow = p => '<div class="box"><b>' + T('Com es fa', 'How it works') + '</b><div>' + T('El professor posa el fragment tres vegades: primer llegeix mentre escoltes, després murmura les paraules alhora i al final repeteix-les en veu alta just darrere de la veu.', 'Your teacher plays the clip three times: first read while you listen, then mumble the words along, then say them aloud just behind the speaker.') + '</div></div>' +
+    '<div class="box">' + p.clip.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<b>' + l[0] + ':</b> ' + l[1] : (Array.isArray(l) ? l[0] : l)) + '</p>').join('') + '</div>';
   const ptsOf = (p, it) => it.p || (it.o ? p.pts[0] : p.pts[1]);
   const ptsWord = n => n + ' ' + (ca ? (n === 1 ? 'punt' : 'punts') : (n === 1 ? 'point' : 'points'));
   R.quiz = p => {

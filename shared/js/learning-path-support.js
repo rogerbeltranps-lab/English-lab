@@ -60,3 +60,17 @@ var learningSupport = {
         : 'Give all headings and feedback in English. Ask the learner to notice and revise key errors independently, with concise reasons. Keep corrected production in English.';
   }
 };
+
+// Every learning-path page loads this file, so it also brings in the microphone helper (shared/js/el-mic.js: level meter,
+// mic choice, clear messages when the mic or the automatic transcript fails) and the writing log of the marking sheets
+// (shared/js/el-typing.js: characters pasted, keys typed, time writing).
+(function () {
+  var s = document.currentScript;
+  if (!s || !s.src) return;
+  [['el-mic.js', window.elMic], ['el-typing.js', window.elTyping]].forEach(function (x) {
+    if (x[1]) return;
+    var e = document.createElement('script');
+    e.src = s.src.replace(/learning-path-support\.js/, x[0]);
+    document.head.appendChild(e);
+  });
+})();

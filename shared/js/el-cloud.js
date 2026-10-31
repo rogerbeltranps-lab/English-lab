@@ -165,21 +165,7 @@ async function ensureGroup(u){
       o.querySelector("#el-gr").append(b)});
   });
 }
-// 2 ESO students with no route choose one (Roger, 26 Oct 2026; elCanPickRoute in el-catalog.js): Base, Core or Plus, saved in the first
-// LS of the course as by:"student" so it carries over. They can change it on their board until the teacher sets a route. null: not saved.
-function chooseRoute(u,course){
-  return new Promise(res=>{
-    const o=overlay('<div style="max-width:520px"><h1>Tria la teva ruta</h1><p>Tria com vols treballar les activitats. La pots canviar a <b>Les meves activitats</b> fins que el professor te\'n posi una; després ja no la podràs canviar.</p><div id="el-lv"></div></div>');
-    EL_LEVELS.filter(l=>l.pick!==false).forEach(l=>{const b=document.createElement("button");b.innerHTML="<b>"+l.name+"</b><br><small>"+l.ca+"</small>";
-      b.style.cssText="display:block;width:100%;margin:10px 0;padding:12px;border:2px solid #0f766e;background:#fff;border-radius:12px;cursor:pointer;font:inherit";
-      b.onclick=async()=>{if(!confirm("Vols fer la ruta "+(l.student||l.name)+"?"))return;
-        try{await setDoc(doc(db,"students",u.uid,"levels",elPickLs(course)),{level:l.id,by:"student",updated:serverTimestamp()})}
-        catch(e){alert("No s'ha pogut desar la ruta: "+e.message);o.remove();res(null);return}
-        o.remove();res(l.id)};
-      o.querySelector("#el-lv").append(b)});
-  });
-}
-// Routes are set by the teacher (Roger, 26 Oct 2026: from the LS1 exam mark); 2 ESO students with none choose their own (chooseRoute).
+// Routes are set by the teacher (Roger, 30 Oct 2026: students never choose one; they ask for a change on their board, today.html).
 // A student sees only their route's button. Testers keep every route button to try them all (their route, if any, opens first).
 function applyLevel(lvl,all){
   myLevel=lvl;
@@ -219,11 +205,8 @@ async function gate(u){
   // The route of this LS, or the one carried over from an earlier LS (elRouteOf). With none yet, a student works on the Insecure
   // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
   const lvs={};try{(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){console.warn("levels",e)}
-  const rt=elRouteOf(lvs,lsId),course=(EL_LS.find(l=>l.id===lsId)||{}).course,canPick=!tester&&elCanPickRoute(lvs,course);
-  let lvl=rt.level;
-  if(!lvl&&canPick&&st!=="closed")lvl=await chooseRoute(u,course);
-  else if(rt.own&&canPick)banner("Aquesta ruta l'has triat tu. La pots canviar a Les meves activitats fins que el professor te'n posi una.","#0369a1");
-  if(!lvl&&!tester){lvl="insecure";banner("Encara no tens nivell: el professor te'l posarà a partir de l'examen de la primera LS. De moment fas la ruta Insecure.","#0369a1")}
+  let lvl=elRouteOf(lvs,lsId).level;
+  if(!lvl&&!tester){lvl="insecure";banner("Encara no tens nivell: el professor te'l posarà a partir de l'examen de la primera LS. De moment fas la ruta Base.","#0369a1")}
   if(lvl||tester)applyLevel(lvl,tester);
   if(st==="closed"){freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
   // Students are never told which activities are assessed (Roger, 26 Oct 2026), so this message does not say it either.
@@ -308,6 +291,29 @@ const reportProblem=u=>report({en:repEn(),save:o=>{
   if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
   return b.commit()}});
 
+// Suggestions to improve the site (bottom bar "💡 Idea"): suggestions/{id}, read only by the teacher in the dashboard. Same language as the Problem window.
+function suggest(u){
+  const en=repEn(),t=(ca,e)=>en?e:ca,d=document.createElement("dialog"),bs="border:0;border-radius:999px;padding:6px 14px;cursor:pointer;font:inherit;";
+  d.style.cssText="border:0;border-radius:14px;padding:16px 18px;max-width:480px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004;font:15px system-ui,sans-serif;color:#0f172a;background:#fff";
+  d.innerHTML='<h3 style="margin:0 0 6px"></h3><p style="margin:0 0 8px;color:#475569"></p><textarea maxlength="1000" rows="5" style="width:100%;box-sizing:border-box;font:inherit;padding:6px;border:1px solid #cbd5e1;border-radius:8px"></textarea>'
+    +'<p data-n style="margin:4px 0 0;color:#64748b;font-size:13px"></p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button data-x></button><button data-ok></button></div>';
+  d.querySelector("h3").textContent="💡 "+t("Suggereix una millora","Suggest an improvement");
+  d.querySelector("p").textContent=t("Què milloraries de la web? Una idea, una cosa que costa d'entendre o que t'agradaria tenir. (Si alguna cosa no funciona, fes servir ⚠️ Problema.) El professor ho llegirà.","What would you improve on the website? An idea, something that is hard to understand or that you would like to have. (If something does not work, use ⚠️ Problem.) Your teacher will read it.");
+  const ta=d.querySelector("textarea"),n=d.querySelector("[data-n]"),x=d.querySelector("[data-x]"),ok=d.querySelector("[data-ok]");
+  x.style.cssText=bs+"background:#e2e8f0;color:#0f172a";x.textContent=t("Cancel·la","Cancel");x.onclick=()=>d.close();
+  ok.style.cssText=bs+"background:#0f766e;color:#fff";ok.textContent=t("Envia","Send");
+  const count=()=>n.textContent=ta.value.length+" / 1000";ta.oninput=count;count();
+  ok.onclick=async()=>{const text=ta.value.trim();if(!text){ta.focus();return}
+    ok.disabled=true;
+    try{await setDoc(doc(collection(db,"suggestions")),{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,
+        page:location.pathname.replace(/^.*?\/English-lab\//i,"").slice(0,200)||"index.html",text,created:serverTimestamp()});
+      d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=t("Gràcies! El professor llegirà el teu suggeriment.","Thank you! Your teacher will read your suggestion.");
+      const c=document.createElement("button");c.style.cssText=bs+"background:#0f766e;color:#fff";c.textContent="OK";c.onclick=()=>d.close();d.append(m,c)}
+    catch(e){console.warn("suggestion",e);ok.disabled=false;alert(t("No s'ha pogut enviar. Torna-ho a provar més tard.","It could not be sent. Please try again later."))}};
+  d.addEventListener("close",()=>d.remove());
+  document.body.append(d);d.showModal();ta.focus();
+}
+
 function bar(){
   const el=document.createElement("div");el.id="el-cloud-bar";
   el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:10002;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;font:13px system-ui,sans-serif;box-shadow:0 2px 8px #0002;display:flex;gap:8px;align-items:center";
@@ -319,6 +325,7 @@ function bar(){
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
+      if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
@@ -393,6 +400,10 @@ onAuthStateChanged(auth,async u=>{
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
+  // A route the teacher set on the student list before their first sign-in (roster/{email}.route = {level, ls}, teacher.html listRoute):
+  // saved as their route in that LS, with the level notice fields, if they have none there yet (firestore.rules checks it matches the list).
+  const lr=myRoster&&myRoster.route;
+  if(lr&&lr.level&&lr.ls)try{const ref=doc(db,"students",u.uid,"levels",lr.ls);if(!(await getDoc(ref)).exists())await setDoc(ref,{level:lr.level,changed:serverTimestamp(),was:null,why:null})}catch(e){console.warn("route from the list",e)}
   gamePush(u);
   lsMenu(u).catch(e=>console.warn("ls menu",e));
   document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u));   // teacher-only links (e.g. a class game on its learning path)
@@ -413,6 +424,14 @@ onAuthStateChanged(auth,async u=>{
       seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().examSeen||{}},
       save:(ls,v)=>setDoc(doc(db,"students",u.uid),{examSeen:{[ls]:v}},{merge:true}),
       visible:async ls=>{const i=await lsInfo(ls);return i.status!=="hidden"&&elLsForGroup((window.EL_LS||[]).find(x=>x.id===ls),i,myGroup)}})).catch(e=>console.warn("exam notice",e));
+  // The teacher's corrections and answers to hand-ins: a card once per new answer with a link to the step's tab, and the answer inside
+  // that tab on the learning path (shared/js/el-corrections.js).
+  if(u&&isStudent(u)&&!document.getElementById("el-corrections"))loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
+    .then(()=>import("./el-corrections.js")).then(m=>m.corrections({here:actId,root:ROOT,en:repEn(),
+      list:async()=>(await getDocs(collection(db,"students",u.uid,"results"))).docs.map(x=>x.data()).filter(r=>r&&r.activity&&(r.replies||r.levels)),
+      seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().fbSeen||{}},
+      save:o=>setDoc(doc(db,"students",u.uid),{fbSeen:o},{merge:true}),
+      name:(aid,step)=>{for(const g of Object.values(window.EL_GRADING||{})){const x=(g.moments||[]).find(m=>m.a===aid&&m.step===step);if(x)return x.name}return null}})).catch(e=>console.warn("corrections",e));
   // "Your level": a card once each time the teacher sets the student's route (shared/js/el-level-notice.js).
   if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-level-notice"))import("./el-level-notice.js").then(m=>m.levelNotice({course:courseOf(myGroup),
     lv:async()=>{const o={};(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>o[d.id]=d.data());return o},

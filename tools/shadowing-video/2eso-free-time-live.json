@@ -1,0 +1,206 @@
+{
+ "course": "2 ESO",
+ "ls": "Free Time, Live!",
+ "folder": "2eso/free-time-live",
+ "out": "video/shadowing.mp4",
+ "theme": {
+  "accent": "#1d6b4f",
+  "ink": "#1e2c25",
+  "title": "#1c3e30",
+  "muted": "#6e7a73",
+  "bg1": "#f1f6f2",
+  "bg2": "#f7f9f6",
+  "soft": "#dcefe5"
+ },
+ "note": "Core level, the same for every route. Sentences cut from the LS2 recordings (unchanged); times from forced alignment (align-words.py).",
+ "voice": {
+  "dir": "tools/shadowing-video/voice/intro",
+  "by": "Amelia (ElevenLabs eleven_v3, voice ZF6FPAbjXT4488VcRRnw), 31 Oct 2026",
+  "what": [
+   "l1"
+  ],
+  "how": [
+   "l2",
+   "chime",
+   "l3"
+  ],
+  "tips": [
+   "l4"
+  ],
+  "examples": [
+   [
+    "l5"
+   ],
+   [
+    "l7"
+   ]
+  ],
+  "try": [
+   "l6"
+  ],
+  "ready": [
+   "l8"
+  ]
+ },
+ "examples": [
+  {
+   "speaker": "Sam",
+   "text": "It's very noisy in here!",
+   "src": "audio/live-from-the-sports-hall.mp3",
+   "start": 24.0,
+   "end": 25.52,
+   "pause": 3.0,
+   "tip": "Strong words are louder and longer. Copy them!",
+   "marks": "It's **ve**ry **noi**sy in **here**!"
+  },
+  {
+   "speaker": "Mei",
+   "text": "It's difficult, but I love it.",
+   "src": "video/mei-ice-rink.mp4",
+   "start": 37.73,
+   "end": 40.71,
+   "pause": 4.7,
+   "tip": "Some words join together, with no pause between them.",
+   "marks": "It's difficult, but I ==love‿it==."
+  },
+  {
+   "speaker": "Omar",
+   "text": "A cat who plays the guitar?",
+   "marks": "A **cat** who **plays** the gui**tar**? ↗",
+   "tip": "No question word at the start? The voice goes up ↗, like in yes/no questions (Do you…?).",
+   "src": "audio/where-are-you.mp3",
+   "start": 33.78,
+   "end": 35.84,
+   "pause": 3.6
+  },
+  {
+   "speaker": "Omar",
+   "text": "What about you? What are you doing?",
+   "marks": "What about **you**? ↘ What are you **do**ing? ↘",
+   "tip": "Questions with who, what, where… go down ↘ at the end, like normal sentences.",
+   "src": "audio/where-are-you.mp3",
+   "start": 21.72,
+   "end": 22.7,
+   "pause": 3.0
+  }
+ ],
+ "items": [
+  {
+   "speaker": "Sam",
+   "text": "The players are warming up and the crowd is cheering.",
+   "src": "audio/live-from-the-sports-hall.mp3",
+   "start": 20.4,
+   "end": 23.55,
+   "pause": 4.9,
+   "marks": "The **play**ers are **warm**ing‿**up** and the **crowd** is **cheer**ing. ↘"
+  },
+  {
+   "speaker": "Emma",
+   "text": "It's cold and rainy outside, but inside it's hot.",
+   "src": "audio/live-from-the-sports-hall.mp3",
+   "start": 26.42,
+   "end": 30.4,
+   "pause": 6.0,
+   "marks": "It's **cold** and **rain**y‿out**side**, ↗ but in**side** it's **hot**. ↘"
+  },
+  {
+   "speaker": "Omar",
+   "text": "My sister is playing basketball and I'm watching the match.",
+   "src": "audio/where-are-you.mp3",
+   "start": 7.0,
+   "end": 10.24,
+   "pause": 5.1,
+   "marks": "My **sis**ter is **play**ing **bas**ketball‿and I'm **watch**ing the **match**. ↘"
+  },
+  {
+   "speaker": "Laia",
+   "text": "Do you go every Saturday?",
+   "src": "audio/where-are-you.mp3",
+   "start": 14.29,
+   "end": 15.93,
+   "pause": 3.0,
+   "marks": "Do you **go** **ev**ery **Sat**urday? ↗"
+  },
+  {
+   "speaker": "Emma",
+   "text": "Marc usually plays as a defender, but today he's playing as a forward.",
+   "src": "audio/live-from-the-sports-hall.mp3",
+   "start": 48.97,
+   "end": 53.82,
+   "pause": 7.1,
+   "marks": "**Marc** **us**ually **plays**‿as‿a de**fend**er, ↗ but to**day** he's **play**ing as a **for**ward. ↘"
+  },
+  {
+   "speaker": "Laia",
+   "text": "I'm drawing a comic about a cat who plays the guitar.",
+   "src": "audio/where-are-you.mp3",
+   "start": 25.65,
+   "end": 29.14,
+   "pause": 5.4,
+   "marks": "I'm **draw**ing‿a **com**ic about a **cat** who **plays** the gui**tar**. ↘"
+  },
+  {
+   "speaker": "Omar",
+   "text": "Do you want to meet in the square at half past twelve?",
+   "src": "audio/where-are-you.mp3",
+   "start": 40.54,
+   "end": 42.64,
+   "pause": 3.6,
+   "marks": "Do you **want** to **meet**‿in the **square** at **half** past **twelve**? ↗"
+  },
+  {
+   "speaker": "Mei",
+   "text": "I'm wearing a woolly hat, gloves and a big red jacket.",
+   "src": "video/mei-ice-rink.mp4",
+   "start": 14.22,
+   "end": 17.61,
+   "pause": 5.2,
+   "marks": "I'm **wear**ing‿a **wool**ly **hat**, ↗ **gloves**‿and‿a **big** **red** **jack**et. ↘"
+  },
+  {
+   "speaker": "Mei",
+   "text": "But today is different: I'm training for the Christmas show.",
+   "marks": "But to**day**‿is **dif**ferent: I'm **train**ing for the **Christ**mas **show**. ↘",
+   "src": "video/mei-ice-rink.mp4",
+   "start": 28.35,
+   "end": 32.03,
+   "pause": 5.6
+  },
+  {
+   "speaker": "Noah",
+   "text": "Behind me, Leo and Sara are racing down the hill.",
+   "src": "video/noah-bike-park.mp4",
+   "start": 16.67,
+   "end": 20.3,
+   "pause": 5.5,
+   "marks": "Be**hind** me, ↗ **Le**o‿and **Sar**a are **rac**ing **down** the **hill**. ↘"
+  },
+  {
+   "speaker": "Presenter",
+   "text": "Today we're talking about phones and free time.",
+   "src": "audio/screen-smart.mp3",
+   "start": 4.43,
+   "end": 7.57,
+   "pause": 4.9,
+   "marks": "To**day** we're **talk**ing‿about **phones** and **free** **time**. ↘"
+  },
+  {
+   "speaker": "Presenter",
+   "text": "Stand up, look out of the window, drink some water.",
+   "src": "audio/screen-smart.mp3",
+   "start": 34.1,
+   "end": 37.39,
+   "pause": 5.1,
+   "marks": "**Stand**‿**up**, ↗ **look**‿**out** of the **win**dow, ↗ **drink** some **wa**ter. ↘"
+  },
+  {
+   "speaker": "Presenter",
+   "text": "Real fun is better than any video.",
+   "src": "audio/screen-smart.mp3",
+   "start": 69.12,
+   "end": 71.71,
+   "pause": 4.2,
+   "marks": "**Real** **fun**‿is **bet**ter than **an**y **vid**eo. ↘"
+  }
+ ]
+}

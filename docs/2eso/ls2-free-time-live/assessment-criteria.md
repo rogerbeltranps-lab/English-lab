@@ -46,6 +46,8 @@
 | Final product | Buddy feedback | not marked | — |
 | Exam | Listening + chart · Reading + log · Vocabulary · Grammar · Writing | 2.2, 4.1, grammar/vocab, **5.1** (level) | scores per section + writing level |
 
+**Four skills (Roger, 30 Oct 2026).** LP1 stays as it was (students had done it). From LP2 on the learning paths also have: *Listen again* (`again` → 2.2) in LP2, LP4, LP5 and LP6; *Talk* (`talk` → 3.2, a hand-in the teacher sees) in LP2–LP6; practice heard in LP2–LP6 and grammar heard in LP2, LP3 and LP5 (*Listen and complete* → 2.2, 5.1); mixed practice said (*Say it* → 3.2; LP6: grammar said); study cards said aloud (4.1, 3.2). Other vocabulary and grammar steps count for 4.1 and 5.1 (Use of English is reading and writing).
+
 ## Criterion by criterion
 
 - **4.1:** LP2 reading log (level) + exam reading (score). **2.2:** LP3 listening chart (level) + exam listening (score). **4.2:** LP4 fact file + final product step 1 (levels; the later one weighs twice). **6.2:** LP4 fact file + final product fact file and credits (levels) + automatic half (LP4 Credits, fact file done). **3.2:** final product step 4 / the video (level). **5.1:** exam writing (level) + final product step 3 (level). **CD2 2.2:** step 4 (level) + automatic half (steps 2 and 4 done). **CD4 4.5:** step 5 (level) + automatic half (LP5 writing and speaking, step 5 done).
