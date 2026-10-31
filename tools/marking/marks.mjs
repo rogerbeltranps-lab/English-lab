@@ -98,7 +98,10 @@ else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026:
   for(const grp of W.EL_GROUPS){const ticks=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
     for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
       const a=W.EL_CATALOG.find(x=>x.id===m.a),rows=await todo(grp,m),r=readyOf(grp,ls,m,ticks);
-      if(rows.length&&r.from&&today>=r.from){const d=days(today,r.from);(d>=LATE?problems:ok).push(`${grp.id} · ${m.name} (${a.title}): ${rows.length} hand-in${rows.length>1?"s":""} ready since ${r.from} still without a level${d>=LATE?` (${d} days late)`:""}`)}
+      // a late hand-in counts from the day it came in, not from when the step was ready
+      if(rows.length&&r.from&&today>=r.from){const since=x=>{const h=String(x.h.date||"").slice(0,10);return h>r.from?h:r.from},late=rows.filter(x=>days(today,since(x))>=LATE);
+        if(late.length)problems.push(`${grp.id} · ${m.name} (${a.title}): ${late.length} hand-in${late.length>1?"s":""} ready since ${late.map(since).sort()[0]} still without a level (${days(today,late.map(since).sort()[0])} days late)`);
+        if(rows.length>late.length)ok.push(`${grp.id} · ${m.name} (${a.title}): ${rows.length-late.length} hand-in${rows.length-late.length>1?"s":""} to mark at the next run`)}
       // possible copies waiting for the teacher
       for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id),f=(st.res.flags||{})[m.step];
         if(f&&!f.done&&days(today,String(f.at).slice(0,10))>=7)remind.push(`${grp.id} · ${m.name}: a possible copy waiting for you since ${String(f.at).slice(0,10)}`)}}}
