@@ -14,7 +14,7 @@ const DEMO = { me: { name: 'Your name', group: '4ESOA' }, rs: {}, lv: { '4eso-se
   ls: { '4eso-my-real-routine': { status: 'closed' }, '4eso-seasons-and-celebrations': { status: 'open' }, '2eso-my-real-routine': { status: 'hidden' }, '2eso-free-time-live': { status: 'hidden' } }, pt: {}, tm: {} };
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.json': 'application/json' };
 
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.EL_CHANNEL ? { channel: process.env.EL_CHANNEL } : {});
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1.5 });
 await page.route('http://el.local/**', async (route) => {
   const rel = decodeURIComponent(new URL(route.request().url()).pathname).replace(/^\/+/, '') || 'index.html';

@@ -258,17 +258,23 @@ await page.goto(BASE + '4eso/my-real-routine/vocabulary-games.html', { waitUntil
 await settle();
 await shot('72-vocabulary-games');
 if (PREFIX !== 'r3-') {
+  // LS2 games are "not open yet" for 4ESO A today (opened per group like any activity), so this shot uses the full view.
   await step('LS2 vocabulary games', async () => {
+    await view('');
     await page.goto(BASE + '4eso/seasons-and-celebrations/vocabulary-games.html', { waitUntil: 'domcontentloaded' });
     await settle();
     await shot('72-vocabulary-games-ls2');
   });
+  // On 31 Oct a student is sent back to the board from lab/practice.html (el-cloud.js gate(): only lab/ and lab/index.html
+  // count as English Lab), so this shot also uses the full view.
   await step('self-practice by level', async () => {
     await page.goto(BASE + 'lab/practice.html', { waitUntil: 'domcontentloaded' });
     await settle(4000);
+    note('practice page url: ' + page.url());
     await shot('73-practice');
     await shot('73-practice', { full: true });
   });
+  await view('4ESOA');
 }
 
 fs.writeFileSync(path.join(OUT, PREFIX + 'capture-log.txt'), log.join('\n') + '\n');
