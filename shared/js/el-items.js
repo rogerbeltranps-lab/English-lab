@@ -10,7 +10,7 @@ window.ELItems=(function(){
   const plain=s=>String(s||"").replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/\s+/g," ").trim();
   const norm=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[“”"]/g,"").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();   // as ls2-engine.js
   // the questions a route sees, exactly as ls2-engine.js forLevel
-  const forLevel=(src,l)=>!src?[]:Array.isArray(src)?src.filter(x=>ROUTES.indexOf(x.r||"beginners")<=ROUTES.indexOf(l)):(src[l]||(l==="beginners"?src.insecure:null)||[]);
+  const forLevel=(src,l)=>!src?[]:Array.isArray(src)?src.filter(x=>ROUTES.indexOf(x.r||"beginners")<=ROUTES.indexOf(l)&&(!x.only||x.only.includes(l))):(src[l]||(l==="beginners"?src.insecure:null)||[]);
   // Recall and checkpoint questions mix grammar and vocabulary: a verb in brackets, a rewrite (→) or a small grammar word as the answer is grammar.
   const FUNC=/^(on|in|at|the|a|an|is|are|am|was|were|will|won't|wont|do|does|don't|doesn't|did|didn't|isn't|aren't|wasn't|weren't|going to|has|have|than|more|most|by|for|since|ago|who|which|that|where|when|whose|could|would|can|can't|should|must|may|might|shall|me|him|her|us|them|my|your|his|its|our|their|not|be|been|being|to|of|from|with|some|any|much|many|used to|are exchanged)$/;
   const gram=it=>/\(|→|->/.test(it.q||"")||(it.a||[]).some(a=>FUNC.test(norm(a)));
@@ -156,7 +156,7 @@ window.ELItems=(function(){
         <span class="muted">· Order:</span> ${[["hard","Hardest first"],["easy","Best first"],["order","Page order"]].map(([k,t])=>`<button class="chip ${f.sort===k?"on":""}" data-do="qa" data-f="sort" data-v="${k}">${t}</button>`).join("")}</div>`
       +`<div class="qwrap"><table class="qa"><tr><th class="ql">Question → right answer</th><th>Area</th><th>All</th>${routes.map(r=>`<th>${esc((LV[r]||r).split(" · ")[0])}</th>`).join("")}${o.gsel==="all"&&o.groups.length>1?o.groups.map(g=>`<th>${esc(g.name)}</th>`).join(""):""}<th class="ql">Most common wrong answers</th></tr>`
       +cut.map(q=>{const miss=q.miss.length?"Wrong the first time: "+q.miss.join(", "):"";
-        const seen=q.list!=="all"?` <span class="route r-${q.list}">${esc((LV[q.list]||q.list).split(" · ")[0])} only</span>`:q.it.r&&q.it.r!=="beginners"?` <small class="muted">(from ${esc((LV[q.it.r]||q.it.r).split(" · ")[0])})</small>`:"";
+        const seen=q.list!=="all"?` <span class="route r-${q.list}">${esc((LV[q.list]||q.list).split(" · ")[0])} only</span>`:q.it.only?` <span class="route r-${q.it.only[0]}">${q.it.only.map(r=>esc((LV[r]||r).split(" · ")[0])).join(", ")} only</span>`:q.it.r&&q.it.r!=="beginners"?` <small class="muted">(from ${esc((LV[q.it.r]||q.it.r).split(" · ")[0])})</small>`:"";
         return `<tr><td class="ql">${qText(q)} → <b>${right(q)}</b>${seen}<br><small class="muted">${where(q)} · question ${q.i+1}</small></td><td><small>${esc(q.area)}</small></td>${cell(q.all,miss)}${routes.map(r=>cell(q.r[r],miss)).join("")}`
           +(o.gsel==="all"&&o.groups.length>1?o.groups.map(g=>cell(q.g[g.id],miss)).join(""):"")
           +`<td class="ql"><small>${topWrong(q,3).map(([w,c])=>`“${esc(w)}” ×${c}`).join(" · ")||(q.all.n&&q.all.ok<q.all.n?"(answer not saved)":"")}</small></td></tr>`}).join("")

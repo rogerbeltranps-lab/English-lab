@@ -26,10 +26,16 @@ var LS2 = (function () {
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
   let LP, level, state;
   const ca = () => level === 'insecure' || level === 'beginners';
+  /* Starter works differently, not only with fewer questions (Roger, 31 Oct 2026, thread "Explain Starter vs Base learning paths").
+     Only in Learning Paths whose data says starter: true (paths students had not started that day; started ones stay as they were):
+     Starter picks typed answers from three options (a wrong pick is crossed out and they try again), starts every listening and
+     video on the slow copy with English subtitles, and has 16 s to answer in Talk. Base and the other routes do not change. */
+  const starter = () => level === 'beginners' && !!(LP && LP.starter);
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca() ? (o.ca || o.en) : (o.en || o.ca));
   const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : level === 'native' && o.daring != null ? o.daring : o.safe != null && (level === 'daring' || level === 'native') ? o.safe : o.insecure);   // beginners → insecure, native → daring
+  // only: ['insecure'] keeps an item to the routes listed (Base-only practice of a basic form the higher routes already know).
   // A list is cumulative (r: tags); an object keyed by route gives each route its own list (the sample exam: same number of items per route).
-  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level)) : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
+  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level) && (!x.only || x.only.includes(level))) : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
   const need = n => Math.ceil(n * 0.8);
   const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -98,12 +104,63 @@ var LS2 = (function () {
   }
   const modeHow = m => m === 'listen' ? (ca() ? 'Prem ▶, escolta la frase i escriu el que falta on sents el xiulet. Obre la frase només si ho necessites.' : 'Press ▶, listen to the sentence and type what is missing where you hear the beep. Open the sentence only if you need it.')
     : m === 'say' ? (ca() ? 'Llegeix la frase, prem 🎤 i digues-la sencera en veu alta, amb el que falta. Si l’ordinador no t’entén dues vegades, la pots escriure.' : 'Read the sentence, press 🎤 and say the whole sentence aloud, with what is missing. If the computer doesn’t understand you twice, you can type it.') : '';
+  /* ---------- Starter choices: the right answer + two distractors ---------- */
+  // Authored distractors first (item.d), then forms of the verb in brackets (Present Simple / Continuous, affirmative or negative),
+  // then other answers of the same step with the same number of words. The order is fixed per item so a page reload shows the same.
+  const s3 = v => ({ go: 'goes', do: 'does', have: 'has', be: 'is' })[v] || (/[^aeiou]y$/.test(v) ? v.slice(0, -1) + 'ies' : /(s|sh|ch|x|z|o)$/.test(v) ? v + 'es' : v + 's');
+  const ing = v => /ie$/.test(v) ? v.slice(0, -2) + 'ying' : (/[^e]e$/.test(v) ? v.slice(0, -1) + 'ing' : /^[^aeiou]*[aeiou][bdgmnprt]$/.test(v) ? v + v.slice(-1) + 'ing' : v + 'ing');
+  const hash = t => { let h = 7; for (const c of String(t)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+  function verbForms(it) {
+    const m = String(it.q).match(/\((?:not \/ )?([a-z]+)\)/); if (!m) return null;
+    const v = m[1], g = ing(v), a = expand(it.a[0]).trim(), be = /(^|\W)I ___/.test(it.q) ? 'am' : 'are';
+    const map = {};
+    map[v] = [s3(v), be + ' ' + g]; map[s3(v)] = [v, 'is ' + g]; map[g] = [v, s3(v)];
+    map['are going to ' + v] = ['is going to ' + v, 'will ' + v]; map['is going to ' + v] = ['are going to ' + v, 'will ' + v]; map['am going to ' + v] = ['is going to ' + v, 'will ' + v]; map['will ' + v] = ['is going to ' + v, s3(v)];
+    map['is ' + g] = ['are ' + g, s3(v)]; map['are ' + g] = ['is ' + g, v]; map['am ' + g] = ['is ' + g, v];
+    map['does not ' + v] = ["don't " + v, "isn't " + g]; map['do not ' + v] = ["doesn't " + v, "aren't " + g];
+    map['is not ' + g] = ["aren't " + g, "doesn't " + v]; map['are not ' + g] = ["isn't " + g, "don't " + v]; map['am not ' + g] = ["isn't " + g, "don't " + v];
+    return map[a] || null;
+  }
+  // words that are confused with each other: a wrong option from the same set teaches more than a random word
+  const SETS = [['at', 'in', 'on'], ['because', 'but', 'and', 'so', 'also'], ['first', 'then', 'finally', 'next'], ['always', 'usually', 'often', 'sometimes', 'never'], ['am', 'is', 'are'], ['do', 'does', 'is', 'are'], ['will', 'going to', 'is going to']];
+  function choices(it, items, salt) {
+    const same = x => it.a.some(a => expand(a) === expand(x)), out = [];
+    const add = x => { if (out.length < 2 && x && !same(x) && !out.some(o => expand(o) === expand(x))) out.push(x); };
+    (it.d || []).forEach(add);
+    (verbForms(it) || []).forEach(add);
+    const ingQ = String(it.q).match(/-ing form: ([a-z]+)/); if (ingQ) { const v = ingQ[1]; [v + 'ing', v.replace(/e$/, '') + v.slice(-1) + 'ing', s3(v)].forEach(add); }
+    const a0 = norm(it.a[0]), set = SETS.find(g => g.includes(a0)); if (set) set.filter(x => x !== a0).sort((x, y) => hash(salt + x) - hash(salt + y)).forEach(add);
+    const wc = words(it.a[0]);
+    items.map(x => x.a[0]).filter(x => x !== it.a[0]).sort((x, y) => ((words(y) === wc) - (words(x) === wc)) || (hash(salt + x) - hash(salt + y))).forEach(add);
+    return [it.a[0]].concat(out).sort((x, y) => hash(salt + x) - hash(salt + y));
+  }
+  function picksHtml(it, items, prefix, i, mode) {
+    return '<div class="actions pick-row" style="justify-content:flex-start" data-for="' + prefix + i + '">' + choices(it, items, LP.key + prefix + i).map(o =>
+      '<button class="btn secondary" type="button" data-pick="' + prefix + i + '"' + (mode === 'say' ? ' data-say="1"' : '') + ' data-v="' + esc(o) + '">' + esc(o) + '</button>').join('') + '</div>';
+  }
+  // highlights the option that is in the box (after a pick or when saved answers come back)
+  function syncPicks() {
+    $$('.pick-row').forEach(r => { const box = $('#' + r.dataset.for), v = box ? norm(box.value) : '';
+      r.querySelectorAll('[data-pick]').forEach(b => { const on = !!v && norm(b.dataset.v) === v; b.setAttribute('aria-pressed', on); b.style.setProperty('background', on ? 'var(--accent)' : '', on ? 'important' : ''); b.style.setProperty('color', on ? '#fff' : '', on ? 'important' : ''); }); });
+  }
+  function bindPicks() {
+    if (document.body.dataset.picks) return; document.body.dataset.picks = '1';
+    document.addEventListener('click', e => {
+      const b = e.target.closest && e.target.closest('[data-pick]'); if (!b || b.disabled) return;
+      const box = $('#' + b.dataset.pick); if (!box) return;
+      if (b.dataset.say && box.readOnly) { const h = $('#' + b.dataset.pick.replace(/(\d+)$/, 'h$1')); if (h) h.textContent = 'Primer prem 🎤 i digues la frase sencera amb aquesta resposta.'; return; }
+      box.value = b.dataset.v; box.dispatchEvent(new Event('input', { bubbles: true })); syncPicks();
+    });
+  }
   function typedHtml(items, prefix, mode) {
-    return items.map((it, i) => '<div class="question">' + (mode === 'listen'
+    if (starter()) bindPicks();
+    return (starter() && items.length ? '<p class="instruction">Tria la resposta correcta entre les tres opcions. Si falles, aquella opció queda ratllada, llegeixes la pista i tornes a provar.</p>' : '') +
+      items.map((it, i) => '<div class="question">' + (mode === 'listen'
         ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
           '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
         : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (mode === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
-      '<input type="text" class="typed" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (mode === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : '') + '>' +
+      '<input type="text" class="typed" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (mode === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : starter() ? ' readonly placeholder="Tria una opció"' : '') + '>' +
+      (starter() ? picksHtml(it, items, prefix, i, mode) : '') +
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>').join('');
   }
   const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
@@ -143,10 +200,11 @@ var LS2 = (function () {
       got.push([ok, typedAs($('#' + prefix + i))]);
       const key = prefix + i;
       if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
+      if (starter() && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
       const why = ca() ? (it.ca || it.en || '') : (it.en || it.ca || '');
       const show = reveal || tries[key] >= 2;
       f.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!')
-        : !v ? (ca() ? 'Escriu una resposta.' : 'Type an answer.')
+        : !v ? (starter() ? 'Tria una resposta.' : ca() ? 'Escriu una resposta.' : 'Type an answer.')
         : (ca() ? 'Encara no. ' : 'Not yet. ') + (why ? why + ' ' : '') +
           (show ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(it.a[0]) + '</strong>'
                 : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
@@ -170,8 +228,8 @@ var LS2 = (function () {
   function forget(id, prefix) { if (state.ans) delete state.ans[id]; if (state.typing) delete state.typing[id + '_' + level]; Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
   const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + (ca() ? 'Torna-ho a fer' : 'Do it again') + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
-  function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); }
-  function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } }
+  function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); syncPicks(); }
+  function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
   // check(count): the step's own check; stays(id, prefix, listId, items, check) wires Check, Do it again and the restore.
   function stays(id, prefix, listId, items, check) {
     $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix)); };
@@ -274,7 +332,7 @@ var LS2 = (function () {
     // Local videos (normal + "-slow" copy, WebVTT subtitles, poster), e.g. the listening chart: media.videos = [{ base: 'video/name', title }]
     if (m.videos) h += m.videos.map((v, i) => '<div class="video-card" style="margin:14px 0"><strong>' + esc(v.title) + '</strong>' +
       '<div class="actions" role="group" aria-label="Video speed"><button class="btn secondary" type="button" data-vs="' + p.id + i + '" data-slow="0">' + (ca() ? 'Velocitat normal' : 'Normal speed') + '</button><button class="btn secondary" type="button" data-vs="' + p.id + i + '" data-slow="1">' + (ca() ? 'Versió més lenta' : 'Slower version') + '</button></div>' +
-      '<video id="' + p.id + 'Video' + i + '" data-base="' + v.base + '" controls preload="metadata" playsinline style="width:100%;border-radius:14px;margin:8px 0;background:#000" poster="' + v.base + '-poster.jpg"><source src="' + v.base + '.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" src="' + v.base + '.vtt"></video></div>').join('') +
+      '<video id="' + p.id + 'Video' + i + '" data-base="' + v.base + (starter() ? '-slow' : '') + '" controls preload="metadata" playsinline style="width:100%;border-radius:14px;margin:8px 0;background:#000" poster="' + v.base + '-poster.jpg"><source src="' + v.base + (starter() ? '-slow' : '') + '.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" src="' + v.base + (starter() ? '-slow' : '') + '.vtt"' + (starter() ? ' default' : '') + '></video></div>').join('') +
       (m.videoCredit ? '<p class="tiny">' + m.videoCredit + '</p>' : '');
     if (m.audio) h += '<div class="audio-card"><strong>' + esc(m.title || 'Listening') + '</strong><audio class="audio-player" id="' + p.id + 'Audio" controls preload="none" src="' + m.audio + '"></audio>' +
       (ca() ? '<div class="audio-row" id="' + p.id + 'Speed" hidden><button class="btn secondary" type="button" id="' + p.id + 'Slow">Versió més lenta</button></div>' : '') +
@@ -292,8 +350,14 @@ var LS2 = (function () {
         if (vid.dataset.base !== base) { vid.dataset.base = base; vid.querySelector('source').src = base + '.mp4'; vid.querySelector('track').src = base + '.vtt'; vid.load(); }
         mark(slow);
       });
-      mark(false);
+      mark(starter());
     });
+    // Starter: the listening starts on the slower copy when it exists (the button goes back to normal speed)
+    if (m.audio && starter()) {
+      const slow = m.audio.replace(/\.mp3$/, '-slow.mp3'), a = $('#' + p.id + 'Audio'), b = $('#' + p.id + 'Slow');
+      fetch(slow, { method: 'HEAD' }).then(r => { if (!r.ok) return; a.src = slow; $('#' + p.id + 'Speed').hidden = false; if (b) b.textContent = 'Velocitat normal'; }).catch(() => {});
+      if (b && !m.script) b.onclick = () => { const toSlow = !a.src.endsWith('-slow.mp3'); a.src = toSlow ? slow : m.audio; b.textContent = toSlow ? 'Velocitat normal' : 'Versió més lenta'; };
+    }
     if (!m.audio || !m.script) return;
     fetch(m.audio, { method: 'HEAD' }).then(r => { if (!r.ok) throw 0; }).catch(() => {
       $('#' + p.id + 'Audio').hidden = true; $('#' + p.id + 'Tts').hidden = false;
@@ -711,7 +775,7 @@ var LS2 = (function () {
           '<div class="actions"><button class="btn secondary" type="button" id="' + id + 'Ai" disabled>' + (ca() ? 'Feedback amb IA ↗' : 'AI feedback ↗') + '</button></div><p class="tiny" id="' + id + 'AiMsg"></p></div>') +
         '<div class="section-card"><div class="actions"><button class="btn" type="button" id="' + id + 'Send">' + (ca() ? 'Entrega la conversa' : 'Hand in the conversation') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
       bind() {
-        const qs = forLevel(p.partner), key = id + '_' + level, wait = (p.wait || { beginners: 12, insecure: 12, safe: 16, daring: 20 })[level] || 16;
+        const qs = forLevel(p.partner), key = id + '_' + level, wait = (p.wait || { beginners: starter() ? 16 : 12, insecure: 12, safe: 16, daring: 20 })[level] || 16;
         state.steps = state.steps || {}; state.speak = state.speak || {}; const sp = state.speak[key] = state.speak[key] || {};
         $('#' + id + 'Task').innerHTML = byLevel(p.task); $('#' + id + 'Model').innerHTML = byLevel(p.model);
         $('#' + id + 'Qs').innerHTML = qs.map((q, i) => '<li><button class="btn secondary" type="button" data-tq="' + id + i + '" aria-label="Listen">▶</button> ' +

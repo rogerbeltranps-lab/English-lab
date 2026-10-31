@@ -1,6 +1,6 @@
 /* LS2 · Learning Path 5 · Plan the day (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
-  key: 'ls2Plan4ESO', n: 5, title: 'Plan the day',
+  key: 'ls2Plan4ESO', n: 5, starter: true, title: 'Plan the day',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2–4', en: 'Recall: Learning Paths 2–4' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -18,7 +18,7 @@ window.LP = {
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Organitzar un esdeveniment', en: 'Planning an event' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
-      core: { insecure: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people'], safe: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people', 'organise', 'set up', 'put up posters / decorations', 'send invitations', 'make a timetable', 'run a stall / workshop', 'take place', 'be held', 'book a band / a room'], daring: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people', 'organise', 'set up', 'put up posters / decorations', 'send invitations', 'make a timetable', 'run a stall / workshop', 'take place', 'be held', 'book a band / a room'] },
+      core: { beginners: ['meet friends', 'buy tickets', 'invite people'], insecure: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people'], safe: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people', 'organise', 'set up', 'put up posters / decorations', 'send invitations', 'make a timetable', 'run a stall / workshop', 'take place', 'be held', 'book a band / a room'], daring: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people', 'organise', 'set up', 'put up posters / decorations', 'send invitations', 'make a timetable', 'run a stall / workshop', 'take place', 'be held', 'book a band / a room'] },
       groups: [
         { g: 'Plans', items: [['go to a festival', 'anar a un festival', 'We’re going to go to a festival.'], ['meet friends', 'quedar amb amics', 'I’ll meet friends in the square.'], ['book a room', 'reservar una sala', 'We need to book a room.'], ['buy tickets', 'comprar entrades', 'Can you buy tickets?'], ['invite people', 'convidar gent', 'We’re going to invite people.']] },
         { r: 'safe', g: 'Event planning (Safe)', items: [['organise', 'organitzar', 'We’re organising a celebration day.'], ['set up', 'muntar, preparar', 'We set up the chairs at 9.'], ['put up posters / decorations', 'penjar cartells / decoració', 'Let’s put up posters.'], ['send invitations', 'enviar invitacions', 'We’re sending invitations on Wednesday.'], ['make a timetable', 'fer un horari', 'We need to make a timetable.'], ['run a stall / workshop', 'portar una parada / un taller', 'Our class runs a food stall.'], ['take place', 'tenir lloc', 'It takes place in the hall.'], ['be held', 'celebrar-se, fer-se', 'The event will be held on Friday.'], ['book a band / a room', 'contractar un grup / reservar una sala', 'We booked a band.']] }
@@ -127,6 +127,8 @@ window.LP = {
         { q: '___ ___ ___ a stall for each festival.', a: ['there will be'], ca: 'There will be.', en: 'There will be.' },
         { q: '“These boxes are heavy.” “I ___ help you!”', a: ['will', "'ll"], ca: 'Oferta.', en: 'Offer.' },
         { q: 'Class 4B ___ ___ ___ (make) lanterns in Art. It’s the plan.', a: ['is going to make', "'s going to make"], ca: 'Pla.', en: 'Plan.' },
+        { r: 'insecure', only: ['insecure'], q: '“We need posters!” “I ___ make them!”', a: ['will', "'ll"], ca: 'Oferta.', en: 'Offer.' },
+        { r: 'insecure', only: ['insecure'], q: 'We ___ ___ ___ (decorate) the hall on Friday. It’s the plan.', a: ['are going to decorate', "'re going to decorate"], ca: 'Pla.', en: 'Plan.' },
         { r: 'safe', q: 'The concert ___ (start) at 12.30, according to the programme.', a: ['starts'], en: 'Timetable.' },
         { r: 'safe', q: 'We ___ ___ (visit) our grandparents on Sunday. We’ve already bought the train tickets.', a: ['are visiting', "'re visiting"], en: 'Arrangement.' },
         { r: 'safe', q: 'I’m sure the families ___ ___ (enjoy) the food.', a: ['will enjoy', "'ll enjoy"], en: 'Prediction.' }
