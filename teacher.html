@@ -46,6 +46,8 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <script src="shared/js/el-marking.js"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-comp-map.js"></script>
+<script src="shared/js/el-reference-data.js"></script>
+<script src="shared/js/el-reference.js"></script>
 <script src="shared/js/el-points.js"></script>
 <script src="shared/js/el-items.js"></script>
 <script src="lab/game/decks/index.js"></script>
@@ -66,7 +68,7 @@ const LAST=(()=>{try{return JSON.parse(localStorage.getItem("el_t_last"))||{}}ca
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(gOf(LAST.g)||["plan","qa","mat","none"].includes(LAST.g))S.g=LAST.g;
+  else if(gOf(LAST.g)||["plan","qa","mat","ref","none"].includes(LAST.g))S.g=LAST.g;
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   if(q.has("course")||q.has("ls")||q.has("g"))history.replaceState(null,"",location.pathname+location.hash)})();
 const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,year:!!S.year,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
@@ -421,13 +423,15 @@ function render0(){
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
   $("#tabs").innerHTML=`<button class="tab cplan ${S.g==="plan"?"on":""}" data-do="tab" data-g="plan" title="Exam day and this week's plan in every group">📅 Time plan</button>`
     +`<button class="tab cplan ${S.g==="qa"?"on":""}" data-do="tab" data-g="qa" title="Which questions students answer well or badly the first time, by route and group">🔎 Questions</button>`
-    +`<button class="tab cplan ${S.g==="mat"?"on":""}" data-do="tab" data-g="mat" title="Class games, paper worksheets and study PDFs of every LS">📚 Materials</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
+    +`<button class="tab cplan ${S.g==="mat"?"on":""}" data-do="tab" data-g="mat" title="Class games, paper worksheets and study PDFs of every LS">📚 Materials</button>`
+    +`<button class="tab cplan ${S.g==="ref"?"on":""}" data-do="tab" data-g="ref" title="Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked">📖 Reference</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
     +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`
     +` <button class="g" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`;
   if(S.g==="plan"){$("#main").innerHTML=annBox()+pbBox()+sgBox()+overview();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
+  if(S.g==="ref"){$("#main").innerHTML=window.ELRef?ELRef.view():`<div class="box"><p class="muted">Loading…</p></div>`;return}
   if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+pbBox()+sgBox()+rosterBox();return}
   const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);COURSE=grp.course;
   const mine=l=>elLsForGroup(l,D.ls[l.id],S.g);
