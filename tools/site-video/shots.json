@@ -1,18 +1,12 @@
 {
  "l01": [
   {
-   "img": "00-home-signed-out.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ]
+   "img": "r3-00-home.png"
   }
  ],
  "l02": [
   {
-   "img": "00-home-signed-out.png",
+   "img": "r3-00-home.png",
    "view": [
     380,
     560,
@@ -28,7 +22,8 @@
    "margin": 0.25
   },
   {
-   "img": "01-signin-window-filled.png",
+   "img": "r3-01-signin.png",
+   "on": "Sign in",
    "view": [
     676,
     212,
@@ -36,34 +31,70 @@
     654
    ],
    "hl": [
-    706,
-    380,
-    506,
-    200
+    704,
+    400,
+    510,
+    184
+   ]
+  },
+  {
+   "img": "r3-01-signin.png",
+   "on": "Forgot",
+   "view": [
+    676,
+    212,
+    568,
+    654
    ],
-   "at": 0.42
+   "hl": [
+    704,
+    756,
+    510,
+    46
+   ]
   }
  ],
  "l03": [
   {
-   "img": "4eso-10-board.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-10-board.png",
    "hl": [
     26,
     106,
     306,
     66
    ]
+  },
+  {
+   "img": "r3-03-board-ca.png",
+   "on": "If your route",
+   "hl": [
+    380,
+    30,
+    380,
+    70
+   ]
+  },
+  {
+   "img": "r3-03-board-ca.png",
+   "on": "your board is in Catalan",
+   "view": [
+    384,
+    440,
+    1300,
+    140
+   ],
+   "hl": [
+    1166,
+    494,
+    74,
+    30
+   ],
+   "margin": 0.1
   }
  ],
  "l04": [
   {
-   "img": "4eso-10-board.png",
+   "img": "r3-10-board.png",
    "from": [
     0,
     0,
@@ -72,14 +103,14 @@
    ],
    "view": [
     384,
-    198,
+    210,
     1512,
-    152
+    140
    ],
    "hl": [
     404,
     268,
-    736,
+    734,
     64
    ],
    "margin": 0.12
@@ -87,7 +118,7 @@
  ],
  "l05": [
   {
-   "img": "4eso-10-board.png",
+   "img": "r3-10-board.png",
    "from": [
     0,
     0,
@@ -96,15 +127,39 @@
    ],
    "view": [
     384,
-    370,
+    400,
     1512,
-    440
-   ]
+    410
+   ],
+   "hl": [
+    404,
+    452,
+    478,
+    94
+   ],
+   "margin": 0.04
+  },
+  {
+   "img": "r3-10-board.png",
+   "on": "If you do all",
+   "view": [
+    384,
+    400,
+    1512,
+    410
+   ],
+   "hl": [
+    900,
+    452,
+    996,
+    94
+   ],
+   "margin": 0.04
   }
  ],
  "l06": [
   {
-   "img": "4eso-10-board.png",
+   "img": "r3-10-board.png",
    "from": [
     0,
     0,
@@ -113,22 +168,61 @@
    ],
    "view": [
     384,
-    832,
+    836,
+    1512,
+    114
+   ],
+   "margin": 0.2
+  },
+  {
+   "img": "r3-10-board.png",
+   "on": "Click",
+   "view": [
+    384,
+    836,
     1512,
     114
    ],
    "hl": [
     1230,
-    886,
+    884,
     118,
-    40
+    44
    ],
    "margin": 0.2
   }
  ],
  "l07": [
   {
+   "img": "r3-11-join-the-class.png",
+   "view": [
+    384,
+    180,
+    1512,
+    130
+   ],
+   "margin": 0.15
+  },
+  {
+   "img": "r3-11-join-the-class.png",
+   "on": "Join the class",
+   "view": [
+    384,
+    180,
+    1512,
+    130
+   ],
+   "hl": [
+    1668,
+    212,
+    206,
+    62
+   ],
+   "margin": 0.15
+  },
+  {
    "img": "4eso-09-exam-notice.png",
+   "on": "And when",
    "from": [
     0,
     0,
@@ -152,29 +246,57 @@
  ],
  "l08": [
   {
-   "img": "4eso-10-board.png",
-   "from": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-12-route-line.png",
    "view": [
-    384,
-    940,
-    1200,
-    90
+    300,
+    300,
+    1350,
+    330
    ],
    "hl": [
-    1100,
-    966,
-    470,
-    46
+    990,
+    456,
+    350,
+    38
    ],
-   "margin": 0.25
+   "margin": 0
   },
   {
-   "img": "4eso-13-ask-route-picked.png",
+   "img": "r3-12-route-line.png",
+   "on": "Click Ask",
+   "view": [
+    300,
+    300,
+    1350,
+    330
+   ],
+   "hl": [
+    1350,
+    452,
+    220,
+    44
+   ],
+   "margin": 0
+  },
+  {
+   "img": "r3-14-ask-route-filled.png",
+   "on": "choose one",
+   "view": [
+    570,
+    226,
+    780,
+    628
+   ],
+   "hl": [
+    1088,
+    428,
+    232,
+    168
+   ]
+  },
+  {
+   "img": "r3-14-ask-route-filled.png",
+   "on": "say why",
    "view": [
     570,
     226,
@@ -183,20 +305,14 @@
    ],
    "hl": [
     596,
-    420,
-    730,
-    180
-   ],
-   "at": 0.42
+    650,
+    726,
+    108
+   ]
   },
   {
-   "img": "4eso-13-ask-route-picked.png",
-   "from": [
-    570,
-    226,
-    780,
-    628
-   ],
+   "img": "r3-14-ask-route-filled.png",
+   "on": "and send it",
    "view": [
     570,
     226,
@@ -206,50 +322,66 @@
    "hl": [
     1128,
     780,
-    196,
-    50
-   ],
-   "at": 0.8
+    194,
+    52
+   ]
   }
  ],
  "l09": [
   {
-   "img": "4eso-10-board.full.jpg",
-   "from": [
-    384,
-    1160,
-    1512,
-    850
-   ],
+   "img": "r3-15-week-plan.png",
    "view": [
     384,
-    1200,
+    90,
     1512,
-    520
+    490
    ],
    "hl": [
-    410,
-    1350,
-    390,
-    52
+    400,
+    264,
+    1476,
+    240
    ],
-   "margin": 0.04
-  }
- ],
- "l28": [
+   "margin": 0.03
+  },
   {
-   "img": "r3-15-whole-ls-plan.png",
+   "img": "r3-15-week-plan.png",
+   "on": "the date of the exam",
    "view": [
     384,
-    0,
-    1536,
-    1080
-   ]
+    90,
+    1512,
+    490
+   ],
+   "hl": [
+    408,
+    210,
+    384,
+    44
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r3-15-week-plan.png",
+   "on": "If you miss",
+   "view": [
+    384,
+    90,
+    1512,
+    490
+   ],
+   "hl": [
+    404,
+    156,
+    900,
+    36
+   ],
+   "margin": 0.03
   }
  ],
  "l10": [
   {
-   "img": "4eso-10-board.png",
+   "img": "r3-10-board.png",
    "view": [
     1200,
     700,
@@ -257,7 +389,7 @@
     380
    ],
    "hl": [
-    1648,
+    1650,
     944,
     256,
     52
@@ -265,7 +397,8 @@
    "margin": 0.1
   },
   {
-   "img": "4eso-16-my-week-window.png",
+   "img": "r3-16-my-week.png",
+   "on": "Click it",
    "view": [
     1100,
     520,
@@ -276,80 +409,70 @@
     1364,
     548,
     540,
-    378
+    374
    ],
-   "at": 0.4,
    "margin": 0.04
   }
  ],
  "l11": [
   {
-   "img": "4eso-10-board.full.jpg",
-   "from": [
-    384,
-    1700,
-    1512,
-    850
-   ],
-   "view": [
-    384,
-    1880,
-    1512,
-    980
-   ],
-   "hl": [
-    1790,
-    1924,
-    90,
-    46
-   ],
-   "margin": 0.02
+   "img": "r3-17-lp-grid.png"
   },
   {
-   "img": "4eso-10-board.full.jpg",
-   "from": [
-    384,
-    1880,
-    1512,
-    980
-   ],
-   "view": [
-    384,
-    2540,
-    1512,
-    320
-   ],
+   "img": "r3-17-lp-grid.png",
+   "on": "with their activities",
    "hl": [
-    1790,
-    2574,
-    90,
+    384,
+    236,
+    1512,
+    300
+   ]
+  },
+  {
+   "img": "r3-17-lp-grid.png",
+   "on": "A green Open",
+   "hl": [
+    1794,
+    240,
+    84,
+    48
+   ]
+  },
+  {
+   "img": "r3-17-lp-grid.png",
+   "on": "A grey one",
+   "hl": [
+    1794,
+    888,
+    84,
     44
-   ],
-   "at": 0.55,
-   "margin": 0.1
+   ]
   }
  ],
  "l12": [
   {
-   "img": "4eso-15-board-criteria-summary.png",
-   "view": [
-    384,
-    640,
-    1512,
-    440
-   ],
+   "img": "r3-19-criteria.png",
    "hl": [
-    588,
-    690,
-    278,
-    56
-   ],
-   "margin": 0.05
+    596,
+    64,
+    216,
+    52
+   ]
+  },
+  {
+   "img": "r3-19-criteria.png",
+   "on": "how you are doing",
+   "hl": [
+    384,
+    400,
+    1512,
+    640
+   ]
   }
  ],
  "l13": [
   {
-   "img": "4eso-10-board.png",
+   "img": "r3-10-board.png",
    "view": [
     0,
     0,
@@ -366,13 +489,17 @@
  ],
  "l14": [
   {
-   "img": "4eso-31-ls-menu-open.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-30-ls.png",
+   "hl": [
+    1060,
+    30,
+    800,
+    52
+   ]
+  },
+  {
+   "img": "r3-31-ls-menu.png",
+   "on": "Click Learning",
    "hl": [
     1190,
     30,
@@ -382,68 +509,77 @@
   },
   {
    "img": "phone:72-phone-ls-menu.png",
-   "at": 0.62
+   "on": "On a phone"
   }
  ],
  "l15": [
   {
-   "img": "4eso-30-ls.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-30-ls.png"
+  },
+  {
+   "img": "r3-30-ls.png",
+   "on": "you see your challenge",
    "hl": [
     1150,
     362,
     650,
-    448
+    440
    ]
   }
  ],
  "l16": [
   {
-   "img": "4eso-30-ls.full.jpg",
-   "from": [
-    0,
-    0,
-    1920,
-    1080
-   ],
-   "view": [
-    60,
-    650,
-    1100,
-    500
-   ],
-   "hl": [
-    80,
-    1040,
-    980,
-    70
-   ],
-   "margin": 0.04,
-   "at": 0
-  },
-  {
-   "img": "4eso-33-ls-tab-learning-path.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-32-ls-tab-overview.png",
    "hl": [
     120,
-    300,
-    1680,
-    430
-   ],
-   "at": 0.28
+    180,
+    920,
+    72
+   ]
   },
   {
-   "img": "4eso-30-ls.png",
+   "img": "r3-32-ls-tab-overview.png",
+   "on": "what you will learn",
+   "hl": [
+    120,
+    180,
+    158,
+    72
+   ]
+  },
+  {
+   "img": "r3-32-ls-tab-learning-path.png",
+   "on": "the learning paths",
+   "hl": [
+    290,
+    180,
+    202,
+    72
+   ]
+  },
+  {
+   "img": "r3-32-ls-tab-language.png",
+   "on": "the language you need",
+   "hl": [
+    508,
+    180,
+    320,
+    72
+   ]
+  },
+  {
+   "img": "r3-32-ls-tab-final.png",
+   "on": "and the final product",
+   "hl": [
+    850,
+    204,
+    186,
+    72
+   ]
+  },
+  {
+   "img": "r3-30-ls.png",
+   "on": "Here you also have",
    "view": [
     60,
     620,
@@ -456,79 +592,65 @@
     750,
     90
    ],
-   "at": 0.62,
    "margin": 0.05
   }
  ],
  "l17": [
   {
-   "img": "4eso-40-getting-started.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-40-lp-top.png"
+  },
+  {
+   "img": "r3-40-lp-top.png",
+   "on": "The top bar",
    "hl": [
     150,
-    14,
+    76,
     660,
-    42
+    44
    ]
   },
   {
-   "img": "4eso-40-getting-started.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-40-lp-top.png",
+   "on": "Use the list",
    "hl": [
     150,
-    82,
+    140,
     1620,
-    56
-   ],
-   "at": 0.6
+    62
+   ]
   }
  ],
  "l18": [
   {
-   "img": "4eso-41-celebrations-around-the-world-tab2.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-41-lp-tabs.png",
    "hl": [
-    152,
-    254,
-    1600,
-    70
+    150,
+    240,
+    1602,
+    72
    ]
   },
   {
-   "img": "4eso-41-celebrations-around-the-world-tab2.png",
+   "img": "r3-42-lp-reading.png",
+   "on": "read the short instruction",
    "view": [
     100,
-    380,
-    1700,
-    440
+    360,
+    1720,
+    500
    ],
    "hl": [
-    200,
-    470,
-    1080,
-    50
+    198,
+    464,
+    1104,
+    42
    ],
-   "at": 0.62
+   "margin": 0.03
   }
  ],
  "l19": [
   {
-   "img": "4eso-41-celebrations-around-the-world-tab2.png",
+   "img": "r3-42-lp-reading.png",
    "view": [
     960,
     340,
@@ -536,104 +658,246 @@
     220
    ],
    "hl": [
-    1528,
-    402,
-    188,
-    38
+    1534,
+    386,
+    184,
+    40
    ],
    "margin": 0.15
+  },
+  {
+   "img": "r3-44-lp-bottom.png",
+   "on": "Your answers save",
+   "view": [
+    300,
+    700,
+    1300,
+    330
+   ],
+   "hl": [
+    640,
+    936,
+    600,
+    40
+   ],
+   "margin": 0.05
   }
  ],
  "l20": [
   {
-   "img": "4eso-40-getting-started.png",
+   "img": "r3-40-lp-top.png",
    "view": [
     100,
-    540,
+    780,
     1720,
-    480
+    240
    ],
    "hl": [
     150,
-    884,
+    846,
     1620,
-    116
+    130
    ],
    "margin": 0.03
   }
  ],
  "l21": [
   {
-   "img": "4eso-41-celebrations-around-the-world-tab2.png",
+   "img": "r3-40-lp-top.png",
    "view": [
-    400,
+    360,
     0,
-    1120,
+    1200,
+    200
+   ],
+   "hl": [
+    510,
+    4,
+    900,
+    50
+   ],
+   "margin": 0.1
+  },
+  {
+   "img": "r3-40-lp-top.png",
+   "on": "click Mark as done",
+   "view": [
+    360,
+    0,
+    1200,
     200
    ],
    "hl": [
     1244,
-    10,
+    8,
     160,
     42
    ],
    "margin": 0.1
   },
   {
-   "img": "4eso-10-board.full.jpg",
+   "img": "r3-18-result-window.png",
+   "on": "and then submit",
    "view": [
-    384,
-    2200,
-    1512,
-    330
+    570,
+    120,
+    780,
+    840
    ],
    "hl": [
-    1770,
-    2330,
-    126,
-    110
+    1218,
+    888,
+    106,
+    48
    ],
-   "at": 0.6,
-   "margin": 0.08
+   "margin": 0.03
+  }
+ ],
+ "l27": [
+  {
+   "img": "r3-20-correction-card.png",
+   "view": [
+    600,
+    10,
+    720,
+    300
+   ],
+   "hl": [
+    616,
+    24,
+    688,
+    276
+   ],
+   "margin": 0.15
+  },
+  {
+   "img": "r3-20-correction-card.png",
+   "on": "Click it",
+   "view": [
+    600,
+    10,
+    720,
+    300
+   ],
+   "hl": [
+    668,
+    132,
+    484,
+    40
+   ],
+   "margin": 0.15
+  },
+  {
+   "img": "r3-45-lp-correction.png",
+   "on": "read the correction",
+   "view": [
+    100,
+    200,
+    1720,
+    400
+   ],
+   "hl": [
+    204,
+    300,
+    1514,
+    152
+   ],
+   "margin": 0.03
   }
  ],
  "l22": [
   {
-   "img": "4eso-33-ls-tab-learning-path.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-32-ls-tab-learning-path.png",
    "hl": [
     1258,
     300,
-    542,
+    544,
     430
    ]
+  },
+  {
+   "img": "r3-61-checkpoint-rules.png",
+   "on": "Read the rules",
+   "view": [
+    100,
+    200,
+    1720,
+    800
+   ],
+   "hl": [
+    204,
+    240,
+    1500,
+    170
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r3-61-checkpoint-rules.png",
+   "on": "tick the box",
+   "view": [
+    100,
+    200,
+    1720,
+    800
+   ],
+   "hl": [
+    230,
+    780,
+    330,
+    120
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r3-61-checkpoint-rules.png",
+   "on": "You see one question",
+   "view": [
+    100,
+    200,
+    1720,
+    800
+   ],
+   "hl": [
+    204,
+    240,
+    1500,
+    170
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r3-61-checkpoint-rules.png",
+   "on": "Don't leave",
+   "view": [
+    100,
+    200,
+    1720,
+    800
+   ],
+   "hl": [
+    230,
+    424,
+    1460,
+    266
+   ],
+   "margin": 0.03
   }
  ],
  "l23": [
   {
-   "img": "4eso-42-recall-checkpoint-1.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
-   ],
+   "img": "r3-60-not-open.png",
    "hl": [
-    330,
-    430,
-    1260,
-    230
+    340,
+    440,
+    1240,
+    210
    ]
   }
  ],
  "l24": [
   {
-   "img": "4eso-40-getting-started.png",
+   "img": "r3-40-lp-top.png",
    "view": [
     1100,
     760,
@@ -641,66 +905,200 @@
     320
    ],
    "hl": [
-    1636,
-    1014,
+    1638,
+    1016,
     134,
-    44
+    42
    ],
    "margin": 0.1
   },
   {
-   "img": "4eso-50-problem-window.png",
+   "img": "r3-51-problem-filled.png",
+   "on": "Choose what happened",
    "view": [
     600,
     124,
     720,
-    812
+    834
    ],
    "hl": [
-    620,
-    236,
-    680,
-    196
+    628,
+    240,
+    390,
+    30
    ],
-   "at": 0.3
+   "margin": 0.03
   },
   {
-   "img": "4eso-50-problem-window.png",
-   "from": [
-    600,
-    124,
-    720,
-    812
-   ],
+   "img": "r3-51-problem-filled.png",
+   "on": "explain it",
    "view": [
     600,
     124,
     720,
-    812
+    834
    ],
    "hl": [
-    620,
-    680,
-    680,
-    100
+    626,
+    440,
+    668,
+    180
    ],
-   "at": 0.66
+   "margin": 0.03
+  },
+  {
+   "img": "r3-51-problem-filled.png",
+   "on": "add a screenshot",
+   "view": [
+    600,
+    124,
+    720,
+    834
+   ],
+   "hl": [
+    626,
+    676,
+    540,
+    96
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r3-51-problem-filled.png",
+   "on": "Your teacher will see",
+   "view": [
+    600,
+    124,
+    720,
+    834
+   ],
+   "hl": [
+    1198,
+    884,
+    124,
+    46
+   ],
+   "margin": 0.03
   }
  ],
  "l25": [
   {
-   "img": "4eso-60-english-lab.png",
-   "view": [
-    0,
-    0,
-    1920,
-    1080
+   "img": "r3-70-english-lab.png",
+   "hl": [
+    380,
+    376,
+    1360,
+    296
    ]
+  },
+  {
+   "img": "r3-70-english-lab.png",
+   "on": "and grammar",
+   "hl": [
+    726,
+    700,
+    320,
+    380
+   ]
+  },
+  {
+   "img": "r3-70-english-lab.png",
+   "on": "vocabulary games",
+   "hl": [
+    380,
+    700,
+    320,
+    380
+   ]
+  },
+  {
+   "img": "r3-71-games-menu.png",
+   "on": "for each Learning",
+   "view": [
+    300,
+    400,
+    1400,
+    620
+   ],
+   "hl": [
+    460,
+    540,
+    330,
+    440
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r3-72-vocabulary-games.png",
+   "on": "Use it"
   }
  ],
  "l26": [
   {
    "img": "card:{\"lines\": [\"Remember\"], \"big\": 52, \"items\": [\"Start on your board: My activities\", \"Check My week\", \"Do the steps in order\", \"Ask your teacher when you need help\"]}"
+  }
+ ],
+ "l28": [
+  {
+   "img": "r3-15-week-plan.png",
+   "view": [
+    384,
+    90,
+    1512,
+    490
+   ],
+   "hl": [
+    404,
+    534,
+    222,
+    36
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r3-15-whole-ls-plan.png",
+   "on": "to see every week",
+   "view": [
+    380,
+    40,
+    1516,
+    1000
+   ],
+   "margin": 0.0
+  },
+  {
+   "img": "r3-15-whole-ls-plan.png",
+   "on": "what we do in class",
+   "view": [
+    380,
+    40,
+    1516,
+    1000
+   ],
+   "hl": [
+    400,
+    416,
+    1480,
+    132
+   ],
+   "margin": 0.0
+  },
+  {
+   "img": "r3-15-whole-ls-plan.png",
+   "on": "and the activities",
+   "view": [
+    380,
+    40,
+    1516,
+    1000
+   ],
+   "hl": [
+    400,
+    600,
+    1480,
+    196
+   ],
+   "margin": 0.0
   }
  ]
 }
