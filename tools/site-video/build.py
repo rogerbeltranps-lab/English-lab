@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Builds the "How English Lab works" video from the site screenshots (captures/), the voice-over (voice/<id>.mp3,
-ElevenLabs, made by voice.mjs) and script.json (English voice, Catalan subtitles) + shots.json (what each line shows).
+ElevenLabs, made by voice.mjs) and script.json (the English and Catalan text of each line) + shots.json (what each line shows).
+No subtitles: one video in English and one in Catalan (Roger, 31 Oct 2026), so the screen fills the frame.
 
-Usage: python3 tools/site-video/build.py OUT.mp4 [--stills DIR]   (--stills: one picture per shot, to check the framing)
+Usage: python3 tools/site-video/build.py OUT.mp4 [--lang ca] [--voice DIR] [--stills DIR]
+  --lang ca: the Catalan version (Catalan text and cards; a shot's "on_ca" word, else the same place in the line as its "on")
+  --voice: folder of the mp3s next to this file (default voice for English, voice-ca for Catalan)
+  --stills: one picture per shot, to check the framing
 A line without its mp3 gets silence for an estimated time, so the video can be previewed before any audio is paid for.
 Needs ffmpeg, Pillow, numpy and the Inter font. 1280x720, 30 fps, light blue cards like the shadowing videos.
 """
@@ -12,7 +16,10 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CAP = os.path.join(HERE, 'captures')
-VOICE = os.path.join(HERE, 'voice')
+def arg(name, default=None):
+    return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else default
+LANG = arg('--lang', 'en')
+VOICE = os.path.join(HERE, arg('--voice', 'voice' if LANG == 'en' else 'voice-ca'))
 W, H, FPS = 1280, 720, 30
 T = {'accent': '#30578c', 'ink': '#181e2f', 'title': '#253b66', 'muted': '#626f82', 'bg1': '#eef3fd', 'bg2': '#f6f8fd', 'soft': '#e3ebf8'}
 HL = (245, 158, 11)                     # highlight frame colour (amber)
@@ -48,7 +55,8 @@ def brand(d):
     d.rounded_rectangle((56, 36, 92, 72), 9, fill=rgb(T['accent']))
     d.polygon([(68, 45), (82, 54), (68, 63)], fill='white')
     d.text((106, 41), 'English Lab', font=font('b', 21), fill=rgb(T['title']))
-    d.text((W - 56 - d.textlength('How the website works', font=font('s', 16)), 45), 'How the website works', font=font('s', 16), fill=rgb(T['muted']))
+    tag = 'Com funciona la web' if LANG == 'ca' else 'How the website works'
+    d.text((W - 56 - d.textlength(tag, font=font('s', 16)), 45), tag, font=font('s', 16), fill=rgb(T['muted']))
 
 def card(lines, sub=None, big=56, chip=None, items=None):
     im = BG.copy(); d = ImageDraw.Draw(im); brand(d)
@@ -110,8 +118,8 @@ def fit(rect, im, margin=0.06):
 def ease(t): t = min(max(t, 0), 1); return t * t * (3 - 2 * t)
 def lerp(a, b, t): return tuple(p + (q - p) * t for p, q in zip(a, b))
 
-# The screen sits in a panel above a caption band, so the subtitles never cover it (Roger, 31 Oct 2026).
-PX, PY, PW, PH = 112, 14, 1056, 594
+# The screen sits in a 16:9 panel that fills the frame (no subtitles).
+PX, PY, PW, PH = 40, 18, 1200, 675
 def _panel_bg():
     im = BG.copy(); sh = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     ImageDraw.Draw(sh).rounded_rectangle((PX - 2, PY + 6, PX + PW + 2, PY + PH + 10), 18, fill=(30, 50, 90, 70))
@@ -134,47 +142,6 @@ def frame(im, view, hl, hl_a):
     out = PBG.copy(); out.paste(f, (PX, PY), PMASK)
     return out
 
-# ---------- subtitles (Catalan), in the band under the panel ----------
-SUBF = font('s', 27)
-LH = 35
-def wrap(text, maxw=1120):
-    d = ImageDraw.Draw(Image.new('RGB', (1, 1))); out, cur = [], ''
-    for wd in text.split():
-        t = (cur + ' ' + wd).strip()
-        if d.textlength(t, font=SUBF) > maxw and cur: out.append(cur); cur = wd
-        else: cur = t
-    return out + ([cur] if cur else [])
-
-SENT = re.compile(r'(?<=[.?!])\s+')
-def chunks(text):
-    """Subtitle pieces of at most two lines, cut at sentence ends (or commas): [(text, first sentence index, last)]."""
-    sents = [p for p in SENT.split(text) if p]
-    out, cur, a = [], '', 0
-    for i, p in enumerate(sents):
-        t = (cur + ' ' + p).strip()
-        if len(wrap(t)) <= 2: cur = t
-        else:
-            if cur: out.append((cur, a, i - 1))
-            cur, a = p, i
-    out.append((cur, a, len(sents) - 1))
-    res = []
-    for c, a, b in out:
-        if len(wrap(c)) <= 2: res.append((c, a, b)); continue
-        ws = c.split(); half = len(ws) // 2
-        k = max([i for i in range(1, len(ws)) if ws[i - 1].endswith(',')] or [half], key=lambda i: -abs(i - half))
-        res += [(' '.join(ws[:k]), a, b, 0.0, k / len(ws)), (' '.join(ws[k:]), a, b, k / len(ws), 1.0)]
-    return [r if len(r) == 5 else r + (0.0, 1.0) for r in res]
-
-_sub = {}
-def subtitle(text):
-    if text not in _sub:
-        ls = wrap(text); im = Image.new('RGBA', (W, H), (0, 0, 0, 0)); dd = ImageDraw.Draw(im)
-        y0 = PY + PH + 14 + (2 - len(ls)) * LH / 2 + 6
-        for i, l in enumerate(ls):
-            lw = dd.textlength(l, font=SUBF); dd.text(((W - lw) / 2, y0 + LH * i), l, font=SUBF, fill=rgb(T['ink']) + (255,))
-        _sub[text] = im
-    return _sub[text]
-
 # ---------- when each word is said ----------
 def silences(path):
     o = subprocess.run(['ffmpeg', '-i', path, '-af', 'silencedetect=n=-35dB:d=0.16', '-f', 'null', '-'], capture_output=True, text=True).stderr
@@ -182,7 +149,7 @@ def silences(path):
     return list(zip(st, en + [None] * (len(st) - len(en))))
 
 class Clock:
-    """Time of any character of the English line: sentences pinned to the pauses found in the audio, linear inside a sentence."""
+    """Time of any character of the spoken line: sentences pinned to the pauses found in the audio, linear inside a sentence."""
     def __init__(self, text, mp3, adur):
         self.text = text; spans = [m.span() for m in re.finditer(r'[^.?!]+[.?!]*', text) if m.group().strip()]
         self.spans = [(a + len(text[a:b]) - len(text[a:b].lstrip()), b) for a, b in spans]
@@ -220,7 +187,9 @@ def dur(path):
     return float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', path]).decode().strip())
 
 segs, t, last_scene = [], 0.0, None      # (start, length, kind, data)
-segs.append((t, TITLE, 'card', {'img': 'card:' + json.dumps({'lines': ['How English Lab works'], 'sub': 'Com funciona English Lab', 'big': 58, 'chip': 'English Lab · 2 ESO and 4 ESO'})}))
+CA = LANG == 'ca'
+segs.append((t, TITLE, 'card', {'img': 'card:' + json.dumps({'lines': ['Com funciona English Lab' if CA else 'How English Lab works'], 'big': 58,
+                                                             'chip': "English Lab · 2n i 4t d'ESO" if CA else 'English Lab · 2 ESO and 4 ESO'})}))
 t += TITLE
 scenes = []
 for l in script['lines']:
@@ -228,10 +197,10 @@ for l in script['lines']:
         last_scene = l['scene']; scenes.append(l['scene'])
         if l['id'] != script['lines'][0]['id'] and l['id'] != script['lines'][-1]['id']:
             n = len(scenes) - 1
-            segs.append((t, CARD, 'card', {'img': 'card:' + json.dumps({'lines': [l['scene']], 'sub': SCENE_CA.get(l['scene'], ''), 'chip': f'Part {n}', 'big': 60})}))
+            segs.append((t, CARD, 'card', {'img': 'card:' + json.dumps({'lines': [SCENE_CA.get(l['scene'], l['scene']) if CA else l['scene']], 'chip': f'Part {n}', 'big': 60})}))
             t += CARD
     mp3 = os.path.join(VOICE, l['id'] + '.mp3')
-    a = dur(mp3) if os.path.exists(mp3) else len(l['en']) / 14.5
+    a = dur(mp3) if os.path.exists(mp3) else len(l[LANG]) / 14.5
     L = a + GAP
     segs.append((t, L, 'line', {'line': l, 'audio': mp3 if os.path.exists(mp3) else None, 'adur': a}))
     t += L
@@ -239,23 +208,23 @@ segs.append((t, END, 'hold', {}))
 TOTAL = t + END
 
 def line_shots(l):
-    sh = shots[l['id']]
-    return sh if isinstance(sh, list) else [sh]
+    sh = shots[l['id']]; sh = sh if isinstance(sh, list) else [sh]
+    return [dict(x, img=x['img_ca']) if CA and x.get('img_ca') else x for x in sh]
 
 def render_line(seg_t, L, l, adur, mp3):
     """Frames for one narration line: its shots one after the other, each starting a moment before the voice says its word
-    ("on"), the camera moving there and the highlight fading in as the word is said; Catalan subtitles in the band."""
-    clock = Clock(l['en'], mp3, adur)
+    ("on"), the camera moving there and the highlight fading in as the word is said."""
+    clock = Clock(l[LANG], mp3, adur)
+    def when(s):
+        if not CA: return clock.word(s['on'])
+        if s.get('on_ca'): return clock.word(s['on_ca'])
+        return clock.at(round(l['en'].lower().find(s['on'].lower()) / len(l['en']) * len(l['ca'])))
     ss = line_shots(l); n = len(ss)
     starts = []
     for i, s in enumerate(ss):
         if i == 0: starts.append(0.0)
-        elif 'on' in s: starts.append(max(starts[-1] + 0.6, clock.word(s['on']) - 0.45))
+        elif 'on' in s: starts.append(max(starts[-1] + 0.6, when(s) - 0.45))
         else: starts.append(s.get('at', i / n) * adur)
-    subs = chunks(l['ca'])
-    ca_n = len([p for p in SENT.split(l['ca']) if p])
-    sub_t = [clock.sentence(a, f) if ca_n == len(clock.t) else (a + f) / ca_n * adur for _, a, b, f, g in subs]
-    sub_t[0] = 0.0
     states, prev = [], None
     for i, s in enumerate(ss):
         im = source(s['img'])
@@ -271,20 +240,15 @@ def render_line(seg_t, L, l, adur, mp3):
         local = tt - starts[i]
         view = lerp(start, target, ease(local / mv)) if mv else target
         a = ease((local - mv * 0.7) / 0.35) if hl else 0
-        f = frame(im, view, hl, a)
-        if tt < adur + 0.3:
-            j = max(j for j in range(len(subs)) if sub_t[j] <= tt + 1e-9)
-            sub = subtitle(subs[j][0]); f.paste(sub, (0, 0), sub)
-        yield f
+        yield frame(im, view, hl, a)
 
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else 'site-video.mp4'
     if '--stills' in sys.argv:
-        d = sys.argv[sys.argv.index('--stills') + 1]; os.makedirs(d, exist_ok=True)
+        d = arg('--stills'); os.makedirs(d, exist_ok=True)
         for l in script['lines']:
             for i, s in enumerate(line_shots(l)):
                 im = source(s['img']); f = frame(im, fit(s.get('view'), im, s.get('margin', 0.06)) if s.get('view') else fit(None, im, 0), s.get('hl'), 1)
-                sub = subtitle(chunks(l['ca'])[0][0]); f.paste(sub, (0, 0), sub)
                 f.save(os.path.join(d, f"{l['id']}-{i}.jpg"), quality=80)
         return
     tmp = tempfile.mkdtemp()
