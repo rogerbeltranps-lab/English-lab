@@ -61,7 +61,8 @@ service cloud.firestore {
       allow read, update, delete: if isTeacher();
     }
     // the screenshot of a problem report (same id), written in the same batch as the report: a JPEG data URL, read only by the teacher
-    // the teacher's answer to a problem report (same id): "fixed" when marked as fixed, "thanks" when deleted; the student reads it once and deletes it
+    // the teacher's answer to a problem report (same id): "fixed" when marked as fixed, "thanks" when deleted; the student reads it once and deletes it.
+    // "message" (the teacher's own words, msg) uses the id {report id}_m{time}; the same rules cover it.
     match /problemReplies/{id} {
       allow read, delete: if isTeacher() || (signedIn() && resource.data.uid == request.auth.uid);
       allow create, update: if isTeacher();
