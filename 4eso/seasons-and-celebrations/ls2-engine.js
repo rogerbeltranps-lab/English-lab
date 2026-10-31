@@ -790,6 +790,89 @@ var LS2 = (function () {
     };
   };
 
+  /* Shadowing (four skills, Roger 30 Oct 2026: "I usually do 5 minutes of shadowing at the beginning of each class … add that to the LS and
+     count it"). p.clip = a 25–45 s part of a recording the LS already has, played as it is (the listenings never change): src and slow
+     (-slow copy), t / ts = [from, to] seconds in each, lines = the script of that part ([speaker, text]), video: true for an mp4.
+     Four rounds: listen and read, mumble along, shadow with the script, shadow without it (the script is hidden and the last go can be
+     recorded; speech recognition shows how much of the script it caught, feedback only). Done after 3 plays and a self-rating, counted by
+     completion, never by accuracy: state.shadow[id_route] = {plays, rate, pct, date}. Insecure and Beginners start on the slower copy. */
+  R.shadow = p => {
+    const id = p.id, c = p.clip;
+    const rounds = ca() ? ['Escolta i llegeix el text.', 'Torna-ho a escoltar i murmura les paraules alhora, fluix.', 'Repeteix en veu alta just darrere de la veu, amb el text: com una ombra.', 'Amaga el text i fes-ho sense mirar. Si vols, grava aquesta última vegada.']
+      : ['Listen and read the script.', 'Listen again and mumble the words along with the speaker, quietly.', 'Say it aloud just behind the speaker, with the script: like a shadow.', 'Hide the script and do it without looking. Record this last go if you like.'];
+    return {
+      html: '<div class="section-card"><h3>' + (ca() ? 'Com es fa' : 'How it works') + '</h3><ol style="margin:6px 0;padding-left:22px;line-height:1.8">' + rounds.map(r => '<li>' + r + '</li>').join('') + '</ol><p class="tiny">' + (ca() ? 'Millor amb auriculars.' : 'Best with headphones.') + '</p></div>' +
+        '<div class="section-card"><strong>' + esc(c.title || 'Listening') + '</strong>' +
+        (c.video ? '<video id="' + id + 'Media" preload="metadata" playsinline style="width:100%;border-radius:14px;margin:8px 0;background:#000"' + (c.poster ? ' poster="' + c.poster + '"' : '') + '></video>' : '<audio id="' + id + 'Media" preload="metadata"></audio>') +
+        '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn" type="button" id="' + id + 'Play">▶ ' + (ca() ? 'Escolta el fragment' : 'Play the clip') + '</button><button class="btn secondary" type="button" id="' + id + 'Stop">■ Stop</button>' +
+        '<button class="btn secondary" type="button" data-sh="' + id + '" data-slow="0">' + (ca() ? 'Velocitat normal' : 'Normal speed') + '</button><button class="btn secondary" type="button" data-sh="' + id + '" data-slow="1">' + (ca() ? 'Versió més lenta' : 'Slower version') + '</button>' +
+        '<span class="tiny" id="' + id + 'Count"></span></div>' +
+        '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Hide">' + (ca() ? 'Amaga el text' : 'Hide the script') + '</button></div>' +
+        '<div class="reading" id="' + id + 'Script">' + c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<strong>' + esc(l[0]) + ':</strong> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('') + '</div></div>' +
+        '<div class="section-card"><h3>' + (ca() ? 'Grava l’última vegada' : 'Record your last go') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes darrere la veu. Amb Chrome veuràs quantes paraules del text ha entès l’ordinador. No compta per a la nota: és per veure com millores.' : 'Press <strong>Record and play</strong>: the clip plays and you shadow it. With Chrome you will see how many words of the script the computer caught. It is just for you, to see how you improve.') + '</p>' +
+        '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Rec">● ' + (ca() ? 'Grava i escolta' : 'Record and play') + '</button></div><div class="record-status" id="' + id + 'RecMsg"></div><audio id="' + id + 'Mine" controls style="width:100%;display:none"></audio></div>' +
+        '<div class="section-card"><h3>' + (ca() ? 'Com ha anat?' : 'How did it go?') + '</h3><div class="actions" style="justify-content:flex-start" role="group">' +
+        [['3', ca() ? '😀 Ho he seguit tot' : '😀 I kept up all the way'], ['2', ca() ? '🙂 Gairebé tot' : '🙂 Most of it'], ['1', ca() ? '😕 Em perdia' : '😕 I got lost']].map(r => '<button class="btn secondary" type="button" data-rate="' + id + '" data-v="' + r[0] + '">' + r[1] + '</button>').join('') +
+        '</div><div class="actions"><button class="btn" type="button" id="' + id + 'Done">' + (ca() ? 'Fet ✓' : 'Done ✓') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
+      bind() {
+        const key = id + '_' + level, m = $('#' + id + 'Media'), msg = $('#' + id + 'Msg');
+        state.shadow = state.shadow || {}; const sh = state.shadow[key] = state.shadow[key] || { plays: 0 };
+        let slow = ca(), endAt = 0, onEnd = null;
+        const count = () => { $('#' + id + 'Count').textContent = (ca() ? 'Vegades: ' : 'Plays: ') + (sh.plays || 0); };
+        const mark = () => $$('[data-sh="' + id + '"]').forEach(b => { const on = (b.dataset.slow === '1') === slow; b.setAttribute('aria-pressed', on); b.style.setProperty('background', on ? 'var(--accent)' : '', on ? 'important' : ''); b.style.setProperty('color', on ? '#fff' : '', on ? 'important' : ''); });
+        const rate = () => $$('[data-rate="' + id + '"]').forEach(b => { const on = String(sh.rate) === b.dataset.v; b.setAttribute('aria-pressed', on); b.style.setProperty('background', on ? 'var(--accent)' : '', on ? 'important' : ''); b.style.setProperty('color', on ? '#fff' : '', on ? 'important' : ''); });
+        const halt = () => { m.pause(); const f = onEnd; onEnd = null; if (f) f(); };
+        m.ontimeupdate = () => { if (endAt && m.currentTime >= endAt) { endAt = 0; halt(); } };
+        m.onended = () => { endAt = 0; halt(); };
+        const play = done => {
+          const src = slow ? c.slow : c.src, t = slow ? c.ts : c.t;
+          const go = () => { m.currentTime = t[0]; endAt = t[1]; onEnd = done || null; m.play().catch(() => {}); sh.plays = (sh.plays || 0) + 1; count(); save(); };
+          if (!m.src || !m.src.endsWith(src)) { m.src = src; m.addEventListener('loadedmetadata', go, { once: true }); m.load(); } else go();
+        };
+        $('#' + id + 'Play').onclick = () => play();
+        $('#' + id + 'Stop').onclick = () => { endAt = 0; halt(); };
+        $$('[data-sh="' + id + '"]').forEach(b => b.onclick = () => { slow = b.dataset.slow === '1'; endAt = 0; m.pause(); mark(); });
+        $('#' + id + 'Hide').onclick = e => { const s = $('#' + id + 'Script'), h = !s.hidden; s.hidden = h; e.target.textContent = h ? (ca() ? 'Mostra el text' : 'Show the script') : (ca() ? 'Amaga el text' : 'Hide the script'); };
+        $$('[data-rate="' + id + '"]').forEach(b => b.onclick = () => { sh.rate = +b.dataset.v; rate(); save(); });
+        // the last go: the mic records while the clip plays; recognition counts the script words it heard (feedback only, never saved as a mark)
+        const recMsg = $('#' + id + 'RecMsg'), recBtn = $('#' + id + 'Rec');
+        recBtn.onclick = async () => {
+          try {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
+            sourceNode = audioCtx.createMediaStreamSource(micStream); processor = audioCtx.createScriptProcessor(4096, 1, 1); pcm = [];
+            processor.onaudioprocess = e => pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+            sourceNode.connect(processor); processor.connect(audioCtx.destination);
+          } catch (e) { recMsg.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Dona permís i torna-ho a provar.' : 'Microphone access was not available. Allow it and try again.'; return; }
+          let rec = null, heard = ''; const SR = SRC();
+          if (SR) try { rec = new SR(); rec.lang = 'en-GB'; rec.continuous = true; rec.interimResults = false; rec.onresult = e => { for (let k = e.resultIndex; k < e.results.length; k++) if (e.results[k].isFinal) heard += ' ' + e.results[k][0].transcript; }; rec.start(); } catch (e) { rec = null; }
+          recBtn.disabled = true; recMsg.textContent = ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.';
+          play(async () => {
+            try { if (rec) rec.stop(); } catch (e) {}
+            if (processor) { processor.disconnect(); sourceNode.disconnect(); micStream.getTracks().forEach(t => t.stop()); await audioCtx.close(); processor = null; }
+            recBlob = encodeWav(pcm, recRate); if (recUrl) URL.revokeObjectURL(recUrl); recUrl = URL.createObjectURL(recBlob);
+            const a = $('#' + id + 'Mine'); a.src = recUrl; a.style.display = 'block'; recBtn.disabled = false;
+            setTimeout(() => {   // the last words arrive after stop
+              const toks = s => norm(s).replace(/[^a-z0-9' ]+/g, ' ').split(' ').filter(Boolean), said = new Set(toks(heard)), want = c.lines.map(l => Array.isArray(l) ? l[l.length - 1] : l).join(' ').replace(/\[[^\]]*\]/g, ' ');
+              const ws = toks(want), got = ws.filter(w => said.has(w)).length, pct = ws.length ? Math.round(got / ws.length * 100) : 0;
+              if (SR && heard.trim()) { sh.pct = pct; save(); }
+              recMsg.textContent = SR && heard.trim() ? (ca() ? 'L’ordinador ha entès el ' + pct + ' % de les paraules. Escolta’t i torna-ho a provar si vols.' : 'The computer caught ' + pct + ' % of the words. Listen to yourself and try again if you like.')
+                : (ca() ? 'Gravació a punt. Escolta’t.' : 'Recording ready. Listen to yourself.');
+            }, 900);
+          });
+        };
+        count(); mark(); rate();
+        if (state.done[id]) { msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓ Pots tornar-ho a fer sempre que vulguis.' : 'Done ✓ You can do it again whenever you like.'; }
+        $('#' + id + 'Done').onclick = () => {
+          if ((sh.plays || 0) < 3) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Escolta el fragment almenys 3 vegades (una per ronda).' : 'Play the clip at least 3 times (one for each round).'; return; }
+          if (!sh.rate) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Tria com ha anat.' : 'Choose how it went.'; return; }
+          sh.date = new Date().toISOString(); complete(id); save();
+          msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓ Molt bé! Com més ho facis, més fàcil serà.' : 'Done ✓ Well done! The more you do it, the easier it gets.';
+        };
+      }
+    };
+  };
+
   /* ---------- sample exam: points per item, tasks marked by ChatGPT, score summary ---------- */
   const ptsOf = (p, q) => q.p || (q.o ? p.pts[0] : p.pts[1]);
   const maxOf = p => p.type === 'quiz' ? forLevel(p.items).reduce((t, q) => t + ptsOf(p, q), 0) : p.max;

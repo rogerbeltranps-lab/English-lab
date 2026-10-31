@@ -86,6 +86,15 @@ window.LP = {
         safe: ['I watched each video twice', 'I wrote what each vlogger is doing now and usually does', 'I wrote two details per video and said which words or images helped me'],
         daring: ['I watched each video twice', 'I wrote what each vlogger is doing now and usually does, with precise details', 'I compared the two vloggers']
       } },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Mei: Saturday at the ice rink', en: 'Shadowing · Mei: Saturday at the ice rink' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Mei: Saturday at the ice rink', video: true, poster: 'video/mei-ice-rink-poster.jpg', src: 'video/mei-ice-rink.mp4', slow: 'video/mei-ice-rink-slow.mp4', t: [0.7, 28.35], ts: [0.7, 34.3], lines: [
+        ['Mei', 'Hi everyone, I\'m Mei, and welcome to my Saturday vlog!'],
+        ['Mei', 'Right now I\'m at the ice rink in the town square.'],
+        ['Mei', 'It\'s December, so it\'s really cold, about three degrees, and it\'s cloudy.'],
+        ['Mei', 'I\'m wearing a woolly hat, gloves and a big red jacket.'],
+        ['Mei', 'Look! My brother Kai is skating behind me, and he\'s falling… again!'],
+        ['Mei', 'I usually come here on Sunday afternoons with my family, just for fun.']] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple o Present Continuous?', en: 'Present Simple or Present Continuous?' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [

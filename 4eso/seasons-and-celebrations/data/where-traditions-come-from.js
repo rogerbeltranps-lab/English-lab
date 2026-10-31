@@ -97,6 +97,13 @@ window.LP = {
         safe: ['I watched each video twice', 'I explained what each speaker values', 'I backed it up with their words, tone or images'],
         daring: ['I watched each video twice', 'I explained what each speaker values with precise evidence', 'I compared the two speakers']
       } },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Culture Bites: the story behind two autumn celebrations', en: 'Shadowing · Culture Bites: the story behind two autumn celebrations' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Culture Bites: the story behind two autumn celebrations', src: 'audio/culture-bites-origins.mp3', slow: 'audio/culture-bites-origins-slow.mp3', t: [53.08, 92.01], ts: [64.6, 111.38], lines: [
+        ['Emma', 'Now, Thanksgiving. It takes place on the fourth Thursday of November, and this year that’s the twenty-sixth.'],
+        ['Sam', 'The story usually starts in 1621. A group of English settlers, the Pilgrims, had a harvest feast with the Wampanoag people, who lived in the area. It lasted three days.'],
+        ['Emma', 'But it didn’t become a national holiday until 1863, when President Abraham Lincoln made it official.'],
+        ['Sam', 'Today families travel home, get together and share a big meal, usually with turkey. Many people say what they are grateful for.']] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Connectors, orígens i comparacions', en: 'Origins, relatives and comparing' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [

@@ -87,6 +87,17 @@ window.LP = {
         { r: 'daring', q: '“Not every family celebrates it in the same way.” Why is this useful for your event plan?', o: ['It reminds you to show customs without saying everyone does them.', 'It means you should not include Lunar New Year.', 'It shows that the customs are not real.'] },
         { r: 'daring', q: '“Nobody is looking at their phone.” What does Mei mean?', o: ['Everyone is really together and enjoying it.', 'Phones are not allowed at dinner.', 'She has lost her phone.'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Student council meeting', en: 'Shadowing · Student council meeting' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Student council meeting', src: 'audio/student-council-meeting.mp3', slow: 'audio/student-council-meeting-slow.mp3', t: [0, 34.32], ts: [0, 42.78], lines: [
+        ['Laia', 'OK, everyone. We’re meeting the head teacher on Monday, so we need a plan today.'],
+        ['Omar', 'Right. The event is going to be about festivals of light: Diwali, Hanukkah, Lunar New Year and Christmas.'],
+        ['Laia', 'Good. When is it?'],
+        ['Omar', 'It’s on Friday the eleventh of December. School finishes at two, so the event starts at ten and finishes at one thirty.'],
+        ['Laia', 'Where’s it going to take place?'],
+        ['Omar', 'In the school hall. There will be four stalls, one for each festival.'],
+        ['Laia', 'What about food?'],
+        ['Omar', 'I’ll ask the families. I think a lot of parents will help.']] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Formes de futur', en: 'Future forms' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
