@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys; sys.dont_write_bytecode = True
 """Build the LS2 vocabulary games pages from the LS1 games engine.
 
 The six games (Alphabet Challenge, Jeopardy, Memory, Scramble, Word Rush, Mystery Picture) are the
