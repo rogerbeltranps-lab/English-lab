@@ -28,7 +28,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 #pdf .ans{border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;margin:8px 0}#pdf .ans p{margin:.3em 0;break-inside:avoid}#pdf .v{white-space:pre-wrap}#pdf ul.rate{margin:2px 0;padding-left:18px}
 #pdf table{border-collapse:collapse;width:100%;font-size:11px}#pdf th,#pdf td{position:static;border:1px solid #94a3b8;padding:4px 5px;text-align:left;vertical-align:top;background:#fff}#pdf thead th{background:#f1f5f9}#pdf table.rb{table-layout:fixed}#pdf td.rn,#pdf table.rb th:first-child{width:20%}#pdf tr{break-inside:avoid}#pdf .tick{font-size:15px;line-height:1}#pdf .note{margin-top:4px;color:#0f766e}#pdf .cmt{margin-top:14px;break-inside:avoid}#pdf .cmt .line{border-bottom:1px solid #94a3b8;height:26px}
 @page{size:A4;margin:12mm}@media print{body.pdfmode{background:#fff;padding:0;margin:0}.pdfbar{display:none!important}#pdf .pg{box-shadow:none;margin:0;padding:0;max-width:none;break-before:page}#pdf .pg:first-of-type{break-before:auto}}
-.ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}</style></head><body>
+.ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
 <div class="tabs" id="tabs"></div>
@@ -77,11 +77,13 @@ const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 // pt, tm = team points (points/{same id as the list}, teams/{group}; shared/js/el-points.js).
 async function load(){
   if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};cpInject(DEMO);return DEMO}
-  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[],ck:{},cp:{}},up=r=>r.ref.parent.parent.id;
+  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[],sg:[],ck:{},cp:{}},up=r=>r.ref.parent.parent.id;
   try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
   try{(await F.getDocs(F.collection(db(),"points"))).forEach(p=>D.pt[p.id]=p.data());(await F.getDocs(F.collection(db(),"teams"))).forEach(t=>D.tm[t.id]=t.data())}catch(e){D.ptErr=true;console.warn("points",e)}
   try{(await F.getDocs(F.collection(db(),"teacherPlan"))).forEach(t=>D.tk[t.id]=t.data())}catch(e){console.warn("teacherPlan",e)}
   try{const c=await F.getDoc(F.doc(db(),"settings","routes"));if(c.exists())D.cuts=c.data()}catch(e){console.warn("settings",e)}
+  // sg = suggestions from students (suggestions/{id}: uid, email, name, group, page, text, created, read), sent with "💡 Idea" in the bottom bar
+  try{(await F.getDocs(F.collection(db(),"suggestions"))).forEach(x=>D.sg.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("suggestions",e)}
   try{(await F.getDocs(F.collection(db(),"problems"))).forEach(x=>D.pb.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("problems",e)}
   // notes not read yet (the student deletes each one with OK): an answer whose note is gone was read
   D.replies={};try{(await F.getDocs(F.collection(db(),"problemReplies"))).forEach(x=>D.replies[x.id]=1)}catch(e){console.warn("problemReplies",e)}
@@ -161,6 +163,8 @@ const api={
     const rid=fix?id:id+"_m"+Date.now().toString(36),rp=Object.assign(pbReply(x,fix?"fixed":"message"),{msg:text}),m={text,at:new Date().toISOString(),rid,fix:!!fix};
     if(DEMO){x.msgs=[...(x.msgs||[]),m];if(fix)x.fixed=true;S.D.replies[rid]=rp;return}
     const b=F.writeBatch(db());b.set(F.doc(db(),"problems",id),Object.assign({msgs:F.arrayUnion(m)},fix?{fixed:true}:{}),{merge:true});b.set(F.doc(db(),"problemReplies",rid),rp);return b.commit()},
+  sgRead:(id,v)=>DEMO?S.D.sg.find(x=>x.id===id).read=v:put(["suggestions",id],{read:v}),
+  sgDel:id=>DEMO?S.D.sg=S.D.sg.filter(x=>x.id!==id):F.deleteDoc(F.doc(db(),"suggestions",id)),
   pbLoad:async()=>{if(DEMO)return;const L=[];(await F.getDocs(F.collection(db(),"problems"))).forEach(x=>L.push(Object.assign({id:x.id},x.data())));S.D.pb=L},
   // the screenshot of a report is loaded only when the teacher opens it (problemShots/{same id})
   pbShot:async id=>DEMO?((DEMO.shots||{})[id]||null):((await F.getDoc(F.doc(db(),"problemShots",id))).data()||{}).img||null,
@@ -407,10 +411,10 @@ function render0(){
     +`<button class="tab cplan ${S.g==="mat"?"on":""}" data-do="tab" data-g="mat" title="Class games, paper worksheets and study PDFs of every LS">📚 Materials</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
     +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
-  if(S.g==="plan"){$("#main").innerHTML=pbBox()+overview();return}
+  if(S.g==="plan"){$("#main").innerHTML=pbBox()+sgBox()+overview();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
-  if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+pbBox()+rosterBox();return}
+  if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+pbBox()+sgBox()+rosterBox();return}
   const grp=GR.find(g=>g.id===S.g),lss=EL_LS.filter(l=>l.course===grp.course);COURSE=grp.course;
   const mine=l=>elLsForGroup(l,D.ls[l.id],S.g);
   // first the group's current LS by the time plan (ELWeek.now), even if still Hidden (Roger, 27 Oct 2026: his Open click went to LS1), then the latest open one assigned to it
@@ -431,7 +435,7 @@ function render0(){
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
     +lpBox(ls,grp)
     +cpBox(ls,grp,inG)
-    +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`+pbBox()
+    +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`+pbBox()+sgBox()
     +routesBox(grp,inG.filter(s=>!s.tester))
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
@@ -528,8 +532,10 @@ function todo(studs,ls,list){   // studs: signed-in students only. Final product
   const grp=GR.find(g=>g.id===S.g),mk=grp?mkTodoItems(grp):[];mk.filter(x=>x.now).forEach(x=>out.push(x.h));if(grp)out.push(...cpItems(grp));
   const np=S.D.pb.filter(x=>!x.fixed).length;
   if(np)out.push(`⚠️ ${np} open problem report${np>1?"s":""} from students (all groups) <button data-do="pbopen">Read</button>`);
+  const nw=(S.D.sg||[]).filter(x=>!x.read).length;
+  if(nw)out.push(`💡 ${nw} new suggestion${nw>1?"s":""} from students (all groups) <button data-do="sgopen">Read</button>`);
   const fp=list.find(a=>a.manual),nm=fp?studs.filter(s=>!((S.D.rs[s.uid]||{})[fp.id]||{}).max).length:0;
-  return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer and no open problem reports.</p>')
+  return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer, no open problem reports and no new suggestions.</p>')
     +(fp&&nm?`<p class="muted">📝 ${nm} student${nm>1?"s":""} without a final product mark (click their Final product score to mark it).</p>`:"")
     +mk.filter(x=>!x.now).map(x=>`<p class="muted">${x.h}</p>`).join("");
 }
@@ -989,6 +995,16 @@ function noGroup(studs){
 // Problem reports from students (all groups): open ones first, then newest first. Fixed ones stay until you delete them.
 const PB_KIND={media:"🔊 An audio or a video does not play",stuck:"⛔ Cannot go on / a button does not work",marking:"❌ A correct answer is marked wrong",display:"🖥️ The page looks wrong or does not load",other:"❓ Something else"};
 const pbWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.created)):null;
+// Suggestions from students (all groups): new ones first, then newest first. Read ones stay until you delete them.
+const sgWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.created)):null;
+function sgBox(){
+  const L=[...(S.D.sg||[])].sort((a,b)=>(!!a.read-!!b.read)||((sgWhen(b)||0)-(sgWhen(a)||0))),nw=L.filter(x=>!x.read).length;
+  const who=x=>S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email),gr=x=>(GR.find(g=>g.id===x.group)||{}).name;
+  const li=x=>{const w=sgWhen(x);return `<li class="${x.read?"read":""}"><div class="hand">${esc(x.text)}</div><small class="muted">${x.read?"":"<b>New</b> · "}${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.page&&/^[\w./-]+$/.test(x.page)?` · <a href="${esc(x.page)}" target="_blank">${esc(x.page)}</a>`:x.page?" · "+esc(x.page):""}</small>
+    <button class="g" data-do="sgread" data-id="${esc(x.id)}" data-v="${x.read?"":"1"}">${x.read?"Mark as new":"Mark as read"}</button> <button class="g" data-do="sgdel" data-id="${esc(x.id)}">Delete</button></li>`};
+  return `<div class="box" id="sugg">${fold("sugg",`💡 Suggestions from students <small class="muted">${nw?`<b>${nw} new</b> · `:""}${L.length} in total</small>`,
+    `<p class="muted">Students (and the tester) send them with 💡 Idea in the bottom bar of any page, in Catalan or English depending on their route. You see the student, group, page and time.</p>`+(L.length?`<ul class="sgl">${L.map(li).join("")}</ul>`:'<p class="muted">No suggestions yet.</p>'))}</div>`;
+}
 function pbBox(){
   const L=[...S.D.pb].sort((a,b)=>(!!a.fixed-!!b.fixed)||((pbWhen(b)||0)-(pbWhen(a)||0))),np=L.filter(x=>!x.fixed).length;
   const who=x=>S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email),gr=x=>(GR.find(g=>g.id===x.group)||{}).name;
@@ -1251,6 +1267,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       $("#dlg").close();act(api.saveRo(id,o,old,s&&!s.away?s.uid:null))},
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
+    sgopen:()=>{S.open.add("sugg");render();$("#sugg").scrollIntoView({behavior:"smooth"})},
+    sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");render();$("#probs").scrollIntoView({behavior:"smooth"})},
     pbshot:async()=>{const x=S.D.pb.find(y=>y.id===k.id)||{},cap=x.shot==="page"?"Captured by the page when the student pressed “Capture this screen” (it can look slightly different from the real screen; videos and embedded content may be blank).":"An image the student chose or pasted.";
       dlg(`<h3>📷 Screenshot</h3><p class="muted">${esc(PB_KIND[x.kind]||"")} · ${esc([x.title||x.page,x.section].filter(Boolean).join(" › "))}</p><p id="pbimg">Loading…</p>`,true);
