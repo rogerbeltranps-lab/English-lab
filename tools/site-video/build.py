@@ -6,7 +6,7 @@ Usage: python3 tools/site-video/build.py OUT.mp4 [--stills DIR]   (--stills: one
 A line without its mp3 gets silence for an estimated time, so the video can be previewed before any audio is paid for.
 Needs ffmpeg, Pillow, numpy and the Inter font. 1280x720, 30 fps, light blue cards like the shadowing videos.
 """
-import json, math, os, subprocess, sys, tempfile
+import json, math, os, re, subprocess, sys, tempfile
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -110,22 +110,34 @@ def fit(rect, im, margin=0.06):
 def ease(t): t = min(max(t, 0), 1); return t * t * (3 - 2 * t)
 def lerp(a, b, t): return tuple(p + (q - p) * t for p, q in zip(a, b))
 
+# The screen sits in a panel above a caption band, so the subtitles never cover it (Roger, 31 Oct 2026).
+PX, PY, PW, PH = 112, 14, 1056, 594
+def _panel_bg():
+    im = BG.copy(); sh = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(sh).rounded_rectangle((PX - 2, PY + 6, PX + PW + 2, PY + PH + 10), 18, fill=(30, 50, 90, 70))
+    sh = sh.filter(ImageFilter.GaussianBlur(12)); im.paste(sh, (0, 0), sh)
+    return im
+PBG = _panel_bg()
+PMASK = Image.new('L', (PW, PH), 0); ImageDraw.Draw(PMASK).rounded_rectangle((0, 0, PW - 1, PH - 1), 16, fill=255)
+
 def frame(im, view, hl, hl_a):
     x, y, w, h = view
-    f = im.resize((W, H), Image.BILINEAR if w > 1.4 * W else Image.BICUBIC, box=(x, y, x + w, y + h))
+    f = im.resize((PW, PH), Image.BILINEAR if w > 1.4 * PW else Image.BICUBIC, box=(x, y, x + w, y + h))
     if hl and hl_a > 0:
-        s = W / w; hx, hy, hw, hh = (hl[0] - x) * s, (hl[1] - y) * s, hl[2] * s, hl[3] * s
-        pad = 8
+        s = PW / w; hx, hy, hw, hh = (hl[0] - x) * s, (hl[1] - y) * s, hl[2] * s, hl[3] * s
+        pad = 7
         box = (hx - pad, hy - pad, hx + hw + pad, hy + hh + pad)
-        dim = Image.new('L', (W, H), int(100 * hl_a)); ImageDraw.Draw(dim).rounded_rectangle(box, 14, fill=0)
-        f = Image.composite(Image.new('RGB', (W, H), (15, 23, 42)), f, dim)
-        ov = Image.new('RGBA', (W, H), (0, 0, 0, 0)); ImageDraw.Draw(ov).rounded_rectangle(box, 14, outline=HL + (int(255 * hl_a),), width=5)
+        dim = Image.new('L', (PW, PH), int(105 * hl_a)); ImageDraw.Draw(dim).rounded_rectangle(box, 12, fill=0)
+        f = Image.composite(Image.new('RGB', (PW, PH), (15, 23, 42)), f, dim)
+        ov = Image.new('RGBA', (PW, PH), (0, 0, 0, 0)); ImageDraw.Draw(ov).rounded_rectangle(box, 12, outline=HL + (int(255 * hl_a),), width=5)
         f.paste(ov, (0, 0), ov)
-    return f
+    out = PBG.copy(); out.paste(f, (PX, PY), PMASK)
+    return out
 
-# ---------- subtitles ----------
-SUBF = font('s', 29)
-def wrap(text, maxw=1060):
+# ---------- subtitles (Catalan), in the band under the panel ----------
+SUBF = font('s', 27)
+LH = 35
+def wrap(text, maxw=1120):
     d = ImageDraw.Draw(Image.new('RGB', (1, 1))); out, cur = [], ''
     for wd in text.split():
         t = (cur + ' ' + wd).strip()
@@ -133,39 +145,75 @@ def wrap(text, maxw=1060):
         else: cur = t
     return out + ([cur] if cur else [])
 
+SENT = re.compile(r'(?<=[.?!])\s+')
 def chunks(text):
-    """Subtitle pieces of at most two lines, cut at sentence ends (or commas) when the text is longer."""
-    if len(wrap(text)) <= 2: return [text]
-    import re
-    parts = [p for p in re.split(r'(?<=[.?!:])\s+', text) if p]
-    out, cur = [], ''
-    for p in parts:
+    """Subtitle pieces of at most two lines, cut at sentence ends (or commas): [(text, first sentence index, last)]."""
+    sents = [p for p in SENT.split(text) if p]
+    out, cur, a = [], '', 0
+    for i, p in enumerate(sents):
         t = (cur + ' ' + p).strip()
         if len(wrap(t)) <= 2: cur = t
         else:
-            if cur: out.append(cur)
-            cur = p
-    out.append(cur)
+            if cur: out.append((cur, a, i - 1))
+            cur, a = p, i
+    out.append((cur, a, len(sents) - 1))
     res = []
-    for c in out:
-        if len(wrap(c)) <= 2: res.append(c); continue
+    for c, a, b in out:
+        if len(wrap(c)) <= 2: res.append((c, a, b)); continue
         ws = c.split(); half = len(ws) // 2
         k = max([i for i in range(1, len(ws)) if ws[i - 1].endswith(',')] or [half], key=lambda i: -abs(i - half))
-        res += [' '.join(ws[:k]), ' '.join(ws[k:])]
-    return res
+        res += [(' '.join(ws[:k]), a, b, 0.0, k / len(ws)), (' '.join(ws[k:]), a, b, k / len(ws), 1.0)]
+    return [r if len(r) == 5 else r + (0.0, 1.0) for r in res]
 
 _sub = {}
 def subtitle(text):
     if text not in _sub:
-        ls = wrap(text); d = ImageDraw.Draw(Image.new('RGB', (1, 1)))
-        w = max(d.textlength(l, font=SUBF) for l in ls) + 44; h = 42 * len(ls) + 22
-        im = Image.new('RGBA', (W, H), (0, 0, 0, 0)); dd = ImageDraw.Draw(im)
-        x0, y0 = (W - w) / 2, H - 26 - h
-        dd.rounded_rectangle((x0, y0, x0 + w, y0 + h), 14, fill=(15, 23, 42, 205))
+        ls = wrap(text); im = Image.new('RGBA', (W, H), (0, 0, 0, 0)); dd = ImageDraw.Draw(im)
+        y0 = PY + PH + 14 + (2 - len(ls)) * LH / 2 + 6
         for i, l in enumerate(ls):
-            lw = dd.textlength(l, font=SUBF); dd.text(((W - lw) / 2, y0 + 11 + 42 * i), l, font=SUBF, fill=(255, 255, 255, 255))
+            lw = dd.textlength(l, font=SUBF); dd.text(((W - lw) / 2, y0 + LH * i), l, font=SUBF, fill=rgb(T['ink']) + (255,))
         _sub[text] = im
     return _sub[text]
+
+# ---------- when each word is said ----------
+def silences(path):
+    o = subprocess.run(['ffmpeg', '-i', path, '-af', 'silencedetect=n=-35dB:d=0.16', '-f', 'null', '-'], capture_output=True, text=True).stderr
+    st = [float(x) for x in re.findall(r'silence_start: ([\d.]+)', o)]; en = [float(x) for x in re.findall(r'silence_end: ([\d.]+)', o)]
+    return list(zip(st, en + [None] * (len(st) - len(en))))
+
+class Clock:
+    """Time of any character of the English line: sentences pinned to the pauses found in the audio, linear inside a sentence."""
+    def __init__(self, text, mp3, adur):
+        self.text = text; spans = [m.span() for m in re.finditer(r'[^.?!]+[.?!]*', text) if m.group().strip()]
+        self.spans = [(a + len(text[a:b]) - len(text[a:b].lstrip()), b) for a, b in spans]
+        n = len(self.spans); sil = silences(mp3) if mp3 else []
+        head = sil[0][1] if sil and sil[0][0] < 0.05 and sil[0][1] else 0.0
+        tail = next((s for s, e in sil if e is None or e >= adur - 0.05), adur) if sil else adur
+        inner = [(s, e) for s, e in sil if e and s > head + 0.2 and e < tail - 0.2]
+        L = sum(b - a for a, b in self.spans); acc, exp = 0, []
+        for a, b in self.spans[:-1]: acc += b - a; exp.append(head + (tail - head) * acc / L)
+        picked = []
+        for x in exp:   # each sentence end: the pause nearest to where it would fall at an even pace
+            c = [p for p in inner if p not in picked and (not picked or p[0] > picked[-1][0])]
+            if not c: break
+            best = min(c, key=lambda p: abs((p[0] + p[1]) / 2 - x) - 2.5 * (p[1] - p[0]))
+            picked.append(best)
+        if len(picked) == n - 1:
+            starts = [head] + [e for s, e in picked]; ends = [s for s, e in picked] + [tail]
+        else:   # fall back: share the time by length
+            acc = head; starts, ends = [], []
+            for a, b in self.spans: d = (tail - head) * (b - a) / L; starts.append(acc); ends.append(acc + d); acc += d
+        self.t = list(zip(starts, ends))
+    def at(self, pos):
+        for (a, b), (s, e) in zip(self.spans, self.t):
+            if pos <= b: return s + (e - s) * max(0, pos - a) / max(1, b - a)
+        return self.t[-1][1]
+    def word(self, w):
+        i = self.text.lower().find(w.lower())
+        if i < 0: raise SystemExit(f'"{w}" is not in: {self.text}')
+        return self.at(i)
+    def sentence(self, k, f=0.0):
+        k = min(k, len(self.t) - 1); s, e = self.t[k]; return s + (e - s) * f
 
 # ---------- timeline ----------
 def dur(path):
@@ -194,31 +242,39 @@ def line_shots(l):
     sh = shots[l['id']]
     return sh if isinstance(sh, list) else [sh]
 
-def render_line(seg_t, L, l, adur):
-    """Yields frames for one narration line: its shots one after the other (camera move + highlight), Catalan subtitles."""
+def render_line(seg_t, L, l, adur, mp3):
+    """Frames for one narration line: its shots one after the other, each starting a moment before the voice says its word
+    ("on"), the camera moving there and the highlight fading in as the word is said; Catalan subtitles in the band."""
+    clock = Clock(l['en'], mp3, adur)
     ss = line_shots(l); n = len(ss)
-    cuts = [s.get('at', i / n) for i, s in enumerate(ss)] + [1.0]
-    subs = chunks(l['ca']); w = [len(s) for s in subs]; sb = np.cumsum([0] + w) / sum(w) * adur
-    nf = round(L * FPS)
-    prev_view = None
-    states = []
+    starts = []
+    for i, s in enumerate(ss):
+        if i == 0: starts.append(0.0)
+        elif 'on' in s: starts.append(max(starts[-1] + 0.6, clock.word(s['on']) - 0.45))
+        else: starts.append(s.get('at', i / n) * adur)
+    subs = chunks(l['ca'])
+    ca_n = len([p for p in SENT.split(l['ca']) if p])
+    sub_t = [clock.sentence(a, f) if ca_n == len(clock.t) else (a + f) / ca_n * adur for _, a, b, f, g in subs]
+    sub_t[0] = 0.0
+    states, prev = [], None
     for i, s in enumerate(ss):
         im = source(s['img'])
-        start = fit(s['from'], im, 0) if s.get('from') else (prev_view if prev_view and s.get('continue') else fit(None, im, 0))
+        same = prev and prev[0] is im
+        start = fit(s['from'], im, 0) if s.get('from') else (prev[1] if same else fit(None, im, 0))
         target = fit(s.get('view'), im, s.get('margin', 0.06)) if s.get('view') else start
-        states.append((im, start, target, s.get('hl')))
-        prev_view = target
-    for k in range(nf):
-        tt = k / FPS; p = tt / L
-        i = max(j for j in range(n) if cuts[j] <= p + 1e-9)
-        im, start, target, hl = states[i]
-        t0 = cuts[i] * L; local = tt - t0
-        view = lerp(start, target, ease(local / 1.1))
-        a = ease((local - 1.0) / 0.4) if hl else 0
+        states.append((im, start, target, s.get('hl'), 0.9 if (s.get('from') or same or s.get('view')) else 0.0))
+        prev = (im, target)
+    for k in range(round(L * FPS)):
+        tt = k / FPS
+        i = max(j for j in range(n) if starts[j] <= tt + 1e-9)
+        im, start, target, hl, mv = states[i]
+        local = tt - starts[i]
+        view = lerp(start, target, ease(local / mv)) if mv else target
+        a = ease((local - mv * 0.7) / 0.35) if hl else 0
         f = frame(im, view, hl, a)
-        j = min(int(np.searchsorted(sb, tt, side='right')) - 1, len(subs) - 1)
-        if tt < adur + 0.25:
-            sub = subtitle(subs[max(j, 0)]); f.paste(sub, (0, 0), sub)
+        if tt < adur + 0.3:
+            j = max(j for j in range(len(subs)) if sub_t[j] <= tt + 1e-9)
+            sub = subtitle(subs[j][0]); f.paste(sub, (0, 0), sub)
         yield f
 
 def main():
@@ -228,6 +284,7 @@ def main():
         for l in script['lines']:
             for i, s in enumerate(line_shots(l)):
                 im = source(s['img']); f = frame(im, fit(s.get('view'), im, s.get('margin', 0.06)) if s.get('view') else fit(None, im, 0), s.get('hl'), 1)
+                sub = subtitle(chunks(l['ca'])[0][0]); f.paste(sub, (0, 0), sub)
                 f.save(os.path.join(d, f"{l['id']}-{i}.jpg"), quality=80)
         return
     tmp = tempfile.mkdtemp()
@@ -243,7 +300,7 @@ def main():
         elif kind == 'hold':
             for _ in range(round(L * FPS)): enc.stdin.write(last.tobytes())
         else:
-            for f in render_line(st, L, dd['line'], dd['adur']):
+            for f in render_line(st, L, dd['line'], dd['adur'], dd['audio']):
                 enc.stdin.write(f.tobytes()); last = f
         print(f'{st:7.1f}s {kind} {dd.get("line", {}).get("id", "")}', flush=True)
     enc.stdin.close(); enc.wait()
