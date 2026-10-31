@@ -70,10 +70,10 @@
   <script src="../shared/js/el-catalog.js"></script>
 </head>
 <body>
-  <nav class="mobile-tabs"><a class="tab-btn" href="../today.html" data-me hidden>My activities</a><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">English Lab</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
+  <nav class="mobile-tabs"><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">English Lab</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
   <div class="app">
   <aside class="sidebar"><a class="brand" href="../index.html">English with Roger</a>
-    <nav class="nav-tabs"><a class="tab-btn" href="../today.html" data-me hidden>My activities</a><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">English Lab</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
+    <nav class="nav-tabs"><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">English Lab</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
   </aside>
   <main class="content"><section class="panel">
     <span class="eyebrow">English Lab</span>
@@ -438,7 +438,6 @@ function start() {
   document.documentElement.lang = EN ? 'en' : 'ca';
   $('#title').textContent = t('Practica pel teu compte', 'Practise on your own');
   document.title = t('Practica pel teu compte', 'Practise on your own') + ' · English Lab';
-  $$('[data-me]').forEach(a => { a.hidden = false; a.textContent = t('Les meves activitats', 'My activities'); });
   $$('[data-pr]').forEach(a => a.textContent = t('Practica', 'Practise'));
   if (!S.course) { $('#lead').textContent = t('Encara no tens cap grup: parla amb el professor.', 'You are not in a group yet: talk to your teacher.'); return; }
   $('#lead').innerHTML = t('Les targetes de paraules, el sentence builder, les escoltes i el shadowing de les teves LS, per nivells. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'The word cards, sentence builder, listenings and shadowing of your LSs, by level. Everything corrects itself and nothing is handed in: practise as much as you like.');
