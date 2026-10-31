@@ -1,0 +1,100 @@
+{
+ "t01": [{"img": "t-00-top.png"}],
+ "t02": [
+  {"img": "t-00-top.png"},
+  {"img": "t-00-top.png", "on": "Time plan", "view": [0, 120, 1400, 220], "hl": [24, 176, 574, 60]},
+  {"img": "t-00-top.png", "on": "one tab for each group", "view": [500, 120, 1400, 220], "hl": [604, 176, 768, 60]}
+ ],
+ "t03": [
+  {"img": "t-00-top.png", "view": [500, 120, 1000, 220], "hl": [992, 176, 186, 60]},
+  {"img": "t-00-top.png", "on": "Learning Situation", "view": [0, 150, 1000, 200], "hl": [24, 250, 324, 36]},
+  {"img": "t-00-top.png", "on": "Starter", "view": [0, 150, 1350, 200], "hl": [516, 248, 764, 40]}
+ ],
+ "t04": [
+  {"img": "t-10-time-plan.png"},
+  {"img": "t-10-time-plan.png", "on": "exam day", "view": [20, 60, 1000, 300], "hl": [44, 100, 400, 44]},
+  {"img": "t-10-time-plan.png", "on": "this week", "view": [20, 160, 1880, 420], "hl": [40, 300, 1840, 230]},
+  {"img": "t-10-time-plan.png", "on": "Tick", "view": [20, 260, 1000, 300], "hl": [54, 332, 36, 36]},
+  {"img": "t-10-time-plan.png", "on": "Set as homework", "view": [20, 260, 1000, 300], "hl": [428, 334, 186, 32]},
+  {"img": "t-10-time-plan.png", "on": "on their board", "view": [20, 150, 1880, 420], "hl": [46, 184, 1830, 106]}
+ ],
+ "t05": [
+  {"img": "t-11-lp-open.png"},
+  {"img": "t-11-lp-open.png", "on": "when it's time", "view": [1000, 200, 900, 880], "hl": [1630, 248, 240, 206]},
+  {"img": "t-11-lp-open.png", "on": "Not open yet", "view": [1000, 200, 900, 880], "hl": [1630, 476, 240, 590]},
+  {"img": "t-11-lp-open.png", "on": "single sections", "hl": [490, 250, 900, 46]}
+ ],
+ "t06": [
+  {"img": "t-13-todo.png", "view": [24, 44, 1872, 420]},
+  {"img": "t-13-todo.png", "on": "route requests", "view": [24, 44, 1872, 420], "hl": [40, 90, 1530, 46]},
+  {"img": "t-13-todo.png", "on": "problem reports", "view": [24, 44, 1872, 420], "hl": [40, 144, 700, 44]},
+  {"img": "t-13-todo.png", "on": "suggestions", "view": [24, 44, 1872, 420], "hl": [40, 198, 640, 44]}
+ ],
+ "t07": [
+  {"img": "t-14-problems.png", "view": [40, 200, 1840, 240], "hl": [40, 224, 1840, 190]},
+  {"img": "t-14-problems.png", "on": "the page", "view": [40, 240, 1000, 200], "hl": [64, 338, 410, 28]},
+  {"img": "t-14-problems.png", "on": "route and device", "view": [40, 240, 1000, 200], "hl": [64, 308, 560, 62]},
+  {"img": "t-14-problems.png", "on": "Answer the student", "view": [40, 240, 1000, 200], "hl": [292, 366, 146, 40]},
+  {"img": "t-14-problems.png", "on": "mark it as fixed", "view": [40, 240, 1000, 200], "hl": [444, 366, 200, 40]},
+  {"img": "t-14-problems.png", "on": "Fix with Claude", "view": [40, 240, 1000, 200], "hl": [68, 366, 218, 40]}
+ ],
+ "t08": [
+  {"img": "t-15-suggestions.png", "view": [24, 24, 1872, 232]},
+  {"img": "t-15-suggestions.png", "on": "Suggestions", "view": [24, 24, 1872, 232], "hl": [48, 144, 1830, 90]}
+ ],
+ "t09": [
+  {"img": "t-16-routes.png"},
+  {"img": "t-16-routes.png", "on": "exam mark", "hl": [432, 440, 230, 640]},
+  {"img": "t-16-routes.png", "on": "cut-offs", "view": [20, 100, 1420, 220], "hl": [44, 148, 1360, 40]},
+  {"img": "t-16-routes.png", "on": "Apply and notify", "view": [20, 100, 1420, 220], "hl": [458, 254, 292, 42]},
+  {"img": "r4-12-level-notice.png", "on": "each student gets", "hl": [628, 22, 664, 330]}
+ ],
+ "t10": [
+  {"img": "t-17-grid.png"},
+  {"img": "t-17-grid.png", "on": "every activity", "view": [48, 180, 1824, 816]},
+  {"img": "t-17-grid.png", "on": "Green", "view": [700, 560, 1200, 520], "hl": [1526, 828, 86, 84]},
+  {"img": "t-17-grid.png", "on": "yellow", "view": [700, 560, 1200, 520], "hl": [1526, 914, 86, 80]}
+ ],
+ "t11": [
+  {"img": "t-17-grid.png", "view": [700, 560, 1200, 520], "hl": [1526, 828, 86, 84]},
+  {"img": "t-18-cell.png", "on": "see the details", "view": [570, 26, 780, 1028]},
+  {"img": "t-18-cell.png", "on": "each step", "view": [570, 26, 780, 1028], "hl": [596, 206, 728, 444]},
+  {"img": "t-18-cell.png", "on": "the first try", "view": [570, 26, 780, 1028], "hl": [970, 206, 124, 444]},
+  {"img": "t-18-cell-handin.png", "on": "hand-ins", "view": [570, 26, 780, 1028], "hl": [596, 190, 728, 420]},
+  {"img": "t-18-cell.png", "on": "Give a level", "view": [570, 26, 780, 1028], "hl": [596, 784, 728, 36]},
+  {"img": "t-18-cell.png", "on": "write feedback", "view": [570, 26, 780, 1028], "hl": [596, 846, 728, 164]}
+ ],
+ "t12": [
+  {"img": "t-17-grid.png", "view": [48, 180, 1824, 816]},
+  {"img": "t-13-todo.png", "on": "written work", "view": [24, 44, 1872, 420], "hl": [40, 312, 1850, 76]},
+  {"img": "t-13-todo.png", "on": "final product", "view": [24, 44, 1872, 420], "hl": [40, 258, 980, 40]}
+ ],
+ "t13": [
+  {"img": "t-19-grade.png"},
+  {"img": "t-19-grade.png", "on": "the final exam", "hl": [558, 168, 736, 56]},
+  {"img": "t-19-grade.png", "on": "with the weights", "hl": [1296, 168, 98, 810]},
+  {"img": "t-20-exam.png", "on": "Enter exam marks", "hl": [636, 208, 784, 800]}
+ ],
+ "t14": [
+  {"img": "t-21-points.png", "hl": [490, 350, 186, 700]},
+  {"img": "t-21-points.png", "on": "done all their work", "hl": [676, 350, 176, 700]},
+  {"img": "t-21-points.png", "on": "bonus", "hl": [852, 350, 156, 700]}
+ ],
+ "t15": [
+  {"img": "t-22-year.png", "view": [0, 160, 1000, 200], "hl": [24, 250, 326, 32]},
+  {"img": "t-22-year.png", "on": "every competence", "view": [24, 440, 1872, 200], "hl": [48, 552, 1824, 42]},
+  {"img": "t-22-year.png", "on": "term by term", "hl": [26, 440, 1870, 500]},
+  {"img": "t-22-year.png", "on": "weighted", "view": [24, 300, 1400, 130], "hl": [858, 330, 290, 38]}
+ ],
+ "t16": [
+  {"img": "t-32-materials.png", "hl": [416, 180, 180, 54]},
+  {"img": "t-32-materials.png", "on": "class games", "view": [0, 560, 1920, 400], "hl": [48, 676, 1824, 196]},
+  {"img": "t-33-materials-games.png", "on": "paper worksheets", "hl": [48, 444, 1824, 636]},
+  {"img": "t-33-materials-games.png", "on": "study PDFs", "view": [20, 200, 1600, 260], "hl": [46, 276, 1120, 44]},
+  {"img": "t-33-materials-games.png", "on": "shadowing videos", "view": [20, 200, 1600, 260], "hl": [46, 334, 1510, 46]},
+  {"img": "t-32-materials.png", "on": "these videos", "view": [20, 160, 1880, 420], "hl": [26, 254, 1868, 312]}
+ ],
+ "t17": [
+  {"img": "card:{\"lines\": [\"Every day\"], \"big\": 52, \"items\": [\"Check your To do list\", \"Tick your sessions\", \"Answer what needs you\", \"Let English Lab do the rest\"]}"}
+ ]
+}

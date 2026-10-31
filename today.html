@@ -100,9 +100,15 @@ function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
   const html=`<a class="nv on" href="today.html" aria-current="page">${t("Les meves activitats","My activities")}</a>`
     +cs.map(c=>`<a class="nv" href="${c}/index.html">${t("El meu curs","My course")} · ${COURSES[c]}</a>`+lss.filter(l=>l.course===c).map(l=>`<a class="nv sub" href="${lsHref(l)}">${lsName(l)}</a>`).join("")).join("")
-    +`<a class="nv" href="lab/">English Lab</a><a class="nv" href="lab/practice.html">${t("Practica","Practise")}</a>`;
+    +`<a class="nv" href="lab/">English Lab</a><a class="nv" href="lab/practice.html">${t("Practica","Practise")}</a>`
+    +`<a class="nv" href="${HOWTO}${t("-ca","")}.mp4" target="_blank" rel="noopener">🎬 ${t("Com funciona la web","How the website works")}</a>`;
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
+// "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
+// tools/site-video (real screens of the site, no subtitles). A box on the board and a link in the menu.
+const HOWTO="video/how-english-lab-works";
+const howBox=()=>`<div class="pend" style="background:#f5f3ff;border-color:#c4b5fd;flex-wrap:wrap"><div><b>🎬 ${t("Com funciona English Lab","How English Lab works")}</b> <span class="muted">· ${t("vídeo de 5 minuts: el tauler, les rutes, les Learning Situations i com moure't per la web","5-minute video: your board, routes, Learning Situations and how to move around the website")}</span></div>`
+  +`<div class="row"><a class="go" href="${HOWTO}.mp4" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${HOWTO}-ca.mp4" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
 // "Go to my Learning Situations": one big button per LS the student can open (open LS first).
 const lsGo=lss=>lss.length?`<div class="box lsgo"><h2>${t("Les meves Learning Situations","My Learning Situations")}</h2><div class="row">${lss.map(l=>`<a class="go" href="${lsHref(l)}">${t("Ves a","Go to")} ${lsName(l)} →</a>`).join("")}</div></div>`:"";
 function render(){
@@ -121,7 +127,7 @@ function render(){
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
-  $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links)+`<div id="ptbox">${pointsBox()}</div>`;
+  $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links)+`<div id="ptbox">${pointsBox()}</div>`+howBox();
   $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("El professor fa el seguiment de totes les activitats que fas. Algunes s'avaluaran i seran la teva avaluació contínua, que és una part de la nota.","Your teacher keeps track of all the activities you do. Some of them will be assessed and make up your continuous assessment, which is part of your mark."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
   if(!lss.length){$("#main").innerHTML="";return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
