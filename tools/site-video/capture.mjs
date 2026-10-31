@@ -16,7 +16,8 @@ if (!PASS) { console.error('Set EL_TESTER_PASSWORD'); process.exit(1); }
 const OUT = path.resolve(process.argv[2] || 'tools/site-video/captures');
 fs.mkdirSync(OUT, { recursive: true });
 const log = [];
-const note = (s) => { console.log(s); log.push(s); };
+const note = (s) => { console.log(s); log.push(s); fs.appendFileSync(path.join(OUT, 'capture-log.txt'), s + '\n'); };
+fs.writeFileSync(path.join(OUT, 'capture-log.txt'), '');
 
 const browser = await chromium.launch(process.env.EL_CHANNEL ? { channel: process.env.EL_CHANNEL } : {});
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1.5, locale: 'en-GB' });
@@ -52,6 +53,8 @@ async function go(rel, name) {
   await page.goto(BASE + rel, { waitUntil: 'domcontentloaded' });
   await settle();
   await shot(name);
+  // A closed activity covers only the window; a full-page shot would show the page under the cover.
+  if (await page.getByText('This activity is not open yet').count()) { note(name + ': not open yet'); return; }
   await shot(name, { full: true });
 }
 async function tryStep(label, fn) {
@@ -83,13 +86,22 @@ const pages = {
 for (const [course, c] of Object.entries(pages)) {
   const P = course + '-';
   // Student view of one group (the tester's own switch in the bottom bar; kept in this browser only).
+  // clean() removes the select, so set the same value it would store (el_view) and reload.
   await page.goto(BASE + 'today.html', { waitUntil: 'domcontentloaded' });
-  await settle();
-  await page.locator('#el-cloud-bar select').selectOption(c.group).catch(() => note('could not pick ' + c.group));
-  await page.waitForLoadState('domcontentloaded');
+  await page.evaluate((g) => Storage.prototype.setItem.call(localStorage, 'el_view', g), c.group);
+  await page.reload({ waitUntil: 'domcontentloaded' });
   await settle(page, 4000);
+  if (!(await page.evaluate((g) => document.body.innerText.includes(g.replace(/(\d)(ESO)([A-Z])/, '$1$2 $3')) || document.body.innerText.includes(g), c.group))) note('board does not name ' + c.group);
 
-  // 2. The board (My activities).
+  // 2. The board (My activities). An "exam results" card comes first: show it, then "Later"
+  // (only remembered in this tab; "See my results" would save that it was seen, so it is never clicked).
+  if (await page.locator('#el-exam-notice').count()) {
+    await shot(P + '09-exam-notice');
+    note(P + 'notice: ' + (await page.locator('#el-exam-notice b').textContent()));
+    await page.locator('#el-exam-notice button').click();
+    await page.waitForTimeout(500);
+  }
+  for (const id of ['el-reply', 'el-level-notice']) if (await page.locator('#' + id).count()) note(P + 'also shown: #' + id);
   await shot(P + '10-board');
   await shot(P + '10-board', { full: true });
   await tryStep('board side menu', () => page.locator('aside.side').screenshot({ path: path.join(OUT, P + '11-board-menu.png') }).then(() => note('shot ' + P + '11-board-menu.png')));
@@ -157,7 +169,8 @@ for (const [course, c] of Object.entries(pages)) {
       for (let k = 1; k < n; k++) {
         await tabs.nth(k).click();
         await page.waitForTimeout(600);
-        await page.evaluate(() => window.scrollTo(0, 0));
+        await tabs.nth(k).evaluate((t) => window.scrollTo(0, t.getBoundingClientRect().top + window.scrollY - 170));
+        await page.waitForTimeout(300);
         await shot(`${name}-tab${k}`);
       }
       if (n) await tabs.nth(0).click();
