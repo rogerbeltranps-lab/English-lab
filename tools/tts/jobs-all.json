@@ -1,0 +1,4848 @@
+[
+ {
+  "id": "7f09070b",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "I watch videos about skateboarding every evening.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "watch"
+  ],
+  "q": "I ___ videos about skateboarding every evening. (mirar)"
+ },
+ {
+  "id": "c647deed",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "She takes photos of her cat for her vlog.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "takes"
+  ],
+  "q": "She ___ photos of her cat for her vlog. (fer)"
+ },
+ {
+  "id": "ceb17dd8",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "[curious] Can you send me a message later?",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "send"
+  ],
+  "q": "Can you ___ me a message later? (enviar)"
+ },
+ {
+  "id": "f44c0a90",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "We chat with friends in a class group.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "chat"
+  ],
+  "q": "We ___ with friends in a class group. (xatejar)"
+ },
+ {
+  "id": "05c67ca4",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "I’m recording a video for my vlog right now.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "recording"
+  ],
+  "q": "I’m ___ a video for my vlog right now. (gravar)"
+ },
+ {
+  "id": "b1341109",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "He plays online with his cousins at the weekend.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "plays"
+  ],
+  "q": "He ___ online with his cousins at the weekend. (jugar)"
+ },
+ {
+  "id": "665c6023",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "I follow a skating channel with 2 million subscribers.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "follow"
+  ],
+  "q": "I ___ a skating channel with 2 million subscribers. (seguir)"
+ },
+ {
+  "id": "ccb3abc4",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Please check the website before you go: it says the pool is closed.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "check"
+  ],
+  "q": "Please ___ the website before you go: it says the pool is closed. (consultar)"
+ },
+ {
+  "id": "a6cb8cd8",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "[excited] My screen time is too high: three hours a day!",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "screen"
+  ],
+  "q": "My ___ time is too high: three hours a day!"
+ },
+ {
+  "id": "1057aab3",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "We upload our video to the club channel on Sundays.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "upload"
+  ],
+  "q": "We ___ our video to the club channel on Sundays. (pujar)"
+ },
+ {
+  "id": "80c57a2b",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Is this page up to date? It says 2019.",
+  "mask": [
+   [
+    3,
+    4
+   ]
+  ],
+  "answers": [
+   "up to"
+  ],
+  "q": "Is this page ___ ___ date? It says “2019”."
+ },
+ {
+  "id": "fc9e2ddb",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "This page is not information: it’s an advert for trainers.",
+  "mask": [
+   [
+    7,
+    7
+   ]
+  ],
+  "answers": [
+   "advert"
+  ],
+  "q": "This page is not information: it’s an ___ for trainers."
+ },
+ {
+  "id": "70d525ef",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Which website did you use?",
+  "mask": [],
+  "answers": [],
+  "q": "Which website did you use?"
+ },
+ {
+  "id": "f953ee18",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Who wrote it?",
+  "mask": [],
+  "answers": [],
+  "q": "Who wrote it?"
+ },
+ {
+  "id": "b1b1b2a7",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Is it a good source? Why?",
+  "mask": [],
+  "answers": [],
+  "q": "Is it a good source? Why?"
+ },
+ {
+  "id": "3fd5718b",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Is the information new or old?",
+  "mask": [],
+  "answers": [],
+  "q": "Is the information new or old?"
+ },
+ {
+  "id": "68fed00a",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] What is one interesting fact from your source?",
+  "mask": [],
+  "answers": [],
+  "q": "What is one interesting fact from your source?"
+ },
+ {
+  "id": "6efa752a",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] How are you going to credit it in your vlog?",
+  "mask": [],
+  "answers": [],
+  "q": "How are you going to credit it in your vlog?"
+ },
+ {
+  "id": "eca881a0",
+  "course": "2eso",
+  "lp": 4,
+  "page": "check-the-source",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Did you check that fact on another website?",
+  "mask": [],
+  "answers": [],
+  "q": "Did you check that fact on another website?"
+ },
+ {
+  "id": "deaa3ca0",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "[excited] I love skating: it’s my favourite hobby!",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "love"
+  ],
+  "q": "I ___ skating: it’s my favourite hobby! (m’encanta)"
+ },
+ {
+  "id": "fc524d31",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "I hate getting up early on Sundays.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "hate"
+  ],
+  "q": "I ___ getting up early on Sundays. (odio)"
+ },
+ {
+  "id": "921194c0",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "She likes reading comics in bed.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "reading"
+  ],
+  "q": "She likes ___ comics in bed. (llegir)"
+ },
+ {
+  "id": "a292a40e",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Take a break every 30 minutes.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "take"
+  ],
+  "q": "___ a break every 30 minutes. (fes)"
+ },
+ {
+  "id": "d4397649",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Switch off your phone at night.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "off"
+  ],
+  "q": "Switch ___ your phone at night. (apaga)"
+ },
+ {
+  "id": "de4e6258",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Put your phone away at dinner.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "away"
+  ],
+  "q": "Put your phone ___ at dinner. (guarda)"
+ },
+ {
+  "id": "7e6ef440",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Don't use your phone in bed.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "don't"
+  ],
+  "q": "___ use your phone in bed. (negatiu)"
+ },
+ {
+  "id": "2856b3a4",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "[excited] Go outside and play with your friends!",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "outside"
+  ],
+  "q": "Go ___ and play with your friends! (a fora)"
+ },
+ {
+  "id": "7c63142f",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Set a time limit of one hour for games.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "limit"
+  ],
+  "q": "Set a time ___ of one hour for games."
+ },
+ {
+  "id": "b88553a3",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Turn off notifications when you do your homework.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "notifications"
+  ],
+  "q": "Turn off ___ when you do your homework."
+ },
+ {
+  "id": "b99bb0e3",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Keep your phone out of your bedroom at night.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "out"
+  ],
+  "q": "Keep your phone ___ of your bedroom at night."
+ },
+ {
+  "id": "3129a00f",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Some games are very addictive: you can’t stop playing.",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "addictive"
+  ],
+  "q": "Some games are very ___: you can’t stop playing."
+ },
+ {
+  "id": "5e3f38d2",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Go outside instead of watching videos all afternoon.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "instead"
+  ],
+  "q": "Go outside ___ of watching videos all afternoon."
+ },
+ {
+  "id": "1d802185",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "I can’t concentrate on my homework with my phone next to me.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "concentrate"
+  ],
+  "q": "I can’t ___ on my homework with my phone next to me."
+ },
+ {
+  "id": "f94d320a",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "I love skating at the park.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "skating"
+  ],
+  "q": "I love ___ (skate) at the park."
+ },
+ {
+  "id": "2434701b",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "She hates losing a match.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "losing"
+  ],
+  "q": "She hates ___ (lose) a match."
+ },
+ {
+  "id": "8f94a3f8",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "We don’t like getting up early.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "getting"
+  ],
+  "q": "We don’t like ___ (get) up early."
+ },
+ {
+  "id": "01e6191d",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Do you like playing online? — Yes, I do.",
+  "mask": [
+   [
+    0,
+    0
+   ],
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "do",
+   "playing"
+  ],
+  "q": "___ you like ___ (play) online? — Yes, I do."
+ },
+ {
+  "id": "aa279ad9",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "My brother doesn't like swimming.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "doesn't like"
+  ],
+  "q": "My brother ___ (not / like) swimming."
+ },
+ {
+  "id": "f5ba814f",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "I don’t mind training in the rain.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "mind"
+  ],
+  "q": "I don’t ___ training in the rain. (no m’importa)"
+ },
+ {
+  "id": "1aa67874",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Tip: take a break every 30 minutes.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "take"
+  ],
+  "q": "Tip: ___ a break every 30 minutes. (fer)"
+ },
+ {
+  "id": "cf05b8c7",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Tip: switch off your phone at night.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "switch"
+  ],
+  "q": "Tip: ___ off your phone at night. (apagar)"
+ },
+ {
+  "id": "b7b80889",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Tip: don't use your phone in bed.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "don't"
+  ],
+  "q": "Tip: ___ use your phone in bed. (negatiu)"
+ },
+ {
+  "id": "21bdd049",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Tip: go outside and play with your friends.",
+  "mask": [
+   [
+    1,
+    1
+   ],
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "go",
+   "play"
+  ],
+  "q": "Tip: ___ outside and ___ with your friends. (anar / jugar)"
+ },
+ {
+  "id": "c4bc85a0",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Correct the mistake: You put your phone away at dinner.. put your phone away at dinner.",
+  "mask": [
+   [
+    10,
+    10
+   ]
+  ],
+  "answers": [
+   "put"
+  ],
+  "q": "Correct the mistake: “You put your phone away at dinner.” (make it a tip) → ___ your phone away at dinner."
+ },
+ {
+  "id": "3692fb8e",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Correct the mistake: I like play video games.. I like playing video games.",
+  "mask": [
+   [
+    10,
+    10
+   ]
+  ],
+  "answers": [
+   "playing"
+  ],
+  "q": "Correct the mistake: “I like play video games.” → I like ___ video games."
+ },
+ {
+  "id": "bb89e15f",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Switch off your phone at night, because the light keeps you awake.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "because"
+  ],
+  "q": "Switch off your phone at night, ___ the light keeps you awake. (raó)"
+ },
+ {
+  "id": "f83765d8",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Set a time limit, so you have time for other things.",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "so"
+  ],
+  "q": "Set a time limit, ___ you have time for other things. (resultat)"
+ },
+ {
+  "id": "1f2281d6",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Keep your phone out of your bedroom.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "keep"
+  ],
+  "q": "___ your phone out of your bedroom. (mantenir)"
+ },
+ {
+  "id": "fff96df8",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Tip: don't check your phone every five minutes.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "don't"
+  ],
+  "q": "Tip: ___ check your phone every five minutes. (negatiu)"
+ },
+ {
+  "id": "61ae214d",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "They love watching highlights after the match.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "watching"
+  ],
+  "q": "They love ___ (watch) highlights after the match."
+ },
+ {
+  "id": "c7894c8b",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Go outside instead of watching videos all afternoon.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "instead of"
+  ],
+  "q": "Go outside ___ ___ watching videos all afternoon. (en lloc de)"
+ },
+ {
+  "id": "13d3a173",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Turn off notifications when you study, so you can concentrate.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "so"
+  ],
+  "q": "Turn off notifications when you study, ___ you can concentrate."
+ },
+ {
+  "id": "a5e17c7e",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "One hour of games a day is enough: you don’t need more.",
+  "mask": [
+   [
+    7,
+    7
+   ]
+  ],
+  "answers": [
+   "enough"
+  ],
+  "q": "One hour of games a day is ___: you don’t need more. (suficient)"
+ },
+ {
+  "id": "48faa6b5",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Correct the mistake: Don’t to use your phone in bed.. don't use your phone in bed.",
+  "mask": [
+   [
+    10,
+    10
+   ]
+  ],
+  "answers": [
+   "don't"
+  ],
+  "q": "Correct the mistake: “Don’t to use your phone in bed.” → ___ use your phone in bed."
+ },
+ {
+  "id": "29cff414",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] What do you love doing in your free time?",
+  "mask": [],
+  "answers": [],
+  "q": "What do you love doing in your free time?"
+ },
+ {
+  "id": "2de5774b",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] What do you hate doing?",
+  "mask": [],
+  "answers": [],
+  "q": "What do you hate doing?"
+ },
+ {
+  "id": "986d2d85",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] How much time do you spend on screens every day?",
+  "mask": [],
+  "answers": [],
+  "q": "How much time do you spend on screens every day?"
+ },
+ {
+  "id": "0c60c76a",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] What’s your best screen tip?",
+  "mask": [],
+  "answers": [],
+  "q": "What’s your best screen tip?"
+ },
+ {
+  "id": "15e002f6",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] Do you switch off your phone before you go to sleep?",
+  "mask": [],
+  "answers": [],
+  "q": "Do you switch off your phone before you go to sleep?"
+ },
+ {
+  "id": "b5898115",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] What do you enjoy doing outside?",
+  "mask": [],
+  "answers": [],
+  "q": "What do you enjoy doing outside?"
+ },
+ {
+  "id": "dab978d9",
+  "course": "2eso",
+  "lp": 5,
+  "page": "likes-and-screen-tips",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] Is three and a half hours a day too much? Why?",
+  "mask": [],
+  "answers": [],
+  "q": "Is three and a half hours a day too much? Why?"
+ },
+ {
+  "id": "4f0e5549",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "I can’t talk right now: I’m in class.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "right"
+  ],
+  "q": "I can’t talk ___ now: I’m in class. (ara mateix)"
+ },
+ {
+  "id": "45dab17e",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "At the moment she’s training for a show.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "moment"
+  ],
+  "q": "At the ___ she’s training for a show. (en aquest moment)"
+ },
+ {
+  "id": "6b835f46",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "We usually go to the park on Sundays.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "usually"
+  ],
+  "q": "We ___ go to the park on Sundays. (normalment)"
+ },
+ {
+  "id": "71602b9e",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "I play football on Saturday mornings.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "on"
+  ],
+  "q": "I play football ___ Saturday mornings."
+ },
+ {
+  "id": "34eece54",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "This weekend we’re going to a tournament.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "this"
+  ],
+  "q": "___ weekend we’re going to a tournament. (aquest)"
+ },
+ {
+  "id": "ed96feac",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[excited] My dad never gets up late: he’s always up at 6!",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "never"
+  ],
+  "q": "My dad ___ gets up late: he’s always up at 6! (mai)"
+ },
+ {
+  "id": "fdc14c09",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "In winter we go skating in the square.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "in"
+  ],
+  "q": "___ winter we go skating in the square."
+ },
+ {
+  "id": "54537f79",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[excited] Look! It’s snowing!",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "look"
+  ],
+  "q": "___! It’s snowing! (Mira!)"
+ },
+ {
+  "id": "0914ce19",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "I practise the piano every day for twenty minutes.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "practise"
+  ],
+  "q": "I ___ the piano every day for twenty minutes. (practicar)"
+ },
+ {
+  "id": "2d1914ef",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "The temperature is only two degrees: it’s freezing.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "temperature"
+  ],
+  "q": "The ___ is only two degrees: it’s freezing."
+ },
+ {
+  "id": "2b03104d",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "We’re going to a concert on Friday.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "to"
+  ],
+  "q": "We’re going ___ a concert on Friday."
+ },
+ {
+  "id": "5fb9685c",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "I prefer skating to cycling.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "prefer"
+  ],
+  "q": "I ___ skating to cycling. (preferir)"
+ },
+ {
+  "id": "2de6c178",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] What does highlights mean?",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "mean"
+  ],
+  "q": "What does “highlights” ___? (voler dir)"
+ },
+ {
+  "id": "0c6d2141",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "I need new gloves: mine are broken.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "need"
+  ],
+  "q": "I ___ new gloves: mine are broken. (necessitar)"
+ },
+ {
+  "id": "b28f7fa5",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "I usually go swimming on Saturdays.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "go"
+  ],
+  "q": "I usually ___ (go) swimming on Saturdays."
+ },
+ {
+  "id": "b844826b",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Today I am watching my sister’s match.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "am watching"
+  ],
+  "q": "Today I ___ (watch) my sister’s match."
+ },
+ {
+  "id": "46a66321",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Mei comes to the rink every Sunday.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "comes"
+  ],
+  "q": "Mei ___ (come) to the rink every Sunday."
+ },
+ {
+  "id": "ec969f13",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Right now she is practising her turns.",
+  "mask": [
+   [
+    3,
+    4
+   ]
+  ],
+  "answers": [
+   "is practising"
+  ],
+  "q": "Right now she ___ (practise) her turns."
+ },
+ {
+  "id": "b77efb6f",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Noah isn't riding today: he’s filming.",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "isn't riding"
+  ],
+  "q": "Noah ___ (not / ride) today: he’s filming."
+ },
+ {
+  "id": "a1f02aae",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[excited] Listen! Somebody is playing the guitar.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "is playing"
+  ],
+  "q": "Listen! Somebody ___ (play) the guitar."
+ },
+ {
+  "id": "356c9e08",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "We never play football in winter.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "play"
+  ],
+  "q": "We never ___ (play) football in winter."
+ },
+ {
+  "id": "dbebc9fe",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Do you usually train on Tuesdays? — Yes, we do.",
+  "mask": [
+   [
+    0,
+    0
+   ],
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "do",
+   "train"
+  ],
+  "q": "___ you usually ___ (train) on Tuesdays? — Yes, we do."
+ },
+ {
+  "id": "d6d2e994",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[excited] What is Kai doing at the moment? — He’s falling!",
+  "mask": [
+   [
+    1,
+    1
+   ],
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "is",
+   "doing"
+  ],
+  "q": "What ___ Kai ___ (do) at the moment? — He’s falling!"
+ },
+ {
+  "id": "abd450a2",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "My dad doesn't like cold weather, so he stays at home in winter.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "doesn't like"
+  ],
+  "q": "My dad ___ (not / like) cold weather, so he stays at home in winter."
+ },
+ {
+  "id": "2876d2cf",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "I usually wear trainers, but today I am wearing boots.",
+  "mask": [
+   [
+    7,
+    8
+   ]
+  ],
+  "answers": [
+   "am wearing"
+  ],
+  "q": "I usually wear trainers, but today I ___ (wear) boots."
+ },
+ {
+  "id": "092b1b29",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "In summer we swim in the sea every day.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "swim"
+  ],
+  "q": "In summer we ___ (swim) in the sea every day."
+ },
+ {
+  "id": "8795812f",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "I want a new helmet. Mine is too small.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "want"
+  ],
+  "q": "I ___ (want) a new helmet. Mine is too small. (state verb)"
+ },
+ {
+  "id": "d963173e",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Do you know the rules of this game?",
+  "mask": [
+   [
+    0,
+    0
+   ],
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "do",
+   "know"
+  ],
+  "q": "___ you ___ (know) the rules of this game?"
+ },
+ {
+  "id": "d12f03a8",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "She prefers skating to cycling.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "prefers"
+  ],
+  "q": "She ___ (prefer) skating to cycling."
+ },
+ {
+  "id": "d68bf9b7",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[curious] I don't understand this exercise. Can you help me?",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "don't understand"
+  ],
+  "q": "I ___ (not / understand) this exercise. Can you help me?"
+ },
+ {
+  "id": "feccccf5",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "[excited] Leo usually wins, and he is winning again today!",
+  "mask": [
+   [
+    5,
+    6
+   ]
+  ],
+  "answers": [
+   "is winning"
+  ],
+  "q": "Leo usually wins, and he ___ (win) again today!"
+ },
+ {
+  "id": "3b4af0ca",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Correct the mistake: I’m needing new gloves.. I need new gloves.",
+  "mask": [
+   [
+    8,
+    8
+   ]
+  ],
+  "answers": [
+   "need"
+  ],
+  "q": "Correct the mistake: “I’m needing new gloves.” → I ___ new gloves."
+ },
+ {
+  "id": "6622d5fd",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "This month I am training for a race, so I ride every day.",
+  "mask": [
+   [
+    3,
+    4
+   ]
+  ],
+  "answers": [
+   "am training"
+  ],
+  "q": "This month I ___ (train) for a race, so I ride every day."
+ },
+ {
+  "id": "cb5f1431",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "My cousin is staying with us this week, so we go skating together every afternoon.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "is staying"
+  ],
+  "q": "My cousin ___ (stay) with us this week, so we go skating together every afternoon."
+ },
+ {
+  "id": "636f1574",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "I think skating is more fun than cycling.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "think"
+  ],
+  "q": "I ___ (think) skating is more fun than cycling. (opinion)"
+ },
+ {
+  "id": "78fbf4c7",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[excited] Be quiet, please! I am thinking about my next video.",
+  "mask": [
+   [
+    4,
+    5
+   ]
+  ],
+  "answers": [
+   "am thinking"
+  ],
+  "q": "Be quiet, please! I ___ (think) about my next video."
+ },
+ {
+  "id": "a8875dad",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Correct the mistake: Leo is knowing all the routes in the park.. Leo knows all the routes.",
+  "mask": [
+   [
+    13,
+    13
+   ]
+  ],
+  "answers": [
+   "knows"
+  ],
+  "q": "Correct the mistake: “Leo is knowing all the routes in the park.” → Leo ___ all the routes."
+ },
+ {
+  "id": "cdd366e5",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] What do you usually do on Saturdays?",
+  "mask": [],
+  "answers": [],
+  "q": "What do you usually do on Saturdays?"
+ },
+ {
+  "id": "8757529b",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] What are you doing this weekend?",
+  "mask": [],
+  "answers": [],
+  "q": "What are you doing this weekend?"
+ },
+ {
+  "id": "8f7d8352",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] Do you usually do sport?",
+  "mask": [],
+  "answers": [],
+  "q": "Do you usually do sport?"
+ },
+ {
+  "id": "c5da25f5",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] Who do you usually go out with?",
+  "mask": [],
+  "answers": [],
+  "q": "Who do you usually go out with?"
+ },
+ {
+  "id": "b89b10d1",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] How often do you see your friends?",
+  "mask": [],
+  "answers": [],
+  "q": "How often do you see your friends?"
+ },
+ {
+  "id": "1aeee362",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] Why is this weekend different?",
+  "mask": [],
+  "answers": [],
+  "q": "Why is this weekend different?"
+ },
+ {
+  "id": "8862d1ad",
+  "course": "2eso",
+  "lp": 3,
+  "page": "now-or-usually",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] Which do you prefer, your usual weekend or this one? Why?",
+  "mask": [],
+  "answers": [],
+  "q": "Which do you prefer, your usual weekend or this one? Why?"
+ },
+ {
+  "id": "ec128d38",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "It’s cold and it’s raining. Take an umbrella and wear a jacket.",
+  "mask": [
+   [
+    11,
+    11
+   ]
+  ],
+  "answers": [
+   "jacket"
+  ],
+  "q": "It’s cold and it’s raining. Take an umbrella and wear a ___. (jaqueta)"
+ },
+ {
+  "id": "99edef87",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "On your bike, always wear a helmet.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "helmet"
+  ],
+  "q": "On your bike, always wear a ___. (casc)"
+ },
+ {
+  "id": "e5e392d8",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "It’s 32 degrees. It’s very hot.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "hot"
+  ],
+  "q": "It’s 32 degrees. It’s very ___. (calor)"
+ },
+ {
+  "id": "eb241638",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "I run in my new trainers.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "trainers"
+  ],
+  "q": "I run in my new ___. (bambes)"
+ },
+ {
+  "id": "beeb32ed",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "[excited] Look at the sky! It’s snowing: white and cold.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "snowing"
+  ],
+  "q": "Look at the sky! It’s ___: white and cold. (nevar)"
+ },
+ {
+  "id": "78236109",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Put on a cap: the sun is strong.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "cap"
+  ],
+  "q": "Put on a ___: the sun is strong. (gorra)"
+ },
+ {
+  "id": "51fc96db",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "It’s cloudy today: the clouds are grey.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "cloudy"
+  ],
+  "q": "It’s ___ today: the clouds are grey. (ennuvolat)"
+ },
+ {
+  "id": "e630b400",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "The football team wears a blue uniform.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "uniform"
+  ],
+  "q": "The football team wears a blue ___. (uniforme)"
+ },
+ {
+  "id": "081dadc6",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "In summer we play in shorts, not in long trousers.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "shorts"
+  ],
+  "q": "In summer we play in ___, not in long trousers. (pantalons curts)"
+ },
+ {
+  "id": "0a8499c6",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[excited] It’s windy: look at the trees moving!",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "windy"
+  ],
+  "q": "It’s ___: look at the trees moving! (vent)"
+ },
+ {
+  "id": "5873d81e",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Our team is in a basketball tournament with 12 teams this weekend.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "tournament"
+  ],
+  "q": "Our team is in a basketball ___ with 12 teams this weekend."
+ },
+ {
+  "id": "9b812c5b",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "It’s foggy: I can’t see the end of the street.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "foggy"
+  ],
+  "q": "It’s ___: I can’t see the end of the street."
+ },
+ {
+  "id": "d320e44c",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "What's the weather like today? — It’s sunny.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "what's"
+  ],
+  "q": "___ the weather like today? — It’s sunny."
+ },
+ {
+  "id": "66a5091c",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Marc is a great player: he scores a goal in every match.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "scores"
+  ],
+  "q": "Marc is a great player: he ___ a goal in every match."
+ },
+ {
+  "id": "c4d6fe7f",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[excited] The crowd is cheering: 500 people!",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "crowd"
+  ],
+  "q": "The ___ is cheering: 500 people!"
+ },
+ {
+  "id": "6eba1398",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Before the match, the players warm up for ten minutes.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "warm"
+  ],
+  "q": "Before the match, the players ___ up for ten minutes."
+ },
+ {
+  "id": "b1229f9e",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[excited] Look! Pol is skating on the big ramp.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "is skating"
+  ],
+  "q": "Look! Pol ___ (skate) on the big ramp."
+ },
+ {
+  "id": "f5fe256c",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "I am watching a basketball match right now.",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "am watching"
+  ],
+  "q": "I ___ (watch) a basketball match right now."
+ },
+ {
+  "id": "1a607dce",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "They are wearing green T-shirts today.",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "are wearing"
+  ],
+  "q": "They ___ (wear) green T-shirts today."
+ },
+ {
+  "id": "c734090c",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "We are swimming in the sea.",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "are swimming"
+  ],
+  "q": "We ___ (swim) in the sea. (atenció a l’ortografia)"
+ },
+ {
+  "id": "141ada1d",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "She is dancing in the show.",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "is dancing"
+  ],
+  "q": "She ___ (dance) in the show."
+ },
+ {
+  "id": "94d2e80f",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[excited] It isn't raining now. It’s sunny!",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "isn't raining"
+  ],
+  "q": "It ___ (not / rain) now. It’s sunny!"
+ },
+ {
+  "id": "bfc72e05",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Are you listening to music? — Yes, I am.",
+  "mask": [
+   [
+    0,
+    0
+   ],
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "are",
+   "listening"
+  ],
+  "q": "___ you ___ (listen) to music? — Yes, I am."
+ },
+ {
+  "id": "5657a4d8",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "What is Marta doing? — She’s taking photos.",
+  "mask": [
+   [
+    1,
+    1
+   ],
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "is",
+   "doing"
+  ],
+  "q": "What ___ Marta ___ (do)? — She’s taking photos."
+ },
+ {
+  "id": "caf400e5",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Is Hugo playing football? — No, he isn't.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "isn't"
+  ],
+  "q": "Is Hugo playing football? — No, he ___."
+ },
+ {
+  "id": "a73a633a",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "The children are running in the park.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "are running"
+  ],
+  "q": "The children ___ (run) in the park."
+ },
+ {
+  "id": "04b5d1aa",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "I 'm not playing video games. I’m doing my homework.",
+  "mask": [
+   [
+    1,
+    3
+   ]
+  ],
+  "answers": [
+   "'m not playing"
+  ],
+  "q": "I ___ (not / play) video games. I’m doing my homework."
+ },
+ {
+  "id": "fc791e2d",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Write the -ing form: sit. sitting",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "sitting"
+  ],
+  "q": "Write the -ing form: sit → ___"
+ },
+ {
+  "id": "bd311bcb",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Write the -ing form: make. making",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "making"
+  ],
+  "q": "Write the -ing form: make → ___"
+ },
+ {
+  "id": "dbe80035",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Write the -ing form: read. reading",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "reading"
+  ],
+  "q": "Write the -ing form: read → ___"
+ },
+ {
+  "id": "c290e52d",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "The crowd is cheering at the moment: the match is exciting.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "is cheering"
+  ],
+  "q": "The crowd ___ (cheer) at the moment: the match is exciting."
+ },
+ {
+  "id": "df6c0cd7",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Why are you wearing a helmet? — Because I’m going cycling.",
+  "mask": [
+   [
+    1,
+    1
+   ],
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "are",
+   "wearing"
+  ],
+  "q": "Why ___ you ___ (wear) a helmet? — Because I’m going cycling."
+ },
+ {
+  "id": "0d585524",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Is she playing well? — Yes, she is.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "is"
+  ],
+  "q": "Is she playing well? — Yes, she ___. (no contraction)"
+ },
+ {
+  "id": "3e78d91d",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Write the -ing form: get. getting",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "getting"
+  ],
+  "q": "Write the -ing form: get → ___"
+ },
+ {
+  "id": "443e0692",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Write the -ing form: write. writing",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "writing"
+  ],
+  "q": "Write the -ing form: write → ___"
+ },
+ {
+  "id": "6200c7a2",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[excited] Who is scoring? — Marc!",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "is scoring"
+  ],
+  "q": "Who ___ (score)? — Marc!"
+ },
+ {
+  "id": "1cf61906",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] Order the words: are / why / the fans / cheering. why are the fans cheering?",
+  "mask": [
+   [
+    8,
+    12
+   ]
+  ],
+  "answers": [
+   "why are the fans cheering"
+  ],
+  "q": "Order the words: are / why / the fans / cheering → ___?"
+ },
+ {
+  "id": "77e161eb",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Correct the mistake: She’s studing for the exam.. studying",
+  "mask": [
+   [
+    8,
+    8
+   ]
+  ],
+  "answers": [
+   "studying"
+  ],
+  "q": "Correct the mistake: “She’s studing for the exam.” → ___"
+ },
+ {
+  "id": "ac8dba6f",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Correct the mistake: They are runing in the park.. running",
+  "mask": [
+   [
+    9,
+    9
+   ]
+  ],
+  "answers": [
+   "running"
+  ],
+  "q": "Correct the mistake: “They are runing in the park.” → ___"
+ },
+ {
+  "id": "9f392784",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Twenty teams are taking part in the tournament this weekend.",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "are taking"
+  ],
+  "q": "Twenty teams ___ (take) part in the tournament this weekend."
+ },
+ {
+  "id": "999ba7c4",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "talk",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[excited] Hi! Where are you?",
+  "mask": [],
+  "answers": [],
+  "q": "Hi! Where are you?"
+ },
+ {
+  "id": "6b5ff3e8",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "talk",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[curious] What are you doing right now?",
+  "mask": [],
+  "answers": [],
+  "q": "What are you doing right now?"
+ },
+ {
+  "id": "8c13a593",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "talk",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[curious] Who are you with?",
+  "mask": [],
+  "answers": [],
+  "q": "Who are you with?"
+ },
+ {
+  "id": "6a23f3a0",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "talk",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[curious] What’s the weather like?",
+  "mask": [],
+  "answers": [],
+  "q": "What’s the weather like?"
+ },
+ {
+  "id": "ecfd159f",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "talk",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[curious] What are the people around you doing?",
+  "mask": [],
+  "answers": [],
+  "q": "What are the people around you doing?"
+ },
+ {
+  "id": "962b5f97",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "talk",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[curious] What are you wearing today?",
+  "mask": [],
+  "answers": [],
+  "q": "What are you wearing today?"
+ },
+ {
+  "id": "fd057ecc",
+  "course": "2eso",
+  "lp": 2,
+  "page": "what-are-they-doing",
+  "kind": "talk",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "[curious] Is this what you usually do on Saturdays?",
+  "mask": [],
+  "answers": [],
+  "q": "Is this what you usually do on Saturdays?"
+ },
+ {
+  "id": "ca2ac849",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "[excited] Hi everyone! Welcome to my vlog.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "everyone"
+  ],
+  "q": "Hi ___! Welcome to my vlog. (tothom)"
+ },
+ {
+  "id": "3de43b63",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Today I’m at the skate park.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "today"
+  ],
+  "q": "___ I’m at the skate park. (avui)"
+ },
+ {
+  "id": "85fdb67a",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "In this photo, my friends are skating.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "photo"
+  ],
+  "q": "In this ___, my friends are skating. (foto)"
+ },
+ {
+  "id": "0ef06d37",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[excited] That’s all! See you next time!",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "time"
+  ],
+  "q": "That’s all! See you next ___! (fins a la pròxima)"
+ },
+ {
+  "id": "8d3daa13",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[excited] Thanks for watching!",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "watching"
+  ],
+  "q": "Thanks for ___! (mirar-ho)"
+ },
+ {
+  "id": "7c090372",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "I spend time drawing every evening.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "spend"
+  ],
+  "q": "I ___ time drawing every evening. (passar)"
+ },
+ {
+  "id": "a6cce114",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "I want to join a climbing club.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "join"
+  ],
+  "q": "I want to ___ a climbing club."
+ },
+ {
+  "id": "10be9791",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "We train hard before a tournament.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "hard"
+  ],
+  "q": "We train ___ before a tournament. (fort)"
+ },
+ {
+  "id": "b8a520d4",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[excited] I’m getting better at skating: I don’t fall now!",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "better"
+  ],
+  "q": "I’m getting ___ at skating: I don’t fall now!"
+ },
+ {
+  "id": "24c71fe2",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "I prefer the park to the sports hall.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "prefer"
+  ],
+  "q": "I ___ the park to the sports hall. (preferir)"
+ },
+ {
+  "id": "66f707f2",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "For me, climbing means freedom.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "means"
+  ],
+  "q": "For me, climbing ___ freedom. (voler dir)"
+ },
+ {
+  "id": "89db938c",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] What’s your vlog about?",
+  "mask": [],
+  "answers": [],
+  "q": "What’s your vlog about?"
+ },
+ {
+  "id": "727eecfa",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Where are you in the vlog?",
+  "mask": [],
+  "answers": [],
+  "q": "Where are you in the vlog?"
+ },
+ {
+  "id": "dd35013e",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Why do you like this activity?",
+  "mask": [],
+  "answers": [],
+  "q": "Why do you like this activity?"
+ },
+ {
+  "id": "125db421",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Who do you usually do it with?",
+  "mask": [],
+  "answers": [],
+  "q": "Who do you usually do it with?"
+ },
+ {
+  "id": "a41bb230",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] What’s happening in your vlog?",
+  "mask": [],
+  "answers": [],
+  "q": "What’s happening in your vlog?"
+ },
+ {
+  "id": "a15e93fd",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] How do you start and end your vlog?",
+  "mask": [],
+  "answers": [],
+  "q": "How do you start and end your vlog?"
+ },
+ {
+  "id": "97051801",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] What’s your tip for your viewers?",
+  "mask": [],
+  "answers": [],
+  "q": "What’s your tip for your viewers?"
+ },
+ {
+  "id": "f214e031",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Let’s invite our families to the event.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "invite"
+  ],
+  "q": "Let’s ___ our families to the event."
+ },
+ {
+  "id": "2717bb5a",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "We need to book a room for the workshop.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "book"
+  ],
+  "q": "We need to ___ a room for the workshop."
+ },
+ {
+  "id": "5090e883",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Can you buy tickets for the concert?",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "buy"
+  ],
+  "q": "Can you ___ tickets for the concert?"
+ },
+ {
+  "id": "ad8eddd5",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "We’re going to put up posters in the corridors.",
+  "mask": [
+   [
+    3,
+    4
+   ]
+  ],
+  "answers": [
+   "put up"
+  ],
+  "q": "We’re going to ___ ___ posters in the corridors."
+ },
+ {
+  "id": "d95247ee",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Our class is going to run a food stall.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "run"
+  ],
+  "q": "Our class is going to ___ a food stall."
+ },
+ {
+  "id": "ee077c78",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] Can you set up the chairs before 9.00?",
+  "mask": [
+   [
+    2,
+    3
+   ]
+  ],
+  "answers": [
+   "set up"
+  ],
+  "q": "Can you ___ ___ the chairs before 9.00?"
+ },
+ {
+  "id": "3ac7c3d3",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "We need to make a timetable so everyone knows what happens and when.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "timetable"
+  ],
+  "q": "We need to make a ___ so everyone knows what happens and when."
+ },
+ {
+  "id": "25028999",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "The event will be held in the school hall.",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "held"
+  ],
+  "q": "The event will be ___ in the school hall."
+ },
+ {
+  "id": "41613a00",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "We are going to decorate the hall. It’s our plan.",
+  "mask": [
+   [
+    1,
+    4
+   ]
+  ],
+  "answers": [
+   "are going to decorate"
+  ],
+  "q": "We ___ ___ ___ (decorate) the hall. It’s our plan."
+ },
+ {
+  "id": "20ab0735",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[excited] We need music! I will bring my speaker!",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "will"
+  ],
+  "q": "“We need music!” “I ___ bring my speaker!”"
+ },
+ {
+  "id": "8531ccb4",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "There will be music and food.",
+  "mask": [
+   [
+    0,
+    2
+   ]
+  ],
+  "answers": [
+   "there will be"
+  ],
+  "q": "___ ___ ___ music and food."
+ },
+ {
+  "id": "14f0a9b6",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Ana is going to make the posters. She bought the paper yesterday.",
+  "mask": [
+   [
+    1,
+    4
+   ]
+  ],
+  "answers": [
+   "is going to make"
+  ],
+  "q": "Ana ___ ___ ___ (make) the posters. She bought the paper yesterday."
+ },
+ {
+  "id": "749561a2",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "It’s cold in here. I will close the window.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "will"
+  ],
+  "q": "“It’s cold in here.” “I ___ close the window.”"
+ },
+ {
+  "id": "8acb33a9",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "We aren't going to invite other schools.",
+  "mask": [
+   [
+    1,
+    4
+   ]
+  ],
+  "answers": [
+   "aren't going to invite"
+  ],
+  "q": "We ___ ___ ___ (not / invite) other schools."
+ },
+ {
+  "id": "6f152633",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "[curious] Are you going to come?",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "are"
+  ],
+  "q": "___ you going to come?"
+ },
+ {
+  "id": "053af8fc",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "There will be four stalls.",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "will be"
+  ],
+  "q": "There ___ ___ four stalls."
+ },
+ {
+  "id": "06746791",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "We are meeting the head teacher on Monday at 9. It’s in her diary.",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "are meeting"
+  ],
+  "q": "We ___ ___ (meet) the head teacher on Monday at 9. It’s in her diary."
+ },
+ {
+  "id": "854204d6",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "The event starts at 10.00.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "starts"
+  ],
+  "q": "The event ___ (start) at 10.00."
+ },
+ {
+  "id": "f27def61",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "I think everyone will love it.",
+  "mask": [
+   [
+    3,
+    4
+   ]
+  ],
+  "answers": [
+   "will love"
+  ],
+  "q": "I think everyone ___ ___ (love) it."
+ },
+ {
+  "id": "eee854ef",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "The bus leaves at 8.15 tomorrow.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "leaves"
+  ],
+  "q": "The bus ___ (leave) at 8.15 tomorrow."
+ },
+ {
+  "id": "baef0c41",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "We are performing a dance at 12. We booked the hall yesterday.",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "are performing"
+  ],
+  "q": "We ___ ___ (perform) a dance at 12. We booked the hall yesterday."
+ },
+ {
+  "id": "b4a5e036",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] What are we going to do on the day?",
+  "mask": [],
+  "answers": [],
+  "q": "What are we going to do on the day?"
+ },
+ {
+  "id": "d27c770d",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] Where is it going to take place?",
+  "mask": [],
+  "answers": [],
+  "q": "Where is it going to take place?"
+ },
+ {
+  "id": "87325ae2",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] We need music. Who can bring it?",
+  "mask": [],
+  "answers": [],
+  "q": "We need music. Who can bring it?"
+ },
+ {
+  "id": "9411d247",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] What time does it start?",
+  "mask": [],
+  "answers": [],
+  "q": "What time does it start?"
+ },
+ {
+  "id": "e112bc56",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] When are we meeting the head teacher?",
+  "mask": [],
+  "answers": [],
+  "q": "When are we meeting the head teacher?"
+ },
+ {
+  "id": "9bdb3fdb",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] How can we make everyone feel welcome?",
+  "mask": [],
+  "answers": [],
+  "q": "How can we make everyone feel welcome?"
+ },
+ {
+  "id": "53e62fe3",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "talk",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] What if it rains and the hall is too small?",
+  "mask": [],
+  "answers": [],
+  "q": "What if it rains and the hall is too small?"
+ },
+ {
+  "id": "68867e8b",
+  "course": "4eso",
+  "lp": 4,
+  "page": "research-it-right",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Where did you find your information?",
+  "mask": [],
+  "answers": [],
+  "q": "Where did you find your information?"
+ },
+ {
+  "id": "7a2bf708",
+  "course": "4eso",
+  "lp": 4,
+  "page": "research-it-right",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Is it reliable? Why?",
+  "mask": [],
+  "answers": [],
+  "q": "Is it reliable? Why?"
+ },
+ {
+  "id": "04ccd503",
+  "course": "4eso",
+  "lp": 4,
+  "page": "research-it-right",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] When was it written?",
+  "mask": [],
+  "answers": [],
+  "q": "When was it written?"
+ },
+ {
+  "id": "68baeebb",
+  "course": "4eso",
+  "lp": 4,
+  "page": "research-it-right",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Did you check the facts in a second source?",
+  "mask": [],
+  "answers": [],
+  "q": "Did you check the facts in a second source?"
+ },
+ {
+  "id": "adf4c12f",
+  "course": "4eso",
+  "lp": 4,
+  "page": "research-it-right",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] How do you write about people’s beliefs with respect?",
+  "mask": [],
+  "answers": [],
+  "q": "How do you write about people’s beliefs with respect?"
+ },
+ {
+  "id": "31673d37",
+  "course": "4eso",
+  "lp": 4,
+  "page": "research-it-right",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] What do you do if two sources say different things?",
+  "mask": [],
+  "answers": [],
+  "q": "What do you do if two sources say different things?"
+ },
+ {
+  "id": "f28bb455",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Thanksgiving is in November.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "in"
+  ],
+  "q": "Thanksgiving is ___ November."
+ },
+ {
+  "id": "74c944cd",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "We celebrate the Castanyada on 31 October.",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "on"
+  ],
+  "q": "We celebrate the Castanyada ___ 31 October."
+ },
+ {
+  "id": "c50aef64",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "We get together at Christmas.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "at"
+  ],
+  "q": "We get together ___ Christmas."
+ },
+ {
+  "id": "001d2d21",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "25/12. on the twenty-fifth of December",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "twenty-fifth"
+  ],
+  "q": "25/12 → on the ___ of December"
+ },
+ {
+  "id": "a3f9a3d7",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "1/11. on the first of November",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "first"
+  ],
+  "q": "1/11 → on the ___ of November"
+ },
+ {
+  "id": "94dd8ba0",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "We celebrate it once a year, in spring.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "once"
+  ],
+  "q": "We celebrate it ___ a year, in spring."
+ },
+ {
+  "id": "31179234",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "The Castanyada is on the night before All Saints’ Day.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "before"
+  ],
+  "q": "The Castanyada is on the night ___ All Saints’ Day."
+ },
+ {
+  "id": "042ee078",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Diwali is different from Christmas in many ways.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "different"
+  ],
+  "q": "Diwali is ___ from Christmas in many ways."
+ },
+ {
+  "id": "a7db7d4d",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Both Halloween and the Castanyada take place on 31 October.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "both"
+  ],
+  "q": "___ Halloween and the Castanyada take place on 31 October."
+ },
+ {
+  "id": "85c69877",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "At Christmas the crowded streets are full of people.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "crowded"
+  ],
+  "q": "At Christmas the ___ streets are full of people."
+ },
+ {
+  "id": "5ecdfbbf",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Halloween dates back to an old Celtic festival.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "dates"
+  ],
+  "q": "Halloween ___ back to an old Celtic festival."
+ },
+ {
+  "id": "23490ea1",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Some people think Christmas is too commercialised: it’s all about buying things.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "commercialised"
+  ],
+  "q": "Some people think Christmas is too ___: it’s all about buying things."
+ },
+ {
+  "id": "6c940902",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Spain is known for its summer festivals.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "for"
+  ],
+  "q": "Spain is known ___ its summer festivals."
+ },
+ {
+  "id": "5f484003",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "I love Halloween because I can dress up.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "because"
+  ],
+  "q": "I love Halloween ___ I can dress up."
+ },
+ {
+  "id": "a4a90b24",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "My brother likes costumes, but he doesn’t like scary films.",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "but"
+  ],
+  "q": "My brother likes costumes, ___ he doesn’t like scary films."
+ },
+ {
+  "id": "4f22a665",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "First, we clean the house. Then we decorate it.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "first"
+  ],
+  "q": "___, we clean the house. Then we decorate it."
+ },
+ {
+  "id": "d9123a29",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "We eat chestnuts. We also eat panellets.",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "also"
+  ],
+  "q": "We eat chestnuts. We ___ eat panellets."
+ },
+ {
+  "id": "c266c7b5",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Finally, we all eat together.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "finally"
+  ],
+  "q": "___, we all eat together."
+ },
+ {
+  "id": "12fa0b85",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "It’s cold outside, but the house is cosy.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "but"
+  ],
+  "q": "It’s cold outside, ___ the house is cosy."
+ },
+ {
+  "id": "4e62b236",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "The first Thanksgiving took place in 1621.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "took"
+  ],
+  "q": "The first Thanksgiving ___ (take) place in 1621."
+ },
+ {
+  "id": "e1ddb3af",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "People in Ireland used to carve turnips, but now they carve pumpkins.",
+  "mask": [
+   [
+    3,
+    4
+   ]
+  ],
+  "answers": [
+   "used to"
+  ],
+  "q": "People in Ireland ___ ___ carve turnips, but now they carve pumpkins."
+ },
+ {
+  "id": "0dc8022b",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Lincoln made Thanksgiving official in 1863.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "made"
+  ],
+  "q": "Lincoln ___ (make) Thanksgiving official in 1863."
+ },
+ {
+  "id": "a1beae1b",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Children didn't use to go trick or treating in Catalonia.",
+  "mask": [
+   [
+    1,
+    3
+   ]
+  ],
+  "answers": [
+   "didn't use to"
+  ],
+  "q": "Children ___ (not / use to) go trick or treating in Catalonia."
+ },
+ {
+  "id": "926e689c",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Did people use to wear masks at Samhain? — Yes, they did.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "did"
+  ],
+  "q": "___ people use to wear masks at Samhain? — Yes, they did."
+ },
+ {
+  "id": "4762d18b",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Diwali is a festival which celebrates light.",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "which"
+  ],
+  "q": "Diwali is a festival ___ celebrates light."
+ },
+ {
+  "id": "fa28f268",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "The Wampanoag were the people who lived in the area.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "who"
+  ],
+  "q": "The Wampanoag were the people ___ lived in the area."
+ },
+ {
+  "id": "dc2952f6",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "The town square is the place where the parade ends.",
+  "mask": [
+   [
+    6,
+    6
+   ]
+  ],
+  "answers": [
+   "where"
+  ],
+  "q": "The town square is the place ___ the parade ends."
+ },
+ {
+  "id": "04e6ca51",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "31 October is the day when we eat panellets.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "when"
+  ],
+  "q": "31 October is the day ___ we eat panellets."
+ },
+ {
+  "id": "3245bb79",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "Halloween is about costumes, whereas the Castanyada is about food and family.",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "whereas"
+  ],
+  "q": "Halloween is about costumes, ___ the Castanyada is about food and family."
+ },
+ {
+  "id": "e2716dd3",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Unlike Hanukkah, Diwali lasts five days.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "unlike"
+  ],
+  "q": "___ Hanukkah, Diwali lasts five days."
+ },
+ {
+  "id": "8dbfba91",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "Join: Thanksgiving became official in 1863. It takes place in November.. Thanksgiving, which takes place in november, became official in 1863.",
+  "mask": [
+   [
+    12,
+    16
+   ]
+  ],
+  "answers": [
+   "which takes place in november"
+  ],
+  "q": "Join: Thanksgiving became official in 1863. It takes place in November. → Thanksgiving, ___ ___ ___ ___ ___, became official in 1863."
+ },
+ {
+  "id": "a678660f",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Join: Abraham Lincoln made it official. He was president in 1863.. Abraham Lincoln, who was president in 1863, made it official.",
+  "mask": [
+   [
+    13,
+    17
+   ]
+  ],
+  "answers": [
+   "who was president in 1863"
+  ],
+  "q": "Join: Abraham Lincoln made it official. He was president in 1863. → Abraham Lincoln, ___ ___ ___ ___ ___, made it official."
+ },
+ {
+  "id": "d6c2ec52",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Although Halloween started in Europe, it is now very popular in the USA.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "although"
+  ],
+  "q": "___ Halloween started in Europe, it is now very popular in the USA."
+ },
+ {
+  "id": "8e8902ef",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Many families love the feast. on the other hand, some Native Americans see it as a day of mourning.",
+  "mask": [
+   [
+    5,
+    8
+   ]
+  ],
+  "answers": [
+   "on the other hand"
+  ],
+  "q": "Many families love the feast. ___, some Native Americans see it as a day of mourning. (3 words)"
+ },
+ {
+  "id": "769ad00d",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Correct the word: Diwali, that is celebrated in autumn, is known as the festival of lights.. which",
+  "mask": [
+   [
+    16,
+    16
+   ]
+  ],
+  "answers": [
+   "which"
+  ],
+  "q": "Correct the word: “Diwali, that is celebrated in autumn, is known as the festival of lights.” → ___"
+ },
+ {
+  "id": "a1f2b5fe",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] Which celebration is your group researching?",
+  "mask": [],
+  "answers": [],
+  "q": "Which celebration is your group researching?"
+ },
+ {
+  "id": "8cddfff6",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] When do people celebrate it?",
+  "mask": [],
+  "answers": [],
+  "q": "When do people celebrate it?"
+ },
+ {
+  "id": "253161a1",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] What do people do?",
+  "mask": [],
+  "answers": [],
+  "q": "What do people do?"
+ },
+ {
+  "id": "95a82923",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] Where does it come from?",
+  "mask": [],
+  "answers": [],
+  "q": "Where does it come from?"
+ },
+ {
+  "id": "cf67371d",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] What did people use to do in the past?",
+  "mask": [],
+  "answers": [],
+  "q": "What did people use to do in the past?"
+ },
+ {
+  "id": "9f063c59",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] Is it older than Halloween?",
+  "mask": [],
+  "answers": [],
+  "q": "Is it older than Halloween?"
+ },
+ {
+  "id": "6696b666",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "talk",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "[curious] How has it changed, and do you think the change is good?",
+  "mask": [],
+  "answers": [],
+  "q": "How has it changed, and do you think the change is good?"
+ },
+ {
+  "id": "a26fa739",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "Dear Ms Puig,",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "dear"
+  ],
+  "q": "___ Ms Puig,"
+ },
+ {
+  "id": "68123958",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "I am writing to propose a celebration day.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "to"
+  ],
+  "q": "I am writing ___ propose a celebration day."
+ },
+ {
+  "id": "e773387b",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "We would like to organise an event.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "like"
+  ],
+  "q": "We would ___ to organise an event."
+ },
+ {
+  "id": "3866d8e4",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Yours sincerely,",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "sincerely"
+  ],
+  "q": "Yours ___,"
+ },
+ {
+  "id": "d6ba010c",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[curious] Could we use the school hall?",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "could"
+  ],
+  "q": "___ we use the school hall?"
+ },
+ {
+  "id": "44a1b14e",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "Please let us know if you need more information.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "know"
+  ],
+  "q": "Please let us ___ if you need more information."
+ },
+ {
+  "id": "affac307",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "I look forward to hearing from you.",
+  "mask": [
+   [
+    4,
+    4
+   ]
+  ],
+  "answers": [
+   "hearing"
+  ],
+  "q": "I look forward to ___ from you."
+ },
+ {
+  "id": "b98935a6",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "I would be grateful if you could reply before Friday.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "grateful"
+  ],
+  "q": "I would be ___ if you could reply before Friday."
+ },
+ {
+  "id": "25f39c44",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "We would appreciate the opportunity to present our idea.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "appreciate"
+  ],
+  "q": "We would ___ the opportunity to present our idea."
+ },
+ {
+  "id": "f06e7ab7",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Good morning. What would you like to organise?",
+  "mask": [],
+  "answers": [],
+  "q": "Good morning. What would you like to organise?"
+ },
+ {
+  "id": "89b4579a",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] When would you like to do it?",
+  "mask": [],
+  "answers": [],
+  "q": "When would you like to do it?"
+ },
+ {
+  "id": "7148bdf9",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] What do you need from the school?",
+  "mask": [],
+  "answers": [],
+  "q": "What do you need from the school?"
+ },
+ {
+  "id": "4db2ff0d",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Who is going to help you?",
+  "mask": [],
+  "answers": [],
+  "q": "Who is going to help you?"
+ },
+ {
+  "id": "cd569d11",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Why is it a good idea for the whole school?",
+  "mask": [],
+  "answers": [],
+  "q": "Why is it a good idea for the whole school?"
+ },
+ {
+  "id": "7ef33652",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] How will you make sure everyone feels welcome?",
+  "mask": [],
+  "answers": [],
+  "q": "How will you make sure everyone feels welcome?"
+ },
+ {
+  "id": "c63983f3",
+  "course": "4eso",
+  "lp": 6,
+  "page": "write-to-the-head-teacher",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] What will you do if not many families come?",
+  "mask": [],
+  "answers": [],
+  "q": "What will you do if not many families come?"
+ }
+]
