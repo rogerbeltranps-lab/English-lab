@@ -1,0 +1,128 @@
+shot 00-home-signed-out.png
+shot 00-home-signed-out.full.jpg
+shot 01-signin-window.png
+shot 01-signin-window-filled.png
+shot 4eso-09-exam-notice.png
+4eso-notice: 📝 Ja tens els resultats de l'examen de la LS1!
+shot 4eso-10-board.png
+shot 4eso-10-board.full.jpg
+shot 4eso-11-board-menu.png
+shot 4eso-12-board-box-0-box
+shot 4eso-12-board-box-1-my-week-plan-seasons-celebrati
+shot 4eso-12-board-box-2-getting-started-castanyada-hal
+shot 4eso-12-board-box-3-celebrations-around-the-world
+shot 4eso-12-board-box-4-recall-checkpoint-1
+shot 4eso-12-board-box-5-where-traditions-come-from
+shot 4eso-12-board-box-6-recall-checkpoint-2
+shot 4eso-12-board-box-7-research-it-right
+shot 4eso-12-board-box-8-plan-the-day
+shot 4eso-12-board-box-9-recall-checkpoint-3
+shot 4eso-12-board-box-10-write-to-the-head-teacher
+shot 4eso-12-board-box-11-recall-checkpoint-4
+shot 4eso-12-board-box-12-sample-exam
+shot 4eso-12-board-box-13-final-product-celebration-day-
+shot 4eso-12-board-box-14-reflect
+shot 4eso-12-board-box-15-ls-total
+shot 4eso-13-ask-route.png
+shot 4eso-13-ask-route-picked.png
+shot 4eso-14-criterion-window.png
+shot 4eso-20-course.png
+shot 4eso-20-course.full.jpg
+shot 4eso-30-ls.png
+shot 4eso-30-ls.full.jpg
+shot 4eso-31-ls-menu-open.png
+SKIPPED LS cards: locator.scrollIntoViewIfNeeded: Timeout 19995.706000000006ms exceeded.
+shot 4eso-40-getting-started.png
+shot 4eso-40-getting-started.full.jpg
+shot 4eso-40-getting-started-tab1.png
+shot 4eso-40-getting-started-tab2.png
+shot 4eso-40-getting-started-tab3.png
+shot 4eso-40-getting-started-tab4.png
+shot 4eso-41-celebrations-around-the-world.png
+shot 4eso-41-celebrations-around-the-world.full.jpg
+shot 4eso-41-celebrations-around-the-world-tab1.png
+shot 4eso-41-celebrations-around-the-world-tab2.png
+shot 4eso-41-celebrations-around-the-world-tab3.png
+shot 4eso-41-celebrations-around-the-world-tab4.png
+shot 4eso-41-celebrations-around-the-world-tab5.png
+shot 4eso-42-recall-checkpoint-1.png
+SKIPPED recall-checkpoint-1 tabs: locator.click: Timeout 20000ms exceeded.
+shot 4eso-43-where-traditions-come-from.png
+SKIPPED where-traditions-come-from tabs: locator.click: Timeout 20000ms exceeded.
+shot 4eso-44-write-to-the-head-teacher.png
+shot 4eso-44-write-to-the-head-teacher.full.jpg
+shot 4eso-44-write-to-the-head-teacher-tab1.png
+shot 4eso-44-write-to-the-head-teacher-tab2.png
+shot 4eso-44-write-to-the-head-teacher-tab3.png
+shot 4eso-44-write-to-the-head-teacher-tab4.png
+shot 4eso-44-write-to-the-head-teacher-tab5.png
+shot 4eso-45-celebration-day-proposal.png
+SKIPPED celebration-day-proposal tabs: locator.click: Timeout 20000ms exceeded.
+shot 4eso-46-sample-exam.png
+shot 4eso-46-sample-exam.full.jpg
+shot 4eso-46-sample-exam-tab1.png
+shot 4eso-46-sample-exam-tab2.png
+shot 4eso-46-sample-exam-tab3.png
+shot 4eso-46-sample-exam-tab4.png
+shot 4eso-46-sample-exam-tab5.png
+shot 4eso-47-reflect.png
+shot 4eso-47-reflect.full.jpg
+shot 4eso-47-reflect-tab1.png
+shot 4eso-50-problem-window.png
+shot 4eso-60-english-lab.png
+shot 4eso-60-english-lab.full.jpg
+shot 2eso-10-board.png
+shot 2eso-10-board.full.jpg
+shot 2eso-11-board-menu.png
+shot 2eso-12-board-box-0-box
+shot 2eso-12-board-box-1-my-week-plan-free-time-live
+shot 2eso-12-board-box-2-getting-started-what-do-you-do
+shot 2eso-12-board-box-3-what-are-they-doing
+shot 2eso-12-board-box-4-recall-checkpoint-1
+shot 2eso-12-board-box-5-now-or-usually
+shot 2eso-12-board-box-6-recall-checkpoint-2
+shot 2eso-12-board-box-7-check-the-source
+shot 2eso-12-board-box-8-likes-and-screen-tips
+shot 2eso-12-board-box-9-recall-checkpoint-3
+shot 2eso-12-board-box-10-write-your-vlog-script
+shot 2eso-12-board-box-11-recall-checkpoint-4
+shot 2eso-12-board-box-12-sample-exam
+shot 2eso-12-board-box-13-final-product-free-time-vlog
+shot 2eso-12-board-box-14-reflect
+shot 2eso-13-ask-route.png
+shot 2eso-13-ask-route-picked.png
+shot 2eso-14-criterion-window.png
+shot 2eso-20-course.png
+shot 2eso-20-course.full.jpg
+shot 2eso-30-ls.png
+shot 2eso-30-ls.full.jpg
+shot 2eso-31-ls-menu-open.png
+SKIPPED LS cards: locator.scrollIntoViewIfNeeded: Timeout 19996.245999999926ms exceeded.
+shot 2eso-40-getting-started.png
+shot 2eso-40-getting-started.full.jpg
+shot 2eso-40-getting-started-tab1.png
+shot 2eso-40-getting-started-tab2.png
+shot 2eso-40-getting-started-tab3.png
+shot 2eso-40-getting-started-tab4.png
+shot 2eso-41-now-or-usually.png
+SKIPPED now-or-usually tabs: locator.click: Timeout 20000ms exceeded.
+shot 2eso-42-recall-checkpoint-1.png
+SKIPPED recall-checkpoint-1 tabs: locator.click: Timeout 20000ms exceeded.
+shot 2eso-43-write-your-vlog-script.png
+SKIPPED write-your-vlog-script tabs: locator.click: Timeout 20000ms exceeded.
+shot 2eso-44-free-time-vlog.png
+SKIPPED free-time-vlog tabs: locator.click: Timeout 20000ms exceeded.
+shot 2eso-50-problem-window.png
+shot 2eso-60-english-lab.png
+shot 2eso-60-english-lab.full.jpg
+shot 70-phone-board.png
+shot 71-phone-ls.png
+shot 72-phone-ls-menu.png
+done: C:\Users\nidia\AppData\Local\Temp\claude\C--Developer\ba888c16-3135-4826-8f2f-3e20a063532b\scratchpad\el-video\tools\site-video\captures
+2eso-41-now-or-usually: not open yet (full-page shot removed)
+2eso-42-recall-checkpoint-1: not open yet (full-page shot removed)
+2eso-43-write-your-vlog-script: not open yet (full-page shot removed)
+2eso-44-free-time-vlog: not open yet (full-page shot removed)
+4eso-42-recall-checkpoint-1: not open yet (full-page shot removed)
+4eso-43-where-traditions-come-from: not open yet (full-page shot removed)
+4eso-45-celebration-day-proposal: not open yet (full-page shot removed)

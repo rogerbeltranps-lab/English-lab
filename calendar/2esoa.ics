@@ -1,0 +1,119 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//English Lab//Homework//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:English · 2ESO A
+X-WR-CALDESC:Homework, classes on your own and exams of 2ESO A (English Lab
+ )
+X-WR-TIMEZONE:Europe/Madrid
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-hw-2026-11-10-15qjuz2@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261106
+DTEND;VALUE=DATE:20261110
+SUMMARY:🏠 English homework for Tue 10 Nov: LP2 Speaking\, Talk and Liste
+ n again
+DESCRIPTION:LP2 Speaking\, Talk and Listen again\nFor the English class on 
+ Tue 10 Nov · Per a la classe d'anglès del dt. 10 nov..\nFree Time\, Live
+ !: https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html\nMy board / El meu tauler: https://rogerbeltranps-lab.github.io/E
+ nglish-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-hw-2026-11-13-1vjvn5g@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261112
+DTEND;VALUE=DATE:20261113
+SUMMARY:🏠 English homework for Fri 13 Nov: LP3 Speaking and Talk
+DESCRIPTION:LP3 Speaking and Talk\nFor the English class on Fri 13 Nov · P
+ er a la classe d'anglès del dv. 13 nov..\nFree Time\, Live!: https://roge
+ rbeltranps-lab.github.io/English-lab/2eso/free-time-live/index.html\nMy bo
+ ard / El meu tauler: https://rogerbeltranps-lab.github.io/English-lab/toda
+ y.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-hw-2026-11-17-hivsgt@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261113
+DTEND;VALUE=DATE:20261117
+SUMMARY:🏠 English homework for Tue 17 Nov: LP5 mixed practice\, Speaking
+ \, Talk and Listen again
+DESCRIPTION:LP5 mixed practice\, Speaking\, Talk and Listen again\nFor the 
+ English class on Tue 17 Nov · Per a la classe d'anglès del dt. 17 nov..\
+ nFree Time\, Live!: https://rogerbeltranps-lab.github.io/English-lab/2eso/
+ free-time-live/index.html\nMy board / El meu tauler: https://rogerbeltranp
+ s-lab.github.io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-hw-2026-11-19-174s2r@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261117
+DTEND;VALUE=DATE:20261119
+SUMMARY:🏠 English homework for Thu 19 Nov: LP6 vocabulary\, grammar and 
+ Listen again (Speaking and Talk after the exam)
+DESCRIPTION:LP6 vocabulary\, grammar and Listen again (Speaking and Talk af
+ ter the exam)\nFor the English class on Thu 19 Nov · Per a la classe d'an
+ glès del dj. 19 nov..\nFree Time\, Live!: https://rogerbeltranps-lab.gith
+ ub.io/English-lab/2eso/free-time-live/index.html\nMy board / El meu tauler
+ : https://rogerbeltranps-lab.github.io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-exam-2026-11-20-1alhb@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261120
+DTEND;VALUE=DATE:20261121
+SUMMARY:📝 English exam · Free Time\, Live!
+DESCRIPTION:Free Time\, Live!: https://rogerbeltranps-lab.github.io/English
+ -lab/2eso/free-time-live/index.html\nSample exam and summaries on my board
+  / Examen de prova i resums al meu tauler: https://rogerbeltranps-lab.gith
+ ub.io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/today.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-self-2026-11-24-sm9kq7@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261124
+DTEND;VALUE=DATE:20261125
+SUMMARY:📚 English class on your own: LP4 Check the source (1/2)
+DESCRIPTION:Your teacher is not in class today. Work on it on your own with
+  headphones and finish it at home.\nAvui el professor no hi és: treballa-
+ ho pel teu compte amb auriculars i acaba-ho a casa.\nFree Time\, Live!: ht
+ tps://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/index.h
+ tml
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-hw-2026-11-26-5szra@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261124
+DTEND;VALUE=DATE:20261126
+SUMMARY:🏠 English homework for Thu 26 Nov: LP6 Speaking and Talk (say yo
+ ur vlog script: first rehearsal)
+DESCRIPTION:LP6 Speaking and Talk (say your vlog script: first rehearsal)\n
+ For the English class on Thu 26 Nov · Per a la classe d'anglès del dj. 2
+ 6 nov..\nFree Time\, Live!: https://rogerbeltranps-lab.github.io/English-l
+ ab/2eso/free-time-live/index.html\nMy board / El meu tauler: https://roger
+ beltranps-lab.github.io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR

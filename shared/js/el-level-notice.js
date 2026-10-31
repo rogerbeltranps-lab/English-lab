@@ -16,7 +16,9 @@ export async function levelNotice({lv,seen,save,course}){
   const at=ms(last.d.changed),N=id=>((window.EL_LEVELS||[]).find(x=>x.id===id)||{}).name||id;
   const lvl=last.d.level,before=last.d.was&&last.d.was!==lvl?last.d.was:null,en=!(window.elCa?elCa(lvl):lvl==="beginners"||lvl==="insecure");
   const n="LS"+(L.indexOf(last.l)+1),ls=n+" · "+last.l.title.replace(/^\S+ · /,"");
-  const title=before?(en?`🧭 Your level has changed: ${N(lvl)}`:`🧭 Has canviat de nivell: ${N(lvl)}`):(en?`🧭 Your level: ${N(lvl)}`:`🧭 El teu nivell: ${N(lvl)}`);
+  // the title names course, route and CEFR level, e.g. "2ESO Starter (A1)" (Roger, 31 Oct 2026; elLevelLabel in el-catalog.js)
+  const full=window.elLevelLabel?elLevelLabel(course,lvl):N(lvl);
+  const title=before?(en?`🧭 Your level has changed: ${full}`:`🧭 Has canviat de nivell: ${full}`):(en?`🧭 Your level: ${full}`:`🧭 El teu nivell: ${full}`);
   const why=last.d.why==="exam"?(en?"Your teacher has set your level from your LS1 exam mark. ":"El professor t'ha posat el nivell a partir de la nota de l'examen de la LS1. "):"";
   const body=why+(en?`From ${ls} on, you work at ${N(lvl)} level${before?` (before: ${N(before)})`:""}. Your activities and Learning Paths follow this level, and the work you have already done is kept.`
     :`A partir de la ${ls}, treballes al nivell ${N(lvl)}${before?` (abans: ${N(before)})`:""}. Les teves activitats i els Learning Paths segueixen aquest nivell, i la feina que ja has fet es manté.`);
@@ -30,6 +32,6 @@ export async function levelNotice({lv,seen,save,course}){
     b.onclick=()=>{c.remove();Promise.resolve(save(course,at)).catch(e=>console.warn("level notice",e))};
     document.body.append(c);b.focus({preventScroll:true})};
   // one card at a time: after the teacher's answers to problem reports (el-reply.js) and the exam results card (el-exam-notice.js)
-  const wait=()=>document.getElementById("el-reply")||document.getElementById("el-corrections")||document.getElementById("el-exam-notice")?setTimeout(wait,600):show();
+  const wait=()=>document.getElementById("el-reply")||document.getElementById("el-announce")||document.getElementById("el-corrections")||document.getElementById("el-exam-notice")?setTimeout(wait,600):show();
   wait();
 }

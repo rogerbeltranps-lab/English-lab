@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practise on your own · English Lab</title>
+  <style>
+    /* Same look as English Lab (lab/index.html) */
+    :root{--bg:#f5f7fb;--surface:#fff;--text:#172033;--muted:#667085;--line:#e5e7eb;--accent:#3157d5;--accent-soft:#eaf0ff;--ok:#15803d;--no:#b91c1c;--shadow:0 14px 40px rgba(23,32,51,.08)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+    button,a,input,select{font:inherit}a{color:inherit}[hidden]{display:none!important}
+    .app{min-height:100vh;display:grid;grid-template-columns:240px 1fr}
+    .sidebar{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid var(--line);padding:24px 18px;display:flex;flex-direction:column;gap:24px}
+    .brand{font-weight:800;letter-spacing:-.03em;font-size:1.1rem;padding:0 10px;text-decoration:none}
+    .nav-tabs{display:flex;flex-direction:column;gap:8px}
+    .tab-btn{text-decoration:none;color:var(--muted);padding:12px 14px;border-radius:14px;font-weight:700}
+    .tab-btn:hover{background:var(--accent-soft);color:var(--accent)}.tab-btn.active{background:var(--accent);color:#fff}
+    .mobile-tabs{display:none}
+    .content{min-width:0;padding:28px;display:flex;justify-content:center;align-items:flex-start}
+    .panel{width:min(1100px,100%);background:var(--surface);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);padding:34px}
+    .eyebrow{display:inline-block;padding:8px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:800;font-size:.84rem;margin-bottom:14px}
+    h1{margin:0 0 6px;font-size:2rem;letter-spacing:-.04em}h2{margin:0 0 8px;font-size:1.3rem}h3{margin:0 0 6px;font-size:1.08rem}
+    .muted{color:var(--muted)}.lead{margin:0 0 18px;color:var(--muted);line-height:1.5}
+    .me{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:16px 18px;margin:0 0 18px}
+    .me .lbl{font-size:.85rem;color:var(--muted);font-weight:700}.me .big{font-size:1.5rem;font-weight:800;letter-spacing:-.02em}.me p{margin:4px 0 0;line-height:1.45}
+    .cefr{display:inline-block;background:#0f766e;color:#fff;border-radius:10px;padding:2px 9px;margin-left:4px}
+    .levels{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 16px}
+    .lv{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:118px;border:2px solid var(--line);background:#fff;border-radius:16px;padding:10px 14px;cursor:pointer;text-align:left}
+    .lv b{font-size:1.35rem;letter-spacing:-.02em}.lv span{font-size:.82rem;color:var(--muted);font-weight:700}
+    .lv.on{border-color:var(--accent);background:var(--accent-soft)}.lv.rec{position:relative}.lv.rec::after{content:"⭐";position:absolute;top:6px;right:8px}
+    .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+    .chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:5px 13px;cursor:pointer}.chip.on{background:#172033;color:#fff;border-color:#172033}
+    select{border:1px solid #cbd5e1;border-radius:10px;padding:5px 8px;background:#fff;max-width:100%}
+    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+    .tab{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px;cursor:pointer;text-align:left;font-weight:800}
+    .tab small{display:block;font-weight:600;color:var(--muted);margin-top:2px}.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}.tab.on small{color:#dbe4ff}
+    .card{border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;background:#fff}
+    .how{background:#f8fafc;border-radius:14px;padding:10px 14px;margin:0 0 12px;line-height:1.5}
+    .btn{border:0;background:var(--accent);color:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:700}
+    .btn.g{background:var(--accent-soft);color:var(--accent)}.btn.ok{background:var(--ok)}.btn:disabled{opacity:.5;cursor:default}
+    .btn.sm{padding:5px 12px;font-size:.9rem}.btn[aria-pressed="true"]{background:#172033;color:#fff}
+    .flash{min-height:210px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:8px;border:2px solid var(--line);border-radius:22px;padding:22px;background:linear-gradient(180deg,#fff,#f8fafc)}
+    .flash .en{font-size:1.9rem;font-weight:800;letter-spacing:-.02em}.flash .ca{font-size:1.25rem;color:#0f766e;font-weight:700}.flash .ex{color:var(--muted);font-style:italic}
+    .star{color:#d97706}
+    .q{padding:10px 0;border-bottom:1px solid #f1f5f9}.q:last-child{border:0}.q p{margin:0 0 6px;font-weight:700}
+    .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+    .opt{border:2px solid #cbd5e1;background:#fff;border-radius:12px;padding:8px 10px;text-align:left;cursor:pointer}
+    .opt.on{border-color:var(--accent);background:var(--accent-soft)}.opt.right{border-color:var(--ok);background:#dcfce7}.opt.wrong{border-color:var(--no);background:#fee2e2}
+    .fb{font-weight:700;margin:6px 0 0}.fb.ok{color:var(--ok)}.fb.no{color:var(--no)}.hint{color:#92400e;background:#fffbeb;border-radius:8px;padding:4px 8px;display:inline-block;margin-top:4px}
+    .typed{width:100%;max-width:420px;border:2px solid #cbd5e1;border-radius:12px;padding:8px 10px}.typed.right{border-color:var(--ok)}.typed.wrong{border-color:var(--no)}
+    .bank,.line{display:flex;flex-wrap:wrap;gap:6px;min-height:46px;padding:8px;border:1px dashed #cbd5e1;border-radius:12px;margin:6px 0}
+    .line{border-style:solid;background:#f8fafc}.w{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:5px 10px;cursor:pointer}.w.used{visibility:hidden}
+    .line.right{border-color:var(--ok);background:#f0fdf4}.line.wrong{border-color:var(--no);background:#fef2f2}
+    .script{background:#f8fafc;border-radius:12px;padding:10px 14px;line-height:1.6;max-height:340px;overflow:auto}.script p{margin:.3em 0}
+    .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+    .item{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;cursor:pointer;text-align:left}
+    .item:hover{box-shadow:var(--shadow)}.item small{display:block;color:var(--muted);margin-top:4px}.done{color:var(--ok);font-weight:800}
+    video,audio{width:100%;border-radius:14px;margin:8px 0}video{background:#000}
+    .yt{position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;margin:8px 0}.yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .empty{padding:18px;border-radius:14px;background:#f8fafc;color:var(--muted)}
+    .signin{padding:22px;border:1px solid var(--line);border-radius:20px;background:#f8fafc}
+    @media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}
+      .mobile-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+      .mobile-tabs .tab-btn{white-space:nowrap;background:#fff;border:1px solid var(--line)}.mobile-tabs .tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+      .content{padding:14px}.panel{padding:22px}.tabs{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:620px){.panel{padding:16px;border-radius:22px}.lv{min-width:0;flex:1 1 40%}.flash .en{font-size:1.5rem}}
+  </style>
+  <script src="../shared/js/el-catalog.js"></script>
+</head>
+<body>
+  <nav class="mobile-tabs"><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">English Lab</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
+  <div class="app">
+  <aside class="sidebar"><a class="brand" href="../index.html">English with Roger</a>
+    <nav class="nav-tabs"><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">English Lab</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
+  </aside>
+  <main class="content"><section class="panel">
+    <span class="eyebrow">English Lab</span>
+    <h1 id="title">Practise on your own</h1>
+    <p class="lead" id="lead">Loading…</p>
+    <div id="app"></div>
+  </section></main>
+  </div>
+
+<script type="module">
+/* Self-practice by level (Roger, 31 Oct 2026, thread "Build a self-practice area by level"): the word cards, sentence builder,
+   listenings and shadowing of the student's LSs, organised by level (the route with its CEFR label, EL_CEFR in el-catalog.js) and
+   with the student's own level recommended. Nothing new: the page reads the LS content itself (LS2-style pages: <ls>/data/<page>.js,
+   Pro panels from data/native/; LS1 pages: the vocabMap / ca / examples / levelInfo / listening objects in the page), so a new LS
+   appears here on its own. Only the LSs and Learning Paths the student can open (status, group, paths opened by the teacher).
+   Everything corrects itself and nothing is handed in: progress stays in this browser (el_ key, never synced). */
+const DEMO = window.EL_DEMO_STUDENT;   // preview: {group, levels:{ls:{level}}, ls:{id:info}, teacher}
+let F = null;
+if (!DEMO) { await import('../shared/js/el-cloud.js'); F = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js'); }
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const ROOT = '../';
+const ROUTES = ['beginners', 'insecure', 'safe', 'daring'];
+const KEY = 'el_practice';   // el_ keys stay in this browser
+const store = (() => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch (e) { return {} } })();
+const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(store)) } catch (e) {} };
+store.known = store.known || {}; store.listen = store.listen || {}; store.shadow = store.shadow || {};
+
+/* ---------- routes, as in the LS2 engine: cumulative r: tags, Starter falls back to Base, Pro to Plus ---------- */
+const base = lv => lv === 'native' ? 'daring' : lv;
+const inR = (x, lv) => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(base(lv)) && (!x.only || x.only.includes(base(lv)));
+const forLevel = (items, lv) => !items ? [] : Array.isArray(items) ? items.filter(x => inR(x, lv))
+  : (items[lv] || items[base(lv)] || (base(lv) === 'beginners' ? items.insecure : null) || []);
+const byLevel = (o, lv) => o == null ? '' : typeof o === 'string' ? o
+  : o.ca != null || o.en != null ? (elCa(base(lv)) ? (o.ca || o.en) : (o.en || o.ca))
+  : (o[lv] ?? o[base(lv)] ?? (base(lv) === 'daring' ? o.safe : null) ?? o.insecure ?? '');
+const tx = o => o == null ? '' : typeof o === 'string' ? o : (o.en || o.ca || '');
+const ls1Level = lv => lv === 'beginners' ? 'insecure' : base(lv);
+
+/* ---------- reading the LS content ---------- */
+const loadScript = src => new Promise(res => { const s = document.createElement('script'); s.src = src; s.onload = () => { s.remove(); res(true) }; s.onerror = () => { s.remove(); res(false) }; document.head.append(s) });
+let queue = Promise.resolve();   // the data files all set window.LP: one at a time
+const serial = f => (queue = queue.then(f, f));
+// one object literal from a page's script: const name={…} / [...] (quote-aware bracket matching)
+function grab(html, name) {
+  const i = html.search(new RegExp('\\bconst ' + name + '\\s*=\\s*[\\[{]')); if (i < 0) return null;
+  const j = html.indexOf(html.slice(i).match(/[\[{]/)[0], i), open = html[j], close = open === '{' ? '}' : ']';
+  let d = 0, q = null;
+  for (let k = j; k < html.length; k++) {
+    const c = html[k];
+    if (q) { if (c === '\\') k++; else if (c === q) q = null; continue; }
+    if (c === '"' || c === "'" || c === '`') q = c;
+    else if (c === open) d++;
+    else if (c === close && --d === 0) { try { return Function('"use strict";return (' + html.slice(j, k + 1) + ')')(); } catch (e) { return null; } }
+  }
+  return null;
+}
+const PAGES = {};
+function loadPage(a) {
+  if (PAGES[a.id]) return PAGES[a.id];
+  const dir = ROOT + a.path.replace(/[^/]+$/, ''), file = a.path.split('/').pop().replace(/\.html$/, '');
+  return PAGES[a.id] = serial(async () => {
+    window.LP = undefined;
+    if (await loadScript(dir + 'data/' + file + '.js') && window.LP && Array.isArray(window.LP.panels)) {
+      const LP = window.LP; window.LP = undefined;
+      return { kind: 'engine', a, dir, file, LP };
+    }
+    window.LP = undefined;
+    try {
+      const html = await (await fetch(ROOT + a.path)).text();
+      if (!/const (vocabMap|levelInfo|listening)\s*=/.test(html)) return null;
+      const src = (html.match(/<audio[^>]*>\s*<source src="([^"]+)"/) || [])[1];
+      return { kind: 'ls1', a, dir, vocab: grab(html, 'vocabMap'), ca: grab(html, 'ca') || {}, ex: grab(html, 'examples') || {}, info: grab(html, 'levelInfo') || {}, listening: grab(html, 'listening'), audio: src ? new URL(src, new URL(ROOT + a.path, location.href)).href : null };
+    } catch (e) { return null; }
+  });
+}
+// Pro panels (data/native/<page>.js adds LP.native to the page's LP); only for an LS with Pro content (EL_LS pro:true)
+function loadNative(pg) {
+  if (!pg || pg.kind !== 'engine') return Promise.resolve(pg);
+  if (pg.nativeTried) return pg.nativeTried;
+  return pg.nativeTried = serial(async () => {
+    window.LP = pg.LP;
+    try { if (await loadScript(pg.dir + 'data/native/' + pg.file + '.js')) pg.native = pg.LP.native || null; } catch (e) {}
+    window.LP = undefined; return pg;
+  });
+}
+function panelsOf(pg, lv) {
+  const P = pg.LP.panels || [], N = lv === 'native' && pg.native;
+  if (!N) return P;
+  const extra = Object.keys(N).filter(k => N[k] && N[k].after && !P.some(p => p.id === k)), as = k => Object.assign({}, N[k], { id: k });
+  return P.flatMap(p => [N[p.id] ? as(p.id) : p].concat(extra.filter(k => N[k].after === p.id).map(as)));
+}
+const plain = h => String(h || '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+const MAXW = { beginners: 8, insecure: 10, safe: 14, daring: 18, native: 18 }, MINW = { beginners: 3, insecure: 3, safe: 4, daring: 5, native: 5 };
+const sentences = (text, lv) => plain(text).split(/(?<=[.!?])\s+(?=[A-Z“"‘'¿¡])/).map(s => s.trim())
+  .filter(s => { const n = s.split(/\s+/).length; return n >= MINW[lv] && n <= MAXW[lv] && /[.!?]$/.test(s) && !/___|…|\[|\]|\s\/\s|\.\.\./.test(s); });
+
+// What a page gives one level: words, sentences to build, listenings (with their questions) and shadowing clips.
+function extract(pg, lv) {
+  const out = { words: [], build: [], listen: [], shadow: [] }, lp = pg.a.title, at = pg.a.id;
+  if (pg.kind === 'ls1') {
+    const L = ls1Level(lv);
+    (pg.vocab && pg.vocab[L] || []).forEach(([g, list]) => (list || []).forEach(en => out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at })));
+    ((pg.info[L] || {}).builders || []).forEach(b => out.build.push({ s: b.join(' '), lp, at }));
+    const qs = pg.listening && pg.listening[L];
+    if (pg.audio && Array.isArray(qs) && qs.length)
+      out.listen.push({ key: at + '#listen', title: lp, lp, media: { kind: 'audio', src: pg.audio }, items: qs.map(q => ({ q: q.q, o: [q.o[q.a]].concat(q.o.filter((x, i) => i !== q.a)) })) });
+    return out;
+  }
+  const texts = [];
+  panelsOf(pg, lv).forEach(p => {
+    if (p.type === 'vocab') {
+      const core = new Set(forLevel(p.core, lv));
+      (p.groups || []).filter(g => inR(g, lv)).forEach(g => (g.items || []).forEach(it => {
+        const [en, ca, ex] = Array.isArray(it) ? it : [it.en, it.ca, it.ex];
+        if (en) out.words.push({ en, ca: ca || '', ex: ex || '', g: g.g, core: core.has(en), lp, at });
+      }));
+    }
+    const m = p.media;
+    if (m && p.items && /^(mc|quiz)$/.test(p.type)) {
+      let media = null;
+      if (m.audio) media = { kind: 'audio', src: pg.dir + m.audio, slow: pg.dir + m.audio.replace(/\.mp3$/, '-slow.mp3'), script: m.script };
+      else if (Array.isArray(m.videos) && m.videos.length) media = { kind: 'video', list: m.videos.map(v => ({ title: v.title, src: pg.dir + v.base + '.mp4', slow: pg.dir + v.base + '-slow.mp4', vtt: pg.dir + v.base + '.vtt', vttSlow: pg.dir + v.base + '-slow.vtt', poster: pg.dir + v.base + '-poster.jpg' })), credit: m.videoCredit };
+      else if (m.youtube) media = { kind: 'yt', id: m.youtube, credit: m.credit };
+      const items = forLevel(p.items, lv).filter(q => Array.isArray(q.o) && q.o.length > 1);
+      if (media && items.length) {
+        let title = m.title || (media.list && media.list.map(v => v.title).join(' · ')) || tx(p.title);
+        if (out.listen.some(x => x.title === title)) title += ' · ' + tx(p.tab);   // the same recording twice in a page (e.g. the sample exam)
+        out.listen.push({ key: at + '#' + p.id, title, lp, media, items });
+      }
+    }
+    if (p.type === 'shadow' && p.clip) { const c = p.clip; out.shadow.push({ key: at + '#' + p.id, title: c.title || tx(p.title), lp, src: pg.dir + c.src, slow: c.slow ? pg.dir + c.slow : null, t: c.t, ts: c.ts, lines: c.lines || [], video: !!c.video || /\.mp4$/.test(c.src), poster: c.poster ? pg.dir + c.poster : null }); }
+    if ((p.type === 'speaking' || p.type === 'talk' || p.type === 'writing') && p.model) texts.push(byLevel(p.model, lv));
+  });
+  const seen = new Set();
+  texts.concat(out.words.map(w => w.ex)).forEach(t => sentences(t, lv).forEach(s => { if (!seen.has(s)) { seen.add(s); out.build.push({ s, lp, at }); } }));
+  return out;
+}
+
+/* ---------- who is here ---------- */
+const COURSES = { '2eso': '2 ESO', '4eso': '4 ESO' };
+const S = { tab: (location.hash.slice(1) || 'words'), course: null, level: null, ls: 'all', lp: 'all', mode: 'cards', coreOnly: null, open: null };
+if (!['words', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
+let U = null, D = null, EN = true;
+const t = (ca, en) => EN ? en : ca;
+const all = () => DEMO ? !!DEMO.teacher : !!U && (ELCloud.isTeacher(U) || (ELCloud.isTester(U) && !ELCloud.viewGroup()));
+async function load(u) {
+  if (DEMO) return { group: DEMO.group, lv: DEMO.levels || {}, ls: DEMO.ls || {} };
+  const db = ELCloud.db, D = { group: ELCloud.viewGroup() || ELCloud.group(), lv: {}, ls: {} };
+  try { (await F.getDocs(F.collection(db, 'students', u.uid, 'levels'))).forEach(l => D.lv[l.id] = l.data()); } catch (e) {}
+  for (const l of EL_LS) D.ls[l.id] = await ELCloud.lsInfo(l.id);
+  return D;
+}
+const myCourse = () => (EL_GROUPS.find(g => g.id === D.group) || {}).course || null;
+const visibleLS = c => EL_LS.filter(l => l.course === c && (all() || ((D.ls[l.id] || {}).status || 'hidden') !== 'hidden' && elLsForGroup(l, D.ls[l.id], D.group)));
+const canDo = a => { const i = D.ls[a.ls] || {}; return all() || i.status === 'closed' || elLpOpen(a, i, D.group); };
+// the student's level now: the route of the latest LS they can see (elRouteOf carries it over from earlier LSs)
+const myLevel = () => { if (all()) return null; const L = visibleLS(myCourse()); return L.length ? elRouteOf(D.lv, L[L.length - 1].id).level : null; };
+const levelsOf = c => ROUTES.concat(c === '4eso' && (all() || myLevel() === 'native') ? ['native'] : []);
+const name = lv => (EL_LEVELS.find(l => l.id === lv) || {}).name || lv;
+
+/* ---------- content for the level on screen ---------- */
+async function content() {
+  const L = visibleLS(S.course).filter(l => S.ls === 'all' || l.id === S.ls), acts = [];
+  L.forEach(l => EL_CATALOG.filter(a => a.ls === l.id && !a.manual && !a.inClass && !a.checkpoint && !/reflect$/.test(a.id) && canDo(a)).forEach(a => acts.push({ a, l })));
+  const out = { words: [], build: [], listen: [], shadow: [], lps: acts, ls: L };
+  const pages = await Promise.all(acts.map(({ a, l }) => loadPage(a).then(pg => S.level === 'native' && l.pro ? loadNative(pg) : pg)));
+  pages.forEach((pg, i) => { if (!pg || (S.lp !== 'all' && acts[i].a.id !== S.lp)) return; const x = extract(pg, S.level); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l })))); });
+  const seen = new Set(); out.words = out.words.filter(w => { const k = w.en.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+  return out;
+}
+
+/* ---------- page ---------- */
+function header() {
+  const mine = myLevel(), c = S.course, rec = mine || 'insecure', L = levelsOf(c);
+  const label = lv => esc(elLevelLabel(c, lv));
+  const meBox = all() ? `<div class="me"><div><div class="lbl">${t('Vista del professor', 'Teacher view')}</div><div class="big">${COURSES[c]}</div><p class="muted">${t('Tria un curs i un nivell per veure el que hi practiquen els alumnes.', 'Choose a course and a level to see what students practise there.')}</p></div>
+      <div class="row">${Object.keys(COURSES).map(k => `<button class="chip ${k === c ? 'on' : ''}" data-do="course" data-v="${k}">${COURSES[k]}</button>`).join('')}</div></div>`
+    : `<div class="me"><div><div class="lbl">${t('El teu nivell', 'Your level')}</div><div class="big">${mine ? label(mine) : t('Encara no en tens', 'Not set yet')}</div>
+      <p>${mine ? t(`Et recomanem practicar al nivell <b>${elCefr(c, rec)}</b>: és el de la teva ruta.`, `We recommend practising at <b>${elCefr(c, rec)}</b>: it is your route's level.`) + (L.indexOf(rec) < L.length - 1 ? t(' Quan et sembli fàcil, prova el següent.', ' When it feels easy, try the next one.') : '')
+        : t(`El professor encara no t'ha posat el nivell. Comença pel <b>${elCefr(c, rec)}</b>.`, `Your teacher has not set your level yet. Start with <b>${elCefr(c, rec)}</b>.`)}</p></div></div>`;
+  return meBox + `<div class="levels" role="group" aria-label="${t('Nivell', 'Level')}">${L.map(lv => `<button class="lv ${lv === S.level ? 'on' : ''} ${lv === rec && !all() ? 'rec' : ''}" data-do="level" data-v="${lv}" aria-pressed="${lv === S.level}" title="${esc(elCefr(c, lv, true))}"><b>${esc(elCefr(c, lv))}</b><span>${esc(name(lv))}${lv === rec && !all() ? ' · ' + t('recomanat', 'recommended') : ''}</span></button>`).join('')}</div>`;
+}
+function filters(x) {
+  const L = visibleLS(S.course);
+  return `<div class="row">${L.length > 1 ? `<button class="chip ${S.ls === 'all' ? 'on' : ''}" data-do="ls" data-v="all">${t('Totes les LS', 'All LSs')}</button>` : ''}${L.map((l, i) => `<button class="chip ${S.ls === l.id ? 'on' : ''}" data-do="ls" data-v="${l.id}">LS${EL_LS.filter(y => y.course === S.course).indexOf(l) + 1} · ${esc(l.title.replace(/^\S+ · /, ''))}</button>`).join('')}
+    ${x.lps.length > 1 ? `<select data-do="lp" aria-label="Learning Path"><option value="all">${t('Tots els Learning Paths', 'All Learning Paths')}</option>${x.lps.map(({ a }) => `<option value="${a.id}" ${S.lp === a.id ? 'selected' : ''}>${esc(a.title)}</option>`).join('')}</select>` : ''}</div>`;
+}
+const TABS = [['words', '🃏', 'Word cards', 'Targetes de paraules', 'Vocabulari de la teva ruta', 'Vocabulary of your route'], ['build', '🧩', 'Sentence builder', 'Sentence builder', 'Ordena les paraules', 'Put the words in order'],
+  ['listen', '🎧', 'Listening', 'Listening', 'Escoltes amb preguntes', 'Listenings with questions'], ['shadow', '🗣', 'Shadowing', 'Shadowing', 'Escolta i repeteix', 'Listen and repeat']];
+let X = null, gen = 0;
+async function render() {
+  const g = ++gen;
+  $('#app').innerHTML = header() + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`;
+  const x = await content(); if (g !== gen) return; X = x;
+  const n = { words: x.words.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length + x.ls.filter(l => l.shadowing).length };
+  $('#app').innerHTML = header() + filters(x)
+    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
+  ({ words: words, build: build, listen: listen, shadow: shadow })[S.tab]();
+}
+const none = () => `<div class="empty">${t('Encara no hi ha res per practicar aquí: apareixerà quan el professor obri més Learning Paths.', 'Nothing to practise here yet: it will appear when your teacher opens more Learning Paths.')}</div>`;
+const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
+const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+const say = s => { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(s.replace(/\s\/\s/g, ', ')); u.lang = 'en-GB'; u.rate = elCa(base(S.level)) ? .85 : 1; speechSynthesis.speak(u); } catch (e) {} };
+
+/* 🃏 Word cards: turn the card over, or test yourself (Catalan → English, checked at once) */
+let deck = [], di = 0, flipped = false, test = [];
+function words() {
+  const ws = X.words, hasCore = ws.some(w => w.core);
+  if (S.coreOnly == null) S.coreOnly = base(S.level) === 'beginners' && hasCore;
+  const list = S.coreOnly && hasCore ? ws.filter(w => w.core) : ws;
+  if (!list.length) return $('#body').innerHTML = none();
+  const head = `<div class="row"><button class="btn sm" aria-pressed="${S.mode === 'cards'}" data-do="mode" data-v="cards">${t('Targetes', 'Cards')}</button><button class="btn sm" aria-pressed="${S.mode === 'test'}" data-do="mode" data-v="test">${t('Posa’t a prova', 'Test me')}</button>
+    ${hasCore ? `<label style="margin-left:6px"><input type="checkbox" data-do="core" ${S.coreOnly ? 'checked' : ''}> ${t('Només les paraules clau', 'Key words only')} <span class="star">⭐</span></label>` : ''}<span class="muted">· ${list.length} ${t('paraules', 'words')}</span></div>`;
+  if (S.mode === 'test') {
+    const pool = list.filter(w => w.ca && !/\+|…|___/.test(w.en));
+    if (!test.length || test.some(w => !pool.includes(w))) test = shuffle(pool).slice(0, 10);
+    $('#body').innerHTML = head + `<div class="card"><div class="how">${t('Llegeix la paraula en català i escriu-la en anglès. Prem <b>Comprova</b>.', 'Read the word in Catalan and type it in English. Press <b>Check</b>.')}</div>`
+      + test.map((w, i) => `<div class="q"><p>${i + 1}. ${esc(w.ca)}${w.core ? ' <span class="star">⭐</span>' : ''}</p><input class="typed" id="tw${i}" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="fb" id="tf${i}"></div></div>`).join('')
+      + `<div class="row"><button class="btn" data-do="tcheck">${t('Comprova', 'Check')}</button><button class="btn g" data-do="tnew">${t('Unes altres', 'New words')}</button><span class="fb" id="tscore"></span></div></div>`;
+    return;
+  }
+  const ids = list.map(w => w.en).join('|');
+  if (deck.ids !== ids) { deck = shuffle(list); deck.ids = ids; di = 0; flipped = false; }
+  if (di >= deck.length) { $('#body').innerHTML = head + `<div class="card flash"><div class="en">🎉 ${t('Has acabat el paquet!', 'You finished the deck!')}</div><p class="muted">${t('Torna-hi demà: repassar sovint és el que fa que les paraules es quedin.', 'Come back tomorrow: reviewing often is what makes words stick.')}</p><button class="btn" data-do="again">${t('Torna a començar', 'Start again')}</button></div>`; return; }
+  const w = deck[di];
+  $('#body').innerHTML = head + `<div class="card"><div class="how">${t('Mira la paraula, digues-la en veu alta i pensa què vol dir. Després gira la targeta.', 'Look at the word, say it out loud and think what it means. Then turn the card over.')}</div>
+    <div class="flash"><div class="muted">${di + 1} / ${deck.length} · ${esc(w.lp)}</div><div class="en">${esc(w.en)} ${w.core ? '<span class="star" title="key word">⭐</span>' : ''}</div><button class="btn g sm" data-do="say" data-v="${esc(w.en)}">🔊 ${t('Escolta', 'Listen')}</button>
+    ${flipped ? `<div class="ca">${esc(w.ca)}</div>${w.ex ? `<div class="ex">${esc(w.ex)}</div>` : ''}<div class="row" style="justify-content:center"><button class="btn ok" data-do="know">✓ ${t('Ho sabia', 'I knew it')}</button><button class="btn g" data-do="later">↺ ${t('Encara no', 'Not yet')}</button></div>`
+      : `<button class="btn" data-do="flip">${t('Gira la targeta', 'Turn over')}</button>`}</div></div>`;
+}
+const variants = en => { const v = new Set([en]); en.split(/\s\/\s/).forEach(x => v.add(x)); [...v].forEach(x => v.add(x.replace(/\([^)]*\)/g, ''))); return [...v].map(norm).filter(Boolean); };
+function tcheck() {
+  let ok = 0;
+  test.forEach((w, i) => { const inp = $('#tw' + i), f = $('#tf' + i), right = variants(w.en).includes(norm(inp.value)); if (right) ok++;
+    inp.className = 'typed ' + (right ? 'right' : 'wrong'); f.className = 'fb ' + (right ? 'ok' : 'no'); f.innerHTML = right ? '✓' : '✗ ' + t('Resposta', 'Answer') + ': <b>' + esc(w.en) + '</b>'; if (right) store.known[w.en] = Date.now(); });
+  keep(); $('#tscore').textContent = ok + ' / ' + test.length + (ok === test.length ? ' 🎉' : '');
+}
+
+/* 🧩 Sentence builder: sentences of the route's models and examples, words shuffled */
+let set = [], built = [];
+function build() {
+  if (!X.build.length) return $('#body').innerHTML = none();
+  const ids = X.build.map(b => b.s).join('|');
+  if (set.ids !== ids) { set = shuffle(X.build).slice(0, 6); set.ids = ids; set.words = set.map(b => shuffle(b.s.split(/\s+/).map((w, i) => ({ w, i })))); built = set.map(() => []); }
+  $('#body').innerHTML = `<div class="card"><div class="how">${t('Toca les paraules en ordre per fer la frase. Toca una paraula de la frase per treure-la. Després prem <b>Comprova</b>.', 'Tap the words in order to build the sentence. Tap a word in your sentence to take it out. Then press <b>Check</b>.')}</div>`
+    + set.map((b, i) => `<div class="q"><p>${i + 1}. <small class="muted">${esc(b.lp)}</small></p><div class="line" id="bl${i}">${built[i].map(j => `<button class="w" data-do="unpick" data-i="${i}" data-j="${j}">${esc(set.words[i][j].w)}</button>`).join('')}</div>
+      <div class="bank">${set.words[i].map((x, j) => `<button class="w ${built[i].includes(j) ? 'used' : ''}" data-do="pick" data-i="${i}" data-j="${j}">${esc(x.w)}</button>`).join('')}</div><div class="fb" id="bf${i}"></div></div>`).join('')
+    + `<div class="row"><button class="btn" data-do="bcheck">${t('Comprova', 'Check')}</button><button class="btn g" data-do="bnew">${t('Unes altres frases', 'New sentences')}</button><span class="fb" id="bscore"></span></div></div>`;
+}
+function bcheck() {
+  let ok = 0;
+  set.forEach((b, i) => { const mine = built[i].map(j => set.words[i][j].w).join(' '), right = mine === b.s; if (right) ok++;
+    $('#bl' + i).className = 'line ' + (right ? 'right' : 'wrong'); const f = $('#bf' + i); f.className = 'fb ' + (right ? 'ok' : 'no');
+    f.innerHTML = right ? '✓ <button class="btn g sm" data-do="say" data-v="' + esc(b.s) + '">🔊</button>' : '✗ ' + t('Frase correcta', 'Correct sentence') + ': <b>' + esc(b.s) + '</b>'; });
+  $('#bscore').textContent = ok + ' / ' + set.length + (ok === set.length ? ' 🎉' : '');
+}
+
+/* 🎧 Listening: the LS listenings and videos with the route's questions; Starter starts on the slow copy */
+let ans = {};
+function listen() {
+  if (!X.listen.length) return $('#body').innerHTML = none();
+  const e = X.listen.find(x => x.key === S.open);
+  if (!e) {
+    $('#body').innerHTML = `<div class="how">${t('Tria una escolta. Escolta-la, respon les preguntes i comprova. Pots repetir-la tantes vegades com vulguis.', 'Choose a listening. Listen, answer the questions and check. You can do it again as many times as you like.')}</div><div class="list">`
+      + X.listen.map(x => { const b = store.listen[x.key + '@' + S.level]; return `<button class="item" data-do="open" data-v="${esc(x.key)}"><b>${x.media.kind === 'audio' ? '🎧' : '🎬'} ${esc(x.title)}</b><small>${esc(x.lp)} · ${x.items.length} ${t('preguntes', 'questions')}</small>${b ? `<small class="done">✓ ${t('Millor', 'Best')}: ${b}</small>` : ''}</button>`; }).join('') + `</div>`;
+    return;
+  }
+  const slow = elCa(base(S.level)) && base(S.level) === 'beginners', m = e.media;
+  if (!e.order) e.order = e.items.map(q => shuffle(q.o));
+  ans = {};
+  let media = '';
+  if (m.kind === 'audio') media = `<audio id="aud" controls preload="metadata" src="${esc(slow && m.slow ? m.slow : m.src)}"></audio>${m.slow ? `<div class="row"><button class="btn sm" data-do="speed" data-v="0" aria-pressed="${!slow}">${t('Velocitat normal', 'Normal speed')}</button><button class="btn sm" data-do="speed" data-v="1" aria-pressed="${slow}">${t('Més lent', 'Slower')}</button></div>` : ''}`;
+  else if (m.kind === 'video') media = m.list.map(v => `<p><b>${esc(v.title || '')}</b></p><video controls preload="metadata" playsinline poster="${esc(v.poster)}" src="${esc(slow ? v.slow : v.src)}"><track kind="subtitles" srclang="en" label="English" src="${esc(slow ? v.vttSlow : v.vtt)}" ${slow ? 'default' : ''}></video>`).join('') + `<p class="muted">${t('Subtítols: botó CC del vídeo. Mira’l primer sense.', 'Subtitles: the CC button on the video. Watch it once without them first.')}</p>`;
+  else media = `<div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(m.id)}" title="${esc(e.title)}" allowfullscreen></iframe></div>`;
+  $('#body').innerHTML = `<div class="row"><button class="btn g sm" data-do="close">← ${t('Totes les escoltes', 'All listenings')}</button></div><div class="card"><h3>${esc(e.title)}</h3>${e.lp !== e.title ? `<p class="muted">${esc(e.lp)}</p>` : ''}${media}${m.credit ? `<p class="muted"><small>${esc(m.credit)}</small></p>` : ''}</div>
+    <div class="card">${e.items.map((q, i) => `<div class="q"><p>${i + 1}. ${esc(q.q)}</p><div class="opts">${e.order[i].map((o, j) => `<button class="opt" data-do="ans" data-i="${i}" data-j="${j}">${esc(o)}</button>`).join('')}</div><div class="fb" id="lf${i}"></div></div>`).join('')}
+    <div class="row"><button class="btn" data-do="lcheck">${t('Comprova', 'Check')}</button><span class="fb" id="lscore"></span></div><div id="lscript"></div></div>`;
+}
+function lcheck() {
+  const e = X.listen.find(x => x.key === S.open); let ok = 0;
+  e.items.forEach((q, i) => {
+    const j = ans[i], right = j != null && e.order[i][j] === q.o[0], f = $('#lf' + i); if (right) ok++;
+    $$(`[data-do="ans"][data-i="${i}"]`).forEach((b, k) => { b.classList.toggle('right', e.order[i][k] === q.o[0] && (right || j != null)); b.classList.toggle('wrong', k === j && !right); });
+    f.className = 'fb ' + (right ? 'ok' : 'no'); f.innerHTML = right ? '✓' : (j == null ? t('Tria una resposta.', 'Choose an answer.') : '✗') + (q.h && elCa(base(S.level)) && j != null && !right ? ' <span class="hint">💡 ' + esc(q.h) + '</span>' : '');
+  });
+  const k = e.key + '@' + S.level, sc = ok + '/' + e.items.length, prev = store.listen[k];
+  if (!prev || ok > +prev.split('/')[0]) { store.listen[k] = sc; keep(); }
+  $('#lscore').textContent = sc + (ok === e.items.length ? ' 🎉' : '');
+  const sc2 = e.media.script; if (sc2 && sc2.length) $('#lscript').innerHTML = `<details style="margin-top:10px"><summary>${t('Mostra el text de l’escolta', 'Show the script')}</summary><div class="script">${sc2.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<b>' + esc(l[0]) + ':</b> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('')}</div></details>`;
+}
+
+/* 🗣 Shadowing: the unit's shadowing video and every Learning Path clip (play, slower copy, hide the script, record yourself) */
+let rec = null;
+function shadow() {
+  const vids = X.ls.filter(l => l.shadowing);
+  if (!X.shadow.length && !vids.length) return $('#body').innerHTML = none();
+  const ca = elCa(base(S.level));
+  $('#body').innerHTML = `<div class="how"><b>${t('Com es fa', 'How it works')}</b> · ${t('1. Escolta i llegeix. 2. Murmura les paraules alhora. 3. Repeteix en veu alta just darrere la veu. 4. Amaga el text i fes-ho sense mirar. Millor amb auriculars.', '1. Listen and read. 2. Mumble the words along. 3. Say it aloud just behind the speaker. 4. Hide the script and do it without looking. Best with headphones.')}</div>`
+    + vids.map(l => `<div class="card"><h3>🎬 ${t('Shadowing de tota la unitat', 'Shadowing for the whole unit')} · ${esc(l.title.replace(/^\S+ · /, ''))}</h3><p class="muted">${t('El vídeo t’espera després de cada frase.', 'The video waits for you after each sentence.')}</p><video controls preload="none" playsinline poster="${ROOT + esc(l.shadowing.replace(/\.mp4$/, '-poster.jpg'))}" src="${ROOT + esc(l.shadowing)}"></video></div>`).join('')
+    + X.shadow.map((c, i) => `<div class="card"><h3>🗣 ${esc(c.title)}</h3><p class="muted">${esc(c.lp)} · ${t('Vegades', 'Plays')}: <span id="sp${i}">${store.shadow[c.key] || 0}</span></p>
+      ${c.video ? `<video id="sm${i}" preload="none" playsinline poster="${esc(c.poster || c.src.replace(/\.mp4$/, '-poster.jpg'))}"></video>` : `<audio id="sm${i}" preload="metadata"></audio>`}
+      <div class="row"><button class="btn sm" data-do="splay" data-i="${i}">▶ ${t('Escolta el fragment', 'Play the clip')}</button><button class="btn g sm" data-do="sstop" data-i="${i}">■ Stop</button>
+      ${c.slow ? `<label><input type="checkbox" id="ss${i}" ${ca ? 'checked' : ''}> ${t('Més lent', 'Slower')}</label>` : ''}<button class="btn g sm" data-do="shide" data-i="${i}">${t('Amaga el text', 'Hide the script')}</button>
+      <button class="btn g sm" data-do="srec" data-i="${i}" id="sr${i}">● ${t('Grava’t mentre sona', 'Record yourself while it plays')}</button></div>
+      <div class="script" id="st${i}">${c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<b>' + esc(l[0]) + ':</b> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('')}</div><audio id="sme${i}" controls hidden></audio><p class="muted" id="smsg${i}"></p></div>`).join('');
+}
+function splay(i, done) {
+  const c = X.shadow[i], m = $('#sm' + i), slow = !!($('#ss' + i) || {}).checked && c.slow, src = slow ? c.slow : c.src, tt = (slow ? c.ts : c.t) || [0, 1e9];
+  const go = () => { m.currentTime = tt[0]; m.play().catch(() => {}); m.ontimeupdate = () => { if (m.currentTime >= tt[1]) { m.pause(); m.ontimeupdate = null; done && done(); } }; m.onended = () => done && done(); };
+  store.shadow[c.key] = (store.shadow[c.key] || 0) + 1; keep(); $('#sp' + i).textContent = store.shadow[c.key];
+  if (m.src !== new URL(src, location.href).href) { m.src = src; m.addEventListener('loadedmetadata', go, { once: true }); m.load(); } else go();
+}
+async function srec(i) {
+  const msg = $('#smsg' + i), btn = $('#sr' + i);
+  if (rec) return;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true }), chunks = [];
+    rec = new MediaRecorder(stream); rec.ondataavailable = e => chunks.push(e.data);
+    rec.onstop = () => { stream.getTracks().forEach(x => x.stop()); const a = $('#sme' + i); a.src = URL.createObjectURL(new Blob(chunks, { type: rec.mimeType || 'audio/webm' })); a.hidden = false; rec = null; btn.disabled = false; msg.textContent = t('Escolta’t i torna-ho a provar si vols. La gravació no s’envia enlloc.', 'Listen to yourself and try again if you like. The recording is not sent anywhere.'); };
+    rec.start(); btn.disabled = true; msg.textContent = t('Gravant… repeteix darrere la veu.', 'Recording… shadow the speaker.');
+    splay(i, () => { if (rec && rec.state === 'recording') rec.stop(); });
+  } catch (e) { msg.textContent = t('No s’ha pogut fer servir el micròfon.', 'The microphone could not be used.'); rec = null; }
+}
+
+/* ---------- clicks ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-do]'); if (!el || el.tagName === 'SELECT') return; const k = el.dataset;
+  const go = (f, r) => { f(); if (r) render(); else ({ words, build, listen, shadow })[S.tab](); };
+  ({
+    course: () => go(() => { S.course = k.v; S.ls = 'all'; S.lp = 'all'; S.open = null; }, 1),
+    level: () => go(() => { S.level = k.v; S.open = null; S.coreOnly = null; }, 1),
+    ls: () => go(() => { S.ls = k.v; S.lp = 'all'; S.open = null; }, 1),
+    tab: () => { S.tab = k.v; S.open = null; history.replaceState(null, '', '#' + k.v); render(); },
+    mode: () => go(() => { S.mode = k.v; }),
+    core: () => go(() => { S.coreOnly = el.checked; }),
+    say: () => say(k.v),
+    flip: () => go(() => { flipped = true; say(deck[di].en); }),
+    know: () => go(() => { store.known[deck[di].en] = Date.now(); keep(); di++; flipped = false; }),
+    later: () => go(() => { deck.push(deck[di]); di++; flipped = false; }),
+    again: () => go(() => { deck.ids = null; }),
+    tcheck, tnew: () => go(() => { test = []; }),
+    pick: () => go(() => { if (!built[k.i].includes(+k.j)) built[k.i].push(+k.j); }),
+    unpick: () => go(() => { built[k.i] = built[k.i].filter(j => j !== +k.j); }),
+    bcheck, bnew: () => go(() => { set.ids = null; }),
+    open: () => go(() => { S.open = k.v; }),
+    close: () => go(() => { S.open = null; }),
+    ans: () => { ans[k.i] = +k.j; $$(`[data-do="ans"][data-i="${k.i}"]`).forEach((b, j) => b.classList.toggle('on', j === +k.j)); },
+    lcheck,
+    speed: () => { const e = X.listen.find(x => x.key === S.open), a = $('#aud'); a.src = k.v === '1' ? e.media.slow : e.media.src; a.currentTime = 0; $$('[data-do="speed"]').forEach(b => b.setAttribute('aria-pressed', b === el)); },
+    splay: () => splay(+k.i), sstop: () => { const m = $('#sm' + k.i); m.pause(); m.ontimeupdate = null; if (rec && rec.state === 'recording') rec.stop(); },
+    shide: () => { const s = $('#st' + k.i); s.hidden = !s.hidden; el.textContent = s.hidden ? t('Mostra el text', 'Show the script') : t('Amaga el text', 'Hide the script'); },
+    srec: () => srec(+k.i)
+  })[k.do]?.();
+});
+document.addEventListener('change', e => { const el = e.target.closest('select[data-do="lp"]'); if (el) { S.lp = el.value; S.open = null; render(); } });
+
+function start() {
+  const c = myCourse();
+  S.course = S.course || (all() ? (c || '2eso') : c);
+  EN = all() || (myLevel() ? !elCa(base(myLevel())) : false);
+  document.documentElement.lang = EN ? 'en' : 'ca';
+  $('#title').textContent = t('Practica pel teu compte', 'Practise on your own');
+  document.title = t('Practica pel teu compte', 'Practise on your own') + ' · English Lab';
+  $$('[data-pr]').forEach(a => a.textContent = t('Practica', 'Practise'));
+  if (!S.course) { $('#lead').textContent = t('Encara no tens cap grup: parla amb el professor.', 'You are not in a group yet: talk to your teacher.'); return; }
+  $('#lead').innerHTML = t('Les targetes de paraules, el sentence builder, les escoltes i el shadowing de les teves LS, per nivells. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'The word cards, sentence builder, listenings and shadowing of your LSs, by level. Everything corrects itself and nothing is handed in: practise as much as you like.');
+  S.level = S.level || myLevel() || 'insecure';
+  // start on the LS the group is working on now (the last open one), not on everything
+  const open = visibleLS(S.course).filter(l => (D.ls[l.id] || {}).status === 'open');
+  if (S.ls === 'all' && open.length && !all()) S.ls = open[open.length - 1].id;
+  if (!levelsOf(S.course).includes(S.level)) S.level = 'insecure';
+  render();
+}
+if (DEMO) { D = await load(); start(); }
+else {
+  ELCloud.onUser(async u => {
+    U = u;
+    if (!u) { $('#lead').textContent = ''; $('#app').innerHTML = `<div class="signin"><p>Entra amb el teu correu de l’institut i la contrasenya per practicar. · Sign in with your school email and password to practise.</p><button class="btn" id="si">Sign in</button></div>`; $('#si').onclick = () => ELCloud.login(); return; }
+    D = await load(u); start();
+  });
+  ELCloud.auth.authStateReady().then(() => { if (!ELCloud.auth.currentUser) { $('#lead').textContent = ''; $('#app').innerHTML = `<div class="signin"><p>Entra amb el teu correu de l’institut i la contrasenya per practicar. · Sign in with your school email and password to practise.</p><button class="btn" id="si">Sign in</button></div>`; $('#si').onclick = () => ELCloud.login(); } });
+}
+</script>
+</body>
+</html>

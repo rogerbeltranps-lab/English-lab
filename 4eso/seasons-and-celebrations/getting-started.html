@@ -88,7 +88,7 @@ html,body{overflow-x:clip}
 </div></header>
 
 <main class="wrap">
-<div id="trackNote"></div><div id="planBox"></div>
+<div id="trackNote"></div><div id="planBox"></div><div id="studyBox"></div>
 <nav class="tabs" aria-label="Warm-up sections">
   <button class="tab active" data-panel="recall">1 Recall</button>
   <button class="tab" data-panel="words">2 Autumn words</button>
@@ -192,6 +192,8 @@ html,body{overflow-x:clip}
 <script src="../../shared/js/flashcard-set.js"></script>
 <script src="data/getting-started.js"></script>
 <script src="data/native/getting-started.js"></script>
+<script src="../../shared/js/el-study.js"></script>
+<script src="data/study/getting-started.js"></script>
 <script>
 // Beginners (A1) sits below Insecure: an item with r:"beginners" is shown to every route; items without r default to beginners.
 const ROUTES=["beginners","insecure","safe","daring","native"];
@@ -352,6 +354,8 @@ function renderPlan(){
   g.onchange=()=>{state.plan[level]=g.value.trim();save()};
   const keep=()=>{state.review[level]={helped:h.value.trim(),review:r.value.trim(),at:new Date().toISOString()};save();$("#lpReviewMsg").textContent=ca()?"Desat ✓":"Saved ✓"};
   h.onchange=keep;r.onchange=keep;
+  // Study guide (Roger, 31 Oct 2026): shared/js/el-study.js, content in data/study/getting-started.js
+  if(window.ELStudy&&window.LP&&window.LP.study){const a={LP:window.LP,level:()=>level,ca};$("#studyBox").innerHTML=ELStudy.html(a);ELStudy.bind(a)}
 }
 // Català → English cards and micro-dictation (research audit, Roger 26 Oct 2026): the same activities as on the LS2 engine pages
 // (ls2-engine.js R.vocab cards in "Català → English" and dictHtml/bindDict), from window.LP's core list (words panel) and chunks (listen panel).

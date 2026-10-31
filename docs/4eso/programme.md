@@ -42,7 +42,7 @@ Cada LS segueix la mateixa estructura: 1. Learning objectives · 2. Competèncie
 
 **Fonts.** Mapa vertical de gramàtica, mapa vertical de lèxic, document de nivells i matriu de competències d'anglès (els 4 documents del projecte), la proposta de LS2 i l'exemple de LS1.
 
-**Nivell de cada ruta a 4t** (document de nivells): Beginners = A1 (ruta assignada només pel professor) · Insecure = A2 / A2+ amb suport · Safe = B1 orientatiu · Daring = B1 / B1+. Els continguts marcats com a *Ampliació B1+* als mapes només apareixen a Daring.
+**Nivell de cada ruta a 4t** (document de nivells): Beginners = A1 (ruta assignada només pel professor) · Insecure = A2 / A2+ amb suport · Safe = B1 orientatiu · Daring = B1 / B1+. Els continguts marcats com a *Ampliació B1+* als mapes només apareixen a Daring, excepte els phrasal verbs de tres parts (*catch up on*, *look forward to*), que Safe també fa a LS1 i LS2. Al web, les rutes es diuen Starter (Beginners), Base (Insecure), Core (Safe) i Plus (Daring); aquest document i el codi conserven els noms antics.
 
 **Ruta Beginners (afegida el 26 d'octubre de 2026).** Quarta ruta, per sota d'Insecure, per a l'alumnat que comença gairebé de zero (A1 del MECR). La ruta la fixa només el professor: l'alumne no la pot triar ni demanar. Mateixa LS, mateixos grups i mateix producte final que la resta, amb menys requisits: 4–6 frases amb marcs de frase i banc de paraules, instruccions i pistes en català, lectures de 60–100 paraules amb el 95–98 % de paraules conegudes i glosses en català, vídeos amb subtítols en anglès des del primer visionat, una llista nuclear de 25–40 paraules per LS amb repàs espaiat, i la mateixa escala NA–AE jutjada amb els can-dos A1. Mentre una LS no té contingut Beginners propi, el web mostra el contingut Insecure. El capítol «Resum de gramàtica i lèxic · ruta Beginners» recull què produeix la ruta a cada LS. LS1, ja acabada, no tindrà contingut Beginners al web aquest curs.
 
@@ -1247,7 +1247,7 @@ Beginners and Insecure retain Catalan guidance at every step, with English examp
 
 **Insecure** *(retains Beginners and adds)*
 
-- Reported speech amb say / tell i canvi de temps bàsic: "It's fake." → She said (that) it was fake. is → was, are → were, can → could, will → would.
+- Reported speech en marcs amb say / tell: "It's fake." → She said (that) it was fake. He told us (that) it was real. Només produeix is → was i are → were; can → could i will → would, receptius (revisió del 31 d'octubre de 2026: el reported speech és B1 i Insecure és A2 / A2+).
 
 - Passiva com a chunk: It was shared… It was made… It was taken in…
 
@@ -1853,7 +1853,7 @@ Aquesta taula coincideix amb la columna de 4t del mapa vertical de gramàtica, a
 | like / love + -ing; verb + -ing / to                                     | A1–B1    | —                          | R (would like to)  | —       | —              | —       | R (want / hope to; S/D: enjoy -ing) |
 | Preguntes de subjecte i d'objecte                                        | A2–B1    | —                          | —                  | —       | —              | —       | R (S/D)                             |
 | **Passats**                                                              |          |                            |                    |         |                |         |                                     |
-| Past Simple (regulars i irregulars)                                      | A1–A2    | —                          | R (S/D: orígens)   | C       | —              | —       | —                                   |
+| Past Simple (regulars i irregulars)                                      | A1–A2    | R (I/S: fet acabat vs rutina) | R (S/D: orígens)   | C       | —              | —       | —                                   |
 | Past Continuous                                                          | A2       | —                          | —                  | C       | —              | —       | —                                   |
 | when / while                                                             | A2       | —                          | —                  | R       | —              | —       | —                                   |
 | Present Perfect                                                          | A2–B1    | —                          | —                  | R       | R (D: passiva) | —       | R (I: chunk)                        |
@@ -1863,7 +1863,7 @@ Aquesta taula coincideix amb la columna de 4t del mapa vertical de gramàtica, a
 | Past Perfect                                                             | B1       | —                          | —                  | I (S/D) | —              | —       | —                                   |
 | Narrative tenses                                                         | B1       | —                          | —                  | C (S/D) | —              | —       | —                                   |
 | **Futur i condicionals**                                                 |          |                            |                    |         |                |         |                                     |
-| Future forms (plans)                                                     | A1–A2    | —                          | C                  | —       | —              | —       | R (I: going to)                     |
+| Future forms (plans)                                                     | A1–A2    | —                          | C (S/D: Present Simple per a horaris) | —       | —              | —       | R (I: going to)                     |
 | will / going to                                                          | A2       | —                          | C                  | —       | —              | —       | —                                   |
 | Present Continuous amb valor de futur                                    | A2       | —                          | R (S/D)            | —       | —              | —       | —                                   |
 | Zero conditional                                                         | A2–B1    | —                          | —                  | —       | —              | R       | —                                   |
@@ -1882,8 +1882,8 @@ Aquesta taula coincideix amb la columna de 4t del mapa vertical de gramàtica, a
 | as … as / not as … as                                                    | A2       | —                          | —                  | —       | —              | R (S/D) | —                                   |
 | **Frase complexa, discurs i cohesió**                                    |          |                            |                    |         |                |         |                                     |
 | Relative clauses (especificatives)                                       | B1       | —                          | R (S/D)            | —       | —              | —       | —                                   |
-| Reported Speech                                                          | B1       | —                          | —                  | —       | C              | —       | R (D: preguntes)                    |
-| Passive voice (present i past simple)                                    | B1       | —                          | R (D: costums)     | —       | C              | —       | —                                   |
+| Reported Speech                                                          | B1       | —                          | —                  | —       | C (I: marcs)   | —       | R (D: preguntes)                    |
+| Passive voice (present i past simple)                                    | B1       | —                          | R (D: costums)     | —       | C (I: chunks)  | —       | —                                   |
 | Indirect questions                                                       | B1       | —                          | —                  | —       | —              | —       | I (S/D)                             |
 | Question tags                                                            | B1       | —                          | —                  | —       | —              | —       | I (S/D)                             |
 | Connectors i cohesió                                                     | A1–B1    | R                          | R                  | R       | R              | C       | C                                   |
@@ -1895,6 +1895,8 @@ Aquesta taula coincideix amb la columna de 4t del mapa vertical de gramàtica, a
 | Third conditional                                                        | B1+      | —                          | —                  | —       | —              | D       | —                                   |
 | Deduccions en passat (must have, can't have)                             | B1+      | —                          | —                  | —       | D              | —       | —                                   |
 | Relatives no especificatives                                             | B1+      | —                          | D                  | —       | —              | —       | —                                   |
+
+*Revisió del 31 d'octubre de 2026 (comprovació amb els mapes de la carpeta 05 del Drive):* LS1 recupera el Past Simple per contrastar un fet acabat amb la rutina (Insecure i Safe); LS2 hi afegeix el Present Simple per a horaris (Safe i Daring); a LS4, Insecure fa el reported speech en marcs i la passiva com a chunk. Els mapes de la carpeta 05 ho recullen igual.
 
 ## Lèxic de 4t ESO per LS
 

@@ -34,10 +34,13 @@ body.locked #gate{display:block}
 </main>
 <script src="lp-list.js"></script>
 <script>
-const R=[['beginners','Starter'],['insecure','Base'],['safe','Core'],['daring','Plus']];
-document.getElementById('list').innerHTML=Object.entries(window.LP_PRINT).map(([ls,v])=>'<section><h2>'+v.title+'</h2>'+v.lps.map(([lp,t])=>
-  '<div class="row"><b>'+t+'</b>'+R.map(([r,n])=>'<a href="worksheet.html?ls='+ls+'&lp='+lp+'&route='+r+'" target="_blank">'+r[0].toUpperCase()+r.slice(1)+' · '+n+'</a>').join('')+
-  R.map(([r])=>'<a class="key" href="worksheet.html?ls='+ls+'&lp='+lp+'&route='+r+'&key=1" target="_blank">Key '+r[0].toUpperCase()+r.slice(1)+'</a>').join('')+'</div>').join('')+'</section>').join('');
+// Route names as students see them (Starter, Base, Core, Plus; Pro only in 4 ESO). Each LS also has its vocabulary and grammar summary per route.
+const R=[['beginners','Starter'],['insecure','Base'],['safe','Core'],['daring','Plus']],RP=ls=>ls.startsWith('4eso/')?R.concat([['native','Pro']]):R;
+document.getElementById('list').innerHTML=Object.entries(window.LP_PRINT).map(([ls,v])=>'<section><h2>'+v.title+'</h2>'+
+  '<div class="row"><b>Vocabulary and grammar summary</b>'+RP(ls).map(([r,n])=>'<a href="summary.html?ls='+ls+'&route='+r+'" target="_blank">'+n+'</a>').join('')+'</div>'+
+  v.lps.map(([lp,t])=>
+  '<div class="row"><b>'+t+'</b>'+RP(ls).map(([r,n])=>'<a href="worksheet.html?ls='+ls+'&lp='+lp+'&route='+r+'" target="_blank">'+n+'</a>').join('')+
+  RP(ls).map(([r,n])=>'<a class="key" href="worksheet.html?ls='+ls+'&lp='+lp+'&route='+r+'&key=1" target="_blank">Key '+n+'</a>').join('')+'</div>').join('')+'</section>').join('');
 </script>
 <script type="module" src="teacher-gate.js"></script>
 </body>

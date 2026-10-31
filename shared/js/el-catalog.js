@@ -16,12 +16,23 @@
 // teacher dashboard included. The ids (beginners, insecure, safe, daring, native) stay in the code, the data and the docs.
 window.EL_LEVELS=[{id:"beginners",name:"Starter",student:"Starter",ca:"Començo des de zero: molt suport, passos curts i instruccions en català.",en:"I am starting from zero: a lot of support, short steps and instructions in Catalan."},{id:"insecure",name:"Base",student:"Base",ca:"Necessito molt suport i pautes (instruccions en català).",en:"I need a lot of support and guidance (instructions in Catalan)."},{id:"safe",name:"Core",student:"Core",ca:"Em sento segur/a amb una mica de suport (instruccions en anglès).",en:"I feel confident with a little support (instructions in English)."},{id:"daring",name:"Plus",student:"Plus",ca:"Vull el repte: més autonomia i menys ajudes.",en:"I want the challenge: more independence and less help."},{id:"native",name:"Pro",student:"Pro",ask:false,ca:"Parlo anglès com a llengua materna i em preparo per al C2 Proficiency de Cambridge.",en:"English is my first language and I am preparing for Cambridge C2 Proficiency."}];
 // Class groups. The student picks one the first time they sign in; the teacher can change it in the dashboard.
+// CEFR level of each route (Roger, 31 Oct 2026: "if they are starters they should read 2ESO_starter (A1)"), from the levels document of
+// the teaching programme (AGENTS.md, "Levels, listenings, videos and readings"): short label + the full description.
+window.EL_CEFR={"2eso":{beginners:["A1","A1 amb molt de suport","A1 with a lot of support"],insecure:["A1+","A1+ / A2 inicial, amb bastides","A1+ / early A2 with scaffolding"],safe:["A2","A2 funcional","Functional A2"],daring:["A2+","A2+ / B1 emergent","A2+ / emerging B1"]},
+  "4eso":{beginners:["A1","A1 amb molt de suport","A1 with a lot of support"],insecure:["A2","A2 / A2+ amb suport","A2 / A2+ with support"],safe:["B1","B1 orientatiu","Indicative B1"],daring:["B1+","B1 / B1+","B1 / B1+"],native:["C2","C2 Proficiency","C2 Proficiency"]}};
+window.elCefr=(c,lv,full)=>{const x=((window.EL_CEFR[c]||{})[lv])||((window.EL_CEFR[c]||{})[lv==="native"?"daring":lv]);return x?(full?x[2]:x[0]):""};
+// "2ESO Starter (A1)": what students read as their level (board, English Lab, practice page, level notice)
+window.elLevelLabel=(c,lv)=>{const n=((window.EL_LEVELS||[]).find(l=>l.id===lv)||{}).name||lv;if(!lv)return "";const k=elCefr(c,lv);return (c?c.toUpperCase()+" ":"")+n+(k?" ("+k+")":"")};
 window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructions in Catalan
 // The student's route in an LS. The teacher sets routes (Roger, 26 Oct 2026: from the LS1 exam mark, on the dashboard). An LS with
 // no route of its own takes the latest route set in an earlier LS of the same course (EL_LS order), so a route carries over to every
 // later LS until the teacher changes it. lv = {lsId: {level, by}}. Returns {level, from, own}: from = the LS whose route it is (null: no
 // route yet); own = a route a 2 ESO student chose before 30 Oct 2026 (by:"student"; it still counts but is not shown as theirs, and
 // students can no longer write it). A route the teacher set, in any LS of the course, wins over it.
+// A hand-in comment that only says "no problem" (no, none, res, cap problema...) needs no answer (Roger, 30 Oct 2026)
+window.elNoComment=function(c){const t=String(c||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z' ]+/g," ").replace(/\s+/g," ").trim().replace(/ (thanks|thank you|gracies|gracias)$/,"");
+  return !t||/^(no|nope|none|nothing|nada|res|cap|ninguno|no comment|all good|ok|okay|fine|everything (is )?(ok|fine)|tot be|todo bien)$/.test(t)
+    ||/^(no|i (do not|don't|dont) have|i have no|i had no|we (do not|don't|dont) have|we have no|we had no|no tinc|no tenim|no he tingut|no hem tingut|no tengo|no tenemos|no he tenido|no hemos tenido|cap|ningun|ninguno)( any| cap| ningun| ninguno)? (problem(s|a|es|as)?|questions?|dubtes?|dudas?|comments?|comentaris?|comentarios?)( at all)?$/.test(t)};
 window.elRouteOf=function(lv,ls){lv=lv||{};const L=window.EL_LS||[],me=L.find(x=>x.id===ls),
     chain=[ls].concat(me?L.slice(0,L.indexOf(me)).reverse().filter(x=>x.course===me.course).map(x=>x.id):[]),
     find=(ids,mine)=>{for(const id of ids){const l=lv[id]||{};if(l.level&&(l.by==="student")===mine)return {level:l.level,from:id,own:mine}}return null},
@@ -40,8 +51,8 @@ window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine",study:"2eso/my-real-routine/downloads/ls1-vocabulary-grammar-"},
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine",study:"4eso/my-real-routine/downloads/ls1-vocabulary-grammar-",pro:true},
-  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4"},
-  {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",shadowing:"2eso/free-time-live/video/shadowing.mp4"}
+  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4"},
+  {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",starter:true,shadowing:"2eso/free-time-live/video/shadowing.mp4"}
 ];
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";
@@ -53,14 +64,14 @@ window.EL_CATALOG=(function(){
     A("2eso","present-simple-grammar.html","Present simple grammar",["5.1"],["s2GrammarState"],5,{graded:false}),
     A("2eso","healthy-habits.html","Healthy habits",["3.1","5.1"],["healthyHabitsState2ESO"],8,{skip:["write","match"],graded:false}),
     A("2eso","vocabulary-games.html","Vocabulary games",["5.1"],[],0,{graded:false,inClass:true}),
-    A("2eso","final-product.html","Final product",["3.1","3.2","3.3","5.1"],["finalProduct2ESO"],0,{manual:true}),
+    A("2eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","9.2"],["finalProduct2ESO"],0,{manual:true}),
     A("4eso","getting-started.html","Getting started (warm-up)",["3.1"],["gettingStarted4ESO"],4,{graded:false}),
     A("4eso","a-day-in-real-life.html","A day in real life",["3.1","5.1"],["lp2StateV2_4ESO"],8,{skip:["write","match"],graded:false}),
     A("4eso","useful-expressions.html","Useful expressions",["3.1","5.1"],["s3Real4State"],4,{skip:["write"],graded:false}),
     A("4eso","grammar-phrasal-verbs.html","Grammar: phrasal verbs",["5.1"],["s4GrammarState"],5,{graded:false}),
     A("4eso","healthy-habits.html","Healthy habits",["3.1","5.2"],["healthyHabitsState4ESO"],8,{skip:["write","match"],graded:false}),
     A("4eso","vocabulary-games.html","Vocabulary games",["5.1"],[],0,{graded:false,inClass:true}),
-    A("4eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","5.2"],["finalProduct4ESO"],0,{manual:true}),
+    A("4eso","final-product.html","Final product",["3.1","3.2","3.3","5.1","5.2","9.2"],["finalProduct4ESO"],0,{manual:true}),
     ...(function(){
       // LS2: ids carry the LS so they never clash with My Real Routine pages of the same name.
       const L=(file,title,criteria,key,points,o)=>A("4eso",file,title,criteria,[key],points,Object.assign({id:"4eso/ls2-"+file.replace(".html",""),ls:"4eso-seasons-and-celebrations",path:"4eso/seasons-and-celebrations/"+file},o||{}));

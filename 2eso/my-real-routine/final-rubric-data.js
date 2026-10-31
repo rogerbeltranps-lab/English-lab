@@ -6,7 +6,7 @@ window.finalRubricData = {
    {
     "name": "Speaking",
     "sub": "Explicació oral",
-    "pct": 35,
+    "pct": 30,
     "cells": [
      "Explico 4–6 idees sobre la rutina del company o companya, en ordre, durant uns 45–60 segons; parlo a poc a poc, se m’entén i només miro les diapositives com a ajuda (no llegeixo frases senceres).",
      "Explico 4–6 idees en ordre i se m’entén, però el vídeo dura menys de 45 s o més de 60 s, o llegeixo 1–2 frases senceres.",
@@ -28,7 +28,7 @@ window.finalRubricData = {
    {
     "name": "Google Slides",
     "sub": "Contingut i suport visual",
-    "pct": 15,
+    "pct": 10,
     "cells": [
      "Hi ha les 5 diapositives (Títol, Matí, Després de l’escola, Vespre, Reflexió de salut); cada una té frases curtes en anglès (màxim 2 línies) i una imatge o icona. La diapositiva de reflexió diu si la rutina és saludable, poc saludable o en part saludable.",
      "Hi ha les 5 diapositives, però en 1 d’elles manca la imatge o la icona, o té un paràgraf llarg en lloc de frases curtes.",
@@ -37,16 +37,16 @@ window.finalRubricData = {
     ]
    },
    {
-  "name": "Pronunciació i entonació",
-  "sub": "Shadowing · pujades i baixades de la veu",
-  "pct": 15,
-  "cells": [
-    "Quan presento, faig pujades i baixades de la veu com als vídeos de <i>shadowing</i>: marco les paraules importants, faig pauses entre idees i baixo la veu en acabar-les. Se m’entén bé gairebé tota la presentació.",
-    "Faig pujades i baixades de la veu en bona part de la presentació, tot i que algunes frases són planes o faig pauses poc naturals. Se m’entén bé.",
-    "La veu és força plana i marco poques paraules importants. Algunes pauses o pujades i baixades no ajuden a seguir les idees, però s’entén el missatge principal.",
-    "Parlo gairebé sempre amb el mateix to, sense pauses clares, o l’entonació i la pronunciació dificulten entendre el missatge."
-  ]
-},
+    "name": "Pronunciació i entonació",
+    "sub": "Shadowing · pujades i baixades de la veu",
+    "pct": 15,
+    "cells": [
+     "Quan presento, faig pujades i baixades de la veu com als vídeos de <i>shadowing</i>: marco les paraules importants, faig pauses entre idees i baixo la veu en acabar-les. Se m’entén bé gairebé tota la presentació.",
+     "Faig pujades i baixades de la veu en bona part de la presentació, tot i que algunes frases són planes o faig pauses poc naturals. Se m’entén bé.",
+     "La veu és força plana i marco poques paraules importants. Algunes pauses o pujades i baixades no ajuden a seguir les idees, però s’entén el missatge principal.",
+     "Parlo gairebé sempre amb el mateix to, sense pauses clares, o l’entonació i la pronunciació dificulten entendre el missatge."
+    ]
+   },
    {
     "name": "Entrevista i reflexió",
     "sub": "Interacció i hàbits saludables",
@@ -56,6 +56,17 @@ window.finalRubricData = {
      "Les notes tenen només 2 de les 3 coses (accions, hores, hàbits), però la valoració té motiu amb almenys 1 detall real de l’entrevista.",
      "La valoració té un motiu general (p. ex. <i>because it is good</i>) que no cita cap detall de l’entrevista.",
      "No hi ha valoració ni motiu, o parlo del cos o del pes de la persona en lloc dels hàbits."
+    ]
+   },
+   {
+    "name": "Estratègies de millora",
+    "sub": "9.2 · assajar, revisar i millorar",
+    "pct": 10,
+    "cells": [
+     "Assajo, faig un vídeo de prova, el miro i el millor. Al final del vídeo dic amb una frase què he millorat (p. ex. <i>After my test video, I spoke more slowly.</i>), i la millora es nota.",
+     "Al final del vídeo dic què he millorat, però la millora gairebé no es nota o la frase no s’entén.",
+     "No dic què he millorat, però es veu que he assajat: parlo amb poques aturades i miro poc les notes.",
+     "No es veu cap assaig ni cap revisió: llegeixo, m’aturo sovint o el vídeo té problemes que una revisió hauria trobat (so, càmera, diapositives)."
     ]
    }
   ]
@@ -85,7 +96,7 @@ window.finalRubricData = {
    "heading": "Rubric for the {route} route",
    "label": "Rubric {route}",
    "req": "Route requirement:",
-   "calc": "<strong>How is the grade calculated?</strong> Each criterion gets a level, which becomes a score: <span class=\"rubric-pill\">Level 4 · 10</span><span class=\"rubric-pill\">Level 3 · 7.5</span><span class=\"rubric-pill\">Level 2 · 5</span><span class=\"rubric-pill\">Level 1 · 2.5</span><span class=\"rubric-pill\">No evidence · 0</span> Then the criterion’s percentage is applied. For example, level 3 in Speaking gives 7.5 out of 10 for that criterion, and that criterion is 35% of the final grade."
+   "calc": "<strong>How is the grade calculated?</strong> Each criterion gets a level, which becomes a score: <span class=\"rubric-pill\">Level 4 · 10</span><span class=\"rubric-pill\">Level 3 · 7.5</span><span class=\"rubric-pill\">Level 2 · 5</span><span class=\"rubric-pill\">Level 1 · 2.5</span><span class=\"rubric-pill\">No evidence · 0</span> Then the criterion’s percentage is applied. For example, level 3 in Speaking gives 7.5 out of 10 for that criterion, and that criterion is 30% of the final grade."
   },
   "intro": "See what is assessed and which level you are at. In this route you describe your classmate in more detail and in a clear sequence.",
   "note": "In this route you do not need to compare with your own routine; it does not affect your grade. You do need a more detailed description and a judgment about the habits, supported by specific details.",
@@ -93,7 +104,7 @@ window.finalRubricData = {
    {
     "name": "Speaking",
     "sub": "Oral explanation",
-    "pct": 35,
+    "pct": 30,
     "cells": [
      "I explain at least 6 ideas about my classmate’s routine in a clear sequence (morning, after school, evening) in 1–1½ minutes; I am easy to understand and only glance at the slides for support.",
      "I explain at least 6 ideas in sequence and I am easy to understand, but the video is shorter than 1 minute or longer than 1½, or I read 1–2 full sentences.",
@@ -115,7 +126,7 @@ window.finalRubricData = {
    {
     "name": "Google Slides",
     "sub": "Content & visual support",
-    "pct": 15,
+    "pct": 10,
     "cells": [
      "All 5 slides are there (Title, Morning, After school, Evening, Health reflection); each has short English sentences (2 lines at most) and an image or icon. The health slide says whether the routine is healthy, partly healthy or not very healthy and gives at least 2 habits as reasons.",
      "All 5 slides are there, but 1 of them has no image or icon, or has a long paragraph instead of short sentences.",
@@ -124,16 +135,16 @@ window.finalRubricData = {
     ]
    },
    {
-  "name": "Pronunciation & intonation",
-  "sub": "Shadowing · pitch, stress and rhythm",
-  "pct": 15,
-  "cells": [
-    "I use natural rises and falls in my voice, stress key words and pause between ideas, as practised in the shadowing videos. My speech is clear and easy to follow throughout.",
-    "I use rises and falls and stress important words in most sentences. A few parts sound flat or have awkward pauses, but my speech is clear.",
-    "My voice is often flat or key words receive little stress. Some pauses interrupt the flow, but the main message is understandable.",
-    "I use almost no pitch variation or clear phrasing, or my pronunciation and intonation make the message difficult to understand."
-  ]
-},
+    "name": "Pronunciation & intonation",
+    "sub": "Shadowing · pitch, stress and rhythm",
+    "pct": 15,
+    "cells": [
+     "I use natural rises and falls in my voice, stress key words and pause between ideas, as practised in the shadowing videos. My speech is clear and easy to follow throughout.",
+     "I use rises and falls and stress important words in most sentences. A few parts sound flat or have awkward pauses, but my speech is clear.",
+     "My voice is often flat or key words receive little stress. Some pauses interrupt the flow, but the main message is understandable.",
+     "I use almost no pitch variation or clear phrasing, or my pronunciation and intonation make the message difficult to understand."
+    ]
+   },
    {
     "name": "Interview & reflection",
     "sub": "Interaction & healthy habits",
@@ -143,6 +154,17 @@ window.finalRubricData = {
      "I support my judgment with 1 specific habit from the interview.",
      "My judgment has a general reason (e.g. <i>because it is good</i>) that does not mention any habit from the interview.",
      "There is no judgment or reason, or I talk about the person’s body or weight instead of habits."
+    ]
+   },
+   {
+    "name": "Learning strategies",
+    "sub": "9.2 · rehearse, review and improve",
+    "pct": 10,
+    "cells": [
+     "I rehearse, make a test video, watch it and improve it. At the end of the video I say in one sentence what I improved (e.g. <i>After my test video, I looked less at my notes.</i>), and the change shows.",
+     "At the end of the video I say what I improved, but the change hardly shows or the sentence is unclear.",
+     "I don’t say what I improved, but the video shows I rehearsed: few pauses and I look little at my notes.",
+     "Nothing shows rehearsal or review: I read, stop often, or the video has problems a review would have caught (sound, camera, slides)."
     ]
    }
   ]
@@ -172,7 +194,7 @@ window.finalRubricData = {
    "heading": "Rubric for the {route} route",
    "label": "Rubric {route}",
    "req": "Route requirement:",
-   "calc": "<strong>How is the grade calculated?</strong> Each criterion gets a level, which becomes a score: <span class=\"rubric-pill\">Level 4 · 10</span><span class=\"rubric-pill\">Level 3 · 7.5</span><span class=\"rubric-pill\">Level 2 · 5</span><span class=\"rubric-pill\">Level 1 · 2.5</span><span class=\"rubric-pill\">No evidence · 0</span> Then the criterion’s percentage is applied. For example, level 3 in Speaking gives 7.5 out of 10 for that criterion, and that criterion is 35% of the final grade."
+   "calc": "<strong>How is the grade calculated?</strong> Each criterion gets a level, which becomes a score: <span class=\"rubric-pill\">Level 4 · 10</span><span class=\"rubric-pill\">Level 3 · 7.5</span><span class=\"rubric-pill\">Level 2 · 5</span><span class=\"rubric-pill\">Level 1 · 2.5</span><span class=\"rubric-pill\">No evidence · 0</span> Then the criterion’s percentage is applied. For example, level 3 in Speaking gives 7.5 out of 10 for that criterion, and that criterion is 30% of the final grade."
   },
   "intro": "See what is assessed and which level you are at. In this route you describe your classmate’s routine and compare it with yours.",
   "note": "In this route you must compare your classmate’s routine with your own, with at least 1 similarity and 1 difference. Your reflection judges both routines and, if you suggest an improvement, it must be realistic and respectful.",
@@ -180,7 +202,7 @@ window.finalRubricData = {
    {
     "name": "Speaking",
     "sub": "Oral explanation",
-    "pct": 35,
+    "pct": 30,
     "cells": [
      "I describe my classmate’s routine and compare it with mine, with at least 1 similarity and 1 difference, in 1½–2 minutes; I speak without reading and am easy to understand.",
      "I describe and compare with at least 1 similarity and 1 difference and I am easy to understand, but the video is shorter than 1½ minutes or longer than 2, or I read 1–2 full sentences.",
@@ -202,7 +224,7 @@ window.finalRubricData = {
    {
     "name": "Google Slides",
     "sub": "Content & visual support",
-    "pct": 15,
+    "pct": 10,
     "cells": [
      "All 6 slides are there (Title, Morning, After school, Evening, Health reflection, Comparison); each has short English sentences (2 lines at most) and an image or icon. The comparison slide shows at least 1 similarity and 1 difference, and the health slide judges both routines.",
      "All 6 slides are there, but 1 of them has no image or icon, or has a long paragraph instead of short sentences.",
@@ -211,16 +233,16 @@ window.finalRubricData = {
     ]
    },
    {
-  "name": "Pronunciation & intonation",
-  "sub": "Shadowing · expressive pitch, stress and rhythm",
-  "pct": 15,
-  "cells": [
-    "I vary my pitch purposefully, stress words that show similarities and differences, and group ideas with natural pauses, building on the shadowing videos. My rhythm makes the comparison easy to follow.",
-    "I use clear rises and falls, word stress and pauses for most of my presentation. Some comparisons sound flat or less connected, but my message remains clear.",
-    "My intonation is often flat or inconsistent; I rarely stress contrasting ideas, and pauses sometimes interrupt the comparison. The main message is still understandable.",
-    "There is little meaningful variation in pitch, stress or phrasing, or my pronunciation makes the description and comparison difficult to follow."
-  ]
-},
+    "name": "Pronunciation & intonation",
+    "sub": "Shadowing · expressive pitch, stress and rhythm",
+    "pct": 15,
+    "cells": [
+     "I vary my pitch purposefully, stress words that show similarities and differences, and group ideas with natural pauses, building on the shadowing videos. My rhythm makes the comparison easy to follow.",
+     "I use clear rises and falls, word stress and pauses for most of my presentation. Some comparisons sound flat or less connected, but my message remains clear.",
+     "My intonation is often flat or inconsistent; I rarely stress contrasting ideas, and pauses sometimes interrupt the comparison. The main message is still understandable.",
+     "There is little meaningful variation in pitch, stress or phrasing, or my pronunciation makes the description and comparison difficult to follow."
+    ]
+   },
    {
     "name": "Interview & reflection",
     "sub": "Interaction & healthy habits",
@@ -230,6 +252,17 @@ window.finalRubricData = {
      "I judge both routines with evidence from each, but I do not suggest any improvement.",
      "I judge only one of the two routines, or I judge both without mentioning any detail from the interview.",
      "There is no judgment, or I talk about the person’s body or weight instead of habits."
+    ]
+   },
+   {
+    "name": "Learning strategies",
+    "sub": "9.2 · rehearse, review and improve",
+    "pct": 10,
+    "cells": [
+     "I rehearse, make a test video, watch it and improve it. At the end of the video I say what I improved (e.g. <i>After my test video, I looked less at my notes.</i>) and one thing I will do next time, and the change shows.",
+     "At the end of the video I say what I improved, but the change hardly shows or the sentence is unclear.",
+     "I don’t say what I improved, but the video shows I rehearsed: few pauses and I look little at my notes.",
+     "Nothing shows rehearsal or review: I read, stop often, or the video has problems a review would have caught (sound, camera, slides)."
     ]
    }
   ]
