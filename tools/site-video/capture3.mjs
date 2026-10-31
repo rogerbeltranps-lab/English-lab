@@ -32,8 +32,12 @@ async function clean({ keepCards = false } = {}) {
       bar.querySelectorAll('select').forEach((s) => (s.style.display = 'none'));
       for (const n of [...bar.childNodes]) if (n.nodeType === 3 && /Beltran|Roger/.test(n.textContent)) n.textContent = 'Your name ';
     }
-    if (!keep) [...document.querySelectorAll('#el-exam-notice button, #el-level-notice button, #el-corrections button, #el-reply button')]
-      .filter((b) => /^(Més tard|Later|OK|D'acord)$/.test(b.textContent.trim())).forEach((b) => b.click());
+    // "Later" on the exam card is only remembered in this tab. "OK"/"D'acord" on the other cards deletes or saves
+    // (el-reply.js: OK deletes the reply), so those cards are only taken off the page here.
+    if (!keep) {
+      [...document.querySelectorAll('#el-exam-notice button')].filter((b) => /^(Més tard|Later)$/.test(b.textContent.trim())).forEach((b) => b.click());
+      document.querySelectorAll('#el-level-notice, #el-corrections, #el-reply').forEach((c) => c.remove());
+    }
   }, keepCards).catch(() => {});
 }
 async function settle(ms = 2500, o) { await page.waitForLoadState('networkidle').catch(() => {}); await page.waitForTimeout(ms); await clean(o); }
