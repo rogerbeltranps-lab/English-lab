@@ -71,7 +71,7 @@ const STEPS = ['1 Listen and read', '2 Repeat', '3 Listen', '4 Repeat'];
 const steps = (on) => `<div class="steps">${STEPS.map((s, i) => `<span class="st${i === on ? ' on' : ''}">${s}</span>`).join('')}</div>`;
 const size = (t) => (t.length > 60 ? 46 : t.length > 40 ? 52 : 60);
 
-// Marks (Roger, 31 Oct 2026): **stressed** syllables underlined, ‿ between linked words, ↗ ↘ the melody (checked against the recording's pitch).
+// Marks (Roger, 31 Oct 2026): **stressed** syllables underlined, ‿ between linked words, ↗ ↘ the melody: ↗ before a comma and in yes/no questions, ↘ at the end and in wh- questions.
 const marked = (t) => pretty(t).replace(/\*\*(.+?)\*\*/g, '<span class="strong">$1</span>').replace(/==(.+?)==/g, '<span class="join">$1</span>')
   .replace(/‿/g, '<span class="link">‿</span>').replace(/\s*([↗↘])/g, '<span class="tone">$1</span>');
 const turnLabel = (txt, icon = ICON.mic) => `<div class="who turn"><svg viewBox="0 0 136 136">${icon}</svg>${txt}</div>`;
@@ -91,11 +91,12 @@ function slides() {
     <ol><li><b>Listen</b> and read the sentence.</li><li><b>Your turn:</b> say it out loud, with the text.</li>
     <li><b>Listen again</b>, this time with no text.</li><li><b>Your turn again</b>, from memory.</li></ol>
     <div class="hint" style="margin-top:22px">A chime tells you it’s your turn. The video waits for you: the bar shows how long you have.</div></div>`)]);
-  out.push(['i2', page(`<div class="card" style="top:120px;height:470px">
+  out.push(['i2', page(`<div class="card" style="top:105px;height:510px">
     <div class="big" style="margin-bottom:16px">Tips</div>
     <ul><li>Say it <b>out loud</b>, not in your head.</li><li>Copy the <b>music</b>: strong words are louder and longer.</li>
     <li><b>Join</b> the words like the speaker does.</li><li>Made a mistake? <b>Keep going.</b></li></ul>
-    <div class="legend"><span><span class="strong">Strong</span> = louder, longer</span><span>a<span class="link">‿</span>b = join them</span><span><span class="tone" style="margin:0">↗</span> up · <span class="tone" style="margin:0">↘</span> down = the melody</span></div></div>`)]);
+    <div class="legend"><span><span class="strong">Strong</span> = louder, longer</span><span>a<span class="link">‿</span>b = join them</span><span><span class="tone" style="margin:0">↗</span> up · <span class="tone" style="margin:0">↘</span> down = the melody</span></div>
+    <div class="hint" style="margin-top:12px"><span class="tone" style="margin:0">↗</span> before a comma, yes/no questions · <span class="tone" style="margin:0">↘</span> at the end, wh- questions</div></div>`)]);
   ex.forEach((it, i) => {
     const sz = size(it.text), head = `<div class="steps"><span class="st on">Example ${i + 1} of ${ex.length}</span></div>`;
     const tip = `<div class="hint" style="margin-top:26px">${esc(it.tip)}</div>`;
