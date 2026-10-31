@@ -57,6 +57,12 @@
    "ca": "El meu pla setmanal mostra què fem a classe i què has de fer cada setmana, i la data de l'examen. Si no has pogut venir a classe, mira-ho aquí."
   },
   {
+   "id": "l28",
+   "scene": "Your week",
+   "en": "Open The whole LS plan to see every week of the Learning Situation: what we do in class and the activities to do, with their dates.",
+   "ca": "Obre The whole LS plan per veure totes les setmanes de la situació d'aprenentatge: què fem a classe i les activitats que has de fer, amb les dates."
+  },
+  {
    "id": "l10",
    "scene": "Your week",
    "en": "The purple My week button is on every page. Click it to see this week's activities and what is still to do.",
