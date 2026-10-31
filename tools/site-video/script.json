@@ -51,16 +51,34 @@
    "ca": "Aquí veus la teva ruta: Starter, Base, Core o Plus. La posa el professor. Creus que una altra ruta et va millor? Clica Demana canviar de ruta, tria'n una, explica per què i envia-ho. El professor et respondrà."
   },
   {
+   "id": "l30",
+   "scene": "Your route",
+   "en": "When your teacher sets or changes your level, for example Core B1, a message tells you. Your activities follow your level.",
+   "ca": "Quan el professor et posa o et canvia el nivell, per exemple Core B1, un missatge t'avisa. Les activitats segueixen el teu nivell."
+  },
+  {
    "id": "l29",
    "scene": "Your route",
    "en": "Below your route, click Download the summary to get a PDF with all the vocabulary and grammar of your route, with explanations and practice.",
    "ca": "A sota de la teva ruta, clica Descarrega el resum per tenir un PDF amb tot el vocabulari i la gramàtica de la teva ruta, amb explicacions i pràctica."
   },
   {
+   "id": "l33",
+   "scene": "Your route",
+   "en": "Below it, open the shadowing video: listen to sentences from the unit and say them out loud. It's great before the exam.",
+   "ca": "A sota, obre el vídeo de shadowing: escolta frases de la unitat i repeteix-les en veu alta. És ideal abans de l'examen."
+  },
+  {
    "id": "l09",
    "scene": "Your week",
    "en": "My week plan shows what we do in class and what you have to do every week, and the date of the exam. If you miss a class, check it here.",
    "ca": "El meu pla setmanal mostra què fem a classe i què has de fer cada setmana, i la data de l'examen. Si no has pogut venir a classe, mira-ho aquí."
+  },
+  {
+   "id": "l31",
+   "scene": "Your week",
+   "en": "In the homework box, click Add it to my Google Calendar once, and your homework and the exam day appear in your calendar.",
+   "ca": "Al requadre dels deures, clica Afegeix-ho al meu Google Calendar una sola vegada, i els deures i el dia de l'examen apareixeran al teu calendari."
   },
   {
    "id": "l28",
@@ -165,10 +183,22 @@
    "ca": "Alguna cosa no funciona? Clica el botó taronja Problema, a baix. Tria què ha passat, explica-ho i afegeix-hi una captura si pots. El professor ho veurà."
   },
   {
+   "id": "l34",
+   "scene": "Problems",
+   "en": "Do you have an idea for the website? Click Idea and tell your teacher.",
+   "ca": "Tens una idea per a la web? Clica Idea i explica-la al professor."
+  },
+  {
    "id": "l25",
    "scene": "English Lab",
    "en": "English Lab has extra practice: shadowing, sentence builder, word cards, listening and grammar, and vocabulary games for each Learning Situation. Use it when you want.",
    "ca": "English Lab té pràctica extra: shadowing, sentence builder, targetes de paraules, listening i gramàtica, i jocs de vocabulari per a cada Learning Situation. Fes-la servir quan vulguis."
+  },
+  {
+   "id": "l32",
+   "scene": "English Lab",
+   "en": "Practise on your own has word cards, sentence builder, listening and shadowing at your level. It corrects itself and doesn't count for your mark.",
+   "ca": "Practica pel teu compte té targetes de paraules, sentence builder, listening i shadowing al teu nivell. Es corregeix sol i no compta per a la nota."
   },
   {
    "id": "l26",
