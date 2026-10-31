@@ -181,6 +181,17 @@ function cpInject(D){
       L[key]=JSON.stringify(st)})})}
 const cpDoc=(u,a)=>(((S.D.cp||{})[u]||{})[a.keys[0]])||null;
 const cpStale=(d,K)=>{if(!d||d.redo)return false;const m=cpMark(d,K);return !d.fb||d.fb.score!==m.score||d.fb.max!==m.max};
+// Results far from the student's usual marks (Roger, 31 Oct 2026: “if these checkpoints differ drastically from their marks, we can spot it
+// and there should be a warning”): the checkpoint % against the average of the exam marks of the course so far (examMark) and the
+// recall warm-ups of the same LS (first try). ⚠️ when it is CP_GAP points or more above it (worth a look), ↓ when that much below.
+const CP_GAP=35;
+function cpUsual(u,a){const c=a.ls.slice(0,4),ex=EL_LS.filter(l=>l.course===c&&(EL_GRADING[l.id]||{}).exam).map(l=>examMark(u,l.id)).filter(Boolean).map(x=>x.mark*10);
+  const w=(((EL_GRADING[a.ls]||{}).gv||{}).parts||[]).filter(p=>p.id==="warm").flatMap(p=>p.first).map(([id,k])=>firstOf(u,id,k)).filter(f=>f&&f.max).map(f=>f.score/f.max*100);
+  const av=l=>l.length?l.reduce((x,y)=>x+y,0)/l.length:null,e=av(ex),wu=av(w),both=[e,wu].filter(x=>x!=null);
+  return both.length?{v:av(both),exam:e,warm:wu}:null}
+function cpGap(u,a,d,K){if(!d||d.redo||!K)return null;const m=cpMark(d,K);if(!m.max)return null;const us=cpUsual(u,a);if(!us)return null;
+  const v=m.score/m.max*100,g=v-us.v;if(Math.abs(g)<CP_GAP)return null;const r=x=>Math.round(x)+" %";
+  return {up:g>0,t:`${g>0?"Much higher":"Much lower"} than usual: this checkpoint ${r(v)} · ${us.exam!=null?"exam marks "+r(us.exam):"no exam mark yet"} · ${us.warm!=null?"recall warm-ups "+r(us.warm):"no warm-ups yet"}`}}
 function cpBox(ls,grp,studs){
   const cps=acts(ls).filter(a=>a.checkpoint);if(!cps.length)return "";const D=S.D;
   const head=cps.map(a=>{const K=D.ck[a.keys[0]],docs=studs.map(s=>cpDoc(s.uid,a)).filter(d=>d&&!d.redo),n=docs.filter(d=>cpStale(d,K)).length;
@@ -188,10 +199,13 @@ function cpBox(ls,grp,studs){
   const rows=studs.filter(s=>!s.tester||cps.some(a=>cpDoc(s.uid,a))).map(s=>`<tr><td style="text-align:left">${name(s)}</td>${cps.map(a=>{const d=cpDoc(s.uid,a),K=D.ck[a.keys[0]];
       if(!d)return '<td class="muted">–</td>';if(d.redo)return `<td data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="You let them do it again">↺ again</td>`;
       const m=cpMark(d,K),glances=(d.leaves||[]).length,secs=(d.times||[]).reduce((x,y)=>x+(+y||0),0);
-      return `<td class="sc" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="Click for the answers">${K?m.score+"/"+m.max:"?"}${d.auto==="left"?' <span title="Sent automatically: left the page">⚡</span>':""}${glances?` <span title="Left the page ${glances} time(s) for less than 2 s">👀${glances}</span>`:""}<br><small class="muted">${Math.round(secs/60*10)/10} min${d.fb&&!cpStale(d,K)?" · ✓ released":""}</small></td>`}).join("")}</tr>`).join("");
+      const gp=cpGap(s.uid,a,d,K);
+      return `<td class="sc" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="${gp?esc(gp.t)+" · ":""}Click for the answers"${gp&&gp.up?' style="background:#fff4e5"':""}>${gp?(gp.up?"⚠️ ":"↓ "):""}${K?m.score+"/"+m.max:"?"}${d.auto==="left"?' <span title="Sent automatically: left the page">⚡</span>':""}${glances?` <span title="Left the page ${glances} time(s) for less than 2 s">👀${glances}</span>`:""}<br><small class="muted">${Math.round(secs/60*10)/10} min${d.fb&&!cpStale(d,K)?" · ✓ released":""}</small></td>`}).join("")}</tr>`).join("");
   const body=`<p class="muted">Each student does each checkpoint once: one question at a time, ${45} s each, no going back, nothing to copy or paste. If they leave the page (another tab, window or app) for more than 2 seconds it is sent at once (⚡). 👀 = left for less than 2 s. Students see their mark and corrections only after you press <b>📣 Release feedback</b>; press it again after accepting an answer. Click a cell for the answers, to accept an answer or to let a student do it again.</p>`
     +`<div class="wrap"><table class="acts"><tr><th>Student</th>${head}</tr>${rows}</table></div>`;
-  return `<div class="box">${fold("cpbox",`🛡️ Recall checkpoints · ${grp.name}`,body)}</div>`;
+  const warn=studs.flatMap(s=>cps.map(a=>{const d=cpDoc(s.uid,a),g=cpGap(s.uid,a,d,D.ck[a.keys[0]]);return g&&g.up?`<li><b>${name(s)}</b> · ${esc(a.title)}: ${esc(g.t)} <button class="g" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}">See the answers</button></li>`:""})).filter(Boolean);
+  const gapNote=`<p class="muted">⚠️ = ${CP_GAP} points or more above the student's usual marks (the average of their exam marks so far and their recall warm-ups in this LS); ↓ = that much below. Worth a look, not proof.</p>`;
+  return `<div class="box">${fold("cpbox",`🛡️ Recall checkpoints · ${grp.name}${warn.length?` <small style="color:#b45309">· ⚠️ ${warn.length} far above usual</small>`:""}`,(warn.length?`<div class="warnbox" style="background:#fff4e5;border:1px solid #f5b971;border-radius:10px;padding:8px 12px;margin:6px 0"><b>⚠️ Much higher than their usual marks</b><ul style="margin:4px 0">${warn.join("")}</ul></div>`:"")+body+gapNote)}</div>`;
 }
 function cpDlg(u,a){
   const d=cpDoc(u,a),K=S.D.ck[a.keys[0]],s=S.P[u];if(!d)return;const m=cpMark(d,K);
@@ -200,6 +214,7 @@ function cpDlg(u,a){
   const lv=(d.leaves||[]).map(l=>`${esc((cpDate(l.at)||"").slice(11,19))} (${Math.round(l.ms/100)/10} s)`).join(", ");
   dlg(`<h3>${esc(a.title)} · ${name(s)}</h3><p class="muted">Route ${esc(LV[d.level]||d.level)} · started ${esc((d.started||"").replace("T"," ").slice(0,16))} · ${d.redo?"<b>let do again</b>":d.auto==="left"?"<b>⚡ sent automatically: left the page</b>":"sent"} · ${K?m.score+"/"+m.max:"no answer key yet"}${d.fb?` · released ${d.fb.score}/${d.fb.max}`:" · not released"}</p>`
     +(lv?`<p class="muted">👀 Left for less than 2 s: ${lv}</p>`:"")
+    +(cpGap(u,a,d,K)?`<p style="color:#b45309">${cpGap(u,a,d,K).up?"⚠️":"↓"} ${esc(cpGap(u,a,d,K).t)}</p>`:"")
     +`<table><tr><th>#</th><th>Question</th><th>Answer</th><th></th><th>Time</th><th></th></tr>${rows}</table>`
     +(d.redo?"":`<div class="row"><button data-do="cpredo" data-u="${u}" data-a="${a.id}" title="Their answers are discarded and they do it again (new questions, new order)">↺ Let them do it again</button></div>`),true);
 }

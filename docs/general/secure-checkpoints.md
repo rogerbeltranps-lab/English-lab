@@ -40,6 +40,10 @@ without any sync script, and students do not see it as an exam (proposal: https:
 - Group tab → "🛡️ Recall checkpoints": score, ⚡, 👀, minutes; "📣 Release feedback (n)" per checkpoint writes `fb` to the group's tries
   (press again after accepting an answer). A cell opens the answers with the time per question, "✓ Accept" (adds to `extra`, for every student)
   and "↺ Let them do it again" (sets `redo`; the page shows the rules again with a new draw).
+- Far from usual (Roger, 31 Oct 2026: “if these checkpoints differ drastically from their marks … there should be a warning on the dashboard”):
+  `cpGap` compares the checkpoint % with the student's usual level, the average of their exam marks in the course so far (`examMark`) and
+  their recall warm-up first tries in the same LS. 35 points or more above (`CP_GAP`) → ⚠️ on the cell, a warning list at the top of the box
+  and "⚠️ n far above usual" in its title; that much below → ↓. Worth a look, not proof.
 
 ## Paper worksheets
 
