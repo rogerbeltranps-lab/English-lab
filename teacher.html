@@ -17,6 +17,7 @@ thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;vertical-align:top}t
 th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#cbd5e1}.first{border-left:3px solid #94a3b8}th.ac{font-weight:500;min-width:44px}.skip{color:#94a3b8;background:#f8fafc}td.ac{color:#16a34a;font-weight:700}
 td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px solid #0f766e;outline-offset:-2px}td.sub{background:#dcfce7}td.mark{background:#fef9c3}td.na{color:#94a3b8;font-weight:400}
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
+.annl .annt{white-space:pre-wrap;overflow-wrap:anywhere;border-left:4px solid #ea580c;background:#fff7ed}.annprev{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:10px}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}button.sec{background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-size:13px}button.sec.off{background:#e2e8f0;color:#475569;border-color:#cbd5e1}button.secall{background:none;color:#0f766e;padding:2px 6px;font-size:12px;text-decoration:underline}
 .ycards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:10px;margin:8px 0}.ycard{border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;background:#f8fafc}.ycard ul{margin:6px 0;padding-left:18px}.ycard li{margin:2px 0}.yfree{border-style:dashed;background:#fff}.yterm.ynow{border:2px solid #0f766e}.cbar{display:flex;height:26px;border-radius:8px;overflow:hidden;margin:6px 0 4px;background:#e2e8f0}.cbar span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;border-right:1px solid #fff}.cbar span:last-child{border-right:0}.clegend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:#475569;margin-bottom:6px}.clegend i,i.cdot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
@@ -50,6 +51,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <script src="shared/print/lp-list.js"></script>
 <script type="module">
 import {replyText,replyColor,MSG_MAX} from "./shared/js/el-reply.js";
+import {ANN_MAX,annMs,annHtml,annCardHtml,annCardStyle} from "./shared/js/el-announce.js";
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
@@ -76,8 +78,8 @@ const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
 // pt, tm = team points (points/{same id as the list}, teams/{group}; shared/js/el-points.js).
 async function load(){
-  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};cpInject(DEMO);return DEMO}
-  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[],sg:[],ck:{},cp:{}},up=r=>r.ref.parent.parent.id;
+  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};DEMO.ann=DEMO.ann||[];cpInject(DEMO);return DEMO}
+  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[],sg:[],ann:[],ck:{},cp:{}},up=r=>r.ref.parent.parent.id;
   try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
   try{(await F.getDocs(F.collection(db(),"points"))).forEach(p=>D.pt[p.id]=p.data());(await F.getDocs(F.collection(db(),"teams"))).forEach(t=>D.tm[t.id]=t.data())}catch(e){D.ptErr=true;console.warn("points",e)}
   try{(await F.getDocs(F.collection(db(),"teacherPlan"))).forEach(t=>D.tk[t.id]=t.data())}catch(e){console.warn("teacherPlan",e)}
@@ -85,6 +87,8 @@ async function load(){
   // sg = suggestions from students (suggestions/{id}: uid, email, name, group, page, text, created, read), sent with "💡 Idea" in the bottom bar
   try{(await F.getDocs(F.collection(db(),"suggestions"))).forEach(x=>D.sg.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("suggestions",e)}
   try{(await F.getDocs(F.collection(db(),"problems"))).forEach(x=>D.pb.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("problems",e)}
+  // ann = announcements to students (announcements/{id}: text, to, label, groups, uids, created, read{uid: time}), sent with "📣 Announcements"
+  try{(await F.getDocs(F.collection(db(),"announcements"))).forEach(x=>D.ann.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("announcements",e)}
   // notes not read yet (the student deletes each one with OK): an answer whose note is gone was read
   D.replies={};try{(await F.getDocs(F.collection(db(),"problemReplies"))).forEach(x=>D.replies[x.id]=1)}catch(e){console.warn("problemReplies",e)}
   (await F.getDocs(F.collection(db(),"students"))).forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()));
@@ -163,6 +167,11 @@ const api={
     const rid=fix?id:id+"_m"+Date.now().toString(36),rp=Object.assign(pbReply(x,fix?"fixed":"message"),{msg:text}),m={text,at:new Date().toISOString(),rid,fix:!!fix};
     if(DEMO){x.msgs=[...(x.msgs||[]),m];if(fix)x.fixed=true;S.D.replies[rid]=rp;return}
     const b=F.writeBatch(db());b.set(F.doc(db(),"problems",id),Object.assign({msgs:F.arrayUnion(m)},fix?{fixed:true}:{}),{merge:true});b.set(F.doc(db(),"problemReplies",rid),rp);return b.commit()},
+  // announcements (Roger, 31 Oct 2026: "I want to be able to send messages to my students, like announcements from the teacher"):
+  // announcements/{id} = {text, to, label, groups, uids, created, read:{}}. Students read the ones for their group or for them (el-announce.js).
+  annSend:o=>{const x=Object.assign({},o,{read:{},created:DEMO?Date.now():F.serverTimestamp()});if(DEMO){S.D.ann.push(Object.assign({id:"a"+Date.now().toString(36)},x));return}
+    return F.setDoc(F.doc(F.collection(db(),"announcements")),x)},
+  annDel:id=>DEMO?S.D.ann=S.D.ann.filter(x=>x.id!==id):F.deleteDoc(F.doc(db(),"announcements",id)),
   sgRead:(id,v)=>DEMO?S.D.sg.find(x=>x.id===id).read=v:put(["suggestions",id],{read:v}),
   sgDel:id=>DEMO?S.D.sg=S.D.sg.filter(x=>x.id!==id):F.deleteDoc(F.doc(db(),"suggestions",id)),
   pbLoad:async()=>{if(DEMO)return;const L=[];(await F.getDocs(F.collection(db(),"problems"))).forEach(x=>L.push(Object.assign({id:x.id},x.data())));S.D.pb=L},
@@ -410,8 +419,9 @@ function render0(){
     +`<button class="tab cplan ${S.g==="qa"?"on":""}" data-do="tab" data-g="qa" title="Which questions students answer well or badly the first time, by route and group">🔎 Questions</button>`
     +`<button class="tab cplan ${S.g==="mat"?"on":""}" data-do="tab" data-g="mat" title="Class games, paper worksheets and study PDFs of every LS">📚 Materials</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
-    +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
-  if(S.g==="plan"){$("#main").innerHTML=pbBox()+sgBox()+overview();return}
+    +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`
+    +` <button class="g" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`;
+  if(S.g==="plan"){$("#main").innerHTML=annBox()+pbBox()+sgBox()+overview();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
   if(S.g==="none"){$("#main").innerHTML=noGroup(studs.filter(s=>!s.group&&!s.tester).sort(byName))+pbBox()+sgBox()+rosterBox();return}
@@ -435,7 +445,7 @@ function render0(){
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
     +lpBox(ls,grp)
     +cpBox(ls,grp,inG)
-    +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`+pbBox()+sgBox()
+    +annBox()+`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`+pbBox()+sgBox()
     +routesBox(grp,inG.filter(s=>!s.tester))
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
@@ -456,10 +466,17 @@ const QA={};S.qa={ls:null,g:"all",f:{act:"all",area:"all",sort:"hard",all:false}
 // Materials tab (Roger, 30 Oct 2026: "a table on the teacher dashboard to see all the games and printable docs"): per course, the class games
 // (lab/game/decks/index.js, opens the board on that game), the paper worksheets of each Learning Path per route + answer keys
 // (shared/print/lp-list.js; teacher only), the class shadowing page (shared/shadow/), the LS shadowing video (EL_LS[].shadowing) and the study PDFs per route (EL_LS[].study). New games and worksheets appear here by themselves.
+// "How English Lab works" videos (Roger, 31 Oct 2026: "the teachers video on the teachers board and the students' on theirs, and the
+// students' video also on the teachers board"): tools/site-video builds them; the student ones are also on the student board (today.html).
+// [title, file, shown]: an entry shows once its video is in the repo.
+const HOW_VIDEOS=[["👩‍🏫 For teachers: how the dashboard works","video/how-the-dashboard-works.mp4",true],
+  ["🎓 For students, in English (Amelia)","video/how-english-lab-works.mp4",true],["🎓 For students, in Catalan (Julian)","video/how-english-lab-works-ca.mp4",true]];
+function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Short videos made from the real site. The student ones are also on the student board.</p>`
+  +HOW_VIDEOS.filter(v=>v[2]).map(([t,href])=>`<p>${esc(t)}: ${a(href,"Watch →","btn")}</p>`).join("")+`</div>`}
 function matTab(){
   const R0=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],RP=l=>R0.concat(l.pro?[["native","Pro"]]:[]);
   const a=(href,t,c)=>`<a href="${href}" target="_blank" rel="noopener"${c?` class="${c}"`:""}>${t}</a>`;
-  return [["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
+  return howTo(a)+[["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
     const games=(window.EL_GAMES||[]).filter(g=>g.course===c).sort((x,y)=>((x.ls||"")+(x.lp||"")).localeCompare((y.ls||"")+(y.lp||""),"en",{numeric:true})),lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
       +`<h3>🎮 Class games</h3>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation · Learning Path</th><th></th></tr>`
@@ -472,7 +489,7 @@ function matTab(){
           +(w?`<p>🗣 Shadowing at the start of the class: ${a("shared/shadow/index.html?ls="+k,"Open on the projector →","btn")} <span class="muted">(the same clips as the Shadowing step of each Learning Path)</span></p>`:"")
           +(w?`<div class="qwrap"><table class="mat"><tr><th>Paper worksheet</th>${R.map(([r,n])=>`<th>${n}</th>`).join("")}<th>Answer key</th></tr>`
             +w.lps.map(([lp,t])=>{const u="shared/print/worksheet.html?ls="+k+"&lp="+lp+"&route=";
-              return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r,n])=>a(u+r+"&key=1",r==="native"?n:n[0],"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
+              return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r,n])=>a(u+r+"&key=1",n,"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
             :`<p class="muted">No paper worksheets for this LS.</p>`)}).join("")
       +`</div>`}).join("");
 }
@@ -996,6 +1013,53 @@ function noGroup(studs){
 // Problem reports from students (all groups): open ones first, then newest first. Fixed ones stay until you delete them.
 const PB_KIND={media:"🔊 An audio or a video does not play",stuck:"⛔ Cannot go on / a button does not work",marking:"❌ A correct answer is marked wrong",display:"🖥️ The page looks wrong or does not load",other:"❓ Something else"};
 const pbWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.created)):null;
+// ---- announcements to students (Roger, 31 Oct 2026: "I want to be able to send messages to my students, like announcements from the teacher")
+// To one group, a whole course, every group or some students. Each student sees it once as a card at the top of the next page they open,
+// and it stays in 📣 Announcements on their board. The test account always gets a copy (uids). shared/js/el-announce.js draws the card.
+const annGroups=to=>to==="all"?GR.map(g=>g.id):to.startsWith("c:")?GR.filter(g=>g.course===to.slice(2)).map(g=>g.id):to.startsWith("g:")?[to.slice(2)]:[];
+const courseName=c=>c.replace(/^(\d)eso$/,"$1ESO");
+const annLabel=(to,sel)=>to==="all"?"Every group":to.startsWith("c:")?courseName(to.slice(2))+" (both groups)":to.startsWith("g:")?(GR.find(g=>g.id===to.slice(2))||{}).name||to.slice(2)
+  :sel.length===1&&S.P[sel[0]]?fullName(S.P[sel[0]]):sel.length+" students";
+// who it is for (testers left out): everyone of its groups (also students who have not signed in yet: they see it when they do) and its uids
+const annWho=a=>Object.values(S.P).filter(s=>!s.tester&&((a.groups||[]).includes(s.group)||(a.uids||[]).includes(s.uid)));
+const annMine=a=>S.g==="plan"||S.g==="none"||(a.groups||[]).includes(S.g)||annWho(a).some(s=>s.group===S.g);
+const annWhen=a=>{const ms=annMs(a.created);return ms?new Date(ms).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"just now"};
+function annBox(){
+  const L=(S.D.ann||[]).filter(annMine).sort((a,b)=>annMs(b.created)-annMs(a.created));
+  const li=a=>{const who=annWho(a),rd=who.filter(s=>(a.read||{})[s.uid]),no=who.filter(s=>!(a.read||{})[s.uid]);
+    return `<li><div class="hand annt">${annHtml(a.text)}</div><small class="muted">📣 To <b>${esc(a.label||"")}</b> · ${annWhen(a)} · ${who.length?`read by <b>${rd.length} of ${who.length}</b>`:"nobody on the list yet"}</small>
+      ${no.length&&rd.length?`<details><summary class="muted" style="font-size:13px;font-weight:600">Not read yet (${no.length})</summary><small>${no.sort(byName).map(s=>name(s)+(s.away?' <span class="muted">(not signed in yet)</span>':"")).join(" · ")}</small></details>`:""}
+      <div><button class="g" data-do="anndel" data-id="${esc(a.id)}">Delete</button></div></li>`};
+  return `<div class="box" id="ann"><h2>📣 Announcements <small class="muted">to your students</small></h2>`
+    +`<div class="bar"><button data-do="annnew" title="A message from you to one group, a whole course, every group or some students">📣 New announcement</button><span class="muted">Each student sees it once, at the top of the next page they open, and it stays in 📣 Announcements on their board.</span></div>`
+    +(L.length?fold("ann",`Sent <small class="muted">${L.length}${S.g==="plan"?"":" for this group"}</small>`,`<ul class="sgl annl">${L.map(li).join("")}</ul>`):"")+`</div>`;
+}
+function annDialog(keep){
+  const old=keep&&$("#annt")?$("#annt").value:"",inTab=GR.find(g=>g.id===S.g);
+  if(!keep){S.annTo=inTab?"g:"+inTab.id:"all";S.annSel=new Set()}
+  const to=S.annTo,opt=(v,l)=>`<button type="button" class="chip ${to===v?"on":""}" data-do="annto" data-v="${v}">${esc(l)}</button>`;
+  const studs=Object.values(S.P).filter(s=>!s.tester&&s.group&&(!inTab||s.group===inTab.id)).sort(byName);
+  const pick=to==="s"?`<div class="annpick">${(inTab?[inTab]:GR).map(g=>{const L=studs.filter(s=>s.group===g.id);return L.length?`<p style="margin:6px 0 2px"><b>${esc(g.name)}</b></p>`
+      +L.map(s=>`<label class="ck" style="font-weight:400;display:inline-flex;gap:4px;margin:2px 10px 2px 0"><input type="checkbox" data-annu="${esc(s.uid)}" ${S.annSel.has(s.uid)?"checked":""} ${s.away?"disabled":""}>${name(s)}${s.away?' <small class="muted">(not signed in yet)</small>':""}</label>`).join(""):""}).join("")}</div>`:"";
+  dlg(`<h3>📣 New announcement</h3><p class="muted" style="margin:0 0 6px">To</p><div class="bar">${GR.map(g=>opt("g:"+g.id,g.name)).join("")}${[...new Set(GR.map(g=>g.course))].map(c=>opt("c:"+c,courseName(c)+" (both groups)")).join("")}${opt("all","Every group")}${opt("s",inTab?"Some students of "+inTab.name:"Some students")}</div>${pick}
+    <label for="annt">Your message <small class="muted">(up to ${ANN_MAX} characters; it goes exactly as you write it, so use the language you want them to read; a web link becomes clickable)</small></label>
+    <textarea id="annt" maxlength="${ANN_MAX}" style="min-height:120px" placeholder="For example: Tomorrow we meet in the computer room. Bring your headphones!"></textarea>
+    <p class="muted" id="anncount" style="margin:6px 0"></p>
+    <p class="muted" style="margin:6px 0 4px">What they see, once, at the top of the next page they open (the words around your message follow their route):</p>
+    <div class="annprev"><div><small class="muted">Core, Plus and Pro</small><div class="annc" id="annp-en" style="${annCardStyle}"></div></div><div><small class="muted">Starter and Base</small><div class="annc" id="annp-ca" style="${annCardStyle}"></div></div></div>
+    <div class="row" style="justify-content:flex-start"><button data-do="annsend" id="annsend" disabled>📣 Send</button></div>`,true);
+  const t=$("#annt");t.value=old;
+  const draw=()=>{const sel=[...S.annSel],who=to==="s"?sel.filter(u=>S.P[u]):Object.values(S.P).filter(s=>!s.tester&&annGroups(to).includes(s.group)),n=who.length,v=t.value.trim();
+    $("#anncount").innerHTML=n?`Goes to <b>${n} student${n===1?"":"s"}</b>${to==="s"?"":" (also the ones who have not signed in yet: they see it when they do)"}. Your test account gets a copy.`:to==="s"?"Tick the students who should get it.":"Nobody on the list in that group yet.";
+    [["en",true],["ca",false]].forEach(([k,en])=>$("#annp-"+k).innerHTML=annCardHtml({text:v,created:Date.now()},en,true));
+    $("#annsend").disabled=!v||!n};
+  t.oninput=draw;document.querySelectorAll("#dlg [data-annu]").forEach(c=>c.onchange=()=>{c.checked?S.annSel.add(c.dataset.annu):S.annSel.delete(c.dataset.annu);draw()});
+  draw();t.focus()}
+function annSendNow(){
+  const text=$("#annt").value.trim().slice(0,ANN_MAX),to=S.annTo,sel=to==="s"?[...S.annSel].filter(u=>S.P[u]&&!S.P[u].away):[];if(!text)return;
+  if(to==="s"&&!sel.length)return alert("Tick the students who should get it.");
+  const testers=Object.values(S.P).filter(s=>s.tester&&!s.away).map(s=>s.uid);
+  $("#dlg").close();act(api.annSend({text,to:to==="s"?"students":to,label:annLabel(to,sel),groups:annGroups(to),uids:[...new Set([...sel,...testers])]}))}
 // Suggestions from students (all groups): new ones first, then newest first. Read ones stay until you delete them.
 const sgWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.created)):null;
 function sgBox(){
@@ -1269,6 +1333,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     sgopen:()=>{S.open.add("sugg");render();$("#sugg").scrollIntoView({behavior:"smooth"})},
+    annnew:()=>annDialog(),annsend:()=>annSendNow(),annto:()=>{S.annTo=k.v;annDialog(true)},
+    anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
     sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");render();$("#probs").scrollIntoView({behavior:"smooth"})},
     pbshot:async()=>{const x=S.D.pb.find(y=>y.id===k.id)||{},cap=x.shot==="page"?"Captured by the page when the student pressed “Capture this screen” (it can look slightly different from the real screen; videos and embedded content may be blank).":"An image the student chose or pasted.";

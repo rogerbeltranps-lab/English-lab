@@ -1,0 +1,91 @@
+{
+ "title": "How the dashboard works",
+ "voice": "Michael C. Vincent",
+ "lines": [
+  {
+   "id": "t01",
+   "scene": "Welcome",
+   "en": "Welcome to the English Lab teacher dashboard! In about four minutes, you'll see how to follow your groups, open their work, answer what needs you, and find all your materials."
+  },
+  {
+   "id": "t02",
+   "scene": "Getting started",
+   "en": "Sign in with your teacher Google account. At the top, you'll find the Time plan, Questions and Materials tabs, and then one tab for each group."
+  },
+  {
+   "id": "t03",
+   "scene": "Getting started",
+   "en": "Click a group. Choose the Learning Situation, and filter the students by route: Starter, Base, Core or Plus."
+  },
+  {
+   "id": "t04",
+   "scene": "Your week",
+   "en": "The time plan shows the exam day and this week's sessions. Tick each session when it's done. Click Set as homework, and students see it on their board and in their Google Calendar."
+  },
+  {
+   "id": "t05",
+   "scene": "Your week",
+   "en": "Open each learning path when it's time. Until then, students see Not open yet. You can also open or lock single sections."
+  },
+  {
+   "id": "t06",
+   "scene": "What needs you",
+   "en": "The To do list gathers everything that needs you: route requests to accept or decline, problem reports, and suggestions from students."
+  },
+  {
+   "id": "t07",
+   "scene": "What needs you",
+   "en": "Each problem report shows the page, the student's route and device. Answer the student, mark it as fixed, or click Fix with Claude."
+  },
+  {
+   "id": "t08",
+   "scene": "What needs you",
+   "en": "Students can also send ideas to improve the website. You'll find them under Suggestions."
+  },
+  {
+   "id": "t09",
+   "scene": "Routes",
+   "en": "Routes from the exam sets every student's route from their exam mark, with the cut-offs you choose. Click Apply and notify, and each student gets a message with their new level."
+  },
+  {
+   "id": "t10",
+   "scene": "Following the work",
+   "en": "The learning paths grid shows every activity for every student. Green means submitted, and yellow means marked as done but not submitted yet."
+  },
+  {
+   "id": "t11",
+   "scene": "Following the work",
+   "en": "Click any score to see the details: each step, the first try, and the hand-ins. Give a level, and write feedback for the student."
+  },
+  {
+   "id": "t12",
+   "scene": "Following the work",
+   "en": "Everything is corrected automatically, and written work is marked for you. You only mark the final product yourself."
+  },
+  {
+   "id": "t13",
+   "scene": "Grades",
+   "en": "The LS grade adds up the final exam, the final product, grammar and vocabulary, and the other competences, with the weights shown. Enter exam marks by section below."
+  },
+  {
+   "id": "t14",
+   "scene": "Grades",
+   "en": "Points come from the class games and presentations. Students who have done all their work get a bonus on the term grade."
+  },
+  {
+   "id": "t15",
+   "scene": "Grades",
+   "en": "Choose Whole school year to see every competence term by term, weighted by how much each activity works on it."
+  },
+  {
+   "id": "t16",
+   "scene": "Materials",
+   "en": "The Materials tab has the class games, paper worksheets with answer keys, study PDFs, shadowing videos, and these videos for you and your students."
+  },
+  {
+   "id": "t17",
+   "scene": "The end",
+   "en": "That's it! Check your To do list every day, tick your sessions, and let English Lab do the rest. Enjoy!"
+  }
+ ]
+}

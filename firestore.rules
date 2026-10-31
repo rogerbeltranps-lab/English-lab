@@ -80,6 +80,18 @@ service cloud.firestore {
       allow read, delete: if isTeacher() || (signedIn() && resource.data.uid == request.auth.uid);
       allow create, update: if isTeacher();
     }
+    // announcements from the teacher (dashboard "📣 Announcements"; shared/js/el-announce.js): only the teacher writes or deletes them.
+    // A student reads the ones sent to their group (groups) or to them (uids); testers read them all. A student can only add their own
+    // read time (read.{uid}) to one of those, and nothing else.
+    function annForMe() { return signedIn() && (isTester() || request.auth.uid in resource.data.uids || rosterGroup() in resource.data.groups); }
+    match /announcements/{id} {
+      allow read: if isTeacher() || annForMe();
+      allow create, delete: if isTeacher();
+      allow update: if isTeacher() || (annForMe()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+        && request.resource.data.read.diff(resource.data.get('read', {})).affectedKeys().hasOnly([request.auth.uid])
+        && request.resource.data.read.get(request.auth.uid, null) is timestamp);
+    }
     match /problemShots/{id} {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['uid','img','created'])
