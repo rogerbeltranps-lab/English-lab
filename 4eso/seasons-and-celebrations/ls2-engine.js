@@ -26,6 +26,7 @@ var LS2 = (function () {
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
   let LP, level, state;
   const ca = () => level === 'insecure' || level === 'beginners';
+  window.elMicCa = ca;   // the microphone helper (shared/js/el-mic.js) speaks the route's language
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca() ? (o.ca || o.en) : (o.en || o.ca));
   const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : level === 'native' && o.daring != null ? o.daring : o.safe != null && (level === 'daring' || level === 'native') ? o.safe : o.insecure);   // beginners → insecure, native → daring
   // A list is cumulative (r: tags); an object keyed by route gives each route its own list (the sample exam: same number of items per route).
@@ -659,6 +660,7 @@ var LS2 = (function () {
       $('#spPlan').value = sp.plan || ''; $('#speechTranscript').value = sp.tr || '';
       $('#spPlan').oninput = keepSp; $('#speechTranscript').oninput = keepSp;
       $('#startRecord').onclick = async () => {
+        if (processor) return; $('#startRecord').disabled = true;
         try {
           micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
@@ -667,7 +669,7 @@ var LS2 = (function () {
           sourceNode.connect(processor); processor.connect(audioCtx.destination); srBox = null; startSR();
           $('#recordStatus').textContent = ca() ? 'Gravant… parla ara.' : 'Recording… speak now.';
           $('#startRecord').disabled = true; $('#stopRecord').disabled = false; $('#downloadWav').disabled = true; $('#spAi').disabled = true;
-        } catch (e) { $('#recordStatus').textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Dona permís i torna-ho a provar.' : 'Microphone access was not available. Allow it and try again.'; }
+        } catch (e) { $('#startRecord').disabled = false; $('#recordStatus').textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; }
       };
       $('#stopRecord').onclick = async () => {
         if (!processor) return;
@@ -676,7 +678,7 @@ var LS2 = (function () {
         $('#recordedAudio').src = recUrl; $('#recordedAudio').style.display = 'block';
         $('#downloadWav').disabled = false; $('#spAi').disabled = false; $('#startRecord').disabled = false; $('#stopRecord').disabled = true; processor = null;
         $('#recordStatus').textContent = ca() ? 'Gravació a punt. Escolta-la abans de demanar feedback.' : 'Recording ready. Listen to it before asking for feedback.';
-        setTimeout(keepSp, 1500);   // the last words of the automatic transcript arrive after Stop
+        setTimeout(() => { keepSp(); if (!$('#speechTranscript').value.trim()) $('#recordStatus').textContent += ' ' + (ca() ? 'No s’ha creat cap transcripció automàtica: escriu tu el que has dit.' : 'No automatic transcript was made: type what you said.'); }, 1500);   // the last words of the automatic transcript arrive after Stop
       };
       $('#downloadWav').onclick = downloadWav;
       $('#spAi').onclick = () => {
@@ -743,15 +745,17 @@ var LS2 = (function () {
             const a = $('#' + id + 'Audio'); a.src = recUrl; a.style.display = 'block';
             btn('Start').disabled = false; btn('Stop').disabled = true; btn('Wav').disabled = false; btn('Ai').disabled = false;
             st.textContent = ca() ? 'Gravació a punt. Escolta-la, revisa la transcripció i demana feedback.' : 'Recording ready. Listen to it, check the transcript and ask for feedback.';
+            setTimeout(() => { if (!tr.value.trim()) st.textContent += ' ' + (ca() ? 'No s’ha creat cap transcripció automàtica: escriu tu el que has dit.' : 'No automatic transcript was made: type what you said.'); }, 1200);
           };
           btn('Start').onclick = async () => {
+            if (processor) return; btn('Start').disabled = true;
             try {
               micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
               audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
               sourceNode = audioCtx.createMediaStreamSource(micStream); processor = audioCtx.createScriptProcessor(4096, 1, 1); pcm = [];
               processor.onaudioprocess = e => pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
               sourceNode.connect(processor); processor.connect(audioCtx.destination);
-            } catch (e) { st.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Dona permís i torna-ho a provar.' : 'Microphone access was not available. Allow it and try again.'; return; }
+            } catch (e) { btn('Start').disabled = false; st.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; return; }
             btn('Start').disabled = true; btn('Stop').disabled = false; btn('Wav').disabled = true; btn('Ai').disabled = true;
             if (tr.value.trim()) { tr.value = ''; sp.tr = ''; save(); }
             const me = ++run; let i = 0;
@@ -810,7 +814,7 @@ var LS2 = (function () {
         '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Hide">' + (ca() ? 'Amaga el text' : 'Hide the script') + '</button></div>' +
         '<div class="reading" id="' + id + 'Script">' + c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<strong>' + esc(l[0]) + ':</strong> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('') + '</div></div>' +
         '<div class="section-card"><h3>' + (ca() ? 'Grava l’última vegada' : 'Record your last go') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes darrere la veu. Amb Chrome veuràs quantes paraules del text ha entès l’ordinador. No compta per a la nota: és per veure com millores.' : 'Press <strong>Record and play</strong>: the clip plays and you shadow it. With Chrome you will see how many words of the script the computer caught. It is just for you, to see how you improve.') + '</p>' +
-        '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Rec">● ' + (ca() ? 'Grava i escolta' : 'Record and play') + '</button></div><div class="record-status" id="' + id + 'RecMsg"></div><audio id="' + id + 'Mine" controls style="width:100%;display:none"></audio></div>' +
+        '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Rec">● ' + (ca() ? 'Grava i escolta' : 'Record and play') + '</button><button class="btn secondary" type="button" id="' + id + 'RecStop" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button></div><div class="record-status" id="' + id + 'RecMsg"></div><audio id="' + id + 'Mine" controls style="width:100%;display:none"></audio></div>' +
         '<div class="section-card"><h3>' + (ca() ? 'Com ha anat?' : 'How did it go?') + '</h3><div class="actions" style="justify-content:flex-start" role="group">' +
         [['3', ca() ? '😀 Ho he seguit tot' : '😀 I kept up all the way'], ['2', ca() ? '🙂 Gairebé tot' : '🙂 Most of it'], ['1', ca() ? '😕 Em perdia' : '😕 I got lost']].map(r => '<button class="btn secondary" type="button" data-rate="' + id + '" data-v="' + r[0] + '">' + r[1] + '</button>').join('') +
         '</div><div class="actions"><button class="btn" type="button" id="' + id + 'Done">' + (ca() ? 'Fet ✓' : 'Done ✓') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
@@ -824,9 +828,10 @@ var LS2 = (function () {
         const halt = () => { m.pause(); const f = onEnd; onEnd = null; if (f) f(); };
         m.ontimeupdate = () => { if (endAt && m.currentTime >= endAt) { endAt = 0; halt(); } };
         m.onended = () => { endAt = 0; halt(); };
+        m.onerror = () => { endAt = 0; $('#' + id + 'Count').textContent = ca() ? 'El fragment no s’ha pogut carregar. Recarrega la pàgina.' : 'The clip could not load. Reload the page.'; halt(); };
         const play = done => {
           const src = slow ? c.slow : c.src, t = slow ? c.ts : c.t;
-          const go = () => { m.currentTime = t[0]; endAt = t[1]; onEnd = done || null; m.play().catch(() => {}); sh.plays = (sh.plays || 0) + 1; count(); save(); };
+          const go = () => { m.currentTime = t[0]; endAt = t[1]; onEnd = done || null; m.play().catch(e => { if (e && e.name === 'AbortError') return; endAt = 0; $('#' + id + 'Count').textContent = ca() ? 'El fragment no s’ha pogut reproduir. Torna-ho a provar.' : 'The clip could not play. Try again.'; halt(); }); sh.plays = (sh.plays || 0) + 1; count(); save(); };
           if (!m.src || !m.src.endsWith(src)) { m.src = src; m.addEventListener('loadedmetadata', go, { once: true }); m.load(); } else go();
         };
         $('#' + id + 'Play').onclick = () => play();
@@ -835,19 +840,23 @@ var LS2 = (function () {
         $('#' + id + 'Hide').onclick = e => { const s = $('#' + id + 'Script'), h = !s.hidden; s.hidden = h; e.target.textContent = h ? (ca() ? 'Mostra el text' : 'Show the script') : (ca() ? 'Amaga el text' : 'Hide the script'); };
         $$('[data-rate="' + id + '"]').forEach(b => b.onclick = () => { sh.rate = +b.dataset.v; rate(); save(); });
         // the last go: the mic records while the clip plays; recognition counts the script words it heard (feedback only, never saved as a mark)
-        const recMsg = $('#' + id + 'RecMsg'), recBtn = $('#' + id + 'Rec');
+        const recMsg = $('#' + id + 'RecMsg'), recBtn = $('#' + id + 'Rec'), recStop = $('#' + id + 'RecStop');
+        recStop.onclick = () => { endAt = 0; halt(); };
         recBtn.onclick = async () => {
+          if (processor) return; recBtn.disabled = true;
           try {
             micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
             audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
             sourceNode = audioCtx.createMediaStreamSource(micStream); processor = audioCtx.createScriptProcessor(4096, 1, 1); pcm = [];
             processor.onaudioprocess = e => pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
             sourceNode.connect(processor); processor.connect(audioCtx.destination);
-          } catch (e) { recMsg.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Dona permís i torna-ho a provar.' : 'Microphone access was not available. Allow it and try again.'; return; }
+          } catch (e) { recBtn.disabled = false; recMsg.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; return; }
           let rec = null, heard = ''; const SR = SRC();
           if (SR) try { rec = new SR(); rec.lang = 'en-GB'; rec.continuous = true; rec.interimResults = false; rec.onresult = e => { for (let k = e.resultIndex; k < e.results.length; k++) if (e.results[k].isFinal) heard += ' ' + e.results[k][0].transcript; }; rec.start(); } catch (e) { rec = null; }
-          recBtn.disabled = true; recMsg.textContent = ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.';
+          recStop.disabled = false; recMsg.textContent = ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.';
+          (c.video ? m : recBtn).scrollIntoView({ behavior: 'smooth', block: 'center' });   // the video has to be in view to follow it
           play(async () => {
+            recStop.disabled = true;
             try { if (rec) rec.stop(); } catch (e) {}
             if (processor) { processor.disconnect(); sourceNode.disconnect(); micStream.getTracks().forEach(t => t.stop()); await audioCtx.close(); processor = null; }
             recBlob = encodeWav(pcm, recRate); if (recUrl) URL.revokeObjectURL(recUrl); recUrl = URL.createObjectURL(recBlob);
@@ -857,7 +866,7 @@ var LS2 = (function () {
               const ws = toks(want), got = ws.filter(w => said.has(w)).length, pct = ws.length ? Math.round(got / ws.length * 100) : 0;
               if (SR && heard.trim()) { sh.pct = pct; save(); }
               recMsg.textContent = SR && heard.trim() ? (ca() ? 'L’ordinador ha entès el ' + pct + ' % de les paraules. Escolta’t i torna-ho a provar si vols.' : 'The computer caught ' + pct + ' % of the words. Listen to yourself and try again if you like.')
-                : (ca() ? 'Gravació a punt. Escolta’t.' : 'Recording ready. Listen to yourself.');
+                : (ca() ? 'Gravació a punt. Escolta’t.' : 'Recording ready. Listen to yourself.') + (SR && window.elMic && window.elMic.srBroken() ? ' ' + window.elMic.text(window.elMic.srBroken()).split('. ')[0] + '.' : '');
             }, 900);
           });
         };

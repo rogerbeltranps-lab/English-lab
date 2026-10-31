@@ -60,3 +60,13 @@ var learningSupport = {
         : 'Give all headings and feedback in English. Ask the learner to notice and revise key errors independently, with concise reasons. Keep corrected production in English.';
   }
 };
+
+// Every page with a recorder loads this file, so it also brings in the microphone helper (shared/js/el-mic.js: level meter,
+// mic choice, clear messages when the mic or the automatic transcript fails).
+(function () {
+  var s = document.currentScript;
+  if (!s || !s.src || window.elMic) return;
+  var e = document.createElement('script');
+  e.src = s.src.replace(/learning-path-support\.js/, 'el-mic.js');
+  document.head.appendChild(e);
+})();
