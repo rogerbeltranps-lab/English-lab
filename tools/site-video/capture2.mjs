@@ -84,8 +84,9 @@ for (const [i, t] of ['learning-path', 'language', 'final'].entries()) {
   await step('LS tab ' + t, async () => {
     await page.locator(`label[for="tab-${t}"]`).click();
     await page.waitForTimeout(600);
-    await page.locator(`label[for="tab-${t}"]`).scrollIntoViewIfNeeded();
-    await page.evaluate(() => window.scrollBy(0, -80));
+    // put the tab row near the top so the tab's content fills the shot (scrollIntoViewIfNeeded left it at the bottom edge)
+    await page.locator(`label[for="tab-${t}"]`).evaluate((l) => window.scrollTo(0, l.getBoundingClientRect().top + window.scrollY - 120));
+    await page.waitForTimeout(300);
     await shot(`4eso-3${i + 3}-ls-tab-${t}`);
     await shot(`4eso-3${i + 3}-ls-tab-${t}`, true);
   });
