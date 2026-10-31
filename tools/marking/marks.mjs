@@ -6,7 +6,8 @@
 //   node tools/marking/marks.mjs apply <group> <activity> <step> <answer file> [--apply] [--feedback]
 //        reads the EL-MARKS v1 answer and saves the levels (students/{uid}/results/{activity}.levels[step][criterion]), as the dashboard's
 //        level buttons do; --feedback also saves each line's feedback as the teacher's answer to the student (replies[step]).
-//        Without --apply it only prints what would change.
+//        Without --apply it only prints what would change. A line with "COPY? reason" (a possible copy) saves no level: it is kept as
+//        results/{activity}.flags[step] = {why, lv, fb, at} for the teacher to accept or send back in the dashboard's To do.
 // Sign-in: FIREBASE_SERVICE_ACCOUNT (the service account's JSON key, an environment secret of the cloud environment, never in the repo),
 // else the Firebase CLI login on Roger's PC (as tools/exam-marks). Group = EL_GROUPS id (2ESOA…); activity = catalogue id
 // (2eso/ls2-what-are-they-doing); step = the moment's step (log, chart, card, factfile). The answer file holds no names.
@@ -57,15 +58,20 @@ const roster=Object.fromEntries(await list("roster")),studs=(await list("student
 const TESTERS=JSON.parse((/TESTERS=(\[[^\]]*\])/.exec(fs.readFileSync(path.join(ROOT,"shared/js/el-firebase.js"),"utf8"))||[,"[]"])[1]),isTester=s=>TESTERS.includes((s.email||"").toLowerCase());   // as ELCloud.isTester
 const cache={};
 async function student(uid,ls,aid){const k=uid+"|"+ls+"|"+aid;if(cache[k])return cache[k];const rk=aid.replace("/","__");
-  const [pg,rs,lv]=await Promise.all([api("GET",DOCS+`students/${uid}/progress/${ls}`),api("GET",DOCS+`students/${uid}/results/${rk}`),api("GET",DOCS+`students/${uid}/levels`)]);
+  const L=W.EL_LS.filter(l=>l.course===ls.split("-")[0]),upto=L.slice(0,L.findIndex(l=>l.id===ls)+1);
+  const [pg,rs,lv,...ex]=await Promise.all([api("GET",DOCS+`students/${uid}/progress/${ls}`),api("GET",DOCS+`students/${uid}/results/${rk}`),api("GET",DOCS+`students/${uid}/levels`),
+    ...upto.map(l=>api("GET",DOCS+`students/${uid}/results/${l.id}__assessment`))]);
   const lvs=Object.fromEntries((lv?.documents||[]).map(d=>[d.name.split("/").pop(),doc(d)]));
-  return cache[k]={data:(doc(pg)||{}).data||{},res:doc(rs)||{},route:W.elRouteOf(lvs,ls).level};
+  const exam=ex.map((d,i)=>{const w=((doc(d)||{}).sections||{}).writing||{};return w.score!=null&&w.score!==""?`LS${i+1} ${w.score}/${w.max||10}`:null}).filter(Boolean).join(", ");   // exam writing so far
+  return cache[k]={data:(doc(pg)||{}).data||{},res:doc(rs)||{},route:W.elRouteOf(lvs,ls).level,exam};
 }
 const moments=ls=>((W.EL_GRADING[ls]||{}).moments||[]).filter(m=>{const a=W.EL_CATALOG.find(x=>x.id===m.a);return !m.group&&a&&!a.manual&&a.ls===ls});
 async function todo(grp,m){const a=W.EL_CATALOG.find(x=>x.id===m.a),out=[];
   for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id);
     let h=null;try{h=(JSON.parse(st.data[a.keys[0]]||"{}").steps||{})[m.step]}catch(e){}
-    const lv=((st.res.levels||{})[m.step])||{};if(h&&!m.c.every(c=>lv[c]))out.push({s,h,route:st.route})}
+    const lv=((st.res.levels||{})[m.step])||{},f=((st.res.flags||{})[m.step]);
+    const waits=!!f&&!(f.done==="redo"&&h&&h.date>f.at);   // a possible copy waiting for the teacher (as mkWaits in teacher.html)
+    if(h&&!m.c.every(c=>lv[c])&&!waits)out.push({s,h,route:st.route,exam:st.exam})}
   return out.sort((x,y)=>x.s.uid<y.s.uid?-1:1)}
 function readyOf(grp,ls,m,ticks){const p=W.EL_PLAN[ls],gi=p?W.ELWeek.col(p,grp.id):-1,due=p&&p.due&&p.due[m.a]?p.due[m.a][gi]:null,a=W.EL_CATALOG.find(x=>x.id===m.a);
   return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls})}
@@ -73,7 +79,7 @@ function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRA
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
   const text=W.ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:W.ELWeek.today(),crits:m.c,
     crit:Object.fromEntries(m.c.map(c=>[c,`${c} · ${W.elCompetence(c)}: ${W.elCriterion(course,c)||""}`])),ind:g.ind,
-    students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:CA_RT.includes(by[u].route),fields:by[u].h.f}))});
+    students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:by[u].h.f}))});
   return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]]))}}
 
 const [cmd,...rest]=process.argv.slice(2),flags=new Set(rest.filter(x=>x.startsWith("--"))),args=rest.filter(x=>!x.startsWith("--"));
@@ -90,10 +96,13 @@ else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(
   const r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:m.a,step:m.step,crits:m.c,codes:sh.codes});if(r.err)throw new Error(r.err);
   const a=W.EL_CATALOG.find(x=>x.id===m.a),rk=a.id.replace("/","__");
   for(const x of r.rows){const s=sh.codes.get(x.code).s,fb=flags.has("--feedback")&&x.fb;
-    console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+(fb?" · feedback: "+x.fb:""));
+    console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+(x.flag?" · ⚠️ POSSIBLE COPY (no level, to the To do): "+x.flag:fb?" · feedback: "+x.fb:""));
     if(!flags.has("--apply"))continue;
+    if(x.flag){await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",m.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},flags:fsv({[m.step]:{why:x.flag,lv:x.lv,fb:fb?x.fb:"",at:new Date().toISOString()}})}});continue}
     const paths=["ls","activity","updated",...m.c.map(c=>fp("levels",m.step,c)),...(fb?[fp("replies",m.step)]:[])];
     await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+paths.map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
       {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},levels:fsv({[m.step]:x.lv}),...(fb?{replies:fsv({[m.step]:x.fb})}:{})}})}
-  console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
+  const nf=r.rows.filter(x=>x.flag).length;
+  console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length-nf} · possible copies for the teacher: ${nf} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else{console.log("Usage: node tools/marking/marks.mjs ready | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback]");process.exit(1)}

@@ -418,6 +418,26 @@ var LS2 = (function () {
      the step completes only when the student saves an improved final version (state.finals[key]) with a line on what they changed.
      The teacher sees draft, final version and that line in the activity dialog; the student sees their own draft here. */
   const revWords = s => (String(s || '').trim().match(/\S+/g) || []).length;
+  // Teacher-marked writing (p.teacher on a writing or marked panel; Roger, 31 Oct 2026: "instead of sending the writing to ChatGPT …
+  // the teacher corrects"): the button hands the text in like a step (state.steps[p.id], with the writing log of el-typing.js), with no
+  // ChatGPT and no points typed by the student. The level and the correction come from the marking sheet a week later
+  // (shared/js/el-marking.js) and show in this panel (shared/js/el-corrections.js); a marked panel then counts the teacher's level as
+  // its points (EL_DEGREE_MARK: NA 2.5 · AS 5 · AN 7.5 · AE 10 out of 10), sent by el-corrections.js as the "el-levels" event.
+  function handToTeacher(p, text) {
+    state.steps = state.steps || {};
+    state.steps[p.id] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum('#' + p.id + 'Text') : null, f: [{ l: ca() ? 'El meu text' : 'My text', v: text }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+    complete(p.id); save();
+  }
+  function teacherBtn() { return ca() ? 'Entrega-ho al professor' : 'Hand it in to my teacher'; }
+  function handedMsg(p) { const h = (state.steps || {})[p.id]; return h ? (ca() ? 'Entregat el ' + new Date(h.date).toLocaleDateString() + '. El professor et tornarà la correcció aquí mateix. Si canvies el text, torna’l a entregar.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. Your teacher’s correction will appear right here. If you change your text, hand it in again.') : ''; }
+  addEventListener('el-levels', e => {
+    const lv = (e.detail || {}).levels || {}, M = { NA: 2.5, AS: 5, AN: 7.5, AE: 10 };
+    (LP.panels || []).filter(p => p.teacher && p.type === 'marked' && lv[p.id]).forEach(p => {
+      const xs = Object.values(lv[p.id]).map(x => M[x]).filter(x => x != null); if (!xs.length) return;
+      state.ai = state.ai || {}; const k = p.id + '_' + level, v = Math.round(xs.reduce((a, b) => a + b, 0) / xs.length / 10 * p.max);
+      if (state.ai[k] !== v) { state.ai[k] = v; save(); if (LP.onScore) LP.onScore(); }
+    });
+  });
   function keepDraft(key, text) {
     state.drafts = state.drafts || {};
     if (state.drafts[key]) return false;
@@ -462,8 +482,8 @@ var LS2 = (function () {
       (p.model ? '<div class="model"><strong>' + (ca() ? 'Model (no el copiïs: és sobre una altra afició)' : 'Model (don’t copy it: it is about another hobby)') + '</strong><br>' + tx(p.model) + '</div>' : '') +
       '<div class="model" id="' + p.id + 'Frame" hidden></div><textarea id="' + p.id + 'Text" placeholder="Write here…"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Revisa abans d’enviar' : 'Check before you send') + '</h3><div class="options" id="' + p.id + 'List"></div>' +
-      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (ca() ? 'Desa i corregeix amb IA ↗' : 'Save and correct with AI ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
-      '</div>' + revisionHtml(p.id),
+      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (p.teacher ? teacherBtn() : ca() ? 'Desa i corregeix amb IA ↗' : 'Save and correct with AI ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
+      '</div>' + (p.teacher ? '' : revisionHtml(p.id)),
     bind() {
       const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level;
       state.texts = state.texts || {};
@@ -481,6 +501,7 @@ var LS2 = (function () {
         const boxes = $$('#' + p.id + 'List input'), msg = $('#' + p.id + 'Msg');
         if (min && words(ta.value) < min) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + min + ' paraules.' : 'Too short: write at least ' + min + ' words.'; return; }
         if (boxes.some(b => !b.checked)) { msg.className = 'feedback no'; msg.textContent = learningSupport.missing(level, boxes); return; }
+        if (p.teacher) { handToTeacher(p, ta.value.trim()); if (p.product) saveProduct(p.product, ta.value.trim()); msg.className = 'feedback ok'; msg.textContent = handedMsg(p); return; }
         window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(aiPrompt(p, ta.value.trim())), '_blank', 'noopener,noreferrer');
         if (p.product) saveProduct(p.product, ta.value.trim());
         const first = keepDraft(key, ta.value.trim());
@@ -489,6 +510,7 @@ var LS2 = (function () {
           : (ca() ? 'S’ha obert ChatGPT amb la teva nova versió.' : 'ChatGPT has opened with your new version.');
         showRevision();
       };
+      if (p.teacher) { const h = handedMsg(p); if (h) { $('#' + p.id + 'Msg').className = 'feedback ok'; $('#' + p.id + 'Msg').textContent = h; } return; }
       const showRevision = bindRevision(p.id, key, () => ta.value.trim(), text => { if (p.product) saveProduct(p.product, text); });
     }
   });
@@ -555,7 +577,7 @@ var LS2 = (function () {
         const ps = byLevel(p.peerRate) || [], peers = (draft.peers || []).filter(d => d && (d.name || '').trim());
         if (p.peers && (peers.length < (p.minPeers || 2) || peers.some(d => ps.some((s, i) => !(d.r || [])[i])))) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Escriu el nom de cada company i puntua totes les frases.' : 'Write each teammate’s name and rate every statement.'; return; }
         const rate = stm.map((s, i) => ({ s, v: draft.rate[i] }));
-        state.steps[key] = { level, title: tx(p.title), f: fields.map(f => ({ l: tx(f.label), v: (draft.f[f.id] || '').trim() })), rate, avg: rate.length ? Math.round(rate.reduce((a, x) => a + x.v, 0) / rate.length * 10) / 10 : null,
+        state.steps[key] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum('#' + key + 'Fields') : null, f: fields.map(f => ({ l: tx(f.label), v: (draft.f[f.id] || '').trim() })), rate, avg: rate.length ? Math.round(rate.reduce((a, x) => a + x.v, 0) / rate.length * 10) / 10 : null,
           peers: p.peers ? peers.map(d => ({ name: d.name.trim(), r: ps.map((s, i) => ({ s, v: d.r[i] })) })) : undefined, comment: (draft.comment || '').trim(), date: new Date().toISOString() };
         // A step can also be a product piece (the research card): it then appears on the final product page too.
         if (p.product) saveProduct(p.product, state.steps[key].f.filter(f => f.v).map(f => f.l + ': ' + f.v).join('\n'));
@@ -751,7 +773,7 @@ var LS2 = (function () {
         $('#' + id + 'Send').onclick = () => {
           const n = nat ? words((sp.notes || []).join(' ')) : words(sp.tr || '');
           if (n < min) { msg.className = 'feedback no'; msg.textContent = nat ? 'Write a few ideas for every question (at least ' + min + ' words in all).' : ca() ? 'La transcripció té ' + n + ' paraules: respon totes les preguntes (almenys ' + min + ' paraules). Si Chrome no l’ha escrita, escriu el que has dit.' : 'Your transcript has ' + n + ' words: answer every question (at least ' + min + ' words). If Chrome didn’t write it, type what you said.'; return; }
-          state.steps[id] = { level, title: tx(p.title), f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+          state.steps[id] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum($('#' + id + 'Tr') && $('#' + id + 'Tr').parentElement) : null, f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
           complete(id); save();
           msg.className = 'feedback ok'; msg.textContent = ca() ? 'Entregada ✓ El professor ho veurà al seu tauler.' : 'Handed in ✓ Your teacher will see it on the dashboard.';
         };
@@ -905,10 +927,11 @@ var LS2 = (function () {
   R.marked = p => ({
     html: '<div class="section-card">' + mediaHtml(p) + '<h3>' + (ca() ? 'La tasca' : 'Your task') + ' <small>[' + ptsWord(p.max) + ']</small></h3><p class="instruction" id="' + p.id + 'Task"></p>' +
       '<textarea id="' + p.id + 'Text" rows="9"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
+      (p.teacher ? '<div class="section-card"><h3>' + (ca() ? 'Entrega' : 'Hand it in') + '</h3><p class="instruction">' + (ca() ? 'Quan acabis, entrega-ho. El professor et tornarà la correcció aquí mateix.' : 'When you finish, hand it in. Your teacher’s correction will appear right here.') + '</p><div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + teacherBtn() + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>' :
       '<div class="section-card"><h3>' + (ca() ? 'Feedback i nota orientativa' : 'Feedback and a guide mark') + '</h3><p class="instruction">' + (ca() ? 'Prem el botó: s’obre ChatGPT amb la teva resposta i els criteris de correcció. Et dirà el nivell (NA, AS, AN, AE), els punts i què has de millorar.' : 'Press the button: ChatGPT opens with your answer and the marking criteria. It tells you the level (NA, AS, AN, AE), the points and what to improve.') + '</p>' +
       '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (ca() ? 'Desa i corregeix amb ChatGPT ↗' : 'Save and mark with ChatGPT ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
       '<label class="field"><strong>' + (ca() ? 'Punts que t’ha donat ChatGPT (de ' + p.max + ')' : 'Points ChatGPT gave you (out of ' + p.max + ')') + '</strong><input type="number" class="typed" id="' + p.id + 'Pts" min="0" max="' + p.max + '" step="1" style="max-width:120px"></label>' +
-      '<p class="warm-note">' + aiWarning() + '</p></div>',
+      '<p class="warm-note">' + aiWarning() + '</p></div>'),
     bind() {
       bindAudio(p);
       const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level, min = byLevel(p.min);
@@ -918,6 +941,14 @@ var LS2 = (function () {
       const count = () => { $('#' + p.id + 'Count').textContent = words(ta.value) + ' ' + (ca() ? 'paraules' : 'words') + (min ? ' · ' + (ca() ? 'mínim ' : 'minimum ') + min : ''); };
       ta.oninput = () => { state.texts[key] = ta.value; save(); count(); };
       count();
+      if (p.teacher) {
+        const msg = $('#' + p.id + 'Msg'); if (handedMsg(p)) { msg.className = 'feedback ok'; msg.textContent = handedMsg(p); }
+        $('#' + p.id + 'Ai').onclick = () => {
+          if (words(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.'; return; }
+          handToTeacher(p, ta.value.trim()); msg.className = 'feedback ok'; msg.textContent = handedMsg(p);
+        };
+        return;
+      }
       const pts = $('#' + p.id + 'Pts'), k = p.id + '_' + level;
       pts.value = state.ai[k] != null ? state.ai[k] : '';
       pts.oninput = () => { const v = pts.value === '' ? null : Math.max(0, Math.min(p.max, Math.round(+pts.value))); if (v == null) delete state.ai[k]; else state.ai[k] = v; save(); if (LP.onScore) LP.onScore(); };

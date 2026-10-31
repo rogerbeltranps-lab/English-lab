@@ -40,6 +40,6 @@ export async function examNotice({get,seen,save,visible,course,en,board}){
     b.textContent=en?"Later":"Més tard";
     b.onclick=()=>{c.remove();try{sessionStorage.setItem("el_exam_later_"+o.l.id,o.v)}catch(e){}next()};
     document.body.append(c);a.focus({preventScroll:true})};
-  const wait=()=>document.getElementById("el-reply")||document.getElementById("el-level-notice")?setTimeout(wait,600):next();   // after the teacher's answers to problem reports (el-reply.js) and the level card (el-level-notice.js)
+  const wait=()=>document.getElementById("el-reply")||document.getElementById("el-corrections")||document.getElementById("el-level-notice")?setTimeout(wait,600):next();   // after the teacher's answers to problem reports (el-reply.js) and the level card (el-level-notice.js)
   wait();
 }

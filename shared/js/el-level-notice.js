@@ -30,6 +30,6 @@ export async function levelNotice({lv,seen,save,course}){
     b.onclick=()=>{c.remove();Promise.resolve(save(course,at)).catch(e=>console.warn("level notice",e))};
     document.body.append(c);b.focus({preventScroll:true})};
   // one card at a time: after the teacher's answers to problem reports (el-reply.js) and the exam results card (el-exam-notice.js)
-  const wait=()=>document.getElementById("el-reply")||document.getElementById("el-exam-notice")?setTimeout(wait,600):show();
+  const wait=()=>document.getElementById("el-reply")||document.getElementById("el-corrections")||document.getElementById("el-exam-notice")?setTimeout(wait,600):show();
   wait();
 }
