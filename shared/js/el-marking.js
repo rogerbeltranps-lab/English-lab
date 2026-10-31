@@ -56,5 +56,40 @@ window.ELMark=(function(){
     const t=line&&(o.ticks||{})[o.ls+"|"+line],done=t?(typeof t==="string"?t:o.due):null;
     return {due:o.due,line,done,from:done?W.add(done,7):null};
   }
-  return {V,codes,sheet,parse,ready,tyText};
+  // ---- Students' comments on hand-ins, answered by Claude (Roger, 31 Oct 2026: "Claude should answer properly with context").
+  // h = the hand-in (state.steps[step]), x = results/{activity}. A comment still needs an answer unless it only says "no problem"
+  // (elNoComment), the teacher marked it "No reply needed" (seen), the teacher answered it (replies[step] not written by the marking,
+  // fbBy[step]), or Claude answered this very comment (answers[step] = {t, q, at}; a new comment opens it again).
+  // asked(): Claude handed it to the teacher (ask[step] = {why, q, at}); then it waits in the To do as 🙋 and Claude leaves it.
+  const q=h=>String((h&&h.comment)||"").trim();
+  function open(h,x,step){x=x||{};const c=q(h);if(!c||(window.elNoComment&&elNoComment(c))||(x.seen||{})[step])return false;
+    if((x.replies||{})[step]&&!(x.fbBy||{})[step])return false;const an=(x.answers||{})[step];return !(an&&an.q===c)}
+  const asked=(h,x,step)=>{const k=((x||{}).ask||{})[step];return !!(k&&k.q===q(h))};
+  const CV="EL-ANSWERS v1";
+  // o = {date, items:[{id ("Q1"…), code, route, ca, ls, title, step, stepName, content (the file with the step and its texts), fields:[{l,v}], comment}]}
+  function commentSheet(o){
+    const head=[`${CV} SHEET · ${o.date}`,"",
+      "Students of English in a Catalan secondary school (2 ESO and 4 ESO) wrote these comments to their teacher when they handed in a step of a Learning Path on the English Lab website. Answer each one as their teacher would: kind, short (one to four sentences), concrete and useful.",
+      "Before answering, read the step in the content file given (the panel with that step id, and any text, audio transcript or model it refers to), so the answer fits what the student was doing. Use the student's hand-in too. Explain a word or an idea with the sentence or example from the Learning Path. Never give the answers of an assessed task, never mention marks, levels or that a step is assessed.",
+      "Answer in the language given (Catalan for Starter and Base, English for Core, Plus and Pro), in simple words for that route.",
+      "Hand to the teacher instead (FORYOU), without answering, anything that needs the teacher's decision or care: handing in again or late, deadlines, exams, marks, a route change, a problem with the website, a personal, family or health matter, a conflict with classmates, anything worrying, rude or unclear.","","COMMENTS"];
+    const body=o.items.flatMap(i=>[`=== ${i.id} · ${i.code} · route ${i.route||"–"} · answer in ${i.ca?"Catalan":"English"}`,`[Where] ${i.ls} · ${i.title} · step "${i.step}" (${i.stepName}) · content: ${i.content}`,
+      ...(i.fields||[]).map(f=>`[${f.l}] ${String(f.v||"").replace(/\s+/g," ").trim()||"(empty)"}`),`[COMMENT] ${String(i.comment).replace(/\s+/g," ").trim()}`,""]);
+    const fmt=["ANSWER FORMAT (strict: read automatically). Reply with ONLY these lines, in a single code block:",`${CV}`,
+      "<id> | <code> | <step> | ANSWER | <the answer to the student, on one line>",
+      "<id> | <code> | <step> | FORYOU | <one short line for the teacher, in English: what the student needs>",
+      "(one line per comment, every id above)","END","Never write | inside a text. Never add names."];
+    return [...head,...body,...fmt].join("\n");
+  }
+  // {err} or {rows:[{id, code, step, kind: "ANSWER"|"FORYOU", text}], bad, missing}; o.items as in commentSheet
+  function parseComments(txt,o){
+    const ls=String(txt||"").replace(/```[a-z]*/gi,"").split(/\r?\n/).map(l=>l.trim()).filter(Boolean),h=ls.findIndex(l=>l===CV);
+    if(h<0)return {err:`No “${CV}” line found.`};
+    const by=new Map(o.items.map(i=>[i.id,i])),rows=[],bad=[],seen=new Set();
+    for(const l of ls.slice(h+1)){if(/^END$/i.test(l))break;const p=l.split("|").map(x=>x.trim()),i=by.get(p[0]),k=(p[3]||"").toUpperCase();
+      if(!i||seen.has(p[0])||p[1]!==i.code||p[2]!==i.step||!["ANSWER","FORYOU"].includes(k)||!p.slice(4).join(" ").trim()){bad.push(l);continue}
+      seen.add(p[0]);rows.push({id:p[0],code:p[1],step:p[2],kind:k,text:p.slice(4).join(" ").trim()})}
+    return {rows,bad,missing:[...by.keys()].filter(c=>!seen.has(c))};
+  }
+  return {V,codes,sheet,parse,ready,tyText,q,open,asked,CV,commentSheet,parseComments};
 })();
