@@ -45,6 +45,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <script src="shared/js/el-week.js"></script>
 <script src="shared/js/el-marking.js"></script>
 <script src="shared/js/el-grading.js"></script>
+<script src="shared/js/el-comp-map.js"></script>
 <script src="shared/js/el-points.js"></script>
 <script src="shared/js/el-items.js"></script>
 <script src="lab/game/decks/index.js"></script>
@@ -790,8 +791,31 @@ function compBar(share,avg){const ks=Object.keys(share).sort(compSort),t=ks.redu
   return `<div class="cbar">${ks.map(k=>`<span style="width:${pc(k)}%;background:${compCol(k)}" title="${esc(lab(k))}">${pc(k)>=8?esc(compShort(k).split(" ")[0])+" "+Math.round(pc(k))+"%":""}</span>`).join("")}</div>`
     +`<div class="clegend">${ks.map(k=>`<span><i style="background:${compCol(k)}"></i>${esc(lab(k))}</span>`).join("")}</div>`}
 const termBonus=(s,t,best)=>withS("term",t.id,()=>s.away||!pkey(s)?null:ptGets(s,best,ptMiss(s)));
+// Map of the integrated competences per LS (Roger, 31 Oct 2026: "we should also have this map in the year distribution"): one row per
+// competence (CE1, CE6–CE10), one column per LS of the course. ● = assessed, with its criteria: from the LS's grading plan once the LS is on
+// the site (its items' pieces), else from the programme (EL_COMP_MAP prog). ○ worked implicitly, ◇ planned, — not worked: EL_COMP_MAP work
+// (shared/js/el-comp-map.js, updated by the LS project). ⚠ = the programme assesses a criterion there that the grading plan does not.
+const INTEG=["1","6","7","8","9","10"];
+function compMap(grp,lss,items){const M=(window.EL_COMP_MAP||{})[grp.course];if(!M)return "";
+  const ns=[...new Set([...Object.keys(M).map(Number),...lss.map((l,i)=>i+1)])].sort((a,b)=>a-b),num=(a,b)=>parseFloat(a)-parseFloat(b)||a.localeCompare(b,"en",{numeric:true});
+  const cols=ns.map(n=>{const l=lss[n-1],m=M[n]||{},its=l?items.filter(it=>it.l===l):[];
+    const live=its.length?[...new Set(its.flatMap(it=>it.pcs.map(p=>p.c)).filter(c=>c&&INTEG.includes(compOf(c))))]:null;
+    return {n,l,m,crit:live||m.prog||[],live:!!live}});
+  const cs=(c,k)=>c.crit.filter(x=>compOf(x)===k).sort(num),miss=(c,k)=>c.live?(c.m.prog||[]).filter(x=>compOf(x)===k&&!c.crit.includes(x)).sort(num):[];
+  const warn=x=>x.length?` <span style="color:#b45309" title="The programme assesses ${esc(x.join(", "))} in this LS, but its grading plan does not">⚠ ${esc(x.join(" · "))}</span>`:"";
+  const cell=(c,k)=>{const a=cs(c,k),x=miss(c,k),w=(c.m.work||{})[k];
+    if(a.length)return `<td class="first" style="background:#dcfce7" title="Assessed (${c.live?"grading plan":"programme: this LS is not on the site yet"})"><b>● ${esc(a.join(" · "))}</b>${warn(x)}</td>`;
+    const o=w==="implicit"?`<span title="Worked implicitly">○</span>`:w==="little"?`<span title="Worked implicitly, but little">○ <small class="muted">little</small></span>`
+      :w==="planned"?`<span title="Planned, not built yet (serial story for CE7, mediation step for CE8)">◇</span>`:`<span class="muted" title="Not worked in this LS">—</span>`;
+    return `<td class="first">${o}${warn(x)}</td>`};
+  const head=c=>`<th class="first">LS${c.n}<br><small class="muted">${esc(c.m.name||(c.l?lsLabel(c.l).replace(/^.*?· /,""):""))}${c.l?"":" · not on the site yet"}</small></th>`;
+  const rows=INTEG.map(k=>{const n=cols.filter(c=>cs(c,k).length).length;
+    return `<tr><td class="stu"><i class="cdot" style="background:${compCol(k)}"></i> ${esc(compName(k))}</td>${cols.map(c=>cell(c,k)).join("")}<td class="first tot" title="LSs that assess it this year">${n}${n<2?` <small class="muted">${n?"once":"never"}</small>`:""}</td></tr>`}).join("");
+  return `<div class="box">${fold("ymap",`Map of the integrated competences <small class="muted">· where each one is assessed (with its criteria) and worked</small>`,
+    `<div class="wrap"><table><thead><tr><th class="stu">Competence</th>${cols.map(head).join("")}<th class="first">Assessed</th></tr></thead><tbody>${rows}</tbody></table></div>`
+    +`<p class="muted">● assessed, with its criteria: from the LS's grading plan, or from the programme while the LS is not on the site · ○ worked implicitly · ◇ planned (serial story for CE7, short mediation step for CE8) · — not worked · ⚠ the programme assesses it there but the grading plan does not. ○ and ◇ come from <code>shared/js/el-comp-map.js</code>, which the LS project updates when it designs an LS. The four communicative competences (CE2–CE5) are assessed in every LS.</p>`)}</div>`}
 function yearView(grp,studs){
-  if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()))}   // the current term starts unfolded
+  if(!S.yOpen){S.yOpen=1;S.open.add("yt"+termOf(ELWeek.today()));S.open.add("ymap")}   // the current term starts unfolded
   const lss=EL_LS.filter(l=>l.course===grp.course),items=lss.flatMap(l=>lsItems(l,grp.id)),now=termOf(ELWeek.today()),live=studs.filter(s=>!s.away);
   const R={},TR={};studs.forEach(s=>{const all=marksOf(s,items);R[s.uid]=all.filter(r=>!r.tr);TR[s.uid]=all.filter(r=>r.tr)});S.yR={R,TR,items};
   const agg=scope=>scope==="y"?yearOf:byComp;
@@ -832,7 +856,7 @@ function yearView(grp,studs){
   const key=`<p class="muted">Each term shows its two LSs (LS1–LS2 in ${esc(EL_TERMS[0].en)}, LS3–LS4 in the next one…). A new LS appears in its slot as soon as it is added to the site, and its items as soon as its grading plan is added. An item counts in the term of its date in the time plan (exam day, last due day of its activities), so an LS can give items to the next term (→).</p>`
     +`<p class="muted"><b>By competence.</b> Every item is split among the criteria it assesses, and each criterion belongs to a competence. <b>By how much it is worked</b> (default): a competence's share of an LS is how many steps of the LS activities work on its criteria, among the competences the LS assesses (LS1 has no step criteria, so it uses the grading plan). <b>By the grading plan</b>: its criteria's weight in the LS mark (exam sections by their points, final product rubric rows by their weight, grammar and vocabulary by the criteria of its steps, other competences equally). Either way each LS weighs 100, a competence assessed in two LSs counts twice, and the competence worked more in an LS counts more. The coloured bars show each competence's share in the LS, the term and the year. <b>Competence mark</b>: its criteria weighted; a degree you confirmed in “Result per assessment criterion” replaces the marks of that criterion in that LS. <b>Term mark</b>: the competences weighted by their share. <b>Year mark</b> (continuous assessment): each competence's year mark is its term marks weighted by the term number (Term 1 ×1, Term 2 ×2, Term 3 ×3), only the terms with a mark for it, so a competence assessed in one term keeps that mark and the four communicative competences show where the student ends up; then the competences are weighted by their share of the year. <b>Transversal competences</b> (CC, CD, CPSAA, entrepreneurial) are not part of the English mark: they are left out of the shares, bars and marks and shown apart with their own marks. Process and teamwork rows have no competence, so they are left out. An item whose day has not come yet (or, with no date, in an LS that is still Hidden) is not counted; after that, missing work counts 0 or is left out as the switch says. Click a mark to see its criteria and items.</p>`;
   return `<div class="box"><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0">not counted yet</button> <span class="muted">· Share of each competence:</span> <button class="chip ${S.yShare==="plan"?"":"on"}" data-do="yshare" data-v="work" title="How many steps of the LS activities work on its criteria">by how much it is worked</button><button class="chip ${S.yShare==="plan"?"on":""}" data-do="yshare" data-v="plan" title="Its criteria's weight in the LS mark (grading plan)">by the grading plan</button></div>${fold("ykey","How it is worked out",key,"key")}</div>`
-    +terms+summary;
+    +compMap(grp,lss,items)+terms+summary;
 }
 // One competence of one student in a term ("t1"…) or the year ("y"): its criteria and the items they come from
 function compPanel(u,scope,k,tr){redraw=null;const {R,TR}=S.yR||{},s=S.P[u],src=tr?TR:R;if(!src||!src[u])return;
