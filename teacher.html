@@ -487,7 +487,8 @@ function render0(){
 const QA={};S.qa={ls:null,g:"all",f:{act:"all",area:"all",sort:"hard",all:false}};
 // Materials tab (Roger, 30 Oct 2026: "a table on the teacher dashboard to see all the games and printable docs"): per course, the class games
 // (lab/game/decks/index.js, opens the board on that game), the paper worksheets of each Learning Path per route + answer keys
-// (shared/print/lp-list.js; teacher only), the class shadowing page (shared/shadow/), the LS shadowing video (EL_LS[].shadowing) and the study PDFs per route (EL_LS[].study). New games and worksheets appear here by themselves.
+// (shared/print/lp-list.js; teacher only), the class shadowing page (shared/shadow/), the LS shadowing video (EL_LS[].shadowing), the study PDFs per route (EL_LS[].study) and the reading story books per route with a link to
+// the Drive doc that has the answer key (EL_LS[].story, Roger 31 Oct 2026: "I want the books to be on the teacher's board too, in materials"). New games and worksheets appear here by themselves.
 // "How English Lab works" videos (Roger, 31 Oct 2026: "the teachers video on the teachers board and the students' on theirs, and the
 // students' video also on the teachers board"): tools/site-video builds them; the student ones are also on the student board (today.html).
 // [title, file, shown]: an entry shows once its video is in the repo.
@@ -507,6 +508,7 @@ function matTab(){
         // LS2 on (EL_LS starter: true): a Starter summary of its own, built from the Learning Paths (tools/lp-worksheets/build.mjs); LS1: Starter uses Base
         return `<h3>📄 ${esc(l.title)}</h3>`
           +(l.study?`<p>Study PDF (vocabulary and grammar): ${R.slice(l.starter?0:1).map(([r,n])=>a(l.study+r+".pdf",n,"chip")).join(" ")}${l.starter?"":` <span class="muted">(Starter uses Base)</span>`}</p>`:"")
+          +(l.story?`<p>📖 Reading story “${esc(l.story.title)}” (one chapter a week at home; students see only their level's book on the LS home page): ${R0.map(([r,n])=>a(l.story.pdf+r+".pdf",n,"chip")).join(" ")}${l.pro?` <span class="muted">(Pro reads Plus)</span>`:""}${l.story.key?` ${a(l.story.key,"Answer key and teacher notes (Drive)","chip")}`:""}</p>`:"")
           +(l.shadowing?`<p>🎬 Shadowing video for the whole unit (Core, about 6 min; also on the student board and before the sample exam): ${a(l.shadowing,"Open on the projector →","btn")}</p>`:"")
           +(w?`<p>🗣 Shadowing at the start of the class: ${a("shared/shadow/index.html?ls="+k,"Open on the projector →","btn")} <span class="muted">(the same clips as the Shadowing step of each Learning Path)</span></p>`:"")
           +(w?`<div class="qwrap"><table class="mat"><tr><th>Paper worksheet</th>${R.map(([r,n])=>`<th>${n}</th>`).join("")}<th>Answer key</th></tr>`
