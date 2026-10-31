@@ -36,7 +36,7 @@ without any sync script, and students do not see it as an exam (proposal: https:
 
 - `load()` reads `cpKeys` and every `checkpoints` doc; `cpInject` marks each try with the key and writes `first`, `last.check`, `items.check_<route>`,
   `done.check` into the student's progress state **in memory only**, so the grade (`gv` first tries), the progress table and the Question analysis
-  work unchanged. A first try saved by the page itself is ignored for a checkpoint with a key. `window.EL_CP_KEYS` gives `el-items.js` the answers.
+  work unchanged. A first try saved by the page itself is ignored for a checkpoint with a key, except one dated before 1 Nov 2026 (done the old way, before the switch: the page shows it as done and the dashboard keeps it; 2 ESO LS2 had its checkpoints open as practice). `window.EL_CP_KEYS` gives `el-items.js` the answers.
 - Group tab → "🛡️ Recall checkpoints": score, ⚡, 👀, minutes; "📣 Release feedback (n)" per checkpoint writes `fb` to the group's tries
   (press again after accepting an answer). A cell opens the answers with the time per question, "✓ Accept" (adds to `extra`, for every student)
   and "↺ Let them do it again" (sets `redo`; the page shows the rules again with a new draw).

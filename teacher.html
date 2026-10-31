@@ -170,7 +170,9 @@ function cpInject(D){
   Object.keys(D.ck||{}).forEach(key=>{const a=cat.find(x=>(x.keys||[])[0]===key);if(!a)return;const K=D.ck[key];
     Object.keys(Object.assign({},D.pg,D.cp)).forEach(u=>{const d=((D.cp||{})[u]||{})[key];if(!(((D.pg[u]||{})[a.ls]||{})[key])&&!d)return;const pg=D.pg[u]=D.pg[u]||{},L=pg[a.ls]=pg[a.ls]||{};
       let st;try{st=JSON.parse(L[key]||"{}")}catch(e){st={}}
-      delete st.first;if(st.tries)delete st.tries.check;if(st.last)delete st.last.check;Object.keys(st.items||{}).forEach(k=>{if(/^check_/.test(k))delete st.items[k]});
+      // a first try saved by the page counts only if it was done the old way, before the checkpoints were secure (31 Oct 2026)
+      const old=Object.values(st.first||{}).some(f=>String(f.date||"")<"2026-11-01");
+      if(d||!old){delete st.first;if(st.tries)delete st.tries.check;if(st.last)delete st.last.check;Object.keys(st.items||{}).forEach(k=>{if(/^check_/.test(k))delete st.items[k]})}
       if(d&&!d.redo){const m=cpMark(d,K),date=cpDate(d.sent)||d.started;
         st.first={[d.level]:{score:m.score,max:m.max,date}};(st.last=st.last||{}).check={score:m.score,max:m.max,level:d.level,date};
         (st.done=st.done||{}).check=true;(st.doneAt=st.doneAt||{}).check=st.doneAt.check||date;

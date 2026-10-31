@@ -132,6 +132,12 @@ window.ELCheckpoint = (function () {
             (ok ? '' : '<p>' + t('Resposta: ', 'Answer: ') + '<strong>' + esc((fb.right || [])[i] || '') + '</strong>' + (why ? ' · ' + esc(why) : '') + '</p>') + '</div>'; }).join('') + testerBtn();
       bindTester();
     }
+    // done the old way (before 31 Oct 2026, answers checked on the page): that try stays, nothing to do again
+    function legacy() {
+      stop(); const f = api.state.first || {}, r = f[api.level()] || Object.values(f)[0];
+      box().innerHTML = '<h3>✓ ' + t('Fet', 'Done') + '</h3><p>' + t('Ja vas fer aquest checkpoint', 'You already did this checkpoint') + (r ? ' (' + r.score + ' / ' + r.max + ')' : '') + '. ' + t('Pots continuar amb el següent Learning Path.', 'You can go on to the next Learning Path.') + '</p>' + testerBtn();
+      bindTester();
+    }
     // testers can delete their own try to see the checkpoint again (firestore.rules)
     const isTester = () => !!(window.ELCloud && window.ELCloud.user && window.ELCloud.isTester(window.ELCloud.user));
     const testerBtn = () => isTester() || window.EL_CP_PREVIEW ? '<div class="actions"><button class="btn secondary" type="button" id="' + p.id + 'Reset">🧪 ' + t('Prova (tester): torna a començar', 'Tester: start again') + '</button></div>' : '';
@@ -161,6 +167,7 @@ window.ELCheckpoint = (function () {
           if (d && d.redo) { if (c.sentAt) { api.state.cp = {}; if (api.state.done) delete api.state.done[p.id]; api.save(); } return intro(t('El professor t’ha deixat tornar a fer aquest checkpoint.', 'Your teacher has let you do this checkpoint again.')); }
           if (d) { if (!c.ok) { Object.assign(c, { ok: true, sentAt: c.sentAt || new Date().toISOString(), level: d.level, ids: d.ids }); api.save(); } if (!(api.state.done || {})[p.id]) api.complete(p.id); return sent(d); }
           if (c.sentAt) return send(c.auto || null);   // sent here but never reached the cloud: try again
+          if (!c.ids && ((api.state.done || {})[p.id] || Object.keys(api.state.first || {}).length)) return legacy();   // done before it was secure: it stays done
           intro();
         } catch (e) { console.warn('checkpoint', e); if (c.sentAt) sent(); else intro(); }
       });
