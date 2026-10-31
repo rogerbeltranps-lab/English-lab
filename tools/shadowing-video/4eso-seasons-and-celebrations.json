@@ -20,7 +20,8 @@
    "src": "audio/student-council-meeting.mp3",
    "start": 1.27,
    "end": 4.84,
-   "pause": 5.7
+   "pause": 5.7,
+   "marks": "We're **meet**ing the **head** teacher on **Mon**day, so we need‿a **plan** to**day**. ↘"
   },
   {
    "speaker": "Omar",
@@ -28,7 +29,8 @@
    "src": "audio/student-council-meeting.mp3",
    "start": 14.77,
    "end": 17.15,
-   "pause": 3.9
+   "pause": 3.9,
+   "marks": "It's‿on **Fri**day the e**lev**enth of De**cem**ber. ↘"
   },
   {
    "speaker": "Omar",
@@ -36,7 +38,8 @@
    "src": "audio/student-council-meeting.mp3",
    "start": 26.34,
    "end": 29.1,
-   "pause": 4.8
+   "pause": 4.8,
+   "marks": "There will be **four** **stalls**, one for **each** **fes**tival. ↘"
   },
   {
    "speaker": "Omar",
@@ -44,7 +47,8 @@
    "src": "audio/student-council-meeting.mp3",
    "start": 32.35,
    "end": 34.02,
-   "pause": 3.2
+   "pause": 3.2,
+   "marks": "I **think**‿a **lot**‿of **par**ents will **help**. ↘"
   },
   {
    "speaker": "Omar",
@@ -52,7 +56,8 @@
    "src": "audio/student-council-meeting.mp3",
    "start": 36.83,
    "end": 38.74,
-   "pause": 3.1
+   "pause": 3.1,
+   "marks": "My **cou**sin **plays**‿in‿a **band**. ↘"
   },
   {
    "speaker": "Laia",
@@ -60,7 +65,8 @@
    "src": "audio/student-council-meeting.mp3",
    "start": 40.91,
    "end": 43.04,
-   "pause": 4.0
+   "pause": 4.0,
+   "marks": "**Who's** going to put‿**up** the deco**ra**tions? ↘"
   },
   {
    "speaker": "Omar",
@@ -68,15 +74,8 @@
    "src": "audio/student-council-meeting.mp3",
    "start": 51.21,
    "end": 53.89,
-   "pause": 4.7
-  },
-  {
-   "speaker": "Laia",
-   "text": "What if it rains and everyone is inside?",
-   "src": "audio/student-council-meeting.mp3",
-   "start": 58.81,
-   "end": 61.71,
-   "pause": 4.8
+   "pause": 4.7,
+   "marks": "We're going to in**vite** **fam**ilies and the **pri**mary **school**. ↘"
   },
   {
    "speaker": "Omar",
@@ -84,7 +83,8 @@
    "src": "audio/student-council-meeting.mp3",
    "start": 63.82,
    "end": 66.15,
-   "pause": 4.0
+   "pause": 4.0,
+   "marks": "**Don't** **wor**ry. We'll **use** the **gym** **too**. ↘"
   },
   {
    "speaker": "Laia",
@@ -92,7 +92,8 @@
    "src": "audio/student-council-meeting.mp3",
    "start": 67.55,
    "end": 69.8,
-   "pause": 4.0
+   "pause": 4.0,
+   "marks": "I **think**‿it'll be the **best** **day** of the **term**! ↘"
   },
   {
    "speaker": "Sam",
@@ -100,7 +101,8 @@
    "src": "audio/culture-bites-origins.mp3",
    "start": 26.58,
    "end": 31.4,
-   "pause": 6.9
+   "pause": 6.9,
+   "marks": "So **peo**ple used to **light** **bon**fires‿and wear **masks** to **hide** from the **spir**its. ↘"
   },
   {
    "speaker": "Sam",
@@ -108,7 +110,8 @@
    "src": "audio/culture-bites-origins.mp3",
    "start": 35.55,
    "end": 37.47,
-   "pause": 3.7
+   "pause": 3.7,
+   "marks": "They **used**‿to **carve** **tur**nips! ↘"
   },
   {
    "speaker": "Sam",
@@ -116,7 +119,8 @@
    "src": "audio/culture-bites-origins.mp3",
    "start": 47.77,
    "end": 52.86,
-   "pause": 7.2
+   "pause": 7.2,
+   "marks": "**Pump**kins were **big**ger‿and **eas**ier to **carve**, so the tra**di**tion **changed**. ↘"
   },
   {
    "speaker": "Sam",
@@ -124,7 +128,8 @@
    "src": "audio/culture-bites-origins.mp3",
    "start": 88.91,
    "end": 91.69,
-   "pause": 4.7
+   "pause": 4.7,
+   "marks": "**Man**y **peo**ple **say** what they‿are **grate**ful for. ↘"
   },
   {
    "speaker": "Sam",
@@ -132,7 +137,8 @@
    "src": "video/halloween-castanyada.mp4",
    "start": 82.99,
    "end": 86.65,
-   "pause": 5.7
+   "pause": 5.7,
+   "marks": "They‿ate **roast**ed **chest**nuts to keep **warm**‿and get **en**ergy. ↘"
   }
  ],
  "examples": [
@@ -155,6 +161,16 @@
    "start": 38.7,
    "end": 39.69,
    "pause": 3.0
+  },
+  {
+   "speaker": "Laia",
+   "text": "What if it rains and everyone is inside?",
+   "marks": "What‿if‿it **rains** and **ev**eryone is‿in**side**? ↗",
+   "tip": "Arrows show the melody: ↗ the voice goes up, ↘ it goes down. Copy it!",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 58.81,
+   "end": 61.71,
+   "pause": 4.8
   }
  ],
  "voice": {

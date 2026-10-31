@@ -62,6 +62,16 @@
    "pause": 4.7,
    "tip": "Some words join together, with no pause between them.",
    "marks": "It's difficult, but I ==love‿it==."
+  },
+  {
+   "speaker": "Omar",
+   "text": "A cat who plays the guitar?",
+   "marks": "A **cat** who **plays** the gui**tar**? ↗",
+   "tip": "Arrows show the melody: ↗ the voice goes up, ↘ it goes down. Copy it!",
+   "src": "audio/where-are-you.mp3",
+   "start": 33.78,
+   "end": 35.84,
+   "pause": 3.6
   }
  ],
  "items": [
@@ -71,7 +81,8 @@
    "src": "audio/live-from-the-sports-hall.mp3",
    "start": 20.4,
    "end": 23.55,
-   "pause": 4.9
+   "pause": 4.9,
+   "marks": "The **play**ers are **warm**ing‿**up** and the **crowd** is **cheer**ing. ↘"
   },
   {
    "speaker": "Emma",
@@ -79,7 +90,8 @@
    "src": "audio/live-from-the-sports-hall.mp3",
    "start": 26.42,
    "end": 30.4,
-   "pause": 6.0
+   "pause": 6.0,
+   "marks": "It's **cold** and **rain**y‿out**side**, but in**side** it's **hot**. ↘"
   },
   {
    "speaker": "Omar",
@@ -87,7 +99,8 @@
    "src": "audio/where-are-you.mp3",
    "start": 7.0,
    "end": 10.24,
-   "pause": 5.1
+   "pause": 5.1,
+   "marks": "My **sis**ter is **play**ing **bas**ketball‿and I'm **watch**ing the **match**. ↘"
   },
   {
    "speaker": "Laia",
@@ -95,7 +108,8 @@
    "src": "audio/where-are-you.mp3",
    "start": 14.29,
    "end": 15.93,
-   "pause": 3.0
+   "pause": 3.0,
+   "marks": "Do you **go** **ev**ery **Sat**urday? ↗"
   },
   {
    "speaker": "Emma",
@@ -103,7 +117,8 @@
    "src": "audio/live-from-the-sports-hall.mp3",
    "start": 48.97,
    "end": 53.82,
-   "pause": 7.1
+   "pause": 7.1,
+   "marks": "**Marc** **us**ually **plays**‿as‿a de**fend**er, but to**day** he's **play**ing as a **for**ward. ↘"
   },
   {
    "speaker": "Laia",
@@ -111,7 +126,8 @@
    "src": "audio/where-are-you.mp3",
    "start": 25.65,
    "end": 29.14,
-   "pause": 5.4
+   "pause": 5.4,
+   "marks": "I'm **draw**ing‿a **com**ic about a **cat** who **plays** the gui**tar**. ↘"
   },
   {
    "speaker": "Omar",
@@ -119,7 +135,8 @@
    "src": "audio/where-are-you.mp3",
    "start": 40.54,
    "end": 42.64,
-   "pause": 3.6
+   "pause": 3.6,
+   "marks": "Do you **want** to **meet**‿in the **square** at **half** past **twelve**? ↗"
   },
   {
    "speaker": "Mei",
@@ -127,15 +144,17 @@
    "src": "video/mei-ice-rink.mp4",
    "start": 14.22,
    "end": 17.61,
-   "pause": 5.2
+   "pause": 5.2,
+   "marks": "I'm **wear**ing‿a **wool**ly **hat**, **gloves**‿and‿a **big** **red** **jack**et. ↘"
   },
   {
    "speaker": "Mei",
-   "text": "I usually come here on Sunday afternoons with my family, just for fun.",
+   "text": "But today is different: I'm training for the Christmas show.",
+   "marks": "But to**day**‿is **dif**ferent: I'm **train**ing for the **Christ**mas **show**. ↘",
    "src": "video/mei-ice-rink.mp4",
-   "start": 23.97,
-   "end": 27.93,
-   "pause": 6.0
+   "start": 28.35,
+   "end": 32.03,
+   "pause": 5.6
   },
   {
    "speaker": "Noah",
@@ -143,7 +162,8 @@
    "src": "video/noah-bike-park.mp4",
    "start": 16.67,
    "end": 20.3,
-   "pause": 5.5
+   "pause": 5.5,
+   "marks": "Be**hind** me, **Le**o‿and **Sar**a are **rac**ing **down** the **hill**. ↘"
   },
   {
    "speaker": "Presenter",
@@ -151,7 +171,8 @@
    "src": "audio/screen-smart.mp3",
    "start": 4.43,
    "end": 7.57,
-   "pause": 4.9
+   "pause": 4.9,
+   "marks": "To**day** we're **talk**ing‿about **phones** and **free** **time**. ↘"
   },
   {
    "speaker": "Presenter",
@@ -159,7 +180,8 @@
    "src": "audio/screen-smart.mp3",
    "start": 34.1,
    "end": 37.39,
-   "pause": 5.1
+   "pause": 5.1,
+   "marks": "**Stand**‿**up**, **look**‿**out** of the **win**dow, **drink** some **wa**ter. ↘"
   },
   {
    "speaker": "Presenter",
@@ -167,7 +189,8 @@
    "src": "audio/screen-smart.mp3",
    "start": 69.12,
    "end": 71.71,
-   "pause": 4.2
+   "pause": 4.2,
+   "marks": "**Real** **fun**‿is **bet**ter than **an**y **vid**eo. ↘"
   }
  ]
 }

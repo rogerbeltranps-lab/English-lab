@@ -54,6 +54,9 @@ function page(body) {
   ul{font-size:27px;font-weight:500;line-height:1.75;text-align:left;padding-left:30px}
   .strong{color:${T.accent};text-decoration:underline;text-decoration-thickness:5px;text-underline-offset:9px}
   .link{color:${T.accent};font-weight:900}
+  .tone{color:${T.accent};font-weight:800;margin-left:.25em;font-family:'Noto Sans Symbols 2','DejaVu Sans',Inter,sans-serif}
+  .legend{display:flex;gap:26px;justify-content:center;margin-top:22px;padding-top:18px;border-top:2px solid ${T.soft};font-size:23px;font-weight:600;color:${T.ink}}
+  .legend span{white-space:nowrap}
   .join{color:${T.accent}}
   .turn{display:flex;align-items:center;gap:8px;background:${T.accent};color:#fff;padding:7px 18px 7px 12px;border-radius:999px;text-transform:none;letter-spacing:0}
   .turn svg{width:26px;height:26px;color:#fff}
@@ -68,7 +71,9 @@ const STEPS = ['1 Listen and read', '2 Repeat', '3 Listen', '4 Repeat'];
 const steps = (on) => `<div class="steps">${STEPS.map((s, i) => `<span class="st${i === on ? ' on' : ''}">${s}</span>`).join('')}</div>`;
 const size = (t) => (t.length > 60 ? 46 : t.length > 40 ? 52 : 60);
 
-const marked = (t) => pretty(t).replace(/\*\*(.+?)\*\*/g, '<span class="strong">$1</span>').replace(/==(.+?)==/g, '<span class="join">$1</span>').replace(/‿/g, '<span class="link">‿</span>');
+// Marks (Roger, 31 Oct 2026): **stressed** syllables underlined, ‿ between linked words, ↗ ↘ the melody (checked against the recording's pitch).
+const marked = (t) => pretty(t).replace(/\*\*(.+?)\*\*/g, '<span class="strong">$1</span>').replace(/==(.+?)==/g, '<span class="join">$1</span>')
+  .replace(/‿/g, '<span class="link">‿</span>').replace(/\s*([↗↘])/g, '<span class="tone">$1</span>');
 const turnLabel = (txt, icon = ICON.mic) => `<div class="who turn"><svg viewBox="0 0 136 136">${icon}</svg>${txt}</div>`;
 const clipLen = (it) => it.end - it.start;
 const play = (it) => LEAD + clipLen(it) + TAIL;
@@ -87,9 +92,10 @@ function slides() {
     <li><b>Listen again</b>, this time with no text.</li><li><b>Your turn again</b>, from memory.</li></ol>
     <div class="hint" style="margin-top:22px">A chime tells you it’s your turn. The video waits for you: the bar shows how long you have.</div></div>`)]);
   out.push(['i2', page(`<div class="card" style="top:120px;height:470px">
-    <div class="big" style="margin-bottom:26px">Tips</div>
+    <div class="big" style="margin-bottom:16px">Tips</div>
     <ul><li>Say it <b>out loud</b>, not in your head.</li><li>Copy the <b>music</b>: strong words are louder and longer.</li>
-    <li><b>Join</b> the words like the speaker does.</li><li>Made a mistake? <b>Keep going.</b></li></ul></div>`)]);
+    <li><b>Join</b> the words like the speaker does.</li><li>Made a mistake? <b>Keep going.</b></li></ul>
+    <div class="legend"><span><span class="strong">Strong</span> = louder, longer</span><span>a<span class="link">‿</span>b = join them</span><span><span class="tone" style="margin:0">↗</span> up · <span class="tone" style="margin:0">↘</span> down = the melody</span></div></div>`)]);
   ex.forEach((it, i) => {
     const sz = size(it.text), head = `<div class="steps"><span class="st on">Example ${i + 1} of ${ex.length}</span></div>`;
     const tip = `<div class="hint" style="margin-top:26px">${esc(it.tip)}</div>`;
@@ -99,7 +105,7 @@ function slides() {
   out.push(['ready', page(`<div class="card"><div class="big">Ready? Let’s start!</div></div>`)]);
   spec.items.forEach((it, i) => {
     const sz = size(it.text), cnt = `<div class="count">Sentence ${i + 1} of ${n}</div>`;
-    const say = `<div class="say" style="font-size:${sz}px">${pretty(it.text)}</div>`;
+    const say = `<div class="say" style="font-size:${sz}px">${it.marks ? marked(it.marks) : pretty(it.text)}</div>`;
     out.push([`s${i}a`, page(steps(0) + `<div class="card"><div class="who">${esc(it.speaker)}</div>${say}</div>` + cnt)]);
     out.push([`s${i}b`, page(steps(1) + `<div class="card">${turnLabel('Your turn: say it!')}${say}</div><div class="track"></div>` + cnt)]);
     out.push([`s${i}c`, page(steps(2) + `<div class="card"><svg class="icon" viewBox="0 0 136 136">${ICON.ear}</svg>
@@ -187,7 +193,7 @@ function totalSecs() {
   else INTRO.forEach((d, i) => still(`i${i}`, d, silence(d), null, `i${i}`));
   (spec.examples || []).forEach((it, i) => {
     const clip = cut(it, `e${i}`);
-    const twice = seq([...(VO ? [{ sil: 0.4 }, ...VO.examples[i].map(voice), { sil: 0.3 }] : []), clip, { sil: GAP }, clip], `e${i}x2`);
+    const twice = seq([...(VO ? [{ sil: 0.4 }, ...(VO.examples[i] || []).map(voice), { sil: 0.3 }] : []), clip, { sil: GAP }, clip], `e${i}x2`);
     still(`e${i}a`, len(twice), ['-i', twice], null, `e${i}a`);
     if (VO) {
       const cue = seq([...VO.try.map(voice), { sil: 0.15 }, chime], `e${i}cue`), P = len(cue) + it.pause;
