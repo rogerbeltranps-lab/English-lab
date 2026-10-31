@@ -9,13 +9,19 @@ from align import align
 ROOT = os.path.join(os.path.dirname(__file__), '..', '..')
 LS = {'2eso': '2eso/free-time-live', '4eso': '4eso/seasons-and-celebrations'}
 BEEP_MIN, PAD = 0.45, 0.04
+WPM, MIN_TEMPO = 175, 0.72   # some v3 takes come out at 250-340 words a minute: slow them towards 175 (never below 0.72)
 
 def run(*a): subprocess.run(['ffmpeg', '-v', 'error', '-y', *a], check=True)
 
 def build(job, raw, out):
     tmp = tempfile.mkdtemp()
+    al = None   # word timings: for the beep and for the speed
+    for t in (job['text'], job['text'].replace('.00', '')):
+        try: al = align(raw, t); break
+        except ValueError as e: err = e
+    if al is None: raise err
+    tempo = max(MIN_TEMPO, min(1.0, WPM / (len(al) / max(0.3, al[-1][2] - al[0][1]) * 60)))
     if job['mask']:
-        al = align(raw, job['text'])
         # cut [before][beep][between]…[after]
         cuts, t = [], 0.0
         for a, b in job['mask']:
@@ -36,8 +42,9 @@ def build(job, raw, out):
         src = raw
     trim = 'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse'
     clean = os.path.join(tmp, 'clean.wav'); run('-i', src, '-af', trim + ',apad=pad_dur=0.25', '-ac', '1', '-ar', '44100', clean)
-    run('-i', clean, '-af', 'loudnorm=I=-16:TP=-1.5', '-ac', '1', '-b:a', '96k', out + '.mp3')
-    run('-i', clean, '-af', 'atempo=0.75,loudnorm=I=-16:TP=-1.5', '-ac', '1', '-b:a', '96k', out + '-slow.mp3')
+    run('-i', clean, '-af', ('atempo=%.3f,' % tempo if tempo < 0.99 else '') + 'loudnorm=I=-16:TP=-1.5', '-ac', '1', '-b:a', '96k', out + '.mp3')
+    run('-i', clean, '-af', 'atempo=%.3f,loudnorm=I=-16:TP=-1.5' % (0.75 * tempo), '-ac', '1', '-b:a', '96k', out + '-slow.mp3')
+    return tempo
 
 def write_manifests():
     for c, d in LS.items():

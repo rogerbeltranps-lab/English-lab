@@ -6,12 +6,14 @@ from pocketsphinx import Decoder
 EXTRA = {'vlog': 'V L AO G', 'vlogs': 'V L AO G Z', 'vlogger': 'V L AO G ER', 'mei': 'M EY', 'laia': 'L AY AH', 'kai': 'K AY',
          'castanyada': 'K AE S T AH N Y AA D AH', 'panellets': 'P AH N AH L EH T S', 'samhain': 'S AW IH N', 'diwali': 'D IH W AA L IY',
          'hanukkah': 'HH AA N AH K AH', 'wampanoag': 'W AA M P AH N OW AE G', 'sant': 'S AA N T', 'jordi': 'ZH AO R D IY',
-         'marta': 'M AA R T AH', 'pol': 'P AO L', 'omar': 'OW M AA R', 'noah': 'N OW AH', 'ellie': 'EH L IY', 'yuki': 'Y UW K IY'}
+         'marta': 'M AA R T AH', 'practising': 'P R AE K T IH S IH NG', 'commercialised': 'K AH M ER SH AH L AY Z D',
+         'organise': 'AO R G AH N AY Z', 'organised': 'AO R G AH N AY Z D', 'studing': 'S T AH D IH NG', 'runing': 'R AH N IH NG', 'pol': 'P AO L', 'omar': 'OW M AA R', 'noah': 'N OW AH', 'ellie': 'EH L IY', 'yuki': 'Y UW K IY'}
 NUM = {'0': 'zero', '1': 'one', '2': 'two', '3': 'three', '4': 'four', '5': 'five', '6': 'six', '7': 'seven', '8': 'eight', '9': 'nine', '10': 'ten',
        '12': 'twelve', '15': 'fifteen', '20': 'twenty', '30': 'thirty', '100': 'one hundred', '500': 'five hundred'}
 
 SPELL = {'4b': 'four b', '4a': 'four a', '1621': 'sixteen twenty one', '1800s': 'eighteen hundreds', '1863': 'eighteen sixty three',
-         '2026': 'twenty twenty six', '31st': 'thirty first', '1st': 'first', '2nd': 'second', '3rd': 'third'}
+         '2026': 'twenty twenty six', '2019': 'twenty nineteen', '32': 'thirty two', '31': 'thirty first', '25': 'twenty fifth',
+         '11': 'eleven', '00': "o'clock", '31st': 'thirty first', '1st': 'first', '2nd': 'second', '3rd': 'third'}
 
 def words(text):
     """The text's words as (raw word, [dictionary tokens]); audio tags like [excited] are dropped."""
