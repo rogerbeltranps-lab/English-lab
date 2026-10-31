@@ -27,10 +27,16 @@ var LS2 = (function () {
   let LP, level, state;
   const ca = () => level === 'insecure' || level === 'beginners';
   window.elMicCa = ca;   // the microphone helper (shared/js/el-mic.js) speaks the route's language
+  /* Starter works differently, not only with fewer questions (Roger, 31 Oct 2026, thread "Explain Starter vs Base learning paths").
+     Only in Learning Paths whose data says starter: true (paths students had not started that day; started ones stay as they were):
+     Starter picks typed answers from three options (a wrong pick is crossed out and they try again), starts every listening and
+     video on the slow copy with English subtitles, and has 16 s to answer in Talk. Base and the other routes do not change. */
+  const starter = () => level === 'beginners' && !!(LP && LP.starter);
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca() ? (o.ca || o.en) : (o.en || o.ca));
   const byLevel = o => o == null ? '' : typeof o === 'string' ? o : (o[level] != null ? o[level] : level === 'native' && o.daring != null ? o.daring : o.safe != null && (level === 'daring' || level === 'native') ? o.safe : o.insecure);   // beginners → insecure, native → daring
+  // only: ['insecure'] keeps an item to the routes listed (Base-only practice of a basic form the higher routes already know).
   // A list is cumulative (r: tags); an object keyed by route gives each route its own list (the sample exam: same number of items per route).
-  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level)) : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
+  const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level) && (!x.only || x.only.includes(level))) : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
   const need = n => Math.ceil(n * 0.8);
   const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -84,9 +90,27 @@ var LS2 = (function () {
   const spoken = q => String(q).replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').replace(/→/g, '. ').replace(/[“”]/g, '').replace(/\s+/g, ' ').trim();
   const cue = q => (String(q).replace(/<[^>]+>/g, '').match(/\([^)]*\)/g) || []).join(' ');
   let sayTok = 0, utt = [], bctx = null;
+  /* ElevenLabs recordings (Roger, 31 Oct 2026: "all the audios with ElevenLabs"): tools/tts records each line the browser voice used to
+     say as audio/tts/<key>.mp3 (+ -slow.mp3, the same audio at 0.75), key = FNV-1a of the text exactly as passed here (tools/tts/tts-key.js);
+     data/tts.js lists the recorded keys. Listen-and-complete recordings already have the beep in the gap. A line with no recording still
+     uses the browser voice. */
+  const ttsKey = s => { let h = 0x811c9dc5; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return ('0000000' + h.toString(16)).slice(-8); };
+  (function () { if (window.LS2_TTS || document.querySelector('script[data-tts]')) return; const t = document.createElement('script'); t.src = 'data/tts.js'; t.dataset.tts = '1'; document.head.appendChild(t); })();
+  let recAudio = null;
+  function stopSay() { sayTok++; if (recAudio) { recAudio.pause(); recAudio = null; } if (window.speechSynthesis) speechSynthesis.cancel(); }
+  // plays the recording of text (slow when rate < 0.8) and returns true, or returns false when there is none
+  function playRec(text, rate, onend) {
+    const k = ttsKey(text); if (!window.LS2_TTS || !window.LS2_TTS.has(k)) return false;
+    stopSay(); const tok = sayTok, a = new Audio('audio/tts/' + k + ((rate || 1) < 0.8 ? '-slow' : '') + '.mp3'); recAudio = a;
+    let once = false; const done = () => { if (once || tok !== sayTok) return; once = true; if (onend) onend(); };
+    a.onended = done; a.onerror = () => { if (tok !== sayTok) return; recAudio = null; window.LS2_TTS.delete(k); sayLine(text, rate, onend); };
+    a.play().catch(() => {}); return true;
+  }
   function beep(done) { try { bctx = bctx || new (window.AudioContext || window.webkitAudioContext)(); const o = bctx.createOscillator(), g = bctx.createGain(); o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(bctx.destination); o.start(); setTimeout(() => { o.stop(); done && done(); }, 450); } catch (e) { done && done(); } }
   // Says text (or a gapped sentence, with a beep for each gap) in order; a newer call stops an older one.
   function sayLine(q, rate, onend) {
+    if (playRec(q, rate, onend)) return;
+    if (recAudio) { recAudio.pause(); recAudio = null; }
     const s = window.speechSynthesis; if (!s) { if (onend) onend(); return; } s.cancel(); const tok = ++sayTok;
     const seq = String(q).replace(/<[^>]+>/g, '').split(/_{2,}(?:[\s/]*_{2,})*/).flatMap((t, i) => i ? [null, t] : [t]).filter(t => t === null || /[A-Za-z0-9]/.test(spoken(t)));
     let i = 0; utt = [];
@@ -99,12 +123,63 @@ var LS2 = (function () {
   }
   const modeHow = m => m === 'listen' ? (ca() ? 'Prem ▶, escolta la frase i escriu el que falta on sents el xiulet. Obre la frase només si ho necessites.' : 'Press ▶, listen to the sentence and type what is missing where you hear the beep. Open the sentence only if you need it.')
     : m === 'say' ? (ca() ? 'Llegeix la frase, prem 🎤 i digues-la sencera en veu alta, amb el que falta. Si l’ordinador no t’entén dues vegades, la pots escriure.' : 'Read the sentence, press 🎤 and say the whole sentence aloud, with what is missing. If the computer doesn’t understand you twice, you can type it.') : '';
+  /* ---------- Starter choices: the right answer + two distractors ---------- */
+  // Authored distractors first (item.d), then forms of the verb in brackets (Present Simple / Continuous, affirmative or negative),
+  // then other answers of the same step with the same number of words. The order is fixed per item so a page reload shows the same.
+  const s3 = v => ({ go: 'goes', do: 'does', have: 'has', be: 'is' })[v] || (/[^aeiou]y$/.test(v) ? v.slice(0, -1) + 'ies' : /(s|sh|ch|x|z|o)$/.test(v) ? v + 'es' : v + 's');
+  const ing = v => /ie$/.test(v) ? v.slice(0, -2) + 'ying' : (/[^e]e$/.test(v) ? v.slice(0, -1) + 'ing' : /^[^aeiou]*[aeiou][bdgmnprt]$/.test(v) ? v + v.slice(-1) + 'ing' : v + 'ing');
+  const hash = t => { let h = 7; for (const c of String(t)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+  function verbForms(it) {
+    const m = String(it.q).match(/\((?:not \/ )?([a-z]+)\)/); if (!m) return null;
+    const v = m[1], g = ing(v), a = expand(it.a[0]).trim(), be = /(^|\W)I ___/.test(it.q) ? 'am' : 'are';
+    const map = {};
+    map[v] = [s3(v), be + ' ' + g]; map[s3(v)] = [v, 'is ' + g]; map[g] = [v, s3(v)];
+    map['are going to ' + v] = ['is going to ' + v, 'will ' + v]; map['is going to ' + v] = ['are going to ' + v, 'will ' + v]; map['am going to ' + v] = ['is going to ' + v, 'will ' + v]; map['will ' + v] = ['is going to ' + v, s3(v)];
+    map['is ' + g] = ['are ' + g, s3(v)]; map['are ' + g] = ['is ' + g, v]; map['am ' + g] = ['is ' + g, v];
+    map['does not ' + v] = ["don't " + v, "isn't " + g]; map['do not ' + v] = ["doesn't " + v, "aren't " + g];
+    map['is not ' + g] = ["aren't " + g, "doesn't " + v]; map['are not ' + g] = ["isn't " + g, "don't " + v]; map['am not ' + g] = ["isn't " + g, "don't " + v];
+    return map[a] || null;
+  }
+  // words that are confused with each other: a wrong option from the same set teaches more than a random word
+  const SETS = [['at', 'in', 'on'], ['because', 'but', 'and', 'so', 'also'], ['first', 'then', 'finally', 'next'], ['always', 'usually', 'often', 'sometimes', 'never'], ['am', 'is', 'are'], ['do', 'does', 'is', 'are'], ['will', 'going to', 'is going to']];
+  function choices(it, items, salt) {
+    const same = x => it.a.some(a => expand(a) === expand(x)), out = [];
+    const add = x => { if (out.length < 2 && x && !same(x) && !out.some(o => expand(o) === expand(x))) out.push(x); };
+    (it.d || []).forEach(add);
+    (verbForms(it) || []).forEach(add);
+    const ingQ = String(it.q).match(/-ing form: ([a-z]+)/); if (ingQ) { const v = ingQ[1]; [v + 'ing', v.replace(/e$/, '') + v.slice(-1) + 'ing', s3(v)].forEach(add); }
+    const a0 = norm(it.a[0]), set = SETS.find(g => g.includes(a0)); if (set) set.filter(x => x !== a0).sort((x, y) => hash(salt + x) - hash(salt + y)).forEach(add);
+    const wc = words(it.a[0]);
+    items.map(x => x.a[0]).filter(x => x !== it.a[0]).sort((x, y) => ((words(y) === wc) - (words(x) === wc)) || (hash(salt + x) - hash(salt + y))).forEach(add);
+    return [it.a[0]].concat(out).sort((x, y) => hash(salt + x) - hash(salt + y));
+  }
+  function picksHtml(it, items, prefix, i, mode) {
+    return '<div class="actions pick-row" style="justify-content:flex-start" data-for="' + prefix + i + '">' + choices(it, items, LP.key + prefix + i).map(o =>
+      '<button class="btn secondary" type="button" data-pick="' + prefix + i + '"' + (mode === 'say' ? ' data-say="1"' : '') + ' data-v="' + esc(o) + '">' + esc(o) + '</button>').join('') + '</div>';
+  }
+  // highlights the option that is in the box (after a pick or when saved answers come back)
+  function syncPicks() {
+    $$('.pick-row').forEach(r => { const box = $('#' + r.dataset.for), v = box ? norm(box.value) : '';
+      r.querySelectorAll('[data-pick]').forEach(b => { const on = !!v && norm(b.dataset.v) === v; b.setAttribute('aria-pressed', on); b.style.setProperty('background', on ? 'var(--accent)' : '', on ? 'important' : ''); b.style.setProperty('color', on ? '#fff' : '', on ? 'important' : ''); }); });
+  }
+  function bindPicks() {
+    if (document.body.dataset.picks) return; document.body.dataset.picks = '1';
+    document.addEventListener('click', e => {
+      const b = e.target.closest && e.target.closest('[data-pick]'); if (!b || b.disabled) return;
+      const box = $('#' + b.dataset.pick); if (!box) return;
+      if (b.dataset.say && box.readOnly) { const h = $('#' + b.dataset.pick.replace(/(\d+)$/, 'h$1')); if (h) h.textContent = 'Primer prem 🎤 i digues la frase sencera amb aquesta resposta.'; return; }
+      box.value = b.dataset.v; box.dispatchEvent(new Event('input', { bubbles: true })); syncPicks();
+    });
+  }
   function typedHtml(items, prefix, mode) {
-    return items.map((it, i) => '<div class="question">' + (mode === 'listen'
+    if (starter()) bindPicks();
+    return (starter() && items.length ? '<p class="instruction">Tria la resposta correcta entre les tres opcions. Si falles, aquella opció queda ratllada, llegeixes la pista i tornes a provar.</p>' : '') +
+      items.map((it, i) => '<div class="question">' + (mode === 'listen'
         ? '<div class="actions" style="justify-content:flex-start;align-items:center"><strong>' + (i + 1) + '.</strong><button class="btn secondary" type="button" data-hear="' + prefix + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + '</button><button class="btn secondary" type="button" data-hear-slow="' + prefix + i + '">🐢 ' + (ca() ? 'Més lent' : 'Slower') + '</button>' + (cue(it.q) ? '<span class="tiny">' + esc(cue(it.q)) + '</span>' : '') + '</div>' +
           '<details class="draft-box"><summary>' + (ca() ? 'Mostra la frase' : 'Show the sentence') + '</summary><p class="q-title">' + it.q + '</p></details>'
         : '<p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' + (mode === 'say' ? '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn secondary" type="button" data-mic="' + prefix + i + '"' + (SRC() ? '' : ' hidden') + '>🎤 ' + (ca() ? 'Digues la frase' : 'Say the sentence') + '</button><span class="tiny" id="' + prefix + 'h' + i + '"></span></div>' : '')) +
-      '<input type="text" class="typed" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (mode === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : '') + '>' +
+      '<input type="text" class="typed" id="' + prefix + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (mode === 'say' && SRC() ? ' readonly placeholder="' + (ca() ? 'Prem 🎤 i digues la frase' : 'Press 🎤 and say the sentence') + '"' : starter() ? ' readonly placeholder="Tria una opció"' : '') + '>' +
+      (starter() ? picksHtml(it, items, prefix, i, mode) : '') +
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>').join('');
   }
   const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
@@ -144,10 +219,11 @@ var LS2 = (function () {
       got.push([ok, typedAs($('#' + prefix + i))]);
       const key = prefix + i;
       if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
+      if (starter() && v && !ok) $$('[data-pick="' + key + '"]').forEach(b => { if (norm(b.dataset.v) === v) { b.disabled = true; b.style.textDecoration = 'line-through'; } });
       const why = ca() ? (it.ca || it.en || '') : (it.en || it.ca || '');
       const show = reveal || tries[key] >= 2;
       f.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!')
-        : !v ? (ca() ? 'Escriu una resposta.' : 'Type an answer.')
+        : !v ? (starter() ? 'Tria una resposta.' : ca() ? 'Escriu una resposta.' : 'Type an answer.')
         : (ca() ? 'Encara no. ' : 'Not yet. ') + (why ? why + ' ' : '') +
           (show ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(it.a[0]) + '</strong>'
                 : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
@@ -171,8 +247,8 @@ var LS2 = (function () {
   function forget(id, prefix) { if (state.ans) delete state.ans[id]; if (state.typing) delete state.typing[id + '_' + level]; Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
   const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + (ca() ? 'Torna-ho a fer' : 'Do it again') + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
-  function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); }
-  function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } }
+  function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); syncPicks(); }
+  function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
   // check(count): the step's own check; stays(id, prefix, listId, items, check) wires Check, Do it again and the restore.
   function stays(id, prefix, listId, items, check) {
     $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix)); };
@@ -183,7 +259,8 @@ var LS2 = (function () {
 
   /* ---------- panels ---------- */
   const R = {};
-  R.recall = p => ({
+  // a checkpoint with `secure` (answers not in the page, one try, feedback when the teacher releases it): shared/js/el-checkpoint.js
+  R.recall = p => p.secure && window.ELCheckpoint ? ELCheckpoint.panel(p, { LP, level: () => level, ca, get state() { return state; }, save, complete, forLevel }) : ({
     html: '<div class="section-card"><div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
     bind() {
       const items = forLevel(p.items);
@@ -275,7 +352,7 @@ var LS2 = (function () {
     // Local videos (normal + "-slow" copy, WebVTT subtitles, poster), e.g. the listening chart: media.videos = [{ base: 'video/name', title }]
     if (m.videos) h += m.videos.map((v, i) => '<div class="video-card" style="margin:14px 0"><strong>' + esc(v.title) + '</strong>' +
       '<div class="actions" role="group" aria-label="Video speed"><button class="btn secondary" type="button" data-vs="' + p.id + i + '" data-slow="0">' + (ca() ? 'Velocitat normal' : 'Normal speed') + '</button><button class="btn secondary" type="button" data-vs="' + p.id + i + '" data-slow="1">' + (ca() ? 'Versió més lenta' : 'Slower version') + '</button></div>' +
-      '<video id="' + p.id + 'Video' + i + '" data-base="' + v.base + '" controls preload="metadata" playsinline style="width:100%;border-radius:14px;margin:8px 0;background:#000" poster="' + v.base + '-poster.jpg"><source src="' + v.base + '.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" src="' + v.base + '.vtt"></video></div>').join('') +
+      '<video id="' + p.id + 'Video' + i + '" data-base="' + v.base + (starter() ? '-slow' : '') + '" controls preload="metadata" playsinline style="width:100%;border-radius:14px;margin:8px 0;background:#000" poster="' + v.base + '-poster.jpg"><source src="' + v.base + (starter() ? '-slow' : '') + '.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" src="' + v.base + (starter() ? '-slow' : '') + '.vtt"' + (starter() ? ' default' : '') + '></video></div>').join('') +
       (m.videoCredit ? '<p class="tiny">' + m.videoCredit + '</p>' : '');
     if (m.audio) h += '<div class="audio-card"><strong>' + esc(m.title || 'Listening') + '</strong><audio class="audio-player" id="' + p.id + 'Audio" controls preload="none" src="' + m.audio + '"></audio>' +
       (ca() ? '<div class="audio-row" id="' + p.id + 'Speed" hidden><button class="btn secondary" type="button" id="' + p.id + 'Slow">Versió més lenta</button></div>' : '') +
@@ -293,8 +370,14 @@ var LS2 = (function () {
         if (vid.dataset.base !== base) { vid.dataset.base = base; vid.querySelector('source').src = base + '.mp4'; vid.querySelector('track').src = base + '.vtt'; vid.load(); }
         mark(slow);
       });
-      mark(false);
+      mark(starter());
     });
+    // Starter: the listening starts on the slower copy when it exists (the button goes back to normal speed)
+    if (m.audio && starter()) {
+      const slow = m.audio.replace(/\.mp3$/, '-slow.mp3'), a = $('#' + p.id + 'Audio'), b = $('#' + p.id + 'Slow');
+      fetch(slow, { method: 'HEAD' }).then(r => { if (!r.ok) return; a.src = slow; $('#' + p.id + 'Speed').hidden = false; if (b) b.textContent = 'Velocitat normal'; }).catch(() => {});
+      if (b && !m.script) b.onclick = () => { const toSlow = !a.src.endsWith('-slow.mp3'); a.src = toSlow ? slow : m.audio; b.textContent = toSlow ? 'Velocitat normal' : 'Versió més lenta'; };
+    }
     if (!m.audio || !m.script) return;
     fetch(m.audio, { method: 'HEAD' }).then(r => { if (!r.ok) throw 0; }).catch(() => {
       $('#' + p.id + 'Audio').hidden = true; $('#' + p.id + 'Tts').hidden = false;
@@ -363,7 +446,7 @@ var LS2 = (function () {
   }
   function bindDict(p) {
     if (!p.chunks || !p.chunks.length) return;
-    const say = (t, rate) => { const s = window.speechSynthesis; if (!s) return; s.cancel(); const u = new SpeechSynthesisUtterance(t), v = s.getVoices().find(x => /^en(-|_)GB/i.test(x.lang)) || s.getVoices().find(x => /^en(-|_)/i.test(x.lang)); u.lang = 'en-GB'; if (v) u.voice = v; u.rate = rate; s.speak(u); };
+    const say = (t, rate) => { if (playRec(t, rate)) return; if (recAudio) { recAudio.pause(); recAudio = null; } const s = window.speechSynthesis; if (!s) return; s.cancel(); const u = new SpeechSynthesisUtterance(t), v = s.getVoices().find(x => /^en(-|_)GB/i.test(x.lang)) || s.getVoices().find(x => /^en(-|_)/i.test(x.lang)); u.lang = 'en-GB'; if (v) u.voice = v; u.rate = rate; s.speak(u); };
     state.dict = state.dict || {}; const kept = state.dict[p.id] || [];
     p.chunks.forEach((c, i) => {
       $('[data-say="' + p.id + i + '"]').onclick = () => say(c, 0.9);
@@ -419,6 +502,26 @@ var LS2 = (function () {
      the step completes only when the student saves an improved final version (state.finals[key]) with a line on what they changed.
      The teacher sees draft, final version and that line in the activity dialog; the student sees their own draft here. */
   const revWords = s => (String(s || '').trim().match(/\S+/g) || []).length;
+  // Teacher-marked writing (p.teacher on a writing or marked panel; Roger, 31 Oct 2026: "instead of sending the writing to ChatGPT …
+  // the teacher corrects"): the button hands the text in like a step (state.steps[p.id], with the writing log of el-typing.js), with no
+  // ChatGPT and no points typed by the student. The level and the correction come from the marking sheet a week later
+  // (shared/js/el-marking.js) and show in this panel (shared/js/el-corrections.js); a marked panel then counts the teacher's level as
+  // its points (EL_DEGREE_MARK: NA 2.5 · AS 5 · AN 7.5 · AE 10 out of 10), sent by el-corrections.js as the "el-levels" event.
+  function handToTeacher(p, text) {
+    state.steps = state.steps || {};
+    state.steps[p.id] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum('#' + p.id + 'Text') : null, f: [{ l: ca() ? 'El meu text' : 'My text', v: text }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+    complete(p.id); save();
+  }
+  function teacherBtn() { return ca() ? 'Entrega-ho al professor' : 'Hand it in to my teacher'; }
+  function handedMsg(p) { const h = (state.steps || {})[p.id]; return h ? (ca() ? 'Entregat el ' + new Date(h.date).toLocaleDateString() + '. El professor et tornarà la correcció aquí mateix. Si canvies el text, torna’l a entregar.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. Your teacher’s correction will appear right here. If you change your text, hand it in again.') : ''; }
+  addEventListener('el-levels', e => {
+    const lv = (e.detail || {}).levels || {}, M = { NA: 2.5, AS: 5, AN: 7.5, AE: 10 };
+    (LP.panels || []).filter(p => p.teacher && p.type === 'marked' && lv[p.id]).forEach(p => {
+      const xs = Object.values(lv[p.id]).map(x => M[x]).filter(x => x != null); if (!xs.length) return;
+      state.ai = state.ai || {}; const k = p.id + '_' + level, v = Math.round(xs.reduce((a, b) => a + b, 0) / xs.length / 10 * p.max);
+      if (state.ai[k] !== v) { state.ai[k] = v; save(); if (LP.onScore) LP.onScore(); }
+    });
+  });
   function keepDraft(key, text) {
     state.drafts = state.drafts || {};
     if (state.drafts[key]) return false;
@@ -465,8 +568,8 @@ var LS2 = (function () {
       (p.model ? '<div class="model"><strong>' + (ca() ? 'Model (no el copiïs: és sobre una altra celebració)' : 'Model (don’t copy it: it is about another celebration)') + '</strong><br>' + tx(p.model) + '</div>' : '') +
       '<div class="model" id="' + p.id + 'Frame" hidden></div><textarea id="' + p.id + 'Text" placeholder="Write here…"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Revisa abans d’enviar' : 'Check before you send') + '</h3><div class="options" id="' + p.id + 'List"></div>' +
-      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (ca() ? 'Desa i corregeix amb IA ↗' : 'Save and correct with AI ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
-      '</div>' + revisionHtml(p.id),
+      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (p.teacher ? teacherBtn() : ca() ? 'Desa i corregeix amb IA ↗' : 'Save and correct with AI ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
+      '</div>' + (p.teacher ? '' : revisionHtml(p.id)),
     bind() {
       const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level;
       state.texts = state.texts || {};
@@ -484,6 +587,7 @@ var LS2 = (function () {
         const boxes = $$('#' + p.id + 'List input'), msg = $('#' + p.id + 'Msg');
         if (min && words(ta.value) < min) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + min + ' paraules.' : 'Too short: write at least ' + min + ' words.'; return; }
         if (boxes.some(b => !b.checked)) { msg.className = 'feedback no'; msg.textContent = learningSupport.missing(level, boxes); return; }
+        if (p.teacher) { handToTeacher(p, ta.value.trim()); if (p.product) saveProduct(p.product, ta.value.trim()); msg.className = 'feedback ok'; msg.textContent = handedMsg(p); return; }
         window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(aiPrompt(p, ta.value.trim())), '_blank', 'noopener,noreferrer');
         if (p.product) saveProduct(p.product, ta.value.trim());
         const first = keepDraft(key, ta.value.trim());
@@ -492,6 +596,7 @@ var LS2 = (function () {
           : (ca() ? 'S’ha obert ChatGPT amb la teva nova versió.' : 'ChatGPT has opened with your new version.');
         showRevision();
       };
+      if (p.teacher) { const h = handedMsg(p); if (h) { $('#' + p.id + 'Msg').className = 'feedback ok'; $('#' + p.id + 'Msg').textContent = h; } return; }
       const showRevision = bindRevision(p.id, key, () => ta.value.trim(), text => { if (p.product) saveProduct(p.product, text); });
     }
   });
@@ -558,7 +663,7 @@ var LS2 = (function () {
         const ps = byLevel(p.peerRate) || [], peers = (draft.peers || []).filter(d => d && (d.name || '').trim());
         if (p.peers && (peers.length < (p.minPeers || 2) || peers.some(d => ps.some((s, i) => !(d.r || [])[i])))) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Escriu el nom de cada company i puntua totes les frases.' : 'Write each teammate’s name and rate every statement.'; return; }
         const rate = stm.map((s, i) => ({ s, v: draft.rate[i] }));
-        state.steps[key] = { level, title: tx(p.title), f: fields.map(f => ({ l: tx(f.label), v: (draft.f[f.id] || '').trim() })), rate, avg: rate.length ? Math.round(rate.reduce((a, x) => a + x.v, 0) / rate.length * 10) / 10 : null,
+        state.steps[key] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum('#' + key + 'Fields') : null, f: fields.map(f => ({ l: tx(f.label), v: (draft.f[f.id] || '').trim() })), rate, avg: rate.length ? Math.round(rate.reduce((a, x) => a + x.v, 0) / rate.length * 10) / 10 : null,
           peers: p.peers ? peers.map(d => ({ name: d.name.trim(), r: ps.map((s, i) => ({ s, v: d.r[i] })) })) : undefined, comment: (draft.comment || '').trim(), date: new Date().toISOString() };
         // A step can also be a product piece (the research card): it then appears on the final product page too.
         if (p.product) saveProduct(p.product, state.steps[key].f.filter(f => f.v).map(f => f.l + ': ' + f.v).join('\n'));
@@ -631,7 +736,7 @@ var LS2 = (function () {
       const ch = $('#' + key + 'Change'), msg = $('#' + key + 'Msg');
       ch.value = d.change || '';
       const hand = () => {
-        state.steps[key] = { level, title: tx(p.title), f: p.fields.map(f => ({ l: f.label, v: (d.f[f.id] || '').trim() })).concat(d.change ? [{ l: 'What I would change after the model', v: d.change }] : []), rate: [], avg: null, comment: '', date: new Date().toISOString() };
+        state.steps[key] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum('#' + key + 'Fields') : null, f: p.fields.map(f => ({ l: f.label, v: (d.f[f.id] || '').trim() })).concat(d.change ? [{ l: 'What I would change after the model', v: d.change }] : []), rate: [], avg: null, comment: '', date: new Date().toISOString() };
         state.done[key] = true; stamp(key); save();
       };
       ch.oninput = () => { d.change = ch.value.trim(); if (state.steps[key]) hand(); else save(); };
@@ -713,7 +818,7 @@ var LS2 = (function () {
           '<div class="actions"><button class="btn secondary" type="button" id="' + id + 'Ai" disabled>' + (ca() ? 'Feedback amb IA ↗' : 'AI feedback ↗') + '</button></div><p class="tiny" id="' + id + 'AiMsg"></p></div>') +
         '<div class="section-card"><div class="actions"><button class="btn" type="button" id="' + id + 'Send">' + (ca() ? 'Entrega la conversa' : 'Hand in the conversation') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
       bind() {
-        const qs = forLevel(p.partner), key = id + '_' + level, wait = (p.wait || { beginners: 12, insecure: 12, safe: 16, daring: 20 })[level] || 16;
+        const qs = forLevel(p.partner), key = id + '_' + level, wait = (p.wait || { beginners: starter() ? 16 : 12, insecure: 12, safe: 16, daring: 20 })[level] || 16;
         state.steps = state.steps || {}; state.speak = state.speak || {}; const sp = state.speak[key] = state.speak[key] || {};
         $('#' + id + 'Task').innerHTML = byLevel(p.task); $('#' + id + 'Model').innerHTML = byLevel(p.model);
         $('#' + id + 'Qs').innerHTML = qs.map((q, i) => '<li><button class="btn secondary" type="button" data-tq="' + id + i + '" aria-label="Listen">▶</button> ' +
@@ -738,7 +843,7 @@ var LS2 = (function () {
               rec.start(); } catch (e) {}
           };
           const stop = async () => {
-            run++; clearTimeout(timer); sayTok++; if (window.speechSynthesis) speechSynthesis.cancel(); listen(false);
+            run++; clearTimeout(timer); stopSay(); listen(false);
             if (!processor) return;
             processor.disconnect(); sourceNode.disconnect(); micStream.getTracks().forEach(t => t.stop()); await audioCtx.close(); processor = null;
             recBlob = encodeWav(pcm, recRate); if (recUrl) URL.revokeObjectURL(recUrl); recUrl = URL.createObjectURL(recBlob);
@@ -786,7 +891,7 @@ var LS2 = (function () {
         $('#' + id + 'Send').onclick = () => {
           const n = nat ? words((sp.notes || []).join(' ')) : words(sp.tr || '');
           if (n < min) { msg.className = 'feedback no'; msg.textContent = nat ? 'Write a few ideas for every question (at least ' + min + ' words in all).' : ca() ? 'La transcripció té ' + n + ' paraules: respon totes les preguntes (almenys ' + min + ' paraules). Si Chrome no l’ha escrita, escriu el que has dit.' : 'Your transcript has ' + n + ' words: answer every question (at least ' + min + ' words). If Chrome didn’t write it, type what you said.'; return; }
-          state.steps[id] = { level, title: tx(p.title), f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+          state.steps[id] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum($('#' + id + 'Tr') && $('#' + id + 'Tr').parentElement) : null, f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
           complete(id); save();
           msg.className = 'feedback ok'; msg.textContent = ca() ? 'Entregada ✓ El professor ho veurà al seu tauler.' : 'Handed in ✓ Your teacher will see it on the dashboard.';
         };
@@ -940,10 +1045,11 @@ var LS2 = (function () {
   R.marked = p => ({
     html: '<div class="section-card">' + mediaHtml(p) + '<h3>' + (ca() ? 'La tasca' : 'Your task') + ' <small>[' + ptsWord(p.max) + ']</small></h3><p class="instruction" id="' + p.id + 'Task"></p>' +
       '<textarea id="' + p.id + 'Text" rows="9"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
+      (p.teacher ? '<div class="section-card"><h3>' + (ca() ? 'Entrega' : 'Hand it in') + '</h3><p class="instruction">' + (ca() ? 'Quan acabis, entrega-ho. El professor et tornarà la correcció aquí mateix.' : 'When you finish, hand it in. Your teacher’s correction will appear right here.') + '</p><div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + teacherBtn() + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>' :
       '<div class="section-card"><h3>' + (ca() ? 'Feedback i nota orientativa' : 'Feedback and a guide mark') + '</h3><p class="instruction">' + (ca() ? 'Prem el botó: s’obre ChatGPT amb la teva resposta i els criteris de correcció. Et dirà el nivell (NA, AS, AN, AE), els punts i què has de millorar.' : 'Press the button: ChatGPT opens with your answer and the marking criteria. It tells you the level (NA, AS, AN, AE), the points and what to improve.') + '</p>' +
       '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (ca() ? 'Desa i corregeix amb ChatGPT ↗' : 'Save and mark with ChatGPT ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
       '<label class="field"><strong>' + (ca() ? 'Punts que t’ha donat ChatGPT (de ' + p.max + ')' : 'Points ChatGPT gave you (out of ' + p.max + ')') + '</strong><input type="number" class="typed" id="' + p.id + 'Pts" min="0" max="' + p.max + '" step="1" style="max-width:120px"></label>' +
-      '<p class="warm-note">' + aiWarning() + '</p></div>',
+      '<p class="warm-note">' + aiWarning() + '</p></div>'),
     bind() {
       bindAudio(p);
       const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level, min = byLevel(p.min);
@@ -953,6 +1059,14 @@ var LS2 = (function () {
       const count = () => { $('#' + p.id + 'Count').textContent = words(ta.value) + ' ' + (ca() ? 'paraules' : 'words') + (min ? ' · ' + (ca() ? 'mínim ' : 'minimum ') + min : ''); };
       ta.oninput = () => { state.texts[key] = ta.value; save(); count(); };
       count();
+      if (p.teacher) {
+        const msg = $('#' + p.id + 'Msg'); if (handedMsg(p)) { msg.className = 'feedback ok'; msg.textContent = handedMsg(p); }
+        $('#' + p.id + 'Ai').onclick = () => {
+          if (words(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.'; return; }
+          handToTeacher(p, ta.value.trim()); msg.className = 'feedback ok'; msg.textContent = handedMsg(p);
+        };
+        return;
+      }
       const pts = $('#' + p.id + 'Pts'), k = p.id + '_' + level;
       pts.value = state.ai[k] != null ? state.ai[k] : '';
       pts.oninput = () => { const v = pts.value === '' ? null : Math.max(0, Math.min(p.max, Math.round(+pts.value))); if (v == null) delete state.ai[k]; else state.ai[k] = v; save(); if (LP.onScore) LP.onScore(); };
@@ -1011,14 +1125,19 @@ var LS2 = (function () {
     const keep = () => { state.review[level] = { helped: h.value.trim(), review: r.value.trim(), at: new Date().toISOString() }; save(); $('#lpReviewMsg').textContent = ca() ? 'Desat ✓' : 'Saved ✓'; };
     h.onchange = keep; r.onchange = keep;
   }
+  /* Study guide (Roger, 31 Oct 2026): shared/js/el-study.js draws it from LP.study (data/study/<page>.js). */
+  const studyApi = () => ({ LP, level: () => level, ca });
+  function studyCard() { return window.ELStudy && LP.study ? ELStudy.html(studyApi()) : ''; }
+  function bindStudy() { if (window.ELStudy && LP.study) ELStudy.bind(studyApi()); }
   function render() {
     const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
-    $('#lp').innerHTML = trackNote() + planCard() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
+    $('#lp').innerHTML = trackNote() + planCard() + studyCard() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
       LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
       reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
     LP.panels.forEach(p => p._r.bind());
     bindPlan();
+    bindStudy();
     $$('.tab').forEach(t => t.onclick = () => { $$('.tab,.panel').forEach(x => x.classList.remove('active')); t.classList.add('active'); $('#' + t.dataset.panel).classList.add('active'); window.scrollTo({ top: $('#lp').offsetTop - 64, behavior: 'smooth' }); });
     initNext();
     progress();

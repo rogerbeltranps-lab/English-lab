@@ -42,7 +42,7 @@ Revisió del 24 d'octubre de 2026: cada objectiu es vincula a un sol criteri per
 
 **Fonts.** Mapa vertical de gramàtica, mapa vertical de lèxic, document de nivells i matriu de competències d'anglès (documents del projecte), la LS1 original de Roger i el document de les LS de 4t com a model de format.
 
-**Nivell de cada ruta a 2n** (document de nivells): Beginners = A1 (ruta assignada només pel professor) · Insecure = A1+ / A2 inicial amb bastides · Safe = A2 funcional · Daring = A2+ / B1 emergent. Insecure treballa sempre amb models, marcs de frase i orientació en català.
+**Nivell de cada ruta a 2n** (document de nivells): Beginners = A1 (ruta assignada només pel professor) · Insecure = A1+ / A2 inicial amb bastides · Safe = A2 funcional · Daring = A2+ / B1 emergent. Insecure treballa sempre amb models, marcs de frase i orientació en català. Al web, les rutes es diuen Starter (Beginners), Base (Insecure), Core (Safe) i Plus (Daring); aquest document i el codi conserven els noms antics.
 
 **Ruta Beginners (afegida el 26 d'octubre de 2026).** Quarta ruta, per sota d'Insecure, per a l'alumnat que comença gairebé de zero (A1 del MECR). La ruta la fixa només el professor: l'alumne no la pot triar ni demanar. Mateixa LS, mateixos grups i mateix producte final que la resta, amb menys requisits: 4–6 frases amb marcs de frase i banc de paraules, instruccions i pistes en català, lectures de 60–100 paraules amb el 95–98 % de paraules conegudes i glosses en català, vídeos amb subtítols en anglès des del primer visionat, una llista nuclear de 25–40 paraules per LS amb repàs espaiat, i la mateixa escala NA–AE jutjada amb els can-dos A1. Mentre una LS no té contingut Beginners propi, el web mostra el contingut Insecure. El capítol «Resum de gramàtica i lèxic · ruta Beginners» recull què produeix la ruta a cada LS. LS1, ja acabada, no tindrà contingut Beginners al web aquest curs.
 
@@ -622,6 +622,8 @@ Beginners and Insecure keep Catalan guidance and a model vlog with sentence fram
 
 - State verbs without continuous form: I like it. I want a new bike. I know the rules. (not *I'm liking it*)
 
+- Who + Present Continuous as a chunk (subject questions are a 3 ESO point): Who is scoring?
+
 **Daring** *(retains Safe and develops)*
 
 - Present Continuous for temporary situations: This month I'm training for a race.
@@ -629,6 +631,8 @@ Beginners and Insecure keep Catalan guidance and a model vlog with sentence fram
 - State verbs with two meanings: I think it's fun ≠ I'm thinking about it.
 
 - Longer descriptions combining both tenses with and, but, because, so.
+
+- Preview in the screen tips: instead of + -ing and enough (too / enough is LS4): Go outside instead of watching videos. One hour is enough.
 
 ### 6. Competències transversals
 
@@ -1526,7 +1530,7 @@ Beginners and Insecure keep Catalan guidance and a planning template (Where? Whe
 
 - will per a prediccions i decisions ràpides: It will be sunny. I'll bring the snacks.
 
-- First conditional amb model: If + Present Simple, will + verb base (If it rains, we'll go to the museum).
+- First conditional en un marc fix: If + Present Simple, will + verb base (If it rains, we'll go to the museum). Completa el marc; no el produeix lliurement (revisió del 31 d'octubre de 2026).
 
 - would like / Could we...? (R): I'd like to go to the beach. Could we leave at nine?
 
@@ -1536,11 +1540,11 @@ Beginners and Insecure keep Catalan guidance and a planning template (Where? Whe
 
 - will vs going to: plan vs decision now.
 
-- Future time clauses with when / before / after + present: When we arrive, we'll have lunch.
+- Future time clauses are only in the model (receptive): When we arrive, we'll have lunch.
 
 **Daring** *(retains Safe and develops)*
 
-- as soon as + present: As soon as we get there, we'll check in.
+- Future time clauses with when / before / after / as soon as + present (B1, Daring only since 31 Oct 2026): When we arrive, we'll have lunch. As soon as we get there, we'll check in.
 
 - First conditional in negatives and questions: What will we do if the train is late? If we don't book now, it'll be more expensive.
 
@@ -1613,9 +1617,9 @@ Aquesta taula coincideix amb la columna de 2n del mapa vertical de gramàtica, a
 
   Present Continuous amb valor de futur                                             A2         ---                    ---                            ---                     ---       ---       I (S/D)
 
-  Oracions temporals de futur (when, as soon as, before + present)                  B1         ---                    ---                            ---                     ---       ---       I (S/D)
+  Oracions temporals de futur (when, as soon as, before + present)                  B1         ---                    ---                            ---                     ---       ---       I (D)
 
-  First conditional                                                                 A2--B1     ---                    ---                            ---                     ---       ---       I
+  First conditional                                                                 A2--B1     ---                    ---                            ---                     ---       ---       I (I: marc)
 
   **Modals**                                                                                                                                                                                     
 
@@ -1635,7 +1639,7 @@ Aquesta taula coincideix amb la columna de 2n del mapa vertical de gramàtica, a
 
   as ... as / not as ... as                                                         A2         ---                    ---                            ---                     ---       I (S/D)   ---
 
-  too / enough                                                                      A2         ---                    ---                            ---                     I (S/D)   ---       ---
+  too / enough                                                                      A2         ---                    avanç (D): enough              ---                     I (S/D)   ---       ---
 
   Quantifiers / quantity (some/any, much/many, a lot of, a few/a little)            A1--A2     ---                    ---                            ---                     C         ---       ---
 
@@ -1651,6 +1655,8 @@ Aquesta taula coincideix amb la columna de 2n del mapa vertical de gramàtica, a
 
   Phrasal verbs: ordre / objecte                                                    B1         expressions lèxiques   ---                            ---                     ---       ---       ---
   -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*Revisió del 31 d'octubre de 2026 (comprovació amb els mapes de la carpeta 05 del Drive):* a LS2, Safe i Daring fan servir *Who is scoring?* com a chunk (les preguntes de subjecte són de 3r) i Daring avança *enough* i *instead of + -ing* en els consells (too / enough és de LS4). A LS6, les oracions temporals de futur (B1) passen a ser només de Daring, i Insecure fa el first conditional en un marc fix. Els mapes de la carpeta 05 ho recullen igual.
 
 ## Lèxic de 2n ESO per LS
 
