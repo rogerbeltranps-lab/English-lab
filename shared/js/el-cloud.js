@@ -384,6 +384,23 @@ function studyCard(u){
     +"</p><p>"+(every?EL_LEVELS.filter(x=>(x.id!=="beginners"||ls.starter)&&(x.id!=="native"||ls.pro)).map(x=>a(x.id)).join(""):a(lv==="beginners"&&!ls.starter?"insecure":lv==="native"&&!ls.pro?"daring":lv))+"</p>";
   el.hidden=false;
 }
+// Reading story on the LS home page (Roger, 31 Oct 2026: "nice pdf book-like versions for each level and put them on the home of each LS
+// per levels"): the Overview tab has an empty card ([data-el-story]); for an LS with `story` in EL_LS it gets the book of the student's
+// route only (tools/reading-story/build.py), nothing until they have a route; the teacher and testers get all four. Pro reads Plus.
+function storyCard(u){
+  const el=document.querySelector("[data-el-story]"),ls=(window.EL_LS||[]).find(x=>x.id===lsId);
+  if(!el||!ls||!ls.story||!u)return;
+  const every=isTeacher(u)||seesAll(u),lv=myLevel,ca=!every&&elCa(lv),s=ls.story;
+  if(!every&&!lv)return;
+  const a=r=>'<a href="'+new URL(s.pdf+r+".pdf",ROOT).href+'" download style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📥 '
+    +(every?EL_LEVELS.find(x=>x.id===r).name+" (PDF)":ca?"Descarrega el teu llibre (PDF)":"Download your book (PDF)")+"</a>";
+  el.innerHTML='<div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap"><img src="'+new URL(s.pdf+"cover.jpg",ROOT).href+'" alt="" style="width:120px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.18)">'
+    +'<div style="flex:1;min-width:220px"><h2>📖 '+(ca?"Història per llegir":"Reading story")+" · "+s.title+"</h2><p>"
+    +(ca?"Un misteri en sis capítols. Llegeix un capítol cada setmana a casa, amb el seu Learning Path. A classe en parlem deu minuts.":"A story in six chapters. Read one chapter a week at home, with its Learning Path. In class we talk about it for ten minutes.")
+    +(every?"":" <b>"+elLevelLabel(ls.course,lv==="native"?"daring":lv)+"</b>")
+    +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="native").map(x=>a(x.id)).join(""):a(lv==="native"?"daring":lv))+"</p></div></div>";
+  el.hidden=false;
+}
 let draw=()=>{};
 const start=()=>{draw=bar();draw(user)};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start):start();
@@ -432,6 +449,7 @@ onAuthStateChanged(auth,async u=>{
   if(u&&isStudent(u)&&!myLevel&&!onBoard)await findHomeLevel(u);
   menuLink(u);
   studyCard(u);
+  storyCard(u);
   if(myLevel||homeLevel)draw(u);   // the route is known now: the Problem button speaks its language
   // The teacher's answer to the student's problem reports (marked fixed, or a thank-you when deleted): a card, once (shared/js/el-reply.js).
   if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
