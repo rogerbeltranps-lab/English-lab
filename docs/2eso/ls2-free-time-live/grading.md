@@ -13,7 +13,7 @@ Every LS criterion ends with a degree (NA · AS · AN · AE) that the teacher ca
 | Final exam | 35 | Listening 20 (5 questions + listening chart) · Reading 20 (5 questions + reading log) · Vocabulary 15 · Grammar 15 · Writing 30 (the vlog script, 5.1 level NA 8 · AS 15 · AN 23 · AE 30). Score / max per section on the dashboard, plus the writing level. |
 | Final product | 25 | My vlog 40 (3.2) · My script and slides 30 (5.1) · My source 15 (4.2) · My process evidence 15. All individual. |
 | Grammar and vocabulary | 20 | Automatic (26 Oct 2026): checkpoints 1–4 50 % (first try) · recall warm-ups of LP2–LP6 25 % (first try) · practice, grammar and mixed practice of LP2–LP6 done by the session deadline 25 %. |
-| Other competences | 20 | 6.2, CD2 2.2, CD4 4.5: half automatic from linked steps, half teacher levels (section 4). |
+| Other competences | 20 | 6.2: half automatic from linked steps, half teacher levels (section 4). CD2 2.2 and CD4 4.5 are assessed the same way and shown apart, but not in the mark (Roger, 30 Oct 2026). |
 
 Key competences for the exam and the final product: 4.1, 4.2, 2.2, 3.2, 5.1.
 

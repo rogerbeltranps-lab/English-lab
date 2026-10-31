@@ -2,7 +2,7 @@
 // see the correction in that tab of the learning path"). The teacher's answer to a hand-in is results/{activity}.replies[step]: written
 // on the dashboard (💬 Answer, or the feedback of a 🤖 Marking sheet) or by tools/marking/marks.mjs. On every page that loads
 // el-cloud.js a student gets a card, once per new answer, with a link to that step's tab of the learning path (page.html#step: el-cloud
-// opens the tab). On the learning path itself the answer sits at the top of the step's tab, always. Levels are never shown to the
+// opens the tab); also the corrections without a level of everything else they write (results.fbSig[step]). On the learning path itself the answer sits at the top of the step's tab, always. Levels are never shown to the
 // student (students are not told which steps are assessed); "corrected" is said when the step has a teacher level, "answered" when not.
 // The answers the student has seen are students/{uid}.fbSeen["activity|step"] = a short signature of the text, so a new or changed
 // answer brings the card back. "Later" hides it until the browser is closed. On the learning path the step's levels are also sent to
@@ -17,10 +17,10 @@ export async function corrections({list,seen,save,here,root,en,name}){
   const cat=window.EL_CATALOG||[],T=(ca,e)=>en?e:ca;
   const items=[];
   for(const r of rs){const a=cat.find(x=>x.id===r.activity);if(!a)continue;
-    // Claude's answer to the student's comment (answers[step].t, tools/marking/marks.mjs) comes first, then the feedback on the work
+    // Claude's answer to the student's comment (answers[step].t, tools/marking/marks.mjs answer) comes first, then the correction of the work
     for(const step of new Set([...Object.keys(r.replies||{}),...Object.keys(r.answers||{})])){
       const text=[((r.answers||{})[step]||{}).t,(r.replies||{})[step]].filter(t=>t&&String(t).trim()).join("\n\n");
-      if(text)items.push({a,step,text,k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)})}}
+      if(text)items.push({a,step,text,k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}}
   // on the learning path: the answers in their tabs, and the levels for the page
   const mine=rs.find(r=>r.activity===here);
   if(mine&&mine.levels)dispatchEvent(new CustomEvent("el-levels",{detail:{levels:mine.levels}}));
@@ -49,7 +49,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
     c.querySelector("small").textContent=T("Del teu professor","From your teacher");
     const ul=c.querySelector("ul");
     for(const it of todo.slice(0,6)){const li=document.createElement("li"),l=document.createElement("a");
-      l.textContent=it.a.title.replace(/:.*$/,"")+" · "+(name(it.a.id,it.step)||it.step)+" →";l.href=new URL(it.a.path,root).href+"#"+encodeURIComponent(it.step);
+      l.textContent=it.a.title.replace(/:.*$/,"")+" · "+(name(it.a.id,it.step)||({write:T("Escriptura","Writing"),speak:"Speaking",talk:"Talk",reflect:T("Reflexió","Reflection")})[it.step]||it.step)+" →";l.href=new URL(it.a.path,root).href+"#"+encodeURIComponent(it.step);
       l.style.cssText="color:#0f766e;font-weight:600";
       l.onclick=ev=>{ev.preventDefault();c.remove();Promise.resolve(save({[it.k]:it.v})).catch(e=>console.warn("corrections",e)).then(()=>{
         const u=new URL(l.href);if(u.pathname===location.pathname){history.replaceState(null,"",u.href);location.reload()}else location.href=u.href})};
