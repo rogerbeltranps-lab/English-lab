@@ -178,6 +178,8 @@ const api={
   // the screenshot of a report is loaded only when the teacher opens it (problemShots/{same id})
   pbShot:async id=>DEMO?((DEMO.shots||{})[id]||null):((await F.getDoc(F.doc(db(),"problemShots",id))).data()||{}).img||null,
   // answer to a final-product step: results/{activity}.replies[step]; the student sees it on their page
+  // "No reply needed" on a step comment: results/{activity}.seen[step]; only the dashboard reads it
+  noReply:(u,a,step)=>{if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{}),x=(r[a.id]=r[a.id]||{ls:a.ls,activity:a.id});(x.seen=x.seen||{})[step]=true;return}return put(["students",u,"results",resKey(a.id)],{ls:a.ls,activity:a.id,seen:{[step]:true}})},
   reply:(u,a,step,text)=>{if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{}),x=(r[a.id]=r[a.id]||{ls:a.ls,activity:a.id});(x.replies=x.replies||{})[step]=text;return}return put(["students",u,"results",resKey(a.id)],{ls:a.ls,activity:a.id,replies:{[step]:text}})}
 };
 async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save: "+e.message)}if(!DEMO)S.D=await load();render()}
@@ -287,7 +289,9 @@ const doneSet=(u,a)=>{const p=(S.D.pg[u]||{})[a.ls]||{},s=new Set();a.keys.forEa
 const stepCrit=(a,k)=>(a.skip||[]).includes(k)?'<small class="muted">not scored</small>':((((window.EL_STEP_CRITERIA||{})[a.id]||{})[k]||EL_EVIDENCE[k]||[]).map(pill).join("")||'<small class="muted" title="Language practice: no criterion linked">–</small>');
 const pts=a=>a.graded?(a.manual?"teacher mark":a.points+" pts"):"not graded";
 const handedIn=(u,a)=>{try{return JSON.parse(((S.D.pg[u]||{})[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){return {}}};
-const unanswered=(u,a)=>{if(!a.steps)return [];const h=handedIn(u,a),rp=((S.D.rs[u]||{})[a.id]||{}).replies||{};return a.steps.filter(([id])=>h[id]&&h[id].comment&&!rp[id])};
+// a comment waits for an answer unless it only says "no problem" (elNoComment) or you marked it "No reply needed" (results.seen)
+const waits=(h,x,id)=>!!(h&&h.comment&&!elNoComment(h.comment)&&!((x.replies||{})[id])&&!((x.seen||{})[id]));
+const unanswered=(u,a)=>{if(!a.steps)return [];const h=handedIn(u,a),x=(S.D.rs[u]||{})[a.id]||{};return a.steps.filter(([id])=>waits(h[id],x,id))};
 const actTitle=id=>(cat.find(a=>a.id===id)||{}).title||id;
 const sortKey=s=>{const n=nameOf(s);return n?[n.surname1,n.surname2||"",n.first||""]:[s.name||s.email||"","",""]};
 const byName=(x,y)=>{const a=sortKey(x),b=sortKey(y);for(let i=0;i<3;i++){const c=a[i].localeCompare(b[i],"ca",{sensitivity:"base"});if(c)return c}return 0};   // by first surname
@@ -544,7 +548,7 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
   return `<div class="box">${fold("routes","🧭 Routes from the LS1 exam",body)}</div>`}
 function todo(studs,ls,list){   // studs: signed-in students only. Final product items and route requests from the students' boards (Roger, 30 Oct 2026); submissions without feedback are not listed (Roger, 2026-10-24)
   const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
-  studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>out.push(`✉️ <b>${name(s)}</b> commented on <b>${esc(t)}</b> (${esc(a.title)}): “${esc(handedIn(s.uid,a)[id].comment)}” <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button>`))));
+  studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>out.push(`✉️ <b>${name(s)}</b> commented on <b>${esc(t)}</b> (${esc(a.title)}): “${esc(handedIn(s.uid,a)[id].comment)}” <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button> <button class="g" data-do="noreply" data-u="${s.uid}" data-a="${a.id}" data-s="${id}" title="Take it off this list without answering (the student sees nothing)">No reply needed</button>`))));
   studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
     if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(elRouteOf(S.D.lv[s.uid],ls).level)} → ${route(l.request)}${l.reason?` · “${esc(l.reason)}”`:""} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Decline</button>`)});
   const grp=GR.find(g=>g.id===S.g),mk=grp?mkTodoItems(grp):[];mk.filter(x=>x.now).forEach(x=>out.push(x.h));if(grp)out.push(...cpItems(grp));
@@ -992,16 +996,16 @@ function revisions(u,a){const st=pstate(u,a),dr=st.drafts||{},fi=st.finals||{},t
       +(!d&&!f?para(tx[k]):"")+`</div></details>`}).join("")+refl}
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
-  const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},rp=((S.D.rs[u]||{})[a.id]||{}).replies||{};
+  const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},xr=(S.D.rs[u]||{})[a.id]||{},rp=xr.replies||{};
   return `<label>Hand-ins and self-assessment</label>`+a.steps.map(([id,title])=>{const x=sp[id];if(!x)return `<details><summary class="muted">${esc(title)} · not handed in</summary></details>`;
-    const wait=x.comment&&!rp[id];
-    return `<details ${wait?"open":""}><summary>${esc(title)} · ✓ ${x.avg!=null?"self-assessment "+x.avg+"/4":""}${x.comment?" 💬":""}${x.peers&&x.peers.length?" 👥":""}${wait?" ✉️ waiting for your answer":rp[id]?" · answered":""}</summary><div class="hand">`
+    const wait=waits(x,xr,id);
+    return `<details ${wait?"open":""}><summary>${esc(title)} · ✓ ${x.avg!=null?"self-assessment "+x.avg+"/4":""}${x.comment?" 💬":""}${x.peers&&x.peers.length?" 👥":""}${wait?" ✉️ waiting for your answer":rp[id]?" · answered":x.comment?" · no reply needed":""}</summary><div class="hand">`
       +(id==="prep"?[1,2,3,4,5].map(n=>`<p><b>Piece ${n}:</b> ${pc[n]?esc(pc[n].text):'<span class="muted">not saved</span>'}</p>`).join(""):"")
       +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")
       +(x.rate||[]).map(r=>`<p>${r.v}/4 · ${esc(r.s)}</p>`).join("")
       +(x.peers||[]).map(q=>`<p>👥 ${esc(q.name)}: ${q.r.map(r=>r.v+" "+esc(r.s)).join(" · ")}</p>`).join("")
       +(x.comment?`<p><b>Comment:</b> ${esc(x.comment)}</p>`:"")
-      +`<p><b>Your answer</b> <small class="muted">(the student sees it on their page)</small></p><textarea id="rp-${id}" style="min-height:60px">${esc(rp[id]||"")}</textarea><div class="row" style="margin-top:4px"><button data-do="replysave" data-u="${u}" data-a="${a.id}" data-s="${id}">${rp[id]?"Update answer":"Send answer"}</button></div></div></details>`}).join("");
+      +`<p><b>Your answer</b> <small class="muted">(the student sees it on their page)</small></p><textarea id="rp-${id}" style="min-height:60px">${esc(rp[id]||"")}</textarea><div class="row" style="margin-top:4px"><button data-do="replysave" data-u="${u}" data-a="${a.id}" data-s="${id}">${rp[id]?"Update answer":"Send answer"}</button>${wait?` <button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button>`:""}</div></div></details>`}).join("");
 }
 const groupSel=(u,g)=>`<select data-do="group" data-u="${u}"><option value="">– choose –</option>${GR.map(x=>`<option value="${x.id}" ${x.id===g?"selected":""}>${x.name}</option>`).join("")}</select>`;
 function noGroup(studs){
@@ -1373,6 +1377,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       quick(patch(u,k.a,{team:v||null,levels:{group:mate?Object.assign({},res(mate.uid,k.a).levels.group):null}}))},
     fin:()=>{const id=asId(S.ls),cur=(res(u,id).final||{})[k.c];quick(patch(u,id,{final:{[k.c]:cur===k.l?null:k.l}}))},
     examsave:()=>{quick(saveExam($("#main")));exDirty.clear()},examsave1:()=>{quick(saveExam($("#dlgc")));exDirty.clear()},
+    noreply:()=>{const open=$("#dlg").open;act(api.noReply(u,a,k.s)).then(()=>{if(open)cellPanel(u,a.id)})},
     replysave:()=>{const v=$("#rp-"+k.s).value.trim();if(!v)return;act(api.reply(u,a,k.s,v)).then(()=>cellPanel(u,a.id))},
     save:()=>{const o={feedback:$("#ffb").value};if(a.manual){const sc=$("#fsc").value,mx=$("#fmx").value;if(sc!==""&&mx!==""&&!isNaN(+sc)&&!isNaN(+mx)){o.score=+sc;o.max=+mx}}$("#dlg").close();act(api.result(u,a,o))},
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
