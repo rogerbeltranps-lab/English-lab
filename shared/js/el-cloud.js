@@ -15,7 +15,7 @@ const ROOT=new URL("../../",import.meta.url);
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
 const origSet=Storage.prototype.setItem;
-let bellEl=null,stopBell=null,stopJoin=null,stopGame=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,stale=false,pulled=false;
+let bellEl=null,stopBell=null,stopJoin=null,stopGame=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,homeLevel=null,stale=false,pulled=false;
 const listeners=[];
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
@@ -138,8 +138,9 @@ function overlay(html){
   o.style.cssText="position:fixed;inset:0;z-index:10000;background:#f8fafc;display:grid;place-items:center;font:16px system-ui,sans-serif;text-align:center;padding:20px;overflow:auto";
   o.innerHTML=html;document.body.append(o);return o;
 }
-const todayLink='<p><a href="'+new URL("today.html",ROOT).href+'">Torna al meu tauler</a></p>';
-const block=(title,msg)=>overlay('<div><h1>'+title+'</h1><p>'+msg+'</p>'+todayLink+'</div>');
+// The link back to the board speaks the page's language: Catalan for Starter, Base and no route, English otherwise.
+const todayLink=(ca=true)=>'<p><a href="'+new URL("today.html",ROOT).href+'">'+(ca?"Torna al meu tauler":"Back to my board")+'</a></p>';
+const block=(title,msg,ca=true)=>overlay('<div><h1>'+title+'</h1><p>'+msg+'</p>'+todayLink(ca)+'</div>');
 // Signed-out visitors on an LS page: the sign-in button sits in the overlay itself; it goes away once someone signs in.
 let signInO=null;
 function signInBlock(){
@@ -197,15 +198,16 @@ async function gate(u){
   const tester=seesAll(u),vg=viewGroup(u);
   if(tester)banner("Test account: you see every LS and activity.","#7c3aed");
   if(vg)banner("Test account · student view of "+EL_GROUPS.find(x=>x.id===vg).name+": you see what this group sees.","#7c3aed",{t:"See everything again",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}});
-  if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block("Aquesta LS no és del teu grup","Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.");return}
-  if(st==="hidden"&&!tester){block("Aquesta LS encara no està disponible","El professor l'obrirà quan estigui preparada.");return}
-  if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
-  if(reloadIfStale())return;
-  const a=EL_CATALOG.find(x=>x.id===actId),saved=hasWork(a);   // before applyLevel, whose route click saves an empty state
   // The route of this LS, or the one carried over from an earlier LS (elRouteOf). With none yet, a student works on the Insecure
   // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
   const lvs={};try{(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){console.warn("levels",e)}
   let lvl=elRouteOf(lvs,lsId).level;
+  const ca0=!lvl||elCa(lvl);   // the blocks below speak the student's language (Catalan with no route)
+  if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block(ca0?"Aquesta LS no és del teu grup":"This LS is not for your group",ca0?"Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.":"Go back to your board: it has the LSs your teacher gave your group.",ca0);return}
+  if(st==="hidden"&&!tester){block(ca0?"Aquesta LS encara no està disponible":"This LS is not available yet",ca0?"El professor l'obrirà quan estigui preparada.":"Your teacher will open it when it is ready.",ca0);return}
+  if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
+  if(reloadIfStale())return;
+  const a=EL_CATALOG.find(x=>x.id===actId),saved=hasWork(a);   // before applyLevel, whose route click saves an empty state
   if(!lvl&&!tester){lvl="insecure";banner("Encara no tens nivell: el professor te'l posarà a partir de l'examen de la primera LS. De moment fas la ruta Base.","#0369a1")}
   if(lvl||tester)applyLevel(lvl,tester);
   if(st==="closed"){freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
@@ -214,12 +216,12 @@ async function gate(u){
   // Learning paths open per group (elLpOpen in el-catalog.js): a locked one shows a block and saves nothing.
   // Students always see their own answers (Roger, 26 Oct 2026): with saved work it opens read-only instead of the block.
   if(a&&!tester&&!elLpOpen(a,info,myGroup)&&saved){freeze();banner(ca?"Aquesta activitat ara està tancada: pots veure les teves respostes, però no canviar-les.":"This activity is closed for now: you can see your answers, but not change them.","#92400e");return}
-  if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.");return}
+  if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.",ca);return}
   if(a&&!tester)lockSections(elSecLockedFor(a,info,myGroup,new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]))),ca);
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
   const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));
   if(cp&&saved){freeze();banner(ca?"Per continuar aquesta activitat, primer acaba el "+cp.title+". Mentrestant pots veure les teves respostes.":"To go on with this activity, first finish "+cp.title+". Meanwhile you can see your answers.","#92400e",{t:(ca?"Obre el ":"Open ")+cp.title+" →",f:()=>{location.href=new URL(cp.path,ROOT).href}});return}
-  if(cp){const o=overlay('<div style="max-width:520px"><h1></h1><p></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:10px 18px;text-decoration:none;font-weight:700"></a></p>'+todayLink+'</div>');
+  if(cp){const o=overlay('<div style="max-width:520px"><h1></h1><p></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:10px 18px;text-decoration:none;font-weight:700"></a></p>'+todayLink(ca)+'</div>');
     o.querySelector("h1").textContent=ca?"Primer fes el "+cp.title:"First do "+cp.title;
     o.querySelector("p").textContent=ca?"Per continuar, primer has d'acabar el "+cp.title+". Fes-lo sense apunts.":"To go on, first finish "+cp.title+". Do it without notes.";
     const go=o.querySelector("a.go");go.href=new URL(cp.path,ROOT).href;go.textContent=(ca?"Obre el ":"Open ")+cp.title+" →";return}
@@ -292,7 +294,9 @@ async function myAnnouncements(u){
 }
 // Problem reports (bottom bar "⚠️ Problema / Problem"): problems/{id}, read only by the teacher in the dashboard.
 // Catalan for Insecure and with no route; English for Safe and Daring (LS pages: the route; the board: its own language).
-const repEn=()=>myLevel?!elCa(myLevel):onBoard&&document.documentElement.lang==="en";
+// Outside an LS page (course pages, English Lab, Practice) the route is the one of the course's latest LS (homeLevel), so a Core or
+// Plus student gets the Problem window and the cards in English there too. The board keeps its own language (the LS on screen).
+const repEn=()=>{const l=myLevel||homeLevel;return l?!elCa(l):onBoard&&document.documentElement.lang==="en"};
 // A screenshot goes in its own document (problemShots/{same id}), so the dashboard loads it only when the teacher opens it.
 const reportProblem=u=>report({en:repEn(),save:o=>{
   const {shot,shotFrom}=o,ref=doc(collection(db,"problems")),b=writeBatch(db);delete o.shot;delete o.shotFrom;
@@ -346,7 +350,7 @@ function bar(){
 function menuLink(u){
   document.querySelectorAll("[data-el-board]").forEach(e=>e.remove());
   if(!u||onBoard||onDash||!(isStudent(u)||isTeacher(u)))return;
-  const teach=isTeacher(u),txt=teach?"Dashboard":elCa(myLevel)?"Les meves activitats":"My activities";
+  const teach=isTeacher(u),txt=teach?"Dashboard":elCa(myLevel||homeLevel)?"Les meves activitats":"My activities";
   const add=(home,cls,icon)=>{if(!home)return;const a=document.createElement("a");a.dataset.elBoard="";a.className=cls;a.href=teach?dashHere:BOARD;a.textContent=icon+txt;home.after(a)};
   document.querySelectorAll(".navlinks").forEach(n=>add(n.querySelector(":scope>a"),"",""));
   document.querySelectorAll(".nav-tabs,.mobile-tabs").forEach(n=>add(n.querySelector(":scope>.tab-btn"),"tab-btn",""));
@@ -395,6 +399,11 @@ function gamePush(u){
     if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)}},
     e=>console.warn("game",e));
 }
+// The student's route on a page outside an LS: the route of their course's latest LS (carried over from earlier LSs, elRouteOf).
+async function findHomeLevel(u){
+  const c=courseOf(myGroup),ls=(window.EL_LS||[]).filter(l=>l.course===c).pop();if(!ls||!window.elRouteOf)return;
+  try{const lvs={};(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data());homeLevel=elRouteOf(lvs,ls.id).level||null}catch(e){console.warn("route",e)}
+}
 function loadScript(src,has){return has()?Promise.resolve():new Promise(r=>{const s=document.createElement("script");s.src=new URL(src,ROOT).href;s.onload=r;s.onerror=r;document.head.append(s)})}
 function loadCatalog(){return window.EL_CATALOG?Promise.resolve():new Promise(r=>{const s=document.createElement("script");s.src=new URL("shared/js/el-catalog.js",ROOT).href;s.onload=r;s.onerror=r;document.head.append(s)})}
 await loadCatalog();
@@ -420,9 +429,10 @@ onAuthStateChanged(auth,async u=>{
   menuLink(u);   // again after gate, which knows the route (the label follows its language)
   try{await gate(u)}catch(e){console.warn("gate",e)}
   if(reloadIfStale())return;   // wiped on a page without progress sync
+  if(u&&isStudent(u)&&!myLevel&&!onBoard)await findHomeLevel(u);
   menuLink(u);
   studyCard(u);
-  if(myLevel)draw(u);   // the route is known now: the Problem button speaks its language
+  if(myLevel||homeLevel)draw(u);   // the route is known now: the Problem button speaks its language
   // The teacher's answer to the student's problem reports (marked fixed, or a thank-you when deleted): a card, once (shared/js/el-reply.js).
   if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
     load:async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())),
