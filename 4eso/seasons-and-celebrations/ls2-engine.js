@@ -1141,14 +1141,50 @@ var LS2 = (function () {
       '<h3>' + (ca() ? 'Què et trobaràs' : 'What comes up') + '</h3><div class="model">' + g.coming + '</div>' +
       g.practice.map(b => '<div class="study-block" id="' + b.id + '"><div class="panel-head"><div><h3>' + b.title + '</h3><p class="instruction">' + b.intro + '</p></div>' + (b.pill ? '<span class="pill">' + b.pill + '</span>' : '') + '</div>' +
         (b.audio ? '<audio controls preload="none" src="' + b.audio + '" style="width:100%;margin:6px 0 10px"></audio>' : '') + (b.text ? '<div class="reading">' + b.text + '</div>' : '') +
-        b.items.map((x, i) => q(b, i, x)).join('') +
+        (b.mock ? '<div class="study-mock" id="' + b.id + 'Mock"></div>' : b.items.map((x, i) => q(b, i, x)).join('') +
         '<div class="actions"><button class="btn" type="button" data-study-check="' + b.id + '">' + (ca() ? 'Comprova' : 'Check') + '</button><button class="btn secondary" type="button" data-study-key="' + b.id + '">' + (ca() ? 'Mostra les solucions' : 'Show the answer key') + '</button></div>' +
-        '<div class="result" id="' + b.id + 'Result"></div><ol class="study-key" id="' + b.id + 'Key" hidden>' + b.items.map(x => '<li><strong>' + esc(x.o ? x.o[0] : x.a[0]) + '</strong>' + (x.why ? ' · ' + x.why : '') + '</li>').join('') + '</ol></div>').join('') +
+        '<div class="result" id="' + b.id + 'Result"></div>') + '<ol class="study-key" id="' + b.id + 'Key" hidden>' + b.items.map(x => '<li><strong>' + esc(x.o ? x.o[0] : x.a[0]) + '</strong>' + (x.why ? ' · ' + x.why : '') + '</li>').join('') + '</ol></div>').join('') +
       '</details>';
+  }
+  // A rehearsal of the secure checkpoint (shared/js/el-checkpoint.js): one question at a time, a timer, no going back; then the
+  // student's answers next to the key. Nothing is sent or saved, and it can be repeated in a new order.
+  let mockTimer = null;
+  function mock(b) {
+    const box = $('#' + b.id + 'Mock'), key = $('#' + b.id + 'Key'), secs = b.mock.secs || 45;
+    const start = () => {
+      clearInterval(mockTimer); key.hidden = true;
+      const order = learningSupport.shuffledIndexes(b.items.length), ans = [];
+      let i = 0, at = 0;
+      const ask = () => {
+        clearInterval(mockTimer);
+        if (i >= order.length) return end(order, ans);
+        const x = b.items[order[i]];
+        box.innerHTML = '<p class="tiny">' + (ca() ? 'Pregunta ' : 'Question ') + (i + 1) + ' / ' + order.length + '</p><div class="study-bar"><i style="width:100%"></i></div>' +
+          '<p class="study-q">' + x.q + '</p><input type="text" class="typed" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="' + (ca() ? 'La teva resposta' : 'Your answer') + '">' +
+          '<div class="actions"><button class="btn" type="button">' + (i === order.length - 1 ? (ca() ? 'Acaba' : 'Finish') : (ca() ? 'Següent →' : 'Next →')) + '</button></div>';
+        const inp = box.querySelector('input'), bar = box.querySelector('.study-bar i');
+        const next = () => { if (ans.length > i) return; ans.push(inp.value.trim()); i++; ask(); };
+        box.querySelector('button').onclick = next; inp.onkeydown = e => { if (e.key === 'Enter') next(); };
+        inp.focus({ preventScroll: true }); at = Date.now();
+        mockTimer = setInterval(() => { const l = secs * 1000 - (Date.now() - at); bar.style.width = Math.max(0, l / (secs * 10)) + '%'; bar.classList.toggle('low', l < 10000); if (l <= 0) next(); }, 250);
+      };
+      ask();
+    };
+    const end = (order, ans) => {
+      let right = 0;
+      const rows = order.map((n, k) => { const x = b.items[n], ok = x.a.some(a => norm(a) === norm(ans[k])); if (ok) right++;
+        return '<li class="' + (ok ? 'ok' : 'no') + '">' + (ok ? '✓ ' : '✗ ') + x.q + '<br><span class="tiny">' + (ca() ? 'La teva resposta: ' : 'Your answer: ') + (ans[k] ? esc(ans[k]) : '–') + (ok ? '' : ' · <strong>' + esc(x.a[0]) + '</strong>') + (x.why ? ' · ' + x.why : '') + '</span></li>'; }).join('');
+      box.innerHTML = '<div class="result show">' + right + ' / ' + order.length + '</div><ol class="study-review">' + rows + '</ol>' +
+        '<div class="actions"><button class="btn secondary" type="button">' + (ca() ? 'Torna-ho a fer (en un altre ordre)' : 'Do it again (in a new order)') + '</button></div>';
+      box.querySelector('button').onclick = start;
+    };
+    box.innerHTML = '<div class="actions"><button class="btn" type="button">' + (ca() ? 'Comença la pràctica' : 'Start the practice') + '</button></div>';
+    box.querySelector('button').onclick = start;
   }
   function bindStudy() {
     const g = guide(); if (!g) return;
     g.practice.forEach(b => {
+      if (b.mock) return mock(b);
       $('[data-study-check="' + b.id + '"]').onclick = () => {
         let right = 0, pts = 0, max = 0;
         b.items.forEach((x, i) => {
@@ -1192,7 +1228,7 @@ var LS2 = (function () {
     LP.panels = LP.base.flatMap(p => [N[p.id] ? as(p.id) : p].concat(extra.filter(k => N[k].after === p.id).map(k => as(k))));
   }
   function init(config) {
-    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.study-card summary{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;font-weight:800;color:var(--dark);font-size:1.05rem}.study-card summary small{color:var(--muted);font-weight:600}.study-card[open] summary small{display:none}.study-card .model{font-weight:500;line-height:1.6}.study-card h3{margin:18px 0 8px;color:var(--dark)}.study-tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}.study-tips p{margin:6px 0 0}.study-plan{margin:0;padding-left:20px;line-height:1.6}.study-block{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}.study-key{margin:10px 0 0;padding:12px 12px 12px 32px;background:#f3f8ff;border:1px solid var(--line);border-radius:12px;line-height:1.6}.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
+    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.study-card summary{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;font-weight:800;color:var(--dark);font-size:1.05rem}.study-card summary small{color:var(--muted);font-weight:600}.study-card[open] summary small{display:none}.study-card .model{font-weight:500;line-height:1.6}.study-card h3{margin:18px 0 8px;color:var(--dark)}.study-tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}.study-tips p{margin:6px 0 0}.study-plan{margin:0;padding-left:20px;line-height:1.6}.study-block{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}.study-bar{height:8px;border-radius:9px;background:#e8eef7;overflow:hidden;margin:6px 0 4px}.study-bar i{display:block;height:100%;background:var(--accent);transition:width .25s linear}.study-bar i.low{background:#d97706}.study-q{font-size:1.1rem;font-weight:700;margin:10px 0 12px}.study-review{margin:10px 0 0;padding-left:32px;line-height:1.5}.study-review li{margin:0 0 8px}.study-review li.ok{color:#166534}.study-review li.no{color:#9f1239}.study-review .tiny{color:var(--muted)}.study-key{margin:10px 0 0;padding:12px 12px 12px 32px;background:#f3f8ff;border:1px solid var(--line);border-radius:12px;line-height:1.6}.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
     LP = config; LP.base = LP.base || LP.panels;
     level = localStorage.getItem(LP.key + 'Level') || 'insecure';
     if (ROUTES.indexOf(level) < 0) level = 'insecure';

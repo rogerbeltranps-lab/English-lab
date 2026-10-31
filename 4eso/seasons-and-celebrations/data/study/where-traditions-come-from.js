@@ -5,7 +5,7 @@
 window.LP.study = {
   safe: {
     title: 'Study guide: prepare for Checkpoint 2 and the final exam',
-    intro: 'How to study what you learn in this Learning Path, and practice that looks like the checkpoint and the exam. The answer key is at the end of each activity.',
+    intro: 'How to study what you learn in this Learning Path, and practice that works like the checkpoint and looks like the exam. The answer key is at the end of each activity.',
     tips: [
       ['🧠', 'Test yourself, don’t reread', 'Close your notes and try to remember: write the words, say the rule, answer the questions. Then check. Rereading and highlighting feel useful, but you remember much less.', 'Retrieval practice · Roediger & Karpicke 2006; Dunlosky et al. 2013'],
       ['📅', 'Spread it out', 'Three short sessions of 15 minutes on different days work better than one long session the day before.', 'Spacing · Cepeda et al. 2006'],
@@ -16,21 +16,25 @@ window.LP.study = {
     ],
     plan: [
       ['Today', 'Close this page. Write five new words and one example of <em>used to</em>, <em>whereas</em> and <em>where</em> from memory. Then check them.'],
-      ['In 2–3 days', 'Do “Like the checkpoint” below with no notes. Mark it with the key and rewrite what you got wrong.'],
+      ['In 2–3 days', 'Do “Practise for Checkpoint 2” below. Look at the key and write again what you got wrong.'],
       ['Before Checkpoint 2', 'Flashcards of Learning Paths 1–3: only the cards you still miss.'],
       ['The week before the exam', 'Do the exam-style practice below, then the Sample exam. Repeat only the parts you failed.']
     ],
-    coming: '<strong>Checkpoint 2</strong> (after this Learning Path): short gaps, no notes, about LS1 and Learning Paths 1–3. It opens the next Learning Path.<br>' +
+    coming: '<strong>Checkpoint 2</strong> (after this Learning Path): short gaps about LS1 and Learning Paths 1–3, one question at a time, about 45 seconds each, no going back and no notes. You do it once, and you must stay on the page: if you leave it, it is sent. It opens the next Learning Path.<br>' +
       '<strong>Final exam</strong>: this Learning Path comes up in the Listening (questions with four options), the Vocabulary (dates, comparing, places) and the Grammar (<em>used to</em> and Past Simple, <em>which / who / where / when</em>, <em>whereas</em>, <em>unlike</em>).',
     practice: [
-      { id: 'sgCheck', title: 'Like the checkpoint', pill: 'No notes · 5 min',
-        intro: 'Type the missing word(s) without looking at your notes.',
+      { id: 'sgCheck', title: 'Practise for Checkpoint 2', pill: 'One question at a time · 45 s',
+        intro: 'It works like the real checkpoint: 11 questions, one at a time, about 45 seconds each, with no going back and no notes. This is only practice: nothing is sent, you can repeat it, and at the end you see your answers and the key.',
+        mock: { secs: 45 },
         items: [
           { q: 'Thanksgiving is ___ the fourth Thursday of November.', a: ['on'], why: 'Days and dates → on.' },
+          { q: 'My sister ___ (get up) at seven every day.', a: ['gets up'], why: 'Present Simple for routines: he / she / it + -s (LS1).' },
           { q: 'My grandparents ___ ___ live in a village, but now they live in Girona.', a: ['used to'], why: 'A past habit or state that is not true now.' },
           { q: 'Leicester is a city ___ thousands of people celebrate Diwali.', a: ['where'], why: 'A place → where.' },
+          { q: 'At Holi, people throw coloured ___ at each other.', a: ['powder'], why: 'Holi: coloured powder (Learning Path 2).' },
           { q: '___ Diwali and Christmas are festivals of light.', a: ['both'], why: 'Both… and… for two things that are the same.' },
           { q: 'The Pilgrims ___ (have) a harvest feast in 1621.', a: ['had'], why: 'One finished event in the past: Past Simple (irregular).' },
+          { q: 'How often ___ you do sport?', a: ['do'], why: 'Present Simple questions: How often do you…? (LS1).' },
           { q: 'Hanukkah is ___ to Diwali: both use lights.', a: ['similar'], why: 'similar to = almost the same as.' },
           { q: '6/1 → on the ___ of January', a: ['sixth', '6th'], why: 'Dates use ordinal numbers: the sixth.' },
           { q: 'Did you ___ to wear a costume when you were little?', a: ['use'], why: 'Questions: Did… use to…? (no -d).' }
