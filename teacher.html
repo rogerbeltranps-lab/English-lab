@@ -75,8 +75,8 @@ const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
 // pt, tm = team points (points/{same id as the list}, teams/{group}; shared/js/el-points.js).
 async function load(){
-  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};return DEMO}
-  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[]},up=r=>r.ref.parent.parent.id;
+  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};cpInject(DEMO);return DEMO}
+  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[],ck:{},cp:{}},up=r=>r.ref.parent.parent.id;
   try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
   try{(await F.getDocs(F.collection(db(),"points"))).forEach(p=>D.pt[p.id]=p.data());(await F.getDocs(F.collection(db(),"teams"))).forEach(t=>D.tm[t.id]=t.data())}catch(e){D.ptErr=true;console.warn("points",e)}
   try{(await F.getDocs(F.collection(db(),"teacherPlan"))).forEach(t=>D.tk[t.id]=t.data())}catch(e){console.warn("teacherPlan",e)}
@@ -86,9 +86,13 @@ async function load(){
   (await F.getDocs(F.collectionGroup(db(),"results"))).forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data());
   (await F.getDocs(F.collectionGroup(db(),"levels"))).forEach(l=>(D.lv[up(l)]=D.lv[up(l)]||{})[l.id]=l.data());
   (await F.getDocs(F.collectionGroup(db(),"progress"))).forEach(p=>(D.pg[up(p)]=D.pg[up(p)]||{})[p.id]=p.data().data||{});
+  // secure recall checkpoints: answer keys (teacher only) and each student's one try (cpInject marks them)
+  try{(await F.getDocs(F.collection(db(),"cpKeys"))).forEach(k=>D.ck[k.id]=k.data())}catch(e){console.warn("cpKeys",e)}
+  try{(await F.getDocs(F.collectionGroup(db(),"checkpoints"))).forEach(c=>(D.cp[up(c)]=D.cp[up(c)]||{})[c.id]=c.data())}catch(e){console.warn("checkpoints",e)}
+  cpInject(D);
   for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
   // students who only have results/progress (no profile yet) still appear, without a group
-  Object.keys(Object.assign({},D.rs,D.pg,D.lv)).forEach(u=>D.st[u]=D.st[u]||{uid:u,name:"",email:u});
+  Object.keys(Object.assign({},D.rs,D.pg,D.lv,D.cp)).forEach(u=>D.st[u]=D.st[u]||{uid:u,name:"",email:u});
   return D;
 }
 const sub=o=>Object.assign(o,{updated:DEMO?Date.now():F.serverTimestamp()});
@@ -152,6 +156,75 @@ async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save
 const deep=(t,o)=>{for(const k in o){const v=o[k];if(v===null)delete t[k];else if(v&&typeof v==="object"&&!Array.isArray(v)){t[k]=t[k]&&typeof t[k]==="object"?t[k]:{};deep(t[k],v)}else t[k]=v}return t};
 const fsv=o=>{const r={};for(const k in o){const v=o[k];r[k]=v===null?F.deleteField():v&&typeof v==="object"&&!Array.isArray(v)?fsv(v):v}return r};
 function patch(u,id,o){o=Object.assign({ls:S.ls,activity:id},o);const r=(S.D.rs[u]=S.D.rs[u]||{});deep(r[id]=r[id]||{},o);return DEMO?Promise.resolve():put(["students",u,"results",resKey(id)],fsv(o))}
+// ---- secure recall checkpoints (Roger, 31 Oct 2026: “make sure they don't cheat”; shared/js/el-checkpoint.js, docs/general/secure-checkpoints.md)
+// D.ck[page key] = cpKeys doc {items:{id:{a,q,i,r,ca,en,extra}}}; D.cp[uid][page key] = the student's one try {level,ids,answers,times,leaves,auto,sent,fb,redo}.
+// cpInject marks each try with the key and writes the result into the student's progress state in memory only (first, items, done, doneAt),
+// so the grade, the question analysis and the progress table read it as before. A first try saved by the page itself is ignored.
+const cpNorm=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[“”"]/g,"").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
+const cpDate=v=>!v?null:typeof v==="string"?v:v.toDate?v.toDate().toISOString():v.seconds?new Date(v.seconds*1e3).toISOString():null;
+const cpAccepted=(K,id)=>{const k=((K||{}).items||{})[id];return k?(k.a||[]).concat(k.extra||[]):null};
+function cpMark(d,K){const ok=(d.ids||[]).map((id,i)=>{const acc=cpAccepted(K,id),v=cpNorm((d.answers||[])[i]);return acc&&v&&acc.some(a=>cpNorm(a)===v)?1:0});
+  return {ok,score:ok.reduce((a,b)=>a+b,0),max:ok.length,known:(d.ids||[]).every(id=>cpAccepted(K,id))}}
+function cpInject(D){
+  window.EL_CP_KEYS=D.ck;const cat=window.EL_CATALOG||[];
+  Object.keys(D.ck||{}).forEach(key=>{const a=cat.find(x=>(x.keys||[])[0]===key);if(!a)return;const K=D.ck[key];
+    Object.keys(Object.assign({},D.pg,D.cp)).forEach(u=>{const d=((D.cp||{})[u]||{})[key];if(!(((D.pg[u]||{})[a.ls]||{})[key])&&!d)return;const pg=D.pg[u]=D.pg[u]||{},L=pg[a.ls]=pg[a.ls]||{};
+      let st;try{st=JSON.parse(L[key]||"{}")}catch(e){st={}}
+      // a first try saved by the page counts only if it was done the old way, before the checkpoints were secure (31 Oct 2026)
+      const old=Object.values(st.first||{}).some(f=>String(f.date||"")<"2026-11-01");
+      if(d||!old){delete st.first;if(st.tries)delete st.tries.check;if(st.last)delete st.last.check;Object.keys(st.items||{}).forEach(k=>{if(/^check_/.test(k))delete st.items[k]})}
+      if(d&&!d.redo){const m=cpMark(d,K),date=cpDate(d.sent)||d.started;
+        st.first={[d.level]:{score:m.score,max:m.max,date}};(st.last=st.last||{}).check={score:m.score,max:m.max,level:d.level,date};
+        (st.done=st.done||{}).check=true;(st.doneAt=st.doneAt||{}).check=st.doneAt.check||date;
+        (st.items=st.items||{})["check_"+d.level]={level:d.level,date,q:d.ids.map(id=>{const k=K.items[id];return k&&k.i>=0?k.i:-1}),ok:m.ok,a:(d.answers||[]).map(x=>String(x||"").slice(0,40))}}
+      else if(d&&d.redo&&st.done)delete st.done.check;
+      L[key]=JSON.stringify(st)})})}
+const cpDoc=(u,a)=>(((S.D.cp||{})[u]||{})[a.keys[0]])||null;
+const cpStale=(d,K)=>{if(!d||d.redo)return false;const m=cpMark(d,K);return !d.fb||d.fb.score!==m.score||d.fb.max!==m.max};
+// Results far from the student's usual marks (Roger, 31 Oct 2026: “if these checkpoints differ drastically from their marks, we can spot it
+// and there should be a warning”): the checkpoint % against the average of the exam marks of the course so far (examMark) and the
+// recall warm-ups of the same LS (first try). ⚠️ when it is CP_GAP points or more above it (worth a look), ↓ when that much below.
+const CP_GAP=35;
+function cpUsual(u,a){const c=a.ls.slice(0,4),ex=EL_LS.filter(l=>l.course===c&&(EL_GRADING[l.id]||{}).exam).map(l=>examMark(u,l.id)).filter(Boolean).map(x=>x.mark*10);
+  const w=(((EL_GRADING[a.ls]||{}).gv||{}).parts||[]).filter(p=>p.id==="warm").flatMap(p=>p.first).map(([id,k])=>firstOf(u,id,k)).filter(f=>f&&f.max).map(f=>f.score/f.max*100);
+  const av=l=>l.length?l.reduce((x,y)=>x+y,0)/l.length:null,e=av(ex),wu=av(w),both=[e,wu].filter(x=>x!=null);
+  return both.length?{v:av(both),exam:e,warm:wu}:null}
+function cpGap(u,a,d,K){if(!d||d.redo||!K)return null;const m=cpMark(d,K);if(!m.max)return null;const us=cpUsual(u,a);if(!us)return null;
+  const v=m.score/m.max*100,g=v-us.v;if(Math.abs(g)<CP_GAP)return null;const r=x=>Math.round(x)+" %";
+  return {up:g>0,t:`${g>0?"Much higher":"Much lower"} than usual: this checkpoint ${r(v)} · ${us.exam!=null?"exam marks "+r(us.exam):"no exam mark yet"} · ${us.warm!=null?"recall warm-ups "+r(us.warm):"no warm-ups yet"}`}}
+function cpBox(ls,grp,studs){
+  const cps=acts(ls).filter(a=>a.checkpoint);if(!cps.length)return "";const D=S.D;
+  const head=cps.map(a=>{const K=D.ck[a.keys[0]],docs=studs.map(s=>cpDoc(s.uid,a)).filter(d=>d&&!d.redo),n=docs.filter(d=>cpStale(d,K)).length;
+    return `<th>${esc(a.title.replace(/^Recall checkpoint/,"C"))}<br>${!K?'<small style="color:#dc2626">⚠ no answer key</small>':!docs.length?'<small class="muted">nothing sent</small>':n?`<button data-do="cprel" data-a="${a.id}" title="Students in ${grp.name} who sent it see their mark and corrections">📣 Release feedback (${n})</button>`:'<small class="muted">✓ all released</small>'}</th>`}).join("");
+  const rows=studs.filter(s=>!s.tester||cps.some(a=>cpDoc(s.uid,a))).map(s=>`<tr><td style="text-align:left">${name(s)}</td>${cps.map(a=>{const d=cpDoc(s.uid,a),K=D.ck[a.keys[0]];
+      if(!d)return '<td class="muted">–</td>';if(d.redo)return `<td data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="You let them do it again">↺ again</td>`;
+      const m=cpMark(d,K),glances=(d.leaves||[]).length,secs=(d.times||[]).reduce((x,y)=>x+(+y||0),0);
+      const gp=cpGap(s.uid,a,d,K);
+      return `<td class="sc" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="${gp?esc(gp.t)+" · ":""}Click for the answers"${gp&&gp.up?' style="background:#fff4e5"':""}>${gp?(gp.up?"⚠️ ":"↓ "):""}${K?m.score+"/"+m.max:"?"}${d.auto==="left"?' <span title="Sent automatically: left the page">⚡</span>':""}${glances?` <span title="Left the page ${glances} time(s) for less than 2 s">👀${glances}</span>`:""}<br><small class="muted">${Math.round(secs/60*10)/10} min${d.fb&&!cpStale(d,K)?" · ✓ released":""}</small></td>`}).join("")}</tr>`).join("");
+  const body=`<p class="muted">Each student does each checkpoint once: one question at a time, ${45} s each, no going back, nothing to copy or paste. If they leave the page (another tab, window or app) for more than 2 seconds it is sent at once (⚡). 👀 = left for less than 2 s. Students see their mark and corrections only after you press <b>📣 Release feedback</b>; press it again after accepting an answer. Click a cell for the answers, to accept an answer or to let a student do it again.</p>`
+    +`<div class="wrap"><table class="acts"><tr><th>Student</th>${head}</tr>${rows}</table></div>`;
+  const warn=studs.flatMap(s=>cps.map(a=>{const d=cpDoc(s.uid,a),g=cpGap(s.uid,a,d,D.ck[a.keys[0]]);return g&&g.up?`<li><b>${name(s)}</b> · ${esc(a.title)}: ${esc(g.t)} <button class="g" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}">See the answers</button></li>`:""})).filter(Boolean);
+  const gapNote=`<p class="muted">⚠️ = ${CP_GAP} points or more above the student's usual marks (the average of their exam marks so far and their recall warm-ups in this LS); ↓ = that much below. Worth a look, not proof.</p>`;
+  return `<div class="box">${fold("cpbox",`🛡️ Recall checkpoints · ${grp.name}${warn.length?` <small style="color:#b45309">· ⚠️ ${warn.length} far above usual</small>`:""}`,(warn.length?`<div class="warnbox" style="background:#fff4e5;border:1px solid #f5b971;border-radius:10px;padding:8px 12px;margin:6px 0"><b>⚠️ Much higher than their usual marks</b><ul style="margin:4px 0">${warn.join("")}</ul></div>`:"")+body+gapNote)}</div>`;
+}
+function cpDlg(u,a){
+  const d=cpDoc(u,a),K=S.D.ck[a.keys[0]],s=S.P[u];if(!d)return;const m=cpMark(d,K);
+  const rows=d.ids.map((id,i)=>{const k=(K&&K.items||{})[id]||{},v=(d.answers||[])[i]||"";
+    return `<tr><td>${i+1}</td><td style="text-align:left">${k.q||esc(id)}</td><td><b>${esc(v)||'<span class="muted">(blank)</span>'}</b></td><td>${m.ok[i]?"✓":"✗"}${m.ok[i]?"":`<br><small class="muted">${esc((cpAccepted(K,id)||[]).join(" / "))}</small>`}</td><td>${(d.times||[])[i]||0} s</td><td>${!m.ok[i]&&cpNorm(v)?`<button class="g" data-do="cpacc" data-u="${u}" data-a="${a.id}" data-i="${id}" data-v="${esc(v)}" title="Accept this answer for every student">✓ Accept</button>`:""}</td></tr>`}).join("");
+  const lv=(d.leaves||[]).map(l=>`${esc((cpDate(l.at)||"").slice(11,19))} (${Math.round(l.ms/100)/10} s)`).join(", ");
+  dlg(`<h3>${esc(a.title)} · ${name(s)}</h3><p class="muted">Route ${esc(LV[d.level]||d.level)} · started ${esc((d.started||"").replace("T"," ").slice(0,16))} · ${d.redo?"<b>let do again</b>":d.auto==="left"?"<b>⚡ sent automatically: left the page</b>":"sent"} · ${K?m.score+"/"+m.max:"no answer key yet"}${d.fb?` · released ${d.fb.score}/${d.fb.max}`:" · not released"}</p>`
+    +(lv?`<p class="muted">👀 Left for less than 2 s: ${lv}</p>`:"")
+    +(cpGap(u,a,d,K)?`<p style="color:#b45309">${cpGap(u,a,d,K).up?"⚠️":"↓"} ${esc(cpGap(u,a,d,K).t)}</p>`:"")
+    +`<table><tr><th>#</th><th>Question</th><th>Answer</th><th></th><th>Time</th><th></th></tr>${rows}</table>`
+    +(d.redo?"":`<div class="row"><button data-do="cpredo" data-u="${u}" data-a="${a.id}" title="Their answers are discarded and they do it again (new questions, new order)">↺ Let them do it again</button></div>`),true);
+}
+api.cpRelease=(a,studs)=>{const K=S.D.ck[a.keys[0]],ops=[];
+  studs.forEach(s=>{const d=cpDoc(s.uid,a);if(!cpStale(d,K))return;const m=cpMark(d,K);
+    const fb={score:m.score,max:m.max,ok:m.ok,right:d.ids.map(id=>(cpAccepted(K,id)||[""])[0]),why:d.ids.map(id=>{const k=K.items[id]||{};return {ca:k.ca||"",en:k.en||""}}),at:new Date().toISOString()};
+    d.fb=fb;if(!DEMO)ops.push(put(["students",s.uid,"checkpoints",a.keys[0]],{fb}))});return Promise.all(ops)};
+api.cpAccept=(a,id,v)=>{const key=a.keys[0],K=S.D.ck[key],k=K.items[id];k.extra=[...new Set((k.extra||[]).concat(v))];if(DEMO)return;
+  return F.setDoc(F.doc(db(),"cpKeys",key),{items:{[id]:{extra:k.extra}}},{merge:true})};
+api.cpRedo=(u,a)=>{const d=cpDoc(u,a);d.redo=true;return DEMO?null:F.setDoc(F.doc(db(),"students",u,"checkpoints",a.keys[0]),{redo:true},{merge:true})};
 function quick(ps){Promise.all([].concat(ps)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});render();again()}
 
 // ---- helpers
@@ -197,7 +270,9 @@ function cell(u,a){ // text + class of an activity's score cell
   if(x&&x.locked){t+=" ✔";c="sub"}else if(x&&x.markedDone){t+=" 🟡";c="mark"}
   if(x&&x.feedback)t+=" 💬";
   if(unanswered(u,a).length)t+=" ✉️";
-  if(x&&x.parts&&x.parts.first)t+=`<br><small title="First attempt (does not count)">1st try ${x.parts.first.score}/${x.parts.first.max}</small>`;
+  const cd=a.checkpoint&&cpDoc(u,a),ck=cd&&S.D.ck[a.keys[0]];   // secure checkpoint: marked here from the key (cpInject)
+  if(cd&&!cd.redo&&ck){const m=cpMark(cd,ck);if(t==="–")t="✔";t+=`<br><small title="First try, marked with the answer key">1st try ${m.score}/${m.max}${cd.auto==="left"?" ⚡":""}</small>`}
+  else if(x&&x.parts&&x.parts.first)t+=`<br><small title="First attempt (does not count)">1st try ${x.parts.first.score}/${x.parts.first.max}</small>`;
   return {t,c};
 }
 
@@ -334,6 +409,7 @@ function render0(){
     +lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
     +timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))
     +lpBox(ls,grp)
+    +cpBox(ls,grp,inG)
     +`<div class="box"><h2>To do</h2>${todo(inG.filter(s=>!s.away),ls,list)}</div>`+pbBox()
     +routesBox(grp,inG.filter(s=>!s.tester))
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
@@ -1102,7 +1178,11 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     lpset:()=>act(api.lpOpen(S.ls,S.g,k.v==="1"?acts(S.ls).map(a=>a.id):[])),
     sec:()=>{const a=byId(k.a),off=new Set(elSecLocked(a,S.D.ls[S.ls],S.g));off.has(k.p)?off.delete(k.p):off.add(k.p);
       act(api.secLock(S.ls,S.g,a.id,(EL_SECTIONS[a.id]||[]).map(x=>x[0]).filter(id=>off.has(id))))},
-    secset:()=>act(api.secLock(S.ls,S.g,k.a,k.v==="1"?[]:(EL_SECTIONS[k.a]||[]).map(x=>x[0])))
+    secset:()=>act(api.secLock(S.ls,S.g,k.a,k.v==="1"?[]:(EL_SECTIONS[k.a]||[]).map(x=>x[0]))),
+    cpdlg:()=>cpDlg(u,a),
+    cprel:()=>act(api.cpRelease(a,Object.values(S.P).filter(s=>s.group===S.g||s.tester))),
+    cpacc:()=>{Promise.resolve(api.cpAccept(a,k.i,k.v)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});cpInject(S.D);render();cpDlg(u,a)},
+    cpredo:()=>{if(!confirm("Let this student do the checkpoint again? Their answers are discarded."))return;$("#dlg").close();act(api.cpRedo(u,a))}
   })[k.do]?.()});
 $("#dlg").addEventListener("close",()=>redraw=null);
 document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);
