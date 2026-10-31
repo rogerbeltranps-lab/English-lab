@@ -2,6 +2,8 @@
 // The same sheets and EL-MARKS v1 answers as the dashboard's 🤖 Marking sheet (shared/js/el-marking.js), read and written straight in
 // Firestore, so Claude can mark the Reading log, Listening chart and Research card / Fact file without Roger's computer.
 //   node tools/marking/marks.mjs ready                                   steps with hand-ins without a level, per group, and when they are ready
+//   node tools/marking/marks.mjs audit                                   is the marking working? ❌ hand-ins ready 4+ days and still without a
+//        level (exit code 2), ⏰ possible copies waiting for the teacher 7+ days; read-only
 //   node tools/marking/marks.mjs sheet <group> <activity> <step>         the sheet (students as codes, never names)
 //   node tools/marking/marks.mjs apply <group> <activity> <step> <answer file> [--apply] [--feedback]
 //        reads the EL-MARKS v1 answer and saves the levels (students/{uid}/results/{activity}.levels[step][criterion]), as the dashboard's
@@ -19,7 +21,8 @@ import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
 
 const PROJECT="english-lab-ietm",ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../..");
-const ctx={console};ctx.window=ctx;vm.createContext(ctx);
+const ctx={console};ctx.window=ctx;if(process.env.EL_TODAY)ctx.EL_TODAY=process.env.EL_TODAY;   // a date for tests
+vm.createContext(ctx);
 for(const f of ["el-catalog.js","el-criteria.js","el-plan.js","el-week.js","el-grading.js","el-marking.js"])vm.runInContext(fs.readFileSync(path.join(ROOT,"shared/js",f),"utf8"),ctx,{filename:f});
 const W=ctx.window,CA_RT=["beginners","insecure"];
 
@@ -90,6 +93,19 @@ if(cmd==="ready"){const today=W.ELWeek.today();
     for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
       const rows=await todo(grp,m);if(!rows.length)continue;const r=readyOf(grp,ls,m,ticks),now=!!(r.from&&today>=r.from);
       console.log([now?"READY":"wait ",grp.id,m.a,m.step,rows.length+" to mark",r.from?"from "+r.from:r.line?"session not ticked: "+r.line:"no session in the plan"].join(" · "))}}}
+else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026: "a command to audit what you do and warn me if it's not working")
+  const today=W.ELWeek.today(),days=(a,b)=>Math.round((Date.parse(a)-Date.parse(b))/864e5),LATE=4,problems=[],remind=[],ok=[];
+  for(const grp of W.EL_GROUPS){const ticks=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
+    for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
+      const a=W.EL_CATALOG.find(x=>x.id===m.a),rows=await todo(grp,m),r=readyOf(grp,ls,m,ticks);
+      if(rows.length&&r.from&&today>=r.from){const d=days(today,r.from);(d>=LATE?problems:ok).push(`${grp.id} · ${m.name} (${a.title}): ${rows.length} hand-in${rows.length>1?"s":""} ready since ${r.from} still without a level${d>=LATE?` (${d} days late)`:""}`)}
+      // possible copies waiting for the teacher
+      for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id),f=(st.res.flags||{})[m.step];
+        if(f&&!f.done&&days(today,String(f.at).slice(0,10))>=7)remind.push(`${grp.id} · ${m.name}: a possible copy waiting for you since ${String(f.at).slice(0,10)}`)}}}
+  console.log(`AUDIT ${today}: ${problems.length?"PROBLEMS":"OK"}`);
+  problems.forEach(x=>console.log("❌ "+x));remind.forEach(x=>console.log("⏰ "+x));ok.forEach(x=>console.log("🤖 to mark now: "+x));
+  if(!problems.length&&!remind.length&&!ok.length)console.log("Nothing waiting: every hand-in that is ready has a level.");
+  if(problems.length)process.exitCode=2}
 else if(cmd==="sheet"){const [gid,aid,step]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m);
   console.log(rows.length?sheetOf(grp,m,rows).text:"Nothing to mark: every hand-in has a level.")}
 else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m),sh=sheetOf(grp,m,rows);
@@ -105,4 +121,4 @@ else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(
       {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},levels:fsv({[m.step]:x.lv}),...(fb?{replies:fsv({[m.step]:x.fb})}:{})}})}
   const nf=r.rows.filter(x=>x.flag).length;
   console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length-nf} · possible copies for the teacher: ${nf} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
-else{console.log("Usage: node tools/marking/marks.mjs ready | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback]");process.exit(1)}
+else{console.log("Usage: node tools/marking/marks.mjs ready | audit | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback]");process.exit(1)}

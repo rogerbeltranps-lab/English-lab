@@ -545,7 +545,8 @@ const mkExam=u=>{const L=EL_LS.filter(l=>l.course===COURSE);return L.slice(0,L.f
 function mkReady(m,grp){const p=(window.EL_PLAN||{})[S.ls];return ELMark.ready({p,gi:p?ELWeek.col(p,grp.id):-1,due:dueOf(m.a,grp.id),title:byId(m.a).title,ticks:(S.D.tk[grp.id]||{}).ticks,ls:S.ls})}
 function mkTodoItems(grp){return mkMoments().map(m=>{const n=mkTodo(m,grp).length;if(!n)return null;const r=mkReady(m,grp),t=ELWeek.today(),btn=`<button data-do="mkopen" data-a="${m.a}" data-s="${m.step}">🤖 Marking sheet</button>`;
     const what=`<b>${esc(m.name)}</b> (${esc(actTitle(m.a))}) · ${n} hand-in${n>1?"s":""} without a level`;
-    if(r.from&&t>=r.from)return {now:true,h:`🤖 ${what} ${btn}`};
+    // Claude marks these from the cloud: still unmarked 4+ days after they were ready means the weekly marking is not working
+    if(r.from&&t>=r.from)return {now:true,h:ELWeek.add(r.from,4)<=t?`❌ <b>Claude's marking is late:</b> ${what}, ready since ${ELWeek.date(r.from)}. Tell Claude in the English Lab chat. ${btn}`:`🤖 ${what}: Claude marks them this week ${btn}`};
     return {now:false,h:`⏳ ${what}: ${r.from?"ready to mark on "+ELWeek.date(r.from)+" (one week after you ticked the session)":r.line?"ready one week after you tick “"+esc(r.line)+"” in the time plan":"no session in the time plan"} ${btn}`}}).filter(Boolean)}
 function mkSheet(m,grp){const a=byId(m.a),g=G(),studs=mkTodo(m,grp),codes=ELMark.codes(studs.map(s=>s.uid)),by=Object.fromEntries(studs.map(s=>[s.uid,s]));
   const students=[...codes].map(([code,u])=>{const l=level(u,S.ls),h=handedIn(u,a)[m.step]||{};return {code,route:LV[l],ca:CA_RT.includes(l),exam:mkExam(u),ty:h.ty,fields:h.f}});
