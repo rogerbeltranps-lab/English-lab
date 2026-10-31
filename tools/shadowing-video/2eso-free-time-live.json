@@ -1,0 +1,173 @@
+{
+ "course": "2 ESO",
+ "ls": "Free Time, Live!",
+ "folder": "2eso/free-time-live",
+ "out": "video/shadowing.mp4",
+ "theme": {
+  "accent": "#1d6b4f",
+  "ink": "#1e2c25",
+  "title": "#1c3e30",
+  "muted": "#6e7a73",
+  "bg1": "#f1f6f2",
+  "bg2": "#f7f9f6",
+  "soft": "#dcefe5"
+ },
+ "note": "Core level, the same for every route. Sentences cut from the LS2 recordings (unchanged); times from forced alignment (align-words.py).",
+ "voice": {
+  "dir": "tools/shadowing-video/voice/intro",
+  "by": "Amelia (ElevenLabs eleven_v3, voice ZF6FPAbjXT4488VcRRnw), 31 Oct 2026",
+  "what": [
+   "l1"
+  ],
+  "how": [
+   "l2",
+   "chime",
+   "l3"
+  ],
+  "tips": [
+   "l4"
+  ],
+  "examples": [
+   [
+    "l5"
+   ],
+   [
+    "l7"
+   ]
+  ],
+  "try": [
+   "l6"
+  ],
+  "ready": [
+   "l8"
+  ]
+ },
+ "examples": [
+  {
+   "speaker": "Sam",
+   "text": "It's very noisy in here!",
+   "src": "audio/live-from-the-sports-hall.mp3",
+   "start": 24.0,
+   "end": 25.52,
+   "pause": 3.0,
+   "tip": "Strong words are louder and longer. Copy them!",
+   "marks": "It's **ve**ry **noi**sy in **here**!"
+  },
+  {
+   "speaker": "Mei",
+   "text": "It's difficult, but I love it.",
+   "src": "video/mei-ice-rink.mp4",
+   "start": 37.73,
+   "end": 40.71,
+   "pause": 4.7,
+   "tip": "Some words join together, with no pause between them.",
+   "marks": "It's difficult, but I ==love‿it==."
+  }
+ ],
+ "items": [
+  {
+   "speaker": "Sam",
+   "text": "The players are warming up and the crowd is cheering.",
+   "src": "audio/live-from-the-sports-hall.mp3",
+   "start": 20.4,
+   "end": 23.55,
+   "pause": 4.9
+  },
+  {
+   "speaker": "Emma",
+   "text": "It's cold and rainy outside, but inside it's hot.",
+   "src": "audio/live-from-the-sports-hall.mp3",
+   "start": 26.42,
+   "end": 30.4,
+   "pause": 6.0
+  },
+  {
+   "speaker": "Omar",
+   "text": "My sister is playing basketball and I'm watching the match.",
+   "src": "audio/where-are-you.mp3",
+   "start": 7.0,
+   "end": 10.24,
+   "pause": 5.1
+  },
+  {
+   "speaker": "Laia",
+   "text": "Do you go every Saturday?",
+   "src": "audio/where-are-you.mp3",
+   "start": 14.29,
+   "end": 15.93,
+   "pause": 3.0
+  },
+  {
+   "speaker": "Emma",
+   "text": "Marc usually plays as a defender, but today he's playing as a forward.",
+   "src": "audio/live-from-the-sports-hall.mp3",
+   "start": 48.97,
+   "end": 53.82,
+   "pause": 7.1
+  },
+  {
+   "speaker": "Laia",
+   "text": "I'm drawing a comic about a cat who plays the guitar.",
+   "src": "audio/where-are-you.mp3",
+   "start": 25.65,
+   "end": 29.14,
+   "pause": 5.4
+  },
+  {
+   "speaker": "Omar",
+   "text": "Do you want to meet in the square at half past twelve?",
+   "src": "audio/where-are-you.mp3",
+   "start": 40.54,
+   "end": 42.64,
+   "pause": 3.6
+  },
+  {
+   "speaker": "Mei",
+   "text": "I'm wearing a woolly hat, gloves and a big red jacket.",
+   "src": "video/mei-ice-rink.mp4",
+   "start": 14.22,
+   "end": 17.61,
+   "pause": 5.2
+  },
+  {
+   "speaker": "Mei",
+   "text": "I usually come here on Sunday afternoons with my family, just for fun.",
+   "src": "video/mei-ice-rink.mp4",
+   "start": 23.97,
+   "end": 27.93,
+   "pause": 6.0
+  },
+  {
+   "speaker": "Noah",
+   "text": "Behind me, Leo and Sara are racing down the hill.",
+   "src": "video/noah-bike-park.mp4",
+   "start": 16.67,
+   "end": 20.3,
+   "pause": 5.5
+  },
+  {
+   "speaker": "Presenter",
+   "text": "Today we're talking about phones and free time.",
+   "src": "audio/screen-smart.mp3",
+   "start": 4.43,
+   "end": 7.57,
+   "pause": 4.9
+  },
+  {
+   "speaker": "Presenter",
+   "text": "Stand up, look out of the window, drink some water.",
+   "src": "audio/screen-smart.mp3",
+   "start": 34.1,
+   "end": 37.39,
+   "pause": 5.1
+  },
+  {
+   "speaker": "Presenter",
+   "text": "Real fun is better than any video.",
+   "src": "audio/screen-smart.mp3",
+   "start": 69.12,
+   "end": 71.71,
+   "pause": 4.2
+  }
+ ]
+}

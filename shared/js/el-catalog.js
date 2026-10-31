@@ -36,11 +36,12 @@ window.EL_GROUPS=[{id:"2ESOA",course:"2eso",name:"2ESO A"},{id:"2ESOB",course:"2
 // Is an LS assigned to a group? ls/{id}.groups lists the groups (set in the teacher dashboard); without it, every group of the LS's course.
 window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=>x.id===gid);if(!g||!ls)return false;return info&&Array.isArray(info.groups)?info.groups.includes(gid):g.course===ls.course};
 // study (optional): start of the path of the vocabulary and grammar summary PDFs; the board adds the route + ".pdf".
+// shadowing (optional): the LS's shadowing video (tools/shadowing-video), the same for every route: on the board next to the summary and in the dashboard's Materials tab.
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine",study:"2eso/my-real-routine/downloads/ls1-vocabulary-grammar-"},
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine",study:"4eso/my-real-routine/downloads/ls1-vocabulary-grammar-",pro:true},
-  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true},
-  {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-"}
+  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4"},
+  {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",shadowing:"2eso/free-time-live/video/shadowing.mp4"}
 ];
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";
