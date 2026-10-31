@@ -47,6 +47,8 @@ let COURSE=null;   // course of the LS on screen: criteria texts depend on it
 const pill=c=>`<span class="pill ce${c[0]}" data-do="crit" data-c="${c}" tabindex="0" title="${esc(elCompetence(c)+" · "+c+": "+(elCriterion(COURSE,c)||"–"))}">${c}</span>`;
 const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name]));
 const route=l=>l?`<span class="route r-${l}">${LV[l]||l}</span>`:"–";
+// what the student reads as their level: course, route and CEFR, e.g. "2ESO Starter (A1)" (Roger, 31 Oct 2026; elLevelLabel in el-catalog.js)
+const levelTag=(c,l)=>l?`<span class="route r-${l}" title="${esc(elCefr(c,l,true))}">${esc(elLevelLabel(c,l))}</span>`:"–";
 const steps=a=>EL_ACTIONS[a.id]||[];
 const stepCrit=(a,k)=>(a.skip||[]).includes(k)?`<small class="muted">${t("no puntua","no points")}</small>`:((((window.EL_STEP_CRITERIA||{})[a.id]||{})[k]||EL_EVIDENCE[k]||[]).map(pill).join("")||`<small class="muted" title="${t("Pràctica de llengua: sense criteri","Language practice: no criterion")}">–</small>`);
 const pts=a=>a.graded?(a.manual?t("nota del professor","teacher's mark"):a.points+(a.points===1?t(" punt"," point"):t(" punts"," points"))):t("no avalua","not assessed");
@@ -98,7 +100,7 @@ function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
   const html=`<a class="nv on" href="today.html" aria-current="page">${t("Les meves activitats","My activities")}</a>`
     +cs.map(c=>`<a class="nv" href="${c}/index.html">${t("El meu curs","My course")} · ${COURSES[c]}</a>`+lss.filter(l=>l.course===c).map(l=>`<a class="nv sub" href="${lsHref(l)}">${lsName(l)}</a>`).join("")).join("")
-    +`<a class="nv" href="lab/">English Lab</a>`;
+    +`<a class="nv" href="lab/">English Lab</a><a class="nv" href="lab/practice.html">${t("Practica","Practise")}</a>`;
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
 // "Go to my Learning Situations": one big button per LS the student can open (open LS first).
@@ -127,8 +129,8 @@ function render(){
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
   const n=S.pend.length;
   $("#main").innerHTML=lateBox(lss)+secBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
-    +`<div class="bar">${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${l.title}</button>`).join("")} <span class="muted">· ${t("El teu nivell:","Your level:")}</span> ${route(elRouteOf(D.lv,ls.id).level)}${routeNote(ls.id,st)} ${stTag}</div>`
-    +studyBox(ls)+weekBox(ls,info)
+    +`<div class="bar">${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${l.title}</button>`).join("")} <span class="muted">· ${t("El teu nivell:","Your level:")}</span> ${levelTag(ls.course,elRouteOf(D.lv,ls.id).level)}${routeNote(ls.id,st)} ${stTag}</div>`
+    +studyBox(ls)+practiceBox(ls)+weekBox(ls,info)
     +(only(ls.id)?onlyView(ls.id):`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
     +(S.view==="sum"?summary(list):lpView(list,info)));
 }
@@ -167,6 +169,9 @@ async function goLive(){
   F.onSnapshot(F.doc(db,"points",(U.email||"").toLowerCase()),x=>{D.pt=x.exists()?x.data():null;ptDraw()},e=>console.warn("points",e));
   F.onSnapshot(F.doc(db,"teams",g),x=>{D.tm=x.exists()?x.data():null;ptDraw()},e=>console.warn("teams",e));
 }
+// Self-practice by level (Roger, 31 Oct 2026): lab/practice.html, with the student's level recommended.
+function practiceBox(ls){if(only(ls.id))return "";const lv=elRouteOf(D.lv,ls.id).level,k=lv?elCefr(ls.course,lv):"";
+  return `<div class="box study"><b>🏋️ ${t("Practica pel teu compte","Practise on your own")}${k?` · ${t("nivell","level")} ${esc(k)}`:""}</b><p class="muted">${t("Targetes de paraules, sentence builder, escoltes i shadowing de les teves LS, al teu nivell. Es corregeix sol i no compta per a la nota.","Word cards, sentence builder, listenings and shadowing from your LSs, at your level. It corrects itself and does not count for your mark.")}</p><div class="row"><a class="go" href="lab/practice.html">${t("Comença a practicar","Start practising")} →</a></div></div>`}
 // Vocabulary and grammar summary (Roger, 25 Oct 2026): an optional PDF per route; a student gets only their route's, the teacher and testers all three.
 function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=elRouteOf(D.lv,ls.id).level,a=r=>`<a class="go" href="${ls.study}${r==="beginners"?"insecure":r==="native"&&!ls.pro?"daring":r}.pdf" download>📥 ${t("Descarrega el resum","Download the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
   if(!all()&&!lv)return "";
