@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Vocabulary and grammar</title>
+<link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
+<style>
+@page{size:A4;margin:14mm 14mm 16mm}
+*{box-sizing:border-box}
+body{margin:0;background:#eef1f4;color:#1d2830;font:10pt/1.45 Arial,Helvetica,sans-serif}
+#sheet{max-width:200mm;margin:16px auto;padding:14mm;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.toolbar{max-width:200mm;margin:16px auto 0;display:flex;gap:8px;justify-content:flex-end}
+.toolbar button{font:inherit;padding:7px 14px;border-radius:8px;border:1px solid #9aa7b1;background:#fff;cursor:pointer}
+@media print{body{background:#fff}#sheet{margin:0;padding:0;max-width:none;box-shadow:none}.toolbar{display:none}}
+.eyebrow{margin:0;font-size:9pt;font-weight:700;color:#1f5f6b}
+h1{margin:2px 0 6px;font-size:19pt;color:#16414a}
+h2{font-size:14pt;margin:18px 0 6px;color:#16414a;border-bottom:2px solid #1f5f6b;padding-bottom:2px;break-after:avoid}
+h2.part{break-before:page}
+h3{font-size:11.5pt;margin:14px 0 4px;color:#1f5f6b;break-after:avoid}
+h4{font-size:10.5pt;margin:8px 0 4px;break-after:avoid}
+.box{border:1px solid #c5ced5;border-left:4px solid #1f5f6b;border-radius:6px;padding:7px 10px;margin:6px 0;background:#f4f8f9;break-inside:avoid}
+.box p{margin:3px 0}.box ul{margin:3px 0;padding-left:18px}.box li{margin:2px 0}
+.tiny{font-size:9pt;color:#5f6b73;margin:4px 0}
+.sub{font-weight:700;margin:8px 0 2px;break-after:avoid}
+table{width:100%;border-collapse:collapse;font-size:9pt;margin:4px 0}
+th,td{border-bottom:1px solid #dde3e7;padding:3px 6px;text-align:left;vertical-align:top}
+thead th{background:#1f5f6b;color:#fff}
+tr{break-inside:avoid}
+.grp td{font-weight:700;background:#e6eff1;color:#1f5f6b}
+table.vocab td:first-child{width:34%}table.vocab td:nth-child(2){width:28%}
+table.practice td:first-child{width:50%}table.practice td:nth-child(2){width:22%}
+body.locked>*:not(#gate){display:none!important}
+#gate{display:none;max-width:420px;margin:60px auto;padding:20px;background:#fff;border:1px solid #c5ced5;border-radius:12px;font:15px/1.5 Arial,Helvetica,sans-serif;text-align:center}
+body.locked #gate{display:block}
+#gate button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #1f5f8b;background:#1f5f8b;color:#fff;cursor:pointer}
+</style>
+</head>
+<body class="locked">
+<div id="gate"></div>
+<div class="toolbar"><button type="button" onclick="print()">🖨 Print</button></div>
+<main id="sheet">Loading…</main>
+<script src="../js/lp-summary.js"></script>
+<script src="../js/el-copyright.js"></script>
+<script src="../js/el-route-names.js"></script>
+<script type="module" src="teacher-gate.js"></script>
+</body>
+</html>

@@ -58,6 +58,16 @@ table.vocab .grp td{font-weight:700;background:#eef1f4}
 .is-key .gap.filled{min-width:0;padding:0 4px}
 .is-key .opt.right{outline:2px solid #b3261e;border-radius:4px;padding:0 3px}
 img{max-width:100%}
+.study .panel-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.study .pill{font-size:9pt;color:#5f6b73;white-space:nowrap}
+.study .instruction{margin:2px 0 6px}
+.study .tiny{font-size:9pt;color:#5f6b73}
+.study-tips{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
+.study-tips .box p{margin:2px 0}
+.study .model{border:1px solid #c5ced5;border-radius:6px;padding:7px 10px;margin:6px 0;background:#f6f8fa}
+.study .question{margin:0 0 9px;break-inside:avoid}.study .q-title{margin:0}
+.study-block{margin:12px 0}
+.study-keys{break-before:page}
 body.locked>*:not(#gate){display:none!important}
 #gate{display:none;max-width:420px;margin:60px auto;padding:20px;background:#fff;border:1px solid #c5ced5;border-radius:12px;font:15px/1.5 Arial,Helvetica,sans-serif;text-align:center}
 body.locked #gate{display:block}
@@ -68,8 +78,10 @@ body.locked #gate{display:block}
 <div id="gate"></div>
 <div class="toolbar"><button type="button" onclick="print()">🖨 Print</button></div>
 <main id="sheet">Loading…</main>
+<script src="../js/el-study.js"></script>
 <script src="../js/lp-worksheet.js"></script>
 <script src="../js/el-copyright.js"></script>
+<script src="../js/el-route-names.js"></script>
 <script type="module" src="teacher-gate.js"></script>
 </body>
 </html>
