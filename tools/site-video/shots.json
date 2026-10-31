@@ -1,0 +1,1499 @@
+{
+ "l01": [
+  {
+   "img": "r4-00-home.png"
+  }
+ ],
+ "l02": [
+  {
+   "img": "r4-00-home.png",
+   "view": [
+    380,
+    560,
+    760,
+    300
+   ],
+   "hl": [
+    460,
+    688,
+    592,
+    148
+   ],
+   "margin": 0.25
+  },
+  {
+   "img": "r4-01-signin.png",
+   "on": "Sign in",
+   "view": [
+    676,
+    212,
+    568,
+    654
+   ],
+   "hl": [
+    704,
+    400,
+    510,
+    184
+   ],
+   "on_ca": "Entra amb"
+  },
+  {
+   "img": "r4-01-signin.png",
+   "on": "Forgot",
+   "view": [
+    676,
+    212,
+    568,
+    654
+   ],
+   "hl": [
+    704,
+    756,
+    510,
+    46
+   ],
+   "on_ca": "Has oblidat"
+  }
+ ],
+ "l03": [
+  {
+   "img": "r4-10-board.png",
+   "hl": [
+    26,
+    106,
+    306,
+    66
+   ]
+  },
+  {
+   "img": "r4-03-board-ca.png",
+   "on": "If your route",
+   "hl": [
+    376,
+    36,
+    364,
+    68
+   ],
+   "on_ca": "Si la teva ruta"
+  },
+  {
+   "img": "r4-03-board-ca.png",
+   "on": "your board is in Catalan",
+   "view": [
+    384,
+    440,
+    1300,
+    140
+   ],
+   "hl": [
+    1114,
+    478,
+    152,
+    36
+   ],
+   "margin": 0.1,
+   "on_ca": "el tauler és en català"
+  }
+ ],
+ "l04": [
+  {
+   "img": "r4-10-board.png",
+   "from": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "view": [
+    384,
+    210,
+    1512,
+    140
+   ],
+   "hl": [
+    404,
+    268,
+    734,
+    64
+   ],
+   "margin": 0.12
+  }
+ ],
+ "l05": [
+  {
+   "img": "r4-10-board.png",
+   "from": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "view": [
+    384,
+    400,
+    1512,
+    410
+   ],
+   "hl": [
+    404,
+    452,
+    478,
+    94
+   ],
+   "margin": 0.04
+  },
+  {
+   "img": "r4-10-board.png",
+   "on": "If you do all",
+   "view": [
+    384,
+    400,
+    1512,
+    410
+   ],
+   "hl": [
+    900,
+    452,
+    996,
+    94
+   ],
+   "margin": 0.04,
+   "on_ca": "Si fas tota"
+  }
+ ],
+ "l06": [
+  {
+   "img": "r4-10-board.png",
+   "from": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "view": [
+    384,
+    836,
+    1512,
+    114
+   ],
+   "margin": 0.2
+  },
+  {
+   "img": "r4-10-board.png",
+   "on": "Click",
+   "view": [
+    384,
+    836,
+    1512,
+    114
+   ],
+   "hl": [
+    1230,
+    884,
+    118,
+    44
+   ],
+   "margin": 0.2,
+   "on_ca": "Clica Fes"
+  }
+ ],
+ "l07": [
+  {
+   "img": "r4-11-join-the-class.png",
+   "view": [
+    384,
+    180,
+    1512,
+    130
+   ],
+   "margin": 0.15
+  },
+  {
+   "img": "r4-11-join-the-class.png",
+   "on": "Join the class",
+   "view": [
+    384,
+    180,
+    1512,
+    130
+   ],
+   "hl": [
+    1668,
+    212,
+    206,
+    62
+   ],
+   "margin": 0.15,
+   "on_ca": "Entra a la classe"
+  },
+  {
+   "img": "4eso-09-exam-notice.png",
+   "on": "And when",
+   "from": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "view": [
+    630,
+    24,
+    660,
+    298
+   ],
+   "hl": [
+    650,
+    240,
+    270,
+    60
+   ],
+   "margin": 0.2,
+   "on_ca": "I quan"
+  }
+ ],
+ "l08": [
+  {
+   "img": "r4-12-route-line.png",
+   "view": [
+    300,
+    300,
+    1350,
+    330
+   ],
+   "hl": [
+    984,
+    456,
+    442,
+    38
+   ],
+   "margin": 0
+  },
+  {
+   "img": "r4-26-routes.png",
+   "on": "Starter",
+   "on_ca": "Starter",
+   "view": [
+    140,
+    440,
+    1640,
+    300
+   ],
+   "hl": [
+    150,
+    540,
+    1620,
+    150
+   ],
+   "margin": 0.02
+  },
+  {
+   "img": "r4-12-level-notice.png",
+   "on": "Your teacher sets",
+   "on_ca": "La posa",
+   "view": [
+    380,
+    0,
+    1160,
+    640
+   ],
+   "hl": [
+    628,
+    22,
+    664,
+    330
+   ],
+   "margin": 0
+  },
+  {
+   "img": "r4-12-route-line.png",
+   "on": "Click Ask",
+   "view": [
+    300,
+    300,
+    1350,
+    330
+   ],
+   "hl": [
+    1430,
+    452,
+    222,
+    44
+   ],
+   "margin": 0,
+   "on_ca": "Clica Demana"
+  },
+  {
+   "img": "r4-14-ask-route-filled.png",
+   "on": "choose one",
+   "view": [
+    570,
+    226,
+    780,
+    628
+   ],
+   "hl": [
+    1088,
+    428,
+    232,
+    168
+   ],
+   "on_ca": "tria'n una"
+  },
+  {
+   "img": "r4-14-ask-route-filled.png",
+   "on": "say why",
+   "view": [
+    570,
+    226,
+    780,
+    628
+   ],
+   "hl": [
+    596,
+    650,
+    726,
+    108
+   ],
+   "on_ca": "explica per què"
+  },
+  {
+   "img": "r4-14-ask-route-filled.png",
+   "on": "and send it",
+   "view": [
+    570,
+    226,
+    780,
+    628
+   ],
+   "hl": [
+    1128,
+    780,
+    194,
+    52
+   ],
+   "on_ca": "i envia-ho"
+  }
+ ],
+ "l09": [
+  {
+   "img": "r4-15-week-plan.png",
+   "view": [
+    384,
+    90,
+    1512,
+    720
+   ],
+   "hl": [
+    406,
+    496,
+    1468,
+    258
+   ],
+   "margin": 0.02
+  },
+  {
+   "img": "r4-15-week-plan.png",
+   "on": "what you have to do",
+   "on_ca": "què has de fer",
+   "view": [
+    384,
+    90,
+    1512,
+    720
+   ],
+   "hl": [
+    408,
+    272,
+    1466,
+    214
+   ],
+   "margin": 0.02
+  },
+  {
+   "img": "r4-15-week-plan.png",
+   "on": "the date of the exam",
+   "on_ca": "la data de l'examen",
+   "view": [
+    384,
+    90,
+    1512,
+    720
+   ],
+   "hl": [
+    408,
+    212,
+    392,
+    42
+   ],
+   "margin": 0.02
+  },
+  {
+   "img": "r4-15-week-plan.png",
+   "on": "If you miss",
+   "on_ca": "Si no has pogut",
+   "view": [
+    384,
+    90,
+    1512,
+    720
+   ],
+   "hl": [
+    404,
+    156,
+    900,
+    36
+   ],
+   "margin": 0.02
+  },
+  {
+   "img": "r4-15-week-plan.png",
+   "on": "check it here",
+   "on_ca": "mira-ho aquí",
+   "view": [
+    384,
+    90,
+    1512,
+    720
+   ],
+   "hl": [
+    420,
+    434,
+    324,
+    40
+   ],
+   "margin": 0.02
+  }
+ ],
+ "l10": [
+  {
+   "img": "r4-10-board.png",
+   "view": [
+    1200,
+    700,
+    720,
+    380
+   ],
+   "hl": [
+    1650,
+    944,
+    256,
+    52
+   ],
+   "margin": 0.1
+  },
+  {
+   "img": "r4-16-my-week.png",
+   "on": "Click it",
+   "view": [
+    1100,
+    230,
+    820,
+    720
+   ],
+   "hl": [
+    1364,
+    250,
+    540,
+    672
+   ],
+   "margin": 0.02,
+   "on_ca": "Clica'l"
+  }
+ ],
+ "l11": [
+  {
+   "img": "r4-17-lp-grid.png"
+  },
+  {
+   "img": "r4-17-lp-grid.png",
+   "on": "with their activities",
+   "hl": [
+    384,
+    236,
+    1512,
+    300
+   ],
+   "on_ca": "amb les activitats"
+  },
+  {
+   "img": "r4-17-lp-grid.png",
+   "on": "A green Open",
+   "hl": [
+    1794,
+    240,
+    84,
+    48
+   ],
+   "on_ca": "Un botó verd"
+  },
+  {
+   "img": "r4-17-lp-grid.png",
+   "on": "A grey one",
+   "hl": [
+    1794,
+    888,
+    84,
+    44
+   ],
+   "on_ca": "Si és gris"
+  }
+ ],
+ "l12": [
+  {
+   "img": "r4-19-criteria.png",
+   "hl": [
+    596,
+    64,
+    216,
+    52
+   ]
+  },
+  {
+   "img": "r4-19-criteria.png",
+   "on": "how you are doing",
+   "hl": [
+    384,
+    400,
+    1512,
+    640
+   ],
+   "on_ca": "com vas"
+  }
+ ],
+ "l13": [
+  {
+   "img": "r4-10-board.png",
+   "view": [
+    0,
+    0,
+    1100,
+    620
+   ],
+   "hl": [
+    20,
+    96,
+    330,
+    360
+   ]
+  }
+ ],
+ "l14": [
+  {
+   "img": "r4-30-ls.png",
+   "hl": [
+    1060,
+    30,
+    800,
+    52
+   ]
+  },
+  {
+   "img": "r4-31-ls-menu.png",
+   "on": "Click Learning",
+   "hl": [
+    1190,
+    30,
+    440,
+    296
+   ],
+   "on_ca": "Clica Learning"
+  },
+  {
+   "img": "phone:72-phone-ls-menu.png",
+   "on": "On a phone",
+   "on_ca": "Al mòbil"
+  }
+ ],
+ "l15": [
+  {
+   "img": "r4-30-ls.png"
+  },
+  {
+   "img": "r4-30-ls.png",
+   "on": "you see your challenge",
+   "hl": [
+    1150,
+    414,
+    650,
+    440
+   ],
+   "on_ca": "veus el teu repte"
+  }
+ ],
+ "l16": [
+  {
+   "img": "r4-32-ls-tab-overview.png",
+   "hl": [
+    120,
+    180,
+    920,
+    72
+   ]
+  },
+  {
+   "img": "r4-32-ls-tab-overview.png",
+   "on": "what you will learn",
+   "hl": [
+    120,
+    180,
+    158,
+    72
+   ],
+   "on_ca": "què aprendràs"
+  },
+  {
+   "img": "r4-32-ls-tab-learning-path.png",
+   "on": "the learning paths",
+   "hl": [
+    290,
+    180,
+    202,
+    72
+   ],
+   "on_ca": "els learning paths"
+  },
+  {
+   "img": "r4-32-ls-tab-language.png",
+   "on": "the language you need",
+   "hl": [
+    508,
+    180,
+    320,
+    72
+   ],
+   "on_ca": "la llengua"
+  },
+  {
+   "img": "r4-32-ls-tab-final.png",
+   "on": "and the final product",
+   "hl": [
+    850,
+    204,
+    186,
+    72
+   ],
+   "on_ca": "i el producte final"
+  },
+  {
+   "img": "r4-30-ls.png",
+   "on": "Here you also have",
+   "view": [
+    60,
+    620,
+    1100,
+    460
+   ],
+   "hl": [
+    120,
+    884,
+    750,
+    90
+   ],
+   "margin": 0.05,
+   "on_ca": "Aquí també"
+  }
+ ],
+ "l17": [
+  {
+   "img": "r4-40-lp-top.png"
+  },
+  {
+   "img": "r4-40-lp-top.png",
+   "on": "The top bar",
+   "hl": [
+    150,
+    76,
+    660,
+    44
+   ],
+   "on_ca": "La barra de dalt"
+  },
+  {
+   "img": "r4-40-lp-top.png",
+   "on": "Use the list",
+   "hl": [
+    150,
+    140,
+    1620,
+    62
+   ],
+   "on_ca": "Fes servir la llista"
+  }
+ ],
+ "l18": [
+  {
+   "img": "r4-41-lp-tabs.png",
+   "hl": [
+    150,
+    240,
+    1602,
+    72
+   ]
+  },
+  {
+   "img": "r4-42-lp-reading.png",
+   "on": "read the short instruction",
+   "view": [
+    100,
+    360,
+    1720,
+    500
+   ],
+   "hl": [
+    196,
+    464,
+    1000,
+    44
+   ],
+   "margin": 0.03,
+   "on_ca": "llegeix primer"
+  }
+ ],
+ "l19": [
+  {
+   "img": "r4-42-lp-reading.png",
+   "view": [
+    960,
+    340,
+    900,
+    220
+   ],
+   "hl": [
+    1534,
+    386,
+    184,
+    40
+   ],
+   "margin": 0.15
+  },
+  {
+   "img": "r4-44-lp-bottom.png",
+   "on": "Your answers save",
+   "view": [
+    300,
+    700,
+    1300,
+    330
+   ],
+   "hl": [
+    640,
+    936,
+    600,
+    40
+   ],
+   "margin": 0.05,
+   "on_ca": "Les respostes"
+  }
+ ],
+ "l20": [
+  {
+   "img": "r4-40-lp-top.png",
+   "view": [
+    100,
+    780,
+    1720,
+    240
+   ],
+   "hl": [
+    150,
+    846,
+    1620,
+    130
+   ],
+   "margin": 0.03
+  }
+ ],
+ "l21": [
+  {
+   "img": "r4-40-lp-top.png",
+   "view": [
+    360,
+    0,
+    1200,
+    200
+   ],
+   "hl": [
+    510,
+    4,
+    900,
+    50
+   ],
+   "margin": 0.1
+  },
+  {
+   "img": "r4-40-lp-top.png",
+   "on": "click Mark as done",
+   "view": [
+    360,
+    0,
+    1200,
+    200
+   ],
+   "hl": [
+    1244,
+    8,
+    160,
+    42
+   ],
+   "margin": 0.1,
+   "on_ca": "clica Marca"
+  },
+  {
+   "img": "r4-18-result-window.png",
+   "on": "and then submit",
+   "view": [
+    570,
+    120,
+    780,
+    840
+   ],
+   "hl": [
+    1218,
+    888,
+    106,
+    48
+   ],
+   "margin": 0.03,
+   "on_ca": "i després entrega"
+  }
+ ],
+ "l27": [
+  {
+   "img": "r4-20-correction-card.png",
+   "view": [
+    600,
+    10,
+    720,
+    300
+   ],
+   "hl": [
+    616,
+    24,
+    688,
+    276
+   ],
+   "margin": 0.15
+  },
+  {
+   "img": "r4-20-correction-card.png",
+   "on": "Click it",
+   "view": [
+    600,
+    10,
+    720,
+    300
+   ],
+   "hl": [
+    668,
+    132,
+    484,
+    40
+   ],
+   "margin": 0.15,
+   "on_ca": "Clica'l"
+  },
+  {
+   "img": "r4-45-lp-correction.png",
+   "on": "read the correction",
+   "view": [
+    100,
+    200,
+    1720,
+    400
+   ],
+   "hl": [
+    204,
+    300,
+    1514,
+    152
+   ],
+   "margin": 0.03,
+   "on_ca": "llegir la correcció"
+  }
+ ],
+ "l22": [
+  {
+   "img": "r4-32-ls-tab-learning-path.png",
+   "hl": [
+    1258,
+    300,
+    544,
+    430
+   ]
+  },
+  {
+   "img": "r4-61-checkpoint-rules.png",
+   "on": "Read the rules",
+   "view": [
+    100,
+    200,
+    1720,
+    800
+   ],
+   "hl": [
+    204,
+    240,
+    1500,
+    170
+   ],
+   "margin": 0.03,
+   "on_ca": "Llegeix les normes"
+  },
+  {
+   "img": "r4-61-checkpoint-rules.png",
+   "on": "tick the box",
+   "view": [
+    100,
+    200,
+    1720,
+    800
+   ],
+   "hl": [
+    230,
+    780,
+    330,
+    120
+   ],
+   "margin": 0.03,
+   "on_ca": "marca la casella"
+  },
+  {
+   "img": "r4-61-checkpoint-rules.png",
+   "on": "You see one question",
+   "view": [
+    100,
+    200,
+    1720,
+    800
+   ],
+   "hl": [
+    204,
+    240,
+    1500,
+    170
+   ],
+   "margin": 0.03,
+   "on_ca": "Veus una pregunta"
+  },
+  {
+   "img": "r4-61-checkpoint-rules.png",
+   "on": "Don't leave",
+   "view": [
+    100,
+    200,
+    1720,
+    800
+   ],
+   "hl": [
+    230,
+    424,
+    1460,
+    266
+   ],
+   "margin": 0.03,
+   "on_ca": "No surtis"
+  }
+ ],
+ "l23": [
+  {
+   "img": "r4-60-not-open.png",
+   "hl": [
+    340,
+    440,
+    1240,
+    210
+   ]
+  }
+ ],
+ "l24": [
+  {
+   "img": "r4-40-lp-top.png",
+   "view": [
+    1100,
+    760,
+    820,
+    320
+   ],
+   "hl": [
+    1522,
+    1013,
+    142,
+    44
+   ],
+   "margin": 0.1
+  },
+  {
+   "img": "r4-51-problem-filled.png",
+   "on": "Choose what happened",
+   "view": [
+    600,
+    124,
+    720,
+    834
+   ],
+   "hl": [
+    628,
+    240,
+    390,
+    30
+   ],
+   "margin": 0.03,
+   "on_ca": "Tria què"
+  },
+  {
+   "img": "r4-51-problem-filled.png",
+   "on": "explain it",
+   "view": [
+    600,
+    124,
+    720,
+    834
+   ],
+   "hl": [
+    626,
+    440,
+    668,
+    180
+   ],
+   "margin": 0.03,
+   "on_ca": "explica-ho"
+  },
+  {
+   "img": "r4-51-problem-filled.png",
+   "on": "add a screenshot",
+   "view": [
+    600,
+    124,
+    720,
+    834
+   ],
+   "hl": [
+    626,
+    676,
+    540,
+    96
+   ],
+   "margin": 0.03,
+   "on_ca": "afegeix-hi"
+  },
+  {
+   "img": "r4-51-problem-filled.png",
+   "on": "Your teacher will see",
+   "view": [
+    600,
+    124,
+    720,
+    834
+   ],
+   "hl": [
+    1198,
+    884,
+    124,
+    46
+   ],
+   "margin": 0.03,
+   "on_ca": "El professor ho"
+  }
+ ],
+ "l25": [
+  {
+   "img": "r4-70-english-lab.png",
+   "hl": [
+    456,
+    372,
+    1372,
+    392
+   ]
+  },
+  {
+   "img": "r4-70-english-lab.png",
+   "on": "and grammar",
+   "hl": [
+    804,
+    788,
+    324,
+    292
+   ],
+   "on_ca": "i gramàtica"
+  },
+  {
+   "img": "r4-70-english-lab.png",
+   "on": "vocabulary games",
+   "hl": [
+    456,
+    788,
+    324,
+    292
+   ],
+   "on_ca": "jocs de vocabulari"
+  },
+  {
+   "img": "r4-71-games-menu.png",
+   "on": "for each Learning",
+   "view": [
+    300,
+    400,
+    1400,
+    620
+   ],
+   "hl": [
+    456,
+    536,
+    640,
+    446
+   ],
+   "margin": 0.03,
+   "on_ca": "per a cada Learning"
+  },
+  {
+   "img": "r4-72-vocabulary-games-ls2.png",
+   "on": "Situation",
+   "on_ca": "Situation"
+  },
+  {
+   "img": "r4-73-practice-student.png",
+   "view": [
+    380,
+    40,
+    1500,
+    840
+   ],
+   "margin": 0,
+   "on": "Use it",
+   "on_ca": "Fes-la servir"
+  }
+ ],
+ "l26": [
+  {
+   "img": "card:{\"lines\": [\"Remember\"], \"big\": 52, \"items\": [\"Start on your board: My activities\", \"Check My week\", \"Do the steps in order\", \"Ask your teacher when you need help\"]}",
+   "img_ca": "card:{\"lines\": [\"Recorda\"], \"big\": 52, \"items\": [\"Comença pel tauler: Les meves activitats\", \"Mira My week\", \"Fes els passos en ordre\", \"Demana ajuda al professor quan la necessitis\"]}"
+  }
+ ],
+ "l28": [
+  {
+   "img": "r4-15-week-plan.png",
+   "view": [
+    384,
+    90,
+    1512,
+    720
+   ],
+   "hl": [
+    404,
+    766,
+    222,
+    36
+   ],
+   "margin": 0.02
+  },
+  {
+   "img": "r4-15-whole-ls-plan.png",
+   "on": "to see every week",
+   "view": [
+    380,
+    40,
+    1516,
+    1000
+   ],
+   "margin": 0,
+   "on_ca": "per veure totes"
+  },
+  {
+   "img": "r4-15-whole-ls-plan.png",
+   "on": "what we do in class",
+   "view": [
+    380,
+    40,
+    1516,
+    1000
+   ],
+   "hl": [
+    400,
+    416,
+    1480,
+    132
+   ],
+   "margin": 0,
+   "on_ca": "què fem a classe"
+  },
+  {
+   "img": "r4-15-whole-ls-plan.png",
+   "on": "and the activities",
+   "view": [
+    380,
+    40,
+    1516,
+    1000
+   ],
+   "hl": [
+    400,
+    600,
+    1480,
+    196
+   ],
+   "margin": 0,
+   "on_ca": "i les activitats"
+  }
+ ],
+ "l29": [
+  {
+   "img": "r4-12-route-line.png",
+   "view": [
+    384,
+    440,
+    1512,
+    370
+   ],
+   "hl": [
+    386,
+    516,
+    1508,
+    280
+   ],
+   "margin": 0
+  },
+  {
+   "img": "r4-12-route-line.png",
+   "on": "click Download",
+   "view": [
+    384,
+    440,
+    1512,
+    370
+   ],
+   "hl": [
+    404,
+    610,
+    324,
+    44
+   ],
+   "margin": 0,
+   "on_ca": "clica Descarrega"
+  },
+  {
+   "img": "r3-25-summary-pdf.png",
+   "on": "a PDF",
+   "on_ca": "un PDF"
+  },
+  {
+   "img": "r3-25-summary-pdf.png",
+   "on": "all the vocabulary",
+   "hl": [
+    30,
+    103,
+    920,
+    873
+   ],
+   "on_ca": "tot el vocabulari"
+  },
+  {
+   "img": "r3-25-summary-pdf.png",
+   "on": "and grammar",
+   "hl": [
+    970,
+    103,
+    920,
+    873
+   ],
+   "on_ca": "i la gramàtica"
+  },
+  {
+   "img": "r3-25-summary-pdf.png",
+   "on": "with explanations",
+   "view": [
+    970,
+    103,
+    920,
+    720
+   ],
+   "hl": [
+    1030,
+    280,
+    800,
+    540
+   ],
+   "on_ca": "amb explicacions"
+  }
+ ],
+ "l30": [
+  {
+   "img": "r4-12-level-notice.png",
+   "view": [
+    380,
+    0,
+    1160,
+    640
+   ],
+   "hl": [
+    628,
+    22,
+    664,
+    330
+   ],
+   "margin": 0
+  },
+  {
+   "img": "r4-12-level-notice.png",
+   "on": "follow that level",
+   "on_ca": "segueixen",
+   "view": [
+    384,
+    440,
+    1512,
+    80
+   ],
+   "hl": [
+    1100,
+    458,
+    145,
+    34
+   ],
+   "margin": 0.3
+  }
+ ],
+ "l33": [
+  {
+   "img": "r4-12-level-notice.png",
+   "view": [
+    384,
+    640,
+    1512,
+    170
+   ],
+   "hl": [
+    406,
+    668,
+    800,
+    112
+   ],
+   "margin": 0.05
+  },
+  {
+   "img": "r4-12-level-notice.png",
+   "on": "say them out loud",
+   "on_ca": "repeteix-les",
+   "view": [
+    384,
+    640,
+    1512,
+    170
+   ],
+   "hl": [
+    406,
+    740,
+    196,
+    38
+   ],
+   "margin": 0.05
+  }
+ ],
+ "l31": [
+  {
+   "img": "r4-15-homework.png",
+   "view": [
+    384,
+    140,
+    1512,
+    300
+   ],
+   "hl": [
+    408,
+    210,
+    1466,
+    214
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r4-15-homework.png",
+   "on": "Click Add",
+   "on_ca": "Clica Add",
+   "view": [
+    384,
+    140,
+    1512,
+    300
+   ],
+   "hl": [
+    424,
+    374,
+    318,
+    38
+   ],
+   "margin": 0.03
+  }
+ ],
+ "l32": [
+  {
+   "img": "r4-12-level-notice.png",
+   "view": [
+    384,
+    800,
+    1512,
+    180
+   ],
+   "hl": [
+    406,
+    815,
+    1488,
+    152
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r4-73-practice-student.png",
+   "view": [
+    380,
+    40,
+    1500,
+    840
+   ],
+   "margin": 0,
+   "on": "word cards",
+   "on_ca": "targetes",
+   "hl": [
+    452,
+    604,
+    1376,
+    104
+   ]
+  },
+  {
+   "img": "r4-12-level-notice.png",
+   "on": "doesn't count",
+   "on_ca": "no compta",
+   "view": [
+    384,
+    800,
+    1512,
+    180
+   ],
+   "hl": [
+    406,
+    875,
+    1340,
+    30
+   ],
+   "margin": 0.03
+  }
+ ],
+ "l34": [
+  {
+   "img": "r4-15-homework.png",
+   "view": [
+    1150,
+    940,
+    770,
+    140
+   ],
+   "hl": [
+    1662,
+    1012,
+    104,
+    48
+   ],
+   "margin": 0
+  }
+ ]
+}
