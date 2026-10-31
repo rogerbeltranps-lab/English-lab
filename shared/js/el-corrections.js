@@ -57,6 +57,6 @@ export async function corrections({list,seen,save,here,root,en,name}){
     b.onclick=()=>{c.remove();todo.forEach(x=>later[x.k]=x.v);try{sessionStorage.setItem("el_corr_later",JSON.stringify(later))}catch(e){}};
     document.body.append(c)};
   // one card at a time: after the problem-report answers, the level card and the exam card
-  const wait=()=>document.getElementById("el-reply")||document.getElementById("el-level-notice")||document.getElementById("el-exam-notice")?setTimeout(wait,600):show();
+  const wait=()=>document.getElementById("el-reply")||document.getElementById("el-announce")||document.getElementById("el-level-notice")||document.getElementById("el-exam-notice")?setTimeout(wait,600):show();
   wait();
 }

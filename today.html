@@ -15,6 +15,7 @@ dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 3
 .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px}button.opt.on{border-color:#0f766e;background:#f0fdfa}.dlg textarea{width:100%;min-height:70px;box-sizing:border-box;font:inherit}button:disabled{opacity:.5;cursor:default}.tag.no{background:#fef2f2;color:#991b1b}
 .pend.late{background:#fef2f2;border-color:#fca5a5;display:block}.pend.late ul{margin:6px 0 0;padding-left:18px}.pend.late li{margin:4px 0}.wkbox h2 small{color:#64748b}.exam{display:inline-block;background:#fef2f2;color:#991b1b;border-radius:10px;padding:4px 10px;font-weight:700;margin:2px 0 6px}
 .wk .s{white-space:pre-line}.wk .n{color:#b45309;font-size:13px}.hw{background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;padding:8px 10px;margin:6px 0}.hw ul{list-style:none;margin:4px 0;padding:0}.hw li{padding:2px 0}.hw p{margin:4px 0 0}ul.due{list-style:none;margin:4px 0;padding:0}ul.due li{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:5px 0;border-bottom:1px solid #f1f5f9}ul.due li>span:first-child{flex:1;min-width:180px}.ok{color:#16a34a;font-weight:700}.lt{color:#b91c1c;font-weight:700}.td{color:#b45309;font-weight:600}details.all{margin-top:8px}details.all summary{cursor:pointer;color:#0f766e}details.all .wk{border-top:1px solid #e2e8f0;padding-top:6px;margin-top:6px}.wk.now{background:#f0fdf4;border-radius:8px;padding:6px 8px}
+.ann{border-color:#fdba74}.ann ul{list-style:none;margin:4px 0;padding:0}.ann li{margin:8px 0}.ann .annt{white-space:pre-wrap;overflow-wrap:anywhere;border-left:4px solid #ea580c;background:#fff7ed;border-radius:8px;padding:6px 10px;margin-top:2px}.ann summary{cursor:pointer}
 .ptgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:6px 0}.ptgrid>div{background:#fffbeb;border-radius:10px;padding:8px 10px}.ptgrid b{display:block;font-size:1.4rem}.ptgrid b small{font-size:13px;font-weight:400}.ptbar{height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin:6px 0}.ptbar span{display:block;height:100%;background:#f59e0b}.ptmiss{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:8px 12px;color:#991b1b;margin:6px 0}.ptmiss ul{margin:6px 0 0;padding-left:18px;color:#0f172a}.ptmiss li{margin:4px 0}.ptok{color:#15803d;font-weight:600}.ptgrid>div.ptno{background:#fee2e2;color:#991b1b}.ptgrid>div.ptyes{background:#dcfce7;color:#166534}
 ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4px 0 8px}ol.ptrank li{border:1px solid #e2e8f0;border-radius:999px;padding:2px 10px;font-size:13px}ol.ptrank li.me{border-color:#f59e0b;background:#fffbeb;font-weight:600}ul.ptrules{list-style:none;padding:0;margin:6px 0}ul.ptrules li{margin:5px 0}.pend.live{background:#eff6ff;border-color:#93c5fd;flex-wrap:wrap}.pend.live a.go{padding:10px 16px;font-size:15px}</style></head><body>
 <style>/* Menu as on Home and English Lab: side menu on a computer, top menu on a phone */
@@ -41,6 +42,7 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 // Demo mode: a page that defines window.EL_DEMO_STUDENT before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_STUDENT;let F=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js")}
+import {annHtml,annDate,annMs,ANN_COLOR} from "./shared/js/el-announce.js";
 const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let EN=false;const t=(ca,en)=>EN?en:ca;
 let COURSE=null;   // course of the LS on screen: criteria texts depend on it
@@ -68,6 +70,7 @@ async function load(u){
   for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
   try{const p=await F.getDoc(F.doc(db,"points",(u.email||"").toLowerCase()));if(p.exists())D.pt=p.data()}catch(e){}
   if(D.me.group)try{const t=await F.getDoc(F.doc(db,"teams",D.me.group));if(t.exists())D.tm=t.data()}catch(e){}
+  try{D.ann=await ELCloud.announcements()}catch(e){console.warn("announcements",e)}
   return D;
 }
 const all=()=>!DEMO&&(ELCloud.isTeacher(U)||(ELCloud.isTester(U)&&!ELCloud.viewGroup()));   // teacher and testers see every LS (not in a group's student view)
@@ -121,7 +124,7 @@ function render(){
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
-  $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links)+`<div id="ptbox">${pointsBox()}</div>`;
+  $("#note").innerHTML=`<div id="live">${liveBox()}</div>`+annBox()+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+lsGo(links)+`<div id="ptbox">${pointsBox()}</div>`;
   $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("El professor fa el seguiment de totes les activitats que fas. Algunes s'avaluaran i seran la teva avaluació contínua, que és una part de la nota.","Your teacher keeps track of all the activities you do. Some of them will be assessed and make up your continuous assessment, which is part of your mark."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
   if(!lss.length){$("#main").innerHTML="";return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
@@ -134,6 +137,14 @@ function render(){
     +(only(ls.id)?onlyView(ls.id):`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
     +(S.view==="sum"?summary(list):lpView(list,info)));
 }
+// Announcements from the teacher (Roger, 31 Oct 2026; shared/js/el-announce.js): the ones sent to my group or to me, newest first.
+// Each one also comes once as a card at the top of the next page I open; here they stay so I can read them again.
+function annBox(){
+  const me=U&&U.uid,L=[...(D.ann||[])].filter(a=>String(a.text||"").trim()).sort((a,b)=>annMs(b.created)-annMs(a.created));if(!L.length)return "";
+  const recent=L.filter((a,i)=>i<3||Date.now()-annMs(a.created)<7*864e5).slice(0,5),older=L.slice(recent.length);
+  const li=a=>`<li><small class="muted">${esc(annDate(a.created,EN))}${me&&!(a.read||{})[me]?` · <b style="color:${ANN_COLOR}">${t("Nou","New")}</b>`:""}</small><div class="annt">${annHtml(a.text)}</div></li>`;
+  return `<div class="box ann"><h2>📣 ${t("Anuncis del professor","Announcements from your teacher")}</h2><ul>${recent.map(li).join("")}</ul>`
+    +(older.length?`<details><summary class="muted">${t(`Anuncis anteriors (${older.length})`,`Older announcements (${older.length})`)}</summary><ul>${older.map(li).join("")}</ul></details>`:"")+`</div>`}
 // Points (Roger, 25–26 Oct 2026; shared/js/el-points.js): my points this term from the class presentations and the bonus they add to
 // my term grade so far (up to EL_POINTS_BONUS, in proportion to the best student of my group), and the rules.
 function pointsBox(){
@@ -313,6 +324,7 @@ async function submitMany(list){if(!confirm(t("Entregar: ","Submit: ")+list.map(
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
   ({ls:()=>{S.ls=k.ls;render()},view:()=>{S.view=k.v;render()},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:askPanel,want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
+addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
 if(DEMO){U={uid:"demo"};D=DEMO;render()}
 else ELCloud.onUser(async u=>{U=u;
   if(!u){nav(null,[]);$("#sub").textContent="Entra amb el teu correu de l’institut i la contrasenya (botó de baix a la dreta) per veure les teves activitats. · Sign in with your school email and password (button at the bottom right) to see your activities.";$("#main").innerHTML="";return}
