@@ -591,7 +591,7 @@ function mkTodoItems(grp){return mkMoments().map(m=>{const n=mkTodo(m,grp).lengt
     if(r.from&&t>=r.from)return {now:true,h:`🤖 ${what} ${btn}`};
     return {now:false,h:`⏳ ${what}: ${r.from?"ready to mark on "+ELWeek.date(r.from)+" (one week after you ticked the session)":r.line?"ready one week after you tick “"+esc(r.line)+"” in the time plan":"no session in the time plan"} ${btn}`}}).filter(Boolean)}
 function mkSheet(m,grp){const a=byId(m.a),g=G(),studs=mkTodo(m,grp),codes=ELMark.codes(studs.map(s=>s.uid)),by=Object.fromEntries(studs.map(s=>[s.uid,s]));
-  const students=[...codes].map(([code,u])=>{const l=level(u,S.ls),h=handedIn(u,a)[m.step]||{};return {code,route:LV[l],ca:CA_RT.includes(l),exam:mkExam(u),ty:h.ty,fields:h.f}});
+  const students=[...codes].map(([code,u])=>{const l=level(u,S.ls),h=handedIn(u,a)[m.step]||{};return {code,route:LV[l],ca:!l||CA_RT.includes(l),exam:mkExam(u),ty:h.ty,fields:h.f}});
   const text=ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:ELWeek.today(),crits:m.c,
     crit:Object.fromEntries(m.c.map(c=>[c,`${c} · ${elCompetence(c)}: ${elCriterion(COURSE,c)||""}`])),ind:g.ind,students});
   return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]])),n:studs.length}}

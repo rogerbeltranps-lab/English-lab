@@ -85,7 +85,7 @@ function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRA
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
   const text=W.ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:W.ELWeek.today(),crits:m.c,
     crit:Object.fromEntries(m.c.map(c=>[c,`${c} · ${W.elCompetence(c)}: ${W.elCriterion(course,c)||""}`])),ind:g.ind,
-    students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:by[u].h.f}))});
+    students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:!by[u].route||CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:by[u].h.f}))});
   return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]]))}}
 
 // Comments waiting for Claude, every group: same order every time (group, student, activity, step), so the ids of the sheet are found again by `answer`
@@ -100,7 +100,7 @@ async function comments(){const out=[],names=Object.fromEntries((W.EL_LEVELS||[]
         if(!a.steps.some(([k])=>sp[k]&&W.ELMark.q(sp[k])))continue;   // no comment here: no need to read the results
         const st={route:W.elRouteOf(lvs,a.ls).level,res:doc(await api("GET",DOCS+`students/${s.uid}/results/${a.id.replace("/","__")}`))||{}};
       for(const [step,name] of a.steps){const h=sp[step];if(!W.ELMark.open(h,st.res,step)||W.ELMark.asked(h,st.res,step))continue;
-        out.push({id:"Q"+(out.length+1),uid:s.uid,code:code[s.uid],route:names[st.route]||st.route,ca:CA_RT.includes(st.route),ls:(W.EL_LS.find(l=>l.id===a.ls)||{}).title||a.ls,lsId:a.ls,
+        out.push({id:"Q"+(out.length+1),uid:s.uid,code:code[s.uid],route:names[st.route]||st.route,ca:!st.route||CA_RT.includes(st.route),ls:(W.EL_LS.find(l=>l.id===a.ls)||{}).title||a.ls,lsId:a.ls,
           aid:a.id,title:a.title,step,stepName:name,content:content(a),fields:h.f,comment:W.ELMark.q(h)})}}}}
   return out}
 
