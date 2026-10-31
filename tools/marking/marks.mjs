@@ -2,6 +2,8 @@
 // The same sheets and EL-MARKS v1 answers as the dashboard's 🤖 Marking sheet (shared/js/el-marking.js), read and written straight in
 // Firestore, so Claude can mark the Reading log, Listening chart and Research card / Fact file without Roger's computer.
 //   node tools/marking/marks.mjs ready                                   steps with hand-ins without a level, per group, and when they are ready
+//   node tools/marking/marks.mjs fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <file> [--apply]
+//        the same for corrections without a level (writing and speaking texts, Talk transcripts, other hand-ins): see "Corrections without a level"
 //   node tools/marking/marks.mjs audit                                   is the marking working? ❌ hand-ins ready 4+ days and still without a
 //        level (exit code 2), ⏰ possible copies waiting for the teacher 7+ days; read-only
 //   node tools/marking/marks.mjs sheet <group> <activity> <step>         the sheet (students as codes, never names)
@@ -60,13 +62,14 @@ async function list(coll){const out=[];let t="";do{const j=await api("GET",DOCS+
 const roster=Object.fromEntries(await list("roster")),studs=(await list("students")).map(([uid,s])=>({uid,...s,group:(roster[(s.email||"").toLowerCase()]||{}).group||s.group}));
 const TESTERS=JSON.parse((/TESTERS=(\[[^\]]*\])/.exec(fs.readFileSync(path.join(ROOT,"shared/js/el-firebase.js"),"utf8"))||[,"[]"])[1]),isTester=s=>TESTERS.includes((s.email||"").toLowerCase());   // as ELCloud.isTester
 const cache={};
-async function student(uid,ls,aid){const k=uid+"|"+ls+"|"+aid;if(cache[k])return cache[k];const rk=aid.replace("/","__");
+const once=(k,f)=>cache[k]||(cache[k]=f());   // each document read once per run
+async function student(uid,ls,aid){const rk=aid.replace("/","__");
   const L=W.EL_LS.filter(l=>l.course===ls.split("-")[0]),upto=L.slice(0,L.findIndex(l=>l.id===ls)+1);
-  const [pg,rs,lv,...ex]=await Promise.all([api("GET",DOCS+`students/${uid}/progress/${ls}`),api("GET",DOCS+`students/${uid}/results/${rk}`),api("GET",DOCS+`students/${uid}/levels`),
-    ...upto.map(l=>api("GET",DOCS+`students/${uid}/results/${l.id}__assessment`))]);
+  const [pg,rs,lv,...ex]=await Promise.all([once("p|"+uid+"|"+ls,()=>api("GET",DOCS+`students/${uid}/progress/${ls}`)),once("r|"+uid+"|"+rk,()=>api("GET",DOCS+`students/${uid}/results/${rk}`)),
+    once("l|"+uid,()=>api("GET",DOCS+`students/${uid}/levels`)),...upto.map(l=>once("r|"+uid+"|"+l.id+"__assessment",()=>api("GET",DOCS+`students/${uid}/results/${l.id}__assessment`)))]);
   const lvs=Object.fromEntries((lv?.documents||[]).map(d=>[d.name.split("/").pop(),doc(d)]));
   const exam=ex.map((d,i)=>{const w=((doc(d)||{}).sections||{}).writing||{};return w.score!=null&&w.score!==""?`LS${i+1} ${w.score}/${w.max||10}`:null}).filter(Boolean).join(", ");   // exam writing so far
-  return cache[k]={data:(doc(pg)||{}).data||{},res:doc(rs)||{},route:W.elRouteOf(lvs,ls).level,exam};
+  return {data:(doc(pg)||{}).data||{},res:doc(rs)||{},route:W.elRouteOf(lvs,ls).level,exam};
 }
 const moments=ls=>((W.EL_GRADING[ls]||{}).moments||[]).filter(m=>{const a=W.EL_CATALOG.find(x=>x.id===m.a);return !m.group&&a&&!a.manual&&a.ls===ls});
 async function todo(grp,m){const a=W.EL_CATALOG.find(x=>x.id===m.a),out=[];
@@ -83,6 +86,28 @@ function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRA
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
   const text=W.ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:W.ELWeek.today(),crits:m.c,
     crit:Object.fromEntries(m.c.map(c=>[c,`${c} · ${W.elCompetence(c)}: ${W.elCriterion(course,c)||""}`])),ind:g.ind,
+    students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:by[u].h.f}))});
+  return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]]))}}
+
+// ---- Corrections without a level (Roger, 31 Oct 2026: "the idea is that if they work more, they can have all the corrections"): every
+// other piece a student writes in a learning path (writing and speaking panels: the final version, else the text sent for AI feedback;
+// Talk transcripts; other hand-ins) gets the teacher's correction as replies[step], with no level and no effect on marks. fbSig[step]
+// keeps the version corrected, so a new version is corrected again. Left out: the level moments (marked above), the final product
+// (the teacher's), Reflect, LSs that are only exam + final product (LS1), and a hand-in the teacher already answered by hand.
+const sigOf=t=>{let h=5381;for(const ch of String(t))h=(h*33+ch.codePointAt(0))>>>0;return h.toString(36)};
+const fbActs=course=>W.EL_CATALOG.filter(a=>{const g=W.EL_GRADING[a.ls]||{};return a.ls.startsWith(course+"-")&&!g.only&&!a.manual&&!(g.fp&&g.fp.a===a.id)&&!/reflect$/.test(a.id)&&a.keys&&a.keys.length});
+async function fbTodo(grp,a){const skip=new Set(moments(a.ls).filter(m=>m.a===a.id).map(m=>m.step)),out={};
+  for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id);let state={};try{state=JSON.parse(st.data[a.keys[0]]||"{}")}catch(e){}
+    const items=W.ELMark.fbItems(state,skip),res=st.res;
+    for(const [step,it] of Object.entries(items)){const v=sigOf(JSON.stringify(it.fields));
+      if((res.fbSig||{})[step]===v)continue;                               // this version is corrected
+      if((res.replies||{})[step]&&!(res.fbSig||{})[step])continue;          // the teacher answered it by hand
+      (out[step]=out[step]||[]).push({s,h:{f:it.fields,ty:it.ty,date:it.date},route:st.route,exam:st.exam,v,title:it.title})}}
+  for(const k in out)out[k].sort((x,y)=>x.s.uid<y.s.uid?-1:1);return out}
+const STEPNAME={write:"Writing",speak:"Speaking",talk:"Talk"};
+function fbSheetOf(grp,a,step,rows){const course=a.ls.split("-")[0],codes=W.ELMark.codes(rows.map(r=>r.s.uid)),by=Object.fromEntries(rows.map(r=>[r.s.uid,r]));
+  const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
+  const text=W.ELMark.sheet({aid:a.id,title:a.title,step,stepName:rows[0].title||STEPNAME[step]||step,group:grp.name,date:W.ELWeek.today(),crits:[],crit:{},ind:{},
     students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:by[u].h.f}))});
   return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]]))}}
 
@@ -106,10 +131,27 @@ else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026:
       // possible copies waiting for the teacher
       for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id),f=(st.res.flags||{})[m.step];
         if(f&&!f.done&&days(today,String(f.at).slice(0,10))>=7)remind.push(`${grp.id} · ${m.name}: a possible copy waiting for you since ${String(f.at).slice(0,10)}`)}}}
+  // corrections without a level: a piece waiting 4+ days since it was handed in
+  for(const grp of W.EL_GROUPS)for(const a of fbActs(grp.course))for(const [step,rows] of Object.entries(await fbTodo(grp,a))){
+    const late=rows.filter(x=>x.h.date&&days(today,String(x.h.date).slice(0,10))>=LATE);
+    if(late.length)problems.push(`${grp.id} · ${a.title} · ${STEPNAME[step]||step}: ${late.length} piece${late.length>1?"s":""} waiting for a correction for ${LATE}+ days`);
+    else ok.push(`${grp.id} · ${a.title} · ${STEPNAME[step]||step}: ${rows.length} piece${rows.length>1?"s":""} to correct at the next run`)}
   console.log(`AUDIT ${today}: ${problems.length?"PROBLEMS":"OK"}`);
   problems.forEach(x=>console.log("❌ "+x));remind.forEach(x=>console.log("⏰ "+x));ok.forEach(x=>console.log("🤖 to mark now: "+x));
   if(!problems.length&&!remind.length&&!ok.length)console.log("Nothing waiting: every hand-in that is ready has a level.");
   if(problems.length)process.exitCode=2}
+else if(cmd==="fb-ready"){   // pieces waiting for a correction without a level, per group, activity and step
+  for(const grp of W.EL_GROUPS)for(const a of fbActs(grp.course)){const t=await fbTodo(grp,a);for(const [step,rows] of Object.entries(t))console.log(["FEEDBACK",grp.id,a.id,step,rows.length+" to correct"].join(" · "))}}
+else if(cmd==="fb-sheet"){const [gid,aid,step]=args,grp=grpOf(gid),a=W.EL_CATALOG.find(x=>x.id===aid),rows=a?(await fbTodo(grp,a))[step]||[]:[];
+  console.log(rows.length?fbSheetOf(grp,a,step,rows).text:"Nothing to correct.")}
+else if(cmd==="fb-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_CATALOG.find(x=>x.id===aid);if(!a)throw new Error("No activity "+aid);
+  const rows=(await fbTodo(grp,a))[step]||[],sh=fbSheetOf(grp,a,step,rows),r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:a.id,step,crits:[],codes:sh.codes});if(r.err)throw new Error(r.err);
+  const rk=a.id.replace("/","__");
+  for(const x of r.rows){const row=sh.codes.get(x.code);if(!x.fb){r.bad.push(x.code+" (no feedback)");continue}
+    console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+x.fb);if(!flags.has("--apply"))continue;
+    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("replies",step),fp("fbSig",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},replies:fsv({[step]:x.fb}),fbSig:fsv({[step]:row.v})}})}
+  console.log(`\n${flags.has("--apply")?"Sent":"Would send"}: ${r.rows.filter(x=>x.fb).length} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else if(cmd==="sheet"){const [gid,aid,step]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m);
   console.log(rows.length?sheetOf(grp,m,rows).text:"Nothing to mark: every hand-in has a level.")}
 else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m),sh=sheetOf(grp,m,rows);
@@ -125,4 +167,4 @@ else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(
       {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},levels:fsv({[m.step]:x.lv}),marked:fsv({[m.step]:new Date().toISOString()}),...(fb?{replies:fsv({[m.step]:x.fb})}:{})}})}
   const nf=r.rows.filter(x=>x.flag).length;
   console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length-nf} · possible copies for the teacher: ${nf} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
-else{console.log("Usage: node tools/marking/marks.mjs ready | audit | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback]");process.exit(1)}
+else{console.log("Usage: node tools/marking/marks.mjs ready | audit | fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <answer file> [--apply] | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback]");process.exit(1)}

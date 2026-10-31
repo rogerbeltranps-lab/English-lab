@@ -11,6 +11,7 @@ window.ELMark=(function(){
   //      students:[{code, route (name), ca (feedback in Catalan), exam ("LS1 6/10": their exam writing marks), ty (the writing log of
   //      el-typing.js: {p pasted chars, k keys typed, s seconds writing, n chars}), fields:[{l, v}]}]}
   function sheet(o){
+    if(!o.crits.length)return fbSheet(o);
     const head=[`${V} SHEET`,`Activity: ${o.aid} · ${o.title}`,`Step: ${o.step} · ${o.stepName}`,`Group: ${o.group} · ${o.date}`,`Criteria: ${o.crits.join(", ")}`,"",
       "You are marking the work of secondary-school students of English (Catalonia). Give each student one level per criterion, using only the indicators below.",
       "Levels, lowest to highest: NA (not achieved), AS (satisfactory), AN (notable), AE (excellent).",
@@ -28,6 +29,28 @@ window.ELMark=(function(){
       "Levels must be exactly NA, AS, AN or AE. Never write | inside the feedback. Never add names."];
     return [...head,"STUDENTS",...body,...fmt].join("\n");
   }
+  // Corrections without a level (crits empty): the same sheet, with a correction for each student instead of levels.
+  function fbSheet(o){
+    const head=[`${V} SHEET · CORRECTIONS`,`Activity: ${o.aid} · ${o.title}`,`Step: ${o.step} · ${o.stepName}`,`Group: ${o.group} · ${o.date}`,"",
+      "You are correcting the work of secondary-school students of English (Catalonia), as their teacher. There is no mark: write each student a correction they will read on their learning path.",
+      "Each correction: one thing done well; the two or three most useful mistakes, each with the correct form (quote their words → the right version); one thing to try next time. Keep it short (two to five sentences), warm and concrete, in the language given, for what their route asked (Starter and Base had more support and shorter tasks). A spoken transcript comes from speech recognition: do not correct spelling or punctuation there, only words and grammar. Empty work: tell them kindly to do it and hand it in again.",""];
+    const body=o.students.flatMap(s=>[`=== ${s.code} · route ${s.route||"–"} · correction in ${s.ca?"Catalan":"English"}`,
+      ...(s.fields||[]).map(f=>`[${f.l}] ${String(f.v||"").replace(/\s+/g," ").trim()||"(empty)"}`),""]);
+    const fmt=["ANSWER FORMAT (strict: the site reads it automatically). Reply with ONLY these lines, in a single code block, nothing before or after:",
+      `${V} | ${o.aid} | ${o.step} | ${o.group}`,"<code> | - | <the correction, on one line>","(one line per student, every code above, same order)","END",
+      "Never write | inside the correction. Never add names."];
+    return [...head,"STUDENTS",...body,...fmt].join("\n");
+  }
+  // Everything in a learning path's saved state that gets a correction without a level (Roger, 31 Oct 2026: "if they work more, they
+  // can have all the corrections"): hand-ins (state.steps) and the texts of writing and speaking panels (final version, else the text
+  // sent for AI feedback, else the text of a done panel). skip = the steps marked with levels. → {step: {fields:[{l,v}], date, ty, title}}
+  function fbItems(st,skip){st=st||{};skip=skip||new Set();const out={},R=/_(beginners|insecure|safe|daring|native)$/,has=v=>String(v||"").trim();
+    for(const [k,h] of Object.entries(st.steps||{})){const f=((h&&h.f)||[]).filter(x=>has(x.v));if(!skip.has(k)&&f.length)out[k]={fields:f,date:h.date||null,ty:h.ty||null,title:h.title||null}}
+    const keys=new Set([...Object.keys(st.drafts||{}),...Object.keys(st.finals||{}),...Object.keys(st.texts||{}).filter(k=>(st.done||{})[k.replace(R,"")])]);
+    for(const k of keys){const id=k.replace(R,"");if(skip.has(id)||out[id])continue;const f=(st.finals||{})[k],t=(st.texts||{})[k],d=(st.drafts||{})[k];
+      const text=has((f&&f.text)||t||(d&&d.text));if(!text)continue;
+      out[id]={fields:[{l:f?"Final version":"Text",v:text},...(f&&has(f.changed)?[{l:"What I changed",v:f.changed}]:[])],date:(f&&f.at)||(d&&d.at)||null,ty:null,title:null}}
+    return out}
   // the writing log in words: "pasted 180 characters (the text has 200) · 40 keys typed · 3 min writing"
   function tyText(t){return `pasted ${t.p||0} characters (the text has ${t.n||0}) · ${t.k||0} keys typed · ${t.s>=60?Math.round(t.s/60)+" min":(t.s||0)+" s"} writing`}
   // the answer: {err} or {group, rows:[{code, lv:{c: level}, fb, flag (the COPY? reason or "")}], bad:[lines left out], missing:[codes without a line]}
@@ -56,5 +79,5 @@ window.ELMark=(function(){
     const t=line&&(o.ticks||{})[o.ls+"|"+line],done=t?(typeof t==="string"?t:o.due):null;
     return {due:o.due,line,done,from:done?W.add(done,7):null};
   }
-  return {V,codes,sheet,parse,ready,tyText};
+  return {V,codes,sheet,parse,ready,tyText,fbItems};
 })();
