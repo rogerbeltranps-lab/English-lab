@@ -18,7 +18,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
   const items=[];
   for(const r of rs){const a=cat.find(x=>x.id===r.activity);if(!a)continue;
     for(const [step,text] of Object.entries(r.replies||{}))if(text&&String(text).trim())
-      items.push({a,step,text:String(text),k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||!!(r.fbSig||{})[step]})}
+      items.push({a,step,text:String(text),k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}
   // on the learning path: the answers in their tabs, and the levels for the page
   const mine=rs.find(r=>r.activity===here);
   if(mine&&mine.levels)dispatchEvent(new CustomEvent("el-levels",{detail:{levels:mine.levels}}));
@@ -47,7 +47,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
     c.querySelector("small").textContent=T("Del teu professor","From your teacher");
     const ul=c.querySelector("ul");
     for(const it of todo.slice(0,6)){const li=document.createElement("li"),l=document.createElement("a");
-      l.textContent=it.a.title.replace(/:.*$/,"")+" · "+(name(it.a.id,it.step)||({write:T("Escriptura","Writing"),speak:"Speaking",talk:"Talk"})[it.step]||it.step)+" →";l.href=new URL(it.a.path,root).href+"#"+encodeURIComponent(it.step);
+      l.textContent=it.a.title.replace(/:.*$/,"")+" · "+(name(it.a.id,it.step)||({write:T("Escriptura","Writing"),speak:"Speaking",talk:"Talk",reflect:T("Reflexió","Reflection")})[it.step]||it.step)+" →";l.href=new URL(it.a.path,root).href+"#"+encodeURIComponent(it.step);
       l.style.cssText="color:#0f766e;font-weight:600";
       l.onclick=ev=>{ev.preventDefault();c.remove();Promise.resolve(save({[it.k]:it.v})).catch(e=>console.warn("corrections",e)).then(()=>{
         const u=new URL(l.href);if(u.pathname===location.pathname){history.replaceState(null,"",u.href);location.reload()}else location.href=u.href})};

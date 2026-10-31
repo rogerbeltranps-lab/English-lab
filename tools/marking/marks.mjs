@@ -93,21 +93,22 @@ function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRA
 // other piece a student writes in a learning path (writing and speaking panels: the final version, else the text sent for AI feedback;
 // Talk transcripts; other hand-ins) gets the teacher's correction as replies[step], with no level and no effect on marks. fbSig[step]
 // keeps the version corrected, so a new version is corrected again. Left out: the level moments (marked above), the final product
-// (the teacher's), Reflect, LSs that are only exam + final product (LS1), and a hand-in the teacher already answered by hand.
+// (the teacher's), LSs that are only exam + final product (LS1); the Reflect card gets a personal answer instead of a correction, and a hand-in the teacher already answered by hand.
 const sigOf=t=>{let h=5381;for(const ch of String(t))h=(h*33+ch.codePointAt(0))>>>0;return h.toString(36)};
-const fbActs=course=>W.EL_CATALOG.filter(a=>{const g=W.EL_GRADING[a.ls]||{};return a.ls.startsWith(course+"-")&&!g.only&&!a.manual&&!(g.fp&&g.fp.a===a.id)&&!/reflect$/.test(a.id)&&a.keys&&a.keys.length});
+const fbActs=course=>W.EL_CATALOG.filter(a=>{const g=W.EL_GRADING[a.ls]||{};return a.ls.startsWith(course+"-")&&!g.only&&!a.manual&&!(g.fp&&g.fp.a===a.id)&&a.keys&&a.keys.length});
+const REFLECT=a=>/reflect$/.test(a.id)?"reflect":null;   // the Reflect page: its card gets a personal answer (el-marking.js fbItems form)
 async function fbTodo(grp,a){const skip=new Set(moments(a.ls).filter(m=>m.a===a.id).map(m=>m.step)),out={};
   for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id);let state={};try{state=JSON.parse(st.data[a.keys[0]]||"{}")}catch(e){}
-    const items=W.ELMark.fbItems(state,skip),res=st.res;
+    const items=W.ELMark.fbItems(state,skip,REFLECT(a)),res=st.res;
     for(const [step,it] of Object.entries(items)){const v=sigOf(JSON.stringify(it.fields));
       if((res.fbSig||{})[step]===v)continue;                               // this version is corrected
       if((res.replies||{})[step]&&!(res.fbSig||{})[step])continue;          // the teacher answered it by hand
-      (out[step]=out[step]||[]).push({s,h:{f:it.fields,ty:it.ty,date:it.date},route:st.route,exam:st.exam,v,title:it.title})}}
+      (out[step]=out[step]||[]).push({s,h:{f:it.fields,ty:it.ty,date:it.date},route:st.route,exam:st.exam,v,title:it.title,mode:it.mode})}}
   for(const k in out)out[k].sort((x,y)=>x.s.uid<y.s.uid?-1:1);return out}
 const STEPNAME={write:"Writing",speak:"Speaking",talk:"Talk"};
 function fbSheetOf(grp,a,step,rows){const course=a.ls.split("-")[0],codes=W.ELMark.codes(rows.map(r=>r.s.uid)),by=Object.fromEntries(rows.map(r=>[r.s.uid,r]));
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
-  const text=W.ELMark.sheet({aid:a.id,title:a.title,step,stepName:rows[0].title||STEPNAME[step]||step,group:grp.name,date:W.ELWeek.today(),crits:[],crit:{},ind:{},
+  const text=W.ELMark.sheet({aid:a.id,title:a.title,step,stepName:rows[0].title||STEPNAME[step]||step,group:grp.name,date:W.ELWeek.today(),crits:[],crit:{},ind:{},mode:rows[0].mode,
     students:[...codes].map(([code,u])=>({code,route:names[by[u].route]||by[u].route,ca:CA_RT.includes(by[u].route),exam:by[u].exam,ty:by[u].h.ty,fields:by[u].h.f}))});
   return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]]))}}
 
