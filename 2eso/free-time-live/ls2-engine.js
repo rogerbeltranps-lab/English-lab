@@ -634,7 +634,7 @@ var LS2 = (function () {
           sourceNode.connect(processor); processor.connect(audioCtx.destination); srBox = null; startSR();
           $('#recordStatus').textContent = ca() ? 'Gravant… parla ara.' : 'Recording… speak now.';
           $('#startRecord').disabled = true; $('#stopRecord').disabled = false; $('#downloadWav').disabled = true; $('#spAi').disabled = true;
-        } catch (e) { $('#startRecord').disabled = false; $('#recordStatus').textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de baix a l’esquerra.' : 'Microphone access was not available. See the message at the bottom left.'; }
+        } catch (e) { $('#startRecord').disabled = false; $('#recordStatus').textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; }
       };
       $('#stopRecord').onclick = async () => {
         if (!processor) return;
@@ -720,7 +720,7 @@ var LS2 = (function () {
               sourceNode = audioCtx.createMediaStreamSource(micStream); processor = audioCtx.createScriptProcessor(4096, 1, 1); pcm = [];
               processor.onaudioprocess = e => pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
               sourceNode.connect(processor); processor.connect(audioCtx.destination);
-            } catch (e) { btn('Start').disabled = false; st.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de baix a l’esquerra.' : 'Microphone access was not available. See the message at the bottom left.'; return; }
+            } catch (e) { btn('Start').disabled = false; st.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; return; }
             btn('Start').disabled = true; btn('Stop').disabled = false; btn('Wav').disabled = true; btn('Ai').disabled = true;
             if (tr.value.trim()) { tr.value = ''; sp.tr = ''; save(); }
             const me = ++run; let i = 0;
@@ -815,7 +815,7 @@ var LS2 = (function () {
             sourceNode = audioCtx.createMediaStreamSource(micStream); processor = audioCtx.createScriptProcessor(4096, 1, 1); pcm = [];
             processor.onaudioprocess = e => pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
             sourceNode.connect(processor); processor.connect(audioCtx.destination);
-          } catch (e) { recBtn.disabled = false; recMsg.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de baix a l’esquerra.' : 'Microphone access was not available. See the message at the bottom left.'; return; }
+          } catch (e) { recBtn.disabled = false; recMsg.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; return; }
           let rec = null, heard = ''; const SR = SRC();
           if (SR) try { rec = new SR(); rec.lang = 'en-GB'; rec.continuous = true; rec.interimResults = false; rec.onresult = e => { for (let k = e.resultIndex; k < e.results.length; k++) if (e.results[k].isFinal) heard += ' ' + e.results[k][0].transcript; }; rec.start(); } catch (e) { rec = null; }
           recStop.disabled = false; recMsg.textContent = ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.';
