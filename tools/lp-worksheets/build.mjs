@@ -35,7 +35,7 @@ const server = http.createServer((req, res) => {
   const f = path.join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/^\/English-lab\//, '/'));
   if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
   res.writeHead(200, { 'content-type': TYPES[path.extname(f)] || 'application/octet-stream' });
-  if (/data\/(native\/)?recall-checkpoint-\d+\.js$/.test(f)) return res.end(withKeys(fs.readFileSync(f, 'utf8')));
+  if (/data[\\/](native[\\/])?recall-checkpoint-\d+\.js$/.test(f)) return res.end(withKeys(fs.readFileSync(f, 'utf8')));
   fs.createReadStream(f).pipe(res);
 }).listen(0);
 const port = server.address().port;
