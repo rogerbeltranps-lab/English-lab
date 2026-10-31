@@ -1,0 +1,134 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//English Lab//Homework//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:English · 4ESO B
+X-WR-CALDESC:Homework, classes on your own and exams of 4ESO B (English Lab
+ )
+X-WR-TIMEZONE:Europe/Madrid
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VEVENT
+UID:4esob-4eso-seasons-and-celebrations-self-2026-10-27-140bvki@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261027
+DTEND;VALUE=DATE:20261028
+SUMMARY:📚 English class on your own: LP2 Celebrations around the world (
+ 1/2)
+DESCRIPTION:Your teacher is not in class today. Work on it on your own with
+  headphones and finish it at home.\nAvui el professor no hi és: treballa-
+ ho pel teu compte amb auriculars i acaba-ho a casa.\nSeasons & Celebration
+ s: https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:4esob-4eso-seasons-and-celebrations-hw-2026-11-04-x0h7hq@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261103
+DTEND;VALUE=DATE:20261104
+SUMMARY:🏠 English homework for Wed 4 Nov: LP3 Speaking and Talk\, then r
+ ecall checkpoint 2
+DESCRIPTION:LP3 Speaking and Talk\, then recall checkpoint 2\nFor the Engli
+ sh class on Wed 4 Nov · Per a la classe d'anglès del dc. 4 nov..\nSeason
+ s & Celebrations: https://rogerbeltranps-lab.github.io/English-lab/4eso/se
+ asons-and-celebrations/index.html\nMy board / El meu tauler: https://roger
+ beltranps-lab.github.io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:4esob-4eso-seasons-and-celebrations-self-2026-11-04-komfcy@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261104
+DTEND;VALUE=DATE:20261105
+SUMMARY:📚 English class on your own: LP5 Plan the day (1/2)
+DESCRIPTION:Your teacher is not in class today. Work on it on your own with
+  headphones and finish it at home.\nAvui el professor no hi és: treballa-
+ ho pel teu compte amb auriculars i acaba-ho a casa.\nSeasons & Celebration
+ s: https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:4esob-4eso-seasons-and-celebrations-hw-2026-11-10-deeiz0@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261109
+DTEND;VALUE=DATE:20261110
+SUMMARY:🏠 English homework for Tue 10 Nov: LP5 Speaking\, Talk and Liste
+ n again\, then recall checkpoint 3
+DESCRIPTION:LP5 Speaking\, Talk and Listen again\, then recall checkpoint 3
+ \nFor the English class on Tue 10 Nov · Per a la classe d'anglès del dt.
+  10 nov..\nSeasons & Celebrations: https://rogerbeltranps-lab.github.io/En
+ glish-lab/4eso/seasons-and-celebrations/index.html\nMy board / El meu taul
+ er: https://rogerbeltranps-lab.github.io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:4esob-4eso-seasons-and-celebrations-hw-2026-11-16-13ccvbm@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261111
+DTEND;VALUE=DATE:20261116
+SUMMARY:🏠 English homework for Mon 16 Nov: LP6 Speaking\, Talk and Liste
+ n again
+DESCRIPTION:LP6 Speaking\, Talk and Listen again\nFor the English class on 
+ Mon 16 Nov · Per a la classe d'anglès del dl. 16 nov..\nSeasons & Celebr
+ ations: https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-
+ celebrations/index.html\nMy board / El meu tauler: https://rogerbeltranps-
+ lab.github.io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:4esob-4eso-seasons-and-celebrations-exam-2026-11-23-1alhb@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261123
+DTEND;VALUE=DATE:20261124
+SUMMARY:📝 English exam · Seasons & Celebrations
+DESCRIPTION:Seasons & Celebrations: https://rogerbeltranps-lab.github.io/En
+ glish-lab/4eso/seasons-and-celebrations/index.html\nSample exam and summar
+ ies on my board / Examen de prova i resums al meu tauler: https://rogerbel
+ tranps-lab.github.io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/today.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:4esob-4eso-seasons-and-celebrations-self-2026-11-24-15ao97d@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261124
+DTEND;VALUE=DATE:20261125
+SUMMARY:📚 English class on your own: LP4 Research it right (1/2)
+DESCRIPTION:Your teacher is not in class today. Work on it on your own with
+  headphones and finish it at home.\nAvui el professor no hi és: treballa-
+ ho pel teu compte amb auriculars i acaba-ho a casa.\nSeasons & Celebration
+ s: https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:4esob-4eso-seasons-and-celebrations-hw-2026-12-15-1ch1nvl@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261214
+DTEND;VALUE=DATE:20261215
+SUMMARY:🏠 English homework for Tue 15 Dec: Step 5 Teamwork · Reflect
+DESCRIPTION:Step 5 Teamwork · Reflect\nFor the English class on Tue 15 Dec
+  · Per a la classe d'anglès del dt. 15 des..\nSeasons & Celebrations: ht
+ tps://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celebratio
+ ns/index.html\nMy board / El meu tauler: https://rogerbeltranps-lab.github
+ .io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
+ rations/index.html
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR
