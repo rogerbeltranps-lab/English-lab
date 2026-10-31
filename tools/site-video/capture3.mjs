@@ -212,6 +212,15 @@ await view('4ESOA');
 await page.goto(BASE + 'lab/index.html', { waitUntil: 'domcontentloaded' });
 await settle();
 await shot('70-english-lab');
+await step('games menu', async () => {
+  await page.locator('[data-lab-menu="games"]').click();
+  await page.waitForTimeout(700);
+  await top('#labGamesMenu', 120);
+  await shot('71-games-menu');
+});
+await page.goto(BASE + '4eso/my-real-routine/vocabulary-games.html', { waitUntil: 'domcontentloaded' });
+await settle();
+await shot('72-vocabulary-games');
 
 fs.writeFileSync(path.join(OUT, 'capture3-log.txt'), log.join('\n') + '\n');
 await browser.close();
