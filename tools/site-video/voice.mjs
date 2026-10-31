@@ -3,12 +3,14 @@
 // to redo a line, delete its mp3 first.
 // Usage: ELEVENLABS_API_KEY=... node tools/site-video/voice.mjs [only=l03,l08]
 //   EL_VOICE_ID (default: the voice named "Amelia" in the account), EL_MODEL (default eleven_v3), EL_SPEED (default 0.95)
+//   EL_LANG=ca reads each line's Catalan text (the Catalan version), EL_OUT = output folder name next to this file (default voice)
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
-const OUT = path.join(DIR, 'voice');
+const LANG = process.env.EL_LANG === 'ca' ? 'ca' : 'en';
+const OUT = path.join(DIR, process.env.EL_OUT || 'voice');
 const KEY = process.env.ELEVENLABS_API_KEY;
 if (!KEY) { console.error('Set ELEVENLABS_API_KEY'); process.exit(1); }
 const MODEL = process.env.EL_MODEL || 'eleven_v3';
@@ -32,9 +34,9 @@ const before = await sub();
 console.log('credits left before:', before);
 
 const todo = script.lines.filter((l) => (!only.length || only.includes(l.id)) && !fs.existsSync(path.join(OUT, l.id + '.mp3')));
-console.log(todo.length, 'lines,', todo.reduce((s, l) => s + l.en.length, 0), 'characters');
+console.log(todo.length, 'lines,', todo.reduce((s, l) => s + l[LANG].length, 0), 'characters');
 for (const l of todo) {
-  const body = { text: l.en, model_id: MODEL, voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: SPEED } };
+  const body = { text: l[LANG], model_id: MODEL, voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: SPEED } };
   let r = await api(`/v1/text-to-speech/${voice}?output_format=mp3_44100_128`, { method: 'POST', body: JSON.stringify(body) });
   if (r.status === 400 || r.status === 422) {   // a model that does not take speed: try once without it
     delete body.voice_settings.speed;
@@ -42,8 +44,8 @@ for (const l of todo) {
   }
   if (!r.ok) { console.error(l.id, r.status, await r.text()); process.exit(1); }
   fs.writeFileSync(path.join(OUT, l.id + '.mp3'), Buffer.from(await r.arrayBuffer()));
-  console.log('ok', l.id, l.en.length);
+  console.log('ok', l.id, l[LANG].length);
 }
 const after = await sub();
 console.log('credits left after:', after, '· used:', before - after);
-fs.writeFileSync(path.join(OUT, 'voice-log.txt'), `model ${MODEL} · voice ${voice} · speed ${SPEED}\ncredits before ${before} · after ${after} · used ${before - after}\n`);
+fs.writeFileSync(path.join(OUT, 'voice-log.txt'), `model ${MODEL} · voice ${voice} · speed ${SPEED} · ${LANG}\ncredits before ${before} · after ${after} · used ${before - after}\n`);
