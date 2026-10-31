@@ -1,6 +1,6 @@
 /* 2 ESO · LS2 Free Time, Live! · Learning Path 3 · Now or usually? (Present Simple vs Present Continuous; listening chart = LS criterion 2.2) */
 window.LP = {
-  key: 'ls2NowUsually2ESO', n: 3, title: 'Now or usually?',
+  key: 'ls2NowUsually2ESO', n: 3, starter: true, title: 'Now or usually?',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 1 i 2', en: 'Recall: Learning Paths 1 and 2' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -21,7 +21,7 @@ window.LP = {
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Ara o normalment: expressions de temps', en: 'Now or usually: time expressions' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'livestream · subscribers · highlights',
-      core: { insecure: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer'], safe: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'go to a concert', 'watch a match', 'temperature'], daring: ['now', 'right now', 'at the moment', 'this weekend', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'watch a match', 'temperature', 'know', 'need', 'want', 'prefer', 'believe', 'understand', 'mean'] },
+      core: { beginners: ['now', 'right now', 'today', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never'], insecure: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer'], safe: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'go to a concert', 'watch a match', 'temperature'], daring: ['now', 'right now', 'at the moment', 'this weekend', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'watch a match', 'temperature', 'know', 'need', 'want', 'prefer', 'believe', 'understand', 'mean'] },
       groups: [
         { g: 'Now (Present Continuous)', items: [['now', 'ara', 'I’m at home now.'], ['right now', 'ara mateix', 'Right now I’m watching a match.'], ['at the moment', 'en aquest moment', 'At the moment she’s training.'], ['today', 'avui', 'Today we’re playing inside.'], ['this weekend', 'aquest cap de setmana', 'This weekend I’m going to a concert.'], ['Look! / Listen!', 'Mira! / Escolta!', 'Look! It’s snowing!']] },
         { g: 'Usually (Present Simple)', items: [['usually', 'normalment', 'I usually play on Saturdays.'], ['on Saturday mornings', 'els dissabtes al matí', 'We train on Saturday mornings.'], ['every weekend', 'cada cap de setmana', 'He goes cycling every weekend.'], ['always / never', 'sempre / mai', 'She never gets up late.'], ['in winter / in summer', 'a l’hivern / a l’estiu', 'In winter we go skating.']] },
@@ -86,6 +86,15 @@ window.LP = {
         safe: ['I watched each video twice', 'I wrote what each vlogger is doing now and usually does', 'I wrote two details per video and said which words or images helped me'],
         daring: ['I watched each video twice', 'I wrote what each vlogger is doing now and usually does, with precise details', 'I compared the two vloggers']
       } },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Mei: Saturday at the ice rink', en: 'Shadowing · Mei: Saturday at the ice rink' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Mei: Saturday at the ice rink', video: true, poster: 'video/mei-ice-rink-poster.jpg', src: 'video/mei-ice-rink.mp4', slow: 'video/mei-ice-rink-slow.mp4', t: [0.7, 28.35], ts: [0.7, 34.3], lines: [
+        ['Mei', 'Hi everyone, I\'m Mei, and welcome to my Saturday vlog!'],
+        ['Mei', 'Right now I\'m at the ice rink in the town square.'],
+        ['Mei', 'It\'s December, so it\'s really cold, about three degrees, and it\'s cloudy.'],
+        ['Mei', 'I\'m wearing a woolly hat, gloves and a big red jacket.'],
+        ['Mei', 'Look! My brother Kai is skating behind me, and he\'s falling… again!'],
+        ['Mei', 'I usually come here on Sunday afternoons with my family, just for fun.']] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple o Present Continuous?', en: 'Present Simple or Present Continuous?' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [

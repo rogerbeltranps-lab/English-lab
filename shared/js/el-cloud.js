@@ -400,6 +400,14 @@ onAuthStateChanged(auth,async u=>{
       seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().examSeen||{}},
       save:(ls,v)=>setDoc(doc(db,"students",u.uid),{examSeen:{[ls]:v}},{merge:true}),
       visible:async ls=>{const i=await lsInfo(ls);return i.status!=="hidden"&&elLsForGroup((window.EL_LS||[]).find(x=>x.id===ls),i,myGroup)}})).catch(e=>console.warn("exam notice",e));
+  // The teacher's corrections and answers to hand-ins: a card once per new answer with a link to the step's tab, and the answer inside
+  // that tab on the learning path (shared/js/el-corrections.js).
+  if(u&&isStudent(u)&&!document.getElementById("el-corrections"))loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
+    .then(()=>import("./el-corrections.js")).then(m=>m.corrections({here:actId,root:ROOT,en:repEn(),
+      list:async()=>(await getDocs(collection(db,"students",u.uid,"results"))).docs.map(x=>x.data()).filter(r=>r&&r.activity&&(r.replies||r.levels)),
+      seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().fbSeen||{}},
+      save:o=>setDoc(doc(db,"students",u.uid),{fbSeen:o},{merge:true}),
+      name:(aid,step)=>{for(const g of Object.values(window.EL_GRADING||{})){const x=(g.moments||[]).find(m=>m.a===aid&&m.step===step);if(x)return x.name}return null}})).catch(e=>console.warn("corrections",e));
   // "Your level": a card once each time the teacher sets the student's route (shared/js/el-level-notice.js).
   if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-level-notice"))import("./el-level-notice.js").then(m=>m.levelNotice({course:courseOf(myGroup),
     lv:async()=>{const o={};(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>o[d.id]=d.data());return o},

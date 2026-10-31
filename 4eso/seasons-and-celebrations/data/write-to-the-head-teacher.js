@@ -1,6 +1,6 @@
 /* LS2 · Learning Path 6 · Write to the head teacher (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
-  key: 'ls2Email4ESO', n: 6, title: 'Write to the head teacher',
+  key: 'ls2Email4ESO', n: 6, starter: true, title: 'Write to the head teacher',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 3–5', en: 'Recall: Learning Paths 3–5' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -18,7 +18,7 @@ window.LP = {
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Llenguatge del correu formal', en: 'Formal email language' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
-      core: { insecure: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely'], safe: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely', 'Dear Mr / Ms…', 'I am writing to propose…', 'Our plan includes…', 'Could we use…?', 'Please let us know if…', 'I look forward to hearing from you', 'Kind regards'], daring: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely', 'Dear Mr / Ms…', 'I am writing to propose…', 'Our plan includes…', 'Could we use…?', 'Please let us know if…', 'I look forward to hearing from you', 'Kind regards', 'request', 'propose', 'ensure', 'appreciate', 'consider', 'I would be grateful if you could…', 'We would appreciate the opportunity to…'] },
+      core: { beginners: ['Dear…', 'We would like to…', 'Yours sincerely'], insecure: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely'], safe: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely', 'Dear Mr / Ms…', 'I am writing to propose…', 'Our plan includes…', 'Could we use…?', 'Please let us know if…', 'I look forward to hearing from you', 'Kind regards'], daring: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely', 'Dear Mr / Ms…', 'I am writing to propose…', 'Our plan includes…', 'Could we use…?', 'Please let us know if…', 'I look forward to hearing from you', 'Kind regards', 'request', 'propose', 'ensure', 'appreciate', 'consider', 'I would be grateful if you could…', 'We would appreciate the opportunity to…'] },
       groups: [
         { g: 'Email chunks', items: [['Dear…', 'Benvolgut/da…', 'Dear Ms Puig,'], ['I am writing to…', 'Us escric per…', 'I am writing to propose a celebration day.'], ['We would like to…', 'Ens agradaria…', 'We would like to organise an event.'], ['Yours sincerely', 'Atentament', 'Yours sincerely, Omar']] },
         { r: 'safe', g: 'Formal email (Safe)', items: [['Dear Mr / Ms…', 'Benvolgut Sr. / Benvolguda Sra.…', 'Dear Mr Roca,'], ['I am writing to propose…', 'Us escric per proposar…', 'I am writing to propose an event.'], ['Our plan includes…', 'El nostre pla inclou…', 'Our plan includes four stalls.'], ['Could we use…?', 'Podríem fer servir…?', 'Could we use the hall?'], ['Please let us know if…', 'Si us plau, feu-nos saber si…', 'Please let us know if you need more information.'], ['I look forward to hearing from you', 'Espero la vostra resposta', 'I look forward to hearing from you.'], ['Kind regards', 'Salutacions cordials', 'Kind regards, Laia']] },
@@ -67,6 +67,7 @@ window.LP = {
         { q: 'Can we have the hall?', o: ['Could we use the school hall?', 'Give us the hall.', 'Hall for us?'] },
         { q: 'Write back soon!', o: ['I look forward to hearing from you.', 'Answer quick!', 'Bye, write soon!'] },
         { q: 'Bye!', o: ['Yours sincerely,', 'See ya!', 'Love,'] },
+        { r: 'insecure', only: ['insecure'], q: 'I’m writing ’cause we want a party.', o: ['I am writing to propose a celebration day.', 'I’m writing ’cause we want a party.', 'We want a party, OK?'] },
         { r: 'safe', q: 'Tell us if you need more stuff.', o: ['Please let us know if you need more information.', 'Tell us if you want more stuff.', 'Need more stuff? Tell us.'] },
         { r: 'daring', q: 'Answer before Friday, OK?', o: ['I would be grateful if you could reply before Friday.', 'Reply before Friday, OK?', 'You must answer before Friday.'] }
       ] },
@@ -103,10 +104,23 @@ window.LP = {
         { r: 'daring', q: 'Which request to the head teacher does the meeting suggest?', o: ['permission to use the hall and the gym', 'money for a new band', 'a whole week without classes'] },
         { r: 'daring', q: '“We’re sending them on Wednesday.” Which is the best formal version for the email?', o: ['The invitations will be sent on Wednesday.', 'We’re gonna send them Wednesday.', 'Invitations on Wednesday, OK?'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Student council meeting', en: 'Shadowing · Student council meeting' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Student council meeting', src: 'audio/student-council-meeting.mp3', slow: 'audio/student-council-meeting-slow.mp3', t: [34.75, 70.19], ts: [43.75, 88.17], lines: [
+        ['Laia', 'Great. And music?'],
+        ['Omar', 'My cousin plays in a band. I’ll call him tonight.'],
+        ['Laia', 'Perfect. Who’s going to put up the decorations?'],
+        ['Omar', 'Class 4B is going to make paper lanterns in Art.'],
+        ['Laia', 'And the invitations?'],
+        ['Omar', 'We’re sending them on Wednesday. We’re going to invite families and the primary school.'],
+        ['Laia', 'OK. One problem: the hall is small. What if it rains and everyone is inside?'],
+        ['Omar', 'Don’t worry. We’ll use the gym too.'],
+        ['Laia', 'Good idea. I think it’ll be the best day of the term!']] } },
     { id: 'grammar', type: 'typed', mode: 'say', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Peticions educades', en: 'Polite requests' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa.', en: 'Read how it works and complete.' },
       explain: [
         { ca: '<strong>would like to</strong> + verb per demanar amb educació: <em>We would like to organise…</em>', en: '<strong>would like to</strong> + verb: <em>We would like to organise…</em>' },
+        { r: 'insecure', only: ['insecure'], ca: '<strong>I am writing to</strong> + verb per dir per què escrius: <em>I am writing to propose a celebration day.</em>', en: '<strong>I am writing to</strong> + verb: <em>I am writing to propose…</em>' },
         { r: 'safe', en: 'Polite requests: <em>Could we…? · Would it be possible to…?</em>' },
         { r: 'daring', en: '<em>look forward to</em> + -ing (<em>We look forward to welcoming families.</em>) · concession to answer a concern (<em>Although some families do not celebrate Diwali, the event will be about learning, not belief.</em>)' }
       ],
@@ -114,6 +128,8 @@ window.LP = {
         { q: 'We would like ___ ___ (invite) families.', a: ['to invite'], ca: 'would like + to + verb.', en: 'would like + to + verb.' },
         { q: 'I would like ___ ___ (explain) our idea.', a: ['to explain'], ca: 'would like + to + verb.', en: 'would like + to + verb.' },
         { q: 'We would ___ to use the hall.', a: ['like'], ca: 'would like to.', en: 'would like to.' },
+        { r: 'insecure', only: ['insecure'], q: 'I am writing ___ ___ (propose) a celebration day.', a: ['to propose'], ca: 'I am writing + to + verb.', en: 'I am writing + to + verb.' },
+        { r: 'insecure', only: ['insecure'], q: 'We ___ ___ to use the school hall on 18 December. (ens agradaria)', a: ['would like'], ca: 'would like to per demanar.', en: 'would like to.' },
         { r: 'safe', q: '___ it be possible to start at 10.00?', a: ['would'], en: 'Would it be possible to…?' },
         { r: 'safe', q: '___ we put up posters in the corridor?', a: ['could'], en: 'Could we…?' },
         { r: 'daring', q: 'We look forward to ___ (welcome) families.', a: ['welcoming'], en: 'look forward to + -ing.' },

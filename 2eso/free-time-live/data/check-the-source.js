@@ -1,6 +1,6 @@
 /* 2 ESO · LS2 Free Time, Live! · Learning Path 4 · Check the source (LS criteria 4.2 and 6.2; term 2, before the final product) */
 window.LP = {
-  key: 'ls2Source2ESO', n: 4, title: 'Check the source',
+  key: 'ls2Source2ESO', n: 4, starter: true, title: 'Check the source',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2 i 3', en: 'Recall: Learning Paths 2 and 3' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -20,7 +20,7 @@ window.LP = {
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Tecnologia i pantalles', en: 'Technology and screens' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'livestream · subscribers · highlights',
-      core: { insecure: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message'], safe: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message', 'upload a video', 'follow a channel', 'download an app', 'search online', 'check a website', 'screen time', 'social media'], daring: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message', 'upload a video', 'follow a channel', 'download an app', 'search online', 'check a website', 'screen time', 'social media', 'a reliable source', 'the author', 'up to date', 'an advert', 'credit a source'] },
+      core: { beginners: ['watch videos', 'take photos', 'chat with friends', 'send a message'], insecure: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message'], safe: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message', 'upload a video', 'follow a channel', 'download an app', 'search online', 'check a website', 'screen time', 'social media'], daring: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message', 'upload a video', 'follow a channel', 'download an app', 'search online', 'check a website', 'screen time', 'social media', 'a reliable source', 'the author', 'up to date', 'an advert', 'credit a source'] },
       groups: [
         { g: 'Technology', items: [['watch videos', 'mirar vídeos', 'I watch videos about skating.'], ['play online', 'jugar en línia', 'He plays online with his cousins.'], ['chat with friends', 'xatejar amb amics', 'We chat with friends after school.'], ['take photos', 'fer fotos', 'She takes photos of her dog.'], ['record a video', 'gravar un vídeo', 'I’m recording a video for my vlog.'], ['send a message', 'enviar un missatge', 'Send me a message when you arrive.']] },
         { r: 'safe', g: 'Online (Safe)', items: [['upload a video', 'pujar un vídeo', 'We upload a video every Sunday.'], ['follow a channel', 'seguir un canal', 'I follow a climbing channel.'], ['download an app', 'descarregar una app', 'Download the app to see the results.'], ['search online', 'buscar en línia', 'Search online for the club’s website.'], ['check a website', 'consultar una web', 'Check the website for the times.'], ['screen time', 'temps de pantalla', 'My screen time is two hours a day.'], ['social media', 'xarxes socials', 'The club is on social media.']] },
@@ -108,6 +108,12 @@ window.LP = {
         { r: 'daring', q: 'Why is a live radio report good for some facts but not for others?', o: ['It’s good for what is happening now, but it mixes facts and opinions and the match isn’t finished.', 'It’s never good because the reporters are students.', 'It’s good for everything because it’s live.'] },
         { r: 'daring', q: 'What do you need to add to use this report in your fact file?', o: ['the name of the source and the date', 'the reporters’ favourite team', 'nothing: radio doesn’t need a credit'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Live from the sports hall', en: 'Shadowing · Live from the sports hall' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Live from the sports hall', src: 'audio/live-from-the-sports-hall.mp3', slow: 'audio/live-from-the-sports-hall-slow.mp3', t: [37.04, 69.96], ts: [42.83, 80.96], lines: [
+        ['Sam', 'And the match is starting! Number seven, Marc, has the ball. He’s running… he’s jumping… and he scores! Two points for the Blue Team!'],
+        ['Emma', 'Marc usually plays as a defender, but today he’s playing as a forward. And it’s working!'],
+        ['Sam', 'Now the Green Team has the ball. Their captain, Júlia, is passing to number four… she’s shooting… and she misses. The Blue Team is winning, six to two.']] } },
     { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: d’on ho has tret?', en: 'Talk: where did you find it?' },
       intro: { ca: 'El teu company de vlog et pregunta per la font de la teva fitxa.', en: 'Your vlog buddy asks you about the source for your fact file.' },
       task: { beginners: 'Respon amb frases curtes: el nom de la web, qui l’ha escrit i si és fiable.', insecure: 'Respon amb frases completes sobre la teva font: el nom, qui l’ha escrit, la data i si és fiable.', safe: 'Answer about your real source. Give reasons: who wrote it, when, and one fact you found.', daring: 'Answer about your real source, give reasons and say how you checked a fact in a second source.' },

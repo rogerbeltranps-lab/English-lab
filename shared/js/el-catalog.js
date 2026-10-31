@@ -36,11 +36,12 @@ window.EL_GROUPS=[{id:"2ESOA",course:"2eso",name:"2ESO A"},{id:"2ESOB",course:"2
 // Is an LS assigned to a group? ls/{id}.groups lists the groups (set in the teacher dashboard); without it, every group of the LS's course.
 window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=>x.id===gid);if(!g||!ls)return false;return info&&Array.isArray(info.groups)?info.groups.includes(gid):g.course===ls.course};
 // study (optional): start of the path of the vocabulary and grammar summary PDFs; the board adds the route + ".pdf".
+// shadowing (optional): the LS's shadowing video (tools/shadowing-video), the same for every route: on the board next to the summary and in the dashboard's Materials tab.
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine",study:"2eso/my-real-routine/downloads/ls1-vocabulary-grammar-"},
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine",study:"4eso/my-real-routine/downloads/ls1-vocabulary-grammar-",pro:true},
-  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true},
-  {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-"}
+  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4"},
+  {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",shadowing:"2eso/free-time-live/video/shadowing.mp4"}
 ];
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";
@@ -68,12 +69,12 @@ window.EL_CATALOG=(function(){
         L("getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["4.1","2.2"],"ls2GettingStarted4ESO",5,{graded:false}),
         L("celebrations-around-the-world.html","Celebrations around the world",["4.1","2.2","5.1","3.2","1.1"],"ls2Celebrations4ESO",9,{skip:["write"],steps:[["log","Reading log"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint14ESO",1,C),
-        L("where-traditions-come-from.html","Where traditions come from",["2.2","5.1","1.2","3.2"],"ls2Traditions4ESO",9,{skip:["write"],steps:[["chart","Listening chart"],["talk","Talk"]]}),
+        L("where-traditions-come-from.html","Where traditions come from",["2.2","5.1","1.2","3.2"],"ls2Traditions4ESO",10,{skip:["write"],steps:[["chart","Listening chart"],["talk","Talk"]]}),
         L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1","5.1"],"ls2Checkpoint24ESO",1,C),
-        L("research-it-right.html","Research it right",["4.2","6.1","1.2","CC3 3.2"],"ls2Research4ESO",9,{steps:[["card","Research card"],["talk","Talk"]]}),
-        L("plan-the-day.html","Plan the day",["2.2","5.1","3.2","CC1 1.3"],"ls2Plan4ESO",9,{skip:["write"],steps:[["talk","Talk"]]}),
+        L("research-it-right.html","Research it right",["4.2","6.1","1.2","CC3 3.2"],"ls2Research4ESO",10,{steps:[["card","Research card"],["talk","Talk"]]}),
+        L("plan-the-day.html","Plan the day",["2.2","5.1","3.2","CC1 1.3"],"ls2Plan4ESO",10,{skip:["write"],steps:[["talk","Talk"]]}),
         L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint34ESO",1,C),
-        L("write-to-the-head-teacher.html","Write to the head teacher",["4.1","5.1","3.2","CC1 1.3"],"ls2Email4ESO",9,{skip:["write"],steps:[["talk","Talk"]]}),
+        L("write-to-the-head-teacher.html","Write to the head teacher",["4.1","5.1","3.2","CC1 1.3"],"ls2Email4ESO",10,{skip:["write"],steps:[["talk","Talk"]]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint44ESO",1,C),
         L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam4ESO",7,{graded:false}),
         L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","3.2","4.2","5.1","6.1","CC1 1.3","CC3 3.2"],"ls2FinalProduct4ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
@@ -86,14 +87,14 @@ window.EL_CATALOG=(function(){
       const C={mode:"practice",checkpoint:true};   // recall checkpoint: opens the way to what comes after it (elCheckpointMissing)
       return [
         L("getting-started.html","Getting started: what do you do in your free time? (warm-up)",["4.1","2.2"],"ls2GettingStarted2ESO",6,{graded:false}),
-        L("what-are-they-doing.html","What are they doing?",["4.1","2.2","5.1","3.2"],"ls2Doing2ESO",11,{skip:["write"],steps:[["log","Reading log"],["talk","Talk"]]}),
+        L("what-are-they-doing.html","What are they doing?",["4.1","2.2","5.1","3.2"],"ls2Doing2ESO",12,{skip:["write"],steps:[["log","Reading log"],["talk","Talk"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint12ESO",1,C),
-        L("now-or-usually.html","Now or usually?",["2.2","5.1","3.2"],"ls2NowUsually2ESO",9,{skip:["write"],steps:[["chart","Listening chart"],["talk","Talk"]]}),
+        L("now-or-usually.html","Now or usually?",["2.2","5.1","3.2"],"ls2NowUsually2ESO",10,{skip:["write"],steps:[["chart","Listening chart"],["talk","Talk"]]}),
         L("recall-checkpoint-2.html","Recall checkpoint 2",["4.1","5.1"],"ls2Checkpoint22ESO",1,C),
-        L("check-the-source.html","Check the source",["4.2","6.2"],"ls2Source2ESO",9,{steps:[["factfile","Fact file"],["talk","Talk"]]}),
-        L("likes-and-screen-tips.html","Likes and screen tips",["2.2","5.1","3.2","CD4 4.5"],"ls2Tips2ESO",9,{skip:["write"],steps:[["talk","Talk"]]}),
+        L("check-the-source.html","Check the source",["4.2","6.2"],"ls2Source2ESO",10,{steps:[["factfile","Fact file"],["talk","Talk"]]}),
+        L("likes-and-screen-tips.html","Likes and screen tips",["2.2","5.1","3.2","CD4 4.5"],"ls2Tips2ESO",10,{skip:["write"],steps:[["talk","Talk"]]}),
         L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint32ESO",1,C),
-        L("write-your-vlog-script.html","Write your vlog script",["4.1","5.1","3.2"],"ls2Script2ESO",9,{skip:["write"],steps:[["talk","Talk"]]}),
+        L("write-your-vlog-script.html","Write your vlog script",["4.1","5.1","3.2"],"ls2Script2ESO",10,{skip:["write"],steps:[["talk","Talk"]]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint42ESO",1,C),
         L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam2ESO",7,{graded:false}),
         L("free-time-vlog.html","Final product: Free Time Vlog",["3.2","4.2","5.1","6.2","CD2 2.2","CD4 4.5"],"ls2FinalProduct2ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["slides","2 · My slides"],["script","3 · My script"],["edit","4 · Record and edit"],["feedback","Feedback for my buddy"],["tips","5 · My tip"]],pieces:"ls2Products2ESO"}),
@@ -160,10 +161,10 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
   Object.assign(window.EL_ACTIONS,{
     "4eso/ls2-getting-started":["recall","words","read","listen","speak"],
     "4eso/ls2-celebrations-around-the-world":[...LP,"read","log","listen","grammar","mixed","write","speak"],
-    "4eso/ls2-where-traditions-come-from":[...LP,"listen","chart","grammar","mixed","write","speak","talk"],
-    "4eso/ls2-research-it-right":["recall","read","sources","respect","notes","credit","again","talk","card"],
-    "4eso/ls2-plan-the-day":[...LP,"listen","again","grammar","mixed","write","speak","talk"],
-    "4eso/ls2-write-to-the-head-teacher":[...LP,"read","register","again","grammar","write","speak","talk"],
+    "4eso/ls2-where-traditions-come-from":[...LP,"listen","chart","shadow","grammar","mixed","write","speak","talk"],
+    "4eso/ls2-research-it-right":["recall","read","sources","respect","notes","credit","again","shadow","talk","card"],
+    "4eso/ls2-plan-the-day":[...LP,"listen","again","shadow","grammar","mixed","write","speak","talk"],
+    "4eso/ls2-write-to-the-head-teacher":[...LP,"read","register","again","shadow","grammar","write","speak","talk"],
     "4eso/ls2-recall-checkpoint-1":["check"],"4eso/ls2-recall-checkpoint-2":["check"],"4eso/ls2-recall-checkpoint-3":["check"],"4eso/ls2-recall-checkpoint-4":["check"],
     "4eso/ls2-sample-exam":["listen","chart","read","log","vocab","grammar","write"],
     "4eso/ls2-celebration-day-proposal":["video","email","submit"],
@@ -172,14 +173,14 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
   // Revised programme (24 Oct 2026): 2.1, 3.1, 6.2 and CE2 2.3 are no longer LS2 criteria, so speaking steps practise the pitch (3.2).
   // Four skills (Roger, 30 Oct 2026): Use of English steps heard (practice and grammar, "listen and complete") give 2.2 + 5.1; said steps ("say it") and Talk give 3.2.
   // Cards (4 ESO LP3–LP6, 2 ESO LP2–LP6): the card asks the student to say the word aloud before turning it, so they give 4.1 + 3.2 (Roger, 30 Oct 2026: paths students had started stay as they were).
-  const LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"];
+  const LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"],SH=["2.2","3.2"];   // shadowing: half listening, half speaking
   window.EL_STEP_CRITERIA={
     "4eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
     "4eso/ls2-celebrations-around-the-world":{read:["4.1"],log:["4.1"],listen:["2.2"],write:["5.1"],speak:["3.2","1.1"]},
-    "4eso/ls2-where-traditions-come-from":{cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","1.2"],speak:["3.2","1.2"],talk:S},
-    "4eso/ls2-research-it-right":{read:["4.2"],sources:["4.2"],respect:["1.2","CC3 3.2"],notes:["6.1"],credit:["6.1"],again:["2.2"],talk:S,card:["4.2","6.1","CC3 3.2"]},
-    "4eso/ls2-plan-the-day":{cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CC1 1.3"],speak:["3.2"],talk:S},
-    "4eso/ls2-write-to-the-head-teacher":{cards:RS,read:["4.1"],register:["5.1"],again:["2.2"],practice:LW,grammar:S,write:["5.1","CC1 1.3"],speak:["3.2"],talk:S},
+    "4eso/ls2-where-traditions-come-from":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","1.2"],speak:["3.2","1.2"],talk:S},
+    "4eso/ls2-research-it-right":{shadow:SH,read:["4.2"],sources:["4.2"],respect:["1.2","CC3 3.2"],notes:["6.1"],credit:["6.1"],again:["2.2"],talk:S,card:["4.2","6.1","CC3 3.2"]},
+    "4eso/ls2-plan-the-day":{shadow:SH,cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CC1 1.3"],speak:["3.2"],talk:S},
+    "4eso/ls2-write-to-the-head-teacher":{shadow:SH,cards:RS,read:["4.1"],register:["5.1"],again:["2.2"],practice:LW,grammar:S,write:["5.1","CC1 1.3"],speak:["3.2"],talk:S},
     "4eso/ls2-recall-checkpoint-1":ck,"4eso/ls2-recall-checkpoint-2":ck,"4eso/ls2-recall-checkpoint-3":ck,"4eso/ls2-recall-checkpoint-4":ck,
     "4eso/ls2-sample-exam":{listen:["2.2"],chart:["2.2"],read:["4.1"],log:["4.1"],write:["5.1"]},
     "4eso/ls2-celebration-day-proposal":{video:["3.2","1.1","1.2","CC3 3.2"],email:["5.1","CC1 1.3"],submit:[]},
@@ -188,14 +189,14 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
 })();
 // LS2 2ESO Free Time, Live!: steps per page and the criterion each step gives evidence for (docs/2eso/ls2-free-time-live/assessment-criteria.md).
 (function(){
-  const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]},LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"];
+  const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]},LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"],SH=["2.2","3.2"];
   Object.assign(window.EL_ACTIONS,{
     "2eso/ls2-getting-started":[...LP,"read","listen","speak"],
-    "2eso/ls2-what-are-they-doing":[...LP,"read","log","listen","again","grammar","mixed","write","speak","talk"],
-    "2eso/ls2-now-or-usually":[...LP,"listen","chart","grammar","mixed","write","speak","talk"],
-    "2eso/ls2-check-the-source":[...LP,"read","sources","credit","again","talk","factfile"],
-    "2eso/ls2-likes-and-screen-tips":[...LP,"listen","again","grammar","mixed","write","speak","talk"],
-    "2eso/ls2-write-your-vlog-script":[...LP,"read","parts","again","grammar","write","speak","talk"],
+    "2eso/ls2-what-are-they-doing":[...LP,"read","log","listen","again","shadow","grammar","mixed","write","speak","talk"],
+    "2eso/ls2-now-or-usually":[...LP,"listen","chart","shadow","grammar","mixed","write","speak","talk"],
+    "2eso/ls2-check-the-source":[...LP,"read","sources","credit","again","shadow","talk","factfile"],
+    "2eso/ls2-likes-and-screen-tips":[...LP,"listen","again","shadow","grammar","mixed","write","speak","talk"],
+    "2eso/ls2-write-your-vlog-script":[...LP,"read","parts","again","shadow","grammar","write","speak","talk"],
     "2eso/ls2-recall-checkpoint-1":["check"],"2eso/ls2-recall-checkpoint-2":["check"],"2eso/ls2-recall-checkpoint-3":["check"],"2eso/ls2-recall-checkpoint-4":["check"],
     "2eso/ls2-sample-exam":["listen","chart","read","log","vocab","grammar","write"],
     "2eso/ls2-free-time-vlog":["video","submit"],
@@ -203,11 +204,11 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
   });
   Object.assign(window.EL_STEP_CRITERIA,{
     "2eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
-    "2eso/ls2-what-are-they-doing":{cards:RS,read:["4.1"],log:["4.1"],listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
-    "2eso/ls2-now-or-usually":{cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
-    "2eso/ls2-check-the-source":{cards:RS,read:["4.2"],sources:["4.2"],credit:["6.2"],practice:LW,again:["2.2"],talk:S,factfile:["4.2","6.2"]},
-    "2eso/ls2-likes-and-screen-tips":{cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CD4 4.5"],speak:["3.2","CD4 4.5"],talk:S},
-    "2eso/ls2-write-your-vlog-script":{cards:RS,read:["4.1"],parts:["5.1"],again:["2.2"],practice:LW,grammar:S,write:["5.1"],speak:["3.2"],talk:S},
+    "2eso/ls2-what-are-they-doing":{shadow:SH,cards:RS,read:["4.1"],log:["4.1"],listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
+    "2eso/ls2-now-or-usually":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
+    "2eso/ls2-check-the-source":{shadow:SH,cards:RS,read:["4.2"],sources:["4.2"],credit:["6.2"],practice:LW,again:["2.2"],talk:S,factfile:["4.2","6.2"]},
+    "2eso/ls2-likes-and-screen-tips":{shadow:SH,cards:RS,listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","CD4 4.5"],speak:["3.2","CD4 4.5"],talk:S},
+    "2eso/ls2-write-your-vlog-script":{shadow:SH,cards:RS,read:["4.1"],parts:["5.1"],again:["2.2"],practice:LW,grammar:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-recall-checkpoint-1":ck,"2eso/ls2-recall-checkpoint-2":ck,"2eso/ls2-recall-checkpoint-3":ck,"2eso/ls2-recall-checkpoint-4":ck,
     "2eso/ls2-sample-exam":{listen:["2.2"],chart:["2.2"],read:["4.1"],log:["4.1"],write:["5.1"]},
     "2eso/ls2-free-time-vlog":{video:["3.2","CD2 2.2"],submit:[]},

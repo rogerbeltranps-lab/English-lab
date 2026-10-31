@@ -1,4 +1,6 @@
-/* 2 ESO · LS2 Free Time, Live! · Recall checkpoint 1. The first attempt is sent to the teacher dashboard as parts.first. */
+/* 2 ESO · LS2 Free Time, Live! · Recall checkpoint 1 (approved content).
+   Secure checkpoint (Roger, 31 Oct 2026; shared/js/el-checkpoint.js): no answers or hints here (a hint can give the answer away). The key and the hints are in cpKeys/ls2Checkpoint12ESO (teacher only),
+   uploaded with tools/checkpoint-keys/upload-keys.mjs from a file kept outside the repo. Each item has a stable id. */
 window.LP = {
  "key": "ls2Checkpoint12ESO",
  "n": "C1",
@@ -13,133 +15,81 @@ window.LP = {
     "en": "Checkpoint 1: LS1, Getting started and What are they doing?"
    },
    "pill": {
-    "ca": "Sense apunts · 5–8 min",
-    "en": "No notes · 5–8 min"
+    "ca": "Sense apunts · una pregunta cada vegada",
+    "en": "No notes · one question at a time"
    },
    "intro": {
-    "ca": "Respon sense apunts ni ajuda i fes-ho tan bé com puguis. Després llegeix el feedback i repassa el que has fallat. Quan l’acabis, s’obrirà el següent Learning Path.",
-    "en": "Answer with no notes or help, and do your best. Then read the feedback and review what you missed. When you finish it, the next Learning Path opens."
+    "ca": "Respon sense apunts ni ajuda: una pregunta cada vegada, sense tornar enrere. Queda’t en aquesta pàgina fins que l’enviïs. Quan l’enviïs, s’obrirà el següent Learning Path.",
+    "en": "Answer with no notes or help: one question at a time, with no going back. Stay on this page until you send it. When you send it, the next Learning Path opens."
+   },
+   "secure": {
+    "secs": 45
    },
    "items": [
     {
+     "id": "c1-01",
      "r": "beginners",
-     "q": "She ___ (get) up at seven every day.",
-     "a": [
-      "gets"
-     ],
-     "ca": "Repassa: LS1.",
-     "en": "Review: LS1."
+     "q": "She ___ (get) up at seven every day."
     },
     {
+     "id": "c1-02",
      "r": "insecure",
-     "q": "___ you play the piano? — No, I don’t.",
-     "a": [
-      "do"
-     ],
-     "ca": "Repassa: LS1 / LP1.",
-     "en": "Review: LS1 / LP1."
+     "q": "___ you play the piano? — No, I don’t."
     },
     {
+     "id": "c1-03",
      "r": "beginners",
-     "q": "We go ___ at the skate park. (patinar)",
-     "a": [
-      "skating"
-     ],
-     "ca": "Repassa: LP1.",
-     "en": "Review: LP1."
+     "q": "We go ___ at the skate park. (patinar)"
     },
     {
+     "id": "c1-04",
      "r": "insecure",
-     "q": "He ___ karate twice a week. (fer)",
-     "a": [
-      "does"
-     ],
-     "ca": "Repassa: LP1.",
-     "en": "Review: LP1."
+     "q": "He ___ karate twice a week. (fer)"
     },
     {
+     "id": "c1-05",
      "r": "beginners",
-     "q": "Look! Pol ___ (skate) on the ramp.",
-     "a": [
-      "is skating",
-      "'s skating"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "Look! Pol ___ (skate) on the ramp."
     },
     {
+     "id": "c1-06",
      "r": "beginners",
-     "q": "Write the -ing form: swim → ___",
-     "a": [
-      "swimming"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "Write the -ing form: swim → ___"
     },
     {
+     "id": "c1-07",
      "r": "insecure",
-     "q": "It ___ (not / rain) now. It’s sunny!",
-     "a": [
-      "isn't raining",
-      "is not raining",
-      "'s not raining"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "It ___ (not / rain) now. It’s sunny!"
     },
     {
+     "id": "c1-08",
      "r": "beginners",
-     "q": "On your bike, always wear a ___. (casc)",
-     "a": [
-      "helmet"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "On your bike, always wear a ___. (casc)"
     },
     {
+     "id": "c1-09",
      "r": "safe",
-     "q": "I meet my friends ___ the weekend.",
-     "a": [
-      "at"
-     ],
-     "ca": "Repassa: LP1.",
-     "en": "Review: LP1."
+     "q": "I meet my friends ___ the weekend."
     },
     {
+     "id": "c1-10",
      "r": "safe",
-     "q": "Our team is in a basketball ___ with 12 teams.",
-     "a": [
-      "tournament"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "Our team is in a basketball ___ with 12 teams."
     },
     {
+     "id": "c1-11",
      "r": "safe",
-     "q": "Is she playing well? — Yes, she ___. (no contraction)",
-     "a": [
-      "is"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "Is she playing well? — Yes, she ___. (no contraction)"
     },
     {
+     "id": "c1-12",
      "r": "daring",
-     "q": "She is very good ___ drawing.",
-     "a": [
-      "at"
-     ],
-     "ca": "Repassa: LP1.",
-     "en": "Review: LP1."
+     "q": "She is very good ___ drawing."
     },
     {
+     "id": "c1-13",
      "r": "daring",
-     "q": "Correct: “They are runing.” → They are ___.",
-     "a": [
-      "running"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "Correct: “They are runing.” → They are ___."
     }
    ]
   }

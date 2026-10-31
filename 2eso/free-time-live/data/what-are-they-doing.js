@@ -1,6 +1,6 @@
 /* 2 ESO · LS2 Free Time, Live! · Learning Path 2 · What are they doing? (Present Continuous; reading log = LS criterion 4.1) */
 window.LP = {
-  key: 'ls2Doing2ESO', n: 2, title: 'What are they doing?',
+  key: 'ls2Doing2ESO', n: 2, starter: true, title: 'What are they doing?',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Path 1', en: 'Recall: Learning Path 1' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -20,7 +20,7 @@ window.LP = {
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Roba, equipament i temps', en: 'Clothes, kit and weather' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
       receptive: 'crowd · half-time · highlights',
-      core: { insecure: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'cap', 'helmet', 'wear a uniform', 'wear a costume', 'It’s sunny', 'It’s cloudy', 'It’s windy', 'It’s cold', 'It’s hot', 'It’s raining', 'It’s snowing'], safe: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'helmet', 'wear a uniform', 'It’s sunny', 'It’s cold', 'It’s raining', 'It’s snowing', 'a concert', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'foggy', 'freezing', 'What’s the weather like?', 'degrees'], daring: ['trainers', 'tracksuit', 'helmet', 'wear a uniform', 'It’s raining', 'It’s snowing', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'freezing', 'What’s the weather like?', 'degrees', 'the crowd', 'cheer', 'warm up', 'take part in'] },
+      core: { beginners: ['T-shirt', 'trainers', 'shorts', 'cap', 'It’s sunny', 'It’s cold', 'It’s hot', 'It’s raining'], insecure: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'cap', 'helmet', 'wear a uniform', 'wear a costume', 'It’s sunny', 'It’s cloudy', 'It’s windy', 'It’s cold', 'It’s hot', 'It’s raining', 'It’s snowing'], safe: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'helmet', 'wear a uniform', 'It’s sunny', 'It’s cold', 'It’s raining', 'It’s snowing', 'a concert', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'foggy', 'freezing', 'What’s the weather like?', 'degrees'], daring: ['trainers', 'tracksuit', 'helmet', 'wear a uniform', 'It’s raining', 'It’s snowing', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'freezing', 'What’s the weather like?', 'degrees', 'the crowd', 'cheer', 'warm up', 'take part in'] },
       groups: [
         { g: 'Clothes & kit', items: [['T-shirt', 'samarreta', 'He’s wearing a red T-shirt.'], ['trainers', 'bambes', 'I need new trainers for running.'], ['tracksuit', 'xandall', 'She’s wearing a blue tracksuit.'], ['shorts', 'pantalons curts', 'They’re playing in shorts.'], ['cap', 'gorra', 'Put on a cap: it’s sunny.'], ['helmet', 'casc', 'Always wear a helmet on your bike.'], ['wear a uniform', 'portar uniforme', 'The team wears a white uniform.'], ['wear a costume', 'portar una disfressa', 'At the fair, people wear costumes.']] },
         { g: 'Weather', items: [['It’s sunny', 'fa sol', 'It’s sunny, so we’re at the beach.'], ['It’s cloudy', 'està ennuvolat', 'It’s cloudy but it isn’t cold.'], ['It’s windy', 'fa vent', 'It’s windy: perfect for kites.'], ['It’s cold', 'fa fred', 'It’s cold. Wear a jacket.'], ['It’s hot', 'fa calor', 'It’s hot today: 30 degrees!'], ['It’s raining', 'plou', 'It’s raining, so the match is cancelled.'], ['It’s snowing', 'neva', 'Look! It’s snowing!']] },
@@ -139,6 +139,12 @@ window.LP = {
         { r: 'daring', q: 'Laia says “It’s really noisy.” Why?', o: ['Omar is watching a basketball match at the sports centre.', 'Laia is playing the guitar.', 'Omar is in the square with friends.'] },
         { r: 'daring', q: 'Which sentence is about now, not about a habit?', o: ['My sister is playing basketball.', 'I usually go swimming.', 'Do you go every Saturday?'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Live from the sports hall (Emma and Sam)', en: 'Shadowing · Live from the sports hall (Emma and Sam)' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Live from the sports hall (Emma and Sam)', src: 'audio/live-from-the-sports-hall.mp3', slow: 'audio/live-from-the-sports-hall-slow.mp3', t: [0.38, 36.41], ts: [0.38, 42.22], lines: [
+        ['Emma', 'Hello and welcome to School Radio! We’re at the sports hall and the big match is starting: the Blue Team against the Green Team. Sam, what’s happening?'],
+        ['Sam', 'Well, Emma, the Blue Team is wearing their new white uniform and the Green Team is wearing green T-shirts and black shorts. The players are warming up and the crowd is cheering. It’s very noisy in here!'],
+        ['Emma', 'It’s cold and rainy outside, but inside it’s hot. There are about two hundred students watching. Some of them are eating sandwiches!']] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: 'Present Continuous', pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
