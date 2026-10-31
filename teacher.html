@@ -83,26 +83,32 @@ const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 async function load(){
   if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};DEMO.ann=DEMO.ann||[];cpInject(DEMO);return DEMO}
   const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[],sg:[],ann:[],ck:{},cp:{}},up=r=>r.ref.parent.parent.id;
-  try{(await F.getDocs(F.collection(db(),"roster"))).forEach(r=>D.ro[r.id]=r.data())}catch(e){D.roErr=true;console.warn("roster",e)}
-  try{(await F.getDocs(F.collection(db(),"points"))).forEach(p=>D.pt[p.id]=p.data());(await F.getDocs(F.collection(db(),"teams"))).forEach(t=>D.tm[t.id]=t.data())}catch(e){D.ptErr=true;console.warn("points",e)}
-  try{(await F.getDocs(F.collection(db(),"teacherPlan"))).forEach(t=>D.tk[t.id]=t.data())}catch(e){console.warn("teacherPlan",e)}
-  try{const c=await F.getDoc(F.doc(db(),"settings","routes"));if(c.exists())D.cuts=c.data()}catch(e){console.warn("settings",e)}
-  // sg = suggestions from students (suggestions/{id}: uid, email, name, group, page, text, created, read), sent with "💡 Idea" in the bottom bar
-  try{(await F.getDocs(F.collection(db(),"suggestions"))).forEach(x=>D.sg.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("suggestions",e)}
-  try{(await F.getDocs(F.collection(db(),"problems"))).forEach(x=>D.pb.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("problems",e)}
-  // ann = announcements to students (announcements/{id}: text, to, label, groups, uids, created, read{uid: time}), sent with "📣 Announcements"
-  try{(await F.getDocs(F.collection(db(),"announcements"))).forEach(x=>D.ann.push(Object.assign({id:x.id},x.data())))}catch(e){console.warn("announcements",e)}
-  // notes not read yet (the student deletes each one with OK): an answer whose note is gone was read
-  D.replies={};try{(await F.getDocs(F.collection(db(),"problemReplies"))).forEach(x=>D.replies[x.id]=1)}catch(e){console.warn("problemReplies",e)}
-  (await F.getDocs(F.collection(db(),"students"))).forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()));
-  (await F.getDocs(F.collectionGroup(db(),"results"))).forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data());
-  (await F.getDocs(F.collectionGroup(db(),"levels"))).forEach(l=>(D.lv[up(l)]=D.lv[up(l)]||{})[l.id]=l.data());
-  (await F.getDocs(F.collectionGroup(db(),"progress"))).forEach(p=>(D.pg[up(p)]=D.pg[up(p)]||{})[p.id]=p.data().data||{});
-  // secure recall checkpoints: answer keys (teacher only) and each student's one try (cpInject marks them)
-  try{(await F.getDocs(F.collection(db(),"cpKeys"))).forEach(k=>D.ck[k.id]=k.data())}catch(e){console.warn("cpKeys",e)}
-  try{(await F.getDocs(F.collectionGroup(db(),"checkpoints"))).forEach(c=>(D.cp[up(c)]=D.cp[up(c)]||{})[c.id]=c.data())}catch(e){console.warn("checkpoints",e)}
+  // All reads at once (Roger, 31 Oct 2026: on the phone the dashboard "took time to load"): they used to go one after another,
+  // about 20 round trips, so a phone on mobile data waited for the sum of them. Now the wait is about the slowest one.
+  // soft = a read that may fail (old rules, nothing there yet): the dashboard still opens; hard = the dashboard needs it.
+  const all=(n,group)=>F.getDocs(group?F.collectionGroup(db(),n):F.collection(db(),n)),
+    soft=(name,p,f,err)=>p.then(f).catch(e=>{if(err)D[err]=true;console.warn(name,e)});
+  const lsI=Promise.all(EL_LS.map(l=>ELCloud.lsInfo(l.id)));
+  await Promise.all([lsI.then(a=>EL_LS.forEach((l,i)=>D.ls[l.id]=a[i])),   // in the catalogue's order, as before
+    soft("roster",all("roster"),q=>q.forEach(r=>D.ro[r.id]=r.data()),"roErr"),
+    soft("points",Promise.all([all("points"),all("teams")]),([p,t])=>{p.forEach(x=>D.pt[x.id]=x.data());t.forEach(x=>D.tm[x.id]=x.data())},"ptErr"),
+    soft("teacherPlan",all("teacherPlan"),q=>q.forEach(t=>D.tk[t.id]=t.data())),
+    soft("settings",F.getDoc(F.doc(db(),"settings","routes")),c=>{if(c.exists())D.cuts=c.data()}),
+    // sg = suggestions from students (suggestions/{id}: uid, email, name, group, page, text, created, read), sent with "💡 Idea" in the bottom bar
+    soft("suggestions",all("suggestions"),q=>q.forEach(x=>D.sg.push(Object.assign({id:x.id},x.data())))),
+    soft("problems",all("problems"),q=>q.forEach(x=>D.pb.push(Object.assign({id:x.id},x.data())))),
+    // ann = announcements to students (announcements/{id}: text, to, label, groups, uids, created, read{uid: time}), sent with "📣 Announcements"
+    soft("announcements",all("announcements"),q=>q.forEach(x=>D.ann.push(Object.assign({id:x.id},x.data())))),
+    // notes not read yet (the student deletes each one with OK): an answer whose note is gone was read
+    soft("problemReplies",(D.replies={},all("problemReplies")),q=>q.forEach(x=>D.replies[x.id]=1)),
+    all("students").then(q=>q.forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()))),
+    all("results",1).then(q=>q.forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data())),
+    all("levels",1).then(q=>q.forEach(l=>(D.lv[up(l)]=D.lv[up(l)]||{})[l.id]=l.data())),
+    all("progress",1).then(q=>q.forEach(p=>(D.pg[up(p)]=D.pg[up(p)]||{})[p.id]=p.data().data||{})),
+    // secure recall checkpoints: answer keys (teacher only) and each student's one try (cpInject marks them)
+    soft("cpKeys",all("cpKeys"),q=>q.forEach(k=>D.ck[k.id]=k.data())),
+    soft("checkpoints",all("checkpoints",1),q=>q.forEach(c=>(D.cp[up(c)]=D.cp[up(c)]||{})[c.id]=c.data()))]);
   cpInject(D);
-  for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
   // students who only have results/progress (no profile yet) still appear, without a group
   Object.keys(Object.assign({},D.rs,D.pg,D.lv,D.cp)).forEach(u=>D.st[u]=D.st[u]||{uid:u,name:"",email:u});
   return D;
@@ -1454,7 +1460,10 @@ document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
 // the teacher's 🔔 (shared/js/el-bell.js): "Open them in the dashboard" lands on #probs, or sends el-probs on this page; the list is reloaded
 const toProbs=async()=>{if(!S.D)return;try{await api.pbLoad()}catch(e){console.warn("problems",e)}S.open.add("probs");render();const b=$("#probs");if(b)b.scrollIntoView({behavior:"smooth"})};
 addEventListener("el-probs",toProbs);
-const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;S.D=await load();render();if(location.hash==="#probs")toProbs()};
+// While the data comes in, the page says so (it used to stay blank under "Hello"); if a read fails, it says that too, with a Try again button.
+const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if(!S.D)$("#main").innerHTML='<p class="muted" id="loading">⏳ Loading your groups and students…</p>';
+  try{S.D=await load()}catch(e){console.warn("load",e);if(!S.D){$("#main").innerHTML='<p><b>The dashboard could not load.</b> Check the connection and try again.</p><p><button id="retry">Try again</button></p>';$("#retry").onclick=()=>start(hello)}return}
+  render();if(location.hash==="#probs")toProbs()};
 if(DEMO)start("Preview with sample students: nothing is saved.");
 else ELCloud.onUser(u=>{if(u&&ELCloud.isTeacher(u))start("Hello, "+(u.displayName||u.email)+".")});
 </script></body></html>
