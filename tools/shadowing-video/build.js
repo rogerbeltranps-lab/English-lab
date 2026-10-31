@@ -18,7 +18,7 @@ const W = 1280, H = 720, FPS = 30;
 const LEAD = 0.5, TAIL = 0.5;                      // silence around each playback
 const BAR = { x: 290, y: 612, w: 700, h: 14 };      // timer bar during the pauses
 
-const ff = (args) => execFileSync('ffmpeg', ['-v', 'error', '-y', ...args]);
+const ff = (args) => execFileSync('ffmpeg', ['-nostdin', '-v', 'error', '-y', ...args]);
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const pretty = (s) => esc(s).replace(/'/g, '’');
 
@@ -80,7 +80,7 @@ function slides() {
     <div class="big" style="margin-bottom:24px">What is shadowing?</div>
     <div class="lead">You copy a speaker, like an echo: the <b>same words</b>, the <b>same speed</b>, the <b>same rhythm</b> and the <b>same melody</b>.</div>
     <div class="lead" style="margin-top:22px">It helps you speak more fluently and understand fast English.</div></div>
-    <div class="count">${n} sentences · about ${Math.round(totalSecs() / 60)} minutes</div>`)]);
+    <div class="count">${n} sentences</div>`)]);
   out.push(['i1', page(`<div class="card" style="top:120px;height:470px">
     <div class="big" style="margin-bottom:26px">How to do it</div>
     <ol><li><b>Listen</b> and read the sentence.</li><li><b>Your turn:</b> say it out loud, with the text.</li>
@@ -160,7 +160,10 @@ function totalSecs() {
     if (id === 'chime') return chime;
     if (!norm[id]) {
       norm[id] = path.join(work, `vo-${id}.wav`);
-      ff(['-i', path.join(ROOT, VO.dir, id + '.mp3'), '-af', 'loudnorm=I=-16:TP=-1.5', ...AF, norm[id]]);
+      // Trim the silence at both ends, then normalise (two passes: in one filter chain ffmpeg 6 stalls).
+      const trim = path.join(work, `vo-${id}-trim.wav`), sr = 'silenceremove=start_periods=1:start_threshold=-45dB:start_silence=';
+      ff(['-i', path.join(ROOT, VO.dir, id + '.mp3'), '-af', `${sr}0.05,areverse,${sr}0.1,areverse`, ...AF, trim]);
+      ff(['-i', trim, '-af', 'loudnorm=I=-16:TP=-1.5', ...AF, norm[id]]);
     }
     return norm[id];
   };

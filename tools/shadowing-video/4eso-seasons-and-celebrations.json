@@ -156,5 +156,34 @@
    "end": 39.69,
    "pause": 3.0
   }
- ]
+ ],
+ "voice": {
+  "dir": "tools/shadowing-video/voice/4eso-intro",
+  "by": "Amelia (ElevenLabs eleven_v3, voice ZF6FPAbjXT4488VcRRnw), 31 Oct 2026",
+  "what": [
+   "l1"
+  ],
+  "how": [
+   "l2",
+   "chime",
+   "l3"
+  ],
+  "tips": [
+   "l4"
+  ],
+  "examples": [
+   [
+    "l5"
+   ],
+   [
+    "l7"
+   ]
+  ],
+  "try": [
+   "l6"
+  ],
+  "ready": [
+   "l8"
+  ]
+ }
 }
