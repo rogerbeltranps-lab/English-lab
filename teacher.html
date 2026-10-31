@@ -225,7 +225,11 @@ const ymd=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).pa
 function dueOf(id,g){const p=(window.EL_PLAN||{})[S.ls],gr=GR.find(x=>x.id===g);if(!p||!p.due||!p.due[id]||!gr)return null;
   const key=x=>String(x).replace(/[^a-z0-9]/gi,"").toLowerCase(),i=(p.groups||[]).findIndex(x=>key(x)===key(gr.name));return i>=0?p.due[id][i]:null}
 // 1 done by the end of its session day, 0 late, null not done, undefined no deadline (not counted)
-function onTime(u,id,step,g){const due=dueOf(id,g);if(!due)return undefined;const d=doneAt(u,id,step);return d==null?null:d===true||ymd(d)<=due?1:0}
+// stepDue (el-plan.js, same shape as due but per step): a step whose deadline is earlier than its activity's (2 ESO LP6: Speaking
+// and Talk after the exam, practice and grammar still by the session day) is counted on time against its own date.
+function stepDueOf(id,step,g){const p=(window.EL_PLAN||{})[S.ls],sd=p&&p.stepDue&&p.stepDue[id]&&p.stepDue[id][step],gr=GR.find(x=>x.id===g);if(!sd||!gr)return null;
+  const key=x=>String(x).replace(/[^a-z0-9]/gi,"").toLowerCase(),i=(p.groups||[]).findIndex(x=>key(x)===key(gr.name));return i>=0?sd[i]:null}
+function onTime(u,id,step,g){const due=stepDueOf(id,step,g)||dueOf(id,g);if(!due)return undefined;const d=doneAt(u,id,step);return d==null?null:d===true||ymd(d)<=due?1:0}
 // Averages: missing values (null) count 0 or are left out, as the "Missing work" switch says
 const avg=vs=>{vs=vs.map(v=>v==null?(S.zero?0:null):v).filter(v=>v!=null);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null};
 const wavg=ps=>{let s=0,w=0;ps.forEach(([v,x])=>{if(v==null){if(!S.zero)return;v=0}s+=v*x;w+=x});return w?s/w:null};
