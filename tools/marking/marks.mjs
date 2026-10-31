@@ -2,6 +2,7 @@
 // The same sheets and EL-MARKS v1 answers as the dashboard's 🤖 Marking sheet (shared/js/el-marking.js), read and written straight in
 // Firestore, so Claude can mark the Reading log, Listening chart and Research card / Fact file without Roger's computer.
 //   node tools/marking/marks.mjs ready                                   steps with hand-ins without a level, per group, and when they are ready
+//        (a moment with daily: true, writings and Talk transcripts from LS3, is ready at once: the 17:00 run marks it)
 //   node tools/marking/marks.mjs sheet <group> <activity> <step>         the sheet (students as codes, never names)
 //   node tools/marking/marks.mjs apply <group> <activity> <step> <answer file> [--apply] [--feedback]
 //        reads the EL-MARKS v1 answer and saves the levels (students/{uid}/results/{activity}.levels[step][criterion]), as the dashboard's
@@ -79,7 +80,7 @@ async function todo(grp,m){const a=W.EL_CATALOG.find(x=>x.id===m.a),out=[];
     if(h&&!m.c.every(c=>lv[c])&&!waits)out.push({s,h,route:st.route,exam:st.exam})}
   return out.sort((x,y)=>x.s.uid<y.s.uid?-1:1)}
 function readyOf(grp,ls,m,ticks){const p=W.EL_PLAN[ls],gi=p?W.ELWeek.col(p,grp.id):-1,due=p&&p.due&&p.due[m.a]?p.due[m.a][gi]:null,a=W.EL_CATALOG.find(x=>x.id===m.a);
-  return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls})}
+  return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls,daily:m.daily})}
 function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRADING[a.ls],course=a.ls.split("-")[0],codes=W.ELMark.codes(rows.map(r=>r.s.uid)),by=Object.fromEntries(rows.map(r=>[r.s.uid,r]));
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
   const text=W.ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:W.ELWeek.today(),crits:m.c,

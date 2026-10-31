@@ -584,9 +584,10 @@ const mkWaits=(u,a,step)=>{const f=flagOf(u,a.id,step),h=handedIn(u,a)[step];ret
 const mkTodo=(m,grp)=>{const a=byId(m.a);return mkStuds(grp).filter(s=>handedIn(s.uid,a)[m.step]&&!m.c.every(c=>lvOf(s.uid,m.a,m.step,c))&&!mkWaits(s.uid,a,m.step))};
 // the student's exam writing marks so far in this course ("LS1 6/10"), for the marking sheet
 const mkExam=u=>{const L=EL_LS.filter(l=>l.course===COURSE);return L.slice(0,L.findIndex(l=>l.id===S.ls)+1).map((l,i)=>{const w=((res(u,asId(l.id)).sections||{}).writing)||{};return w.score!=null&&w.score!==""?`LS${i+1} ${w.score}/${w.max||10}`:null}).filter(Boolean).join(", ")};
-function mkReady(m,grp){const p=(window.EL_PLAN||{})[S.ls];return ELMark.ready({p,gi:p?ELWeek.col(p,grp.id):-1,due:dueOf(m.a,grp.id),title:byId(m.a).title,ticks:(S.D.tk[grp.id]||{}).ticks,ls:S.ls})}
+function mkReady(m,grp){const p=(window.EL_PLAN||{})[S.ls];return ELMark.ready({p,gi:p?ELWeek.col(p,grp.id):-1,due:dueOf(m.a,grp.id),title:byId(m.a).title,ticks:(S.D.tk[grp.id]||{}).ticks,ls:S.ls,daily:m.daily})}
 function mkTodoItems(grp){return mkMoments().map(m=>{const n=mkTodo(m,grp).length;if(!n)return null;const r=mkReady(m,grp),t=ELWeek.today(),btn=`<button data-do="mkopen" data-a="${m.a}" data-s="${m.step}">🤖 Marking sheet</button>`;
     const what=`<b>${esc(m.name)}</b> (${esc(actTitle(m.a))}) · ${n} hand-in${n>1?"s":""} without a level`;
+    if(r.daily)return {now:true,h:`🤖 ${what} <small class="muted">· Claude marks them at 17:00</small> ${btn}`};
     if(r.from&&t>=r.from)return {now:true,h:`🤖 ${what} ${btn}`};
     return {now:false,h:`⏳ ${what}: ${r.from?"ready to mark on "+ELWeek.date(r.from)+" (one week after you ticked the session)":r.line?"ready one week after you tick “"+esc(r.line)+"” in the time plan":"no session in the time plan"} ${btn}`}}).filter(Boolean)}
 function mkSheet(m,grp){const a=byId(m.a),g=G(),studs=mkTodo(m,grp),codes=ELMark.codes(studs.map(s=>s.uid)),by=Object.fromEntries(studs.map(s=>[s.uid,s]));
