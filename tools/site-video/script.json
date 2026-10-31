@@ -53,8 +53,8 @@
   {
    "id": "l30",
    "scene": "Your route",
-   "en": "When your teacher sets or changes your level, for example Core B1, a message tells you. Your activities follow your level.",
-   "ca": "Quan el professor et posa o et canvia el nivell, per exemple Core B1, un missatge t'avisa. Les activitats segueixen el teu nivell."
+   "en": "Your teacher sets your level from your exam, for example Core B1. A message tells you, and your activities and learning paths follow that level.",
+   "ca": "El professor posa el teu nivell a partir de l'examen, per exemple Core B1. Un missatge t'avisa, i les activitats i els learning paths segueixen aquest nivell."
   },
   {
    "id": "l29",
@@ -65,8 +65,8 @@
   {
    "id": "l33",
    "scene": "Your route",
-   "en": "Below it, open the shadowing video: listen to sentences from the unit and say them out loud. It's great before the exam.",
-   "ca": "A sota, obre el vídeo de shadowing: escolta frases de la unitat i repeteix-les en veu alta. És ideal abans de l'examen."
+   "en": "There is also a shadowing video for the whole unit: listen to sentences and say them out loud. It's great before the exam.",
+   "ca": "També tens un vídeo de shadowing de tota la unitat: escolta frases i repeteix-les en veu alta. Va molt bé abans de l'examen."
   },
   {
    "id": "l09",
@@ -77,8 +77,8 @@
   {
    "id": "l31",
    "scene": "Your week",
-   "en": "In the homework box, click Add it to my Google Calendar once, and your homework and the exam day appear in your calendar.",
-   "ca": "Al requadre dels deures, clica Afegeix-ho al meu Google Calendar una sola vegada, i els deures i el dia de l'examen apareixeran al teu calendari."
+   "en": "Homework and classes on your own are in a blue box. Click Add it to my Google Calendar once, and your homework and the exam day appear in your calendar.",
+   "ca": "Els deures i les classes pel teu compte són en un requadre blau. Clica Add it to my Google Calendar una vegada i els deures i el dia de l'examen apareixeran al teu calendari."
   },
   {
    "id": "l28",
@@ -185,8 +185,8 @@
   {
    "id": "l34",
    "scene": "Problems",
-   "en": "Do you have an idea for the website? Click Idea and tell your teacher.",
-   "ca": "Tens una idea per a la web? Clica Idea i explica-la al professor."
+   "en": "Have an idea to make the website better? Click Idea and tell your teacher.",
+   "ca": "Tens una idea per millorar la web? Clica Idea i explica-la al professor."
   },
   {
    "id": "l25",
@@ -197,8 +197,8 @@
   {
    "id": "l32",
    "scene": "English Lab",
-   "en": "Practise on your own has word cards, sentence builder, listening and shadowing at your level. It corrects itself and doesn't count for your mark.",
-   "ca": "Practica pel teu compte té targetes de paraules, sentence builder, listening i shadowing al teu nivell. Es corregeix sol i no compta per a la nota."
+   "en": "Practise on your own has word cards, a sentence builder, listenings and shadowing at your level. It corrects itself and doesn't count for your mark.",
+   "ca": "A Practise on your own tens targetes de paraules, construcció de frases, listenings i shadowing al teu nivell. Es corregeix sol i no compta per a la nota."
   },
   {
    "id": "l26",

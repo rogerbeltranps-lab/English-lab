@@ -1196,7 +1196,7 @@
     1516,
     1000
    ],
-   "margin": 0.0,
+   "margin": 0,
    "on_ca": "per veure totes"
   },
   {
@@ -1214,7 +1214,7 @@
     1480,
     132
    ],
-   "margin": 0.0,
+   "margin": 0,
    "on_ca": "què fem a classe"
   },
   {
@@ -1232,7 +1232,7 @@
     1480,
     196
    ],
-   "margin": 0.0,
+   "margin": 0,
    "on_ca": "i les activitats"
   }
  ],
@@ -1314,6 +1314,186 @@
     540
    ],
    "on_ca": "amb explicacions"
+  }
+ ],
+ "l30": [
+  {
+   "img": "r4-12-level-notice.png",
+   "view": [
+    380,
+    0,
+    1160,
+    640
+   ],
+   "hl": [
+    628,
+    22,
+    664,
+    330
+   ],
+   "margin": 0
+  },
+  {
+   "img": "r4-12-level-notice.png",
+   "on": "follow that level",
+   "on_ca": "segueixen",
+   "view": [
+    384,
+    440,
+    1512,
+    80
+   ],
+   "hl": [
+    1100,
+    458,
+    145,
+    34
+   ],
+   "margin": 0.3
+  }
+ ],
+ "l33": [
+  {
+   "img": "r4-12-level-notice.png",
+   "view": [
+    384,
+    640,
+    1512,
+    170
+   ],
+   "hl": [
+    406,
+    668,
+    800,
+    112
+   ],
+   "margin": 0.05
+  },
+  {
+   "img": "r4-12-level-notice.png",
+   "on": "say them out loud",
+   "on_ca": "repeteix-les",
+   "view": [
+    384,
+    640,
+    1512,
+    170
+   ],
+   "hl": [
+    406,
+    740,
+    196,
+    38
+   ],
+   "margin": 0.05
+  }
+ ],
+ "l31": [
+  {
+   "img": "r4-15-homework.png",
+   "view": [
+    384,
+    140,
+    1512,
+    300
+   ],
+   "hl": [
+    408,
+    210,
+    1466,
+    214
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r4-15-homework.png",
+   "on": "Click Add",
+   "on_ca": "Clica Add",
+   "view": [
+    384,
+    140,
+    1512,
+    300
+   ],
+   "hl": [
+    424,
+    374,
+    318,
+    38
+   ],
+   "margin": 0.03
+  }
+ ],
+ "l32": [
+  {
+   "img": "r4-12-level-notice.png",
+   "view": [
+    384,
+    800,
+    1512,
+    180
+   ],
+   "hl": [
+    406,
+    815,
+    1488,
+    152
+   ],
+   "margin": 0.03
+  },
+  {
+   "img": "r4-73-practice.png",
+   "on": "word cards",
+   "on_ca": "targetes",
+   "view": [
+    440,
+    520,
+    1400,
+    400
+   ],
+   "hl": [
+    455,
+    800,
+    1370,
+    100
+   ],
+   "margin": 0.02
+  },
+  {
+   "img": "r4-12-level-notice.png",
+   "on": "doesn't count",
+   "on_ca": "no compta",
+   "view": [
+    384,
+    800,
+    1512,
+    180
+   ],
+   "hl": [
+    406,
+    875,
+    1340,
+    30
+   ],
+   "margin": 0.03
+  }
+ ],
+ "l34": [
+  {
+   "img": "r4-15-homework.png",
+   "view": [
+    1150,
+    940,
+    770,
+    140
+   ],
+   "hl": [
+    1662,
+    1012,
+    104,
+    48
+   ],
+   "margin": 0
   }
  ]
 }
