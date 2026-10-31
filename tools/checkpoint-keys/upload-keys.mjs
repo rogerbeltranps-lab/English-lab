@@ -36,6 +36,9 @@ const enc=x=>x==null?{nullValue:null}:Array.isArray(x)?{arrayValue:{values:x.map
 const dec=v=>!v?null:"stringValue" in v?v.stringValue:"integerValue" in v?+v.integerValue:"doubleValue" in v?v.doubleValue:"booleanValue" in v?v.booleanValue:
   "arrayValue" in v?(v.arrayValue.values||[]).map(dec):"mapValue" in v?Object.fromEntries(Object.entries(v.mapValue.fields||{}).map(([k,x])=>[k,dec(x)])):null;
 
+// compares like JSON but whatever the order of the fields (Firestore gives a map's fields back in another order)
+const canon=x=>Array.isArray(x)?"["+x.map(canon).join(",")+"]":x&&typeof x==="object"?"{"+Object.keys(x).sort().map(k=>JSON.stringify(k)+":"+canon(x[k])).join(",")+"}":JSON.stringify(x);
+
 // students who already have a first try (or the step done) of these checkpoints in their progress
 const started={};let pageToken="";
 do{const j=await api("GET",DOCS+"students?pageSize=300"+(pageToken?"&pageToken="+pageToken:""));pageToken=j.nextPageToken||"";
@@ -51,7 +54,7 @@ let n=0;
 for(const [key,K] of Object.entries(KEYS)){
   const cur=await api("GET",DOCS+"cpKeys/"+key,null,true),old=cur?dec(cur.fields?.items)||{}:{};
   const items=Object.fromEntries(Object.entries(K.items).map(([id,it])=>[id,Object.assign({},it,old[id]&&old[id].extra?{extra:old[id].extra}:{})]));
-  const diff=Object.keys(items).filter(id=>JSON.stringify(old[id]||null)!==JSON.stringify(items[id])).length;
+  const diff=Object.keys(items).filter(id=>canon(old[id]||null)!==canon(items[id])).length;
   console.log((diff?apply?"✓ ":"→ ":"= ")+key+": "+Object.keys(items).length+" questions"+(diff?", "+diff+" new or changed":", up to date")+
     (started[key]?"\n   ⚠ already done the old way by "+started[key].length+": "+started[key].join(", "):""));
   if(!diff||!apply)continue;n++;
