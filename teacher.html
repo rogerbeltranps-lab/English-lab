@@ -42,6 +42,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <script src="shared/js/el-criteria.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
+<script src="shared/js/el-marking.js"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-points.js"></script>
 <script src="shared/js/el-items.js"></script>
@@ -70,7 +71,7 @@ const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Ope
 const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 
 // ---- data: D = {st:{uid:{uid,name,email,group}}, rs:{uid:{activity:result}}, lv:{uid:{ls:{level,request}}}, pg:{uid:{ls:data}}, ls:{id:{status,enabled,groups,open,secLocked}}, ro:{id:{email,group,surname1,surname2,first,tutor}},
-//               pt:{id:{team,t1,t2,t3}}, tm:{group:{list,score,best}}, tk:{group:{ticks:{"ls|session line":true}}} (the teacher's time plan checklist)}
+//               pt:{id:{team,t1,t2,t3}}, tm:{group:{list,score,best}}, tk:{group:{ticks:{"ls|session line":"YYYY-MM-DD" (the day it was ticked; older ticks are true)}}} (the teacher's time plan checklist)}
 // pb = problem reports from students (problems/{id}: uid, email, name, group, ls, activity, route, page, title, section, kind, text, errors, device, created, fixed), sent with "⚠️ Problem" in the bottom bar.
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
 // pt, tm = team points (points/{same id as the list}, teams/{group}; shared/js/el-points.js).
@@ -100,7 +101,8 @@ async function load(){
 const sub=o=>Object.assign(o,{updated:DEMO?Date.now():F.serverTimestamp()});
 const put=(path,o)=>DEMO?null:F.setDoc(F.doc(db(),...path),sub(o),{merge:true});
 const api={
-  tick:(gid,ls,line,on)=>{const k=ls+"|"+line;((S.D.tk[gid]=S.D.tk[gid]||{}).ticks=S.D.tk[gid].ticks||{})[k]=on;return put(["teacherPlan",gid],{ticks:{[k]:on}})},
+  tick:(gid,ls,line,on)=>{const k=ls+"|"+line;on=on?ELWeek.today():false;   // the day it was ticked (marking sheets: mkReady)
+    ((S.D.tk[gid]=S.D.tk[gid]||{}).ticks=S.D.tk[gid].ticks||{})[k]=on;return put(["teacherPlan",gid],{ticks:{[k]:on}})},
   setGroup:(u,g)=>{const s=S.P[u],ps=[];   // the list's group decides; the student's own doc copies it
     if(s.ro)ps.push(DEMO?S.D.ro[s.rid].group=g:put(["roster",s.rid],{group:g}));
     if(!s.away)ps.push(DEMO?S.D.st[u].group=g:put(["students",u],{group:g}));
@@ -515,12 +517,78 @@ function todo(studs,ls,list){   // studs: signed-in students only. Final product
   studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>out.push(`✉️ <b>${name(s)}</b> commented on <b>${esc(t)}</b> (${esc(a.title)}): “${esc(handedIn(s.uid,a)[id].comment)}” <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button>`))));
   studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
     if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(elRouteOf(S.D.lv[s.uid],ls).level)} → ${route(l.request)}${l.reason?` · “${esc(l.reason)}”`:""} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Decline</button>`)});
+  const grp=GR.find(g=>g.id===S.g),mk=grp?mkTodoItems(grp):[];mk.filter(x=>x.now).forEach(x=>out.push(x.h));if(grp)out.push(...cpItems(grp));
   const np=S.D.pb.filter(x=>!x.fixed).length;
   if(np)out.push(`⚠️ ${np} open problem report${np>1?"s":""} from students (all groups) <button data-do="pbopen">Read</button>`);
   const fp=list.find(a=>a.manual),nm=fp?studs.filter(s=>!((S.D.rs[s.uid]||{})[fp.id]||{}).max).length:0;
   return (out.length?`<ul class="todo">${out.map(x=>"<li>"+x+"</li>").join("")}</ul>`:'<p class="muted">Nothing pending: no final product comments to answer and no open problem reports.</p>')
-    +(fp&&nm?`<p class="muted">📝 ${nm} student${nm>1?"s":""} without a final product mark (click their Final product score to mark it).</p>`:"");
+    +(fp&&nm?`<p class="muted">📝 ${nm} student${nm>1?"s":""} without a final product mark (click their Final product score to mark it).</p>`:"")
+    +mk.filter(x=>!x.now).map(x=>`<p class="muted">${x.h}</p>`).join("");
 }
+// ---- Marking sheets (shared/js/el-marking.js; Roger, 31 Oct 2026: "the idea of this website is that everything gets corrected by itself
+// except for the final product"). The 🤖 Marking sheet of a step lists every hand-in of the group without a level, as codes, with the
+// indicators and the strict EL-MARKS v1 answer format; the answer is pasted or uploaded in the same dialog, checked, and saved as the same
+// levels the NA·AS·AN·AE buttons save. The To do lists a step one week after its last session is ticked in the time plan.
+const CA_RT=["beginners","insecure"];
+const mkMoments=()=>{const g=G();return g&&!g.only?(g.moments||[]).filter(m=>!m.group&&byId(m.a)&&!byId(m.a).manual&&byId(m.a).ls===S.ls):[]};
+const mkStuds=grp=>Object.values(S.P).filter(s=>s.group===grp.id&&!s.away&&!s.tester).sort(byName);
+// Possible copies (Roger, 31 Oct 2026: "if the text is perfect or from Google Translate we should notice"): a line of the answer with
+// "COPY? reason" saves no level; it is kept as results/{activity}.flags[step] = {why, lv, fb, at} and listed in the To do, where the
+// teacher accepts it (the levels and the feedback are saved) or asks for it again in class (the student gets a note; their next hand-in
+// goes back to the marking sheet).
+const flagOf=(u,aid,step)=>((res(u,aid).flags||{})[step])||null;
+const mkWaits=(u,a,step)=>{const f=flagOf(u,a.id,step),h=handedIn(u,a)[step];return !!f&&!(f.done==="redo"&&h&&h.date>f.at)};
+// hand-ins of one step still without a level for every criterion of it (a possible copy waiting for the teacher is left out)
+const mkTodo=(m,grp)=>{const a=byId(m.a);return mkStuds(grp).filter(s=>handedIn(s.uid,a)[m.step]&&!m.c.every(c=>lvOf(s.uid,m.a,m.step,c))&&!mkWaits(s.uid,a,m.step))};
+// the student's exam writing marks so far in this course ("LS1 6/10"), for the marking sheet
+const mkExam=u=>{const L=EL_LS.filter(l=>l.course===COURSE);return L.slice(0,L.findIndex(l=>l.id===S.ls)+1).map((l,i)=>{const w=((res(u,asId(l.id)).sections||{}).writing)||{};return w.score!=null&&w.score!==""?`LS${i+1} ${w.score}/${w.max||10}`:null}).filter(Boolean).join(", ")};
+function mkReady(m,grp){const p=(window.EL_PLAN||{})[S.ls];return ELMark.ready({p,gi:p?ELWeek.col(p,grp.id):-1,due:dueOf(m.a,grp.id),title:byId(m.a).title,ticks:(S.D.tk[grp.id]||{}).ticks,ls:S.ls})}
+function mkTodoItems(grp){return mkMoments().map(m=>{const n=mkTodo(m,grp).length;if(!n)return null;const r=mkReady(m,grp),t=ELWeek.today(),btn=`<button data-do="mkopen" data-a="${m.a}" data-s="${m.step}">🤖 Marking sheet</button>`;
+    const what=`<b>${esc(m.name)}</b> (${esc(actTitle(m.a))}) · ${n} hand-in${n>1?"s":""} without a level`;
+    if(r.from&&t>=r.from)return {now:true,h:`🤖 ${what} ${btn}`};
+    return {now:false,h:`⏳ ${what}: ${r.from?"ready to mark on "+ELWeek.date(r.from)+" (one week after you ticked the session)":r.line?"ready one week after you tick “"+esc(r.line)+"” in the time plan":"no session in the time plan"} ${btn}`}}).filter(Boolean)}
+function mkSheet(m,grp){const a=byId(m.a),g=G(),studs=mkTodo(m,grp),codes=ELMark.codes(studs.map(s=>s.uid)),by=Object.fromEntries(studs.map(s=>[s.uid,s]));
+  const students=[...codes].map(([code,u])=>{const l=level(u,S.ls),h=handedIn(u,a)[m.step]||{};return {code,route:LV[l],ca:CA_RT.includes(l),exam:mkExam(u),ty:h.ty,fields:h.f}});
+  const text=ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:ELWeek.today(),crits:m.c,
+    crit:Object.fromEntries(m.c.map(c=>[c,`${c} · ${elCompetence(c)}: ${elCriterion(COURSE,c)||""}`])),ind:g.ind,students});
+  return {text,codes:new Map([...codes].map(([c,u])=>[c,by[u]])),n:studs.length}}
+function mkPanel(aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step),grp=GR.find(g=>g.id===S.g);if(!m||!grp)return;
+  const sh=mkSheet(m,grp);S.mk={m,grp,sh,rows:null};
+  dlg(`<h3>🤖 Marking sheet · ${esc(m.name)}</h3><p class="muted">${esc(grp.name)} · ${esc(actTitle(aid))} · ${m.c.map(pill).join(" ")} · ${sh.n} hand-in${sh.n===1?"":"s"} without a level. Students appear as codes, never names.</p><p class="muted">Claude marks these hand-ins from the cloud every week and saves the levels; you only check the possible copies. Use this sheet if you ever want to mark a group yourself.</p>`
+    +(sh.n?`<label>1 · The sheet</label><textarea id="mksheet" readonly style="min-height:160px;font:12px/1.4 ui-monospace,monospace">${esc(sh.text)}</textarea>
+      <div class="row" style="justify-content:flex-start"><button data-do="mkcopy">📋 Copy</button><button class="g" data-do="mkdown">⬇ Download</button> <small id="mkst" class="muted"></small></div>
+      <label>2 · The marks <small class="muted">(paste the answer, or upload it as a .txt file)</small></label><textarea id="mkin" style="min-height:110px;font:12px/1.4 ui-monospace,monospace" placeholder="${ELMark.V} | ${esc(m.a)} | ${esc(m.step)} | ${esc(grp.name)}&#10;S-… | ${esc(m.c.map(c=>c+"=AN").join("; "))} | …&#10;END"></textarea>
+      <div class="row" style="justify-content:flex-start"><input type="file" id="mkfile" accept=".txt,.md,.csv,text/plain"><button data-do="mkcheck">Check</button></div><div id="mkprev"></div>`
+      :`<p>Every hand-in of this step already has a level.</p>`),true);
+  const f=$("#mkfile");if(f)f.onchange=async()=>{const x=f.files[0];if(x){$("#mkin").value=await x.text();mkCheck()}}}
+function mkCheck(){const k=S.mk,r=ELMark.parse($("#mkin").value,{aid:k.m.a,step:k.m.step,crits:k.m.c,codes:k.sh.codes});k.rows=null;
+  if(r.err){$("#mkprev").innerHTML=`<p class="no">${esc(r.err)}</p>`;return}r.rows.forEach(x=>x.s=k.sh.codes.get(x.code));k.rows=r.rows;
+  const nf=r.rows.filter(x=>x.flag).length,ok=r.rows.length-nf;
+  $("#mkprev").innerHTML=`<table class="lvt"><thead><tr><th style="text-align:left">Student</th>${k.m.c.map(c=>`<th>${cpill(c)}</th>`).join("")}<th style="text-align:left">Feedback</th></tr></thead><tbody>`
+    +r.rows.map(x=>`<tr${x.flag?' style="background:#fef3c7"':""}><td style="text-align:left">${name(x.s)}</td>${k.m.c.map(c=>`<td><b style="color:${LVCOL[x.lv[c]]}">${x.lv[c]}</b></td>`).join("")}<td style="text-align:left"><small>${esc(x.fb)}</small>${x.flag?`<br><small><b>⚠️ Possible copy:</b> ${esc(x.flag)} <i>(no level saved: it goes to your To do)</i></small>`:""}</td></tr>`).join("")+`</tbody></table>`
+    +(r.missing.length?`<p class="muted">⚠️ No line for ${r.missing.length} student${r.missing.length>1?"s":""}: ${r.missing.map(c=>name(k.sh.codes.get(c))).join(" · ")} (they keep no level).</p>`:"")
+    +(r.bad.length?`<p class="muted">⚠️ ${r.bad.length} line${r.bad.length>1?"s":""} not understood and left out: <code>${esc(r.bad.slice(0,3).join(" ⏎ "))}</code></p>`:"")
+    +(r.rows.length?`<label style="font-weight:400"><input type="checkbox" id="mkfb" checked> Send each student the feedback (they get a notification and read it in that step of the learning path)</label><div class="row" style="justify-content:flex-start"><button data-do="mksave">✔ Save ${ok} level${ok===1?"":"s"}${nf?` and ${nf} possible cop${nf>1?"ies":"y"} to check`:""}</button></div>`:"")}
+function mkDown(){const k=S.mk,b=new Blob([k.sh.text],{type:"text/plain"}),l=document.createElement("a");l.href=URL.createObjectURL(b);l.download=`marking-${k.grp.name}-${k.m.a.split("/").pop()}-${k.m.step}.txt`;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(l.href),2000)}
+function mkSave(){const k=S.mk;if(!k||!k.rows||!k.rows.length)return;const fb=$("#mkfb")&&$("#mkfb").checked,a=byId(k.m.a);
+  const ps=k.rows.flatMap(x=>x.flag?[patch(x.s.uid,k.m.a,{flags:{[k.m.step]:{why:x.flag,lv:x.lv,fb:fb?x.fb:"",at:new Date().toISOString()}}})]
+    :[patch(x.s.uid,k.m.a,{levels:{[k.m.step]:x.lv}}),...(fb&&x.fb?[api.reply(x.s.uid,a,k.m.step,x.fb)]:[])]);
+  $("#dlg").close();S.mk=null;act(Promise.all(ps))}
+// the To do's possible copies of the group on screen, and their dialog: the work, its writing log, the reason, Accept or Redo in class
+function cpItems(grp){return mkMoments().flatMap(m=>{const a=byId(m.a);return mkStuds(grp).filter(s=>{const f=flagOf(s.uid,m.a,m.step);return f&&!f.done}).map(s=>
+  `⚠️ Possible copy: <b>${name(s)}</b> · ${esc(m.name)} (${esc(actTitle(m.a))}): ${esc(flagOf(s.uid,m.a,m.step).why)} <button data-do="cpopen" data-u="${s.uid}" data-a="${m.a}" data-s="${m.step}">Check</button>`)})}
+const REDO={ca:"El professor vol que tornis a fer aquesta tasca a classe, amb les teves paraules. Després entrega-la una altra vegada.",en:"Your teacher would like you to do this task again in class, in your own words. Then hand it in again."};
+function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step),a=byId(aid),f=flagOf(u,aid,step),h=handedIn(u,a)[step]||{},s=S.P[u];if(!m||!f)return;S.cp={u,m,f};
+  dlg(`<h3>⚠️ Possible copy · ${name(s)}</h3><p class="muted">${esc(m.name)} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
+    <p><b>Why:</b> ${esc(f.why)}</p>${h.ty?`<p class="muted">Writing log: ${esc(ELMark.tyText(h.ty))}</p>`:""}
+    ${(h.f||[]).map(x=>`<div class="hand"><b>${esc(x.l)}</b><p style="white-space:pre-wrap">${esc(x.v||"")}</p></div>`).join("")}
+    <p>If it is their own work, it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[f.lv[c]]}">${f.lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.</p>
+    <div class="row" style="justify-content:flex-start"><button data-do="cpok">✔ Accept: it's their work</button><button class="g" data-do="cpredo">↺ Redo in class</button></div>
+    <p class="muted">Redo in class sends the student: “${esc(CA_RT.includes(level(u,S.ls))?REDO.ca:REDO.en)}” Their next hand-in goes back to the marking sheet.</p>`,true)}
+function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.m.a),done=ok?"accepted":"redo";
+  const ps=ok?[patch(k.u,k.m.a,{levels:{[k.m.step]:k.f.lv},flags:{[k.m.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.m.step,k.f.fb)]:[])]
+    :[patch(k.u,k.m.a,{flags:{[k.m.step]:{done}}}),api.reply(k.u,a,k.m.step,CA_RT.includes(level(k.u,S.ls))?REDO.ca:REDO.en)];
+  $("#dlg").close();S.cp=null;act(Promise.all(ps))}
 // ---- points (shared/js/el-points.js; root AGENTS.md "Points"): each student's points per term from the class presentations.
 // Here the teacher corrects one student's points (an absent student, a mistake). A change also saves the group's best of the term
 // (teams/{group}.best), which the student board needs for the bonus.
@@ -1144,7 +1212,11 @@ async function markingPdf(r){
 // ---- events
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
   ({tab:()=>{S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();if(k.ls)scrollTo(0,0)},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),
-    tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),wk:()=>{S.wk=k.w;S.g="plan";render()},
+    tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
+    mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),cpok:()=>cpDone(true),cpredo:()=>cpDone(false),
+    mkcopy:()=>{const v=$("#mksheet").value;navigator.clipboard.writeText(v).then(()=>$("#mkst").textContent="✓ Copied",()=>{$("#mksheet").select();$("#mkst").textContent="Press Ctrl+C"})},
+    mkdown:()=>mkDown(),
+    wk:()=>{S.wk=k.w;S.g="plan";render()},
     tips:()=>{S.tips=!S.tips;try{localStorage.setItem("el_t_tips",S.tips?"on":"off")}catch(e){}render()},
     addstu:()=>dlg("<h3>Add a student</h3>"+roForm({})),impok:()=>{$("#dlg").close();act(api.importRoster(S.imp))},
     rosave:()=>{const v=f=>$("#ro-"+f).value.replace(/\s+/g," ").trim(),o={email:v("email").toLowerCase(),surname1:v("surname1"),surname2:v("surname2"),first:v("first"),tutor:v("tutor"),group:$("#ro-group").value};
