@@ -73,7 +73,8 @@ const size = (t) => (t.length > 60 ? 46 : t.length > 40 ? 52 : 60);
 
 // Marks (Roger, 31 Oct 2026): **stressed** syllables underlined, ‿ between linked words, ↗ ↘ the melody: ↗ before a comma and in yes/no questions, ↘ at the end and in wh- questions.
 const marked = (t) => pretty(t).replace(/\*\*(.+?)\*\*/g, '<span class="strong">$1</span>').replace(/==(.+?)==/g, '<span class="join">$1</span>')
-  .replace(/‿/g, '<span class="link">‿</span>').replace(/\s*([↗↘])/g, '<span class="tone">$1</span>');
+  .replace(/‿/g, '<span class="link">‿</span>').replace(/([,.?!:;])\s*([↗↘])/g, '$2$1')
+  .replace(/\s*([↗↘])/g, '<span class="tone">$1</span>'); // arrow right after the word, before the comma or full stop (Roger)
 const turnLabel = (txt, icon = ICON.mic) => `<div class="who turn"><svg viewBox="0 0 136 136">${icon}</svg>${txt}</div>`;
 const clipLen = (it) => it.end - it.start;
 const play = (it) => LEAD + clipLen(it) + TAIL;
