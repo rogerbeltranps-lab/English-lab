@@ -1,0 +1,175 @@
+[
+ {
+  "id": "e55bdbe1",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "[excited] Look at those dark clouds! It is going to rain before the parade.",
+  "mask": [
+   [
+    6,
+    9
+   ]
+  ],
+  "answers": [
+   "is going to rain"
+  ],
+  "q": "Look at those dark clouds! It ___ ___ ___ (rain) before the parade."
+ },
+ {
+  "id": "e0ea2736",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "The head teacher has said yes: we are using the hall on Friday.",
+  "mask": [
+   [
+    7,
+    8
+   ]
+  ],
+  "answers": [
+   "are using"
+  ],
+  "q": "The head teacher has said yes: we ___ ___ (use) the hall on Friday."
+ },
+ {
+  "id": "e4734770",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "The doors open at 9.30, and the event finishes at 13.00.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "open"
+  ],
+  "q": "The doors ___ (open) at 9.30, and the event finishes at 13.00."
+ },
+ {
+  "id": "eec4888e",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Nobody has a speaker. Don’t worry, I will bring mine.",
+  "mask": [
+   [
+    7,
+    8
+   ]
+  ],
+  "answers": [
+   "will bring"
+  ],
+  "q": "“Nobody has a speaker.” “Don’t worry, I ___ ___ (bring) mine.”"
+ },
+ {
+  "id": "49dbf9e2",
+  "course": "4eso",
+  "lp": 5,
+  "page": "plan-the-day",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "Correct it: We will meet the head teacher on Monday at 9. It’s in her diary.. We are meeting the head teacher on Monday at 9.",
+  "mask": [
+   [
+    17,
+    18
+   ]
+  ],
+  "answers": [
+   "are meeting"
+  ],
+  "q": "Correct it: “We will meet the head teacher on Monday at 9. It’s in her diary.” → We ___ ___ the head teacher on Monday at 9."
+ },
+ {
+  "id": "f953ee18",
+  "course": "4eso",
+  "lp": 4,
+  "page": "research-it-right",
+  "kind": "talk",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[curious] Who wrote it?",
+  "mask": [],
+  "answers": [],
+  "q": "Who wrote it?"
+ },
+ {
+  "id": "96405edf",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "Thanksgiving takes place in November.",
+  "mask": [
+   [
+    1,
+    2
+   ]
+  ],
+  "answers": [
+   "takes place"
+  ],
+  "q": "Thanksgiving ___ ___ in November. (té lloc)"
+ },
+ {
+  "id": "50a3154c",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "In Catalonia, we don't work on 25 December.",
+  "mask": [
+   [
+    3,
+    4
+   ]
+  ],
+  "answers": [
+   "don't work"
+  ],
+  "q": "In Catalonia, we ___ (not / work) on 25 December."
+ },
+ {
+  "id": "cb2bffbb",
+  "course": "4eso",
+  "lp": 3,
+  "page": "where-traditions-come-from",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "At Diwali, people light lamps, and they also eat sweets.",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "and"
+  ],
+  "q": "At Diwali, people light lamps, ___ they also eat sweets. (afegeix)"
+ }
+]
