@@ -1100,5 +1100,80 @@
    ],
    "margin": 0.0
   }
+ ],
+ "l29": [
+  {
+   "img": "r3-12-route-line.png",
+   "view": [
+    384,
+    440,
+    1512,
+    370
+   ],
+   "hl": [
+    386,
+    516,
+    1508,
+    280
+   ],
+   "margin": 0
+  },
+  {
+   "img": "r3-12-route-line.png",
+   "on": "click Download",
+   "view": [
+    384,
+    440,
+    1512,
+    370
+   ],
+   "hl": [
+    404,
+    610,
+    324,
+    44
+   ],
+   "margin": 0
+  },
+  {
+   "img": "r3-25-summary-pdf.png",
+   "on": "a PDF"
+  },
+  {
+   "img": "r3-25-summary-pdf.png",
+   "on": "all the vocabulary",
+   "hl": [
+    30,
+    103,
+    920,
+    873
+   ]
+  },
+  {
+   "img": "r3-25-summary-pdf.png",
+   "on": "and grammar",
+   "hl": [
+    970,
+    103,
+    920,
+    873
+   ]
+  },
+  {
+   "img": "r3-25-summary-pdf.png",
+   "on": "with explanations",
+   "view": [
+    970,
+    103,
+    920,
+    720
+   ],
+   "hl": [
+    1030,
+    280,
+    800,
+    540
+   ]
+  }
  ]
 }
