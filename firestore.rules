@@ -29,6 +29,10 @@ service cloud.firestore {
       allow read, write: if isTeacher();
     }
     // The teacher's dashboard settings (routes: the LS1 exam cut-offs per course): only the teacher
+    // answer keys of the secure recall checkpoints (and their hints): never readable by students (tools/checkpoint-keys)
+    match /cpKeys/{key} {
+      allow read, write: if isTeacher();
+    }
     match /settings/{id} {
       allow read, write: if isTeacher();
     }
@@ -38,6 +42,19 @@ service cloud.firestore {
     }
     // problem reports (the "Problem" button in the bottom bar): signed-in students and testers send them with where they happened; only the teacher reads, marks or deletes them
     function shortText(v, n) { return v == null || (v is string && v.size() <= n); }
+    // suggestions to improve the site (the "Idea" button in the bottom bar): signed-in students and testers send them; only the teacher reads, marks or deletes them. Kept apart from problem reports.
+    match /suggestions/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid','email','name','group','page','text','created'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == myEmail()
+        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+        && request.resource.data.get('name', '') is string && request.resource.data.get('name', '').size() <= 200
+        && request.resource.data.get('page', '') is string && request.resource.data.get('page', '').size() <= 200
+        && request.resource.data.get('group', null) in [null, '2ESOA', '2ESOB', '4ESOA', '4ESOB']
+        && request.resource.data.created == request.time;
+      allow read, update, delete: if isTeacher();
+    }
     match /problems/{id} {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['uid','email','name','group','ls','activity','route','page','title','section','kind','text','errors','device','shot','created'])
@@ -57,10 +74,23 @@ service cloud.firestore {
       allow read, update, delete: if isTeacher();
     }
     // the screenshot of a problem report (same id), written in the same batch as the report: a JPEG data URL, read only by the teacher
-    // the teacher's answer to a problem report (same id): "fixed" when marked as fixed, "thanks" when deleted; the student reads it once and deletes it
+    // the teacher's answer to a problem report (same id): "fixed" when marked as fixed, "thanks" when deleted; the student reads it once and deletes it.
+    // "message" (the teacher's own words, msg) uses the id {report id}_m{time}; the same rules cover it.
     match /problemReplies/{id} {
       allow read, delete: if isTeacher() || (signedIn() && resource.data.uid == request.auth.uid);
       allow create, update: if isTeacher();
+    }
+    // announcements from the teacher (dashboard "📣 Announcements"; shared/js/el-announce.js): only the teacher writes or deletes them.
+    // A student reads the ones sent to their group (groups) or to them (uids); testers read them all. A student can only add their own
+    // read time (read.{uid}) to one of those, and nothing else.
+    function annForMe() { return signedIn() && (isTester() || request.auth.uid in resource.data.uids || rosterGroup() in resource.data.groups); }
+    match /announcements/{id} {
+      allow read: if isTeacher() || annForMe();
+      allow create, delete: if isTeacher();
+      allow update: if isTeacher() || (annForMe()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+        && request.resource.data.read.diff(resource.data.get('read', {})).affectedKeys().hasOnly([request.auth.uid])
+        && request.resource.data.read.get(request.auth.uid, null) is timestamp);
     }
     match /problemShots/{id} {
       allow create: if signedIn()
@@ -71,7 +101,8 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/problems/$(id)).data.uid == request.auth.uid;
       allow read, delete: if isTeacher();
     }
-    // student list: doc id = school email in lower case; {group, surname1, surname2, first, tutor, email}. Written only by the teacher (dashboard import).
+    // student list: doc id = school email in lower case; {group, surname1, surname2, first, tutor, email, route?}. Written only by the teacher (dashboard import;
+    // route = {level, ls}: the route a student gets at their first sign-in, see levels below).
     match /roster/{email} {
       allow read: if isTeacher() || (school() && email == myEmail());
       allow write: if isTeacher();
@@ -146,6 +177,32 @@ service cloud.firestore {
           && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['request','reason','requestedAt'])
           && request.resource.data.request in ['beginners','insecure','safe','daring']
           && request.resource.data.get('reason', '') is string && request.resource.data.get('reason', '').size() <= 300;
+        // the route the teacher set on the student list before the student's first sign-in (roster/{email}.route = {level, ls}): the
+        // student's page saves it once, only when there is no doc yet, exactly as listed and with the notice time (el-cloud.js).
+        allow create: if signedIn() && request.auth.uid == uid && !isTester()
+          && get(roster()).data.get('route', {}).get('ls', null) == ls
+          && get(roster()).data.get('route', {}).get('level', null) == request.resource.data.level
+          && request.resource.data.keys().hasOnly(['level','changed','was','why'])
+          && request.resource.data.changed == request.time
+          && request.resource.data.was == null && request.resource.data.why == null;
+        allow write: if isTeacher();
+      }
+      // secure recall checkpoints (shared/js/el-checkpoint.js; Roger, 31 Oct 2026: “make sure they don't cheat”): the answers are sent once.
+      // A student creates the doc (only while the LS and that checkpoint are open for their group) and can never change it, except when the
+      // teacher has let them do it again (redo: true). The corrections (fb) and redo are written by the teacher only; testers may delete their own.
+      match /checkpoints/{key} {
+        function cpOk() {
+          return request.resource.data.keys().hasOnly(['ls','activity','key','level','ids','answers','times','leaves','auto','started','sent'])
+            && request.resource.data.key == key && request.resource.data.sent == request.time
+            && request.resource.data.ids is list && request.resource.data.ids.size() <= 40
+            && request.resource.data.answers is list && request.resource.data.answers.size() <= 40
+            && ((lsOpen(request.resource.data.ls) && lsForMe(request.resource.data.ls, uid)
+                  && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'locked'))) || isTester());
+        }
+        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+        allow create: if signedIn() && request.auth.uid == uid && cpOk();
+        allow update: if signedIn() && request.auth.uid == uid && resource.data.get('redo', false) == true && cpOk();
+        allow delete: if isTester() && request.auth.uid == uid;
         allow write: if isTeacher();
       }
       // results: students cannot touch feedback, nor edit a locked (submitted) result
@@ -158,6 +215,9 @@ service cloud.firestore {
           && request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(['ls','activity','done','locked','markedDone','updated','parts','score','max']);
         allow write: if isTeacher();
       }
+    }
+    match /{path=**}/checkpoints/{key} {
+      allow read: if isTeacher();
     }
     match /{path=**}/results/{rid} {
       allow read: if isTeacher();

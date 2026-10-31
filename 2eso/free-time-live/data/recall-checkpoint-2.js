@@ -1,4 +1,6 @@
-/* 2 ESO · LS2 Free Time, Live! · Recall checkpoint 2. The first attempt is sent to the teacher dashboard as parts.first. */
+/* 2 ESO · LS2 Free Time, Live! · Recall checkpoint 2 (approved content).
+   Secure checkpoint (Roger, 31 Oct 2026; shared/js/el-checkpoint.js): no answers or hints here (a hint can give the answer away). The key and the hints are in cpKeys/ls2Checkpoint22ESO (teacher only),
+   uploaded with tools/checkpoint-keys/upload-keys.mjs from a file kept outside the repo. Each item has a stable id. */
 window.LP = {
  "key": "ls2Checkpoint22ESO",
  "n": "C2",
@@ -13,132 +15,81 @@ window.LP = {
     "en": "Checkpoint 2: Learning Paths 1–3"
    },
    "pill": {
-    "ca": "Sense apunts · 5–8 min",
-    "en": "No notes · 5–8 min"
+    "ca": "Sense apunts · una pregunta cada vegada",
+    "en": "No notes · one question at a time"
    },
    "intro": {
-    "ca": "Respon sense apunts ni ajuda i fes-ho tan bé com puguis. Després llegeix el feedback i repassa el que has fallat. Quan l’acabis, s’obrirà el següent Learning Path.",
-    "en": "Answer with no notes or help, and do your best. Then read the feedback and review what you missed. When you finish it, the next Learning Path opens."
+    "ca": "Respon sense apunts ni ajuda: una pregunta cada vegada, sense tornar enrere. Queda’t en aquesta pàgina fins que l’enviïs. Quan l’enviïs, s’obrirà el següent Learning Path.",
+    "en": "Answer with no notes or help: one question at a time, with no going back. Stay on this page until you send it. When you send it, the next Learning Path opens."
+   },
+   "secure": {
+    "secs": 45
    },
    "items": [
     {
+     "id": "c2-01",
      "r": "beginners",
-     "q": "I ___ to music on the bus. (escoltar)",
-     "a": [
-      "listen"
-     ],
-     "ca": "Repassa: LP1.",
-     "en": "Review: LP1."
+     "q": "I ___ to music on the bus. (escoltar)"
     },
     {
+     "id": "c2-02",
      "r": "beginners",
-     "q": "It’s 30 degrees. It’s very ___. (calor)",
-     "a": [
-      "hot"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "It’s 30 degrees. It’s very ___. (calor)"
     },
     {
+     "id": "c2-03",
      "r": "insecure",
-     "q": "What ___ Marta doing? — She’s taking photos.",
-     "a": [
-      "is"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "What ___ Marta doing? — She’s taking photos."
     },
     {
+     "id": "c2-04",
      "r": "beginners",
-     "q": "Write the -ing form: dance → ___",
-     "a": [
-      "dancing"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "Write the -ing form: dance → ___"
     },
     {
+     "id": "c2-05",
      "r": "beginners",
-     "q": "I usually ___ (play) football on Saturdays.",
-     "a": [
-      "play"
-     ],
-     "ca": "Repassa: LP3.",
-     "en": "Review: LP3."
+     "q": "I usually ___ (play) football on Saturdays."
     },
     {
+     "id": "c2-06",
      "r": "beginners",
-     "q": "Today I ___ (play) basketball.",
-     "a": [
-      "am playing",
-      "'m playing"
-     ],
-     "ca": "Repassa: LP3.",
-     "en": "Review: LP3."
+     "q": "Today I ___ (play) basketball."
     },
     {
+     "id": "c2-07",
      "r": "insecure",
-     "q": "At the ___ she’s training for a show. (en aquest moment)",
-     "a": [
-      "moment"
-     ],
-     "ca": "Repassa: LP3.",
-     "en": "Review: LP3."
+     "q": "At the ___ she’s training for a show. (en aquest moment)"
     },
     {
+     "id": "c2-08",
      "r": "insecure",
-     "q": "We never ___ (play) football in winter.",
-     "a": [
-      "play"
-     ],
-     "ca": "Repassa: LP3.",
-     "en": "Review: LP3."
+     "q": "We never ___ (play) football in winter."
     },
     {
+     "id": "c2-09",
      "r": "safe",
-     "q": "It’s ___: I can’t see the end of the street.",
-     "a": [
-      "foggy"
-     ],
-     "ca": "Repassa: LP2.",
-     "en": "Review: LP2."
+     "q": "It’s ___: I can’t see the end of the street."
     },
     {
+     "id": "c2-10",
      "r": "safe",
-     "q": "I ___ (want) a new helmet. (state verb)",
-     "a": [
-      "want"
-     ],
-     "ca": "Repassa: LP3.",
-     "en": "Review: LP3."
+     "q": "I ___ (want) a new helmet. (state verb)"
     },
     {
+     "id": "c2-11",
      "r": "safe",
-     "q": "The ___ is only two degrees: it’s freezing.",
-     "a": [
-      "temperature"
-     ],
-     "ca": "Repassa: LP3.",
-     "en": "Review: LP3."
+     "q": "The ___ is only two degrees: it’s freezing."
     },
     {
+     "id": "c2-12",
      "r": "daring",
-     "q": "This month I ___ (train) for a race.",
-     "a": [
-      "am training",
-      "'m training"
-     ],
-     "ca": "Repassa: LP3.",
-     "en": "Review: LP3."
+     "q": "This month I ___ (train) for a race."
     },
     {
+     "id": "c2-13",
      "r": "daring",
-     "q": "I ___ (prefer) skating to cycling.",
-     "a": [
-      "prefer"
-     ],
-     "ca": "Repassa: LP3.",
-     "en": "Review: LP3."
+     "q": "I ___ (prefer) skating to cycling."
     }
    ]
   }

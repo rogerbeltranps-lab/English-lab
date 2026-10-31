@@ -1,0 +1,215 @@
+{
+ "course": "4 ESO",
+ "ls": "Seasons & Celebrations",
+ "folder": "4eso/seasons-and-celebrations",
+ "out": "video/shadowing.mp4",
+ "theme": {
+  "accent": "#30578c",
+  "ink": "#181e2f",
+  "title": "#253b66",
+  "muted": "#626f82",
+  "bg1": "#eef3fd",
+  "bg2": "#f6f8fd",
+  "soft": "#e3ebf8"
+ },
+ "note": "Core level, the same for every route. Sentences cut from the LS2 recordings (unchanged); times from forced alignment.",
+ "items": [
+  {
+   "speaker": "Laia",
+   "text": "We're meeting the head teacher on Monday, so we need a plan today.",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 1.27,
+   "end": 4.84,
+   "pause": 5.7,
+   "marks": "We're **meet**ing the **head** teacher on **Mon**day, ↗ so we need‿a **plan** to**day**. ↘"
+  },
+  {
+   "speaker": "Omar",
+   "text": "It's on Friday the eleventh of December.",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 14.77,
+   "end": 17.15,
+   "pause": 3.9,
+   "marks": "It's‿on **Fri**day the e**lev**enth of De**cem**ber. ↘"
+  },
+  {
+   "speaker": "Omar",
+   "text": "There will be four stalls, one for each festival.",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 26.34,
+   "end": 29.1,
+   "pause": 4.8,
+   "marks": "There will be **four** **stalls**, ↗ one for **each** **fes**tival. ↘"
+  },
+  {
+   "speaker": "Omar",
+   "text": "I think a lot of parents will help.",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 32.35,
+   "end": 34.02,
+   "pause": 3.2,
+   "marks": "I **think**‿a **lot**‿of **par**ents will **help**. ↘"
+  },
+  {
+   "speaker": "Omar",
+   "text": "My cousin plays in a band.",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 36.83,
+   "end": 38.74,
+   "pause": 3.1,
+   "marks": "My **cou**sin **plays**‿in‿a **band**. ↘"
+  },
+  {
+   "speaker": "Laia",
+   "text": "Who's going to put up the decorations?",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 40.91,
+   "end": 43.04,
+   "pause": 4.0,
+   "marks": "**Who's** going to put‿**up** the deco**ra**tions? ↘"
+  },
+  {
+   "speaker": "Omar",
+   "text": "We're going to invite families and the primary school.",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 51.21,
+   "end": 53.89,
+   "pause": 4.7,
+   "marks": "We're going to in**vite** **fam**ilies and the **pri**mary **school**. ↘"
+  },
+  {
+   "speaker": "Omar",
+   "text": "Don't worry. We'll use the gym too.",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 63.82,
+   "end": 66.15,
+   "pause": 4.0,
+   "marks": "**Don't** **wor**ry. ↘ We'll **use** the **gym** **too**. ↘"
+  },
+  {
+   "speaker": "Laia",
+   "text": "I think it'll be the best day of the term!",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 67.55,
+   "end": 69.8,
+   "pause": 4.0,
+   "marks": "I **think**‿it'll be the **best** **day** of the **term**! ↘"
+  },
+  {
+   "speaker": "Sam",
+   "text": "So people used to light bonfires and wear masks to hide from the spirits.",
+   "src": "audio/culture-bites-origins.mp3",
+   "start": 26.58,
+   "end": 31.4,
+   "pause": 6.9,
+   "marks": "So **peo**ple used to **light** **bon**fires‿and wear **masks** to **hide** from the **spir**its. ↘"
+  },
+  {
+   "speaker": "Sam",
+   "text": "They used to carve turnips!",
+   "src": "audio/culture-bites-origins.mp3",
+   "start": 35.55,
+   "end": 37.47,
+   "pause": 3.7,
+   "marks": "They **used**‿to **carve** **tur**nips! ↘"
+  },
+  {
+   "speaker": "Sam",
+   "text": "Pumpkins were bigger and easier to carve, so the tradition changed.",
+   "src": "audio/culture-bites-origins.mp3",
+   "start": 47.77,
+   "end": 52.86,
+   "pause": 7.2,
+   "marks": "**Pump**kins were **big**ger‿and **eas**ier to **carve**, ↗ so the tra**di**tion **changed**. ↘"
+  },
+  {
+   "speaker": "Sam",
+   "text": "Many people say what they are grateful for.",
+   "src": "audio/culture-bites-origins.mp3",
+   "start": 88.91,
+   "end": 91.69,
+   "pause": 4.7,
+   "marks": "**Man**y **peo**ple **say** what they‿are **grate**ful for. ↘"
+  },
+  {
+   "speaker": "Sam",
+   "text": "They ate roasted chestnuts to keep warm and get energy.",
+   "src": "video/halloween-castanyada.mp4",
+   "start": 82.99,
+   "end": 86.65,
+   "pause": 5.7,
+   "marks": "They‿ate **roast**ed **chest**nuts to keep **warm**‿and get **en**ergy. ↘"
+  }
+ ],
+ "examples": [
+  {
+   "speaker": "Emma",
+   "text": "That's all for today.",
+   "marks": "That's **all** for to**day**.",
+   "tip": "Strong words are louder and longer. Copy them!",
+   "src": "audio/culture-bites-origins.mp3",
+   "start": 110.01,
+   "end": 111.42,
+   "pause": 3.0
+  },
+  {
+   "speaker": "Omar",
+   "text": "I'll call him tonight.",
+   "marks": "I'll ==call‿him== tonight.",
+   "tip": "Some words join together, with no pause between them.",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 38.7,
+   "end": 39.69,
+   "pause": 3.0
+  },
+  {
+   "speaker": "Laia",
+   "text": "And the invitations?",
+   "marks": "And the invi**ta**tions? ↗",
+   "tip": "No question word at the start? The voice goes up ↗, like in yes/no questions (Do you…?).",
+   "src": "audio/student-council-meeting.mp3",
+   "start": 47.45,
+   "end": 48.8,
+   "pause": 3.2
+  },
+  {
+   "speaker": "Emma",
+   "text": "So where do the pumpkins come from?",
+   "marks": "So **where** do the **pump**kins come from? ↘",
+   "tip": "Questions with who, what, where… go down ↘ at the end, like normal sentences.",
+   "src": "audio/culture-bites-origins.mp3",
+   "start": 40.02,
+   "end": 41.85,
+   "pause": 3.3
+  }
+ ],
+ "voice": {
+  "dir": "tools/shadowing-video/voice/intro",
+  "by": "Amelia (ElevenLabs eleven_v3, voice ZF6FPAbjXT4488VcRRnw), 31 Oct 2026",
+  "what": [
+   "l1"
+  ],
+  "how": [
+   "l2",
+   "chime",
+   "l3"
+  ],
+  "tips": [
+   "l4"
+  ],
+  "examples": [
+   [
+    "l5"
+   ],
+   [
+    "l7"
+   ]
+  ],
+  "try": [
+   "l6"
+  ],
+  "ready": [
+   "l8"
+  ]
+ }
+}

@@ -1,6 +1,6 @@
 /* 2 ESO · LS2 Free Time, Live! · Learning Path 5 · Likes and screen tips (like / love / hate + -ing, imperatives; CD4 4.5 screen-use tips) */
 window.LP = {
-  key: 'ls2Tips2ESO', n: 5, title: 'Likes and screen tips',
+  key: 'ls2Tips2ESO', n: 5, starter: true, title: 'Likes and screen tips',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2 i 3', en: 'Recall: Learning Paths 2 and 3' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -20,7 +20,7 @@ window.LP = {
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'M’agrada, no m’agrada i consells de pantalla', en: 'Likes, dislikes and screen tips' },
       intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
-      core: { insecure: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside'], safe: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well'], daring: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well', 'addictive', 'concentrate', 'instead of', 'a habit', 'healthy / unhealthy'] },
+      core: { beginners: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'my favourite', 'take a break', 'switch off your phone', 'go outside'], insecure: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside'], safe: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well'], daring: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well', 'addictive', 'concentrate', 'instead of', 'a habit', 'healthy / unhealthy'] },
       groups: [
         { g: 'Likes and dislikes (+ -ing)', items: [['I love + -ing', 'm’encanta', 'I love skating.'], ['I like + -ing', 'm’agrada', 'I like drawing comics.'], ['I don’t like + -ing', 'no m’agrada', 'I don’t like getting up early.'], ['I hate + -ing', 'odio', 'I hate losing!'], ['I don’t mind + -ing', 'no m’importa', 'I don’t mind training in the rain.'], ['my favourite', 'el meu preferit', 'Skating is my favourite hobby.']] },
         { g: 'Screen tips (imperatives)', items: [['take a break', 'fes una pausa', 'Take a break every 30 minutes.'], ['switch off your phone', 'apaga el mòbil', 'Switch off your phone at night.'], ['put your phone away', 'guarda el mòbil', 'Put your phone away at dinner.'], ['don’t use your phone in bed', 'no facis servir el mòbil al llit', 'Don’t use your phone in bed.'], ['go outside', 'surt a fora', 'Go outside and play!']] },
@@ -87,6 +87,12 @@ window.LP = {
         { r: 'daring', q: 'Noah uses a screen today. How is it different from watching videos alone?', o: ['He films outside with his friends.', 'He watches races on his phone.', 'He plays a racing game at home.'] },
         { r: 'daring', q: 'Which tip from Screen Smart does Noah’s Saturday follow best?', o: ['Go outside.', 'Switch off your phone before bed.', 'Set a time limit.'] }
       ] },
+    { id: 'shadow', type: 'shadow', tab: { ca: 'Shadowing', en: 'Shadowing' }, title: { ca: 'Shadowing · Screen Smart (School Radio)', en: 'Shadowing · Screen Smart (School Radio)' }, pill: '3 ×',
+      intro: { ca: 'Repeteix un tros de l’escolta just darrere de la veu, com una ombra.', en: 'Repeat part of the listening just behind the speaker, like a shadow.' },
+      clip: { title: 'Screen Smart (School Radio)', src: 'audio/screen-smart.mp3', slow: 'audio/screen-smart-slow.mp3', t: [26.95, 61.39], ts: [32.35, 73.46], lines: [
+        ['Presenter', 'Tip number one: take a break. After thirty minutes on a screen, stop for five minutes. Stand up, look out of the window, drink some water.'],
+        ['Presenter', 'Tip number two: set a time limit. Decide how long you want to play, for example one hour, and use the timer on your phone. When it rings, stop.'],
+        ['Presenter', 'Tip number three: switch off your phone one hour before you go to sleep, and keep it out of your bedroom. The light from the screen tells your brain that it is still daytime, so you don’t sleep well.']] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'like + -ing i imperatius', en: 'like + -ing and imperatives' }, pill: '80 %',
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [

@@ -5,7 +5,7 @@ import "./el-route-names.js";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {signIn} from "./el-signin.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
 import {report} from "./el-report.js";
 
@@ -176,8 +176,8 @@ function applyLevel(lvl,all){
   if(mine&&!mine.classList.contains("active"))mine.click();
   if(!all)btns.forEach(b=>{if(b!==mine)b.style.display="none"});
 }
-// Students only use their board, English Lab, their own course page and the LSs assigned to their group.
-const BOARD=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html)?$/.test(location.pathname),
+// Students only use their board, English Lab (lab/ and its practice page lab/practice.html), their own course page and the LSs assigned to their group.
+const BOARD=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html|practice\.html)?$/.test(location.pathname),
   onHome=[ROOT.pathname,ROOT.pathname+"index.html"].includes(location.pathname),onDash=/\/teacher\.html$/.test(location.pathname);
 // The teacher's Dashboard link says which course (and LS) this page is in, so the dashboard opens on it (teacher.html, el_t_last).
 const dashHere=(()=>{const c=relPath.match(/^((2|4)eso)\//);if(!c)return DASH;const u=new URL(DASH);u.searchParams.set("course",c[1]);
@@ -281,6 +281,15 @@ async function submitActivity(a){
   return true;
 }
 
+// Announcements for this student (shared/js/el-announce.js): the ones sent to their group and the ones sent to them (testers are in every
+// one's uids). Two queries, because firestore.rules let a student read only those; the teacher reads them all.
+async function myAnnouncements(u){
+  const c=collection(db,"announcements"),out={},add=s=>s.forEach(x=>out[x.id]=Object.assign({id:x.id},x.data()));
+  if(isTeacher(u)){add(await getDocs(c));return Object.values(out)}
+  const g=viewGroup(u)||myGroup;
+  await Promise.all([getDocs(query(c,where("uids","array-contains",u.uid))).then(add),g&&getDocs(query(c,where("groups","array-contains",g))).then(add)].filter(Boolean));
+  return Object.values(out);
+}
 // Problem reports (bottom bar "⚠️ Problema / Problem"): problems/{id}, read only by the teacher in the dashboard.
 // Catalan for Insecure and with no route; English for Safe and Daring (LS pages: the route; the board: its own language).
 const repEn=()=>myLevel?!elCa(myLevel):onBoard&&document.documentElement.lang==="en";
@@ -290,6 +299,29 @@ const reportProblem=u=>report({en:repEn(),save:o=>{
   b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,ls:lsId,activity:actId,route:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()}));
   if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
   return b.commit()}});
+
+// Suggestions to improve the site (bottom bar "💡 Idea"): suggestions/{id}, read only by the teacher in the dashboard. Same language as the Problem window.
+function suggest(u){
+  const en=repEn(),t=(ca,e)=>en?e:ca,d=document.createElement("dialog"),bs="border:0;border-radius:999px;padding:6px 14px;cursor:pointer;font:inherit;";
+  d.style.cssText="border:0;border-radius:14px;padding:16px 18px;max-width:480px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004;font:15px system-ui,sans-serif;color:#0f172a;background:#fff";
+  d.innerHTML='<h3 style="margin:0 0 6px"></h3><p style="margin:0 0 8px;color:#475569"></p><textarea maxlength="1000" rows="5" style="width:100%;box-sizing:border-box;font:inherit;padding:6px;border:1px solid #cbd5e1;border-radius:8px"></textarea>'
+    +'<p data-n style="margin:4px 0 0;color:#64748b;font-size:13px"></p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button data-x></button><button data-ok></button></div>';
+  d.querySelector("h3").textContent="💡 "+t("Suggereix una millora","Suggest an improvement");
+  d.querySelector("p").textContent=t("Què milloraries de la web? Una idea, una cosa que costa d'entendre o que t'agradaria tenir. (Si alguna cosa no funciona, fes servir ⚠️ Problema.) El professor ho llegirà.","What would you improve on the website? An idea, something that is hard to understand or that you would like to have. (If something does not work, use ⚠️ Problem.) Your teacher will read it.");
+  const ta=d.querySelector("textarea"),n=d.querySelector("[data-n]"),x=d.querySelector("[data-x]"),ok=d.querySelector("[data-ok]");
+  x.style.cssText=bs+"background:#e2e8f0;color:#0f172a";x.textContent=t("Cancel·la","Cancel");x.onclick=()=>d.close();
+  ok.style.cssText=bs+"background:#0f766e;color:#fff";ok.textContent=t("Envia","Send");
+  const count=()=>n.textContent=ta.value.length+" / 1000";ta.oninput=count;count();
+  ok.onclick=async()=>{const text=ta.value.trim();if(!text){ta.focus();return}
+    ok.disabled=true;
+    try{await setDoc(doc(collection(db,"suggestions")),{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,
+        page:location.pathname.replace(/^.*?\/English-lab\//i,"").slice(0,200)||"index.html",text,created:serverTimestamp()});
+      d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=t("Gràcies! El professor llegirà el teu suggeriment.","Thank you! Your teacher will read your suggestion.");
+      const c=document.createElement("button");c.style.cssText=bs+"background:#0f766e;color:#fff";c.textContent="OK";c.onclick=()=>d.close();d.append(m,c)}
+    catch(e){console.warn("suggestion",e);ok.disabled=false;alert(t("No s'ha pogut enviar. Torna-ho a provar més tard.","It could not be sent. Please try again later."))}};
+  d.addEventListener("close",()=>d.remove());
+  document.body.append(d);d.showModal();ta.focus();
+}
 
 function bar(){
   const el=document.createElement("div");el.id="el-cloud-bar";
@@ -302,6 +334,7 @@ function bar(){
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
+      if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
@@ -334,7 +367,8 @@ async function lsMenu(u){
 }
 // Vocabulary and grammar summary on the LS page (Roger, 26 Oct 2026): the "Language & Knowledge" tab has an empty card ([data-el-study]);
 // for an LS with `study` in EL_LS it gets the student's route PDF (nothing until they have a route), the teacher and testers all three.
-// Pro (native, C2): its own PDF where the LS has `pro` (tools/study-summary/build-pro.sh), otherwise the Daring one; Starter gets Base.
+// Pro (native, C2): its own PDF where the LS has `pro`, otherwise the Daring one; Starter its own where the LS has `starter` (LS2 on,
+// tools/lp-worksheets/build.mjs), otherwise Base.
 function studyCard(u){
   const el=document.querySelector("[data-el-study]"),ls=(window.EL_LS||[]).find(x=>x.id===lsId);
   if(!el||!ls||!ls.study||!u)return;
@@ -343,7 +377,7 @@ function studyCard(u){
   const a=r=>'<a href="'+new URL(ls.study+r+".pdf",ROOT).href+'" download style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📥 '+(ca?"Descarrega el resum":"Download the summary")+(every?" · "+EL_LEVELS.find(x=>x.id===r).name:"")+" (PDF)</a>";
   el.innerHTML="<h2>📚 "+(ca?"Resum del vocabulari i la gramàtica":"Vocabulary and grammar summary")+"</h2><p>"
     +(ca?"Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. Descarrega'l quan vulguis per estudiar. És opcional: fes-lo servir si et va bé.":"All the vocabulary and then all the grammar of your route, with the explanations and practice. Download it whenever you want to study. It is optional: use it if it helps you.")
-    +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="beginners"&&(x.id!=="native"||ls.pro)).map(x=>a(x.id)).join(""):a(lv==="beginners"?"insecure":lv==="native"&&!ls.pro?"daring":lv))+"</p>";
+    +"</p><p>"+(every?EL_LEVELS.filter(x=>(x.id!=="beginners"||ls.starter)&&(x.id!=="native"||ls.pro)).map(x=>a(x.id)).join(""):a(lv==="beginners"&&!ls.starter?"insecure":lv==="native"&&!ls.pro?"daring":lv))+"</p>";
   el.hidden=false;
 }
 let draw=()=>{};
@@ -376,6 +410,10 @@ onAuthStateChanged(auth,async u=>{
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
+  // A route the teacher set on the student list before their first sign-in (roster/{email}.route = {level, ls}, teacher.html listRoute):
+  // saved as their route in that LS, with the level notice fields, if they have none there yet (firestore.rules checks it matches the list).
+  const lr=myRoster&&myRoster.route;
+  if(lr&&lr.level&&lr.ls)try{const ref=doc(db,"students",u.uid,"levels",lr.ls);if(!(await getDoc(ref)).exists())await setDoc(ref,{level:lr.level,changed:serverTimestamp(),was:null,why:null})}catch(e){console.warn("route from the list",e)}
   gamePush(u);
   lsMenu(u).catch(e=>console.warn("ls menu",e));
   document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u));   // teacher-only links (e.g. a class game on its learning path)
@@ -389,6 +427,10 @@ onAuthStateChanged(auth,async u=>{
   if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
     load:async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())),
     done:id=>deleteDoc(doc(db,"problemReplies",id))})).catch(e=>console.warn("replies",e));
+  // Announcements from the teacher to the student's group or to them (announcements/{id}): a card once each (shared/js/el-announce.js).
+  if(u&&isStudent(u)&&!document.getElementById("el-announce"))import("./el-announce.js").then(m=>m.showAnnouncements({en:repEn(),
+    load:async()=>(await myAnnouncements(u)).filter(a=>!(a.read||{})[u.uid]),
+    done:id=>updateDoc(doc(db,"announcements",id),{["read."+u.uid]:serverTimestamp()})})).catch(e=>console.warn("announcements",e));
   // "Your exam results are ready": a card once per new set of exam marks, with a link to the board on that LS (shared/js/el-exam-notice.js).
   if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-exam-notice"))loadScript("shared/js/el-grading.js",()=>window.EL_GRADING)
     .then(()=>import("./el-exam-notice.js")).then(m=>m.examNotice({course:courseOf(myGroup),en:repEn(),board:BOARD,
@@ -396,6 +438,14 @@ onAuthStateChanged(auth,async u=>{
       seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().examSeen||{}},
       save:(ls,v)=>setDoc(doc(db,"students",u.uid),{examSeen:{[ls]:v}},{merge:true}),
       visible:async ls=>{const i=await lsInfo(ls);return i.status!=="hidden"&&elLsForGroup((window.EL_LS||[]).find(x=>x.id===ls),i,myGroup)}})).catch(e=>console.warn("exam notice",e));
+  // The teacher's corrections and answers to hand-ins: a card once per new answer with a link to the step's tab, and the answer inside
+  // that tab on the learning path (shared/js/el-corrections.js).
+  if(u&&isStudent(u)&&!document.getElementById("el-corrections"))loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
+    .then(()=>import("./el-corrections.js")).then(m=>m.corrections({here:actId,root:ROOT,en:repEn(),
+      list:async()=>(await getDocs(collection(db,"students",u.uid,"results"))).docs.map(x=>x.data()).filter(r=>r&&r.activity&&(r.replies||r.levels)),
+      seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().fbSeen||{}},
+      save:o=>setDoc(doc(db,"students",u.uid),{fbSeen:o},{merge:true}),
+      name:(aid,step)=>{for(const g of Object.values(window.EL_GRADING||{})){const x=(g.moments||[]).find(m=>m.a===aid&&m.step===step);if(x)return x.name}return null}})).catch(e=>console.warn("corrections",e));
   // "Your level": a card once each time the teacher sets the student's route (shared/js/el-level-notice.js).
   if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-level-notice"))import("./el-level-notice.js").then(m=>m.levelNotice({course:courseOf(myGroup),
     lv:async()=>{const o={};(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>o[d.id]=d.data());return o},
@@ -413,4 +463,4 @@ onAuthStateChanged(auth,async u=>{
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};

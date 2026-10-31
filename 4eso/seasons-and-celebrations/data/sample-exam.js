@@ -6,6 +6,7 @@
    grammar 15, writing 30. Numbered 1–43 like the real exam; multiple choice has four options (the first is the right one; the engine shuffles). */
 (function () {
 const L30 = [8, 15, 23, 30];
+const SHADOW_VIDEO = '<video controls preload="none" playsinline poster="video/shadowing-poster.jpg" src="video/shadowing.mp4" style="width:100%;border-radius:14px;margin:8px 0;background:#000"></video>';
 const SCRIPT = [
   ['Callum', '[cheerful] Hi, I’m Callum, from Edinburgh in Scotland. In Scotland, New Year’s Eve is called Hogmanay, and for us it’s bigger than Christmas! There’s a huge street party in the city centre, with concerts and fireworks over the castle at midnight. It’s usually freezing, so you wear about three jumpers. [laughs]'],
   ['Callum', 'Then everyone holds hands and sings an old song, “Auld Lang Syne”. [laughs] Nobody knows all the words! It’s a song about old friends and remembering the good times. After midnight, we go “first-footing”: you visit your neighbours and you’re the first person to walk into their house in the new year.'],
@@ -30,6 +31,10 @@ const AUDIO = { audio: 'audio/sample-exam-new-year.mp3', title: 'Two New Years: 
 window.LP = {
   key: 'ls2SampleExam4ESO', n: 'E', title: 'Sample exam',
   panels: [
+    // Shadowing review (Roger, 31 Oct 2026): the LS's shadowing video, once per LS as revision before the exam. Not a step: nothing is saved or counted.
+    { id: 'shadowing', type: 'info', tab: { ca: '🗣 Shadowing', en: '🗣 Shadowing' }, title: { ca: 'Abans de l’examen: shadowing de tota la unitat', en: 'Before the exam: shadowing for the whole unit' },
+      html: { ca: '<p>Un repàs de 6 minuts per escoltar i parlar: frases de les escoltes de la unitat. Escolta, repeteix en veu alta i torna-ho a fer sense text. El vídeo t’espera.</p>' + SHADOW_VIDEO,
+        en: '<p>A 6-minute review for listening and speaking: sentences from the unit’s recordings. Listen, say them out loud, then do it again with no text. The video waits for you.</p>' + SHADOW_VIDEO } },
     { id: 'how', type: 'info', tab: { ca: 'Com és', en: 'How it works' }, title: { ca: 'Com és l’examen', en: 'How the exam works' },
       html: { ca: '<p>Aquest examen d’exemple té <strong>el mateix format i els mateixos punts que l’examen real</strong> (que faràs amb un Google Forms). 55 minuts, sense apunts.</p>' +
         '<table class="score-table" style="width:100%;border-collapse:collapse"><tbody><tr><td>1 Listening: 5 preguntes + listening chart, 5 preguntes (2 punts cada una)</td><td style="text-align:right">20</td></tr><tr><td>2 Reading: 5 preguntes + reading log, 5 preguntes (2 punts cada una)</td><td style="text-align:right">20</td></tr><tr><td>3 Vocabulary: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>4 Grammar: 7 d’opcions (1 punt) + 4 per completar (2 punts)</td><td style="text-align:right">15</td></tr><tr><td>5 Writing: un correu formal</td><td style="text-align:right">30</td></tr><tr><td><strong>Total</strong></td><td style="text-align:right"><strong>100</strong></td></tr></tbody></table>' +
