@@ -12,6 +12,13 @@ const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 
 const ROOT = process.cwd(), OUT = path.resolve(process.argv[2] || 'worksheets');
+// Secure recall checkpoints (31 Oct 2026) have no answers or hints in the repo: pass the keys file (kept outside the repo) to print them,
+//   node tools/lp-worksheets/build.mjs OUTDIR --keys <ls2-checkpoint-keys.json>
+const KEYS = (i => i > 0 ? JSON.parse(fs.readFileSync(process.argv[i + 1], 'utf8')) : null)(process.argv.indexOf('--keys'));
+// fills a / ca / en back into a checkpoint data file as it is served
+const withKeys = src => !KEYS ? src : src + '\n;(function (K) { const fix = p => { if (!p || !p.items) return; const k = (K[(window.LP || {}).key] || {}).items || {};' +
+  ' p.items = p.items.map(it => k[it.id] ? Object.assign({}, it, { a: (k[it.id].a || []).concat(k[it.id].extra || []), ca: k[it.id].ca, en: k[it.id].en }) : it); };' +
+  ' ((window.LP || {}).panels || []).forEach(fix); Object.values((window.LP || {}).native || {}).forEach(fix); })(' + JSON.stringify(KEYS) + ');\n';
 const ROUTES = ['beginners', 'insecure', 'safe', 'daring'];
 const NAMES = { beginners: 'starter', insecure: 'base', safe: 'core', daring: 'plus' };
 // The Learning Paths with a worksheet: shared/print/lp-list.js (also read by the site's worksheet index).
@@ -21,7 +28,9 @@ const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/cs
 const server = http.createServer((req, res) => {
   const f = path.join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/^\/English-lab\//, '/'));
   if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
-  res.writeHead(200, { 'content-type': TYPES[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res);
+  res.writeHead(200, { 'content-type': TYPES[path.extname(f)] || 'application/octet-stream' });
+  if (/data\/(native\/)?recall-checkpoint-\d+\.js$/.test(f)) return res.end(withKeys(fs.readFileSync(f, 'utf8')));
+  fs.createReadStream(f).pipe(res);
 }).listen(0);
 const port = server.address().port;
 const browser = await chromium.launch();

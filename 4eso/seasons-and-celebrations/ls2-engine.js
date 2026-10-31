@@ -26,6 +26,7 @@ var LS2 = (function () {
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
   let LP, level, state;
   const ca = () => level === 'insecure' || level === 'beginners';
+  window.elMicCa = ca;   // the microphone helper (shared/js/el-mic.js) speaks the route's language
   /* Starter works differently, not only with fewer questions (Roger, 31 Oct 2026, thread "Explain Starter vs Base learning paths").
      Only in Learning Paths whose data says starter: true (paths students had not started that day; started ones stay as they were):
      Starter picks typed answers from three options (a wrong pick is crossed out and they try again), starts every listening and
@@ -89,9 +90,27 @@ var LS2 = (function () {
   const spoken = q => String(q).replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').replace(/→/g, '. ').replace(/[“”]/g, '').replace(/\s+/g, ' ').trim();
   const cue = q => (String(q).replace(/<[^>]+>/g, '').match(/\([^)]*\)/g) || []).join(' ');
   let sayTok = 0, utt = [], bctx = null;
+  /* ElevenLabs recordings (Roger, 31 Oct 2026: "all the audios with ElevenLabs"): tools/tts records each line the browser voice used to
+     say as audio/tts/<key>.mp3 (+ -slow.mp3, the same audio at 0.75), key = FNV-1a of the text exactly as passed here (tools/tts/tts-key.js);
+     data/tts.js lists the recorded keys. Listen-and-complete recordings already have the beep in the gap. A line with no recording still
+     uses the browser voice. */
+  const ttsKey = s => { let h = 0x811c9dc5; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return ('0000000' + h.toString(16)).slice(-8); };
+  (function () { if (window.LS2_TTS || document.querySelector('script[data-tts]')) return; const t = document.createElement('script'); t.src = 'data/tts.js'; t.dataset.tts = '1'; document.head.appendChild(t); })();
+  let recAudio = null;
+  function stopSay() { sayTok++; if (recAudio) { recAudio.pause(); recAudio = null; } if (window.speechSynthesis) speechSynthesis.cancel(); }
+  // plays the recording of text (slow when rate < 0.8) and returns true, or returns false when there is none
+  function playRec(text, rate, onend) {
+    const k = ttsKey(text); if (!window.LS2_TTS || !window.LS2_TTS.has(k)) return false;
+    stopSay(); const tok = sayTok, a = new Audio('audio/tts/' + k + ((rate || 1) < 0.8 ? '-slow' : '') + '.mp3'); recAudio = a;
+    let once = false; const done = () => { if (once || tok !== sayTok) return; once = true; if (onend) onend(); };
+    a.onended = done; a.onerror = () => { if (tok !== sayTok) return; recAudio = null; window.LS2_TTS.delete(k); sayLine(text, rate, onend); };
+    a.play().catch(() => {}); return true;
+  }
   function beep(done) { try { bctx = bctx || new (window.AudioContext || window.webkitAudioContext)(); const o = bctx.createOscillator(), g = bctx.createGain(); o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(bctx.destination); o.start(); setTimeout(() => { o.stop(); done && done(); }, 450); } catch (e) { done && done(); } }
   // Says text (or a gapped sentence, with a beep for each gap) in order; a newer call stops an older one.
   function sayLine(q, rate, onend) {
+    if (playRec(q, rate, onend)) return;
+    if (recAudio) { recAudio.pause(); recAudio = null; }
     const s = window.speechSynthesis; if (!s) { if (onend) onend(); return; } s.cancel(); const tok = ++sayTok;
     const seq = String(q).replace(/<[^>]+>/g, '').split(/_{2,}(?:[\s/]*_{2,})*/).flatMap((t, i) => i ? [null, t] : [t]).filter(t => t === null || /[A-Za-z0-9]/.test(spoken(t)));
     let i = 0; utt = [];
@@ -240,7 +259,8 @@ var LS2 = (function () {
 
   /* ---------- panels ---------- */
   const R = {};
-  R.recall = p => ({
+  // a checkpoint with `secure` (answers not in the page, one try, feedback when the teacher releases it): shared/js/el-checkpoint.js
+  R.recall = p => p.secure && window.ELCheckpoint ? ELCheckpoint.panel(p, { LP, level: () => level, ca, get state() { return state; }, save, complete, forLevel }) : ({
     html: '<div class="section-card"><div id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>',
     bind() {
       const items = forLevel(p.items);
@@ -426,7 +446,7 @@ var LS2 = (function () {
   }
   function bindDict(p) {
     if (!p.chunks || !p.chunks.length) return;
-    const say = (t, rate) => { const s = window.speechSynthesis; if (!s) return; s.cancel(); const u = new SpeechSynthesisUtterance(t), v = s.getVoices().find(x => /^en(-|_)GB/i.test(x.lang)) || s.getVoices().find(x => /^en(-|_)/i.test(x.lang)); u.lang = 'en-GB'; if (v) u.voice = v; u.rate = rate; s.speak(u); };
+    const say = (t, rate) => { if (playRec(t, rate)) return; if (recAudio) { recAudio.pause(); recAudio = null; } const s = window.speechSynthesis; if (!s) return; s.cancel(); const u = new SpeechSynthesisUtterance(t), v = s.getVoices().find(x => /^en(-|_)GB/i.test(x.lang)) || s.getVoices().find(x => /^en(-|_)/i.test(x.lang)); u.lang = 'en-GB'; if (v) u.voice = v; u.rate = rate; s.speak(u); };
     state.dict = state.dict || {}; const kept = state.dict[p.id] || [];
     p.chunks.forEach((c, i) => {
       $('[data-say="' + p.id + i + '"]').onclick = () => say(c, 0.9);
@@ -482,6 +502,26 @@ var LS2 = (function () {
      the step completes only when the student saves an improved final version (state.finals[key]) with a line on what they changed.
      The teacher sees draft, final version and that line in the activity dialog; the student sees their own draft here. */
   const revWords = s => (String(s || '').trim().match(/\S+/g) || []).length;
+  // Teacher-marked writing (p.teacher on a writing or marked panel; Roger, 31 Oct 2026: "instead of sending the writing to ChatGPT …
+  // the teacher corrects"): the button hands the text in like a step (state.steps[p.id], with the writing log of el-typing.js), with no
+  // ChatGPT and no points typed by the student. The level and the correction come from the marking sheet a week later
+  // (shared/js/el-marking.js) and show in this panel (shared/js/el-corrections.js); a marked panel then counts the teacher's level as
+  // its points (EL_DEGREE_MARK: NA 2.5 · AS 5 · AN 7.5 · AE 10 out of 10), sent by el-corrections.js as the "el-levels" event.
+  function handToTeacher(p, text) {
+    state.steps = state.steps || {};
+    state.steps[p.id] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum('#' + p.id + 'Text') : null, f: [{ l: ca() ? 'El meu text' : 'My text', v: text }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+    complete(p.id); save();
+  }
+  function teacherBtn() { return ca() ? 'Entrega-ho al professor' : 'Hand it in to my teacher'; }
+  function handedMsg(p) { const h = (state.steps || {})[p.id]; return h ? (ca() ? 'Entregat el ' + new Date(h.date).toLocaleDateString() + '. El professor et tornarà la correcció aquí mateix. Si canvies el text, torna’l a entregar.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. Your teacher’s correction will appear right here. If you change your text, hand it in again.') : ''; }
+  addEventListener('el-levels', e => {
+    const lv = (e.detail || {}).levels || {}, M = { NA: 2.5, AS: 5, AN: 7.5, AE: 10 };
+    (LP.panels || []).filter(p => p.teacher && p.type === 'marked' && lv[p.id]).forEach(p => {
+      const xs = Object.values(lv[p.id]).map(x => M[x]).filter(x => x != null); if (!xs.length) return;
+      state.ai = state.ai || {}; const k = p.id + '_' + level, v = Math.round(xs.reduce((a, b) => a + b, 0) / xs.length / 10 * p.max);
+      if (state.ai[k] !== v) { state.ai[k] = v; save(); if (LP.onScore) LP.onScore(); }
+    });
+  });
   function keepDraft(key, text) {
     state.drafts = state.drafts || {};
     if (state.drafts[key]) return false;
@@ -528,8 +568,8 @@ var LS2 = (function () {
       (p.model ? '<div class="model"><strong>' + (ca() ? 'Model (no el copiïs: és sobre una altra celebració)' : 'Model (don’t copy it: it is about another celebration)') + '</strong><br>' + tx(p.model) + '</div>' : '') +
       '<div class="model" id="' + p.id + 'Frame" hidden></div><textarea id="' + p.id + 'Text" placeholder="Write here…"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
       '<div class="section-card"><h3>' + (ca() ? 'Revisa abans d’enviar' : 'Check before you send') + '</h3><div class="options" id="' + p.id + 'List"></div>' +
-      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (ca() ? 'Desa i corregeix amb IA ↗' : 'Save and correct with AI ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
-      '</div>' + revisionHtml(p.id),
+      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (p.teacher ? teacherBtn() : ca() ? 'Desa i corregeix amb IA ↗' : 'Save and correct with AI ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
+      '</div>' + (p.teacher ? '' : revisionHtml(p.id)),
     bind() {
       const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level;
       state.texts = state.texts || {};
@@ -547,6 +587,7 @@ var LS2 = (function () {
         const boxes = $$('#' + p.id + 'List input'), msg = $('#' + p.id + 'Msg');
         if (min && words(ta.value) < min) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + min + ' paraules.' : 'Too short: write at least ' + min + ' words.'; return; }
         if (boxes.some(b => !b.checked)) { msg.className = 'feedback no'; msg.textContent = learningSupport.missing(level, boxes); return; }
+        if (p.teacher) { handToTeacher(p, ta.value.trim()); if (p.product) saveProduct(p.product, ta.value.trim()); msg.className = 'feedback ok'; msg.textContent = handedMsg(p); return; }
         window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(aiPrompt(p, ta.value.trim())), '_blank', 'noopener,noreferrer');
         if (p.product) saveProduct(p.product, ta.value.trim());
         const first = keepDraft(key, ta.value.trim());
@@ -555,6 +596,7 @@ var LS2 = (function () {
           : (ca() ? 'S’ha obert ChatGPT amb la teva nova versió.' : 'ChatGPT has opened with your new version.');
         showRevision();
       };
+      if (p.teacher) { const h = handedMsg(p); if (h) { $('#' + p.id + 'Msg').className = 'feedback ok'; $('#' + p.id + 'Msg').textContent = h; } return; }
       const showRevision = bindRevision(p.id, key, () => ta.value.trim(), text => { if (p.product) saveProduct(p.product, text); });
     }
   });
@@ -621,7 +663,7 @@ var LS2 = (function () {
         const ps = byLevel(p.peerRate) || [], peers = (draft.peers || []).filter(d => d && (d.name || '').trim());
         if (p.peers && (peers.length < (p.minPeers || 2) || peers.some(d => ps.some((s, i) => !(d.r || [])[i])))) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Escriu el nom de cada company i puntua totes les frases.' : 'Write each teammate’s name and rate every statement.'; return; }
         const rate = stm.map((s, i) => ({ s, v: draft.rate[i] }));
-        state.steps[key] = { level, title: tx(p.title), f: fields.map(f => ({ l: tx(f.label), v: (draft.f[f.id] || '').trim() })), rate, avg: rate.length ? Math.round(rate.reduce((a, x) => a + x.v, 0) / rate.length * 10) / 10 : null,
+        state.steps[key] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum('#' + key + 'Fields') : null, f: fields.map(f => ({ l: tx(f.label), v: (draft.f[f.id] || '').trim() })), rate, avg: rate.length ? Math.round(rate.reduce((a, x) => a + x.v, 0) / rate.length * 10) / 10 : null,
           peers: p.peers ? peers.map(d => ({ name: d.name.trim(), r: ps.map((s, i) => ({ s, v: d.r[i] })) })) : undefined, comment: (draft.comment || '').trim(), date: new Date().toISOString() };
         // A step can also be a product piece (the research card): it then appears on the final product page too.
         if (p.product) saveProduct(p.product, state.steps[key].f.filter(f => f.v).map(f => f.l + ': ' + f.v).join('\n'));
@@ -694,7 +736,7 @@ var LS2 = (function () {
       const ch = $('#' + key + 'Change'), msg = $('#' + key + 'Msg');
       ch.value = d.change || '';
       const hand = () => {
-        state.steps[key] = { level, title: tx(p.title), f: p.fields.map(f => ({ l: f.label, v: (d.f[f.id] || '').trim() })).concat(d.change ? [{ l: 'What I would change after the model', v: d.change }] : []), rate: [], avg: null, comment: '', date: new Date().toISOString() };
+        state.steps[key] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum('#' + key + 'Fields') : null, f: p.fields.map(f => ({ l: f.label, v: (d.f[f.id] || '').trim() })).concat(d.change ? [{ l: 'What I would change after the model', v: d.change }] : []), rate: [], avg: null, comment: '', date: new Date().toISOString() };
         state.done[key] = true; stamp(key); save();
       };
       ch.oninput = () => { d.change = ch.value.trim(); if (state.steps[key]) hand(); else save(); };
@@ -723,6 +765,7 @@ var LS2 = (function () {
       $('#spPlan').value = sp.plan || ''; $('#speechTranscript').value = sp.tr || '';
       $('#spPlan').oninput = keepSp; $('#speechTranscript').oninput = keepSp;
       $('#startRecord').onclick = async () => {
+        if (processor) return; $('#startRecord').disabled = true;
         try {
           micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
@@ -731,7 +774,7 @@ var LS2 = (function () {
           sourceNode.connect(processor); processor.connect(audioCtx.destination); srBox = null; startSR();
           $('#recordStatus').textContent = ca() ? 'Gravant… parla ara.' : 'Recording… speak now.';
           $('#startRecord').disabled = true; $('#stopRecord').disabled = false; $('#downloadWav').disabled = true; $('#spAi').disabled = true;
-        } catch (e) { $('#recordStatus').textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Dona permís i torna-ho a provar.' : 'Microphone access was not available. Allow it and try again.'; }
+        } catch (e) { $('#startRecord').disabled = false; $('#recordStatus').textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; }
       };
       $('#stopRecord').onclick = async () => {
         if (!processor) return;
@@ -740,7 +783,7 @@ var LS2 = (function () {
         $('#recordedAudio').src = recUrl; $('#recordedAudio').style.display = 'block';
         $('#downloadWav').disabled = false; $('#spAi').disabled = false; $('#startRecord').disabled = false; $('#stopRecord').disabled = true; processor = null;
         $('#recordStatus').textContent = ca() ? 'Gravació a punt. Escolta-la abans de demanar feedback.' : 'Recording ready. Listen to it before asking for feedback.';
-        setTimeout(keepSp, 1500);   // the last words of the automatic transcript arrive after Stop
+        setTimeout(() => { keepSp(); if (!$('#speechTranscript').value.trim()) $('#recordStatus').textContent += ' ' + (ca() ? 'No s’ha creat cap transcripció automàtica: escriu tu el que has dit.' : 'No automatic transcript was made: type what you said.'); }, 1500);   // the last words of the automatic transcript arrive after Stop
       };
       $('#downloadWav').onclick = downloadWav;
       $('#spAi').onclick = () => {
@@ -800,22 +843,24 @@ var LS2 = (function () {
               rec.start(); } catch (e) {}
           };
           const stop = async () => {
-            run++; clearTimeout(timer); sayTok++; if (window.speechSynthesis) speechSynthesis.cancel(); listen(false);
+            run++; clearTimeout(timer); stopSay(); listen(false);
             if (!processor) return;
             processor.disconnect(); sourceNode.disconnect(); micStream.getTracks().forEach(t => t.stop()); await audioCtx.close(); processor = null;
             recBlob = encodeWav(pcm, recRate); if (recUrl) URL.revokeObjectURL(recUrl); recUrl = URL.createObjectURL(recBlob);
             const a = $('#' + id + 'Audio'); a.src = recUrl; a.style.display = 'block';
             btn('Start').disabled = false; btn('Stop').disabled = true; btn('Wav').disabled = false; btn('Ai').disabled = false;
             st.textContent = ca() ? 'Gravació a punt. Escolta-la, revisa la transcripció i demana feedback.' : 'Recording ready. Listen to it, check the transcript and ask for feedback.';
+            setTimeout(() => { if (!tr.value.trim()) st.textContent += ' ' + (ca() ? 'No s’ha creat cap transcripció automàtica: escriu tu el que has dit.' : 'No automatic transcript was made: type what you said.'); }, 1200);
           };
           btn('Start').onclick = async () => {
+            if (processor) return; btn('Start').disabled = true;
             try {
               micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
               audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
               sourceNode = audioCtx.createMediaStreamSource(micStream); processor = audioCtx.createScriptProcessor(4096, 1, 1); pcm = [];
               processor.onaudioprocess = e => pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
               sourceNode.connect(processor); processor.connect(audioCtx.destination);
-            } catch (e) { st.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Dona permís i torna-ho a provar.' : 'Microphone access was not available. Allow it and try again.'; return; }
+            } catch (e) { btn('Start').disabled = false; st.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; return; }
             btn('Start').disabled = true; btn('Stop').disabled = false; btn('Wav').disabled = true; btn('Ai').disabled = true;
             if (tr.value.trim()) { tr.value = ''; sp.tr = ''; save(); }
             const me = ++run; let i = 0;
@@ -846,7 +891,7 @@ var LS2 = (function () {
         $('#' + id + 'Send').onclick = () => {
           const n = nat ? words((sp.notes || []).join(' ')) : words(sp.tr || '');
           if (n < min) { msg.className = 'feedback no'; msg.textContent = nat ? 'Write a few ideas for every question (at least ' + min + ' words in all).' : ca() ? 'La transcripció té ' + n + ' paraules: respon totes les preguntes (almenys ' + min + ' paraules). Si Chrome no l’ha escrita, escriu el que has dit.' : 'Your transcript has ' + n + ' words: answer every question (at least ' + min + ' words). If Chrome didn’t write it, type what you said.'; return; }
-          state.steps[id] = { level, title: tx(p.title), f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
+          state.steps[id] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum($('#' + id + 'Tr') && $('#' + id + 'Tr').parentElement) : null, f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
           complete(id); save();
           msg.className = 'feedback ok'; msg.textContent = ca() ? 'Entregada ✓ El professor ho veurà al seu tauler.' : 'Handed in ✓ Your teacher will see it on the dashboard.';
         };
@@ -874,7 +919,7 @@ var LS2 = (function () {
         '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Hide">' + (ca() ? 'Amaga el text' : 'Hide the script') + '</button></div>' +
         '<div class="reading" id="' + id + 'Script">' + c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<strong>' + esc(l[0]) + ':</strong> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('') + '</div></div>' +
         '<div class="section-card"><h3>' + (ca() ? 'Grava l’última vegada' : 'Record your last go') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes darrere la veu. Amb Chrome veuràs quantes paraules del text ha entès l’ordinador. No compta per a la nota: és per veure com millores.' : 'Press <strong>Record and play</strong>: the clip plays and you shadow it. With Chrome you will see how many words of the script the computer caught. It is just for you, to see how you improve.') + '</p>' +
-        '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Rec">● ' + (ca() ? 'Grava i escolta' : 'Record and play') + '</button></div><div class="record-status" id="' + id + 'RecMsg"></div><audio id="' + id + 'Mine" controls style="width:100%;display:none"></audio></div>' +
+        '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Rec">● ' + (ca() ? 'Grava i escolta' : 'Record and play') + '</button><button class="btn secondary" type="button" id="' + id + 'RecStop" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button></div><div class="record-status" id="' + id + 'RecMsg"></div><audio id="' + id + 'Mine" controls style="width:100%;display:none"></audio></div>' +
         '<div class="section-card"><h3>' + (ca() ? 'Com ha anat?' : 'How did it go?') + '</h3><div class="actions" style="justify-content:flex-start" role="group">' +
         [['3', ca() ? '😀 Ho he seguit tot' : '😀 I kept up all the way'], ['2', ca() ? '🙂 Gairebé tot' : '🙂 Most of it'], ['1', ca() ? '😕 Em perdia' : '😕 I got lost']].map(r => '<button class="btn secondary" type="button" data-rate="' + id + '" data-v="' + r[0] + '">' + r[1] + '</button>').join('') +
         '</div><div class="actions"><button class="btn" type="button" id="' + id + 'Done">' + (ca() ? 'Fet ✓' : 'Done ✓') + '</button></div><p class="feedback" id="' + id + 'Msg"></p></div>',
@@ -888,9 +933,10 @@ var LS2 = (function () {
         const halt = () => { m.pause(); const f = onEnd; onEnd = null; if (f) f(); };
         m.ontimeupdate = () => { if (endAt && m.currentTime >= endAt) { endAt = 0; halt(); } };
         m.onended = () => { endAt = 0; halt(); };
+        m.onerror = () => { endAt = 0; $('#' + id + 'Count').textContent = ca() ? 'El fragment no s’ha pogut carregar. Recarrega la pàgina.' : 'The clip could not load. Reload the page.'; halt(); };
         const play = done => {
           const src = slow ? c.slow : c.src, t = slow ? c.ts : c.t;
-          const go = () => { m.currentTime = t[0]; endAt = t[1]; onEnd = done || null; m.play().catch(() => {}); sh.plays = (sh.plays || 0) + 1; count(); save(); };
+          const go = () => { m.currentTime = t[0]; endAt = t[1]; onEnd = done || null; m.play().catch(e => { if (e && e.name === 'AbortError') return; endAt = 0; $('#' + id + 'Count').textContent = ca() ? 'El fragment no s’ha pogut reproduir. Torna-ho a provar.' : 'The clip could not play. Try again.'; halt(); }); sh.plays = (sh.plays || 0) + 1; count(); save(); };
           if (!m.src || !m.src.endsWith(src)) { m.src = src; m.addEventListener('loadedmetadata', go, { once: true }); m.load(); } else go();
         };
         $('#' + id + 'Play').onclick = () => play();
@@ -899,19 +945,23 @@ var LS2 = (function () {
         $('#' + id + 'Hide').onclick = e => { const s = $('#' + id + 'Script'), h = !s.hidden; s.hidden = h; e.target.textContent = h ? (ca() ? 'Mostra el text' : 'Show the script') : (ca() ? 'Amaga el text' : 'Hide the script'); };
         $$('[data-rate="' + id + '"]').forEach(b => b.onclick = () => { sh.rate = +b.dataset.v; rate(); save(); });
         // the last go: the mic records while the clip plays; recognition counts the script words it heard (feedback only, never saved as a mark)
-        const recMsg = $('#' + id + 'RecMsg'), recBtn = $('#' + id + 'Rec');
+        const recMsg = $('#' + id + 'RecMsg'), recBtn = $('#' + id + 'Rec'), recStop = $('#' + id + 'RecStop');
+        recStop.onclick = () => { endAt = 0; halt(); };
         recBtn.onclick = async () => {
+          if (processor) return; recBtn.disabled = true;
           try {
             micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
             audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
             sourceNode = audioCtx.createMediaStreamSource(micStream); processor = audioCtx.createScriptProcessor(4096, 1, 1); pcm = [];
             processor.onaudioprocess = e => pcm.push(new Float32Array(e.inputBuffer.getChannelData(0)));
             sourceNode.connect(processor); processor.connect(audioCtx.destination);
-          } catch (e) { recMsg.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Dona permís i torna-ho a provar.' : 'Microphone access was not available. Allow it and try again.'; return; }
+          } catch (e) { recBtn.disabled = false; recMsg.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; return; }
           let rec = null, heard = ''; const SR = SRC();
           if (SR) try { rec = new SR(); rec.lang = 'en-GB'; rec.continuous = true; rec.interimResults = false; rec.onresult = e => { for (let k = e.resultIndex; k < e.results.length; k++) if (e.results[k].isFinal) heard += ' ' + e.results[k][0].transcript; }; rec.start(); } catch (e) { rec = null; }
-          recBtn.disabled = true; recMsg.textContent = ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.';
+          recStop.disabled = false; recMsg.textContent = ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.';
+          (c.video ? m : recBtn).scrollIntoView({ behavior: 'smooth', block: 'center' });   // the video has to be in view to follow it
           play(async () => {
+            recStop.disabled = true;
             try { if (rec) rec.stop(); } catch (e) {}
             if (processor) { processor.disconnect(); sourceNode.disconnect(); micStream.getTracks().forEach(t => t.stop()); await audioCtx.close(); processor = null; }
             recBlob = encodeWav(pcm, recRate); if (recUrl) URL.revokeObjectURL(recUrl); recUrl = URL.createObjectURL(recBlob);
@@ -921,7 +971,7 @@ var LS2 = (function () {
               const ws = toks(want), got = ws.filter(w => said.has(w)).length, pct = ws.length ? Math.round(got / ws.length * 100) : 0;
               if (SR && heard.trim()) { sh.pct = pct; save(); }
               recMsg.textContent = SR && heard.trim() ? (ca() ? 'L’ordinador ha entès el ' + pct + ' % de les paraules. Escolta’t i torna-ho a provar si vols.' : 'The computer caught ' + pct + ' % of the words. Listen to yourself and try again if you like.')
-                : (ca() ? 'Gravació a punt. Escolta’t.' : 'Recording ready. Listen to yourself.');
+                : (ca() ? 'Gravació a punt. Escolta’t.' : 'Recording ready. Listen to yourself.') + (SR && window.elMic && window.elMic.srBroken() ? ' ' + window.elMic.text(window.elMic.srBroken()).split('. ')[0] + '.' : '');
             }, 900);
           });
         };
@@ -995,10 +1045,11 @@ var LS2 = (function () {
   R.marked = p => ({
     html: '<div class="section-card">' + mediaHtml(p) + '<h3>' + (ca() ? 'La tasca' : 'Your task') + ' <small>[' + ptsWord(p.max) + ']</small></h3><p class="instruction" id="' + p.id + 'Task"></p>' +
       '<textarea id="' + p.id + 'Text" rows="9"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
+      (p.teacher ? '<div class="section-card"><h3>' + (ca() ? 'Entrega' : 'Hand it in') + '</h3><p class="instruction">' + (ca() ? 'Quan acabis, entrega-ho. El professor et tornarà la correcció aquí mateix.' : 'When you finish, hand it in. Your teacher’s correction will appear right here.') + '</p><div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + teacherBtn() + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>' :
       '<div class="section-card"><h3>' + (ca() ? 'Feedback i nota orientativa' : 'Feedback and a guide mark') + '</h3><p class="instruction">' + (ca() ? 'Prem el botó: s’obre ChatGPT amb la teva resposta i els criteris de correcció. Et dirà el nivell (NA, AS, AN, AE), els punts i què has de millorar.' : 'Press the button: ChatGPT opens with your answer and the marking criteria. It tells you the level (NA, AS, AN, AE), the points and what to improve.') + '</p>' +
       '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (ca() ? 'Desa i corregeix amb ChatGPT ↗' : 'Save and mark with ChatGPT ↗') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p>' +
       '<label class="field"><strong>' + (ca() ? 'Punts que t’ha donat ChatGPT (de ' + p.max + ')' : 'Points ChatGPT gave you (out of ' + p.max + ')') + '</strong><input type="number" class="typed" id="' + p.id + 'Pts" min="0" max="' + p.max + '" step="1" style="max-width:120px"></label>' +
-      '<p class="warm-note">' + aiWarning() + '</p></div>',
+      '<p class="warm-note">' + aiWarning() + '</p></div>'),
     bind() {
       bindAudio(p);
       const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level, min = byLevel(p.min);
@@ -1008,6 +1059,14 @@ var LS2 = (function () {
       const count = () => { $('#' + p.id + 'Count').textContent = words(ta.value) + ' ' + (ca() ? 'paraules' : 'words') + (min ? ' · ' + (ca() ? 'mínim ' : 'minimum ') + min : ''); };
       ta.oninput = () => { state.texts[key] = ta.value; save(); count(); };
       count();
+      if (p.teacher) {
+        const msg = $('#' + p.id + 'Msg'); if (handedMsg(p)) { msg.className = 'feedback ok'; msg.textContent = handedMsg(p); }
+        $('#' + p.id + 'Ai').onclick = () => {
+          if (words(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.'; return; }
+          handToTeacher(p, ta.value.trim()); msg.className = 'feedback ok'; msg.textContent = handedMsg(p);
+        };
+        return;
+      }
       const pts = $('#' + p.id + 'Pts'), k = p.id + '_' + level;
       pts.value = state.ai[k] != null ? state.ai[k] : '';
       pts.oninput = () => { const v = pts.value === '' ? null : Math.max(0, Math.min(p.max, Math.round(+pts.value))); if (v == null) delete state.ai[k]; else state.ai[k] = v; save(); if (LP.onScore) LP.onScore(); };

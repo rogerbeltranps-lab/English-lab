@@ -1,0 +1,313 @@
+[
+ {
+  "id": "ca2ac849",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "[excited] Hi everyone! Welcome to my vlog.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "everyone"
+  ],
+  "q": "Hi ___! Welcome to my vlog. (tothom)"
+ },
+ {
+  "id": "3de43b63",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "Today I’m at the skate park.",
+  "mask": [
+   [
+    0,
+    0
+   ]
+  ],
+  "answers": [
+   "today"
+  ],
+  "q": "___ I’m at the skate park. (avui)"
+ },
+ {
+  "id": "85fdb67a",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "In this photo, my friends are skating.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "photo"
+  ],
+  "q": "In this ___, my friends are skating. (foto)"
+ },
+ {
+  "id": "0ef06d37",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[excited] That’s all! See you next time!",
+  "mask": [
+   [
+    5,
+    5
+   ]
+  ],
+  "answers": [
+   "time"
+  ],
+  "q": "That’s all! See you next ___! (fins a la pròxima)"
+ },
+ {
+  "id": "8d3daa13",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Julian",
+  "voice_id": "9IzcwKmvwJcw58h3KnlH",
+  "text": "[excited] Thanks for watching!",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "watching"
+  ],
+  "q": "Thanks for ___! (mirar-ho)"
+ },
+ {
+  "id": "7c090372",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Zara",
+  "voice_id": "jqcCZkN6Knx8BJ5TBdYR",
+  "text": "I spend time drawing every evening.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "spend"
+  ],
+  "q": "I ___ time drawing every evening. (passar)"
+ },
+ {
+  "id": "a6cce114",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Lewis",
+  "voice_id": "gUbIduqGzBP438teh4ZA",
+  "text": "I want to join a climbing club.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "join"
+  ],
+  "q": "I want to ___ a climbing club."
+ },
+ {
+  "id": "10be9791",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Clyde",
+  "voice_id": "wyWA56cQNU2KqUW4eCsI",
+  "text": "We train hard before a tournament.",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "hard"
+  ],
+  "q": "We train ___ before a tournament. (fort)"
+ },
+ {
+  "id": "b8a520d4",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Amelia",
+  "voice_id": "ZF6FPAbjXT4488VcRRnw",
+  "text": "[excited] I’m getting better at skating: I don’t fall now!",
+  "mask": [
+   [
+    2,
+    2
+   ]
+  ],
+  "answers": [
+   "better"
+  ],
+  "q": "I’m getting ___ at skating: I don’t fall now!"
+ },
+ {
+  "id": "24c71fe2",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Finn",
+  "voice_id": "vBKc2FfBKJfcZNyEt1n6",
+  "text": "I prefer the park to the sports hall.",
+  "mask": [
+   [
+    1,
+    1
+   ]
+  ],
+  "answers": [
+   "prefer"
+  ],
+  "q": "I ___ the park to the sports hall. (preferir)"
+ },
+ {
+  "id": "66f707f2",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "listen",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "For me, climbing means freedom.",
+  "mask": [
+   [
+    3,
+    3
+   ]
+  ],
+  "answers": [
+   "means"
+  ],
+  "q": "For me, climbing ___ freedom. (voler dir)"
+ },
+ {
+  "id": "89db938c",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] What’s your vlog about?",
+  "mask": [],
+  "answers": [],
+  "q": "What’s your vlog about?"
+ },
+ {
+  "id": "727eecfa",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Where are you in the vlog?",
+  "mask": [],
+  "answers": [],
+  "q": "Where are you in the vlog?"
+ },
+ {
+  "id": "dd35013e",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Why do you like this activity?",
+  "mask": [],
+  "answers": [],
+  "q": "Why do you like this activity?"
+ },
+ {
+  "id": "125db421",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] Who do you usually do it with?",
+  "mask": [],
+  "answers": [],
+  "q": "Who do you usually do it with?"
+ },
+ {
+  "id": "a41bb230",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] What’s happening in your vlog?",
+  "mask": [],
+  "answers": [],
+  "q": "What’s happening in your vlog?"
+ },
+ {
+  "id": "a15e93fd",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] How do you start and end your vlog?",
+  "mask": [],
+  "answers": [],
+  "q": "How do you start and end your vlog?"
+ },
+ {
+  "id": "97051801",
+  "course": "2eso",
+  "lp": 6,
+  "page": "write-your-vlog-script",
+  "kind": "talk",
+  "voice": "Tonia",
+  "voice_id": "ui11Rd52NKH2DbWlcbvw",
+  "text": "[curious] What’s your tip for your viewers?",
+  "mask": [],
+  "answers": [],
+  "q": "What’s your tip for your viewers?"
+ }
+]
