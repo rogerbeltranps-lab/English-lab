@@ -8,6 +8,7 @@ shot r3-12-route-line.png
 shot r3-13-ask-route.png
 shot r3-14-ask-route-filled.png
 shot r3-15-week-plan.png
+shot r3-15-whole-ls-plan.png
 shot r3-16-my-week.png
 shot r3-17-lp-grid.png
 shot r3-18-result-window.png
