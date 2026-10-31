@@ -98,6 +98,14 @@ await step('route request with a reason (not sent)', async () => {
   await page.locator('[data-do="close"]').first().click();
 });
 await step('week plan', async () => { await top('#main .box:has(h2:text-matches("week plan|pla setmanal","i"))', 40); await shot('15-week-plan'); });
+await step('whole LS plan', async () => {
+  const s = page.locator('#main summary', { hasText: /whole LS plan|Tot el pla/ }).first();
+  await s.click();
+  await page.waitForTimeout(500);
+  await s.evaluate((e) => window.scrollTo(0, e.getBoundingClientRect().top + window.scrollY - 60));
+  await shot('15-whole-ls-plan');
+  await s.click();
+});
 await step('my week window', async () => {
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.locator('#el-todo-btn').click();
