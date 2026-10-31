@@ -538,8 +538,11 @@ const mkStuds=grp=>Object.values(S.P).filter(s=>s.group===grp.id&&!s.away&&!s.te
 // goes back to the marking sheet).
 const flagOf=(u,aid,step)=>((res(u,aid).flags||{})[step])||null;
 const mkWaits=(u,a,step)=>{const f=flagOf(u,a.id,step),h=handedIn(u,a)[step];return !!f&&!(f.done==="redo"&&h&&h.date>f.at)};
-// hand-ins of one step still without a level for every criterion of it (a possible copy waiting for the teacher is left out)
-const mkTodo=(m,grp)=>{const a=byId(m.a);return mkStuds(grp).filter(s=>handedIn(s.uid,a)[m.step]&&!m.c.every(c=>lvOf(s.uid,m.a,m.step,c))&&!mkWaits(s.uid,a,m.step))};
+// hand-ins of one step still without a level for every criterion of it, or handed in again after the sheet marked them (Roger, 31 Oct
+// 2026: resubmissions are marked again; results/{activity}.marked[step] = when the sheet saved the levels; a level set with the buttons
+// stays). A possible copy waiting for the teacher is left out.
+const mkAgain=(u,a,step)=>{const t=(res(u,a.id).marked||{})[step],h=handedIn(u,a)[step];return !!t&&!!h&&h.date>t};
+const mkTodo=(m,grp)=>{const a=byId(m.a);return mkStuds(grp).filter(s=>handedIn(s.uid,a)[m.step]&&(!m.c.every(c=>lvOf(s.uid,m.a,m.step,c))||mkAgain(s.uid,a,m.step))&&!mkWaits(s.uid,a,m.step))};
 // the student's exam writing marks so far in this course ("LS1 6/10"), for the marking sheet
 const mkExam=u=>{const L=EL_LS.filter(l=>l.course===COURSE);return L.slice(0,L.findIndex(l=>l.id===S.ls)+1).map((l,i)=>{const w=((res(u,asId(l.id)).sections||{}).writing)||{};return w.score!=null&&w.score!==""?`LS${i+1} ${w.score}/${w.max||10}`:null}).filter(Boolean).join(", ")};
 function mkReady(m,grp){const p=(window.EL_PLAN||{})[S.ls];return ELMark.ready({p,gi:p?ELWeek.col(p,grp.id):-1,due:dueOf(m.a,grp.id),title:byId(m.a).title,ticks:(S.D.tk[grp.id]||{}).ticks,ls:S.ls})}
@@ -575,7 +578,7 @@ function mkCheck(){const k=S.mk,r=ELMark.parse($("#mkin").value,{aid:k.m.a,step:
 function mkDown(){const k=S.mk,b=new Blob([k.sh.text],{type:"text/plain"}),l=document.createElement("a");l.href=URL.createObjectURL(b);l.download=`marking-${k.grp.name}-${k.m.a.split("/").pop()}-${k.m.step}.txt`;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(l.href),2000)}
 function mkSave(){const k=S.mk;if(!k||!k.rows||!k.rows.length)return;const fb=$("#mkfb")&&$("#mkfb").checked,a=byId(k.m.a);
   const ps=k.rows.flatMap(x=>x.flag?[patch(x.s.uid,k.m.a,{flags:{[k.m.step]:{why:x.flag,lv:x.lv,fb:fb?x.fb:"",at:new Date().toISOString()}}})]
-    :[patch(x.s.uid,k.m.a,{levels:{[k.m.step]:x.lv}}),...(fb&&x.fb?[api.reply(x.s.uid,a,k.m.step,x.fb)]:[])]);
+    :[patch(x.s.uid,k.m.a,{levels:{[k.m.step]:x.lv},marked:{[k.m.step]:new Date().toISOString()}}),...(fb&&x.fb?[api.reply(x.s.uid,a,k.m.step,x.fb)]:[])]);
   $("#dlg").close();S.mk=null;act(Promise.all(ps))}
 // the To do's possible copies of the group on screen, and their dialog: the work, its writing log, the reason, Accept or Redo in class
 function cpItems(grp){return mkMoments().flatMap(m=>{const a=byId(m.a);return mkStuds(grp).filter(s=>{const f=flagOf(s.uid,m.a,m.step);return f&&!f.done}).map(s=>
@@ -589,7 +592,7 @@ function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step
     <div class="row" style="justify-content:flex-start"><button data-do="cpok">✔ Accept: it's their work</button><button class="g" data-do="cpredo">↺ Redo in class</button></div>
     <p class="muted">Redo in class sends the student: “${esc(CA_RT.includes(level(u,S.ls))?REDO.ca:REDO.en)}” Their next hand-in goes back to the marking sheet.</p>`,true)}
 function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.m.a),done=ok?"accepted":"redo";
-  const ps=ok?[patch(k.u,k.m.a,{levels:{[k.m.step]:k.f.lv},flags:{[k.m.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.m.step,k.f.fb)]:[])]
+  const ps=ok?[patch(k.u,k.m.a,{levels:{[k.m.step]:k.f.lv},marked:{[k.m.step]:new Date().toISOString()},flags:{[k.m.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.m.step,k.f.fb)]:[])]
     :[patch(k.u,k.m.a,{flags:{[k.m.step]:{done}}}),api.reply(k.u,a,k.m.step,CA_RT.includes(level(k.u,S.ls))?REDO.ca:REDO.en)];
   $("#dlg").close();S.cp=null;act(Promise.all(ps))}
 // ---- points (shared/js/el-points.js; root AGENTS.md "Points"): each student's points per term from the class presentations.
