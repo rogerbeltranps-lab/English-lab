@@ -291,6 +291,29 @@ const reportProblem=u=>report({en:repEn(),save:o=>{
   if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
   return b.commit()}});
 
+// Suggestions to improve the site (bottom bar "💡 Idea"): suggestions/{id}, read only by the teacher in the dashboard. Same language as the Problem window.
+function suggest(u){
+  const en=repEn(),t=(ca,e)=>en?e:ca,d=document.createElement("dialog"),bs="border:0;border-radius:999px;padding:6px 14px;cursor:pointer;font:inherit;";
+  d.style.cssText="border:0;border-radius:14px;padding:16px 18px;max-width:480px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004;font:15px system-ui,sans-serif;color:#0f172a;background:#fff";
+  d.innerHTML='<h3 style="margin:0 0 6px"></h3><p style="margin:0 0 8px;color:#475569"></p><textarea maxlength="1000" rows="5" style="width:100%;box-sizing:border-box;font:inherit;padding:6px;border:1px solid #cbd5e1;border-radius:8px"></textarea>'
+    +'<p data-n style="margin:4px 0 0;color:#64748b;font-size:13px"></p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button data-x></button><button data-ok></button></div>';
+  d.querySelector("h3").textContent="💡 "+t("Suggereix una millora","Suggest an improvement");
+  d.querySelector("p").textContent=t("Què milloraries de la web? Una idea, una cosa que costa d'entendre o que t'agradaria tenir. (Si alguna cosa no funciona, fes servir ⚠️ Problema.) El professor ho llegirà.","What would you improve on the website? An idea, something that is hard to understand or that you would like to have. (If something does not work, use ⚠️ Problem.) Your teacher will read it.");
+  const ta=d.querySelector("textarea"),n=d.querySelector("[data-n]"),x=d.querySelector("[data-x]"),ok=d.querySelector("[data-ok]");
+  x.style.cssText=bs+"background:#e2e8f0;color:#0f172a";x.textContent=t("Cancel·la","Cancel");x.onclick=()=>d.close();
+  ok.style.cssText=bs+"background:#0f766e;color:#fff";ok.textContent=t("Envia","Send");
+  const count=()=>n.textContent=ta.value.length+" / 1000";ta.oninput=count;count();
+  ok.onclick=async()=>{const text=ta.value.trim();if(!text){ta.focus();return}
+    ok.disabled=true;
+    try{await setDoc(doc(collection(db,"suggestions")),{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,
+        page:location.pathname.replace(/^.*?\/English-lab\//i,"").slice(0,200)||"index.html",text,created:serverTimestamp()});
+      d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=t("Gràcies! El professor llegirà el teu suggeriment.","Thank you! Your teacher will read your suggestion.");
+      const c=document.createElement("button");c.style.cssText=bs+"background:#0f766e;color:#fff";c.textContent="OK";c.onclick=()=>d.close();d.append(m,c)}
+    catch(e){console.warn("suggestion",e);ok.disabled=false;alert(t("No s'ha pogut enviar. Torna-ho a provar més tard.","It could not be sent. Please try again later."))}};
+  d.addEventListener("close",()=>d.remove());
+  document.body.append(d);d.showModal();ta.focus();
+}
+
 function bar(){
   const el=document.createElement("div");el.id="el-cloud-bar";
   el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:10002;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;font:13px system-ui,sans-serif;box-shadow:0 2px 8px #0002;display:flex;gap:8px;align-items:center";
@@ -302,6 +325,7 @@ function bar(){
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
+      if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");

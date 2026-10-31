@@ -42,6 +42,19 @@ service cloud.firestore {
     }
     // problem reports (the "Problem" button in the bottom bar): signed-in students and testers send them with where they happened; only the teacher reads, marks or deletes them
     function shortText(v, n) { return v == null || (v is string && v.size() <= n); }
+    // suggestions to improve the site (the "Idea" button in the bottom bar): signed-in students and testers send them; only the teacher reads, marks or deletes them. Kept apart from problem reports.
+    match /suggestions/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid','email','name','group','page','text','created'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == myEmail()
+        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+        && request.resource.data.get('name', '') is string && request.resource.data.get('name', '').size() <= 200
+        && request.resource.data.get('page', '') is string && request.resource.data.get('page', '').size() <= 200
+        && request.resource.data.get('group', null) in [null, '2ESOA', '2ESOB', '4ESOA', '4ESOB']
+        && request.resource.data.created == request.time;
+      allow read, update, delete: if isTeacher();
+    }
     match /problems/{id} {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['uid','email','name','group','ls','activity','route','page','title','section','kind','text','errors','device','shot','created'])
