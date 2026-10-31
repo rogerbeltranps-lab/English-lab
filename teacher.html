@@ -952,11 +952,13 @@ function revisions(u,a){const st=pstate(u,a),dr=st.drafts||{},fi=st.finals||{},t
   const keys=[...new Set([...Object.keys(dr),...Object.keys(fi),...Object.keys(tx).filter(k=>!dr[k])])];if(!keys.length)return refl;
   const when=x=>x&&x.at?` <small class="muted">${ymd(x.at)}</small>`:"",para=t=>`<p style="white-space:pre-wrap">${esc(t)||'<span class="muted">(empty)</span>'}</p>`;
   return `<label>Writing and speaking</label>`+keys.map(k=>{const [step,rt]=[k.replace(/_[a-z]+$/,""),(k.match(/_([a-z]+)$/)||[])[1]],d=dr[k],f=fi[k];
-    const sum=f?"✓ final version"+(d?" · draft kept":""):d?"draft only, no final version yet":"text";
+    const sum=(f?"✓ final version"+(d?" · draft kept":""):d?"draft only, no final version yet":"text")+((res(u,a.id).replies||{})[step]?" · ✏️ corrected":"");
     return `<details><summary>${esc(step)}${rt?` <small class="muted">(${esc(LV[rt]||rt)})</small>`:""} · ${sum}</summary><div class="hand">`
       +(d?`<p><b>Draft</b>${when(d)}</p>${para(d.text)}`:"")
       +(f?`<p><b>Final version</b>${when(f)}</p>${para(f.text)}<p><b>What I changed:</b> ${esc(f.changed)}</p>`:"")
-      +(!d&&!f?para(tx[k]):"")+`</div></details>`}).join("")+refl}
+      +(!d&&!f?para(tx[k]):"")+corrOf(u,a,step)+`</div></details>`}).join("")+refl}
+// the correction Claude sent for a step (results.replies[step]; tools/marking/marks.mjs), shown under the student's work
+const corrOf=(u,a,step)=>{const t=(res(u,a.id).replies||{})[step];return t?`<p class="muted" style="border-left:3px solid #16a34a;padding-left:8px">✏️ <b>Correction sent:</b> ${esc(t)}</p>`:""};
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},rp=((S.D.rs[u]||{})[a.id]||{}).replies||{};
