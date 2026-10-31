@@ -582,14 +582,20 @@ const mkStuds=grp=>Object.values(S.P).filter(s=>s.group===grp.id&&!s.away&&!s.te
 // goes back to the marking sheet).
 const flagOf=(u,aid,step)=>((res(u,aid).flags||{})[step])||null;
 const mkWaits=(u,a,step)=>{const f=flagOf(u,a.id,step),h=handedIn(u,a)[step];return !!f&&!(f.done==="redo"&&h&&h.date>f.at)};
-// hand-ins of one step still without a level for every criterion of it (a possible copy waiting for the teacher is left out)
-const mkTodo=(m,grp)=>{const a=byId(m.a);return mkStuds(grp).filter(s=>handedIn(s.uid,a)[m.step]&&!m.c.every(c=>lvOf(s.uid,m.a,m.step,c))&&!mkWaits(s.uid,a,m.step))};
+// hand-ins of one step still without a level for every criterion of it, or handed in again after the sheet marked them (Roger, 31 Oct
+// 2026: resubmissions are marked again; results/{activity}.marked[step] = when the sheet saved the levels; a level set with the buttons
+// stays). A possible copy waiting for the teacher is left out.
+const mkAgain=(u,a,step)=>{const t=(res(u,a.id).marked||{})[step],h=handedIn(u,a)[step];return !!t&&!!h&&h.date>t};
+const mkTodo=(m,grp)=>{const a=byId(m.a);return mkStuds(grp).filter(s=>handedIn(s.uid,a)[m.step]&&(!m.c.every(c=>lvOf(s.uid,m.a,m.step,c))||mkAgain(s.uid,a,m.step))&&!mkWaits(s.uid,a,m.step))};
 // the student's exam writing marks so far in this course ("LS1 6/10"), for the marking sheet
 const mkExam=u=>{const L=EL_LS.filter(l=>l.course===COURSE);return L.slice(0,L.findIndex(l=>l.id===S.ls)+1).map((l,i)=>{const w=((res(u,asId(l.id)).sections||{}).writing)||{};return w.score!=null&&w.score!==""?`LS${i+1} ${w.score}/${w.max||10}`:null}).filter(Boolean).join(", ")};
 function mkReady(m,grp){const p=(window.EL_PLAN||{})[S.ls];return ELMark.ready({p,gi:p?ELWeek.col(p,grp.id):-1,due:dueOf(m.a,grp.id),title:byId(m.a).title,ticks:(S.D.tk[grp.id]||{}).ticks,ls:S.ls})}
-function mkTodoItems(grp){return mkMoments().map(m=>{const n=mkTodo(m,grp).length;if(!n)return null;const r=mkReady(m,grp),t=ELWeek.today(),btn=`<button data-do="mkopen" data-a="${m.a}" data-s="${m.step}">🤖 Marking sheet</button>`;
+function mkTodoItems(grp){return mkMoments().map(m=>{const st=mkTodo(m,grp),n=st.length;if(!n)return null;const r=mkReady(m,grp),t=ELWeek.today(),btn=`<button data-do="mkopen" data-a="${m.a}" data-s="${m.step}">🤖 Marking sheet</button>`;
+    // late hand-ins count from the day they came in (as marks.mjs audit)
+    const since=r.from?st.map(s=>{const h=String((handedIn(s.uid,byId(m.a))[m.step]||{}).date||"").slice(0,10);return h>r.from?h:r.from}).sort()[0]:null;
     const what=`<b>${esc(m.name)}</b> (${esc(actTitle(m.a))}) · ${n} hand-in${n>1?"s":""} without a level`;
-    if(r.from&&t>=r.from)return {now:true,h:`🤖 ${what} ${btn}`};
+    // Claude marks these from the cloud: still unmarked 4+ days after they were ready means the weekly marking is not working
+    if(r.from&&t>=r.from)return {now:true,h:ELWeek.add(since,4)<=t?`❌ <b>Claude's marking is late:</b> ${what}, ready since ${ELWeek.date(since)}. Tell Claude in the English Lab chat. ${btn}`:`🤖 ${what}: Claude marks them this week ${btn}`};
     return {now:false,h:`⏳ ${what}: ${r.from?"ready to mark on "+ELWeek.date(r.from)+" (one week after you ticked the session)":r.line?"ready one week after you tick “"+esc(r.line)+"” in the time plan":"no session in the time plan"} ${btn}`}}).filter(Boolean)}
 function mkSheet(m,grp){const a=byId(m.a),g=G(),studs=mkTodo(m,grp),codes=ELMark.codes(studs.map(s=>s.uid)),by=Object.fromEntries(studs.map(s=>[s.uid,s]));
   const students=[...codes].map(([code,u])=>{const l=level(u,S.ls),h=handedIn(u,a)[m.step]||{};return {code,route:LV[l],ca:CA_RT.includes(l),exam:mkExam(u),ty:h.ty,fields:h.f}});
@@ -616,7 +622,7 @@ function mkCheck(){const k=S.mk,r=ELMark.parse($("#mkin").value,{aid:k.m.a,step:
 function mkDown(){const k=S.mk,b=new Blob([k.sh.text],{type:"text/plain"}),l=document.createElement("a");l.href=URL.createObjectURL(b);l.download=`marking-${k.grp.name}-${k.m.a.split("/").pop()}-${k.m.step}.txt`;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(l.href),2000)}
 function mkSave(){const k=S.mk;if(!k||!k.rows||!k.rows.length)return;const fb=$("#mkfb")&&$("#mkfb").checked,a=byId(k.m.a);
   const ps=k.rows.flatMap(x=>x.flag?[patch(x.s.uid,k.m.a,{flags:{[k.m.step]:{why:x.flag,lv:x.lv,fb:fb?x.fb:"",at:new Date().toISOString()}}})]
-    :[patch(x.s.uid,k.m.a,{levels:{[k.m.step]:x.lv}}),...(fb&&x.fb?[api.reply(x.s.uid,a,k.m.step,x.fb)]:[])]);
+    :[patch(x.s.uid,k.m.a,{levels:{[k.m.step]:x.lv},marked:{[k.m.step]:new Date().toISOString()}}),...(fb&&x.fb?[api.reply(x.s.uid,a,k.m.step,x.fb)]:[])]);
   $("#dlg").close();S.mk=null;act(Promise.all(ps))}
 // the To do's possible copies of the group on screen, and their dialog: the work, its writing log, the reason, Accept or Redo in class
 function cpItems(grp){return mkMoments().flatMap(m=>{const a=byId(m.a);return mkStuds(grp).filter(s=>{const f=flagOf(s.uid,m.a,m.step);return f&&!f.done}).map(s=>
@@ -630,7 +636,7 @@ function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step
     <div class="row" style="justify-content:flex-start"><button data-do="cpok">✔ Accept: it's their work</button><button class="g" data-do="cpredo">↺ Redo in class</button></div>
     <p class="muted">Redo in class sends the student: “${esc(CA_RT.includes(level(u,S.ls))?REDO.ca:REDO.en)}” Their next hand-in goes back to the marking sheet.</p>`,true)}
 function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.m.a),done=ok?"accepted":"redo";
-  const ps=ok?[patch(k.u,k.m.a,{levels:{[k.m.step]:k.f.lv},flags:{[k.m.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.m.step,k.f.fb)]:[])]
+  const ps=ok?[patch(k.u,k.m.a,{levels:{[k.m.step]:k.f.lv},marked:{[k.m.step]:new Date().toISOString()},flags:{[k.m.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.m.step,k.f.fb)]:[])]
     :[patch(k.u,k.m.a,{flags:{[k.m.step]:{done}}}),api.reply(k.u,a,k.m.step,CA_RT.includes(level(k.u,S.ls))?REDO.ca:REDO.en)];
   $("#dlg").close();S.cp=null;act(Promise.all(ps))}
 // ---- points (shared/js/el-points.js; root AGENTS.md "Points"): each student's points per term from the class presentations.
@@ -1021,11 +1027,13 @@ function revisions(u,a){const st=pstate(u,a),dr=st.drafts||{},fi=st.finals||{},t
   const keys=[...new Set([...Object.keys(dr),...Object.keys(fi),...Object.keys(tx).filter(k=>!dr[k])])];if(!keys.length)return refl;
   const when=x=>x&&x.at?` <small class="muted">${ymd(x.at)}</small>`:"",para=t=>`<p style="white-space:pre-wrap">${esc(t)||'<span class="muted">(empty)</span>'}</p>`;
   return `<label>Writing and speaking</label>`+keys.map(k=>{const [step,rt]=[k.replace(/_[a-z]+$/,""),(k.match(/_([a-z]+)$/)||[])[1]],d=dr[k],f=fi[k];
-    const sum=f?"✓ final version"+(d?" · draft kept":""):d?"draft only, no final version yet":"text";
+    const sum=(f?"✓ final version"+(d?" · draft kept":""):d?"draft only, no final version yet":"text")+((res(u,a.id).replies||{})[step]?" · ✏️ corrected":"");
     return `<details><summary>${esc(step)}${rt?` <small class="muted">(${esc(LV[rt]||rt)})</small>`:""} · ${sum}</summary><div class="hand">`
       +(d?`<p><b>Draft</b>${when(d)}</p>${para(d.text)}`:"")
       +(f?`<p><b>Final version</b>${when(f)}</p>${para(f.text)}<p><b>What I changed:</b> ${esc(f.changed)}</p>`:"")
-      +(!d&&!f?para(tx[k]):"")+`</div></details>`}).join("")+refl}
+      +(!d&&!f?para(tx[k]):"")+corrOf(u,a,step)+`</div></details>`}).join("")+refl}
+// the correction Claude sent for a step (results.replies[step]; tools/marking/marks.mjs), shown under the student's work
+const corrOf=(u,a,step)=>{const t=(res(u,a.id).replies||{})[step];return t?`<p class="muted" style="border-left:3px solid #16a34a;padding-left:8px">✏️ <b>Correction sent:</b> ${esc(t)}</p>`:""};
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},xr=(S.D.rs[u]||{})[a.id]||{},rp=xr.replies||{};
