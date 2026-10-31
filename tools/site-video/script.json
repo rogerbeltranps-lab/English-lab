@@ -51,6 +51,12 @@
    "ca": "Aquí veus la teva ruta: Starter, Base, Core o Plus. La posa el professor. Creus que una altra ruta et va millor? Clica Demana canviar de ruta, tria'n una, explica per què i envia-ho. El professor et respondrà."
   },
   {
+   "id": "l29",
+   "scene": "Your route",
+   "en": "Below your route, click Download the summary to get a PDF with all the vocabulary and grammar of your route, with explanations and practice.",
+   "ca": "A sota de la teva ruta, clica Descarrega el resum per tenir un PDF amb tot el vocabulari i la gramàtica de la teva ruta, amb explicacions i pràctica."
+  },
+  {
    "id": "l09",
    "scene": "Your week",
    "en": "My week plan shows what we do in class and what you have to do every week, and the date of the exam. If you miss a class, check it here.",
