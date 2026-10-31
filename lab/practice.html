@@ -253,8 +253,11 @@ function header() {
   const meBox = all() ? `<div class="me"><div><div class="lbl">${t('Vista del professor', 'Teacher view')}</div><div class="big">${COURSES[c]}</div><p class="muted">${t('Tria un curs i un nivell per veure el que hi practiquen els alumnes.', 'Choose a course and a level to see what students practise there.')}</p></div>
       <div class="row">${Object.keys(COURSES).map(k => `<button class="chip ${k === c ? 'on' : ''}" data-do="course" data-v="${k}">${COURSES[k]}</button>`).join('')}</div></div>`
     : `<div class="me"><div><div class="lbl">${t('El teu nivell', 'Your level')}</div><div class="big">${mine ? label(mine) : t('Encara no en tens', 'Not set yet')}</div>
-      <p>${mine ? t(`Et recomanem practicar al nivell <b>${elCefr(c, rec)}</b>: és el de la teva ruta.`, `We recommend practising at <b>${elCefr(c, rec)}</b>: it is your route's level.`) + (L.indexOf(rec) < L.length - 1 ? t(' Quan et sembli fàcil, prova el següent.', ' When it feels easy, try the next one.') : '')
-        : t(`El professor encara no t'ha posat el nivell. Comença pel <b>${elCefr(c, rec)}</b>.`, `Your teacher has not set your level yet. Start with <b>${elCefr(c, rec)}</b>.`)}</p></div></div>`;
+      <p>${mine ? t(`Practiques al nivell <b>${elCefr(c, rec)}</b>: el de la teva ruta.`, `You practise at <b>${elCefr(c, rec)}</b>: your route's level.`)
+        : t(`El professor encara no t'ha posat el nivell. De moment practiques al <b>${elCefr(c, rec)}</b>.`, `Your teacher has not set your level yet. For now you practise at <b>${elCefr(c, rec)}</b>.`)}</p></div></div>`;
+  // Students see only their own level (Roger, 31 Oct 2026: "those buttons where you can change the level should be only for the
+  // teacher's view. Students should only see their level and that's all"). The teacher and testers keep the level buttons.
+  if (!all()) return meBox;
   return meBox + `<div class="levels" role="group" aria-label="${t('Nivell', 'Level')}">${L.map(lv => `<button class="lv ${lv === S.level ? 'on' : ''} ${lv === rec && !all() ? 'rec' : ''}" data-do="level" data-v="${lv}" aria-pressed="${lv === S.level}" title="${esc(elCefr(c, lv, true))}"><b>${esc(elCefr(c, lv))}</b><span>${esc(name(lv))}${lv === rec && !all() ? ' · ' + t('recomanat', 'recommended') : ''}</span></button>`).join('')}</div>`;
 }
 function filters(x) {
@@ -405,7 +408,7 @@ document.addEventListener('click', e => {
   const go = (f, r) => { f(); if (r) render(); else ({ words, build, listen, shadow })[S.tab](); };
   ({
     course: () => go(() => { S.course = k.v; S.ls = 'all'; S.lp = 'all'; S.open = null; }, 1),
-    level: () => go(() => { S.level = k.v; S.open = null; S.coreOnly = null; }, 1),
+    level: () => { if (all()) go(() => { S.level = k.v; S.open = null; S.coreOnly = null; }, 1); },
     ls: () => go(() => { S.ls = k.v; S.lp = 'all'; S.open = null; }, 1),
     tab: () => { S.tab = k.v; S.open = null; history.replaceState(null, '', '#' + k.v); render(); },
     mode: () => go(() => { S.mode = k.v; }),
@@ -441,7 +444,7 @@ function start() {
   $$('[data-pr]').forEach(a => a.textContent = t('Practica', 'Practise'));
   if (!S.course) { $('#lead').textContent = t('Encara no tens cap grup: parla amb el professor.', 'You are not in a group yet: talk to your teacher.'); return; }
   $('#lead').innerHTML = t('Les targetes de paraules, el sentence builder, les escoltes i el shadowing de les teves LS, per nivells. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'The word cards, sentence builder, listenings and shadowing of your LSs, by level. Everything corrects itself and nothing is handed in: practise as much as you like.');
-  S.level = S.level || myLevel() || 'insecure';
+  S.level = all() ? (S.level || 'insecure') : (myLevel() || 'insecure');   // a student always works at their own level
   // start on the LS the group is working on now (the last open one), not on everything
   const open = visibleLS(S.course).filter(l => (D.ls[l.id] || {}).status === 'open');
   if (S.ls === 'all' && open.length && !all()) S.ls = open[open.length - 1].id;
