@@ -1152,16 +1152,16 @@
    "on_ca": "Situation"
   },
   {
-   "img": "r4-73-practice.png",
-   "on": "Use it",
-   "on_ca": "Fes-la servir",
+   "img": "r4-73-practice-student.png",
    "view": [
-    420,
-    560,
-    1000,
-    520
+    380,
+    40,
+    1500,
+    840
    ],
-   "margin": 0
+   "margin": 0,
+   "on": "Use it",
+   "on_ca": "Fes-la servir"
   }
  ],
  "l26": [
@@ -1442,22 +1442,22 @@
    "margin": 0.03
   },
   {
-   "img": "r4-73-practice.png",
+   "img": "r4-73-practice-student.png",
+   "view": [
+    380,
+    40,
+    1500,
+    840
+   ],
+   "margin": 0,
    "on": "word cards",
    "on_ca": "targetes",
-   "view": [
-    440,
-    520,
-    1400,
-    400
-   ],
    "hl": [
-    455,
-    800,
-    1370,
-    100
-   ],
-   "margin": 0.02
+    452,
+    604,
+    1376,
+    104
+   ]
   },
   {
    "img": "r4-12-level-notice.png",
