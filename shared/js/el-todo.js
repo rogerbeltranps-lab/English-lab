@@ -51,7 +51,7 @@ export async function start({db,user,group,root,lsId,seesAll}){
     const dayOf=d=>days[d]||(days[d]={items:[],cls:[]});
     (r.g?r.g[gi]||"":r.what||"").split("\n").filter(Boolean).forEach(line=>{
       const m=line.match(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat) \d+ · (.*)$/);
-      if(!m){extra.push(line);return}
+      if(!m){if(!/^Homework by /.test(line))extra.push(line);return}   // homework lines are in the 🏠 box
       const d=W.add(r.from,(WD.indexOf(m[1])+6)%7),dd=dayOf(d);
       m[2].split(" · ").forEach(seg=>{const as=mentions(seg);
         if(!as.length){dd.cls.push(seg);return}
@@ -86,8 +86,11 @@ export async function start({db,user,group,root,lsId,seesAll}){
       return `<div class="dy ${d===today?"now":""}"><h4>${DAY[lang][dt.getDay()]} ${dt.getDate()}${d===today?` <i>· ${t("avui","today")}</i>`:""}</h4>`
         +(dd.items.length?`<ul>${dd.items.map(it=>item(it,d)).join("")}</ul>`:"")
         +(dd.cls.length?`<div class="cl">${t("A classe:","In class:")} ${esc(dd.cls.join(" · "))}</div>`:"")+`</div>`}).join("");
+    const hws=W.upcoming(p,gi,null,null,((info||{}).homework||{})[group]),cal=W.calendar(group,root);
+    const hw=`<div class="hw"><b>🏠 ${t("Deures i classes pel teu compte","Homework and classes on your own")}</b>`+(hws.length?`<ul>${hws.map(x=>`<li><span class="tt">${x.kind==="self"?"📚":"🏠"} ${esc(W.taskText(x,lang))}</span>${x.extra?`<a href="${W.gcalLink(x,lang)}" target="_blank" rel="noopener">📅</a>`:""}</li>`).join("")}</ul>`:`<div class="cl">${t("No tens deures per als propers dies.","No homework for the next few days.")}</div>`)
+      +`<a class="cal" href="${cal.google}" target="_blank" rel="noopener">📅 ${t("Afegeix-ho al meu Google Calendar","Add it to my Google Calendar")}</a></div>`;
     const head=i===W.row(p)?t("La meva setmana","My week"):i===0?t("Comencem","We start"):t("Propera setmana","Next week");
-    return `<div class="hd"><b>📋 ${head} · ${W.week(r,lang)}</b><button type="button" data-x aria-label="${t("Tanca","Close")}">✕</button></div><div class="bd">${exam}${lt}${sp}${ds||`<p class="cl">${t("Aquesta setmana no hi ha classes previstes.","No classes planned this week.")}</p>`}`
+    return `<div class="hd"><b>📋 ${head} · ${W.week(r,lang)}</b><button type="button" data-x aria-label="${t("Tanca","Close")}">✕</button></div><div class="bd">${exam}${hw}${lt}${sp}${ds||`<p class="cl">${t("Aquesta setmana no hi ha classes previstes.","No classes planned this week.")}</p>`}`
       +extra.map(e=>`<div class="cl">${esc(W.line(e,lang))}</div>`).join("")+(r.note?`<div class="cl">ℹ️ ${esc(r.note)}</div>`:"")
       +`<a class="all" href="${new URL("today.html",root).href}">${t("Tot el pla al meu tauler","The whole plan on my board")} →</a></div>`}
 
@@ -105,6 +108,7 @@ export async function start({db,user,group,root,lsId,seesAll}){
 #el-todo li a,#el-todo .la a{font-size:12px;color:#4338ca;border:1px solid #c7d2fe;border-radius:6px;padding:1px 7px;text-decoration:none;white-space:nowrap}
 #el-todo .ok{color:#16a34a;font-weight:600;font-size:12px;white-space:nowrap}#el-todo .td{color:#b45309;font-weight:600;font-size:12px;white-space:nowrap}
 #el-todo .lt{color:#b91c1c;font-weight:600;font-size:12px;white-space:nowrap}#el-todo .tg{color:#64748b;font-size:12px}
+#el-todo .hw{background:#ecfeff;color:#155e75;border-radius:8px;padding:5px 8px;margin-bottom:6px;font-size:13px}#el-todo .hw .cal{display:inline-block;margin-top:4px;font-size:12px;color:#0e7490;border:1px solid #a5f3fc;border-radius:6px;padding:1px 7px;text-decoration:none}
 #el-todo .ex{background:#fef3c7;border-radius:8px;padding:4px 8px;margin:2px 0 6px;font-size:13px}
 #el-todo .sp{background:#e0e7ff;color:#3730a3;border-radius:8px;padding:5px 8px;margin-bottom:6px;font-size:13px}
 #el-todo .la{background:#fee2e2;color:#991b1b;border-radius:8px;padding:5px 8px;margin-bottom:6px;font-size:13px}
