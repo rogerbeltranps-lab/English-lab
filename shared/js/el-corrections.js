@@ -10,15 +10,17 @@
 const sig=t=>{let h=5381;for(const ch of String(t))h=(h*33+ch.codePointAt(0))>>>0;return h.toString(36)};
 const css=s=>window.CSS&&CSS.escape?CSS.escape(s):s.replace(/[^\w-]/g,"\\$&");
 
-// list() → [{activity, replies, levels}] (the student's results), seen() → fbSeen, save({key: sig}), here = this page's activity id or
+// list() → [{activity, replies, answers, levels}] (the student's results), seen() → fbSeen, save({key: sig}), here = this page's activity id or
 // null, root = the site root URL, en = the route reads English, name(activity, step) → the step's name or null.
 export async function corrections({list,seen,save,here,root,en,name}){
   let rs,was;try{[rs,was]=await Promise.all([list(),seen()]);was=was||{}}catch(e){console.warn("corrections",e);return}
   const cat=window.EL_CATALOG||[],T=(ca,e)=>en?e:ca;
   const items=[];
   for(const r of rs){const a=cat.find(x=>x.id===r.activity);if(!a)continue;
-    for(const [step,text] of Object.entries(r.replies||{}))if(text&&String(text).trim())
-      items.push({a,step,text:String(text),k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}
+    // Claude's answer to the student's comment (answers[step].t, tools/marking/marks.mjs answer) comes first, then the correction of the work
+    for(const step of new Set([...Object.keys(r.replies||{}),...Object.keys(r.answers||{})])){
+      const text=[((r.answers||{})[step]||{}).t,(r.replies||{})[step]].filter(t=>t&&String(t).trim()).join("\n\n");
+      if(text)items.push({a,step,text,k:a.id+"|"+step,v:sig(text),corr:!!((r.levels||{})[step]&&Object.keys(r.levels[step]).length)||(!!(r.fbSig||{})[step]&&step!=="reflect")})}}
   // on the learning path: the answers in their tabs, and the levels for the page
   const mine=rs.find(r=>r.activity===here);
   if(mine&&mine.levels)dispatchEvent(new CustomEvent("el-levels",{detail:{levels:mine.levels}}));
