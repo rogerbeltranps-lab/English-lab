@@ -4,7 +4,9 @@
 // Three shots show a state the tester account does not have, drawn in this browser only and never saved:
 //   - the "Join the class" box (the board's own markup), - a teacher's correction (the site's own el-corrections.js with a sample
 //   text and a save() that does nothing), - a typed reason in "Ask to change route" / the Problem window (never sent).
-// Usage: EL_TESTER_PASSWORD=... node tools/site-video/capture3.mjs [outdir]   → files named r3-*
+// Usage: EL_TESTER_PASSWORD=... [EL_PREFIX=r4-] node tools/site-video/capture3.mjs [outdir]   → files named r3-* (or EL_PREFIX*)
+// Fourth round (EL_PREFIX=r4-, after Roger's "add the latest features" on 31 Oct): also the level notice (el-level-notice.js with a
+// sample level and a save() that does nothing), the homework box and Google Calendar link, self-practice by level, LS2 games.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -14,6 +16,7 @@ const { chromium } = require('playwright');
 const BASE = (process.env.EL_BASE || 'https://rogerbeltranps-lab.github.io/English-lab/').replace(/\/?$/, '/');
 const PASS = process.env.EL_TESTER_PASSWORD;
 if (!PASS) { console.error('Set EL_TESTER_PASSWORD'); process.exit(1); }
+const PREFIX = process.env.EL_PREFIX || 'r3-';
 const OUT = path.resolve(process.argv[2] || 'tools/site-video/captures');
 fs.mkdirSync(OUT, { recursive: true });
 const log = [];
@@ -43,7 +46,7 @@ async function clean({ keepCards = false } = {}) {
 async function settle(ms = 2500, o) { await page.waitForLoadState('networkidle').catch(() => {}); await page.waitForTimeout(ms); await clean(o); }
 async function shot(name, { full = false, keepCards = false } = {}) {
   await clean({ keepCards });
-  const f = path.join(OUT, 'r3-' + name + (full ? '.full.jpg' : '.png'));
+  const f = path.join(OUT, PREFIX + name + (full ? '.full.jpg' : '.png'));
   await page.screenshot(full ? { path: f, fullPage: true, type: 'jpeg', quality: 85 } : { path: f });
   note('shot ' + path.basename(f));
 }
@@ -91,6 +94,17 @@ await step('join the class (drawn here only)', async () => {
 await step('route request with a reason (not sent)', async () => {
   await top('button[data-do="ask"]', 300);
   await shot('12-route-line');
+  if (PREFIX !== 'r3-') await step('level notice (drawn here only)', async () => {
+    await page.evaluate(async (root) => {
+      const { levelNotice } = await import(root + 'shared/js/el-level-notice.js');
+      await levelNotice({ course: '4eso', seen: async () => ({}), save: async () => {},
+        lv: async () => ({ '4eso-seasons-and-celebrations': { level: 'safe', by: 'teacher', why: 'exam', changed: Date.now() } }) });
+    }, BASE);
+    await page.waitForSelector('#el-level-notice', { timeout: 8000 });
+    await page.waitForTimeout(400);
+    await shot('12-level-notice', { keepCards: true });
+    await page.evaluate(() => document.getElementById('el-level-notice')?.remove());
+  });
   await page.locator('button[data-do="ask"]').first().click();
   await page.waitForSelector('#dlg[open]');
   await page.waitForTimeout(400);
@@ -102,6 +116,7 @@ await step('route request with a reason (not sent)', async () => {
   await page.locator('[data-do="close"]').first().click();
 });
 await step('week plan', async () => { await top('#main .box:has(h2:text-matches("week plan|pla setmanal","i"))', 40); await shot('15-week-plan'); });
+if (PREFIX !== 'r3-') await step('homework box', async () => { await top('#main .hw', 140); await shot('15-homework'); });
 await step('whole LS plan', async () => {
   const s = page.locator('#main summary', { hasText: /whole LS plan|Tot el pla/ }).first();
   await s.click();
@@ -233,7 +248,20 @@ await step('games menu', async () => {
 await page.goto(BASE + '4eso/my-real-routine/vocabulary-games.html', { waitUntil: 'domcontentloaded' });
 await settle();
 await shot('72-vocabulary-games');
+if (PREFIX !== 'r3-') {
+  await step('LS2 vocabulary games', async () => {
+    await page.goto(BASE + '4eso/seasons-and-celebrations/vocabulary-games.html', { waitUntil: 'domcontentloaded' });
+    await settle();
+    await shot('72-vocabulary-games-ls2');
+  });
+  await step('self-practice by level', async () => {
+    await page.goto(BASE + 'lab/practice.html', { waitUntil: 'domcontentloaded' });
+    await settle(4000);
+    await shot('73-practice');
+    await shot('73-practice', { full: true });
+  });
+}
 
-fs.writeFileSync(path.join(OUT, 'capture3-log.txt'), log.join('\n') + '\n');
+fs.writeFileSync(path.join(OUT, PREFIX + 'capture-log.txt'), log.join('\n') + '\n');
 await browser.close();
 note('done');
