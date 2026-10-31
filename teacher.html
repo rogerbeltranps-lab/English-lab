@@ -10,7 +10,7 @@ table.plan td,table.plan th{text-align:left;vertical-align:top}table.plan tr.t t
 table.mat{width:100%}table.mat td,table.mat th{text-align:left;vertical-align:top}a.chip{text-decoration:none;display:inline-block;margin:1px}.box h3{margin:14px 0 6px;font-size:1rem}
 table.qa td.ql,table.qa th.ql{text-align:left;max-width:440px;white-space:normal}table.qa td{vertical-align:top;white-space:nowrap}.qwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px}.tp>*{min-width:0}tr.qa-area td{border-top:2px solid #94a3b8}.qp{border-radius:999px;padding:0 6px;font-weight:700;font-size:12px}.tpc ol,.tpc ul{padding-left:20px;margin:4px 0}.tpc li{margin:3px 0}
 .tab.cplan.on{background:#0f172a;border-color:#0f172a;color:#fff}.tp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:12px}.tpc{border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;background:#fff}.tpc.c2eso{border-top:4px solid #16a34a}.tpc.c4eso{border-top:4px solid #2563eb}.tpc h3{margin:0 0 4px}
-.exam{display:inline-block;background:#fef2f2;color:#991b1b;border-radius:10px;padding:4px 10px;font-weight:700;margin:4px 0}.exam.past{background:#f1f5f9;color:#475569}.wk{margin:8px 0}.wk b{display:block}.wk .s{white-space:pre-line}label.ck{display:flex;gap:8px;align-items:flex-start;padding:3px 4px;border-radius:6px;cursor:pointer}label.ck:hover{background:#f1f5f9}label.ck input{margin-top:3px;flex:none;width:16px;height:16px}label.ck.on span{color:#64748b;text-decoration:line-through}label.ck.today{background:#ecfdf5}ul.tips{margin:0 0 4px 28px;padding:0;list-style:none;font-size:13px;color:#475569}ul.tips li{margin:2px 0}.hwr{background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;padding:6px 10px;margin:6px 0;font-size:14px}.hwr ul{list-style:none;margin:3px 0;padding:0}.behind{color:#b45309;font-size:13px;margin:4px 0}.wkbar .chip.past{color:#94a3b8}.wkbar .chip small{margin-left:4px}.wk .n{color:#b45309;font-size:13px}ul.due{margin:4px 0;padding-left:18px}ul.due li{margin:3px 0}.late{color:#b91c1c;font-weight:600}.ptok{color:#15803d;font-weight:600}.hand{background:#f8fafc;border-radius:8px;padding:4px 10px;margin:4px 0;white-space:pre-wrap}.hand p{margin:.3em 0}
+.exam{display:inline-block;background:#fef2f2;color:#991b1b;border-radius:10px;padding:4px 10px;font-weight:700;margin:4px 0}.exam.past{background:#f1f5f9;color:#475569}.wk{margin:8px 0}.wk b{display:block}.wk .s{white-space:pre-line}label.ck{display:flex;gap:8px;align-items:flex-start;padding:3px 4px;border-radius:6px;cursor:pointer}label.ck:hover{background:#f1f5f9}label.ck input{margin-top:3px;flex:none;width:16px;height:16px}label.ck.on span{color:#64748b;text-decoration:line-through}label.ck.today{background:#ecfdf5}ul.tips{margin:0 0 4px 28px;padding:0;list-style:none;font-size:13px;color:#475569}ul.tips li{margin:2px 0}.sethw{margin-left:6px;font-size:12px;padding:1px 7px;opacity:.55}label.ck:hover .sethw{opacity:1}button.mini{font-size:12px;padding:0 6px}.hwr{background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;padding:6px 10px;margin:6px 0;font-size:14px}.hwr ul{list-style:none;margin:3px 0;padding:0}.behind{color:#b45309;font-size:13px;margin:4px 0}.wkbar .chip.past{color:#94a3b8}.wkbar .chip small{margin-left:4px}.wk .n{color:#b45309;font-size:13px}ul.due{margin:4px 0;padding-left:18px}ul.due li{margin:3px 0}.late{color:#b91c1c;font-weight:600}.ptok{color:#15803d;font-weight:600}.hand{background:#f8fafc;border-radius:8px;padding:4px 10px;margin:4px 0;white-space:pre-wrap}.hand p{margin:.3em 0}
 .route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-beginners{background:#ffe4e6;color:#9f1239}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-native{background:#e0f2fe;color:#075985}.r-daring{background:#ede9fe;color:#5b21b6}.r-none{color:#94a3b8}
 .wrap{overflow:auto;max-height:75vh;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
 thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;vertical-align:top}thead tr+tr th{top:var(--h1,52px)}.stu{position:sticky;left:0;z-index:1;text-align:left;min-width:150px;white-space:nowrap}thead .stu{z-index:3}
@@ -94,6 +94,10 @@ async function load(){
 const sub=o=>Object.assign(o,{updated:DEMO?Date.now():F.serverTimestamp()});
 const put=(path,o)=>DEMO?null:F.setDoc(F.doc(db(),...path),sub(o),{merge:true});
 const api={
+  // homework set from a session line (Roger, 31 Oct 2026: "if I can't do sth with my students, let me say: set as homework and students
+  // have it in their to do list"): ls/{ls}.homework[group][id] = {text, by, set, at}; null removes it. Students read ls docs.
+  hw:(ls,gid,id,o)=>{const i=S.D.ls[ls]=S.D.ls[ls]||{status:"hidden",enabled:[]},h=(i.homework=Object.assign({},i.homework)),g=(h[gid]=Object.assign({},h[gid]));
+    if(o)g[id]=o;else delete g[id];if(DEMO)return;return put(["ls",ls],{homework:{[gid]:{[id]:o?Object.assign({at:F.serverTimestamp()},o):F.deleteField()}}})},
   tick:(gid,ls,line,on)=>{const k=ls+"|"+line;((S.D.tk[gid]=S.D.tk[gid]||{}).ticks=S.D.tk[gid].ticks||{})[k]=on;return put(["teacherPlan",gid],{ticks:{[k]:on}})},
   setGroup:(u,g)=>{const s=S.P[u],ps=[];   // the list's group decides; the student's own doc copies it
     if(s.ro)ps.push(DEMO?S.D.ro[s.rid].group=g:put(["roster",s.rid],{group:g}));
@@ -748,7 +752,7 @@ const lines=(x,r)=>String(r.g?r.g[x.gi]||"":r.what||"").split("\n").filter(Boole
 const lineDate=(r,l)=>{const m=/^\w{3} (\d{1,2})\b/.exec(l);if(!m||!r.from)return null;for(let j=0;j<7;j++){const d=ELWeek.add(r.from,j);if(+d.slice(8)===+m[1])return d}return null};
 function weekRow(x,i,title){const r=x.p.rows[i];if(!r)return "";const ls=lines(x,r),n=ls.filter(l=>ticked(x,l)).length,t=ELWeek.today();
   return `<div class="wk"><b>${title?title+" · ":""}${esc(r.when)} <small class="muted">${n}/${ls.length} done</small></b>`+ls.map(l=>{const on=ticked(x,l),tp=S.tips?tipsFor(x.p,l):[];
-      return `<label class="ck ${on?"on":""} ${lineDate(r,l)===t?"today":""}"><input type="checkbox" data-do="tick" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(l)}" ${on?"checked":""}><span>${esc(l)}</span></label>`
+      return `<label class="ck ${on?"on":""} ${lineDate(r,l)===t?"today":""}"><input type="checkbox" data-do="tick" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(l)}" ${on?"checked":""}><span>${esc(l)}</span>${/^Homework by /.test(l)?"":` <button type="button" class="g mini sethw" data-do="sethw" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" title="Set it as homework: students see it in their homework box and To do list">🏠 Set as homework</button>`}</label>`
         +(tp.length?`<ul class="tips">${tp.map(s=>`<li>💡 ${esc(s)}</li>`).join("")}</ul>`:"")}).join("")
     +(r.note?`<div class="n">${esc(r.note)}</div>`:"")+`</div>`}
 // sessions before today that are not ticked: [{i, line}]
@@ -756,8 +760,10 @@ const behind=x=>{const t=ELWeek.today();return x.p.rows.flatMap((r,i)=>lines(x,r
 const behindTag=x=>{const b=behind(x);return b.length?`<div class="behind" title="${esc(b.map(y=>y.line).join("\n"))}">⚠ ${b.length} earlier session${b.length===1?"":"s"} not ticked <a data-do="wk" data-w="${x.p.rows[b[0].i].from}">see</a></div>`:""};
 // Homework to remind (Roger, 31 Oct 2026: "it should appear in my dashboard to remind them and on theirs too"): the group's "Homework by …"
 // lines and self-study classes of the next 7 days (ELWeek.upcoming), and the group's calendar feed students subscribe to once.
-const hwTag=x=>{const xs=ELWeek.upcoming(x.p,x.gi,null,7),cal=ELWeek.calendar(x.gid);
-  return `<div class="hwr"><b>🏠 Homework to remind</b>${xs.length?`<ul>${xs.map(y=>`<li>${y.kind==="self"?"📚 Self-study class ":"🏠 By "}${esc(ELWeek.date(y.date))}${y.set?` <small class="muted">(set ${esc(ELWeek.date(y.set))})</small>`:""} · ${esc(y.text)}</li>`).join("")}</ul>`:` <span class="muted">nothing in the next 7 days</span>`}`
+const planX=(ls,gid)=>{const p=(window.EL_PLAN||{})[ls];return {ls,p,gi:ELWeek.col(p,gid),gid}};
+const hwOf=x=>((S.D.ls[x.ls]||{}).homework||{})[x.gid];
+const hwTag=x=>{const xs=ELWeek.upcoming(x.p,x.gi,null,7,hwOf(x)),cal=ELWeek.calendar(x.gid);
+  return `<div class="hwr"><b>🏠 Homework to remind</b>${xs.length?`<ul>${xs.map(y=>`<li>${y.kind==="self"?"📚 Self-study class ":"🏠 By "}${esc(ELWeek.date(y.date))}${y.set?` <small class="muted">(set ${esc(ELWeek.date(y.set))})</small>`:""} · ${esc(y.text)}${y.extra?` <button class="g mini" data-do="hwdel" data-gid="${x.gid}" data-ls="${x.ls}" data-id="${y.id}" title="Remove this homework">✕</button>`:""}</li>`).join("")}</ul>`:` <span class="muted">nothing in the next 7 days</span>`}`
     +`<small class="muted">Students see it on their board and in My week, and in their calendar if they subscribed: <a href="${cal.google}" target="_blank" rel="noopener">Google Calendar</a> · <a href="${cal.ics}">.ics link</a></small></div>`};
 // this week and next week; before the plan starts, its first week; after it ends, a line
 function weeks(x){const p=x.p,i=ELWeek.row(p),sp=ELWeek.span(p),t=ELWeek.today();
@@ -1053,7 +1059,16 @@ async function markingPdf(r){
 // ---- events
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
   ({tab:()=>{S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();if(k.ls)scrollTo(0,0)},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),
-    tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),wk:()=>{S.wk=k.w;S.g="plan";render()},
+    tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
+    sethw:()=>{e.preventDefault();const x=planX(k.ls,k.gid),r=x.p.rows[+k.i],from=lineDate(r,k.line)||ELWeek.today();
+      const next=x.p.rows.flatMap(rr=>lines(x,rr).map(l=>lineDate(rr,l))).filter(d=>d&&d>from).sort()[0]||ELWeek.add(from,2);
+      dlg(`<h3>🏠 Set as homework · ${esc((GR.find(g=>g.id===k.gid)||{}).name||k.gid)}</h3><p class="muted">Students see it in their 🏠 Homework box on the board and in My week, with a 📅 button to add it to their calendar.</p>`
+        +`<label class="field">What they have to do<br><textarea id="hw-text" rows="2" style="width:100%">${esc(k.line.replace(/^\w{3} \d{1,2} · /,"").replace(/\s*· self-study\b/,""))}</textarea></label>`
+        +`<label class="field">For the class on <input type="date" id="hw-by" value="${next}"></label>`
+        +`<div class="row"><button data-do="hwsave" data-gid="${k.gid}" data-ls="${k.ls}" data-set="${from}">Set as homework</button></div>`)},
+    hwsave:()=>{const text=$("#hw-text").value.replace(/\s+/g," ").trim(),by=$("#hw-by").value;if(!text||!by)return alert("Write what they have to do and choose the day.");
+      $("#dlg").close();act(api.hw(k.ls,k.gid,"h"+Date.now().toString(36),{text,by,set:k.set}))},
+    hwdel:()=>{if(!confirm("Remove this homework? Students will no longer see it."))return;act(api.hw(k.ls,k.gid,k.id,null))},wk:()=>{S.wk=k.w;S.g="plan";render()},
     tips:()=>{S.tips=!S.tips;try{localStorage.setItem("el_t_tips",S.tips?"on":"off")}catch(e){}render()},
     addstu:()=>dlg("<h3>Add a student</h3>"+roForm({})),impok:()=>{$("#dlg").close();act(api.importRoster(S.imp))},
     rosave:()=>{const v=f=>$("#ro-"+f).value.replace(/\s+/g," ").trim(),o={email:v("email").toLowerCase(),surname1:v("surname1"),surname2:v("surname2"),first:v("first"),tutor:v("tutor"),group:$("#ro-group").value};

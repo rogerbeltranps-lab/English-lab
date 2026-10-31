@@ -86,8 +86,8 @@ export async function start({db,user,group,root,lsId,seesAll}){
       return `<div class="dy ${d===today?"now":""}"><h4>${DAY[lang][dt.getDay()]} ${dt.getDate()}${d===today?` <i>· ${t("avui","today")}</i>`:""}</h4>`
         +(dd.items.length?`<ul>${dd.items.map(it=>item(it,d)).join("")}</ul>`:"")
         +(dd.cls.length?`<div class="cl">${t("A classe:","In class:")} ${esc(dd.cls.join(" · "))}</div>`:"")+`</div>`}).join("");
-    const hws=W.upcoming(p,gi),cal=W.calendar(group,root);
-    const hw=`<div class="hw"><b>🏠 ${t("Deures i classes pel teu compte","Homework and classes on your own")}</b>`+(hws.length?`<ul>${hws.map(x=>`<li><span class="tt">${x.kind==="self"?"📚":"🏠"} ${esc(W.taskText(x,lang))}</span></li>`).join("")}</ul>`:`<div class="cl">${t("No tens deures per als propers dies.","No homework for the next few days.")}</div>`)
+    const hws=W.upcoming(p,gi,null,null,((info||{}).homework||{})[group]),cal=W.calendar(group,root);
+    const hw=`<div class="hw"><b>🏠 ${t("Deures i classes pel teu compte","Homework and classes on your own")}</b>`+(hws.length?`<ul>${hws.map(x=>`<li><span class="tt">${x.kind==="self"?"📚":"🏠"} ${esc(W.taskText(x,lang))}</span>${x.extra?`<a href="${W.gcalLink(x,lang)}" target="_blank" rel="noopener">📅</a>`:""}</li>`).join("")}</ul>`:`<div class="cl">${t("No tens deures per als propers dies.","No homework for the next few days.")}</div>`)
       +`<a class="cal" href="${cal.google}" target="_blank" rel="noopener">📅 ${t("Afegeix-ho al meu Google Calendar","Add it to my Google Calendar")}</a></div>`;
     const head=i===W.row(p)?t("La meva setmana","My week"):i===0?t("Comencem","We start"):t("Propera setmana","Next week");
     return `<div class="hd"><b>📋 ${head} · ${W.week(r,lang)}</b><button type="button" data-x aria-label="${t("Tanca","Close")}">✕</button></div><div class="bd">${exam}${hw}${lt}${sp}${ds||`<p class="cl">${t("Aquesta setmana no hi ha classes previstes.","No classes planned this week.")}</p>`}`

@@ -32,7 +32,10 @@
     // they have to do"): from the session lines of a group, [{kind, date, set, text}] by date. kind "hw" = a line
     // "Homework by Tue 10 · …" (date = that day, set = the class just before it), "self" = a class line marked "· self-study"
     // (the teacher is away), "exam" = the exam day. The student board, My week, the dashboard and the calendar feeds use it.
-    tasks(p,gi){const out=[];if(!p||gi<0)return out;
+    // added: homework the teacher set from the dashboard ("🏠 Set as homework" on a session line; ls/{id}.homework[group] =
+    // {id: {text, by, set}}), listed with kind "hw" and extra:true (they are not in the calendar feed, which is a static file).
+    tasks(p,gi,added){const out=[];if(!p||gi<0)return out;
+      Object.entries(added||{}).forEach(([id,h])=>{if(h&&h.text&&h.by)out.push({kind:"hw",date:h.by,set:h.set||null,text:h.text,extra:true,id})});
       const at=(from,dn,n)=>{for(let k=0;k<21;k++){const s=add(from,k),d=day(s);if(d.getDate()===n&&DAYS.en[d.getDay()]===dn)return s}return null};
       let last=null;
       (p.rows||[]).forEach(r=>{if(!r.from)return;String((r.g?r.g[gi]:r.what)||"").split("\n").forEach(raw=>{const ln=raw.trim();
@@ -44,11 +47,15 @@
       const ex=p.exam&&p.exam[gi];if(ex)out.push({kind:"exam",date:ex,set:null,text:"Exam"});
       return out.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0)},
     // homework and self-study classes still ahead (date >= from, by default today), within `days` days
-    upcoming(p,gi,from,days){from=from||today();const to=add(from,days==null?14:days);return this.tasks(p,gi).filter(x=>x.kind!=="exam"&&x.date>=from&&x.date<=to)},
+    upcoming(p,gi,from,days,added){from=from||today();const to=add(from,days==null?14:days);return this.tasks(p,gi,added).filter(x=>x.kind!=="exam"&&x.date>=from&&x.date<=to)},
     // calendar feed of a group (tools/gen-calendar.js writes calendar/<group id>.ics from this file): the .ics link and the link
     // that subscribes a Google Calendar to it once, so every later homework appears by itself
     calendar(gid,root){const ics=new URL("calendar/"+String(gid).toLowerCase()+".ics",root||location.href).href;
       return {ics,google:"https://calendar.google.com/calendar/r?cid="+encodeURIComponent(ics.replace(/^https?:/,"webcal:"))}},
+    // a Google Calendar link that adds one homework (for the ones the teacher set from the dashboard)
+    gcalLink(x,lang){const ca=L(lang)==="ca",d=s=>s.replace(/-/g,""),start=x.set&&x.set<x.date?x.set:add(x.date,-1);
+      return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent((ca?"🏠 Deures d'anglès: ":"🏠 English homework: ")+x.text)
+        +"&dates="+d(start)+"/"+d(x.date)+"&details="+encodeURIComponent((ca?"Per a la classe del ":"For the class on ")+this.date(x.date,lang))},
     // one homework or self-study item as text for students ("by Tue 10 Nov · …", Catalan for Starter and Base)
     taskText(x,lang){const ca=L(lang)==="ca";
       return x.kind==="self"?(ca?"Classe pel teu compte":"Class on your own")+" ("+this.date(x.date,lang)+") · "+x.text+" · "+(ca?"treballa amb auriculars i acaba-ho a casa":"work with headphones and finish it at home")
