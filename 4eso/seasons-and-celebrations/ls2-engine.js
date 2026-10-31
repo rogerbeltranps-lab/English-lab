@@ -1125,14 +1125,89 @@ var LS2 = (function () {
     const keep = () => { state.review[level] = { helped: h.value.trim(), review: r.value.trim(), at: new Date().toISOString() }; save(); $('#lpReviewMsg').textContent = ca() ? 'Desat ✓' : 'Saved ✓'; };
     h.onchange = keep; r.onchange = keep;
   }
+  /* Study guide (EXAMPLE, Roger 30 Oct 2026): LP.study[route] from data/study/<page>.js, a folded card above the steps with
+     evidence-based tips, a spaced plan and practice in the format of the next checkpoint and the final exam, each with its answer key.
+     Practice only: never a step, never saved or sent to the dashboard. */
+  const guide = () => LP.study && (LP.study[level] || null);
+  function studyCard() {
+    const g = guide(); if (!g) return '';
+    const q = (b, i, q) => '<div class="question"><p class="q-title">' + (i + 1) + '. ' + q.q + (b.pts ? ' <small>[' + ptsWord(q.o ? b.pts[0] : b.pts[1]) + ']</small>' : '') + '</p>' +
+      (q.o ? '<div class="options">' + learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + b.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') + '</div>'
+           : '<input type="text" class="typed" id="' + b.id + i + '" autocomplete="off" autocapitalize="off" spellcheck="false">') + '<div class="feedback" id="' + b.id + 'f' + i + '"></div></div>';
+    return '<details class="section-card study-card"><summary><span>📚 ' + g.title + '</span><small>' + (ca() ? 'Obre la guia' : 'Open the guide') + '</small></summary>' +
+      '<p class="instruction">' + g.intro + '</p>' +
+      '<h3>' + (ca() ? 'Com estudiar' : 'How to study') + '</h3><div class="study-tips">' + g.tips.map(t => '<div class="mini-card"><strong>' + t[0] + ' ' + t[1] + '</strong><p>' + t[2] + '</p><p class="tiny">' + t[3] + '</p></div>').join('') + '</div>' +
+      '<h3>' + (ca() ? 'El meu pla' : 'My plan') + '</h3><ol class="study-plan">' + g.plan.map(r => '<li><strong>' + r[0] + '</strong> · ' + r[1] + '</li>').join('') + '</ol>' +
+      '<h3>' + (ca() ? 'Què et trobaràs' : 'What comes up') + '</h3><div class="model">' + g.coming + '</div>' +
+      g.practice.map(b => '<div class="study-block" id="' + b.id + '"><div class="panel-head"><div><h3>' + b.title + '</h3><p class="instruction">' + b.intro + '</p></div>' + (b.pill ? '<span class="pill">' + b.pill + '</span>' : '') + '</div>' +
+        (b.audio ? '<audio controls preload="none" src="' + b.audio + '" style="width:100%;margin:6px 0 10px"></audio>' : '') + (b.text ? '<div class="reading">' + b.text + '</div>' : '') +
+        (b.mock ? '<div class="study-mock" id="' + b.id + 'Mock"></div>' : b.items.map((x, i) => q(b, i, x)).join('') +
+        '<div class="actions"><button class="btn" type="button" data-study-check="' + b.id + '">' + (ca() ? 'Comprova' : 'Check') + '</button><button class="btn secondary" type="button" data-study-key="' + b.id + '">' + (ca() ? 'Mostra les solucions' : 'Show the answer key') + '</button></div>' +
+        '<div class="result" id="' + b.id + 'Result"></div>') + '<ol class="study-key" id="' + b.id + 'Key" hidden>' + b.items.map(x => '<li><strong>' + esc(x.o ? x.o[0] : x.a[0]) + '</strong>' + (x.why ? ' · ' + x.why : '') + '</li>').join('') + '</ol></div>').join('') +
+      '</details>';
+  }
+  // A rehearsal of the secure checkpoint (shared/js/el-checkpoint.js): one question at a time, a timer, no going back; then the
+  // student's answers next to the key. Nothing is sent or saved, and it can be repeated in a new order.
+  let mockTimer = null;
+  function mock(b) {
+    const box = $('#' + b.id + 'Mock'), key = $('#' + b.id + 'Key'), secs = b.mock.secs || 45;
+    const start = () => {
+      clearInterval(mockTimer); key.hidden = true;
+      const order = learningSupport.shuffledIndexes(b.items.length), ans = [];
+      let i = 0, at = 0;
+      const ask = () => {
+        clearInterval(mockTimer);
+        if (i >= order.length) return end(order, ans);
+        const x = b.items[order[i]];
+        box.innerHTML = '<p class="tiny">' + (ca() ? 'Pregunta ' : 'Question ') + (i + 1) + ' / ' + order.length + '</p><div class="study-bar"><i style="width:100%"></i></div>' +
+          '<p class="study-q">' + x.q + '</p><input type="text" class="typed" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="' + (ca() ? 'La teva resposta' : 'Your answer') + '">' +
+          '<div class="actions"><button class="btn" type="button">' + (i === order.length - 1 ? (ca() ? 'Acaba' : 'Finish') : (ca() ? 'Següent →' : 'Next →')) + '</button></div>';
+        const inp = box.querySelector('input'), bar = box.querySelector('.study-bar i');
+        const next = () => { if (ans.length > i) return; ans.push(inp.value.trim()); i++; ask(); };
+        box.querySelector('button').onclick = next; inp.onkeydown = e => { if (e.key === 'Enter') next(); };
+        inp.focus({ preventScroll: true }); at = Date.now();
+        mockTimer = setInterval(() => { const l = secs * 1000 - (Date.now() - at); bar.style.width = Math.max(0, l / (secs * 10)) + '%'; bar.classList.toggle('low', l < 10000); if (l <= 0) next(); }, 250);
+      };
+      ask();
+    };
+    const end = (order, ans) => {
+      let right = 0;
+      const rows = order.map((n, k) => { const x = b.items[n], ok = x.a.some(a => norm(a) === norm(ans[k])); if (ok) right++;
+        return '<li class="' + (ok ? 'ok' : 'no') + '">' + (ok ? '✓ ' : '✗ ') + x.q + '<br><span class="tiny">' + (ca() ? 'La teva resposta: ' : 'Your answer: ') + (ans[k] ? esc(ans[k]) : '–') + (ok ? '' : ' · <strong>' + esc(x.a[0]) + '</strong>') + (x.why ? ' · ' + x.why : '') + '</span></li>'; }).join('');
+      box.innerHTML = '<div class="result show">' + right + ' / ' + order.length + '</div><ol class="study-review">' + rows + '</ol>' +
+        '<div class="actions"><button class="btn secondary" type="button">' + (ca() ? 'Torna-ho a fer (en un altre ordre)' : 'Do it again (in a new order)') + '</button></div>';
+      box.querySelector('button').onclick = start;
+    };
+    box.innerHTML = '<div class="actions"><button class="btn" type="button">' + (ca() ? 'Comença la pràctica' : 'Start the practice') + '</button></div>';
+    box.querySelector('button').onclick = start;
+  }
+  function bindStudy() {
+    const g = guide(); if (!g) return;
+    g.practice.forEach(b => {
+      if (b.mock) return mock(b);
+      $('[data-study-check="' + b.id + '"]').onclick = () => {
+        let right = 0, pts = 0, max = 0;
+        b.items.forEach((x, i) => {
+          const fb = $('#' + b.id + 'f' + i), w = b.pts ? (x.o ? b.pts[0] : b.pts[1]) : 1; let ok;
+          if (x.o) { const c = document.querySelector('input[name="' + b.id + i + '"]:checked'); ok = !!c && +c.value === 0; }
+          else ok = x.a.some(a => norm(a) === norm($('#' + b.id + i).value));
+          fb.textContent = ok ? (ca() ? 'Correcte!' : 'Correct!') : (ca() ? 'Encara no: mira les solucions.' : 'Not yet: check the answer key.');
+          fb.className = 'feedback ' + (ok ? 'ok' : 'no'); max += w; if (ok) { right++; pts += w; }
+        });
+        const r = $('#' + b.id + 'Result'); r.textContent = right + ' / ' + b.items.length + (b.pts ? ' · ' + pts + ' / ' + ptsWord(max) : ''); r.classList.add('show');
+      };
+      $('[data-study-key="' + b.id + '"]').onclick = () => { const k = $('#' + b.id + 'Key'); k.hidden = !k.hidden; };
+    });
+  }
   function render() {
     const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
-    $('#lp').innerHTML = trackNote() + planCard() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
+    $('#lp').innerHTML = trackNote() + planCard() + studyCard() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
       LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
       reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
     LP.panels.forEach(p => p._r.bind());
     bindPlan();
+    bindStudy();
     $$('.tab').forEach(t => t.onclick = () => { $$('.tab,.panel').forEach(x => x.classList.remove('active')); t.classList.add('active'); $('#' + t.dataset.panel).classList.add('active'); window.scrollTo({ top: $('#lp').offsetTop - 64, behavior: 'smooth' }); });
     initNext();
     progress();
@@ -1153,7 +1228,7 @@ var LS2 = (function () {
     LP.panels = LP.base.flatMap(p => [N[p.id] ? as(p.id) : p].concat(extra.filter(k => N[k].after === p.id).map(k => as(k))));
   }
   function init(config) {
-    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
+    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.study-card summary{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;font-weight:800;color:var(--dark);font-size:1.05rem}.study-card summary small{color:var(--muted);font-weight:600}.study-card[open] summary small{display:none}.study-card .model{font-weight:500;line-height:1.6}.study-card h3{margin:18px 0 8px;color:var(--dark)}.study-tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}.study-tips p{margin:6px 0 0}.study-plan{margin:0;padding-left:20px;line-height:1.6}.study-block{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}.study-bar{height:8px;border-radius:9px;background:#e8eef7;overflow:hidden;margin:6px 0 4px}.study-bar i{display:block;height:100%;background:var(--accent);transition:width .25s linear}.study-bar i.low{background:#d97706}.study-q{font-size:1.1rem;font-weight:700;margin:10px 0 12px}.study-review{margin:10px 0 0;padding-left:32px;line-height:1.5}.study-review li{margin:0 0 8px}.study-review li.ok{color:#166534}.study-review li.no{color:#9f1239}.study-review .tiny{color:var(--muted)}.study-key{margin:10px 0 0;padding:12px 12px 12px 32px;background:#f3f8ff;border:1px solid var(--line);border-radius:12px;line-height:1.6}.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
     LP = config; LP.base = LP.base || LP.panels;
     level = localStorage.getItem(LP.key + 'Level') || 'insecure';
     if (ROUTES.indexOf(level) < 0) level = 'insecure';
