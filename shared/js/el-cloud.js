@@ -452,7 +452,7 @@ onAuthStateChanged(auth,async u=>{
   // that tab on the learning path (shared/js/el-corrections.js).
   if(u&&isStudent(u)&&!document.getElementById("el-corrections"))loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
     .then(()=>import("./el-corrections.js")).then(m=>m.corrections({here:actId,root:ROOT,en:repEn(),
-      list:async()=>(await getDocs(collection(db,"students",u.uid,"results"))).docs.map(x=>x.data()).filter(r=>r&&r.activity&&(r.replies||r.levels)),
+      list:async()=>(await getDocs(collection(db,"students",u.uid,"results"))).docs.map(x=>x.data()).filter(r=>r&&r.activity&&(r.replies||r.answers||r.levels)),
       seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().fbSeen||{}},
       save:o=>setDoc(doc(db,"students",u.uid),{fbSeen:o},{merge:true}),
       name:(aid,step)=>{for(const g of Object.values(window.EL_GRADING||{})){const x=(g.moments||[]).find(m=>m.a===aid&&m.step===step);if(x)return x.name}return null}})).catch(e=>console.warn("corrections",e));
