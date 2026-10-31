@@ -251,7 +251,7 @@ def main():
     ins, flt = [], []
     lines = [(st, dd['audio']) for (st, L, kind, dd) in segs if kind == 'line' and dd['audio']]
     for i, (st, a) in enumerate(lines):
-        ins += ['-i', a]; flt.append(f'[{i}:a]aresample=44100,aformat=channel_layouts=mono,adelay={int(st * 1000)}[a{i}]')
+        ins += ['-i', a]; flt.append(f'[{i + 1}:a]aresample=44100,aformat=channel_layouts=mono,adelay={int(st * 1000)}[a{i}]')
     if lines:
         flt.append(''.join(f'[a{i}]' for i in range(len(lines))) + f'amix=inputs={len(lines)}:normalize=0,apad,atrim=0:{TOTAL:.3f}[out]')
         subprocess.check_call(['ffmpeg', '-v', 'error', '-y', '-i', video, *ins, '-filter_complex', ';'.join(flt), '-map', '0:v', '-map', '[out]',
