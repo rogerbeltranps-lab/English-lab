@@ -6,7 +6,7 @@ without any sync script, and students do not see it as an exam (proposal: https:
 
 ## What the student gets
 
-- Before starting: the rules (number of questions, about 45 s each, no going back, stay on the page or it is sent).
+- Before starting: "How it works" (number of questions, about 45 s each, no going back, only once) and an "⚠️ Important" box: leaving the page sends it automatically, no copying or pasting, no notes, translator, AI or classmates. Start needs the "I have read the rules" tick (Roger, 31 Oct 2026).
 - One question at a time with a timer bar (`secure.secs`, 45 s). When time is up the next question comes. Enter or Next moves on.
 - The question can't be selected or copied, and nothing can be pasted or dropped into the answer.
 - Leaving the page (another tab, window or app: `blur` / `visibilitychange`) hides the question at once. Back within 2 s

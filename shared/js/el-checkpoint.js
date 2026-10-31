@@ -30,7 +30,7 @@ window.ELCheckpoint = (function () {
     const html = '<div class="section-card cp-box" id="' + p.id + 'Cp"><p class="tiny">' + t('Carregant…', 'Loading…') + '</p></div>' +
       '<style>.cp-box .cp-q{font-size:1.15rem;font-weight:700;margin:10px 0 12px;-webkit-user-select:none;user-select:none}.cp-box .cp-bar{height:8px;border-radius:9px;background:#e8eef7;overflow:hidden;margin:6px 0 4px}' +
       '.cp-box .cp-bar i{display:block;height:100%;background:var(--accent,#315f9f);transition:width .25s linear}.cp-box .cp-bar i.low{background:#d9534f}.cp-box .cp-rules{margin:8px 0 14px;padding-left:20px;line-height:1.6}' +
-      '.cp-box .cp-fb{border-top:1px solid var(--line,#dbe5f1);padding:10px 0}.cp-box .cp-fb .ok{color:#16a34a}.cp-box .cp-fb .no{color:#b42318}.cp-veil{position:fixed;inset:0;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;z-index:999;text-align:center;padding:20px}</style>';
+      '.cp-box .cp-fb{border-top:1px solid var(--line,#dbe5f1);padding:10px 0}.cp-box .cp-fb .ok{color:#16a34a}.cp-box .cp-fb .no{color:#b42318}.cp-box .cp-warn{background:#fff4e5;border:1px solid #f5b971;border-radius:13px;padding:10px 14px;margin:6px 0 12px}.cp-box .cp-warn h3{margin:0;color:#8a4b00}.cp-box .cp-ok{display:flex;gap:8px;align-items:center;font-weight:700;margin:6px 0}.cp-veil{position:fixed;inset:0;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;z-index:999;text-align:center;padding:20px}</style>';
 
     function box() { return document.getElementById(p.id + 'Cp'); }
     function draw() {   // the route's questions: all of them, or a draw of secure.n[route] from the bank, in a new order
@@ -41,16 +41,26 @@ window.ELCheckpoint = (function () {
     // ---- states: intro → running → sent (waiting) → feedback (released) ----
     function intro(note) {
       stop(); const n = ((S.n || {})[api.level()]) || api.forLevel(p.items).filter(x => x.id).length;
+      // the rules before the first question (Roger, 31 Oct 2026: “before entering the checkpoint, the instructions and what happens if they
+      // copy-paste or leave the tab”); Start needs the “I have read the rules” tick
       box().innerHTML = (note ? '<p class="feedback no">' + note + '</p>' : '') +
-        '<h3>' + t('Abans de començar', 'Before you start') + '</h3><ul class="cp-rules">' +
+        '<h3>' + t('Com funciona', 'How it works') + '</h3><ul class="cp-rules">' +
         '<li>' + t(n + ' preguntes, una cada vegada. Tens uns ' + secs + ' segons per a cada una.', n + ' questions, one at a time. You have about ' + secs + ' seconds for each one.') + '</li>' +
-        '<li>' + t('No pots tornar enrere. Si el temps s’acaba, passes a la següent.', 'You can’t go back. When the time is up, the next question comes.') + '</li>' +
-        '<li>' + t('Sense apunts ni ajuda. <strong>Queda’t en aquesta pàgina fins al final:</strong> si canvies de pestanya, de finestra o d’aplicació, el checkpoint s’envia tal com està.', 'No notes or help. <strong>Stay on this page until the end:</strong> if you change tab, window or app, your checkpoint is sent as it is.') + '</li>' +
-        '<li>' + t('Quan l’enviïs, s’obrirà el següent Learning Path. Veuràs la correcció quan el professor la publiqui.', 'When you send it, the next Learning Path opens. You will see the corrections when your teacher shares them.') + '</li></ul>' +
+        '<li>' + t('No pots tornar enrere. Quan el temps s’acaba, passes a la pregunta següent.', 'You can’t go back. When the time is up, the next question comes.') + '</li>' +
+        '<li>' + t('Només el pots fer <strong>una vegada</strong>.', 'You can only do it <strong>once</strong>.') + '</li></ul>' +
+        '<div class="cp-warn"><h3>⚠️ ' + t('Important', 'Important') + '</h3><ul class="cp-rules">' +
+        '<li><strong>' + t('No surtis d’aquesta pàgina.', 'Don’t leave this page.') + '</strong> ' + t('Si canvies de pestanya, de finestra o d’aplicació més de 2 segons, el checkpoint <strong>s’envia automàticament</strong> amb les respostes que tinguis, i ja no el pots continuar.', 'If you change to another tab, window or app for more than 2 seconds, your checkpoint <strong>is sent automatically</strong> with the answers you have, and you can’t go on with it.') + '</li>' +
+        '<li><strong>' + t('No es pot copiar ni enganxar.', 'No copying or pasting.') + '</strong> ' + t('Les preguntes no es poden copiar i a les caselles no s’hi pot enganxar res: escriu tu les respostes.', 'The questions can’t be copied and nothing can be pasted into the boxes: type your own answers.') + '</li>' +
+        '<li><strong>' + t('Sense apunts ni ajuda', 'No notes or help') + '</strong>' + t(': ni traductor, ni IA, ni companys.', ': no translator, no AI, no classmates.') + '</li></ul></div>' +
+        '<p>' + t('Quan l’enviïs, s’obrirà el següent Learning Path. Veuràs la correcció quan el professor la publiqui.', 'When you send it, the next Learning Path opens. You will see the corrections when your teacher shares them.') + '</p>' +
+        '<label class="cp-ok"><input type="checkbox" id="' + p.id + 'Read"> ' + t('He llegit les instruccions', 'I have read the rules') + '</label>' +
         '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Start" disabled>' + t('Comença', 'Start') + '</button><span class="tiny" id="' + p.id + 'Wait">' + t('Un moment…', 'One moment…') + '</span></div>';
-      // Start only once the cloud knows who it is (and has had time to reload the page with the student's progress)
-      const ready = () => { const b = document.getElementById(p.id + 'Start'), w = document.getElementById(p.id + 'Wait'); if (!b) return; b.disabled = false; if (w) w.textContent = ''; };
-      if (window.EL_CP_PREVIEW) ready(); else waitCloud(() => setTimeout(ready, 1500));
+      // Start only once the cloud knows who it is (and has had time to reload the page with the student's progress) and the rules are ticked
+      let cloudOk = false;
+      const ready = () => { const b = document.getElementById(p.id + 'Start'), w = document.getElementById(p.id + 'Wait'), r = document.getElementById(p.id + 'Read'); if (!b) return;
+        b.disabled = !(cloudOk && r.checked); if (w) w.textContent = cloudOk ? (r.checked ? '' : t('Marca la casella per començar.', 'Tick the box to start.')) : t('Un moment…', 'One moment…'); };
+      document.getElementById(p.id + 'Read').onchange = ready;
+      if (window.EL_CP_PREVIEW) { cloudOk = true; ready(); } else waitCloud(() => setTimeout(() => { cloudOk = true; ready(); }, 1500));
       document.getElementById(p.id + 'Start').onclick = () => {
         const c = st(); Object.keys(c).forEach(k => delete c[k]);
         Object.assign(c, { level: api.level(), ids: draw(), answers: [], times: [], leaves: [], i: 0, started: new Date().toISOString(), qAt: Date.now() });
