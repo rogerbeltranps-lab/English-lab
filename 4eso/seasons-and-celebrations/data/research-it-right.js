@@ -1,6 +1,6 @@
 /* LS2 · Learning Path 4 · Research it right (approved content, docs/4eso/ls2-seasons-and-celebrations/overview.md) */
 window.LP = {
-  key: 'ls2Research4ESO', n: 4, title: 'Research it right',
+  key: 'ls2Research4ESO', n: 4, starter: true, title: 'Research it right',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 2 i 3', en: 'Recall: Learning Paths 2 and 3' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
@@ -28,6 +28,7 @@ window.LP = {
         { q: 'What should you look for first?', o: ['who wrote it', 'how many pictures it has', 'how long it is'], h: 'Mira la pregunta 1 del text.' },
         { q: 'Why must you check the date of Diwali or Hanukkah?', o: ['It changes every year.', 'It is always the same.', 'Nobody knows it.'], h: 'Mira la pregunta 2 del text.' },
         { q: 'How many sources do you need for each fact?', o: ['at least two', 'one', 'five'], h: 'Mira la pregunta 4 del text.' },
+        { r: 'insecure', only: ['insecure'], q: 'Which of these is a good place to look for facts?', o: ['an official tourism website', 'a costume shop', 'a video with no name'], h: 'Mira la pregunta 1 del text.' },
         { r: 'safe', q: 'Why might a shop say a tradition is “ancient”?', o: ['because it sounds good and helps it sell', 'because it is always true', 'because shops are experts'] },
         { r: 'daring', q: 'What should you do if two reliable sources disagree?', o: ['choose the more reliable one or say that they disagree', 'use the first one you found', 'invent the answer'] },
         { r: 'daring', q: 'Which sentence avoids a stereotype?', o: ['Many families in China celebrate with a reunion dinner.', 'All Chinese people eat dumplings at New Year.', 'Chinese people always wear red.'] }
@@ -40,7 +41,8 @@ window.LP = {
         { q: 'A 15-second social video, “Lunar New Year facts you didn’t know 🤯”, no sources.', o: ['Not reliable', 'Reliable', 'Check it'], ex: { ca: 'Sense autor ni fonts, fet per tenir visualitzacions.', en: 'No author, no sources, made for views.' } },
         { q: 'An online encyclopedia article on Thanksgiving with references.', o: ['Reliable', 'Check it', 'Not reliable'], ex: { ca: 'Té referències que pots comprovar.', en: 'It has references you can check.' } },
         { q: 'An anonymous forum answer from 2011: “Hanukkah is always on 25 December.”', o: ['Not reliable', 'Reliable', 'Check it'], ex: { ca: 'Antic, anònim i incorrecte: la data canvia cada any.', en: 'Old, anonymous and wrong: the date changes every year.' } },
-        { q: 'The Catalan government’s culture website on the Castanyada.', o: ['Reliable', 'Check it', 'Not reliable'], ex: { ca: 'Font oficial.', en: 'An official source.' } }
+        { q: 'The Catalan government’s culture website on the Castanyada.', o: ['Reliable', 'Check it', 'Not reliable'], ex: { ca: 'Font oficial.', en: 'An official source.' } },
+        { r: 'insecure', only: ['insecure'], q: 'A classmate’s blog, no date, with facts copied from a video.', o: ['Not reliable', 'Reliable', 'Check it'], ex: { ca: 'Sense data ni fonts, i copiat d’un vídeo.', en: 'No date, no sources, and copied from a video.' } }
       ] },
     { id: 'respect', type: 'mc', tab: { ca: 'Respecte', en: 'Respect' }, title: { ca: 'Informació, no creença', en: 'Information, not belief' }, pill: '80 %',
       intro: { ca: 'Tria la versió que explica la celebració com a informació i amb respecte.', en: 'Choose the version that presents the celebration as information, respectfully.' },
@@ -48,20 +50,23 @@ window.LP = {
         { q: '“During Diwali, light wins over darkness.”', o: ['For many Hindus, Diwali celebrates light winning over darkness.', 'Diwali makes light win over darkness.', 'Diwali is when darkness disappears.'], ex: { ca: '“For many Hindus…” diu qui ho creu.', en: '“For many Hindus…” says who believes it.' } },
         { q: '“The candles of Hanukkah are a miracle.”', o: ['For Jewish families, the candles remember a story about a miracle.', 'The candles of Hanukkah are magic.', 'Hanukkah candles are a miracle every year.'], ex: { ca: 'Explica què recorden, no ho afirma com a fet.', en: 'It explains what they remember instead of stating it as fact.' } },
         { q: '“Halloween is a weird American party.”', o: ['Halloween is very popular in the USA, and it comes from an old Celtic festival.', 'Halloween is a strange party.', 'Halloween is only for Americans.'], ex: { ca: 'Dona informació sense jutjar.', en: 'It gives information without judging.' } },
-        { q: '“People in China all eat dumplings.”', o: ['Many families in northern China eat dumplings at Lunar New Year.', 'All Chinese people eat dumplings.', 'Chinese people only eat dumplings.'], ex: { ca: 'Evita generalitzar: “many families”.', en: 'Avoids generalising: “many families”.' } }
+        { q: '“People in China all eat dumplings.”', o: ['Many families in northern China eat dumplings at Lunar New Year.', 'All Chinese people eat dumplings.', 'Chinese people only eat dumplings.'], ex: { ca: 'Evita generalitzar: “many families”.', en: 'Avoids generalising: “many families”.' } },
+        { r: 'insecure', only: ['insecure'], q: '“Thanksgiving is just a day to eat too much.”', o: ['In the USA, families share a big meal at Thanksgiving to give thanks.', 'Thanksgiving is a day to eat too much.', 'Americans only eat turkey.'], ex: { ca: 'Explica el sentit de la festa sense jutjar.', en: 'It explains the meaning without judging.' } }
       ] },
     { id: 'notes', type: 'mc', tab: { ca: 'Notes', en: 'Notes' }, title: { ca: 'Notes, no còpies', en: 'Notes, not copies' }, pill: '80 %',
       intro: { ca: 'Tria les millors notes: paraules clau, no frases copiades.', en: 'Choose the best notes: key words, not copied sentences.' },
       items: [
         { q: '“Lunar New Year is celebrated in China, Vietnam and Korea in late January or February.”', o: ['LNY: China, Vietnam, Korea · late Jan / Feb', 'Lunar New Year is celebrated in China, Vietnam and Korea in late January or February.', 'LNY: China · summer'] },
         { q: '“Families light one more candle on the menorah every night, for eight nights.”', o: ['Hanukkah: menorah · +1 candle a night · 8 nights', 'Families light one more candle on the menorah every night.', 'Hanukkah: 1 candle · 1 night'] },
-        { q: '“The first Thanksgiving was a three-day harvest feast in 1621.”', o: ['1st Thanksgiving: 1621 · harvest feast · 3 days', 'The first Thanksgiving was a three-day harvest feast in 1621.', 'Thanksgiving: 1863 · 1 day'] }
+        { q: '“The first Thanksgiving was a three-day harvest feast in 1621.”', o: ['1st Thanksgiving: 1621 · harvest feast · 3 days', 'The first Thanksgiving was a three-day harvest feast in 1621.', 'Thanksgiving: 1863 · 1 day'] },
+        { r: 'insecure', only: ['insecure'], q: '“At the Castanyada, people in Catalonia eat roast chestnuts, sweet potatoes and panellets on 31 October.”', o: ['Castanyada: 31 Oct · chestnuts, sweet potatoes, panellets', 'At the Castanyada, people in Catalonia eat roast chestnuts, sweet potatoes and panellets.', 'Castanyada: 1 Nov · turkey'] }
       ] },
     { id: 'credit', type: 'mc', tab: { ca: 'Crèdits', en: 'Credits' }, title: { ca: 'Cita les fonts', en: 'Credit your sources' }, pill: '80 %',
       intro: { ca: 'Ordre: <strong>"Títol de la pàgina", web o autor, any.</strong> Exemple: <em>"The Castanyada", Catalan culture website, 2025.</em>', en: 'Order: <strong>"Title of the page", website or author, year.</strong> Example: <em>"The Castanyada", Catalan culture website, 2025.</em>' },
       items: [
         { q: 'Which credit line is in the right order?', o: ['"Diwali", Encyclopedia website, 2024.', '2024, Diwali, Encyclopedia website.', 'Encyclopedia website 2024 "Diwali"'] },
-        { q: 'Which credit line is complete?', o: ['"Thanksgiving history", History museum website, 2025.', '"Thanksgiving history".', 'I found it on the internet.'] }
+        { q: 'Which credit line is complete?', o: ['"Thanksgiving history", History museum website, 2025.', '"Thanksgiving history".', 'I found it on the internet.'] },
+        { r: 'insecure', only: ['insecure'], q: 'Which credit line is right for a video?', o: ['"Diwali in two minutes", BBC video, 2023.', 'A video I watched.', 'YouTube.'] }
       ] },
     { id: 'again', type: 'mc', tab: { ca: 'Escolta una font', en: 'Listen to a source' }, title: { ca: 'Escolta: un pòdcast també és una font', en: 'Listen: a podcast is a source too' }, pill: { ca: 'Pòdcast · 80 %', en: 'Podcast · 80 %' },
       intro: { ca: 'Escolta el pòdcast de l’LP3 com un investigador: quins fets dona, quins comprovaries i com parla de les creences.', en: 'Listen to the LP3 podcast like a researcher: what facts does it give, which ones would you check, and how does it talk about beliefs?' },

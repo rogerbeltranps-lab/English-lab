@@ -1,6 +1,6 @@
 /* 2 ESO · LS2 Free Time, Live! · Learning Path 6 · Write your vlog script (LS criterion 5.1: the script and the slide text, following a model) */
 window.LP = {
-  key: 'ls2Script2ESO', n: 6, title: 'Write your vlog script',
+  key: 'ls2Script2ESO', n: 6, starter: true, title: 'Write your vlog script',
   panels: [
     { id: 'recall', type: 'recall', tab: 'Recall', title: { ca: 'Recall: Learning Paths 3 i 5', en: 'Recall: Learning Paths 3 and 5' }, pill: { ca: 'Sense apunts', en: 'No notes' },
       intro: { ca: 'Escriu les respostes sense mirar res.', en: 'Type the answers without looking.' },
