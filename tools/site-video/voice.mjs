@@ -3,6 +3,7 @@
 // to redo a line, delete its mp3 first.
 // Usage: ELEVENLABS_API_KEY=... node tools/site-video/voice.mjs [only=l03,l08]
 //   EL_VOICE_ID (default: the voice named "Amelia" in the account), EL_MODEL (default eleven_v3), EL_SPEED (default 0.95)
+//   EL_SCRIPT = script file next to this file (default script.json; script-teacher.json for the teacher video)
 //   EL_LANG=ca reads each line's Catalan text (the Catalan version), EL_OUT = output folder name next to this file (default voice)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,7 +19,7 @@ const SPEED = +(process.env.EL_SPEED || 0.95);
 const only = (process.argv.find((a) => a.startsWith('only=')) || '').slice(5).split(',').filter(Boolean);
 const api = (p, o = {}) => fetch('https://api.elevenlabs.io' + p, { ...o, headers: { 'xi-api-key': KEY, 'content-type': 'application/json', ...(o.headers || {}) } });
 
-const script = JSON.parse(fs.readFileSync(path.join(DIR, 'script.json'), 'utf8'));
+const script = JSON.parse(fs.readFileSync(path.join(DIR, process.env.EL_SCRIPT || 'script.json'), 'utf8'));
 fs.mkdirSync(OUT, { recursive: true });
 
 let voice = process.env.EL_VOICE_ID;

@@ -410,7 +410,8 @@ function render0(){
     +`<button class="tab cplan ${S.g==="qa"?"on":""}" data-do="tab" data-g="qa" title="Which questions students answer well or badly the first time, by route and group">🔎 Questions</button>`
     +`<button class="tab cplan ${S.g==="mat"?"on":""}" data-do="tab" data-g="mat" title="Class games, paper worksheets and study PDFs of every LS">📚 Materials</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
-    +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`;
+    +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`
+    +` <button class="g" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`;
   if(S.g==="plan"){$("#main").innerHTML=pbBox()+sgBox()+overview();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
@@ -456,10 +457,17 @@ const QA={};S.qa={ls:null,g:"all",f:{act:"all",area:"all",sort:"hard",all:false}
 // Materials tab (Roger, 30 Oct 2026: "a table on the teacher dashboard to see all the games and printable docs"): per course, the class games
 // (lab/game/decks/index.js, opens the board on that game), the paper worksheets of each Learning Path per route + answer keys
 // (shared/print/lp-list.js; teacher only), the class shadowing page (shared/shadow/), the LS shadowing video (EL_LS[].shadowing) and the study PDFs per route (EL_LS[].study). New games and worksheets appear here by themselves.
+// "How English Lab works" videos (Roger, 31 Oct 2026: "the teachers video on the teachers board and the students' on theirs, and the
+// students' video also on the teachers board"): tools/site-video builds them; the student ones are also on the student board (today.html).
+// [title, file, shown]: an entry shows once its video is in the repo.
+const HOW_VIDEOS=[["👩‍🏫 For teachers: how the dashboard works","video/how-the-dashboard-works.mp4",false],
+  ["🎓 For students, in English (Amelia)","video/how-english-lab-works.mp4",true],["🎓 For students, in Catalan (Julian)","video/how-english-lab-works-ca.mp4",true]];
+function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Short videos made from the real site. The student ones are also on the student board.</p>`
+  +HOW_VIDEOS.filter(v=>v[2]).map(([t,href])=>`<p>${esc(t)}: ${a(href,"Watch →","btn")}</p>`).join("")+`</div>`}
 function matTab(){
   const R=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],cap=r=>r[0].toUpperCase()+r.slice(1);
   const a=(href,t,c)=>`<a href="${href}" target="_blank" rel="noopener"${c?` class="${c}"`:""}>${t}</a>`;
-  return [["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
+  return howTo(a)+[["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
     const games=(window.EL_GAMES||[]).filter(g=>g.course===c).sort((x,y)=>((x.ls||"")+(x.lp||"")).localeCompare((y.ls||"")+(y.lp||""),"en",{numeric:true})),lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
       +`<h3>🎮 Class games</h3>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation · Learning Path</th><th></th></tr>`
