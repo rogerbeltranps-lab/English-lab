@@ -28,7 +28,10 @@ window.ELItems=(function(){
     return banks[ls]=Promise.all(acts.map(async a=>{
       const file=a.path.replace(/[^/]+\.html$/,"data/"+a.path.split("/").pop().replace(".html",".js"));
       try{const r=await fetch(file,{cache:"no-cache"});if(!r.ok)return {a,panels:[]};const w={};new Function("window",await r.text())(w);
-        const panels=((w.LP||{}).panels||[]).map(p=>{const src=p.type==="vocab"?p.practice:["recall","mc","typed","quiz"].includes(p.type)?p.items:null;
+        // secure checkpoints (el-checkpoint.js) have no answers in the page: the dashboard's copy of the key (cpKeys) fills them in
+        const K=((window.EL_CP_KEYS||{})[(w.LP||{}).key]||{}).items||{};
+        const panels=((w.LP||{}).panels||[]).map(p=>{if(p.secure&&p.items)p.items=p.items.map(it=>it.id&&K[it.id]?Object.assign({},it,{a:K[it.id].a,ca:K[it.id].ca,en:K[it.id].en}):it);
+          const src=p.type==="vocab"?p.practice:["recall","mc","typed","quiz"].includes(p.type)?p.items:null;
           return src?{id:p.id,type:p.type,src,step:p.step,title:plain(en(p.title)).replace(/^(Reading|Listening)\s*:\s*/,"").replace(/^./,c=>c.toUpperCase())||p.id,area:p.area||areaOf(p),stay:p.type==="vocab"?"vocab":p.id,prefix:p.type==="vocab"?"vp":p.id,p}:null}).filter(Boolean);
         return {a,panels}}
       catch(e){console.warn("questions",file,e);return {a,panels:[]}}
