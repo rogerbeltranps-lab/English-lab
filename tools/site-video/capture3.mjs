@@ -233,6 +233,15 @@ await view('');
 await page.goto(BASE + '4eso/seasons-and-celebrations/recall-checkpoint-1.html', { waitUntil: 'domcontentloaded' });
 await settle(3500);
 await step('checkpoint rules', async () => { await top('.cp-box', 140); await shot('61-checkpoint-rules'); });
+// All the routes side by side (a student sees only theirs; the full view shows every route card). Nothing is clicked.
+await step('route cards', async () => {
+  await page.goto(LP, { waitUntil: 'domcontentloaded' });
+  await settle(3000);
+  await top('.route', 360);
+  await shot('26-routes');
+  const boxes = await page.locator('.route').evaluateAll((rs) => rs.map((r) => { const b = r.getBoundingClientRect(); return r.querySelector('strong').textContent + ' ' + [b.x, b.y, b.width, b.height].map(Math.round).join(','); }));
+  note('routes (x,y,w,h at 1280x720): ' + boxes.join(' | '));
+});
 await view('4ESOA');
 
 // ---- English Lab ----
