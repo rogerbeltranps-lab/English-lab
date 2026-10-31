@@ -143,5 +143,7 @@ window.ELStudy = (function () {
     box.querySelector('button').onclick = start;
   }
 
-  return { html, bind };
+  // the questions of a block for the route (paper worksheets, shared/js/lp-worksheet.js)
+  const items = (a, k) => { api = a; const s = api.LP.study && src(k); return s ? mine(Array.isArray(s) ? s : s.items) : []; };
+  return { html, bind, items };
 })();

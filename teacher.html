@@ -474,21 +474,22 @@ const HOW_VIDEOS=[["👩‍🏫 For teachers: how the dashboard works","video/ho
 function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Short videos made from the real site. The student ones are also on the student board.</p>`
   +HOW_VIDEOS.filter(v=>v[2]).map(([t,href])=>`<p>${esc(t)}: ${a(href,"Watch →","btn")}</p>`).join("")+`</div>`}
 function matTab(){
-  const R=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],cap=r=>r[0].toUpperCase()+r.slice(1);
+  const R0=[["beginners","Starter"],["insecure","Base"],["safe","Core"],["daring","Plus"]],RP=l=>R0.concat(l.pro?[["native","Pro"]]:[]);
   const a=(href,t,c)=>`<a href="${href}" target="_blank" rel="noopener"${c?` class="${c}"`:""}>${t}</a>`;
   return howTo(a)+[["2eso","2 ESO"],["4eso","4 ESO"]].map(([c,name])=>{
     const games=(window.EL_GAMES||[]).filter(g=>g.course===c).sort((x,y)=>((x.ls||"")+(x.lp||"")).localeCompare((y.ls||"")+(y.lp||""),"en",{numeric:true})),lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
       +`<h3>🎮 Class games</h3>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation · Learning Path</th><th></th></tr>`
         +games.map(g=>`<tr><td>${esc(g.emoji||"")} ${esc(g.title)}</td><td>${esc(g.ls||"")}${g.lp?" · "+esc(g.lp):""}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
-      +lss.map(l=>{const k=l.id.replace("-","/"),w=(window.LP_PRINT||{})[k];
+      +lss.map(l=>{const k=l.id.replace("-","/"),w=(window.LP_PRINT||{})[k],R=RP(l);
+        // LS2 on (EL_LS starter: true): a Starter summary of its own, built from the Learning Paths (tools/lp-worksheets/build.mjs); LS1: Starter uses Base
         return `<h3>📄 ${esc(l.title)}</h3>`
-          +(l.study?`<p>Study PDF (vocabulary and grammar): ${R.slice(1).concat(l.pro?[["native","Pro"]]:[]).map(([r,n])=>a(l.study+r+".pdf",cap(r)+" · "+n,"chip")).join(" ")} <span class="muted">(Beginners uses Insecure)</span></p>`:"")
+          +(l.study?`<p>Study PDF (vocabulary and grammar): ${R.slice(l.starter?0:1).map(([r,n])=>a(l.study+r+".pdf",n,"chip")).join(" ")}${l.starter?"":` <span class="muted">(Starter uses Base)</span>`}</p>`:"")
           +(l.shadowing?`<p>🎬 Shadowing video for the whole unit (Core, about 6 min; also on the student board and before the sample exam): ${a(l.shadowing,"Open on the projector →","btn")}</p>`:"")
           +(w?`<p>🗣 Shadowing at the start of the class: ${a("shared/shadow/index.html?ls="+k,"Open on the projector →","btn")} <span class="muted">(the same clips as the Shadowing step of each Learning Path)</span></p>`:"")
-          +(w?`<div class="qwrap"><table class="mat"><tr><th>Paper worksheet</th>${R.map(([r,n])=>`<th>${cap(r)}<br><small>${n}</small></th>`).join("")}<th>Answer key</th></tr>`
+          +(w?`<div class="qwrap"><table class="mat"><tr><th>Paper worksheet</th>${R.map(([r,n])=>`<th>${n}</th>`).join("")}<th>Answer key</th></tr>`
             +w.lps.map(([lp,t])=>{const u="shared/print/worksheet.html?ls="+k+"&lp="+lp+"&route=";
-              return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r])=>a(u+r+"&key=1",cap(r),"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
+              return `<tr><td>${esc(t)}</td>${R.map(([r])=>`<td>${a(u+r,"🖨 Print")}</td>`).join("")}<td>${R.map(([r,n])=>a(u+r+"&key=1",n,"chip")).join(" ")}</td></tr>`}).join("")+`</table></div>`
             :`<p class="muted">No paper worksheets for this LS.</p>`)}).join("")
       +`</div>`}).join("");
 }
