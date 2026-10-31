@@ -30,7 +30,7 @@ window.ELCheckpoint = (function () {
     const html = '<div class="section-card cp-box" id="' + p.id + 'Cp"><p class="tiny">' + t('Carregant…', 'Loading…') + '</p></div>' +
       '<style>.cp-box .cp-q{font-size:1.15rem;font-weight:700;margin:10px 0 12px;-webkit-user-select:none;user-select:none}.cp-box .cp-bar{height:8px;border-radius:9px;background:#e8eef7;overflow:hidden;margin:6px 0 4px}' +
       '.cp-box .cp-bar i{display:block;height:100%;background:var(--accent,#315f9f);transition:width .25s linear}.cp-box .cp-bar i.low{background:#d9534f}.cp-box .cp-rules{margin:8px 0 14px;padding-left:20px;line-height:1.6}' +
-      '.cp-box .cp-fb{border-top:1px solid var(--line,#dbe5f1);padding:10px 0}.cp-box .cp-fb .ok{color:#16a34a}.cp-box .cp-fb .no{color:#b42318}.cp-veil{position:fixed;inset:0;background:#0f172ae6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;z-index:999;text-align:center;padding:20px}</style>';
+      '.cp-box .cp-fb{border-top:1px solid var(--line,#dbe5f1);padding:10px 0}.cp-box .cp-fb .ok{color:#16a34a}.cp-box .cp-fb .no{color:#b42318}.cp-veil{position:fixed;inset:0;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;z-index:999;text-align:center;padding:20px}</style>';
 
     function box() { return document.getElementById(p.id + 'Cp'); }
     function draw() {   // the route's questions: all of them, or a draw of secure.n[route] from the bank, in a new order
