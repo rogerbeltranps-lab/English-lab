@@ -67,11 +67,21 @@
    "speaker": "Omar",
    "text": "A cat who plays the guitar?",
    "marks": "A **cat** who **plays** the gui**tar**? ↗",
-   "tip": "Arrows show the melody: ↗ the voice goes up, ↘ it goes down. Copy it!",
+   "tip": "No question word at the start? The voice goes up ↗, like in yes/no questions (Do you…?).",
    "src": "audio/where-are-you.mp3",
    "start": 33.78,
    "end": 35.84,
    "pause": 3.6
+  },
+  {
+   "speaker": "Omar",
+   "text": "What about you? What are you doing?",
+   "marks": "What about **you**? ↘ What are you **do**ing? ↘",
+   "tip": "Questions with who, what, where… go down ↘ at the end, like normal sentences.",
+   "src": "audio/where-are-you.mp3",
+   "start": 21.72,
+   "end": 22.7,
+   "pause": 3.0
   }
  ],
  "items": [

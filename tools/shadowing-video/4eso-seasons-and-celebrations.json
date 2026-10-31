@@ -164,13 +164,23 @@
   },
   {
    "speaker": "Laia",
-   "text": "What if it rains and everyone is inside?",
-   "marks": "What‿if‿it **rains** and **ev**eryone is‿in**side**? ↗",
-   "tip": "Arrows show the melody: ↗ the voice goes up, ↘ it goes down. Copy it!",
+   "text": "And the invitations?",
+   "marks": "And the invi**ta**tions? ↗",
+   "tip": "No question word at the start? The voice goes up ↗, like in yes/no questions (Do you…?).",
    "src": "audio/student-council-meeting.mp3",
-   "start": 58.81,
-   "end": 61.71,
-   "pause": 4.8
+   "start": 47.45,
+   "end": 48.8,
+   "pause": 3.2
+  },
+  {
+   "speaker": "Emma",
+   "text": "So where do the pumpkins come from?",
+   "marks": "So **where** do the **pump**kins come from? ↘",
+   "tip": "Questions with who, what, where… go down ↘ at the end, like normal sentences.",
+   "src": "audio/culture-bites-origins.mp3",
+   "start": 40.02,
+   "end": 41.85,
+   "pause": 3.3
   }
  ],
  "voice": {
