@@ -493,7 +493,7 @@ const QA={};S.qa={ls:null,g:"all",f:{act:"all",area:"all",sort:"hard",all:false}
 // students' video also on the teachers board"): tools/site-video builds them; the student ones are also on the student board (today.html).
 // [title, file, shown]: an entry shows once its video is in the repo.
 const HOW_VIDEOS=[["👩‍🏫 For teachers: how the dashboard works","video/how-the-dashboard-works.mp4?v=20261101",true],
-  ["🎓 For students, in English (Amelia)","video/how-english-lab-works.mp4?v=20261101",true],["🎓 For students, in Catalan (Julian)","video/how-english-lab-works-ca.mp4?v=20261101",true]];
+  ["🎓 For students, in English (Amelia)","video/how-english-lab-works.mp4?v=20261101b",true],["🎓 For students, in Catalan (Julian)","video/how-english-lab-works-ca.mp4?v=20261101b",true]];
 function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Short videos made from the real site. The student ones are also on the student board.</p>`
   +HOW_VIDEOS.filter(v=>v[2]).map(([t,href])=>`<p>${esc(t)}: ${a(href,"Watch →","btn")}</p>`).join("")+`</div>`}
 function matTab(){

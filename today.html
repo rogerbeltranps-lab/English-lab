@@ -109,7 +109,7 @@ function nav(g,lss){
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
 // tools/site-video (real screens of the site, no subtitles). A box on the board and a link in the menu.
-const HOWTO="video/how-english-lab-works",HOWTO_V="20261101";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
+const HOWTO="video/how-english-lab-works",HOWTO_V="20261101b";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
 const howBox=()=>`<div class="pend" style="background:#f5f3ff;border-color:#c4b5fd;flex-wrap:wrap"><div><b>🎬 ${t("Com funciona English Lab","How English Lab works")}</b> <span class="muted">· ${t("vídeo de 5 minuts: el tauler, les rutes, les Learning Situations i com moure't per la web","5-minute video: your board, routes, Learning Situations and how to move around the website")}</span></div>`
   +`<div class="row"><a class="go" href="${HOWTO}.mp4?v=${HOWTO_V}" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${HOWTO}-ca.mp4?v=${HOWTO_V}" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
 // "Go to my Learning Situations": one big button per LS the student can open (open LS first).
