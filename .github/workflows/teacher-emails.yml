@@ -7,7 +7,7 @@
 #     corrected, from the teacher's school account. (tools/notify/students.mjs)
 # GitHub may start a run a few minutes late. Secret (repo Settings > Secrets and variables > Actions): SCHOOL_MAIL_URL, the web app link of
 # the teacher's Apps Script in roger.beltran@ietramuntana.cat (tools/notify/school-mail.gs; students only receive mail from the school
-# domain and the school blocks app passwords). Optional: SCHOOL_APP_PASSWORD, ALERT_EMAIL_TO, GMAIL_APP_PASSWORD (+ GMAIL_USER) for the
+# domain and the school blocks app passwords), and SCHOOL_MAIL_KEY, the KEY in that script. Optional: SCHOOL_APP_PASSWORD, ALERT_EMAIL_TO, GMAIL_APP_PASSWORD (+ GMAIL_USER) for the
 # teacher emails only. Without any, every run does nothing.
 # By hand: Actions > English Lab emails > Run workflow. The log shows counts only (it is public).
 name: English Lab emails
@@ -45,6 +45,7 @@ jobs:
     env:
       FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM }}
       SCHOOL_MAIL_URL: ${{ secrets.SCHOOL_MAIL_URL }}
+      SCHOOL_MAIL_KEY: ${{ secrets.SCHOOL_MAIL_KEY }}
       SCHOOL_APP_PASSWORD: ${{ secrets.SCHOOL_APP_PASSWORD }}
       SCHOOL_USER: ${{ secrets.SCHOOL_USER }}
       GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
