@@ -331,9 +331,12 @@ function hwBox(p,gi,info){const xs=ELWeek.upcoming(p,gi,null,null,((info||{}).ho
 function weekBox(ls,info){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.me.group);if(!p||gi<0||!ELWeek.span(p))return "";
   const today=ELWeek.today(),i=ELWeek.row(p),nx=p.rows.findIndex(r=>r.from>today),ex=ELWeek.exam(p,gi),n=ex?ELWeek.days(today,ex):null;
   const exam=ex&&n>=0?`<div class="exam">📝 ${t("Examen","Exam")}: ${when(ex)}${n>1?t(` · d'aquí a ${n} dies`,` · in ${n} days`):n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
+  // learning paths the teacher dropped for the group (no time): not in the exam and not counted (Roger, 1 Nov 2026)
+  const dr=((p._dropped||{})[gi]||[]).map(id=>EL_CATALOG.find(a=>a.id===id)).filter(Boolean);
+  const drop=dr.length?`<p class="muted">✂ ${t("No entra a l'examen ni compta per a la nota (no hi vam tenir temps): ","Not in the exam and it does not count (we had no time for it): ")}${dr.map(a=>"<b>"+esc(a.title.split(/[:(]/)[0].trim())+"</b>").join(", ")}</p>`:"";
   const wk=n=>t("Setmana ","Week ")+(n+1);
   const main=i>=0?weekHtml(p,gi,i,info,t("Aquesta setmana","This week")+" · "+wk(i),true):nx>=0?weekHtml(p,gi,nx,info,(nx===0?t("Comencem","We start"):t("Propera setmana","Next week"))+" · "+wk(nx),true):`<p class="muted">${t("El pla d'aquesta LS ja s'ha acabat.","The plan of this LS is over.")}</p>`;
-  return `<div class="box wkbox"><h2>${t("El meu pla setmanal","My week plan")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Què fem a classe i què has de fer cada setmana. Si un dia no pots venir, mira-ho aquí.","What we do in class and what you have to do every week. If you miss a class, check it here.")}</p>${exam}${hwBox(p,gi,info)}${main}`
+  return `<div class="box wkbox"><h2>${t("El meu pla setmanal","My week plan")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Què fem a classe i què has de fer cada setmana. Si un dia no pots venir, mira-ho aquí.","What we do in class and what you have to do every week. If you miss a class, check it here.")}</p>${exam}${drop}${hwBox(p,gi,info)}${main}`
     +`<details class="all"><summary>${t("Tot el pla de la LS","The whole LS plan")}</summary>${p.rows.map((r,k)=>weekHtml(p,gi,k,info,wk(k),k===i)).join("")}</details></div>`}
 // Routes (Roger, 30 Oct 2026: "I am deciding it now and they can't change that, only ask for it through their dashboards"): the teacher
 // sets every route; it carries over to later LSs until he changes it (elRouteOf in el-catalog.js). A student never chooses one: they
