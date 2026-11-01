@@ -74,14 +74,23 @@ const nBehind=behind.reduce((a,[,ps])=>a+ps.length,0);
 const weekAgo=new Date(Date.now()-7*864e5).toISOString();
 const [allProbs,ideas]=await Promise.all([since("problems",weekAgo),since("suggestions",weekAgo)]);
 const probs=allProbs.filter(x=>!x.fixed),nFixed=allProbs.length-probs.length;   // the ones already marked as fixed need nothing
-console.log("Today "+TODAY+": "+nBehind+" session(s) not ticked, "+probs.length+" open problem report(s), "+ideas.length+" idea(s) this week.");   // counts only: the log is public
-if(!nBehind&&!probs.length&&!ideas.length){console.log("Nothing to send.");process.exit(0)}
+// ---- 3. website problems found by the weekly site check (Roger, 1 Nov 2026: "send me a mail if theres any prob"). The check runs on Saturday
+// at 5:45 Madrid time, before this email, and opens a GitHub issue labelled site-check for each problem it finds; Roger closes it when it is fixed.
+let siteIssues=[];
+try{
+  const r=await fetch("https://api.github.com/repos/rogerbeltranps-lab/English-lab/issues?labels=site-check&state=open&per_page=50",
+    {headers:Object.assign({Accept:"application/vnd.github+json"},E.GITHUB_TOKEN?{Authorization:"Bearer "+E.GITHUB_TOKEN}:{})});
+  if(r.ok)siteIssues=(await r.json()).filter(x=>!x.pull_request);else console.log("Site check issues: GitHub answered "+r.status+".");
+}catch(e){console.log("Site check issues: could not reach GitHub.")}
+console.log("Today "+TODAY+": "+nBehind+" session(s) not ticked, "+probs.length+" open problem report(s), "+ideas.length+" idea(s) this week, "+siteIssues.length+" website problem(s).");   // counts only: the log is public
+if(!nBehind&&!probs.length&&!ideas.length&&!siteIssues.length){console.log("Nothing to send.");process.exit(0)}
 
 const out=["Good morning! Here is your English Lab week.",""];
 if(nBehind)out.push("⚠ SESSIONS NOT TICKED ("+nBehind+")","Tick the ones you did. For the others, 🏠 Set as homework so students do them at home, or leave them: they move to next week's list.","",
   ...behind.flatMap(([x,ps])=>[x.name+":",...ps.map(y=>"   ☐ "+y.line),""]),"Open the Time plan: "+SITE+"teacher.html","");
 if(probs.length)out.push("⚠️ PROBLEM REPORTS THIS WEEK ("+probs.length+")","",...probs.map(probBlock),(nFixed?"("+n(nFixed,"more report","more reports")+" this week already marked as fixed.)\n":"")+"Open them: "+SITE+"teacher.html#probs","");
 if(ideas.length)out.push("💡 IDEAS THIS WEEK ("+ideas.length+")","",...ideas.map(ideaBlock),"Open them: "+SITE+"teacher.html","");
+if(siteIssues.length)out.push("🛠️ WEBSITE PROBLEMS FOUND BY THE WEEKLY CHECK ("+siteIssues.length+")","",...siteIssues.map(x=>"• "+x.title+"\n   "+x.html_url+"\n"),"Close each one on GitHub when it is fixed.","");
 out.push("—","English Lab sends this every Saturday morning, only when there is something. Students do not see it.");
-const subj=[nBehind?n(nBehind,"session","sessions")+" not ticked":"",probs.length?n(probs.length,"problem report","problem reports"):"",ideas.length?n(ideas.length,"idea","ideas"):""].filter(Boolean);
+const subj=[nBehind?n(nBehind,"session","sessions")+" not ticked":"",probs.length?n(probs.length,"problem report","problem reports"):"",ideas.length?n(ideas.length,"idea","ideas"):"",siteIssues.length?n(siteIssues.length,"website problem","website problems"):""].filter(Boolean);
 await sendMail("English Lab · your week: "+subj.join(", "),out.join("\n"));
