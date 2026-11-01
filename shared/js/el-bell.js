@@ -1,5 +1,5 @@
 // Teacher's problem bell (Roger, 26 Oct 2026): "🔔" in the bottom bar of every page that loads el-cloud.js, only for the teacher.
-// It shows how many problem reports from students (all groups) are still open and lists the latest ones; it updates live.
+// It shows how many problem reports from students (all groups) are still open and lists the latest ones; live on the dashboard, every 10 minutes elsewhere (bellWatch in el-cloud.js).
 // bell({watch,dash,onDash}) returns the element; el-cloud.js puts it in the bar. watch(cb) calls cb(reports) on every change
 // (problems/{id}, read only by the teacher); dash = the dashboard URL; onDash = this page is the dashboard (it opens the box itself).
 const KIND={media:"🔊 Audio or video does not play",stuck:"⛔ Cannot go on",marking:"❌ Correct answer marked wrong",display:"🖥️ Page looks wrong",other:"❓ Something else"};
