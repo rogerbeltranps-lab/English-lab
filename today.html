@@ -69,22 +69,26 @@ const col=p=>p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";
 const S={ls:null,view:"lp",pend:[]};let U=null,D=null;   // view: lp = one grid per learning path · sum = summary of my criteria
 
 // D = {me:{name,group}, rs:{activity:result}, lv:{ls:{level}}, pg:{ls:data}, ls:{id:{status,enabled,groups,open,secLocked}}, pt:{team,t1,t2,t3}, tm:{list,score,best}}
+// The teacher can open any student's board as the student sees it, read-only (Roger, 1 Nov 2026: "teacher should be able to see their
+// reports, all of them"): today.html?student={uid} from the 📄 links on the dashboard. Nothing is written in that view.
+let AS=null;
 async function load(u){
   if(DEMO)return DEMO;
-  const db=ELCloud.db,D={me:{},rs:{},lv:{},pg:{},ls:{}},q=async(p,f)=>{try{(await F.getDocs(F.collection(db,...p))).forEach(f)}catch(e){}};
-  try{const s=await F.getDoc(F.doc(db,"students",u.uid));if(s.exists())D.me=s.data()}catch(e){}
-  D.me.name=D.me.name||u.displayName||u.email;
-  if(ELCloud.viewGroup())D.me.group=ELCloud.viewGroup();   // tester in the student view of a group
-  await q(["students",u.uid,"results"],r=>D.rs[r.data().activity]=r.data());
-  await q(["students",u.uid,"levels"],l=>D.lv[l.id]=l.data());
-  await q(["students",u.uid,"progress"],p=>D.pg[p.id]=p.data().data||{});
+  const sid=AS||u.uid,db=ELCloud.db,D={me:{},rs:{},lv:{},pg:{},ls:{}},q=async(p,f)=>{try{(await F.getDocs(F.collection(db,...p))).forEach(f)}catch(e){}};
+  try{const s=await F.getDoc(F.doc(db,"students",sid));if(s.exists())D.me=s.data()}catch(e){}
+  const mail=(AS?D.me.email||"":u.email||"").toLowerCase();
+  D.me.name=D.me.name||(AS?mail:u.displayName||u.email);
+  if(!AS&&ELCloud.viewGroup())D.me.group=ELCloud.viewGroup();   // tester in the student view of a group
+  await q(["students",sid,"results"],r=>D.rs[r.data().activity]=r.data());
+  await q(["students",sid,"levels"],l=>D.lv[l.id]=l.data());
+  await q(["students",sid,"progress"],p=>D.pg[p.id]=p.data().data||{});
   for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
-  try{const p=await F.getDoc(F.doc(db,"points",(u.email||"").toLowerCase()));if(p.exists())D.pt=p.data()}catch(e){}
+  try{const p=await F.getDoc(F.doc(db,"points",mail));if(p.exists())D.pt=p.data()}catch(e){}
   if(D.me.group)try{const t=await F.getDoc(F.doc(db,"teams",D.me.group));if(t.exists())D.tm=t.data()}catch(e){}
-  try{D.ann=await ELCloud.announcements()}catch(e){console.warn("announcements",e)}
+  if(!AS)try{D.ann=await ELCloud.announcements()}catch(e){console.warn("announcements",e)}
   return D;
 }
-const all=()=>!DEMO&&(ELCloud.isTeacher(U)||(ELCloud.isTester(U)&&!ELCloud.viewGroup()));   // teacher and testers see every LS (not in a group's student view)
+const all=()=>!DEMO&&!AS&&(ELCloud.isTeacher(U)||(ELCloud.isTester(U)&&!ELCloud.viewGroup()));   // teacher and testers see every LS (not in a group's student view)
 function setLang(){
   const lv=elRouteOf(D.lv,S.ls).level||(Object.values(D.lv).find(x=>x&&x.level)||{}).level;
   EN=all()||(!!lv&&!elCa(lv));
@@ -349,7 +353,7 @@ function askPanel(){const ls=EL_LS.find(x=>x.id===S.ls),l=D.lv[S.ls]||{},now=elR
     +`<div class="row"><button class="g" data-do="close">${t("Cancel·la","Cancel")}</button><button class="sub" data-do="send" ${S.want?"":"disabled"}>${t("Envia la petició","Send the request")}</button></div>`;
   if(!$("#dlg").open)$("#dlg").showModal()}
 function want(r){S.want=r;document.querySelectorAll("button.opt").forEach(b=>b.classList.toggle("on",b.dataset.r===r));$('[data-do="send"]').disabled=false}
-async function sendAsk(){if(!S.want)return;const reason=$("#why").value.replace(/\s+/g," ").trim().slice(0,300);
+async function sendAsk(){if(!S.want||AS)return;const reason=$("#why").value.replace(/\s+/g," ").trim().slice(0,300);
   if(!DEMO)try{await F.setDoc(F.doc(ELCloud.db,"students",U.uid,"levels",S.ls),{request:S.want,reason,requestedAt:F.serverTimestamp()},{merge:true})}catch(e){return alert(t("No s'ha pogut enviar la petició: ","Could not send the request: ")+e.message)}
   D.lv[S.ls]=Object.assign(D.lv[S.ls]||{},{request:S.want,reason});$("#dlg").close();render()}
 function lpView(list,info){return ""
@@ -404,13 +408,17 @@ function detail(id){
     +`<div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button><a class="go ${can?"":"off"}" href="${a.path}" style="padding:6px 12px;font-size:14px">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a>${a.graded&&!a.manual&&info.status==="open"&&can&&!x.locked?`<button class="sub" data-do="submit" data-a="${a.id}">${t("Entrega","Submit")}</button>`:""}</div>`;
   if(!$("#dlg").open)$("#dlg").showModal();
 }
-async function submitMany(list){if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
+function asBanner(){const b=document.createElement("div");b.className="pend";b.style.cssText="background:#fef9c3;border-color:#facc15;position:sticky;top:0;z-index:30";
+  b.innerHTML=`<div><b>👁 ${esc(D.me.name||"")}${D.me.group?" · "+esc(D.me.group):""}</b> <span class="muted">· the student's board as they see it (read-only)</span></div><a class="go" href="teacher.html">Dashboard</a>`;
+  document.querySelector(".page").prepend(b)}
+async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
-  ({ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative"}[k.t]||k.t))}catch(e){}render();document.querySelector(".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:askPanel,want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
+  ({ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative"}[k.t]||k.t))}catch(e){}render();document.querySelector(".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(),want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
 if(DEMO){U={uid:"demo"};D=DEMO;render()}
 else ELCloud.onUser(async u=>{U=u;
   if(!u){nav(null,[]);$("#sub").textContent="Entra amb el teu correu de l’institut i la contrasenya (botó de baix a la dreta) per veure les teves activitats. · Sign in with your school email and password (button at the bottom right) to see your activities.";$("#main").innerHTML="";return}
-  D=await load(u);render();goLive();if(location.hash==="#exam")setTimeout(()=>document.getElementById("exam")?.scrollIntoView({block:"start"}),0)});
+  const sp=new URLSearchParams(location.search).get("student");AS=sp&&ELCloud.isTeacher(u)?sp:null;
+  D=await load(u);render();if(AS)asBanner();else goLive();if(location.hash==="#exam")setTimeout(()=>document.getElementById("exam")?.scrollIntoView({block:"start"}),0)});
 </script></body></html>
