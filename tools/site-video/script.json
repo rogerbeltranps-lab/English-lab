@@ -165,6 +165,12 @@
    "ca": "Quan el professor et corregeix o et respon una feina, un missatge t'avisa. Clica'l per llegir la correcció a dalt d'aquell pas."
   },
   {
+   "id": "l35",
+   "scene": "A learning path",
+   "en": "Write your texts yourself. Your teacher can see if you paste a text, use a translator, or write far above your level. Then you may have to do it again in class, in your own words.",
+   "ca": "Escriu tu els teus textos. El professor pot veure si enganxes un text, si fas servir un traductor o si escrius molt per sobre del teu nivell. Llavors potser l'hauràs de tornar a fer a classe, amb les teves paraules."
+  },
+  {
    "id": "l22",
    "scene": "Checkpoints",
    "en": "Recall checkpoints are short quizzes between learning paths. Read the rules, tick the box and click Start. You see one question at a time, with a timer, and you can't go back. Don't leave the page, or your answers are sent.",

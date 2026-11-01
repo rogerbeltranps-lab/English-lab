@@ -1495,5 +1495,30 @@
    ],
    "margin": 0
   }
+ ],
+ "l35": [
+  {
+   "img": "card:{\"lines\": [\"Write it yourself\"], \"big\": 52, \"items\": [\"No pasting\", \"No translator\", \"Your own words, at your level\"]}",
+   "img_ca": "card:{\"lines\": [\"Escriu-ho tu\"], \"big\": 52, \"items\": [\"Sense enganxar\", \"Sense traductor\", \"Amb les teves paraules, al teu nivell\"]}"
+  },
+  {
+   "img": "r5-46-redo.png",
+   "img_ca": "r5-46-redo-ca.png",
+   "on": "do it again",
+   "on_ca": "tornar a fer",
+   "view": [
+    100,
+    200,
+    1720,
+    400
+   ],
+   "hl": [
+    204,
+    300,
+    1514,
+    152
+   ],
+   "margin": 0.03
+  }
  ]
 }
