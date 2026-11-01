@@ -1,23 +1,33 @@
-# Teacher emails (Roger, 1 Nov 2026), free (GitHub Actions in a public repo, no Claude):
-#   • every 15 minutes from about 7:00 to 23:00 Madrid time: an email when students sent new ⚠️ Problem reports or 💡 Ideas (none: no email);
-#     at night they wait for the first check of the morning.
-#   • every Saturday about 8:00: one email with the class sessions not ticked (they move to next week) and the week's open reports and ideas.
-# GitHub may start a run a few minutes late. Secret (repo Settings > Secrets and variables > Actions): GMAIL_APP_PASSWORD; optional
-# GMAIL_USER and ALERT_EMAIL_TO. Without it every run does nothing. Test: Actions > Teacher emails > Run workflow ("test" sends a short
-# test email; "saturday" sends this week's Saturday email now). The log shows counts only (it is public).
-name: Teacher emails
+# English Lab emails (Roger, 1 Nov 2026), free (GitHub Actions in a public repo, no Claude):
+#   • every 15 minutes from about 7:00 to 23:00 Madrid time: an email to the teacher when students sent new ⚠️ Problem reports or 💡 Ideas
+#     (none: no email); at night they wait for the first check of the morning. (tools/notify/notify.mjs --instant)
+#   • Saturday about 8:00 (after the Friday 19:37 marking audit): one email to the teacher with the class sessions not ticked (they move to
+#     next week) and the week's open reports and ideas. (tools/notify/notify.mjs)
+#   • Sunday about 18:00: each student's summary of the coming week (homework, classes on their own) and what the teacher answered or
+#     corrected, from the teacher's school account. (tools/notify/students.mjs)
+# GitHub may start a run a few minutes late. Secret (repo Settings > Secrets and variables > Actions): SCHOOL_APP_PASSWORD (an app password
+# of roger.beltran@ietramuntana.cat; students only receive mail from the school domain); optional SCHOOL_USER, ALERT_EMAIL_TO, and
+# GMAIL_APP_PASSWORD (+ GMAIL_USER) for the teacher emails only. Without a password every run does nothing.
+# By hand: Actions > English Lab emails > Run workflow. The log shows counts only (it is public).
+name: English Lab emails
 
 on:
   schedule:
     - cron: "*/15 6-21 * * *"
     - cron: "0 7 * * 6"
+    - cron: "0 17 * * 0"
   workflow_dispatch:
     inputs:
       send:
         description: "What to send now"
         type: choice
-        options: [test, saturday, new reports and ideas]
-        default: test
+        options:
+          - test email to me
+          - Saturday email to me
+          - new reports and ideas to me
+          - one student's Sunday email, to me
+          - Sunday emails to all students
+        default: test email to me
 
 concurrency:
   group: teacher-emails
@@ -30,14 +40,17 @@ jobs:
   email:
     if: github.repository == 'rogerbeltranps-lab/English-lab'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     env:
       FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM }}
+      SCHOOL_APP_PASSWORD: ${{ secrets.SCHOOL_APP_PASSWORD }}
+      SCHOOL_USER: ${{ secrets.SCHOOL_USER }}
       GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
       GMAIL_USER: ${{ secrets.GMAIL_USER }}
       ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
       NOTIFY_STATE: .notify-state.json
-      MODE: ${{ github.event_name == 'workflow_dispatch' && (inputs.send == 'test' && '--test' || inputs.send == 'saturday' && 'saturday' || '--instant') || github.event.schedule == '0 7 * * 6' && 'saturday' || '--instant' }}
+      SEND: ${{ inputs.send }}
+      SCHEDULE: ${{ github.event.schedule }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,16 +60,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: What to run
+        id: mode
+        run: |
+          case "$SCHEDULE|$SEND" in
+            "0 7 * * 6|"|"|Saturday email to me") m="notify.mjs" ;;
+            "0 17 * * 0|"|"|Sunday emails to all students") m="students.mjs" ;;
+            "|one student's Sunday email, to me") m="students.mjs --test" ;;
+            "|test email to me") m="notify.mjs --test" ;;
+            *) m="notify.mjs --instant" ;;
+          esac
+          echo "run=$m" >> "$GITHUB_OUTPUT"
       # the time of the last check, kept between runs (the newest cache whose name starts with teacher-emails-)
-      - if: env.MODE == '--instant'
+      - if: steps.mode.outputs.run == 'notify.mjs --instant'
         uses: actions/cache/restore@v4
         with:
           path: .notify-state.json
           key: teacher-emails-${{ github.run_id }}
           restore-keys: teacher-emails-
       - name: Build and send
-        run: node tools/notify/notify.mjs $( [ "$MODE" = saturday ] || echo "$MODE" )
-      - if: env.MODE == '--instant' && hashFiles('.notify-state.json') != ''
+        run: node tools/notify/${{ steps.mode.outputs.run }}
+      - if: steps.mode.outputs.run == 'notify.mjs --instant' && hashFiles('.notify-state.json') != ''
         uses: actions/cache/save@v4
         with:
           path: .notify-state.json
