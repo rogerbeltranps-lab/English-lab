@@ -77,9 +77,9 @@ window.ELMark=(function(){
   // When a step is ready to mark in a group: its last session in the plan (the due day; the line that names the activity or its
   // "LPn") ticked in the time plan, plus 7 days. Ticks keep the day they were ticked; an older tick (true) counts from the due day.
   // o = {p: EL_PLAN[ls], gi: the group's column, due, title, ticks: teacherPlan/{group}.ticks, ls}
-  // A moment with daily: true (writings and Talk transcripts, from LS3; Roger, 31 Oct 2026) is ready the day it is handed in: Claude
-  // marks it in the 17:00 run, with no week to wait and no tick needed. from is long past, so each hand-in counts from the day it came in.
-  function ready(o){const W=window.ELWeek;if(o.daily)return {due:o.due||null,line:null,done:null,from:"2000-01-01",daily:true};
+  // A moment with weekly: true (writings and Talk transcripts, from LS3; Roger, 1 Nov 2026: "once a week, Friday at 15h") is ready the
+  // day it is handed in: Claude marks it in the Friday run, with no tick needed. from is long past, so each hand-in counts from the day it came in.
+  function ready(o){const W=window.ELWeek;if(o.weekly)return {due:o.due||null,line:null,done:null,from:"2000-01-01",weekly:true};
     if(!o.p||!o.due||o.gi<0)return {};
     const lines=r=>String(r.g?r.g[o.gi]||"":r.what||"").split("\n").filter(Boolean);
     const date=(r,l)=>{const m=/^\w{3} (\d{1,2})\b/.exec(l);if(!m||!r.from)return null;for(let j=0;j<7;j++){const d=W.add(r.from,j);if(+d.slice(8)===+m[1])return d}return null};
