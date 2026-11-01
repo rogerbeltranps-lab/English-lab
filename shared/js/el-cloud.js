@@ -23,6 +23,10 @@ const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
 // Kept in this browser only (el_view), so it needs no rules change; "" = tester view, everything open.
 const viewGroup=u=>{if(!isTester(u))return null;const g=localStorage.getItem("el_view");return (window.EL_GROUPS||[]).some(x=>x.id===g)?g:null};
 const seesAll=u=>isTester(u)&&!viewGroup(u);
+// In a group's view the tester can also pick a level (Roger, 1 Nov 2026: "see how each level sees it"): el_view_level, this browser only.
+// "" = the route saved on the tester's own account. It replaces the route everywhere through window.EL_VIEW_LEVEL (elRouteOf, el-catalog.js).
+const viewLevel=u=>{const g=viewGroup(u);if(!g)return null;const l=localStorage.getItem("el_view_level"),c=((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
+  return (window.EL_LEVELS||[]).some(x=>x.id===l)&&(l!=="native"||c==="4eso")?l:null};
 const isStudent=u=>!!u&&DOMAINS.some(d=>(u.email||"").toLowerCase().endsWith("@"+d));
 // Student list (roster/{email}, imported by the teacher in the dashboard): only listed school accounts (and testers) can use the site, and the list sets their group.
 // null = not on the list; undefined = the list could not be read (then the site behaves as before the list existed).
@@ -197,7 +201,7 @@ async function gate(u){
   if(!u||!isStudent(u)){signInBlock();return}
   const tester=seesAll(u),vg=viewGroup(u);
   if(tester)banner("Test account: you see every LS and activity.","#7c3aed");
-  if(vg)banner("Test account · student view of "+EL_GROUPS.find(x=>x.id===vg).name+": you see what this group sees.","#7c3aed",{t:"See everything again",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}});
+  if(vg){const vl=viewLevel(u);banner("Test account · student view of "+EL_GROUPS.find(x=>x.id===vg).name+(vl?" · level "+(window.elLevelLabel?elLevelLabel(courseOf(vg),vl):vl):"")+": you see what this group sees.","#7c3aed",{t:"See everything again",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}})}
   // The route of this LS, or the one carried over from an earlier LS (elRouteOf). With none yet, a student works on the Insecure
   // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
   const lvs={};try{(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){console.warn("levels",e)}
@@ -342,7 +346,10 @@ function bar(){
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
         s.innerHTML='<option value="">View: tester (everything)</option>'+(window.EL_GROUPS||[]).map(g=>'<option value="'+g.id+'">View as '+g.name+'</option>').join("");
-        s.value=viewGroup(u)||"";s.onchange=()=>{origSet.call(localStorage,"el_view",s.value);location.reload()};el.append(s," ")}
+        s.value=viewGroup(u)||"";s.onchange=()=>{origSet.call(localStorage,"el_view",s.value);location.reload()};el.append(s," ");
+        const vg=viewGroup(u);if(vg){const c=courseOf(vg),lv=document.createElement("select");lv.title="Tester: see the site as a student on this level";
+          lv.innerHTML='<option value="">Level: my own route</option>'+(window.EL_LEVELS||[]).filter(x=>x.id!=="native"||c==="4eso").map(x=>'<option value="'+x.id+'">'+(window.elLevelLabel?elLevelLabel(c,x.id):x.name)+'</option>').join("");
+          lv.value=viewLevel(u)||"";lv.onchange=()=>{origSet.call(localStorage,"el_view_level",lv.value);location.reload()};el.append(lv," ")}}
       el.append(b("Sign out",logout))}};
 }
 // Every page's own menu gets a link to the board ("My activities") for a signed-in student, or to the dashboard for the teacher,
@@ -429,6 +436,7 @@ await loadCatalog();
 const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=byPath.id;
 
 onAuthStateChanged(auth,async u=>{
+  window.EL_VIEW_LEVEL=viewLevel(u);   // before anything reads a route (elRouteOf)
   user=u;draw(u);
   if(u&&signInO){signInO.remove();signInO=null}
   // A student's first sign-in on this browser starts clean too: what is there was done by the teacher, a signed-out visitor or
