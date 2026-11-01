@@ -1,0 +1,63 @@
+# Teacher emails (Roger, 1 Nov 2026), free (GitHub Actions in a public repo, no Claude):
+#   • every 15 minutes from about 7:00 to 23:00 Madrid time: an email when students sent new ⚠️ Problem reports or 💡 Ideas (none: no email);
+#     at night they wait for the first check of the morning.
+#   • every Saturday about 8:00: one email with the class sessions not ticked (they move to next week) and the week's open reports and ideas.
+# GitHub may start a run a few minutes late. Secret (repo Settings > Secrets and variables > Actions): GMAIL_APP_PASSWORD; optional
+# GMAIL_USER and ALERT_EMAIL_TO. Without it every run does nothing. Test: Actions > Teacher emails > Run workflow ("test" sends a short
+# test email; "saturday" sends this week's Saturday email now). The log shows counts only (it is public).
+name: Teacher emails
+
+on:
+  schedule:
+    - cron: "*/15 6-21 * * *"
+    - cron: "0 7 * * 6"
+  workflow_dispatch:
+    inputs:
+      send:
+        description: "What to send now"
+        type: choice
+        options: [test, saturday, new reports and ideas]
+        default: test
+
+concurrency:
+  group: teacher-emails
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  email:
+    if: github.repository == 'rogerbeltranps-lab/English-lab'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+      NOTIFY_STATE: .notify-state.json
+      MODE: ${{ github.event_name == 'workflow_dispatch' && (inputs.send == 'test' && '--test' || inputs.send == 'saturday' && 'saturday' || '--instant') || github.event.schedule == '0 7 * * 6' && 'saturday' || '--instant' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/notify
+            shared/js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # the time of the last check, kept between runs (the newest cache whose name starts with teacher-emails-)
+      - if: env.MODE == '--instant'
+        uses: actions/cache/restore@v4
+        with:
+          path: .notify-state.json
+          key: teacher-emails-${{ github.run_id }}
+          restore-keys: teacher-emails-
+      - name: Build and send
+        run: node tools/notify/notify.mjs $( [ "$MODE" = saturday ] || echo "$MODE" )
+      - if: env.MODE == '--instant' && hashFiles('.notify-state.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .notify-state.json
+          key: teacher-emails-${{ github.run_id }}-${{ github.run_attempt }}
