@@ -12,6 +12,22 @@ const css=s=>window.CSS&&CSS.escape?CSS.escape(s):s.replace(/[^\w-]/g,"\\$&");
 
 // list() → [{activity, replies, answers, levels}] (the student's results), seen() → fbSeen, save({key: sig}), here = this page's activity id or
 // null, root = the site root URL, en = the route reads English, name(activity, step) → the step's name or null.
+// A writing correction (el-marking.js fbText: the comment, "✗ their words → right — why" lines, "✅ " + the corrected text with the
+// changes in *…*) as a table of mistakes and the corrected text with the changes in bold; any other answer as plain text.
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+export function writing(el,text,T){const ls=String(text).split("\n"),rows=ls.filter(l=>l.startsWith("✗ ")),fixed=ls.find(l=>l.startsWith("✅ "));
+  if(!rows.length&&!fixed){el.textContent=text;return}
+  const note=ls.filter(l=>!l.startsWith("✗ ")&&!l.startsWith("✅ ")).join("\n").trim(),td="padding:6px 8px;border-top:1px solid #bbf7d0;vertical-align:top;text-align:left";
+  el.style.whiteSpace="normal";
+  el.innerHTML=(note?'<p style="margin:0 0 10px;white-space:pre-wrap">'+esc(note)+'</p>':"")
+    +(rows.length?'<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;margin:0 0 12px;background:#fff;font-size:14px"><thead><tr>'
+      +[T("Errada","Mistake"),T("Correcció","Correction"),T("Per què","Why")].map(h=>'<th style="'+td+';border-top:0;color:#166534">'+h+'</th>').join("")+'</tr></thead><tbody>'
+      +rows.map(l=>{const m=/^✗ ([\s\S]+?) → ([\s\S]+?)(?: — ([\s\S]*))?$/.exec(l)||[null,l.slice(2),"",""];
+        return '<tr><td style="'+td+';color:#b91c1c"><s>'+esc(m[1])+'</s></td><td style="'+td+';color:#15803d;font-weight:600">'+esc(m[2])+'</td><td style="'+td+'">'+esc(m[3]||"")+'</td></tr>'}).join("")
+      +'</tbody></table></div>':"")
+    +(fixed?'<b style="display:block;margin-bottom:4px">'+T("✅ El teu text corregit","✅ Your text, corrected")+'</b><p style="margin:0;padding:10px 12px;background:#fff;border-radius:10px;white-space:pre-wrap">'
+      +esc(fixed.slice(2)).replace(/\*([^*\n]+)\*/g,'<b style="color:#15803d;text-decoration:underline">$1</b>')+'</p>':"")}
+
 export async function corrections({list,seen,save,here,root,en,name}){
   let rs,was;try{[rs,was]=await Promise.all([list(),seen()]);was=was||{}}catch(e){console.warn("corrections",e);return}
   const cat=window.EL_CATALOG||[],T=(ca,e)=>en?e:ca;
@@ -31,7 +47,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
       b.style.cssText="margin:0 0 14px;padding:12px 14px;border:2px solid #16a34a;border-radius:14px;background:#f0fdf4;color:#0f172a;font:15px/1.5 system-ui,sans-serif";
       b.innerHTML='<b style="display:block;margin-bottom:4px"></b><div style="white-space:pre-wrap"></div>';
       b.querySelector("b").textContent=it.corr?T("✏️ La correcció del professor","✏️ Your teacher’s correction"):T("💬 La resposta del professor","💬 Your teacher’s answer");
-      b.querySelector("div").textContent=it.text;return true};
+      writing(b.querySelector("div"),it.text,T);return true};
     if(put())shown[it.k]=it.v;else{let n=0;const t=setInterval(()=>{if(put()||++n>40)clearInterval(t)},250)}   // the page may still be drawing its tabs
   }
   if(Object.keys(shown).length)Promise.resolve(save(shown)).catch(e=>console.warn("corrections",e));

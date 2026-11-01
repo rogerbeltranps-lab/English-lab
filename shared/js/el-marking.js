@@ -37,11 +37,22 @@ window.ELMark=(function(){
       "VOICE: you write as the students' teacher, Roger, in the first person (\"I liked…\", \"next time try…\"). Students must read it as their teacher's own words: never mention AI, Claude, a computer, an automatic correction or this sheet, and never sign it. Catalan for the Starter and Base routes, English for Core, Plus and Pro, always.",
       ...(o.mode==="reply"?["This is the student's reflection on the unit (self-assessment, what helped, a goal). Do NOT correct their English. Answer them personally, as their teacher: show you read it (mention something they wrote), encourage them, and give one concrete tip for their goal. One to three short sentences, warm, in the language given.",
           "Write as their teacher, in the first person (\"I\"), with no signature; never invent anything that happened in class or that you saw them do."]
+        :o.mode==="writing"?["This is a piece of writing. Correct it as their teacher (Roger, 1 Nov 2026): a short comment, a table of the mistakes, and their text corrected changing as little as possible.",
+          "COMMENT: one or two short sentences, first person, no signature: one thing done well and one thing to try next time.",
+          "MISTAKES: every real mistake (grammar, vocabulary, spelling, word order, missing words), at most 8 (the most useful ones first), each as: the student's exact words => the correct form :: why, in a few simple words. Correct only what is wrong: never rewrite for style, never make it sound more advanced than their route.",
+          "CORRECTED TEXT: their whole text with only those mistakes fixed, everything else exactly as they wrote it; put every word you changed or added between *asterisks*.",
+          "Starter and Base had more support and shorter tasks: be gentle, explain in very simple Catalan. No mistakes: say so in the comment and leave the mistakes out.",
+          "COPYING: flag a text you think the student did not write themselves: far above what their route and exam writing mark suggest, translator-like (correct but unnatural, words or structures a learner at that level would not know), or mostly pasted according to its writing log. Never flag the Pro route for being too good. Still write the full correction: the teacher decides."]
         :["Write as their teacher, in the first person, with no signature. Each correction: one thing done well; the two or three most useful mistakes, each with the correct form (quote their words → the right version); one thing to try next time. Keep it short (two to five sentences), warm and concrete, in the language given, for what their route asked (Starter and Base had more support and shorter tasks). A spoken transcript comes from speech recognition: do not correct spelling or punctuation there, only words and grammar. Empty work: tell them kindly to do it and hand it in again."]),""];
-    const body=o.students.flatMap(s=>[`=== ${s.code} · route ${s.route||"–"} · ${o.mode==="reply"?"answer":"correction"} in ${s.ca?"Catalan":"English"}`,
+    const body=o.students.flatMap(s=>[`=== ${s.code} · route ${s.route||"–"} · ${o.mode==="reply"?"answer":"correction"} in ${s.ca?"Catalan":"English"}${o.mode==="writing"&&s.exam?" · exam writing "+s.exam:""}`,
+      ...(o.mode==="writing"&&s.ty?[`[writing log] ${tyText(s.ty)}`]:[]),
       ...(s.fields||[]).map(f=>`[${f.l}] ${String(f.v||"").replace(/\s+/g," ").trim()||"(empty)"}`),""]);
     const fmt=["ANSWER FORMAT (strict: the site reads it automatically). Reply with ONLY these lines, in a single code block, nothing before or after:",
-      `${V} | ${o.aid} | ${o.step} | ${o.group}`,`<code> | - | <the ${o.mode==="reply"?"answer":"correction"}, on one line>`,"(one line per student, every code above, same order)","END",
+      `${V} | ${o.aid} | ${o.step} | ${o.group}`,
+      ...(o.mode==="writing"?["<code> | - | <comment> ## <their words> => <correct form> :: <why> ## <their words> => <correct form> :: <why> ## TEXT: <their text corrected, changes in *asterisks*>",
+          "For a flagged text add a fourth part at the end of its line: <code> | - | <the correction as above> | COPY? <short reason for the teacher, in English>"]
+        :[`<code> | - | <the ${o.mode==="reply"?"answer":"correction"}, on one line>`]),
+      "(one line per student, every code above, same order)","END",
       "Never write | inside the correction. Never add names."];
     return [...head,"STUDENTS",...body,...fmt].join("\n");
   }
@@ -52,12 +63,20 @@ window.ELMark=(function(){
   const FORM={can:"My scores (1-4) for the unit goals",improve:"What improved most",helped:"What helped me most",goal:"My goal for the next LS"};
   function fbItems(st,skip,form){st=st||{};skip=skip||new Set();const out={},R=/_(beginners|insecure|safe|daring|native)$/,has=v=>String(v||"").trim();
     if(form){const f=Object.entries(st.form||{}).filter(([,v])=>has(v)).map(([k,v])=>({l:FORM[k]||k,v}));return (st.done||{})[form]&&f.length?{[form]:{fields:f,date:(st.doneAt||{})[form]||null,ty:null,title:"Reflection",mode:"reply"}}:{}}
-    for(const [k,h] of Object.entries(st.steps||{})){const f=((h&&h.f)||[]).filter(x=>has(x.v));if(!skip.has(k)&&f.length)out[k]={fields:f,date:h.date||null,ty:h.ty||null,title:h.title||null}}
+    for(const [k,h] of Object.entries(st.steps||{})){const f=((h&&h.f)||[]).filter(x=>has(x.v));if(!skip.has(k)&&f.length)out[k]={fields:f,date:h.date||null,ty:h.ty||null,title:h.title||null,...(h.w?{mode:"writing"}:{})}}
     const keys=new Set([...Object.keys(st.drafts||{}),...Object.keys(st.finals||{}),...Object.keys(st.texts||{}).filter(k=>(st.done||{})[k.replace(R,"")])]);
     for(const k of keys){const id=k.replace(R,"");if(skip.has(id)||out[id])continue;const f=(st.finals||{})[k],t=(st.texts||{})[k],d=(st.drafts||{})[k];
       const text=has((f&&f.text)||t||(d&&d.text));if(!text)continue;
-      out[id]={fields:[{l:f?"Final version":"Text",v:text},...(f&&has(f.changed)?[{l:"What I changed",v:f.changed}]:[])],date:(f&&f.at)||(d&&d.at)||null,ty:null,title:null}}
+      out[id]={fields:[{l:f?"Final version":"Text",v:text},...(f&&has(f.changed)?[{l:"What I changed",v:f.changed}]:[])],date:(f&&f.at)||(d&&d.at)||null,ty:null,title:null,...(/speak|talk/.test(id)?{}:{mode:"writing"})}}
     return out}
+  // A writing correction from the sheet's one line ("comment ## words => right :: why ## … ## TEXT: corrected") as the text the student
+  // gets (replies[step]): the comment, one "✗ words → right — why" line per mistake, and "✅ " + the corrected text (changes in *…*).
+  // shared/js/el-corrections.js shows the ✗ lines as a table; anywhere else it reads as plain text.
+  function fbText(fb){const ps=String(fb||"").split(/\s*##\s*/).map(x=>x.trim()).filter(Boolean);if(ps.length<2)return String(fb||"").trim();
+    const out=[],rows=[];let text="";
+    for(const x of ps){const t=/^TEXT\s*:\s*([\s\S]*)$/i.exec(x),m=/^([\s\S]+?)\s*=>\s*([\s\S]+?)(?:\s*::\s*([\s\S]*))?$/.exec(x);
+      if(t)text=t[1].trim();else if(m)rows.push("✗ "+m[1].trim()+" → "+m[2].trim()+(m[3]&&m[3].trim()?" — "+m[3].trim():""));else out.push(x)}
+    return [out.join(" "),...(rows.length?["",...rows]:[]),...(text?["","✅ "+text]:[])].join("\n").trim()}
   // the writing log in words: "pasted 180 characters (the text has 200) · 40 keys typed · 3 min writing"
   function tyText(t){return `pasted ${t.p||0} characters (the text has ${t.n||0}) · ${t.k||0} keys typed · ${t.s>=60?Math.round(t.s/60)+" min":(t.s||0)+" s"} writing`}
   // the answer: {err} or {group, rows:[{code, lv:{c: level}, fb, flag (the COPY? reason or "")}], bad:[lines left out], missing:[codes without a line]}
@@ -133,5 +152,5 @@ window.ELMark=(function(){
       seen.add(p[0]);rows.push({id:p[0],code:p[1],step:p[2],kind:k,text:p.slice(4).join(" ").trim()})}
     return {rows,bad,missing:[...by.keys()].filter(c=>!seen.has(c))};
   }
-  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,q,open,asked,CV,commentSheet,parseComments};
+  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,q,open,asked,CV,commentSheet,parseComments};
 })();
