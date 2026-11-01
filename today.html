@@ -24,7 +24,7 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 .tabbody{border-radius:14px}.t-form{background:#fff7ed;border:2px solid #fdba74;padding:2px 12px 8px}.t-exam{background:#f5f3ff;border:2px solid #c4b5fd;padding:2px 12px 8px}.fhead h2{margin:12px 0 2px;color:#9a3412}.fhead p{margin:0 0 6px;color:#9a3412}
 .xt{width:100%}.xt th{text-align:left}.xt td.l{text-align:left;vertical-align:top}.xbar{display:inline-block;width:120px;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;vertical-align:middle}.xbar span{display:block;height:100%}
 .corr thead th{color:#166534;background:#f0fdf4}.corr td.bad{color:#b91c1c}.corr td.good{color:#15803d;font-weight:600}.rv{margin-top:6px}.t-exam h3{font-size:1rem;margin:14px 0 6px}.wtexts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wtx{white-space:pre-wrap;background:#f8fafc;border-radius:10px;padding:10px 12px;margin:0;line-height:1.5}.wtx.ok2{background:#f0fdf4}.wtx.ok2 b{color:#15803d;text-decoration:underline}
-ol.rvl{margin:4px 0;padding-left:20px}ol.rvl li{margin:8px 0}ol.rvl li span{margin-right:6px}.notyet{background:#fff;border-style:dashed}
+ol.rvl{margin:4px 0;padding-left:20px}ol.rvl li{margin:8px 0}ol.rvl li span{margin-right:6px}.notyet{background:#fff;border-style:dashed}.wnote{white-space:pre-wrap;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:8px 12px;margin:8px 0}
 @media (max-width:600px){.lsbtn{flex:1 1 100%}.lsopen{margin-left:0}.xbar{width:60px}}</style></head><body>
 <style>/* Menu as on Home and English Lab: side menu on a computer, top menu on a phone */
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
@@ -256,11 +256,11 @@ function examWriting(r){const w=r.writing;if(!w)return "";
   const tot=(w.rubric||[]).reduce((a,x)=>[a[0]+(+x[1]||0),a[1]+(+x[2]||0)],[0,0]);
   return `<div class="box"><h2>4 · ${t("El teu writing","Your writing")}</h2>`
     +((w.rubric||[]).length?`<h3>${t("Rúbrica","Rubric")}</h3><div class="wrap"><table class="xt"><thead><tr><th>${t("Criteri de la rúbrica","Rubric row")}</th><th>${t("Nota","Score")}</th><th></th></tr></thead><tbody>${w.rubric.map(([n,v,m])=>`<tr><td class="l">${esc(n)}</td><td><b>${pts1(v)}</b> / ${m}</td><td class="l">${bar(v/m*100)}</td></tr>`).join("")}<tr><td class="l"><b>${t("Total","Total")}</b></td><td><b>${pts1(tot[0])}</b> / ${tot[1]}</td><td></td></tr></tbody></table></div>`:"")
-    +(w.note?`<div class="ptmiss">${esc(w.note)}</div>`:"")
+    +(w.note?`<div class="wnote">ℹ️ ${esc(w.note)}</div>`:"")
     +(w.feedback?`<h3>💬 ${t("Comentari del professor","Your teacher's comment")}</h3><div class="fb">${esc(w.feedback)}</div>`:"")
     +((w.errors||[]).length?`<h3>✏️ ${t("Errades: correcció i explicació","Mistakes: correction and why")}</h3><div class="wrap"><table class="xt corr"><thead><tr><th>${t("Errada","Mistake")}</th><th>${t("Correcció","Correction")}</th><th>${t("Per què","Why")}</th></tr></thead><tbody>`
       +w.errors.map(x=>`<tr><td class="l bad"><s>${esc(x.orig)}</s></td><td class="l good">${esc(x.fix)}</td><td class="l">${x.type?`<span class="tag">${esc(x.type)}</span> `:""}${esc(x.why||"")}</td></tr>`).join("")+`</tbody></table></div>`:"")
-    +(w.original||w.corrected?`<div class="wtexts">${w.original?`<div><h3>📝 ${t("El teu text","Your text")}</h3><p class="wtx">${esc(w.original)}</p></div>`:""}${w.corrected&&!w.note?`<div><h3>✅ ${t("El teu text corregit","Your text, corrected")}</h3><p class="wtx ok2">${esc(w.corrected).replace(/\*([^*\n]+)\*/g,"<b>$1</b>")}</p></div>`:""}</div>`:"")
+    +(w.original||w.corrected?`<div class="wtexts">${w.original?`<div><h3>📝 ${t("El teu text","Your text")}</h3><p class="wtx">${esc(w.original)}</p></div>`:""}${w.corrected?`<div><h3>✅ ${t("El teu text corregit","Your text, corrected")}</h3><p class="wtx ok2">${esc(w.corrected).replace(/\*([^*\n]+)\*/g,"<b>$1</b>")}</p></div>`:""}</div>`:"")
     +`</div>`}
 function examReview(r){const xs=r.review||[];if(!xs.length)return "";
   return `<div class="box"><h2>5 · ${t("Què has de repassar?","What should you review?")}</h2><ol class="rvl">${xs.map(x=>`<li><span>${esc(x.text)}</span> ${lpLink(x.lp)}</li>`).join("")}</ol></div>`}
