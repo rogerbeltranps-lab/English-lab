@@ -26,12 +26,12 @@ No longer in LS2: 2.1, 3.1, 1.3, 6.2 and CE2 emprenedora 2.3. Speaking steps in 
 | Activity | Criteria (catalogue) | Steps that give the evidence |
 | --- | --- | --- |
 | LP1 Getting started (not graded) | 4.1, 2.2 | read → 4.1 · listen → 2.2 · speak (practice) |
-| LP2 Celebrations around the world | 4.1, 2.2, 5.1, 3.2, 1.1 | read → 4.1 · **log → 4.1** · listen → 2.2 · write (not scored) → 5.1 · speak → 3.2, 1.1 |
+| LP2 Celebrations around the world | 4.1, 2.2, 5.1, 3.2, 1.1 | read → 4.1 · **log → 4.1** · listen → 2.2 · write (handed in and corrected; scored as a step since 1 Nov 2026) → 5.1 · speak → 3.2, 1.1 |
 | Recall checkpoints 1–4 | 4.1, 5.1 (formative) | check |
-| LP3 Where traditions come from | 2.2, 5.1, 1.2, 3.2 | listen → 2.2 · **chart → 2.2** · write (not scored) → 5.1, 1.2 · speak → 3.2, 1.2 |
+| LP3 Where traditions come from | 2.2, 5.1, 1.2, 3.2 | listen → 2.2 · **chart → 2.2** · write (handed in and corrected; scored as a step since 1 Nov 2026) → 5.1, 1.2 · speak → 3.2, 1.2 |
 | LP4 Research it right | 4.2, 6.1, 1.2, CC3 3.2 | read → 4.2 · sources → 4.2 · respect → 1.2, CC3 3.2 · notes → 6.1 · credit → 6.1 · **card → 4.2, 6.1, CC3 3.2** |
-| LP5 Plan the day | 2.2, 5.1, 3.2, CC1 1.3 | listen → 2.2 · write (not scored) → 5.1, CC1 1.3 · speak → 3.2 |
-| LP6 Write to the head teacher | 4.1, 5.1, 3.2, CC1 1.3 | read → 4.1 · register → 5.1 · write (not scored) → 5.1, CC1 1.3 · speak → 3.2 |
+| LP5 Plan the day | 2.2, 5.1, 3.2, CC1 1.3 | listen → 2.2 · write (handed in and corrected; scored as a step since 1 Nov 2026) → 5.1, CC1 1.3 · speak → 3.2 |
+| LP6 Write to the head teacher | 4.1, 5.1, 3.2, CC1 1.3 | read → 4.1 · register → 5.1 · write (handed in and corrected; scored as a step since 1 Nov 2026) → 5.1, CC1 1.3 · speak → 3.2 |
 | Sample exam (not graded) | 2.2, 4.1, 5.1 | listen, chart → 2.2 · read, log → 4.1 · vocab · grammar · write → 5.1 |
 | LP7 Final product | 1.1, 1.2, 3.2, 4.2, 5.1, 6.1, CC1 1.3, CC3 3.2 | video → 3.2, 1.1, 1.2, CC3 3.2 · email → 5.1, CC1 1.3 · hand-in steps 0–5 · rubric ([final-product-assessment.md](final-product-assessment.md)) |
 | Reflect (not graded) | none | reflect |
