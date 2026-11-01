@@ -32,6 +32,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 .ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
+<p class="muted" style="margin:-6px 0 8px"><small id="loadedAt"></small> <button class="g mini" id="refresh" title="Read the students' latest work (the dashboard reads everything only when it opens and when you press this)">🔄 Refresh</button></p>
 <div class="tabs" id="tabs"></div>
 <div id="main"></div>
 </div>
@@ -57,7 +58,14 @@ import {replyText,replyColor,MSG_MAX} from "./shared/js/el-reply.js";
 import {ANN_MAX,annMs,annHtml,annCardHtml,annCardStyle} from "./shared/js/el-announce.js";
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
-if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
+if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db;
+  // Every document the dashboard writes is noted (TOUCHED), so after a save act() reads back only those documents instead of the whole
+  // database (Roger, 1 Nov 2026: the free plan's daily reads ran out; a full load reads every student's work, thousands of documents).
+  const M=F,tk=r=>{try{TOUCHED.add(r.path)}catch(e){TOUCHED.add("?")}return r};
+  F=Object.assign({},M,{setDoc:(r,...x)=>M.setDoc(tk(r),...x),updateDoc:(r,...x)=>M.updateDoc(tk(r),...x),deleteDoc:r=>M.deleteDoc(tk(r)),
+    writeBatch:d=>{const w=M.writeBatch(d),o={set:w.set.bind(w),update:w.update.bind(w),delete:w.delete.bind(w)};
+      w.set=(r,...x)=>(o.set(tk(r),...x),w);w.update=(r,...x)=>(o.update(tk(r),...x),w);w.delete=r=>(o.delete(tk(r)),w);return w}})}
+const TOUCHED=new Set();
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 // LV: Starter · Base · Core · Plus · Pro (Roger, 30 Oct 2026: only the new names, here too), each with its CEFR level for the course on
 // screen (Roger, 1 Nov 2026: "I need to see the levels like this: Plus B1"; EL_CEFR in el-catalog.js): 4 ESO "Core B1", 2 ESO "Core A2".
@@ -205,12 +213,32 @@ const api={
   claudeAns:(u,a,step,text)=>{const r=(S.D.rs[u]=S.D.rs[u]||{}),x=(r[a.id]=r[a.id]||{ls:a.ls,activity:a.id}),o=Object.assign({},(x.answers||{})[step],{t:text,edited:new Date().toISOString()});
     if(DEMO){(x.answers=x.answers||{})[step]=o;return}return put(["students",u,"results",resKey(a.id)],{ls:a.ls,activity:a.id,answers:{[step]:o}})}
 };
-async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save: "+e.message)}if(!DEMO)S.D=await load();render()}
+async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save: "+e.message)}if(!DEMO)S.D=await reread();render()}
+// After a save: read back only the documents the dashboard wrote (TOUCHED). A full load() only when that cannot be done exactly: nothing
+// noted (a write made elsewhere), too many documents, or a kind of document whose effect on the screen is more than itself (progress and
+// checkpoints are merged by cpInject). Students' new work shows when the dashboard is opened again or with 🔄 Refresh.
+async function reread(){const ps=[...TOUCHED];TOUCHED.clear();const D=S.D;
+  const one=p=>{const k=p.split("/");
+    if(k[0]==="students"&&k.length===2)return x=>{if(x)D.st[k[1]]=Object.assign({},D.st[k[1]],{uid:k[1]},x);else delete D.st[k[1]]};
+    if(k[0]==="students"&&k[2]==="results"&&k.length===4)return x=>{const r=(D.rs[k[1]]=D.rs[k[1]]||{}),id=x&&x.activity||k[3].replace("__","/");if(x)r[id]=x;else delete r[id]};
+    if(k[0]==="students"&&k[2]==="levels"&&k.length===4)return x=>{const r=(D.lv[k[1]]=D.lv[k[1]]||{});if(x)r[k[3]]=x;else delete r[k[3]]};
+    const map={roster:"ro",points:"pt",teams:"tm",teacherPlan:"tk"}[k[0]];
+    if(map&&k.length===2)return x=>{if(x)D[map][k[1]]=x;else delete D[map][k[1]]};
+    const arr={problems:"pb",suggestions:"sg",announcements:"ann"}[k[0]];
+    if(arr&&k.length===2)return x=>{D[arr]=D[arr].filter(y=>y.id!==k[1]);if(x)D[arr].push(Object.assign({id:k[1]},x))};
+    if(k[0]==="problemReplies"&&k.length===2)return x=>{if(x)D.replies[k[1]]=1;else delete D.replies[k[1]]};
+    if(p==="settings/routes")return x=>{D.cuts=x||undefined};
+    if(k[0]==="ls"&&k.length===2)return "ls";
+    return null};
+  const fs=ps.map(one);if(!D||!ps.length||ps.length>60||fs.some(f=>!f))return load();
+  await Promise.all(ps.map(async(p,i)=>{if(fs[i]==="ls"){const id=p.split("/")[1];D.ls[id]=await ELCloud.lsInfo(id);return}
+    const d=await F.getDoc(F.doc(db(),...p.split("/")));fs[i](d.exists()?d.data():null)}));
+  return D}
 // One-click assessment (levels, groups, exam marks, confirmed degrees): merged into results/{id} at once and on screen without reloading.
 // null deletes a field. id is an activity id, or the LS's own record (asId: exam marks, exam writing level, confirmed degrees).
 const deep=(t,o)=>{for(const k in o){const v=o[k];if(v===null)delete t[k];else if(v&&typeof v==="object"&&!Array.isArray(v)){t[k]=t[k]&&typeof t[k]==="object"?t[k]:{};deep(t[k],v)}else t[k]=v}return t};
 const fsv=o=>{const r={};for(const k in o){const v=o[k];r[k]=v===null?F.deleteField():v&&typeof v==="object"&&!Array.isArray(v)?fsv(v):v}return r};
-function patch(u,id,o){o=Object.assign({ls:S.ls,activity:id},o);const r=(S.D.rs[u]=S.D.rs[u]||{});deep(r[id]=r[id]||{},o);return DEMO?Promise.resolve():put(["students",u,"results",resKey(id)],fsv(o))}
+function patch(u,id,o){o=Object.assign({ls:S.ls,activity:id},o);const r=(S.D.rs[u]=S.D.rs[u]||{});deep(r[id]=r[id]||{},o);if(DEMO)return Promise.resolve();const w=put(["students",u,"results",resKey(id)],fsv(o));TOUCHED.delete(["students",u,"results",resKey(id)].join("/"));return w}   // already on screen: nothing to read back
 // ---- secure recall checkpoints (Roger, 31 Oct 2026: “make sure they don't cheat”; shared/js/el-checkpoint.js, docs/general/secure-checkpoints.md)
 // D.ck[page key] = cpKeys doc {items:{id:{a,q,i,r,ca,en,extra}}}; D.cp[uid][page key] = the student's one try {level,ids,answers,times,leaves,auto,sent,fb,redo}.
 // cpInject marks each try with the key and writes the result into the student's progress state in memory only (first, items, done, doneAt),
@@ -1732,7 +1760,10 @@ addEventListener("el-probs",toProbs);
 // While the data comes in, the page says so (it used to stay blank under "Hello"); if a read fails, it says that too, with a Try again button.
 const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if(!S.D)$("#main").innerHTML='<p class="muted" id="loading">⏳ Loading your groups and students…</p>';
   try{S.D=await load()}catch(e){console.warn("load",e);if(!S.D){$("#main").innerHTML='<p><b>The dashboard could not load.</b> Check the connection and try again.</p><p><button id="retry">Try again</button></p>';$("#retry").onclick=()=>start(hello)}return}
-  render();if(location.hash==="#probs")toProbs()};
+  TOUCHED.clear();loadedAt();render();if(location.hash==="#probs")toProbs()};
+const loadedAt=()=>{const e=$("#loadedAt");if(e)e.textContent="Students' work as of "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})+"."};
+$("#refresh").onclick=async()=>{const b=$("#refresh");b.disabled=true;b.textContent="⏳ Refreshing…";
+  try{S.D=await load();TOUCHED.clear();loadedAt();render()}catch(e){console.warn("load",e);alert("Could not refresh: "+e.message)}b.disabled=false;b.textContent="🔄 Refresh"};
 if(DEMO)start("Preview with sample students: nothing is saved.");
 else ELCloud.onUser(u=>{if(u&&ELCloud.isTeacher(u))start("Hello, "+(u.displayName||u.email)+".")});
 </script></body></html>

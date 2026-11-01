@@ -217,3 +217,6 @@ All docs are mapped in [docs/README.md](docs/README.md), which is also Roger's *
 
 ## One level per student (Roger, 1 Nov 2026)
 A student has ONE level (route) per course, the same in every LS: `elRouteOf` (el-catalog.js) returns the route the teacher set most recently in any LS of the course (`levels/{ls}.changed`, else `.updated`; without times: this LS, then nearest earlier, then later). Setting a route in any LS view (dashboard Route cell, routes box, accepted request) changes it everywhere, for the dashboard and the students. Student-chosen routes (`by:"student"`) count only while the teacher has set none.
+
+## Dashboard reads (Roger, 1 Nov 2026: the free Firestore plan's 50,000 reads/day ran out)
+teacher.html reads the whole database only when it opens and with 🔄 Refresh. After a save, `act()` → `reread()` reads back only the documents the dashboard wrote (the Firestore module is wrapped so every setDoc/updateDoc/deleteDoc/batch write notes its path in TOUCHED); a full `load()` only when that can't be exact (progress/checkpoints, unknown paths, >60 docs). One-click `patch()` writes are already on screen and read nothing back. Never add a full reload after each click again. Cloud scripts reading Firestore must check for 429 errors instead of treating them as empty data.
