@@ -998,11 +998,33 @@ const lineDate=(r,l)=>{const m=/^\w{3} (\d{1,2})\b/.exec(l);if(!m||!r.from)retur
 // (checkpoints, sample exam). Same matching as My week (el-todo.js). Opens the page in a new tab.
 const shortT=t=>String(t).split(/[:(]/)[0].trim().toLowerCase();
 const lpMap=x=>{const as=acts(x.ls),m={};x.p.rows.forEach(r=>lines(x,r).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,n,name)=>{const nm=name.trim().toLowerCase(),a=as.find(a=>shortT(a.title).startsWith(nm)||nm.startsWith(shortT(a.title)));if(a&&!m[n])m[n]=a}));return m};
-function lineLinks(x,l){const as=acts(x.ls),m=lpMap(x),out=[];
+// the activities a line (or one " · " segment of it) names: [[activity, label "LP3" or short title]]
+function lineActs(x,l){const as=acts(x.ls),m=lpMap(x),out=[];
   l.split(" · ").forEach(seg=>{const s=seg.toLowerCase();as.filter(a=>s.includes(shortT(a.title))).forEach(a=>{if(!out.some(o=>o[0]===a))out.push([a,null])});
     (seg.match(/\bLP(\d+)\b/g)||[]).forEach(t=>{const a=m[t.slice(2)];if(a&&!out.some(o=>o[0]===a))out.push([a,t])})});
-  return out.map(([a,lp])=>{const n=lp||(Object.entries(m).find(([,b])=>b===a)||[])[0];const lab=lp||(n&&!/^lp/i.test(n)?"LP"+n:a.title.split(/[:(]/)[0].trim());
-    return ` <a class="lplink" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open ${esc(a.title)}">↗ ${esc(lab)}</a>`}).join("")}
+  return out.map(([a,lp])=>{const n=lp||(Object.entries(m).find(([,b])=>b===a)||[])[0];return [a,lp||(n&&!/^lp/i.test(n)?"LP"+n:a.title.split(/[:(]/)[0].trim())]})}
+function lineLinks(x,l){return lineActs(x,l).map(([a,lab])=>` <a class="lplink" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open ${esc(a.title)}">↗ ${esc(lab)}</a>`).join("")}
+// Ready-to-send homework message (Roger, 1 Nov 2026: "when I set as homework I want a message ready for the students telling instructions"):
+// from the homework text and the day it is for, numbered steps for students, one per " · " or "then" part: the learning path or activity it
+// names (which steps: the ones it names, like "LP3 Speaking and Talk", else the first half for "(1/2)", the rest for "(2/2)", all of them otherwise, by the page's tabs in EL_SECTIONS) and
+// its full link; any other part as written. lang "en", "ca" or "both" (English, then Catalan: Starter and Base read Catalan).
+function hwMsg(x,text,by,lang){if(lang==="both")return hwMsg(x,text,by,"en")+"\n\n— — —\n\n"+hwMsg(x,text,by,"ca");
+  const ca=lang==="ca",T=(c,e)=>ca?c:e,grp=(GR.find(g=>g.id===x.gid)||{}).name||x.gid,steps=[];
+  String(text).split(" · ").flatMap(s=>s.split(/,?\s+then\s+/i)).map(s=>s.trim()).filter(s=>s&&!/^self-study$/i.test(s)).forEach(seg=>{const as=lineActs(x,seg);
+    if(!as.length){steps.push(seg);return}
+    as.forEach(([a,lab])=>{const sec=(window.EL_SECTIONS||{})[a.id]||[],names=sec.map(z=>z[1]),h=Math.ceil(names.length/2),url=new URL(a.path,location.href).href;
+      const nm=/^LP\d/.test(lab)?lab+" "+a.title:a.title,first=/\(1\/2\)/.test(seg),rest=/\(2\/2\)/.test(seg);
+      const said=names.filter(n=>new RegExp("\\b"+n.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","i").test(seg.replace(a.title,"")));   // "LP3 Speaking and Talk"
+      const what=said.length?T("Fes aquests passos: ","Do these steps: ")+said.join(", ")+"."
+        :!names.length?T("Fes-la sencera.","Do all of it.")
+        :first?T("Comença-la i fes aquests passos: ","Start it and do these steps: ")+names.slice(0,h).join(", ")+"."
+        :rest?T("Acaba-la: fes els passos que encara no hagis acabat (","Finish it: do the steps you have not finished yet (")+names.slice(h).join(", ")+T("). Els passos fets tenen ✓.","). The steps you have done have a ✓.")
+        :T("Fes tots els passos: ","Do all the steps: ")+names.join(", ")+".";
+      steps.push(nm+"\n   "+what+"\n   👉 "+url)})});
+  return T("🏠 Deures d'anglès · ","🏠 English homework · ")+grp+"\n"+T("Per a la classe del ","For the class on ")+ELWeek.date(by,ca?"ca":"en").replace(/\.$/,"")+".\n\n"
+    +steps.map((s,i)=>(i+1)+". "+s).join("\n")+"\n\n"
+    +T("Entra amb el teu correu de l'escola i la contrasenya. També ho tens al teu tauler d'English Lab (🏠 Deures), amb un 📅 per afegir-ho al calendari.",
+       "Sign in with your school email and password. It is also on your English Lab board (🏠 Homework), with a 📅 to add it to your calendar.")}
 function weekRow(x,i,title){const r=x.p.rows[i];if(!r)return "";const ls=lines(x,r),n=ls.filter(l=>ticked(x,l)).length,cs=carried(x,i);
   return `<div class="wk"><b>${title?title+" · ":""}${esc(r.when)} <small class="muted">${n}/${ls.length} done${cs.length?` · ${cs.length} carried over`:""}</small></b>`
     +cs.map(y=>lineRow(x,y.i,y.line,(lineDate(x.p.rows[y.i],y.line)?ELWeek.date(lineDate(x.p.rows[y.i],y.line)):"earlier"))).join("")
@@ -1036,7 +1058,7 @@ const behindTag=x=>{const b=behind(x);return b.length?`<div class="behind" title
 const planX=(ls,gid)=>{const p=(window.EL_PLAN||{})[ls];return {ls,p,gi:ELWeek.col(p,gid),gid}};
 const hwOf=x=>((S.D.ls[x.ls]||{}).homework||{})[x.gid];
 const hwTag=x=>{const xs=ELWeek.upcoming(x.p,x.gi,null,7,hwOf(x)),cal=ELWeek.calendar(x.gid);
-  return `<div class="hwr"><b>🏠 Homework to remind</b>${xs.length?`<ul>${xs.map(y=>`<li>${y.kind==="self"?"📚 Self-study class ":"🏠 By "}${esc(ELWeek.date(y.date))}${y.set?` <small class="muted">(set ${esc(ELWeek.date(y.set))})</small>`:""} · ${esc(y.text)}${lineLinks(x,y.text)}${y.extra?` <button class="g mini" data-do="hwdel" data-gid="${x.gid}" data-ls="${x.ls}" data-id="${y.id}" title="Remove this homework">✕</button>`:""}</li>`).join("")}</ul>`:` <span class="muted">nothing in the next 7 days</span><br>`}`
+  return `<div class="hwr"><b>🏠 Homework to remind</b>${xs.length?`<ul>${xs.map(y=>`<li>${y.kind==="self"?"📚 Self-study class ":"🏠 By "}${esc(ELWeek.date(y.date))}${y.set?` <small class="muted">(set ${esc(ELWeek.date(y.set))})</small>`:""} · ${esc(y.text)}${lineLinks(x,y.text)} <button class="g mini" data-do="hwcopy" data-msg="${esc(y.msg||hwMsg(x,y.text,y.date,"both"))}" title="Copy the message for students (to paste in Classroom)">📋 Message</button>${y.extra?` <button class="g mini" data-do="hwdel" data-gid="${x.gid}" data-ls="${x.ls}" data-id="${y.id}" title="Remove this homework">✕</button>`:""}</li>`).join("")}</ul>`:` <span class="muted">nothing in the next 7 days</span><br>`}`
     +`<small class="muted">Students see it on their board and in My week, and in their calendar if they subscribed: <a href="${cal.google}" target="_blank" rel="noopener">Google Calendar</a> · <a href="${cal.ics}">.ics link</a></small></div>`};
 // this week and next week; before the plan starts, its first week; after it ends, a line
 function weeks(x){const p=x.p,i=ELWeek.row(p),sp=ELWeek.span(p),t=ELWeek.today();
@@ -1405,6 +1427,10 @@ async function markingPdf(r){
     +(pages||`<section class="pg"><p>No signed-in students in ${esc(grp.name)} yet.</p></section>`);
   document.body.classList.add("pdfmode");scrollTo(0,0);setTimeout(()=>print(),300)}
 
+// the Set as homework dialog: the message follows "What they have to do", the day and the language until the teacher edits it by hand
+function hwFill(){const h=S.hwX,ta=$("#hw-msg");if(!h||!ta||h.dirty)return;const by=$("#hw-by").value;ta.value=by?hwMsg(h.x,$("#hw-text").value.replace(/\s+/g," ").trim(),by,$("#hw-lang").value):""}
+document.addEventListener("input",e=>{const id=e.target.id;if(id==="hw-msg"&&S.hwX)S.hwX.dirty=true;else if(id==="hw-text"||id==="hw-by"||id==="hw-lang")hwFill()});
+document.addEventListener("change",e=>{if(e.target.id==="hw-lang"&&S.hwX){S.hwX.dirty=false;hwFill()}});
 // ---- events
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
   ({tab:()=>{S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();if(k.ls)scrollTo(0,0)},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),
@@ -1414,9 +1440,13 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       dlg(`<h3>🏠 Set as homework · ${esc((GR.find(g=>g.id===k.gid)||{}).name||k.gid)}</h3><p class="muted">Students see it in their 🏠 Homework box on the board and in My week, with a 📅 button to add it to their calendar.</p>`
         +`<label class="field">What they have to do<br><textarea id="hw-text" rows="2" style="width:100%">${esc(k.line.replace(/^\w{3} \d{1,2} · /,"").replace(/\s*· self-study\b/,""))}</textarea></label>`
         +`<label class="field">For the class on <input type="date" id="hw-by" value="${next}"></label>`
-        +`<div class="row"><button data-do="hwsave" data-gid="${k.gid}" data-ls="${k.ls}" data-set="${from}" data-line="${esc(k.line)}">Set as homework</button></div>`)},
-    hwsave:()=>{const text=$("#hw-text").value.replace(/\s+/g," ").trim(),by=$("#hw-by").value;if(!text||!by)return alert("Write what they have to do and choose the day.");
-      $("#dlg").close();act(api.hw(k.ls,k.gid,"h"+Date.now().toString(36),Object.assign({text,by,set:k.set},k.line?{line:k.line}:{})))},
+        +`<label class="field">📨 Message for students <small class="muted">(ready to copy to Classroom or email; they also see it on their board)</small> <select id="hw-lang"><option value="both">English + Català</option><option value="en">English</option><option value="ca">Català</option></select><br><textarea id="hw-msg" rows="12" style="width:100%;font-size:13px;font-weight:400"></textarea></label>`
+        +`<div class="row"><button data-do="hwsave" data-gid="${k.gid}" data-ls="${k.ls}" data-set="${from}" data-line="${esc(k.line)}">Set as homework</button> <button class="g" data-do="hwcopy">📋 Copy the message</button> <span id="hw-copied" class="muted"></span></div>`);
+      S.hwX={x,dirty:false};hwFill()},
+    hwcopy:()=>{e.preventDefault();const v=k.msg!=null?k.msg:$("#hw-msg").value;const ok=()=>{const c=k.msg!=null?t:$("#hw-copied");if(k.msg!=null){const o=t.textContent;t.textContent="✓ Copied";setTimeout(()=>t.textContent=o,1500)}else c.textContent="✓ Copied: paste it in Classroom"};
+      (navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(ok,()=>{const ta=document.createElement("textarea");ta.value=v;document.body.append(ta);ta.select();document.execCommand("copy");ta.remove();ok()})},
+    hwsave:()=>{const text=$("#hw-text").value.replace(/\s+/g," ").trim(),by=$("#hw-by").value,msg=$("#hw-msg").value.trim();if(!text||!by)return alert("Write what they have to do and choose the day.");
+      $("#dlg").close();act(api.hw(k.ls,k.gid,"h"+Date.now().toString(36),Object.assign({text,by,set:k.set},msg?{msg}:{},k.line?{line:k.line}:{})))},
     hwdel:()=>{if(!confirm("Remove this homework? Students will no longer see it."))return;act(api.hw(k.ls,k.gid,k.id,null))},
     mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),cpok:()=>cpDone(true),cpredo:()=>cpDone(false),
     mkcopy:()=>{const v=$("#mksheet").value;navigator.clipboard.writeText(v).then(()=>$("#mkst").textContent="✓ Copied",()=>{$("#mksheet").select();$("#mkst").textContent="Press Ctrl+C"})},

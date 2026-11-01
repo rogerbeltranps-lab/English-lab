@@ -33,9 +33,9 @@
     // "Homework by Tue 10 · …" (date = that day, set = the class just before it), "self" = a class line marked "· self-study"
     // (the teacher is away), "exam" = the exam day. The student board, My week, the dashboard and the calendar feeds use it.
     // added: homework the teacher set from the dashboard ("🏠 Set as homework" on a session line; ls/{id}.homework[group] =
-    // {id: {text, by, set}}), listed with kind "hw" and extra:true (they are not in the calendar feed, which is a static file).
+    // {id: {text, by, set, msg}}; msg = the teacher's message with the instructions, shown to students under the item), listed with kind "hw" and extra:true (they are not in the calendar feed, which is a static file).
     tasks(p,gi,added){const out=[];if(!p||gi<0)return out;
-      Object.entries(added||{}).forEach(([id,h])=>{if(h&&h.text&&h.by)out.push({kind:"hw",date:h.by,set:h.set||null,text:h.text,extra:true,id})});
+      Object.entries(added||{}).forEach(([id,h])=>{if(h&&h.text&&h.by)out.push({kind:"hw",date:h.by,set:h.set||null,text:h.text,extra:true,id,msg:h.msg||null})});
       const at=(from,dn,n)=>{for(let k=0;k<21;k++){const s=add(from,k),d=day(s);if(d.getDate()===n&&DAYS.en[d.getDay()]===dn)return s}return null};
       let last=null;
       (p.rows||[]).forEach(r=>{if(!r.from)return;String((r.g?r.g[gi]:r.what)||"").split("\n").forEach(raw=>{const ln=raw.trim();
