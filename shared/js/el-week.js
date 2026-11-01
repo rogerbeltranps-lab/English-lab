@@ -60,6 +60,31 @@
     taskText(x,lang){const ca=L(lang)==="ca";
       return x.kind==="self"?(ca?"Classe pel teu compte":"Class on your own")+" ("+this.date(x.date,lang)+") · "+x.text+" · "+(ca?"treballa amb auriculars i acaba-ho a casa":"work with headphones and finish it at home")
         :(ca?"Per al ":"By ")+this.date(x.date,lang)+" · "+x.text},
+    // Moved sessions (Roger, 1 Nov 2026: "be able to change the day of sth you arranged for a certain day"): the teacher moves a session
+    // line to another day on the dashboard; ls/{ls}.planEdits[group][original line] = {to: "YYYY-MM-DD" or null, tabs: ["activity#panel"…] or null}
+    // (tabs = the tabs of that session, chosen by the teacher). applyEdits rewrites EL_PLAN[ls] in place from its original rows, so every page
+    // (dashboard, student board, My week, emails) shows the line on its new day ("Wed 4 · …" → "Fri 6 · …", in the week of that day; a week
+    // with no row gets one), and the due days of the activities (`due`, `stepDue`) that fell on the old day of a class move with it.
+    // p._moved[gi][new line] = {orig, from (old day)}; p._tabs[gi][original line] = the chosen tabs. Safe to call again with new edits.
+    applyEdits(ls,edits){const p=(window.EL_PLAN||{})[ls];if(!p||!p.rows)return null;const cp=o=>o==null?o:JSON.parse(JSON.stringify(o));
+      if(!p._base)p._base=cp({rows:p.rows,due:p.due||null,stepDue:p.stepDue||null});
+      const b=cp(p._base);p.rows=b.rows;if(b.due)p.due=b.due;if(b.stepDue)p.stepDue=b.stepDue;p._moved={};p._tabs={};
+      const get=(r,gi)=>String((r.g?r.g[gi]:r.what)||"").split("\n").filter(Boolean),set=(r,gi,ls)=>{if(r.g)r.g[gi]=ls.join("\n");else r.what=ls.join("\n")};
+      Object.entries(edits||{}).forEach(([gid,m])=>{const gi=col(p,gid);if(gi<0||!m)return;const mv=p._moved[gi]={},tb=p._tabs[gi]={};
+        Object.entries(m).forEach(([orig,e])=>{if(!e)return;if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!e.to||!/^\d{4}-\d\d-\d\d$/.test(e.to))return;
+          const ri=p.rows.findIndex(r=>r.from&&get(r,gi).includes(orig));if(ri<0)return;const old=this.lineDay(p.rows[ri].from,orig);if(!old||old===e.to)return;
+          const hw=/^Homework by /.test(orig),d=day(e.to),nl=orig.replace(/^(Homework by )?\w{3} \d{1,2}\b/,(_,h)=>(h||"")+DAYS.en[d.getDay()]+" "+d.getDate());
+          set(p.rows[ri],gi,get(p.rows[ri],gi).filter(l=>l!==orig));
+          let ti=p.rows.findIndex(r=>r.from&&r.from<=e.to&&e.to<=add(r.from,6));
+          if(ti<0){const mon=add(e.to,-((d.getDay()+6)%7)),prev=[...p.rows].reverse().find(r=>r.from&&r.from<mon)||p.rows[0],nr={term:prev.term,from:mon,when:this.week({from:mon}),added:true};
+            if(p.rows[0].g)nr.g=p.rows[0].g.map(()=>"");else nr.what="";ti=p.rows.findIndex(r=>r.from&&r.from>mon);if(ti<0)ti=p.rows.length;p.rows.splice(ti,0,nr)}
+          const tr=p.rows[ti],ls=get(tr,gi),at=ls.findIndex(l=>{const x=this.lineDay(tr.from,l);return x&&x>e.to});ls.splice(at<0?ls.length:at,0,nl);set(tr,gi,ls);
+          mv[nl]={orig,from:old};
+          if(!hw){Object.values(p.due||{}).forEach(a=>{if(a&&a[gi]===old)a[gi]=e.to});Object.values(p.stepDue||{}).forEach(o=>Object.values(o||{}).forEach(a=>{if(a&&a[gi]===old)a[gi]=e.to}))}})});
+      return p},
+    // the day of a session line ("Tue 27 · …" or "Homework by Mon 9 · …") counted from the Monday of its week row, or null
+    lineDay(from,l){const m=/^(?:Homework by )?(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2})\b/.exec(String(l));if(!m||!from)return null;
+      for(let k=0;k<21;k++){const s=add(from,k),d=day(s);if(d.getDate()===+m[2]&&DAYS.en[d.getDay()]===m[1])return s}return null},
     // "Fri 20 Nov" · "dv. 20 nov."
     date:(s,lang)=>{const d=day(s),l=L(lang);return DAYS[l][d.getDay()]+" "+d.getDate()+" "+MON[l][d.getMonth()]},
     // "26–30 Oct" · "30 Nov–4 Dec" (Monday to Friday)
