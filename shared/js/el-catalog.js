@@ -18,8 +18,10 @@ window.EL_LEVELS=[{id:"beginners",name:"Starter",student:"Starter",ca:"Començo 
 // Class groups. The student picks one the first time they sign in; the teacher can change it in the dashboard.
 // CEFR level of each route (Roger, 31 Oct 2026: "if they are starters they should read 2ESO_starter (A1)"), from the levels document of
 // the teaching programme (AGENTS.md, "Levels, listenings, videos and readings"): short label + the full description.
-window.EL_CEFR={"2eso":{beginners:["A1","A1 amb molt de suport","A1 with a lot of support"],insecure:["A1+","A1+ / A2 inicial, amb bastides","A1+ / early A2 with scaffolding"],safe:["A2","A2 funcional","Functional A2"],daring:["A2+","A2+ / B1 emergent","A2+ / emerging B1"]},
-  "4eso":{beginners:["A1","A1 amb molt de suport","A1 with a lot of support"],insecure:["A2","A2 / A2+ amb suport","A2 / A2+ with support"],safe:["B1","B1 orientatiu","Indicative B1"],daring:["B1+","B1 / B1+","B1 / B1+"],native:["C2","C2 Proficiency","C2 Proficiency"]}};
+window.EL_CEFR={"2eso":{beginners:["A1","A1","A1"],insecure:["A1+","A1+ / A2 inicial","A1+ / early A2"],safe:["A2","A2","A2"],daring:["A2+","A2+ / B1 emergent","A2+ / emerging B1"]},
+  "4eso":{beginners:["A1","A1","A1"],insecure:["A2","A2 / A2+","A2 / A2+"],safe:["B1","B1","B1"],daring:["B1+","B1 / B1+","B1 / B1+"],native:["C2","C2 Proficiency","C2 Proficiency"]}};
+// Students see levels, never support descriptions such as "molt suport" (Roger, 1 Nov 2026: "they might feel judged"): route cards on LS
+// pages show the short label, the board's route request shows it too, and EL_LEVELS[].ca/.en stay for the teacher only.
 window.elCefr=(c,lv,full)=>{const x=((window.EL_CEFR[c]||{})[lv])||((window.EL_CEFR[c]||{})[lv==="native"?"daring":lv]);return x?(full?x[2]:x[0]):""};
 // "2ESO Starter (A1)": what students read as their level (board, English Lab, practice page, level notice)
 window.elLevelLabel=(c,lv)=>{const n=((window.EL_LEVELS||[]).find(l=>l.id===lv)||{}).name||lv;if(!lv)return "";const k=elCefr(c,lv);return (c?c.toUpperCase()+" ":"")+n+(k?" ("+k+")":"")};

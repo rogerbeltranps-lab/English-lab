@@ -997,7 +997,7 @@ var LS2 = (function () {
   // An open task (for example the sample exam's email): the student writes, then ChatGPT gives feedback and an orientative mark
   // with the criterion's levels; the student can note that mark for the summary.
   function markPrompt(p, text) {
-    const lv = { beginners: 'Beginners (A1, amb molt suport)', insecure: 'Insecure (A1+ / A2 inicial, amb bastides)', safe: 'Safe (A2 funcional)', daring: 'Daring (A2+ / B1 emergent)' }[level];
+    const lv = { beginners: 'Beginners (A1)', insecure: 'Insecure (A1+ / A2 inicial)', safe: 'Safe (A2)', daring: 'Daring (A2+ / B1 emergent)' }[level];   // CEFR only: students copy this prompt (Roger, 1 Nov 2026: no "molt suport")
     const src = byLevel(p.source || '');
     return (ca() ? 'Actua com a professor d’anglès de 2n d’ESO. És l’EXAMEN D’EXEMPLE (pràctica) de la Learning Situation “Free Time, Live!”.' : 'Act as a 2 ESO English teacher. This is the SAMPLE EXAM (practice) of the Learning Situation “Free Time, Live!”.') +
       '\n\nRoute / level: ' + lv + '.\nTask (' + p.max + ' points): ' + byLevel(p.task).replace(/<[^>]+>/g, '') +
