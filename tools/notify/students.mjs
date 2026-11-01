@@ -19,6 +19,8 @@ import {ARGS,DRY,SITE,SCHOOL,TEACHER_TO,ROOT,sendMail,site,firestore} from "./li
 const TEST=ARGS.includes("--test"),DOMAIN="@ietramuntana.cat";
 if(!SCHOOL.pass&&!DRY){console.log("No SCHOOL_APP_PASSWORD: students' emails are off, nothing to do.");process.exit(0)}
 const W=site(["el-catalog.js","el-plan.js","el-week.js"]),WK=W.ELWeek,TODAY=WK.today();
+// the first real Sunday: 8 Nov 2026, so the teacher sees the test email first (a test or dry run works any day)
+if(!TEST&&!DRY&&TODAY<"2026-11-08"){console.log("Students' emails start on Sunday 8 Nov 2026.");process.exit(0)}
 const wd=new Date(TODAY+"T12:00").getDay(),MON=WK.add(TODAY,wd===0?1:wd===6?2:(8-wd)%7||7);   // the next Monday
 const TESTERS=JSON.parse((/TESTERS=(\[[^\]]*\])/.exec(fs.readFileSync(path.join(ROOT,"shared/js/el-firebase.js"),"utf8"))||[,"[]"])[1]);
 const CA_ROUTES=["beginners","insecure"];
