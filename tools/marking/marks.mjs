@@ -86,7 +86,7 @@ async function todo(grp,m){const a=W.EL_CATALOG.find(x=>x.id===m.a),out=[];
     if(h&&(!m.c.every(c=>lv[c])||again)&&!waits)out.push({s,h,route:st.route,exam:st.exam})}
   return out.sort((x,y)=>x.s.uid<y.s.uid?-1:1)}
 function readyOf(grp,ls,m,ticks){const p=W.EL_PLAN[ls],gi=p?W.ELWeek.col(p,grp.id):-1,due=p&&p.due&&p.due[m.a]?p.due[m.a][gi]:null,a=W.EL_CATALOG.find(x=>x.id===m.a);
-  return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls,daily:m.daily})}
+  return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls,weekly:m.weekly})}
 function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRADING[a.ls],course=a.ls.split("-")[0],codes=W.ELMark.codes(rows.map(r=>r.s.uid)),by=Object.fromEntries(rows.map(r=>[r.s.uid,r]));
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
   const text=W.ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:W.ELWeek.today(),crits:m.c,
@@ -147,7 +147,7 @@ else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026:
     for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
       const a=W.EL_CATALOG.find(x=>x.id===m.a),rows=await todo(grp,m),r=readyOf(grp,ls,m,ticks);
       // a late hand-in counts from the day it came in, not from when the step was ready
-      if(rows.length&&r.from&&today>=r.from){const since=x=>{const h=String(x.h.date||"").slice(0,10);return h>r.from?h:r.from},late=rows.filter(x=>days(today,since(x))>=(m.daily?2:LATE));   // a daily moment (LS3 writing, Talk) is late after 2 days
+      if(rows.length&&r.from&&today>=r.from){const since=x=>{const h=String(x.h.date||"").slice(0,10);return h>r.from?h:r.from},late=rows.filter(x=>days(today,since(x))>=(m.weekly?8:LATE));   // a weekly moment (LS3 writing, Talk) is late after 8 days
         if(late.length)problems.push(`${grp.id} · ${m.name} (${a.title}): ${late.length} hand-in${late.length>1?"s":""} ready since ${late.map(since).sort()[0]} still without a level (${days(today,late.map(since).sort()[0])} days late)`);
         if(rows.length>late.length)ok.push(`${grp.id} · ${m.name} (${a.title}): ${rows.length-late.length} hand-in${rows.length-late.length>1?"s":""} to mark at the next run`)}
       // possible copies waiting for the teacher
