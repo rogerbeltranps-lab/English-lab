@@ -1,6 +1,6 @@
 // Students' Sunday summary (Roger, 1 Nov 2026: "the same for the students. However they can't receive mails outside of the school domain";
 // chose "Weekly summary on Sunday"). Run by .github/workflows/teacher-emails.yml every Sunday evening: one email per student, from the
-// teacher's school account (SCHOOL_APP_PASSWORD, see lib.mjs; school accounts only receive mail from the school domain), with
+// teacher's school account (SCHOOL_MAIL_URL, see lib.mjs; school accounts only receive mail from the school domain), with
 //   1. their homework and self-study classes for the coming week (Mon to Sun): ELWeek.upcoming with the plan's lines and the homework the
 //      teacher set from the dashboard (ls/{id}.homework[group]), exactly what the student board lists;
 //   2. what the teacher answered or corrected in the last 7 days, as pointers only (activity · step): answers to their comments
@@ -17,7 +17,7 @@ import path from "node:path";
 import {ARGS,DRY,SITE,SCHOOL,TEACHER_TO,ROOT,sendMail,site,firestore} from "./lib.mjs";
 
 const TEST=ARGS.includes("--test"),DOMAIN="@ietramuntana.cat";
-if(!SCHOOL.pass&&!DRY){console.log("No SCHOOL_APP_PASSWORD: students' emails are off, nothing to do.");process.exit(0)}
+if(!SCHOOL.ok&&!DRY){console.log("No SCHOOL_MAIL_URL: students' emails are off, nothing to do.");process.exit(0)}
 const W=site(["el-catalog.js","el-plan.js","el-week.js"]),WK=W.ELWeek,TODAY=WK.today();
 // the first real Sunday: 8 Nov 2026, so the teacher sees the test email first (a test or dry run works any day)
 if(!TEST&&!DRY&&TODAY<"2026-11-08"){console.log("Students' emails start on Sunday 8 Nov 2026.");process.exit(0)}
@@ -55,7 +55,7 @@ for(const s of (TEST?studs.slice(0,1):studs)){
   if(uniq.length)out.push(T("✉️ T'HE CONTESTAT O CORREGIT","✉️ I ANSWERED OR CORRECTED"),...uniq.map(x=>"• "+x),T("Ho tens tot al teu tauler.","It is all on your board."),"");
   out.push(T("Entra amb el teu correu de l'institut: ","Sign in with your school email: ")+SITE+"today.html","",T("Bona setmana!","Have a good week!"),"Roger");
   const subject=T("English Lab: la teva setmana del "+WK.date(MON,"ca"),"English Lab: your week from "+WK.date(MON,"en"));
-  sendMail(SCHOOL,TEST?TEACHER_TO:[s.email],subject,out.join("\n"),"Roger Beltran · English Lab");sent++;
+  await sendMail(SCHOOL,TEST?TEACHER_TO:[s.email],subject,out.join("\n"),"Roger Beltran · English Lab");sent++;
   if(!DRY)await new Promise(r=>setTimeout(r,300));   // gently, under Google's sending limits
 }
 console.log((DRY?"Dry run: ":"")+sent+" student email(s) "+(DRY?"written":TEST?"sent to the teacher as a test":"sent")+", "+skipped+" with nothing this week.");   // counts only: the log is public

@@ -1,7 +1,10 @@
 // Shared by tools/notify/notify.mjs (teacher emails) and tools/notify/students.mjs (students' Sunday summary): sending with Google's SMTP,
 // the site's own helpers (EL_GROUPS, EL_LS, EL_PLAN, EL_CATALOG, ELWeek) and read-only Firestore with a service account.
-// Sender (Roger, 1 Nov 2026: students' school accounts only receive mail from the school domain): the school account SCHOOL_USER
-// (default roger.beltran@ietramuntana.cat) with SCHOOL_APP_PASSWORD; teacher emails fall back to GMAIL_USER + GMAIL_APP_PASSWORD.
+// Sender (Roger, 1 Nov 2026: students' school accounts only receive mail from the school domain): the teacher's school account
+// roger.beltran@ietramuntana.cat. The school blocks app passwords, so it sends through a small Apps Script in that account
+// (tools/notify/school-mail.gs, deployed as a web app): SCHOOL_MAIL_URL = its web app link (a secret: long and random, only in GitHub's
+// secrets). SCHOOL_APP_PASSWORD (SMTP) also works if the school ever allows it; teacher emails fall back to
+// GMAIL_USER + GMAIL_APP_PASSWORD.
 // DRY=true: nothing is sent, the emails are appended to notify-dry.eml in the temp folder.
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -14,13 +17,18 @@ import {execFileSync} from "node:child_process";
 export const E=process.env,ARGS=process.argv.slice(2),DRY=ARGS.includes("--dry");
 export const SITE="https://rogerbeltranps-lab.github.io/English-lab/",TZ="Europe/Madrid",ROOT=path.join(path.dirname(fileURLToPath(import.meta.url)),"../..");
 const PROJECT="english-lab-ietm";
-export const SCHOOL={user:(E.SCHOOL_USER||"roger.beltran@ietramuntana.cat").trim(),pass:(E.SCHOOL_APP_PASSWORD||"").replace(/\s+/g,"")};
+export const SCHOOL={user:(E.SCHOOL_USER||"roger.beltran@ietramuntana.cat").trim(),pass:(E.SCHOOL_APP_PASSWORD||"").replace(/\s+/g,""),relay:(E.SCHOOL_MAIL_URL||"").trim()};
+SCHOOL.ok=!!(SCHOOL.relay||SCHOOL.pass);
 export const GMAIL={user:(E.GMAIL_USER||"roger.beltranps@gmail.com").trim(),pass:(E.GMAIL_APP_PASSWORD||"").replace(/\s+/g,"")};
 export const TEACHER_TO=(E.ALERT_EMAIL_TO||"roger.beltranps@gmail.com").split(",").map(s=>s.trim()).filter(Boolean);
 
 // one plain-text email; from = {user, pass}; name = the sender's display name
-export function sendMail(from,to,subject,text,name="English Lab"){
-  to=[].concat(to);const b64=s=>Buffer.from(s,"utf8").toString("base64"),wrap=s=>s.replace(/.{1,76}/g,"$&\r\n");
+export async function sendMail(from,to,subject,text,name="English Lab"){
+  to=[].concat(to);
+  if(from.relay&&!DRY){   // the school's Apps Script: POST, Google answers with a redirect that fetch follows
+    let r,j;try{r=await fetch(from.relay,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({to,subject,body:text,name}),redirect:"follow"});j=await r.json()}
+    catch(e){throw new Error("The school mail script did not answer (check SCHOOL_MAIL_URL and the deployment): "+(r?r.status:e.name))}
+    if(!j||!j.ok)throw new Error("The school mail script refused: "+(j&&j.error||"no answer"));return}const b64=s=>Buffer.from(s,"utf8").toString("base64"),wrap=s=>s.replace(/.{1,76}/g,"$&\r\n");
   const eml=["From: =?UTF-8?B?"+b64(name)+"?= <"+from.user+">","To: "+to.join(", "),"Subject: =?UTF-8?B?"+b64(subject)+"?=",
     "Date: "+new Date().toUTCString().replace("GMT","+0000"),"Message-ID: <"+crypto.randomUUID()+"@english-lab>","MIME-Version: 1.0",
     "Content-Type: text/plain; charset=UTF-8","Content-Transfer-Encoding: base64","",wrap(b64(text))].join("\r\n");

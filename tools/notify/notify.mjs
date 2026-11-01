@@ -6,7 +6,7 @@
 //        today, not ticked in teacherPlan/{group}.ticks, not set as homework, not "Homework by …", "moved to" or self-study lines). Left
 //        alone they move to next week's list (↪), so the email suggests ticking them or 🏠 Set as homework.
 //     2. the problem reports not marked as fixed and the ideas of the last 7 days.
-// Nothing to say: no email. Sent from the school account (SCHOOL_APP_PASSWORD) or else Gmail (GMAIL_APP_PASSWORD) to ALERT_EMAIL_TO (default
+// Nothing to say: no email. Sent from the school account (SCHOOL_MAIL_URL, see lib.mjs) or else Gmail (GMAIL_APP_PASSWORD) to ALERT_EMAIL_TO (default
 // roger.beltranps@gmail.com); no password: it does nothing. See lib.mjs. Free (GitHub Actions in a public repo), no Claude.
 // The Action log is public (the repo is public): counts only, never names or text.
 //   node tools/notify/notify.mjs [--instant] [--dry]    --dry: nothing sent, the email goes to notify-dry.eml in the temp folder
@@ -17,10 +17,10 @@ import os from "node:os";
 import path from "node:path";
 import {E,ARGS,DRY,SITE,TZ,SCHOOL,GMAIL,TEACHER_TO,sendMail as send,site,firestore} from "./lib.mjs";
 
-const TEST=ARGS.includes("--test"),INSTANT=ARGS.includes("--instant"),FROM=SCHOOL.pass?SCHOOL:GMAIL.pass?GMAIL:null;
-if(!FROM&&!DRY){console.log("No SCHOOL_APP_PASSWORD or GMAIL_APP_PASSWORD: teacher emails are off, nothing to do.");process.exit(0)}
-const sendMail=(subject,text)=>{send(FROM||SCHOOL,TEACHER_TO,subject,text);console.log(DRY?"Dry run: email written.":"Email sent.")};
-if(TEST){sendMail("English Lab: test email ✅","This is a test. You will get an email when a student sends a ⚠️ Problem report or a 💡 Idea, and every Saturday morning one email with the sessions you did not tick and the week's open reports and ideas (no email when there is nothing).\n\nDashboard: "+SITE+"teacher.html\n");process.exit(0)}
+const TEST=ARGS.includes("--test"),INSTANT=ARGS.includes("--instant"),FROM=SCHOOL.ok?SCHOOL:GMAIL.pass?GMAIL:null;
+if(!FROM&&!DRY){console.log("No SCHOOL_MAIL_URL, SCHOOL_APP_PASSWORD or GMAIL_APP_PASSWORD: teacher emails are off, nothing to do.");process.exit(0)}
+const sendMail=async(subject,text)=>{await send(FROM||SCHOOL,TEACHER_TO,subject,text);console.log(DRY?"Dry run: email written.":"Email sent.")};
+if(TEST){await sendMail("English Lab: test email ✅","This is a test. You will get an email when a student sends a ⚠️ Problem report or a 💡 Idea, and every Saturday morning one email with the sessions you did not tick and the week's open reports and ideas (no email when there is nothing).\n\nDashboard: "+SITE+"teacher.html\n");process.exit(0)}
 
 const W=site(["el-catalog.js","el-plan.js","el-week.js"]),WK=W.ELWeek,TODAY=WK.today();
 const db=await firestore(),since=db.since;
@@ -51,7 +51,7 @@ if(INSTANT){
     if(probs.length)out.push("⚠️ NEW PROBLEM REPORTS","",...probs.map(probBlock),"Open them: "+SITE+"teacher.html#probs","");
     if(ideas.length)out.push("💡 NEW IDEAS","",...ideas.map(ideaBlock),"Open them: "+SITE+"teacher.html","");
     out.push("—","English Lab checks every 15 minutes from 7:00 to 23:00. Students do not see this email.");
-    sendMail("English Lab: "+[probs.length?n(probs.length,"new problem report","new problem reports"):"",ideas.length?n(ideas.length,"new idea","new ideas"):""].filter(Boolean).join(" and "),out.join("\n"))}
+    await sendMail("English Lab: "+[probs.length?n(probs.length,"new problem report","new problem reports"):"",ideas.length?n(ideas.length,"new idea","new ideas"):""].filter(Boolean).join(" and "),out.join("\n"))}
   if(!DRY)fs.writeFileSync(STATE,JSON.stringify({lastAt:now}));
   process.exit(0);
 }
@@ -84,4 +84,4 @@ if(probs.length)out.push("⚠️ PROBLEM REPORTS THIS WEEK ("+probs.length+")","
 if(ideas.length)out.push("💡 IDEAS THIS WEEK ("+ideas.length+")","",...ideas.map(ideaBlock),"Open them: "+SITE+"teacher.html","");
 out.push("—","English Lab sends this every Saturday morning, only when there is something. Students do not see it.");
 const subj=[nBehind?n(nBehind,"session","sessions")+" not ticked":"",probs.length?n(probs.length,"problem report","problem reports"):"",ideas.length?n(ideas.length,"idea","ideas"):""].filter(Boolean);
-sendMail("English Lab · your week: "+subj.join(", "),out.join("\n"));
+await sendMail("English Lab · your week: "+subj.join(", "),out.join("\n"));
