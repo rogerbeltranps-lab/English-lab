@@ -35,7 +35,8 @@ window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructio
 window.elNoComment=function(c){const t=String(c||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z' ]+/g," ").replace(/\s+/g," ").trim().replace(/ (thanks|thank you|gracies|gracias)$/,"");
   return !t||/^(no|nope|none|nothing|nada|res|cap|ninguno|no comment|all good|ok|okay|fine|everything (is )?(ok|fine)|tot be|todo bien)$/.test(t)
     ||/^(no|i (do not|don't|dont) have|i have no|i had no|we (do not|don't|dont) have|we have no|we had no|no tinc|no tenim|no he tingut|no hem tingut|no tengo|no tenemos|no he tenido|no hemos tenido|cap|ningun|ninguno)( any| cap| ningun| ninguno)? (problem(s|a|es|as)?|questions?|dubtes?|dudas?|comments?|comentaris?|comentarios?)( at all)?$/.test(t)};
-window.elRouteOf=function(lv,ls){lv=lv||{};const L=window.EL_LS||[],me=L.find(x=>x.id===ls),
+window.elRouteOf=function(lv,ls){if(window.EL_VIEW_LEVEL)return {level:window.EL_VIEW_LEVEL,from:ls,own:false};   // tester previewing a level (el-cloud.js viewLevel)
+  lv=lv||{};const L=window.EL_LS||[],me=L.find(x=>x.id===ls),
     chain=[ls].concat(me?L.slice(0,L.indexOf(me)).reverse().filter(x=>x.course===me.course).map(x=>x.id):[]),
     find=(ids,mine)=>{for(const id of ids){const l=lv[id]||{};if(l.level&&(l.by==="student")===mine)return {level:l.level,from:id,own:mine}}return null},
     later=me?L.slice(L.indexOf(me)+1).filter(x=>x.course===me.course).map(x=>x.id):[];   // a route the teacher set later also replaces the student's choice
