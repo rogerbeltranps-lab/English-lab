@@ -378,12 +378,13 @@ function studyCard(u){
   if(!el||!ls||!ls.study||!u)return;
   const every=isTeacher(u)||seesAll(u),lv=myLevel,ca=!every&&elCa(lv);
   if(!every&&!lv)return;
-  const a=r=>'<a href="'+new URL(ls.study+r+".pdf",ROOT).href+'" download style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📥 '+(ca?"Descarrega el resum":"Download the summary")+(every?" · "+EL_LEVELS.find(x=>x.id===r).name:"")+" (PDF)</a>";
+  const a=r=>'<a href="'+new URL(ls.study+r+".pdf",ROOT).href+'" target="_blank" rel="noopener" style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📄 '+(ca?"Obre el resum":"Open the summary")+(every?" · "+EL_LEVELS.find(x=>x.id===r).name:"")+" (PDF)</a>";
   el.innerHTML="<h2>📚 "+(ca?"Resum del vocabulari i la gramàtica":"Vocabulary and grammar summary")+"</h2><p>"
-    +(ca?"Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. Descarrega'l quan vulguis per estudiar. És opcional: fes-lo servir si et va bé.":"All the vocabulary and then all the grammar of your route, with the explanations and practice. Download it whenever you want to study. It is optional: use it if it helps you.")
+    +(ca?"Primer tot el vocabulari i després tota la gramàtica de la teva ruta, amb les explicacions i la pràctica. Obre'l quan vulguis per estudiar (des del navegador també el pots descarregar). És opcional: fes-lo servir si et va bé.":"All the vocabulary and then all the grammar of your route, with the explanations and practice. Open it whenever you want to study (you can also download it from the browser). It is optional: use it if it helps you.")
     +"</p><p>"+(every?EL_LEVELS.filter(x=>(x.id!=="beginners"||ls.starter)&&(x.id!=="native"||ls.pro)).map(x=>a(x.id)).join(""):a(lv==="beginners"&&!ls.starter?"insecure":lv==="native"&&!ls.pro?"daring":lv))+"</p>";
   el.hidden=false;
 }
+// PDFs open in a new browser tab, not as a download (Roger, 1 Nov 2026: "They can download them if they want once are opened on the browser").
 // Reading story on the LS home page (Roger, 31 Oct 2026: "nice pdf book-like versions for each level and put them on the home of each LS
 // per levels"): the Overview tab has an empty card ([data-el-story]); for an LS with `story` in EL_LS it gets the book of the student's
 // route only (tools/reading-story/build.py), nothing until they have a route; the teacher and testers get all four. Pro reads Plus.
@@ -392,8 +393,8 @@ function storyCard(u){
   if(!el||!ls||!ls.story||!u)return;
   const every=isTeacher(u)||seesAll(u),lv=myLevel,ca=!every&&elCa(lv),s=ls.story;
   if(!every&&!lv)return;
-  const a=r=>'<a href="'+new URL(s.pdf+r+".pdf",ROOT).href+'" download style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📥 '
-    +(every?EL_LEVELS.find(x=>x.id===r).name+" (PDF)":ca?"Descarrega el teu llibre (PDF)":"Download your book (PDF)")+"</a>";
+  const a=r=>'<a href="'+new URL(s.pdf+r+".pdf",ROOT).href+'" target="_blank" rel="noopener" style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📖 '
+    +(every?EL_LEVELS.find(x=>x.id===r).name+" (PDF)":ca?"Obre el teu llibre (PDF)":"Open your book (PDF)")+"</a>";
   el.innerHTML='<div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap"><img src="'+new URL(s.pdf+"cover.jpg",ROOT).href+'" alt="" style="width:120px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.18)">'
     +'<div style="flex:1;min-width:220px"><h2>📖 '+(ca?"Història per llegir":"Reading story")+" · "+s.title+"</h2><p>"
     +(ca?"Un misteri en sis capítols. Llegeix un capítol cada setmana a casa, amb el seu Learning Path. A classe en parlem deu minuts.":"A story in six chapters. Read one chapter a week at home, with its Learning Path. In class we talk about it for ten minutes.")
