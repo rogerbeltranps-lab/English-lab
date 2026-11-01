@@ -608,8 +608,8 @@ function mkTodoItems(grp){return mkMoments().map(m=>{const st=mkTodo(m,grp),n=st
     // late hand-ins count from the day they came in (as marks.mjs audit)
     const since=r.from?st.map(s=>{const h=String((handedIn(s.uid,byId(m.a))[m.step]||{}).date||"").slice(0,10);return h>r.from?h:r.from}).sort()[0]:null;
     const what=`<b>${esc(m.name)}</b> (${esc(actTitle(m.a))}) · ${n} hand-in${n>1?"s":""} without a level`;
-    // Claude marks these from the cloud: still unmarked 4+ days after they were ready means the weekly marking is not working
-    if(r.from&&t>=r.from)return {now:true,h:ELWeek.add(since,m.daily?2:4)<=t?`❌ <b>Claude's marking is late:</b> ${what}, ready since ${ELWeek.date(since)}. Tell Claude in the English Lab chat. ${btn}`:`🤖 ${what}: Claude marks them ${m.daily?"at 17:00":"this week"} ${btn}`};
+    // Claude marks these from the cloud every Wednesday: still unmarked after the Wednesday run that followed means the marking is not working
+    if(r.from&&t>=r.from)return {now:true,h:ELMark.late(since,t)?`❌ <b>Claude's marking is late:</b> ${what}, ready since ${ELWeek.date(since)}. Tell Claude in the English Lab chat. ${btn}`:`🤖 ${what}: Claude marks them on Wednesday ${btn}`};
     return {now:false,h:`⏳ ${what}: ${r.from?"ready to mark on "+ELWeek.date(r.from)+" (one week after you ticked the session)":r.line?"ready one week after you tick “"+esc(r.line)+"” in the time plan":"no session in the time plan"} ${btn}`}}).filter(Boolean)}
 function mkSheet(m,grp){const a=byId(m.a),g=G(),studs=mkTodo(m,grp),codes=ELMark.codes(studs.map(s=>s.uid)),by=Object.fromEntries(studs.map(s=>[s.uid,s]));
   const students=[...codes].map(([code,u])=>{const l=level(u,S.ls),h=handedIn(u,a)[m.step]||{};return {code,route:LV[l],ca:!l||CA_RT.includes(l),exam:mkExam(u),ty:h.ty,fields:h.f}});
