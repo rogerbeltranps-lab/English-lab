@@ -639,19 +639,26 @@ function mkSave(){const k=S.mk;if(!k||!k.rows||!k.rows.length)return;const fb=$(
     :[patch(x.s.uid,k.m.a,{levels:{[k.m.step]:x.lv},marked:{[k.m.step]:new Date().toISOString()}}),...(fb&&x.fb?[api.reply(x.s.uid,a,k.m.step,x.fb)]:[])]);
   $("#dlg").close();S.mk=null;act(Promise.all(ps))}
 // the To do's possible copies of the group on screen, and their dialog: the work, its writing log, the reason, Accept or Redo in class
-function cpItems(grp){return mkMoments().flatMap(m=>{const a=byId(m.a);return mkStuds(grp).filter(s=>{const f=flagOf(s.uid,m.a,m.step);return f&&!f.done}).map(s=>
-  `⚠️ Possible copy: <b>${name(s)}</b> · ${esc(m.name)} (${esc(actTitle(m.a))}): ${esc(flagOf(s.uid,m.a,m.step).why)} <button data-do="cpopen" data-u="${s.uid}" data-a="${m.a}" data-s="${m.step}">Check</button>`)})}
+// Possible copies come from the level sheets (moments: Accept saves the level) and from the writing corrections (Roger, 1 Nov 2026: every
+// writing is handed in to the teacher; no level: Accept sends the correction Claude wrote, f.fb, as the teacher's answer).
+function cpList(grp){const out=[];cat.filter(a=>a.ls===S.ls).forEach(a=>mkStuds(grp).forEach(s=>Object.entries(res(s.uid,a.id).flags||{}).forEach(([step,f])=>{if(f&&f.why&&!f.done)out.push({s,a,step,f})})));return out}
+const cpName=(aid,step)=>{const m=mkMoments().find(x=>x.a===aid&&x.step===step);return m?m.name:({write:"Writing",speak:"Speaking",talk:"Talk"})[step]||step};
+function cpItems(grp){return cpList(grp).map(({s,a,step,f})=>
+  `⚠️ Possible copy: <b>${name(s)}</b> · ${esc(cpName(a.id,step))} (${esc(actTitle(a.id))}): ${esc(f.why)} <button data-do="cpopen" data-u="${s.uid}" data-a="${a.id}" data-s="${step}">Check</button>`)}
 const REDO={ca:"El professor vol que tornis a fer aquesta tasca a classe, amb les teves paraules. Després entrega-la una altra vegada.",en:"Your teacher would like you to do this task again in class, in your own words. Then hand it in again."};
-function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step),a=byId(aid),f=flagOf(u,aid,step),h=handedIn(u,a)[step]||{},s=S.P[u];if(!m||!f)return;S.cp={u,m,f};
-  dlg(`<h3>⚠️ Possible copy · ${name(s)}</h3><p class="muted">${esc(m.name)} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
+function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step)||null,a=byId(aid),f=flagOf(u,aid,step),hs=handedIn(u,a)[step]||{},s=S.P[u];if(!a||!f)return;S.cp={u,aid,step,m,f};
+  const h={ty:hs.ty||f.ty,f:hs.f&&hs.f.length?hs.f:f.f||[]},lv=f.lv||{};
+  dlg(`<h3>⚠️ Possible copy · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
     <p><b>Why:</b> ${esc(f.why)}</p>${h.ty?`<p class="muted">Writing log: ${esc(ELMark.tyText(h.ty))}</p>`:""}
     ${(h.f||[]).map(x=>`<div class="hand"><b>${esc(x.l)}</b><p style="white-space:pre-wrap">${esc(x.v||"")}</p></div>`).join("")}
-    <p>If it is their own work, it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[f.lv[c]]}">${f.lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.</p>
+    <p>If it is their own work, ${m?`it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[lv[c]]}">${lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.`:`they get this correction:</p><p style="white-space:pre-wrap" class="hand">${esc(f.fb||"")}`}</p>
     <div class="row" style="justify-content:flex-start"><button data-do="cpok">✔ Accept: it's their work</button><button class="g" data-do="cpredo">↺ Redo in class</button></div>
-    <p class="muted">Redo in class sends the student: “${esc(CA_RT.includes(level(u,S.ls))?REDO.ca:REDO.en)}” Their next hand-in goes back to the marking sheet.</p>`,true)}
-function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.m.a),done=ok?"accepted":"redo";
-  const ps=ok?[patch(k.u,k.m.a,{levels:{[k.m.step]:k.f.lv},marked:{[k.m.step]:new Date().toISOString()},flags:{[k.m.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.m.step,k.f.fb)]:[])]
-    :[patch(k.u,k.m.a,{flags:{[k.m.step]:{done}}}),api.reply(k.u,a,k.m.step,CA_RT.includes(level(k.u,S.ls))?REDO.ca:REDO.en)];
+    <p class="muted">Redo in class sends the student: “${esc(CA_RT.includes(level(u,S.ls))?REDO.ca:REDO.en)}” Their next hand-in goes back to ${m?"the marking sheet":"Claude's correction"}.</p>`,true)}
+function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.aid),done=ok?"accepted":"redo",note=CA_RT.includes(level(k.u,S.ls))?REDO.ca:REDO.en;
+  const ps=k.m?(ok?[patch(k.u,k.aid,{levels:{[k.step]:k.f.lv},marked:{[k.step]:new Date().toISOString()},flags:{[k.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.step,k.f.fb)]:[])]
+      :[patch(k.u,k.aid,{flags:{[k.step]:{done}}}),api.reply(k.u,a,k.step,note)])
+    // a writing correction: Accept sends it as the version corrected (fbSig), so a new version is corrected again; Redo sends the note
+    :[patch(k.u,k.aid,{flags:{[k.step]:{done}},replies:{[k.step]:ok?k.f.fb||"":note},fbSig:{[k.step]:ok?k.f.v||null:"redo"},fbBy:{[k.step]:null}})];
   $("#dlg").close();S.cp=null;act(Promise.all(ps))}
 // ---- points (shared/js/el-points.js; root AGENTS.md "Points"): each student's points per term from the class presentations.
 // Here the teacher corrects one student's points (an absent student, a mistake). A change also saves the group's best of the term
