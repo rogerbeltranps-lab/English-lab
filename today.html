@@ -30,6 +30,7 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-sections.js"></script>
 <script src="shared/js/el-criteria.js"></script>
+<script src="shared/js/el-criteria-easy.js"></script>
 <script src="shared/js/el-grading.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
@@ -46,7 +47,9 @@ import {annHtml,annDate,annMs,ANN_COLOR} from "./shared/js/el-announce.js";
 const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let EN=false;const t=(ca,en)=>EN?en:ca;
 let COURSE=null;   // course of the LS on screen: criteria texts depend on it
-const pill=c=>`<span class="pill ce${c[0]}" data-do="crit" data-c="${c}" tabindex="0" title="${esc(elCompetence(c)+" · "+c+": "+(elCriterion(COURSE,c)||"–"))}">${c}</span>`;
+// Simple words first (el-criteria-easy.js, Roger 1 Nov 2026); the official text stays in the criterion dialog.
+const easy=c=>elCriterionEasy(COURSE,c,EN)||elCriterion(COURSE,c)||"–";
+const pill=c=>`<span class="pill ce${c[0]}" data-do="crit" data-c="${c}" tabindex="0" title="${esc(elCompetence(c)+" · "+c+": "+easy(c))}">${c}</span>`;
 const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name]));
 const route=l=>l?`<span class="route r-${l}">${LV[l]||l}</span>`:"–";
 // what the student reads as their level: course, route and CEFR, e.g. "2ESO Starter (A1)" (Roger, 31 Oct 2026; elLevelLabel in el-catalog.js)
@@ -202,9 +205,9 @@ const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")}
 // carry criteria; nothing until the teacher has entered a section.
 function examByCrit(e,sc){const by=elExamByCrit(e,sc).filter(o=>o.n),pts=n=>f1(+(+n).toFixed(2));if(!by.length)return "";
   return `<details style="margin-top:10px"${location.hash==="#exam"?" open":""}><summary style="font-weight:600;cursor:pointer">${t("L'examen per criteris","Your exam by criteria")}</summary>`
-    +`<table class="legend"><tbody>${by.map(o=>`<tr><td><b>${o.c}</b> <small class="muted">${esc(elCompetence(o.c))}</small><br><small class="muted">${e.sections.filter(x=>(x[3]||[]).includes(o.c)).map(x=>x[1]).join(" + ")}</small></td><td><b style="color:${col(o.score/o.max*100)}">${f1(o.score/o.max*10)} / 10</b><br><small class="muted">${pts(o.score)} / ${o.max} ${t("punts","points")}</small></td></tr>`).join("")}</tbody></table>`
+    +`<table class="legend"><tbody>${by.map(o=>`<tr><td style="white-space:normal">${pill(o.c)} <b>${esc(elCompetence(o.c))}</b><br><span>${esc(easy(o.c))}</span><br><small class="muted">${t("Parts de l'examen","Exam parts")}: ${e.sections.filter(x=>(x[3]||[]).includes(o.c)).map(x=>x[1]).join(" + ")}</small></td><td style="white-space:nowrap;width:1%"><b style="color:${col(o.score/o.max*100)}">${f1(o.score/o.max*10)} / 10</b><br><small class="muted">${pts(o.score)} / ${o.max} ${t("punts","points")}</small></td></tr>`).join("")}</tbody></table>`
     +`<p class="muted" style="margin:6px 0">${t("Punts per apartat","Points per section")}: ${e.sections.filter(([k])=>sc[k]&&sc[k].score!=null).map(([k,n,mx])=>`${n} ${pts(sc[k].score)}/${sc[k].max||mx}`).join(" · ")}</p>`
-    +`<p class="muted" style="margin:0">${elExamShared(e).length?t("Aquests apartats compten per a dos criteris: ","These sections count for two criteria: ")+esc(elExamShared(e).join(", "))+". ":""}${t("La nota de l'examen és el total de punts ÷ 10.","Your exam mark is all your points ÷ 10.")}</p></details>`}
+    +`<p class="muted" style="margin:0">${elExamShared(e).length?t("Aquests apartats compten per a dos criteris: ","These sections count for two criteria: ")+esc(elExamShared(e).join(", "))+". ":""}${t("La nota de l'examen és el total de punts ÷ 10.","Your exam mark is all your points ÷ 10.")} ${t("Toca un codi per veure el text oficial del criteri.","Tap a code to see the official text of the criterion.")}</p></details>`}
 // Exam: results/{ls}__assessment, sections[k] = {score, max} written by the teacher (sum of scores / sum of maxes × 10). Final product: the teacher's mark.
 function onlyView(id){const g=EL_GRADING[id],e=g.exam,sc=(D.rs[id+"/assessment"]||{}).sections||{},got=e.sections.filter(([k])=>sc[k]&&sc[k].score!=null),fp=D.rs[g.fp.a]||{};
   const m=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null,prod=fp.max?(fp.score||0)/fp.max*10:null;
@@ -301,16 +304,16 @@ function summary(list){
   const marked=rows.filter(r=>r.mark!=null),avg=marked.length?marked.reduce((s,r)=>s+r.mark,0)/marked.length:null,f=n=>EN?n.toFixed(1):n.toFixed(1).replace(".",",");
   return `<div class="box"><div class="lphead"><h2>${t("La meva nota mitjana","My average mark")}</h2><b style="font-size:1.6rem;color:${avg==null?"#94a3b8":col(avg*10)}">${avg==null?"–":f(avg)+" / 10"}</b></div><p class="muted">${t(`Mitjana de les notes de cada criteri que ja té activitats avaluades (${marked.length} de ${rows.length}). És orientativa: la nota final la posa el professor.`,`Average of the marks of each criterion that already has graded activities (${marked.length} of ${rows.length}). It is only a guide: your teacher gives the final mark.`)}</p></div>`
     +`<div class="box"><h2>${t("Els meus criteris","My criteria")}</h2><div class="wrap"><table class="legend sum"><thead><tr><th>${t("Criteri","Criterion")}</th><th style="text-align:left">${t("Què vol dir","What it means")}</th><th>${t("Punts","Points")}</th><th>${t("Nota","Mark")}</th></tr></thead><tbody>`
-    +rows.map(r=>`<tr><td>${pill(r.c)}</td><td><b>${esc(elCompetence(r.c))}</b><br><small>${esc(elCriterion(COURSE,r.c)||"–")}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(r.c)).map(a=>esc(a.title)).join(" · ")}</small></td><td>${r.m?r.s+"/"+r.m:"–"}</td><td><b style="color:${r.mark==null?"#94a3b8":col(r.mark*10)}">${r.mark==null?t("encara no","not yet"):f(r.mark)}</b></td></tr>`).join("")
+    +rows.map(r=>`<tr><td>${pill(r.c)}</td><td><b>${esc(elCompetence(r.c))}</b><br><small>${esc(easy(r.c))}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(r.c)).map(a=>esc(a.title)).join(" · ")}</small></td><td>${r.m?r.s+"/"+r.m:"–"}</td><td><b style="color:${r.mark==null?"#94a3b8":col(r.mark*10)}">${r.mark==null?t("encara no","not yet"):f(r.mark)}</b></td></tr>`).join("")
     +`</tbody></table></div><p class="muted">${t("Cada nota és la suma de punts de les activitats avaluables lligades al criteri, sobre 10. El producte final compta amb la nota que posa el professor.","Each mark is the sum of the points of the graded activities linked to the criterion, out of 10. The final product counts with the mark your teacher gives.")}</p></div>`;
 }
 // Criteria that appear in a learning path's grid: its own and those of its steps.
 const gridCrits=a=>[...new Set([...a.criteria,...steps(a).filter(k=>!(a.skip||[]).includes(k)).flatMap(k=>((window.EL_STEP_CRITERIA||{})[a.id]||{})[k]||EL_EVIDENCE[k]||[])])].sort();
 function legend(cs){if(!cs.length)return "";
-  return `<details class="crit"><summary>${t("Criteris d'avaluació d'aquest learning path","Assessment criteria of this learning path")}</summary><table class="legend"><tbody>${cs.map(c=>`<tr><td>${pill(c)}</td><td><b>${esc(elCompetence(c))}</b><br>${esc(elCriterion(COURSE,c)||"–")}</td></tr>`).join("")}</tbody></table></details>`}
+  return `<details class="crit"><summary>${t("Criteris d'avaluació d'aquest learning path","Assessment criteria of this learning path")}</summary><table class="legend"><tbody>${cs.map(c=>`<tr><td>${pill(c)}</td><td><b>${esc(elCompetence(c))}</b><br>${esc(easy(c))}</td></tr>`).join("")}</tbody></table></details>`}
 function critPanel(c){
   const list=EL_CATALOG.filter(a=>a.ls===S.ls),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+k));
-  $("#dlgc").innerHTML=`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterion(COURSE,c)||t("Encara no hi ha el text d'aquest criteri.","This criterion has no text yet."))}</p><label>${t("Learning paths que el treballen","Learning paths that work on it")}</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>${t("Activitats que en donen evidència","Activities that give evidence of it")}</label><p>${st.map(esc).join(" · ")||"–"}</p><div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button></div>`;
+  $("#dlgc").innerHTML=`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterionEasy(COURSE,c,EN)||elCriterion(COURSE,c)||t("Encara no hi ha el text d'aquest criteri.","This criterion has no text yet."))}</p>${elCriterionEasy(COURSE,c,EN)&&elCriterion(COURSE,c)?`<label>${t("Text oficial (Decret 175/2022)","Official text (Decret 175/2022, in Catalan)")}</label><p class="muted"><small>${esc(elCriterion(COURSE,c))}</small></p>`:""}<label>${t("Learning paths que el treballen","Learning paths that work on it")}</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>${t("Activitats que en donen evidència","Activities that give evidence of it")}</label><p>${st.map(esc).join(" · ")||"–"}</p><div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button></div>`;
   if(!$("#dlg").open)$("#dlg").showModal();
 }
 // Detail of one learning path: steps, score, feedback, final-product self-assessment with the teacher's answers.
