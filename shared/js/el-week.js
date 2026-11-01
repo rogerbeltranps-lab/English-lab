@@ -67,20 +67,36 @@
     // with no row gets one), and the due days of the activities (`due`, `stepDue`) that fell on the old day of a class move with it.
     // p._moved[gi][new line] = {orig, from (old day)}; p._tabs[gi][original line] = the chosen tabs. Safe to call again with new edits.
     applyEdits(ls,edits){const p=(window.EL_PLAN||{})[ls];if(!p||!p.rows)return null;const cp=o=>o==null?o:JSON.parse(JSON.stringify(o));
-      if(!p._base)p._base=cp({rows:p.rows,due:p.due||null,stepDue:p.stepDue||null});
-      const b=cp(p._base);p.rows=b.rows;if(b.due)p.due=b.due;if(b.stepDue)p.stepDue=b.stepDue;p._moved={};p._tabs={};
+      if(!p._base)p._base=cp({rows:p.rows,due:p.due||null,stepDue:p.stepDue||null,optional:p.optional||null});
+      const b=cp(p._base);p.rows=b.rows;if(b.due)p.due=b.due;if(b.stepDue)p.stepDue=b.stepDue;if(b.optional)p.optional=b.optional;p._moved={};p._tabs={};p._added={};p._dropped={};
       const get=(r,gi)=>String((r.g?r.g[gi]:r.what)||"").split("\n").filter(Boolean),set=(r,gi,ls)=>{if(r.g)r.g[gi]=ls.join("\n");else r.what=ls.join("\n")};
-      Object.entries(edits||{}).forEach(([gid,m])=>{const gi=col(p,gid);if(gi<0||!m)return;const mv=p._moved[gi]={},tb=p._tabs[gi]={};
-        Object.entries(m).forEach(([orig,e])=>{if(!e)return;if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!e.to||!/^\d{4}-\d\d-\d\d$/.test(e.to))return;
+      const ok=d=>/^\d{4}-\d\d-\d\d$/.test(d||""),lab=to=>{const d=day(to);return DAYS.en[d.getDay()]+" "+d.getDate()};
+      // puts a line on day `to` in that day's week row (a new row when the week has none), before the later lines
+      const place=(gi,to,nl)=>{const d=day(to);let ti=p.rows.findIndex(r=>r.from&&r.from<=to&&to<=add(r.from,6));
+        if(ti<0){const mon=add(to,-((d.getDay()+6)%7)),prev=[...p.rows].reverse().find(r=>r.from&&r.from<mon)||p.rows[0],nr={term:prev.term,from:mon,when:this.week({from:mon}),added:true};
+          if(p.rows[0].g)nr.g=p.rows[0].g.map(()=>"");else nr.what="";ti=p.rows.findIndex(r=>r.from&&r.from>mon);if(ti<0)ti=p.rows.length;p.rows.splice(ti,0,nr)}
+        const tr=p.rows[ti],ls=get(tr,gi),at=ls.findIndex(l=>{const x=this.lineDay(tr.from,l);return x&&x>to});ls.splice(at<0?ls.length:at,0,nl);set(tr,gi,ls)};
+      const shift=(gi,old,to,ids)=>{Object.entries(p.due||{}).forEach(([id,a])=>{if(a&&a[gi]===old&&(!ids||ids.includes(id)))a[gi]=to});
+        Object.entries(p.stepDue||{}).forEach(([id,o])=>{if(!ids||ids.includes(id))Object.values(o||{}).forEach(a=>{if(a&&a[gi]===old)a[gi]=to})})};
+      Object.entries(edits||{}).forEach(([gid,m])=>{const gi=col(p,gid);if(gi<0||!m)return;const mv=p._moved[gi]={},tb=p._tabs[gi]={},ad=p._added[gi]={};
+        const es=Object.entries(m).filter(([,e])=>e),dr=p._dropped[gi]=[];
+        // a learning path dropped for this group (Roger, 1 Nov 2026: "we didn't have time and it doesn't count for the unit and it's not part of
+        // the exam"): key "drop:<activity id>" = {drop: true}; it has no due day any more (no late reminders, no on-time marks, no bonus check)
+        es.filter(([k,e])=>/^drop:/.test(k)&&e.drop).forEach(([k])=>{const id=k.slice(5);dr.push(id);
+          [p.due,p.optional].forEach(o=>{if(o&&o[id])o[id][gi]=null});if(p.stepDue&&p.stepDue[id])Object.values(p.stepDue[id]).forEach(a=>{if(a)a[gi]=null});
+          // its "Homework by …" lines go too (students are not asked to do it): the ones that name only its "LPn"
+          const a=(window.EL_CATALOG||[]).find(x=>x.id===id),t=a&&String(a.title).split(/[:(]/)[0].trim().toLowerCase();let n=null;
+          if(t)p.rows.forEach(r=>get(r,gi).forEach(l=>{const q=!n&&/\bLP(\d+) ([^(\n·]+)/.exec(l);if(q&&q[2].trim().toLowerCase().startsWith(t.slice(0,12)))n=q[1]}));
+          if(n)p.rows.forEach(r=>{const ls=get(r,gi),k=ls.filter(l=>{if(!/^Homework by /.test(l))return true;const lp=l.match(/\bLP\d+\b/g)||[];return !(lp.length&&lp.every(x=>x==="LP"+n))});if(k.length!==ls.length)set(r,gi,k)})});
+        es.filter(([k,e])=>!e.add&&!/^drop:/.test(k)).forEach(([orig,e])=>{if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!ok(e.to))return;
           const ri=p.rows.findIndex(r=>r.from&&get(r,gi).includes(orig));if(ri<0)return;const old=this.lineDay(p.rows[ri].from,orig);if(!old||old===e.to)return;
-          const hw=/^Homework by /.test(orig),d=day(e.to),nl=orig.replace(/^(Homework by )?\w{3} \d{1,2}\b/,(_,h)=>(h||"")+DAYS.en[d.getDay()]+" "+d.getDate());
-          set(p.rows[ri],gi,get(p.rows[ri],gi).filter(l=>l!==orig));
-          let ti=p.rows.findIndex(r=>r.from&&r.from<=e.to&&e.to<=add(r.from,6));
-          if(ti<0){const mon=add(e.to,-((d.getDay()+6)%7)),prev=[...p.rows].reverse().find(r=>r.from&&r.from<mon)||p.rows[0],nr={term:prev.term,from:mon,when:this.week({from:mon}),added:true};
-            if(p.rows[0].g)nr.g=p.rows[0].g.map(()=>"");else nr.what="";ti=p.rows.findIndex(r=>r.from&&r.from>mon);if(ti<0)ti=p.rows.length;p.rows.splice(ti,0,nr)}
-          const tr=p.rows[ti],ls=get(tr,gi),at=ls.findIndex(l=>{const x=this.lineDay(tr.from,l);return x&&x>e.to});ls.splice(at<0?ls.length:at,0,nl);set(tr,gi,ls);
-          mv[nl]={orig,from:old};
-          if(!hw){Object.values(p.due||{}).forEach(a=>{if(a&&a[gi]===old)a[gi]=e.to});Object.values(p.stepDue||{}).forEach(o=>Object.values(o||{}).forEach(a=>{if(a&&a[gi]===old)a[gi]=e.to}))}})});
+          const hw=/^Homework by /.test(orig),nl=orig.replace(/^(Homework by )?\w{3} \d{1,2}\b/,(_,h)=>(h||"")+lab(e.to));
+          set(p.rows[ri],gi,get(p.rows[ri],gi).filter(l=>l!==orig));place(gi,e.to,nl);mv[nl]={orig,from:old};
+          if(!hw)shift(gi,old,e.to)});
+        // the tabs not done in a session, sent to a later class ("⏭ Next class" on the dashboard): {add: "LP3 Where traditions come from",
+        // to, from: the day they were planned, tabs, shift: activity ids whose due day on `from` moves to `to`}
+        es.filter(([,e])=>e.add&&ok(e.to)).sort((x,y)=>(x[1].at||0)-(y[1].at||0)).forEach(([key,e])=>{const nl=lab(e.to)+" · "+e.add+(e.from?" · not finished on "+lab(e.from):"");
+          if(e.tabs&&e.tabs.length)tb[key]=e.tabs;place(gi,e.to,nl);ad[nl]={key,from:e.from||null};if(ok(e.from)&&e.shift)shift(gi,e.from,e.to,e.shift)})});
       return p},
     // the day of a session line ("Tue 27 · …" or "Homework by Mon 9 · …") counted from the Monday of its week row, or null
     lineDay(from,l){const m=/^(?:Homework by )?(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2})\b/.exec(String(l));if(!m||!from)return null;
