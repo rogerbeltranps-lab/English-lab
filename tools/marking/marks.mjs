@@ -86,7 +86,7 @@ async function todo(grp,m){const a=W.EL_CATALOG.find(x=>x.id===m.a),out=[];
     if(h&&(!m.c.every(c=>lv[c])||again)&&!waits)out.push({s,h,route:st.route,exam:st.exam})}
   return out.sort((x,y)=>x.s.uid<y.s.uid?-1:1)}
 function readyOf(grp,ls,m,ticks){const p=W.EL_PLAN[ls],gi=p?W.ELWeek.col(p,grp.id):-1,due=p&&p.due&&p.due[m.a]?p.due[m.a][gi]:null,a=W.EL_CATALOG.find(x=>x.id===m.a);
-  return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls,daily:m.daily})}
+  return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls,atOnce:m.atOnce})}
 function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRADING[a.ls],course=a.ls.split("-")[0],codes=W.ELMark.codes(rows.map(r=>r.s.uid)),by=Object.fromEntries(rows.map(r=>[r.s.uid,r]));
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
   const text=W.ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:W.ELWeek.today(),crits:m.c,
