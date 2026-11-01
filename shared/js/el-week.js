@@ -68,19 +68,27 @@
     // p._moved[gi][new line] = {orig, from (old day)}; p._tabs[gi][original line] = the chosen tabs. Safe to call again with new edits.
     applyEdits(ls,edits){const p=(window.EL_PLAN||{})[ls];if(!p||!p.rows)return null;const cp=o=>o==null?o:JSON.parse(JSON.stringify(o));
       if(!p._base)p._base=cp({rows:p.rows,due:p.due||null,stepDue:p.stepDue||null});
-      const b=cp(p._base);p.rows=b.rows;if(b.due)p.due=b.due;if(b.stepDue)p.stepDue=b.stepDue;p._moved={};p._tabs={};
+      const b=cp(p._base);p.rows=b.rows;if(b.due)p.due=b.due;if(b.stepDue)p.stepDue=b.stepDue;p._moved={};p._tabs={};p._added={};
       const get=(r,gi)=>String((r.g?r.g[gi]:r.what)||"").split("\n").filter(Boolean),set=(r,gi,ls)=>{if(r.g)r.g[gi]=ls.join("\n");else r.what=ls.join("\n")};
-      Object.entries(edits||{}).forEach(([gid,m])=>{const gi=col(p,gid);if(gi<0||!m)return;const mv=p._moved[gi]={},tb=p._tabs[gi]={};
-        Object.entries(m).forEach(([orig,e])=>{if(!e)return;if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!e.to||!/^\d{4}-\d\d-\d\d$/.test(e.to))return;
+      const ok=d=>/^\d{4}-\d\d-\d\d$/.test(d||""),lab=to=>{const d=day(to);return DAYS.en[d.getDay()]+" "+d.getDate()};
+      // puts a line on day `to` in that day's week row (a new row when the week has none), before the later lines
+      const place=(gi,to,nl)=>{const d=day(to);let ti=p.rows.findIndex(r=>r.from&&r.from<=to&&to<=add(r.from,6));
+        if(ti<0){const mon=add(to,-((d.getDay()+6)%7)),prev=[...p.rows].reverse().find(r=>r.from&&r.from<mon)||p.rows[0],nr={term:prev.term,from:mon,when:this.week({from:mon}),added:true};
+          if(p.rows[0].g)nr.g=p.rows[0].g.map(()=>"");else nr.what="";ti=p.rows.findIndex(r=>r.from&&r.from>mon);if(ti<0)ti=p.rows.length;p.rows.splice(ti,0,nr)}
+        const tr=p.rows[ti],ls=get(tr,gi),at=ls.findIndex(l=>{const x=this.lineDay(tr.from,l);return x&&x>to});ls.splice(at<0?ls.length:at,0,nl);set(tr,gi,ls)};
+      const shift=(gi,old,to,ids)=>{Object.entries(p.due||{}).forEach(([id,a])=>{if(a&&a[gi]===old&&(!ids||ids.includes(id)))a[gi]=to});
+        Object.entries(p.stepDue||{}).forEach(([id,o])=>{if(!ids||ids.includes(id))Object.values(o||{}).forEach(a=>{if(a&&a[gi]===old)a[gi]=to})})};
+      Object.entries(edits||{}).forEach(([gid,m])=>{const gi=col(p,gid);if(gi<0||!m)return;const mv=p._moved[gi]={},tb=p._tabs[gi]={},ad=p._added[gi]={};
+        const es=Object.entries(m).filter(([,e])=>e);
+        es.filter(([,e])=>!e.add).forEach(([orig,e])=>{if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!ok(e.to))return;
           const ri=p.rows.findIndex(r=>r.from&&get(r,gi).includes(orig));if(ri<0)return;const old=this.lineDay(p.rows[ri].from,orig);if(!old||old===e.to)return;
-          const hw=/^Homework by /.test(orig),d=day(e.to),nl=orig.replace(/^(Homework by )?\w{3} \d{1,2}\b/,(_,h)=>(h||"")+DAYS.en[d.getDay()]+" "+d.getDate());
-          set(p.rows[ri],gi,get(p.rows[ri],gi).filter(l=>l!==orig));
-          let ti=p.rows.findIndex(r=>r.from&&r.from<=e.to&&e.to<=add(r.from,6));
-          if(ti<0){const mon=add(e.to,-((d.getDay()+6)%7)),prev=[...p.rows].reverse().find(r=>r.from&&r.from<mon)||p.rows[0],nr={term:prev.term,from:mon,when:this.week({from:mon}),added:true};
-            if(p.rows[0].g)nr.g=p.rows[0].g.map(()=>"");else nr.what="";ti=p.rows.findIndex(r=>r.from&&r.from>mon);if(ti<0)ti=p.rows.length;p.rows.splice(ti,0,nr)}
-          const tr=p.rows[ti],ls=get(tr,gi),at=ls.findIndex(l=>{const x=this.lineDay(tr.from,l);return x&&x>e.to});ls.splice(at<0?ls.length:at,0,nl);set(tr,gi,ls);
-          mv[nl]={orig,from:old};
-          if(!hw){Object.values(p.due||{}).forEach(a=>{if(a&&a[gi]===old)a[gi]=e.to});Object.values(p.stepDue||{}).forEach(o=>Object.values(o||{}).forEach(a=>{if(a&&a[gi]===old)a[gi]=e.to}))}})});
+          const hw=/^Homework by /.test(orig),nl=orig.replace(/^(Homework by )?\w{3} \d{1,2}\b/,(_,h)=>(h||"")+lab(e.to));
+          set(p.rows[ri],gi,get(p.rows[ri],gi).filter(l=>l!==orig));place(gi,e.to,nl);mv[nl]={orig,from:old};
+          if(!hw)shift(gi,old,e.to)});
+        // the tabs not done in a session, sent to a later class ("⏭ Next class" on the dashboard): {add: "LP3 Where traditions come from",
+        // to, from: the day they were planned, tabs, shift: activity ids whose due day on `from` moves to `to`}
+        es.filter(([,e])=>e.add&&ok(e.to)).sort((x,y)=>(x[1].at||0)-(y[1].at||0)).forEach(([key,e])=>{const nl=lab(e.to)+" · "+e.add+(e.from?" · not finished on "+lab(e.from):"");
+          if(e.tabs&&e.tabs.length)tb[key]=e.tabs;place(gi,e.to,nl);ad[nl]={key,from:e.from||null};if(ok(e.from)&&e.shift)shift(gi,e.from,e.to,e.shift)})});
       return p},
     // the day of a session line ("Tue 27 · …" or "Homework by Mon 9 · …") counted from the Monday of its week row, or null
     lineDay(from,l){const m=/^(?:Homework by )?(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2})\b/.exec(String(l));if(!m||!from)return null;

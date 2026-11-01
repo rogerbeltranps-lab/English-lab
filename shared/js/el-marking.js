@@ -105,7 +105,7 @@ window.ELMark=(function(){
     const key=String(o.title||"").split(":")[0].toLowerCase().slice(0,14);let n=null,line=null;
     o.p.rows.forEach(r=>lines(r).forEach(l=>{const q=!n&&l.toLowerCase().includes(key)&&/\bLP(\d+)\b/.exec(l);if(q)n=q[1]}));   // "LP2 What are they doing? (1/2)" … "LP2 (2/2)"
     o.p.rows.forEach(r=>lines(r).forEach(l=>{if(date(r,l)===o.due&&(l.toLowerCase().includes(key)||n&&new RegExp("\\bLP"+n+"\\b").test(l)))line=l}));
-    const mv=line&&((o.p._moved||{})[o.gi]||{})[line],t=line&&((o.ticks||{})[o.ls+"|"+line]||mv&&(o.ticks||{})[o.ls+"|"+mv.orig]),   // a moved session keeps a tick given before the move
+    const mv=line&&((o.p._moved||{})[o.gi]||{})[line],ad=line&&((o.p._added||{})[o.gi]||{})[line],tk=o.ticks||{},t=line&&(tk[o.ls+"|"+line]||mv&&tk[o.ls+"|"+mv.orig]||ad&&tk[o.ls+"|"+ad.key]),   // a moved session keeps a tick given before the move
           done=t?(typeof t==="string"?t:o.due):null;
     return {due:o.due,line,done,from:done?W.add(done,7):null};
   }
