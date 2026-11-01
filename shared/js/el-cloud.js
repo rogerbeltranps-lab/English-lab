@@ -202,7 +202,7 @@ async function gate(u){
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
   if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
-  if(isTeacher(u)){banner("Teacher mode · LS "+lsId+": "+st,"#475569");return}
+  if(isTeacher(u)){banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);return}
   if(!u||!isStudent(u)){signInBlock();return}
   const tester=seesAll(u),vg=viewGroup(u);
   if(tester)banner("Test account: you see every LS and activity.","#7c3aed");
@@ -278,6 +278,60 @@ function lockSections(ids,ca){
       if(!p.querySelector(":scope>.el-sec-note")){const n=document.createElement("div");n.className="el-sec-note";n.textContent=note;p.prepend(n)}
       p.querySelectorAll("input,textarea,select,button:not([data-vs])").forEach(e=>{if(!e.disabled){e.disabled=true;e.tabIndex=-1}})})};
   apply();new MutationObserver(apply).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["disabled"]});
+}
+// Open and close sections right on the page (Roger, 1 Nov 2026: "vull poder obrir i tancar les tabs, són les seccions dels camins"): in
+// teacher mode a bar above the tabs picks a group, and every section tab gets a 🔓/🔒 switch for that group. Same data and rule as the
+// dashboard's Sections column (teacher.html api.secLock): ls/{id}.secLocked[group][activity] = locked panel ids, and secOpened keeps every
+// section opened so far (elSecLockedFor, elSecPending in el-catalog.js). A learning path still locked for the group shows a warning with
+// an Open button (ls/{id}.open, locked, lockedKeys, as api.lpOpen). LS1 pages are left as they are (Roger: leave LS1 alone).
+// The learning path pages do not load el-sections.js (the section list the dashboard uses), so it is loaded here for the teacher only.
+async function teacherSections(info){
+  if(!window.EL_SECTIONS)await new Promise(r=>{const sc=document.createElement("script");sc.src=new URL("shared/js/el-sections.js",ROOT).href;sc.onload=sc.onerror=r;document.head.append(sc)});
+  const a=(window.EL_CATALOG||[]).find(x=>x.id===actId),secs=a&&(window.EL_SECTIONS||{})[a.id];
+  if(!secs||!secs.length||/-my-real-routine$/.test(lsId))return;
+  const ls=(window.EL_LS||[]).find(l=>l.id===lsId),course=lsId.split("-")[0];
+  let grs=(window.EL_GROUPS||[]).filter(g=>elLsForGroup(ls,info,g.id));if(!grs.length)grs=(window.EL_GROUPS||[]).filter(g=>g.course===course);if(!grs.length)return;
+  const k=a.id.replace("/","__"),ref=doc(db,"ls",lsId),all=secs.map(x=>x[0]),nm=id=>(secs.find(x=>x[0]===id)||[])[1]||id;
+  let g=localStorage.getItem("el_t_secgroup");if(!grs.some(x=>x.id===g))g=grs[0].id;
+  let msg="",busy=false;
+  const st=document.createElement("style");st.textContent=".el-tsec{margin:0 0 10px;padding:10px 14px;border:2px solid #a5b4fc;border-radius:12px;background:#eef2ff;font:14px system-ui,sans-serif;color:#1e1b4b}"
+    +".el-tsec .r{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.el-tsec b{margin-right:4px}.el-tsec button{border:1px solid #c7d2fe;background:#fff;color:#3730a3;border-radius:999px;padding:3px 12px;cursor:pointer;font:600 13px system-ui,sans-serif}"
+    +".el-tsec button.on{background:#4338ca;color:#fff;border-color:#4338ca}.el-tsec button.g{background:none;border-color:transparent;text-decoration:underline;font-weight:500}.el-tsec small{display:block;color:#475569;margin-top:6px}"
+    +".el-tsec .w{margin-top:8px;padding:6px 10px;border-radius:8px;background:#fef2f2;color:#991b1b;font-weight:600}.el-tsec .w button{margin-left:6px}.el-tsec .m{margin-left:6px;color:#15803d;font-weight:600}.el-tsec .m.err{color:#b91c1c}"
+    +".tab .el-tsw{display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;font-size:12px;line-height:18px;background:#dcfce7;border:1px solid #86efac;cursor:pointer;vertical-align:1px}"
+    +".tab .el-tsw.off{background:#fee2e2;border-color:#fca5a5}.tab .el-tsw:hover{outline:2px solid #6366f1}.tab.el-toff{border-style:dashed!important;opacity:.75}";
+  document.head.append(st);
+  const locked=()=>((info.secLocked||{})[g]||{})[k]||[],gname=id=>(grs.find(x=>x.id===id)||{}).name||id;
+  async function save(ids){if(busy)return;busy=true;
+    const op=[...new Set([...(((info.secOpened||{})[g]||{})[k]||[]),...all.filter(x=>!ids.includes(x))])];
+    try{await setDoc(ref,{secLocked:{[g]:{[k]:ids}},secOpened:{[g]:{[k]:op}}},{merge:true});
+      for(const [f,v] of [["secLocked",ids],["secOpened",op]]){info[f]=Object.assign({},info[f]);info[f][g]=Object.assign({},info[f][g],{[k]:v})}msg="✓ Saved";}
+    catch(e){console.warn("sections",e);msg="✗ Not saved: "+(e.code||e.message||e)}
+    busy=false;draw();setTimeout(()=>{if(msg==="✓ Saved"){msg="";draw()}},2500)}
+  async function openLp(){const ids=(window.EL_CATALOG||[]).filter(x=>x.ls===lsId&&(x===a||elLpOpen(x,info,g))).map(x=>x.id),L=elLpLocks(lsId,ids);
+    try{await setDoc(ref,{open:{[g]:ids},locked:{[g]:L.locked},lockedKeys:{[g]:L.lockedKeys}},{merge:true});info.open=Object.assign({},info.open,{[g]:ids});msg="✓ Saved"}
+    catch(e){console.warn("open",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
+  const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
+  function draw(){
+    const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
+    let bar=document.getElementById("el-tsec");
+    if(!bar||bar.nextElementSibling!==nav){if(bar)bar.remove();bar=document.createElement("div");bar.id="el-tsec";bar.className="el-tsec";nav.before(bar);
+      bar.onclick=e=>{const b=e.target.closest("button");if(!b)return;e.preventDefault();
+        if(b.dataset.g){g=b.dataset.g;origSet.call(localStorage,"el_t_secgroup",g);msg="";draw()}
+        else if(b.dataset.all)save(b.dataset.all==="1"?[]:all.slice());else if(b.dataset.lp)openLp()}}
+    const off=locked(),n=all.length-off.filter(x=>all.includes(x)).length;
+    const html='<div class="r"><b>🔓 Sections open for</b>'+grs.map(x=>'<button data-g="'+x.id+'" class="'+(x.id===g?"on":"")+'">'+x.name+'</button>').join("")
+      +'<span>· '+n+' of '+all.length+' open</span><button class="g" data-all="1">open all</button><button class="g" data-all="0">close all</button>'
+      +(msg?'<span class="m'+(msg[0]==="✗"?" err":"")+'">'+msg+'</span>':"")+'</div>'
+      +'<small>Click 🔓 or 🔒 on a tab to open or close that section for '+gname(g)+'. Students see a closed section read-only, with their saved answers; one you opened before stays doable for students who have not finished it. Teacher only: students never see this bar.</small>'
+      +(elLpOpen(a,info,g)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
+    if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html}
+    document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);
+      let sw=t.querySelector(".el-tsw");if(!sw){sw=document.createElement("span");sw.className="el-tsw";sw.setAttribute("role","button");
+        sw.onclick=e=>{e.stopPropagation();e.preventDefault();toggle(id)};t.append(sw)}
+      const tx=on?"🔓":"🔒",ti=(on?"Open":"Closed")+" for "+gname(g)+": click to "+(on?"close":"open")+" “"+nm(id)+"”";
+      if(sw.textContent!==tx)sw.textContent=tx;if(sw.title!==ti)sw.title=ti;sw.classList.toggle("off",!on);t.classList.toggle("el-toff",!on)})}
+  draw();new MutationObserver(()=>draw()).observe(document.body,{childList:true,subtree:true});
 }
 // A link to a section (activity.html#read, from the to-do list) opens that tab once the page is ready.
 function openHashTab(){const id=decodeURIComponent(location.hash.slice(1));if(!id)return;const t=[...document.querySelectorAll(".tab[data-panel]")].find(x=>x.dataset.panel===id);if(t)t.click()}
