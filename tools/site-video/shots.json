@@ -1498,14 +1498,70 @@
  ],
  "l35": [
   {
-   "img": "card:{\"lines\": [\"Write it yourself\"], \"big\": 52, \"items\": [\"No pasting\", \"No translator\", \"Your own words, at your level\"]}",
-   "img_ca": "card:{\"lines\": [\"Escriu-ho tu\"], \"big\": 52, \"items\": [\"Sense enganxar\", \"Sense traductor\", \"Amb les teves paraules, al teu nivell\"]}"
+   "img": "card:{\"lines\": [\"No cheating\"], \"big\": 52, \"items\": [\"No copying or pasting\", \"No translator, no AI\", \"Do your best, in your own words\"]}",
+   "img_ca": "card:{\"lines\": [\"Sense trampes\"], \"big\": 52, \"items\": [\"Ni copiar ni enganxar\", \"Ni traductor ni IA\", \"Dona el millor de tu, amb les teves paraules\"]}"
+  },
+  {
+   "img": "r5-47-possible-copy.png",
+   "on": "Your teacher checks",
+   "on_ca": "El professor comprova"
+  },
+  {
+   "img": "r5-47-possible-copy.png",
+   "on": "pasting a text",
+   "on_ca": "enganxes",
+   "view": [
+    150,
+    180,
+    1620,
+    300
+   ],
+   "hl": [
+    196,
+    268,
+    1150,
+    52
+   ]
+  },
+  {
+   "img": "r5-47-possible-copy.png",
+   "on": "translator",
+   "on_ca": "traductor",
+   "view": [
+    150,
+    180,
+    1620,
+    300
+   ],
+   "hl": [
+    196,
+    203,
+    1380,
+    50
+   ]
+  },
+  {
+   "img": "r5-47-possible-copy.png",
+   "on": "If a text isn't yours",
+   "on_ca": "Si un text no és teu",
+   "view": [
+    150,
+    520,
+    1620,
+    320
+   ],
+   "hl": [
+    572,
+    762,
+    254,
+    64
+   ]
   },
   {
    "img": "r5-46-redo.png",
    "img_ca": "r5-46-redo-ca.png",
-   "on": "do it again",
-   "on_ca": "tornar a fer",
+   "on": "do it again in class",
+   "on_ca": "tornar a fer a classe",
    "view": [
     100,
     200,
