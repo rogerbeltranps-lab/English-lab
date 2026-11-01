@@ -2291,9 +2291,9 @@ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;
 const STORE='english-lab-vocabulary-v1-'+DATA.course;
 const ROUTE_NAMES={insecure:'Insecure',safe:'Safe',daring:'Daring'};
 const ROUTE_INFO={
- insecure:{short:'Instruccions en català',detail:DATA.course===2?'Expressions quotidianes, opcions de resposta i frases dividides en blocs, sense pistes que revelin la solució.':'Phrasal verbs, opcions de resposta i frases en blocs, sense pistes que revelin la solució.'},
- safe:{short:'More independence, optional hints',detail:DATA.course===2?'English definitions, written answers and sentences with he/she, do/does and frequency adverbs.':'English-language context, natural collocations, guided writing, and cause-and-contrast connectors.'},
- daring:{short:'Inference and less support',detail:DATA.course===2?'Infer expressions, correct verb forms and compare routines. Some sentence puzzles include extra words.':'Infer meaning and nuance, practise pronoun placement and connectors, and write without a word bank.'}
+ insecure:{short:'A2',detail:DATA.course===2?'Expressions quotidianes, opcions de resposta i frases dividides en blocs, sense pistes que revelin la solució.':'Phrasal verbs, opcions de resposta i frases en blocs, sense pistes que revelin la solució.'},
+ safe:{short:'B1',detail:DATA.course===2?'English definitions, written answers and sentences with he/she, do/does and frequency adverbs.':'English-language context, natural collocations, guided writing, and cause-and-contrast connectors.'},
+ daring:{short:'B1+',detail:DATA.course===2?'Infer expressions, correct verb forms and compare routines. Some sentence puzzles include extra words.':'Infer meaning and nuance, practise pronoun placement and connectors, and write without a word bank.'}
 };
 const GAMES={
  rosco:{name:'Alphabet Challenge',icon:'rosco',tag:'A curriculum-based word wheel',desc:'A wheel of studied expressions. Read the clue, find the answer or pass and return.',badges:['Write the answer · Catalan instructions','English clues + typed answers','Infer the expression from context']},
