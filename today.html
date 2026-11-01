@@ -239,7 +239,7 @@ const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")}
 // Exam tab (Roger, 1 Nov 2026). The exam record is results/{ls}__assessment: sections[k] = {score, max} written by the teacher (exam mark =
 // sum of scores / sum of maxes × 10), .version = the exam version, and .report, the content of the paper reports of LS1 (tools/exam-report):
 //   report = {model, questions:[{q, part, pts, got, text, mine, right, why, lp:{t, href}}]   (the questions to review: wrong or part marks),
-//             writing:{original, corrected, rubric:[[name, score, max]], feedback, errors:[{type, orig, fix, why}], note},
+//             writing:{original, corrected, rubric:[{name, score, max}] (old form [name, score, max] still read), feedback, errors:[{type, orig, fix, why}], note},
 //             review:[{text, lp:{t, href}}]}
 // The report's texts are written in the student's language (Catalan for Starter and Base, English for the others), as on the paper.
 const pts1=n=>f1(+(+n).toFixed(2)),bar=p=>`<span class="xbar"><span style="width:${Math.max(0,Math.min(100,p))}%;background:${col(p)}"></span></span>`;
@@ -257,9 +257,10 @@ function examQuestions(r){const qs=(r.questions||[]);if(!qs.length)return "";
     +qs.map(q=>`<tr><td class="l"><small class="muted">Q${String(q.q).padStart(2,"0")} · ${esc(q.part||"")} · ${q.got!=null?pts1(q.got)+"/":""}${q.pts} ${t("punts","points")}</small><br>${esc(q.text||"")}</td><td class="l bad">${q.mine?`<s>${esc(q.mine)}</s>`:`<i>${t("en blanc","blank")}</i>`}</td><td class="l good">${esc(q.right||"")}</td><td class="l">${esc(q.why||"")}${q.lp?`<div class="rv">${lpLink(q.lp)}</div>`:""}</td></tr>`).join("")
     +`</tbody></table></div></div>`}
 function examWriting(r){const w=r.writing;if(!w)return "";
-  const tot=(w.rubric||[]).reduce((a,x)=>[a[0]+(+x[1]||0),a[1]+(+x[2]||0)],[0,0]);
+  const rub=(w.rubric||[]).map(x=>Array.isArray(x)?x:[x.name,x.score,x.max]);   // Firestore stores rows as {name, score, max}
+  const tot=rub.reduce((a,x)=>[a[0]+(+x[1]||0),a[1]+(+x[2]||0)],[0,0]);
   return `<div class="box"><h2>4 · ${t("El teu writing","Your writing")}</h2>`
-    +((w.rubric||[]).length?`<h3>${t("Rúbrica","Rubric")}</h3><div class="wrap"><table class="xt"><thead><tr><th>${t("Criteri de la rúbrica","Rubric row")}</th><th>${t("Nota","Score")}</th><th></th></tr></thead><tbody>${w.rubric.map(([n,v,m])=>`<tr><td class="l">${esc(n)}</td><td><b>${pts1(v)}</b> / ${m}</td><td class="l">${bar(v/m*100)}</td></tr>`).join("")}<tr><td class="l"><b>${t("Total","Total")}</b></td><td><b>${pts1(tot[0])}</b> / ${tot[1]}</td><td></td></tr></tbody></table></div>`:"")
+    +(rub.length?`<h3>${t("Rúbrica","Rubric")}</h3><div class="wrap"><table class="xt"><thead><tr><th>${t("Criteri de la rúbrica","Rubric row")}</th><th>${t("Nota","Score")}</th><th></th></tr></thead><tbody>${rub.map(([n,v,m])=>`<tr><td class="l">${esc(n)}</td><td><b>${pts1(v)}</b> / ${m}</td><td class="l">${bar(v/m*100)}</td></tr>`).join("")}<tr><td class="l"><b>${t("Total","Total")}</b></td><td><b>${pts1(tot[0])}</b> / ${tot[1]}</td><td></td></tr></tbody></table></div>`:"")
     +(w.note?`<div class="wnote">ℹ️ ${esc(w.note)}</div>`:"")
     +(w.feedback?`<h3>💬 ${t("Comentari del professor","Your teacher's comment")}</h3><div class="fb">${esc(w.feedback)}</div>`:"")
     +((w.errors||[]).length?`<h3>✏️ ${t("Errades: correcció i explicació","Mistakes: correction and why")}</h3><div class="wrap"><table class="xt corr"><thead><tr><th>${t("Errada","Mistake")}</th><th>${t("Correcció","Correction")}</th><th>${t("Per què","Why")}</th></tr></thead><tbody>`

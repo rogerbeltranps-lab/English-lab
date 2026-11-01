@@ -38,7 +38,11 @@ const dec=v=>!v?undefined:"nullValue" in v?null:v.arrayValue?(v.arrayValue.value
 const canon=x=>JSON.stringify(x,(k,v)=>v&&typeof v==="object"&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
 
 let changed=0,same=0,skipped=0;
-for(const [mail,rep] of Object.entries(reports)){const email=mail.toLowerCase();
+// Firestore allows no array directly inside an array, so rubric rows [name, score, max] are stored as {name, score, max} (today.html reads both).
+const fsSafe=r=>{if(r.writing&&Array.isArray(r.writing.rubric))r.writing.rubric=r.writing.rubric.map(x=>Array.isArray(x)?{name:x[0],score:x[1],max:x[2]}:x);
+  const nested=(x,inArr)=>Array.isArray(x)?(inArr||x.some(y=>nested(y,true))):x&&typeof x==="object"?Object.values(x).some(y=>nested(y,false)):false;
+  if(nested(r,false))throw new Error("The report has an array inside an array, which Firestore cannot store");return r};
+for(const [mail,raw] of Object.entries(reports)){const email=mail.toLowerCase(),rep=fsSafe(raw);
   const ro=await api("GET",DOCS+"roster/"+encodeURIComponent(email),null,true);
   if(!ro){console.log("✗ "+email+": not on the student list, skipped");skipped++;continue}
   const u=(await api("POST",IT+"/accounts:lookup",{email:[email]})).users?.[0];
