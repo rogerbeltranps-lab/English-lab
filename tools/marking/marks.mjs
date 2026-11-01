@@ -134,6 +134,8 @@ async function comments(){const out=[],names=Object.fromEntries((W.EL_LEVELS||[]
           aid:a.id,title:a.title,step,stepName:name,content:content(a),fields:h.f,comment:W.ELMark.q(h)})}}}}
   return out}
 
+// sessions the teacher moved to another day on the dashboard (ls/{id}.planEdits): due days and session lines follow, as on the dashboard
+for(const ls of Object.keys(W.EL_PLAN||{})){const d=doc(await api("GET",DOCS+"ls/"+encodeURIComponent(ls)).catch(()=>null))||{};if(d.planEdits)W.ELWeek.applyEdits(ls,d.planEdits)}
 const [cmd,...rest]=process.argv.slice(2),flags=new Set(rest.filter(x=>x.startsWith("--"))),args=rest.filter(x=>!x.startsWith("--"));
 const grpOf=id=>{const g=W.EL_GROUPS.find(x=>x.id===id);if(!g)throw new Error("No group "+id);return g};
 const momentOf=(aid,step)=>{const a=W.EL_CATALOG.find(x=>x.id===aid),m=a&&moments(a.ls).find(x=>x.a===aid&&x.step===step);if(!m)throw new Error("No marking step "+aid+" · "+step);return m};

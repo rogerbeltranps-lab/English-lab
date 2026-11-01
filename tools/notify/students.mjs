@@ -31,7 +31,7 @@ const studs=(await db.list("students")).map(([uid,s])=>{const em=String(s.email|
   .filter(s=>s.email.endsWith(DOMAIN)&&!TESTERS.includes(s.email)&&W.EL_GROUPS.some(g=>g.id===s.group));
 const lsInfo={},plans={};
 for(const g of W.EL_GROUPS)plans[g.id]=WK.now(g.id);
-await Promise.all([...new Set(Object.values(plans).filter(Boolean).map(x=>x.ls))].map(async ls=>{lsInfo[ls]=await db.get("ls/"+encodeURIComponent(ls))||{}}));
+await Promise.all([...new Set(Object.values(plans).filter(Boolean).map(x=>x.ls))].map(async ls=>{lsInfo[ls]=await db.get("ls/"+encodeURIComponent(ls))||{};if(lsInfo[ls].planEdits)WK.applyEdits(ls,lsInfo[ls].planEdits)}));   // sessions moved on the dashboard
 const pReplies=await db.since("problemReplies",weekAgo);
 const act=id=>W.EL_CATALOG.find(a=>a.id===id)||null;
 const stepName=(a,k)=>((a&&a.steps)||[]).find(([s])=>s===k)?.[1]||k;

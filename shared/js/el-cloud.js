@@ -46,7 +46,12 @@ const progressRef=()=>doc(db,"students",user.uid,"progress",lsId);
 
 // "public" (free access, nothing saved) was removed when students got their own password (Roger, 26 Oct 2026): an LS still stored as public is open.
 const lsSt=s=>s==="public"?"open":s||"hidden";
-async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));return s.exists()?{status:lsSt(s.data().status),enabled:s.data().enabled||[],groups:s.data().groups||null,open:s.data().open||{},secLocked:s.data().secLocked||{},secOpened:s.data().secOpened||{}}:{status:"hidden",enabled:[],groups:null,open:{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
+// homework (set from the dashboard) and planEdits (sessions moved to another day, tabs per session) came later: they were not copied
+// here, so the dashboard and the student board lost the homework set from the dashboard after a reload. planEdits is applied to the
+// time plan (ELWeek.applyEdits) as soon as it is read.
+async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
+  if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
+  return {status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
 // Any key the pull changes marks the page stale, not only this activity's: the final product reads every product piece and Reflect

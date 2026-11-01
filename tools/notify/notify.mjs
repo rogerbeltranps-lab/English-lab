@@ -60,10 +60,10 @@ if(INSTANT){
 const ticks={},hw={};
 await Promise.all(W.EL_GROUPS.map(async g=>{ticks[g.id]=(await db.get("teacherPlan/"+g.id)||{}).ticks||{}}));
 const plans=W.EL_GROUPS.map(g=>{const n=WK.now(g.id);return n?Object.assign({gid:g.id,name:g.name},n):null}).filter(Boolean);
-await Promise.all([...new Set(plans.map(x=>x.ls))].map(async ls=>{hw[ls]=(await db.get("ls/"+encodeURIComponent(ls))||{}).homework||{}}));
+await Promise.all([...new Set(plans.map(x=>x.ls))].map(async ls=>{const d=await db.get("ls/"+encodeURIComponent(ls))||{};hw[ls]=d.homework||{};if(d.planEdits)WK.applyEdits(ls,d.planEdits)}));   // sessions moved on the dashboard
 const lines=(x,r)=>String(r.g?r.g[x.gi]||"":r.what||"").split("\n").filter(Boolean);
 const lineDate=(r,l)=>{const m=/^\w{3} (\d{1,2})\b/.exec(l);if(!m||!r.from)return null;for(let j=0;j<7;j++){const d=WK.add(r.from,j);if(+d.slice(8)===+m[1])return d}return null};
-const ticked=(x,l)=>!!ticks[x.gid][x.ls+"|"+l];
+const ticked=(x,l)=>{const o=((x.p._moved||{})[x.gi]||{})[l];return !!(ticks[x.gid][x.ls+"|"+l]||o&&ticks[x.gid][x.ls+"|"+o.orig])};   // a moved session keeps a tick given before the move
 const hwLine=(x,l)=>Object.values((hw[x.ls]||{})[x.gid]||{}).some(h=>h&&h.line===l);
 const pending=x=>x.p.rows.flatMap((r,i)=>lines(x,r).filter(l=>{const d=lineDate(r,l);return d&&d<TODAY&&!ticked(x,l)}).map(line=>({i,line})))
   .filter(y=>!/^Homework by /.test(y.line)&&!/\bmoved to\b|· self-study\b/.test(y.line)&&!hwLine(x,y.line));

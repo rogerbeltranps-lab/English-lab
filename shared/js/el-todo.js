@@ -27,6 +27,7 @@ export async function start({db,user,group,root,lsId,seesAll}){
   const get=async path=>{const s=await getDoc(doc(db,...path)).catch(()=>null);return s&&s.exists()?s.data():null};
   const lvs={};try{(await getDocs(collection(db,"students",user.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){}
   const [info,pg]=await Promise.all([get(["ls",ls]),get(["students",user.uid,"progress",ls])]),lv=window.elRouteOf?elRouteOf(lvs,ls):lvs[ls];   // carried over from an earlier LS
+  if(info&&info.planEdits&&W.applyEdits){W.applyEdits(ls,info.planEdits);i=W.row(p);if(i<0)i=p.rows.findIndex(r=>r.from>today);if(i<0)return}   // sessions the teacher moved to another day
   const st=(info&&info.status)==="public"?"open":(info&&info.status)||"hidden";
   if(!seesAll&&st!=="open")return;
   const rs={};try{(await getDocs(collection(db,"students",user.uid,"results"))).forEach(d=>rs[d.data().activity||d.id.replace("__","/")]=d.data())}catch(e){}
