@@ -10,7 +10,7 @@
 #   python3 -I tools/exam-report/build-ls1-reports.py 2eso <2ESO_INFORMES_Writing_revisat_53_alumnes.xlsx> <out.json> [why-en.json]
 # why-en.json: English for the Catalan "Per què?" lines of the mistakes table ({catalan: english}); missing ones are listed in
 # <out>.todo.json. The workbook and the JSON hold personal data: keep them outside the repo.
-import json, re, sys, difflib
+import json, os, re, sys, difflib
 import openpyxl
 
 mode, src, out = sys.argv[1], sys.argv[2], sys.argv[3]
@@ -29,10 +29,10 @@ LESSONS = {"LP2": ("LP2 · A day in real life", "a-day-in-real-life.html"), "LP3
            "LP4": ("LP4 · Present Simple & Phrasal verbs", "grammar-phrasal-verbs.html"), "LP5": ("LP5 · Healthy habits", "healthy-habits.html")}
 lp = lambda k: {"t": LESSONS[k][0], "href": BASE + LESSONS[k][1]}
 FORM_TABS = {"A": "Respuestas de formulario 1", "B": "Respuestas de formulario 2", "C": "Respuestas de formulario 3", "D": "Respuestas de formulario 4"}
-OPTION_FALLBACK = {'D|Insecure|11': 'A. turns in at ten.', 'C|Daring|15': 'C. take', 'A|Daring|27': 'B. As a result', 'B|Safe|2': 'A. At 5:00.',
-    'B|Safe|5': 'C. Helps with the shopping.', 'B|Safe|14': 'B. does the housework.', 'B|Safe|28': 'C. with', 'C|Insecure|4': 'C. At 10:15.',
-    'C|Insecure|14': 'A. come home.', 'C|Insecure|17': 'D. usually.', 'C|Insecure|26': 'A. Do', 'C|Insecure|28': 'D. We never watch TV during dinner.',
-    'C|Insecure|29': 'B. but', 'D|Safe|29': 'D. She is often tired, but she usually turns in early.'}
+# Right answers no student wrote out in full (Roger's checked answer key, as in his Apps Script). Kept out of the repo with the exam:
+# an optional option-fallback.json next to the workbook, {"model|route|question": "B. answer"}.
+_fb = os.path.join(os.path.dirname(os.path.abspath(src)), "option-fallback.json")
+OPTION_FALLBACK = json.load(open(_fb, encoding="utf-8")) if os.path.exists(_fb) else {}
 ROUTES = ["Insecure", "Safe", "Daring"]
 
 def lesson(q, text):
