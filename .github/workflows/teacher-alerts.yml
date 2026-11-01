@@ -1,0 +1,59 @@
+# Teacher alerts (Roger, 1 Nov 2026): an email and/or a phone push when a student sends a ⚠️ Problem report or a 💡 Idea.
+# Every 15 minutes from about 7:00 to 23:00 Madrid time (GitHub may start a run a few minutes late); a report sent at night arrives
+# with the first run of the morning. Run it by hand from the Actions tab ("Run workflow", tick "test") to get a test message.
+# Secrets (repo Settings > Secrets and variables > Actions): GMAIL_APP_PASSWORD (email) and/or NTFY_TOPIC (phone push);
+# optional GMAIL_USER and ALERT_EMAIL_TO. With neither, the run does nothing. The log shows counts only (it is public).
+name: Teacher alerts
+
+on:
+  schedule:
+    - cron: "*/15 6-21 * * *"
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "Send a test message now"
+        type: boolean
+        default: true
+
+concurrency:
+  group: teacher-alerts
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  alert:
+    if: github.repository == 'rogerbeltranps-lab/English-lab'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      NOTIFY_STATE: .notify-state.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/notify
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # the time of the last check, kept between runs (the newest cache whose name starts with teacher-alerts-)
+      - uses: actions/cache/restore@v4
+        with:
+          path: .notify-state.json
+          key: teacher-alerts-${{ github.run_id }}
+          restore-keys: teacher-alerts-
+      - name: Check and send
+        run: node tools/notify/notify.mjs ${{ (github.event_name == 'workflow_dispatch' && inputs.test) && '--test' || '' }}
+      - name: Is there a new last check to keep?
+        id: state
+        run: '[ -f "$NOTIFY_STATE" ] && echo "keep=yes" >> "$GITHUB_OUTPUT" || true'
+      - if: steps.state.outputs.keep == 'yes' && !(github.event_name == 'workflow_dispatch' && inputs.test)
+        uses: actions/cache/save@v4
+        with:
+          path: .notify-state.json
+          key: teacher-alerts-${{ github.run_id }}-${{ github.run_attempt }}
