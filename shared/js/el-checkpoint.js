@@ -6,6 +6,8 @@
    - the question can't be selected or copied and nothing can be pasted into the answer;
    - leaving the page (another tab, window or app) for more than 2 seconds sends the checkpoint at once with the answers so far
      (Roger, 31 Oct 2026: “if they leave the tab or open another app on their Chromebook, send the test automatically”);
+   - full screen while it runs (Roger, 1 Nov 2026: other tabs were still in sight): Start puts the page in full screen; leaving it (Esc)
+     shows "Back to full screen" and sends the checkpoint after 5 s (a tab or app switch keeps its 2 s);
    - the answers go once to students/{uid}/checkpoints/{page key} (firestore.rules: create only; again only when the teacher lets them);
    - the mark and the corrections only appear when the teacher releases them on the dashboard (doc.fb); the next Learning Path opens at once.
    The dashboard marks with the key (teacher.html cpInject), so the grade, the question analysis and the student's board work as before. */
@@ -20,6 +22,12 @@ window.ELCheckpoint = (function () {
   function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   const ref = (F, key) => F.doc(window.ELCloud.db, 'students', window.ELCloud.user.uid, 'checkpoints', key);
   function stop() { clearInterval(timer); timer = null; off.forEach(f => f()); off = []; }
+  // full screen while a checkpoint runs (not on iPhones, which can't put a page in full screen)
+  const FS_GRACE = 5000, D = document, E = D.documentElement;
+  const fsOk = () => !!(D.fullscreenEnabled || D.webkitFullscreenEnabled);
+  const isFull = () => !!(D.fullscreenElement || D.webkitFullscreenElement);
+  const goFull = () => { try { if (!fsOk() || isFull()) return; const r = (E.requestFullscreen || E.webkitRequestFullscreen).call(E); if (r && r.catch) r.catch(() => {}); } catch (e) {} };
+  const exitFull = () => { try { if (isFull()) (D.exitFullscreen || D.webkitExitFullscreen).call(D); } catch (e) {} };
   const on = (el, ev, f, o) => { el.addEventListener(ev, f, o); off.push(() => el.removeEventListener(ev, f, o)); };
 
   /* api (from ls2-engine.js): LP, level(), ca(), state, save(), complete(id), forLevel(items) */
@@ -30,7 +38,7 @@ window.ELCheckpoint = (function () {
     const html = '<div class="section-card cp-box" id="' + p.id + 'Cp"><p class="tiny">' + t('Carregant…', 'Loading…') + '</p></div>' +
       '<style>.cp-box .cp-q{font-size:1.15rem;font-weight:700;margin:10px 0 12px;-webkit-user-select:none;user-select:none}.cp-box .cp-bar{height:8px;border-radius:9px;background:#e8eef7;overflow:hidden;margin:6px 0 4px}' +
       '.cp-box .cp-bar i{display:block;height:100%;background:var(--accent,#315f9f);transition:width .25s linear}.cp-box .cp-bar i.low{background:#d9534f}.cp-box .cp-rules{margin:8px 0 14px;padding-left:20px;line-height:1.6}' +
-      '.cp-box .cp-fb{border-top:1px solid var(--line,#dbe5f1);padding:10px 0}.cp-box .cp-fb .ok{color:#16a34a}.cp-box .cp-fb .no{color:#b42318}.cp-box .cp-warn{background:#fff4e5;border:1px solid #f5b971;border-radius:13px;padding:10px 14px;margin:6px 0 12px}.cp-box .cp-warn h3{margin:0;color:#8a4b00}.cp-box .cp-ok{display:flex;gap:8px;align-items:center;font-weight:700;margin:6px 0}.cp-veil{position:fixed;inset:0;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;z-index:999;text-align:center;padding:20px}</style>';
+      '.cp-box .cp-fb{border-top:1px solid var(--line,#dbe5f1);padding:10px 0}.cp-box .cp-fb .ok{color:#16a34a}.cp-box .cp-fb .no{color:#b42318}.cp-box .cp-warn{background:#fff4e5;border:1px solid #f5b971;border-radius:13px;padding:10px 14px;margin:6px 0 12px}.cp-box .cp-warn h3{margin:0;color:#8a4b00}.cp-box .cp-ok{display:flex;gap:8px;align-items:center;font-weight:700;margin:6px 0}.cp-veil{position:fixed;inset:0;background:#0f172a;color:#fff;display:flex;flex-direction:column;gap:18px;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;z-index:999;text-align:center;padding:20px}</style>';
 
     function box() { return document.getElementById(p.id + 'Cp'); }
     function draw() {   // the route's questions: all of them, or a draw of secure.n[route] from the bank, in a new order
@@ -50,6 +58,7 @@ window.ELCheckpoint = (function () {
         '<li>' + t('Només el pots fer <strong>una vegada</strong>.', 'You can only do it <strong>once</strong>.') + '</li></ul>' +
         '<div class="cp-warn"><h3>⚠️ ' + t('Important', 'Important') + '</h3><ul class="cp-rules">' +
         '<li><strong>' + t('No surtis d’aquesta pàgina.', 'Don’t leave this page.') + '</strong> ' + t('Si canvies de pestanya, de finestra o d’aplicació més de 2 segons, el checkpoint <strong>s’envia automàticament</strong> amb les respostes que tinguis, i ja no el pots continuar.', 'If you change to another tab, window or app for more than 2 seconds, your checkpoint <strong>is sent automatically</strong> with the answers you have, and you can’t go on with it.') + '</li>' +
+        (fsOk() ? '<li><strong>' + t('Es fa a pantalla completa.', 'It runs in full screen.') + '</strong> ' + t('Quan comencis, la pàgina ocuparà tota la pantalla i no veuràs les altres pestanyes. Si en surts (Esc) i no hi tornes en 5 segons amb el botó, el checkpoint <strong>s’envia automàticament</strong>.', 'When you start, the page fills the whole screen and you can’t see your other tabs. If you leave full screen (Esc) and don’t go back within 5 seconds with the button, your checkpoint <strong>is sent automatically</strong>.') + '</li>' : '') +
         '<li><strong>' + t('No es pot copiar ni enganxar.', 'No copying or pasting.') + '</strong> ' + t('Les preguntes no es poden copiar i a les caselles no s’hi pot enganxar res: escriu tu les respostes.', 'The questions can’t be copied and nothing can be pasted into the boxes: type your own answers.') + '</li>' +
         '<li><strong>' + t('Sense apunts ni ajuda', 'No notes or help') + '</strong>' + t(': ni traductor, ni IA, ni companys.', ': no translator, no AI, no classmates.') + '</li></ul></div>' +
         '<p>' + t('Quan l’enviïs, s’obrirà el següent Learning Path. Veuràs la correcció quan el professor la publiqui.', 'When you send it, the next Learning Path opens. You will see the corrections when your teacher shares them.') + '</p>' +
@@ -64,7 +73,7 @@ window.ELCheckpoint = (function () {
       document.getElementById(p.id + 'Start').onclick = () => {
         const c = st(); Object.keys(c).forEach(k => delete c[k]);
         Object.assign(c, { level: api.level(), ids: draw(), answers: [], times: [], leaves: [], i: 0, started: new Date().toISOString(), qAt: Date.now() });
-        api.save(); run();
+        api.save(); goFull(); run();
       };
     }
 
@@ -92,11 +101,21 @@ window.ELCheckpoint = (function () {
       }
       // leaving the page: hidden at once; back within 2 s only counts as a glance (shown to the teacher), otherwise it is sent
       let away = 0, veil = null, wait = null;
-      const leave = () => { if (away) return; away = Date.now(); c.away = away; api.save();
+      const sendNow = () => { c.answers[c.i] = String(inp.value || '').trim().slice(0, 80); c.times[c.i] = Math.round((Date.now() - c.qAt) / 1000); send('left'); };
+      let fullAway = false;
+      const leave = full => { if (away) { if (!full && fullAway) { fullAway = false; clearTimeout(wait); wait = setTimeout(sendNow, GRACE); } return; }   // out of full screen and then another tab: 2 s
+        away = Date.now(); fullAway = !!full; c.away = away; api.save();
         veil = document.createElement('div'); veil.className = 'cp-veil'; veil.textContent = t('Torna a la pàgina del checkpoint!', 'Come back to the checkpoint page!'); document.body.appendChild(veil);
-        wait = setTimeout(() => { c.answers[c.i] = String(inp.value || '').trim().slice(0, 80); c.times[c.i] = Math.round((Date.now() - c.qAt) / 1000); send('left'); }, GRACE); };
-      const back = () => { if (!away || c.sentAt) return; clearTimeout(wait); c.leaves.push({ at: new Date(away).toISOString(), ms: Date.now() - away }); delete c.away; away = 0; api.save(); if (veil) veil.remove(); veil = null; inp.focus(); };
-      on(window, 'blur', leave); on(document, 'visibilitychange', () => document.hidden ? leave() : back()); on(window, 'focus', back);
+        if (full) { veil.textContent = t('Torna a la pantalla completa en 5 segons o el checkpoint s’enviarà.', 'Go back to full screen within 5 seconds or your checkpoint will be sent.');
+          const bt = document.createElement('button'); bt.className = 'btn'; bt.type = 'button'; bt.textContent = t('⛶ Torna a la pantalla completa', '⛶ Back to full screen'); bt.onclick = () => goFull(); veil.appendChild(bt); }
+        wait = setTimeout(sendNow, full ? FS_GRACE : GRACE); };
+      const back = () => { if (!away || c.sentAt) return; clearTimeout(wait); fullAway = false; c.leaves.push({ at: new Date(away).toISOString(), ms: Date.now() - away }); delete c.away; away = 0; api.save(); if (veil) veil.remove(); veil = null; inp.focus(); };
+      on(window, 'blur', () => leave()); on(document, 'visibilitychange', () => document.hidden ? leave() : isFull() || !fsOk() ? back() : null); on(window, 'focus', () => isFull() || !fsOk() || !wasFull ? back() : null);
+      // full screen (Roger, 1 Nov 2026: "you can't browse the website but can go to other tabs"): the tabs are out of sight; leaving full screen
+      // counts as leaving the page, with 5 s to press "Back to full screen" (an Esc by mistake), shown to the teacher like a glance
+      let wasFull = isFull();
+      on(document, 'fullscreenchange', () => { if (isFull()) { wasFull = true; back(); } else if (wasFull) leave(true); });
+      on(document, 'webkitfullscreenchange', () => { if (isFull()) { wasFull = true; back(); } else if (wasFull) leave(true); });
       on(window, 'pagehide', () => { c.away = c.away || Date.now(); api.save(); });
       off.push(() => { clearTimeout(wait); if (veil) veil.remove(); });
     }
@@ -104,7 +123,7 @@ window.ELCheckpoint = (function () {
     // the answers go once to the cloud; the step is done (the next Learning Path opens) as soon as they are sent
     let busy = false;
     async function send(auto) {
-      stop(); const c = st(); if (c.sentAt && c.ok) return sent(); if (busy) return; busy = true;
+      stop(); exitFull(); const c = st(); if (c.sentAt && c.ok) return sent(); if (busy) return; busy = true;
       c.auto = c.auto || auto; c.sentAt = c.sentAt || new Date().toISOString(); delete c.away; delete c.draft; api.save();
       while (c.answers.length < c.ids.length) { c.answers.push(''); c.times.push(0); }
       box().innerHTML = '<p>' + t('Enviant…', 'Sending…') + '</p>';
