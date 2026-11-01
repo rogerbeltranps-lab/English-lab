@@ -2,7 +2,8 @@
 #   • every 15 minutes from about 7:00 to 23:00 Madrid time: an email to the teacher when students sent new ⚠️ Problem reports or 💡 Ideas
 #     (none: no email); at night they wait for the first check of the morning. (tools/notify/notify.mjs --instant)
 #   • Saturday about 8:00 (after the Friday 19:37 marking audit): one email to the teacher with the class sessions not ticked (they move to
-#     next week) and the week's open reports and ideas. (tools/notify/notify.mjs)
+#     next week), the week's open reports and ideas, and the open site-check issues (website problems found by the Saturday 5:45 check).
+#     (tools/notify/notify.mjs)
 #   • Sunday about 18:00: each student's summary of the coming week (homework, classes on their own) and what the teacher answered or
 #     corrected, from the teacher's school account. (tools/notify/students.mjs)
 # GitHub may start a run a few minutes late. Secret (repo Settings > Secrets and variables > Actions): SCHOOL_MAIL_URL, the web app link of
@@ -36,6 +37,7 @@ concurrency:
 
 permissions:
   contents: read
+  issues: read
 
 jobs:
   email:
@@ -53,6 +55,7 @@ jobs:
       ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
       NOTIFY_STATE: .notify-state.json
       SEND: ${{ inputs.send }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SCHEDULE: ${{ github.event.schedule }}
     steps:
       - uses: actions/checkout@v4
