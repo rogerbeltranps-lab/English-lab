@@ -104,7 +104,7 @@ const canDo=(a,info)=>info.status==="closed"||all()||elLpOpen(a,info,D.me.group)
 function cell(a){
   const x=D.rs[a.id],d=doneSet(a);let v,c="";
   if(a.manual)v=x&&x.max?x.score+"/"+x.max:"–";
-  else if(a.graded)v=x?(x.score||0)+"/"+a.points:"–";
+  else if(a.graded){const y=elScore(a,x,D.pg[a.ls]);v=y?y.score+"/"+y.max:"–"}
   else{const n=steps(a).filter(k=>d.has(k)).length;v=steps(a).length?n+"/"+steps(a).length:"–";c="na"}
   if(x&&x.locked){v+=" ✔";c="sub"}else if(x&&x.markedDone){v+=" 🟡";c="mark"}
   if(x&&x.feedback)v+=" 💬";
@@ -371,11 +371,11 @@ function lpGrid(a,info){
     +`<tbody><tr>${steps(a).map(k=>`<td class="ac ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("")}<td class="sc ${c.c} first" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr></tbody></table></div>`
     +(steps(a).length?`<small class="muted">${t(`${n} de ${steps(a).length} activitats fetes`,`${n} of ${steps(a).length} activities done`)}</small>`:"")+legend(gridCrits(a))+`</div>`;
 }
-function total(list){let ts=0,tm=0;list.forEach(a=>{const x=D.rs[a.id];if(a.graded&&x&&x.max){ts+=x.score||0;tm+=x.max}});if(!tm)return "";const p=ts/tm*100;
+function total(list){let ts=0,tm=0;list.forEach(a=>{const x=D.rs[a.id],y=a.graded&&x&&x.max&&elScore(a,x,D.pg[a.ls]);if(y){ts+=y.score;tm+=y.max}});if(!tm)return "";const p=ts/tm*100;
   return `<div class="box"><div class="lphead"><h2>${t("Total de la LS","LS total")}</h2><b style="color:${col(p)};font-size:1.2rem">${ts} / ${tm} (${Math.round(p)}%)</b></div><small class="muted">${t("Amb les activitats avaluables que has fet. Verd al 50% · blau al 75% · lila al 90%.","With the graded activities you have done. Green at 50% · blue at 75% · purple at 90%.")}</small></div>`}
 // Summary of my criteria: points, a mark out of 10 per criterion and the average of those marks.
 function summary(list){
-  const rows=[...new Set(list.flatMap(a=>a.criteria))].sort().map(c=>{let s=0,m=0;list.forEach(a=>{const x=D.rs[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){s+=x.score||0;m+=x.max}});return {c,s,m,mark:m?s/m*10:null}});
+  const rows=[...new Set(list.flatMap(a=>a.criteria))].sort().map(c=>{let s=0,m=0;list.forEach(a=>{const x=D.rs[a.id],y=a.graded&&a.criteria.includes(c)&&x&&x.max&&elScore(a,x,D.pg[a.ls]);if(y){s+=y.score;m+=y.max}});return {c,s,m,mark:m?s/m*10:null}});
   const marked=rows.filter(r=>r.mark!=null),avg=marked.length?marked.reduce((s,r)=>s+r.mark,0)/marked.length:null,f=n=>EN?n.toFixed(1):n.toFixed(1).replace(".",",");
   return `<div class="box"><div class="lphead"><h2>${t("La meva nota mitjana","My average mark")}</h2><b style="font-size:1.6rem;color:${avg==null?"#94a3b8":col(avg*10)}">${avg==null?"–":f(avg)+" / 10"}</b></div><p class="muted">${t(`Mitjana de les notes de cada criteri que ja té activitats avaluades (${marked.length} de ${rows.length}). És orientativa: la nota final la posa el professor.`,`Average of the marks of each criterion that already has graded activities (${marked.length} of ${rows.length}). It is only a guide: your teacher gives the final mark.`)}</p></div>`
     +`<div class="box"><h2>${t("Els meus criteris","My criteria")}</h2><div class="wrap"><table class="legend sum"><thead><tr><th>${t("Criteri","Criterion")}</th><th style="text-align:left">${t("Què vol dir","What it means")}</th><th>${t("Punts","Points")}</th><th>${t("Nota","Mark")}</th></tr></thead><tbody>`
@@ -397,7 +397,7 @@ function detail(id){
   const state=x.locked?t("✔ Entregada","✔ Submitted"):x.markedDone?t("🟡 Marcada com a feta, sense entregar","🟡 Marked as done, not submitted"):a.graded?t("Encara no l'has entregada","You have not submitted it yet"):t("No avalua (per practicar)","Not assessed (for practice)");
   let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
   const rp=x.replies||{},ans=k=>[((x.answers||{})[k]||{}).t,rp[k]].filter(Boolean).join("\n\n");   // the answer to the comment (Claude) and the feedback on the work
-  $("#dlgc").innerHTML=`<h3>${a.title}</h3><p class="muted">${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${x.score||0}/${a.points}`:""}${a.manual&&x.max?` · ${t("nota","mark")} ${x.score}/${x.max}`:""}</p>`
+  $("#dlgc").innerHTML=`<h3>${a.title}</h3><p class="muted">${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(elScore(a,x,D.pg[a.ls])||{score:0}).score}/${a.points}`:""}${a.manual&&x.max?` · ${t("nota","mark")} ${x.score}/${x.max}`:""}</p>`
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">${t("Activitat","Activity")}</th><th>${t("Criteri","Criterion")}</th><th>${t("Feta","Done")}</th></tr></thead><tbody>${steps(a).map(k=>`<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td></tr>`).join("")}</tbody></table>`:"")
     +(x.feedback?`<label>${t("Feedback del professor","Teacher's feedback")}</label><div class="fb">${esc(x.feedback)}</div>`:"")
     +(a.steps?`<label>${t("Les meves autoavaluacions","My self-assessments")}</label>`+a.steps.map(([sid,tt])=>{const h=sp[sid];if(!h)return `<div class="hand muted">${esc(tt)} · ${t("encara no entregat","not handed in yet")}</div>`;

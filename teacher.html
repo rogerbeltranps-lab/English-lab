@@ -14,7 +14,7 @@ table.qa td.ql,table.qa th.ql{text-align:left;max-width:440px;white-space:normal
 .route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-beginners{background:#ffe4e6;color:#9f1239}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-native{background:#e0f2fe;color:#075985}.r-daring{background:#ede9fe;color:#5b21b6}.r-none{color:#94a3b8}
 .wrap{overflow:auto;max-height:75vh;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
 thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;vertical-align:top}thead tr+tr th{top:var(--h1,52px)}.stu{position:sticky;left:0;z-index:1;text-align:left;min-width:150px;white-space:nowrap}thead .stu{z-index:3}
-th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#cbd5e1}.first{border-left:3px solid #94a3b8}th.ac{font-weight:500;min-width:44px}.skip{color:#94a3b8;background:#f8fafc}td.ac{color:#16a34a;font-weight:700}
+th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#cbd5e1}.first{border-left:3px solid #94a3b8}th.ac{font-weight:500;min-width:44px}.skip{color:#94a3b8;background:#f8fafc}td.ac{color:#16a34a;font-weight:700}.wr{font-weight:500;white-space:nowrap}.wrw{color:#64748b}.wrk{color:#16a34a}.wrc{color:#b45309}.wrx{color:#dc2626}.wrl{color:#2563eb;font-weight:700}
 td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px solid #0f766e;outline-offset:-2px}td.sub{background:#dcfce7}td.mark{background:#fef9c3}td.na{color:#94a3b8;font-weight:400}
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 .annl .annt{white-space:pre-wrap;overflow-wrap:anywhere;border-left:4px solid #ea580c;background:#fff7ed}.annprev{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:10px}
@@ -303,6 +303,8 @@ const route=l=>l?`<span class="route r-${l}">${LV[l]||l}</span>`:'<span class="r
 const level=(u,ls)=>elRouteOf(S.D.lv[u],ls).level;
 const acts=ls=>cat.filter(a=>a.ls===ls);
 const steps=a=>EL_ACTIONS[a.id]||[];
+// score of an activity: the saved result, counted again from the progress when it was saved with older points (elScore, el-catalog.js)
+const scOf=(u,a)=>elScore(a,(S.D.rs[u]||{})[a.id],(S.D.pg[u]||{})[a.ls]);
 const doneSet=(u,a)=>{const p=(S.D.pg[u]||{})[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
 const stepCrit=(a,k)=>(a.skip||[]).includes(k)?'<small class="muted">not scored</small>':((((window.EL_STEP_CRITERIA||{})[a.id]||{})[k]||EL_EVIDENCE[k]||[]).map(pill).join("")||'<small class="muted" title="Language practice: no criterion linked">–</small>');
 const pts=a=>a.graded?(a.manual?"teacher mark":a.points+" pts"):"not graded";
@@ -317,7 +319,7 @@ function cell(u,a){ // text + class of an activity's score cell
   const x=(S.D.rs[u]||{})[a.id],d=doneSet(u,a);
   let t,c="";
   if(a.manual)t=x&&x.max?x.score+"/"+x.max:"–";
-  else if(a.graded)t=x?(x.score||0)+"/"+a.points:"–";
+  else if(a.graded){const y=scOf(u,a);t=y?y.score+"/"+y.max:"–"}
   else{const n=steps(a).filter(k=>d.has(k)).length;t=steps(a).length?n+"/"+steps(a).length:"–";c="na"}
   if(x&&x.locked){t+=" ✔";c="sub"}else if(x&&x.markedDone){t+=" 🟡";c="mark"}
   if(x&&x.feedback)t+=" 💬";
@@ -347,6 +349,28 @@ const trySc=t=>t.score+"/"+t.max,same=(f,l)=>!f||!l||(f.score===l.score&&f.max==
 function tryCell(u,id,k){const f=firstOf(u,id,k),l=lastOf(u,id,k);if(!f&&!l)return "";
   const tip=(f?"First try "+trySc(f)+"":"")+(l?(f?" · ":"")+"latest "+trySc(l)+(l.date?" on "+ymd(l.date):""):"");
   return `<br><small title="${tip}">${same(f,l)?trySc(f||l):trySc(f)+" → "+trySc(l)}</small>`}
+// The writing of a learning path (Roger, 1 Nov 2026: "be careful here, now we will mark the writings"): handed in to the teacher and
+// corrected by Claude in the Wednesday run (el-marking.js; tools/marking/marks.mjs fb-*), or given a level when it is a level moment
+// (atOnce, LS3 on). Its cell says where it is: 📨 waiting for Wednesday · ❌ late (should have been in the last Wednesday run) · ✏️ corrected
+// (this very version: fbSig = the version's signature, as marks.mjs computes it) · 📨 new version (handed in again after the correction)
+// · ⚠️ copy? (a possible copy waiting in the To do) · 🔁 redo in class · a level (NA · AS · AN · AE). LS1 writings stay not scored.
+const sigOf=t=>{let h=5381;for(const ch of String(t))h=(h*33+ch.codePointAt(0))>>>0;return h.toString(36)};
+const isWriting=(a,k,st)=>!(a.skip||[]).includes(k)&&(k==="write"||!!(((st||{}).steps||{})[k]||{}).w);
+function wrState(u,a,k){if(!window.ELMark)return null;const st=pstate(u,a);if(!isWriting(a,k,st))return null;
+  const g=(window.EL_GRADING||{})[a.ls]||{};if(g.only)return null;
+  const ms=(g.moments||[]).filter(m=>m.a===a.id),mo=ms.find(m=>m.step===k),x=res(u,a.id),fl=(x.flags||{})[k],today=ELWeek.today();
+  const it=mo?((st.steps||{})[k]?{fields:(st.steps[k].f||[]),date:st.steps[k].date}:null):ELMark.fbItems(st,new Set(ms.map(m=>m.step)))[k];
+  if(!it)return null;const day=String(it.date||"").slice(0,10),on=day?" on "+day:"",late=day&&ELMark.late(day,today);
+  if(fl&&!fl.done)return {i:"⚠️ copy?",t:"Possible copy: waiting for you in the To do"+(fl.why?" ("+fl.why+")":""),c:"wrc"};
+  if(mo){const lv=Object.values((x.levels||{})[k]||{});const mk=(x.marked||{})[k],again=mk&&day&&String(mk).slice(0,10)<day;
+    if(lv.length&&!again)return {i:lv.join(" "),t:"Level given"+(mk?" on "+String(mk).slice(0,10):""),c:"wrl"};
+    return {i:late?"❌ late":"📨 Wed",t:(again?"Handed in again":"Handed in")+on+(late?": it should have been marked in the last Wednesday run":": marked in the Wednesday run"),c:late?"wrx":"wrw"}}
+  const v=sigOf(JSON.stringify(it.fields)),fs=(x.fbSig||{})[k],rp=(x.replies||{})[k];
+  if(fs===v)return {i:"✏️ corrected",t:"Corrected (the student sees the correction in the step)",c:"wrk"};
+  if(rp&&!fs)return {i:"✏️ answered",t:"You answered it by hand",c:"wrk"};
+  if(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")))return {i:"🔁 redo",t:"Possible copy: redo it in class (note sent)",c:"wrc"};
+  return {i:late?"❌ late":fs?"📨 new":"📨 Wed",t:(fs?"New version handed in after the correction":"Handed in")+on+(late?": it should have been corrected in the last Wednesday run":": corrected in the Wednesday run"),c:late?"wrx":"wrw"}}
+const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return w?`<br><small class="wr ${w.c}" title="${esc(w.t)}">${w.i}</small>`:""};
 const doneAt=(u,id,step)=>{const a=byId(id),st=a?pstate(u,a):{};return st.done&&st.done[step]?((st.doneAt||{})[step]||true):null};
 const ymd=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 function dueOf(id,g){const p=(window.EL_PLAN||{})[S.ls],gr=GR.find(x=>x.id===g);if(!p||!p.due||!p.due[id]||!gr)return null;
@@ -477,7 +501,7 @@ function render0(){
     +routesBox(grp,inG.filter(s=>!s.tester))
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
-    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time (↩ = carried over from an earlier LS; set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. Grey rows: on the student list, not signed in yet.</p>`,"key")}
+    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time (↩ = carried over from an earlier LS; set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
     +(G()&&!G().only?gradeBox(shown):"")
@@ -722,16 +746,16 @@ function progress(studs,list){
     if(s.away){b+=`<tr class="away">${who}${awayRt(s)}<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
     b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
-      if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}${tryCell(s.uid,a.id,k)}</td>`).join("");
+      if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}${tryCell(s.uid,a.id,k)}${wrCell(s.uid,a,k)}</td>`).join("");
       b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}">${c.t}</td>`;
-      if(a.graded&&x&&x.max){ts+=x.score||0;tm+=x.max}});
+      const y=a.graded&&x&&x.max&&scOf(s.uid,a);if(y){ts+=y.score;tm+=y.max}});
     b+=`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td></tr>`});
   return `<table><thead>${h1}${any?h2:""}</thead><tbody>${b}</tbody></table>`;
 }
 function criteria(studs,list){
   const crits=[...new Set(list.flatMap(a=>a.criteria))].sort();
   let h=`<table><thead><tr><th class="stu">Student</th>`+crits.map(c=>`<th>${pill(c)}<br><small>${esc(elCompetence(c))}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(c)).map(a=>a.title).join(" · ")}</small></th>`).join("")+"</tr></thead><tbody>";
-  studs.forEach(s=>{const r=S.D.rs[s.uid]||{};h+=`<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td>`+crits.map(c=>{let ts=0,tm=0;list.forEach(a=>{const x=r[a.id];if(a.graded&&a.criteria.includes(c)&&x&&x.max){ts+=x.score||0;tm+=x.max}});
+  studs.forEach(s=>{const r=S.D.rs[s.uid]||{};h+=`<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td>`+crits.map(c=>{let ts=0,tm=0;list.forEach(a=>{const x=r[a.id],y=a.graded&&a.criteria.includes(c)&&x&&x.max&&scOf(s.uid,a);if(y){ts+=y.score;tm+=y.max}});
     if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return `<td><b style="color:${col}">${ts}/${tm}</b><br><small>${Math.round(p)}%</small></td>`}).join("")+"</tr>"});
   return h+"</tbody></table>";
 }
@@ -1386,8 +1410,8 @@ function stuPanel(u){redraw=null;
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
   const gx=!!G()&&!G().only&&a.ls===S.ls,state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
-  dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${x.score||0}/${a.points}`:""}</p>`
-    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
+  dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(scOf(u,a)||{score:0}).score}/${a.points}`:""}</p>`
+    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.steps?handIns(u,a):"")
     +revisions(u,a)
     +levelRows(u,a)

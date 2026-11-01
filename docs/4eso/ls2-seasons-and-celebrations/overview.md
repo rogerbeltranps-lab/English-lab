@@ -806,8 +806,8 @@ Insecure keeps Catalan guidance at every step, with English examples linking sou
 | Page | Steps / points | Graded |
 | --- | --- | --- |
 | LP0 Getting started | 4 | no (warm-up) |
-| LP1 Celebrations around the world | 9 (with the reading log; writing not scored) | yes, once |
-| LP2 Where traditions come from | 8 (with the listening chart; writing not scored) | yes, once |
+| LP1 Celebrations around the world | 9 (with the reading log; writing scored as a step since 1 Nov 2026) | yes, once |
+| LP2 Where traditions come from | 8 (with the listening chart; writing scored as a step since 1 Nov 2026) | yes, once |
 | LP3 Research it right | 7 | yes, once |
 | LP4 Plan the day | 9 | yes, once |
 | LP5 Write to the head teacher | 9 | yes, once |
