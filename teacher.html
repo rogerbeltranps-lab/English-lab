@@ -59,7 +59,12 @@ import {ANN_MAX,annMs,annHtml,annCardHtml,annCardStyle} from "./shared/js/el-ann
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db}
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const LV=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),resKey=a=>a.replace("/","__");  // LV: Starter · Base · Core · Plus · Pro (Roger, 30 Oct 2026: only the new names, here too)
+// LV: Starter · Base · Core · Plus · Pro (Roger, 30 Oct 2026: only the new names, here too), each with its CEFR level for the course on
+// screen (Roger, 1 Nov 2026: "I need to see the levels like this: Plus B1"; EL_CEFR in el-catalog.js): 4 ESO "Core B1", 2 ESO "Core A2".
+const LV_NAME=Object.fromEntries(EL_LEVELS.map(l=>[l.id,l.name])),
+  lvCourse=()=>{try{return ((EL_LS.find(x=>x.id===S.ls)||{}).course)||((EL_GROUPS.find(g=>g.id===S.g)||{}).course)||null}catch(e){return null}},
+  LV=new Proxy(LV_NAME,{get:(t,k)=>{const n=t[k];if(n===undefined)return n;const c=lvCourse(),x=c&&window.elCefr?elCefr(c,k):"";return x?n+" "+x:n}}),
+  resKey=a=>a.replace("/","__");
 const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Set(["lpopen"]),D:null,P:{},zero:true,term:elTerm(),wk:null,tips:(()=>{try{return localStorage.getItem("el_t_tips")!=="off"}catch(e){return true}})()};   // P: people on screen (see people()); zero: missing work counts 0 in the LS grade; term: of the team points
 // Back to where you were (Roger, 30 Oct 2026: "si vaig al dashboard, vull anar al curs del dashboard d'on vinc"): the last tab is remembered (el_t_last),
 // and a link from a course, LS or game page (?course=, ?ls=, ?g=; el-cloud.js and lab/game/host.js) opens a group of that course, the one used last.
