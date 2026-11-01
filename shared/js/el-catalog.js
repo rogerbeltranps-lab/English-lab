@@ -37,12 +37,18 @@ window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructio
 window.elNoComment=function(c){const t=String(c||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z' ]+/g," ").replace(/\s+/g," ").trim().replace(/ (thanks|thank you|gracies|gracias)$/,"");
   return !t||/^(no|nope|none|nothing|nada|res|cap|ninguno|no comment|all good|ok|okay|fine|everything (is )?(ok|fine)|tot be|todo bien)$/.test(t)
     ||/^(no|i (do not|don't|dont) have|i have no|i had no|we (do not|don't|dont) have|we have no|we had no|no tinc|no tenim|no he tingut|no hem tingut|no tengo|no tenemos|no he tenido|no hemos tenido|cap|ningun|ninguno)( any| cap| ningun| ninguno)? (problem(s|a|es|as)?|questions?|dubtes?|dudas?|comments?|comentaris?|comentarios?)( at all)?$/.test(t)};
+// A student's level (route): ONE level per course, the same in every LS (Roger, 1 Nov 2026: "why doesn't it show everywhere if I make a
+// change?"). It is the route the teacher set most recently in ANY LS of the course (levels/{ls}.changed, or .updated on older docs);
+// without times, this LS's own route, then the nearest earlier LS, then a later one. A route a 2 ESO student chose before 30 Oct 2026
+// (by:"student") counts only while the teacher has set none. Returns {level, from: the LS whose doc holds it, own: chosen by the student}.
 window.elRouteOf=function(lv,ls){if(window.EL_VIEW_LEVEL)return {level:window.EL_VIEW_LEVEL,from:ls,own:false};   // tester previewing a level (el-cloud.js viewLevel)
   lv=lv||{};const L=window.EL_LS||[],me=L.find(x=>x.id===ls),
-    chain=[ls].concat(me?L.slice(0,L.indexOf(me)).reverse().filter(x=>x.course===me.course).map(x=>x.id):[]),
-    find=(ids,mine)=>{for(const id of ids){const l=lv[id]||{};if(l.level&&(l.by==="student")===mine)return {level:l.level,from:id,own:mine}}return null},
-    later=me?L.slice(L.indexOf(me)+1).filter(x=>x.course===me.course).map(x=>x.id):[];   // a route the teacher set later also replaces the student's choice
-  const own=find(chain,true);return find(chain,false)||own&&(find(later,false)||own)||{level:null,from:null,own:false}};
+    ids=[ls].concat(me?L.slice(0,L.indexOf(me)).reverse().filter(x=>x.course===me.course).map(x=>x.id):[],
+      me?L.slice(L.indexOf(me)+1).filter(x=>x.course===me.course).map(x=>x.id):[]),
+    ms=x=>!x?0:typeof x.toMillis==="function"?x.toMillis():typeof x==="string"?Date.parse(x)||0:typeof x==="number"?x:x.seconds!=null?x.seconds*1000:0,
+    pick=mine=>{let best=null,bt=-1;for(const id of ids){const l=lv[id]||{};if(!l.level||(l.by==="student")!==mine)continue;
+      const t=ms(l.changed)||ms(l.updated);if(t>bt){best={level:l.level,from:id,own:mine};bt=t}}return best};
+  return pick(false)||pick(true)||{level:null,from:null,own:false}};
 // Route from the LS1 exam mark (out of 10), default cut-offs per course: under beginners → Starter, under insecure → Base,
 // under safe → Core, otherwise Plus (Roger, 30 Oct 2026: under 3 Starter, 3 to under 6 Base, 6 to under 8 Core, 8 or more Plus).
 // Roger can change them on the dashboard (settings/routes in Firestore overrides these). Pro is never given by a mark.
