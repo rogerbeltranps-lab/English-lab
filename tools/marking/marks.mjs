@@ -4,8 +4,8 @@
 //   node tools/marking/marks.mjs ready                                   steps with hand-ins without a level, per group, and when they are ready
 //   node tools/marking/marks.mjs fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <file> [--apply]
 //        the same for corrections without a level (writing and speaking texts, Talk transcripts, other hand-ins): see "Corrections without a level"
-//   node tools/marking/marks.mjs audit                                   is the marking working? ❌ hand-ins ready 4+ days and still without a
-//        level (exit code 2), ⏰ possible copies waiting for the teacher 7+ days; read-only
+//   node tools/marking/marks.mjs audit                                   is the marking working? ❌ hand-ins ready before the last Wednesday run
+//        and still without a level or correction (exit code 2), ⏰ possible copies waiting for the teacher 7+ days; read-only
 //   node tools/marking/marks.mjs sheet <group> <activity> <step>         the sheet (students as codes, never names)
 //   node tools/marking/marks.mjs apply <group> <activity> <step> <answer file> [--apply] [--feedback]
 //        reads the EL-MARKS v1 answer and saves the levels (students/{uid}/results/{activity}.levels[step][criterion]), as the dashboard's
@@ -86,7 +86,7 @@ async function todo(grp,m){const a=W.EL_CATALOG.find(x=>x.id===m.a),out=[];
     if(h&&(!m.c.every(c=>lv[c])||again)&&!waits)out.push({s,h,route:st.route,exam:st.exam})}
   return out.sort((x,y)=>x.s.uid<y.s.uid?-1:1)}
 function readyOf(grp,ls,m,ticks){const p=W.EL_PLAN[ls],gi=p?W.ELWeek.col(p,grp.id):-1,due=p&&p.due&&p.due[m.a]?p.due[m.a][gi]:null,a=W.EL_CATALOG.find(x=>x.id===m.a);
-  return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls,weekly:m.weekly})}
+  return W.ELMark.ready({p,gi,due,title:a.title,ticks,ls,atOnce:m.atOnce})}
 function sheetOf(grp,m,rows){const a=W.EL_CATALOG.find(x=>x.id===m.a),g=W.EL_GRADING[a.ls],course=a.ls.split("-")[0],codes=W.ELMark.codes(rows.map(r=>r.s.uid)),by=Object.fromEntries(rows.map(r=>[r.s.uid,r]));
   const names=Object.fromEntries((W.EL_LEVELS||[]).map(l=>[l.id,l.name]));
   const text=W.ELMark.sheet({aid:m.a,title:a.title,step:m.step,stepName:m.name,group:grp.name,date:W.ELWeek.today(),crits:m.c,
@@ -142,21 +142,21 @@ if(cmd==="ready"){const today=W.ELWeek.today();
       const rows=await todo(grp,m);if(!rows.length)continue;const r=readyOf(grp,ls,m,ticks),now=!!(r.from&&today>=r.from);
       console.log([now?"READY":"wait ",grp.id,m.a,m.step,rows.length+" to mark",r.from?"from "+r.from:r.line?"session not ticked: "+r.line:"no session in the plan"].join(" · "))}}}
 else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026: "a command to audit what you do and warn me if it's not working")
-  const today=W.ELWeek.today(),days=(a,b)=>Math.round((Date.parse(a)-Date.parse(b))/864e5),LATE=4,problems=[],remind=[],ok=[];
+  const today=W.ELWeek.today(),days=(a,b)=>Math.round((Date.parse(a)-Date.parse(b))/864e5),problems=[],remind=[],ok=[];
   for(const grp of W.EL_GROUPS){const ticks=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
     for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
       const a=W.EL_CATALOG.find(x=>x.id===m.a),rows=await todo(grp,m),r=readyOf(grp,ls,m,ticks);
       // a late hand-in counts from the day it came in, not from when the step was ready
-      if(rows.length&&r.from&&today>=r.from){const since=x=>{const h=String(x.h.date||"").slice(0,10);return h>r.from?h:r.from},late=rows.filter(x=>days(today,since(x))>=(m.weekly?8:LATE));   // a weekly moment (LS3 writing, Talk) is late after 8 days
-        if(late.length)problems.push(`${grp.id} · ${m.name} (${a.title}): ${late.length} hand-in${late.length>1?"s":""} ready since ${late.map(since).sort()[0]} still without a level (${days(today,late.map(since).sort()[0])} days late)`);
+      if(rows.length&&r.from&&today>=r.from){const since=x=>{const h=String(x.h.date||"").slice(0,10);return h>r.from?h:r.from},late=rows.filter(x=>W.ELMark.late(since(x),today));   // ready before the last Wednesday run
+        if(late.length)problems.push(`${grp.id} · ${m.name} (${a.title}): ${late.length} hand-in${late.length>1?"s":""} ready since ${late.map(since).sort()[0]} still without a level (missed the Wednesday run of ${W.ELMark.lastRun(today)})`);
         if(rows.length>late.length)ok.push(`${grp.id} · ${m.name} (${a.title}): ${rows.length-late.length} hand-in${rows.length-late.length>1?"s":""} to mark at the next run`)}
       // possible copies waiting for the teacher
       for(const s of studs.filter(x=>x.group===grp.id&&!isTester(x))){const st=await student(s.uid,a.ls,a.id),f=(st.res.flags||{})[m.step];
         if(f&&!f.done&&days(today,String(f.at).slice(0,10))>=7)remind.push(`${grp.id} · ${m.name}: a possible copy waiting for you since ${String(f.at).slice(0,10)}`)}}}
-  // corrections without a level: a piece waiting 4+ days since it was handed in
+  // corrections without a level: a piece handed in before the last Wednesday run and still without a correction
   for(const grp of W.EL_GROUPS)for(const a of fbActs(grp.course))for(const [step,rows] of Object.entries(await fbTodo(grp,a))){
-    const late=rows.filter(x=>x.h.date&&days(today,String(x.h.date).slice(0,10))>=LATE);
-    if(late.length)problems.push(`${grp.id} · ${a.title} · ${STEPNAME[step]||step}: ${late.length} piece${late.length>1?"s":""} waiting for a correction for ${LATE}+ days`);
+    const late=rows.filter(x=>x.h.date&&W.ELMark.late(String(x.h.date).slice(0,10),today));
+    if(late.length)problems.push(`${grp.id} · ${a.title} · ${STEPNAME[step]||step}: ${late.length} piece${late.length>1?"s":""} that missed the Wednesday run of ${W.ELMark.lastRun(today)}`);
     else ok.push(`${grp.id} · ${a.title} · ${STEPNAME[step]||step}: ${rows.length} piece${rows.length>1?"s":""} to correct at the next run`)}
   console.log(`AUDIT ${today}: ${problems.length?"PROBLEMS":"OK"}`);
   problems.forEach(x=>console.log("❌ "+x));remind.forEach(x=>console.log("⏰ "+x));ok.forEach(x=>console.log("🤖 to mark now: "+x));

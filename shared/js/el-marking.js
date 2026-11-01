@@ -77,9 +77,9 @@ window.ELMark=(function(){
   // When a step is ready to mark in a group: its last session in the plan (the due day; the line that names the activity or its
   // "LPn") ticked in the time plan, plus 7 days. Ticks keep the day they were ticked; an older tick (true) counts from the due day.
   // o = {p: EL_PLAN[ls], gi: the group's column, due, title, ticks: teacherPlan/{group}.ticks, ls}
-  // A moment with weekly: true (writings and Talk transcripts, from LS3; Roger, 1 Nov 2026: "once a week, Friday at 15h") is ready the
-  // day it is handed in: Claude marks it in the Friday run, with no tick needed. from is long past, so each hand-in counts from the day it came in.
-  function ready(o){const W=window.ELWeek;if(o.weekly)return {due:o.due||null,line:null,done:null,from:"2000-01-01",weekly:true};
+  // A moment with atOnce: true (writings and Talk transcripts, from LS3; Roger, 1 Nov 2026) is ready the day it is handed in: Claude
+  // marks it in the next Wednesday run, with no tick needed. from is long past, so each hand-in counts from the day it came in (ELMark.late).
+  function ready(o){const W=window.ELWeek;if(o.atOnce)return {due:o.due||null,line:null,done:null,from:"2000-01-01",atOnce:true};
     if(!o.p||!o.due||o.gi<0)return {};
     const lines=r=>String(r.g?r.g[o.gi]||"":r.what||"").split("\n").filter(Boolean);
     const date=(r,l)=>{const m=/^\w{3} (\d{1,2})\b/.exec(l);if(!m||!r.from)return null;for(let j=0;j<7;j++){const d=W.add(r.from,j);if(+d.slice(8)===+m[1])return d}return null};
@@ -89,6 +89,13 @@ window.ELMark=(function(){
     const t=line&&(o.ticks||{})[o.ls+"|"+line],done=t?(typeof t==="string"?t:o.due):null;
     return {due:o.due,line,done,from:done?W.add(done,7):null};
   }
+  // Claude's marking runs once a week, on Wednesday at about 15:00 (Roger, 1 Nov 2026; it was Monday and Thursday mornings). A piece
+  // (ready on day `since`: a level moment's ready day or later hand-in, or a hand-in waiting for a correction) is late when it was ready
+  // before the last Wednesday run and still has nothing: by then that run should have done it. The day of a run itself never counts as
+  // late (the piece may have come in after 15:00). Same rule on the dashboard (❌ Claude's marking is late) and in marks.mjs audit.
+  const RUN_DAY=3;   // Wednesday (0 = Sunday)
+  function lastRun(today){const W=window.ELWeek,d=new Date(today+"T12:00:00Z").getUTCDay();return W.add(today,-(((d-RUN_DAY+7)%7)||7))}
+  function late(since,today){return !!since&&since<lastRun(today)}
   // ---- Students' comments on hand-ins, answered by Claude (Roger, 31 Oct 2026: "Claude should answer properly with context").
   // h = the hand-in (state.steps[step]), x = results/{activity}. A comment still needs an answer unless it only says "no problem"
   // (elNoComment), the teacher marked it "No reply needed" (seen), the teacher answered it (replies[step] not written by the marking,
@@ -126,5 +133,5 @@ window.ELMark=(function(){
       seen.add(p[0]);rows.push({id:p[0],code:p[1],step:p[2],kind:k,text:p.slice(4).join(" ").trim()})}
     return {rows,bad,missing:[...by.keys()].filter(c=>!seen.has(c))};
   }
-  return {V,codes,sheet,parse,ready,tyText,fbItems,q,open,asked,CV,commentSheet,parseComments};
+  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,q,open,asked,CV,commentSheet,parseComments};
 })();
