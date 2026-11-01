@@ -207,7 +207,7 @@ async function gate(u){
   const tester=seesAll(u),vg=viewGroup(u);
   if(tester)banner("Test account: you see every LS and activity.","#7c3aed");
   if(vg){const vl=viewLevel(u);banner("Test account · student view of "+EL_GROUPS.find(x=>x.id===vg).name+(vl?" · level "+(window.elLevelLabel?elLevelLabel(courseOf(vg),vl):vl):"")+": you see what this group sees.","#7c3aed",{t:"See everything again",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}})}
-  // The route of this LS, or the one carried over from an earlier LS (elRouteOf). With none yet, a student works on the Insecure
+  // The student's level: one per course, the same in every LS (elRouteOf). With none yet, a student works on the Insecure
   // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
   const lvs={};try{(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){console.warn("levels",e)}
   let lvl=elRouteOf(lvs,lsId).level;

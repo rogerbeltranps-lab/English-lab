@@ -281,7 +281,7 @@ async function joinLive(u){
   if(!liveGroup){try{const r=await S.getDoc(S.doc(db,"roster",em));liveGroup=(r.exists()&&r.data().group||localStorage.getItem("el_view")||"").replace(/[^\w-]/g,"")}catch(e){console.warn("roster",e)}if(gen!==liveGen)return}
   if(!liveGroup){liveDraw();return}
   Q={S,ref:S.doc(db,"live",liveGroup,"answers",em)};
-  // Catalan for Insecure and Beginners: the route of this LS, or the one carried over from an earlier LS (elRouteOf in el-catalog.js)
+  // Catalan for Insecure and Beginners: the student's level, the same in every LS (elRouteOf in el-catalog.js)
   if(bar.dataset.ls)S.getDocs(S.collection(db,"students",u.uid,"levels")).then(qs=>{const m={},ls=bar.dataset.ls;qs.forEach(d=>m[d.id]=d.data());
     const l=window.elRouteOf?elRouteOf(m,ls).level:(m[ls]||{}).level;if((l==="insecure"||l==="beginners")&&window.ELDeck)ELDeck.setCa(true)}).catch(()=>{});
   liveStop=S.onSnapshot(S.doc(db,"live",liveGroup),s=>{lastLive=s.exists()?s.data():null;liveDraw()},e=>{console.warn("live",e);lv.innerHTML=`📺 ${B("You cannot join this class.","No pots entrar a aquesta classe.")}`;playerDraw()});

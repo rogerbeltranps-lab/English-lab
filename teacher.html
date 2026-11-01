@@ -299,7 +299,7 @@ const fold=(k,title,html,cls="",force)=>`<details data-k="${k}" class="${cls}" $
 let COURSE=null;   // course of the group on screen: criteria texts depend on it
 const pill=c=>`<span class="pill ce${c[0]}" data-do="crit" data-c="${c}" tabindex="0" title="${esc(elCompetence(c)+" · "+c+": "+(elCriterion(COURSE,c)||"–"))}">${c}</span>`;
 const route=l=>l?`<span class="route r-${l}">${LV[l]||l}</span>`:'<span class="route r-none">–</span>';
-// A student's route in an LS: its own, or carried over from an earlier LS of the course (elRouteOf in el-catalog.js)
+// A student's route: one per course, the same in every LS (the latest one set in any LS, elRouteOf in el-catalog.js)
 const level=(u,ls)=>elRouteOf(S.D.lv[u],ls).level;
 const acts=ls=>cat.filter(a=>a.ls===ls);
 const steps=a=>EL_ACTIONS[a.id]||[];
@@ -512,7 +512,7 @@ function render0(){
     +routesBox(grp,inG.filter(s=>!s.tester))
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
-    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to set it at any time (↩ = carried over from an earlier LS; set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Grey rows: on the student list, not signed in yet.</p>`,"key")}
+    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
     +(G()&&!G().only?gradeBox(shown):"")
@@ -592,7 +592,7 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
   const cnt={};rows.forEach(r=>{const k=r.ex?r.sug:"none";cnt[k]=(cnt[k]||0)+1});
   const inp=k=>`<input type="number" step="0.1" min="0" max="10" data-do="cut" data-k="${k}" value="${cu[k]}" style="width:58px">`;
   const sel=r=>`<select data-do="rtpick" data-u="${r.s.uid}"><option value="">–</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===r.pick?"selected":""}>${LV[x.id]}</option>`).join("")}</select>`;
-  const body=`<p class="muted">Each student's ${lsName(src.id)} exam mark gives a route with these cut-offs. Check the list, change any route or untick a student, then apply it to one LS. Later LSs keep that route until you change it (↩ in the Route column), and you can still change one student's route by clicking their Route cell. Their work so far is kept.</p>`
+  const body=`<p class="muted">Each student's ${lsName(src.id)} exam mark gives a route with these cut-offs. Check the list, change any route or untick a student, then apply it to one LS. A student has one level, the same in every LS of the course: the latest one you set, here or by clicking their Route cell in any LS. Their work so far is kept.</p>`
     +`<div class="bar"><b>Cut-offs (${c==="2eso"?"2 ESO":"4 ESO"}, mark out of 10):</b> ${route("beginners")} under ${inp("beginners")} · ${route("insecure")} under ${inp("insecure")} · ${route("safe")} under ${inp("safe")} · ${route("daring")} from ${f1(cu.safe)}`
     +(["beginners","insecure","safe"].some(k=>cu[k]!==def[k])?` <button class="g" data-do="cutdef">Back to ${def.beginners} · ${def.insecure} · ${def.safe}</button>`:"")+`</div>`
     +`<p>${["beginners","insecure","safe","daring"].map(k=>`${route(k)} ${cnt[k]||0}`).join(" · ")}${cnt.none?` · <span class="muted">no exam mark: ${cnt.none}</span>`:""}</p>`
@@ -602,8 +602,8 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
     +`<p class="muted">Each student you apply a route to gets a notice with their level the next time they open their board or any page of the site (🔔 in their window shows whether they have seen it).</p>`
     +(rows.length?`<div class="wrap"><table><thead><tr><th>Apply</th><th class="stu">Student</th><th>${lsName(src.id)} exam</th><th>Now in ${lsName(to)}</th><th>New route</th></tr></thead><tbody>`
       +rows.map(r=>{const ex=r.ex?f1(r.ex.mark)+(r.ex.n<r.ex.of?` <small class="muted" title="Only these sections are entered: the mark may change">(${r.ex.n}/${r.ex.of} sections)</small>`:""):'<span class="muted">no mark</span>';
-        const carried=r.now.level&&r.now.from!==to,same=r.pick&&r.pick===r.now.level;
-        return `<tr><td><input type="checkbox" data-do="rton" data-u="${r.s.uid}" ${r.on?"checked":""} ${r.pick?"":"disabled"}></td><td class="stu">${name(r.s)}</td><td>${ex}</td><td>${route(r.now.level)}${carried?" ↩":""}</td><td>${sel(r)}${r.pick&&r.pick!==r.sug&&r.ex?(r.pick==="native"&&r.now.level==="native"&&S.rtPick[r.s.uid]===undefined?' <small class="muted" title="Pro is never given by a mark: pick another route to change it">Pro kept</small>':' <small class="muted" title="Changed by you">✎</small>'):""}${same?' <small class="muted">same</small>':""}</td></tr>`}).join("")
+        const same=r.pick&&r.pick===r.now.level;
+        return `<tr><td><input type="checkbox" data-do="rton" data-u="${r.s.uid}" ${r.on?"checked":""} ${r.pick?"":"disabled"}></td><td class="stu">${name(r.s)}</td><td>${ex}</td><td>${route(r.now.level)}</td><td>${sel(r)}${r.pick&&r.pick!==r.sug&&r.ex?(r.pick==="native"&&r.now.level==="native"&&S.rtPick[r.s.uid]===undefined?' <small class="muted" title="Pro is never given by a mark: pick another route to change it">Pro kept</small>':' <small class="muted" title="Changed by you">✎</small>'):""}${same?' <small class="muted">same</small>':""}</td></tr>`}).join("")
       +`</tbody></table></div>`:'<p class="muted">No signed-in students in this group yet.</p>')
     +(away.length?`<p class="muted">Not signed in yet (click their Route cell in the grid to set the route they get when they first sign in): ${away.map(name).join(" · ")}</p>`:"");
   return `<div class="box">${fold("routes","🧭 Routes from the LS1 exam",body)}</div>`}
@@ -1427,12 +1427,12 @@ function degPanel(u,c){redraw=()=>degPanel(u,c);
     +`<label>Degree</label>${lvBtns(`data-do="fin" data-u="${u}" data-c="${esc(c)}"`,f,c)} ${sg.mark!=null&&!f?`<button class="g" data-do="fin" data-u="${u}" data-c="${esc(c)}" data-l="${sg.level}">Confirm ${sg.level}</button>`:""}<p class="muted">${f?"Confirmed. Click it again to go back to the suggestion.":"Not confirmed yet."}</p>`);
 }
 // Route cell: click to set the student's route in this LS at any time, or to answer their request (🔁).
-// ↩: no route of its own in this LS, so the one from an earlier LS applies (the student sees that one).
+// One level per student and course, the same in every LS (Roger, 1 Nov 2026): the latest route set in any LS (elRouteOf).
 const lsName=id=>esc(((EL_LS.find(x=>x.id===id)||{}).title||id).replace(/^\S+ · /,""));
 // "LS1 · My Real Routine": numbered per course, as in the students' LS menu (Roger, 30 Oct 2026)
 const lsLabel=l=>"LS"+(EL_LS.filter(x=>x.course===l.course).indexOf(l)+1)+" · "+lsName(l.id);
-const rtCell=u=>{const l=(S.D.lv[u]||{})[S.ls]||{},r=elRouteOf(S.D.lv[u],S.ls),carried=r.level&&r.from!==S.ls;
-  return `<td class="gr" data-do="rt" data-u="${u}" title="${l.request?"Asks for "+(LV[l.request]||l.request)+" · click to answer":(carried?"Carried over from "+lsName(r.from)+" · click to set it for this LS":"Click to set the route")}">${route(r.level)}${carried?" ↩":""}${l.request?" 🔁":""}</td>`};
+const rtCell=u=>{const l=(S.D.lv[u]||{})[S.ls]||{},r=elRouteOf(S.D.lv[u],S.ls);
+  return `<td class="gr" data-do="rt" data-u="${u}" title="${l.request?"Asks for "+(LV[l.request]||l.request)+" · click to answer":(r.level?"Set in "+lsName(r.from)+" · the same in every LS · click to change it":"Click to set the route")}">${route(r.level)}${l.request?" 🔁":""}</td>`};
 // the notice a route change sends (el-level-notice.js): when, and whether the student has seen it (students/{uid}.levelSeen[course])
 function toldLine(u,ls){const l=(S.D.lv[u]||{})[ls]||{},ms=l.changed&&l.changed.toMillis?l.changed.toMillis():0;if(!ms||!l.level)return "";
   const c=(EL_LS.find(x=>x.id===ls)||{}).course,seen=(((S.D.st[u]||{}).levelSeen)||{})[c]||0;
@@ -1443,15 +1443,15 @@ const awayRt=s=>{const r=s.ro&&s.ro.route;if(!s.ro||!s.email)return `<td>${route
 function rtListPanel(u){redraw=null;const s=S.P[u],r=s.ro.route,lsT=(EL_LS.find(x=>x.id===S.ls)||{}).title;
   dlg(`<h3>${name(s)} · Route</h3><p class="muted">Not signed in yet.${r?` Waiting: ${route(r.level)} in ${lsName(r.ls)}.`:""}</p>`
     +`<label>Route when they first sign in</label><div class="bar">${EL_LEVELS.map(x=>`<button class="${r&&x.id===r.level?"":"g"}" data-do="setlist" data-u="${u}" data-r="${x.id}" ${r&&x.id===r.level?"disabled":""}>${LV[x.id]}</button>`).join("")}${r?` <button class="g" data-do="setlist" data-u="${u}" data-r="">Clear</button>`:""}</div>`
-    +`<p class="muted">Saved on the student list. The first time they sign in it becomes their route in ${esc(lsT)} (later LSs take it too until you change it), and they get the notice with their level.</p>`)}
+    +`<p class="muted">Saved on the student list. The first time they sign in it becomes their level in every LS of the course, and they get the notice with their level.</p>`)}
 function rtPanel(u){redraw=null;
   const s=S.P[u],l=(S.D.lv[u]||{})[S.ls]||{},lsT=(EL_LS.find(x=>x.id===S.ls)||{}).title;
-  const r=elRouteOf(S.D.lv[u],S.ls),carried=r.level&&r.from!==S.ls;
-  dlg(`<h3>${name(s)} · Route</h3><p class="muted">${esc(lsT)} · now ${route(r.level)}${carried?" ↩ carried over from "+lsName(r.from):""}</p>`
+  const r=elRouteOf(S.D.lv[u],S.ls);
+  dlg(`<h3>${name(s)} · Route</h3><p class="muted">Now ${route(r.level)}${r.level&&r.from!==S.ls?" (set in "+lsName(r.from)+")":""}: the same in every LS</p>`
     +(l.request?`<div class="hand">🔁 Asks to change to ${route(l.request)}${l.reason?`<p>“${esc(l.reason)}”</p>`:'<p class="muted">No reason given.</p>'}<button data-do="acc" data-u="${u}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${u}">Decline</button></div>`
       :l.declined?`<p class="muted">You declined their last request (${LV[l.declined]||esc(l.declined)}).</p>`:"")
-    +`<label>Set the route</label><div class="bar">${EL_LEVELS.map(x=>`<button class="${x.id===l.level?"":"g"}" data-do="setrt" data-u="${u}" data-r="${x.id}" ${x.id===l.level?"disabled":""}>${LV[x.id]}</button>`).join("")}</div>`
-    +`<p class="muted">Saved at once for this LS (later LSs take it too until you change it). The student gets it, with a notice telling them their new level, the next time they open the LS or their board.</p>`+toldLine(u,S.ls));
+    +`<label>Set the route</label><div class="bar">${EL_LEVELS.map(x=>`<button class="${x.id===r.level?"":"g"}" data-do="setrt" data-u="${u}" data-r="${x.id}" ${x.id===r.level?"disabled":""}>${LV[x.id]}</button>`).join("")}</div>`
+    +`<p class="muted">Saved at once: it becomes the student's level in every LS of the course. The student gets it, with a notice telling them their new level, the next time they open an LS or their board.</p>`+toldLine(u,r.from||S.ls));
 }
 function stuPanel(u){redraw=null;
   const s=S.P[u],ls=S.ls,l=level(u,ls),lsT=(EL_LS.find(x=>x.id===ls)||{}).title;

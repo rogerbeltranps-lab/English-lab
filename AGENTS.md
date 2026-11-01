@@ -214,3 +214,6 @@ All docs are mapped in [docs/README.md](docs/README.md), which is also Roger's *
 - Check affected routes, route switching, interactive feedback and progress. For matching changes, verify duplicate interchangeability, alternatives, round completion and route coverage.
 - Check changed JavaScript syntax and run `git diff --check`. Use isolated browser automation when available; do not require macOS App Management or broader system permissions. Report programmatic-only verification honestly when browser automation is unavailable.
 - Preserve existing user changes. **Do not commit or push unless explicitly asked.**
+
+## One level per student (Roger, 1 Nov 2026)
+A student has ONE level (route) per course, the same in every LS: `elRouteOf` (el-catalog.js) returns the route the teacher set most recently in any LS of the course (`levels/{ls}.changed`, else `.updated`; without times: this LS, then nearest earlier, then later). Setting a route in any LS view (dashboard Route cell, routes box, accepted request) changes it everywhere, for the dashboard and the students. Student-chosen routes (`by:"student"`) count only while the teacher has set none.
