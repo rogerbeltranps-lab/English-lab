@@ -32,7 +32,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 .ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
-<p class="muted" style="margin:-6px 0 8px"><small id="loadedAt"></small> <button class="g mini" id="refresh" title="Read the students' latest work (the dashboard reads everything only when it opens and when you press this)">🔄 Refresh</button></p>
+<p class="muted" id="loadbar" style="margin:-6px 0 8px"></p>
 <div class="tabs" id="tabs"></div>
 <div id="main"></div>
 </div>
@@ -93,39 +93,76 @@ const STCOL={hidden:"#64748b",open:"#16a34a",closed:"#b45309"};
 // pb = problem reports from students (problems/{id}: uid, email, name, group, ls, activity, route, page, title, section, kind, text, errors, device, created, fixed), sent with "⚠️ Problem" in the bottom bar.
 // ro = student list (roster/{email in lower case}, or pending-… for a student without an email yet), imported here; it is never stored in the repository.
 // pt, tm = team points (points/{same id as the list}, teams/{group}; shared/js/el-points.js).
-async function load(){
-  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};DEMO.ann=DEMO.ann||[];cpInject(DEMO);Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits)ELWeek.applyEdits(id,i.planEdits)});return DEMO}
-  const D={st:{},rs:{},lv:{},pg:{},ls:{},ro:{},pt:{},tm:{},tk:{},pb:[],sg:[],ann:[],ck:{},cp:{}},up=r=>r.ref.parent.parent.id;
-  // All reads at once (Roger, 31 Oct 2026: on the phone the dashboard "took time to load"): they used to go one after another,
-  // about 20 round trips, so a phone on mobile data waited for the sum of them. Now the wait is about the slowest one.
-  // soft = a read that may fail (old rules, nothing there yet): the dashboard still opens; hard = the dashboard needs it.
-  const all=(n,group)=>F.getDocs(group?F.collectionGroup(db(),n):F.collection(db(),n)),
-    soft=(name,p,f,err)=>p.then(f).catch(e=>{if(err)D[err]=true;console.warn(name,e)});
+// ---- reading the database (Roger, 1 Nov 2026: the free plan's daily reads ran out; "can I make the dashboard static? it shows what students
+// have done the last time, and only pulls up a group's data when I ask with a button").
+// The students' work (HEAVY: students, results, levels, progress, checkpoints, roster, points, teams) is kept in this browser (IndexedDB,
+// CACHE) with the time each group was fetched (AT). Opening the dashboard shows that copy and reads only the LIGHT documents (LS settings,
+// time plan ticks, problems, ideas, announcements, checkpoint keys: a few dozen). "🔄 Update <group>" fetches one group's students
+// (about a quarter of everything); "Update all" fetches everything, and so does the first open on a computer with no copy yet.
+// After a save, act() reads back only the documents the dashboard wrote (reread). Team points (ptSync) are only rewritten for groups
+// fetched in this visit (FRESH), never from an old copy.
+const CACHE={k:"el_t_cache_v1",db:null,
+  open(){return this.db||(this.db=new Promise((ok,no)=>{const r=indexedDB.open("el-teacher",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}))},
+  async get(){try{const d=await this.open();return await new Promise((ok,no)=>{const q=d.transaction("kv").objectStore("kv").get(this.k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>no(q.error)})}catch(e){console.warn("cache",e);return null}},
+  async put(v){try{const d=await this.open();await new Promise((ok,no)=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,this.k);t.oncomplete=ok;t.onerror=()=>no(t.error)})}catch(e){console.warn("cache",e)}}};
+// Firestore times come back from IndexedDB as plain {seconds, nanoseconds}: give them toMillis/toDate again
+const revive=o=>{if(!o||typeof o!=="object")return o;if(Array.isArray(o)){o.forEach(revive);return o}
+  const k=Object.keys(o);if(k.length===2&&typeof o.seconds==="number"&&typeof o.nanoseconds==="number"){o.toMillis=function(){return this.seconds*1e3+Math.floor(this.nanoseconds/1e6)};o.toDate=function(){return new Date(this.toMillis())};return o}
+  k.forEach(x=>revive(o[x]));return o};
+const plainT=o=>JSON.parse(JSON.stringify(o,function(k,v){return v&&typeof v==="object"&&typeof v.toMillis==="function"&&typeof v.seconds==="number"?{seconds:v.seconds,nanoseconds:v.nanoseconds||0}:v}));
+let RAW=null,AT={all:0,g:{}},cacheT=null;const FRESH=new Set();
+const saveCache=()=>{clearTimeout(cacheT);cacheT=setTimeout(()=>{if(RAW)CACHE.put({v:1,at:AT,raw:plainT(RAW)})},800)};
+const ALL=(n,group)=>F.getDocs(group?F.collectionGroup(db(),n):F.collection(db(),n)),up=r=>r.ref.parent.parent.id;
+async function loadLight(){const L={ls:{},tk:{},pb:[],sg:[],ann:[],ck:{},replies:{}},soft=(name,p,f)=>p.then(f).catch(e=>console.warn(name,e));
   const lsI=Promise.all(EL_LS.map(l=>ELCloud.lsInfo(l.id)));
-  await Promise.all([lsI.then(a=>EL_LS.forEach((l,i)=>D.ls[l.id]=a[i])),   // in the catalogue's order, as before
-    soft("roster",all("roster"),q=>q.forEach(r=>D.ro[r.id]=r.data()),"roErr"),
-    soft("points",Promise.all([all("points"),all("teams")]),([p,t])=>{p.forEach(x=>D.pt[x.id]=x.data());t.forEach(x=>D.tm[x.id]=x.data())},"ptErr"),
-    soft("teacherPlan",all("teacherPlan"),q=>q.forEach(t=>D.tk[t.id]=t.data())),
-    soft("settings",F.getDoc(F.doc(db(),"settings","routes")),c=>{if(c.exists())D.cuts=c.data()}),
+  await Promise.all([lsI.then(a=>EL_LS.forEach((l,i)=>L.ls[l.id]=a[i])),   // in the catalogue's order, as before
+    soft("teacherPlan",ALL("teacherPlan"),q=>q.forEach(t=>L.tk[t.id]=t.data())),
+    soft("settings",F.getDoc(F.doc(db(),"settings","routes")),c=>{if(c.exists())L.cuts=c.data()}),
     // sg = suggestions from students (suggestions/{id}: uid, email, name, group, page, text, created, read), sent with "💡 Idea" in the bottom bar
-    soft("suggestions",all("suggestions"),q=>q.forEach(x=>D.sg.push(Object.assign({id:x.id},x.data())))),
-    soft("problems",all("problems"),q=>q.forEach(x=>D.pb.push(Object.assign({id:x.id},x.data())))),
+    soft("suggestions",ALL("suggestions"),q=>q.forEach(x=>L.sg.push(Object.assign({id:x.id},x.data())))),
+    soft("problems",ALL("problems"),q=>q.forEach(x=>L.pb.push(Object.assign({id:x.id},x.data())))),
     // ann = announcements to students (announcements/{id}: text, to, label, groups, uids, created, read{uid: time}), sent with "📣 Announcements"
-    soft("announcements",all("announcements"),q=>q.forEach(x=>D.ann.push(Object.assign({id:x.id},x.data())))),
+    soft("announcements",ALL("announcements"),q=>q.forEach(x=>L.ann.push(Object.assign({id:x.id},x.data())))),
     // notes not read yet (the student deletes each one with OK): an answer whose note is gone was read
-    soft("problemReplies",(D.replies={},all("problemReplies")),q=>q.forEach(x=>D.replies[x.id]=1)),
-    all("students").then(q=>q.forEach(s=>D.st[s.id]=Object.assign({uid:s.id},s.data()))),
-    all("results",1).then(q=>q.forEach(r=>(D.rs[up(r)]=D.rs[up(r)]||{})[r.data().activity]=r.data())),
-    all("levels",1).then(q=>q.forEach(l=>(D.lv[up(l)]=D.lv[up(l)]||{})[l.id]=l.data())),
-    all("progress",1).then(q=>q.forEach(p=>(D.pg[up(p)]=D.pg[up(p)]||{})[p.id]=p.data().data||{})),
-    // secure recall checkpoints: answer keys (teacher only) and each student's one try (cpInject marks them)
-    soft("cpKeys",all("cpKeys"),q=>q.forEach(k=>D.ck[k.id]=k.data())),
-    soft("checkpoints",all("checkpoints",1),q=>q.forEach(c=>(D.cp[up(c)]=D.cp[up(c)]||{})[c.id]=c.data()))]);
-  cpInject(D);
+    soft("problemReplies",ALL("problemReplies"),q=>q.forEach(x=>L.replies[x.id]=1)),
+    // secure recall checkpoints: answer keys (teacher only); each student's one try is in HEAVY (cp, cpInject marks them)
+    soft("cpKeys",ALL("cpKeys"),q=>q.forEach(k=>L.ck[k.id]=k.data()))]);
+  return L}
+// Everything (all groups). All reads at once (Roger, 31 Oct 2026: on the phone the dashboard "took time to load").
+async function loadAll(){const R={st:{},rs:{},lv:{},pg:{},cp:{},ro:{},pt:{},tm:{}},soft=(name,p,f,err)=>p.then(f).catch(e=>{if(err)R[err]=true;console.warn(name,e)});
+  await Promise.all([soft("roster",ALL("roster"),q=>q.forEach(r=>R.ro[r.id]=r.data()),"roErr"),
+    soft("points",Promise.all([ALL("points"),ALL("teams")]),([p,t])=>{p.forEach(x=>R.pt[x.id]=x.data());t.forEach(x=>R.tm[x.id]=x.data())},"ptErr"),
+    ALL("students").then(q=>q.forEach(s=>R.st[s.id]=Object.assign({uid:s.id},s.data()))),
+    ALL("results",1).then(q=>q.forEach(r=>(R.rs[up(r)]=R.rs[up(r)]||{})[r.data().activity]=r.data())),
+    ALL("levels",1).then(q=>q.forEach(l=>(R.lv[up(l)]=R.lv[up(l)]||{})[l.id]=l.data())),
+    ALL("progress",1).then(q=>q.forEach(p=>(R.pg[up(p)]=R.pg[up(p)]||{})[p.id]=p.data().data||{})),
+    soft("checkpoints",ALL("checkpoints",1),q=>q.forEach(c=>(R.cp[up(c)]=R.cp[up(c)]||{})[c.id]=c.data()))]);
+  RAW=R;const t=Date.now();AT={all:t,g:Object.fromEntries(GR.map(g=>[g.id,t]))};GR.forEach(g=>FRESH.add(g.id))}
+// One student's work, read again (after a save that touched their progress or checkpoints, or for a group)
+async function loadStudent(u){const sub=n=>F.getDocs(F.collection(db(),"students",u,n));
+  const [r,l,p,c]=await Promise.all([sub("results"),sub("levels"),sub("progress"),sub("checkpoints").catch(e=>{console.warn("checkpoints",e);return null})]);
+  RAW.rs[u]={};r.forEach(x=>RAW.rs[u][x.data().activity]=x.data());RAW.lv[u]={};l.forEach(x=>RAW.lv[u][x.id]=x.data());
+  RAW.pg[u]={};p.forEach(x=>RAW.pg[u][x.id]=x.data().data||{});if(c){RAW.cp[u]={};c.forEach(x=>RAW.cp[u][x.id]=x.data())}}
+// One group: its students and list entries (by group), their points, the team, and each student's work
+async function loadGroup(gid){const q=(n)=>F.getDocs(F.query(F.collection(db(),n),F.where("group","==",gid)));
+  const [st,ro,tm]=await Promise.all([q("students"),q("roster").catch(e=>{RAW.roErr=true;console.warn("roster",e);return null}),F.getDoc(F.doc(db(),"teams",gid)).catch(()=>null)]);
+  st.forEach(s=>RAW.st[s.id]=Object.assign({uid:s.id},s.data()));if(ro)ro.forEach(r=>RAW.ro[r.id]=r.data());if(tm&&tm.exists())RAW.tm[gid]=tm.data();
+  const uids=Object.values(RAW.st).filter(s=>s.group===gid).map(s=>s.uid),ids=Object.keys(RAW.ro).filter(id=>RAW.ro[id].group===gid);
+  await Promise.all([...uids.map(loadStudent),...ids.map(id=>F.getDoc(F.doc(db(),"points",id)).then(d=>{if(d.exists())RAW.pt[id]=d.data();else delete RAW.pt[id]}).catch(()=>{}))]);
+  AT.g[gid]=Date.now();FRESH.add(gid)}
+// D for the screen: the light part + the heavy copy (progress copied, as cpInject writes the checkpoint tries into it)
+function build(L){const R=RAW,pg={};Object.entries(R.pg).forEach(([u,x])=>{pg[u]={};Object.entries(x).forEach(([ls,v])=>pg[u][ls]=Object.assign({},v))});
+  const D=Object.assign({},L,{st:R.st,rs:R.rs,lv:R.lv,pg,cp:R.cp,ro:R.ro,pt:R.pt,tm:R.tm,roErr:R.roErr,ptErr:R.ptErr});cpInject(D);
   // students who only have results/progress (no profile yet) still appear, without a group
   Object.keys(Object.assign({},D.rs,D.pg,D.lv,D.cp)).forEach(u=>D.st[u]=D.st[u]||{uid:u,name:"",email:u});
-  return D;
-}
+  return D}
+// mode: undefined = open (the copy if there is one), "all", or a group id
+async function load(mode){
+  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};DEMO.ann=DEMO.ann||[];cpInject(DEMO);Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits)ELWeek.applyEdits(id,i.planEdits)});return DEMO}
+  if(!RAW&&mode!=="all"){const c=await CACHE.get();if(c&&c.v===1&&c.raw){RAW=revive(c.raw);AT=c.at||{all:0,g:{}}}}
+  const L=loadLight();
+  if(!RAW||mode==="all")await loadAll();else if(mode&&GR.some(g=>g.id===mode))await loadGroup(mode);
+  const D=build(await L);if(mode||!AT.saved){AT.saved=1;saveCache()}return D}
 const sub=o=>Object.assign(o,{updated:DEMO?Date.now():F.serverTimestamp()});
 const put=(path,o)=>DEMO?null:F.setDoc(F.doc(db(),...path),sub(o),{merge:true});
 const api={
@@ -222,6 +259,7 @@ async function reread(){const ps=[...TOUCHED];TOUCHED.clear();const D=S.D;
     if(k[0]==="students"&&k.length===2)return x=>{if(x)D.st[k[1]]=Object.assign({},D.st[k[1]],{uid:k[1]},x);else delete D.st[k[1]]};
     if(k[0]==="students"&&k[2]==="results"&&k.length===4)return x=>{const r=(D.rs[k[1]]=D.rs[k[1]]||{}),id=x&&x.activity||k[3].replace("__","/");if(x)r[id]=x;else delete r[id]};
     if(k[0]==="students"&&k[2]==="levels"&&k.length===4)return x=>{const r=(D.lv[k[1]]=D.lv[k[1]]||{});if(x)r[k[3]]=x;else delete r[k[3]]};
+    if(k[0]==="students"&&k.length===4)return "stu";   // progress, checkpoints: the student's work read again (cpInject)
     const map={roster:"ro",points:"pt",teams:"tm",teacherPlan:"tk"}[k[0]];
     if(map&&k.length===2)return x=>{if(x)D[map][k[1]]=x;else delete D[map][k[1]]};
     const arr={problems:"pb",suggestions:"sg",announcements:"ann"}[k[0]];
@@ -230,10 +268,13 @@ async function reread(){const ps=[...TOUCHED];TOUCHED.clear();const D=S.D;
     if(p==="settings/routes")return x=>{D.cuts=x||undefined};
     if(k[0]==="ls"&&k.length===2)return "ls";
     return null};
-  const fs=ps.map(one);if(!D||!ps.length||ps.length>60||fs.some(f=>!f))return load();
+  const fs=ps.map(one);if(!D||!RAW||!ps.length||ps.length>300||fs.some(f=>!f))return load();
+  const stu=new Set();
   await Promise.all(ps.map(async(p,i)=>{if(fs[i]==="ls"){const id=p.split("/")[1];D.ls[id]=await ELCloud.lsInfo(id);return}
+    if(fs[i]==="stu"){stu.add(p.split("/")[1]);return}
     const d=await F.getDoc(F.doc(db(),...p.split("/")));fs[i](d.exists()?d.data():null)}));
-  return D}
+  saveCache();if(!stu.size)return D;
+  await Promise.all([...stu].map(loadStudent));return build(D)}
 // One-click assessment (levels, groups, exam marks, confirmed degrees): merged into results/{id} at once and on screen without reloading.
 // null deletes a field. id is an activity id, or the LS's own record (asId: exam marks, exam writing level, confirmed degrees).
 const deep=(t,o)=>{for(const k in o){const v=o[k];if(v===null)delete t[k];else if(v&&typeof v==="object"&&!Array.isArray(v)){t[k]=t[k]&&typeof t[k]==="object"?t[k]:{};deep(t[k],v)}else t[k]=v}return t};
@@ -504,7 +545,7 @@ function lsWarn(ls,grp,assigned){
   return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
 }
 function render(){
-  render0();keepLast();ptSync()}
+  render0();keepLast();ptSync();loadBar()}
 function render0(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
@@ -513,7 +554,7 @@ function render0(){
     +`<button class="tab cplan ${S.g==="mat"?"on":""}" data-do="tab" data-g="mat" title="Class games, paper worksheets and study PDFs of every LS">📚 Materials</button>`
     +`<button class="tab cplan ${S.g==="ref"?"on":""}" data-do="tab" data-g="ref" title="Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked">📖 Reference</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
-    +` <button class="g" data-do="reload" title="Load the latest data">↻ Reload</button>`
+    // (the old ↻ Reload is now "🔄 Update <group>" / "Update all" above the tabs: loadBar)
     +` <button class="g" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`;
   if(S.g==="plan"){$("#main").innerHTML=satBox(GR.map(g=>g.id))+annBox()+pbBox()+sgBox()+overview();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
@@ -747,7 +788,8 @@ const ptMiss=s=>s.uid?elMissing(s.group,S.term,a=>isDone(s.uid,a),ls=>S.D.ls[ls]
 // whenever it renders and the value has changed, so it follows new work, new due days and point changes.
 const ptOk=s=>{const m=ptMiss(s);return !!m&&!m.length},ptBestOk=g=>Math.max(0,...ptStuds(g).filter(ptOk).map(ptOn));
 function ptSync(){if(S.term!==elTerm()||S.D.ptErr)return;const term=S.term;
-  GR.forEach(g=>{const v=ptBestOk(g.id),t=(S.D.tm[g.id]=S.D.tm[g.id]||{});if((t.bestOk||{})[term]===v)return;
+  // only groups fetched in this visit: never from an old copy
+  GR.filter(g=>DEMO||FRESH.has(g.id)).forEach(g=>{const v=ptBestOk(g.id),t=(S.D.tm[g.id]=S.D.tm[g.id]||{});if((t.bestOk||{})[term]===v)return;
     t.bestOk=Object.assign({},t.bestOk,{[term]:v});const w=put(["teams",g.id],{bestOk:{[term]:v}});if(w)w.catch(e=>console.warn("bestOk",e))})}
 const pt={
   add:(k,g,d)=>{const p=(S.D.pt[k]=S.D.pt[k]||{}),term=S.term;p[term]=Math.max(0,(+p[term]||0)+d);const best=ptBest(g),t=(S.D.tm[g]=S.D.tm[g]||{});t.best=Object.assign({},t.best,{[term]:best});
@@ -1760,10 +1802,17 @@ addEventListener("el-probs",toProbs);
 // While the data comes in, the page says so (it used to stay blank under "Hello"); if a read fails, it says that too, with a Try again button.
 const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if(!S.D)$("#main").innerHTML='<p class="muted" id="loading">⏳ Loading your groups and students…</p>';
   try{S.D=await load()}catch(e){console.warn("load",e);if(!S.D){$("#main").innerHTML='<p><b>The dashboard could not load.</b> Check the connection and try again.</p><p><button id="retry">Try again</button></p>';$("#retry").onclick=()=>start(hello)}return}
-  TOUCHED.clear();loadedAt();render();if(location.hash==="#probs")toProbs()};
-const loadedAt=()=>{const e=$("#loadedAt");if(e)e.textContent="Students' work as of "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})+"."};
-$("#refresh").onclick=async()=>{const b=$("#refresh");b.disabled=true;b.textContent="⏳ Refreshing…";
-  try{S.D=await load();TOUCHED.clear();loadedAt();render()}catch(e){console.warn("load",e);alert("Could not refresh: "+e.message)}b.disabled=false;b.textContent="🔄 Refresh"};
+  TOUCHED.clear();render();if(location.hash==="#probs")toProbs()};
+// "Students' work in 2ESO B: as of 10:42" and the buttons that fetch it (load: "Update <group>" one group, "Update all" everything)
+const whenAt=t=>{if(!t)return "never";const d=new Date(t),today=new Date().toDateString()===d.toDateString();
+  return (today?"":d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+" ")+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})};
+function loadBar(){const e=$("#loadbar");if(!e||DEMO)return;const g=GR.find(x=>x.id===S.g);
+  e.innerHTML=`Students' work${g?` in <b>${esc(g.name)}</b>: as of ${whenAt(AT.g[g.id])}`:`: ${GR.map(x=>esc(x.name)+" "+whenAt(AT.g[x.id])).join(" · ")}`}. `
+    +(g?`<button class="mini" data-load="${g.id}" title="Fetch this group's latest work (about a quarter of everything)">🔄 Update ${esc(g.name)}</button> `:"")
+    +`<button class="g mini" data-load="all" title="Fetch every group's latest work (the most reads: use it rarely)">Update all</button>`}
+document.addEventListener("click",async ev=>{const b=ev.target.closest("[data-load]");if(!b)return;const m=b.dataset.load;
+  document.querySelectorAll("[data-load]").forEach(x=>x.disabled=true);b.textContent="⏳ Fetching…";
+  try{S.D=await load(m);TOUCHED.clear();render()}catch(e){console.warn("load",e);alert("Could not fetch: "+e.message);loadBar()}});
 if(DEMO)start("Preview with sample students: nothing is saved.");
 else ELCloud.onUser(u=>{if(u&&ELCloud.isTeacher(u))start("Hello, "+(u.displayName||u.email)+".")});
 </script></body></html>
