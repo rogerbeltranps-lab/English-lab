@@ -104,14 +104,14 @@ function nav(g,lss){
   const html=`<a class="nv on" href="today.html" aria-current="page">${t("Les meves activitats","My activities")}</a>`
     +cs.map(c=>`<a class="nv" href="${c}/index.html">${t("El meu curs","My course")} · ${COURSES[c]}</a>`+lss.filter(l=>l.course===c).map(l=>`<a class="nv sub" href="${lsHref(l)}">${lsName(l)}</a>`).join("")).join("")
     +`<a class="nv" href="lab/">English Lab</a><a class="nv" href="lab/practice.html">${t("Practica","Practise")}</a>`
-    +`<a class="nv" href="${HOWTO}${t("-ca","")}.mp4" target="_blank" rel="noopener">🎬 ${t("Com funciona la web","How the website works")}</a>`;
+    +`<a class="nv" href="${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}" target="_blank" rel="noopener">🎬 ${t("Com funciona la web","How the website works")}</a>`;
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
 // tools/site-video (real screens of the site, no subtitles). A box on the board and a link in the menu.
-const HOWTO="video/how-english-lab-works";
+const HOWTO="video/how-english-lab-works",HOWTO_V="20261101";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
 const howBox=()=>`<div class="pend" style="background:#f5f3ff;border-color:#c4b5fd;flex-wrap:wrap"><div><b>🎬 ${t("Com funciona English Lab","How English Lab works")}</b> <span class="muted">· ${t("vídeo de 5 minuts: el tauler, les rutes, les Learning Situations i com moure't per la web","5-minute video: your board, routes, Learning Situations and how to move around the website")}</span></div>`
-  +`<div class="row"><a class="go" href="${HOWTO}.mp4" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${HOWTO}-ca.mp4" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
+  +`<div class="row"><a class="go" href="${HOWTO}.mp4?v=${HOWTO_V}" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${HOWTO}-ca.mp4?v=${HOWTO_V}" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
 // "Go to my Learning Situations": one big button per LS the student can open (open LS first).
 const lsGo=lss=>lss.length?`<div class="box lsgo"><h2>${t("Les meves Learning Situations","My Learning Situations")}</h2><div class="row">${lss.map(l=>`<a class="go" href="${lsHref(l)}">${t("Ves a","Go to")} ${lsName(l)} →</a>`).join("")}</div></div>`:"";
 function render(){
