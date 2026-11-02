@@ -18,17 +18,13 @@
    "img": "top",
    "view": "pull+ann",
    "hl": "pull",
-   "margin": 0.08,
-   "on": {
-    "en": "In class: straight there",
-    "ca": "A classe: hi vas directament"
-   }
+   "margin": 0.08
   },
   {
    "img": "top",
    "on": {
-    "en": "Or click Open it",
-    "ca": "O clica Obre-ho"
+    "en": "click Open it",
+    "ca": "clicar Obre-ho"
    },
    "view": "pull+ann",
    "hl": "pullgo",
@@ -151,8 +147,8 @@
   {
    "img": "top",
    "on": {
-    "en": "The main one",
-    "ca": "La principal"
+    "en": "Your board opens",
+    "ca": "El tauler s'obre"
    },
    "view": "lscard",
    "hl": "tab-form",
