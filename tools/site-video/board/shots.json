@@ -1,0 +1,643 @@
+{
+ "_": "What each line of script.json shows. img = a state of capture.mjs (the picture <lang>-<img>.png); view and hl = boxes it measured (a+b = the box around both); on = the word (en / ca) when the shot starts; no view = the top of the picture.",
+ "b01": [
+  {
+   "img": "top"
+  }
+ ],
+ "b02": [
+  {
+   "img": "top",
+   "view": "sub+ann",
+   "hl": "ann",
+   "margin": 0.08
+  }
+ ],
+ "b02p": [
+  {
+   "img": "top",
+   "view": "pull+ann",
+   "hl": "pull",
+   "margin": 0.08
+  },
+  {
+   "img": "top",
+   "on": {
+    "en": "Click Open it",
+    "ca": "Clica Obre-ho"
+   },
+   "view": "pull+ann",
+   "hl": "pullgo",
+   "margin": 0.08
+  }
+ ],
+ "b03": [
+  {
+   "img": "top",
+   "view": "points",
+   "hl": "points",
+   "margin": 0.06
+  }
+ ],
+ "b04": [
+  {
+   "img": "top",
+   "view": "points",
+   "hl": "ptno",
+   "margin": 0.06
+  },
+  {
+   "img": "top",
+   "on": {
+    "en": "Do the missing",
+    "ca": "Si fa"
+   },
+   "view": "points",
+   "hl": "ptmissbox",
+   "margin": 0.06
+  }
+ ],
+ "b05": [
+  {
+   "img": "top",
+   "view": "work",
+   "hl": "workbar",
+   "margin": 0.06
+  }
+ ],
+ "b06": [
+  {
+   "img": "top",
+   "view": "work",
+   "hl": "work",
+   "margin": 0.06
+  },
+  {
+   "img": "top",
+   "on": {
+    "en": "The missing",
+    "ca": "Aquí tens"
+   },
+   "view": "work",
+   "hl": "workmiss",
+   "margin": 0.06
+  }
+ ],
+ "b07": [
+  {
+   "img": "top",
+   "view": "workmiss+howto",
+   "hl": "howto",
+   "margin": 0.1
+  }
+ ],
+ "b08": [
+  {
+   "img": "top",
+   "view": "lscard",
+   "hl": "lscard",
+   "margin": 0.05
+  },
+  {
+   "img": "top",
+   "on": {
+    "en": "Each button",
+    "ca": "Cada botó"
+   },
+   "view": "lscard",
+   "hl": "lspick",
+   "margin": 0.05
+  }
+ ],
+ "b09": [
+  {
+   "img": "top",
+   "view": "lscard",
+   "hl": "lvline",
+   "margin": 0.05
+  },
+  {
+   "img": "top",
+   "on": {
+    "en": "click Ask",
+    "ca": "clica Demana"
+   },
+   "view": "lscard",
+   "hl": "askbtn",
+   "margin": 0.05
+  },
+  {
+   "img": "top",
+   "on": {
+    "en": "On the right",
+    "ca": "A la dreta"
+   },
+   "view": "lscard",
+   "hl": "lsopen",
+   "margin": 0.05
+  }
+ ],
+ "b10": [
+  {
+   "img": "top",
+   "view": "lscard",
+   "hl": "btabs",
+   "margin": 0.05
+  },
+  {
+   "img": "top",
+   "on": {
+    "en": "Click a card",
+    "ca": "Clica una"
+   },
+   "view": "lscard",
+   "hl": "tab-week",
+   "margin": 0.05
+  }
+ ],
+ "b11": [
+  {
+   "img": "top",
+   "view": "tab-week+practice",
+   "hl": "study",
+   "margin": 0.04
+  },
+  {
+   "img": "top",
+   "on": {
+    "en": "extra practice",
+    "ca": "pràctica extra"
+   },
+   "view": "tab-week+practice",
+   "hl": "practice",
+   "margin": 0.04
+  }
+ ],
+ "b12": [
+  {
+   "img": "top",
+   "view": "wkbox",
+   "hl": "examday",
+   "margin": 0.04
+  },
+  {
+   "img": "top",
+   "on": {
+    "en": "Below",
+    "ca": "A sota"
+   },
+   "view": "wkbox",
+   "hl": "hw",
+   "margin": 0.04
+  }
+ ],
+ "b13": [
+  {
+   "img": "top",
+   "view": "wknow",
+   "hl": "wknow",
+   "margin": 0.06
+  }
+ ],
+ "b14": [
+  {
+   "img": "form",
+   "view": "btabs+lpsum",
+   "hl": "tab-form",
+   "margin": 0.04
+  },
+  {
+   "img": "form",
+   "on": {
+    "en": "Next for you",
+    "ca": "El següent"
+   },
+   "view": "fhead+lprow1",
+   "hl": "nextbox",
+   "margin": 0.04
+  }
+ ],
+ "b15": [
+  {
+   "img": "form",
+   "view": "fhead+lprow1",
+   "hl": "lpsum",
+   "margin": 0.04
+  }
+ ],
+ "b16": [
+  {
+   "img": "form",
+   "view": "lpsum+lprow4",
+   "hl": "lptable",
+   "margin": 0.04
+  },
+  {
+   "img": "form",
+   "on": {
+    "en": "Each tab",
+    "ca": "Cada pestanya"
+   },
+   "view": "lpsum+lprow4",
+   "hl": "lprow1",
+   "margin": 0.04
+  }
+ ],
+ "b17": [
+  {
+   "img": "form",
+   "view": "lprow0+lprow3",
+   "hl": "amber",
+   "margin": 0.04
+  }
+ ],
+ "b18": [
+  {
+   "img": "form",
+   "view": "lprow1+lprow5",
+   "hl": "lpmiss",
+   "margin": 0.04
+  },
+  {
+   "img": "form",
+   "on": {
+    "en": "Click a red tab",
+    "ca": "Clica una pestanya"
+   },
+   "view": "lprow1+lprow5",
+   "hl": "lptabsmiss",
+   "margin": 0.04
+  }
+ ],
+ "b19": [
+  {
+   "img": "form",
+   "view": "lprow1+lprow5",
+   "hl": "cprow",
+   "margin": 0.04
+  },
+  {
+   "img": "form",
+   "on": {
+    "en": "A lock",
+    "ca": "Un cadenat"
+   },
+   "view": "lprow6+lprow11",
+   "hl": "lock",
+   "margin": 0.04
+  }
+ ],
+ "b20": [
+  {
+   "img": "form",
+   "view": "lprow0+lprow5",
+   "hl": "scorecol",
+   "margin": 0.04
+  },
+  {
+   "img": "detail",
+   "on": {
+    "en": "Click it",
+    "ca": "Clica-la"
+   },
+   "view": "dlg",
+   "hl": "dlg",
+   "margin": 0.04
+  }
+ ],
+ "b21": [
+  {
+   "img": "form",
+   "view": "prog",
+   "from": "lprow8+lprow12",
+   "hl": "wsplit",
+   "margin": 0.0,
+   "top": true
+  }
+ ],
+ "b22": [
+  {
+   "img": "form",
+   "view": "prog",
+   "hl": "wbig",
+   "top": true
+  },
+  {
+   "img": "form",
+   "on": {
+    "en": "And every",
+    "ca": "I cada"
+   },
+   "view": "prog",
+   "hl": "progwarn",
+   "top": true
+  }
+ ],
+ "b23": [
+  {
+   "img": "form",
+   "view": "pr0+pr5",
+   "hl": "pr1+pr4",
+   "margin": 0.03
+  },
+  {
+   "img": "form",
+   "on": {
+    "en": "other competences",
+    "ca": "altres competències"
+   },
+   "view": "pr0+pr5",
+   "hl": "pr5",
+   "margin": 0.03
+  }
+ ],
+ "b24": [
+  {
+   "img": "form",
+   "view": "pr5+pr8",
+   "hl": "pr6+pr7",
+   "margin": 0.05
+  },
+  {
+   "img": "form",
+   "on": {
+    "en": "At the bottom",
+    "ca": "A baix"
+   },
+   "view": "pr5+pr8",
+   "hl": "prtotal",
+   "margin": 0.05
+  }
+ ],
+ "b25": [
+  {
+   "img": "form",
+   "view": "crittop",
+   "hl": "crittop",
+   "margin": 0.05
+  },
+  {
+   "img": "crit",
+   "on": {
+    "en": "Tap a code",
+    "ca": "Toca un codi"
+   },
+   "view": "dlg",
+   "hl": "dlg",
+   "margin": 0.06
+  }
+ ],
+ "b26": [
+  {
+   "img": "fpmid",
+   "view": "btabs+fpbox0",
+   "hl": "tab-fp",
+   "margin": 0.04
+  },
+  {
+   "img": "fpmid",
+   "on": {
+    "en": "You see",
+    "ca": "Hi veus"
+   },
+   "view": "btabs+fpbox0",
+   "hl": "fpbox0",
+   "margin": 0.04
+  }
+ ],
+ "b27": [
+  {
+   "img": "fp",
+   "view": "fhead+fpbox0",
+   "hl": "fpmark",
+   "margin": 0.06
+  },
+  {
+   "img": "fp",
+   "on": {
+    "en": "feedback",
+    "ca": "feedback"
+   },
+   "view": "fhead+fpbox0",
+   "hl": "fpfeedback",
+   "margin": 0.06
+  },
+  {
+   "img": "fp",
+   "on": {
+    "en": "This is an example",
+    "ca": "Això és"
+   },
+   "view": "fhead+fpbox0",
+   "hl": "fpmark",
+   "margin": 0.06
+  }
+ ],
+ "b28": [
+  {
+   "img": "fp",
+   "view": "fpbox1",
+   "hl": "fpsteps",
+   "margin": 0.04
+  },
+  {
+   "img": "fp",
+   "on": {
+    "en": "your teacher's answers",
+    "ca": "les respostes"
+   },
+   "view": "fpbox1",
+   "hl": "fpans",
+   "margin": 0.04
+  },
+  {
+   "img": "fp",
+   "on": {
+    "en": "Click Review",
+    "ca": "Clica Revisa"
+   },
+   "view": "fpbox1",
+   "hl": "fpreview",
+   "margin": 0.04
+  }
+ ],
+ "b29": [
+  {
+   "img": "fp",
+   "view": "fprubric",
+   "hl": "fprubric",
+   "margin": 0.04
+  }
+ ],
+ "b30": [
+  {
+   "img": "ls1",
+   "view": "lscard+ex0",
+   "hl": "tab-exam",
+   "margin": 0.03
+  },
+  {
+   "img": "ls1",
+   "on": {
+    "en": "In LS1",
+    "ca": "A la LS1"
+   },
+   "view": "lscard+ex0",
+   "hl": "ex0",
+   "margin": 0.03
+  },
+  {
+   "img": "ls1",
+   "on": {
+    "en": "exam version",
+    "ca": "quina versió"
+   },
+   "view": "lscard+ex0",
+   "hl": "exver",
+   "margin": 0.03
+  }
+ ],
+ "b31": [
+  {
+   "img": "ls1",
+   "view": "ex1",
+   "hl": "ex1",
+   "margin": 0.05
+  }
+ ],
+ "b32": [
+  {
+   "img": "ls1",
+   "view": "ex2",
+   "hl": "ex2",
+   "margin": 0.04
+  }
+ ],
+ "b33": [
+  {
+   "img": "ls1",
+   "view": "ex3",
+   "hl": "qtable",
+   "margin": 0.03
+  },
+  {
+   "img": "ls1",
+   "on": {
+    "en": "a button",
+    "ca": "un botó"
+   },
+   "view": "ex3",
+   "hl": "qlp",
+   "margin": 0.03
+  }
+ ],
+ "b34": [
+  {
+   "img": "ls1",
+   "view": "wr0",
+   "hl": "wr0",
+   "margin": 0.05
+  },
+  {
+   "img": "ls1",
+   "on": {
+    "en": "Each row",
+    "ca": "Cadascun"
+   },
+   "view": "wr0",
+   "hl": "wbands",
+   "margin": 0.05
+  },
+  {
+   "img": "ls1",
+   "on": {
+    "en": "Your level",
+    "ca": "El teu nivell"
+   },
+   "view": "wr0",
+   "hl": "wbandon",
+   "margin": 0.05
+  }
+ ],
+ "b35": [
+  {
+   "img": "ls1",
+   "view": "wr0",
+   "hl": "wweight",
+   "margin": 0.05
+  },
+  {
+   "img": "ls1",
+   "on": {
+    "en": "It also tells",
+    "ca": "També et diu"
+   },
+   "view": "wr1",
+   "hl": "wr1mist",
+   "margin": 0.05
+  }
+ ],
+ "b36": [
+  {
+   "img": "ls1",
+   "view": "wfb+werrs",
+   "hl": "wfb",
+   "margin": 0.04
+  },
+  {
+   "img": "ls1",
+   "on": {
+    "en": "a table",
+    "ca": "una taula"
+   },
+   "view": "wfb+werrs",
+   "hl": "werrs",
+   "margin": 0.04
+  }
+ ],
+ "b37": [
+  {
+   "img": "ls1",
+   "view": "wtexts",
+   "hl": "wtexts",
+   "margin": 0.04
+  }
+ ],
+ "b38": [
+  {
+   "img": "ls1",
+   "view": "rvl",
+   "hl": "rvl",
+   "margin": 0.1
+  }
+ ],
+ "b39": [
+  {
+   "img": "exam2",
+   "view": "btabs+ex1",
+   "hl": "ex1",
+   "margin": 0.05
+  }
+ ],
+ "b40": [
+  {
+   "img": "card",
+   "card": {
+    "en": {
+     "lines": [
+      "That's your board!"
+     ],
+     "sub": "Check it often · do your learning paths every day",
+     "big": 58
+    },
+    "ca": {
+     "lines": [
+      "Aquest és el teu tauler!"
+     ],
+     "sub": "Mira'l sovint · fes els learning paths cada dia",
+     "big": 58
+    }
+   }
+  }
+ ]
+}
