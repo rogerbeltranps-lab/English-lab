@@ -13,16 +13,26 @@ const css=s=>window.CSS&&CSS.escape?CSS.escape(s):s.replace(/[^\w-]/g,"\\$&");
 // list() → [{activity, replies, answers, levels}] (the student's results), seen() → fbSeen, save({key: sig}), here = this page's activity id or
 // null, root = the site root URL, en = the route reads English, name(activity, step) → the step's name or null.
 // A writing correction (el-marking.js fbText: the comment, "✗ their words → right — why" lines, "✅ " + the corrected text with the
-// changes in *…*) as a table of mistakes and the corrected text with the changes in bold; any other answer as plain text.
+// changes in *…*) as the student's own text as handed in with the mistakes underlined in red (orig, when the page has it: Roger, 2 Nov
+// 2026: "they should see the original text and the corrections with a table: mistakes, corrections and why"), the table of mistakes
+// and the corrected text with the changes in bold; any other answer as plain text.
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
-export function writing(el,text,T){const ls=String(text).split("\n"),rows=ls.filter(l=>l.startsWith("✗ ")),fixed=ls.find(l=>l.startsWith("✅ "));
+const ROW=/^✗ ([\s\S]+?) → ([\s\S]+?)(?: — ([\s\S]*))?$/;
+// the original text with each mistake ("their words" of a row, first time it appears and not inside another one) underlined in red
+function marked(orig,rows){const rs=[];for(const l of rows){const w=(ROW.exec(l)||[])[1];if(!w)continue;let i=orig.indexOf(w);
+    while(i>=0&&rs.some(r=>i<r[1]&&i+w.length>r[0]))i=orig.indexOf(w,i+1);if(i>=0)rs.push([i,i+w.length])}
+  rs.sort((a,b)=>a[0]-b[0]);let h="",at=0;
+  for(const [a,b] of rs){h+=esc(orig.slice(at,a))+'<span style="color:#b91c1c;text-decoration:underline wavy #ef4444;text-underline-offset:3px">'+esc(orig.slice(a,b))+'</span>';at=b}
+  return h+esc(orig.slice(at))}
+export function writing(el,text,T,orig){const ls=String(text).split("\n"),rows=ls.filter(l=>l.startsWith("✗ ")),fixed=ls.find(l=>l.startsWith("✅ "));
   if(!rows.length&&!fixed){el.textContent=text;return}
   const note=ls.filter(l=>!l.startsWith("✗ ")&&!l.startsWith("✅ ")).join("\n").trim(),td="padding:6px 8px;border-top:1px solid #bbf7d0;vertical-align:top;text-align:left";
   el.style.whiteSpace="normal";
   el.innerHTML=(note?'<p style="margin:0 0 10px;white-space:pre-wrap">'+esc(note)+'</p>':"")
+    +(orig&&String(orig).trim()?'<b style="display:block;margin-bottom:4px">'+T("📝 El teu text, tal com l’has entregat","📝 Your text, as you handed it in")+'</b><p style="margin:0 0 12px;padding:10px 12px;background:#fff;border-radius:10px;white-space:pre-wrap">'+marked(String(orig),rows)+'</p>':"")
     +(rows.length?'<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;margin:0 0 12px;background:#fff;font-size:14px"><thead><tr>'
       +[T("Errada","Mistake"),T("Correcció","Correction"),T("Per què","Why")].map(h=>'<th style="'+td+';border-top:0;color:#166534">'+h+'</th>').join("")+'</tr></thead><tbody>'
-      +rows.map(l=>{const m=/^✗ ([\s\S]+?) → ([\s\S]+?)(?: — ([\s\S]*))?$/.exec(l)||[null,l.slice(2),"",""];
+      +rows.map(l=>{const m=ROW.exec(l)||[null,l.slice(2),"",""];
         return '<tr><td style="'+td+';color:#b91c1c"><s>'+esc(m[1])+'</s></td><td style="'+td+';color:#15803d;font-weight:600">'+esc(m[2])+'</td><td style="'+td+'">'+esc(m[3]||"")+'</td></tr>'}).join("")
       +'</tbody></table></div>':"")
     +(fixed?'<b style="display:block;margin-bottom:4px">'+T("✅ El teu text corregit","✅ Your text, corrected")+'</b><p style="margin:0;padding:10px 12px;background:#fff;border-radius:10px;white-space:pre-wrap">'
@@ -40,6 +50,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
   // on the learning path: the answers in their tabs, and the levels for the page
   const mine=rs.find(r=>r.activity===here);
   if(mine&&mine.levels)dispatchEvent(new CustomEvent("el-levels",{detail:{levels:mine.levels}}));
+  if(mine)dispatchEvent(new CustomEvent("el-result",{detail:{result:mine}}));   // a writing the teacher sent back opens again (ls2-engine.js)
   const shown={};
   for(const it of items.filter(x=>x.a.id===here)){
     const put=()=>{const p=document.querySelector("section.panel#"+css(it.step))||document.getElementById(it.step);if(!p)return false;
@@ -47,7 +58,7 @@ export async function corrections({list,seen,save,here,root,en,name}){
       b.style.cssText="margin:0 0 14px;padding:12px 14px;border:2px solid #16a34a;border-radius:14px;background:#f0fdf4;color:#0f172a;font:15px/1.5 system-ui,sans-serif";
       b.innerHTML='<b style="display:block;margin-bottom:4px"></b><div style="white-space:pre-wrap"></div>';
       b.querySelector("b").textContent=it.corr?T("✏️ La correcció del professor","✏️ Your teacher’s correction"):T("💬 La resposta del professor","💬 Your teacher’s answer");
-      writing(b.querySelector("div"),it.text,T);return true};
+      writing(b.querySelector("div"),it.text,T,window.elHandedText&&window.elHandedText(it.step));return true};
     if(put())shown[it.k]=it.v;else{let n=0;const t=setInterval(()=>{if(put()||++n>40)clearInterval(t)},250)}   // the page may still be drawing its tabs
   }
   if(Object.keys(shown).length)Promise.resolve(save(shown)).catch(e=>console.warn("corrections",e));

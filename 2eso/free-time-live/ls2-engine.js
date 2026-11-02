@@ -541,6 +541,22 @@ var LS2 = (function () {
   // them in the Wednesday run: a table of mistakes and the text corrected with the fewest changes (el-marking.js, mode "writing").
   const toTeacher = p => p.teacher !== false;
   function handedMsg(p) { const h = (state.steps || {})[p.id]; return h ? (ca() ? 'Entregat el ' + new Date(h.date).toLocaleDateString() + '. El professor et tornarà la correcció aquí mateix. Si canvies el text, torna’l a entregar.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. Your teacher’s correction will appear right here. If you change your text, hand it in again.') : ''; }
+  /* A writing handed in is kept as it was (Roger, 2 Nov 2026: "they should see what they did, and warn them that they won't be able to
+     modify it once handed in"): the box shows the text handed in, read-only, and the hand-in button is gone. It opens again only when
+     the teacher asks for it again: "Redo in class" on a possible copy (results.flags[step].done = "redo", after that hand-in) or
+     "Reopen" on the dashboard (results.reopenedAt after it). el-corrections.js sends the activity's result as the "el-result" event. */
+  const reopened = {};
+  const handedText = id => { const h = (state.steps || {})[id]; return h && h.f && h.f[0] ? String(h.f[0].v || '') : ''; };
+  window.elHandedText = id => (LP.panels || []).some(p => p.id === id && p.type === 'writing') ? handedText(id) : '';
+  function wroteMsg(p) { const h = (state.steps || {})[p.id]; return ca() ? 'Entregat el ' + new Date(h.date).toLocaleDateString() + '. Ja no el pots canviar. Quan el professor l’hagi corregit, veuràs la correcció a dalt de tot d’aquesta secció: el teu text, una taula amb les errades i el text corregit.' : 'Handed in on ' + new Date(h.date).toLocaleDateString() + '. You can’t change it now. When your teacher has corrected it, you will see the correction at the top of this section: your text, a table with your mistakes and your text, corrected.'; }
+  addEventListener('el-result', e => {
+    const r = (e.detail || {}).result || {}, ms = v => v == null ? 0 : typeof v === 'number' ? v : v.toDate ? +v.toDate() : v.seconds ? v.seconds * 1000 : +new Date(v) || 0;
+    (LP.panels || []).filter(p => p.type === 'writing' && toTeacher(p)).forEach(p => {
+      const h = (state.steps || {})[p.id]; if (!h || reopened[p.id]) return;
+      const fl = (r.flags || {})[p.id], at = ms(h.date);
+      if ((fl && fl.done === 'redo' && ms(fl.at) >= at) || ms(r.reopenedAt) > at) { reopened[p.id] = true; if (p._lock) p._lock(); }
+    });
+  });
   addEventListener('el-levels', e => {
     const lv = (e.detail || {}).levels || {}, M = { NA: 2.5, AS: 5, AN: 7.5, AE: 10 };
     (LP.panels || []).filter(p => p.teacher && p.type === 'marked' && lv[p.id]).forEach(p => {
@@ -592,8 +608,8 @@ var LS2 = (function () {
     html: '<div class="section-card"><h3>' + (ca() ? 'La tasca' : 'Your task') + '</h3><p class="instruction" id="' + p.id + 'Task"></p>' +
       (p.model ? '<div class="model"><strong>' + (ca() ? 'Model (no el copiïs: és sobre una altra afició)' : 'Model (don’t copy it: it is about another hobby)') + '</strong><br>' + tx(p.model) + '</div>' : '') +
       '<div class="model" id="' + p.id + 'Frame" hidden></div><textarea id="' + p.id + 'Text" placeholder="Write here…"></textarea><p class="tiny" id="' + p.id + 'Count"></p></div>' +
-      '<div class="section-card"><h3>' + (ca() ? 'Revisa abans d’enviar' : 'Check before you send') + '</h3><div class="options" id="' + p.id + 'List"></div>' +
-      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (toTeacher(p) ? teacherBtn() : ca() ? 'Desa i corregeix amb IA ↗' : 'Save and correct with AI ↗') + '</button></div>' + (toTeacher(p) ? '<p class="tiny">' + (ca() ? 'El professor et corregirà el text i et tornarà la correcció aquí mateix: una taula amb les errades i el teu text corregit.' : 'Your teacher will correct your text and give you the correction right here: a table with your mistakes and your text, corrected.') + '</p>' : '') + '<p class="feedback" id="' + p.id + 'Msg"></p>' +
+      '<div class="section-card"><div id="' + p.id + 'Send"><h3>' + (ca() ? 'Revisa abans d’enviar' : 'Check before you send') + '</h3><div class="options" id="' + p.id + 'List"></div>' +
+      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Ai">' + (toTeacher(p) ? teacherBtn() : ca() ? 'Desa i corregeix amb IA ↗' : 'Save and correct with AI ↗') + '</button></div>' + (toTeacher(p) ? '<p class="tiny">' + (ca() ? 'El professor et corregirà el text i et tornarà la correcció aquí mateix: el teu text, una taula amb les errades i el text corregit. <strong>Un cop entregat, ja no el podràs canviar.</strong>' : 'Your teacher will correct your text and give you the correction right here: your text, a table with your mistakes and your text, corrected. <strong>Once you hand it in, you can’t change it.</strong>') + '</p>' : '') + '</div><p class="feedback" id="' + p.id + 'Msg"></p>' +
       '</div>' + (toTeacher(p) ? '' : revisionHtml(p.id)),
     bind() {
       const ta = $('#' + p.id + 'Text'), key = p.id + '_' + level;
@@ -612,7 +628,10 @@ var LS2 = (function () {
         const boxes = $$('#' + p.id + 'List input'), msg = $('#' + p.id + 'Msg');
         if (min && words(ta.value) < min) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + min + ' paraules.' : 'Too short: write at least ' + min + ' words.'; return; }
         if (boxes.some(b => !b.checked)) { msg.className = 'feedback no'; msg.textContent = learningSupport.missing(level, boxes); return; }
-        if (toTeacher(p)) { handToTeacher(p, ta.value.trim()); if (p.product) saveProduct(p.product, ta.value.trim()); msg.className = 'feedback ok'; msg.textContent = handedMsg(p); return; }
+        if (toTeacher(p)) {
+          if (!confirm(ca() ? 'Vols entregar el text al professor? Un cop entregat, ja no el podràs canviar.' : 'Hand your text in to your teacher? Once you hand it in, you can’t change it.')) return;
+          handToTeacher(p, ta.value.trim()); if (p.product) saveProduct(p.product, ta.value.trim()); reopened[p.id] = false; lock(); return;
+        }
         window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(aiPrompt(p, ta.value.trim())), '_blank', 'noopener,noreferrer');
         if (p.product) saveProduct(p.product, ta.value.trim());
         const first = keepDraft(key, ta.value.trim());
@@ -621,7 +640,14 @@ var LS2 = (function () {
           : (ca() ? 'S’ha obert ChatGPT amb la teva nova versió.' : 'ChatGPT has opened with your new version.');
         showRevision();
       };
-      if (toTeacher(p)) { const h = handedMsg(p); if (h) { $('#' + p.id + 'Msg').className = 'feedback ok'; $('#' + p.id + 'Msg').textContent = h; } return; }
+      // handed in: the text as handed in, read-only, no button (reopened by the teacher: editable again, hand it in again)
+      function lock() {
+        const h = (state.steps || {})[p.id], on = !!h && !reopened[p.id], msg = $('#' + p.id + 'Msg');
+        ta.readOnly = on; ta.style.background = on ? '#eef2f7' : ''; ta.style.fieldSizing = on ? 'content' : ''; $('#' + p.id + 'Send').hidden = on;
+        if (on) { ta.value = handedText(p.id) || ta.value; count(); msg.className = 'feedback ok'; msg.textContent = wroteMsg(p); }
+        else if (h) { msg.className = 'feedback'; msg.textContent = ca() ? 'El professor et demana que el tornis a fer: millora’l i torna’l a entregar.' : 'Your teacher asks you to do it again: improve it and hand it in again.'; }
+      }
+      if (toTeacher(p)) { p._lock = lock; lock(); return; }
       const showRevision = bindRevision(p.id, key, () => ta.value.trim(), text => { if (p.product) saveProduct(p.product, text); });
     }
   });
