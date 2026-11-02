@@ -30,7 +30,7 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 .tabbody{border-radius:14px}.t-form{background:#fff7ed;border:2px solid #fdba74;padding:2px 12px 8px}.t-exam{background:#f5f3ff;border:2px solid #c4b5fd;padding:2px 12px 8px}.fhead h2{margin:12px 0 2px;color:#9a3412}.fhead p{margin:0 0 6px;color:#9a3412}
 .xt{width:100%}.xt th{text-align:left}.xt td.l{text-align:left;vertical-align:top}.xbar{display:inline-block;width:120px;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;vertical-align:middle}.xbar span{display:block;height:100%}
 .corr thead th{color:#166534;background:#f0fdf4}.corr td.bad{color:#b91c1c}.corr td.good{color:#15803d;font-weight:600}.rv{margin-top:6px}.t-exam h3{font-size:1rem;margin:14px 0 6px}.wtexts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wtx{white-space:pre-wrap;background:#f8fafc;border-radius:10px;padding:10px 12px;margin:0;line-height:1.5}.wtx.ok2{background:#f0fdf4}.wtx.ok2 b{color:#15803d;text-decoration:underline}
-ol.rvl{margin:4px 0;padding-left:20px}ol.rvl li{margin:8px 0}ol.rvl li span{margin-right:6px}.notyet{background:#fff;border-style:dashed}.wnote{white-space:pre-wrap;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:8px 12px;margin:8px 0}
+ol.rvl{margin:4px 0;padding-left:20px}ol.rvl li{margin:8px 0}ol.rvl li span{margin-right:6px}.notyet{background:#fff;border-style:dashed}.wcopyn{background:#fef2f2;border:1px solid #fca5a5;color:#7f1d1d;border-radius:10px;padding:8px 12px;margin:0 0 10px}.wr.wcopy .wrs{color:#b91c1c}.wnote{white-space:pre-wrap;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:8px 12px;margin:8px 0}
 .asbar{background:#fef9c3;border:1px solid #facc15;border-radius:12px;padding:8px 12px;margin:0 0 10px;position:sticky;top:0;z-index:30;box-shadow:0 4px 12px #0001}.asbar .top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.asbar .bar{margin:6px 0 0}.asbar .bar>small{min-width:34px;font-weight:600;color:#713f12}.asbar .chip{font-size:13px;padding:4px 12px}
 body.as .tabbody,body.as .lscard,body.as #exam{scroll-margin-top:130px}
 .lpst td{vertical-align:top}.lpst td.l{text-align:left}.lpst .stp{display:inline-block;font-size:12px;border-radius:999px;padding:1px 8px;margin:1px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;white-space:nowrap}.lpst .stp.ok{background:#dcfce7;border-color:#86efac;color:#166534}.lpst .stp.lt{background:#fef3c7;border-color:#fcd34d;color:#92400e}.lpst .stp.no{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:600}.lpst .stp.off{opacity:.6}
@@ -387,13 +387,22 @@ const wRowOf=type=>{const f=String(type||"").toLowerCase().split("/")[0].trim();
 const wCuts=m=>[m,Math.ceil(m*.75),Math.ceil(m*.375),0];
 const wBand=(v,m)=>{const c=wCuts(m);return v>=c[0]?0:v>=c[1]?1:v>=c[2]?2:3};
 const wRange=(i,m)=>{const c=wCuts(m),lo=c[i],hi=i?Math.max(lo,c[i-1]-1):m;return lo===hi?String(lo):lo+"–"+hi};
+// Copied from the reading (Roger, 2 Nov 2026: "add copied from the reading so that students that were penalized can see it"). The LS1
+// reports say it only in the teacher's comment or note ("similarity check", "fiabilitat", "copied Reading material"…), so it is read
+// from there (writing.copied "all"/"part" wins if a report sets it): "all" = the writing got 0 because it was the reading rewritten,
+// every row says so instead of its levels; "part" = only the student's own sentences were marked, the rubric says so above the rows.
+function wCopied(w,tot){if(w.copied==="all"||w.copied==="part")return w.copied;
+  const x=(w.feedback||"")+" "+(w.note||"");
+  if(/copied reading|extrets del reading|fragment (del|adapted)/i.test(x)&&tot>0)return "part";
+  return /similarity[- ]check|similitud|reliability|fiabilitat|reprodu(ces|eix)[^.]*reading|copied reading|extrets del reading/i.test(x)?(tot>0?"part":"all"):""}
 function examWriting(r,e){const w=r.writing;if(!w)return "";
   const rub=(w.rubric||[]).map(x=>Array.isArray(x)?x:[x.name,x.score,x.max]);   // Firestore stores rows as {name, score, max}
-  const tot=rub.reduce((a,x)=>[a[0]+(+x[1]||0),a[1]+(+x[2]||0)],[0,0]),errs=w.errors||[],L=EN?1:0;
+  const tot=rub.reduce((a,x)=>[a[0]+(+x[1]||0),a[1]+(+x[2]||0)],[0,0]),errs=w.errors||[],L=EN?1:0,cp=wCopied(w,tot[0]);
   const crit=k=>((e&&e.sections||[]).find(x=>x[0]===k)||[])[3]||[];
   const bandName=[t("Excel·lent","Excellent"),t("Bé","Good"),t("A millorar","Needs work"),t("Insuficient","Not enough")];
   const row=([n,v,m])=>{const id=(String(n).match(/^\s*(C[1-4])\b/)||[])[1],d=WRUB[id];v=+v||0;m=+m||0;
     if(!d)return `<div class="wr"><div class="wrh"><b>${esc(n)}</b><span class="wrs"><b>${pts1(v)}</b> / ${m}</span></div></div>`;
+    if(cp==="all")return `<div class="wr wcopy"><div class="wrh"><b>${id} · ${t(d.ca,d.en)}</b> ${crit(d.k).map(pill).join("")}<span class="wrs">🚫 ${t("Copiat del reading","Copied from the reading")} · <b>0</b> / ${m} ${t("punts","points")}</span></div></div>`;
     const b=wBand(v,m),mine=errs.map((x,i)=>wRowOf(x.type)===id?i+1:0).filter(Boolean);
     // Roger, 2 Nov 2026 ("hauria de ser 3/4 i si vols la ponderació"): each row is marked by its level out of 4 (Excellent 4, Good 3,
     // Needs work 2, Not enough 1), and its weight in the writing (its points out of the writing's) is said apart, with the points it gives
@@ -406,7 +415,10 @@ function examWriting(r,e){const w=r.writing;if(!w)return "";
         :id==="C1"?`💬 ${t("Mira el comentari del professor: et diu què faltava.","Read your teacher's comment: it tells you what was missing.")}`:""}</p>`:"")+`</div>`};
   return `<div class="box"><h2>4 · ${t("El teu writing","Your writing")}</h2>`
     +(rub.length?`<h3>${t("Rúbrica","Rubric")} <small class="muted">· ${pts1(tot[0])} / ${tot[1]} ${t("punts","points")}</small></h3>`
-      +(rub.some(x=>/^\s*C[1-4]\b/.test(x[0]))?`<p class="muted" style="margin:0 0 8px">${t("El writing es corregeix amb 4 criteris. Cadascun té 4 nivells (de 4/4 Excel·lent a 1/4 Insuficient): hi veus què es valora, què vol dir cada nivell (el teu està marcat), quant pesa el criteri en la nota del writing i quines errades t'hi han tret punts. Toca el codi (5.1, 5.2) per veure el criteri oficial.","Your writing is marked on 4 rows. Each has 4 levels (from 4/4 Excellent to 1/4 Not enough): you can see what it checks, what each level means (yours is highlighted), how much the row weighs in your writing mark and which mistakes cost you points. Tap the code (5.1, 5.2) to see the official criterion.")}</p>`:"")
+      +(cp!=="all"&&rub.some(x=>/^\s*C[1-4]\b/.test(x[0]))?`<p class="muted" style="margin:0 0 8px">${t("El writing es corregeix amb 4 criteris. Cadascun té 4 nivells (de 4/4 Excel·lent a 1/4 Insuficient): hi veus què es valora, què vol dir cada nivell (el teu està marcat), quant pesa el criteri en la nota del writing i quines errades t'hi han tret punts. Toca el codi (5.1, 5.2) per veure el criteri oficial.","Your writing is marked on 4 rows. Each has 4 levels (from 4/4 Excellent to 1/4 Not enough): you can see what it checks, what each level means (yours is highlighted), how much the row weighs in your writing mark and which mistakes cost you points. Tap the code (5.1, 5.2) to see the official criterion.")}</p>`:"")
+      +(cp?`<div class="wcopyn">🚫 <b>${t(cp==="all"?"Copiat del reading":"Una part copiada del reading",cp==="all"?"Copied from the reading":"Part copied from the reading")}</b><br>${t(cp==="all"
+          ?"El teu writing repeteix el text del reading de l'examen, frase per frase, canviant només alguns detalls. Un text copiat no mostra com escrius tu, per això cap criteri té punts.":"Algunes frases del teu writing són del text del reading de l'examen. Aquestes frases no compten: només s'han corregit les frases que has escrit tu.",cp==="all"
+          ?"Your writing repeats the text of the exam's reading, sentence by sentence, with only some details changed. A copied text does not show how you write, so no row gets any points.":"Some sentences of your writing come from the exam's reading. Those sentences do not count: only the sentences you wrote yourself were marked.")}</div>`:"")
       +`<div class="wrub">${rub.map(row).join("")}<div class="wr wrt"><div class="wrh"><b>${t("Total del writing","Writing total")}</b><span class="wrs"><b>${pts1(tot[0])}</b> / ${tot[1]} ${bar(tot[1]?tot[0]/tot[1]*100:0)}</span></div></div></div>`:"")
     +(w.note?`<div class="wnote">ℹ️ ${esc(w.note)}</div>`:"")
     +(w.feedback?`<h3>💬 ${t("Comentari del professor","Your teacher's comment")}</h3><div class="fb">${esc(w.feedback)}</div>`:"")
