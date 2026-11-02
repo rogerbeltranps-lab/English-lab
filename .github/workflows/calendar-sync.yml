@@ -1,0 +1,42 @@
+# Students' calendar feeds follow the dashboard (Roger, 2 Nov 2026: "I should be able to delete the homework"). calendar/<group>.ics is a
+# static file built from the teaching plans (shared/js/el-plan.js); this job rebuilds it with the changes made on the dashboard
+# (ls/{id}.planEdits: homework removed ✕, sessions moved ✏️, self-study classes taught in class, learning paths dropped ✂) and commits it
+# only when something changed. Google Calendar refreshes a subscribed feed by itself every few hours.
+# Free (GitHub Actions in a public repo), Firestore read only: one read per LS each run. By hand: Actions > Calendar sync > Run workflow.
+name: Calendar sync
+
+on:
+  schedule:
+    - cron: "7 6-21 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: calendar-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.repository == 'rogerbeltranps-lab/English-lab'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Rebuild the calendar feeds with the dashboard's changes
+        run: node tools/gen-calendar.js . --live
+      - name: Commit them if they changed
+        run: |
+          if git diff --quiet -- calendar; then echo "Calendar feeds already up to date."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add calendar
+          git commit -m "Calendar feeds: changes made on the dashboard"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push origin HEAD:main && exit 0; sleep 5; done
+          exit 1
