@@ -1,12 +1,13 @@
 // Week helpers for the teaching plans in el-plan.js (exam day, `from` of each week row, `due` per activity), shared by the
 // teacher dashboard (time plan) and the student board (this week, reminders). Dates are YYYY-MM-DD in local time.
-// window.EL_TODAY (YYYY-MM-DD) replaces today in previews.
+// window.EL_TODAY (YYYY-MM-DD) replaces today in previews; window.EL_NOW ("YYYY-MM-DDTHH:MM") replaces the date and time.
 (function(){
   const key=x=>String(x).replace(/[^a-z0-9]/gi,"").toLowerCase();
   const ymd=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   const day=s=>{const [y,m,d]=String(s).split("-").map(Number);return new Date(y,m-1,d)};
   const add=(s,n)=>{const d=day(s);d.setDate(d.getDate()+n);return ymd(d)};
-  const today=()=>window.EL_TODAY||ymd(new Date());
+  const clock=()=>window.EL_NOW?new Date(window.EL_NOW):new Date();
+  const today=()=>window.EL_TODAY||ymd(clock());
   const span=p=>{const fs=((p&&p.rows)||[]).map(r=>r.from).filter(Boolean).sort();return fs.length?[fs[0],add(fs[fs.length-1],6)]:null};
   // column of a group (EL_GROUPS id or name) in a plan; -1 if the plan is not for that group
   const col=(p,gid)=>{const g=(window.EL_GROUPS||[]).find(x=>x.id===gid||x.name===gid);return g&&p&&p.groups?p.groups.findIndex(x=>key(x)===key(g.name)):-1};
@@ -25,6 +26,15 @@
     now(gid){const t=today(),ps=this.plans(gid).sort((a,b)=>span(a.p)[0]<span(b.p)[0]?-1:1);
       return ps.find(x=>span(x.p)[0]<=t&&t<=span(x.p)[1])||ps.find(x=>span(x.p)[0]>t)||ps[ps.length-1]||null},
     exam:(p,gi)=>p&&p.exam&&p.exam[gi]||null,
+    // The class going on now by the timetable (EL_TIMETABLE in el-plan.js; Roger, 2 Nov 2026: "when I open the dashboard, the group
+    // I have at that hour"): {gid, start "12:00", end "13:00", key} from 5 minutes before it starts until 5 minutes before it ends
+    // (so it never overlaps the next one), or null (no class, weekend, a day in `off`). at: a Date, by default now (or EL_NOW).
+    classAt(at){const T=window.EL_TIMETABLE;if(!T||!T.groups)return null;at=at||clock();const d=ymd(at);
+      if((T.off||[]).some(o=>Array.isArray(o)?o[0]<=d&&d<=o[1]:o===d))return null;
+      const dn=DAYS.en[at.getDay()],m=at.getHours()*60+at.getMinutes(),hm=x=>Math.floor(x/60)+":"+String(x%60).padStart(2,"0");
+      for(const [gid,slots] of Object.entries(T.groups))for(const sl of slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;
+        const s=+x[2]*60+ +x[3];if(m>=s-5&&m<s+55)return {gid,start:hm(s),end:hm(s+60),key:d+" "+gid+" "+hm(s)}}
+      return null},
     // activities due in week row i: [[activity id, date]] by date
     dueIn:(p,gi,i)=>{const r=p.rows[i];if(!r||!r.from)return [];const e=add(r.from,6);
       return Object.keys(p.due||{}).map(id=>[id,due(p,id,gi)]).filter(([,d])=>d&&r.from<=d&&d<=e).sort((a,b)=>a[1]<b[1]?-1:1)},

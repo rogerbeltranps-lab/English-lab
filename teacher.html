@@ -30,11 +30,13 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 #pdf table{border-collapse:collapse;width:100%;font-size:11px}#pdf th,#pdf td{position:static;border:1px solid #94a3b8;padding:4px 5px;text-align:left;vertical-align:top;background:#fff}#pdf thead th{background:#f1f5f9}#pdf table.rb{table-layout:fixed}#pdf td.rn,#pdf table.rb th:first-child{width:20%}#pdf tr{break-inside:avoid}#pdf .tick{font-size:15px;line-height:1}#pdf .note{margin-top:4px;color:#0f766e}#pdf .cmt{margin-top:14px;break-inside:avoid}#pdf .cmt .line{border-bottom:1px solid #94a3b8;height:26px}
 @page{size:A4;margin:12mm}@media print{body.pdfmode{background:#fff;padding:0;margin:0}.pdfbar{display:none!important}#pdf .pg{box-shadow:none;margin:0;padding:0;max-width:none;break-before:page}#pdf .pg:first-of-type{break-before:auto}}
 .ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}table.plan td{vertical-align:top;text-align:left;white-space:normal}table.plan td.pc{text-align:center;white-space:nowrap}table.plan tr.pb td{background:#f1f5f9;border-top:2px solid #cbd5e1}table.plan td.in{padding-left:22px}
+.cnow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-radius:12px;padding:8px 12px;margin:6px 0}.cnow.ask{background:#fef3c7;border:2px solid #f59e0b}.cnow.info{background:#ecfdf5;border:1px solid #86efac;font-size:14px}.cnow .x{background:none;color:#475569;padding:0 6px;margin-left:auto}
 .who{display:inline-block;border-radius:999px;padding:1px 8px;font-size:12px;white-space:nowrap}.who.a{background:#dcfce7;color:#166534}.who.y{background:#e0e7ff;color:#3730a3}
 </style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
 <p class="muted" id="loadbar" style="margin:-6px 0 8px"></p>
+<div id="classnow"></div>
 <div class="tabs" id="tabs"></div>
 <div id="main"></div>
 </div>
@@ -83,12 +85,15 @@ const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Se
 // different groups of the same level"); kept in this browser, all groups by default
 S.tpg=(()=>{try{const v=JSON.parse(localStorage.getItem("el_t_tpg"));if(Array.isArray(v)){const ok=v.filter(id=>GR.some(g=>g.id===id));if(ok.length)return ok}}catch(e){}return GR.map(g=>g.id)})();
 const keepTpg=()=>{try{localStorage.setItem("el_t_tpg",JSON.stringify(S.tpg))}catch(e){}};
+// the class going on now (see classCheck below); link: the dashboard was opened from a link to a course, LS or group
+const CLS={link:false,ready:false,done:(()=>{try{return sessionStorage.getItem("el_t_class")}catch(e){return null}})(),info:null};
 const LAST=(()=>{try{return JSON.parse(localStorage.getItem("el_t_last"))||{}}catch(e){return {}}})();
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
   else if(gOf(LAST.g)||["plan","qa","mat","ref","none"].includes(LAST.g))S.g=LAST.g;
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
+  CLS.link=q.has("course")||q.has("ls")||q.has("g");
   if(q.has("course")||q.has("ls")||q.has("g"))history.replaceState(null,"",location.pathname+location.hash)})();
 const keepLast=()=>{const g=GR.find(x=>x.id===S.g),c=Object.assign({},LAST.c);if(g)c[g.course]=g.id;Object.assign(LAST,{g:S.g,ls:S.ls,year:!!S.year,c,t:Date.now()});try{localStorage.setItem("el_t_last",JSON.stringify(LAST))}catch(e){}};
 const LS_INFO={hidden:["Hidden","Students cannot do anything in it."],open:["Open","Students practise and their progress is saved, in the learning paths you open for their group."],closed:["Closed","Students can only review what they did and the feedback."]};
@@ -555,7 +560,30 @@ function lsWarn(ls,grp,assigned){
   return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
 }
 function render(){
-  render0();keepLast();ptSync();progSync();loadBar()}
+  render0();keepLast();ptSync();progSync();loadBar();if(CLS.ready)classCheck()}
+// ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
+// somewhere else, a message asks whether to go to the group or stay where I am"). The timetable is EL_TIMETABLE (el-plan.js), read by
+// ELWeek.classAt (from 5 minutes before the class). Opening the dashboard during a class goes straight to that group (and its current LS);
+// a class that starts while the dashboard shows something else, or a dashboard opened from a link to another group or LS, gets a yellow
+// bar "Go to <group>" / "Stay here". Each class is handled once per browser tab (sessionStorage el_t_class), so a reload keeps your choice.
+// A class marked "· self-study" in the time plan (you are away) is skipped.
+function classNow(){const c=ELWeek.classAt();if(!c)return null;const x=ELWeek.now(c.gid);
+  if(x&&ELWeek.tasks(x.p,x.gi).some(t=>t.kind==="self"&&t.date===ELWeek.today()))return null;return c}
+const classDone=c=>{CLS.done=c.key;try{sessionStorage.setItem("el_t_class",c.key)}catch(e){}};
+function classGo(c){classDone(c);CLS.info=c.key;S.g=c.gid;S.tutor="all";S.year=false;S.ls=null;   // render() picks the group's current LS by the time plan
+  render();scrollTo(0,0)}
+function classCheck(){const el=$("#classnow");if(!el||!S.D)return;const c=classNow(),g=c&&GR.find(x=>x.id===c.gid);
+  if(!c||!g){el.innerHTML="";return}
+  if(CLS.done!==c.key&&S.g===c.gid)classDone(c);
+  if(CLS.done!==c.key){el.innerHTML=`<div class="cnow ask">🔔 <b>${esc(g.name)}</b> has English now (${c.start}–${c.end}). Go to ${esc(g.name)}?`
+    +` <button data-cls="go">Go to ${esc(g.name)}</button> <button class="g" data-cls="stay">Stay here</button></div>`;return}
+  el.innerHTML=CLS.info===c.key&&S.g===c.gid?`<div class="cnow info">🕘 Class now: <b>${esc(g.name)}</b> (${c.start}–${c.end}). The dashboard opened on this group.<button class="x" data-cls="hide" title="Hide">✕</button></div>`:""}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-cls]");if(!b)return;const c=classNow();
+  if(b.dataset.cls==="go"&&c)return classGo(c);
+  if(b.dataset.cls==="stay"&&c)classDone(c);
+  CLS.info=null;classCheck()});
+setInterval(classCheck,30e3);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)classCheck()});
 // LS mark so far for the student board (Roger, 2 Nov 2026: "students should see their progress"). Only the dashboard can work out the
 // continuous-assessment blocks (secure checkpoints are marked here with the teacher-only keys), so it keeps each student's marks so far
 // (a missing piece counts 0 once its day has passed, S.dueZero; not marked yet is left out) in results/{ls}__assessment .progress = {exam, fp, gv, other, total, at}, out of 10,
@@ -1879,7 +1907,10 @@ addEventListener("el-probs",toProbs);
 // While the data comes in, the page says so (it used to stay blank under "Hello"); if a read fails, it says that too, with a Try again button.
 const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if(!S.D)$("#main").innerHTML='<p class="muted" id="loading">⏳ Loading your groups and students…</p>';
   try{S.D=await load()}catch(e){console.warn("load",e);if(!S.D){$("#main").innerHTML='<p><b>The dashboard could not load.</b> Check the connection and try again.</p><p><button id="retry">Try again</button></p>';$("#retry").onclick=()=>start(hello)}return}
-  TOUCHED.clear();render();if(location.hash==="#probs")toProbs()};
+  // the first time: during a class, open on its group, unless a link asked for a group, course or LS (then the bar asks)
+  TOUCHED.clear();
+  if(!CLS.ready){CLS.ready=true;const c=classNow();if(c&&CLS.done!==c.key&&!CLS.link&&S.g!==c.gid&&GR.some(g=>g.id===c.gid)){classGo(c);if(location.hash==="#probs")toProbs();return}}
+  render();if(location.hash==="#probs")toProbs()};
 // "Students' work in 2ESO B: as of 10:42" and the buttons that fetch it (load: "Update <group>" one group, "Update all" everything)
 const whenAt=t=>{if(!t)return "never";const d=new Date(t),today=new Date().toDateString()===d.toDateString();
   return (today?"":d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+" ")+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})};
