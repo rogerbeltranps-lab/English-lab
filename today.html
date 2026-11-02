@@ -184,7 +184,7 @@ const TABS=["week","form","fp","exam"];
 function tabOf(ls){const h=location.hash.slice(1),m={exam:"exam",formative:"form",week:"week",final:"fp"}[h];if(m==="fp"&&!hasFp(ls))m="form";
   if(S.tab&&S.tabLs===ls.id)return S.tab;S.tabLs=ls.id;
   if(m&&!S.hashUsed){S.hashUsed=true;return S.tab=m}
-  return S.tab=only(ls.id)||(D.ls[ls.id]||{}).status==="closed"?"exam":AS?"form":hasWeek(ls)?"week":"form"}
+  return S.tab=only(ls.id)||(D.ls[ls.id]||{}).status==="closed"?"exam":"form"}   // 📈 My formative assessment is the main tab (Roger, 2 Nov 2026)
 const hasWeek=ls=>{const p=(window.EL_PLAN||{})[ls.id];return !only(ls.id)||!!(p&&ELWeek.col(p,D.me.group)>=0&&ELWeek.span(p))};
 function lsCard(lss,ls,st,stTag){const tab=tabOf(ls),st2=l=>{const s=(D.ls[l.id]||{}).status;return s==="closed"?t("tancada · per repassar","closed · to revise"):s==="hidden"?t("oculta","hidden"):t("ara","now")};
   const tb=(id,icon,ca,en,sub)=>`<button class="btab b-${id} ${tab===id?"on":""}" data-do="tab" data-t="${id}"><span class="bi">${icon}</span><span><b>${t(ca,en)}</b><small>${sub}</small></span></button>`;
@@ -192,8 +192,8 @@ function lsCard(lss,ls,st,stTag){const tab=tabOf(ls),st2=l=>{const s=(D.ls[l.id]
     +`<div class="lspick">${lss.map(l=>`<button class="lsbtn ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}"><small>${esc(l.title.split(" · ")[0])} · ${st2(l)}</small>${lsName(l)}</button>`).join("")}</div>`
     +`<div class="lvline"><span class="muted">${t("El teu nivell:","Your level:")}</span> ${levelTag(ls.course,elRouteOf(D.lv,ls.id).level)}${routeNote(ls.id,st)} ${stTag} <a class="go lsopen" href="${lsHref(ls)}">${t("Ves a","Go to")} ${lsName(ls)} →</a></div>`
     +`<div class="btabs" role="tablist">`
-    +(hasWeek(ls)?tb("week","🗓","La meva setmana","My week",t("pla, deures i estudi","plan, homework and study")):"")
     +tb("form","📈","La meva avaluació formativa","My formative assessment",t("activitats dels learning paths","learning-path activities"))
+    +(hasWeek(ls)?tb("week","🗓","La meva setmana","My week",t("pla, deures i estudi","plan, homework and study")):"")
     +(hasFp(ls)?tb("fp","🎬","El meu producte final","My final product",fpSub(ls)):"")
     +tb("exam","📝","Els meus exàmens","My exams",examSub(ls))+`</div></div>`}
 function examSub(ls){const x=(D.rs[ls.id+"/assessment"]||{}).sections||{};return Object.values(x).some(y=>y&&y.score!=null)?t("resultats i informe","results and report"):t("encara no hi ha resultats","no results yet")}
