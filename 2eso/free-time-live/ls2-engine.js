@@ -43,6 +43,30 @@ var LS2 = (function () {
   const words = s => (String(s).trim().match(/\S+/g) || []).length;
 
   function save() { localStorage.setItem(LP.key, JSON.stringify(state)); localStorage.setItem(LP.key + 'Level', level); progress(); }
+  /* Own work follows the route (Roger, 2 Nov 2026, problem report: a student wrote the LP2 writing on Daring, the teacher moved him to Safe
+     from the LS1 exam, and the Writing tab showed an empty box). Texts, speaking plans and transcripts, Talk answers, drafts, final
+     versions and the goal and review cards are saved per route; when the route on screen has nothing yet, the newest (else the longest)
+     from another route is copied in, so the student sees it, can improve it and hand it in. Never overwrites what the route already has. */
+  function carryRoute() {
+    const rx = new RegExp('^(.*)_(' + ROUTES.join('|') + ')$');
+    const size = v => typeof v === 'string' ? v.trim().length : v && typeof v === 'object' ? Object.keys(v).filter(k => k !== 'at').reduce((n, k) => n + size(v[k]), 0) : 0;
+    const at = v => v && typeof v === 'object' && typeof v.at === 'string' ? v.at : '';
+    const better = (a, b) => at(a) !== at(b) ? at(a) > at(b) : size(a) > size(b);
+    let moved = false;
+    const carry = (o, base) => {   // o[key] for every route: keys "<base>_<route>", or the route itself when base is null
+      const key = r => base == null ? r : base + '_' + r;
+      if (size(o[key(level)])) return;
+      let best = null;
+      ROUTES.forEach(r => { const v = o[key(r)]; if (r !== level && size(v) && (best == null || better(v, best))) best = v; });
+      if (best != null) { o[key(level)] = JSON.parse(JSON.stringify(best)); moved = true; }
+    };
+    ['texts', 'speak', 'drafts', 'finals'].forEach(n => {
+      const o = state[n]; if (!o || typeof o !== 'object') return;
+      new Set(Object.keys(o).map(k => (k.match(rx) || [])[1]).filter(b => b != null)).forEach(b => carry(o, b));
+    });
+    ['plan', 'review'].forEach(n => { if (state[n] && typeof state[n] === 'object') carry(state[n], null); });
+    if (moved) save();
+  }
   // doneAt[k]: when the step was first completed; tries[k]: the first check of an auto-corrected step. The teacher dashboard
   // uses them for the grammar and vocabulary block (first try + done by the session deadline in el-plan.js).
   // last[k]: the latest check, shown on the dashboard next to the first try (never counted).
@@ -1104,6 +1128,7 @@ var LS2 = (function () {
   function studyCard() { return window.ELStudy && LP.study ? ELStudy.html(studyApi()) : ''; }
   function bindStudy() { if (window.ELStudy && LP.study) ELStudy.bind(studyApi()); }
   function render() {
+    carryRoute();
     const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
     $('#lp').innerHTML = trackNote() + planCard() + studyCard() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
       LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
