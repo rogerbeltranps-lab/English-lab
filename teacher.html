@@ -29,7 +29,9 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 #pdf .ans{border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;margin:8px 0}#pdf .ans p{margin:.3em 0;break-inside:avoid}#pdf .v{white-space:pre-wrap}#pdf ul.rate{margin:2px 0;padding-left:18px}
 #pdf table{border-collapse:collapse;width:100%;font-size:11px}#pdf th,#pdf td{position:static;border:1px solid #94a3b8;padding:4px 5px;text-align:left;vertical-align:top;background:#fff}#pdf thead th{background:#f1f5f9}#pdf table.rb{table-layout:fixed}#pdf td.rn,#pdf table.rb th:first-child{width:20%}#pdf tr{break-inside:avoid}#pdf .tick{font-size:15px;line-height:1}#pdf .note{margin-top:4px;color:#0f766e}#pdf .cmt{margin-top:14px;break-inside:avoid}#pdf .cmt .line{border-bottom:1px solid #94a3b8;height:26px}
 @page{size:A4;margin:12mm}@media print{body.pdfmode{background:#fff;padding:0;margin:0}.pdfbar{display:none!important}#pdf .pg{box-shadow:none;margin:0;padding:0;max-width:none;break-before:page}#pdf .pg:first-of-type{break-before:auto}}
-.ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}</style></head><body>
+.ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}table.plan td{vertical-align:top;text-align:left;white-space:normal}table.plan td.pc{text-align:center;white-space:nowrap}table.plan tr.pb td{background:#f1f5f9;border-top:2px solid #cbd5e1}table.plan td.in{padding-left:22px}
+.who{display:inline-block;border-radius:999px;padding:1px 8px;font-size:12px;white-space:nowrap}.who.a{background:#dcfce7;color:#166534}.who.y{background:#e0e7ff;color:#3730a3}
+</style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
 <div id="app" hidden>
 <p class="muted" id="loadbar" style="margin:-6px 0 8px"></p>
@@ -849,8 +851,41 @@ function criteria(studs,list){
     if(!tm)return "<td>–</td>";const p=ts/tm*100,col=p>=90?"#8b5cf6":p>=75?"#2563eb":p>=50?"#16a34a":"#94a3b8";return `<td><b style="color:${col}">${ts}/${tm}</b><br><small>${Math.round(p)}%</small></td>`}).join("")+"</tr>"});
   return h+"</tbody></table>";
 }
+// What makes up the LS mark (Roger, 2 Nov 2026: "can you make a table that counts and explains this? … I need it to be very clear"):
+// every part of EL_GRADING[ls] for the group on screen (dropped learning paths left out), with its share of the LS mark, what feeds it,
+// how it is marked and who marks it. Shares: exam sections by their points, final product rows by their weight, grammar and vocabulary
+// parts by their weight, other competences one equal share per English criterion (half steps, half your levels).
+function planTable(g){
+  const pc=n=>{const r=Math.round(n*100)/100;return (Number.isInteger(r)?r:r.toFixed(r*10%1?2:1))+" %"},sec=(id,k)=>{const s=((window.EL_SECTIONS||{})[id]||[]).find(x=>x[0]===k);return s?s[1]:k.charAt(0).toUpperCase()+k.slice(1)};
+  const lp=id=>esc(((byId(id)||{}).title||id).replace(/^Recall checkpoint\s*/i,"Checkpoint ")),it=([id,k])=>/checkpoint/.test(id)?lp(id):lp(id)+" · "+esc(sec(id,k));
+  const list=xs=>{const by=new Map();xs.forEach(([id,k])=>{if(!by.has(id))by.set(id,[]);by.get(id).push(k)});
+    return [...by].map(([id,ks])=>/checkpoint/.test(id)?lp(id):lp(id)+" <small class=\"muted\">("+ks.map(k=>esc(sec(id,k))).join(", ")+")</small>").join(" · ")};
+  const W=id=>(g.blocks.find(b=>b.id===id)||{}).w||0,auto='<span class="who a">automatic</span>',you='<span class="who y">you</span>',both='<span class="who a">steps</span> + <span class="who y">you</span>';
+  const head=(id,name,how)=>`<tr class="pb"><td><b>${name}</b></td><td class="pc"><b>${W(id)} %</b></td><td colspan="2">${how}</td></tr>`;
+  let rows="";
+  // final exam: each section by its points
+  const e=g.exam,tot=e.sections.reduce((a,x)=>a+(+x[2]||e.max),0);
+  rows+=head("exam","Final exam","One exam at the end of the LS. Mark = all the points ÷ the total × 10, so each part counts by its points (the maximums of the grading plan here; if you enter other maximums, the shares follow them).")
+    +e.sections.map(([k,n,mx,cs])=>`<tr><td class="in">${esc(n)} ${(cs||[]).map(pill).join(" ")}</td><td class="pc">${pc(W("exam")*(+mx||e.max)/tot)}</td><td>${+mx||e.max} of ${tot} exam points</td><td>${you}</td></tr>`).join("");
+  // final product
+  const f=g.fp;
+  rows+=head("fp","Final product",f.mark?"The mark you give in the final product dialog.":"Your levels (NA · AS · AN · AE) in the final product dialog, row by row.");
+  if(!f.mark){const fw=f.rows.reduce((a,r)=>a+r.w,0);rows+=f.rows.map(r=>`<tr><td class="in">${esc(r.name)} ${/^\d|^C/.test(r.c)?pill(r.c):""}</td><td class="pc">${pc(W("fp")*r.w/fw)}</td><td>${r.w} % of the final product</td><td>${you}</td></tr>`).join("")}
+  // grammar and vocabulary
+  if(g.gv){const gw=g.gv.parts.reduce((a,p)=>a+p.w,0);
+    rows+=head("gv","Grammar and vocabulary","Learning-path work, marked by the site.")
+      +g.gv.parts.map(p=>`<tr><td class="in">${esc(p.name)}</td><td class="pc">${pc(W("gv")*p.w/gw)}</td><td>${p.first?"Score of the <b>first try</b> only (what they remember from earlier paths): ":"<b>Done by the class deadline</b> in the Time plan (not the score): "}${list(p.first||p.time)}</td><td>${auto}</td></tr>`).join("")}
+  // other competences
+  if(g.other){const cs=engOther(g),n=cs.length;
+    rows+=head("other","Other competences",`${n>1?n+" criteria, an equal share each. For each one":"1 criterion, the whole block. For it"}: half from learning-path steps done (or their first-try score), half from your levels.`)
+      +cs.map(c=>{const a=(g.auto||{})[c]||[],t=(g.teacher||{})[c]||[];
+        return `<tr><td class="in">${pill(c)} <small>${esc(elCompetence(c))}</small></td><td class="pc">${pc(W("other")/n)}</td><td>${a.length?"<b>Steps:</b> "+list(a):""}${a.length&&t.length?"<br>":""}${t.length?"<b>Your levels:</b> "+list(t):""}</td><td>${both}</td></tr>`}).join("")
+      +(transOther(g).length?`<tr><td class="in muted" colspan="4">Transversal (${transOther(g).join(", ")}): shown in each student's breakdown, never in the LS mark.</td></tr>`:"")}
+  return `<div class="wrap"><table class="plan"><thead><tr><th style="text-align:left">Part</th><th>Share of the LS mark</th><th style="text-align:left">What counts</th><th>Marked by</th></tr></thead><tbody>${rows}`
+    +`<tr class="pb"><td><b>LS mark</b></td><td class="pc"><b>${g.blocks.reduce((a,b)=>a+b.w,0)} %</b></td><td colspan="2">${elFormativeShare(S.ls)?`<b>Continuous assessment (learning-path work): ${elFormativeShare(S.ls)} %</b> · exam ${W("exam")} % · final product ${W("fp")} %.<br>`:""}Each part is out of 10; the LS mark is their weighted sum. Missing work counts 0 or is left out, as the switch above says. Dropped learning paths (✂ in the Time plan) are left out for that group.</td></tr></tbody></table></div>`}
 // LS grade per group: the blocks of el-grading.js (exam, final product, grammar and vocabulary, other competences) and the weighted total
 function gradeBox(studs){
+  if(!S.gpOpen){S.gpOpen=1;S.open.add("gradeplan")}   // unfolded the first time on each visit
   const g=G(),fpA=g.fp.a,blk=id=>g.blocks.find(b=>b.id===id);
   const tm=hasTeams(),head=`<tr><th class="stu">Student</th><th>Route</th>${tm?"<th>Group</th>":""}${g.blocks.map(b=>`<th>${esc(b.name)}<br><small class="muted">${b.w} %</small></th>`).join("")}<th class="first">LS mark</th></tr>`;
   const body=studs.map(s=>{const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a> ${repLink(s.uid)}</td>`;
@@ -866,6 +901,7 @@ function gradeBox(studs){
   const key=g.only?`<p class="muted">Marks out of 10. Only the final exam (${g.blocks.find(b=>b.id==="exam").w} %) and the final product (${g.blocks.find(b=>b.id==="fp").w} %) count in this LS: its learning paths are practice. Exam: sum of section scores ÷ sum of maxes; enter it below or by clicking a mark. Final product: the mark you give in its dialog (click a student's mark here, then "Open the final product").</p>`
     :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: ${g.gv.parts.map(p=>p.name.toLowerCase()+" "+p.w+" %").join(" + ")} (accuracy only from delayed retrieval; practice, grammar and mixed practice count as done by the session deadline in the teaching plan). Other competences: for each of ${engOther(g).join(", ")}, half from the linked steps (done, or their first try) and half from your levels; the block is their average.${transOther(g).length?" Transversal competences ("+transOther(g).join(", ")+") are worked out the same way and shown in each student's breakdown, but never count in the LS mark.":""} Group: the final product group (set it in the final product dialog).</p>`;
   return `<div class="box"><h2>LS grade</h2><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1" title="As in the grading plan: missing work counts 0 until it is handed in">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0" title="Mark so far: only what is done or assessed counts">not counted yet</button></div>`
+    +fold("gradeplan","📊 What makes up the LS mark",planTable(g),"key")
     +fold("gradekey","How it is worked out",key,"key")
     +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`:"")
     +fold("exam","Exam marks",examTable(studs.filter(s=>!s.away)))+`</div>`;
