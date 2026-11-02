@@ -193,9 +193,7 @@ function tabBody(ls,list,info){const tab=tabOf(ls);
   if(tab==="fp"&&hasFp(ls))return `<div class="tabbody t-fp">${fpView(ls,info)}</div>`;
   if(tab==="exam")return `<div class="tabbody t-exam">${examView(ls)}</div>`;   // the mark so far and the learning paths are on 📈 (Roger, 2 Nov 2026)
   return `<div class="tabbody t-form"><div class="fhead"><h2>📈 ${t("La meva avaluació formativa","My formative assessment")} <small>· ${lsName(ls)}</small></h2><p>${t("Totes les activitats dels learning paths, el que has fet i la teva puntuació. Mira-ho sovint: és la teva feina de cada dia.","All the learning-path activities, what you have done and your score. Check it often: it is your everyday work.")}</p></div>`+lpStatus(ls,list,info)+progressBox(ls)
-    +(only(ls.id)?onlyForm(ls.id)
-      :`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
-      +(S.view==="sum"?summary(list):lpView(list,info)))+`</div>`}
+    +(only(ls.id)?onlyForm(ls.id):summary(list))+`</div>`}   // the old per-path grids are gone: the table on top has the same and more (Roger, 2 Nov 2026)
 // Announcements from the teacher (Roger, 31 Oct 2026; shared/js/el-announce.js): the ones sent to my group or to me, newest first.
 // Each one also comes once as a card at the top of the next page I open; here they stay so I can read them again.
 function annBox(){
@@ -525,22 +523,6 @@ function want(r){S.want=r;document.querySelectorAll("button.opt").forEach(b=>b.c
 async function sendAsk(){if(!S.want||AS)return;const reason=$("#why").value.replace(/\s+/g," ").trim().slice(0,300);
   if(!DEMO)try{await F.setDoc(F.doc(ELCloud.db,"students",U.uid,"levels",S.ls),{request:S.want,reason,requestedAt:F.serverTimestamp()},{merge:true})}catch(e){return alert(t("No s'ha pogut enviar la petició: ","Could not send the request: ")+e.message)}
   D.lv[S.ls]=Object.assign(D.lv[S.ls]||{},{request:S.want,reason});$("#dlg").close();render()}
-function lpView(list,info){return ""
-    +`<p class="muted">${t("Cada learning path té la seva graella: les activitats amb el criteri d'avaluació que treballen (– vol dir pràctica de llengua) i la teva puntuació. Clica la puntuació per veure'n el detall, el feedback i entregar-la. ✔ entregada · 🟡 marcada com a feta, sense entregar · 💬 té feedback.","Each learning path has its own grid: the activities with the assessment criterion they work on (– means language practice) and your score. Click the score to see the details and the feedback, and to submit it. ✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback.")}</p>`
-    +list.map(a=>lpGrid(a,info)).join("")+total(list);
-}
-// One grid per learning path: its steps as columns (with their criterion), a row of ✔ and the score.
-function lpGrid(a,info){
-  const d=doneSet(a),c=cell(a),n=steps(a).filter(k=>d.has(k)).length;
-  // a recall checkpoint before it not done yet: closed until it is (el-catalog.js elCheckpointMissing; the page itself blocks too)
-  const cp=!all()&&info.status!=="closed"&&canDo(a,info)&&elCheckpointMissing(a,doneSet,x=>canDo(x,info)),can=canDo(a,info)&&!cp;   // a locked one says "not open yet"
-  return `<div class="box lpbox"><div class="lphead"><div><h2>${a.title}</h2>${a.criteria.map(pill).join("")} <small class="muted">· ${pts(a)}${a.mode==="once"?t(" · una sola vegada"," · only once"):""}${cp?t(` · 🔒 primer fes el ${cp.title}`,` · 🔒 first do ${cp.title}`):!can?t(" · 🔒 encara no està oberta"," · 🔒 not open yet"):""}</small></div><a class="go ${can?"":"off"}" href="${a.path}">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`
-    +`<div class="wrap"><table><thead><tr>${steps(a).map((k,i)=>`<th class="ac ${(a.skip||[]).includes(k)?"skip":""}"${secOff(a,info,k)?` title="${t("Encara no està oberta","Not open yet")}"`:""}>${secOff(a,info,k)?"🔒 ":""}${k}<br>${stepCrit(a,k)}</th>`).join("")}<th class="sc first">${t("Punts","Points")}</th></tr></thead>`
-    +`<tbody><tr>${steps(a).map(k=>`<td class="ac ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}</td>`).join("")}<td class="sc ${c.c} first" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr></tbody></table></div>`
-    +(steps(a).length?`<small class="muted">${t(`${n} de ${steps(a).length} activitats fetes`,`${n} of ${steps(a).length} activities done`)}</small>`:"")+legend(gridCrits(a))+`</div>`;
-}
-function total(list){let ts=0,tm=0;list.forEach(a=>{const x=D.rs[a.id],y=a.graded&&x&&x.max&&elScore(a,x,D.pg[a.ls]);if(y){ts+=y.score;tm+=y.max}});if(!tm)return "";const p=ts/tm*100;
-  return `<div class="box"><div class="lphead"><h2>${t("Total de la LS","LS total")}</h2><b style="color:${col(p)};font-size:1.2rem">${ts} / ${tm} (${Math.round(p)}%)</b></div><small class="muted">${t("Amb les activitats avaluables que has fet. Verd al 50% · blau al 75% · lila al 90%.","With the graded activities you have done. Green at 50% · blue at 75% · purple at 90%.")}</small></div>`}
 // Summary of my criteria: points, a mark out of 10 per criterion and the average of those marks.
 function summary(list){
   const rows=[...new Set(list.flatMap(a=>a.criteria))].sort().map(c=>{let s=0,m=0;list.forEach(a=>{const x=D.rs[a.id],y=a.graded&&a.criteria.includes(c)&&x&&x.max&&elScore(a,x,D.pg[a.ls]);if(y){s+=y.score;m+=y.max}});return {c,s,m,mark:m?s/m*10:null}});
@@ -550,10 +532,6 @@ function summary(list){
     +rows.map(r=>`<tr><td>${pill(r.c)}</td><td><b>${esc(elCompetence(r.c))}</b><br><small>${esc(easy(r.c))}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(r.c)).map(a=>esc(a.title)).join(" · ")}</small></td><td>${r.m?r.s+"/"+r.m:"–"}</td><td><b style="color:${r.mark==null?"#94a3b8":col(r.mark*10)}">${r.mark==null?t("encara no","not yet"):f(r.mark)}</b></td></tr>`).join("")
     +`</tbody></table></div><p class="muted">${t("Cada nota és la suma de punts de les activitats avaluables lligades al criteri, sobre 10. El producte final compta amb la nota que posa el professor.","Each mark is the sum of the points of the graded activities linked to the criterion, out of 10. The final product counts with the mark your teacher gives.")}</p></div>`;
 }
-// Criteria that appear in a learning path's grid: its own and those of its steps.
-const gridCrits=a=>[...new Set([...a.criteria,...steps(a).filter(k=>!(a.skip||[]).includes(k)).flatMap(k=>((window.EL_STEP_CRITERIA||{})[a.id]||{})[k]||EL_EVIDENCE[k]||[])])].sort();
-function legend(cs){if(!cs.length)return "";
-  return `<details class="crit"><summary>${t("Criteris d'avaluació d'aquest learning path","Assessment criteria of this learning path")}</summary><table class="legend"><tbody>${cs.map(c=>`<tr><td>${pill(c)}</td><td><b>${esc(elCompetence(c))}</b><br>${esc(easy(c))}</td></tr>`).join("")}</tbody></table></details>`}
 function critPanel(c){
   const list=EL_CATALOG.filter(a=>a.ls===S.ls),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+k));
   $("#dlgc").innerHTML=`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterionEasy(COURSE,c,EN)||elCriterion(COURSE,c)||t("Encara no hi ha el text d'aquest criteri.","This criterion has no text yet."))}</p>${elCriterionEasy(COURSE,c,EN)&&elCriterion(COURSE,c)?`<label>${t("Text oficial (Decret 175/2022)","Official text (Decret 175/2022, in Catalan)")}</label><p class="muted"><small>${esc(elCriterion(COURSE,c))}</small></p>`:""}<label>${t("Learning paths que el treballen","Learning paths that work on it")}</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>${t("Activitats que en donen evidència","Activities that give evidence of it")}</label><p>${st.map(esc).join(" · ")||"–"}</p><div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button></div>`;
@@ -620,8 +598,8 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!AS&&all()))retur
     else if(!can){st=`<span class="s-off">🔒 ${t("Encara no està oberta","Not open yet")}</span>`;n.off++}
     else if(late){st=`<span class="s-no">⏰ ${t("Falta · calia fer-la el","Missing · was due")} ${when(d)}</span>`;n.miss++}
     else{st=`<span class="s-td">${t("Per fer","To do")}${d?" · "+t("fins al","by")+" "+when(d):""}</span>`;n.todo++}
-    const c=cell(a),title=go?`<a href="${tabHref(a)}">${esc(a.title)}</a>`:esc(a.title);
-    return `<tr class="${late?"miss":""}"><td class="l"><b>${title}</b>${counted.has(a.id)?` <span class="tag" title="Its day has passed: it is in “X of Y done this term”">counted</span>`:""}</td><td class="l">${st}</td><td class="l">${hand}${tabs||`<small class="muted">–</small>`}</td><td class="sc ${c.c}" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr>`}).join("");
+    const c=cell(a),title=can?`<a href="${tabHref(a)}">${esc(a.title)}</a>`:esc(a.title);
+    return `<tr class="${late?"miss":""}"><td class="l"><b>${title}</b>${a.criteria.length?`<br>${a.criteria.filter(c=>/^\d/.test(c)).map(pill).join("")}`:""}${counted.has(a.id)?` <span class="tag" title="Its day has passed: it is in “X of Y done this term”">counted</span>`:""}</td><td class="l">${st}</td><td class="l">${hand}${tabs||`<small class="muted">–</small>`}</td><td class="sc ${c.c}" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr>`}).join("");
   const due=[...counted].filter(id=>list.some(a=>a.id===id)),dn=due.filter(id=>isDone(list.find(a=>a.id===id))).length;
   const nx=next?`<div class="nextbox ${next.past?"late":""}"><div>👉 <b>${AS?"Next for this student":t("El següent que et toca","Next for you")}:</b> ${esc(next.a.title)} · <b>${esc(next.nm)}</b>${next.past?` <span class="s-no">· ${t("ja havia d'estar feta","it was due already")}</span>`:""}</div><a class="go" href="${tabHref(next.a,next.k)}">${t("Obre-la","Open it")} →</a></div>`
     :open?`<p class="ptok">✓ ${t("No tens res pendent als learning paths oberts. Molt bé!","Nothing left to do in the open learning paths. Well done!")}</p>`:"";
