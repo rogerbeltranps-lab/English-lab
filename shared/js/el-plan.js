@@ -204,3 +204,11 @@ window.EL_PLAN={
     ]
   }
 };
+// Roger's weekly English timetable (2026–27), by EL_GROUPS id: "Day H:MM" class starts (one hour each). The teacher dashboard opens on the
+// group in class at that moment and, when a class starts while it shows something else, asks whether to go there (ELWeek.classAt).
+// off: days with no English classes (single days or [first, last]); add the next terms' holidays when the school calendar gives them.
+window.EL_TIMETABLE={
+  groups:{"4ESOA":["Mon 8:30","Wed 12:00","Fri 13:00"],"4ESOB":["Mon 15:00","Tue 9:30","Wed 10:30"],
+    "2ESOA":["Tue 12:00","Thu 12:00","Fri 8:30"],"2ESOB":["Tue 10:30","Thu 8:30","Fri 9:30"]},
+  off:["2026-10-30",["2026-12-07","2026-12-08"],["2026-12-15","2026-12-18"],["2026-12-22","2027-01-07"]]
+};
