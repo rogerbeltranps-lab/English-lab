@@ -149,6 +149,9 @@
   const SCALE = ca ? ['Encara no', 'En part', 'Gairebé del tot', 'Del tot'] : ['Not yet', 'Partly', 'Mostly', 'Fully'];
   R.step = p => (p.html ? '<div class="html">' + (typeof p.html === 'function' ? p.html(level) : tx(p.html)) + '</div>' : '') + media(p) + fields(forLevel(p.fields)) +
     (p.rate ? '<h3>' + T('Autoavaluació', 'Self-assessment') + '</h3><p class="tiny">' + T('Encercla: ', 'Circle: ') + SCALE.map((s, i) => (i + 1) + ' ' + s).join(' · ') + '</p><ul class="rate">' + (byLevel(p.rate) || []).map(s => '<li><span>' + s + '</span><span class="nums">1 · 2 · 3 · 4</span></li>').join('') + '</ul>' : '');
+  // End-of-LS self-assessment (shared/js/el-self.js, Roger 2 Nov 2026): the same statements by competence, circled 1–4, and the one to improve.
+  R.self = p => '<p class="tiny">' + T('Encercla: ', 'Circle: ') + SCALE.map((s, i) => (i + 1) + ' ' + s).join(' · ') + '</p>' + p.groups.map(g => '<h3>' + (g.icon || '') + ' ' + tx(g.n) + '</h3><ul class="rate">' + g.items.map(it => '<li><span>' + tx(it) + '</span><span class="nums">1 · 2 · 3 · 4</span></li>').join('') + '</ul>').join('') +
+    '<p><b>' + T('Què vols millorar més? Encercla’n un: ', 'What do you most want to improve? Circle one: ') + '</b>' + p.groups.map(g => tx(g.n)).join(' · ') + '</p>';
   R.info = p => '<div class="html">' + (typeof p.html === 'function' ? p.html(level) : tx(p.html)) + '</div>';
   R.checklist = p => ticks(byLevel(p.items) || []);
   R.speaking = p => '<div class="box"><b>' + T('La tasca', 'Your task') + '</b><div>' + byLevel(p.task) + '</div></div>' +

@@ -677,6 +677,11 @@ var LS2 = (function () {
     }
   });
 
+  // Self-assessment at the end of the LS (Roger, 2 Nov 2026): tap 1–4 on "I can…" statements by competence (shared/js/el-self.js,
+  // loaded by the Reflect page). Saved in state[p.id]; the dashboard's Self-assessment box reads it.
+  R.self = p => window.ELSelf ? ELSelf.panel(p, { ca, tx, esc, pages: PAGES, level: () => level, state: () => state, save, done: k => { state.done[k] = true; stamp(k); save(); } })
+    : { html: '<div class="section-card"><p>…</p></div>', bind() {} };
+
   // Static content; html may be a function so it can read saved work. Not a step.
   R.info = p => ({ html: '<div class="section-card">' + (typeof p.html === 'function' ? p.html(level) : tx(p.html)) + '</div>', bind() { if (p.after) p.after(level); } });
 

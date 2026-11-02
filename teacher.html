@@ -641,7 +641,7 @@ function render0(){
     +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
-    +(G()&&!G().only?gradeBox(shown):"")
+    +(G()&&!G().only?gradeBox(shown):"")+selfBox(ls,grp,shown)
     +(G()&&G().only?"":`<div class="box">${G()&&G().evidence?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
       :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`)
     +pointsBox(S.g)
@@ -952,6 +952,32 @@ function gradeBox(studs){
     +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`:"")
     +fold("exam","Exam marks",examTable(studs.filter(s=>!s.away)))+`</div>`;
 }
+// ---- Self-assessment at the end of the LS (Roger, 2 Nov 2026: "afegir una autoavaluació al final de la LS"). The LS's Reflect page has a
+// 'self' panel (shared/js/el-self.js; catalogue flag self = its panel id): students tap 1–4 on "I can…" statements by competence and pick
+// the one to improve. It is in the page's synced progress (pstate), so this box costs no reads. Each competence shows the student's own
+// average (1–4) next to their mark in this LS for that competence (byComp of marksOf, the same pieces as the year view; English
+// competences only). ⬆ / ⬇: they see themselves at least 1.5 bands above / below their marks (mark bands: <5 → 1, <6.5 → 2, <8.5 → 3,
+// else 4), the gap to talk about in Reflect. Not part of any mark.
+const selfBand=m=>m<5?1:m<6.5?2:m<8.5?3:4,selfCol=v=>v==null?"":v<2?"#fee2e2":v<2.75?"#fef3c7":v<3.5?"#dcfce7":"#bbf7d0";
+function selfBox(ls,grp,studs){const a=acts(ls).find(x=>x.self);if(!a)return "";
+  const l=EL_LS.find(x=>x.id===ls),live=studs.filter(s=>!s.away),rows=live.map(s=>({s,x:pstate(s.uid,a)[a.self]||null})),done=rows.filter(r=>r.x&&r.x.groups);
+  const gs=[];done.forEach(r=>r.x.groups.forEach(g=>{if(!gs.some(y=>y.k===g.k))gs.push(g)}));   // in the page's order: the four communicative competences first
+  let its=null;const marks=s=>{try{its=its||lsItems(l,grp.id);return byComp(marksOf(s,its).filter(r=>!r.tr)).c}catch(e){return {}}};
+  const cell=(x,mk,k)=>{const g=x.groups.find(y=>y.k===k);if(!g)return `<td>–</td>`;const m=isTr(k)?null:(mk[k]||{}).m,d=m==null?0:g.v-selfBand(m);
+    const fl=d>=1.5?` <span title="Sees themselves higher than their marks">⬆</span>`:d<=-1.5?` <span title="Sees themselves lower than their marks">⬇</span>`:"";
+    return `<td style="background:${selfCol(g.v)}" title="Self ${g.v}/4${m!=null?" · mark in this LS "+f1(m):""}"><b>${g.v}</b>${m!=null?` <small class="muted">· ${f1(m)}</small>`:""}${fl}</td>`};
+  const head=`<tr><th class="stu">Student</th>${gs.map(g=>`<th title="${esc(g.c||"")}">${esc(g.icon||"")} ${esc(g.n)}<br><small class="muted">${esc(g.c||"")}</small></th>`).join("")}<th>Average</th><th>Wants to improve</th><th>Statements</th></tr>`;
+  const body=rows.map(({s,x})=>{const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td>`;
+    if(!x||!x.groups)return `<tr>${who}<td colspan="${gs.length+3}" class="muted" style="text-align:left">Not handed in yet</td></tr>`;
+    const mk=marks(s);
+    return `<tr>${who}${gs.map(g=>cell(x,mk,g.k)).join("")}<td class="first" title="Handed in ${esc(day(x.date))}"><b>${f1(x.avg)}</b></td><td>${x.focus?esc(x.focus.n):"–"}</td>`
+      +`<td style="text-align:left"><details><summary style="font-size:.85rem;font-weight:600">${x.items.length}</summary><ul style="margin:4px 0;padding-left:18px">${x.items.map(i=>`<li><b>${i.v}</b> ${esc(i.s)}</li>`).join("")}</ul></details></td></tr>`}).join("");
+  const avg=k=>{const v=done.map(r=>(r.x.groups.find(g=>g.k===k)||{}).v).filter(v=>v!=null);return v.length?v.reduce((t,x)=>t+x,0)/v.length:null};
+  const foot=done.length?`<tr><td class="stu"><b>Group average</b></td>${gs.map(g=>`<td style="background:${selfCol(avg(g.k))}"><b>${f1(avg(g.k))}</b></td>`).join("")}<td class="first"><b>${f1(done.reduce((t,r)=>t+(r.x.avg||0),0)/done.length)}</b></td>`
+    +`<td colspan="2" style="text-align:left"><small>${Object.entries(done.reduce((o,r)=>{const n=r.x.focus&&r.x.focus.n;if(n)o[n]=(o[n]||0)+1;return o},{})).sort((x,y)=>y[1]-x[1]).map(([n,c])=>esc(n)+" "+c).join(" · ")}</small></td></tr>`:"";
+  return `<div class="box">${fold("self",`🪞 Self-assessment <small class="muted">· ${done.length} of ${live.length} handed in · on the Reflect page, not in the mark</small>`,
+    `<p class="muted">Each student rates "I can…" statements from 1 (not yet) to 4 (fully), grouped by competence, and picks the one they most want to improve. Bold = their own average; small grey = their mark in this LS for that competence (out of 10). ⬆ they see themselves clearly higher than their marks · ⬇ clearly lower: worth a word in Reflect. For every statement they rate 1 or 2, the student gets a link to the Learning Path tab to review. Click ▶ to read the statements with their ratings.</p>`
+    +(done.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}${foot}</tbody></table></div>`:`<p class="muted">Nobody has handed it in yet.</p>`))}</div>`}
 // ---- Whole school year by terms (Roger, 30 Oct 2026: "an option to see all the school year by terms … (2 LS per each) that update as I
 // create the LS and the items to assess"). "📆 Whole school year" in the LS dropdown. Nothing here names an LS: the course's LSs come from
 // EL_LS, LS n is in term ceil(n/2) (or `term` in its EL_LS entry), and its assessed items are the blocks of EL_GRADING[ls] with their weights.
