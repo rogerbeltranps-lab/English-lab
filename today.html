@@ -162,7 +162,7 @@ function render(){
   S.pend=[];lss.forEach(l=>EL_CATALOG.filter(a=>a.ls===l.id).forEach(a=>{const r=D.rs[a.id]||{};if(a.graded&&!a.manual&&r.markedDone&&!r.locked&&(D.ls[l.id]||{}).status==="open")S.pend.push(a)}));
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
   const n=S.pend.length;
-  $("#main").innerHTML=lateBox(lss)+secBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
+  $("#main").innerHTML=lateBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
     +lsCard(lss,ls,st,stTag)+tabBody(ls,list,info);
   if(AS)asBar(lss,ls);
 }
@@ -460,14 +460,7 @@ function onlyForm(id){const g=EL_GRADING[id],fp=D.rs[g.fp.a]||{},a=EL_CATALOG.fi
 // "Done" = submitted or marked as done, or every scored step done. The final product is handed in on Classroom, so it is listed but never reminded.
 const isDone=a=>{const x=D.rs[a.id]||{};if(x.locked||x.markedDone)return true;const req=steps(a).filter(k=>!(a.skip||[]).includes(k)),d=doneSet(a);return req.length>0&&req.every(k=>d.has(k))};
 const lang=()=>EN?"en":"ca",when=d=>ELWeek.date(d,lang());
-// Sections the teacher has opened in a learning path and the student has not finished (elSecPending; Roger, 26 Oct 2026: they stay
-// on the to-do list until they finish them). The link opens that section's tab.
-function secBox(lss){const rows=[];
-  lss.forEach(l=>{const info=D.ls[l.id]||{status:"hidden",enabled:[]};if(info.status!=="open")return;
-    EL_CATALOG.filter(a=>a.ls===l.id&&canDo(a,info)).forEach(a=>elSecPending(a,info,D.me.group,doneSet(a)).forEach(([id,name])=>rows.push([a,id,name])))});
-  if(!rows.length)return "";
-  return `<div class="pend"><div><b>📌 ${t("Seccions per acabar:","Sections to finish:")}</b><ul>`
-    +rows.map(([a,id,name])=>`<li>${esc(a.title.split(/[:(]/)[0].trim())} · ${esc(name)} <a class="go" href="${a.path}#${id}">${t("Obre","Open")}</a></li>`).join("")+`</ul></div></div>`}
+// "Sections to finish" box removed (Roger, 2 Nov 2026: the learning paths table on 📈 shows every missing tab, with links).
 function lateBox(lss){const today=ELWeek.today(),late=[];
   lss.forEach(l=>{const info=D.ls[l.id]||{status:"hidden",enabled:[]},p=(window.EL_PLAN||{})[l.id],gi=ELWeek.col(p,D.me.group);if(info.status!=="open"||gi<0)return;
     Object.keys(p.due||{}).forEach(id=>{const a=EL_CATALOG.find(x=>x.id===id),d=ELWeek.due(p,id,gi);if(a&&d&&d<today&&!a.manual&&canDo(a,info)&&!isDone(a)&&!(S.wmiss&&S.wmiss.has(a.id)))late.push([a,d])})});
