@@ -28,6 +28,8 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 .xt{width:100%}.xt th{text-align:left}.xt td.l{text-align:left;vertical-align:top}.xbar{display:inline-block;width:120px;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;vertical-align:middle}.xbar span{display:block;height:100%}
 .corr thead th{color:#166534;background:#f0fdf4}.corr td.bad{color:#b91c1c}.corr td.good{color:#15803d;font-weight:600}.rv{margin-top:6px}.t-exam h3{font-size:1rem;margin:14px 0 6px}.wtexts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wtx{white-space:pre-wrap;background:#f8fafc;border-radius:10px;padding:10px 12px;margin:0;line-height:1.5}.wtx.ok2{background:#f0fdf4}.wtx.ok2 b{color:#15803d;text-decoration:underline}
 ol.rvl{margin:4px 0;padding-left:20px}ol.rvl li{margin:8px 0}ol.rvl li span{margin-right:6px}.notyet{background:#fff;border-style:dashed}.wnote{white-space:pre-wrap;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:8px 12px;margin:8px 0}
+.wrub{display:grid;gap:10px}.wr{border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;background:#fff}.wr.wrt{background:#f8fafc}.wrh{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.wrs{margin-left:auto;white-space:nowrap}.wrw{margin:6px 0 0;line-height:1.45}ol.wbands{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}ol.wbands li{border:1px solid #e2e8f0;border-radius:10px;padding:6px 8px;font-size:.86rem;color:#64748b;line-height:1.35}ol.wbands li small{display:block;font-weight:700;margin-bottom:2px}ol.wbands li.on{border:2px solid #2563eb;background:#eff6ff;color:#0f172a}ol.wbands li.on small{color:#1d4ed8}
+@media (max-width:700px){ol.wbands{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:600px){.lsbtn{flex:1 1 100%}.lsopen{margin-left:0}.xbar{width:60px}}</style></head><body>
 <style>/* Menu as on Home and English Lab: side menu on a computer, top menu on a phone */
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
@@ -278,15 +280,65 @@ function examQuestions(r){const qs=(r.questions||[]);if(!qs.length)return "";
     +`<div class="wrap"><table class="xt corr"><thead><tr><th>${t("Pregunta","Question")}</th><th>${t("La teva resposta","Your answer")}</th><th>${t("Resposta correcta","Right answer")}</th><th>${t("Per què","Why")}</th></tr></thead><tbody>`
     +qs.map(q=>`<tr><td class="l"><small class="muted">Q${String(q.q).padStart(2,"0")} · ${esc(q.part||"")} · ${q.got!=null?pts1(q.got)+"/":""}${q.pts} ${t("punts","points")}</small><br>${esc(q.text||"")}</td><td class="l bad">${q.mine?`<s>${esc(q.mine)}</s>`:`<i>${t("en blanc","blank")}</i>`}</td><td class="l good">${esc(q.right||"")}</td><td class="l">${esc(q.why||"")}${q.lp?`<div class="rv">${lpLink(q.lp)}</div>`:""}</td></tr>`).join("")
     +`</tbody></table></div></div>`}
-function examWriting(r){const w=r.writing;if(!w)return "";
+// The writing rubric explained (Roger, 2 Nov 2026: "aquí falta explicar bé els criteris d'avaluació"). The report keeps only the row
+// names and scores (C1 task and content 8, C2 grammar 4, C3 vocabulary 4, C4 organisation and cohesion 4, as on his paper reports),
+// so each row is explained here, in the language of the board: what it checks, the official criterion it is evidence for (the
+// exam's writing sections in EL_GRADING: wtask/wgrammar/wvocab/worg), what each band of marks means with the student's band marked,
+// and the mistakes of the table below that belong to that row (by their type, so "why did I lose points" points at real mistakes).
+const WRUB={
+  C1:{k:"wtask",ca:"Tasca i contingut",en:"Task and content",
+    what:["Si fas tot el que demana la tasca: hi ha tots els punts que es demanaven, amb detalls i raons, i el text té la llargada indicada.","Whether you do everything the task asks: all the points it asks for are there, with details and reasons, and the text is the length asked for."],
+    band:[["Respons a tota la tasca: hi ha tots els punts que es demanaven, amb detalls, i la llargada és la indicada.","You answer the whole task: every point it asks for is there, with details, and the length is right."],
+      ["Respons a la tasca, però falta un punt o algun detall (per exemple, la raó d'un hàbit).","You answer the task, but one point or some details are missing (for example, the reason for a habit)."],
+      ["Només respons a una part de la tasca: falten diversos punts o el text és massa curt.","You answer only part of the task: several points are missing or the text is too short."],
+      ["El text gairebé no respon a la tasca o és molt curt.","The text hardly answers the task or is very short."]]},
+  C2:{k:"wgrammar",ca:"Gramàtica",en:"Grammar",
+    what:["Si la gramàtica treballada a la unitat és correcta: els temps verbals, la concordança (he/she + -s), les negacions i preguntes, l'ordre de la frase, les preposicions i els pronoms.","Whether the grammar of the unit is correct: verb tenses, agreement (he/she + -s), negatives and questions, word order, prepositions and pronouns."],
+    band:[["Gairebé sense errades: la gramàtica de la unitat està ben feta.","Almost no mistakes: the grammar of the unit is well used."],
+      ["Algunes errades, però el text s'entén bé.","Some mistakes, but the text is easy to understand."],
+      ["Moltes errades (per exemple, la -s de he/she), tot i que el text encara s'entén.","Many mistakes (for example, the -s with he/she), although the text can still be understood."],
+      ["Tantes errades que costa entendre el text.","So many mistakes that the text is hard to understand."]]},
+  C3:{k:"wvocab",ca:"Vocabulari",en:"Vocabulary",
+    what:["Si fas servir les paraules i expressions de la unitat, variades i amb el significat correcte, sense paraules en català o castellà.","Whether you use the words and expressions of the unit, varied and with the right meaning, with no Catalan or Spanish words."],
+    band:[["Fas servir moltes expressions de la unitat, variades i ben usades.","You use many expressions from the unit, varied and well used."],
+      ["Fas servir expressions de la unitat, amb algun error de significat o alguna repetició.","You use expressions from the unit, with a few mistakes in meaning or some repetition."],
+      ["Poques expressions de la unitat, o diverses mal usades.","Few expressions from the unit, or several used wrongly."],
+      ["Vocabulari molt bàsic, equivocat o en una altra llengua.","Very basic or wrong vocabulary, or words in another language."]]},
+  C4:{k:"worg",ca:"Organització i cohesió",en:"Organisation and cohesion",
+    what:["Si les idees van en ordre i les uneixes amb connectors (first, then, after that, because, but…), i si l'ortografia, les majúscules i la puntuació són correctes.","Whether your ideas are in order and joined with linkers (first, then, after that, because, but…), and whether spelling, capital letters and punctuation are correct."],
+    band:[["Idees ben ordenades, connectors variats i gairebé cap errada d'ortografia o puntuació.","Ideas in a clear order, varied linkers and almost no spelling or punctuation mistakes."],
+      ["Ordre clar i alguns connectors; algunes errades d'ortografia o puntuació.","A clear order and some linkers; a few spelling or punctuation mistakes."],
+      ["Ordre poc clar o pocs connectors; moltes errades d'ortografia, majúscules o puntuació.","The order is not clear or there are few linkers; many spelling, capital-letter or punctuation mistakes."],
+      ["Idees desordenades i sense connectors: costa seguir el text.","Ideas out of order and no linkers: the text is hard to follow."]]}};
+// the row a mistake belongs to, from the first word of its type (the types of the LS1 reports, Catalan and English). Mixed types
+// ("Expression and style", "Healthy habits", "Reason", "Comparison"…) hold all kinds of mistakes, so they get no row; C1 (the task)
+// is not about language mistakes, so the teacher's comment explains it.
+const WTYPE=[["C4",/^(spelling|ortografia|punct|puntuaci|capital|maj[uú]scul|coheren|coher[eè]ncia|cohesi|connector|linker|conjunction|organitz|organis|conclusi|repetition|cohesi[oó]n?$|ordre$)/],
+  ["C3",/^(vocab|l[eè]xic|expressi[oó]$|expression$|expressi[oó] (de|verbal)|natural|collocation|phrasal|habit (vocab|expr)|food|time|temps|telling|expressar|significat|spanish)/],
+  ["C2",/^(gram|present|preposi|pronou|pronom|verb|negati|negaci|possess|third|subject|article|concord|question|comparati|comparacions|perfect|word order|ordre de la frase|missing|construcci|adjecti|frequency|freq)/]];
+const wRowOf=type=>{const f=String(type||"").toLowerCase().split("/")[0].trim();const m=WTYPE.find(([,re])=>re.test(f));return m?m[0]:""};
+const wBand=(v,m)=>{const p=m?v/m:0;return p>=.875?0:p>=.625?1:p>=.375?2:3};
+function examWriting(r,e){const w=r.writing;if(!w)return "";
   const rub=(w.rubric||[]).map(x=>Array.isArray(x)?x:[x.name,x.score,x.max]);   // Firestore stores rows as {name, score, max}
-  const tot=rub.reduce((a,x)=>[a[0]+(+x[1]||0),a[1]+(+x[2]||0)],[0,0]);
+  const tot=rub.reduce((a,x)=>[a[0]+(+x[1]||0),a[1]+(+x[2]||0)],[0,0]),errs=w.errors||[],L=EN?1:0;
+  const crit=k=>((e&&e.sections||[]).find(x=>x[0]===k)||[])[3]||[];
+  const bandName=[t("Excel·lent","Excellent"),t("Bé","Good"),t("A millorar","Needs work"),t("Insuficient","Not enough")];
+  const row=([n,v,m])=>{const id=(String(n).match(/^\s*(C[1-4])\b/)||[])[1],d=WRUB[id];v=+v||0;m=+m||0;
+    if(!d)return `<div class="wr"><div class="wrh"><b>${esc(n)}</b><span class="wrs"><b>${pts1(v)}</b> / ${m}</span></div></div>`;
+    const b=wBand(v,m),mine=errs.map((x,i)=>wRowOf(x.type)===id?i+1:0).filter(Boolean);
+    return `<div class="wr"><div class="wrh"><b>${id} · ${t(d.ca,d.en)}</b> ${crit(d.k).map(pill).join("")}<span class="wrs"><b style="color:${col(v/m*100)}">${pts1(v)}</b> / ${m} ${bar(v/m*100)}</span></div>`
+      +`<p class="wrw"><b>${t("Què es valora?","What does it check?")}</b> ${d.what[L]}</p>`
+      +`<ol class="wbands">${d.band.map((x,i)=>`<li class="${i===b?"on":""}"><small>${bandName[i]}${i===b?` · ${t("la teva nota","your mark")}`:""}</small>${x[L]}</li>`).join("")}</ol>`
+      +(v<m?`<p class="wrw">${mine.length?`✏️ ${t(mine.length>1?`Les errades d'aquest criteri a la taula de sota: núm. ${mine.join(", ")}.`:`L'errada d'aquest criteri a la taula de sota: núm. ${mine[0]}.`,mine.length>1?`The mistakes for this row in the table below: no. ${mine.join(", ")}.`:`The mistake for this row in the table below: no. ${mine[0]}.`)}`
+        :id==="C1"?`💬 ${t("Mira el comentari del professor: et diu què faltava.","Read your teacher's comment: it tells you what was missing.")}`:""}</p>`:"")+`</div>`};
   return `<div class="box"><h2>4 · ${t("El teu writing","Your writing")}</h2>`
-    +(rub.length?`<h3>${t("Rúbrica","Rubric")}</h3><div class="wrap"><table class="xt"><thead><tr><th>${t("Criteri de la rúbrica","Rubric row")}</th><th>${t("Nota","Score")}</th><th></th></tr></thead><tbody>${rub.map(([n,v,m])=>`<tr><td class="l">${esc(n)}</td><td><b>${pts1(v)}</b> / ${m}</td><td class="l">${bar(v/m*100)}</td></tr>`).join("")}<tr><td class="l"><b>${t("Total","Total")}</b></td><td><b>${pts1(tot[0])}</b> / ${tot[1]}</td><td></td></tr></tbody></table></div>`:"")
+    +(rub.length?`<h3>${t("Rúbrica","Rubric")} <small class="muted">· ${pts1(tot[0])} / ${tot[1]} ${t("punts","points")}</small></h3>`
+      +(rub.some(x=>/^\s*C[1-4]\b/.test(x[0]))?`<p class="muted" style="margin:0 0 8px">${t("El writing es corregeix amb 4 criteris. Per a cadascun veus què es valora, què vol dir cada nota (la teva està marcada) i quines errades t'hi han tret punts. Toca el codi (5.1, 5.2) per veure el criteri oficial.","Your writing is marked on 4 rows. For each one you can see what it checks, what each mark means (yours is highlighted) and which mistakes cost you points. Tap the code (5.1, 5.2) to see the official criterion.")}</p>`:"")
+      +`<div class="wrub">${rub.map(row).join("")}<div class="wr wrt"><div class="wrh"><b>${t("Total del writing","Writing total")}</b><span class="wrs"><b>${pts1(tot[0])}</b> / ${tot[1]} ${bar(tot[1]?tot[0]/tot[1]*100:0)}</span></div></div></div>`:"")
     +(w.note?`<div class="wnote">ℹ️ ${esc(w.note)}</div>`:"")
     +(w.feedback?`<h3>💬 ${t("Comentari del professor","Your teacher's comment")}</h3><div class="fb">${esc(w.feedback)}</div>`:"")
-    +((w.errors||[]).length?`<h3>✏️ ${t("Errades: correcció i explicació","Mistakes: correction and why")}</h3><div class="wrap"><table class="xt corr"><thead><tr><th>${t("Errada","Mistake")}</th><th>${t("Correcció","Correction")}</th><th>${t("Per què","Why")}</th></tr></thead><tbody>`
-      +w.errors.map(x=>`<tr><td class="l bad"><s>${esc(x.orig)}</s></td><td class="l good">${esc(x.fix)}</td><td class="l">${x.type?`<span class="tag">${esc(x.type)}</span> `:""}${esc(x.why||"")}</td></tr>`).join("")+`</tbody></table></div>`:"")
+    +(errs.length?`<h3>✏️ ${t("Errades: correcció i explicació","Mistakes: correction and why")}</h3><div class="wrap"><table class="xt corr"><thead><tr><th>${t("Núm.","No.")}</th><th>${t("Errada","Mistake")}</th><th>${t("Correcció","Correction")}</th><th>${t("Per què","Why")}</th></tr></thead><tbody>`
+      +errs.map((x,i)=>{const c=wRowOf(x.type);return `<tr><td class="l"><b>${i+1}</b>${c?`<br><small class="muted">${c}</small>`:""}</td><td class="l bad"><s>${esc(x.orig)}</s></td><td class="l good">${esc(x.fix)}</td><td class="l">${x.type?`<span class="tag">${esc(x.type)}</span> `:""}${esc(x.why||"")}</td></tr>`}).join("")+`</tbody></table></div>`:"")
     +(w.original||w.corrected?`<div class="wtexts">${w.original?`<div><h3>📝 ${t("El teu text","Your text")}</h3><p class="wtx">${esc(w.original)}</p></div>`:""}${w.corrected?`<div><h3>✅ ${t("El teu text corregit","Your text, corrected")}</h3><p class="wtx ok2">${esc(w.corrected).replace(/\*([^*\n]+)\*/g,"<b>$1</b>")}</p></div>`:""}</div>`:"")
     +`</div>`}
 function examReview(r){const xs=r.review||[];if(!xs.length)return "";
@@ -308,7 +360,7 @@ function examView(ls){const id=ls.id,g=(window.EL_GRADING||{})[id];if(!g||!g.exa
     head=`<div class="box" id="exam"><div class="lphead"><div><h2>${t("Examen final","Final exam")} ${ver}</h2><p class="muted" style="margin:0">${w?t(`L'examen és el ${w} % de la nota de la LS. La resta (el producte final i la feina de la LS) la veus a «La meva avaluació formativa» › La meva nota de la LS fins ara.`,`The exam is ${w} % of your LS mark. The rest (the final product and your work in the LS) is in “My formative assessment” › My LS mark so far.`):""}</p></div>${big(exam)}</div></div>`}
   if(!got.length){const p=(window.EL_PLAN||{})[id],ex=ELWeek.exam(p,ELWeek.col(p,D.me.group));
     return head+`<div class="box notyet">📝 <b>${t("Encara no tens els resultats de l'examen.","Your exam results are not here yet.")}</b> ${ex?t(`Examen: ${when(ex)}. `,`Exam: ${when(ex)}. `):""}${t("Quan el professor l'hagi corregit, aquí veuràs la nota de cada part, els criteris, les preguntes que cal revisar i el teu writing corregit.","When your teacher has marked it, you will see here the mark of each part, the criteria, the questions to review and your writing corrected.")}</div>`}
-  return head+examParts(e,sc)+examCrit(e,sc)+examQuestions(rep)+examWriting(rep)+examReview(rep)}
+  return head+examParts(e,sc)+examCrit(e,sc)+examQuestions(rep)+examWriting(rep,e)+examReview(rep)}
 // My LS mark so far (Roger, 2 Nov 2026: "students should see their progress"): each block of EL_GRADING[ls] with its share and my mark
 // so far, out of 10. The teacher dashboard keeps the marks in results/{ls}__assessment .progress (progSync in teacher.html: only it can
 // work out the continuous assessment); the exam comes from its sections when they are there. Missing work is left out, so it is "so far".
