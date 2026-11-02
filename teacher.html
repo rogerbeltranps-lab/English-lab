@@ -77,6 +77,10 @@ const S={g:GR[0].id,route:"all",tutor:"all",ls:null,folded:new Set(),open:new Se
 // Back to where you were (Roger, 30 Oct 2026: "si vaig al dashboard, vull anar al curs del dashboard d'on vinc"): the last tab is remembered (el_t_last),
 // and a link from a course, LS or game page (?course=, ?ls=, ?g=; el-cloud.js and lab/game/host.js) opens a group of that course, the one used last.
 // The LS comes from ?ls= or from the last visit (within 3 hours); otherwise the group's current LS by the time plan, as before.
+// the groups shown in Time plan · all groups (Roger, 2 Nov 2026: "see only one course, two courses and three courses … to compare
+// different groups of the same level"); kept in this browser, all groups by default
+S.tpg=(()=>{try{const v=JSON.parse(localStorage.getItem("el_t_tpg"));if(Array.isArray(v)){const ok=v.filter(id=>GR.some(g=>g.id===id));if(ok.length)return ok}}catch(e){}return GR.map(g=>g.id)})();
+const keepTpg=()=>{try{localStorage.setItem("el_t_tpg",JSON.stringify(S.tpg))}catch(e){}};
 const LAST=(()=>{try{return JSON.parse(localStorage.getItem("el_t_last"))||{}}catch(e){return {}}})();
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
@@ -1241,7 +1245,7 @@ function lineRow(x,i,l,from,noTips){const r=x.p.rows[i],on=ticked(x,l),mv=((x.p.
   return `<label class="ck ${on?"on":""} ${!from&&lineDate(r,l)===t?"today":""} ${from?"carry":""}"><input type="checkbox" data-do="tick" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(origOf(x,l))}" ${on?"checked":""}><span>${from?`<small class="cfrom">↪ not ticked · ${esc(from)}</small> `:""}${esc(l)}${lineLinks(x,l)}${!canSetHw(x,l)?"":` <button type="button" class="g mini sethw" data-do="sethw" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" title="Set it as homework: students see it in their homework box and To do list">🏠 Set as homework</button>`}`
     +` <button type="button" class="g mini pledit" data-do="pledit" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" title="Move it to another day or change its tabs">✏️ Change</button>`
     +(/^Homework by /.test(l)||on?"":`<span class="nav"> <button type="button" class="g mini" data-do="sendto" data-dir="-1" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" title="Send what is not ticked back to the previous class">⏮ Back</button><button type="button" class="g mini" data-do="sendto" data-dir="1" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" title="Send what is not ticked to the next class">⏭ Next class</button></span>`)
-    +(mv?`<br><small class="mvd" title="Planned: ${esc(mv.orig)}">↔ moved from ${esc(ELWeek.date(mv.from))}</small>`:"")
+    +(mv&&mv.from!==lineDate(r,l)?`<br><small class="mvd" title="Planned: ${esc(mv.orig)}">↔ moved from ${esc(ELWeek.date(mv.from))}</small>`:"")
     +lineActs(x,l).filter(([a])=>((x.p._dropped||{})[x.gi]||[]).includes(a.id)).map(([,lab])=>`<br><small class="dropl">✂ ${esc(lab)} dropped: not counted, not in the exam</small>`).join("")+tabsHtml(x,l,i)+`</span></label>`
     +(tp.length?`<ul class="tips">${tp.map(s=>`<li>💡 ${esc(s)}</li>`).join("")}</ul>`:"")}
 // Saturday check: on Saturday and Sunday, the sessions still not ticked in every group (or one group), to tick or set as homework
@@ -1256,7 +1260,7 @@ const behindTag=x=>{const b=behind(x);return b.length?`<div class="behind" title
 const planX=(ls,gid)=>{const p=(window.EL_PLAN||{})[ls];return {ls,p,gi:ELWeek.col(p,gid),gid}};
 const hwOf=x=>((S.D.ls[x.ls]||{}).homework||{})[x.gid];
 const hwTag=x=>{const xs=ELWeek.upcoming(x.p,x.gi,null,7,hwOf(x)),cal=ELWeek.calendar(x.gid);
-  return `<div class="hwr"><b>🏠 Homework to remind</b>${xs.length?`<ul>${xs.map(y=>`<li>${y.kind==="self"?"📚 Self-study class ":"🏠 By "}${esc(ELWeek.date(y.date))}${y.set?` <small class="muted">(set ${esc(ELWeek.date(y.set))})</small>`:""} · ${esc(y.text)}${lineLinks(x,y.text)} <button class="g mini" data-do="hwcopy" data-msg="${esc(y.msg||hwMsg(x,y.text,y.date,"both"))}" title="Copy the message for students (to paste in Classroom)">📋 Message</button>${y.extra?` <button class="g mini" data-do="hwdel" data-gid="${x.gid}" data-ls="${x.ls}" data-id="${y.id}" title="Remove this homework">✕</button>`:""}</li>`).join("")}</ul>`:` <span class="muted">nothing in the next 7 days</span><br>`}`
+  return `<div class="hwr"><b>🏠 Homework to remind</b>${xs.length?`<ul>${xs.map(y=>`<li>${y.kind==="self"?"📚 Self-study class ":"🏠 By "}${esc(ELWeek.date(y.date))}${y.set?` <small class="muted">(set ${esc(ELWeek.date(y.set))})</small>`:""} · ${esc(y.text)}${lineLinks(x,y.text)} <button class="g mini" data-do="hwcopy" data-msg="${esc(y.msg||hwMsg(x,y.text,y.date,"both"))}" title="Copy the message for students (to paste in Classroom)">📋 Message</button>${y.extra?` <button class="g mini" data-do="hwdel" data-gid="${x.gid}" data-ls="${x.ls}" data-id="${y.id}" title="Remove this homework">✕</button>`:y.kind==="self"?` <button class="g mini" data-do="noself" data-v="1" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(origOf(x,y.line))}" title="You teach it in class: it stops being a self-study class">✕</button>`:""}</li>`).join("")}</ul>`:` <span class="muted">nothing in the next 7 days</span><br>`}`
     +`<small class="muted">Students see it on their board and in My week, and in their calendar if they subscribed: <a href="${cal.google}" target="_blank" rel="noopener">Google Calendar</a> · <a href="${cal.ics}">.ics link</a></small></div>`};
 // this week and next week; before the plan starts, its first week; after it ends, a line
 // On Saturday and Sunday the agenda opens on the coming week (Roger, 1 Nov 2026: on a Sunday he saw last week and "nothing" in it)
@@ -1289,8 +1293,13 @@ function overview(){const t=ELWeek.today(),all=[...new Set(GR.flatMap(g=>ELWeek.
     if(!x)return `<div class="tpc c${g.course}"><h3>${esc(g.name)}</h3><p class="muted">No time plan yet. When the plan of this course's LS is ready, add it to <code>shared/js/el-plan.js</code> and it appears here.</p></div>`;
     const body=show.map(w=>{const [y,i]=planAt(g.id,w);const nm=w===cur?TW:w===ELWeek.add(cur,7)?"Next week":"";return y?weekRow(y,i,nm):`<div class="wk"><b>${nm?nm+" · ":""}${ELWeek.week({from:w})}</b><p class="muted">No classes planned.</p></div>`}).join("");
     return `<div class="tpc c${g.course}"><h3>${esc(g.name)}</h3><div class="muted">${esc(l?l.title:x.ls)}</div>${examTag(ELWeek.exam(x.p,x.gi))}${dropTag(Object.assign({gid:g.id},x))}${behindTag(Object.assign({gid:g.id},x))}${hwTag(Object.assign({gid:g.id},x))}${body}<button class="g" data-do="tab" data-g="${g.id}" data-ls="${x.ls}">Open ${esc(g.name)}</button></div>`};
-  return `<div class="box"><h2>Time plan · all groups</h2><p class="muted">Today is ${ELWeek.date(t)}. Your checklist: tick each session when you have taught it (saved with your account). Pick a week to plan ahead; the 💡 tips come from the LS docs. Plans are in <code>shared/js/el-plan.js</code>; open a group for its whole plan and who is late.</p>`
-    +`<div class="bar wkbar">${chips}</div><div class="tp">${GR.map(card).join("")}</div></div>`}
+  const gs=GR.filter(g=>S.tpg.includes(g.id)),crs=[...new Set(GR.map(g=>g.course))],same=ids=>ids.length===gs.length&&ids.every(id=>S.tpg.includes(id)),
+    cn=c=>String(c).replace(/^(\d)(\D+)$/,(_,n,w)=>n+" "+w.toUpperCase()),
+    gchips=`<span class="muted">Groups:</span> <button class="chip ${gs.length===GR.length?"on":""}" data-do="tpg" data-v="all">All</button>`
+      +crs.map(c=>{const ids=GR.filter(g=>g.course===c).map(g=>g.id);return `<button class="chip ${same(ids)?"on":""}" data-do="tpg" data-v="c:${c}" title="Only the ${cn(c)} groups, side by side">${cn(c)}</button>`}).join("")
+      +` <span class="muted">·</span> `+GR.map(g=>`<button class="chip ${S.tpg.includes(g.id)?"on":""}" data-do="tpg" data-v="${g.id}" title="Show or hide ${esc(g.name)}">${S.tpg.includes(g.id)?"☑":"☐"} ${esc(g.name)}</button>`).join("");
+  return `<div class="box"><h2>Time plan · ${gs.length===GR.length?"all groups":esc(gs.map(g=>g.name).join(", "))}</h2><p class="muted">Today is ${ELWeek.date(t)}. Your checklist: tick each session when you have taught it (saved with your account). Pick a week to plan ahead; the 💡 tips come from the LS docs. Plans are in <code>shared/js/el-plan.js</code>; open a group for its whole plan and who is late.</p>`
+    +`<div class="bar wkbar">${chips}</div><div class="bar wkbar">${gchips}</div><div class="tp">${gs.map(card).join("")}</div></div>`}
 // Writing and speaking revisions (LS2 engine, research audit 26 Oct 2026): state.drafts[key] = the first version sent for AI feedback
 // (speaking: its transcript), state.finals[key] = {text, changed, at} the improved version; key = step + "_" + route. Older texts
 // saved before drafts were kept (state.texts) appear on their own.
@@ -1678,6 +1687,7 @@ function peOpen(x,i,l){const r=x.p.rows[i],o=origOf(x,l),mv=((x.p._moved||{})[x.
     +`<p class="muted">Students see it on the new day on their board and in My week (the subscribed calendar keeps the plan's days). ${hw?"":"Activities due on the old day are due on the new day. "}Its tick, 🏠 homework and tips go with it.</p>`
     +(hw?"":lineActs(x,l).filter(([a])=>a.graded!==false&&!/checkpoint|exam/i.test(a.title)).map(([a,lab])=>{const off=((x.p._dropped||{})[x.gi]||[]).includes(a.id);
       return `<p class="muted">✂ <button class="g mini" data-do="lpdrop" data-gid="${x.gid}" data-ls="${x.ls}" data-a="${esc(a.id)}" data-v="${off?0:1}">${off?"↩ Bring back":"Drop"} ${esc(lab)} for ${esc(grp)}</button> ${off?"It is dropped: it does not count and is not in the exam.":"No time for it: it stops counting in the LS grade and is not in the exam."}</p>`}).join(""))
+    +(/· self-study\b/.test(o)?(ns=>`<p class="muted">📚 <button class="g mini" data-do="noself" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(o)}" data-v="${ns?0:1}">${ns?"↩ Make it a self-study class again":"Not a self-study class"}</button> ${ns?"You teach it in class.":"The plan says students do it on their own. If you teach it in class, students stop seeing it as a class on their own."}</p>`)(!!(((S.D.ls[x.ls]||{}).planEdits||{})[x.gid]||{})["noself:"+o]):"")
     +`<div class="row"><button data-do="pesave">Save</button>${edited&&!S.peX.add?` <button class="g" data-do="pereset" title="The day and tabs of the plan">↩ Back to the plan</button>`:""}</div>`);
   peWarn()}
 function peWarn(){const h=S.peX,el=$("#pe-warn"),v=($("#pe-day")||{}).value;if(!h||!el)return;const w=v?["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(v+"T12:00").getDay()]:"";
@@ -1697,6 +1707,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
     sethw:()=>{e.preventDefault();const x=planX(k.ls,k.gid),r=x.p.rows[+k.i];hwOpen(x,noCp(x,k.line.replace(/^\w{3} \d{1,2} · /,"").replace(/\s*· self-study\b/,"")),lineDate(r,k.line)||ELWeek.today(),origOf(x,k.line));
       dayTabs(x,k.line).forEach(([a,,ts])=>{if(ts.length)S.hwX.tabs[a.id]=ts.map(z=>z[0]).filter(id=>!isGame(id))});hwTabs();hwFill()},   // the tabs of that session, ticked
+    noself:()=>{e.preventDefault();if(k.v==="1"&&!confirm("You teach this class yourself? Students stop seeing it as a self-study class; it stays in the plan as a normal class."))return;
+      const d=$("#dlg");if(d&&d.open)d.close();S.peX=null;quick(api.planEdit(k.ls,k.gid,"noself:"+k.line,k.v==="1"?{noSelf:true}:null))},   // a self-study class taught after all (planEdits "noself:<line>")
     pledit:()=>{e.preventDefault();peOpen(planX(k.ls,k.gid),+k.i,k.line)},
     sendto:()=>{e.preventDefault();sendTo(planX(k.ls,k.gid),+k.i,k.line,+k.dir,k.only||null)},
     lpdrop:()=>{e.preventDefault();const x=planX(k.ls,k.gid),a=byId(k.a),on=k.v==="1";
@@ -1721,6 +1733,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     mkcopy:()=>{const v=$("#mksheet").value;navigator.clipboard.writeText(v).then(()=>$("#mkst").textContent="✓ Copied",()=>{$("#mksheet").select();$("#mkst").textContent="Press Ctrl+C"})},
     mkdown:()=>mkDown(),
     wk:()=>{S.wk=k.w;S.g="plan";render()},
+    tpg:()=>{const v=k.v;if(v==="all")S.tpg=GR.map(g=>g.id);else if(v.startsWith("c:"))S.tpg=GR.filter(g=>g.course===v.slice(2)).map(g=>g.id);
+      else if(S.tpg.includes(v)){if(S.tpg.length>1)S.tpg=S.tpg.filter(id=>id!==v)}else S.tpg=GR.filter(g=>g.id===v||S.tpg.includes(g.id)).map(g=>g.id);keepTpg();render()},   // show or hide groups in Time plan · all groups
     tips:()=>{S.tips=!S.tips;try{localStorage.setItem("el_t_tips",S.tips?"on":"off")}catch(e){}render()},
     addstu:()=>dlg("<h3>Add a student</h3>"+roForm({})),impok:()=>{$("#dlg").close();act(api.importRoster(S.imp))},
     rosave:()=>{const v=f=>$("#ro-"+f).value.replace(/\s+/g," ").trim(),o={email:v("email").toLowerCase(),surname1:v("surname1"),surname2:v("surname2"),first:v("first"),tutor:v("tutor"),group:$("#ro-group").value};

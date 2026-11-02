@@ -43,7 +43,7 @@
         if(m){const d=at(r.from,m[1],+m[2]);if(d)out.push({kind:"hw",date:d,set:last,text:m[3]});return}
         m=ln.match(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}) · (.+)$/);if(!m)return;
         const d=at(r.from,m[1],+m[2]);if(!d)return;last=d;
-        if(/· self-study\b/.test(m[3]))out.push({kind:"self",date:d,set:null,text:m[3].replace(/\s*· self-study\b/,"").trim()})})});
+        if(/· self-study\b/.test(m[3]))out.push({kind:"self",date:d,set:null,text:m[3].replace(/\s*· self-study\b/,"").trim(),line:ln})})});
       const ex=p.exam&&p.exam[gi];if(ex)out.push({kind:"exam",date:ex,set:null,text:"Exam"});
       return out.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0)},
     // homework and self-study classes still ahead (date >= from, by default today), within `days` days
@@ -88,11 +88,16 @@
           const a=(window.EL_CATALOG||[]).find(x=>x.id===id),t=a&&String(a.title).split(/[:(]/)[0].trim().toLowerCase();let n=null;
           if(t)p.rows.forEach(r=>get(r,gi).forEach(l=>{const q=!n&&/\bLP(\d+) ([^(\n·]+)/.exec(l);if(q&&q[2].trim().toLowerCase().startsWith(t.slice(0,12)))n=q[1]}));
           if(n)p.rows.forEach(r=>{const ls=get(r,gi),k=ls.filter(l=>{if(!/^Homework by /.test(l))return true;const lp=l.match(/\bLP\d+\b/g)||[];return !(lp.length&&lp.every(x=>x==="LP"+n))});if(k.length!==ls.length)set(r,gi,k)})});
-        es.filter(([k,e])=>!e.add&&!/^drop:/.test(k)).forEach(([orig,e])=>{if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!ok(e.to))return;
+        es.filter(([k,e])=>!e.add&&!/^(drop|noself):/.test(k)).forEach(([orig,e])=>{if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!ok(e.to))return;
           const ri=p.rows.findIndex(r=>r.from&&get(r,gi).includes(orig));if(ri<0)return;const old=this.lineDay(p.rows[ri].from,orig);if(!old||old===e.to)return;
           const hw=/^Homework by /.test(orig),nl=orig.replace(/^(Homework by )?\w{3} \d{1,2}\b/,(_,h)=>(h||"")+lab(e.to));
           set(p.rows[ri],gi,get(p.rows[ri],gi).filter(l=>l!==orig));place(gi,e.to,nl);mv[nl]={orig,from:old};
           if(!hw)shift(gi,old,e.to)});
+        // a self-study class the teacher teaches after all (Roger, 2 Nov 2026: "I can't delete this homework … they do it in class"): key
+        // "noself:<original line>" = {noSelf: true}; the line (moved or not) loses "· self-study", so it is a normal class everywhere
+        // (no 📚 item on the boards and in Homework to remind, carried and reminded like any class). The .ics feed keeps the plan.
+        es.filter(([k,e])=>/^noself:/.test(k)&&e.noSelf).forEach(([k])=>{const orig=k.slice(7),cur=Object.keys(mv).find(n=>mv[n].orig===orig)||orig,nl=cur.replace(/\s*· self-study\b/,"");
+          if(nl===cur)return;p.rows.forEach(r=>{const ls=get(r,gi),j=ls.indexOf(cur);if(j<0)return;ls[j]=nl;set(r,gi,ls);mv[nl]=mv[cur]||{orig,from:this.lineDay(r.from,cur)};delete mv[cur]})});
         // the tabs not done in a session, sent to a later class ("⏭ Next class" on the dashboard): {add: "LP3 Where traditions come from",
         // to, from: the day they were planned, tabs, shift: activity ids whose due day on `from` moves to `to`}
         es.filter(([,e])=>e.add&&ok(e.to)).sort((x,y)=>(x[1].at||0)-(y[1].at||0)).forEach(([key,e])=>{const nl=lab(e.to)+" · "+e.add+(e.from?" · not finished on "+lab(e.from):"");
