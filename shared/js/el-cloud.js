@@ -416,7 +416,8 @@ async function myAnnouncements(u){
   if(isTeacher(u)){add(await getDocs(c));return Object.values(out)}
   const g=viewGroup(u)||myGroup;
   await Promise.all([getDocs(query(c,where("uids","array-contains",u.uid))).then(add),g&&getDocs(query(c,where("groups","array-contains",g))).then(add)].filter(Boolean));
-  return Object.values(out);
+  // scheduled ones (at = ms, Roger 2 Nov 2026: "program announcements") reach the student only from that time, dated then (card and board)
+  return Object.values(out).filter(a=>!(a.at>Date.now())).map(a=>a.at?Object.assign(a,{created:a.at}):a);
 }
 // Problem reports (bottom bar "⚠️ Problema / Problem"): problems/{id}, read only by the teacher in the dashboard.
 // Catalan for Insecure and with no route; English for Safe and Daring (LS pages: the route; the board: its own language).
