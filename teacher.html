@@ -478,12 +478,15 @@ const wavg=ps=>{let s=0,w=0;ps.forEach(([v,x])=>{if(v==null){if(!S.zero)return;v
 const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).title||id)+" · "+k;
 // Grammar and vocabulary: weighted parts (EL_GRADING[ls].gv.parts). first: the average first-try score of those steps (checkpoints, recall
 // warm-ups: delayed retrieval); time: the share of those steps done by their session deadline (teaching plan), out of 10.
-function gvBlock(u,g){const parts=G().gv.parts.map(p=>({...p,v:p.first?avg(p.first.map(([id,k])=>pct(firstOf(u,id,k))))
-    :avg(p.time.map(([id,k])=>onTime(u,id,k,g)).filter(x=>x!==undefined).map(x=>x==null?x:x*10))}));
+// S.dueZero = a group id (progSync, the student board's mark so far; Roger, 2 Nov 2026: "students must understand that if they don't work
+// daily their grades are low"): a missing piece counts 0 once its day in the time plan has passed, and is left out before that.
+const missZ=(v,id,k)=>{if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()?0:null};
+function gvBlock(u,g){const parts=G().gv.parts.map(p=>({...p,v:p.first?avg(p.first.map(([id,k])=>missZ(pct(firstOf(u,id,k)),id,k)))
+    :avg(p.time.map(([id,k])=>{const o=onTime(u,id,k,g);return o===undefined?o:missZ(o==null?null:o*10,id,k)}).filter(x=>x!==undefined))}));
   return {mark:wavg(parts.map(p=>[p.v,p.w])),parts}}
 const gvSum=B=>(B.gv.parts||[]).map(p=>p.name+" "+f1(p.v)+" × "+p.w+" %").join(" + ");
 function otherCrit(u,c){const g=G();
-  const auto=avg((g.auto[c]||[]).map(([id,k,first])=>first?pct(firstOf(u,id,k)):doneAt(u,id,k)?10:null));
+  const auto=avg((g.auto[c]||[]).map(([id,k,first])=>missZ(first?pct(firstOf(u,id,k)):doneAt(u,id,k)?10:null,id,k)));
   const teacher=avg((g.teacher[c]||[]).map(([id,k])=>lvMark(lvOf(u,id,k,c))));
   // a half with no pieces drops out (1.1 and 1.2 in 4ESO LS2 have only steps), so it never counts 0
   return {auto,teacher,mark:wavg([[auto,(g.auto[c]||[]).length?1:0],[teacher,(g.teacher[c]||[]).length?1:0]].filter(x=>x[1]))}}
@@ -555,18 +558,18 @@ function render(){
   render0();keepLast();ptSync();progSync();loadBar()}
 // LS mark so far for the student board (Roger, 2 Nov 2026: "students should see their progress"). Only the dashboard can work out the
 // continuous-assessment blocks (secure checkpoints are marked here with the teacher-only keys), so it keeps each student's marks so far
-// (missing work left out, as "not counted yet") in results/{ls}__assessment .progress = {exam, fp, gv, other, total, at}, out of 10,
+// (a missing piece counts 0 once its day has passed, S.dueZero; not marked yet is left out) in results/{ls}__assessment .progress = {exam, fp, gv, other, total, at}, out of 10,
 // and rewrites them only when they change. Only for the group on screen, fetched in this visit, in an LS with continuous assessment.
 function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S.g)))return;
   const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
-  try{Object.values(S.P||{}).filter(s=>s&&s.uid&&!s.away&&(s.group===S.g||s.tester)).forEach(s=>{const {B,total}=grade(s);
+  try{Object.values(S.P||{}).filter(s=>s&&s.uid&&!s.away&&(s.group===S.g||s.tester)).forEach(s=>{S.dueZero=s.group||S.g;const {B,total}=grade(s);
     const p={exam:r1(B.exam),fp:r1(B.fp),gv:r1(B.gv&&B.gv.mark),other:r1(B.other),total:r1(total)},cur=res(s.uid,id).progress||{};
     // the pieces of each block, for the teacher's view of the student's board (today.html?student=…; Roger, 2 Nov 2026)
     const parts={gv:Object.fromEntries(((B.gv&&B.gv.parts)||[]).map(x=>[x.id,r1(x.v)])),other:Object.fromEntries(engOther(g).map(c=>[c,r1(otherCrit(s.uid,c).mark)])),
-      fp:g.fp&&!g.fp.mark?Object.fromEntries(g.fp.rows.map(x=>[x.step,r1(lvMark(lvOf(s.uid,g.fp.a,x.step,x.c)))])):{}};p.parts=parts;
+      fp:g.fp&&!g.fp.mark?Object.fromEntries(g.fp.rows.map(x=>[x.step+"|"+x.c,r1(lvMark(lvOf(s.uid,g.fp.a,x.step,x.c)))])):{}};p.parts=parts;
     if(K.every(k=>(cur[k]??null)===p[k])&&Object.entries(parts).every(([k,o])=>Object.entries(o).every(([c,v])=>(((cur.parts||{})[k]||{})[c]??null)===v)))return;p.at=ymd(Date.now());
     const w=patch(s.uid,id,{progress:p});if(w&&w.catch)w.catch(e=>console.warn("progress",e))})}
-  finally{S.zero=z}}
+  finally{S.zero=z;S.dueZero=null}}
 function render0(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
@@ -914,7 +917,7 @@ function gradeBox(studs){
       +g.blocks.map(b=>`<td class="gr" data-do="grade" data-u="${s.uid}" title="${esc(tip[b.id])}">${f1(val[b.id])}${b.id==="exam"&&exVer(s.uid)?"<br>"+route(exVer(s.uid))+(exVerOff(s.uid)?' <span title="Exam version differs from the current route">⚠️</span>':""):""}</td>`).join("")
       +`<td class="first gr tot" data-do="grade" data-u="${s.uid}">${f1(total)} ${deg(elDegree(total))}</td></tr>`}).join("");
   const key=g.only?`<p class="muted">Marks out of 10. Only the final exam (${g.blocks.find(b=>b.id==="exam").w} %) and the final product (${g.blocks.find(b=>b.id==="fp").w} %) count in this LS: its learning paths are practice. Exam: sum of section scores ÷ sum of maxes; enter it below or by clicking a mark. Final product: the mark you give in its dialog (click a student's mark here, then "Open the final product").</p>`
-    :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: levels of my part ${g.fp.rows.map(r=>r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: ${g.gv.parts.map(p=>p.name.toLowerCase()+" "+p.w+" %").join(" + ")} (accuracy only from delayed retrieval; practice, grammar and mixed practice count as done by the session deadline in the teaching plan). Other competences (learning paths only): for each of ${engOther(g).join(", ")}, the linked steps (done, or their first try) and, where there is one, your level on a learning-path piece, half and half; the block is their average. Final product levels on these criteria are evidence for the criterion degree, not part of this block.${transOther(g).length?" Transversal competences ("+transOther(g).join(", ")+") are worked out the same way and shown in each student's breakdown, but never count in the LS mark.":""} Group: the final product group (set it in the final product dialog).</p>`;
+    :`<p class="muted">Marks out of 10. Click a mark for the student's breakdown (and to enter exam marks). Exam: sum of section scores ÷ sum of maxes. Final product: your levels on its rows, weighted ${g.fp.rows.map(r=>r.name.toLowerCase()+" "+r.w).join(" · ")} (in the final product dialog). Grammar and vocabulary: ${g.gv.parts.map(p=>p.name.toLowerCase()+" "+p.w+" %").join(" + ")} (accuracy only from delayed retrieval; practice, grammar and mixed practice count as done by the session deadline in the teaching plan). Other competences (learning paths only): for each of ${engOther(g).join(", ")}, the linked steps (done, or their first try) and, where there is one, your level on a learning-path piece, half and half; the block is their average. Final product levels on these criteria are evidence for the criterion degree, not part of this block.${transOther(g).length?" Transversal competences ("+transOther(g).join(", ")+") are worked out the same way and shown in each student's breakdown, but never count in the LS mark.":""} Group: the final product group (set it in the final product dialog).</p>`;
   return `<div class="box"><h2>LS grade</h2><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1" title="As in the grading plan: missing work counts 0 until it is handed in">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0" title="Mark so far: only what is done or assessed counts">not counted yet</button></div>`
     +fold("gradeplan","📊 What makes up the LS mark",planTable(g),"key")
     +fold("gradekey","How it is worked out",key,"key")

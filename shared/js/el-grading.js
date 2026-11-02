@@ -44,7 +44,7 @@ window.EL_GRADING={
       // Exam: a mark per section (score out of max) and the writing level. Exam mark = sum of scores / sum of maxes × 10.
       // Use of English (vocabulary, grammar) counts for reading and writing alike, 4.1 and 5.1, in both LS2s (Roger, 30 Oct 2026:
       // “even though students see that section as Use of English … the competences are reading and writing”).
-      exam:{sections:[["listening","Listening",10,["2.2"]],["reading","Reading",10,["4.1"]],["vocabulary","Vocabulary",10,["4.1","5.1"]],["grammar","Grammar",10,["4.1","5.1"]],["writing","Writing",10,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},
+      exam:{sections:[["listening","Listening",20,["2.2"]],["reading","Reading",20,["4.1"]],["vocabulary","Vocabulary",15,["4.1","5.1"]],["grammar","Grammar",15,["4.1","5.1"]],["writing","Writing",30,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},   // points of the real exam, /100 (grading.md, 25 Oct 2026)
       // Where the teacher gives one-click levels: activity + step + criteria. group: given once per final-product group and copied to each member.
       // Only the video is marked in groups (Roger, 25 Oct 2026): the research card (6.1) is a level per student in round 1.
       // c may be a pseudo criterion with its own indicators (teamwork, process). The final product rows are in the final product dialog.
@@ -60,7 +60,11 @@ window.EL_GRADING={
         {a:FP,step:"process",name:"My process evidence (steps 0–5)",c:["process"]},
         {a:FP,step:"group",name:"Group rows (the video)",c:["1.1","1.2","CC3 3.2"],group:true}
       ],
-      fp:{a:FP,rows:[{step:"part",c:"3.2",name:"My part",w:40},{step:"email",c:"5.1",name:"My email",w:35},{step:"source",c:"4.2",name:"My source",w:15},{step:"team",c:"teamwork",name:"Teamwork",w:5},{step:"process",c:"process",name:"Process",w:5}]},
+      // Final product (Roger, 2 Nov 2026: "the final product must be in the final product"): the research card and the video's meaning and local
+      // link rows count here too, not in "other competences". The rubric's pct (final-rubric-data.js) shows the same weights.
+      fp:{a:FP,rows:[{step:"part",c:"3.2",name:"My part",w:30},{step:"email",c:"5.1",name:"My email",w:25},{step:"source",c:"4.2",name:"My source",w:10},
+        {step:"research",c:"6.1",name:"My research card",w:10},{step:"group",c:"1.1",name:"Video: what it means (group)",w:7.5},{step:"group",c:"1.2",name:"Video: local link (group)",w:7.5},
+        {step:"team",c:"teamwork",name:"Teamwork",w:5},{step:"process",c:"process",name:"Process",w:5}]},
       // Marking PDF per round (final-product-assessment.md section 8): the rubric rows come from the LS's rubric data by round, group and video
       // (peers: the teammates' average goes next to that row; process: the process summary); answers = hand-ins [activity, step, {rate: also the self-check}].
       marking:{rubric:"4eso/seasons-and-celebrations/final-rubric-data.js",process:["prep","source","contribution","part","email","team"],afterDue:["team"],
@@ -126,7 +130,7 @@ window.EL_GRADING={
       blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar and vocabulary",w:20},{id:"other",name:"Other competences",w:20}],
       key:["4.1","4.2","2.2","3.2","5.1"],      // key competences (CE2–CE5): exam and final product
       other:["6.2","CD2 2.2","CD4 4.5"],        // the 20 % block
-      exam:{sections:[["listening","Listening",10,["2.2"]],["reading","Reading",10,["4.1"]],["vocabulary","Vocabulary",10,["4.1","5.1"]],["grammar","Grammar",10,["4.1","5.1"]],["writing","Writing",10,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},
+      exam:{sections:[["listening","Listening",20,["2.2"]],["reading","Reading",20,["4.1"]],["vocabulary","Vocabulary",15,["4.1","5.1"]],["grammar","Grammar",15,["4.1","5.1"]],["writing","Writing",30,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},   // points of the real exam, /100 (grading.md, 25 Oct 2026)
       // One-click levels per student; the vlog is individual, so there are no group moments. "edit" (step 4) is where the vlog itself is marked (3.2, CD2 2.2).
       moments:[
         {a:LP2,step:"log",name:"Reading log",c:["4.1"]},
@@ -139,7 +143,9 @@ window.EL_GRADING={
         {a:FP,step:"tips",name:"5 · My screen tips",c:["CD4 4.5"]},
         {a:FP,step:"process",name:"My process evidence (steps 0–5)",c:["process"]}
       ],
-      fp:{a:FP,rows:[{step:"edit",c:"3.2",name:"My vlog",w:40},{step:"script",c:"5.1",name:"My script and slides",w:30},{step:"source",c:"4.2",name:"My source",w:15},{step:"process",c:"process",name:"Process",w:15}]},
+      // Final product (Roger, 2 Nov 2026, as in 4ESO LS2): the fact file (6.2) counts here too; the rubric's pct shows the same weights.
+      fp:{a:FP,rows:[{step:"edit",c:"3.2",name:"My vlog",w:35},{step:"script",c:"5.1",name:"My script and slides",w:25},{step:"source",c:"4.2",name:"My source",w:15},
+        {step:"factfile",c:"6.2",name:"My fact file and credits",w:15},{step:"process",c:"process",name:"Process",w:10}]},
       marking:{rubric:"2eso/free-time-live/final-rubric-data.js",process:["prep","source","slides","script","edit","tips"],afterDue:["tips"],
         rounds:{1:{name:"Round 1 · Source and fact file",note:"Fact file and steps 0–2: My source and My fact file, per student",answers:[[LP4,"factfile"],[FP,"prep"],[FP,"source"],[FP,"slides"]]},
           2:{name:"Round 2 · Vlog, script, editing and tip",note:"Steps 3–5 with the full script, the editing log and the tip, plus the process; the video is watched on Classroom",answers:[[FP,"script",{rate:true}],[FP,"edit",{rate:true}],[FP,"tips"]],process:true}}},
