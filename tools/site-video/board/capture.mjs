@@ -23,6 +23,7 @@ const LS = LANG === 'ca' ? { ls1: '2eso-my-real-routine', ls2: '2eso-free-time-l
 const STATES = [
   { id: 'top', phase: 'mid' },   // as it opens: on My formative assessment (Roger, 2 Nov 2026)
   { id: 'week', phase: 'mid', tab: 'week' },
+  { id: 'live', phase: 'mid', live: true },   // the Join the class box while the teacher presents (liveBox in today.html)
   { id: 'go', phase: 'mid', go: true, dialog: true },   // the notice a pull-up shows on open pages (el-cloud.js goTo), drawn the same way
   { id: 'form', phase: 'mid', tab: 'form' },
   { id: 'detail', phase: 'mid', tab: 'form', click: `[data-do="cell"][data-a="${LANG === 'ca' ? '2eso/ls2-what-are-they-doing' : '4eso/ls2-plan-the-day'}"]`, dialog: true },
@@ -61,6 +62,9 @@ for (const S of STATES) {
   if (S.ls) { await page.click(`[data-do="ls"][data-ls="${S.ls}"]`); await page.waitForTimeout(300); }
   if (S.tab) { await page.click(`[data-do="tab"][data-t="${S.tab}"]`); await page.waitForTimeout(400); }
   if (S.click) { await page.click(S.click); await page.waitForTimeout(400); }
+  if (S.live) await page.evaluate((en) => {   // the same markup as liveBox() (the board listens to live/{group}; nothing to listen to in demo mode)
+    document.querySelector('#live').innerHTML = `<div class="pend live"><div><b>📺 ${en ? 'Your class is on a presentation now' : 'Ara hi ha una presentació a classe'}</b><div class="muted">LS2 · ${en ? 'Celebrations around the world' : 'What are they doing?'}</div></div><a class="go" href="#">${en ? 'Join the class' : 'Entra a la classe'} →</a></div>`;
+  }, LANG === 'en');
   if (S.go) await page.evaluate((en) => {   // same overlay, texts and colours as goTo() in shared/js/el-cloud.js
     const o = document.createElement('div');
     o.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:#f8fafc;display:grid;place-items:center;font:16px system-ui,sans-serif;text-align:center;padding:20px;overflow:auto';
@@ -76,6 +80,7 @@ for (const S of STATES) {
     const R = (el) => { const r = el.getBoundingClientRect(); return [Math.round(r.left + scrollX), Math.round(r.top + scrollY), Math.round(r.width), Math.round(r.height)] };
     const out = {}, add = (k, el) => { if (el) out[k] = R(el) };
     const q = (s) => document.querySelector(s), qa = (s) => [...document.querySelectorAll(s)];
+    add('side', q('aside.side')); add('nav', q('aside.side .nvs')); add('livebox', q('#live .pend')); add('livego', q('#live .pend a.go'));
     add('gonote', q('.gonote')); add('gocount', q('.gonote .c'));
     add('h1', q('h1')); add('sub', q('#sub')); add('pull', q('.pullcard')); add('pullgo', q('.pullcard .pc-go'));
     add('ann', q('.box.ann')); add('points', q('#ptbox .box')); add('work', q('.box.work')); add('workbar', q('.box.work .wkgrid'));
