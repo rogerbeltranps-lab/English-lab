@@ -2,20 +2,51 @@
 # could be on their student board"). Reads his marked workbook (Drive: Notes_4ESO_definitives.xlsx, the one his Apps Script
 # Code_Informes_LS1_v4_4.gs turned into PDF reports) and writes one report per student, as the board reads it in
 # results/{ls}__assessment .report (today.html examView): the questions to review, the writing (rubric, feedback, mistakes table,
-# original and corrected text) and what to review. Same rules as the PDFs: wrong or blank answers only; explanations and review links
-# as in the script; Catalan for the Insecure (Base) route, English for the others; a writing marked "NO AVALUABLE · FIABILITAT" gets
+# original and corrected text) and what to review. Same rules as the PDFs for the questions to review (wrong or blank answers, with the
+# explanation and review link of the script). Since 2 Nov 2026 (Roger: "students want to see what they did well too") the report also
+# holds the questions the student got right ({q, part, pts, got, text, mine, ok: true}, no explanation) and, with --exam, each question's
+# choices and hint as on the paper (opts, hint) and the texts of the exam they did: the listening instructions (and the audio transcript when there is one), the reading text and the writing task
+# (report.exam, from exam-texts.json, made from the exam papers; real exams stay out of the public repo); report.full marks it.
+# Explanations and review links as in the script; Catalan for the Insecure (Base) route, English for the others; a writing marked "NO AVALUABLE · FIABILITAT" gets
 # the reliability note and no corrections. Nothing here recalculates marks (they are imported by tools/exam-marks).
-#   python3 -I tools/exam-report/build-ls1-reports.py 4eso <Notes_4ESO_definitives.xlsx> <out.json> [why-en.json]
-#   python3 -I tools/exam-report/build-ls1-reports.py 4eso-six <the workbook of the 6 later 4 ESO exams> <out.json> [why-en.json]
-#   python3 -I tools/exam-report/build-ls1-reports.py 2eso <2ESO_INFORMES_Writing_revisat_53_alumnes.xlsx> <out.json> [why-en.json]
+#   python3 -I tools/exam-report/build-ls1-reports.py 4eso <Notes_4ESO_definitives.xlsx> <out.json> [why-en.json] [--exam exam-texts.json]
+#   python3 -I tools/exam-report/build-ls1-reports.py 4eso-six <the workbook of the 6 later 4 ESO exams> <out.json> [why-en.json] [--exam exam-texts.json]
+#   python3 -I tools/exam-report/build-ls1-reports.py 2eso <2ESO_INFORMES_Writing_revisat_53_alumnes.xlsx> <out.json> [why-en.json] [--exam exam-texts.json]
+# exam-texts.json: {"2eso"|"4eso": {model: {route: {"listening": "…", "reading": {"title", "body"}, "writing": {"title", "task", "points": […]},
+#                                                    "opts": {"1": ["A. …", "B. …", "C. …", "D. …"], …}, "hints": {"19": ["Pista: …"], …}}}},
+#                   "transcripts": {"2eso"|"4eso": {"text": "…"}}} (route = Insecure / Safe / Daring, as in the workbooks).
 # why-en.json: English for the Catalan "Per què?" lines of the mistakes table ({catalan: english}); missing ones are listed in
 # <out>.todo.json. The workbook and the JSON hold personal data: keep them outside the repo.
 import json, os, re, sys, difflib
 import openpyxl
 
-mode, src, out = sys.argv[1], sys.argv[2], sys.argv[3]
+argv = sys.argv[1:]; exam_path = None
+if "--exam" in argv: i = argv.index("--exam"); exam_path = argv[i + 1]; del argv[i:i + 2]
+mode, src, out = argv[0], argv[1], argv[2]
 assert mode in ("4eso", "4eso-six", "2eso"), mode
-why_en = json.load(open(sys.argv[4], encoding="utf-8")) if len(sys.argv) > 4 else {}
+why_en = json.load(open(argv[3], encoding="utf-8")) if len(argv) > 3 else {}
+EXAM = json.load(open(exam_path, encoding="utf-8")) if exam_path else None
+COURSE = "2eso" if mode == "2eso" else "4eso"
+def exam_texts(model, route):
+    """The texts of the exam this student did (their model and route), for report.exam; None when they are not in exam-texts.json."""
+    if not EXAM: return None
+    x = ((EXAM.get(COURSE) or {}).get(model) or {}).get(route)
+    if not x: print(f"! no exam texts for {COURSE} model {model} {route}"); return None
+    e = {k: x[k] for k in ("reading", "writing") if x.get(k)}
+    li = {"about": x.get("listening") or ""}
+    tr = ((EXAM.get("transcripts") or {}).get(COURSE) or {}).get("text")
+    if tr: li["text"] = tr
+    if li["about"] or li.get("text"): e["listening"] = li
+    return e
+def finish(rep, model, route):
+    """Every question in exam order, marked as the full report (report.full), with the exam texts when there are any."""
+    rep["questions"].sort(key=lambda q: q["q"]); rep["full"] = True
+    e = exam_texts(model, route)
+    if e: rep["exam"] = e
+    x = ((EXAM or {}).get(COURSE) or {}).get(model, {}).get(route) or {}
+    for q in rep["questions"]:   # the choices A–D and the hint line of the paper, so the question reads as it did in the exam
+        if x.get("opts", {}).get(str(q["q"])): q["opts"] = x["opts"][str(q["q"])]
+        if x.get("hints", {}).get(str(q["q"])): q["hint"] = " ".join(x["hints"][str(q["q"])])
 wb = openpyxl.load_workbook(src, read_only=True, data_only=True)
 rows = lambda name: [r + (None,) * 30 for r in wb[name].iter_rows(values_only=True) if r]
 s = lambda v: "" if v is None else str(v).strip()
@@ -110,14 +141,20 @@ def build_4eso():
         email = mail.get(name) or s(r[4]).lower(); T = lambda a, b: a if ca else b
         t = txt.get(wri_row[key]); assert t, name
         rep = {"model": model, "lang": "ca" if ca else "en", "questions": []}
-        wrong = [q for q in sorted(ques.get(key, []), key=lambda q: n(q[4])) if s(q[10]) in ("INCORRECTA", "SENSE RESPOSTA")]
+        allq = sorted(ques.get(key, []), key=lambda q: n(q[4]))
+        wrong = [q for q in allq if s(q[10]) in ("INCORRECTA", "SENSE RESPOSTA")]
+        part = lambda qn: "Listening" if qn <= 5 else "Reading" if qn <= 10 else "Vocabulary" if qn <= 22 else "Grammar"
+        for q in allq:   # the ones they got right (CORRECTA, or CORRECTA (docent) when the teacher accepted it)
+            if q in wrong: continue
+            qn = int(n(q[4])); k = f"{model}|{route}|{qn}"
+            rep["questions"].append({"q": qn, "part": part(qn), "pts": num(n(q[7])), "got": num(n(q[11]) or 0), "text": prompts.get(k, f"Q{qn}"), "mine": s(q[8]), "ok": True})
         weight = {"LP2": 0, "LP3": 0, "LP4": 0, "LP5": 0}
         for q in wrong:
             qn = int(n(q[4])); k = f"{model}|{route}|{qn}"; prompt = prompts.get(k, f"Q{qn}")
             full = best.get(k) or OPTION_FALLBACK.get(k); valid = s(q[9])
             right = full if full and valid and full[0].upper() == valid[0].upper() else valid
             l = lesson(qn, prompt + " " + right); weight[lesson(qn, prompt + " " + valid)] += n(q[7]) or 0
-            rep["questions"].append({"q": qn, "part": "Listening" if qn <= 5 else "Reading" if qn <= 10 else "Vocabulary" if qn <= 22 else "Grammar",
+            rep["questions"].append({"q": qn, "part": part(qn),
                 "pts": num(n(q[7])), "got": num(n(q[11]) or 0), "text": prompt, "mine": "" if s(q[10]) == "SENSE RESPOSTA" else s(q[8]),
                 "right": right, "why": explain(qn, prompt, right, ca), "lp": lp(l)})
         unassessable = re.search(r"NO AVALUABLE.*FIABILITAT", s(w[11]), re.I)
@@ -149,7 +186,7 @@ def build_4eso():
         rep["review"] = ([{"text": T(PLAN[k][0], PLAN[k][1]), "lp": lp(k)} for k in order if weight[k] > 0][:3]
                          or [{"text": T("Mantén el bon nivell: amplia el vocabulari amb expressions noves.", "Keep progressing: extend your vocabulary with new expressions."), "lp": lp("LP3")}])
         assert email and "@" in email, name
-        reports[email] = rep
+        finish(rep, model, route); reports[email] = rep
 
 
     return reports, todo
@@ -183,8 +220,9 @@ def build_4eso_six():
         name, email, model, route = s(r[0]), s(r[1]).lower(), s(r[3]).upper(), s(r[4]); ca = route == "Insecure"; T = lambda a, b: a if ca else b
         rep = {"model": model, "lang": "ca" if ca else "en", "questions": []}; weight = {"LP2": 0, "LP3": 0, "LP4": 0, "LP5": 0}
         for q in sorted(qs.get(name, []), key=lambda q: n(q[4])):
-            if s(q[12]) == "CORRECTA": continue
             qn = int(n(q[4])); prompt = re.sub(r"^\s*\d+\s+", "", re.sub(r"\s*\[\s*\d+\s*punts\s*\]\s*$", "", s(q[7]), flags=re.I))
+            if s(q[12]).startswith("CORRECTA"):
+                rep["questions"].append({"q": qn, "part": s(q[5]), "pts": num(n(q[10])), "got": num(n(q[11]) or 0), "text": prompt, "mine": s(q[8]), "ok": True}); continue
             right = s(q[9]); weight[lesson(qn, prompt + " " + right)] += n(q[10]) or 0
             rep["questions"].append({"q": qn, "part": s(q[5]), "pts": num(n(q[10])), "got": num(n(q[11]) or 0), "text": prompt,
                 "mine": s(q[8]), "right": right, "why": explain(qn, prompt, right, ca), "lp": lp(lesson(qn, prompt + " " + right))})
@@ -196,7 +234,7 @@ def build_4eso_six():
         for e in errs.get(name, []):
             cat = s(e[3]); wr["errors"].append({"type": cat if ca else CAT_EN.get(cat, cat), "orig": s(e[4]), "fix": s(e[5]), "why": why_of(s(e[6]), ca, todo)})
             err_weight(weight, s(e[6]), cat)
-        rep["writing"] = wr; rep["review"] = plan(weight, T); reports[email] = rep
+        rep["writing"] = wr; rep["review"] = plan(weight, T); finish(rep, model, route); reports[email] = rep
     return reports, todo
 
 # 2 ESO (Roger's "INFORMES 2ESO" workbook, 53 exams): questions with their explanation and what to review, the writing, its mistakes.
@@ -218,7 +256,8 @@ def build_2eso():
         rep = {"model": model, "lang": "ca" if ca else "en", "questions": []}; weight = {}
         for q in sorted(qs.get(key, []), key=lambda q: n(q[4])):
             mx, got = n(q[9]) or 0, n(q[10]) or 0
-            if got >= mx: continue
+            if got >= mx:
+                rep["questions"].append({"q": int(n(q[4])), "part": s(q[5]), "pts": num(mx), "got": num(got), "text": s(q[6]), "mine": s(q[7]), "ok": True}); continue
             weight[s(q[12])] = weight.get(s(q[12]), 0) + mx - got
             rep["questions"].append({"q": int(n(q[4])), "part": s(q[5]), "pts": num(mx), "got": num(got), "text": s(q[6]), "mine": s(q[7]),
                 "right": s(q[8]), "why": s(q[11]), "lp": link(s(q[12]))})
@@ -238,7 +277,7 @@ def build_2eso():
             weight[k] = weight.get(k, 0) + 1
         rep["writing"] = wr
         rep["review"] = [{"text": T(LP2E[k][2], LP2E[k][3]), "lp": link(k)} for k in sorted(weight, key=lambda k: -weight[k]) if k in LP2E][:3]
-        reports[email] = rep
+        finish(rep, model, route); reports[email] = rep
     return reports, todo
 
 reports, todo = {"4eso": build_4eso, "4eso-six": build_4eso_six, "2eso": build_2eso}[mode]()
