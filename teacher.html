@@ -691,10 +691,9 @@ const QA={};S.qa={ls:null,g:"all",f:{act:"all",area:"all",sort:"hard",all:false}
 // "How English Lab works" videos (Roger, 31 Oct 2026: "the teachers video on the teachers board and the students' on theirs, and the
 // students' video also on the teachers board"): tools/site-video builds them; the student ones are also on the student board (today.html).
 // [title, file, shown]: an entry shows once its video is in the repo. Groups (Roger, 2 Nov 2026: "add it in the sections how it works ·
-// students dashboard"): for teachers, for students (how the website works), and the students' dashboard explained part by part.
+// students dashboard"): for teachers, and for students; since 2 Nov 2026 one student video per language holds the board part by part.
 const HOW_VIDEOS=[["For teachers",[["👩‍🏫 How the dashboard works","video/how-the-dashboard-works.mp4?v=20261101",true]]],
-  ["For students · how the website works",[["🎓 In English (Amelia)","video/how-english-lab-works.mp4?v=20261101b",true],["🎓 In Catalan (Julian)","video/how-english-lab-works-ca.mp4?v=20261101b",true]]],
-  ["For students · the students' dashboard (My activities), part by part",[["📊 In English (Amelia) · a sample 4 ESO Core student","video/your-student-board.mp4?v=20261102b",true],["📊 In Catalan (Julian) · a sample 2 ESO Base student","video/your-student-board-ca.mp4?v=20261102b",true]]]];
+  ["For students · how the website works",[["🎓 In English (Amelia)","video/how-english-lab-works.mp4?v=20261102c",true],["🎓 In Catalan (Julian)","video/how-english-lab-works-ca.mp4?v=20261102c",true]]]];
 function howTo(a){return `<div class="box"><h2>🎬 How English Lab works</h2><p class="muted">Short videos made from the real site. The student ones are also on the student board.</p>`
   +HOW_VIDEOS.map(([g,vs])=>vs.some(v=>v[2])?`<h3 style="margin:10px 0 4px">${esc(g)}</h3>`+vs.filter(v=>v[2]).map(([t,href])=>`<p style="margin:4px 0">${esc(t)}: ${a(href,"Watch →","btn")}</p>`).join(""):"").join("")+`</div>`}
 function matTab(){

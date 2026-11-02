@@ -146,15 +146,13 @@ function nav(g,lss){
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
 // tools/site-video (real screens of the site, no subtitles). A box on the board and a link in the menu.
-const HOWTO="video/how-english-lab-works",HOWTO_V="20261101b";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
-// "Your student board" (Roger, 2 Nov 2026: "a video that explains very well the students dashboard in detail … in Catalan and in English"):
-// every part of this board on a sample student (tools/site-video/board), in English (Amelia) and Catalan (Julian). Same box as the other one.
-const BOARDVID="video/your-student-board",BOARDVID_V="20261102b";
+const HOWTO="video/how-english-lab-works",HOWTO_V="20261102c";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
+// One video per language (Roger, 2 Nov 2026: "this videos could be merged … the original video with the changes"): the website
+// video now holds the whole board, part by part, on a sample student (tools/site-video/full.json).
 const vidRow=(icon,ca,en,dca,den,f,v)=>`<div class="hv"><div><b>${icon} ${t(ca,en)}</b> <span class="muted">· ${t(dca,den)}</span></div>`
   +`<div class="row"><a class="go" href="${f}.mp4?v=${v}" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${f}-ca.mp4?v=${v}" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
 const howBox=()=>`<div class="pend howto" style="background:#f5f3ff;border-color:#c4b5fd;flex-direction:column;align-items:stretch;gap:10px">`
-  +vidRow("🎬","Com funciona English Lab","How English Lab works","vídeo de 5 minuts: el tauler, les rutes, les Learning Situations i com moure't per la web","5-minute video: your board, routes, Learning Situations and how to move around the website",HOWTO,HOWTO_V)
-  +vidRow("📊","El teu tauler, part per part","Your board, part by part","vídeo de 8 minuts: la setmana, la feina diària i la nota fins ara, el producte final i l'informe de l'examen, amb un exemple","8-minute video: your week, your daily work and mark so far, the final product and the exam report, with an example",BOARDVID,BOARDVID_V)+`</div>`;
+  +vidRow("🎬","Com funciona English Lab","How English Lab works","vídeo de 13 minuts: el tauler part per part, les Learning Situations, els learning paths i com moure't per la web","12-minute video: your board part by part, Learning Situations, learning paths and how to move around the website",HOWTO,HOWTO_V)+`</div>`;
 function render(){
   const g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lss=[...EL_LS].filter(l=>{const i=D.ls[l.id]||{status:"hidden"};return all()||(i.status!=="hidden"&&elLsForGroup(l,i,D.me.group))})

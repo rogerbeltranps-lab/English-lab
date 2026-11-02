@@ -9,6 +9,7 @@ Usage: python3 tools/site-video/build.py OUT.mp4 [--set teacher] [--lang ca] [--
                voice in board/voice-en or board/voice-ca); English and Catalan describe two different sample boards
   --lang ca: the Catalan version (Catalan text and cards; a shot's "on_ca" word, else the same place in the line as its "on")
   --voice: folder of the mp3s next to this file (default voice for English, voice-ca for Catalan)
+  --set full: one "How English Lab works" per language, the first video with the board video's part in the middle (full.json)
   --stills: one picture per shot, to check the framing
 A line without its mp3 gets silence for an estimated time, so the video can be previewed before any audio is paid for.
 Needs ffmpeg, Pillow, numpy and the Inter font. 1280x720, 30 fps, light blue cards like the shadowing videos.
@@ -53,6 +54,42 @@ if BOARD:   # named boxes → pixels of this language's pictures (board/captures
         if s.get('on'): o['on'], o['on_ca'] = s['on']['en'], s['on']['ca']
         return o
     shots = {k: [_shot(s) for s in v] for k, v in shots.items() if not k.startswith('_')}
+if SET == 'full':   # one video: the first video's lines with the board video's part in the middle (full.json)
+    BCAP = os.path.join(HERE, 'board', 'captures')
+    BBOX = {lg: json.load(open(os.path.join(BCAP, lg + '-boxes.json'))) for lg in ('en', 'ca')}
+    def _fshot(s):
+        if str(s['img']).endswith('.png'): return dict(s)   # a screenshot of captures/, as in shots.json
+        if s['img'] == 'card': return {'img': 'card:' + json.dumps(s['card'][LANG])}
+        lg = s.get('lang', LANG); bx = BBOX[lg][s['img']]
+        def box(names):
+            bs = [bx[n] for n in names.split('+')]
+            x0, y0 = min(b[0] for b in bs), min(b[1] for b in bs); x1, y1 = max(b[0] + b[2] for b in bs), max(b[1] + b[3] for b in bs)
+            return [x0, y0, x1 - x0, y1 - y0]
+        o = {'img': os.path.join(BCAP, f"{lg}-{s['img']}.png")}
+        for k in ('view', 'hl', 'from'):
+            if s.get(k): o[k] = box(s[k])
+        if s.get('top') and o.get('view'):
+            x, y, w, h = o['view']; o['view'] = [x - 24, y - 24, w + 48, (w + 48) * 9 / 16]
+        if 'margin' in s: o['margin'] = s['margin']
+        if s.get('on'): o['on'], o['on_ca'] = s['on']['en'], s['on']['ca']
+        return o
+    FULL = json.load(open(os.path.join(HERE, 'full.json')))
+    SITE = {l['id']: l for l in script['lines']}; BRD = {l['id']: l for l in json.load(open(os.path.join(HERE, 'board/script.json')))['lines']}
+    BSH = json.load(open(os.path.join(HERE, 'board/shots.json')))
+    lines, fshots = [], {}
+    for e in FULL['lines']:
+        if e['src'] == 'site':
+            l = dict(SITE[e['id']]); l['voice'] = os.path.join(HERE, 'voice' if LANG == 'en' else 'voice-ca-julian', e['id'] + '.mp3')
+            sh = FULL['shots'].get(e['id']) or shots[e['id']]; sh = sh if isinstance(sh, list) else [sh]
+            fshots[e['id']] = [_fshot(x) if e['id'] in FULL['shots'] else x for x in sh]
+        else:
+            l = dict(BRD.get(e['id'], {})); l.update({k: e[k] for k in ('en', 'ca') if k in e}); l['id'] = e['id']
+            l['voice'] = os.path.join(HERE, 'board', 'voice-' + LANG, e['id'] + '.mp3')
+            fshots[e['id']] = [_fshot(x) for x in (e.get('shots') or BSH[e['id']])]
+        if e.get('scene'): l['scene'] = e['scene']
+        elif e['src'] == 'board' and 'scene' not in l: l['scene'] = 'Your board'
+        lines.append(l)
+    script, shots = {'lines': lines}, fshots
 GAP, CARD, TITLE, END = 0.55, 1.7, 3.2, 1.2
 SCENE_CA = {'Sign in': 'Entrar', 'Your board': 'El teu tauler', 'Your route': 'La teva ruta', 'Your week': 'La teva setmana',
             'Learning paths': 'Els learning paths', 'The menu': 'El menú', 'A Learning Situation': 'Una Learning Situation',
@@ -220,7 +257,7 @@ segs.append((t, TITLE, 'card', {'img': 'card:' + json.dumps({'lines': TITLE_TXT,
 t += TITLE
 scenes = []
 for l in script['lines']:
-    if '--voiced-only' in sys.argv and not os.path.exists(os.path.join(VOICE, l['id'] + '.mp3')):
+    if '--voiced-only' in sys.argv and not os.path.exists(l.get('voice') or os.path.join(VOICE, l['id'] + '.mp3')):
         print('  skip (no voice yet)', l['id']); continue   # a line written but not recorded yet stays out of the video
     if l['scene'] != last_scene:
         last_scene = l['scene']; scenes.append(l['scene'])
@@ -228,7 +265,7 @@ for l in script['lines']:
             n = len(scenes) - 1
             segs.append((t, CARD, 'card', {'img': 'card:' + json.dumps({'lines': [SCENE_CA.get(l['scene'], l['scene']) if CA else l['scene']], 'chip': f'Part {n}', 'big': 60})}))
             t += CARD
-    mp3 = os.path.join(VOICE, l['id'] + '.mp3')
+    mp3 = l.get('voice') or os.path.join(VOICE, l['id'] + '.mp3')
     a = dur(mp3) if os.path.exists(mp3) else len(l[LANG]) / 14.5
     L = a + GAP
     segs.append((t, L, 'line', {'line': l, 'audio': mp3 if os.path.exists(mp3) else None, 'adur': a}))
