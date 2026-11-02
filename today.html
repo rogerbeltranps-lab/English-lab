@@ -28,7 +28,11 @@ ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4
 .xt{width:100%}.xt th{text-align:left}.xt td.l{text-align:left;vertical-align:top}.xbar{display:inline-block;width:120px;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;vertical-align:middle}.xbar span{display:block;height:100%}
 .corr thead th{color:#166534;background:#f0fdf4}.corr td.bad{color:#b91c1c}.corr td.good{color:#15803d;font-weight:600}.rv{margin-top:6px}.t-exam h3{font-size:1rem;margin:14px 0 6px}.wtexts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wtx{white-space:pre-wrap;background:#f8fafc;border-radius:10px;padding:10px 12px;margin:0;line-height:1.5}.wtx.ok2{background:#f0fdf4}.wtx.ok2 b{color:#15803d;text-decoration:underline}
 ol.rvl{margin:4px 0;padding-left:20px}ol.rvl li{margin:8px 0}ol.rvl li span{margin-right:6px}.notyet{background:#fff;border-style:dashed}.wnote{white-space:pre-wrap;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:8px 12px;margin:8px 0}
-@media (max-width:600px){.lsbtn{flex:1 1 100%}.lsopen{margin-left:0}.xbar{width:60px}}</style></head><body>
+.asbar{background:#fef9c3;border:1px solid #facc15;border-radius:12px;padding:8px 12px;margin:0 0 10px;position:sticky;top:0;z-index:30;box-shadow:0 4px 12px #0001}.asbar .top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.asbar .bar{margin:6px 0 0}.asbar .bar>small{min-width:34px;font-weight:600;color:#713f12}.asbar .chip{font-size:13px;padding:4px 12px}
+body.as .tabbody,body.as .lscard,body.as #exam{scroll-margin-top:130px}
+.lpst td{vertical-align:top}.lpst td.l{text-align:left}.lpst .stp{display:inline-block;font-size:12px;border-radius:999px;padding:1px 8px;margin:1px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;white-space:nowrap}.lpst .stp.ok{background:#dcfce7;border-color:#86efac;color:#166534}.lpst .stp.lt{background:#fef3c7;border-color:#fcd34d;color:#92400e}.lpst .stp.no{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:600}.lpst .stp.off{opacity:.6}
+.lpst .s-ok{color:#15803d;font-weight:600}.lpst .s-no{color:#b91c1c;font-weight:600}.lpst .s-td{color:#b45309}.lpst .s-off{color:#94a3b8}.lpst tr.miss td{background:#fef2f2}.lpsum{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 8px}.lpsum span{border-radius:999px;padding:2px 10px;font-size:13px;background:#f1f5f9}
+@media (max-width:600px){.asbar{position:static}.lsbtn{flex:1 1 100%}.lsopen{margin-left:0}.xbar{width:60px}}</style></head><body>
 <style>/* Menu as on Home and English Lab: side menu on a computer, top menu on a phone */
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
 .brand{font-weight:800;letter-spacing:-.03em;font-size:1.1rem;padding:0 10px}.nvs{display:flex;flex-direction:column;gap:8px}.nv{color:#667085;text-decoration:none;padding:12px 14px;border-radius:14px;font-weight:700}.nv:hover{background:#eaf0ff;color:#3157d5}.nv.on{background:#3157d5;color:#fff}.nv.sub{padding:8px 14px 8px 26px;font-weight:600;font-size:14px}
@@ -158,6 +162,7 @@ function render(){
   const n=S.pend.length;
   $("#main").innerHTML=lateBox(lss)+secBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
     +lsCard(lss,ls,st,stTag)+tabBody(ls,list,info);
+  if(AS)asBar(lss,ls);
 }
 // The LS report (Roger, 1 Nov 2026: "the idea is that I don't need to make [the LS1 reports] again since all the info could be on their
 // student board"): a big LS picker and three tabs per LS. 🗓 My week (plan, homework, summary, practice), 📈 My formative assessment
@@ -168,7 +173,7 @@ const TABS=["week","form","exam"];
 function tabOf(ls){const h=location.hash.slice(1),m={exam:"exam",formative:"form",week:"week"}[h];
   if(S.tab&&S.tabLs===ls.id)return S.tab;S.tabLs=ls.id;
   if(m&&!S.hashUsed){S.hashUsed=true;return S.tab=m}
-  return S.tab=only(ls.id)||(D.ls[ls.id]||{}).status==="closed"?"exam":hasWeek(ls)?"week":"form"}
+  return S.tab=only(ls.id)||(D.ls[ls.id]||{}).status==="closed"?"exam":AS?"form":hasWeek(ls)?"week":"form"}
 const hasWeek=ls=>{const p=(window.EL_PLAN||{})[ls.id];return !only(ls.id)||!!(p&&ELWeek.col(p,D.me.group)>=0&&ELWeek.span(p))};
 function lsCard(lss,ls,st,stTag){const tab=tabOf(ls),st2=l=>{const s=(D.ls[l.id]||{}).status;return s==="closed"?t("tancada · per repassar","closed · to revise"):s==="hidden"?t("oculta","hidden"):t("ara","now")};
   const tb=(id,icon,ca,en,sub)=>`<button class="btab b-${id} ${tab===id?"on":""}" data-do="tab" data-t="${id}"><span class="bi">${icon}</span><span><b>${t(ca,en)}</b><small>${sub}</small></span></button>`;
@@ -182,8 +187,8 @@ function lsCard(lss,ls,st,stTag){const tab=tabOf(ls),st2=l=>{const s=(D.ls[l.id]
 function examSub(ls){const x=(D.rs[ls.id+"/assessment"]||{}).sections||{};return Object.values(x).some(y=>y&&y.score!=null)?t("resultats i informe","results and report"):t("encara no hi ha resultats","no results yet")}
 function tabBody(ls,list,info){const tab=tabOf(ls);
   if(tab==="week")return `<div class="tabbody">${studyBox(ls)+practiceBox(ls)+weekBox(ls,info)||`<p class="muted">${t("Aquesta LS no té pla setmanal.","This LS has no week plan.")}</p>`}</div>`;
-  if(tab==="exam")return `<div class="tabbody t-exam">${AS?progressBox(ls):""}${examView(ls)}</div>`;
-  return `<div class="tabbody t-form"><div class="fhead"><h2>📈 ${t("La meva avaluació formativa","My formative assessment")} <small>· ${lsName(ls)}</small></h2><p>${t("Totes les activitats dels learning paths, el que has fet i la teva puntuació. Mira-ho sovint: és la teva feina de cada dia.","All the learning-path activities, what you have done and your score. Check it often: it is your everyday work.")}</p></div>`+progressBox(ls)
+  if(tab==="exam")return `<div class="tabbody t-exam">${AS?progressBox(ls)+lpStatus(ls,list,info):""}${examView(ls)}</div>`;
+  return `<div class="tabbody t-form"><div class="fhead"><h2>📈 ${t("La meva avaluació formativa","My formative assessment")} <small>· ${lsName(ls)}</small></h2><p>${t("Totes les activitats dels learning paths, el que has fet i la teva puntuació. Mira-ho sovint: és la teva feina de cada dia.","All the learning-path activities, what you have done and your score. Check it often: it is your everyday work.")}</p></div>`+lpStatus(ls,list,info)+progressBox(ls)
     +(only(ls.id)?onlyForm(ls.id)
       :`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
       +(S.view==="sum"?summary(list):lpView(list,info)))+`</div>`}
@@ -327,7 +332,6 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
   const other=(g.other||[]).filter(c=>!/^(CC|CD|CPSAA|CE)\s?\d/.test(String(c)));
   // where each other-competence mark comes from (Roger, 2 Nov 2026: "other competences … should say where the info comes from"):
   // the learning paths and their tabs in EL_GRADING[ls].auto (steps done) and .teacher (the teacher's level), by name
-  const tabName=(id,k)=>{const x=((window.EL_SECTIONS||{})[id]||[]).find(y=>y[0]===k);return x?x[1]:k.charAt(0).toUpperCase()+k.slice(1)};
   const srcOf=c=>{const by=new Map();[...((g.auto||{})[c]||[]),...((g.teacher||{})[c]||[])].forEach(([id,k])=>{const a=EL_CATALOG.find(y=>y.id===id);if(!a)return;
       if(!by.has(id))by.set(id,{a,ks:[]});const n=tabName(id,k);if(!by.get(id).ks.includes(n))by.get(id).ks.push(n)});
     return by.size?`<br><small class="src">📍 ${t("Surt de:","Comes from:")} ${[...by.values()].map(({a,ks})=>`<a href="${a.path}">${esc(a.title)}</a> (${ks.map(esc).join(", ")})`).join(" · ")}</small>`:""};
@@ -484,17 +488,57 @@ function detail(id){
     +`<div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button><a class="go ${can?"":"off"}" href="${a.path}" style="padding:6px 12px;font-size:14px">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a>${a.graded&&!a.manual&&info.status==="open"&&can&&!x.locked?`<button class="sub" data-do="submit" data-a="${a.id}">${t("Entrega","Submit")}</button>`:""}</div>`;
   if(!$("#dlg").open)$("#dlg").showModal();
 }
-function asBanner(){const b=document.createElement("div");b.className="pend";b.style.cssText="background:#fef9c3;border-color:#facc15;position:sticky;top:0;z-index:30";
-  b.innerHTML=`<div><b>👁 ${esc(D.me.name||"")}${D.me.group?" · "+esc(D.me.group):""}</b> <span class="muted">· the student's board as they see it (read-only)</span></div><a class="go" href="teacher.html">Dashboard</a>`;
-  document.querySelector(".page").prepend(b)}
+// The teacher's view of a student's board (?student=…; Roger, 2 Nov 2026: "the learning paths are missing here, what they have done and
+// what not, and choosing the LS on the student's board"): a bar that stays on top with the student's name, every LS of their group and
+// the board's tabs, so the teacher can move around without scrolling back to the LS card.
+function asBar(lss,ls){let b=document.getElementById("asbar");
+  if(!b){b=document.createElement("div");b.id="asbar";b.className="asbar";document.querySelector(".page").prepend(b);document.body.classList.add("as")}
+  const tab=tabOf(ls),tb=(id,lbl)=>`<button class="chip ${tab===id?"on":""}" data-do="tab" data-t="${id}">${lbl}</button>`;
+  b.innerHTML=`<div class="top"><div><b>👁 ${esc(D.me.name||"")}${D.me.group?" · "+esc(D.me.group):""}</b> <span class="muted">· the student's board as they see it (read-only)</span></div><a class="go" href="teacher.html">Dashboard</a></div>`
+    +`<div class="bar"><small>LS</small>${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</button>`).join("")}</div>`
+    +`<div class="bar"><small>Show</small>${tb("form",only(ls.id)?"🎬 Final product":"📈 Learning paths and mark")}${tb("exam","📝 Exams")}${hasWeek(ls)?tb("week","🗓 Week plan"):""}</div>`}
+// Teacher view only: the LS's learning paths for this student in one table, by their day in the group's time plan: each tab done (✔, amber
+// when done after its day) or missing (red once its day has passed), the state and the score. "Counted" = in "X of Y done this term"
+// (elDueWork: its day has passed, open, no section locked). Students never see it (it names the checkpoints; AGENTS.md).
+const stateOf=a=>{try{return JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}")}catch(e){return {}}};
+const ymd=v=>{const d=new Date(v);return isNaN(d)?"":d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+function lpStatus(ls,list,info){if(!AS||only(ls.id)||!list.length)return "";
+  const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1,today=ELWeek.today(),dr=(gi>=0&&(p._dropped||{})[gi])||[];
+  const counted=new Set((D.me.group?elDueWork(D.me.group,elTerm(),l=>D.ls[l]):[]).map(([a])=>a.id));
+  const dueOf=a=>gi>=0?ELWeek.due(p,a.id,gi):null,stepDue=(a,k)=>{const sd=p&&p.stepDue&&p.stepDue[a.id]&&p.stepDue[a.id][k];return (sd&&sd[gi])||dueOf(a)};
+  const rows=list.map((a,i)=>({a,i,d:dueOf(a)})).sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i);
+  const n={done:0,miss:0,todo:0,off:0};
+  const body=rows.map(({a,d})=>{const ds=doneSet(a),at=stateOf(a).doneAt||{},can=canDo(a,info),drop=dr.includes(a.id),done=!a.manual&&isDone(a),x=D.rs[a.id]||{};
+    const late=!a.manual&&!done&&can&&!drop&&d&&d<today;
+    const tabs=steps(a).map(k=>{const sk=(a.skip||[]).includes(k),sd=stepDue(a,k),nm=tabName(a.id,k),off=secOff(a,info,k);
+      if(ds.has(k)){const w=at[k]?ymd(at[k]):"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: done${w?" on "+w:""}${lt?" (after its day, "+sd+")":""}">✔ ${esc(nm)}</span>`}
+      const past=!sk&&can&&!drop&&sd&&sd<today;
+      return `<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${esc(nm)}: not done${sk?" (no points)":""}${off?" (section not open)":""}${sd?" · by "+sd:""}">${off?"🔒":past?"✗":"·"} ${esc(nm)}</span>`}).join("");
+    const hand=steps(a).length?`<small class="muted">${steps(a).filter(k=>ds.has(k)).length} / ${steps(a).length} ${steps(a).length===1?"tab":"tabs"}</small><br>`:"";
+    let st;
+    if(drop){st=`<span class="s-off">✂ Dropped · not counted</span>`;n.off++}
+    else if(a.manual){st=x.max?`<span class="s-ok">✔ Marked</span>`:`<span class="s-off">Classroom · your mark</span>`}
+    else if(done){st=`<span class="s-ok">✔ Done${x.locked?" · submitted":""}</span>`;n.done++}
+    else if(!can){st=`<span class="s-off">🔒 Not open yet</span>`;n.off++}
+    else if(late){st=`<span class="s-no">⏰ Missing · was due ${when(d)}</span>`;n.miss++}
+    else{st=`<span class="s-td">To do${d?" · by "+when(d):""}</span>`;n.todo++}
+    const c=cell(a);
+    return `<tr class="${late?"miss":""}"><td class="l"><b>${esc(a.title)}</b>${counted.has(a.id)?` <span class="tag" title="Its day has passed: it is in “X of Y done this term”">counted</span>`:""}</td><td class="l">${st}</td><td class="l">${hand}${tabs||`<small class="muted">–</small>`}</td><td class="sc ${c.c}" data-do="cell" data-a="${a.id}" title="Click to see the details">${c.t}</td></tr>`}).join("");
+  const due=[...counted].filter(id=>list.some(a=>a.id===id)),dn=due.filter(id=>isDone(list.find(a=>a.id===id))).length;
+  return `<div class="box"><h2>📋 Learning paths: done and missing <small class="muted">· ${lsName(ls)}</small></h2>`
+    +`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: every learning path of this LS for this student, in the order of the time plan (the student sees the grids below, not this table).</p>`
+    +`<div class="lpsum"><span>✔ ${n.done} done</span><span style="background:#fee2e2;color:#991b1b">⏰ ${n.miss} missing past their day</span><span>${n.todo} to do</span><span>🔒 ${n.off} not open / dropped</span><span>Counted so far: ${dn} of ${due.length} done</span></div>`
+    +`<div class="wrap"><table class="xt lpst"><thead><tr><th>Learning path</th><th>State</th><th>Tabs <small class="muted">(✔ done · <span style="color:#92400e">amber</span> = after its day · <span style="color:#991b1b">✗ missing past its day</span> · 🔒 not open)</small></th><th>Score</th></tr></thead><tbody>${body}</tbody></table></div>`
+    +`<p class="muted" style="margin:6px 0 0">“Counted” = its day in the time plan has passed, it is open and no section is still locked: these are the ones in “X of Y done this term” and in the bonus check. Click a score for the details, feedback and self-assessments.</p></div>`}
+const tabName=(id,k)=>{const x=((window.EL_SECTIONS||{})[id]||[]).find(y=>y[0]===k);return x?x[1]:k.charAt(0).toUpperCase()+k.slice(1)};
 async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
-  ({ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative"}[k.t]||k.t))}catch(e){}render();document.querySelector(".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(),want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
+  ({ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative"}[k.t]||k.t))}catch(e){}render();document.querySelector(AS?".tabbody":".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(),want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
-if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;render()}   // DEMO.as: preview the teacher's view of a student's board
+if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
 else ELCloud.onUser(async u=>{U=u;
   if(!u){nav(null,[]);$("#sub").textContent="Entra amb el teu correu de l’institut i la contrasenya (botó de baix a la dreta) per veure les teves activitats. · Sign in with your school email and password (button at the bottom right) to see your activities.";$("#main").innerHTML="";return}
   const sp=new URLSearchParams(location.search).get("student");AS=sp&&ELCloud.isTeacher(u)?sp:null;
-  D=await load(u);render();if(AS)asBanner();else goLive();if(location.hash==="#exam")setTimeout(()=>document.getElementById("exam")?.scrollIntoView({block:"start"}),0)});
+  D=await load(u);render();if(!AS)goLive();if(location.hash==="#exam")setTimeout(()=>document.querySelector(AS?".tabbody":"#exam")?.scrollIntoView({block:"start"}),0)});
 </script></body></html>
