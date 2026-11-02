@@ -152,7 +152,7 @@ const HOWTO="video/how-english-lab-works",HOWTO_V="20261102c";   // change HOWTO
 const vidRow=(icon,ca,en,dca,den,f,v)=>`<div class="hv"><div><b>${icon} ${t(ca,en)}</b> <span class="muted">· ${t(dca,den)}</span></div>`
   +`<div class="row"><a class="go" href="${f}.mp4?v=${v}" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${f}-ca.mp4?v=${v}" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
 const howBox=()=>`<div class="pend howto" style="background:#f5f3ff;border-color:#c4b5fd;flex-direction:column;align-items:stretch;gap:10px">`
-  +vidRow("🎬","Com funciona English Lab","How English Lab works","vídeo de 12 minuts: el tauler part per part, les Learning Situations, els learning paths i com moure't per la web","12-minute video: your board part by part, Learning Situations, learning paths and how to move around the website",HOWTO,HOWTO_V)+`</div>`;
+  +vidRow("🎬","Com funciona English Lab","How English Lab works","vídeo de 13 minuts: el tauler part per part, les Learning Situations, els learning paths i com moure't per la web","12-minute video: your board part by part, Learning Situations, learning paths and how to move around the website",HOWTO,HOWTO_V)+`</div>`;
 function render(){
   const g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lss=[...EL_LS].filter(l=>{const i=D.ls[l.id]||{status:"hidden"};return all()||(i.status!=="hidden"&&elLsForGroup(l,i,D.me.group))})
