@@ -560,7 +560,10 @@ function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S
   const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
   try{Object.values(S.P||{}).filter(s=>s&&s.uid&&!s.away&&(s.group===S.g||s.tester)).forEach(s=>{const {B,total}=grade(s);
     const p={exam:r1(B.exam),fp:r1(B.fp),gv:r1(B.gv&&B.gv.mark),other:r1(B.other),total:r1(total)},cur=res(s.uid,id).progress||{};
-    if(K.every(k=>(cur[k]??null)===p[k]))return;p.at=ymd(Date.now());
+    // the pieces of each block, for the teacher's view of the student's board (today.html?student=…; Roger, 2 Nov 2026)
+    const parts={gv:Object.fromEntries(((B.gv&&B.gv.parts)||[]).map(x=>[x.id,r1(x.v)])),other:Object.fromEntries(engOther(g).map(c=>[c,r1(otherCrit(s.uid,c).mark)])),
+      fp:g.fp&&!g.fp.mark?Object.fromEntries(g.fp.rows.map(x=>[x.step,r1(lvMark(lvOf(s.uid,g.fp.a,x.step,x.c)))])):{}};p.parts=parts;
+    if(K.every(k=>(cur[k]??null)===p[k])&&Object.entries(parts).every(([k,o])=>Object.entries(o).every(([c,v])=>(((cur.parts||{})[k]||{})[c]??null)===v)))return;p.at=ymd(Date.now());
     const w=patch(s.uid,id,{progress:p});if(w&&w.catch)w.catch(e=>console.warn("progress",e))})}
   finally{S.zero=z}}
 function render0(){
