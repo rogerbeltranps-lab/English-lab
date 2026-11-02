@@ -37,6 +37,6 @@ window.elDueWork=function(gid,term,infoOf){
   return out.sort((a,b)=>a[1]<b[1]?-1:1)};
 window.elMissing=(gid,term,isDone,infoOf)=>elDueWork(gid,term,infoOf).filter(([a])=>!isDone(a));
 // Share of an LS mark that is continuous assessment (Roger, 2 Nov 2026: students must see how much their everyday work counts):
-// every block of EL_GRADING[ls] except the final exam and the final product (LS2: grammar and vocabulary 20 % + other competences 20 %).
+// every block of EL_GRADING[ls] except the final exam and the final product (from LS2 on: grammar, vocabulary and skills 35 % + other competences 5 % = 40 %).
 window.elFormativeShare=ls=>{const g=(window.EL_GRADING||{})[ls];if(!g||g.only||!g.blocks)return 0;
   return g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp").reduce((s,b)=>s+(+b.w||0),0)};

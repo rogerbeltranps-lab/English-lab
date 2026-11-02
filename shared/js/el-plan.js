@@ -14,7 +14,7 @@ window.EL_PLAN={
   "4eso-seasons-and-celebrations":{
     note:"Starts 26 Oct 2026. 4ESO-A: Mon 8:30 · Wed 12:00 · Fri 13:00. 4ESO-B: Mon 15:00 · Tue 9:30 · Wed 10:30. Term 1 ends on 20 Nov; the exam is on Mon 23 Nov for both groups and its mark stays in the term 1 block. The final product starts the week after the exam (30 Nov) and its mark goes into the term 2 report. LP = Learning Path.",
     terms:{
-      1:{title:"Term 1 · Learning Paths and exam",assess:"Exam (35 %) + grammar and vocabulary activities (20 %, automatic) · criteria 4.1, 2.2, 5.1 (exam, LP2 reading log, LP3 listening chart) · other competences start from the Learning Paths (docs/4eso/ls2-seasons-and-celebrations/grading.md)"},
+      1:{title:"Term 1 · Learning Paths and exam",assess:"Exam (35 %) + daily work in the learning paths (40 %, automatic) · criteria 4.1, 2.2, 5.1 (exam, LP2 reading log, LP3 listening chart) · other competences start from the Learning Paths (docs/4eso/ls2-seasons-and-celebrations/grading.md)"},
       2:{title:"Term 2 · Final product",assess:"Final product (25 %: my part, email, my source, teamwork, process) + other competences (20 %: LP4 research card and the final product content rows) · criteria 3.2, 5.1, 4.2 · 6.1, 1.1, 1.2, CC1 1.3, CC3 3.2 · marked in two rounds: round 1 after step 2 (my source, research sheet), round 2 after submitting (video, email, teamwork, process) · the LS2 mark closes here"}
     },
     groups:["4ESO-A","4ESO-B"],
@@ -111,7 +111,7 @@ window.EL_PLAN={
   "2eso-free-time-live":{
     note:"Starts 27 Oct 2026. 2ESO-A: Tue 12:00 · Thu 12:00 · Fri 8:30. 2ESO-B: Tue 10:30 · Thu 8:30 · Fri 9:30 (same days, so both groups follow the same plan). Term 1 ends on 20 Nov, so the exam is in term 1 and the final product (the vlog) is in term 2. No classes on 30 Oct, 7–8 Dec and 15–18 Dec (projecte propi), so the vlog is submitted on Thu 10 Dec. LP = Learning Path.",
     terms:{
-      1:{title:"Term 1 · Learning Paths and exam",assess:"Exam (35 %) + grammar and vocabulary activities (20 %, automatic) · criteria 4.1, 2.2, 5.1 (exam, LP2 reading log, LP3 listening chart) · other competences start from the Learning Paths (docs/2eso/ls2-free-time-live/grading.md)"},
+      1:{title:"Term 1 · Learning Paths and exam",assess:"Exam (35 %) + daily work in the learning paths (40 %, automatic) · criteria 4.1, 2.2, 5.1 (exam, LP2 reading log, LP3 listening chart) · other competences start from the Learning Paths (docs/2eso/ls2-free-time-live/grading.md)"},
       2:{title:"Term 2 · Final product",assess:"Final product (25 %: my vlog, my script and slides, my source, process) + other competences (20 %: fact file and credits, recording and editing, screen tips) · criteria 3.2, 5.1, 4.2 · 6.2, CD2 2.2, CD4 4.5 · marked in two rounds: round 1 after step 2 (my source, fact file), round 2 after submitting (vlog, script, editing, tip, process) · the LS2 mark closes here"}
     },
     groups:["2ESO-A","2ESO-B"],
