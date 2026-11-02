@@ -31,7 +31,7 @@ ol.rvl{margin:4px 0;padding-left:20px}ol.rvl li{margin:8px 0}ol.rvl li span{marg
 .asbar{background:#fef9c3;border:1px solid #facc15;border-radius:12px;padding:8px 12px;margin:0 0 10px;position:sticky;top:0;z-index:30;box-shadow:0 4px 12px #0001}.asbar .top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.asbar .bar{margin:6px 0 0}.asbar .bar>small{min-width:34px;font-weight:600;color:#713f12}.asbar .chip{font-size:13px;padding:4px 12px}
 body.as .tabbody,body.as .lscard,body.as #exam{scroll-margin-top:130px}
 .lpst td{vertical-align:top}.lpst td.l{text-align:left}.lpst .stp{display:inline-block;font-size:12px;border-radius:999px;padding:1px 8px;margin:1px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;white-space:nowrap}.lpst .stp.ok{background:#dcfce7;border-color:#86efac;color:#166534}.lpst .stp.lt{background:#fef3c7;border-color:#fcd34d;color:#92400e}.lpst .stp.no{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:600}.lpst .stp.off{opacity:.6}
-.lpst .s-ok{color:#15803d;font-weight:600}.lpst .s-no{color:#b91c1c;font-weight:600}.lpst .s-td{color:#b45309}.lpst .s-off{color:#94a3b8}.lpst tr.miss td{background:#fef2f2}.lpsum{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 8px}.lpsum span{border-radius:999px;padding:2px 10px;font-size:13px;background:#f1f5f9}
+.lpst a.stp{text-decoration:none;color:#0f766e;border-color:#99f6e4;background:#f0fdfa}.lpst a.stp.no{color:#991b1b;border-color:#fca5a5;background:#fee2e2}.lpst a.stp:hover{outline:2px solid currentColor}.lpst td.l b a{color:inherit}.nextbox{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;background:#f0fdfa;border:1px solid #5eead4;border-radius:10px;padding:8px 12px;margin:6px 0}.nextbox.late{background:#fef2f2;border-color:#fca5a5}.lpst .s-ok{color:#15803d;font-weight:600}.lpst .s-no{color:#b91c1c;font-weight:600}.lpst .s-td{color:#b45309}.lpst .s-off{color:#94a3b8}.lpst tr.miss td{background:#fef2f2}.lpsum{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 8px}.lpsum span{border-radius:999px;padding:2px 10px;font-size:13px;background:#f1f5f9}
 .wrub{display:grid;gap:10px}.wr{border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;background:#fff}.wr.wrt{background:#f8fafc}.wrh{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.wrs{margin-left:auto;white-space:nowrap}.wrw{margin:6px 0 0;line-height:1.45}ol.wbands{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}ol.wbands li{border:1px solid #e2e8f0;border-radius:10px;padding:6px 8px;font-size:.86rem;color:#64748b;line-height:1.35}ol.wbands li small{display:block;font-weight:700;margin-bottom:2px}ol.wbands li.on{border:2px solid #2563eb;background:#eff6ff;color:#0f172a}ol.wbands li.on small{color:#1d4ed8}
 @media (max-width:700px){ol.wbands{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:600px){.asbar{position:static}.lsbtn{flex:1 1 100%}.lsopen{margin-left:0}.xbar{width:60px}}</style></head><body>
@@ -549,39 +549,51 @@ function asBar(lss,ls){let b=document.getElementById("asbar");
   b.innerHTML=`<div class="top"><div><b>👁 ${esc(D.me.name||"")}${D.me.group?" · "+esc(D.me.group):""}</b> <span class="muted">· the student's board as they see it (read-only)</span></div><a class="go" href="teacher.html">Dashboard</a></div>`
     +`<div class="bar"><small>LS</small>${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</button>`).join("")}</div>`
     +`<div class="bar"><small>Show</small>${tb("form",only(ls.id)?"🎬 Final product":"📈 Learning paths and mark")}${tb("exam","📝 Exams")}${hasWeek(ls)?tb("week","🗓 Week plan"):""}</div>`}
-// Teacher view only: the LS's learning paths for this student in one table, by their day in the group's time plan: each tab done (✔, amber
-// when done after its day) or missing (red once its day has passed), the state and the score. "Counted" = in "X of Y done this term"
-// (elDueWork: its day has passed, open, no section locked). Students never see it (it names the checkpoints; AGENTS.md).
+// The LS's learning paths in one table, in the order of the group's time plan: each tab done (✔, amber when done after its day, from the
+// page state doneAt against stepDue/due) or missing (red once its day has passed), the state and the score. Every tab not done is a link
+// that opens that tab (path#panel, el-cloud.js openHashTab), and "👉 Next" proposes the first one to do (Roger, 2 Nov 2026: "you can click
+// the learning paths you haven't done yet and it proposes them to you"). Students get it too, without the teacher's "counted" tag
+// (AGENTS.md: students are never told which activities count); the teacher's view (?student=…) adds it.
 const stateOf=a=>{try{return JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}")}catch(e){return {}}};
 const ymd=v=>{const d=new Date(v);return isNaN(d)?"":d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
-function lpStatus(ls,list,info){if(!AS||only(ls.id)||!list.length)return "";
-  const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1,today=ELWeek.today(),dr=(gi>=0&&(p._dropped||{})[gi])||[];
-  const counted=new Set((D.me.group?elDueWork(D.me.group,elTerm(),l=>D.ls[l]):[]).map(([a])=>a.id));
+// the panel a step lives in: its own, or the vocabulary panel for the cards and practice steps (elSecSteps)
+const panelOf=(a,k)=>{const xs=(window.EL_SECTIONS||{})[a.id]||[];return xs.some(x=>x[0]===k)?k:(k==="cards"||k==="practice")&&xs.some(x=>x[0]==="vocab")?"vocab":k};
+const tabHref=(a,k)=>a.path.split("/").map(encodeURIComponent).join("/")+(k?"#"+encodeURIComponent(panelOf(a,k)):"");
+function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!AS&&all()))return "";
+  const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1,today=ELWeek.today(),dr=(gi>=0&&(p._dropped||{})[gi])||[],open=info.status!=="closed";
+  const counted=new Set(AS&&D.me.group?elDueWork(D.me.group,elTerm(),l=>D.ls[l]).map(([a])=>a.id):[]);
   const dueOf=a=>gi>=0?ELWeek.due(p,a.id,gi):null,stepDue=(a,k)=>{const sd=p&&p.stepDue&&p.stepDue[a.id]&&p.stepDue[a.id][k];return (sd&&sd[gi])||dueOf(a)};
   const rows=list.map((a,i)=>({a,i,d:dueOf(a)})).sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i);
-  const n={done:0,miss:0,todo:0,off:0};
-  const body=rows.map(({a,d})=>{const ds=doneSet(a),at=stateOf(a).doneAt||{},can=canDo(a,info),drop=dr.includes(a.id),done=!a.manual&&isDone(a),x=D.rs[a.id]||{};
-    const late=!a.manual&&!done&&can&&!drop&&d&&d<today;
+  const n={done:0,miss:0,todo:0,off:0};let next=null;
+  const body=rows.map(({a,d})=>{const ds=doneSet(a),at=stateOf(a).doneAt||{},drop=dr.includes(a.id),cp=!AS&&open&&canDo(a,info)&&elCheckpointMissing(a,doneSet,y=>canDo(y,info)),can=canDo(a,info)&&!cp;
+    const done=!a.manual&&isDone(a),x=D.rs[a.id]||{},late=!a.manual&&!done&&can&&!drop&&d&&d<today,go=can&&!drop&&!done&&!a.manual&&open;
     const tabs=steps(a).map(k=>{const sk=(a.skip||[]).includes(k),sd=stepDue(a,k),nm=tabName(a.id,k),off=secOff(a,info,k);
-      if(ds.has(k)){const w=at[k]?ymd(at[k]):"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: done${w?" on "+w:""}${lt?" (after its day, "+sd+")":""}">✔ ${esc(nm)}</span>`}
-      const past=!sk&&can&&!drop&&sd&&sd<today;
-      return `<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${esc(nm)}: not done${sk?" (no points)":""}${off?" (section not open)":""}${sd?" · by "+sd:""}">${off?"🔒":past?"✗":"·"} ${esc(nm)}</span>`}).join("");
-    const hand=steps(a).length?`<small class="muted">${steps(a).filter(k=>ds.has(k)).length} / ${steps(a).length} ${steps(a).length===1?"tab":"tabs"}</small><br>`:"";
+      if(ds.has(k)){const w=at[k]?ymd(at[k]):"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}">✔ ${esc(nm)}</span>`}
+      const past=!sk&&can&&!drop&&sd&&sd<today,ln=go&&!off;
+      if(ln&&!sk&&!next)next={a,k,nm,past};
+      const tip=`${esc(nm)}: ${t("no fet","not done")}${sk?t(" (sense punts)"," (no points)"):""}${off?t(" (encara no està oberta)"," (not open yet)"):""}${sd?" · "+t("fins al","by")+" "+sd:""}${ln?" · "+t("clica per obrir-la","click to open it"):""}`;
+      const lbl=`${off?"🔒":past?"✗":"·"} ${esc(nm)}`;
+      return ln?`<a class="stp go2 ${past?"no":""}" href="${tabHref(a,k)}" title="${tip}">${lbl} →</a>`:`<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${tip}">${lbl}</span>`}).join("");
+    const hand=steps(a).length?`<small class="muted">${steps(a).filter(k=>ds.has(k)).length} / ${steps(a).length} ${steps(a).length===1?t("pestanya","tab"):t("pestanyes","tabs")}</small><br>`:"";
     let st;
-    if(drop){st=`<span class="s-off">✂ Dropped · not counted</span>`;n.off++}
-    else if(a.manual){st=x.max?`<span class="s-ok">✔ Marked</span>`:`<span class="s-off">Classroom · your mark</span>`}
-    else if(done){st=`<span class="s-ok">✔ Done${x.locked?" · submitted":""}</span>`;n.done++}
-    else if(!can){st=`<span class="s-off">🔒 Not open yet</span>`;n.off++}
-    else if(late){st=`<span class="s-no">⏰ Missing · was due ${when(d)}</span>`;n.miss++}
-    else{st=`<span class="s-td">To do${d?" · by "+when(d):""}</span>`;n.todo++}
-    const c=cell(a);
-    return `<tr class="${late?"miss":""}"><td class="l"><b>${esc(a.title)}</b>${counted.has(a.id)?` <span class="tag" title="Its day has passed: it is in “X of Y done this term”">counted</span>`:""}</td><td class="l">${st}</td><td class="l">${hand}${tabs||`<small class="muted">–</small>`}</td><td class="sc ${c.c}" data-do="cell" data-a="${a.id}" title="Click to see the details">${c.t}</td></tr>`}).join("");
+    if(drop){st=`<span class="s-off">✂ ${t("No compta (no hi vam tenir temps)","Dropped · not counted")}</span>`;n.off++}
+    else if(a.manual){st=x.max?`<span class="s-ok">✔ ${t("Corregit","Marked")}</span>`:`<span class="s-off">${t("Es lliura al Classroom","Handed in on Classroom")}</span>`}
+    else if(done){st=`<span class="s-ok">✔ ${t("Fet","Done")}${x.locked?t(" · entregat"," · submitted"):""}</span>`;n.done++}
+    else if(cp){st=`<span class="s-off">🔒 ${t(`Primer fes ${esc(cp.title)}`,`First do ${esc(cp.title)}`)}</span>`;n.off++}
+    else if(!can){st=`<span class="s-off">🔒 ${t("Encara no està oberta","Not open yet")}</span>`;n.off++}
+    else if(late){st=`<span class="s-no">⏰ ${t("Falta · calia fer-la el","Missing · was due")} ${when(d)}</span>`;n.miss++}
+    else{st=`<span class="s-td">${t("Per fer","To do")}${d?" · "+t("fins al","by")+" "+when(d):""}</span>`;n.todo++}
+    const c=cell(a),title=go?`<a href="${tabHref(a)}">${esc(a.title)}</a>`:esc(a.title);
+    return `<tr class="${late?"miss":""}"><td class="l"><b>${title}</b>${counted.has(a.id)?` <span class="tag" title="Its day has passed: it is in “X of Y done this term”">counted</span>`:""}</td><td class="l">${st}</td><td class="l">${hand}${tabs||`<small class="muted">–</small>`}</td><td class="sc ${c.c}" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr>`}).join("");
   const due=[...counted].filter(id=>list.some(a=>a.id===id)),dn=due.filter(id=>isDone(list.find(a=>a.id===id))).length;
-  return `<div class="box"><h2>📋 Learning paths: done and missing <small class="muted">· ${lsName(ls)}</small></h2>`
-    +`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: every learning path of this LS for this student, in the order of the time plan (the student sees the grids below, not this table).</p>`
-    +`<div class="lpsum"><span>✔ ${n.done} done</span><span style="background:#fee2e2;color:#991b1b">⏰ ${n.miss} missing past their day</span><span>${n.todo} to do</span><span>🔒 ${n.off} not open / dropped</span><span>Counted so far: ${dn} of ${due.length} done</span></div>`
-    +`<div class="wrap"><table class="xt lpst"><thead><tr><th>Learning path</th><th>State</th><th>Tabs <small class="muted">(✔ done · <span style="color:#92400e">amber</span> = after its day · <span style="color:#991b1b">✗ missing past its day</span> · 🔒 not open)</small></th><th>Score</th></tr></thead><tbody>${body}</tbody></table></div>`
-    +`<p class="muted" style="margin:6px 0 0">“Counted” = its day in the time plan has passed, it is open and no section is still locked: these are the ones in “X of Y done this term” and in the bonus check. Click a score for the details, feedback and self-assessments.</p></div>`}
+  const nx=next?`<div class="nextbox ${next.past?"late":""}"><div>👉 <b>${AS?"Next for this student":t("El següent que et toca","Next for you")}:</b> ${esc(next.a.title)} · <b>${esc(next.nm)}</b>${next.past?` <span class="s-no">· ${t("ja havia d'estar feta","it was due already")}</span>`:""}</div><a class="go" href="${tabHref(next.a,next.k)}">${t("Obre-la","Open it")} →</a></div>`
+    :open?`<p class="ptok">✓ ${t("No tens res pendent als learning paths oberts. Molt bé!","Nothing left to do in the open learning paths. Well done!")}</p>`:"";
+  return `<div class="box"><h2>📋 ${t("Els meus learning paths: què he fet i què em falta","My learning paths: done and missing")} <small class="muted">· ${lsName(ls)}</small></h2>`
+    +(AS?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the student sees this table without the “counted” tags.</p>`:`<p class="muted" style="margin:0 0 6px">${t("Clica una pestanya que et falta per anar-hi directament.","Click a tab you are missing to go straight to it.")}</p>`)
+    +nx
+    +`<div class="lpsum"><span>✔ ${n.done} ${t(n.done===1?"fet":"fets","done")}</span><span style="background:#fee2e2;color:#991b1b">⏰ ${n.miss} ${t(n.miss===1?"endarrerit":"endarrerits",n.miss===1?"missing past its day":"missing past their day")}</span><span>${n.todo} ${t("per fer","to do")}</span><span>🔒 ${n.off} ${t(n.off===1?"tancat":"tancats","not open")}</span>${AS?`<span>Counted so far: ${dn} of ${due.length} done</span>`:""}</div>`
+    +`<div class="wrap"><table class="xt lpst"><thead><tr><th>Learning path</th><th>${t("Estat","State")}</th><th>${t("Pestanyes","Tabs")} <small class="muted">(✔ ${t("fet","done")} · <span style="color:#92400e">${t("taronja = després del seu dia","amber = after its day")}</span> · <span style="color:#991b1b">✗ ${t("falta i ja tocava","missing past its day")}</span> · 🔒 ${t("tancada","not open")})</small></th><th>${t("Punts","Score")}</th></tr></thead><tbody>${body}</tbody></table></div>`
+    +(AS?`<p class="muted" style="margin:6px 0 0">“Counted” = its day in the time plan has passed, it is open and no section is still locked: these are the ones in “X of Y done this term” and in the bonus check. Click a score for the details, feedback and self-assessments.</p>`:"")+`</div>`}
 const tabName=(id,k)=>{const x=((window.EL_SECTIONS||{})[id]||[]).find(y=>y[0]===k);return x?x[1]:k.charAt(0).toUpperCase()+k.slice(1)};
 async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
