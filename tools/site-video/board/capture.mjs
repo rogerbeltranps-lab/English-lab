@@ -21,7 +21,8 @@ const SCALE = 1.5;
 // the states: page phase (mid / end of LS2), the LS and tab on screen, and what to do before the picture
 const LS = LANG === 'ca' ? { ls1: '2eso-my-real-routine', ls2: '2eso-free-time-live' } : { ls1: '4eso-my-real-routine', ls2: '4eso-seasons-and-celebrations' };
 const STATES = [
-  { id: 'top', phase: 'mid', tab: 'week' },
+  { id: 'top', phase: 'mid' },   // as it opens: on My formative assessment (Roger, 2 Nov 2026)
+  { id: 'week', phase: 'mid', tab: 'week' },
   { id: 'form', phase: 'mid', tab: 'form' },
   { id: 'detail', phase: 'mid', tab: 'form', click: `[data-do="cell"][data-a="${LANG === 'ca' ? '2eso/ls2-what-are-they-doing' : '4eso/ls2-plan-the-day'}"]`, dialog: true },
   { id: 'crit', phase: 'mid', tab: 'form', click: '.sum [data-do="crit"]', dialog: true },

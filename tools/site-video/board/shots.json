@@ -18,13 +18,17 @@
    "img": "top",
    "view": "pull+ann",
    "hl": "pull",
-   "margin": 0.08
+   "margin": 0.08,
+   "on": {
+    "en": "In class: straight there",
+    "ca": "A classe: hi vas directament"
+   }
   },
   {
    "img": "top",
    "on": {
-    "en": "Click Open it",
-    "ca": "Clica Obre-ho"
+    "en": "Or click Open it",
+    "ca": "O clica Obre-ho"
    },
    "view": "pull+ann",
    "hl": "pullgo",
@@ -147,23 +151,23 @@
   {
    "img": "top",
    "on": {
-    "en": "Click a card",
-    "ca": "Clica una"
+    "en": "The main one",
+    "ca": "La principal"
    },
    "view": "lscard",
-   "hl": "tab-week",
+   "hl": "tab-form",
    "margin": 0.05
   }
  ],
  "b11": [
   {
-   "img": "top",
+   "img": "week",
    "view": "tab-week+practice",
    "hl": "study",
    "margin": 0.04
   },
   {
-   "img": "top",
+   "img": "week",
    "on": {
     "en": "extra practice",
     "ca": "pràctica extra"
@@ -175,13 +179,13 @@
  ],
  "b12": [
   {
-   "img": "top",
+   "img": "week",
    "view": "wkbox",
    "hl": "examday",
    "margin": 0.04
   },
   {
-   "img": "top",
+   "img": "week",
    "on": {
     "en": "Below",
     "ca": "A sota"
@@ -193,7 +197,7 @@
  ],
  "b13": [
   {
-   "img": "top",
+   "img": "week",
    "view": "wknow",
    "hl": "wknow",
    "margin": 0.06

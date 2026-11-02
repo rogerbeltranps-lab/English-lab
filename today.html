@@ -149,7 +149,7 @@ function nav(g,lss){
 const HOWTO="video/how-english-lab-works",HOWTO_V="20261101b";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
 // "Your student board" (Roger, 2 Nov 2026: "a video that explains very well the students dashboard in detail … in Catalan and in English"):
 // every part of this board on a sample student (tools/site-video/board), in English (Amelia) and Catalan (Julian). Same box as the other one.
-const BOARDVID="video/your-student-board",BOARDVID_V="20261102";
+const BOARDVID="video/your-student-board",BOARDVID_V="20261102b";
 const vidRow=(icon,ca,en,dca,den,f,v)=>`<div class="hv"><div><b>${icon} ${t(ca,en)}</b> <span class="muted">· ${t(dca,den)}</span></div>`
   +`<div class="row"><a class="go" href="${f}.mp4?v=${v}" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${f}-ca.mp4?v=${v}" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
 const howBox=()=>`<div class="pend howto" style="background:#f5f3ff;border-color:#c4b5fd;flex-direction:column;align-items:stretch;gap:10px">`
