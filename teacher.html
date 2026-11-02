@@ -638,6 +638,8 @@ function render0(){
     +`<button class="tab cplan ${S.g==="ref"?"on":""}" data-do="tab" data-g="ref" title="Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked">📖 Reference</button>`+GR.map(g=>`<button class="tab c${g.course} ${S.g===g.id?"on":""}" data-do="tab" data-g="${g.id}" title="${listed()?"Signed in / on the student list":"Students"}">${g.name}<small>${cnt(g.id)}</small></button>`).join("")
     +(n("none")||S.g==="none"?`<button class="tab cnone ${S.g==="none"?"on":""}" data-do="tab" data-g="none">${listed()?"Not on the list":"No group"}<small>${n("none")}</small></button>`:"")
     // (the old ↻ Reload is now "🔄 Update <group>" / "Update all" above the tabs: loadBar)
+    // 📣 always in the top bar (Roger, 2 Nov 2026: "where is the announcement?": the 📣 Announcements box sits far down each group's page)
+    +` <button class="g" data-do="annnew" title="Send a message to one group, a whole course, every group or some students. Sent ones are in 📣 Announcements, further down the page">📣 Announcement</button>`
     +` <button class="g" data-do="tab" data-g="mat" title="Videos for teachers and students (in the Materials tab)">🎬 How it works</button>`;
   if(S.g==="plan"){$("#main").innerHTML=satBox(GR.map(g=>g.id))+annBox()+pbBox()+sgBox()+overview();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
@@ -1508,6 +1510,11 @@ function annBox(){
     +`<div class="bar"><button data-do="annnew" title="A message from you to one group, a whole course, every group or some students">📣 New announcement</button><span class="muted">Each student sees it once, at the top of the next page they open, and it stays in 📣 Announcements on their board.</span></div>`
     +(L.length?fold("ann",`Sent <small class="muted">${L.length}${S.g==="plan"?"":" for this group"}</small>`,`<ul class="sgl annl">${L.map(li).join("")}</ul>`):"")+`</div>`;
 }
+// The student videos as ready links for an announcement (Roger, 2 Nov 2026: tell students to watch "How English Lab works").
+// [chip title, line title, file name]: the English and Catalan videos of that name in HOW_VIDEOS (with its ?v=) become full web links (clickable on the card).
+const ANN_VIDEOS=[["How English Lab works","🎬 How English Lab works","how-english-lab-works"]];
+const annVideoText=([,title,f])=>{const all=HOW_VIDEOS.flatMap(g=>g[1]).map(v=>v[1]),url=k=>new URL(all.find(h=>h.startsWith(`video/${k}.mp4`))||`video/${k}.mp4`,location.href).href;
+  return `${title}\nEnglish: ${url(f)}\nCatalà: ${url(f+"-ca")}`};
 function annDialog(keep){
   const old=keep&&$("#annt")?$("#annt").value:"",inTab=GR.find(g=>g.id===S.g);
   if(!keep){S.annTo=inTab?"g:"+inTab.id:"all";S.annSel=new Set()}
@@ -1518,6 +1525,7 @@ function annDialog(keep){
   dlg(`<h3>📣 New announcement</h3><p class="muted" style="margin:0 0 6px">To</p><div class="bar">${GR.map(g=>opt("g:"+g.id,g.name)).join("")}${[...new Set(GR.map(g=>g.course))].map(c=>opt("c:"+c,courseName(c)+" (both groups)")).join("")}${opt("all","Every group")}${opt("s",inTab?"Some students of "+inTab.name:"Some students")}</div>${pick}
     <label for="annt">Your message <small class="muted">(up to ${ANN_MAX} characters; it goes exactly as you write it, so use the language you want them to read; a web link becomes clickable)</small></label>
     <textarea id="annt" maxlength="${ANN_MAX}" style="min-height:120px" placeholder="For example: Tomorrow we meet in the computer room. Bring your headphones!"></textarea>
+    <div class="bar" style="margin:4px 0 0"><span class="muted">Add a video link:</span>${ANN_VIDEOS.map(([t],i)=>`<button type="button" class="chip" data-annv="${i}">🎬 ${esc(t)}</button>`).join("")}</div>
     <p class="muted" id="anncount" style="margin:6px 0"></p>
     <p class="muted" style="margin:6px 0 4px">What they see, once, at the top of the next page they open (the words around your message follow their route):</p>
     <div class="annprev"><div><small class="muted">Core, Plus and Pro</small><div class="annc" id="annp-en" style="${annCardStyle}"></div></div><div><small class="muted">Starter and Base</small><div class="annc" id="annp-ca" style="${annCardStyle}"></div></div></div>
@@ -1527,6 +1535,7 @@ function annDialog(keep){
     $("#anncount").innerHTML=n?`Goes to <b>${n} student${n===1?"":"s"}</b>${to==="s"?"":" (also the ones who have not signed in yet: they see it when they do)"}. Your test account gets a copy.`:to==="s"?"Tick the students who should get it.":"Nobody on the list in that group yet.";
     [["en",true],["ca",false]].forEach(([k,en])=>$("#annp-"+k).innerHTML=annCardHtml({text:v,created:Date.now()},en,true));
     $("#annsend").disabled=!v||!n};
+  document.querySelectorAll("#dlg [data-annv]").forEach(c=>c.onclick=()=>{const add=annVideoText(ANN_VIDEOS[+c.dataset.annv]);t.value=(t.value.trim()?t.value.trim()+"\n\n":"")+add;t.value=t.value.slice(0,ANN_MAX);draw();t.focus()});
   t.oninput=draw;document.querySelectorAll("#dlg [data-annu]").forEach(c=>c.onchange=()=>{c.checked?S.annSel.add(c.dataset.annu):S.annSel.delete(c.dataset.annu);draw()});
   draw();t.focus()}
 function annSendNow(){
