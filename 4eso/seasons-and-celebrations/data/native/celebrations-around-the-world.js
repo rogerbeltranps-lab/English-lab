@@ -88,16 +88,21 @@ window.LP.native = {
     ],
     rate: ['My summary uses my own words, not phrases lifted from the text', 'I kept the argument’s turning point (purists vs. adaptation)', 'My evaluation gives reasons, not just opinions', 'I stayed within the word limit'] },
 
-  listen: { type: 'step', tab: 'Listening', title: 'Listening: listen like an examiner', pill: 'Real video · BBC',
-    intro: 'This BBC video is made for children, so the challenge is not understanding it: it is noticing how it is built. C2 Proficiency Listening tests purpose, attitude and what speakers imply.',
+  // Pro listening (fixed 2 Nov 2026, problem report: the old version asked open questions "compared with the reading text", which the
+  // student could not find in this tab, and sent free text to the teacher). Now marked automatically, about the video only.
+  listen: { type: 'mc', tab: 'Listening', title: 'Listening: listen like an examiner', pill: 'Real video · BBC · 80 %',
+    intro: 'A short BBC video made for children. Understanding it will be easy, so listen like a C2 Proficiency examiner: the facts, but also who the video is for, what it is trying to do and how it says things. Watch it once, read the questions, then watch it again.',
     media: { youtube: 'kjIPGD_WcEY', title: 'Happy Diwali', credit: 'Video: “Happy Diwali”, BBC / British Council LearnEnglish Kids.' },
-    fields: [
-      { id: 'aud', label: 'Who is the intended audience? Give two pieces of evidence from the language or the images.', rows: 3 },
-      { id: 'simp', label: 'Two things the video simplifies or leaves out, compared with the reading text', rows: 3 },
-      { id: 'purp', label: 'What is the video’s main purpose: to inform, to persuade, to entertain? Justify your choice.', rows: 2 },
-      { id: 'adult', label: 'Rewrite one sentence of the video for an adult documentary (C2 register)', rows: 2 }
-    ],
-    rate: ['I gave evidence, not just impressions', 'I compared the video with the reading text', 'My rewritten sentence sounds natural for adults'] },
+    items: [
+      { q: 'Who is the video mainly made for?', o: ['children who are learning English', 'adults who already know a lot about Diwali', 'tourists planning a trip to India', 'teachers of religious studies'], ex: 'It comes from LearnEnglish Kids: short, simple sentences for young learners.' },
+      { q: 'What is the main purpose of the video?', o: ['to introduce the festival in a simple, positive way', 'to argue that Diwali has become too commercial', 'to compare Diwali with Christmas in detail', 'to sell tickets for a Diwali event'], ex: 'It describes and celebrates; it does not argue or sell.' },
+      { q: 'How long does Diwali last, according to the video?', o: ['five days', 'one night', 'eight nights', 'two weeks'], ex: 'Diwali lasts five days.' },
+      { q: 'Which groups does the video say celebrate Diwali?', o: ['Hindus, Sikhs and Jains', 'only Hindus in India', 'Hindus and Muslims', 'everyone in the UK'], ex: 'Hindus, Sikhs and Jains.' },
+      { q: 'Why does the video mention Leicester?', o: ['to show that Diwali is also celebrated on a big scale in the UK', 'because Diwali started there', 'because it is the only UK city that celebrates it', 'to explain where the lamps are made'], ex: 'Leicester has some of the biggest Diwali celebrations outside India.' },
+      { q: 'What do the lights stand for, according to the video?', o: ['good winning over evil, and light over darkness', 'the start of winter', 'the wealth of each family', 'the number of days of the festival'], ex: 'The lamps stand for good over evil and light over darkness.' },
+      { q: 'You are rewriting “Diwali is a festival of lights. People light lamps.” for an adult documentary. Which version has the most natural C2 register?', o: ['Known as the festival of lights, Diwali sees homes and streets lit with rows of small oil lamps.', 'Diwali is a really, really nice festival with loads of lights.', 'Diwali is a festival. It has lights. People light lamps.', 'Lights are lit by people at Diwali, which is a festival of lights.'], ex: 'A participle opener (Known as…) and a precise verb make one smooth, adult sentence.' },
+      { q: 'Which of these would an adult documentary about Diwali most likely add that this video leaves out?', o: ['the different stories and meanings the festival has for each religion and region', 'the fact that people light lamps', 'the name of the festival', 'that Diwali is a happy time'], ex: 'A children’s video keeps one simple meaning; an adult documentary would explore how the meaning varies.' }
+    ] },
 
   grammar: { type: 'typed', tab: 'Grammar', title: 'Grammar for emphasis: inversion and cleft sentences', pill: '80 %',
     intro: 'Key word transformations (Reading and Use of English, Part 4): complete the second sentence so it means the same as the first, using 3–8 words including the word in CAPITALS. Small changes in spelling are not accepted, so be precise.',
@@ -162,7 +167,7 @@ window.LP.native = {
 
 // Pro extra (Roger, 30 Oct 2026: real native-speed videos on the Learning Path's topic): added after the Listening tab (usePanels `after`).
 window.LP.native.realvideo = { after: 'listen', type: 'mc', tab: 'Real video', title: 'Real video: the ancient history of the winter solstice', pill: 'Native speed · 9 min',
-  intro: 'A real documentary-style video at native speed (World History Encyclopedia). Watch it once for the argument, then answer: some questions test detail, others how confidently the presenter presents her claims. Compare it with this Learning Path’s reading.',
+  intro: 'A real documentary-style video at native speed (World History Encyclopedia). Watch it once for the argument, then answer: some questions test detail, others how confidently the presenter presents her claims. Compare it with the text in the Reading tab (“Why we light up the darkest days”).',
   media: { youtube: 'qX9NEUE6ed0', title: 'Ancient History of Winter Solstice Traditions and Sites', credit: 'Video: “Ancient History of Winter Solstice Traditions and Sites”, World History Encyclopedia (YouTube).' },
   items: [
     { q: 'What is the presenter’s opening claim?', o: ['People were marking the winter solstice long before Christmas existed.', 'Christmas was invented to replace the solstice.', 'Only northern peoples celebrated midwinter.', 'The solstice is no longer celebrated anywhere.'], ex: 'She opens by stressing that solstice celebrations are far older than Christmas.' },
@@ -172,5 +177,5 @@ window.LP.native.realvideo = { after: 'listen', type: 'mc', tab: 'Real video', t
     { q: 'The presenter explains that the “tide” in “Yuletide” means…', o: ['a period of time', 'the movement of the sea', 'a religious ceremony', 'a gift exchanged at midwinter'], ex: '“Tide” here is an old word for a season or period of time.' },
     { q: 'Why does she single out Newgrange in Ireland?', o: ['It is older than Stonehenge, and its passage is lit by the solstice sunrise, which shows great precision.', 'It is the largest stone circle in Europe.', 'It is where Yule was first celebrated.', 'It is still used for solstice sacrifices.'], ex: 'Newgrange (around 3200 BCE) predates Stonehenge; the sunrise lights its long passage for about 20 minutes.' },
     { q: 'She traces trees, wreaths and mistletoe to Yule, and “perhaps even” Santa Claus. What does “perhaps even” signal?', o: ['She is less confident about this last link than about the others.', 'She is joking and does not believe any of the links.', 'She is quoting a historian she disagrees with.', 'She thinks Santa Claus is the most important link.'], ex: 'A hedge: the speaker marks the final link as more speculative.' },
-    { q: 'Which is the fairest critical evaluation of the video, given this Learning Path’s reading?', o: ['It is informative, but it sometimes presents contested links between ancient festivals and Christmas as settled fact.', 'It is unreliable because it gives no dates.', 'It only presents the Christian point of view.', 'It deliberately avoids any connection with Christmas.'], ex: 'Some connections (e.g. the date of Sol Invictus, the origins of Christmas customs) are debated by historians: a C2 listener notices how certain a speaker sounds.' }
+    { q: 'Which is the fairest critical evaluation of the video? (Think of the Reading tab: festivals have always borrowed and adapted.)', o: ['It is informative, but it sometimes presents contested links between ancient festivals and Christmas as settled fact.', 'It is unreliable because it gives no dates.', 'It only presents the Christian point of view.', 'It deliberately avoids any connection with Christmas.'], ex: 'Some connections (e.g. the date of Sol Invictus, the origins of Christmas customs) are debated by historians: a C2 listener notices how certain a speaker sounds.' }
   ] };

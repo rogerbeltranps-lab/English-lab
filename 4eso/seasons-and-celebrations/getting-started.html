@@ -115,7 +115,7 @@ html,body{overflow-x:clip}
 </section>
 
 <section class="panel" id="read">
-  <div class="panel-head"><div><h2>Reading: Autumn in two places</h2><p class="instruction" data-support-ca="Llegeix el xat entre la Núria (Catalunya) i en Josh (Manchester) una vegada per entendre de què parlen. Després llegeix les preguntes i busca al text la frase que respon cada una. Necessites un 80 % per completar el pas." data-support-en="Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.">Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.</p></div><span class="pill" id="readPill">80 %</span></div>
+  <div class="panel-head"><div><h2 id="readTitle">Reading: Autumn in two places</h2><p class="instruction" id="readHow" data-support-ca="Llegeix el xat entre la Núria (Catalunya) i en Josh (Manchester) una vegada per entendre de què parlen. Després llegeix les preguntes i busca al text la frase que respon cada una. Necessites un 80 % per completar el pas." data-support-en="Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.">Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.</p></div><span class="pill" id="readPill">80 %</span></div>
   <div class="section-card">
     <div class="chat" id="readText"></div>
     <form id="readForm"></form>
@@ -273,6 +273,10 @@ $("#againPractice").onclick=()=>again("words",renderWords);
 let readItems=[];
 function renderRead(){
   const chat=readingChat[level]||readingChat.insecure;
+  // Pro reads an essay, not the chat (problem report 2 Nov 2026): its own title and instruction; the other routes get the original back.
+  {const h=$("#readHow"),t=$("#readTitle");if(!h.dataset.chatEn)h.dataset.chatEn=h.getAttribute("data-support-en");
+   const en=N()?"Read the essay once for the writer’s argument. Then answer: the questions test attitude, implication and meaning, not facts you can simply find. You need 80 % to complete the step.":h.dataset.chatEn;
+   h.setAttribute("data-support-en",en);if(N())h.textContent=en;t.textContent=N()?"Reading: In praise of the in-between season":"Reading: Autumn in two places"}
   if(N())$("#readText").innerHTML=GS_NATIVE.readingHtml;else $("#readText").innerHTML=(level==="beginners"?'<p class="tiny" style="margin:0 0 10px"><strong>Paraules:</strong> mild = suau · dark = fosc · sweets = dolços · costumes = disfresses · skeleton = esquelet · leaves = fulles</p>':"")+chat.map(([w,t])=>'<div class="msg '+w.toLowerCase()+'"><b>'+w+'</b>'+t+'</div>').join("");
   readItems=forLevel(nat("readingQs",readingQs),level);const f=$("#readForm");f.innerHTML="";
   readItems.forEach((q,i)=>{const box=document.createElement("div");box.className="question";
