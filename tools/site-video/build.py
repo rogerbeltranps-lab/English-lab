@@ -220,6 +220,8 @@ segs.append((t, TITLE, 'card', {'img': 'card:' + json.dumps({'lines': TITLE_TXT,
 t += TITLE
 scenes = []
 for l in script['lines']:
+    if '--voiced-only' in sys.argv and not os.path.exists(os.path.join(VOICE, l['id'] + '.mp3')):
+        print('  skip (no voice yet)', l['id']); continue   # a line written but not recorded yet stays out of the video
     if l['scene'] != last_scene:
         last_scene = l['scene']; scenes.append(l['scene'])
         if l['id'] != script['lines'][0]['id'] and l['id'] != script['lines'][-1]['id']:
