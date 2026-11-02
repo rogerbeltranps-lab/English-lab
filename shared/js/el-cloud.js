@@ -366,7 +366,7 @@ async function teacherSections(info){
   async function pull(p){if(busy)return;const o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:Date.now()};
     if(o&&!elLpOpen(a,info,g))await openLp();
     if(o&&p&&locked().includes(p))await save(locked().filter(x=>x!==p));
-    busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens":"✓ Taken down"}
+    busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});await setDoc(doc(db,"live",g),{go:o},{merge:true});/* live: open pages go there (goTo) */info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens":"✓ Taken down"}
     catch(e){console.warn("pull",e);msg="✗ Not saved: "+(e.code||e.message||e)}busy=false;draw()}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
   function pullRow(){const x0=pulled(),x=x0&&x0.a&&x0.at&&Date.now()-x0.at<EL_PULL_DAYS*864e5?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
@@ -542,9 +542,40 @@ const GAME=new URL("lab/game/play.html",ROOT),onGame=location.pathname===GAME.pa
 function gamePush(u){
   if(stopGame){stopGame();stopGame=null}
   if(!u||!isStudent(u)||!myGroup||onGame)return;
+  let first=true;
   stopGame=onSnapshot(doc(db,"live",myGroup),s=>{const x=s.exists()?s.data():null,ms=x&&x.at&&x.at.toMillis?x.at.toMillis():0;
-    if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)}},
+    if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search);return}
+    goTo(x&&x.go,first);first=false},
     e=>console.warn("game",e));
+}
+// 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
+// the teacher's pull-up also writes live/{group}.go = {a, p, pn, t, at} (the document this page already listens to for class games, so
+// no extra reads). Every student page that is open goes to that learning path (and tab) after a 5-second notice that saves their work
+// first (the field they are typing in, then the cloud save). A page opened up to 3 minutes later goes there too; later than that,
+// only the card and bar of pullBar remain. Each pull-up moves a browser once (localStorage el_go_<at>). Not from a recall checkpoint,
+// the sample exam or a class presentation followed live (?live=): there the bar of pullBar says where to go.
+const GO_MS=3*60e3;
+function goTo(g,first){
+  if(!g||!g.a||!g.at)return;const k="el_go_"+g.at;try{if(localStorage.getItem(k))return}catch(e){}
+  if(first&&Math.abs(Date.now()-g.at)>GO_MS)return;   // an old pull-up already in the document when the page opened
+  const a=(window.EL_CATALOG||[]).find(y=>y.id===g.a);if(!a)return;
+  const here=window.EL_CATALOG&&EL_CATALOG.find(y=>y.id===actId);
+  if(here&&(here.checkpoint||/sample-exam$/.test(here.id))||/[?&]live=/.test(location.search))return;
+  try{origSet.call(localStorage,k,"1")}catch(e){}
+  const url=new URL(a.path,ROOT);url.hash=g.p?g.p:"";
+  if(here&&here.id===a.id){if(g.p){const t=document.querySelector('.tab[data-panel="'+CSS.escape(g.p)+'"]');if(t)t.click()}return}
+  const lv=myLevel||homeLevel,ca=!lv||elCa(lv),o=overlay('<div style="max-width:560px"><div style="font-size:48px">📌</div><h1></h1><p class="n" style="font-size:22px;font-weight:800"></p><p class="c"></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:12px 24px;text-decoration:none;font-weight:800"></a></p></div>');
+  o.style.zIndex="2147483000";   // above the My week panel and the bottom bar
+  o.querySelector("h1").textContent=ca?"El professor et porta a:":"Your teacher is taking you to:";
+  o.querySelector(".n").textContent=(g.t||a.title)+(g.pn?" · "+g.pn:"");
+  const go=o.querySelector("a.go");go.href=url.href;go.textContent=(ca?"Ves-hi ara":"Go now")+" →";
+  let n=5;const c=o.querySelector(".c"),tick=()=>{c.textContent=ca?"Desant la teva feina… hi vas en "+n+" s.":"Saving your work… going there in "+n+" s."};tick();
+  const leave=async()=>{clearInterval(iv);c.textContent=ca?"Desant…":"Saving…";
+    try{if(timer){clearTimeout(timer);await send()}}catch(e){console.warn("go",e)}location.href=url.href};
+  // the field being typed in saves on change/blur, then the 1.5-second cloud save runs during the countdown
+  try{const f=document.activeElement;if(f&&f!==document.body&&f.blur)f.blur()}catch(e){}
+  const iv=setInterval(()=>{n--;if(n<=0)leave();else tick()},1000);
+  go.onclick=e=>{e.preventDefault();leave()};
 }
 // The student's route on a page outside an LS: the route of their course's latest LS (carried over from earlier LSs, elRouteOf).
 async function findHomeLevel(u){

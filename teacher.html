@@ -232,7 +232,9 @@ const api={
     for(const [f,v] of [["secLocked",ids],["secOpened",op]]){const m=(i[f]=Object.assign({},i[f]));m[g]=Object.assign({},m[g],{[k]:v})}if(DEMO)return;   // on screen at once (the Time plan switches redraw without reloading)
     return put(["ls",id],{secLocked:{[g]:{[k]:ids}},secOpened:{[g]:{[k]:op}}})},
   // 📌 the learning path pulled up on a group's screens: ls/{id}.push[group] = {a, p, pn, t, at} or null (elPullFor in el-catalog.js)
-  pull:(id,g,o)=>{const i=S.D.ls[id]=S.D.ls[id]||{status:"hidden",enabled:[]};i.push=Object.assign({},i.push,{[g]:o});if(DEMO)return;return put(["ls",id],{push:{[g]:o}})},
+  // and live/{group}.go, the document every open student page listens to: their pages go to it at once (goTo in el-cloud.js)
+  pull:(id,g,o)=>{const i=S.D.ls[id]=S.D.ls[id]||{status:"hidden",enabled:[]};i.push=Object.assign({},i.push,{[g]:o});if(DEMO)return;
+    return Promise.all([put(["ls",id],{push:{[g]:o}}),F.setDoc(F.doc(db(),"live",g),{go:o},{merge:true})])},
   // marking a report as fixed tells the student (problemReplies/{same id}, kind "fixed"); reopening takes the note back if it is still unread
   // an answer sent with "Send and mark as fixed" and still unread is taken back with the note: it is marked back:true on the report
   pbFix:(id,v)=>{const x=S.D.pb.find(y=>y.id===id),o={fixed:v};if(!v&&(S.D.replies||{})[id]&&(x.msgs||[]).some(m=>m.rid===id))o.msgs=x.msgs.map(m=>m.rid===id?Object.assign({},m,{back:true}):m);
@@ -580,7 +582,7 @@ function pullBox(ls,grp){if(/-my-real-routine$/.test(ls))return "";
       :other?`<p class="muted">On their screens now, from another LS: <b>${esc(other.t)}</b>. Pulling up one here replaces it.</p>`:`<p class="muted">Nothing pulled up for ${esc(grp.name)} right now.</p>`)
     +`<div class="pick">${list.map(a=>{const on=x&&x.a===a.id;return `<button class="chip ${on?"on":""}" data-do="pull" data-gid="${grp.id}" data-ls="${ls}" data-a="${a.id}" data-p="" title="${elLpOpen(a,S.D.ls[ls]||{},grp.id)?"":"Locked for this group now: pulling it up opens it. "}Put it on ${esc(grp.name)}'s screens">${elLpOpen(a,S.D.ls[ls]||{},grp.id)?"":"🔒 "}${esc(elLpLabel(a))}</button>`}).join("")}</div>`
     +(xa&&secs.length?`<div class="pick"><span class="muted">Open it at a tab:</span> ${secs.map(([id,n])=>`<button class="chip ${x.p===id?"on":""}" data-do="pull" data-gid="${grp.id}" data-ls="${ls}" data-a="${xa.id}" data-p="${esc(id)}">${esc(n)}</button>`).join("")}</div>`:"")
-    +`<p class="muted">Students see a big “Open it” card at the top of their board (at once, no reload) and a bar on every other page of this LS. It stays until you pull up another one or take it down (at most ${EL_PULL_DAYS} days). A locked learning path or tab is opened for ${esc(grp.name)} when you pull it up. Also with 📌 next to each tab in the Time plan, and on the learning path page.</p></div>`}
+    +`<p class="muted"><b>Every student of ${esc(grp.name)} with the site open is taken there at once</b> (a 5-second notice saves their work first; not out of a recall checkpoint, the sample exam or a presentation they are following), and so is anyone who opens a page in the next 3 minutes. After that, they see a big “Open it” card at the top of their board and a bar on every other page of this LS, until you pull up another one or take it down (at most ${EL_PULL_DAYS} days). “Take it down” only removes the card and the bar: the path stays open. A locked learning path or tab is opened for ${esc(grp.name)} when you pull it up. Also with 📌 next to each tab in the Time plan, and on the learning path page.</p></div>`}
 function lsWarn(ls,grp,assigned){
   const st=(S.D.ls[ls]||{}).status||"hidden",w=[];
   // one click fixes each warning (Roger, 27 Oct 2026: he opened the learning paths and the LS stayed Hidden)
