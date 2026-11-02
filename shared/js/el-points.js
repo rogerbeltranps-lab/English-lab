@@ -27,10 +27,16 @@ window.elPointsRules=function(){const en=elNum(EL_POINTS_BONUS,"en"),ca=elNum(EL
 // product (manual) and optional homework never count. Done late still counts as done. isDone(activity) is the page's own check.
 // Returns the missing ones as [[activity, due day]], oldest first.
 window.elTermSpan=id=>{const i=EL_TERMS.findIndex(t=>t.id===id);return [i>0?EL_TERMS[i-1].end:"",EL_TERMS[i]&&EL_TERMS[i].end||"9999-12-31"]};
-window.elMissing=function(gid,term,isDone,infoOf){
+// elDueWork: every activity that counts so far this term (the same rule), as [[activity, due day]], oldest first; elMissing: the ones not done.
+window.elDueWork=function(gid,term,infoOf){
   const [from,to]=elTermSpan(term),today=ELWeek.today(),out=[];
   ELWeek.plans(gid).forEach(x=>{const info=infoOf(x.ls)||{status:"hidden"};if(info.status==="hidden")return;
     Object.keys(x.p.due||{}).forEach(id=>{const a=(window.EL_CATALOG||[]).find(y=>y.id===id),d=ELWeek.due(x.p,id,x.gi);
       if(!a||!d||a.manual||d<=from||d>to||d>=today||!elLpOpen(a,info,gid)||elSecLocked(a,info,gid).length)return;
-      if(!isDone(a))out.push([a,d])})});
+      out.push([a,d])})});
   return out.sort((a,b)=>a[1]<b[1]?-1:1)};
+window.elMissing=(gid,term,isDone,infoOf)=>elDueWork(gid,term,infoOf).filter(([a])=>!isDone(a));
+// Share of an LS mark that is continuous assessment (Roger, 2 Nov 2026: students must see how much their everyday work counts):
+// every block of EL_GRADING[ls] except the final exam and the final product (LS2: grammar and vocabulary 20 % + other competences 20 %).
+window.elFormativeShare=ls=>{const g=(window.EL_GRADING||{})[ls];if(!g||g.only||!g.blocks)return 0;
+  return g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp").reduce((s,b)=>s+(+b.w||0),0)};
