@@ -1512,10 +1512,10 @@ function annBox(){
     +(L.length?fold("ann",`Sent <small class="muted">${L.length}${S.g==="plan"?"":" for this group"}</small>`,`<ul class="sgl annl">${L.map(li).join("")}</ul>`):"")+`</div>`;
 }
 // The student videos as ready links for an announcement (Roger, 2 Nov 2026: tell students to watch "How English Lab works").
-// [chip title, line title, HOW_VIDEOS group]: the group's English and Catalan videos become full web links (clickable on the card).
-const ANN_VIDEOS=[["How English Lab works","🎬 How English Lab works",1],["Your student board","📊 Your student board, part by part",2]];
-const annVideoText=([,title,gi])=>{const [en,ca]=HOW_VIDEOS[gi][1].map(v=>new URL(v[1],location.href).href);
-  return `${title}\nEnglish: ${en}\nCatalà: ${ca}`};
+// [chip title, line title, file name]: the English and Catalan videos of that name in HOW_VIDEOS (with its ?v=) become full web links (clickable on the card).
+const ANN_VIDEOS=[["How English Lab works","🎬 How English Lab works","how-english-lab-works"]];
+const annVideoText=([,title,f])=>{const all=HOW_VIDEOS.flatMap(g=>g[1]).map(v=>v[1]),url=k=>new URL(all.find(h=>h.startsWith(`video/${k}.mp4`))||`video/${k}.mp4`,location.href).href;
+  return `${title}\nEnglish: ${url(f)}\nCatalà: ${url(f+"-ca")}`};
 function annDialog(keep){
   const old=keep&&$("#annt")?$("#annt").value:"",inTab=GR.find(g=>g.id===S.g);
   if(!keep){S.annTo=inTab?"g:"+inTab.id:"all";S.annSel=new Set()}
