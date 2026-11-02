@@ -551,7 +551,18 @@ function lsWarn(ls,grp,assigned){
   return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
 }
 function render(){
-  render0();keepLast();ptSync();loadBar()}
+  render0();keepLast();ptSync();progSync();loadBar()}
+// LS mark so far for the student board (Roger, 2 Nov 2026: "students should see their progress"). Only the dashboard can work out the
+// continuous-assessment blocks (secure checkpoints are marked here with the teacher-only keys), so it keeps each student's marks so far
+// (missing work left out, as "not counted yet") in results/{ls}__assessment .progress = {exam, fp, gv, other, total, at}, out of 10,
+// and rewrites them only when they change. Only for the group on screen, fetched in this visit, in an LS with continuous assessment.
+function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S.g)))return;
+  const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
+  try{Object.values(S.P||{}).filter(s=>s&&s.uid&&!s.away&&(s.group===S.g||s.tester)).forEach(s=>{const {B,total}=grade(s);
+    const p={exam:r1(B.exam),fp:r1(B.fp),gv:r1(B.gv&&B.gv.mark),other:r1(B.other),total:r1(total)},cur=res(s.uid,id).progress||{};
+    if(K.every(k=>(cur[k]??null)===p[k]))return;p.at=ymd(Date.now());
+    const w=patch(s.uid,id,{progress:p});if(w&&w.catch)w.catch(e=>console.warn("progress",e))})}
+  finally{S.zero=z}}
 function render0(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
