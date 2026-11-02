@@ -17,8 +17,8 @@
   {
    "id": "b02p",
    "scene": "The top of your board",
-   "en": "Sometimes, a big green card appears above them: Your teacher wants you to open. It means your teacher has pulled up a learning path for your class. Click Open it and you go straight there.",
-   "ca": "De vegades, a sobre hi apareix una targeta verda gran: El professor vol que obris. Vol dir que el professor ha posat un learning path a les pantalles de la classe. Clica Obre-ho i hi vas directament."
+   "en": "Sometimes, a big green card appears above them: Your teacher wants you to open. When we do a learning path in class, your teacher pulls it up for everyone. A notice tells you: Your teacher is taking you to. Your work is saved, and after five seconds you are there. You can also click Open it.",
+   "ca": "De vegades, a sobre hi apareix una targeta verda gran: El professor vol que obris. Quan fem un learning path a classe, el professor el posa a les pantalles de tothom. Un avís et diu: El professor et porta a. La feina es desa, i al cap de cinc segons ja hi ets. També pots clicar Obre-ho."
   },
   {
    "id": "b03",
@@ -65,32 +65,14 @@
   {
    "id": "b10",
    "scene": "Your Learning Situations",
-   "en": "Each LS has four cards: My week, My formative assessment, My final product and My exams. Click a card to open it. Let's look at them one by one.",
-   "ca": "Cada LS té quatre targetes: La meva setmana, La meva avaluació formativa, El meu producte final i Els meus exàmens. Clica una targeta per obrir-la. Les veurem una per una."
-  },
-  {
-   "id": "b11",
-   "scene": "My week",
-   "en": "My week first. Here you can open the summary of the vocabulary and grammar of your level, the shadowing video of the unit, and extra practice that corrects itself and does not count for your mark.",
-   "ca": "Primer, La meva setmana. Aquí pots obrir el resum del vocabulari i la gramàtica del teu nivell, el vídeo de shadowing de la unitat i pràctica extra que es corregeix sola i no compta per a la nota."
-  },
-  {
-   "id": "b12",
-   "scene": "My week",
-   "en": "Then, your week plan. The red label tells you when the exam is. Below, your homework, and a button that adds all your homework and the exam day to your Google Calendar.",
-   "ca": "Després, el pla setmanal. L'etiqueta vermella et diu quan és l'examen. A sota, els deures, i un botó que afegeix tots els deures i el dia de l'examen al teu Google Calendar."
-  },
-  {
-   "id": "b13",
-   "scene": "My week",
-   "en": "This week shows what we do in class every day, and the activities you have to do, with their day. If you miss a class, look here.",
-   "ca": "Aquesta setmana et mostra què fem a classe cada dia i quines activitats has de fer, amb el seu dia. Si un dia no vens a classe, mira-ho aquí."
+   "en": "Each LS has four cards: My formative assessment, My week, My final product and My exams. Your board opens on My formative assessment, the main one. Click a card to open it. Let's look at them one by one.",
+   "ca": "Cada LS té quatre targetes: La meva avaluació formativa, La meva setmana, El meu producte final i Els meus exàmens. El tauler s'obre a La meva avaluació formativa, la principal. Clica una targeta per obrir-la. Les veurem una per una."
   },
   {
    "id": "b14",
    "scene": "My formative assessment",
-   "en": "The second card, My formative assessment, is your everyday work: all the learning paths of the LS. At the top, Next for you tells you what to do now. Click Open it and you go straight there.",
-   "ca": "La segona targeta, La meva avaluació formativa, és la teva feina de cada dia: tots els learning paths de la LS. A dalt, El següent que et toca et diu què has de fer ara. Clica Obre-la i hi vas directament."
+   "en": "The first card, My formative assessment, is your everyday work: all the learning paths of the LS. At the top, Next for you tells you what to do now. Click Open it and you go straight there.",
+   "ca": "La primera targeta, La meva avaluació formativa, és la teva feina de cada dia: tots els learning paths de la LS. A dalt, El següent que et toca et diu què has de fer ara. Clica Obre-la i hi vas directament."
   },
   {
    "id": "b15",
@@ -157,6 +139,24 @@
    "scene": "My LS mark so far",
    "en": "Finally, My criteria: every criterion of the LS, what it means in simple words, and your mark in it. Tap a code to read the official text.",
    "ca": "Finalment, Els meus criteris: cada criteri de la LS, què vol dir en paraules senzilles i la teva nota. Toca un codi per llegir-ne el text oficial."
+  },
+  {
+   "id": "b11",
+   "scene": "My week",
+   "en": "The second card is My week. Here you can open the summary of the vocabulary and grammar of your level, the shadowing video of the unit, and extra practice that corrects itself and does not count for your mark.",
+   "ca": "La segona targeta és La meva setmana. Aquí pots obrir el resum del vocabulari i la gramàtica del teu nivell, el vídeo de shadowing de la unitat i pràctica extra que es corregeix sola i no compta per a la nota."
+  },
+  {
+   "id": "b12",
+   "scene": "My week",
+   "en": "Then, your week plan. The red label tells you when the exam is. Below, your homework, and a button that adds all your homework and the exam day to your Google Calendar.",
+   "ca": "Després, el pla setmanal. L'etiqueta vermella et diu quan és l'examen. A sota, els deures, i un botó que afegeix tots els deures i el dia de l'examen al teu Google Calendar."
+  },
+  {
+   "id": "b13",
+   "scene": "My week",
+   "en": "This week shows what we do in class every day, and the activities you have to do, with their day. If you miss a class, look here.",
+   "ca": "Aquesta setmana et mostra què fem a classe cada dia i quines activitats has de fer, amb el seu dia. Si un dia no vens a classe, mira-ho aquí."
   },
   {
    "id": "b26",

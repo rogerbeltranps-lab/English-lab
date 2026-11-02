@@ -21,10 +21,30 @@
    "margin": 0.08
   },
   {
+   "img": "go",
+   "on": {
+    "en": "When we do a learning path",
+    "ca": "Quan fem un learning path"
+   },
+   "view": "gonote",
+   "hl": "gonote",
+   "margin": 0.25
+  },
+  {
+   "img": "go",
+   "on": {
+    "en": "Your work is saved",
+    "ca": "La feina es desa"
+   },
+   "view": "gonote",
+   "hl": "gocount",
+   "margin": 0.25
+  },
+  {
    "img": "top",
    "on": {
-    "en": "Click Open it",
-    "ca": "Clica Obre-ho"
+    "en": "click Open it",
+    "ca": "clicar Obre-ho"
    },
    "view": "pull+ann",
    "hl": "pullgo",
@@ -147,23 +167,23 @@
   {
    "img": "top",
    "on": {
-    "en": "Click a card",
-    "ca": "Clica una"
+    "en": "Your board opens",
+    "ca": "El tauler s'obre"
    },
    "view": "lscard",
-   "hl": "tab-week",
+   "hl": "tab-form",
    "margin": 0.05
   }
  ],
  "b11": [
   {
-   "img": "top",
+   "img": "week",
    "view": "tab-week+practice",
    "hl": "study",
    "margin": 0.04
   },
   {
-   "img": "top",
+   "img": "week",
    "on": {
     "en": "extra practice",
     "ca": "pràctica extra"
@@ -175,13 +195,13 @@
  ],
  "b12": [
   {
-   "img": "top",
+   "img": "week",
    "view": "wkbox",
    "hl": "examday",
    "margin": 0.04
   },
   {
-   "img": "top",
+   "img": "week",
    "on": {
     "en": "Below",
     "ca": "A sota"
@@ -193,7 +213,7 @@
  ],
  "b13": [
   {
-   "img": "top",
+   "img": "week",
    "view": "wknow",
    "hl": "wknow",
    "margin": 0.06
