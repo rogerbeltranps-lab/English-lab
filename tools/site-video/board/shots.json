@@ -21,6 +21,26 @@
    "margin": 0.08
   },
   {
+   "img": "go",
+   "on": {
+    "en": "When we do a learning path",
+    "ca": "Quan fem un learning path"
+   },
+   "view": "gonote",
+   "hl": "gonote",
+   "margin": 0.25
+  },
+  {
+   "img": "go",
+   "on": {
+    "en": "Your work is saved",
+    "ca": "La feina es desa"
+   },
+   "view": "gonote",
+   "hl": "gocount",
+   "margin": 0.25
+  },
+  {
    "img": "top",
    "on": {
     "en": "click Open it",
