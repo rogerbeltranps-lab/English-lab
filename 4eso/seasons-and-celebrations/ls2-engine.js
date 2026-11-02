@@ -251,11 +251,46 @@ var LS2 = (function () {
   function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
   // check(count): the step's own check; stays(id, prefix, listId, items, check) wires Check, Do it again and the restore.
   function stays(id, prefix, listId, items, check) {
+    if (binding) binding.push([id, prefix]);   // the section's "Redo this section" clears it too (redoBar)
     $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix)); };
     $('#' + id + 'Again').onclick = () => { forget(id, prefix); clearStep(id, listId); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
     const v = kept(id), t = (state.typing || {})[id + '_' + level]; if (v) { fill(items, prefix, v); check(false); } else if (t) fill(items, prefix, t);
   }
+
+  /* ---------- redo one section (Roger, 2 Nov 2026: "I want them to be able to repeat the sections individually, I don't want them
+     restart the whole learning path") ---------- */
+  // A "↺ Redo this section" button on top of every section with corrected or practice answers that stay (stays(), the listening cycle,
+  // the micro-dictation). It clears only that section's answers (state.ans, state.typing, state.cycle, state.dict) and draws it again.
+  // What the teacher's marks read is kept: done/doneAt (done on time), tries/first/items (first try only), the hand-ins. The new checks
+  // only update last[k]. It shows only when there is something to clear; a locked section or a read-only page disables it (el-cloud.js).
+  let binding = null;
+  const redoable = p => !!(p._redo.length || isListening(p) || (p.chunks && p.chunks.length));
+  function redoHas(p) {
+    const filled = x => x != null && x !== '' && (typeof x !== 'object' || Object.values(x).some(filled));
+    return p._redo.some(([id]) => (state.ans && state.ans[id]) || filled((state.typing || {})[id + '_' + level])) || filled((state.cycle || {})[p.id]) || filled((state.dict || {})[p.id]);
+  }
+  function redoBar(p) {
+    const sec = document.getElementById(p.id); if (!sec || !redoable(p)) return;
+    const head = sec.querySelector(':scope > .panel-head'), bar = document.createElement('div');
+    bar.className = 'actions redo-sec';
+    bar.innerHTML = '<button class="btn secondary" type="button">↺ ' + (ca() ? 'Torna a fer aquesta secció' : 'Redo this section') + '</button><span class="tiny" aria-live="polite"></span>';
+    (head || sec.firstChild).insertAdjacentElement(head ? 'afterend' : 'beforebegin', bar);
+    const btn = bar.querySelector('button'), note = bar.querySelector('span');
+    if (p._redone) { note.textContent = ca() ? 'Fet: comença la secció de nou. Les altres seccions no han canviat.' : 'Done: start the section again. The other sections have not changed.'; p._redone = false; }
+    p._redoSync = () => { bar.hidden = !redoHas(p) && !note.textContent; };
+    p._redoSync();
+    btn.onclick = () => {
+      if (!confirm(ca() ? 'Vols tornar a fer aquesta secció? S’esborraran les teves respostes d’aquesta secció perquè la puguis fer de nou des del principi. Les altres seccions no canvien.'
+        : 'Redo this section? Your answers in this section will be cleared so you can do it again from the start. The other sections stay as they are.')) return;
+      p._redo.forEach(([id, prefix]) => forget(id, prefix));
+      if (state.cycle) delete state.cycle[p.id];
+      if (state.dict) delete state.dict[p.id];
+      p._redone = true; save(); render();
+      const s = document.getElementById(p.id); if (s) window.scrollTo({ top: s.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
+    };
+  }
+  if (!window.elRedoSync) { window.elRedoSync = true; ['click', 'input', 'change'].forEach(t => document.addEventListener(t, () => setTimeout(() => (LP && LP.panels || []).forEach(p => p._redoSync && p._redoSync()), 80))); }
 
   /* ---------- panels ---------- */
   const R = {};
@@ -1144,7 +1179,7 @@ var LS2 = (function () {
       LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
       reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
-    LP.panels.forEach(p => p._r.bind());
+    LP.panels.forEach(p => { p._redo = binding = []; p._r.bind(); binding = null; p._redoSync = null; redoBar(p); });
     bindPlan();
     bindStudy();
     $$('.tab').forEach(t => t.onclick = () => { $$('.tab,.panel').forEach(x => x.classList.remove('active')); t.classList.add('active'); $('#' + t.dataset.panel).classList.add('active'); window.scrollTo({ top: $('#lp').offsetTop - 64, behavior: 'smooth' }); });
@@ -1167,7 +1202,7 @@ var LS2 = (function () {
     LP.panels = LP.base.flatMap(p => [N[p.id] ? as(p.id) : p].concat(extra.filter(k => N[k].after === p.id).map(k => as(k))));
   }
   function init(config) {
-    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}</style>');
+    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}.redo-sec{justify-content:flex-end;align-items:center;margin:0 0 12px}.redo-sec[hidden]{display:none}.redo-sec .tiny{margin:0}</style>');
     LP = config; LP.base = LP.base || LP.panels;
     level = localStorage.getItem(LP.key + 'Level') || 'insecure';
     if (ROUTES.indexOf(level) < 0) level = 'insecure';
