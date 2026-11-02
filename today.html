@@ -313,7 +313,8 @@ function examQuestions(r){if(r.full)return examWhole(r);const qs=(r.questions||[
 // section (what they had to read) in their reports, since some students want to see what they did well too"). With report.full
 // (tools/exam-report/add-full-exam.mjs) the report holds every question of the student's own exam (model and route) — the right ones
 // marked ok, without explanation — with the choices and hint of the paper (opts, hint), and report.exam the texts they had in front of
-// them: listening instructions and the audio transcript when there is one, the reading text and the writing task. Questions are grouped
+// them: listening instructions and the audio transcript when there is one, and the reading text (report.exam.writing is not shown:
+// the writing stays in part 4 as it was). Questions are grouped
 // by part, each part with its text; a filter shows all, only the right ones or only the ones to review (CSS only, nothing saved).
 // An older report (only the questions to review) keeps the table below.
 const letter=s=>(String(s||"").match(/^\s*([A-D])(?:[.)]|\s|$)/)||[])[1]||"";
@@ -334,7 +335,7 @@ function examWhole(r){const qs=(r.questions||[]).slice().sort((a,b)=>a.q-b.q),x=
   const okN=qs.filter(q=>q.ok||(+q.got||0)>=(+q.pts||0)).length,badN=qs.length-okN;
   const parts=[];qs.forEach(q=>{const p=q.part||"";let g=parts.find(y=>y.p===p);if(!g)parts.push(g={p,qs:[]});g.qs.push(q)});
   const icon={Listening:"🎧",Reading:"📖",Vocabulary:"🔤",Grammar:"🧩"},name={Listening:"Listening",Reading:"Reading",Vocabulary:t("Vocabulari","Vocabulary"),Grammar:t("Gramàtica","Grammar")};
-  const li=x.listening,rd=x.reading,wr=x.writing;
+  const li=x.listening,rd=x.reading;   // the writing stays only in part 4, as before (Roger, 2 Nov 2026: "I want to keep the way they see the writing now … only add the missing questions")
   const intro=p=>p==="Listening"&&li?`<div class="xread">${li.about?`<p class="muted" style="margin-top:0">${esc(li.about)}</p>`:""}${li.text?`<details><summary>🎧 ${t("Llegeix el que vas escoltar (transcripció de l'àudio)","Read what you heard (the audio transcript)")}</summary><div class="tr">${paras(li.text)}</div></details>`:`<p class="muted" style="margin:0">${t("L'àudio no té transcripció escrita.","There is no written transcript of this audio.")}</p>`}</div>`
     :p==="Reading"&&rd?`<div class="xread"><h4>📖 ${esc(rd.title||"")}</h4>${paras(rd.body)}</div>`:"";
   return `<div class="box xwhole" id="whole"><h2>3 · ${t("El teu examen, pregunta per pregunta","Your exam, question by question")}</h2>`
@@ -343,7 +344,6 @@ function examWhole(r){const qs=(r.questions||[]).slice().sort((a,b)=>a.q-b.q),x=
     +`<input type="radio" name="xf" id="xf-ok"><label for="xf-ok">✓ ${t("Encertades","Right")} · ${okN}</label><input type="radio" name="xf" id="xf-bad"><label for="xf-bad">✗ ${t("Per revisar","To review")} · ${badN}</label></div>`
     +parts.map(g=>{const got=g.qs.reduce((n,q)=>n+(q.ok?+q.pts||0:+q.got||0),0),max=g.qs.reduce((n,q)=>n+(+q.pts||0),0);
       return `<h3 class="xpart">${icon[g.p]||"📝"} ${esc(name[g.p]||g.p)} <small>· Q${String(g.qs[0].q).padStart(2,"0")}–Q${String(g.qs[g.qs.length-1].q).padStart(2,"0")} · ${pts1(got)} / ${max} ${t("punts","points")}</small></h3>`+intro(g.p)+`<div class="xqs">${g.qs.map(examQ).join("")}</div>`}).join("")
-    +(wr?`<h3 class="xpart">✍️ Writing <small>· Q35</small></h3><div class="xread"><h4>${esc(wr.title||"")}</h4>${paras(wr.task)}${(wr.points||[]).length?`<ul>${wr.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}<p class="muted" style="margin-bottom:0">${t("El teu text, la rúbrica i la correcció són a l'apartat 4, just a sota.","Your text, the rubric and the correction are in part 4, just below.")}</p></div>`:"")
     +`</div>`}
 // The writing rubric explained (Roger, 2 Nov 2026: "aquí falta explicar bé els criteris d'avaluació"). The report keeps only the row
 // names and scores (C1 task and content 8, C2 grammar 4, C3 vocabulary 4, C4 organisation and cohesion 4, as on his paper reports),
