@@ -282,7 +282,8 @@ const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) 
 const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
 const say = s => { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(s.replace(/\s\/\s/g, ', ')); u.lang = 'en-GB'; u.rate = elCa(base(S.level)) ? .85 : 1; speechSynthesis.speak(u); } catch (e) {} };
 
-/* 🃏 Word cards: turn the card over, or test yourself (Catalan → English, checked at once) */
+/* 🃏 Word cards: turn the card over, or test yourself (Catalan → English, checked at once). Pro cards from Pro panels carry an
+   English meaning instead of the Catalan, so the Test me instruction says "meaning" on that level (fix 2 Nov 2026). */
 let deck = [], di = 0, flipped = false, test = [];
 function words() {
   const ws = X.words, hasCore = ws.some(w => w.core);
@@ -294,7 +295,7 @@ function words() {
   if (S.mode === 'test') {
     const pool = list.filter(w => w.ca && !/\+|…|___/.test(w.en));
     if (!test.length || test.some(w => !pool.includes(w))) test = shuffle(pool).slice(0, 10);
-    $('#body').innerHTML = head + `<div class="card"><div class="how">${t('Llegeix la paraula en català i escriu-la en anglès. Prem <b>Comprova</b>.', 'Read the word in Catalan and type it in English. Press <b>Check</b>.')}</div>`
+    $('#body').innerHTML = head + `<div class="card"><div class="how">${S.level === 'native' ? 'Read the meaning and type the English word or expression. Press <b>Check</b>.' : t('Llegeix la paraula en català i escriu-la en anglès. Prem <b>Comprova</b>.', 'Read the word in Catalan and type it in English. Press <b>Check</b>.')}</div>`
       + test.map((w, i) => `<div class="q"><p>${i + 1}. ${esc(w.ca)}${w.core ? ' <span class="star">⭐</span>' : ''}</p><input class="typed" id="tw${i}" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="fb" id="tf${i}"></div></div>`).join('')
       + `<div class="row"><button class="btn" data-do="tcheck">${t('Comprova', 'Check')}</button><button class="btn g" data-do="tnew">${t('Unes altres', 'New words')}</button><span class="fb" id="tscore"></span></div></div>`;
     return;

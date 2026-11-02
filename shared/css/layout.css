@@ -252,6 +252,9 @@ h3 {
   gap: 9px;
   margin-top: 15px;
 }
+/* LS2 study cards: these rows use the hidden attribute, which display:flex above would override (fix 2 Nov 2026): the
+   English → Català buttons on the Pro route and the "Type the English" row when the card already shows the English. */
+.dir-toggle[hidden], #cardTypeRow[hidden] { display: none; }
 
 /* Result & Feedback Notices */
 .result {
