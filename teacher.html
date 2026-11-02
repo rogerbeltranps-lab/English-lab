@@ -1492,18 +1492,26 @@ const pbWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.create
 // ---- announcements to students (Roger, 31 Oct 2026: "I want to be able to send messages to my students, like announcements from the teacher")
 // To one group, a whole course, every group or some students. Each student sees it once as a card at the top of the next page they open,
 // and it stays in 📣 Announcements on their board. The test account always gets a copy (uids). shared/js/el-announce.js draws the card.
-const annGroups=to=>to==="all"?GR.map(g=>g.id):to.startsWith("c:")?GR.filter(g=>g.course===to.slice(2)).map(g=>g.id):to.startsWith("g:")?[to.slice(2)]:[];
+// Any set of groups can be ticked (Roger, 2 Nov 2026: "be able to select more than one class"): S.annG = ticked group ids, S.annS = some students.
+// annTarget() → {to, label, groups}: to = "all", "c:<course>", "g:<group>", "groups" (any other set) or "students".
 const courseName=c=>c.replace(/^(\d)eso$/,"$1ESO");
-const annLabel=(to,sel)=>to==="all"?"Every group":to.startsWith("c:")?courseName(to.slice(2))+" (both groups)":to.startsWith("g:")?(GR.find(g=>g.id===to.slice(2))||{}).name||to.slice(2)
-  :sel.length===1&&S.P[sel[0]]?fullName(S.P[sel[0]]):sel.length+" students";
+const annIds=v=>v==="all"?GR.map(g=>g.id):v.startsWith("c:")?GR.filter(g=>g.course===v.slice(2)).map(g=>g.id):v.startsWith("g:")?[v.slice(2)]:[];
+function annTarget(sel){
+  if(S.annS)return {to:"students",groups:[],label:sel.length===1&&S.P[sel[0]]?fullName(S.P[sel[0]]):sel.length+" students"};
+  const G=GR.filter(g=>S.annG.has(g.id)),ids=G.map(g=>g.id),same=(a,b)=>a.length===b.length&&a.every(x=>b.includes(x));
+  const c=[...new Set(GR.map(g=>g.course))].find(c=>same(ids,annIds("c:"+c)));
+  return ids.length===GR.length?{to:"all",groups:ids,label:"Every group"}:c?{to:"c:"+c,groups:ids,label:courseName(c)+" (both groups)"}
+    :{to:ids.length===1?"g:"+ids[0]:"groups",groups:ids,label:G.map(g=>g.name).join(" + ")}}
+// Send later (Roger, 2 Nov 2026: "I want to program announcements"): at = time in ms; students get it only from then (el-cloud.js myAnnouncements).
+const annLater=a=>a.at&&annMs(a.at)>Date.now();
 // who it is for (testers left out): everyone of its groups (also students who have not signed in yet: they see it when they do) and its uids
 const annWho=a=>Object.values(S.P).filter(s=>!s.tester&&((a.groups||[]).includes(s.group)||(a.uids||[]).includes(s.uid)));
 const annMine=a=>S.g==="plan"||S.g==="none"||(a.groups||[]).includes(S.g)||annWho(a).some(s=>s.group===S.g);
-const annWhen=a=>{const ms=annMs(a.created);return ms?new Date(ms).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"just now"};
+const annWhen=a=>{const ms=annMs(a.at||a.created);return ms?new Date(ms).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"just now"};
 function annBox(){
-  const L=(S.D.ann||[]).filter(annMine).sort((a,b)=>annMs(b.created)-annMs(a.created));
+  const L=(S.D.ann||[]).filter(annMine).sort((a,b)=>annMs(b.at||b.created)-annMs(a.at||a.created));
   const li=a=>{const who=annWho(a),rd=who.filter(s=>(a.read||{})[s.uid]),no=who.filter(s=>!(a.read||{})[s.uid]);
-    return `<li><div class="hand annt">${annHtml(a.text)}</div><small class="muted">📣 To <b>${esc(a.label||"")}</b> · ${annWhen(a)} · ${who.length?`read by <b>${rd.length} of ${who.length}</b>`:"nobody on the list yet"}</small>
+    return `<li><div class="hand annt">${annHtml(a.text)}</div><small class="muted">📣 To <b>${esc(a.label||"")}</b> · ${annLater(a)?`<b style="color:#ea580c">⏰ scheduled for ${annWhen(a)}</b> (students don't see it yet)`:`${annWhen(a)} · `}${annLater(a)?"":who.length?`read by <b>${rd.length} of ${who.length}</b>`:"nobody on the list yet"}</small>
       ${no.length&&rd.length?`<details><summary class="muted" style="font-size:13px;font-weight:600">Not read yet (${no.length})</summary><small>${no.sort(byName).map(s=>name(s)+(s.away?' <span class="muted">(not signed in yet)</span>':"")).join(" · ")}</small></details>`:""}
       <div><button class="g" data-do="anndel" data-id="${esc(a.id)}">Delete</button></div></li>`};
   return `<div class="box" id="ann"><h2>📣 Announcements <small class="muted">to your students</small></h2>`
@@ -1517,32 +1525,49 @@ const annVideoText=([,title,f])=>{const all=HOW_VIDEOS.flatMap(g=>g[1]).map(v=>v
   return `${title}\nEnglish: ${url(f)}\nCatalà: ${url(f+"-ca")}`};
 function annDialog(keep){
   const old=keep&&$("#annt")?$("#annt").value:"",inTab=GR.find(g=>g.id===S.g);
-  if(!keep){S.annTo=inTab?"g:"+inTab.id:"all";S.annSel=new Set()}
-  const to=S.annTo,opt=(v,l)=>`<button type="button" class="chip ${to===v?"on":""}" data-do="annto" data-v="${v}">${esc(l)}</button>`;
+  if(keep&&$("#annat"))S.annAt=$("#annat").value;
+  if(!keep){S.annG=new Set(inTab?[inTab.id]:GR.map(g=>g.id));S.annS=false;S.annSel=new Set();S.annAt=""}
+  const on=v=>v==="s"?S.annS:!S.annS&&annIds(v).every(id=>S.annG.has(id));
+  const opt=(v,l)=>`<button type="button" class="chip ${on(v)?"on":""}" data-do="annto" data-v="${v}">${on(v)&&v!=="s"?"✓ ":""}${esc(l)}</button>`;
   const studs=Object.values(S.P).filter(s=>!s.tester&&s.group&&(!inTab||s.group===inTab.id)).sort(byName);
-  const pick=to==="s"?`<div class="annpick">${(inTab?[inTab]:GR).map(g=>{const L=studs.filter(s=>s.group===g.id);return L.length?`<p style="margin:6px 0 2px"><b>${esc(g.name)}</b></p>`
+  const pick=S.annS?`<div class="annpick">${(inTab?[inTab]:GR).map(g=>{const L=studs.filter(s=>s.group===g.id);return L.length?`<p style="margin:6px 0 2px"><b>${esc(g.name)}</b></p>`
       +L.map(s=>`<label class="ck" style="font-weight:400;display:inline-flex;gap:4px;margin:2px 10px 2px 0"><input type="checkbox" data-annu="${esc(s.uid)}" ${S.annSel.has(s.uid)?"checked":""} ${s.away?"disabled":""}>${name(s)}${s.away?' <small class="muted">(not signed in yet)</small>':""}</label>`).join(""):""}).join("")}</div>`:"";
-  dlg(`<h3>📣 New announcement</h3><p class="muted" style="margin:0 0 6px">To</p><div class="bar">${GR.map(g=>opt("g:"+g.id,g.name)).join("")}${[...new Set(GR.map(g=>g.course))].map(c=>opt("c:"+c,courseName(c)+" (both groups)")).join("")}${opt("all","Every group")}${opt("s",inTab?"Some students of "+inTab.name:"Some students")}</div>${pick}
+  const pad=n=>String(n).padStart(2,"0"),loc=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  dlg(`<h3>📣 New announcement</h3><p class="muted" style="margin:0 0 6px">To <small>(tick as many groups as you like)</small></p><div class="bar">${GR.map(g=>opt("g:"+g.id,g.name)).join("")}${[...new Set(GR.map(g=>g.course))].map(c=>opt("c:"+c,courseName(c)+" (both groups)")).join("")}${opt("all","Every group")}${opt("s",inTab?"Some students of "+inTab.name:"Some students")}</div>${pick}
     <label for="annt">Your message <small class="muted">(up to ${ANN_MAX} characters; it goes exactly as you write it, so use the language you want them to read; a web link becomes clickable)</small></label>
     <textarea id="annt" maxlength="${ANN_MAX}" style="min-height:120px" placeholder="For example: Tomorrow we meet in the computer room. Bring your headphones!"></textarea>
     <div class="bar" style="margin:4px 0 0"><span class="muted">Add a video link:</span>${ANN_VIDEOS.map(([t],i)=>`<button type="button" class="chip" data-annv="${i}">🎬 ${esc(t)}</button>`).join("")}</div>
+    <div class="bar" style="margin:8px 0 0;align-items:center"><label for="annat" style="margin:0">⏰ Send later <small class="muted">(optional: leave it empty to send now)</small></label>
+      <input type="datetime-local" id="annat" min="${loc(new Date())}" value="${esc(S.annAt||"")}" style="width:auto"><button type="button" class="g" id="annatx" ${S.annAt?"":"hidden"}>✕ Send now instead</button></div>
     <p class="muted" id="anncount" style="margin:6px 0"></p>
-    <p class="muted" style="margin:6px 0 4px">What they see, once, at the top of the next page they open (the words around your message follow their route):</p>
+    <p class="muted" style="margin:6px 0 4px" id="annwhen"></p>
     <div class="annprev"><div><small class="muted">Core, Plus and Pro</small><div class="annc" id="annp-en" style="${annCardStyle}"></div></div><div><small class="muted">Starter and Base</small><div class="annc" id="annp-ca" style="${annCardStyle}"></div></div></div>
     <div class="row" style="justify-content:flex-start"><button data-do="annsend" id="annsend" disabled>📣 Send</button></div>`,true);
-  const t=$("#annt");t.value=old;
-  const draw=()=>{const sel=[...S.annSel],who=to==="s"?sel.filter(u=>S.P[u]):Object.values(S.P).filter(s=>!s.tester&&annGroups(to).includes(s.group)),n=who.length,v=t.value.trim();
-    $("#anncount").innerHTML=n?`Goes to <b>${n} student${n===1?"":"s"}</b>${to==="s"?"":" (also the ones who have not signed in yet: they see it when they do)"}. Your test account gets a copy.`:to==="s"?"Tick the students who should get it.":"Nobody on the list in that group yet.";
-    [["en",true],["ca",false]].forEach(([k,en])=>$("#annp-"+k).innerHTML=annCardHtml({text:v,created:Date.now()},en,true));
+  const t=$("#annt"),at=$("#annat");t.value=old;
+  const draw=()=>{const sel=[...S.annSel],who=S.annS?sel.filter(u=>S.P[u]):Object.values(S.P).filter(s=>!s.tester&&S.annG.has(s.group)),n=who.length,v=t.value.trim();
+    const later=annAtMs(),when=later?new Date(later).toLocaleString("en-GB",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"";
+    $("#anncount").innerHTML=n?`Goes to <b>${n} student${n===1?"":"s"}</b>${S.annS?"":" (also the ones who have not signed in yet: they see it when they do)"}. Your test account gets a copy.`:S.annS?"Tick the students who should get it.":S.annG.size?"Nobody on the list in those groups yet.":"Tick at least one group.";
+    $("#annwhen").innerHTML=later?`What they see, once, at the top of the first page they open <b>from ${esc(when)}</b> (before then they don't see it; the words around your message follow their route):`
+      :"What they see, once, at the top of the next page they open (the words around your message follow their route):";
+    [["en",true],["ca",false]].forEach(([k,en])=>$("#annp-"+k).innerHTML=annCardHtml({text:v,created:later||Date.now()},en,true));
+    $("#annatx").hidden=!at.value;$("#annsend").textContent=later?"⏰ Schedule":"📣 Send";
     $("#annsend").disabled=!v||!n};
   document.querySelectorAll("#dlg [data-annv]").forEach(c=>c.onclick=()=>{const add=annVideoText(ANN_VIDEOS[+c.dataset.annv]);t.value=(t.value.trim()?t.value.trim()+"\n\n":"")+add;t.value=t.value.slice(0,ANN_MAX);draw();t.focus()});
-  t.oninput=draw;document.querySelectorAll("#dlg [data-annu]").forEach(c=>c.onchange=()=>{c.checked?S.annSel.add(c.dataset.annu):S.annSel.delete(c.dataset.annu);draw()});
+  t.oninput=draw;at.oninput=at.onchange=draw;$("#annatx").onclick=()=>{at.value="";draw()};
+  document.querySelectorAll("#dlg [data-annu]").forEach(c=>c.onchange=()=>{c.checked?S.annSel.add(c.dataset.annu):S.annSel.delete(c.dataset.annu);draw()});
   draw();t.focus()}
+// the "Send later" time in ms, or 0 for now (empty, or a time that has already passed)
+const annAtMs=()=>{const v=$("#annat")&&$("#annat").value,ms=v?+new Date(v):0;return ms>Date.now()?ms:0};
+function annToggle(v){
+  if(v==="s"){S.annS=true;return}
+  if(S.annS){S.annS=false;S.annG=new Set()}
+  const ids=annIds(v),all=ids.every(id=>S.annG.has(id));ids.forEach(id=>all?S.annG.delete(id):S.annG.add(id))}
 function annSendNow(){
-  const text=$("#annt").value.trim().slice(0,ANN_MAX),to=S.annTo,sel=to==="s"?[...S.annSel].filter(u=>S.P[u]&&!S.P[u].away):[];if(!text)return;
-  if(to==="s"&&!sel.length)return alert("Tick the students who should get it.");
-  const testers=Object.values(S.P).filter(s=>s.tester&&!s.away).map(s=>s.uid);
-  $("#dlg").close();act(api.annSend({text,to:to==="s"?"students":to,label:annLabel(to,sel),groups:annGroups(to),uids:[...new Set([...sel,...testers])]}))}
+  const text=$("#annt").value.trim().slice(0,ANN_MAX),sel=S.annS?[...S.annSel].filter(u=>S.P[u]&&!S.P[u].away):[];if(!text)return;
+  if(S.annS&&!sel.length)return alert("Tick the students who should get it.");
+  if(!S.annS&&!S.annG.size)return alert("Tick at least one group.");
+  const testers=Object.values(S.P).filter(s=>s.tester&&!s.away).map(s=>s.uid),later=annAtMs();
+  $("#dlg").close();act(api.annSend(Object.assign({text,uids:[...new Set([...sel,...testers])]},annTarget(sel),later?{at:later}:{})))}
 // Suggestions from students (all groups): new ones first, then newest first. Read ones stay until you delete them.
 const sgWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.created)):null;
 function sgBox(){
@@ -1904,7 +1929,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     sgopen:()=>{S.open.add("sugg");render();$("#sugg").scrollIntoView({behavior:"smooth"})},
-    annnew:()=>annDialog(),annsend:()=>annSendNow(),annto:()=>{S.annTo=k.v;annDialog(true)},
+    annnew:()=>annDialog(),annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
     sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");render();$("#probs").scrollIntoView({behavior:"smooth"})},
