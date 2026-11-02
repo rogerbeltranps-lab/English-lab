@@ -15,7 +15,7 @@ Key competences (Roger's *Progressió de les competències d'anglès*, 01 Habili
 | Final exam | 35 % | 4.1, 2.2, 5.1, grammar and vocabulary | Google Form, out of 100 (approved 25 Oct 2026): listening 20 (incl. listening chart, 5 multiple choice), reading 20 (incl. reading log, 5 multiple choice), vocabulary 15, grammar 15, writing 30 | Exam score out of 10, marked automatically except the email; the email also gives the 5.1 level |
 | Final product | 25 % | 3.2, 5.1, 4.2, individual only | My part of the pitch 40 · my email 35 · my source 15 · teamwork 5 · my process evidence 5 | Rubric levels |
 | Grammar and vocabulary | 20 % | Language practice | Recall checkpoints 1–4, recall warm-ups (LP2–LP6); vocabulary practice, grammar, mixed practice (LP2, LP3, LP5, LP6) and the LP6 register step | Automatic (26 Oct 2026): checkpoints 50 % (first try) · warm-ups 25 % (first try) · practice done by the session deadline 25 % |
-| Other competences | 20 % | 1.1, 1.2, 6.1 (CC1 1.3 and CC3 3.2 are assessed and shown apart, not in the mark: Roger, 30 Oct 2026) | Every activity linked to them + the final product content rows | Per criterion: half automatic, half teacher levels; the block is the average of the five |
+| Other competences | 20 % | 1.1, 1.2, 6.1 (CC1 1.3 and CC3 3.2 are assessed and shown apart, not in the mark: Roger, 30 Oct 2026) | Learning-path work only (Roger, 2 Nov 2026) | Per criterion: steps done and, where there is one, a teacher level on a learning-path piece, half and half; the block is the average of 1.1, 1.2 and 6.1 |
 
 The final product content rows (research card 6.1, meaning 1.1, local link 1.2, stereotypes CC3 3.2, welcome actions CC1 1.3) are still marked with the rubric, but they count in the "other competences" block, not in the 25 %. The 25 % is fully individual. Only the video is marked in groups (Roger, 25 Oct 2026): meaning, local link and stereotypes are judged on the video, once per group; the research card is marked per student.
 
@@ -46,11 +46,13 @@ Rules:
 
 | Criterion | Automatic half: LP steps linked to it | Teacher half: levels |
 | --- | --- | --- |
-| 1.1 | LP2 speaking handed in | Final product, pitch part 1 (group) |
-| 1.2 | LP3 writing and speaking handed in; LP4 respectful wording, first try | Final product, local link and inclusion (group) |
-| 6.1 | LP4 notes and credit line, first try; research card handed in | Research card; final product research card (round 1) |
-| CC1 1.3 | LP5 plan and LP6 email handed in | Final product, welcome actions |
-| CC3 3.2 | LP4 respectful wording, first try | Research card stereotype; final product stereotype row (group) |
+| 1.1 | LP2 speaking handed in | none (the steps are the whole mark) |
+| 1.2 | LP3 writing and speaking handed in; LP4 respectful wording, first try | none (the steps are the whole mark) |
+| 6.1 | LP4 notes and credit line, first try; research card handed in | LP4 research card |
+| CC1 1.3 | LP5 plan and LP6 email handed in | Final product, welcome actions (transversal, not in the mark) |
+| CC3 3.2 | LP4 respectful wording, first try | LP4 research card stereotype (transversal, not in the mark) |
+
+**Changed 2 Nov 2026 (Roger: "the final product must be in the final product … the other competences come from the learning paths"):** this block now reads learning-path work only. The final product levels on 1.1, 1.2 and 6.1 (video meaning and local link, final product research card) are still given and are evidence for the criterion degree, but they are not part of this block.
 
 Automatic half: share of linked steps done, auto-corrected steps counting their first-try score, as a mark out of 10. Teacher half: the level (or the average of two levels). Missing work counts 0 until handed in.
 

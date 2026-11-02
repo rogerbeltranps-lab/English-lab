@@ -35,7 +35,7 @@ Key competences for the exam and the final product: 4.1, 4.2, 2.2, 3.2, 5.1.
 
 | Criterion | Automatic half (steps done) | Teacher half (levels) |
 | --- | --- | --- |
-| 6.2 | LP4 Credits quiz (first try) · LP4 fact file done | LP4 fact file · final product fact file and credits |
+| 6.2 | LP4 Credits quiz (first try) · LP4 fact file done | LP4 fact file (since 2 Nov 2026 only learning-path levels count here; the final product fact file is evidence for the criterion degree, Roger: "the other competences come from the learning paths") |
 | CD2 2.2 | final product steps 2 (slides) and 4 (editing) done | final product step 4 |
 | CD4 4.5 | LP5 writing and speaking done · final product step 5 done | final product step 5 |
 

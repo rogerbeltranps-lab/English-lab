@@ -327,7 +327,7 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
   // the teacher's view of a student's board (?student=…): every piece of each block, from the dashboard's progress.parts (students never see it)
   const P=p.parts||{},sub=(name,w,m,note)=>row(name,Math.round(w*100)/100,m,note,"in sub"),det=id=>{if(!AS)return "";
     if(id==="gv"&&g.gv){const sw=g.gv.parts.reduce((n,x)=>n+x.w,0);return g.gv.parts.map(x=>sub(esc(x.name),W("gv")*x.w/sw,(P.gv||{})[x.id]??null,/first try/i.test(x.name)?"":x.first?"Only the first try counts":"Done by the class deadline")).join("")}
-    if(id==="other")return other.map(c=>sub(pill(c)+" "+esc(elCompetence(c)),W("other")/other.length,(P.other||{})[c]??null,"Half steps done, half your levels")).join("");
+    if(id==="other")return other.map(c=>sub(pill(c)+" "+esc(elCompetence(c)),W("other")/other.length,(P.other||{})[c]??null,"Learning paths: steps done"+(((g.teacher||{})[c]||[]).length?" + your level":""))).join("");
     if(id==="exam"&&e){const tot=e.sections.reduce((n,x)=>n+(+x[2]||e.max),0);return e.sections.map(([k,n,mx])=>{const y=sc[k];return sub(esc(n),W("exam")*(+mx||e.max)/tot,y&&y.score!=null?y.score/(+(y.max||mx||e.max))*10:null,y&&y.score!=null?`${f1(+y.score)} / ${+(y.max||mx||e.max)}`:"")}).join("")}
     if(id==="fp"&&g.fp&&g.fp.rows){const fw=g.fp.rows.reduce((n,x)=>n+x.w,0);return g.fp.rows.map(x=>sub(esc(x.name),W("fp")*x.w/fw,(P.fp||{})[x.step]??null,"")).join("")}
     return ""};

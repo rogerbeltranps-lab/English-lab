@@ -81,7 +81,10 @@ window.EL_GRADING={
         "CC1 1.3":[[LP5,"write"],[LP6,"write"]],
         "CC3 3.2":[[LP4,"respect",1]]
       },
-      teacher:{"1.1":[[FP,"group"]],"1.2":[[FP,"group"]],"6.1":[[LP4,"card"],[FP,"research"]],"CC1 1.3":[[FP,"email"]],"CC3 3.2":[[LP4,"card"],[FP,"group"]]},
+      // Teacher half: levels on learning-path pieces only (Roger, 2 Nov 2026: "the final product must be in the final product … the other
+      // competences come from the learning paths"). 1.1 and 1.2 have no learning-path level, so they are the steps alone. The final product
+      // levels on these criteria stay evidence for the criterion degree (evidence below). CC1 1.3 is transversal: shown apart, never in the mark.
+      teacher:{"6.1":[[LP4,"card"]],"CC1 1.3":[[FP,"email"]],"CC3 3.2":[[LP4,"card"]]},
       // Evidence per criterion for the suggested degree, earlier first: a later piece weighs `later` times the one before it.
       // [a,step] = teacher level; {exam:"reading"} = exam section mark. levelOnly: a score never sets the degree alone.
       later:2,
@@ -150,7 +153,8 @@ window.EL_GRADING={
         "CD2 2.2":[[FP,"slides"],[FP,"edit"]],
         "CD4 4.5":[[LP5,"write"],[LP5,"speak"],[FP,"tips"]]
       },
-      teacher:{"6.2":[[LP4,"factfile"],[FP,"factfile"]],"CD2 2.2":[[FP,"edit"]],"CD4 4.5":[[FP,"tips"]]},
+      // Teacher half: learning-path levels only (Roger, 2 Nov 2026, as in 4ESO LS2); CD2 and CD4 are transversal: shown apart, never in the mark.
+      teacher:{"6.2":[[LP4,"factfile"]],"CD2 2.2":[[FP,"edit"]],"CD4 4.5":[[FP,"tips"]]},
       later:2,
       evidence:{
         "4.1":{e:[[LP2,"log"],{exam:"reading"}],levelOnly:true},
