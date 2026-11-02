@@ -223,7 +223,7 @@ const all = () => DEMO ? !!DEMO.teacher : !!U && (ELCloud.isTeacher(U) || (ELClo
 async function load(u) {
   if (DEMO) return { group: DEMO.group, lv: DEMO.levels || {}, ls: DEMO.ls || {} };
   const db = ELCloud.db, D = { group: ELCloud.viewGroup() || ELCloud.group(), lv: {}, ls: {} };
-  try { (await F.getDocs(F.collection(db, 'students', u.uid, 'levels'))).forEach(l => D.lv[l.id] = l.data()); } catch (e) {}
+  try { if (ELCloud.levels) Object.assign(D.lv, await ELCloud.levels()); else (await F.getDocs(F.collection(db, 'students', u.uid, 'levels'))).forEach(l => D.lv[l.id] = l.data()); } catch (e) {}   // the read el-cloud.js already made
   for (const l of EL_LS) D.ls[l.id] = await ELCloud.lsInfo(l.id);
   return D;
 }

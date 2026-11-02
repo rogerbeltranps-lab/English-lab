@@ -79,8 +79,11 @@ async function load(u){
   const mail=(AS?D.me.email||"":u.email||"").toLowerCase();
   D.me.name=D.me.name||(AS?mail:u.displayName||u.email);
   if(!AS&&ELCloud.viewGroup())D.me.group=ELCloud.viewGroup();   // tester in the student view of a group
-  await q(["students",sid,"results"],r=>D.rs[r.data().activity]=r.data());
-  await q(["students",sid,"levels"],l=>D.lv[l.id]=l.data());
+  // the student's own results and levels: the reads el-cloud.js shares with the page's cards (one each; results fresh from the server here)
+  if(!AS&&ELCloud.results){try{for(const r of Object.values(await ELCloud.results(true)))if(r&&r.activity)D.rs[r.activity]=r}catch(e){}
+    try{Object.assign(D.lv,await ELCloud.levels())}catch(e){}}
+  else{await q(["students",sid,"results"],r=>D.rs[r.data().activity]=r.data());
+  await q(["students",sid,"levels"],l=>D.lv[l.id]=l.data())}
   await q(["students",sid,"progress"],p=>D.pg[p.id]=p.data().data||{});
   for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
   try{const p=await F.getDoc(F.doc(db,"points",mail));if(p.exists())D.pt=p.data()}catch(e){}

@@ -4,7 +4,8 @@
 // (✔ Done / To do / Late, with Open), what else happens in class, the exam day and late work from earlier weeks.
 // Optional activities (`optional` in el-plan.js, same shape as `due`) show as homework and are never late (students are not told
 // they are optional or how they count: Roger, 26 Oct 2026; checkpoints open the next Learning Path anyway).
-// Loaded by el-cloud.js for students and testers: start({db,user,group,root,lsId,seesAll}). Catalan for Insecure.
+// Loaded by el-cloud.js for students and testers: start({db,user,group,root,lsId,seesAll,results,levels,lsInfo}); the last three are
+// el-cloud.js's shared reads (one per page, results from the 30-minute copy), so the list costs no reads of its own. Catalan for Insecure.
 import {doc,getDoc,collection,getDocs} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const load=src=>new Promise(r=>{const s=document.createElement("script");s.src=src;s.onload=r;s.onerror=r;document.head.append(s)});
@@ -15,7 +16,7 @@ const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 // "Getting started: Castanyada & Halloween (warm-up)" → "getting started"
 const short=t=>String(t).split(/[:(]/)[0].trim().toLowerCase();
 
-export async function start({db,user,group,root,lsId,seesAll}){
+export async function start({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
   if(!group)return;
   if(!window.EL_PLAN)await load(new URL("shared/js/el-plan.js",root).href);
   if(!window.ELWeek)await load(new URL("shared/js/el-week.js",root).href);
@@ -25,12 +26,13 @@ export async function start({db,user,group,root,lsId,seesAll}){
   let i=W.row(p);if(i<0)i=p.rows.findIndex(r=>r.from>today);
   if(i<0)return;   // the plan is over
   const get=async path=>{const s=await getDoc(doc(db,...path)).catch(()=>null);return s&&s.exists()?s.data():null};
-  const lvs={};try{(await getDocs(collection(db,"students",user.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){}
-  const [info,pg]=await Promise.all([get(["ls",ls]),get(["students",user.uid,"progress",ls])]),lv=window.elRouteOf?elRouteOf(lvs,ls):lvs[ls];   // carried over from an earlier LS
+  let lvs={};try{lvs=levels?await levels():{};if(!levels)(await getDocs(collection(db,"students",user.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){}
+  const [info,pg]=await Promise.all([lsInfo?lsInfo(ls):get(["ls",ls]),lsId===ls?null:get(["students",user.uid,"progress",ls])]),lv=window.elRouteOf?elRouteOf(lvs,ls):lvs[ls];   // carried over from an earlier LS
   if(info&&info.planEdits&&W.applyEdits){W.applyEdits(ls,info.planEdits);i=W.row(p);if(i<0)i=p.rows.findIndex(r=>r.from>today);if(i<0)return}   // sessions the teacher moved to another day
   const st=(info&&info.status)==="public"?"open":(info&&info.status)||"hidden";
   if(!seesAll&&st!=="open")return;
-  const rs={};try{(await getDocs(collection(db,"students",user.uid,"results"))).forEach(d=>rs[d.data().activity||d.id.replace("__","/")]=d.data())}catch(e){}
+  const rs={};try{const all=results?await results():null;if(all)for(const [id,r] of Object.entries(all))rs[r.activity||id.replace("__","/")]=r;
+    else (await getDocs(collection(db,"students",user.uid,"results"))).forEach(d=>rs[d.data().activity||d.id.replace("__","/")]=d.data())}catch(e){}
   const ca=!seesAll&&(!lv||!lv.level||lv.level==="insecure"||lv.level==="beginners"),lang=ca?"ca":"en",t=(c,e)=>ca?c:e;   // no route yet: the Insecure version, in Catalan
   const acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls);
   // On a page of this LS the local progress is the freshest; elsewhere the synced copy.

@@ -14,6 +14,33 @@ const ROOT=new URL("../../",import.meta.url);
 
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
+// Fewer Firestore reads (Roger, 1 Nov 2026: the free plan's 50,000 reads a day ran out; AGENTS.md "Student page reads").
+// Each page reads the student's own documents once and every card shares them (once): students/{uid}, levels, ls/{id}.
+// The results list (students/{uid}/results, the longest one) is also kept in this browser for 30 minutes (el_rc_<uid>), and the
+// student's own result saves go into that copy, so teachers' corrections and exam marks show up at most 30 minutes late.
+const once=(()=>{const m={};const f=(k,get)=>m[k]||(m[k]=Promise.resolve().then(get).catch(e=>{delete m[k];throw e}));f.drop=k=>{delete m[k]};return f})();
+const RC="el_rc_",RC_MS=30*60e3;
+const plain=o=>JSON.parse(JSON.stringify(o,(k,v)=>v&&typeof v.toMillis==="function"?v.toMillis():v));   // Timestamps → milliseconds
+function rcGet(uid){try{const c=JSON.parse(localStorage.getItem(RC+uid)||"null");return c&&Date.now()-c.t<RC_MS?c.d:null}catch(e){return null}}
+function rcPut(uid,d,t){try{origSet.call(localStorage,RC+uid,JSON.stringify({t:t||Date.now(),d}))}catch(e){}}
+// fresh: read from the server (the board), otherwise the copy in this browser while it is younger than 30 minutes.
+function myResults(uid,fresh){
+  const c=!fresh&&rcGet(uid);if(c)return Promise.resolve(c);
+  return once("rs:"+uid,async()=>{const d={};(await getDocs(collection(db,"students",uid,"results"))).forEach(x=>d[x.id]=x.data());rcPut(uid,plain(d));return d});
+}
+// A result this page saved: put into the copy too (the server's time is unknown here, so "updated" stays out).
+function rcSaved(uid,id,data){try{const c=JSON.parse(localStorage.getItem(RC+uid)||"null");if(!c)return;const o=Object.assign({},data);delete o.updated;
+  c.d[id]=Object.assign(c.d[id]||{},plain(o));rcPut(uid,c.d,c.t)}catch(e){}}
+// Cards that are usually empty (the teacher's replies to problem reports, announcements): after a check that found nothing, the
+// next pages skip it for 15 minutes (el_ck_<kind>_<uid>). A card still waiting to be closed is checked on every page.
+async function quiet(kind,u,load){
+  const k="el_ck_"+kind+"_"+u.uid;let t=0;try{t=+localStorage.getItem(k)||0}catch(e){}
+  if(Date.now()-t<15*60e3)return [];
+  const r=await load();try{if(r.length)localStorage.removeItem(k);else origSet.call(localStorage,k,String(Date.now()))}catch(e){}
+  return r;
+}
+const myLevels=uid=>once("lv:"+uid,async()=>{const o={};(await getDocs(collection(db,"students",uid,"levels"))).forEach(d=>o[d.id]=d.data());return o});
+const myDoc=uid=>once("me:"+uid,async()=>{const s=await getDoc(doc(db,"students",uid));return s.exists()?s.data():null});
 const origSet=Storage.prototype.setItem;
 let bellEl=null,stopBell=null,stopJoin=null,stopGame=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,homeLevel=null,stale=false,pulled=false;
 const listeners=[];
@@ -49,7 +76,9 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 // homework (set from the dashboard) and planEdits (sessions moved to another day, tabs per session) came later: they were not copied
 // here, so the dashboard and the student board lost the homework set from the dashboard after a reload. planEdits is applied to the
 // time plan (ELWeek.applyEdits) as soon as it is read.
-async function lsInfo(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
+// once per page here; ELCloud.lsInfo (the dashboard, after it changes an LS) always reads the server.
+const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
+async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
   return {status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 const lsStatus=async id=>(await lsInfo(id)).status;
@@ -80,16 +109,18 @@ function push(){
   clearTimeout(timer);
   timer=setTimeout(send,1500);
 }
+let meAt=0;
 async function send(){
   timer=null;
   try{
     const snap=snapshot();
-    await setDoc(doc(db,"students",user.uid),{name:user.displayName||"",email:user.email,updated:serverTimestamp()},{merge:true});
+    // students/{uid} (name, email, last active) at most every 5 minutes, not on every save: the free plan also has 20,000 writes a day
+    if(Date.now()-meAt>5*60e3){await setDoc(doc(db,"students",user.uid),{name:user.displayName||"",email:user.email,updated:serverTimestamp()},{merge:true});meAt=Date.now()}
     await setDoc(progressRef(),{data:snap,updated:serverTimestamp()},{merge:true});
     // saved: these keys are no longer newer here than in the cloud (keys of a locked learning path can never be sent)
     const d=dirty();for(const k in d)if(snap[k]===localStorage.getItem(k)||lockedKeys.includes(k))delete d[k];setDirty(d);
     const a=window.EL_CATALOG&&actId&&EL_CATALOG.find(x=>x.id===actId);
-    if(a&&a.graded&&!a.manual)await setDoc(doc(db,"students",user.uid,"results",resKey(actId)),resultPayload(a),{merge:true});
+    if(a&&a.graded&&!a.manual){const r=resultPayload(a);await setDoc(doc(db,"students",user.uid,"results",resKey(actId)),r,{merge:true});rcSaved(user.uid,resKey(actId),r)}
   }catch(e){console.warn("sync",e)}
 }
 // Leaving the page (a presentation link, the board…) sends what is waiting at once instead of 1.5 s later.
@@ -160,7 +191,7 @@ function signInBlock(){
 // Class group: listed students get the group of the student list (copied to students/{uid}.group, which the pages read).
 // Testers, and everyone while the list cannot be read, choose it once on the first sign-in; afterwards only the teacher changes it.
 async function ensureGroup(u){
-  const s=await getDoc(doc(db,"students",u.uid)).catch(()=>null),cur=s&&s.exists()?s.data().group:null;
+  const me=await myDoc(u.uid).catch(()=>null),cur=me?me.group:null;
   if(!window.EL_GROUPS)return null;
   if(myRoster&&myRoster.group){
     if(cur!==myRoster.group)await setDoc(doc(db,"students",u.uid),{group:myRoster.group,name:u.displayName||"",email:u.email,updated:serverTimestamp()},{merge:true});
@@ -209,7 +240,7 @@ async function gate(u){
   if(vg){const vl=viewLevel(u);banner("Test account · student view of "+EL_GROUPS.find(x=>x.id===vg).name+(vl?" · level "+(window.elLevelLabel?elLevelLabel(courseOf(vg),vl):vl):"")+": you see what this group sees.","#7c3aed",{t:"See everything again",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}})}
   // The student's level: one per course, the same in every LS (elRouteOf). With none yet, a student works on the Insecure
   // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
-  const lvs={};try{(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data())}catch(e){console.warn("levels",e)}
+  let lvs={};try{lvs=await myLevels(u.uid)}catch(e){console.warn("levels",e)}
   let lvl=elRouteOf(lvs,lsId).level;
   const ca0=!lvl||elCa(lvl);   // the blocks below speak the student's language (Catalan with no route)
   if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block(ca0?"Aquesta LS no és del teu grup":"This LS is not for your group",ca0?"Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.":"Go back to your board: it has the LSs your teacher gave your group.",ca0);return}
@@ -237,6 +268,7 @@ async function gate(u){
   if(a&&a.manual&&a.graded)banner(ca?"Aquesta activitat és per entregar a través del Google Classroom.":"This activity is to be submitted through Google Classroom.","#1d4ed8");
   if(a&&a.mode==="once"){
     const rref=doc(db,"students",u.uid,"results",resKey(actId));
+    const rset=d=>setDoc(rref,d,{merge:true}).then(()=>rcSaved(u.uid,resKey(actId),d));   // the copy in this browser too
     const r=await getDoc(rref).catch(()=>null),rd=r&&r.exists()?r.data():{};
     if(rd.locked){
       noSync=true;const pk="el_practice_"+actId;
@@ -245,12 +277,12 @@ async function gate(u){
       freeze();return}
     const submit=async()=>{if(!confirm(ca?"Un cop entregada, la nota queda fixada (podràs practicar-la de nou, però no s'enviarà). Vols entregar-la?":"Once submitted, your result is fixed (you can practise it again, but it will not be sent). Submit it?"))return;
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
-      await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});location.reload()};
-    if(rd.markedDone)banner((ca?"Aquesta activitat és per entregar. L'has marcada com a feta, però encara no l'has entregada.":"This activity is to be submitted. You have marked it as done but not submitted it yet."),"#15803d",[{t:ca?"Entrega-la":"Submit",f:submit},{t:ca?"Desmarca":"Unmark",f:async()=>{await setDoc(rref,{markedDone:false,updated:serverTimestamp()},{merge:true});location.reload()}}]);
+      await rset(resultPayload(a,{locked:true,markedDone:true}));location.reload()};
+    if(rd.markedDone)banner((ca?"Aquesta activitat és per entregar. L'has marcada com a feta, però encara no l'has entregada.":"This activity is to be submitted. You have marked it as done but not submitted it yet."),"#15803d",[{t:ca?"Entrega-la":"Submit",f:submit},{t:ca?"Desmarca":"Unmark",f:async()=>{await rset({markedDone:false,updated:serverTimestamp()});location.reload()}}]);
     else banner((ca?"Aquesta activitat és per entregar (només una vegada). Quan acabis, marca-la com a feta.":"This activity is to be submitted (only once). When you finish, mark it as done."),"#1d4ed8",{t:ca?"Marca com a feta":"Mark as done",f:async()=>{
       await setDoc(progressRef(),{data:snapshot(),updated:serverTimestamp()},{merge:true});
-      await setDoc(rref,resultPayload(a,{markedDone:true}),{merge:true});
-      if(confirm(ca?"Activitat marcada com a feta. Vols entregar-la ara? (La nota quedarà fixada.)":"Activity marked as done. Do you want to submit it now? (Your result will be fixed.)"))await setDoc(rref,resultPayload(a,{locked:true,markedDone:true}),{merge:true});
+      await rset(resultPayload(a,{markedDone:true}));
+      if(confirm(ca?"Activitat marcada com a feta. Vols entregar-la ara? (La nota quedarà fixada.)":"Activity marked as done. Do you want to submit it now? (Your result will be fixed.)"))await rset(resultPayload(a,{locked:true,markedDone:true}));
       location.reload()}});
   }
   openHashTab();
@@ -342,7 +374,8 @@ async function submitActivity(a){
   const u=user;if(!u||!isStudent(u))return false;
   const p=await getDoc(doc(db,"students",u.uid,"progress",a.ls)).catch(()=>null),data=p&&p.exists()?p.data().data||{}:{};
   const sc=elPoints(a,k=>data[k]);
-  await setDoc(doc(db,"students",u.uid,"results",resKey(a.id)),{ls:a.ls,activity:a.id,score:sc,max:a.points,done:sc,locked:true,markedDone:true,updated:serverTimestamp()},{merge:true});
+  const r={ls:a.ls,activity:a.id,score:sc,max:a.points,done:sc,locked:true,markedDone:true,updated:serverTimestamp()};
+  await setDoc(doc(db,"students",u.uid,"results",resKey(a.id)),r,{merge:true});rcSaved(u.uid,resKey(a.id),r);
   return true;
 }
 
@@ -486,7 +519,7 @@ function gamePush(u){
 // The student's route on a page outside an LS: the route of their course's latest LS (carried over from earlier LSs, elRouteOf).
 async function findHomeLevel(u){
   const c=courseOf(myGroup),ls=(window.EL_LS||[]).filter(l=>l.course===c).pop();if(!ls||!window.elRouteOf)return;
-  try{const lvs={};(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>lvs[d.id]=d.data());homeLevel=elRouteOf(lvs,ls.id).level||null}catch(e){console.warn("route",e)}
+  try{const lvs=await myLevels(u.uid);homeLevel=elRouteOf(lvs,ls.id).level||null}catch(e){console.warn("route",e)}
 }
 function loadScript(src,has){return has()?Promise.resolve():new Promise(r=>{const s=document.createElement("script");s.src=new URL(src,ROOT).href;s.onload=r;s.onerror=r;document.head.append(s)})}
 function loadCatalog(){return window.EL_CATALOG?Promise.resolve():new Promise(r=>{const s=document.createElement("script");s.src=new URL("shared/js/el-catalog.js",ROOT).href;s.onload=r;s.onerror=r;document.head.append(s)})}
@@ -494,6 +527,20 @@ await loadCatalog();
 // Activities are matched by path, so pages with the same file name in different LSs keep separate results.
 const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=byPath.id;
 
+// The 🔔 reads every problem report, so only the dashboard listens live (and keeps the copy el_bell up to date); other pages show
+// that copy while it is younger than 10 minutes and read the reports again at most every 10 minutes (Roger, 1 Nov 2026: reads limit).
+// New reports also reach the teacher by email within 15 minutes (tools/notify).
+function bellWatch(cb){
+  const K="el_bell",MS=10*60e3,keep=list=>{const l=plain(list);try{origSet.call(localStorage,K,JSON.stringify({t:Date.now(),l}))}catch(e){}return l};
+  const docs=s=>s.docs.map(x=>Object.assign({id:x.id},x.data()));
+  if(onDash)return onSnapshot(collection(db,"problems"),s=>{keep(docs(s));cb(docs(s))},e=>console.warn("bell",e));
+  let c=null;try{c=JSON.parse(localStorage.getItem(K)||"null")}catch(e){}
+  const read=()=>getDocs(collection(db,"problems")).then(s=>cb(keep(docs(s)))).catch(e=>console.warn("bell",e));
+  if(c&&Date.now()-c.t<MS)cb(c.l);else read();
+  const t=setInterval(()=>{if(document.visibilityState!=="visible")return;let x=null;try{x=JSON.parse(localStorage.getItem(K)||"null")}catch(e){}
+    if(x&&Date.now()-x.t<MS){if(!c||x.t!==c.t){c=x;cb(x.l)}}else read()},60e3);
+  return()=>clearInterval(t);
+}
 onAuthStateChanged(auth,async u=>{
   window.EL_VIEW_LEVEL=viewLevel(u);   // before anything reads a route (elRouteOf)
   user=u;draw(u);
@@ -507,7 +554,7 @@ onAuthStateChanged(auth,async u=>{
   // A route the teacher set on the student list before their first sign-in (roster/{email}.route = {level, ls}, teacher.html listRoute):
   // saved as their route in that LS, with the level notice fields, if they have none there yet (firestore.rules checks it matches the list).
   const lr=myRoster&&myRoster.route;
-  if(lr&&lr.level&&lr.ls)try{const ref=doc(db,"students",u.uid,"levels",lr.ls);if(!(await getDoc(ref)).exists())await setDoc(ref,{level:lr.level,changed:serverTimestamp(),was:null,why:null})}catch(e){console.warn("route from the list",e)}
+  if(lr&&lr.level&&lr.ls)try{const ref=doc(db,"students",u.uid,"levels",lr.ls);if(!(await myLevels(u.uid))[lr.ls]){await setDoc(ref,{level:lr.level,changed:serverTimestamp(),was:null,why:null});once.drop("lv:"+u.uid)}}catch(e){console.warn("route from the list",e)}
   gamePush(u);
   lsMenu(u).catch(e=>console.warn("ls menu",e));
   document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u));   // teacher-only links (e.g. a class game on its learning path)
@@ -521,42 +568,42 @@ onAuthStateChanged(auth,async u=>{
   if(myLevel||homeLevel)draw(u);   // the route is known now: the Problem button speaks its language
   // The teacher's answer to the student's problem reports (marked fixed, or a thank-you when deleted): a card, once (shared/js/el-reply.js).
   if(u&&isStudent(u)&&!document.getElementById("el-reply"))import("./el-reply.js").then(m=>m.showReplies({en:repEn(),
-    load:async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data())),
+    load:()=>quiet("rp",u,async()=>(await getDocs(query(collection(db,"problemReplies"),where("uid","==",u.uid)))).docs.map(x=>Object.assign({id:x.id},x.data()))),
     done:id=>deleteDoc(doc(db,"problemReplies",id))})).catch(e=>console.warn("replies",e));
   // Announcements from the teacher to the student's group or to them (announcements/{id}): a card once each (shared/js/el-announce.js).
   if(u&&isStudent(u)&&!document.getElementById("el-announce"))import("./el-announce.js").then(m=>m.showAnnouncements({en:repEn(),
-    load:async()=>(await myAnnouncements(u)).filter(a=>!(a.read||{})[u.uid]),
+    load:()=>quiet("an",u,async()=>(await myAnnouncements(u)).filter(a=>!(a.read||{})[u.uid])),
     done:id=>updateDoc(doc(db,"announcements",id),{["read."+u.uid]:serverTimestamp()})})).catch(e=>console.warn("announcements",e));
   // "Your exam results are ready": a card once per new set of exam marks, with a link to the board on that LS (shared/js/el-exam-notice.js).
   if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-exam-notice"))loadScript("shared/js/el-grading.js",()=>window.EL_GRADING)
     .then(()=>import("./el-exam-notice.js")).then(m=>m.examNotice({course:courseOf(myGroup),en:repEn(),board:BOARD,
-      get:async ls=>{const s=await getDoc(doc(db,"students",u.uid,"results",ls+"__assessment"));return s.exists()?s.data():null},
-      seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().examSeen||{}},
+      get:async ls=>(await myResults(u.uid))[ls+"__assessment"]||null,
+      seen:async()=>((await myDoc(u.uid))||{}).examSeen||{},
       save:(ls,v)=>setDoc(doc(db,"students",u.uid),{examSeen:{[ls]:v}},{merge:true}),
       visible:async ls=>{const i=await lsInfo(ls);return i.status!=="hidden"&&elLsForGroup((window.EL_LS||[]).find(x=>x.id===ls),i,myGroup)}})).catch(e=>console.warn("exam notice",e));
   // The teacher's corrections and answers to hand-ins: a card once per new answer with a link to the step's tab, and the answer inside
   // that tab on the learning path (shared/js/el-corrections.js).
   if(u&&isStudent(u)&&!document.getElementById("el-corrections"))loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
     .then(()=>import("./el-corrections.js")).then(m=>m.corrections({here:actId,root:ROOT,en:repEn(),
-      list:async()=>(await getDocs(collection(db,"students",u.uid,"results"))).docs.map(x=>x.data()).filter(r=>r&&r.activity&&(r.replies||r.answers||r.levels)),
-      seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().fbSeen||{}},
+      list:async()=>Object.values(await myResults(u.uid)).filter(r=>r&&r.activity&&(r.replies||r.answers||r.levels)),
+      seen:async()=>((await myDoc(u.uid))||{}).fbSeen||{},
       save:o=>setDoc(doc(db,"students",u.uid),{fbSeen:o},{merge:true}),
       name:(aid,step)=>{for(const g of Object.values(window.EL_GRADING||{})){const x=(g.moments||[]).find(m=>m.a===aid&&m.step===step);if(x)return x.name}return null}})).catch(e=>console.warn("corrections",e));
   // "Your level": a card once each time the teacher sets the student's route (shared/js/el-level-notice.js).
   if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-level-notice"))import("./el-level-notice.js").then(m=>m.levelNotice({course:courseOf(myGroup),
-    lv:async()=>{const o={};(await getDocs(collection(db,"students",u.uid,"levels"))).forEach(d=>o[d.id]=d.data());return o},
-    seen:async()=>{const s=await getDoc(doc(db,"students",u.uid));return s.exists()&&s.data().levelSeen||{}},
+    lv:()=>myLevels(u.uid),
+    seen:async()=>((await myDoc(u.uid))||{}).levelSeen||{},
     save:(c,ms)=>setDoc(doc(db,"students",u.uid),{levelSeen:{[c]:ms}},{merge:true})})).catch(e=>console.warn("level notice",e));
   // Floating weekly to-do list for students (and testers) on every page that loads this file (shared/js/el-todo.js).
-  if(u&&isStudent(u)&&myGroup&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:u,group:myGroup,root:ROOT,lsId,seesAll:seesAll(u)})).catch(e=>console.warn("todo",e));
-  // The teacher's 🔔 in the bottom bar: open problem reports from all groups, live, on every page (shared/js/el-bell.js).
+  if(u&&isStudent(u)&&myGroup&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:u,group:myGroup,root:ROOT,lsId,seesAll:seesAll(u),results:()=>myResults(u.uid),levels:()=>myLevels(u.uid),lsInfo})).catch(e=>console.warn("todo",e));
+  // The teacher's 🔔 in the bottom bar: open problem reports from all groups on every page (live on the dashboard, bellWatch) (shared/js/el-bell.js).
   if(stopBell&&!isTeacher(u)){stopBell();stopBell=null;bellEl=null;draw(u)}
   if(isTeacher(u)&&!bellEl)import("./el-bell.js").then(m=>{if(bellEl||!isTeacher(user))return;
-    bellEl=m.bell({dash:DASH,onDash,watch:cb=>{stopBell=onSnapshot(collection(db,"problems"),s=>cb(s.docs.map(x=>Object.assign({id:x.id},x.data()))),e=>console.warn("bell",e))}});draw(user)}).catch(e=>console.warn("bell",e));
+    bellEl=m.bell({dash:DASH,onDash,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
   listeners.forEach(f=>f(u));
   // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
   if(stopJoin){stopJoin();stopJoin=null}const jg=++joinGen;
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo,onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,results:(fresh)=>user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>user?myLevels(user.uid):Promise.resolve({}),onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
