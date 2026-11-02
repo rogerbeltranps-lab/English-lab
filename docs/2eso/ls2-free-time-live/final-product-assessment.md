@@ -36,7 +36,7 @@ Each step has self-assessment statements (1–4) and an optional comment; they d
 
 ## 4. How it is marked
 
-Final product block (25 % of the LS mark): **My vlog 40** (3.2, step 4 + video) · **My script and slides 30** (5.1, step 3) · **My source 15** (4.2, step 1) · **My process evidence 15** (steps 0–5). Other competences rows on the rubric, counted in the 20 % block: My fact file and credits (6.2), Recording and editing (CD2 2.2), Screen tips (CD4 4.5). Levels NA/AS/AN/AE per row, descriptors per route from [indicators.md](indicators.md).
+Final product block (25 % of the LS mark, since 2 Nov 2026): **My vlog 35** (3.2, step 4 + video) · **My script and slides 25** (5.1, step 3) · **My source 15** (4.2, step 1) · **My fact file and credits 15** (6.2) · **My process evidence 10** (steps 0–5). Transversal rows on the rubric (Recording and editing CD2 2.2, Screen tips CD4 4.5) are marked but not in the mark. Levels NA/AS/AN/AE per row, descriptors per route from [indicators.md](indicators.md).
 
 ## 5. Marking in two rounds
 

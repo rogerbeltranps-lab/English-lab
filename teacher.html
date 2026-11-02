@@ -891,7 +891,7 @@ function planTable(g){
   if(!f.mark){const fw=f.rows.reduce((a,r)=>a+r.w,0);rows+=f.rows.map(r=>`<tr><td class="in">${esc(r.name)} ${/^\d|^C/.test(r.c)?pill(r.c):""}</td><td class="pc">${pc(W("fp")*r.w/fw)}</td><td>${r.w} % of the final product</td><td>${you}</td></tr>`).join("")}
   // grammar and vocabulary
   if(g.gv){const gw=g.gv.parts.reduce((a,p)=>a+p.w,0);
-    rows+=head("gv","Grammar and vocabulary","Learning-path work, marked by the site.")
+    rows+=head("gv",esc((g.blocks.find(b=>b.id==="gv")||{}).name||"Grammar and vocabulary"),"Learning-path work, marked by the site.")
       +g.gv.parts.map(p=>`<tr><td class="in">${esc(p.name)}</td><td class="pc">${pc(W("gv")*p.w/gw)}</td><td>${p.first?"Score of the <b>first try</b> only (what they remember from earlier paths): ":"<b>Done by the class deadline</b> in the Time plan (not the score): "}${list(p.first||p.time)}</td><td>${auto}</td></tr>`).join("")}
   // other competences
   if(g.other){const cs=engOther(g),n=cs.length;
