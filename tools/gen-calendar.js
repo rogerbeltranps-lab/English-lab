@@ -4,6 +4,9 @@
 // class that sets it to the day before it is due), every self-study class (the teacher is away) and the exam day.
 // Students subscribe once from their board ("📅 Add it to my Google Calendar"); Google refreshes the feed by itself (every few hours).
 // Run after every change to el-plan.js:   node tools/gen-calendar.js .
+// --live (Roger, 2 Nov 2026: a homework he deletes on the dashboard must go from the students' calendar too): also reads ls/{id}.planEdits
+// from Firestore (FIREBASE_SERVICE_ACCOUNT, read only, one read per LS) and applies them (ELWeek.applyEdits), so homework removed, sessions
+// moved and learning paths dropped on the dashboard are in the feed. .github/workflows/calendar-sync.yml runs it every hour in the day.
 const fs=require("fs"),path=require("path"),vm=require("vm");
 const root=path.resolve(process.argv[2]||"."),SITE="https://rogerbeltranps-lab.github.io/English-lab/";
 const ctx={window:{},console};ctx.window.window=ctx.window;vm.createContext(ctx);
@@ -13,6 +16,9 @@ const D=s=>s.replace(/-/g,""),esc=s=>String(s).replace(/\\/g,"\\\\").replace(/;/
 // lines of at most 75 octets, continued with a space (RFC 5545)
 const fold=l=>{const b=Buffer.from(l);if(b.length<=75)return l;const out=[];let cur="";for(const ch of l){if(Buffer.byteLength(cur+ch)>(out.length?74:75)){out.push(cur);cur=""}cur+=ch}out.push(cur);return out.join("\r\n ")};
 const hash=s=>{let h=0;for(const c of s)h=(h*31+c.codePointAt(0))>>>0;return h.toString(36)};
+(async()=>{
+if(process.argv.includes("--live")){const {firestore}=await import("./notify/lib.mjs"),db=await firestore();
+  for(const ls of Object.keys(ctx.window.EL_PLAN||{})){const d=await db.get("ls/"+encodeURIComponent(ls));if(d&&d.planEdits)W.applyEdits(ls,d.planEdits)}}
 fs.mkdirSync(path.join(root,"calendar"),{recursive:true});
 for(const g of GROUPS){
   const ev=[];
@@ -35,3 +41,4 @@ for(const g of GROUPS){
   const out=cal.split("\n").map(fold).join("\r\n")+"\r\n",f=path.join(root,"calendar",g.id.toLowerCase()+".ics");
   fs.writeFileSync(f,out);console.log(path.relative(root,f),ev.length,"events");
 }
+})().catch(e=>{console.error(e.message);process.exit(1)});

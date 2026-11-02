@@ -50,7 +50,7 @@
       let last=null;
       (p.rows||[]).forEach(r=>{if(!r.from)return;String((r.g?r.g[gi]:r.what)||"").split("\n").forEach(raw=>{const ln=raw.trim();
         let m=ln.match(/^Homework by (Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}) · (.+)$/);
-        if(m){const d=at(r.from,m[1],+m[2]);if(d)out.push({kind:"hw",date:d,set:last,text:m[3]});return}
+        if(m){const d=at(r.from,m[1],+m[2]);if(d)out.push({kind:"hw",date:d,set:last,text:m[3],line:ln});return}
         m=ln.match(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}) · (.+)$/);if(!m)return;
         const d=at(r.from,m[1],+m[2]);if(!d)return;last=d;
         if(/· self-study\b/.test(m[3]))out.push({kind:"self",date:d,set:null,text:m[3].replace(/\s*· self-study\b/,"").trim(),line:ln})})});
@@ -78,7 +78,7 @@
     // p._moved[gi][new line] = {orig, from (old day)}; p._tabs[gi][original line] = the chosen tabs. Safe to call again with new edits.
     applyEdits(ls,edits){const p=(window.EL_PLAN||{})[ls];if(!p||!p.rows)return null;const cp=o=>o==null?o:JSON.parse(JSON.stringify(o));
       if(!p._base)p._base=cp({rows:p.rows,due:p.due||null,stepDue:p.stepDue||null,optional:p.optional||null});
-      const b=cp(p._base);p.rows=b.rows;if(b.due)p.due=b.due;if(b.stepDue)p.stepDue=b.stepDue;if(b.optional)p.optional=b.optional;p._moved={};p._tabs={};p._added={};p._dropped={};
+      const b=cp(p._base);p.rows=b.rows;if(b.due)p.due=b.due;if(b.stepDue)p.stepDue=b.stepDue;if(b.optional)p.optional=b.optional;p._moved={};p._tabs={};p._added={};p._dropped={};p._nohw={};
       const get=(r,gi)=>String((r.g?r.g[gi]:r.what)||"").split("\n").filter(Boolean),set=(r,gi,ls)=>{if(r.g)r.g[gi]=ls.join("\n");else r.what=ls.join("\n")};
       const ok=d=>/^\d{4}-\d\d-\d\d$/.test(d||""),lab=to=>{const d=day(to);return DAYS.en[d.getDay()]+" "+d.getDate()};
       // puts a line on day `to` in that day's week row (a new row when the week has none), before the later lines
@@ -89,7 +89,7 @@
       const shift=(gi,old,to,ids)=>{Object.entries(p.due||{}).forEach(([id,a])=>{if(a&&a[gi]===old&&(!ids||ids.includes(id)))a[gi]=to});
         Object.entries(p.stepDue||{}).forEach(([id,o])=>{if(!ids||ids.includes(id))Object.values(o||{}).forEach(a=>{if(a&&a[gi]===old)a[gi]=to})})};
       Object.entries(edits||{}).forEach(([gid,m])=>{const gi=col(p,gid);if(gi<0||!m)return;const mv=p._moved[gi]={},tb=p._tabs[gi]={},ad=p._added[gi]={};
-        const es=Object.entries(m).filter(([,e])=>e),dr=p._dropped[gi]=[];
+        const es=Object.entries(m).filter(([,e])=>e),dr=p._dropped[gi]=[],nh=p._nohw[gi]=[];
         // a learning path dropped for this group (Roger, 1 Nov 2026: "we didn't have time and it doesn't count for the unit and it's not part of
         // the exam"): key "drop:<activity id>" = {drop: true}; it has no due day any more (no late reminders, no on-time marks, no bonus check)
         es.filter(([k,e])=>/^drop:/.test(k)&&e.drop).forEach(([k])=>{const id=k.slice(5);dr.push(id);
@@ -98,16 +98,22 @@
           const a=(window.EL_CATALOG||[]).find(x=>x.id===id),t=a&&String(a.title).split(/[:(]/)[0].trim().toLowerCase();let n=null;
           if(t)p.rows.forEach(r=>get(r,gi).forEach(l=>{const q=!n&&/\bLP(\d+) ([^(\n·]+)/.exec(l);if(q&&q[2].trim().toLowerCase().startsWith(t.slice(0,12)))n=q[1]}));
           if(n)p.rows.forEach(r=>{const ls=get(r,gi),k=ls.filter(l=>{if(!/^Homework by /.test(l))return true;const lp=l.match(/\bLP\d+\b/g)||[];return !(lp.length&&lp.every(x=>x==="LP"+n))});if(k.length!==ls.length)set(r,gi,k)})});
-        es.filter(([k,e])=>!e.add&&!/^(drop|noself):/.test(k)).forEach(([orig,e])=>{if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!ok(e.to))return;
+        es.filter(([k,e])=>!e.add&&!/^(drop|noself|nohw):/.test(k)).forEach(([orig,e])=>{if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!ok(e.to))return;
           const ri=p.rows.findIndex(r=>r.from&&get(r,gi).includes(orig));if(ri<0)return;const old=this.lineDay(p.rows[ri].from,orig);if(!old||old===e.to)return;
           const hw=/^Homework by /.test(orig),nl=orig.replace(/^(Homework by )?\w{3} \d{1,2}\b/,(_,h)=>(h||"")+lab(e.to));
           set(p.rows[ri],gi,get(p.rows[ri],gi).filter(l=>l!==orig));place(gi,e.to,nl);mv[nl]={orig,from:old};
           if(!hw)shift(gi,old,e.to)});
         // a self-study class the teacher teaches after all (Roger, 2 Nov 2026: "I can't delete this homework … they do it in class"): key
         // "noself:<original line>" = {noSelf: true}; the line (moved or not) loses "· self-study", so it is a normal class everywhere
-        // (no 📚 item on the boards and in Homework to remind, carried and reminded like any class). The .ics feed keeps the plan.
+        // (no 📚 item on the boards and in Homework to remind, carried and reminded like any class). The .ics feed follows within the hour (calendar-sync.yml).
         es.filter(([k,e])=>/^noself:/.test(k)&&e.noSelf).forEach(([k])=>{const orig=k.slice(7),cur=Object.keys(mv).find(n=>mv[n].orig===orig)||orig,nl=cur.replace(/\s*· self-study\b/,"");
           if(nl===cur)return;p.rows.forEach(r=>{const ls=get(r,gi),j=ls.indexOf(cur);if(j<0)return;ls[j]=nl;set(r,gi,ls);mv[nl]=mv[cur]||{orig,from:this.lineDay(r.from,cur)};delete mv[cur]})});
+        // a "Homework by …" line of the plan the teacher deleted (Roger, 2 Nov 2026: "I should be able to delete the homework"): key
+        // "nohw:<original line>" = {noHw: true}; the line (moved or not) goes, so it is not on the boards, in My week, in the emails or in
+        // the calendar feed (tools/gen-calendar.js --live). p._nohw[gi] = [{orig, text, date}] for the dashboard's "↩ Bring back".
+        es.filter(([k,e])=>/^nohw:/.test(k)&&e.noHw).forEach(([k])=>{const orig=k.slice(5),cur=Object.keys(mv).find(n=>mv[n].orig===orig)||orig;
+          p.rows.forEach(r=>{const ls=get(r,gi),j=ls.indexOf(cur);if(j<0||!/^Homework by /.test(cur))return;ls.splice(j,1);set(r,gi,ls);
+            nh.push({orig,text:cur.replace(/^Homework by \w{3} \d{1,2} · /,""),date:this.lineDay(r.from,cur)});delete mv[cur]})});
         // the tabs not done in a session, sent to a later class ("⏭ Next class" on the dashboard): {add: "LP3 Where traditions come from",
         // to, from: the day they were planned, tabs, shift: activity ids whose due day on `from` moves to `to`}
         es.filter(([,e])=>e.add&&ok(e.to)).sort((x,y)=>(x[1].at||0)-(y[1].at||0)).forEach(([key,e])=>{const nl=lab(e.to)+" · "+e.add+(e.from?" · not finished on "+lab(e.from):"");
