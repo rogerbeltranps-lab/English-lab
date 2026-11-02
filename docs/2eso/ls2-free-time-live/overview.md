@@ -88,7 +88,9 @@ See [final-product-assessment.md](final-product-assessment.md). The page opens w
 
 ## Reflect
 
-Reads the four checkpoints' first tries and asks five reflection questions (what I can do now, what was hard, my best piece, my route, the screen tip I applied and how it is going).
+**Tab 1 · Self-assessment** (Roger, 2 Nov 2026; `shared/js/el-self.js`, statements in `data/reflect.js`): 13 "I can…" statements tapped 1–4, two each for listening (2.2), speaking (3.2), reading (4.1, 4.2) and writing (5.1), one for sources and credits (6.2), two for screens and video (CD4 4.5, CD2 2.2) and two for how I learn (9.3), each linked to the Learning Path tab that worked it; then the competence to improve in LS3. Shown on the dashboard (🪞 Self-assessment), not in the mark.
+
+**Tab 2** reads the four checkpoints' first tries; **tab 3** asks four reflection questions (what improved most, what helped most, the screen tip I applied and how it is going, one goal for LS3), answered personally.
 
 ## Beginners route (A1), added 26 Oct 2026
 

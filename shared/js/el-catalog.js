@@ -9,6 +9,7 @@
 // manual:true = scored by the teacher (not by counting actions); delivered through Google Classroom, not in this site.
 // steps: final-product steps (id, title) whose hand-ins (state.steps in the page's key) the dashboard shows; pieces: product-pieces key.
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
+// self: the id of the LS's self-assessment panel (shared/js/el-self.js, on the Reflect page; Roger, 2 Nov 2026): the dashboard's Self-assessment box reads it.
 // LS1 My Real Routine (Roger, 25 Oct 2026): done in class and redesigned for next year; only the exam and the final product count,
 // so its learning paths are graded:false (practice). Results already saved stay in Firestore.
 // Beginners (Roger, 26 Oct 2026): A1, below Insecure, Catalan with heavy scaffolding; the teacher sets it. The teacher sets every route (Roger, 30 Oct 2026: students never choose one, they can only ask for a change on their board).
@@ -101,7 +102,7 @@ window.EL_CATALOG=(function(){
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint44ESO",1,C),
         L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam4ESO",7,{graded:false}),
         L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","3.2","4.2","5.1","6.1","CC1 1.3","CC3 3.2"],"ls2FinalProduct4ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
-        L("reflect.html","Reflect",[],"ls2Reflect4ESO",1,{graded:false})
+        L("reflect.html","Reflect",[],"ls2Reflect4ESO",2,{graded:false,self:"self"})
       ];
     })(),
     ...(function(){
@@ -121,7 +122,7 @@ window.EL_CATALOG=(function(){
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint42ESO",1,C),
         L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam2ESO",7,{graded:false}),
         L("free-time-vlog.html","Final product: Free Time Vlog",["3.2","4.2","5.1","6.2","CD2 2.2","CD4 4.5"],"ls2FinalProduct2ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["slides","2 · My slides"],["script","3 · My script"],["edit","4 · Record and edit"],["feedback","Feedback for my buddy"],["tips","5 · My tip"]],pieces:"ls2Products2ESO"}),
-        L("reflect.html","Reflect",[],"ls2Reflect2ESO",1,{graded:false})
+        L("reflect.html","Reflect",[],"ls2Reflect2ESO",2,{graded:false,self:"self"})
       ];
     })()
   ];
@@ -196,7 +197,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
     "4eso/ls2-recall-checkpoint-1":["check"],"4eso/ls2-recall-checkpoint-2":["check"],"4eso/ls2-recall-checkpoint-3":["check"],"4eso/ls2-recall-checkpoint-4":["check"],
     "4eso/ls2-sample-exam":["listen","chart","read","log","vocab","grammar","write"],
     "4eso/ls2-celebration-day-proposal":["video","email","submit"],
-    "4eso/ls2-reflect":["reflect"]
+    "4eso/ls2-reflect":["self","reflect"]
   });
   // Revised programme (24 Oct 2026): 2.1, 3.1, 6.2 and CE2 2.3 are no longer LS2 criteria, so speaking steps practise the pitch (3.2).
   // Four skills (Roger, 30 Oct 2026): Use of English steps heard (practice and grammar, "listen and complete") give 2.2 + 5.1; said steps ("say it") and Talk give 3.2.
@@ -212,7 +213,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
     "4eso/ls2-recall-checkpoint-1":ck,"4eso/ls2-recall-checkpoint-2":ck,"4eso/ls2-recall-checkpoint-3":ck,"4eso/ls2-recall-checkpoint-4":ck,
     "4eso/ls2-sample-exam":{listen:["2.2"],chart:["2.2"],read:["4.1"],log:["4.1"],write:["5.1"]},
     "4eso/ls2-celebration-day-proposal":{video:["3.2","1.1","1.2","CC3 3.2"],email:["5.1","CC1 1.3"],submit:[]},
-    "4eso/ls2-reflect":{reflect:[]}
+    "4eso/ls2-reflect":{self:[],reflect:[]}
   };
 })();
 // LS2 2ESO Free Time, Live!: steps per page and the criterion each step gives evidence for (docs/2eso/ls2-free-time-live/assessment-criteria.md).
@@ -228,7 +229,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
     "2eso/ls2-recall-checkpoint-1":["check"],"2eso/ls2-recall-checkpoint-2":["check"],"2eso/ls2-recall-checkpoint-3":["check"],"2eso/ls2-recall-checkpoint-4":["check"],
     "2eso/ls2-sample-exam":["listen","chart","read","log","vocab","grammar","write"],
     "2eso/ls2-free-time-vlog":["video","submit"],
-    "2eso/ls2-reflect":["reflect"]
+    "2eso/ls2-reflect":["self","reflect"]
   });
   Object.assign(window.EL_STEP_CRITERIA,{
     "2eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
@@ -240,7 +241,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
     "2eso/ls2-recall-checkpoint-1":ck,"2eso/ls2-recall-checkpoint-2":ck,"2eso/ls2-recall-checkpoint-3":ck,"2eso/ls2-recall-checkpoint-4":ck,
     "2eso/ls2-sample-exam":{listen:["2.2"],chart:["2.2"],read:["4.1"],log:["4.1"],write:["5.1"]},
     "2eso/ls2-free-time-vlog":{video:["3.2","CD2 2.2"],submit:[]},
-    "2eso/ls2-reflect":{reflect:[]}
+    "2eso/ls2-reflect":{self:[],reflect:[]}
   });
 })();
 // Use of English is reading and writing (Roger, 30 Oct 2026: "the vocabulary sections of the learning path count as reading and writing alike,

@@ -16,7 +16,7 @@ window.EL_SECTIONS={
   "4eso/ls2-write-to-the-head-teacher":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["register","Register"],["again","Listen again"],["shadow","Shadowing"],["grammar","Grammar"],["write","The email"],["speak","Speaking"],["talk","Talk"]],
   "4eso/ls2-sample-exam":[["shadowing","🗣 Shadowing"],["how","How it works"],["listen","Listening"],["chart","Listening chart"],["read","Reading"],["log","Reading log"],["vocab","Vocabulary"],["grammar","Grammar"],["write","Writing"],["score","My score"]],
   "4eso/ls2-celebration-day-proposal":[["task","The task"],["rubric","Rubric"],["prep","Step 0 · My pieces"],["source","Step 1 · My source"],["contribution","Step 2 · My contribution"],["part","Step 3 · My part"],["video","Video"],["email","Step 4 · My email"],["feedback","Feedback for another group"],["submit","Submit"],["team","Step 5 · Teamwork"]],
-  "4eso/ls2-reflect":[["scores","My checkpoints"],["reflect","Reflection"]],
+  "4eso/ls2-reflect":[["self","Self-assessment"],["scores","My checkpoints"],["reflect","Reflection"]],
   "2eso/ls2-getting-started":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["listen","Listening"],["speak","Speaking"]],
   "2eso/ls2-what-are-they-doing":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["log","Reading log"],["listen","Listening"],["again","Listen again"],["shadow","Shadowing"],["grammar","Grammar"],["mixed","Mixed"],["write","Writing"],["speak","Speaking"],["talk","Talk"]],
   "2eso/ls2-now-or-usually":[["recall","Recall"],["vocab","Vocabulary"],["listen","Listening"],["chart","Listening chart"],["shadow","Shadowing"],["grammar","Grammar"],["mixed","Mixed"],["write","Writing"],["speak","Speaking"],["talk","Talk"]],
@@ -25,5 +25,5 @@ window.EL_SECTIONS={
   "2eso/ls2-write-your-vlog-script":[["recall","Recall"],["vocab","Vocabulary"],["read","Reading"],["parts","Script parts"],["again","Listen again"],["shadow","Shadowing"],["grammar","Grammar"],["write","Writing"],["speak","Speaking"],["talk","Talk"]],
   "2eso/ls2-sample-exam":[["shadowing","🗣 Shadowing"],["how","How it works"],["listen","Listening"],["chart","Listening chart"],["read","Reading"],["log","Reading log"],["vocab","Vocabulary"],["grammar","Grammar"],["write","Writing"],["score","My score"]],
   "2eso/ls2-free-time-vlog":[["task","The task"],["rubric","Rubric"],["prep","Step 0 · My pieces"],["source","Step 1 · My source"],["slides","Step 2 · My slides"],["script","Step 3 · My script"],["video","Video"],["edit","Step 4 · Record and edit"],["feedback","Feedback for my buddy"],["submit","Submit"],["tips","Step 5 · My tip"]],
-  "2eso/ls2-reflect":[["scores","My checkpoints"],["reflect","Reflection"]]
+  "2eso/ls2-reflect":[["self","Self-assessment"],["scores","My checkpoints"],["reflect","Reflection"]]
 };

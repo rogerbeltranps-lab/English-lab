@@ -796,7 +796,7 @@ Insecure keeps Catalan guidance at every step, with English examples linking sou
 
 ## Reflect (week 8, not graded)
 
-1. Rate yourself 1–4 on each learning objective ("I can…" statements from the programme).
+1. **Self-assessment** (Roger, 2 Nov 2026; `shared/js/el-self.js`, statements in `data/reflect.js`): 13 "I can…" statements tapped 1–4, two each for listening (2.2), speaking (3.2), reading (4.1, 4.2) and writing (5.1), one each for cultures (1.1, 1.2), sources (6.1) and teamwork (CC1 1.3), two for how I learn (9.3), each linked to the Learning Path tab that worked it; then the competence to improve in LS3. Shown on the dashboard (🪞 Self-assessment), not in the mark.
 2. Your checkpoint scores from week 2 to week 8: what improved most?
 3. Which helped you most: recall warm-ups, flashcards, mixed practice, AI feedback, or the group work? Why?
 4. One goal for LS3.
@@ -815,7 +815,7 @@ Insecure keeps Catalan guidance at every step, with English examples linking sou
 | Vocabulary games, flashcards | — | no, in class |
 | Sample exam | — | no |
 | Final Product | manual | yes, Classroom |
-| Reflect | 1 | no |
+| Reflect | 2 (self-assessment, reflection) | no |
 
 ## Beginners route (A1), added 26 Oct 2026
 
