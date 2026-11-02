@@ -2,125 +2,251 @@
  "title": "Your student board",
  "note": "English = the board of a sample 4 ESO Core student (Alex); Catalan = a sample 2 ESO Base student (Pau). Each language describes its own board, so the lines are not word-for-word translations.",
  "lines": [
-  {"id": "b01", "scene": "Welcome",
+  {
+   "id": "b01",
+   "scene": "Welcome",
    "en": "Hi! This video explains your board, My activities, in detail. It is the first page you see when you sign in. We will look at the board of Alex, a sample student in 4 ESO, so you can see what every part means.",
-   "ca": "Hola! Aquest vídeo t'explica amb detall el teu tauler, Les meves activitats. És la primera pàgina que veus quan entres a la web. Mirarem el tauler d'en Pau, un alumne d'exemple de segon d'ESO, perquè vegis què vol dir cada part."},
-  {"id": "b02", "scene": "The top of your board",
+   "ca": "Hola! Aquest vídeo t'explica amb detall el teu tauler, Les meves activitats. És la primera pàgina que veus quan entres a la web. Mirarem el tauler d'en Pau, un alumne d'exemple de segon d'ESO, perquè vegis què vol dir cada part."
+  },
+  {
+   "id": "b02",
+   "scene": "The top of your board",
    "en": "At the top, you find the announcements from your teacher. The new ones are marked New. Read them: they tell you about exams, homework and changes.",
-   "ca": "A dalt hi ha els anuncis del professor. Els nous porten l'etiqueta Nou. Llegeix-los: t'avisen dels exàmens, dels deures i dels canvis."},
-  {"id": "b03", "scene": "The top of your board",
+   "ca": "A dalt hi ha els anuncis del professor. Els nous porten l'etiqueta Nou. Llegeix-los: t'avisen dels exàmens, dels deures i dels canvis."
+  },
+  {
+   "id": "b02p",
+   "scene": "The top of your board",
+   "en": "Sometimes, a big green card appears above them: Your teacher wants you to open. It means your teacher has pulled up a learning path for your class. Click Open it and you go straight there.",
+   "ca": "De vegades, a sobre hi apareix una targeta verda gran: El professor vol que obris. Vol dir que el professor ha posat un learning path a les pantalles de la classe. Clica Obre-ho i hi vas directament."
+  },
+  {
+   "id": "b03",
+   "scene": "The top of your board",
    "en": "Then, My points. In the class presentations, every right answer gives you one point. Your points give you a bonus on your term grade: up to half a point.",
-   "ca": "Després, Els meus punts. A les presentacions de classe, cada resposta correcta et dona un punt. Els punts et donen un bonus a la nota del trimestre: fins a mig punt."},
-  {"id": "b04", "scene": "The top of your board",
+   "ca": "Després, Els meus punts. A les presentacions de classe, cada resposta correcta et dona un punt. Els punts et donen un bonus a la nota del trimestre: fins a mig punt."
+  },
+  {
+   "id": "b04",
+   "scene": "The top of your board",
    "en": "But careful: you only get the bonus with all your work done. Alex has one activity missing, so the bonus is zero for now. Do the missing activity, and the bonus comes back.",
-   "ca": "Però compte: només tens el bonus si has fet tota la feina. En Pau té una activitat pendent, i per això ara el bonus és zero. Si fa l'activitat que li falta, el recupera."},
-  {"id": "b05", "scene": "The top of your board",
+   "ca": "Però compte: només tens el bonus si has fet tota la feina. En Pau té una activitat pendent, i per això ara el bonus és zero. Si fa l'activitat que li falta, el recupera."
+  },
+  {
+   "id": "b05",
+   "scene": "The top of your board",
    "en": "Below, My activities. It counts the activities you had to do by now, following the class plan. Alex has done six of seven, so the bar is orange.",
-   "ca": "A sota, Les meves activitats. Compta les activitats que ja havies de tenir fetes, segons el pla de classe. En Pau n'ha fet quatre de cinc, i per això la barra és taronja."},
-  {"id": "b06", "scene": "The top of your board",
+   "ca": "A sota, Les meves activitats. Compta les activitats que ja havies de tenir fetes, segons el pla de classe. En Pau n'ha fet quatre de cinc, i per això la barra és taronja."
+  },
+  {
+   "id": "b06",
+   "scene": "The top of your board",
    "en": "Your everyday work is your continuous assessment: forty percent of your LS mark. The missing activities are listed here. Click Do it now to go and finish them.",
-   "ca": "La feina de cada dia és la teva avaluació contínua: el quaranta per cent de la nota de la LS. Aquí tens la llista de les activitats que et falten. Clica Fes-la ara per anar-hi i acabar-la."},
-  {"id": "b07", "scene": "The top of your board",
+   "ca": "La feina de cada dia és la teva avaluació contínua: el quaranta per cent de la nota de la LS. Aquí tens la llista de les activitats que et falten. Clica Fes-la ara per anar-hi i acabar-la."
+  },
+  {
+   "id": "b07",
+   "scene": "The top of your board",
    "en": "Here you also have the videos that explain how the website works, like this one.",
-   "ca": "Aquí també tens els vídeos que expliquen com funciona la web, com aquest."},
-  {"id": "b08", "scene": "Your Learning Situations",
+   "ca": "Aquí també tens els vídeos que expliquen com funciona la web, com aquest."
+  },
+  {
+   "id": "b08",
+   "scene": "Your Learning Situations",
    "en": "Now, the heart of your board: My Learning Situations. Each button is one LS. Seasons and Celebrations is the one we are doing now. My Real Routine is closed, but you can still open it to see your results.",
-   "ca": "Ara, el cor del tauler: Les meves Learning Situations. Cada botó és una LS. Free Time, Live! és la que fem ara. My Real Routine està tancada, però la pots obrir per veure'n els resultats."},
-  {"id": "b09", "scene": "Your Learning Situations",
+   "ca": "Ara, el cor del tauler: Les meves Learning Situations. Cada botó és una LS. Free Time, Live! és la que fem ara. My Real Routine està tancada, però la pots obrir per veure'n els resultats."
+  },
+  {
+   "id": "b09",
+   "scene": "Your Learning Situations",
    "en": "Under the buttons, you see your level, which your teacher sets. If you think another level suits you better, click Ask to change route. On the right, the green button takes you to the LS pages.",
-   "ca": "Sota els botons veus el teu nivell, que el posa el professor. Si creus que un altre nivell et va millor, clica Demana canviar de ruta. A la dreta, el botó verd et porta a les pàgines de la LS."},
-  {"id": "b10", "scene": "Your Learning Situations",
+   "ca": "Sota els botons veus el teu nivell, que el posa el professor. Si creus que un altre nivell et va millor, clica Demana canviar de ruta. A la dreta, el botó verd et porta a les pàgines de la LS."
+  },
+  {
+   "id": "b10",
+   "scene": "Your Learning Situations",
    "en": "Each LS has four cards: My week, My formative assessment, My final product and My exams. Click a card to open it. Let's look at them one by one.",
-   "ca": "Cada LS té quatre targetes: La meva setmana, La meva avaluació formativa, El meu producte final i Els meus exàmens. Clica una targeta per obrir-la. Les veurem una per una."},
-  {"id": "b11", "scene": "My week",
+   "ca": "Cada LS té quatre targetes: La meva setmana, La meva avaluació formativa, El meu producte final i Els meus exàmens. Clica una targeta per obrir-la. Les veurem una per una."
+  },
+  {
+   "id": "b11",
+   "scene": "My week",
    "en": "My week first. Here you can open the summary of the vocabulary and grammar of your level, the shadowing video of the unit, and extra practice that corrects itself and does not count for your mark.",
-   "ca": "Primer, La meva setmana. Aquí pots obrir el resum del vocabulari i la gramàtica del teu nivell, el vídeo de shadowing de la unitat i pràctica extra que es corregeix sola i no compta per a la nota."},
-  {"id": "b12", "scene": "My week",
+   "ca": "Primer, La meva setmana. Aquí pots obrir el resum del vocabulari i la gramàtica del teu nivell, el vídeo de shadowing de la unitat i pràctica extra que es corregeix sola i no compta per a la nota."
+  },
+  {
+   "id": "b12",
+   "scene": "My week",
    "en": "Then, your week plan. The red label tells you when the exam is. Below, your homework, and a button that adds all your homework and the exam day to your Google Calendar.",
-   "ca": "Després, el pla setmanal. L'etiqueta vermella et diu quan és l'examen. A sota, els deures, i un botó que afegeix tots els deures i el dia de l'examen al teu Google Calendar."},
-  {"id": "b13", "scene": "My week",
+   "ca": "Després, el pla setmanal. L'etiqueta vermella et diu quan és l'examen. A sota, els deures, i un botó que afegeix tots els deures i el dia de l'examen al teu Google Calendar."
+  },
+  {
+   "id": "b13",
+   "scene": "My week",
    "en": "This week shows what we do in class every day, and the activities you have to do, with their day. If you miss a class, look here.",
-   "ca": "Aquesta setmana et mostra què fem a classe cada dia i quines activitats has de fer, amb el seu dia. Si un dia no vens a classe, mira-ho aquí."},
-  {"id": "b14", "scene": "My formative assessment",
+   "ca": "Aquesta setmana et mostra què fem a classe cada dia i quines activitats has de fer, amb el seu dia. Si un dia no vens a classe, mira-ho aquí."
+  },
+  {
+   "id": "b14",
+   "scene": "My formative assessment",
    "en": "The second card, My formative assessment, is your everyday work: all the learning paths of the LS. At the top, Next for you tells you what to do now. Click Open it and you go straight there.",
-   "ca": "La segona targeta, La meva avaluació formativa, és la teva feina de cada dia: tots els learning paths de la LS. A dalt, El següent que et toca et diu què has de fer ara. Clica Obre-la i hi vas directament."},
-  {"id": "b15", "scene": "My formative assessment",
+   "ca": "La segona targeta, La meva avaluació formativa, és la teva feina de cada dia: tots els learning paths de la LS. A dalt, El següent que et toca et diu què has de fer ara. Clica Obre-la i hi vas directament."
+  },
+  {
+   "id": "b15",
+   "scene": "My formative assessment",
    "en": "These labels count your learning paths: done, missing past their day, to do, and not open yet.",
-   "ca": "Aquestes etiquetes compten els teus learning paths: fets, endarrerits, per fer i tancats."},
-  {"id": "b16", "scene": "My formative assessment",
+   "ca": "Aquestes etiquetes compten els teus learning paths: fets, endarrerits, per fer i tancats."
+  },
+  {
+   "id": "b16",
+   "scene": "My formative assessment",
    "en": "The table has every learning path, in the order of the class plan, with its criteria under the name. Each tab you have done has a green tick.",
-   "ca": "La taula té tots els learning paths, en l'ordre del pla de classe, amb els criteris sota el nom. Cada pestanya que has fet porta un tic verd."},
-  {"id": "b17", "scene": "My formative assessment",
+   "ca": "La taula té tots els learning paths, en l'ordre del pla de classe, amb els criteris sota el nom. Cada pestanya que has fet porta un tic verd."
+  },
+  {
+   "id": "b17",
+   "scene": "My formative assessment",
    "en": "An amber tab means you did it, but after its day. It is better to do every tab on time.",
-   "ca": "Una pestanya taronja vol dir que l'has fet, però després del seu dia. És millor fer cada pestanya a temps."},
-  {"id": "b18", "scene": "My formative assessment",
+   "ca": "Una pestanya taronja vol dir que l'has fet, però després del seu dia. És millor fer cada pestanya a temps."
+  },
+  {
+   "id": "b18",
+   "scene": "My formative assessment",
    "en": "A red row is a learning path with tabs missing after their day. Here, Alex is missing Speaking and Talk. Click a red tab and it opens, so you can do it now.",
-   "ca": "Una fila vermella és un learning path amb pestanyes que falten i que ja tocava fer. Aquí, a en Pau li falten Speaking i Talk. Clica una pestanya vermella i s'obre, perquè la puguis fer ara."},
-  {"id": "b19", "scene": "My formative assessment",
+   "ca": "Una fila vermella és un learning path amb pestanyes que falten i que ja tocava fer. Aquí, a en Pau li falten Speaking i Talk. Clica una pestanya vermella i s'obre, perquè la puguis fer ara."
+  },
+  {
+   "id": "b19",
+   "scene": "My formative assessment",
    "en": "Recall checkpoints are short quizzes about what you have learnt. You need to do each one to open the learning paths after it. A lock means a learning path is not open yet: your teacher opens it when it is time.",
-   "ca": "Els Recall checkpoints són qüestionaris curts sobre el que has après. Has de fer cadascun per obrir els learning paths que venen després. Un cadenat vol dir que el learning path encara no està obert: el professor l'obre quan toca."},
-  {"id": "b20", "scene": "My formative assessment",
+   "ca": "Els Recall checkpoints són qüestionaris curts sobre el que has après. Has de fer cadascun per obrir els learning paths que venen després. Un cadenat vol dir que el learning path encara no està obert: el professor l'obre quan toca."
+  },
+  {
+   "id": "b20",
+   "scene": "My formative assessment",
    "en": "On the right, your score in each learning path. Click it to see the details: every tab, its criterion, and your teacher's corrections.",
-   "ca": "A la dreta, la teva puntuació a cada learning path. Clica-la per veure'n el detall: cada pestanya, el seu criteri i les correccions del professor."},
-  {"id": "b21", "scene": "My LS mark so far",
+   "ca": "A la dreta, la teva puntuació a cada learning path. Clica-la per veure'n el detall: cada pestanya, el seu criteri i les correccions del professor."
+  },
+  {
+   "id": "b21",
+   "scene": "My LS mark so far",
    "en": "Below the table, My LS mark so far. It shows how your LS mark is made. Your daily work in the learning paths is forty percent, the exam is thirty-five, and the final product is twenty-five.",
-   "ca": "Sota la taula, La meva nota de la LS fins ara. Et mostra com es fa la nota de la LS. La feina diària als learning paths és el quaranta per cent, l'examen el trenta-cinc i el producte final el vint-i-cinc."},
-  {"id": "b22", "scene": "My LS mark so far",
+   "ca": "Sota la taula, La meva nota de la LS fins ara. Et mostra com es fa la nota de la LS. La feina diària als learning paths és el quaranta per cent, l'examen el trenta-cinc i el producte final el vint-i-cinc."
+  },
+  {
+   "id": "b22",
+   "scene": "My LS mark so far",
    "en": "So your daily work counts more than the exam! And every activity you have not done by its day counts zero. When you do it, your mark goes up again.",
-   "ca": "És a dir, la feina de cada dia compta més que l'examen! I cada activitat que no has fet quan tocava compta un zero. Quan la fas, la nota torna a pujar."},
-  {"id": "b23", "scene": "My LS mark so far",
+   "ca": "És a dir, la feina de cada dia compta més que l'examen! I cada activitat que no has fet quan tocava compta un zero. Quan la fas, la nota torna a pujar."
+  },
+  {
+   "id": "b23",
+   "scene": "My LS mark so far",
    "en": "Your daily work has these parts: remembering vocabulary and grammar, practising them, and the biggest part, listening, reading, speaking and writing. Then, other competences, and each one says which learning path it comes from.",
-   "ca": "La feina diària té aquestes parts: recordar el vocabulari i la gramàtica, practicar-los i, la part més gran, escoltar, llegir, parlar i escriure. Després, altres competències, i cadascuna diu de quin learning path surt."},
-  {"id": "b24", "scene": "My LS mark so far",
+   "ca": "La feina diària té aquestes parts: recordar el vocabulari i la gramàtica, practicar-los i, la part més gran, escoltar, llegir, parlar i escriure. Després, altres competències, i cadascuna diu de quin learning path surt."
+  },
+  {
+   "id": "b24",
+   "scene": "My LS mark so far",
    "en": "The exam and the final product say not yet until they are marked. At the bottom, your LS mark so far. It changes every day with your work.",
-   "ca": "L'examen i el producte final diuen encara no fins que estan corregits. A baix de tot, la teva nota de la LS fins ara. Canvia cada dia amb la teva feina."},
-  {"id": "b25", "scene": "My LS mark so far",
+   "ca": "L'examen i el producte final diuen encara no fins que estan corregits. A baix de tot, la teva nota de la LS fins ara. Canvia cada dia amb la teva feina."
+  },
+  {
+   "id": "b25",
+   "scene": "My LS mark so far",
    "en": "Finally, My criteria: every criterion of the LS, what it means in simple words, and your mark in it. Tap a code to read the official text.",
-   "ca": "Finalment, Els meus criteris: cada criteri de la LS, què vol dir en paraules senzilles i la teva nota. Toca un codi per llegir-ne el text oficial."},
-  {"id": "b26", "scene": "My final product",
+   "ca": "Finalment, Els meus criteris: cada criteri de la LS, què vol dir en paraules senzilles i la teva nota. Toca un codi per llegir-ne el text oficial."
+  },
+  {
+   "id": "b26",
+   "scene": "My final product",
    "en": "The third card is My final product. It is twenty-five percent of your LS mark. You see the day it is due, a button to open it, and the rubric.",
-   "ca": "La tercera targeta és El meu producte final. És el vint-i-cinc per cent de la nota de la LS. Hi veus el dia d'entrega, un botó per obrir-lo i la rúbrica."},
-  {"id": "b27", "scene": "My final product",
+   "ca": "La tercera targeta és El meu producte final. És el vint-i-cinc per cent de la nota de la LS. Hi veus el dia d'entrega, un botó per obrir-lo i la rúbrica."
+  },
+  {
+   "id": "b27",
+   "scene": "My final product",
    "en": "When your teacher has marked it, your mark appears here, with your teacher's feedback. This is an example: seven point eight out of ten.",
-   "ca": "Quan el professor l'ha corregit, aquí hi apareix la nota, amb el feedback del professor. Això és un exemple: set i mig sobre deu."},
-  {"id": "b28", "scene": "My final product",
+   "ca": "Quan el professor l'ha corregit, aquí hi apareix la nota, amb el feedback del professor. Això és un exemple: set i mig sobre deu."
+  },
+  {
+   "id": "b28",
+   "scene": "My final product",
    "en": "The steps show what you have handed in, your self-assessment, and your teacher's answers. Click Review to look at a step again.",
-   "ca": "Els passos mostren què has entregat, la teva autoavaluació i les respostes del professor. Clica Revisa per tornar a mirar un pas."},
-  {"id": "b29", "scene": "My final product",
+   "ca": "Els passos mostren què has entregat, la teva autoavaluació i les respostes del professor. Clica Revisa per tornar a mirar un pas."
+  },
+  {
+   "id": "b29",
+   "scene": "My final product",
    "en": "How it is marked lists the parts of the rubric, and how much each one counts in your LS mark.",
-   "ca": "Com es corregeix et mostra les parts de la rúbrica i quant compta cadascuna a la nota de la LS."},
-  {"id": "b30", "scene": "My exams",
+   "ca": "Com es corregeix et mostra les parts de la rúbrica i quant compta cadascuna a la nota de la LS."
+  },
+  {
+   "id": "b30",
+   "scene": "My exams",
    "en": "The last card is My exams. Let's open the report of the LS1 exam. In LS1, the LS grade was the exam, seventy-five percent, and the final product, twenty-five. You also see which exam version you did.",
-   "ca": "L'última targeta és Els meus exàmens. Obrim l'informe de l'examen de la LS1. A la LS1, la nota era l'examen, el setanta-cinc per cent, i el producte final, el vint-i-cinc. També hi veus quina versió de l'examen vas fer."},
-  {"id": "b31", "scene": "My exams",
+   "ca": "L'última targeta és Els meus exàmens. Obrim l'informe de l'examen de la LS1. A la LS1, la nota era l'examen, el setanta-cinc per cent, i el producte final, el vint-i-cinc. També hi veus quina versió de l'examen vas fer."
+  },
+  {
+   "id": "b31",
+   "scene": "My exams",
    "en": "Part one: your results in each part of the exam, with its criterion.",
-   "ca": "Part u: els resultats de cada apartat de l'examen, amb el seu criteri."},
-  {"id": "b32", "scene": "My exams",
+   "ca": "Part u: els resultats de cada apartat de l'examen, amb el seu criteri."
+  },
+  {
+   "id": "b32",
+   "scene": "My exams",
    "en": "Part two: your exam by criteria, with a mark out of ten for each criterion, and the parts of the exam it comes from.",
-   "ca": "Part dos: l'examen per criteris, amb una nota sobre deu per a cada criteri, i els apartats de l'examen d'on surt."},
-  {"id": "b33", "scene": "My exams",
+   "ca": "Part dos: l'examen per criteris, amb una nota sobre deu per a cada criteri, i els apartats de l'examen d'on surt."
+  },
+  {
+   "id": "b33",
+   "scene": "My exams",
    "en": "Part three: questions to review. These are the questions where you lost points: your answer, the right answer, why, and a button to review that learning path.",
-   "ca": "Part tres: preguntes que cal revisar. Són les preguntes on has perdut punts: la teva resposta, la correcta, per què, i un botó per repassar aquell learning path."},
-  {"id": "b34", "scene": "My exams",
+   "ca": "Part tres: preguntes que cal revisar. Són les preguntes on has perdut punts: la teva resposta, la correcta, per què, i un botó per repassar aquell learning path."
+  },
+  {
+   "id": "b34",
+   "scene": "My exams",
    "en": "Part four: your writing. It is marked on four rows. Each row has four levels, from four out of four, Excellent, to one out of four, Not enough. Your level is the one in blue.",
-   "ca": "Part quatre: el teu writing. Es corregeix amb quatre criteris. Cadascun té quatre nivells, del quatre sobre quatre, Excel·lent, a l'u sobre quatre, Insuficient. El teu nivell és el blau."},
-  {"id": "b35", "scene": "My exams",
+   "ca": "Part quatre: el teu writing. Es corregeix amb quatre criteris. Cadascun té quatre nivells, del quatre sobre quatre, Excel·lent, a l'u sobre quatre, Insuficient. El teu nivell és el blau."
+  },
+  {
+   "id": "b35",
+   "scene": "My exams",
    "en": "Under each row, its weight: how much it counts in your writing, and the points your level gives you. It also tells you which of your mistakes belong to that row.",
-   "ca": "Sota cada criteri, el seu pes: quant compta al writing i quants punts et dona el teu nivell. També et diu quines de les teves errades són d'aquell criteri."},
-  {"id": "b36", "scene": "My exams",
+   "ca": "Sota cada criteri, el seu pes: quant compta al writing i quants punts et dona el teu nivell. També et diu quines de les teves errades són d'aquell criteri."
+  },
+  {
+   "id": "b36",
+   "scene": "My exams",
    "en": "Then, your teacher's comment, and a table with each mistake, its correction, and why.",
-   "ca": "Després, el comentari del professor i una taula amb cada errada, la correcció i per què."},
-  {"id": "b37", "scene": "My exams",
+   "ca": "Després, el comentari del professor i una taula amb cada errada, la correcció i per què."
+  },
+  {
+   "id": "b37",
+   "scene": "My exams",
    "en": "And your text, next to your text corrected, with the changes in green.",
-   "ca": "I el teu text, al costat del teu text corregit, amb els canvis en verd."},
-  {"id": "b38", "scene": "My exams",
+   "ca": "I el teu text, al costat del teu text corregit, amb els canvis en verd."
+  },
+  {
+   "id": "b38",
+   "scene": "My exams",
    "en": "Part five tells you what to review, with a button to each learning path.",
-   "ca": "La part cinc et diu què has de repassar, amb un botó a cada learning path."},
-  {"id": "b39", "scene": "My exams",
+   "ca": "La part cinc et diu què has de repassar, amb un botó a cada learning path."
+  },
+  {
+   "id": "b39",
+   "scene": "My exams",
    "en": "For LS2, your exam results will appear on this card when your teacher has marked the exam.",
-   "ca": "De la LS2, els resultats de l'examen apareixeran en aquesta targeta quan el professor l'hagi corregit."},
-  {"id": "b40", "scene": "That's your board",
+   "ca": "De la LS2, els resultats de l'examen apareixeran en aquesta targeta quan el professor l'hagi corregit."
+  },
+  {
+   "id": "b40",
+   "scene": "That's your board",
    "en": "That's your board! Check it often, do your learning paths every day, and your mark will show it. See you in class!",
-   "ca": "Aquest és el teu tauler! Mira'l sovint, fes els learning paths cada dia, i la nota ho notarà. Ens veiem a classe!"}
+   "ca": "Aquest és el teu tauler! Mira'l sovint, fes els learning paths cada dia, i la nota ho notarà. Ens veiem a classe!"
+  }
  ]
 }

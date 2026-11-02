@@ -72,7 +72,7 @@ function en(phase) {
     demo: {
       me: { name: 'Alex Sample', group: G }, rs, lv: { [LS2]: { level: 'safe', by: 'teacher' }, [LS1]: { level: 'safe', by: 'teacher' } },
       pg: { [LS2]: pg, [LS1]: {} },
-      ls: { [LS1]: { status: 'closed' }, [LS2]: { status: 'open', open: { [G]: open } }, '2eso-my-real-routine': { status: 'hidden' }, '2eso-free-time-live': { status: 'hidden' } },
+      ls: { [LS1]: { status: 'closed' }, [LS2]: { status: 'open', open: { [G]: open }, push: end ? {} : { [G]: { a: P('write-to-the-head-teacher'), p: 'read', pn: 'Reading', t: 'LP6 Write to the head teacher', at: DAY('2026-11-16', 9) } } }, '2eso-my-real-routine': { status: 'hidden' }, '2eso-free-time-live': { status: 'hidden' } },
       pt: { t1: 18, t2: 6 }, tm: { best: { t1: 24, t2: 9 }, bestOk: { t1: 24, t2: 9 } },
       ann: [{ id: 'a1', text: 'Remember: the LS2 exam is on Monday 23 November. Do the Sample exam learning path to prepare!', created: DAY('2026-11-13', 12), read: {} }],
     },
@@ -167,7 +167,7 @@ function ca(phase) {
     demo: {
       me: { name: 'Pau Exemple', group: G }, rs, lv: { [LS2]: { level: 'insecure', by: 'teacher' }, [LS1]: { level: 'insecure', by: 'teacher' } },
       pg: { [LS2]: pg, [LS1]: {} },
-      ls: { [LS1]: { status: 'closed' }, [LS2]: { status: 'open', open: { [G]: open } }, '4eso-my-real-routine': { status: 'hidden' }, '4eso-seasons-and-celebrations': { status: 'hidden' } },
+      ls: { [LS1]: { status: 'closed' }, [LS2]: { status: 'open', open: { [G]: open }, push: end ? {} : { [G]: { a: P('likes-and-screen-tips'), p: 'listen', pn: 'Listening', t: 'LP5 Likes and screen tips', at: DAY('2026-11-16', 9) } } }, '4eso-my-real-routine': { status: 'hidden' }, '4eso-seasons-and-celebrations': { status: 'hidden' } },
       pt: { t1: 15, t2: 5 }, tm: { best: { t1: 21, t2: 8 }, bestOk: { t1: 21, t2: 8 } },
       ann: [{ id: 'a1', text: "Recordeu: l'examen de la LS2 és el divendres 20 de novembre. Feu el learning path Sample exam per preparar-lo!", created: DAY('2026-11-13', 12), read: {} }],
     },

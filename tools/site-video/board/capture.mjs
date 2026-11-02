@@ -64,7 +64,7 @@ for (const S of STATES) {
     const R = (el) => { const r = el.getBoundingClientRect(); return [Math.round(r.left + scrollX), Math.round(r.top + scrollY), Math.round(r.width), Math.round(r.height)] };
     const out = {}, add = (k, el) => { if (el) out[k] = R(el) };
     const q = (s) => document.querySelector(s), qa = (s) => [...document.querySelectorAll(s)];
-    add('h1', q('h1')); add('sub', q('#sub'));
+    add('h1', q('h1')); add('sub', q('#sub')); add('pull', q('.pullcard')); add('pullgo', q('.pullcard .pc-go'));
     add('ann', q('.box.ann')); add('points', q('#ptbox .box')); add('work', q('.box.work')); add('workbar', q('.box.work .wkgrid'));
     add('workmiss', q('.box.work .ptmiss')); add('howto', qa('#note .pend').find((x) => /🎬/.test(x.textContent)));
     add('late', q('.pend.late')); add('ptno', q('#ptbox .ptno')); add('ptmissbox', q('#ptbox .ptmiss'));
