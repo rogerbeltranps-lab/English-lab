@@ -488,15 +488,15 @@ var LS2 = (function () {
       $('[data-say-slow="' + p.id + i + '"]').onclick = () => say(c, 0.6);
       $('#' + p.id + 'D' + i).value = kept[i] || '';
     });
-    $('#' + p.id + 'DCheck').onclick = () => {
-      state.dict[p.id] = p.chunks.map((c, i) => {
+    // Checked answers come back with their feedback (Roger, 2 Nov 2026: students always see a path they did with its corrections).
+    const show = () => p.chunks.map((c, i) => {
         const v = $('#' + p.id + 'D' + i).value, ok = norm(v) === norm(c), f = $('#' + p.id + 'Df' + i);
         f.className = 'feedback ' + (ok ? 'ok' : 'no');
         f.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!') : (ca() ? 'Era: ' : 'It was: ') + '<strong>' + esc(c) + '</strong>' + (ca() ? '. Compara-ho paraula per paraula.' : '. Compare it word by word.');
         return v;
       });
-      save();
-    };
+    $('#' + p.id + 'DCheck').onclick = () => { state.dict[p.id] = show(); save(); };
+    if (kept.some(v => v)) show();
   }
   R.mc = p => ({
     html: '<div class="section-card">' + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
