@@ -38,7 +38,7 @@ window.EL_GRADING={
     const LP2="4eso/ls2-celebrations-around-the-world",LP3="4eso/ls2-where-traditions-come-from",LP4="4eso/ls2-research-it-right",
       LP5="4eso/ls2-plan-the-day",LP6="4eso/ls2-write-to-the-head-teacher",FP="4eso/ls2-celebration-day-proposal",CP=n=>"4eso/ls2-recall-checkpoint-"+n;
     return {
-      blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar and vocabulary",w:20},{id:"other",name:"Other competences",w:20}],
+      blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar, vocabulary and skills",w:35},{id:"other",name:"Other competences",w:5}],   // 2 Nov 2026 (Roger): daily work 40 %, shared by the amount of work (checkpoints a bit more: the only scored, uncopyable part)
       key:["4.1","4.2","2.2","3.2","5.1"],          // key competences (CE2–CE5): exam and final product
       other:["1.1","1.2","6.1","CC1 1.3","CC3 3.2"], // the 20 % block
       // Exam: a mark per section (score out of max) and the writing level. Exam mark = sum of scores / sum of maxes × 10.
@@ -72,11 +72,16 @@ window.EL_GRADING={
           2:{name:"Round 2 · Video, email and teamwork",note:"Steps 3–5 with the full email, teamwork received and the process, and a video sheet per group",answers:[[FP,"part"],[FP,"email",{rate:true}],[FP,"team"]],peers:"team",process:true}}},
       // Accuracy only from delayed retrieval (research audit, Roger 26 Oct 2026): first try of the four checkpoints and of the recall warm-ups
       // (they ask about earlier Learning Paths). Practice, grammar and mixed practice count only as done by the session deadline (EL_PLAN[ls].due).
+      // gv part weights are their % of the LS mark (they add up to the block weight, 35)
       gv:{parts:[
-        {id:"cp",name:"Recall checkpoints (first try)",w:50,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
-        {id:"warm",name:"Recall warm-ups (first try)",w:25,first:[[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
-        {id:"time",name:"Practice done on time",w:25,time:[[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],
-          [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"],[LP6,"register"]]}]},
+        {id:"cp",name:"Recall checkpoints (first try)",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
+        {id:"warm",name:"Recall warm-ups (first try)",w:2.5,first:[[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
+        {id:"time",name:"Practice done on time",w:7.5,time:[[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],
+          [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"],[LP6,"register"]]},
+        // Skills work (Roger, 2 Nov 2026: daily work = all the learning-path work): the reading, listening, speaking and writing tabs, done on time
+        {id:"skills",name:"Skills work done on time (reading, listening, speaking, writing)",w:15,time:[[LP2,"read"],[LP2,"log"],[LP2,"listen"],[LP2,"write"],[LP2,"speak"],
+          [LP3,"listen"],[LP3,"chart"],[LP3,"shadow"],[LP3,"write"],[LP3,"speak"],[LP3,"talk"],[LP4,"read"],[LP4,"sources"],[LP4,"again"],[LP4,"shadow"],[LP4,"talk"],
+          [LP5,"listen"],[LP5,"again"],[LP5,"shadow"],[LP5,"write"],[LP5,"speak"],[LP5,"talk"],[LP6,"read"],[LP6,"again"],[LP6,"shadow"],[LP6,"write"],[LP6,"speak"],[LP6,"talk"]]}]},
       // Other competences: per criterion, half automatic (linked steps done; first:true = counts its first-try score) and half teacher levels (average).
       auto:{
         "1.1":[[LP2,"speak"]],
@@ -127,7 +132,7 @@ window.EL_GRADING={
     const LP2="2eso/ls2-what-are-they-doing",LP3="2eso/ls2-now-or-usually",LP4="2eso/ls2-check-the-source",
       LP5="2eso/ls2-likes-and-screen-tips",LP6="2eso/ls2-write-your-vlog-script",FP="2eso/ls2-free-time-vlog",CP=n=>"2eso/ls2-recall-checkpoint-"+n;
     return {
-      blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar and vocabulary",w:20},{id:"other",name:"Other competences",w:20}],
+      blocks:[{id:"exam",name:"Final exam",w:35},{id:"fp",name:"Final product",w:25},{id:"gv",name:"Grammar, vocabulary and skills",w:35},{id:"other",name:"Other competences",w:5}],   // 2 Nov 2026 (Roger): daily work 40 %, shared by the amount of work (checkpoints a bit more: the only scored, uncopyable part)
       key:["4.1","4.2","2.2","3.2","5.1"],      // key competences (CE2–CE5): exam and final product
       other:["6.2","CD2 2.2","CD4 4.5"],        // the 20 % block
       exam:{sections:[["listening","Listening",20,["2.2"]],["reading","Reading",20,["4.1"]],["vocabulary","Vocabulary",15,["4.1","5.1"]],["grammar","Grammar",15,["4.1","5.1"]],["writing","Writing",30,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},   // points of the real exam, /100 (grading.md, 25 Oct 2026)
@@ -149,11 +154,16 @@ window.EL_GRADING={
       marking:{rubric:"2eso/free-time-live/final-rubric-data.js",process:["prep","source","slides","script","edit","tips"],afterDue:["tips"],
         rounds:{1:{name:"Round 1 · Source and fact file",note:"Fact file and steps 0–2: My source and My fact file, per student",answers:[[LP4,"factfile"],[FP,"prep"],[FP,"source"],[FP,"slides"]]},
           2:{name:"Round 2 · Vlog, script, editing and tip",note:"Steps 3–5 with the full script, the editing log and the tip, plus the process; the video is watched on Classroom",answers:[[FP,"script",{rate:true}],[FP,"edit",{rate:true}],[FP,"tips"]],process:true}}},
+      // gv part weights are their % of the LS mark (they add up to the block weight, 35)
       gv:{parts:[
-        {id:"cp",name:"Recall checkpoints (first try)",w:50,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
-        {id:"warm",name:"Recall warm-ups (first try)",w:25,first:[[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
-        {id:"time",name:"Practice done on time",w:25,time:[[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"practice"],
-          [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"]]}]},
+        {id:"cp",name:"Recall checkpoints (first try)",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
+        {id:"warm",name:"Recall warm-ups (first try)",w:2.5,first:[[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
+        {id:"time",name:"Practice done on time",w:7.5,time:[[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"practice"],
+          [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"]]},
+        // Skills work (Roger, 2 Nov 2026, as in 4ESO LS2): the reading, listening, speaking and writing tabs, done on time
+        {id:"skills",name:"Skills work done on time (reading, listening, speaking, writing)",w:15,time:[[LP2,"read"],[LP2,"log"],[LP2,"listen"],[LP2,"again"],[LP2,"shadow"],[LP2,"write"],[LP2,"speak"],[LP2,"talk"],
+          [LP3,"listen"],[LP3,"chart"],[LP3,"shadow"],[LP3,"write"],[LP3,"speak"],[LP3,"talk"],[LP4,"read"],[LP4,"sources"],[LP4,"again"],[LP4,"shadow"],[LP4,"talk"],
+          [LP5,"listen"],[LP5,"again"],[LP5,"shadow"],[LP5,"write"],[LP5,"speak"],[LP5,"talk"],[LP6,"read"],[LP6,"parts"],[LP6,"again"],[LP6,"shadow"],[LP6,"write"],[LP6,"speak"],[LP6,"talk"]]}]},
       auto:{
         "6.2":[[LP4,"credit",1],[LP4,"factfile"]],
         "CD2 2.2":[[FP,"slides"],[FP,"edit"]],
