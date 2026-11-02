@@ -189,7 +189,7 @@ function lsCard(lss,ls,st,stTag){const tab=tabOf(ls),st2=l=>{const s=(D.ls[l.id]
 function examSub(ls){const x=(D.rs[ls.id+"/assessment"]||{}).sections||{};return Object.values(x).some(y=>y&&y.score!=null)?t("resultats i informe","results and report"):t("encara no hi ha resultats","no results yet")}
 function tabBody(ls,list,info){const tab=tabOf(ls);
   if(tab==="week")return `<div class="tabbody">${studyBox(ls)+practiceBox(ls)+weekBox(ls,info)||`<p class="muted">${t("Aquesta LS no té pla setmanal.","This LS has no week plan.")}</p>`}</div>`;
-  if(tab==="exam")return `<div class="tabbody t-exam">${AS?progressBox(ls)+lpStatus(ls,list,info):""}${examView(ls)}</div>`;
+  if(tab==="exam")return `<div class="tabbody t-exam">${AS?progressBox(ls):""}${examView(ls)}</div>`;
   return `<div class="tabbody t-form"><div class="fhead"><h2>📈 ${t("La meva avaluació formativa","My formative assessment")} <small>· ${lsName(ls)}</small></h2><p>${t("Totes les activitats dels learning paths, el que has fet i la teva puntuació. Mira-ho sovint: és la teva feina de cada dia.","All the learning-path activities, what you have done and your score. Check it often: it is your everyday work.")}</p></div>`+lpStatus(ls,list,info)+progressBox(ls)
     +(only(ls.id)?onlyForm(ls.id)
       :`<div class="tabs"><button class="tab ${S.view==="lp"?"on":""}" data-do="view" data-v="lp">Learning paths</button><button class="tab ${S.view==="sum"?"on":""}" data-do="view" data-v="sum">${t("Resum dels meus criteris","Summary of my criteria")}</button></div>`
