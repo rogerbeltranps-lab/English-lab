@@ -176,6 +176,22 @@ window.elSecLockedFor=function(a,info,gid,done){const op=secOf(info,"secOpened",
 // or was opened before, holds steps and has some not done. Returns [[panel id, name]].
 window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk))return [];const op=secOf(info,"secOpened",gid,a)||[];
   return ((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>(!lk.includes(id)||op.includes(id))&&elSecSteps(a,id).length&&!secDone(a,id,done))};
+// Pull up a learning path (Roger, 2 Nov 2026: "students find it difficult to find the learning path … I go to the LS and pull it up for the
+// A or B group"): the teacher puts one learning path (and maybe one of its tabs) on a group's screens from the dashboard, the Time plan or
+// the learning path page in teacher mode. ls/{id}.push[group] = {a: activity id, p: panel id or "", pn: tab name, t: label "LP3 …", at: ms}
+// or null (taken down). Students get a big "Open it" card on their board and a bar on every page of that LS. The newest one counts, while
+// its learning path is open for the group, and for EL_PULL_DAYS days at most. infos = {lsId: ls info} (lsInfo in el-cloud.js).
+window.EL_PULL_DAYS=7;
+window.elPullFor=function(infos,gid){let best=null;
+  for(const [ls,info] of Object.entries(infos||{})){const x=info&&info.push&&info.push[gid];if(!x||!x.a||!x.at||Date.now()-x.at>EL_PULL_DAYS*864e5)continue;
+    const a=(window.EL_CATALOG||[]).find(y=>y.id===x.a),l=(window.EL_LS||[]).find(y=>y.id===ls);
+    if(!a||(info.status||"hidden")==="hidden"||!elLsForGroup(l,info,gid)||!elLpOpen(a,info,gid))continue;
+    if(!best||x.at>best.at)best=Object.assign({ls,act:a},x)}
+  return best};
+// "LP3 Where traditions come from": the number the time plan gives the learning path (EL_PLAN text "LP3 Where traditions …"), else its short title.
+window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh(a.title),lo=st.toLowerCase(),p=(window.EL_PLAN||{})[a.ls];let n=null;
+  if(p)(p.rows||[]).forEach(r=>[].concat(r.g||r.what||[]).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,k,nm)=>{nm=nm.trim().toLowerCase();if(!n&&nm&&(lo.startsWith(nm)||nm.startsWith(lo)))n=k}));
+  return (n?"LP"+n+" ":"")+st};
 window.elLpLocks=function(ls,open){const shut=(window.EL_CATALOG||[]).filter(a=>a.ls===ls&&!open.includes(a.id));
   return {locked:shut.map(a=>a.id),lockedKeys:shut.flatMap(a=>a.keys.flatMap(k=>[k,k+"Level"]))}};
 // Recall checkpoints open the way (Roger, 26 Oct 2026): an activity that comes after a checkpoint in its LS (catalogue order = LS page
