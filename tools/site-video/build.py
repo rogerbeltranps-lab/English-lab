@@ -5,6 +5,8 @@ No subtitles: one video in English and one in Catalan (Roger, 31 Oct 2026), so t
 
 Usage: python3 tools/site-video/build.py OUT.mp4 [--set teacher] [--lang ca] [--voice DIR] [--stills DIR]
   --set teacher: the teacher video (script-teacher.json, shots-teacher.json, voice-teacher; dashboard screens from teacher-demo.mjs)
+  --set board: "Your student board" (board/: script.json, shots.json with named boxes, screens from board/capture.mjs in board/captures,
+               voice in board/voice-en or board/voice-ca); English and Catalan describe two different sample boards
   --lang ca: the Catalan version (Catalan text and cards; a shot's "on_ca" word, else the same place in the line as its "on")
   --voice: folder of the mp3s next to this file (default voice for English, voice-ca for Catalan)
   --stills: one picture per shot, to check the framing
@@ -22,7 +24,9 @@ def arg(name, default=None):
 LANG = arg('--lang', 'en')
 SET = arg('--set', 'students')
 TEACH = SET == 'teacher'
-VOICE = os.path.join(HERE, arg('--voice', 'voice-teacher' if TEACH else 'voice' if LANG == 'en' else 'voice-ca'))
+BOARD = SET == 'board'
+if BOARD: CAP = os.path.join(HERE, 'board', 'captures')
+VOICE = os.path.join(HERE, arg('--voice', os.path.join('board', 'voice-' + LANG) if BOARD else 'voice-teacher' if TEACH else 'voice' if LANG == 'en' else 'voice-ca'))
 W, H, FPS = 1280, 720, 30
 T = {'accent': '#30578c', 'ink': '#181e2f', 'title': '#253b66', 'muted': '#626f82', 'bg1': '#eef3fd', 'bg2': '#f6f8fd', 'soft': '#e3ebf8'}
 HL = (245, 158, 11)                     # highlight frame colour (amber)
@@ -30,13 +34,32 @@ FONTS = '/usr/share/fonts/opentype/inter/'
 def font(w, s): return ImageFont.truetype(FONTS + {'r': 'Inter-Regular', 'm': 'Inter-Medium', 's': 'Inter-SemiBold', 'b': 'Inter-Bold', 'x': 'Inter-ExtraBold'}[w] + '.otf', s)
 def rgb(h): return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
 
-script = json.load(open(os.path.join(HERE, 'script-teacher.json' if TEACH else 'script.json')))
-shots = json.load(open(os.path.join(HERE, 'shots-teacher.json' if TEACH else 'shots.json')))
+script = json.load(open(os.path.join(HERE, 'board/script.json' if BOARD else 'script-teacher.json' if TEACH else 'script.json')))
+shots = json.load(open(os.path.join(HERE, 'board/shots.json' if BOARD else 'shots-teacher.json' if TEACH else 'shots.json')))
+if BOARD:   # named boxes → pixels of this language's pictures (board/captures/<lang>-boxes.json, written by board/capture.mjs)
+    BOX = json.load(open(os.path.join(CAP, LANG + '-boxes.json')))
+    def _box(state, names):
+        bs = [BOX[state][n] for n in names.split('+')]
+        x0, y0 = min(b[0] for b in bs), min(b[1] for b in bs); x1, y1 = max(b[0] + b[2] for b in bs), max(b[1] + b[3] for b in bs)
+        return [x0, y0, x1 - x0, y1 - y0]
+    def _shot(s):
+        if s['img'] == 'card': return {'img': 'card:' + json.dumps(s['card'][LANG])}
+        o = {'img': f"{LANG}-{s['img']}.png"}
+        for k in ('view', 'hl', 'from'):
+            if s.get(k): o[k] = _box(s['img'], s[k])
+        if s.get('top') and o.get('view'):   # the top of a tall box, full 16:9
+            x, y, w, h = o['view']; o['view'] = [x - 24, y - 24, w + 48, (w + 48) * 9 / 16]
+        if 'margin' in s: o['margin'] = s['margin']
+        if s.get('on'): o['on'], o['on_ca'] = s['on']['en'], s['on']['ca']
+        return o
+    shots = {k: [_shot(s) for s in v] for k, v in shots.items() if not k.startswith('_')}
 GAP, CARD, TITLE, END = 0.55, 1.7, 3.2, 1.2
 SCENE_CA = {'Sign in': 'Entrar', 'Your board': 'El teu tauler', 'Your route': 'La teva ruta', 'Your week': 'La teva setmana',
             'Learning paths': 'Els learning paths', 'The menu': 'El menú', 'A Learning Situation': 'Una Learning Situation',
             'A learning path': 'Un learning path', 'Checkpoints': 'Checkpoints i activitats tancades', 'Problems': 'Si alguna cosa falla',
-            'English Lab': 'Pràctica extra'}
+            'English Lab': 'Pràctica extra', 'The top of your board': 'La part de dalt del tauler', 'Your Learning Situations': 'Les teves Learning Situations',
+            'My week': 'La meva setmana', 'My formative assessment': 'La meva avaluació formativa', 'My LS mark so far': 'La meva nota de la LS fins ara',
+            'My final product': 'El meu producte final', 'My exams': 'Els meus exàmens', "That's your board": 'Aquest és el teu tauler'}
 
 # ---------- backgrounds and cards ----------
 def gradient():
@@ -58,7 +81,7 @@ def brand(d):
     d.rounded_rectangle((56, 36, 92, 72), 9, fill=rgb(T['accent']))
     d.polygon([(68, 45), (82, 54), (68, 63)], fill='white')
     d.text((106, 41), 'English Lab', font=font('b', 21), fill=rgb(T['title']))
-    tag = 'For teachers' if TEACH else 'Com funciona la web' if LANG == 'ca' else 'How the website works'
+    tag = 'For teachers' if TEACH else ('El teu tauler' if LANG == 'ca' else 'Your student board') if BOARD else 'Com funciona la web' if LANG == 'ca' else 'How the website works'
     d.text((W - 56 - d.textlength(tag, font=font('s', 16)), 45), tag, font=font('s', 16), fill=rgb(T['muted']))
 
 def card(lines, sub=None, big=56, chip=None, items=None):
@@ -191,7 +214,8 @@ def dur(path):
 
 segs, t, last_scene = [], 0.0, None      # (start, length, kind, data)
 CA = LANG == 'ca'
-segs.append((t, TITLE, 'card', {'img': 'card:' + json.dumps({'lines': ['How the dashboard works' if TEACH else 'Com funciona English Lab' if CA else 'How English Lab works'], 'big': 58,
+TITLE_TXT = (['El teu tauler'] if CA else ['Your student board']) if BOARD else ['How the dashboard works' if TEACH else 'Com funciona English Lab' if CA else 'How English Lab works']
+segs.append((t, TITLE, 'card', {'img': 'card:' + json.dumps({'lines': TITLE_TXT, 'big': 58, 'sub': ('Les meves activitats, part per part' if CA else 'My activities, part by part') if BOARD else None,
                                                              'chip': 'English Lab · for teachers' if TEACH else "English Lab · 2n i 4t d'ESO" if CA else 'English Lab · 2 ESO and 4 ESO'})}))
 t += TITLE
 scenes = []
