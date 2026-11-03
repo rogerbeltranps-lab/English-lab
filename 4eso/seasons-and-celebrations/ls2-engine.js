@@ -266,20 +266,72 @@ var LS2 = (function () {
   // until they press "Do it again" next to Check. A restore shows the feedback again without counting a try.
   // Answers not checked yet stay too (state.typing[id_route], saved as the student types or chooses), so leaving the page for a
   // presentation or a game loses nothing (problem report, 26 Oct 2026).
-  function keep(id, prefix, v) { state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => k.startsWith(prefix))) }; if (state.typing) delete state.typing[id + '_' + level]; save(); }
-  function kept(id) { const a = state.ans && state.ans[id]; if (a) Object.assign(tries, a.tries || {}); return a ? a.v : null; }
-  function forget(id, prefix) { if (state.ans) delete state.ans[id]; if (state.typing) delete state.typing[id + '_' + level]; Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
+  /* Answers follow a level change (Roger, 3 Nov 2026: "si faig un canvi de nivell a mig LP l'alumne ha de guardar les activitats que hagi fet").
+     Each route sees its own list of questions (cumulative r: tags, only:, a list per route), so answers saved by position landed on other
+     questions after the teacher changed the level (a Base grammar step done 9 / 9 showed 6 / 17 with three "Not yet" at Core). state.ans[id]
+     now keeps the route (l) and each question (q: its id or text); a restore at another route puts every answer back on the same question and
+     leaves the route's new questions empty. done, doneAt and the first try never change, so the step stays done and keeps its mark.
+     Answers saved before this (no q) are placed with the route of their check (last / tries .level); with no route known, they are only
+     shown when the list has the same length. Answers not checked yet (state.typing[id_route]) are carried in the same way. */
+  const qid = it => String(it && (it.id || it.q) || '');
+  const atLevel = (L, fn) => { const was = level; level = L; try { return fn(); } finally { level = was; } };
+  function checkLevel(id) {   // the route of the latest check of a step, for answers saved without one
+    const L = state.last || {}, T = state.tries || {}, k = id === 'vocab' ? 'practice' : id, x = L[k] || T[k];
+    if (x && x.level) return x.level;
+    const rs = ROUTES.filter(r => L[id + '_' + r] || T[id + '_' + r]), d = r => ((L[id + '_' + r] || T[id + '_' + r]).date || '');
+    return rs.sort((a, b) => d(b) > d(a) ? 1 : -1)[0] || null;
+  }
+  // moves v (answers in the order of the questions `from`) onto `items`; tr: tries keyed prefix + position. null when no question is shared.
+  function moveTo(items, from, v, prefix, tr) {
+    const used = {}, pos = items.map(it => { const j = from.findIndex((x, n) => x === qid(it) && !used[n]); if (j >= 0) used[j] = 1; return j; });
+    if (!pos.some(j => j >= 0)) return null;
+    const out = { v: pos.map(j => j < 0 ? null : v[j]), tries: {}, same: pos.every((j, i) => j === i) && from.length === items.length };
+    Object.keys(tr || {}).forEach(k => { const m = k.slice(prefix.length).match(/^(\d+)(\D.*)?$/); if (!m || !k.startsWith(prefix)) return; const i = pos.indexOf(+m[1]); if (i >= 0) out.tries[prefix + i + (m[2] || '')] = tr[k]; });
+    return out;
+  }
+  const qsAt = (L, src) => src ? atLevel(L, () => forLevel(src)).map(qid) : null;
+  function keep(id, prefix, v, items) { state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => k.startsWith(prefix))), l: level, q: (items || []).map(qid) }; if (state.typing) delete state.typing[id + '_' + level]; save(); }
+  // the answers to show on this route ({v, moved}), with their tries, or null
+  function kept(id, prefix, items, src) {
+    const a = state.ans && state.ans[id]; if (!a || !Array.isArray(a.v)) return null;
+    const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
+    if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false }; }
+    const m = moveTo(items, from, a.v, prefix, a.tries); if (!m) return null;
+    Object.assign(tries, m.tries); return { v: m.v, moved: !m.same, fresh: m.v.some(x => x == null) };
+  }
+  // answers typed but not checked yet: this route's, else the fullest from another route, moved onto this route's questions
+  function typed(id, prefix, items, src) {
+    const T = state.typing || {}, own = T[id + '_' + level]; if (own) return own;
+    const n = v => (v || []).filter(x => x != null && x !== '').length;
+    const r = ROUTES.filter(x => x !== level && n(T[id + '_' + x])).sort((a, b) => n(T[id + '_' + b]) - n(T[id + '_' + a]))[0];
+    const m = r && src ? moveTo(items, qsAt(r, src), T[id + '_' + r], prefix) : null;
+    return m && n(m.v) ? m.v : null;
+  }
+  // a note under the result when the answers come from another level; a step already done stays done
+  function movedNote(id, fresh) {
+    const el = $('#' + id + 'Result'); if (!el) return;
+    const done = state.done[id === 'vocab' ? 'practice' : id];
+    if (done) el.textContent = el.textContent.replace(/ · (You need \d+ to complete the step\.|Necessites \d+ per completar el pas\.)/, ca() ? ' · Pas completat ✓' : ' · Step complete ✓');
+    if (done && !/✓/.test(el.textContent)) el.textContent += ca() ? ' · Pas completat ✓' : ' · Step complete ✓';
+    const p = document.createElement('span'); p.className = 'moved-note'; p.style.cssText = 'display:block;margin-top:6px;font-weight:400';
+    p.textContent = ca()
+      ? '🔁 Has canviat de nivell. Les respostes que ja havies fet hi són' + (done ? ' i aquest pas continua fet ✓.' + (fresh ? ' Les preguntes buides són noves del teu nivell: les pots fer per practicar.' : '') : '.' + (fresh ? ' Respon també les preguntes buides per completar el pas.' : ''))
+      : '🔁 Your level has changed. The answers you had already given are here' + (done ? ' and this step stays done ✓.' + (fresh ? ' The empty questions are new at your level: you can do them to practise.' : '') : '.' + (fresh ? ' Answer the empty questions too to complete the step.' : ''));
+    el.appendChild(p); el.classList.add('show');
+  }
+  function forget(id, prefix) { if (state.ans) delete state.ans[id]; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]);   /* every route's: typed() would bring another route's back */ Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
   const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + (ca() ? 'Torna-ho a fer' : 'Do it again') + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
   function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); syncPicks(); }
   function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
   // check(count): the step's own check; stays(id, prefix, listId, items, check) wires Check, Do it again and the restore.
-  function stays(id, prefix, listId, items, check) {
+  // src: the panel's whole list (p.items / p.practice), to place answers saved at another route
+  function stays(id, prefix, listId, items, check, src) {
     if (binding) binding.push([id, prefix]);   // the section's "Redo this section" clears it too (redoBar)
-    $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix)); };
+    $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix), items); };
     $('#' + id + 'Again').onclick = () => { forget(id, prefix); clearStep(id, listId); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
-    const v = kept(id), t = (state.typing || {})[id + '_' + level]; if (v) { fill(items, prefix, v); check(false); } else if (t) fill(items, prefix, t);
+    const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh); } else if (t) fill(items, prefix, t);
   }
 
   /* ---------- redo one section (Roger, 2 Nov 2026: "I want them to be able to repeat the sections individually, I don't want them
@@ -336,7 +388,7 @@ var LS2 = (function () {
         el.textContent = s + ' / ' + items.length + (ca() ? ' correctes · Pas completat ✓ Llegeix el feedback de les que has fallat.' : ' correct · Step complete ✓ Read the feedback for the ones you missed.');
         el.classList.add('show');
         if (count) complete(p.id);
-      });
+      }, p.items);
     }
   });
 
@@ -397,7 +449,7 @@ var LS2 = (function () {
       if (p.practice) {
         const items = forLevel(p.practice);
         $('#vocabPractice').innerHTML = typedHtml(items, 'vp', p.practiceMode); bindModes(items, 'vp', p.practiceMode);
-        stays('vocab', 'vp', 'vocabPractice', items, count => { const s = checkTyped(items, 'vp', false, count); if (count) { firstTry('practice', s, items.length); firstItems('vocab', p.practice, items, got); } const ok = s >= need(items.length); result($('#vocabResult'), s, items.length, ok); if (ok && count) complete('practice'); });
+        stays('vocab', 'vp', 'vocabPractice', items, count => { const s = checkTyped(items, 'vp', false, count); if (count) { firstTry('practice', s, items.length); firstItems('vocab', p.practice, items, got); } const ok = s >= need(items.length); result($('#vocabResult'), s, items.length, ok); if (ok && count) complete('practice'); }, p.practice);
       }
     }
   });
@@ -543,7 +595,7 @@ var LS2 = (function () {
         const ok = score >= need(items.length);
         result($('#' + p.id + 'Result'), score, items.length, ok);
         if (ok && count) complete(p.id);
-      });
+      }, p.items);
     }
   });
 
@@ -553,7 +605,7 @@ var LS2 = (function () {
     bind() {
       const items = forLevel(p.items);
       $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode); bindModes(items, p.id, p.mode);
-      stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = s >= need(items.length); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok && count) complete(p.id); });
+      stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = s >= need(items.length); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok && count) complete(p.id); }, p.items);
     }
   });
 
@@ -1120,7 +1172,7 @@ var LS2 = (function () {
         result($('#' + p.id + 'Result'), right, items.length, done, ' · ' + pts + ' / ' + ptsWord(maxOf(p)) + (ca() ? ' (primer intent: ' : ' (first try: ') + ((state.tries || {})[tk] || {}).score + ')');
         if (done && count) complete(p.id);
         if (LP.onScore) LP.onScore();
-      });
+      }, p.items);
     }
   });
   // An open task (for example the sample exam's email): the student writes, then ChatGPT gives feedback and an orientative mark
