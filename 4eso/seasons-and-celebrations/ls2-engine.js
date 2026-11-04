@@ -355,7 +355,8 @@ var LS2 = (function () {
       $('#vocabGroups').innerHTML = groups.map(g => '<article class="vocab-group"><h3>' + g.g + '</h3><div class="chips">' + g.items.map(x => '<span class="chip" tabindex="0">' + x[0] + '<span class="chip-tooltip"><b>' + x[1] + '</b>' + x[2] + '</span></span>').join('') + '</div></article>').join('');
       /* Catalan → English (research audit, Roger 26 Oct 2026): the card shows the Catalan, the student types (or says) the English, then turns it.
          It uses the core words of the panel (p.core: a list of English words, or one list per route) and, until the LS project marks them,
-         every word of the Learning Path. state.cardDir remembers the direction. */
+         every word of the Learning Path. state.cardDir remembers the direction.
+         English → Català (Roger, 3 Nov 2026) also has an optional box: type the meaning, Check and turn; lenient check (loose/oneEdit). */
       const dir = () => state.cardDir === 'ca' && level !== 'native' ? 'ca' : 'en';   // Native: word → meaning only
       const coreSet = () => { const c = p.core; if (!c) return null; const l = Array.isArray(c) ? c : forLevel(c); return l.length ? new Set(l.map(norm)) : null; };
       const deck = () => {
@@ -372,15 +373,26 @@ var LS2 = (function () {
         const c = dir() === 'ca';
         $$('.dir-toggle [data-dir]').forEach(b => { const on = b.dataset.dir === dir(); b.classList.toggle('secondary', !on); b.setAttribute('aria-pressed', on); });
         $('#cardHow').textContent = c ? (ca() ? 'Llegeix la paraula en català, escriu-la o digues-la en anglès i després gira la targeta per comprovar-ho.' : 'Read the Catalan, type or say the English, then turn the card to check.')
-          : (ca() ? 'Digues l’expressió en veu alta i intenta recordar què vol dir. Després gira la targeta.' : 'Say the expression aloud and try to remember its meaning. Then turn the card.');
+          : (ca() ? 'Digues l’expressió en veu alta i, si vols, escriu què vol dir en català. Després gira la targeta.' : level === 'native' ? 'Say the expression aloud and, if you want, type its meaning. Then turn the card.' : 'Say the expression aloud and, if you want, type what it means in Catalan. Then turn the card.');
         $('#cardBackLabel').textContent = c ? 'English + example' : level === 'native' ? 'Meaning + example' : 'Català + example';
-        $('#cardTypeRow').hidden = !c; $('#cardType').value = ''; $('#cardTypeMsg').textContent = '';
+        $('#cardTypeRow').hidden = false; $('#cardType').value = '';
+        $('#cardType').placeholder = c ? (ca() ? 'Escriu la paraula en anglès' : 'Type the English') : ca() ? 'Escriu què vol dir en català (opcional)' : level === 'native' ? 'Type the meaning (optional)' : 'Type the meaning in Catalan (optional)'; $('#cardTypeMsg').textContent = '';
       };
+      const loose = x => norm(String(x).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’‘·-]/g, ' '))
+        .split(' ').filter(w => w && !/^(el|la|l|els|les|lo|un|una|uns|unes|al|als|del|dels|d|de|the|a|an|to)$/.test(w)).join(' ');
+      const oneEdit = (a, b) => { if (Math.abs(a.length - b.length) > 1) return false; let i = 0, j = 0, d = 0;
+        while (i < a.length && j < b.length) { if (a[i] === b[j]) { i++; j++; continue; } if (++d > 1) return false; if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; } }
+        return d + (a.length - i) + (b.length - j) <= 1; };
       const typedCheck = () => {
         const card = flashcardSet.cards[flashcardSet.index]; if (!card) return;
-        const v = norm($('#cardType').value), ok = !!v && String(card[1]).split(/\s*[\/,;]\s*/).some(a => norm(a.replace(/\([^)]*\)/g, '')) === v || norm(a) === v);
-        $('#cardTypeMsg').className = 'feedback ' + (ok ? 'ok' : 'no');
-        $('#cardTypeMsg').textContent = !v ? (ca() ? 'Escriu-la o digues-la en veu alta i gira la targeta.' : 'Type it, or say it aloud and turn the card.') : ok ? (ca() ? 'Correcte! Tria «Ho sé».' : 'Correct! Choose “Got it”.') : (ca() ? 'Compara-la amb la targeta. Si no la sabies, tria «Un altre cop».' : 'Compare it with the card. If you didn’t know it, choose “Again”.');
+        const v = norm($('#cardType').value), alts = String(card[1]).split(/\s*[\/,;]\s*/);
+        let ok = !!v && alts.some(a => norm(a.replace(/\([^)]*\)/g, '')) === v || norm(a) === v), near = false;
+        if (v && !ok && dir() === 'en') {   // a meaning (Catalan) can be written in several ways: ignore accents, articles, brackets; one typo is "nearly"
+          const t = loose(v), cands = alts.flatMap(a => [a.replace(/\([^)]*\)/g, ''), ...(a.match(/\(([^)]*)\)/g) || []).map(x => x.slice(1, -1))]).map(loose).filter(Boolean);
+          ok = cands.includes(t); near = !ok && t.length >= 5 && cands.some(x => oneEdit(x, t));
+        }
+        $('#cardTypeMsg').className = 'feedback ' + (ok || near ? 'ok' : 'no');
+        $('#cardTypeMsg').textContent = !v ? (ca() ? 'Escriu-la o digues-la en veu alta i gira la targeta.' : 'Type it, or say it aloud and turn the card.') : ok ? (ca() ? 'Correcte! Tria «Ho sé».' : 'Correct! Choose “Got it”.') : near ? (ca() ? 'Gairebé! Mira com s’escriu a la targeta.' : 'Nearly! Check the spelling on the card.') : (ca() ? 'Compara-la amb la targeta. Si no la sabies, tria «Un altre cop».' : 'Compare it with the card. If you didn’t know it, choose “Again”.');
         $('#flashcard').classList.add('flipped');
       };
       $('#flashcard').onclick = () => $('#flashcard').classList.toggle('flipped');
