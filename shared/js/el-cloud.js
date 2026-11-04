@@ -556,6 +556,14 @@ function gamePush(u){
 // only the card and bar of pullBar remain. Each pull-up moves a browser once (localStorage el_go_<at>). Not from a recall checkpoint,
 // the sample exam or a class presentation followed live (?live=): there the bar of pullBar says where to go.
 const GO_MS=3*60e3;
+function tabBar(g){const lv=myLevel||homeLevel,ca=!lv||elCa(lv),old=document.getElementById("el-pull");if(old)old.remove();
+  const b=document.createElement("div");b.id="el-pull";
+  b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
+  const tx=document.createElement("span");tx.textContent="📌 "+(ca?"El professor és a la pestanya: ":"Your teacher is on the tab: ")+(g.pn||g.p)+(ca?". Acaba el que estàs fent i ves-hi.":". Finish what you are doing and go there.");
+  const go=document.createElement("button");go.textContent=(ca?"Ves-hi":"Go there")+" →";go.style.cssText="background:#fff;color:#0f766e;border:0;border-radius:999px;padding:6px 16px;font-weight:800;cursor:pointer";
+  go.onclick=()=>{const t=document.querySelector('.tab[data-panel="'+CSS.escape(g.p)+'"]');if(t)t.click();b.remove()};
+  const no=document.createElement("button");no.textContent="✕";no.style.cssText="border:0;background:none;color:#fff;font-size:18px;cursor:pointer";no.onclick=()=>b.remove();
+  b.append(tx,go,no);document.body.prepend(b)}
 function goTo(g,first){
   if(!g||!g.a||!g.at)return;const k="el_go_"+g.at;try{if(localStorage.getItem(k))return}catch(e){}
   if(first&&Math.abs(Date.now()-g.at)>GO_MS)return;   // an old pull-up already in the document when the page opened
@@ -564,7 +572,9 @@ function goTo(g,first){
   if(here&&(here.checkpoint||/sample-exam$/.test(here.id))||/[?&]live=/.test(location.search))return;
   try{origSet.call(localStorage,k,"1")}catch(e){}
   const url=new URL(a.path,ROOT);url.hash=g.p?g.p:"";
-  if(here&&here.id===a.id){if(g.p){const t=document.querySelector('.tab[data-panel="'+CSS.escape(g.p)+'"]');if(t)t.click()}return}
+  // already on that learning path (Roger, 3 Nov 2026: "if one is already there they don't get pulled"): nothing moves and nothing
+  // reloads, they stay in the section they are working on; when the teacher chose another tab, a bar offers to go to it
+  if(here&&here.id===a.id){const at=document.querySelector(".tab.active[data-panel]");if(g.p&&(!at||at.dataset.panel!==g.p))tabBar(g);return}
   const lv=myLevel||homeLevel,ca=!lv||elCa(lv),o=overlay('<div style="max-width:560px"><div style="font-size:48px">📌</div><h1></h1><p class="n" style="font-size:22px;font-weight:800"></p><p class="c"></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:12px 24px;text-decoration:none;font-weight:800"></a></p></div>');
   o.style.zIndex="2147483000";   // above the My week panel and the bottom bar
   o.querySelector("h1").textContent=ca?"El professor et porta a:":"Your teacher is taking you to:";
