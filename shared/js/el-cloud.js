@@ -181,7 +181,8 @@ function banner(text,color,btn){
 // next-section buttons and the video speed buttons still work).
 function freeze(){
   frozen=true;
-  const lock=()=>document.querySelectorAll("main input,main textarea,main select,main .opt,main [draggable],main .actions button:not([data-vs])").forEach(e=>{if(e.closest(".section-next"))return;e.disabled=true;e.style.pointerEvents="none"});
+  // the LS home page's tabs are radio buttons (.tab-radio): they keep working (Roger, 4 Nov 2026: student view, "I can't go to learning paths")
+  const lock=()=>document.querySelectorAll("main input:not(.tab-radio),main textarea,main select,main .opt,main [draggable],main .actions button:not([data-vs])").forEach(e=>{if(e.closest(".section-next"))return;e.disabled=true;e.style.pointerEvents="none"});
   lock();new MutationObserver(lock).observe(document.body,{childList:true,subtree:true});
 }
 function overlay(html){
@@ -786,8 +787,9 @@ onAuthStateChanged(auth,async u=>{
   if(u&&AS&&!onBoard&&!document.getElementById("el-corrections"))loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
     .then(()=>import("./el-corrections.js")).then(m=>m.corrections({here:actId,root:ROOT,en:repEn(),
       list:async()=>Object.values(await myResults(AS.uid)).filter(r=>r&&r.activity&&(r.replies||r.answers||r.levels)),
-      seen:async()=>((await myDoc(AS.uid))||{}).fbSeen||{},
-      save:()=>{},   // the student view never marks an answer as seen
+      // what the student has seen, plus what the teacher has already seen in this tab (el_as_seen): the card does not come back on every page
+      seen:async()=>{let t={};try{t=JSON.parse(sessionStorage.getItem("el_as_seen_"+AS.uid)||"{}")}catch(e){}return Object.assign({},((await myDoc(AS.uid))||{}).fbSeen||{},t)},
+      save:o=>{try{const t=JSON.parse(sessionStorage.getItem("el_as_seen_"+AS.uid)||"{}");sessionStorage.setItem("el_as_seen_"+AS.uid,JSON.stringify(Object.assign(t,o)))}catch(e){}},   // never the student's fbSeen
       name:(aid,step)=>{for(const g of Object.values(window.EL_GRADING||{})){const x=(g.moments||[]).find(m=>m.a===aid&&m.step===step);if(x)return x.name}return null}})).catch(e=>console.warn("corrections",e));
   if(u&&isStudent(u)&&!document.getElementById("el-corrections"))loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
     .then(()=>import("./el-corrections.js")).then(m=>m.corrections({here:actId,root:ROOT,en:repEn(),
