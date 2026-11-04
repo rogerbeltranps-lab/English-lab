@@ -138,6 +138,20 @@ window.elPoints=function(a,get){const g=get||(k=>localStorage.getItem(k));let n=
 // The saved result is used only when there is no progress, and always for the final product (the teacher's mark). → {score, max} or null.
 window.elScore=function(a,x,pg){if(a.manual||!a.graded||!pg||!a.keys.some(k=>pg[k]))return x?{score:x.score||0,max:x.max||a.points}:null;
   return {score:elPoints(a,k=>pg[k]||null),max:a.points}};
+// Steps the teacher has corrected (results/{activity}.replies[step]) that the progress does not mark as done (Roger, 4 Nov 2026: "he did it
+// but he sees that, why?"). Before 1 Nov a writing went to ChatGPT first and was done only once the final version was saved; many students
+// stopped after the draft, and the Wednesday run corrects drafts too (fbItems in el-marking.js). A corrected step counts as done, unless
+// the teacher sent it back to redo (flags[step].done = "redo"). → [step ids]
+window.elCorrected=function(a,r){const rp=(r&&r.replies)||{},fl=(r&&r.flags)||{};
+  return ((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>String(rp[k]||"").trim()&&!(fl[k]&&fl[k].done==="redo"))};
+// The same in a student's loaded progress, in memory only (nothing is saved): pg = {ls: {key: state JSON}}, rs = {activity id: result}.
+// Each corrected step gets done[step] and, when it has none, doneAt[step] = the day the text was first saved (draft or final version).
+window.elInjectCorrected=function(pg,rs){if(!pg||!rs)return;(window.EL_CATALOG||[]).forEach(a=>{if(a.manual||!a.keys||!a.keys.length)return;
+  const ks=elCorrected(a,rs[a.id]);if(!ks.length)return;const L=pg[a.ls];if(!L)return;let st;try{st=JSON.parse(L[a.keys[0]]||"{}")}catch(e){return}
+  let ch=false;ks.forEach(k=>{if((st.done||{})[k])return;(st.done=st.done||{})[k]=true;ch=true;
+    const at=[st.drafts,st.finals].flatMap(o=>Object.entries(o||{}).filter(([x])=>x===k||x.indexOf(k+"_")===0).map(([,v])=>v&&v.at)).filter(Boolean).sort()[0]||((st.steps||{})[k]||{}).date;
+    if(at)(st.doneAt=st.doneAt||{})[k]=(st.doneAt||{})[k]||at});
+  if(ch)L[a.keys[0]]=JSON.stringify(st)})};
 // Every step of a learning path done (Roger, 4 Nov 2026: "some students have that they did everything and that the bonus counts, however
 // this is not true"): the steps themselves (EL_ACTIONS without the not-scored ones), never the Submit or "Mark as done" flag, which a
 // student can press with 1 step of 10 done. done = Set of the student's done steps, r = results/{activity}; an activity with no steps

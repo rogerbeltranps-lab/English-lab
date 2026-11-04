@@ -105,6 +105,7 @@ async function load(u){
   else{await q(["students",sid,"results"],r=>D.rs[r.data().activity]=r.data());
   await q(["students",sid,"levels"],l=>D.lv[l.id]=l.data())}
   await q(["students",sid,"progress"],p=>D.pg[p.id]=p.data().data||{});
+  elInjectCorrected(D.pg,D.rs);   // steps the teacher corrected count as done (el-catalog.js; in memory only)
   for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
   try{const p=await F.getDoc(F.doc(db,"points",mail));if(p.exists())D.pt=p.data()}catch(e){}
   if(D.me.group)try{const t=await F.getDoc(F.doc(db,"teams",D.me.group));if(t.exists())D.tm=t.data()}catch(e){}
