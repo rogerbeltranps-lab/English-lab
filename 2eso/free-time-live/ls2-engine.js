@@ -41,6 +41,10 @@ var LS2 = (function () {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const cap = s => s[0].toUpperCase() + s.slice(1);
   const words = s => (String(s).trim().match(/\S+/g) || []).length;
+  /* Words that count for a writing's minimum (Roger, 4 Nov 2026: a student filled the text with "c c c c" to reach it): a letter
+     repeated alone ("c", "cc", "xxxx") is not a word; "a", "I" and numbers are. The tip under the box says single letters don't count. */
+  const realWords = s => (String(s).match(/\S+/g) || []).filter(w => { const l = w.toLowerCase().replace(/[^a-zà-ÿ]/g, ''); return /\d/.test(w) || (l && (!/^(.)\1*$/.test(l) || l === 'a' || l === 'i')); }).length;
+  const padNote = s => words(s) - realWords(s) >= 3 ? (ca() ? ' Les lletres soltes (com «c c c») no compten.' : ' Single letters (like "c c c") don\u2019t count.') : '';
 
   function save() { localStorage.setItem(LP.key, JSON.stringify(state)); localStorage.setItem(LP.key + 'Level', level); progress(); }
   /* Own work follows the route (Roger, 2 Nov 2026, problem report: a student wrote the LP2 writing on Daring, the teacher moved him to Safe
@@ -726,14 +730,14 @@ var LS2 = (function () {
       const frame = byLevel(p.frame || {});
       if (frame) { $('#' + p.id + 'Frame').hidden = false; $('#' + p.id + 'Frame').innerHTML = frame; }
       const min = byLevel(p.min);
-      const count = () => { $('#' + p.id + 'Count').textContent = words(ta.value) + ' ' + (ca() ? 'paraules' : 'words') + (min ? ' · ' + (ca() ? 'mínim ' : 'minimum ') + min : ''); };
+      const count = () => { $('#' + p.id + 'Count').textContent = realWords(ta.value) + ' ' + (ca() ? 'paraules' : 'words') + (min ? ' · ' + (ca() ? 'mínim ' : 'minimum ') + min : ''); };
       ta.oninput = () => { state.texts[key] = ta.value; save(); count(); };
       count();
       const checks = byLevel(p.checklist) || [];
       $('#' + p.id + 'List').innerHTML = checks.map(c => '<label class="option"><input type="checkbox"><span>' + c + '</span></label>').join('');
       $('#' + p.id + 'Ai').onclick = () => {
         const boxes = $$('#' + p.id + 'List input'), msg = $('#' + p.id + 'Msg');
-        if (min && words(ta.value) < min) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + min + ' paraules.' : 'Too short: write at least ' + min + ' words.'; return; }
+        if (min && realWords(ta.value) < min) { msg.className = 'feedback no'; msg.textContent = (ca() ? 'Encara és massa curt: escriu almenys ' + min + ' paraules.' : 'Too short: write at least ' + min + ' words.') + padNote(ta.value); return; }
         if (boxes.some(b => !b.checked)) { msg.className = 'feedback no'; msg.textContent = learningSupport.missing(level, boxes); return; }
         if (toTeacher(p)) {
           if (!confirm(ca() ? 'Vols entregar el text al professor? Un cop entregat, ja no el podràs canviar.' : 'Hand your text in to your teacher? Once you hand it in, you can’t change it.')) return;
@@ -925,7 +929,7 @@ var LS2 = (function () {
       handed();
       $('#spSend').onclick = () => {
         if (processor) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Atura la gravació primer.' : 'Stop the recording first.'; return; }
-        const tr = $('#speechTranscript').value.trim(), n = words(tr), min = (p.speakMin || { beginners: 10, insecure: 15, safe: 25, daring: 35 })[level] || 15;
+        const tr = $('#speechTranscript').value.trim(), n = realWords(tr), min = (p.speakMin || { beginners: 10, insecure: 15, safe: 25, daring: 35 })[level] || 15;
         if (n < min) { msg.className = 'feedback no'; msg.textContent = ca() ? 'La transcripció té ' + n + ' paraules: grava’t fent tota la tasca (almenys ' + min + ' paraules). Si Chrome no l’ha escrita, escriu el que has dit.' : 'Your transcript has ' + n + ' words: record yourself doing the whole task (at least ' + min + ' words). If Chrome didn’t write it, type what you said.'; return; }
         state.steps = state.steps || {};
         state.steps[p.id] = { level, title: tx(p.title), ty: window.elTyping ? elTyping.sum($('#speechTranscript').parentElement) : null, f: [{ l: ca() ? 'Transcripció' : 'Transcript', v: tr }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
@@ -1183,13 +1187,13 @@ var LS2 = (function () {
       state.texts = state.texts || {}; state.ai = state.ai || {};
       ta.value = state.texts[key] || ''; ta.placeholder = byLevel(p.template || '');
       $('#' + p.id + 'Task').innerHTML = byLevel(p.task).replace(/\n/g, '<br>');
-      const count = () => { $('#' + p.id + 'Count').textContent = words(ta.value) + ' ' + (ca() ? 'paraules' : 'words') + (min ? ' · ' + (ca() ? 'mínim ' : 'minimum ') + min : ''); };
+      const count = () => { $('#' + p.id + 'Count').textContent = realWords(ta.value) + ' ' + (ca() ? 'paraules' : 'words') + (min ? ' · ' + (ca() ? 'mínim ' : 'minimum ') + min : ''); };
       ta.oninput = () => { state.texts[key] = ta.value; save(); count(); };
       count();
       if (p.teacher) {
         const msg = $('#' + p.id + 'Msg'); if (handedMsg(p)) { msg.className = 'feedback ok'; msg.textContent = handedMsg(p); }
         $('#' + p.id + 'Ai').onclick = () => {
-          if (words(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.'; return; }
+          if (realWords(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = (ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.') + padNote(ta.value); return; }
           handToTeacher(p, ta.value.trim()); msg.className = 'feedback ok'; msg.textContent = handedMsg(p);
         };
         return;
@@ -1199,7 +1203,7 @@ var LS2 = (function () {
       pts.oninput = () => { const v = pts.value === '' ? null : Math.max(0, Math.min(p.max, Math.round(+pts.value))); if (v == null) delete state.ai[k]; else state.ai[k] = v; save(); if (LP.onScore) LP.onScore(); };
       $('#' + p.id + 'Ai').onclick = () => {
         const msg = $('#' + p.id + 'Msg');
-        if (words(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.'; return; }
+        if (realWords(ta.value) < (min || 10)) { msg.className = 'feedback no'; msg.textContent = (ca() ? 'Encara és massa curt: escriu almenys ' + (min || 10) + ' paraules.' : 'Too short: write at least ' + (min || 10) + ' words.') + padNote(ta.value); return; }
         window.open('https://chatgpt.com/?prompt=' + encodeURIComponent(markPrompt(p, ta.value.trim())), '_blank', 'noopener,noreferrer');
         msg.className = 'feedback ok';
         msg.textContent = ca() ? 'Desat ✓ S’ha obert ChatGPT. Apunta aquí sota els punts que et doni i llegeix què has de millorar.' : 'Saved ✓ ChatGPT has opened. Note the points it gives you below and read what to improve.';

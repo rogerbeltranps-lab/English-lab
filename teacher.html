@@ -300,7 +300,7 @@ async function reread(){const ps=[...TOUCHED];TOUCHED.clear();const D=S.D;
 // null deletes a field. id is an activity id, or the LS's own record (asId: exam marks, exam writing level, confirmed degrees).
 const deep=(t,o)=>{for(const k in o){const v=o[k];if(v===null)delete t[k];else if(v&&typeof v==="object"&&!Array.isArray(v)){t[k]=t[k]&&typeof t[k]==="object"?t[k]:{};deep(t[k],v)}else t[k]=v}return t};
 const fsv=o=>{const r={};for(const k in o){const v=o[k];r[k]=v===null?F.deleteField():v&&typeof v==="object"&&!Array.isArray(v)?fsv(v):v}return r};
-function patch(u,id,o){o=Object.assign({ls:S.ls,activity:id},o);const r=(S.D.rs[u]=S.D.rs[u]||{});deep(r[id]=r[id]||{},o);if(DEMO)return Promise.resolve();const w=put(["students",u,"results",resKey(id)],fsv(o));TOUCHED.delete(["students",u,"results",resKey(id)].join("/"));return w}   // already on screen: nothing to read back
+function patch(u,id,o){o=Object.assign({ls:S.ls,activity:id},o);const r=(S.D.rs[u]=S.D.rs[u]||{});deep(r[id]=r[id]||{},o);if(DEMO)return Promise.resolve();const w=put(["students",u,"results",resKey(id)],fsv(o));TOUCHED.delete(["students",u,"results",resKey(id)].join("/"));if(w&&w.then)w.then(saveCache,()=>{});return w}   // already on screen: nothing to read back; the saved copy is updated too once the write is done (Roger, 4 Nov 2026: after a reload, a Redo or Send it back already sent showed again, because the copy the dashboard opens with still had the old result)
 // ---- secure recall checkpoints (Roger, 31 Oct 2026: “make sure they don't cheat”; shared/js/el-checkpoint.js, docs/general/secure-checkpoints.md)
 // D.ck[page key] = cpKeys doc {items:{id:{a,q,i,r,ca,en,extra}}}; D.cp[uid][page key] = the student's one try {level,ids,answers,times,leaves,auto,sent,fb,redo}.
 // cpInject marks each try with the key and writes the result into the student's progress state in memory only (first, items, done, doneAt),
@@ -416,13 +416,18 @@ function cell(u,a){ // text + class of an activity's score cell
   if(a.manual)t=x&&x.max?x.score+"/"+x.max:"–";
   else if(a.graded){const y=scOf(u,a);t=y?y.score+"/"+y.max:"–"}
   else{const n=steps(a).filter(k=>d.has(k)).length;t=steps(a).length?n+"/"+steps(a).length:"–";c="na"}
-  if(x&&x.locked){t+=" ✔";c="sub"}else if(x&&x.markedDone){t+=" 🟡";c="mark"}
+  // ✅ + green only when every step is done (Roger, 4 Nov 2026: the old green ✔ meant "pressed Submit", which he read as "did everything");
+  // pressing Submit or Mark as done is a small note under the score, and the tooltip lists the missing steps
+  const req=steps(a).filter(k=>!(a.skip||[]).includes(k)),miss=req.filter(k=>!d.has(k)),all=!a.manual&&elAllDone(a,d,x);
+  if(all){t+=" ✅";c=c?c+" sub":"sub"}
   if(x&&x.feedback)t+=" 💬";
   if(unanswered(u,a).length)t+=" ✉️";
+  if(!a.manual&&x&&x.locked)t+=`<br><small class="muted">📤 submitted</small>`;else if(!a.manual&&x&&x.markedDone)t+=`<br><small class="muted">🟡 marked done</small>`;
+  const n=req.length-miss.length,tip=a.manual||!req.length?"":`${n} of ${req.length} steps done${a.graded?"\nScore = 1 point per step done: how much is done, not how well (not the LS mark)":""}${miss.length?"\nMissing: "+miss.join(", "):"\nAll done"}${x&&x.locked&&miss.length?"\nPressed Submit before finishing":""}`;
   const cd=a.checkpoint&&cpDoc(u,a),ck=cd&&S.D.ck[a.keys[0]];   // secure checkpoint: marked here from the key (cpInject)
   if(cd&&!cd.redo&&ck){const m=cpMark(cd,ck);if(t==="–")t="✔";t+=`<br><small title="First try, marked with the answer key">1st try ${m.score}/${m.max}${cd.auto==="left"?" ⚡":""}</small>`}
   else if(x&&x.parts&&x.parts.first)t+=`<br><small title="First attempt (does not count)">1st try ${x.parts.first.score}/${x.parts.first.max}</small>`;
-  return {t,c};
+  return {t,c,tip};
 }
 
 // ---- assessment and grading (shared/js/el-grading.js; root AGENTS.md "Assessment and grading")
@@ -474,7 +479,7 @@ function wrState(u,a,k){if(!window.ELMark)return null;const st=pstate(u,a);if(!i
   const v=sigOf(JSON.stringify(it.fields)),fs=(x.fbSig||{})[k],rp=(x.replies||{})[k];
   if(fs===v)return {i:"✏️ corrected",t:"Corrected (the student sees the correction in the step)",c:"wrk"};
   if(rp&&!fs)return {i:"✏️ answered",t:"You answered it by hand",c:"wrk"};
-  if(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")))return {i:"🔁 redo",t:"Possible copy: redo it in class (note sent)",c:"wrc"};
+  if(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")))return fl.back?{i:"↩ sent back",t:"You sent it back"+(fl.at?" on "+String(fl.at).slice(0,10):"")+": waiting for the new version",c:"wrc"}:{i:"🔁 redo",t:"Possible copy: redo it in class (note sent)",c:"wrc"};
   return {i:late?"❌ late":fs?"📨 new":"📨 Wed",t:(fs?"New version handed in after the correction":"Handed in")+on+(late?": it should have been corrected in the last Wednesday run":": corrected in the Wednesday run"),c:late?"wrx":"wrw"}}
 const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return w?`<br><small class="wr ${w.c}" title="${esc(w.t)}: click to open" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button">${w.i}</small>`:""};
 // A write cell opens the correction (Roger, 4 Nov 2026: "I want to be able to click here and see the corrections"): Claude's correction
@@ -486,16 +491,36 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
   if(fl&&fl.why&&!fl.done)return cpOpen(u,aid,step);
   const w=wrState(u,a,step)||{i:"",t:""},it=ELMark.fbItems(pstate(u,a))[step]||{fields:[]},f=it.fields||[],orig=String((f[0]||{}).v||"");
   const t=(x.replies||{})[step],fs=(x.fbSig||{})[step],lv=Object.entries((x.levels||{})[step]||{}),old=!!t&&!!fs&&fs!=="redo"&&fs!==sigOf(JSON.stringify(f));
+  const mo=(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).some(m=>m.a===aid&&m.step===step),canBack=!!f.length&&!mo&&!(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")));
   const on=v=>v?ELWeek.date(ymd(v)):"",log=it.ty?`<p class="muted">✍️ Writing log: ${esc(ELMark.tyText(it.ty))}</p>`:"";
-  const copy=fl&&fl.why?`<p class="muted">⚠️ <b>Possible copy</b>${fl.at?" on "+on(fl.at):""}: ${esc(fl.why)} · ${fl.done==="redo"?"you sent it back to redo in class":"you accepted it as their work"}</p>`:"";
+  const back=fl&&fl.back&&fl.done==="redo"?`<p class="muted">↩ <b>You sent it back</b>${fl.at?" on "+on(fl.at):""}: “${esc(fl.back)}”</p>`:"";
+  const copy=fl&&fl.why&&!fl.back?`<p class="muted">⚠️ <b>Possible copy</b>${fl.at?" on "+on(fl.at):""}: ${esc(fl.why)} · ${fl.done==="redo"?"you sent it back to redo in class":"you accepted it as their work"}</p>`:"";
   const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.map(y=>`<p><b>${esc(y.l)}</b></p>${text(y.v)}`).join("");
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
-    <p class="muted">${esc(w.t)}.</p>${log}${copy}
+    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
-    ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>✏️ Correction sent</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(f.slice(1)))
+    ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(f.slice(1)))
       :`<p><b>Handed in</b> <small class="muted">(no correction yet: Claude corrects it in the Wednesday run)</small></p>${more(f)}`}
+    ${canBack?backBox(u,aid,step,orig):""}
     <div class="row" style="justify-content:flex-start"><button class="g" data-do="cell" data-u="${u}" data-a="${esc(aid)}">All their work in this learning path</button></div>`,true);
   if(t)writing($("#wrfix"),t,EN,old?"":orig)}
+// ↩ Send it back (Roger, 4 Nov 2026, on a text filled with "c c c" to reach the minimum: "I want to be able to tell him that they need to
+// write the characters missing"): a message in the student's language (Catalan for Starter/Base, English for Core/Plus; ready-made for
+// the usual cases, editable) goes on top of the correction, the writing opens again on their page (flags[step] = {done: "redo", back,
+// at}, as Redo in class: ls2-engine.js) and their new hand-in is corrected again on Wednesday (marks.mjs skips it until then).
+const padOf=t=>(String(t).match(/\S+/g)||[]).filter(w=>{const l=w.toLowerCase().replace(/[^a-zà-ÿ]/g,"");return l&&/^(.)\1*$/.test(l)&&l!=="a"&&l!=="i"}).length;
+const BACK={pad:{ca:"Les lletres soltes del final del teu text (com «c c c») no són paraules i no compten. Escriu amb les teves paraules el que hi falta i torna a entregar el text.",
+    en:"The single letters at the end of your text (like “c c c”) are not words, so they don't count. Write what is missing in your own words and hand your text in again."},
+  short:{ca:"El teu text és massa curt. Escriu amb les teves paraules el que hi falta i torna a entregar el text.",en:"Your text is too short. Write what is missing in your own words and hand your text in again."},
+  fix:{ca:"Llegeix la correcció, corregeix el teu text i torna’l a entregar.",en:"Read the correction, fix your text and hand it in again."}};
+function backBox(u,aid,step,orig){const L=CA_RT.includes(level(u,S.ls))?"ca":"en",pad=padOf(orig)>=3,m=k=>esc(BACK[k][L]);
+  return `<details class="box" ${pad?"open":""} style="margin:10px 0;padding:10px 12px"><summary><b>↩ Send it back to the student</b>${pad?' <small class="wrc">· ⚠️ single letters used to fill the text</small>':""}</summary>
+    <p class="muted">They get this message on top of the correction (in ${L==="ca"?"Catalan":"English"}, their route's language), their writing opens again so they can change it, and the new version is corrected on Wednesday.</p>
+    <div class="row" style="justify-content:flex-start;gap:6px;flex-wrap:wrap">${["pad","short","fix"].map(k=>`<button class="chip mini" data-do="wrmsg" data-v="${m(k)}">${k==="pad"?"Letters to fill it":k==="short"?"Too short":"Fix and hand in again"}</button>`).join("")}</div>
+    <textarea id="wrback" style="min-height:70px">${pad?m("pad"):m("short")}</textarea>
+    <div class="row" style="justify-content:flex-start"><button data-do="wrback" data-u="${u}" data-a="${esc(aid)}" data-s="${esc(step)}">↩ Send it back</button></div></details>`}
+function wrBack(u,aid,step){const a=byId(aid),msg=($("#wrback")||{}).value;if(!a||!msg||!msg.trim())return;const x=res(u,aid),old=String((x.replies||{})[step]||"").trim(),at=new Date().toISOString();
+  $("#dlg").close();act(patch(u,aid,{flags:{[step]:{done:"redo",back:msg.trim(),at}},replies:{[step]:msg.trim()+(old?"\n\n"+old:"")},fbSig:{[step]:"redo"},fbBy:{[step]:null}}))}
 const doneAt=(u,id,step)=>{const a=byId(id),st=a?pstate(u,a):{};return st.done&&st.done[step]?((st.doneAt||{})[step]||true):null};
 const ymd=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 function dueOf(id,g){const p=(window.EL_PLAN||{})[S.ls],gr=GR.find(x=>x.id===g);if(!p||!p.due||!p.due[id]||!gr)return null;
@@ -693,7 +718,7 @@ function render0(){
     +routesBox(grp,inG.filter(s=>!s.tester))
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
-    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo). Grey rows: on the student list, not signed in yet.</p>`,"key")}
+    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo), where ↩ Send it back asks the student to change it and hand it in again (↩ sent back until they do). Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
     +(G()&&!G().only?gradeBox(shown):"")+selfBox(ls,grp,shown)
@@ -868,6 +893,16 @@ function cpList(grp){const out=[];cat.filter(a=>a.ls===S.ls).forEach(a=>mkStuds(
 const cpName=(aid,step)=>{const m=mkMoments().find(x=>x.a===aid&&x.step===step);return m?m.name:({write:"Writing",speak:"Speaking",talk:"Talk"})[step]||step};
 function cpItems(grp){return cpList(grp).map(({s,a,step,f})=>
   `⚠️ Possible copy: <b>${name(s)}</b> · ${esc(cpName(a.id,step))} (${esc(actTitle(a.id))}): ${esc(f.why)} <button data-do="cpopen" data-u="${s.uid}" data-a="${a.id}" data-s="${step}">Check</button>`)}
+// Why, for the student (Roger, 4 Nov 2026: "when I send redo I want students see why, like text copied in 1 minute"): from the writing
+// log (pasted characters, keys typed, time) and, when the reason mentions it, the level; in the student's language, editable before sending.
+function cpWhy(ty,why,ca){const t=ty||{},out=[],n=+t.n||0,p=+t.p||0,k=+t.k||0,sec=+t.s||0;
+  const tm=sec<60?(ca?sec+" segons":sec+" seconds"):(m=>ca?m+(m===1?" minut":" minuts"):m+(m===1?" minute":" minutes"))(Math.max(1,Math.round(sec/60)));
+  if(p>=20)out.push(ca?`has enganxat ${p} dels ${n} caràcters del text`:`you pasted ${p} of the ${n} characters of your text`);
+  if(ty&&n&&k<n/2&&p<20)out.push(ca?`només has escrit ${k} lletres amb el teclat per a un text de ${n}`:`you only typed ${k} keys for a text of ${n} characters`);
+  if(ty&&sec&&(sec<180||p>=20))out.push(ca?`l’has fet en ${tm}`:`you did it in ${tm}`);
+  if(/level|vocab|above|grammar/i.test(why||""))out.push(ca?"el nivell d’anglès és molt més alt del que fas servir normalment":"the English is far above the level you usually write at");
+  if(!out.length)out.push(ca?"el text no sembla escrit per tu":"the text doesn't look like your own writing");
+  const j=out.length>1?out.slice(0,-1).join(", ")+(ca?" i ":" and ")+out[out.length-1]:out[0];return (ca?"Per què: ":"Why: ")+j+"."}
 const REDO={ca:"El professor vol que tornis a fer aquesta tasca a classe, amb les teves paraules. Després entrega-la una altra vegada.",en:"Your teacher would like you to do this task again in class, in your own words. Then hand it in again."};
 function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step)||null,a=byId(aid),f=flagOf(u,aid,step),hs=handedIn(u,a)[step]||{},s=S.P[u];if(!a||!f)return;S.cp={u,aid,step,m,f};
   const h={ty:hs.ty||f.ty,f:hs.f&&hs.f.length?hs.f:f.f||[]},lv=f.lv||{};
@@ -875,9 +910,11 @@ function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step
     <p><b>Why:</b> ${esc(f.why)}${f.at?` <small class="muted">(flagged on ${ELWeek.date(ymd(f.at))})</small>`:""}</p>${h.ty?`<p class="muted">Writing log: ${esc(ELMark.tyText(h.ty))}</p>`:""}
     ${(h.f||[]).map(x=>`<div class="hand"><b>${esc(x.l)}</b><p style="white-space:pre-wrap">${esc(x.v||"")}</p></div>`).join("")}
     <p>If it is their own work, ${m?`it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[lv[c]]}">${lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.`:`they get this correction:</p><div id="cpfix" style="${corrBox}"></div><p>`}</p>
-    <div class="row" style="justify-content:flex-start"><button data-do="cpok">✔ Accept: it's their work</button><button class="g" data-do="cpredo">↺ Redo in class</button></div>
-    <p class="muted">Redo in class sends the student: “${esc(CA_RT.includes(level(u,S.ls))?REDO.ca:REDO.en)}” Their next hand-in goes back to ${m?"the marking sheet":"Claude's correction"}.</p>`,true);if(!m&&$("#cpfix"))writing($("#cpfix"),f.fb||"",EN,"")}
-function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.aid),done=ok?"accepted":"redo",note=CA_RT.includes(level(k.u,S.ls))?REDO.ca:REDO.en;
+    <label style="font-weight:400">↺ Redo in class sends the student this message <small class="muted">(in ${CA_RT.includes(level(u,S.ls))?"Catalan":"English"}, their route's language; you can change it). Their writing opens again and their next hand-in goes back to ${m?"the marking sheet":"Claude's correction"}.</small></label>
+    <textarea id="cpnote" style="min-height:70px">${esc(cpNote(u,f,h.ty))}</textarea>
+    <div class="row" style="justify-content:flex-start"><button data-do="cpok">✔ Accept: it's their work</button><button class="g" data-do="cpback">↺ Redo in class</button></div>`,true);if(!m&&$("#cpfix"))writing($("#cpfix"),f.fb||"",EN,"")}
+const cpNote=(u,f,ty)=>{const ca=CA_RT.includes(level(u,S.ls));return (ca?REDO.ca:REDO.en)+" "+cpWhy(ty,f.why,ca)};
+function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.aid),done=ok?"accepted":"redo",nb=$("#cpnote"),note=(nb&&nb.value.trim())||cpNote(k.u,k.f,k.f.ty);
   const ps=k.m?(ok?[patch(k.u,k.aid,{levels:{[k.step]:k.f.lv},marked:{[k.step]:new Date().toISOString()},flags:{[k.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.step,k.f.fb)]:[])]
       :[patch(k.u,k.aid,{flags:{[k.step]:{done}}}),api.reply(k.u,a,k.step,note)])
     // a writing correction: Accept sends it as the version corrected (fbSig), so a new version is corrected again; Redo sends the note
@@ -929,9 +966,9 @@ const canHw=a=>GR.some(g=>g.id===S.g)&&((window.EL_SECTIONS||{})[a.id]||[]).leng
 function progress(studs,list){
   const open=a=>!S.folded.has(a.id)&&steps(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
   let h1=`<tr><th class="stu"${rs}>Student</th><th${rs}>Route</th>`,h2="<tr>";
-  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}${canHw(a)?` <button type="button" class="g mini lphw" data-do="lphw" data-a="${esc(a.id)}" title="Set some tabs of this learning path as homework">🏠 Homework</button>`:""}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${pts(a)}</small>`;
+  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}${canHw(a)?` <button type="button" class="g mini lphw" data-do="lphw" data-a="${esc(a.id)}" title="Set some tabs of this learning path as homework">🏠 Homework</button>`:""}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} steps)`:pts(a)}</small>`;
     if(open(a)){h1+=`<th class="lp first" colspan="${steps(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
-      h2+=steps(a).map((k,i)=>`<th class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")+`<th class="sc">Score</th>`}
+      h2+=steps(a).map((k,i)=>`<th class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
     else h1+=`<th class="lp first"${rs} data-do="fold" data-a="${a.id}">${head}</th>`});
   h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
   let b="";const cols=list.reduce((n,a)=>n+(open(a)?steps(a).length+1:1),0);
@@ -941,7 +978,7 @@ function progress(studs,list){
     b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
       if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}${tryCell(s.uid,a.id,k)}${wrCell(s.uid,a,k)}</td>`).join("");
-      b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}">${c.t}</td>`;
+      b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}"${c.tip?` title="${esc(c.tip)}"`:""}>${c.t}</td>`;
       const y=a.graded&&x&&x.max&&scOf(s.uid,a);if(y){ts+=y.score;tm+=y.max}});
     b+=`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td></tr>`});
   return `<table><thead>${h1}${any?h2:""}</thead><tbody>${b}</tbody></table>`;
@@ -1271,7 +1308,7 @@ function plan(p,grp){let t=0; // week-by-week calendar from shared/js/el-plan.js
   return `<p class="muted">${esc(p.note)}</p><table class="plan"><tr><th>When</th><th>${gi>=0?esc(grp.name):"What"}</th><th>Calendar</th></tr>`+p.rows.map((r,i)=>{let h="";if(r.term!==t){t=r.term;const T=p.terms[t]||{};h=`<tr class="t"><td colspan="3">${esc(T.title)}<br><small class="muted">Assessment: ${esc(T.assess)}</small></td></tr>`}
     return h+`<tr class="${i===now?"now":""}"><td>${esc(r.when)}${i===now?"<br><small><b>this week</b></small>":""}</td><td style="white-space:pre-line">${what(r)}</td><td class="muted">${esc(r.note||"")}</td></tr>`}).join("")+`</table>${p.extra?`<p class="muted">${esc(p.extra)}</p>`:""}`}
 // ---- time plan (el-plan.js through el-week.js): exam day, this week and next week, per group; the overview tab shows every group
-const isDone=(u,a)=>{const x=(S.D.rs[u]||{})[a.id]||{};if(x.locked||x.markedDone)return true;const req=steps(a).filter(k=>!(a.skip||[]).includes(k));if(!req.length)return false;const d=doneSet(u,a);return req.every(k=>d.has(k))};
+const isDone=(u,a)=>elAllDone(a,doneSet(u,a),(S.D.rs[u]||{})[a.id]);   // every step done, not the Submit flag (el-catalog.js)
 // ✂ dropped learning paths of a group, under its exam day: not in the exam, do not count; ↩ brings one back
 const dropTag=x=>{const dr=((x.p||{})._dropped||{})[x.gi]||[];if(!dr.length)return "";
   return `<div class="dropt">✂ Dropped (no time), not in the exam and not counted: ${dr.map(id=>{const a=byId(id),lab=(Object.entries(lpMap(x)).find(([,b])=>b===a)||[])[0];
@@ -1777,7 +1814,8 @@ function stuPanel(u){redraw=null;
 }
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
-  const gx=!!G()&&!G().only&&a.ls===S.ls,state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
+  const gx=!!G()&&!G().only&&a.ls===S.ls,nd=steps(a).filter(k=>!(a.skip||[]).includes(k)),nn=nd.filter(k=>d.has(k)).length,
+    state=(nd.length&&!a.manual?(nn===nd.length?"✅ Every step done":`${nn} of ${nd.length} steps done`)+" · ":"")+(x.locked?"📤 Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)");
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(scOf(u,a)||{score:0}).score}/${a.points}`:""}</p>`
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.steps?handIns(u,a):"")
@@ -1952,7 +1990,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     hwsave:()=>{const text=$("#hw-text").value.replace(/\s+/g," ").trim(),by=$("#hw-by").value,msg=$("#hw-msg").value.trim();if(!text||!by)return alert("Write what they have to do and choose the day.");
       $("#dlg").close();act(api.hw(k.ls,k.gid,"h"+Date.now().toString(36),Object.assign({text,by,set:k.set},msg?{msg}:{},k.line?{line:k.line}:{})))},
     hwdel:()=>{if(!confirm("Remove this homework? Students will no longer see it."))return;act(api.hw(k.ls,k.gid,k.id,null))},
-    mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),wrop:()=>wrOpen(k.u,k.a,k.s),cpok:()=>cpDone(true),cpredo:()=>cpDone(false),
+    mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),wrop:()=>wrOpen(k.u,k.a,k.s),wrback:()=>wrBack(k.u,k.a,k.s),wrmsg:()=>{const b=$("#wrback");if(b)b.value=k.v},cpok:()=>cpDone(true),cpback:()=>cpDone(false),   // not "cpredo": that name is the checkpoint's "Let them do it again" (Roger, 4 Nov 2026: Redo in class did nothing)
+    
     mkcopy:()=>{const v=$("#mksheet").value;navigator.clipboard.writeText(v).then(()=>$("#mkst").textContent="✓ Copied",()=>{$("#mksheet").select();$("#mkst").textContent="Press Ctrl+C"})},
     mkdown:()=>mkDown(),
     wk:()=>{S.wk=k.w;S.g="plan";render()},
