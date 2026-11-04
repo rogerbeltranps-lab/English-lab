@@ -363,16 +363,16 @@ async function teacherSections(info){
     catch(e){console.warn("open",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
   // 📌 Pull up on the group's screens (Roger, 2 Nov 2026): this learning path, or it at the tab on screen; it opens the path (and that tab) if locked.
   const pulled=()=>((info.push||{})[g])||null;
-  async function pull(p){if(busy)return;const o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:Date.now()};
+  async function pull(p){if(busy)return;const o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:Date.now(),lock:true};
     if(o&&!elLpOpen(a,info,g))await openLp();
     if(o&&p&&locked().includes(p))await save(locked().filter(x=>x!==p));
-    busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});await setDoc(doc(db,"live",g),{go:o},{merge:true});/* live: open pages go there (goTo) */info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens":"✓ Taken down"}
+    busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});await setDoc(doc(db,"live",g),{go:o},{merge:true});/* live: open pages go there (goTo) */info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens, kept there":"✓ Released"}
     catch(e){console.warn("pull",e);msg="✗ Not saved: "+(e.code||e.message||e)}busy=false;draw()}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
   function pullRow(){const x0=pulled(),x=x0&&x0.a&&x0.at&&Date.now()-x0.at<EL_PULL_DAYS*864e5?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
     return '<div class="r pl"><b>📌 Pull up on '+gname(g)+'\'s screens</b><button data-pull="">This learning path</button>'
       +(cur?'<button data-pull="'+cur+'">At this tab: '+nm(cur).replace(/</g,"&lt;")+'</button>':"")
-      +(here?'<span class="now">Now on their screens'+(x.p?" at “"+nm(x.p).replace(/</g,"&lt;")+"”":"")+'</span><button class="g" data-pull="-">Take it down</button>':x?'<span>Now on their screens: '+String(x.t||"").replace(/</g,"&lt;")+'</span>':"")+'</div>'}
+      +(here?'<span class="now">🔒 Kept on their screens'+(x.p?" at “"+nm(x.p).replace(/</g,"&lt;")+"”":"")+'</span><button class="g" data-pull="-">🔓 Release them</button>':x?'<span>🔒 Kept on their screens: '+String(x.t||"").replace(/</g,"&lt;")+'</span><button class="g" data-pull="-">🔓 Release them</button>':"")+'</div>'}
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
     let bar=document.getElementById("el-tsec");
@@ -564,23 +564,60 @@ function tabBar(g){const lv=myLevel||homeLevel,ca=!lv||elCa(lv),old=document.get
   go.onclick=()=>{const t=document.querySelector('.tab[data-panel="'+CSS.escape(g.p)+'"]');if(t)t.click();b.remove()};
   const no=document.createElement("button");no.textContent="✕";no.style.cssText="border:0;background:none;color:#fff;font-size:18px;cursor:pointer";no.onclick=()=>b.remove();
   b.append(tx,go,no);document.body.prepend(b)}
+// 🔒 Kept there until the teacher lets them go (Roger, 4 Nov 2026: "once I pull students in a section or LP, they mustn't be able to go
+// to another part of the website until I say so"): a pull-up carries lock:true. While it lasts (until the teacher clicks Release, which
+// sets go to null, or LOCK_MS after it at the latest, in case it is forgotten) every other page that loads el-cloud.js sends the student
+// back to that learning path at once, links that leave it are blocked with a message, and with a tab chosen the other tabs are blocked too
+// (except the one the student was already working on, until they reach the teacher's tab). A bar on the path says they are kept there.
+const LOCK_MS=70*60e3;
+let LOCK=null,lockFrom=null;
+const lockOn=g=>!!(g&&g.lock&&g.a&&g.at&&Date.now()-g.at<LOCK_MS);
+const lockCa=()=>{const lv=myLevel||homeLevel;return !lv||elCa(lv)};
+const lockHere=()=>LOCK&&actId===LOCK.a;
+function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-toast");if(!n){n=document.createElement("div");n.id="el-lock-toast";
+  n.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:2147483001;max-width:92vw;padding:12px 18px;border-radius:12px;background:#7f1d1d;color:#fff;font:600 15px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.3);text-align:center";document.body.append(n)}
+  n.textContent=t||(ca?"🔒 El professor t'ha fet venir aquí: no pots anar a cap altra part de la web fins que et deixi anar.":"🔒 Your teacher brought you here: you can't go to any other part of the website until they let you go.");
+  clearTimeout(lockToast.t);lockToast.t=setTimeout(()=>n.remove(),3500)}
+function lockBar(){let b=document.getElementById("el-lock");
+  if(!lockHere()){if(b)b.remove();return}
+  const ca=lockCa(),at=document.querySelector(".tab.active[data-panel]"),cur=at&&at.dataset.panel,g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
+  if(!b){b=document.createElement("div");b.id="el-lock";b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
+    b.onclick=e=>{const x=e.target.closest("button");if(!x)return;const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
+  const off=g.p&&cur!==g.p,h="🔒 "+(ca?"El professor et manté aquí":"Your teacher is keeping you here")+(g.p?(ca?": pestanya ":": tab ")+(g.pn||g.p):"")
+    +(off?(ca?". Acaba el que estàs fent i ves-hi.":". Finish what you are doing and go there."):"")+"|"+(off?(ca?"Ves-hi":"Go there")+" →":"");
+  if(b.dataset.h!==h){b.dataset.h=h;const [t,btn]=h.split("|");b.textContent=t+" ";if(btn){const x=document.createElement("button");x.textContent=btn;
+    x.style.cssText="background:#fff;color:#0f766e;border:0;border-radius:999px;padding:6px 16px;font-weight:800;cursor:pointer";b.append(x)}}}
+// clicks on the kept page: links that leave it, and other tabs when the teacher chose one
+document.addEventListener("click",e=>{if(!lockHere())return;
+  const t=e.target.closest&&e.target.closest(".tab[data-panel]");
+  if(t&&LOCK.p&&t.dataset.panel!==LOCK.p&&t.dataset.panel!==lockFrom){e.preventDefault();e.stopImmediatePropagation();lockToast((lockCa()?"🔒 Ara toca la pestanya ":"🔒 Now it is the tab ")+(LOCK.pn||LOCK.p)+(lockCa()?": el professor l'obrirà quan toqui.":": your teacher will open the next one."));return}
+  const a=e.target.closest&&e.target.closest("a[href]");if(!a)return;let u;try{u=new URL(a.href,location.href)}catch(x){return}
+  if(u.origin===location.origin&&u.pathname===location.pathname)return;   // a tab or a link on this page
+  if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
+  e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
+setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar()}else if(LOCK)lockBar()},1000);
 function goTo(g,first){
-  if(!g||!g.a||!g.at)return;const k="el_go_"+g.at;try{if(localStorage.getItem(k))return}catch(e){}
-  if(first&&Math.abs(Date.now()-g.at)>GO_MS)return;   // an old pull-up already in the document when the page opened
+  const was=LOCK;LOCK=lockOn(g)?g:null;
+  if(was&&!LOCK){lockBar();lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");return}
+  if(!g||!g.a||!g.at)return;const k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
   const a=(window.EL_CATALOG||[]).find(y=>y.id===g.a);if(!a)return;
   const here=window.EL_CATALOG&&EL_CATALOG.find(y=>y.id===actId);
   if(here&&(here.checkpoint||/sample-exam$/.test(here.id))||/[?&]live=/.test(location.search))return;
+  if(!LOCK&&(seen||first&&Math.abs(Date.now()-g.at)>GO_MS))return;   // not kept: once per pull-up, and not an old one already there when the page opened
   try{origSet.call(localStorage,k,"1")}catch(e){}
   const url=new URL(a.path,ROOT);url.hash=g.p?g.p:"";
   // already on that learning path (Roger, 3 Nov 2026: "if one is already there they don't get pulled"): nothing moves and nothing
   // reloads, they stay in the section they are working on; when the teacher chose another tab, a bar offers to go to it
-  if(here&&here.id===a.id){const at=document.querySelector(".tab.active[data-panel]");if(g.p&&(!at||at.dataset.panel!==g.p))tabBar(g);return}
+  if(here&&here.id===a.id){const at=document.querySelector(".tab.active[data-panel]");
+    if(LOCK){if(!seen)lockFrom=at&&at.dataset.panel!==g.p?at.dataset.panel:null;lockBar();return}
+    if(g.p&&(!at||at.dataset.panel!==g.p))tabBar(g);return}
   const lv=myLevel||homeLevel,ca=!lv||elCa(lv),o=overlay('<div style="max-width:560px"><div style="font-size:48px">📌</div><h1></h1><p class="n" style="font-size:22px;font-weight:800"></p><p class="c"></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:12px 24px;text-decoration:none;font-weight:800"></a></p></div>');
   o.style.zIndex="2147483000";   // above the My week panel and the bottom bar
-  o.querySelector("h1").textContent=ca?"El professor et porta a:":"Your teacher is taking you to:";
+  o.querySelector("h1").textContent=seen&&LOCK?(ca?"🔒 El professor et manté a:":"🔒 Your teacher is keeping you on:"):(ca?"El professor et porta a:":"Your teacher is taking you to:");
   o.querySelector(".n").textContent=(g.t||a.title)+(g.pn?" · "+g.pn:"");
   const go=o.querySelector("a.go");go.href=url.href;go.textContent=(ca?"Ves-hi ara":"Go now")+" →";
-  let n=5;const c=o.querySelector(".c"),tick=()=>{c.textContent=ca?"Desant la teva feina… hi vas en "+n+" s.":"Saving your work… going there in "+n+" s."};tick();
+  // the first time: 5 seconds to save their work; sent back again while kept there: 2 seconds
+  let n=seen&&LOCK?2:5;const c=o.querySelector(".c"),tick=()=>{c.textContent=seen&&LOCK?(ca?"Hi tornes en "+n+" s.":"Going back in "+n+" s."):(ca?"Desant la teva feina… hi vas en "+n+" s.":"Saving your work… going there in "+n+" s.")};tick();
   const leave=async()=>{clearInterval(iv);c.textContent=ca?"Desant…":"Saving…";
     try{if(timer){clearTimeout(timer);await send()}}catch(e){console.warn("go",e)}location.href=url.href};
   // the field being typed in saves on change/blur, then the 1.5-second cloud save runs during the countdown
