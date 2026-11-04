@@ -320,7 +320,11 @@ var LS2 = (function () {
     el.appendChild(p); el.classList.add('show');
   }
   function forget(id, prefix) { if (state.ans) delete state.ans[id]; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]);   /* every route's: typed() would bring another route's back */ Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
-  const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + (ca() ? 'Torna-ho a fer' : 'Do it again') + '</button>';
+  /* One activity at a time (Roger, 4 Nov 2026: "they should be able to redo one activity of the section and still see all the answers of
+     the other activities"): every checked activity of a section has its own "↺ Redo this activity" next to Check (the questions, the
+     practice, the micro-dictation), which clears only that activity; "↺ Redo the whole section" on top clears them all. */
+  const againLabel = () => '↺ ' + (ca() ? 'Torna a fer aquesta activitat' : 'Redo this activity');
+  const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + againLabel() + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
   function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); syncPicks(); }
   function clearStep(id, listId) { $$('#' + listId + ' input').forEach(x => { if (x.type === 'radio') x.checked = false; else x.value = ''; }); $$('#' + listId + ' .feedback').forEach(f => { f.textContent = ''; f.className = 'feedback'; }); const r = $('#' + id + 'Result'); if (r) { r.textContent = ''; r.classList.remove('show'); } $$('#' + listId + ' [data-pick]').forEach(b => { b.disabled = false; b.style.textDecoration = ''; }); syncPicks(); }
@@ -350,15 +354,15 @@ var LS2 = (function () {
     const sec = document.getElementById(p.id); if (!sec || !redoable(p)) return;
     const head = sec.querySelector(':scope > .panel-head'), bar = document.createElement('div');
     bar.className = 'actions redo-sec';
-    bar.innerHTML = '<button class="btn secondary" type="button">↺ ' + (ca() ? 'Torna a fer aquesta secció' : 'Redo this section') + '</button><span class="tiny" aria-live="polite"></span>';
+    bar.innerHTML = '<button class="btn secondary" type="button">↺ ' + (ca() ? 'Torna a fer tota la secció' : 'Redo the whole section') + '</button><span class="tiny" aria-live="polite"></span>';
     (head || sec.firstChild).insertAdjacentElement(head ? 'afterend' : 'beforebegin', bar);
     const btn = bar.querySelector('button'), note = bar.querySelector('span');
     if (p._redone) { note.textContent = ca() ? 'Fet: comença la secció de nou. Les altres seccions no han canviat.' : 'Done: start the section again. The other sections have not changed.'; p._redone = false; }
     p._redoSync = () => { bar.hidden = !redoHas(p) && !note.textContent; };
     p._redoSync();
     btn.onclick = () => {
-      if (!confirm(ca() ? 'Vols tornar a fer aquesta secció? S’esborraran les teves respostes d’aquesta secció perquè la puguis fer de nou des del principi. Les altres seccions no canvien.'
-        : 'Redo this section? Your answers in this section will be cleared so you can do it again from the start. The other sections stay as they are.')) return;
+      if (!confirm(ca() ? 'Vols tornar a fer TOTA aquesta secció? S’esborraran totes les teves respostes d’aquesta secció. Les altres seccions no canvien.\n\nSi només vols repetir una activitat, prem Cancel·la i fes servir «↺ Torna a fer aquesta activitat», al costat del seu botó Comprova: les altres respostes es queden.'
+        : 'Redo the WHOLE section? All your answers in this section will be cleared. The other sections stay as they are.\n\nTo repeat only one activity, press Cancel and use “↺ Redo this activity” next to its Check button: your other answers stay.')) return;
       p._redo.forEach(([id, prefix]) => forget(id, prefix));
       if (state.cycle) delete state.cycle[p.id];
       if (state.dict) delete state.dict[p.id];
@@ -565,7 +569,7 @@ var LS2 = (function () {
     return '<div class="section-card"><h3>✍️ ' + (ca() ? 'Microdictat' : 'Micro-dictation') + '</h3><p class="instruction">' + (ca() ? 'Escolta cada fragment del listening (pots repetir-lo) i escriu-lo exactament.' : 'Listen to each bit from the listening (you can play it again) and write it exactly.') + '</p>' +
       p.chunks.map((c, i) => '<div class="question"><div class="actions"><button class="btn secondary" type="button" data-say="' + p.id + i + '">▶ ' + (ca() ? 'Escolta' : 'Listen') + ' ' + (i + 1) + '</button><button class="btn secondary" type="button" data-say-slow="' + p.id + i + '">🐢 ' + (ca() ? 'Més a poc a poc' : 'Slower') + '</button></div>' +
         '<input type="text" class="typed" id="' + p.id + 'D' + i + '" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="feedback" id="' + p.id + 'Df' + i + '"></div></div>').join('') +
-      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'DCheck">' + (ca() ? 'Comprova' : 'Check') + '</button></div></div>';
+      '<div class="actions"><button class="btn" type="button" id="' + p.id + 'DCheck">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id + 'D') + '</div></div>';
   }
   function bindDict(p) {
     if (!p.chunks || !p.chunks.length) return;
@@ -584,6 +588,10 @@ var LS2 = (function () {
         return v;
       });
     $('#' + p.id + 'DCheck').onclick = () => { state.dict[p.id] = show(); save(); };
+    $('#' + p.id + 'DAgain').onclick = () => {   // only the dictation: the questions and the prediction above stay
+      delete state.dict[p.id]; save();
+      p.chunks.forEach((c, i) => { $('#' + p.id + 'D' + i).value = ''; const f = $('#' + p.id + 'Df' + i); f.textContent = ''; f.className = 'feedback'; });
+    };
     if (kept.some(v => v)) show();
   }
   R.mc = p => ({

@@ -100,7 +100,7 @@ html,body{overflow-x:clip}
 <section class="panel active" id="recall">
   <div class="panel-head"><div><h2>Recall: My Real Routine</h2><p class="instruction" data-support-ca="Escriu la resposta sense mirar apunts. No passa res si no te'n recordes: intentar recordar és el que t'ajuda a aprendre. Després llegeix el feedback." data-support-en="Type the answers without looking at your notes. Trying to remember is what helps you learn. Then read the feedback.">Type the answers without looking at your notes. Trying to remember is what helps you learn. Then read the feedback.</p></div><span class="pill">No notes · 3 min</span></div>
   <div class="section-card"><div id="recallList"></div>
-    <div class="actions"><button class="btn" id="checkRecall" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againRecall" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
+    <div class="actions"><button class="btn" id="checkRecall" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againRecall" type="button" data-support-ca="↺ Torna a fer aquesta activitat" data-support-en="↺ Redo this activity">↺ Redo this activity</button></div>
     <div class="result" id="recallResult"></div></div>
 </section>
 
@@ -110,7 +110,7 @@ html,body{overflow-x:clip}
   <div class="section-card" id="caCards"></div>
   <div class="section-card"><h3 data-support-ca="Completa les frases" data-support-en="Complete the sentences">Complete the sentences</h3>
     <div id="practiceList"></div>
-    <div class="actions"><button class="btn" id="checkPractice" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againPractice" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
+    <div class="actions"><button class="btn" id="checkPractice" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againPractice" type="button" data-support-ca="↺ Torna a fer aquesta activitat" data-support-en="↺ Redo this activity">↺ Redo this activity</button></div>
     <div class="result" id="practiceResult"></div></div>
 </section>
 
@@ -119,7 +119,7 @@ html,body{overflow-x:clip}
   <div class="section-card">
     <div class="chat" id="readText"></div>
     <form id="readForm"></form>
-    <div class="actions"><button class="btn" id="checkRead" type="button" data-support-ca="Comprova el reading" data-support-en="Check reading">Check reading</button> <button class="btn secondary" id="againRead" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
+    <div class="actions"><button class="btn" id="checkRead" type="button" data-support-ca="Comprova el reading" data-support-en="Check reading">Check reading</button> <button class="btn secondary" id="againRead" type="button" data-support-ca="↺ Torna a fer aquesta activitat" data-support-en="↺ Redo this activity">↺ Redo this activity</button></div>
     <div class="result" id="readResult"></div>
   </div>
 </section>
@@ -136,7 +136,7 @@ html,body{overflow-x:clip}
     <p class="tiny" style="color:var(--muted)">Illustrated video made for English Lab. Voices generated with ElevenLabs.</p>
     <div id="gsGist"></div>
     <form id="listenForm"></form>
-    <div class="actions"><button class="btn" id="checkListen" type="button" data-support-ca="Comprova el listening" data-support-en="Check listening">Check listening</button> <button class="btn secondary" id="againListen" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
+    <div class="actions"><button class="btn" id="checkListen" type="button" data-support-ca="Comprova el listening" data-support-en="Check listening">Check listening</button> <button class="btn secondary" id="againListen" type="button" data-support-ca="↺ Torna a fer aquesta activitat" data-support-en="↺ Redo this activity">↺ Redo this activity</button></div>
     <div class="result" id="listenResult"></div>
     <div id="gsDict"></div>
     <div id="gsRealVideo"></div>
@@ -420,12 +420,14 @@ function renderDict(){
   const chunks=lpPanel("listen").chunks||[];if(!chunks.length){$("#gsDict").innerHTML="";return}
   $("#gsDict").innerHTML='<h3 style="margin-top:22px">✍️ '+(ca()?'Microdictat':'Micro-dictation')+'</h3><p class="instruction">'+(ca()?'Escolta cada fragment del listening (pots repetir-lo) i escriu-lo exactament.':'Listen to each bit from the listening (you can play it again) and write it exactly.')+'</p>'
     +chunks.map((c,i)=>'<div class="question"><div class="actions"><button class="btn secondary" type="button" data-say="'+i+'">▶ '+(ca()?'Escolta':'Listen')+' '+(i+1)+'</button><button class="btn secondary" type="button" data-slow="'+i+'">🐢 '+(ca()?'Més a poc a poc':'Slower')+'</button></div><input type="text" class="typed" id="gsD'+i+'" autocomplete="off" autocapitalize="off" spellcheck="false" style="width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit"><div class="feedback" id="gsDf'+i+'"></div></div>').join("")
-    +'<div class="actions"><button class="btn" type="button" id="gsDCheck">'+(ca()?'Comprova':'Check')+'</button></div>';
+    +'<div class="actions"><button class="btn" type="button" id="gsDCheck">'+(ca()?'Comprova':'Check')+'</button> <button class="btn secondary" type="button" id="gsDAgain">↺ '+(ca()?'Torna a fer aquesta activitat':'Redo this activity')+'</button></div>';
   const say=(t,rate)=>{const s=window.speechSynthesis;if(!s)return;s.cancel();const u=new SpeechSynthesisUtterance(t),v=s.getVoices().find(x=>/^en(-|_)GB/i.test(x.lang))||s.getVoices().find(x=>/^en(-|_)/i.test(x.lang));u.lang="en-GB";if(v)u.voice=v;u.rate=rate;s.speak(u)};
   state.dict=state.dict||{};const kept=state.dict.listen||[];
   chunks.forEach((c,i)=>{$('[data-say="'+i+'"]').onclick=()=>say(c,.9);$('[data-slow="'+i+'"]').onclick=()=>say(c,.6);$("#gsD"+i).value=kept[i]||""});
   $("#gsDCheck").onclick=()=>{state.dict.listen=chunks.map((c,i)=>{const v=$("#gsD"+i).value,ok=norm(v)===norm(c),f=$("#gsDf"+i);f.className="feedback "+(ok?"ok":"no");
     f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(ca()?"Era: ":"It was: ")+"<strong>"+c+"</strong>"+(ca()?". Compara-ho paraula per paraula.":". Compare it word by word.");return v});save()};
+  // only the dictation (Roger, 4 Nov 2026: redo one activity, keep the others' answers)
+  $("#gsDAgain").onclick=()=>{delete state.dict.listen;save();chunks.forEach((c,i)=>{$("#gsD"+i).value="";const f=$("#gsDf"+i);f.textContent="";f.className="feedback"})};
 }
 // Listening cycle (research audit, Roger 27 Oct 2026): a copy of ls2-engine.js predictHtml/gistHtml/bindCycle; saved in state.cycle.listen.
 function renderCycle(){
