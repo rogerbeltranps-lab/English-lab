@@ -153,5 +153,23 @@ window.ELMark=(function(){
       seen.add(p[0]);rows.push({id:p[0],code:p[1],step:p[2],kind:k,text:p.slice(4).join(" ").trim()})}
     return {rows,bad,missing:[...by.keys()].filter(c=>!seen.has(c))};
   }
-  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,q,open,asked,CV,commentSheet,parseComments};
+  // Redo (Roger, 4 Nov 2026): the note a student gets when a possible copy is sent back, with the reason from the writing log
+  // ("when I send redo I want students see why, like text copied in 1 minute"), in their language (ca = Starter, Base or no route).
+  // Used by the dashboard's Check dialog (editable there) and by tools/marking/marks.mjs (automatic redo, below).
+  const REDO={ca:"El professor vol que tornis a fer aquesta tasca, amb les teves paraules. Després entrega-la una altra vegada.",en:"Your teacher would like you to do this task again, in your own words. Then hand it in again."};   // not "in class" (Roger, 4 Nov 2026: "simply redo")
+  function redoWhy(ty,why,ca){const t=ty||{},out=[],n=+t.n||0,p=+t.p||0,k=+t.k||0,sec=+t.s||0;
+    const tm=sec<60?(ca?sec+" segons":sec+" seconds"):(m=>ca?m+(m===1?" minut":" minuts"):m+(m===1?" minute":" minutes"))(Math.max(1,Math.round(sec/60)));
+    // p counts every paste, so it can be more than the text (pasted several times)
+    if(p>=20)out.push(p>=n?(ca?"has enganxat el text sencer en lloc d’escriure’l":"you pasted the whole text instead of writing it"):(ca?`has enganxat ${p} dels ${n} caràcters del text`:`you pasted ${p} of the ${n} characters of your text`));
+    if(ty&&n&&k<n/2)out.push(ca?`només has escrit ${k} lletres amb el teclat per a un text de ${n}`:`you only typed ${k} keys for a text of ${n} characters`);
+    if(ty&&sec&&(sec<180||p>=20))out.push(ca?`l’has fet en ${tm}`:`you did it in ${tm}`);
+    if(/level|vocab|above|grammar/i.test(why||""))out.push(ca?"el nivell d’anglès és molt més alt del que fas servir normalment":"the English is far above the level you usually write at");
+    if(!out.length)out.push(ca?"el text no sembla escrit per tu":"the text doesn't look like your own writing");
+    return (ca?"Per què: ":"Why: ")+(out.length>1?out.slice(0,-1).join(", ")+(ca?" i ":" and ")+out[out.length-1]:out[0])+"."}
+  const redoNote=(ty,why,ca)=>(ca?REDO.ca:REDO.en)+" "+redoWhy(ty,why,ca);
+  // Clearly pasted (Roger, 4 Nov 2026: "when this happens and you see it on Wednesdays, you can automatically send redo"): most of the
+  // text came in by pasting and little was typed. A possible copy like this is sent back at once by the Wednesday run (marks.mjs), with
+  // the note above; any other possible copy still waits for the teacher. Never for the Pro route.
+  const pasted=t=>{t=t||{};const n=+t.n||0;return n>=40&&(+t.p||0)>=0.8*n&&(+t.k||0)<0.5*n};
+  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,q,open,asked,CV,commentSheet,parseComments,REDO,redoWhy,redoNote,pasted};
 })();
