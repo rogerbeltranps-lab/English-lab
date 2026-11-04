@@ -37,10 +37,10 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
   const acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls);
   // On a page of this LS the local progress is the freshest; elsewhere the synced copy.
   const prog=k=>lsId===ls?store.get(k):((pg&&pg.data)||{})[k];
-  const isDone=a=>{const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));return window.elAllDone(a,d,rs[a.id])};   // every step, not the Submit flag
+  const isDone=a=>{const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));(window.elCorrected?elCorrected(a,rs[a.id]):[]).forEach(k=>d.add(k));return window.elAllDone(a,d,rs[a.id])};   // every step, not the Submit flag
   const canDo=a=>seesAll||window.elLpOpen(a,info,group);   // learning paths the teacher has opened for the group
   // sections the teacher has opened and the student has not finished: on the list until they are done (elSecPending in el-catalog.js)
-  const doneOf=a=>{const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));return d};
+  const doneOf=a=>{const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));(window.elCorrected?elCorrected(a,rs[a.id]):[]).forEach(k=>d.add(k));return d};
   const secs=()=>seesAll?[]:acts.filter(canDo).flatMap(a=>window.elSecPending(a,info,group,doneOf(a)).map(([id,name])=>[a,id,name]));
   const opt=id=>p.optional&&p.optional[id]&&p.optional[id][gi]||null;
   // "LP3" in a session line → the activity named next to it somewhere in the plan ("LP3 Where traditions come from")

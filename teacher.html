@@ -169,13 +169,13 @@ async function loadGroup(gid){const q=(n)=>F.getDocs(F.query(F.collection(db(),n
   AT.g[gid]=Date.now();FRESH.add(gid)}
 // D for the screen: the light part + the heavy copy (progress copied, as cpInject writes the checkpoint tries into it)
 function build(L){const R=RAW,pg={};Object.entries(R.pg).forEach(([u,x])=>{pg[u]={};Object.entries(x).forEach(([ls,v])=>pg[u][ls]=Object.assign({},v))});
-  const D=Object.assign({},L,{st:R.st,rs:R.rs,lv:R.lv,pg,cp:R.cp,ro:R.ro,pt:R.pt,tm:R.tm,roErr:R.roErr,ptErr:R.ptErr});cpInject(D);
+  const D=Object.assign({},L,{st:R.st,rs:R.rs,lv:R.lv,pg,cp:R.cp,ro:R.ro,pt:R.pt,tm:R.tm,roErr:R.roErr,ptErr:R.ptErr});cpInject(D);corrInject(D);
   // students who only have results/progress (no profile yet) still appear, without a group
   Object.keys(Object.assign({},D.rs,D.pg,D.lv,D.cp)).forEach(u=>D.st[u]=D.st[u]||{uid:u,name:"",email:u});
   return D}
 // mode: undefined = open (the copy if there is one), "all", or a group id
 async function load(mode){
-  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};DEMO.ann=DEMO.ann||[];DEMO.tkOk=true;cpInject(DEMO);Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits)ELWeek.applyEdits(id,i.planEdits)});return DEMO}
+  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};DEMO.ann=DEMO.ann||[];DEMO.tkOk=true;cpInject(DEMO);Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits)ELWeek.applyEdits(id,i.planEdits)});corrInject(DEMO);return DEMO}
   if(!RAW&&mode!=="all"){const c=await CACHE.get();if(c&&c.v===1&&c.raw){RAW=revive(c.raw);AT=c.at||{all:0,g:{}}}}
   const L=loadLight();
   if(!RAW||mode==="all")await loadAll();else if(mode&&GR.some(g=>g.id===mode))await loadGroup(mode);
@@ -310,6 +310,8 @@ const cpDate=v=>!v?null:typeof v==="string"?v:v.toDate?v.toDate().toISOString():
 const cpAccepted=(K,id)=>{const k=((K||{}).items||{})[id];return k?(k.a||[]).concat(k.extra||[]):null};
 function cpMark(d,K){const ok=(d.ids||[]).map((id,i)=>{const acc=cpAccepted(K,id),v=cpNorm((d.answers||[])[i]);return acc&&v&&acc.some(a=>cpNorm(a)===v)?1:0});
   return {ok,score:ok.reduce((a,b)=>a+b,0),max:ok.length,known:(d.ids||[]).every(id=>cpAccepted(K,id))}}
+// corrected steps count as done (elInjectCorrected in el-catalog.js; in memory only)
+function corrInject(D){Object.keys(D.rs||{}).forEach(u=>elInjectCorrected((D.pg||{})[u],D.rs[u]))}
 function cpInject(D){
   window.EL_CP_KEYS=D.ck;const cat=window.EL_CATALOG||[];
   Object.keys(D.ck||{}).forEach(key=>{const a=cat.find(x=>(x.keys||[])[0]===key);if(!a)return;const K=D.ck[key];
