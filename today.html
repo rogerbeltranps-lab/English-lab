@@ -129,8 +129,10 @@ function cell(a){
   if(a.manual)v=x&&x.max?x.score+"/"+x.max:"–";
   else if(a.graded){const y=elScore(a,x,D.pg[a.ls]);v=y?y.score+"/"+y.max:"–"}
   else{const n=steps(a).filter(k=>d.has(k)).length;v=steps(a).length?n+"/"+steps(a).length:"–";c="na"}
-  if(x&&x.locked){v+=" ✔";c="sub"}else if(x&&x.markedDone){v+=" 🟡";c="mark"}
+  // ✅ + green only with every step done (Roger, 4 Nov 2026); pressing Submit / Mark as done is only a small note
+  if(!a.manual&&elAllDone(a,d,x)){v+=" ✅";c=c?c+" sub":"sub"}
   if(x&&x.feedback)v+=" 💬";
+  if(!a.manual&&x&&x.locked)v+=`<br><small class="muted">📤 ${t("entregada","submitted")}</small>`;else if(!a.manual&&x&&x.markedDone)v+=`<br><small class="muted">🟡 ${t("marcada com a feta","marked as done")}</small>`;
   return {t:v,c};
 }
 
@@ -549,7 +551,7 @@ function onlyForm(id){const g=EL_GRADING[id],fp=D.rs[g.fp.a]||{},a=EL_CATALOG.fi
 // Week plan and reminders (Roger, 25 Oct 2026), from the teacher's plan in el-plan.js (shared/js/el-week.js): this week's classes,
 // the activities due this week, the exam day and the whole plan, for the student's group; past-due activities not done are reminded on top.
 // "Done" = submitted or marked as done, or every scored step done. The final product is handed in on Classroom, so it is listed but never reminded.
-const isDone=a=>{const x=D.rs[a.id]||{};if(x.locked||x.markedDone)return true;const req=steps(a).filter(k=>!(a.skip||[]).includes(k)),d=doneSet(a);return req.length>0&&req.every(k=>d.has(k))};
+const isDone=a=>elAllDone(a,doneSet(a),D.rs[a.id]);   // every step done, not the Submit flag (el-catalog.js)
 const lang=()=>EN?"en":"ca",when=d=>ELWeek.date(d,lang());
 // "Sections to finish" box removed (Roger, 2 Nov 2026: the learning paths table on 📈 shows every missing tab, with links).
 function lateBox(lss){const today=ELWeek.today(),late=[];

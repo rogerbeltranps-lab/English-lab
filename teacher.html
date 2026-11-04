@@ -416,13 +416,18 @@ function cell(u,a){ // text + class of an activity's score cell
   if(a.manual)t=x&&x.max?x.score+"/"+x.max:"–";
   else if(a.graded){const y=scOf(u,a);t=y?y.score+"/"+y.max:"–"}
   else{const n=steps(a).filter(k=>d.has(k)).length;t=steps(a).length?n+"/"+steps(a).length:"–";c="na"}
-  if(x&&x.locked){t+=" ✔";c="sub"}else if(x&&x.markedDone){t+=" 🟡";c="mark"}
+  // ✅ + green only when every step is done (Roger, 4 Nov 2026: the old green ✔ meant "pressed Submit", which he read as "did everything");
+  // pressing Submit or Mark as done is a small note under the score, and the tooltip lists the missing steps
+  const req=steps(a).filter(k=>!(a.skip||[]).includes(k)),miss=req.filter(k=>!d.has(k)),all=!a.manual&&elAllDone(a,d,x);
+  if(all){t+=" ✅";c=c?c+" sub":"sub"}
   if(x&&x.feedback)t+=" 💬";
   if(unanswered(u,a).length)t+=" ✉️";
+  if(!a.manual&&x&&x.locked)t+=`<br><small class="muted">📤 submitted</small>`;else if(!a.manual&&x&&x.markedDone)t+=`<br><small class="muted">🟡 marked done</small>`;
+  const n=req.length-miss.length,tip=a.manual||!req.length?"":`${n} of ${req.length} steps done${a.graded?"\nScore = 1 point per step done: how much is done, not how well (not the LS mark)":""}${miss.length?"\nMissing: "+miss.join(", "):"\nAll done"}${x&&x.locked&&miss.length?"\nPressed Submit before finishing":""}`;
   const cd=a.checkpoint&&cpDoc(u,a),ck=cd&&S.D.ck[a.keys[0]];   // secure checkpoint: marked here from the key (cpInject)
   if(cd&&!cd.redo&&ck){const m=cpMark(cd,ck);if(t==="–")t="✔";t+=`<br><small title="First try, marked with the answer key">1st try ${m.score}/${m.max}${cd.auto==="left"?" ⚡":""}</small>`}
   else if(x&&x.parts&&x.parts.first)t+=`<br><small title="First attempt (does not count)">1st try ${x.parts.first.score}/${x.parts.first.max}</small>`;
-  return {t,c};
+  return {t,c,tip};
 }
 
 // ---- assessment and grading (shared/js/el-grading.js; root AGENTS.md "Assessment and grading")
@@ -693,7 +698,7 @@ function render0(){
     +routesBox(grp,inG.filter(s=>!s.tester))
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
-    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo). Grey rows: on the student list, not signed in yet.</p>`,"key")}
+    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo). Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
     +(G()&&!G().only?gradeBox(shown):"")+selfBox(ls,grp,shown)
@@ -929,9 +934,9 @@ const canHw=a=>GR.some(g=>g.id===S.g)&&((window.EL_SECTIONS||{})[a.id]||[]).leng
 function progress(studs,list){
   const open=a=>!S.folded.has(a.id)&&steps(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
   let h1=`<tr><th class="stu"${rs}>Student</th><th${rs}>Route</th>`,h2="<tr>";
-  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}${canHw(a)?` <button type="button" class="g mini lphw" data-do="lphw" data-a="${esc(a.id)}" title="Set some tabs of this learning path as homework">🏠 Homework</button>`:""}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${pts(a)}</small>`;
+  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}${canHw(a)?` <button type="button" class="g mini lphw" data-do="lphw" data-a="${esc(a.id)}" title="Set some tabs of this learning path as homework">🏠 Homework</button>`:""}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} steps)`:pts(a)}</small>`;
     if(open(a)){h1+=`<th class="lp first" colspan="${steps(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
-      h2+=steps(a).map((k,i)=>`<th class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")+`<th class="sc">Score</th>`}
+      h2+=steps(a).map((k,i)=>`<th class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
     else h1+=`<th class="lp first"${rs} data-do="fold" data-a="${a.id}">${head}</th>`});
   h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
   let b="";const cols=list.reduce((n,a)=>n+(open(a)?steps(a).length+1:1),0);
@@ -941,7 +946,7 @@ function progress(studs,list){
     b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
       if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}${tryCell(s.uid,a.id,k)}${wrCell(s.uid,a,k)}</td>`).join("");
-      b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}">${c.t}</td>`;
+      b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}"${c.tip?` title="${esc(c.tip)}"`:""}>${c.t}</td>`;
       const y=a.graded&&x&&x.max&&scOf(s.uid,a);if(y){ts+=y.score;tm+=y.max}});
     b+=`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td></tr>`});
   return `<table><thead>${h1}${any?h2:""}</thead><tbody>${b}</tbody></table>`;
@@ -1271,7 +1276,7 @@ function plan(p,grp){let t=0; // week-by-week calendar from shared/js/el-plan.js
   return `<p class="muted">${esc(p.note)}</p><table class="plan"><tr><th>When</th><th>${gi>=0?esc(grp.name):"What"}</th><th>Calendar</th></tr>`+p.rows.map((r,i)=>{let h="";if(r.term!==t){t=r.term;const T=p.terms[t]||{};h=`<tr class="t"><td colspan="3">${esc(T.title)}<br><small class="muted">Assessment: ${esc(T.assess)}</small></td></tr>`}
     return h+`<tr class="${i===now?"now":""}"><td>${esc(r.when)}${i===now?"<br><small><b>this week</b></small>":""}</td><td style="white-space:pre-line">${what(r)}</td><td class="muted">${esc(r.note||"")}</td></tr>`}).join("")+`</table>${p.extra?`<p class="muted">${esc(p.extra)}</p>`:""}`}
 // ---- time plan (el-plan.js through el-week.js): exam day, this week and next week, per group; the overview tab shows every group
-const isDone=(u,a)=>{const x=(S.D.rs[u]||{})[a.id]||{};if(x.locked||x.markedDone)return true;const req=steps(a).filter(k=>!(a.skip||[]).includes(k));if(!req.length)return false;const d=doneSet(u,a);return req.every(k=>d.has(k))};
+const isDone=(u,a)=>elAllDone(a,doneSet(u,a),(S.D.rs[u]||{})[a.id]);   // every step done, not the Submit flag (el-catalog.js)
 // ✂ dropped learning paths of a group, under its exam day: not in the exam, do not count; ↩ brings one back
 const dropTag=x=>{const dr=((x.p||{})._dropped||{})[x.gi]||[];if(!dr.length)return "";
   return `<div class="dropt">✂ Dropped (no time), not in the exam and not counted: ${dr.map(id=>{const a=byId(id),lab=(Object.entries(lpMap(x)).find(([,b])=>b===a)||[])[0];
@@ -1777,7 +1782,8 @@ function stuPanel(u){redraw=null;
 }
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
-  const gx=!!G()&&!G().only&&a.ls===S.ls,state=x.locked?"✔ Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)";
+  const gx=!!G()&&!G().only&&a.ls===S.ls,nd=steps(a).filter(k=>!(a.skip||[]).includes(k)),nn=nd.filter(k=>d.has(k)).length,
+    state=(nd.length&&!a.manual?(nn===nd.length?"✅ Every step done":`${nn} of ${nd.length} steps done`)+" · ":"")+(x.locked?"📤 Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)");
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(scOf(u,a)||{score:0}).score}/${a.points}`:""}</p>`
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.steps?handIns(u,a):"")

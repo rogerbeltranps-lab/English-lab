@@ -37,9 +37,7 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
   const acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls);
   // On a page of this LS the local progress is the freshest; elsewhere the synced copy.
   const prog=k=>lsId===ls?store.get(k):((pg&&pg.data)||{})[k];
-  const isDone=a=>{const r=rs[a.id]||{};if(r.locked||r.markedDone)return true;
-    const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));
-    const req=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));return req.length>0&&req.every(k=>d.has(k))};
+  const isDone=a=>{const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));return window.elAllDone(a,d,rs[a.id])};   // every step, not the Submit flag
   const canDo=a=>seesAll||window.elLpOpen(a,info,group);   // learning paths the teacher has opened for the group
   // sections the teacher has opened and the student has not finished: on the list until they are done (elSecPending in el-catalog.js)
   const doneOf=a=>{const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));return d};
