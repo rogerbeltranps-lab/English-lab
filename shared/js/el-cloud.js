@@ -54,6 +54,17 @@ const seesAll=u=>isTester(u)&&!viewGroup(u);
 // "" = the route saved on the tester's own account. It replaces the route everywhere through window.EL_VIEW_LEVEL (elRouteOf, el-catalog.js).
 const viewLevel=u=>{const g=viewGroup(u);if(!g)return null;const l=localStorage.getItem("el_view_level"),c=((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
   return (window.EL_LEVELS||[]).some(x=>x.id===l)&&(l!=="native"||c==="4eso")?l:null};
+// 👁 The teacher browses the site as one student sees it (Roger, 4 Nov 2026: "I want to be able to [browse] the web like they do so that I can
+// see how they see the writing corrections, their activities"). The student's board opened from the dashboard (today.html?student=uid)
+// starts it in that browser tab (sessionStorage el_as = {uid}); every page of that tab then shows what that student sees: their group's
+// LSs and learning paths, their level, their saved answers (students/{uid}/progress/{ls}, copied into this browser and marked el_as_loaded),
+// the teacher's corrections in each step's tab and the same locks and messages. Read-only: the page is frozen and nothing is written to the
+// student's documents (push() is only for student accounts; the cards that save something when closed are not shown). The dashboard, Exit,
+// or any page of the teacher's own view clears the student's answers from this browser again (leaveAs).
+const AS_K="el_as",AS_LOADED="el_as_loaded",AS_MS=10*60e3;
+let AS=null;   // {uid, name, group, email}: only for the teacher account, set in onAuthStateChanged
+const asRead=()=>{try{const o=JSON.parse(sessionStorage.getItem(AS_K)||"null");return o&&o.uid?o:null}catch(e){return null}};
+const asSave=o=>{try{sessionStorage.setItem(AS_K,JSON.stringify(o))}catch(e){}};
 const isStudent=u=>!!u&&DOMAINS.some(d=>(u.email||"").toLowerCase().endsWith("@"+d));
 // Student list (roster/{email}, imported by the teacher in the dashboard): only listed school accounts (and testers) can use the site, and the list sets their group.
 // null = not on the list; undefined = the list could not be read (then the site behaves as before the list existed).
@@ -179,7 +190,7 @@ function overlay(html){
   o.innerHTML=html;document.body.append(o);return o;
 }
 // The link back to the board speaks the page's language: Catalan for Starter, Base and no route, English otherwise.
-const todayLink=(ca=true)=>'<p><a href="'+new URL("today.html",ROOT).href+'">'+(ca?"Torna al meu tauler":"Back to my board")+'</a></p>';
+const todayLink=(ca=true)=>'<p><a href="'+boardUrl()+'">'+(ca?"Torna al meu tauler":"Back to my board")+'</a></p>';
 const block=(title,msg,ca=true)=>overlay('<div><h1>'+title+'</h1><p>'+msg+'</p>'+todayLink(ca)+'</div>');
 // Signed-out visitors on an LS page: the sign-in button sits in the overlay itself; it goes away once someone signs in.
 let signInO=null;
@@ -218,8 +229,11 @@ function applyLevel(lvl,all){
   if(!all)btns.forEach(b=>{if(b!==mine)b.style.display="none"});
 }
 // Students only use their board, English Lab (lab/ and its practice page lab/practice.html), their own course page and the LSs assigned to their group.
-const BOARD=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html|practice\.html)?$/.test(location.pathname),
+const BOARD0=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html|practice\.html)?$/.test(location.pathname),
   onHome=[ROOT.pathname,ROOT.pathname+"index.html"].includes(location.pathname),onDash=/\/teacher\.html$/.test(location.pathname);
+// the student's board: in the teacher's student view, the board of that student
+const boardUrl=()=>AS?BOARD0+"?student="+encodeURIComponent(AS.uid):BOARD0;
+const BOARD=BOARD0;
 // The teacher's Dashboard link says which course (and LS) this page is in, so the dashboard opens on it (teacher.html, el_t_last).
 const dashHere=(()=>{const c=relPath.match(/^((2|4)eso)\//);if(!c)return DASH;const u=new URL(DASH);u.searchParams.set("course",c[1]);
   if(lsId)u.searchParams.set("ls",lsId);return u.href})();
@@ -227,29 +241,33 @@ const courseOf=g=>((window.EL_GROUPS||[]).find(x=>x.id===g)||{}).course;
 async function gate(u){
   const c=relPath.match(/^((2|4)eso)\/(index\.html)?$/);
   if(!u&&c){signInBlock();return}   // course pages are for signed-in users only
-  if(isStudent(u)&&!seesAll(u)&&!lsId&&!onBoard&&!onLab){
-    if(!(c&&c[1]===courseOf(myGroup))){location.replace(BOARD);return}
+  if((AS||isStudent(u)&&!seesAll(u))&&!lsId&&!onBoard&&!onLab){
+    if(!(c&&c[1]===courseOf(myGroup))){location.replace(boardUrl());return}
   }
+  if(AS&&!lsId&&!onBoard)asBanner();   // course pages, English Lab, Practice: the student view's banner too
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
   if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
-  if(isTeacher(u)){banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);return}
-  if(!u||!isStudent(u)){signInBlock();return}
-  const tester=seesAll(u),vg=viewGroup(u);
+  if(isTeacher(u)&&!AS){banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);return}
+  if(AS)asBanner();
+  else if(!u||!isStudent(u)){signInBlock();return}
+  const tester=!AS&&seesAll(u),vg=!AS&&viewGroup(u);
   if(tester)banner("Test account: you see every LS and activity.","#7c3aed");
   if(vg){const vl=viewLevel(u);banner("Test account · student view of "+EL_GROUPS.find(x=>x.id===vg).name+(vl?" · level "+(window.elLevelLabel?elLevelLabel(courseOf(vg),vl):vl):"")+": you see what this group sees.","#7c3aed",{t:"See everything again",f:()=>{origSet.call(localStorage,"el_view","");location.reload()}})}
   // The student's level: one per course, the same in every LS (elRouteOf). With none yet, a student works on the Insecure
   // version (nothing is saved as their route) until the teacher sets it; testers just see every route.
-  let lvs={};try{lvs=await myLevels(u.uid)}catch(e){console.warn("levels",e)}
+  let lvs={};try{lvs=await myLevels(AS?AS.uid:u.uid)}catch(e){console.warn("levels",e)}
   let lvl=elRouteOf(lvs,lsId).level;
   const ca0=!lvl||elCa(lvl);   // the blocks below speak the student's language (Catalan with no route)
   if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block(ca0?"Aquesta LS no és del teu grup":"This LS is not for your group",ca0?"Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.":"Go back to your board: it has the LSs your teacher gave your group.",ca0);return}
   if(st==="hidden"&&!tester){block(ca0?"Aquesta LS encara no està disponible":"This LS is not available yet",ca0?"El professor l'obrirà quan estigui preparada.":"Your teacher will open it when it is ready.",ca0);return}
-  if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
+  if(AS){if(await asPull())return}
+  else if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   if(reloadIfStale())return;
   const a=EL_CATALOG.find(x=>x.id===actId),saved=hasWork(a);   // before applyLevel, whose route click saves an empty state
   if(!lvl&&!tester){lvl="insecure";banner("Encara no tens nivell: el professor te'l posarà a partir de l'examen de la primera LS. De moment fas la ruta Base.","#0369a1")}
   if(lvl||tester)applyLevel(lvl,tester);
+  if(AS){freeze();asBanner()}   // the student's page, read-only (the banner again, now with their level)
   if(st==="closed"){freeze();banner("LS tancada: només pots consultar el que vas fer i el feedback.","#92400e");return}
   // Students are never told which activities are assessed (Roger, 26 Oct 2026), so this message does not say it either.
   const ca=elCa(lvl);
@@ -266,7 +284,7 @@ async function gate(u){
     o.querySelector("p").textContent=ca?"Per continuar, primer has d'acabar el "+cp.title+". Fes-lo sense apunts.":"To go on, first finish "+cp.title+". Do it without notes.";
     const go=o.querySelector("a.go");go.href=new URL(cp.path,ROOT).href;go.textContent=(ca?"Obre el ":"Open ")+cp.title+" →";return}
   if(a&&a.manual&&a.graded)banner(ca?"Aquesta activitat és per entregar a través del Google Classroom.":"This activity is to be submitted through Google Classroom.","#1d4ed8");
-  if(a&&a.mode==="once"){
+  if(a&&a.mode==="once"&&!AS){
     const rref=doc(db,"students",u.uid,"results",resKey(actId));
     const rset=d=>setDoc(rref,d,{merge:true}).then(()=>rcSaved(u.uid,resKey(actId),d));   // the copy in this browser too
     const r=await getDoc(rref).catch(()=>null),rd=r&&r.exists()?r.data():{};
@@ -291,6 +309,30 @@ async function gate(u){
   push();
 }
 
+// 👁 The student's answers in this LS, copied into this browser for the teacher's student view: read again when it is another student
+// or LS, or after 10 minutes. The page then reloads once (reloadIfStale) so its own script draws them. Returns true when it reloads.
+async function asPull(){
+  const k=AS.uid+"|"+lsId;let cur=null;try{cur=JSON.parse(localStorage.getItem(AS_LOADED)||"null")}catch(e){}
+  if(cur&&cur.k===k&&Date.now()-cur.t<AS_MS)return false;
+  const s=await getDoc(doc(db,"students",AS.uid,"progress",lsId)).catch(e=>{console.warn("student view",e);return null});
+  const cloud=s&&s.exists()?s.data().data||{}:{};
+  wipeKeys();for(const x in cloud)origSet.call(localStorage,x,cloud[x]);
+  origSet.call(localStorage,AS_LOADED,JSON.stringify({k,t:Date.now()}));
+  stale=true;return reloadIfStale();
+}
+// Remove the page answers kept in this browser (not the el_ settings), without marking them as unsaved.
+function wipeKeys(){const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k));localStorage.removeItem(DIRTY);return ks.length}
+// Back to the teacher's own view: the student's answers leave this browser. reload: the page's script may have drawn them already.
+function leaveAs(clear){
+  if(clear)try{sessionStorage.removeItem(AS_K)}catch(e){}
+  if(localStorage.getItem(AS_LOADED)==null)return;
+  localStorage.removeItem(AS_LOADED);if(wipeKeys()&&!onDash)stale=true;
+}
+const asExit=()=>{leaveAs(true);location.href=DASH};
+const asWho=()=>(AS.name||AS.email||"this student")+(AS.group?" · "+(((window.EL_GROUPS||[]).find(x=>x.id===AS.group)||{}).name||AS.group):"")+((myLevel||homeLevel)&&AS.group&&window.elLevelLabel?" · "+elLevelLabel(courseOf(AS.group),myLevel||homeLevel):"");
+function asBanner(){const b0=document.getElementById("el-as-banner");if(b0)b0.remove();
+  banner("👁 Student view: "+asWho()+" · as they see it, read-only (nothing is saved)","#a16207",[{t:"Their board",f:()=>{location.href=boardUrl()}},{t:"Exit student view",f:asExit}]);
+  const b=document.getElementById("el-banner");if(b)b.id="el-as-banner"}
 // The learning path the teacher has pulled up for the group (ls/{id}.push[group], elPullFor in el-catalog.js; Roger, 2 Nov 2026): on any
 // other page of this LS a bar "📌 Your teacher wants you to open …" with Open it →; on that learning path itself its tab opens once (the
 // first time the student lands there after the teacher pulled it up). ✕ hides the bar until the teacher pulls up something else.
@@ -461,6 +503,10 @@ function bar(){
   return u=>{el.innerHTML="";
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
     if(!u)el.append("Not signed in ",b("Sign in",login));
+    else if(AS){el.style.background="#fef3c7";el.style.borderColor="#f59e0b";el.append("👁 "+(AS.name||AS.email||"Student")+" ");
+      const a=document.createElement("a");a.textContent="Their board";a.href=boardUrl();el.append(a," ");
+      if(!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
+      const x=b("Exit student view",asExit);x.style.background="#a16207";x.title="Back to your dashboard; their answers leave this browser";el.append(x)}
     else{el.append(u.displayName||u.email," ");
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
@@ -480,8 +526,8 @@ function bar(){
 function menuLink(u){
   document.querySelectorAll("[data-el-board]").forEach(e=>e.remove());
   if(!u||onBoard||onDash||!(isStudent(u)||isTeacher(u)))return;
-  const teach=isTeacher(u),txt=teach?"Dashboard":elCa(myLevel||homeLevel)?"Les meves activitats":"My activities";
-  const add=(home,cls,icon)=>{if(!home)return;const a=document.createElement("a");a.dataset.elBoard="";a.className=cls;a.href=teach?dashHere:BOARD;a.textContent=icon+txt;home.after(a)};
+  const teach=isTeacher(u)&&!AS,txt=teach?"Dashboard":elCa(myLevel||homeLevel)?"Les meves activitats":"My activities";
+  const add=(home,cls,icon)=>{if(!home)return;const a=document.createElement("a");a.dataset.elBoard="";a.className=cls;a.href=teach?dashHere:boardUrl();a.textContent=icon+txt;home.after(a)};
   document.querySelectorAll(".navlinks").forEach(n=>add(n.querySelector(":scope>a"),"",""));
   document.querySelectorAll(".nav-tabs,.mobile-tabs").forEach(n=>add(n.querySelector(":scope>.tab-btn"),"tab-btn",""));
   document.querySelectorAll(".lp-home-link").forEach(h=>add(h,"lp-home-link","☰ "));
@@ -491,7 +537,7 @@ function menuLink(u){
 // course with the LSs assigned to their group that are not hidden; the other courses and the "Soon" ones go (Roger, 26 Oct 2026).
 async function lsMenu(u){
   const dds=document.querySelectorAll(".ls-dropdown");
-  if(!dds.length||!u||!isStudent(u)||seesAll(u)||!myGroup)return;
+  if(!dds.length||!u||(!AS&&(!isStudent(u)||seesAll(u)))||!myGroup)return;
   const course=courseOf(myGroup),home=new URL(course+"/",ROOT).href,norm=h=>new URL(h,location.href).href.replace(/index\.html$/,""),ok={};
   await Promise.all((window.EL_LS||[]).filter(l=>l.course===course).map(async l=>{const i=await lsInfo(l.id);
     ok[new URL(l.id.replace(course+"-",course+"/")+"/",ROOT).href]=i.status!=="hidden"&&elLsForGroup(l,i,myGroup)}));
@@ -506,7 +552,7 @@ async function lsMenu(u){
 function studyCard(u){
   const el=document.querySelector("[data-el-study]"),ls=(window.EL_LS||[]).find(x=>x.id===lsId);
   if(!el||!ls||!ls.study||!u)return;
-  const every=isTeacher(u)||seesAll(u),lv=myLevel,ca=!every&&elCa(lv);
+  const every=(isTeacher(u)&&!AS)||seesAll(u),lv=myLevel,ca=!every&&elCa(lv);
   if(!every&&!lv)return;
   const a=r=>'<a href="'+new URL(ls.study+r+".pdf",ROOT).href+'" target="_blank" rel="noopener" style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📄 '+(ca?"Obre el resum":"Open the summary")+(every?" · "+EL_LEVELS.find(x=>x.id===r).name:"")+" (PDF)</a>";
   el.innerHTML="<h2>📚 "+(ca?"Resum del vocabulari i la gramàtica":"Vocabulary and grammar summary")+"</h2><p>"
@@ -521,7 +567,7 @@ function studyCard(u){
 function storyCard(u){
   const el=document.querySelector("[data-el-story]"),ls=(window.EL_LS||[]).find(x=>x.id===lsId);
   if(!el||!ls||!ls.story||!u)return;
-  const every=isTeacher(u)||seesAll(u),lv=myLevel,ca=!every&&elCa(lv),s=ls.story;
+  const every=(isTeacher(u)&&!AS)||seesAll(u),lv=myLevel,ca=!every&&elCa(lv),s=ls.story;
   if(!every&&!lv)return;
   const a=r=>'<a href="'+new URL(s.pdf+r+".pdf",ROOT).href+'" target="_blank" rel="noopener" style="display:inline-block;margin:4px 8px 0 0;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">📖 '
     +(every?EL_LEVELS.find(x=>x.id===r).name+" (PDF)":ca?"Obre el teu llibre (PDF)":"Open your book (PDF)")+"</a>";
@@ -652,6 +698,17 @@ function bellWatch(cb){
 }
 onAuthStateChanged(auth,async u=>{
   window.EL_VIEW_LEVEL=viewLevel(u);   // before anything reads a route (elRouteOf)
+  // 👁 the teacher's student view of this tab: started by the student's board (today.html?student=uid), ended by the dashboard
+  AS=null;
+  if(isTeacher(u)){
+    const sp=onBoard&&new URLSearchParams(location.search).get("student"),was=asRead();
+    if(sp&&(!was||was.uid!==sp))asSave({uid:sp});
+    if(onDash)leaveAs(true);
+    else if((AS=asRead())){
+      if(!AS.name||!AS.group){const me=await myDoc(AS.uid).catch(()=>null)||{};AS=Object.assign(AS,{name:me.name||"",email:me.email||"",group:me.group||null});asSave(AS)}
+      myGroup=AS.group;if(lsId)frozen=true}   // nothing typed on the student's LS pages is kept
+    else leaveAs(false);
+  }
   user=u;draw(u);
   if(u&&signInO){signInO.remove();signInO=null}
   // A student's first sign-in on this browser starts clean too: what is there was done by the teacher, a signed-out visitor or
@@ -666,11 +723,12 @@ onAuthStateChanged(auth,async u=>{
   if(lr&&lr.level&&lr.ls)try{const ref=doc(db,"students",u.uid,"levels",lr.ls);if(!(await myLevels(u.uid))[lr.ls]){await setDoc(ref,{level:lr.level,changed:serverTimestamp(),was:null,why:null});once.drop("lv:"+u.uid)}}catch(e){console.warn("route from the list",e)}
   gamePush(u);
   lsMenu(u).catch(e=>console.warn("ls menu",e));
-  document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u));   // teacher-only links (e.g. a class game on its learning path)
+  document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u)||!!AS);   // teacher-only links (e.g. a class game on its learning path)
   menuLink(u);   // again after gate, which knows the route (the label follows its language)
   try{await gate(u)}catch(e){console.warn("gate",e)}
   if(reloadIfStale())return;   // wiped on a page without progress sync
-  if(u&&isStudent(u)&&!myLevel&&!onBoard)await findHomeLevel(u);
+  if(u&&(isStudent(u)||AS)&&!myLevel&&!onBoard)await findHomeLevel(AS||u);
+  if(AS&&!lsId&&!onBoard&&homeLevel)asBanner();   // again, with their level
   menuLink(u);
   studyCard(u);
   storyCard(u);
@@ -692,6 +750,12 @@ onAuthStateChanged(auth,async u=>{
       visible:async ls=>{const i=await lsInfo(ls);return i.status!=="hidden"&&elLsForGroup((window.EL_LS||[]).find(x=>x.id===ls),i,myGroup)}})).catch(e=>console.warn("exam notice",e));
   // The teacher's corrections and answers to hand-ins: a card once per new answer with a link to the step's tab, and the answer inside
   // that tab on the learning path (shared/js/el-corrections.js).
+  if(u&&AS&&!onBoard&&!document.getElementById("el-corrections"))loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
+    .then(()=>import("./el-corrections.js")).then(m=>m.corrections({here:actId,root:ROOT,en:repEn(),
+      list:async()=>Object.values(await myResults(AS.uid)).filter(r=>r&&r.activity&&(r.replies||r.answers||r.levels)),
+      seen:async()=>((await myDoc(AS.uid))||{}).fbSeen||{},
+      save:()=>{},   // the student view never marks an answer as seen
+      name:(aid,step)=>{for(const g of Object.values(window.EL_GRADING||{})){const x=(g.moments||[]).find(m=>m.a===aid&&m.step===step);if(x)return x.name}return null}})).catch(e=>console.warn("corrections",e));
   if(u&&isStudent(u)&&!document.getElementById("el-corrections"))loadScript("shared/js/el-catalog.js",()=>window.EL_CATALOG).then(()=>loadScript("shared/js/el-grading.js",()=>window.EL_GRADING))
     .then(()=>import("./el-corrections.js")).then(m=>m.corrections({here:actId,root:ROOT,en:repEn(),
       list:async()=>Object.values(await myResults(u.uid)).filter(r=>r&&r.activity&&(r.replies||r.answers||r.levels)),
@@ -704,6 +768,7 @@ onAuthStateChanged(auth,async u=>{
     seen:async()=>((await myDoc(u.uid))||{}).levelSeen||{},
     save:(c,ms)=>setDoc(doc(db,"students",u.uid),{levelSeen:{[c]:ms}},{merge:true})})).catch(e=>console.warn("level notice",e));
   // Floating weekly to-do list for students (and testers) on every page that loads this file (shared/js/el-todo.js).
+  if(u&&AS&&myGroup&&!onBoard&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:{uid:AS.uid,email:AS.email||"",displayName:AS.name||""},group:myGroup,root:ROOT,lsId,seesAll:false,results:()=>myResults(AS.uid),levels:()=>myLevels(AS.uid),lsInfo})).catch(e=>console.warn("todo",e));
   if(u&&isStudent(u)&&myGroup&&!document.getElementById("el-todo-btn"))import(new URL("shared/js/el-todo.js",ROOT).href).then(m=>m.start({db,user:u,group:myGroup,root:ROOT,lsId,seesAll:seesAll(u),results:()=>myResults(u.uid),levels:()=>myLevels(u.uid),lsInfo})).catch(e=>console.warn("todo",e));
   // The teacher's 🔔 in the bottom bar: open problem reports from all groups on every page (live on the dashboard, bellWatch) (shared/js/el-bell.js).
   if(stopBell&&!isTeacher(u)){stopBell();stopBell=null;bellEl=null;draw(u)}
@@ -715,4 +780,4 @@ onAuthStateChanged(auth,async u=>{
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,results:(fresh)=>user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>user?myLevels(user.uid):Promise.resolve({}),onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};

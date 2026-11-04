@@ -20,7 +20,9 @@ window.ELCheckpoint = (function () {
   const cloud = () => window.ELCloud && window.ELCloud.user ? window.ELCloud : null;
   const act = key => (window.EL_CATALOG || []).find(a => (a.keys || []).includes(key)) || null;
   function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-  const ref = (F, key) => F.doc(window.ELCloud.db, 'students', window.ELCloud.user.uid, 'checkpoints', key);
+  // the teacher's student view (el-cloud.js): that student's checkpoint, read only
+  const viewing = () => !!(window.ELCloud && window.ELCloud.viewing);
+  const ref = (F, key) => F.doc(window.ELCloud.db, 'students', (window.ELCloud.viewing || window.ELCloud.user).uid, 'checkpoints', key);
   function stop() { clearInterval(timer); timer = null; off.forEach(f => f()); off = []; }
   // full screen while a checkpoint runs (not on iPhones, which can't put a page in full screen)
   const FS_GRACE = 300, D = document, E = D.documentElement;
@@ -132,6 +134,7 @@ window.ELCheckpoint = (function () {
     // the answers go once to the cloud; the step is done (the next Learning Path opens) as soon as they are sent
     let busy = false;
     async function send(auto) {
+      if (viewing()) { stop(); box().innerHTML = '<p>👁 ' + t('Començat però no enviat.', 'Started but not sent.') + ' <span class="tiny">(Student view: nothing is sent.)</span></p>'; return; }
       stop(); exitFull(); const c = st(); if (c.sentAt && c.ok) return sent(); if (busy) return; busy = true;
       c.auto = c.auto || auto; c.sentAt = c.sentAt || new Date().toISOString(); delete c.away; delete c.draft; api.save();
       while (c.answers.length < c.ids.length) { c.answers.push(''); c.times.push(0); }

@@ -668,7 +668,7 @@ function detail(id){
 function asBar(lss,ls){let b=document.getElementById("asbar");
   if(!b){b=document.createElement("div");b.id="asbar";b.className="asbar";document.querySelector(".page").prepend(b);document.body.classList.add("as")}
   const tab=tabOf(ls),tb=(id,lbl)=>`<button class="chip ${tab===id?"on":""}" data-do="tab" data-t="${id}">${lbl}</button>`;
-  b.innerHTML=`<div class="top"><div><b>👁 ${esc(D.me.name||"")}${D.me.group?" · "+esc(D.me.group):""}</b> <span class="muted">· the student's board as they see it (read-only)</span></div><a class="go" href="teacher.html">Dashboard</a></div>`
+  b.innerHTML=`<div class="top"><div><b>👁 ${esc(D.me.name||"")}${D.me.group?" · "+esc(D.me.group):""}</b> <span class="muted">· the student's board as they see it (read-only)</span><div class="muted" style="font-size:13px;margin-top:2px">👁 In this tab you browse the whole site as they see it: open a learning path, a tab or their course page to see their answers, your corrections and what is locked for them. Nothing is saved.</div></div><a class="go" href="teacher.html" title="Back to your dashboard (ends the student view)">Exit · Dashboard</a></div>`
     +`<div class="bar"><small>LS</small>${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</button>`).join("")}</div>`
     +`<div class="bar"><small>Show</small>${tb("form",only(ls.id)?"🎬 Final product":"📈 Learning paths and mark")}${hasFp(ls)?tb("fp","🎬 Final product"):""}${tb("exam","📝 Exams")}${hasWeek(ls)?tb("week","🗓 Week plan"):""}</div>`}
 // The LS's learning paths in one table, in the order of the group's time plan: each tab done (✔, amber when done after its day, from the
@@ -725,6 +725,7 @@ addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detai
 if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
 else ELCloud.onUser(async u=>{U=u;
   if(!u){nav(null,[]);$("#sub").textContent="Entra amb el teu correu de l’institut i la contrasenya (botó de baix a la dreta) per veure les teves activitats. · Sign in with your school email and password (button at the bottom right) to see your activities.";$("#main").innerHTML="";return}
-  const sp=new URLSearchParams(location.search).get("student");AS=sp&&ELCloud.isTeacher(u)?sp:null;
+  // the student view of this tab (el-cloud.js, el_as) keeps the board on that student when the URL has no ?student
+  const sp=new URLSearchParams(location.search).get("student")||(ELCloud.viewing||{}).uid;AS=sp&&ELCloud.isTeacher(u)?sp:null;
   D=await load(u);render();if(!AS)goLive();if(location.hash==="#exam")setTimeout(()=>document.querySelector(AS?".tabbody":"#exam")?.scrollIntoView({block:"start"}),0)});
 </script></body></html>

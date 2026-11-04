@@ -1188,8 +1188,9 @@ function compPanel(u,scope,k,tr){redraw=null;const {R,TR}=S.yR||{},s=S.P[u],src=
     +cs.map(c=>{const rc=rows.filter(r=>r.c===c),m=byComp(rc).c[k];return `<h4 style="margin:10px 0 4px">${pill(c)} ${f1(m&&m.m)}</h4><table><tbody>${rc.map(r=>`<tr><td style="text-align:left">${lsLabel(r.it.l).replace(/ · .*/,"")} · ${esc(r.it.b.name)}${r.n?" · "+esc(r.n):""}</td><td>${f1(r.m)}</td><td><small class="muted">weight ${+r.w.toFixed(1)}</small></td></tr>`).join("")}</tbody></table>`}).join(""));
 }
 // A student's board as they see it (Roger, 1 Nov 2026: "teacher should be able to see their reports, all of them"): today.html?student=uid
-// opens it read-only for the teacher, on this LS's 📝 My exams tab (the exam report).
-const repLink=u=>`<a class="replink" style="text-decoration:none" href="today.html?student=${encodeURIComponent(u)}&ls=${encodeURIComponent(S.ls)}#exam" target="_blank" rel="noopener" title="Open this student's board: exam report, formative assessment">📄</a>`;
+// opens it read-only for the teacher, on this LS's 📝 My exams tab (the exam report). From there that browser tab shows every page as the
+// student sees it (el-cloud.js student view, Roger 4 Nov 2026).
+const repLink=u=>`<a class="replink" style="text-decoration:none" href="today.html?student=${encodeURIComponent(u)}&ls=${encodeURIComponent(S.ls)}#exam" target="_blank" rel="noopener" title="Open this student's board (exam report, formative assessment) and browse the whole site as they see it, read-only">📄</a>`;
 // Which exam version a student took (Roger, 30 Oct 2026): results/{ls}__assessment .version = insecure|safe|daring, imported with the
 // marks (tools/exam-marks) or chosen here; it saves on change.
 const EXV=["insecure","safe","daring"],exVer=u=>res(u,asId(S.ls)).version||"",
