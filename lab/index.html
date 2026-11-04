@@ -98,7 +98,8 @@
   </style>
 </head>
 <body>
-  <!-- Same menu as the home page; Courses and Learning Situations ([data-private]) only for the teacher and the tester -->
+  <!-- Same menu as the home page; Courses and Learning Situations ([data-private]) only for the teacher and the tester.
+       Students get Current Learning Situation, All Learning Situations, My activities and English Lab instead (sideMenu in el-cloud.js). -->
   <nav class="mobile-tabs">
     <a class="tab-btn" href="../index.html">Home</a>
     <a class="tab-btn" href="../index.html#courses" data-private hidden>Courses</a>
@@ -249,7 +250,8 @@
 
     const C = () => window.ELCloud;
     const signedIn = u => !!u && (C().isStudent(u) || C().isTeacher(u));
-    const switches = u => C().isTeacher(u) || (C().isTester(u) && !C().viewGroup());
+    // the teacher's student view (ELCloud.viewing) sees the student's English Lab, as the student does
+    const switches = u => !C().viewing && (C().isTeacher(u) || (C().isTester(u) && !C().viewGroup()));
     const login = () => { if (C()) C().login(); };
 
     function render(){
