@@ -132,7 +132,7 @@ const ALL=(n,group)=>F.getDocs(group?F.collectionGroup(db(),n):F.collection(db()
 async function loadLight(){const L={ls:{},tk:{},pb:[],sg:[],ann:[],ck:{},replies:{}},soft=(name,p,f)=>p.then(f).catch(e=>console.warn(name,e));
   const lsI=Promise.all(EL_LS.map(l=>ELCloud.lsInfo(l.id)));
   await Promise.all([lsI.then(a=>EL_LS.forEach((l,i)=>L.ls[l.id]=a[i])),   // in the catalogue's order, as before
-    soft("teacherPlan",ALL("teacherPlan"),q=>q.forEach(t=>L.tk[t.id]=t.data())),
+    soft("teacherPlan",ALL("teacherPlan"),q=>{q.forEach(t=>L.tk[t.id]=t.data());L.tkOk=true}),   // tkOk: the ticks really came in (doneSync)
     soft("settings",F.getDoc(F.doc(db(),"settings","routes")),c=>{if(c.exists())L.cuts=c.data()}),
     // sg = suggestions from students (suggestions/{id}: uid, email, name, group, page, text, created, read), sent with "💡 Idea" in the bottom bar
     soft("suggestions",ALL("suggestions"),q=>q.forEach(x=>L.sg.push(Object.assign({id:x.id},x.data())))),
@@ -174,7 +174,7 @@ function build(L){const R=RAW,pg={};Object.entries(R.pg).forEach(([u,x])=>{pg[u]
   return D}
 // mode: undefined = open (the copy if there is one), "all", or a group id
 async function load(mode){
-  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};DEMO.ann=DEMO.ann||[];cpInject(DEMO);Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits)ELWeek.applyEdits(id,i.planEdits)});return DEMO}
+  if(DEMO){Object.values(DEMO.ls||{}).forEach(i=>{if(i.status==="public")i.status="open"});DEMO.ro=DEMO.ro||{};DEMO.pt=DEMO.pt||{};DEMO.tm=DEMO.tm||{};DEMO.tk=DEMO.tk||{};DEMO.pb=DEMO.pb||[];DEMO.replies=DEMO.replies||{};DEMO.ck=DEMO.ck||{};DEMO.cp=DEMO.cp||{};DEMO.ann=DEMO.ann||[];DEMO.tkOk=true;cpInject(DEMO);Object.entries(DEMO.ls||{}).forEach(([id,i])=>{if(i&&i.planEdits)ELWeek.applyEdits(id,i.planEdits)});return DEMO}
   if(!RAW&&mode!=="all"){const c=await CACHE.get();if(c&&c.v===1&&c.raw){RAW=revive(c.raw);AT=c.at||{all:0,g:{}}}}
   const L=loadLight();
   if(!RAW||mode==="all")await loadAll();else if(mode&&GR.some(g=>g.id===mode))await loadGroup(mode);
@@ -592,7 +592,7 @@ function lsWarn(ls,grp,assigned){
   return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
 }
 function render(){
-  render0();keepLast();ptSync();progSync();loadBar();if(CLS.ready)classCheck()}
+  render0();keepLast();ptSync();progSync();doneLater();loadBar();if(CLS.ready)classCheck()}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
 // somewhere else, a message asks whether to go to the group or stay where I am"). The timetable is EL_TIMETABLE (el-plan.js), read by
 // ELWeek.classAt (from 5 minutes before the class). Opening the dashboard during a class goes straight to that group (and its current LS);
@@ -1338,6 +1338,25 @@ function dayTabs(x,l,plain){const c=plain?null:((x.p._tabs||{})[x.gi]||{})[origO
 // all its tabs ticked. Homework lines only list their tabs (students do them).
 const tabKey=(x,l,a,id)=>origOf(x,l)+"#"+a.id+"#"+id;
 const tabOn=(x,l,a,id)=>!!((S.D.tk[x.gid]||{}).ticks||{})[x.ls+"|"+tabKey(x,l,a,id)];
+// What the class has done so far (Roger, 4 Nov 2026: "Instead of having a to do list or what we'll do during the week, I want them [to] see what
+// LP and section we've done so far, when I tick them off in my planning"): every learning-path tab ticked in the Time plan (a ticked session =
+// all its tabs) and every activity without tabs in a ticked session (recall checkpoints, sample exam), with the day of its session. Copied to
+// ls/{ls}.done[group] = {"activity#panel": "YYYY-MM-DD"} ("activity#" for one without tabs): students can't read teacherPlan and the board
+// reads the ls docs anyway, so no extra reads. Written only when it changes (after a tick, a move, a ✂ drop…). Never for LS1. Games left out.
+function doneMap(x){const out={},t=(S.D.tk[x.gid]||{}).ticks||{},set=(k,d)=>{if(!out[k]||out[k]<d)out[k]=d};
+  x.p.rows.forEach(r=>lines(x,r).forEach(l=>{if(/^Homework by /.test(l))return;const all=ticked(x,l),v=t[x.ls+"|"+origOf(x,l)];
+    const d=lineDate(r,l)||(typeof v==="string"?v:"")||r.from||ELWeek.today();
+    dayTabs(x,l).forEach(([a,,ts])=>ts.forEach(([id])=>{if(isGame(id))return;if(all||tabOn(x,l,a,id)){const tv=t[x.ls+"|"+tabKey(x,l,a,id)];set(a.id+"#"+id,lineDate(r,l)||(typeof tv==="string"?tv:d))}}));
+    if(all)lineActs(x,l).forEach(([a])=>{if(!secOf(a).length&&!((x.p._dropped||{})[x.gi]||[]).includes(a.id))set(a.id+"#",d)})}));
+  return out}
+const sameMap=(a,b)=>{const ka=Object.keys(a||{}),kb=Object.keys(b||{});return ka.length===kb.length&&ka.every(k=>(b||{})[k]===a[k])};
+function doneSync(){if(!S.D||!S.D.tkOk)return;
+  Object.keys(window.EL_PLAN||{}).filter(ls=>!/-my-real-routine$/.test(ls)&&S.D.ls[ls]).forEach(ls=>GR.forEach(g=>{const x=planX(ls,g.id);if(x.gi<0||!(x.p.rows||[]).length)return;
+    let m;try{m=doneMap(x)}catch(e){console.warn("done",ls,g.id,e);return}
+    const i=S.D.ls[ls],cur=(i.done||{})[g.id]||{};if(sameMap(m,cur))return;
+    const w=Object.assign(Object.fromEntries(Object.keys(cur).filter(k=>!(k in m)).map(k=>[k,DEMO?null:F.deleteField()])),m);
+    i.done=Object.assign({},i.done,{[g.id]:m});const p=put(["ls",ls],{done:{[g.id]:w}});if(p)p.catch(e=>console.warn("done",e))}))}
+let doneT=0;const doneLater=()=>{clearTimeout(doneT);doneT=setTimeout(doneSync,1500)};
 // 🔓/🔒 next to each tab opens or closes that section for the group (Roger, 1 Nov 2026: "vull poder obrir i tancar les tabs"), the same
 // switch as the Sections column of "Learning paths open for …" and the one on the learning path page in teacher mode (api.secLock).
 const secSw=(x,a,id)=>{if(isGame(id)||/-my-real-routine$/.test(x.ls)||!(EL_SECTIONS[a.id]||[]).some(z=>z[0]===id))return "";const off=elSecLocked(a,S.D.ls[x.ls]||{},x.gid).includes(id),gn=(GR.find(g=>g.id===x.gid)||{}).name||x.gid;
