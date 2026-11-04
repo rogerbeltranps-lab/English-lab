@@ -6,7 +6,7 @@ window.GS_NATIVE = {
     { q: 'I’m shattered: I’m going to turn ___ early tonight.', a: ['in'], en: 'turn in = go to bed.' },
     { q: 'I keep putting ___ my homework until the last minute.', a: ['off'], en: 'put off = postpone.' },
     { q: 'My alarm went off, but I lay ___ for another twenty minutes.', a: ['in'], en: 'lie in = stay in bed later than usual.' },
-    { q: 'I’m not a morning ___: I can’t think before nine.', a: ['person'], en: 'a morning person.' },
+    { q: 'I’m not a morning ___: I can’t think before nine.', a: ['person', 'lark'], en: 'a morning person / a morning lark.' },
     { q: 'Weekends throw my sleep pattern completely out of ___.', a: ['sync', 'kilter', 'balance'], en: 'out of sync / out of kilter.' },
     { q: 'Sticking to a routine requires a lot of ___ (DISCIPLINE).', a: ['self-discipline', 'discipline'], en: 'Compound noun: self-discipline.' },
     { q: 'Scrolling at night makes it ___ (NOTORIOUS) hard to fall asleep.', a: ['notoriously'], en: 'Adverb before an adjective.' },
