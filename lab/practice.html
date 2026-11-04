@@ -219,7 +219,7 @@ const S = { tab: (location.hash.slice(1) || 'words'), course: null, level: null,
 if (!['words', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
 let U = null, D = null, EN = true;
 const t = (ca, en) => EN ? en : ca;
-const all = () => DEMO ? !!DEMO.teacher : !!U && (ELCloud.isTeacher(U) || (ELCloud.isTester(U) && !ELCloud.viewGroup()));
+const all = () => DEMO ? !!DEMO.teacher : !!U && !ELCloud.viewing && (ELCloud.isTeacher(U) || (ELCloud.isTester(U) && !ELCloud.viewGroup()));   // viewing: the teacher's student view (el-cloud.js)
 async function load(u) {
   if (DEMO) return { group: DEMO.group, lv: DEMO.levels || {}, ls: DEMO.ls || {} };
   const db = ELCloud.db, D = { group: ELCloud.viewGroup() || ELCloud.group(), lv: {}, ls: {} };

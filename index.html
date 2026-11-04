@@ -419,7 +419,7 @@
     await import('./shared/js/el-cloud.js');
     // Students never stay on this page (el-cloud sends them to their board), so only the teacher and the tester get here signed in.
     ELCloud.onUser(u => {
-      const all = ELCloud.isTeacher(u) || (ELCloud.isTester(u) && !ELCloud.viewGroup());
+      const all = !ELCloud.viewing && (ELCloud.isTeacher(u) || (ELCloud.isTester(u) && !ELCloud.viewGroup()));
       document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !all; });
       if (all && initialTab) openTab(initialTab);
     });
