@@ -533,6 +533,36 @@ function menuLink(u){
   document.querySelectorAll(".lp-home-link").forEach(h=>add(h,"lp-home-link","☰ "));
   document.querySelectorAll(".site-header .home-link").forEach(h=>add(h,"home-link",""));
 }
+// The side and phone menus (English Lab, Practise) for a student, the teacher's student view and the tester in a group's view (Roger,
+// 4 Nov 2026: "from this menu they should see: Go to the current Learning Situation, All LS, My activities and English Lab"). Home,
+// Courses and Learning Situations go (they only lead back to the board); the current LS is the board's: the group's LS by the time plan
+// (ELWeek.now), else its first open one, never a hidden one or one not assigned to the group. All LS = the course page.
+// No new reads: lsInfo is the same cached ls/{id} read the LS dropdown and the to-do list make.
+async function sideMenu(u){
+  const navs=document.querySelectorAll(".nav-tabs,.mobile-tabs");
+  document.querySelectorAll("[data-el-side]").forEach(e=>e.remove());
+  document.querySelectorAll("[data-el-side-hid]").forEach(e=>{e.hidden=false;delete e.dataset.elSideHid});
+  if(!navs.length||!u||onBoard||onDash||!myGroup||(!AS&&(!isStudent(u)||seesAll(u))))return;
+  const course=courseOf(myGroup);if(!course)return;
+  await Promise.all([loadScript("shared/js/el-plan.js",()=>window.EL_PLAN),loadScript("shared/js/el-week.js",()=>window.ELWeek)]);
+  const mine=(window.EL_LS||[]).filter(l=>l.course===course),info={};
+  await Promise.all(mine.map(async l=>{info[l.id]=await lsInfo(l.id)}));
+  const vis=mine.filter(l=>info[l.id].status!=="hidden"&&elLsForGroup(l,info[l.id],myGroup));
+  const nowId=window.ELWeek&&(ELWeek.now(myGroup)||{}).ls,cur=vis.find(l=>l.id===nowId)||vis.find(l=>info[l.id].status==="open")||vis[0];
+  const ca=elCa(myLevel||homeLevel),href=p=>new URL(p,ROOT).href,root=href("index.html");
+  document.querySelectorAll("[data-el-side]").forEach(e=>e.remove());   // a second call may have finished first
+  navs.forEach(n=>{
+    n.querySelectorAll(":scope>.tab-btn").forEach(a=>{const h=a.getAttribute("href");if(!h)return;const x=new URL(h,location.href);
+      if(x.origin+x.pathname===root||x.href===ROOT.href){a.hidden=true;a.dataset.elSideHid=""}});
+    const mk=(txt,h,sub)=>{const a=document.createElement("a");a.className="tab-btn";a.dataset.elSide="";a.href=h;a.textContent=txt;
+      if(sub){a.title=sub;if(n.classList.contains("nav-tabs")){const s=document.createElement("small");s.textContent=sub;s.style.cssText="display:block;font-weight:600;opacity:.75;margin-top:2px";a.append(s)}}return a};
+    const items=[];
+    if(cur)items.push(mk(ca?"Learning Situation actual":"Current Learning Situation",href(cur.course+"/"+cur.id.slice(cur.course.length+1)+"/index.html"),cur.title.replace(/^\S+ · /,"")));
+    items.push(mk(ca?"Totes les Learning Situations":"All Learning Situations",href(course+"/index.html")));
+    const at=n.querySelector(":scope>[data-el-board]")||n.querySelector(":scope>.tab-btn:not([hidden])");
+    items.forEach(i=>at?at.before(i):n.append(i));
+  });
+}
 // Learning Situations dropdown (.ls-dropdown, course and LS pages): a student, and the tester in a group's view, sees only their own
 // course with the LSs assigned to their group that are not hidden; the other courses and the "Soon" ones go (Roger, 26 Oct 2026).
 async function lsMenu(u){
@@ -544,6 +574,8 @@ async function lsMenu(u){
   dds.forEach(dd=>dd.querySelectorAll(".course-group").forEach(g=>{const c=g.querySelector(":scope>.course-link");
     if(g.classList.contains("muted-group")||!c||norm(c.getAttribute("href"))!==home){g.remove();return}
     g.querySelectorAll(".ls-link").forEach(a=>{if(!ok[norm(a.getAttribute("href"))])a.remove()})}));
+  // the course page's LS cards too (the side menu's "All Learning Situations" opens it): only the ones the group can open
+  document.querySelectorAll("a.card[href]").forEach(a=>{const h=norm(a.getAttribute("href"));if(h in ok&&!ok[h])a.remove()});
 }
 // Vocabulary and grammar summary on the LS page (Roger, 26 Oct 2026): the "Language & Knowledge" tab has an empty card ([data-el-study]);
 // for an LS with `study` in EL_LS it gets the student's route PDF (nothing until they have a route), the teacher and testers all three.
@@ -730,6 +762,7 @@ onAuthStateChanged(auth,async u=>{
   if(u&&(isStudent(u)||AS)&&!myLevel&&!onBoard)await findHomeLevel(AS||u);
   if(AS&&!lsId&&!onBoard&&homeLevel)asBanner();   // again, with their level
   menuLink(u);
+  sideMenu(u).catch(e=>console.warn("side menu",e));   // after menuLink: the LS links go before My activities
   studyCard(u);
   storyCard(u);
   if(myLevel||homeLevel)draw(u);   // the route is known now: the Problem button speaks its language
