@@ -131,11 +131,19 @@ window.EL_CATALOG=(function(){
 window.elDone=function(str,skip){skip=skip||[];const s=new Set();try{(function w(o){if(o&&typeof o==="object"){for(const k in o){if(k==="done"&&o[k]&&typeof o[k]==="object"){for(const d in o[k])if(o[k][d]&&!skip.includes(d))s.add(d)}else w(o[k])}}})(JSON.parse(str))}catch(e){}return s.size};
 // Points of an activity from the current localStorage (capped at the activity's total).
 window.elPoints=function(a,get){const g=get||(k=>localStorage.getItem(k));let n=0;a.keys.forEach(k=>n+=elDone(g(k),a.skip));return Math.min(n,a.points)};
-// An activity's score on the dashboards: the saved result (results/{activity}.score of max), or, when it was saved before the activity's
-// points changed (the LS2 writings became scored on 1 Nov 2026: 9 → 10 points), the same count made again from the saved progress
-// (pg = the LS's progress data), so the score is right before the student opens the page again. → {score, max} or null.
-window.elScore=function(a,x,pg){if(!x)return null;if(a.manual||!a.graded||!x.max||x.max===a.points||!pg||!a.keys.some(k=>pg[k]))return {score:x.score||0,max:x.max||a.points};
+// An activity's score on the dashboards: 1 point per step done (elPoints, the count the page itself saves), counted again from the saved
+// progress (pg = the LS's progress data) whenever it is there, so it always matches the ✔ steps. The saved result
+// (results/{activity}.score of max) can be older: a student who pressed Submit with 1 step done kept 1/10 for good, because
+// firestore.rules freeze a submitted result, while the progress kept growing (Roger, 4 Nov 2026: "I don't understand this score").
+// The saved result is used only when there is no progress, and always for the final product (the teacher's mark). → {score, max} or null.
+window.elScore=function(a,x,pg){if(a.manual||!a.graded||!pg||!a.keys.some(k=>pg[k]))return x?{score:x.score||0,max:x.max||a.points}:null;
   return {score:elPoints(a,k=>pg[k]||null),max:a.points}};
+// Every step of a learning path done (Roger, 4 Nov 2026: "some students have that they did everything and that the bonus counts, however
+// this is not true"): the steps themselves (EL_ACTIONS without the not-scored ones), never the Submit or "Mark as done" flag, which a
+// student can press with 1 step of 10 done. done = Set of the student's done steps, r = results/{activity}; an activity with no steps
+// listed falls back to the flag. Used by the bonus (All work), the student's missing list and every ✅ Done.
+window.elAllDone=function(a,done,r){const req=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));
+  if(req.length)return req.every(k=>done.has(k));r=r||{};return !!(r.locked||r.markedDone)};
 window.elToday=function(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 
 // Actions (steps) inside each activity, as recorded in the "done" maps. 'note' = not scored.
