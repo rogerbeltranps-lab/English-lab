@@ -172,16 +172,16 @@ html,body{overflow-x:clip}
   </div>
   <div class="section-card">
     <h3 data-support-ca="Revisa la transcripció" data-support-en="Transcript">Transcript</h3>
-    <p class="instruction" data-support-ca="Amb Chrome, la transcripció es crea mentre graves. Escolta la gravació i comprova que el text diu el mateix. Corregeix-lo; si no apareix, escriu què has dit." data-support-en="With Chrome, a transcript is created automatically while you record. Check it before asking for feedback.">With Chrome, a transcript is created automatically while you record. Check it before asking for feedback.</p>
+    <p class="instruction" data-support-ca="Amb Chrome, la transcripció es crea mentre graves. Escolta la gravació i comprova que el text diu el mateix. Corregeix-lo; si no apareix, escriu què has dit." data-support-en="With Chrome, a transcript is created automatically while you record. Listen to your recording and correct the transcript so it says what you said.">With Chrome, a transcript is created automatically while you record. Listen to your recording and correct the transcript so it says what you said.</p>
     <textarea id="speechTranscript" placeholder="Your transcript will appear here. You can correct it."></textarea>
   </div>
   <div class="section-card">
-    <h3 data-support-ca="Demana feedback" data-support-en="Get feedback">Get feedback</h3>
-    <p class="instruction" data-support-ca="Prem &lt;strong&gt;Corregeix amb IA&lt;/strong&gt;: es descarrega el WAV i s’obre ChatGPT amb la petició preparada. Adjunta el WAV i prem Envia. Llegeix el perquè de les correccions i torna a practicar." data-support-en="When you press &lt;strong&gt;Correct with AI&lt;/strong&gt;, the WAV will download automatically and ChatGPT will open with the prompt prepared. Attach the WAV and press Send.">When you press <strong>Correct with AI</strong>, the WAV will download automatically and ChatGPT will open with the prompt prepared. Attach the WAV and press Send.</p>
-    <div class="actions"><button class="btn" id="prepareSpeakingFeedback" type="button" disabled data-support-ca="Corregeix amb IA ↗" data-support-en="Correct with AI ↗">Correct with AI ↗</button></div>
-    <p class="tiny" id="speakingCopyStatus"></p>
+    <h3 data-support-ca="Entrega-ho al professor" data-support-en="Hand it in">Hand it in</h3>
+    <p class="instruction" data-support-ca="Quan la transcripció digui el que has dit, prem &lt;strong&gt;Entrega al professor&lt;/strong&gt;. El professor et tornarà la correcció aquí mateix. Si després et tornes a gravar millor, torna-la a entregar." data-support-en="When the transcript says what you said, press &lt;strong&gt;Hand it in to my teacher&lt;/strong&gt;. Your teacher’s correction will appear right here. If you record a better version later, hand it in again.">When the transcript says what you said, press <strong>Hand it in to my teacher</strong>. Your teacher’s correction will appear right here. If you record a better version later, hand it in again.</p>
+    <div class="actions"><button class="btn" id="handInSpeaking" type="button" data-support-ca="Entrega al professor" data-support-en="Hand it in to my teacher">Hand it in to my teacher</button></div>
+    <p class="feedback" id="speakingHandMsg"></p>
   </div>
-  <div class="result" id="speakResult" data-support-ca="Has acabat l’escalfament. Revisa una correcció i prova de dir la frase millorada." data-support-en="Warm-up complete. You are ready for the next Learning Path.">Warm-up complete. You are ready for the next Learning Path.</div>
+  <div class="result" id="speakResult" data-support-ca="Has acabat l’escalfament. Entrega la transcripció al professor: et tornarà la correcció aquí mateix." data-support-en="Warm-up complete. You are ready for the next Learning Path.">Warm-up complete. You are ready for the next Learning Path.</div>
 </section>
 
 <div id="reviewBox"></div>
@@ -419,7 +419,7 @@ function renderCycle(){
   pr.onchange=()=>{c.predict=pr.value.trim();save()};g.onchange=()=>{c.gist=g.value.trim();save()};
   hb.forEach(b=>b.onclick=()=>{c.heard=b.dataset.heard;save();mark()});
 }
-function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderCycle();renderRecall();renderWords();renderRead();renderListen();renderRealVideo();renderSpeak();renderChoices();learningSupport.apply(level);if(N())$("#speak .panel-head .instruction").textContent="Plan a C2 Proficiency long turn in writing: no recording.";updateProgress()}
+function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderCycle();renderRecall();renderWords();renderRead();renderListen();renderRealVideo();renderSpeak();renderChoices();learningSupport.apply(level);speakHanded();if(N())$("#speak .panel-head .instruction").textContent="Plan a C2 Proficiency long turn in writing: no recording.";updateProgress()}
 function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));save();renderAll()}
 $$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
 $$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");window.scrollTo({top:document.querySelector("main").offsetTop-64,behavior:"smooth"})});
@@ -485,7 +485,7 @@ $('#startRecord').onclick=async()=>{
     startSpeechTranscription();
     $('#recordStatus').textContent='Recording… speak now.';
     $('#startRecord').disabled=true;$('#stopRecord').disabled=false;
-    $('#downloadWav').disabled=true;$('#prepareSpeakingFeedback').disabled=true;
+    $('#downloadWav').disabled=true;
   }catch(e){
     $('#recordStatus').textContent='Microphone access was not available. Allow microphone permission and try again.';
   }
@@ -501,8 +501,8 @@ $('#stopRecord').onclick=async()=>{
   if(recordUrl)URL.revokeObjectURL(recordUrl);
   recordUrl=URL.createObjectURL(recordBlob);
   $('#recordedAudio').src=recordUrl;$('#recordedAudio').style.display='block';
-  $('#downloadWav').disabled=false;$('#prepareSpeakingFeedback').disabled=false;
-  $('#recordStatus').textContent='Recording ready. Listen to it before asking for feedback.';
+  $('#downloadWav').disabled=false;
+  $('#recordStatus').textContent=ca()?'Gravació a punt. Escolta-la, revisa la transcripció i entrega-la al professor.':'Recording ready. Listen to it, check the transcript and hand it in to your teacher.';
   $('#startRecord').disabled=false;$('#stopRecord').disabled=true;
   processor=null;
   complete('speak');$('#speakResult').classList.add('show');
@@ -515,49 +515,20 @@ function downloadWarmupWav(){
 }
 $('#downloadWav').onclick=downloadWarmupWav;
 
-function speakingPrompt(){
-  const tr=$('#speechTranscript').value.trim();
-  return `IMPORTANT: ENCARA NO DONIS FEEDBACK SI NO HI HA CAP ÀUDIO ADJUNT. Espera que l'usuari adjunti l'àudio. Si aquest missatge arriba abans que l'àudio, respon només: "Adjunta l'àudio i l'escoltaré."
-
-Quan l'àudio estigui adjunt, escolta'l i actua com a professor d'anglès de 4t d'ESO dins de la Learning Situation “Seasons & Celebrations”, Learning Path 1 “Getting started: Castanyada & Halloween”.
-
-Nivell: ${level[0].toUpperCase()+level.slice(1)}.
-Tasca: ${speakTask[level]}
-
-${tr?`Transcripció automàtica de suport (pot contenir errors):
-"${tr}"
-
-Primer escolta l'àudio i dona prioritat al que realment s'hi sent.`:'No hi ha transcripció automàtica disponible. Escolta l’àudio abans de donar feedback.'}
-
-${learningSupport.aiLanguage(level)} No posis nota numèrica. Respon només amb aquests apartats:
-1. 📝 Transcripció — escriu què diu realment l'alumne.
-2. ✅ Què ha fet bé — una o dues coses concretes.
-3. 🔧 Què ha de corregir — màxim 2 errors importants; escriu exactament com ho hauria de dir.
-4. 🗣️ Pronunciació — comenta només un problema clar; si no n'hi ha, digues que s'entén bé.
-5. 📋 Instruccions — indica breument si ha complert la tasca.
-6. 🎯 Un següent pas — una sola millora concreta.`;
-}
-
-function copyPromptNow(text){
-  const ta=document.createElement('textarea');
-  ta.value=text;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';ta.style.pointerEvents='none';
-  document.body.appendChild(ta);ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);
-  let ok=false;try{ok=document.execCommand('copy')}catch(e){}
-  ta.remove();return ok;
-}
-
-$('#prepareSpeakingFeedback').onclick=()=>{
-  if(!recordBlob){alert('Record your speaking first.');return}
-  const p=speakingPrompt();
-  const chatUrl='https://chatgpt.com/?prompt='+encodeURIComponent(p);
-  const chatWindow=window.open(chatUrl,'_blank','noopener,noreferrer');
-  downloadWarmupWav();
-  let copied=copyPromptNow(p);
-  if(!copied&&navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(p).catch(()=>{});
-  $('#speakingCopyStatus').textContent=chatWindow
-    ?'✓ WAV downloaded · ChatGPT opened with the prompt prepared. Attach the WAV and press Send.'
-    :'The browser blocked the ChatGPT tab. Allow pop-ups and try again.';
+// Speaking hands in to the teacher (Roger, 3 Nov 2026: no ChatGPT, no audio): the checked transcript is handed in like a step
+// (state.steps.speak, as in ls2-engine.js R.speaking) and corrected in the Wednesday run; the correction shows at the top of this tab.
+function speakHanded(){const h=(state.steps||{}).speak,m=$('#speakingHandMsg');if(!h||h.level==='native'){m.textContent='';return}
+  m.className='feedback ok';m.textContent=ca()?'Entregada el '+new Date(h.date).toLocaleDateString()+'. El professor et tornarà la correcció aquí mateix. Si et tornes a gravar millor, torna-la a entregar.':'Handed in on '+new Date(h.date).toLocaleDateString()+'. Your teacher’s correction will appear right here. If you record a better version, hand it in again.'}
+$('#handInSpeaking').onclick=()=>{
+  const m=$('#speakingHandMsg');
+  if(processor){m.className='feedback no';m.textContent=ca()?'Atura la gravació primer.':'Stop the recording first.';return}
+  const tr=$('#speechTranscript').value.trim(),n=(tr.match(/\S+/g)||[]).length,min={beginners:8,insecure:12,safe:20,daring:30}[level]||12;
+  if(n<min){m.className='feedback no';m.textContent=ca()?'La transcripció té '+n+' paraules: grava’t fent tota la tasca (almenys '+min+' paraules). Si Chrome no l’ha escrita, escriu el que has dit.':'Your transcript has '+n+' words: record yourself doing the whole task (at least '+min+' words). If Chrome didn’t write it, type what you said.';return}
+  state.steps=state.steps||{};
+  state.steps.speak={level,title:'Speaking',ty:window.elTyping?elTyping.sum($('#speechTranscript').parentElement):null,f:[{l:ca()?'Transcripció':'Transcript',v:tr}],rate:[],avg:null,comment:'',date:new Date().toISOString()};
+  complete('speak');$('#speakResult').classList.add('show');speakHanded();
 };
+speakHanded();
 
 renderAll();
 
