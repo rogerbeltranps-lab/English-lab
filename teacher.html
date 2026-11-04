@@ -19,7 +19,7 @@ table.qa td.ql,table.qa th.ql{text-align:left;max-width:440px;white-space:normal
 .route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-beginners{background:#ffe4e6;color:#9f1239}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-native{background:#e0f2fe;color:#075985}.r-daring{background:#ede9fe;color:#5b21b6}.r-none{color:#94a3b8}
 .wrap{overflow:auto;max-height:75vh;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
 thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;vertical-align:top}thead tr+tr th{top:var(--h1,52px)}.stu{position:sticky;left:0;z-index:1;text-align:left;min-width:150px;white-space:nowrap}thead .stu{z-index:3}
-th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#cbd5e1}.first{border-left:3px solid #94a3b8}th.ac{font-weight:500;min-width:44px}.skip{color:#94a3b8;background:#f8fafc}td.ac{color:#16a34a;font-weight:700}.wr{font-weight:500;white-space:nowrap}.wrw{color:#64748b}.wrk{color:#16a34a}.wrc{color:#b45309}.wrx{color:#dc2626}.wrl{color:#2563eb;font-weight:700}
+th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#cbd5e1}.first{border-left:3px solid #94a3b8}th.ac{font-weight:500;min-width:44px}.skip{color:#94a3b8;background:#f8fafc}td.ac{color:#16a34a;font-weight:700}.wr{font-weight:500;white-space:nowrap;cursor:pointer;border-radius:6px;padding:0 2px}.wr:hover{background:#f1f5f9;text-decoration:underline}.wrw{color:#64748b}.wrk{color:#16a34a}.wrc{color:#b45309}.wrx{color:#dc2626}.wrl{color:#2563eb;font-weight:700}
 td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px solid #0f766e;outline-offset:-2px}td.sub{background:#dcfce7}td.mark{background:#fef9c3}td.na{color:#94a3b8;font-weight:400}
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 .annl .annt{white-space:pre-wrap;overflow-wrap:anywhere;border-left:4px solid #ea580c;background:#fff7ed}.annprev{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:10px}
@@ -65,6 +65,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 <script type="module">
 import {replyText,replyColor,MSG_MAX} from "./shared/js/el-reply.js";
 import {ANN_MAX,annMs,annHtml,annCardHtml,annCardStyle} from "./shared/js/el-announce.js";
+import {writing} from "./shared/js/el-corrections.js";
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db;
@@ -475,7 +476,26 @@ function wrState(u,a,k){if(!window.ELMark)return null;const st=pstate(u,a);if(!i
   if(rp&&!fs)return {i:"✏️ answered",t:"You answered it by hand",c:"wrk"};
   if(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")))return {i:"🔁 redo",t:"Possible copy: redo it in class (note sent)",c:"wrc"};
   return {i:late?"❌ late":fs?"📨 new":"📨 Wed",t:(fs?"New version handed in after the correction":"Handed in")+on+(late?": it should have been corrected in the last Wednesday run":": corrected in the Wednesday run"),c:late?"wrx":"wrw"}}
-const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return w?`<br><small class="wr ${w.c}" title="${esc(w.t)}">${w.i}</small>`:""};
+const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return w?`<br><small class="wr ${w.c}" title="${esc(w.t)}: click to open" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button">${w.i}</small>`:""};
+// A write cell opens the correction (Roger, 4 Nov 2026: "I want to be able to click here and see the corrections"): Claude's correction
+// the way the student sees it (el-corrections.js writing(): their text with the mistakes underlined, the table Mistake · Correction · Why and
+// the corrected text), with the writing log; ⚠️ copy? opens the To do's Check dialog (the reason, the writing log, Accept or Redo in
+// class). Everything comes from what the dashboard has already loaded: no extra Firestore reads.
+const EN=(c,e)=>e,corrBox='margin:8px 0;padding:12px 14px;border:2px solid #16a34a;border-radius:14px;background:#f0fdf4;color:#0f172a;font:15px/1.5 system-ui,sans-serif';
+function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=res(u,aid),fl=(x.flags||{})[step];
+  if(fl&&fl.why&&!fl.done)return cpOpen(u,aid,step);
+  const w=wrState(u,a,step)||{i:"",t:""},it=ELMark.fbItems(pstate(u,a))[step]||{fields:[]},f=it.fields||[],orig=String((f[0]||{}).v||"");
+  const t=(x.replies||{})[step],fs=(x.fbSig||{})[step],lv=Object.entries((x.levels||{})[step]||{}),old=!!t&&!!fs&&fs!=="redo"&&fs!==sigOf(JSON.stringify(f));
+  const on=v=>v?ELWeek.date(ymd(v)):"",log=it.ty?`<p class="muted">✍️ Writing log: ${esc(ELMark.tyText(it.ty))}</p>`:"";
+  const copy=fl&&fl.why?`<p class="muted">⚠️ <b>Possible copy</b>${fl.at?" on "+on(fl.at):""}: ${esc(fl.why)} · ${fl.done==="redo"?"you sent it back to redo in class":"you accepted it as their work"}</p>`:"";
+  const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.map(y=>`<p><b>${esc(y.l)}</b></p>${text(y.v)}`).join("");
+  dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
+    <p class="muted">${esc(w.t)}.</p>${log}${copy}
+    ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
+    ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>✏️ Correction sent</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(f.slice(1)))
+      :`<p><b>Handed in</b> <small class="muted">(no correction yet: Claude corrects it in the Wednesday run)</small></p>${more(f)}`}
+    <div class="row" style="justify-content:flex-start"><button class="g" data-do="cell" data-u="${u}" data-a="${esc(aid)}">All their work in this learning path</button></div>`,true);
+  if(t)writing($("#wrfix"),t,EN,old?"":orig)}
 const doneAt=(u,id,step)=>{const a=byId(id),st=a?pstate(u,a):{};return st.done&&st.done[step]?((st.doneAt||{})[step]||true):null};
 const ymd=d=>{d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 function dueOf(id,g){const p=(window.EL_PLAN||{})[S.ls],gr=GR.find(x=>x.id===g);if(!p||!p.due||!p.due[id]||!gr)return null;
@@ -673,7 +693,7 @@ function render0(){
     +routesBox(grp,inG.filter(s=>!s.tester))
     +((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:"")
     +(G()&&G().only?gradeBox(shown):"")   // LS1: the LS grade first, the learning paths (practice) folded below it
-    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Grey rows: on the student list, not signed in yet.</p>`,"key")}
+    +`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”).✔ submitted · 🟡 marked as done, not submitted · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo in class · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo). Grey rows: on the student list, not signed in yet.</p>`,"key")}
       <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`
     +`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`
     +(G()&&!G().only?gradeBox(shown):"")+selfBox(ls,grp,shown)
@@ -852,11 +872,11 @@ const REDO={ca:"El professor vol que tornis a fer aquesta tasca a classe, amb le
 function cpOpen(u,aid,step){const m=mkMoments().find(x=>x.a===aid&&x.step===step)||null,a=byId(aid),f=flagOf(u,aid,step),hs=handedIn(u,a)[step]||{},s=S.P[u];if(!a||!f)return;S.cp={u,aid,step,m,f};
   const h={ty:hs.ty||f.ty,f:hs.f&&hs.f.length?hs.f:f.f||[]},lv=f.lv||{};
   dlg(`<h3>⚠️ Possible copy · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
-    <p><b>Why:</b> ${esc(f.why)}</p>${h.ty?`<p class="muted">Writing log: ${esc(ELMark.tyText(h.ty))}</p>`:""}
+    <p><b>Why:</b> ${esc(f.why)}${f.at?` <small class="muted">(flagged on ${ELWeek.date(ymd(f.at))})</small>`:""}</p>${h.ty?`<p class="muted">Writing log: ${esc(ELMark.tyText(h.ty))}</p>`:""}
     ${(h.f||[]).map(x=>`<div class="hand"><b>${esc(x.l)}</b><p style="white-space:pre-wrap">${esc(x.v||"")}</p></div>`).join("")}
-    <p>If it is their own work, ${m?`it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[lv[c]]}">${lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.`:`they get this correction:</p><p style="white-space:pre-wrap" class="hand">${esc(f.fb||"")}`}</p>
+    <p>If it is their own work, ${m?`it gets ${m.c.map(c=>`${cpill(c)} <b style="color:${LVCOL[lv[c]]}">${lv[c]}</b>`).join(" ")}${f.fb?` and the feedback “${esc(f.fb)}”`:""}.`:`they get this correction:</p><div id="cpfix" style="${corrBox}"></div><p>`}</p>
     <div class="row" style="justify-content:flex-start"><button data-do="cpok">✔ Accept: it's their work</button><button class="g" data-do="cpredo">↺ Redo in class</button></div>
-    <p class="muted">Redo in class sends the student: “${esc(CA_RT.includes(level(u,S.ls))?REDO.ca:REDO.en)}” Their next hand-in goes back to ${m?"the marking sheet":"Claude's correction"}.</p>`,true)}
+    <p class="muted">Redo in class sends the student: “${esc(CA_RT.includes(level(u,S.ls))?REDO.ca:REDO.en)}” Their next hand-in goes back to ${m?"the marking sheet":"Claude's correction"}.</p>`,true);if(!m&&$("#cpfix"))writing($("#cpfix"),f.fb||"",EN,"")}
 function cpDone(ok){const k=S.cp;if(!k)return;const a=byId(k.aid),done=ok?"accepted":"redo",note=CA_RT.includes(level(k.u,S.ls))?REDO.ca:REDO.en;
   const ps=k.m?(ok?[patch(k.u,k.aid,{levels:{[k.step]:k.f.lv},marked:{[k.step]:new Date().toISOString()},flags:{[k.step]:{done}}}),...(k.f.fb?[api.reply(k.u,a,k.step,k.f.fb)]:[])]
       :[patch(k.u,k.aid,{flags:{[k.step]:{done}}}),api.reply(k.u,a,k.step,note)])
@@ -1913,7 +1933,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     hwsave:()=>{const text=$("#hw-text").value.replace(/\s+/g," ").trim(),by=$("#hw-by").value,msg=$("#hw-msg").value.trim();if(!text||!by)return alert("Write what they have to do and choose the day.");
       $("#dlg").close();act(api.hw(k.ls,k.gid,"h"+Date.now().toString(36),Object.assign({text,by,set:k.set},msg?{msg}:{},k.line?{line:k.line}:{})))},
     hwdel:()=>{if(!confirm("Remove this homework? Students will no longer see it."))return;act(api.hw(k.ls,k.gid,k.id,null))},
-    mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),cpok:()=>cpDone(true),cpredo:()=>cpDone(false),
+    mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),wrop:()=>wrOpen(k.u,k.a,k.s),cpok:()=>cpDone(true),cpredo:()=>cpDone(false),
     mkcopy:()=>{const v=$("#mksheet").value;navigator.clipboard.writeText(v).then(()=>$("#mkst").textContent="✓ Copied",()=>{$("#mksheet").select();$("#mkst").textContent="Press Ctrl+C"})},
     mkdown:()=>mkDown(),
     wk:()=>{S.wk=k.w;S.g="plan";render()},
