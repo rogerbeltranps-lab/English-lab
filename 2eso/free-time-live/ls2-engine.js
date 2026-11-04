@@ -325,7 +325,7 @@ var LS2 = (function () {
   function forget(id, prefix) { if (state.ans) delete state.ans[id]; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]);   /* every route's: typed() would bring another route's back */ Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
   /* One activity at a time (Roger, 4 Nov 2026: "they should be able to redo one activity of the section and still see all the answers of
      the other activities"): every checked activity of a section has its own "↺ Redo this activity" next to Check (the questions, the
-     practice, the micro-dictation), which clears only that activity; "↺ Redo the whole section" on top clears them all. */
+     practice, the micro-dictation), which clears only that activity. There is no button that clears a whole section. */
   const againLabel = () => '↺ ' + (ca() ? 'Torna a fer aquesta activitat' : 'Redo this activity');
   const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + againLabel() + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
@@ -334,46 +334,16 @@ var LS2 = (function () {
   // check(count): the step's own check; stays(id, prefix, listId, items, check) wires Check, Do it again and the restore.
   // src: the panel's whole list (p.items / p.practice), to place answers saved at another route
   function stays(id, prefix, listId, items, check, src) {
-    if (binding) binding.push([id, prefix]);   // the section's "Redo this section" clears it too (redoBar)
     $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix), items); };
     $('#' + id + 'Again').onclick = () => { forget(id, prefix); clearStep(id, listId); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
     const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh); } else if (t) fill(items, prefix, t);
   }
 
-  /* ---------- redo one section (Roger, 2 Nov 2026: "I want them to be able to repeat the sections individually, I don't want them
-     restart the whole learning path") ---------- */
-  // A "↺ Redo this section" button on top of every section with corrected or practice answers that stay (stays(), the listening cycle,
-  // the micro-dictation). It clears only that section's answers (state.ans, state.typing, state.cycle, state.dict) and draws it again.
-  // What the teacher's marks read is kept: done/doneAt (done on time), tries/first/items (first try only), the hand-ins. The new checks
-  // only update last[k]. It shows only when there is something to clear; a locked section or a read-only page disables it (el-cloud.js).
-  let binding = null;
-  const redoable = p => !!(p._redo.length || isListening(p) || (p.chunks && p.chunks.length));
-  function redoHas(p) {
-    const filled = x => x != null && x !== '' && (typeof x !== 'object' || Object.values(x).some(filled));
-    return p._redo.some(([id]) => (state.ans && state.ans[id]) || filled((state.typing || {})[id + '_' + level])) || filled((state.cycle || {})[p.id]) || filled((state.dict || {})[p.id]);
-  }
-  function redoBar(p) {
-    const sec = document.getElementById(p.id); if (!sec || !redoable(p)) return;
-    const head = sec.querySelector(':scope > .panel-head'), bar = document.createElement('div');
-    bar.className = 'actions redo-sec';
-    bar.innerHTML = '<button class="btn secondary" type="button">↺ ' + (ca() ? 'Torna a fer tota la secció' : 'Redo the whole section') + '</button><span class="tiny" aria-live="polite"></span>';
-    (head || sec.firstChild).insertAdjacentElement(head ? 'afterend' : 'beforebegin', bar);
-    const btn = bar.querySelector('button'), note = bar.querySelector('span');
-    if (p._redone) { note.textContent = ca() ? 'Fet: comença la secció de nou. Les altres seccions no han canviat.' : 'Done: start the section again. The other sections have not changed.'; p._redone = false; }
-    p._redoSync = () => { bar.hidden = !redoHas(p) && !note.textContent; };
-    p._redoSync();
-    btn.onclick = () => {
-      if (!confirm(ca() ? 'Vols tornar a fer TOTA aquesta secció? S’esborraran totes les teves respostes d’aquesta secció. Les altres seccions no canvien.\n\nSi només vols repetir una activitat, prem Cancel·la i fes servir «↺ Torna a fer aquesta activitat», al costat del seu botó Comprova: les altres respostes es queden.'
-        : 'Redo the WHOLE section? All your answers in this section will be cleared. The other sections stay as they are.\n\nTo repeat only one activity, press Cancel and use “↺ Redo this activity” next to its Check button: your other answers stay.')) return;
-      p._redo.forEach(([id, prefix]) => forget(id, prefix));
-      if (state.cycle) delete state.cycle[p.id];
-      if (state.dict) delete state.dict[p.id];
-      p._redone = true; save(); render();
-      const s = document.getElementById(p.id); if (s) window.scrollTo({ top: s.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
-    };
-  }
-  if (!window.elRedoSync) { window.elRedoSync = true; ['click', 'input', 'change'].forEach(t => document.addEventListener(t, () => setTimeout(() => (LP && LP.panels || []).forEach(p => p._redoSync && p._redoSync()), 80))); }
+  /* ---------- redo one activity (Roger, 2 Nov 2026: "I don't want them restart the whole learning path"; 4 Nov 2026: "I only want
+     redo this activity, not the entire page") ---------- */
+  // No section-wide button any more: each activity clears only itself with its own "↺ Redo this activity" (againBtn). Marks are never
+  // touched: done/doneAt (done on time), tries/first/items (first try only) and hand-ins stay; new checks only update last[k].
 
   /* ---------- panels ---------- */
   const R = {};
@@ -458,7 +428,7 @@ var LS2 = (function () {
       $('#flashcard').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#flashcard').classList.toggle('flipped'); } };
       window.renderCards = window.renderCards || function () {};
       flashcardSet.cards = []; flashcardSet.lastLevel = null;
-      if (!flashcardSet.config) flashcardSet.init({ cards: deck, level: () => level, complete: () => complete('cards'), isDone: () => !!state.done.cards });
+      if (!flashcardSet.config) flashcardSet.init({ cards: deck, level: () => level, complete: () => complete('cards'), isDone: () => !!state.done.cards, always: true });
       else { flashcardSet.config.cards = deck; flashcardSet.render(); }
       showDir();
       $$('.dir-toggle [data-dir]').forEach(b => b.onclick = () => { state.cardDir = b.dataset.dir; save(); flashcardSet.cards = []; flashcardSet.render(); showDir(); });
@@ -1267,7 +1237,7 @@ var LS2 = (function () {
       LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
       reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
-    LP.panels.forEach(p => { p._redo = binding = []; p._r.bind(); binding = null; p._redoSync = null; redoBar(p); });
+    LP.panels.forEach(p => p._r.bind());
     bindPlan();
     bindStudy();
     $$('.tab').forEach(t => t.onclick = () => { $$('.tab,.panel').forEach(x => x.classList.remove('active')); t.classList.add('active'); $('#' + t.dataset.panel).classList.add('active'); window.scrollTo({ top: $('#lp').offsetTop - 64, behavior: 'smooth' }); });

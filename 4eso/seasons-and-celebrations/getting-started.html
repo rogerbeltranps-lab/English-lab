@@ -406,7 +406,7 @@ function renderCaCards(){
   $("#flashcard").onclick=()=>$("#flashcard").classList.toggle("flipped");
   $("#flashcard").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#flashcard").classList.toggle("flipped")}};
   window.renderCards=function(){};flashcardSet.cards=[];flashcardSet.lastLevel=null;flashcardSet.config=null;
-  flashcardSet.init({cards:cardDeck,level:()=>level,complete:()=>{state.cardsDone=true;save()},isDone:()=>!!state.cardsDone});
+  flashcardSet.init({cards:cardDeck,level:()=>level,complete:()=>{state.cardsDone=true;save()},isDone:()=>!!state.cardsDone,always:true});
   if(c){
     const check=()=>{const card=flashcardSet.cards[flashcardSet.index];if(!card)return;const v=norm($("#cardType").value),ok=!!v&&String(card[1]).split(/\s*[\/,;]\s*/).some(a=>norm(a.replace(/\([^)]*\)/g,""))===v||norm(a)===v);
       $("#cardTypeMsg").className="feedback "+(ok?"ok":"no");
