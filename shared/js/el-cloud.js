@@ -652,7 +652,8 @@ function gamePush(u){
   let first=true;
   stopGame=onSnapshot(doc(db,"live",myGroup),s=>{const x=s.exists()?s.data():null,ms=x&&x.at&&x.at.toMillis?x.at.toMillis():0;
     if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search);return}
-    goTo(x&&x.go,first);first=false;FSG=(x&&x.fs)||null;fsCheck()},
+    const f=first,run=()=>{goTo(x&&x.go,f);FSG=(x&&x.fs)||null;fsCheck()};first=false;
+    if(x&&(x.go||x.fs)&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
 }
 // 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
@@ -662,7 +663,7 @@ function gamePush(u){
 // only the card and bar of pullBar remain. Each pull-up moves a browser once (localStorage el_go_<at>). Not from a recall checkpoint,
 // the sample exam or a class presentation followed live (?live=): there the bar of pullBar says where to go.
 const GO_MS=3*60e3;
-function tabBar(g){const lv=myLevel||homeLevel,ca=!lv||elCa(lv),old=document.getElementById("el-pull");if(old)old.remove();
+function tabBar(g){const ca=lockCa(),old=document.getElementById("el-pull");if(old)old.remove();
   const b=document.createElement("div");b.id="el-pull";
   b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
   const tx=document.createElement("span");tx.textContent="📌 "+(ca?"El professor és a la pestanya: ":"Your teacher is on the tab: ")+(g.pn||g.p)+(ca?". Acaba el que estàs fent i ves-hi.":". Finish what you are doing and go there.");
@@ -679,7 +680,11 @@ function tabBar(g){const lv=myLevel||homeLevel,ca=!lv||elCa(lv),old=document.get
 const LOCK_MS=70*60e3;
 let LOCK=null,lockFrom=null;
 const lockOn=g=>!!(g&&g.lock&&g.a&&g.at&&Date.now()-g.at<LOCK_MS&&!(g.until&&Date.now()>=g.until));
-const lockCa=()=>{const lv=myLevel||homeLevel;return !lv||elCa(lv)};
+// Catalan only for Starter and Base, English for Core, Plus and Pro (Roger, 5 Nov 2026: "the messages when pulled up and full screen should
+// be in English except for the low levels starter and base"); the level comes from the page (LS pages) or the course's latest LS (findHomeLevel,
+// read before the first pull-up or full screen message on pages that do not know it, such as the board)
+const lockCa=()=>{const lv=myLevel||homeLevel;return !!lv&&elCa(lv)};
+let lvTried=false;
 const lockHere=()=>LOCK&&actId===LOCK.a;
 function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-toast");if(!n){n=document.createElement("div");n.id="el-lock-toast";
   n.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:2147483001;max-width:92vw;padding:12px 18px;border-radius:12px;background:#7f1d1d;color:#fff;font:600 15px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.3);text-align:center";document.body.append(n)}
@@ -754,7 +759,7 @@ function goTo(g,first){
   if(here&&here.id===a.id){const at=document.querySelector(".tab.active[data-panel]");
     if(LOCK){if(!seen)lockFrom=at&&at.dataset.panel!==g.p?at.dataset.panel:null;lockBar();return}
     if(g.p&&(!at||at.dataset.panel!==g.p))tabBar(g);return}
-  const lv=myLevel||homeLevel,ca=!lv||elCa(lv),o=overlay('<div style="max-width:560px"><div style="font-size:48px">📌</div><h1></h1><p class="n" style="font-size:22px;font-weight:800"></p><p class="c"></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:12px 24px;text-decoration:none;font-weight:800"></a></p></div>');
+  const ca=lockCa(),o=overlay('<div style="max-width:560px"><div style="font-size:48px">📌</div><h1></h1><p class="n" style="font-size:22px;font-weight:800"></p><p class="c"></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:12px 24px;text-decoration:none;font-weight:800"></a></p></div>');
   o.style.zIndex="2147483000";   // above the My week panel and the bottom bar
   o.querySelector("h1").textContent=seen&&LOCK?(ca?"🔒 El professor et manté a:":"🔒 Your teacher is keeping you on:"):(ca?"El professor et porta a:":"Your teacher is taking you to:");
   o.querySelector(".n").textContent=(g.t||a.title)+(g.pn?" · "+g.pn:"");
