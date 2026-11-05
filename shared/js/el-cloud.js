@@ -423,6 +423,15 @@ async function teacherSections(info){
   async function fsToggle(){const now=Date.now(),v=fsOnNow(fsX)?null:{on:true,at:now,until:(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS};
     try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});msg=v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
   const fsHm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
+  // while the group is in full screen, the same state and list stay fixed at the top right of the page, also when scrolling (Roger, 5 Nov 2026)
+  function fsFloat(){let f=document.getElementById("el-fsfloat");if(!fsOnNow(fsX)){if(f)f.remove();return}
+    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147481000;max-width:min(340px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
+      f.onclick=e=>{if(e.target.closest("button"))fsToggle()};document.body.append(f)}
+    const l=fsList.filter(y=>y.pull===fsX.at).sort((p,q)=>(q.at&&q.at.toMillis?q.at.toMillis():+q.at||0)-(p.at&&p.at.toMillis?p.at.toMillis():+p.at||0));
+    const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>⛶ '+gname(g)+' in full screen</b><button style="border:1px solid #1e293b;background:#1e293b;color:#fff;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui">Switch off</button></div>'
+      +'<div style="color:#475569;font-size:12px;margin-top:2px">until '+fsHm(fsX.until||fsX.at+LOCK_MS)+'</div><div style="color:#9a3412;margin-top:6px;max-height:40vh;overflow:auto;line-height:1.5">'
+      +(l.length?'⚠️ Left full screen ('+l.length+'):<br>'+l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+fsHm(y.at)+(y.n>1?" ("+y.n+"×)":"")).join("<br>"):"✓ Nobody has left it")+'</div>';
+    if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
   function fsRow(){const on=fsOnNow(fsX),l=on?fsList.filter(y=>y.pull===fsX.at).sort((p,q)=>(q.at&&q.at.toMillis?q.at.toMillis():+q.at||0)-(p.at&&p.at.toMillis?p.at.toMillis():+p.at||0)):[];
     return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who leaves it). Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+'</button>'
       +(on?'<div class="fsl">until '+fsHm(fsX.until||fsX.at+LOCK_MS)+' · '+(l.length?'⚠️ Left it: '+l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+fsHm(y.at)+(y.n>1?" ("+y.n+"×)":"")).join(" · "):"nobody has left it")+'</div>':"")}
@@ -448,6 +457,7 @@ async function teacherSections(info){
       +pullRow()
       +(elLpOpen(a,info,g)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
     if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html}
+    fsFloat()
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);
       let sw=t.querySelector(".el-tsw");if(!sw){sw=document.createElement("span");sw.className="el-tsw";sw.setAttribute("role","button");
         sw.onclick=e=>{e.stopPropagation();e.preventDefault();toggle(id)};t.append(sw)}
