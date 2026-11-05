@@ -1656,9 +1656,9 @@ function pbBox(){
     <small class="muted">${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.route?" · "+route(x.route):""}<br>
     ${x.page?"📍 "+(/^[\w./-]+(#.*)?$/.test(x.page)?`<a href="${esc(x.page)}" target="_blank">${esc(where)}</a>`:esc(where)):""}${x.device?" · "+esc(x.device):""}</small>
     ${pbSent(x)}${(x.errors||[]).length?`<details><summary>Errors the page logged (${x.errors.length})</summary>${x.errors.map(e=>`<code>${esc(e)}</code>`).join("")}</details>`:""}
-    <div>${x.fixed?"":`<button data-do="pbclaude" data-id="${esc(x.id)}" title="Start a Claude session to fix it, with everything in this report">🤖 Fix with Claude</button> `}${x.shot?`<button data-do="pbshot" data-id="${esc(x.id)}">📷 Screenshot</button> `:""}<button data-do="pbmsg" data-id="${esc(x.id)}" title="Write to the student: they see your words on a card the next time they open a page">💬 Answer</button> <button class="g" data-do="pbfix" data-id="${esc(x.id)}" data-v="${x.fixed?"":"1"}" title="${x.fixed?"Open it again (an unread ✅ note to the student is taken back)":"The student gets a ✅ note saying it is fixed, the next time they open a page"}">${x.fixed?"Reopen":"✅ Mark as fixed"}</button> <button class="g" data-do="pbdel" data-id="${esc(x.id)}">Delete</button></div></li>`};
+    <div>${x.fixed?"":`<button data-do="pbclaude" data-id="${esc(x.id)}" title="Copy everything in this report and open the English Lab project, to start a thread that fixes it">🤖 Fix with Claude</button> `}${x.shot?`<button data-do="pbshot" data-id="${esc(x.id)}">📷 Screenshot</button> `:""}<button data-do="pbmsg" data-id="${esc(x.id)}" title="Write to the student: they see your words on a card the next time they open a page">💬 Answer</button> <button class="g" data-do="pbfix" data-id="${esc(x.id)}" data-v="${x.fixed?"":"1"}" title="${x.fixed?"Open it again (an unread ✅ note to the student is taken back)":"The student gets a ✅ note saying it is fixed, the next time they open a page"}">${x.fixed?"Reopen":"✅ Mark as fixed"}</button> <button class="g" data-do="pbdel" data-id="${esc(x.id)}">Delete</button></div></li>`};
   return `<div class="box" id="probs">${fold("probs",`⚠️ Problem reports <small class="muted">${np?`<b>${np} open</b> · `:""}${L.length} in total</small>`,
-    `<p class="muted">Students (and the tester) send them with ⚠️ Problem in the bottom bar of any page. Each report says where the student was (page and the section on screen), their route and device, and the last errors the page logged (for example an audio file that did not load). 🤖 Fix with Claude starts a Claude session with the whole report. 💬 Answer sends the student your own message (to explain something, or to ask for more details). ✅ Mark as fixed sends the student a note that it is fixed; Delete can send them a thank-you instead. The 🔔 in the bottom bar of every page counts the open ones.</p>`+(L.length?`<ul class="pbl">${L.map(li).join("")}</ul>`:'<p class="muted">No problem reports.</p>'))}</div>`;
+    `<p class="muted">Students (and the tester) send them with ⚠️ Problem in the bottom bar of any page. Each report says where the student was (page and the section on screen), their route and device, and the last errors the page logged (for example an audio file that did not load). 🤖 Fix with Claude copies the whole report and opens the English Lab project (Claude Desktop or the browser), where you paste it to start a thread. 💬 Answer sends the student your own message (to explain something, or to ask for more details). ✅ Mark as fixed sends the student a note that it is fixed; Delete can send them a thank-you instead. The 🔔 in the bottom bar of every page counts the open ones.</p>`+(L.length?`<ul class="pbl">${L.map(li).join("")}</ul>`:'<p class="muted">No problem reports.</p>'))}</div>`;
 }
 // The note the student gets (shared/js/el-reply.js writes the words): in the language of the route the report was sent with.
 const pbReply=(x,kind)=>({uid:x.uid,kind,what:x.kind||"other",text:String(x.text||"").slice(0,300),where:String(x.section||x.title||"").slice(0,200),en:!!x.route&&!elCa(x.route),created:DEMO?new Date():F.serverTimestamp()});
@@ -1676,10 +1676,12 @@ function pbAnswer(id){
   const t=$("#pbt"),bs=[...document.querySelectorAll('#dlg [data-do="pbmsgok"]')],draw=()=>{const f=bs.some(b=>b.matches(":hover,:focus")&&b.dataset.f);
     $("#pbprev").innerHTML=pbNote(x,f?"fixed":"message",t.value.trim());bs.forEach(b=>b.disabled=!t.value.trim())};
   t.oninput=draw;bs.forEach(b=>{b.onmouseenter=b.onmouseleave=b.onfocus=b.onblur=draw});t.focus()}
-// "🤖 Fix with Claude" (Roger, 26 Oct 2026): a prompt with everything in the report. Claude Desktop opens a new Claude Code session with it
-// (claude://code/new?q=…&folder=…, the prompt is only filled in, never sent); the English Lab project has no link that starts a thread,
-// so the other button copies the prompt and opens the project chat, where Roger pastes it.
-const PB_SITE="https://rogerbeltranps-lab.github.io/English-lab/",PB_REPO="C:\\Developer\\English-lab",PB_PROJECT="https://claude.ai/code/project/chan_017jG9qj6UCzLVY2nyyfmBNP";
+// "🤖 Fix with Claude" (Roger, 26 Oct 2026): a prompt with everything in the report. 5 Nov 2026 (Roger: "the left button should always
+// open the English Lab project", on the desktop app): the left button copies the prompt and opens the English Lab project in Claude Desktop
+// (PB_DESKTOP, a claude:// link to the project; ?q= is added in case the app fills it in), where Roger pastes it in the project chat.
+// It used to be claude://code/new, which always starts a new chat. No link can start a thread in a project, so the text is always copied.
+// The other button does the same in the browser (PB_PROJECT).
+const PB_SITE="https://rogerbeltranps-lab.github.io/English-lab/",PB_REPO="C:\\Developer\\English-lab",PB_PROJECT="https://claude.ai/code/project/chan_017jG9qj6UCzLVY2nyyfmBNP",PB_DESKTOP="claude://claude.ai/code/project/chan_017jG9qj6UCzLVY2nyyfmBNP";
 function pbPrompt(x){
   const w=pbWhen(x),where=[x.title,x.section].filter(Boolean).join(" › "),gr=(GR.find(g=>g.id===x.group)||{}).name;
   return [`Fix a problem a student reported on the English Lab site (repo rogerbeltranps-lab/English-lab; on the Windows PC: ${PB_REPO}). git pull first and read AGENTS.md before changing anything.`,"",
@@ -1694,14 +1696,12 @@ function pbPrompt(x){
     "Find the cause. If it is a bug on the site, fix it on a branch, open a PR with a clickable preview and tell me what was wrong. If the site is right (for example the student's answer is not correct), tell me what to answer the student instead."
   ].filter(l=>l!==null).join("\n")}
 function pbClaude(id){
-  const x=S.D.pb.find(y=>y.id===id);if(!x)return;const q=pbPrompt(x),win=/Win/i.test(navigator.userAgent);
-  const code="claude://code/new?q="+encodeURIComponent(q)+(win?"&folder="+encodeURIComponent(PB_REPO):"");
+  const x=S.D.pb.find(y=>y.id===id);if(!x)return;const q=pbPrompt(x);
   dlg(`<h3>🤖 Fix with Claude</h3><p class="muted">${esc(PB_KIND[x.kind]||"")} · ${esc([x.title||x.page,x.section].filter(Boolean).join(" › "))}</p>
     <label for="pbq">What Claude gets <small class="muted">(you can change it)</small></label><textarea id="pbq" style="min-height:220px;font-size:13px">${esc(q)}</textarea>
-    <div class="row" style="justify-content:flex-start"><a class="btn" id="pbcode" href="${esc(code)}" title="Opens Claude Desktop with a new Claude Code session${win?" in "+PB_REPO:""}; the prompt is filled in, you press Enter">💻 Open in Claude Desktop (Claude Code)</a>
-    <button class="g" data-do="pbcopy" title="Copies the text and opens the English Lab project; paste it in the project chat to start a thread">📋 Copy and open the English Lab project</button></div>
-    <p class="muted" id="pbmsg">Claude Desktop only fills in the prompt; nothing is sent until you press Enter.${win?"":" On this computer it asks you to pick the folder (C:\\Developer\\English-lab is only on the Windows PC)."}</p>`,true);
-  const t=$("#pbq"),a=$("#pbcode");t.oninput=()=>{a.href="claude://code/new?q="+encodeURIComponent(t.value)+(win?"&folder="+encodeURIComponent(PB_REPO):"")}}
+    <div class="row" style="justify-content:flex-start"><button data-do="pbcopy" data-v="app" title="Copies the text and opens the English Lab project in Claude Desktop; paste it in the project chat to start a thread">💻 Copy and open the project in Claude Desktop</button>
+    <button class="g" data-do="pbcopy" title="Copies the text and opens the English Lab project in a new browser tab; paste it in the project chat to start a thread">📋 Copy and open the project in the browser</button></div>
+    <p class="muted" id="pbmsg">Both buttons copy the text and open the English Lab project. Paste it in the project chat (Cmd+V or Ctrl+V) and press Enter to start a thread.</p>`,true)}
 // ---- student list (roster): import from Excel, add, edit, remove
 function rosterBox(){
   const ro=Object.values(S.D.ro),noMail=ro.filter(r=>!r.email);
@@ -2012,8 +2012,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       catch(e){console.warn("shot",e);$("#pbimg").textContent="The screenshot could not be loaded: "+e.message}},
     pbclaude:()=>pbClaude(k.id),pbmsg:()=>pbAnswer(k.id),
     pbmsgok:()=>{const v=$("#pbt").value.trim();if(!v)return;$("#dlg").close();act(api.pbMsg(k.id,v,!!k.f))},
-    pbcopy:async()=>{const txt=$("#pbq").value;let ok=true;try{await navigator.clipboard.writeText(txt)}catch(e){ok=false;$("#pbq").select()}
-      $("#pbmsg").textContent=ok?"Copied. Paste it in the English Lab project chat (it opened in a new tab) to start a thread.":"Could not copy: the text is selected, press Ctrl+C.";open(PB_PROJECT,"_blank","noopener")},
+    pbcopy:async()=>{const txt=$("#pbq").value,app=k.v==="app";let ok=true;try{await navigator.clipboard.writeText(txt)}catch(e){ok=false;$("#pbq").select()}
+      $("#pbmsg").textContent=ok?`Copied. Paste it in the English Lab project chat (it opened ${app?"in Claude Desktop":"in a new tab"}) to start a thread.`:"Could not copy: the text is selected, press Cmd+C or Ctrl+C, then paste it in the project chat.";
+      if(app)location.href=PB_DESKTOP+"?q="+encodeURIComponent(txt);else open(PB_PROJECT,"_blank","noopener")},
     pbfix:()=>act(api.pbFix(k.id,!!k.v)),pbdel:()=>{const x=S.D.pb.find(y=>y.id===k.id);if(!x)return;
       dlg(x.fixed?`<h3>Delete this report?</h3><p class="muted">It is marked as fixed and the student was told. Nothing else is sent.</p><div class="row" style="justify-content:flex-start"><button data-do="pbdelok" data-id="${esc(x.id)}">Delete</button></div>`
         :`<h3>Delete this report?</h3><p class="muted">Deleting it means you checked it and the site is right. You can send ${esc(x.name||"the student")} a thank-you note; they see it once, the next time they open a page:</p>${pbNote(x,"thanks")}
