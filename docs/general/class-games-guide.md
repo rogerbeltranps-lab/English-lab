@@ -18,8 +18,18 @@ Kahoot-style games for class (Roger, 26 Oct 2026). The board runs on the project
   - **passive:** the words appear in the question and theory texts;
   - **active:** some questions ask for a word directly (meaning, use, collocation or preposition).
 - **Theory slides between the questions**: short, a few lines, with examples. The questions after each theory slide practise it.
-- **One game per learning path**, linked from that page with the teacher-only Start button.
-- Keep it lean: about 15–20 questions and 3 theory slides.
+- **Two games per learning path (5 Nov 2026):** a **vocabulary game** (only words: meaning, use, collocations, prepositions) and a **grammar game** (only the grammar of the path). Both are linked from the learning path page with teacher-only buttons (📚 Vocabulary game, 🧩 Grammar game). Done for LS2 LP1 and LP2 in 2 ESO and 4 ESO; LP3 keeps its older mixed game for now.
+- **The grammar game explains before it asks:** each grammar point starts with explanation slides (how it is made, when we use it, examples and the typical mistake, often in a table), then 4–6 questions on it. Press Space to show the explanation one part at a time, and **CA** (or the C key) to show a short Catalan help under the slide.
+- Keep it lean: about 15–20 questions and 3 theory slides in a vocabulary game, about 16 questions and 3–4 explanation slides in a grammar game.
+
+## Results
+
+Every game you play is saved when it ends. Open **📊 Results** (on the board, at the end of a game, or from the dashboard's Points box and Materials) and choose a group:
+
+- **The group, game by game:** one bar per game (blue vocabulary, orange grammar) with the % of right answers; click a bar to see which questions were hardest.
+- **Each student:** % right in all games, in vocabulary games and in grammar games (red under 50 %), and how many games they played. Click a student to see their games next to the class average and the questions they should review.
+
+Only the questions whose answer you showed count, and a student who joined but didn't answer one gets it wrong. Games played before 5 Nov 2026 were not saved.
 
 ## What a game is made of
 
@@ -44,11 +54,15 @@ Tell Claude: "Make a class game for [course] [learning situation], [learning pat
 
 | Game | Course | Learning path |
 |---|---|---|
-| Autumn words: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP1 Getting started (choose and write questions alternate; replaces the Autumn words slides) |
-| Free-time words & how often | 2 ESO | LS2 Free Time, Live!, LP1 Getting started |
-| What are they doing? Choose it, write it | 2 ESO | LS2 Free Time, Live!, LP2 What are they doing? (choose and write questions alternate) |
-| Now or usually? Choose it, write it | 2 ESO | LS2 Free Time, Live!, LP3 Now or usually? (choose and write questions alternate) |
-| Celebrations around the world: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP2 Celebrations around the world (choose and write questions alternate) |
-| Where traditions come from: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from (choose and write questions alternate) |
+| Vocabulary · Free-time activities | 2 ESO | LS2 Free Time, Live!, LP1 Getting started (play / go / do, how often, hobbies) |
+| Grammar · Present Simple: how often? | 2 ESO | LS2 Free Time, Live!, LP1 Getting started (he / she / it + -s, questions, adverbs of frequency) |
+| Vocabulary · Clothes, kit and weather | 2 ESO | LS2 Free Time, Live!, LP2 What are they doing? (clothes and kit, weather, at the event) |
+| Grammar · Present Continuous | 2 ESO | LS2 Free Time, Live!, LP2 What are they doing? (form, -ing spelling, negatives, questions) |
+| Now or usually? Choose it, write it | 2 ESO | LS2 Free Time, Live!, LP3 Now or usually? (older mixed game) |
+| Vocabulary · Autumn words | 4 ESO | LS2 Seasons & Celebrations, LP1 Getting started (replaces Autumn words: choose it, write it) |
+| Grammar · Talking about change | 4 ESO | LS2 Seasons & Celebrations, LP1 Getting started (get + comparative, every autumn or right now, adjective + preposition + -ing) |
+| Vocabulary · Celebrations around the world | 4 ESO | LS2 Seasons & Celebrations, LP2 Celebrations around the world (traditions, adjectives, words from four celebrations) |
+| Grammar · Customs, dates and It is celebrated | 4 ESO | LS2 Seasons & Celebrations, LP2 Celebrations around the world (Present Simple for customs, on / in / at, It is celebrated / takes place / is held) |
+| Where traditions come from: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from (older mixed game) |
 
 One known limit: the deck files are public on the site, so a student who knows the address could read the answers. Nothing on the student side links to them.

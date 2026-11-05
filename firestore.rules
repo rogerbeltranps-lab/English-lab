@@ -136,6 +136,11 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['sid', 'a', 'at'])
         && request.resource.data.sid is number && request.resource.data.a is map && request.resource.data.a.size() <= 300;
     }
+    // class game results (Roger, 5 Nov 2026): gameResults/{group}_{sid}, one per game played, written by the board (lab/game/host.js)
+    // and read by the results page (lab/game/results.html). Students' marks per game: only the teacher.
+    match /gameResults/{id} {
+      allow read, write: if isTeacher();
+    }
     match /buzz/{group} {
       allow read: if isTeacher() || inGroup(group);
       allow write: if isTeacher();
