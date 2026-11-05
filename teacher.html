@@ -665,13 +665,13 @@ setInterval(classCheck,30e3);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)classCheck()});
 // ---- live during class (Roger, 5 Nov 2026: "Always when I have a class, refresh the teacher's dashboard of that class so that I don't think
 // they didn't do stuff they did"). From 5 minutes before a class until 10 minutes after it ends (liveClass), while that group is on screen and
-// the tab is visible, every 2 minutes (LIVE.ms) the dashboard asks Firestore only for that group's work that CHANGED since its last look:
-// each signed-in student's progress (updated > since); results (updated) and checkpoints (sent) when the progress changed, and every third
-// round for everyone (a submit or a recall checkpoint can come without a progress save). An empty answer costs one read, so a round is
-// about one read per student plus the documents that changed: a whole class is roughly 1,500–3,000 reads (one 🔄 Update is ~900).
+// the tab is visible, every 7 minutes (LIVE.ms; Roger, 5 Nov 2026: "every 7 minutes") the dashboard asks Firestore only for that group's
+// work that CHANGED since its last look: each signed-in student's progress and results (updated > since) and checkpoints (sent > since).
+// An empty answer costs one read, so a round is about three reads per student plus the documents that changed: a whole class (about 11
+// rounds) is roughly 800–1,500 reads (one 🔄 Update is ~900).
 // Not a full load: the student list, levels and team points still come with 🔄 Update. The screen is redrawn only when something changed,
 // never while the window (#dlg) is open or while you are typing (an edited box waits until the next round); the scroll position stays.
-const LIVE={ms:120e3,gid:null,since:{},n:0,at:0,busy:false,pend:false,err:false};
+const LIVE={ms:420e3,gid:null,since:{},n:0,at:0,busy:false,pend:false,err:false};
 function liveClass(){const c=classNow();if(c)return c;
   const now=window.EL_NOW?new Date(window.EL_NOW):new Date();return classNow(new Date(now.getTime()-15*60e3))}   // classAt stops 5 min before the end: +15 = 10 min after it
 const liveOn=()=>{const c=!DEMO&&RAW&&S.D&&liveClass();return c&&S.g===c.gid&&!S.year?c:null};
@@ -684,15 +684,13 @@ async function liveTick(force){const c=liveOn();
   if(!c||document.hidden||LIVE.busy){liveDraw();return}
   const gid=c.gid;if(LIVE.gid!==gid){LIVE.gid=gid;LIVE.since={};LIVE.n=0;LIVE.at=0}
   if(!force&&Date.now()-LIVE.at<LIVE.ms-5e3){liveDraw();return}
-  LIVE.busy=true;const t0=Date.now(),base=(AT.g[gid]||t0)-180e3,all=LIVE.n%3===0;LIVE.n++;   // 3 min margin: this computer's clock vs the server's
+  LIVE.busy=true;const t0=Date.now(),base=(AT.g[gid]||t0)-180e3;LIVE.n++;   // 3 min margin: this computer's clock vs the server's
   const ms=x=>x&&typeof x.toMillis==="function"?x.toMillis():0,
         q=(u,n,f,t)=>F.getDocs(F.query(F.collection(db(),"students",u,n),F.where(f,">",F.Timestamp.fromMillis(t))));
   const uids=Object.values(RAW.st).filter(s=>s.group===gid&&s.uid).map(s=>s.uid);let got=0;
   try{await Promise.all(uids.map(async u=>{const s=LIVE.since[u]=LIVE.since[u]||{pg:base,rs:base,cp:base};
-      const p=await q(u,"progress","updated",s.pg);
+      const [p,r,k]=await Promise.all([q(u,"progress","updated",s.pg),q(u,"results","updated",s.rs),q(u,"checkpoints","sent",s.cp).catch(e=>{console.warn("live checkpoints",e);return null})]);
       p.forEach(d=>{const x=d.data();(RAW.pg[u]=RAW.pg[u]||{})[d.id]=x.data||{};s.pg=Math.max(s.pg,ms(x.updated));got++});
-      if(!all&&p.empty)return;
-      const [r,k]=await Promise.all([q(u,"results","updated",s.rs),q(u,"checkpoints","sent",s.cp).catch(e=>{console.warn("live checkpoints",e);return null})]);
       r.forEach(d=>{const x=d.data();(RAW.rs[u]=RAW.rs[u]||{})[x.activity||d.id.replace("__","/")]=x;s.rs=Math.max(s.rs,ms(x.updated));got++});
       if(k)k.forEach(d=>{const x=d.data();(RAW.cp[u]=RAW.cp[u]||{})[d.id]=x;s.cp=Math.max(s.cp,ms(x.sent));got++})}));
     LIVE.err=false;LIVE.at=t0;AT.g[gid]=t0;saveCache();
@@ -2126,7 +2124,7 @@ const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if
 const whenAt=t=>{if(!t)return "never";const d=new Date(t),today=new Date().toDateString()===d.toDateString();
   return (today?"":d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+" ")+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})};
 function loadBar(){const e=$("#loadbar");if(!e||DEMO&&!window.EL_LIVE_DEMO)return;const g=GR.find(x=>x.id===S.g),lv=liveOn()||window.EL_LIVE_DEMO;
-  if(lv&&g){e.innerHTML=`<span class="live">🟢 <b>Live: ${esc(g.name)} is in class</b>. Its students' work updates by itself every 2 minutes (last: ${whenAt(AT.g[g.id])}${LIVE.err?", the last try failed, trying again":""}).</span> `
+  if(lv&&g){e.innerHTML=`<span class="live">🟢 <b>Live: ${esc(g.name)} is in class</b>. Its students' work updates by itself every 7 minutes (last: ${whenAt(AT.g[g.id])}${LIVE.err?", the last try failed, trying again":""}).</span> `
     +`<button class="mini" data-load="${g.id}" title="Fetch this group's whole work now, with the student list and levels">🔄 Update ${esc(g.name)}</button>`;return}
   e.innerHTML=`Students' work${g?` in <b>${esc(g.name)}</b>: as of ${whenAt(AT.g[g.id])}`:`: ${GR.map(x=>esc(x.name)+" "+whenAt(AT.g[x.id])).join(" · ")}`}. `
     +(g?`<button class="mini" data-load="${g.id}" title="Fetch this group's latest work (about a quarter of everything)">🔄 Update ${esc(g.name)}</button> `:"")
