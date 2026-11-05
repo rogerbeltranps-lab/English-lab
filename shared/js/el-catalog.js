@@ -203,9 +203,11 @@ window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gi
 // the learning path page in teacher mode. ls/{id}.push[group] = {a: activity id, p: panel id or "", pn: tab name, t: label "LP3 …", at: ms}
 // or null (taken down). Students get a big "Open it" card on their board and a bar on every page of that LS. The newest one counts, while
 // its learning path is open for the group, and for EL_PULL_DAYS days at most. infos = {lsId: ls info} (lsInfo in el-cloud.js).
+// A pull-up made during a class carries until = the end of that class (elClassEnd in el-plan.js): then it is over, like "Release them".
 window.EL_PULL_DAYS=7;
+window.elPullLive=x=>!!(x&&x.a&&x.at&&Date.now()-x.at<EL_PULL_DAYS*864e5&&!(x.until&&Date.now()>=x.until));
 window.elPullFor=function(infos,gid){let best=null;
-  for(const [ls,info] of Object.entries(infos||{})){const x=info&&info.push&&info.push[gid];if(!x||!x.a||!x.at||Date.now()-x.at>EL_PULL_DAYS*864e5)continue;
+  for(const [ls,info] of Object.entries(infos||{})){const x=info&&info.push&&info.push[gid];if(!elPullLive(x))continue;
     const a=(window.EL_CATALOG||[]).find(y=>y.id===x.a),l=(window.EL_LS||[]).find(y=>y.id===ls);
     if(!a||(info.status||"hidden")==="hidden"||!elLsForGroup(l,info,gid)||!elLpOpen(a,info,gid))continue;
     if(!best||x.at>best.at)best=Object.assign({ls,act:a},x)}

@@ -277,7 +277,7 @@ async function goLive(){
   if(DEMO||!D.me.group||goLive.on)return;goLive.on=true;const db=ELCloud.db,g=D.me.group,redraw=()=>{const n=$("#live");if(n)n.innerHTML=liveBox()};
   F.onSnapshot(F.doc(db,"live",g),x=>{LIVE=x.exists()?x.data():null;redraw()},e=>console.warn("live",e));setInterval(redraw,60e3);
   // 📌 a learning path pulled up by the teacher shows at once: only the LS docs of the group's open LSs (one read each when the board opens)
-  const pdraw=()=>{const n=$("#pull");if(n)n.innerHTML=pullBox()};
+  const pdraw=()=>{const n=$("#pull");if(n)n.innerHTML=pullBox()};setInterval(pdraw,30e3);   // gone when the class it was made in ends (until)
   EL_LS.filter(l=>{const i=D.ls[l.id];return i&&i.status==="open"&&elLsForGroup(l,i,g)}).forEach(l=>F.onSnapshot(F.doc(db,"ls",l.id),x=>{const d=x.exists()?x.data():{},i=D.ls[l.id];
     i.push=d.push||{};if(d.open)i.open=d.open;if(d.done)i.done=d.done;pdraw()},e=>console.warn("pull",e)));
   // my points and the teams' scores change during the class (✓ Right · +1): show them at once

@@ -406,16 +406,16 @@ async function teacherSections(info){
     catch(e){console.warn("open",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
   // 📌 Pull up on the group's screens (Roger, 2 Nov 2026): this learning path, or it at the tab on screen; it opens the path (and that tab) if locked.
   const pulled=()=>((info.push||{})[g])||null;
-  async function pull(p){if(busy)return;const o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:Date.now(),lock:true};
+  async function pull(p){if(busy)return;const now=Date.now(),o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:now,lock:true,until:(window.elClassEnd&&elClassEnd(g,now))||null};
     if(o&&!elLpOpen(a,info,g))await openLp();
     if(o&&p&&locked().includes(p))await save(locked().filter(x=>x!==p));
     busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});await setDoc(doc(db,"live",g),{go:o},{merge:true});/* live: open pages go there (goTo) */info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens, kept there":"✓ Released"}
     catch(e){console.warn("pull",e);msg="✗ Not saved: "+(e.code||e.message||e)}busy=false;draw()}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
-  function pullRow(){const x0=pulled(),x=x0&&x0.a&&x0.at&&Date.now()-x0.at<EL_PULL_DAYS*864e5?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
+  function pullRow(){const x0=pulled(),x=elPullLive(x0)?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
     return '<div class="r pl"><b>📌 Pull up on '+gname(g)+'\'s screens</b><button data-pull="">This learning path</button>'
       +(cur?'<button data-pull="'+cur+'">At this tab: '+nm(cur).replace(/</g,"&lt;")+'</button>':"")
-      +(here?'<span class="now">🔒 Kept on their screens'+(x.p?" at “"+nm(x.p).replace(/</g,"&lt;")+"”":"")+'</span><button class="g" data-pull="-">🔓 Release them</button>':x?'<span>🔒 Kept on their screens: '+String(x.t||"").replace(/</g,"&lt;")+'</span><button class="g" data-pull="-">🔓 Release them</button>':"")+'</div>'}
+      +(here?'<span class="now">🔒 Kept on their screens'+(x.p?" at “"+nm(x.p).replace(/</g,"&lt;")+"”":"")+(x.until?" until "+new Date(x.until).toTimeString().slice(0,5)+" (end of the class)":"")+'</span><button class="g" data-pull="-">🔓 Release them</button>':x?'<span>🔒 Kept on their screens: '+String(x.t||"").replace(/</g,"&lt;")+'</span><button class="g" data-pull="-">🔓 Release them</button>':"")+'</div>'}
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
     let bar=document.getElementById("el-tsec");
@@ -645,12 +645,13 @@ function tabBar(g){const lv=myLevel||homeLevel,ca=!lv||elCa(lv),old=document.get
   b.append(tx,go,no);document.body.prepend(b)}
 // 🔒 Kept there until the teacher lets them go (Roger, 4 Nov 2026: "once I pull students in a section or LP, they mustn't be able to go
 // to another part of the website until I say so"): a pull-up carries lock:true. While it lasts (until the teacher clicks Release, which
-// sets go to null, or LOCK_MS after it at the latest, in case it is forgotten) every other page that loads el-cloud.js sends the student
+// sets go to null, or when the class it was made in ends (until; Roger, 5 Nov 2026: "when I finish a class, this should be released"),
+// or LOCK_MS after it at the latest, in case it is forgotten) every other page that loads el-cloud.js sends the student
 // back to that learning path at once, links that leave it are blocked with a message, and with a tab chosen the other tabs are blocked too
 // (except the one the student was already working on, until they reach the teacher's tab). A bar on the path says they are kept there.
 const LOCK_MS=70*60e3;
 let LOCK=null,lockFrom=null;
-const lockOn=g=>!!(g&&g.lock&&g.a&&g.at&&Date.now()-g.at<LOCK_MS);
+const lockOn=g=>!!(g&&g.lock&&g.a&&g.at&&Date.now()-g.at<LOCK_MS&&!(g.until&&Date.now()>=g.until));
 const lockCa=()=>{const lv=myLevel||homeLevel;return !lv||elCa(lv)};
 const lockHere=()=>LOCK&&actId===LOCK.a;
 function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-toast");if(!n){n=document.createElement("div");n.id="el-lock-toast";
@@ -674,10 +675,12 @@ document.addEventListener("click",e=>{if(!lockHere())return;
   if(u.origin===location.origin&&u.pathname===location.pathname)return;   // a tab or a link on this page
   if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
   e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
-setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar()}else if(LOCK)lockBar()},1000);
+const lockFree=()=>lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");
+setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar()},1000);   // the class is over (until) or LOCK_MS passed
 function goTo(g,first){
   const was=LOCK;LOCK=lockOn(g)?g:null;
-  if(was&&!LOCK){lockBar();lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");return}
+  if(was&&!LOCK){lockBar();lockFree();return}
+  if(g&&g.until&&Date.now()>=g.until)return;   // the class it was made in is over
   if(!g||!g.a||!g.at)return;const k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
   const a=(window.EL_CATALOG||[]).find(y=>y.id===g.a);if(!a)return;
   const here=window.EL_CATALOG&&EL_CATALOG.find(y=>y.id===actId);
