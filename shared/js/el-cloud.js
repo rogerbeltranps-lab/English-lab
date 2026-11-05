@@ -406,32 +406,33 @@ async function teacherSections(info){
     catch(e){console.warn("open",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
   // 📌 Pull up on the group's screens (Roger, 2 Nov 2026): this learning path, or it at the tab on screen; it opens the path (and that tab) if locked.
   const pulled=()=>((info.push||{})[g])||null;
-  async function pull(p){if(busy)return;const now=Date.now(),o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:now,lock:true,until:(window.elClassEnd&&elClassEnd(g,now))||null,fs:fsOn()};
+  async function pull(p){if(busy)return;const now=Date.now(),o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:now,lock:true,until:(window.elClassEnd&&elClassEnd(g,now))||null};
     if(o&&!elLpOpen(a,info,g))await openLp();
     if(o&&p&&locked().includes(p))await save(locked().filter(x=>x!==p));
     busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});await setDoc(doc(db,"live",g),{go:o},{merge:true});/* live: open pages go there (goTo) */info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens, kept there":"✓ Released"}
     catch(e){console.warn("pull",e);msg="✗ Not saved: "+(e.code||e.message||e)}busy=false;draw()}
-  // ⛶ full screen with the pull-up (el_t_pullfs, shared with the dashboard); switching it on a pull-up that is on screens changes it at once
-  const fsOn=()=>{try{return localStorage.getItem("el_t_pullfs")==="1"}catch(e){return false}};
-  async function fsToggle(){const v=!fsOn();try{origSet.call(localStorage,"el_t_pullfs",v?"1":"0")}catch(e){}
-    const x=pulled();if(x&&elPullLive(x)&&x.a===a.id){const o=Object.assign({},x,{fs:v});busy=true;
-      try{await setDoc(ref,{push:{[g]:o}},{merge:true});await setDoc(doc(db,"live",g),{go:o},{merge:true});info.push=Object.assign({},info.push,{[g]:o});msg=v?"✓ Full screen on":"✓ Full screen off"}
-      catch(e){console.warn("fs",e);msg="✗ Not saved: "+(e.code||e.message||e)}busy=false}
-    draw()}
-  // who left full screen during this pull-up (live/{group}/fsLeft), live while a full-screen pull-up of this group is on
-  let fsStop=null,fsG=null,fsList=[];
-  function fsWatch(x){const want=x&&x.fs?g:null;if(want===fsG)return;if(fsStop){fsStop();fsStop=null}fsG=want;fsList=[];if(!want)return;
-    fsStop=onSnapshot(collection(db,"live",want,"fsLeft"),s=>{fsList=s.docs.map(d=>d.data());const n=document.getElementById("el-fsleft");if(n)n.innerHTML=fsLeftHtml(pulled())},e=>console.warn("fsLeft",e))}
-  function fsLeftHtml(x){const l=x?fsList.filter(y=>y.pull===x.at).sort((p,q)=>(q.at&&q.at.toMillis?q.at.toMillis():0)-(p.at&&p.at.toMillis?p.at.toMillis():0)):[];
-    const hm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
-    return l.length?'⚠️ Left full screen: '+l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+hm(y.at)+(y.n>1?" ("+y.n+"×)":"")).join(" · "):(x&&x.fs?"Nobody has left full screen":"")}
+  // ⛶ full screen for the group (live/{group}.fs = {on, at, until}, as on the dashboard; fsCheck below): the state and who left
+  // (live/{group}/fsLeft), live for the group chosen in this bar
+  let fsStop=null,fsStopL=null,fsG=null,fsX=null,fsList=[];
+  const fsOnNow=x=>!!(x&&x.on&&x.at&&Date.now()<(x.until||x.at+LOCK_MS));
+  function fsWatch(){if(fsG===g)return;[fsStop,fsStopL].forEach(f=>f&&f());fsStop=fsStopL=null;fsG=g;fsX=null;fsList=[];
+    fsStop=onSnapshot(doc(db,"live",g),s=>{fsX=(s.exists()&&s.data().fs)||null;
+      if(fsOnNow(fsX)&&!fsStopL)fsStopL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{fsList=c.docs.map(d=>d.data());draw()},e=>console.warn("fsLeft",e));
+      else if(!fsOnNow(fsX)&&fsStopL){fsStopL();fsStopL=null;fsList=[]}
+      draw()},e=>console.warn("live",e))}
+  async function fsToggle(){const now=Date.now(),v=fsOnNow(fsX)?null:{on:true,at:now,until:(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS};
+    try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});msg=v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
+  const fsHm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
+  function fsRow(){const on=fsOnNow(fsX),l=on?fsList.filter(y=>y.pull===fsX.at).sort((p,q)=>(q.at&&q.at.toMillis?q.at.toMillis():+q.at||0)-(p.at&&p.at.toMillis?p.at.toMillis():+p.at||0)):[];
+    return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who leaves it). Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+'</button>'
+      +(on?'<div class="fsl">until '+fsHm(fsX.until||fsX.at+LOCK_MS)+' · '+(l.length?'⚠️ Left it: '+l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+fsHm(y.at)+(y.n>1?" ("+y.n+"×)":"")).join(" · "):"nobody has left it")+'</div>':"")}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
   function pullRow(){const x0=pulled(),x=elPullLive(x0)?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
-    fsWatch(here?x:null);
-    return '<div class="r pl"><b>📌 Pull up on '+gname(g)+'\'s screens</b><button class="fs'+(fsOn()?" on":"")+'" data-fs="1" title="Students\' pages go full screen (they tap once to start; you see who leaves it)">⛶ Full screen: '+(fsOn()?"on":"off")+'</button><button data-pull="">This learning path</button>'
+    fsWatch();
+    return '<div class="r pl"><b>📌 Pull up on '+gname(g)+'\'s screens</b><button data-pull="">This learning path</button>'
       +(cur?'<button data-pull="'+cur+'">At this tab: '+nm(cur).replace(/</g,"&lt;")+'</button>':"")
       +(here?'<span class="now">🔒 Kept on their screens'+(x.p?" at “"+nm(x.p).replace(/</g,"&lt;")+"”":"")+(x.until?" until "+new Date(x.until).toTimeString().slice(0,5)+" (end of the class)":"")+'</span><button class="g" data-pull="-">🔓 Release them</button>':x?'<span>🔒 Kept on their screens: '+String(x.t||"").replace(/</g,"&lt;")+'</span><button class="g" data-pull="-">🔓 Release them</button>':"")
-      +(here&&x.fs?'<div class="fsl" id="el-fsleft">'+fsLeftHtml(x)+'</div>':"")+'</div>'}
++'</div><div class="r pl">'+fsRow()+'</div>'}
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
     let bar=document.getElementById("el-tsec");
@@ -641,7 +642,7 @@ function gamePush(u){
   let first=true;
   stopGame=onSnapshot(doc(db,"live",myGroup),s=>{const x=s.exists()?s.data():null,ms=x&&x.at&&x.at.toMillis?x.at.toMillis():0;
     if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search);return}
-    goTo(x&&x.go,first);first=false},
+    goTo(x&&x.go,first);first=false;FSG=(x&&x.fs)||null;fsCheck()},
     e=>console.warn("game",e));
 }
 // 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
@@ -693,29 +694,33 @@ document.addEventListener("click",e=>{if(!lockHere())return;
   e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
 const lockFree=()=>lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");
 setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();fsCheck()},1000);   // the class is over (until) or LOCK_MS passed
-// ⛶ Full screen in class (Roger, 5 Nov 2026: "put students in full screen mode when I say it and they don't have a way to get out"): a
-// pull-up with fs:true covers the kept page until the student taps it (a browser only goes full screen after a tap), then Esc is locked
-// (Chrome and Chromebooks: Keyboard Lock, only holding Esc down leaves). Leaving full screen (or reloading the page) brings the cover back
-// and writes live/{group}/fsLeft/{email} = {name, at, pull, n}: the teacher bar and the dashboard list who left. When the pull-up ends
-// (Release, the end of the class), the page leaves full screen. Never on a recall checkpoint or the sample exam (they have their own full
-// screen: leaving it sends the checkpoint), nor in the teacher's student view; not on iPhones (no full screen for pages there).
+// ⛶ Full screen in class (Roger, 5 Nov 2026: "put students in full screen mode when I say it and they don't have a way to get out"; then
+// "make the selected group go full screen" from the top right of the dashboard): live/{group}.fs = {on, at, until} (the doc gamePush
+// already listens to). While it is on, every page of the site covers itself until the student taps it (a browser only goes full screen
+// after a tap), then Esc is locked (Chrome and Chromebooks: Keyboard Lock, only holding Esc down leaves). Leaving full screen brings the
+// cover back and writes live/{group}/fsLeft/{email} = {name, at, pull: fs.at, n}: the dashboard and the teacher bar list who left. Moving
+// to another page of the site (a link, the pull-up, a reload: beforeunload/pagehide) needs a new tap but does not count as leaving. When it is switched off or
+// the class ends, the page leaves full screen. Never on a recall checkpoint or the sample exam (they have their own full screen: leaving
+// it sends the checkpoint), nor in the teacher's student view; not on iPhones (no full screen for pages there).
 const FD=document,FE=FD.documentElement;
 const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!(FD.fullscreenElement||FD.webkitFullscreenElement);
-let fsWas=false;
-const fsKey=()=>"el_fs_"+(LOCK&&LOCK.at);
+let fsWas=false,FSG=null;
+const fsKey=()=>"el_fs_"+(FSG&&FSG.at);
 const fsSS=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}};
-function fsWanted(){if(frozen||!lockHere()||!LOCK.fs||!fsCan())return false;const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !(h&&(h.checkpoint||/sample-exam$/.test(h.id)))}
-async function fsLeft(){if(!user||!myGroup||!LOCK)return;const k=fsKey()+"_n",n=(+fsSS(k)||0)+1;fsSS(k,String(n));
-  try{await setDoc(doc(db,"live",myGroup,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:serverTimestamp(),pull:LOCK.at,n},{merge:true})}catch(e){console.warn("full screen",e)}}
+const fsOnG=()=>!!(FSG&&FSG.on&&FSG.at&&Date.now()<(FSG.until||FSG.at+LOCK_MS));
+function fsWanted(){if(frozen||!myGroup||!fsOnG()||!fsCan())return false;const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !(h&&(h.checkpoint||/sample-exam$/.test(h.id)))}
+let fsBye=false;addEventListener("beforeunload",()=>{fsBye=true});addEventListener("pagehide",()=>{fsBye=true});   // going to another page: not leaving
+async function fsLeft(){if(!user||!myGroup||!FSG)return;const k=fsKey()+"_n",n=(+fsSS(k)||0)+1;fsSS(k,String(n));
+  try{await setDoc(doc(db,"live",myGroup,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:serverTimestamp(),pull:FSG.at,n},{merge:true})}catch(e){console.warn("full screen",e)}}
 function fsGo(){try{const lk=()=>{try{if(navigator.keyboard&&navigator.keyboard.lock)navigator.keyboard.lock(["Escape"]).catch(()=>{})}catch(e){}},
   r=(FE.requestFullscreen||FE.webkitRequestFullscreen).call(FE);if(r&&r.then)r.then(()=>{lk();fsCheck()},()=>{});else{lk();fsCheck()}}catch(e){}}
 function fsCheck(){let c=document.getElementById("el-fs");
   if(!fsWanted()){if(c)c.remove();if(fsWas){fsWas=false;try{if(navigator.keyboard&&navigator.keyboard.unlock)navigator.keyboard.unlock()}catch(e){}
     try{if(fsIs())(FD.exitFullscreen||FD.webkitExitFullscreen).call(FD)}catch(e){}}return}
-  if(fsIs()){if(c)c.remove();fsWas=true;fsSS(fsKey(),"1");return}
-  const left=fsWas||fsSS(fsKey())==="1";if(left){fsWas=false;fsSS(fsKey(),null);fsLeft()}
+  if(fsIs()){if(c)c.remove();fsWas=true;return}
+  const left=fsWas;if(left){fsWas=false;setTimeout(()=>{if(!fsBye)fsLeft()},500)}   // after the cover is on (fsLeft's write can call fsCheck again); not when the page is being left
   const ca=lockCa(),again=left||(+fsSS(fsKey()+"_n")||0)>0;
-  if(!c){c=document.createElement("div");c.id="el-fs";c.setAttribute("role","button");
+  c=document.getElementById("el-fs");if(!c){c=document.createElement("div");c.id="el-fs";c.setAttribute("role","button");
     c.style.cssText="position:fixed;inset:0;z-index:2147483002;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:#0f766e;color:#fff;font:600 18px system-ui,sans-serif;cursor:pointer";
     c.onclick=fsGo;document.body.append(c)}
   const h=(again?(ca?"Has sortit de la pantalla completa. El professor ho veu.":"You left full screen. Your teacher can see it."):(ca?"El professor vol aquesta pàgina a pantalla completa.":"Your teacher wants this page in full screen."))
