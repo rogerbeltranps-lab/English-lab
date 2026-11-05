@@ -141,6 +141,15 @@ service cloud.firestore {
     match /gameResults/{id} {
       allow read, write: if isTeacher();
     }
+    // ⛶ class full screen (shared/js/el-cloud.js fsLeft): live/{group}/fsLeft/{email} = {name, at, pull, n}, written by a student of the group
+    // when they leave the full screen of a pull-up; only the teacher reads them (the dashboard and the learning path page list who left)
+    match /live/{group}/fsLeft/{email} {
+      allow read, delete: if isTeacher();
+      allow create, update: if inGroup(group) && email == myEmail()
+        && request.resource.data.keys().hasOnly(['name', 'at', 'pull', 'n'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 120
+        && request.resource.data.at == request.time && request.resource.data.pull is number && request.resource.data.n is number;
+    }
     match /buzz/{group} {
       allow read: if isTeacher() || inGroup(group);
       allow write: if isTeacher();

@@ -390,7 +390,7 @@ async function teacherSections(info){
     +".el-tsec .r{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.el-tsec b{margin-right:4px}.el-tsec button{border:1px solid #c7d2fe;background:#fff;color:#3730a3;border-radius:999px;padding:3px 12px;cursor:pointer;font:600 13px system-ui,sans-serif}"
     +".el-tsec button.on{background:#4338ca;color:#fff;border-color:#4338ca}.el-tsec button.g{background:none;border-color:transparent;text-decoration:underline;font-weight:500}.el-tsec small{display:block;color:#475569;margin-top:6px}"
     +".el-tsec .w{margin-top:8px;padding:6px 10px;border-radius:8px;background:#fef2f2;color:#991b1b;font-weight:600}.el-tsec .w button{margin-left:6px}.el-tsec .m{margin-left:6px;color:#15803d;font-weight:600}.el-tsec .m.err{color:#b91c1c}"
-    +".el-tsec .pl{margin-top:8px;padding-top:8px;border-top:1px dashed #a5b4fc}.el-tsec .pl button[data-pull]:not(.g){background:#0f766e;border-color:#0f766e;color:#fff}.el-tsec .now{color:#0f766e;font-weight:700}"
+    +".el-tsec .pl{margin-top:8px;padding-top:8px;border-top:1px dashed #a5b4fc}.el-tsec .pl button[data-pull]:not(.g){background:#0f766e;border-color:#0f766e;color:#fff}.el-tsec .now{color:#0f766e;font-weight:700}.el-tsec .pl button.fs.on{background:#1e293b;border-color:#1e293b;color:#fff}.el-tsec .fsl{flex-basis:100%;font-size:13px;color:#9a3412;font-weight:600}"
     +".tab .el-tsw{display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;font-size:12px;line-height:18px;background:#dcfce7;border:1px solid #86efac;cursor:pointer;vertical-align:1px}"
     +".tab .el-tsw.off{background:#fee2e2;border-color:#fca5a5}.tab .el-tsw:hover{outline:2px solid #6366f1}.tab.el-toff{border-style:dashed!important;opacity:.75}";
   document.head.append(st);
@@ -406,23 +406,49 @@ async function teacherSections(info){
     catch(e){console.warn("open",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
   // 📌 Pull up on the group's screens (Roger, 2 Nov 2026): this learning path, or it at the tab on screen; it opens the path (and that tab) if locked.
   const pulled=()=>((info.push||{})[g])||null;
-  async function pull(p){if(busy)return;const o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:Date.now(),lock:true};
+  async function pull(p){if(busy)return;const now=Date.now(),o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:now,lock:true,until:(window.elClassEnd&&elClassEnd(g,now))||null};
     if(o&&!elLpOpen(a,info,g))await openLp();
     if(o&&p&&locked().includes(p))await save(locked().filter(x=>x!==p));
     busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});await setDoc(doc(db,"live",g),{go:o},{merge:true});/* live: open pages go there (goTo) */info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens, kept there":"✓ Released"}
     catch(e){console.warn("pull",e);msg="✗ Not saved: "+(e.code||e.message||e)}busy=false;draw()}
+  // ⛶ full screen for the group (live/{group}.fs = {on, at, until}, as on the dashboard; fsCheck below): the state and who left
+  // (live/{group}/fsLeft), live for the group chosen in this bar
+  let fsStop=null,fsStopL=null,fsG=null,fsX=null,fsList=[];
+  const fsOnNow=x=>!!(x&&x.on&&x.at&&Date.now()<(x.until||x.at+LOCK_MS));
+  function fsWatch(){if(fsG===g)return;[fsStop,fsStopL].forEach(f=>f&&f());fsStop=fsStopL=null;fsG=g;fsX=null;fsList=[];
+    fsStop=onSnapshot(doc(db,"live",g),s=>{fsX=(s.exists()&&s.data().fs)||null;
+      if(fsOnNow(fsX)&&!fsStopL)fsStopL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{fsList=c.docs.map(d=>d.data());draw()},e=>console.warn("fsLeft",e));
+      else if(!fsOnNow(fsX)&&fsStopL){fsStopL();fsStopL=null;fsList=[]}
+      draw()},e=>console.warn("live",e))}
+  async function fsToggle(){const now=Date.now(),v=fsOnNow(fsX)?null:{on:true,at:now,until:(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS};
+    try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});msg=v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
+  const fsHm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
+  // while the group is in full screen, the same state and list stay fixed at the top right of the page, also when scrolling (Roger, 5 Nov 2026)
+  function fsFloat(){let f=document.getElementById("el-fsfloat");if(!fsOnNow(fsX)){if(f)f.remove();return}
+    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147481000;max-width:min(340px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
+      f.onclick=e=>{if(e.target.closest("button"))fsToggle()};document.body.append(f)}
+    const l=fsList.filter(y=>y.pull===fsX.at).sort((p,q)=>(q.at&&q.at.toMillis?q.at.toMillis():+q.at||0)-(p.at&&p.at.toMillis?p.at.toMillis():+p.at||0));
+    const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>⛶ '+gname(g)+' in full screen</b><button style="border:1px solid #1e293b;background:#1e293b;color:#fff;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui">Switch off</button></div>'
+      +'<div style="color:#475569;font-size:12px;margin-top:2px">until '+fsHm(fsX.until||fsX.at+LOCK_MS)+'</div><div style="color:#9a3412;margin-top:6px;max-height:40vh;overflow:auto;line-height:1.5">'
+      +(l.length?'⚠️ Left full screen ('+l.length+'):<br>'+l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+fsHm(y.at)+(y.n>1?" ("+y.n+"×)":"")).join("<br>"):"✓ Nobody has left it")+'</div>';
+    if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
+  function fsRow(){const on=fsOnNow(fsX),l=on?fsList.filter(y=>y.pull===fsX.at).sort((p,q)=>(q.at&&q.at.toMillis?q.at.toMillis():+q.at||0)-(p.at&&p.at.toMillis?p.at.toMillis():+p.at||0)):[];
+    return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who leaves it). Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+'</button>'
+      +(on?'<div class="fsl">until '+fsHm(fsX.until||fsX.at+LOCK_MS)+' · '+(l.length?'⚠️ Left it: '+l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+fsHm(y.at)+(y.n>1?" ("+y.n+"×)":"")).join(" · "):"nobody has left it")+'</div>':"")}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
-  function pullRow(){const x0=pulled(),x=x0&&x0.a&&x0.at&&Date.now()-x0.at<EL_PULL_DAYS*864e5?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
+  function pullRow(){const x0=pulled(),x=elPullLive(x0)?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
+    fsWatch();
     return '<div class="r pl"><b>📌 Pull up on '+gname(g)+'\'s screens</b><button data-pull="">This learning path</button>'
       +(cur?'<button data-pull="'+cur+'">At this tab: '+nm(cur).replace(/</g,"&lt;")+'</button>':"")
-      +(here?'<span class="now">🔒 Kept on their screens'+(x.p?" at “"+nm(x.p).replace(/</g,"&lt;")+"”":"")+'</span><button class="g" data-pull="-">🔓 Release them</button>':x?'<span>🔒 Kept on their screens: '+String(x.t||"").replace(/</g,"&lt;")+'</span><button class="g" data-pull="-">🔓 Release them</button>':"")+'</div>'}
+      +(here?'<span class="now">🔒 Kept on their screens'+(x.p?" at “"+nm(x.p).replace(/</g,"&lt;")+"”":"")+(x.until?" until "+new Date(x.until).toTimeString().slice(0,5)+" (end of the class)":"")+'</span><button class="g" data-pull="-">🔓 Release them</button>':x?'<span>🔒 Kept on their screens: '+String(x.t||"").replace(/</g,"&lt;")+'</span><button class="g" data-pull="-">🔓 Release them</button>':"")
++'</div><div class="r pl">'+fsRow()+'</div>'}
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
     let bar=document.getElementById("el-tsec");
     if(!bar||bar.nextElementSibling!==nav){if(bar)bar.remove();bar=document.createElement("div");bar.id="el-tsec";bar.className="el-tsec";nav.before(bar);
       bar.onclick=e=>{const b=e.target.closest("button");if(!b)return;e.preventDefault();
         if(b.dataset.g){g=b.dataset.g;origSet.call(localStorage,"el_t_secgroup",g);msg="";draw()}
-        else if(b.dataset.all)save(b.dataset.all==="1"?[]:all.slice());else if(b.dataset.lp)openLp();else if(b.dataset.pull!=null)pull(b.dataset.pull==="-"?null:b.dataset.pull)}}
+        else if(b.dataset.all)save(b.dataset.all==="1"?[]:all.slice());else if(b.dataset.lp)openLp();else if(b.dataset.fs)fsToggle();else if(b.dataset.pull!=null)pull(b.dataset.pull==="-"?null:b.dataset.pull)}}
     const off=locked(),n=all.length-off.filter(x=>all.includes(x)).length;
     const html='<div class="r"><b>🔓 Sections open for</b>'+grs.map(x=>'<button data-g="'+x.id+'" class="'+(x.id===g?"on":"")+'">'+x.name+'</button>').join("")
       +'<span>· '+n+' of '+all.length+' open</span><button class="g" data-all="1">open all</button><button class="g" data-all="0">close all</button>'
@@ -431,6 +457,7 @@ async function teacherSections(info){
       +pullRow()
       +(elLpOpen(a,info,g)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
     if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html}
+    fsFloat()
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);
       let sw=t.querySelector(".el-tsw");if(!sw){sw=document.createElement("span");sw.className="el-tsw";sw.setAttribute("role","button");
         sw.onclick=e=>{e.stopPropagation();e.preventDefault();toggle(id)};t.append(sw)}
@@ -625,7 +652,8 @@ function gamePush(u){
   let first=true;
   stopGame=onSnapshot(doc(db,"live",myGroup),s=>{const x=s.exists()?s.data():null,ms=x&&x.at&&x.at.toMillis?x.at.toMillis():0;
     if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search);return}
-    goTo(x&&x.go,first);first=false},
+    const f=first,run=()=>{goTo(x&&x.go,f);FSG=(x&&x.fs)||null;fsCheck()};first=false;
+    if(x&&(x.go||x.fs)&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
 }
 // 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
@@ -635,7 +663,7 @@ function gamePush(u){
 // only the card and bar of pullBar remain. Each pull-up moves a browser once (localStorage el_go_<at>). Not from a recall checkpoint,
 // the sample exam or a class presentation followed live (?live=): there the bar of pullBar says where to go.
 const GO_MS=3*60e3;
-function tabBar(g){const lv=myLevel||homeLevel,ca=!lv||elCa(lv),old=document.getElementById("el-pull");if(old)old.remove();
+function tabBar(g){const ca=lockCa(),old=document.getElementById("el-pull");if(old)old.remove();
   const b=document.createElement("div");b.id="el-pull";
   b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
   const tx=document.createElement("span");tx.textContent="📌 "+(ca?"El professor és a la pestanya: ":"Your teacher is on the tab: ")+(g.pn||g.p)+(ca?". Acaba el que estàs fent i ves-hi.":". Finish what you are doing and go there.");
@@ -645,13 +673,18 @@ function tabBar(g){const lv=myLevel||homeLevel,ca=!lv||elCa(lv),old=document.get
   b.append(tx,go,no);document.body.prepend(b)}
 // 🔒 Kept there until the teacher lets them go (Roger, 4 Nov 2026: "once I pull students in a section or LP, they mustn't be able to go
 // to another part of the website until I say so"): a pull-up carries lock:true. While it lasts (until the teacher clicks Release, which
-// sets go to null, or LOCK_MS after it at the latest, in case it is forgotten) every other page that loads el-cloud.js sends the student
+// sets go to null, or when the class it was made in ends (until; Roger, 5 Nov 2026: "when I finish a class, this should be released"),
+// or LOCK_MS after it at the latest, in case it is forgotten) every other page that loads el-cloud.js sends the student
 // back to that learning path at once, links that leave it are blocked with a message, and with a tab chosen the other tabs are blocked too
 // (except the one the student was already working on, until they reach the teacher's tab). A bar on the path says they are kept there.
 const LOCK_MS=70*60e3;
 let LOCK=null,lockFrom=null;
-const lockOn=g=>!!(g&&g.lock&&g.a&&g.at&&Date.now()-g.at<LOCK_MS);
-const lockCa=()=>{const lv=myLevel||homeLevel;return !lv||elCa(lv)};
+const lockOn=g=>!!(g&&g.lock&&g.a&&g.at&&Date.now()-g.at<LOCK_MS&&!(g.until&&Date.now()>=g.until));
+// Catalan only for Starter and Base, English for Core, Plus and Pro (Roger, 5 Nov 2026: "the messages when pulled up and full screen should
+// be in English except for the low levels starter and base"); the level comes from the page (LS pages) or the course's latest LS (findHomeLevel,
+// read before the first pull-up or full screen message on pages that do not know it, such as the board)
+const lockCa=()=>{const lv=myLevel||homeLevel;return !!lv&&elCa(lv)};
+let lvTried=false;
 const lockHere=()=>LOCK&&actId===LOCK.a;
 function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-toast");if(!n){n=document.createElement("div");n.id="el-lock-toast";
   n.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:2147483001;max-width:92vw;padding:12px 18px;border-radius:12px;background:#7f1d1d;color:#fff;font:600 15px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.3);text-align:center";document.body.append(n)}
@@ -674,10 +707,46 @@ document.addEventListener("click",e=>{if(!lockHere())return;
   if(u.origin===location.origin&&u.pathname===location.pathname)return;   // a tab or a link on this page
   if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
   e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
-setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar()}else if(LOCK)lockBar()},1000);
+const lockFree=()=>lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");
+setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();fsCheck()},1000);   // the class is over (until) or LOCK_MS passed
+// ⛶ Full screen in class (Roger, 5 Nov 2026: "put students in full screen mode when I say it and they don't have a way to get out"; then
+// "make the selected group go full screen" from the top right of the dashboard): live/{group}.fs = {on, at, until} (the doc gamePush
+// already listens to). While it is on, every page of the site covers itself until the student taps it (a browser only goes full screen
+// after a tap), then Esc is locked (Chrome and Chromebooks: Keyboard Lock, only holding Esc down leaves). Leaving full screen brings the
+// cover back and writes live/{group}/fsLeft/{email} = {name, at, pull: fs.at, n}: the dashboard and the teacher bar list who left. Moving
+// to another page of the site (a link, the pull-up, a reload: beforeunload/pagehide) needs a new tap but does not count as leaving. When it is switched off or
+// the class ends, the page leaves full screen. Never on a recall checkpoint or the sample exam (they have their own full screen: leaving
+// it sends the checkpoint), nor in the teacher's student view; not on iPhones (no full screen for pages there).
+const FD=document,FE=FD.documentElement;
+const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!(FD.fullscreenElement||FD.webkitFullscreenElement);
+let fsWas=false,FSG=null;
+const fsKey=()=>"el_fs_"+(FSG&&FSG.at);
+const fsSS=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}};
+const fsOnG=()=>!!(FSG&&FSG.on&&FSG.at&&Date.now()<(FSG.until||FSG.at+LOCK_MS));
+function fsWanted(){if(frozen||!myGroup||!fsOnG()||!fsCan())return false;const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !(h&&(h.checkpoint||/sample-exam$/.test(h.id)))}
+let fsBye=false;addEventListener("beforeunload",()=>{fsBye=true});addEventListener("pagehide",()=>{fsBye=true});   // going to another page: not leaving
+async function fsLeft(){if(!user||!myGroup||!FSG)return;const k=fsKey()+"_n",n=(+fsSS(k)||0)+1;fsSS(k,String(n));
+  try{await setDoc(doc(db,"live",myGroup,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:serverTimestamp(),pull:FSG.at,n},{merge:true})}catch(e){console.warn("full screen",e)}}
+function fsGo(){try{const lk=()=>{try{if(navigator.keyboard&&navigator.keyboard.lock)navigator.keyboard.lock(["Escape"]).catch(()=>{})}catch(e){}},
+  r=(FE.requestFullscreen||FE.webkitRequestFullscreen).call(FE);if(r&&r.then)r.then(()=>{lk();fsCheck()},()=>{});else{lk();fsCheck()}}catch(e){}}
+function fsCheck(){let c=document.getElementById("el-fs");
+  if(!fsWanted()){if(c)c.remove();if(fsWas){fsWas=false;try{if(navigator.keyboard&&navigator.keyboard.unlock)navigator.keyboard.unlock()}catch(e){}
+    try{if(fsIs())(FD.exitFullscreen||FD.webkitExitFullscreen).call(FD)}catch(e){}}return}
+  if(fsIs()){if(c)c.remove();fsWas=true;return}
+  const left=fsWas;if(left){fsWas=false;setTimeout(()=>{if(!fsBye)fsLeft()},500)}   // after the cover is on (fsLeft's write can call fsCheck again); not when the page is being left
+  const ca=lockCa(),again=left||(+fsSS(fsKey()+"_n")||0)>0;
+  c=document.getElementById("el-fs");if(!c){c=document.createElement("div");c.id="el-fs";c.setAttribute("role","button");
+    c.style.cssText="position:fixed;inset:0;z-index:2147483002;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:#0f766e;color:#fff;font:600 18px system-ui,sans-serif;cursor:pointer";
+    c.onclick=fsGo;document.body.append(c)}
+  const h=(again?(ca?"Has sortit de la pantalla completa. El professor ho veu.":"You left full screen. Your teacher can see it."):(ca?"El professor vol aquesta pàgina a pantalla completa.":"Your teacher wants this page in full screen."))
+    +"|"+(ca?"Toca la pantalla per continuar":"Tap the screen to go on");
+  if(c.dataset.h!==h){c.dataset.h=h;const [a,b]=h.split("|");c.innerHTML='<div style="font-size:64px">⛶</div><div style="font-size:26px;font-weight:800;max-width:640px"></div><div style="background:#fff;color:#0f766e;border-radius:999px;padding:14px 30px;font-size:20px;font-weight:800"></div>';
+    c.children[1].textContent=a;c.children[2].textContent=b+" →"}}
+FD.addEventListener("fullscreenchange",()=>fsCheck());FD.addEventListener("webkitfullscreenchange",()=>fsCheck());
 function goTo(g,first){
   const was=LOCK;LOCK=lockOn(g)?g:null;
-  if(was&&!LOCK){lockBar();lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");return}
+  if(was&&!LOCK){lockBar();lockFree();return}
+  if(g&&g.until&&Date.now()>=g.until)return;   // the class it was made in is over
   if(!g||!g.a||!g.at)return;const k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
   const a=(window.EL_CATALOG||[]).find(y=>y.id===g.a);if(!a)return;
   const here=window.EL_CATALOG&&EL_CATALOG.find(y=>y.id===actId);
@@ -690,7 +759,7 @@ function goTo(g,first){
   if(here&&here.id===a.id){const at=document.querySelector(".tab.active[data-panel]");
     if(LOCK){if(!seen)lockFrom=at&&at.dataset.panel!==g.p?at.dataset.panel:null;lockBar();return}
     if(g.p&&(!at||at.dataset.panel!==g.p))tabBar(g);return}
-  const lv=myLevel||homeLevel,ca=!lv||elCa(lv),o=overlay('<div style="max-width:560px"><div style="font-size:48px">📌</div><h1></h1><p class="n" style="font-size:22px;font-weight:800"></p><p class="c"></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:12px 24px;text-decoration:none;font-weight:800"></a></p></div>');
+  const ca=lockCa(),o=overlay('<div style="max-width:560px"><div style="font-size:48px">📌</div><h1></h1><p class="n" style="font-size:22px;font-weight:800"></p><p class="c"></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:12px 24px;text-decoration:none;font-weight:800"></a></p></div>');
   o.style.zIndex="2147483000";   // above the My week panel and the bottom bar
   o.querySelector("h1").textContent=seen&&LOCK?(ca?"🔒 El professor et manté a:":"🔒 Your teacher is keeping you on:"):(ca?"El professor et porta a:":"Your teacher is taking you to:");
   o.querySelector(".n").textContent=(g.t||a.title)+(g.pn?" · "+g.pn:"");

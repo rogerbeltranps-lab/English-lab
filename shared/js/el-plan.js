@@ -212,3 +212,13 @@ window.EL_TIMETABLE={
     "2ESOA":["Tue 12:00","Thu 12:00","Fri 8:30"],"2ESOB":["Tue 10:30","Thu 8:30","Fri 9:30"]},
   off:["2026-10-30",["2026-12-07","2026-12-08"],["2026-12-15","2026-12-18"],["2026-12-22","2027-01-07"]]
 };
+// End of the group's class going on at `at` (ms; from 5 minutes before it starts until it ends), as a time in ms, or null when the group
+// has no class then. A pull-up made during a class is released when that class ends (Roger, 5 Nov 2026: "when I finish a class, this
+// should be released"): the teacher writes it as `until` on the pull-up (ls/{id}.push[group], live/{group}.go).
+window.elClassEnd=function(gid,at){const T=window.EL_TIMETABLE,d=new Date(at||Date.now());if(!T||!T.groups||!T.groups[gid])return null;
+  const ymd=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  if((T.off||[]).some(o=>Array.isArray(o)?o[0]<=ymd&&ymd<=o[1]:o===ymd))return null;
+  const dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()],m=d.getHours()*60+d.getMinutes();
+  for(const sl of T.groups[gid]){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const s=+x[2]*60+ +x[3];
+    if(m>=s-5&&m<s+60){const e=new Date(d);e.setHours(0,0,0,0);return e.getTime()+(s+60)*60e3}}
+  return null};
