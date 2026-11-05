@@ -35,7 +35,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 #pdf table{border-collapse:collapse;width:100%;font-size:11px}#pdf th,#pdf td{position:static;border:1px solid #94a3b8;padding:4px 5px;text-align:left;vertical-align:top;background:#fff}#pdf thead th{background:#f1f5f9}#pdf table.rb{table-layout:fixed}#pdf td.rn,#pdf table.rb th:first-child{width:20%}#pdf tr{break-inside:avoid}#pdf .tick{font-size:15px;line-height:1}#pdf .note{margin-top:4px;color:#0f766e}#pdf .cmt{margin-top:14px;break-inside:avoid}#pdf .cmt .line{border-bottom:1px solid #94a3b8;height:26px}
 @page{size:A4;margin:12mm}@media print{body.pdfmode{background:#fff;padding:0;margin:0}.pdfbar{display:none!important}#pdf .pg{box-shadow:none;margin:0;padding:0;max-width:none;break-before:page}#pdf .pg:first-of-type{break-before:auto}}
 .ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}table.plan td{vertical-align:top;text-align:left;white-space:normal}table.plan td.pc{text-align:center;white-space:nowrap}table.plan tr.pb td{background:#f1f5f9;border-top:2px solid #cbd5e1}table.plan td.in{padding-left:22px}
-.cnow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-radius:12px;padding:8px 12px;margin:6px 0}.cnow.ask{background:#fef3c7;border:2px solid #f59e0b}.cnow.info{background:#ecfdf5;border:1px solid #86efac;font-size:14px}.cnow .x{background:none;color:#475569;padding:0 6px;margin-left:auto}
+#loadbar .live{color:#166534}.cnow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-radius:12px;padding:8px 12px;margin:6px 0}.cnow.ask{background:#fef3c7;border:2px solid #f59e0b}.cnow.info{background:#ecfdf5;border:1px solid #86efac;font-size:14px}.cnow .x{background:none;color:#475569;padding:0 6px;margin-left:auto}
 .who{display:inline-block;border-radius:999px;padding:1px 8px;font-size:12px;white-space:nowrap}.who.a{background:#dcfce7;color:#166534}.who.y{background:#e0e7ff;color:#3730a3}
 </style></head><body>
 <h1>Teacher dashboard</h1><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
@@ -639,14 +639,14 @@ function lsWarn(ls,grp,assigned){
   return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
 }
 function render(){
-  render0();keepLast();ptSync();progSync();doneLater();loadBar();if(CLS.ready)classCheck()}
+  render0();keepLast();ptSync();progSync();doneLater();loadBar();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0)}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
 // somewhere else, a message asks whether to go to the group or stay where I am"). The timetable is EL_TIMETABLE (el-plan.js), read by
 // ELWeek.classAt (from 5 minutes before the class). Opening the dashboard during a class goes straight to that group (and its current LS);
 // a class that starts while the dashboard shows something else, or a dashboard opened from a link to another group or LS, gets a yellow
 // bar "Go to <group>" / "Stay here". Each class is handled once per browser tab (sessionStorage el_t_class), so a reload keeps your choice.
 // A class marked "· self-study" in the time plan (you are away) is skipped.
-function classNow(){const c=ELWeek.classAt();if(!c)return null;const x=ELWeek.now(c.gid);
+function classNow(at){const c=ELWeek.classAt(at);if(!c)return null;const x=ELWeek.now(c.gid);
   if(x&&ELWeek.tasks(x.p,x.gi).some(t=>t.kind==="self"&&t.date===ELWeek.today()))return null;return c}
 const classDone=c=>{CLS.done=c.key;try{sessionStorage.setItem("el_t_class",c.key)}catch(e){}};
 function classGo(c){classDone(c);CLS.info=c.key;S.g=c.gid;S.tutor="all";S.year=false;S.ls=null;   // render() picks the group's current LS by the time plan
@@ -663,6 +663,44 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-cls]");if(
   CLS.info=null;classCheck()});
 setInterval(classCheck,30e3);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)classCheck()});
+// ---- live during class (Roger, 5 Nov 2026: "Always when I have a class, refresh the teacher's dashboard of that class so that I don't think
+// they didn't do stuff they did"). From 5 minutes before a class until 10 minutes after it ends (liveClass), while that group is on screen and
+// the tab is visible, every 2 minutes (LIVE.ms) the dashboard asks Firestore only for that group's work that CHANGED since its last look:
+// each signed-in student's progress (updated > since); results (updated) and checkpoints (sent) when the progress changed, and every third
+// round for everyone (a submit or a recall checkpoint can come without a progress save). An empty answer costs one read, so a round is
+// about one read per student plus the documents that changed: a whole class is roughly 1,500–3,000 reads (one 🔄 Update is ~900).
+// Not a full load: the student list, levels and team points still come with 🔄 Update. The screen is redrawn only when something changed,
+// never while the window (#dlg) is open or while you are typing (an edited box waits until the next round); the scroll position stays.
+const LIVE={ms:120e3,gid:null,since:{},n:0,at:0,busy:false,pend:false,err:false};
+function liveClass(){const c=classNow();if(c)return c;
+  const now=window.EL_NOW?new Date(window.EL_NOW):new Date();return classNow(new Date(now.getTime()-15*60e3))}   // classAt stops 5 min before the end: +15 = 10 min after it
+const liveOn=()=>{const c=!DEMO&&RAW&&S.D&&liveClass();return c&&S.g===c.gid&&!S.year?c:null};
+const busyEdit=()=>{if($("#dlg")&&$("#dlg").open)return true;const a=document.activeElement;
+  if(a&&a.closest&&a.closest("#main,#classnow")&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return true;
+  return [...document.querySelectorAll("#main textarea,#main input[type=text]")].some(x=>x.value!==x.defaultValue)};
+function liveDraw(){if(!LIVE.pend||busyEdit())return;LIVE.pend=false;const y=scrollY;render();scrollTo(0,y)}
+async function liveTick(force){const c=liveOn();
+  if(!c&&$("#loadbar .live"))loadBar();   // the class is over: back to "as of …"
+  if(!c||document.hidden||LIVE.busy){liveDraw();return}
+  const gid=c.gid;if(LIVE.gid!==gid){LIVE.gid=gid;LIVE.since={};LIVE.n=0;LIVE.at=0}
+  if(!force&&Date.now()-LIVE.at<LIVE.ms-5e3){liveDraw();return}
+  LIVE.busy=true;const t0=Date.now(),base=(AT.g[gid]||t0)-180e3,all=LIVE.n%3===0;LIVE.n++;   // 3 min margin: this computer's clock vs the server's
+  const ms=x=>x&&typeof x.toMillis==="function"?x.toMillis():0,
+        q=(u,n,f,t)=>F.getDocs(F.query(F.collection(db(),"students",u,n),F.where(f,">",F.Timestamp.fromMillis(t))));
+  const uids=Object.values(RAW.st).filter(s=>s.group===gid&&s.uid).map(s=>s.uid);let got=0;
+  try{await Promise.all(uids.map(async u=>{const s=LIVE.since[u]=LIVE.since[u]||{pg:base,rs:base,cp:base};
+      const p=await q(u,"progress","updated",s.pg);
+      p.forEach(d=>{const x=d.data();(RAW.pg[u]=RAW.pg[u]||{})[d.id]=x.data||{};s.pg=Math.max(s.pg,ms(x.updated));got++});
+      if(!all&&p.empty)return;
+      const [r,k]=await Promise.all([q(u,"results","updated",s.rs),q(u,"checkpoints","sent",s.cp).catch(e=>{console.warn("live checkpoints",e);return null})]);
+      r.forEach(d=>{const x=d.data();(RAW.rs[u]=RAW.rs[u]||{})[x.activity||d.id.replace("__","/")]=x;s.rs=Math.max(s.rs,ms(x.updated));got++});
+      if(k)k.forEach(d=>{const x=d.data();(RAW.cp[u]=RAW.cp[u]||{})[d.id]=x;s.cp=Math.max(s.cp,ms(x.sent));got++})}));
+    LIVE.err=false;LIVE.at=t0;AT.g[gid]=t0;saveCache();
+    if(got){S.D=build(S.D);LIVE.pend=true}else loadBar()}
+  catch(e){console.warn("live",e);LIVE.err=true;LIVE.at=t0;loadBar()}   // tried again at the next round
+  LIVE.busy=false;liveDraw()}
+setInterval(()=>liveTick(),15e3);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)liveTick()});
 // LS mark so far for the student board (Roger, 2 Nov 2026: "students should see their progress"). Only the dashboard can work out the
 // continuous-assessment blocks (secure checkpoints are marked here with the teacher-only keys), so it keeps each student's marks so far
 // (a missing piece counts 0 once its day has passed, S.dueZero; not marked yet is left out) in results/{ls}__assessment .progress = {exam, fp, gv, other, total, at}, out of 10,
@@ -2087,13 +2125,15 @@ const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if
 // "Students' work in 2ESO B: as of 10:42" and the buttons that fetch it (load: "Update <group>" one group, "Update all" everything)
 const whenAt=t=>{if(!t)return "never";const d=new Date(t),today=new Date().toDateString()===d.toDateString();
   return (today?"":d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+" ")+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})};
-function loadBar(){const e=$("#loadbar");if(!e||DEMO)return;const g=GR.find(x=>x.id===S.g);
+function loadBar(){const e=$("#loadbar");if(!e||DEMO&&!window.EL_LIVE_DEMO)return;const g=GR.find(x=>x.id===S.g),lv=liveOn()||window.EL_LIVE_DEMO;
+  if(lv&&g){e.innerHTML=`<span class="live">🟢 <b>Live: ${esc(g.name)} is in class</b>. Its students' work updates by itself every 2 minutes (last: ${whenAt(AT.g[g.id])}${LIVE.err?", the last try failed, trying again":""}).</span> `
+    +`<button class="mini" data-load="${g.id}" title="Fetch this group's whole work now, with the student list and levels">🔄 Update ${esc(g.name)}</button>`;return}
   e.innerHTML=`Students' work${g?` in <b>${esc(g.name)}</b>: as of ${whenAt(AT.g[g.id])}`:`: ${GR.map(x=>esc(x.name)+" "+whenAt(AT.g[x.id])).join(" · ")}`}. `
     +(g?`<button class="mini" data-load="${g.id}" title="Fetch this group's latest work (about a quarter of everything)">🔄 Update ${esc(g.name)}</button> `:"")
     +`<button class="g mini" data-load="all" title="Fetch every group's latest work (the most reads: use it rarely)">Update all</button>`}
 document.addEventListener("click",async ev=>{const b=ev.target.closest("[data-load]");if(!b)return;const m=b.dataset.load;
   document.querySelectorAll("[data-load]").forEach(x=>x.disabled=true);b.textContent="⏳ Fetching…";
-  try{S.D=await load(m);TOUCHED.clear();render()}catch(e){console.warn("load",e);alert("Could not fetch: "+e.message);loadBar()}});
+  try{S.D=await load(m);TOUCHED.clear();LIVE.since={};render()}catch(e){console.warn("load",e);alert("Could not fetch: "+e.message);loadBar()}});
 if(DEMO)start("Preview with sample students: nothing is saved.");
 else ELCloud.onUser(u=>{if(u&&ELCloud.isTeacher(u))start("Hello, "+(u.displayName||u.email)+".")});
 </script></body></html>
