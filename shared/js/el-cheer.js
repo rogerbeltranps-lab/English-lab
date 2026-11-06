@@ -1,6 +1,6 @@
 // Encouraging sentences (Roger, 6 Nov 2026: "add interesting sentences for teacher (me in this case) being encouraging and optimistic",
 // and for students "everyday and every student randomly gets a new one"). No Firestore reads: the pick comes from the date.
-// ELCheer.teacher(day, n)  → the sentence under "Hi, Roger" on the dashboard home: the same all day, a new one each day;
+// ELCheer.teacher(day, n)  → the sentence in the "Hi, Roger! …" heading on the dashboard home (same line and font as the name): the same all day, a new one each day;
 //                            n = how many times ↻ was pressed. Monday, Friday and the weekend start with their own line.
 // ELCheer.student(seed, day, en) → the end of the board greeting "Hi Pau, …" (Catalan for Starter/Base, English for Core/Plus).
 //                            Each student starts at a different place (seed = their email or name) and moves one sentence a day,
