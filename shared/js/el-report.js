@@ -24,9 +24,13 @@ export const KINDS=[
   {id:"other",ca:"Una altra cosa",en:"Something else"}
 ];
 
+// Inside a closed <details> (e.g. the folded 📚 Study guide): Chrome keeps a layout box for it although nothing is painted, so
+// offsetParent and html2canvas both treat it as on screen (problem report 6 Nov 2026: "How to study" as the section, and the guide's
+// tips drawn over the Mixed tab in the screenshot). The <summary> stays visible.
+const folded=el=>{const d=el.closest&&el.closest("details:not([open])");return !!d&&!el.closest("summary")};
 // The heading of the part of the page the student is looking at (the last heading above the middle of the screen).
 function section(){
-  const hs=[...document.querySelectorAll("h1,h2,h3")].filter(h=>h.offsetParent&&!h.closest("dialog,#el-cloud-bar,#el-banner"));
+  const hs=[...document.querySelectorAll("h1,h2,h3")].filter(h=>h.offsetParent&&!folded(h)&&!h.closest("dialog,#el-cloud-bar,#el-banner"));
   let best=null;for(const h of hs){if(h.getBoundingClientRect().top<=innerHeight*0.5)best=h;else{best=best||h;break}}
   return best?cut(best.textContent,120):"";
 }
@@ -65,7 +69,7 @@ const loadH2c=()=>h2c||(h2c=new Promise((ok,no)=>{if(window.html2canvas)return o
 async function pageShot(skip){
   const html2canvas=await loadH2c(),w=innerWidth,h=innerHeight;
   const c=await html2canvas(document.body,{x:scrollX,y:scrollY,scrollX:0,scrollY:0,width:w,height:h,windowWidth:w,windowHeight:h,   // the part on screen (scrollX/Y 0: crop by x/y)
-    scale:Math.min(devicePixelRatio||1,1280/w),useCORS:true,logging:false,backgroundColor:"#ffffff",ignoreElements:el=>el===skip||el.id==="el-cloud-bar"});   // the bottom bar would come out in the wrong place
+    scale:Math.min(devicePixelRatio||1,1280/w),useCORS:true,logging:false,backgroundColor:"#ffffff",ignoreElements:el=>el===skip||el.id==="el-cloud-bar"||(el.tagName!=="SUMMARY"&&el.parentElement&&el.parentElement.matches("details:not([open])"))});   // the bottom bar would come out in the wrong place
   return jpeg(c,c.width,c.height);
 }
 
