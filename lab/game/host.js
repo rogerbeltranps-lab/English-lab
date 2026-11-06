@@ -47,10 +47,15 @@ const slides=()=>H.deck?H.deck.slides:[];
 const cur=()=>slides()[H.i];
 const isQ=s=>!!(s&&s.q);
 const isW=s=>!!(s&&s.q&&s.write);   // a written question
+const isN=s=>!!(s&&!s.q&&typeof s.notes==="number");   // a 📝 Take your notes slide (withNotes)
+const meta=()=>(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{};
+// the LS of the game (decks/index.js ls "LS2 · Free Time, Live!" → EL_LS id "2eso-free-time-live"), where the notes are shown
+const lsId=()=>{const m=meta(),c=m.course||(H.deck&&H.deck.course)||"",nm=String(m.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();
+  const l=(window.EL_LS||[]).find(x=>x.course===c&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""};
 const accepted=i=>slides()[i].write.map(G.norm);
 // A theory slide's blocks (Roger, 5 Nov 2026, grammar games): lines can be text, a table {table:[[header…],[row…]…]} or a warning
 // {watch:"…"}. With step:true, Space shows one block at a time (the teacher explains each one), then goes on.
-const blocks=s=>s&&!isQ(s)?(s.lines||[]):[];
+const blocks=s=>s&&!isQ(s)&&!isN(s)?(s.lines||[]):[];
 const moreToShow=()=>{const s=cur();return H.phase==="show"&&s&&!isQ(s)&&s.step&&H.step<blocks(s).length};
 const qList=()=>slides().map((s,i)=>isQ(s)?i:-1).filter(i=>i>=0);
 const order=i=>{const s=slides()[i];return s.keep?[...s.options.keys()]:G.shuffle(s.options.length,H.sid+i*7919)};   // order[k] = the deck's option shown k-th
@@ -61,7 +66,23 @@ const nameOf=em=>H.names[em]||em.split("@")[0];
 
 /* ---------- the deck file ---------- */
 // A deck is loaded only for the teacher, so nothing on a student's device ever loads the answers.
-window.ELGameDeck=d=>{H.deck=d};
+window.ELGameDeck=d=>{H.deck=withNotes(d)};
+// 📝 Take your notes (Roger, 6 Nov 2026: "in the slides I explain theory, I want students to have a slide with: Take your notes: and then
+// they can see on their LS: your notes"): after each run of theory slides the board adds a notes slide {notes:k, topics, from}. The board
+// shows the theory again in small (the projector) and each student types notes on their device (play.js), saved in
+// students/{uid}/notes/{deck}.parts.p{k}; the LS home page shows them in 📝 Your notes (shared/js/el-notes.js). No notes slide with
+// notes:false on the deck or on a theory slide. Space / Next goes on, so the teacher can skip it.
+function withNotes(d){
+  if(!d||d.notes===false)return d;
+  const res=[];let run=[],k=0;
+  const flush=()=>{if(run.length){k++;res.push({notes:k,topics:run.map(i=>res[i].theory||""),from:run.slice()});run=[]}};
+  d.slides.forEach(s=>{
+    if(s.q){flush();res.push(s);return}
+    res.push(s);if(s.notes!==false)run.push(res.length-1);
+  });
+  flush();
+  return Object.assign({},d,{slides:res});
+}
 function loadDeck(id){
   return new Promise(res=>{if(!/^[\w-]+$/.test(id))return res(false);H.deck=null;
     const s=document.createElement("script");s.src=`decks/${id}.js`;s.onload=()=>res(!!H.deck);s.onerror=()=>res(false);document.head.append(s)});
@@ -71,16 +92,17 @@ function loadDeck(id){
 let liveBeat=null,ansStop=null;
 function live(){
   if(!H.g||!H.sid||!H.deck)return;
-  const s=cur(),qs=qList(),base={on:true,game:true,deck:location.pathname,title:H.deck.title,sid:H.sid,phase:H.phase==="show"?(isQ(s)?"q":"theory"):H.phase,
+  const s=cur(),qs=qList(),base={on:true,game:true,deck:location.pathname,title:H.deck.title,sid:H.sid,phase:H.phase==="show"?(isQ(s)?"q":isN(s)?"notes":"theory"):H.phase,
     i:H.i,qn:qs.indexOf(H.i)+1,qt:qs.length,keys:H.keys,at:S.serverTimestamp()};
   if(s&&H.phase!=="end"&&H.phase!=="lobby"){
-    if(isW(s))base.q={text:s.q,img:s.img||"",write:true};
+    if(isN(s)){const m=meta();base.nt={k:s.notes,topics:s.topics,deck:H.deckId,ls:lsId(),lp:m.lp||"",title:H.deck.title,course:m.course||""}}
+    else if(isW(s))base.q={text:s.q,img:s.img||"",write:true};
     else if(isQ(s))base.q={text:s.q,img:s.img||"",opts:order(H.i).map(k=>s.options[k])};else base.th={title:s.theory||"",img:s.img||""};
     if(H.phase==="reveal")base.ok=isW(s)?s.write[0]:okAt(H.i);
   }
   // only the game's own fields: a pull-up (go) and the group's full screen (fs) stay as they are (Roger, 6 Nov 2026), so after the game
-  // the students are kept and in full screen again; a field the slide does not use (q, th, ok) is removed
-  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D},base);
+  // the students are kept and in full screen again; a field the slide does not use (q, th, ok, nt) is removed
+  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D,nt:D},base);
   S.setDoc(S.doc(db,"live",H.g),data,{mergeFields:Object.keys(data)}).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()});
 }
 function liveOff(g){if(g)S.setDoc(S.doc(db,"live",g),{on:false,at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}
@@ -197,11 +219,16 @@ const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1,s0=cur();
   const box=WHO.open&&w.active?`<div class="whobox pop">${gone.length?`<p>${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("<br>")}</p>`:""}${never.length?`<p class="nv">⚪ Not in the game (${never.length}): ${never.map(y=>esc(y.name)).join(", ")}</p>`:""}<p class="i">✓ In (${w.inn.length}): ${w.inn.map(y=>esc(y.name)).join(", ")||"nobody yet"}</p></div>`:"";
   return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">🎮 ${Object.keys(H.players).length}</span>
   ${w.active?`<button class="pill who${w.out.length?" warn":""}" data-do="who" title="Who is in full screen and connected, and who is out (tap to show or hide the names)">✓ ${w.inn.length} in · ✗ ${w.out.length} out</button>`:""}${box}
-  ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}`:"Theory"}</span>`:""}<span class="sp"></span>
+  ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}`:isN(cur())?"📝 Notes":"Theory"}</span>`:""}<span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}
   ${H.phase==="show"&&s0&&!isQ(s0)&&s0.ca?`<button class="btn ghost${caOn()?" on":""}" data-do="ca" title="Catalan help on this slide (C)">CA</button>`:""}
   <button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
   <button class="btn ghost" data-do="end" title="End the game for everyone">${Date.now()-endArm<3000?"Tap again to end":"■ End"}</button></div>`};
+// one block of a theory slide: text, a table {table} or a warning {watch} (also the small copy on the notes slide)
+function blockHtml(l,hid,fresh){
+  if(l&&l.table){const [h,...r]=l.table;return `<table class="tt${fresh}"${hid}><thead><tr>${h.map(c=>`<th>${md(c)}</th>`).join("")}</tr></thead><tbody>${r.map(x=>`<tr>${x.map(c=>`<td>${md(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
+  if(l&&l.watch)return `<p class="watch${fresh}"${hid}>⚠️ ${md(l.watch)}</p>`;
+  return `<p class="${fresh}"${hid}>${md(l)}</p>`}
 const tiles=(s,i,reveal)=>{const o=order(i),ok=okAt(i);
   return `<div class="tiles">${o.map((k,n)=>`<div class="tile t${n}${reveal&&n!==ok?" dim":""}"><span class="shp s${n}"></span><span class="tx">${md(s.options[k])}</span>${reveal&&n===ok?'<span class="mark">✓</span>':""}</div>`).join("")}</div>`};
 
@@ -236,16 +263,19 @@ function draw(){
       <h1 class="logo pop">🏁 Well done!</h1><p class="sub">${tot?`The class got <b>${Math.round(right/tot*100)} %</b> right.`:""} Every right answer is +1 point.</p>
       ${rank.length?"":`<p class="card msg" style="margin:1em auto">No right answers this time. Next time!</p>`}<div class="podium"${rank.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm">${esc(nameOf(x.em))}<br><span class="sc">${x.n} right</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
       <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a> ${backBtn()}</p></div></div></div>`;return}
-  if(!isQ(s)){
+  if(!isQ(s)&&!isN(s)){
     const bl=blocks(s),n=s.step?Math.max(1,H.step):bl.length,ca=[].concat(s.ca||[]);
-    const block=(l,k)=>{const hid=k>=n?' style="visibility:hidden"':"",fresh=s.step&&k===n-1&&k>0?" pop":"";
-      if(l&&l.table){const [h,...r]=l.table;return `<table class="tt${fresh}"${hid}><thead><tr>${h.map(c=>`<th>${md(c)}</th>`).join("")}</tr></thead><tbody>${r.map(x=>`<tr>${x.map(c=>`<td>${md(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
-      if(l&&l.watch)return `<p class="watch${fresh}"${hid}>⚠️ ${md(l.watch)}</p>`;
-      return `<p class="${fresh}"${hid}>${md(l)}</p>`};
+    const block=(l,k)=>blockHtml(l,k>=n?' style="visibility:hidden"':"",s.step&&k===n-1&&k>0?" pop":"");
     app$.innerHTML=top()+`<div class="main"><div class="card theory slidein${s.wide?" wide":""}"><div class="pic">${pic(s.img)}</div><div class="tx"><h2>${md(s.theory)}</h2>${bl.map(block).join("")}
       ${ca.length&&caOn()?`<div class="ca pop"><b>En català</b>${ca.map(l=>`<p>${md(l)}</p>`).join("")}</div>`:""}</div></div>
       <div style="text-align:right">${moreToShow()?`<span class="stepn">${n} / ${bl.length}</span> <button class="btn go" data-do="more">Show more ▼<span class="kbd">Space</span></button>`:`<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button>`}</div></div>`;return}
   const rev=H.phase==="reveal",n=answered(H.i).length;
+  if(isN(s)){   // 📝 Take your notes: the theory of the run again, small, while the students write on their devices
+    const recap=s.from.map(i=>slides()[i]).map(t=>`<section><h3>${pic(t.img)} ${md(t.theory)}</h3>${(t.lines||[]).map(l=>blockHtml(l,"","")).join("")}</section>`).join("");
+    app$.innerHTML=top()+`<div class="main"><div class="card notes slidein"><div class="nhead"><span class="nemo">📝</span><div><h2>Take your notes</h2>
+      <p>On your Chromebook, in your own words: <b>the rule</b>, <b>two examples</b> and <b>the mistake to avoid</b>. They are saved on your LS page, in <b>📝 Your notes</b>.</p></div>
+      <div class="stat"><b>${n}</b>writing${P.length?` / ${P.length}`:""}</div></div><div class="recap">${recap}</div></div>
+      <div style="text-align:right"><button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}
   if(isW(s)){
     const ok=accepted(H.i),wrong={};
     answered(H.i).forEach(a=>{if(!G.right(a[H.i],ok)){const t=G.norm(a[H.i]);wrong[t]=(wrong[t]||0)+1}});

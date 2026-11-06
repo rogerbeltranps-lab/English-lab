@@ -229,6 +229,15 @@ service cloud.firestore {
         allow delete: if isTester() && request.auth.uid == uid;
         allow write: if isTeacher();
       }
+      // 📝 notes from the class games (Roger, 6 Nov 2026: "Take your notes" slide, lab/game/play.js; shown on the LS home page,
+      // shared/js/el-notes.js): notes/{deck} = {ls, course, deck, title, lp, parts:{p<k>:{topic, text, at}}, updated}. Their own; the teacher reads.
+      match /notes/{deck} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['ls','course','deck','title','lp','parts','updated'])
+          && request.resource.data.deck == deck && request.resource.data.parts is map && request.resource.data.parts.size() <= 20;
+        allow delete: if signedIn() && request.auth.uid == uid;
+      }
       // results: students cannot touch feedback, nor edit a locked (submitted) result
       match /results/{rid} {
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();

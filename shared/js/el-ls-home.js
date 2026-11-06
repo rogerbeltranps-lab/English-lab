@@ -4,7 +4,7 @@
 // <section data-place="study|about|final">); this file adds:
 // - the side menu of the board (today.html): My activities (the teacher: Dashboard), this LS, All Learning Situations, English Lab,
 //   Practise, Help; on a phone the board's bottom bar; a ‹ back link at the top to the board or the dashboard;
-// - places by hash (#study, #about, #final) with a ‹ back link to the LS home, as the board's places;
+// - places by hash (#study, #about, #final, #notes: el-notes.js fills it) with a ‹ back link to the LS home, as the board's places;
 // - the Continue card (the first open learning path not done, in the order of the group's time plan, or the checkpoint it needs first)
 //   and each learning path's progress (✓ done, steps done, 🔒 not open yet, ✂ dropped), from the progress el-cloud.js already copied
 //   into this browser, the LS document it already read (ELCloud.lsNow) and the results it already read: no new Firestore reads;
@@ -51,7 +51,7 @@
       .map(([h,i,l])=>h===null?`<a class="on" aria-current="page" href="#"><i>${i}</i>${l}</a>`:`<a href="${boardHref()}${h}"><i>${i}</i>${l}</a>`).join(""):"";
   }
   // ---- places (#study, #about, #final): the board's rule, little on the menu and the details inside each place
-  const PLACES=["study","about","final"];
+  const PLACES=["study","about","final","notes"];   // notes: 📝 Your notes from the class games (el-notes.js)
   function place(){
     const p=PLACES.includes(location.hash.slice(1))?location.hash.slice(1):"home";
     $$("[data-place]").forEach(s=>s.hidden=s.dataset.place!==p);
@@ -122,7 +122,9 @@
   function draw(){
     lang();nav();place();
     if(ST){const S=status();lpRows(S);contCard(S)}
+    document.dispatchEvent(new Event("ellshome"));   // el-notes.js draws again in the right language
   }
+  window.ELLsHome={ca:()=>CA};
   window.addEventListener("hashchange",place);
   // teacher-only tiles (data-el-teacher: el-cloud.js shows them for the teacher)
   draw();
