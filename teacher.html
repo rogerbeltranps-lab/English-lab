@@ -63,6 +63,37 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 @media (max-width:980px){.tshell{grid-template-columns:1fr;gap:6px}.tside{position:sticky;top:0;z-index:20;flex-direction:row;overflow-x:auto;max-height:none;padding:8px 0;background:rgba(248,250,252,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}
   .tside .brand,.tside .sep,.tside .lab{display:none}.tside .nv{white-space:nowrap;background:#fff;border:1px solid #e2e8f0}.tside .nv.ann{margin:0}.hgrid{grid-template-columns:1fr}.cont .ct{font-size:23px}}
 @media(max-width:640px){body:has(#fsctl .fsrow) .tshell{padding-top:40px}}
+/* 📅 Agenda (Roger, 6 Nov 2026): the LS on the left, the class days on the right, drag and drop */
+.agw{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;align-items:start}.agr{min-width:0}
+.agl{position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:14px;box-sizing:border-box}
+.agl h2{margin:0 0 2px;font-size:1.05rem}.agl>p{font-size:13px;margin:0 0 10px}
+.agla{border:1px solid #e2e8f0;border-radius:14px;padding:8px 10px;margin:0 0 8px;background:#fff}.agla.exam{background:#fef2f2;border-color:#fca5a5}.agla.exam b{color:#991b1b}.agla.drp{opacity:.55}.agla.on{background:#f0fdf4;border-color:#bbf7d0}
+.aglh,.agh{display:flex;align-items:center;gap:6px;cursor:grab}.agln{display:flex;flex-direction:column;min-width:0;flex:1}.agln b{font-size:14px;line-height:1.25}.agln small{color:#64748b;font-size:12px}
+.agdot{color:#94a3b8;font-size:14px;cursor:grab;user-select:none}
+.agcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.agc{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;line-height:1.35;border:1px solid #c7d4ff;background:#eef2ff;color:#1e3a8a;border-radius:999px;padding:2px 8px;cursor:grab;user-select:none}
+.agc small{color:#64748b;font-size:11px}.agc input{margin:0;width:13px;height:13px;cursor:pointer}.agc .tabsec{margin-left:0}
+.agc.np{background:#fff;border:1px dashed #94a3b8;color:#475569}.agc.on{background:#dcfce7;border-color:#86efac;color:#166534}.agc.hw{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
+.agc.ex{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700}.agc.nt{background:#f8fafc;border-color:#e2e8f0;color:#475569;font-style:italic;border-radius:10px}
+.agday .agc .tabsec:not(.off),.agday .agc .agx,.agday .agh .agx{opacity:0}.agday .agc:hover .tabsec,.agday .agc:hover .agx,.agday .agh:hover .agx,.agday .agc .agx:focus{opacity:1}
+.agx{background:none;color:#94a3b8;border:0;padding:0 2px;margin:0;font-size:12px;cursor:pointer;line-height:1}.agx:hover{color:#dc2626}
+.agwk h3{font-size:15px;margin:16px 0 6px;color:#334155}
+.agdays{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;align-items:stretch}
+.agday{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:10px;min-height:110px;display:flex;flex-direction:column;gap:7px;box-sizing:border-box}
+.agday.today{border:2px solid #3157d5;box-shadow:0 4px 14px #3157d51f}.agday.done{background:#f0fdf4;border-color:#bbf7d0}.agday.late{border-color:#fdba74;background:#fffbeb}
+.agday.off{background:#f1f5f9;border-style:dashed;min-height:0;color:#94a3b8}.agday.cpt{min-height:0}
+.agover{outline:3px dashed #3157d5;outline-offset:2px;background:#eef2ff!important}
+body.agdrag .agday:not(.off),body.agdrag .agl{outline:1px dashed #a5b4fc;outline-offset:1px}
+.agdh{display:flex;align-items:baseline;gap:6px}.agdh b{font-size:14px}.agdh small{color:#64748b}
+.agt{background:#3157d5;color:#fff;border-radius:999px;padding:0 8px;font-size:11px;font-weight:700}.agok{color:#15803d;font-size:12px;font-weight:700;margin-left:auto}.agwarn{color:#b45309;font-size:12px;font-weight:700;margin-left:auto}
+.agg{display:flex;flex-direction:column;gap:4px}.agg.drp{opacity:.5}.agh b{font-size:13px}.agh input{margin:0}.aglk{font-size:12px;text-decoration:none;color:#4338ca}
+.agempty{color:#94a3b8;font-size:12px;margin:auto 0;text-align:center;border:1px dashed #cbd5e1;border-radius:10px;padding:10px}
+.agf{display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:2px;opacity:.45}.agday:hover .agf{opacity:1}.agf button{margin:0}
+.agself{font-size:12px;color:#7c2d12;background:#ffedd5;border-radius:8px;padding:2px 6px}
+.aglate{background:#fffbeb;border:1px solid #fcd34d;border-radius:16px;padding:10px 12px;margin:8px 0}.aglate h3{margin:0;color:#b45309;font-size:15px}.aglate p{margin:2px 0 8px;font-size:13px}
+details.agpast>summary{cursor:pointer;color:#3157d5;font-weight:700;margin:12px 0 4px}
+.tpc .agdays{grid-template-columns:1fr}
+@media(max-width:1100px){.agw{grid-template-columns:1fr}.agl{position:static;max-height:none}}
 </style></head><body>
 <div id="fsctl"></div>
 <div class="tshell" id="shell"><nav class="tside" id="tabs" hidden></nav><div class="tpage">
@@ -219,6 +250,8 @@ const api={
   // Students read ls docs, so their board and My week follow (ELWeek.applyEdits).
   planEdit:(ls,gid,orig,o)=>{const i=S.D.ls[ls]=S.D.ls[ls]||{status:"hidden",enabled:[]},pe=(i.planEdits=Object.assign({},i.planEdits)),g=(pe[gid]=Object.assign({},pe[gid]));
     if(o)g[orig]=o;else delete g[orig];ELWeek.applyEdits(ls,pe);if(DEMO)return;return put(["ls",ls],{planEdits:{[gid]:{[orig]:o||F.deleteField()}}})},
+  // several ticks at once (the agenda: an item and its day), keys without the "ls|" in front
+  ticks:(gid,ls,o)=>{const m=((S.D.tk[gid]=S.D.tk[gid]||{}).ticks=S.D.tk[gid].ticks||{}),w={};Object.entries(o).forEach(([k,v])=>{m[ls+"|"+k]=v;w[ls+"|"+k]=v});return put(["teacherPlan",gid],{ticks:w})},
   tick:(gid,ls,line,on)=>{const k=ls+"|"+line;on=on?ELWeek.today():false;   // the day it was ticked (marking sheets: mkReady)
     ((S.D.tk[gid]=S.D.tk[gid]||{}).ticks=S.D.tk[gid].ticks||{})[k]=on;return put(["teacherPlan",gid],{ticks:{[k]:on}})},
   setGroup:(u,g)=>{const s=S.P[u],ps=[];   // the list's group decides; the student's own doc copies it
@@ -927,7 +960,7 @@ function render0(){
   const resultB=(G()&&G().only?"":`<div class="box">${G()&&G().evidence?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
       :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`);
   const place={
-    plan:()=>satBox([grp.id])+timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))+((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:""),
+    plan:()=>AGOK(ls)&&p&&gi>=0&&agEnsure(planX(ls,grp.id))?agPage(planX(ls,grp.id),inG.filter(s=>!s.away&&!s.tester&&s.uid)):satBox([grp.id])+timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))+((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:""),
     todo:()=>cpBox(ls,grp,inG)+`<div class="box"><h2>To do</h2>${todoH}</div>`,
     paths:()=>pullBox(ls,grp)+lpBox(ls,grp)+`<div class="bar">${stuF}${G()&&!G().only?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:""}</div>`+lpAll+legendB+`<div class="box">${fold("settings","LS status and groups",lsSettings(ls))}</div>`,
     marks:()=>`<div class="bar">${stuF}${G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:""}</div>`
@@ -942,7 +975,7 @@ function render0(){
       +(/❌/.test(todoH)?tAlert("todo","❌","Claude's marking is late","See"):"")
       +(np?tAlert("msgs","⚠️",`${plural(np,"problem report")} from students`,"Read"):"");
     $("#main").innerHTML=head+`<div class="hgrid"><div class="hl">${al}${classCard(grp)}</div><div class="tiles">`
-      +tTile("plan","📅","Time plan","this week, homework, teaching plan",nb?nb+" not ticked":"",true)
+      +tTile("plan","📅","Time plan","your agenda: drag learning paths to class days",nb?nb+" not ticked":"",true)
       +tTile("todo","✅","To do","comments, marking, possible copies, level requests",nTodo||"",/❌|Possible copy/.test(todoH))
       +tTile("paths","📈","Learning paths","progress, open and lock, pull up")
       +tTile("marks","📊","Marks","LS grade, criteria, self-assessment")
@@ -1675,7 +1708,7 @@ const carryTo=(x,j)=>{const t=ELWeek.today(),wd=new Date(t+"T12:00").getDay(),op
   return x.p.rows.findIndex((r,k)=>k>j&&r.from&&ELWeek.add(r.from,6)>=open)};
 const carried=(x,i)=>pending(x).filter(y=>carryTo(x,y.i)===i);
 // one session line with its tick box, links and 🏠 button (i = the line's own week row); from = "↪ from …" for a carried one
-function lineRow(x,i,l,from,noTips){const r=x.p.rows[i],on=ticked(x,l),mv=((x.p._moved||{})[x.gi]||{})[l],tp=S.tips&&!from&&!noTips?tipsFor(x.p,l):[],t=ELWeek.today();
+function lineRow(x,i,l,from,noTips){const r=x.p.rows[i],on=ticked(x,l),mv=((x.p._moved||{})[x.gi]||{})[l],tp=[],t=ELWeek.today();
   return `<label class="ck ${on?"on":""} ${!from&&lineDate(r,l)===t?"today":""} ${from?"carry":""}"><input type="checkbox" data-do="tick" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(origOf(x,l))}" ${on?"checked":""}><span>${from?`<small class="cfrom">↪ not ticked · ${esc(from)}</small> `:""}${esc(l)}${lineLinks(x,l)}${!canSetHw(x,l)?"":` <button type="button" class="g mini sethw" data-do="sethw" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" title="Set it as homework: students see it in their homework box and To do list">🏠 Set as homework</button>`}`
     +` <button type="button" class="g mini pledit" data-do="pledit" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" title="Move it to another day or change its tabs">✏️ Change</button>`
     +(/^Homework by /.test(l)||on?"":`<span class="nav"> <button type="button" class="g mini" data-do="sendto" data-dir="-1" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" title="Send what is not ticked back to the previous class">⏮ Back</button><button type="button" class="g mini" data-do="sendto" data-dir="1" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" title="Send what is not ticked to the next class">⏭ Next class</button></span>`)
@@ -1684,10 +1717,12 @@ function lineRow(x,i,l,from,noTips){const r=x.p.rows[i],on=ticked(x,l),mv=((x.p.
     +(tp.length?`<ul class="tips">${tp.map(s=>`<li>💡 ${esc(s)}</li>`).join("")}</ul>`:"")}
 // Saturday check: on Saturday and Sunday, the sessions still not ticked in every group (or one group), to tick or set as homework
 function satBox(gids){const t=ELWeek.today();if(!isWkEnd(t))return "";
-  const gs=gids.map(gid=>{const n=ELWeek.now(gid);if(!n)return null;const x=Object.assign({gid},n),ps=pending(x);return ps.length?[gid,x,ps]:null}).filter(Boolean);
+  const gs=gids.map(gid=>{const n=ELWeek.now(gid);if(!n)return null;const x=Object.assign({gid},n);
+    if(AGOK(x.ls)&&agEnsure(x)){const ag=agOf(x),ds=agDays(ag).filter(d=>d<t&&dayIts(ag,d).some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]));return ds.length?[gid,x,ds,true]:null}   // the agenda: its days not ticked
+    const ps=pending(x);return ps.length?[gid,x,ps]:null}).filter(Boolean);
   if(!gs.length)return "";const n=gs.reduce((a,g)=>a+g[2].length,0);
   return `<div class="box satw"><h2>⚠ Weekend check: ${n} session${n===1?"":"s"} not ticked</h2><p class="muted">Tick the ones you did. For the others, <b>🏠 Set as homework</b> so students do them at home, or leave them: they move to next week's list (↪).</p>`
-    +gs.map(([gid,x,ps])=>`<div class="wk"><b>${esc((GR.find(g=>g.id===gid)||{}).name||gid)}</b>${ps.map(y=>lineRow(x,y.i,y.line,null,true)).join("")}</div>`).join("")+`</div>`}
+    +gs.map(([gid,x,ps,ag])=>`<div class="wk"><b>${esc((GR.find(g=>g.id===gid)||{}).name||gid)}</b>${ag?`<div class="agdays">${ps.map(d=>agDay(x,d,true)).join("")}</div>`:ps.map(y=>lineRow(x,y.i,y.line,null,true)).join("")}</div>`).join("")+`</div>`}
 const behindTag=x=>{const b=behind(x);return b.length?`<div class="behind" title="${esc(b.map(y=>y.line).join("\n"))}">⚠ ${b.length} earlier session${b.length===1?"":"s"} not ticked <a data-do="wk" data-w="${x.p.rows[b[0].i].from}">see</a></div>`:""};
 // Homework to remind (Roger, 31 Oct 2026: "it should appear in my dashboard to remind them and on theirs too"): the group's "Homework by …"
 // lines and self-study classes of the next 7 days (ELWeek.upcoming), and the group's calendar feed students subscribe to once.
@@ -1697,10 +1732,11 @@ const hwOf=x=>((S.D.ls[x.ls]||{}).homework||{})[x.gid];
 // line is hidden for this group (planEdits "nohw:<line>", ↩ Bring back under the list while its day has not passed), a self-study class
 // becomes a normal class.
 // a 💡 planned line already set as homework (same text and day) shows only once, as 🏠
-const hwTag=x=>{const xs=ELWeek.upcoming(x.p,x.gi,null,7,hwOf(x)).filter((y,_,all)=>y.extra||!all.some(z=>z.extra&&z.text===y.text&&z.date===y.date)),cal=ELWeek.calendar(x.gid),t=ELWeek.today(),gone=((x.p._nohw||{})[x.gi]||[]).filter(g=>!g.date||g.date>=t);
+// Only the homework you set (Roger, 6 Nov 2026: "No tips and I decide what to do"): the plan's 💡 ideas and 📚 lines are not listed any more.
+const hwTag=x=>{const xs=ELWeek.upcoming(x.p,x.gi,null,7,hwOf(x)).filter(y=>y.extra),cal=ELWeek.calendar(x.gid),gone=[];
   return `<div class="hwr"><b>🏠 Homework to remind</b>${xs.length?`<ul>${xs.map(y=>`<li>${y.kind==="self"?"📚 Self-study class ":y.extra?"🏠 By ":"💡 Planned for "}${esc(ELWeek.date(y.date))}${y.set?` <small class="muted">(set ${esc(ELWeek.date(y.set))})</small>`:""} · ${esc(y.text)}${lineLinks(x,y.text)} <button class="g mini" data-do="hwcopy" data-msg="${esc(y.msg||hwMsg(x,y.text,y.date,"both"))}" title="Copy the message for students (to paste in Classroom)">📋 Message</button>${y.extra?` <button class="g mini" data-do="hwdel" data-gid="${x.gid}" data-ls="${x.ls}" data-id="${y.id}" title="Remove this homework">✕</button>`:y.kind==="self"?` <button class="g mini" data-do="noself" data-v="1" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(origOf(x,y.line))}" title="You teach it in class: it stops being a self-study class">✕</button>`:y.line?` <button class="g mini" data-do="nohw" data-v="1" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(origOf(x,y.line))}" title="Remove this homework">✕</button>`:""}${!y.extra&&y.kind==="hw"?` <button class="g mini" data-do="planhw" data-gid="${x.gid}" data-ls="${x.ls}" data-t="${esc(y.text)}" data-set="${esc(y.set||"")}" data-by="${esc(y.date)}" title="Students don't see planned homework: set it to send it">🏠 Set as homework</button>`:""}</li>`).join("")}</ul>`:` <span class="muted">nothing in the next 7 days</span><br>`}`
     +(gone.length?`<small class="muted">Removed: ${gone.map(g=>`${g.date?"by "+esc(ELWeek.date(g.date))+" · ":""}${esc(g.text)} <button class="g mini" data-do="nohw" data-v="0" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(g.orig)}" title="Students see it again">↩ Bring back</button>`).join(" · ")}</small><br>`:"")
-    +`<small class="muted">Students see only 🏠 homework you set: on their board, in the ✅ To do button, in the Sunday email and in their calendar if they subscribed. 💡 and 📚 lines are the plan's ideas: they don't see them. <a href="${cal.google}" target="_blank" rel="noopener">Google Calendar</a> · <a href="${cal.ics}">.ics link</a></small></div>`};
+    +`<small class="muted">Students see it on their board, in the ✅ To do button, in the Sunday email and in their calendar if they subscribed. <a href="${cal.google}" target="_blank" rel="noopener">Google Calendar</a> · <a href="${cal.ics}">.ics link</a></small></div>`};
 // this week and next week; before the plan starts, its first week; after it ends, a line
 // On Saturday and Sunday the agenda opens on the coming week (Roger, 1 Nov 2026: on a Sunday he saw last week and "nothing" in it)
 const wkOpen=()=>{const t=ELWeek.today(),wd=new Date(t+"T12:00").getDay();return wd===6?ELWeek.add(t,2):wd===0?ELWeek.add(t,1):t};
@@ -1727,18 +1763,185 @@ function overview(){const t=ELWeek.today(),all=[...new Set(GR.flatMap(g=>ELWeek.
   const show=S.wk==="all"?all.filter(w=>w>=cur):[S.wk];
   const chips=all.map(w=>`<button class="chip ${S.wk===w?"on":""} ${w<cur?"past":""}" data-do="wk" data-w="${w}">${w===cur?TW:ELWeek.week({from:w})}${w===cur?`<small>${ELWeek.week({from:w})}</small>`:""}</button>`).join("")
     +`<button class="chip ${S.wk==="all"?"on":""}" data-do="wk" data-w="all">All upcoming</button>`
-    +` <button class="chip ${S.tips?"on":""}" data-do="tips" title="Short teaching tips under each session, from the LS docs">💡 Tips ${S.tips?"on":"off"}</button>`;
+    ;
   const card=g=>{const x=ELWeek.now(g.id),l=x&&EL_LS.find(y=>y.id===x.ls);
     if(!x)return `<div class="tpc c${g.course}"><h3>${esc(g.name)}</h3><p class="muted">No time plan yet. When the plan of this course's LS is ready, add it to <code>shared/js/el-plan.js</code> and it appears here.</p></div>`;
-    const body=show.map(w=>{const [y,i]=planAt(g.id,w);const nm=w===cur?TW:w===ELWeek.add(cur,7)?"Next week":"";return y?weekRow(y,i,nm):`<div class="wk"><b>${nm?nm+" · ":""}${ELWeek.week({from:w})}</b><p class="muted">No classes planned.</p></div>`}).join("");
-    return `<div class="tpc c${g.course}"><h3>${esc(g.name)}</h3><div class="muted">${esc(l?l.title:x.ls)}</div>${examTag(ELWeek.exam(x.p,x.gi))}${dropTag(Object.assign({gid:g.id},x))}${behindTag(Object.assign({gid:g.id},x))}${hwTag(Object.assign({gid:g.id},x))}${body}<button class="g" data-do="tab" data-g="${g.id}" data-ls="${x.ls}">Open ${esc(g.name)}</button></div>`};
+    const xa=Object.assign({gid:g.id},x),aw=AGOK(x.ls)&&agEnsure(xa)?agWeeks(xa,0):null;   // the agenda's days of that week
+    const body=aw?show.map(w=>{const f=aw.find(([m])=>m===w),nm=w===cur?TW:w===ELWeek.add(cur,7)?"Next week":"";return f&&f[1].length?agWeek(xa,f[0],f[1],true):`<div class="wk"><b>${nm?nm+" · ":""}${ELWeek.week({from:w})}</b><p class="muted">No classes planned.</p></div>`}).join(""):show.map(w=>{const [y,i]=planAt(g.id,w);const nm=w===cur?TW:w===ELWeek.add(cur,7)?"Next week":"";return y?weekRow(y,i,nm):`<div class="wk"><b>${nm?nm+" · ":""}${ELWeek.week({from:w})}</b><p class="muted">No classes planned.</p></div>`}).join("");
+    return `<div class="tpc c${g.course}"><h3>${esc(g.name)}</h3><div class="muted">${esc(l?l.title:x.ls)}</div>${examTag(ELWeek.exam(x.p,x.gi))}${dropTag(Object.assign({gid:g.id},x))}${behindTag(Object.assign({gid:g.id},x))}${Object.keys(hwOf(Object.assign({gid:g.id},x))||{}).length?hwTag(Object.assign({gid:g.id},x)):""}${body}<button class="g" data-do="tab" data-g="${g.id}" data-ls="${x.ls}">Open ${esc(g.name)}</button></div>`};
   const gs=GR.filter(g=>S.tpg.includes(g.id)),crs=[...new Set(GR.map(g=>g.course))],same=ids=>ids.length===gs.length&&ids.every(id=>S.tpg.includes(id)),
     cn=c=>String(c).replace(/^(\d)(\D+)$/,(_,n,w)=>n+" "+w.toUpperCase()),
     gchips=`<span class="muted">Groups:</span> <button class="chip ${gs.length===GR.length?"on":""}" data-do="tpg" data-v="all">All</button>`
       +crs.map(c=>{const ids=GR.filter(g=>g.course===c).map(g=>g.id);return `<button class="chip ${same(ids)?"on":""}" data-do="tpg" data-v="c:${c}" title="Only the ${cn(c)} groups, side by side">${cn(c)}</button>`}).join("")
       +` <span class="muted">·</span> `+GR.map(g=>`<button class="chip ${S.tpg.includes(g.id)?"on":""}" data-do="tpg" data-v="${g.id}" title="Show or hide ${esc(g.name)}">${S.tpg.includes(g.id)?"☑":"☐"} ${esc(g.name)}</button>`).join("");
-  return `<div class="box"><h2>Time plan · ${gs.length===GR.length?"all groups":esc(gs.map(g=>g.name).join(", "))}</h2><p class="muted">Today is ${ELWeek.date(t)}. Your checklist: tick each session when you have taught it (saved with your account). Pick a week to plan ahead; the 💡 tips come from the LS docs. Plans are in <code>shared/js/el-plan.js</code>; open a group for its whole plan and who is late.</p>`
+  return `<div class="box"><h2>Time plan · ${gs.length===GR.length?"all groups":esc(gs.map(g=>g.name).join(", "))}</h2><p class="muted">Today is ${ELWeek.date(t)}. Tick what you have taught. Drag a tab or a learning path to another day of the same group; open a group's 📅 Time plan for the whole list of learning paths, the final product and the exam.</p>`
     +`<div class="bar wkbar">${chips}</div><div class="bar wkbar">${gchips}</div><div class="tp">${gs.map(card).join("")}</div></div>`}
+// ---- 📅 Agenda (Roger, 6 Nov 2026: "This is a mess. No tips and I decide what to do: on the left I want a list of the LP and SLP (sections
+// of the learning path) and Final Product and exam … and on the right my agenda, and I can drag the LP or SLP to the right. It should match
+// the last design"; then "I should be able to move things around the days and exams and FP too"). The group's 📅 Time plan is two columns:
+// left, every activity of the LS in catalogue order (learning paths with their tabs, checkpoints, sample exam, final product with its steps,
+// reflect) and the exam; right, the group's class days (EL_TIMETABLE) week by week. Drag a learning path, one tab, the exam or a day's
+// learning path to a day; drop it back on the left to take it off. Data: ls/{ls}.planEdits[group].agenda (JSON; ELWeek.applyEdits turns it
+// into the plan's lines, so boards, emails, marking and the calendar follow), made from the plan the first time it is opened (agSeed).
+// Ticks: teacherPlan/{group}.ticks["ls|@day#item"] per item and "ls|@day" when every item of that day is ticked (the old session tick).
+// LS1 keeps the old list.
+const AGOK=ls=>!/-my-real-routine$/.test(ls);
+const agOf=x=>(((x.p||{})._ag)||{})[x.gi]||null;
+const tkOf=x=>(S.D.tk[x.gid]||{}).ticks||{};
+const itKey=(d,it)=>"@"+d+"#"+it;
+const nrm=s=>String(s).toLowerCase().replace(/[·:()\-–,.!?]/g," ").replace(/\s+/g," ").trim();
+const shortTi=a=>a.title.split(/[:(]/)[0].trim();
+const isLpA=a=>!/checkpoint|sample exam|final product|reflect/i.test(a.title);
+// "LP3 Now or usually?" (its number in the plan, else its place among the LS's learning paths), "Final product", else the short title
+function agLab(x,a){if(/final product/i.test(a.title))return "Final product";
+  const n=(Object.entries(lpMap(x)).find(([,b])=>b===a)||[])[0]||(isLpA(a)?String(acts(x.ls).filter(isLpA).indexOf(a)+1):null);
+  return n?"LP"+n+" "+shortTi(a):shortTi(a)}
+// a tab named on its own in a plan line ("Step 1 My source", "Fact file"): "activity#panel"
+function secHit(x,seg){const s=nrm(seg);let best=null;
+  acts(x.ls).forEach(a=>secOf(a).forEach(([id,nm])=>{const n=nrm(nm);if(n&&(s===n||s.startsWith(n+" "))&&(!best||n.length>best[1]))best=[a.id+"#"+id,n.length]}));return best&&best[0]}
+// the agenda made from the plan as it is now (moved sessions, tabs chosen, ticks): {ag, tick}; "Homework by …" ideas and "moved to" notes go
+function agSeed(x){const days={},tick={},t=tkOf(x),dr=(x.p._dropped||{})[x.gi]||[];
+  x.p.rows.forEach(r=>lines(x,r).forEach(l=>{if(/^Homework by /.test(l)||/\bmoved to\b/.test(l))return;const d=lineDate(r,l);if(!d)return;
+    const its=days[d]=days[d]||[],all=t[x.ls+"|"+origOf(x,l)]||t[x.ls+"|"+l],dt=dayTabs(x,l);
+    const put1=(it,on)=>{if(!its.includes(it))its.push(it);if(on&&it!=="self")tick[itKey(d,it)]=typeof on==="string"?on:ELWeek.today()};
+    l.replace(/^\w{3} \d{1,2} · /,"").replace(/\s*· self-study\b/,"").replace(/\s*· not finished on \w{3} \d{1,2}$/,"").split(" · ").map(s=>s.trim()).filter(Boolean).forEach(seg=>{
+      if(/^exam$/i.test(seg))return;const as=lineActs(x,seg);
+      if(as.length){as.forEach(([a])=>{if(dr.includes(a.id))return;if(!secOf(a).length)return put1(a.id+"#",all);
+        const z=dt.find(q=>q[0]===a);(z?z[2]:[]).forEach(([id])=>put1(a.id+"#"+id,all||t[x.ls+"|"+tabKey(x,l,a,id)]))});return}
+      put1(secHit(x,seg)||"note:"+seg,all)});
+    if(/· self-study\b/.test(l))put1("self")}));
+  Object.keys(days).forEach(d=>{if(!days[d].some(it=>it!=="self"))delete days[d]});
+  const base={},due0={},opt0={},step0={},gi=x.gi;
+  Object.keys(days).sort().forEach(d=>days[d].forEach(it=>{if(!/^note:|^self$/.test(it))base[it.split("#")[0]]=d}));
+  acts(x.ls).forEach(a=>{const v=(x.p.due||{})[a.id],o=(x.p.optional||{})[a.id],s=(x.p.stepDue||{})[a.id];if(v&&v[gi])due0[a.id]=v[gi];if(o&&o[gi])opt0[a.id]=o[gi];
+    if(s){const q={};Object.entries(s).forEach(([k,arr])=>{if(arr&&arr[gi])q[k]=arr[gi]});if(Object.keys(q).length)step0[a.id]=q}});
+  return {ag:{v:1,days,exam:ELWeek.exam(x.p,gi),base,due0,opt0,step0,lab:{}},tick}}
+const agDays=ag=>{const s=new Set(Object.keys(ag.days||{}));if(ag.exam)s.add(ag.exam);return [...s].sort()};
+const dayIts=(ag,d)=>[...((ag.days||{})[d]||[]).filter(it=>it!=="self"),...(ag.exam===d?["exam"]:[])];   // the items to tick on a day
+// saves the agenda after fn(ag, ticks to write, on(day, item)) changed it, and keeps "ls|@day" = every item of the day ticked
+function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=seed.ag}else ag=JSON.parse(JSON.stringify(ag));
+  const tk=Object.assign({},seed?seed.tick:{}),on=(d,it)=>{const k=itKey(d,it);return k in tk?tk[k]:tkOf(x)[x.ls+"|"+k]||false};
+  if(fn&&fn(ag,tk,on)===false)return;
+  Object.keys(ag.days).forEach(d=>{if(!ag.days[d].some(it=>it!=="self"))delete ag.days[d]});
+  acts(x.ls).forEach(a=>{if(!ag.lab[a.id])ag.lab[a.id]=agLab(x,a)});
+  const ps=[api.planEdit(x.ls,x.gid,"agenda",JSON.stringify(ag))];
+  const touched=new Set([...agDays(ag),...Object.keys(tkOf(x)).filter(k=>k.startsWith(x.ls+"|@")&&!k.includes("#")).map(k=>k.slice(x.ls.length+2))]);
+  touched.forEach(d=>{const its=dayIts(ag,d),all=its.length>0&&its.every(it=>on(d,it)),cur=tkOf(x)[x.ls+"|@"+d];if(!!cur!==all)tk["@"+d]=all?ELWeek.today():false});
+  if(Object.keys(tk).length)ps.push(api.ticks(x.gid,x.ls,tk));
+  if(quiet)return Promise.all(ps).catch(e=>console.warn("agenda",e));quick(ps)}
+// the first time a group's Time plan opens: its agenda from the plan (one write; nothing happens on the students' side)
+const agEnsure=x=>{if(!agOf(x)&&x.p&&x.gi>=0&&AGOK(x.ls)&&S.D.tkOk)agSave(x,null,true);return agOf(x)};
+const rmIt=(ag,d,it)=>{const a=ag.days[d];if(!a)return;const i=a.indexOf(it);if(i>=0)a.splice(i,1)};
+const addIt=(ag,d,it)=>{const a=ag.days[d]=ag.days[d]||[];if(a.includes(it))return;const id=it.split("#")[0],j=a.map(z=>z.split("#")[0]).lastIndexOf(id);if(j>=0)a.splice(j+1,0,it);else a.push(it)};
+// items to day `to` ("" = off the agenda) from day `from`, or, from the list on the left (from ""), from every day where they are not ticked;
+// done: leave an item that is only on the agenda ticked (a learning path dragged again moves what is left). A tick goes with its item.
+function agMove(x,its,from,to,done){agSave(x,(ag,tk,on)=>{let n=0;its.forEach(it=>{
+  const all=Object.keys(ag.days).filter(d=>ag.days[d].includes(it)),src=from?all.filter(d=>d===from):all.filter(d=>!on(d,it));
+  if(!from&&!src.length&&all.length&&(done||!to))return;
+  let v=false;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w){v=w;tk[itKey(d,it)]=false}rmIt(ag,d,it);n++});
+  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v}});
+  return n>0})}
+const agItems=a=>secOf(a).length?itemsOf(a).map(z=>a.id+"#"+z[0]):[a.id+"#"];
+const nextClassDay=(x,d)=>ELWeek.classDays(x.gid,ELWeek.add(d,1),ELWeek.add(d,70))[0]||null;
+function agDrop(k,to){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag||!k.from&&!to)return;
+  if(k.ag==="exam"){if(!to||to===ag.exam)return;
+    return agSave(x,(g,tk,on)=>{const v=g.exam&&on(g.exam,"exam");if(v){tk[itKey(g.exam,"exam")]=false;tk[itKey(to,"exam")]=v}g.exam=to})}
+  if(k.from&&k.from===to)return;
+  if(k.ag==="it")return agMove(x,[k.it],k.from||"",to);
+  const a=byId(k.a);if(!a)return;
+  if(k.ag==="act")return agMove(x,agItems(a),"",to,true);
+  if(k.ag==="day")return agMove(x,((ag.days||{})[k.from]||[]).filter(it=>it.split("#")[0]===a.id),k.from,to)}
+// ---- what the agenda shows
+const hwItems=x=>{const s=new Set(),t=ELWeek.today();Object.values(hwOf(x)||{}).forEach(h=>{if(!h||!h.by||h.by<ELWeek.add(t,-14))return;
+  Object.entries((typeof elHwTargets==="function"?elHwTargets({kind:"hw",text:h.text,tabs:h.tabs},x.ls,x.p,x.gi):h.tabs)||{}).forEach(([id,ps])=>{const a=byId(id);if(!a)return;(ps&&ps.length?ps:secOf(a).map(z=>z[0])).forEach(p=>s.add(id+"#"+p));if(!secOf(a).length)s.add(id+"#")})});return s};
+const itName=(it)=>{if(it==="exam")return "📝 Exam";if(/^note:/.test(it))return it.slice(5);const [id,p]=[it.slice(0,it.indexOf("#")),it.slice(it.indexOf("#")+1)],a=byId(id);
+  if(!a)return it;if(!p)return shortTi(a);const z=itemsOf(a).find(q=>q[0]===p);return z?z[1]:p};
+const dayLab=d=>ELWeek.date(d);
+const slotOf=(gid,d)=>{const T=window.EL_TIMETABLE,dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d+"T12:00").getDay()];
+  const s=((T&&T.groups&&T.groups[gid])||[]).find(v=>String(v).startsWith(dn+" "));return s?String(s).slice(4):""};
+// one class day: its items grouped by activity, each with a tick box, drag handle and ✕; c = compact (Home, weekend check)
+function agDay(x,d,c){const ag=agOf(x),t=ELWeek.today(),its=(ag.days[d]||[]),isEx=ag.exam===d,self=its.includes("self"),tkb=dayIts(ag,d);
+  const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
+  const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
+  const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
+    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" data-from="${d}" ${D} title="Drag it to another day, or back to the list on the left">`
+      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${esc(label)}`
+      +(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
+  const groups=[];its.forEach(it=>{if(it==="self")return;const id=/^note:/.test(it)?"":it.split("#")[0],g=groups.find(z=>z.id===id&&id);if(g)g.its.push(it);else groups.push({id,its:[it]})});
+  const body=groups.map(g=>{if(!g.id)return `<div class="agg">${g.its.map(it=>chip(it,it.slice(5))).join("")}</div>`;const a=byId(g.id);if(!a)return "";
+    const sec=itemsOf(a).map(z=>z[0]),ord=it=>{const i=sec.indexOf(it.slice(it.indexOf("#")+1));return i<0?99:i};
+    const nos=!secOf(a).length;
+    return `<div class="agg ${dr.includes(a.id)?"drp":""}"><div class="agh" draggable="true" data-ag="day" data-a="${esc(a.id)}" data-from="${d}" ${D} title="Drag this learning path's tabs of the day to another day">`
+      +(nos?`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} ${tkOf(x)[x.ls+"|"+itKey(d,a.id+"#")]?"checked":""} title="Done in class">`:"<span class=\"agdot\">⠿</span>")
+      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>`
+      +(nos?`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} title="Take it off this day">✕</button>`:"")+`</div>`
+      +(nos?"":`<div class="agcs">${g.its.slice().sort((p,q)=>ord(p)-ord(q)).map(it=>chip(it,itName(it),a)).join("")}</div>`)+`</div>`}).join("");
+  const hwOk=its.some(it=>{const a=byId(it.split("#")[0]);return a&&!isCp(a)&&!a.manual});
+  const l=Object.entries(((x.p._added||{})[x.gi])||{}).find(([,v])=>v.key==="@"+d),ri=l?x.p.rows.findIndex(r=>lines(x,r).includes(l[0])):-1;
+  return `<div class="agday ${d===t?"today":""} ${past?"past":""} ${done?"done":""} ${late?"late":""} ${c?"cpt":""}" data-agdrop="${d}" ${D}>`
+    +`<div class="agdh"><b>${esc(dayLab(d))}</b><small>${esc(slotOf(x.gid,d))}</small>${d===t?`<span class="agt">Today</span>`:""}${done?`<span class="agok">✓ Done</span>`:late?`<span class="agwarn">⚠ not ticked</span>`:""}</div>`
+    +(self?`<div class="agself">📚 Self-study (you are away) <button type="button" class="agx" data-do="agself" data-d="${d}" ${D} title="You teach this class yourself">✕</button></div>`:"")
+    +(isEx?`<div class="agg">${chip("exam","📝 Exam")}</div>`:"")+body
+    +(!its.length&&!isEx?`<p class="agempty">Drop a learning path or a tab here</p>`:"")
+    +`<div class="agf">${hwOk&&l&&ri>=0?`<button type="button" class="g mini" data-do="sethw" data-i="${ri}" data-line="${esc(l[0])}" ${D} title="Students see it as homework (with a ready message)">🏠 Homework</button>`:""}`
+    +(tkb.some(it=>it!=="exam"&&!tkOf(x)[x.ls+"|"+itKey(d,it)])?`<button type="button" class="g mini" data-do="agnext" data-d="${d}" ${D} title="Send what is not ticked to the next class">⏭ Next class</button>`:"")
+    +`<button type="button" class="g mini" data-do="agnote" data-d="${d}" ${D} title="Add a short note to this day">✎ Note</button></div></div>`}
+// the class days to show, by week: [[monday, [days]]]; holidays the timetable has a class on are listed too ("no class")
+function agWeeks(x,extra){const ag=agOf(x),sp=ELWeek.span(x.p)||[ELWeek.today(),ELWeek.today()],ds=agDays(ag),first=[sp[0],ds[0]].filter(Boolean).sort()[0];
+  let last=[sp[1],ds[ds.length-1]].filter(Boolean).sort().pop();last=ELWeek.add(last,7*(extra||0));
+  const mon=d=>{const w=new Date(d+"T12:00").getDay();return ELWeek.add(d,-((w+6)%7))},out=[];
+  for(let m=mon(first),k=0;m<=last&&k<60;m=ELWeek.add(m,7),k++){const dd=[];
+    for(let j=0;j<7;j++){const d=ELWeek.add(m,j),c=ELWeek.isClass(x.gid,d);if(c||ds.includes(d))dd.push([d,true]);else if(c===false&&slotOf(x.gid,d))dd.push([d,false])}
+    out.push([m,dd])}
+  return out}
+const offDay=(x,d)=>`<div class="agday off"><div class="agdh"><b>${esc(dayLab(d))}</b><small>no class</small></div></div>`;
+const wkName=(m,t)=>{const tm=new Date(t+"T12:00").getDay(),cur=ELWeek.add(t,-((tm+6)%7));return m===cur?"This week":m===ELWeek.add(cur,7)?"Next week":""};
+function agWeek(x,m,dd,c){const t=ELWeek.today(),nm=wkName(m,t);
+  return `<div class="agwk"><h3>${nm?nm+" · ":""}${esc(ELWeek.week({from:m}))}</h3><div class="agdays">${dd.map(([d,on])=>on?agDay(x,d,c):offDay(x,d)).join("")}</div></div>`}
+// the list on the left: every activity, where its tabs are on the agenda, students done; drag from here
+function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr=(x.p._dropped||{})[x.gi]||[],t=ELWeek.today(),D=`data-gid="${x.gid}" data-ls="${x.ls}"`;
+  const where={};Object.entries(ag.days).forEach(([d,its])=>its.forEach(it=>{(where[it]=where[it]||[]).push(d)}));
+  const st=(it,ds)=>ds.length&&ds.every(d=>tkOf(x)[x.ls+"|"+itKey(d,it)])?"on":ds.length?"pl":hw.has(it)?"hw":"np";
+  const sm=d=>ELWeek.date(d).replace(/ \w+$/,"");
+  const rows=acts(x.ls).map(a=>{const its=agItems(a),ds=[...new Set(its.flatMap(it=>where[it]||[]))].sort(),open=elLpOpen(a,info,x.gid),nos=!secOf(a).length,drop=dr.includes(a.id);
+    const nd=studs.length&&(secOf(a).length||isCp(a))?studs.filter(s=>isDone(s.uid,a)).length:null,stA=nos?st(a.id+"#",where[a.id+"#"]||[]):"";
+    const left=its.filter(it=>st(it,where[it]||[])==="np").length;
+    return `<div class="agla ${drop?"drp":""} ${stA}"><div class="aglh" draggable="true" data-ag="${nos?"it":"act"}" data-a="${esc(a.id)}" data-it="${esc(a.id+"#")}" data-from="" ${D} title="Drag it to a class day">`
+      +`<span class="agdot">⠿</span><span class="agln"><b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>`
+      +`<small>${ds.length?ds.map(sm).join(" · "):"not on the agenda"}${!nos&&ds.length&&left?` · ${left} tab${left===1?"":"s"} not planned`:""}${open?"":" · 🔒 locked"}${nd!=null?` · ${nd}/${studs.length} done`:""}</small></span>`
+      +(isLpA(a)&&!/-my-real-routine$/.test(x.ls)?`<button type="button" class="agx" data-do="lpdrop" data-a="${esc(a.id)}" data-v="${drop?0:1}" ${D} title="${drop?"Count it again":"Drop it for this group: not counted, not in the exam"}">${drop?"↩":"✂"}</button>`:"")+`</div>`
+      +(nos?"":`<div class="agcs">${itemsOf(a).map(([p,nm])=>{const it=a.id+"#"+p,w=where[it]||[],s=st(it,w);
+        return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${s==="np"?"Not on the agenda: drag it to a day":s==="hw"?"Set as homework":"On "+w.map(sm).join(", ")}">${s==="on"?"✓ ":s==="hw"?"🏠 ":""}${esc(nm)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:""}</span>`}).join("")}</div>`)+`</div>`}).join("");
+  const ex=ag.exam,n=ex?ELWeek.days(t,ex):null;
+  return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day. Drop it back here to take it off the agenda.</p>`
+    +`<div class="agla exam"><div class="aglh" draggable="${ex?"true":"false"}" data-ag="exam" data-from="${ex||""}" ${D} title="Drag it to another day"><span class="agdot">⠿</span><span class="agln"><b>📝 Exam</b><small>${ex?esc(ELWeek.date(ex))+(n>1?` · in ${n} days`:n===1?" · tomorrow":n===0?" · today":" · done"):"no day yet"}</small></span></div></div>`
+    +rows+`</aside>`}
+// the group's 📅 Time plan
+function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="muted">No time plan for this group in this LS yet.</p></div>`;
+  const t=ELWeek.today(),ws=agWeeks(x,(S.agExt||{})[x.ls+"|"+x.gid]||0),tm=new Date(t+"T12:00").getDay(),cur=ELWeek.add(t,-((tm+6)%7));
+  const pastW=ws.filter(([m])=>m<cur),now=ws.filter(([m])=>m>=cur),ag=agOf(x);
+  const late=agDays(ag).filter(d=>d<cur&&dayIts(ag,d).some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]));   // earlier weeks (this week's days say it themselves)
+  return `<div class="agw">${agList(x,studs)}<section class="agr">`
+    +hwTag(x)
+    +(late.length?`<div class="aglate"><h3>⚠ Not ticked yet (${late.length})</h3><p class="muted">Tick what you did. Drag the rest to a later day, or ⏭ Next class.</p><div class="agdays">${late.map(d=>agDay(x,d,true)).join("")}</div></div>`:"")
+    +(pastW.length?`<details class="agpast"><summary>Earlier weeks (${pastW.length})</summary>${pastW.map(([m,dd])=>agWeek(x,m,dd)).join("")}</details>`:"")
+    +now.map(([m,dd])=>agWeek(x,m,dd)).join("")
+    +`<p><button type="button" class="g" data-do="agmore" ${`data-gid="${x.gid}" data-ls="${x.ls}"`}>＋ Show one more week</button></p>`
+    +`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Each class day of ${esc((GR.find(g=>g.id===x.gid)||{}).name||x.gid)} by your timetable. Drag a learning path (all the tabs not ticked yet), one tab, the exam or the final product steps from the list or from another day. Tick what you did in class: students see it in “What we've done”. 🔓/🔒 opens or closes a tab for the group. Students see as homework only what you set with 🏠 Homework. Due days move with the learning path's last class, and the exam day students see follows the 📝 Exam.</p></details>`
+    +`</section></div>`}
+if(DEMO)window.EL_T=S;   // previews and tests look at the state
+// one tick (an item done in class) and the day's tick when all its items are done
+function agTick(x,d,it,v){const ag=agOf(x);if(!ag)return;const tk={[itKey(d,it)]:v?ELWeek.today():false},on=i=>i===it?v:!!tkOf(x)[x.ls+"|"+itKey(d,i)],its=dayIts(ag,d),all=its.length>0&&its.every(on);
+  if(!!tkOf(x)[x.ls+"|@"+d]!==all)tk["@"+d]=all?ELWeek.today():false;quick(api.ticks(x.gid,x.ls,tk))}
+// drag and drop (a laptop or desktop: HTML drag events)
+let AGD=null;
+document.addEventListener("dragstart",e=>{const el=e.target.closest&&e.target.closest("[data-ag]");if(!el)return;AGD=Object.assign({},el.dataset);e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain",el.dataset.ag)}catch(_){}setTimeout(()=>document.body.classList.add("agdrag"),0)});
+document.addEventListener("dragend",()=>{AGD=null;document.body.classList.remove("agdrag");document.querySelectorAll(".agover").forEach(z=>z.classList.remove("agover"))});
+document.addEventListener("dragover",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;e.preventDefault();e.dataTransfer.dropEffect="move";
+  document.querySelectorAll(".agover").forEach(q=>{if(q!==z)q.classList.remove("agover")});z.classList.add("agover")});
+document.addEventListener("dragleave",e=>{const z=e.target.closest&&e.target.closest("[data-agdrop]");if(z&&!z.contains(e.relatedTarget))z.classList.remove("agover")});
+document.addEventListener("drop",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");
+  if(!S.D.tkOk)return alert("Your ticks did not load: reload the page before changing the agenda.");agDrop(k,z.dataset.agdrop)});
 // Writing and speaking revisions (LS2 engine, research audit 26 Oct 2026): state.drafts[key] = the first version sent for AI feedback
 // (speaking: its transcript), state.finals[key] = {text, changed, at} the improved version; key = step + "_" + route. Older texts
 // saved before drafts were kept (state.texts) appear on their own.
@@ -2198,6 +2401,13 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     nohw:()=>{e.preventDefault();if(k.v==="1"&&!confirm("Remove this planned homework from your list? (Students don't see planned homework.) You can bring it back."))return;
       quick(api.planEdit(k.ls,k.gid,"nohw:"+k.line,k.v==="1"?{noHw:true,at:Date.now()}:null))},   // a plan's "Homework by …" line removed for this group (planEdits "nohw:<line>")
     pledit:()=>{e.preventDefault();peOpen(planX(k.ls,k.gid),+k.i,k.line)},
+    agtick:()=>{e.stopPropagation();agTick(planX(k.ls,k.gid),k.d,k.it,t.checked)},
+    agrm:()=>{e.preventDefault();e.stopPropagation();agMove(planX(k.ls,k.gid),[k.it],k.d,"")},
+    agnext:()=>{e.preventDefault();const x=planX(k.ls,k.gid),ag=agOf(x),nd=nextClassDay(x,k.d);if(!nd)return alert("No later class in the timetable.");
+      agMove(x,((ag.days||{})[k.d]||[]).filter(it=>it!=="self"&&!tkOf(x)[x.ls+"|"+itKey(k.d,it)]),k.d,nd)},
+    agnote:()=>{e.preventDefault();const v=(prompt("A short note for "+ELWeek.date(k.d)+":")||"").replace(/\s+/g," ").replace(/·/g,"-").trim();if(v)agSave(planX(k.ls,k.gid),ag=>{addIt(ag,k.d,"note:"+v)})},
+    agself:()=>{e.preventDefault();agSave(planX(k.ls,k.gid),ag=>{rmIt(ag,k.d,"self")})},
+    agmore:()=>{e.preventDefault();S.agExt=S.agExt||{};const q=k.ls+"|"+k.gid;S.agExt[q]=(S.agExt[q]||0)+1;render()},
     sendto:()=>{e.preventDefault();sendTo(planX(k.ls,k.gid),+k.i,k.line,+k.dir,k.only||null)},
     lpdrop:()=>{e.preventDefault();const x=planX(k.ls,k.gid),a=byId(k.a),on=k.v==="1";
       if(on&&!confirm(`Drop “${a.title}” for ${(GR.find(g=>g.id===k.gid)||{}).name}?\n\nIt will not count in their LS grade, it has no due day (no late reminders) and it is marked “not in the exam”. Students can still open it. You can undo it.`))return;
