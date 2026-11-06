@@ -77,7 +77,7 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .agdot{color:#94a3b8;font-size:14px;cursor:grab;user-select:none}
 .agcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .agc{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;line-height:1.35;border:1px solid #c7d4ff;background:#eef2ff;color:#1e3a8a;border-radius:999px;padding:2px 8px;cursor:grab;user-select:none}
-.agc small{color:#64748b;font-size:11px}.agc input{margin:0;width:13px;height:13px;cursor:pointer}.agc .tabsec{margin-left:0}
+.agc small{color:#64748b;font-size:11px}.agtg{display:inline-flex;gap:2px;margin-left:2px}.agtg i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.aglh .agtg{margin-left:6px;vertical-align:1px}.agkey{font-size:11.5px;color:#64748b;margin:4px 0 8px}.agkey i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.agc input{margin:0;width:13px;height:13px;cursor:pointer}.agc .tabsec{margin-left:0}
 .agc.np{background:#fff;border:1px dashed #94a3b8;color:#475569}.agc.on{background:#dcfce7;border-color:#86efac;color:#166534}.agc.hw{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
 .agc.ex{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700}.agc.nt{background:#f8fafc;border-color:#e2e8f0;color:#475569;font-style:italic;border-radius:10px}
 .agday .agc .tabsec:not(.off),.agday .agc .agx,.agday .agh .agx{opacity:0}.agday .agc:hover .tabsec,.agday .agc:hover .agx,.agday .agh:hover .agx,.agday .agc .agx:focus{opacity:1}
@@ -1912,13 +1912,13 @@ function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr
     const nd=studs.length&&(secOf(a).length||isCp(a))?studs.filter(s=>isDone(s.uid,a)).length:null,stA=nos?st(a.id+"#",where[a.id+"#"]||[]):"";
     const left=its.filter(it=>st(it,where[it]||[])==="np").length;
     return `<div class="agla ${drop?"drp":""} ${stA}"><div class="aglh" draggable="true" data-ag="${nos?"it":"act"}" data-a="${esc(a.id)}" data-it="${esc(a.id+"#")}" data-from="" ${D} title="Drag it to a class day">`
-      +`<span class="agdot">⠿</span><span class="agln"><b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>`
+      +`<span class="agdot">⠿</span><span class="agln"><b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${nos?agTags(a.id+"#"):""}`
       +`<small>${ds.length?ds.map(sm).join(" · "):"not on the agenda"}${!nos&&ds.length&&left?` · ${left} tab${left===1?"":"s"} not planned`:""}${open?"":" · 🔒 locked"}${nd!=null?` · ${nd}/${studs.length} done`:""}</small></span>`
       +(isLpA(a)&&!/-my-real-routine$/.test(x.ls)?`<button type="button" class="agx" data-do="lpdrop" data-a="${esc(a.id)}" data-v="${drop?0:1}" ${D} title="${drop?"Count it again":"Drop it for this group: not counted, not in the exam"}">${drop?"↩":"✂"}</button>`:"")+`</div>`
       +(nos?"":`<div class="agcs">${itemsOf(a).map(([p,nm])=>{const it=a.id+"#"+p,w=where[it]||[],s=st(it,w);
-        return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${s==="np"?"Not on the agenda: drag it to a day":s==="hw"?"Set as homework":"On "+w.map(sm).join(", ")}">${s==="on"?"✓ ":s==="hw"?"🏠 ":""}${esc(nm)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:""}</span>`}).join("")}</div>`)+`</div>`}).join("");
+        return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${s==="np"?"Not on the agenda: drag it to a day":s==="hw"?"Set as homework":"On "+w.map(sm).join(", ")}">${s==="on"?"✓ ":s==="hw"?"🏠 ":""}${esc(nm)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:""}${agTags(it)}</span>`}).join("")}</div>`)+`</div>`}).join("");
   const ex=ag.exam,n=ex?ELWeek.days(t,ex):null;
-  return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day. Drop it back here to take it off the agenda.</p>`
+  return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day. Drop it back here to take it off the agenda.</p><p class="agkey">What each tab works: ${[["2","L","Listening"],["3","S","Speaking"],["4","R","Reading"],["5","W","Writing"]].map(([k,l,n])=>`<i style="background:${compCol(k)}">${l}</i> ${n}`).join(" ")} · other competences by their code</p>`
     +`<div class="agla exam"><div class="aglh" draggable="${ex?"true":"false"}" data-ag="exam" data-from="${ex||""}" ${D} title="Drag it to another day"><span class="agdot">⠿</span><span class="agln"><b>📝 Exam</b><small>${ex?esc(ELWeek.date(ex))+(n>1?` · in ${n} days`:n===1?" · tomorrow":n===0?" · today":" · done"):"no day yet"}</small></span></div></div>`
     +rows+`</aside>`}
 // Competences of what is on the agenda (Roger, 6 Nov 2026: "sometimes there will be sections that won't be done. So on the top I want 4
@@ -1928,13 +1928,18 @@ function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr
 // count for the whole LS. Bar 1: Listening, Speaking, Reading, Writing (CE2–CE5, the curriculum's order), aim 20–30 % each.
 function agWork(its){const n={},sc=window.EL_STEP_CRITERIA||{};new Set(its).forEach(it=>{const i=it.indexOf("#");if(i<0)return;const a=byId(it.slice(0,i)),p=it.slice(i+1);if(!a||isGame(p))return;
   (p?elSecSteps(a,p):((window.EL_ACTIONS||{})[a.id]||[])).forEach(k=>{const cs=((sc[a.id]||{})[k]||[]).filter(c=>compOf(c));cs.forEach(c=>{const q=compOf(c);n[q]=(n[q]||0)+1/cs.length})})});return n}
+// what one item of the list works (Roger, 6 Nov 2026: "could it be possible to know what is worked in each SLP?"): small coloured tags,
+// L S R W for the four skills (same colours as the bars), the other competences by their code; hover gives the names and shares
+function agTags(it){const n=agWork([it]),tot=Object.values(n).reduce((a,b)=>a+b,0);if(!tot)return "";
+  const four={"2":"L","3":"S","4":"R","5":"W"},ks=Object.keys(n).sort(compSort),pc=k=>Math.round(n[k]/tot*100);
+  return `<span class="agtg" title="${esc("Works: "+ks.map(k=>compName(k)+" "+pc(k)+" %").join(", "))}">${ks.map(k=>`<i style="background:${compCol(k)}">${esc(four[k]||(isTr(k)?k:"CE"+k))}</i>`).join("")}</span>`}
 function agBars(x){const ag=agOf(x),dr=(x.p._dropped||{})[x.gi]||[],ok=it=>!dr.includes(it.split("#")[0]);
   const plan=agWork(Object.values(ag.days).flat().filter(it=>/#/.test(it)&&ok(it))),all=agWork(acts(x.ls).flatMap(agItems));
   const bar=(ks,title,sub,band)=>{const tot=ks.reduce((a,k)=>a+(plan[k]||0),0);if(!ks.length)return "";
     const pc=k=>tot?Math.round((plan[k]||0)/tot*100):0,kept=k=>all[k]?Math.round((plan[k]||0)/all[k]*100):0,nm=k=>isTr(k)?({CC:"Citizenship",CD:"Digital",CE:"Entrepreneurship",CPSAA:"Learning to learn"})[(k.match(/^[A-Z]+/)||[""])[0]]||k:compName(k).replace(/^CE\d+ · /,"");
     const low=band?ks.filter(k=>pc(k)<20):[];
     return `<div class="agbar"><div class="agbt"><b>${title}</b><small>${sub}</small>${low.length?`<span class="agwarn">⚠ ${low.map(nm).join(", ")} below 20 %</span>`:band&&tot?`<span class="agok">✓ balanced</span>`:""}</div>`
-      +`<div class="agbs" role="img" aria-label="${esc(ks.map(k=>nm(k)+" "+pc(k)+" %").join(", "))}">${ks.map(k=>pc(k)?`<span style="width:${pc(k)}%;background:${compCol(k)}" title="${esc(compName(k))}: ${pc(k)} % of what is on the agenda · ${kept(k)} % of its work in the whole LS">${pc(k)>=17?esc(nm(k))+" "+pc(k)+" %":pc(k)>=5?pc(k)+" %":""}</span>`:"").join("")}</div>`
+      +`<div class="agbs" role="img" aria-label="${esc(ks.map(k=>nm(k)+" "+pc(k)+" %").join(", "))}">${ks.map(k=>pc(k)?`<span style="width:${pc(k)}%;background:${compCol(k)}" title="${esc(compName(k))}: ${pc(k)} % of what is on the agenda · ${kept(k)} % of its work in the whole LS">${pc(k)>=17?esc(nm(k))+" "+pc(k)+" %":pc(k)>=8?esc(({"2":"L","3":"S","4":"R","5":"W"})[k]||"")+" "+pc(k)+" %":pc(k)>=5?pc(k)+" %":""}</span>`:"").join("")}</div>`
       +`<div class="agbl">${ks.map(k=>`<span><i style="background:${compCol(k)}"></i>${esc(isTr(k)?k:"CE"+k)} ${esc(nm(k))} <b>${pc(k)} %</b> <small>· ${kept(k)} % of the LS</small></span>`).join("")}</div></div>`};
   const four=["2","3","4","5"],other=Object.keys(all).filter(k=>!four.includes(k)).sort(compSort);
   return `<div class="agbars">${bar(four,"Communicative skills","of the tabs on the agenda",true)}${bar(other,"Other competences of the LS","of the tabs on the agenda",false)}</div>`}
