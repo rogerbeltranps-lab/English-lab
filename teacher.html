@@ -1870,7 +1870,7 @@ function agDay(x,d,c){const ag=agOf(x),t=ELWeek.today(),its=(ag.days[d]||[]),isE
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
   const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
     return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" data-from="${d}" ${D} title="Drag it to another day, or back to the list on the left">`
-      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${esc(label)}`
+      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${esc(label)}${/#/.test(it)?agTags(it):""}`
       +(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
   const groups=[];its.forEach(it=>{if(it==="self")return;const id=/^note:/.test(it)?"":it.split("#")[0],g=groups.find(z=>z.id===id&&id);if(g)g.its.push(it);else groups.push({id,its:[it]})});
   const body=groups.map(g=>{if(!g.id)return `<div class="agg">${g.its.map(it=>chip(it,it.slice(5))).join("")}</div>`;const a=byId(g.id);if(!a)return "";
