@@ -71,7 +71,7 @@
     ["l'esforç d'avui és el teu anglès de demà! 🚀","your effort today is your English tomorrow! 🚀"],
     ["continua així, vas pel bon camí! 🛤️","keep going, you're on the right track! 🛤️"],
     ["tots els experts van començar sent principiants! 🌱","every expert was once a beginner! 🌱"],
-    ["espero que el teu dia estigui ple de coses bones! 🌈","I hope your day is full of good things! 🌈"],
+    ["espero que el teu dia estigui ple de coses bones! 🌻","I hope your day is full of good things! 🌻"],
     ["gràcies per esforçar-te tant! 👏","thanks for working so hard! 👏"],
     ["un somriure i una mica de pràctica fan molt! 😊","a smile and a bit of practice go a long way! 😊"]
   ];
