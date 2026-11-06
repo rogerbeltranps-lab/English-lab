@@ -141,6 +141,13 @@ service cloud.firestore {
     match /gameResults/{id} {
       allow read, write: if isTeacher();
     }
+    // each student's own class game results (Roger, 6 Nov 2026: "I want students to see their results in the games and suggestions of what
+    // to study"): myGames/{email}.games[{group}_{sid}], written by the board at the end of a game (lab/game/host.js); the student reads only
+    // their own (📝 Your notes on the LS page, shared/js/el-notes.js)
+    match /myGames/{email} {
+      allow get: if school() && email == myEmail();
+      allow read, write: if isTeacher();
+    }
     // ⛶ class full screen (shared/js/el-cloud.js fsLeft): live/{group}/fsLeft/{email} = {name, at, pull, n}, written by a student of the group
     // when they leave the full screen of a pull-up; only the teacher reads them (the dashboard and the learning path page list who left)
     match /live/{group}/fsLeft/{email} {
@@ -228,6 +235,15 @@ service cloud.firestore {
         allow update: if signedIn() && request.auth.uid == uid && resource.data.get('redo', false) == true && cpOk();
         allow delete: if isTester() && request.auth.uid == uid;
         allow write: if isTeacher();
+      }
+      // 📝 notes from the class games (Roger, 6 Nov 2026: "Take your notes" slide, lab/game/play.js; shown on the LS home page,
+      // shared/js/el-notes.js): notes/{deck} = {ls, course, deck, title, lp, parts:{p<k>:{topic, text, at}}, updated}. Their own; the teacher reads.
+      match /notes/{deck} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['ls','course','deck','title','lp','parts','updated'])
+          && request.resource.data.deck == deck && request.resource.data.parts is map && request.resource.data.parts.size() <= 20;
+        allow delete: if signedIn() && request.auth.uid == uid;
       }
       // results: students cannot touch feedback, nor edit a locked (submitted) result
       match /results/{rid} {

@@ -52,6 +52,7 @@
         <div class="hr">
           <a class="chal" href="#final"><span class="k" data-ca="El teu repte · producte final">Your challenge · final product</span><b>Your Free Time Vlog</b><span class="d">Record a 1.5–2 minute vlog about your hobby or a free-time event: Google Slides with your face in picture-in-picture, a clear voice, what people are doing now and what they usually do, what you like, and your screen-use tips. Credit your photos and sources on the last slide.</span><span class="go" data-ca="Mira què has de fer →">See what to do →</span></a>
           <div class="tiles">
+            <a class="tile nt" href="#notes"><span class="ti" aria-hidden="true">📝</span><span><b data-ca="Jocs i teoria · els teus apunts">Games and theory · your notes</b><small data-ca="jocs de classe: teoria, els teus apunts, resultats i què estudiar">class games: theory, your notes, results and what to study</small></span></a>
             <a class="tile" href="#study"><span class="ti" aria-hidden="true">📚</span><span><b data-ca="Estudia">Study</b><small data-ca="resum, llibre de lectura, paraules i gramàtica">summary, reading book, words and grammar</small></span></a>
             <a class="tile" href="vocabulary-games.html"><span class="ti" aria-hidden="true">🎮</span><span><b data-ca="Jocs de vocabulari">Vocabulary games</b><small>6 games · 4 routes</small></span></a>
             <button type="button" class="tile" id="shadowOpen" aria-label="Watch the shadowing video for the whole unit"><span class="ti" aria-hidden="true">🗣</span><span><b data-ca="Vídeo de shadowing">Shadowing video</b><small data-ca="tota la unitat · 6 minuts · repeteix en veu alta">the whole unit · 6 minutes · say it aloud</small></span></button>
@@ -152,6 +153,12 @@
     </section>
 
     <!-- 🎬 Final product: a short card, everything else is on the final product page (Roger, 25 Oct 2026) -->
+    <!-- 📝 Your notes: what the student wrote on the "Take your notes" slides of the class games (shared/js/el-notes.js fills it) -->
+    <section class="place" data-place="notes" hidden>
+      <h2 class="pt" data-ca="📝 Jocs i teoria · els teus apunts">📝 Games and theory · your notes</h2>
+      <div id="notesBox"></div>
+    </section>
+
     <section class="place" data-place="final" hidden>
       <h2 class="pt" data-ca="🎬 El producte final">🎬 Final product</h2>
       <div class="bigcard">
@@ -189,6 +196,9 @@
 <script src="../../shared/js/el-plan.js"></script>
 <script src="../../shared/js/el-week.js"></script>
 <script src="../../shared/js/el-ls-home.js"></script>
+<script src="../../lab/game/decks/index.js"></script>
+<script src="../../lab/game/decks/theory.js"></script>
+<script src="../../shared/js/el-notes.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>
