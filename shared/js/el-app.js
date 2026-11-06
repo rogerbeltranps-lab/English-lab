@@ -96,6 +96,43 @@
     const L = items(), first = L[0];
     c.innerHTML = `<a href="${first.h}">‹ ${esc(first.long)}</a>`;
   }
+  // ---- All Learning Situations (the course page) for a signed-in user, in the board's style (Roger, 6 Nov 2026: "aquest no m'agrada
+  // (all LSs)"): one list of the group's LSs, the one the group is doing now first and in the course colour, each with its number,
+  // what it is about, whether it is now, open or closed, and one Open button. The page's own content stays for signed-out visitors.
+  // No new reads: ELCloud.lsNow is the cached ls/{id} that el-cloud.js reads for the menus.
+  let allInfo = null, allBusy = false;
+  async function allLs() {
+    if (mode !== "course") return;
+    const main = $("body>main:not(.elall)"), foot = $("body>footer");
+    let box = $(".elall");
+    if (who.role === "none" || !window.EL_LS) { if (box) box.hidden = true; if (main) main.hidden = false; if (foot) foot.hidden = false; return; }
+    const c = who.course || course0, C = window.ELCloud, all = who.role === "teacher" || who.role === "tester";
+    const list = (window.EL_LS || []).filter(l => l.course === c);
+    if (!allInfo && !allBusy && C && C.lsNow) {
+      allBusy = true;
+      const o = {}; await Promise.all(list.map(async l => { try { o[l.id] = await C.lsNow(l.id); } catch (e) { o[l.id] = {}; } }));
+      allInfo = o; allBusy = false;
+    }
+    const info = allInfo || {};
+    // what the page says about each LS (its card's text), by folder
+    const about = {}; $$("a.card[href]").forEach(a => { const k = (a.getAttribute("href") || "").split("/")[0]; const p = a.querySelector("p"); if (p) about[k] = p.textContent.trim(); });
+    const st = id => { const s = (info[id] || {}).status; return s === "public" ? "open" : s || (allInfo ? "hidden" : "open"); };
+    const vis = list.filter(l => all || (st(l.id) !== "hidden" && (!window.elLsForGroup || !who.group || elLsForGroup(l, info[l.id] || {}, who.group))));
+    const now = who.group && window.ELWeek && (ELWeek.now(who.group) || {}).ls;
+    if (!box) { box = document.createElement("main"); box.className = "elall"; (main || document.body.firstElementChild).before(box); }
+    box.hidden = false; if (main) main.hidden = true; if (foot) foot.hidden = true;
+    const CN = { "2eso": "2 ESO", "4eso": "4 ESO" };
+    const row = l => {
+      const n = list.indexOf(l) + 1, k = l.id.slice(c.length + 1), s = st(l.id), cur = l.id === now;
+      const chip = cur ? `<span class="ch now">${t("Ara", "Now")}</span>` : s === "closed" ? `<span class="ch cl">${t("Tancada · per repassar", "Closed · to review")}</span>` : s === "hidden" ? `<span class="ch hd">Hidden</span>` : `<span class="ch op">${t("Oberta", "Open")}</span>`;
+      return `<a class="ells${cur ? " cur" : ""}" href="${ROOT + c + "/" + k + "/index.html"}"><span class="n">LS${n}</span><span class="t"><b>${esc(l.title.replace(/^\S+ · /, ""))}</b><small>${esc(about[k] || "")}</small></span>${chip}<span class="go">${t("Obre", "Open")} ›</span></a>`;
+    };
+    const order = vis.slice().sort((a, b) => (b.id === now) - (a.id === now));
+    box.innerHTML = `<div class="elall-in"><h1>${t("Les meves Learning Situations", "My Learning Situations")}</h1>`
+      + `<p class="sub">${CN[c] || ""}${who.group ? " · " + esc(who.group.replace(/^(\d)ESO/, "$1 ESO ")) : ""} · ${t("una per unitat; la de dalt és la que fem ara", "one per unit; the one at the top is the one we are doing now")}</p>`
+      + `<div class="ellist">${order.map(row).join("") || `<p class="sub">${t("Encara no hi ha cap Learning Situation oberta.", "No Learning Situation is open yet.")}</p>`}</div>`
+      + `<p class="more">${t("N'aniran apareixent més durant el curs.", "More will appear during the year.")}</p></div>`;
+  }
   function lpBar() {   // learning paths: the back link to the LS, as a button
     if (mode !== "lp") return;
     $$(".topbar .brand>a").forEach(a => {
@@ -179,6 +216,7 @@
     if (mode === "lab") side(L); else rail(L);
     bar(L);
     crumb();
+    allLs();
     document.documentElement.classList.toggle("el-ca", CA);
   }
 

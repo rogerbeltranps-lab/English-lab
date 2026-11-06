@@ -152,3 +152,38 @@ body.ellp2.elteach #el-banner{display:none!important}
 /* order in the column: the path, progress, (the teacher's tools), the steps, then how it works, the study guide and my goal */
 .ellp-head{order:0}.ellp-prog{order:1}.ellp-teach{order:2}.ellp-steps{order:3}.ellp-more{order:4}
 .ellp-teach[hidden],.ellpside [hidden]{display:none!important}
+
+/* ---- My Learning Situations (the course page for a signed-in user; el-app.js allLs) ---- */
+main.elall{display:block;font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a}
+main.elall[hidden]{display:none!important}
+.elall-in{max-width:980px;margin:0 auto;padding:6px 24px 48px}
+.elall h1{font-size:2rem;letter-spacing:-.02em;margin:8px 0 4px}
+.elall .sub{color:#64748b;margin:0 0 18px;font-size:16px}
+.ellist{display:flex;flex-direction:column;gap:10px}
+a.ells{display:grid;grid-template-columns:56px minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:14px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;
+  text-decoration:none;color:inherit;box-shadow:0 1px 0 #e2e8f0,0 2px 6px rgba(15,23,42,.05);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+a.ells:hover{border-color:#3157d5;transform:translateY(-1px);box-shadow:0 1px 0 #c7d2fe,0 8px 18px rgba(49,87,213,.14)}
+a.ells .n{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:17px;background:#eef2ff;color:#2443ad}
+a.ells .t{min-width:0}
+a.ells .t b{display:block;font-size:18px;line-height:1.25}
+a.ells .t small{display:block;color:#64748b;font-size:14px;margin-top:2px}
+a.ells .ch{font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 12px;white-space:nowrap}
+a.ells .ch.now{background:#3157d5;color:#fff}
+a.ells .ch.op{background:#dcfce7;color:#166534}
+a.ells .ch.cl{background:#f1f5f9;color:#475569}
+a.ells .ch.hd{background:#fef3c7;color:#92400e}
+a.ells .go{font-weight:800;color:#3157d5;white-space:nowrap;padding:9px 16px;border-radius:12px;background:#eaf0ff}
+a.ells.cur{border:2px solid #3157d5;padding:18px;grid-template-columns:64px minmax(0,1fr) auto auto}
+a.ells.cur .n{background:#3157d5;color:#fff;width:64px;height:64px;font-size:19px}
+a.ells.cur .t b{font-size:21px}
+a.ells.cur .go{background:#3157d5;color:#fff}
+.elall .more{color:#94a3b8;margin:16px 2px 0;font-size:14px}
+body.elapp.elcourse .elcrumb{max-width:980px}
+@media (max-width:640px){
+  .elall-in{padding:4px 16px 24px}.elall h1{font-size:1.6rem}
+  a.ells{grid-template-columns:48px minmax(0,1fr);row-gap:8px}
+  a.ells .n,a.ells.cur .n{width:48px;height:48px;font-size:16px}
+  a.ells.cur{grid-template-columns:48px minmax(0,1fr);padding:14px}
+  a.ells .ch{grid-column:2;justify-self:start}
+  a.ells .go{grid-column:1/-1;text-align:center}
+}
