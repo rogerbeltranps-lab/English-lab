@@ -9,6 +9,39 @@ X-WR-TIMEZONE:Europe/Madrid
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 X-PUBLISHED-TTL:PT6H
 BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-hw-2026-11-05-14fztf1@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261103
+DTEND;VALUE=DATE:20261105
+SUMMARY:🏠 English homework for Thu 5 Nov: LP1 Getting started: Recall\, 
+ Vocabulary\, Reading\, Listening · pair the vlog buddies (same route)\, c
+ hoose the hobby or event
+DESCRIPTION:LP1 Getting started: Recall\, Vocabulary\, Reading\, Listening 
+ · pair the vlog buddies (same route)\, choose the hobby or event\nFor the
+  English class on Thu 5 Nov · Per a la classe d'anglès del dj. 5 nov..\n
+ Free Time\, Live!: https://rogerbeltranps-lab.github.io/English-lab/2eso/f
+ ree-time-live/index.html\nMy board / El meu tauler: https://rogerbeltranps
+ -lab.github.io/English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-hw-2026-11-06-1vg8sya@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261105
+DTEND;VALUE=DATE:20261106
+SUMMARY:🏠 English homework for Fri 6 Nov: LP1 Getting started
+DESCRIPTION:LP1 Getting started\nFor the English class on Fri 6 Nov · Per 
+ a la classe d'anglès del dv. 6 nov..\nFree Time\, Live!: https://rogerbel
+ tranps-lab.github.io/English-lab/2eso/free-time-live/index.html\nMy board 
+ / El meu tauler: https://rogerbeltranps-lab.github.io/English-lab/today.ht
+ ml
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:2esoa-2eso-free-time-live-exam-2026-11-20-1alhb@english-lab
 DTSTAMP:20261031T000000Z
 DTSTART;VALUE=DATE:20261120
