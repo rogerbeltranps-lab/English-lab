@@ -2138,7 +2138,15 @@ function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=s
   if(Object.keys(tk).length)ps.push(api.ticks(x.gid,x.ls,tk));
   if(quiet)return Promise.all(ps).catch(e=>console.warn("agenda",e));quick(ps)}
 // the first time a group's Time plan opens: its agenda from the plan (one write; nothing happens on the students' side)
-const agEnsure=x=>{if(!agOf(x)&&x.p&&x.gi>=0&&AGOK(x.ls)&&S.D.tkOk)agSave(x,null,true);return agOf(x)};
+const agEnsure=x=>{if(!agOf(x)&&x.p&&x.gi>=0&&AGOK(x.ls)&&S.D.tkOk)agSave(x,null,true);agPrune(x);return agOf(x)};
+// The agenda holds only open learning paths (Roger, 6 Nov 2026: "I only want the SLP that are open in the agenda, and I will put the rest
+// here and when I do they will get open"): a learning path locked for the group comes off the class days and back to the list (ticked
+// items stay, the exam and notes too). Dropping it on a day opens it (agOpenSync). Checked once per group and LS each time the dashboard
+// loads; one write only when something comes off.
+function agPrune(x){const ag=agOf(x),k=x.ls+"|"+x.gid;if(!ag||!S.D.tkOk||(S.agPr=S.agPr||new Set()).has(k))return;S.agPr.add(k);
+  const info=S.D.ls[x.ls]||{},shut=it=>{const i=it.indexOf("#");if(i<0)return false;const a=byId(it.slice(0,i));return !!a&&!elLpOpen(a,info,x.gid)};
+  if(!Object.entries(ag.days).some(([d,its])=>its.some(it=>shut(it)&&!tkOf(x)[x.ls+"|"+itKey(d,it)])))return;
+  agSave(x,(g,tk,on)=>{Object.keys(g.days).forEach(d=>{g.days[d]=g.days[d].filter(it=>!shut(it)||on(d,it))})},true)}
 const rmIt=(ag,d,it)=>{const a=ag.days[d];if(!a)return;const i=a.indexOf(it);if(i>=0)a.splice(i,1)};
 const addIt=(ag,d,it)=>{const a=ag.days[d]=ag.days[d]||[];if(a.includes(it))return;const id=it.split("#")[0],j=a.map(z=>z.split("#")[0]).lastIndexOf(id);if(j>=0)a.splice(j+1,0,it);else a.push(it)};
 // items to day `to` ("" = off the agenda) from day `from`, or, from the list on the left (from ""), from every day where they are not ticked;
