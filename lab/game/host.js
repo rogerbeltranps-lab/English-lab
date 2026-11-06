@@ -105,7 +105,7 @@ async function startGroup(){
   // ⛶ 📴 who left full screen in this game and who is not connected (Roger, 6 Nov 2026): live/{group}/fsLeft (at after the game started)
   // and live/{group}/here (the players' beats, play.js); pills in the top bar, the names when the teacher taps them
   whoStop();
-  WHO.stops=[S.onSnapshot(S.collection(db,"live",g,"fsLeft"),c=>{WHO.left=c.docs.map(d=>d.data());drawTop()},e=>console.warn("fsLeft",e)),
+  WHO.stops=[S.onSnapshot(S.collection(db,"live",g,"fsLeft"),c=>{WHO.left=c.docs.map(d=>Object.assign({e:d.id},d.data()));drawTop()},e=>console.warn("fsLeft",e)),
     S.onSnapshot(S.collection(db,"live",g,"here"),c=>{WHO.here={};c.docs.forEach(d=>WHO.here[d.id]=d.data());drawTop()},e=>console.warn("here",e))];
   clearInterval(liveBeat);liveBeat=setInterval(live,60e3);   // every minute too: the students' devices know the game is still on
   live();draw();
@@ -154,10 +154,11 @@ const WHO={stops:[],left:[],here:{},open:false};
 const whoStop=()=>{WHO.stops.forEach(f=>f());WHO.stops=[];WHO.left=[];WHO.here={};WHO.open=false};
 const ms=t=>t&&t.toMillis?t.toMillis():typeof t==="number"?t:0;
 const hm=t=>{const d=new Date(ms(t));return ms(t)?String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"):""};
-function who(){if(!H.sid||H.phase==="end"||H.phase==="pick")return {left:[],off:[]};const now=Date.now(),lim=window.EL_HERE_MS||150e3;
-  const left=WHO.left.filter(y=>ms(y.at)>=H.sid).sort((a,b)=>ms(b.at)-ms(a.at));
-  const off=Object.keys(H.players).map(em=>Object.assign({em},WHO.here[em])).filter(y=>ms(y.seen)>=H.sid-60e3&&(y.off||now-ms(y.seen)>lim)).sort((a,b)=>ms(b.seen)-ms(a.seen));
-  return {left,off}}
+// the whole group, in or out (Roger, 6 Nov 2026: "who is in and who is out"): elClassRoll in el-catalog.js with the group's student list
+function who(){if(!H.sid||H.phase==="end"||H.phase==="pick")return {active:false,inn:[],out:[],n:0};
+  const x={game:true,on:true,phase:"q",sid:H.sid,at:Date.now(),title:H.deck&&H.deck.title},left=WHO.left.filter(y=>ms(y.at)>=H.sid).map(y=>Object.assign({},y,{pull:H.sid}));
+  return elClassRoll(x,left,Object.entries(WHO.here).map(([e,y])=>Object.assign({e},y)),Object.keys(H.names).map(e=>({e,name:H.names[e]})))}
+const why=y=>y.why==="full"?"out of full screen"+(y.left?` · left ${hm(y.left.at)}${y.left.n>1?` (${y.left.n}×)`:""}`:""):y.why==="closed"?`screen closed or another window · since ${hm(y.seen)}`:y.why==="lost"?`lost connection · since ${hm(y.seen)}`:"not in the game";
 // only the top bar is drawn again (the slide underneath keeps its animation)
 function drawTop(){const t=app$.querySelector(".top");if(t&&H.g&&H.sid)t.outerHTML=top()}
 setInterval(drawTop,15e3);   // a beat missed for EL_HERE_MS
@@ -192,11 +193,10 @@ function endGame(){
 
 /* ---------- screens ---------- */
 const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1,s0=cur();
-  const w=who(),nm=y=>esc(H.names[y.em||""]||y.name||nameOf(y.em||"?"));
-  const box=WHO.open&&(w.left.length||w.off.length)?`<div class="whobox pop">${w.left.length?`<p><b>⛶ Left full screen</b><br>${w.left.map(y=>`${esc(y.name||"?")} ${hm(y.at)}${y.n>1?` (${y.n}×)`:""}`).join("<br>")}</p>`:""}${w.off.length?`<p><b>📴 Not connected</b><br>${w.off.map(y=>`${nm(y)} · ${y.off?"screen closed or left":"no signal"} since ${hm(y.seen)}`).join("<br>")}</p>`:""}</div>`:"";
+  const w=who(),gone=w.out.filter(y=>y.why!=="never"),never=w.out.filter(y=>y.why==="never");
+  const box=WHO.open&&w.active?`<div class="whobox pop">${gone.length?`<p>${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("<br>")}</p>`:""}${never.length?`<p class="nv">⚪ Not in the game (${never.length}): ${never.map(y=>esc(y.name)).join(", ")}</p>`:""}<p class="i">✓ In (${w.inn.length}): ${w.inn.map(y=>esc(y.name)).join(", ")||"nobody yet"}</p></div>`:"";
   return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">🎮 ${Object.keys(H.players).length}</span>
-  ${w.left.length?`<button class="pill warn" data-do="who" title="Who left full screen in this game (tap to show or hide the names)">⛶ ${w.left.length} left full screen</button>`:""}
-  ${w.off.length?`<button class="pill warn off" data-do="who" title="Who lost the connection or closed their screen (tap to show or hide the names)">📴 ${w.off.length} not connected</button>`:""}${box}
+  ${w.active?`<button class="pill who${w.out.length?" warn":""}" data-do="who" title="Who is in full screen and connected, and who is out (tap to show or hide the names)">✓ ${w.inn.length} in · ✗ ${w.out.length} out</button>`:""}${box}
   ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}`:"Theory"}</span>`:""}<span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}
   ${H.phase==="show"&&s0&&!isQ(s0)&&s0.ca?`<button class="btn ghost${caOn()?" on":""}" data-do="ca" title="Catalan help on this slide (C)">CA</button>`:""}

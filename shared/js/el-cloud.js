@@ -425,35 +425,43 @@ async function teacherSections(info){
   function fsWatch(){if(fsG===g)return;[fsStop,fsStopL,fsStopH].forEach(f=>f&&f());fsStop=fsStopL=fsStopH=null;fsG=g;fsX=fsLive=null;fsList=[];fsHere=[];
     fsStop=onSnapshot(doc(db,"live",g),s=>{fsLive=s.exists()?s.data():null;fsX=(fsLive&&fsLive.fs)||null;fsListen();draw()},e=>console.warn("live",e))}
   function fsListen(){const on=fsW().active;
-    if(on&&!fsStopL){fsStopL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{fsList=c.docs.map(d=>d.data());draw()},e=>console.warn("fsLeft",e));
-      fsStopH=onSnapshot(collection(db,"live",g,"here"),c=>{fsHere=c.docs.map(d=>d.data());draw()},e=>console.warn("here",e))}
+    if(on&&!fsStopL){fsStopL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{fsList=c.docs.map(d=>Object.assign({e:d.id},d.data()));draw()},e=>console.warn("fsLeft",e));
+      fsStopH=onSnapshot(collection(db,"live",g,"here"),c=>{fsHere=c.docs.map(d=>Object.assign({e:d.id},d.data()));draw()},e=>console.warn("here",e));
+      if(!fsRo[g]){fsRo[g]=[];getDocs(query(collection(db,"roster"),where("group","==",g))).then(q=>{fsRo[g]=q.docs.map(d=>{const r=d.data();return {e:d.id,name:(r.first||r.name||d.id.split("@")[0])+(r.surname1?" "+r.surname1:"")}});draw()}).catch(e=>{delete fsRo[g];console.warn("roster",e)})}}
     else if(!on&&fsStopL){fsStopL();fsStopH&&fsStopH();fsStopL=fsStopH=null;fsList=[];fsHere=[]}}
   setInterval(()=>{if(fsLive){fsListen();draw()}},30e3);   // a beat missed for EL_HERE_MS, the end of the class or of the game
   async function fsToggle(){const now=Date.now(),v=fsOnNow(fsX)?null:{on:true,at:now,until:(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS};
     try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});msg=v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
   const fsHm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
   // while the group is in full screen, the same state and list stay fixed at the top right of the page, also when scrolling (Roger, 5 Nov 2026)
-  const fsNames=l=>l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+fsHm(y.at)+(y.n>1?" ("+y.n+"×)":"")),
-    offNames=l=>l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+(y.off?"(screen closed or left) ":"")+"since "+fsHm(y.seen));
-  function fsFloat(){let f=document.getElementById("el-fsfloat");const w=fsW();if(!w.active){if(f)f.remove();return}
-    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147481000;max-width:min(340px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
-      f.onclick=e=>{if(e.target.closest("button"))fsToggle()};document.body.append(f)}
-    const l=w.left,o=w.off;
-    const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b>'+(w.fs?'<button style="border:1px solid #1e293b;background:#1e293b;color:#fff;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui">Switch off</button>':'')+'</div>'
-      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+String(w.title).replace(/</g,"&lt;")+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsX.until||fsX.at+LOCK_MS):'')+'</div><div style="color:#9a3412;margin-top:6px;max-height:40vh;overflow:auto;line-height:1.5">'
-      +(l.length?'⚠️ Left full screen ('+l.length+'):<br>'+fsNames(l).join("<br>"):"✓ Nobody has left full screen")
-      +'<div style="color:#b91c1c;margin-top:4px">'+(o.length?'📴 Not connected ('+o.length+'):<br>'+offNames(o).join("<br>"):'<span style="color:#166534">✓ Everyone connected</span>')+'</div></div>';
+  // the whole group, in or out (Roger, 6 Nov 2026), as on the dashboard: the group's student list (read once), ▾ makes it small,
+  // and it opens again by itself when a student who was in goes out (elClassRoll in el-catalog.js)
+  const fsRo={},fsMin={on:false,was:new Set()},E=t=>String(t==null?"":t).replace(/</g,"&lt;");
+  const fsRoll=()=>{const w=elClassRoll(Object.assign({},fsLive,{fs:fsX}),fsList,fsHere,fsRo[g]||[]),now=new Set(w.inn.map(y=>y.e));
+    if(fsMin.on&&w.out.some(y=>fsMin.was.has(y.e)))fsMin.on=false;fsMin.was=now;return w};
+  const fsWhy=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+fsHm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+fsHm(y.seen):y.why==="lost"?"lost connection · since "+fsHm(y.seen):"not connected";
+  function fsFloat(w){let f=document.getElementById("el-fsfloat");if(!w.active){if(f)f.remove();return}
+    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147481000;max-width:min(380px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
+      f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.min){fsMin.on=!fsMin.on;draw()}else fsToggle()};document.body.append(f)}
+    const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;",gone=w.out.filter(y=>y.why!=="never"),never=w.out.filter(y=>y.why==="never");
+    const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+'<button data-min="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(fsMin.on?"Show the names":"Make this small (it opens again when someone goes out)")+'">'+(fsMin.on?"▸":"▾")+'</button></span></div>'
+      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsX.until||fsX.at+LOCK_MS):'')+'</div>'
+      +'<div style="margin-top:4px;font-size:15px"><b style="color:#166534">✓ '+w.inn.length+' in</b> · <b style="color:#b91c1c">✗ '+w.out.length+' out</b> <span style="color:#64748b;font-weight:500">of '+w.n+'</span></div>'
+      +(fsMin.on?'':'<div style="margin-top:6px;max-height:40vh;overflow:auto;line-height:1.5">'
+        +gone.map(y=>'<div style="color:#b91c1c">✗ <b>'+E(y.name)+'</b> · '+fsWhy(y)+'</div>').join("")
+        +(never.length?'<div style="color:#475569;margin-top:4px">⚪ Not connected ('+never.length+'): '+never.map(y=>E(y.name)).join(", ")+'</div>':'')
+        +(w.inn.length?'<div style="color:#166534;margin-top:4px">✓ In ('+w.inn.length+'): '+w.inn.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b;margin-top:4px">Nobody is in yet: they tap their screen to go full screen.</div>')+'</div>');
     if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
-  function fsRow(){const on=fsOnNow(fsX),w=fsW(),l=w.left,o=w.off;
-    return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who leaves it or loses the connection). A pull-up turns it on too. Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+'</button>'
-      +(w.active?'<div class="fsl">'+(on?'until '+fsHm(fsX.until||fsX.at+LOCK_MS):'🎮 in a game')+' · '+(l.length?'⚠️ Left it: '+fsNames(l).join(" · "):"nobody has left it")+(o.length?' · 📴 Not connected: '+offNames(o).join(" · "):"")+'</div>':"")}
+  function fsRow(w){const on=fsOnNow(fsX);
+    return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who is in and who is out). A pull-up turns it on too. Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+'</button>'
+      +(w.active?'<div class="fsl">'+(on?'until '+fsHm(fsX.until||fsX.at+LOCK_MS):'🎮 in a game')+' · ✓ '+w.inn.length+' in · ✗ '+w.out.length+' out'+(w.out.length?': '+w.out.map(y=>E(y.name)+" ("+fsWhy(y)+")").join(" · "):"")+'</div>':"")}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
   function pullRow(){const x0=pulled(),x=elPullLive(x0)?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
     fsWatch();
     return '<div class="r pl"><b>📌 Pull up on '+gname(g)+'\'s screens</b><button data-pull="">This learning path</button>'
       +(cur?'<button data-pull="'+cur+'">At this tab: '+nm(cur).replace(/</g,"&lt;")+'</button>':"")
       +(here?'<span class="now">🔒 Kept on their screens'+(x.p?" at “"+nm(x.p).replace(/</g,"&lt;")+"”":"")+(x.until?" until "+new Date(x.until).toTimeString().slice(0,5)+" (end of the class)":"")+'</span><button class="g" data-pull="-">🔓 Release them</button>':x?'<span>🔒 Kept on their screens: '+String(x.t||"").replace(/</g,"&lt;")+'</span><button class="g" data-pull="-">🔓 Release them</button>':"")
-+'</div><div class="r pl">'+fsRow()+'</div>'}
++'</div><div class="r pl">'+fsRow(fsRoll())+'</div>'}
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
     let bar=document.getElementById("el-tsec");
@@ -469,7 +477,7 @@ async function teacherSections(info){
       +pullRow()
       +(elLpOpen(a,info,g)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
     if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html}
-    fsFloat()
+    fsFloat(fsRoll())
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);
       let sw=t.querySelector(".el-tsw");if(!sw){sw=document.createElement("span");sw.className="el-tsw";sw.setAttribute("role","button");
         sw.onclick=e=>{e.stopPropagation();e.preventDefault();toggle(id)};t.append(sw)}
@@ -763,10 +771,13 @@ function fsCheck(){let c=document.getElementById("el-fs");
 // The class game player beats the same document during a game (lab/game/play.js).
 let beatAt=0;
 function hereBeat(off){if(!user||!isStudent(user)||AS||!myGroup)return;beatAt=Date.now();
-  setDoc(doc(db,"live",myGroup,"here",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",seen:serverTimestamp(),off:!!off}).catch(e=>console.warn("here",e))}
-function hereTick(){if(fsOnG()&&document.visibilityState==="visible"&&Date.now()-beatAt>=(window.EL_BEAT_MS||60e3))hereBeat(false)}
+  setDoc(doc(db,"live",myGroup,"here",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",seen:serverTimestamp(),off:!!off,fs:fsOk()}).catch(e=>console.warn("here",e))}
+// fs: in full screen, or on a page that needs none (a recall checkpoint, the sample exam, no full screen on the device); sent at once when it changes
+const fsOk=()=>!fsWanted()||fsIs();let fsOkWas=null;
+function hereTick(){if(!fsOnG())return;const k=fsOk();if(k!==fsOkWas&&fsOkWas!==null&&document.visibilityState==="visible"){fsOkWas=k;hereBeat(false);return}fsOkWas=k;
+  if(document.visibilityState==="visible"&&Date.now()-beatAt>=(window.EL_BEAT_MS||60e3))hereBeat(false)}
 document.addEventListener("visibilitychange",()=>{if(!fsOnG())return;if(document.visibilityState==="hidden"){if(!fsBye)hereBeat(true)}else hereBeat(false)});
-FD.addEventListener("fullscreenchange",()=>fsCheck());FD.addEventListener("webkitfullscreenchange",()=>fsCheck());
+FD.addEventListener("fullscreenchange",()=>{fsCheck();hereTick()});FD.addEventListener("webkitfullscreenchange",()=>{fsCheck();hereTick()});
 function goTo(g,first){
   const was=LOCK;LOCK=lockOn(g)?g:null;
   if(was&&!LOCK){lockBar();lockFree();return}

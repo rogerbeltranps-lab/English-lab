@@ -150,14 +150,15 @@ service cloud.firestore {
         && request.resource.data.name is string && request.resource.data.name.size() <= 120
         && request.resource.data.at == request.time && request.resource.data.pull is number && request.resource.data.n is number;
     }
-    // 📴 connected in class (Roger, 6 Nov 2026: "if they disconnect, the teacher's board shows it"): live/{group}/here/{email} = {name, seen, off},
-    // a student's beat once a minute while full screen or a class game is on (el-cloud.js hereBeat, lab/game/play.js); only the teacher reads them
+    // 📴 connected in class (Roger, 6 Nov 2026: "if they disconnect, the teacher's board shows it"): live/{group}/here/{email} = {name, seen, off, fs},
+    // a student's beat once a minute (and when fs changes) while full screen or a class game is on (el-cloud.js hereBeat, lab/game/play.js);
+    // fs: in full screen (or on a page that needs none); only the teacher reads them
     match /live/{group}/here/{email} {
       allow read, delete: if isTeacher();
       allow create, update: if inGroup(group) && email == myEmail()
-        && request.resource.data.keys().hasOnly(['name', 'seen', 'off'])
+        && request.resource.data.keys().hasOnly(['name', 'seen', 'off', 'fs'])
         && request.resource.data.name is string && request.resource.data.name.size() <= 120
-        && request.resource.data.seen == request.time && request.resource.data.off is bool;
+        && request.resource.data.seen == request.time && request.resource.data.off is bool && request.resource.data.get('fs', true) is bool;
     }
     match /buzz/{group} {
       allow read: if isTeacher() || inGroup(group);

@@ -142,7 +142,10 @@ FD.addEventListener("fullscreenchange",()=>fsCheck());FD.addEventListener("webki
 // The board and the dashboard list who stopped beating (elClassWatch in el-catalog.js, host.js).
 let beatAt=0,beatSid=0;
 function beat(off){if(!user||!group||isT())return;beatAt=Date.now();
-  S.setDoc(S.doc(db,"live",group,"here",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",seen:S.serverTimestamp(),off:!!off}).catch(e=>console.warn("here",e))}
+  S.setDoc(S.doc(db,"live",group,"here",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",seen:S.serverTimestamp(),off:!!off,fs:!fsWanted()||fsIs()}).catch(e=>console.warn("here",e))}
+let okWas=null;   // in or out of full screen: sent at once when it changes
 document.addEventListener("visibilitychange",()=>{if(!gameOn()||x.phase==="end")return;if(document.visibilityState==="hidden"){if(!bye)beat(true)}else beat(false)});
-setInterval(()=>{fsCheck();if(!gameOn()||x.phase==="end"||document.visibilityState!=="visible")return;
-  if(x.sid!==beatSid||Date.now()-beatAt>=60e3){beatSid=x.sid;beat(false)}},1000);
+function hereTick(){if(!gameOn()||x.phase==="end"||document.visibilityState!=="visible")return;
+  const ok=!fsWanted()||fsIs(),ch=okWas!==null&&ok!==okWas;okWas=ok;
+  if(ch||x.sid!==beatSid||Date.now()-beatAt>=60e3){beatSid=x.sid;beat(false)}}
+setInterval(()=>{fsCheck();hereTick()},1000);FD.addEventListener("fullscreenchange",hereTick);FD.addEventListener("webkitfullscreenchange",hereTick);
