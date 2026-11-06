@@ -363,7 +363,9 @@ const api={
 const MAIL_URL="https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec";
 const mailTo=list=>[...new Set(list.filter(s=>s&&!s.tester).map(s=>String(s.email||"").trim().toLowerCase()).filter(e=>/^[^@\s,]+@ietramuntana\.cat$/.test(e)))];
 const mailFoot=ca=>"\n\n"+(ca===true?"Entra amb el teu correu de l'institut: ":ca===false?"Sign in with your school email: ":"Sign in with your school email / Entra amb el teu correu de l'institut: ")+new URL("today.html",location.href).href+"\n\nRoger";
-async function mailStudents(emails,subject,body){if(DEMO||!emails.length)return 0;const tok=await ELCloud.auth.currentUser.getIdToken();let n=0;
+async function mailStudents(emails,subject,body){if(DEMO||!emails.length)return 0;
+  // Roger, 6 Nov 2026: "before sending a mail, I want the program to ask me if I want to send it"
+  if(!confirm("✉️ Send this email to "+emails.length+" student"+(emails.length===1?"":"s")+"?\n\n"+subject+"\n\n"+body.slice(0,400)+(body.length>400?"…":"")))return 0;const tok=await ELCloud.auth.currentUser.getIdToken();let n=0;
   for(let i=0;i<emails.length;i+=45){const part=emails.slice(i,i+45);let j=null;
     try{const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:tok,bcc:part,subject,body,name:"Roger Beltran · English Lab"})});j=await r.json()}catch(e){throw new Error("the school mail script did not answer")}
     if(!j||!j.ok)throw new Error(j&&j.error==="not the teacher"?"the school mail script is the old version (update it: tools/notify/school-mail.gs)":(j&&j.error)||"no answer");n+=part.length}
@@ -2204,7 +2206,7 @@ const annVideoText=([,title,f])=>{const all=HOW_VIDEOS.flatMap(g=>g[1]).map(v=>v
 function annDialog(keep){
   const old=keep&&$("#annt")?$("#annt").value:"",inTab=GR.find(g=>g.id===S.g);
   if(keep&&$("#annat"))S.annAt=$("#annat").value;if(keep&&$("#annmail"))S.annMail=$("#annmail").checked;
-  if(!keep){S.annG=new Set(inTab?[inTab.id]:GR.map(g=>g.id));S.annS=false;S.annSel=new Set();S.annAt="";S.annMail=true}
+  if(!keep){S.annG=new Set(inTab?[inTab.id]:GR.map(g=>g.id));S.annS=false;S.annSel=new Set();S.annAt="";S.annMail=false}
   const on=v=>v==="s"?S.annS:!S.annS&&annIds(v).every(id=>S.annG.has(id));
   const opt=(v,l)=>`<button type="button" class="chip ${on(v)?"on":""}" data-do="annto" data-v="${v}">${on(v)&&v!=="s"?"✓ ":""}${esc(l)}</button>`;
   const studs=Object.values(S.P).filter(s=>!s.tester&&s.group&&(!inTab||s.group===inTab.id)).sort(byName);
@@ -2220,7 +2222,7 @@ function annDialog(keep){
     <p class="muted" id="anncount" style="margin:6px 0"></p>
     <p class="muted" style="margin:6px 0 4px" id="annwhen"></p>
     <div class="annprev"><div><small class="muted">Core, Plus and Pro</small><div class="annc" id="annp-en" style="${annCardStyle}"></div></div><div><small class="muted">Starter and Base</small><div class="annc" id="annp-ca" style="${annCardStyle}"></div></div></div>
-    <label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="annmail" style="width:auto;margin-right:6px;vertical-align:middle" ${S.annMail===false?"":"checked"}> ✉️ Also email it to them <small class="muted">(school email, from your school account; a scheduled one goes when the time comes, the next time this dashboard is open)</small></label>
+    <label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="annmail" style="width:auto;margin-right:6px;vertical-align:middle" ${S.annMail?"checked":""}> ✉️ Also email it to them <small class="muted">(school email, from your school account; a scheduled one goes when the time comes, the next time this dashboard is open)</small></label>
     <div class="row" style="justify-content:flex-start"><button data-do="annsend" id="annsend" disabled>📣 Send</button></div>`,true);
   const t=$("#annt"),at=$("#annat");t.value=old;
   const draw=()=>{const sel=[...S.annSel],who=S.annS?sel.filter(u=>S.P[u]):Object.values(S.P).filter(s=>!s.tester&&S.annG.has(s.group)),n=who.length,v=t.value.trim();
@@ -2521,7 +2523,7 @@ function hwOpen(x,text,from,line,pre){const gid=x.gid,next=x.p.rows.flatMap(rr=>
     +`<div id="hw-tabs"></div>`
     +`<label class="field">For the class on <input type="date" id="hw-by" value="${next}"></label>`
     +`<label class="field">📨 Message for students <small class="muted">(ready to copy to Classroom or email; they also see it on their board)</small> <select id="hw-lang"><option value="both">English + Català</option><option value="en">English</option><option value="ca">Català</option></select><br><textarea id="hw-msg" rows="12" style="width:100%;font-size:13px;font-weight:400"></textarea></label>`
-    +`<label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="hw-mail" style="width:auto;margin-right:6px;vertical-align:middle" checked> ✉️ Also email this message to the students of ${esc((GR.find(g=>g.id===gid)||{}).name||gid)} <small class="muted">(school email, from your school account)</small></label>`
+    +`<label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="hw-mail" style="width:auto;margin-right:6px;vertical-align:middle"> ✉️ Also email this message to the students of ${esc((GR.find(g=>g.id===gid)||{}).name||gid)} <small class="muted">(school email, from your school account)</small></label>`
     +`<div class="row"><button data-do="hwsave" data-gid="${gid}" data-ls="${x.ls}" data-set="${from}" data-line="${esc(line||"")}">Set as homework</button> <button class="g" data-do="hwcopy">📋 Copy the message</button> <span id="hw-copied" class="muted"></span></div>`);
   S.hwX={x,dirty:false,textDirty:false,base:text,tabs:{},pre:pre||null};hwTabs();hwFill()}
 // What the homework covers (Roger, 6 Nov 2026: "I can say that a LP is homework or only a section"), saved with it as tabs = {activity id:
