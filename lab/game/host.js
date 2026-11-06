@@ -78,7 +78,10 @@ function live(){
     else if(isQ(s))base.q={text:s.q,img:s.img||"",opts:order(H.i).map(k=>s.options[k])};else base.th={title:s.theory||"",img:s.img||""};
     if(H.phase==="reveal")base.ok=isW(s)?s.write[0]:okAt(H.i);
   }
-  S.setDoc(S.doc(db,"live",H.g),base).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()});
+  // only the game's own fields: a pull-up (go) and the group's full screen (fs) stay as they are (Roger, 6 Nov 2026), so after the game
+  // the students are kept and in full screen again; a field the slide does not use (q, th, ok) is removed
+  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D},base);
+  S.setDoc(S.doc(db,"live",H.g),data,{mergeFields:Object.keys(data)}).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()});
 }
 function liveOff(g){if(g)S.setDoc(S.doc(db,"live",g),{on:false,at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}
 addEventListener("pagehide",()=>{if(H.g&&H.sid&&H.teacher)liveOff(H.g)});   // a reload puts it back on at once (the tab keeps the game)
@@ -99,6 +102,11 @@ async function startGroup(){
     H.players=P;if(H.phase==="lobby"&&Object.keys(P).length>before)G.fx("join");
     draw();autoReveal();
   },e=>{console.warn("answers",e);H.err="⚠ Could not read the answers: "+e.message;draw()});
+  // ⛶ 📴 who left full screen in this game and who is not connected (Roger, 6 Nov 2026): live/{group}/fsLeft (at after the game started)
+  // and live/{group}/here (the players' beats, play.js); pills in the top bar, the names when the teacher taps them
+  whoStop();
+  WHO.stops=[S.onSnapshot(S.collection(db,"live",g,"fsLeft"),c=>{WHO.left=c.docs.map(d=>Object.assign({e:d.id},d.data()));drawTop()},e=>console.warn("fsLeft",e)),
+    S.onSnapshot(S.collection(db,"live",g,"here"),c=>{WHO.here={};c.docs.forEach(d=>WHO.here[d.id]=d.data());drawTop()},e=>console.warn("here",e))];
   clearInterval(liveBeat);liveBeat=setInterval(live,60e3);   // every minute too: the students' devices know the game is still on
   live();draw();
 }
@@ -142,6 +150,19 @@ function autoReveal(){   // like a Kahoot: once everyone who joined has answered
   if(n&&answered(H.i).length>=n)autoT=setTimeout(()=>{if(H.phase==="show"&&answered(H.i).length>=Object.keys(H.players).length)go("reveal")},900);
 }
 
+const WHO={stops:[],left:[],here:{},open:false};
+const whoStop=()=>{WHO.stops.forEach(f=>f());WHO.stops=[];WHO.left=[];WHO.here={};WHO.open=false};
+const ms=t=>t&&t.toMillis?t.toMillis():typeof t==="number"?t:0;
+const hm=t=>{const d=new Date(ms(t));return ms(t)?String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"):""};
+// the whole group, in or out (Roger, 6 Nov 2026: "who is in and who is out"): elClassRoll in el-catalog.js with the group's student list
+function who(){if(!H.sid||H.phase==="end"||H.phase==="pick")return {active:false,inn:[],out:[],n:0};
+  const x={game:true,on:true,phase:"q",sid:H.sid,at:Date.now(),title:H.deck&&H.deck.title},left=WHO.left.filter(y=>ms(y.at)>=H.sid).map(y=>Object.assign({},y,{pull:H.sid}));
+  return elClassRoll(x,left,Object.entries(WHO.here).map(([e,y])=>Object.assign({e},y)),Object.keys(H.names).map(e=>({e,name:H.names[e]})))}
+const why=y=>y.why==="full"?"out of full screen"+(y.left?` · left ${hm(y.left.at)}${y.left.n>1?` (${y.left.n}×)`:""}`:""):y.why==="closed"?`screen closed or another window · since ${hm(y.seen)}`:y.why==="lost"?`lost connection · since ${hm(y.seen)}`:"not in the game";
+// only the top bar is drawn again (the slide underneath keeps its animation)
+function drawTop(){const t=app$.querySelector(".top");if(t&&H.g&&H.sid)t.outerHTML=top()}
+setInterval(drawTop,15e3);   // a beat missed for EL_HERE_MS
+
 /* ---------- moving through the game ---------- */
 function go(to){
   if(to==="reveal"){H.phase="reveal";award(H.i);G.music("");G.fx("reveal");setTimeout(()=>G.fx(H.aw[H.i]&&H.aw[H.i].length?"right":"wrong"),700)}
@@ -166,18 +187,21 @@ function startGame(g){
   H.g=g;H.sid=Date.now();H.i=-1;H.phase="lobby";H.keys={};H.aw={};keep();G.music("lobby");startGroup();
 }
 function endGame(){
-  const g=H.g;saveResults();liveOff(g);if(ansStop)ansStop();ansStop=null;clearInterval(liveBeat);G.music("");
+  const g=H.g;saveResults();liveOff(g);if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
   Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{}});keep();draw();
 }
 
 /* ---------- screens ---------- */
 const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1,s0=cur();
+  const w=who(),gone=w.out.filter(y=>y.why!=="never"),never=w.out.filter(y=>y.why==="never");
+  const box=WHO.open&&w.active?`<div class="whobox pop">${gone.length?`<p>${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("<br>")}</p>`:""}${never.length?`<p class="nv">⚪ Not in the game (${never.length}): ${never.map(y=>esc(y.name)).join(", ")}</p>`:""}<p class="i">✓ In (${w.inn.length}): ${w.inn.map(y=>esc(y.name)).join(", ")||"nobody yet"}</p></div>`:"";
   return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">🎮 ${Object.keys(H.players).length}</span>
+  ${w.active?`<button class="pill who${w.out.length?" warn":""}" data-do="who" title="Who is in full screen and connected, and who is out (tap to show or hide the names)">✓ ${w.inn.length} in · ✗ ${w.out.length} out</button>`:""}${box}
   ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}`:"Theory"}</span>`:""}<span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}
   ${H.phase==="show"&&s0&&!isQ(s0)&&s0.ca?`<button class="btn ghost${caOn()?" on":""}" data-do="ca" title="Catalan help on this slide (C)">CA</button>`:""}
   <button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
-  <button class="btn ghost" data-do="end" title="End the game for everyone">■ End</button></div>`};
+  <button class="btn ghost" data-do="end" title="End the game for everyone">${Date.now()-endArm<3000?"Tap again to end":"■ End"}</button></div>`};
 const tiles=(s,i,reveal)=>{const o=order(i),ok=okAt(i);
   return `<div class="tiles">${o.map((k,n)=>`<div class="tile t${n}${reveal&&n!==ok?" dim":""}"><span class="shp s${n}"></span><span class="tx">${md(s.options[k])}</span>${reveal&&n===ok?'<span class="mark">✓</span>':""}</div>`).join("")}</div>`};
 
@@ -261,6 +285,7 @@ app$.addEventListener("click",async e=>{
   if(d==="ca"){caOn(!caOn());draw()}
   if(d==="reveal")go("reveal");
   if(d==="mute"){G.sound(!G.sound());draw()}
+  if(d==="who"){WHO.open=!WHO.open;drawTop()}
   if(d==="end"){if(Date.now()-endArm<3000)endGame();else{endArm=Date.now();b.textContent="Tap again to end";setTimeout(()=>{if(b.isConnected)b.textContent="■ End"},3000)}}
   if(d==="finish")endGame();
   if(d==="again"){const g=H.g;startGame(g)}

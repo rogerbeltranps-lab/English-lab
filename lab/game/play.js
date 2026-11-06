@@ -103,3 +103,49 @@ A.onAuthStateChanged(auth,async u=>{
   draw();
 });
 let wasOn=false;setInterval(()=>{if(x&&gameOn()!==wasOn)draw();wasOn=gameOn()},30e3);   // the board stopped sending (closed): back to waiting
+
+// ⛶ Full screen in the game (Roger, 6 Nov 2026: "when they are playing a game, I want them to be in full screen too"): while a game is on
+// (lobby to the last question), the player is covered until the student taps it (a browser only goes full screen after a tap), then
+// Esc is locked (Chrome and Chromebooks: Keyboard Lock, only holding Esc down leaves). Leaving full screen brings the cover back and
+// writes live/{group}/fsLeft/{email} = {name, at, pull, n} (pull = the group's full screen fs.at when it is on, else this game's sid),
+// the same list as the dashboard's; the board shows it too. Not for the teacher, not on iPhones (no full screen for pages there).
+// Catalan only for Starter and Base: ?ca=1 (el-cloud.js knows the level), ?ca=0 English, none (another page brought them here) both.
+const FD=document,FE=FD.documentElement,CA=P.get("ca");
+const T=(en,ca)=>CA==="1"?ca:CA==="0"?en:en+" · "+ca;
+const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!(FD.fullscreenElement||FD.webkitFullscreenElement);
+const isT=()=>!!user&&TEACHERS.includes((user.email||"").toLowerCase());
+const fsOnG=f=>!!(f&&f.on&&f.at&&Date.now()<(f.until||f.at+70*60e3));
+const pullKey=()=>fsOnG(x&&x.fs)?x.fs.at:x&&x.sid;
+const ss=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}};
+let fsWas=false,bye=false;addEventListener("beforeunload",()=>{bye=true});addEventListener("pagehide",()=>{bye=true});   // ← Back: not leaving
+const fsWanted=()=>!!(user&&group&&!isT()&&gameOn()&&x.phase!=="end"&&fsCan());
+function fsLeft(){const pk=pullKey();if(!pk)return;const k="el_fs_"+pk+"_n",n=(+ss(k)||0)+1;ss(k,String(n));
+  S.setDoc(S.doc(db,"live",group,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:S.serverTimestamp(),pull:pk,n},{merge:true}).catch(e=>console.warn("full screen",e))}
+function fsGo(){try{const lk=()=>{try{if(navigator.keyboard&&navigator.keyboard.lock)navigator.keyboard.lock(["Escape"]).catch(()=>{})}catch(e){}},
+  r=(FE.requestFullscreen||FE.webkitRequestFullscreen).call(FE);if(r&&r.then)r.then(()=>{lk();fsCheck()},()=>{});else{lk();fsCheck()}}catch(e){}}
+function fsCheck(){let c=document.getElementById("el-fs");
+  if(!fsWanted()){if(c)c.remove();if(fsWas){fsWas=false;try{if(navigator.keyboard&&navigator.keyboard.unlock)navigator.keyboard.unlock()}catch(e){}
+    try{if(fsIs())(FD.exitFullscreen||FD.webkitExitFullscreen).call(FD)}catch(e){}}return}
+  if(fsIs()){if(c)c.remove();fsWas=true;return}
+  const left=fsWas;if(left){fsWas=false;setTimeout(()=>{if(!bye)fsLeft()},500)}
+  const again=left||(+ss("el_fs_"+pullKey()+"_n")||0)>0;
+  if(!c){c=document.createElement("div");c.id="el-fs";c.setAttribute("role","button");
+    c.style.cssText="position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:#3d1d8f;color:#fff;cursor:pointer";
+    c.onclick=fsGo;document.body.append(c)}
+  const h=(again?T("You left full screen. Your teacher can see it.","Has sortit de la pantalla completa. El professor ho veu."):T("The game is in full screen.","El joc és a pantalla completa."))
+    +"|"+(again?T("Tap to go back to the game","Toca per tornar al joc"):T("Tap to join the game","Toca per entrar al joc"));
+  if(c.dataset.h!==h){c.dataset.h=h;const [a,b]=h.split("|");c.innerHTML='<div class="emo pop">'+(again?"⛶":"🎮")+'</div><p class="big" style="max-width:760px"></p><span class="btn go"></span>';
+    c.children[1].textContent=a;c.children[2].textContent=b+" →"}}
+FD.addEventListener("fullscreenchange",()=>fsCheck());FD.addEventListener("webkitfullscreenchange",()=>fsCheck());
+// 📴 Connected (Roger, 6 Nov 2026: "if they disconnect, the teacher's board shows it"): during a game the player beats
+// live/{group}/here/{email} = {name, seen, off} once a minute, and off:true at once when the page is hidden (lid closed, another window).
+// The board and the dashboard list who stopped beating (elClassWatch in el-catalog.js, host.js).
+let beatAt=0,beatSid=0;
+function beat(off){if(!user||!group||isT())return;beatAt=Date.now();
+  S.setDoc(S.doc(db,"live",group,"here",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",seen:S.serverTimestamp(),off:!!off,fs:!fsWanted()||fsIs()}).catch(e=>console.warn("here",e))}
+let okWas=null;   // in or out of full screen: sent at once when it changes
+document.addEventListener("visibilitychange",()=>{if(!gameOn()||x.phase==="end")return;if(document.visibilityState==="hidden"){if(!bye)beat(true)}else beat(false)});
+function hereTick(){if(!gameOn()||x.phase==="end"||document.visibilityState!=="visible")return;
+  const ok=!fsWanted()||fsIs(),ch=okWas!==null&&ok!==okWas;okWas=ok;
+  if(ch||x.sid!==beatSid||Date.now()-beatAt>=60e3){beatSid=x.sid;beat(false)}}
+setInterval(()=>{fsCheck();hereTick()},1000);FD.addEventListener("fullscreenchange",hereTick);FD.addEventListener("webkitfullscreenchange",hereTick);

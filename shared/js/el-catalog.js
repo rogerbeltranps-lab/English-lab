@@ -212,6 +212,35 @@ window.elPullFor=function(infos,gid){let best=null;
     if(!a||(info.status||"hidden")==="hidden"||!elLsForGroup(l,info,gid)||!elLpOpen(a,info,gid))continue;
     if(!best||x.at>best.at)best=Object.assign({ls,act:a},x)}
   return best};
+// ⛶ 📴 Who left full screen and who is not connected in class (Roger, 6 Nov 2026: "when they are playing a game, I want them to be in full
+// screen too; if I pull them they should be in full screen. If they disconnect, the teacher's board shows it"). x = live/{group} (fs, the
+// class game: game, on, phase, sid, at), left = live/{group}/fsLeft docs {name, at, pull, n}, here = live/{group}/here docs {name, seen, off}
+// (every student page beats every EL_BEAT_MS while full screen or a game is on; off:true when the page is hidden: lid closed, other window).
+// A session is the full screen (fs.at) and/or the game (sid). Not connected = beat during this session, then off or no beat for EL_HERE_MS.
+window.EL_BEAT_MS=60e3;window.EL_HERE_MS=150e3;
+const elMs=t=>t&&t.toMillis?t.toMillis():typeof t==="number"?t:0;
+window.elFsOn=f=>!!(f&&f.on&&f.at&&Date.now()<(f.until||f.at+70*60e3));
+window.elGameOn=x=>!!(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-elMs(x.at)<10*60e3);
+window.elClassWatch=function(x,left,here){const fs=x&&x.fs,fo=elFsOn(fs),go=elGameOn(x),now=Date.now(),keys=[];
+  if(fo)keys.push(fs.at);if(x&&x.sid&&(go||fo&&x.sid>=fs.at))keys.push(x.sid);
+  if(!keys.length)return {active:false,fs:false,game:false,left:[],off:[]};
+  const t0=Math.min(...keys)-60e3;   // a minute for the difference between the teacher's clock and the server's
+  return {active:true,fs:fo,game:go,title:go?x.title||"":"",t0,
+    left:(left||[]).filter(y=>keys.includes(y.pull)).sort((p,q)=>elMs(q.at)-elMs(p.at)),
+    off:(here||[]).filter(y=>elMs(y.seen)>=t0&&(y.off||now-elMs(y.seen)>EL_HERE_MS)).sort((p,q)=>elMs(q.seen)-elMs(p.seen))}};
+// The whole group, in or out (Roger, 6 Nov 2026: "I want to see not who's left but who is in and who is out … the students we have"):
+// roster = [{e: email, name}] (the group's student list; anyone else who beat in this session is added). here and left docs carry e (their id).
+// In = connected now and in full screen (here.fs: true also where the page needs none: checkpoints, iPhones). Out, with why:
+// "full" out of full screen (left: when and how many times), "lost" no beat for EL_HERE_MS, "closed" screen closed or another window,
+// "never" not connected in this session (absent, not signed in, or on a page that does not load el-cloud.js).
+window.elClassRoll=function(x,left,here,roster){const w=elClassWatch(x,left,here);w.inn=[];w.out=[];if(!w.active)return w;const now=Date.now();
+  const H={},Lf={},who=new Map();(here||[]).forEach(y=>{if(y.e)H[y.e]=y});w.left.forEach(y=>{if(y.e)Lf[y.e]=y});
+  (roster||[]).forEach(r=>who.set(r.e,r.name||r.e.split("@")[0]));
+  Object.values(H).forEach(y=>{if(!who.has(y.e)&&elMs(y.seen)>=w.t0)who.set(y.e,y.name||y.e.split("@")[0])});
+  for(const [e,name] of who){const h=H[e],l=Lf[e],seen=h&&elMs(h.seen)>=w.t0?elMs(h.seen):0,live=seen&&!h.off&&now-seen<=EL_HERE_MS,o={e,name,left:l||null,seen};
+    if(live&&h.fs!==false)w.inn.push(o);else{o.why=live?"full":seen?(h.off?"closed":"lost"):"never";w.out.push(o)}}
+  const rank={full:0,closed:1,lost:2,never:3},az=(a,b)=>a.name.localeCompare(b.name);
+  w.inn.sort(az);w.out.sort((a,b)=>rank[a.why]-rank[b.why]||az(a,b));w.n=who.size;return w};
 // "LP3 Where traditions come from": the number the time plan gives the learning path (EL_PLAN text "LP3 Where traditions …"), else its short title.
 window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh(a.title),lo=st.toLowerCase(),p=(window.EL_PLAN||{})[a.ls];let n=null;
   if(p)(p.rows||[]).forEach(r=>[].concat(r.g||r.what||[]).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,k,nm)=>{nm=nm.trim().toLowerCase();if(!n&&nm&&(lo.startsWith(nm)||nm.startsWith(lo)))n=k}));
