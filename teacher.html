@@ -2269,6 +2269,10 @@ function agTags(it){const n=agWork([it]),tot=Object.values(n).reduce((a,b)=>a+b,
   return `<span class="agtg" title="${esc("Works: "+ks.map(k=>compName(k)+" "+pc(k)+" %").join(", "))}">${ks.map(k=>`<i style="background:${compCol(k)}">${esc(four[k]||(isTr(k)?k:"CE"+k))}</i>`).join("")}</span>`}
 function agBars(x){const ag=agOf(x),dr=(x.p._dropped||{})[x.gi]||[],ok=it=>!dr.includes(it.split("#")[0]);
   const plan=agWork(Object.values(ag.days).flat().filter(it=>/#/.test(it)&&ok(it))),all=agWork(acts(x.ls).flatMap(agItems));
+  // 5 minutes of shadowing with the LS video every class (Roger, 6 Nov 2026: "they do shadowing every 5 minutes (with the video of the LS
+  // with vocabulary and grammar of the unit) … that means that is speaking"): each class day with a learning path on it adds one step
+  // of CE3 Speaking, to the agenda and to the whole LS alike
+  const shd=Object.values(ag.days).filter(its=>its.some(it=>/#/.test(it)&&ok(it))).length;if(shd){plan["3"]=(plan["3"]||0)+shd;all["3"]=(all["3"]||0)+shd}
   const bar=(ks,title,sub,band)=>{const tot=ks.reduce((a,k)=>a+(plan[k]||0),0);if(!ks.length)return "";
     const pc=k=>tot?Math.round((plan[k]||0)/tot*100):0,kept=k=>all[k]?Math.round((plan[k]||0)/all[k]*100):0,nm=k=>isTr(k)?({CC:"Citizenship",CD:"Digital",CE:"Entrepreneurship",CPSAA:"Learning to learn"})[(k.match(/^[A-Z]+/)||[""])[0]]||k:compName(k).replace(/^CE\d+ · /,"");
     const low=band?ks.filter(k=>pc(k)<20):[];
@@ -2276,7 +2280,7 @@ function agBars(x){const ag=agOf(x),dr=(x.p._dropped||{})[x.gi]||[],ok=it=>!dr.i
       +`<div class="agbs" role="img" aria-label="${esc(ks.map(k=>nm(k)+" "+pc(k)+" %").join(", "))}">${ks.map(k=>pc(k)?`<span style="width:${pc(k)}%;background:${compCol(k)}" title="${esc(compName(k))}: ${pc(k)} % of what is on the agenda · ${kept(k)} % of its work in the whole LS">${pc(k)>=17?esc(nm(k))+" "+pc(k)+" %":pc(k)>=8?esc(({"2":"L","3":"S","4":"R","5":"W"})[k]||"")+" "+pc(k)+" %":pc(k)>=5?pc(k)+" %":""}</span>`:"").join("")}</div>`
       +`<div class="agbl">${ks.map(k=>`<span><i style="background:${compCol(k)}"></i>${esc(isTr(k)?k:"CE"+k)} ${esc(nm(k))} <b>${pc(k)} %</b> <small>· ${kept(k)} % of the LS</small></span>`).join("")}</div></div>`};
   const four=["2","3","4","5"],other=Object.keys(all).filter(k=>!four.includes(k)).sort(compSort);
-  return `<div class="agbars">${bar(four,"Communicative skills","of the tabs on the agenda",true)}${bar(other,"Other competences of the LS","of the tabs on the agenda",false)}</div>`}
+  return `<div class="agbars">${bar(four,"Communicative skills","of the tabs on the agenda"+(shd?` + 5-min shadowing in ${shd} class${shd===1?"":"es"}`:""),true)}${bar(other,"Other competences of the LS","of the tabs on the agenda",false)}</div>`}
 // the group's 📅 Time plan
 function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="muted">No time plan for this group in this LS yet.</p></div>`;
   const t=ELWeek.today(),ws=agWeeks(x,(S.agExt||{})[x.ls+"|"+x.gid]||0),tm=new Date(t+"T12:00").getDay(),cur=ELWeek.add(t,-((tm+6)%7));
