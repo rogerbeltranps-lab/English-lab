@@ -1,6 +1,7 @@
 <!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Les meves activitats · English Lab</title>
+<title>El meu tauler · English Lab</title>
 <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
+<link rel="stylesheet" href="shared/css/el-app.css">
 <style>body{font:15px system-ui,sans-serif;margin:0;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}h1{font-size:1.5rem}h2{font-size:1.15rem}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:12px 0}.muted{color:#64748b}small{font-weight:400}
 button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}button.sub{background:#15803d}a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:4px 10px;font-size:13px;white-space:nowrap;display:inline-block}a.go.off{background:#94a3b8;pointer-events:none}
 .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}
@@ -86,7 +87,7 @@ body[data-place="home"] .page h1{font-size:1.75rem;margin:.2em 0 .1em}body[data-
 table.lpst,table.lpst tbody,table.lpst tr,table.lpst td{display:block;width:auto}table.lpst thead{display:none}table.lpst tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:10px 12px;background:#fff}table.lpst td{border:0!important;padding:3px 0!important;text-align:left!important}table.lpst td:empty{display:none}table.lpst td{background:transparent!important}table.lpst tr.miss{background:#fef2f2;border-color:#fca5a5}}</style>
 <nav class="mtabs nvs-m" aria-label="Menú"></nav><nav class="bnav" id="bnav" aria-label="Menú"></nav>
 <div class="app"><aside class="side"><div class="brand">English with Roger</div><nav class="nvs" aria-label="Menú"></nav></aside>
-<div class="page"><div id="crumb"></div><h1>Les meves activitats</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
+<div class="page"><div id="crumb"></div><h1>El meu tauler</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-sections.js"></script>
@@ -152,8 +153,8 @@ function setLang(){
   const lv=elRouteOf(D.lv,S.ls).level||(Object.values(D.lv).find(x=>x&&x.level)||{}).level;
   EN=all()||(!!lv&&!elCa(lv));
   document.documentElement.lang=EN?"en":"ca";
-  document.title=t("Les meves activitats","My activities")+" · English Lab";
-  $("h1").textContent=t("Les meves activitats","My activities");
+  document.title=t("El meu tauler","My dashboard")+" · English Lab";   // Roger, 6 Nov 2026: "it's not my activities but my dashboard"
+  $("h1").textContent=t("El meu tauler","My dashboard");
 }
 const doneSet=a=>{const p=D.pg[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
 // a step of a section the teacher has not opened yet for the group (elSecLocked; a vocabulary section holds the cards and practice steps)
@@ -177,10 +178,13 @@ const COURSES={"2eso":"2 ESO","4eso":"4 ESO"};
 const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName=l=>esc(l.title.replace(/^\S+ · /,""));
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
-  const html=`<a class="nv on" href="today.html" aria-current="page">${t("Les meves activitats","My activities")}</a>`
-    +cs.map(c=>`<a class="nv" href="${c}/index.html">${t("El meu curs","My course")} · ${COURSES[c]}</a>`+lss.filter(l=>l.course===c).map(l=>`<a class="nv sub" href="${lsHref(l)}">${lsName(l)}</a>`).join("")).join("")
-    +`<a class="nv" href="lab/">English Lab</a><a class="nv" href="lab/practice.html">${t("Practica","Practise")}</a>`
-    +`<a class="nv" href="${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}" target="_blank" rel="noopener">🎬 ${t("Com funciona la web","How the website works")}</a>`;
+  // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css)
+  const b=(cls,h,ic,txt,x)=>`<a class="nv${cls}" href="${h}"${x||""}><span class="ic" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`;
+  const html=b(" on","today.html","🏠",t("El meu tauler","My dashboard"),' aria-current="page"')
+    +cs.map(c=>b("",`${c}/index.html`,"🗂",`${t("El meu curs","My course")} · ${COURSES[c]}`)+lss.filter(l=>l.course===c).map(l=>b(" sub",lsHref(l),"📚",lsName(l))).join("")).join("")
+    +b("","lab/","🧪","English Lab")+b("","lab/practice.html","🎯",t("Practica","Practise"))
+    +b("","#help","❓",t("Ajuda","Help"))
+    +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"');
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
