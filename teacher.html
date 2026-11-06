@@ -2133,10 +2133,29 @@ function agDrop(k,to){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag||!k.from&&!to)
   if(k.ag==="exam"){if(!to||to===ag.exam)return;
     return agSave(x,(g,tk,on)=>{const v=g.exam&&on(g.exam,"exam");if(v){tk[itKey(g.exam,"exam")]=false;tk[itKey(to,"exam")]=v}g.exam=to})}
   if(k.from&&k.from===to)return;
-  if(k.ag==="it")return agMove(x,[k.it],k.from||"",to);
-  const a=byId(k.a);if(!a)return;
-  if(k.ag==="act")return agMove(x,agItems(a),"",to,true);
-  if(k.ag==="day")return agMove(x,((ag.days||{})[k.from]||[]).filter(it=>it.split("#")[0]===a.id),k.from,to)}
+  let its;
+  if(k.ag==="it"){its=[k.it];agMove(x,its,k.from||"",to)}
+  else{const a=byId(k.a);if(!a)return;
+    if(k.ag==="act"){its=agItems(a);agMove(x,its,"",to,true)}
+    else if(k.ag==="day"){its=((ag.days||{})[k.from]||[]).filter(it=>it.split("#")[0]===a.id);agMove(x,its,k.from,to)}else return}
+  agOpenSync(x,its,to)}
+// Dragging opens, taking off closes (Roger, 6 Nov 2026: "when I drag them there they get opened, if I take them out they get closed"):
+// a learning path or tab dropped on a class day opens for the group (the path and those tabs, like 📌 Pull up and 🏠 Homework); dropped
+// back on the list, those tabs lock again, and the learning path too when none of its tabs is left on the agenda. Moving between days
+// changes nothing. Only these two switches, no extra reads.
+function agOpenSync(x,its,to){const info=S.D.ls[x.ls]||{},ag=agOf(x)||{days:{}},gid=x.gid,ps=[];
+  const by={};(its||[]).forEach(it=>{const i=it.indexOf("#");if(i<0)return;(by[it.slice(0,i)]=by[it.slice(0,i)]||[]).push(it.slice(i+1))});
+  let open=acts(x.ls).filter(a=>elLpOpen(a,info,gid)).map(a=>a.id);const was=open.join("|");
+  const onAg=new Set(Object.values(ag.days).flat());
+  Object.entries(by).forEach(([aid,tabs])=>{const a=byId(aid);if(!a)return;const lk=elSecLocked(a,info,gid),ids=tabs.filter(Boolean);
+    if(to){if(!open.includes(aid))open.push(aid);
+      const keep=ids.length?lk.filter(z=>!ids.includes(z)):[];if(keep.length!==lk.length)ps.push(api.secLock(x.ls,gid,aid,keep))}
+    else{const left=agItems(a).filter(it=>onAg.has(it));
+      if(!left.length)open=open.filter(z=>z!==aid);
+      else if(ids.length){const add=ids.filter(z=>!lk.includes(z)&&!left.includes(aid+"#"+z));if(add.length)ps.push(api.secLock(x.ls,gid,aid,[...lk,...add]))}}});
+  if(open.join("|")!==was){ps.unshift(api.lpOpen(x.ls,gid,open));
+    if(!DEMO){const i=S.D.ls[x.ls]=S.D.ls[x.ls]||{status:"hidden",enabled:[]},L=elLpLocks(x.ls,open);i.open=Object.assign({},i.open,{[gid]:open});i.locked=Object.assign({},i.locked,{[gid]:L.locked})}}   // on screen at once
+  if(ps.length)quick(ps)}
 // ---- what the agenda shows
 const hwItems=x=>{const s=new Set(),t=ELWeek.today();Object.values(hwOf(x)||{}).forEach(h=>{if(!h||!h.by||h.by<ELWeek.add(t,-14))return;
   Object.entries((typeof elHwTargets==="function"?elHwTargets({kind:"hw",text:h.text,tabs:h.tabs},x.ls,x.p,x.gi):h.tabs)||{}).forEach(([id,ps])=>{const a=byId(id);if(!a)return;(ps&&ps.length?ps:secOf(a).map(z=>z[0])).forEach(p=>s.add(id+"#"+p));if(!secOf(a).length)s.add(id+"#")})});return s};
@@ -2192,16 +2211,20 @@ function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr
   const rows=acts(x.ls).map(a=>{const its=agItems(a),ds=[...new Set(its.flatMap(it=>where[it]||[]))].sort(),open=elLpOpen(a,info,x.gid),nos=!secOf(a).length,drop=dr.includes(a.id);
     const nd=studs.length&&(secOf(a).length||isCp(a))?studs.filter(s=>isDone(s.uid,a)).length:null,stA=nos?st(a.id+"#",where[a.id+"#"]||[]):"";
     const left=its.filter(it=>st(it,where[it]||[])==="np").length;
-    return `<div class="agla ${drop?"drp":""} ${stA}"><div class="aglh" draggable="true" data-ag="${nos?"it":"act"}" data-a="${esc(a.id)}" data-it="${esc(a.id+"#")}" data-from="" ${D} title="Drag it to a class day">`
+    return {open,h:`<div class="agla ${drop?"drp":""} ${stA}"><div class="aglh" draggable="true" data-ag="${nos?"it":"act"}" data-a="${esc(a.id)}" data-it="${esc(a.id+"#")}" data-from="" ${D} title="Drag it to a class day">`
       +`<span class="agdot">⠿</span><span class="agln"><b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${nos?agTags(a.id+"#"):""}`
       +`<small>${ds.length?ds.map(sm).join(" · "):"not on the agenda"}${!nos&&ds.length&&left?` · ${left} tab${left===1?"":"s"} not planned`:""}${open?"":" · 🔒 locked"}${nd!=null?` · ${nd}/${studs.length} done`:""}</small></span>`
       +(isLpA(a)&&!/-my-real-routine$/.test(x.ls)?`<button type="button" class="agx" data-do="lpdrop" data-a="${esc(a.id)}" data-v="${drop?0:1}" ${D} title="${drop?"Count it again":"Drop it for this group: not counted, not in the exam"}">${drop?"↩":"✂"}</button>`:"")+`</div>`
       +(nos?"":`<div class="agcs">${itemsOf(a).map(([p,nm])=>{const it=a.id+"#"+p,w=where[it]||[],s=st(it,w);
-        return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${s==="np"?"Not on the agenda: drag it to a day":s==="hw"?"Set as homework":"On "+w.map(sm).join(", ")}">${s==="on"?"✓ ":s==="hw"?"🏠 ":""}${esc(nm)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:""}${agTags(it)}</span>`}).join("")}</div>`)+`</div>`}).join("");
+        return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${s==="np"?"Not on the agenda: drag it to a day":s==="hw"?"Set as homework":"On "+w.map(sm).join(", ")}">${s==="on"?"✓ ":s==="hw"?"🏠 ":""}${esc(nm)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:""}${agTags(it)}</span>`}).join("")}</div>`)+`</div>`}});
+  // only the learning paths opened for the group (Roger, 6 Nov 2026: "here I only want the SLPs I opened since they are the only ones done
+  // so far"); the ones not opened yet fold into "Not opened yet", still there to drag to a day
+  const shut=rows.filter(r=>!r.open),k="agshut"+x.ls+x.gid;
+  const rowsH=rows.filter(r=>r.open).map(r=>r.h).join("")+(shut.length?`<details class="agpast agshut" data-k="${esc(k)}" ${S.open.has(k)?"open":""}><summary>🔒 Not opened yet (${shut.length})</summary>${shut.map(r=>r.h).join("")}</details>`:"");
   const ex=ag.exam,n=ex?ELWeek.days(t,ex):null;
-  return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day. Drop it back here to take it off the agenda.</p><p class="agkey">What each tab works: ${[["2","L","Listening"],["3","S","Speaking"],["4","R","Reading"],["5","W","Writing"]].map(([k,l,n])=>`<i style="background:${compCol(k)}">${l}</i> ${n}`).join(" ")} · other competences by their code</p>`
+  return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day: it opens for the group. Drop it back here to take it off the agenda: it locks again.</p><p class="agkey">What each tab works: ${[["2","L","Listening"],["3","S","Speaking"],["4","R","Reading"],["5","W","Writing"]].map(([k,l,n])=>`<i style="background:${compCol(k)}">${l}</i> ${n}`).join(" ")} · other competences by their code</p>`
     +`<div class="agla exam"><div class="aglh" draggable="${ex?"true":"false"}" data-ag="exam" data-from="${ex||""}" ${D} title="Drag it to another day"><span class="agdot">⠿</span><span class="agln"><b>📝 Exam</b><small>${ex?esc(ELWeek.date(ex))+(n>1?` · in ${n} days`:n===1?" · tomorrow":n===0?" · today":" · done"):"no day yet"}</small></span></div></div>`
-    +rows+`</aside>`}
+    +rowsH+`</aside>`}
 // Competences of what is on the agenda (Roger, 6 Nov 2026: "sometimes there will be sections that won't be done. So on the top I want 4
 // colors in a bar, one for each communicative skill … so if a teacher runs out of time, they can make sure we work those competences
 // equally, and another bar below with the other competences of the LS"). The steps of every tab on the agenda (done or still to do; not
