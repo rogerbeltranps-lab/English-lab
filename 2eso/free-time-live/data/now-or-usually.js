@@ -19,7 +19,7 @@ window.LP = {
         { r: 'daring', q: 'Correct: “She’s studing.” → She’s ___.', a: ['studying'] }
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Ara o normalment: expressions de temps', en: 'Now or usually: time expressions' },
-      intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
+      intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       receptive: 'livestream · subscribers · highlights',
       core: { beginners: ['now', 'right now', 'today', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never'], insecure: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer'], safe: ['now', 'right now', 'at the moment', 'today', 'this weekend', 'Look! / Listen!', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'go to a concert', 'watch a match', 'temperature'], daring: ['now', 'right now', 'at the moment', 'this weekend', 'usually', 'on Saturday mornings', 'every weekend', 'always / never', 'in winter / in summer', 'practise', 'train', 'watch a match', 'temperature', 'know', 'need', 'want', 'prefer', 'believe', 'understand', 'mean'] },
       groups: [
@@ -48,7 +48,7 @@ window.LP = {
         { r: 'daring', q: 'What does “highlights” ___? (voler dir)', a: ['mean'] },
         { r: 'daring', q: 'I ___ new gloves: mine are broken. (necessitar)', a: ['need'] }
       ] },
-    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Mei’s Saturday vlog', pill: { ca: 'Vídeo · 80 %', en: 'Video · 80 %' },
+    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Mei’s Saturday vlog', pill: { ca: 'Vídeo', en: 'Video' },
       intro: { ca: 'Mira el vlog de la Mei una vegada per saber on és. Després llegeix les preguntes i torna’l a mirar. A la ruta Insecure pots triar la versió més lenta.', en: 'Watch Mei’s vlog once to find out where she is. Then read the questions and watch again.' },
       media: { videos: [{ base: 'video/mei-ice-rink', title: 'Video 1 · Mei: Saturday at the ice rink' }], videoCredit: 'Illustrated video made for English Lab. Voice generated with ElevenLabs.' },
       chunks: ['I\'m wearing a woolly hat', 'I usually come here', 'I\'m training for the Christmas show'],
@@ -95,7 +95,7 @@ window.LP = {
         ['Mei', 'I\'m wearing a woolly hat, gloves and a big red jacket.'],
         ['Mei', 'Look! My brother Kai is skating behind me, and he\'s falling… again!'],
         ['Mei', 'I usually come here on Sunday afternoons with my family, just for fun.']] } },
-    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple o Present Continuous?', en: 'Present Simple or Present Continuous?' }, pill: '80 %',
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple o Present Continuous?', en: 'Present Simple or Present Continuous?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>Present Simple</strong> = hàbits i coses que passen sempre: <em>I usually play on Saturdays. She goes skating every Sunday.</em> Marcadors: <em>usually, always, never, every day, on Saturdays, in winter</em>.<br><strong>Present Continuous</strong> = ara: <em>Today I’m playing inside. Look! She’s skating.</em> Marcadors: <em>now, right now, at the moment, today, this weekend, Look!, Listen!</em>', en: '<strong>Present Simple</strong> = habits and things that are always true: <em>I usually play on Saturdays. She goes skating every Sunday.</em> Markers: <em>usually, always, never, every day, on Saturdays, in winter</em>.<br><strong>Present Continuous</strong> = now: <em>Today I’m playing inside. Look! She’s skating.</em> Markers: <em>now, right now, at the moment, today, this weekend, Look!, Listen!</em>' },
@@ -128,7 +128,7 @@ window.LP = {
         { r: 'daring', q: 'Be quiet, please! I ___ (think) about my next video.', a: ['am thinking', "'m thinking"], en: 'An activity now: I’m thinking about…' },
         { r: 'daring', q: 'Correct the mistake: “Leo is knowing all the routes in the park.” → Leo ___ all the routes.', a: ['knows'], en: 'know is a state verb.' }
       ] },
-    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Barreja de formes de les LS1 i LS2: decideix primer quina necessites.', en: 'Mixed forms from LS1 and LS2: decide which one you need first.' },
       items: [
         { q: 'She ___ (have) got a new bike.', a: ['has'] },

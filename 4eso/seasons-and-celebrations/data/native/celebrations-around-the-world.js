@@ -15,7 +15,7 @@ window.LP.native = {
     ] },
 
   vocab: { type: 'vocab', tab: 'Vocabulary', title: 'C2 vocabulary: ritual, festivity and meaning',
-    intro: 'Explore the words (hover for a definition and an example), go through the cards and complete the sentences (80 %). These are the words that make a C2 answer sound precise rather than general.',
+    intro: 'Explore the words (hover for a definition and an example), go through the cards and complete the sentences. These are the words that make a C2 answer sound precise rather than general.',
     receptive: 'liturgical · solstice · equinox · effigy · votive · carnivalesque',
     groups: [
       { g: 'Ritual and observance', items: [
@@ -58,7 +58,7 @@ window.LP.native = {
       { q: 'We rang ___ the New Year with fireworks.', a: ['in'] }
     ] },
 
-  read: { type: 'mc', tab: 'Reading', title: 'Reading: Why we light up the darkest days', pill: '80 % to complete',
+  read: { type: 'mc', tab: 'Reading', title: 'Reading: Why we light up the darkest days', pill: 'Answer all',
     intro: 'A C2 Proficiency-style text (Reading and Use of English, Part 5). Read it all once for the writer’s argument, then answer. The questions test attitude, implication and reference, not facts you can simply find.',
     media: { text: '<p><strong>Why we light up the darkest days</strong></p>' +
       '<p>It is tempting to treat the festivals of light that cluster around the turn of the year as a happy coincidence: Diwali in the autumn, Hanukkah and Christmas in December, Lunar New Year as winter loosens its grip. Yet coincidence is a lazy explanation for something so persistent. Wherever the nights grow long, people seem compelled to answer the dark with flame, and to do so together.</p>' +
@@ -90,7 +90,7 @@ window.LP.native = {
 
   // Pro listening (fixed 2 Nov 2026, problem report: the old version asked open questions "compared with the reading text", which the
   // student could not find in this tab, and sent free text to the teacher). Now marked automatically, about the video only.
-  listen: { type: 'mc', tab: 'Listening', title: 'Listening: listen like an examiner', pill: 'Real video · BBC · 80 %',
+  listen: { type: 'mc', tab: 'Listening', title: 'Listening: listen like an examiner', pill: 'Real video · BBC',
     intro: 'A short BBC video made for children. Understanding it will be easy, so listen like a C2 Proficiency examiner: the facts, but also who the video is for, what it is trying to do and how it says things. Watch it once, read the questions, then watch it again.',
     media: { youtube: 'kjIPGD_WcEY', title: 'Happy Diwali', credit: 'Video: “Happy Diwali”, BBC / British Council LearnEnglish Kids.' },
     items: [
@@ -104,7 +104,7 @@ window.LP.native = {
       { q: 'Which of these would an adult documentary about Diwali most likely add that this video leaves out?', o: ['the different stories and meanings the festival has for each religion and region', 'the fact that people light lamps', 'the name of the festival', 'that Diwali is a happy time'], ex: 'A children’s video keeps one simple meaning; an adult documentary would explore how the meaning varies.' }
     ] },
 
-  grammar: { type: 'typed', tab: 'Grammar', title: 'Grammar for emphasis: inversion and cleft sentences', pill: '80 %',
+  grammar: { type: 'typed', tab: 'Grammar', title: 'Grammar for emphasis: inversion and cleft sentences', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Key word transformations (Reading and Use of English, Part 4): complete the second sentence so it means the same as the first, using 3–8 words including the word in CAPITALS. Small changes in spelling are not accepted, so be precise.',
     explain: [
       '<strong>Negative inversion</strong> for emphasis: <em>Never have I seen… · Not only does it…, but… · Only when… did… · No sooner had… than… · At no time did… · Little did they know…</em>',
@@ -124,7 +124,7 @@ window.LP.native = {
       { q: 'The organisers did not apologise at any point. TIME → At ___ apologise.', a: ['no time did the organisers', 'no time did they'], en: 'At no time + did + subject + verb.' }
     ] },
 
-  mixed: { type: 'typed', tab: 'Open cloze', title: 'Open cloze: The paradox of the festive season', pill: '80 %',
+  mixed: { type: 'typed', tab: 'Open cloze', title: 'Open cloze: The paradox of the festive season', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Reading and Use of English, Part 2: one word in each gap, mostly grammar words (prepositions, linkers, pronouns, parts of fixed phrases). Read the whole paragraph first.',
     explain: [
       '<div class="reading" style="font-weight:400">For a season supposedly devoted (1) ___ joy, December can be strangely exhausting. (2) ___ the endless lists, the crowded shops and the obligatory gatherings, many people reach January feeling (3) ___ though they need a holiday from their holidays. Psychologists point out that it is not the celebrations (4) ___ that wear us down, (5) ___ rather the pressure to enjoy them. (6) ___ more we expect to feel, the more we notice what we are not feeling. Perhaps the answer lies (7) ___ lowering our expectations, (8) ___ is easier said than done.</div>',
