@@ -206,6 +206,8 @@ async function loadLight(){const L={ls:{},tk:{},pb:[],sg:[],ann:[],ck:{},replies
   await Promise.all([lsI.then(a=>EL_LS.forEach((l,i)=>L.ls[l.id]=a[i])),   // in the catalogue's order, as before
     soft("teacherPlan",ALL("teacherPlan"),q=>{q.forEach(t=>L.tk[t.id]=t.data());L.tkOk=true}),   // tkOk: the ticks really came in (doneSync)
     soft("settings",F.getDoc(F.doc(db(),"settings","routes")),c=>{if(c.exists())L.cuts=c.data()}),
+    // accounts hidden from "Not on the list" (Roger, 6 Nov 2026: "I don't know who these people are"): settings/accounts.hidden[uid] = {at}
+    soft("accounts",F.getDoc(F.doc(db(),"settings","accounts")),c=>{L.acc=c.exists()?c.data():{}}),
     // ✏️ Corrections: a correction asked from the dashboard and the last marking run (settings/marking: request, run)
     soft("marking",F.getDoc(F.doc(db(),"settings","marking")),c=>{if(c.exists())L.mk=c.data()}),
     // sg = suggestions from students (suggestions/{id}: uid, email, name, group, page, text, created, read), sent with "💡 Idea" in the bottom bar
@@ -243,8 +245,9 @@ async function loadGroup(gid){const q=(n)=>F.getDocs(F.query(F.collection(db(),n
 // D for the screen: the light part + the heavy copy (progress copied, as cpInject writes the checkpoint tries into it)
 function build(L){const R=RAW,pg={};Object.entries(R.pg).forEach(([u,x])=>{pg[u]={};Object.entries(x).forEach(([ls,v])=>pg[u][ls]=Object.assign({},v))});
   const D=Object.assign({},L,{st:R.st,rs:R.rs,lv:R.lv,pg,cp:R.cp,ro:R.ro,pt:R.pt,tm:R.tm,roErr:R.roErr,ptErr:R.ptErr});cpInject(D);corrInject(D);
-  // students who only have results/progress (no profile yet) still appear, without a group
-  Object.keys(Object.assign({},D.rs,D.pg,D.lv,D.cp)).forEach(u=>D.st[u]=D.st[u]||{uid:u,name:"",email:u});
+  // students who only have results/progress (no profile yet) still appear, without a group. stub: no students/{uid} doc, so no name or email
+  // (e.g. marks imported for an account that never signed in); "Not on the list" says what work it holds and links it to a list entry.
+  Object.keys(Object.assign({},D.rs,D.pg,D.lv,D.cp)).forEach(u=>D.st[u]=D.st[u]||{uid:u,name:"",email:"",stub:true});
   return D}
 // mode: undefined = open (the copy if there is one), "all", or a group id
 async function load(mode){
@@ -278,6 +281,12 @@ const api={
     const ps=[put(["roster",id],o)];if(old&&old!==id)ps.push(F.deleteDoc(F.doc(db(),"roster",old)));if(uid)ps.push(put(["students",uid],{group:o.group}));
     if(po)ps.push(put(["points",id],Object.assign({},po)),F.deleteDoc(F.doc(db(),"points",old)));return Promise.all(ps)},
   delRo:id=>DEMO?delete S.D.ro[id]:F.deleteDoc(F.doc(db(),"roster",id)),
+  // an unknown account (work, no profile) joined to a list entry: its students/{uid} doc gets that email, name and group, exactly what the
+  // student's first sign-in writes (el-cloud.js), so the dashboard shows its work under that student from now on
+  accLink:(u,rid)=>{const ro=S.D.ro[rid],o={email:ro.email||rid,name:[ro.first,ro.surname1,ro.surname2].filter(Boolean).join(" "),group:ro.group,linked:true};
+    if(DEMO){S.D.st[u]=Object.assign({uid:u},o);return}return put(["students",u],o)},
+  accHide:(u,on)=>{const a=S.D.acc=S.D.acc||{},h=a.hidden=Object.assign({},a.hidden);if(on)h[u]={at:new Date().toISOString()};else delete h[u];
+    if(DEMO)return;return put(["settings","accounts"],{hidden:{[u]:on?{at:new Date().toISOString()}:F.deleteField()}})},
   importRoster:async out=>{Object.entries(out).forEach(([id,o])=>{const r=(S.D.ro[id]||{}).route;if(r&&!o.route)o.route=r});   // keeps a route set for the first sign-in (listRoute)
     const gone=Object.keys(S.D.ro).filter(id=>!out[id]);if(DEMO){S.D.ro=out;return}   // replaces the whole list
     const ops=[...Object.entries(out).map(([id,o])=>b=>b.set(F.doc(db(),"roster",id),sub(Object.assign({},o)))),...gone.map(id=>b=>b.delete(F.doc(db(),"roster",id)))];
@@ -484,7 +493,7 @@ function quick(ps){Promise.all([].concat(ps)).catch(e=>{console.warn(e);alert("C
 // The tester is not on the student list, so its Google name ("Roger Beltran Porres") would not follow "Surname1 Surname2, First"
 const TESTER_NAME={surname1:"Beltran",surname2:"Porres",first:"Roger"};
 const nameOf=s=>s.ro&&s.ro.surname1?s.ro:s.tester?TESTER_NAME:null;
-const fullName=s=>{const n=nameOf(s);return n?[n.surname1,n.surname2].filter(Boolean).join(" ")+", "+n.first:s.name||s.email||s.uid};
+const fullName=s=>{const n=nameOf(s);return n?[n.surname1,n.surname2].filter(Boolean).join(" ")+", "+n.first:s.name||s.email||(s.stub?"Unknown account":s.uid)};
 const name=s=>esc(fullName(s));
 const norm=x=>String(x??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
 const listed=()=>Object.keys(S.D.ro).length>0,isTester=s=>!DEMO&&ELCloud.isTester(s);
@@ -493,7 +502,8 @@ const listed=()=>Object.keys(S.D.ro).length>0,isTester=s=>!DEMO&&ELCloud.isTeste
 function people(){
   const D=S.D,P={},seen=new Set();
   Object.values(D.st).forEach(s=>{const e=(s.email||"").toLowerCase(),ro=D.ro[e];if(ro)seen.add(e);
-    P[s.uid]=Object.assign({},s,{ro,rid:ro?e:null,tester:isTester(s),group:ro?ro.group:listed()&&!isTester(s)?null:s.group})});
+    const me=!DEMO&&s.uid===((window.ELCloud&&ELCloud.user||{}).uid);   // the teacher's own account (a page tried in teacher mode can save work for it): never a student
+    P[s.uid]=Object.assign({},s,{ro,rid:ro?e:null,tester:me||isTester(s),teacher:me,group:ro?ro.group:listed()&&!isTester(s)?null:s.group})});
   Object.entries(D.ro).forEach(([id,ro])=>{if(!seen.has(id))P["ro:"+id]={uid:"ro:"+id,rid:id,email:ro.email||"",ro,group:ro.group,away:true}});
   return P;
 }
@@ -952,7 +962,7 @@ function homePage(){const t=ELWeek.today(),np=S.D.pb.filter(x=>!x.fixed).length,
     +`<div class="tiles">${gt}${corrTile()}${tTile("week","📅","Time plan","every group's week and exam day",sat?sat+" not ticked":"",true)}${tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw||"",!!np)}</div></div>`}
 function render0(){
   const D=S.D;S.P=people();
-  const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
+  const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g&&!(g==="none"&&((S.D.acc||{}).hidden||{})[s.uid])),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
   const nv=(g,lab,cls,tip,extra)=>`<button class="nv ${cls||""} ${S.g===g?"on":""}" data-do="tab" data-g="${g}" ${tip?`title="${tip}"`:""}>${lab}${extra||""}</button>`;
   $("#tabs").hidden=false;$("#shell").classList.add("on");
   $("#tabs").innerHTML=`<div class="brand">Teacher dashboard</div>`
@@ -2169,11 +2179,26 @@ function handIns(u,a){
 }
 const groupSel=(u,g)=>`<select data-do="group" data-u="${u}"><option value="">– choose –</option>${GR.map(x=>`<option value="${x.id}" ${x.id===g?"selected":""}>${x.name}</option>`).join("")}</select>`;
 function noGroup(studs){
-  if(listed())return `<div class="box"><h2>Signed in, not on the student list</h2><p class="muted">They signed in before the list was imported and can no longer sign in. Add them to the list if they are your students; their work is kept.</p>`
-    +(studs.length?`<table><tbody>${studs.map(s=>`<tr><td class="stu">${name(s)}<br><small class="muted">${esc(s.email)}</small></td><td><button data-do="stu" data-u="${s.uid}">Add to the list</button></td></tr>`).join("")}</tbody></table>`:'<p class="muted">Nobody.</p>')+"</div>";
+  if(listed()){const hid=(S.D.acc||{}).hidden||{},shown=studs.filter(s=>!hid[s.uid]),gone=studs.filter(s=>hid[s.uid]);
+    // list entries nobody has signed in with yet: an unknown account can be one of them (its marks were saved before the first sign-in)
+    const free=Object.values(S.P).filter(s=>s.away&&s.ro).sort((a,b)=>(a.group||"").localeCompare(b.group||"")||byName(a,b));
+    const row=s=>`<tr><td class="stu" style="white-space:normal;min-width:220px">${s.stub?"❔ ":""}${name(s)}<br><small class="muted">${s.email?esc(s.email):"no name or email: it never opened the site with this account"}</small><br><small class="muted" style="font-family:monospace;font-size:11px">${esc(s.uid)}</small></td>`
+      +`<td style="white-space:normal;max-width:380px"><small>${workOf(s.uid)}</small></td><td style="white-space:normal">`
+      +(hid[s.uid]?`<button class="g" data-do="accshow" data-u="${esc(s.uid)}">Show again</button>`
+        :(s.email?`<button data-do="stu" data-u="${esc(s.uid)}">Add to the list</button> `
+          :`<select id="lnk-${esc(s.uid)}" style="max-width:220px"><option value="">This is… (not signed in yet)</option>${free.map(f=>`<option value="${esc(f.rid)}">${esc(GR.find(g=>g.id===f.group)?.name||"")} · ${name(f)}</option>`).join("")}</select> <button data-do="acclink" data-u="${esc(s.uid)}" title="Joins this account and its work to that student on the list">Link</button> `)
+        +`<button class="g" data-do="acchide" data-u="${esc(s.uid)}" title="Takes it off this page (nothing is deleted)">Hide</button>`)+`</td></tr>`;
+    return `<div class="box"><h2>Signed in, not on the student list</h2><p class="muted">Accounts with work saved that match nobody on your student list. <b>❔ Unknown account</b>: work was saved for an account that has never opened the site (for example a mark you imported), so the page has no name for it. Pick who it is and press <b>Link</b>: the work goes to that student. <b>Hide</b> takes an account off this page; nothing is deleted.</p>`
+      +(shown.length?`<table><tbody>${shown.map(row).join("")}</tbody></table>`:'<p class="muted">Nobody.</p>')
+      +(gone.length?fold("acchid",`Hidden <small class="muted">${gone.length}</small>`,`<table><tbody>${gone.map(row).join("")}</tbody></table>`):"")+"</div>"}
   return `<div class="box"><h2>Students without a group</h2><p class="muted">They signed in before choosing a group. Assign one and they move to that group's tab.</p>`
     +(studs.length?`<table><tbody>${studs.map(s=>`<tr><td class="stu">${name(s)}<br><small class="muted">${esc(s.email)}</small></td><td>${groupSel(s.uid,"")}</td></tr>`).join("")}</tbody></table>`:'<p class="muted">Everyone has a group.</p>')+"</div>";
 }
+// what an account holds: marks (activity · score), learning-path progress (per LS), checkpoints, routes
+function workOf(u){const D=S.D,rs=Object.values(D.rs[u]||{}),pg=Object.keys(D.pg[u]||{}),cp=Object.keys(D.cp[u]||{}),lv=Object.keys(D.lv[u]||{}),lsT=id=>(EL_LS.find(l=>l.id===id)||{}).title||id;
+  const L=[...rs.map(r=>`📊 ${r.ls?esc(lsT(r.ls))+" · ":""}${esc(actTitle(r.activity))}${r.score!=null?` · ${r.score}${r.max?"/"+r.max:""}`:""}${/no presentat/i.test(r.feedback||"")?" (not handed in)":""}`),
+    ...pg.map(ls=>`📈 progress in ${esc(lsT(ls))}`),...(cp.length?[`🔒 ${cp.length} checkpoint${cp.length>1?"s":""} started`]:[]),...(lv.length?[`🧭 route set in ${lv.length} LS`]:[])];
+  return L.length?L.join("<br>"):'<span class="muted">no work saved</span>'}
 // Problem reports from students (all groups): open ones first, then newest first. Fixed ones stay until you delete them.
 const PB_KIND={media:"🔊 An audio or a video does not play",stuck:"⛔ Cannot go on / a button does not work",marking:"❌ A correct answer is marked wrong",display:"🖥️ The page looks wrong or does not load",other:"❓ Something else"};
 const pbWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.created)):null;
@@ -2723,6 +2748,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     cpdlg:()=>cpDlg(u,a),
     cprel:()=>act(api.cpRelease(a,Object.values(S.P).filter(s=>s.group===S.g||s.tester))),
     cpacc:()=>{Promise.resolve(api.cpAccept(a,k.i,k.v)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});cpInject(S.D);render();cpDlg(u,a)},
+    acclink:()=>{const sel=$("#lnk-"+CSS.escape(k.u)),rid=sel&&sel.value;if(!rid)return alert("First choose who it is.");const ro=S.D.ro[rid];
+      if(!confirm(`Link this account and its work to ${[ro.first,ro.surname1].join(" ")} (${ro.group})?`))return;act(api.accLink(k.u,rid))},
+    acchide:()=>quick(api.accHide(k.u,true)),accshow:()=>quick(api.accHide(k.u,false)),
     cpredo:()=>{if(!confirm("Let this student do the checkpoint again? Their answers are discarded."))return;$("#dlg").close();act(api.cpRedo(u,a))}
   })[k.do]?.()});
 $("#dlg").addEventListener("close",()=>redraw=null);
