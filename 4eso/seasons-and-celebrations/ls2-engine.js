@@ -550,10 +550,13 @@ var LS2 = (function () {
     if (!p.chunks || !p.chunks.length) return;
     const say = (t, rate) => { if (playRec(t, rate)) return; if (recAudio) { recAudio.pause(); recAudio = null; } const s = window.speechSynthesis; if (!s) return; s.cancel(); const u = new SpeechSynthesisUtterance(t), v = s.getVoices().find(x => /^en(-|_)GB/i.test(x.lang)) || s.getVoices().find(x => /^en(-|_)/i.test(x.lang)); u.lang = 'en-GB'; if (v) u.voice = v; u.rate = rate; s.speak(u); };
     state.dict = state.dict || {}; const kept = state.dict[p.id] || [];
+    // typed but not checked yet stays too (state.dictT[panel]; Roger, 6 Nov 2026: "they must see them with their responses")
+    state.dictT = state.dictT || {}; const typedD = kept.some(v => v) ? [] : state.dictT[p.id] || [];
     p.chunks.forEach((c, i) => {
       $('[data-say="' + p.id + i + '"]').onclick = () => say(c, 0.9);
       $('[data-say-slow="' + p.id + i + '"]').onclick = () => say(c, 0.6);
-      $('#' + p.id + 'D' + i).value = kept[i] || '';
+      const box = $('#' + p.id + 'D' + i); box.value = kept[i] || typedD[i] || '';
+      box.oninput = () => { state.dictT[p.id] = p.chunks.map((x, j) => $('#' + p.id + 'D' + j).value); save(); };
     });
     // Checked answers come back with their feedback (Roger, 2 Nov 2026: students always see a path they did with its corrections).
     const show = () => p.chunks.map((c, i) => {
@@ -562,9 +565,9 @@ var LS2 = (function () {
         f.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!') : (ca() ? 'Era: ' : 'It was: ') + '<strong>' + esc(c) + '</strong>' + (ca() ? '. Compara-ho paraula per paraula.' : '. Compare it word by word.');
         return v;
       });
-    $('#' + p.id + 'DCheck').onclick = () => { state.dict[p.id] = show(); save(); };
+    $('#' + p.id + 'DCheck').onclick = () => { state.dict[p.id] = show(); delete state.dictT[p.id]; save(); };
     $('#' + p.id + 'DAgain').onclick = () => {   // only the dictation: the questions and the prediction above stay
-      delete state.dict[p.id]; save();
+      delete state.dict[p.id]; delete state.dictT[p.id]; save();
       p.chunks.forEach((c, i) => { $('#' + p.id + 'D' + i).value = ''; const f = $('#' + p.id + 'Df' + i); f.textContent = ''; f.className = 'feedback'; });
     };
     if (kept.some(v => v)) show();

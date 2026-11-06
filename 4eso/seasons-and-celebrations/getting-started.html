@@ -422,12 +422,16 @@ function renderDict(){
     +chunks.map((c,i)=>'<div class="question"><div class="actions"><button class="btn secondary" type="button" data-say="'+i+'">▶ '+(ca()?'Escolta':'Listen')+' '+(i+1)+'</button><button class="btn secondary" type="button" data-slow="'+i+'">🐢 '+(ca()?'Més a poc a poc':'Slower')+'</button></div><input type="text" class="typed" id="gsD'+i+'" autocomplete="off" autocapitalize="off" spellcheck="false" style="width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit"><div class="feedback" id="gsDf'+i+'"></div></div>').join("")
     +'<div class="actions"><button class="btn" type="button" id="gsDCheck">'+(ca()?'Comprova':'Check')+'</button> <button class="btn secondary" type="button" id="gsDAgain">↺ '+(ca()?'Torna a fer aquesta activitat':'Redo this activity')+'</button></div>';
   const say=(t,rate)=>{const s=window.speechSynthesis;if(!s)return;s.cancel();const u=new SpeechSynthesisUtterance(t),v=s.getVoices().find(x=>/^en(-|_)GB/i.test(x.lang))||s.getVoices().find(x=>/^en(-|_)/i.test(x.lang));u.lang="en-GB";if(v)u.voice=v;u.rate=rate;s.speak(u)};
-  state.dict=state.dict||{};const kept=state.dict.listen||[];
-  chunks.forEach((c,i)=>{$('[data-say="'+i+'"]').onclick=()=>say(c,.9);$('[data-slow="'+i+'"]').onclick=()=>say(c,.6);$("#gsD"+i).value=kept[i]||""});
-  $("#gsDCheck").onclick=()=>{state.dict.listen=chunks.map((c,i)=>{const v=$("#gsD"+i).value,ok=norm(v)===norm(c),f=$("#gsDf"+i);f.className="feedback "+(ok?"ok":"no");
-    f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(ca()?"Era: ":"It was: ")+"<strong>"+c+"</strong>"+(ca()?". Compara-ho paraula per paraula.":". Compare it word by word.");return v});save()};
+  // checked answers come back with their feedback; typed but not checked yet stays too (state.dictT.listen; Roger, 6 Nov 2026)
+  state.dict=state.dict||{};state.dictT=state.dictT||{};const kept=state.dict.listen||[],typedD=kept.some(v=>v)?[]:state.dictT.listen||[];
+  chunks.forEach((c,i)=>{$('[data-say="'+i+'"]').onclick=()=>say(c,.9);$('[data-slow="'+i+'"]').onclick=()=>say(c,.6);$("#gsD"+i).value=kept[i]||typedD[i]||"";
+    $("#gsD"+i).oninput=()=>{state.dictT.listen=chunks.map((x,j)=>$("#gsD"+j).value);save()}});
+  const show=()=>chunks.map((c,i)=>{const v=$("#gsD"+i).value,ok=norm(v)===norm(c),f=$("#gsDf"+i);f.className="feedback "+(ok?"ok":"no");
+    f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(ca()?"Era: ":"It was: ")+"<strong>"+c+"</strong>"+(ca()?". Compara-ho paraula per paraula.":". Compare it word by word.");return v});
+  $("#gsDCheck").onclick=()=>{state.dict.listen=show();delete state.dictT.listen;save()};
   // only the dictation (Roger, 4 Nov 2026: redo one activity, keep the others' answers)
-  $("#gsDAgain").onclick=()=>{delete state.dict.listen;save();chunks.forEach((c,i)=>{$("#gsD"+i).value="";const f=$("#gsDf"+i);f.textContent="";f.className="feedback"})};
+  $("#gsDAgain").onclick=()=>{delete state.dict.listen;delete state.dictT.listen;save();chunks.forEach((c,i)=>{$("#gsD"+i).value="";const f=$("#gsDf"+i);f.textContent="";f.className="feedback"})};
+  if(kept.some(v=>v))show();
 }
 // Listening cycle (research audit, Roger 27 Oct 2026): a copy of ls2-engine.js predictHtml/gistHtml/bindCycle; saved in state.cycle.listen.
 function renderCycle(){
@@ -486,7 +490,7 @@ function startSpeechTranscription(){
           const t=e.results[i][0].transcript;
           if(e.results[i].isFinal)speechFinalText+=t.trim()+' ';else interim+=t;
         }
-        $('#speechTranscript').value=(speechFinalText+interim).trim();
+        $('#speechTranscript').value=(speechFinalText+interim).trim();keepSpeak();
       };
       recognition.onend=()=>{if(speechTranscribingActive)speechRestartTimer=setTimeout(launch,180)};
       recognition.start();
@@ -552,6 +556,12 @@ $('#handInSpeaking').onclick=()=>{
   complete('speak');$('#speakResult').classList.add('show');speakHanded();
 };
 speakHanded();
+// the plan and the transcript stay (state.speak.gs, as state.speak in ls2-engine.js; Roger, 6 Nov 2026: "they must see them with their
+// responses"); a recording itself is never saved. A transcript handed in before this came back from the hand-in.
+function keepSpeak(){state.speak=state.speak||{};state.speak.gs={plan:$('#speakPlan').value,tr:$('#speechTranscript').value};save()}
+(()=>{const g=(state.speak||{}).gs||{},h=(state.steps||{}).speak,hv=h&&h.level!=='native'&&h.f&&h.f[0]?h.f[0].v:'';
+  $('#speakPlan').value=g.plan||'';$('#speechTranscript').value=g.tr||hv||'';
+  $('#speakPlan').addEventListener('input',keepSpeak);$('#speechTranscript').addEventListener('input',keepSpeak)})();
 
 renderAll();
 
