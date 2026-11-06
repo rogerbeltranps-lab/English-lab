@@ -262,6 +262,11 @@ async function gate(u){
   const ca0=!lvl||elCa(lvl);   // the blocks below speak the student's language (Catalan with no route)
   if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block(ca0?"Aquesta LS no és del teu grup":"This LS is not for your group",ca0?"Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.":"Go back to your board: it has the LSs your teacher gave your group.",ca0);return}
   if(st==="hidden"&&!tester){block(ca0?"Aquesta LS encara no està disponible":"This LS is not available yet",ca0?"El professor l'obrirà quan estigui preparada.":"Your teacher will open it when it is ready.",ca0);return}
+  // Submit is only for LS1 (Roger, 6 Nov 2026: no Submit, answers save on their own). From LS2 on, a learning path a student
+  // submitted before (results locked) stays open like any other, and an old "practise again" mode in this browser is switched off,
+  // so the page pulls and saves their answers again (a student had LP2 submitted with 4 of 10 steps and could not do the rest).
+  const a0=EL_CATALOG.find(x=>x.id===actId),once=!!(a0&&a0.mode==="once"&&/-my-real-routine$/.test(a0.ls));
+  if(a0&&!once&&localStorage.getItem("el_practice_"+actId)!==null)localStorage.removeItem("el_practice_"+actId);
   if(AS){if(await asPull())return}
   else if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
   if(reloadIfStale())return;
@@ -285,7 +290,7 @@ async function gate(u){
     o.querySelector("p").textContent=ca?"Per continuar, primer has d'acabar el "+cp.title+". Fes-lo sense apunts.":"To go on, first finish "+cp.title+". Do it without notes.";
     const go=o.querySelector("a.go");go.href=new URL(cp.path,ROOT).href;go.textContent=(ca?"Obre el ":"Open ")+cp.title+" →";return}
   if(a&&a.manual&&a.graded)banner(ca?"Aquesta activitat és per entregar a través del Google Classroom.":"This activity is to be submitted through Google Classroom.","#1d4ed8");
-  if(a&&a.mode==="once"&&!AS){
+  if(once&&!AS){
     const rref=doc(db,"students",u.uid,"results",resKey(actId));
     const rset=d=>setDoc(rref,d,{merge:true}).then(()=>rcSaved(u.uid,resKey(actId),d));   // the copy in this browser too
     const r=await getDoc(rref).catch(()=>null),rd=r&&r.exists()?r.data():{};
