@@ -18,7 +18,7 @@ window.LP = {
         { r: 'daring', q: 'I ___ a lot of time playing the guitar. (passar)', a: ['spend'] }
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Roba, equipament i temps', en: 'Clothes, kit and weather' },
-      intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
+      intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       receptive: 'crowd · half-time · highlights',
       core: { beginners: ['T-shirt', 'trainers', 'shorts', 'cap', 'It’s sunny', 'It’s cold', 'It’s hot', 'It’s raining'], insecure: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'cap', 'helmet', 'wear a uniform', 'wear a costume', 'It’s sunny', 'It’s cloudy', 'It’s windy', 'It’s cold', 'It’s hot', 'It’s raining', 'It’s snowing'], safe: ['T-shirt', 'trainers', 'tracksuit', 'shorts', 'helmet', 'wear a uniform', 'It’s sunny', 'It’s cold', 'It’s raining', 'It’s snowing', 'a concert', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'foggy', 'freezing', 'What’s the weather like?', 'degrees'], daring: ['trainers', 'tracksuit', 'helmet', 'wear a uniform', 'It’s raining', 'It’s snowing', 'a match', 'a competition', 'a tournament', 'win / lose a match', 'score a goal', 'freezing', 'What’s the weather like?', 'degrees', 'the crowd', 'cheer', 'warm up', 'take part in'] },
       groups: [
@@ -50,7 +50,7 @@ window.LP = {
         { r: 'daring', q: 'The ___ is cheering: 500 people!', a: ['crowd'] },
         { r: 'daring', q: 'Before the match, the players ___ up for ten minutes.', a: ['warm'] }
       ] },
-    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: A post and a web page', pill: '80 %',
+    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: A post and a web page', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix un post d’un club i una pàgina web d’un esdeveniment. Després respon.', en: 'Read a post from a club and an event web page. Then answer.' },
       media: { text: {
         beginners: '<p><strong>Text A · Post · Climb Up Club, Saturday 14 November, 11:05</strong><br>Live from the climbing wall! 🧗 Today our climbers are training for a competition. Nil is climbing the red route. His friends are cheering. It’s cold outside, but it’s warm inside. We usually train on Saturday mornings. Come and try! First class free.</p><p><strong>Text B · Web page · Autumn Fun Run</strong><br><strong>Sunday 22 November · 10:00 · Parc Central</strong><br>Run 3 km with your family and friends! Every runner gets a T-shirt and a medal. 🏅 Tickets: 5 euros. Sign up now: only 200 places!</p><p class="tiny"><strong>Paraules:</strong> climbing wall = rocòdrom · training = entrenant · cheering = animant · outside / inside = fora / dins · runner = corredor/a · sign up = apunta’t</p>',
@@ -92,7 +92,7 @@ window.LP = {
         safe: ['I wrote short notes in my own words', 'I noted what people are doing and what they usually do', 'I gave the purpose of each text with evidence from the text', 'I worked out a new word from its context'],
         daring: ['I wrote short notes in my own words', 'I noted what people are doing and what they usually do', 'I gave the purpose of each text with precise evidence', 'I compared how the two texts use language']
       } },
-    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Live from the sports hall', pill: { ca: 'Àudio · 80 %', en: 'Audio · 80 %' },
+    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Live from the sports hall', pill: { ca: 'Àudio', en: 'Audio' },
       intro: { ca: 'L’Emma i el Sam retransmeten en directe un partit de bàsquet de l’escola. Escolta una vegada per saber qui guanya. Després llegeix les preguntes i torna a escoltar.', en: 'Emma and Sam are reporting live from a school basketball match. Listen once to find out who is winning. Then read the questions and listen again.' },
       media: { audio: 'audio/live-from-the-sports-hall.mp3', title: 'Live from the sports hall (Emma and Sam)', script: [
         ['Emma', '[excited] Hello and welcome to School Radio! We’re at the sports hall and the big match is starting: the Blue Team against the Green Team. Sam, what’s happening?'],
@@ -115,7 +115,7 @@ window.LP = {
         { r: 'daring', q: 'Why does Emma say “And it’s working!”?', o: ['Marc is playing in a new position and he is scoring.', 'The radio is working again.', 'The coach is working hard.'] },
         { r: 'daring', q: 'Which sentence describes something happening now?', o: ['“The players are drinking water.”', '“Marc usually plays as a defender.”', '“We’ll be back in ten minutes.”'] }
       ] },
-    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: què estan fent?', en: 'Listen again: what are they doing?' }, pill: { ca: 'Àudio · 80 %', en: 'Audio · 80 %' },
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: què estan fent?', en: 'Listen again: what are they doing?' }, pill: { ca: 'Àudio', en: 'Audio' },
       intro: { ca: 'Ja vas escoltar aquesta trucada a l’LP1. Ara escolta què està fent cada persona ara mateix.', en: 'You heard this phone call in LP1. Now listen for what each person is doing right now.' },
       media: { audio: 'audio/where-are-you.mp3', title: 'Where are you?', script: [
         ['Laia', '[cheerful] Hi Omar! Where are you? It’s really noisy.'],
@@ -145,7 +145,7 @@ window.LP = {
         ['Emma', 'Hello and welcome to School Radio! We’re at the sports hall and the big match is starting: the Blue Team against the Green Team. Sam, what’s happening?'],
         ['Sam', 'Well, Emma, the Blue Team is wearing their new white uniform and the Green Team is wearing green T-shirts and black shorts. The players are warming up and the crowd is cheering. It’s very noisy in here!'],
         ['Emma', 'It’s cold and rainy outside, but inside it’s hot. There are about two hundred students watching. Some of them are eating sandwiches!']] } },
-    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: 'Present Continuous', pill: '80 %',
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: 'Present Continuous', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>Present Continuous = am / is / are + verb-ing.</strong> Per a accions que passen <em>ara</em>. <em>I am (I’m) playing · She is (She’s) skating · They are (They’re) watching.</em> Negativa: <em>I’m not playing · He isn’t playing · We aren’t playing.</em> Pregunta: <em>Are you playing? Is she skating? What are they doing?</em> Resposta curta: <em>Yes, I am. / No, she isn’t.</em>', en: '<strong>Present Continuous = am / is / are + verb-ing</strong>, for actions happening <em>now</em>. <em>I’m playing · She’s skating · They’re watching.</em> Negative: <em>I’m not playing · He isn’t playing · We aren’t playing.</em> Questions: <em>Are you playing? Is she skating? What are they doing?</em> Short answers: <em>Yes, I am. / No, she isn’t.</em>' },
@@ -179,7 +179,7 @@ window.LP = {
         { r: 'daring', q: 'Correct the mistake: “They are runing in the park.” → ___', a: ['running'], en: 'Double the n.' },
         { r: 'daring', q: 'Twenty teams ___ (take) part in the tournament this weekend.', a: ['are taking', "'re taking"], en: 'Plural subject: are taking.' }
       ] },
-    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada: ara o normalment?', en: 'Mixed practice: now or usually?' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada: ara o normalment?', en: 'Mixed practice: now or usually?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Barreja de formes: decideix si la frase parla d’ara (Present Continuous) o d’un hàbit (Present Simple).', en: 'Mixed forms: decide if the sentence is about now (Present Continuous) or a habit (Present Simple).' },
       items: [
         { q: 'I usually ___ (play) football on Saturdays.', a: ['play'], ca: 'usually → hàbit → Present Simple.', en: 'usually → habit → Present Simple.' },

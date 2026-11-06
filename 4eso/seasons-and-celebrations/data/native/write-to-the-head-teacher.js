@@ -14,7 +14,7 @@ window.LP.native = {
     ] },
 
   vocab: { type: 'vocab', tab: 'Vocabulary', title: 'C2 vocabulary: formal persuasion',
-    intro: 'Explore, go through the cards and complete the sentences (80 %). The language of a letter that gets a “yes”.',
+    intro: 'Explore, go through the cards and complete the sentences. The language of a letter that gets a “yes”.',
     receptive: 'with all due respect · notwithstanding · hereby · forthwith',
     groups: [
       { g: 'Proposing and requesting', items: [
@@ -51,7 +51,7 @@ window.LP.native = {
       { q: 'We hope you will ___ permission for the event.', a: ['grant', 'give'] }
     ] },
 
-  read: { type: 'mc', tab: 'Reading', title: 'Reading: what makes a formal letter persuasive', pill: '80 %',
+  read: { type: 'mc', tab: 'Reading', title: 'Reading: what makes a formal letter persuasive', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     media: (window.LP.panels.find(p => p.id === 'read') || {}).media,   // the class's model email
     intro: 'Read your class’s model email again, this time as an examiner. The questions are about how it works, not what it says. Then you will write something better.',
     items: [
@@ -63,7 +63,7 @@ window.LP.native = {
       { q: 'If the email began “Dear Ms Puig”, the most appropriate sign-off is…', o: ['Yours sincerely', 'Yours faithfully', 'Cheers', 'Best wishes'] }
     ] },
 
-  register: { type: 'mc', tab: 'Register', title: 'Register: choose the C2 formal version', pill: '80 %',
+  register: { type: 'mc', tab: 'Register', title: 'Register: choose the C2 formal version', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Formal does not mean long or stiff. Choose the version that is formal, precise and natural.',
     items: [
       { q: '“We want to do a party about festivals.”', o: ['We would like to propose a celebration day focusing on festivals of light.', 'We are desirous of performing a festival-related party.', 'We wanna do a festivals party.', 'It is our wish that a party will be done.'], ex: 'Formal and natural: propose + a precise noun phrase. The second is over-formal and unnatural.' },
@@ -72,7 +72,7 @@ window.LP.native = {
       { q: '“Can you answer quickly because we need to start?”', o: ['We would be grateful for a reply by Friday, so that preparations can begin.', 'Answer quickly, please.', 'We demand an immediate response.', 'Can you answer us really soon?'], ex: 'A polite request with a specific deadline and a reason.' }
     ] },
 
-  grammar: { type: 'typed', tab: 'Grammar', title: 'Politeness and distance in formal requests', pill: '80 %',
+  grammar: { type: 'typed', tab: 'Grammar', title: 'Politeness and distance in formal requests', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Key word transformations (Reading and Use of English, Part 4): 3–8 words including the word in CAPITALS.',
     explain: [
       '<strong>Distancing with past forms:</strong> <em>We were wondering whether… · We were hoping you might…</em>',

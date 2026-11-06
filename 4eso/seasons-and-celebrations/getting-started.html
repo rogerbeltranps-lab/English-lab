@@ -105,7 +105,7 @@ html,body{overflow-x:clip}
 </section>
 
 <section class="panel" id="words">
-  <div class="panel-head"><div><h2>Autumn words</h2><p class="instruction" data-support-ca="Passa el ratolí (o toca) cada paraula per veure què vol dir. Després completa les frases: necessites un 80 % per completar el pas." data-support-en="Hover over (or tap) each word to see its meaning. Then complete the sentences: you need 80 % to complete the step.">Hover over (or tap) each word to see its meaning. Then complete the sentences: you need 80 % to complete the step.</p></div><span class="pill" id="wordsPill"></span></div>
+  <div class="panel-head"><div><h2>Autumn words</h2><p class="instruction" data-support-ca="Passa el ratolí (o toca) cada paraula per veure què vol dir. Després completa les frases: respon-les totes per completar el pas." data-support-en="Hover over (or tap) each word to see its meaning. Then complete the sentences: answer them all to complete the step.">Hover over (or tap) each word to see its meaning. Then complete the sentences: answer them all to complete the step.</p></div><span class="pill" id="wordsPill"></span></div>
   <div class="section-card"><div class="vocab-groups" id="vocabGroups"></div></div>
   <div class="section-card" id="caCards"></div>
   <div class="section-card"><h3 data-support-ca="Completa les frases" data-support-en="Complete the sentences">Complete the sentences</h3>
@@ -115,7 +115,7 @@ html,body{overflow-x:clip}
 </section>
 
 <section class="panel" id="read">
-  <div class="panel-head"><div><h2 id="readTitle">Reading: Autumn in two places</h2><p class="instruction" id="readHow" data-support-ca="Llegeix el xat entre la Núria (Catalunya) i en Josh (Manchester) una vegada per entendre de què parlen. Després llegeix les preguntes i busca al text la frase que respon cada una. Necessites un 80 % per completar el pas." data-support-en="Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.">Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.</p></div><span class="pill" id="readPill">80 %</span></div>
+  <div class="panel-head"><div><h2 id="readTitle">Reading: Autumn in two places</h2><p class="instruction" id="readHow" data-support-ca="Llegeix el xat entre la Núria (Catalunya) i en Josh (Manchester) una vegada per entendre de què parlen. Després llegeix les preguntes i busca al text la frase que respon cada una. Respon-les totes per completar el pas." data-support-en="Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. Answer them all to complete the step.">Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. Answer them all to complete the step.</p></div><span class="pill" id="readPill">80 %</span></div>
   <div class="section-card">
     <div class="chat" id="readText"></div>
     <form id="readForm"></form>
@@ -210,6 +210,8 @@ const state=Object.assign({done:{},choices:[]},JSON.parse(localStorage.getItem(s
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const STEPS=["recall","words","read","listen","speak"];
 function save(){localStorage.setItem(storageKey,JSON.stringify(state));localStorage.setItem(storageKey+"Level",level);updateProgress()}
+// checked earlier with every question answered but under the old 80 %: done now, on the day of that check (Roger, 6 Nov 2026)
+function doneFrom(k){if(state.done[k])return;const d=((state.last||{})[k]||(state.tries||{})[k]||{}).date;if(!d)return;state.done[k]=true;state.doneAt=state.doneAt||{};if(!state.doneAt[k])state.doneAt[k]=d;save()}
 function complete(k){if(!state.done[k]){state.done[k]=true;state.doneAt=state.doneAt||{};state.doneAt[k]=new Date().toISOString()}save()}
 // tries[k]: first check of a step; last[k]: latest check (the teacher dashboard shows both; recall keeps its first try in first[route])
 function attempt(k,score,max){const t={score,max,level,date:new Date().toISOString()};state.tries=state.tries||{};if(k!=="recall"&&!state.tries[k])state.tries[k]=t;state.last=state.last||{};state.last[k]=t;save()}
@@ -222,6 +224,8 @@ const gotRadio=(items,name)=>items.map((_,i)=>{const c=document.querySelector('i
 function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / "+STEPS.length;$("#progressBar").style.width=(n/STEPS.length*100)+"%"}
 const ca=()=>level==="insecure"||level==="beginners";
 const need=n=>Math.ceil(n*0.8);
+// a step is done once every question is answered and checked, whatever the score (Roger, 6 Nov 2026); the score still shows
+const allIn=(prefix,n)=>{for(let i=0;i<n;i++){const r=document.querySelector('input[name="'+prefix+i+'"]');if(r){if(!document.querySelector('input[name="'+prefix+i+'"]:checked'))return false}else{const t=document.getElementById(prefix+i);if(t&&!String(t.value).trim())return false}}return true};
 // Answers and feedback stay (Roger, 26 Oct 2026): a checked step keeps its answers (state.ans[step] = {l: route, v: answers}) and shows
 // its feedback again on every visit, without counting another try, until the student presses "Do it again" next to Check.
 // Answers not checked yet stay too (state.typing[step], saved as the student types or chooses): a student typed the recall,
@@ -269,7 +273,7 @@ function checkTyped(items,prefix,result,key,explain){
     f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(v===""?(ca()?"Escriu una resposta.":"Type an answer."):(ca()?"Encara no. ":"Not yet. ")+(explain?(ca()?"Resposta: <strong>"+it.a[0]+"</strong>. "+(it.ca||it.en||""):"Answer: <strong>"+it.a[0]+"</strong>. "+(it.en||it.ca||"")):(ca()?"Revisa la paraula al vocabulari de dalt i torna-ho a provar.":"Check the word list above and try again.")));
     f.className="feedback "+(ok?"ok":"no")});
   const n=items.length;
-  $(result).textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):(ca()?" · Necessites "+need(n)+" per completar el pas.":" · You need "+need(n)+" to complete the step."));
+  $(result).textContent=score+" / "+n+(ca()?" correctes":" correct")+(allIn(prefix,n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):(ca()?" · Respon totes les preguntes per completar el pas.":" · Answer every question to complete the step."));
   $(result).classList.add("show");
   return score;
 }
@@ -288,7 +292,7 @@ function renderWords(){
   delete movedFrom.practice;const v=kept("words",practiceItems,"practice",practice),t=v?null:typing("words",practiceItems,"practice",practice);if(v){fillTyped(practiceItems,"pr",v);doPractice(false);if(movedFrom.practice)movedNote("#practiceResult","words",movedFrom.practice===2)}else if(t)fillTyped(practiceItems,"pr",t);
 }
 $("#practiceList").oninput=()=>keepTyping("words",typedVals(practiceItems,"pr"));
-function doPractice(count){const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(count){firstItems("words",nat("practice",practice),practiceItems,gotTyped(practiceItems,"pr"));attempt("words",s,practiceItems.length);if(s>=need(practiceItems.length))complete("words")}}
+function doPractice(count){const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(count){firstItems("words",nat("practice",practice),practiceItems,gotTyped(practiceItems,"pr"));attempt("words",s,practiceItems.length);if(allIn("pr",practiceItems.length))complete("words")}else if(allIn("pr",practiceItems.length))doneFrom("words")}
 $("#checkPractice").onclick=()=>{doPractice(true);keepAns("words",typedVals(practiceItems,"pr"),practiceItems)};
 $("#againPractice").onclick=()=>again("words",renderWords);
 
@@ -297,7 +301,7 @@ function renderRead(){
   const chat=readingChat[level]||readingChat.insecure;
   // Pro reads an essay, not the chat (problem report 2 Nov 2026): its own title and instruction; the other routes get the original back.
   {const h=$("#readHow"),t=$("#readTitle");if(!h.dataset.chatEn)h.dataset.chatEn=h.getAttribute("data-support-en");
-   const en=N()?"Read the essay once for the writer’s argument. Then answer: the questions test attitude, implication and meaning, not facts you can simply find. You need 80 % to complete the step.":h.dataset.chatEn;
+   const en=N()?"Read the essay once for the writer’s argument. Then answer: the questions test attitude, implication and meaning, not facts you can simply find. Answer them all to complete the step.":h.dataset.chatEn;
    h.setAttribute("data-support-en",en);if(N())h.textContent=en;t.textContent=N()?"Reading: In praise of the in-between season":"Reading: Autumn in two places"}
   if(N())$("#readText").innerHTML=GS_NATIVE.readingHtml;else $("#readText").innerHTML=(level==="beginners"?'<p class="tiny" style="margin:0 0 10px"><strong>Paraules:</strong> mild = suau · dark = fosc · sweets = dolços · costumes = disfresses · skeleton = esquelet · leaves = fulles</p>':"")+chat.map(([w,t])=>'<div class="msg '+w.toLowerCase()+'"><b>'+w+'</b>'+t+'</div>').join("");
   readItems=forLevel(nat("readingQs",readingQs),level);const f=$("#readForm");f.innerHTML="";
@@ -308,7 +312,7 @@ function renderRead(){
 }
 $("#readForm").onchange=()=>keepTyping("read",radioVals(readItems,"rd"));
 function doRead(count){let score=0;readItems.forEach((q,i)=>{const c=document.querySelector('input[name="rd'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#rdf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,false);f.className="feedback "+(ok?"ok":"no")});
-  const n=readItems.length;if(count){firstItems("read",nat("readingQs",readingQs),readItems,gotRadio(readItems,"rd"));attempt("read",score,n)}$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(count&&score>=need(n))complete("read")}
+  const n=readItems.length;if(count){firstItems("read",nat("readingQs",readingQs),readItems,gotRadio(readItems,"rd"));attempt("read",score,n)}$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(allIn("rd",n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(allIn("rd",n)){if(count)complete("read");else doneFrom("read")}}
 $("#checkRead").onclick=()=>{doRead(true);keepAns("read",radioVals(readItems,"rd"),readItems)};
 $("#againRead").onclick=()=>again("read",renderRead);
 let listenItems=[];
@@ -321,7 +325,7 @@ function renderListen(){
 }
 $("#listenForm").onchange=()=>keepTyping("listen",radioVals(listenItems,"l"));
 function doListen(count){let score=0;listenItems.forEach((q,i)=>{const c=document.querySelector('input[name="l'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#lf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,true);f.className="feedback "+(ok?"ok":"no")});
-  const n=listenItems.length;if(count){firstItems("listen",nat("listening",listening),listenItems,gotRadio(listenItems,"l"));attempt("listen",score,n)}$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(count&&score>=need(n))complete("listen")}
+  const n=listenItems.length;if(count){firstItems("listen",nat("listening",listening),listenItems,gotRadio(listenItems,"l"));attempt("listen",score,n)}$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(allIn("l",n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(allIn("l",n)){if(count)complete("listen");else doneFrom("listen")}}
 $("#checkListen").onclick=()=>{doListen(true);keepAns("listen",radioVals(listenItems,"l"),listenItems)};
 $("#againListen").onclick=()=>again("listen",renderListen);
 // Native: a real native-speed video with C2 questions (GS_NATIVE.video), an extra under the listening. Not a step: it never changes progress.
@@ -574,9 +578,9 @@ if(sessionJump){sessionJump.addEventListener('change',()=>{const target=sessionJ
 <script>
 sectionNext.init({level:()=>level,panels:[
  {id:'recall',done:()=>!!state.done.recall,detail:ca=>ca?'Prem «Comprova» al recall.':'Press “Check” in the recall quiz.'},
- {id:'words',done:()=>!!state.done.words,detail:ca=>ca?'Encerta almenys el 80 % de les frases.':'Get at least 80 % of the sentences right.'},
- {id:'read',done:()=>!!state.done.read,detail:ca=>ca?'Encerta almenys el 80 % del reading.':'Get at least 80 % of the reading right.'},
- {id:'listen',done:()=>!!state.done.listen,detail:ca=>ca?'Encerta almenys el 80 % del listening.':'Get at least 80 % of the listening right.'}
+ {id:'words',done:()=>!!state.done.words,detail:ca=>ca?'Respon i comprova totes les frases.':'Answer and check all the sentences.'},
+ {id:'read',done:()=>!!state.done.read,detail:ca=>ca?'Respon i comprova totes les preguntes del reading.':'Answer and check all the reading questions.'},
+ {id:'listen',done:()=>!!state.done.listen,detail:ca=>ca?'Respon i comprova totes les preguntes del listening.':'Answer and check all the listening questions.'}
 ]});
 sectionNext.final({id:'speak',level:()=>level,done:()=>!!state.done.speak,detail:ca=>ca?'Grava el teu àudio i atura la gravació.':'Record your audio and stop the recording.'});
 </script>

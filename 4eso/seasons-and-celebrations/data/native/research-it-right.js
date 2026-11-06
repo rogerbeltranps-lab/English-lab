@@ -13,7 +13,7 @@ window.LP.native = {
       { q: 'We pushed the ___ out for my grandmother’s birthday.', a: ['boat'] }
     ] },
 
-  read: { type: 'mc', tab: 'Reading', title: 'Reading: The pagan origins myth machine', pill: '80 %',
+  read: { type: 'mc', tab: 'Reading', title: 'Reading: The pagan origins myth machine', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'A C2 Proficiency-style text (Reading and Use of English, Part 5). Read it all once, then answer. Pay attention to the writer’s attitude and to what phrases refer to.',
     media: { text: '<p><strong>The pagan origins myth machine</strong></p>' +
       '<p>Every December, a familiar genre of article resurfaces. Christmas, we are told, is “really” a pagan festival in disguise: the date was stolen from the Roman Saturnalia, the tree from Germanic tree-worship, the whole thing a thin Christian coat of paint over something older and, by implication, more authentic. The articles are shared widely, partly because they flatter the reader with the sense of having seen through an official story.</p>' +
@@ -30,7 +30,7 @@ window.LP.native = {
       { q: 'Which best describes the overall purpose of the text?', o: ['to encourage readers to question origin claims before repeating them', 'to prove that Christmas has no pagan elements', 'to criticise newspapers for their coverage of religion', 'to explain the history of Saturnalia'] }
     ] },
 
-  sources: { type: 'mc', tab: 'Sources', title: 'Evaluating sources at C2: what exactly can it tell you?', pill: '80 %',
+  sources: { type: 'mc', tab: 'Sources', title: 'Evaluating sources at C2: what exactly can it tell you?', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'At this level the question is rarely “reliable or not?” but “reliable for what?”. Choose the best judgement and read the explanation.',
     items: [
       { q: 'A national museum’s web page on Diwali, written by a named curator in 2025. You want to know how Diwali is celebrated in Leicester today.', o: ['Good for general background; check a local or community source for Leicester specifically.', 'Perfect: museums are always the best source.', 'Not reliable: it is not about Leicester.', 'Not usable: curators are not neutral.'], ex: 'Reliability depends on the question. A strong general source may still not answer a specific, local question.' },
@@ -41,7 +41,7 @@ window.LP.native = {
       { q: 'A travel company blog: “Experience the ancient magic of Diwali, unchanged for 5,000 years!”', o: ['Its purpose is to sell; the claim about age is marketing and needs checking.', 'Reliable: travel companies know the destinations.', 'Reliable about dates but not about history.', 'It must be true or it would be illegal to publish.'], ex: '“Unchanged for 5,000 years” is the kind of claim the reading text warns about.' }
     ] },
 
-  respect: { type: 'mc', tab: 'Framing', title: 'Framing: precise, respectful, not exotic', pill: '80 %',
+  respect: { type: 'mc', tab: 'Framing', title: 'Framing: precise, respectful, not exotic', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'C2 writing about cultures needs precision: who believes what, without exaggerating, generalising or making people sound strange. Choose the best version.',
     items: [
       { q: 'Which sentence frames a belief most accurately?', o: ['For many Hindus, the lamps symbolise the triumph of light over darkness.', 'The lamps make light triumph over darkness.', 'Hindus believe the lamps magically defeat evil.', 'Everyone in India believes in the power of the lamps.'], ex: 'Attribute the belief (for many…), use “symbolise”, avoid “everyone” and “magically”.' },
@@ -50,7 +50,7 @@ window.LP.native = {
       { q: 'Which sentence about Thanksgiving represents more than one perspective fairly?', o: ['For many Americans it is a day of family and gratitude; for some Native American communities it is a National Day of Mourning.', 'Thanksgiving is a happy day for everybody.', 'Thanksgiving is a terrible holiday.', 'Native Americans are against the holiday.'], ex: 'Name both perspectives and the groups precisely; avoid speaking for a whole people.' }
     ] },
 
-  notes: { type: 'mc', tab: 'Paraphrase', title: 'Paraphrase, not patchwriting', pill: '80 %',
+  notes: { type: 'mc', tab: 'Paraphrase', title: 'Paraphrase, not patchwriting', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: '“Patchwriting” means changing a few words of a source but keeping its structure. Examiners and teachers treat it like copying. Choose the genuine paraphrase.',
     items: [
       { q: 'Source: “Each step lends the claim a little more apparent authority, and none of them involves anybody checking the original evidence.”', o: ['As a claim passes from source to source, it looks increasingly credible, although nobody has gone back to the evidence.', 'Each stage gives the claim a bit more apparent authority, and none of them involves someone checking the first evidence.', 'Every step lends a claim authority and nobody checks.', 'The claim has more authority at each step.'], ex: 'The second option is patchwriting: same structure, a few synonyms. The first restructures the idea.' },

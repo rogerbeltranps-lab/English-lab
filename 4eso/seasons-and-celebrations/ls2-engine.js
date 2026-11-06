@@ -1,7 +1,7 @@
 /* Seasons & Celebrations (4 ESO, LS2): renders a Learning Path from the page's window.LP config.
    Content lives in each page; this file only holds the activity types, scoring and progress.
    Routes are cumulative: an item with r:"safe" is shown to Safe and Daring. Auto-corrected steps
-   complete at 80 % (rounded up); the recall warm-up completes when submitted and keeps the first attempt. */
+   complete once every question is answered and checked, whatever the score (Roger, 6 Nov 2026; was 80 %); the recall warm-up completes when submitted and keeps the first attempt. */
 var LS2 = (function () {
   // Beginners (A1) sits below Insecure: it sees every untagged item and, where a text or list has no 'beginners' version, the Insecure one.
   // Native (Roger, 30 Oct 2026): above Daring, for a native speaker preparing Cambridge C2 Proficiency; only the teacher sets it. A page's
@@ -37,7 +37,10 @@ var LS2 = (function () {
   // only: ['insecure'] keeps an item to the routes listed (Base-only practice of a basic form the higher routes already know).
   // A list is cumulative (r: tags); an object keyed by route gives each route its own list (the sample exam: same number of items per route).
   const forLevel = items => !items ? [] : Array.isArray(items) ? items.filter(x => ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level) && (!x.only || x.only.includes(level))) : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
-  const need = n => Math.ceil(n * 0.8);
+  const need = n => Math.ceil(n * 0.8);   // no longer decides a step (kept for older notes)
+  /* A step is done once every activity has been answered and checked, whatever the score (Roger, 6 Nov 2026: "when all the activities
+     have been done the SLP counts as done"). The score still shows, the first try still counts for the mark. */
+  const answered = (items, prefix) => vals(items, prefix).every(v => v != null && String(v).trim() !== '');
   const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const cap = s => s[0].toUpperCase() + s.slice(1);
@@ -76,6 +79,8 @@ var LS2 = (function () {
   // uses them for the grammar and vocabulary block (first try + done by the session deadline in el-plan.js).
   // last[k]: the latest check, shown on the dashboard next to the first try (never counted).
   function complete(k) { if (!state.done[k]) { state.done[k] = true; stamp(k); save(); } else progress(); }
+  // a step checked earlier with every question answered but under the old 80 %: done now, on the day of that check (Roger, 6 Nov 2026)
+  function doneFrom(k, tk) { if (state.done[k]) return; const d = ((state.last || {})[tk] || (state.tries || {})[tk] || {}).date; if (!d) return; state.done[k] = true; state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = d; save(); }
   function stamp(k) { state.doneAt = state.doneAt || {}; if (!state.doneAt[k]) state.doneAt[k] = new Date().toISOString(); }
   function lastTry(k, score, max) { state.last = state.last || {}; state.last[k] = { score, max, level, date: new Date().toISOString() }; }
   function firstTry(k, score, max) { state.tries = state.tries || {}; if (!state.tries[k]) state.tries[k] = { score, max, level, date: new Date().toISOString() }; lastTry(k, score, max); save(); }
@@ -263,7 +268,7 @@ var LS2 = (function () {
   function result(el, score, n, done, extra) {
     el.textContent = score + ' / ' + n + (ca() ? ' correctes' : ' correct') +
       (done ? (ca() ? ' · Pas completat ✓' : ' · Step complete ✓')
-            : (ca() ? ' · Necessites ' + need(n) + ' per completar el pas.' : ' · You need ' + need(n) + ' to complete the step.')) + (extra || '');
+            : (ca() ? ' · Respon totes les preguntes per completar el pas.' : ' · Answer every question to complete the step.')) + (extra || '');
     el.classList.add('show');
   }
   /* ---------- answers and feedback stay (Roger, 26 Oct 2026) ---------- */
@@ -316,7 +321,7 @@ var LS2 = (function () {
   function movedNote(id, fresh) {
     const el = $('#' + id + 'Result'); if (!el) return;
     const done = state.done[id === 'vocab' ? 'practice' : id];
-    if (done) el.textContent = el.textContent.replace(/ · (You need \d+ to complete the step\.|Necessites \d+ per completar el pas\.)/, ca() ? ' · Pas completat ✓' : ' · Step complete ✓');
+    if (done) el.textContent = el.textContent.replace(/ · (You need \d+ to complete the step\.|Necessites \d+ per completar el pas\.|Answer every question to complete the step\.|Respon totes les preguntes per completar el pas\.)/, ca() ? ' · Pas completat ✓' : ' · Step complete ✓');
     if (done && !/✓/.test(el.textContent)) el.textContent += ca() ? ' · Pas completat ✓' : ' · Step complete ✓';
     const p = document.createElement('span'); p.className = 'moved-note'; p.style.cssText = 'display:block;margin-top:6px;font-weight:400';
     p.textContent = ca()
@@ -443,7 +448,7 @@ var LS2 = (function () {
       if (p.practice) {
         const items = forLevel(p.practice);
         $('#vocabPractice').innerHTML = typedHtml(items, 'vp', p.practiceMode); bindModes(items, 'vp', p.practiceMode);
-        stays('vocab', 'vp', 'vocabPractice', items, count => { const s = checkTyped(items, 'vp', false, count); if (count) { firstTry('practice', s, items.length); firstItems('vocab', p.practice, items, got); } const ok = s >= need(items.length); result($('#vocabResult'), s, items.length, ok); if (ok && count) complete('practice'); }, p.practice);
+        stays('vocab', 'vp', 'vocabPractice', items, count => { const s = checkTyped(items, 'vp', false, count); if (count) { firstTry('practice', s, items.length); firstItems('vocab', p.practice, items, got); } const ok = answered(items, 'vp'); result($('#vocabResult'), s, items.length, ok); if (ok) { if (count) complete('practice'); else doneFrom('practice', 'practice'); }; }, p.practice);
       }
     }
   });
@@ -593,9 +598,9 @@ var LS2 = (function () {
           fb.className = 'feedback ' + (ok ? 'ok' : 'no');
         });
         if (count) { firstTry(p.id, score, items.length); firstItems(p.id, p.items, items, g); }
-        const ok = score >= need(items.length);
+        const ok = answered(items, p.id);
         result($('#' + p.id + 'Result'), score, items.length, ok);
-        if (ok && count) complete(p.id);
+        if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); };
       }, p.items);
     }
   });
@@ -606,7 +611,7 @@ var LS2 = (function () {
     bind() {
       const items = forLevel(p.items);
       $('#' + p.id + 'List').innerHTML = typedHtml(items, p.id, p.mode); bindModes(items, p.id, p.mode);
-      stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = s >= need(items.length); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok && count) complete(p.id); }, p.items);
+      stays(p.id, p.id, p.id + 'List', items, count => { const s = checkTyped(items, p.id, false, count); if (count) { firstTry(p.id, s, items.length); firstItems(p.id, p.items, items, got); } const ok = answered(items, p.id); result($('#' + p.id + 'Result'), s, items.length, ok); if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); }; }, p.items);
     }
   });
 
@@ -1165,9 +1170,9 @@ var LS2 = (function () {
         });
         const tk = p.id + '_' + level;
         if (count) { firstTry(tk, pts, maxOf(p)); firstItems(p.id, p.items, items, g); }
-        const done = right >= need(items.length);
+        const done = answered(items, p.id);
         result($('#' + p.id + 'Result'), right, items.length, done, ' · ' + pts + ' / ' + ptsWord(maxOf(p)) + (ca() ? ' (primer intent: ' : ' (first try: ') + ((state.tries || {})[tk] || {}).score + ')');
-        if (done && count) complete(p.id);
+        if (done) { if (count) complete(p.id); else doneFrom(p.id, p.id + '_' + level); };
         if (LP.onScore) LP.onScore();
       }, p.items);
     }
@@ -1305,7 +1310,7 @@ var LS2 = (function () {
   function initNext() {
     $$('.section-next').forEach(e => e.remove());
     const last = LP.panels[LP.panels.length - 1];
-    sectionNext.init({ level: () => level, panels: LP.panels.slice(0, -1).map(p => ({ id: p.id, done: () => stepDone(p), detail: c => c ? 'Completa les activitats d’aquesta secció (80 % on es corregeix).' : 'Finish this section’s activities (80 % where they are corrected).' })) });
+    sectionNext.init({ level: () => level, panels: LP.panels.slice(0, -1).map(p => ({ id: p.id, done: () => stepDone(p), detail: c => c ? 'Respon i comprova totes les activitats d’aquesta secció.' : 'Answer and check every activity in this section.' })) });
     sectionNext.final({ id: last.id, level: () => level, done: () => stepDone(last), detail: c => c ? 'Completa l’última activitat.' : 'Finish the last activity.' });
   }
   // Native: LP.native = { panelId: panel } replaces that panel (same id, so progress, checkpoints and locks work as for every route).
