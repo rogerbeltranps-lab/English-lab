@@ -250,6 +250,34 @@ window.elPullFor=function(infos,gid){let best=null;
 window.EL_BEAT_MS=60e3;window.EL_HERE_MS=150e3;
 const elMs=t=>t&&t.toMillis?t.toMillis():typeof t==="number"?t:0;
 window.elFsOn=f=>!!(f&&f.on&&f.at&&Date.now()<(f.until||f.at+70*60e3));
+// 🗓 The timetable of a group (Roger, 6 Nov 2026: "according to the teacher's timetable students should go full screen when they have
+// class"; "I want a section where the teacher can add the schedule"): tt = {slots: ["Tue 12:00", …], off: ["YYYY-MM-DD" | [from, to]],
+// len: minutes}. The teacher edits it on the dashboard (🗓 Timetable: settings/timetable) and every group's copy goes into live/{group}.tt,
+// the document every student page already listens to, so students need no extra read. elTT(gid) = the group's tt from window.EL_TIMETABLE.
+window.elTT=gid=>{const T=window.EL_TIMETABLE;return T&&T.groups&&T.groups[gid]?{slots:T.groups[gid],off:T.off||[],len:T.len||60}:null};
+// days off as [from, to] pairs: "YYYY-MM-DD", ["from", "to"] or "from/to" (Firestore keeps no arrays inside arrays, so stored ones use "from/to")
+window.elOffList=off=>(off||[]).map(o=>Array.isArray(o)?[o[0],o[1]||o[0]]:String(o).includes("/")?String(o).split("/"):[String(o),String(o)]);
+window.elTTStore=T=>({groups:Object.assign({},T.groups),off:elOffList(T.off).map(([a,b])=>a===b?a:a+"/"+b),len:+T.len||60});
+window.elTTRead=o=>({groups:Object.assign({},o.groups),off:elOffList(o.off).map(([a,b])=>a===b?a:[a,b]),len:+o.len||60});
+// the class going on at `at` (ms): {start, end} in ms, from 5 minutes before it starts until it ends, or null (no class, a day off)
+window.elSlotNow=function(tt,at){if(!tt||!tt.slots)return null;const d=new Date(at||Date.now()),len=+tt.len||60;
+  const ymd=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  if(elOffList(tt.off).some(o=>o[0]<=ymd&&ymd<=o[1]))return null;
+  const dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()],m=d.getHours()*60+d.getMinutes(),z=new Date(d);z.setHours(0,0,0,0);
+  for(const sl of tt.slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const s=+x[2]*60+ +x[3];
+    if(m>=s-5&&m<s+len)return {start:z.getTime()+s*60e3,end:z.getTime()+(s+len)*60e3}}
+  return null};
+// ⛶ Full screen by the timetable (Roger, 6 Nov 2026: "no need to release since they get released after the class"): during a class of the
+// group it is on by itself ({on, at: the start of the class, until: its end, auto: true}) and it ends with the class. The teacher's switch
+// (live/{group}.fs) still counts: {on: true, …} turns it on outside a class; {on: false, off: true, until: end of the class} switches it
+// off for that class only. Returns the full screen in force now, or null.
+window.elFsEff=function(fs,tt,at){const now=at||Date.now(),c=elSlotNow(tt,now);
+  if(fs&&fs.at&&now<(fs.until||fs.at+70*60e3)){if(fs.on)return fs;if(fs.off&&c&&fs.until>=c.end)return null}
+  return c?{on:true,at:c.start,until:c.end,auto:true}:null};
+// 🎓 Class mode (Roger, 6 Nov 2026: "instead of pulling students to the LS, I want to go class mode, and this makes students go wherever
+// you are in the LS"): live/{group}.go = {cm: true, u: page path from the site root, p: tab or "", pn: tab name, t: page title, at, s: when
+// class mode started, lock: true, until}. Written by the teacher's class tab each time it moves (el-cloud.js cmSend); open student pages go there.
+window.elCmOn=g=>!!(g&&g.cm&&g.u&&g.at&&Date.now()<(g.until||g.at+70*60e3));
 window.elGameOn=x=>!!(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-elMs(x.at)<10*60e3);
 window.elClassWatch=function(x,left,here){const fs=x&&x.fs,fo=elFsOn(fs),go=elGameOn(x),now=Date.now(),keys=[];
   if(fo)keys.push(fs.at);if(x&&x.sid&&(go||fo&&x.sid>=fs.at))keys.push(x.sid);

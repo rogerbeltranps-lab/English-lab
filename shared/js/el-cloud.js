@@ -390,7 +390,7 @@ async function teacherSections(info){
     +".el-tsec .r{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.el-tsec b{margin-right:4px}.el-tsec button{border:1px solid #c7d2fe;background:#fff;color:#3730a3;border-radius:999px;padding:3px 12px;cursor:pointer;font:600 13px system-ui,sans-serif}"
     +".el-tsec button.on{background:#4338ca;color:#fff;border-color:#4338ca}.el-tsec button.g{background:none;border-color:transparent;text-decoration:underline;font-weight:500}.el-tsec small{display:block;color:#475569;margin-top:6px}"
     +".el-tsec .w{margin-top:8px;padding:6px 10px;border-radius:8px;background:#fef2f2;color:#991b1b;font-weight:600}.el-tsec .w button{margin-left:6px}.el-tsec .m{margin-left:6px;color:#15803d;font-weight:600}.el-tsec .m.err{color:#b91c1c}"
-    +".el-tsec .pl{margin-top:8px;padding-top:8px;border-top:1px dashed #a5b4fc}.el-tsec .pl button[data-pull]:not(.g){background:#0f766e;border-color:#0f766e;color:#fff}.el-tsec .now{color:#0f766e;font-weight:700}.el-tsec .pl button.fs.on{background:#1e293b;border-color:#1e293b;color:#fff}.el-tsec .fsl{flex-basis:100%;font-size:13px;color:#9a3412;font-weight:600}"
+    +".el-tsec .pl{margin-top:8px;padding-top:8px;border-top:1px dashed #a5b4fc}.el-tsec .pl button[data-cm]:not(.g){background:#0f766e;border-color:#0f766e;color:#fff}.el-tsec .now{color:#0f766e;font-weight:700}.el-tsec .pl button.fs.on{background:#1e293b;border-color:#1e293b;color:#fff}.el-tsec .fsl{flex-basis:100%;font-size:13px;color:#9a3412;font-weight:600}"
     +".tab .el-tsw{display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;font-size:12px;line-height:18px;background:#dcfce7;border:1px solid #86efac;cursor:pointer;vertical-align:1px}"
     +".tab .el-tsw.off{background:#fee2e2;border-color:#fca5a5}.tab .el-tsw:hover{outline:2px solid #6366f1}.tab.el-toff{border-style:dashed!important;opacity:.75}";
   document.head.append(st);
@@ -404,24 +404,18 @@ async function teacherSections(info){
   async function openLp(){const ids=(window.EL_CATALOG||[]).filter(x=>x.ls===lsId&&(x===a||elLpOpen(x,info,g))).map(x=>x.id),L=elLpLocks(lsId,ids);
     try{await setDoc(ref,{open:{[g]:ids},locked:{[g]:L.locked},lockedKeys:{[g]:L.lockedKeys}},{merge:true});info.open=Object.assign({},info.open,{[g]:ids});msg="✓ Saved"}
     catch(e){console.warn("open",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
-  // 📌 Pull up on the group's screens (Roger, 2 Nov 2026): this learning path, or it at the tab on screen; it opens the path (and that tab) if locked.
-  const pulled=()=>((info.push||{})[g])||null;
-  async function pull(p){if(busy)return;const now=Date.now(),o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:now,lock:true,until:(window.elClassEnd&&elClassEnd(g,now))||null};
-    if(o&&!elLpOpen(a,info,g))await openLp();
-    if(o&&p&&locked().includes(p))await save(locked().filter(x=>x!==p));
-    // a pull-up puts the group in full screen too (Roger, 6 Nov 2026: "if I pull them they should be in full screen"): a full screen already
-    // on stays as it is; Release ends the full screen that came with a pull-up (fs.pull), not one switched on with the ⛶ button
-    busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});
-      let cur=fsG===g?fsX:null;if(fsG!==g)try{const d=await getDoc(doc(db,"live",g));cur=(d.exists()&&d.data().fs)||null}catch(e){}
-      const lv={go:o};if(o&&!fsOnNow(cur))lv.fs={on:true,at:now,until:o.until||now+LOCK_MS,pull:true};else if(!o&&cur&&cur.pull)lv.fs=null;
-      await setDoc(doc(db,"live",g),lv,{merge:true});/* live: open pages go there (goTo) */info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens, kept there":"✓ Released"}
-    catch(e){console.warn("pull",e);msg="✗ Not saved: "+(e.code||e.message||e)}busy=false;draw()}
+  // 🎓 Class mode (Roger, 6 Nov 2026, replaces 📌 Pull up): "Start class mode" opens this page in a new browser tab, the class tab for the
+  // projector; the students of the group follow that tab wherever it goes (cmTeacher below) and this tab stays free for other things.
+  const cmOpen=()=>{const now=Date.now(),until=(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS,u=new URL(location.href);
+    u.searchParams.set("elcm",g+"."+until);window.open(u.href,"_blank","noopener")};
+  const cmStop=()=>setDoc(doc(db,"live",g),{go:null},{merge:true}).then(()=>{msg="✓ Class mode stopped"},e=>{msg="✗ Not saved: "+(e.code||e.message||e)}).then(draw);
   // ⛶ full screen for the group (live/{group}.fs = {on, at, until}, as on the dashboard; fsCheck below): the state and who left
   // (live/{group}/fsLeft), live for the group chosen in this bar
   // and who is not connected (live/{group}/here, elClassWatch in el-catalog.js), while full screen or a class game is on
   let fsStop=null,fsStopL=null,fsStopH=null,fsG=null,fsX=null,fsLive=null,fsList=[],fsHere=[];
-  const fsOnNow=x=>!!(x&&x.on&&x.at&&Date.now()<(x.until||x.at+LOCK_MS));
-  const fsW=()=>elClassWatch(Object.assign({},fsLive,{fs:fsX}),fsList,fsHere);
+  // in force now: the switch (fsX) or, during a class of the timetable, on by itself (elFsEff in el-catalog.js)
+  const fsTT=()=>(fsLive&&fsLive.tt)||elTT(g),fsE=()=>elFsEff(fsX,fsTT());
+  const fsW=()=>elClassWatch(Object.assign({},fsLive,{fs:fsE()}),fsList,fsHere);
   function fsWatch(){if(fsG===g)return;[fsStop,fsStopL,fsStopH].forEach(f=>f&&f());fsStop=fsStopL=fsStopH=null;fsG=g;fsX=fsLive=null;fsList=[];fsHere=[];
     fsStop=onSnapshot(doc(db,"live",g),s=>{fsLive=s.exists()?s.data():null;fsX=(fsLive&&fsLive.fs)||null;fsListen();draw()},e=>console.warn("live",e))}
   function fsListen(){const on=fsW().active;
@@ -430,37 +424,39 @@ async function teacherSections(info){
       if(!fsRo[g]){fsRo[g]=[];getDocs(query(collection(db,"roster"),where("group","==",g))).then(q=>{fsRo[g]=q.docs.map(d=>{const r=d.data();return {e:d.id,name:(r.first||r.name||d.id.split("@")[0])+(r.surname1?" "+r.surname1:"")}});draw()}).catch(e=>{delete fsRo[g];console.warn("roster",e)})}}
     else if(!on&&fsStopL){fsStopL();fsStopH&&fsStopH();fsStopL=fsStopH=null;fsList=[];fsHere=[]}}
   setInterval(()=>{if(fsLive){fsListen();draw()}},30e3);   // a beat missed for EL_HERE_MS, the end of the class or of the game
-  async function fsToggle(){const now=Date.now(),v=fsOnNow(fsX)?null:{on:true,at:now,until:(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS};
+  // during a class it is on by itself: switching it off writes {on:false, off:true, until: the end of the class} (off for this class only)
+  async function fsToggle(){const now=Date.now(),c=elSlotNow(fsTT(),now),v=fsE()?(c?{on:false,off:true,at:now,until:c.end}:null):{on:true,at:now,until:c?c.end:now+LOCK_MS};
     try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});msg=v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
   const fsHm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
   // while the group is in full screen, the same state and list stay fixed at the top right of the page, also when scrolling (Roger, 5 Nov 2026)
   // the whole group, in or out (Roger, 6 Nov 2026), as on the dashboard: the group's student list (read once), ▾ makes it small,
   // and it opens again by itself when a student who was in goes out (elClassRoll in el-catalog.js)
-  const fsRo={},fsMin={on:false,was:new Set()},E=t=>String(t==null?"":t).replace(/</g,"&lt;");
-  const fsRoll=()=>{const w=elClassRoll(Object.assign({},fsLive,{fs:fsX}),fsList,fsHere,fsRo[g]||[]),now=new Set(w.inn.map(y=>y.e));
-    if(fsMin.on&&w.out.some(y=>fsMin.was.has(y.e)))fsMin.on=false;fsMin.was=now;return w};
+  // in the class tab (on the projector) the panel stays small: counts only, the names one tap away
+  const fsRo={},fsMin={on:!!cmRead(),was:new Set()},E=t=>String(t==null?"":t).replace(/</g,"&lt;");
+  const fsRoll=()=>{const w=elClassRoll(Object.assign({},fsLive,{fs:fsE()}),fsList,fsHere,fsRo[g]||[]),now=new Set(w.inn.map(y=>y.e));
+    if(fsMin.on&&!cmRead()&&w.out.some(y=>fsMin.was.has(y.e)))fsMin.on=false;fsMin.was=now;return w};
   const fsWhy=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+fsHm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+fsHm(y.seen):y.why==="lost"?"lost connection · since "+fsHm(y.seen):"not connected";
   function fsFloat(w){let f=document.getElementById("el-fsfloat");if(!w.active){if(f)f.remove();return}
     if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147481000;max-width:min(380px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
       f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.min){fsMin.on=!fsMin.on;draw()}else fsToggle()};document.body.append(f)}
     const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;",gone=w.out.filter(y=>y.why!=="never"),never=w.out.filter(y=>y.why==="never");
     const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+'<button data-min="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(fsMin.on?"Show the names":"Make this small (it opens again when someone goes out)")+'">'+(fsMin.on?"▸":"▾")+'</button></span></div>'
-      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsX.until||fsX.at+LOCK_MS):'')+'</div>'
+      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsE().until)+(fsE().auto?' (class, by your timetable)':''):'')+'</div>'
       +'<div style="margin-top:4px;font-size:15px"><b style="color:#166534">✓ '+w.inn.length+' in</b> · <b style="color:#b91c1c">✗ '+w.out.length+' out</b> <span style="color:#64748b;font-weight:500">of '+w.n+'</span></div>'
       +(fsMin.on?'':'<div style="margin-top:6px;max-height:40vh;overflow:auto;line-height:1.5">'
         +gone.map(y=>'<div style="color:#b91c1c">✗ <b>'+E(y.name)+'</b> · '+fsWhy(y)+'</div>').join("")
         +(never.length?'<div style="color:#475569;margin-top:4px">⚪ Not connected ('+never.length+'): '+never.map(y=>E(y.name)).join(", ")+'</div>':'')
         +(w.inn.length?'<div style="color:#166534;margin-top:4px">✓ In ('+w.inn.length+'): '+w.inn.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b;margin-top:4px">Nobody is in yet: they tap their screen to go full screen.</div>')+'</div>');
     if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
-  function fsRow(w){const on=fsOnNow(fsX);
-    return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who is in and who is out). A pull-up turns it on too. Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+'</button>'
-      +(w.active?'<div class="fsl">'+(on?'until '+fsHm(fsX.until||fsX.at+LOCK_MS):'🎮 in a game')+' · ✓ '+w.inn.length+' in · ✗ '+w.out.length+' out'+(w.out.length?': '+w.out.map(y=>E(y.name)+" ("+fsWhy(y)+")").join(" · "):"")+'</div>':"")}
+  function fsRow(w){const x=fsE(),on=!!x,cls=!!elSlotNow(fsTT());
+    return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who is in and who is out). During each class of your timetable it is on by itself and ends with the class. Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+(cls?on?" (class)":" for this class":"")+'</button>'
+      +(w.active?'<div class="fsl">'+(on?'until '+fsHm(x.until):'🎮 in a game')+' · ✓ '+w.inn.length+' in · ✗ '+w.out.length+' out'+(w.out.length&&!cmRead()?': '+w.out.map(y=>E(y.name)+" ("+fsWhy(y)+")").join(" · "):"")+'</div>':"")}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
-  function pullRow(){const x0=pulled(),x=elPullLive(x0)?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
-    fsWatch();
-    return '<div class="r pl"><b>📌 Pull up on '+gname(g)+'\'s screens</b><button data-pull="">This learning path</button>'
-      +(cur?'<button data-pull="'+cur+'">At this tab: '+nm(cur).replace(/</g,"&lt;")+'</button>':"")
-      +(here?'<span class="now">🔒 Kept on their screens'+(x.p?" at “"+nm(x.p).replace(/</g,"&lt;")+"”":"")+(x.until?" until "+new Date(x.until).toTimeString().slice(0,5)+" (end of the class)":"")+'</span><button class="g" data-pull="-">🔓 Release them</button>':x?'<span>🔒 Kept on their screens: '+String(x.t||"").replace(/</g,"&lt;")+'</span><button class="g" data-pull="-">🔓 Release them</button>':"")
+  function cmRow(){fsWatch();const x=fsLive&&fsLive.go,on=elCmOn(x),me=cmRead(),mine=me&&me.g===g;
+    return '<div class="r pl"><b>🎓 Class mode for '+gname(g)+'</b>'
+      +(mine?'<span class="now">This tab is the class tab: '+gname(g)+' follows it'+(x&&x.until?' until '+fsHm(x.until):'')+'</span><button class="g" data-cm="-">⏹ Stop class mode</button>'
+        :on?'<span class="now">On: they follow your class tab ('+E(x.t||"")+(x.pn?" · "+E(x.pn):"")+')</span><button class="g" data-cm="-">⏹ Stop class mode</button><button data-cm="1">Start it here instead</button>'
+        :'<button data-cm="1" title="Opens this page in a new tab for the projector. Every student of '+gname(g)+' goes wherever that tab goes (page and tab) until you stop it or the class ends. Keep using this tab for anything else.">Start class mode (new tab)</button>')
 +'</div><div class="r pl">'+fsRow(fsRoll())+'</div>'}
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
@@ -468,13 +464,13 @@ async function teacherSections(info){
     if(!bar||bar.nextElementSibling!==nav){if(bar)bar.remove();bar=document.createElement("div");bar.id="el-tsec";bar.className="el-tsec";nav.before(bar);
       bar.onclick=e=>{const b=e.target.closest("button");if(!b)return;e.preventDefault();
         if(b.dataset.g){g=b.dataset.g;origSet.call(localStorage,"el_t_secgroup",g);msg="";draw()}
-        else if(b.dataset.all)save(b.dataset.all==="1"?[]:all.slice());else if(b.dataset.lp)openLp();else if(b.dataset.fs)fsToggle();else if(b.dataset.pull!=null)pull(b.dataset.pull==="-"?null:b.dataset.pull)}}
+        else if(b.dataset.all)save(b.dataset.all==="1"?[]:all.slice());else if(b.dataset.lp)openLp();else if(b.dataset.fs)fsToggle();else if(b.dataset.cm)b.dataset.cm==="-"?cmStop():cmOpen()}}
     const off=locked(),n=all.length-off.filter(x=>all.includes(x)).length;
     const html='<div class="r"><b>🔓 Sections open for</b>'+grs.map(x=>'<button data-g="'+x.id+'" class="'+(x.id===g?"on":"")+'">'+x.name+'</button>').join("")
       +'<span>· '+n+' of '+all.length+' open</span><button class="g" data-all="1">open all</button><button class="g" data-all="0">close all</button>'
       +(msg?'<span class="m'+(msg[0]==="✗"?" err":"")+'">'+msg+'</span>':"")+'</div>'
       +'<small>Click 🔓 or 🔒 on a tab to open or close that section for '+gname(g)+'. Students see a closed section read-only, with their saved answers; one you opened before stays doable for students who have not finished it. Teacher only: students never see this bar.</small>'
-      +pullRow()
+      +cmRow()
       +(elLpOpen(a,info,g)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
     if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html}
     fsFloat(fsRoll())
@@ -674,8 +670,8 @@ function gamePush(u){
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
     if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
-    const f=first,run=()=>{goTo(x&&x.go,f);const was=FSG&&FSG.at;FSG=(x&&x.fs)||null;if((FSG&&FSG.at)!==was)beatAt=0;fsCheck()};first=false;
-    if(x&&(x.go||x.fs)&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
+    const f=first,run=()=>{goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;fsRefresh();fsCheck()};first=false;
+    if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
 }
 // 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
@@ -701,13 +697,13 @@ function tabBar(g){const ca=lockCa(),old=document.getElementById("el-pull");if(o
 // (except the one the student was already working on, until they reach the teacher's tab). A bar on the path says they are kept there.
 const LOCK_MS=70*60e3;
 let LOCK=null,lockFrom=null;
-const lockOn=g=>!!(g&&g.lock&&g.a&&g.at&&Date.now()-g.at<LOCK_MS&&!(g.until&&Date.now()>=g.until));
+const lockOn=g=>!!(g&&g.lock&&(g.a||g.cm&&g.u)&&g.at&&(g.cm?elCmOn(g):Date.now()-g.at<LOCK_MS&&!(g.until&&Date.now()>=g.until)));
 // Catalan only for Starter and Base, English for Core, Plus and Pro (Roger, 5 Nov 2026: "the messages when pulled up and full screen should
 // be in English except for the low levels starter and base"); the level comes from the page (LS pages) or the course's latest LS (findHomeLevel,
 // read before the first pull-up or full screen message on pages that do not know it, such as the board)
 const lockCa=()=>{const lv=myLevel||homeLevel;return !!lv&&elCa(lv)};
 let lvTried=false;
-const lockHere=()=>LOCK&&actId===LOCK.a;
+const cmUrl=g=>{const u=new URL(g.u,ROOT);u.hash=g.p||"";return u},lockHere=()=>!!LOCK&&(LOCK.cm?location.pathname===cmUrl(LOCK).pathname:actId===LOCK.a);
 function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-toast");if(!n){n=document.createElement("div");n.id="el-lock-toast";
   n.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:2147483001;max-width:92vw;padding:12px 18px;border-radius:12px;background:#7f1d1d;color:#fff;font:600 15px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.3);text-align:center";document.body.append(n)}
   n.textContent=t||(ca?"🔒 El professor t'ha fet venir aquí: no pots anar a cap altra part de la web fins que et deixi anar.":"🔒 Your teacher brought you here: you can't go to any other part of the website until they let you go.");
@@ -717,7 +713,7 @@ function lockBar(){let b=document.getElementById("el-lock");
   const ca=lockCa(),at=document.querySelector(".tab.active[data-panel]"),cur=at&&at.dataset.panel,g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
   if(!b){b=document.createElement("div");b.id="el-lock";b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
     b.onclick=e=>{const x=e.target.closest("button");if(!x)return;const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
-  const off=g.p&&cur!==g.p,h="🔒 "+(ca?"El professor et manté aquí":"Your teacher is keeping you here")+(g.p?(ca?": pestanya ":": tab ")+(g.pn||g.p):"")
+  const off=g.p&&cur!==g.p,h=(g.cm?"🎓 "+(ca?"Mode classe: segueixes el professor":"Class mode: you follow your teacher"):"🔒 "+(ca?"El professor et manté aquí":"Your teacher is keeping you here"))+(g.p?(ca?": pestanya ":": tab ")+(g.pn||g.p):"")
     +(off?(ca?". Acaba el que estàs fent i ves-hi.":". Finish what you are doing and go there."):"")+"|"+(off?(ca?"Ves-hi":"Go there")+" →":"");
   if(b.dataset.h!==h){b.dataset.h=h;const [t,btn]=h.split("|");b.textContent=t+" ";if(btn){const x=document.createElement("button");x.textContent=btn;
     x.style.cssText="background:#fff;color:#0f766e;border:0;border-radius:999px;padding:6px 16px;font-weight:800;cursor:pointer";b.append(x)}}}
@@ -730,7 +726,7 @@ document.addEventListener("click",e=>{if(!lockHere())return;
   if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
   e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
 const lockFree=()=>lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");
-setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();fsCheck();hereTick()},1000);   // the class is over (until) or LOCK_MS passed
+setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();fsRefresh();fsCheck();hereTick()},1000);   // the class is over (until) or LOCK_MS passed
 // ⛶ Full screen in class (Roger, 5 Nov 2026: "put students in full screen mode when I say it and they don't have a way to get out"; then
 // "make the selected group go full screen" from the top right of the dashboard): live/{group}.fs = {on, at, until} (the doc gamePush
 // already listens to). While it is on, every page of the site covers itself until the student taps it (a browser only goes full screen
@@ -741,10 +737,13 @@ setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(
 // it sends the checkpoint), nor in the teacher's student view; not on iPhones (no full screen for pages there).
 const FD=document,FE=FD.documentElement;
 const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!(FD.fullscreenElement||FD.webkitFullscreenElement);
-let fsWas=false,FSG=null;
+// FSG = the full screen in force: the teacher's switch (FSL = live/{group}.fs) or the group's class by the timetable (TT = live/{group}.tt),
+// elFsEff in el-catalog.js (Roger, 6 Nov 2026: "according to the teacher's timetable students should go full screen when they have class")
+let fsWas=false,FSG=null,FSL=null,TT=null;
+function fsRefresh(){const was=FSG&&FSG.at;FSG=myGroup?elFsEff(FSL,TT):null;if((FSG&&FSG.at)!==was)beatAt=0}
 const fsKey=()=>"el_fs_"+(FSG&&FSG.at);
 const fsSS=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}};
-const fsOnG=()=>!!(FSG&&FSG.on&&FSG.at&&Date.now()<(FSG.until||FSG.at+LOCK_MS));
+const fsOnG=()=>!!(FSG&&FSG.on&&FSG.at&&Date.now()<(FSG.until||FSG.at+LOCK_MS));   // FSG is refreshed every second
 function fsWanted(){if(frozen||!myGroup||!fsOnG()||!fsCan())return false;const h=(window.EL_CATALOG||[]).find(y=>y.id===actId);return !(h&&(h.checkpoint||/sample-exam$/.test(h.id)))}
 let fsBye=false;addEventListener("beforeunload",()=>{fsBye=true});addEventListener("pagehide",()=>{fsBye=true});   // going to another page: not leaving
 async function fsLeft(){if(!user||!myGroup||!FSG)return;const k=fsKey()+"_n",n=(+fsSS(k)||0)+1;fsSS(k,String(n));
@@ -782,6 +781,7 @@ function goTo(g,first){
   const was=LOCK;LOCK=lockOn(g)?g:null;
   if(was&&!LOCK){lockBar();lockFree();return}
   if(g&&g.until&&Date.now()>=g.until)return;   // the class it was made in is over
+  if(g&&g.cm)return cmGo(g);
   if(!g||!g.a||!g.at)return;const k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
   const a=(window.EL_CATALOG||[]).find(y=>y.id===g.a);if(!a)return;
   const here=window.EL_CATALOG&&EL_CATALOG.find(y=>y.id===actId);
@@ -794,19 +794,79 @@ function goTo(g,first){
   if(here&&here.id===a.id){const at=document.querySelector(".tab.active[data-panel]");
     if(LOCK){if(!seen)lockFrom=at&&at.dataset.panel!==g.p?at.dataset.panel:null;lockBar();return}
     if(g.p&&(!at||at.dataset.panel!==g.p))tabBar(g);return}
-  const ca=lockCa(),o=overlay('<div style="max-width:560px"><div style="font-size:48px">📌</div><h1></h1><p class="n" style="font-size:22px;font-weight:800"></p><p class="c"></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:12px 24px;text-decoration:none;font-weight:800"></a></p></div>');
-  o.style.zIndex="2147483000";   // above the My week panel and the bottom bar
-  o.querySelector("h1").textContent=seen&&LOCK?(ca?"🔒 El professor et manté a:":"🔒 Your teacher is keeping you on:"):(ca?"El professor et porta a:":"Your teacher is taking you to:");
-  o.querySelector(".n").textContent=(g.t||a.title)+(g.pn?" · "+g.pn:"");
+  goMove(url,(g.t||a.title)+(g.pn?" · "+g.pn:""),seen&&LOCK,seen&&LOCK?2:5,"📌");
+}
+// the notice that saves the student's work and takes them to url (back: sent back to where they are kept)
+function goMove(url,name,back,secs,icon){const was=document.getElementById("el-go-move");
+  if(was){was.dataset.u=url.href;was.querySelector(".n").textContent=name;was.querySelector("a.go").href=url.href;return}   // the teacher moved again: the newest place
+  const ca=lockCa(),o=overlay('<div style="max-width:560px"><div class="ic" style="font-size:48px"></div><h1></h1><p class="n" style="font-size:22px;font-weight:800"></p><p class="c"></p><p><a class="go" style="display:inline-block;background:#0f766e;color:#fff;border-radius:999px;padding:12px 24px;text-decoration:none;font-weight:800"></a></p></div>');
+  o.id="el-go-move";o.dataset.u=url.href;o.style.zIndex="2147483000";   // above the My week panel and the bottom bar
+  o.querySelector(".ic").textContent=icon;
+  o.querySelector("h1").textContent=back?(ca?"🔒 El professor et manté a:":"🔒 Your teacher is keeping you on:"):(ca?"El professor et porta a:":"Your teacher is taking you to:");
+  o.querySelector(".n").textContent=name;
   const go=o.querySelector("a.go");go.href=url.href;go.textContent=(ca?"Ves-hi ara":"Go now")+" →";
-  // the first time: 5 seconds to save their work; sent back again while kept there: 2 seconds
-  let n=seen&&LOCK?2:5;const c=o.querySelector(".c"),tick=()=>{c.textContent=seen&&LOCK?(ca?"Hi tornes en "+n+" s.":"Going back in "+n+" s."):(ca?"Desant la teva feina… hi vas en "+n+" s.":"Saving your work… going there in "+n+" s.")};tick();
+  // the first time: a few seconds to save their work; sent back again while kept there: 2 seconds
+  let n=secs;const c=o.querySelector(".c"),tick=()=>{c.textContent=back?(ca?"Hi tornes en "+n+" s.":"Going back in "+n+" s."):(ca?"Desant la teva feina… hi vas en "+n+" s.":"Saving your work… going there in "+n+" s.")};tick();
   const leave=async()=>{clearInterval(iv);c.textContent=ca?"Desant…":"Saving…";
-    try{if(timer){clearTimeout(timer);await send()}}catch(e){console.warn("go",e)}location.href=url.href};
+    try{if(timer){clearTimeout(timer);await send()}}catch(e){console.warn("go",e)}location.href=o.dataset.u};
   // the field being typed in saves on change/blur, then the 1.5-second cloud save runs during the countdown
   try{const f=document.activeElement;if(f&&f!==document.body&&f.blur)f.blur()}catch(e){}
   const iv=setInterval(()=>{n--;if(n<=0)leave();else tick()},1000);
   go.onclick=e=>{e.preventDefault();leave()};
+}
+// 🎓 Class mode (Roger, 6 Nov 2026: "instead of pulling students to the LS, I want to go class mode, and this makes students go wherever you
+// are in the LS. When we go to class mode, a new tab is opened so that I can check other stuff"). live/{group}.go = {cm: true, u, p, pn, t,
+// at, s, lock, until} (elCmOn in el-catalog.js), written by the teacher's class tab each time it moves (cmTeacher below). On the student's
+// side (the live/{group} listener of gamePush, no extra reads): on the same page only the tab changes, in place (nothing reloads, what
+// they typed stays); on another page a 3-second notice saves their work and takes them there (2 seconds when they went somewhere else
+// and are sent back). While it lasts they are kept there like a pull-up (lock: links that leave the page and the other tabs are blocked).
+// Not out of a recall checkpoint, the sample exam or a followed presentation. It ends with ⏹ Stop or the end of the class (until).
+function cmGo(g){
+  const here=window.EL_CATALOG&&EL_CATALOG.find(y=>y.id===actId);
+  if(here&&(here.checkpoint||/sample-exam$/.test(here.id))||/[?&]live=/.test(location.search)||!LOCK)return;
+  const url=cmUrl(g),k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
+  try{origSet.call(localStorage,k,"1")}catch(e){}
+  if(location.pathname===url.pathname){lockFrom=null;
+    const t=g.p&&document.querySelector('.tab[data-panel="'+CSS.escape(g.p)+'"]'),at=document.querySelector(".tab.active[data-panel]");
+    if(t&&t!==at){try{const f=document.activeElement;if(f&&f!==document.body&&f.blur)f.blur()}catch(e){}t.click()}
+    lockBar();return}
+  goMove(url,(g.t||"")+(g.pn?" · "+g.pn:""),seen,seen?2:3,"🎓");
+}
+// The teacher's class tab: opened by "🎓 Class mode" on the dashboard or the learning path page with ?elcm=<group>.<until ms>; this browser
+// tab keeps it (sessionStorage el_cm = {g, s, until}), so the dashboard in the other tab never moves the students. Every second it looks
+// at the page and its open tab, and once they have stayed the same for a second (quick clicks through tabs are not sent) and differ from
+// the last one sent, it writes live/{group}.go: one write per move, read once by each student page of the group. A chip at the bottom
+// shows it and ⏹ Stop ends it (go = null); the dashboard can stop it too (the tab listens to live/{group}). Not from the dashboard or the board.
+const CM_K="el_cm";
+function cmRead(){try{const o=JSON.parse(sessionStorage.getItem(CM_K)||"null");return o&&o.g&&Date.now()<o.until?o:null}catch(e){return null}}
+const cmEnd=()=>{try{sessionStorage.removeItem(CM_K)}catch(e){}};
+(()=>{const sp=new URLSearchParams(location.search),v=sp.get("elcm");if(!v)return;const [g,u]=v.split(".");
+  try{sessionStorage.setItem(CM_K,JSON.stringify({g,s:Date.now(),until:+u||Date.now()+LOCK_MS}));sessionStorage.removeItem(CM_K+"_last")}catch(e){}
+  sp.delete("elcm");history.replaceState(null,"",location.pathname+(sp.toString()?"?"+sp:"")+location.hash)})();
+let cmOn=false;
+function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=true;
+  const gn=((window.EL_GROUPS||[]).find(x=>x.id===o.g)||{}).name||o.g,hm=t=>new Date(t).toTimeString().slice(0,5);
+  const rel=()=>location.pathname.slice(ROOT.pathname.length)||"index.html";
+  const state=()=>{const t=document.querySelector(".tab.active[data-panel]"),a=(window.EL_CATALOG||[]).find(y=>y.id===actId);
+    return {u:rel(),p:t?t.dataset.panel:"",pn:t?[...t.childNodes].filter(n=>!(n.classList&&n.classList.contains("el-tsw"))).map(n=>n.textContent).join("").trim():"",
+      t:a?(window.elLpLabel?elLpLabel(a):a.title):(document.title||"").replace(/ · English (with Roger|Lab)$/,"").trim()}};
+  let last=null,seen=null,since=0,chip=null,stop=null;
+  try{last=JSON.parse(sessionStorage.getItem(CM_K+"_last")||"null")}catch(e){}
+  const key=x=>x.u+"#"+x.p;
+  function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
+  async function send(x){const go=Object.assign({cm:true,at:Date.now(),s:o.s,lock:true,until:o.until},x);last=x;
+    try{sessionStorage.setItem(CM_K+"_last",JSON.stringify(x))}catch(e){}
+    try{await setDoc(doc(db,"live",o.g),{go},{merge:true});draw()}catch(e){console.warn("class mode",e);last=null;draw("✗ Not sent: "+(e.code||e.message||e))}}
+  function draw(err){if(!chip){chip=document.createElement("div");chip.id="el-cmchip";
+      chip.style.cssText="position:fixed;left:12px;bottom:12px;z-index:2147481500;display:flex;gap:10px;align-items:center;max-width:calc(100vw - 24px);padding:8px 10px 8px 14px;border-radius:999px;background:#4338ca;color:#fff;font:700 14px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.25)";
+      chip.onclick=e=>{if(!e.target.closest("button"))return;setDoc(doc(db,"live",o.g),{go:null},{merge:true}).catch(x=>console.warn("class mode",x));quit("stopped")};document.body.append(chip)}
+    chip.innerHTML='<span>🎓 Class mode · '+gn+' follows this tab · until '+hm(o.until)+(err?' · '+String(err).replace(/</g,"&lt;"):'')+'</span><button style="border:0;border-radius:999px;padding:5px 12px;background:#fff;color:#4338ca;font:800 13px system-ui;cursor:pointer">⏹ Stop</button>'}
+  draw();
+  // stopped from the dashboard or another class tab started later
+  stop=onSnapshot(doc(db,"live",o.g),s=>{const g=s.exists()?s.data().go:null;if(s.metadata.hasPendingWrites||!last)return;if(!g||!g.cm||g.s!==o.s)quit(g&&g.cm?"another tab took over":"stopped")},e=>console.warn("class mode",e));
+  const iv=setInterval(()=>{if(!cmRead())return quit("the class is over");const x=state(),k=key(x);
+    if(k!==seen){seen=k;since=Date.now();return}
+    if(Date.now()-since>=1000&&(!last||key(last)!==k||last.pn!==x.pn))send(x)},500);
 }
 // The student's route on a page outside an LS: the route of their course's latest LS (carried over from earlier LSs, elRouteOf).
 async function findHomeLevel(u){
@@ -859,6 +919,7 @@ onAuthStateChanged(auth,async u=>{
   const lr=myRoster&&myRoster.route;
   if(lr&&lr.level&&lr.ls)try{const ref=doc(db,"students",u.uid,"levels",lr.ls);if(!(await myLevels(u.uid))[lr.ls]){await setDoc(ref,{level:lr.level,changed:serverTimestamp(),was:null,why:null});once.drop("lv:"+u.uid)}}catch(e){console.warn("route from the list",e)}
   gamePush(u);
+  if(isTeacher(u)&&!AS)cmTeacher();
   lsMenu(u).catch(e=>console.warn("ls menu",e));
   document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u)||!!AS);   // teacher-only links (e.g. a class game on its learning path)
   menuLink(u);   // again after gate, which knows the route (the label follows its language)
