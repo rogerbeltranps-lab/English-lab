@@ -59,7 +59,13 @@ body[data-place="home"] .page h1{font-size:2.2rem;letter-spacing:-.02em;margin:.
 .cont .ct{font-size:30px;font-weight:800;line-height:1.15;letter-spacing:-.01em}.cont .cs{font-size:17px;color:#e3e9ff}.cont .crow{display:flex;align-items:center;gap:12px;max-width:520px}.cont .cbar{flex:1;height:10px;border-radius:999px;background:#2443ad;overflow:hidden}.cont .cbar span{display:block;height:100%;background:#fff;border-radius:999px}.cont .cn{font-size:14px;font-weight:700;white-space:nowrap}
 .cont a.cgo{align-self:flex-start;margin-top:6px;background:#fff;color:#2443ad;border-radius:14px;padding:15px 38px;font-size:19px;font-weight:800;text-decoration:none}.cont a.cgo:hover{outline:3px solid #c7d4ff}.cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done a.cgo{color:#166534}
 a.hal{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:16px;text-decoration:none;font-size:16px}a.hal span{margin-left:auto;font-weight:800;white-space:nowrap}a.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}a.hal.news{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}a.hal:hover{filter:brightness(.97)}
-.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px;color:#0f172a;text-decoration:none;min-height:120px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile.wide{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;gap:14px;padding:14px 20px}a.tile .tb.hw{background:#0e7490}
+.todo .tdl,.hwlist{list-style:none;margin:0;padding:0}.todo .tdl li{border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin:0 0 10px;background:#fff}.todo .tdl li.late{border-color:#fca5a5;background:#fff7f7}
+.todo .tdh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-bottom:8px}.todo .tdh b{font-size:17px}.todo .tdh b a{color:#1e3a8a;text-decoration:none}.todo .tdh b a:hover{text-decoration:underline}
+.todo .chips{display:flex;flex-wrap:wrap;gap:6px}.todo .stp{display:inline-block;font-size:14px;font-weight:600;border-radius:999px;padding:6px 13px;border:1px solid #99f6e4;background:#f0fdfa;color:#0f766e;text-decoration:none;white-space:nowrap}.todo a.stp:hover{outline:2px solid currentColor}.todo li.late .stp{border-color:#fca5a5;background:#fee2e2;color:#991b1b}.todo .stp.hwt{background:#ecfeff;border-color:#67e8f9;color:#155e75}.tdls{font-size:15px;margin:12px 0 8px;color:#475569}
+.tdtag{font-size:13px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}.tdtag.late{background:#fee2e2;color:#991b1b}.tdtag.hw{background:#cffafe;color:#155e75}
+.hwlist li{border:1px solid #a5f3fc;background:#f0fdff;border-radius:14px;padding:12px 14px;margin:0 0 10px}.hwlist li.dn{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
+.hwl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}.hwl .hwi{font-size:20px}.hwl .hwt{flex:1 1 260px;font-weight:600}.hwl .ok{color:#16a34a;font-weight:700}.hwl .td{color:#b45309;font-weight:700}.hwlist .hwmsg{margin-top:6px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px;color:#0f172a;text-decoration:none;min-height:120px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:30px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:18px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
 .ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}a.ucard{border:2px solid #e2e8f0;border-radius:16px;padding:16px 18px;text-decoration:none;color:#0f172a;display:flex;flex-direction:column;gap:4px}a.ucard small{color:#64748b;font-size:13px}a.ucard b{font-size:19px}a.ucard span{color:#3157d5;font-weight:700;margin-top:6px}a.ucard.on{border-color:#3157d5;background:#f5f8ff}a.ucard:hover{border-color:#3157d5}
 .helpl{margin:6px 0 0;padding-left:20px}.helpl li{margin:6px 0}
@@ -72,7 +78,7 @@ details.psteps{border:1px solid #e2e8f0;border-radius:14px;padding:0 14px;margin
 /* Phone view (Roger, 6 Nov 2026: "so that students can use it on their cellphones"): no top menu, an app-style bar at the bottom with the four places, compact home, tables as cards */
 @media (max-width:640px){.mtabs{display:none!important}body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}.page{padding:12px 14px}
 #el-cloud-bar{position:static!important;margin:16px 14px 0;border-radius:14px!important;flex-wrap:wrap;justify-content:center}.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -4px 16px #0f172a14;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
-.bnav a{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;text-decoration:none;color:#64748b;font-size:11px;font-weight:700;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bnav a i{font-style:normal;font-size:22px;line-height:1}.bnav a.on{color:#2443ad;background:#eef2ff}.bnav a b{position:absolute;top:2px;right:calc(50% - 22px);background:#dc2626;color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;line-height:1.3}
+.bnav a{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;text-decoration:none;color:#64748b;font-size:11px;font-weight:700;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bnav a i{font-style:normal;font-size:22px;line-height:1}.bnav a.on{color:#2443ad;background:#eef2ff}.bnav a b{position:absolute;top:2px;right:calc(50% - 22px);background:#dc2626;color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;line-height:1.3}.bnav a b.hw{background:#0e7490}
 body[data-place="home"] .page h1{font-size:1.75rem;margin:.2em 0 .1em}body[data-place="home"] #sub{font-size:15px;margin:0 0 10px}#crumb a.back{display:none}.page h1{font-size:1.5rem;margin:.3em 0 .4em}
 .hl{gap:10px}a.hal{padding:12px 14px;font-size:15px}.cont{padding:18px;border-radius:20px}.cont .ct{font-size:21px}.cont .cs{font-size:15px}.cont a.cgo{align-self:stretch;text-align:center;padding:14px}
 .tiles{gap:10px}a.tile{min-height:0;padding:14px;gap:6px}a.tile .ti{font-size:24px}a.tile b{font-size:16px}a.tile small{font-size:13px}
@@ -188,12 +194,13 @@ const howBox=()=>`<div class="pend howto" style="background:#f5f3ff;border-color
 // Simple board (Roger, 6 Nov 2026: "the menus have little information and when you go to a place you can find the info that you need";
 // the students work on Chromebooks; the site is for self-study and for class): the board opens on a home with only the class bar
 // (📌 pulled-up path, live presentation), one Continue button to the next step and four places. Each place keeps the boxes that were on
-// the board: 📝 Homework (late and missing activities, what we've done, homework and calendar), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
+// the board: ✅ To do (what the teacher has opened and I haven't finished, my activities, what we've done) and 🏠 Homework (only what the
+// teacher set as homework, and the calendar; Roger, 6 Nov 2026), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
 // the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (video, problems). A place is a hash
-// (#homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
-const PLACE_OF={homework:"hw",week:"hw",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news",phone:"phone"};
+// (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
+const PLACE_OF={todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news",phone:"phone"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
-const placeTitle=p=>({hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone")})[p];
+const placeTitle=p=>({todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone")})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
 const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];return t("Hola","Hi")+(f?", "+f:"")};
 const planOf=ls=>{const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;return {p,gi:p?gi:-1}};
@@ -211,7 +218,7 @@ function nextFor(ls,info){if(only(ls.id)||info.status==="closed")return null;
 function homeHtml(lss,ls,info){
   workBox();const miss=(S.wmiss?S.wmiss.size:0)+lateList(lss).length,me=U&&U.uid;
   const unread=(D.ann||[]).filter(a=>String(a.text||"").trim()&&me&&!(a.read||{})[me]).length;
-  const alerts=(miss?`<a class="hal late" href="#homework">⏰ <b>${miss>1?t(`Et falten ${miss} activitats`,`You have ${miss} activities missing`):t("Et falta 1 activitat","You have 1 activity missing")}</b><span>${miss>1?t("Mira-les","See them"):t("Mira-la","See it")} →</span></a>`:"")
+  const alerts=(miss?`<a class="hal late" href="#marks">⏰ <b>${miss>1?t(`Et falten ${miss} activitats`,`You have ${miss} activities missing`):t("Et falta 1 activitat","You have 1 activity missing")}</b><span>${miss>1?t("Mira-les","See them"):t("Mira-la","See it")} →</span></a>`:"")
     +(unread?`<a class="hal news" href="#news">📣 <b>${unread>1?t(`${unread} anuncis nous del professor`,`${unread} new announcements from your teacher`):t("1 anunci nou del professor","1 new announcement from your teacher")}</b><span>${t("Llegeix","Read")} →</span></a>`:"");
   const nx=nextFor(ls,info),{p,gi}=planOf(ls),num=p&&gi>=0&&nx?lpNums(p,gi)(nx.a):"";
   const cont=nx?`<div class="cont"><div class="ck">${t("Continua on ho vas deixar","Continue where you left off")}</div><div class="ct">${num?num+" · ":""}${esc(nx.a.title)}</div>`
@@ -219,16 +226,19 @@ function homeHtml(lss,ls,info){
       +(nx.total?`<div class="crow"><div class="cbar"><span style="width:${Math.round(nx.done/nx.total*100)}%"></span></div><span class="cn">${nx.done} / ${nx.total} ${t("passos","steps")}</span></div>`:"")
       +`<a class="cgo" href="${nx.cp?tabHref(nx.a):tabHref(nx.a,nx.k)}">▶ ${t("Continua","Continue")}</a></div>`
     :`<div class="cont done"><div class="ct">✓ ${t("Ho tens tot fet!","You're all done!")}</div><div class="cs">${t("No tens res pendent als learning paths oberts.","Nothing left to do in the open learning paths.")}</div><a class="cgo" href="lab/practice.html">${t("Practica pel teu compte","Practise on your own")} →</a></div>`;
-  const up=gi>=0?ELWeek.upcoming(p,gi,null,null,((info||{}).homework||{})[D.me.group]):[];
-  const tile=(h,i,b,sub,badge,cl)=>`<a class="tile" href="${h}"><span class="ti"><span aria-hidden="true">${i}</span>${badge?`<span class="tb ${cl||""}">${badge}</span>`:""}</span><span><b>${b}</b><small>${sub}</small></span></a>`;
-  const tiles=tile("#homework","📝",t("Deures","Homework"),miss?t(`${miss} per fer`,`${miss} missing`):up.length?t("Els següents: ","Next: ")+when(up[0].date):t("Res per als propers dies","Nothing for the next few days"),miss||up.length||"",miss?"late":"")
+  const td=todoItems(lss),hws=hwList(ls,info),hwOpen=hws.filter(x=>!x.done);
+  const tile=(h,i,b,sub,badge,cl,wide)=>`<a class="tile${wide?" wide":""}" href="${h}"><span class="ti"><span aria-hidden="true">${i}</span>${badge?`<span class="tb ${cl||""}">${badge}</span>`:""}</span><span><b>${b}</b><small>${sub}</small></span></a>`;
+  // ✅ To do (opened in class, not finished) and 🏠 Homework (only what the teacher set as homework) are two tiles (Roger, 6 Nov 2026)
+  const tiles=tile("#todo","✅",t("Per fer","To do"),td.length?(td.length>1?t(`${td.length} learning paths oberts per acabar`,`${td.length} open learning paths to finish`):t("1 learning path obert per acabar","1 open learning path to finish")):t("Ho tens tot fet","All done"),td.length||"","")
+    +tile("#homework","📝",t("Deures","Homework"),hwOpen.length?t("Per al ","For ")+when(hwOpen[0].x.date):t("No tens deures","No homework"),hwOpen.length||"","hw")
     +tile("#marks","📊",t("Les meves notes","My marks"),t("activitats, exàmens i producte final","activities, exams and final product"))
     +tile("#units","📚","Learning Situations",t("resums, pràctica i el teu nivell","summaries, practice and your level"))
-    +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"));
+    +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"),"","",true);
   return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr"><div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`}
 function placeHtml(place,lss,ls,list,info,st,stTag,pend){
-  if(place==="hw"){const w=workBox(),l=lateBox(lss),wk=weekBox(ls,info);return l+w+(wk||`<div class="box"><p class="muted">${t("No tens deures per als propers dies.","No homework for the next few days.")}</p></div>`)}
-  if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";return pend+marksHead(lss,ls)+`<div id="ptbox">${pointsBox()}</div>`+tabBody(ls,list,info)}
+  if(place==="todo")return todoBox(lss,ls,info)+(only(ls.id)?"":weekBox(ls,info,true));
+  if(place==="hw")return homeworkBox(ls,info);
+  if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";return pend+workBox()+marksHead(lss,ls)+`<div id="ptbox">${pointsBox()}</div>`+tabBody(ls,list,info)}   // 📋 My activities: what counts for the mark (Roger, 6 Nov 2026: not under To do)
   if(place==="units")return unitsBox(lss,ls,st,stTag)+studyBox(ls)+practiceBox(ls);
   if(place==="phone")return phoneBox();
   if(place==="news")return annBox()||`<div class="box"><p class="muted">${t("Encara no hi ha anuncis.","No announcements yet.")}</p></div>`;
@@ -314,8 +324,9 @@ function render(){
 }
 // Phone bar (Roger, 6 Nov 2026): the same four places as the home tiles, always at the bottom of the screen.
 function bnav(place,lss){
-  const miss=lss.length?(S.wmiss?S.wmiss.size:0)+lateList(lss).length:0,it=[["home","#","🏠",t("Inici","Home")],["hw","#homework","📝",t("Deures","Homework")],["marks","#marks","📊",t("Notes","Marks")],["units","#units","📚","LS"],["help","#help","❓",t("Ajuda","Help")]];
-  $("#bnav").innerHTML=lss.length?it.map(([k,h,i,l])=>`<a href="${h}" class="${place===k?"on":""}"${place===k?' aria-current="page"':""}><i>${i}</i>${l}${k==="hw"&&miss?`<b>${miss}</b>`:""}</a>`).join(""):"";
+  const miss=lss.length?(S.wmiss?S.wmiss.size:0)+lateList(lss).length:0,it=[["home","#","🏠",t("Inici","Home")],["todo","#todo","✅",t("Per fer","To do")],["hw","#homework","📝",t("Deures","Homework")],["marks","#marks","📊",t("Notes","Marks")],["units","#units","📚","LS"],["help","#help","❓",t("Ajuda","Help")]];
+  const ls=EL_LS.find(l=>l.id===S.ls),nt=lss.length?todoItems(lss).length:0,nh=ls?hwList(ls,D.ls[ls.id]||{}).filter(x=>!x.done).length:0;
+  $("#bnav").innerHTML=lss.length?it.map(([k,h,i,l])=>`<a href="${h}" class="${place===k?"on":""}"${place===k?' aria-current="page"':""}><i>${i}</i>${l}${k==="todo"&&nt?`<b>${nt}</b>`:k==="hw"&&nh?`<b class="hw">${nh}</b>`:""}</a>`).join(""):"";
 }
 // The LS report (Roger, 1 Nov 2026: "the idea is that I don't need to make [the LS1 reports] again since all the info could be on their
 // student board"): a big LS picker and three tabs per LS. 🗓 My week (plan, homework, summary, practice), 📈 My formative assessment
@@ -723,18 +734,57 @@ function weekHtml(p,gi,i,info,title,now){const r=p.rows[i];if(!r)return "";const
 // Calendar to the group's feed (calendar/<group>.ics, tools/gen-calendar.js), so all later homework appears there by itself.
 // the teacher's message of a homework (Roger, 1 Nov 2026: "a message ready for the students telling instructions"), links clickable
 const hwLinks=m=>esc(m).replace(/https?:\/\/[^\s<]+/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
-function hwBox(p,gi,info){const xs=ELWeek.upcoming(p,gi,null,null,((info||{}).homework||{})[D.me.group]),cal=ELWeek.calendar(D.me.group);
+function hwBox(p,gi,info){const xs=ELWeek.studentHw(p,gi,((info||{}).homework||{})[D.me.group]),cal=ELWeek.calendar(D.me.group);
   return `<div class="hw"><b>🏠 ${t("Deures i classes pel teu compte","Homework and classes on your own")}</b>`
     +(xs.length?`<ul>${xs.map(x=>`<li>${x.kind==="self"?"📚":"🏠"} ${esc(ELWeek.taskText(x,lang()))}${x.extra?` <a href="${ELWeek.gcalLink(x,lang())}" target="_blank" rel="noopener" title="${t("Afegeix-ho al calendari","Add it to my calendar")}">📅</a>`:""}${x.msg?`<details class="hwmsg"><summary>${t("Instruccions del professor","Teacher's instructions")}</summary><div>${hwLinks(x.msg)}</div></details>`:""}</li>`).join("")}</ul>`:`<p class="muted">${t("No tens deures per als propers dies.","No homework for the next few days.")}</p>`)
     +`<p><a class="go" href="${cal.google}" target="_blank" rel="noopener">📅 ${t("Afegeix-ho al meu Google Calendar","Add it to my Google Calendar")}</a> <small class="muted">${t("Només cal fer-ho una vegada: hi apareixeran tots els deures i el dia de l'examen.","You only do it once: all your homework and the exam day will appear there.")}</small></p></div>`}
-function weekBox(ls,info){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.me.group);if(!p||gi<0||!ELWeek.span(p))return "";
+// ✅ To do (Roger, 6 Nov 2026: "When I open a section it must be set as to do. So in each class I open a section or LP and they see it as to
+// do. They are only homework if I say so (I can say that a LP is homework or only a section)"): every learning path and tab the teacher
+// has opened for my group that I haven't finished (elTodoList in el-catalog.js), with its open tabs as links and 📝 when the teacher has also
+// set it (or one of its tabs) as homework. Nothing from the plan's days (Roger: "I don't [want] students [to] see anything as to do nor the
+// week. I say when to do sth since otherwise is too much info"). Opening is enough: the teacher sets
+// nothing else. Homework has its own place (homeworkBox): only what the teacher set as homework.
+function todoItems(lss){if(!D.me.group)return [];
+  return lss.filter(l=>!only(l.id)).flatMap(l=>{const {p,gi}=planOf(l);return elTodoList(l.id,D.ls[l.id]||{},D.me.group,doneSet,isDone,p,gi).map(x=>Object.assign(x,{l,p,gi}))})}
+const tabDone=(a,id,ds)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>ds.has(k))};
+// the homework of an LS still ahead, only what the teacher set (ELWeek.studentHw): {x, acts: [[activity, [panel ids]]] (elHwTargets; [] = the whole path), done, href}
+function hwList(ls,info){const {p,gi}=planOf(ls);if(gi<0||only(ls.id)||!D.me.group)return [];
+  return ELWeek.studentHw(p,gi,((info||{}).homework||{})[D.me.group]).map(x=>{const tg=elHwTargets(x,ls.id,p,gi)||{};
+    const acts=Object.entries(tg).map(([id,ps])=>[EL_CATALOG.find(a=>a.id===id),ps||[]]).filter(([a])=>a);
+    const left=acts.flatMap(([a,ps])=>{const ds=doneSet(a),all=((window.EL_SECTIONS||{})[a.id]||[]).map(z=>z[0]).filter(id=>elSecSteps(a,id).length);
+      return (ps.length?ps:all.length?all:[""]).filter(id=>id?!tabDone(a,id,ds):!isDone(a)).map(id=>[a,id])});
+    return {x,acts,done:acts.length>0&&!left.length,href:left.length?tabHref(left[0][0],left[0][1]||undefined):acts.length?tabHref(acts[0][0]):null,can:acts.every(([a,ps])=>canDo(a,info)&&!ps.some(id=>secOff(a,info,id)))}})}   // a tab still locked: "not open yet"
+function todoBox(lss,ls,info){const xs=todoItems(lss),hws=hwList(ls,info).filter(h=>!h.done),many=new Set(xs.map(x=>x.l.id)).size>1;
+  const hwOf=a=>hws.find(h=>h.acts.some(([y])=>y.id===a.id)),hwTab=(a,id)=>hws.some(h=>h.acts.some(([y,ps])=>y.id===a.id&&ps.includes(id)));
+  const head=`<h2>✅ ${t("Per fer","To do")}</h2><p class="muted" style="margin:0 0 10px">${t("Tot el que el professor ha obert a classe i encara no has acabat. Clica una pestanya per anar-hi. Els <b>deures</b> són una altra cosa: només el que el professor posa com a deures (📝 Deures).","Everything your teacher has opened in class that you haven't finished yet. Click a tab to go straight to it. <b>Homework</b> is different: only what your teacher sets as homework (📝 Homework).")}</p>`;
+  if(!xs.length)return `<div class="box todo">${head}<p class="ptok">✓ ${t("No tens res per fer: has acabat tot el que el professor ha obert.","Nothing to do: you have finished everything your teacher has opened.")}</p></div>`;
+  const li=x=>{const a=x.a,ds=doneSet(a),ks=steps(a),n=ks.filter(k=>ds.has(k)).length,num=x.p&&x.gi>=0?lpNums(x.p,x.gi)(a):"",nm=(num?num+" · ":"")+a.title.split(/[:(]/)[0].trim(),h=hwOf(a);
+    const tags=(h?` <span class="tdtag hw">📝 ${t("deures per al","homework for")} ${when(h.x.date)}</span>`:"");
+    const chips=x.cp?`<a class="stp go2" href="${tabHref(x.cp)}">⏱ ${t(`Primer fes el ${esc(x.cp.title)} (sense apunts)`,`First do ${esc(x.cp.title)} (without notes)`)} →</a>`
+      :x.tabs.length?x.tabs.map(([id,tn])=>`<a class="stp go2 ${hwTab(a,id)?"hwt":""}" href="${tabHref(a,id)}">${hwTab(a,id)?"📝 ":""}${esc(tn)} →</a>`).join("")
+      :`<a class="stp go2" href="${tabHref(a)}">${t("Obre-la","Open it")} →</a>`;
+    return `<li><div class="tdh"><b><a href="${tabHref(a)}">${esc(nm)}</a></b>${ks.length>1?` <small class="muted">· ${n} / ${ks.length} ${t("passos fets","steps done")}</small>`:""}${tags}</div><div class="chips">${chips}</div></li>`};
+  return `<div class="box todo">${head}${many?lss.filter(l=>xs.some(x=>x.l.id===l.id)).map(l=>`<h3 class="tdls">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</h3><ul class="tdl">${xs.filter(x=>x.l.id===l.id).map(li).join("")}</ul>`).join(""):`<ul class="tdl">${xs.map(li).join("")}</ul>`}</div>`}
+// 📝 Homework (Roger, 6 Nov 2026: "They are only homework if I say so"): only what the teacher set as homework (a learning path or some of
+// its tabs, 🏠 Set as homework on the dashboard; never the plan's "Homework by …" lines: ELWeek.studentHw), with the day it is for, ✔ when I have done it, a
+// button to the first tab still to do, the teacher's instructions and the calendar. LS1 keeps its old week plan.
+function homeworkBox(ls,info){const empty=`<div class="box"><p class="muted">${t("No tens deures per als propers dies.","No homework for the next few days.")}</p></div>`;
+  if(only(ls.id))return weekBox(ls,info)||empty;
+  const {p,gi}=planOf(ls);if(gi<0||!ELWeek.span(p))return empty;const xs=hwList(ls,info),cal=ELWeek.calendar(D.me.group);
+  const li=h=>{const x=h.x,st=h.done?`<span class="ok">✔ ${t("Fet","Done")}</span>`:h.acts.length&&!h.can?`<small class="muted">🔒 ${t("encara no està oberta","not open yet")}</small>`:h.acts.length?`<span class="td">${t("Per fer","To do")}</span>`:"";
+    return `<li class="${h.done?"dn":""}"><div class="hwl"><span class="hwi">📝</span><span class="hwt">${esc(ELWeek.taskText(x,lang()))}</span>${st}${h.href&&!h.done&&h.can?`<a class="go" href="${h.href}">${t("Obre","Open")} →</a>`:""}${x.extra?` <a href="${ELWeek.gcalLink(x,lang())}" target="_blank" rel="noopener" title="${t("Afegeix-ho al calendari","Add it to my calendar")}">📅</a>`:""}</div>`
+      +`${x.msg?`<details class="hwmsg"><summary>${t("Instruccions del professor","Teacher's instructions")}</summary><div>${hwLinks(x.msg)}</div></details>`:""}</li>`};
+  return `<div class="box hwbox"><h2>📝 ${t("Deures","Homework")} <small class="muted">· ${lsName(ls)}</small></h2><p class="muted" style="margin:0 0 10px">${t("Només el que el professor ha posat com a deures, amb el dia per al qual és. El que obrim a classe és a ✅ Per fer.","Only what your teacher has set as homework, with the day it is for. What we open in class is in ✅ To do.")}</p>`
+    +(xs.length?`<ul class="hwlist">${xs.map(li).join("")}</ul>`:`<p class="ptok">✓ ${t("No tens deures per als propers dies.","No homework for the next few days.")}</p>`)
+    +`<p style="margin-top:12px"><a class="go" href="${cal.google}" target="_blank" rel="noopener">📅 ${t("Afegeix-ho al meu Google Calendar","Add it to my Google Calendar")}</a> <small class="muted">${t("Només cal fer-ho una vegada: hi apareixeran tots els deures i el dia de l'examen.","You only do it once: all your homework and the exam day will appear there.")}</small></p></div>`}
+function weekBox(ls,info,noHw){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.me.group);if(!p||gi<0||!ELWeek.span(p))return "";
   const today=ELWeek.today(),i=ELWeek.row(p),nx=p.rows.findIndex(r=>r.from>today),ex=ELWeek.exam(p,gi),n=ex?ELWeek.days(today,ex):null;
   const exam=ex&&n>=0?`<div class="exam">📝 ${t("Examen","Exam")}: ${when(ex)}${n>1?t(` · d'aquí a ${n} dies`,` · in ${n} days`):n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
   // learning paths the teacher dropped for the group (no time): not in the exam and not counted (Roger, 1 Nov 2026)
   const dr=((p._dropped||{})[gi]||[]).map(id=>EL_CATALOG.find(a=>a.id===id)).filter(Boolean);
   const drop=dr.length?`<p class="muted">✂ ${t("No entra a l'examen ni compta per a la nota (no hi vam tenir temps): ","Not in the exam and it does not count (we had no time for it): ")}${dr.map(a=>"<b>"+esc(a.title.split(/[:(]/)[0].trim())+"</b>").join(", ")}</p>`:"";
   const wk=n=>t("Setmana ","Week ")+(n+1);
-  if(!only(ls.id))return `<div class="box wkbox"><h2>${t("Què hem fet a classe","What we've done in class")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Els learning paths i les pestanyes que ja hem fet a classe. Si un dia no vas poder venir, mira-ho aquí i fes-ho a casa.","The learning paths and tabs we have already done in class. If you missed a class, check it here and do it at home.")}</p>${exam}${drop}${doneBox(ls,p,gi,info)}${hwBox(p,gi,info)}</div>`;
+  if(!only(ls.id))return `<div class="box wkbox"><h2>${t("Què hem fet a classe","What we've done in class")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Els learning paths i les pestanyes que ja hem fet a classe. Si un dia no vas poder venir, mira-ho aquí i fes-ho a casa.","The learning paths and tabs we have already done in class. If you missed a class, check it here and do it at home.")}</p>${exam}${drop}${doneBox(ls,p,gi,info)}${noHw?"":hwBox(p,gi,info)}</div>`;
   const main=i>=0?weekHtml(p,gi,i,info,t("Aquesta setmana","This week")+" · "+wk(i),true):nx>=0?weekHtml(p,gi,nx,info,(nx===0?t("Comencem","We start"):t("Propera setmana","Next week"))+" · "+wk(nx),true):`<p class="muted">${t("El pla d'aquesta LS ja s'ha acabat.","The plan of this LS is over.")}</p>`;
   return `<div class="box wkbox"><h2>${t("El meu pla setmanal","My week plan")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Què fem a classe i què has de fer cada setmana. Si un dia no pots venir, mira-ho aquí.","What we do in class and what you have to do every week. If you miss a class, check it here.")}</p>${exam}${drop}${hwBox(p,gi,info)}${main}`
     +`<details class="all"><summary>${t("Tot el pla de la LS","The whole LS plan")}</summary>${p.rows.map((r,k)=>weekHtml(p,gi,k,info,wk(k),k===i)).join("")}</details></div>`}

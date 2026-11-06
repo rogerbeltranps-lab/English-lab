@@ -43,9 +43,9 @@
     // "Homework by Tue 10 · …" (date = that day, set = the class just before it), "self" = a class line marked "· self-study"
     // (the teacher is away), "exam" = the exam day. The student board, My week, the dashboard and the calendar feeds use it.
     // added: homework the teacher set from the dashboard ("🏠 Set as homework" on a session line; ls/{id}.homework[group] =
-    // {id: {text, by, set, msg}}; msg = the teacher's message with the instructions, shown to students under the item), listed with kind "hw" and extra:true (they are not in the calendar feed, which is a static file).
+    // {id: {text, by, set, msg, tabs}}; msg = the teacher's message with the instructions, shown to students under the item; tabs = {activity id: [panel ids]}, what it covers, elHwTargets), listed with kind "hw" and extra:true (they are not in the calendar feed, which is a static file).
     tasks(p,gi,added){const out=[];if(!p||gi<0)return out;
-      Object.entries(added||{}).forEach(([id,h])=>{if(h&&h.text&&h.by)out.push({kind:"hw",date:h.by,set:h.set||null,text:h.text,extra:true,id,msg:h.msg||null})});
+      Object.entries(added||{}).forEach(([id,h])=>{if(h&&h.text&&h.by)out.push({kind:"hw",date:h.by,set:h.set||null,text:h.text,extra:true,id,msg:h.msg||null,tabs:h.tabs||null})});
       const at=(from,dn,n)=>{for(let k=0;k<21;k++){const s=add(from,k),d=day(s);if(d.getDate()===n&&DAYS.en[d.getDay()]===dn)return s}return null};
       let last=null;
       (p.rows||[]).forEach(r=>{if(!r.from)return;String((r.g?r.g[gi]:r.what)||"").split("\n").forEach(raw=>{const ln=raw.trim();
@@ -58,6 +58,10 @@
       return out.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0)},
     // homework and self-study classes still ahead (date >= from, by default today), within `days` days
     upcoming(p,gi,from,days,added){from=from||today();const to=add(from,days==null?14:days);return this.tasks(p,gi,added).filter(x=>x.kind!=="exam"&&x.date>=from&&x.date<=to)},
+    // what students see as homework (Roger, 6 Nov 2026: "I say when to do sth since otherwise is too much info … if we don't finish I can
+    // say this is homework"): only the homework the teacher set on the dashboard (🏠 Set as homework, extra:true). The plan's "Homework by …"
+    // and self-study lines are only suggestions on the teacher's dashboard. The board, el-todo.js, the Sunday email and the calendar use it.
+    studentHw(p,gi,added,from,days){return this.upcoming(p,gi,from,days,added).filter(x=>x.extra)},
     // calendar feed of a group (tools/gen-calendar.js writes calendar/<group id>.ics from this file): the .ics link and the link
     // that subscribes a Google Calendar to it once, so every later homework appears by itself
     calendar(gid,root){const ics=new URL("calendar/"+String(gid).toLowerCase()+".ics",root||location.href).href;
