@@ -141,6 +141,13 @@ service cloud.firestore {
     match /gameResults/{id} {
       allow read, write: if isTeacher();
     }
+    // each student's own class game results (Roger, 6 Nov 2026: "I want students to see their results in the games and suggestions of what
+    // to study"): myGames/{email}.games[{group}_{sid}], written by the board at the end of a game (lab/game/host.js); the student reads only
+    // their own (📝 Your notes on the LS page, shared/js/el-notes.js)
+    match /myGames/{email} {
+      allow get: if school() && email == myEmail();
+      allow read, write: if isTeacher();
+    }
     // ⛶ class full screen (shared/js/el-cloud.js fsLeft): live/{group}/fsLeft/{email} = {name, at, pull, n}, written by a student of the group
     // when they leave the full screen of a pull-up; only the teacher reads them (the dashboard and the learning path page list who left)
     match /live/{group}/fsLeft/{email} {

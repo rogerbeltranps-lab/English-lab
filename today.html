@@ -58,7 +58,7 @@ body[data-place="home"] .page h1{font-size:2.2rem;letter-spacing:-.02em;margin:.
 .cont{background:#3157d5;color:#fff;border-radius:22px;padding:28px 30px;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 24px #3157d533}.cont .ck{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d6e0ff}
 .cont .ct{font-size:30px;font-weight:800;line-height:1.15;letter-spacing:-.01em}.cont .cs{font-size:17px;color:#e3e9ff}.cont .crow{display:flex;align-items:center;gap:12px;max-width:520px}.cont .cbar{flex:1;height:10px;border-radius:999px;background:#2443ad;overflow:hidden}.cont .cbar span{display:block;height:100%;background:#fff;border-radius:999px}.cont .cn{font-size:14px;font-weight:700;white-space:nowrap}
 .cont a.cgo{align-self:flex-start;margin-top:6px;background:#fff;color:#2443ad;border-radius:14px;padding:15px 38px;font-size:19px;font-weight:800;text-decoration:none}.cont a.cgo:hover{outline:3px solid #c7d4ff}.cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done a.cgo{color:#166534}
-a.hal{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:16px;text-decoration:none;font-size:16px}a.hal span{margin-left:auto;font-weight:800;white-space:nowrap}a.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}a.hal.news{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}a.hal.lsl{background:#fff;border:1px solid #e2e8f0;color:#0f172a}a.hal.lsl .lt{font-style:normal;min-width:0}a.hal.lsl b{color:#0f172a;font-size:17px}a.hal.lsl small{display:block;color:#64748b;font-size:14px}a.hal.lsl span{color:#3157d5}a.hal.lsl:hover{border-color:#3157d5}a.hal:hover{filter:brightness(.97)}
+a.hal{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:16px;text-decoration:none;font-size:16px}a.hal span{margin-left:auto;font-weight:800;white-space:nowrap}a.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}a.hal.news{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}a.hal.lsl{background:#fff;border:1px solid #e2e8f0;color:#0f172a}a.hal.lsl .lt{font-style:normal;min-width:0}a.hal.lsl b{color:#0f172a;font-size:17px}a.hal.lsl small{display:block;color:#64748b;font-size:14px}a.hal.lsl span{color:#3157d5}a.hal.lsl:hover{border-color:#3157d5}a.hal:hover{filter:brightness(.97)}a.hal.games{background:#fff;border:1px solid #e2e8f0;color:#0f172a;flex-wrap:wrap}a.hal.games .rings{display:flex;gap:14px;margin:0}a.hal.games .rings span{margin:0!important}a.hal.games .lt{font-style:normal;min-width:0}a.hal.games .lt b{font-size:17px;color:#0f172a}a.hal.games small{display:block;color:#64748b;font-size:14px}a.hal.games>span:last-child{color:#3157d5}a.hal.games:hover{border-color:#3157d5}
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile.wide{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;gap:14px;padding:14px 20px}a.tile .tb.hw{background:#0e7490}
 .todo .tdl,.hwlist{list-style:none;margin:0;padding:0}.todo .tdl li{border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin:0 0 10px;background:#fff}.todo .tdl li.late{border-color:#fca5a5;background:#fff7f7}
 .todo .tdh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-bottom:8px}.todo .tdh b{font-size:17px}.todo .tdh b a{color:#1e3a8a;text-decoration:none}.todo .tdh b a:hover{text-decoration:underline}
@@ -142,6 +142,7 @@ async function load(u){
   elInjectCorrected(D.pg,D.rs);   // steps the teacher corrected count as done (el-catalog.js; in memory only)
   for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
   try{const p=await F.getDoc(F.doc(db,"points",mail));if(p.exists())D.pt=p.data()}catch(e){}
+  try{const g=await F.getDoc(F.doc(db,"myGames",mail));if(g.exists())D.mg=g.data().games||{}}catch(e){}   // 🧩 📚 class game circles (gamesCard)
   if(D.me.group)try{const t=await F.getDoc(F.doc(db,"teams",D.me.group));if(t.exists())D.tm=t.data()}catch(e){}
   if(!AS)try{D.ann=await ELCloud.announcements()}catch(e){console.warn("announcements",e)}
   return D;
@@ -236,7 +237,14 @@ function homeHtml(lss,ls,info){
     +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"),"","",true);
   // the LS page, right under Continue (Roger, 6 Nov 2026: "students go from the dashboard to the ls and the ls to the dashboard")
   const lsLink=ls&&!only(ls.id)?`<a class="hal lsl" href="${lsHref(ls)}">📚 <em class="lt"><b>${lsName(ls)}</b><small>${t("tots els learning paths, el repte i per estudiar","all learning paths, the challenge and study")}</small></em><span>${t("Obre la LS","Open the LS")} →</span></a>`:"";
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}${lsLink}</div><div class="hr"><div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`}
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}${lsLink}${gamesCard(ls)}</div><div class="hr"><div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`}
+// 🧩 📚 Games and theory (Roger, 6 Nov 2026: "a kind of circle with a percentage on the board saying something like games and theory, click
+// to see your performance and what to study … two, grammar and vocabulary"): % right in this LS's class games (myGames/{email}, written by
+// the game board), the link opens the LS page's 📝 place with the theory, their notes, each game's result and what to study
+function gamesCard(ls){
+  const all=Object.values(D.mg||{}).filter(g=>ls&&g.ls===ls.id);if(!all.length||!window.elGameStats)return "";
+  const st=elGameStats(all);
+  return `<a class="hal games" href="${lsHref(ls)}#notes"><span class="rings">${elRing(st.grammar,"🧩 "+t("Gramàtica","Grammar"))}${elRing(st.vocab,"📚 "+t("Vocabulari","Vocabulary"))}</span><em class="lt"><b>${t("Jocs i teoria","Games and theory")}</b><small>${t("Mira els teus resultats i què has d'estudiar","See your results and what to study")}</small></em><span>${t("Obre","Open")} →</span></a>`}
 function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="todo")return todoBox(lss,ls,info)+(only(ls.id)?"":weekBox(ls,info,true));
   if(place==="hw")return homeworkBox(ls,info);

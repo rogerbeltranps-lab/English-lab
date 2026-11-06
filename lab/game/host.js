@@ -153,8 +153,18 @@ async function award(i){
 //    stu:[{e, r, a, miss:[n…], ans:{n: their answer}, notes:{p<k>: text}}] (e = email, r = right, a = answered, miss = the shown questions
 //    they got wrong or didn't answer, ans = what they tapped or wrote, notes = their 📝 notes), qs[].ok = the right answer,
 //    nts:[{k, topic}] (the notes slides; a game is saved also when nobody answered a question but someone wrote notes)}
+// 📝 The group played this game (Roger, 6 Nov 2026: "if a student doesn't come and doesn't do the game, the system detects it and saves the
+// theory in their notes"): ls/{id}.played[group][deck] = day (ms of the first time), written once per game when the board reaches a notes
+// slide or the end. Students already read their LS's ls doc on every page (el-cloud.js lsInfo), so 📝 Your notes shows the theory of
+// every game their group played, with their own notes when they took them (el-notes.js). No extra reads.
+let playedSid=0;
+function markPlayed(){
+  const id=lsId();if(!id||!H.g||!H.sid||playedSid===H.sid||!H.deck||H.deck.notes===false)return;playedSid=H.sid;
+  S.setDoc(S.doc(db,"ls",id),{played:{[H.g]:{[H.deckId]:H.sid}}},{merge:true}).catch(e=>{playedSid=0;console.warn("played",e)});
+}
 let savedSid=0;
 async function saveResults(){
+  markPlayed();
   if(!H.g||!H.sid||savedSid===H.sid||!H.deck)return;
   const qs=qList(),shown=qs.filter(i=>H.aw[i]);if(!shown.length&&!slides().some((s,i)=>isN(s)&&answered(i).length))return;
   const meta=(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{},num=i=>qs.indexOf(i)+1;
@@ -173,6 +183,16 @@ async function saveResults(){
     nts:nIdx.map(i=>({k:"p"+slides()[i].notes,topic:slides()[i].topics.join(" · ").slice(0,200)})),stu};
   savedSid=H.sid;
   try{await S.setDoc(S.doc(db,"gameResults",H.g+"_"+H.sid),doc)}catch(e){savedSid=0;console.warn("results",e);H.err="⚠ Results not saved: "+e.message;draw()}
+  // each student's own result (Roger, 6 Nov 2026: "I want students to see their results in the games and suggestions of what to study"):
+  // myGames/{email}.games[{group}_{sid}] = {deck, title, kind, ls, lp, day, sid, r, of, miss:[{n, q, a (their answer), ok, p (the notes part
+  // whose theory it practises)}]} (firestore.rules: the student reads their own, only the teacher writes). One write per player per game;
+  // the LS page's 📝 Your notes reads it once (shared/js/el-notes.js) and puts it with the theory and their notes.
+  if(!shown.length)return;
+  const partOf=i=>{for(let j=i-1;j>=0;j--)if(isN(slides()[j]))return "p"+slides()[j].notes;return ""};
+  try{const w=S.writeBatch(db),key=H.g+"_"+H.sid;
+    stu.forEach(x=>{const miss=x.miss.map(n=>{const i=qs[n-1],q=doc.qs.find(z=>z.n===n)||{};return {n,q:q.q||"",a:x.ans[n]==null?"":x.ans[n],ok:q.ok||"",p:partOf(i)}});
+      w.set(S.doc(db,"myGames",x.e),{games:{[key]:{deck:H.deckId,title:H.deck.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid,r:x.r,of:shown.length,miss}},updated:S.serverTimestamp()},{merge:true})});
+    await w.commit()}catch(e){console.warn("my games",e);H.err="⚠ Students' results not saved: "+e.message;draw()}
 }
 let autoT=null;
 function autoReveal(){   // like a Kahoot: once everyone who joined has answered, the answer shows by itself
@@ -199,7 +219,7 @@ function go(to){
   if(to==="reveal"){H.phase="reveal";award(H.i);G.music("");G.fx("reveal");setTimeout(()=>G.fx(H.aw[H.i]&&H.aw[H.i].length?"right":"wrong"),700)}
   else if(to==="next"){
     if(H.i+1>=slides().length){H.phase="end";saveResults();G.music("");G.fx("drum");setTimeout(()=>{G.fx("fanfare");G.confetti()},1700)}
-    else{H.i++;H.phase="show";H.step=1;G.fx("next");G.music(isQ(cur())?"think":"")}
+    else{H.i++;H.phase="show";H.step=1;G.fx("next");G.music(isQ(cur())?"think":"");if(isN(cur()))markPlayed()}
   }
   keep();live();draw();autoReveal();
 }

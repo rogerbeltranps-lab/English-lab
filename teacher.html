@@ -37,6 +37,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 .ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}table.plan td{vertical-align:top;text-align:left;white-space:normal}table.plan td.pc{text-align:center;white-space:nowrap}table.plan tr.pb td{background:#f1f5f9;border-top:2px solid #cbd5e1}table.plan td.in{padding-left:22px}
 #loadbar .live{color:#166534}.cnow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-radius:12px;padding:8px 12px;margin:6px 0}.cnow.ask{background:#fef3c7;border:2px solid #f59e0b}.cnow.info{background:#ecfdf5;border:1px solid #86efac;font-size:14px}.cnow .x{background:none;color:#475569;padding:0 6px;margin-left:auto}
 .who{display:inline-block;border-radius:999px;padding:1px 8px;font-size:12px;white-space:nowrap}.who.a{background:#dcfce7;color:#166534}.who.y{background:#e0e7ff;color:#3730a3}
+.grings{display:inline-flex;align-items:center;gap:3px;margin-left:8px;vertical-align:middle;text-decoration:none;font-size:13px}
 </style>
 <style>/* Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"): a side menu, a home with a few
    alerts, one big card for the class and tiles; every box of the old long page lives inside one place behind a tile */
@@ -1176,9 +1177,21 @@ function pointsBox(g){
 }
 // 🏠 on a learning path's heading (set some of its tabs as homework): a group tab whose time plan has this LS, and a page with tabs
 const canHw=a=>GR.some(g=>g.id===S.g)&&((window.EL_SECTIONS||{})[a.id]||[]).length>0&&ELWeek.col((window.EL_PLAN||{})[a.ls],S.g)>=0;
+// 🧩 📚 class game circles next to each student (Roger, 6 Nov 2026: "I want those circles next to the students in the list"): % right in the
+// grammar and vocabulary games of this LS (gameResults of the group, read once per dashboard load: one read per game played)
+const GAMES={};
+function gameRings(s){const g=GAMES[S.g];if(!g||g.busy||!s.email)return "";const em=String(s.email).toLowerCase(),ls=S.ls||"";
+  const mine=g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done}:null}).filter(Boolean);
+  if(!mine.length)return "";const st=elGameStats(mine);
+  return `<a class="grings" href="lab/game/results.html?g=${encodeURIComponent(S.g)}" target="_blank" rel="noopener" title="Class games of this LS: % right in 🧩 grammar and 📚 vocabulary (click for the answers and notes)"><span>🧩</span>${elRing(st.grammar,"",30)}<span>📚</span>${elRing(st.vocab,"",30)}</a>`}
+function loadGames(){const g=S.g;if(DEMO||!g||GAMES[g])return;GAMES[g]={busy:true,list:[]};
+  F.getDocs(F.query(F.collection(db(),"gameResults"),F.where("group","==",g))).then(q=>{
+    const lsOf=x=>{const nm=String(x.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase(),l=(window.EL_LS||[]).find(y=>y.course===x.course&&y.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""};
+    GAMES[g]={list:q.docs.map(d=>{const x=d.data();x.lsId=lsOf(x);return x})};render()}).catch(e=>{console.warn("games",e);GAMES[g]={list:[]}})}
 function progress(studs,list){
+  loadGames();
   const open=a=>!S.folded.has(a.id)&&steps(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
-  let h1=`<tr><th class="stu"${rs}>Student</th><th${rs}>Route</th>`,h2="<tr>";
+  let h1=`<tr><th class="stu"${rs}>Student${GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small>':""}</th><th${rs}>Route</th>`,h2="<tr>";
   list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}${canHw(a)?` <button type="button" class="g mini lphw" data-do="lphw" data-a="${esc(a.id)}" title="Set some tabs of this learning path as homework">🏠 Homework</button>`:""}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} steps)`:pts(a)}</small>`;
     if(open(a)){h1+=`<th class="lp first" colspan="${steps(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
       h2+=steps(a).map((k,i)=>`<th class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${k}<br>${stepCrit(a,k)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
@@ -1186,7 +1199,7 @@ function progress(studs,list){
   h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
   let b="";const cols=list.reduce((n,a)=>n+(open(a)?steps(a).length+1:1),0);
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
-    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}</td>`;
+    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${gameRings(s)}</td>`;
     if(s.away){b+=`<tr class="away">${who}${awayRt(s)}<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
     b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);

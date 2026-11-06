@@ -99,8 +99,13 @@ function notesView(){
   if(ta&&ta.dataset.k===k)return;   // a redraw (the board's beat) keeps the box, the caret and what they are typing
   if(NT.k!==k){Object.assign(NT,{k,pk:"p"+nt.k,i:String(x.i),meta:nt,v:((NT.docs[nt.deck]&&NT.docs[nt.deck].parts||{})["p"+nt.k]||{}).text||"",st:""})}
   const tp=(nt.topics||[]).filter(Boolean);
-  app$.innerHTML=top()+`<div class="main"><form class="nform slidein" data-k="${esc(k)}"><div class="nhead"><span class="nemo">📝</span><div><label for="nt" class="nlab">${esc(T("Take your notes:","Pren apunts:"))}</label>
-      ${tp.length?`<div class="ntop">${tp.map(t=>`<span>${md(t)}</span>`).join("")}</div>`:""}</div></div>
+  // a copy of the theory slides next to the box (Roger, 6 Nov 2026: "they get a copy of the slides"): decks/theory.js has only the theory
+  const th=(((window.EL_GAME_THEORY||{})[nt.deck]||{}).parts||[]).find(p=>p.k==="p"+nt.k);
+  const bl=l=>l&&l.table?`<table><thead><tr>${l.table[0].map(c=>`<th>${md(c)}</th>`).join("")}</tr></thead><tbody>${l.table.slice(1).map(r=>`<tr>${r.map(c=>`<td>${md(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
+    :l&&l.watch?`<p class="w">⚠️ ${md(l.watch)}</p>`:`<p>${md(l)}</p>`;
+  const thHtml=th?`<div class="nth">${th.slides.map(s=>`<h4>${md(s.theory)}</h4>${(s.lines||[]).map(bl).join("")}`).join("")}</div>`:"";
+  app$.innerHTML=top()+`<div class="main"><form class="nform slidein${th?" two":""}" data-k="${esc(k)}"><div class="nhead"><span class="nemo">📝</span><div><label for="nt" class="nlab">${esc(T("Take your notes:","Pren apunts:"))}</label>
+      ${tp.length?`<div class="ntop">${tp.map(t=>`<span>${md(t)}</span>`).join("")}</div>`:""}</div></div>${thHtml}
       <textarea id="nt" data-k="${esc(k)}" maxlength="3000" spellcheck="false" placeholder="${esc(T("In your own words: the rule, two examples and the mistake to avoid. Look at the board.","Amb les teves paraules: la regla, dos exemples i l'error que has d'evitar. Mira la pissarra."))}">${esc(NT.v)}</textarea>
       <p class="nst" id="ntst"></p></form></div>`;
   noteState(null);

@@ -348,3 +348,14 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
 // vocabulary or grammar step with none of its own (recall, words, cards, practice, grammar, mixed, vocab) gives evidence for 4.1 and 5.1.
 (function(){const UOE=["recall","words","cards","practice","grammar","mixed","vocab"];
   Object.keys(window.EL_STEP_CRITERIA).forEach(id=>{const sc=window.EL_STEP_CRITERIA[id];(window.EL_ACTIONS[id]||[]).forEach(k=>{if(UOE.includes(k)&&!sc[k])sc[k]=["4.1","5.1"]})})})();
+
+// 🧩 📚 Class game circles (Roger, 6 Nov 2026: "a kind of circle with a percentage on the board saying something like games and theory,
+// click to see your performance and what to study … two, grammar and vocabulary, and I want those circles next to the students in the
+// list"). elGameStats(games) takes class game results [{kind, r, of}] (myGames on the student board, gameResults on the dashboard) and gives
+// {grammar, vocab} = % right (null when none played); elRing(p, label, size) draws one circle (inline styles, any page).
+window.elGameStats=function(games){
+  const t={grammar:[0,0],vocab:[0,0]};(games||[]).forEach(g=>{const k=t[g.kind];if(k&&g.of){k[0]+=g.r||0;k[1]+=g.of}});
+  const pc=([a,b])=>b?Math.round(a/b*100):null;return {grammar:pc(t.grammar),vocab:pc(t.vocab),n:(games||[]).length}};
+window.elRing=function(p,label,size){
+  const z=size||46,col=p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a";
+  return `<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle" title="${label}: ${p==null?"–":p+" %"}"><span style="width:${z}px;height:${z}px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:conic-gradient(${col} ${(p||0)*3.6}deg,#e5e7eb 0)"><b style="width:${z-10}px;height:${z-10}px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 ${Math.round(z/3.6)}px/1 system-ui,sans-serif;color:#0f172a">${p==null?"–":p+"%"}</b></span>${label?`<span style="font-size:${Math.max(11,Math.round(z/3.6))}px;font-weight:700;line-height:1.15">${label}</span>`:""}</span>`};
