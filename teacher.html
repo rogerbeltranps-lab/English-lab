@@ -63,6 +63,11 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 @media (max-width:980px){.tshell{grid-template-columns:1fr;gap:6px}.tside{position:sticky;top:0;z-index:20;flex-direction:row;overflow-x:auto;max-height:none;padding:8px 0;background:rgba(248,250,252,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}
   .tside .brand,.tside .sep,.tside .lab{display:none}.tside .nv{white-space:nowrap;background:#fff;border:1px solid #e2e8f0}.tside .nv.ann{margin:0}.hgrid{grid-template-columns:1fr}.cont .ct{font-size:23px}}
 @media(max-width:640px){body:has(#fsctl .fsrow) .tshell{padding-top:40px}}
+.agbars{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 14px}.agbar{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:10px 14px;min-width:0}
+.agbt{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}.agbt small{color:#64748b}
+.agbs{display:flex;height:26px;border-radius:999px;overflow:hidden;background:#f1f5f9}.agbs span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;min-width:0}
+.agbl{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12.5px;color:#334155}.agbl i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}.agbl small{color:#64748b}
+@media(max-width:1100px){.agbars{grid-template-columns:1fr}}
 /* 📅 Agenda (Roger, 6 Nov 2026): the LS on the left, the class days on the right, drag and drop */
 .agw{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;align-items:start}.agr{min-width:0}
 .agl{position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:14px;box-sizing:border-box}
@@ -1916,12 +1921,29 @@ function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr
   return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day. Drop it back here to take it off the agenda.</p>`
     +`<div class="agla exam"><div class="aglh" draggable="${ex?"true":"false"}" data-ag="exam" data-from="${ex||""}" ${D} title="Drag it to another day"><span class="agdot">⠿</span><span class="agln"><b>📝 Exam</b><small>${ex?esc(ELWeek.date(ex))+(n>1?` · in ${n} days`:n===1?" · tomorrow":n===0?" · today":" · done"):"no day yet"}</small></span></div></div>`
     +rows+`</aside>`}
+// Competences of what is on the agenda (Roger, 6 Nov 2026: "sometimes there will be sections that won't be done. So on the top I want 4
+// colors in a bar, one for each communicative skill … so if a teacher runs out of time, they can make sure we work those competences
+// equally, and another bar below with the other competences of the LS"). The steps of every tab on the agenda (done or still to do; not
+// dropped learning paths), counted like the whole-year view (a step with n criteria gives 1/n to each, EL_STEP_CRITERIA), next to the same
+// count for the whole LS. Bar 1: Listening, Speaking, Reading, Writing (CE2–CE5, the curriculum's order), aim 20–30 % each.
+function agWork(its){const n={},sc=window.EL_STEP_CRITERIA||{};new Set(its).forEach(it=>{const i=it.indexOf("#");if(i<0)return;const a=byId(it.slice(0,i)),p=it.slice(i+1);if(!a||isGame(p))return;
+  (p?elSecSteps(a,p):((window.EL_ACTIONS||{})[a.id]||[])).forEach(k=>{const cs=((sc[a.id]||{})[k]||[]).filter(c=>compOf(c));cs.forEach(c=>{const q=compOf(c);n[q]=(n[q]||0)+1/cs.length})})});return n}
+function agBars(x){const ag=agOf(x),dr=(x.p._dropped||{})[x.gi]||[],ok=it=>!dr.includes(it.split("#")[0]);
+  const plan=agWork(Object.values(ag.days).flat().filter(it=>/#/.test(it)&&ok(it))),all=agWork(acts(x.ls).flatMap(agItems));
+  const bar=(ks,title,sub,band)=>{const tot=ks.reduce((a,k)=>a+(plan[k]||0),0);if(!ks.length)return "";
+    const pc=k=>tot?Math.round((plan[k]||0)/tot*100):0,kept=k=>all[k]?Math.round((plan[k]||0)/all[k]*100):0,nm=k=>isTr(k)?({CC:"Citizenship",CD:"Digital",CE:"Entrepreneurship",CPSAA:"Learning to learn"})[(k.match(/^[A-Z]+/)||[""])[0]]||k:compName(k).replace(/^CE\d+ · /,"");
+    const low=band?ks.filter(k=>pc(k)<20):[];
+    return `<div class="agbar"><div class="agbt"><b>${title}</b><small>${sub}</small>${low.length?`<span class="agwarn">⚠ ${low.map(nm).join(", ")} below 20 %</span>`:band&&tot?`<span class="agok">✓ balanced</span>`:""}</div>`
+      +`<div class="agbs" role="img" aria-label="${esc(ks.map(k=>nm(k)+" "+pc(k)+" %").join(", "))}">${ks.map(k=>pc(k)?`<span style="width:${pc(k)}%;background:${compCol(k)}" title="${esc(compName(k))}: ${pc(k)} % of what is on the agenda · ${kept(k)} % of its work in the whole LS">${pc(k)>=17?esc(nm(k))+" "+pc(k)+" %":pc(k)>=5?pc(k)+" %":""}</span>`:"").join("")}</div>`
+      +`<div class="agbl">${ks.map(k=>`<span><i style="background:${compCol(k)}"></i>${esc(isTr(k)?k:"CE"+k)} ${esc(nm(k))} <b>${pc(k)} %</b> <small>· ${kept(k)} % of the LS</small></span>`).join("")}</div></div>`};
+  const four=["2","3","4","5"],other=Object.keys(all).filter(k=>!four.includes(k)).sort(compSort);
+  return `<div class="agbars">${bar(four,"Communicative skills","of the tabs on the agenda",true)}${bar(other,"Other competences of the LS","of the tabs on the agenda",false)}</div>`}
 // the group's 📅 Time plan
 function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="muted">No time plan for this group in this LS yet.</p></div>`;
   const t=ELWeek.today(),ws=agWeeks(x,(S.agExt||{})[x.ls+"|"+x.gid]||0),tm=new Date(t+"T12:00").getDay(),cur=ELWeek.add(t,-((tm+6)%7));
   const pastW=ws.filter(([m])=>m<cur),now=ws.filter(([m])=>m>=cur),ag=agOf(x);
   const late=agDays(ag).filter(d=>d<cur&&dayIts(ag,d).some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]));   // earlier weeks (this week's days say it themselves)
-  return `<div class="agw">${agList(x,studs)}<section class="agr">`
+  return agBars(x)+`<div class="agw">${agList(x,studs)}<section class="agr">`
     +hwTag(x)
     +(late.length?`<div class="aglate"><h3>⚠ Not ticked yet (${late.length})</h3><p class="muted">Tick what you did. Drag the rest to a later day, or ⏭ Next class.</p><div class="agdays">${late.map(d=>agDay(x,d,true)).join("")}</div></div>`:"")
     +(pastW.length?`<details class="agpast"><summary>Earlier weeks (${pastW.length})</summary>${pastW.map(([m,dd])=>agWeek(x,m,dd)).join("")}</details>`:"")
