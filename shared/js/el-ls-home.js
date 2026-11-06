@@ -79,11 +79,16 @@
       const cp=elCheckpointMissing(a,doneOf,open);next=cp?{a:cp,cp:true}:{a};break}
     return {open,done,dropped,next,all,closed};
   }
+  // Students see only the learning paths the teacher has opened for their group (Roger, 6 Nov 2026: "I don't want students to see the
+  // future LP as depending on the time left they might not do them"): not open yet and dropped ones are left out; the teacher and testers see all.
   function lpRows(S){
-    $$("a.lp[data-a]").forEach(el=>{
+    let shown=0;
+    $$("a.lp[data-a]").forEach(el=>{const li=el.closest("li")||el;li.hidden=false;
       const a=acts().find(x=>x.id===el.dataset.a),st=el.querySelector(".st")||el.appendChild(Object.assign(document.createElement("span"),{className:"st"}));
       el.classList.remove("done","locked","nextup","dropped");st.className="st";st.innerHTML="";
-      if(!a||teach()){st.innerHTML=t("Obre","Open")+" →";return}
+      if(!a||teach()){st.innerHTML=t("Obre","Open")+" →";shown++;return}
+      if(!S.all&&(S.dropped.includes(a.id)||!S.open(a))){li.hidden=true;return}
+      shown++;
       const ks=stepsOf(a),ds=doneOf(a),n=ks.filter(k=>ds.has(k)).length,isNext=S.next&&S.next.a.id===a.id;
       const cp=!S.all&&!S.closed&&!a.manual&&elCheckpointMissing(a,doneOf,S.open);
       if(S.dropped.includes(a.id)){el.classList.add("dropped");st.textContent="✂ "+t("No cal fer-lo","Not needed")}
@@ -93,6 +98,8 @@
       else if(cp){el.classList.add("locked");st.classList.add("lock");st.textContent="🔒 "+t("Primer el checkpoint","Checkpoint first")}
       else if(ks.length)st.innerHTML=(n?`<span class="mb"><i style="width:${Math.round(n/ks.length*100)}%"></i></span>`:"")+n+" / "+ks.length;
     });
+    const none=$("#lpsNone");if(none)none.hidden=shown>0;
+    document.body.classList.add("lps-ready");
   }
   function contCard(S){
     const c=$("#cont");if(!c)return;
