@@ -49,3 +49,19 @@ function isTeacher(idToken) {
 function testMe() {
   MailApp.sendEmail({to: TEACHER, subject: "English Lab: the school mail script works ✅", body: "Now deploy it as a web app and copy the link.", name: "English Lab"});
 }
+
+// One "English Lab" label in the school Gmail (Roger, 6 Nov 2026: "to see the mails I sent in a section of the mail ... together as well as
+// the notifications"): every thread whose subject has "English Lab" (the students' emails, the teacher alerts sent from here to the Gmail,
+// students' replies) gets it. Run setupLabel ONCE from the editor (Ejecutar): it labels the old ones and labels new ones every 10 minutes.
+// No new deployment is needed for this part.
+const LABEL = "English Lab";
+function labelEnglishLab() {
+  const l = GmailApp.getUserLabelByName(LABEL) || GmailApp.createLabel(LABEL);
+  GmailApp.search('subject:"English Lab" newer_than:7d -label:english-lab', 0, 100).forEach(t => t.addLabel(l));
+}
+function setupLabel() {
+  ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === "labelEnglishLab").forEach(t => ScriptApp.deleteTrigger(t));
+  ScriptApp.newTrigger("labelEnglishLab").timeBased().everyMinutes(10).create();
+  const l = GmailApp.getUserLabelByName(LABEL) || GmailApp.createLabel(LABEL);
+  GmailApp.search('subject:"English Lab" -label:english-lab', 0, 500).forEach(t => t.addLabel(l));
+}
