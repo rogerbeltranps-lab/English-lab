@@ -92,6 +92,7 @@ var LS2 = (function () {
     $('#progressLabel').textContent = cap(level);
     $('#progressText').textContent = n + ' / ' + s.length;
     $('#progressBar').style.width = (n / s.length * 100) + '%';
+    if (LP && LP.panels) markTabs();
   }
   function saveProduct(piece, text) {
     let all = {}; try { all = JSON.parse(localStorage.getItem(PRODUCTS) || '{}'); } catch (e) {}
@@ -103,8 +104,8 @@ var LS2 = (function () {
   // The same note on every page: the teacher tracks every activity and some are assessed. Never say which steps count.
   function trackNote() {
     return '<p class="track-note">' + (ca()
-      ? '📋 <strong>El professor fa el seguiment de totes les activitats que fas.</strong> Algunes s’avaluaran i seran la teva avaluació contínua, que és una part de la nota. Fes cada activitat tu sol/a i sense apunts la primera vegada; després la pots repetir per practicar. Acaba-les a temps: mira «El meu pla setmanal» al teu tauler.'
-      : '📋 <strong>Your teacher keeps track of all the activities you do.</strong> Some of them will be assessed and make up your continuous assessment, which is part of your mark. Do each activity on your own and without notes the first time; you can repeat it later to practise. Finish them on time: check “My week plan” on your board.') + '</p>';
+      ? '📋 <strong>El professor fa el seguiment de totes les activitats que fas.</strong> Algunes s’avaluaran i seran la teva avaluació contínua, que és una part de la nota. Fes cada activitat tu sol/a i sense apunts la primera vegada; després la pots repetir per practicar. Acaba-les a temps: mira «Deures» al teu tauler.'
+      : '📋 <strong>Your teacher keeps track of all the activities you do.</strong> Some of them will be assessed and make up your continuous assessment, which is part of your mark. Do each activity on your own and without notes the first time; you can repeat it later to practise. Finish them on time: check “Homework” on your board.') + '</p>';
   }
 
   /* ---------- typed answers (recall, practice, grammar) ---------- */
@@ -1261,6 +1262,18 @@ var LS2 = (function () {
     const keep = () => { state.review[level] = { helped: h.value.trim(), review: r.value.trim(), at: new Date().toISOString() }; save(); $('#lpReviewMsg').textContent = ca() ? 'Desat ✓' : 'Saved ✓'; };
     h.onchange = keep; r.onchange = keep;
   }
+  /* Simple pages (Roger, 6 Nov 2026: "the menus have little information and when you go to a place you can find the info that you need"):
+     the hero's "Remember before you look" and the tracking note fold into one "How this learning path works" row (closed), and on a
+     computer the tabs become a list of steps beside the open step, each with ✓ when done and the next one marked (progress()). */
+  function howTo() {
+    const warm = document.querySelector('.hero .warm-note');
+    if (warm) warm.hidden = true;
+    return '<details class="lp-how"><summary>ⓘ ' + (ca() ? 'Com funciona aquest learning path' : 'How this learning path works') + '</summary>' + (warm ? '<p class="track-note">💡 ' + warm.innerHTML + '</p>' : '') + trackNote() + '</details>';
+  }
+  function markTabs() {
+    let next = false;
+    LP.panels.forEach(p => { const t = document.querySelector('.tab[data-panel="' + p.id + '"]'); if (!t) return; const d = stepDone(p); t.classList.toggle('done', d); t.classList.toggle('next', !d && !next); t.dataset.next = ca() ? 'SEGÜENT' : 'NEXT'; if (!d) next = true; });
+  }
   /* Study guide (Roger, 31 Oct 2026): shared/js/el-study.js draws it from LP.study (data/study/<page>.js). */
   const studyApi = () => ({ LP, level: () => level, ca });
   function studyCard() { return window.ELStudy && LP.study ? ELStudy.html(studyApi()) : ''; }
@@ -1268,8 +1281,8 @@ var LS2 = (function () {
   function render() {
     carryRoute();
     const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
-    $('#lp').innerHTML = trackNote() + planCard() + studyCard() + '<nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '">' + (i + 1) + ' ' + tx(p.tab) + '</button>').join('') + '</nav>' +
-      LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') +
+    $('#lp').innerHTML = '<div class="lp-top">' + howTo() + studyCard() + '</div>' + planCard() + '<div class="lp-body"><nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '"><span class="tn">' + (i + 1) + '</span> <span class="tl">' + tx(p.tab) + '</span></button>').join('') + '</nav><div class="lp-panels">' +
+      LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') + '</div></div>' +
       reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
     LP.panels.forEach(p => p._r.bind());
@@ -1295,7 +1308,12 @@ var LS2 = (function () {
     LP.panels = LP.base.flatMap(p => [N[p.id] ? as(p.id) : p].concat(extra.filter(k => N[k].after === p.id).map(k => as(k))));
   }
   function init(config) {
-    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}.redo-sec{justify-content:flex-end;align-items:center;margin:0 0 12px}.redo-sec[hidden]{display:none}.redo-sec .tiny{margin:0}</style>');
+    if (!document.getElementById('trackNoteCss')) document.head.insertAdjacentHTML('beforeend', '<style id="trackNoteCss">.lp-how{margin:0 0 14px;background:#fff;border:1px solid var(--line,#dbe5f1);border-radius:14px;padding:0 14px}.lp-how>summary{cursor:pointer;padding:12px 0;font-weight:750;color:var(--dark,#234777)}.lp-how .track-note{margin:0 0 12px}'
+      + '.tab .tn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:24px;height:24px;border-radius:999px;font-size:.85rem}.tab.done .tn{background:#16a34a!important;color:#fff!important;font-size:0}.tab.done .tn::after{content:"✓";font-size:.85rem}.tab.next:not(.active){box-shadow:inset 0 0 0 2px var(--accent,#315f9f)}'
+      + '@media (min-width:1000px){.lp-body{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;align-items:start}.lp-body>.el-tsec{grid-column:1/-1}.lp-body>.tabs{flex-direction:column;overflow:visible;position:sticky;top:76px;padding:0;gap:6px}.lp-body .tab{display:flex;align-items:center;gap:10px;text-align:left;white-space:normal;padding:11px 13px}.lp-body .tab.next:not(.active)::after{content:attr(data-next);margin-left:auto;font-size:.7rem;letter-spacing:.06em;color:var(--accent,#315f9f)}}'
+      + '.lp-top{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;align-items:start;margin:0 0 14px}.lp-top>*{margin:0!important}.routes:has(.route[style*="none"]){display:flex;flex-wrap:wrap}.routes:has(.route[style*="none"]) .route{flex:0 0 auto;padding:8px 16px;min-height:0}'
+      + '.hero{padding:24px 0 18px!important}.hero h1{font-size:clamp(2rem,3.4vw,2.8rem)!important;margin:.15em 0 .2em!important}.lp-top+.plan-card{padding:12px 16px!important;margin-bottom:14px}.lp-top+.plan-card h3{display:inline;font-size:1rem;margin:0}.lp-top+.plan-card .instruction{display:inline;margin:0 0 0 6px;font-size:.92rem}.lp-top+.plan-card input{display:block;width:100%;box-sizing:border-box;margin-top:8px}'
+      + '.track-note{margin:0 0 14px;padding:10px 13px;background:#fff8e1;border:1px solid #f3d27a;border-radius:13px;color:#5b4300;font-size:.95rem;line-height:1.45}.redo-sec{justify-content:flex-end;align-items:center;margin:0 0 12px}.redo-sec[hidden]{display:none}.redo-sec .tiny{margin:0}</style>');
     LP = config; LP.base = LP.base || LP.panels;
     level = localStorage.getItem(LP.key + 'Level') || 'insecure';
     if (ROUTES.indexOf(level) < 0) level = 'insecure';
