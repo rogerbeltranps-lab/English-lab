@@ -409,32 +409,44 @@ async function teacherSections(info){
   async function pull(p){if(busy)return;const now=Date.now(),o=p===null?null:{a:a.id,p:p||"",pn:p?nm(p):"",t:elLpLabel(a),at:now,lock:true,until:(window.elClassEnd&&elClassEnd(g,now))||null};
     if(o&&!elLpOpen(a,info,g))await openLp();
     if(o&&p&&locked().includes(p))await save(locked().filter(x=>x!==p));
-    busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});await setDoc(doc(db,"live",g),{go:o},{merge:true});/* live: open pages go there (goTo) */info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens, kept there":"✓ Released"}
+    // a pull-up puts the group in full screen too (Roger, 6 Nov 2026: "if I pull them they should be in full screen"): a full screen already
+    // on stays as it is; Release ends the full screen that came with a pull-up (fs.pull), not one switched on with the ⛶ button
+    busy=true;try{await setDoc(ref,{push:{[g]:o}},{merge:true});
+      let cur=fsG===g?fsX:null;if(fsG!==g)try{const d=await getDoc(doc(db,"live",g));cur=(d.exists()&&d.data().fs)||null}catch(e){}
+      const lv={go:o};if(o&&!fsOnNow(cur))lv.fs={on:true,at:now,until:o.until||now+LOCK_MS,pull:true};else if(!o&&cur&&cur.pull)lv.fs=null;
+      await setDoc(doc(db,"live",g),lv,{merge:true});/* live: open pages go there (goTo) */info.push=Object.assign({},info.push,{[g]:o});msg=o?"✓ On "+gname(g)+"'s screens, kept there":"✓ Released"}
     catch(e){console.warn("pull",e);msg="✗ Not saved: "+(e.code||e.message||e)}busy=false;draw()}
   // ⛶ full screen for the group (live/{group}.fs = {on, at, until}, as on the dashboard; fsCheck below): the state and who left
   // (live/{group}/fsLeft), live for the group chosen in this bar
-  let fsStop=null,fsStopL=null,fsG=null,fsX=null,fsList=[];
+  // and who is not connected (live/{group}/here, elClassWatch in el-catalog.js), while full screen or a class game is on
+  let fsStop=null,fsStopL=null,fsStopH=null,fsG=null,fsX=null,fsLive=null,fsList=[],fsHere=[];
   const fsOnNow=x=>!!(x&&x.on&&x.at&&Date.now()<(x.until||x.at+LOCK_MS));
-  function fsWatch(){if(fsG===g)return;[fsStop,fsStopL].forEach(f=>f&&f());fsStop=fsStopL=null;fsG=g;fsX=null;fsList=[];
-    fsStop=onSnapshot(doc(db,"live",g),s=>{fsX=(s.exists()&&s.data().fs)||null;
-      if(fsOnNow(fsX)&&!fsStopL)fsStopL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{fsList=c.docs.map(d=>d.data());draw()},e=>console.warn("fsLeft",e));
-      else if(!fsOnNow(fsX)&&fsStopL){fsStopL();fsStopL=null;fsList=[]}
-      draw()},e=>console.warn("live",e))}
+  const fsW=()=>elClassWatch(Object.assign({},fsLive,{fs:fsX}),fsList,fsHere);
+  function fsWatch(){if(fsG===g)return;[fsStop,fsStopL,fsStopH].forEach(f=>f&&f());fsStop=fsStopL=fsStopH=null;fsG=g;fsX=fsLive=null;fsList=[];fsHere=[];
+    fsStop=onSnapshot(doc(db,"live",g),s=>{fsLive=s.exists()?s.data():null;fsX=(fsLive&&fsLive.fs)||null;fsListen();draw()},e=>console.warn("live",e))}
+  function fsListen(){const on=fsW().active;
+    if(on&&!fsStopL){fsStopL=onSnapshot(collection(db,"live",g,"fsLeft"),c=>{fsList=c.docs.map(d=>d.data());draw()},e=>console.warn("fsLeft",e));
+      fsStopH=onSnapshot(collection(db,"live",g,"here"),c=>{fsHere=c.docs.map(d=>d.data());draw()},e=>console.warn("here",e))}
+    else if(!on&&fsStopL){fsStopL();fsStopH&&fsStopH();fsStopL=fsStopH=null;fsList=[];fsHere=[]}}
+  setInterval(()=>{if(fsLive){fsListen();draw()}},30e3);   // a beat missed for EL_HERE_MS, the end of the class or of the game
   async function fsToggle(){const now=Date.now(),v=fsOnNow(fsX)?null:{on:true,at:now,until:(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS};
     try{await setDoc(doc(db,"live",g),{fs:v},{merge:true});msg=v?"✓ "+gname(g)+" in full screen":"✓ Full screen off"}catch(e){console.warn("fs",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
   const fsHm=t=>{const d=t&&t.toDate?t.toDate():typeof t==="number"?new Date(t):null;return d?d.toTimeString().slice(0,5):""};
   // while the group is in full screen, the same state and list stay fixed at the top right of the page, also when scrolling (Roger, 5 Nov 2026)
-  function fsFloat(){let f=document.getElementById("el-fsfloat");if(!fsOnNow(fsX)){if(f)f.remove();return}
+  const fsNames=l=>l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+fsHm(y.at)+(y.n>1?" ("+y.n+"×)":"")),
+    offNames=l=>l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+(y.off?"(screen closed or left) ":"")+"since "+fsHm(y.seen));
+  function fsFloat(){let f=document.getElementById("el-fsfloat");const w=fsW();if(!w.active){if(f)f.remove();return}
     if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147481000;max-width:min(340px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
       f.onclick=e=>{if(e.target.closest("button"))fsToggle()};document.body.append(f)}
-    const l=fsList.filter(y=>y.pull===fsX.at).sort((p,q)=>(q.at&&q.at.toMillis?q.at.toMillis():+q.at||0)-(p.at&&p.at.toMillis?p.at.toMillis():+p.at||0));
-    const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>⛶ '+gname(g)+' in full screen</b><button style="border:1px solid #1e293b;background:#1e293b;color:#fff;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui">Switch off</button></div>'
-      +'<div style="color:#475569;font-size:12px;margin-top:2px">until '+fsHm(fsX.until||fsX.at+LOCK_MS)+'</div><div style="color:#9a3412;margin-top:6px;max-height:40vh;overflow:auto;line-height:1.5">'
-      +(l.length?'⚠️ Left full screen ('+l.length+'):<br>'+l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+fsHm(y.at)+(y.n>1?" ("+y.n+"×)":"")).join("<br>"):"✓ Nobody has left it")+'</div>';
+    const l=w.left,o=w.off;
+    const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b>'+(w.fs?'<button style="border:1px solid #1e293b;background:#1e293b;color:#fff;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui">Switch off</button>':'')+'</div>'
+      +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+String(w.title).replace(/</g,"&lt;")+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsX.until||fsX.at+LOCK_MS):'')+'</div><div style="color:#9a3412;margin-top:6px;max-height:40vh;overflow:auto;line-height:1.5">'
+      +(l.length?'⚠️ Left full screen ('+l.length+'):<br>'+fsNames(l).join("<br>"):"✓ Nobody has left full screen")
+      +'<div style="color:#b91c1c;margin-top:4px">'+(o.length?'📴 Not connected ('+o.length+'):<br>'+offNames(o).join("<br>"):'<span style="color:#166534">✓ Everyone connected</span>')+'</div></div>';
     if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
-  function fsRow(){const on=fsOnNow(fsX),l=on?fsList.filter(y=>y.pull===fsX.at).sort((p,q)=>(q.at&&q.at.toMillis?q.at.toMillis():+q.at||0)-(p.at&&p.at.toMillis?p.at.toMillis():+p.at||0)):[];
-    return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who leaves it). Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+'</button>'
-      +(on?'<div class="fsl">until '+fsHm(fsX.until||fsX.at+LOCK_MS)+' · '+(l.length?'⚠️ Left it: '+l.map(y=>String(y.name||"?").replace(/</g,"&lt;")+" "+fsHm(y.at)+(y.n>1?" ("+y.n+"×)":"")).join(" · "):"nobody has left it")+'</div>':"")}
+  function fsRow(){const on=fsOnNow(fsX),w=fsW(),l=w.left,o=w.off;
+    return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who leaves it or loses the connection). A pull-up turns it on too. Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+'</button>'
+      +(w.active?'<div class="fsl">'+(on?'until '+fsHm(fsX.until||fsX.at+LOCK_MS):'🎮 in a game')+' · '+(l.length?'⚠️ Left it: '+fsNames(l).join(" · "):"nobody has left it")+(o.length?' · 📴 Not connected: '+offNames(o).join(" · "):"")+'</div>':"")}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
   function pullRow(){const x0=pulled(),x=elPullLive(x0)?x0:null,here=x&&x.a===a.id,at=document.querySelector(".tab.active[data-panel]"),cur=at&&all.includes(at.dataset.panel)?at.dataset.panel:"";
     fsWatch();
@@ -651,8 +663,10 @@ function gamePush(u){
   if(!u||!isStudent(u)||!myGroup||onGame)return;
   let first=true;
   stopGame=onSnapshot(doc(db,"live",myGroup),s=>{const x=s.exists()?s.data():null,ms=x&&x.at&&x.at.toMillis?x.at.toMillis():0;
-    if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search);return}
-    const f=first,run=()=>{goTo(x&&x.go,f);FSG=(x&&x.fs)||null;fsCheck()};first=false;
+    // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
+    if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
+      if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
+    const f=first,run=()=>{goTo(x&&x.go,f);const was=FSG&&FSG.at;FSG=(x&&x.fs)||null;if((FSG&&FSG.at)!==was)beatAt=0;fsCheck()};first=false;
     if(x&&(x.go||x.fs)&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
 }
@@ -708,7 +722,7 @@ document.addEventListener("click",e=>{if(!lockHere())return;
   if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
   e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
 const lockFree=()=>lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");
-setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();fsCheck()},1000);   // the class is over (until) or LOCK_MS passed
+setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();fsCheck();hereTick()},1000);   // the class is over (until) or LOCK_MS passed
 // ⛶ Full screen in class (Roger, 5 Nov 2026: "put students in full screen mode when I say it and they don't have a way to get out"; then
 // "make the selected group go full screen" from the top right of the dashboard): live/{group}.fs = {on, at, until} (the doc gamePush
 // already listens to). While it is on, every page of the site covers itself until the student taps it (a browser only goes full screen
@@ -742,6 +756,16 @@ function fsCheck(){let c=document.getElementById("el-fs");
     +"|"+(ca?"Toca la pantalla per continuar":"Tap the screen to go on");
   if(c.dataset.h!==h){c.dataset.h=h;const [a,b]=h.split("|");c.innerHTML='<div style="font-size:64px">⛶</div><div style="font-size:26px;font-weight:800;max-width:640px"></div><div style="background:#fff;color:#0f766e;border-radius:999px;padding:14px 30px;font-size:20px;font-weight:800"></div>';
     c.children[1].textContent=a;c.children[2].textContent=b+" →"}}
+// 📴 Not connected (Roger, 6 Nov 2026: "if they disconnect, the teacher's board shows it"): while full screen is on for the group (a pull-up
+// turns it on too), every student page beats live/{group}/here/{email} = {name, seen, off} every EL_BEAT_MS (one write a minute) and
+// at once with off:true when the page is hidden (lid closed, another window or app; not when going to another page of the site).
+// The dashboard and the learning path's teacher bar list who stopped beating for EL_HERE_MS or is off (elClassWatch in el-catalog.js).
+// The class game player beats the same document during a game (lab/game/play.js).
+let beatAt=0;
+function hereBeat(off){if(!user||!isStudent(user)||AS||!myGroup)return;beatAt=Date.now();
+  setDoc(doc(db,"live",myGroup,"here",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",seen:serverTimestamp(),off:!!off}).catch(e=>console.warn("here",e))}
+function hereTick(){if(fsOnG()&&document.visibilityState==="visible"&&Date.now()-beatAt>=(window.EL_BEAT_MS||60e3))hereBeat(false)}
+document.addEventListener("visibilitychange",()=>{if(!fsOnG())return;if(document.visibilityState==="hidden"){if(!fsBye)hereBeat(true)}else hereBeat(false)});
 FD.addEventListener("fullscreenchange",()=>fsCheck());FD.addEventListener("webkitfullscreenchange",()=>fsCheck());
 function goTo(g,first){
   const was=LOCK;LOCK=lockOn(g)?g:null;

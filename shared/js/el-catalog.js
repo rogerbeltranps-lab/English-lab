@@ -212,6 +212,22 @@ window.elPullFor=function(infos,gid){let best=null;
     if(!a||(info.status||"hidden")==="hidden"||!elLsForGroup(l,info,gid)||!elLpOpen(a,info,gid))continue;
     if(!best||x.at>best.at)best=Object.assign({ls,act:a},x)}
   return best};
+// ⛶ 📴 Who left full screen and who is not connected in class (Roger, 6 Nov 2026: "when they are playing a game, I want them to be in full
+// screen too; if I pull them they should be in full screen. If they disconnect, the teacher's board shows it"). x = live/{group} (fs, the
+// class game: game, on, phase, sid, at), left = live/{group}/fsLeft docs {name, at, pull, n}, here = live/{group}/here docs {name, seen, off}
+// (every student page beats every EL_BEAT_MS while full screen or a game is on; off:true when the page is hidden: lid closed, other window).
+// A session is the full screen (fs.at) and/or the game (sid). Not connected = beat during this session, then off or no beat for EL_HERE_MS.
+window.EL_BEAT_MS=60e3;window.EL_HERE_MS=150e3;
+const elMs=t=>t&&t.toMillis?t.toMillis():typeof t==="number"?t:0;
+window.elFsOn=f=>!!(f&&f.on&&f.at&&Date.now()<(f.until||f.at+70*60e3));
+window.elGameOn=x=>!!(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-elMs(x.at)<10*60e3);
+window.elClassWatch=function(x,left,here){const fs=x&&x.fs,fo=elFsOn(fs),go=elGameOn(x),now=Date.now(),keys=[];
+  if(fo)keys.push(fs.at);if(x&&x.sid&&(go||fo&&x.sid>=fs.at))keys.push(x.sid);
+  if(!keys.length)return {active:false,fs:false,game:false,left:[],off:[]};
+  const t0=Math.min(...keys)-60e3;   // a minute for the difference between the teacher's clock and the server's
+  return {active:true,fs:fo,game:go,title:go?x.title||"":"",
+    left:(left||[]).filter(y=>keys.includes(y.pull)).sort((p,q)=>elMs(q.at)-elMs(p.at)),
+    off:(here||[]).filter(y=>elMs(y.seen)>=t0&&(y.off||now-elMs(y.seen)>EL_HERE_MS)).sort((p,q)=>elMs(q.seen)-elMs(p.seen))}};
 // "LP3 Where traditions come from": the number the time plan gives the learning path (EL_PLAN text "LP3 Where traditions …"), else its short title.
 window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh(a.title),lo=st.toLowerCase(),p=(window.EL_PLAN||{})[a.ls];let n=null;
   if(p)(p.rows||[]).forEach(r=>[].concat(r.g||r.what||[]).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,k,nm)=>{nm=nm.trim().toLowerCase();if(!n&&nm&&(lo.startsWith(nm)||nm.startsWith(lo)))n=k}));
