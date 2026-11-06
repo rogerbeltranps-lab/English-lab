@@ -1575,8 +1575,8 @@ function hwMsg(x,text,by,lang,tabs){if(lang==="both")return hwMsg(x,text,by,"en"
       steps.push(nm+"\n   "+what+"\n   👉 "+url)})});
   return T("🏠 Deures d'anglès · ","🏠 English homework · ")+grp+"\n"+T("Per a la classe del ","For the class on ")+ELWeek.date(by,ca?"ca":"en").replace(/\.$/,"")+".\n\n"
     +steps.map((s,i)=>(i+1)+". "+s).join("\n")+"\n\n"
-    +T("Entra amb el teu correu de l'escola i la contrasenya. També ho tens al teu tauler d'English Lab (🏠 Deures), amb un 📅 per afegir-ho al calendari.",
-       "Sign in with your school email and password. It is also on your English Lab board (🏠 Homework), with a 📅 to add it to your calendar.")}
+    +T("Entra amb el teu correu de l'escola i la contrasenya. També ho tens al teu tauler d'English Lab (📝 Deures), amb un 📅 per afegir-ho al calendari.",
+       "Sign in with your school email and password. It is also on your English Lab board (📝 Homework), with a 📅 to add it to your calendar.")}
 // Tabs of each session (Roger, 1 Nov 2026: "in the agenda I need which tabs to do every day"): under every session line, the tabs of each
 // learning path it names (EL_SECTIONS, the page's own tabs). The plan's "Homework by …" lines say which tabs go home (Speaking, Talk,
 // Listen again…); the other tabs are the class part: "(1/2)" = its first half, "(2/2)" = the rest, no half = all of them. A line that names
@@ -1696,10 +1696,11 @@ const hwOf=x=>((S.D.ls[x.ls]||{}).homework||{})[x.gid];
 // Every item has a ✕ (Roger, 2 Nov 2026: "I should be able to delete the homework"): homework set here is deleted, a plan's "Homework by …"
 // line is hidden for this group (planEdits "nohw:<line>", ↩ Bring back under the list while its day has not passed), a self-study class
 // becomes a normal class.
-const hwTag=x=>{const xs=ELWeek.upcoming(x.p,x.gi,null,7,hwOf(x)),cal=ELWeek.calendar(x.gid),t=ELWeek.today(),gone=((x.p._nohw||{})[x.gi]||[]).filter(g=>!g.date||g.date>=t);
-  return `<div class="hwr"><b>🏠 Homework to remind</b>${xs.length?`<ul>${xs.map(y=>`<li>${y.kind==="self"?"📚 Self-study class ":"🏠 By "}${esc(ELWeek.date(y.date))}${y.set?` <small class="muted">(set ${esc(ELWeek.date(y.set))})</small>`:""} · ${esc(y.text)}${lineLinks(x,y.text)} <button class="g mini" data-do="hwcopy" data-msg="${esc(y.msg||hwMsg(x,y.text,y.date,"both"))}" title="Copy the message for students (to paste in Classroom)">📋 Message</button>${y.extra?` <button class="g mini" data-do="hwdel" data-gid="${x.gid}" data-ls="${x.ls}" data-id="${y.id}" title="Remove this homework">✕</button>`:y.kind==="self"?` <button class="g mini" data-do="noself" data-v="1" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(origOf(x,y.line))}" title="You teach it in class: it stops being a self-study class">✕</button>`:y.line?` <button class="g mini" data-do="nohw" data-v="1" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(origOf(x,y.line))}" title="Remove this homework">✕</button>`:""}</li>`).join("")}</ul>`:` <span class="muted">nothing in the next 7 days</span><br>`}`
+// a 💡 planned line already set as homework (same text and day) shows only once, as 🏠
+const hwTag=x=>{const xs=ELWeek.upcoming(x.p,x.gi,null,7,hwOf(x)).filter((y,_,all)=>y.extra||!all.some(z=>z.extra&&z.text===y.text&&z.date===y.date)),cal=ELWeek.calendar(x.gid),t=ELWeek.today(),gone=((x.p._nohw||{})[x.gi]||[]).filter(g=>!g.date||g.date>=t);
+  return `<div class="hwr"><b>🏠 Homework to remind</b>${xs.length?`<ul>${xs.map(y=>`<li>${y.kind==="self"?"📚 Self-study class ":y.extra?"🏠 By ":"💡 Planned for "}${esc(ELWeek.date(y.date))}${y.set?` <small class="muted">(set ${esc(ELWeek.date(y.set))})</small>`:""} · ${esc(y.text)}${lineLinks(x,y.text)} <button class="g mini" data-do="hwcopy" data-msg="${esc(y.msg||hwMsg(x,y.text,y.date,"both"))}" title="Copy the message for students (to paste in Classroom)">📋 Message</button>${y.extra?` <button class="g mini" data-do="hwdel" data-gid="${x.gid}" data-ls="${x.ls}" data-id="${y.id}" title="Remove this homework">✕</button>`:y.kind==="self"?` <button class="g mini" data-do="noself" data-v="1" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(origOf(x,y.line))}" title="You teach it in class: it stops being a self-study class">✕</button>`:y.line?` <button class="g mini" data-do="nohw" data-v="1" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(origOf(x,y.line))}" title="Remove this homework">✕</button>`:""}${!y.extra&&y.kind==="hw"?` <button class="g mini" data-do="planhw" data-gid="${x.gid}" data-ls="${x.ls}" data-t="${esc(y.text)}" data-set="${esc(y.set||"")}" data-by="${esc(y.date)}" title="Students don't see planned homework: set it to send it">🏠 Set as homework</button>`:""}</li>`).join("")}</ul>`:` <span class="muted">nothing in the next 7 days</span><br>`}`
     +(gone.length?`<small class="muted">Removed: ${gone.map(g=>`${g.date?"by "+esc(ELWeek.date(g.date))+" · ":""}${esc(g.text)} <button class="g mini" data-do="nohw" data-v="0" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(g.orig)}" title="Students see it again">↩ Bring back</button>`).join(" · ")}</small><br>`:"")
-    +`<small class="muted">Students see it on their board and in My week, and in their calendar if they subscribed: <a href="${cal.google}" target="_blank" rel="noopener">Google Calendar</a> · <a href="${cal.ics}">.ics link</a></small></div>`};
+    +`<small class="muted">Students see only 🏠 homework you set: on their board, in the ✅ To do button, in the Sunday email and in their calendar if they subscribed. 💡 and 📚 lines are the plan's ideas: they don't see them. <a href="${cal.google}" target="_blank" rel="noopener">Google Calendar</a> · <a href="${cal.ics}">.ics link</a></small></div>`};
 // this week and next week; before the plan starts, its first week; after it ends, a line
 // On Saturday and Sunday the agenda opens on the coming week (Roger, 1 Nov 2026: on a Sunday he saw last week and "nothing" in it)
 const wkOpen=()=>{const t=ELWeek.today(),wd=new Date(t+"T12:00").getDay();return wd===6?ELWeek.add(t,2):wd===0?ELWeek.add(t,1):t};
@@ -1717,7 +1718,7 @@ function timeBox(ls,grp,studs){const p=(window.EL_PLAN||{})[ls],gi=ELWeek.col(p,
     return `<li>${esc(a.title)} · due ${ELWeek.date(d)} · ${studs.length-no.length}/${studs.length} done${no.length&&past?` <span class="late" title="${esc(no.map(fullName).join(" · "))}">${no.length} late</span>`:""}</li>`};
   return `<div class="box"><h2>Time plan · ${esc(grp.name)}</h2>${examTag(ELWeek.exam(p,gi))}${dropTag(x)}${behindTag(x)}${hwTag(x)}${weeks(x)}`
     +(due.length&&studs.length?`<b>Activities due up to the end of this week</b> <small class="muted">(signed-in students; hover “late” for the names)</small><ul class="due">${due.map(li).join("")}</ul>`:"")
-    +`<p class="muted">Tick each session when it is done; every week is in the 📅 Time plan tab. The whole plan is in “Teaching plan” below. Students see this week, their exam day and reminders of late activities on their board.</p></div>`}
+    +`<p class="muted">Tick each session when it is done; every week is in the 📅 Time plan tab. The whole plan is in “Teaching plan” below. Students see as ✅ To do only what you open (learning paths and tabs), and as homework only what you set with 🏠; no week plan.</p></div>`}
 // Overview tab: one card per group for the chosen week (S.wk: a Monday, "all" = this week and every later one; this week by default)
 const planAt=(gid,w)=>{for(const x of ELWeek.plans(gid)){const i=x.p.rows.findIndex(r=>r.from===w);if(i>=0)return [Object.assign({gid},x),i]}return [null,-1]};
 function overview(){const t=ELWeek.today(),all=[...new Set(GR.flatMap(g=>ELWeek.plans(g.id).flatMap(x=>x.p.rows.map(r=>r.from).filter(Boolean))))].sort();
@@ -2118,13 +2119,25 @@ document.addEventListener("change",e=>{if(e.target.id==="hw-lang"&&S.hwX){S.hwX.
 // opens the first one. Nothing ticked = the old rule (the tabs the text names, (1/2), (2/2) or all of it). Opened from 🏠 Set as homework on
 // a Time plan line, or from 🏠 on a learning path's heading in the "Learning paths and activities" table.
 function hwOpen(x,text,from,line,pre){const gid=x.gid,next=x.p.rows.flatMap(rr=>lines(x,rr).map(l=>lineDate(rr,l))).filter(d=>d&&d>from).sort()[0]||ELWeek.add(from,2);
-  dlg(`<h3>🏠 Set as homework · ${esc((GR.find(g=>g.id===gid)||{}).name||gid)}</h3><p class="muted">Students see it in their 🏠 Homework box on the board and in My week, with a 📅 button to add it to their calendar.</p>`
+  dlg(`<h3>🏠 Set as homework · ${esc((GR.find(g=>g.id===gid)||{}).name||gid)}</h3><p class="muted">Students see it in 📝 Homework on their board and in the ✅ To do button on every page, with a 📅 button to add it to their calendar. A learning path or tab still locked for the group opens.</p>`
     +`<label class="field">What they have to do<br><textarea id="hw-text" rows="2" style="width:100%">${esc(text)}</textarea></label>`
     +`<div id="hw-tabs"></div>`
     +`<label class="field">For the class on <input type="date" id="hw-by" value="${next}"></label>`
     +`<label class="field">📨 Message for students <small class="muted">(ready to copy to Classroom or email; they also see it on their board)</small> <select id="hw-lang"><option value="both">English + Català</option><option value="en">English</option><option value="ca">Català</option></select><br><textarea id="hw-msg" rows="12" style="width:100%;font-size:13px;font-weight:400"></textarea></label>`
     +`<div class="row"><button data-do="hwsave" data-gid="${gid}" data-ls="${x.ls}" data-set="${from}" data-line="${esc(line||"")}">Set as homework</button> <button class="g" data-do="hwcopy">📋 Copy the message</button> <span id="hw-copied" class="muted"></span></div>`);
   S.hwX={x,dirty:false,textDirty:false,base:text,tabs:{},pre:pre||null};hwTabs();hwFill()}
+// What the homework covers (Roger, 6 Nov 2026: "I can say that a LP is homework or only a section"), saved with it as tabs = {activity id:
+// [panel ids]} ([] = the whole learning path; elHwTargets): the tabs ticked in the dialog, else the tabs the text names, else all of it.
+// Students see ✔ Done / Open on it and 📝 on those tabs in their ✅ To do. Recall checkpoints never go home (noCp).
+function hwCover(h,text){const out={};if(!h)return out;
+  lineActs(h.x,text).filter(([a])=>!isCp(a)&&!a.manual).forEach(([a])=>{const tk=h.tabs[a.id]||[],said=text.split(" · ").filter(seg=>lineActs(h.x,seg).some(([b])=>b===a)).flatMap(seg=>namedTabs(a,seg).map(z=>z[0]));
+    out[a.id]=tk.length?tk:[...new Set(said)]});return out}
+// Homework must be doable: a learning path or tab still locked for the group opens when it is set as homework (like 📌 Pull up).
+function hwUnlock(ls,gid,tabs){const info=S.D.ls[ls]||{},ps=[];let open=acts(ls).filter(x=>elLpOpen(x,info,gid)).map(x=>x.id);
+  Object.entries(tabs).forEach(([aid,ids])=>{const a=byId(aid);if(!a)return;
+    if(!elLpOpen(a,info,gid))open=[...open,aid];
+    const lk=elSecLocked(a,info,gid),keep=ids.length?lk.filter(z=>!ids.includes(z)):[];if(keep.length!==lk.length)ps.push(api.secLock(ls,gid,aid,keep))});
+  if(open.some(id=>!elLpOpen(byId(id),info,gid)))ps.unshift(api.lpOpen(ls,gid,open));return ps}
 // the activities of the homework text that have tabs: [[activity, label]]; from the table, the learning path even before the text names it
 const hwActs=h=>{const as=lineActs(h.x,$("#hw-text").value).filter(([a])=>((window.EL_SECTIONS||{})[a.id]||[]).length);
   if(h.pre&&!as.some(([a])=>a.id===h.pre)){const a=cat.find(y=>y.id===h.pre);if(a&&(EL_SECTIONS[a.id]||[]).length&&!h.textDirty)as.unshift([a,a.title])}return as};
@@ -2155,7 +2168,7 @@ function peOpen(x,i,l){const r=x.p.rows[i],o=origOf(x,l),mv=((x.p._moved||{})[x.
     +(d.length?`<div class="field">📑 Tabs to do that day <small class="muted">(ticked = what the plan says; change them if you do other tabs)</small>`
       +d.map(([a,lab,ts])=>{const on=ts.map(z=>z[0]);return `<div class="hwtabs"><b>${esc(/^LP\d/.test(lab)?lab+" · "+a.title.split(/[:(]/)[0].trim():lab)}</b> `
         +itemsOf(a).map(([id,nm])=>`<label class="chip ${on.includes(id)?"on":""}"><input type="checkbox" class="petab" data-a="${esc(a.id)}" data-p="${esc(id)}" ${on.includes(id)?"checked":""}> ${esc(nm)}</label>`).join("")+`</div>`}).join("")+`</div>`:"")
-    +`<p class="muted">Students see it on the new day on their board and in My week (the subscribed calendar keeps the plan's days). ${hw?"":"Activities due on the old day are due on the new day. "}Its tick, 🏠 homework and tips go with it.</p>`
+    +`<p class="muted">Your Time plan shows it on the new day. ${hw?"":"Activities due on the old day are due on the new day. "}Its tick, 🏠 homework and tips go with it.</p>`
     +(hw?"":lineActs(x,l).filter(([a])=>a.graded!==false&&!/checkpoint|exam/i.test(a.title)).map(([a,lab])=>{const off=((x.p._dropped||{})[x.gi]||[]).includes(a.id);
       return `<p class="muted">✂ <button class="g mini" data-do="lpdrop" data-gid="${x.gid}" data-ls="${x.ls}" data-a="${esc(a.id)}" data-v="${off?0:1}">${off?"↩ Bring back":"Drop"} ${esc(lab)} for ${esc(grp)}</button> ${off?"It is dropped: it does not count and is not in the exam.":"No time for it: it stops counting in the LS grade and is not in the exam."}</p>`}).join(""))
     +(/· self-study\b/.test(o)?(ns=>`<p class="muted">📚 <button class="g mini" data-do="noself" data-gid="${x.gid}" data-ls="${x.ls}" data-line="${esc(o)}" data-v="${ns?0:1}">${ns?"↩ Make it a self-study class again":"Not a self-study class"}</button> ${ns?"You teach it in class.":"The plan says students do it on their own. If you teach it in class, students stop seeing it as a class on their own."}</p>`)(!!(((S.D.ls[x.ls]||{}).planEdits||{})[x.gid]||{})["noself:"+o]):"")
@@ -2182,7 +2195,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       dayTabs(x,k.line).forEach(([a,,ts])=>{if(ts.length)S.hwX.tabs[a.id]=ts.map(z=>z[0]).filter(id=>!isGame(id))});hwTabs();hwFill()},   // the tabs of that session, ticked
     noself:()=>{e.preventDefault();if(k.v==="1"&&!confirm("You teach this class yourself? Students stop seeing it as a self-study class; it stays in the plan as a normal class."))return;
       const d=$("#dlg");if(d&&d.open)d.close();S.peX=null;quick(api.planEdit(k.ls,k.gid,"noself:"+k.line,k.v==="1"?{noSelf:true}:null))},   // a self-study class taught after all (planEdits "noself:<line>")
-    nohw:()=>{e.preventDefault();if(k.v==="1"&&!confirm("Remove this homework? Students will no longer see it on their board, in My week, in their emails or in their calendar. You can bring it back."))return;
+    nohw:()=>{e.preventDefault();if(k.v==="1"&&!confirm("Remove this planned homework from your list? (Students don't see planned homework.) You can bring it back."))return;
       quick(api.planEdit(k.ls,k.gid,"nohw:"+k.line,k.v==="1"?{noHw:true,at:Date.now()}:null))},   // a plan's "Homework by …" line removed for this group (planEdits "nohw:<line>")
     pledit:()=>{e.preventDefault();peOpen(planX(k.ls,k.gid),+k.i,k.line)},
     sendto:()=>{e.preventDefault();sendTo(planX(k.ls,k.gid),+k.i,k.line,+k.dir,k.only||null)},
@@ -2209,8 +2222,10 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     hwtabs:()=>{const h=S.hwX;if(!h)return;e.preventDefault();const on=k.v==="all";(window.EL_SECTIONS[k.a]||[]).forEach(([id])=>{const s=(h.tabs[k.a]=h.tabs[k.a]||[]);if(on&&!s.includes(id))s.push(id);if(!on)h.tabs[k.a]=[]});hwTabsDone()},
     hwcopy:()=>{e.preventDefault();const v=k.msg!=null?k.msg:$("#hw-msg").value;const ok=()=>{const c=k.msg!=null?t:$("#hw-copied");if(k.msg!=null){const o=t.textContent;t.textContent="✓ Copied";setTimeout(()=>t.textContent=o,1500)}else c.textContent="✓ Copied: paste it in Classroom"};
       (navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(ok,()=>{const ta=document.createElement("textarea");ta.value=v;document.body.append(ta);ta.select();document.execCommand("copy");ta.remove();ok()})},
+    planhw:()=>{const x=planX(k.ls,k.gid);hwOpen(x,noCp(x,k.t),k.set||ELWeek.today(),null);const b=$("#hw-by");if(b&&k.by){b.value=k.by;hwFill()}},   // a plan's 💡 "Homework by …" line becomes real homework
     hwsave:()=>{const text=$("#hw-text").value.replace(/\s+/g," ").trim(),by=$("#hw-by").value,msg=$("#hw-msg").value.trim();if(!text||!by)return alert("Write what they have to do and choose the day.");
-      $("#dlg").close();act(api.hw(k.ls,k.gid,"h"+Date.now().toString(36),Object.assign({text,by,set:k.set},msg?{msg}:{},k.line?{line:k.line}:{})))},
+      const tabs=hwCover(S.hwX,text);$("#dlg").close();
+      act(Promise.all([api.hw(k.ls,k.gid,"h"+Date.now().toString(36),Object.assign({text,by,set:k.set},msg?{msg}:{},k.line?{line:k.line}:{},Object.keys(tabs).length?{tabs}:{})),...hwUnlock(k.ls,k.gid,tabs)]))},
     hwdel:()=>{if(!confirm("Remove this homework? Students will no longer see it."))return;act(api.hw(k.ls,k.gid,k.id,null))},
     mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),wrop:()=>wrOpen(k.u,k.a,k.s),wrback:()=>wrBack(k.u,k.a,k.s),wrmsg:()=>{const b=$("#wrback");if(b)b.value=k.v},cpok:()=>cpDone(true),cpback:()=>cpDone(false),   // not "cpredo": that name is the checkpoint's "Let them do it again" (Roger, 4 Nov 2026: Redo in class did nothing)
     
