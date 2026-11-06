@@ -64,10 +64,14 @@ a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-si
 .ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}a.ucard{border:2px solid #e2e8f0;border-radius:16px;padding:16px 18px;text-decoration:none;color:#0f172a;display:flex;flex-direction:column;gap:4px}a.ucard small{color:#64748b;font-size:13px}a.ucard b{font-size:19px}a.ucard span{color:#3157d5;font-weight:700;margin-top:6px}a.ucard.on{border-color:#3157d5;background:#f5f8ff}a.ucard:hover{border-color:#3157d5}
 .helpl{margin:6px 0 0;padding-left:20px}.helpl li{margin:6px 0}
 @media (max-width:900px){.hgrid{grid-template-columns:1fr}.cont .ct{font-size:24px}}
+.hr{display:flex;flex-direction:column;gap:14px}.phonebn{position:relative}.phonebn>a{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#eef2ff,#f0f9ff);border:1px solid #c7d2fe;border-radius:18px;padding:14px 44px 14px 16px;color:#0f172a;text-decoration:none}.phonebn>a:hover{border-color:#3157d5}.phonebn .pbi{font-size:30px}.phonebn b{display:block;font-size:16px}.phonebn small{display:block;color:#475569;font-size:13.5px;margin-top:2px}.phonebn .pbg{margin-left:auto;font-weight:800;color:#2443ad;white-space:nowrap}.phonebn .pbx{position:absolute;top:8px;right:8px;background:none;color:#64748b;padding:4px 8px;font-size:14px}
+.phero{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:28px;align-items:center}.phero>img{width:100%;height:auto}.plead{font-size:18px;line-height:1.5;margin-top:0}.pqr{display:flex;gap:16px;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin-top:14px}.pqr img{flex:0 0 auto;background:#fff;border-radius:8px}.pinst{font-size:17px;font-weight:800;padding:14px 22px;border-radius:14px;background:#2443ad}
+details.psteps{border:1px solid #e2e8f0;border-radius:14px;padding:0 14px;margin:10px 0}details.psteps>summary{cursor:pointer;font-weight:800;font-size:17px;padding:12px 0}.pfig{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:4px 0 14px}.pfig figure{margin:0;display:flex;flex-direction:column;gap:8px}.pfig img{width:100%;height:auto}.pfig figcaption{font-size:14.5px;line-height:1.4}
+@media (max-width:900px){.phero{grid-template-columns:1fr}.phero>img{max-width:320px;margin:0 auto}.pfig{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:640px){.pqr{display:none}.phonebn>a{padding:12px 40px 12px 14px}}
 .ulinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ulinks a{border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;text-decoration:none;color:#2443ad;font-weight:700;background:#fff}.bnav{display:none}
 /* Phone view (Roger, 6 Nov 2026: "so that students can use it on their cellphones"): no top menu, an app-style bar at the bottom with the four places, compact home, tables as cards */
 @media (max-width:640px){.mtabs{display:none!important}body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}.page{padding:12px 14px}
-.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -4px 16px #0f172a14;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+#el-cloud-bar{position:static!important;margin:16px 14px 0;border-radius:14px!important;flex-wrap:wrap;justify-content:center}.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -4px 16px #0f172a14;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
 .bnav a{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;text-decoration:none;color:#64748b;font-size:11px;font-weight:700;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bnav a i{font-style:normal;font-size:22px;line-height:1}.bnav a.on{color:#2443ad;background:#eef2ff}.bnav a b{position:absolute;top:2px;right:calc(50% - 22px);background:#dc2626;color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;line-height:1.3}
 body[data-place="home"] .page h1{font-size:1.75rem;margin:.2em 0 .1em}body[data-place="home"] #sub{font-size:15px;margin:0 0 10px}#crumb a.back{display:none}.page h1{font-size:1.5rem;margin:.3em 0 .4em}
 .hl{gap:10px}a.hal{padding:12px 14px;font-size:15px}.cont{padding:18px;border-radius:20px}.cont .ct{font-size:21px}.cont .cs{font-size:15px}.cont a.cgo{align-self:stretch;text-align:center;padding:14px}
@@ -187,9 +191,9 @@ const howBox=()=>`<div class="pend howto" style="background:#f5f3ff;border-color
 // the board: 📝 Homework (late and missing activities, what we've done, homework and calendar), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
 // the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (video, problems). A place is a hash
 // (#homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
-const PLACE_OF={homework:"hw",week:"hw",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news"};
+const PLACE_OF={homework:"hw",week:"hw",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news",phone:"phone"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
-const placeTitle=p=>({hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher")})[p];
+const placeTitle=p=>({hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone")})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
 const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];return t("Hola","Hi")+(f?", "+f:"")};
 const planOf=ls=>{const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;return {p,gi:p?gi:-1}};
@@ -221,13 +225,14 @@ function homeHtml(lss,ls,info){
     +tile("#marks","📊",t("Les meves notes","My marks"),t("activitats, exàmens i producte final","activities, exams and final product"))
     +tile("#units","📚","Learning Situations",t("resums, pràctica i el teu nivell","summaries, practice and your level"))
     +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"));
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="tiles">${tiles}</div></div>`}
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr"><div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`}
 function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="hw"){const w=workBox(),l=lateBox(lss),wk=weekBox(ls,info);return l+w+(wk||`<div class="box"><p class="muted">${t("No tens deures per als propers dies.","No homework for the next few days.")}</p></div>`)}
   if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";return pend+marksHead(lss,ls)+`<div id="ptbox">${pointsBox()}</div>`+tabBody(ls,list,info)}
   if(place==="units")return unitsBox(lss,ls,st,stTag)+studyBox(ls)+practiceBox(ls);
+  if(place==="phone")return phoneBox();
   if(place==="news")return annBox()||`<div class="box"><p class="muted">${t("Encara no hi ha anuncis.","No announcements yet.")}</p></div>`;
-  return howBox()+`<div class="box"><b>${t("Alguna cosa no funciona?","Something isn't working?")}</b><ul class="helpl"><li>${t("Prem <b>⚠️ Problema</b> a baix de la pantalla i explica-ho: el professor ho veurà.","Press <b>⚠️ Problem</b> at the bottom of the screen and explain it: your teacher will see it.")}</li>`
+  return howBox()+phoneBanner(true)+`<div class="box"><b>${t("Alguna cosa no funciona?","Something isn't working?")}</b><ul class="helpl"><li>${t("Prem <b>⚠️ Problema</b> a baix de la pantalla i explica-ho: el professor ho veurà.","Press <b>⚠️ Problem</b> at the bottom of the screen and explain it: your teacher will see it.")}</li>`
     +`<li>${t("Tens una idea per millorar la web? Prem <b>💡 Idea</b>.","Have an idea to make the website better? Press <b>💡 Idea</b>.")}</li><li>${t("Si una pàgina es veu antiga, recarrega-la amb <b>Ctrl+Maj+R</b>.","If a page looks old, reload it with <b>Ctrl+Shift+R</b>.")}</li></ul></div>`}
 const lsState=l=>{const s=(D.ls[l.id]||{}).status;return s==="closed"?t("tancada · per repassar","closed · to revise"):s==="hidden"?t("oculta","hidden"):t("ara","now")};
 // 📊 My marks: the LS chips (when there are several) and the three tabs of an LS
@@ -240,6 +245,41 @@ function unitsBox(lss,ls,st,stTag){
   return `<div class="box"><div class="ugrid">${lss.map(l=>`<a class="ucard ${l.id===ls.id?"on":""}" href="${lsHref(l)}"><small>${esc(l.title.split(" · ")[0])} · ${lsState(l)}</small><b>${lsName(l)}</b><span>${t("Obre-la","Open it")} →</span></a>`).join("")}</div>`
     +`<div class="lvline"><span class="muted">${t("El teu nivell:","Your level:")}</span> ${levelTag(ls.course,elRouteOf(D.lv,ls.id).level)}${routeNote(ls.id,st)} ${stTag}</div>`
     +`<div class="ulinks"><a href="${ls.course}/index.html">${t("El meu curs","My course")} · ${COURSES[ls.course]||""}</a><a href="lab/practice.html">${t("Practica","Practise")}</a><a href="lab/">English Lab</a></div></div>`}
+// "Study on your phone" (Roger, 6 Nov 2026: "telling them that they can study using their cellphones if they attach the website on the screen"):
+// a card on the home (and in Help) that leads to the #phone place: the board on a phone, a QR code to open it from the Chromebook,
+// and step-by-step pictures to add English Lab to the home screen on Android (Chrome) and iPhone (Safari). Pictures in shared/img/phone/.
+const APP=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
+let BIP=null;   // Android Chrome's install prompt, when the browser offers one
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();BIP=e;if(D&&placeNow()==="phone")render()});
+document.addEventListener("click",async e=>{
+  const x=e.target.closest("[data-phone-x]");if(x){e.preventDefault();try{localStorage.setItem("el_phone_seen","1")}catch(_){}x.closest(".phonebn").remove();return}
+  if(e.target.closest("[data-install]")&&BIP){BIP.prompt();try{await BIP.userChoice}catch(_){}BIP=null;render()}});
+function phoneBanner(always){
+  let seen=false;try{seen=localStorage.getItem("el_phone_seen")==="1"}catch(e){}
+  if(APP()||(!always&&seen))return "";
+  return `<div class="phonebn"><a href="#phone"><span class="pbi" aria-hidden="true">📱</span><span><b>${t("Estudia també amb el mòbil","Study on your phone too")}</b><small>${t("Posa English Lab a la pantalla d'inici del mòbil i obre'l com una aplicació.","Put English Lab on your phone's home screen and open it like an app.")}</small></span><span class="pbg">${t("Com","How")} →</span></a>${always?"":`<button class="pbx" data-phone-x title="${t("Amaga","Hide")}" aria-label="${t("Amaga","Hide")}">✕</button>`}</div>`}
+function phoneBox(){
+  const L=lang(),im=(n,alt)=>`<img src="shared/img/phone/${n}.webp" alt="${esc(alt)}" loading="lazy">`,ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  const fig=(n,c)=>`<figure>${im(n,c)}<figcaption>${c}</figcaption></figure>`;
+  const done=t("Fet! Toca la icona d'English Lab per estudiar.","Done! Tap the English Lab icon to study.");
+  const and=`<details class="psteps" ${ios?"":"open"}><summary>🤖 Android · Chrome</summary><div class="pfig">`
+    +fig("android-1-"+L,t("1 · Obre English Lab amb Chrome, inicia la sessió i toca <b>⋮</b> (a dalt a la dreta).","1 · Open English Lab in Chrome, sign in and tap <b>⋮</b> (top right)."))
+    +fig("android-2-"+L,t("2 · Toca <b>«Afegeix a la pantalla d'inici»</b> (o «Instal·la l'aplicació»).","2 · Tap <b>“Add to Home screen”</b> (or “Install app”)."))
+    +fig("android-3-"+L,t("3 · Toca <b>«Afegeix»</b>.","3 · Tap <b>“Add”</b>."))
+    +fig("home","4 · "+done)+`</div></details>`;
+  const iph=`<details class="psteps" ${ios?"open":""}><summary>🍏 iPhone · Safari</summary><div class="pfig">`
+    +fig("iphone-1-"+L,t("1 · Obre English Lab amb Safari, inicia la sessió i toca el botó <b>Comparteix</b> (a baix).","1 · Open English Lab in Safari, sign in and tap the <b>Share</b> button (at the bottom)."))
+    +fig("iphone-2-"+L,t("2 · Baixa una mica i toca <b>«Afegeix a la pantalla d'inici»</b>.","2 · Scroll down a little and tap <b>“Add to Home Screen”</b>."))
+    +fig("iphone-3-"+L,t("3 · Toca <b>«Afegeix»</b> (a dalt a la dreta).","3 · Tap <b>“Add”</b> (top right)."))
+    +fig("home","4 · "+done)+`</div></details>`;
+  return `<div class="box phonex"><div class="phero">${im("hero-"+L,t("El tauler i un learning path al mòbil","The board and a learning path on a phone"))}<div>`
+    +`<p class="plead">${t("English Lab també funciona al mòbil. Posa'l a la pantalla d'inici i s'obrirà com una aplicació, amb un sol toc: fes els deures, mira les notes i practica on vulguis.","English Lab works on your phone too. Put it on your home screen and it opens like an app, with one tap: do your homework, check your marks and practise wherever you are.")}</p>`
+    +`<p>💾 ${t("La feina es desa al teu compte: pots començar al Chromebook i acabar-la al mòbil.","Your work is saved in your account: you can start on the Chromebook and finish on your phone.")}</p>`
+    +(BIP?`<button class="pinst" data-install>📲 ${t("Instal·la English Lab en aquest mòbil","Install English Lab on this phone")}</button>`:"")
+    +`<div class="pqr"><img src="shared/img/phone/qr-board.svg" alt="${t("Codi QR d'English Lab","English Lab QR code")}" width="132" height="132"><span>${t("<b>Des del Chromebook:</b> escaneja aquest codi amb la càmera del mòbil per obrir English Lab. Inicia la sessió amb el correu de l'institut i la teva contrasenya.","<b>From the Chromebook:</b> scan this code with your phone's camera to open English Lab. Sign in with your school email and your password.")}</span></div>`
+    +`</div></div></div>`
+    +`<div class="box"><h2>${t("Com posar English Lab a la pantalla d'inici","How to put English Lab on your home screen")}</h2>${ios?iph+and:and+iph}`
+    +`<p class="muted">${t("Si tens el mòbil en castellà: «Añadir a pantalla de inicio» i «Añadir».","If your phone is in Spanish: “Añadir a pantalla de inicio” and “Añadir”. In Catalan: “Afegeix a la pantalla d'inici” and “Afegeix”.")}</p></div>`}
 function render(){
   const g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lss=[...EL_LS].filter(l=>{const i=D.ls[l.id]||{status:"hidden"};return all()||(i.status!=="hidden"&&elLsForGroup(l,i,D.me.group))})
