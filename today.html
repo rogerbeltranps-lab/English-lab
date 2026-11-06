@@ -96,6 +96,7 @@ table.lpst,table.lpst tbody,table.lpst tr,table.lpst td{display:block;width:auto
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
+<script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js"></script>
 <script src="shared/js/el-sound.js"></script>
 <script type="module">
@@ -202,7 +203,8 @@ const PLACE_OF={todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"m
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
 const placeTitle=p=>({todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone")})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
-const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];return t("Hola","Hi")+(f?" "+f:"")+t(", espero que tinguis un dia genial! ☺️",", hope you are having a great day! ☺️")};   // Roger, 6 Nov 2026
+const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];const end=window.ELCheer?ELCheer.student(D.me.email||D.me.name||"",ELWeek.today(),EN):t("espero que tinguis un dia genial! ☺️","hope you are having a great day! ☺️");
+  return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
 const planOf=ls=>{const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;return {p,gi:p?gi:-1}};
 function homeSub(g,ls){const {p,gi}=planOf(ls),ex=gi>=0?ELWeek.exam(p,gi):null,n=ex?ELWeek.days(ELWeek.today(),ex):null;
   return (g?esc(g.name)+" · ":"")+lsName(ls)+(ex&&n>=0?` · <b style="color:#b91c1c">${n>1?t(`examen d'aquí a ${n} dies`,`exam in ${n} days`):n===1?t("examen demà","exam tomorrow"):t("examen avui","exam today")}</b>`:"")}

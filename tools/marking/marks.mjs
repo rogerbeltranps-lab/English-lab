@@ -18,6 +18,11 @@
 //        waiting for an answer (ELMark.open, not handed to the teacher), all groups, with the hand-in and the content file to read
 //   node tools/marking/marks.mjs answer <answer file> [--apply]             saves the EL-ANSWERS v1 answer: ANSWER → answers[step] =
 //        {t, q, at} (the student sees it as the teacher's answer), FORYOU → ask[step] = {why, q, at} (🙋 in the dashboard's To do)
+// The dashboard's ✏️ Corrections (Roger, 6 Nov 2026) shows when each piece was corrected and where the run is: fb-apply saves
+// results/{activity}.fbAt[step] = when the correction was sent; `ready` (the first step of the scheduled task "English Lab: mark and
+// correct") saves settings/marking.run = {started, via: "request" when the teacher asked for it with ✏️ Correct everything waiting now
+// (settings/marking.request.at is newer than the last start), else "schedule"}; `audit` (its last step) saves run.done, only for a run
+// started in the last 12 hours and not finished (the Friday audit alone changes nothing). --no-run: `ready` saves nothing (a test).
 // Sign-in: FIREBASE_SERVICE_ACCOUNT (the service account's JSON key, an environment secret of the cloud environment, never in the repo),
 // else the Firebase CLI login on Roger's PC (as tools/exam-marks). Group = EL_GROUPS id (2ESOA…); activity = catalogue id
 // (2eso/ls2-what-are-they-doing); step = the moment's step (log, chart, card, factfile). The answer file holds no names.
@@ -146,6 +151,8 @@ const [cmd,...rest]=process.argv.slice(2),flags=new Set(rest.filter(x=>x.startsW
 const grpOf=id=>{const g=W.EL_GROUPS.find(x=>x.id===id);if(!g)throw new Error("No group "+id);return g};
 const momentOf=(aid,step)=>{const a=W.EL_CATALOG.find(x=>x.id===aid),m=a&&moments(a.ls).find(x=>x.a===aid&&x.step===step);if(!m)throw new Error("No marking step "+aid+" · "+step);return m};
 if(cmd==="ready"){const today=W.ELWeek.today();
+  if(!flags.has("--no-run")){const mk=doc(await api("GET",DOCS+"settings/marking"))||{},rq=Date.parse((mk.request||{}).at||"")||0,st=Date.parse((mk.run||{}).started||"")||0,via=rq>st?"request":"schedule";
+    await api("PATCH",DOCS+"settings/marking?updateMask.fieldPaths=run",{fields:{run:fsv({started:new Date().toISOString(),via})}});console.log("RUN started ("+(via==="request"?"asked from the dashboard":"scheduled")+")")}
   for(const grp of W.EL_GROUPS){const ticks=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
     for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
       const rows=await todo(grp,m);if(!rows.length)continue;const r=readyOf(grp,ls,m,ticks),now=!!(r.from&&today>=r.from);
@@ -170,6 +177,8 @@ else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026:
   console.log(`AUDIT ${today}: ${problems.length?"PROBLEMS":"OK"}`);
   problems.forEach(x=>console.log("❌ "+x));remind.forEach(x=>console.log("⏰ "+x));ok.forEach(x=>console.log("🤖 to mark now: "+x));
   if(!problems.length&&!remind.length&&!ok.length)console.log("Nothing waiting: every hand-in that is ready has a level.");
+  {const run=(doc(await api("GET",DOCS+"settings/marking"))||{}).run||{},st=Date.parse(run.started||"")||0,dn=Date.parse(run.done||"")||0;   // the end of a run (see the top)
+    if(st&&dn<st&&Date.now()-st<12*3600e3){await api("PATCH",DOCS+"settings/marking?updateMask.fieldPaths=run.done",{fields:{run:fsv({done:new Date().toISOString()})}});console.log("RUN done")}}
   if(problems.length)process.exitCode=2}
 else if(cmd==="fb-ready"){   // pieces waiting for a correction without a level, per group, activity and step
   for(const grp of W.EL_GROUPS)for(const a of fbActs(grp.course)){const t=await fbTodo(grp,a);for(const [step,rows] of Object.entries(t))console.log(["FEEDBACK",grp.id,a.id,step,rows.length+" to correct"].join(" · "))}}
@@ -183,12 +192,13 @@ else if(cmd==="fb-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_C
     const auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
     console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+(auto?"↺ MOSTLY PASTED: sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+") · ":x.flag?"⚠️ POSSIBLE COPY (to the To do, not sent): "+x.flag+" · ":"")+x.fb.replace(/\n+/g," / "));if(!flags.has("--apply"))continue;
     if(auto){const at=new Date().toISOString();   // as the dashboard's Redo: the writing opens again, its next hand-in is corrected again
-      await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step),fp("replies",step),fp("fbSig",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
-        {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},flags:fsv({[step]:{why:x.flag,lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at,done:"redo",auto:true}}),replies:fsv({[step]:redoNote(row.route,row.h.ty,x.flag)}),fbSig:fsv({[step]:"redo"})}});continue}
+      await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step),fp("replies",step),fp("fbSig",step),fp("fbAt",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+        {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},fbAt:fsv({[step]:at}),flags:fsv({[step]:{why:x.flag,lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at,done:"redo",auto:true}}),replies:fsv({[step]:redoNote(row.route,row.h.ty,x.flag)}),fbSig:fsv({[step]:"redo"})}});continue}
     if(x.flag){await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),   // the teacher accepts it (the correction is sent) or asks for it again in class
       {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},flags:fsv({[step]:{why:x.flag,lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at:new Date().toISOString()}})}});continue}
-    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("replies",step),fp("fbSig",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
-      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},replies:fsv({[step]:x.fb}),fbSig:fsv({[step]:row.v})}})}
+    const at=new Date().toISOString();
+    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("replies",step),fp("fbSig",step),fp("fbAt",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},replies:fsv({[step]:x.fb}),fbSig:fsv({[step]:row.v}),fbAt:fsv({[step]:at})}})}
   console.log(`\n${flags.has("--apply")?"Sent":"Would send"}: ${r.rows.filter(x=>x.fb&&!x.flag).length} · sent back automatically (mostly pasted): ${r.rows.filter(x=>x.auto).length} · possible copies for the teacher: ${r.rows.filter(x=>x.flag&&!x.auto).length} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else if(cmd==="sheet"){const [gid,aid,step]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m);
   console.log(rows.length?sheetOf(grp,m,rows).text:"Nothing to mark: every hand-in has a level.")}
