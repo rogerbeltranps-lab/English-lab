@@ -64,6 +64,18 @@ table.st{border-collapse:collapse;width:100%}
 .demo{background:#fff4d6;border:1px solid #f1d28a;border-radius:12px;padding:8px 12px}
 .miss li{margin:3px 0}
 @media (max-width:600px){.hb{grid-template-columns:minmax(0,1fr) 90px 40px}.mini{width:60px}}
+/* one student's games: answers and 📝 notes (Roger, 6 Nov 2026) */
+.games{display:flex;flex-direction:column;gap:8px;margin:6px 0 14px}
+details.gm{border:1px solid var(--line);border-radius:12px;background:#fff}
+details.gm summary{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:8px 12px;cursor:pointer;font-weight:600}
+details.gm[open] summary{border-bottom:1px solid var(--line)}
+table.qa{border-collapse:collapse;width:100%;font-size:.92em}
+.qa th{text-align:left;color:var(--ink2);font-size:.85em;padding:5px 8px;border-bottom:1px solid var(--line)}
+.qa td{padding:5px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+.qa tr.no td{background:#fff5f4}.qa .mk{font-weight:700}.qa tr.ok .mk{color:#166534}.qa tr.no .mk{color:#b3261e}
+.gm .notes{padding:8px 12px 12px;background:#fffef7;border-top:1px solid var(--line);border-radius:0 0 12px 12px}
+.gm .nh{margin:0 0 4px;font-weight:700}.gm .note{margin:6px 0}.gm .note b{color:var(--accent)}.gm .note p{margin:2px 0 0;white-space:normal}
+.gm>p.muted{padding:0 12px}
 </style></head>
 <body><main id="app"><p>Loading…</p></main><div class="tip" id="tip" hidden></div>
 <script src="../../shared/js/el-catalog.js"></script>
@@ -78,7 +90,7 @@ const $=s=>document.querySelector(s),app$=$("#app"),tip$=$("#tip");
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const P=new URLSearchParams(location.search),DEMO=P.has("demo");
 const GROUPS=window.EL_GROUPS||[],KIND={vocab:"Vocabulary",grammar:"Grammar",mixed:"Mixed"};
-const R={user:null,teacher:false,g:P.get("g")||"",games:[],names:{},sel:"",stu:"",sort:"name",err:"",loading:false};
+const R={user:null,teacher:false,g:P.get("g")||"",games:[],all:[],ls:P.get("ls")||"",names:{},sel:"",stu:"",sort:"name",err:"",loading:false};
 const pct=(a,b)=>b?Math.round(a/b*100):null,show=v=>v==null?"–":v+" %";
 const day=d=>{const x=new Date(d+"T12:00");return x.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})};
 const short=t=>String(t||"").replace(/^(Vocabulary|Grammar) · /,"");
@@ -96,9 +108,13 @@ async function load(){
       const games=[];gs.forEach(d=>games.push(d.data()));games.sort((a,b)=>a.sid-b.sid);
       Object.assign(R,{games,names});
     }
+    R.all=R.games;pickLs();
   }catch(e){console.warn("results",e);R.err=e.message}
   R.loading=false;R.sel="";R.stu="";draw();
 }
+// One LS at a time (Roger, 6 Nov 2026: each student's answers, performance and notes "of the LS … all together"): chips by the games' ls
+const lsList=()=>[...new Set(R.all.map(x=>x.ls||""))].filter(Boolean).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
+function pickLs(){const l=lsList();if(R.ls&&!l.includes(R.ls))R.ls="";R.games=R.ls?R.all.filter(x=>x.ls===R.ls):R.all}
 // a game's numbers, students on the list only (a tester's answers never count)
 const onList=x=>x.stu.filter(s=>R.names[s.e]);
 const classPct=x=>{const l=onList(x);return pct(l.reduce((t,s)=>t+s.r,0),l.length*x.done)};
@@ -126,7 +142,8 @@ function draw(){
     ${DEMO?`<p class="demo">Sample data with made-up students, to show how the page works. The real page fills itself as you play the games.</p>`:""}
     <p class="muted">Every class game you play from the board is saved here: who got each question right. Only the questions whose answer you showed count; a student who didn't answer one gets it wrong.</p>
     <div class="bar">${GROUPS.map(g=>`<button class="chip${g.id===R.g?" on":""}" data-do="group" data-g="${g.id}">${esc(g.name)}</button>`).join("")}
-    <a class="chip" href="host.html" style="text-decoration:none">🎮 Board</a></div>`;
+    <a class="chip" href="host.html" style="text-decoration:none">🎮 Board</a></div>
+    ${R.g&&lsList().length>1?`<div class="bar"><span class="muted">LS:</span><button class="chip${R.ls?"":" on"}" data-do="ls" data-l="">All</button>${lsList().map(l=>`<button class="chip${l===R.ls?" on":""}" data-do="ls" data-l="${esc(l)}">${esc(l)}</button>`).join("")}</div>`:""}`;
   if(!R.g){app$.innerHTML=head+`<p>Choose a group.</p>`;return}
   if(R.loading){app$.innerHTML=head+`<p>Loading…</p>`;return}
   if(R.err){app$.innerHTML=head+`<p><b>The results could not be read.</b> ${esc(R.err)}. If the page is new, the Firestore rules publish when the change reaches main; then reload.</p>`;return}
@@ -143,7 +160,7 @@ function draw(){
   const group=`<div class="card"><h2>The group, game by game</h2><p class="muted">% of right answers of the whole class in each game. Click a bar to see its questions.</p>${legend()}${columns(items)}${R.sel?gameDetail():""}</div>`;
   const sorted=[...st].sort(R.sort==="name"?(a,b)=>a.name.localeCompare(b.name):(a,b)=>(a[R.sort]??-1)-(b[R.sort]??-1)||a.name.localeCompare(b.name));
   const hasK=k=>R.games.some(x=>x.kind===k);
-  const stuT=`<div class="card"><h2>Each student</h2><p class="muted">% right over the games they played. Click a student to see their games. Sort by a column with its heading.</p>
+  const stuT=`<div class="card"><h2>Each student</h2><p class="muted">% right over the games they played. Click a student to see their games, their answers and their 📝 notes. Sort by a column with its heading.</p>
     <div class="wrap"><table class="st"><thead><tr><th data-do="sort" data-k="name">Student${R.sort==="name"?" ▲":""}</th><th data-do="sort" data-k="all">All games${R.sort==="all"?" ▲":""}</th>
     ${hasK("vocab")?`<th data-do="sort" data-k="vocab">Vocabulary${R.sort==="vocab"?" ▲":""}</th>`:""}${hasK("grammar")?`<th data-do="sort" data-k="grammar">Grammar${R.sort==="grammar"?" ▲":""}</th>`:""}${hasK("mixed")?`<th data-do="sort" data-k="mixed">Mixed${R.sort==="mixed"?" ▲":""}</th>`:""}<th>Played</th></tr></thead><tbody>
     ${sorted.map(s=>`<tr class="row${s.e===R.stu?" sel":""}" data-do="stu" data-e="${esc(s.e)}"><td>${esc(s.name)}</td>
@@ -163,8 +180,24 @@ function stuDetail(s){
   const items=R.games.map(x=>{const y=x.stu.find(z=>z.e===s.e),v=y?pct(y.r,x.done):null,c=classPct(x);
     return {label:day(x.day),value:v,avg:c,kind:x.kind in KIND?x.kind:"mixed",tip:`${x.title} · ${day(x.day)} · ${y?`${y.r} of ${x.done} right (${v} %)`:"absent"} · class ${show(c)}`}});
   const last=[...R.games].reverse().map(x=>{const y=x.stu.find(z=>z.e===s.e);return y&&y.miss.length?{x,m:y.miss}:null}).filter(Boolean).slice(0,3);
-  return `<div style="padding:6px 0 10px"><b>${esc(s.name)}</b>, game by game ${legend('<span class="key"><i style="border-top:2px dashed var(--ink);height:0;border-radius:0"></i>Class</span>')}${columns(items)}
+  const det=R.games.map(x=>gameOf(x,s.e)).join("");
+  return `<div style="padding:6px 0 10px">${det?`<p style="margin:4px 0"><b>${esc(s.name)}: answers and notes${R.ls?" · "+esc(R.ls):""}</b></p><div class="games">${det}</div>`:""}<b>${esc(s.name)}</b>, game by game ${legend('<span class="key"><i style="border-top:2px dashed var(--ink);height:0;border-radius:0"></i>Class</span>')}${columns(items)}
     ${last.length?`<p style="margin:12px 0 4px"><b>Questions to review</b> (the last games with mistakes):</p><ul class="miss">${last.map(({x,m})=>`<li><b>${esc(short(x.title))}</b> (${day(x.day)}): ${m.map(n=>{const q=x.qs.find(z=>z.n===n);return q?esc(q.q):"question "+n}).join(" · ")}</li>`).join("")}</ul>`:""}</div>`;
+}
+
+// one game of one student: score, each question with their answer and the right one, and their 📝 notes (open by default for the
+// latest game; games saved before 6 Nov 2026 have no answers or notes: only right or wrong)
+function gameOf(x,e){
+  const y=x.stu.find(z=>z.e===e),last=x===R.games[R.games.length-1];
+  if(!y)return `<details class="gm"><summary><span>${esc(short(x.title))}</span><span class="muted">${day(x.day)}</span><span class="muted">absent</span></summary></details>`;
+  const v=pct(y.r,x.done),ans=y.ans||null,notes=y.notes||{},nts=x.nts||[];
+  const rows=x.qs.map(q=>{const ok=!y.miss.includes(q.n),a=ans?ans[q.n]:undefined;
+    return `<tr class="${ok?"ok":"no"}"><td class="num">${q.n}</td><td>${esc(q.q)}</td><td>${ans?(a==null?'<span class="muted">no answer</span>':esc(a)):'<span class="muted">–</span>'}</td><td class="mk">${ok?"✓":"✗"}</td><td class="muted">${ok?"":esc(q.ok||"")}</td></tr>`}).join("");
+  const nt=nts.map(n=>`<div class="note"><b>${esc(n.topic)}</b>${notes[n.k]?`<p>${esc(notes[n.k]).replace(/\n/g,"<br>")}</p>`:'<p class="muted">No notes.</p>'}</div>`).join("");
+  return `<details class="gm"${last?" open":""}><summary><span>${esc(short(x.title))}</span><span class="muted">${day(x.day)}${x.lp?" · "+esc(x.lp):""}</span><span class="${v!=null&&v<50?"low":""}">${x.done?`${y.r} / ${x.done} (${v} %)`:""}</span></summary>
+    ${x.done?`<table class="qa"><thead><tr><th>#</th><th>Question</th><th>Their answer</th><th></th><th>Right answer</th></tr></thead><tbody>${rows}</tbody></table>`:""}
+    ${ans?"":`<p class="muted">This game was played before the answers were saved: only right or wrong.</p>`}
+    ${nts.length?`<div class="notes"><p class="nh">📝 Notes</p>${nt}</div>`:""}</details>`;
 }
 
 /* ---------- events ---------- */
@@ -174,6 +207,7 @@ app$.addEventListener("click",async e=>{const b=e.target.closest("[data-do]");if
   if(d==="game"){R.sel=R.sel===b.dataset.id?"":b.dataset.id;draw()}
   if(d==="stu"){R.stu=R.stu===b.dataset.e?"":b.dataset.e;draw()}
   if(d==="sort"){R.sort=b.dataset.k;draw()}
+  if(d==="ls"){R.ls=b.dataset.l;pickLs();R.sel="";history.replaceState(null,"","?g="+R.g+(R.ls?"&ls="+encodeURIComponent(R.ls):"")+(DEMO?"&demo":""));draw()}
 });
 addEventListener("pointermove",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");
   if(!t){tip$.hidden=true;return}tip$.textContent=t.dataset.tip;tip$.hidden=false;
@@ -186,9 +220,11 @@ function demo(g){
   const course=(GROUPS.find(x=>x.id===g)||{}).course||"2eso",list=(window.EL_GAMES||[]).filter(d=>d.course===course&&d.kind).slice(0,4);
   let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
   const games=list.map((d,k)=>{const qn=d.kind==="vocab"?18:16,done=qn,skill=d.kind==="vocab"?.78:.62;
-    const stu=Object.keys(names).filter(()=>rnd()>.08).map((e,i)=>{const lv=.35+((i*37)%60)/100;const miss=[];for(let n=1;n<=done;n++)if(rnd()>Math.min(.97,skill*lv*1.35))miss.push(n);return {e,r:done-miss.length,a:done,miss}});
-    return {group:g,deck:d.id,title:d.title,kind:d.kind,day:["2026-10-28","2026-10-29","2026-11-03","2026-11-04"][k],sid:k+1,qn,done,
-      qs:Array.from({length:done},(_,n)=>({n:n+1,q:`Question ${n+1} of “${short(d.title)}”`})),stu}});
+    const nts=[{k:"p1",topic:"The first theory slide"},{k:"p2",topic:"The second theory slide"}];
+    const stu=Object.keys(names).filter(()=>rnd()>.08).map((e,i)=>{const lv=.35+((i*37)%60)/100;const miss=[],ans={};for(let n=1;n<=done;n++){if(rnd()>Math.min(.97,skill*lv*1.35))miss.push(n);ans[n]=miss.includes(n)?"a wrong answer":"the right answer"}
+      return {e,r:done-miss.length,a:done,miss,ans,notes:{p1:"Sample notes: the rule in my own words.\nExample 1. Example 2.\nThe mistake to avoid.",p2:i%3?"More sample notes.":""}}});
+    return {group:g,deck:d.id,title:d.title,kind:d.kind,ls:d.ls,lp:d.lp,day:["2026-10-28","2026-10-29","2026-11-03","2026-11-04"][k],sid:k+1,qn,done,nts,
+      qs:Array.from({length:done},(_,n)=>({n:n+1,q:`Question ${n+1} of “${short(d.title)}”`,ok:"the right answer"})),stu}});
   return {games,names};
 }
 

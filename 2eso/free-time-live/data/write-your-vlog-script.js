@@ -18,7 +18,7 @@ window.LP = {
         { r: 'daring', q: 'This week my cousin ___ (stay) with us.', a: ['is staying', "'s staying"] }
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Paraules per al vlog', en: 'Words for your vlog' },
-      intro: { ca: 'Explora, practica amb les targetes (amb repàs de tota la LS) i completa les frases (80 %).', en: 'Explore, practise with the cards (with review from the whole LS) and complete the sentences (80 %).' },
+      intro: { ca: 'Explora, practica amb les targetes (amb repàs de tota la LS) i completa les frases.', en: 'Explore, practise with the cards (with review from the whole LS) and complete the sentences.' },
       receptive: 'subscribers · livestream · highlights',
       core: { insecure: ['Hi everyone!', 'welcome to my vlog', 'today I’m at…', 'in this photo…', 'see you next time!', 'thanks for watching'], safe: ['Hi everyone!', 'welcome to my vlog', 'today I’m at…', 'in this photo…', 'see you next time!', 'thanks for watching', 'join a club', 'train hard', 'practise every day', 'get better at', 'be good at', 'spend time + -ing'], daring: ['Hi everyone!', 'welcome to my vlog', 'today I’m at…', 'in this photo…', 'see you next time!', 'thanks for watching', 'join a club', 'train hard', 'practise every day', 'get better at', 'be good at', 'spend time + -ing', 'I think (that)…', 'I believe…', 'I prefer… to…', 'it means…', 'I don’t need…'] },
       groups: [
@@ -44,7 +44,7 @@ window.LP = {
         { r: 'daring', q: 'I ___ the park to the sports hall. (preferir)', a: ['prefer'] },
         { r: 'daring', q: 'For me, climbing ___ freedom. (voler dir)', a: ['means'] }
       ] },
-    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: a model vlog script', pill: '80 %',
+    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: a model vlog script', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix el guió del vlog de la Noa. Fixa’t en les parts: salutació, ara, normalment, la foto, m’agrada, consells, crèdits i comiat.', en: 'Read Noa’s vlog script. Notice its parts: greeting, now, usually, the photo, likes, tips, credits and goodbye.' },
       media: { text: {
         beginners: '<p><strong>Slide 1 · Hi!</strong><br>Hi everyone! I’m Noa. This is my vlog about climbing.</p><p><strong>Slide 2 · Now</strong><br>Today I’m at the climbing wall. It’s cold outside. I’m wearing a T-shirt. My friend Nil is climbing.</p><p><strong>Slide 3 · Usually</strong><br>I usually climb on Saturday mornings.</p><p><strong>Slide 4 · Photo</strong><br>In this photo, we’re at a competition. Nil is climbing. We’re cheering.</p><p><strong>Slide 5 · I like…</strong><br>I love climbing. I don’t like falling!</p><p><strong>Slide 6 · Tips</strong><br>Two tips: take a break. Don’t use your phone in bed.</p><p><strong>Slide 7 · Credits</strong><br>Photos: me. Facts: "Climbing", Encyclopedia website, 2026.<br>Thanks for watching!</p><p class="tiny"><strong>Paraules:</strong> climbing wall = rocòdrom · cheering = animant · falling = caure · take a break = fes una pausa · credits = crèdits</p>',
@@ -64,7 +64,7 @@ window.LP = {
         { r: 'daring', q: 'What is temporary in Noa’s routine this month?', o: ['She’s training three times a week.', 'She climbs on Saturday mornings.', 'She wears climbing shoes.'] },
         { r: 'daring', q: 'Which tip is Noa going to apply?', o: ['keeping her phone out of her bedroom', 'setting a time limit', 'taking a break every thirty minutes'] }
       ] },
-    { id: 'parts', type: 'mc', tab: { ca: 'Parts del guió', en: 'Script parts' }, title: { ca: 'Quina part del vlog és?', en: 'Which part of the vlog is it?' }, pill: '80 %',
+    { id: 'parts', type: 'mc', tab: { ca: 'Parts del guió', en: 'Script parts' }, title: { ca: 'Quina part del vlog és?', en: 'Which part of the vlog is it?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Un bon guió té parts clares. Per a cada frase, tria a quina part va.', en: 'A good script has clear parts. For each sentence, choose the part it belongs to.' },
       items: [
         { q: '“Hi everyone! I’m Pau and welcome to my vlog about basketball.”', o: ['Greeting (slide 1)', 'Now (slide 2)', 'Credits (last slide)'] },
@@ -77,7 +77,7 @@ window.LP = {
         { r: 'safe', q: 'Which slide text is best? (short text, one idea)', o: ['Usually: Tuesdays and Thursdays · club · 2 hours', 'I usually train on Tuesdays and Thursdays with my club for two hours and we always finish with a game and then we go home.', 'Usually'] },
         { r: 'daring', q: 'Which sentence links two parts of the script well?', o: ['“That’s what I do every week. But today is different!”', '“Now. Usually.”', '“Photo. Slide four.”'] }
       ] },
-    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: com comença i acaba un vlog', en: 'Listen again: how a vlog starts and ends' }, pill: { ca: 'Vídeo · 80 %', en: 'Video · 80 %' },
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: com comença i acaba un vlog', en: 'Listen again: how a vlog starts and ends' }, pill: { ca: 'Vídeo', en: 'Video' },
       intro: { ca: 'Mira el vlog de la Mei de l’LP3 i fixa’t en les parts: salutació, on és, què passa, què fa normalment i comiat.', en: 'Watch Mei’s vlog from LP3 and notice its parts: greeting, where she is, what’s happening, what she usually does and goodbye.' },
       media: { videos: [{ base: 'video/mei-ice-rink', title: 'Mei: Saturday at the ice rink' }], videoCredit: 'Illustrated video made for English Lab. Voices generated with ElevenLabs.' },
       chunks: ['welcome to my Saturday vlog', 'See you next week'],
@@ -103,7 +103,7 @@ window.LP = {
         ['Noah', 'I usually ride here with my dad on Sunday mornings, and we go slowly.'],
         ['Noah', 'But this weekend I\'m filming a race for our club channel, so I\'m not riding, I\'m holding the camera.'],
         ['Noah', 'Next week I\'m racing too. Wish me luck!']] } },
-    { id: 'grammar', type: 'typed', mode: 'say', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Repàs: les formes del vlog', en: 'Review: the forms of the vlog' }, pill: '80 %',
+    { id: 'grammar', type: 'typed', mode: 'say', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Repàs: les formes del vlog', en: 'Review: the forms of the vlog' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Tot el que necessites per al guió: Present Continuous (ara), Present Simple (normalment), like + -ing, imperatius i expressions de temps.', en: 'Everything you need for the script: Present Continuous (now), Present Simple (usually), like + -ing, imperatives and time expressions.' },
       explain: [
         { ca: '<strong>El guió del vlog en quatre formes:</strong> ara → <em>I’m / she’s / they’re + -ing</em> (<em>Today I’m at…, Nil is climbing</em>) · normalment → Present Simple (<em>I usually climb on Saturdays</em>) · gustos → <em>love / like / hate + -ing</em> · consells → imperatius (<em>Take a break. Don’t…</em>). Expressions de temps: <em>today, right now, at the moment · usually, on Saturday mornings, twice a week</em>.', en: '<strong>The vlog script in four forms:</strong> now → <em>I’m / she’s / they’re + -ing</em> (<em>Today I’m at…, Nil is climbing</em>) · usually → Present Simple (<em>I usually climb on Saturdays</em>) · likes → <em>love / like / hate + -ing</em> · tips → imperatives (<em>Take a break. Don’t…</em>). Time expressions: <em>today, right now, at the moment · usually, on Saturday mornings, twice a week</em>.' },

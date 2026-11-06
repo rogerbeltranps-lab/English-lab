@@ -29,7 +29,7 @@
     .levels{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 16px}
     .lv{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:118px;border:2px solid var(--line);background:#fff;border-radius:16px;padding:10px 14px;cursor:pointer;text-align:left}
     .lv b{font-size:1.35rem;letter-spacing:-.02em}.lv span{font-size:.82rem;color:var(--muted);font-weight:700}
-    .lv.on{border-color:var(--accent);background:var(--accent-soft)}.lv.rec{position:relative}.lv.rec::after{content:"⭐";position:absolute;top:6px;right:8px}
+    .lv.on{border-color:var(--accent);background:var(--accent-soft)}.levels .lv{flex:1 1 0;min-width:96px}.lv.rec{position:relative}.lv.rec::after{content:"⭐";position:absolute;top:6px;right:8px}
     .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
     .chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:5px 13px;cursor:pointer}.chip.on{background:#172033;color:#fff;border-color:#172033}
     select{border:1px solid #cbd5e1;border-radius:10px;padding:5px 8px;background:#fff;max-width:100%}
@@ -215,7 +215,7 @@ function extract(pg, lv) {
 
 /* ---------- who is here ---------- */
 const COURSES = { '2eso': '2 ESO', '4eso': '4 ESO' };
-const S = { tab: (location.hash.slice(1) || 'words'), course: null, level: null, ls: 'all', lp: 'all', mode: 'cards', coreOnly: null, open: null };
+const S = { tab: (location.hash.slice(1) || 'words'), course: null, level: null, step: null, ls: 'all', lp: 'all', mode: 'cards', coreOnly: null, open: null };
 if (!['words', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
 let U = null, D = null, EN = true;
 const t = (ca, en) => EN ? en : ca;
@@ -230,6 +230,19 @@ async function load(u) {
 const myCourse = () => (EL_GROUPS.find(g => g.id === D.group) || {}).course || null;
 const visibleLS = c => EL_LS.filter(l => l.course === c && (all() || ((D.ls[l.id] || {}).status || 'hidden') !== 'hidden' && elLsForGroup(l, D.ls[l.id], D.group)));
 const canDo = a => { const i = D.ls[a.ls] || {}; return all() || i.status === 'closed' || elLpOpen(a, i, D.group); };
+// By level, not by course (Roger, 6 Nov 2026): a step of the ladder (elLadder in el-catalog.js) shows every course with that level, so
+// an A2 student in 2 ESO (Core) also gets the 4 ESO Base practice. The other course's LSs count once they are open or closed, and
+// their Learning Paths once the teacher opened them for any group of that course. No new reads: D.ls already holds every LS.
+const LADDER = elLadder();
+const stepOf = (c, lv) => elCefr(c, lv);
+const pairsOf = k => { const st = LADDER.find(x => x.k === k); if (!st) return [[S.course, S.level]];
+  const own = st.pairs.filter(([c, lv]) => c === S.course && lv === S.level);   // the student's own course and route first
+  return own.concat(st.pairs.filter(x => !own.includes(x))).filter(([c, lv]) => all() || lv !== 'native' || myLevel() === 'native'); };
+const otherLS = c => EL_LS.filter(l => l.course === c && /^(open|closed)$/.test((D.ls[l.id] || {}).status || ''));
+const otherDo = a => { const i = D.ls[a.ls] || {}; return i.status === 'closed' || EL_GROUPS.some(g => g.course === (EL_LS.find(l => l.id === a.ls) || {}).course && elLpOpen(a, i, g.id)); };
+const lsOf = c => all() || c === myCourse() ? visibleLS(c) : otherLS(c);
+const stepLS = () => { const seen = new Set(); return pairsOf(S.step).flatMap(([c]) => lsOf(c)).filter(l => !seen.has(l.id) && seen.add(l.id)); };
+const lsName = l => (new Set(pairsOf(S.step).map(x => x[0])).size > 1 ? COURSES[l.course] + ' · ' : '') + 'LS' + (EL_LS.filter(y => y.course === l.course).indexOf(l) + 1) + ' · ' + l.title.replace(/^\S+ · /, '');
 // the student's level now: the route of the latest LS they can see (elRouteOf carries it over from earlier LSs)
 const myLevel = () => { if (all()) return null; const L = visibleLS(myCourse()); return L.length ? elRouteOf(D.lv, L[L.length - 1].id).level : null; };
 const levelsOf = c => ROUTES.concat(c === '4eso' && (all() || myLevel() === 'native') ? ['native'] : []);
@@ -237,11 +250,13 @@ const name = lv => (EL_LEVELS.find(l => l.id === lv) || {}).name || lv;
 
 /* ---------- content for the level on screen ---------- */
 async function content() {
-  const L = visibleLS(S.course).filter(l => S.ls === 'all' || l.id === S.ls), acts = [];
-  L.forEach(l => EL_CATALOG.filter(a => a.ls === l.id && !a.manual && !a.inClass && !a.checkpoint && !/reflect$/.test(a.id) && canDo(a)).forEach(a => acts.push({ a, l })));
+  const acts = [], L = [];
+  pairsOf(S.step).forEach(([c, lv]) => lsOf(c).filter(l => S.ls === 'all' || l.id === S.ls).forEach(l => { if (!L.includes(l)) L.push(l);
+    const ok = all() || c === myCourse() ? canDo : otherDo;
+    EL_CATALOG.filter(a => a.ls === l.id && !a.manual && !a.inClass && !a.checkpoint && !/reflect$/.test(a.id) && ok(a)).forEach(a => acts.push({ a, l, lv })); }));
   const out = { words: [], build: [], listen: [], shadow: [], lps: acts, ls: L };
-  const pages = await Promise.all(acts.map(({ a, l }) => loadPage(a).then(pg => S.level === 'native' && l.pro ? loadNative(pg) : pg)));
-  pages.forEach((pg, i) => { if (!pg || (S.lp !== 'all' && acts[i].a.id !== S.lp)) return; const x = extract(pg, S.level); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l })))); });
+  const pages = await Promise.all(acts.map(({ a, l, lv }) => loadPage(a).then(pg => lv === 'native' && l.pro ? loadNative(pg) : pg)));
+  pages.forEach((pg, i) => { if (!pg || (S.lp !== 'all' && acts[i].a.id !== S.lp)) return; const x = extract(pg, acts[i].lv); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l })))); });
   const seen = new Set(); out.words = out.words.filter(w => { const k = w.en.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
   return out;
 }
@@ -250,19 +265,19 @@ async function content() {
 function header() {
   const mine = myLevel(), c = S.course, rec = mine || 'insecure', L = levelsOf(c);
   const label = lv => esc(elLevelLabel(c, lv));
-  const meBox = all() ? `<div class="me"><div><div class="lbl">${t('Vista del professor', 'Teacher view')}</div><div class="big">${COURSES[c]}</div><p class="muted">${t('Tria un curs i un nivell per veure el que hi practiquen els alumnes.', 'Choose a course and a level to see what students practise there.')}</p></div>
-      <div class="row">${Object.keys(COURSES).map(k => `<button class="chip ${k === c ? 'on' : ''}" data-do="course" data-v="${k}">${COURSES[k]}</button>`).join('')}</div></div>`
+  const who = k => pairsOf(k).map(([pc, lv]) => COURSES[pc] + ' ' + name(lv)).join(' + ');
+  const meBox = all() ? `<div class="me"><div><div class="lbl">${t('Vista del professor', 'Teacher view')}</div><div class="big">${esc(S.step)}</div><p class="muted">${esc(who(S.step))}. ${t('Tria un nivell per veure el que hi practiquen els alumnes.', 'Choose a level to see what students practise there.')}</p></div></div>`
     : `<div class="me"><div><div class="lbl">${t('El teu nivell', 'Your level')}</div><div class="big">${mine ? label(mine) : t('Encara no en tens', 'Not set yet')}</div>
-      <p>${mine ? t(`Practiques al nivell <b>${elCefr(c, rec)}</b>: el de la teva ruta.`, `You practise at <b>${elCefr(c, rec)}</b>: your route's level.`)
+      <p>${mine ? t(`Practiques al nivell <b>${elCefr(c, rec)}</b>: el de la teva ruta.`, `You practise at <b>${elCefr(c, rec)}</b>: your route's level.`) + (pairsOf(S.step).some(x => x[0] !== c) ? ' ' + t('També hi tens la pràctica dels alumnes de ' + COURSES[pairsOf(S.step).find(x => x[0] !== c)[0]] + ' amb el teu nivell.', 'You also get the practice of ' + COURSES[pairsOf(S.step).find(x => x[0] !== c)[0]] + ' students at your level.') : '')
         : t(`El professor encara no t'ha posat el nivell. De moment practiques al <b>${elCefr(c, rec)}</b>.`, `Your teacher has not set your level yet. For now you practise at <b>${elCefr(c, rec)}</b>.`)}</p></div></div>`;
   // Students see only their own level (Roger, 31 Oct 2026: "those buttons where you can change the level should be only for the
   // teacher's view. Students should only see their level and that's all"). The teacher and testers keep the level buttons.
   if (!all()) return meBox;
-  return meBox + `<div class="levels" role="group" aria-label="${t('Nivell', 'Level')}">${L.map(lv => `<button class="lv ${lv === S.level ? 'on' : ''} ${lv === rec && !all() ? 'rec' : ''}" data-do="level" data-v="${lv}" aria-pressed="${lv === S.level}" title="${esc(elCefr(c, lv, true))}"><b>${esc(elCefr(c, lv))}</b><span>${esc(name(lv))}${lv === rec && !all() ? ' · ' + t('recomanat', 'recommended') : ''}</span></button>`).join('')}</div>`;
+  return meBox + `<div class="levels" role="group" aria-label="${t('Nivell', 'Level')}">${LADDER.map(({ k }) => `<button class="lv ${k === S.step ? 'on' : ''}" data-do="level" data-v="${esc(k)}" aria-pressed="${k === S.step}"><b>${esc(k)}</b><span>${esc(who(k))}</span></button>`).join('')}</div>`;
 }
 function filters(x) {
-  const L = visibleLS(S.course);
-  return `<div class="row">${L.length > 1 ? `<button class="chip ${S.ls === 'all' ? 'on' : ''}" data-do="ls" data-v="all">${t('Totes les LS', 'All LSs')}</button>` : ''}${L.map((l, i) => `<button class="chip ${S.ls === l.id ? 'on' : ''}" data-do="ls" data-v="${l.id}">LS${EL_LS.filter(y => y.course === S.course).indexOf(l) + 1} · ${esc(l.title.replace(/^\S+ · /, ''))}</button>`).join('')}
+  const L = stepLS();
+  return `<div class="row">${L.length > 1 ? `<button class="chip ${S.ls === 'all' ? 'on' : ''}" data-do="ls" data-v="all">${t('Totes les LS', 'All LSs')}</button>` : ''}${L.map((l, i) => `<button class="chip ${S.ls === l.id ? 'on' : ''}" data-do="ls" data-v="${l.id}">${esc(lsName(l))}</button>`).join('')}
     ${x.lps.length > 1 ? `<select data-do="lp" aria-label="Learning Path"><option value="all">${t('Tots els Learning Paths', 'All Learning Paths')}</option>${x.lps.map(({ a }) => `<option value="${a.id}" ${S.lp === a.id ? 'selected' : ''}>${esc(a.title)}</option>`).join('')}</select>` : ''}</div>`;
 }
 const TABS = [['words', '🃏', 'Word cards', 'Targetes de paraules', 'Vocabulari de la teva ruta', 'Vocabulary of your route'], ['build', '🧩', 'Sentence builder', 'Sentence builder', 'Ordena les paraules', 'Put the words in order'],
@@ -409,7 +424,7 @@ document.addEventListener('click', e => {
   const go = (f, r) => { f(); if (r) render(); else ({ words, build, listen, shadow })[S.tab](); };
   ({
     course: () => go(() => { S.course = k.v; S.ls = 'all'; S.lp = 'all'; S.open = null; }, 1),
-    level: () => { if (all()) go(() => { S.level = k.v; S.open = null; S.coreOnly = null; }, 1); },
+    level: () => { if (all()) go(() => { S.step = k.v; [S.course, S.level] = (LADDER.find(x => x.k === k.v) || { pairs: [[S.course, S.level]] }).pairs[0]; S.ls = 'all'; S.lp = 'all'; S.open = null; S.coreOnly = null; }, 1); },
     ls: () => go(() => { S.ls = k.v; S.lp = 'all'; S.open = null; }, 1),
     tab: () => { S.tab = k.v; S.open = null; history.replaceState(null, '', '#' + k.v); render(); },
     mode: () => go(() => { S.mode = k.v; }),
@@ -450,6 +465,9 @@ function start() {
   const open = visibleLS(S.course).filter(l => (D.ls[l.id] || {}).status === 'open');
   if (S.ls === 'all' && open.length && !all()) S.ls = open[open.length - 1].id;
   if (!levelsOf(S.course).includes(S.level)) S.level = 'insecure';
+  const want = all() && new URLSearchParams(location.search).get('level'), st = want && LADDER.find(x => x.k === want);
+  if (st && !S.step) [S.course, S.level] = st.pairs[0];
+  S.step = S.step || stepOf(S.course, S.level);
   render();
 }
 if (DEMO) { D = await load(); start(); }

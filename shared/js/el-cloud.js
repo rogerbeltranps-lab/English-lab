@@ -91,7 +91,7 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
 async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
-  return {status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
+  return {status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
 // Any key the pull changes marks the page stale, not only this activity's: the final product reads every product piece and Reflect
@@ -263,7 +263,9 @@ async function gate(u){
   if(!tester&&!elLsForGroup(EL_LS.find(l=>l.id===lsId),info,myGroup)){block(ca0?"Aquesta LS no és del teu grup":"This LS is not for your group",ca0?"Torna al teu tauler: allà tens les LS que el professor ha assignat al teu grup.":"Go back to your board: it has the LSs your teacher gave your group.",ca0);return}
   if(st==="hidden"&&!tester){block(ca0?"Aquesta LS encara no està disponible":"This LS is not available yet",ca0?"El professor l'obrirà quan estigui preparada.":"Your teacher will open it when it is ready.",ca0);return}
   if(AS){if(await asPull())return}
-  else if(localStorage.getItem("el_practice_"+actId)!=="1")await pull();
+  else{const a0=EL_CATALOG.find(x=>x.id===actId);   // practice mode of a submitted activity is LS1 only: from LS2 on an old flag is dropped, so the page pulls and saves again
+    if(a0&&!/-my-real-routine$/.test(a0.ls||""))localStorage.removeItem("el_practice_"+actId);
+    if(localStorage.getItem("el_practice_"+actId)!=="1")await pull()}
   if(reloadIfStale())return;
   const a=EL_CATALOG.find(x=>x.id===actId),saved=hasWork(a);   // before applyLevel, whose route click saves an empty state
   if(!lvl&&!tester){lvl="insecure";banner("Encara no tens nivell: el professor te'l posarà a partir de l'examen de la primera LS. De moment fas la ruta Base.","#0369a1")}
@@ -285,7 +287,10 @@ async function gate(u){
     o.querySelector("p").textContent=ca?"Per continuar, primer has d'acabar el "+cp.title+". Fes-lo sense apunts.":"To go on, first finish "+cp.title+". Do it without notes.";
     const go=o.querySelector("a.go");go.href=new URL(cp.path,ROOT).href;go.textContent=(ca?"Obre el ":"Open ")+cp.title+" →";return}
   if(a&&a.manual&&a.graded)banner(ca?"Aquesta activitat és per entregar a través del Google Classroom.":"This activity is to be submitted through Google Classroom.","#1d4ed8");
-  if(a&&a.mode==="once"&&!AS){
+  // Submitting (locking) an activity is only for LS1 (left as it was). From LS2 on answers save on their own and nothing is submitted
+  // (Roger, 6 Nov 2026): a learning path a student had submitted, even at 0, opened read-only, and "Practise again" there emptied
+  // every answer and saved nothing (a 4 ESO student redid Celebrations around the world twice and could not hand in the Speaking).
+  if(a&&a.mode==="once"&&/-my-real-routine$/.test(a.ls||"")&&!AS){
     const rref=doc(db,"students",u.uid,"results",resKey(actId));
     const rset=d=>setDoc(rref,d,{merge:true}).then(()=>rcSaved(u.uid,resKey(actId),d));   // the copy in this browser too
     const r=await getDoc(rref).catch(()=>null),rd=r&&r.exists()?r.data():{};
@@ -461,7 +466,8 @@ async function teacherSections(info){
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
     let bar=document.getElementById("el-tsec");
-    if(!bar||bar.nextElementSibling!==nav){if(bar)bar.remove();bar=document.createElement("div");bar.id="el-tsec";bar.className="el-tsec";nav.before(bar);
+    const host=document.querySelector(".eltsec-host");   // the learning path's left column (el-app.js) has a place for it, else above the tabs
+    if(!bar||(host?bar.parentElement!==host:bar.nextElementSibling!==nav)){if(bar)bar.remove();bar=document.createElement("div");bar.id="el-tsec";bar.className="el-tsec";if(host)host.append(bar);else nav.before(bar);
       bar.onclick=e=>{const b=e.target.closest("button");if(!b)return;e.preventDefault();
         if(b.dataset.g){g=b.dataset.g;origSet.call(localStorage,"el_t_secgroup",g);msg="";draw()}
         else if(b.dataset.all)save(b.dataset.all==="1"?[]:all.slice());else if(b.dataset.lp)openLp();else if(b.dataset.fs)fsToggle();else if(b.dataset.cm)b.dataset.cm==="-"?cmStop():cmOpen()}}
@@ -552,7 +558,7 @@ function bar(){
       if(!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       const x=b("Exit student view",asExit);x.style.background="#a16207";x.title="Back to your dashboard; their answers leave this browser";el.append(x)}
     else{el.append(u.displayName||u.email," ");
-      const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
+      const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My dashboard";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
       if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
@@ -570,7 +576,7 @@ function bar(){
 function menuLink(u){
   document.querySelectorAll("[data-el-board]").forEach(e=>e.remove());
   if(!u||onBoard||onDash||!(isStudent(u)||isTeacher(u)))return;
-  const teach=isTeacher(u)&&!AS,txt=teach?"Dashboard":elCa(myLevel||homeLevel)?"Les meves activitats":"My activities";
+  const teach=isTeacher(u)&&!AS,txt=teach?"Dashboard":elCa(myLevel||homeLevel)?"El meu tauler":"My dashboard";
   const add=(home,cls,icon)=>{if(!home)return;const a=document.createElement("a");a.dataset.elBoard="";a.className=cls;a.href=teach?dashHere:boardUrl();a.textContent=icon+txt;home.after(a)};
   document.querySelectorAll(".navlinks").forEach(n=>add(n.querySelector(":scope>a"),"",""));
   document.querySelectorAll(".nav-tabs,.mobile-tabs").forEach(n=>add(n.querySelector(":scope>.tab-btn"),"tab-btn",""));
@@ -980,4 +986,5 @@ onAuthStateChanged(auth,async u=>{
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+loadScript("shared/js/el-app.js",()=>window.ELApp);   // the app menu on student pages (el-app.js: a strip of icon buttons, a phone's bottom bar)
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};

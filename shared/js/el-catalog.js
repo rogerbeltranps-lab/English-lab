@@ -28,6 +28,11 @@ window.EL_CEFR={"2eso":{beginners:["A1","A1","A1"],insecure:["A1+","A1+ / A2 ini
 window.elCefr=(c,lv,full)=>{const x=((window.EL_CEFR[c]||{})[lv])||((window.EL_CEFR[c]||{})[lv==="native"?"daring":lv]);return x?(full?x[2]:x[0]):""};
 // "2ESO Starter (A1)": what students read as their level (board, English Lab, practice page, level notice)
 window.elLevelLabel=(c,lv)=>{const n=((window.EL_LEVELS||[]).find(l=>l.id===lv)||{}).name||lv;if(!lv)return "";const k=elCefr(c,lv);return (c?c.toUpperCase()+" ":"")+n+(k?" ("+k+")":"")};
+// English Lab by level, not by course (Roger, 6 Nov 2026: "hauria d'estar per nivells no per cursos"): one ladder of CEFR steps; each step
+// is every [course, route] whose level is that step (A1 = 2 ESO Starter + 4 ESO Starter, A2 = 2 ESO Core + 4 ESO Base...), so students of
+// the same level in both courses share the practice. [{k:"A2", pairs:[["2eso","safe"],["4eso","insecure"]]}, ...]
+window.elLadder=()=>{const o={};Object.keys(window.EL_CEFR).forEach(c=>Object.keys(window.EL_CEFR[c]).forEach(lv=>{const k=window.EL_CEFR[c][lv][0];(o[k]=o[k]||[]).push([c,lv])}));
+  return ["A1","A1+","A2","A2+","B1","B1+","B2","C1","C2"].filter(k=>o[k]).map(k=>({k,pairs:o[k]}))};
 window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructions in Catalan
 // The student's route in an LS. The teacher sets routes (Roger, 26 Oct 2026: from the LS1 exam mark, on the dashboard). An LS with
 // no route of its own takes the latest route set in an earlier LS of the same course (EL_LS order), so a route carries over to every
@@ -376,3 +381,14 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
 // vocabulary or grammar step with none of its own (recall, words, cards, practice, grammar, mixed, vocab) gives evidence for 4.1 and 5.1.
 (function(){const UOE=["recall","words","cards","practice","grammar","mixed","vocab"];
   Object.keys(window.EL_STEP_CRITERIA).forEach(id=>{const sc=window.EL_STEP_CRITERIA[id];(window.EL_ACTIONS[id]||[]).forEach(k=>{if(UOE.includes(k)&&!sc[k])sc[k]=["4.1","5.1"]})})})();
+
+// 🧩 📚 Class game circles (Roger, 6 Nov 2026: "a kind of circle with a percentage on the board saying something like games and theory,
+// click to see your performance and what to study … two, grammar and vocabulary, and I want those circles next to the students in the
+// list"). elGameStats(games) takes class game results [{kind, r, of}] (myGames on the student board, gameResults on the dashboard) and gives
+// {grammar, vocab} = % right (null when none played); elRing(p, label, size) draws one circle (inline styles, any page).
+window.elGameStats=function(games){
+  const t={grammar:[0,0],vocab:[0,0]};(games||[]).forEach(g=>{const k=t[g.kind];if(k&&g.of){k[0]+=g.r||0;k[1]+=g.of}});
+  const pc=([a,b])=>b?Math.round(a/b*100):null;return {grammar:pc(t.grammar),vocab:pc(t.vocab),n:(games||[]).length}};
+window.elRing=function(p,label,size){
+  const z=size||46,col=p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a";
+  return `<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle" title="${label}: ${p==null?"–":p+" %"}"><span style="width:${z}px;height:${z}px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:conic-gradient(${col} ${(p||0)*3.6}deg,#e5e7eb 0)"><b style="width:${z-10}px;height:${z-10}px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 ${Math.round(z/3.6)}px/1 system-ui,sans-serif;color:#0f172a">${p==null?"–":p+"%"}</b></span>${label?`<span style="font-size:${Math.max(11,Math.round(z/3.6))}px;font-weight:700;line-height:1.15">${label}</span>`:""}</span>`};

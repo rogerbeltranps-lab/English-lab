@@ -3,6 +3,7 @@
    The same side menu as the board (today.html), a ‹ back link to the board or the dashboard, one Continue card, the learning paths as one
    list with each one's progress, and tiles that open places (#study, #about, #final) with the details. Chromebook screens (1366×768) first.
    Course colours: the page sets --c (strong), --c-dark and --c-soft (2 ESO green, 4 ESO blue). */
+@import url("el-app.css");   /* the menu items as buttons (Roger, 6 Nov 2026) */
 :root{--bg:#f8fafc;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--blue:#3157d5;--c:#3157d5;--c-dark:#2443ad;--c-soft:#eaf0ff;--accent-dark:var(--c-dark)}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -148,4 +149,37 @@ footer.lsf{color:var(--muted);font-size:13px;padding:24px 0 0}
   a.lp{grid-template-columns:36px minmax(0,1fr);gap:10px}a.lp .n{width:36px;height:36px}a.lp .st{grid-column:2;justify-self:start}
   .tiles{gap:10px}.tile{min-height:0;padding:14px}
   .box{padding:14px}
+}
+
+/* 📝 Your notes (Roger, 6 Nov 2026): the tile across the tile grid, and the place #notes (shared/js/el-notes.js) */
+.tile.nt{grid-column:1/-1;flex-direction:row;align-items:center;min-height:0;padding:14px 18px;border-color:color-mix(in srgb,var(--c) 35%,var(--line));background:var(--c-soft)}
+.nintro{max-width:820px}
+.ncard{margin:0 0 16px}.ncard h2{margin:2px 0 8px}
+.ncard .nlp{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--c-dark);background:var(--c-soft);border-radius:999px;padding:3px 10px}
+.npart{margin:10px 0 0}.npart h3{margin:0 0 6px;font-size:16px;color:var(--c-dark)}
+.nread{white-space:normal;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fffef7}
+.nempty{display:flex;align-items:center;gap:14px}.nempty span{font-size:36px}
+.nbtn{font:inherit;font-weight:700;border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 16px;cursor:pointer}
+.nbtn:hover{border-color:var(--c);background:var(--c-soft)}
+.nt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.nt-day{font-size:13px}
+.nt-score{flex:0 0 auto;font-weight:800;font-size:15px;border-radius:999px;padding:6px 14px;background:var(--c-soft);color:var(--c-dark)}
+.nt-score.good{background:#dcfce7;color:#166534}.nt-score.low{background:#fee2e2;color:#991b1b}.nt-score.away{background:#f1f5f9;color:var(--muted)}
+.nt-study{margin:12px 0 4px;padding:12px 14px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa}
+.nt-study.good{background:#f0fdf4;border-color:#bbf7d0}.nt-study.away{background:#f8fafc;border-color:var(--line)}
+.nt-study ul{margin:6px 0;padding-left:20px}.nt-study a{color:var(--c-dark);font-weight:700}.nt-study p{margin:4px 0}
+.nt-study summary{cursor:pointer;font-weight:700;margin-top:4px}.nt-miss{margin:6px 0 0;padding-left:22px}.nt-miss li{margin:0 0 6px}
+.nt-miss .no{color:#b91c1c}.nt-miss .ok{color:#166534;font-weight:700}
+.npart{border-top:1px solid var(--line);padding-top:12px;margin-top:14px;scroll-margin-top:16px}
+.nt-flag{display:inline-block;font-size:12px;font-weight:800;color:#9a3412;background:#ffedd5;border-radius:999px;padding:2px 10px;margin-bottom:6px}
+.nt-th{background:#faf8ff;border:1px solid #e9e3fb;border-radius:12px;padding:8px 14px}
+.nt-s h4{margin:6px 0 4px;color:#4c1d95;font-size:16px}.nt-s p{margin:4px 0}
+.nt-t{border-collapse:collapse;width:100%;margin:6px 0;font-size:14px}.nt-t th{background:#ede4ff;color:#4c1d95;text-align:left;padding:4px 8px;border:1px solid #d9c8ff}
+.nt-t td{padding:4px 8px;border:1px solid #e6dcff;vertical-align:top}
+.nt-w{background:#fff4d6;border-left:4px solid #f5b400;border-radius:8px;padding:4px 10px}.nt-ca{background:#eef6ff;border-radius:8px;padding:4px 10px;color:#1e3a8a}
+.nt-my{margin-top:8px}.nt-lab{display:block;font-size:13px;font-weight:800;color:var(--c-dark);margin-bottom:4px}.nt-none{margin:0}
+@media print{
+  .side,.mtabs,.bnav,.crumb,.nprint,.nintro{display:none!important}
+  body.lsh{background:#fff}.app{display:block}.page{padding:0}
+  .nread{border:0;padding:0;background:none}
+  .ncard{break-inside:auto;border:0;padding:0}.npart{break-inside:avoid}
 }
