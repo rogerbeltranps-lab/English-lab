@@ -57,6 +57,8 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 .cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done .cgo a,.cont.done .cgo button{color:#166534}.cont.done .cgo .s2{background:#166534;color:#fff}.cont.idle{background:#334155;box-shadow:none}
 .cline{padding:7px 0;border-top:1px solid #eef2f7}.cwho{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}details.cgrp details.cgrp,details.cday details.cgrp{margin-left:14px}
 .chip.cchip{font-size:13px;padding:2px 10px;cursor:pointer}.chip.cchip:hover{border-color:#3157d5;color:#2443ad}.chip.cchip.late{border-color:#fca5a5;background:#fef2f2;color:#991b1b}
+.cstu{padding:9px 0;border-top:1px solid #eef2f7}.cst{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:2px 0 6px}.cst .cfix,.chead .cfix,.cst .cask,.chead .cask{margin-left:auto}
+button.cfix{background:#3157d5;color:#fff;border:0;border-radius:10px;padding:5px 12px;font-weight:700;cursor:pointer}button.cfix:hover{background:#2443ad}.cask{margin-left:auto;color:#15803d;font-weight:700;font-size:14px}
 .cnum{display:inline-block;margin:2px 10px 0 0;font-size:14px;color:#334155;white-space:nowrap}details.cgrp,details.cday{border-top:1px solid #e2e8f0;padding:8px 0}details.cgrp>summary,details.cday>summary{cursor:pointer}details.cday h3{margin:10px 0 2px;font-size:.95rem;color:#475569}
 p.hal{display:block;padding:10px 14px;border-radius:12px}p.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}.tside .nv small.late{opacity:1;color:#b91c1c;font-weight:800}
 a.hal{display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:16px;text-decoration:none;font-size:16px}a.hal span{margin-left:auto;font-weight:800;white-space:nowrap}a.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}a.hal.news{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}a.hal:hover{filter:brightness(.97)}
@@ -988,7 +990,8 @@ const tms=v=>!v?0:typeof v==="number"?v:typeof v==="string"?(Date.parse(v)||0):t
 const ckOf=(step,it)=>step==="speak"||/speak/.test(step)?"speak":step==="talk"||/talk/.test(step)?"talk":it&&it.mode==="reply"||step==="reflect"?"reflect":step==="write"||it&&it.mode==="writing"?"write":"other";
 // a step's name in any LS (cpName only knows the LS on screen)
 const corrNm=(aid,step)=>{const a=byId(aid),m=a&&(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).find(x=>x.a===aid&&x.step===step);return m?m.name:({write:"Writing",speak:"Speaking",talk:"Talk",reflect:"Reflection"})[step]||step};
-const CORR={d:null,t:0,v:null,mkT:0};S.corrG="all";S.corrN=6;
+const CORR={d:null,t:0,v:null,mkT:0};S.corrG="all";S.corrN=6;S.corrV="stu";S.corrShut=new Set();
+document.addEventListener("toggle",e=>{const g=e.target.dataset&&e.target.dataset.cs;if(g)e.target.open?S.corrShut.delete(g):S.corrShut.add(g)},true);
 function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
   const wait=[],done=[],today=ELWeek.today(),day=v=>{const t=tms(v);return t?ymd(t):""};
   Object.values(S.P).filter(s=>s.uid&&!s.tester&&GR.some(g=>g.id===s.group)).forEach(s=>{const grp=GR.find(g=>g.id===s.group),tk=(S.D.tk[grp.id]||{}).ticks;
@@ -1045,11 +1048,21 @@ function corrPage(){
       +(allNow?`<div class="cgo"><button data-do="corrask">✏️ Correct everything waiting now</button></div>`:"")+`</div>`;
   const gchips=`<div class="bar"><span class="muted">Group:</span> `+["all",...GR.map(g=>g.id)].map(g=>`<button class="chip ${S.corrG===g?"on":""}" data-do="corrg" data-g="${g}">${g==="all"?"All groups":esc(GR.find(x=>x.id===g).name)}</button>`).join("")+`</div>`;
   const byG=(L,f)=>GR.filter(g=>L.some(i=>i.gid===g.id)).map(g=>{const is=L.filter(i=>i.gid===g.id);return f(g,is)}).join("");
-  const waitB=`<div class="box"><h2>Waiting to be corrected</h2>`
-    +(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything waiting now, or tell Claude in the English Lab chat.</p>`:"")
-    +(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.open.has("cw"+g.id)?"open":""} data-k="cw${g.id}"><summary><b>${esc(g.name)}</b> ${corrCount(is)}</summary>${corrLines(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`)
-    +(you.length?`<h3>⚠️ Waiting for you: ${(you.length===1?"1 possible copy":you.length+" possible copies")}</h3><p class="muted">Claude does not correct these: check each one (Accept or Redo). They are also in each group's To do.</p>${corrLines(you)}`:"")
-    +(later.length?`<details class="cgrp" data-k="cwlater" ${S.open.has("cwlater")?"open":""}><summary><b>⏳ Not ready yet: ${plural(later.length,"marked step")}</b></summary><p class="muted">Steps with a level (reading log, listening chart…) are marked one week after you tick their session in the time plan, so everyone had time to hand them in. The button does not mark them earlier.</p>${corrLines(later)}</details>`:"")+`</div>`;
+  // Waiting, in plain words (Roger, 6 Nov 2026: "I need info that I can understand, so if there is work to correct, even if you correct it, I
+  // wanna see, Pau is waiting for these corrections and a button to say correct it"): by student (default) or by activity
+  const asked=st.s==="asked"||st.s==="running",fixB=(lab,tip)=>asked?`<span class="cask">✓ ${st.s==="running"?"Claude is correcting now":"Asked"}</span>`:`<button class="cfix" data-do="corrask" title="${esc(tip)}">✏️ ${lab}</button>`;
+  const view=`<div class="bar"><span class="muted">Show:</span> ${[["stu","By student"],["act","By activity"]].map(([v,l])=>`<button class="chip ${S.corrV===v?"on":""}" data-do="corrv" data-v="${v}">${l}</button>`).join("")}</div>`;
+  const itemB=i=>`<button class="chip mini cchip ${i.late?"late":""}" data-do="corropen" data-u="${i.u}" data-a="${esc(i.aid)}" data-s="${esc(i.step)}" data-k="${i.k}" title="Open what they handed in">${CK[i.k][0]} ${esc(i.name||CK[i.k][1])} <span class="muted">· ${esc(actTitle(i.aid))}</span>${i.late?" ❌":""}${i.k==="level"&&!i.ready?" ⏳":""}</button>`;
+  const stuRows=L=>{const by={};L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});return Object.values(by).sort((p,q)=>byName(S.P[p[0].u]||{},S.P[q[0].u]||{})).map(is=>{const s=S.P[is[0].u],first=Math.min(...is.map(i=>i.at).filter(Boolean));
+    return `<div class="cstu"><div class="cst"><b>${s?name(s):"?"}</b> <span class="muted">is waiting for ${plural(is.length,"correction")}${isFinite(first)?" · handed in since "+esc(ELWeek.date(ymd(first))):""}</span>${fixB("Correct it now","Claude corrects everything that is waiting now ("+fullName(s||{})+"'s work too), within 15 minutes")}</div><div class="cwho">${is.map(itemB).join("")}</div></div>`}).join("")};
+  const laterB=later.length?`<details class="cgrp" data-k="cwlater" ${S.open.has("cwlater")?"open":""}><summary><b>⏳ Not ready yet: ${plural(later.length,"marked step")}</b></summary><p class="muted">Steps with a level (reading log, listening chart…) are marked one week after you tick their session in the time plan, so everyone had time to hand them in. The button does not mark them earlier.</p>${corrLines(later)}</details>`:"";
+  const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length?fixB("Correct everything now","Claude corrects everything that is waiting now, in every group, within 15 minutes"):""}</div>`
+    +`<p class="muted">Everything students handed in that has no correction yet. Claude corrects it on Wednesday, or now if you press the button. Click a piece to see what they wrote.</p>`
+    +(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything now, or tell Claude in the English Lab chat.</p>`:"")+view
+    +(S.corrV==="act"
+      ?(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.open.has("cw"+g.id)?"open":""} data-k="cw${g.id}"><summary><b>${esc(g.name)}</b> ${corrCount(is)}</summary>${corrLines(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`)
+      :(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.corrShut.has(g.id)?"":"open"} data-cs="${g.id}"><summary><b>${esc(g.name)}</b> <span class="muted">· ${plural(new Set(is.map(i=>i.u)).size,"student")} waiting</span></summary>${stuRows(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`))+laterB
+    +(you.length?`<h3>⚠️ Waiting for you: ${you.length===1?"1 possible copy":you.length+" possible copies"}</h3><p class="muted">Claude does not correct these: check each one (Accept or Redo). They are also in each group's To do.</p>${corrLines(you)}`:"")+`</div>`;
   // history by day
   const days=[...new Set(Dn.map(i=>ymd(i.at)))].filter(d=>d&&d!=="1970-01-01"),shown=days.slice(0,S.corrN);
   const histB=`<div class="box"><h2>Last corrections</h2><p class="muted">What Claude corrected and when. Click a name to see the correction the student got.</p>`
@@ -1201,7 +1214,7 @@ const mkTodo=(m,grp)=>{const a=byId(m.a);return mkStuds(grp).filter(s=>handedIn(
 // the student's exam writing marks so far in this course ("LS1 6/10"), for the marking sheet
 const mkExam=u=>{const L=EL_LS.filter(l=>l.course===COURSE);return L.slice(0,L.findIndex(l=>l.id===S.ls)+1).map((l,i)=>{const w=((res(u,asId(l.id)).sections||{}).writing)||{};return w.score!=null&&w.score!==""?`LS${i+1} ${w.score}/${w.max||10}`:null}).filter(Boolean).join(", ")};
 function mkReady(m,grp){const p=(window.EL_PLAN||{})[S.ls];return ELMark.ready({p,gi:p?ELWeek.col(p,grp.id):-1,due:dueOf(m.a,grp.id),title:byId(m.a).title,ticks:(S.D.tk[grp.id]||{}).ticks,ls:S.ls,atOnce:m.atOnce})}
-function mkTodoItems(grp){return mkMoments().map(m=>{const st=mkTodo(m,grp),n=st.length;if(!n)return null;const r=mkReady(m,grp),t=ELWeek.today(),btn=`<button data-do="mkopen" data-a="${m.a}" data-s="${m.step}">🤖 Marking sheet</button>`;
+function mkTodoItems(grp){return mkMoments().map(m=>{const st=mkTodo(m,grp),n=st.length;if(!n)return null;const r=mkReady(m,grp),t=ELWeek.today(),btn=`<button data-do="tab" data-g="corr" title="See who is waiting and correct it now">✏️ See in Corrections</button> <button class="g mini" data-do="mkopen" data-a="${m.a}" data-s="${m.step}" title="Only if you want to give the levels yourself">mark it yourself</button>`;
     // late hand-ins count from the day they came in (as marks.mjs audit)
     const since=r.from?st.map(s=>{const h=String((handedIn(s.uid,byId(m.a))[m.step]||{}).date||"").slice(0,10);return h>r.from?h:r.from}).sort()[0]:null;
     const what=`<b>${esc(m.name)}</b> (${esc(actTitle(m.a))}) · ${n} hand-in${n>1?"s":""} without a level`;
@@ -2317,7 +2330,7 @@ document.addEventListener("change",e=>{if(e.target.classList.contains("petab"))e
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
   ({tab:()=>{e.preventDefault();if(S.g!==k.g||S.place!=="home"){S.place="home";S.year=false}S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();goPlace(k.p)},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
-    corrg:()=>{S.corrG=k.g;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
+    corrg:()=>{S.corrG=k.g;render()},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
     corrask:()=>act(api.mkAsk(true)),corrcancel:()=>act(api.mkAsk(false)),
     corrcheck:()=>{const r=api.mkRead();(r&&r.then?r:Promise.resolve()).then(render,e=>alert("Could not check: "+e.message))},   // one read, never a full load
     sethw:()=>{e.preventDefault();const x=planX(k.ls,k.gid),r=x.p.rows[+k.i];hwOpen(x,noCp(x,k.line.replace(/^\w{3} \d{1,2} · /,"").replace(/\s*· self-study\b/,"")),lineDate(r,k.line)||ELWeek.today(),origOf(x,k.line));
