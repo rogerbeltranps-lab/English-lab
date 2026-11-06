@@ -13,7 +13,7 @@
   const band=c=>c==="1"||c==="2"?"a":"b";
   // Core-route CEFR level under each course header (Roger, 6 Nov 2026: "under the ESO courses I need the levels (core level)"):
   // 2n/4t from EL_CEFR (el-catalog.js), 1r/3r from the levels table in AGENTS.md (Safe = Core column)
-  const CORE={"1":["A1","A1 consolidated"],"2":["A2","Functional A2"],"3":["A2","More autonomous A2"],"4":["B1","Indicative B1"]};
+  const CORE={"1":["A1","A1 consolidated"],"2":["A2","Functional A2"],"3":["A2+","More autonomous A2, towards B1"],"4":["B1","Indicative B1"]};
   const coreOf=c=>(PC[c]&&window.elCefr&&elCefr(PC[c],"safe"))||CORE[c][0];
   const lvl=c=>`<span class="rf-cefr" title="Core route: ${esc(CORE[c][1])}">Core ${esc(coreOf(c))}</span>`;
   const cTh=(c,t)=>`${t}<br>${lvl(c)}`;
