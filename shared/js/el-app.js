@@ -103,12 +103,77 @@
       a.dataset.ls = a.textContent.replace(/^\s*←\s*/, "").trim(); a.textContent = a.dataset.ls; a.classList.add("elback");
     });
   }
+  // ---- learning paths on a computer (Roger, 6 Nov 2026: "use a column on the left with info of the LP, and it must be super easy to
+  // understand"): a left column with the path (title, what it is, level and steps done, the list of steps, how it works, the study
+  // guide, my goal; the teacher's tools at the end) and the step on the right. The engine redraws #lp on every route change, so the
+  // pieces it draws (.lp-top, .plan-card, the steps nav) are moved into the column after each redraw; on a phone nothing moves.
+  const WIDE = window.matchMedia("(min-width:1000px)");
+  let col = null;
+  function lpLayout() {
+    if (mode !== "lp") return;
+    const lp = $("#lp"), hero = $("header.hero");
+    if (!lp || !hero) return;
+    if (!WIDE.matches) { if (col) lpBack(); return; }
+    if (!col) {
+      const grid = document.createElement("div"); grid.className = "ellpgrid";
+      col = document.createElement("aside"); col.className = "ellpside"; col.setAttribute("aria-label", "Learning path");
+      col.innerHTML = '<div class="ellp-head"></div><div class="ellp-prog"></div><div class="ellp-steps"></div><div class="ellp-more"></div><div class="ellp-teach" hidden><div class="ellp-th">Teacher</div></div>';
+      lp.before(grid); grid.append(col, lp);
+      const w = hero.querySelector(".wrap") || hero, head = col.querySelector(".ellp-head"), teach = col.querySelector(".ellp-teach");
+      [".eyebrow", "h1", ".lead"].forEach(q => { const e = w.querySelector(":scope>" + q); if (e) head.append(e); });
+      const pr = $(".topbar .progress-shell"); if (pr) col.querySelector(".ellp-prog").append(pr);
+      w.querySelectorAll(":scope>[data-el-teacher],:scope>.routes").forEach(e => teach.append(e));
+      document.body.classList.add("ellp2");
+    }
+    const pl = col.querySelector(".ellp-prog");
+    let lab = pl.querySelector(".ellp-pl"); if (!lab) { lab = document.createElement("div"); lab.className = "ellp-pl"; pl.prepend(lab); }
+    lab.textContent = t("El teu progrés", "Your progress");
+    const steps = col.querySelector(".ellp-steps"), more = col.querySelector(".ellp-more");
+    const nav = lp.querySelector(".lp-body>nav.tabs");
+    if (nav) { steps.textContent = ""; steps.append(nav); }
+    // .lp-top (how it works, the study guide) and the goal card right after it; the review card at the end of the path stays there
+    const top = lp.querySelector(":scope>.lp-top"), plan = top && top.nextElementSibling && top.nextElementSibling.classList.contains("plan-card") ? top.nextElementSibling : null;
+    if (top) { more.textContent = ""; more.append(top); if (plan) more.append(plan); }
+    // the teacher's part: class game, the level to look at, and the sections bar el-cloud.js draws (it goes where .eltsec-host is)
+    const teach = col.querySelector(".ellp-teach");
+    teachVis(teach);
+    if (!teach._obs) { teach._obs = new MutationObserver(() => teachVis(teach)); teach._obs.observe(teach, { subtree: true, childList: true, attributes: true, attributeFilter: ["style", "hidden"] }); }
+    const ban = $("#el-banner"); document.body.classList.toggle("elteach", who.role === "teacher" && !!ban && /^Teacher mode/.test(ban.textContent));
+    if (!teach.querySelector(".eltsec-host")) { const h = document.createElement("div"); h.className = "eltsec-host"; teach.append(h); }
+  }
+  // the teacher's card shows only with something in it: the class game (el-cloud.js unhides it for the teacher), more than one level to
+  // pick (a student sees only their own) or the sections bar
+  function teachVis(teach) {
+    const r = teach.querySelector(".routes");
+    const on = !!(teach.querySelector("[data-el-teacher]:not([hidden])") || teach.querySelector("#el-tsec") || (r && ![...r.querySelectorAll(".route")].some(x => x.style.display === "none")));
+    if (teach.hidden === on) teach.hidden = !on;
+  }
+  function lpBack() {   // back to the page's own layout (the window got narrow)
+    const grid = col.parentElement, lp = $("#lp"), hero = $("header.hero"), w = hero.querySelector(".wrap") || hero;
+    const head = col.querySelector(".ellp-head"), teach = col.querySelector(".ellp-teach");
+    [...head.children].reverse().forEach(e => w.prepend(e));
+    teach.querySelectorAll("[data-el-teacher],.routes").forEach(e => w.append(e));
+    const pr = col.querySelector(".progress-shell"), row = $(".topbar .toprow"); if (pr && row) row.append(pr);
+    const body = lp.querySelector(".lp-body"), nav = col.querySelector("nav.tabs"); if (body && nav) body.prepend(nav);
+    const top = col.querySelector(".lp-top"), plan = col.querySelector(".plan-card");
+    if (plan) lp.prepend(plan); if (top) lp.prepend(top);
+    const t = $("#el-tsec"); if (t && nav) nav.before(t);
+    grid.before(lp); grid.remove(); col = null; document.body.classList.remove("ellp2");
+  }
+  if (mode === "lp") {
+    WIDE.addEventListener ? WIDE.addEventListener("change", () => lpLayout()) : WIDE.addListener(() => lpLayout());
+    let busy = false;
+    new MutationObserver(() => { if (busy) return; busy = true; try { lpLayout(); } finally { busy = false; } })
+      .observe(document.getElementById("lp") || document.body, { childList: true });
+  }
+
   function draw() {
     const on = who.role !== "none" || mode === "lp" || mode === "games";   // course pages and English Lab keep the public look when signed out
     document.body.classList.toggle("elapp", on);
     document.body.classList.add("el" + mode);
     if (!on) { $$(".elrail,.elbar,.elside,.elcrumb").forEach(e => e.remove()); document.body.classList.remove("elhas-rail", "elhas-bar"); return; }
     lpBar();
+    lpLayout();
     curLs = pickLs();
     const L = items();
     if (mode === "lab") side(L); else rail(L);

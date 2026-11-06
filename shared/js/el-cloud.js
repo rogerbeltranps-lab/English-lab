@@ -465,7 +465,8 @@ async function teacherSections(info){
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
     let bar=document.getElementById("el-tsec");
-    if(!bar||bar.nextElementSibling!==nav){if(bar)bar.remove();bar=document.createElement("div");bar.id="el-tsec";bar.className="el-tsec";nav.before(bar);
+    const host=document.querySelector(".eltsec-host");   // the learning path's left column (el-app.js) has a place for it, else above the tabs
+    if(!bar||(host?bar.parentElement!==host:bar.nextElementSibling!==nav)){if(bar)bar.remove();bar=document.createElement("div");bar.id="el-tsec";bar.className="el-tsec";if(host)host.append(bar);else nav.before(bar);
       bar.onclick=e=>{const b=e.target.closest("button");if(!b)return;e.preventDefault();
         if(b.dataset.g){g=b.dataset.g;origSet.call(localStorage,"el_t_secgroup",g);msg="";draw()}
         else if(b.dataset.all)save(b.dataset.all==="1"?[]:all.slice());else if(b.dataset.lp)openLp();else if(b.dataset.fs)fsToggle();else if(b.dataset.pull!=null)pull(b.dataset.pull==="-"?null:b.dataset.pull)}}
