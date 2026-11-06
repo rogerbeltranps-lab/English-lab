@@ -305,6 +305,23 @@ const api={
   claudeAns:(u,a,step,text)=>{const r=(S.D.rs[u]=S.D.rs[u]||{}),x=(r[a.id]=r[a.id]||{ls:a.ls,activity:a.id}),o=Object.assign({},(x.answers||{})[step],{t:text,edited:new Date().toISOString()});
     if(DEMO){(x.answers=x.answers||{})[step]=o;return}return put(["students",u,"results",resKey(a.id)],{ls:a.ls,activity:a.id,answers:{[step]:o}})}
 };
+// Emails to students (Roger, 6 Nov 2026: "how can I make students receive mails when I give them homework, announcements or feedback?").
+// Homework and announcements go by email at the moment they are set or sent, from the teacher's school account: the school's Apps Script
+// (tools/notify/school-mail.gs) checks the teacher's own sign-in (idToken), so nothing secret is in the page. Students in Bcc, at most 45 per
+// email; only school addresses (@ietramuntana.cat), never the test account; students not signed in yet get it too (roster email).
+// Results (exams, final products, corrections) are emailed once a day by the GitHub Action (tools/notify/news.mjs).
+const MAIL_URL="https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec";
+const mailTo=list=>[...new Set(list.filter(s=>s&&!s.tester).map(s=>String(s.email||"").trim().toLowerCase()).filter(e=>/^[^@\s,]+@ietramuntana\.cat$/.test(e)))];
+const mailFoot=ca=>"\n\n"+(ca===true?"Entra amb el teu correu de l'institut: ":ca===false?"Sign in with your school email: ":"Sign in with your school email / Entra amb el teu correu de l'institut: ")+new URL("today.html",location.href).href+"\n\nRoger";
+async function mailStudents(emails,subject,body){if(DEMO||!emails.length)return 0;const tok=await ELCloud.auth.currentUser.getIdToken();let n=0;
+  for(let i=0;i<emails.length;i+=45){const part=emails.slice(i,i+45);let j=null;
+    try{const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:tok,bcc:part,subject,body,name:"Roger Beltran · English Lab"})});j=await r.json()}catch(e){throw new Error("the school mail script did not answer")}
+    if(!j||!j.ok)throw new Error(j&&j.error==="not the teacher"?"the school mail script is the old version (update it: tools/notify/school-mail.gs)":(j&&j.error)||"no answer");n+=part.length}
+  return n}
+// sends in the background; a small note says how it went (the homework or announcement is saved either way)
+function mailNote(p,what){p.then(n=>{if(!n)return;const d=document.createElement("div");d.textContent="✉️ "+what+" emailed to "+n+" student"+(n===1?"":"s");
+  d.style.cssText="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0f766e;color:#fff;padding:8px 16px;border-radius:999px;z-index:10010;font:600 14px system-ui";document.body.appendChild(d);setTimeout(()=>d.remove(),5000)})
+  .catch(e=>{console.warn("mail",e);alert("Saved, but the email to the students did not go: "+e.message+". They still see it on their board.")})}
 async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save: "+e.message)}if(!DEMO)S.D=await reread();render()}
 // After a save: read back only the documents the dashboard wrote (TOUCHED). A full load() only when that cannot be done exactly: nothing
 // noted (a write made elsewhere), too many documents, or a kind of document whose effect on the screen is more than itself (progress and
@@ -746,7 +763,7 @@ function lsWarn(ls,grp,assigned){
   return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
 }
 function render(){
-  render0();keepLast();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0)}
+  render0();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0)}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
 // somewhere else, a message asks whether to go to the group or stay where I am"). The timetable is EL_TIMETABLE (el-plan.js), read by
 // ELWeek.classAt (from 5 minutes before the class). Opening the dashboard during a class goes straight to that group (and its current LS);
@@ -1817,8 +1834,8 @@ const annVideoText=([,title,f])=>{const all=HOW_VIDEOS.flatMap(g=>g[1]).map(v=>v
   return `${title}\nEnglish: ${url(f)}\nCatalà: ${url(f+"-ca")}`};
 function annDialog(keep){
   const old=keep&&$("#annt")?$("#annt").value:"",inTab=GR.find(g=>g.id===S.g);
-  if(keep&&$("#annat"))S.annAt=$("#annat").value;
-  if(!keep){S.annG=new Set(inTab?[inTab.id]:GR.map(g=>g.id));S.annS=false;S.annSel=new Set();S.annAt=""}
+  if(keep&&$("#annat"))S.annAt=$("#annat").value;if(keep&&$("#annmail"))S.annMail=$("#annmail").checked;
+  if(!keep){S.annG=new Set(inTab?[inTab.id]:GR.map(g=>g.id));S.annS=false;S.annSel=new Set();S.annAt="";S.annMail=true}
   const on=v=>v==="s"?S.annS:!S.annS&&annIds(v).every(id=>S.annG.has(id));
   const opt=(v,l)=>`<button type="button" class="chip ${on(v)?"on":""}" data-do="annto" data-v="${v}">${on(v)&&v!=="s"?"✓ ":""}${esc(l)}</button>`;
   const studs=Object.values(S.P).filter(s=>!s.tester&&s.group&&(!inTab||s.group===inTab.id)).sort(byName);
@@ -1834,6 +1851,7 @@ function annDialog(keep){
     <p class="muted" id="anncount" style="margin:6px 0"></p>
     <p class="muted" style="margin:6px 0 4px" id="annwhen"></p>
     <div class="annprev"><div><small class="muted">Core, Plus and Pro</small><div class="annc" id="annp-en" style="${annCardStyle}"></div></div><div><small class="muted">Starter and Base</small><div class="annc" id="annp-ca" style="${annCardStyle}"></div></div></div>
+    <label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="annmail" style="width:auto;margin-right:6px;vertical-align:middle" ${S.annMail===false?"":"checked"}> ✉️ Also email it to them <small class="muted">(school email, from your school account; a scheduled one goes when the time comes, the next time this dashboard is open)</small></label>
     <div class="row" style="justify-content:flex-start"><button data-do="annsend" id="annsend" disabled>📣 Send</button></div>`,true);
   const t=$("#annt"),at=$("#annat");t.value=old;
   const draw=()=>{const sel=[...S.annSel],who=S.annS?sel.filter(u=>S.P[u]):Object.values(S.P).filter(s=>!s.tester&&S.annG.has(s.group)),n=who.length,v=t.value.trim();
@@ -1859,7 +1877,17 @@ function annSendNow(){
   if(S.annS&&!sel.length)return alert("Tick the students who should get it.");
   if(!S.annS&&!S.annG.size)return alert("Tick at least one group.");
   const testers=Object.values(S.P).filter(s=>s.tester&&!s.away).map(s=>s.uid),later=annAtMs();
-  $("#dlg").close();act(api.annSend(Object.assign({text,uids:[...new Set([...sel,...testers])]},annTarget(sel),later?{at:later}:{})))}
+  const mail=$("#annmail")&&$("#annmail").checked,o=Object.assign({text,uids:[...new Set([...sel,...testers])]},annTarget(sel),later?{at:later}:{},mail?{mail:true}:{});
+  if(mail&&!later)o.mailed=Date.now();
+  $("#dlg").close();act(api.annSend(o));if(mail&&!later)mailNote(annMail(o),"Announcement")}
+// the announcement's email: to everyone it is for (annWho, also students not signed in yet), its text exactly as written
+const annMail=a=>mailStudents(mailTo(annWho(a)),"English Lab · 📣 Announcement / Anunci del professor",a.text+mailFoot(null));
+// scheduled announcements with ✉️: emailed by the first dashboard open after their time; a transaction marks them mailed first, so two
+// open dashboards (Mac, PC, phone) never send it twice
+function annDue(){if(DEMO||S.annDue)return;const due=(S.D&&S.D.ann||[]).filter(a=>a.mail&&!a.mailed&&a.at&&annMs(a.at)<=Date.now());if(!due.length)return;S.annDue=true;
+  (async()=>{for(const a of due){const ref=F.doc(db(),"announcements",a.id);
+    const mine=await F.runTransaction(db(),async tx=>{const d=await tx.get(ref);if(!d.exists()||d.data().mailed)return false;tx.update(ref,{mailed:Date.now()});return true}).catch(e=>{console.warn("annDue",e);return false});
+    a.mailed=true;if(mine)mailNote(annMail(a),"A scheduled announcement")}})().finally(()=>S.annDue=false)}
 // Suggestions from students (all groups): new ones first, then newest first. Read ones stay until you delete them.
 const sgWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.created)):null;
 function sgBox(){
@@ -2124,6 +2152,7 @@ function hwOpen(x,text,from,line,pre){const gid=x.gid,next=x.p.rows.flatMap(rr=>
     +`<div id="hw-tabs"></div>`
     +`<label class="field">For the class on <input type="date" id="hw-by" value="${next}"></label>`
     +`<label class="field">📨 Message for students <small class="muted">(ready to copy to Classroom or email; they also see it on their board)</small> <select id="hw-lang"><option value="both">English + Català</option><option value="en">English</option><option value="ca">Català</option></select><br><textarea id="hw-msg" rows="12" style="width:100%;font-size:13px;font-weight:400"></textarea></label>`
+    +`<label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="hw-mail" style="width:auto;margin-right:6px;vertical-align:middle" checked> ✉️ Also email this message to the students of ${esc((GR.find(g=>g.id===gid)||{}).name||gid)} <small class="muted">(school email, from your school account)</small></label>`
     +`<div class="row"><button data-do="hwsave" data-gid="${gid}" data-ls="${x.ls}" data-set="${from}" data-line="${esc(line||"")}">Set as homework</button> <button class="g" data-do="hwcopy">📋 Copy the message</button> <span id="hw-copied" class="muted"></span></div>`);
   S.hwX={x,dirty:false,textDirty:false,base:text,tabs:{},pre:pre||null};hwTabs();hwFill()}
 // What the homework covers (Roger, 6 Nov 2026: "I can say that a LP is homework or only a section"), saved with it as tabs = {activity id:
@@ -2224,7 +2253,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       (navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(ok,()=>{const ta=document.createElement("textarea");ta.value=v;document.body.append(ta);ta.select();document.execCommand("copy");ta.remove();ok()})},
     planhw:()=>{const x=planX(k.ls,k.gid);hwOpen(x,noCp(x,k.t),k.set||ELWeek.today(),null);const b=$("#hw-by");if(b&&k.by){b.value=k.by;hwFill()}},   // a plan's 💡 "Homework by …" line becomes real homework
     hwsave:()=>{const text=$("#hw-text").value.replace(/\s+/g," ").trim(),by=$("#hw-by").value,msg=$("#hw-msg").value.trim();if(!text||!by)return alert("Write what they have to do and choose the day.");
-      const tabs=hwCover(S.hwX,text);$("#dlg").close();
+      const tabs=hwCover(S.hwX,text),mail=$("#hw-mail")&&$("#hw-mail").checked,lang=$("#hw-lang").value;$("#dlg").close();
+      if(mail){const ca=lang==="ca"?true:lang==="en"?false:null,day=ELWeek.date(by,ca?"ca":"en");
+        mailNote(mailStudents(mailTo(Object.values(S.P).filter(s=>s.group===k.gid)),ca?"English Lab · Deures per al "+day:ca===false?"English Lab · Homework for "+day:"English Lab · Homework / Deures: "+day,(msg||text)+mailFoot(ca)),"Homework")}
       act(Promise.all([api.hw(k.ls,k.gid,"h"+Date.now().toString(36),Object.assign({text,by,set:k.set},msg?{msg}:{},k.line?{line:k.line}:{},Object.keys(tabs).length?{tabs}:{})),...hwUnlock(k.ls,k.gid,tabs)]))},
     hwdel:()=>{if(!confirm("Remove this homework? Students will no longer see it."))return;act(api.hw(k.ls,k.gid,k.id,null))},
     mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),wrop:()=>wrOpen(k.u,k.a,k.s),wrback:()=>wrBack(k.u,k.a,k.s),wrmsg:()=>{const b=$("#wrback");if(b)b.value=k.v},cpok:()=>cpDone(true),cpback:()=>cpDone(false),   // not "cpredo": that name is the checkpoint's "Let them do it again" (Roger, 4 Nov 2026: Redo in class did nothing)
