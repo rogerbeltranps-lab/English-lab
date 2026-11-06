@@ -69,9 +69,10 @@ const ANSWER = () => {
     e.value = (e.tagName === 'TEXTAREA' ? 'I like playing football with my friends at the weekend because it is fun ' : 'answer') + i; ev(e, 'input'); ev(e, 'change');
   });
   // picks (word bank buttons) are not answers; Check buttons: every one but each third, which stays typed only
-  const checks = [...document.querySelectorAll(document.getElementById('lp') ? '#lp button[id$="Check"]' : 'main button[id$="Check"]')];
-  checks.forEach((b, i) => { if (i % 3 !== 2 && !b.disabled) b.click(); });
-  return checks.length;
+  const checks = [...document.querySelectorAll(document.getElementById('lp') ? '#lp button[id$="Check"], #lp button[id^="check"]' : 'main button[id$="Check"], main button[id^="check"]')];
+  const done = [];
+  checks.forEach((b, i) => { if (i % 3 !== 2 && !b.disabled) { b.click(); done.push(b.id); } });
+  return done;
 };
 const lost = [];
 let runs = 0;
@@ -92,7 +93,7 @@ async function run([dir, f, r, routes]) {
     await page.evaluate(([k, r]) => { localStorage.clear(); localStorage.setItem(k + 'Level', r); }, [key, r]);
     await page.reload(); await page.waitForTimeout(400);
     if (await page.evaluate(LEVEL) !== r) return;   // the page has no such route
-    await page.evaluate(ANSWER); await page.waitForTimeout(300);
+    const checked = await page.evaluate(ANSWER); await page.waitForTimeout(300);
     const before = await page.evaluate(SNAP);
     runs++;
     const cmp = (after, when) => { for (const k of Object.keys(before)) if (after[k] !== before[k]) lost.push(`${dir}/${f} · ${r} · ${when}: ${k} was "${String(before[k]).slice(0, 40)}", now "${String(after[k] ?? '').slice(0, 40)}"`); };
@@ -103,6 +104,17 @@ async function run([dir, f, r, routes]) {
     await page.evaluate(([k, o]) => localStorage.setItem(k + 'Level', o), [key, other]); await page.reload(); await page.waitForTimeout(400);
     await page.evaluate(([k, r]) => localStorage.setItem(k + 'Level', r), [key, r]); await page.reload(); await page.waitForTimeout(500);
     cmp(await page.evaluate(SNAP), 'after a level change and back');
+    // ↺ Practise again on every checked activity, type a new answer, leave without checking: the old results must come back
+    // (Roger, 6 Nov 2026: "if they don't finish and leave the pages without checking, next time they come back they see the old results")
+    const emptied = await page.evaluate(ids => {
+      let n = 0;
+      ids.forEach(id => { const g = document.getElementById(id.endsWith('Check') ? id.slice(0, -5) + 'Again' : 'again' + id.slice(5)); if (g && !g.disabled) { g.click(); n++; } });
+      const box = [...document.querySelectorAll('#lp input.typed, main input.typed')].find(e => !e.value && !e.disabled && !/^(study_|card)/.test(e.id));
+      if (box) { box.value = 'a new try'; box.dispatchEvent(new Event('input', { bubbles: true })); }
+      return n;
+    }, checked);
+    await page.waitForTimeout(300); await page.reload(); await page.waitForTimeout(500);
+    if (emptied) cmp(await page.evaluate(SNAP), 'after Practise again and leaving without checking');
     if (errs.length) lost.push(`${dir}/${f} · ${r} · page error: ${errs[0]}`);
   } catch (e) { lost.push(`${dir}/${f} · ${r} · could not run: ${String(e.message || e).split('\n')[0]}`); }
   finally { await ctx.close(); }

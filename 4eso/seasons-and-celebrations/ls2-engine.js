@@ -295,10 +295,10 @@ var LS2 = (function () {
     return out;
   }
   const qsAt = (L, src) => src ? atLevel(L, () => forLevel(src)).map(qid) : null;
-  function keep(id, prefix, v, items) { state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => k.startsWith(prefix))), l: level, q: (items || []).map(qid) }; if (state.typing) delete state.typing[id + '_' + level]; save(); }
+  function keep(id, prefix, v, items) { delete fresh[id]; state.ans = state.ans || {}; state.ans[id] = { v, tries: Object.fromEntries(Object.entries(tries).filter(([k]) => k.startsWith(prefix))), l: level, q: (items || []).map(qid) }; if (state.typing) delete state.typing[id + '_' + level]; save(); }
   // the answers to show on this route ({v, moved}), with their tries, or null
   function kept(id, prefix, items, src) {
-    const a = state.ans && state.ans[id]; if (!a || !Array.isArray(a.v)) return null;
+    const a = !fresh[id] && state.ans && state.ans[id]; if (!a || !Array.isArray(a.v)) return null;
     const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
     if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false }; }
     const m = moveTo(items, from, a.v, prefix, a.tries); if (!m) return null;
@@ -324,11 +324,14 @@ var LS2 = (function () {
       : '🔁 Your level has changed. The answers you had already given are here' + (done ? ' and this step stays done ✓.' + (fresh ? ' The empty questions are new at your level: you can do them to practise.' : '') : '.' + (fresh ? ' Answer the empty questions too to complete the step.' : ''));
     el.appendChild(p); el.classList.add('show');
   }
-  function forget(id, prefix) { if (state.ans) delete state.ans[id]; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]);   /* every route's: typed() would bring another route's back */ Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
+  /* ↺ Practise again (Roger, 6 Nov 2026: "if they don't finish and leave the page without checking, next time they come back they see the
+     old results"): the boxes empty for a new try, but the last checked answers stay saved (state.ans) until the new try is checked. */
+  const fresh = {};
+  function forget(id, prefix) { fresh[id] = true; if (state.typing) ROUTES.forEach(r => delete state.typing[id + '_' + r]); Object.keys(tries).forEach(k => { if (k.startsWith(prefix)) delete tries[k]; }); save(); }
   /* One activity at a time (Roger, 4 Nov 2026: "they should be able to redo one activity of the section and still see all the answers of
      the other activities"): every checked activity of a section has its own "↺ Redo this activity" next to Check (the questions, the
      practice, the micro-dictation), which clears only that activity. There is no button that clears a whole section. */
-  const againLabel = () => '↺ ' + (ca() ? 'Torna a fer aquesta activitat' : 'Redo this activity');
+  const againLabel = () => '↺ ' + (ca() ? 'Torna a practicar' : 'Practise again');
   const againBtn = id => '<button class="btn secondary" type="button" id="' + id + 'Again">' + againLabel() + '</button>';
   const vals = (items, prefix) => items.map((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"]:checked'); return c ? +c.value : null; } const t = $('#' + prefix + i); return t ? t.value : null; });
   function fill(items, prefix, v) { items.forEach((q, i) => { if (q.o) { const c = document.querySelector('input[name="' + prefix + i + '"][value="' + v[i] + '"]'); if (c) c.checked = true; } else { const t = $('#' + prefix + i); if (t) t.value = v[i] || ''; } }); syncPicks(); }
@@ -551,7 +554,7 @@ var LS2 = (function () {
     const say = (t, rate) => { if (playRec(t, rate)) return; if (recAudio) { recAudio.pause(); recAudio = null; } const s = window.speechSynthesis; if (!s) return; s.cancel(); const u = new SpeechSynthesisUtterance(t), v = s.getVoices().find(x => /^en(-|_)GB/i.test(x.lang)) || s.getVoices().find(x => /^en(-|_)/i.test(x.lang)); u.lang = 'en-GB'; if (v) u.voice = v; u.rate = rate; s.speak(u); };
     state.dict = state.dict || {}; const kept = state.dict[p.id] || [];
     // typed but not checked yet stays too (state.dictT[panel]; Roger, 6 Nov 2026: "they must see them with their responses")
-    state.dictT = state.dictT || {}; const typedD = kept.some(v => v) ? [] : state.dictT[p.id] || [];
+    state.dictT = state.dictT || {}; const typedD = kept.some(v => v) ? [] : state.dictT[p.id] || [];   // Practise again keeps state.dict until the new check
     p.chunks.forEach((c, i) => {
       $('[data-say="' + p.id + i + '"]').onclick = () => say(c, 0.9);
       $('[data-say-slow="' + p.id + i + '"]').onclick = () => say(c, 0.6);
@@ -567,7 +570,7 @@ var LS2 = (function () {
       });
     $('#' + p.id + 'DCheck').onclick = () => { state.dict[p.id] = show(); delete state.dictT[p.id]; save(); };
     $('#' + p.id + 'DAgain').onclick = () => {   // only the dictation: the questions and the prediction above stay
-      delete state.dict[p.id]; delete state.dictT[p.id]; save();
+      delete state.dictT[p.id]; save();
       p.chunks.forEach((c, i) => { $('#' + p.id + 'D' + i).value = ''; const f = $('#' + p.id + 'Df' + i); f.textContent = ''; f.className = 'feedback'; });
     };
     if (kept.some(v => v)) show();
