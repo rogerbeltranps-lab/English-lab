@@ -28,6 +28,11 @@ window.EL_CEFR={"2eso":{beginners:["A1","A1","A1"],insecure:["A1+","A1+ / A2 ini
 window.elCefr=(c,lv,full)=>{const x=((window.EL_CEFR[c]||{})[lv])||((window.EL_CEFR[c]||{})[lv==="native"?"daring":lv]);return x?(full?x[2]:x[0]):""};
 // "2ESO Starter (A1)": what students read as their level (board, English Lab, practice page, level notice)
 window.elLevelLabel=(c,lv)=>{const n=((window.EL_LEVELS||[]).find(l=>l.id===lv)||{}).name||lv;if(!lv)return "";const k=elCefr(c,lv);return (c?c.toUpperCase()+" ":"")+n+(k?" ("+k+")":"")};
+// English Lab by level, not by course (Roger, 6 Nov 2026: "hauria d'estar per nivells no per cursos"): one ladder of CEFR steps; each step
+// is every [course, route] whose level is that step (A1 = 2 ESO Starter + 4 ESO Starter, A2 = 2 ESO Core + 4 ESO Base...), so students of
+// the same level in both courses share the practice. [{k:"A2", pairs:[["2eso","safe"],["4eso","insecure"]]}, ...]
+window.elLadder=()=>{const o={};Object.keys(window.EL_CEFR).forEach(c=>Object.keys(window.EL_CEFR[c]).forEach(lv=>{const k=window.EL_CEFR[c][lv][0];(o[k]=o[k]||[]).push([c,lv])}));
+  return ["A1","A1+","A2","A2+","B1","B1+","B2","C1","C2"].filter(k=>o[k]).map(k=>({k,pairs:o[k]}))};
 window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructions in Catalan
 // The student's route in an LS. The teacher sets routes (Roger, 26 Oct 2026: from the LS1 exam mark, on the dashboard). An LS with
 // no route of its own takes the latest route set in an earlier LS of the same course (EL_LS order), so a route carries over to every

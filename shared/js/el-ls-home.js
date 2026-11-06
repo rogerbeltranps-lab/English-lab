@@ -2,7 +2,7 @@
 // and students go from the dashboard to the ls and the ls to the dashboard"). shared/css/ls-home.css draws it.
 // The page holds the content (head, learning paths as <ol class="lps"> of <a class="lp" data-a="activity id">, tiles and the places
 // <section data-place="study|about|final">); this file adds:
-// - the side menu of the board (today.html): My activities (the teacher: Dashboard), this LS, All Learning Situations, English Lab,
+// - the side menu of the board (today.html): My dashboard (the teacher: Dashboard), this LS, All Learning Situations, English Lab,
 //   Practise, Help; on a phone the board's bottom bar; a ‹ back link at the top to the board or the dashboard;
 // - places by hash (#study, #about, #final, #notes: el-notes.js fills it) with a ‹ back link to the LS home, as the board's places;
 // - the Continue card (the first open learning path not done, in the order of the group's time plan, or the checkpoint it needs first)
@@ -31,17 +31,19 @@
   const dashHref=()=>ROOT+"teacher.html?course="+COURSE+"&ls="+encodeURIComponent(LS);
   const teach=()=>who.role==="teacher";
   function nav(){
-    const a=(h,txt,cls,cur)=>`<a class="nv${cls?" "+cls:""}" href="${h}"${cur?' aria-current="page"':""}>${txt}</a>`;
+    // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css): "🏠 My dashboard" → icon + label
+    const a=(h,txt,cls,cur)=>{const m=String(txt).match(/^(\p{Extended_Pictographic}\uFE0F?)\s*(.*)$/u),ic={"English Lab":"🧪",Practise:"🎯",Practica:"🎯"}[txt]||(m?m[1]:/^LS\d/.test(txt)?"📚":"🗂");
+      return `<a class="nv${cls?" "+cls:""}" href="${h}"${cur?' aria-current="page"':""}><span class="ic" aria-hidden="true">${ic}</span><span class="lb">${m?m[2]:txt}</span></a>`};
     let html;
     if(teach()||who.role==="tester"){
-      const first=teach()?a(dashHref(),"📊 Dashboard"):a(boardHref(),"🏠 My activities");
+      const first=teach()?a(dashHref(),"📊 Dashboard"):a(boardHref(),"🏠 My dashboard");
       html=first+`<div class="nvsep"></div>`+["2eso","4eso"].map(c=>`<div class="nvh">${CN[c]}</div>`+a(ROOT+c+"/index.html",CN[c]+" · Learning Situations","sub")
         +(window.EL_LS||[]).filter(l=>l.course===c).map((l,i)=>a(lsHref(l),"LS"+(i+1)+" · "+esc(lsName(l)),"sub"+(l.id===LS?" on":""),l.id===LS)).join("")).join("")
         +`<div class="nvsep"></div>`+a(ROOT+"lab/","English Lab")+a(ROOT+"lab/practice.html",t("Practica","Practise"));
     }else{
-      html=a(boardHref(),"🏠 "+t("Les meves activitats","My activities"))
+      html=a(boardHref(),"🏠 "+t("El meu tauler","My dashboard"))
         +a("index.html","📚 "+esc(lsName(ls)),"on",true)
-        +a(ROOT+COURSE+"/index.html",t("Totes les Learning Situations","All Learning Situations"),"sub")
+        +a(ROOT+COURSE+"/index.html","🗂 "+t("Totes les Learning Situations","All Learning Situations"))
         +a(ROOT+"lab/","English Lab")+a(ROOT+"lab/practice.html",t("Practica","Practise"))
         +a(ROOT+"today.html#help","❓ "+t("Ajuda","Help"));
     }
@@ -56,7 +58,7 @@
     const p=PLACES.includes(location.hash.slice(1))?location.hash.slice(1):"home";
     $$("[data-place]").forEach(s=>s.hidden=s.dataset.place!==p);
     const c=$("#crumb");
-    if(c)c.innerHTML=p==="home"?`<a class="back" href="${teach()?dashHref():boardHref()}">‹ ${teach()?"Dashboard":t("Les meves activitats","My activities")}</a>`
+    if(c)c.innerHTML=p==="home"?`<a class="back" href="${teach()?dashHref():boardHref()}">‹ ${teach()?"Dashboard":t("El meu tauler","My dashboard")}</a>`
       :`<a class="back" href="#">‹ ${esc(lsName(ls))}</a>`;
     if(p!=="home")window.scrollTo(0,0);
   }

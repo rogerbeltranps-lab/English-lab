@@ -47,17 +47,20 @@
     .level-btn:focus-visible{outline:3px solid var(--text);outline-offset:3px}
     .level-btn strong{font-size:1.8rem;letter-spacing:-.04em}
     .level-btn span{font-size:.9rem;font-weight:700;opacity:.9}
-    .level-btn[data-level="2eso"]{background:#557c68}
-    .level-btn[data-level="4eso"]{background:#55769f}
-    .level-pick.chosen .level-btn{opacity:.45}
-    .level-pick.chosen .level-btn.on{opacity:1;border-color:var(--text)}
+    .level-pick{gap:10px}
+    .level-btn{min-width:0;flex:1 1 0;padding:12px 14px;border-radius:16px;background:#fff;color:var(--text);border:2px solid var(--line);box-shadow:none}
+    .level-btn strong{font-size:1.4rem}
+    .level-btn span{font-size:.78rem;color:var(--muted);opacity:1}
+    .level-pick.chosen .level-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+    .level-pick.chosen .level-btn.on span{color:#dbe4ff}
+
     .signin{margin-top:26px;padding:22px;border:1px solid var(--line);border-radius:20px;background:#f8fafc}
     .signin p{margin:0 0 14px;color:var(--muted);line-height:1.5}
     .signin button{border:0;background:#0f766e;color:#fff;border-radius:999px;padding:10px 18px;cursor:pointer;font-weight:700}
     .lab{margin-top:30px}
     .level-tag{display:inline-block;padding:7px 12px;border-radius:999px;color:#fff;font-weight:800;font-size:.9rem;margin-bottom:18px}
-    .level-tag.c2eso{background:#557c68}
-    .level-tag.c4eso{background:#55769f}
+    .level-tag{background:var(--accent)}
+    .level-note{margin:-8px 0 18px;color:var(--muted)}
 
     /* English Lab cards, as on the home page before they moved here */
     .lab-card{border:1px solid var(--line);border-radius:20px;padding:22px;background:#fff;transition:.2s ease}
@@ -125,14 +128,12 @@
           <span class="eyebrow">Practice</span>
           <h1>English Lab</h1>
         </div>
-        <p id="lead">Choose your level, then sign in with your school email and password.</p>
+        <p id="lead">Sign in with your school email and password.</p>
       </div>
 
-      <!-- Signed-out visitors choose a level and sign in; the teacher and the tester use it to switch level. Students get their own course. -->
-      <div class="level-pick" id="levelPick">
-        <button type="button" class="level-btn" data-level="2eso"><strong>2 ESO</strong><span>English Lab for 2 ESO</span></button>
-        <button type="button" class="level-btn" data-level="4eso"><strong>4 ESO</strong><span>English Lab for 4 ESO</span></button>
-      </div>
+      <!-- By level, not by course (Roger, 6 Nov 2026): one ladder A1 to C2 (elLadder in el-catalog.js). Students open straight on their
+           own level and never choose; the teacher and the tester pick a step here. A step both courses share shows both courses' games. -->
+      <div class="level-pick" id="levelPick" hidden></div>
 
       <div class="signin" id="signin" hidden>
         <p>To open English Lab you need to sign in with your school email (@ietramuntana.cat) and the password your teacher gave you.</p>
@@ -141,6 +142,7 @@
 
       <div class="lab" id="lab" hidden>
         <span class="level-tag" id="levelTag"></span>
+        <p class="level-note" id="levelNote" hidden></p>
 
         <!-- Shadowing, Sentence Builder, Word Cards and Listening open the self-practice page by level (practice.html, Roger 31 Oct 2026) -->
         <div class="lab-overview" id="labOverview">
@@ -233,11 +235,10 @@
   <script type="module">
     // English Lab: a signed-out visitor chooses a level and signs in here (el-cloud keeps students on this page after sign-in).
     // A student sees the English Lab of their own course (their group); the teacher and the tester can switch level.
-    const LEVELS = {'2eso':'2 ESO', '4eso':'4 ESO'};
-    const KEY = 'el_lab_level';   // el_ keys stay in this browser: not synced, not wiped on sign-out
+    const COURSES = {'2eso':'2 ESO', '4eso':'4 ESO'};
+    const KEY = 'el_lab_step';   // the teacher's last step; el_ keys stay in this browser: not synced, not wiped on sign-out
     const $ = id => document.getElementById(id);
-    const read = () => { try { return LEVELS[localStorage.getItem(KEY)] ? localStorage.getItem(KEY) : null } catch (e) { return null } };
-    let level = read(), user = null;
+    let step = (() => { try { return localStorage.getItem(KEY) } catch (e) { return null } })(), user = null, mine = null;
 
     const labMenus = {games: $('labGamesMenu'), grammar: $('labGrammarMenu')};
     function showLabMenu(menu){
@@ -253,44 +254,52 @@
     // the teacher's student view (ELCloud.viewing) sees the student's English Lab, as the student does
     const switches = u => !C().viewing && (C().isTeacher(u) || (C().isTester(u) && !C().viewGroup()));
     const login = () => { if (C()) C().login(); };
-
-    function render(){
-      const inside = signedIn(user), canSwitch = inside && switches(user);
-      document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !canSwitch; });
-      if (inside && !canSwitch) {   // a student (or the tester in a group's view): their own course
-        const g = (window.EL_GROUPS || []).find(x => x.id === C().group());
-        if (g && LEVELS[g.course]) level = g.course;
-      }
-      if (inside && !level) level = '2eso';
-      $('levelPick').hidden = inside && !canSwitch;
-      $('levelPick').classList.toggle('chosen', Boolean(level));
-      document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('on', b.dataset.level === level));
-      $('signin').hidden = inside || !level;
-      $('lab').hidden = !inside;
-      $('lead').textContent = !inside ? 'Choose your level, then sign in with your school email and password.'
-        : canSwitch ? 'Teacher view: choose a level to see its English Lab.' : 'Practice activities for your course.';
-      if (!inside) return;
-      $('levelTag').textContent = LEVELS[level];
-      $('levelTag').className = 'level-tag c' + level;
-      document.querySelectorAll('.lab-card[data-level]').forEach(c => { c.hidden = c.dataset.level !== level; });
+    const name = lv => ((window.EL_LEVELS || []).find(l => l.id === lv) || {}).name || lv;
+    // the student's level: their course's latest LS route (elRouteOf carries it over), from the levels el-cloud.js already read
+    async function myStep(){
+      const g = (window.EL_GROUPS || []).find(x => x.id === C().group()); if (!g) return null;
+      const last = (window.EL_LS || []).filter(l => l.course === g.course).pop(); if (!last) return null;
+      let lv = null; try { lv = elRouteOf(await C().levels(), last.id).level; } catch (e) {}
+      return { course: g.course, route: lv || 'insecure', set: !!lv, k: elCefr(g.course, lv || 'insecure') };
     }
 
-    document.querySelectorAll('.level-btn').forEach(b => b.addEventListener('click', () => {
-      level = b.dataset.level;
-      try { localStorage.setItem(KEY, level) } catch (e) {}
-      render();
-      if (!signedIn(user)) login();
-    }));
-    $('signinBtn').addEventListener('click', login);
+    function render(){
+      const inside = signedIn(user), canSwitch = inside && switches(user), L = window.elLadder ? elLadder() : [];
+      document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !canSwitch; });
+      if (inside && !canSwitch && mine && mine.k) step = mine.k;
+      if (!L.some(x => x.k === step)) step = (L[2] || L[0] || {}).k;
+      const st = L.find(x => x.k === step) || { pairs: [] }, courses = st.pairs.map(p => p[0]);
+      $('levelPick').hidden = !canSwitch;
+      if (canSwitch) {
+        $('levelPick').innerHTML = L.map(x => `<button type="button" class="level-btn ${x.k === step ? 'on' : ''}" data-step="${x.k}" aria-pressed="${x.k === step}"><strong>${x.k}</strong><span>${x.pairs.map(([c, lv]) => COURSES[c] + ' ' + name(lv)).join(' + ')}</span></button>`).join('');
+        $('levelPick').classList.add('chosen');
+      }
+      $('signin').hidden = inside;
+      $('lab').hidden = !inside || (!canSwitch && !mine);   // a student: once their level is known
+      const ca = inside && !canSwitch && mine && window.elCa && elCa(mine.route);
+      $('lead').textContent = !inside ? 'Sign in with your school email and password.'
+        : canSwitch ? 'Teacher view: choose a level to see its English Lab.' : ca ? 'Practica al teu nivell.' : 'Practice at your level.';
+      if (!inside) return;
+      $('levelTag').textContent = canSwitch ? step : (ca ? 'El teu nivell: ' : 'Your level: ') + step;
+      const other = !canSwitch && mine && courses.find(c => c !== mine.course);
+      $('levelTag').hidden = canSwitch;   // the teacher sees the step on its button
+      $('levelNote').hidden = !other;
+      $('levelNote').textContent = canSwitch ? st.pairs.map(([c, lv]) => COURSES[c] + ' ' + name(lv)).join(' + ')
+        : other ? (ca ? `També hi tens els jocs i la gramàtica dels alumnes de ${COURSES[other]} amb el teu nivell.` : `You also get the games and grammar of ${COURSES[other]} students at your level.`) : '';
+      document.querySelectorAll('.lab-card[data-level]').forEach(c => { c.hidden = !courses.includes(c.dataset.level); });
+      // the teacher's practice links open on the step on screen (practice.html?level=A2); students always practise at their own level
+      document.querySelectorAll('a.lab-card[href^="practice.html"]').forEach(a => { a.href = 'practice.html' + (canSwitch ? '?level=' + encodeURIComponent(step) : '') + '#' + a.getAttribute('href').split('#')[1]; });
+    }
 
-    // Before el-cloud has loaded: the level choice works, sign-in waits for it.
-    $('levelPick').classList.toggle('chosen', Boolean(level));
-    document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('on', b.dataset.level === level));
-    $('signin').hidden = !level;
+    $('levelPick').addEventListener('click', e => { const b = e.target.closest('[data-step]'); if (!b) return;
+      step = b.dataset.step; try { localStorage.setItem(KEY, step) } catch (e) {} render(); });
+    $('signinBtn').addEventListener('click', login);
+    $('signin').hidden = false;   // before el-cloud has loaded: sign-in waits for it
 
     await import('../shared/js/el-cloud.js');
-    window.ELCloud.onUser(u => {
-      user = u; render();
+    window.ELCloud.onUser(async u => {
+      user = u; mine = null; render();
+      if (signedIn(u) && !switches(u)) { mine = (await myStep()) || {}; render(); }
       const hash = location.hash.slice(1);
       if (signedIn(u) && labMenus[hash]) showLabMenu(hash);
     });

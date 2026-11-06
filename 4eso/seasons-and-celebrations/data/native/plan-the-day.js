@@ -14,7 +14,7 @@ window.LP.native = {
     ] },
 
   vocab: { type: 'vocab', tab: 'Vocabulary', title: 'C2 vocabulary: organising an event',
-    intro: 'Explore, go through the cards and complete the sentences (80 %). Precise planning language for your proposal.',
+    intro: 'Explore, go through the cards and complete the sentences. Precise planning language for your proposal.',
     receptive: 'risk assessment · capacity · footfall · signage · stakeholders',
     groups: [
       { g: 'Making it happen', items: [
@@ -53,7 +53,7 @@ window.LP.native = {
       { q: 'The ___ (LOGISTIC) are the hardest part of the job.', a: ['logistics'] }
     ] },
 
-  listen: { type: 'mc', tab: 'Listening', title: 'Listening: student council meeting', pill: '80 %',
+  listen: { type: 'mc', tab: 'Listening', title: 'Listening: student council meeting', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'The same meeting as your class, with C2 Proficiency Listening questions: implied meaning, how decisions are reached and what is left unresolved.',
     media: { audio: 'audio/student-council-meeting.mp3', title: 'Student council meeting' },
     items: [
@@ -66,7 +66,7 @@ window.LP.native = {
       { q: 'Laia’s final remark (“the best day of the term”) mainly serves to…', o: ['end the meeting on a positive, motivating note', 'set a measurable target', 'compare it with other events in detail', 'ask for more ideas'] }
     ] },
 
-  grammar: { type: 'typed', tab: 'Grammar', title: 'The future at C2: formal arrangements and inverted conditionals', pill: '80 %',
+  grammar: { type: 'typed', tab: 'Grammar', title: 'The future at C2: formal arrangements and inverted conditionals', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Key word transformations (Reading and Use of English, Part 4): 3–8 words including the word in CAPITALS.',
     explain: [
       '<strong>Formal arrangements:</strong> <em>The event is to take place in the hall. · The guests are due to arrive at ten. · We are on the point of confirming the band.</em>',
@@ -87,7 +87,7 @@ window.LP.native = {
       { q: 'Please contact Laia if you need anything. SHOULD → ___ anything, please contact Laia.', a: ['should you need'], en: 'Formal: Should you need…' }
     ] },
 
-  mixed: { type: 'mc', tab: 'Multiple-choice cloze', title: 'Multiple-choice cloze: collocations', pill: '80 %',
+  mixed: { type: 'mc', tab: 'Multiple-choice cloze', title: 'Multiple-choice cloze: collocations', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Reading and Use of English, Part 1: choose the word that fits each gap. All four options are similar in meaning, so the answer depends on collocation and grammar.',
     items: [
       { q: 'Organising the stalls was no mean ___.', o: ['feat', 'deed', 'act', 'achievement'], ex: 'no mean feat = a difficult achievement (fixed phrase).' },

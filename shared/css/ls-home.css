@@ -3,6 +3,7 @@
    The same side menu as the board (today.html), a ‹ back link to the board or the dashboard, one Continue card, the learning paths as one
    list with each one's progress, and tiles that open places (#study, #about, #final) with the details. Chromebook screens (1366×768) first.
    Course colours: the page sets --c (strong), --c-dark and --c-soft (2 ESO green, 4 ESO blue). */
+@import url("el-app.css");   /* the menu items as buttons (Roger, 6 Nov 2026) */
 :root{--bg:#f8fafc;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--blue:#3157d5;--c:#3157d5;--c-dark:#2443ad;--c-soft:#eaf0ff;--accent-dark:var(--c-dark)}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}

@@ -1,6 +1,7 @@
 <!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Les meves activitats · English Lab</title>
+<title>El meu tauler · English Lab</title>
 <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
+<link rel="stylesheet" href="shared/css/el-app.css">
 <style>body{font:15px system-ui,sans-serif;margin:0;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}h1{font-size:1.5rem}h2{font-size:1.15rem}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:12px 0}.muted{color:#64748b}small{font-weight:400}
 button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}button.sub{background:#15803d}a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:4px 10px;font-size:13px;white-space:nowrap;display:inline-block}a.go.off{background:#94a3b8;pointer-events:none}
 .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}
@@ -86,7 +87,7 @@ body[data-place="home"] .page h1{font-size:1.75rem;margin:.2em 0 .1em}body[data-
 table.lpst,table.lpst tbody,table.lpst tr,table.lpst td{display:block;width:auto}table.lpst thead{display:none}table.lpst tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:10px 12px;background:#fff}table.lpst td{border:0!important;padding:3px 0!important;text-align:left!important}table.lpst td:empty{display:none}table.lpst td{background:transparent!important}table.lpst tr.miss{background:#fef2f2;border-color:#fca5a5}}</style>
 <nav class="mtabs nvs-m" aria-label="Menú"></nav><nav class="bnav" id="bnav" aria-label="Menú"></nav>
 <div class="app"><aside class="side"><div class="brand">English with Roger</div><nav class="nvs" aria-label="Menú"></nav></aside>
-<div class="page"><div id="crumb"></div><h1>Les meves activitats</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
+<div class="page"><div id="crumb"></div><h1>El meu tauler</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-sections.js"></script>
@@ -96,6 +97,7 @@ table.lpst,table.lpst tbody,table.lpst tr,table.lpst td{display:block;width:auto
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
+<script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js"></script>
 <script src="shared/js/el-sound.js"></script>
 <script type="module">
@@ -152,8 +154,8 @@ function setLang(){
   const lv=elRouteOf(D.lv,S.ls).level||(Object.values(D.lv).find(x=>x&&x.level)||{}).level;
   EN=all()||(!!lv&&!elCa(lv));
   document.documentElement.lang=EN?"en":"ca";
-  document.title=t("Les meves activitats","My activities")+" · English Lab";
-  $("h1").textContent=t("Les meves activitats","My activities");
+  document.title=t("El meu tauler","My dashboard")+" · English Lab";   // Roger, 6 Nov 2026: "it's not my activities but my dashboard"
+  $("h1").textContent=t("El meu tauler","My dashboard");
 }
 const doneSet=a=>{const p=D.pg[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
 // a step of a section the teacher has not opened yet for the group (elSecLocked; a vocabulary section holds the cards and practice steps)
@@ -168,7 +170,6 @@ function cell(a){
   // ✅ + green only with every step done (Roger, 4 Nov 2026); pressing Submit / Mark as done is only a small note
   if(!a.manual&&elAllDone(a,d,x)){v+=" ✅";c=c?c+" sub":"sub"}
   if(x&&x.feedback)v+=" 💬";
-  if(!a.manual&&x&&x.locked)v+=`<br><small class="muted">📤 ${t("entregada","submitted")}</small>`;else if(!a.manual&&x&&x.markedDone)v+=`<br><small class="muted">🟡 ${t("marcada com a feta","marked as done")}</small>`;
   return {t:v,c};
 }
 
@@ -177,10 +178,13 @@ const COURSES={"2eso":"2 ESO","4eso":"4 ESO"};
 const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName=l=>esc(l.title.replace(/^\S+ · /,""));
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
-  const html=`<a class="nv on" href="today.html" aria-current="page">${t("Les meves activitats","My activities")}</a>`
-    +cs.map(c=>`<a class="nv" href="${c}/index.html">${t("El meu curs","My course")} · ${COURSES[c]}</a>`+lss.filter(l=>l.course===c).map(l=>`<a class="nv sub" href="${lsHref(l)}">${lsName(l)}</a>`).join("")).join("")
-    +`<a class="nv" href="lab/">English Lab</a><a class="nv" href="lab/practice.html">${t("Practica","Practise")}</a>`
-    +`<a class="nv" href="${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}" target="_blank" rel="noopener">🎬 ${t("Com funciona la web","How the website works")}</a>`;
+  // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css)
+  const b=(cls,h,ic,txt,x)=>`<a class="nv${cls}" href="${h}"${x||""}><span class="ic" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`;
+  const html=b(" on","today.html","🏠",t("El meu tauler","My dashboard"),' aria-current="page"')
+    +cs.map(c=>b("",`${c}/index.html`,"🗂",`${t("El meu curs","My course")} · ${COURSES[c]}`)+lss.filter(l=>l.course===c).map(l=>b(" sub",lsHref(l),"📚",lsName(l))).join("")).join("")
+    +b("","lab/","🧪","English Lab")+b("","lab/practice.html","🎯",t("Practica","Practise"))
+    +b("","#help","❓",t("Ajuda","Help"))
+    +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"');
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
@@ -203,7 +207,8 @@ const PLACE_OF={todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"m
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
 const placeTitle=p=>({todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone")})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
-const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];return t("Hola","Hi")+(f?" "+f:"")+t(", espero que tinguis un dia genial! ☺️",", hope you are having a great day! ☺️")};   // Roger, 6 Nov 2026
+const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];const end=window.ELCheer?ELCheer.student(D.me.email||D.me.name||"",ELWeek.today(),EN):t("espero que tinguis un dia genial! ☺️","hope you are having a great day! ☺️");
+  return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
 const planOf=ls=>{const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;return {p,gi:p?gi:-1}};
 function homeSub(g,ls){const {p,gi}=planOf(ls),ex=gi>=0?ELWeek.exam(p,gi):null,n=ex?ELWeek.days(ELWeek.today(),ex):null;
   return (g?esc(g.name)+" · ":"")+lsName(ls)+(ex&&n>=0?` · <b style="color:#b91c1c">${n>1?t(`examen d'aquí a ${n} dies`,`exam in ${n} days`):n===1?t("examen demà","exam tomorrow"):t("examen avui","exam today")}</b>`:"")}
@@ -321,10 +326,10 @@ function render(){
   if(!lss.length){$("#crumb").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
     $("#note").innerHTML=cls+annBox()+noteBox+howBox();$("#main").innerHTML="";return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
-  S.pend=[];lss.forEach(l=>EL_CATALOG.filter(a=>a.ls===l.id).forEach(a=>{const r=D.rs[a.id]||{};if(a.graded&&!a.manual&&r.markedDone&&!r.locked&&(D.ls[l.id]||{}).status==="open")S.pend.push(a)}));
+  S.pend=[];   // no Submit any more (Roger, 6 Nov 2026): answers save on their own, Submit only froze the score
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
   const n=S.pend.length;
-  const pend=n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"";
+  const pend="";
   if(place==="home"){$("#crumb").innerHTML="";$("h1").textContent=hello();$("#sub").innerHTML=homeSub(g,ls);
     $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info)}
   else{$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
@@ -861,7 +866,7 @@ function critPanel(c){
 // Detail of one learning path: steps, score, feedback, final-product self-assessment with the teacher's answers.
 function detail(id){
   const a=EL_CATALOG.find(x=>x.id===id),x=D.rs[id]||{},d=doneSet(a),info=D.ls[a.ls]||{status:"hidden",enabled:[]},can=canDo(a,info);
-  const state=x.locked?t("✔ Entregada","✔ Submitted"):x.markedDone?t("🟡 Marcada com a feta, sense entregar","🟡 Marked as done, not submitted"):a.graded?t("Encara no l'has entregada","You have not submitted it yet"):t("No avalua (per practicar)","Not assessed (for practice)");
+  const state=isDone(a)?t("✔ Tot fet","✔ All done"):a.graded?t("Encara hi ha passos per fer","Some steps are still to do"):t("No avalua (per practicar)","Not assessed (for practice)");   // no Submit (Roger, 6 Nov 2026)
   let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
   const rp=x.replies||{},ans=k=>[((x.answers||{})[k]||{}).t,rp[k]].filter(Boolean).join("\n\n");   // the answer to the comment (Claude) and the feedback on the work
   $("#dlgc").innerHTML=`<h3>${a.title}</h3><p class="muted">${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(elScore(a,x,D.pg[a.ls])||{score:0}).score}/${a.points}`:""}${a.manual&&x.max?` · ${t("nota","mark")} ${x.score}/${x.max}`:""}</p>`
@@ -873,7 +878,7 @@ function detail(id){
     +(()=>{const own=new Set((a.steps||[]).map(([sid])=>sid)),cs=Object.entries(rp).filter(([k,v])=>v&&!own.has(k));
       return cs.length?`<label>${t("Correccions del professor","Your teacher's corrections")}</label>`+cs.map(([k,v])=>`<div class="ans">✏️ <b>${esc(({write:t("Escriptura","Writing"),speak:"Speaking",talk:"Talk",reflect:t("Reflexió","Reflection")})[k]||k)}:</b> ${esc(v)} <a href="${a.path.split("/").map(encodeURIComponent).join("/")}#${encodeURIComponent(k)}">${t("Obre","Open")} →</a></div>`).join(""):""})()
     +(a.manual&&a.graded?`<p class="muted">${t("Aquesta activitat es lliura pel Google Classroom i la puntua el professor.","This activity is handed in through Google Classroom and marked by your teacher.")}</p>`:"")
-    +`<div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button><a class="go ${can?"":"off"}" href="${a.path}" style="padding:6px 12px;font-size:14px">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a>${a.graded&&!a.manual&&info.status==="open"&&can&&!x.locked?`<button class="sub" data-do="submit" data-a="${a.id}">${t("Entrega","Submit")}</button>`:""}</div>`;
+    +`<div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button><a class="go ${can?"":"off"}" href="${a.path}" style="padding:6px 12px;font-size:14px">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`;
   if(!$("#dlg").open)$("#dlg").showModal();
 }
 // The teacher's view of a student's board (?student=…; Roger, 2 Nov 2026: "the learning paths are missing here, what they have done and
