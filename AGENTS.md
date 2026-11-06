@@ -116,6 +116,7 @@ All docs are mapped in [docs/README.md](docs/README.md), which is also Roger's *
 - The student **flips** the card, then chooses **Got it** or **Again**. The rating buttons stay disabled until the card is flipped. An **Again** card comes back before the student moves on, and the step is complete when every card in the set is **Got it**.
 - "New set" gives a different random set. The counter keeps the format `Card 6 of 10 · Practising · 5/10 known`; Insecure shows it and the instructions in Catalan.
 - Reuse the existing implementations (`flashcard-set` logic in the vocabulary pages and `shared/js/flashcard-set.js`) instead of writing a new one.
+- **A new card appears front-up at once (problem report, 2ESO A, 5 Nov 2026):** when Got it / Again / Next / Previous changes the card, `flashcardSet.render()` turns it back with no animation (only on `always: true` pages, LS2; LS1 unchanged), so the next card's answer never shows while the card turns. Turning a card by hand still animates.
 
 ## Answer options
 - **Randomize the answer options, never the questions.** Multiple-choice options and dropdown options are shuffled every time a question is shown, so the correct answer is not always in the same position. Question order stays as written.
