@@ -19,7 +19,7 @@ Kahoot-style games for class (Roger, 26 Oct 2026). The board runs on the project
   - **passive:** the words appear in the question and theory texts;
   - **active:** some questions ask for a word directly (meaning, use, collocation or preposition).
 - **Theory slides between the questions**: short, a few lines, with examples. The questions after each theory slide practise it.
-- **Two games per learning path (5 Nov 2026):** a **vocabulary game** (only words: meaning, use, collocations, prepositions) and a **grammar game** (only the grammar of the path). Both are linked from the learning path page with teacher-only buttons (📚 Vocabulary game, 🧩 Grammar game). Done for LS2 LP1 and LP2 in 2 ESO and 4 ESO; LP3 keeps its older mixed game for now.
+- **Two games per learning path (5 Nov 2026):** a **vocabulary game** (only words: meaning, use, collocations, prepositions) and a **grammar game** (only the grammar of the path). Both are linked from the learning path page with teacher-only buttons (📚 Vocabulary game, 🧩 Grammar game). Done for LS2 LP1, LP2 and LP3 in 2 ESO and 4 ESO (LP3 on 6 Nov 2026, replacing its older mixed game).
 - **The grammar game explains before it asks:** each grammar point starts with explanation slides (how it is made, when we use it, examples and the typical mistake, often in a table), then 4–6 questions on it. Press Space to show the explanation one part at a time, and **CA** (or the C key) to show a short Catalan help under the slide.
 - Keep it lean: about 15–20 questions and 3 theory slides in a vocabulary game, about 16 questions and 3–4 explanation slides in a grammar game.
 
@@ -59,11 +59,13 @@ Tell Claude: "Make a class game for [course] [learning situation], [learning pat
 | Grammar · Present Simple: how often? | 2 ESO | LS2 Free Time, Live!, LP1 Getting started (he / she / it + -s, questions, adverbs of frequency) |
 | Vocabulary · Clothes, kit and weather | 2 ESO | LS2 Free Time, Live!, LP2 What are they doing? (clothes and kit, weather, at the event) |
 | Grammar · Present Continuous | 2 ESO | LS2 Free Time, Live!, LP2 What are they doing? (form, -ing spelling, negatives, questions) |
-| Now or usually? Choose it, write it | 2 ESO | LS2 Free Time, Live!, LP3 Now or usually? (older mixed game) |
+| Vocabulary · Now or usually? Time words and sport | 2 ESO | LS2 Free Time, Live!, LP3 Now or usually? (time words, how often, doing sport, state verbs and vlog words; replaces Now or usually? Choose it, write it) |
+| Grammar · Present Simple or Present Continuous? | 2 ESO | LS2 Free Time, Live!, LP3 Now or usually? (usually or now, questions and negatives, state verbs, temporary situations) |
 | Vocabulary · Autumn words | 4 ESO | LS2 Seasons & Celebrations, LP1 Getting started (replaces Autumn words: choose it, write it) |
 | Grammar · Talking about change | 4 ESO | LS2 Seasons & Celebrations, LP1 Getting started (get + comparative, every autumn or right now, adjective + preposition + -ing) |
 | Vocabulary · Celebrations around the world | 4 ESO | LS2 Seasons & Celebrations, LP2 Celebrations around the world (traditions, adjectives, words from four celebrations) |
 | Grammar · Customs, dates and It is celebrated | 4 ESO | LS2 Seasons & Celebrations, LP2 Celebrations around the world (Present Simple for customs, on / in / at, It is celebrated / takes place / is held) |
-| Where traditions come from: choose it, write it | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from (older mixed game) |
+| Vocabulary · Origins, comparing and change | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from (verb + preposition, dates, comparing cultures, places, change and debate; replaces Where traditions come from: choose it, write it) |
+| Grammar · Origins, relatives and contrast | 4 ESO | LS2 Seasons & Celebrations, LP3 Where traditions come from (Past Simple or used to, defining relatives, whereas / unlike / although / however, non-defining relatives) |
 
 One known limit: the deck files are public on the site, so a student who knows the address could read the answers. Nothing on the student side links to them.
