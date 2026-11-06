@@ -33,7 +33,7 @@
       if((T.off||[]).some(o=>Array.isArray(o)?o[0]<=d&&d<=o[1]:o===d))return null;
       const dn=DAYS.en[at.getDay()],m=at.getHours()*60+at.getMinutes(),hm=x=>Math.floor(x/60)+":"+String(x%60).padStart(2,"0");
       for(const [gid,slots] of Object.entries(T.groups))for(const sl of slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;
-        const s=+x[2]*60+ +x[3];if(m>=s-5&&m<s+55)return {gid,start:hm(s),end:hm(s+60),key:d+" "+gid+" "+hm(s)}}
+        const s=+x[2]*60+ +x[3],len=+T.len||60;if(m>=s-5&&m<s+len-5)return {gid,start:hm(s),end:hm(s+len),key:d+" "+gid+" "+hm(s)}}
       return null},
     // activities due in week row i: [[activity id, date]] by date
     dueIn:(p,gi,i)=>{const r=p.rows[i];if(!r||!r.from)return [];const e=add(r.from,6);

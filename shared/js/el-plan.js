@@ -210,8 +210,11 @@ window.EL_PLAN={
 window.EL_TIMETABLE={
   groups:{"4ESOA":["Mon 8:30","Wed 12:00","Fri 13:00"],"4ESOB":["Mon 15:00","Tue 9:30","Wed 10:30"],
     "2ESOA":["Tue 12:00","Thu 12:00","Fri 8:30"],"2ESOB":["Tue 10:30","Thu 8:30","Fri 9:30"]},
-  off:["2026-10-30",["2026-12-07","2026-12-08"],["2026-12-15","2026-12-18"],["2026-12-22","2027-01-07"]]
+  off:["2026-10-30",["2026-12-07","2026-12-08"],["2026-12-15","2026-12-18"],["2026-12-22","2027-01-07"]],
+  len:60   // minutes a class lasts
 };
+// 🗓 This is the starting timetable. The teacher edits it on the dashboard (🗓 Timetable, Roger 6 Nov 2026): it is saved in
+// settings/timetable (the dashboard reads it and replaces this one) and each group's part in live/{group}.tt (student pages).
 // End of the group's class going on at `at` (ms; from 5 minutes before it starts until it ends), as a time in ms, or null when the group
 // has no class then. A pull-up made during a class is released when that class ends (Roger, 5 Nov 2026: "when I finish a class, this
 // should be released"): the teacher writes it as `until` on the pull-up (ls/{id}.push[group], live/{group}.go).
@@ -220,5 +223,5 @@ window.elClassEnd=function(gid,at){const T=window.EL_TIMETABLE,d=new Date(at||Da
   if((T.off||[]).some(o=>Array.isArray(o)?o[0]<=ymd&&ymd<=o[1]:o===ymd))return null;
   const dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()],m=d.getHours()*60+d.getMinutes();
   for(const sl of T.groups[gid]){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const s=+x[2]*60+ +x[3];
-    if(m>=s-5&&m<s+60){const e=new Date(d);e.setHours(0,0,0,0);return e.getTime()+(s+60)*60e3}}
+    const len=+T.len||60;if(m>=s-5&&m<s+len){const e=new Date(d);e.setHours(0,0,0,0);return e.getTime()+(s+len)*60e3}}
   return null};
