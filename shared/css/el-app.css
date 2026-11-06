@@ -1,0 +1,91 @@
+/* English Lab as an app (Roger, 6 Nov 2026: "I want everything to look like an app for them even though they connect through a
+   Chromebook most of the time"; "these things should look like buttons"; "it's not my activities but my dashboard").
+   1. The side menu of the board (today.html), the LS home (ls-home.css) and English Lab: every item is a button with an icon.
+   2. el-app.js: the same menu on every other student page (learning paths, course pages, English Lab, Practise, vocabulary games):
+      a slim strip of icon buttons on the left on a computer (.elrail), the board's bottom bar on a phone (.elbar), and on
+      learning paths a light top bar instead of the dark one. Chromebook (1366×768) first. LS1 pages keep their design. */
+
+/* ---- 1. menu buttons (the board, the LS home, English Lab) ---- */
+.side .nvs,.elside{display:flex;flex-direction:column;gap:8px}
+.side .nv,.elside .nv{display:flex;align-items:center;gap:11px;padding:8px 12px 8px 8px;border-radius:14px;background:#fff;border:1px solid #e2e8f0;
+  box-shadow:0 1px 0 #e2e8f0,0 2px 6px rgba(15,23,42,.05);color:#1e293b;font-weight:700;font-size:15px;line-height:1.25;text-decoration:none;
+  transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease,background .12s ease}
+.side .nv .ic,.elside .nv .ic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#eef2ff;font-size:18px;line-height:1}
+.side .nv .lb,.elside .nv .lb{flex:1 1 auto;min-width:0}
+.side .nv::after,.elside .nv::after{content:"›";flex:0 0 auto;margin-left:auto;color:#94a3b8;font-size:20px;font-weight:600;line-height:1}
+.side .nv:hover,.elside .nv:hover{border-color:#3157d5;background:#fff;color:#3157d5;transform:translateY(-1px);box-shadow:0 1px 0 #c7d2fe,0 6px 14px rgba(49,87,213,.14)}
+.side .nv:active,.elside .nv:active{transform:translateY(1px);box-shadow:0 1px 2px rgba(15,23,42,.08)}
+.side .nv.on,.elside .nv.on{background:#3157d5;border-color:#3157d5;color:#fff;box-shadow:0 1px 0 #2443ad,0 6px 14px rgba(49,87,213,.25)}
+.side .nv.on .ic,.elside .nv.on .ic{background:rgba(255,255,255,.2)}
+.side .nv.on::after,.elside .nv.on::after{color:#fff}
+.side .nv.sub,.elside .nv.sub{margin-left:16px;padding:6px 10px 6px 6px;font-size:14px;font-weight:650;border-radius:12px}
+.side .nv.sub .ic,.elside .nv.sub .ic{width:28px;height:28px;font-size:15px;border-radius:8px}
+.side .nv.sub.on,.elside .nv.sub.on{background:#eaf0ff;border-color:#3157d5;color:#2443ad;box-shadow:none}
+.side .nv.sub.on .ic,.elside .nv.sub.on .ic{background:#fff}
+.side .nv.sub.on::after,.elside .nv.sub.on::after{color:#3157d5}
+.side .nvh{padding-top:10px}
+/* phone/top scrolling rows keep the pill look (the board's .mtabs) */
+.mtabs .nv .ic{display:none}.mtabs .nv::after{content:none}
+
+/* ---- 2. el-app.js: the strip of icon buttons on a computer ---- */
+body.elapp{--elrail:92px}
+.elrail{position:fixed!important;left:0;top:0;bottom:0;width:var(--elrail)!important;height:auto!important;margin:0!important;z-index:40;background:#fff!important;border:0!important;border-right:1px solid #e2e8f0!important;padding:12px 8px!important;
+  display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:stretch!important;flex-wrap:nowrap!important;gap:8px!important;overflow-y:auto;box-sizing:border-box;font:13px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:none!important}
+.elrail .elr-brand{display:grid;place-items:center;height:40px;margin:0 0 4px;font-weight:900;font-size:15px;letter-spacing:-.04em;color:#3157d5;text-decoration:none}
+.elrail a.elr{box-sizing:border-box;width:100%;margin:0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px 8px;border-radius:14px;background:#fff;border:1px solid #e2e8f0;
+  box-shadow:0 1px 0 #e2e8f0,0 2px 6px rgba(15,23,42,.05);color:#334155;text-decoration:none;font-weight:700;font-size:11.5px;text-align:center;
+  transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+.elrail a.elr i{font-style:normal;font-size:21px;line-height:1;width:36px;height:30px;display:grid;place-items:center;border-radius:10px;background:#eef2ff}
+.elrail a.elr span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;max-width:100%;overflow:hidden;line-height:1.15;overflow-wrap:anywhere}
+.elrail a.elr:hover{border-color:#3157d5;color:#3157d5;background:#fff;transform:translateY(-1px);box-shadow:0 1px 0 #c7d2fe,0 6px 14px rgba(49,87,213,.14)}
+.elrail a.elr.on{background:#3157d5;border-color:#3157d5;color:#fff}
+.elrail a.elr.on i{background:rgba(255,255,255,.2)}
+.elrail .elr-sep{height:1px;background:#e2e8f0;margin:2px 6px}
+body.elapp.elhas-rail{padding-left:var(--elrail)!important}
+
+/* the phone's bottom bar (the board's bnav) */
+.elbar{display:none}
+@media (max-width:640px){
+  body.elapp.elhas-rail{padding-left:0!important}
+  .elrail{display:none!important}
+  .elbar{display:flex!important;flex-direction:row!important;justify-content:space-around;margin:0!important;position:fixed!important;left:0;right:0;bottom:0;z-index:9000;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -4px 14px rgba(15,23,42,.08);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));font:11px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif}
+  .elbar a{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 2px;border-radius:12px;color:#475569;text-decoration:none;font-weight:700}
+  .elbar a i{font-style:normal;font-size:20px;line-height:1}
+  .elbar a span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .elbar a.on{background:#eaf0ff;color:#3157d5}
+  body.elapp.elhas-bar{padding-bottom:72px!important}
+  /* the account bar (Problem, Idea) goes to the end of the page, as on the board; the floating buttons sit above the bottom bar */
+  body.elapp.elhas-bar #el-cloud-bar{position:static!important;margin:16px 14px 0;border-radius:14px!important;flex-wrap:wrap;justify-content:center}
+  body.elapp.elhas-bar #el-todo-btn{bottom:84px!important}
+}
+
+/* ---- learning paths: a light app bar instead of the dark top bar ---- */
+body.elapp.ellp .topbar{background:rgba(255,255,255,.97)!important;box-shadow:0 1px 0 #e2e8f0,0 4px 14px rgba(15,23,42,.05)!important;backdrop-filter:blur(8px);color:#0f172a}
+body.elapp.ellp .topbar .toprow{min-height:58px;padding-top:8px;padding-bottom:8px;gap:14px}
+body.elapp.ellp .topbar .brand{gap:8px}
+body.elapp.ellp .topbar .brand>a{color:var(--dark,#234777)!important;background:#fff;border:1px solid #dbe5f1;border-radius:12px;padding:8px 14px;font-weight:800;text-decoration:none;
+  box-shadow:0 1px 0 #dbe5f1;white-space:nowrap;max-width:340px;overflow:hidden;text-overflow:ellipsis}
+body.elapp.ellp .topbar .brand>a:hover{border-color:var(--accent,#315f9f);background:var(--soft,#edf4ff)}
+body.elapp.ellp .topbar .brand>a.lp-home-link{display:none!important}   /* the strip on the left has My dashboard */
+body.elapp.ellp .topbar .brand>a.elback::before{content:"‹ ";font-size:1.15em}
+body.elapp.ellp .topbar .session-jump label{color:#64748b!important}
+body.elapp.ellp .topbar .session-jump select{background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;border-radius:12px!important;font-weight:700}
+body.elapp.ellp .topbar .progress-label,body.elapp.ellp .topbar .progress-row{color:#475569!important}
+body.elapp.ellp .topbar .progress-track{background:#e2e8f0!important}
+body.elapp.ellp .topbar .progress-bar{background:var(--accent,#315f9f)!important}
+@media (min-width:900px){body.elapp.ellp .topbar .toprow{flex-wrap:nowrap!important;padding:8px 0!important}body.elapp.ellp .topbar .session-jump{order:0!important;width:auto!important;margin-left:auto!important}body.elapp.ellp .topbar .progress-shell{margin-left:0!important}}
+body.elapp.ellp .hero{padding:16px 0 12px!important}
+/* a student sees only their own level: it is already in the top bar next to the steps done, so the single level card goes */
+body.elapp.ellp .routes:has(.route[style*="none"]){display:none!important}
+body.elapp.ellp .hero h1{font-size:clamp(1.8rem,2.8vw,2.4rem)!important}
+@media (max-width:640px){body.elapp.ellp .topbar .brand>a{max-width:none;padding:7px 11px}}
+
+/* ---- course pages and vocabulary games: the strip replaces the site header for signed-in users ---- */
+body.elapp.elcourse>header,body.elapp.elgames .site-header>.home-link,body.elapp.elgames .site-header>[data-el-board]{display:none!important}
+.elcrumb{max-width:1180px;margin:14px auto 0;padding:0 24px}
+.elcrumb a{display:inline-flex;align-items:center;gap:4px;color:#3157d5;font:700 16px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px}
+.elcrumb a:hover{background:#eaf0ff}
+
+/* ---- English Lab and Practise: their side menu becomes the button menu ---- */
+body.elapp.ellab .nav-tabs,body.elapp.ellab .mobile-tabs{display:none!important}

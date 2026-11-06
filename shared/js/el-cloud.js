@@ -556,7 +556,7 @@ function bar(){
       if(!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       const x=b("Exit student view",asExit);x.style.background="#a16207";x.title="Back to your dashboard; their answers leave this browser";el.append(x)}
     else{el.append(u.displayName||u.email," ");
-      const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My activities";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
+      const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My dashboard";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
       if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
@@ -574,7 +574,7 @@ function bar(){
 function menuLink(u){
   document.querySelectorAll("[data-el-board]").forEach(e=>e.remove());
   if(!u||onBoard||onDash||!(isStudent(u)||isTeacher(u)))return;
-  const teach=isTeacher(u)&&!AS,txt=teach?"Dashboard":elCa(myLevel||homeLevel)?"Les meves activitats":"My activities";
+  const teach=isTeacher(u)&&!AS,txt=teach?"Dashboard":elCa(myLevel||homeLevel)?"El meu tauler":"My dashboard";
   const add=(home,cls,icon)=>{if(!home)return;const a=document.createElement("a");a.dataset.elBoard="";a.className=cls;a.href=teach?dashHere:boardUrl();a.textContent=icon+txt;home.after(a)};
   document.querySelectorAll(".navlinks").forEach(n=>add(n.querySelector(":scope>a"),"",""));
   document.querySelectorAll(".nav-tabs,.mobile-tabs").forEach(n=>add(n.querySelector(":scope>.tab-btn"),"tab-btn",""));
@@ -919,4 +919,5 @@ onAuthStateChanged(auth,async u=>{
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+loadScript("shared/js/el-app.js",()=>window.ELApp);   // the app menu on student pages (el-app.js: a strip of icon buttons, a phone's bottom bar)
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
