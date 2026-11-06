@@ -645,12 +645,14 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
 // of the LS (EL_GRADING[ls].fp): its mark and share of the LS mark, the day it is due, every step with what was handed in (the page
 // saves the hand-ins in its state .steps, with the self-assessment) and the teacher's answers, and how it is marked (the rubric rows
 // of fp.rows with their share of the LS mark). The teacher's view adds the mark of each row (progress.parts.fp, from the dashboard).
-// LS1 (EL_GRADING.only) keeps its final product on the formative tab, as before.
-const hasFp=ls=>{const g=(window.EL_GRADING||{})[ls.id];return !!(g&&!g.only&&g.fp&&g.fp.a&&EL_CATALOG.some(a=>a.id===g.fp.a))};
+// LS1 (EL_GRADING.only) has the same card since Roger, 6 Nov 2026 ("in the LS1 it should appear the final product as it does in the LS2"):
+// its mark, the teacher's feedback with the rubric shaded, and how it is marked from the rubric the teacher used (EL_FP_RUBRICS), as it has
+// no fp.rows; its formative tab only says there was no continuous assessment.
+const hasFp=ls=>{const g=(window.EL_GRADING||{})[ls.id];return !!(g&&g.fp&&g.fp.a&&EL_CATALOG.some(a=>a.id===g.fp.a))};
 const fpAct=ls=>EL_CATALOG.find(a=>a.id===EL_GRADING[ls.id].fp.a);
 const fpMark=ls=>{const x=D.rs[fpAct(ls).id]||{},pr=(D.rs[ls.id+"/assessment"]||{}).progress||{};return pr.fp??(x.max?(x.score||0)/x.max*10:null)};
 const fpDue=ls=>{const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;return gi>=0?ELWeek.due(p,fpAct(ls).id,gi):null};
-function fpSub(ls){const m=fpMark(ls),d=fpDue(ls);return m!=null?t(`nota: ${f1(m)} / 10`,`mark: ${f1(m)} / 10`):d?t(`fins al ${when(d)}`,`by ${when(d)}`):t("passos i rúbrica","steps and rubric")}
+function fpSub(ls){const m=fpMark(ls),d=fpDue(ls);return m!=null?t(`nota: ${f1(m)} / 10`,`mark: ${f1(m)} / 10`):d?t(`fins al ${when(d)}`,`by ${when(d)}`):only(ls.id)?t("encara no hi ha nota","no mark yet"):t("passos i rúbrica","steps and rubric")}
 function fpView(ls,info){const g=EL_GRADING[ls.id],a=fpAct(ls),x=D.rs[a.id]||{},pr=(D.rs[ls.id+"/assessment"]||{}).progress||{},P=pr.parts||{};
   const W=(g.blocks.find(b=>b.id==="fp")||{}).w||0,m=fpMark(ls),d=fpDue(ls),open=info.status!=="closed",can=canDo(a,info)&&open,today=ELWeek.today();
   let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
@@ -659,15 +661,15 @@ function fpView(ls,info){const g=EL_GRADING[ls.id],a=fpAct(ls),x=D.rs[a.id]||{},
     return `<tr><td class="l"><b>${esc(tt)}</b>${ans(sid)?`<div class="ans">💬 <b>${t("Resposta del professor:","Teacher's answer:")}</b> ${esc(ans(sid))}</div>`:""}</td>`
       +`<td class="l">${h?`<span class="s-ok">✔ ${t("Entregat","Handed in")}</span>${h.avg!=null?` <small class="muted">· ${t("autoavaluació","self-assessment")} ${h.avg}/4</small>`:""}`:late?`<span class="s-no">✗ ${t("No entregat","Not handed in")}</span>`:`<span class="s-off">${t("Encara no","Not yet")}</span>`}</td>`
       +`<td>${can?`<a class="go" href="${href(sid)}">${h?t("Revisa","Review"):t("Fes-lo","Do it")} →</a>`:""}</td></tr>`}).join("");
-  const sw=g.fp.rows.reduce((n,r)=>n+r.w,0),num=c=>/^\d+\.\d+$/.test(c);
-  const rub=g.fp.rows.map(r=>{const v=(P.fp||{})[r.step+"|"+r.c];return `<tr><td class="l"><b>${esc(r.name)}</b> ${num(r.c)?pill(r.c):""}</td><td><b>${Math.round(W*r.w/sw*100)/100} %</b></td>${AS?`<td>${v==null?`<span class="muted">${t("encara no","not yet")}</span>`:`<b style="color:${col(v*10)}">${f1(v)}</b> <small class="muted">/ 10</small>`}</td>`:""}</tr>`}).join("");
+  const sw=(g.fp.rows||[]).reduce((n,r)=>n+r.w,0),num=c=>/^\d+\.\d+$/.test(c),R=!g.fp.rows&&(window.EL_FP_RUBRICS||{})[a.id];
+  const rub=R?R.rows.map(r=>`<tr><td class="l"><b>${esc(r.name)}</b> <small class="muted">· ${esc(r.sub)}</small></td><td><b>${Math.round(W*r.w)/100} %</b></td></tr>`).join(""):(g.fp.rows||[]).map(r=>{const v=(P.fp||{})[r.step+"|"+r.c];return `<tr><td class="l"><b>${esc(r.name)}</b> ${num(r.c)?pill(r.c):""}</td><td><b>${Math.round(W*r.w/sw*100)/100} %</b></td>${AS?`<td>${v==null?`<span class="muted">${t("encara no","not yet")}</span>`:`<b style="color:${col(v*10)}">${f1(v)}</b> <small class="muted">/ 10</small>`}</td>`:""}</tr>`}).join("");
   return `<div class="fhead"><h2>🎬 ${t("El meu producte final","My final product")} <small>· ${lsName(ls)}</small></h2><p>${t(`${esc(a.title.replace(/^[^:]*:\s*/,""))}: és el ${W} % de la nota de la LS. Aquí tens els passos, què has entregat i com es corregeix.`,`${esc(a.title.replace(/^[^:]*:\s*/,""))}: it is ${W} % of your LS mark. Here are its steps, what you have handed in and how it is marked.`)}</p></div>`
     +`<div class="box"><div class="lphead"><div><h2>${esc(a.title)}</h2><small class="muted">${W} % ${t("de la nota de la LS","of your LS mark")}${d?` · ${t("fins al","due")} ${when(d)}`:""}</small></div><b style="font-size:1.3rem;color:${m==null?"#94a3b8":col(m*10)}">${m==null?t("encara no hi ha nota","no mark yet"):f1(m)+" / 10"}</b></div>`
-    +`<div class="row" style="margin-top:8px"><a class="go" href="${href("")}">${open?t("Obre el producte final","Open the final product"):t("Revisa el producte final","Review the final product")} →</a> <a class="go" href="${href("rubric")}">📋 ${t("Rúbrica","Rubric")}</a></div>`
+    +`<div class="row" style="margin-top:8px"><a class="go" href="${href("")}">${open?t("Obre el producte final","Open the final product"):t("Revisa el producte final","Review the final product")} →</a> ${g.only?"":`<a class="go" href="${href("rubric")}">📋 ${t("Rúbrica","Rubric")}</a>`}</div>`
     +(x.feedback?`<label style="font-weight:600;display:block;margin-top:10px">${t("Feedback del professor","Your teacher's feedback")}</label>${fbBox(x.feedback,a.id)}`:"")+`</div>`
     +(sts?`<div class="box"><h2>${t("Els passos","The steps")}</h2><div class="wrap"><table class="xt fpst"><thead><tr><th>${t("Pas","Step")}</th><th>${t("Estat","State")}</th><th></th></tr></thead><tbody>${sts}</tbody></table></div></div>`:"")
-    +`<div class="box"><h2>${t("Com es corregeix","How it is marked")}</h2><div class="wrap"><table class="xt fpst"><thead><tr><th>${t("Part de la rúbrica","Rubric part")}</th><th>${t("Pes a la nota de la LS","Share of the LS mark")}</th>${AS?"<th>Mark</th>":""}</tr></thead><tbody>${rub}</tbody></table></div>`
-    +`<p class="muted" style="margin:6px 0 0">${t("El professor el corregeix amb la rúbrica quan l'has entregat.","Your teacher marks it with the rubric once you have handed it in.")}</p></div>`}
+    +(rub?`<div class="box"><h2>${t("Com es corregeix","How it is marked")}</h2>${R&&R.note?`<p class="muted" style="margin:0 0 6px">${esc(R.note)}</p>`:""}<div class="wrap"><table class="xt fpst"><thead><tr><th>${t("Part de la rúbrica","Rubric part")}</th><th>${t("Pes a la nota de la LS","Share of the LS mark")}</th>${AS&&!R?"<th>Mark</th>":""}</tr></thead><tbody>${rub}</tbody></table></div>`
+    +`<p class="muted" style="margin:6px 0 0">${t("El professor el corregeix amb la rúbrica quan l'has entregat.","Your teacher marks it with the rubric once you have handed it in.")}</p></div>`:"")}
 // Teacher feedback with a rubric (Roger, 4 Nov 2026: "they should see the rubric and the teacher's observations"): the feedback text
 // "Final mark…", the comment, then per part "Name (30%) · 7.5/10" with "✔ went well" and "➜ keep in mind" lines, shown as the comment
 // plus a table. Feedback without parts stays plain text with its line breaks.
@@ -692,11 +694,9 @@ function fbRubric(R,parts,com){const lv=m=>Math.max(0,Math.min(4,Math.round(m/2.
         +`<div class="rbg">${r.d.map((d,k)=>`<div class="rbc${k===L?" on":""}"><b>${esc(R.levels[k])}</b> <small class="muted">${r.pts[k]} ${t("punts","pts")}</small>${k===L?` <span class="rby">◀ ${t("tu","you")}</span>`:""}<div>${esc(d)}</div></div>`).join("")}</div>`
         +(L===last?`<div class="rbc on" style="margin-top:6px"><b>${esc(R.levels[last])}</b> <span class="rby">◀ ${t("tu","you")}</span></div>`:"")
         +((p.ok.length||p.todo.length)?`<div class="rbn">${p.ok.length?`<div>✔ ${esc(p.ok.join(" "))}</div>`:""}${p.todo.length?`<div>➜ ${esc(p.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
-// The formative tab of an LS where only the exam and the final product count (LS1): its final product.
-function onlyForm(id){const g=EL_GRADING[id],fp=D.rs[g.fp.a]||{},a=EL_CATALOG.find(x=>x.id===g.fp.a);
-  return `<div class="box"><p>${t("En aquesta LS no hi havia avaluació contínua: només compten l'examen (a «Els meus exàmens») i el producte final.","In this LS there was no continuous assessment: only the exam (in “My exams”) and the final product count.")}</p>`
-    +`<div class="lphead"><h2>${t("Producte final","Final product")}${a?` <small class="muted">· ${esc(a.title)}</small>`:""}</h2><b style="font-size:1.2rem;color:${fp.max?col(fp.score/fp.max*100):"#94a3b8"}">${fp.max?f1((fp.score||0)/fp.max*10)+" / 10":t("encara no hi ha nota","no mark yet")}</b></div>`
-    +(fp.feedback?`<label style="font-weight:600">${t("Feedback del professor","Your teacher's feedback")}</label>${fbBox(fp.feedback,g.fp.a)}`:"")+`</div>`}
+// The formative tab of an LS where only the exam and the final product count (LS1): the final product has its own card (🎬, fpView).
+function onlyForm(id){
+  return `<div class="box"><p>${t("En aquesta LS no hi havia avaluació contínua: només compten l'examen (a «Els meus exàmens») i el producte final (a «El meu producte final»).","In this LS there was no continuous assessment: only the exam (in “My exams”) and the final product (in “My final product”) count.")}</p></div>`}
 // Week plan and reminders (Roger, 25 Oct 2026), from the teacher's plan in el-plan.js (shared/js/el-week.js): this week's classes,
 // the activities due this week, the exam day and the whole plan, for the student's group; past-due activities not done are reminded on top.
 // "Done" = submitted or marked as done, or every scored step done. The final product is handed in on Classroom, so it is listed but never reminded.
@@ -824,7 +824,7 @@ function asBar(lss,ls){let b=document.getElementById("asbar");
   const tab=tabOf(ls),tb=(id,lbl)=>`<button class="chip ${tab===id?"on":""}" data-do="tab" data-t="${id}">${lbl}</button>`;
   b.innerHTML=`<div class="top"><div><b>👁 ${esc(D.me.name||"")}${D.me.group?" · "+esc(D.me.group):""}</b> <span class="muted">· the student's board as they see it (read-only)</span><div class="muted" style="font-size:13px;margin-top:2px">👁 In this tab you browse the whole site as they see it: open a learning path, a tab or their course page to see their answers, your corrections and what is locked for them. Nothing is saved.</div></div><a class="go" href="teacher.html" title="Back to your dashboard (ends the student view)">Exit · Dashboard</a></div>`
     +`<div class="bar"><small>LS</small>${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</button>`).join("")}</div>`
-    +`<div class="bar"><small>Show</small>${tb("form",only(ls.id)?"🎬 Final product":"📈 Learning paths and mark")}${hasFp(ls)?tb("fp","🎬 Final product"):""}${tb("exam","📝 Exams")}${hasWeek(ls)?tb("week","🗓 Week plan"):""}</div>`}
+    +`<div class="bar"><small>Show</small>${tb("form","📈 Learning paths and mark")}${hasFp(ls)?tb("fp","🎬 Final product"):""}${tb("exam","📝 Exams")}${hasWeek(ls)?tb("week","🗓 Week plan"):""}</div>`}
 // The LS's learning paths in one table, in the order of the group's time plan: each tab done (✔, amber when done after its day, from the
 // page state doneAt against stepDue/due) or missing (red once its day has passed), the state and the score. Every tab not done is a link
 // that opens that tab (path#panel, el-cloud.js openHashTab), and "👉 Next" proposes the first one to do (Roger, 2 Nov 2026: "you can click
