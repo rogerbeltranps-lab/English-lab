@@ -37,6 +37,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 .ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}table.plan td{vertical-align:top;text-align:left;white-space:normal}table.plan td.pc{text-align:center;white-space:nowrap}table.plan tr.pb td{background:#f1f5f9;border-top:2px solid #cbd5e1}table.plan td.in{padding-left:22px}
 #loadbar .live{color:#166534}.cnow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-radius:12px;padding:8px 12px;margin:6px 0}.cnow.ask{background:#fef3c7;border:2px solid #f59e0b}.cnow.info{background:#ecfdf5;border:1px solid #86efac;font-size:14px}.cnow .x{background:none;color:#475569;padding:0 6px;margin-left:auto}
 .who{display:inline-block;border-radius:999px;padding:1px 8px;font-size:12px;white-space:nowrap}.who.a{background:#dcfce7;color:#166534}.who.y{background:#e0e7ff;color:#3730a3}
+.rgames td,.rgames th{padding:4px 10px;text-align:left}.rgames td.num{text-align:center}.rgames .grings{margin-left:0}
 .grings{display:inline-flex;align-items:center;gap:3px;margin-left:8px;vertical-align:middle;text-decoration:none;font-size:13px}
 </style>
 <style>/* Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"): a side menu, a home with a few
@@ -1028,7 +1029,7 @@ function render0(){
     paths:()=>lpBox(ls,grp)+`<div class="bar">${stuF}${G()&&!G().only?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:""}</div>`+lpAll+legendB+`<div class="box">${fold("settings","LS status and groups",lsSettings(ls))}</div>`,
     marks:()=>`<div class="bar">${stuF}${G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:""}</div>`
       +(G()&&G().only?gradeBox(shown):(G()?gradeBox(shown):"")+resultB)+selfBox(ls,grp,shown),
-    students:()=>`<div class="bar">${stuF}</div>`+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(),
+    students:()=>`<div class="bar">${stuF}</div>`+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(shown),
     msgs:()=>annBox()+pbBox()+sgBox(),
     cov:()=>covPage(grp,ls)};
   if(place[S.place]){$("#main").innerHTML=placeHead(back,S.place)+place[S.place]()}
@@ -1506,7 +1507,7 @@ function gameRings(s){const g=GAMES[S.g];if(!g||g.busy||!s.email)return "";const
   const mine=g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done}:null}).filter(Boolean);
   if(!mine.length)return "";const st=elGameStats(mine);
   return `<a class="grings" href="lab/game/results.html?g=${encodeURIComponent(S.g)}" target="_blank" rel="noopener" title="Class games of this LS: % right in 🧩 grammar and 📚 vocabulary (click for the answers and notes)"><span>🧩</span>${elRing(st.grammar,"",30)}<span>📚</span>${elRing(st.vocab,"",30)}</a>`}
-function loadGames(){const g=S.g;if(DEMO||!g||GAMES[g])return;GAMES[g]={busy:true,list:[]};
+function loadGames(){const g=S.g;if(!g||GAMES[g])return;if(DEMO){if(DEMO.games)GAMES[g]={list:DEMO.games.filter(x=>x.group===g)};return}GAMES[g]={busy:true,list:[]};
   F.getDocs(F.query(F.collection(db(),"gameResults"),F.where("group","==",g))).then(q=>{
     const lsOf=x=>{const nm=String(x.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase(),l=(window.EL_LS||[]).find(y=>y.course===x.course&&y.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""};
     GAMES[g]={list:q.docs.map(d=>{const x=d.data();x.lsId=lsOf(x);return x})};render()}).catch(e=>{console.warn("games",e);GAMES[g]={list:[]}})}
@@ -2507,9 +2508,18 @@ function pbClaude(id){
     <button class="g" data-do="pbcopy" title="Copies the text and opens the English Lab project in a new browser tab; paste it in the project chat to start a thread">📋 Copy and open the project in the browser</button></div>
     <p class="muted" id="pbmsg">Both buttons copy the text and open the English Lab project. Paste it in the project chat (Cmd+V or Ctrl+V) and press Enter to start a thread.</p>`,true)}
 // ---- student list (roster): import from Excel, add, edit, remove
-function rosterBox(){
+// 🧩 📚 class game circles in the Student list (Roger, 6 Nov 2026: "here I should have this", on 👥 Students › Student list): one row per
+// student of the group (the page's filters apply), click the name for the student, the circles open Results (same data as gameRings)
+function rosterGames(studs){if(!studs||!studs.length||!S.g||S.g==="none")return "";loadGames();const g=GAMES[S.g];if(!g)return "";
+  if(g.busy)return `<p class="muted">Loading the class games…</p>`;
+  const rows=studs.filter(s=>!s.tester).map(s=>{const em=String(s.email||"").toLowerCase(),ls=S.ls||"";
+    const mine=em?g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done}:null}).filter(Boolean):[];
+    return `<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td><td>${mine.length?gameRings(s):'<span class="muted">no class games yet</span>'}</td><td class="num">${mine.length}</td></tr>`}).join("");
+  return `<h3 style="margin:4px 0 6px">🎮 Class games in this LS</h3><p class="muted">% right in the 🧩 grammar and 📚 vocabulary games of this LS. Click the circles for every answer and the notes (Results).</p>
+    <div class="wrap"><table class="rgames"><tr><th class="stu">Student</th><th>🧩 grammar · 📚 vocabulary</th><th>Games</th></tr>${rows}</table></div>`}
+function rosterBox(studs){
   const ro=Object.values(S.D.ro),noMail=ro.filter(r=>!r.email);
-  const body=(S.D.roErr?'<p><b>The student list could not be read.</b> Publish the Firestore rules (<code>firebase deploy --only firestore:rules</code>) and reload.</p>':"")
+  const body=rosterGames(studs)+(S.D.roErr?'<p><b>The student list could not be read.</b> Publish the Firestore rules (<code>firebase deploy --only firestore:rules</code>) and reload.</p>':"")
     +`<p class="muted">${ro.length?`<b>${ro.length} students</b>: `+GR.map(g=>g.name+" "+ro.filter(r=>r.group===g.id).length).join(" · ")+".":"No student list yet."} Only students on this list (and the tester account) can sign in, and the list sets their group. It is stored in Firebase, never in the website's repository.</p>`
     +(noMail.length?`<p>Without an email, so they cannot sign in yet: ${noMail.map(r=>esc(fullName({ro:r}))).join(" · ")}. Click the name in the table to add it.</p>`:"")
     +`<div class="bar"><label class="btn">Import from Excel<input type="file" accept=".xlsx,.xls,.csv" data-do="import" hidden></label><button class="g" data-do="addstu">Add a student</button></div>`
