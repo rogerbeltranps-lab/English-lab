@@ -150,18 +150,27 @@ async function award(i){
 // One write per game; results.html reads a group's documents (one per game played) and draws the charts. Teacher only (firestore.rules).
 //   {group, course, deck, title, kind: vocab | grammar | mixed, ls, lp, sid, day, term, at, qn (questions in the game), done (shown),
 //    qs:[{n, q, right, of}] (n = question number, right / of = students right / students who answered),
-//    stu:[{e, r, a, miss:[n…]}] (e = email, r = right, a = answered, miss = the shown questions they got wrong or didn't answer)}
+//    stu:[{e, r, a, miss:[n…], ans:{n: their answer}, notes:{p<k>: text}}] (e = email, r = right, a = answered, miss = the shown questions
+//    they got wrong or didn't answer, ans = what they tapped or wrote, notes = their 📝 notes), qs[].ok = the right answer,
+//    nts:[{k, topic}] (the notes slides; a game is saved also when nobody answered a question but someone wrote notes)}
 let savedSid=0;
 async function saveResults(){
   if(!H.g||!H.sid||savedSid===H.sid||!H.deck)return;
-  const qs=qList(),shown=qs.filter(i=>H.aw[i]);if(!shown.length)return;
+  const qs=qList(),shown=qs.filter(i=>H.aw[i]);if(!shown.length&&!slides().some((s,i)=>isN(s)&&answered(i).length))return;
   const meta=(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{},num=i=>qs.indexOf(i)+1;
-  const stu=Object.entries(H.players).map(([e,a])=>{const miss=shown.filter(i=>!H.aw[i].includes(e)).map(num);
-    return {e,r:shown.length-miss.length,a:shown.filter(i=>a[i]!=null).length,miss}});
+  // each student's own answers (Roger, 6 Nov 2026: "I want to be able to see the answers of each student, their performance and their
+  // notes of the LS"): ans {n: the option they tapped or what they wrote}, notes {p<k>: what they wrote on the 📝 notes slides}
+  const nIdx=slides().map((s,i)=>isN(s)?i:-1).filter(i=>i>=0);
+  const said=(i,v)=>{const s=slides()[i];if(v==null)return null;if(isW(s))return String(v).slice(0,80);const k=order(i)[v];return k==null?null:String(s.options[k]).replace(/\*\*/g,"").slice(0,80)};
+  const stu=Object.entries(H.players).map(([e,a])=>{const miss=shown.filter(i=>!H.aw[i].includes(e)).map(num),ans={},notes={};
+    shown.forEach(i=>{const v=said(i,a[i]);if(v!=null)ans[num(i)]=v});
+    nIdx.forEach(i=>{if(typeof a[i]==="string"&&a[i].trim())notes["p"+slides()[i].notes]=a[i].slice(0,3000)});
+    return {e,r:shown.length-miss.length,a:shown.filter(i=>a[i]!=null).length,miss,ans,notes}});
   const d=new Date(H.sid),day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   const doc={group:H.g,course:meta.course||H.deck.course||"",deck:H.deckId,title:H.deck.title,kind:meta.kind||"mixed",ls:meta.ls||"",lp:meta.lp||"",
     sid:H.sid,day,term:H.term,at:S.serverTimestamp(),qn:qs.length,done:shown.length,
-    qs:shown.map(i=>({n:num(i),q:String(slides()[i].q).replace(/\*\*/g,"").slice(0,160),right:H.aw[i].length,of:answered(i).length})),stu};
+    qs:shown.map(i=>({n:num(i),q:String(slides()[i].q).replace(/\*\*/g,"").slice(0,160),ok:String(isW(slides()[i])?slides()[i].write[0]:slides()[i].options[0]).replace(/\*\*/g,"").slice(0,80),right:H.aw[i].length,of:answered(i).length})),
+    nts:nIdx.map(i=>({k:"p"+slides()[i].notes,topic:slides()[i].topics.join(" · ").slice(0,200)})),stu};
   savedSid=H.sid;
   try{await S.setDoc(S.doc(db,"gameResults",H.g+"_"+H.sid),doc)}catch(e){savedSid=0;console.warn("results",e);H.err="⚠ Results not saved: "+e.message;draw()}
 }

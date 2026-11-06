@@ -69,8 +69,9 @@ function draw(){
 // they can see on their LS: your notes"). After the theory slides the board shows a notes slide (live/{group}.nt = {k, topics, deck, ls,
 // lp, title, course}); here the student types their notes. Saved in students/{uid}/notes/{deck} = {ls, course, deck, title, lp,
 // parts:{p<k>:{topic, text, at}}, updated} (firestore.rules: their own), 2.5 s after they stop typing and when the teacher goes on;
-// the LS home page shows them in 📝 Your notes (shared/js/el-notes.js), where they can also change them. The same game played again
-// brings back what they wrote (one read per game). The board counts who has written: a:{slide: number of characters}, once.
+// the LS home page shows them, read only, in 📝 Your notes (shared/js/el-notes.js; Roger, 6 Nov 2026: "they can't edit, they only can see
+// them after they do them in the formative games"). The same game played again brings back what they wrote (one read per game). The text
+// also goes to the game's answers doc (a:{slide: text}): the board counts who is writing and saves it with the results for the teacher.
 const NT={k:"",pk:"",i:"",meta:null,v:"",dirty:false,t:0,docs:{},sent:{},st:""};
 const noteRef=deck=>S.doc(db,"students",user.uid,"notes",deck);
 async function notesLoad(deck){
@@ -89,7 +90,8 @@ async function saveNotes(){
   try{await S.setDoc(noteRef(m.deck),{ls:m.ls||"",course:m.course||"",deck:m.deck,title:m.title||"",lp:m.lp||"",parts:{[NT.pk]:part},updated:now},{merge:true});
     const d=NT.docs[m.deck]||(NT.docs[m.deck]={});d.parts=Object.assign({},d.parts,{[NT.pk]:{text}});
     if(NT.k===k)noteState("saved");
-    if(text.trim()&&!NT.sent[k]&&ref&&mySid===x.sid){NT.sent[k]=1;S.setDoc(ref,{sid:mySid,a:{[i]:text.length},at:S.serverTimestamp()},{merge:true}).catch(e=>{NT.sent[k]=0;console.warn("notes count",e)})}
+    // the same text in this game's answers doc: the board counts who is writing and keeps the notes with the game's results (results.html)
+    if((text.trim()||NT.sent[k])&&ref&&mySid===x.sid){NT.sent[k]=1;S.setDoc(ref,{sid:mySid,a:{[i]:text},at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("notes answer",e))}
   }catch(e){console.warn("notes",e);NT.dirty=true;if(NT.k===k)noteState("err");NT.t=setTimeout(saveNotes,8e3)}
 }
 function notesView(){
