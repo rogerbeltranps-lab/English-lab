@@ -28,9 +28,11 @@ window.ELCheckpoint = (function () {
   const FS_GRACE = 300, D = document, E = D.documentElement;
   const fsOk = () => !!(D.fullscreenEnabled || D.webkitFullscreenEnabled);
   const isFull = () => !!(D.fullscreenElement || D.webkitFullscreenElement);
-  const goFull = () => { try { if (!fsOk() || isFull()) return; const r = (E.requestFullscreen || E.webkitRequestFullscreen).call(E);
+  const goFull = () => { try { if (!fsOk()) return;
     // Esc does not leave full screen (Chrome and Chromebooks: Keyboard Lock); only holding Esc down does, and that sends the checkpoint
     const lock = () => { try { if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(['Escape']).catch(() => {}); } catch (e) {} };
+    if (isFull()) { lock(); return; }   // already in full screen (e.g. the class full screen of el-cloud.js): Esc is still locked
+    const r = (E.requestFullscreen || E.webkitRequestFullscreen).call(E);
     if (r && r.then) r.then(lock, () => {}); else lock(); } catch (e) {} };
   const exitFull = () => { try { if (isFull()) (D.exitFullscreen || D.webkitExitFullscreen).call(D); } catch (e) {} };
   const on = (el, ev, f, o) => { el.addEventListener(ev, f, o); off.push(() => el.removeEventListener(ev, f, o)); };

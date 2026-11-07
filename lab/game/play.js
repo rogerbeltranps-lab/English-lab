@@ -32,6 +32,8 @@ function draw(){
   if(!group)return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>You are not on a class list yet. Ask your teacher.</p></div>`);
   if(!gameOn())return page(`<div class="emo pop">⏳</div><p class="big">${x&&x.game&&x.phase==="end"?"The game is over":"Waiting for your teacher…"}</p><p class="mid">The game opens here by itself.</p>`);
   const ph=x.phase,i=String(x.i),q=x.q||{},n=(q.opts||[]).length;
+  if(NT.dirty&&!(ph==="notes"&&x.sid+":"+i===NT.k))saveNotes();   // the teacher went on: what they wrote is saved
+  if(ph==="notes")return notesView();
   if(ph==="lobby")return page(`<div class="emo pop">🎉</div><p class="big">You're in, ${esc(first())}!</p><p class="mid">Look for your name on the board.</p>`);
   if(ph==="theory")return page(`<div class="emo pop">${pic(x.th&&x.th.img)||"👀"}</div><p class="big">Look at the board</p><p class="mid">${md(x.th&&x.th.title)}</p>`);
   if(ph==="end"){const s=score(),t=x.qt||0;
@@ -62,6 +64,57 @@ function draw(){
       ${right?"":`<p class="mid">The answer: <b>${md((q.opts||[])[ok])}</b></p>`}<p class="mid">Look at the board.</p></div></div>`;return}
   page(`<p class="big">Look at the board</p>`);
 }
+
+// 📝 Take your notes (Roger, 6 Nov 2026: "in the slides I explain theory, I want students to have a slide with: Take your notes: and then
+// they can see on their LS: your notes"). After the theory slides the board shows a notes slide (live/{group}.nt = {k, topics, deck, ls,
+// lp, title, course}); here the student types their notes. Saved in students/{uid}/notes/{deck} = {ls, course, deck, title, lp,
+// parts:{p<k>:{topic, text, at}}, updated} (firestore.rules: their own), 2.5 s after they stop typing and when the teacher goes on;
+// the LS home page shows them, read only, in 📝 Your notes (shared/js/el-notes.js; Roger, 6 Nov 2026: "they can't edit, they only can see
+// them after they do them in the formative games"). The same game played again brings back what they wrote (one read per game). The text
+// also goes to the game's answers doc (a:{slide: text}): the board counts who is writing and saves it with the results for the teacher.
+const NT={k:"",pk:"",i:"",meta:null,v:"",dirty:false,t:0,docs:{},sent:{},st:""};
+const noteRef=deck=>S.doc(db,"students",user.uid,"notes",deck);
+async function notesLoad(deck){
+  if(NT.docs[deck]!==undefined||!user)return;NT.docs[deck]=null;
+  try{const d=await S.getDoc(noteRef(deck));NT.docs[deck]=d.exists()?d.data():{}}catch(e){console.warn("notes",e);NT.docs[deck]={}}
+  const ta=document.getElementById("nt"),old=((NT.docs[deck].parts||{})[NT.pk]||{}).text||"";
+  if(ta&&NT.meta&&NT.meta.deck===deck&&!ta.value&&old){ta.value=NT.v=old;noteState("")}
+}
+function noteState(st){if(st!=null)NT.st=st;const e=document.getElementById("ntst");if(!e)return;
+  e.textContent=NT.st==="saving"?T("Saving…","Desant…"):NT.st==="saved"?T("✓ Saved on your LS page, in 📝 Your notes","✓ Desat a la pàgina de la LS, a 📝 Els teus apunts")
+    :NT.st==="err"?T("⚠ Not saved yet: keep writing, it tries again","⚠ Encara no s'ha desat: continua escrivint, ho torna a provar"):T("Saved by itself while you write.","Es desa sol mentre escrius.")}
+async function saveNotes(){
+  clearTimeout(NT.t);if(!NT.dirty||!user||!NT.meta||!NT.meta.deck)return;NT.dirty=false;
+  const m=NT.meta,text=NT.v.slice(0,3000),k=NT.k,i=NT.i,now=S.serverTimestamp();noteState("saving");
+  const part={topic:(m.topics||[]).join(" · ").slice(0,200),text,at:now};
+  try{await S.setDoc(noteRef(m.deck),{ls:m.ls||"",course:m.course||"",deck:m.deck,title:m.title||"",lp:m.lp||"",parts:{[NT.pk]:part},updated:now},{merge:true});
+    const d=NT.docs[m.deck]||(NT.docs[m.deck]={});d.parts=Object.assign({},d.parts,{[NT.pk]:{text}});
+    if(NT.k===k)noteState("saved");
+    // the same text in this game's answers doc: the board counts who is writing and keeps the notes with the game's results (results.html)
+    if((text.trim()||NT.sent[k])&&ref&&mySid===x.sid){NT.sent[k]=1;S.setDoc(ref,{sid:mySid,a:{[i]:text},at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("notes answer",e))}
+  }catch(e){console.warn("notes",e);NT.dirty=true;if(NT.k===k)noteState("err");NT.t=setTimeout(saveNotes,8e3)}
+}
+function notesView(){
+  const nt=x.nt||{},k=x.sid+":"+x.i,ta=document.getElementById("nt");
+  if(ta&&ta.dataset.k===k)return;   // a redraw (the board's beat) keeps the box, the caret and what they are typing
+  if(NT.k!==k){Object.assign(NT,{k,pk:"p"+nt.k,i:String(x.i),meta:nt,v:((NT.docs[nt.deck]&&NT.docs[nt.deck].parts||{})["p"+nt.k]||{}).text||"",st:""})}
+  const tp=(nt.topics||[]).filter(Boolean);
+  // a copy of the theory slides next to the box (Roger, 6 Nov 2026: "they get a copy of the slides"): decks/theory.js has only the theory
+  const th=(((window.EL_GAME_THEORY||{})[nt.deck]||{}).parts||[]).find(p=>p.k==="p"+nt.k);
+  const bl=l=>l&&l.table?`<table><thead><tr>${l.table[0].map(c=>`<th>${md(c)}</th>`).join("")}</tr></thead><tbody>${l.table.slice(1).map(r=>`<tr>${r.map(c=>`<td>${md(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`
+    :l&&l.watch?`<p class="w">⚠️ ${md(l.watch)}</p>`:`<p>${md(l)}</p>`;
+  const thHtml=th?`<div class="nth">${th.slides.map(s=>`<h4>${md(s.theory)}</h4>${(s.lines||[]).map(bl).join("")}`).join("")}</div>`:"";
+  app$.innerHTML=top()+`<div class="main"><form class="nform slidein${th?" two":""}" data-k="${esc(k)}"><div class="nhead"><span class="nemo">📝</span><div><label for="nt" class="nlab">${esc(T("Take your notes:","Pren apunts:"))}</label>
+      ${tp.length?`<div class="ntop">${tp.map(t=>`<span>${md(t)}</span>`).join("")}</div>`:""}</div></div>${thHtml}
+      <textarea id="nt" data-k="${esc(k)}" maxlength="3000" spellcheck="false" placeholder="${esc(T("In your own words: the rule, two examples and the mistake to avoid. Look at the board.","Amb les teves paraules: la regla, dos exemples i l'error que has d'evitar. Mira la pissarra."))}">${esc(NT.v)}</textarea>
+      <p class="nst" id="ntst"></p></form></div>`;
+  noteState(null);
+  const t=document.getElementById("nt");t.focus();t.setSelectionRange(t.value.length,t.value.length);
+  if(nt.deck)notesLoad(nt.deck);
+}
+app$.addEventListener("input",e=>{if(e.target.id!=="nt")return;NT.v=e.target.value;NT.dirty=true;noteState("");clearTimeout(NT.t);NT.t=setTimeout(saveNotes,2500)});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")saveNotes()});
+addEventListener("pagehide",()=>saveNotes());
 
 function send(v){   // a written answer, once
   if(!gameOn()||x.phase!=="q"||!(x.q&&x.q.write))return;const i=String(x.i);v=String(v||"").replace(/\s+/g," ").trim().slice(0,60);
@@ -103,3 +156,49 @@ A.onAuthStateChanged(auth,async u=>{
   draw();
 });
 let wasOn=false;setInterval(()=>{if(x&&gameOn()!==wasOn)draw();wasOn=gameOn()},30e3);   // the board stopped sending (closed): back to waiting
+
+// ⛶ Full screen in the game (Roger, 6 Nov 2026: "when they are playing a game, I want them to be in full screen too"): while a game is on
+// (lobby to the last question), the player is covered until the student taps it (a browser only goes full screen after a tap), then
+// Esc is locked (Chrome and Chromebooks: Keyboard Lock, only holding Esc down leaves). Leaving full screen brings the cover back and
+// writes live/{group}/fsLeft/{email} = {name, at, pull, n} (pull = the group's full screen fs.at when it is on, else this game's sid),
+// the same list as the dashboard's; the board shows it too. Not for the teacher, not on iPhones (no full screen for pages there).
+// Catalan only for Starter and Base: ?ca=1 (el-cloud.js knows the level), ?ca=0 English, none (another page brought them here) both.
+const FD=document,FE=FD.documentElement,CA=P.get("ca");
+const T=(en,ca)=>CA==="1"?ca:CA==="0"?en:en+" · "+ca;
+const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!(FD.fullscreenElement||FD.webkitFullscreenElement);
+const isT=()=>!!user&&TEACHERS.includes((user.email||"").toLowerCase());
+const fsOnG=f=>!!(f&&f.on&&f.at&&Date.now()<(f.until||f.at+70*60e3));
+const pullKey=()=>fsOnG(x&&x.fs)?x.fs.at:x&&x.sid;
+const ss=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}};
+let fsWas=false,bye=false;addEventListener("beforeunload",()=>{bye=true});addEventListener("pagehide",()=>{bye=true});   // ← Back: not leaving
+const fsWanted=()=>!!(user&&group&&!isT()&&gameOn()&&x.phase!=="end"&&fsCan());
+function fsLeft(){const pk=pullKey();if(!pk)return;const k="el_fs_"+pk+"_n",n=(+ss(k)||0)+1;ss(k,String(n));
+  S.setDoc(S.doc(db,"live",group,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:S.serverTimestamp(),pull:pk,n},{merge:true}).catch(e=>console.warn("full screen",e))}
+function fsGo(){try{const lk=()=>{try{if(navigator.keyboard&&navigator.keyboard.lock)navigator.keyboard.lock(["Escape"]).catch(()=>{})}catch(e){}},
+  r=(FE.requestFullscreen||FE.webkitRequestFullscreen).call(FE);if(r&&r.then)r.then(()=>{lk();fsCheck()},()=>{});else{lk();fsCheck()}}catch(e){}}
+function fsCheck(){let c=document.getElementById("el-fs");
+  if(!fsWanted()){if(c)c.remove();if(fsWas){fsWas=false;try{if(navigator.keyboard&&navigator.keyboard.unlock)navigator.keyboard.unlock()}catch(e){}
+    try{if(fsIs())(FD.exitFullscreen||FD.webkitExitFullscreen).call(FD)}catch(e){}}return}
+  if(fsIs()){if(c)c.remove();fsWas=true;return}
+  const left=fsWas;if(left){fsWas=false;setTimeout(()=>{if(!bye)fsLeft()},500)}
+  const again=left||(+ss("el_fs_"+pullKey()+"_n")||0)>0;
+  if(!c){c=document.createElement("div");c.id="el-fs";c.setAttribute("role","button");
+    c.style.cssText="position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:#3d1d8f;color:#fff;cursor:pointer";
+    c.onclick=fsGo;document.body.append(c)}
+  const h=(again?T("You left full screen. Your teacher can see it.","Has sortit de la pantalla completa. El professor ho veu."):T("The game is in full screen.","El joc és a pantalla completa."))
+    +"|"+(again?T("Tap to go back to the game","Toca per tornar al joc"):T("Tap to join the game","Toca per entrar al joc"));
+  if(c.dataset.h!==h){c.dataset.h=h;const [a,b]=h.split("|");c.innerHTML='<div class="emo pop">'+(again?"⛶":"🎮")+'</div><p class="big" style="max-width:760px"></p><span class="btn go"></span>';
+    c.children[1].textContent=a;c.children[2].textContent=b+" →"}}
+FD.addEventListener("fullscreenchange",()=>fsCheck());FD.addEventListener("webkitfullscreenchange",()=>fsCheck());
+// 📴 Connected (Roger, 6 Nov 2026: "if they disconnect, the teacher's board shows it"): during a game the player beats
+// live/{group}/here/{email} = {name, seen, off} once a minute, and off:true at once when the page is hidden (lid closed, another window).
+// The board and the dashboard list who stopped beating (elClassWatch in el-catalog.js, host.js).
+let beatAt=0,beatSid=0;
+function beat(off){if(!user||!group||isT())return;beatAt=Date.now();
+  S.setDoc(S.doc(db,"live",group,"here",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",seen:S.serverTimestamp(),off:!!off,fs:!fsWanted()||fsIs()}).catch(e=>console.warn("here",e))}
+let okWas=null;   // in or out of full screen: sent at once when it changes
+document.addEventListener("visibilitychange",()=>{if(!gameOn()||x.phase==="end")return;if(document.visibilityState==="hidden"){if(!bye)beat(true)}else beat(false)});
+function hereTick(){if(!gameOn()||x.phase==="end"||document.visibilityState!=="visible")return;
+  const ok=!fsWanted()||fsIs(),ch=okWas!==null&&ok!==okWas;okWas=ok;
+  if(ch||x.sid!==beatSid||Date.now()-beatAt>=60e3){beatSid=x.sid;beat(false)}}
+setInterval(()=>{fsCheck();hereTick()},1000);FD.addEventListener("fullscreenchange",hereTick);FD.addEventListener("webkitfullscreenchange",hereTick);

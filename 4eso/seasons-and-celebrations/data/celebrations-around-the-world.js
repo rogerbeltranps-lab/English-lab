@@ -15,7 +15,7 @@ window.LP = {
         { r: 'safe', q: 'It’s ___ today. Wear a jumper.', a: ['chilly', 'cold', 'cool'] }
       ] },
     { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Vocabulari de celebracions', en: 'Celebration vocabulary' },
-      intro: { ca: 'Explora cada expressió, practica amb les targetes i completa les frases (80 %).', en: 'Explore each expression, practise with the cards and complete the sentences (80 %).' },
+      intro: { ca: 'Explora cada expressió, practica amb les targetes i completa les frases.', en: 'Explore each expression, practise with the cards and complete the sentences.' },
       receptive: 'menorah · diyas (oil lamps) · lanterns · reunion dinner · Advent calendar · Caga Tió',
       core: { insecure: ['celebration', 'festival', 'holiday', 'tradition', 'custom', 'parade', 'fireworks', 'lights', 'candles', 'decorations', 'present / gift', 'costume', 'special meal', 'relatives', 'celebrate', 'decorate', 'dress up', 'give / get presents', 'visit relatives', 'light candles'], safe: ['tradition', 'custom', 'parade', 'fireworks', 'decorations', 'relatives', 'celebrate', 'dress up', 'light candles', 'gather', 'get together', 'take part in', 'look forward to', 'pass down', 'share a meal', 'exchange gifts', 'meaningful', 'traditional', 'religious', 'crowded'], daring: ['tradition', 'custom', 'celebrate', 'take part in', 'look forward to', 'pass down', 'mark an occasion', 'exchange gifts', 'meaningful', 'religious', 'secular', 'belonging', 'heritage', 'roots', 'community', 'ritual', 'gratitude', 'commemorate', 'honour the dead / ancestors', 'the festive season'] },
       groups: [
@@ -41,7 +41,7 @@ window.LP = {
         { r: 'daring', q: 'Many families ___ their ancestors on All Saints’ Day.', a: ['honour', 'honor'] },
         { r: 'daring', q: 'Celebrations give people a sense of ___ to a community.', a: ['belonging'] }
       ] },
-    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Four celebrations, four seasons', pill: { ca: '80 % per completar', en: '80 % to complete' },
+    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Four celebrations, four seasons', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix una vegada per saber de quines festes parla. Després busca a cada paràgraf la frase que respon cada pregunta.', en: 'Read once to see which celebrations it describes. Then find the sentence that answers each question.' },
       media: { text: {
         beginners: '<p><strong>Diwali.</strong> Diwali is the festival of lights. It is in October or November. People decorate their houses and light small oil lamps called diyas. Families give presents and eat sweets. There are fireworks at night.</p><p><strong>Hanukkah.</strong> Hanukkah is a Jewish festival in December. It lasts eight nights. Every night, families light one more candle. Children play with a spinning top.</p><p><strong>Lunar New Year.</strong> Lunar New Year is in late January or February. Families have a big dinner together. There are red lanterns and dragon dances in the streets.</p><p><strong>Castanyada.</strong> In Catalonia, we celebrate the Castanyada on 31 October. We eat chestnuts, sweet potatoes and panellets.</p><p class="tiny"><strong>Paraules:</strong> lights = llums · oil lamps = llànties d’oli · sweets = dolços · candle = espelma · spinning top = baldufa · lanterns = fanalets</p>',
@@ -94,7 +94,7 @@ window.LP = {
         { r: 'safe', q: 'What does Diwali celebrate, according to the video?', o: ['good over evil and light over darkness', 'the end of the school year', 'the harvest of apples'] },
         { r: 'daring', q: 'Which idea from the video also appears in the reading text?', o: ['Families share food and exchange gifts.', 'Children get red envelopes.', 'People play with a dreidel.'] }
       ] },
-    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple per a costums · on / in / at', en: 'Present Simple for customs · on / in / at' }, pill: '80 %',
+    { id: 'grammar', type: 'typed', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple per a costums · on / in / at', en: 'Present Simple for customs · on / in / at' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa les frases. Si falles dues vegades, et mostrarem la resposta.', en: 'Read how it works and complete the sentences. After two wrong tries you will see the answer.' },
       explain: [
         { ca: 'Fem servir el <strong>Present Simple</strong> per parlar de costums que es repeteixen cada any: <em>People decorate their houses. Children dress up. We don’t work on 25 December.</em>', en: 'We use the <strong>Present Simple</strong> for customs that happen every year: <em>People decorate their houses. Children dress up. We don’t work on 25 December.</em>' },
@@ -119,7 +119,7 @@ window.LP = {
         { r: 'daring', q: 'People exchange gifts at midnight. → Gifts ___ ___ at midnight.', a: ['are exchanged'], en: 'are + past participle.' },
         { r: 'daring', q: 'They don’t sell chestnuts in summer. → Chestnuts ___ ___ ___ in summer.', a: ["aren't sold", 'are not sold'], en: 'Negative passive: aren’t + past participle.' }
       ] },
-    { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada (LS1 + LS2)', en: 'Mixed practice (LS1 + LS2)' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada (LS1 + LS2)', en: 'Mixed practice (LS1 + LS2)' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Aquí es barregen coses noves i de la LS1: primer pensa quina forma necessites.', en: 'New and LS1 language mixed: first decide which form you need.' },
       items: [
         { q: 'The parade starts ___ ten o’clock.', a: ['at'], ca: 'Hora → at.', en: 'Clock time → at.' },

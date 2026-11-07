@@ -19,7 +19,7 @@ window.LP = {
         { r: 'daring', q: 'How ___ do you play football? — Twice a week.', a: ['often'], en: 'How often…? asks about frequency.' }
       ] },
     { id: 'vocab', type: 'vocab', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Activitats de temps lliure', en: 'Free-time activities' },
-      intro: { ca: 'Explora les paraules, practica amb les targetes i completa les frases (80 %).', en: 'Explore the words, practise with the cards and complete the sentences (80 %).' },
+      intro: { ca: 'Explora les paraules, practica amb les targetes i completa les frases.', en: 'Explore the words, practise with the cards and complete the sentences.' },
       receptive: 'livestream · subscribers · highlights · fans',
       core: { insecure: ['play football', 'play basketball', 'play video games', 'play the guitar', 'play the piano', 'go swimming', 'go skating', 'go cycling', 'go to the park', 'do karate', 'do gymnastics', 'do yoga', 'dance', 'draw', 'read comics', 'listen to music', 'meet friends'], safe: ['play football', 'play basketball', 'play video games', 'play the guitar', 'go swimming', 'go skating', 'go cycling', 'do karate', 'do gymnastics', 'do yoga', 'dance', 'draw', 'read comics', 'listen to music', 'meet friends', 'once a week', 'twice a week', 'every day', 'at the weekend', 'in my free time'], daring: ['play football', 'play video games', 'play the guitar', 'go swimming', 'go skating', 'go cycling', 'do karate', 'do yoga', 'draw', 'read comics', 'listen to music', 'meet friends', 'once a week', 'twice a week', 'at the weekend', 'in my free time', 'be good at', 'spend time + -ing', 'join a club', 'practise'] },
       groups: [
@@ -49,7 +49,7 @@ window.LP = {
         { r: 'daring', q: 'He is very good ___ basketball.', a: ['at'] },
         { r: 'daring', q: 'I ___ a lot of time drawing. (passar)', a: ['spend'] }
       ] },
-    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Two posts from Saturday', pill: '80 %',
+    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Two posts from Saturday', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix dos missatges d’un grup de classe. Fixa’t en què fan normalment i en què fan avui.', en: 'Read two posts from a class group chat. Notice what people usually do and what they are doing today.' },
       media: { text: {
         beginners: '<p><strong>Post 1 · Marta, 10:30</strong><br>Hi! I’m at the skate park. ☀️ It’s sunny. I’m here with Pol and Aina. Pol is skating. Aina is taking photos. I usually come here on Saturdays. Today there is a competition at 12. Come and watch!</p><p><strong>Post 2 · Hugo, 16:45</strong><br>Hi! I’m at home. ☔ It’s raining. No football today. I usually play football on Saturdays. Now I’m playing video games with my brother. Boring!</p><p class="tiny"><strong>Paraules:</strong> skate park = parc d’skate · taking photos = fent fotos · competition = competició · raining = plou · boring = avorrit</p>',
@@ -69,7 +69,7 @@ window.LP = {
         { r: 'daring', q: 'Why does Marta say “we need fans”?', o: ['She wants people to come and support them at the competition.', 'The skate park is empty.', 'She is selling tickets.'] },
         { r: 'daring', q: 'How does Hugo feel about his afternoon?', o: ['It’s fine, but he prefers playing football.', 'He loves it.', 'He hates video games.'] }
       ] },
-    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Where are you?', pill: { ca: 'Àudio · 80 %', en: 'Audio · 80 %' },
+    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Where are you?', pill: { ca: 'Àudio', en: 'Audio' },
       intro: { ca: 'La Laia truca a l’Omar un dissabte. Escolta una vegada per saber on és. Després llegeix les preguntes i torna a escoltar.', en: 'Laia phones Omar on a Saturday. Listen once to find out where he is. Then read the questions and listen again.' },
       media: { audio: 'audio/where-are-you.mp3', title: 'Where are you? (Laia and Omar)', script: [
         ['Laia', '[cheerful] Hi Omar! Where are you? It’s really noisy.'],

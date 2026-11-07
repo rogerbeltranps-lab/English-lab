@@ -6,6 +6,9 @@
 #     (tools/notify/notify.mjs)
 #   • Sunday about 18:00: each student's summary of the coming week (homework, classes on their own) and what the teacher answered or
 #     corrected, from the teacher's school account. (tools/notify/students.mjs)
+#   • every day about 16:40 Madrid (after the Wednesday 15:00 marking and the Friday 15:00 answers): each student with something new on their
+#     board since the last run gets one email: exam results, final product mark, corrections, answers to comments and problem reports
+#     (tools/notify/news.mjs; what each student was told is kept in the Actions cache). Homework and announcements are emailed by the dashboard.
 # GitHub may start a run a few minutes late. Secret (repo Settings > Secrets and variables > Actions): SCHOOL_MAIL_URL, the web app link of
 # the teacher's Apps Script in roger.beltran@ietramuntana.cat (tools/notify/school-mail.gs; students only receive mail from the school
 # domain and the school blocks app passwords), and SCHOOL_MAIL_KEY, the KEY in that script. Optional: SCHOOL_APP_PASSWORD, ALERT_EMAIL_TO, GMAIL_APP_PASSWORD (+ GMAIL_USER) for the
@@ -17,7 +20,8 @@ on:
   schedule:
     - cron: "*/15 6-21 * * *"
     - cron: "0 7 * * 6"
-    - cron: "0 17 * * 0"
+    # - cron: "0 17 * * 0"   # paused (Roger, 6 Nov 2026: ask before sending); run it by hand: Sunday emails to all students
+    # - cron: "40 15 * * *"   # paused (Roger, 6 Nov 2026: ask before sending); run it by hand: new results to students
   workflow_dispatch:
     inputs:
       send:
@@ -29,6 +33,8 @@ on:
           - new reports and ideas to me
           - one student's Sunday email, to me
           - Sunday emails to all students
+          - new results to students
+          - one student's results email, to me
         default: test email to me
 
 concurrency:
@@ -54,6 +60,7 @@ jobs:
       GMAIL_USER: ${{ secrets.GMAIL_USER }}
       ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
       NOTIFY_STATE: .notify-state.json
+      NEWS_STATE: .news-state.json
       SEND: ${{ inputs.send }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       SCHEDULE: ${{ github.event.schedule }}
@@ -73,6 +80,8 @@ jobs:
             "0 7 * * 6|"|"|Saturday email to me") m="notify.mjs" ;;
             "0 17 * * 0|"|"|Sunday emails to all students") m="students.mjs" ;;
             "|one student's Sunday email, to me") m="students.mjs --test" ;;
+            "40 15 * * *|"|"|new results to students") m="news.mjs" ;;
+            "|one student's results email, to me") m="news.mjs --test" ;;
             "|test email to me") m="notify.mjs --test" ;;
             *) m="notify.mjs --instant" ;;
           esac
@@ -84,6 +93,13 @@ jobs:
           path: .notify-state.json
           key: teacher-emails-${{ github.run_id }}
           restore-keys: teacher-emails-
+      # what each student was last told about new results (news.mjs); the newest cache whose name starts with student-news-
+      - if: steps.mode.outputs.run == 'news.mjs'
+        uses: actions/cache/restore@v4
+        with:
+          path: .news-state.json
+          key: student-news-${{ github.run_id }}
+          restore-keys: student-news-
       - name: Build and send
         run: node tools/notify/${{ steps.mode.outputs.run }}
       - if: steps.mode.outputs.run == 'notify.mjs --instant' && hashFiles('.notify-state.json') != ''
@@ -91,3 +107,8 @@ jobs:
         with:
           path: .notify-state.json
           key: teacher-emails-${{ github.run_id }}-${{ github.run_attempt }}
+      - if: steps.mode.outputs.run == 'news.mjs' && hashFiles('.news-state.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .news-state.json
+          key: student-news-${{ github.run_id }}-${{ github.run_attempt }}

@@ -28,6 +28,11 @@ window.EL_CEFR={"2eso":{beginners:["A1","A1","A1"],insecure:["A1+","A1+ / A2 ini
 window.elCefr=(c,lv,full)=>{const x=((window.EL_CEFR[c]||{})[lv])||((window.EL_CEFR[c]||{})[lv==="native"?"daring":lv]);return x?(full?x[2]:x[0]):""};
 // "2ESO Starter (A1)": what students read as their level (board, English Lab, practice page, level notice)
 window.elLevelLabel=(c,lv)=>{const n=((window.EL_LEVELS||[]).find(l=>l.id===lv)||{}).name||lv;if(!lv)return "";const k=elCefr(c,lv);return (c?c.toUpperCase()+" ":"")+n+(k?" ("+k+")":"")};
+// English Lab by level, not by course (Roger, 6 Nov 2026: "hauria d'estar per nivells no per cursos"): one ladder of CEFR steps; each step
+// is every [course, route] whose level is that step (A1 = 2 ESO Starter + 4 ESO Starter, A2 = 2 ESO Core + 4 ESO Base...), so students of
+// the same level in both courses share the practice. [{k:"A2", pairs:[["2eso","safe"],["4eso","insecure"]]}, ...]
+window.elLadder=()=>{const o={};Object.keys(window.EL_CEFR).forEach(c=>Object.keys(window.EL_CEFR[c]).forEach(lv=>{const k=window.EL_CEFR[c][lv][0];(o[k]=o[k]||[]).push([c,lv])}));
+  return ["A1","A1+","A2","A2+","B1","B1+","B2","C1","C2"].filter(k=>o[k]).map(k=>({k,pairs:o[k]}))};
 window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructions in Catalan
 // The student's route in an LS. The teacher sets routes (Roger, 26 Oct 2026: from the LS1 exam mark, on the dashboard). An LS with
 // no route of its own takes the latest route set in an earlier LS of the same course (EL_LS order), so a route carries over to every
@@ -198,18 +203,107 @@ window.elSecLockedFor=function(a,info,gid,done){const op=secOf(info,"secOpened",
 // or was opened before, holds steps and has some not done. Returns [[panel id, name]].
 window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk))return [];const op=secOf(info,"secOpened",gid,a)||[];
   return ((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>(!lk.includes(id)||op.includes(id))&&elSecSteps(a,id).length&&!secDone(a,id,done))};
+// ✅ To do (Roger, 6 Nov 2026: "When I open a section it must be set as to do. So in each class I open a section or LP and they see it as
+// to do. They are only homework if I say so (I can say that a LP is homework or only a section)"): every learning path of an open LS that
+// the teacher has opened for the group (elLpOpen) and the student has not finished, with its tabs that are open for them (elSecLockedFor:
+// not locked, or opened before and not finished) and hold steps not done yet. Opening is enough: nothing else to set. Dropped paths and the
+// final product handed in on Classroom are left out. Homework is separate: only what the teacher sets with 🏠 Set as homework (elHwTargets).
+// The board's ✅ To do and the floating ✅ To do button (el-todo.js) use it. p, gi = the group's plan (or null, -1); doneOf(a) = Set of the
+// student's done steps; isDone(a) = every step done. Returns [{a, tabs: [[panel id, name]], due, late, cp}] in the order of the plan
+// (due day, then the LS's order); cp = the recall checkpoint to do first (elCheckpointMissing), or null.
+window.elTodoList=function(ls,info,gid,doneOf,isDone,p,gi){const st=info&&info.status==="public"?"open":info&&info.status;if(st!=="open"||!gid)return [];
+  const W=window.ELWeek,today=W?W.today():new Date().toISOString().slice(0,10),dr=(p&&gi>=0&&(p._dropped||{})[gi])||[],due=a=>p&&gi>=0&&W?W.due(p,a.id,gi):null;
+  return (window.EL_CATALOG||[]).filter(a=>a.ls===ls).map((a,i)=>({a,i,d:due(a)})).filter(({a})=>!a.manual&&!dr.includes(a.id)&&elLpOpen(a,info,gid)&&!isDone(a))
+    .sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i)
+    .map(({a,d})=>{const done=doneOf(a),secs=(window.EL_SECTIONS||{})[a.id]||[],off=secs.length?elSecLockedFor(a,info,gid,done):[];
+      const tabs=secs.filter(([id])=>!off.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done));
+      if(secs.length&&!tabs.length)return null;   // what is open is done; the rest is still locked
+      return {a,tabs,due:d,late:!!(d&&d<today),cp:elCheckpointMissing(a,doneOf,y=>elLpOpen(y,info,gid))}}).filter(Boolean)};
+// "LP3" in the group's plan → its learning path ("LP3 Where traditions come from" somewhere in the plan): {"3": activity}
+window.elLpNumMap=function(ls,p,gi){const m={},acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls),sh=x=>String(x).split(/[:(]/)[0].trim().toLowerCase();
+  ((p&&p.rows)||[]).forEach(r=>String(r.g?r.g[gi]||"":r.what||"").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,n,name)=>{const nm=name.trim().toLowerCase(),a=acts.find(y=>sh(y.title).startsWith(nm)||nm.startsWith(sh(y.title)));if(a&&!m[n])m[n]=a}));
+  return m};
+// What a homework covers (🏠 Homework on the board and in el-todo.js): {activity id: [panel ids]} ([] = the whole learning path), or null.
+// x = an item of ELWeek.tasks. Homework set on the dashboard since 6 Nov 2026 saves it (x.tabs); older ones and the plan's "Homework by …"
+// lines are read from their text: "LP3 Speaking and Talk", "LP3 Where traditions come from: Speaking, Talk" (tab names of that path; none
+// named = the whole path; words in brackets are left out, e.g. "(Speaking and Talk after the exam)").
+window.elHwTargets=function(x,ls,p,gi){if(!x||x.kind!=="hw")return null;if(x.tabs&&typeof x.tabs==="object"&&Object.keys(x.tabs).length)return x.tabs;
+  const m=elLpNumMap(ls,p,gi),out={},txt=String(x.text||"").replace(/\([^)]*\)/g," "),parts=txt.split(/(?=\bLP\d+\b)/);
+  parts.forEach(seg=>{const n=(seg.match(/^LP(\d+)\b/)||[])[1],a=n&&m[n];if(!a)return;const s=seg.replace(/^LP\d+\s*/,"").toLowerCase();
+    const ids=((window.EL_SECTIONS||{})[a.id]||[]).filter(([id,nm])=>elSecSteps(a,id).length&&new RegExp("(^|[^a-z])"+String(nm).toLowerCase().replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"($|[^a-z])").test(s)).map(z=>z[0]);
+    out[a.id]=[...new Set([...(out[a.id]||[]),...ids])]});
+  return Object.keys(out).length?out:null};
 // Pull up a learning path (Roger, 2 Nov 2026: "students find it difficult to find the learning path … I go to the LS and pull it up for the
 // A or B group"): the teacher puts one learning path (and maybe one of its tabs) on a group's screens from the dashboard, the Time plan or
 // the learning path page in teacher mode. ls/{id}.push[group] = {a: activity id, p: panel id or "", pn: tab name, t: label "LP3 …", at: ms}
 // or null (taken down). Students get a big "Open it" card on their board and a bar on every page of that LS. The newest one counts, while
 // its learning path is open for the group, and for EL_PULL_DAYS days at most. infos = {lsId: ls info} (lsInfo in el-cloud.js).
+// A pull-up made during a class carries until = the end of that class (elClassEnd in el-plan.js): then it is over, like "Release them".
 window.EL_PULL_DAYS=7;
+window.elPullLive=x=>!!(x&&x.a&&x.at&&Date.now()-x.at<EL_PULL_DAYS*864e5&&!(x.until&&Date.now()>=x.until));
 window.elPullFor=function(infos,gid){let best=null;
-  for(const [ls,info] of Object.entries(infos||{})){const x=info&&info.push&&info.push[gid];if(!x||!x.a||!x.at||Date.now()-x.at>EL_PULL_DAYS*864e5)continue;
+  for(const [ls,info] of Object.entries(infos||{})){const x=info&&info.push&&info.push[gid];if(!elPullLive(x))continue;
     const a=(window.EL_CATALOG||[]).find(y=>y.id===x.a),l=(window.EL_LS||[]).find(y=>y.id===ls);
     if(!a||(info.status||"hidden")==="hidden"||!elLsForGroup(l,info,gid)||!elLpOpen(a,info,gid))continue;
     if(!best||x.at>best.at)best=Object.assign({ls,act:a},x)}
   return best};
+// ⛶ 📴 Who left full screen and who is not connected in class (Roger, 6 Nov 2026: "when they are playing a game, I want them to be in full
+// screen too; if I pull them they should be in full screen. If they disconnect, the teacher's board shows it"). x = live/{group} (fs, the
+// class game: game, on, phase, sid, at), left = live/{group}/fsLeft docs {name, at, pull, n}, here = live/{group}/here docs {name, seen, off}
+// (every student page beats every EL_BEAT_MS while full screen or a game is on; off:true when the page is hidden: lid closed, other window).
+// A session is the full screen (fs.at) and/or the game (sid). Not connected = beat during this session, then off or no beat for EL_HERE_MS.
+window.EL_BEAT_MS=60e3;window.EL_HERE_MS=150e3;
+const elMs=t=>t&&t.toMillis?t.toMillis():typeof t==="number"?t:0;
+window.elFsOn=f=>!!(f&&f.on&&f.at&&Date.now()<(f.until||f.at+70*60e3));
+// 🗓 The timetable of a group (Roger, 6 Nov 2026: "according to the teacher's timetable students should go full screen when they have
+// class"; "I want a section where the teacher can add the schedule"): tt = {slots: ["Tue 12:00", …], off: ["YYYY-MM-DD" | [from, to]],
+// len: minutes}. The teacher edits it on the dashboard (🗓 Timetable: settings/timetable) and every group's copy goes into live/{group}.tt,
+// the document every student page already listens to, so students need no extra read. elTT(gid) = the group's tt from window.EL_TIMETABLE.
+window.elTT=gid=>{const T=window.EL_TIMETABLE;return T&&T.groups&&T.groups[gid]?{slots:T.groups[gid],off:T.off||[],len:T.len||60}:null};
+// days off as [from, to] pairs: "YYYY-MM-DD", ["from", "to"] or "from/to" (Firestore keeps no arrays inside arrays, so stored ones use "from/to")
+window.elOffList=off=>(off||[]).map(o=>Array.isArray(o)?[o[0],o[1]||o[0]]:String(o).includes("/")?String(o).split("/"):[String(o),String(o)]);
+window.elTTStore=T=>({groups:Object.assign({},T.groups),off:elOffList(T.off).map(([a,b])=>a===b?a:a+"/"+b),len:+T.len||60});
+window.elTTRead=o=>({groups:Object.assign({},o.groups),off:elOffList(o.off).map(([a,b])=>a===b?a:[a,b]),len:+o.len||60});
+// the class going on at `at` (ms): {start, end} in ms, from 5 minutes before it starts until it ends, or null (no class, a day off)
+window.elSlotNow=function(tt,at){if(!tt||!tt.slots)return null;const d=new Date(at||Date.now()),len=+tt.len||60;
+  const ymd=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  if(elOffList(tt.off).some(o=>o[0]<=ymd&&ymd<=o[1]))return null;
+  const dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()],m=d.getHours()*60+d.getMinutes(),z=new Date(d);z.setHours(0,0,0,0);
+  for(const sl of tt.slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const s=+x[2]*60+ +x[3];
+    if(m>=s-5&&m<s+len)return {start:z.getTime()+s*60e3,end:z.getTime()+(s+len)*60e3}}
+  return null};
+// ⛶ Full screen by the timetable (Roger, 6 Nov 2026: "no need to release since they get released after the class"): during a class of the
+// group it is on by itself ({on, at: the start of the class, until: its end, auto: true}) and it ends with the class. The teacher's switch
+// (live/{group}.fs) still counts: {on: true, …} turns it on outside a class; {on: false, off: true, until: end of the class} switches it
+// off for that class only. Returns the full screen in force now, or null.
+window.elFsEff=function(fs,tt,at){const now=at||Date.now(),c=elSlotNow(tt,now);
+  if(fs&&fs.at&&now<(fs.until||fs.at+70*60e3)){if(fs.on)return fs;if(fs.off&&c&&fs.until>=c.end)return null}
+  return c?{on:true,at:c.start,until:c.end,auto:true}:null};
+// 🎓 Class mode (Roger, 6 Nov 2026: "instead of pulling students to the LS, I want to go class mode, and this makes students go wherever
+// you are in the LS"): live/{group}.go = {cm: true, u: page path from the site root, p: tab or "", pn: tab name, t: page title, at, s: when
+// class mode started, lock: true, until}. Written by the teacher's class tab each time it moves (el-cloud.js cmSend); open student pages go there.
+window.elCmOn=g=>!!(g&&g.cm&&g.u&&g.at&&Date.now()<(g.until||g.at+70*60e3));
+window.elGameOn=x=>!!(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-elMs(x.at)<10*60e3);
+window.elClassWatch=function(x,left,here){const fs=x&&x.fs,fo=elFsOn(fs),go=elGameOn(x),now=Date.now(),keys=[];
+  if(fo)keys.push(fs.at);if(x&&x.sid&&(go||fo&&x.sid>=fs.at))keys.push(x.sid);
+  if(!keys.length)return {active:false,fs:false,game:false,left:[],off:[]};
+  const t0=Math.min(...keys)-60e3;   // a minute for the difference between the teacher's clock and the server's
+  return {active:true,fs:fo,game:go,title:go?x.title||"":"",t0,
+    left:(left||[]).filter(y=>keys.includes(y.pull)).sort((p,q)=>elMs(q.at)-elMs(p.at)),
+    off:(here||[]).filter(y=>elMs(y.seen)>=t0&&(y.off||now-elMs(y.seen)>EL_HERE_MS)).sort((p,q)=>elMs(q.seen)-elMs(p.seen))}};
+// The whole group, in or out (Roger, 6 Nov 2026: "I want to see not who's left but who is in and who is out … the students we have"):
+// roster = [{e: email, name}] (the group's student list; anyone else who beat in this session is added). here and left docs carry e (their id).
+// In = connected now and in full screen (here.fs: true also where the page needs none: checkpoints, iPhones). Out, with why:
+// "full" out of full screen (left: when and how many times), "lost" no beat for EL_HERE_MS, "closed" screen closed or another window,
+// "never" not connected in this session (absent, not signed in, or on a page that does not load el-cloud.js).
+window.elClassRoll=function(x,left,here,roster){const w=elClassWatch(x,left,here);w.inn=[];w.out=[];if(!w.active)return w;const now=Date.now();
+  const H={},Lf={},who=new Map();(here||[]).forEach(y=>{if(y.e)H[y.e]=y});w.left.forEach(y=>{if(y.e)Lf[y.e]=y});
+  (roster||[]).forEach(r=>who.set(r.e,r.name||r.e.split("@")[0]));
+  Object.values(H).forEach(y=>{if(!who.has(y.e)&&elMs(y.seen)>=w.t0)who.set(y.e,y.name||y.e.split("@")[0])});
+  for(const [e,name] of who){const h=H[e],l=Lf[e],seen=h&&elMs(h.seen)>=w.t0?elMs(h.seen):0,live=seen&&!h.off&&now-seen<=EL_HERE_MS,o={e,name,left:l||null,seen};
+    if(live&&h.fs!==false)w.inn.push(o);else{o.why=live?"full":seen?(h.off?"closed":"lost"):"never";w.out.push(o)}}
+  const rank={full:0,closed:1,lost:2,never:3},az=(a,b)=>a.name.localeCompare(b.name);
+  w.inn.sort(az);w.out.sort((a,b)=>rank[a.why]-rank[b.why]||az(a,b));w.n=who.size;return w};
 // "LP3 Where traditions come from": the number the time plan gives the learning path (EL_PLAN text "LP3 Where traditions …"), else its short title.
 window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh(a.title),lo=st.toLowerCase(),p=(window.EL_PLAN||{})[a.ls];let n=null;
   if(p)(p.rows||[]).forEach(r=>[].concat(r.g||r.what||[]).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,k,nm)=>{nm=nm.trim().toLowerCase();if(!n&&nm&&(lo.startsWith(nm)||nm.startsWith(lo)))n=k}));
@@ -287,3 +381,14 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
 // vocabulary or grammar step with none of its own (recall, words, cards, practice, grammar, mixed, vocab) gives evidence for 4.1 and 5.1.
 (function(){const UOE=["recall","words","cards","practice","grammar","mixed","vocab"];
   Object.keys(window.EL_STEP_CRITERIA).forEach(id=>{const sc=window.EL_STEP_CRITERIA[id];(window.EL_ACTIONS[id]||[]).forEach(k=>{if(UOE.includes(k)&&!sc[k])sc[k]=["4.1","5.1"]})})})();
+
+// 🧩 📚 Class game circles (Roger, 6 Nov 2026: "a kind of circle with a percentage on the board saying something like games and theory,
+// click to see your performance and what to study … two, grammar and vocabulary, and I want those circles next to the students in the
+// list"). elGameStats(games) takes class game results [{kind, r, of}] (myGames on the student board, gameResults on the dashboard) and gives
+// {grammar, vocab} = % right (null when none played); elRing(p, label, size) draws one circle (inline styles, any page).
+window.elGameStats=function(games){
+  const t={grammar:[0,0],vocab:[0,0]};(games||[]).forEach(g=>{const k=t[g.kind];if(k&&g.of){k[0]+=g.r||0;k[1]+=g.of}});
+  const pc=([a,b])=>b?Math.round(a/b*100):null;return {grammar:pc(t.grammar),vocab:pc(t.vocab),n:(games||[]).length}};
+window.elRing=function(p,label,size){
+  const z=size||46,col=p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a";
+  return `<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle" title="${label}: ${p==null?"–":p+" %"}"><span style="width:${z}px;height:${z}px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:conic-gradient(${col} ${(p||0)*3.6}deg,#e5e7eb 0)"><b style="width:${z-10}px;height:${z-10}px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 ${Math.round(z/3.6)}px/1 system-ui,sans-serif;color:#0f172a">${p==null?"–":p+"%"}</b></span>${label?`<span style="font-size:${Math.max(11,Math.round(z/3.6))}px;font-weight:700;line-height:1.15">${label}</span>`:""}</span>`};

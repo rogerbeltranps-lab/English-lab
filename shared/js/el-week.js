@@ -33,7 +33,7 @@
       if((T.off||[]).some(o=>Array.isArray(o)?o[0]<=d&&d<=o[1]:o===d))return null;
       const dn=DAYS.en[at.getDay()],m=at.getHours()*60+at.getMinutes(),hm=x=>Math.floor(x/60)+":"+String(x%60).padStart(2,"0");
       for(const [gid,slots] of Object.entries(T.groups))for(const sl of slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;
-        const s=+x[2]*60+ +x[3];if(m>=s-5&&m<s+55)return {gid,start:hm(s),end:hm(s+60),key:d+" "+gid+" "+hm(s)}}
+        const s=+x[2]*60+ +x[3],len=+T.len||60;if(m>=s-5&&m<s+len-5)return {gid,start:hm(s),end:hm(s+len),key:d+" "+gid+" "+hm(s)}}
       return null},
     // activities due in week row i: [[activity id, date]] by date
     dueIn:(p,gi,i)=>{const r=p.rows[i];if(!r||!r.from)return [];const e=add(r.from,6);
@@ -43,9 +43,9 @@
     // "Homework by Tue 10 · …" (date = that day, set = the class just before it), "self" = a class line marked "· self-study"
     // (the teacher is away), "exam" = the exam day. The student board, My week, the dashboard and the calendar feeds use it.
     // added: homework the teacher set from the dashboard ("🏠 Set as homework" on a session line; ls/{id}.homework[group] =
-    // {id: {text, by, set, msg}}; msg = the teacher's message with the instructions, shown to students under the item), listed with kind "hw" and extra:true (they are not in the calendar feed, which is a static file).
+    // {id: {text, by, set, msg, tabs}}; msg = the teacher's message with the instructions, shown to students under the item; tabs = {activity id: [panel ids]}, what it covers, elHwTargets), listed with kind "hw" and extra:true (they are not in the calendar feed, which is a static file).
     tasks(p,gi,added){const out=[];if(!p||gi<0)return out;
-      Object.entries(added||{}).forEach(([id,h])=>{if(h&&h.text&&h.by)out.push({kind:"hw",date:h.by,set:h.set||null,text:h.text,extra:true,id,msg:h.msg||null})});
+      Object.entries(added||{}).forEach(([id,h])=>{if(h&&h.text&&h.by)out.push({kind:"hw",date:h.by,set:h.set||null,text:h.text,extra:true,id,msg:h.msg||null,tabs:h.tabs||null})});
       const at=(from,dn,n)=>{for(let k=0;k<21;k++){const s=add(from,k),d=day(s);if(d.getDate()===n&&DAYS.en[d.getDay()]===dn)return s}return null};
       let last=null;
       (p.rows||[]).forEach(r=>{if(!r.from)return;String((r.g?r.g[gi]:r.what)||"").split("\n").forEach(raw=>{const ln=raw.trim();
@@ -58,6 +58,10 @@
       return out.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0)},
     // homework and self-study classes still ahead (date >= from, by default today), within `days` days
     upcoming(p,gi,from,days,added){from=from||today();const to=add(from,days==null?14:days);return this.tasks(p,gi,added).filter(x=>x.kind!=="exam"&&x.date>=from&&x.date<=to)},
+    // what students see as homework (Roger, 6 Nov 2026: "I say when to do sth since otherwise is too much info … if we don't finish I can
+    // say this is homework"): only the homework the teacher set on the dashboard (🏠 Set as homework, extra:true). The plan's "Homework by …"
+    // and self-study lines are only suggestions on the teacher's dashboard. The board, el-todo.js, the Sunday email and the calendar use it.
+    studentHw(p,gi,added,from,days){return this.upcoming(p,gi,from,days,added).filter(x=>x.extra)},
     // calendar feed of a group (tools/gen-calendar.js writes calendar/<group id>.ics from this file): the .ics link and the link
     // that subscribes a Google Calendar to it once, so every later homework appears by itself
     calendar(gid,root){const ics=new URL("calendar/"+String(gid).toLowerCase()+".ics",root||location.href).href;
@@ -77,8 +81,8 @@
     // with no row gets one), and the due days of the activities (`due`, `stepDue`) that fell on the old day of a class move with it.
     // p._moved[gi][new line] = {orig, from (old day)}; p._tabs[gi][original line] = the chosen tabs. Safe to call again with new edits.
     applyEdits(ls,edits){const p=(window.EL_PLAN||{})[ls];if(!p||!p.rows)return null;const cp=o=>o==null?o:JSON.parse(JSON.stringify(o));
-      if(!p._base)p._base=cp({rows:p.rows,due:p.due||null,stepDue:p.stepDue||null,optional:p.optional||null});
-      const b=cp(p._base);p.rows=b.rows;if(b.due)p.due=b.due;if(b.stepDue)p.stepDue=b.stepDue;if(b.optional)p.optional=b.optional;p._moved={};p._tabs={};p._added={};p._dropped={};p._nohw={};
+      if(!p._base)p._base=cp({rows:p.rows,due:p.due||null,stepDue:p.stepDue||null,optional:p.optional||null,exam:p.exam||null});
+      const b=cp(p._base);p.rows=b.rows;if(b.due)p.due=b.due;if(b.stepDue)p.stepDue=b.stepDue;if(b.optional)p.optional=b.optional;if(b.exam)p.exam=b.exam;p._moved={};p._tabs={};p._added={};p._dropped={};p._nohw={};p._ag={};
       const get=(r,gi)=>String((r.g?r.g[gi]:r.what)||"").split("\n").filter(Boolean),set=(r,gi,ls)=>{if(r.g)r.g[gi]=ls.join("\n");else r.what=ls.join("\n")};
       const ok=d=>/^\d{4}-\d\d-\d\d$/.test(d||""),lab=to=>{const d=day(to);return DAYS.en[d.getDay()]+" "+d.getDate()};
       // puts a line on day `to` in that day's week row (a new row when the week has none), before the later lines
@@ -98,6 +102,27 @@
           const a=(window.EL_CATALOG||[]).find(x=>x.id===id),t=a&&String(a.title).split(/[:(]/)[0].trim().toLowerCase();let n=null;
           if(t)p.rows.forEach(r=>get(r,gi).forEach(l=>{const q=!n&&/\bLP(\d+) ([^(\n·]+)/.exec(l);if(q&&q[2].trim().toLowerCase().startsWith(t.slice(0,12)))n=q[1]}));
           if(n)p.rows.forEach(r=>{const ls=get(r,gi),k=ls.filter(l=>{if(!/^Homework by /.test(l))return true;const lp=l.match(/\bLP\d+\b/g)||[];return !(lp.length&&lp.every(x=>x==="LP"+n))});if(k.length!==ls.length)set(r,gi,k)})});
+        // The agenda (Roger, 6 Nov 2026: "on the left … the LP and SLP … Final Product and exam … on the right my agenda, and I can drag the
+        // LP or SLP to the right"; "I should be able to move things around the days and exams and FP too"): key "agenda" = a JSON string
+        // {days: {"YYYY-MM-DD": ["activity#panel", "activity#" (no tabs), "note:text", "self"]}, exam, lab: {activity: "LP3 Now or usually?"},
+        // base: {activity: its last day when the agenda was made}, due0/opt0: {activity: due day then}, step0: {activity: {step: day}}}.
+        // It replaces the group's whole column: one line per day ("Tue 10 · Recall checkpoint 1 · LP3 Now or usually?"), its items as
+        // that line's tabs (p._tabs[gi]["@day"]) and "@day" as the line's key for ticks (p._added, like a line sent from another class);
+        // the plan's "Homework by …" ideas go. The exam day follows. An activity whose last day moved has its due days moved by as many
+        // classes of the group (EL_TIMETABLE) as it moved. The other edits of the group (moves, added lines, nohw, noself) were folded in.
+        const agS=m.agenda;let ag=null;if(agS)try{ag=typeof agS==="string"?JSON.parse(agS):agS}catch(e){ag=null}
+        if(ag&&ag.days){p._ag[gi]=ag;p.rows.forEach(r=>set(r,gi,[]));const lb=ag.lab||{},last={};
+          const ds=Object.keys(ag.days).filter(ok);if(ok(ag.exam)&&!ds.includes(ag.exam))ds.push(ag.exam);ds.sort();
+          ds.forEach(d=>{const its=(ag.days[d]||[]).filter(Boolean),segs=[],seen=new Set(),tabs=[];
+            its.forEach(it=>{if(it==="self")return;if(/^note:/.test(it)){segs.push(it.slice(5));return}const id=it.split("#")[0];last[id]=d;
+              if(/#./.test(it))tabs.push(it);if(!seen.has(id)){seen.add(id);segs.push(lb[id]||id)}});
+            if(ag.exam===d)segs.push("EXAM");if(!segs.length)return;
+            const nl=lab(d)+" · "+segs.join(" · ")+(its.includes("self")?" · self-study":"");place(gi,d,nl);ad[nl]={key:"@"+d,from:null};tb["@"+d]=tabs});
+          if(ok(ag.exam)){if(!p.exam)p.exam=[];p.exam[gi]=ag.exam}
+          const mv1=(id,v)=>v&&ag.base&&ag.base[id]&&last[id]&&last[id]!==ag.base[id]?this.shiftClass(gid,ag.base[id],v,last[id]):v;
+          [["due","due0"],["optional","opt0"]].forEach(([f,f0])=>Object.entries(ag[f0]||{}).forEach(([id,v])=>{if(dr.includes(id))return;if(!p[f])p[f]={};if(!p[f][id])p[f][id]=p.groups.map(()=>null);p[f][id][gi]=mv1(id,v)}));
+          Object.entries(ag.step0||{}).forEach(([id,o])=>{if(dr.includes(id)||!p.stepDue||!p.stepDue[id])return;Object.entries(o||{}).forEach(([st,v])=>{const a=p.stepDue[id][st];if(a)a[gi]=mv1(id,v)})});
+          return}
         es.filter(([k,e])=>!e.add&&!/^(drop|noself|nohw):/.test(k)).forEach(([orig,e])=>{if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!ok(e.to))return;
           const ri=p.rows.findIndex(r=>r.from&&get(r,gi).includes(orig));if(ri<0)return;const old=this.lineDay(p.rows[ri].from,orig);if(!old||old===e.to)return;
           const hw=/^Homework by /.test(orig),nl=orig.replace(/^(Homework by )?\w{3} \d{1,2}\b/,(_,h)=>(h||"")+lab(e.to));
@@ -119,6 +144,15 @@
         es.filter(([,e])=>e.add&&ok(e.to)).sort((x,y)=>(x[1].at||0)-(y[1].at||0)).forEach(([key,e])=>{const nl=lab(e.to)+" · "+e.add+(e.from?" · not finished on "+lab(e.from):"");
           if(e.tabs&&e.tabs.length)tb[key]=e.tabs;place(gi,e.to,nl);ad[nl]={key,from:e.from||null};if(ok(e.from)&&e.shift)shift(gi,e.from,e.to,e.shift)})});
       return p},
+    // a day the group has English by its timetable (EL_TIMETABLE in el-plan.js): true/false, or null without a timetable for it
+    isClass(gid,d){const T=window.EL_TIMETABLE;if(!T||!T.groups||!T.groups[gid])return null;if((T.off||[]).some(o=>Array.isArray(o)?o[0]<=d&&d<=o[1]:o===d))return false;
+      const dn=DAYS.en[day(d).getDay()];return T.groups[gid].some(s=>String(s).startsWith(dn+" "))},
+    // the group's class days from a to b (both included), by its timetable
+    classDays(gid,a,b){const out=[];if(!a||!b)return out;for(let d=a,k=0;d<=b&&k<400;d=add(d,1),k++)if(this.isClass(gid,d))out.push(d);return out},
+    // day v, which was some classes after (or before) day `from`, moved as many classes after (or before) day `to` (without a timetable, as many days)
+    shiftClass(gid,from,v,to){if(this.isClass(gid,from)==null)return add(to,this.days(from,v));
+      const n=v>from?this.classDays(gid,add(from,1),v).length:-this.classDays(gid,v,add(from,-1)).length;if(!n)return add(to,this.days(from,v));
+      let d=to,k=0,g=0;while(k<Math.abs(n)&&g<400){d=add(d,n>0?1:-1);g++;if(this.isClass(gid,d))k++}return d},
     // the day of a session line ("Tue 27 · …" or "Homework by Mon 9 · …") counted from the Monday of its week row, or null
     lineDay(from,l){const m=/^(?:Homework by )?(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2})\b/.exec(String(l));if(!m||!from)return null;
       for(let k=0;k<21;k++){const s=add(from,k),d=day(s);if(d.getDate()===+m[2]&&DAYS.en[d.getDay()]===m[1])return s}return null},

@@ -62,6 +62,16 @@ var flashcardSet = {
     if (!this.cards.length || level !== this.lastLevel) { this.lastLevel = level; this.newSet(); }
     if (this.index >= this.cards.length) this.index = 0;
     const v = this.cards[this.index], n = this.cards.length, ca = level === 'insecure' || level === 'beginners';
+    /* Problem report (2ESO A, 5 Nov 2026: "quan gira surt un moment la resposta al clickar Got it!"): the card used to turn back
+       with its .5s animation after the new card's text was already in, so the next card's answer showed while it turned.
+       On LS2 pages (config.always) a new card now appears front-up at once, with no turning; turning a card by hand still animates. LS1 unchanged. */
+    const inner = document.querySelector('#flashcard .flash-inner');
+    if (this.config.always && inner && $('#flashcard').classList.contains('flipped')) {
+      inner.style.transition = 'none';
+      $('#flashcard').classList.remove('flipped');
+      void inner.offsetWidth;
+      inner.style.transition = '';
+    }
     $('#flashcard').classList.remove('flipped');
     $('#cardIcon').textContent = v[2];
     $('#cardFront').textContent = v[0];

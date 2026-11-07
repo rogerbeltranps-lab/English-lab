@@ -1,0 +1,20 @@
+# Students' saved answers must always come back (Roger, 6 Nov 2026). On every pull request that changes a learning path page or shared
+# code, tools/answers-stay/check.mjs answers every activity of every LS2 learning path at every level, reloads, changes the level and back,
+# and fails when an answer or a correction does not come back. Free, read-only, no secrets.
+name: Answers stay
+on:
+  pull_request:
+    paths: ['2eso/**', '4eso/**', 'shared/**', 'tools/answers-stay/**', '.github/workflows/answers-stay.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - run: node tools/answers-stay/check.mjs

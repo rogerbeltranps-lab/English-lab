@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="../../favicon-192.png">
+<title>Game results · English Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap">
+<style>
+/* Class game results (Roger, 5 Nov 2026: "I need to see their results in a chart, as a group and individually, so that I can see how
+   they are doing"). Teacher only. Reads gameResults (one document per game played, written by the board) for one group + its student list. */
+:root{
+  color-scheme:light;
+  --surface:#fcfcfb; --card:#ffffff; --line:#e7e5ef; --grid:#eeedf3;
+  --ink:#1d1640; --ink2:#52514e; --muted:#7a7790; --accent:#5b21b6;
+  --vocab:#2a78d6; --grammar:#eb6834; --mixed:#1baf7a;   /* categorical slots 1-3 (dataviz reference palette, validated) */
+  --f:"Fredoka","Nunito","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface);color:var(--ink);font:500 16px/1.4 var(--f)}
+main{max-width:1100px;margin:0 auto;padding:16px}
+h1{margin:.2em 0 .1em;font-size:1.8em;color:var(--accent)}
+h2{margin:0 0 .3em;font-size:1.25em}
+.muted{color:var(--muted)}
+a{color:var(--accent)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:.3em .9em;font:inherit;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:14px 0;box-shadow:0 2px 0 rgba(0,0,0,.03)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.tile b{display:block;font-size:1.9em;line-height:1.1}
+.tile span{color:var(--ink2);font-size:.92em}
+.key{display:inline-flex;align-items:center;gap:6px;margin-right:14px;color:var(--ink2);font-size:.92em}
+.key i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.sw-vocab{background:var(--vocab)}.sw-grammar{background:var(--grammar)}.sw-mixed{background:var(--mixed)}
+/* column chart: one bar per game */
+.cols{position:relative;display:flex;align-items:flex-end;gap:10px;height:240px;padding:0 4px 0 34px;border-bottom:1px solid #c9c6d6;overflow-x:auto}
+.cols .gl{position:absolute;left:34px;right:0;border-top:1px solid var(--grid);font-size:.75em;color:var(--muted)}
+.cols .gl span{position:absolute;left:-34px;top:-.7em;width:30px;text-align:right}
+.col{position:relative;flex:0 0 46px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:pointer;background:none;border:0;padding:0;font:inherit;color:var(--ink)}
+.col i{display:block;width:26px;border-radius:4px 4px 0 0;min-height:3px}
+.col .v{font-size:.8em;color:var(--ink2);margin-bottom:2px}
+.col:hover i,.col:focus-visible i,.col.sel i{outline:2px solid var(--ink);outline-offset:2px}
+.col .avg{position:absolute;left:4px;right:4px;border-top:2px dashed var(--ink);pointer-events:none}
+.xl{display:flex;gap:10px;padding:4px 4px 0 34px;overflow-x:auto}
+.xl span{flex:0 0 46px;font-size:.72em;color:var(--muted);text-align:center;line-height:1.15}
+/* horizontal bars */
+.hb{display:grid;grid-template-columns:minmax(0,1fr) 150px 44px;gap:6px 10px;align-items:center}
+.hb .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb .trk{height:12px;background:var(--grid);border-radius:4px;overflow:hidden}
+.hb .trk i{display:block;height:100%;border-radius:0 4px 4px 0}
+.hb .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.low{color:#b3261e;font-weight:700}
+table.st{border-collapse:collapse;width:100%}
+.st th{text-align:left;font-size:.85em;color:var(--ink2);border-bottom:2px solid var(--line);padding:6px 8px;cursor:pointer;white-space:nowrap}
+.st td{border-bottom:1px solid var(--line);padding:6px 8px;vertical-align:middle}
+.st tr.row{cursor:pointer}.st tr.row:hover td,.st tr.sel td{background:#f6f2ff}
+.st .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.mini{display:inline-block;vertical-align:middle;width:110px;height:10px;background:var(--grid);border-radius:4px;overflow:hidden;margin-right:6px}
+.mini i{display:block;height:100%;background:var(--accent);border-radius:0 4px 4px 0}
+.wrap{overflow-x:auto}
+.tip{position:fixed;z-index:9;pointer-events:none;background:var(--ink);color:#fff;border-radius:8px;padding:6px 10px;font-size:.85em;max-width:280px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.demo{background:#fff4d6;border:1px solid #f1d28a;border-radius:12px;padding:8px 12px}
+.miss li{margin:3px 0}
+@media (max-width:600px){.hb{grid-template-columns:minmax(0,1fr) 90px 40px}.mini{width:60px}}
+/* one student's games: answers and 📝 notes (Roger, 6 Nov 2026) */
+.games{display:flex;flex-direction:column;gap:8px;margin:6px 0 14px}
+details.gm{border:1px solid var(--line);border-radius:12px;background:#fff}
+details.gm summary{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:8px 12px;cursor:pointer;font-weight:600}
+details.gm[open] summary{border-bottom:1px solid var(--line)}
+table.qa{border-collapse:collapse;width:100%;font-size:.92em}
+.qa th{text-align:left;color:var(--ink2);font-size:.85em;padding:5px 8px;border-bottom:1px solid var(--line)}
+.qa td{padding:5px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+.qa tr.no td{background:#fff5f4}.qa .mk{font-weight:700}.qa tr.ok .mk{color:#166534}.qa tr.no .mk{color:#b3261e}
+.gm .notes{padding:8px 12px 12px;background:#fffef7;border-top:1px solid var(--line);border-radius:0 0 12px 12px}
+.gm .nh{margin:0 0 4px;font-weight:700}.gm .note{margin:6px 0}.gm .note b{color:var(--accent)}.gm .note p{margin:2px 0 0;white-space:normal}
+.gm>p.muted{padding:0 12px}
+</style></head>
+<body><main id="app"><p>Loading…</p></main><div class="tip" id="tip" hidden></div>
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="decks/index.js"></script>
+<script type="module">
+import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {CONFIG,TEACHERS} from "../../shared/js/el-firebase.js";
+
+const $=s=>document.querySelector(s),app$=$("#app"),tip$=$("#tip");
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const P=new URLSearchParams(location.search),DEMO=P.has("demo");
+const GROUPS=window.EL_GROUPS||[],KIND={vocab:"Vocabulary",grammar:"Grammar",mixed:"Mixed"};
+const R={user:null,teacher:false,g:P.get("g")||"",games:[],all:[],ls:P.get("ls")||"",names:{},sel:"",stu:"",sort:"name",err:"",loading:false};
+const pct=(a,b)=>b?Math.round(a/b*100):null,show=v=>v==null?"–":v+" %";
+const day=d=>{const x=new Date(d+"T12:00");return x.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})};
+const short=t=>String(t||"").replace(/^(Vocabulary|Grammar) · /,"");
+
+/* ---------- data ---------- */
+async function load(){
+  if(!R.g)return draw();
+  R.loading=true;R.err="";draw();
+  try{
+    if(DEMO)Object.assign(R,demo(R.g));
+    else{
+      const [gs,ro]=await Promise.all([S.getDocs(S.query(S.collection(db,"gameResults"),S.where("group","==",R.g))),
+        S.getDocs(S.query(S.collection(db,"roster"),S.where("group","==",R.g)))]);
+      const names={};ro.forEach(d=>{const x=d.data();names[d.id]=[x.first||d.id.split("@")[0],x.surname1||""].join(" ").trim()});
+      const games=[];gs.forEach(d=>games.push(d.data()));games.sort((a,b)=>a.sid-b.sid);
+      Object.assign(R,{games,names});
+    }
+    R.all=R.games;pickLs();
+  }catch(e){console.warn("results",e);R.err=e.message}
+  R.loading=false;R.sel="";R.stu="";draw();
+}
+// One LS at a time (Roger, 6 Nov 2026: each student's answers, performance and notes "of the LS … all together"): chips by the games' ls
+const lsList=()=>[...new Set(R.all.map(x=>x.ls||""))].filter(Boolean).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
+function pickLs(){const l=lsList();if(R.ls&&!l.includes(R.ls))R.ls="";R.games=R.ls?R.all.filter(x=>x.ls===R.ls):R.all}
+// a game's numbers, students on the list only (a tester's answers never count)
+const onList=x=>x.stu.filter(s=>R.names[s.e]);
+const classPct=x=>{const l=onList(x);return pct(l.reduce((t,s)=>t+s.r,0),l.length*x.done)};
+function perStudent(){
+  return Object.entries(R.names).map(([e,name])=>{const t={all:[0,0],vocab:[0,0],grammar:[0,0],mixed:[0,0]};let n=0;
+    R.games.forEach(x=>{const s=x.stu.find(y=>y.e===e);if(!s)return;n++;t.all[0]+=s.r;t.all[1]+=x.done;const k=t[x.kind]||t.mixed;k[0]+=s.r;k[1]+=x.done});
+    return {e,name,n,all:pct(...t.all),vocab:pct(...t.vocab),grammar:pct(...t.grammar),mixed:pct(...t.mixed)}});
+}
+const kindPct=k=>{let r=0,o=0;R.games.filter(x=>x.kind===k).forEach(x=>onList(x).forEach(s=>{r+=s.r;o+=x.done}));return pct(r,o)};
+
+/* ---------- drawing ---------- */
+function columns(items,avgLine){   // items: [{id, label, value (0-100 | null), kind, tip}]
+  const gl=[0,25,50,75,100].map(v=>`<div class="gl" style="bottom:${v*2.4*0.82}px"><span>${v}</span></div>`).join("");   // 82 % of the height is 100 %
+  return `<div class="cols" role="list">${gl}${items.map(x=>`<button class="col${x.id&&x.id===R.sel?" sel":""}" role="listitem" data-do="${x.act||""}" data-id="${esc(x.id||"")}" data-tip="${esc(x.tip)}" aria-label="${esc(x.tip)}">
+      <span class="v">${x.value==null?"absent":x.value+"%"}</span><i style="height:${x.value==null?0:Math.max(1.5,x.value*0.82)}%;background:var(--${x.kind})"></i>
+      ${x.avg!=null?`<span class="avg" style="bottom:${x.avg*0.82}%" title="Class: ${x.avg} %"></span>`:""}</button>`).join("")}</div>
+    <div class="xl">${items.map(x=>`<span>${esc(x.label)}</span>`).join("")}</div>`;
+}
+const legend=(extra)=>`<p>${["vocab","grammar","mixed"].filter(k=>R.games.some(x=>x.kind===k)).map(k=>`<span class="key"><i class="sw-${k}"></i>${KIND[k]}</span>`).join("")}${extra||""}</p>`;
+
+function draw(){
+  if(!DEMO&&!R.user){app$.innerHTML=`<h1>📊 Class game results</h1><p>Sign in with the teacher's account to see the results.</p><p><button class="chip on" data-do="signin">Sign in with Google</button></p>`;return}
+  if(!DEMO&&!R.teacher){app$.innerHTML=`<h1>📊 Class game results</h1><p>Only the teacher can see this page.</p>`;return}
+  const head=`<h1>📊 Class game results</h1>
+    ${DEMO?`<p class="demo">Sample data with made-up students, to show how the page works. The real page fills itself as you play the games.</p>`:""}
+    <p class="muted">Every class game you play from the board is saved here: who got each question right. Only the questions whose answer you showed count; a student who didn't answer one gets it wrong.</p>
+    <div class="bar">${GROUPS.map(g=>`<button class="chip${g.id===R.g?" on":""}" data-do="group" data-g="${g.id}">${esc(g.name)}</button>`).join("")}
+    <a class="chip" href="host.html" style="text-decoration:none">🎮 Board</a></div>
+    ${R.g&&lsList().length>1?`<div class="bar"><span class="muted">LS:</span><button class="chip${R.ls?"":" on"}" data-do="ls" data-l="">All</button>${lsList().map(l=>`<button class="chip${l===R.ls?" on":""}" data-do="ls" data-l="${esc(l)}">${esc(l)}</button>`).join("")}</div>`:""}`;
+  if(!R.g){app$.innerHTML=head+`<p>Choose a group.</p>`;return}
+  if(R.loading){app$.innerHTML=head+`<p>Loading…</p>`;return}
+  if(R.err){app$.innerHTML=head+`<p><b>The results could not be read.</b> ${esc(R.err)}. If the page is new, the Firestore rules publish when the change reaches main; then reload.</p>`;return}
+  if(!R.games.length){app$.innerHTML=head+`<div class="card"><p>No games saved for this group yet. Play a game from the board and its results appear here when it ends.</p></div>`;return}
+  const st=perStudent(),played=st.filter(s=>s.n);
+  let r=0,o=0;R.games.forEach(x=>onList(x).forEach(s=>{r+=s.r;o+=x.done}));
+  const tiles=`<div class="tiles"><div class="tile"><b>${R.games.length}</b><span>games played</span></div>
+    <div class="tile"><b>${show(pct(r,o))}</b><span>right, all games</span></div>
+    ${R.games.some(x=>x.kind==="vocab")?`<div class="tile"><b style="color:var(--vocab)">${show(kindPct("vocab"))}</b><span>right in vocabulary games</span></div>`:""}
+    ${R.games.some(x=>x.kind==="grammar")?`<div class="tile"><b style="color:var(--grammar)">${show(kindPct("grammar"))}</b><span>right in grammar games</span></div>`:""}
+    <div class="tile"><b>${played.length} / ${st.length}</b><span>students who played</span></div></div>`;
+  const items=R.games.map(x=>{const v=classPct(x),l=onList(x).length;
+    return {id:String(x.sid),act:"game",label:day(x.day),value:v,kind:x.kind in KIND?x.kind:"mixed",tip:`${x.title} · ${day(x.day)} · ${l} students · ${show(v)} right`}});
+  const group=`<div class="card"><h2>The group, game by game</h2><p class="muted">% of right answers of the whole class in each game. Click a bar to see its questions.</p>${legend()}${columns(items)}${R.sel?gameDetail():""}</div>`;
+  const sorted=[...st].sort(R.sort==="name"?(a,b)=>a.name.localeCompare(b.name):(a,b)=>(a[R.sort]??-1)-(b[R.sort]??-1)||a.name.localeCompare(b.name));
+  const hasK=k=>R.games.some(x=>x.kind===k);
+  const stuT=`<div class="card"><h2>Each student</h2><p class="muted">% right over the games they played. Click a student to see their games, their answers and their 📝 notes. Sort by a column with its heading.</p>
+    <div class="wrap"><table class="st"><thead><tr><th data-do="sort" data-k="name">Student${R.sort==="name"?" ▲":""}</th><th data-do="sort" data-k="all">All games${R.sort==="all"?" ▲":""}</th>
+    ${hasK("vocab")?`<th data-do="sort" data-k="vocab">Vocabulary${R.sort==="vocab"?" ▲":""}</th>`:""}${hasK("grammar")?`<th data-do="sort" data-k="grammar">Grammar${R.sort==="grammar"?" ▲":""}</th>`:""}${hasK("mixed")?`<th data-do="sort" data-k="mixed">Mixed${R.sort==="mixed"?" ▲":""}</th>`:""}<th>Played</th></tr></thead><tbody>
+    ${sorted.map(s=>`<tr class="row${s.e===R.stu?" sel":""}" data-do="stu" data-e="${esc(s.e)}"><td>${esc(s.name)}</td>
+      <td class="num">${s.all==null?'<span class="muted">–</span>':`<span class="mini"><i style="width:${s.all}%"></i></span>${s.all} %`}</td>
+      ${hasK("vocab")?`<td class="num${s.vocab!=null&&s.vocab<50?" low":""}">${show(s.vocab)}</td>`:""}${hasK("grammar")?`<td class="num${s.grammar!=null&&s.grammar<50?" low":""}">${show(s.grammar)}</td>`:""}${hasK("mixed")?`<td class="num">${show(s.mixed)}</td>`:""}
+      <td class="num muted">${s.n} / ${R.games.length}</td></tr>${s.e===R.stu?`<tr><td colspan="6">${stuDetail(s)}</td></tr>`:""}`).join("")}</tbody></table></div>
+    <p class="muted">Red: under 50 %.</p></div>`;
+  app$.innerHTML=head+tiles+group+stuT;
+}
+function gameDetail(){
+  const x=R.games.find(y=>String(y.sid)===R.sel);if(!x)return "";
+  const list=onList(x),q=x.qs.map(z=>{const right=list.filter(s=>!s.miss.includes(z.n)).length;return {...z,p:pct(right,list.length)}});
+  return `<h2 style="margin-top:16px">${esc(x.title)} · ${day(x.day)}</h2><p class="muted">${list.length} students · ${x.done} of ${x.qn} questions shown · % right per question (the hardest in red)</p>
+    <div class="hb">${q.map(z=>`<span class="t" title="${esc(z.q)}">${z.n}. ${esc(z.q)}</span><span class="trk"><i style="width:${z.p||0}%;background:var(--${x.kind in KIND?x.kind:"mixed"})"></i></span><span class="n${z.p<50?" low":""}">${show(z.p)}</span>`).join("")}</div>`;
+}
+function stuDetail(s){
+  const items=R.games.map(x=>{const y=x.stu.find(z=>z.e===s.e),v=y?pct(y.r,x.done):null,c=classPct(x);
+    return {label:day(x.day),value:v,avg:c,kind:x.kind in KIND?x.kind:"mixed",tip:`${x.title} · ${day(x.day)} · ${y?`${y.r} of ${x.done} right (${v} %)`:"absent"} · class ${show(c)}`}});
+  const last=[...R.games].reverse().map(x=>{const y=x.stu.find(z=>z.e===s.e);return y&&y.miss.length?{x,m:y.miss}:null}).filter(Boolean).slice(0,3);
+  const det=R.games.map(x=>gameOf(x,s.e)).join("");
+  return `<div style="padding:6px 0 10px">${det?`<p style="margin:4px 0"><b>${esc(s.name)}: answers and notes${R.ls?" · "+esc(R.ls):""}</b></p><div class="games">${det}</div>`:""}<b>${esc(s.name)}</b>, game by game ${legend('<span class="key"><i style="border-top:2px dashed var(--ink);height:0;border-radius:0"></i>Class</span>')}${columns(items)}
+    ${last.length?`<p style="margin:12px 0 4px"><b>Questions to review</b> (the last games with mistakes):</p><ul class="miss">${last.map(({x,m})=>`<li><b>${esc(short(x.title))}</b> (${day(x.day)}): ${m.map(n=>{const q=x.qs.find(z=>z.n===n);return q?esc(q.q):"question "+n}).join(" · ")}</li>`).join("")}</ul>`:""}</div>`;
+}
+
+// one game of one student: score, each question with their answer and the right one, and their 📝 notes (open by default for the
+// latest game; games saved before 6 Nov 2026 have no answers or notes: only right or wrong)
+function gameOf(x,e){
+  const y=x.stu.find(z=>z.e===e),last=x===R.games[R.games.length-1];
+  if(!y)return `<details class="gm"><summary><span>${esc(short(x.title))}</span><span class="muted">${day(x.day)}</span><span class="muted">absent</span></summary></details>`;
+  const v=pct(y.r,x.done),ans=y.ans||null,notes=y.notes||{},nts=x.nts||[];
+  const rows=x.qs.map(q=>{const ok=!y.miss.includes(q.n),a=ans?ans[q.n]:undefined;
+    return `<tr class="${ok?"ok":"no"}"><td class="num">${q.n}</td><td>${esc(q.q)}</td><td>${ans?(a==null?'<span class="muted">no answer</span>':esc(a)):'<span class="muted">–</span>'}</td><td class="mk">${ok?"✓":"✗"}</td><td class="muted">${ok?"":esc(q.ok||"")}</td></tr>`}).join("");
+  const nt=nts.map(n=>`<div class="note"><b>${esc(n.topic)}</b>${notes[n.k]?`<p>${esc(notes[n.k]).replace(/\n/g,"<br>")}</p>`:'<p class="muted">No notes.</p>'}</div>`).join("");
+  return `<details class="gm"${last?" open":""}><summary><span>${esc(short(x.title))}</span><span class="muted">${day(x.day)}${x.lp?" · "+esc(x.lp):""}</span><span class="${v!=null&&v<50?"low":""}">${x.done?`${y.r} / ${x.done} (${v} %)`:""}</span></summary>
+    ${x.done?`<table class="qa"><thead><tr><th>#</th><th>Question</th><th>Their answer</th><th></th><th>Right answer</th></tr></thead><tbody>${rows}</tbody></table>`:""}
+    ${ans?"":`<p class="muted">This game was played before the answers were saved: only right or wrong.</p>`}
+    ${nts.length?`<div class="notes"><p class="nh">📝 Notes</p>${nt}</div>`:""}</details>`;
+}
+
+/* ---------- events ---------- */
+app$.addEventListener("click",async e=>{const b=e.target.closest("[data-do]");if(!b)return;const d=b.dataset.do;
+  if(d==="signin"){try{const p=new A.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});await A.signInWithPopup(auth,p)}catch(x){console.warn(x)}}
+  if(d==="group"){R.g=b.dataset.g;history.replaceState(null,"","?g="+R.g+(DEMO?"&demo":""));load()}
+  if(d==="game"){R.sel=R.sel===b.dataset.id?"":b.dataset.id;draw()}
+  if(d==="stu"){R.stu=R.stu===b.dataset.e?"":b.dataset.e;draw()}
+  if(d==="sort"){R.sort=b.dataset.k;draw()}
+  if(d==="ls"){R.ls=b.dataset.l;pickLs();R.sel="";history.replaceState(null,"","?g="+R.g+(R.ls?"&ls="+encodeURIComponent(R.ls):"")+(DEMO?"&demo":""));draw()}
+});
+addEventListener("pointermove",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");
+  if(!t){tip$.hidden=true;return}tip$.textContent=t.dataset.tip;tip$.hidden=false;
+  const x=Math.min(e.clientX+14,innerWidth-tip$.offsetWidth-8),y=Math.max(8,e.clientY-tip$.offsetHeight-10);tip$.style.left=x+"px";tip$.style.top=y+"px"});
+
+/* ---------- sample data (?demo): made-up students, never real names ---------- */
+function demo(g){
+  const names={},N=["Alex","Bruna","Carla","Dani","Elia","Fèlix","Gal·la","Hugo","Iris","Joan","Laia","Marc","Nora","Oriol","Pau","Queralt","Roc","Sara","Teo","Vera"];
+  N.forEach((n,i)=>names[`s${i}@demo`]=n+" Sample");
+  const course=(GROUPS.find(x=>x.id===g)||{}).course||"2eso",list=(window.EL_GAMES||[]).filter(d=>d.course===course&&d.kind).slice(0,4);
+  let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const games=list.map((d,k)=>{const qn=d.kind==="vocab"?18:16,done=qn,skill=d.kind==="vocab"?.78:.62;
+    const nts=[{k:"p1",topic:"The first theory slide"},{k:"p2",topic:"The second theory slide"}];
+    const stu=Object.keys(names).filter(()=>rnd()>.08).map((e,i)=>{const lv=.35+((i*37)%60)/100;const miss=[],ans={};for(let n=1;n<=done;n++){if(rnd()>Math.min(.97,skill*lv*1.35))miss.push(n);ans[n]=miss.includes(n)?"a wrong answer":"the right answer"}
+      return {e,r:done-miss.length,a:done,miss,ans,notes:{p1:"Sample notes: the rule in my own words.\nExample 1. Example 2.\nThe mistake to avoid.",p2:i%3?"More sample notes.":""}}});
+    return {group:g,deck:d.id,title:d.title,kind:d.kind,ls:d.ls,lp:d.lp,day:["2026-10-28","2026-10-29","2026-11-03","2026-11-04"][k],sid:k+1,qn,done,nts,
+      qs:Array.from({length:done},(_,n)=>({n:n+1,q:`Question ${n+1} of “${short(d.title)}”`,ok:"the right answer"})),stu}});
+  return {games,names};
+}
+
+/* ---------- start ---------- */
+let db=null,auth=null;
+if(DEMO){R.user={};R.teacher=true;if(!R.g)R.g=GROUPS[0].id;load()}
+else{const fb=getApps()[0]||initializeApp(CONFIG);auth=A.getAuth(fb);db=S.getFirestore(fb);
+  A.onAuthStateChanged(auth,u=>{R.user=u;R.teacher=!!u&&TEACHERS.includes((u.email||"").toLowerCase());if(R.teacher&&R.g)load();else draw()})}
+</script>
+</body></html>

@@ -1,6 +1,7 @@
 <!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Les meves activitats · English Lab</title>
+<title>El meu tauler · English Lab</title>
 <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
+<link rel="stylesheet" href="shared/css/el-app.css">
 <style>body{font:15px system-ui,sans-serif;margin:0;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}h1{font-size:1.5rem}h2{font-size:1.15rem}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:12px 0}.muted{color:#64748b}small{font-weight:400}
 button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}button.sub{background:#15803d}a.go{background:#0f766e;color:#fff;text-decoration:none;border-radius:8px;padding:4px 10px;font-size:13px;white-space:nowrap;display:inline-block}a.go.off{background:#94a3b8;pointer-events:none}
 .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}
@@ -21,7 +22,7 @@ dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 3
 .wk .s{white-space:pre-line}.wk .n{color:#b45309;font-size:13px}.hw{background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;padding:8px 10px;margin:6px 0}.hw ul{list-style:none;margin:4px 0;padding:0}.hw li{padding:2px 0}.hw p{margin:4px 0 0}.hwmsg summary{cursor:pointer;color:#0e7490;font-size:13px}.hwmsg div{white-space:pre-wrap;font-size:13px;background:#fff;border-radius:8px;padding:6px 8px;margin-top:4px;overflow-wrap:anywhere}ul.due{list-style:none;margin:4px 0;padding:0}ul.due li{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:5px 0;border-bottom:1px solid #f1f5f9}ul.due li>span:first-child{flex:1;min-width:180px}.ok{color:#16a34a;font-weight:700}.lt{color:#b91c1c;font-weight:700}.td{color:#b45309;font-weight:600}details.all{margin-top:8px}details.all summary{cursor:pointer;color:#0f766e}details.all .wk{border-top:1px solid #e2e8f0;padding-top:6px;margin-top:6px}.wk.now{background:#f0fdf4;border-radius:8px;padding:6px 8px}
 .ann{border-color:#fdba74}.ann ul{list-style:none;margin:4px 0;padding:0}.ann li{margin:8px 0}.ann .annt{white-space:pre-wrap;overflow-wrap:anywhere;border-left:4px solid #ea580c;background:#fff7ed;border-radius:8px;padding:6px 10px;margin-top:2px}.ann summary{cursor:pointer}
 .wsplit{display:flex;gap:3px;margin:8px 0 4px;border-radius:10px;overflow:hidden;font-size:13px;font-weight:600}.wsplit span{padding:8px 6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wsplit .d{background:#16a34a;color:#fff;font-size:15px}.wsplit .e{background:#e0e7ff;color:#3730a3}.wsplit .f{background:#fef3c7;color:#92400e}.wbig{margin:4px 0 10px;color:#166534}.wsplit i{font-style:normal}@media (max-width:600px){.wsplit i{display:none}}
-table.prt tr.daily td{background:#dcfce7!important}table.prt tr.pb td{background:#f8fafc;border-top:2px solid #e2e8f0}table.prt tr.in td:first-child{padding-left:22px}table.prt ul.oc{margin:4px 0 0;padding-left:0;list-style:none}table.prt ul.oc li{margin:4px 0}table.prt .src{color:#166534;font-weight:600}table.prt .src a{color:inherit}table.prt tr.sub td{font-size:.9em;background:#fffdf5}table.prt tr.sub td:first-child{padding-left:40px}table.prt td:nth-child(2),table.prt td:nth-child(3){white-space:nowrap}@media (max-width:600px){table.prt th:nth-child(4),table.prt td:nth-child(4){display:none}}table.prt tr.tot td{border-top:2px solid #94a3b8;background:#f1f5f9}
+table.prt tr.daily td{background:#dcfce7!important}table.prt tr.pb td{background:#f8fafc;border-top:2px solid #e2e8f0}table.prt tr.in td:first-child{padding-left:22px}table.prt ul.oc{margin:4px 0 0;padding-left:0;list-style:none}table.prt ul.oc li{margin:4px 0}table.prt .src{color:#166534;font-weight:600}table.prt .src a{color:inherit}table.prt tr.sub td{font-size:.9em;background:#fffdf5}table.prt tr.sub td:first-child{padding-left:40px}table.prt td:nth-child(2),table.prt td:nth-child(3){white-space:nowrap}@media (max-width:600px){table.prt th:nth-child(4),table.prt td:nth-child(4){display:none}}table.prt tr.tot td{border-top:2px solid #94a3b8;background:#f1f5f9}table.prt tr.tot td{font-size:1.05rem;padding-top:8px;padding-bottom:8px;vertical-align:middle}table.prt tr.tot td:nth-child(3) b{font-size:1.4rem}table.prt tr.tot td:nth-child(3) small{font-size:.9rem}table.prt tr.tot .xbar{height:11px;width:140px}
 .wkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:6px 0}.wkgrid>div{background:#eff6ff;border-radius:10px;padding:8px 10px}.wkgrid>div.wno{background:#fef2f2}.wkgrid>div.wyes{background:#f0fdf4}.wkgrid b{display:block;font-size:1.4rem}.wbar{margin-bottom:8px}
 .ptgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:6px 0}.ptgrid>div{background:#fffbeb;border-radius:10px;padding:8px 10px}.ptgrid b{display:block;font-size:1.4rem}.ptgrid b small{font-size:13px;font-weight:400}.ptbar{height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin:6px 0}.ptbar span{display:block;height:100%;background:#f59e0b}.ptmiss{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:8px 12px;color:#991b1b;margin:6px 0}.ptmiss ul{margin:6px 0 0;padding-left:18px;color:#0f172a}.ptmiss li{margin:4px 0}.ptok{color:#15803d;font-weight:600}.ptgrid>div.ptno{background:#fee2e2;color:#991b1b}.ptgrid>div.ptyes{background:#dcfce7;color:#166534}
 ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4px 0 8px}ol.ptrank li{border:1px solid #e2e8f0;border-radius:999px;padding:2px 10px;font-size:13px}ol.ptrank li.me{border-color:#f59e0b;background:#fffbeb;font-weight:600}ul.ptrules{list-style:none;padding:0;margin:6px 0}ul.ptrules li{margin:5px 0}.pend.live{background:#eff6ff;border-color:#93c5fd;flex-wrap:wrap}.pend.live a.go{padding:10px 16px;font-size:15px}
@@ -51,9 +52,43 @@ body.as .tabbody,body.as .lscard,body.as #exam{scroll-margin-top:130px}
 .brand{font-weight:800;letter-spacing:-.03em;font-size:1.1rem;padding:0 10px}.nvs{display:flex;flex-direction:column;gap:8px}.nv{color:#667085;text-decoration:none;padding:12px 14px;border-radius:14px;font-weight:700}.nv:hover{background:#eaf0ff;color:#3157d5}.nv.on{background:#3157d5;color:#fff}.nv.sub{padding:8px 14px 8px 26px;font-weight:600;font-size:14px}
 .page{min-width:0;max-width:1400px;padding:16px}.mtabs{display:none}.lsgo h2{margin:0 0 10px}.study{background:#f0fdf4;border-color:#bbf7d0}.study p{margin:4px 0 8px}.study .row{display:flex;gap:8px;flex-wrap:wrap}.lsgo .row{display:flex;gap:10px;flex-wrap:wrap}.lsgo a.go{font-size:16px;padding:10px 18px;border-radius:12px}
 @media (max-width:980px){.app{grid-template-columns:1fr}.side{display:none}.mtabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}.mtabs .nv{white-space:nowrap;background:#fff;border:1px solid #e5e7eb}.mtabs .nv.on{background:#3157d5;color:#fff;border-color:#3157d5}.mtabs .nv.sub{padding:12px 14px;font-weight:700}}</style>
-<nav class="mtabs nvs-m" aria-label="Menú"></nav>
+<style>/* Simple board (Roger, 6 Nov 2026): a home with one Continue button and four places; Chromebook screens first */
+body[data-place="home"] .page h1{font-size:2.2rem;letter-spacing:-.02em;margin:.4em 0 .1em}body[data-place="home"] #sub{font-size:17px;margin:0 0 14px}
+#crumb a.back{display:inline-flex;align-items:center;gap:4px;margin:6px 0 0;color:#3157d5;font-weight:700;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px;font-size:16px}#crumb a.back:hover{background:#eaf0ff}
+.hgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start;margin-top:6px}.hl{display:flex;flex-direction:column;gap:12px;min-width:0}
+.cont{background:#3157d5;color:#fff;border-radius:22px;padding:28px 30px;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 24px #3157d533}.cont .ck{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d6e0ff}
+.cont .ct{font-size:30px;font-weight:800;line-height:1.15;letter-spacing:-.01em}.cont .cs{font-size:17px;color:#e3e9ff}.cont .crow{display:flex;align-items:center;gap:12px;max-width:520px}.cont .cbar{flex:1;height:10px;border-radius:999px;background:#2443ad;overflow:hidden}.cont .cbar span{display:block;height:100%;background:#fff;border-radius:999px}.cont .cn{font-size:14px;font-weight:700;white-space:nowrap}
+.cont a.cgo{align-self:flex-start;margin-top:6px;background:#fff;color:#2443ad;border-radius:14px;padding:15px 38px;font-size:19px;font-weight:800;text-decoration:none}.cont a.cgo:hover{outline:3px solid #c7d4ff}.cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done a.cgo{color:#166534}
+a.hal{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:16px;text-decoration:none;font-size:16px}a.hal span{margin-left:auto;font-weight:800;white-space:nowrap}a.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}a.hal.news{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}a.hal.lsl{background:#fff;border:1px solid #e2e8f0;color:#0f172a}a.hal.lsl .lt{font-style:normal;min-width:0}a.hal.lsl b{color:#0f172a;font-size:17px}a.hal.lsl small{display:block;color:#64748b;font-size:14px}a.hal.lsl span{color:#3157d5}a.hal.lsl:hover{border-color:#3157d5}a.hal:hover{filter:brightness(.97)}a.hal.games{background:#fff;border:1px solid #e2e8f0;color:#0f172a;flex-wrap:wrap}a.hal.games .rings{display:flex;gap:14px;margin:0}a.hal.games .rings span{margin:0!important}a.hal.games .lt{font-style:normal;min-width:0}a.hal.games .lt b{font-size:17px;color:#0f172a}a.hal.games small{display:block;color:#64748b;font-size:14px}a.hal.games>span:last-child{color:#3157d5}a.hal.games:hover{border-color:#3157d5}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile.wide{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;gap:14px;padding:14px 20px}a.tile .tb.hw{background:#0e7490}
+.todo .tdl,.hwlist{list-style:none;margin:0;padding:0}.todo .tdl li{border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin:0 0 10px;background:#fff}.todo .tdl li.late{border-color:#fca5a5;background:#fff7f7}
+.todo .tdh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-bottom:8px}.todo .tdh b{font-size:17px}.todo .tdh b a{color:#1e3a8a;text-decoration:none}.todo .tdh b a:hover{text-decoration:underline}
+.todo .chips{display:flex;flex-wrap:wrap;gap:6px}.todo .stp{display:inline-block;font-size:14px;font-weight:600;border-radius:999px;padding:6px 13px;border:1px solid #99f6e4;background:#f0fdfa;color:#0f766e;text-decoration:none;white-space:nowrap}.todo a.stp:hover{outline:2px solid currentColor}.todo li.late .stp{border-color:#fca5a5;background:#fee2e2;color:#991b1b}.todo .stp.hwt{background:#ecfeff;border-color:#67e8f9;color:#155e75}.tdls{font-size:15px;margin:12px 0 8px;color:#475569}
+.tdtag{font-size:13px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}.tdtag.late{background:#fee2e2;color:#991b1b}.tdtag.hw{background:#cffafe;color:#155e75}
+.hwlist li{border:1px solid #a5f3fc;background:#f0fdff;border-radius:14px;padding:12px 14px;margin:0 0 10px}.hwlist li.dn{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
+.hwl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}.hwl .hwi{font-size:20px}.hwl .hwt{flex:1 1 260px;font-weight:600}.hwl .ok{color:#16a34a;font-weight:700}.hwl .td{color:#b45309;font-weight:700}.hwlist .hwmsg{margin-top:6px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px;color:#0f172a;text-decoration:none;min-height:120px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
+a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:30px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:18px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
+.ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}a.ucard{border:2px solid #e2e8f0;border-radius:16px;padding:16px 18px;text-decoration:none;color:#0f172a;display:flex;flex-direction:column;gap:4px}a.ucard small{color:#64748b;font-size:13px}a.ucard b{font-size:19px}a.ucard span{color:#3157d5;font-weight:700;margin-top:6px}a.ucard.on{border-color:#3157d5;background:#f5f8ff}a.ucard:hover{border-color:#3157d5}
+.helpl{margin:6px 0 0;padding-left:20px}.helpl li{margin:6px 0}
+@media (max-width:900px){.hgrid{grid-template-columns:1fr}.cont .ct{font-size:24px}}
+.hr{display:flex;flex-direction:column;gap:14px}.phonebn{position:relative}.phonebn>a{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#eef2ff,#f0f9ff);border:1px solid #c7d2fe;border-radius:18px;padding:14px 44px 14px 16px;color:#0f172a;text-decoration:none}.phonebn>a:hover{border-color:#3157d5}.phonebn .pbi{font-size:30px}.phonebn b{display:block;font-size:16px}.phonebn small{display:block;color:#475569;font-size:13.5px;margin-top:2px}.phonebn .pbg{margin-left:auto;font-weight:800;color:#2443ad;white-space:nowrap}.phonebn .pbx{position:absolute;top:8px;right:8px;background:none;color:#64748b;padding:4px 8px;font-size:14px}
+.phero{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:28px;align-items:center}.phero>img{width:100%;height:auto}.plead{font-size:18px;line-height:1.5;margin-top:0}.pqr{display:flex;gap:16px;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin-top:14px}.pqr img{flex:0 0 auto;background:#fff;border-radius:8px}.pinst{font-size:17px;font-weight:800;padding:14px 22px;border-radius:14px;background:#2443ad}
+details.psteps{border:1px solid #e2e8f0;border-radius:14px;padding:0 14px;margin:10px 0}details.psteps>summary{cursor:pointer;font-weight:800;font-size:17px;padding:12px 0}.pfig{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:4px 0 14px}.pfig figure{margin:0;display:flex;flex-direction:column;gap:8px}.pfig img{width:100%;height:auto}.pfig figcaption{font-size:14.5px;line-height:1.4}
+@media (max-width:900px){.phero{grid-template-columns:1fr}.phero>img{max-width:320px;margin:0 auto}.pfig{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:640px){.pqr{display:none}.phonebn>a{padding:12px 40px 12px 14px}}
+.ulinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.ulinks a{border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;text-decoration:none;color:#2443ad;font-weight:700;background:#fff}.bnav{display:none}
+/* Phone view (Roger, 6 Nov 2026: "so that students can use it on their cellphones"): no top menu, an app-style bar at the bottom with the four places, compact home, tables as cards */
+@media (max-width:640px){.mtabs{display:none!important}body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}.page{padding:12px 14px}
+#el-cloud-bar{position:static!important;margin:16px 14px 0;border-radius:14px!important;flex-wrap:wrap;justify-content:center}.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -4px 16px #0f172a14;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.bnav a{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;text-decoration:none;color:#64748b;font-size:11px;font-weight:700;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bnav a i{font-style:normal;font-size:22px;line-height:1}.bnav a.on{color:#2443ad;background:#eef2ff}.bnav a b{position:absolute;top:2px;right:calc(50% - 22px);background:#dc2626;color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;line-height:1.3}.bnav a b.hw{background:#0e7490}
+body[data-place="home"] .page h1{font-size:1.75rem;margin:.2em 0 .1em}body[data-place="home"] #sub{font-size:15px;margin:0 0 10px}#crumb a.back{display:none}.page h1{font-size:1.5rem;margin:.3em 0 .4em}
+.hl{gap:10px}a.hal{padding:12px 14px;font-size:15px}.cont{padding:18px;border-radius:20px}.cont .ct{font-size:21px}.cont .cs{font-size:15px}.cont a.cgo{align-self:stretch;text-align:center;padding:14px}
+.tiles{gap:10px}a.tile{min-height:0;padding:14px;gap:6px}a.tile .ti{font-size:24px}a.tile b{font-size:16px}a.tile small{font-size:13px}
+.box{padding:14px}.ugrid{grid-template-columns:1fr}
+table.lpst,table.lpst tbody,table.lpst tr,table.lpst td{display:block;width:auto}table.lpst thead{display:none}table.lpst tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:10px 12px;background:#fff}table.lpst td{border:0!important;padding:3px 0!important;text-align:left!important}table.lpst td:empty{display:none}table.lpst td{background:transparent!important}table.lpst tr.miss{background:#fef2f2;border-color:#fca5a5}}</style>
+<nav class="mtabs nvs-m" aria-label="Menú"></nav><nav class="bnav" id="bnav" aria-label="Menú"></nav>
 <div class="app"><aside class="side"><div class="brand">English with Roger</div><nav class="nvs" aria-label="Menú"></nav></aside>
-<div class="page"><h1>Les meves activitats</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
+<div class="page"><div id="crumb"></div><h1>El meu tauler</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
+<script>/* the first words in the language of who was signed in here last (el_who, el-cloud.js), not Catalan for everyone (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&(w.role!=="student"||w.ca===false)){document.querySelector(".page>h1").textContent="My dashboard";document.getElementById("sub").textContent="Loading…"}}catch(e){}</script>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-sections.js"></script>
@@ -63,6 +98,7 @@ body.as .tabbody,body.as .lscard,body.as #exam{scroll-margin-top:130px}
 <script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-plan.js"></script>
 <script src="shared/js/el-week.js"></script>
+<script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-points.js"></script>
 <script src="shared/js/el-sound.js"></script>
 <script type="module">
@@ -109,6 +145,7 @@ async function load(u){
   elInjectCorrected(D.pg,D.rs);   // steps the teacher corrected count as done (el-catalog.js; in memory only)
   for(const l of EL_LS)D.ls[l.id]=await ELCloud.lsInfo(l.id);
   try{const p=await F.getDoc(F.doc(db,"points",mail));if(p.exists())D.pt=p.data()}catch(e){}
+  try{const g=await F.getDoc(F.doc(db,"myGames",mail));if(g.exists())D.mg=g.data().games||{}}catch(e){}   // 🧩 📚 class game circles (gamesCard)
   if(D.me.group)try{const t=await F.getDoc(F.doc(db,"teams",D.me.group));if(t.exists())D.tm=t.data()}catch(e){}
   if(!AS)try{D.ann=await ELCloud.announcements()}catch(e){console.warn("announcements",e)}
   return D;
@@ -118,8 +155,8 @@ function setLang(){
   const lv=elRouteOf(D.lv,S.ls).level||(Object.values(D.lv).find(x=>x&&x.level)||{}).level;
   EN=all()||(!!lv&&!elCa(lv));
   document.documentElement.lang=EN?"en":"ca";
-  document.title=t("Les meves activitats","My activities")+" · English Lab";
-  $("h1").textContent=t("Les meves activitats","My activities");
+  document.title=t("El meu tauler","My dashboard")+" · English Lab";   // Roger, 6 Nov 2026: "it's not my activities but my dashboard"
+  $("h1").textContent=t("El meu tauler","My dashboard");
 }
 const doneSet=a=>{const p=D.pg[a.ls]||{},s=new Set();a.keys.forEach(k=>elDoneSet(p[k]).forEach(x=>s.add(x)));return s};
 // a step of a section the teacher has not opened yet for the group (elSecLocked; a vocabulary section holds the cards and practice steps)
@@ -134,7 +171,6 @@ function cell(a){
   // ✅ + green only with every step done (Roger, 4 Nov 2026); pressing Submit / Mark as done is only a small note
   if(!a.manual&&elAllDone(a,d,x)){v+=" ✅";c=c?c+" sub":"sub"}
   if(x&&x.feedback)v+=" 💬";
-  if(!a.manual&&x&&x.locked)v+=`<br><small class="muted">📤 ${t("entregada","submitted")}</small>`;else if(!a.manual&&x&&x.markedDone)v+=`<br><small class="muted">🟡 ${t("marcada com a feta","marked as done")}</small>`;
   return {t:v,c};
 }
 
@@ -143,10 +179,13 @@ const COURSES={"2eso":"2 ESO","4eso":"4 ESO"};
 const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName=l=>esc(l.title.replace(/^\S+ · /,""));
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
-  const html=`<a class="nv on" href="today.html" aria-current="page">${t("Les meves activitats","My activities")}</a>`
-    +cs.map(c=>`<a class="nv" href="${c}/index.html">${t("El meu curs","My course")} · ${COURSES[c]}</a>`+lss.filter(l=>l.course===c).map(l=>`<a class="nv sub" href="${lsHref(l)}">${lsName(l)}</a>`).join("")).join("")
-    +`<a class="nv" href="lab/">English Lab</a><a class="nv" href="lab/practice.html">${t("Practica","Practise")}</a>`
-    +`<a class="nv" href="${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}" target="_blank" rel="noopener">🎬 ${t("Com funciona la web","How the website works")}</a>`;
+  // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css)
+  const b=(cls,h,ic,txt,x)=>`<a class="nv${cls}" href="${h}"${x||""}><span class="ic" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`;
+  const html=b(" on","today.html","🏠",t("El meu tauler","My dashboard"),' aria-current="page"')
+    +cs.map(c=>b("",`${c}/index.html`,"🗂",`${t("El meu curs","My course")} · ${COURSES[c]}`)+lss.filter(l=>l.course===c).map(l=>b(" sub",lsHref(l),"📚",lsName(l))).join("")).join("")
+    +b("","lab/","🧪","English Lab")+b("","lab/practice.html","🎯",t("Practica","Practise"))
+    +b("","#help","❓",t("Ajuda","Help"))
+    +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"');
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
@@ -158,6 +197,115 @@ const vidRow=(icon,ca,en,dca,den,f,v)=>`<div class="hv"><div><b>${icon} ${t(ca,e
   +`<div class="row"><a class="go" href="${f}.mp4?v=${v}" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${f}-ca.mp4?v=${v}" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
 const howBox=()=>`<div class="pend howto" style="background:#f5f3ff;border-color:#c4b5fd;flex-direction:column;align-items:stretch;gap:10px">`
   +vidRow("🎬","Com funciona English Lab","How English Lab works","vídeo de 13 minuts: el tauler part per part, les Learning Situations, els learning paths i com moure't per la web","12-minute video: your board part by part, Learning Situations, learning paths and how to move around the website",HOWTO,HOWTO_V)+`</div>`;
+// Simple board (Roger, 6 Nov 2026: "the menus have little information and when you go to a place you can find the info that you need";
+// the students work on Chromebooks; the site is for self-study and for class): the board opens on a home with only the class bar
+// (📌 pulled-up path, live presentation), one Continue button to the next step and four places. Each place keeps the boxes that were on
+// the board: ✅ To do (what the teacher has opened and I haven't finished, my activities, what we've done) and 🏠 Homework (only what the
+// teacher set as homework, and the calendar; Roger, 6 Nov 2026), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
+// the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (video, problems). A place is a hash
+// (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
+const PLACE_OF={todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news",phone:"phone"};
+const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
+const placeTitle=p=>({todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone")})[p];
+// the first name: "Surname Surname, Name" on the student list, else the first word
+const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];const end=window.ELCheer?ELCheer.student(D.me.email||D.me.name||"",ELWeek.today(),EN):t("espero que tinguis un dia genial! ☺️","hope you are having a great day! ☺️");
+  return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
+const planOf=ls=>{const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;return {p,gi:p?gi:-1}};
+function homeSub(g,ls){const {p,gi}=planOf(ls),ex=gi>=0?ELWeek.exam(p,gi):null,n=ex?ELWeek.days(ELWeek.today(),ex):null;
+  return (g?esc(g.name)+" · ":"")+lsName(ls)+(ex&&n>=0?` · <b style="color:#b91c1c">${n>1?t(`examen d'aquí a ${n} dies`,`exam in ${n} days`):n===1?t("examen demà","exam tomorrow"):t("examen avui","exam today")}</b>`:"")}
+// the student's next step: the first open learning path (in the order of the group's plan) with a step still to do, as on 📋 My learning paths
+function nextFor(ls,info){if(only(ls.id)||info.status==="closed")return null;
+  const {p,gi}=planOf(ls),dr=(gi>=0&&(p._dropped||{})[gi])||[],today=ELWeek.today(),dueOf=a=>gi>=0?ELWeek.due(p,a.id,gi):null;
+  const rows=EL_CATALOG.filter(a=>a.ls===ls.id).map((a,i)=>({a,i,d:dueOf(a)})).sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i);
+  for(const {a,d} of rows){if(a.manual||dr.includes(a.id)||!canDo(a,info)||isDone(a))continue;
+    const cp=!AS&&elCheckpointMissing(a,doneSet,y=>canDo(y,info));if(cp)return {a:cp,cp:true};
+    const ds=doneSet(a),ks=steps(a),k=ks.find(x=>!ds.has(x)&&!(a.skip||[]).includes(x)&&!secOff(a,info,x));if(k===undefined)continue;
+    return {a,k,nm:tabName(a.id,k),done:ks.filter(x=>ds.has(x)).length,total:ks.length,late:!!(d&&d<today)}}
+  return null}
+function homeHtml(lss,ls,info){
+  workBox();const miss=(S.wmiss?S.wmiss.size:0)+lateList(lss).length,me=U&&U.uid;
+  const unread=(D.ann||[]).filter(a=>String(a.text||"").trim()&&me&&!(a.read||{})[me]).length;
+  const alerts=(miss?`<a class="hal late" href="#marks">⏰ <b>${miss>1?t(`Et falten ${miss} activitats`,`You have ${miss} activities missing`):t("Et falta 1 activitat","You have 1 activity missing")}</b><span>${miss>1?t("Mira-les","See them"):t("Mira-la","See it")} →</span></a>`:"")
+    +(unread?`<a class="hal news" href="#news">📣 <b>${unread>1?t(`${unread} anuncis nous del professor`,`${unread} new announcements from your teacher`):t("1 anunci nou del professor","1 new announcement from your teacher")}</b><span>${t("Llegeix","Read")} →</span></a>`:"");
+  const nx=nextFor(ls,info),{p,gi}=planOf(ls),num=p&&gi>=0&&nx?lpNums(p,gi)(nx.a):"";
+  const cont=nx?`<div class="cont"><div class="ck">${t("Continua on ho vas deixar","Continue where you left off")}</div><div class="ct">${num?num+" · ":""}${esc(nx.a.title)}</div>`
+      +`<div class="cs">${nx.cp?t("Primer fes aquest checkpoint, sense apunts.","First do this checkpoint, without notes."):t("Següent pas","Next step")+": <b>"+esc(nx.nm)+"</b>"}${nx.late?" · "+t("ja havia d'estar fet","it was due already"):""}</div>`
+      +(nx.total?`<div class="crow"><div class="cbar"><span style="width:${Math.round(nx.done/nx.total*100)}%"></span></div><span class="cn">${nx.done} / ${nx.total} ${t("passos","steps")}</span></div>`:"")
+      +`<a class="cgo" href="${nx.cp?tabHref(nx.a):tabHref(nx.a,nx.k)}">▶ ${t("Continua","Continue")}</a></div>`
+    :`<div class="cont done"><div class="ct">✓ ${t("Ho tens tot fet!","You're all done!")}</div><div class="cs">${t("No tens res pendent als learning paths oberts.","Nothing left to do in the open learning paths.")}</div><a class="cgo" href="lab/practice.html">${t("Practica pel teu compte","Practise on your own")} →</a></div>`;
+  const td=todoItems(lss),hws=hwList(ls,info),hwOpen=hws.filter(x=>!x.done);
+  const tile=(h,i,b,sub,badge,cl,wide)=>`<a class="tile${wide?" wide":""}" href="${h}"><span class="ti"><span aria-hidden="true">${i}</span>${badge?`<span class="tb ${cl||""}">${badge}</span>`:""}</span><span><b>${b}</b><small>${sub}</small></span></a>`;
+  // ✅ To do (opened in class, not finished) and 🏠 Homework (only what the teacher set as homework) are two tiles (Roger, 6 Nov 2026)
+  const tiles=tile("#todo","✅",t("Per fer","To do"),td.length?(td.length>1?t(`${td.length} learning paths oberts per acabar`,`${td.length} open learning paths to finish`):t("1 learning path obert per acabar","1 open learning path to finish")):t("Ho tens tot fet","All done"),td.length||"","")
+    +tile("#homework","📝",t("Deures","Homework"),hwOpen.length?t("Per al ","For ")+when(hwOpen[0].x.date):t("No tens deures","No homework"),hwOpen.length||"","hw")
+    +tile("#marks","📊",t("Les meves notes","My marks"),t("activitats, exàmens i producte final","activities, exams and final product"))
+    +tile("#units","📚","Learning Situations",t("resums, pràctica i el teu nivell","summaries, practice and your level"))
+    +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"),"","",true);
+  // the LS page, right under Continue (Roger, 6 Nov 2026: "students go from the dashboard to the ls and the ls to the dashboard")
+  const lsLink=ls&&!only(ls.id)?`<a class="hal lsl" href="${lsHref(ls)}">📚 <em class="lt"><b>${lsName(ls)}</b><small>${t("tots els learning paths, el repte i per estudiar","all learning paths, the challenge and study")}</small></em><span>${t("Obre la LS","Open the LS")} →</span></a>`:"";
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}${lsLink}${gamesCard(ls)}</div><div class="hr"><div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`}
+// 🧩 📚 Games and theory (Roger, 6 Nov 2026: "a kind of circle with a percentage on the board saying something like games and theory, click
+// to see your performance and what to study … two, grammar and vocabulary"): % right in this LS's class games (myGames/{email}, written by
+// the game board), the link opens the LS page's 📝 place with the theory, their notes, each game's result and what to study
+function gamesCard(ls){
+  const all=Object.values(D.mg||{}).filter(g=>ls&&g.ls===ls.id);if(!all.length||!window.elGameStats)return "";
+  const st=elGameStats(all);
+  return `<a class="hal games" href="${lsHref(ls)}#notes"><span class="rings">${elRing(st.grammar,"🧩 "+t("Gramàtica","Grammar"))}${elRing(st.vocab,"📚 "+t("Vocabulari","Vocabulary"))}</span><em class="lt"><b>${t("Jocs i teoria","Games and theory")}</b><small>${t("Mira els teus resultats i què has d'estudiar","See your results and what to study")}</small></em><span>${t("Obre","Open")} →</span></a>`}
+function placeHtml(place,lss,ls,list,info,st,stTag,pend){
+  if(place==="todo")return todoBox(lss,ls,info)+(only(ls.id)?"":weekBox(ls,info,true));
+  if(place==="hw")return homeworkBox(ls,info);
+  if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";return pend+workBox()+marksHead(lss,ls)+`<div id="ptbox">${pointsBox()}</div>`+tabBody(ls,list,info)}   // 📋 My activities: what counts for the mark (Roger, 6 Nov 2026: not under To do)
+  if(place==="units")return unitsBox(lss,ls,st,stTag)+studyBox(ls)+practiceBox(ls);
+  if(place==="phone")return phoneBox();
+  if(place==="news")return annBox()||`<div class="box"><p class="muted">${t("Encara no hi ha anuncis.","No announcements yet.")}</p></div>`;
+  return howBox()+phoneBanner(true)+`<div class="box"><b>${t("Alguna cosa no funciona?","Something isn't working?")}</b><ul class="helpl"><li>${t("Prem <b>⚠️ Problema</b> a baix de la pantalla i explica-ho: el professor ho veurà.","Press <b>⚠️ Problem</b> at the bottom of the screen and explain it: your teacher will see it.")}</li>`
+    +`<li>${t("Tens una idea per millorar la web? Prem <b>💡 Idea</b>.","Have an idea to make the website better? Press <b>💡 Idea</b>.")}</li><li>${t("Si una pàgina es veu antiga, recarrega-la amb <b>Ctrl+Maj+R</b>.","If a page looks old, reload it with <b>Ctrl+Shift+R</b>.")}</li></ul></div>`}
+const lsState=l=>{const s=(D.ls[l.id]||{}).status;return s==="closed"?t("tancada · per repassar","closed · to revise"):s==="hidden"?t("oculta","hidden"):t("ara","now")};
+// 📊 My marks: the LS chips (when there are several) and the three tabs of an LS
+function marksHead(lss,ls){const tab=tabOf(ls),tb=(id,icon,ca,en,sub)=>`<button class="btab b-${id} ${tab===id?"on":""}" data-do="tab" data-t="${id}"><span class="bi">${icon}</span><span><b>${t(ca,en)}</b><small>${sub}</small></span></button>`;
+  return `<div class="box lscard">`+(lss.length>1?`<div class="lspick">${lss.map(l=>`<button class="lsbtn ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}"><small>${esc(l.title.split(" · ")[0])} · ${lsState(l)}</small>${lsName(l)}</button>`).join("")}</div>`:"")
+    +`<div class="btabs" role="tablist">`+tb("form","📈","La meva avaluació formativa","My formative assessment",t("activitats dels learning paths","learning-path activities"))
+    +(hasFp(ls)?tb("fp","🎬","El meu producte final","My final product",fpSub(ls)):"")+tb("exam","📝","Els meus exàmens","My exams",examSub(ls))+`</div></div>`}
+// 📚 Learning Situations: one card per LS to open it, and my level (with the request to change it)
+function unitsBox(lss,ls,st,stTag){
+  return `<div class="box"><div class="ugrid">${lss.map(l=>`<a class="ucard ${l.id===ls.id?"on":""}" href="${lsHref(l)}"><small>${esc(l.title.split(" · ")[0])} · ${lsState(l)}</small><b>${lsName(l)}</b><span>${t("Obre-la","Open it")} →</span></a>`).join("")}</div>`
+    +`<div class="lvline"><span class="muted">${t("El teu nivell:","Your level:")}</span> ${levelTag(ls.course,elRouteOf(D.lv,ls.id).level)}${routeNote(ls.id,st)} ${stTag}</div>`
+    +`<div class="ulinks"><a href="${ls.course}/index.html">${t("El meu curs","My course")} · ${COURSES[ls.course]||""}</a><a href="lab/practice.html">${t("Practica","Practise")}</a><a href="lab/">English Lab</a></div></div>`}
+// "Study on your phone" (Roger, 6 Nov 2026: "telling them that they can study using their cellphones if they attach the website on the screen"):
+// a card on the home (and in Help) that leads to the #phone place: the board on a phone, a QR code to open it from the Chromebook,
+// and step-by-step pictures to add English Lab to the home screen on Android (Chrome) and iPhone (Safari). Pictures in shared/img/phone/.
+const APP=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
+let BIP=null;   // Android Chrome's install prompt, when the browser offers one
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();BIP=e;if(D&&placeNow()==="phone")render()});
+document.addEventListener("click",async e=>{
+  const x=e.target.closest("[data-phone-x]");if(x){e.preventDefault();try{localStorage.setItem("el_phone_seen","1")}catch(_){}x.closest(".phonebn").remove();return}
+  if(e.target.closest("[data-install]")&&BIP){BIP.prompt();try{await BIP.userChoice}catch(_){}BIP=null;render()}});
+function phoneBanner(always){
+  let seen=false;try{seen=localStorage.getItem("el_phone_seen")==="1"}catch(e){}
+  if(APP()||(!always&&seen))return "";
+  return `<div class="phonebn"><a href="#phone"><span class="pbi" aria-hidden="true">📱</span><span><b>${t("Estudia també amb el mòbil","Study on your phone too")}</b><small>${t("Posa English Lab a la pantalla d'inici del mòbil i obre'l com una aplicació.","Put English Lab on your phone's home screen and open it like an app.")}</small></span><span class="pbg">${t("Com","How")} →</span></a>${always?"":`<button class="pbx" data-phone-x title="${t("Amaga","Hide")}" aria-label="${t("Amaga","Hide")}">✕</button>`}</div>`}
+function phoneBox(){
+  const L=lang(),im=(n,alt)=>`<img src="shared/img/phone/${n}.webp" alt="${esc(alt)}" loading="lazy">`,ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  const fig=(n,c)=>`<figure>${im(n,c)}<figcaption>${c}</figcaption></figure>`;
+  const done=t("Fet! Toca la icona d'English Lab per estudiar.","Done! Tap the English Lab icon to study.");
+  const and=`<details class="psteps" ${ios?"":"open"}><summary>🤖 Android · Chrome</summary><div class="pfig">`
+    +fig("android-1-"+L,t("1 · Obre English Lab amb Chrome, inicia la sessió i toca <b>⋮</b> (a dalt a la dreta).","1 · Open English Lab in Chrome, sign in and tap <b>⋮</b> (top right)."))
+    +fig("android-2-"+L,t("2 · Toca <b>«Afegeix a la pantalla d'inici»</b> (o «Instal·la l'aplicació»).","2 · Tap <b>“Add to Home screen”</b> (or “Install app”)."))
+    +fig("android-3-"+L,t("3 · Toca <b>«Afegeix»</b>.","3 · Tap <b>“Add”</b>."))
+    +fig("home","4 · "+done)+`</div></details>`;
+  const iph=`<details class="psteps" ${ios?"open":""}><summary>🍏 iPhone · Safari</summary><div class="pfig">`
+    +fig("iphone-1-"+L,t("1 · Obre English Lab amb Safari, inicia la sessió i toca el botó <b>Comparteix</b> (a baix).","1 · Open English Lab in Safari, sign in and tap the <b>Share</b> button (at the bottom)."))
+    +fig("iphone-2-"+L,t("2 · Baixa una mica i toca <b>«Afegeix a la pantalla d'inici»</b>.","2 · Scroll down a little and tap <b>“Add to Home Screen”</b>."))
+    +fig("iphone-3-"+L,t("3 · Toca <b>«Afegeix»</b> (a dalt a la dreta).","3 · Tap <b>“Add”</b> (top right)."))
+    +fig("home","4 · "+done)+`</div></details>`;
+  return `<div class="box phonex"><div class="phero">${im("hero-"+L,t("El tauler i un learning path al mòbil","The board and a learning path on a phone"))}<div>`
+    +`<p class="plead">${t("English Lab també funciona al mòbil. Posa'l a la pantalla d'inici i s'obrirà com una aplicació, amb un sol toc: fes els deures, mira les notes i practica on vulguis.","English Lab works on your phone too. Put it on your home screen and it opens like an app, with one tap: do your homework, check your marks and practise wherever you are.")}</p>`
+    +`<p>💾 ${t("La feina es desa al teu compte: pots començar al Chromebook i acabar-la al mòbil.","Your work is saved in your account: you can start on the Chromebook and finish on your phone.")}</p>`
+    +(BIP?`<button class="pinst" data-install>📲 ${t("Instal·la English Lab en aquest mòbil","Install English Lab on this phone")}</button>`:"")
+    +`<div class="pqr"><img src="shared/img/phone/qr-board.svg" alt="${t("Codi QR d'English Lab","English Lab QR code")}" width="132" height="132"><span>${t("<b>Des del Chromebook:</b> escaneja aquest codi amb la càmera del mòbil per obrir English Lab. Inicia la sessió amb el correu de l'institut i la teva contrasenya.","<b>From the Chromebook:</b> scan this code with your phone's camera to open English Lab. Sign in with your school email and your password.")}</span></div>`
+    +`</div></div></div>`
+    +`<div class="box"><h2>${t("Com posar English Lab a la pantalla d'inici","How to put English Lab on your home screen")}</h2>${ios?iph+and:and+iph}`
+    +`<p class="muted">${t("Si tens el mòbil en castellà: «Añadir a pantalla de inicio» i «Añadir».","If your phone is in Spanish: “Añadir a pantalla de inicio” and “Añadir”. In Catalan: “Afegeix a la pantalla d'inici” and “Afegeix”.")}</p></div>`}
 function render(){
   const g=EL_GROUPS.find(x=>x.id===D.me.group);
   const lss=[...EL_LS].filter(l=>{const i=D.ls[l.id]||{status:"hidden"};return all()||(i.status!=="hidden"&&elLsForGroup(l,i,D.me.group))})
@@ -174,16 +322,27 @@ function render(){
   let pick=null;try{pick=localStorage.getItem("el_pick");localStorage.removeItem("el_pick")}catch(e){}
   if(pick&&g&&COURSES[pick]&&pick!==g.course&&!all())S.pick=pick;
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
-  $("#note").innerHTML=`<div id="pull">${pullBox()}</div><div id="live">${liveBox()}</div>`+annBox()+(note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"")+`<div id="ptbox">${pointsBox()}</div>`+workBox()+howBox();
-  $("#sub").textContent=(g?g.name+" · ":"")+(lss.length?t("El professor fa el seguiment de totes les activitats que fas. Algunes s'avaluaran i seran la teva avaluació contínua, que és una part de la nota.","Your teacher keeps track of all the activities you do. Some of them will be assessed and make up your continuous assessment, which is part of your mark."):t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start."));
-  if(!lss.length){$("#main").innerHTML="";return}
+  const place=placeNow(),cls=`<div id="pull">${pullBox()}</div><div id="live">${liveBox()}</div>`,noteBox=note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"";
+  document.body.dataset.place=lss.length?place:"home";
+  if(!lss.length){$("#crumb").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
+    $("#note").innerHTML=cls+annBox()+noteBox+howBox();$("#main").innerHTML="";return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
-  S.pend=[];lss.forEach(l=>EL_CATALOG.filter(a=>a.ls===l.id).forEach(a=>{const r=D.rs[a.id]||{};if(a.graded&&!a.manual&&r.markedDone&&!r.locked&&(D.ls[l.id]||{}).status==="open")S.pend.push(a)}));
+  S.pend=[];   // no Submit any more (Roger, 6 Nov 2026): answers save on their own, Submit only froze the score
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
   const n=S.pend.length;
-  $("#main").innerHTML=lateBox(lss)+(n?`<div class="pend"><div><b>${n>1?t(`Tens ${n} activitats marcades com a fetes sense entregar:`,`You have ${n} activities marked as done but not submitted:`):t("Tens 1 activitat marcada com a feta sense entregar:","You have 1 activity marked as done but not submitted:")}</b><div class="muted">${S.pend.map(a=>a.title).join(" · ")}</div></div><button class="sub" data-do="suball">${t("Entrega-les","Submit them")}</button></div>`:"")
-    +lsCard(lss,ls,st,stTag)+tabBody(ls,list,info);
+  const pend="";
+  if(place==="home"){$("#crumb").innerHTML="";$("h1").textContent=hello();$("#sub").innerHTML=homeSub(g,ls);
+    $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info)}
+  else{$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
+    $("#note").innerHTML=cls;$("#main").innerHTML=placeHtml(place,lss,ls,list,info,st,stTag,pend)}
+  bnav(lss.length?place:"home",lss);
   if(AS)asBar(lss,ls);
+}
+// Phone bar (Roger, 6 Nov 2026): the same four places as the home tiles, always at the bottom of the screen.
+function bnav(place,lss){
+  const miss=lss.length?(S.wmiss?S.wmiss.size:0)+lateList(lss).length:0,it=[["home","#","🏠",t("Inici","Home")],["todo","#todo","✅",t("Per fer","To do")],["hw","#homework","📝",t("Deures","Homework")],["marks","#marks","📊",t("Notes","Marks")],["units","#units","📚","LS"],["help","#help","❓",t("Ajuda","Help")]];
+  const ls=EL_LS.find(l=>l.id===S.ls),nt=lss.length?todoItems(lss).length:0,nh=ls?hwList(ls,D.ls[ls.id]||{}).filter(x=>!x.done).length:0;
+  $("#bnav").innerHTML=lss.length?it.map(([k,h,i,l])=>`<a href="${h}" class="${place===k?"on":""}"${place===k?' aria-current="page"':""}><i>${i}</i>${l}${k==="todo"&&nt?`<b>${nt}</b>`:k==="hw"&&nh?`<b class="hw">${nh}</b>`:""}</a>`).join(""):"";
 }
 // The LS report (Roger, 1 Nov 2026: "the idea is that I don't need to make [the LS1 reports] again since all the info could be on their
 // student board"): a big LS picker and three tabs per LS. 🗓 My week (plan, homework, summary, practice), 📈 My formative assessment
@@ -196,16 +355,6 @@ function tabOf(ls){const h=location.hash.slice(1),m={exam:"exam",formative:"form
   if(m&&!S.hashUsed){S.hashUsed=true;return S.tab=m}
   return S.tab=only(ls.id)||(D.ls[ls.id]||{}).status==="closed"?"exam":"form"}   // 📈 My formative assessment is the main tab (Roger, 2 Nov 2026)
 const hasWeek=ls=>{const p=(window.EL_PLAN||{})[ls.id];return !only(ls.id)||!!(p&&ELWeek.col(p,D.me.group)>=0&&ELWeek.span(p))};
-function lsCard(lss,ls,st,stTag){const tab=tabOf(ls),st2=l=>{const s=(D.ls[l.id]||{}).status;return s==="closed"?t("tancada · per repassar","closed · to revise"):s==="hidden"?t("oculta","hidden"):t("ara","now")};
-  const tb=(id,icon,ca,en,sub)=>`<button class="btab b-${id} ${tab===id?"on":""}" data-do="tab" data-t="${id}"><span class="bi">${icon}</span><span><b>${t(ca,en)}</b><small>${sub}</small></span></button>`;
-  return `<div class="box lscard"><h2>${t("Les meves Learning Situations","My Learning Situations")}</h2>`
-    +`<div class="lspick">${lss.map(l=>`<button class="lsbtn ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}"><small>${esc(l.title.split(" · ")[0])} · ${st2(l)}</small>${lsName(l)}</button>`).join("")}</div>`
-    +`<div class="lvline"><span class="muted">${t("El teu nivell:","Your level:")}</span> ${levelTag(ls.course,elRouteOf(D.lv,ls.id).level)}${routeNote(ls.id,st)} ${stTag} <a class="go lsopen" href="${lsHref(ls)}">${t("Ves a","Go to")} ${lsName(ls)} →</a></div>`
-    +`<div class="btabs" role="tablist">`
-    +tb("form","📈","La meva avaluació formativa","My formative assessment",t("activitats dels learning paths","learning-path activities"))
-    +(hasWeek(ls)?only(ls.id)?tb("week","🗓","La meva setmana","My week",t("pla, deures i estudi","plan, homework and study")):tb("week","✅","Què hem fet","What we've done",t("a classe, deures i estudi","in class, homework and study")):"")
-    +(hasFp(ls)?tb("fp","🎬","El meu producte final","My final product",fpSub(ls)):"")
-    +tb("exam","📝","Els meus exàmens","My exams",examSub(ls))+`</div></div>`}
 function examSub(ls){const x=(D.rs[ls.id+"/assessment"]||{}).sections||{};return Object.values(x).some(y=>y&&y.score!=null)?t("resultats i informe","results and report"):t("encara no hi ha resultats","no results yet")}
 function tabBody(ls,list,info){const tab=tabOf(ls);
   if(tab==="week")return `<div class="tabbody">${studyBox(ls)+practiceBox(ls)+weekBox(ls,info)||`<p class="muted">${t("Aquesta LS no té pla setmanal.","This LS has no week plan.")}</p>`}</div>`;
@@ -277,7 +426,7 @@ async function goLive(){
   if(DEMO||!D.me.group||goLive.on)return;goLive.on=true;const db=ELCloud.db,g=D.me.group,redraw=()=>{const n=$("#live");if(n)n.innerHTML=liveBox()};
   F.onSnapshot(F.doc(db,"live",g),x=>{LIVE=x.exists()?x.data():null;redraw()},e=>console.warn("live",e));setInterval(redraw,60e3);
   // 📌 a learning path pulled up by the teacher shows at once: only the LS docs of the group's open LSs (one read each when the board opens)
-  const pdraw=()=>{const n=$("#pull");if(n)n.innerHTML=pullBox()};
+  const pdraw=()=>{const n=$("#pull");if(n)n.innerHTML=pullBox()};setInterval(pdraw,30e3);   // gone when the class it was made in ends (until)
   EL_LS.filter(l=>{const i=D.ls[l.id];return i&&i.status==="open"&&elLsForGroup(l,i,g)}).forEach(l=>F.onSnapshot(F.doc(db,"ls",l.id),x=>{const d=x.exists()?x.data():{},i=D.ls[l.id];
     i.push=d.push||{};if(d.open)i.open=d.open;if(d.done)i.done=d.done;pdraw()},e=>console.warn("pull",e)));
   // my points and the teams' scores change during the class (✓ Right · +1): show them at once
@@ -505,7 +654,8 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
   const stu=()=>{if(!g.gv)return "";const sw=g.gv.parts.reduce((n,x)=>n+x.w,0),by=new Map();
     g.gv.parts.forEach(x=>{const k=x.sn||x.id;if(!by.has(k))by.set(k,{w:0,mw:0,ms:0,x});const y=by.get(k),m=(P.gv||{})[x.id];y.w+=x.w;if(m!=null){y.mw+=x.w;y.ms+=m*x.w}});
     return [...by.entries()].map(([k,y])=>{const n=SN[k]||[esc(y.x.name),""];return sub(n[0],W("gv")*y.w/sw,y.mw?y.ms/y.mw:null,n[1])}).join("")};
-  return `<div class="box prog"><h2>📊 ${t("La meva nota de la LS fins ara","My LS mark so far")}</h2>${AS?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the indented rows show every piece of each part (the student sees only the parts).</p>`:""}`
+  // the LS mark so far also big in the heading (Roger, 5 Nov 2026: "podria sortir aquí tb"), where the old "My average mark" stood
+  return `<div class="box prog"><div class="lphead"><h2>📊 ${t("La meva nota de la LS fins ara","My LS mark so far")}</h2>${total==null?"":`<b style="font-size:2rem;color:${col(total*10)}">${f1(total)} <small class="muted" style="font-size:1rem">/ 10</small></b>`}</div>${AS?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the indented rows show every piece of each part (the student sees only the parts).</p>`:""}`
     +`<p class="muted">${t("Com es fa la nota d'aquesta LS i com vas. Canvia cada dia amb la teva feina.","How the mark of this LS is made and how you are doing. It changes every day with your work.")}</p>`
     // the three parts as one bar, the daily work first and highlighted (Roger, 2 Nov 2026: "make clear … their daily work from the learning paths is very important")
     +(share?`<div class="wsplit" aria-hidden="true"><span class="d" style="flex:${share}">📚 <i>${t("Feina diària","Daily work")}</i> ${share} %</span><span class="e" style="flex:${W("exam")}">📝 <i>${t("Examen","Exam")}</i> ${W("exam")} %</span><span class="f" style="flex:${W("fp")}">🎬 <i>${t("Producte final","Final product")}</i> ${W("fp")} %</span></div>`
@@ -522,12 +672,14 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
 // of the LS (EL_GRADING[ls].fp): its mark and share of the LS mark, the day it is due, every step with what was handed in (the page
 // saves the hand-ins in its state .steps, with the self-assessment) and the teacher's answers, and how it is marked (the rubric rows
 // of fp.rows with their share of the LS mark). The teacher's view adds the mark of each row (progress.parts.fp, from the dashboard).
-// LS1 (EL_GRADING.only) keeps its final product on the formative tab, as before.
-const hasFp=ls=>{const g=(window.EL_GRADING||{})[ls.id];return !!(g&&!g.only&&g.fp&&g.fp.a&&EL_CATALOG.some(a=>a.id===g.fp.a))};
+// LS1 (EL_GRADING.only) has the same card since Roger, 6 Nov 2026 ("in the LS1 it should appear the final product as it does in the LS2"):
+// its mark, the teacher's feedback with the rubric shaded, and how it is marked from the rubric the teacher used (EL_FP_RUBRICS), as it has
+// no fp.rows; its formative tab only says there was no continuous assessment.
+const hasFp=ls=>{const g=(window.EL_GRADING||{})[ls.id];return !!(g&&g.fp&&g.fp.a&&EL_CATALOG.some(a=>a.id===g.fp.a))};
 const fpAct=ls=>EL_CATALOG.find(a=>a.id===EL_GRADING[ls.id].fp.a);
 const fpMark=ls=>{const x=D.rs[fpAct(ls).id]||{},pr=(D.rs[ls.id+"/assessment"]||{}).progress||{};return pr.fp??(x.max?(x.score||0)/x.max*10:null)};
 const fpDue=ls=>{const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;return gi>=0?ELWeek.due(p,fpAct(ls).id,gi):null};
-function fpSub(ls){const m=fpMark(ls),d=fpDue(ls);return m!=null?t(`nota: ${f1(m)} / 10`,`mark: ${f1(m)} / 10`):d?t(`fins al ${when(d)}`,`by ${when(d)}`):t("passos i rúbrica","steps and rubric")}
+function fpSub(ls){const m=fpMark(ls),d=fpDue(ls);return m!=null?t(`nota: ${f1(m)} / 10`,`mark: ${f1(m)} / 10`):d?t(`fins al ${when(d)}`,`by ${when(d)}`):only(ls.id)?t("encara no hi ha nota","no mark yet"):t("passos i rúbrica","steps and rubric")}
 function fpView(ls,info){const g=EL_GRADING[ls.id],a=fpAct(ls),x=D.rs[a.id]||{},pr=(D.rs[ls.id+"/assessment"]||{}).progress||{},P=pr.parts||{};
   const W=(g.blocks.find(b=>b.id==="fp")||{}).w||0,m=fpMark(ls),d=fpDue(ls),open=info.status!=="closed",can=canDo(a,info)&&open,today=ELWeek.today();
   let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
@@ -536,15 +688,15 @@ function fpView(ls,info){const g=EL_GRADING[ls.id],a=fpAct(ls),x=D.rs[a.id]||{},
     return `<tr><td class="l"><b>${esc(tt)}</b>${ans(sid)?`<div class="ans">💬 <b>${t("Resposta del professor:","Teacher's answer:")}</b> ${esc(ans(sid))}</div>`:""}</td>`
       +`<td class="l">${h?`<span class="s-ok">✔ ${t("Entregat","Handed in")}</span>${h.avg!=null?` <small class="muted">· ${t("autoavaluació","self-assessment")} ${h.avg}/4</small>`:""}`:late?`<span class="s-no">✗ ${t("No entregat","Not handed in")}</span>`:`<span class="s-off">${t("Encara no","Not yet")}</span>`}</td>`
       +`<td>${can?`<a class="go" href="${href(sid)}">${h?t("Revisa","Review"):t("Fes-lo","Do it")} →</a>`:""}</td></tr>`}).join("");
-  const sw=g.fp.rows.reduce((n,r)=>n+r.w,0),num=c=>/^\d+\.\d+$/.test(c);
-  const rub=g.fp.rows.map(r=>{const v=(P.fp||{})[r.step+"|"+r.c];return `<tr><td class="l"><b>${esc(r.name)}</b> ${num(r.c)?pill(r.c):""}</td><td><b>${Math.round(W*r.w/sw*100)/100} %</b></td>${AS?`<td>${v==null?`<span class="muted">${t("encara no","not yet")}</span>`:`<b style="color:${col(v*10)}">${f1(v)}</b> <small class="muted">/ 10</small>`}</td>`:""}</tr>`}).join("");
+  const sw=(g.fp.rows||[]).reduce((n,r)=>n+r.w,0),num=c=>/^\d+\.\d+$/.test(c),R=!g.fp.rows&&(window.EL_FP_RUBRICS||{})[a.id];
+  const rub=R?R.rows.map(r=>`<tr><td class="l"><b>${esc(r.name)}</b> <small class="muted">· ${esc(r.sub)}</small></td><td><b>${Math.round(W*r.w)/100} %</b></td></tr>`).join(""):(g.fp.rows||[]).map(r=>{const v=(P.fp||{})[r.step+"|"+r.c];return `<tr><td class="l"><b>${esc(r.name)}</b> ${num(r.c)?pill(r.c):""}</td><td><b>${Math.round(W*r.w/sw*100)/100} %</b></td>${AS?`<td>${v==null?`<span class="muted">${t("encara no","not yet")}</span>`:`<b style="color:${col(v*10)}">${f1(v)}</b> <small class="muted">/ 10</small>`}</td>`:""}</tr>`}).join("");
   return `<div class="fhead"><h2>🎬 ${t("El meu producte final","My final product")} <small>· ${lsName(ls)}</small></h2><p>${t(`${esc(a.title.replace(/^[^:]*:\s*/,""))}: és el ${W} % de la nota de la LS. Aquí tens els passos, què has entregat i com es corregeix.`,`${esc(a.title.replace(/^[^:]*:\s*/,""))}: it is ${W} % of your LS mark. Here are its steps, what you have handed in and how it is marked.`)}</p></div>`
     +`<div class="box"><div class="lphead"><div><h2>${esc(a.title)}</h2><small class="muted">${W} % ${t("de la nota de la LS","of your LS mark")}${d?` · ${t("fins al","due")} ${when(d)}`:""}</small></div><b style="font-size:1.3rem;color:${m==null?"#94a3b8":col(m*10)}">${m==null?t("encara no hi ha nota","no mark yet"):f1(m)+" / 10"}</b></div>`
-    +`<div class="row" style="margin-top:8px"><a class="go" href="${href("")}">${open?t("Obre el producte final","Open the final product"):t("Revisa el producte final","Review the final product")} →</a> <a class="go" href="${href("rubric")}">📋 ${t("Rúbrica","Rubric")}</a></div>`
+    +`<div class="row" style="margin-top:8px"><a class="go" href="${href("")}">${open?t("Obre el producte final","Open the final product"):t("Revisa el producte final","Review the final product")} →</a> ${g.only?"":`<a class="go" href="${href("rubric")}">📋 ${t("Rúbrica","Rubric")}</a>`}</div>`
     +(x.feedback?`<label style="font-weight:600;display:block;margin-top:10px">${t("Feedback del professor","Your teacher's feedback")}</label>${fbBox(x.feedback,a.id)}`:"")+`</div>`
     +(sts?`<div class="box"><h2>${t("Els passos","The steps")}</h2><div class="wrap"><table class="xt fpst"><thead><tr><th>${t("Pas","Step")}</th><th>${t("Estat","State")}</th><th></th></tr></thead><tbody>${sts}</tbody></table></div></div>`:"")
-    +`<div class="box"><h2>${t("Com es corregeix","How it is marked")}</h2><div class="wrap"><table class="xt fpst"><thead><tr><th>${t("Part de la rúbrica","Rubric part")}</th><th>${t("Pes a la nota de la LS","Share of the LS mark")}</th>${AS?"<th>Mark</th>":""}</tr></thead><tbody>${rub}</tbody></table></div>`
-    +`<p class="muted" style="margin:6px 0 0">${t("El professor el corregeix amb la rúbrica quan l'has entregat.","Your teacher marks it with the rubric once you have handed it in.")}</p></div>`}
+    +(rub?`<div class="box"><h2>${t("Com es corregeix","How it is marked")}</h2>${R&&R.note?`<p class="muted" style="margin:0 0 6px">${esc(R.note)}</p>`:""}<div class="wrap"><table class="xt fpst"><thead><tr><th>${t("Part de la rúbrica","Rubric part")}</th><th>${t("Pes a la nota de la LS","Share of the LS mark")}</th>${AS&&!R?"<th>Mark</th>":""}</tr></thead><tbody>${rub}</tbody></table></div>`
+    +`<p class="muted" style="margin:6px 0 0">${t("El professor el corregeix amb la rúbrica quan l'has entregat.","Your teacher marks it with the rubric once you have handed it in.")}</p></div>`:"")}
 // Teacher feedback with a rubric (Roger, 4 Nov 2026: "they should see the rubric and the teacher's observations"): the feedback text
 // "Final mark…", the comment, then per part "Name (30%) · 7.5/10" with "✔ went well" and "➜ keep in mind" lines, shown as the comment
 // plus a table. Feedback without parts stays plain text with its line breaks.
@@ -569,21 +721,20 @@ function fbRubric(R,parts,com){const lv=m=>Math.max(0,Math.min(4,Math.round(m/2.
         +`<div class="rbg">${r.d.map((d,k)=>`<div class="rbc${k===L?" on":""}"><b>${esc(R.levels[k])}</b> <small class="muted">${r.pts[k]} ${t("punts","pts")}</small>${k===L?` <span class="rby">◀ ${t("tu","you")}</span>`:""}<div>${esc(d)}</div></div>`).join("")}</div>`
         +(L===last?`<div class="rbc on" style="margin-top:6px"><b>${esc(R.levels[last])}</b> <span class="rby">◀ ${t("tu","you")}</span></div>`:"")
         +((p.ok.length||p.todo.length)?`<div class="rbn">${p.ok.length?`<div>✔ ${esc(p.ok.join(" "))}</div>`:""}${p.todo.length?`<div>➜ ${esc(p.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
-// The formative tab of an LS where only the exam and the final product count (LS1): its final product.
-function onlyForm(id){const g=EL_GRADING[id],fp=D.rs[g.fp.a]||{},a=EL_CATALOG.find(x=>x.id===g.fp.a);
-  return `<div class="box"><p>${t("En aquesta LS no hi havia avaluació contínua: només compten l'examen (a «Els meus exàmens») i el producte final.","In this LS there was no continuous assessment: only the exam (in “My exams”) and the final product count.")}</p>`
-    +`<div class="lphead"><h2>${t("Producte final","Final product")}${a?` <small class="muted">· ${esc(a.title)}</small>`:""}</h2><b style="font-size:1.2rem;color:${fp.max?col(fp.score/fp.max*100):"#94a3b8"}">${fp.max?f1((fp.score||0)/fp.max*10)+" / 10":t("encara no hi ha nota","no mark yet")}</b></div>`
-    +(fp.feedback?`<label style="font-weight:600">${t("Feedback del professor","Your teacher's feedback")}</label>${fbBox(fp.feedback,g.fp.a)}`:"")+`</div>`}
+// The formative tab of an LS where only the exam and the final product count (LS1): the final product has its own card (🎬, fpView).
+function onlyForm(id){
+  return `<div class="box"><p>${t("En aquesta LS no hi havia avaluació contínua: només compten l'examen (a «Els meus exàmens») i el producte final (a «El meu producte final»).","In this LS there was no continuous assessment: only the exam (in “My exams”) and the final product (in “My final product”) count.")}</p></div>`}
 // Week plan and reminders (Roger, 25 Oct 2026), from the teacher's plan in el-plan.js (shared/js/el-week.js): this week's classes,
 // the activities due this week, the exam day and the whole plan, for the student's group; past-due activities not done are reminded on top.
 // "Done" = submitted or marked as done, or every scored step done. The final product is handed in on Classroom, so it is listed but never reminded.
 const isDone=a=>elAllDone(a,doneSet(a),D.rs[a.id]);   // every step done, not the Submit flag (el-catalog.js)
 const lang=()=>EN?"en":"ca",when=d=>ELWeek.date(d,lang());
 // "Sections to finish" box removed (Roger, 2 Nov 2026: the learning paths table on 📈 shows every missing tab, with links).
-function lateBox(lss){const today=ELWeek.today(),late=[];
+function lateList(lss){const today=ELWeek.today(),late=[];
   lss.forEach(l=>{const info=D.ls[l.id]||{status:"hidden",enabled:[]},p=(window.EL_PLAN||{})[l.id],gi=ELWeek.col(p,D.me.group);if(info.status!=="open"||gi<0)return;
     Object.keys(p.due||{}).forEach(id=>{const a=EL_CATALOG.find(x=>x.id===id),d=ELWeek.due(p,id,gi);if(a&&d&&d<today&&!a.manual&&canDo(a,info)&&!isDone(a)&&!(S.wmiss&&S.wmiss.has(a.id)))late.push([a,d])})});
-  if(!late.length)return "";late.sort((x,y)=>x[1]<y[1]?-1:1);
+  return late.sort((x,y)=>x[1]<y[1]?-1:1)}
+function lateBox(lss){const late=lateList(lss);if(!late.length)return "";
   return `<div class="pend late"><b>⏰ ${late.length>1?t(`Tens ${late.length} activitats endarrerides:`,`You have ${late.length} late activities:`):t("Tens 1 activitat endarrerida:","You have 1 late activity:")}</b><ul>`
     +late.map(([a,d])=>`<li>${esc(a.title)} · <span class="muted">${t("calia fer-la el","it was due on")} ${when(d)}</span> <a class="go" href="${a.path}">${t("Fes-la ara","Do it now")}</a></li>`).join("")+`</ul></div>`}
 function dueList(p,gi,i,info){const today=ELWeek.today(),ds=ELWeek.dueIn(p,gi,i).map(([id,d])=>[EL_CATALOG.find(x=>x.id===id),d]).filter(([a])=>a);
@@ -599,18 +750,57 @@ function weekHtml(p,gi,i,info,title,now){const r=p.rows[i];if(!r)return "";const
 // Calendar to the group's feed (calendar/<group>.ics, tools/gen-calendar.js), so all later homework appears there by itself.
 // the teacher's message of a homework (Roger, 1 Nov 2026: "a message ready for the students telling instructions"), links clickable
 const hwLinks=m=>esc(m).replace(/https?:\/\/[^\s<]+/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
-function hwBox(p,gi,info){const xs=ELWeek.upcoming(p,gi,null,null,((info||{}).homework||{})[D.me.group]),cal=ELWeek.calendar(D.me.group);
+function hwBox(p,gi,info){const xs=ELWeek.studentHw(p,gi,((info||{}).homework||{})[D.me.group]),cal=ELWeek.calendar(D.me.group);
   return `<div class="hw"><b>🏠 ${t("Deures i classes pel teu compte","Homework and classes on your own")}</b>`
     +(xs.length?`<ul>${xs.map(x=>`<li>${x.kind==="self"?"📚":"🏠"} ${esc(ELWeek.taskText(x,lang()))}${x.extra?` <a href="${ELWeek.gcalLink(x,lang())}" target="_blank" rel="noopener" title="${t("Afegeix-ho al calendari","Add it to my calendar")}">📅</a>`:""}${x.msg?`<details class="hwmsg"><summary>${t("Instruccions del professor","Teacher's instructions")}</summary><div>${hwLinks(x.msg)}</div></details>`:""}</li>`).join("")}</ul>`:`<p class="muted">${t("No tens deures per als propers dies.","No homework for the next few days.")}</p>`)
     +`<p><a class="go" href="${cal.google}" target="_blank" rel="noopener">📅 ${t("Afegeix-ho al meu Google Calendar","Add it to my Google Calendar")}</a> <small class="muted">${t("Només cal fer-ho una vegada: hi apareixeran tots els deures i el dia de l'examen.","You only do it once: all your homework and the exam day will appear there.")}</small></p></div>`}
-function weekBox(ls,info){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.me.group);if(!p||gi<0||!ELWeek.span(p))return "";
+// ✅ To do (Roger, 6 Nov 2026: "When I open a section it must be set as to do. So in each class I open a section or LP and they see it as to
+// do. They are only homework if I say so (I can say that a LP is homework or only a section)"): every learning path and tab the teacher
+// has opened for my group that I haven't finished (elTodoList in el-catalog.js), with its open tabs as links and 📝 when the teacher has also
+// set it (or one of its tabs) as homework. Nothing from the plan's days (Roger: "I don't [want] students [to] see anything as to do nor the
+// week. I say when to do sth since otherwise is too much info"). Opening is enough: the teacher sets
+// nothing else. Homework has its own place (homeworkBox): only what the teacher set as homework.
+function todoItems(lss){if(!D.me.group)return [];
+  return lss.filter(l=>!only(l.id)).flatMap(l=>{const {p,gi}=planOf(l);return elTodoList(l.id,D.ls[l.id]||{},D.me.group,doneSet,isDone,p,gi).map(x=>Object.assign(x,{l,p,gi}))})}
+const tabDone=(a,id,ds)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>ds.has(k))};
+// the homework of an LS still ahead, only what the teacher set (ELWeek.studentHw): {x, acts: [[activity, [panel ids]]] (elHwTargets; [] = the whole path), done, href}
+function hwList(ls,info){const {p,gi}=planOf(ls);if(gi<0||only(ls.id)||!D.me.group)return [];
+  return ELWeek.studentHw(p,gi,((info||{}).homework||{})[D.me.group]).map(x=>{const tg=elHwTargets(x,ls.id,p,gi)||{};
+    const acts=Object.entries(tg).map(([id,ps])=>[EL_CATALOG.find(a=>a.id===id),ps||[]]).filter(([a])=>a);
+    const left=acts.flatMap(([a,ps])=>{const ds=doneSet(a),all=((window.EL_SECTIONS||{})[a.id]||[]).map(z=>z[0]).filter(id=>elSecSteps(a,id).length);
+      return (ps.length?ps:all.length?all:[""]).filter(id=>id?!tabDone(a,id,ds):!isDone(a)).map(id=>[a,id])});
+    return {x,acts,done:acts.length>0&&!left.length,href:left.length?tabHref(left[0][0],left[0][1]||undefined):acts.length?tabHref(acts[0][0]):null,can:acts.every(([a,ps])=>canDo(a,info)&&!ps.some(id=>secOff(a,info,id)))}})}   // a tab still locked: "not open yet"
+function todoBox(lss,ls,info){const xs=todoItems(lss),hws=hwList(ls,info).filter(h=>!h.done),many=new Set(xs.map(x=>x.l.id)).size>1;
+  const hwOf=a=>hws.find(h=>h.acts.some(([y])=>y.id===a.id)),hwTab=(a,id)=>hws.some(h=>h.acts.some(([y,ps])=>y.id===a.id&&ps.includes(id)));
+  const head=`<h2>✅ ${t("Per fer","To do")}</h2><p class="muted" style="margin:0 0 10px">${t("Tot el que el professor ha obert a classe i encara no has acabat. Clica una pestanya per anar-hi. Els <b>deures</b> són una altra cosa: només el que el professor posa com a deures (📝 Deures).","Everything your teacher has opened in class that you haven't finished yet. Click a tab to go straight to it. <b>Homework</b> is different: only what your teacher sets as homework (📝 Homework).")}</p>`;
+  if(!xs.length)return `<div class="box todo">${head}<p class="ptok">✓ ${t("No tens res per fer: has acabat tot el que el professor ha obert.","Nothing to do: you have finished everything your teacher has opened.")}</p></div>`;
+  const li=x=>{const a=x.a,ds=doneSet(a),ks=steps(a),n=ks.filter(k=>ds.has(k)).length,num=x.p&&x.gi>=0?lpNums(x.p,x.gi)(a):"",nm=(num?num+" · ":"")+a.title.split(/[:(]/)[0].trim(),h=hwOf(a);
+    const tags=(h?` <span class="tdtag hw">📝 ${t("deures per al","homework for")} ${when(h.x.date)}</span>`:"");
+    const chips=x.cp?`<a class="stp go2" href="${tabHref(x.cp)}">⏱ ${t(`Primer fes el ${esc(x.cp.title)} (sense apunts)`,`First do ${esc(x.cp.title)} (without notes)`)} →</a>`
+      :x.tabs.length?x.tabs.map(([id,tn])=>`<a class="stp go2 ${hwTab(a,id)?"hwt":""}" href="${tabHref(a,id)}">${hwTab(a,id)?"📝 ":""}${esc(tn)} →</a>`).join("")
+      :`<a class="stp go2" href="${tabHref(a)}">${t("Obre-la","Open it")} →</a>`;
+    return `<li><div class="tdh"><b><a href="${tabHref(a)}">${esc(nm)}</a></b>${ks.length>1?` <small class="muted">· ${n} / ${ks.length} ${t("passos fets","steps done")}</small>`:""}${tags}</div><div class="chips">${chips}</div></li>`};
+  return `<div class="box todo">${head}${many?lss.filter(l=>xs.some(x=>x.l.id===l.id)).map(l=>`<h3 class="tdls">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</h3><ul class="tdl">${xs.filter(x=>x.l.id===l.id).map(li).join("")}</ul>`).join(""):`<ul class="tdl">${xs.map(li).join("")}</ul>`}</div>`}
+// 📝 Homework (Roger, 6 Nov 2026: "They are only homework if I say so"): only what the teacher set as homework (a learning path or some of
+// its tabs, 🏠 Set as homework on the dashboard; never the plan's "Homework by …" lines: ELWeek.studentHw), with the day it is for, ✔ when I have done it, a
+// button to the first tab still to do, the teacher's instructions and the calendar. LS1 keeps its old week plan.
+function homeworkBox(ls,info){const empty=`<div class="box"><p class="muted">${t("No tens deures per als propers dies.","No homework for the next few days.")}</p></div>`;
+  if(only(ls.id))return weekBox(ls,info)||empty;
+  const {p,gi}=planOf(ls);if(gi<0||!ELWeek.span(p))return empty;const xs=hwList(ls,info),cal=ELWeek.calendar(D.me.group);
+  const li=h=>{const x=h.x,st=h.done?`<span class="ok">✔ ${t("Fet","Done")}</span>`:h.acts.length&&!h.can?`<small class="muted">🔒 ${t("encara no està oberta","not open yet")}</small>`:h.acts.length?`<span class="td">${t("Per fer","To do")}</span>`:"";
+    return `<li class="${h.done?"dn":""}"><div class="hwl"><span class="hwi">📝</span><span class="hwt">${esc(ELWeek.taskText(x,lang()))}</span>${st}${h.href&&!h.done&&h.can?`<a class="go" href="${h.href}">${t("Obre","Open")} →</a>`:""}${x.extra?` <a href="${ELWeek.gcalLink(x,lang())}" target="_blank" rel="noopener" title="${t("Afegeix-ho al calendari","Add it to my calendar")}">📅</a>`:""}</div>`
+      +`${x.msg?`<details class="hwmsg"><summary>${t("Instruccions del professor","Teacher's instructions")}</summary><div>${hwLinks(x.msg)}</div></details>`:""}</li>`};
+  return `<div class="box hwbox"><h2>📝 ${t("Deures","Homework")} <small class="muted">· ${lsName(ls)}</small></h2><p class="muted" style="margin:0 0 10px">${t("Només el que el professor ha posat com a deures, amb el dia per al qual és. El que obrim a classe és a ✅ Per fer.","Only what your teacher has set as homework, with the day it is for. What we open in class is in ✅ To do.")}</p>`
+    +(xs.length?`<ul class="hwlist">${xs.map(li).join("")}</ul>`:`<p class="ptok">✓ ${t("No tens deures per als propers dies.","No homework for the next few days.")}</p>`)
+    +`<p style="margin-top:12px"><a class="go" href="${cal.google}" target="_blank" rel="noopener">📅 ${t("Afegeix-ho al meu Google Calendar","Add it to my Google Calendar")}</a> <small class="muted">${t("Només cal fer-ho una vegada: hi apareixeran tots els deures i el dia de l'examen.","You only do it once: all your homework and the exam day will appear there.")}</small></p></div>`}
+function weekBox(ls,info,noHw){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col(p,D.me.group);if(!p||gi<0||!ELWeek.span(p))return "";
   const today=ELWeek.today(),i=ELWeek.row(p),nx=p.rows.findIndex(r=>r.from>today),ex=ELWeek.exam(p,gi),n=ex?ELWeek.days(today,ex):null;
   const exam=ex&&n>=0?`<div class="exam">📝 ${t("Examen","Exam")}: ${when(ex)}${n>1?t(` · d'aquí a ${n} dies`,` · in ${n} days`):n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
   // learning paths the teacher dropped for the group (no time): not in the exam and not counted (Roger, 1 Nov 2026)
   const dr=((p._dropped||{})[gi]||[]).map(id=>EL_CATALOG.find(a=>a.id===id)).filter(Boolean);
   const drop=dr.length?`<p class="muted">✂ ${t("No entra a l'examen ni compta per a la nota (no hi vam tenir temps): ","Not in the exam and it does not count (we had no time for it): ")}${dr.map(a=>"<b>"+esc(a.title.split(/[:(]/)[0].trim())+"</b>").join(", ")}</p>`:"";
   const wk=n=>t("Setmana ","Week ")+(n+1);
-  if(!only(ls.id))return `<div class="box wkbox"><h2>${t("Què hem fet a classe","What we've done in class")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Els learning paths i les pestanyes que ja hem fet a classe. Si un dia no vas poder venir, mira-ho aquí i fes-ho a casa.","The learning paths and tabs we have already done in class. If you missed a class, check it here and do it at home.")}</p>${exam}${drop}${doneBox(ls,p,gi,info)}${hwBox(p,gi,info)}</div>`;
+  if(!only(ls.id))return `<div class="box wkbox"><h2>${t("Què hem fet a classe","What we've done in class")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Els learning paths i les pestanyes que ja hem fet a classe. Si un dia no vas poder venir, mira-ho aquí i fes-ho a casa.","The learning paths and tabs we have already done in class. If you missed a class, check it here and do it at home.")}</p>${exam}${drop}${doneBox(ls,p,gi,info)}${noHw?"":hwBox(p,gi,info)}</div>`;
   const main=i>=0?weekHtml(p,gi,i,info,t("Aquesta setmana","This week")+" · "+wk(i),true):nx>=0?weekHtml(p,gi,nx,info,(nx===0?t("Comencem","We start"):t("Propera setmana","Next week"))+" · "+wk(nx),true):`<p class="muted">${t("El pla d'aquesta LS ja s'ha acabat.","The plan of this LS is over.")}</p>`;
   return `<div class="box wkbox"><h2>${t("El meu pla setmanal","My week plan")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Què fem a classe i què has de fer cada setmana. Si un dia no pots venir, mira-ho aquí.","What we do in class and what you have to do every week. If you miss a class, check it here.")}</p>${exam}${drop}${hwBox(p,gi,info)}${main}`
     +`<details class="all"><summary>${t("Tot el pla de la LS","The whole LS plan")}</summary>${p.rows.map((r,k)=>weekHtml(p,gi,k,info,wk(k),k===i)).join("")}</details></div>`}
@@ -658,14 +848,16 @@ function want(r){S.want=r;document.querySelectorAll("button.opt").forEach(b=>b.c
 async function sendAsk(){if(!S.want||AS)return;const reason=$("#why").value.replace(/\s+/g," ").trim().slice(0,300);
   if(!DEMO)try{await F.setDoc(F.doc(ELCloud.db,"students",U.uid,"levels",S.ls),{request:S.want,reason,requestedAt:F.serverTimestamp()},{merge:true})}catch(e){return alert(t("No s'ha pogut enviar la petició: ","Could not send the request: ")+e.message)}
   D.lv[S.ls]=Object.assign(D.lv[S.ls]||{},{request:S.want,reason});$("#dlg").close();render()}
-// Summary of my criteria: points, a mark out of 10 per criterion and the average of those marks.
+// Summary of my criteria (Roger, 5 Nov 2026, Maria Romero 2ESO B: "the average shown is 9.9 but I think it is 3.1"): the old box "My average
+// mark" (steps done of every graded path per criterion, out of 10, with the steps whose day has not come yet counted as missing) said 3.1
+// next to "My LS mark so far" 9.9. The LS mark is only the one in "My LS mark so far" (progressBox), so this table now shows how much of the
+// work behind each criterion is done (steps done / steps, with a bar), never a mark out of 10 and no average.
 function summary(list){
-  const rows=[...new Set(list.flatMap(a=>a.criteria))].sort().map(c=>{let s=0,m=0;list.forEach(a=>{const x=D.rs[a.id],y=a.graded&&a.criteria.includes(c)&&x&&x.max&&elScore(a,x,D.pg[a.ls]);if(y){s+=y.score;m+=y.max}});return {c,s,m,mark:m?s/m*10:null}});
-  const marked=rows.filter(r=>r.mark!=null),avg=marked.length?marked.reduce((s,r)=>s+r.mark,0)/marked.length:null,f=n=>EN?n.toFixed(1):n.toFixed(1).replace(".",",");
-  return `<div class="box"><div class="lphead"><h2>${t("La meva nota mitjana","My average mark")}</h2><b style="font-size:1.6rem;color:${avg==null?"#94a3b8":col(avg*10)}">${avg==null?"–":f(avg)+" / 10"}</b></div><p class="muted">${t(`Mitjana de les notes de cada criteri que ja té activitats avaluades (${marked.length} de ${rows.length}). És orientativa: la nota final la posa el professor.`,`Average of the marks of each criterion that already has graded activities (${marked.length} of ${rows.length}). It is only a guide: your teacher gives the final mark.`)}</p></div>`
-    +`<div class="box"><h2>${t("Els meus criteris","My criteria")}</h2><div class="wrap"><table class="legend sum"><thead><tr><th>${t("Criteri","Criterion")}</th><th style="text-align:left">${t("Què vol dir","What it means")}</th><th>${t("Punts","Points")}</th><th>${t("Nota","Mark")}</th></tr></thead><tbody>`
-    +rows.map(r=>`<tr><td>${pill(r.c)}</td><td><b>${esc(elCompetence(r.c))}</b><br><small>${esc(easy(r.c))}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(r.c)).map(a=>esc(a.title)).join(" · ")}</small></td><td>${r.m?r.s+"/"+r.m:"–"}</td><td><b style="color:${r.mark==null?"#94a3b8":col(r.mark*10)}">${r.mark==null?t("encara no","not yet"):f(r.mark)}</b></td></tr>`).join("")
-    +`</tbody></table></div><p class="muted">${t("Cada nota és la suma de punts de les activitats avaluables lligades al criteri, sobre 10. El producte final compta amb la nota que posa el professor.","Each mark is the sum of the points of the graded activities linked to the criterion, out of 10. The final product counts with the mark your teacher gives.")}</p></div>`;
+  const rows=[...new Set(list.flatMap(a=>a.criteria))].sort().map(c=>{let s=0,m=0;list.forEach(a=>{const x=D.rs[a.id],y=a.graded&&a.criteria.includes(c)&&x&&x.max&&elScore(a,x,D.pg[a.ls]);if(y){s+=y.score;m+=y.max}});return {c,s,m}});
+  const bar=r=>`<span class="xbar"><span style="width:${Math.max(0,Math.min(100,r.s/r.m*100))}%;background:#0ea5e9"></span></span>`;
+  return `<div class="box"><h2>${t("Els meus criteris","My criteria")}</h2><p class="muted">${t("Quanta feina dels learning paths tens feta per a cada criteri, comptant també les activitats que encara no toquen. No és una nota: la teva nota és a «La meva nota de la LS fins ara», a dalt.","How much of the learning-path work for each criterion you have done, also counting the activities whose day has not come yet. It is not a mark: your mark is in “My LS mark so far”, above.")}</p><div class="wrap"><table class="legend sum"><thead><tr><th>${t("Criteri","Criterion")}</th><th style="text-align:left">${t("Què vol dir","What it means")}</th><th>${t("Activitats fetes","Activities done")}</th></tr></thead><tbody>`
+    +rows.map(r=>`<tr><td>${pill(r.c)}</td><td><b>${esc(elCompetence(r.c))}</b><br><small>${esc(easy(r.c))}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(r.c)).map(a=>esc(a.title)).join(" · ")}</small></td><td style="white-space:nowrap">${r.m?`<b>${r.s}</b> ${t("de","of")} ${r.m}<br>${bar(r)}`:`<span class="muted">${t("encara no","not yet")}</span>`}</td></tr>`).join("")
+    +`</tbody></table></div></div>`;
 }
 function critPanel(c){
   const list=EL_CATALOG.filter(a=>a.ls===S.ls),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+k));
@@ -675,7 +867,7 @@ function critPanel(c){
 // Detail of one learning path: steps, score, feedback, final-product self-assessment with the teacher's answers.
 function detail(id){
   const a=EL_CATALOG.find(x=>x.id===id),x=D.rs[id]||{},d=doneSet(a),info=D.ls[a.ls]||{status:"hidden",enabled:[]},can=canDo(a,info);
-  const state=x.locked?t("✔ Entregada","✔ Submitted"):x.markedDone?t("🟡 Marcada com a feta, sense entregar","🟡 Marked as done, not submitted"):a.graded?t("Encara no l'has entregada","You have not submitted it yet"):t("No avalua (per practicar)","Not assessed (for practice)");
+  const state=isDone(a)?t("✔ Tot fet","✔ All done"):a.graded?t("Encara hi ha passos per fer","Some steps are still to do"):t("No avalua (per practicar)","Not assessed (for practice)");   // no Submit (Roger, 6 Nov 2026)
   let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
   const rp=x.replies||{},ans=k=>[((x.answers||{})[k]||{}).t,rp[k]].filter(Boolean).join("\n\n");   // the answer to the comment (Claude) and the feedback on the work
   $("#dlgc").innerHTML=`<h3>${a.title}</h3><p class="muted">${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(elScore(a,x,D.pg[a.ls])||{score:0}).score}/${a.points}`:""}${a.manual&&x.max?` · ${t("nota","mark")} ${x.score}/${x.max}`:""}</p>`
@@ -687,7 +879,7 @@ function detail(id){
     +(()=>{const own=new Set((a.steps||[]).map(([sid])=>sid)),cs=Object.entries(rp).filter(([k,v])=>v&&!own.has(k));
       return cs.length?`<label>${t("Correccions del professor","Your teacher's corrections")}</label>`+cs.map(([k,v])=>`<div class="ans">✏️ <b>${esc(({write:t("Escriptura","Writing"),speak:"Speaking",talk:"Talk",reflect:t("Reflexió","Reflection")})[k]||k)}:</b> ${esc(v)} <a href="${a.path.split("/").map(encodeURIComponent).join("/")}#${encodeURIComponent(k)}">${t("Obre","Open")} →</a></div>`).join(""):""})()
     +(a.manual&&a.graded?`<p class="muted">${t("Aquesta activitat es lliura pel Google Classroom i la puntua el professor.","This activity is handed in through Google Classroom and marked by your teacher.")}</p>`:"")
-    +`<div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button><a class="go ${can?"":"off"}" href="${a.path}" style="padding:6px 12px;font-size:14px">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a>${a.graded&&!a.manual&&info.status==="open"&&can&&!x.locked?`<button class="sub" data-do="submit" data-a="${a.id}">${t("Entrega","Submit")}</button>`:""}</div>`;
+    +`<div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button><a class="go ${can?"":"off"}" href="${a.path}" style="padding:6px 12px;font-size:14px">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`;
   if(!$("#dlg").open)$("#dlg").showModal();
 }
 // The teacher's view of a student's board (?student=…; Roger, 2 Nov 2026: "the learning paths are missing here, what they have done and
@@ -698,7 +890,7 @@ function asBar(lss,ls){let b=document.getElementById("asbar");
   const tab=tabOf(ls),tb=(id,lbl)=>`<button class="chip ${tab===id?"on":""}" data-do="tab" data-t="${id}">${lbl}</button>`;
   b.innerHTML=`<div class="top"><div><b>👁 ${esc(D.me.name||"")}${D.me.group?" · "+esc(D.me.group):""}</b> <span class="muted">· the student's board as they see it (read-only)</span><div class="muted" style="font-size:13px;margin-top:2px">👁 In this tab you browse the whole site as they see it: open a learning path, a tab or their course page to see their answers, your corrections and what is locked for them. Nothing is saved.</div></div><a class="go" href="teacher.html" title="Back to your dashboard (ends the student view)">Exit · Dashboard</a></div>`
     +`<div class="bar"><small>LS</small>${lss.map(l=>`<button class="chip ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</button>`).join("")}</div>`
-    +`<div class="bar"><small>Show</small>${tb("form",only(ls.id)?"🎬 Final product":"📈 Learning paths and mark")}${hasFp(ls)?tb("fp","🎬 Final product"):""}${tb("exam","📝 Exams")}${hasWeek(ls)?tb("week","🗓 Week plan"):""}</div>`}
+    +`<div class="bar"><small>Show</small>${tb("form","📈 Learning paths and mark")}${hasFp(ls)?tb("fp","🎬 Final product"):""}${tb("exam","📝 Exams")}${hasWeek(ls)?tb("week","🗓 Week plan"):""}</div>`}
 // The LS's learning paths in one table, in the order of the group's time plan: each tab done (✔, amber when done after its day, from the
 // page state doneAt against stepDue/due) or missing (red once its day has passed), the state and the score. Every tab not done is a link
 // that opens that tab (path#panel, el-cloud.js openHashTab), and "👉 Next" proposes the first one to do (Roger, 2 Nov 2026: "you can click
@@ -749,6 +941,7 @@ async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit:
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
   ({ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative",fp:"final"}[k.t]||k.t))}catch(e){}render();document.querySelector(AS?".tabbody":".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(),want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
+addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;render();scrollTo(0,0)});   // a place of the board (placeNow)
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
 if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
 else ELCloud.onUser(async u=>{U=u;

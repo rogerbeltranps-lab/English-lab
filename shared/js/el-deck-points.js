@@ -157,7 +157,11 @@ let liveT=null,beat=null;
 addEventListener("deckstep",()=>{if(ready()){sendLive();awardOpen()}drawAns()});
 function sendLive(){clearTimeout(liveT);liveT=setTimeout(async()=>{
   const fb=await cloud();if(!fb||!ready()||!window.ELDeck)return;
-  try{await fb.S.setDoc(fb.S.doc(fb.db,"live",T.group),Object.assign({on:true,deck:location.pathname,title:document.title,sid:T.sid},ELDeck.info(),{at:fb.S.serverTimestamp()}))}catch(e){console.warn("live",e)}},150)}
+  // only the presentation's own fields (and a class game's removed): the teacher's pull-up (go) and the group's full screen (fs) stay
+  // (Roger, 6 Nov 2026: "full screen only lasts some minutes": every slide used to overwrite the whole document)
+  const D=fb.S.deleteField(),data=Object.assign({game:D,phase:D,i:D,qn:D,qt:D,keys:D,q:D,th:D,ok:D,slide:D,step:D,man:D,order:D},
+    {on:true,deck:location.pathname,title:document.title,sid:T.sid},ELDeck.info(),{at:fb.S.serverTimestamp()});
+  try{await fb.S.setDoc(fb.S.doc(fb.db,"live",T.group),data,{mergeFields:Object.keys(data)})}catch(e){console.warn("live",e)}},150)}
 async function liveOff(g){const fb=await cloud();if(fb)fb.S.setDoc(fb.S.doc(fb.db,"live",g),{on:false,at:fb.S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}
 addEventListener("pagehide",()=>{if(T.live)liveOff(T.live)});
 let ansUnsub=null;
