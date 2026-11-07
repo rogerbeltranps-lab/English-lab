@@ -6,7 +6,8 @@
 //   course · the course pages (2eso/, 4eso/: "All Learning Situations")
 //   games  · vocabulary games (<ls>/vocabulary-games.html)
 //   lab    · English Lab and Practise (lab/, lab/practice.html), which keep their side menu, now as buttons
-// It adds the board's menu as one strip of icon buttons on the left (a computer) or the board's bottom bar (a phone):
+// It adds the LS home's side menu on the left (a computer: brand + wide buttons; a narrow window: a strip of icon buttons) or the
+// board's bottom bar (a phone):
 // 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🧪 English Lab · 🎯 Practise · ❓ Help (the teacher: 📊 Dashboard and no Help).
 // LS1 pages keep their design (Roger's rule: leave LS1 alone). No Firestore reads: who is signed in, the group and the language
 // come from el-cloud.js (ELCloud.onUser, its cached reads); the current LS from the time plan (el-plan.js, el-week.js: static files).
@@ -72,14 +73,19 @@
       L.push(["practise", "🎯", t("Practica", "Practise"), t("Practica", "Practise"), ROOT + "lab/practice.html"]);
       if (!teach) L.push(["help", "❓", t("Ajuda", "Help"), t("Ajuda", "Help"), board + "#help"]);
     }
-    return L.map(([k, i, long, short, h]) => ({ k, i, long, short, h, on: k === here }));
+    // the side menu names the LS as the LS home does: only its title (LS2 · … stays in the tooltip and the narrow strip says LS2)
+    return L.map(([k, i, long, short, h]) => ({ k, i, long, short, h, side: k === "ls" && lsT ? lsT : long, on: k === here }));
   }
 
   // ---- drawing
   function rail(L) {
     let r = $(".elrail");
     if (!r) { r = document.createElement("nav"); r.className = "elrail"; r.setAttribute("aria-label", "Menu"); document.body.prepend(r); }
-    r.innerHTML = L.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.long)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.i}</i><span>${esc(x.short)}</span></a>`).join("");
+    // a computer (Chromebook): the LS home's side menu, brand + wide buttons with labels and › (Roger, 7 Nov 2026: "the format should be
+    // the same (buttons)"); a narrow window (641–980 px): the strip of icon buttons; a phone: the bottom bar (bar below)
+    r.innerHTML = `<a class="elr-brand" href="${ROOT}index.html">English with Roger</a>`
+      + `<div class="elside elw">${L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic" aria-hidden="true">${x.i}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`
+      + `<div class="eln">${L.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.long)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.i}</i><span>${esc(x.short)}</span></a>`).join("")}</div>`;
     document.body.classList.add("elhas-rail");
   }
   function bar(L) {
@@ -94,7 +100,7 @@
     if (!tabs) return;
     let s = $(".elside");
     if (!s) { s = document.createElement("nav"); s.className = "elside"; s.setAttribute("aria-label", "Menu"); tabs.after(s); }
-    s.innerHTML = L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic" aria-hidden="true">${x.i}</span><span class="lb">${esc(x.long)}</span></a>`).join("");
+    s.innerHTML = L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic" aria-hidden="true">${x.i}</span><span class="lb">${esc(x.side)}</span></a>`).join("");
   }
   function crumb() {   // course pages: ‹ My dashboard, as on the LS home
     if (mode !== "course") return;
