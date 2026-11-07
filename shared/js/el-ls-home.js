@@ -134,6 +134,8 @@
   }
   function draw(){
     lang();nav();place();
+    // 📈 My formative assessment tile (Roger, 7 Nov 2026: "instead of study, my formative assessment"): the board's formative tab of this LS
+    $$("[data-el-formative]").forEach(e=>{const b=boardHref();e.href=b+(b.includes("?")?"&":"?")+"ls="+encodeURIComponent(LS)+"#formative"});
     if(ST){const S=status();lpRows(S);contCard(S)}
     document.dispatchEvent(new Event("ellshome"));   // el-notes.js draws again in the right language
   }
