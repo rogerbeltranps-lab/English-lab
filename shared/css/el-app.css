@@ -10,6 +10,9 @@
    html.elready: the browser paints no old layout, no menu without its styles, no half-moved learning path. Pages opened from the site
    keep the previous page on screen meanwhile (paint holding), so it reads as one step. If no script sets it, the page shows after 1.5 s. */
 html.elgate:not(.elready) body{visibility:hidden;animation:elshow 0s linear 1.5s forwards}
+/* html.elwait: nobody signed in on this browser; el-cloud.js shows the page once Firebase knows who it is (the Sign in screen for a
+   signed-out visitor, with no page before it). If that never comes, the page shows after 8 s. */
+html.elgate.elwait:not(.elready) body{animation-delay:8s}
 @keyframes elshow{to{visibility:visible}}
 
 
