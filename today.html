@@ -638,7 +638,9 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
   const other=(g.other||[]).filter(c=>!/^(CC|CD|CPSAA|CE)\s?\d/.test(String(c)));
   // where each other-competence mark comes from (Roger, 2 Nov 2026: "other competences … should say where the info comes from"):
   // the learning paths and their tabs in EL_GRADING[ls].auto (steps done) and .teacher (the teacher's level), by name
+  const lsInfo=D.ls[ls.id]||{};   // students: only the paths and tabs open for them (Roger, 7 Nov 2026: never anything locked)
   const srcOf=c=>{const by=new Map();[...((g.auto||{})[c]||[]),...((g.teacher||{})[c]||[])].forEach(([id,k])=>{const a=EL_CATALOG.find(y=>y.id===id);if(!a)return;
+      if(!AS&&!(doneSet(a).has(k)||(canDo(a,lsInfo)&&!secOff(a,lsInfo,k))))return;
       if(!by.has(id))by.set(id,{a,ks:[]});const n=tabName(id,k);if(!by.get(id).ks.includes(n))by.get(id).ks.push(n)});
     return by.size?`<br><small class="src">📍 ${t("Surt de:","Comes from:")} ${[...by.values()].map(({a,ks})=>`<a href="${a.path}">${esc(a.title)}</a> (${ks.map(esc).join(", ")})`).join(" · ")}</small>`:""};
   // the teacher's view of a student's board (?student=…): every piece of each block, from the dashboard's progress.parts (students never see it)
@@ -855,6 +857,7 @@ async function sendAsk(){if(!S.want||AS)return;const reason=$("#why").value.repl
 // next to "My LS mark so far" 9.9. The LS mark is only the one in "My LS mark so far" (progressBox), so this table now shows how much of the
 // work behind each criterion is done (steps done / steps, with a bar), never a mark out of 10 and no average.
 function summary(list){
+  if(!AS)list=list.filter(a=>canDo(a,D.ls[a.ls]||{})||D.rs[a.id]||doneSet(a).size);   // students never see a path that is not open (Roger, 7 Nov 2026)
   const rows=[...new Set(list.flatMap(a=>a.criteria))].sort().map(c=>{let s=0,m=0;list.forEach(a=>{const x=D.rs[a.id],y=a.graded&&a.criteria.includes(c)&&x&&x.max&&elScore(a,x,D.pg[a.ls]);if(y){s+=y.score;m+=y.max}});return {c,s,m}});
   const bar=r=>`<span class="xbar"><span style="width:${Math.max(0,Math.min(100,r.s/r.m*100))}%;background:#0ea5e9"></span></span>`;
   return `<div class="box"><h2>${t("Els meus criteris","My criteria")}</h2><p class="muted">${t("Quanta feina dels learning paths tens feta per a cada criteri, comptant també les activitats que encara no toquen. No és una nota: la teva nota és a «La meva nota de la LS fins ara», a dalt.","How much of the learning-path work for each criterion you have done, also counting the activities whose day has not come yet. It is not a mark: your mark is in “My LS mark so far”, above.")}</p><div class="wrap"><table class="legend sum"><thead><tr><th>${t("Criteri","Criterion")}</th><th style="text-align:left">${t("Què vol dir","What it means")}</th><th>${t("Activitats fetes","Activities done")}</th></tr></thead><tbody>`
@@ -862,7 +865,7 @@ function summary(list){
     +`</tbody></table></div></div>`;
 }
 function critPanel(c){
-  const list=EL_CATALOG.filter(a=>a.ls===S.ls),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+k));
+  const list=EL_CATALOG.filter(a=>a.ls===S.ls&&(AS||canDo(a,D.ls[a.ls]||{})||D.rs[a.id]||doneSet(a).size)),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+k));
   $("#dlgc").innerHTML=`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterionEasy(COURSE,c,EN)||elCriterion(COURSE,c)||t("Encara no hi ha el text d'aquest criteri.","This criterion has no text yet."))}</p>${elCriterionEasy(COURSE,c,EN)&&elCriterion(COURSE,c)?`<label>${t("Text oficial (Decret 175/2022)","Official text (Decret 175/2022, in Catalan)")}</label><p class="muted"><small>${esc(elCriterion(COURSE,c))}</small></p>`:""}<label>${t("Learning paths que el treballen","Learning paths that work on it")}</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>${t("Activitats que en donen evidència","Activities that give evidence of it")}</label><p>${st.map(esc).join(" · ")||"–"}</p><div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button></div>`;
   if(!$("#dlg").open)$("#dlg").showModal();
 }
@@ -913,7 +916,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!AS&&all()))retur
     if(!AS&&!can&&!ds.size&&!D.rs[a.id])return "";   // students never see a learning path they cannot open yet (Roger, 7 Nov 2026: "they mustn't see that anything is locked")
     const vis=steps(a).filter(k=>AS||ds.has(k)||(can&&!secOff(a,info,k)));   // students: only the tabs they have done or can open
     if(!AS&&steps(a).length&&!vis.length)return "";   // open, but none of its sections yet
-    const done=!a.manual&&isDone(a),x=D.rs[a.id]||{},late=!a.manual&&!done&&can&&!drop&&d&&d<today,go=can&&!drop&&!done&&!a.manual&&open;
+    const done=!a.manual&&isDone(a),x=D.rs[a.id]||{},late=!a.manual&&!done&&can&&!drop&&d&&d<today&&!steps(a).some(k=>secOff(a,info,k)),go=can&&!drop&&!done&&!a.manual&&open;
     const tabs=steps(a).map(k=>{const sk=(a.skip||[]).includes(k),sd=stepDue(a,k),nm=tabName(a.id,k),off=secOff(a,info,k);
       if(ds.has(k)){const w=at[k]?ymd(at[k]):"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}">✔ ${esc(nm)}</span>`}
       if(!vis.includes(k))return "";

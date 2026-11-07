@@ -288,9 +288,9 @@ async function gate(u){
   const ca=elCa(lvl);
   // Learning paths open per group (elLpOpen in el-catalog.js): a locked one shows a block and saves nothing.
   // Students always see their own answers (Roger, 26 Oct 2026): with saved work it opens read-only instead of the block.
-  if(a&&!tester&&!elLpOpen(a,info,myGroup)&&saved){freeze();banner(ca?"Aquesta activitat ara està tancada: pots veure les teves respostes, però no canviar-les.":"This activity is closed for now: you can see your answers, but not change them.","#92400e");return}
+  if(a&&!tester&&!elLpOpen(a,info,myGroup)&&saved){freeze();banner(ca?"Aquí pots veure les teves respostes, però ara no les pots canviar.":"Here you can see your answers, but you can't change them now.","#92400e");return}
   if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.",ca);return}
-  if(a&&!tester){const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn)}
+  if(a&&!tester){const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn);trimJump(a,info,myGroup)}
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
   const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));
   if(cp&&saved){freeze();banner(ca?"Per continuar aquesta activitat, primer acaba el "+cp.title+". Mentrestant pots veure les teves respostes.":"To go on with this activity, first finish "+cp.title+". Meanwhile you can see your answers.","#92400e",{t:(ca?"Obre el ":"Open ")+cp.title+" →",f:()=>{location.href=new URL(cp.path,ROOT).href}});return}
@@ -401,6 +401,11 @@ function lockSections(ids,ca,a,done){
       p.querySelectorAll("input,textarea,select,button:not([data-vs])").forEach(e=>{if(!e.disabled){e.disabled=true;e.tabIndex=-1}})})};
   apply();new MutationObserver(apply).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["disabled"]});
 }
+// The "Learning Path" menu at the top of an LS2 page lists only the paths a student can open (or did some of): never one still
+// closed or waiting for a checkpoint (Roger, 7 Nov 2026: "they mustn't see that anything is locked").
+function trimJump(a,info,g){const sel=document.getElementById("sessionJump");if(!sel)return;const dn=x=>elDoneSet(localStorage.getItem(x.keys[0])),op=x=>elLpOpen(x,info,g);
+  [...sel.options].forEach(o=>{const x=EL_CATALOG.find(y=>y.ls===a.ls&&y.path.split("/").pop()===o.value);
+    if(x&&x.id!==a.id&&!hasWork(x)&&(!op(x)||elCheckpointMissing(x,dn,op)))o.remove()})}
 // Open and close sections right on the page (Roger, 1 Nov 2026: "vull poder obrir i tancar les tabs, són les seccions dels camins"): in
 // teacher mode a bar above the tabs picks a group, and every section tab gets a 🔓/🔒 switch for that group. Same data and rule as the
 // dashboard's Sections column (teacher.html api.secLock): ls/{id}.secLocked[group][activity] = locked panel ids, and secOpened keeps every
