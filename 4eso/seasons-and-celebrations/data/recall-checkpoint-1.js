@@ -29,7 +29,8 @@ window.LP = {
     {
      "id": "c1-01",
      "r": "beginners",
-     "q": "She ___ (watch) TV after dinner."
+     "q": "She ___ (watch) TV after dinner.",
+     "o": ["watches", "is watching", "watch"]
     },
     {
      "id": "c1-02",
@@ -49,17 +50,20 @@ window.LP = {
     {
      "id": "c1-05",
      "r": "beginners",
-     "q": "Hanukkah ___ (last) eight nights."
+     "q": "Hanukkah ___ (last) eight nights.",
+     "o": ["last", "lasts", "is lasting"]
     },
     {
      "id": "c1-06",
      "r": "beginners",
-     "q": "We give and get ___ at Christmas."
+     "q": "We give and get ___ at Christmas.",
+     "o": ["presents", "presenting", "present"]
     },
     {
      "id": "c1-07",
      "r": "beginners",
-     "q": "The fireworks are ___ night."
+     "q": "The fireworks are ___ night.",
+     "o": ["at", "in", "on"]
     },
     {
      "id": "c1-08",

@@ -170,6 +170,7 @@
     if(who.role==="teacher")$$("[data-el-teacher]").forEach(e=>e.hidden=false);
     draw();
   })();
+  document.documentElement.classList.add("elready");   // <html class="elgate">: the page shows now, on this drawing (ls-home.css)
   let tries=0;(function wait(){if(window.ELCloud&&ELCloud.onUser){ELCloud.onUser(u=>fromCloud(u).catch(e=>console.warn("ls home",e)));return}
     if(++tries<300)setTimeout(wait,100)})();
 })();

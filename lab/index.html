@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="elgate elhold">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
@@ -305,7 +305,10 @@
     const LAST = 'el_lab_last';
     let early = (() => { try { const w = JSON.parse(localStorage.getItem('el_who') || 'null'), l = JSON.parse(localStorage.getItem(LAST) || 'null');
       return w && l && l.uid === w.uid && !sessionStorage.getItem('el_as') ? l : null } catch (e) { return null } })();
-    if (early) render(); else $('signin').hidden = false;   // sign-in waits for el-cloud
+    // who was signed in here last but has no English Lab kept yet: nothing until el-cloud knows (not the Sign in card, then the Lab)
+    const known = (() => { try { return !!JSON.parse(localStorage.getItem('el_who') || 'null') } catch (e) { return false } })();
+    if (early) render(); else if (!known) $('signin').hidden = false; else $('lead').textContent = '';   // sign-in waits for el-cloud
+    document.documentElement.classList.add('elready');   // <html class="elgate elhold">: the page shows on this drawing (el-app.css)
 
     await import('../shared/js/el-cloud.js');
     window.ELCloud.onUser(async u => {

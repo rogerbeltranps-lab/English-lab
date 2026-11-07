@@ -19,6 +19,8 @@ table.qa td.ql,table.qa th.ql{text-align:left;max-width:440px;white-space:normal
 .route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-beginners{background:#ffe4e6;color:#9f1239}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-native{background:#e0f2fe;color:#075985}.r-daring{background:#ede9fe;color:#5b21b6}.r-none{color:#94a3b8}
 .wrap{overflow:auto;max-height:75vh;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
 thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;vertical-align:top}thead tr+tr th{top:var(--h1,52px)}.stu{position:sticky;left:0;z-index:1;text-align:left;min-width:150px;white-space:nowrap}thead .stu{z-index:3}
+/* ⛶ Full screen table (Roger, 7 Nov 2026): the Learning paths box fills the window, the table takes the rest; Esc or ✕ leaves */
+body.gfs{overflow:hidden}body.gfs .lpall{position:fixed;inset:0;z-index:1005;margin:0;border-radius:0;border:0;display:flex;flex-direction:column;padding:8px 14px 10px;overflow:hidden}body.gfs .lpall>details[data-k=lpall]{display:flex;flex-direction:column;flex:1;min-height:0}body.gfs .lpall .wrap{flex:1;min-height:0;max-height:none}body.gfs .lpall h2,body.gfs .lpall summary{margin:.1em 0 .2em}.gfsb{margin-left:auto}
 th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#cbd5e1}.first{border-left:3px solid #94a3b8}th.ac{font-weight:500;min-width:44px}a.stl{color:inherit;text-decoration:none}a.stl:hover{color:#0f766e;text-decoration:underline}.skip{color:#94a3b8;background:#f8fafc}td.ac{color:#16a34a;font-weight:700}.wr{font-weight:500;white-space:nowrap;cursor:pointer;border-radius:6px;padding:0 2px}.wr:hover{background:#f1f5f9;text-decoration:underline}.wrw{color:#64748b}.wrk{color:#16a34a}.wrc{color:#b45309}.wrx{color:#dc2626}.wrl{color:#2563eb;font-weight:700}
 td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px solid #0f766e;outline-offset:-2px}td.sub{background:#dcfce7}td.mark{background:#fef9c3}td.na{color:#94a3b8;font-weight:400}
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
@@ -50,6 +52,12 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .tside .nv:hover{background:#eaf0ff;color:#3157d5}.tside .nv.on{background:#0f172a;color:#fff}.tside .nv.c2eso.on{background:#16a34a}.tside .nv.c4eso.on{background:#2563eb}
 .tside .nv small{font-weight:600;font-size:12px;opacity:.75}.tside .sep{height:1px;background:#e2e8f0;margin:8px 8px}.tside .lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:6px 12px 2px}
 .tside .nv.ann{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;margin-bottom:6px}.tside .nv.ann:hover{background:#ffedd5}
+/* 🛠 maintenance mode (mtDialog): the side menu button and the red bar on every page while it is on */
+.tside .nv.mton{background:#dc2626;color:#fff}.tside .nv.mton:hover{background:#b91c1c;color:#fff}.tside .nv small.mt{opacity:1;background:#fff;color:#b91c1c;border-radius:999px;padding:0 7px;font-weight:800}
+#mtbar:empty{display:none}#mtbar{margin-top:46px!important;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:#dc2626;color:#fff;border-radius:14px;padding:10px 14px;margin:0 0 10px;font-weight:700}
+#mtbar button{border:0;background:#fff;color:#b91c1c;border-radius:999px;padding:5px 14px;font-weight:800;cursor:pointer}#mtbar .g2{background:#fecaca}
+.mtpick{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 18px}.mtpick label{display:block;font-weight:400;margin:3px 0}.mtpick input{width:auto;margin-right:6px;vertical-align:middle}
+.mtprev{border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;padding:18px 14px;margin:8px 0}.mtprev .mt-box{font-size:14px}.mtprev .mt-box h1{font-size:20px}.mtprev .mt-ic{font-size:32px}
 .ph h1{font-size:2.1rem;letter-spacing:-.02em;margin:.25em 0 .1em}.ph .sub{font-size:16px;color:#475569;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}.ph .sub select{font-size:15px;padding:4px 6px;border-radius:8px}
 .ph h1.hi{max-width:1100px;line-height:1.15;text-wrap:pretty}.ph h1.hi .cheer{vertical-align:middle;border:0;background:#eef2ff;color:#3157d5;border-radius:999px;width:34px;height:34px;font-size:18px;font-weight:700;cursor:pointer;padding:0;margin-left:4px}.ph h1.hi .cheer:hover{background:#dbe4ff}
 .ph h1.pt{font-size:1.6rem}.crumb{margin:4px 0 0}.crumb a.back{display:inline-flex;align-items:center;color:#3157d5;font-weight:700;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px;font-size:16px}.crumb a.back:hover{background:#eaf0ff}
@@ -92,6 +100,8 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .agc.np{background:#fff;border:1px dashed #94a3b8;color:#475569}.agc.on{background:#dcfce7;border-color:#86efac;color:#166534}.agc.hw{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
 .agc.ex{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700}.agc.nt{background:#f8fafc;border-color:#e2e8f0;color:#475569;font-style:italic;border-radius:10px}
 .agday .agc .tabsec:not(.off),.agday .agc .agx,.agday .agh .agx{opacity:0}.agday .agc:hover .tabsec,.agday .agc:hover .agx,.agday .agh:hover .agx,.agday .agc .agx:focus{opacity:1}
+.agiw{background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:999px;padding:0 5px;margin:0 0 0 2px;font-size:11px;line-height:16px;cursor:pointer;white-space:nowrap}.agiw:hover{border-color:#6366f1}.agiw.g{background:#fef3c7;border-color:#f59e0b;color:#92400e}.agiw.m{background:#f1f5f9}.agh .agiw{font-size:12px;padding:0 6px}.agiwk{background:#fef3c7;border:1px solid #f59e0b;border-radius:999px;padding:0 4px;font-weight:400}
+.agc.grp{background:#fffbeb;border-color:#fcd34d;color:#92400e}.agc.shd{font-style:normal;font-weight:600;background:#f5f3ff;border-color:#c4b5fd;color:#5b21b6}.agla.shd{background:#f5f3ff;border-color:#c4b5fd}.agla.shd b{color:#5b21b6}
 .agx{background:none;color:#94a3b8;border:0;padding:0 2px;margin:0;font-size:12px;cursor:pointer;line-height:1}.agx:hover{color:#dc2626}
 .agwk h3{font-size:15px;margin:16px 0 6px;color:#334155}
 .agdays{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;align-items:stretch}
@@ -116,6 +126,7 @@ details.agpast>summary{cursor:pointer;color:#3157d5;font-weight:700;margin:12px 
 <div class="dhead"><h1>Teacher dashboard</h1></div><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p><script>/* the teacher who was signed in here last (el_who, el-cloud.js) sees it is loading, not a sign-in request (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="teacher")document.getElementById("msg").textContent="⏳ Loading your dashboard…"}catch(e){}</script>
 <div id="app" hidden>
 <p class="muted" id="loadbar" style="margin:0 0 8px"></p>
+<div id="mtbar"></div>
 <div id="classnow"></div>
 <div id="main"></div>
 </div></div></div>
@@ -217,6 +228,8 @@ async function loadLight(){const L={ls:{},tk:{},pb:[],sg:[],ann:[],ck:{},replies
     soft("accounts",F.getDoc(F.doc(db(),"settings","accounts")),c=>{L.acc=c.exists()?c.data():{}}),
     // ✏️ Corrections: a correction asked from the dashboard and the last marking run (settings/marking: request, run)
     soft("marking",F.getDoc(F.doc(db(),"settings","marking")),c=>{if(c.exists())L.mk=c.data()}),
+    // 🛠 maintenance mode (site/maintenance: on, note, since; mtDialog): students see only the maintenance message while it is on
+    soft("maintenance",F.getDoc(F.doc(db(),"site","maintenance")),c=>{L.mt=c.exists()?c.data():{}}),
     // sg = suggestions from students (suggestions/{id}: uid, email, name, group, page, text, created, read), sent with "💡 Idea" in the bottom bar
     soft("suggestions",ALL("suggestions"),q=>q.forEach(x=>L.sg.push(Object.assign({id:x.id},x.data())))),
     soft("problems",ALL("problems"),q=>q.forEach(x=>L.pb.push(Object.assign({id:x.id},x.data())))),
@@ -313,8 +326,11 @@ const api={
   listRoute:(rid,level,ls)=>{const v=level?{level,ls}:null;if(DEMO){if(v)S.D.ro[rid].route=v;else delete S.D.ro[rid].route;return}return put(["roster",rid],{route:v||F.deleteField()})},
   cuts:(c,o)=>{(S.D.cuts=S.D.cuts||{})[c]=o;return put(["settings","routes"],{[c]:o})},
   // ✏️ Correct everything waiting now: settings/marking.request = {at, by}; null cancels it (see corrPage)
-  mkAsk:on=>{const v=on?{at:new Date().toISOString(),by:"dashboard"}:null;S.D.mk=Object.assign({},S.D.mk);if(v)S.D.mk.request=v;else delete S.D.mk.request;CORR.mkT=Date.now();
-    if(DEMO)return;return put(["settings","marking"],{request:v||F.deleteField()})},
+  // Since 7 Nov 2026 the button also starts the task at once through the school Apps Script (markStart); request.fired = when it did, so
+  // the GitHub Action (the backup, which GitHub runs only every few hours) does not start it again.
+  mkAsk:async on=>{const v=on?{at:new Date().toISOString(),by:"dashboard"}:null;S.D.mk=Object.assign({},S.D.mk);if(v)S.D.mk.request=v;else delete S.D.mk.request;CORR.mkT=Date.now();
+    if(DEMO){if(v)v.fired=new Date().toISOString();return}await put(["settings","marking"],{request:v||F.deleteField()});if(!v)return;
+    const r=await markStart(v.at);CORR.start=r;if(r.ok){v.fired=r.started||r.already;await put(["settings","marking"],{request:{fired:v.fired}})}},
   mkRead:async()=>{if(DEMO)return;const d=await F.getDoc(F.doc(db(),"settings","marking"));S.D.mk=d.exists()?d.data():null;CORR.mkT=Date.now()},
   reject:(u,ls)=>{const l=S.D.lv[u][ls],to=l.request;if(DEMO){delete l.request;delete l.reason;l.declined=to;return}return put(["students",u,"levels",ls],{request:F.deleteField(),reason:F.deleteField(),declined:to,declinedAt:F.serverTimestamp()})},
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
@@ -383,6 +399,13 @@ async function mailStudents(emails,subject,body){if(DEMO||!emails.length)return 
     try{const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:tok,bcc:part,subject,body,name:"Roger Beltran · English Lab"})});j=await r.json()}catch(e){throw new Error("the school mail script did not answer")}
     if(!j||!j.ok)throw new Error(j&&j.error==="not the teacher"?"the school mail script is the old version (update it: tools/notify/school-mail.gs)":(j&&j.error)||"no answer");n+=part.length}
   return n}
+// ✏️ Correct everything waiting now, at once (Roger, 7 Nov 2026): the school Apps Script starts the scheduled task "English Lab: mark and
+// correct" with its API token (tools/notify/school-mail.gs, action "mark"; the token never reaches the page). {ok, started|already} or
+// {ok: false, error}; an old script version answers "nothing to send". Never throws: the GitHub Action is the backup.
+async function markStart(at){try{const tok=await ELCloud.auth.currentUser.getIdToken();
+    const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:tok,action:"mark",at})});const j=await r.json();
+    return j&&j.ok?j:{ok:false,error:j&&j.error==="nothing to send"?"old script":(j&&j.error)||"no answer"}}
+  catch(e){console.warn("mark start",e);return {ok:false,error:"the school script did not answer"}}}
 // sends in the background; a small note says how it went (the homework or announcement is saved either way)
 function mailNote(p,what,fail){p.then(n=>{if(!n)return;const d=document.createElement("div");d.textContent="✉️ "+what+" emailed to "+n+" student"+(n===1?"":"s");
   d.style.cssText="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0f766e;color:#fff;padding:8px 16px;border-radius:999px;z-index:10010;font:600 14px system-ui";document.body.appendChild(d);setTimeout(()=>d.remove(),5000)})
@@ -404,6 +427,7 @@ async function reread(){const ps=[...TOUCHED];TOUCHED.clear();const D=S.D;
     if(k[0]==="problemReplies"&&k.length===2)return x=>{if(x)D.replies[k[1]]=1;else delete D.replies[k[1]]};
     if(p==="settings/routes")return x=>{D.cuts=x||undefined};
     if(p==="settings/marking")return x=>{D.mk=x||null};
+    if(p==="site/maintenance")return x=>{D.mt=x||{}};
     if(k[0]==="ls"&&k.length===2)return "ls";
     return null};
   const fs=ps.map(one);if(!D||!RAW||!ps.length||ps.length>300||fs.some(f=>!f))return load();
@@ -1000,9 +1024,11 @@ function render0(){
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g&&!(g==="none"&&((S.D.acc||{}).hidden||{})[s.uid])),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
   const nv=(g,lab,cls,tip,extra)=>`<button class="nv ${cls||""} ${S.g===g?"on":""}" data-do="tab" data-g="${g}" ${tip?`title="${tip}"`:""}>${lab}${extra||""}</button>`;
   $("#tabs").hidden=false;$("#shell").classList.add("on");
+  $("#mtbar").innerHTML=mtOn()?`🛠 Maintenance mode is ON: students only see the maintenance message and the worksheets.<button data-do="mtoff">Turn it off</button><button class="g2" data-do="mtdlg">See the message</button>`:"";
   $("#tabs").innerHTML=`<div class="brand">Teacher dashboard</div>`
     // 📣 always at hand (Roger, 2 Nov 2026: "where is the announcement?"): sent ones are in 💬 Messages
     +`<button class="nv ann" data-do="annnew" title="Send a message to one group, a whole course, every group or some students. Sent ones are in 💬 Messages">📣 Announcement</button>`
+    +`<button class="nv ${mtOn()?"mton":""}" data-do="mtdlg" title="Close the site to students for a while: they see a maintenance message with worksheets to print">🛠 Maintenance${mtOn()?'<small class="mt">ON</small>':""}</button>`
     +nv("plan","🏠 Home","","The next class, every group, the time plan of all groups and the messages")
     +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,esc(g.name),"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`)).join("")
     +(n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):"")
@@ -1040,8 +1066,8 @@ function render0(){
   if(S.year){$("#main").innerHTML=placeHead(grp.name,"")+`<div class="bar">${filters}</div>`+yearView(grp,shown);return}
   const back=grp.name+" · "+lsLabel(EL_LS.find(l=>l.id===ls));
   const todoH=todo(inG.filter(s=>!s.away),ls,list),nTodo=(todoH.match(/<li>/g)||[]).length;
-  const lpAll=`<div class="box">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo), where ↩ Send it back asks the student to change it and hand it in again (↩ sent back until they do). Grey rows: on the student list, not signed in yet.</p>`,"key")}
-      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button></div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`;
+  const lpAll=`<div class="box lpall">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo), where ↩ Send it back asks the student to change it and hand it in again (↩ sent back until they do). Grey rows: on the student list, not signed in yet.</p>`,"key")}
+      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button>${shown.length?`<button class="g gfsb" data-do="gfs" title="${S.gfs?"Back to the dashboard (Esc)":"Show this table on the whole screen"}">${S.gfs?"✕ Exit full screen":"⛶ Table full screen"}</button>`:""}</div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`;
   const legendB=`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`;
   const resultB=(G()&&G().only?"":`<div class="box">${G()&&G().evidence?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
       :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`);
@@ -1075,6 +1101,7 @@ function render0(){
       +tTile("students","👥","Students","levels, team points, student list")
       +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
       +tTile("cov","🎯","Coverage","criteria, competences, grammar and lexicon worked, this LS and the year",(n=>n?n+" to check":"")(covGaps(grp,ls)),true)+`</div></div>`}
+  document.body.classList.toggle("gfs",!!(S.gfs&&document.querySelector("#main .lpall .wrap")));
   const w=document.querySelector("#main .wrap"),h=w&&w.querySelector("thead tr");if(h)w.style.setProperty("--h1",h.offsetHeight+"px");
 
 }
@@ -1186,11 +1213,12 @@ const COVK={crit:"criteria and competences",gram:"grammar",lex:"lexicon"};
 //    sent back) and answers[step].at (students' comments answered on Fridays). Each name opens that correction (wrOpen / cpOpen / cellPanel).
 //  • Waiting: what the next run will correct, with the same rules as tools/marking/marks.mjs (fb-ready, and ready for the marked steps:
 //    a marked step that is not ready yet, one week after its session is ticked, waits for that), plus the possible copies waiting for you.
-//  • ✏️ Correct everything waiting now: settings/marking.request = {at, by} (teacher only). The GitHub Action "Marking on request"
-//    (.github/workflows/marking-request.yml, every 15 minutes) sees it and starts the scheduled task "English Lab: mark and correct" through
-//    its API trigger (secret MARK_TASK_TOKEN); marks.mjs saves settings/marking.run = {started, via} on `ready` (its first step) and
-//    run.done on `audit` (its last step), so the card says asked → correcting → done. Without the secret nothing starts: after 30 minutes
-//    the card says so and links to the scheduled tasks page (Run now).
+//  • ✏️ Correct everything waiting now: settings/marking.request = {at, by} (teacher only), and at once the school Apps Script starts the
+//    scheduled task "English Lab: mark and correct" through its API trigger (markStart; the token is in the script) and request.fired is
+//    saved. Backup: the GitHub Action "Marking on request" (.github/workflows/marking-request.yml; GitHub runs it only every few hours)
+//    starts it if nothing did (Roger, 7 Nov 2026: the first press waited 45 minutes and then hit the read limit). marks.mjs saves settings/marking.run = {started, via} on `ready` (its first step) and
+//    run.done on `audit` (its last step), so the card says asked → correcting → done. If the script could not start it, or nothing began 20 minutes
+//    after it did, the card says so and links to the scheduled tasks page (Run now).
 //  • ⓘ What runs on its own and what needs Claude (Roger, 6 Nov 2026).
 // Reads: only settings/marking (1 document, again when the page opens after a minute); everything else is what the dashboard has loaded.
 // Marking stays apart from the page (Roger, 6 Nov 2026: if other teachers use the site one day, they would plug in their own Claude or
@@ -1231,6 +1259,12 @@ function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
       Object.entries(x.answers||{}).forEach(([step,o])=>{if(o&&o.at)done.push(Object.assign({step,k:"answer",name:((a.steps||[]).find(z=>z[0]===step)||[])[1]||corrNm(a.id,step),at:tms(o.at)},base))})})});
   done.sort((p,q)=>q.at-p.at);CORR.d=S.D;CORR.t=Date.now();CORR.v={wait,done};return CORR.v}
 // the next scheduled run: Wednesday at about 15:00 (Madrid time; the scheduled task starts at 14:43)
+// what the asked card says: started at once by the school script (fd), or why not and what to do
+function corrAskMsg(st,RUN){const e=(CORR.start||{}).error,why=e==="no task token"?"the task's token is not in your school script yet"
+    :e==="old script"?"your school script is the old version":e?"the school script said: "+esc(e):"";
+  if(st.fd&&!st.slow)return `Claude got it at ${esc(new Date(st.fd).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))} and is starting. In a few minutes this card says <b>Claude is correcting now</b> (press ↻ Check again). It corrects everything that is waiting, in every group.`;
+  if(st.fd)return `Claude got it at ${esc(new Date(st.fd).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))} but has not started after 20 minutes. Open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`;
+  return `It could not start at once${why?" ("+why+")":""}. A backup check on GitHub will start it, but that can take a few hours. To start it now, open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`}
 function corrNext(){const now=window.EL_NOW?new Date(window.EL_NOW):new Date();for(let k=0;k<8;k++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+k);
   if(d.getDay()===3&&!(k===0&&now.getHours()*60+now.getMinutes()>=14*60+43))return d}return null}
 const corrWhen=v=>new Date(v).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
@@ -1238,7 +1272,7 @@ const corrDay=v=>new Date(v).toLocaleDateString("en-GB",{weekday:"long",day:"num
 // where the request is: {s: "asked" | "running" | "done" | "idle", ...}
 function corrState(){const m=S.D.mk||{},rq=tms((m.request||{}).at),run=m.run||{},st=tms(run.started),dn=tms(run.done),now=Date.now();
   if(st&&dn<st&&now-st<12*3600e3)return {s:"running",st,via:run.via};
-  if(rq&&rq>st)return {s:"asked",rq,slow:now-rq>30*60e3};
+  if(rq&&rq>st){const fd=tms((m.request||{}).fired);return {s:"asked",rq,fd,slow:fd?now-Math.max(fd,rq)>20*60e3:true}}
   return {s:st?"done":"idle",st,dn,via:run.via}}
 const corrChips=(L,more)=>{const by={};L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});return Object.values(by).map(is=>{const i=is[0],s=S.P[i.u];
   return `<button class="chip mini cchip ${is.some(x=>x.late)?"late":""}" data-do="corropen" data-u="${i.u}" data-a="${esc(i.aid)}" data-s="${esc(i.step)}" data-k="${i.k}" title="Open it">${s?name(s):"?"}${is.length>1?` ×${is.length}`:""}${is.some(x=>x.late)?" ❌":""}</button>`}).join("")+(more||"")};
@@ -1254,7 +1288,7 @@ function corrPage(){
   const allNow=wait.filter(i=>i.k!=="copy"&&i.ready).length,st=corrState(),nx=corrNext(),RUN=`<a href="https://claude.ai/code/routines" target="_blank" rel="noopener">scheduled tasks on claude.ai ↗</a>`;
   // the big card
   const card=st.s==="running"?`<div class="cont"><span class="ck">Claude is correcting now</span><span class="ct">Started ${esc(corrWhen(st.st))}</span><span class="cs">${st.via==="request"?"You asked for it here.":"The weekly Wednesday run."} It usually takes 20 to 60 minutes. The corrections appear below as they are saved, and students see each one in that step of their learning path.</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button></div></div>`
-    :st.s==="asked"?`<div class="cont ${st.slow?"idle":""}"><span class="ck">${st.slow?"Not started yet":"You asked for a correction"}</span><span class="ct">Asked ${esc(corrWhen(st.rq))}</span><span class="cs">${st.slow?`It should have started within 15 minutes. The automatic start may not be set up yet: open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`:"Claude starts within 15 minutes and corrects everything that is waiting (all groups)."}</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button><button class="s2" data-do="corrcancel">✕ Cancel the request</button></div></div>`
+    :st.s==="asked"?`<div class="cont ${st.slow?"idle":""}"><span class="ck">${st.slow?"Not started yet":"Starting now"}</span><span class="ct">Asked ${esc(corrWhen(st.rq))}</span><span class="cs">${corrAskMsg(st,RUN)}</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button><button class="s2" data-do="corrcancel">✕ Cancel the request</button></div></div>`
     :`<div class="cont ${allNow?"":"done"}"><span class="ck">Next correction · ${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Wednesday"} · about 15:00</span>`
       +`<span class="ct">${allNow?plural(allNow,"piece")+" waiting to be corrected":"Nothing is waiting"}</span>`
       +`<span class="cs">${st.st?`Last run: ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}. `:""}${allNow?"Don't want to wait until Wednesday? Claude can correct them now (every group).":"Everything students handed in is corrected."}</span>`
@@ -1267,9 +1301,9 @@ function corrPage(){
   const view=`<div class="bar"><span class="muted">Show:</span> ${[["stu","By student"],["act","By activity"]].map(([v,l])=>`<button class="chip ${S.corrV===v?"on":""}" data-do="corrv" data-v="${v}">${l}</button>`).join("")}</div>`;
   const itemB=i=>`<button class="chip mini cchip ${i.late?"late":""}" data-do="corropen" data-u="${i.u}" data-a="${esc(i.aid)}" data-s="${esc(i.step)}" data-k="${i.k}" title="Open what they handed in">${CK[i.k][0]} ${esc(i.name||CK[i.k][1])} <span class="muted">· ${esc(actTitle(i.aid))}</span>${i.late?" ❌":""}${i.k==="level"&&!i.ready?" ⏳":""}</button>`;
   const stuRows=L=>{const by={};L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});return Object.values(by).sort((p,q)=>byName(S.P[p[0].u]||{},S.P[q[0].u]||{})).map(is=>{const s=S.P[is[0].u],first=Math.min(...is.map(i=>i.at).filter(Boolean));
-    return `<div class="cstu"><div class="cst"><b>${s?name(s):"?"}</b> <span class="muted">is waiting for ${plural(is.length,"correction")}${isFinite(first)?" · handed in since "+esc(ELWeek.date(ymd(first))):""}</span>${fixB("Correct it now","Claude corrects everything that is waiting now ("+fullName(s||{})+"'s work too), within 15 minutes")}</div><div class="cwho">${is.map(itemB).join("")}</div></div>`}).join("")};
+    return `<div class="cstu"><div class="cst"><b>${s?name(s):"?"}</b> <span class="muted">is waiting for ${plural(is.length,"correction")}${isFinite(first)?" · handed in since "+esc(ELWeek.date(ymd(first))):""}</span>${fixB("Correct it now","Claude corrects everything that is waiting now ("+fullName(s||{})+"'s work too): it starts within a few minutes")}</div><div class="cwho">${is.map(itemB).join("")}</div></div>`}).join("")};
   const laterB=later.length?`<details class="cgrp" data-k="cwlater" ${S.open.has("cwlater")?"open":""}><summary><b>⏳ Not ready yet: ${plural(later.length,"marked step")}</b></summary><p class="muted">Steps with a level (reading log, listening chart…) are marked one week after you tick their session in the time plan, so everyone had time to hand them in. The button does not mark them earlier.</p>${corrLines(later)}</details>`:"";
-  const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length?fixB("Correct everything now","Claude corrects everything that is waiting now, in every group, within 15 minutes"):""}</div>`
+  const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length?fixB("Correct everything now","Claude corrects everything that is waiting now, in every group: it starts within a few minutes"):""}</div>`
     +`<p class="muted">Everything students handed in that has no correction yet. Claude corrects it on Wednesday, or now if you press the button. Click a piece to see what they wrote.</p>`
     +(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything now, or tell Claude in the English Lab chat.</p>`:"")+view
     +(S.corrV==="act"
@@ -1290,7 +1324,7 @@ function corrPage(){
       <li><b>Wednesday about 15:00</b> · corrects everything students wrote (writings, speaking and Talk transcripts, reflections) and marks the steps with a level. Possible copies go to your To do; texts that were mostly pasted are sent back to redo.</li>
       <li><b>Friday 15:00</b> · answers students' comments on their work (anything that needs you shows 🙋 in the To do).</li>
       <li><b>Friday 19:37</b> · checks that Wednesday's run worked and warns you on your phone if it did not.</li>
-      <li><b>When you press ✏️ Correct everything waiting now</b> · the same as Wednesday, at once (it starts within 15 minutes).</li>
+      <li><b>When you press ✏️ Correct everything waiting now</b> · the same as Wednesday, at once (it starts within a few minutes).</li>
       <li><b>When you ask in the English Lab chat</b> · fixes, new features and new audio.</li></ul>
     <h3>If Claude stopped</h3><p>Students could still do everything. Their writings would wait here without a correction and comments would stay unanswered. You can always do it by hand: open a hand-in and write your correction, or use 🤖 Marking sheet in a group's To do. Corrections stay the same whoever writes them.</p>`)}</div>`;
   return `<div class="ph"><h1>✏️ Corrections</h1><div class="sub">Writings, speaking and Talk transcripts, reflections and marked steps of every group · Claude corrects them every Wednesday</div></div>`
@@ -2173,6 +2207,7 @@ function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=s
   const tk=Object.assign({},seed?seed.tick:{}),on=(d,it)=>{const k=itKey(d,it);return k in tk?tk[k]:tkOf(x)[x.ls+"|"+k]||false};
   if(fn&&fn(ag,tk,on)===false)return;
   Object.keys(ag.days).forEach(d=>{if(!ag.days[d].some(it=>it!=="self"))delete ag.days[d]});
+  if(ag.wk){Object.keys(ag.wk).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1)))delete ag.wk[q]});if(!Object.keys(ag.wk).length)delete ag.wk}
   acts(x.ls).forEach(a=>{if(!ag.lab[a.id])ag.lab[a.id]=agLab(x,a)});
   const ps=[api.planEdit(x.ls,x.gid,"agenda",JSON.stringify(ag))];
   const touched=new Set([...agDays(ag),...Object.keys(tkOf(x)).filter(k=>k.startsWith(x.ls+"|@")&&!k.includes("#")).map(k=>k.slice(x.ls.length+2))]);
@@ -2196,14 +2231,15 @@ const addIt=(ag,d,it)=>{const a=ag.days[d]=ag.days[d]||[];if(a.includes(it))retu
 function agMove(x,its,from,to,done){agSave(x,(ag,tk,on)=>{let n=0;its.forEach(it=>{
   const all=Object.keys(ag.days).filter(d=>ag.days[d].includes(it)),src=from?all.filter(d=>d===from):all.filter(d=>!on(d,it));
   if(!from&&!src.length&&all.length&&(done||!to))return;
-  let v=false;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w){v=w;tk[itKey(d,it)]=false}rmIt(ag,d,it);n++});
-  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v}});
+  let v=false,gw=null;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w){v=w;tk[itKey(d,it)]=false}gw=gw||(ag.wk||{})[d+"|"+it]||null;rmIt(ag,d,it);n++});
+  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v;if(gw){ag.wk=ag.wk||{};ag.wk[to+"|"+it]=gw}}});
   return n>0})}
 const agItems=a=>secOf(a).length?itemsOf(a).map(z=>a.id+"#"+z[0]):[a.id+"#"];
 const nextClassDay=(x,d)=>ELWeek.classDays(x.gid,ELWeek.add(d,1),ELWeek.add(d,70))[0]||null;
 function agDrop(k,to){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag||!k.from&&!to)return;
   if(k.ag==="exam"){if(!to||to===ag.exam)return;
     return agSave(x,(g,tk,on)=>{const v=g.exam&&on(g.exam,"exam");if(v){tk[itKey(g.exam,"exam")]=false;tk[itKey(to,"exam")]=v}g.exam=to})}
+  if(k.ag==="shd"){if(!to||(ag.days[to]||[]).includes(SHD))return;return agSave(x,g=>{addIt(g,to,SHD)})}
   if(k.from&&k.from===to)return;
   let its;
   if(k.ag==="it"){its=[k.it];agMove(x,its,k.from||"",to)}
@@ -2234,6 +2270,18 @@ const hwItems=x=>{const s=new Set(),t=ELWeek.today();Object.values(hwOf(x)||{}).
 const itName=(it)=>{if(it==="exam")return "📝 Exam";if(/^note:/.test(it))return it.slice(5);const [id,p]=[it.slice(0,it.indexOf("#")),it.slice(it.indexOf("#")+1)],a=byId(id);
   if(!a)return it;if(!p)return shortTi(a);const z=itemsOf(a).find(q=>q[0]===p);return z?z[1]:p};
 const dayLab=d=>ELWeek.date(d);
+// Individual or group work (Roger, 7 Nov 2026: "I want a tick in each SLP on the right where I can switch from individual to grupal so that I
+// organise my classes this way"): each learning path and tab on a class day is 👤 Individual (default) or 👥 Group work, for this group
+// and this day only. Stored in the agenda as wk: {"day|item": "g"}; it goes with the item when it moves to another day. Teacher only:
+// the students' plan lines ignore it. One write per click, no reads.
+const agG=(ag,d,it)=>(ag.wk||{})[d+"|"+it]==="g";
+const wkBtn=(x,d,its,big)=>{const ag=agOf(x),n=its.filter(it=>agG(ag,d,it)).length,st=!n?"i":n===its.length?"g":"m";
+  const lab=st==="g"?"👥":st==="i"?"👤":"👤👥",word=st==="g"?"Group":st==="i"?"Individual":"Mixed";
+  return `<button type="button" class="agiw ${st}" data-do="agwk" data-d="${d}" ${its.length>1||big?`data-a="${esc(its[0].split("#")[0])}"`:`data-it="${esc(its[0])}"`} data-gid="${x.gid}" data-ls="${x.ls}" aria-pressed="${st==="g"}" title="${word} work${big?" (all its tabs this day)":""} · click for ${st==="g"?"individual":"group"} work">${lab}</button>`};
+// 🎬 Group shadowing with the unit's video (Roger, 7 Nov 2026: "make it possible to add shadowing grupal (the video of the unit)"): one
+// item of the list on the left, dragged to as many class days as you like; on a day it is a note, so the students' plan line says it too.
+const SHD="note:🎬 Shadowing with the whole class";   // no " · ": plan lines are split on it
+const shdUrl=ls=>{const l=(typeof EL_LS!=="undefined"?EL_LS:[]).find(z=>z.id===ls);return l&&l.shadowing?l.shadowing:""};
 const slotOf=(gid,d)=>{const T=window.EL_TIMETABLE,dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d+"T12:00").getDay()];
   const s=((T&&T.groups&&T.groups[gid])||[]).find(v=>String(v).startsWith(dn+" "));return s?String(s).slice(4):""};
 // one class day: its items grouped by activity, each with a tick box, drag handle and ✕; c = compact (Home, weekend check)
@@ -2241,16 +2289,17 @@ function agDay(x,d,c){const ag=agOf(x),t=ELWeek.today(),its=(ag.days[d]||[]),isE
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
   const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
-    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" data-from="${d}" ${D} title="Drag it to another day, or back to the list on the left">`
+    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" data-from="${d}" ${D} title="Drag it to another day, or back to the list on the left">`
       +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${esc(label)}${/#/.test(it)?agTags(it):""}`
-      +(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
+      +(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" title="Open the unit's shadowing video">▶</a>`:"")
+      +(a&&p?wkBtn(x,d,[it]):"")+(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
   const groups=[];its.forEach(it=>{if(it==="self")return;const id=/^note:/.test(it)?"":it.split("#")[0],g=groups.find(z=>z.id===id&&id);if(g)g.its.push(it);else groups.push({id,its:[it]})});
   const body=groups.map(g=>{if(!g.id)return `<div class="agg">${g.its.map(it=>chip(it,it.slice(5))).join("")}</div>`;const a=byId(g.id);if(!a)return "";
     const sec=itemsOf(a).map(z=>z[0]),ord=it=>{const i=sec.indexOf(it.slice(it.indexOf("#")+1));return i<0?99:i};
     const nos=!secOf(a).length;
     return `<div class="agg ${dr.includes(a.id)?"drp":""}"><div class="agh" draggable="true" data-ag="day" data-a="${esc(a.id)}" data-from="${d}" ${D} title="Drag this learning path's tabs of the day to another day">`
       +(nos?`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} ${tkOf(x)[x.ls+"|"+itKey(d,a.id+"#")]?"checked":""} title="Done in class">`:"<span class=\"agdot\">⠿</span>")
-      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>`
+      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>${wkBtn(x,d,g.its,true)}`
       +(nos?`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} title="Take it off this day">✕</button>`:"")+`</div>`
       +(nos?"":`<div class="agcs">${g.its.slice().sort((p,q)=>ord(p)-ord(q)).map(it=>chip(it,itName(it),a)).join("")}</div>`)+`</div>`}).join("");
   const hwOk=its.some(it=>{const a=byId(it.split("#")[0]);return a&&!isCp(a)&&!a.manual});
@@ -2294,8 +2343,9 @@ function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr
   const shut=rows.filter(r=>!r.open),k="agshut"+x.ls+x.gid;
   const rowsH=rows.filter(r=>r.open).map(r=>r.h).join("")+(shut.length?`<details class="agpast agshut" data-k="${esc(k)}" ${S.open.has(k)?"open":""}><summary>🔒 Not opened yet (${shut.length})</summary>${shut.map(r=>r.h).join("")}</details>`:"");
   const ex=ag.exam,n=ex?ELWeek.days(t,ex):null;
-  return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day: it opens for the group. Drop it back here to take it off the agenda: it locks again.</p><p class="agkey">What each tab works: ${[["2","L","Listening"],["3","S","Speaking"],["4","R","Reading"],["5","W","Writing"]].map(([k,l,n])=>`<i style="background:${compCol(k)}">${l}</i> ${n}`).join(" ")} · other competences by their code</p>`
+  return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day: it opens for the group. Drop it back here to take it off the agenda: it locks again.</p><p class="agkey">What each tab works: ${[["2","L","Listening"],["3","S","Speaking"],["4","R","Reading"],["5","W","Writing"]].map(([k,l,n])=>`<i style="background:${compCol(k)}">${l}</i> ${n}`).join(" ")} · other competences by their code<p class="agkey">On the class days: 👤 individual work · <b class="agiwk">👥</b> group work. Click it to switch a tab, or the one next to the learning path for all its tabs that day.</p>`
     +`<div class="agla exam"><div class="aglh" draggable="${ex?"true":"false"}" data-ag="exam" data-from="${ex||""}" ${D} title="Drag it to another day"><span class="agdot">⠿</span><span class="agln"><b>📝 Exam</b><small>${ex?esc(ELWeek.date(ex))+(n>1?` · in ${n} days`:n===1?" · tomorrow":n===0?" · today":" · done"):"no day yet"}</small></span></div></div>`
+    +(shdUrl(x.ls)?(()=>{const sd=Object.keys(ag.days).filter(d=>ag.days[d].includes(SHD)).sort();return `<div class="agla shd"><div class="aglh" draggable="true" data-ag="shd" data-from="" ${D} title="Drag it to a class day (as many days as you like)"><span class="agdot">⠿</span><span class="agln"><b>🎬 Shadowing · whole class</b><small>the unit's video${sd.length?" · "+sd.map(d=>ELWeek.date(d).replace(/ \w+$/,"")).join(" · "):" · not on the agenda"}</small></span><a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" title="Open the video">▶</a></div></div>`})():"")
     +rowsH+`</aside>`}
 // Competences of what is on the agenda (Roger, 6 Nov 2026: "sometimes there will be sections that won't be done. So on the top I want 4
 // colors in a bar, one for each communicative skill … so if a teacher runs out of time, they can make sure we work those competences
@@ -2314,7 +2364,7 @@ function agBars(x){const ag=agOf(x),dr=(x.p._dropped||{})[x.gi]||[],ok=it=>!dr.i
   // 5 minutes of shadowing with the LS video every class (Roger, 6 Nov 2026: "they do shadowing every 5 minutes (with the video of the LS
   // with vocabulary and grammar of the unit) … that means that is speaking"): each class day with a learning path on it adds one step
   // of CE3 Speaking, to the agenda and to the whole LS alike
-  const shd=Object.values(ag.days).filter(its=>its.some(it=>/#/.test(it)&&ok(it))).length;if(shd){plan["3"]=(plan["3"]||0)+shd;all["3"]=(all["3"]||0)+shd}
+  const shd=Object.values(ag.days).filter(its=>its.some(it=>it===SHD||/#/.test(it)&&ok(it))).length;if(shd){plan["3"]=(plan["3"]||0)+shd;all["3"]=(all["3"]||0)+shd}
   const bar=(ks,title,sub,band)=>{const tot=ks.reduce((a,k)=>a+(plan[k]||0),0);if(!ks.length)return "";
     const pc=k=>tot?Math.round((plan[k]||0)/tot*100):0,kept=k=>all[k]?Math.round((plan[k]||0)/all[k]*100):0,nm=k=>isTr(k)?({CC:"Citizenship",CD:"Digital",CE:"Entrepreneurship",CPSAA:"Learning to learn"})[(k.match(/^[A-Z]+/)||[""])[0]]||k:compName(k).replace(/^CE\d+ · /,"");
     const low=band?ks.filter(k=>pc(k)<20):[];
@@ -2475,6 +2525,41 @@ function annDialog(keep){
   t.oninput=draw;at.oninput=at.onchange=draw;$("#annatx").onclick=()=>{at.value="";draw()};
   document.querySelectorAll("#dlg [data-annu]").forEach(c=>c.onchange=()=>{c.checked?S.annSel.add(c.dataset.annu):S.annSel.delete(c.dataset.annu);draw()});
   draw();t.focus()}
+// 🛠 Maintenance mode (Roger, 7 Nov 2026: "que els estudiants no puguin entrar a la web, deixant un missatge que estic fent manteniment"):
+// site/maintenance = {on, note, pdfs, since}. While it is on, every student page (el-cloud.js mtCheck) shows only the message of
+// shared/js/el-maintenance.js with the worksheets of the student's course and level (PDFS there); it opens again by itself when it goes
+// off. The teacher, the student view (👁) and the test account's "see everything" still get in. A page opened within 2 minutes of a
+// check that found it off can still open as usual (that saves a read per page).
+const mtOn=()=>!!(S.D&&S.D.mt&&S.D.mt.on);
+let MT=null;const mtMod=()=>MT?Promise.resolve(MT):import("./shared/js/el-maintenance.js").then(m=>MT=m);
+async function mtDialog(keep){const m=await mtMod(),x=(S.D&&S.D.mt)||{},on=!!x.on;
+  // the PDFs students can download (Roger, 7 Nov 2026: "make possible to select the pdf that they can download"): ticked per course,
+  // kept while the dialog is open (S.mtP), saved with Turn on / Save changes as site/maintenance.pdfs = {course: [item ids]}
+  if(!keep||!S.mtP)S.mtP=Object.fromEntries(Object.keys(m.PDFS).map(c=>[c,new Set(m.chosen(c,x.pdfs).map(i=>i[0]))]));
+  if(!document.getElementById("mtcss")){const st=document.createElement("style");st.id="mtcss";st.textContent=m.CSS;document.head.append(st)}   // the message's own look, for the preview
+  S.mtC=S.mtC||"2eso";S.mtR=m.ROUTES[S.mtC].includes(S.mtR)?S.mtR:"insecure";
+  const since=on&&x.since&&x.since.toDate?x.since.toDate().toLocaleString("en-GB",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"";
+  dlg(`<h3>🛠 Maintenance mode</h3>`
+    +(on?`<p class="hal late"><b>ON${since?" since "+esc(since):""}.</b> Students only see the message below.</p>`:`<p class="muted" style="margin:0 0 8px">While it is on, students can't use the site: every page they open shows only this message, with the PDFs you tick below (their own course and level) to download and print. When you turn it off, their page opens again by itself. You, the 👁 student view and your test account in “see everything” still get in.</p>`)
+    +`<label for="mtnote">A note for students <small class="muted">(optional, shown under the message exactly as you write it, e.g. “Back on Monday”)</small></label>
+    <textarea id="mtnote" maxlength="300" style="min-height:60px" placeholder="For example: Do the worksheet of LP1 for Monday."></textarea>
+    <p style="margin:10px 0 4px"><b>PDFs they can download</b> <small class="muted">(each student gets the one of their own level; worksheets have no answers)</small></p>
+    <div class="mtpick">${Object.entries(m.PDFS).map(([c,v])=>`<div><b>${courseName(c)}</b> <small class="muted">${esc(v.name)}</small>${v.items.map(([id,tt])=>`<label><input type="checkbox" data-mtp="${c}|${id}" ${S.mtP[c].has(id)?"checked":""}> ${esc(tt)}</label>`).join("")}</div>`).join("")}</div>
+    <p class="muted" style="margin:10px 0 4px">What students see:</p>
+    <div class="bar">${Object.keys(m.PDFS).map(c=>`<button type="button" class="chip ${S.mtC===c?"on":""}" data-mtc="${c}">${courseName(c)}</button>`).join("")} <span class="muted">·</span> ${m.ROUTES[S.mtC].map(r=>`<button type="button" class="chip ${S.mtR===r?"on":""}" data-mtr="${r}">${LV_NAME[r]}</button>`).join("")}</div>
+    <div class="mtprev" id="mtprev"></div>
+    <div class="row" style="justify-content:flex-start">${on?`<button data-do="mtoff">✅ Turn it off: open the site again</button><button class="g" data-do="mton">Save changes</button>`:`<button data-do="mton" style="background:#dc2626">🛠 Turn maintenance on</button>`}</div>`,true);
+  const t=$("#mtnote");t.value=S.mtNote!=null?S.mtNote:x.note||"";S.mtNote=null;
+  const draw=()=>{$("#mtprev").innerHTML=m.html({course:S.mtC,route:S.mtR,ca:elCa(S.mtR),note:t.value.trim(),pdfs:mtPdfs(),root:new URL("./",location.href).href})};
+  t.oninput=draw;draw();
+  document.querySelectorAll("#dlg [data-mtp]").forEach(b=>b.onchange=()=>{const [c,id]=b.dataset.mtp.split("|");b.checked?S.mtP[c].add(id):S.mtP[c].delete(id);if(c!==S.mtC){S.mtC=c;S.mtNote=t.value;mtDialog(true)}else draw()});
+  document.querySelectorAll("#dlg [data-mtc],#dlg [data-mtr]").forEach(b=>b.onclick=()=>{if(b.dataset.mtc)S.mtC=b.dataset.mtc;else S.mtR=b.dataset.mtr;S.mtNote=t.value;mtDialog(true)})}
+const mtPdfs=()=>Object.fromEntries(Object.entries(S.mtP||{}).map(([c,v])=>[c,[...v]]));
+function mtSave(on){const t=$("#dlg").open&&$("#mtnote"),note=t?t.value.trim().slice(0,300):((S.D.mt||{}).note||"");
+  if(on&&!mtOn()&&!confirm("Turn maintenance on? Students will not be able to use the site until you turn it off."))return;
+  if(!on&&!confirm("Turn maintenance off? Students can use the site again."))return;
+  const was=mtOn(),o={on,note};if($("#dlg").open&&S.mtP)o.pdfs=mtPdfs();S.mtP=null;if(on&&!was)o.since=DEMO?new Date():F.serverTimestamp();
+  S.D.mt=Object.assign({},S.D.mt,o);if($("#dlg").open)$("#dlg").close();act(put(["site","maintenance"],o))}
 // the "Send later" time in ms, or 0 for now (empty, or a time that has already passed)
 const annAtMs=()=>{const v=$("#annat")&&$("#annat").value,ms=v?+new Date(v):0;return ms>Date.now()?ms:0};
 function annToggle(v){
@@ -2597,6 +2682,18 @@ function roForm(s){const r=s.ro||{email:s.email||"",first:s.name||"",group:s.gro
     +`<div class="row">${s.ro?`<button class="g" data-do="rodel" data-u="${s.uid}">Remove from the list</button>`:""}<button data-do="rosave" data-u="${s.uid||""}">${s.ro?"Save":"Add to the list"}</button></div>`}
 
 // ---- panels
+// ⛶ Full screen for the Learning paths and activities table (Roger, 7 Nov 2026: "a button to see this table full screen"). The box covers
+// the whole window (body.gfs) and the browser goes full screen too when it allows it; names and headers stay sticky inside the table.
+// Esc (the browser leaving full screen, or the key when it stayed in the window) or ✕ Exit full screen go back. No re-render, so the
+// table keeps its scroll; a later render (live refresh) keeps it on through S.gfs.
+function gfs(on){S.gfs=on;const box=document.querySelector("#main .lpall");document.body.classList.toggle("gfs",!!(on&&box));
+  const b=box&&box.querySelector("[data-do=gfs]");if(b){b.textContent=on?"✕ Exit full screen":"⛶ Table full screen";b.title=on?"Back to the dashboard (Esc)":"Show this table on the whole screen"}
+  const d=document,fe=d.fullscreenElement||d.webkitFullscreenElement;
+  if(on&&!fe){const r=d.documentElement.requestFullscreen||d.documentElement.webkitRequestFullscreen;if(r)try{const x=r.call(d.documentElement);if(x&&x.catch)x.catch(()=>{});S.gfsB=true}catch(e){}}
+  if(!on&&fe&&S.gfsB){const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d);if(x&&x.catch)x.catch(()=>{})}
+  if(!on)S.gfsB=false}
+["fullscreenchange","webkitfullscreenchange"].forEach(ev=>document.addEventListener(ev,()=>{if(!(document.fullscreenElement||document.webkitFullscreenElement)&&S.gfs&&S.gfsB){S.gfsB=false;gfs(false)}}));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.gfs&&!$("#dlg").open){e.preventDefault();gfs(false)}});
 function dlg(html,wide){$("#dlg").style.maxWidth=wide?"820px":"";$("#dlgc").innerHTML=html+`<div class="row"><button class="g" data-do="close">Close</button></div>`;if(!$("#dlg").open)$("#dlg").showModal()}
 let redraw=null;   // the open assessment dialog, drawn again after a one-click change (typed text, open sections and scroll are kept)
 function again(){const d=$("#dlg"),c=$("#dlgc");if(!d.open||!redraw)return;const f=()=>[...c.querySelectorAll("textarea,input:not([type=checkbox])")],vals=f().map(e=>e.value),op=[...c.querySelectorAll("details")].map(x=>x.open),top=d.scrollTop;
@@ -2898,6 +2995,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       quick(api.planEdit(k.ls,k.gid,"nohw:"+k.line,k.v==="1"?{noHw:true,at:Date.now()}:null))},   // a plan's "Homework by …" line removed for this group (planEdits "nohw:<line>")
     pledit:()=>{e.preventDefault();peOpen(planX(k.ls,k.gid),+k.i,k.line)},
     agtick:()=>{e.stopPropagation();agTick(planX(k.ls,k.gid),k.d,k.it,t.checked)},
+    agwk:()=>{e.preventDefault();e.stopPropagation();const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)return;
+      const its=k.a?((ag.days||{})[k.d]||[]).filter(it=>it.split("#")[0]===k.a):[k.it],allG=its.every(it=>agG(ag,k.d,it));
+      agSave(x,g=>{g.wk=g.wk||{};its.forEach(it=>{const q=k.d+"|"+it;if(allG)delete g.wk[q];else g.wk[q]="g"})})},
     agrm:()=>{e.preventDefault();e.stopPropagation();agMove(planX(k.ls,k.gid),[k.it],k.d,"")},
     agnext:()=>{e.preventDefault();const x=planX(k.ls,k.gid),ag=agOf(x),nd=nextClassDay(x,k.d);if(!nd)return alert("No later class in the timetable.");
       agMove(x,((ag.days||{})[k.d]||[]).filter(it=>it!=="self"&&!tkOf(x)[x.ls+"|"+itKey(k.d,it)]),k.d,nd)},
@@ -2959,9 +3059,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       if(S.D.ro[id]&&id!==old)return alert("This student is already on the list.");
       $("#dlg").close();act(api.saveRo(id,o,old,s&&!s.away?s.uid:null))},
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
-    fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
+    fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},gfs:()=>gfs(!S.gfs),"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     sgopen:()=>{S.open.add("sugg");S.place="msgs";render();$("#sugg").scrollIntoView({behavior:"smooth"})},
-    annnew:()=>annDialog(),msgnew:()=>msgDialog(u,k.id),msgsend:()=>msgSend(u,k.id),msgseen:()=>{const inStu=$("#dlg").open;act(api.annSeen(k.id)).then(()=>{if(inStu&&S.P[u])stuPanel(u)})},annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
+    annnew:()=>annDialog(),msgnew:()=>msgDialog(u,k.id),msgsend:()=>msgSend(u,k.id),msgseen:()=>{const inStu=$("#dlg").open;act(api.annSeen(k.id)).then(()=>{if(inStu&&S.P[u])stuPanel(u)})},mtdlg:()=>mtDialog(),mton:()=>mtSave(true),mtoff:()=>mtSave(false),annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
     sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");S.place="msgs";render();$("#probs").scrollIntoView({behavior:"smooth"})},

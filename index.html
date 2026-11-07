@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- A student who was signed in on this browser last (el_who, el-cloud.js) goes to their board at once: el-cloud.js sends students
+       there anyway, but only after Firebase has loaded, so this page showed its Sign in buttons for a second or two first
+       (Roger, 7 Nov 2026: "all pages still pop up in between"). -->
+  <script>try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="student"&&!sessionStorage.getItem("el_as"))location.replace("today.html")}catch(e){}</script>
+  <link rel="preload" as="image" href="avatar-roger.jpg">
   <meta name="description" content="English with Roger — learning space for ESO and Batxillerat students." />
   <title>English with Roger</title>
   <style>

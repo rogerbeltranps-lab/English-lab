@@ -25,7 +25,12 @@
     : /\/lab\/(index\.html|practice\.html)?$/.test(path) ? "lab"
     : /\/(?:2|4)eso\/(index\.html)?$/.test(path) ? "course" : null;
   window.ELApp = { mode };
-  if (!mode) return;
+  // The page shows once this file has drawn it (Roger, 7 Nov 2026, video: "all pages still pop up in between"): pages with
+  // <html class="elgate"> stay hidden until html.elready (el-app.css), so the browser never paints the page's own old layout, the
+  // menu without its styles or a half-moved learning path. html.elhold: the page adds elready itself (English Lab, after its first
+  // drawing). el-app.css shows the page anyway after 1.5 s.
+  const ready = () => { if (!document.documentElement.classList.contains("elhold")) document.documentElement.classList.add("elready"); };
+  if (!mode) { ready(); return; }
   if (!document.querySelector('link[href$="shared/css/el-app.css"]')) { const css = document.createElement("link"); css.rel = "stylesheet"; css.href = ROOT + "shared/css/el-app.css"; document.head.append(css); }
   const course0 = (path.match(/\/((?:2|4)eso)\//) || [])[1] || null;
 
@@ -37,7 +42,7 @@
     : W.role === "teacher" && AS0 && AS0.uid ? { role: "student", as: AS0.uid, group: AS0.group || null }
     : { role: W.role, group: W.group || null };
   if (who.group) who.course = who.group.slice(0, 4).toLowerCase();
-  let CA = !!W && W.role === "student" && W.ca === true;
+  let CA = !!W && W.role === "student" && W.ca !== false;   // a student with no level known yet: Catalan, as el-ls-home.js (Starter and Base)
   const t = (ca, en) => CA ? ca : en;
   const load = (src, has) => has() ? Promise.resolve() : new Promise(r => { const s = document.createElement("script"); s.src = ROOT + src; s.onload = s.onerror = r; document.head.append(s); });
   const lsHref = id => { const l = (window.EL_LS || []).find(x => x.id === id); return l ? ROOT + l.course + "/" + l.id.slice(l.course.length + 1) + "/index.html" : null; };
@@ -153,6 +158,14 @@
       + `<div class="ellist">${order.map(row).join("") || (!known && !all ? "" : `<p class="sub">${t("Encara no hi ha cap Learning Situation oberta.", "No Learning Situation is open yet.")}</p>`)}</div>`
       + `<p class="more">${t("N'aniran apareixent més durant el curs.", "More will appear during the year.")}</p></div>`;
   }
+  // a student sees only the button of their own level (el-cloud.js applyLevel does it again once it has read the level): at once, so
+  // the teacher's Level card with four levels does not show to a student for a second and then go
+  function ownLevel() {
+    if ((mode !== "lp" && mode !== "games") || who.role !== "student") return;
+    const b = $$(".route[data-level]"); if (b.length < 2 || b.some(x => x.style.display === "none")) return;
+    const on = b.find(x => x.classList.contains("active") || x.getAttribute("aria-pressed") === "true"); if (!on) return;
+    b.forEach(x => { if (x !== on) x.style.display = "none"; });
+  }
   function lpBar() {   // learning paths: the back link to the LS, as a button
     if (mode !== "lp") return;
     $$(".topbar .brand>a").forEach(a => {
@@ -202,8 +215,25 @@
   // pick (a student sees only their own) or the sections bar
   function teachVis(teach) {
     const r = teach.querySelector(".routes");
-    const on = !!(teach.querySelector("[data-el-teacher]:not([hidden])") || teach.querySelector("#el-tsec") || (r && ![...r.querySelectorAll(".route")].some(x => x.style.display === "none")));
+    const on = !!(teach.querySelector("[data-el-teacher]:not([hidden])") || teach.querySelector("#el-tsec,#el-tsec-early") || (r && ![...r.querySelectorAll(".route")].some(x => x.style.display === "none")));
     if (teach.hidden === on) teach.hidden = !on;
+  }
+  // The teacher's sections card (el-cloud.js teacherSections: open sections, class mode, full screen) needs the LS document, so it came
+  // a second after the page and pushed the steps down (Roger, 7 Nov 2026: "and how can you fix this?"). It is drawn at once from the copy
+  // el-cloud.js keeps of its last drawing on this page (el_tsec_<page path>, this browser), with the 🔓/🔒 on the tabs; el-cloud.js puts
+  // the real one in the same place when it has read the LS (the same picture unless something changed meanwhile). Clicks wait for it.
+  function tsecEarly() {
+    if (mode !== "lp" || who.role !== "teacher" || who.as || document.getElementById("el-tsec") || document.getElementById("el-tsec-early")) return;
+    const rel = path.match(/\/((?:2|4)eso\/[^/]+\/[^/]+\.html)$/); if (!rel) return;   // the page's path from the course folder, as el-cloud.js relPath
+    let c = null; try { c = JSON.parse(localStorage.getItem("el_tsec_" + rel[1]) || "null"); } catch (e) {}
+    const t0 = $(".tab[data-panel]"), nav = t0 && t0.parentElement; if (!c || !c.h || !nav) return;
+    if (c.css && !document.getElementById("el-tsec-css")) { const st = document.createElement("style"); st.id = "el-tsec-css"; st.textContent = c.css; document.head.append(st); }
+    const bar = document.createElement("div"); bar.id = "el-tsec-early"; bar.className = "el-tsec"; bar.innerHTML = c.h;
+    const host = $(".eltsec-host"); if (host) host.append(bar); else nav.before(bar);
+    const all = c.all || [], off = c.off || [];
+    $$(".tab[data-panel]").forEach(t => { const id = t.dataset.panel; if (!all.includes(id) || t.querySelector(".el-tsw")) return; const on = !off.includes(id);
+      const sw = document.createElement("span"); sw.className = "el-tsw el-tsw-early" + (on ? "" : " off"); sw.textContent = on ? "🔓" : "🔒"; t.append(sw); t.classList.toggle("el-toff", !on); });
+    const teach = $(".ellp-teach"); if (teach) teachVis(teach);
   }
   function lpBack() {   // back to the page's own layout (the window got narrow)
     const grid = col.parentElement, lp = $("#lp"), hero = $("header.hero"), w = hero.querySelector(".wrap") || hero;
@@ -229,8 +259,10 @@
     document.body.classList.toggle("elapp", on);
     document.body.classList.add("el" + mode);
     if (!on) { $$(".elrail,.elbar,.elside,.elcrumb").forEach(e => e.remove()); document.body.classList.remove("elhas-rail", "elhas-bar"); return; }
+    ownLevel();
     lpBar();
     lpLayout();
+    tsecEarly();
     curLs = pickLs();
     const L = items();
     if (mode === "lab") side(L); else rail(L);
@@ -243,6 +275,7 @@
   const start = () => {
     if (who.role === "teacher" && !who.as) $$("[data-el-teacher]").forEach(e => e.hidden = false);   // the teacher's links at once too (el-cloud.js sets them again)
     draw();
+    ready();
     if (who.group) Promise.all([load("shared/js/el-plan.js", () => window.EL_PLAN), load("shared/js/el-week.js", () => window.ELWeek)]).then(() => draw());
     // the course's LSs and the time plan: static files, no reads
     load("shared/js/el-catalog.js", () => window.EL_LS).then(() => draw());
@@ -255,10 +288,12 @@
           if (!u) who = { role: "none" };
           else if (AS) who = { role: "student", as: AS.uid, group: AS.group || null };
           else if (C.isTeacher(u)) who = { role: "teacher" };
-          else who = { role: C.isTester(u) && !C.viewGroup() ? "tester" : "student", group: C.group() };
+          else who = { role: C.isTester(u) && !C.viewGroup() ? "tester" : "student", group: C.group() || (W && W.uid === u.uid ? W.group || null : null) };
           const g = who.group;
           who.course = g ? ((window.EL_GROUPS || []).find(x => x.id === g) || {}).course || g.slice(0, 4).toLowerCase() : null;
-          CA = (who.role === "student") && C.ca === true;
+          // the language changes only once el-cloud.js knows the level (C.ca true or false); unknown keeps the first drawing's, so the
+          // menu does not switch Catalan → English → Catalan while the level is read
+          if (who.role !== "student") CA = false; else if (C.ca === true || C.ca === false) CA = C.ca;
           if (g) await Promise.all([load("shared/js/el-plan.js", () => window.EL_PLAN), load("shared/js/el-week.js", () => window.ELWeek)]);
           draw();
         });
@@ -267,6 +302,9 @@
       if (++tries < 300) setTimeout(wait, 100);
     })();
   };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+  // In the page's HTML after its content (a plain <script>, not async): draw now, before the browser paints. Waiting for
+  // DOMContentLoaded meant waiting for el-cloud.js and its imports too, and the page's old look showed meanwhile.
+  const sync = document.currentScript && !document.currentScript.async && !document.currentScript.defer;
+  if (document.readyState === "loading" && !sync) document.addEventListener("DOMContentLoaded", start); else start();
   window.ELApp.redraw = () => draw();
 })();

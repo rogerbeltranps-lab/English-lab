@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
 <meta charset="utf-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
@@ -60,6 +60,9 @@ html,body{overflow-x:clip}
 .btn.secondary.active{background:var(--accent);color:#fff!important;border-color:var(--accent)!important}
 </style>
 <link rel="stylesheet" href="../../shared/css/lp-theme-4eso.css">
+<!-- the learning path look of the LS2 engine pages (ls2-engine.js init, the same rules): the "How it works" fold, the steps with a tick and NEXT, the phone strip -->
+<style id="trackNoteCss">#lp>.lp-top>div>*{margin:0!important}.lp-how{margin:0 0 14px;background:#fff;border:1px solid var(--line,#dbe5f1);border-radius:14px;padding:0 14px}.lp-how>summary{cursor:pointer;padding:12px 0;font-weight:750;color:var(--dark,#234777)}.lp-how .track-note{margin:0 0 12px}.tab .tn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:24px;height:24px;border-radius:999px;font-size:.85rem}.tab.done .tn{background:#16a34a!important;color:#fff!important;font-size:0}.tab.done .tn::after{content:"✓";font-size:.85rem}.tab.next:not(.active){box-shadow:inset 0 0 0 2px var(--accent,#315f9f)}@media (min-width:1000px){.lp-body{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;align-items:start}.lp-body>.el-tsec{grid-column:1/-1}.lp-body>.tabs{flex-direction:column;overflow:visible;position:sticky;top:76px;padding:0;gap:6px}.lp-body .tab{display:flex;align-items:center;gap:10px;text-align:left;white-space:normal;padding:11px 13px}.lp-body .tab.next:not(.active)::after{content:attr(data-next);margin-left:auto;font-size:.7rem;letter-spacing:.06em;color:var(--accent,#315f9f)}}.lp-top{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;align-items:start;margin:0 0 14px}.lp-top>*{margin:0!important}.routes:has(.route[style*="none"]){display:flex;flex-wrap:wrap}.routes:has(.route[style*="none"]) .route{flex:0 0 auto;padding:8px 16px;min-height:0}.hero{padding:24px 0 18px!important}.hero h1{font-size:clamp(2rem,3.4vw,2.8rem)!important;margin:.15em 0 .2em!important}.lp-top+.plan-card{padding:12px 16px!important;margin-bottom:14px}.lp-top+.plan-card h3{display:inline;font-size:1rem;margin:0}.lp-top+.plan-card .instruction{display:inline;margin:0 0 0 6px;font-size:.92rem}.lp-top+.plan-card input{display:block;width:100%;box-sizing:border-box;margin-top:8px}@media (max-width:640px){.topbar{position:static!important}.hero{padding:14px 0 10px!important}.hero h1{font-size:1.75rem!important}.hero .lead{font-size:.98rem;margin:.2em 0 .6em}.hero .eyebrow{font-size:.72rem}.lp-body>.tabs{position:sticky;top:0;z-index:25;margin:0 -16px 10px;padding:8px 16px;background:var(--bg,#f4f7fb);box-shadow:0 6px 10px -8px #0f172a40;gap:6px;scrollbar-width:none}.lp-body>.tabs::-webkit-scrollbar{display:none}.lp-body .tab{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;font-size:.92rem;border-radius:11px}.lp-body .tab .tn{min-width:22px;height:22px}.panel{padding:16px!important;border-radius:16px!important}.panel-head h2{font-size:1.35rem}.lp-how>summary{padding:11px 0}}</style>
+<link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu's styles before the first paint (Roger, 7 Nov 2026) -->
 </head>
 <body>
 <script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws (Roger, 7 Nov 2026) -->
@@ -88,15 +91,20 @@ html,body{overflow-x:clip}
     <button class="route" data-level="native"><strong>Native</strong><span>C2</span></button></div>
 </div></header>
 
-<main class="wrap">
-<div id="trackNote"></div><div id="planBox"></div><div id="studyBox"></div>
-<nav class="tabs" aria-label="Warm-up sections">
-  <button class="tab active" data-panel="recall">1 Recall</button>
-  <button class="tab" data-panel="words">2 Autumn words</button>
-  <button class="tab" data-panel="read">3 Reading</button>
-  <button class="tab" data-panel="listen">4 Listening</button>
-  <button class="tab" data-panel="speak">5 Speaking</button>
+<!-- the same parts as the LS2 engine pages draw in #lp (Roger, 7 Nov 2026: "this doesn't match the new style"), so el-app.js puts the
+     path in the left column on a computer: .lp-top (how it works + study guide), the goal card, .lp-body (steps + panels) -->
+<main class="wrap" id="lp">
+<div class="lp-top"><div id="trackNote"></div><div id="studyBox"></div></div>
+<div class="section-card plan-card" id="planBox"></div>
+<div class="lp-body">
+<nav class="tabs" aria-label="Sections">
+  <button class="tab active" data-panel="recall"><span class="tn">1</span> <span class="tl">Recall</span></button>
+  <button class="tab" data-panel="words"><span class="tn">2</span> <span class="tl" data-support-ca="Paraules de tardor" data-support-en="Autumn words">Autumn words</span></button>
+  <button class="tab" data-panel="read"><span class="tn">3</span> <span class="tl">Reading</span></button>
+  <button class="tab" data-panel="listen"><span class="tn">4</span> <span class="tl">Listening</span></button>
+  <button class="tab" data-panel="speak"><span class="tn">5</span> <span class="tl">Speaking</span></button>
 </nav>
+<div class="lp-panels">
 
 <section class="panel active" id="recall">
   <div class="panel-head"><div><h2>Recall: My Real Routine</h2><p class="instruction" data-support-ca="Escriu la resposta sense mirar apunts. No passa res si no te'n recordes: intentar recordar és el que t'ajuda a aprendre. Després llegeix el feedback." data-support-en="Type the answers without looking at your notes. Trying to remember is what helps you learn. Then read the feedback.">Type the answers without looking at your notes. Trying to remember is what helps you learn. Then read the feedback.</p></div><span class="pill">No notes · 3 min</span></div>
@@ -184,6 +192,7 @@ html,body{overflow-x:clip}
   </div>
   <div class="result" id="speakResult" data-support-ca="Has acabat l’escalfament. Entrega la transcripció al professor: et tornarà la correcció aquí mateix." data-support-en="Warm-up complete. You are ready for the next Learning Path.">Warm-up complete. You are ready for the next Learning Path.</div>
 </section>
+</div></div>
 
 <div id="reviewBox"></div>
 <p class="footer-note">Your answers and progress are saved separately for each route.</p>
@@ -222,7 +231,11 @@ function firstItems(k,src,items,got){state.items=state.items||{};const key=k+"_"
   state.items[key]={level,date:new Date().toISOString(),q:items.map(it=>src.indexOf(it)),ok:got.map(g=>g[0]?1:0),a:got.map(g=>g[1])};save()}
 const gotTyped=(items,prefix)=>items.map((it,i)=>{const v=$("#"+prefix+i).value;return [it.a.some(a=>norm(a)===norm(v)),String(v||"").trim().slice(0,40)]});
 const gotRadio=(items,name)=>items.map((_,i)=>{const c=document.querySelector('input[name="'+name+i+'"]:checked');return [!!c&&+c.value===0,c?+c.value:null]});
-function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / "+STEPS.length;$("#progressBar").style.width=(n/STEPS.length*100)+"%"}
+function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / "+STEPS.length;$("#progressBar").style.width=(n/STEPS.length*100)+"%";markTabs()}
+// the list of steps as on the LS2 engine pages (ls2-engine.js markTabs): a tick on each step done, the first one not done marked NEXT;
+// on a phone the open step stays in view in the strip of steps
+function markTabs(){let next=false;STEPS.forEach(k=>{const t=document.querySelector('.tab[data-panel="'+k+'"]');if(!t)return;const d=!!state.done[k];t.classList.toggle("done",d);t.classList.toggle("next",!d&&!next);t.dataset.next=ca()?"SEGÜENT":"NEXT";if(!d)next=true});
+  const a=$(".lp-body>.tabs .tab.active");if(a&&innerWidth<1000&&markTabs.on!==a.dataset.panel){markTabs.on=a.dataset.panel;a.parentNode.scrollLeft=a.offsetLeft-a.parentNode.offsetLeft-16}}
 const ca=()=>level==="insecure"||level==="beginners";
 const need=n=>Math.ceil(n*0.8);
 // a step is done once every question is answered and checked, whatever the score (Roger, 6 Nov 2026); the score still shows
@@ -371,11 +384,14 @@ $("#vidNormal").onclick=()=>setVideo(false);$("#vidSlow").onclick=()=>setVideo(t
 // Tracking note, goal and review cards: the same as on the LS2 engine pages (ls2-engine.js trackNote, planCard, reviewCard, bindPlan;
 // state.plan[route], state.review[route], shown to the teacher in the activity dialog). Never a step, never marked.
 function renderPlan(){
-  $("#trackNote").innerHTML='<p class="track-note">'+(ca()
-    ?'📋 <strong>El professor fa el seguiment de totes les activitats que fas.</strong> Algunes s’avaluaran i seran la teva avaluació contínua, que és una part de la nota. Fes cada activitat tu sol/a i sense apunts la primera vegada; després la pots repetir per practicar. Acaba-les a temps: mira «El meu pla setmanal» al teu tauler.'
-    :'📋 <strong>Your teacher keeps track of all the activities you do.</strong> Some of them will be assessed and make up your continuous assessment, which is part of your mark. Do each activity on your own and without notes the first time; you can repeat it later to practise. Finish them on time: check “My week plan” on your board.')+'</p>';
-  $("#planBox").innerHTML='<div class="section-card plan-card"><h3>🎯 '+(ca()?'El meu objectiu':'My goal')+'</h3><p class="instruction">'+(ca()?'Abans de començar: pensa en el teu últim recall o checkpoint. Què vols millorar en aquest Learning Path?':'Before you start: think about your last recall or checkpoint. What do you want to get better at in this Learning Path?')+'</p>'
-    +'<input type="text" class="typed" id="lpGoal" maxlength="200" placeholder="'+(ca()?'Per exemple: recordar les paraules noves sense mirar.':'For example: remember the new words without looking.')+'"></div>';
+  // "How this learning path works" fold, as ls2-engine.js howTo(): the hero's warm-up note and the tracking note
+  const warm=document.querySelector(".hero .warm-note");if(warm)warm.hidden=true;
+  $("#trackNote").innerHTML='<details class="lp-how"><summary>ⓘ '+(ca()?'Com funciona aquest learning path':'How this learning path works')+'</summary>'
+    +(warm?'<p class="track-note">💡 '+warm.innerHTML+'</p>':'')+'<p class="track-note">'+(ca()
+    ?'📋 <strong>El professor fa el seguiment de totes les activitats que fas.</strong> Algunes s’avaluaran i seran la teva avaluació contínua, que és una part de la nota. Fes cada activitat tu sol/a i sense apunts la primera vegada; després la pots repetir per practicar. Acaba-les a temps: mira «Deures» al teu tauler.'
+    :'📋 <strong>Your teacher keeps track of all the activities you do.</strong> Some of them will be assessed and make up your continuous assessment, which is part of your mark. Do each activity on your own and without notes the first time; you can repeat it later to practise. Finish them on time: check “Homework” on your board.')+'</p></details>';
+  $("#planBox").innerHTML='<h3>🎯 '+(ca()?'El meu objectiu':'My goal')+'</h3><p class="instruction">'+(ca()?'Abans de començar: pensa en el teu últim recall o checkpoint. Què vols millorar en aquest Learning Path?':'Before you start: think about your last recall or checkpoint. What do you want to get better at in this Learning Path?')+'</p>'
+    +'<input type="text" class="typed" id="lpGoal" maxlength="200" placeholder="'+(ca()?'Per exemple: recordar les paraules noves sense mirar.':'For example: remember the new words without looking.')+'">';
   $("#reviewBox").innerHTML='<div class="section-card plan-card"><h3>🔁 '+(ca()?'Com m’ha anat':'How did it go?')+'</h3>'
     +'<label class="field"><strong>'+(ca()?'Què m’ha ajudat més?':'What helped me most?')+'</strong><input type="text" class="typed" id="lpHelped" maxlength="200"></label>'
     +'<label class="field"><strong>'+(ca()?'Què he de repassar?':'What do I need to review?')+'</strong><input type="text" class="typed" id="lpReview" maxlength="200"></label>'
@@ -456,7 +472,7 @@ function renderCycle(){
 function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderCycle();renderRecall();renderWords();renderRead();renderListen();renderRealVideo();renderSpeak();renderChoices();learningSupport.apply(level);speakHanded();if(N())$("#speak .panel-head .instruction").textContent="Plan a C2 Proficiency long turn in writing: no recording.";updateProgress()}
 function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));save();renderAll()}
 $$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
-$$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");window.scrollTo({top:document.querySelector("main").offsetTop-64,behavior:"smooth"})});
+$$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");markTabs();const top=innerWidth<=640?$(".lp-body").getBoundingClientRect().top+scrollY:$("#lp").offsetTop-64;if(innerWidth>640||scrollY>top)window.scrollTo({top,behavior:"smooth"})});
 
 let audioCtx,sourceNode,processor,micStream,pcm=[],recSampleRate=44100,recordBlob=null,recordUrl=null;
 let recognition=null,speechTranscribingActive=false,speechRestartTimer=null,speechFinalText='';
@@ -585,6 +601,9 @@ sectionNext.init({level:()=>level,panels:[
 ]});
 sectionNext.final({id:'speak',level:()=>level,done:()=>!!state.done.speak,detail:ca=>ca?'Grava el teu àudio i atura la gravació.':'Record your audio and stop the recording.'});
 </script>
+<!-- the app menu and the learning path's left column at once, before the browser paints: no old look first (Roger, 7 Nov 2026) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>
