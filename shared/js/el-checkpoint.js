@@ -61,6 +61,7 @@ window.ELCheckpoint = (function () {
       box().innerHTML = (note ? '<p class="feedback no">' + note + '</p>' : '') +
         '<h3>' + t('Com funciona', 'How it works') + '</h3><ul class="cp-rules">' +
         '<li>' + t(n + ' preguntes, una cada vegada. Tens uns ' + secs + ' segons per a cada una.', n + ' questions, one at a time. You have about ' + secs + ' seconds for each one.') + '</li>' +
+        (api.level() === 'beginners' && (p.items || []).some(x => Array.isArray(x.o)) ? '<li>' + t('A cada pregunta tries la resposta entre <strong>tres opcions</strong>.', 'For each question you choose the answer from <strong>three options</strong>.') + '</li>' : '') +
         '<li>' + t('No pots tornar enrere. Quan el temps s’acaba, passes a la pregunta següent.', 'You can’t go back. When the time is up, the next question comes.') + '</li>' +
         '<li>' + t('Només el pots fer <strong>una vegada</strong>.', 'You can only do it <strong>once</strong>.') + '</li></ul>' +
         '<div class="cp-warn"><h3>⚠️ ' + t('Important', 'Important') + '</h3><ul class="cp-rules">' +
@@ -88,13 +89,21 @@ window.ELCheckpoint = (function () {
       stop(); const c = st(), b = box();
       if (c.i >= c.ids.length) return send(null);
       const it = byId(c.ids[c.i]) || { q: '?' }, last = c.i === c.ids.length - 1;
+      // Starter picks one of three options, as in its learning paths (Roger, 7 Nov 2026: "make checkpoints the same level and difficulty
+      // as the LPs"); the options are in the page data (item.o, tools/checkpoint-keys/starter-options.cjs), the key still is not
+      const picks = c.level === 'beginners' && Array.isArray(it.o) && it.o.length > 1 ? it.o : null;
       b.innerHTML = '<p class="tiny">' + t('Pregunta ', 'Question ') + (c.i + 1) + ' / ' + c.ids.length + '</p><div class="cp-bar"><i id="' + p.id + 'Bar" style="width:100%"></i></div>' +
-        '<p class="cp-q">' + it.q + '</p><div class="question" style="margin:0"><input type="text" class="typed" id="' + p.id + 'In" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="' + t('La teva resposta', 'Your answer') + '"></div>' +
+        '<p class="cp-q">' + it.q + '</p>' + (picks ? '<p class="instruction">' + t('Tria la resposta correcta entre les tres opcions.', 'Choose the right answer from the three options.') + '</p>' : '') +
+        '<div class="question" style="margin:0"><input type="text" class="typed" id="' + p.id + 'In" autocomplete="off" autocapitalize="off" spellcheck="false"' + (picks ? ' readonly placeholder="' + t('Tria una opció', 'Choose an option') + '"' : '') + ' aria-label="' + t('La teva resposta', 'Your answer') + '"></div>' +
+        (picks ? '<div class="actions pick-row" style="justify-content:flex-start">' + picks.map(o => '<button class="btn secondary" type="button" data-cp-pick="' + esc(o) + '">' + esc(o) + '</button>').join('') + '</div>' : '') +
         '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Next">' + (last ? t('Envia', 'Send') : t('Següent →', 'Next →')) + '</button>' +
         (last ? '' : ' <button class="btn secondary" type="button" id="' + p.id + 'End">' + t('Entrega', 'Turn in') + '</button>') + '</div><p class="cp-esc" id="' + p.id + 'Esc" hidden></p>';
       const inp = document.getElementById(p.id + 'In'), bar = document.getElementById(p.id + 'Bar');
       inp.value = (c.draft && c.draft.i === c.i ? c.draft.v : '') || '';
       inp.oninput = () => { c.draft = { i: c.i, v: inp.value }; api.save(); };
+      const lit = () => b.querySelectorAll('[data-cp-pick]').forEach(x => { const on2 = !!inp.value && x.dataset.cpPick === inp.value; x.setAttribute('aria-pressed', on2); x.style.setProperty('background', on2 ? 'var(--accent)' : '', on2 ? 'important' : ''); x.style.setProperty('color', on2 ? '#fff' : '', on2 ? 'important' : ''); });
+      b.querySelectorAll('[data-cp-pick]').forEach(x => x.onclick = () => { inp.value = x.dataset.cpPick; inp.oninput(); lit(); });
+      lit();
       inp.onkeydown = e => { if (e.key === 'Enter') next(); };
       document.getElementById(p.id + 'Next').onclick = () => next();
       // Turn in (Roger, 1 Nov 2026: "don't allow them to exit with Esc, only with a button that says turn in"): asks once, then sends

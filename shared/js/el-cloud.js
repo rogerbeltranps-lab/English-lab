@@ -2,15 +2,49 @@
 // route (set by the teacher), learning paths the teacher opens per group, once-only activities, points per completed action.
 import "./el-copyright.js";
 import "./el-route-names.js";
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {signIn} from "./el-signin.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
 import {report} from "./el-report.js";
 
 const SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
+// Pages open straight on the right version (Roger, 7 Nov 2026: "When I open a page, it loads old version for seconds and then it opens
+// the last version"). The Firebase SDK is loaded with import() after this point, not with static imports: those held back this whole file,
+// so the app menu (el-app.js) and the route names (el-route-names.js) waited for the SDK, and every page first showed its signed-out or
+// old look. The pages draw at once from el_who (who was signed in on this browser last, saved below in onAuthStateChanged) and redraw
+// when the sign-in is known, which is the same picture.
+loadScript("shared/js/el-app.js",()=>window.ELApp);   // the app menu on student pages (el-app.js: a strip of icon buttons, a phone's bottom bar)
+// 🛠 Maintenance mode (Roger, 7 Nov 2026; shared/js/el-maintenance.js has the message and the worksheets). The teacher's switch on the
+// dashboard writes site/maintenance = {on, note, pdfs, since} (anyone can read it, only the teacher writes it). Students only: the teacher, the
+// teacher's student view and the test account's "see everything" get in as usual. Reads: none for 2 minutes after a check that found it
+// off (el_mt in this browser), so a page opened from then on is covered within 2 minutes; otherwise one (a listener on that document,
+// whose first answer is the check). While it is on, the page saves nothing, keeps listening and opens again by itself when it goes off.
+// el_mt also keeps the last message shown, so a student's next page shows it at once, before the sign-in is known.
+const MT_K="el_mt",MT_MS=2*60e3,mtSet=Storage.prototype.setItem;
+const mtGet=()=>{try{return JSON.parse(localStorage.getItem(MT_K)||"null")}catch(e){return null}};
+const mtPut=o=>{try{mtSet.call(localStorage,MT_K,JSON.stringify(Object.assign({t:Date.now()},o)))}catch(e){}};
+let mtO=null,mtStop=null;
+async function mtShow(o,tester){
+  const m=await import("./el-maintenance.js");
+  if(!mtO){const st=document.createElement("style");st.textContent=m.CSS;document.head.append(st);
+    mtO=document.createElement("div");mtO.id="el-maintenance";
+    mtO.style.cssText="position:fixed;inset:0;z-index:2147483600;background:#f8fafc;display:grid;place-items:center;padding:20px;overflow:auto";
+    document.body.append(mtO)}
+  mtO.innerHTML=m.html(Object.assign({root:ROOT.href,signOut:true},o));
+  const b=mtO.querySelector("[data-mt-out]");if(b)b.onclick=()=>logout();
+  // the test account in a group's student view: a way back to its own view (that bar is under the message)
+  if(tester){const t=document.createElement("p");t.innerHTML='<button type="button" style="border:0;background:#7c3aed;color:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;font:inherit">Test account: see everything again</button>';
+    t.querySelector("button").onclick=()=>{mtSet.call(localStorage,"el_view","");location.reload()};mtO.firstElementChild.append(t)}
+  document.documentElement.classList.add("elready");
+}
+function mtHide(){if(mtO){mtO.remove();mtO=null}}
+(()=>{let w=null;try{w=JSON.parse(localStorage.getItem("el_who")||"null")}catch(e){}const c=mtGet();
+  if(w&&w.role==="student"&&c&&c.on)mtShow(c).catch(e=>console.warn("maintenance",e))})();
+const FB="https://www.gstatic.com/firebasejs/10.14.1/";
+const FBM=await Promise.all([import(FB+"firebase-app.js"),import(FB+"firebase-auth.js"),import(FB+"firebase-firestore.js")])
+  .catch(e=>{console.warn("Firebase could not load (offline?): the page works on its own, nothing is synced",e);return null});
+if(!FBM)await new Promise(()=>{});   // offline: stop here quietly, as the failed static import did before
+const [{initializeApp},A,{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot}]=FBM;
 
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
@@ -43,7 +77,7 @@ const myLevels=uid=>once("lv:"+uid,async()=>{const o={};(await getDocs(collectio
 const myDoc=uid=>once("me:"+uid,async()=>{const s=await getDoc(doc(db,"students",uid));return s.exists()?s.data():null});
 const origSet=Storage.prototype.setItem;
 let bellEl=null,stopBell=null,stopJoin=null,stopGame=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,homeLevel=null,stale=false,pulled=false;
-const listeners=[];
+const listeners=[];let userDone=false;   // userDone: onAuthStateChanged has worked out group, level and gate (ELCloud.onUser)
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
 // Testers can switch to the student view of one group (bottom bar): the site then behaves as for a listed student of that group.
@@ -91,7 +125,11 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
 async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
-  return {status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
+  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{}};
+  lsKeep(id,o);return o}catch(e){return {status:"hidden",enabled:[],open:{}}}}
+// The last LS state read in this browser (el_ls_<id>: status, groups, open learning paths), only for a page's first drawing before the
+// sign-in is known (the LS home's learning paths, All Learning Situations). The page draws again with the state it reads now.
+function lsKeep(id,o){try{origSet.call(localStorage,"el_ls_"+id,JSON.stringify({status:o.status,enabled:o.enabled,groups:o.groups,open:o.open,done:o.done}))}catch(e){}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
 // Any key the pull changes marks the page stale, not only this activity's: the final product reads every product piece and Reflect
@@ -162,13 +200,13 @@ async function teacherLogin(){
   try{return (await A.signInWithPopup(auth,p)).user}catch(x){if(x&&x.code!=="auth/popup-closed-by-user")console.warn("sign in",x);return null}
 }
 async function refuse(u){
-  const mail=u.email;await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");
+  const mail=u.email;await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");localStorage.removeItem("el_who");
   const o=overlay('<div style="max-width:520px"><h1>Aquest compte no pot entrar</h1><p><b></b> no és a la llista d\'alumnes d\'English Lab. Entra amb el teu correu de l\'institut i la contrasenya que t\'ha donat el professor, o parla amb ell.</p><p><button style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit">Entra amb un altre compte</button></p></div>');
   o.style.zIndex=10001;o.querySelector("b").textContent=mail;o.querySelector("button").onclick=()=>{o.remove();login()};
 }
 // Shared school computers: never leak one student's local progress into another account.
 const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k));localStorage.removeItem(DIRTY);if(ks.length)stale=true};
-const logout=async()=>{await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");location.reload()};
+const logout=async()=>{await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");localStorage.removeItem("el_who");location.reload()};
 
 function banner(text,color,btn){
   const b=document.createElement("div");b.id="el-banner";
@@ -227,7 +265,7 @@ function applyLevel(lvl,all){
   // A page without a Native button shows the Daring version.
   const mine=btns.find(b=>b.dataset.level===lvl)||(lvl==="beginners"?btns.find(b=>b.dataset.level==="insecure"):lvl==="native"?btns.find(b=>b.dataset.level==="daring"):null);
   if(mine&&!mine.classList.contains("active"))mine.click();
-  if(!all)btns.forEach(b=>{if(b!==mine)b.style.display="none"});
+  if(!all)btns.forEach(b=>{b.style.display=b===mine?"":"none"});   // el-app.js already showed only the active one: the student's own shows again
 }
 // Students only use their board, English Lab (lab/ and its practice page lab/practice.html), their own course page and the LSs assigned to their group.
 const BOARD0=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html|practice\.html)?$/.test(location.pathname),
@@ -249,7 +287,7 @@ async function gate(u){
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
   if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
-  if(isTeacher(u)&&!AS){banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);return}
+  if(isTeacher(u)&&!AS){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);return}   // an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
   if(AS)asBanner();
   else if(!u||!isStudent(u)){signInBlock();return}
   const tester=!AS&&seesAll(u),vg=!AS&&viewGroup(u);
@@ -465,12 +503,15 @@ async function teacherSections(info){
 +'</div><div class="r pl">'+fsRow(fsRoll())+'</div>'}
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
+    // the copy el-app.js drew at once from el_tsec_<page path> (tsecEarly): the real bar takes its place now
+    const early=document.getElementById("el-tsec-early");
     let bar=document.getElementById("el-tsec");
     const host=document.querySelector(".eltsec-host");   // the learning path's left column (el-app.js) has a place for it, else above the tabs
     if(!bar||(host?bar.parentElement!==host:bar.nextElementSibling!==nav)){if(bar)bar.remove();bar=document.createElement("div");bar.id="el-tsec";bar.className="el-tsec";if(host)host.append(bar);else nav.before(bar);
       bar.onclick=e=>{const b=e.target.closest("button");if(!b)return;e.preventDefault();
         if(b.dataset.g){g=b.dataset.g;origSet.call(localStorage,"el_t_secgroup",g);msg="";draw()}
         else if(b.dataset.all)save(b.dataset.all==="1"?[]:all.slice());else if(b.dataset.lp)openLp();else if(b.dataset.fs)fsToggle();else if(b.dataset.cm)b.dataset.cm==="-"?cmStop():cmOpen()}}
+    if(early){document.querySelectorAll(".el-tsw-early").forEach(e=>e.remove());early.replaceWith(bar)}
     const off=locked(),n=all.length-off.filter(x=>all.includes(x)).length;
     const html='<div class="r"><b>🔓 Sections open for</b>'+grs.map(x=>'<button data-g="'+x.id+'" class="'+(x.id===g?"on":"")+'">'+x.name+'</button>').join("")
       +'<span>· '+n+' of '+all.length+' open</span><button class="g" data-all="1">open all</button><button class="g" data-all="0">close all</button>'
@@ -478,7 +519,7 @@ async function teacherSections(info){
       +'<small>Click 🔓 or 🔒 on a tab to open or close that section for '+gname(g)+'. Students see a closed section read-only, with their saved answers; one you opened before stays doable for students who have not finished it. Teacher only: students never see this bar.</small>'
       +cmRow()
       +(elLpOpen(a,info,g)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
-    if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html}
+    if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html;try{origSet.call(localStorage,"el_tsec_"+relPath,JSON.stringify({h:html,css:st.textContent,all,off}))}catch(e){}}   // for el-app.js tsecEarly on the next visit
     fsFloat(fsRoll())
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);
       let sw=t.querySelector(".el-tsw");if(!sw){sw=document.createElement("span");sw.className="el-tsw";sw.setAttribute("role","button");
@@ -550,7 +591,9 @@ function bar(){
   const el=document.createElement("div");el.id="el-cloud-bar";
   el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:10002;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;font:13px system-ui,sans-serif;box-shadow:0 2px 8px #0002;display:flex;gap:8px;align-items:center";
   document.body.appendChild(el);
-  return u=>{el.innerHTML="";
+  // until Firebase has said who is signed in, the chip stays empty: it showed "Not signed in · Sign in" for a second to a signed-in
+  // student on every page (Roger, 7 Nov 2026: "all pages still pop up in between")
+  return u=>{el.innerHTML="";el.style.visibility=authKnown?"":"hidden";if(!authKnown)return;
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
     if(!u)el.append("Not signed in ",b("Sign in",login));
     else if(AS){el.style.background="#fef3c7";el.style.borderColor="#f59e0b";el.append("👁 "+(AS.name||AS.email||"Student")+" ");
@@ -660,7 +703,7 @@ function storyCard(u){
     +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="native").map(x=>a(x.id)).join(""):a(lv==="native"?"daring":lv))+"</p></div></div>";
   el.hidden=false;
 }
-let draw=()=>{};
+let draw=()=>{},authKnown=false;
 const start=()=>{draw=bar();draw(user)};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start):start();
 new MutationObserver(()=>draw(user)).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});   // the board picks its language after loading
@@ -884,6 +927,9 @@ function loadCatalog(){return window.EL_CATALOG?Promise.resolve():new Promise(r=
 await loadCatalog();
 // Activities are matched by path, so pages with the same file name in different LSs keep separate results.
 const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=byPath.id;
+// A page that is not in the catalog must not take the id of another LS's page with the same file name: the LS2 vocabulary games
+// (not in the catalog: always open, Roger 7 Nov 2026 "games should be available") were read as LS1's and locked as "not open yet".
+else if((window.EL_CATALOG||[]).some(x=>x.id===actId&&x.ls!==lsId))actId=relPath.replace(/\.html$/,"");
 
 // The 🔔 reads every problem report, so only the dashboard listens live (and keeps the copy el_bell up to date); other pages show
 // that copy while it is younger than 10 minutes and read the reports again at most every 10 minutes (Roger, 1 Nov 2026: reads limit).
@@ -899,6 +945,38 @@ function bellWatch(cb){
     if(x&&Date.now()-x.t<MS){if(!c||x.t!==c.t){c=x;cb(x.l)}}else read()},60e3);
   return()=>clearInterval(t);
 }
+// 🛠 Is the site in maintenance? (see mtShow at the top). true: the message is on screen and the page stops here.
+function mtCheck(u){
+  if(mtStop){mtStop();mtStop=null}
+  const c=mtGet();if(c&&!c.on&&Date.now()-c.t<MT_MS){mtHide();return Promise.resolve(false)}
+  return new Promise(res=>{let first=true,o=null;
+    const off=()=>{mtPut({on:false});if(mtStop){mtStop();mtStop=null}};
+    const stop=onSnapshot(doc(db,"site","maintenance"),async s=>{const d=s.exists()?s.data():{};
+      if(!first){if(!d.on){off();location.reload()}else if(o&&((d.note||"")!==o.note||JSON.stringify(d.pdfs||null)!==JSON.stringify(o.pdfs))){o.note=d.note||"";o.pdfs=d.pdfs||null;mtPut(Object.assign({on:true},o));mtShow(o,isTester(u))}return}
+      first=false;
+      if(!d.on){off();mtHide();res(false);return}
+      frozen=true;   // nothing typed behind the message is saved
+      const g=myGroup||(myRoster||{}).group||"",mm=/^([24])eso/i.exec(g),course=courseOf(g)||(mm?mm[1]+"eso":null);
+      const ls=(window.EL_LS||[]).filter(l=>l.course===course).pop();let route=null;
+      try{if(ls&&window.elRouteOf)route=elRouteOf(await myLevels(u.uid),ls.id).level||null}catch(e){console.warn("route",e)}
+      o={course,route,ca:!route||(window.elCa?elCa(route):true),note:d.note||"",pdfs:d.pdfs||null};   // pdfs: what the teacher ticked
+      mtPut(Object.assign({on:true},o));
+      try{await mtShow(o,isTester(u))}catch(e){console.warn("maintenance",e)}
+      remember(u);   // el_who: the next page shows the message at once
+      res(true)},e=>{console.warn("maintenance",e);if(first){first=false;res(false)}});
+    mtStop=stop;});
+}
+// Who was signed in on this browser last (el_who: uid, role, group, language), for each page's first drawing before the sign-in is known
+// (el-app.js, el-ls-home.js, today.html, teacher.html, lab/): the page opens on the right version, not the signed-out or a guessed one.
+// Removed on sign-out and for an account that cannot come in. The teacher's student view keeps the teacher's own.
+function remember(u){try{
+  if(!u){localStorage.removeItem("el_who");return}
+  if(AS||myRoster===null)return;
+  const role=isTeacher(u)?"teacher":seesAll(u)?"tester":"student",l=myLevel||homeLevel;
+  // a page that does not read the level (the board) keeps the language saved before: it wrote null, and the next page drew English first
+  let was=null;try{was=JSON.parse(localStorage.getItem("el_who")||"null")}catch(e){}
+  const ca=role!=="student"?false:l?elCa(l):was&&was.uid===u.uid&&typeof was.ca==="boolean"?was.ca:null;
+  origSet.call(localStorage,"el_who",JSON.stringify({uid:u.uid,role,group:role==="student"?myGroup:null,ca,t:Date.now()}))}catch(e){}}
 onAuthStateChanged(auth,async u=>{
   window.EL_VIEW_LEVEL=viewLevel(u);   // before anything reads a route (elRouteOf)
   // 👁 the teacher's student view of this tab: started by the student's board (today.html?student=uid), ended by the dashboard
@@ -912,7 +990,7 @@ onAuthStateChanged(auth,async u=>{
       myGroup=AS.group;if(lsId)frozen=true}   // nothing typed on the student's LS pages is kept
     else leaveAs(false);
   }
-  user=u;draw(u);
+  user=u;authKnown=true;draw(u);
   if(u&&signInO){signInO.remove();signInO=null}
   // A student's first sign-in on this browser starts clean too: what is there was done by the teacher, a signed-out visitor or
   // another student, and this student's own work comes back from the cloud (pull).
@@ -920,6 +998,7 @@ onAuthStateChanged(auth,async u=>{
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
+  if(u&&isStudent(u)&&!seesAll(u)&&!AS){if(await mtCheck(u))return}else mtHide();   // 🛠 maintenance: the message instead of the page
   // A route the teacher set on the student list before their first sign-in (roster/{email}.route = {level, ls}, teacher.html listRoute):
   // saved as their route in that LS, with the level notice fields, if they have none there yet (firestore.rules checks it matches the list).
   const lr=myRoster&&myRoster.route;
@@ -980,11 +1059,11 @@ onAuthStateChanged(auth,async u=>{
   if(stopBell&&!isTeacher(u)){stopBell();stopBell=null;bellEl=null;draw(u)}
   if(isTeacher(u)&&!bellEl)import("./el-bell.js").then(m=>{if(bellEl||!isTeacher(user))return;
     bellEl=m.bell({dash:DASH,onDash,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
-  listeners.forEach(f=>f(u));
+  remember(u);
+  userDone=true;listeners.forEach(f=>f(u));
   // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
   if(stopJoin){stopJoin();stopJoin=null}const jg=++joinGen;
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
-loadScript("shared/js/el-app.js",()=>window.ELApp);   // the app menu on student pages (el-app.js: a strip of icon buttons, a phone's bottom bar)
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null&&userDone)f(user)},get user(){return user}};

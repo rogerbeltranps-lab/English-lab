@@ -152,6 +152,25 @@
     const pg={[LS]:pgOf()};try{elInjectCorrected(pg,D.rs||{})}catch(e){}
     ST={info:D.info||{status:"open"},group:D.group,pg:pg[LS],rs:D.rs||{}};draw();
     $$("[data-el-teacher]").forEach(e=>e.hidden=D.role!=="teacher");return}
+  // Until Firebase has loaded and said who is signed in, draw for who was signed in on this browser last (el_who, el-cloud.js), with the
+  // LS state, answers and results last kept in this browser: the page opens on its real look, not on an empty or a student's one
+  // (Roger, 7 Nov 2026: "it loads old version for seconds and then it opens the last version"). fromCloud draws it again with what it reads.
+  (function early(){
+    const J=(st,k)=>{try{return JSON.parse(st.getItem(k)||"null")}catch(e){return null}};
+    const W=J(localStorage,"el_who");if(!W||!W.role)return;
+    const A=W.role==="teacher"?J(sessionStorage,"el_as"):null;
+    who=A&&A.uid?{role:"as",uid:A.uid}:{role:W.role};
+    CA=who.role==="student"&&W.ca!==false;
+    const info=J(localStorage,"el_ls_"+LS),rc=who.role==="student"&&W.uid?J(localStorage,"el_rc_"+W.uid):null,rs={};
+    if(rc&&rc.d)for(const r of Object.values(rc.d))if(r&&r.activity)rs[r.activity]=r;
+    if(info||who.role==="teacher"||who.role==="tester"){
+      const pg={[LS]:pgOf()};try{elInjectCorrected(pg,rs)}catch(e){}
+      ST={info:info||{},group:who.role==="as"?(A.group||null):W.group||null,pg:pg[LS],rs};
+    }
+    if(who.role==="teacher")$$("[data-el-teacher]").forEach(e=>e.hidden=false);
+    draw();
+  })();
+  document.documentElement.classList.add("elready");   // <html class="elgate">: the page shows now, on this drawing (ls-home.css)
   let tries=0;(function wait(){if(window.ELCloud&&ELCloud.onUser){ELCloud.onUser(u=>fromCloud(u).catch(e=>console.warn("ls home",e)));return}
     if(++tries<300)setTimeout(wait,100)})();
 })();

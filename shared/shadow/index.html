@@ -9,7 +9,9 @@
 <!-- Class shadowing (Roger, 30 Oct 2026: "I usually do 5 minutes of shadowing at the beginning of each class"): the projector page for the
      shadowing clips of an LS. ?ls=4eso/seasons-and-celebrations lists the shadow panels (type 'shadow') of that LS's Learning Paths
      (shared/print/lp-list.js, data/<lp>.js) and plays one: normal or slower, the four rounds, the script hidden in round 4.
-     The clips are the same as the Learning Path step, so students do at home what they did in class. Nothing is saved. -->
+     The clips are the same as the Learning Path step, so students do at home what they did in class. Nothing is saved.
+     Marks + two modes (Roger, 7 Nov 2026): stressed words, linking and ↗ ↘ on the script, with a key and a show/hide button; 🔁 Listen and
+     repeat stops after each sentence and gives time to say it, 🗣 Shadowing plays it all with the four rounds (shared/js/el-shadow.js). -->
 <style>
 :root{--ink:#14232e;--muted:#5d6b75;--line:#d3dbe1;--bg:#f2f5f7;--card:#fff;--accent:#1f5f8b}
 body.c2eso{--accent:#1d6b4f}
@@ -30,6 +32,8 @@ video{width:100%;max-height:46vh;border-radius:14px;background:#000}
 #script.hidden{display:none}
 #hiddenNote{display:none;font-size:1.4rem;text-align:center;padding:30px 0}
 #script.hidden+#hiddenNote{display:block}
+.rounds[hidden],#key[hidden]{display:none}
+#key .shm-key{margin:0 0 6px}
 .crumb a{color:var(--accent)}
 </style>
 </head>
@@ -37,7 +41,7 @@ video{width:100%;max-height:46vh;border-radius:14px;background:#000}
 <main>
 <p class="crumb"><a href="../../teacher.html">← Dashboard</a></p>
 <h1 id="title">Class shadowing</h1>
-<p class="muted">Five minutes at the start of the class. Choose the clip, then go through the four rounds together.</p>
+<p class="muted">Five minutes at the start of the class. Choose the clip and the mode: 🔁 Listen and repeat (one sentence at a time) or 🗣 Shadowing (the four rounds).</p>
 <div class="bar"><select id="clip" aria-label="Clip"></select></div>
 <div class="card">
   <div id="media"></div>
@@ -48,11 +52,14 @@ video{width:100%;max-height:46vh;border-radius:14px;background:#000}
     <button type="button" data-slow="1">Slower version</button>
     <span class="muted" id="count"></span>
   </div>
+  <div id="modes"></div>
   <div class="rounds" id="rounds"></div>
+  <div id="turn"></div>
 </div>
-<div class="card"><div id="script"></div><p id="hiddenNote">🙈 No script now: shadow from memory.</p></div>
+<div class="card"><div id="key"></div><div id="script"></div><p id="hiddenNote">🙈 No script now: shadow from memory.</p></div>
 </main>
 <script src="../print/lp-list.js"></script>
+<script src="../js/el-shadow.js"></script>
 <script>
 (function () {
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -73,7 +80,8 @@ video{width:100%;max-height:46vh;border-radius:14px;background:#000}
     s.onerror = () => load(i + 1);
     document.head.appendChild(s);
   };
-  let cur = null, slow = false, m = null, endAt = 0, plays = 0, round = 0;
+  let cur = null, slow = false, m = null, endAt = 0, plays = 0, round = 0, rp = null;
+  const SH = window.elShadow, c2 = ls.split('/')[0] === '2eso';
   const KEY = 'elShadowClip_' + ls;
   function start() {
     if (!clips.length) { $('#script').innerHTML = '<p class="muted">This LS has no shadowing clips yet.</p>'; return; }
@@ -83,9 +91,9 @@ video{width:100%;max-height:46vh;border-radius:14px;background:#000}
     $('#clip').onchange = () => { try { localStorage.setItem(KEY, $('#clip').value); } catch (e) {} pick(); };
     $('#rounds').innerHTML = ROUNDS.map((r, i) => '<button type="button" data-r="' + i + '"><b>' + r[0] + '</b>' + r[1] + '</button>').join('');
     $$('[data-r]').forEach(b => b.onclick = () => setRound(+b.dataset.r));
-    $$('[data-slow]').forEach(b => b.onclick = () => { slow = b.dataset.slow === '1'; if (m) m.pause(); endAt = 0; mark(); });
+    $$('[data-slow]').forEach(b => b.onclick = () => { slow = b.dataset.slow === '1'; if (rp) rp.stop(); if (m) m.pause(); endAt = 0; mark(); });
     $('#play').onclick = play;
-    $('#stop').onclick = () => { endAt = 0; if (m) m.pause(); };
+    $('#stop').onclick = () => { endAt = 0; if (rp) rp.stop(); if (m) m.pause(); };
     pick();
   }
   function pick() {
@@ -93,17 +101,32 @@ video{width:100%;max-height:46vh;border-radius:14px;background:#000}
     $('#media').innerHTML = cur.video ? '<video id="m" preload="metadata" playsinline' + (cur.poster ? ' poster="' + base + cur.poster + '"' : '') + '></video>' : '<audio id="m" preload="metadata"></audio>';
     m = $('#m');
     m.ontimeupdate = () => { if (endAt && m.currentTime >= endAt) { endAt = 0; m.pause(); } };
-    $('#script').innerHTML = cur.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<b>' + esc(l[0]) + ':</b> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('');
+    $('#script').innerHTML = SH.script(cur, 'b');
+    // the key in English; 2 ESO also in Catalan (Starter and Base read it in Catalan)
+    $('#key').innerHTML = SH.has(cur) ? SH.key(false) + (c2 ? SH.key(true) : '') : '';
+    $('#modes').innerHTML = SH.bar(cur, false, '');
+    $('#turn').innerHTML = SH.turnBox(false);
+    rp = SH.player({ media: m, clip: cur, src: () => base + (slow ? cur.slow : cur.src), slow: () => slow, scriptEl: $('#script'), turnEl: $('#turn .shm-turn'), ca: false,
+      onStart: () => { plays++; count(); } });
+    SH.bindBar($('#modes'), cur, false, () => { rp.stop(); if (m) m.pause(); endAt = 0; rp.sync(); setRound(0); });
     setRound(0); mark();
   }
   function play() {
+    if (rp && SH.has(cur) && SH.mode() === 'repeat') { endAt = 0; rp.start(0); return; }
+    if (rp) rp.stop();
     const src = base + (slow ? cur.slow : cur.src), t = slow ? cur.ts : cur.t;
     const go = () => { m.currentTime = t[0]; endAt = t[1]; m.play().catch(() => {}); plays++; count(); };
     if (!m.src || !m.src.endsWith(src.replace('../../', ''))) { m.src = src; m.addEventListener('loadedmetadata', go, { once: true }); m.load(); } else go();
   }
   const count = () => { $('#count').textContent = 'Plays: ' + plays; };
   const mark = () => $$('[data-slow]').forEach(b => b.classList.toggle('on', (b.dataset.slow === '1') === slow));
-  function setRound(i) { round = i; $$('[data-r]').forEach(b => b.classList.toggle('on', +b.dataset.r === i)); $('#script').classList.toggle('hidden', i === 3); }
+  // the four rounds belong to Shadowing; Listen and repeat always shows the script
+  function setRound(i) {
+    const rep = SH.has(cur) && SH.mode() === 'repeat';
+    round = rep ? 0 : i; $('#rounds').hidden = rep;
+    $$('[data-r]').forEach(b => b.classList.toggle('on', +b.dataset.r === round)); $('#script').classList.toggle('hidden', round === 3);
+    $('#key').hidden = round === 3;
+  }
   load(0);
 })();
 </script>

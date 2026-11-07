@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
 <meta charset="utf-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
@@ -57,8 +57,10 @@ html,body{overflow-x:clip}
 .speak-support{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:760px){.speak-support{grid-template-columns:1fr}}
 .audio-card[hidden],.audio-row[hidden],audio[hidden]{display:none!important}
 </style>
+<link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu's styles before the first paint (Roger, 7 Nov 2026) -->
 </head>
 <body>
+<script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws (Roger, 7 Nov 2026) -->
 <div class="topbar"><div class="wrap toprow">
   <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← Seasons &amp; Celebrations</a><span class="brand-mark">3</span><span class="brand-title">Where traditions come from<small>4 ESO · Seasons &amp; Celebrations · Learning Path 3</small></span></div>
   <div class="session-jump"><label for="sessionJump">Learning Path</label><select id="sessionJump" aria-label="Go to another Learning Path"></select></div>
@@ -86,11 +88,15 @@ html,body{overflow-x:clip}
 <script src="../../shared/js/section-next.js"></script>
 <script src="../../shared/js/el-grading.js"></script>
 <script src="../../shared/js/el-study.js"></script>
+<script src="../../shared/js/el-shadow.js"></script>
 <script src="ls2-engine.js"></script>
 <script src="data/where-traditions-come-from.js"></script>
 <script src="data/native/where-traditions-come-from.js"></script>
 <script src="data/study/where-traditions-come-from.js"></script>
 <script>LS2.init(window.LP);</script>
+<!-- the app menu and the learning path's left column at once, before the browser paints: no old look first (Roger, 7 Nov 2026) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

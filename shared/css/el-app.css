@@ -2,8 +2,16 @@
    Chromebook most of the time"; "these things should look like buttons"; "it's not my activities but my dashboard").
    1. The side menu of the board (today.html), the LS home (ls-home.css) and English Lab: every item is a button with an icon.
    2. el-app.js: the same menu on every other student page (learning paths, course pages, English Lab, Practise, vocabulary games):
-      a slim strip of icon buttons on the left on a computer (.elrail), the board's bottom bar on a phone (.elbar), and on
+      the LS home's side menu on the left on a computer (.elrail; icon strip in a narrow window), the board's bottom bar on a phone (.elbar), and on
       learning paths a light top bar instead of the dark one. Chromebook (1366×768) first. LS1 pages keep their design. */
+
+/* ---- 0. the page shows once it is drawn (Roger, 7 Nov 2026, video: "all pages still pop up in between") ----
+   A page with <html class="elgate"> stays hidden until el-app.js (or el-ls-home.js, English Lab) has drawn its real look and set
+   html.elready: the browser paints no old layout, no menu without its styles, no half-moved learning path. Pages opened from the site
+   keep the previous page on screen meanwhile (paint holding), so it reads as one step. If no script sets it, the page shows after 1.5 s. */
+html.elgate:not(.elready) body{visibility:hidden;animation:elshow 0s linear 1.5s forwards}
+@keyframes elshow{to{visibility:visible}}
+
 
 /* ---- 1. menu buttons (the board, the LS home, English Lab) ---- */
 .side .nvs,.elside{display:flex;flex-direction:column;gap:8px}
@@ -27,11 +35,15 @@
 /* phone/top scrolling rows keep the pill look (the board's .mtabs) */
 .mtabs .nv .ic{display:none}.mtabs .nv::after{content:none}
 
-/* ---- 2. el-app.js: the strip of icon buttons on a computer ---- */
-body.elapp{--elrail:92px}
-.elrail{position:fixed!important;left:0;top:0;bottom:0;width:var(--elrail)!important;height:auto!important;margin:0!important;z-index:40;background:#fff!important;border:0!important;border-right:1px solid #e2e8f0!important;padding:12px 8px!important;
-  display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:stretch!important;flex-wrap:nowrap!important;gap:8px!important;overflow-y:auto;box-sizing:border-box;font:13px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:none!important}
-.elrail .elr-brand{display:grid;place-items:center;height:40px;margin:0 0 4px;font-weight:900;font-size:15px;letter-spacing:-.04em;color:#3157d5;text-decoration:none}
+/* ---- 2. el-app.js: the side menu on the left. A computer (Chromebook): the LS home's menu, brand + wide buttons (.elw, the same .nv
+   buttons as above; Roger, 7 Nov 2026: "the format should be the same (buttons)"); a narrow window (641–980 px, where the LS home
+   drops its side menu too): the strip of icon buttons (.eln); a phone: the bottom bar ---- */
+body.elapp{--elrail:240px}
+.elrail{position:fixed!important;left:0;top:0;bottom:0;width:var(--elrail)!important;height:auto!important;margin:0!important;z-index:40;background:#fff!important;border:0!important;border-right:1px solid #e5e7eb!important;padding:24px 18px!important;
+  display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:stretch!important;flex-wrap:nowrap!important;gap:24px!important;overflow-y:auto;box-sizing:border-box;font:13px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:none!important;text-align:left}
+.elrail .elr-brand{display:block;padding:0 10px;font-weight:800;font-size:1.1rem;letter-spacing:-.03em;line-height:1.5;color:#0f172a!important;text-decoration:none!important;background:none!important;border:0!important}
+.elrail .elw .nv{margin:0!important;width:auto!important;box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",sans-serif!important}
+.elrail .eln{display:none}
 .elrail a.elr{box-sizing:border-box;width:100%;margin:0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px 8px;border-radius:14px;background:#fff;border:1px solid #e2e8f0;
   box-shadow:0 1px 0 #e2e8f0,0 2px 6px rgba(15,23,42,.05);color:#334155;text-decoration:none;font-weight:700;font-size:11.5px;text-align:center;
   transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
@@ -40,7 +52,12 @@ body.elapp{--elrail:92px}
 .elrail a.elr:hover{border-color:#3157d5;color:#3157d5;background:#fff;transform:translateY(-1px);box-shadow:0 1px 0 #c7d2fe,0 6px 14px rgba(49,87,213,.14)}
 .elrail a.elr.on{background:#3157d5;border-color:#3157d5;color:#fff}
 .elrail a.elr.on i{background:rgba(255,255,255,.2)}
-.elrail .elr-sep{height:1px;background:#e2e8f0;margin:2px 6px}
+@media (max-width:980px){
+  body.elapp{--elrail:92px}
+  .elrail{padding:12px 8px!important;gap:8px!important}
+  .elrail .elr-brand,.elrail .elw{display:none!important}
+  .elrail .eln{display:flex;flex-direction:column;gap:8px}
+}
 body.elapp.elhas-rail{padding-left:var(--elrail)!important}
 
 /* the phone's bottom bar (the board's bnav) */

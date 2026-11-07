@@ -120,7 +120,10 @@
   const chat = () => '<div class="chat">' + forLevel(readingChat).map(([w, l]) => '<p><b>' + esc(w) + ':</b> ' + l + '</p>').join('') + '</div>';
 
   const R = {};
-  R.recall = p => gaps(forLevel(p.items), p.secure ? null : p.id);
+  // secure checkpoints: Starter's three options are in the data (item.o, tools/checkpoint-keys/starter-options.cjs), as on the screen
+  R.recall = p => { const its = forLevel(p.items);
+    if (!p.secure || level !== 'beginners' || !its.some(it => Array.isArray(it.o))) return gaps(its, p.secure ? null : p.id);
+    return '<p class="tiny">Tria la resposta correcta entre les tres opcions i escriu-la al buit (o encercla la lletra).</p><ol class="items">' + its.map(it => gapped(it, it.o || null)).join('') + '</ol>'; };
   R.typed = p => (p.groups ? table(p) : '') + (p.explain ? '<div class="box"><b>' + T('Com funciona', 'How it works') + '</b>' + forLevel(p.explain).map(e => '<div>' + tx(e) + '</div>').join('') + '</div>' : '') + gaps(forLevel(p.items), p.id);
   // ★ marks the panel's core words for the route (p.core, as the engine's Català → English cards); review: earlier paths' words.
   function table(p) {
