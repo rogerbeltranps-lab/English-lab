@@ -107,6 +107,12 @@ body.elapp.elcourse>header,body.elapp.elgames .site-header>.home-link,body.elapp
 .elcrumb a{display:inline-flex;align-items:center;gap:4px;color:#3157d5;font:700 16px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px}
 .elcrumb a:hover{background:#eaf0ff}
 
+/* ---- the home page (index.html): a welcome page to sign in, never its old side menu and phone row of tabs (Roger, 7 Nov 2026);
+   the teacher's Courses and Learning Situations lists get the app menu ---- */
+body.elroot .sidebar,body.elroot .mobile-tabs{display:none!important}
+body.elroot .app{display:block!important}
+body.elroot:not(.elapp) #el-cloud-bar{display:none!important}
+
 /* ---- English Lab and Practise: their side menu becomes the button menu ---- */
 body.elapp.ellab .nav-tabs,body.elapp.ellab .mobile-tabs{display:none!important}
 
