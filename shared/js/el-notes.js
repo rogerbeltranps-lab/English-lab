@@ -10,6 +10,7 @@
 //  - their notes: students/{uid}/notes where ls == this LS (one query; lab/game/play.js writes them);
 //  - their results: myGames/{email} (one read; the board writes it at the end of each game): right / shown and each mistake with their
 //    answer, the right answer and the theory part it practises, so "🎯 What to study" points at that part.
+//    Games played before the board saved each answer (before 6 Nov 2026, copied later from gameResults) have no a: only the right answer shows.
 // Catalan for Starter and Base (ELLsHome.ca()). The teacher's student view shows the student's page. Preview: EL_DEMO_LS.notes, .myGames,
 // .played before el-ls-home.js.
 (function(){
@@ -54,7 +55,7 @@
     else if(r){const ps=Object.entries(byPart).sort((a,b)=>b[1].length-a[1].length);
       study=`<div class="nt-study"><b>🎯 ${t("Què has d'estudiar","What to study")}</b>${pc<50?`<p>${t("Llegeix tota la teoria de sota amb calma i torna a mirar les preguntes.","Read all the theory below slowly and look at the questions again.")}</p>`:""}<ul>${ps.map(([k,l])=>{const p=g.parts.find(x=>x.k===k);
         return `<li>${p?`<a href="#nt-${esc(g.id)}-${esc(k)}">${md(p.topic)}</a>`:t("Altres preguntes","Other questions")} <span class="muted">· ${l.length} ${l.length===1?t("errada","mistake"):t("errades","mistakes")}</span></li>`}).join("")}</ul>
-        <details><summary>${t("Les preguntes que has de revisar","The questions to look at again")} (${miss.length})</summary><ol class="nt-miss">${miss.map(x=>`<li>${md(x.q)}<br><span class="no">✗ ${x.a?esc(x.a):t("sense resposta","no answer")}</span> → <span class="ok">✓ ${esc(x.ok)}</span></li>`).join("")}</ol></details></div>`}
+        <details><summary>${t("Les preguntes que has de revisar","The questions to look at again")} (${miss.length})</summary><ol class="nt-miss">${miss.map(x=>`<li>${md(x.q)}<br>${x.a==null?"":`<span class="no">✗ ${x.a?esc(x.a):t("sense resposta","no answer")}</span> → `}<span class="ok">✓ ${esc(x.ok)}</span></li>`).join("")}</ol></details></div>`}
     const parts=g.parts.map(p=>{const n=g.notes[p.k],txt=n&&String(n.text||"").trim(),bad=(byPart[p.k]||[]).length;
       return `<section class="npart" id="nt-${esc(g.id)}-${esc(p.k)}">${bad?`<span class="nt-flag">🎯 ${bad} ${bad===1?t("errada","mistake"):t("errades","mistakes")} ${t("sobre això","on this")}</span>`:""}
         ${p.slides.length?`<div class="nt-th">${p.slides.map(slide).join("")}</div>`:`<h3>${md(p.topic)}</h3>`}
