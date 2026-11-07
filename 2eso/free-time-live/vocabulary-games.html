@@ -117,8 +117,10 @@ dialog{max-width:740px;width:calc(100% - 32px);max-height:calc(100dvh - 40px);bo
 @media(max-width:780px){.route-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .letter-pattern{flex-wrap:wrap;justify-content:center;max-width:100%;flex-shrink:0;row-gap:4px!important;column-gap:10px!important}.wheel-center:has(.lp-small) .big-letter{font-size:60px!important}.wheel-center:has(.lp-tiny) .big-letter{font-size:46px!important}.wheel-center:has(.lp-small) p,.wheel-center:has(.lp-tiny) p{margin-top:4px}.letter-pattern>.lp-word{display:inline-flex;gap:3px;width:auto!important;height:auto!important;background:none;border:0;border-radius:0}.letter-pattern .lp-word>*{width:18px;height:21px;background:#e9f2ed;border:1px solid #d5e3dc;border-radius:4px;display:inline-grid;place-items:center;font-size:12px;font-style:normal;font-weight:700;line-height:1}.letter-pattern .lp-word>b{background:#087557;color:white;border-color:#087557}.wheel-center.contains .letter-pattern .lp-word>b{background:#7542b0;border-color:#7542b0}.letter-pattern .lp-word>.lp-sep{background:none;border:0;width:auto}.letter-pattern.lp-small .lp-word>*{width:14px;height:17px;font-size:10px}.letter-pattern.lp-tiny{column-gap:6px!important}.letter-pattern.lp-tiny .lp-word{gap:2px}.letter-pattern.lp-tiny .lp-word>*{width:11px;height:14px;font-size:8px;border-radius:3px}@media(max-width:620px){.letter-pattern .lp-word>*{width:14px;height:17px;font-size:10px}.letter-pattern.lp-small .lp-word>*{width:12px;height:15px;font-size:9px}.letter-pattern.lp-tiny .lp-word>*{width:9px;height:12px;font-size:7px}}
 </style>
+<link rel="stylesheet" href="../../shared/css/el-app.css">
 </head>
 <body data-course="2">
+<script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws (Roger, 7 Nov 2026) -->
 <a class="skip-link" href="#main">Salta al contingut</a>
 <header class="site-header">
   <a class="home-link" href="../../index.html" aria-label="Back to English Lab home">Home</a>
@@ -3731,6 +3733,9 @@ function memorySelection(count){
 }
 
 </script>
+<!-- the app menu at once, not after Firebase has loaded: the page opens on its real look (Roger, 7 Nov 2026) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

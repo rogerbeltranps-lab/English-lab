@@ -99,6 +99,7 @@
       .level-btn{flex:1;min-width:0}
     }
   </style>
+<link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
 <body>
   <!-- Same menu as the home page; Courses and Learning Situations ([data-private]) only for the teacher and the tester.
@@ -232,6 +233,9 @@
   </main>
   </div>
 
+<!-- the app menu at once, not after Firebase has loaded: the page opens on its real look (Roger, 7 Nov 2026) -->
+<script src="../shared/js/el-catalog.js"></script>
+<script src="../shared/js/el-app.js"></script>
   <script type="module">
     // English Lab: a signed-out visitor chooses a level and signs in here (el-cloud keeps students on this page after sign-in).
     // A student sees the English Lab of their own course (their group); the teacher and the tester can switch level.
@@ -264,7 +268,8 @@
     }
 
     function render(){
-      const inside = signedIn(user), canSwitch = inside && switches(user), L = window.elLadder ? elLadder() : [];
+      const inside = early ? true : signedIn(user), canSwitch = early ? early.canSwitch : inside && switches(user), L = window.elLadder ? elLadder() : [];
+      if (early) mine = early.mine || null;
       document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !canSwitch; });
       if (inside && !canSwitch && mine && mine.k) step = mine.k;
       if (!L.some(x => x.k === step)) step = (L[2] || L[0] || {}).k;
@@ -280,6 +285,7 @@
       $('lead').textContent = !inside ? 'Sign in with your school email and password.'
         : canSwitch ? 'Teacher view: choose a level to see its English Lab.' : ca ? 'Practica al teu nivell.' : 'Practice at your level.';
       if (!inside) return;
+      if (!early && user && (canSwitch || mine)) try { localStorage.setItem(LAST, JSON.stringify({ uid: user.uid, canSwitch, mine })) } catch (e) {}
       $('levelTag').textContent = canSwitch ? step : (ca ? 'El teu nivell: ' : 'Your level: ') + step;
       const other = !canSwitch && mine && courses.find(c => c !== mine.course);
       $('levelTag').hidden = canSwitch;   // the teacher sees the step on its button
@@ -294,17 +300,26 @@
     $('levelPick').addEventListener('click', e => { const b = e.target.closest('[data-step]'); if (!b) return;
       step = b.dataset.step; try { localStorage.setItem(KEY, step) } catch (e) {} render(); });
     $('signinBtn').addEventListener('click', login);
-    $('signin').hidden = false;   // before el-cloud has loaded: sign-in waits for it
+    // Before el-cloud.js has loaded (Firebase): the English Lab this browser showed last to the same account (el_lab_last, el_who), not the
+    // Sign in card for a few seconds (Roger, 7 Nov 2026: "it loads old version for seconds and then it opens the last version").
+    const LAST = 'el_lab_last';
+    let early = (() => { try { const w = JSON.parse(localStorage.getItem('el_who') || 'null'), l = JSON.parse(localStorage.getItem(LAST) || 'null');
+      return w && l && l.uid === w.uid && !sessionStorage.getItem('el_as') ? l : null } catch (e) { return null } })();
+    if (early) render(); else $('signin').hidden = false;   // sign-in waits for el-cloud
 
     await import('../shared/js/el-cloud.js');
     window.ELCloud.onUser(async u => {
-      user = u; mine = null; render();
-      if (signedIn(u) && !switches(u)) { mine = (await myStep()) || {}; render(); }
+      const was = early; early = null;
+      user = u; mine = null;
+      // the same account as last time: keep what is on screen until its level is read again
+      if (was && signedIn(u) && u.uid === was.uid && !switches(u) && was.mine) { mine = (await myStep()) || {}; render(); }
+      else render();
+      if (signedIn(u) && !switches(u) && !(was && u.uid === was.uid && was.mine)) { mine = (await myStep()) || {}; render(); }
       const hash = location.hash.slice(1);
       if (signedIn(u) && labMenus[hash]) showLabMenu(hash);
     });
     // onUser only reports a signed-out visitor if it is registered before auth settles.
-    window.ELCloud.auth.authStateReady().then(() => { if (!window.ELCloud.auth.currentUser) { user = null; render(); } });
+    window.ELCloud.auth.authStateReady().then(() => { if (!window.ELCloud.auth.currentUser) { early = null; user = null; render(); } });
   </script>
 </body>
 </html>
