@@ -93,7 +93,7 @@
     if (mode === "home" && (who.role === "teacher" || who.role === "tester"))   // the teacher's lists: Courses and Learning Situations after Dashboard
       L.splice(1, 0, ["courses", "🏫", "Courses", "Courses", ROOT + "index.html#courses"], ["learning", "📚", "Learning Situations", "LS", ROOT + "index.html#learning"]);
     // the side menu names the LS as the LS home does: only its title (LS2 · … stays in the tooltip and the narrow strip says LS2)
-    return L.map(([k, i, long, short, h]) => ({ k, i, long, short, h, side: long, on: k === here }));
+    return L.map(([k, i, long, short, h]) => ({ k, i, long, short, h, side: k === "ls" && lsT ? lsT : long, si: k === "ls" && /^LS\d/.test(short) ? short : i, on: k === here }));
   }
 
   // ---- drawing
@@ -103,7 +103,7 @@
     // a computer (Chromebook): the LS home's side menu, brand + wide buttons with labels and › (Roger, 7 Nov 2026: "the format should be
     // the same (buttons)"); a narrow window (641–980 px): the strip of icon buttons; a phone: the bottom bar (bar below)
     r.innerHTML = `<a class="elr-brand" href="${ROOT}index.html">English with Roger</a>`
-      + `<div class="elside elw">${L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic" aria-hidden="true">${x.i}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`
+      + `<div class="elside elw">${L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`
       + `<div class="eln">${L.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.long)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.i}</i><span>${esc(x.short)}</span></a>`).join("")}</div>`;
     document.body.classList.add("elhas-rail");
   }
@@ -119,7 +119,7 @@
     if (!tabs) return;
     let s = $(".elside");
     if (!s) { s = document.createElement("nav"); s.className = "elside"; s.setAttribute("aria-label", "Menu"); tabs.after(s); }
-    s.innerHTML = L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic" aria-hidden="true">${x.i}</span><span class="lb">${esc(x.side)}</span></a>`).join("");
+    s.innerHTML = L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("");
   }
   function crumb() {   // course pages: ‹ My dashboard, as on the LS home
     if (mode !== "course") return;

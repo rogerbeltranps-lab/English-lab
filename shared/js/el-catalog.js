@@ -74,6 +74,8 @@ window.EL_LS=[
 ];
 // The LS name with its number for students and the teacher (Roger, 7 Nov 2026: "we should see LS2 Free Time..."): "LS2 · Free Time, Live!".
 // The number is the LS's place in its course in EL_LS (LS1 first).
+// elLsNum(l) = "LS2": menus show it in the icon box instead of 📚 (Roger, 7 Nov 2026: "instead of the book emoji").
+window.elLsNum=l=>{if(!l)return "";const i=(window.EL_LS||[]).filter(x=>x.course===l.course).findIndex(x=>x.id===l.id);return i>=0?"LS"+(i+1):""};
 window.elLsName=l=>{if(!l)return "";const c=(window.EL_LS||[]).filter(x=>x.course===l.course),i=c.findIndex(x=>x.id===l.id);return (i>=0?"LS"+(i+1)+" · ":"")+String(l.title||"").replace(/^\S+ · /,"")};
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";

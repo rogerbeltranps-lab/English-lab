@@ -32,8 +32,9 @@
   const teach=()=>who.role==="teacher";
   function nav(){
     // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css): "🏠 My dashboard" → icon + label
-    const a=(h,txt,cls,cur)=>{const m=String(txt).match(/^(\p{Extended_Pictographic}\uFE0F?)\s*(.*)$/u),ic={"English Lab":"🧪",Practise:"🎯",Practica:"🎯"}[txt]||(m?m[1]:/^LS\d/.test(txt)?"📚":"🗂");
-      return `<a class="nv${cls?" "+cls:""}" href="${h}"${cur?' aria-current="page"':""}><span class="ic" aria-hidden="true">${ic}</span><span class="lb">${m?m[2]:txt}</span></a>`};
+    // an LS item ("LS2 · Free Time, Live!") shows its number in the icon box instead of 📚 (Roger, 7 Nov 2026: "instead of the book emoji")
+    const a=(h,txt,cls,cur)=>{const m=String(txt).match(/^(\p{Extended_Pictographic}\uFE0F?)\s*(.*)$/u)||String(txt).match(/^(LS\d+) · (.*)$/),ic={"English Lab":"🧪",Practise:"🎯",Practica:"🎯"}[txt]||(m?m[1]:"🗂");
+      return `<a class="nv${cls?" "+cls:""}" href="${h}"${cur?' aria-current="page"':""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${m?m[2]:txt}</span></a>`};
     let html;
     if(teach()||who.role==="tester"){
       const first=teach()?a(dashHref(),"📊 Dashboard"):a(boardHref(),"🏠 My dashboard");
@@ -42,7 +43,7 @@
         +`<div class="nvsep"></div>`+a(ROOT+"lab/","🎲 "+t("Jocs","Games"))+a(ROOT+"lab/practice.html",t("Practica","Practise"));
     }else{
       html=a(boardHref(),"🏠 "+t("El meu tauler","My dashboard"))
-        +a("index.html","📚 "+esc(lsName(ls)),"on",true)
+        +a("index.html",esc(lsName(ls)),"on",true)
         +a(ROOT+COURSE+"/index.html","🗂 "+t("Totes les Learning Situations","All Learning Situations"))
         +a(ROOT+"lab/","🎲 "+t("Jocs","Games"))+a(ROOT+"lab/practice.html",t("Practica","Practise"))
         +a(ROOT+"today.html#help","❓ "+t("Ajuda","Help"));

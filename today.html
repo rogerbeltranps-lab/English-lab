@@ -195,9 +195,9 @@ const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
   // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css)
-  const b=(cls,h,ic,txt,x)=>`<a class="nv${cls}" href="${h}"${x||""}><span class="ic" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`;
+  const b=(cls,h,ic,txt,x)=>`<a class="nv${cls}" href="${h}"${x||""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`;
   const html=b(" on","today.html","🏠",t("El meu tauler","My dashboard"),' aria-current="page"')
-    +cs.map(c=>b("",`${c}/index.html`,"🗂",`${t("El meu curs","My course")} · ${COURSES[c]}`)+lss.filter(l=>l.course===c).map(l=>b(" sub",lsHref(l),"📚",lsName(l))).join("")).join("")
+    +cs.map(c=>b("",`${c}/index.html`,"🗂",`${t("El meu curs","My course")} · ${COURSES[c]}`)+lss.filter(l=>l.course===c).map(l=>b(" sub",lsHref(l),elLsNum(l)||"📚",esc(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
     +b("","lab/","🎲",t("Jocs","Games"))+b("","lab/practice.html","🎯",t("Practica","Practise"))
     +b("","#help","❓",t("Ajuda","Help"))
     +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"');
