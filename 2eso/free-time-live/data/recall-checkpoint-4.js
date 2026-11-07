@@ -34,22 +34,26 @@ window.LP = {
     {
      "id": "c4-02",
      "r": "beginners",
-     "q": "It’s ___: the clouds are grey. (ennuvolat)"
+     "q": "It’s ___: the clouds are grey. (ennuvolat)",
+     "o": ["cloudy", "cloud", "sunny"]
     },
     {
      "id": "c4-03",
      "r": "beginners",
-     "q": "Right now I ___ (record) a video."
+     "q": "Right now I ___ (record) a video.",
+     "o": ["record", "is recording", "am recording"]
     },
     {
      "id": "c4-04",
      "r": "beginners",
-     "q": "I usually ___ (come) here on Saturdays."
+     "q": "I usually ___ (come) here on Saturdays.",
+     "o": ["are coming", "come", "comes"]
     },
     {
      "id": "c4-05",
      "r": "beginners",
-     "q": "Do you like ___ (read) comics?"
+     "q": "Do you like ___ (read) comics?",
+     "o": ["read", "reads", "reading"]
     },
     {
      "id": "c4-06",
@@ -59,12 +63,14 @@ window.LP = {
     {
      "id": "c4-07",
      "r": "beginners",
-     "q": "Hi ___! Welcome to my vlog. (tothom)"
+     "q": "Hi ___! Welcome to my vlog. (tothom)",
+     "o": ["everyone", "anyone", "every"]
     },
     {
      "id": "c4-08",
      "r": "beginners",
-     "q": "Thanks for ___! (mirar-ho)"
+     "q": "Thanks for ___! (mirar-ho)",
+     "o": ["watched", "watch", "watching"]
     },
     {
      "id": "c4-09",
