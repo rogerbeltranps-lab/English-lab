@@ -96,7 +96,7 @@
       const cp=!S.all&&!S.closed&&!a.manual&&elCheckpointMissing(a,doneOf,S.open);
       if(!S.all&&(S.dropped.includes(a.id)||!S.open(a)||cp||(stepsOf(a).length&&!S.vis(a).length))){li.hidden=true;return}
       shown++;
-      const ks=S.vis(a),ds=doneOf(a),n=ks.filter(k=>ds.has(k)).length,isNext=S.next&&S.next.a.id===a.id;
+      const ks=elTabGroups(a,S.vis(a)),ds=doneOf(a),n=ks.filter(g=>g.every(k=>ds.has(k))).length,isNext=S.next&&S.next.a.id===a.id;
       if(S.dropped.includes(a.id)){el.classList.add("dropped");st.textContent="✂ "+t("No cal fer-lo","Not needed")}
       else if(!S.open(a)){el.classList.add("locked");st.classList.add("lock");st.textContent="🔒 "+t("Encara no està obert","Not open yet")}
       else if(ks.length&&S.done(a)){el.classList.add("done");st.classList.add("ok");st.textContent="✓ "+t("Fet","Done")}
@@ -117,7 +117,7 @@
     if(S.all){c.hidden=true;return}
     const nx=S.next;
     if(!nx){c.className="cont done";c.innerHTML=`<div class="ct">✓ ${t("Ho tens tot fet!","You're all done!")}</div><div class="cs">${t("No tens res pendent als learning paths oberts.","Nothing left to do in the open learning paths.")}</div><a class="cgo" href="${ROOT}lab/practice.html">${t("Practica pel teu compte","Practise on your own")} →</a>`;c.hidden=false;return}
-    const ks=S.vis(nx.a),ds=doneOf(nx.a),n=ks.filter(k=>ds.has(k)).length,num=lpNum(nx.a),title=nx.a.title.replace(/\s*\(warm-up\)$/,"");
+    const ks=elTabGroups(nx.a,S.vis(nx.a)),ds=doneOf(nx.a),n=ks.filter(g=>g.every(k=>ds.has(k))).length,num=lpNum(nx.a),title=nx.a.title.replace(/\s*\(warm-up\)$/,"");
     c.className="cont";
     c.innerHTML=`<div class="ck">${n?t("Continua on ho vas deixar","Continue where you left off"):t("El següent learning path","Your next learning path")}</div><div class="ct">${num&&/^\d+$/.test(num)?"LP"+num+" · ":""}${esc(title)}</div>`
       +`<div class="cs">${nx.cp?t("Primer fes aquest checkpoint, sense apunts: obre el que ve després.","First do this checkpoint, without notes: it opens what comes next."):t("El learning path et marca el pas que toca.","The learning path shows you the next step.")}</div>`

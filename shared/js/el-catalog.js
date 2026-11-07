@@ -219,6 +219,10 @@ window.elPlanLater=function(info,gid,today){const none={acts:new Set(),tabs:{}};
 const secKey=a=>a.id.replace("/","__"),secOf=(info,f,gid,a)=>{const g=info&&info[f]&&info[f][gid];return g&&g[secKey(a)]};
 window.elSecLocked=function(a,info,gid){return secOf(info,"secLocked",gid,a)||[]};
 // Steps a section holds (EL_ACTIONS keys): its panel id, or the cards and practice steps for a vocabulary section; none for info panels.
+// Steps grouped by the tab they live in, in the path's order: [[step, …], …]. The Vocabulary tab holds two steps (cards, practice) and counts
+// as one tab, done when both are (Roger, 7 Nov 2026: students see the same tabs and counts as the learning path and the dashboard).
+window.elTabGroups=function(a,ks){const xs=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]),m=new Map();
+  ks.forEach(k=>{const p=xs.includes(k)?k:(k==="cards"||k==="practice")&&xs.includes("vocab")?"vocab":k;if(!m.has(p))m.set(p,[]);m.get(p).push(k)});return [...m.values()]};
 window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
