@@ -71,6 +71,12 @@ a.hal{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:1
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:30px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:18px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
 .ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}a.ucard{border:2px solid #e2e8f0;border-radius:16px;padding:16px 18px;text-decoration:none;color:#0f172a;display:flex;flex-direction:column;gap:4px}a.ucard small{color:#64748b;font-size:13px}a.ucard b{font-size:19px}a.ucard span{color:#3157d5;font-weight:700;margin-top:6px}a.ucard.on{border-color:#3157d5;background:#f5f8ff}a.ucard:hover{border-color:#3157d5}
 .helpl{margin:6px 0 0;padding-left:20px}.helpl li{margin:6px 0}
+/* ❓ Help: the picture guide (helpGuide) */
+.hguide h2{margin:.1em 0 .2em}details.hgp{border:1px solid #e2e8f0;border-radius:14px;margin:10px 0;background:#fff}details.hgp>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:14px;padding:12px 16px}
+details.hgp>summary::-webkit-details-marker{display:none}details.hgp>summary::after{content:"›";margin-left:auto;font-size:26px;color:#94a3b8;transition:transform .15s}details.hgp[open]>summary::after{transform:rotate(90deg)}
+.hgi{font-size:26px;width:44px;height:44px;border-radius:12px;background:#f1f5f9;display:grid;place-items:center;flex:none}.hgt{display:flex;flex-direction:column;min-width:0}.hgt b{font-size:17px}.hgt small{color:#64748b;font-size:14px}
+.hgb{padding:0 16px 16px}@media (min-width:1000px){.hgb{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:22px;align-items:start}.hgb ol.hgs{position:sticky;top:16px}}a.hgimg{display:block;margin:4px 0 12px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px #0f172a14}a.hgimg img{display:block;width:100%;height:auto}a.hgimg.narrow{max-width:260px}
+ol.hgs{margin:0;padding-left:22px;font-size:16px;line-height:1.5}ol.hgs li{margin:7px 0}
 /* both home columns end at the same line (Roger, 7 Nov 2026: "I want this to be aligned to make room on the page"): a compact left column
    (slimmer alert, blue card with the bar and Continue on one row, one-line My marks) and the shorter column's last card stretches */
 @media (min-width:901px){.hgrid{align-items:stretch}.hl>.cont{flex:1 1 auto}.hr>.tiles{flex:1 1 auto;grid-auto-rows:1fr}.hr>.tiles>a.tile{height:100%}
@@ -271,21 +277,66 @@ function nav(g,lss){
   const html=elStudentMenu({root:"",courses:cs,lss,ca:lang()==="ca",board:location.search||"today.html",here,app:APP()});
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
-// "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
-// tools/site-video (real screens of the site, no subtitles). A box on the board and a link in the menu.
-const HOWTO="video/how-english-lab-works",HOWTO_V="20261102c";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
-// One video per language (Roger, 2 Nov 2026: "this videos could be merged … the original video with the changes"): the website
-// video now holds the whole board, part by part, on a sample student (tools/site-video/full.json).
-const vidRow=(icon,ca,en,dca,den,f,v)=>`<div class="hv"><div><b>${icon} ${t(ca,en)}</b> <span class="muted">· ${t(dca,den)}</span></div>`
-  +`<div class="row"><a class="go" href="${f}.mp4?v=${v}" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${f}-ca.mp4?v=${v}" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
-const howBox=()=>`<div class="pend howto" style="background:#f5f3ff;border-color:#c4b5fd;flex-direction:column;align-items:stretch;gap:10px">`
-  +vidRow("🎬","Com funciona English Lab","How English Lab works","vídeo de 13 minuts: el tauler part per part, les Learning Situations, els learning paths i com moure't per la web","12-minute video: your board part by part, Learning Situations, learning paths and how to move around the website",HOWTO,HOWTO_V)+`</div>`;
+// ❓ Help: a picture guide instead of the old videos (Roger, 7 Nov 2026: "instead of the videos (which are obsolete) I need a guide
+// with images so that students can check it if they want it"). One folded part per place of the site, each with a real screenshot
+// (Chromebook size, invented sample students) and a few short steps, in the student's language. Pictures: shared/img/help/<id>-<ca|en>.webp,
+// made by tools/help-guide/capture.mjs; run it again when the student pages change a lot and change HELP_V so browsers fetch the new ones.
+// The old videos (video/how-english-lab-works*.mp4) stay in the repo for the teacher's Materials; students no longer see them.
+const HELP_V="20261107";
+const helpGuide=()=>{
+  const L=lang(),img=(id,alt,cls)=>`<a class="hgimg${cls?" "+cls:""}" href="shared/img/help/${id}-${L}.webp?v=${HELP_V}" target="_blank" rel="noopener" title="${t("Obre la imatge en gran","Open the picture full size")}"><img src="shared/img/help/${id}-${L}.webp?v=${HELP_V}" alt="${esc(alt)}" loading="lazy"></a>`;
+  const part=(icon,ti,sub,pics,steps)=>`<details class="hgp"><summary><span class="hgi" aria-hidden="true">${icon}</span><span class="hgt"><b>${ti}</b><small>${sub}</small></span></summary>`
+    +`<div class="hgb"><div class="hgpics">${pics}</div><ol class="hgs">${steps.map(s=>`<li>${s}</li>`).join("")}</ol></div></details>`;
+  const P=[
+    part("🏠",t("El meu tauler","My dashboard"),t("El primer que veus quan entres","The first thing you see when you sign in"),img("board",t("El tauler","The dashboard")),[
+      t("A dalt veus el teu <b>nivell</b> i els avisos: les <b>activitats que et falten</b> i els <b>anuncis del professor</b>.","At the top you see your <b>level</b> and the notices: the <b>activities you are missing</b> and the <b>announcements from your teacher</b>."),
+      t("Prem <b>▶ Continua</b> i aniràs directament al pas que et toca fer.","Press <b>▶ Continue</b> to go straight to your next step."),
+      t("<b>✅ Per fer</b>: els learning paths que el professor ha obert i encara no has acabat. <b>📝 Deures</b>: només el que el professor posa com a deures.","<b>✅ To do</b>: the learning paths your teacher has opened that you haven't finished. <b>📝 Homework</b>: only what your teacher sets as homework."),
+      t("A sota tens la teva <b>Learning Situation d'ara</b>: els seus learning paths i el teu repte (el producte final).","Below is your <b>Learning Situation now</b>: its learning paths and your challenge (the final product).")]),
+    part("☰",t("El menú","The menu"),t("Per anar a qualsevol lloc de la web","To go anywhere on the website"),img("menu",t("El menú de l'esquerra","The menu on the left"),"narrow"),[
+      t("El menú de l'esquerra és igual a totes les pàgines. Al mòbil el trobes a baix.","The menu on the left is the same on every page. On a phone it is at the bottom."),
+      t("<b>🏠 El meu tauler</b>: torna a l'inici. <b>📊 Les meves notes</b>: les teves activitats, notes i exàmens. <b>🎯 Practica</b>: practica pel teu compte.","<b>🏠 My dashboard</b>: back to the start. <b>📊 My marks</b>: your activities, marks and exams. <b>🎯 Practise</b>: practise on your own."),
+      t("<b>🗂 El meu curs</b> i a sota cada <b>LS</b>: obre la pàgina d'una Learning Situation.","<b>🗂 My course</b> and each <b>LS</b> below it: open the page of a Learning Situation."),
+      t("<b>📖 Llibres</b>, <b>🔤 Gramàtica i vocabulari</b> (els resums per estudiar), <b>🎲 Jocs</b>, <b>❓ Ajuda</b> (aquesta pàgina) i <b>📱 Estudia amb el mòbil</b>.","<b>📖 Books</b>, <b>🔤 Grammar and vocabulary</b> (summaries to study), <b>🎲 Games</b>, <b>❓ Help</b> (this page) and <b>📱 Study on your phone</b>.")]),
+    part("📚",t("La pàgina d'una LS","An LS page"),t("Els learning paths i el producte final","The learning paths and the final product"),img("ls",t("La pàgina de la LS","The LS page")),[
+      t("Fes els <b>learning paths</b> en ordre: cada un acaba amb una peça del teu producte final. Hi veus <b>✓ Fet</b> o quants passos portes.","Do the <b>learning paths</b> in order: each one ends with a piece of your final product. You see <b>✓ Done</b> or how many steps you have done."),
+      t("<b>▶ Continua</b> t'obre el learning path i el pas que et toca.","<b>▶ Continue</b> opens the learning path and the step you need to do."),
+      t("<b>El teu repte · Producte final</b> → <b>Mira què has de fer</b>: què has de fer i com t'avaluaran.","<b>Your challenge · Final product</b> → <b>See what to do</b>: what to do and how it is marked."),
+      t("També hi tens <b>Jocs i teoria</b>, el <b>vídeo de shadowing</b> i <b>Sobre aquesta LS</b> (què aprendràs i com t'avaluen).","There are also <b>Games and theory</b>, the <b>shadowing video</b> and <b>About this LS</b> (what you learn and how you are assessed).")]),
+    part("🧭",t("Un learning path","A learning path"),t("Pas a pas: respon i prem Comprova","Step by step: answer and press Check"),img("lp",t("Un pas d'un learning path, comprovat","A learning path step, checked")),[
+      t("A l'esquerra tens els <b>passos</b>. Quan n'acabes un, es posa <b>verd ✓</b>.","On the left are the <b>steps</b>. When you finish one, it turns <b>green ✓</b>."),
+      t("Llegeix la instrucció curta, respon i prem <b>Comprova</b>. Veuràs <b>Correcte!</b> o una pista per tornar-ho a provar.","Read the short instruction, answer and press <b>Check</b>. You see <b>Correct!</b> or a tip to try again."),
+      t("Un pas està fet quan has respost i comprovat <b>totes</b> les activitats.","A step is done when you have answered and checked <b>every</b> activity."),
+      t("Les respostes es desen soles: les tornes a veure un altre dia o en un altre aparell. Amb <b>↺ Torna a practicar</b> ho tornes a fer; el resultat d'abans es queda fins que tornes a prémer Comprova.","Your answers save on their own: you see them again another day or on another device. With <b>↺ Practise again</b> you can do it again; your old result stays until you press Check again."),
+      t("Quan entregues una <b>escriptura</b>, ja no es pot canviar. La correcció del professor apareix en el mateix pas.","When you hand in a <b>writing</b>, it can't be changed any more. Your teacher's correction appears in the same step.")]),
+    part("🃏",t("Les targetes (vocabulari)","Study cards (vocabulary)"),t("Per aprendre les paraules de cada learning path","To learn the words of each learning path"),img("cards",t("Les targetes d'estudi","The study cards")),[
+      t("Al pas <b>Vocabulari</b>, digues la paraula en veu alta i pensa què vol dir. Prem <b>🔊 Escolta</b> per sentir-la.","In the <b>Vocabulary</b> step, say the word aloud and think what it means. Press <b>🔊 Listen</b> to hear it."),
+      t("Clica la targeta per <b>girar-la</b> i veure què vol dir i un exemple. Si vols, escriu-ho abans i prem <b>Comprova i gira</b>.","Click the card to <b>turn it</b> and see the meaning and an example. If you want, type it first and press <b>Check and turn</b>."),
+      t("Prem <b>Ho sé ✓</b> quan ja te la saps. Pots canviar el sentit: <b>English → Català</b> o <b>Català → English</b>.","Press <b>Got it ✓</b> when you know it. You can change the direction: <b>English → Català</b> or <b>Català → English</b>.")]),
+    part("🧩",t("Jocs i teoria","Games and theory"),t("La teoria dels jocs de classe, els teus apunts i què has d'estudiar","The theory of the class games, your notes and what to study"),img("notes",t("Jocs i teoria","Games and theory")),[
+      t("Obre <b>Jocs i teoria</b> des del tauler o des de la pàgina de la LS. Els cercles et diuen el teu % de gramàtica i de vocabulari.","Open <b>Games and theory</b> from your dashboard or the LS page. The circles show your % in grammar and vocabulary."),
+      t("Hi ha cada joc de classe de la LS: la <b>teoria</b>, <b>els teus apunts</b> i el teu <b>resultat</b>.","Every class game of the LS is there: the <b>theory</b>, <b>your notes</b> and your <b>result</b>."),
+      t("<b>🎯 Què has d'estudiar</b> et diu les parts on t'has equivocat: clica-les per anar-hi. Mira també <b>les preguntes que has de revisar</b>.","<b>🎯 What to study</b> shows the parts you got wrong: click them to go there. Look at <b>the questions to look at again</b> too."),
+      t("Si no vas fer un joc, llegeix-ne la teoria i pren apunts en paper. Pots imprimir-ho tot amb <b>🖨 Imprimeix-ho</b>.","If you missed a game, read its theory and take notes on paper. You can print it all with <b>🖨 Print it</b>.")]),
+    part("📊",t("Les meves notes","My marks"),t("El que has fet, el que et falta i les teves notes","What you have done, what you are missing and your marks"),img("marks",t("Les meves notes","My marks"))+img("marks-lps",t("Els meus learning paths: fet i pendent","My learning paths: done and missing"))+img("marks-exam",t("La nota de la LS i l'examen","The LS mark and the exam")),[
+      t("<b>📋 Les meves activitats</b>: quantes n'has fet, quantes et falten i quant compten. Prem <b>Fes-la ara</b> per anar a una activitat que et falta.","<b>📋 My activities</b>: how many you have done, how many you are missing and how much they count. Press <b>Do it now</b> to go to a missing activity."),
+      t("Tria la <b>LS</b> i després una pestanya: <b>📈 La meva avaluació formativa</b>, <b>🎬 El meu producte final</b> o <b>📝 Els meus exàmens</b>.","Choose the <b>LS</b> and then a tab: <b>📈 My formative assessment</b>, <b>🎬 My final product</b> or <b>📝 My exams</b>."),
+      t("A l'avaluació formativa veus cada learning path: fet, pendent i la puntuació. Clica una pestanya que et falta per anar-hi directament.","In your formative assessment you see every learning path: done, missing and the score. Click a tab you are missing to go straight to it."),
+      t("A <b>Els meus exàmens</b> veus la nota de cada part, els criteris, les preguntes que has de repassar i la teva escriptura corregida.","In <b>My exams</b> you see the mark of each part, the criteria, the questions to review and your writing corrected."),
+      t("<b>🏆 Els meus punts</b>: guanyes punts responent bé a classe. Si tens tota la feina feta, sumen a la nota del trimestre.","<b>🏆 My points</b>: you win points by answering well in class. If you have all your work done, they add to your term grade.")]),
+    part("🎯",t("Practica","Practise"),t("Practica pel teu compte, al teu nivell","Practise on your own, at your level"),img("practise",t("Practica","Practise")),[
+      t("<b>Vocabulari</b> (targetes), <b>Gramàtica</b> (explicació i exercicis), <b>Sentence builder</b>, <b>Listening</b> i <b>Shadowing</b>, al teu nivell.","<b>Vocabulary</b> (word cards), <b>Grammar</b> (explanation and exercises), <b>Sentence builder</b>, <b>Listening</b> and <b>Shadowing</b>, at your level."),
+      t("Tot es corregeix sol i no s'entrega res: practica tant com vulguis.","Everything corrects itself and nothing is handed in: practise as much as you like.")]),
+    part("🎲",t("Jocs","Games"),t("Jocs de vocabulari de cada LS","Vocabulary games for each LS"),img("games",t("Jocs","Games")),[
+      t("Tria la LS i prem <b>Juga →</b>. Els jocs són al teu nivell.","Choose the LS and press <b>Play →</b>. The games are at your level.")]),
+  ];
+  return `<div class="box hguide"><h2>📘 ${t("Guia d'English Lab","English Lab guide")}</h2><p class="muted">${t("Obre una part per veure-la amb imatges. Clica una imatge per veure-la en gran.","Open a part to see it with pictures. Click a picture to see it full size.")}</p>${P.join("")}</div>`};
 // Simple board (Roger, 6 Nov 2026: "the menus have little information and when you go to a place you can find the info that you need";
 // the students work on Chromebooks; the site is for self-study and for class): the board opens on a home with only the class bar
 // (📌 pulled-up path, live presentation), one Continue button to the next step and four places. Each place keeps the boxes that were on
 // the board: ✅ To do (what the teacher has opened and I haven't finished, my activities, what we've done) and 🏠 Homework (only what the
 // teacher set as homework, and the calendar; Roger, 6 Nov 2026), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
-// the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (video, problems). A place is a hash
+// the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (picture guide, problems). A place is a hash
 // (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
 const PLACE_OF={todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
@@ -451,7 +502,7 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="books"||place==="lang"){const c=place==="books"?bookCard(ls):langCard(ls);
     return c?`<div class="rcards one">${c}</div>`:`<div class="box"><p class="muted">${place==="books"?t("Aquesta LS no té llibre de lectura.","This LS has no reading book."):t("Aquesta LS no té resum de gramàtica i vocabulari.","This LS has no grammar and vocabulary summary.")}${!all()&&!elRouteOf(D.lv,ls.id).level?" "+t("Apareixerà quan el professor et posi el nivell.","It will appear when your teacher sets your level."):""}</p></div>`}
   if(place==="news")return annBox()||`<div class="box"><p class="muted">${t("Encara no hi ha anuncis.","No announcements yet.")}</p></div>`;
-  return howBox()+phoneBanner(true)+`<div class="box"><b>${t("Alguna cosa no funciona?","Something isn't working?")}</b><ul class="helpl"><li>${t("Prem <b>⚠️ Problema</b> a baix de la pantalla i explica-ho: el professor ho veurà.","Press <b>⚠️ Problem</b> at the bottom of the screen and explain it: your teacher will see it.")}</li>`
+  return helpGuide()+phoneBanner(true)+`<div class="box"><b>${t("Alguna cosa no funciona?","Something isn't working?")}</b><ul class="helpl"><li>${t("Prem <b>⚠️ Problema</b> a baix de la pantalla i explica-ho: el professor ho veurà.","Press <b>⚠️ Problem</b> at the bottom of the screen and explain it: your teacher will see it.")}</li>`
     +`<li>${t("Tens una idea per millorar la web? Prem <b>💡 Idea</b>.","Have an idea to make the website better? Press <b>💡 Idea</b>.")}</li><li>${t("Si una pàgina es veu antiga, recarrega-la amb <b>Ctrl+Maj+R</b>.","If a page looks old, reload it with <b>Ctrl+Shift+R</b>.")}</li></ul></div>`}
 const lsState=l=>{const s=(D.ls[l.id]||{}).status;return s==="closed"?t("tancada · per repassar","closed · to revise"):s==="hidden"?t("oculta","hidden"):t("ara","now")};
 // 📊 My marks: the LS chips (when there are several) and the three tabs of an LS
@@ -518,7 +569,7 @@ function render(){
   const place=placeNow(),cls=`<div id="pull">${pullBox()}</div><div id="live">${liveBox()}</div>`,noteBox=note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"";
   document.body.dataset.place=lss.length?place:"home";
   if(!lss.length){$("#crumb").innerHTML="";$("#lvl").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
-    $("#note").innerHTML=cls+annBox()+noteBox+howBox();$("#main").innerHTML="";if(canReply())wireAnn();return}
+    $("#note").innerHTML=cls+annBox()+noteBox;$("#main").innerHTML="";if(canReply())wireAnn();return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;document.body.dataset.course=COURSE;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
   S.pend=[];   // no Submit any more (Roger, 6 Nov 2026): answers save on their own, Submit only froze the score
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
