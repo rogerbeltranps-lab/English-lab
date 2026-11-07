@@ -58,6 +58,10 @@ body[data-place="home"] .page h1{font-size:2.2rem;letter-spacing:-.02em;margin:.
 .cont .ct{font-size:30px;font-weight:800;line-height:1.15;letter-spacing:-.01em}.cont .cs{font-size:17px;color:#e3e9ff}.cont .crow{display:flex;align-items:center;gap:12px;max-width:520px}.cont .cbar{flex:1;height:10px;border-radius:999px;background:#2443ad;overflow:hidden}.cont .cbar span{display:block;height:100%;background:#fff;border-radius:999px}.cont .cn{font-size:14px;font-weight:700;white-space:nowrap}
 .cont a.cgo{align-self:flex-start;margin-top:6px;background:#fff;color:#2443ad;border-radius:14px;padding:15px 38px;font-size:19px;font-weight:800;text-decoration:none}.cont a.cgo:hover{outline:3px solid #c7d4ff}.cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done a.cgo{color:#166534}
 a.hal{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:16px;text-decoration:none;font-size:16px}a.hal span{margin-left:auto;font-weight:800;white-space:nowrap}a.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}a.hal.news{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}a.hal.lsl{background:#fff;border:1px solid #e2e8f0;color:#0f172a}a.hal.lsl .lt{font-style:normal;min-width:0}a.hal.lsl b{color:#0f172a;font-size:17px}a.hal.lsl small{display:block;color:#64748b;font-size:14px}a.hal.lsl span{color:#3157d5}a.hal.lsl:hover{border-color:#3157d5}a.hal:hover{filter:brightness(.97)}a.hal.games{background:#fff;border:1px solid #e2e8f0;color:#0f172a;flex-wrap:wrap}a.hal.games .rings{display:flex;gap:14px;margin:0}a.hal.games .rings span{margin:0!important}a.hal.games .lt{font-style:normal;min-width:0}a.hal.games .lt b{font-size:17px;color:#0f172a}a.hal.games small{display:block;color:#64748b;font-size:14px}a.hal.games>span:last-child{color:#3157d5}a.hal.games:hover{border-color:#3157d5}
+.rcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.rcard{display:flex;gap:16px;align-items:flex-start;border-radius:18px;padding:18px 20px;border:1px solid}.rcard.book{background:#fff7ed;border-color:#fed7aa}.rcard.lang{background:#f0fdf4;border-color:#bbf7d0}
+.rcard img{width:78px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.18);flex:none}.rcard .rb{display:flex;flex-direction:column;gap:4px;min-width:0}.rcard .rk{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a3412}.rcard.lang .rk{color:#166534}.rcard b{font-size:19px}.rcard p{margin:2px 0 6px;color:#475569;font-size:14px}
+.rrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}a.rgo{background:#c2410c;color:#fff;border-radius:12px;padding:10px 16px;font-weight:800;text-decoration:none;font-size:15px}.rcard.lang a.rgo{background:#15803d}a.rgo:hover{outline:3px solid #fdba74}.rcard.lang a.rgo:hover{outline-color:#86efac}a.rlk{color:#166534;font-weight:700;text-decoration:none;font-size:14px;padding:8px 4px}a.rlk:hover{text-decoration:underline}
+@media (max-width:1180px){.rcards{grid-template-columns:1fr}}
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile.wide{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;gap:14px;padding:14px 20px}a.tile .tb.hw{background:#0e7490}
 .todo .tdl,.hwlist{list-style:none;margin:0;padding:0}.todo .tdl li{border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin:0 0 10px;background:#fff}.todo .tdl li.late{border-color:#fca5a5;background:#fff7f7}
 .todo .tdh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-bottom:8px}.todo .tdh b{font-size:17px}.todo .tdh b a{color:#1e3a8a;text-decoration:none}.todo .tdh b a:hover{text-decoration:underline}
@@ -257,7 +261,25 @@ function homeHtml(lss,ls,info){
     +tile("#units","📚","Learning Situations",t("resums, pràctica i el teu nivell","summaries, practice and your level"))
     +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"),"","",true);
   // the current LS right on the board, under Continue and the tiles (Roger, 7 Nov 2026: "students should see in their dashboard the current LS"): lsNowHtml
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`+lsNowHtml(ls,info,nx)}
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}${readCards(ls)}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`+lsNowHtml(ls,info,nx)}
+// 📖 Books and 📚 Grammar and vocabulary under Continue (Roger, 7 Nov 2026: "on the left I want a section called books with the books of the
+// LS, a section with grammar and vocabulary summary"): the LS reading book and the vocabulary and grammar summary of the student's level (the
+// same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS), the teacher and testers every level. Nothing until the student
+// has a level; no new Firestore reads.
+function readCards(ls){if(!ls||only(ls.id))return "";
+  const lv=elRouteOf(D.lv,ls.id).level,every=all();if(!every&&!lv)return "";
+  const btn=(h,tx)=>`<a class="rgo" href="${h}" target="_blank" rel="noopener">${tx}</a>`,lvls=f=>EL_LEVELS.filter(f);
+  let out="";
+  if(ls.story){const s=ls.story,r=x=>x==="native"?"daring":x;
+    out+=`<div class="rcard book"><img src="${s.pdf}cover.jpg" alt="" loading="lazy"><div class="rb"><span class="rk">📖 ${t("Llibres","Books")}</span><b>${esc(s.title)}</b>`
+      +`<p>${t("Una història en sis capítols. Llegeix un capítol cada setmana a casa.","A story in six chapters. Read one chapter a week at home.")}</p>`
+      +`<div class="rrow">${every?lvls(x=>x.id!=="native").map(x=>btn(`${s.pdf}${x.id}.pdf`,`📖 ${LV[x.id]}`)).join(""):btn(`${s.pdf}${r(lv)}.pdf`,`📖 ${t("Obre el teu llibre","Open your book")}`)}</div></div></div>`}
+  if(ls.study){const r=x=>x==="beginners"&&!ls.starter?"insecure":x==="native"&&!ls.pro?"daring":x;
+    out+=`<div class="rcard lang"><div class="rb"><span class="rk">📚 ${t("Gramàtica i vocabulari","Grammar and vocabulary")}</span><b>${t("Resum per estudiar","Summary to study")}</b>`
+      +`<p>${t("Tot el vocabulari i tota la gramàtica d'aquesta LS al teu nivell, amb explicacions i pràctica.","All the vocabulary and grammar of this LS at your level, with explanations and practice.")}</p>`
+      +`<div class="rrow">${every?lvls(x=>(x.id!=="beginners"||ls.starter)&&(x.id!=="native"||ls.pro)).map(x=>btn(`${ls.study}${x.id}.pdf`,`📄 ${LV[x.id]}`)).join(""):btn(`${ls.study}${r(lv)}.pdf`,`📄 ${t("Obre el resum","Open the summary")}`)}`
+      +`<a class="rlk" href="${lsHref(ls)}#study">${t("Llista de la LS","List in the LS")} →</a></div></div></div>`}
+  return out?`<div class="rcards">${out}</div>`:""}
 // 📚 The current LS on the board home (Roger, 7 Nov 2026: "I love this dashboard. However, students should see in their dashboard the
 // current LS"): the LS home page's learning paths with the student's progress (only the ones the teacher has opened for the group, as on the
 // LS page), the final product challenge and the LS tiles (games and theory, study, vocabulary games, shadowing video, about this LS), so
