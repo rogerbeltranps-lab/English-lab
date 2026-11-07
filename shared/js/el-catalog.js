@@ -201,6 +201,15 @@ window.elLpOpen=function(a,info,gid,raw){const o=info&&info.open&&info.open[gid]
 // later days. Homework the teacher set and a pull-up open it at once, as before. Page-only, like the section switches. raw (or
 // window.EL_RAW_OPEN, set by the dashboard) = the switches alone, for whatever writes them.
 const agToday=()=>window.ELWeek&&ELWeek.today?ELWeek.today():window.EL_TODAY||new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"});
+// 🖨 Print session (Roger, 7 Nov 2026: "print today's sections for those who don't have a Chromebook … also the games"; "the same here [the
+// Time plan's class day] in case I know it beforehand", "like print session"): the paper sheet of one class day, shared/print/today.html.
+// its = the day's agenda items in order; returns the link from the site root (learning path tabs, then each game; notes are left out).
+window.elPrintDay=function(its,gname,dlab){const by=new Map(),games=[];
+  (its||[]).forEach(it=>{it=String(it);const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;const id=it.slice(0,i),p=it.slice(i+1);
+    if(/^game:/.test(p)){if(!games.includes(p.slice(5)))games.push(p.slice(5));return}
+    const a=(window.EL_CATALOG||[]).find(x=>x.id===id);if(!a||!a.path)return;const k=a.path.replace(/\.html$/,"");if(!by.has(k))by.set(k,[]);if(p)by.get(k).push(p);else by.get(k).all=true});
+  const items=[...by].map(([k,ps])=>k+(ps.all?"":":"+ps.join("."))).join("|");
+  return "shared/print/today.html?items="+encodeURIComponent(items)+"&games="+encodeURIComponent(games.join(","))+"&g="+encodeURIComponent(gname||"")+"&d="+encodeURIComponent(dlab||"")};
 window.elAgendaOf=function(info,gid){const s=info&&info.planEdits&&info.planEdits[gid]&&info.planEdits[gid].agenda;if(!s)return null;
   try{const ag=typeof s==="string"?JSON.parse(s):s;return ag&&ag.days?ag:null}catch(e){return null}};
 const laterMemo=new WeakMap();   // per ls info and group: recomputed when the agenda, homework, pull-up or day changes

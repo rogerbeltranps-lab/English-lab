@@ -51,6 +51,7 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
   background:#fff;border:2px solid #4338ca;border-radius:16px;box-shadow:0 10px 30px rgba(30,27,75,.3);font:600 16px system-ui,sans-serif;color:#1e1b4b;padding:12px 14px}
 #el-cmag .hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}#el-cmag .hd b{font-size:20px}#el-cmag .hd small{color:#4338ca;font-weight:700}
 #el-cmag .hd .x{margin-left:auto;border:0;background:#eef2ff;color:#3730a3;border-radius:999px;width:30px;height:30px;font-size:16px;cursor:pointer}
+#el-cmag .pr{display:block;width:100%;margin:0 0 8px;padding:5px 10px;border:1.5px solid #c7d2fe;border-radius:999px;background:#fff;color:#3730a3;font:700 14px system-ui,sans-serif;cursor:pointer}#el-cmag .pr:hover{border-color:#4338ca}
 #el-cmag .tot{color:#1d4ed8;font-size:14px;margin:0 0 8px}#el-cmag .tot.over{color:#b91c1c}
 #el-cmag .lp{display:flex;align-items:center;gap:8px;margin:10px 2px 4px;font-weight:800;font-size:17px}#el-cmag .lp small{margin-left:auto;color:#1d4ed8;font-weight:700;font-size:14px}
 #el-cmag .it{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:5px 0;padding:8px 12px;border:1.5px solid #c7d2fe;border-radius:14px;background:#eef2ff;color:#1e1b4b;font:600 16px system-ui,sans-serif;cursor:pointer}
@@ -106,10 +107,12 @@ async function draw(){if(!box)return;
         body+=`<button class="it ${now?"now":""}" data-i="${n}" title="${gm?"Open the game board in a new tab":"Go there: "+E(C.gname)+" follows"}">${m?`<span class="m">${m} min</span>`:""}<span>${E(nos?(window.elLpLabel?elLpLabel(a):a.title):itName(a,p))}</span><span class="go ${now||gm?"":"gt"}">${now?"● now":gm?"↗":"Go →"}</span></button>`})})});
   const len=+((window.EL_TIMETABLE||{}).len)||60;
   box.innerHTML=`<div class="hd"><b>📋 ${D===t?"Today":"Next class"} · ${E(dLab(D))}</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Hide (📋 Today on the class mode bar shows it again)">✕</button></div>`
+    +(its.some(x=>x.a)?`<button class="pr" data-pr="1" title="This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key">🖨 Print session</button>`:"")
     +(tot?`<p class="tot ${tot>len?"over":""}">⏱ ${tot} of ${len} min planned</p>`:"")
     +(body||`<p class="msg">Nothing on the agenda${D===t?" today":""} for ${E(C.gname)}. Plan it in the dashboard's Time plan.</p>`);
   box._its=its}
 function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();
+  if(b.dataset.pr){const its=(box._its||[]).filter(x=>x.a).map(x=>x.it);window.open(new URL(elPrintDay(its,C.gname,dLab(D)),C.root).href,"_blank","noopener");return}
   const x=(box._its||[])[+b.dataset.i];if(!x)return;
   if(x.it===SHD)return play(new URL(x.ls.ls.shadowing,C.root).href);
   if(isGame(x.p)){window.open(new URL("lab/game/host.html?deck="+encodeURIComponent(x.p.slice(5))+"&g="+encodeURIComponent(C.g),C.root).href,"_blank","noopener");return}

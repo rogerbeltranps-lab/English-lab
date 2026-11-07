@@ -2453,7 +2453,8 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
     +(!its.length&&!isEx?`<p class="agempty">Drop a learning path or a tab here</p>`:"")
     +`<div class="agf">${hwOk&&l&&ri>=0?`<button type="button" class="g mini" data-do="sethw" data-i="${ri}" data-line="${esc(l[0])}" ${D} title="Students see it as homework (with a ready message)">🏠 Homework</button>`:""}`
     +(tkb.some(it=>it!=="exam"&&!tkOf(x)[x.ls+"|"+itKey(d,it)])?`<button type="button" class="g mini" data-do="agnext" data-d="${d}" ${D} title="Send what is not ticked to the next class">⏭ Next class</button>`:"")
-    +`<button type="button" class="g mini" data-do="agnote" data-d="${d}" ${D} title="Add a short note to this day">✎ Note</button></div></div>`}
+    +`<button type="button" class="g mini" data-do="agnote" data-d="${d}" ${D} title="Add a short note to this day">✎ Note</button>`
+    +(its.some(it=>/#/.test(it)&&!/^note:/.test(it))?`<button type="button" class="g mini" data-do="agprint" data-d="${d}" ${D} title="This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key">🖨 Print session</button>`:"")+`</div></div>`}
 // the class days to show, by week: [[monday, [days]]]; holidays the timetable has a class on are listed too ("no class")
 function agWeeks(x,extra){const ag=agOf(x),sp=ELWeek.span(x.p)||[ELWeek.today(),ELWeek.today()],ds=agDays(ag),first=[sp[0],ds[0]].filter(Boolean).sort()[0];
   let last=[sp[1],ds[ds.length-1]].filter(Boolean).sort().pop();last=ELWeek.add(last,7*(extra||0));
@@ -3198,6 +3199,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     agrm:()=>{e.preventDefault();e.stopPropagation();agMove(planX(k.ls,k.gid),[k.it],k.d,"")},
     agnext:()=>{e.preventDefault();const x=planX(k.ls,k.gid),ag=agOf(x),nd=nextClassDay(x,k.d);if(!nd)return alert("No later class in the timetable.");
       agMove(x,((ag.days||{})[k.d]||[]).filter(it=>it!=="self"&&!tkOf(x)[x.ls+"|"+itKey(k.d,it)]),k.d,nd)},
+    agprint:()=>{e.preventDefault();const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)return;   // 🖨 the day on paper (elPrintDay in el-catalog.js)
+      window.open(elPrintDay(agRuns(ag,k.d).flatMap(g=>g.its),(GR.find(g=>g.id===k.gid)||{}).name||k.gid,ELWeek.date(k.d)),"_blank","noopener")},
     agnote:()=>{e.preventDefault();const v=(prompt("A short note for "+ELWeek.date(k.d)+":")||"").replace(/\s+/g," ").replace(/·/g,"-").trim();if(v)agSave(planX(k.ls,k.gid),ag=>{addIt(ag,k.d,"note:"+v)})},
     agself:()=>{e.preventDefault();agSave(planX(k.ls,k.gid),ag=>{rmIt(ag,k.d,"self")})},
     agmore:()=>{e.preventDefault();S.agExt=S.agExt||{};const q=k.ls+"|"+k.gid;S.agExt[q]=(S.agExt[q]||0)+1;render()},

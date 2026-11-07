@@ -10,6 +10,9 @@
   const LS = { 'free-time-live': 'Free Time, Live!', 'seasons-and-celebrations': 'Seasons & Celebrations' };
   const q = new URLSearchParams(location.search);
   const ls = q.get('ls') || '', lp = q.get('lp') || '', level = ROUTES.includes(q.get('route')) ? q.get('route') : 'insecure', key = q.get('key') === '1';
+  // tabs=a,b: only those tabs (panel ids), no goal, review or study guide; bare=1: no name line or note (Roger, 7 Nov 2026: "print today's
+  // sections for those who don't have a Chromebook": shared/print/today.html puts several of these on one sheet)
+  const tabs = (q.get('tabs') || '').split(',').filter(Boolean), bare = q.get('bare') === '1';
   const base = '../../' + ls + '/';
   const ca = level === 'insecure' || level === 'beginners';
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
@@ -190,6 +193,7 @@
 
   function header(LP) {
     const course = ls.split('/')[0], name = LS[ls.split('/')[1]] || '';
+    if (bare) return '<header class="sheet-head part-head"><h1>' + (typeof LP.n === 'number' ? 'Learning Path ' + LP.n + ' · ' : '') + LP.title + '</h1></header>';
     return '<header class="sheet-head"><div class="who"><span>' + T('Nom', 'Name') + ': </span><span>' + T('Grup', 'Group') + ': </span><span>' + T('Data', 'Date') + ': </span></div>' +
       '<p class="eyebrow">' + (COURSE[course] || '') + ' · ' + name + ' · ' + T('Ruta', 'Route') + ' ' + STUDENT[level] + (key ? ' · ' + T('SOLUCIONS', 'ANSWER KEY') : '') + '</p>' +
       '<h1>' + (typeof LP.n === 'number' ? 'Learning Path ' + LP.n + ' · ' : '') + LP.title + '</h1>' +
@@ -266,6 +270,7 @@
     if (level === 'native') await load(base + 'data/native/' + lp + '.js').catch(() => {});
     await load(base + 'data/study/' + lp + '.js').catch(() => {});
     usePanels();
+    if (tabs.length) LP.panels = LP.panels.filter(p => tabs.includes(p.id));
     document.title = LP.title + ' · ' + STUDENT[level] + (key ? ' · key' : '');
     const parts = LP.panels.map(p => {
       const body = (R[p.type] || (() => null))(p);
@@ -274,8 +279,8 @@
       return '<section class="step"><div class="head"><h2><span class="num">' + n + '</span>' + tx(p.title || p.tab) + '</h2>' +
         (p.intro ? '<p class="intro">' + tx(p.intro) + '</p>' : '') + '</div>' + body + '</section>';
     }).join('');
-    const reflective = LP.panels.some(p => p.id === 'recall');
-    const study = studyGuide();
+    const reflective = !tabs.length && LP.panels.some(p => p.id === 'recall');
+    const study = tabs.length ? '' : studyGuide();
     let tr = '';
     for (const [i, t] of transcripts.entries()) tr += '<div class="tr"><h3>' + T('Transcripció ', 'Transcript ') + (i + 1) + ' · ' + esc(t.title) + '</h3>' + (t.script || await vtt(base + t.vtt)) + '</div>';
     const out = document.getElementById('sheet');
