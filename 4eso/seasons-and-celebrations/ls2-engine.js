@@ -92,13 +92,16 @@ var LS2 = (function () {
     state.items[k] = { level, date: new Date().toISOString(), q: items.map((it, i) => Array.isArray(src) ? src.indexOf(it) : i), ok: got.map(g => g[0] ? 1 : 0), a: got.map(g => g[1]) }; save();
   }
   function steps() { return LP.panels.flatMap(p => p.type === 'info' || p.type === 'summary' ? [] : p.type === 'vocab' ? (p.practice ? ['cards', 'practice'] : ['cards']) : [p.id]); }
+  // steps of a section the teacher has not opened yet and the student never did are left out (EL_HIDDEN_STEPS, el-cloud.js lockSections):
+  // students never see that anything is locked (Roger, 7 Nov 2026)
   function progress() {
-    const s = steps(), n = s.filter(k => state.done[k]).length;
+    const hid = window.EL_HIDDEN_STEPS || [], s = steps().filter(k => state.done[k] || !hid.includes(k)), n = s.filter(k => state.done[k]).length;
     $('#progressLabel').textContent = cap(level);
     $('#progressText').textContent = n + ' / ' + s.length;
     $('#progressBar').style.width = (n / s.length * 100) + '%';
     if (LP && LP.panels) markTabs();
   }
+  window.elProgress = () => { try { progress(); } catch (e) {} };
   function saveProduct(piece, text) {
     let all = {}; try { all = JSON.parse(localStorage.getItem(PRODUCTS) || '{}'); } catch (e) {}
     all[piece] = { level, text, date: new Date().toISOString() };
@@ -1283,7 +1286,7 @@ var LS2 = (function () {
   }
   function markTabs() {
     let next = false;
-    LP.panels.forEach(p => { const t = document.querySelector('.tab[data-panel="' + p.id + '"]'); if (!t) return; const d = stepDone(p); t.classList.toggle('done', d); t.classList.toggle('next', !d && !next); t.dataset.next = ca() ? 'SEGÜENT' : 'NEXT'; if (!d) next = true; });
+    LP.panels.forEach(p => { const t = document.querySelector('.tab[data-panel="' + p.id + '"]'); if (!t || t.classList.contains('el-sec-hide')) return; const d = stepDone(p); t.classList.toggle('done', d); t.classList.toggle('next', !d && !next); t.dataset.next = ca() ? 'SEGÜENT' : 'NEXT'; if (!d) next = true; });
     // Phone (Roger, 6 Nov 2026): keep the open step visible in the strip of steps.
     const a = $('.lp-body>.tabs .tab.active');
     if (a && innerWidth < 1000 && markTabs.on !== a.dataset.panel) { markTabs.on = a.dataset.panel; a.parentNode.scrollLeft = a.offsetLeft - a.parentNode.offsetLeft - 16; }
