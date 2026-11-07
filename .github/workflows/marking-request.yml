@@ -1,8 +1,9 @@
 # Marking on request (Roger, 6 Nov 2026), free (GitHub Actions in a public repo): every 15 minutes, if the teacher pressed
 # ✏️ Correct everything waiting now on the dashboard (settings/marking.request), it starts the scheduled task "English Lab: mark and correct"
 # on claude.ai at once (tools/marking/request.mjs). Secrets: FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM (read-only, already there) and
-# MARK_TASK_TOKEN (the scheduled task's API trigger token). Without MARK_TASK_TOKEN every run does nothing. GitHub may start a run a few
-# minutes late. The log shows no names (it is public).
+# MARK_TASK_TOKEN (the scheduled task's API trigger token). Since 7 Nov 2026 the dashboard starts the task itself through the school
+# Apps Script (the token lives there) and this is the backup: GitHub runs this schedule only every few hours, not every 15 minutes. It asks
+# the school script first (SCHOOL_MAIL_URL + SCHOOL_MAIL_KEY), then MARK_TASK_TOKEN. The log shows no names (it is public).
 name: Marking on request
 
 on:
@@ -24,6 +25,8 @@ jobs:
     timeout-minutes: 5
     env:
       FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM }}
+      SCHOOL_MAIL_URL: ${{ secrets.SCHOOL_MAIL_URL }}
+      SCHOOL_MAIL_KEY: ${{ secrets.SCHOOL_MAIL_KEY }}
       MARK_TASK_TOKEN: ${{ secrets.MARK_TASK_TOKEN }}
       MARK_TASK_URL: ${{ secrets.MARK_TASK_URL }}
       MARK_STATE: .mark-state.json

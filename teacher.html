@@ -326,8 +326,11 @@ const api={
   listRoute:(rid,level,ls)=>{const v=level?{level,ls}:null;if(DEMO){if(v)S.D.ro[rid].route=v;else delete S.D.ro[rid].route;return}return put(["roster",rid],{route:v||F.deleteField()})},
   cuts:(c,o)=>{(S.D.cuts=S.D.cuts||{})[c]=o;return put(["settings","routes"],{[c]:o})},
   // ✏️ Correct everything waiting now: settings/marking.request = {at, by}; null cancels it (see corrPage)
-  mkAsk:on=>{const v=on?{at:new Date().toISOString(),by:"dashboard"}:null;S.D.mk=Object.assign({},S.D.mk);if(v)S.D.mk.request=v;else delete S.D.mk.request;CORR.mkT=Date.now();
-    if(DEMO)return;return put(["settings","marking"],{request:v||F.deleteField()})},
+  // Since 7 Nov 2026 the button also starts the task at once through the school Apps Script (markStart); request.fired = when it did, so
+  // the GitHub Action (the backup, which GitHub runs only every few hours) does not start it again.
+  mkAsk:async on=>{const v=on?{at:new Date().toISOString(),by:"dashboard"}:null;S.D.mk=Object.assign({},S.D.mk);if(v)S.D.mk.request=v;else delete S.D.mk.request;CORR.mkT=Date.now();
+    if(DEMO){if(v)v.fired=new Date().toISOString();return}await put(["settings","marking"],{request:v||F.deleteField()});if(!v)return;
+    const r=await markStart(v.at);CORR.start=r;if(r.ok){v.fired=r.started||r.already;await put(["settings","marking"],{request:{fired:v.fired}})}},
   mkRead:async()=>{if(DEMO)return;const d=await F.getDoc(F.doc(db(),"settings","marking"));S.D.mk=d.exists()?d.data():null;CORR.mkT=Date.now()},
   reject:(u,ls)=>{const l=S.D.lv[u][ls],to=l.request;if(DEMO){delete l.request;delete l.reason;l.declined=to;return}return put(["students",u,"levels",ls],{request:F.deleteField(),reason:F.deleteField(),declined:to,declinedAt:F.serverTimestamp()})},
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
@@ -390,6 +393,13 @@ async function mailStudents(emails,subject,body){if(DEMO||!emails.length)return 
     try{const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:tok,bcc:part,subject,body,name:"Roger Beltran · English Lab"})});j=await r.json()}catch(e){throw new Error("the school mail script did not answer")}
     if(!j||!j.ok)throw new Error(j&&j.error==="not the teacher"?"the school mail script is the old version (update it: tools/notify/school-mail.gs)":(j&&j.error)||"no answer");n+=part.length}
   return n}
+// ✏️ Correct everything waiting now, at once (Roger, 7 Nov 2026): the school Apps Script starts the scheduled task "English Lab: mark and
+// correct" with its API token (tools/notify/school-mail.gs, action "mark"; the token never reaches the page). {ok, started|already} or
+// {ok: false, error}; an old script version answers "nothing to send". Never throws: the GitHub Action is the backup.
+async function markStart(at){try{const tok=await ELCloud.auth.currentUser.getIdToken();
+    const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:tok,action:"mark",at})});const j=await r.json();
+    return j&&j.ok?j:{ok:false,error:j&&j.error==="nothing to send"?"old script":(j&&j.error)||"no answer"}}
+  catch(e){console.warn("mark start",e);return {ok:false,error:"the school script did not answer"}}}
 // sends in the background; a small note says how it went (the homework or announcement is saved either way)
 function mailNote(p,what){p.then(n=>{if(!n)return;const d=document.createElement("div");d.textContent="✉️ "+what+" emailed to "+n+" student"+(n===1?"":"s");
   d.style.cssText="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0f766e;color:#fff;padding:8px 16px;border-radius:999px;z-index:10010;font:600 14px system-ui";document.body.appendChild(d);setTimeout(()=>d.remove(),5000)})
@@ -1195,11 +1205,12 @@ const COVK={crit:"criteria and competences",gram:"grammar",lex:"lexicon"};
 //    sent back) and answers[step].at (students' comments answered on Fridays). Each name opens that correction (wrOpen / cpOpen / cellPanel).
 //  • Waiting: what the next run will correct, with the same rules as tools/marking/marks.mjs (fb-ready, and ready for the marked steps:
 //    a marked step that is not ready yet, one week after its session is ticked, waits for that), plus the possible copies waiting for you.
-//  • ✏️ Correct everything waiting now: settings/marking.request = {at, by} (teacher only). The GitHub Action "Marking on request"
-//    (.github/workflows/marking-request.yml, every 15 minutes) sees it and starts the scheduled task "English Lab: mark and correct" through
-//    its API trigger (secret MARK_TASK_TOKEN); marks.mjs saves settings/marking.run = {started, via} on `ready` (its first step) and
-//    run.done on `audit` (its last step), so the card says asked → correcting → done. Without the secret nothing starts: after 30 minutes
-//    the card says so and links to the scheduled tasks page (Run now).
+//  • ✏️ Correct everything waiting now: settings/marking.request = {at, by} (teacher only), and at once the school Apps Script starts the
+//    scheduled task "English Lab: mark and correct" through its API trigger (markStart; the token is in the script) and request.fired is
+//    saved. Backup: the GitHub Action "Marking on request" (.github/workflows/marking-request.yml; GitHub runs it only every few hours)
+//    starts it if nothing did (Roger, 7 Nov 2026: the first press waited 45 minutes and then hit the read limit). marks.mjs saves settings/marking.run = {started, via} on `ready` (its first step) and
+//    run.done on `audit` (its last step), so the card says asked → correcting → done. If the script could not start it, or nothing began 20 minutes
+//    after it did, the card says so and links to the scheduled tasks page (Run now).
 //  • ⓘ What runs on its own and what needs Claude (Roger, 6 Nov 2026).
 // Reads: only settings/marking (1 document, again when the page opens after a minute); everything else is what the dashboard has loaded.
 // Marking stays apart from the page (Roger, 6 Nov 2026: if other teachers use the site one day, they would plug in their own Claude or
@@ -1240,6 +1251,12 @@ function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
       Object.entries(x.answers||{}).forEach(([step,o])=>{if(o&&o.at)done.push(Object.assign({step,k:"answer",name:((a.steps||[]).find(z=>z[0]===step)||[])[1]||corrNm(a.id,step),at:tms(o.at)},base))})})});
   done.sort((p,q)=>q.at-p.at);CORR.d=S.D;CORR.t=Date.now();CORR.v={wait,done};return CORR.v}
 // the next scheduled run: Wednesday at about 15:00 (Madrid time; the scheduled task starts at 14:43)
+// what the asked card says: started at once by the school script (fd), or why not and what to do
+function corrAskMsg(st,RUN){const e=(CORR.start||{}).error,why=e==="no task token"?"the task's token is not in your school script yet"
+    :e==="old script"?"your school script is the old version":e?"the school script said: "+esc(e):"";
+  if(st.fd&&!st.slow)return `Claude got it at ${esc(new Date(st.fd).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))} and is starting. In a few minutes this card says <b>Claude is correcting now</b> (press ↻ Check again). It corrects everything that is waiting, in every group.`;
+  if(st.fd)return `Claude got it at ${esc(new Date(st.fd).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))} but has not started after 20 minutes. Open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`;
+  return `It could not start at once${why?" ("+why+")":""}. A backup check on GitHub will start it, but that can take a few hours. To start it now, open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`}
 function corrNext(){const now=window.EL_NOW?new Date(window.EL_NOW):new Date();for(let k=0;k<8;k++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+k);
   if(d.getDay()===3&&!(k===0&&now.getHours()*60+now.getMinutes()>=14*60+43))return d}return null}
 const corrWhen=v=>new Date(v).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
@@ -1247,7 +1264,7 @@ const corrDay=v=>new Date(v).toLocaleDateString("en-GB",{weekday:"long",day:"num
 // where the request is: {s: "asked" | "running" | "done" | "idle", ...}
 function corrState(){const m=S.D.mk||{},rq=tms((m.request||{}).at),run=m.run||{},st=tms(run.started),dn=tms(run.done),now=Date.now();
   if(st&&dn<st&&now-st<12*3600e3)return {s:"running",st,via:run.via};
-  if(rq&&rq>st)return {s:"asked",rq,slow:now-rq>30*60e3};
+  if(rq&&rq>st){const fd=tms((m.request||{}).fired);return {s:"asked",rq,fd,slow:fd?now-Math.max(fd,rq)>20*60e3:true}}
   return {s:st?"done":"idle",st,dn,via:run.via}}
 const corrChips=(L,more)=>{const by={};L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});return Object.values(by).map(is=>{const i=is[0],s=S.P[i.u];
   return `<button class="chip mini cchip ${is.some(x=>x.late)?"late":""}" data-do="corropen" data-u="${i.u}" data-a="${esc(i.aid)}" data-s="${esc(i.step)}" data-k="${i.k}" title="Open it">${s?name(s):"?"}${is.length>1?` ×${is.length}`:""}${is.some(x=>x.late)?" ❌":""}</button>`}).join("")+(more||"")};
@@ -1263,7 +1280,7 @@ function corrPage(){
   const allNow=wait.filter(i=>i.k!=="copy"&&i.ready).length,st=corrState(),nx=corrNext(),RUN=`<a href="https://claude.ai/code/routines" target="_blank" rel="noopener">scheduled tasks on claude.ai ↗</a>`;
   // the big card
   const card=st.s==="running"?`<div class="cont"><span class="ck">Claude is correcting now</span><span class="ct">Started ${esc(corrWhen(st.st))}</span><span class="cs">${st.via==="request"?"You asked for it here.":"The weekly Wednesday run."} It usually takes 20 to 60 minutes. The corrections appear below as they are saved, and students see each one in that step of their learning path.</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button></div></div>`
-    :st.s==="asked"?`<div class="cont ${st.slow?"idle":""}"><span class="ck">${st.slow?"Not started yet":"You asked for a correction"}</span><span class="ct">Asked ${esc(corrWhen(st.rq))}</span><span class="cs">${st.slow?`It should have started within 15 minutes. The automatic start may not be set up yet: open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`:"Claude starts within 15 minutes and corrects everything that is waiting (all groups)."}</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button><button class="s2" data-do="corrcancel">✕ Cancel the request</button></div></div>`
+    :st.s==="asked"?`<div class="cont ${st.slow?"idle":""}"><span class="ck">${st.slow?"Not started yet":"Starting now"}</span><span class="ct">Asked ${esc(corrWhen(st.rq))}</span><span class="cs">${corrAskMsg(st,RUN)}</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button><button class="s2" data-do="corrcancel">✕ Cancel the request</button></div></div>`
     :`<div class="cont ${allNow?"":"done"}"><span class="ck">Next correction · ${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Wednesday"} · about 15:00</span>`
       +`<span class="ct">${allNow?plural(allNow,"piece")+" waiting to be corrected":"Nothing is waiting"}</span>`
       +`<span class="cs">${st.st?`Last run: ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}. `:""}${allNow?"Don't want to wait until Wednesday? Claude can correct them now (every group).":"Everything students handed in is corrected."}</span>`
@@ -1276,9 +1293,9 @@ function corrPage(){
   const view=`<div class="bar"><span class="muted">Show:</span> ${[["stu","By student"],["act","By activity"]].map(([v,l])=>`<button class="chip ${S.corrV===v?"on":""}" data-do="corrv" data-v="${v}">${l}</button>`).join("")}</div>`;
   const itemB=i=>`<button class="chip mini cchip ${i.late?"late":""}" data-do="corropen" data-u="${i.u}" data-a="${esc(i.aid)}" data-s="${esc(i.step)}" data-k="${i.k}" title="Open what they handed in">${CK[i.k][0]} ${esc(i.name||CK[i.k][1])} <span class="muted">· ${esc(actTitle(i.aid))}</span>${i.late?" ❌":""}${i.k==="level"&&!i.ready?" ⏳":""}</button>`;
   const stuRows=L=>{const by={};L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});return Object.values(by).sort((p,q)=>byName(S.P[p[0].u]||{},S.P[q[0].u]||{})).map(is=>{const s=S.P[is[0].u],first=Math.min(...is.map(i=>i.at).filter(Boolean));
-    return `<div class="cstu"><div class="cst"><b>${s?name(s):"?"}</b> <span class="muted">is waiting for ${plural(is.length,"correction")}${isFinite(first)?" · handed in since "+esc(ELWeek.date(ymd(first))):""}</span>${fixB("Correct it now","Claude corrects everything that is waiting now ("+fullName(s||{})+"'s work too), within 15 minutes")}</div><div class="cwho">${is.map(itemB).join("")}</div></div>`}).join("")};
+    return `<div class="cstu"><div class="cst"><b>${s?name(s):"?"}</b> <span class="muted">is waiting for ${plural(is.length,"correction")}${isFinite(first)?" · handed in since "+esc(ELWeek.date(ymd(first))):""}</span>${fixB("Correct it now","Claude corrects everything that is waiting now ("+fullName(s||{})+"'s work too): it starts within a few minutes")}</div><div class="cwho">${is.map(itemB).join("")}</div></div>`}).join("")};
   const laterB=later.length?`<details class="cgrp" data-k="cwlater" ${S.open.has("cwlater")?"open":""}><summary><b>⏳ Not ready yet: ${plural(later.length,"marked step")}</b></summary><p class="muted">Steps with a level (reading log, listening chart…) are marked one week after you tick their session in the time plan, so everyone had time to hand them in. The button does not mark them earlier.</p>${corrLines(later)}</details>`:"";
-  const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length?fixB("Correct everything now","Claude corrects everything that is waiting now, in every group, within 15 minutes"):""}</div>`
+  const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length?fixB("Correct everything now","Claude corrects everything that is waiting now, in every group: it starts within a few minutes"):""}</div>`
     +`<p class="muted">Everything students handed in that has no correction yet. Claude corrects it on Wednesday, or now if you press the button. Click a piece to see what they wrote.</p>`
     +(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything now, or tell Claude in the English Lab chat.</p>`:"")+view
     +(S.corrV==="act"
@@ -1299,7 +1316,7 @@ function corrPage(){
       <li><b>Wednesday about 15:00</b> · corrects everything students wrote (writings, speaking and Talk transcripts, reflections) and marks the steps with a level. Possible copies go to your To do; texts that were mostly pasted are sent back to redo.</li>
       <li><b>Friday 15:00</b> · answers students' comments on their work (anything that needs you shows 🙋 in the To do).</li>
       <li><b>Friday 19:37</b> · checks that Wednesday's run worked and warns you on your phone if it did not.</li>
-      <li><b>When you press ✏️ Correct everything waiting now</b> · the same as Wednesday, at once (it starts within 15 minutes).</li>
+      <li><b>When you press ✏️ Correct everything waiting now</b> · the same as Wednesday, at once (it starts within a few minutes).</li>
       <li><b>When you ask in the English Lab chat</b> · fixes, new features and new audio.</li></ul>
     <h3>If Claude stopped</h3><p>Students could still do everything. Their writings would wait here without a correction and comments would stay unanswered. You can always do it by hand: open a hand-in and write your correction, or use 🤖 Marking sheet in a group's To do. Corrections stay the same whoever writes them.</p>`)}</div>`;
   return `<div class="ph"><h1>✏️ Corrections</h1><div class="sub">Writings, speaking and Talk transcripts, reflections and marked steps of every group · Claude corrects them every Wednesday</div></div>`
