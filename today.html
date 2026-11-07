@@ -197,24 +197,14 @@ const COURSES={"2eso":"2 ESO","4eso":"4 ESO"};
 const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName=l=>esc(elLsName(l));
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
-  // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css)
-  const b=(cls,h,ic,txt,x)=>`<a class="nv${cls}" href="${h}"${x||""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`;
-  const pl=placeNow(),rd=pl==="books"||pl==="lang",cur=k=>pl===k?' aria-current="page"':"";
-  const html=b(rd?"":" on","today.html","🏠",t("El meu tauler","My dashboard"),rd?"":' aria-current="page"')
-    +cs.map(c=>b("",`${c}/index.html`,"🗂",`${t("El meu curs","My course")} · ${COURSES[c]}`)+lss.filter(l=>l.course===c).map(l=>b(" sub",lsHref(l),elLsNum(l)||"📚",esc(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
-    // 📖 Books and 🔤 Grammar and vocabulary of the current LS (Roger, 7 Nov 2026: "on the left [menu] I want a section called books with the
-    // books of the LS, a section with grammar and vocabulary summary")
-    +(cs.length?b(pl==="books"?" on":"","#books","📖",t("Llibres","Books"),cur("books"))+b(pl==="lang"?" on":"","#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary"),cur("lang")):"")
-    +b("","lab/","🎲",t("Jocs","Games"))+b("","lab/practice.html","🎯",t("Practica","Practise"))
-    // 🎬 hidden for now (Roger, 7 Nov 2026: "take this out for the moment"): set HOWTO_MENU=true to bring it back
-    +(HOWTO_MENU?b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"'):"")
-    +b("","#help","❓",t("Ajuda","Help"))   // Help near the bottom of the menu (Roger, 7 Nov 2026: "only on the left menu at the bottom")
-    +(APP()?"":b("","#phone","📱",t("Estudia amb el mòbil","Study on your phone")));   // under Help, off the board home (Roger, 7 Nov 2026)
+  // the same menu as every other student page: elStudentMenu in shared/js/el-catalog.js (Roger, 7 Nov 2026: "this should always be the same")
+  const pl=placeNow(),here={home:"board",books:"books",lang:"lang",help:"help",phone:"phone"}[pl]||"";
+  if(!all())try{localStorage.setItem("el_menu_ls",JSON.stringify(lss.map(l=>l.id)))}catch(e){}   // the other pages show the same LSs
+  const html=elStudentMenu({root:"",courses:cs,lss,ca:lang()==="ca",board:location.search||"today.html",here,app:APP()});
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
 // tools/site-video (real screens of the site, no subtitles). A box on the board and a link in the menu.
-const HOWTO_MENU=false;   // the 🎬 How the website works item in the left menu (off for now, Roger 7 Nov 2026)
 const HOWTO="video/how-english-lab-works",HOWTO_V="20261102c";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
 // One video per language (Roger, 2 Nov 2026: "this videos could be merged … the original video with the changes"): the website
 // video now holds the whole board, part by part, on a sample student (tools/site-video/full.json).

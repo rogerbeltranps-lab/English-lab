@@ -42,11 +42,13 @@
         +(window.EL_LS||[]).filter(l=>l.course===c).map((l,i)=>a(lsHref(l),esc(lsName(l)),"sub"+(l.id===LS?" on":""),l.id===LS)).join("")).join("")
         +`<div class="nvsep"></div>`+a(ROOT+"lab/","🎲 "+t("Jocs","Games"))+a(ROOT+"lab/practice.html",t("Practica","Practise"));
     }else{
-      html=a(boardHref(),"🏠 "+t("El meu tauler","My dashboard"))
-        +a("index.html",esc(lsName(ls)),"on",true)
-        +a(ROOT+COURSE+"/index.html","🗂 "+t("Totes les Learning Situations","All Learning Situations"))
-        +a(ROOT+"lab/","🎲 "+t("Jocs","Games"))+a(ROOT+"lab/practice.html",t("Practica","Practise"))
-        +a(ROOT+"today.html#help","❓ "+t("Ajuda","Help"));
+      // the students' menu, the same on every page: elStudentMenu (el-catalog.js; Roger, 7 Nov 2026: "this should always be the same")
+      let g=null;try{g=(window.ELCloud&&ELCloud.group&&ELCloud.group())||null}catch(e){}
+      let app=false;try{app=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){}
+      // the LS being looked at is in the list even when the saved list does not have it
+      const ML=window.elMenuLs?elMenuLs([COURSE],g):[],lss=ML.some(l=>l.id===LS)?ML:[...ML,...(window.EL_LS||[]).filter(l=>l.id===LS)];
+      html=window.elStudentMenu?elStudentMenu({root:ROOT,courses:[COURSE],lss,ca:CA,board:boardHref(),here:"ls:"+LS,app})
+        :a(boardHref(),"🏠 "+t("El meu tauler","My dashboard"))+a("index.html",esc(lsName(ls)),"on",true);
     }
     $$(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
     const stu=!teach()&&who.role!=="tester";document.body.classList.toggle("stu",stu);
