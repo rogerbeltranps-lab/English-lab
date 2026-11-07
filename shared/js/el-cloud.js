@@ -971,15 +971,22 @@ function bellWatch(cb){
   return()=>clearInterval(t);
 }
 // 🛠 Is the site in maintenance? (see mtShow at the top). true: the message is on screen and the page stops here.
+// A page that opened while it was off keeps listening too (Roger, 7 Nov 2026: a student handed in a Listening chart at 16:40 with
+// maintenance on since 10:52: his page was opened before, and the listener used to stop when the first answer was "off"). When it
+// goes on, the page reloads (el_mt with t:0, so the next load waits for the check) and shows the message. A page opened within 2 minutes of a check that found it off
+// does not wait for the answer (no delay), but it still listens.
 function mtCheck(u){
   if(mtStop){mtStop();mtStop=null}
-  const c=mtGet();if(c&&!c.on&&Date.now()-c.t<MT_MS){mtHide();return Promise.resolve(false)}
-  return new Promise(res=>{let first=true,o=null;
-    const off=()=>{mtPut({on:false});if(mtStop){mtStop();mtStop=null}};
+  const c=mtGet(),quick=!!(c&&!c.on&&Date.now()-c.t<MT_MS);if(quick)mtHide();
+  return new Promise(res=>{let first=true,o=null,on=false;if(quick)res(false);
     const stop=onSnapshot(doc(db,"site","maintenance"),async s=>{const d=s.exists()?s.data():{};
-      if(!first){if(!d.on){off();location.reload()}else if(o&&((d.note||"")!==o.note||JSON.stringify(d.pdfs||null)!==JSON.stringify(o.pdfs))){o.note=d.note||"";o.pdfs=d.pdfs||null;mtPut(Object.assign({on:true},o));mtShow(o,isTester(u))}return}
+      if(!first){if(!d.on){if(on){mtPut({on:false});location.reload()}}
+        else if(!on){on=true;frozen=true;mtPut({on:false,t:0});location.reload()}
+        else if(o&&((d.note||"")!==o.note||JSON.stringify(d.pdfs||null)!==JSON.stringify(o.pdfs))){o.note=d.note||"";o.pdfs=d.pdfs||null;mtPut(Object.assign({on:true},o));mtShow(o,isTester(u))}return}
       first=false;
-      if(!d.on){off();mtHide();res(false);return}
+      if(!d.on){mtPut({on:false});if(!quick)mtHide();res(false);return}
+      if(quick){on=true;frozen=true;mtPut({on:false,t:0});location.reload();return}   // went on in the last 2 minutes: reload into the message (t:0, so that load waits for the check)
+      on=true;
       frozen=true;   // nothing typed behind the message is saved
       const g=myGroup||(myRoster||{}).group||"",mm=/^([24])eso/i.exec(g),course=courseOf(g)||(mm?mm[1]+"eso":null);
       const ls=(window.EL_LS||[]).filter(l=>l.course===course).pop();let route=null;
