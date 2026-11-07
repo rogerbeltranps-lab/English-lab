@@ -20,11 +20,14 @@
   const NAME={"2":"Listening","3":"Speaking","4":"Reading","5":"Writing","1":"Intercultural awareness","6":"Research and information",
     "7":"Personal reading","8":"Mediation","9":"Learning strategies","10":"Ethical communication"};
   const ORDER=["2","3","4","5","1","6","7","8","9","10"],COMM=["2","3","4","5"];
+  // one colour and icon per competence, the same as the LS pages' About this LS (Roger, 7 Nov 2026: "I want this to have the same style")
+  const ICON={"1":"🌍","2":"🎧","3":"🗣","4":"📖","5":"✏️","6":"🔎","7":"📚","8":"🔁","9":"🧠","10":"🕊"};
+  const ceName=ce=>`<span class="rf-ic" aria-hidden="true">${ICON[ce]}</span> <span class="rf-cc">CE${ce}</span> ${NAME[ce]}`;
   const crOf=ce=>Object.keys(R.criteria).filter(k=>k.split(".")[0]===ce).sort((x,y)=>+x.split(".")[1]-+y.split(".")[1]);
   // criteria of competence ce worked in course c (1r/3r: every communicative criterion of the band, the integrated ones by the course distribution)
   const inCourse=(ce,c)=>COMM.includes(ce)?crOf(ce).filter(k=>R.criteria[k][band(c)]):((R.dist[c]||{})[ce]||[]);
   const progEng=(c,ce)=>R.prog[PC[c]].eng[ce]||[[],[],[],[],[],[]];
-  const pill=k=>`<span class="rf-p">${esc(k)}</span>`;
+  const pill=k=>{const ce=String(k).split(".")[0];return `<span class="rf-p${ICON[ce]?" rf-k"+ce:""}">${esc(k)}</span>`};
   const cols=()=>S.c==="all"?COURSES:COURSES.filter(([c])=>c===S.c);
   const lsCols=c=>[1,2,3,4,5,6].filter(n=>S.ls==="all"||+S.ls===n);
 
@@ -42,7 +45,7 @@
 
   // ---- English competences
   function comp(){
-    const rowsM=ORDER.map((ce,i)=>`${i===0?`<tr class="rf-sec"><td colspan="99">Communicative skills (every course, every term)</td></tr>`:i===4?`<tr class="rf-sec"><td colspan="99">Integrated competences</td></tr>`:""}<tr data-q="${esc(("ce"+ce+" "+NAME[ce]+" "+R.statements[ce]).toLowerCase())}"><th class="rf-l">CE${ce} · ${NAME[ce]}</th>`
+    const rowsM=ORDER.map((ce,i)=>`${i===0?`<tr class="rf-sec"><td colspan="99">💬 Communicative skills (every course, every term)</td></tr>`:i===4?`<tr class="rf-sec"><td colspan="99">🧩 Integrated competences</td></tr>`:""}<tr class="rf-k${ce}" data-q="${esc(("ce"+ce+" "+NAME[ce]+" "+R.statements[ce]).toLowerCase())}"><th class="rf-l">${ceName(ce)}</th>`
       +cols().map(([c])=>PC[c]?lsCols(c).map(n=>{const x=progEng(c,ce)[n-1];return `<td>${x.length?x.map(pill).join(" "):'<span class="muted">—</span>'}</td>`}).join("")
         :`<td>${inCourse(ce,c).map(pill).join(" ")||'<span class="muted">—</span>'}</td>`).join("")+`</tr>`).join("");
     const matrix=`<h3>Where each criterion is assessed</h3><p class="muted">2n and 4t: the criteria each LS assesses (annual programme). 1r and 3r: the criteria of the course (communicative ones all, integrated ones by the course distribution of the mother doc, a proposal).</p>`
@@ -52,7 +55,7 @@
     const bands=S.c==="all"?["a","b"]:[band(S.c)],BT={a:"1r i 2n ESO",b:"3r i 4t ESO"};
     const okLs=k=>!PC[S.c]||S.ls==="all"||progEng(S.c,k.split(".")[0])[S.ls-1].includes(k);
     const list=ORDER.map(ce=>{const ks=crOf(ce).filter(k=>bands.some(b=>R.criteria[k][b])&&(S.c==="all"||PC[S.c]||inCourse(ce,S.c).includes(k))&&okLs(k));if(!ks.length)return "";
-      return `<tr class="rf-sec"><td colspan="99"><b>CE${ce} · ${NAME[ce]}.</b> <span class="rf-st">${esc(R.statements[ce])}</span></td></tr>`
+      return `<tr class="rf-sec rf-k${ce}"><td colspan="99"><b>${ceName(ce)}.</b> <span class="rf-st">${esc(R.statements[ce])}</span></td></tr>`
         +ks.map(k=>`<tr data-q="${esc((k+" ce"+ce+" "+NAME[ce]+" "+R.statements[ce]+" "+bands.map(b=>R.criteria[k][b]).join(" ")).toLowerCase())}"><th>${k}</th>${bands.map(b=>`<td class="rf-t">${esc(R.criteria[k][b])||'<span class="muted">— (only in 3r i 4t)</span>'}</td>`).join("")}<td class="rf-w">${where(k)}</td></tr>`).join("")}).join("");
     return matrix+`<h3>Competences and assessment criteria</h3><p class="muted">Decret 175/2022, Llengua estrangera. Each competence has the same statement in all ESO; the criteria change between 1r–2n and 3r–4t.</p>`
       +`<div class="qwrap"><table class="rf"><thead><tr><th>Criterion</th>${bands.map(b=>`<th>${BT[b]}</th>`).join("")}<th>Where it is assessed</th></tr></thead><tbody>${list}</tbody></table></div>`;
@@ -111,7 +114,13 @@
   css.textContent=`table.rf{width:100%}table.rf thead th{position:static}table.rf th,table.rf td{text-align:left;vertical-align:top}table.rf td.rf-t{min-width:260px;max-width:520px;white-space:normal}table.rf td.rf-w{white-space:nowrap;font-size:12px}table.rf td.rf-m{min-width:110px;white-space:normal}
 table.rf th.rf-l{white-space:nowrap}table.rf tr.rf-sec td{background:#f1f5f9;font-weight:700}table.rf tr.rf-sec2 td{background:#f8fafc}table.rf .rf-st{font-weight:400;color:#475569}
 .rf-p{display:inline-block;border:1px solid #cbd5e1;border-radius:6px;padding:0 5px;font-weight:600;background:#fff}table.rf th.rf-c2,table.rf th.rf-c1{border-top:3px solid #16a34a}table.rf th.rf-c4,table.rf th.rf-c3{border-top:3px solid #2563eb}
-.rf-cefr{display:inline-block;margin-top:2px;border-radius:5px;padding:0 6px;font-size:12px;font-weight:700;background:#ede9fe;color:#4c1d95}.rf-lI,.rf-lC,.rf-lR{display:inline-block;border-radius:5px;padding:0 5px;font-weight:700;font-size:12px}.rf-lI{background:#dbeafe;color:#1e3a8a}.rf-lC{background:#dcfce7;color:#14532d}.rf-lR{background:#fef3c7;color:#78350f}`;
+.rf-cefr{display:inline-block;margin-top:2px;border-radius:5px;padding:0 6px;font-size:12px;font-weight:700;background:#ede9fe;color:#4c1d95}.rf-lI,.rf-lC,.rf-lR{display:inline-block;border-radius:5px;padding:0 5px;font-weight:700;font-size:12px}.rf-lI{background:#dbeafe;color:#1e3a8a}.rf-lC{background:#dcfce7;color:#14532d}.rf-lR{background:#fef3c7;color:#78350f}
+.rf-k1{--k:#0f766e;--ks:#ccfbf1}.rf-k2{--k:#1d4ed8;--ks:#dbeafe}.rf-k3{--k:#c2410c;--ks:#ffedd5}.rf-k4{--k:#15803d;--ks:#dcfce7}.rf-k5{--k:#7e22ce;--ks:#f3e8ff}
+.rf-k6{--k:#a16207;--ks:#fef3c7}.rf-k7{--k:#0369a1;--ks:#e0f2fe}.rf-k8{--k:#4d7c0f;--ks:#ecfccb}.rf-k9{--k:#475569;--ks:#e2e8f0}.rf-k10{--k:#be123c;--ks:#ffe4e6}
+.rf-p[class*=rf-k]{border:0;border-radius:999px;padding:1px 8px;background:var(--ks);color:var(--k);font-weight:800}
+table.rf tr[class*=rf-k] th.rf-l{border-left:6px solid var(--k);background:var(--ks);color:var(--k)}
+table.rf tr.rf-sec[class*=rf-k] td{background:var(--ks);border-left:6px solid var(--k)}table.rf tr.rf-sec[class*=rf-k] td>b{color:var(--k)}
+.rf-cc{display:inline-block;background:var(--k);color:#fff;border-radius:7px;padding:0 6px;font-size:12px;font-weight:900}.rf-ic{font-size:16px}`;
   document.head.appendChild(css);
   window.ELRef={view};
 })();
