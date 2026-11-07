@@ -168,7 +168,7 @@ window.ELMark=(function(){
     // p counts every paste, so it can be more than the text (pasted several times)
     if(p>=20&&/spoken/i.test(why||""))out.push(ca?"has enganxat el text en lloc de dir-lo amb el micròfon":"you pasted the text instead of saying it into the microphone");
     else if(p>=20)out.push(p>=n?(ca?"has enganxat el text sencer en lloc d’escriure’l":"you pasted the whole text instead of writing it"):(ca?`has enganxat ${p} dels ${n} caràcters del text`:`you pasted ${p} of the ${n} characters of your text`));
-    if(ty&&n&&k<n/2)out.push(ca?`només has escrit ${k} lletres amb el teclat per a un text de ${n}`:`you only typed ${k} keys for a text of ${n} characters`);
+    if(ty&&n&&k<n/2&&!/spoken/i.test(why||""))out.push(ca?`només has escrit ${k} lletres amb el teclat per a un text de ${n}`:`you only typed ${k} keys for a text of ${n} characters`);
     if(ty&&sec&&(sec<180||p>=20))out.push(ca?`l’has fet en ${tm}`:`you did it in ${tm}`);
     if(/level|vocab|above|grammar/i.test(why||""))out.push(ca?"el nivell d’anglès és molt més alt del que fas servir normalment":"the English is far above the level you usually write at");
     if(!out.length)out.push(ca?"el text no sembla escrit per tu":"the text doesn't look like your own writing");
