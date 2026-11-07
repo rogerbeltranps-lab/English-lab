@@ -16,3 +16,8 @@ window.EL_GAMES=[
   {id:"2eso-ls2-lp3-vocab",title:"Vocabulary · Now or usually? Time words and sport",course:"2eso",emoji:"⛸️",kind:"vocab",ls:"LS2 · Free Time, Live!",lp:"LP3 · Now or usually?"},
   {id:"2eso-ls2-lp3-grammar",title:"Grammar · Present Simple or Present Continuous?",course:"2eso",emoji:"🔄",kind:"grammar",ls:"LS2 · Free Time, Live!",lp:"LP3 · Now or usually?"},
 ];
+// A game's name starts with its learning path (Roger, 7 Nov 2026: "games should have the name of the LP … they should start with LP1 and the
+// name they already have"): "LP2 · Vocabulary · Clothes, kit and weather". g = an EL_GAMES entry, a deck id, or a saved result ({deck, title,
+// lp}); a game without lp keeps its title.
+window.elGameName=function(g){const L=window.EL_GAMES||[],id=typeof g==="string"?g:g&&(g.deck||g.id),m=L.find(d=>d.id===id)||{},o=typeof g==="object"&&g||{};
+  const t=String(m.title||o.title||""),n=String(m.lp||o.lp||"").split(" · ")[0].trim();return n&&!t.startsWith(n+" ")?n+" · "+t:t};

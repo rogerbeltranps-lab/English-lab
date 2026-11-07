@@ -49,6 +49,8 @@ const isQ=s=>!!(s&&s.q);
 const isW=s=>!!(s&&s.q&&s.write);   // a written question
 const isN=s=>!!(s&&!s.q&&typeof s.notes==="number");   // a 📝 Take your notes slide (withNotes)
 const meta=()=>(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{};
+// the game's name starts with its learning path: "LP2 · Vocabulary · Clothes, kit and weather" (decks/index.js elGameName, Roger 7 Nov 2026)
+const gName=()=>meta().lp?elGameName(H.deckId):H.deck.title;
 // the LS of the game (decks/index.js ls "LS2 · Free Time, Live!" → EL_LS id "2eso-free-time-live"), where the notes are shown
 const lsId=()=>{const m=meta(),c=m.course||(H.deck&&H.deck.course)||"",nm=String(m.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();
   const l=(window.EL_LS||[]).find(x=>x.course===c&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""};
@@ -92,7 +94,7 @@ function loadDeck(id){
 let liveBeat=null,ansStop=null;
 function live(){
   if(!H.g||!H.sid||!H.deck)return;
-  const s=cur(),qs=qList(),base={on:true,game:true,deck:location.pathname,title:H.deck.title,sid:H.sid,phase:H.phase==="show"?(isQ(s)?"q":isN(s)?"notes":"theory"):H.phase,
+  const s=cur(),qs=qList(),base={on:true,game:true,deck:location.pathname,title:gName(),sid:H.sid,phase:H.phase==="show"?(isQ(s)?"q":isN(s)?"notes":"theory"):H.phase,
     i:H.i,qn:qs.indexOf(H.i)+1,qt:qs.length,keys:H.keys,at:S.serverTimestamp()};
   if(s&&H.phase!=="end"&&H.phase!=="lobby"){
     if(isN(s)){const m=meta();base.nt={k:s.notes,topics:s.topics,deck:H.deckId,ls:lsId(),lp:m.lp||"",title:H.deck.title,course:m.course||""}}
@@ -208,7 +210,7 @@ const ms=t=>t&&t.toMillis?t.toMillis():typeof t==="number"?t:0;
 const hm=t=>{const d=new Date(ms(t));return ms(t)?String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"):""};
 // the whole group, in or out (Roger, 6 Nov 2026: "who is in and who is out"): elClassRoll in el-catalog.js with the group's student list
 function who(){if(!H.sid||H.phase==="end"||H.phase==="pick")return {active:false,inn:[],out:[],n:0};
-  const x={game:true,on:true,phase:"q",sid:H.sid,at:Date.now(),title:H.deck&&H.deck.title},left=WHO.left.filter(y=>ms(y.at)>=H.sid).map(y=>Object.assign({},y,{pull:H.sid}));
+  const x={game:true,on:true,phase:"q",sid:H.sid,at:Date.now(),title:H.deck&&gName()},left=WHO.left.filter(y=>ms(y.at)>=H.sid).map(y=>Object.assign({},y,{pull:H.sid}));
   return elClassRoll(x,left,Object.entries(WHO.here).map(([e,y])=>Object.assign({e},y)),Object.keys(H.names).map(e=>({e,name:H.names[e]})))}
 const why=y=>y.why==="full"?"out of full screen"+(y.left?` · left ${hm(y.left.at)}${y.left.n>1?` (${y.left.n}×)`:""}`:""):y.why==="closed"?`screen closed or another window · since ${hm(y.seen)}`:y.why==="lost"?`lost connection · since ${hm(y.seen)}`:"not in the game";
 // only the top bar is drawn again (the slide underneath keeps its animation)
@@ -268,19 +270,19 @@ function draw(){
   if(!H.deck){
     // Games by course (2 ESO, 4 ESO), then by LS, then by learning path (Roger, 30 Oct 2026: "organised by course and LS").
     const list=window.EL_GAMES||[],by=(a,k)=>[...new Set(a.map(d=>d[k]||""))].sort((x,y)=>x.localeCompare(y,"en",{numeric:true}));
-    const card=d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(d.title)}${d.lp?`<br><small style="opacity:.7">${esc(d.lp)}</small>`:""}</span></button>`;
+    const card=d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(elGameName(d))}${d.lp?`<br><small style="opacity:.7">${esc(d.lp)}</small>`:""}</span></button>`;
     const cols=by(list,"course").map(c=>{const g=list.filter(d=>d.course===c);
       return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${g.filter(d=>(d.ls||"")===l).sort((a,b)=>(a.lp||"").localeCompare(b.lp||"","en",{numeric:true})).map(card).join("")}</div>`).join("")}</section>`}).join("");
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game. All games are at Safe level. Each learning path has a 📚 vocabulary game and a 🧩 grammar game.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.phase==="pick"||!H.g){
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
-    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(H.deck.title)}</h1><p class="sub">${slides().length} slides · ${qList().length} questions. Start the game for a group: its students are taken into it.</p>
+    app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(gName())}</h1><p class="sub">${slides().length} slides · ${qList().length} questions. Start the game for a group: its students are taken into it.</p>
       <div class="picks">${gs.map(g=>`<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}</button>`).join("")}</div>
       <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
   if(H.phase==="lobby"){
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
-      <h1 class="logo pop">${esc(H.deck.title)}</h1>
+      <h1 class="logo pop">${esc(gName())}</h1>
       <div class="join"><div class="card">💻 Sign in on your Chromebook: the game opens by itself.</div><div class="count">🎮 ${P.length} player${P.length===1?"":"s"}</div>
         <button class="btn go" data-do="next" style="font-size:1.2em">Start ▶</button></div>
       <div class="names">${P.sort((a,b)=>nameOf(a).localeCompare(nameOf(b))).map(em=>`<span${seen.has(em)?"":' class="pop"'}>${esc(nameOf(em))}</span>`).join("")||'<span style="background:none;color:#fff;box-shadow:none;opacity:.8">Waiting for students…</span>'}</div>
