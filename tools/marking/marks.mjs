@@ -146,20 +146,23 @@ async function comments(){const out=[],names=Object.fromEntries((W.EL_LEVELS||[]
   return out}
 
 // sessions the teacher moved to another day on the dashboard (ls/{id}.planEdits): due days and session lines follow, as on the dashboard
-for(const ls of Object.keys(W.EL_PLAN||{})){const d=doc(await api("GET",DOCS+"ls/"+encodeURIComponent(ls)).catch(()=>null))||{};if(d.planEdits)W.ELWeek.applyEdits(ls,d.planEdits)}
+const PE={};for(const ls of Object.keys(W.EL_PLAN||{})){const d=doc(await api("GET",DOCS+"ls/"+encodeURIComponent(ls)).catch(()=>null))||{};PE[ls]=d.planEdits||{};if(d.planEdits)W.ELWeek.applyEdits(ls,d.planEdits)}
+// a group's ticks, with the past class days of its agendas counted as done (ELWeek.autoTicks, as on the dashboard)
+async function ticksOf(grp){const t=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
+  for(const [ls,pe] of Object.entries(PE)){const a=(pe[grp.id]||{}).agenda;if(!a)continue;let ag=null;try{ag=typeof a==="string"?JSON.parse(a):a}catch(e){}W.ELWeek.autoTicks(ls,ag,t)}return t}
 const [cmd,...rest]=process.argv.slice(2),flags=new Set(rest.filter(x=>x.startsWith("--"))),args=rest.filter(x=>!x.startsWith("--"));
 const grpOf=id=>{const g=W.EL_GROUPS.find(x=>x.id===id);if(!g)throw new Error("No group "+id);return g};
 const momentOf=(aid,step)=>{const a=W.EL_CATALOG.find(x=>x.id===aid),m=a&&moments(a.ls).find(x=>x.a===aid&&x.step===step);if(!m)throw new Error("No marking step "+aid+" · "+step);return m};
 if(cmd==="ready"){const today=W.ELWeek.today();
   if(!flags.has("--no-run")){const mk=doc(await api("GET",DOCS+"settings/marking"))||{},rq=Date.parse((mk.request||{}).at||"")||0,st=Date.parse((mk.run||{}).started||"")||0,via=rq>st?"request":"schedule";
     await api("PATCH",DOCS+"settings/marking?updateMask.fieldPaths=run",{fields:{run:fsv({started:new Date().toISOString(),via})}});console.log("RUN started ("+(via==="request"?"asked from the dashboard":"scheduled")+")")}
-  for(const grp of W.EL_GROUPS){const ticks=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
+  for(const grp of W.EL_GROUPS){const ticks=await ticksOf(grp);
     for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
       const rows=await todo(grp,m);if(!rows.length)continue;const r=readyOf(grp,ls,m,ticks),now=!!(r.from&&today>=r.from);
       console.log([now?"READY":"wait ",grp.id,m.a,m.step,rows.length+" to mark",r.from?"from "+r.from:r.line?"session not ticked: "+r.line:"no session in the plan"].join(" · "))}}}
 else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026: "a command to audit what you do and warn me if it's not working")
   const today=W.ELWeek.today(),days=(a,b)=>Math.round((Date.parse(a)-Date.parse(b))/864e5),problems=[],remind=[],ok=[];
-  for(const grp of W.EL_GROUPS){const ticks=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
+  for(const grp of W.EL_GROUPS){const ticks=await ticksOf(grp);
     for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
       const a=W.EL_CATALOG.find(x=>x.id===m.a),rows=await todo(grp,m),r=readyOf(grp,ls,m,ticks);
       // a late hand-in counts from the day it came in, not from when the step was ready

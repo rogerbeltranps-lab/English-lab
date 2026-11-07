@@ -97,7 +97,8 @@ window.ELMark=(function(){
   // "LPn") ticked in the time plan, plus 7 days. Ticks keep the day they were ticked; an older tick (true) counts from the due day.
   // o = {p: EL_PLAN[ls], gi: the group's column, due, title, ticks: teacherPlan/{group}.ticks, ls}
   // A moment with atOnce: true (writings and Talk transcripts, from LS3; Roger, 1 Nov 2026) is ready the day it is handed in: Claude
-  // marks it in the next Wednesday run, with no tick needed. from is long past, so each hand-in counts from the day it came in (ELMark.late).
+  // marks it in the next Wednesday run, with no tick needed. Since 7 Nov 2026 every learning-path level step (Reading log, Listening chart,
+  // Research card / Fact file) is atOnce too; only the final product steps still wait for a tick. from is long past, so each hand-in counts from the day it came in (ELMark.late).
   function ready(o){const W=window.ELWeek;if(o.atOnce)return {due:o.due||null,line:null,done:null,from:"2000-01-01",atOnce:true};
     if(!o.p||!o.due||o.gi<0)return {};
     const lines=r=>String(r.g?r.g[o.gi]||"":r.what||"").split("\n").filter(Boolean);

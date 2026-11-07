@@ -465,7 +465,7 @@ async function teacherSections(info){
       for(const [f,v] of [["secLocked",ids],["secOpened",op]]){info[f]=Object.assign({},info[f]);info[f][g]=Object.assign({},info[f][g],{[k]:v})}msg="✓ Saved";}
     catch(e){console.warn("sections",e);msg="✗ Not saved: "+(e.code||e.message||e)}
     busy=false;draw();setTimeout(()=>{if(msg==="✓ Saved"){msg="";draw()}},2500)}
-  async function openLp(){const ids=(window.EL_CATALOG||[]).filter(x=>x.ls===lsId&&(x===a||elLpOpen(x,info,g))).map(x=>x.id),L=elLpLocks(lsId,ids);
+  async function openLp(){const ids=(window.EL_CATALOG||[]).filter(x=>x.ls===lsId&&(x===a||elLpOpen(x,info,g,true))).map(x=>x.id),L=elLpLocks(lsId,ids);
     try{await setDoc(ref,{open:{[g]:ids},locked:{[g]:L.locked},lockedKeys:{[g]:L.lockedKeys}},{merge:true});info.open=Object.assign({},info.open,{[g]:ids});msg="✓ Saved"}
     catch(e){console.warn("open",e);msg="✗ Not saved: "+(e.code||e.message||e)}draw()}
   // 🎓 Class mode (Roger, 6 Nov 2026, replaces 📌 Pull up): "Start class mode" opens this page in a new browser tab, the class tab for the
@@ -539,7 +539,7 @@ async function teacherSections(info){
       +(msg?'<span class="m'+(msg[0]==="✗"?" err":"")+'">'+msg+'</span>':"")+'</div>'
       +'<small>Click 🔓 or 🔒 on a tab to open or close that section for '+gname(g)+'. Students see a closed section read-only, with their saved answers; one you opened before stays doable for students who have not finished it. Teacher only: students never see this bar.</small>'
       +cmRow()
-      +(elLpOpen(a,info,g)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
+      +(elLpOpen(a,info,g,true)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
     if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html;try{origSet.call(localStorage,"el_tsec_"+relPath,JSON.stringify({h:html,css:st.textContent,all,off}))}catch(e){}}   // for el-app.js tsecEarly on the next visit
     fsFloat(fsRoll())
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);

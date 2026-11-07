@@ -186,7 +186,32 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
 // of an LS for each group (dashboard → LS settings), stored as ls/{id}.open[group] = [activity ids]. A group without that list keeps the
 // old rule: practice always open, graded activities only when in ls/{id}.enabled. elLpLocks gives what firestore.rules check:
 // locked[group] (activity ids, for results) and lockedKeys[group] (their saved keys, for progress; key + "Level" is the route the page keeps).
-window.elLpOpen=function(a,info,gid){const o=info&&info.open&&info.open[gid];return Array.isArray(o)?o.includes(a.id):!a.graded||((info&&info.enabled)||[]).includes(a.id)};
+window.elLpOpen=function(a,info,gid,raw){const o=info&&info.open&&info.open[gid];
+  if(!(Array.isArray(o)?o.includes(a.id):!a.graded||((info&&info.enabled)||[]).includes(a.id)))return false;
+  return raw||window.EL_RAW_OPEN||!elPlanLater(info,gid).acts.has(a.id)};
+// The Time plan opens on the class day (Roger, 7 Nov 2026: "the SLPs will be automatically open the day the group has class and it's on my
+// plan"; "If I don't do sth in class I drag it to the next day and that's all"). Dragging a learning path or tab onto a class day still opens
+// it for the group (rules level, so saving works on that day without anyone writing); on the students' screens it stays closed until that
+// day: a learning path whose items on the agenda (ls/{id}.planEdits[group].agenda) are all on later days, and a tab whose items are all on
+// later days. Homework the teacher set and a pull-up open it at once, as before. Page-only, like the section switches. raw (or
+// window.EL_RAW_OPEN, set by the dashboard) = the switches alone, for whatever writes them.
+const agToday=()=>window.ELWeek&&ELWeek.today?ELWeek.today():window.EL_TODAY||new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"});
+window.elAgendaOf=function(info,gid){const s=info&&info.planEdits&&info.planEdits[gid]&&info.planEdits[gid].agenda;if(!s)return null;
+  try{const ag=typeof s==="string"?JSON.parse(s):s;return ag&&ag.days?ag:null}catch(e){return null}};
+const laterMemo=new WeakMap();   // per ls info and group: recomputed when the agenda, homework, pull-up or day changes
+window.elPlanLater=function(info,gid,today){const none={acts:new Set(),tabs:{}};if(!info||typeof info!=="object")return none;
+  const ag=elAgendaOf(info,gid);if(!ag)return none;today=today||agToday();
+  const src=info.planEdits[gid].agenda,mm=laterMemo.get(info)||{},m=mm[gid];if(m&&m.today===today&&m.src===src&&m.hw===info.homework&&m.push===info.push)return m.v;
+  const first={},tabFirst={};
+  Object.entries(ag.days).forEach(([d,its])=>(its||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0)return;const id=it.slice(0,i),p=it.slice(i+1);
+    if(!first[id]||d<first[id])first[id]=d;if(p){const k=id+"#"+p;if(!tabFirst[k]||d<tabFirst[k])tabFirst[k]=d}}));
+  const free=new Set();   // opened at once by the teacher: homework and a pull-up; the sample exam stays open for revising (Roger, 7 Nov 2026: "I want them to see the sample exam")
+  Object.keys(first).forEach(id=>{if(/sample-exam$/.test(id))free.add(id)});Object.keys(tabFirst).forEach(k=>{if(/sample-exam#/.test(k))free.add(k)});
+  Object.values(((info.homework||{})[gid])||{}).forEach(h=>{if(!h||!h.tabs||typeof h.tabs!=="object")return;Object.entries(h.tabs).forEach(([id,ps])=>{free.add(id);(ps||[]).forEach(p=>free.add(id+"#"+p))})});
+  const pu=(info.push||{})[gid];if(pu&&pu.a){free.add(pu.a);if(pu.p)free.add(pu.a+"#"+pu.p)}
+  const v={acts:new Set(Object.keys(first).filter(id=>first[id]>today&&!free.has(id))),tabs:{}};
+  Object.entries(tabFirst).forEach(([k,d])=>{if(d<=today||free.has(k))return;const [id,p]=[k.slice(0,k.indexOf("#")),k.slice(k.indexOf("#")+1)];(v.tabs[id]=v.tabs[id]||[]).push(p)});
+  mm[gid]={today,src,hw:info.homework,push:info.push,v};laterMemo.set(info,mm);return v};
 // Sections inside a learning path (Roger, 26 Oct 2026: "even in the learning path, I want to open these sections as I teach"): the section
 // tabs the teacher has locked for a group, ls/{id}.secLocked[group][activity id with "/" as "__"] = panel ids (EL_SECTIONS in el-sections.js),
 // and the ones opened at some point, ls/{id}.secOpened[group][same key]. None locked = every section open. A locked section is read-only
@@ -198,11 +223,12 @@ window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];retu
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
 // again stays open for a student who has not finished it; it is read-only for everyone else. done = Set of the student's done steps.
-window.elSecLockedFor=function(a,info,gid,done){const op=secOf(info,"secOpened",gid,a)||[];return elSecLocked(a,info,gid).filter(id=>!(op.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done)))};
+window.elSecLockedFor=function(a,info,gid,done){const op=secOf(info,"secOpened",gid,a)||[],lk=elSecLocked(a,info,gid).filter(id=>!(op.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done)));
+  if(window.EL_RAW_OPEN)return lk;const later=elPlanLater(info,gid).tabs[a.id]||[];return [...new Set([...lk,...later])]};   // + tabs planned for a later class day (elPlanLater)
 // Sections still to finish (the to-do list): only in a learning path where the teacher uses the section switches, a section that is open
 // or was opened before, holds steps and has some not done. Returns [[panel id, name]].
-window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk))return [];const op=secOf(info,"secOpened",gid,a)||[];
-  return ((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>(!lk.includes(id)||op.includes(id))&&elSecSteps(a,id).length&&!secDone(a,id,done))};
+window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk))return [];const op=secOf(info,"secOpened",gid,a)||[],later=window.EL_RAW_OPEN?[]:elPlanLater(info,gid).tabs[a.id]||[];
+  return ((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>(!lk.includes(id)||op.includes(id))&&!later.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done))};
 // ✅ To do (Roger, 6 Nov 2026: "When I open a section it must be set as to do. So in each class I open a section or LP and they see it as
 // to do. They are only homework if I say so (I can say that a LP is homework or only a section)"): every learning path of an open LS that
 // the teacher has opened for the group (elLpOpen) and the student has not finished, with its tabs that are open for them (elSecLockedFor:
