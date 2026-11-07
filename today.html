@@ -105,6 +105,51 @@ body[data-place="home"] .page h1{font-size:1.75rem;margin:.2em 0 .1em}body[data-
 .tiles{gap:10px}a.tile{min-height:0;padding:14px;gap:6px}a.tile .ti{font-size:24px}a.tile b{font-size:16px}a.tile small{font-size:13px}
 .box{padding:14px}.ugrid{grid-template-columns:1fr}
 table.lpst,table.lpst tbody,table.lpst tr,table.lpst td{display:block;width:auto}table.lpst thead{display:none}table.lpst tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:10px 12px;background:#fff}table.lpst td{border:0!important;padding:3px 0!important;text-align:left!important}table.lpst td:empty{display:none}table.lpst td{background:transparent!important}table.lpst tr.miss{background:#fef2f2;border-color:#fca5a5}}</style>
+<style>/* 📊 My marks as visual cards (Roger, 7 Nov 2026: "this section would be better with a style like this", pointing at the LS page's
+   ⓘ About this LS): a heading with an icon, soft cards with a coloured top border and a big number, the missing activities as numbered
+   cards, the three parts of the LS mark as cards that add up, and the criteria as competence-coloured cards (tap: the official text).
+   Course colour as on the LS pages (2 ESO green, 4 ESO blue); one colour per competence as on About this LS: CE1 teal · CE2 blue ·
+   CE3 orange · CE4 green · CE5 purple · CE6 amber · CD indigo · CC pink. */
+body{--c:#3157d5;--c-dark:#2443ad;--c-soft:#eaf0ff}
+body[data-course="2eso"]{--c:#1f6b52;--c-dark:#174d3d;--c-soft:#e9f5ef}body[data-course="4eso"]{--c:#315f9f;--c-dark:#234777;--c-soft:#edf4ff}
+.fk-g{--k:#15803d;--ks:#ecfdf3}.fk-a{--k:#b45309;--ks:#fffbeb}.fk-r{--k:#b91c1c;--ks:#fef2f2}.fk-b{--k:var(--c-dark);--ks:var(--c-soft)}.fk-v{--k:#6d28d9;--ks:#f5f3ff}.fk-i{--k:#4338ca;--ks:#eef2ff}
+.fk-1{--k:#0f766e;--ks:#ccfbf1}.fk-2{--k:#1d4ed8;--ks:#dbeafe}.fk-3{--k:#c2410c;--ks:#ffedd5}.fk-4{--k:#15803d;--ks:#dcfce7}.fk-5{--k:#7e22ce;--ks:#f3e8ff}.fk-6{--k:#a16207;--ks:#fef3c7}.fk-d{--k:#4338ca;--ks:#e0e7ff}.fk-c{--k:#be185d;--ks:#fce7f3}
+.pill.ce1{background:#ccfbf1;color:#0f766e}.pill.ce2{background:#dbeafe;color:#1d4ed8}.pill.ce3{background:#ffedd5;color:#c2410c}.pill.ce4{background:#dcfce7;color:#15803d}.pill.ce5{background:#f3e8ff;color:#7e22ce}.pill.ce6{background:#fef3c7;color:#a16207}.pill.ceC{background:#e0e7ff;color:#4338ca}
+.box.fv{border-radius:18px;padding:18px 20px}
+.fvh{display:flex;align-items:baseline;gap:6px 8px;flex-wrap:wrap;margin:0 0 2px}.fvh h2{margin:0;font-size:1.3rem;letter-spacing:-.01em}.fvh .fvt{color:#64748b;font-size:15px}
+.fvlead{color:#475569;margin:4px 0 12px;font-size:15px}.fvlead b{color:#0f172a}.fv-tip{display:block;font-size:13.5px;margin-top:2px}
+.fv-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0 0 4px}
+.fv-stat,.fv-part{display:flex;flex-direction:column;gap:2px;min-width:0;background:var(--ks);border-radius:14px;padding:12px 14px;border-top:5px solid var(--k)}
+.fv-sh{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--k);font-size:15px;line-height:1.2}.fv-si{font-size:22px;line-height:1}
+.fv-big{display:block;font-size:2rem;font-weight:900;color:var(--k);line-height:1.15;letter-spacing:-.02em;margin-top:2px}.fv-big small{font-size:15px;font-weight:700;color:#475569;letter-spacing:0}
+.fv-stat p{margin:0;font-size:13.5px;color:#475569}
+.fv-bar{display:block;height:8px;border-radius:999px;background:#fff;overflow:hidden;margin:6px 0 4px}.fv-bar>span{display:block;height:100%;background:var(--k);border-radius:999px}
+.fv-missbox{margin-top:14px}.fv-sub{margin:0 0 8px;font-size:1.05rem;color:#991b1b}
+.fv-miss{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.fv-miss li{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid #fecaca;border-left:6px solid #dc2626;border-radius:14px;padding:10px 12px}
+.fv-mh{display:flex;align-items:flex-start;gap:8px}.fv-mh b{font-size:15px;line-height:1.3}.fv-n{background:#dc2626;color:#fff;font-weight:900;border-radius:9px;padding:2px 7px;font-size:13px;flex:none}
+.fv-due{font-size:13.5px;color:#991b1b}.fv-miss a.go{align-self:flex-start;font-size:14px;padding:7px 14px;border-radius:10px;background:#b91c1c;margin-top:auto}
+.fv-ok{display:flex;align-items:center;gap:10px;background:#ecfdf3;border-left:6px solid #16a34a;border-radius:14px;padding:10px 14px;color:#166534;font-weight:700;margin:12px 0 0}
+.fv-warn{background:#fef2f2;border-left:6px solid #dc2626;border-radius:14px;padding:10px 14px;color:#991b1b;margin:12px 0 8px}
+.fv .muted{margin:10px 0 0}
+details.fv-how{margin-top:10px}details.fv-how>summary{cursor:pointer;color:var(--c-dark);font-weight:700}
+.fv-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;list-style:none;padding:0;margin:8px 0 0}
+.fv-tiles li{display:flex;gap:10px;align-items:flex-start;border:1px solid #e2e8f0;border-radius:14px;padding:10px 12px;font-size:14px;color:#334155;background:#fff}.fv-tiles i{font-style:normal;font-size:22px;line-height:1.1}
+.box.prog .lphead{align-items:center}
+.fv-parts{display:flex;gap:28px;margin:2px 0 4px}
+.fv-part{position:relative;flex:1 1 0}.fv-part.main{flex-grow:1.35}
+.fv-part+.fv-part::before{content:"+";position:absolute;left:-21px;top:50%;transform:translateY(-50%);font-weight:900;font-size:22px;color:#94a3b8}
+.fv-ps{color:#475569;font-size:13px}.fv-pm{font-size:14px;color:#334155;margin-top:4px}.fv-pm b{color:var(--k);font-size:16px}
+.fv-tag{align-self:flex-start;background:var(--k);color:#fff;border-radius:999px;padding:1px 10px;font-size:12.5px;font-weight:800}
+.fv-crits{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.fv-crit{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:inherit;cursor:pointer;background:#fff;border:1px solid #e2e8f0;border-left:6px solid var(--k);border-radius:14px;padding:10px 12px}
+.fv-crit:hover,.fv-crit:focus-visible{background:var(--ks);outline:none}.fv-crit:focus-visible{box-shadow:0 0 0 3px var(--k)}
+.fv-ch{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.fv-ch b{color:var(--k);font-size:15px}
+.fv-chip{display:inline-flex;align-items:center;gap:4px;background:var(--ks);color:var(--k);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:800;white-space:nowrap}
+.fv-cd{font-size:14px;color:#334155}.fv-crit small{color:#64748b;font-size:12.5px}
+.fv-cn{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:4px;font-size:14px;white-space:nowrap}.fv-cn .fv-bar{flex:1;margin:0;background:#f1f5f9}
+@media (max-width:760px){.fv-parts{flex-direction:column;gap:26px}.fv-part+.fv-part::before{left:50%;top:-24px;transform:translateX(-50%)}.box.fv{padding:14px}.fv-big{font-size:1.7rem}}
+</style>
 <nav class="mtabs nvs-m" aria-label="Menú"></nav><nav class="bnav" id="bnav" aria-label="Menú"></nav>
 <div class="app"><aside class="side"><div class="brand">English with Roger</div><nav class="nvs" aria-label="Menú"></nav></aside>
 <div class="page"><div id="crumb"></div><div class="phead"><div class="pht"><h1>El meu tauler</h1><p class="muted" id="sub">Carregant…</p></div><div id="lvl"></div></div><div id="note"></div><div id="main"></div></div></div>
@@ -446,7 +491,7 @@ function render(){
   document.body.dataset.place=lss.length?place:"home";
   if(!lss.length){$("#crumb").innerHTML="";$("#lvl").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
     $("#note").innerHTML=cls+annBox()+noteBox+howBox();$("#main").innerHTML="";if(canReply())wireAnn();return}
-  const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
+  const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;document.body.dataset.course=COURSE;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
   S.pend=[];   // no Submit any more (Roger, 6 Nov 2026): answers save on their own, Submit only froze the score
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
   const n=S.pend.length;
@@ -507,17 +552,17 @@ function pointsBox(){
   if(!EL_TERMS.some(x=>+p[x.id]>0)&&!bestOf(elTerm()))return "";   // no points in my group yet
   const L=lang(),term=elTerm(),mine=+p[term]||0,best=bestOf(term),miss=missOf(term),bonus=miss.length?0:elBonus(mine,best);
   const past=EL_TERMS.filter(x=>x.id<term&&+p[x.id]>0).map(x=>`${elTermName(x.id,L)}: ${p[x.id]} ${t("punts","points")} → +${elNum(missOf(x.id).length?0:elBonus(+p[x.id],bestOf(x.id)),L)}`);
-  return `<div class="box"><h2>🏆 ${t("Els meus punts","My points")} <small class="muted">· ${elTermName(term,L)}</small></h2>`
-    +`<div class="ptgrid"><div><small class="muted">${t("Els meus punts","My points")}</small><b>${mine}</b></div>`
-    +`<div><small class="muted">${t("Bonus a la nota del trimestre","Bonus on my term grade")}</small><b>+${elNum(bonus,L)} <small class="muted">${t("de","of")} +${elNum(EL_POINTS_BONUS,L)}</small></b></div>`
-    +(miss.length?`<div class="ptno"><small>${t("Tota la feina feta","All my work done")}</small><b>✗ ${t("No","No")} <small>· ${t(`en falten ${miss.length}`,`${miss.length} missing`)}</small></b></div>`
-      :`<div class="ptyes"><small>${t("Tota la feina feta","All my work done")}</small><b>✓ ${t("Sí","Yes")}</b></div>`)+`</div>`
-    +`<div class="ptbar" aria-hidden="true"><span style="width:${Math.round(bonus/EL_POINTS_BONUS*100)}%"></span></div>`
-    +(miss.length?`<div class="ptmiss">⏳ <b>${t("Sense tota la feina feta no tens el bonus.","No bonus without all your work done.")}</b> ${t(`Fes les activitats que et falten (just a sota) i recuperes el teu +${elNum(elBonus(mine,best),L)}.`,`Do your missing activities (just below) and you get your +${elNum(elBonus(mine,best),L)} back.`)}</div>`
-      :`<p class="ptok">✓ ${t("Has fet totes les activitats d'aquest trimestre: el bonus compta.","You have done all the activities of this term: your bonus counts.")}</p>`)
-    +`<p class="muted">${best?t(`La puntuació més alta de la classe amb tota la feina feta: ${best} punts. `,`The top score in your class with all the work done: ${best} points. `):""}${t("Respon bé a classe per sumar-ne més!","Answer well in class to get more!")}</p>`
+  const pb=Math.round(bonus/EL_POINTS_BONUS*100);
+  return `<div class="box fv pts">${fvHead("🏆",t("Els meus punts","My points"),elTermName(term,L))}`
+    +`<p class="fvlead">${t("Guanyes punts responent bé a classe. Si a més tens tota la feina feta, sumen un bonus a la nota del trimestre.","You win points by answering well in class. If you also have all your work done, they add a bonus to your term grade.")}</p>`
+    +`<div class="fv-stats">`+fvStat("fk-a","🏆",t("Els meus punts","My points"),String(mine),best?t(`el màxim de la classe amb tota la feina feta: ${best}`,`top score in your class with all the work done: ${best}`):"")
+    +fvStat("fk-v","➕",t("Bonus a la nota del trimestre","Bonus on my term grade"),`+${elNum(bonus,L)} <small>${t("de","of")} +${elNum(EL_POINTS_BONUS,L)}</small>`,`<span class="fv-bar"><span style="width:${pb}%"></span></span>`)
+    +(miss.length?fvStat("fk-r ptno","✗",t("Tota la feina feta","All my work done"),t("No","No"),t(`en falten ${miss.length}`,`${miss.length} missing`))
+      :fvStat("fk-g ptyes","✓",t("Tota la feina feta","All my work done"),t("Sí","Yes"),t("el bonus compta","your bonus counts")))+`</div>`
+    +(miss.length?`<div class="fv-warn">⏳ <b>${t("Sense tota la feina feta no tens el bonus.","No bonus without all your work done.")}</b> ${t(`Fes les activitats que et falten (a «Les meves activitats», a dalt) i recuperes el teu +${elNum(elBonus(mine,best),L)}.`,`Do your missing activities (in “My activities”, above) and you get your +${elNum(elBonus(mine,best),L)} back.`)}</div>`
+      :`<p class="fv-ok"><span aria-hidden="true">🎉</span> ${t("Has fet totes les activitats d'aquest trimestre: el bonus compta.","You have done all the activities of this term: your bonus counts.")}</p>`)
     +(past.length?`<p class="muted">${past.join(" · ")}</p>`:"")
-    +`<details class="all"><summary>${t("Com funciona","How it works")}</summary><ul class="ptrules">${elPointsRules().map(r=>`<li>${r.icon} ${EN?r.en:r.ca}</li>`).join("")}</ul></details></div>`}
+    +`<details class="fv-how"><summary>${t("Com funciona","How it works")}</summary><ul class="fv-tiles">${elPointsRules().map(r=>`<li><i aria-hidden="true">${r.icon}</i><span>${EN?r.en:r.ca}</span></li>`).join("")}</ul></details></div>`}
 // My activities this term (Roger, 2 Nov 2026: "students need to understand the importance of their work … your activities done are
 // 4/10 … then a list of the activities missing"): below the bonus, the activities that count so far by the time plan (elDueWork, the same
 // rule as the bonus), how many are done, how much continuous assessment weighs in the current LS (elFormativeShare) and the missing ones.
@@ -526,15 +571,20 @@ function workBox(){S.wmiss=new Set();if(all()||!D.me.group)return "";
   const L=lang(),term=elTerm(),due=elDueWork(D.me.group,term,ls=>D.ls[ls]);if(!due.length)return "";
   const miss=due.filter(([a])=>!isDone(a)),done=due.length-miss.length,p=Math.round(done/due.length*100);miss.forEach(([a])=>S.wmiss.add(a.id));
   const cur=EL_LS.find(l=>l.id===(ELWeek.now(D.me.group)||{}).ls)||EL_LS.find(l=>l.id===S.ls),share=cur?elFormativeShare(cur.id):0,lsN=cur?lsName(cur):"";
-  return `<div class="box work"><h2>📋 ${t("Les meves activitats","My activities")} <small class="muted">· ${elTermName(term,L)}</small></h2>`
-    +`<div class="wkgrid"><div class="${miss.length?"wno":"wyes"}"><small>${t("Activitats fetes (segons l'agenda de classe)","Activities done (by the class plan)")}</small><b>${done} / ${due.length}</b></div>`
-    +(share?`<div><small>${t(`Avaluació contínua a la nota de ${lsN}`,`Continuous assessment in your ${lsN} mark`)}</small><b>${share} %</b></div>`:"")+`</div>`
-    +`<div class="ptbar wbar" aria-hidden="true"><span style="width:${p}%;background:${p>=100?"#16a34a":p>=50?"#f59e0b":"#dc2626"}"></span></div>`
-    +`<p>${share?t(`<b>La feina de cada dia compta.</b> Les activitats dels learning paths són la teva avaluació contínua: un <b>${share} %</b> de la nota de ${lsN}. Fes-les totes, i a temps, perquè compti sencera.`,`<b>Your everyday work counts.</b> The learning-path activities are your continuous assessment: <b>${share} %</b> of your ${lsN} mark. Do them all, and on time, so it counts in full.`)
+  const k=p>=100?"fk-g":p>=50?"fk-a":"fk-r";
+  return `<div class="box fv work">${fvHead("📋",t("Les meves activitats","My activities"),elTermName(term,L))}`
+    +`<p class="fvlead">${share?t(`<b>La feina de cada dia compta.</b> Les activitats dels learning paths són la teva avaluació contínua: un <b>${share} %</b> de la nota de ${lsN}. Fes-les totes, i a temps, perquè compti sencera.`,`<b>Your everyday work counts.</b> The learning-path activities are your continuous assessment: <b>${share} %</b> of your ${lsN} mark. Do them all, and on time, so it counts in full.`)
       :t("<b>La feina de cada dia compta.</b> Les activitats dels learning paths són la teva avaluació contínua. Fes-les totes, i a temps.","<b>Your everyday work counts.</b> The learning-path activities are your continuous assessment. Do them all, and on time.")}</p>`
-    +(miss.length?`<div class="ptmiss">⏳ <b>${miss.length>1?t(`Et falten ${miss.length} activitats:`,`You have ${miss.length} activities missing:`):t("Et falta 1 activitat:","You have 1 activity missing:")}</b><ul>`
-      +miss.map(([a,d])=>`<li>${esc(a.title)} · <span class="muted">${t("calia fer-la el","due on")} ${when(d)}</span> <a class="go" href="${a.path}">${t("Fes-la ara","Do it now")}</a></li>`).join("")+`</ul></div>`
-      :`<p class="ptok">✓ ${t("Les tens totes fetes. Continua així!","You have done them all. Keep it up!")}</p>`)+`</div>`}
+    +`<div class="fv-stats">`
+    +fvStat(k,"✅",t("Activitats fetes","Activities done"),`${done} <small>/ ${due.length}</small>`,`<span class="fv-bar"><span style="width:${p}%"></span></span>${t("segons l'agenda de classe","by the class plan")}`)
+    +fvStat(miss.length?"fk-r":"fk-g",miss.length?"⏳":"🎉",t("Activitats que et falten","Activities missing"),String(miss.length),miss.length?t("fes-les com més aviat millor","do them as soon as you can"):t("cap: molt bé!","none: well done!"))
+    +(share?fvStat("fk-b","📈",t("Avaluació contínua","Continuous assessment"),`${share} <small>%</small>`,t(`de la nota de ${lsN}`,`of your ${lsN} mark`)):"")+`</div>`
+    +(miss.length?`<div class="fv-missbox"><h3 class="fv-sub">⏳ ${miss.length>1?t(`Et falten ${miss.length} activitats`,`You have ${miss.length} activities missing`):t("Et falta 1 activitat","You have 1 activity missing")}</h3><ol class="fv-miss">`
+      +miss.map(([a,d],i)=>`<li><span class="fv-mh"><span class="fv-n">${String(i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span><span class="fv-due">📅 ${t("calia fer-la el","due on")} ${when(d)}</span><a class="go" href="${a.path}">${t("Fes-la ara","Do it now")} →</a></li>`).join("")+`</ol></div>`
+      :`<p class="fv-ok"><span aria-hidden="true">🎉</span> ${t("Les tens totes fetes. Continua així!","You have done them all. Keep it up!")}</p>`)+`</div>`}
+// the heading and the cards of the visual boxes on 📊 My marks (fvHead, fvStat; CSS .fv-*), in the style of the LS page's ⓘ About this LS
+const fvHead=(i,h,sub)=>`<div class="fvh"><h2><span class="fvi" aria-hidden="true">${i}</span> ${h}</h2>${sub?`<span class="fvt">· ${sub}</span>`:""}</div>`;
+const fvStat=(k,i,label,big,foot)=>`<div class="fv-stat ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${label}</span><b class="fv-big">${big}</b>${foot?`<p>${foot}</p>`:""}</div>`;
 // 📌 The learning path the teacher has pulled up for my group (Roger, 2 Nov 2026: "students find it difficult to find the learning path"):
 // ls/{id}.push[group], the newest one whose path is open for the group (elPullFor in el-catalog.js). A big card at the very top of the board
 // with "Open it", straight to the tab when the teacher chose one; it changes at once while the board is open (goLive listens to the LS docs).
@@ -784,12 +834,16 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
     g.gv.parts.forEach(x=>{const k=x.sn||x.id;if(!by.has(k))by.set(k,{w:0,mw:0,ms:0,x});const y=by.get(k),m=(P.gv||{})[x.id];y.w+=x.w;if(m!=null){y.mw+=x.w;y.ms+=m*x.w}});
     return [...by.entries()].map(([k,y])=>{const n=SN[k]||[esc(y.x.name),""];return sub(n[0],W("gv")*y.w/sw,y.mw?y.ms/y.mw:null,n[1])}).join("")};
   // the LS mark so far also big in the heading (Roger, 5 Nov 2026: "podria sortir aquí tb"), where the old "My average mark" stood
-  return `<div class="box prog"><div class="lphead"><h2>📊 ${t("La meva nota de la LS fins ara","My LS mark so far")}</h2>${total==null?"":`<b style="font-size:2rem;color:${col(total*10)}">${f1(total)} <small class="muted" style="font-size:1rem">/ 10</small></b>`}</div>${AS?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the indented rows show every piece of each part (the student sees only the parts).</p>`:""}`
-    +`<p class="muted">${t("Com es fa la nota d'aquesta LS i com vas. Canvia cada dia amb la teva feina.","How the mark of this LS is made and how you are doing. It changes every day with your work.")}</p>`
+  return `<div class="box fv prog"><div class="lphead">${fvHead("📊",t("La meva nota de la LS fins ara","My LS mark so far"),lsName(ls))}${total==null?"":`<b style="font-size:2rem;color:${col(total*10)}">${f1(total)} <small class="muted" style="font-size:1rem">/ 10</small></b>`}</div>${AS?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the indented rows show every piece of each part (the student sees only the parts).</p>`:""}`
+    +`<p class="fvlead">${t("Com es fa la nota d'aquesta LS i com vas. Canvia cada dia amb la teva feina.","How the mark of this LS is made and how you are doing. It changes every day with your work.")}</p>`
     // the three parts as one bar, the daily work first and highlighted (Roger, 2 Nov 2026: "make clear … their daily work from the learning paths is very important")
-    +(share?`<div class="wsplit" aria-hidden="true"><span class="d" style="flex:${share}">📚 <i>${t("Feina diària","Daily work")}</i> ${share} %</span><span class="e" style="flex:${W("exam")}">📝 <i>${t("Examen","Exam")}</i> ${W("exam")} %</span><span class="f" style="flex:${W("fp")}">🎬 <i>${t("Producte final","Final product")}</i> ${W("fp")} %</span></div>`
-      +`<p class="wbig">📚 <b>${t(`La teva feina de cada dia als learning paths és la part més gran de la nota: ${share} %${share>W("exam")?", més que l'examen":""}.`,`Your daily work in the learning paths is the biggest part of your mark: ${share} %${share>W("exam")?", more than the exam":""}.`)}</b></p>`:"")
-    +`<div class="ptmiss" style="margin-bottom:8px">⚠️ <b>${t("Si no treballes cada dia, la teva nota baixa.","If you don't work every day, your mark goes down.")}</b> ${t("Cada activitat que no has fet quan tocava compta un 0 a l'avaluació contínua.","Every activity you haven't done by its day counts 0 in your continuous assessment.")}${due.length-done?` <b>${t(`Ara en tens ${due.length-done} amb un 0: fes-les i la nota pujarà.`,`Right now ${due.length-done} of them ${due.length-done===1?"counts":"count"} 0: do ${due.length-done===1?"it":"them"} and your mark goes up.`)}</b>`:""}</div>`
+    // the three parts as cards that add up to the LS mark, the daily work first and biggest (Roger, 2 Nov 2026: "make clear … their daily
+    // work from the learning paths is very important"; 7 Nov 2026: cards in the style of ⓘ About this LS)
+    +(share?`<div class="fv-parts">`
+      +fvPart("fk-g main","📚",t("Feina diària","Daily work"),t("els learning paths","the learning paths"),share,cont,share>W("exam")?t("la part més gran","the biggest part"):"")
+      +fvPart("fk-i","📝",t("Examen","Exam"),v.exam==null&&exDay?when(exDay):t("al final de la LS","at the end of the LS"),W("exam"),v.exam,"")
+      +fvPart("fk-a","🎬",t("Producte final","Final product"),hasFp(ls)?fpSub(ls):t("al final de la LS","at the end of the LS"),W("fp"),v.fp,"")+`</div>`:"")
+    +`<div class="fv-warn">⚠️ <b>${t("Si no treballes cada dia, la teva nota baixa.","If you don't work every day, your mark goes down.")}</b> ${t("Cada activitat que no has fet quan tocava compta un 0 a l'avaluació contínua.","Every activity you haven't done by its day counts 0 in your continuous assessment.")}${due.length-done?` <b>${t(`Ara en tens ${due.length-done} amb un 0: fes-les i la nota pujarà.`,`Right now ${due.length-done} of them ${due.length-done===1?"counts":"count"} 0: do ${due.length-done===1?"it":"them"} and your mark goes up.`)}</b>`:""}</div>`
     +`<div class="wrap"><table class="xt prt"><thead><tr><th>${t("Part","Part")}</th><th>${t("Pes","Weight")}</th><th>${t("Nota fins ara","Mark so far")}</th><th></th></tr></thead><tbody>`
     +(share?row("📚 "+t("La meva feina diària als learning paths","My daily work in the learning paths")+` <small class="muted">(${t("avaluació contínua","continuous assessment")})</small>`,share,cont,t(`Les activitats dels learning paths${due.length?` · fetes ${done} de ${due.length} aquest trimestre`:""}`,`Your learning-path activities${due.length?` · ${done} of ${due.length} done this term`:""}`),"pb daily")
       +cw.map(b=>row(b.id==="gv"?t("Vocabulari, gramàtica i destreses","Vocabulary, grammar and skills"):b.id==="other"?t("Altres competències","Other competences"):esc(b.name),b.w,v[b.id],b.id==="gv"?(TX?t("El vocabulari i la gramàtica que recordes i practiques, i les pestanyes d'escoltar, llegir, parlar i escriure dels learning paths, fetes a temps","The vocabulary and grammar you remember and practise, and the listening, reading, speaking and writing tabs of the learning paths, done on time"):t("Està fet d'aquestes parts:","It is made of these parts:")):b.id==="other"&&other.length?t("Les competències que treballes a més d'escoltar, llegir, parlar i escriure:","The skills you work on besides listening, reading, speaking and writing:")+`<ul class="oc">${other.map(c=>`<li>${pill(c)} ${esc(easy(c))}${srcOf(c)}</li>`).join("")}</ul>`:"","in")+det(b.id)).join(""):"")
@@ -797,6 +851,12 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
     +row(t("Producte final","Final product"),W("fp"),v.fp,v.fp==null?t("Al final de la LS","At the end of the LS"):"","pb")+det("fp")
     +`<tr class="tot"><td class="l"><b>${t("Nota de la LS fins ara","LS mark so far")}</b></td><td><b>100 %</b></td><td>${mark(total)}</td><td class="l">${bar(total)}</td></tr></tbody></table></div>`
     +`<p class="muted" style="margin:6px 0 0">${t("Les activitats que encara no toquen i les parts que encara no estan corregides no compten fins llavors.","Activities whose day has not come yet and parts not marked yet do not count until then.")}${p.at?" "+t(`Actualitzat: ${when(p.at)}`,`Updated: ${when(p.at)}`):""}</p></div>`}
+// one part of the LS mark as a card: icon, name, when, its weight and the mark so far with a bar (progressBox)
+function fvPart(k,i,name,sub,w,m,tag){
+  return `<div class="fv-part ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${name}</span><small class="fv-ps">${sub}</small>`
+    +`<b class="fv-big">${w} <small>%</small></b>${tag?`<span class="fv-tag">⭐ ${tag}</span>`:""}`
+    +`<span class="fv-pm">${t("Nota fins ara:","Mark so far:")} ${m==null?`<span class="muted">${t("encara no","not yet")}</span>`:`<b>${f1(m)}</b> / 10`}</span>`
+    +`<span class="fv-bar"><span style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%"></span></span></div>`}
 // My final product (Roger, 2 Nov 2026: "final product missing" on the board's cards): from LS2 on, a fourth card with the final product
 // of the LS (EL_GRADING[ls].fp): its mark and share of the LS mark, the day it is due, every step with what was handed in (the page
 // saves the hand-ins in its state .steps, with the self-assessment) and the teacher's answers, and how it is marked (the rubric rows
@@ -984,10 +1044,13 @@ async function sendAsk(){if(!S.want||AS)return;const reason=$("#why").value.repl
 function summary(list){
   if(!TX)list=list.filter(a=>canDo(a,D.ls[a.ls]||{})||D.rs[a.id]||doneSet(a).size);   // students never see a path that is not open (Roger, 7 Nov 2026)
   const rows=[...new Set(list.flatMap(a=>a.criteria))].sort().map(c=>{let s=0,m=0;list.forEach(a=>{const x=D.rs[a.id],y=a.graded&&a.criteria.includes(c)&&x&&x.max&&elScore(a,x,D.pg[a.ls]);if(y){s+=y.score;m+=y.max}});return {c,s,m}});
-  const bar=r=>`<span class="xbar"><span style="width:${Math.max(0,Math.min(100,r.s/r.m*100))}%;background:#0ea5e9"></span></span>`;
-  return `<div class="box"><h2>${t("Els meus criteris","My criteria")}</h2><p class="muted">${t("Quanta feina dels learning paths tens feta per a cada criteri, comptant també les activitats que encara no toquen. No és una nota: la teva nota és a «La meva nota de la LS fins ara», a dalt.","How much of the learning-path work for each criterion you have done, also counting the activities whose day has not come yet. It is not a mark: your mark is in “My LS mark so far”, above.")}</p><div class="wrap"><table class="legend sum"><thead><tr><th>${t("Criteri","Criterion")}</th><th style="text-align:left">${t("Què vol dir","What it means")}</th><th>${t("Activitats fetes","Activities done")}</th></tr></thead><tbody>`
-    +rows.map(r=>`<tr><td>${pill(r.c)}</td><td><b>${esc(elCompetence(r.c))}</b><br><small>${esc(easy(r.c))}</small><br><small class="muted">${list.filter(a=>a.graded&&a.criteria.includes(r.c)).map(a=>esc(a.title)).join(" · ")}</small></td><td style="white-space:nowrap">${r.m?`<b>${r.s}</b> ${t("de","of")} ${r.m}<br>${bar(r)}`:`<span class="muted">${t("encara no","not yet")}</span>`}</td></tr>`).join("")
-    +`</tbody></table></div></div>`;
+  const k=c=>/^\d/.test(c)?"fk-"+c[0]:/^CD/.test(c)?"fk-d":/^CC/.test(c)?"fk-c":"fk-b",ic=c=>({1:"🤝",2:"🎧",3:"🗣",4:"📖",5:"✏️",6:"🔎"})[/^\d/.test(c)?c[0]:""]||(/^CD/.test(c)?"💻":/^CC/.test(c)?"🌍":"🧩");
+  return `<div class="box fv crits">${fvHead("📏",t("Els meus criteris","My criteria"))}<p class="fvlead">${t("Quanta feina dels learning paths tens feta per a cada criteri, comptant també les activitats que encara no toquen. No és una nota: la teva nota és a «La meva nota de la LS fins ara», a dalt.","How much of the learning-path work for each criterion you have done, also counting the activities whose day has not come yet. It is not a mark: your mark is in “My LS mark so far”, above.")} <span class="fv-tip">${t("Toca un criteri per veure'n el text oficial.","Tap a criterion to see its official wording.")}</span></p><div class="fv-crits sum">`
+    +rows.map(r=>{const lps=list.filter(a=>a.graded&&a.criteria.includes(r.c)).map(a=>esc(a.title)).join(" · "),p=r.m?Math.max(0,Math.min(100,r.s/r.m*100)):0;
+      return `<button type="button" class="fv-crit ${k(r.c)}" data-do="crit" data-c="${esc(r.c)}"><span class="fv-ch"><span class="fv-chip"><span aria-hidden="true">${ic(r.c)}</span> ${esc(r.c)}</span><b>${esc(elCompetence(r.c))}</b></span>`
+        +`<span class="fv-cd">${esc(easy(r.c))}</span>${lps?`<small>📍 ${lps}</small>`:""}`
+        +`<span class="fv-cn">${r.m?`<span class="fv-bar"><span style="width:${p}%"></span></span><span><b>${r.s}</b> ${t("de","of")} ${r.m}</span>`:`<span class="muted">${t("encara no","not yet")}</span>`}</span></button>`}).join("")
+    +`</div></div>`;
 }
 function critPanel(c){
   const list=EL_CATALOG.filter(a=>a.ls===S.ls&&(TX||canDo(a,D.ls[a.ls]||{})||D.rs[a.id]||doneSet(a).size)),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>visSteps(a,D.ls[a.ls]||{}).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+k));
@@ -1054,11 +1117,11 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     const c=cell(a);if(vis.length<steps(a).length&&!a.graded&&!a.manual)c.t=vis.filter(k=>ds.has(k)).length+"/"+vis.length+(x.feedback?" 💬":"");
     const title=can?`<a href="${tabHref(a)}">${esc(a.title)}</a>`:esc(a.title);
     return `<tr class="${late?"miss":""}"><td class="l"><b>${title}</b>${a.criteria.length?`<br>${a.criteria.filter(c=>/^\d/.test(c)).map(pill).join("")}`:""}${counted.has(a.id)?` <span class="tag" title="Its day has passed: it is in “X of Y done this term”">counted</span>`:""}</td><td class="l">${st}</td><td class="l">${hand}${tabs||`<small class="muted">–</small>`}</td><td class="sc ${c.c}" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr>`}).join("");
-  if(!TX&&!body)return `<div class="box"><h2>📋 ${t("Els meus learning paths: què he fet i què em falta","My learning paths: done and missing")} <small class="muted">· ${lsName(ls)}</small></h2><p class="muted">${t("Aquí veuràs els learning paths que fem a classe.","The learning paths we do in class will appear here.")}</p></div>`;
+  if(!TX&&!body)return `<div class="box fv lps">${fvHead("🧭",t("Els meus learning paths: què he fet i què em falta","My learning paths: done and missing"),lsName(ls))}<p class="muted">${t("Aquí veuràs els learning paths que fem a classe.","The learning paths we do in class will appear here.")}</p></div>`;
   const due=[...counted].filter(id=>list.some(a=>a.id===id)),dn=due.filter(id=>isDone(list.find(a=>a.id===id))).length;
   const nx=next?`<div class="nextbox ${next.past?"late":""}"><div>👉 <b>${TX?"Next for this student":t("El següent que et toca","Next for you")}:</b> ${esc(next.a.title)} · <b>${esc(next.nm)}</b>${next.past?` <span class="s-no">· ${t("ja havia d'estar feta","it was due already")}</span>`:""}</div><a class="go" href="${tabHref(next.a,next.k)}">${t("Obre-la","Open it")} →</a></div>`
     :open?`<p class="ptok">✓ ${t("No tens res pendent als learning paths oberts. Molt bé!","Nothing left to do in the open learning paths. Well done!")}</p>`:"";
-  return `<div class="box"><h2>📋 ${t("Els meus learning paths: què he fet i què em falta","My learning paths: done and missing")} <small class="muted">· ${lsName(ls)}</small></h2>`
+  return `<div class="box fv lps">${fvHead("🧭",t("Els meus learning paths: què he fet i què em falta","My learning paths: done and missing"),lsName(ls))}`
     +(TX?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the student sees this table without the “counted” tags.</p>`:`<p class="muted" style="margin:0 0 6px">${t("Clica una pestanya que et falta per anar-hi directament.","Click a tab you are missing to go straight to it.")}</p>`)
     +nx
     +`<div class="lpsum"><span>✔ ${n.done} ${t(n.done===1?"fet":"fets","done")}</span><span style="background:#fee2e2;color:#991b1b">⏰ ${n.miss} ${t(n.miss===1?"endarrerit":"endarrerits",n.miss===1?"missing past its day":"missing past their day")}</span><span>${n.todo} ${t("per fer","to do")}</span>${TX?`<span>🔒 ${n.off} not open</span>`:""}${TX?`<span>Counted so far: ${dn} of ${due.length} done</span>`:""}</div>`
