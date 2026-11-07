@@ -114,6 +114,54 @@ a.chal .go{display:inline-block;margin-top:8px;font-weight:800;color:#b45309}
 a.btn{display:inline-block;padding:12px 18px;border-radius:12px;background:var(--c-dark);color:#fff;font-weight:800;text-decoration:none}
 a.btn:hover{background:var(--c)}
 
+/* ⓘ About this LS as visual cards (Roger, 7 Nov 2026: "this should be more visual"). One colour per competence, the same on the chips,
+   tiles and criteria: CE1 teal · CE2 blue · CE3 orange · CE4 green · CE5 purple · CE6 amber · CD indigo · CC pink. */
+.ab .ab-lead{color:var(--muted);margin:0 0 12px}
+.ab h2{font-size:1.3rem}
+.k1{--k:#0f766e;--ks:#ccfbf1}.k2{--k:#1d4ed8;--ks:#dbeafe}.k3{--k:#c2410c;--ks:#ffedd5}.k4{--k:#15803d;--ks:#dcfce7}
+.k5{--k:#7e22ce;--ks:#f3e8ff}.k6{--k:#a16207;--ks:#fef3c7}.kd{--k:#4338ca;--ks:#e0e7ff}.kc{--k:#be185d;--ks:#fce7f3}
+.ab-chip{display:inline-flex;align-items:center;gap:4px;background:var(--ks);color:var(--k);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:800;white-space:nowrap}
+.ab-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:8px}
+.ab-objs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.ab-obj{display:flex;flex-direction:column;background:var(--c-soft);border-radius:14px;padding:14px;border-top:5px solid var(--c)}
+.ab-obj p{margin:6px 0 0;font-size:14px}
+.ab-oh{display:flex;align-items:center;gap:8px}
+.ab-on{background:var(--c);color:#fff;font-weight:900;border-radius:10px;padding:3px 8px;font-size:14px}
+.ab-oi{font-size:22px}.ab-oh b{font-size:18px;color:var(--c-dark)}
+.ab-obj .ab-why{color:var(--c-dark);font-weight:600}
+.ab-obj .ab-deep{color:var(--muted);font-style:italic;font-size:13px}
+.ab-flow{list-style:none;margin:4px 0 16px;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:22px}
+.ab-flow li{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;background:var(--c-soft);border-radius:14px;padding:12px 6px}
+.ab-flow li+li::before{content:"➜";position:absolute;left:-19px;top:50%;transform:translateY(-50%);color:var(--c);font-weight:900;font-size:16px}
+.ab-si{font-size:28px;line-height:1}
+.ab-sn{position:absolute;top:6px;left:8px;font-size:12px;font-weight:900;color:var(--c-dark)}
+.ab-flow b{font-size:14px;color:var(--c-dark)}
+.ab-prins{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}
+.ab-prin,.ab-comp{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.ab-prin p,.ab-comp p{margin:2px 0 0;font-size:14px;color:#334155}
+.ab-pi,.ab-ci{font-size:24px;line-height:1.2}
+.ab-comps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.ab-comp{background:var(--ks);border:0;border-left:6px solid var(--k)}
+.ab-comp b{color:var(--k)}
+.ab-cc{display:inline-block;background:var(--k);color:#fff;border-radius:8px;padding:0 7px;font-size:12px;font-weight:900;margin-right:6px}
+.ab-tip{display:block;font-size:13px;margin-top:2px}
+.ab-crits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
+.ab-crit{border:1px solid var(--line);border-left:6px solid var(--k);border-radius:14px;background:#fff}
+.ab-crit summary{cursor:pointer;list-style:none;padding:10px 12px;display:block}
+.ab-crit summary::-webkit-details-marker{display:none}
+.ab-ch{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ab-ch b{color:var(--k)}
+.ab-ob{margin-left:auto;background:var(--c-soft);color:var(--c-dark);font-weight:800;font-size:12px;border-radius:8px;padding:1px 7px}
+.ab-ch::after{content:"▾";color:var(--muted);font-size:13px}
+.ab-crit[open] .ab-ch::after{content:"▴"}
+.ab-do{display:block;font-size:14px;margin-top:6px}
+.ab-do em{color:var(--muted)}
+.ab-off{margin:0;padding:8px 12px 12px;font-size:14px;background:var(--ks);border-radius:0 0 12px 0}
+@media (max-width:1100px){.ab-flow{grid-template-columns:repeat(3,minmax(0,1fr))}.ab-flow li:nth-child(4)::before{display:none}}
+@media (max-width:980px){.ab-crits{grid-template-columns:1fr}}
+@media (max-width:640px){.ab-flow{grid-template-columns:repeat(2,minmax(0,1fr))}.ab-flow li:nth-child(4)::before{display:block}.ab-flow li:nth-child(odd)::before{display:none}}
+@media print{.ab-crit{break-inside:avoid}}
+
 /* shadowing video window */
 .shadow-dlg{border:0;border-radius:18px;padding:18px 20px;max-width:860px;width:calc(100% - 32px);box-shadow:0 20px 60px #0f172a55}
 .shadow-dlg::backdrop{background:#0f172a99}
@@ -153,6 +201,15 @@ footer.lsf{color:var(--muted);font-size:13px;padding:24px 0 0}
 
 /* 📝 Your notes (Roger, 6 Nov 2026): the tile across the tile grid, and the place #notes (shared/js/el-notes.js) */
 .tile.nt{grid-column:1/-1;flex-direction:row;align-items:center;min-height:0;padding:14px 18px;border-color:color-mix(in srgb,var(--c) 35%,var(--line));background:var(--c-soft)}
+/* 🧩 📚 Games and theory card (el-notes.js homeCard), the board's card with its circles (Roger, 7 Nov 2026) */
+.tile.nt.gm{flex-direction:column;align-items:stretch;gap:10px;background:#fff;border-color:var(--line)}
+.tile.nt.gm:hover{border-color:var(--c)}
+.gm-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.gm-h b{font-size:18px}.gm-open{font-weight:800;color:var(--c-dark);white-space:nowrap;font-size:17px}
+.gm-row{display:flex;align-items:center;gap:10px}
+.gm-rings{display:flex;gap:8px 14px;flex-wrap:wrap;min-width:0}
+.gm-note{margin-left:auto;display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border:1px solid color-mix(in srgb,var(--c) 30%,var(--line));border-radius:12px;background:var(--c-soft);color:var(--c-dark);font-size:13px;font-weight:800;line-height:1.15;white-space:nowrap}
+.gm-note i{font-style:normal;font-size:20px}
 .nintro{max-width:820px}
 .ncard{margin:0 0 16px}.ncard h2{margin:2px 0 8px}
 .ncard .nlp{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--c-dark);background:var(--c-soft);border-radius:999px;padding:3px 10px}

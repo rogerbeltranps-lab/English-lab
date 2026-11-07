@@ -61,7 +61,8 @@
   // threw the student back to the top while scrolling the Study place (Roger's screen recording, 7 Nov 2026)
   let shownPlace=null;
   function place(){
-    const p=PLACES.includes(location.hash.slice(1))?location.hash.slice(1):"home",moved=p!==shownPlace;shownPlace=p;
+    // a place the page does not have (LS2 has no #study since 7 Nov 2026; an old link or bookmark) opens the LS home
+    const h=location.hash.slice(1),p=PLACES.includes(h)&&document.querySelector(`[data-place="${h}"]`)?h:"home",moved=p!==shownPlace;shownPlace=p;
     $$("[data-place]").forEach(s=>s.hidden=s.dataset.place!==p);
     const c=$("#crumb");
     if(c)c.innerHTML=p==="home"?`<a class="back" href="${teach()?dashHref():boardHref()}">‹ ${teach()?"Dashboard":t("El meu tauler","My dashboard")}</a>`
@@ -133,6 +134,8 @@
   }
   function draw(){
     lang();nav();place();
+    // 📈 My formative assessment tile (Roger, 7 Nov 2026: "instead of study, my formative assessment"): the board's formative tab of this LS
+    $$("[data-el-formative]").forEach(e=>{const b=boardHref();e.href=b+(b.includes("?")?"&":"?")+"ls="+encodeURIComponent(LS)+"#formative"});
     if(ST){const S=status();lpRows(S);contCard(S)}
     document.dispatchEvent(new Event("ellshome"));   // el-notes.js draws again in the right language
   }
