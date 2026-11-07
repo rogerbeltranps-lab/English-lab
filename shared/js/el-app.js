@@ -5,13 +5,15 @@
 //   lp     · learning paths, checkpoints, Reflect, final product, sample exam (LS2 on: the engine's #sessionJump in .topbar)
 //   course · the course pages (2eso/, 4eso/: "All Learning Situations")
 //   games  · vocabulary games (<ls>/vocabulary-games.html)
-//   lab    · English Lab and Practise (lab/, lab/practice.html), which keep their side menu, now as buttons
+//   lab    · Games and Practise (lab/, lab/practice.html), which keep their side menu, now as buttons
 //   home   · the site's home page (index.html), now only a welcome page to sign in with no menu (Roger, 7 Nov 2026: "it makes no
 //            sense that this menu exists since we all go to the dashboards"); whoever is signed in goes to their dashboard. Only the
 //            teacher's and the test account's Courses and Learning Situations lists (#courses, #learning) stay, with this menu
 // It adds the LS home's side menu on the left (a computer: brand + wide buttons; a narrow window: a strip of icon buttons) or the
 // board's bottom bar (a phone):
-// 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🧪 English Lab · 🎯 Practise · ❓ Help (the teacher: 📊 Dashboard and no Help).
+// 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🎲 Games · 🎯 Practise · ❓ Help (the teacher: 📊 Dashboard and no Help).
+// Games replaced English Lab (Roger, 7 Nov 2026: "I want games on the left and vocabulary and grammar in practice, English Lab is not
+// needed anymore"): lab/ is now the Games page, and Practise has the vocabulary and grammar at the student's level.
 // LS1 pages keep their design (Roger's rule: leave LS1 alone). No Firestore reads: who is signed in, the group and the language
 // come from el-cloud.js (ELCloud.onUser, its cached reads); the current LS from the time plan (el-plan.js, el-week.js: static files).
 // Styles: shared/css/el-app.css.
@@ -75,16 +77,16 @@
     const lsLink = curLs && lsHref(curLs), back = $(".topbar .brand>a.elback"), lsT = lsName(curLs) || (back && back.dataset.ls) || "";
     const lsN = (() => { const cl = (window.EL_LS || []).filter(l => l.id.split("-")[0] === (curLs || "").split("-")[0]); const i = cl.findIndex(l => l.id === curLs); return i >= 0 ? "LS" + (i + 1) : "LS"; })();
     const here = mode === "home" ? ((location.hash.match(/^#(courses|learning)$/) || [])[1] || "")
-      : mode === "lp" || mode === "games" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? "practise" : "lab";
+      : mode === "lp" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? "practise" : "games";
     const L = [];
     if (who.role === "none") {
       L.push(["home", "⌂", "Home", "Home", ROOT + "index.html"]);
-      L.push(["lab", "🧪", "English Lab", "Lab", ROOT + "lab/"]);
+      L.push(["games", "🎲", "Games", "Games", ROOT + "lab/"]);
     } else {
       L.push(teach ? ["dash", "📊", "Dashboard", "Dashboard", dash] : ["board", "🏠", t("El meu tauler", "My dashboard"), t("El meu tauler", "My dashboard"), board]);
       if (lsLink) L.push(["ls", "📚", lsN + (lsT ? " · " + lsT : ""), lsN, lsLink]);
       if (c) L.push(["all", "🗂", t("Totes les Learning Situations", "All Learning Situations"), t("Totes les LS", "All LS"), ROOT + c + "/index.html"]);
-      L.push(["lab", "🧪", "English Lab", "Lab", ROOT + "lab/"]);
+      L.push(["games", "🎲", t("Jocs", "Games"), t("Jocs", "Games"), ROOT + "lab/"]);
       L.push(["practise", "🎯", t("Practica", "Practise"), t("Practica", "Practise"), ROOT + "lab/practice.html"]);
       if (!teach) L.push(["help", "❓", t("Ajuda", "Help"), t("Ajuda", "Help"), board + "#help"]);
     }
@@ -112,7 +114,7 @@
     b.innerHTML = L.map(x => `<a${x.on ? ' class="on" aria-current="page"' : ""} href="${x.h}"><i aria-hidden="true">${x.i}</i><span>${esc(sh(x))}</span></a>`).join("");
     document.body.classList.add("elhas-bar");
   }
-  function side(L) {   // English Lab and Practise: their side menu, as the board's buttons
+  function side(L) {   // Games and Practise: their side menu, as the board's buttons
     const tabs = $(".sidebar .nav-tabs");
     if (!tabs) return;
     let s = $(".elside");

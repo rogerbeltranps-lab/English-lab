@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Practise on your own · English Lab</title>
+  <title>Practise · English with Roger</title>
   <style>
     /* Same look as English Lab (lab/index.html) */
     :root{--bg:#f5f7fb;--surface:#fff;--text:#172033;--muted:#667085;--line:#e5e7eb;--accent:#3157d5;--accent-soft:#eaf0ff;--ok:#15803d;--no:#b91c1c;--shadow:0 14px 40px rgba(23,32,51,.08)}
@@ -33,7 +33,7 @@
     .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
     .chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:5px 13px;cursor:pointer}.chip.on{background:#172033;color:#fff;border-color:#172033}
     select{border:1px solid #cbd5e1;border-radius:10px;padding:5px 8px;background:#fff;max-width:100%}
-    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+    .tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:16px 0}.tabs .tab{grid-column:span 2}.tabs .tab.big{grid-column:span 3;font-size:1.15rem;padding:16px}
     .tab{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px;cursor:pointer;text-align:left;font-weight:800}
     .tab small{display:block;font-weight:600;color:var(--muted);margin-top:2px}.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}.tab.on small{color:#dbe4ff}
     .card{border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;background:#fff}
@@ -60,11 +60,14 @@
     video,audio{width:100%;border-radius:14px;margin:8px 0}video{background:#000}
     .yt{position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;margin:8px 0}.yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
     .empty{padding:18px;border-radius:14px;background:#f8fafc;color:var(--muted)}
+    .explain{background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px 16px;margin:0 0 12px;line-height:1.55}.explain p{margin:.35em 0}
+    .slides{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.slides a{border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:999px;padding:6px 14px;text-decoration:none;font-weight:700}
+    .picks{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}.picks .w.on{background:var(--accent-soft);border-color:var(--accent)}.picks .w:disabled{text-decoration:line-through;opacity:.5;cursor:default}
     .signin{padding:22px;border:1px solid var(--line);border-radius:20px;background:#f8fafc}
     @media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}
       .mobile-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;position:sticky;top:0;z-index:20;background:rgba(245,247,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
       .mobile-tabs .tab-btn{white-space:nowrap;background:#fff;border:1px solid var(--line)}.mobile-tabs .tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-      .content{padding:14px}.panel{padding:22px}.tabs{grid-template-columns:repeat(2,1fr)}}
+      .content{padding:14px}.panel{padding:22px}.tabs{grid-template-columns:repeat(2,1fr)}.tabs .tab,.tabs .tab.big{grid-column:span 1}.tabs .tab.big{font-size:1.05rem}}
     @media (max-width:620px){.panel{padding:16px;border-radius:22px}.lv{min-width:0;flex:1 1 40%}.flash .en{font-size:1.5rem}}
   </style>
   <script src="../shared/js/el-catalog.js"></script>
@@ -72,14 +75,13 @@
   <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
 <body>
-  <nav class="mobile-tabs"><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">English Lab</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
+  <nav class="mobile-tabs"><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">Games</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
   <div class="app">
   <aside class="sidebar"><a class="brand" href="../index.html">English with Roger</a>
-    <nav class="nav-tabs"><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">English Lab</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
+    <nav class="nav-tabs"><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">Games</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
   </aside>
   <main class="content"><section class="panel">
-    <span class="eyebrow">English Lab</span>
-    <h1 id="title">Practise on your own</h1>
+    <h1 id="title">Practise</h1>
     <p class="lead" id="lead">Loading…</p>
     <div id="app"></div>
   </section></main>
@@ -104,7 +106,7 @@ const ROUTES = ['beginners', 'insecure', 'safe', 'daring'];
 const KEY = 'el_practice';   // el_ keys stay in this browser
 const store = (() => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch (e) { return {} } })();
 const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(store)) } catch (e) {} };
-store.known = store.known || {}; store.listen = store.listen || {}; store.shadow = store.shadow || {};
+store.known = store.known || {}; store.listen = store.listen || {}; store.shadow = store.shadow || {}; store.gram = store.gram || {};
 
 /* ---------- routes, as in the LS2 engine: cumulative r: tags, Starter falls back to Base, Pro to Plus ---------- */
 const base = lv => lv === 'native' ? 'daring' : lv;
@@ -177,7 +179,7 @@ const sentences = (text, lv) => plain(text).split(/(?<=[.!?])\s+(?=[A-Z“"‘'�
 
 // What a page gives one level: words, sentences to build, listenings (with their questions) and shadowing clips.
 function extract(pg, lv) {
-  const out = { words: [], build: [], listen: [], shadow: [] }, lp = pg.a.title, at = pg.a.id;
+  const out = { words: [], grammar: [], build: [], listen: [], shadow: [] }, lp = pg.a.title, at = pg.a.id;
   if (pg.kind === 'ls1') {
     const L = ls1Level(lv);
     (pg.vocab && pg.vocab[L] || []).forEach(([g, list]) => (list || []).forEach(en => out.words.push({ en, ca: pg.ca[en] || '', ex: pg.ex[en] || '', g, lp, at })));
@@ -209,6 +211,13 @@ function extract(pg, lv) {
         out.listen.push({ key: at + '#' + p.id, title, lp, media, items });
       }
     }
+    // 📘 Grammar (Roger, 7 Nov 2026: "students can do grammar and vocabulary of their level"): the Grammar and Mixed tabs of the
+    // learning paths, with the route's explanation and questions (r: tags, as in the LP itself)
+    if (p.type === 'typed' && /^(grammar|mixed)$/.test(p.id)) {
+      const items = forLevel(p.items, lv).filter(q => q && q.q && Array.isArray(q.a) && q.a.length);
+      if (items.length) out.grammar.push({ key: at + '#' + p.id, title: plain(byLevel(p.title, lv)), mixed: p.id === 'mixed', lp, items,
+        explain: (p.explain || []).filter(x => inR(x, lv)).map(x => byLevel(x, lv)).filter(Boolean) });
+    }
     if (p.type === 'shadow' && p.clip) { const c = p.clip; out.shadow.push({ key: at + '#' + p.id, title: c.title || tx(p.title), lp, src: pg.dir + c.src, slow: c.slow ? pg.dir + c.slow : null, t: c.t, ts: c.ts, lines: c.lines || [], marks: c.marks, cues: c.cues, video: !!c.video || /\.mp4$/.test(c.src), poster: c.poster ? pg.dir + c.poster : null }); }
     if ((p.type === 'speaking' || p.type === 'talk' || p.type === 'writing') && p.model) texts.push(byLevel(p.model, lv));
   });
@@ -220,7 +229,7 @@ function extract(pg, lv) {
 /* ---------- who is here ---------- */
 const COURSES = { '2eso': '2 ESO', '4eso': '4 ESO' };
 const S = { tab: (location.hash.slice(1) || 'words'), course: null, level: null, step: null, ls: 'all', lp: 'all', mode: 'cards', coreOnly: null, open: null };
-if (!['words', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
+if (!['words', 'grammar', 'build', 'listen', 'shadow'].includes(S.tab)) S.tab = 'words';
 let U = null, D = null, EN = true;
 const t = (ca, en) => EN ? en : ca;
 const all = () => DEMO ? !!DEMO.teacher : !!U && !ELCloud.viewing && (ELCloud.isTeacher(U) || (ELCloud.isTester(U) && !ELCloud.viewGroup()));   // viewing: the teacher's student view (el-cloud.js)
@@ -228,7 +237,7 @@ async function load(u) {
   if (DEMO) return { group: DEMO.group, lv: DEMO.levels || {}, ls: DEMO.ls || {} };
   const db = ELCloud.db, D = { group: ELCloud.viewGroup() || ELCloud.group(), lv: {}, ls: {} };
   try { if (ELCloud.levels) Object.assign(D.lv, await ELCloud.levels()); else (await F.getDocs(F.collection(db, 'students', u.uid, 'levels'))).forEach(l => D.lv[l.id] = l.data()); } catch (e) {}   // the read el-cloud.js already made
-  for (const l of EL_LS) D.ls[l.id] = await ELCloud.lsInfo(l.id);
+  for (const l of EL_LS) D.ls[l.id] = await (ELCloud.lsNow || ELCloud.lsInfo)(l.id);   // lsNow: el-cloud.js's cached read of ls/{id}
   return D;
 }
 const myCourse = () => (EL_GROUPS.find(g => g.id === D.group) || {}).course || null;
@@ -258,7 +267,7 @@ async function content() {
   pairsOf(S.step).forEach(([c, lv]) => (all() ? lsOf(c) : lsOf(c).slice().reverse()).filter(l => S.ls === 'all' || l.id === S.ls).forEach(l => { if (!L.includes(l)) L.push(l);
     const ok = all() || c === myCourse() ? canDo : otherDo;
     EL_CATALOG.filter(a => a.ls === l.id && !a.manual && !a.inClass && !a.checkpoint && !/reflect$/.test(a.id) && ok(a)).forEach(a => acts.push({ a, l, lv })); }));
-  const out = { words: [], build: [], listen: [], shadow: [], lps: acts, ls: L };
+  const out = { words: [], grammar: [], build: [], listen: [], shadow: [], lps: acts, ls: L };
   const pages = await Promise.all(acts.map(({ a, l, lv }) => loadPage(a).then(pg => lv === 'native' && l.pro ? loadNative(pg) : pg)));
   pages.forEach((pg, i) => { if (!pg || (S.lp !== 'all' && acts[i].a.id !== S.lp)) return; const x = extract(pg, acts[i].lv); Object.keys(x).forEach(k => out[k].push(...x[k].map(y => Object.assign(y, { ls: acts[i].l })))); });
   const seen = new Set(); out.words = out.words.filter(w => { const k = w.en.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
@@ -287,17 +296,18 @@ function filters(x) {
   return `<div class="row">${L.length > 1 ? `<button class="chip ${S.ls === 'all' ? 'on' : ''}" data-do="ls" data-v="all">${t('Totes les LS', 'All LSs')}</button>` : ''}${L.map((l, i) => `<button class="chip ${S.ls === l.id ? 'on' : ''}" data-do="ls" data-v="${l.id}">${esc(lsName(l))}</button>`).join('')}
     ${x.lps.length > 1 ? `<select data-do="lp" aria-label="Learning Path"><option value="all">${t('Tots els Learning Paths', 'All Learning Paths')}</option>${x.lps.map(({ a }) => `<option value="${a.id}" ${S.lp === a.id ? 'selected' : ''}>${esc(a.title)}</option>`).join('')}</select>` : ''}</div>`;
 }
-const TABS = [['words', '🃏', 'Word cards', 'Targetes de paraules', 'Vocabulari de la teva ruta', 'Vocabulary of your route'], ['build', '🧩', 'Sentence builder', 'Sentence builder', 'Ordena les paraules', 'Put the words in order'],
+// Vocabulary and Grammar first and bigger (Roger, 7 Nov 2026), then sentence builder, listening and shadowing
+const TABS = [['words', '🃏', 'Vocabulary', 'Vocabulari', 'Targetes de paraules', 'Word cards'], ['grammar', '📘', 'Grammar', 'Gramàtica', 'Explicació i exercicis', 'Explanation and exercises'], ['build', '🧩', 'Sentence builder', 'Sentence builder', 'Ordena les paraules', 'Put the words in order'],
   ['listen', '🎧', 'Listening', 'Listening', 'Escoltes amb preguntes', 'Listenings with questions'], ['shadow', '🗣', 'Shadowing', 'Shadowing', 'Escolta i repeteix', 'Listen and repeat']];
 let X = null, gen = 0;
 async function render() {
   const g = ++gen;
   $('#app').innerHTML = header() + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`;
   const x = await content(); if (g !== gen) return; X = x;
-  const n = { words: x.words.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length + x.ls.filter(l => l.shadowing).length };
+  const n = { words: x.words.length, grammar: x.grammar.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length + x.ls.filter(l => l.shadowing).length };
   $('#app').innerHTML = header() + filters(x)
-    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
-  ({ words: words, build: build, listen: listen, shadow: shadow })[S.tab]();
+    + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab${/^(words|grammar)$/.test(k) ? ' big' : ''} ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
+  ({ words, grammar, build, listen, shadow })[S.tab]();
 }
 const none = () => `<div class="empty">${t('Encara no hi ha res per practicar aquí: apareixerà quan el professor obri més Learning Paths.', 'Nothing to practise here yet: it will appear when your teacher opens more Learning Paths.')}</div>`;
 const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
@@ -313,7 +323,7 @@ function words() {
   const list = S.coreOnly && hasCore ? ws.filter(w => w.core) : ws;
   if (!list.length) return $('#body').innerHTML = none();
   const head = `<div class="row"><button class="btn sm" aria-pressed="${S.mode === 'cards'}" data-do="mode" data-v="cards">${t('Targetes', 'Cards')}</button><button class="btn sm" aria-pressed="${S.mode === 'test'}" data-do="mode" data-v="test">${t('Posa’t a prova', 'Test me')}</button>
-    ${hasCore ? `<label style="margin-left:6px"><input type="checkbox" data-do="core" ${S.coreOnly ? 'checked' : ''}> ${t('Només les paraules clau', 'Key words only')} <span class="star">⭐</span></label>` : ''}<span class="muted">· ${list.length} ${t('paraules', 'words')}</span></div>`;
+    ${hasCore ? `<label style="margin-left:6px"><input type="checkbox" data-do="core" ${S.coreOnly ? 'checked' : ''}> ${t('Només les paraules clau', 'Key words only')} <span class="star">⭐</span></label>` : ''}<span class="muted">· ${list.length} ${t('paraules', 'words')}</span><a class="btn g sm" style="margin-left:auto;text-decoration:none" href="./">🎲 ${t('Jocs de vocabulari', 'Vocabulary games')}</a></div>`;
   if (S.mode === 'test') {
     const pool = list.filter(w => w.ca && !/\+|…|___/.test(w.en));
     if (!test.length || test.some(w => !pool.includes(w))) test = shuffle(pool).slice(0, 10);
@@ -393,6 +403,90 @@ function lcheck() {
   const sc2 = e.media.script; if (sc2 && sc2.length) $('#lscript').innerHTML = `<details style="margin-top:10px"><summary>${t('Mostra el text de l’escolta', 'Show the script')}</summary><div class="script">${sc2.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<b>' + esc(l[0]) + ':</b> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('')}</div></details>`;
 }
 
+/* 📘 Grammar (Roger, 7 Nov 2026: "the idea is that students can do grammar and vocabulary of their level"): the Grammar and Mixed
+   tabs of the opened learning paths, at the student's level: the explanation, then the questions, checked at once (the answer shows
+   after two wrong tries, as in the learning path). Starter picks from three options. The LS grammar slides (lab/grammar/) are linked
+   for the LSs on screen. What the student typed comes back when they return (this browser only, el_practice), until ↺ Practise again. */
+const SLIDES = [['2eso-my-real-routine', 'grammar/2eso-present-simple.html', 'Present Simple'], ['4eso-my-real-routine', 'grammar/4eso-present-simple-phrasal-verbs.html', 'Phrasal verbs'],
+  ['4eso-seasons-and-celebrations', 'grammar/4eso-present-simple-customs.html', 'Customs & dates']];
+let gtries = {};
+const gKey = () => S.open + '@' + S.level;
+// a Mixed tab is named after the grammar topic of its learning path ("Mixed practice · like + -ing and imperatives"): several are called the same
+const gTitle = g => { if (!g.mixed) return g.title; const main = X.grammar.find(x => !x.mixed && x.key.split('#')[0] === g.key.split('#')[0]);
+  return main ? t('Barreja', 'Mixed practice') + ' · ' + main.title : g.title; };
+const starterLv = () => base(S.level) === 'beginners';
+// Starter picks from three options, made as in the learning path (ls2-engine.js, copied: authored distractors, forms of the verb in
+// brackets, words of the same set, then other answers), in a fixed order per question
+const nWords = x => (String(x).trim().match(/\S+/g) || []).length;
+const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
+const s3 = v => ({ go: 'goes', do: 'does', have: 'has', be: 'is' })[v] || (/[^aeiou]y$/.test(v) ? v.slice(0, -1) + 'ies' : /(s|sh|ch|x|z|o)$/.test(v) ? v + 'es' : v + 's');
+const ing = v => /ie$/.test(v) ? v.slice(0, -2) + 'ying' : (/[^e]e$/.test(v) ? v.slice(0, -1) + 'ing' : /^[^aeiou]*[aeiou][bdgmnprt]$/.test(v) ? v + v.slice(-1) + 'ing' : v + 'ing');
+const hash = t => { let h = 7; for (const c of String(t)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+function verbForms(it) {
+  const m = String(it.q).match(/\((?:not \/ )?([a-z]+)\)/); if (!m) return null;
+  const v = m[1], g = ing(v), a = expand(it.a[0]).trim(), be = /(^|\W)I ___/.test(it.q) ? 'am' : 'are';
+  const map = {};
+  map[v] = [s3(v), be + ' ' + g]; map[s3(v)] = [v, 'is ' + g]; map[g] = [v, s3(v)];
+  map['are going to ' + v] = ['is going to ' + v, 'will ' + v]; map['is going to ' + v] = ['are going to ' + v, 'will ' + v]; map['am going to ' + v] = ['is going to ' + v, 'will ' + v]; map['will ' + v] = ['is going to ' + v, s3(v)];
+  map['is ' + g] = ['are ' + g, s3(v)]; map['are ' + g] = ['is ' + g, v]; map['am ' + g] = ['is ' + g, v];
+  map['does not ' + v] = ["don't " + v, "isn't " + g]; map['do not ' + v] = ["doesn't " + v, "aren't " + g];
+  map['is not ' + g] = ["aren't " + g, "doesn't " + v]; map['are not ' + g] = ["isn't " + g, "don't " + v]; map['am not ' + g] = ["isn't " + g, "don't " + v];
+  return map[a] || null;
+}
+// words that are confused with each other: a wrong option from the same set teaches more than a random word
+const SETS = [['at', 'in', 'on'], ['because', 'but', 'and', 'so', 'also'], ['first', 'then', 'finally', 'next'], ['always', 'usually', 'often', 'sometimes', 'never'], ['am', 'is', 'are'], ['do', 'does', 'is', 'are'], ['will', 'going to', 'is going to']];
+function choices(it, items, salt) {
+  const same = x => it.a.some(a => expand(a) === expand(x)), out = [];
+  const add = x => { if (out.length < 2 && x && !same(x) && !out.some(o => expand(o) === expand(x))) out.push(x); };
+  (it.d || []).forEach(add);
+  (verbForms(it) || []).forEach(add);
+  const ingQ = String(it.q).match(/-ing form: ([a-z]+)/); if (ingQ) { const v = ingQ[1]; [v + 'ing', v.replace(/e$/, '') + v.slice(-1) + 'ing', s3(v)].forEach(add); }
+  const a0 = norm(it.a[0]), set = SETS.find(g => g.includes(a0)); if (set) set.filter(x => x !== a0).sort((x, y) => hash(salt + x) - hash(salt + y)).forEach(add);
+  const wc = nWords(it.a[0]);
+  items.map(x => x.a[0]).filter(x => x !== it.a[0]).sort((x, y) => ((nWords(y) === wc) - (nWords(x) === wc)) || (hash(salt + x) - hash(salt + y))).forEach(add);
+  return [it.a[0]].concat(out).sort((x, y) => hash(salt + x) - hash(salt + y));
+}
+const gChoices = (it, items, i) => choices(it, items, S.open + i);
+function grammar() {
+  if (!X.grammar.length) return $('#body').innerHTML = none();
+  const g = X.grammar.find(x => x.key === S.open);
+  const slides = SLIDES.filter(([ls]) => X.ls.some(l => l.id === ls));
+  if (!g) {
+    $('#body').innerHTML = `<div class="how">${t('Tria un tema. Llegeix l’explicació, completa les frases i prem <b>Comprova</b>.', 'Choose a topic. Read the explanation, complete the sentences and press <b>Check</b>.')}</div>`
+      + (slides.length ? `<div class="slides"><span class="muted" style="align-self:center">📽 ${t('Explicacions de classe', 'Class explanations')}:</span>${slides.map(([, h, n]) => `<a href="${h}">${esc(n)}</a>`).join('')}</div>` : '')
+      + `<div class="list">${X.grammar.map((x, i) => { const b = (store.gram[x.key + '@' + S.level] || {}).best; return `<button class="item" data-do="open" data-v="${esc(x.key)}"><b>${x.mixed ? '🔀' : '📘'} ${esc(gTitle(x))}</b><small>${srcLine(esc(x.lp) + ' · ')}${x.items.length} ${t('preguntes', 'questions')}</small>${b ? `<small class="done">✓ ${t('Millor', 'Best')}: ${b}</small>` : ''}</button>`; }).join('')}</div>`;
+    return;
+  }
+  const st = starterLv();
+  $('#body').innerHTML = `<div class="row"><button class="btn g sm" data-do="close">← ${t('Tots els temes', 'All topics')}</button></div>
+    <div class="card"><h3>${g.mixed ? '🔀' : '📘'} ${esc(gTitle(g))}</h3>${g.explain.length ? `<div class="explain">${g.explain.map(e => `<p>${e}</p>`).join('')}</div>` : ''}
+    <div class="how">${st ? 'Tria la resposta correcta. Si falles, torna-ho a provar: a la segona vegada veuràs la resposta.' : t('Escriu la forma correcta a cada frase. Si falles dues vegades, veuràs la resposta.', 'Type the right form in each sentence. After two wrong tries you will see the answer.')}</div>
+    ${g.items.map((it, i) => `<div class="q"><p>${i + 1}. ${it.q}</p><input class="typed" id="gq${i}" autocomplete="off" autocapitalize="off" spellcheck="false"${st ? ` readonly placeholder="Tria una opció"` : ''}>
+      ${st ? `<div class="picks">${gChoices(it, g.items, i).map(o => `<button class="w" data-do="gpick" data-i="${i}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>` : ''}<div class="fb" id="gf${i}"></div></div>`).join('')}
+    <div class="row"><button class="btn" data-do="gcheck">${t('Comprova', 'Check')}</button><button class="btn g" data-do="gagain">↺ ${t('Torna a practicar', 'Practise again')}</button><span class="fb" id="gscore"></span></div></div>`;
+  // what they typed last time, with its correction (not counted as a new try)
+  const kept = store.gram[gKey()];
+  if (kept && kept.v) { (kept.tr || []).forEach((n, i) => { gtries[g.key + i] = n; }); kept.v.forEach((v, i) => { const b = $('#gq' + i); if (b) b.value = v || ''; $$(`[data-do="gpick"][data-i="${i}"]`).forEach(x => x.classList.toggle('on', norm(x.dataset.v) === norm(v))); }); gcheck(false); }
+  $$('#body input.typed').forEach(b => b.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); gcheck(true); } }));
+}
+function gcheck(count) {
+  const g = X.grammar.find(x => x.key === S.open); if (!g) return;
+  let ok = 0; const v = [];
+  g.items.forEach((it, i) => {
+    const box = $('#gq' + i), val = box.value, n = norm(val), right = !!n && it.a.some(a => expand(a) === expand(val)), f = $('#gf' + i), k = g.key + i;
+    v.push(val.trim().slice(0, 60)); if (right) ok++; else if (n && count) gtries[k] = (gtries[k] || 0) + 1;
+    if (starterLv() && n && !right && count) $$(`[data-do="gpick"][data-i="${i}"]`).forEach(x => { if (norm(x.dataset.v) === n) x.disabled = true; });
+    const why = EN ? (it.en || it.ca || '') : (it.ca || it.en || ''), show = gtries[k] >= 2;
+    box.className = 'typed' + (n ? right ? ' right' : ' wrong' : '');
+    f.className = 'fb ' + (right ? 'ok' : 'no');
+    f.innerHTML = right ? '✓' : !n ? (starterLv() ? 'Tria una resposta.' : t('Escriu una resposta.', 'Type an answer.'))
+      : '✗ ' + (why ? `<span class="hint">💡 ${esc(why)}</span> ` : '') + (show ? t('Resposta', 'Answer') + ': <b>' + esc(it.a[0]) + '</b>' : t('Torna-ho a provar.', 'Try again.'));
+  });
+  const k = gKey(), prev = store.gram[k] || {}, sc = ok + '/' + g.items.length;
+  if (count) { store.gram[k] = { v, tr: g.items.map((x, i) => gtries[g.key + i] || 0), best: !prev.best || ok > +prev.best.split('/')[0] ? sc : prev.best }; keep(); }
+  $('#gscore').textContent = sc + (ok === g.items.length ? ' 🎉' : '');
+}
+
 /* 🗣 Shadowing: the unit's shadowing video and every Learning Path clip (play, slower copy, hide the script, record yourself).
    Marks + two modes (Roger, 7 Nov 2026, shared/js/el-shadow.js): stress, linking and ↗ ↘ on the script with a key and a show/hide
    button; 🔁 Listen and repeat (one sentence, time to say it, the next) or 🗣 Shadowing (all of it, speaking along). */
@@ -438,7 +532,7 @@ async function srec(i) {
 /* ---------- clicks ---------- */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-do]'); if (!el || el.tagName === 'SELECT') return; const k = el.dataset;
-  const go = (f, r) => { f(); if (r) render(); else ({ words, build, listen, shadow })[S.tab](); };
+  const go = (f, r) => { f(); if (r) render(); else ({ words, grammar, build, listen, shadow })[S.tab](); };
   ({
     course: () => go(() => { S.course = k.v; S.ls = 'all'; S.lp = 'all'; S.open = null; }, 1),
     level: () => { if (all()) go(() => { S.step = k.v; [S.course, S.level] = (LADDER.find(x => x.k === k.v) || { pairs: [[S.course, S.level]] }).pairs[0]; S.ls = 'all'; S.lp = 'all'; S.open = null; S.coreOnly = null; }, 1); },
@@ -455,14 +549,16 @@ document.addEventListener('click', e => {
     pick: () => go(() => { if (!built[k.i].includes(+k.j)) built[k.i].push(+k.j); }),
     unpick: () => go(() => { built[k.i] = built[k.i].filter(j => j !== +k.j); }),
     bcheck, bnew: () => go(() => { set.ids = null; }),
-    open: () => go(() => { S.open = k.v; }),
+    open: () => { go(() => { S.open = k.v; }); window.scrollTo({ top: Math.max(0, $('#body').getBoundingClientRect().top + scrollY - 90) }); },
     close: () => go(() => { S.open = null; }),
     ans: () => { ans[k.i] = +k.j; $$(`[data-do="ans"][data-i="${k.i}"]`).forEach((b, j) => b.classList.toggle('on', j === +k.j)); },
     lcheck,
     speed: () => { const e = X.listen.find(x => x.key === S.open), a = $('#aud'); a.src = k.v === '1' ? e.media.slow : e.media.src; a.currentTime = 0; $$('[data-do="speed"]').forEach(b => b.setAttribute('aria-pressed', b === el)); },
     splay: () => splay(+k.i), sstop: () => { if (PL[+k.i]) PL[+k.i].stop(); const m = $('#sm' + k.i); m.pause(); m.ontimeupdate = null; if (rec && rec.state === 'recording') rec.stop(); },
     shide: () => { const s = $('#st' + k.i); s.hidden = !s.hidden; $('#sk' + k.i).hidden = s.hidden; el.textContent = s.hidden ? t('Mostra el text', 'Show the script') : t('Amaga el text', 'Hide the script'); },
-    srec: () => srec(+k.i)
+    srec: () => srec(+k.i),
+    gcheck: () => gcheck(true), gagain: () => go(() => { const b = (store.gram[gKey()] || {}).best; if (b) store.gram[gKey()] = { best: b }; else delete store.gram[gKey()]; keep(); Object.keys(gtries).forEach(x => { if (x.startsWith(S.open)) delete gtries[x]; }); }),
+    gpick: () => { const b = $('#gq' + k.i); if (b) { b.value = k.v; $$(`[data-do="gpick"][data-i="${k.i}"]`).forEach(x => x.classList.toggle('on', x === el)); } }
   })[k.do]?.();
 });
 document.addEventListener('change', e => { const el = e.target.closest('select[data-do="lp"]'); if (el) { S.lp = el.value; S.open = null; render(); } });
@@ -472,11 +568,11 @@ function start() {
   S.course = S.course || (all() ? (c || '2eso') : c);
   EN = all() || (myLevel() ? !elCa(base(myLevel())) : false);
   document.documentElement.lang = EN ? 'en' : 'ca';
-  $('#title').textContent = t('Practica pel teu compte', 'Practise on your own');
-  document.title = t('Practica pel teu compte', 'Practise on your own') + ' · English Lab';
+  $('#title').textContent = t('Practica', 'Practise');
+  document.title = t('Practica', 'Practise') + ' · English with Roger';
   $$('[data-pr]').forEach(a => a.textContent = t('Practica', 'Practise'));
   if (!S.course) { $('#lead').textContent = t('Encara no tens cap grup: parla amb el professor.', 'You are not in a group yet: talk to your teacher.'); return; }
-  $('#lead').innerHTML = t('Targetes de paraules, sentence builder, escoltes i shadowing del teu nivell. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'Word cards, sentence builder, listenings and shadowing at your level. Everything corrects itself and nothing is handed in: practise as much as you like.');
+  $('#lead').innerHTML = t('El vocabulari i la gramàtica del teu nivell, i també sentence builder, escoltes i shadowing. Tot es corregeix sol i no s’entrega res: practica tant com vulguis.', 'Vocabulary and grammar at your level, plus sentence builder, listening and shadowing. Everything corrects itself and nothing is handed in: practise as much as you like.');
   S.level = all() ? (S.level || 'insecure') : (myLevel() || 'insecure');   // a student always works at their own level
   // students get everything at their level in one place (no LS filter, newest LS first: content())
   if (!levelsOf(S.course).includes(S.level)) S.level = 'insecure';

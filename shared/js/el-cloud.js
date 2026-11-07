@@ -269,7 +269,7 @@ function applyLevel(lvl,all){
   if(mine&&!mine.classList.contains("active"))mine.click();
   if(!all)btns.forEach(b=>{b.style.display=b===mine?"":"none"});   // el-app.js already showed only the active one: the student's own shows again
 }
-// Students only use their board, English Lab (lab/ and its practice page lab/practice.html), their own course page and the LSs assigned to their group.
+// Students only use their board, Games (lab/) and Practise (lab/practice.html), their own course page and the LSs assigned to their group.
 const BOARD0=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html|practice\.html)?$/.test(location.pathname),
   onHome=[ROOT.pathname,ROOT.pathname+"index.html"].includes(location.pathname),onDash=/\/teacher\.html$/.test(location.pathname);
 // the student's board: in the teacher's student view, the board of that student
@@ -623,11 +623,11 @@ function bar(){
     if(!u)el.append("Not signed in ",b("Sign in",login));
     else if(AS){el.style.background="#fef3c7";el.style.borderColor="#f59e0b";el.append("👁 "+(AS.name||AS.email||"Student")+" ");
       const a=document.createElement("a");a.textContent="Their board";a.href=boardUrl();el.append(a," ");
-      if(!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
+      if(!onLab){const l=document.createElement("a");l.textContent=elCa(myLevel||homeLevel)&&!AS?"Jocs":"Games";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       const x=b("Exit student view",asExit);x.style.background="#a16207";x.title="Back to your dashboard; their answers leave this browser";el.append(x)}
     else{el.append(u.displayName||u.email," ");
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My dashboard";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
-      if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent="English Lab";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
+      if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent=elCa(myLevel||homeLevel)&&!AS?"Jocs":"Games";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
       if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
