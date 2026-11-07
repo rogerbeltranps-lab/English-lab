@@ -384,9 +384,16 @@ function leaveAs(clear){
 }
 const asExit=()=>{leaveAs(true);location.href=DASH};
 const asWho=()=>(AS.name||AS.email||"this student")+(AS.group?" · "+(((window.EL_GROUPS||[]).find(x=>x.id===AS.group)||{}).name||AS.group):"")+((myLevel||homeLevel)&&AS.group&&window.elLevelLabel?" · "+elLevelLabel(courseOf(AS.group),myLevel||homeLevel):"");
-function asBanner(){const b0=document.getElementById("el-as-banner");if(b0)b0.remove();
-  banner("👁 Student view: "+asWho()+" · as they see it, read-only (nothing is saved)","#a16207",[{t:"Their board",f:()=>{location.href=boardUrl()}},{t:"Exit student view",f:asExit}]);
-  const b=document.getElementById("el-banner");if(b)b.id="el-as-banner"}
+// The student view shows the pages exactly as the student sees them, with only a red frame round the screen (Roger, 7 Nov 2026: "I need
+// to see what students really see, I don't want to see this yellow thing, maybe a red line surrounding the screen"). The frame lets every
+// click through; its corner tag names the student and is the way out (the bottom bar's ✕ Exit does the same).
+function asBanner(){if(!AS||document.getElementById("el-as-frame"))return;
+  const f=document.createElement("div");f.id="el-as-frame";
+  f.style.cssText="position:fixed;inset:0;border:4px solid #dc2626;pointer-events:none;z-index:2147483646";
+  const t=document.createElement("button");t.type="button";t.textContent="👁 "+(AS.name||AS.email||"Student")+" · ✕";
+  t.title="Student view (read-only, nothing is saved). Click to exit and go back to your dashboard.";t.onclick=asExit;
+  t.style.cssText="position:absolute;top:0;left:50%;transform:translateX(-50%);pointer-events:auto;border:0;border-radius:0 0 8px 8px;background:#dc2626;color:#fff;font:600 11px system-ui,sans-serif;padding:1px 8px 2px;cursor:pointer;opacity:.85";
+  f.append(t);(document.body||document.documentElement).append(f)}
 // The learning path the teacher has pulled up for the group (ls/{id}.push[group], elPullFor in el-catalog.js; Roger, 2 Nov 2026): on any
 // other page of this LS a bar "📌 Your teacher wants you to open …" with Open it →; on that learning path itself its tab opens once (the
 // first time the student lands there after the teacher pulled it up). ✕ hides the bar until the teacher pulls up something else.
@@ -628,10 +635,11 @@ function bar(){
   return u=>{el.innerHTML="";el.style.visibility=authKnown?"":"hidden";if(!authKnown)return;
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
     if(!u)el.append("Not signed in ",b("Sign in",login));
-    else if(AS){el.style.background="#fef3c7";el.style.borderColor="#f59e0b";el.append("👁 "+(AS.name||AS.email||"Student")+" ");
-      const a=document.createElement("a");a.textContent="Their board";a.href=boardUrl();el.append(a," ");
-      if(!onLab){const l=document.createElement("a");l.textContent=elCa(myLevel||homeLevel)&&!AS?"Jocs":"Games";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
-      const x=b("Exit student view",asExit);x.style.background="#a16207";x.title="Back to your dashboard; their answers leave this browser";el.append(x)}
+    else if(AS){const ca=elCa(myLevel||homeLevel),no=()=>{};el.append((AS.name||AS.email||"")+" ");   // the student's own bar; its buttons do nothing here
+      const a=document.createElement("a");a.textContent=ca?"El meu tauler":"My dashboard";a.href=boardUrl();el.append(a," ");
+      if(!onLab){const l=document.createElement("a");l.textContent=ca?"Jocs":"Games";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
+      const p=b("⚠️ "+(ca?"Problema":"Problem"),no);p.style.background="#b45309";el.append(p," ",b("💡 Idea",no)," ");
+      const x=b("✕ Exit",asExit);x.style.background="#dc2626";x.title="Exit the student view: back to your dashboard";el.append(x)}
     else{el.append(u.displayName||u.email," ");
       const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My dashboard";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
       if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent=elCa(myLevel||homeLevel)&&!AS?"Jocs":"Games";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
@@ -1026,7 +1034,7 @@ onAuthStateChanged(auth,async u=>{
     if(onDash)leaveAs(true);
     else if((AS=asRead())){
       if(!AS.name||!AS.group){const me=await myDoc(AS.uid).catch(()=>null)||{};AS=Object.assign(AS,{name:me.name||"",email:me.email||"",group:me.group||null});asSave(AS)}
-      myGroup=AS.group;if(lsId)frozen=true}   // nothing typed on the student's LS pages is kept
+      myGroup=AS.group;if(lsId)frozen=true;asBanner()}   // nothing typed on the student's LS pages is kept
     else leaveAs(false);
   }
   user=u;authKnown=true;draw(u);
