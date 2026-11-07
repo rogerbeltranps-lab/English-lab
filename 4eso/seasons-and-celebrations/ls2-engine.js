@@ -1052,20 +1052,27 @@ var LS2 = (function () {
      (-slow copy), t / ts = [from, to] seconds in each, lines = the script of that part ([speaker, text]), video: true for an mp4.
      Four rounds: listen and read, mumble along, shadow with the script, shadow without it (the script is hidden and the last go can be
      recorded; speech recognition shows how much of the script it caught, feedback only). Done after 3 plays and a self-rating, counted by
-     completion, never by accuracy: state.shadow[id_route] = {plays, rate, pct, date}. Insecure and Beginners start on the slower copy. */
+     completion, never by accuracy: state.shadow[id_route] = {plays, rate, pct, date}. Insecure and Beginners start on the slower copy.
+     Marks + two modes (Roger, 7 Nov 2026): the script shows stressed words, linking and ↗ ↘ (clip.marks, key + show/hide), and
+     🔁 Listen and repeat (clip.cues: one sentence, a pause to say it, the next) sits next to 🗣 Shadowing (shared/js/el-shadow.js).
+     A Listen and repeat run counts as a play. */
   R.shadow = p => {
-    const id = p.id, c = p.clip;
+    const id = p.id, c = p.clip, SH = window.elShadow;
+    const repeatHow = ca() ? ['Prem ▶: sentiràs una frase i l’àudio s’aturarà.', 'Digues la frase en veu alta: copia les síl·labes fortes, les paraules unides i la melodia (↗ ↘).', 'La frase següent sona sola. Amb ↺ Una altra vegada la tornes a sentir.', 'Després prova 🗣 Shadowing: tot el fragment seguit, parlant alhora.']
+      : ['Press ▶: you hear one sentence, then the audio stops.', 'Say the sentence aloud: copy the stressed words, the linking and the melody (↗ ↘).', 'The next sentence plays by itself. Press ↺ Again to hear a sentence once more.', 'Then try 🗣 Shadowing: the whole clip, speaking along.'];
+    const howList = list => '<ol style="margin:6px 0;padding-left:22px;line-height:1.8">' + list.map(r => '<li>' + r + '</li>').join('') + '</ol>';
     const rounds = ca() ? ['Escolta i llegeix el text.', 'Torna-ho a escoltar i murmura les paraules alhora, fluix.', 'Repeteix en veu alta just darrere de la veu, amb el text: com una ombra.', 'Amaga el text i fes-ho sense mirar. Si vols, grava aquesta última vegada.']
       : ['Listen and read the script.', 'Listen again and mumble the words along with the speaker, quietly.', 'Say it aloud just behind the speaker, with the script: like a shadow.', 'Hide the script and do it without looking. Record this last go if you like.'];
     return {
-      html: '<div class="section-card"><h3>' + (ca() ? 'Com es fa' : 'How it works') + '</h3><ol style="margin:6px 0;padding-left:22px;line-height:1.8">' + rounds.map(r => '<li>' + r + '</li>').join('') + '</ol><p class="tiny">' + (ca() ? 'Millor amb auriculars.' : 'Best with headphones.') + '</p></div>' +
-        '<div class="section-card"><strong>' + esc(c.title || 'Listening') + '</strong>' +
+      html: '<div class="section-card"><h3>' + (ca() ? 'Com es fa' : 'How it works') + '</h3><div id="' + id + 'How">' + howList(SH && SH.has(c) && SH.mode() === 'repeat' ? repeatHow : rounds) + '</div><p class="tiny">' + (ca() ? 'Millor amb auriculars.' : 'Best with headphones.') + '</p></div>' +
+        '<div class="section-card"><strong>' + esc(c.title || 'Listening') + '</strong>' + (SH ? '<div id="' + id + 'Modes">' + SH.bar(c, ca(), 'btn secondary') + '</div>' : '') +
         (c.video ? '<video id="' + id + 'Media" preload="metadata" playsinline style="width:100%;border-radius:14px;margin:8px 0;background:#000"' + (c.poster ? ' poster="' + c.poster + '"' : '') + '></video>' : '<audio id="' + id + 'Media" preload="metadata"></audio>') +
         '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn" type="button" id="' + id + 'Play">▶ ' + (ca() ? 'Escolta el fragment' : 'Play the clip') + '</button><button class="btn secondary" type="button" id="' + id + 'Stop">■ Stop</button>' +
         '<button class="btn secondary" type="button" data-sh="' + id + '" data-slow="0">' + (ca() ? 'Velocitat normal' : 'Normal speed') + '</button><button class="btn secondary" type="button" data-sh="' + id + '" data-slow="1">' + (ca() ? 'Versió més lenta' : 'Slower version') + '</button>' +
-        '<span class="tiny" id="' + id + 'Count"></span></div>' +
+        '<span class="tiny" id="' + id + 'Count"></span></div>' + (SH ? '<div id="' + id + 'Turn">' + SH.turnBox(ca()) + '</div>' : '') +
         '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Hide">' + (ca() ? 'Amaga el text' : 'Hide the script') + '</button></div>' +
-        '<div class="reading" id="' + id + 'Script">' + c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<strong>' + esc(l[0]) + ':</strong> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('') + '</div></div>' +
+        '<div id="' + id + 'Key">' + (SH && SH.has(c) ? SH.key(ca()) : '') + '</div>' +
+        '<div class="reading" id="' + id + 'Script">' + (SH ? SH.script(c, 'strong') : c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<strong>' + esc(l[0]) + ':</strong> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('')) + '</div></div>' +
         '<div class="section-card"><h3>' + (ca() ? 'Grava l’última vegada' : 'Record your last go') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes darrere la veu. Amb Chrome veuràs quantes paraules del text ha entès l’ordinador. No compta per a la nota: és per veure com millores.' : 'Press <strong>Record and play</strong>: the clip plays and you shadow it. With Chrome you will see how many words of the script the computer caught. It is just for you, to see how you improve.') + '</p>' +
         '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Rec">● ' + (ca() ? 'Grava i escolta' : 'Record and play') + '</button><button class="btn secondary" type="button" id="' + id + 'RecStop" disabled>■ ' + (ca() ? 'Atura' : 'Stop') + '</button></div><div class="record-status" id="' + id + 'RecMsg"></div><audio id="' + id + 'Mine" controls style="width:100%;display:none"></audio></div>' +
         '<div class="section-card"><h3>' + (ca() ? 'Com ha anat?' : 'How did it go?') + '</h3><div class="actions" style="justify-content:flex-start" role="group">' +
@@ -1087,16 +1094,21 @@ var LS2 = (function () {
           const go = () => { m.currentTime = t[0]; endAt = t[1]; onEnd = done || null; m.play().catch(e => { if (e && e.name === 'AbortError') return; endAt = 0; $('#' + id + 'Count').textContent = ca() ? 'El fragment no s’ha pogut reproduir. Torna-ho a provar.' : 'The clip could not play. Try again.'; halt(); }); sh.plays = (sh.plays || 0) + 1; count(); save(); };
           if (!m.src || !m.src.endsWith(src)) { m.src = src; m.addEventListener('loadedmetadata', go, { once: true }); m.load(); } else go();
         };
-        $('#' + id + 'Play').onclick = () => play();
-        $('#' + id + 'Stop').onclick = () => { endAt = 0; halt(); };
-        $$('[data-sh="' + id + '"]').forEach(b => b.onclick = () => { slow = b.dataset.slow === '1'; endAt = 0; m.pause(); mark(); });
-        $('#' + id + 'Hide').onclick = e => { const s = $('#' + id + 'Script'), h = !s.hidden; s.hidden = h; e.target.textContent = h ? (ca() ? 'Mostra el text' : 'Show the script') : (ca() ? 'Amaga el text' : 'Hide the script'); };
+        // Listen and repeat: el-shadow.js plays sentence by sentence; a run counts as one play
+        const rp = SH ? SH.player({ media: m, clip: c, src: () => slow ? c.slow : c.src, slow: () => slow, scriptEl: $('#' + id + 'Script'), turnEl: $('#' + id + 'Turn .shm-turn'), ca: ca(),
+          onStart: () => { sh.plays = (sh.plays || 0) + 1; count(); save(); } }) : null;
+        const repeat = () => rp && rp.has && SH.mode() === 'repeat';
+        if (SH) SH.bindBar($('#' + id + 'Modes'), c, ca(), () => { rp.stop(); endAt = 0; halt(); rp.sync(); $('#' + id + 'How').innerHTML = howList(repeat() ? repeatHow : rounds); });
+        $('#' + id + 'Play').onclick = () => { if (repeat()) { endAt = 0; onEnd = null; rp.start(0); } else { if (rp) rp.stop(); play(); } };
+        $('#' + id + 'Stop').onclick = () => { if (rp) rp.stop(); endAt = 0; halt(); };
+        $$('[data-sh="' + id + '"]').forEach(b => b.onclick = () => { if (rp) rp.stop(); slow = b.dataset.slow === '1'; endAt = 0; m.pause(); mark(); });
+        $('#' + id + 'Hide').onclick = e => { const s = $('#' + id + 'Script'), h = !s.hidden; s.hidden = h; $('#' + id + 'Key').hidden = h; e.target.textContent = h ? (ca() ? 'Mostra el text' : 'Show the script') : (ca() ? 'Amaga el text' : 'Hide the script'); };
         $$('[data-rate="' + id + '"]').forEach(b => b.onclick = () => { sh.rate = +b.dataset.v; rate(); save(); });
         // the last go: the mic records while the clip plays; recognition counts the script words it heard (feedback only, never saved as a mark)
         const recMsg = $('#' + id + 'RecMsg'), recBtn = $('#' + id + 'Rec'), recStop = $('#' + id + 'RecStop');
         recStop.onclick = () => { endAt = 0; halt(); };
         recBtn.onclick = async () => {
-          if (processor) return; recBtn.disabled = true;
+          if (processor) return; recBtn.disabled = true; if (rp) rp.stop();
           try {
             micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
             audioCtx = new (window.AudioContext || window.webkitAudioContext)(); recRate = audioCtx.sampleRate;
