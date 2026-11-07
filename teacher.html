@@ -100,6 +100,8 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .agc.np{background:#fff;border:1px dashed #94a3b8;color:#475569}.agc.on{background:#dcfce7;border-color:#86efac;color:#166534}.agc.hw{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
 .agc.ex{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700}.agc.nt{background:#f8fafc;border-color:#e2e8f0;color:#475569;font-style:italic;border-radius:10px}
 .agday .agc .tabsec:not(.off),.agday .agc .agx,.agday .agh .agx{opacity:0}.agday .agc:hover .tabsec,.agday .agc:hover .agx,.agday .agh:hover .agx,.agday .agc .agx:focus{opacity:1}
+.agiw{background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:999px;padding:0 5px;margin:0 0 0 2px;font-size:11px;line-height:16px;cursor:pointer;white-space:nowrap}.agiw:hover{border-color:#6366f1}.agiw.g{background:#fef3c7;border-color:#f59e0b;color:#92400e}.agiw.m{background:#f1f5f9}.agh .agiw{font-size:12px;padding:0 6px}.agiwk{background:#fef3c7;border:1px solid #f59e0b;border-radius:999px;padding:0 4px;font-weight:400}
+.agc.grp{background:#fffbeb;border-color:#fcd34d;color:#92400e}.agc.shd{font-style:normal;font-weight:600;background:#f5f3ff;border-color:#c4b5fd;color:#5b21b6}.agla.shd{background:#f5f3ff;border-color:#c4b5fd}.agla.shd b{color:#5b21b6}
 .agx{background:none;color:#94a3b8;border:0;padding:0 2px;margin:0;font-size:12px;cursor:pointer;line-height:1}.agx:hover{color:#dc2626}
 .agwk h3{font-size:15px;margin:16px 0 6px;color:#334155}
 .agdays{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;align-items:stretch}
@@ -2180,6 +2182,7 @@ function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=s
   const tk=Object.assign({},seed?seed.tick:{}),on=(d,it)=>{const k=itKey(d,it);return k in tk?tk[k]:tkOf(x)[x.ls+"|"+k]||false};
   if(fn&&fn(ag,tk,on)===false)return;
   Object.keys(ag.days).forEach(d=>{if(!ag.days[d].some(it=>it!=="self"))delete ag.days[d]});
+  if(ag.wk){Object.keys(ag.wk).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1)))delete ag.wk[q]});if(!Object.keys(ag.wk).length)delete ag.wk}
   acts(x.ls).forEach(a=>{if(!ag.lab[a.id])ag.lab[a.id]=agLab(x,a)});
   const ps=[api.planEdit(x.ls,x.gid,"agenda",JSON.stringify(ag))];
   const touched=new Set([...agDays(ag),...Object.keys(tkOf(x)).filter(k=>k.startsWith(x.ls+"|@")&&!k.includes("#")).map(k=>k.slice(x.ls.length+2))]);
@@ -2203,14 +2206,15 @@ const addIt=(ag,d,it)=>{const a=ag.days[d]=ag.days[d]||[];if(a.includes(it))retu
 function agMove(x,its,from,to,done){agSave(x,(ag,tk,on)=>{let n=0;its.forEach(it=>{
   const all=Object.keys(ag.days).filter(d=>ag.days[d].includes(it)),src=from?all.filter(d=>d===from):all.filter(d=>!on(d,it));
   if(!from&&!src.length&&all.length&&(done||!to))return;
-  let v=false;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w){v=w;tk[itKey(d,it)]=false}rmIt(ag,d,it);n++});
-  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v}});
+  let v=false,gw=null;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w){v=w;tk[itKey(d,it)]=false}gw=gw||(ag.wk||{})[d+"|"+it]||null;rmIt(ag,d,it);n++});
+  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v;if(gw){ag.wk=ag.wk||{};ag.wk[to+"|"+it]=gw}}});
   return n>0})}
 const agItems=a=>secOf(a).length?itemsOf(a).map(z=>a.id+"#"+z[0]):[a.id+"#"];
 const nextClassDay=(x,d)=>ELWeek.classDays(x.gid,ELWeek.add(d,1),ELWeek.add(d,70))[0]||null;
 function agDrop(k,to){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag||!k.from&&!to)return;
   if(k.ag==="exam"){if(!to||to===ag.exam)return;
     return agSave(x,(g,tk,on)=>{const v=g.exam&&on(g.exam,"exam");if(v){tk[itKey(g.exam,"exam")]=false;tk[itKey(to,"exam")]=v}g.exam=to})}
+  if(k.ag==="shd"){if(!to||(ag.days[to]||[]).includes(SHD))return;return agSave(x,g=>{addIt(g,to,SHD)})}
   if(k.from&&k.from===to)return;
   let its;
   if(k.ag==="it"){its=[k.it];agMove(x,its,k.from||"",to)}
@@ -2241,6 +2245,18 @@ const hwItems=x=>{const s=new Set(),t=ELWeek.today();Object.values(hwOf(x)||{}).
 const itName=(it)=>{if(it==="exam")return "📝 Exam";if(/^note:/.test(it))return it.slice(5);const [id,p]=[it.slice(0,it.indexOf("#")),it.slice(it.indexOf("#")+1)],a=byId(id);
   if(!a)return it;if(!p)return shortTi(a);const z=itemsOf(a).find(q=>q[0]===p);return z?z[1]:p};
 const dayLab=d=>ELWeek.date(d);
+// Individual or group work (Roger, 7 Nov 2026: "I want a tick in each SLP on the right where I can switch from individual to grupal so that I
+// organise my classes this way"): each learning path and tab on a class day is 👤 Individual (default) or 👥 Group work, for this group
+// and this day only. Stored in the agenda as wk: {"day|item": "g"}; it goes with the item when it moves to another day. Teacher only:
+// the students' plan lines ignore it. One write per click, no reads.
+const agG=(ag,d,it)=>(ag.wk||{})[d+"|"+it]==="g";
+const wkBtn=(x,d,its,big)=>{const ag=agOf(x),n=its.filter(it=>agG(ag,d,it)).length,st=!n?"i":n===its.length?"g":"m";
+  const lab=st==="g"?"👥":st==="i"?"👤":"👤👥",word=st==="g"?"Group":st==="i"?"Individual":"Mixed";
+  return `<button type="button" class="agiw ${st}" data-do="agwk" data-d="${d}" ${its.length>1||big?`data-a="${esc(its[0].split("#")[0])}"`:`data-it="${esc(its[0])}"`} data-gid="${x.gid}" data-ls="${x.ls}" aria-pressed="${st==="g"}" title="${word} work${big?" (all its tabs this day)":""} · click for ${st==="g"?"individual":"group"} work">${lab}</button>`};
+// 🎬 Group shadowing with the unit's video (Roger, 7 Nov 2026: "make it possible to add shadowing grupal (the video of the unit)"): one
+// item of the list on the left, dragged to as many class days as you like; on a day it is a note, so the students' plan line says it too.
+const SHD="note:🎬 Shadowing with the whole class";   // no " · ": plan lines are split on it
+const shdUrl=ls=>{const l=(typeof EL_LS!=="undefined"?EL_LS:[]).find(z=>z.id===ls);return l&&l.shadowing?l.shadowing:""};
 const slotOf=(gid,d)=>{const T=window.EL_TIMETABLE,dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d+"T12:00").getDay()];
   const s=((T&&T.groups&&T.groups[gid])||[]).find(v=>String(v).startsWith(dn+" "));return s?String(s).slice(4):""};
 // one class day: its items grouped by activity, each with a tick box, drag handle and ✕; c = compact (Home, weekend check)
@@ -2248,16 +2264,17 @@ function agDay(x,d,c){const ag=agOf(x),t=ELWeek.today(),its=(ag.days[d]||[]),isE
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
   const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
-    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" data-from="${d}" ${D} title="Drag it to another day, or back to the list on the left">`
+    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" data-from="${d}" ${D} title="Drag it to another day, or back to the list on the left">`
       +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${esc(label)}${/#/.test(it)?agTags(it):""}`
-      +(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
+      +(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" title="Open the unit's shadowing video">▶</a>`:"")
+      +(a&&p?wkBtn(x,d,[it]):"")+(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
   const groups=[];its.forEach(it=>{if(it==="self")return;const id=/^note:/.test(it)?"":it.split("#")[0],g=groups.find(z=>z.id===id&&id);if(g)g.its.push(it);else groups.push({id,its:[it]})});
   const body=groups.map(g=>{if(!g.id)return `<div class="agg">${g.its.map(it=>chip(it,it.slice(5))).join("")}</div>`;const a=byId(g.id);if(!a)return "";
     const sec=itemsOf(a).map(z=>z[0]),ord=it=>{const i=sec.indexOf(it.slice(it.indexOf("#")+1));return i<0?99:i};
     const nos=!secOf(a).length;
     return `<div class="agg ${dr.includes(a.id)?"drp":""}"><div class="agh" draggable="true" data-ag="day" data-a="${esc(a.id)}" data-from="${d}" ${D} title="Drag this learning path's tabs of the day to another day">`
       +(nos?`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} ${tkOf(x)[x.ls+"|"+itKey(d,a.id+"#")]?"checked":""} title="Done in class">`:"<span class=\"agdot\">⠿</span>")
-      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>`
+      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>${wkBtn(x,d,g.its,true)}`
       +(nos?`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} title="Take it off this day">✕</button>`:"")+`</div>`
       +(nos?"":`<div class="agcs">${g.its.slice().sort((p,q)=>ord(p)-ord(q)).map(it=>chip(it,itName(it),a)).join("")}</div>`)+`</div>`}).join("");
   const hwOk=its.some(it=>{const a=byId(it.split("#")[0]);return a&&!isCp(a)&&!a.manual});
@@ -2301,8 +2318,9 @@ function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr
   const shut=rows.filter(r=>!r.open),k="agshut"+x.ls+x.gid;
   const rowsH=rows.filter(r=>r.open).map(r=>r.h).join("")+(shut.length?`<details class="agpast agshut" data-k="${esc(k)}" ${S.open.has(k)?"open":""}><summary>🔒 Not opened yet (${shut.length})</summary>${shut.map(r=>r.h).join("")}</details>`:"");
   const ex=ag.exam,n=ex?ELWeek.days(t,ex):null;
-  return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day: it opens for the group. Drop it back here to take it off the agenda: it locks again.</p><p class="agkey">What each tab works: ${[["2","L","Listening"],["3","S","Speaking"],["4","R","Reading"],["5","W","Writing"]].map(([k,l,n])=>`<i style="background:${compCol(k)}">${l}</i> ${n}`).join(" ")} · other competences by their code</p>`
+  return `<aside class="agl" data-agdrop="" ${D}><h2>${esc(lsLabel(EL_LS.find(l=>l.id===x.ls))||x.ls)}</h2><p class="muted">Drag a learning path or one tab to a class day: it opens for the group. Drop it back here to take it off the agenda: it locks again.</p><p class="agkey">What each tab works: ${[["2","L","Listening"],["3","S","Speaking"],["4","R","Reading"],["5","W","Writing"]].map(([k,l,n])=>`<i style="background:${compCol(k)}">${l}</i> ${n}`).join(" ")} · other competences by their code<p class="agkey">On the class days: 👤 individual work · <b class="agiwk">👥</b> group work. Click it to switch a tab, or the one next to the learning path for all its tabs that day.</p>`
     +`<div class="agla exam"><div class="aglh" draggable="${ex?"true":"false"}" data-ag="exam" data-from="${ex||""}" ${D} title="Drag it to another day"><span class="agdot">⠿</span><span class="agln"><b>📝 Exam</b><small>${ex?esc(ELWeek.date(ex))+(n>1?` · in ${n} days`:n===1?" · tomorrow":n===0?" · today":" · done"):"no day yet"}</small></span></div></div>`
+    +(shdUrl(x.ls)?(()=>{const sd=Object.keys(ag.days).filter(d=>ag.days[d].includes(SHD)).sort();return `<div class="agla shd"><div class="aglh" draggable="true" data-ag="shd" data-from="" ${D} title="Drag it to a class day (as many days as you like)"><span class="agdot">⠿</span><span class="agln"><b>🎬 Shadowing · whole class</b><small>the unit's video${sd.length?" · "+sd.map(d=>ELWeek.date(d).replace(/ \w+$/,"")).join(" · "):" · not on the agenda"}</small></span><a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" title="Open the video">▶</a></div></div>`})():"")
     +rowsH+`</aside>`}
 // Competences of what is on the agenda (Roger, 6 Nov 2026: "sometimes there will be sections that won't be done. So on the top I want 4
 // colors in a bar, one for each communicative skill … so if a teacher runs out of time, they can make sure we work those competences
@@ -2321,7 +2339,7 @@ function agBars(x){const ag=agOf(x),dr=(x.p._dropped||{})[x.gi]||[],ok=it=>!dr.i
   // 5 minutes of shadowing with the LS video every class (Roger, 6 Nov 2026: "they do shadowing every 5 minutes (with the video of the LS
   // with vocabulary and grammar of the unit) … that means that is speaking"): each class day with a learning path on it adds one step
   // of CE3 Speaking, to the agenda and to the whole LS alike
-  const shd=Object.values(ag.days).filter(its=>its.some(it=>/#/.test(it)&&ok(it))).length;if(shd){plan["3"]=(plan["3"]||0)+shd;all["3"]=(all["3"]||0)+shd}
+  const shd=Object.values(ag.days).filter(its=>its.some(it=>it===SHD||/#/.test(it)&&ok(it))).length;if(shd){plan["3"]=(plan["3"]||0)+shd;all["3"]=(all["3"]||0)+shd}
   const bar=(ks,title,sub,band)=>{const tot=ks.reduce((a,k)=>a+(plan[k]||0),0);if(!ks.length)return "";
     const pc=k=>tot?Math.round((plan[k]||0)/tot*100):0,kept=k=>all[k]?Math.round((plan[k]||0)/all[k]*100):0,nm=k=>isTr(k)?({CC:"Citizenship",CD:"Digital",CE:"Entrepreneurship",CPSAA:"Learning to learn"})[(k.match(/^[A-Z]+/)||[""])[0]]||k:compName(k).replace(/^CE\d+ · /,"");
     const low=band?ks.filter(k=>pc(k)<20):[];
@@ -2901,6 +2919,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       quick(api.planEdit(k.ls,k.gid,"nohw:"+k.line,k.v==="1"?{noHw:true,at:Date.now()}:null))},   // a plan's "Homework by …" line removed for this group (planEdits "nohw:<line>")
     pledit:()=>{e.preventDefault();peOpen(planX(k.ls,k.gid),+k.i,k.line)},
     agtick:()=>{e.stopPropagation();agTick(planX(k.ls,k.gid),k.d,k.it,t.checked)},
+    agwk:()=>{e.preventDefault();e.stopPropagation();const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)return;
+      const its=k.a?((ag.days||{})[k.d]||[]).filter(it=>it.split("#")[0]===k.a):[k.it],allG=its.every(it=>agG(ag,k.d,it));
+      agSave(x,g=>{g.wk=g.wk||{};its.forEach(it=>{const q=k.d+"|"+it;if(allG)delete g.wk[q];else g.wk[q]="g"})})},
     agrm:()=>{e.preventDefault();e.stopPropagation();agMove(planX(k.ls,k.gid),[k.it],k.d,"")},
     agnext:()=>{e.preventDefault();const x=planX(k.ls,k.gid),ag=agOf(x),nd=nextClassDay(x,k.d);if(!nd)return alert("No later class in the timetable.");
       agMove(x,((ag.days||{})[k.d]||[]).filter(it=>it!=="self"&&!tkOf(x)[x.ls+"|"+itKey(k.d,it)]),k.d,nd)},
