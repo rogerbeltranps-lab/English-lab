@@ -618,7 +618,9 @@ const fvStat=(k,i,label,big,foot)=>`<div class="fv-stat ${k}"><span class="fv-sh
 // 📌 The learning path the teacher has pulled up for my group (Roger, 2 Nov 2026: "students find it difficult to find the learning path"):
 // ls/{id}.push[group], the newest one whose path is open for the group (elPullFor in el-catalog.js). A big card at the very top of the board
 // with "Open it", straight to the tab when the teacher chose one; it changes at once while the board is open (goLive listens to the LS docs).
-function pullBox(){const g=D.me.group,x=g&&elPullFor(D.ls,g);if(!x)return "";const a=x.act,done=isDone(a),info=D.ls[x.ls]||{};
+// Not shown any more (Roger, 7 Nov 2026: "we dont need this because in class mode I pull them up, right?"): 🎓 class mode (PR #315) took
+// students to the page and replaced the 📌 Pull up buttons, so only old pull-ups were left to show here.
+function pullBox(){return "";const g=D.me.group,x=g&&elPullFor(D.ls,g);if(!x)return "";const a=x.act,done=isDone(a),info=D.ls[x.ls]||{};
   // a recall checkpoint still to do opens the way first (elCheckpointMissing): the card says so and its button goes there
   const cp=!TX&&elCheckpointMissing(a,doneSet,y=>canDo(y,info)),href=(cp||a).path.split("/").map(encodeURIComponent).join("/")+(!cp&&x.p?"#"+encodeURIComponent(x.p):"");
   return `<div class="pullcard"><div><div class="pc-t">📌 ${TX?"Pulled up by the teacher for this group":t("El professor vol que obris","Your teacher wants you to open")}</div><div class="pc-n">${esc(x.t||a.title)}${x.pn?` <span>· ${esc(x.pn)}</span>`:""}</div>`
