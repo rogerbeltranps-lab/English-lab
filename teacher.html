@@ -2368,13 +2368,20 @@ const minSel=(x,d,it)=>{const v=agMin(agOf(x),d,it),os=[...new Set([...MINS,...(
     +`<option value="">⏱</option>${os.map(m=>`<option value="${m}" ${m===v?"selected":""}>${m} min</option>`).join("")}<option value="other">Other…</option>${v?`<option value="0">✕ No time</option>`:""}</select>`};
 // The day's items as they are shown, in groups: [{id (activity; "" for a note), its}]. A day whose order you changed by dragging (ag.man[day])
 // shows its items in the order you left them (a learning path shows twice when something sits between its tabs); any other day groups each
-// learning path's tabs in the path's own order.
+// learning path's tabs in the path's own order. The tabs (SLPs) of a learning path always keep the path's order, on every day (Roger, 7 Nov 2026:
+// "SLP should always be in order, the only thing that I can move are the LP and games"): only games, notes and whole learning paths move.
+const isTab=it=>{const i=it.indexOf("#");return !/^note:/.test(it)&&i>0&&i<it.length-1&&!isGame(it.slice(i+1))};
+function agTabOrder(its){const out=its.slice(),by={};
+  out.forEach((it,i)=>{if(!isTab(it))return;const id=it.split("#")[0];(by[id]=by[id]||[]).push(i)});
+  Object.entries(by).forEach(([id,pos])=>{const a=byId(id);if(!a)return;const sec=itemsOf(a).map(z=>z[0]),ord=it=>{const i=sec.indexOf(it.slice(it.indexOf("#")+1));return i<0?99:i};
+    pos.map(i=>out[i]).sort((p,q)=>ord(p)-ord(q)).forEach((it,j)=>{out[pos[j]]=it})});
+  return out}
 function agRuns(ag,d){const man=!!(ag.man||{})[d],gs=[];
-  ((ag.days||{})[d]||[]).forEach(it=>{if(it==="self")return;const id=/^note:/.test(it)?"":it.split("#")[0],g=id&&(man?[gs[gs.length-1]]:gs).find(z=>z&&z.id===id);if(g)g.its.push(it);else gs.push({id,its:[it]})});
+  agTabOrder((ag.days||{})[d]||[]).forEach(it=>{if(it==="self")return;const id=/^note:/.test(it)?"":it.split("#")[0],g=id&&(man?[gs[gs.length-1]]:gs).find(z=>z&&z.id===id);if(g)g.its.push(it);else gs.push({id,its:[it]})});
   if(!man)gs.forEach(g=>{const a=g.id&&byId(g.id);if(!a)return;const sec=itemsOf(a).map(z=>z[0]),ord=it=>{const i=sec.indexOf(it.slice(it.indexOf("#")+1));return i<0?99:i};g.its.sort((p,q)=>ord(p)-ord(q))});
   return gs}
-// Change the order inside a day (Roger, 7 Nov 2026: "I want to be able to change the order here by dragging up or down"): a tab, a note
-// (🎬 Shadowing, ✎ Note) or a learning path with its tabs, dragged up or down inside its own day, goes where the blue line shows. That day
+// Change the order inside a day (Roger, 7 Nov 2026: "I want to be able to change the order here by dragging up or down"): a game, a note
+// (🎬 Shadowing, ✎ Note) or a learning path with its tabs (not a single tab: those keep the path's order), dragged up or down inside its own day, goes where the blue line shows. That day
 // keeps the order from then on (ag.man[day] = 1), and the students' plan line for the day follows it. One write, ticks untouched.
 function agReorder(k,d,before){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)return;
   const cur=agRuns(ag,d).flatMap(g=>g.its);let mv=[];try{mv=k.ag==="day"?JSON.parse(k.its||"[]"):[k.it]}catch(e){}
@@ -2387,7 +2394,7 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
   const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
-    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
+    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)?"Drag it to another day, or back to the list on the left (tabs keep the learning path's order)":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
       +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${esc(label)}${/#/.test(it)?agTags(it):""}`
       +(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" title="Open the unit's shadowing video">▶</a>`:"")
       +(a&&p&&!isGame(p)?(()=>{const h=hwNext(x,d,it),o=!!h||hwS.has(it);return `<button type="button" class="aghw ${o?"on":""}" data-do="aghw1" data-d="${d}" data-it="${esc(it)}" ${D} aria-pressed="${o}" title="${h?"Homework for "+esc(ELWeek.date(h[1].by))+" · click to take it off":o?"Homework · click to take this tab off it":"Make it homework for the next class"}">🏠</button>`})():"")
@@ -2482,7 +2489,7 @@ function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="mute
     +(pastW.length?`<details class="agpast"><summary>Earlier weeks (${pastW.length})</summary>${pastW.map(([m,dd])=>agWeek(x,m,dd)).join("")}</details>`:"")
     +now.map(([m,dd])=>agWeek(x,m,dd)).join("")
     +`<p><button type="button" class="g" data-do="agmore" ${`data-gid="${x.gid}" data-ls="${x.ls}"`}>＋ Show one more week</button></p>`
-    +`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Each class day of ${esc((GR.find(g=>g.id===x.gid)||{}).name||x.gid)} by your timetable. Drag a learning path (all the tabs not ticked yet), one tab, the exam or the final product steps from the list or from another day. Drag a tab, a note or a learning path up or down inside its day to change the order. ⏱ sets how many minutes each one takes in class; the day adds them up against the class length. Tick what you did in class: students see it in “What we've done”. 🔓/🔒 opens or closes a tab for the group. Students see as homework only what you set with 🏠 Homework. Due days move with the learning path's last class, and the exam day students see follows the 📝 Exam.</p></details>`
+    +`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Each class day of ${esc((GR.find(g=>g.id===x.gid)||{}).name||x.gid)} by your timetable. Drag a learning path (all the tabs not ticked yet), one tab, the exam or the final product steps from the list or from another day. Drag a game, a note or a learning path up or down inside its day to change the order (tabs keep the learning path's order). ⏱ sets how many minutes each one takes in class; the day adds them up against the class length. Tick what you did in class: students see it in “What we've done”. 🔓/🔒 opens or closes a tab for the group. Students see as homework only what you set with 🏠 Homework. Due days move with the learning path's last class, and the exam day students see follows the 📝 Exam.</p></details>`
     +`</section></div>`}
 if(DEMO)window.EL_T=S;   // previews and tests look at the state
 // one tick (an item done in class) and the day's tick when all its items are done
@@ -2493,12 +2500,13 @@ let AGD=null;
 document.addEventListener("dragstart",e=>{const el=e.target.closest&&e.target.closest("[data-ag]");if(!el)return;AGD=Object.assign({},el.dataset);e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain",el.dataset.ag)}catch(_){}setTimeout(()=>document.body.classList.add("agdrag"),0)});
 const agInsOff=()=>document.querySelectorAll(".agins-b,.agins-a").forEach(q=>q.classList.remove("agins-b","agins-a"));
 // up or down inside its own day: the item it goes before ("" = at the end), shown by a blue line
-const agSame=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&(k.ag==="it"||k.ag==="day");
+const agSame=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&(k.ag==="it"&&!isTab(k.it)||k.ag==="day");
+const agFixed=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&k.ag==="it"&&isTab(k.it);   // a tab inside its own day: nothing to do
 function agInsAt(z,k,e){const els=[...z.querySelectorAll(k.ag==="day"?"[data-og]":"[data-oi]")];if(!els.length)return null;
   const el=els.find(q=>{const r=q.getBoundingClientRect();return e.clientY<r.top+r.height/2});agInsOff();
   if(el){el.classList.add("agins-b");return el.dataset.og||el.dataset.oi}els[els.length-1].classList.add("agins-a");return ""}
 document.addEventListener("dragend",()=>{AGD=null;document.body.classList.remove("agdrag");agInsOff();document.querySelectorAll(".agover").forEach(z=>z.classList.remove("agover"))});
-document.addEventListener("dragover",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;e.preventDefault();e.dataTransfer.dropEffect="move";
+document.addEventListener("dragover",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;if(agFixed(AGD,z)){agInsOff();z.classList.remove("agover");return}e.preventDefault();e.dataTransfer.dropEffect="move";
   document.querySelectorAll(".agover").forEach(q=>{if(q!==z)q.classList.remove("agover")});
   if(agSame(AGD,z)){z.classList.remove("agover");const v=agInsAt(z,AGD,e);if(v!=null)AGD.ins=v;return}agInsOff();z.classList.add("agover")});
 document.addEventListener("dragleave",e=>{const z=e.target.closest&&e.target.closest("[data-agdrop]");if(z&&!z.contains(e.relatedTarget)){z.classList.remove("agover");agInsOff()}});
