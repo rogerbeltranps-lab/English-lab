@@ -486,7 +486,7 @@ async function teacherSections(info){
   // projector; the students of the group follow that tab wherever it goes (cmTeacher below) and this tab stays free for other things.
   const cmOpen=()=>{const now=Date.now(),until=(window.elClassEnd&&elClassEnd(g,now))||now+LOCK_MS,u=new URL(location.href);
     u.searchParams.set("elcm",g+"."+until);window.open(u.href,"_blank","noopener")};
-  const cmStop=()=>setDoc(doc(db,"live",g),{go:null},{merge:true}).then(()=>{msg="✓ Class mode stopped"},e=>{msg="✗ Not saved: "+(e.code||e.message||e)}).then(draw);
+  const cmStop=()=>setDoc(doc(db,"live",g),{go:null,fs:null},{merge:true}).then(()=>{msg="✓ Class mode stopped"},e=>{msg="✗ Not saved: "+(e.code||e.message||e)}).then(draw);
   // ⛶ full screen for the group (live/{group}.fs = {on, at, until}, as on the dashboard; fsCheck below): the state and who left
   // (live/{group}/fsLeft), live for the group chosen in this bar
   // and who is not connected (live/{group}/here, elClassWatch in el-catalog.js), while full screen or a class game is on
@@ -526,16 +526,16 @@ async function teacherSections(info){
         +(never.length?'<div style="color:#475569;margin-top:4px">⚪ Not connected ('+never.length+'): '+never.map(y=>E(y.name)).join(", ")+'</div>':'')
         +(w.inn.length?'<div style="color:#166534;margin-top:4px">✓ In ('+w.inn.length+'): '+w.inn.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b;margin-top:4px">Nobody is in yet: they tap their screen to go full screen.</div>')+'</div>');
     if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
-  function fsRow(w){const x=fsE(),on=!!x,cls=!!elSlotNow(fsTT());
-    return '<button class="fs'+(on?" on":"")+'" data-fs="1" title="Every open page of '+gname(g)+' goes full screen (they tap once to start; Esc does nothing; you see who is in and who is out). During each class of your timetable it is on by itself and ends with the class. Not on recall checkpoints or the sample exam.">⛶ Full screen '+gname(g)+': '+(on?"on":"off")+(cls?on?" (class)":" for this class":"")+'</button>'
-      +(w.active?'<div class="fsl">'+(on?'until '+fsHm(x.until):'🎮 in a game')+' · ✓ '+w.inn.length+' in · ✗ '+w.out.length+' out'+(w.out.length&&!cmRead()?': '+w.out.map(y=>E(y.name)+" ("+fsWhy(y)+")").join(" · "):"")+'</div>':"")}
+  // no full screen button any more (Roger, 7 Nov 2026): it is on during every class of the timetable and while class mode is on
+  function fsRow(w){const x=fsE(),on=!!x;
+    return (w.active?'<div class="fsl">⛶ Full screen '+gname(g)+' · '+(on?'until '+fsHm(x.until):'🎮 in a game')+' · ✓ '+w.inn.length+' in · ✗ '+w.out.length+' out'+(w.out.length&&!cmRead()?': '+w.out.map(y=>E(y.name)+" ("+fsWhy(y)+")").join(" · "):"")+'</div>':"")}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
   function cmRow(){fsWatch();const x=fsLive&&fsLive.go,on=elCmOn(x),me=cmRead(),mine=me&&me.g===g;
     return '<div class="r pl"><b>🎓 Class mode for '+gname(g)+'</b>'
       +(mine?'<span class="now">This tab is the class tab: '+gname(g)+' follows it'+(x&&x.until?' until '+fsHm(x.until):'')+'</span><button class="g" data-cm="-">⏹ Stop class mode</button>'
         :on?'<span class="now">On: they follow your class tab ('+E(x.t||"")+(x.pn?" · "+E(x.pn):"")+')</span><button class="g" data-cm="-">⏹ Stop class mode</button><button data-cm="1">Start it here instead</button>'
         :'<button data-cm="1" title="Opens this page in a new tab for the projector. Every student of '+gname(g)+' goes wherever that tab goes (page and tab) until you stop it or the class ends. Keep using this tab for anything else.">Start class mode (new tab)</button>')
-+'</div><div class="r pl">'+fsRow(fsRoll())+'</div>'}
++'</div>'+((r=>r?'<div class="r pl">'+r+'</div>':'')(fsRow(fsRoll())))}
   function draw(){
     const t0=document.querySelector(".tab[data-panel]"),nav=t0&&t0.parentElement;if(!nav)return;
     // the copy el-app.js drew at once from el_tsec_<page path> (tsecEarly): the real bar takes its place now
@@ -690,7 +690,7 @@ async function sideMenu(u){
     const mk=(txt,h,sub)=>{const a=document.createElement("a");a.className="tab-btn";a.dataset.elSide="";a.href=h;a.textContent=txt;
       if(sub){a.title=sub;if(n.classList.contains("nav-tabs")){const s=document.createElement("small");s.textContent=sub;s.style.cssText="display:block;font-weight:600;opacity:.75;margin-top:2px";a.append(s)}}return a};
     const items=[];
-    if(cur)items.push(mk(ca?"Learning Situation actual":"Current Learning Situation",href(cur.course+"/"+cur.id.slice(cur.course.length+1)+"/index.html"),cur.title.replace(/^\S+ · /,"")));
+    if(cur)items.push(mk(ca?"Learning Situation actual":"Current Learning Situation",href(cur.course+"/"+cur.id.slice(cur.course.length+1)+"/index.html"),window.elLsName?elLsName(cur):cur.title.replace(/^\S+ · /,"")));
     items.push(mk(ca?"Totes les Learning Situations":"All Learning Situations",href(course+"/index.html")));
     const at=n.querySelector(":scope>[data-el-board]")||n.querySelector(":scope>.tab-btn:not([hidden])");
     items.forEach(i=>at?at.before(i):n.append(i));
@@ -943,12 +943,16 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   try{last=JSON.parse(sessionStorage.getItem(CM_K+"_last")||"null")}catch(e){}
   const key=x=>x.u+"#"+x.p;
   function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
-  async function send(x){const go=Object.assign({cm:true,at:Date.now(),s:o.s,lock:true,until:o.until},x);last=x;
+  // class mode puts the group in full screen until it stops (Roger, 7 Nov 2026: "only when I go class mode outside my schedule … then I
+  // press end class mode and I don't need that button"): the first move of this class mode also writes live/{group}.fs; Stop clears it
+  // (inside a class of the timetable full screen stays on by itself, elFsEff)
+  async function send(x){const now=Date.now(),go=Object.assign({cm:true,at:now,s:o.s,lock:true,until:o.until},x);last=x;
+    let fsK=null;try{fsK=sessionStorage.getItem(CM_K+"_fs")}catch(e){}const w={go};if(fsK!==String(o.s))w.fs={on:true,at:now,until:o.until,cm:o.s};
     try{sessionStorage.setItem(CM_K+"_last",JSON.stringify(x))}catch(e){}
-    try{await setDoc(doc(db,"live",o.g),{go},{merge:true});draw()}catch(e){console.warn("class mode",e);last=null;draw("✗ Not sent: "+(e.code||e.message||e))}}
+    try{await setDoc(doc(db,"live",o.g),w,{merge:true});if(w.fs)try{sessionStorage.setItem(CM_K+"_fs",String(o.s))}catch(e){}draw()}catch(e){console.warn("class mode",e);last=null;draw("✗ Not sent: "+(e.code||e.message||e))}}
   function draw(err){if(!chip){chip=document.createElement("div");chip.id="el-cmchip";
       chip.style.cssText="position:fixed;left:12px;bottom:12px;z-index:2147481500;display:flex;gap:10px;align-items:center;max-width:calc(100vw - 24px);padding:8px 10px 8px 14px;border-radius:999px;background:#4338ca;color:#fff;font:700 14px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.25)";
-      chip.onclick=e=>{if(!e.target.closest("button"))return;setDoc(doc(db,"live",o.g),{go:null},{merge:true}).catch(x=>console.warn("class mode",x));quit("stopped")};document.body.append(chip)}
+      chip.onclick=e=>{if(!e.target.closest("button"))return;setDoc(doc(db,"live",o.g),{go:null,fs:null},{merge:true}).catch(x=>console.warn("class mode",x));quit("stopped")};document.body.append(chip)}
     chip.innerHTML='<span>🎓 Class mode · '+gn+' follows this tab · until '+hm(o.until)+(err?' · '+String(err).replace(/</g,"&lt;"):'')+'</span><button style="border:0;border-radius:999px;padding:5px 12px;background:#fff;color:#4338ca;font:800 13px system-ui;cursor:pointer">⏹ Stop</button>'}
   draw();
   // stopped from the dashboard or another class tab started later

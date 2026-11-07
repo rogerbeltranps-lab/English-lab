@@ -169,7 +169,7 @@ footer.lsf{color:var(--muted);font-size:13px;padding:24px 0 0}
 .nt-study ul{margin:6px 0;padding-left:20px}.nt-study a{color:var(--c-dark);font-weight:700}.nt-study p{margin:4px 0}
 .nt-study summary{cursor:pointer;font-weight:700;margin-top:4px}.nt-miss{margin:6px 0 0;padding-left:22px}.nt-miss li{margin:0 0 6px}
 .nt-miss .no{color:#b91c1c}.nt-miss .ok{color:#166534;font-weight:700}
-.npart{border-top:1px solid var(--line);padding-top:12px;margin-top:14px;scroll-margin-top:16px}
+.npart{border-top:1px solid var(--line);padding-top:12px;margin-top:14px;scroll-margin-top:16px}.npart.nt-hit{animation:ntHit 2.2s ease}@keyframes ntHit{0%,40%{background:#fef3c7;box-shadow:0 0 0 8px #fef3c7}100%{background:transparent;box-shadow:0 0 0 8px transparent}}
 .nt-flag{display:inline-block;font-size:12px;font-weight:800;color:#9a3412;background:#ffedd5;border-radius:999px;padding:2px 10px;margin-bottom:6px}
 .nt-th{background:#faf8ff;border:1px solid #e9e3fb;border-radius:12px;padding:8px 14px}
 .nt-s h4{margin:6px 0 4px;color:#4c1d95;font-size:16px}.nt-s p{margin:4px 0}
