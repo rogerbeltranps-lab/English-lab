@@ -188,10 +188,17 @@ Storage.prototype.setItem=function(k,v){if(frozen&&this===localStorage&&!SKIP.te
 async function login(){
   // The dashboard is the teacher's page: its Sign in goes straight to Google (the students' window is for every other page).
   const u=onDash?await teacherLogin():await signIn({auth,A,domain:DOMAINS[0]});if(!u)return;
+  // Off to the dashboard or the board: cover this page at once, before the sign-in window's removal is painted, so the page
+  // signed in from (the welcome page) doesn't flash up while the next one loads (Roger, 7 Nov 2026: "When I sign in I see for a
+  // fraction of a second the welcome page"). Taken away again if the account is refused.
+  const leaving=(isStudent(u)&&!onBoard&&!onLab)||(isTeacher(u)&&onHome);
+  const cover=leaving?overlay('<p style="margin:0;color:#475569;font-weight:600">Opening your dashboard…</p>'):null;
+  if(cover)cover.style.zIndex=10004
+  const uncover=()=>{if(cover)cover.remove()};
   // Google is only for the teacher (Roger, 26 Oct 2026): any other account that comes in through the Google link is signed out.
   const google=(u.providerData||[]).some(p=>p.providerId==="google.com")&&!(u.providerData||[]).some(p=>p.providerId==="password");
-  if(!isTeacher(u)&&(google||!isStudent(u))){await signOut(auth);alert(google&&isStudent(u)?"Google sign-in is only for the teacher. Sign in with your school email and your password. · Entra amb el correu de l'institut i la teva contrasenya.":"Sign in with your school email (@"+DOMAINS.join(", @")+").");return}
-  if(isStudent(u)&&!isTester(u)&&(await onRoster(u))===null)return;   // refused in onAuthStateChanged
+  if(!isTeacher(u)&&(google||!isStudent(u))){uncover();await signOut(auth);alert(google&&isStudent(u)?"Google sign-in is only for the teacher. Sign in with your school email and your password. · Entra amb el correu de l'institut i la teva contrasenya.":"Sign in with your school email (@"+DOMAINS.join(", @")+").");return}
+  if(isStudent(u)&&!isTester(u)&&(await onRoster(u))===null){uncover();return}   // refused in onAuthStateChanged
   // Right after signing in: students (testers too) go to their board, except on English Lab, where they stay to use it;
   // the teacher goes from Home to the dashboard and stays on any other page (to preview it).
   if(isStudent(u)&&!onBoard&&!onLab)location.href=BOARD;
