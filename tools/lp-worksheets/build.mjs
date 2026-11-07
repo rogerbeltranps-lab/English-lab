@@ -1,21 +1,26 @@
 // Paper worksheets of the LS2 Learning Paths as PDFs (Roger, 30 Oct 2026). Run from the repo root:
 //   node tools/lp-worksheets/build.mjs OUTDIR
 //   node tools/lp-worksheets/build.mjs --summaries     (only the vocabulary and grammar summaries, into each LS's downloads folder)
+//   node tools/lp-worksheets/build.mjs --maintenance   (only the worksheets students download during maintenance, shared/js/el-maintenance.js)
 // Serves the repo on a local port, prints shared/print/worksheet.html for every Learning Path and route with Playwright's Chromium,
 // and writes OUTDIR/<course>/<lp>/<nn>-<lp>-<route>.pdf plus OUTDIR/<course>/<lp>/<nn>-<lp>-KEY.pdf (every route's answers, Pro last in 4 ESO).
 // It also prints shared/print/summary.html for every route into <ls>/downloads/ls<n>-vocabulary-grammar-<route>.pdf (committed: the
 // dashboard's Materials tab links them), so the summaries always match the Learning Paths.
+// It also prints the worksheets students can download while the site is in maintenance (PDFS in shared/js/el-maintenance.js, no keys)
+// into <ls>/downloads/worksheets/<lp>-<route>.pdf (committed, like the summaries).
 // The copyright line is printed by el-copyright.js at the foot of every page. The PDFs are not committed: they go to Roger's Drive.
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 
-const ONLY_SUMMARIES = process.argv.includes('--summaries');
-const ROOT = process.cwd(), OUT = path.resolve(ONLY_SUMMARIES ? '.' : process.argv[2] || 'worksheets');
+const ONLY_SUMMARIES = process.argv.includes('--summaries'), ONLY_MT = process.argv.includes('--maintenance');
+const ROOT = process.cwd(), OUT = path.resolve(ONLY_SUMMARIES || ONLY_MT ? '.' : process.argv[2] || 'worksheets');
+const MT = await import(pathToFileURL(path.join(ROOT, 'shared/js/el-maintenance.js')).href);
 // Secure recall checkpoints (31 Oct 2026) have no answers or hints in the repo: pass the keys file (kept outside the repo) to print them,
 //   node tools/lp-worksheets/build.mjs OUTDIR --keys <ls2-checkpoint-keys.json>
 const KEYS = (i => i > 0 ? JSON.parse(fs.readFileSync(process.argv[i + 1], 'utf8')) : null)(process.argv.indexOf('--keys'));
@@ -49,12 +54,18 @@ async function pdf(ls, lp, route, key, file, page_ = 'worksheet') {
   await page.pdf({ path: file, format: 'A4', printBackground: true, preferCSSPageSize: true });
 }
 // Vocabulary and grammar summaries per route (Starter has its own since 31 Oct 2026), into the LS's downloads folder.
-for (const ls of Object.keys(LSS)) {
+for (const ls of ONLY_MT ? [] : Object.keys(LSS)) {
   const n = (window.LP_PRINT[ls].title.match(/LS(\d+)/) || [])[1];
   for (const r of routesOf(ls)) await pdf(ls, '', r, false, path.join(ROOT, ls, 'downloads', `ls${n}-vocabulary-grammar-${r}.pdf`), 'summary');
   console.log('summaries', ls);
 }
-for (const [ls, lps] of ONLY_SUMMARIES ? [] : Object.entries(LSS)) {
+// Worksheets for maintenance mode: the student's route only, no answers.
+for (const [course, c] of ONLY_SUMMARIES ? [] : Object.entries(MT.PDFS)) {
+  fs.mkdirSync(path.join(ROOT, c.ls, 'downloads', 'worksheets'), { recursive: true });
+  for (const [lp] of c.lps) for (const r of MT.ROUTES[course]) await pdf(c.ls, lp, r, false, path.join(ROOT, MT.pdfPath(course, lp, r)));
+  console.log('maintenance worksheets', c.ls);
+}
+for (const [ls, lps] of ONLY_SUMMARIES || ONLY_MT ? [] : Object.entries(LSS)) {
   const course = ls.split('/')[0];
   for (const [i, lp] of lps.entries()) {
     const dir = path.join(OUT, course, lp), nn = String(i + 1).padStart(2, '0');

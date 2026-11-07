@@ -14,6 +14,32 @@ const ROOT=new URL("../../",import.meta.url);
 // old look. The pages draw at once from el_who (who was signed in on this browser last, saved below in onAuthStateChanged) and redraw
 // when the sign-in is known, which is the same picture.
 loadScript("shared/js/el-app.js",()=>window.ELApp);   // the app menu on student pages (el-app.js: a strip of icon buttons, a phone's bottom bar)
+// 🛠 Maintenance mode (Roger, 7 Nov 2026; shared/js/el-maintenance.js has the message and the worksheets). The teacher's switch on the
+// dashboard writes site/maintenance = {on, note, since} (anyone can read it, only the teacher writes it). Students only: the teacher, the
+// teacher's student view and the test account's "see everything" get in as usual. Reads: none for 2 minutes after a check that found it
+// off (el_mt in this browser), so a page opened from then on is covered within 2 minutes; otherwise one (a listener on that document,
+// whose first answer is the check). While it is on, the page saves nothing, keeps listening and opens again by itself when it goes off.
+// el_mt also keeps the last message shown, so a student's next page shows it at once, before the sign-in is known.
+const MT_K="el_mt",MT_MS=2*60e3,mtSet=Storage.prototype.setItem;
+const mtGet=()=>{try{return JSON.parse(localStorage.getItem(MT_K)||"null")}catch(e){return null}};
+const mtPut=o=>{try{mtSet.call(localStorage,MT_K,JSON.stringify(Object.assign({t:Date.now()},o)))}catch(e){}};
+let mtO=null,mtStop=null;
+async function mtShow(o,tester){
+  const m=await import("./el-maintenance.js");
+  if(!mtO){const st=document.createElement("style");st.textContent=m.CSS;document.head.append(st);
+    mtO=document.createElement("div");mtO.id="el-maintenance";
+    mtO.style.cssText="position:fixed;inset:0;z-index:2147483600;background:#f8fafc;display:grid;place-items:center;padding:20px;overflow:auto";
+    document.body.append(mtO)}
+  mtO.innerHTML=m.html(Object.assign({root:ROOT.href,signOut:true},o));
+  const b=mtO.querySelector("[data-mt-out]");if(b)b.onclick=()=>logout();
+  // the test account in a group's student view: a way back to its own view (that bar is under the message)
+  if(tester){const t=document.createElement("p");t.innerHTML='<button type="button" style="border:0;background:#7c3aed;color:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;font:inherit">Test account: see everything again</button>';
+    t.querySelector("button").onclick=()=>{mtSet.call(localStorage,"el_view","");location.reload()};mtO.firstElementChild.append(t)}
+  document.documentElement.classList.add("elready");
+}
+function mtHide(){if(mtO){mtO.remove();mtO=null}}
+(()=>{let w=null;try{w=JSON.parse(localStorage.getItem("el_who")||"null")}catch(e){}const c=mtGet();
+  if(w&&w.role==="student"&&c&&c.on)mtShow(c).catch(e=>console.warn("maintenance",e))})();
 const FB="https://www.gstatic.com/firebasejs/10.14.1/";
 const FBM=await Promise.all([import(FB+"firebase-app.js"),import(FB+"firebase-auth.js"),import(FB+"firebase-firestore.js")])
   .catch(e=>{console.warn("Firebase could not load (offline?): the page works on its own, nothing is synced",e);return null});
@@ -919,6 +945,27 @@ function bellWatch(cb){
     if(x&&Date.now()-x.t<MS){if(!c||x.t!==c.t){c=x;cb(x.l)}}else read()},60e3);
   return()=>clearInterval(t);
 }
+// 🛠 Is the site in maintenance? (see mtShow at the top). true: the message is on screen and the page stops here.
+function mtCheck(u){
+  if(mtStop){mtStop();mtStop=null}
+  const c=mtGet();if(c&&!c.on&&Date.now()-c.t<MT_MS){mtHide();return Promise.resolve(false)}
+  return new Promise(res=>{let first=true,o=null;
+    const off=()=>{mtPut({on:false});if(mtStop){mtStop();mtStop=null}};
+    const stop=onSnapshot(doc(db,"site","maintenance"),async s=>{const d=s.exists()?s.data():{};
+      if(!first){if(!d.on){off();location.reload()}else if(o&&(d.note||"")!==o.note){o.note=d.note||"";mtPut(Object.assign({on:true},o));mtShow(o,isTester(u))}return}
+      first=false;
+      if(!d.on){off();mtHide();res(false);return}
+      frozen=true;   // nothing typed behind the message is saved
+      const g=myGroup||(myRoster||{}).group||"",mm=/^([24])eso/i.exec(g),course=courseOf(g)||(mm?mm[1]+"eso":null);
+      const ls=(window.EL_LS||[]).filter(l=>l.course===course).pop();let route=null;
+      try{if(ls&&window.elRouteOf)route=elRouteOf(await myLevels(u.uid),ls.id).level||null}catch(e){console.warn("route",e)}
+      o={course,route,ca:!route||(window.elCa?elCa(route):true),note:d.note||""};
+      mtPut(Object.assign({on:true},o));
+      try{await mtShow(o,isTester(u))}catch(e){console.warn("maintenance",e)}
+      remember(u);   // el_who: the next page shows the message at once
+      res(true)},e=>{console.warn("maintenance",e);if(first){first=false;res(false)}});
+    mtStop=stop;});
+}
 // Who was signed in on this browser last (el_who: uid, role, group, language), for each page's first drawing before the sign-in is known
 // (el-app.js, el-ls-home.js, today.html, teacher.html, lab/): the page opens on the right version, not the signed-out or a guessed one.
 // Removed on sign-out and for an account that cannot come in. The teacher's student view keeps the teacher's own.
@@ -951,6 +998,7 @@ onAuthStateChanged(auth,async u=>{
   myRoster=u&&isStudent(u)&&!isTester(u)?await onRoster(u):undefined;
   if(myRoster===null){await refuse(u);return}
   if(u&&isStudent(u))try{myGroup=viewGroup(u)||await ensureGroup(u)}catch(e){console.warn("group",e)}
+  if(u&&isStudent(u)&&!seesAll(u)&&!AS){if(await mtCheck(u))return}else mtHide();   // 🛠 maintenance: the message instead of the page
   // A route the teacher set on the student list before their first sign-in (roster/{email}.route = {level, ls}, teacher.html listRoute):
   // saved as their route in that LS, with the level notice fields, if they have none there yet (firestore.rules checks it matches the list).
   const lr=myRoster&&myRoster.route;
