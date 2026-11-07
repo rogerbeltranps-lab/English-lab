@@ -335,7 +335,7 @@ function lsNowHtml(ls,info,nx){
   // itself sits at the top of the board's right column, above the tiles (Roger, 7 Nov 2026: "could this be on the top-right side?")
   const gc=gamesCard(ls);
   const tiles=L.tiles.filter(x=>!(x.notes&&gc)).map(x=>{const inner=`<span class="ti" aria-hidden="true">${esc(x.i)}</span><span><b>${tx(x.b)}</b><small>${tx(x.s)}</small></span>`;
-    return x.shadow?(L.video?`<button type="button" class="lst" data-lsvid>${inner}</button>`:""):`<a class="lst${x.notes?" wide":""}" href="${esc(x.h)}">${inner}</a>`}).join("");
+    return x.shadow?(L.video?`<button type="button" class="lst" data-lsvid>${inner}</button>`:""):`<a class="lst${x.notes||/#about$/.test(x.h)?" wide":""}" href="${esc(x.h)}">${inner}</a>`}).join("");
   return `<section class="lsnow" id="lsNow">${head}<div class="lsng">${lps}<div class="lsnr">${chal}<div class="lstiles">${tiles}</div></div></div></section>`}
 // 🗣 the LS shadowing video opens here in a window, as on the LS page
 document.addEventListener("click",e=>{const b=e.target.closest("[data-lsvid]");if(!b)return;const ls=EL_LS.find(l=>l.id===S.ls),L=ls&&LSH[ls.id];if(!L||!L.video)return;
