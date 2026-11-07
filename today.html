@@ -71,6 +71,18 @@ a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-si
 .ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}a.ucard{border:2px solid #e2e8f0;border-radius:16px;padding:16px 18px;text-decoration:none;color:#0f172a;display:flex;flex-direction:column;gap:4px}a.ucard small{color:#64748b;font-size:13px}a.ucard b{font-size:19px}a.ucard span{color:#3157d5;font-weight:700;margin-top:6px}a.ucard.on{border-color:#3157d5;background:#f5f8ff}a.ucard:hover{border-color:#3157d5}
 .helpl{margin:6px 0 0;padding-left:20px}.helpl li{margin:6px 0}
 @media (max-width:900px){.hgrid{grid-template-columns:1fr}.cont .ct{font-size:24px}}
+/* 📚 The current LS on the board home (Roger, 7 Nov 2026): learning paths with progress, the challenge and the LS tiles */
+.lsnow{margin-top:26px}.lsnh{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}.lsnt{min-width:0}.lsne{font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#3157d5}.lsnh h2{font-size:1.6rem;letter-spacing:-.02em;margin:.1em 0 0}.lsnh p{margin:2px 0 0;color:#64748b;font-size:15px}
+a.lsopen{color:#3157d5;font-weight:800;text-decoration:none;white-space:nowrap;padding:8px 12px;border-radius:12px}a.lsopen:hover{background:#eaf0ff}
+.lsng{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}.lsnl{margin:0;border-radius:18px;padding:16px 18px}.lsnl h3{margin:0 0 10px;font-size:18px}
+ol.lsrows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}a.lsr{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid #e2e8f0;border-radius:14px;padding:9px 12px;text-decoration:none;color:#0f172a;background:#fff}a.lsr:hover{border-color:#3157d5}
+a.lsr .n{width:34px;height:34px;border-radius:10px;background:#f1f5f9;display:grid;place-items:center;font-weight:800;color:#334155}a.lsr.cp .n{background:#fef3c7;color:#92400e}a.lsr .tt{min-width:0}a.lsr .tt b{display:block;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}a.lsr .tt small{display:block;color:#64748b;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+a.lsr .st{font-size:13px;font-weight:700;color:#64748b;white-space:nowrap;display:flex;align-items:center;gap:6px}a.lsr .st .mb{width:60px;height:6px;border-radius:9px;background:#e2e8f0;overflow:hidden}a.lsr .st .mb i{display:block;height:100%;background:#3157d5}
+a.lsr.next{border:2px solid #3157d5;background:#f5f8ff}a.lsr.next .n{background:#3157d5;color:#fff}a.lsr .st.next{background:#3157d5;color:#fff;border-radius:999px;padding:4px 10px}a.lsr.ok .n{background:#dcfce7;color:#166534}a.lsr .st.ok{color:#15803d}a.lsr.lock,a.lsr.drop{opacity:.7}a.lsr .st.lock{color:#b45309}
+.lsnr{display:flex;flex-direction:column;gap:12px;min-width:0}a.lsch{display:flex;flex-direction:column;gap:5px;background:#fff;border:1px solid #e2e8f0;border-top:4px solid #c2410c;border-radius:18px;padding:14px 18px;color:#0f172a;text-decoration:none}a.lsch:hover{border-color:#c2410c}a.lsch .k{font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#c2410c}a.lsch b{font-size:18px}a.lsch .d{color:#475569;font-size:14px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}a.lsch .go{color:#c2410c;font-weight:800;font-size:14.5px}
+.lstiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.lst{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px 14px;color:#0f172a;text-decoration:none;text-align:left;font:inherit;cursor:pointer;min-width:0}.lst:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}.lst.wide{grid-column:1/-1}.lst .ti{font-size:24px;line-height:1;flex:0 0 auto}.lst b{display:block;font-size:15.5px}.lst small{display:block;color:#64748b;font-size:13px;margin-top:1px}
+dialog.lsvid{border:0;border-radius:18px;padding:18px 20px;max-width:min(900px,94vw);width:900px}dialog.lsvid::backdrop{background:#0f172a99}.lsvh{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:18px}dialog.lsvid video{width:100%;border-radius:12px;background:#000}
+@media (max-width:900px){.lsng{grid-template-columns:1fr}}@media (max-width:640px){.lsnh h2{font-size:1.3rem}a.lsr{grid-template-columns:32px minmax(0,1fr);row-gap:4px}a.lsr .n{width:30px;height:30px}a.lsr .st{grid-column:2;justify-self:start}.lstiles{grid-template-columns:1fr}}
 .hr{display:flex;flex-direction:column;gap:14px}.phonebn{position:relative}.phonebn>a{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#eef2ff,#f0f9ff);border:1px solid #c7d2fe;border-radius:18px;padding:14px 44px 14px 16px;color:#0f172a;text-decoration:none}.phonebn>a:hover{border-color:#3157d5}.phonebn .pbi{font-size:30px}.phonebn b{display:block;font-size:16px}.phonebn small{display:block;color:#475569;font-size:13.5px;margin-top:2px}.phonebn .pbg{margin-left:auto;font-weight:800;color:#2443ad;white-space:nowrap}.phonebn .pbx{position:absolute;top:8px;right:8px;background:none;color:#64748b;padding:4px 8px;font-size:14px}
 .phero{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:28px;align-items:center}.phero>img{width:100%;height:auto}.plead{font-size:18px;line-height:1.5;margin-top:0}.pqr{display:flex;gap:16px;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin-top:14px}.pqr img{flex:0 0 auto;background:#fff;border-radius:8px}.pinst{font-size:17px;font-weight:800;padding:14px 22px;border-radius:14px;background:#2443ad}
 details.psteps{border:1px solid #e2e8f0;border-radius:14px;padding:0 14px;margin:10px 0}details.psteps>summary{cursor:pointer;font-weight:800;font-size:17px;padding:12px 0}.pfig{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:4px 0 14px}.pfig figure{margin:0;display:flex;flex-direction:column;gap:8px}.pfig img{width:100%;height:auto}.pfig figcaption{font-size:14.5px;line-height:1.4}
@@ -241,9 +253,69 @@ function homeHtml(lss,ls,info){
     +tile("#marks","📊",t("Les meves notes","My marks"),t("activitats, exàmens i producte final","activities, exams and final product"))
     +tile("#units","📚","Learning Situations",t("resums, pràctica i el teu nivell","summaries, practice and your level"))
     +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"),"","",true);
-  // the LS page, right under Continue (Roger, 6 Nov 2026: "students go from the dashboard to the ls and the ls to the dashboard")
-  const lsLink=ls&&!only(ls.id)?`<a class="hal lsl" href="${lsHref(ls)}">📚 <em class="lt"><b>${lsName(ls)}</b><small>${t("tots els learning paths, el repte i per estudiar","all learning paths, the challenge and study")}</small></em><span>${t("Obre la LS","Open the LS")} →</span></a>`:"";
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}${lsLink}${gamesCard(ls)}</div><div class="hr"><div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`}
+  // the current LS right on the board, under Continue and the tiles (Roger, 7 Nov 2026: "students should see in their dashboard the current LS"): lsNowHtml
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr"><div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`+lsNowHtml(ls,info,nx)}
+// 📚 The current LS on the board home (Roger, 7 Nov 2026: "I love this dashboard. However, students should see in their dashboard the
+// current LS"): the LS home page's learning paths with the student's progress (only the ones the teacher has opened for the group, as on the
+// LS page), the final product challenge and the LS tiles (games and theory, study, vocabulary games, shadowing video, about this LS), so
+// students don't need to open the LS page. The content comes from the LS home page itself (<ls>/index.html: ol.lps, a.chal, .tiles; one
+// static file, kept in this browser as el_lsh_<id>), the progress from what the board already read: no new Firestore reads.
+const LSH={},lshKey=id=>"el_lsh_"+id;
+function lshParse(ls,html){
+  const doc=new DOMParser().parseFromString(html,"text/html"),base=new URL(lsHref(ls),location.href).href;
+  const abs=h=>new URL(h,base).href,tx=e=>e?e.textContent.replace(/\s+/g," ").trim():"",both=e=>e?{en:tx(e),ca:e.dataset.ca?e.dataset.ca.replace(/<[^>]*>/g,""):""}:null;
+  const lps=[...doc.querySelectorAll("ol.lps a.lp[data-a]")].map(a=>({id:a.dataset.a,n:tx(a.querySelector(".n")),b:tx(a.querySelector(".t b")),d:tx(a.querySelector(".t small")),h:abs(a.getAttribute("href")),cp:a.classList.contains("cp")}));
+  const c=doc.querySelector("a.chal"),v=doc.querySelector("#shadowDlg video");
+  const tiles=[...doc.querySelectorAll(".tiles .tile")].filter(e=>!e.hasAttribute("data-el-teacher")).map(e=>({i:tx(e.querySelector(".ti")),b:both(e.querySelector("b")),s:both(e.querySelector("small")),
+    h:e.id==="shadowOpen"?"":abs(e.getAttribute("href")||""),shadow:e.id==="shadowOpen",notes:(e.getAttribute("href")||"")==="#notes"}));
+  return {lps,tiles,q:tx(doc.querySelector(".lshead .q")),chal:c?{k:both(c.querySelector(".k")),b:tx(c.querySelector("b")),d:tx(c.querySelector(".d")),go:both(c.querySelector(".go")),h:abs(c.getAttribute("href"))}:null,
+    video:v?{src:abs(v.getAttribute("src")),poster:v.getAttribute("poster")?abs(v.getAttribute("poster")):""}:null};
+}
+function lshGet(ls){
+  if(!LSH[ls.id])try{const c=JSON.parse(localStorage.getItem(lshKey(ls.id))||"null");if(c&&c.lps)LSH[ls.id]=c}catch(e){}
+  if(!LSH["_f"+ls.id]){LSH["_f"+ls.id]=1;   // once per page load: the file may have changed
+    fetch(lsHref(ls)).then(r=>r.ok?r.text():Promise.reject(r.status)).then(h=>{const x=lshParse(ls,h),was=JSON.stringify(LSH[ls.id]||null);LSH[ls.id]=x;
+      try{localStorage.setItem(lshKey(ls.id),JSON.stringify(x))}catch(e){}
+      if(JSON.stringify(x)!==was&&placeNow()==="home"&&S.ls===ls.id&&$("#lsNow"))render()}).catch(e=>console.warn("LS home",e))}
+  return LSH[ls.id]||null}
+function lsNowHtml(ls,info,nx){
+  if(!ls||only(ls.id))return "";
+  const L=lshGet(ls),num=EL_LS.filter(l=>l.course===ls.course).findIndex(l=>l.id===ls.id)+1,go=lsHref(ls);
+  const head=`<div class="lsnh"><div class="lsnt"><span class="lsne">${t("La teva Learning Situation ara","Your Learning Situation now")} · LS${num}</span><h2>${lsName(ls)}</h2>${L&&L.q?`<p>${esc(L.q)}</p>`:""}</div>`
+    +`<a class="lsopen" href="${go}">${t("Obre la pàgina de la LS","Open the LS page")} →</a></div>`;
+  if(!L)return `<section class="lsnow" id="lsNow">${head}<p class="muted">${t("Carregant la LS…","Loading the LS…")}</p></section>`;
+  const tx=o=>o?esc(!EN&&o.ca?o.ca:o.en):"";
+  // learning paths: the student sees only the ones the teacher has opened for the group, not the dropped ones (as on the LS page, Roger 6 Nov 2026)
+  const {p,gi}=planOf(ls),dr=(gi>=0&&p&&(p._dropped||{})[gi])||[],closed=info.status==="closed",every=all()||closed;
+  let shown=0;
+  const rows=L.lps.map(r=>{const a=EL_CATALOG.find(x=>x.id===r.id);
+    if(a&&!every&&(dr.includes(a.id)||!canDo(a,info)))return "";
+    shown++;
+    let st="",cl="";
+    if(a){const ks=steps(a),ds=doneSet(a),n=ks.filter(k=>ds.has(k)).length,isNext=nx&&nx.a.id===a.id;
+      const cp=!every&&!a.manual&&!AS&&elCheckpointMissing(a,doneSet,y=>canDo(y,info));
+      if(dr.includes(a.id)){cl="drop";st="✂ "+t("No cal fer-lo","Not needed")}
+      else if(!canDo(a,info)){cl="lock";st="🔒 "+t("Encara no està obert","Not open yet")}
+      else if(ks.length&&isDone(a)){cl="ok";st="✓ "+t("Fet","Done")}
+      else if(isNext){cl="next";st=(nx.cp?t("Fes-lo ara","Do it now"):t("Ara toca","Next"))+(ks.length?" · "+n+"/"+ks.length:"")}
+      else if(cp){cl="lock";st="🔒 "+t("Primer el checkpoint","Checkpoint first")}
+      else if(ks.length)st=(n?`<span class="mb"><i style="width:${Math.round(n/ks.length*100)}%"></i></span>`:"")+n+" / "+ks.length}
+    return `<li><a class="lsr ${cl}${r.cp?" cp":""}" href="${esc(r.h)}" title="${esc(r.d)}"><span class="n">${esc(r.n)}</span><span class="tt"><b>${esc(r.b)}</b><small>${esc(r.d)}</small></span><span class="st ${cl}">${st}</span></a></li>`}).join("");
+  const lps=`<div class="box lsnl"><h3>Learning paths</h3>`+(shown?`<ol class="lsrows">${rows}</ol>`:`<p class="muted">${t("El professor obrirà els learning paths a classe, quan toqui.","Your teacher will open the learning paths in class, when it is time.")}</p>`)+`</div>`;
+  const c=L.chal,chal=c?`<a class="lsch" href="${esc(c.h)}"><span class="k">${tx(c.k)}</span><b>${esc(c.b)}</b><span class="d">${esc(c.d)}</span><span class="go">${tx(c.go)}</span></a>`:"";
+  // 🧩 📚 the class games circles (gamesCard) take the place of the plain "Games and theory" tile when the student has played
+  const gc=gamesCard(ls);
+  const tiles=L.tiles.filter(x=>!(x.notes&&gc)).map(x=>{const inner=`<span class="ti" aria-hidden="true">${esc(x.i)}</span><span><b>${tx(x.b)}</b><small>${tx(x.s)}</small></span>`;
+    return x.shadow?(L.video?`<button type="button" class="lst" data-lsvid>${inner}</button>`:""):`<a class="lst${x.notes?" wide":""}" href="${esc(x.h)}">${inner}</a>`}).join("");
+  return `<section class="lsnow" id="lsNow">${head}<div class="lsng">${lps}<div class="lsnr">${chal}${gc}<div class="lstiles">${tiles}</div></div></div></section>`}
+// 🗣 the LS shadowing video opens here in a window, as on the LS page
+document.addEventListener("click",e=>{const b=e.target.closest("[data-lsvid]");if(!b)return;const ls=EL_LS.find(l=>l.id===S.ls),L=ls&&LSH[ls.id];if(!L||!L.video)return;
+  let d=$("#lsVid");if(!d){d=document.createElement("dialog");d.id="lsVid";d.className="lsvid";document.body.appendChild(d);
+    d.addEventListener("click",ev=>{if(ev.target===d||ev.target.closest("[data-close]"))d.close()});d.addEventListener("close",()=>{const v=d.querySelector("video");if(v)v.pause()})}
+  d.innerHTML=`<div class="lsvh"><b>🗣 ${t("Shadowing de tota la unitat","Shadowing for the whole unit")}</b><button type="button" class="g" data-close>✕ ${t("Tanca","Close")}</button></div>`
+    +`<p>${t("Escolta frases de la unitat i repeteix-les en veu alta. Després torna-ho a fer sense el text. El vídeo t'espera.","Listen to sentences from the unit and say them out loud with the speaker. Then say them again with no text. The video waits for you.")}</p>`
+    +`<video controls preload="none" playsinline${L.video.poster?` poster="${esc(L.video.poster)}"`:""} src="${esc(L.video.src)}"></video>`;
+  if(d.showModal)d.showModal();else window.open(L.video.src,"_blank")});
 // 🧩 📚 Games and theory (Roger, 6 Nov 2026: "a kind of circle with a percentage on the board saying something like games and theory, click
 // to see your performance and what to study … two, grammar and vocabulary"): % right in this LS's class games (myGames/{email}, written by
 // the game board), the link opens the LS page's 📝 place with the theory, their notes, each game's result and what to study
