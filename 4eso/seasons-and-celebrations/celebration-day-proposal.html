@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
 <meta charset="utf-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
@@ -58,6 +58,7 @@ html,body{overflow-x:clip}
 .audio-card[hidden],.audio-row[hidden],audio[hidden]{display:none!important}
 .rubric-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;margin-top:12px;background:#fff}.rubric{border-collapse:collapse;width:100%;min-width:900px;table-layout:fixed;font-size:.92rem}.rubric th,.rubric td{padding:12px 13px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}.rubric tbody tr:last-child th,.rubric tbody tr:last-child td{border-bottom:0}.rubric thead th{background:var(--soft);color:var(--dark)}.rubric th:first-child{width:17%}.rubric .level-num{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:850}.rubric .level-name{display:block;font-size:1rem}.rubric tbody th small{display:block;color:var(--dark);font-size:.78rem;font-weight:750;margin-top:3px}.rubric .percent{display:inline-block;background:var(--soft);color:var(--dark);font-size:.78rem;font-weight:850;border-radius:9px;padding:2px 7px;margin-top:6px}.rubric .round{display:block;color:var(--muted);font-size:.74rem;font-weight:750;margin-top:6px}.rubric-calc{margin-top:12px;color:var(--muted);font-size:.92rem}.rubric-pill{display:inline-block;background:var(--soft);color:var(--dark);border-radius:10px;padding:3px 9px;margin:4px 4px 0 0;font-size:.85rem;font-weight:700}
 </style>
+<link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu's styles before the first paint (Roger, 7 Nov 2026) -->
 </head>
 <body>
 <script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws (Roger, 7 Nov 2026) -->
@@ -91,6 +92,9 @@ html,body{overflow-x:clip}
 <script src="data/celebration-day-proposal.js"></script>
 <script src="data/native/celebration-day-proposal.js"></script>
 <script>LS2.init(window.LP);</script>
+<!-- the app menu and the learning path's left column at once, before the browser paints: no old look first (Roger, 7 Nov 2026) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>
