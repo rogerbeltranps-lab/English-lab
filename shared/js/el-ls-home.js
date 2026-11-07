@@ -57,13 +57,16 @@
   }
   // ---- places (#study, #about, #final): the board's rule, little on the menu and the details inside each place
   const PLACES=["study","about","final","notes"];   // notes: 📝 Your notes from the class games (el-notes.js)
+  // Go to the top only when the place changes, never on a redraw: the page draws again when Firebase answers and on every refresh, and that
+  // threw the student back to the top while scrolling the Study place (Roger's screen recording, 7 Nov 2026)
+  let shownPlace=null;
   function place(){
-    const p=PLACES.includes(location.hash.slice(1))?location.hash.slice(1):"home";
+    const p=PLACES.includes(location.hash.slice(1))?location.hash.slice(1):"home",moved=p!==shownPlace;shownPlace=p;
     $$("[data-place]").forEach(s=>s.hidden=s.dataset.place!==p);
     const c=$("#crumb");
     if(c)c.innerHTML=p==="home"?`<a class="back" href="${teach()?dashHref():boardHref()}">‹ ${teach()?"Dashboard":t("El meu tauler","My dashboard")}</a>`
       :`<a class="back" href="#">‹ ${esc(lsName(ls))}</a>`;
-    if(p!=="home")window.scrollTo(0,0);
+    if(moved&&p!=="home")window.scrollTo(0,0);
   }
 
   // ---- progress
