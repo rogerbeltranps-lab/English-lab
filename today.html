@@ -1036,7 +1036,8 @@ addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;rend
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
 if(DEMO){U={uid:"demo"};D=DEMO;AS=DEMO.as||null;render();if(AS&&location.hash==="#exam")setTimeout(()=>document.querySelector(".tabbody")?.scrollIntoView({block:"start"}),0)}   // DEMO.as: preview the teacher's view of a student's board
 else ELCloud.onUser(async u=>{U=u;
-  if(!u){nav(null,[]);$("#sub").textContent="Entra amb el teu correu de l’institut i la contrasenya (botó de baix a la dreta) per veure les teves activitats. · Sign in with your school email and password (button at the bottom right) to see your activities.";$("#main").innerHTML="";return}
+  // signed out: the welcome page, where everyone signs in (Roger, 7 Nov 2026); el_who is already gone, so it does not send them back here
+  if(!u){location.replace("index.html");return}
   // the student view of this tab (el-cloud.js, el_as) keeps the board on that student when the URL has no ?student
   const sp=new URLSearchParams(location.search).get("student")||(ELCloud.viewing||{}).uid;AS=sp&&ELCloud.isTeacher(u)?sp:null;
   D=await load(u);render();if(!AS)goLive();if(location.hash==="#exam")setTimeout(()=>document.querySelector(AS?".tabbody":"#exam")?.scrollIntoView({block:"start"}),0)});
