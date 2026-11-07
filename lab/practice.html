@@ -72,6 +72,7 @@
   </style>
   <script src="../shared/js/el-catalog.js"></script>
   <script src="../shared/js/el-shadow.js"></script>
+  <script src="../shared/js/el-voice.js"></script>
   <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
 <body>
@@ -316,7 +317,9 @@ async function render() {
 const none = () => `<div class="empty">${t('Encara no hi ha res per practicar aquí: apareixerà quan el professor obri més Learning Paths.', 'Nothing to practise here yet: it will appear when your teacher opens more Learning Paths.')}</div>`;
 const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
 const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
-const say = s => { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(s.replace(/\s\/\s/g, ', ')); u.lang = 'en-GB'; u.rate = elCa(base(S.level)) ? .85 : 1; speechSynthesis.speak(u); } catch (e) {} };
+// 🔊 Kokoro recordings, voice Heart, American English (shared/js/el-voice.js; Roger, 7 Nov 2026); a text with no recording uses the
+// browser's American voice. say([word, example]) plays one after the other.
+const say = s => { try { window.ELVoice.say(s, elCa(base(S.level)) ? .85 : 1); } catch (e) {} };
 
 /* 🃏 Word cards: turn the card over, or test yourself (Catalan → English, checked at once). Pro cards from Pro panels carry an
    English meaning instead of the Catalan, so the Test me instruction says "meaning" on that level (fix 2 Nov 2026). */
@@ -342,7 +345,7 @@ function words() {
   const w = deck[di];
   $('#body').innerHTML = head + `<div class="card"><div class="how">${t('Mira la paraula, digues-la en veu alta i pensa què vol dir. Després gira la targeta.', 'Look at the word, say it out loud and think what it means. Then turn the card over.')}</div>
     <div class="flash"><div class="muted">${di + 1} / ${deck.length}${srcLine(' · ' + esc(w.lp))}</div><div class="en">${esc(w.en)} ${w.core ? '<span class="star" title="key word">⭐</span>' : ''}</div><button class="btn g sm" data-do="say" data-v="${esc(w.en)}">🔊 ${t('Escolta', 'Listen')}</button>
-    ${flipped ? `<div class="ca">${esc(w.ca)}</div>${w.ex ? `<div class="ex">${esc(w.ex)}</div>` : ''}<div class="row" style="justify-content:center"><button class="btn ok" data-do="know">✓ ${t('Ho sabia', 'I knew it')}</button><button class="btn g" data-do="later">↺ ${t('Encara no', 'Not yet')}</button></div>`
+    ${flipped ? `<div class="ca">${esc(w.ca)}</div>${w.ex ? `<div class="ex">${esc(w.ex)} <button class="btn g sm" data-do="say" data-v="${esc(w.ex)}" aria-label="${t('Escolta l’exemple', 'Listen to the example')}">🔊</button></div>` : ''}<div class="row" style="justify-content:center"><button class="btn ok" data-do="know">✓ ${t('Ho sabia', 'I knew it')}</button><button class="btn g" data-do="later">↺ ${t('Encara no', 'Not yet')}</button></div>`
       : `<button class="btn" data-do="flip">${t('Gira la targeta', 'Turn over')}</button>`}</div></div>`;
 }
 const variants = en => { const v = new Set([en]); en.split(/\s\/\s/).forEach(x => v.add(x)); [...v].forEach(x => v.add(x.replace(/\([^)]*\)/g, ''))); return [...v].map(norm).filter(Boolean); };
@@ -547,7 +550,7 @@ document.addEventListener('click', e => {
     mode: () => go(() => { S.mode = k.v; }),
     core: () => go(() => { S.coreOnly = el.checked; }),
     say: () => say(k.v),
-    flip: () => go(() => { flipped = true; say(deck[di].en); }),
+    flip: () => go(() => { flipped = true; say([deck[di].en, deck[di].ex]); }),
     know: () => go(() => { store.known[deck[di].en] = Date.now(); keep(); di++; flipped = false; }),
     later: () => go(() => { deck.push(deck[di]); di++; flipped = false; }),
     again: () => go(() => { deck.ids = null; }),

@@ -1,0 +1,7010 @@
+[
+ {
+  "key": "757dcb08",
+  "text": "watch videos",
+  "say": "watch videos",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "367d0495",
+  "text": "I watch videos about skating.",
+  "say": "I watch videos about skating.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "b482cc16",
+  "text": "play online",
+  "say": "play online",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "a10819e4",
+  "text": "He plays online with his cousins.",
+  "say": "He plays online with his cousins.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "01ba91d0",
+  "text": "chat with friends",
+  "say": "chat with friends",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "259d2e3a",
+  "text": "We chat with friends after school.",
+  "say": "We chat with friends after school.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "41b8ee3b",
+  "text": "take photos",
+  "say": "take photos",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "c1987230",
+  "text": "She takes photos of her dog.",
+  "say": "She takes photos of her dog.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "0eada0c4",
+  "text": "record a video",
+  "say": "record a video",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "8d9129cc",
+  "text": "I'm recording a video for my vlog.",
+  "say": "I'm recording a video for my vlog.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "3bd70c1b",
+  "text": "send a message",
+  "say": "send a message",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "f0bcee59",
+  "text": "Send me a message when you arrive.",
+  "say": "Send me a message when you arrive.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "91b7e0b4",
+  "text": "upload a video",
+  "say": "upload a video",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "3ff40c5b",
+  "text": "We upload a video every Sunday.",
+  "say": "We upload a video every Sunday.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "65e5de10",
+  "text": "follow a channel",
+  "say": "follow a channel",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "cdd1f6c8",
+  "text": "I follow a climbing channel.",
+  "say": "I follow a climbing channel.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "04bc572b",
+  "text": "download an app",
+  "say": "download an app",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "db3e0cf6",
+  "text": "Download the app to see the results.",
+  "say": "Download the app to see the results.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "9eeabb4c",
+  "text": "search online",
+  "say": "search online",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "b67d712b",
+  "text": "Search online for the club's website.",
+  "say": "Search online for the club's website.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "a7690c51",
+  "text": "check a website",
+  "say": "check a website",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "d8634fcf",
+  "text": "Check the website for the times.",
+  "say": "Check the website for the times.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "3423d3ba",
+  "text": "screen time",
+  "say": "screen time",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "49d5e518",
+  "text": "My screen time is two hours a day.",
+  "say": "My screen time is two hours a day.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "497e5d26",
+  "text": "social media",
+  "say": "social media",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "ee59c32a",
+  "text": "The club is on social media.",
+  "say": "The club is on social media.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "b566ed53",
+  "text": "a reliable source",
+  "say": "a reliable source",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "752b4aab",
+  "text": "A museum website is a reliable source.",
+  "say": "A museum website is a reliable source.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "5767946f",
+  "text": "the author",
+  "say": "the author",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "a8611896",
+  "text": "Who is the author of this page?",
+  "say": "Who is the author of this page?",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "e03eb6df",
+  "text": "up to date",
+  "say": "up to date",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "74082f97",
+  "text": "The dates are up to date.",
+  "say": "The dates are up to date.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "9b7ab9ac",
+  "text": "an advert",
+  "say": "an advert",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "b6d00195",
+  "text": "This page is an advert for a shop.",
+  "say": "This page is an advert for a shop.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "b415c1a8",
+  "text": "credit a source",
+  "say": "credit a source",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "c3605894",
+  "text": "Credit your sources on the last slide.",
+  "say": "Credit your sources on the last slide.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "4742d9e9",
+  "text": "right now",
+  "say": "right now",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "b64786f4",
+  "text": "Right now I'm at home.",
+  "say": "Right now I'm at home.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "0391d612",
+  "text": "usually",
+  "say": "usually",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "6d5acea0",
+  "text": "I usually play on Saturdays.",
+  "say": "I usually play on Saturdays.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "7a95f0a0",
+  "text": "practise",
+  "say": "practise",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "a54b894e",
+  "text": "I practise every day.",
+  "say": "I practise every day.",
+  "src": "2eso/free-time-live/data/check-the-source.js"
+ },
+ {
+  "key": "a39d0d2c",
+  "text": "play football",
+  "say": "play football",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "9852c81a",
+  "text": "I play football on Saturday mornings.",
+  "say": "I play football on Saturday mornings.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "8000dbba",
+  "text": "play basketball",
+  "say": "play basketball",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "c3c2903c",
+  "text": "We play basketball at the park.",
+  "say": "We play basketball at the park.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "1f611e5b",
+  "text": "play video games",
+  "say": "play video games",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "847d9739",
+  "text": "He plays video games after dinner.",
+  "say": "He plays video games after dinner.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "5bc00e8a",
+  "text": "play the guitar",
+  "say": "play the guitar",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "a9a1f0e0",
+  "text": "She plays the guitar in a band.",
+  "say": "She plays the guitar in a band.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "46c35465",
+  "text": "play the piano",
+  "say": "play the piano",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "c908ff79",
+  "text": "My cousin plays the piano very well.",
+  "say": "My cousin plays the piano very well.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "d102b5cc",
+  "text": "go swimming",
+  "say": "go swimming",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "a84e2f98",
+  "text": "We go swimming in summer.",
+  "say": "We go swimming in summer.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "37423bbe",
+  "text": "go skating",
+  "say": "go skating",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "a7d2d604",
+  "text": "They go skating at the skate park.",
+  "say": "They go skating at the skate park.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "7174b9fe",
+  "text": "go cycling",
+  "say": "go cycling",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "51b2f0ee",
+  "text": "I go cycling with my dad.",
+  "say": "I go cycling with my dad.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "fe177225",
+  "text": "go to the park",
+  "say": "go to the park",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "977a9f63",
+  "text": "We go to the park after school.",
+  "say": "We go to the park after school.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "869e50ee",
+  "text": "do karate",
+  "say": "do karate",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "64ed892a",
+  "text": "He does karate on Tuesdays.",
+  "say": "He does karate on Tuesdays.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "256ea9b6",
+  "text": "do gymnastics",
+  "say": "do gymnastics",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "9ef8cfdc",
+  "text": "She does gymnastics at a club.",
+  "say": "She does gymnastics at a club.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "d9cf193c",
+  "text": "do yoga",
+  "say": "do yoga",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "03290c7b",
+  "text": "My mum does yoga in the morning.",
+  "say": "My mum does yoga in the morning.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "f815289c",
+  "text": "dance",
+  "say": "dance",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "5c645f07",
+  "text": "I dance in my room.",
+  "say": "I dance in my room.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "a88bf413",
+  "text": "draw",
+  "say": "draw",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "cec839ae",
+  "text": "She draws comics.",
+  "say": "She draws comics.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "e6ed425d",
+  "text": "read comics",
+  "say": "read comics",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "6ed68b09",
+  "text": "I read comics at night.",
+  "say": "I read comics at night.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "09bffb14",
+  "text": "listen to music",
+  "say": "listen to music",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "1e2987fc",
+  "text": "We listen to music on the bus.",
+  "say": "We listen to music on the bus.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "d49ed7e7",
+  "text": "meet friends",
+  "say": "meet friends",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "e393f16b",
+  "text": "I meet friends on Saturday afternoons.",
+  "say": "I meet friends on Saturday afternoons.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "1bd78ced",
+  "text": "once a week",
+  "say": "once a week",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "1bb72945",
+  "text": "I go swimming once a week.",
+  "say": "I go swimming once a week.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "5df04aa4",
+  "text": "twice a week",
+  "say": "twice a week",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "328eea9a",
+  "text": "We train twice a week.",
+  "say": "We train twice a week.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "152f19e6",
+  "text": "every day",
+  "say": "every day",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "c7d70a61",
+  "text": "He practises every day.",
+  "say": "He practises every day.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "855b4cce",
+  "text": "at the weekend",
+  "say": "at the weekend",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "69ced999",
+  "text": "I meet friends at the weekend.",
+  "say": "I meet friends at the weekend.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "e2a185df",
+  "text": "in my free time",
+  "say": "in my free time",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "a71d02b8",
+  "text": "In my free time I draw.",
+  "say": "In my free time I draw.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "2bcffeca",
+  "text": "be good at",
+  "say": "be good at",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "0be2f09f",
+  "text": "She is good at drawing.",
+  "say": "She is good at drawing.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "1c254576",
+  "text": "spend time + -ing",
+  "say": "spend time doing",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "5e1278e4",
+  "text": "I spend time playing the guitar.",
+  "say": "I spend time playing the guitar.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "8b5feb76",
+  "text": "join a club",
+  "say": "join a club",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "17e928b2",
+  "text": "He wants to join a climbing club.",
+  "say": "He wants to join a climbing club.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "a6ca67d4",
+  "text": "They practise after school.",
+  "say": "They practise after school.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "91336f30",
+  "text": "get up",
+  "say": "get up",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "dfb19027",
+  "text": "I get up at seven.",
+  "say": "I get up at seven.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "1d31d982",
+  "text": "have breakfast",
+  "say": "have breakfast",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "2f4cfdac",
+  "text": "We have breakfast at eight.",
+  "say": "We have breakfast at eight.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "812e5d77",
+  "text": "go to bed",
+  "say": "go to bed",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "380a5c29",
+  "text": "She goes to bed at ten.",
+  "say": "She goes to bed at ten.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "ec727ee6",
+  "text": "do homework",
+  "say": "do homework",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "cf39b2d9",
+  "text": "I do homework after school.",
+  "say": "I do homework after school.",
+  "src": "2eso/free-time-live/data/getting-started.js"
+ },
+ {
+  "key": "b7203162",
+  "text": "I love + -ing",
+  "say": "I love doing",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "a829eb15",
+  "text": "I love skating.",
+  "say": "I love skating.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "de36d49f",
+  "text": "I like + -ing",
+  "say": "I like doing",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "05ae0641",
+  "text": "I like drawing comics.",
+  "say": "I like drawing comics.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "d6682545",
+  "text": "I don't like + -ing",
+  "say": "I don't like doing",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "4557ae75",
+  "text": "I don't like getting up early.",
+  "say": "I don't like getting up early.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "f503ca2a",
+  "text": "I hate + -ing",
+  "say": "I hate doing",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "e34868a5",
+  "text": "I hate losing!",
+  "say": "I hate losing!",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "8f586c70",
+  "text": "I don't mind + -ing",
+  "say": "I don't mind doing",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "3deeff00",
+  "text": "I don't mind training in the rain.",
+  "say": "I don't mind training in the rain.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "b1995b50",
+  "text": "my favourite",
+  "say": "my favourite",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "36e1d9af",
+  "text": "Skating is my favourite hobby.",
+  "say": "Skating is my favourite hobby.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "a567e54e",
+  "text": "take a break",
+  "say": "take a break",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "bb714105",
+  "text": "Take a break every 30 minutes.",
+  "say": "Take a break every 30 minutes.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "2b2dfd1b",
+  "text": "switch off your phone",
+  "say": "switch off your phone",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "1a998d1c",
+  "text": "Switch off your phone at night.",
+  "say": "Switch off your phone at night.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "16b2dbe9",
+  "text": "put your phone away",
+  "say": "put your phone away",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "67479e0c",
+  "text": "Put your phone away at dinner.",
+  "say": "Put your phone away at dinner.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "e543b1c3",
+  "text": "don't use your phone in bed",
+  "say": "don't use your phone in bed",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "6616cb37",
+  "text": "Don't use your phone in bed.",
+  "say": "Don't use your phone in bed.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "9a6d0610",
+  "text": "go outside",
+  "say": "go outside",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "edea06e0",
+  "text": "Go outside and play!",
+  "say": "Go outside and play!",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "2e3f65de",
+  "text": "set a time limit",
+  "say": "set a time limit",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "a541a95f",
+  "text": "Set a time limit of one hour.",
+  "say": "Set a time limit of one hour.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "e192c18b",
+  "text": "turn off notifications",
+  "say": "turn off notifications",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "894c42cb",
+  "text": "Turn off notifications when you study.",
+  "say": "Turn off notifications when you study.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "0cbb1d4f",
+  "text": "keep your phone out of your bedroom",
+  "say": "keep your phone out of your bedroom",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "12fc7798",
+  "text": "Keep your phone out of your bedroom at night.",
+  "say": "Keep your phone out of your bedroom at night.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "53365322",
+  "text": "Check your screen time every week.",
+  "say": "Check your screen time every week.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "a3b06ee0",
+  "text": "sleep well",
+  "say": "sleep well",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "ea5dbbfd",
+  "text": "Sleep well before a match.",
+  "say": "Sleep well before a match.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "8733c8ee",
+  "text": "addictive",
+  "say": "addictive",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "2dd668f9",
+  "text": "Some games are very addictive.",
+  "say": "Some games are very addictive.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "c368200f",
+  "text": "concentrate",
+  "say": "concentrate",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "bac33183",
+  "text": "I can't concentrate with notifications.",
+  "say": "I can't concentrate with notifications.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "ae4eb746",
+  "text": "instead of",
+  "say": "instead of",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "59adc552",
+  "text": "Go outside instead of watching videos.",
+  "say": "Go outside instead of watching videos.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "16da307a",
+  "text": "a habit",
+  "say": "a habit",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "763bd271",
+  "text": "Checking your phone every minute is a bad habit.",
+  "say": "Checking your phone every minute is a bad habit.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "a4cd4897",
+  "text": "healthy / unhealthy",
+  "say": "healthy, unhealthy",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "eca3d2c1",
+  "text": "Two hours of screen time a day is not healthy for sleep.",
+  "say": "Two hours of screen time a day is not healthy for sleep.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "529c21da",
+  "text": "I watch videos at night.",
+  "say": "I watch videos at night.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "1edcdc4d",
+  "text": "He plays online every day.",
+  "say": "He plays online every day.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "2e3b734f",
+  "text": "Send me a message.",
+  "say": "Send me a message.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "b9413b85",
+  "text": "Download the app.",
+  "say": "Download the app.",
+  "src": "2eso/free-time-live/data/likes-and-screen-tips.js"
+ },
+ {
+  "key": "28b19af7",
+  "text": "now",
+  "say": "now",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "c0b62f62",
+  "text": "I'm at home now.",
+  "say": "I'm at home now.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "fda68295",
+  "text": "Right now I'm watching a match.",
+  "say": "Right now I'm watching a match.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "89f57381",
+  "text": "at the moment",
+  "say": "at the moment",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "b5ac4029",
+  "text": "At the moment she's training.",
+  "say": "At the moment she's training.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "420372be",
+  "text": "today",
+  "say": "today",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "86e7291e",
+  "text": "Today we're playing inside.",
+  "say": "Today we're playing inside.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "fd9c09a0",
+  "text": "this weekend",
+  "say": "this weekend",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "dab0bffb",
+  "text": "This weekend I'm going to a concert.",
+  "say": "This weekend I'm going to a concert.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "c22809ce",
+  "text": "Look! / Listen!",
+  "say": "Look! Listen!",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "38c23a88",
+  "text": "Look! It's snowing!",
+  "say": "Look! It's snowing!",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "277936ac",
+  "text": "on Saturday mornings",
+  "say": "on Saturday mornings",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "444f5fd2",
+  "text": "We train on Saturday mornings.",
+  "say": "We train on Saturday mornings.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "1ddfeee5",
+  "text": "every weekend",
+  "say": "every weekend",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "ff7175fb",
+  "text": "He goes cycling every weekend.",
+  "say": "He goes cycling every weekend.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "9697ee0f",
+  "text": "always / never",
+  "say": "always, never",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "bcd5297b",
+  "text": "She never gets up late.",
+  "say": "She never gets up late.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "56608c4e",
+  "text": "in winter / in summer",
+  "say": "in winter, in summer",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "860787be",
+  "text": "In winter we go skating.",
+  "say": "In winter we go skating.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "793886ce",
+  "text": "I practise my turns every day.",
+  "say": "I practise my turns every day.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "78556c69",
+  "text": "train",
+  "say": "train",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "e2f01e7d",
+  "text": "go to a concert",
+  "say": "go to a concert",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "178f5d28",
+  "text": "We're going to a concert tonight.",
+  "say": "We're going to a concert tonight.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "a90bdfba",
+  "text": "watch a match",
+  "say": "watch a match",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "b4fd93cd",
+  "text": "I usually watch the match on TV.",
+  "say": "I usually watch the match on TV.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "e9f2a935",
+  "text": "temperature",
+  "say": "temperature",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "cdc3645b",
+  "text": "The temperature is three degrees.",
+  "say": "The temperature is three degrees.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "464bc5aa",
+  "text": "know",
+  "say": "know",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "7a36eb68",
+  "text": "I know the answer.",
+  "say": "I know the answer.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "72ea8bed",
+  "text": "need",
+  "say": "need",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "8df03bde",
+  "text": "I need new trainers.",
+  "say": "I need new trainers.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "8b2c112f",
+  "text": "want",
+  "say": "want",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "0d613c33",
+  "text": "She wants to join the team.",
+  "say": "She wants to join the team.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "0a3bda77",
+  "text": "prefer",
+  "say": "prefer",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "0cfa0521",
+  "text": "I prefer skating to cycling.",
+  "say": "I prefer skating to cycling.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "82d4d3ff",
+  "text": "believe",
+  "say": "believe",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "c0e5296f",
+  "text": "I believe you.",
+  "say": "I believe you.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "0ec63aab",
+  "text": "understand",
+  "say": "understand",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "23ccd4f0",
+  "text": "Do you understand the rules?",
+  "say": "Do you understand the rules?",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "9ede2954",
+  "text": "mean",
+  "say": "mean",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "21e5717d",
+  "text": "What does \"crowd\" mean?",
+  "say": "What does \"crowd\" mean?",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "909a0983",
+  "text": "trainers",
+  "say": "trainers",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "696f410f",
+  "text": "It's windy",
+  "say": "It's windy",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "b3d261b8",
+  "text": "It's windy today.",
+  "say": "It's windy today.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "779ba3ff",
+  "text": "wear a costume",
+  "say": "wear a costume",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "0518a81e",
+  "text": "People wear costumes at the fair.",
+  "say": "People wear costumes at the fair.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "77fbfc17",
+  "text": "a tournament",
+  "say": "a tournament",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "0e103564",
+  "text": "We're playing in a tournament.",
+  "say": "We're playing in a tournament.",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "04142ba5",
+  "text": "freezing",
+  "say": "freezing",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "ac6c1bb5",
+  "text": "It's freezing!",
+  "say": "It's freezing!",
+  "src": "2eso/free-time-live/data/now-or-usually.js"
+ },
+ {
+  "key": "1e336243",
+  "text": "I can understand what Mei and Noah are doing now and what they usually do in their videos.",
+  "say": "I can understand what Mei and Noah are doing now and what they usually do in their videos.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "2bd8492b",
+  "text": "I can understand the main tips in a short radio programme (Screen smart).",
+  "say": "I can understand the main tips in a short radio programme.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "3c7c39b3",
+  "text": "I can say what people are doing right now and what I usually do in my free time.",
+  "say": "I can say what people are doing right now and what I usually do in my free time.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "d03f916c",
+  "text": "I can record my vlog speaking clearly, without reading every word.",
+  "say": "I can record my vlog speaking clearly, without reading every word.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "cc8fe9c1",
+  "text": "I can understand posts and web pages about hobbies and events: who, what, where and when.",
+  "say": "I can understand posts and web pages about hobbies and events: who, what, where and when.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "463c46ac",
+  "text": "I can check if a web page is reliable: who wrote it, when and why.",
+  "say": "I can check if a web page is reliable: who wrote it, when and why.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "f7b39621",
+  "text": "I can write what I usually do and what I am doing today (Present Simple and Present Continuous).",
+  "say": "I can write what I usually do and what I am doing today.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "53f96485",
+  "text": "I can write my vlog script in seven parts, with time expressions, likes and tips.",
+  "say": "I can write my vlog script in seven parts, with time expressions, likes and tips.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "ce88531c",
+  "text": "I can credit every photo and fact I use (title, website, year).",
+  "say": "I can credit every photo and fact I use.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "88354d32",
+  "text": "I can give tips for a healthy use of screens, and I follow at least one.",
+  "say": "I can give tips for a healthy use of screens, and I follow at least one.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "3ce556cb",
+  "text": "I can plan, record and edit a short video with slides.",
+  "say": "I can plan, record and edit a short video with slides.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "236ce92a",
+  "text": "I do each activity on my own and without notes the first time.",
+  "say": "I do each activity on my own and without notes the first time.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "2eb57626",
+  "text": "I read my teacher's corrections and use them to improve my next text.",
+  "say": "I read my teacher's corrections and use them to improve my next text.",
+  "src": "2eso/free-time-live/data/reflect.js"
+ },
+ {
+  "key": "a8136946",
+  "text": "T-shirt",
+  "say": "T-shirt",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "e01bc93e",
+  "text": "He's wearing a red T-shirt.",
+  "say": "He's wearing a red T-shirt.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "82b4b6ba",
+  "text": "I need new trainers for running.",
+  "say": "I need new trainers for running.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "3d8d3095",
+  "text": "tracksuit",
+  "say": "tracksuit",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "9080ffe1",
+  "text": "She's wearing a blue tracksuit.",
+  "say": "She's wearing a blue tracksuit.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "aa2f7652",
+  "text": "shorts",
+  "say": "shorts",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "60245439",
+  "text": "They're playing in shorts.",
+  "say": "They're playing in shorts.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "027455bb",
+  "text": "cap",
+  "say": "cap",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "b6e9f934",
+  "text": "Put on a cap: it's sunny.",
+  "say": "Put on a cap: it's sunny.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "8d7a7c20",
+  "text": "helmet",
+  "say": "helmet",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "a7f5a8cc",
+  "text": "Always wear a helmet on your bike.",
+  "say": "Always wear a helmet on your bike.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "05cd5d8d",
+  "text": "wear a uniform",
+  "say": "wear a uniform",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "645c0e27",
+  "text": "The team wears a white uniform.",
+  "say": "The team wears a white uniform.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "7ae65924",
+  "text": "At the fair, people wear costumes.",
+  "say": "At the fair, people wear costumes.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "b0cefe39",
+  "text": "It's sunny",
+  "say": "It's sunny",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "f9ca141e",
+  "text": "It's sunny, so we're at the beach.",
+  "say": "It's sunny, so we're at the beach.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "93dfdd0e",
+  "text": "It's cloudy",
+  "say": "It's cloudy",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "c80c2497",
+  "text": "It's cloudy but it isn't cold.",
+  "say": "It's cloudy but it isn't cold.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "a0d1e8f5",
+  "text": "It's windy: perfect for kites.",
+  "say": "It's windy: perfect for kites.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "55861620",
+  "text": "It's cold",
+  "say": "It's cold",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "9eb82fd2",
+  "text": "It's cold. Wear a jacket.",
+  "say": "It's cold. Wear a jacket.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "75a064c1",
+  "text": "It's hot",
+  "say": "It's hot",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "8d6cdb1b",
+  "text": "It's hot today: 30 degrees!",
+  "say": "It's hot today: 30 degrees!",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "198c4ebc",
+  "text": "It's raining",
+  "say": "It's raining",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "c62f930f",
+  "text": "It's raining, so the match is cancelled.",
+  "say": "It's raining, so the match is cancelled.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "89a896d7",
+  "text": "It's snowing",
+  "say": "It's snowing",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "e0a01102",
+  "text": "a concert",
+  "say": "a concert",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "5612ab9d",
+  "text": "a match",
+  "say": "a match",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "0fd27493",
+  "text": "The match starts at six.",
+  "say": "The match starts at six.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "6689c02c",
+  "text": "a festival",
+  "say": "a festival",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "ea0cdbcc",
+  "text": "There is a music festival in July.",
+  "say": "There is a music festival in July.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "ed1f73d3",
+  "text": "a competition",
+  "say": "a competition",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "67a42dcd",
+  "text": "She's in a dance competition.",
+  "say": "She's in a dance competition.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "10ccd2eb",
+  "text": "Our team is playing in a tournament.",
+  "say": "Our team is playing in a tournament.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "164bbfbd",
+  "text": "a show",
+  "say": "a show",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "4a1bd3d6",
+  "text": "The show starts at eight.",
+  "say": "The show starts at eight.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "ca088602",
+  "text": "a fair",
+  "say": "a fair",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "6d4838db",
+  "text": "The town fair is this weekend.",
+  "say": "The town fair is this weekend.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "5b1974c7",
+  "text": "win / lose a match",
+  "say": "win, lose a match",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "d7a00945",
+  "text": "We usually win, but today we're losing!",
+  "say": "We usually win, but today we're losing!",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "6f100411",
+  "text": "score a goal",
+  "say": "score a goal",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "dc3f6bf7",
+  "text": "Marc is scoring a lot of goals this season.",
+  "say": "Marc is scoring a lot of goals this season.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "cf087b63",
+  "text": "foggy",
+  "say": "foggy",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "0bb73df0",
+  "text": "It's foggy this morning.",
+  "say": "It's foggy this morning.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "08b9f53d",
+  "text": "stormy",
+  "say": "stormy",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "c3e8af0f",
+  "text": "It's stormy, so the fair is closed.",
+  "say": "It's stormy, so the fair is closed.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "53773b60",
+  "text": "It's freezing! Minus two degrees.",
+  "say": "It's freezing! Minus two degrees.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "0a0734c6",
+  "text": "What's the weather like?",
+  "say": "What's the weather like?",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "6d52dda0",
+  "text": "What's the weather like in Girona today?",
+  "say": "What's the weather like in Girona today?",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "af5442ee",
+  "text": "degrees",
+  "say": "degrees",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "3a35219c",
+  "text": "It's 25 degrees.",
+  "say": "It's 25 degrees.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "eaeb657d",
+  "text": "the crowd",
+  "say": "the crowd",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "ab806644",
+  "text": "The crowd is cheering.",
+  "say": "The crowd is cheering.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "aa758b4a",
+  "text": "cheer",
+  "say": "cheer",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "7507fe82",
+  "text": "The fans are cheering for the team.",
+  "say": "The fans are cheering for the team.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "81341ed5",
+  "text": "warm up",
+  "say": "warm up",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "8a4d8542",
+  "text": "The players are warming up.",
+  "say": "The players are warming up.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "80a5fffa",
+  "text": "take part in",
+  "say": "take part in",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "d0f58b6c",
+  "text": "Twenty teams are taking part in the tournament.",
+  "say": "Twenty teams are taking part in the tournament.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "5138ebef",
+  "text": "I meet friends on Saturdays.",
+  "say": "I meet friends on Saturdays.",
+  "src": "2eso/free-time-live/data/what-are-they-doing.js"
+ },
+ {
+  "key": "13f10a42",
+  "text": "Hi everyone!",
+  "say": "Hi everyone!",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "874ecbbf",
+  "text": "Hi everyone, welcome to my vlog!",
+  "say": "Hi everyone, welcome to my vlog!",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "b0c4ae62",
+  "text": "welcome to my vlog",
+  "say": "welcome to my vlog",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "33337440",
+  "text": "Welcome to my vlog about climbing.",
+  "say": "Welcome to my vlog about climbing.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "26cffc44",
+  "text": "today I'm at…",
+  "say": "today I'm at",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "0f2fe5ab",
+  "text": "Today I'm at the sports hall.",
+  "say": "Today I'm at the sports hall.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "5d2762c0",
+  "text": "in this photo…",
+  "say": "in this photo",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "e096a2a6",
+  "text": "In this photo, we're training.",
+  "say": "In this photo, we're training.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "a3ed44dc",
+  "text": "see you next time!",
+  "say": "see you next time!",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "091bc29a",
+  "text": "That's all. See you next time!",
+  "say": "That's all. See you next time!",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "bae2b358",
+  "text": "thanks for watching",
+  "say": "thanks for watching",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "54c79e1b",
+  "text": "Thanks for watching!",
+  "say": "Thanks for watching!",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "0f8f8fff",
+  "text": "I want to join a dance club.",
+  "say": "I want to join a dance club.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "48c9e55e",
+  "text": "train hard",
+  "say": "train hard",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "237443e7",
+  "text": "We train hard before a tournament.",
+  "say": "We train hard before a tournament.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "11cda6b1",
+  "text": "practise every day",
+  "say": "practise every day",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "185e5d1c",
+  "text": "She practises every day.",
+  "say": "She practises every day.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "3991fd50",
+  "text": "get better at",
+  "say": "get better at",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "adc002e4",
+  "text": "I'm getting better at skating.",
+  "say": "I'm getting better at skating.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "71c6d83a",
+  "text": "He's good at drawing.",
+  "say": "He's good at drawing.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "ae4b97bc",
+  "text": "I spend time drawing at night.",
+  "say": "I spend time drawing at night.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "4e539e2e",
+  "text": "I think (that)…",
+  "say": "I think",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "edac4a0a",
+  "text": "I think skating is the best sport.",
+  "say": "I think skating is the best sport.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "b9f8b002",
+  "text": "I believe…",
+  "say": "I believe",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "d7990821",
+  "text": "I believe everyone can learn.",
+  "say": "I believe everyone can learn.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "2d396a51",
+  "text": "I prefer… to…",
+  "say": "I prefer, to",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "1c9cc391",
+  "text": "I prefer the park to the sports hall.",
+  "say": "I prefer the park to the sports hall.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "d9e117a0",
+  "text": "it means…",
+  "say": "it means",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "04612961",
+  "text": "For me, climbing means freedom.",
+  "say": "For me, climbing means freedom.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "e18c3c90",
+  "text": "I don't need…",
+  "say": "I don't need",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "6717ae83",
+  "text": "I don't need expensive kit.",
+  "say": "I don't need expensive kit.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "de5dba2d",
+  "text": "I go cycling on Sundays.",
+  "say": "I go cycling on Sundays.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "cb0628d8",
+  "text": "Wear a helmet.",
+  "say": "Wear a helmet.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "1dab40c2",
+  "text": "Right now I'm filming.",
+  "say": "Right now I'm filming.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "ddeef17b",
+  "text": "I'm recording a video.",
+  "say": "I'm recording a video.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "588b265d",
+  "text": "Take a break!",
+  "say": "Take a break!",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "dc4a2d1a",
+  "text": "We're in a tournament.",
+  "say": "We're in a tournament.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "11653684",
+  "text": "We upload a video on Sundays.",
+  "say": "We upload a video on Sundays.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "8a7ec070",
+  "text": "Set a time limit.",
+  "say": "Set a time limit.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "51d3c5be",
+  "text": "Use a reliable source.",
+  "say": "Use a reliable source.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "77f6057a",
+  "text": "Go outside instead of playing online.",
+  "say": "Go outside instead of playing online.",
+  "src": "2eso/free-time-live/data/write-your-vlog-script.js"
+ },
+ {
+  "key": "79d6555f",
+  "text": "celebration",
+  "say": "celebration",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "df6f6143",
+  "text": "It's a family celebration.",
+  "say": "It's a family celebration.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "e29c4bb5",
+  "text": "festival",
+  "say": "festival",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "6302d75c",
+  "text": "Diwali is a festival of lights.",
+  "say": "Diwali is a festival of lights.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "2b3c411b",
+  "text": "holiday",
+  "say": "holiday",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "c0355c98",
+  "text": "Christmas is a holiday.",
+  "say": "Christmas is a holiday.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "a2b21edf",
+  "text": "tradition",
+  "say": "tradition",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "9c7edb52",
+  "text": "It's an old tradition.",
+  "say": "It's an old tradition.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "2057306e",
+  "text": "custom",
+  "say": "custom",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "21269a08",
+  "text": "Eating grapes is a New Year custom.",
+  "say": "Eating grapes is a New Year custom.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "5e3dad97",
+  "text": "party",
+  "say": "party",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "dd28a73c",
+  "text": "We have a party at home.",
+  "say": "We have a party at home.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "43756428",
+  "text": "parade",
+  "say": "parade",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "7f08f760",
+  "text": "There's a parade in the street.",
+  "say": "There's a parade in the street.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "25570d85",
+  "text": "fireworks",
+  "say": "fireworks",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "b3a243b3",
+  "text": "We watch the fireworks.",
+  "say": "We watch the fireworks.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "1956cad4",
+  "text": "lights",
+  "say": "lights",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "555b3421",
+  "text": "The streets are full of lights.",
+  "say": "The streets are full of lights.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8b44e2f1",
+  "text": "candles",
+  "say": "candles",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "56302faf",
+  "text": "We light candles.",
+  "say": "We light candles.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "cc4626d0",
+  "text": "decorations",
+  "say": "decorations",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "1db8ff60",
+  "text": "We put up decorations.",
+  "say": "We put up decorations.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "fce5883d",
+  "text": "present / gift",
+  "say": "present, gift",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "85a7800a",
+  "text": "I get a present.",
+  "say": "I get a present.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "9766c891",
+  "text": "costume",
+  "say": "costume",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "51b41e7f",
+  "text": "She wears a witch costume.",
+  "say": "She wears a witch costume.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "e7774569",
+  "text": "mask",
+  "say": "mask",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "a68b8197",
+  "text": "He wears a mask.",
+  "say": "He wears a mask.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8827595f",
+  "text": "card",
+  "say": "card",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "72b4a0f6",
+  "text": "I send a card to my aunt.",
+  "say": "I send a card to my aunt.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "e5fdb00b",
+  "text": "special meal",
+  "say": "special meal",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "564c5ea6",
+  "text": "We have a special meal.",
+  "say": "We have a special meal.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "2c2d8a80",
+  "text": "guests",
+  "say": "guests",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "afa876bb",
+  "text": "We have ten guests.",
+  "say": "We have ten guests.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "ef8af02a",
+  "text": "relatives",
+  "say": "relatives",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "4ef893b1",
+  "text": "We visit our relatives.",
+  "say": "We visit our relatives.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "e9c3f10a",
+  "text": "celebrate",
+  "say": "celebrate",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "4bc6cbff",
+  "text": "We celebrate it every year.",
+  "say": "We celebrate it every year.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "b4330f66",
+  "text": "decorate",
+  "say": "decorate",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "46c55c23",
+  "text": "We decorate the house.",
+  "say": "We decorate the house.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "3837017d",
+  "text": "dress up",
+  "say": "dress up",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "a4ed9318",
+  "text": "Children dress up.",
+  "say": "Children dress up.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "2d3eb1b7",
+  "text": "give / get presents",
+  "say": "give, get presents",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "5dfe04c7",
+  "text": "We give presents at Christmas.",
+  "say": "We give presents at Christmas.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "15d2601e",
+  "text": "sing",
+  "say": "sing",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "84258300",
+  "text": "We sing songs.",
+  "say": "We sing songs.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "dfc1fa08",
+  "text": "People dance in the square.",
+  "say": "People dance in the square.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "ef3e2929",
+  "text": "cook",
+  "say": "cook",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "9e4a38f8",
+  "text": "My dad cooks a special meal.",
+  "say": "My dad cooks a special meal.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "1730b54d",
+  "text": "eat together",
+  "say": "eat together",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "fb9af35b",
+  "text": "The family eats together.",
+  "say": "The family eats together.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "68ecf175",
+  "text": "visit relatives",
+  "say": "visit relatives",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "fc759fa6",
+  "text": "We visit relatives in Girona.",
+  "say": "We visit relatives in Girona.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "d27c86b9",
+  "text": "light candles",
+  "say": "light candles",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "d7c7c3ae",
+  "text": "They light candles every night.",
+  "say": "They light candles every night.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "7b4a2459",
+  "text": "wear special clothes",
+  "say": "wear special clothes",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "d9bfe0b4",
+  "text": "People wear special clothes.",
+  "say": "People wear special clothes.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "dd85598a",
+  "text": "gather",
+  "say": "gather",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "6f3ffacc",
+  "text": "People gather in the square.",
+  "say": "People gather in the square.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "6547a31f",
+  "text": "get together",
+  "say": "get together",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "98bc4135",
+  "text": "Families get together.",
+  "say": "Families get together.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "af9d4685",
+  "text": "I take part in the parade.",
+  "say": "I take part in the parade.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "f97e661c",
+  "text": "look forward to",
+  "say": "look forward to",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "4167ec89",
+  "text": "I look forward to the holidays.",
+  "say": "I look forward to the holidays.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "61f3c634",
+  "text": "pass down",
+  "say": "pass down",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "d592c9f8",
+  "text": "Recipes are passed down.",
+  "say": "Recipes are passed down.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "004f01fa",
+  "text": "mark an occasion",
+  "say": "mark an occasion",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "c85d106e",
+  "text": "Fireworks mark the occasion.",
+  "say": "Fireworks mark the occasion.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "064b133e",
+  "text": "share a meal",
+  "say": "share a meal",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8fb46a36",
+  "text": "We share a meal.",
+  "say": "We share a meal.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "234f85ff",
+  "text": "exchange gifts",
+  "say": "exchange gifts",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "34431a7d",
+  "text": "Families exchange gifts.",
+  "say": "Families exchange gifts.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "1e9c338b",
+  "text": "make a wish",
+  "say": "make a wish",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "c98573be",
+  "text": "Make a wish!",
+  "say": "Make a wish!",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "c656fd8b",
+  "text": "wish someone a happy…",
+  "say": "wish someone a happy",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "46cc6113",
+  "text": "We wish everyone a happy new year.",
+  "say": "We wish everyone a happy new year.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "2439ac7f",
+  "text": "meaningful",
+  "say": "meaningful",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "43860a63",
+  "text": "It's a meaningful day.",
+  "say": "It's a meaningful day.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "6b31b8c2",
+  "text": "traditional",
+  "say": "traditional",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "ddd3b5d4",
+  "text": "A traditional dance.",
+  "say": "A traditional dance.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "5b67e878",
+  "text": "religious",
+  "say": "religious",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "119af43d",
+  "text": "A religious festival.",
+  "say": "A religious festival.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "79f5cd44",
+  "text": "secular",
+  "say": "secular",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "70deeefb",
+  "text": "A secular holiday.",
+  "say": "A secular holiday.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "9c436708",
+  "text": "local",
+  "say": "local",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "cdbf14b9",
+  "text": "A local festival.",
+  "say": "A local festival.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "4b36a6cc",
+  "text": "worldwide",
+  "say": "worldwide",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "45218cf4",
+  "text": "It's celebrated worldwide.",
+  "say": "It's celebrated worldwide.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "90b9d613",
+  "text": "family-friendly",
+  "say": "family-friendly",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "f514358a",
+  "text": "A family-friendly event.",
+  "say": "A family-friendly event.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "7024afd0",
+  "text": "colourful",
+  "say": "colourful",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "5e1fa27b",
+  "text": "Colourful decorations.",
+  "say": "Colourful decorations.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "82a3544f",
+  "text": "crowded",
+  "say": "crowded",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "6b69600c",
+  "text": "The streets are crowded.",
+  "say": "The streets are crowded.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "5809f147",
+  "text": "festive",
+  "say": "festive",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "a14e7cb6",
+  "text": "A festive atmosphere.",
+  "say": "A festive atmosphere.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "b4e017f2",
+  "text": "belonging",
+  "say": "belonging",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "984c0afc",
+  "text": "A sense of belonging.",
+  "say": "A sense of belonging.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "5d7aee10",
+  "text": "heritage",
+  "say": "heritage",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "4a2cda28",
+  "text": "Our cultural heritage.",
+  "say": "Our cultural heritage.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "245d5f02",
+  "text": "roots",
+  "say": "roots",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "93ebe312",
+  "text": "It reminds us of our roots.",
+  "say": "It reminds us of our roots.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "9dd7e26e",
+  "text": "community",
+  "say": "community",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "7bc77077",
+  "text": "The whole community takes part.",
+  "say": "The whole community takes part.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "234b4712",
+  "text": "ritual",
+  "say": "ritual",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8a4d893d",
+  "text": "Lighting candles is a ritual.",
+  "say": "Lighting candles is a ritual.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "4d341728",
+  "text": "gratitude",
+  "say": "gratitude",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "aebe3296",
+  "text": "A day of gratitude.",
+  "say": "A day of gratitude.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "27da62be",
+  "text": "commemorate",
+  "say": "commemorate",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "b4350271",
+  "text": "It commemorates an old story.",
+  "say": "It commemorates an old story.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "15c8c45c",
+  "text": "honour the dead / ancestors",
+  "say": "honour the dead, ancestors",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "e9e3c3b5",
+  "text": "People honour their ancestors.",
+  "say": "People honour their ancestors.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8b466fe5",
+  "text": "sacred",
+  "say": "sacred",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "bb8a691b",
+  "text": "A sacred place.",
+  "say": "A sacred place.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8b9ad261",
+  "text": "the festive season",
+  "say": "the festive season",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "9a9bf256",
+  "text": "Shops are busy in the festive season.",
+  "say": "Shops are busy in the festive season.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "ff85e716",
+  "text": "the days get shorter",
+  "say": "the days get shorter",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "df082007",
+  "text": "In autumn the days get shorter.",
+  "say": "In autumn the days get shorter.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "43de826e",
+  "text": "chestnuts",
+  "say": "chestnuts",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "50a49615",
+  "text": "We roast chestnuts.",
+  "say": "We roast chestnuts.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8b8e7f5b",
+  "text": "mild",
+  "say": "mild",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "6b41a6f9",
+  "text": "Autumn here is mild.",
+  "say": "Autumn here is mild.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "c427a112",
+  "text": "harvest",
+  "say": "harvest",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "fab9b2c6",
+  "text": "The harvest is in autumn.",
+  "say": "The harvest is in autumn.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "1d5e6fba",
+  "text": "the clocks go back",
+  "say": "the clocks go back",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "b854c691",
+  "text": "The clocks go back in October.",
+  "say": "The clocks go back in October.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "e55c2e7f",
+  "text": "cosy",
+  "say": "cosy",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "b78b53bf",
+  "text": "Our living room is cosy.",
+  "say": "Our living room is cosy.",
+  "src": "4eso/seasons-and-celebrations/data/celebrations-around-the-world.js"
+ },
+ {
+  "key": "63f1336c",
+  "text": "spring",
+  "say": "spring",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "7eb61604",
+  "text": "Flowers grow in spring.",
+  "say": "Flowers grow in spring.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "fce32734",
+  "text": "summer",
+  "say": "summer",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "fc03b421",
+  "text": "It's hot in summer.",
+  "say": "It's hot in summer.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "3f6ba38f",
+  "text": "autumn (UK) / fall (US)",
+  "say": "autumn, fall",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "de1c4c5b",
+  "text": "Autumn is my favourite season.",
+  "say": "Autumn is my favourite season.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "c4bb620c",
+  "text": "winter",
+  "say": "winter",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "d8e9b48e",
+  "text": "It's cold in winter.",
+  "say": "It's cold in winter.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "494372ec",
+  "text": "sunny",
+  "say": "sunny",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "6e5f617e",
+  "text": "It's sunny today.",
+  "say": "It's sunny today.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "2dbc1605",
+  "text": "cloudy",
+  "say": "cloudy",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "c23e8424",
+  "text": "It's cloudy and grey.",
+  "say": "It's cloudy and grey.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "1af8295a",
+  "text": "windy",
+  "say": "windy",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "6dbc1ec6",
+  "text": "It's windy by the sea.",
+  "say": "It's windy by the sea.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "56b6fa9e",
+  "text": "rainy",
+  "say": "rainy",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "ffec7563",
+  "text": "Take an umbrella: it's rainy.",
+  "say": "Take an umbrella: it's rainy.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "ba2b9830",
+  "text": "It's foggy in the morning.",
+  "say": "It's foggy in the morning.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "ea44dd0f",
+  "text": "cold",
+  "say": "cold",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "54e23839",
+  "text": "It's very cold in January.",
+  "say": "It's very cold in January.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "f03e2abc",
+  "text": "cool",
+  "say": "cool",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "1aeaf23e",
+  "text": "The mornings are cool.",
+  "say": "The mornings are cool.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "81fa6638",
+  "text": "warm",
+  "say": "warm",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "5dcef011",
+  "text": "It's warm in the afternoon.",
+  "say": "It's warm in the afternoon.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "7c907080",
+  "text": "the days get shorter / longer",
+  "say": "the days get shorter, longer",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "d97c7b85",
+  "text": "leaves change colour",
+  "say": "leaves change colour",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "a47d0ccb",
+  "text": "In October the leaves change colour.",
+  "say": "In October the leaves change colour.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "7bfa6b32",
+  "text": "leaves fall",
+  "say": "leaves fall",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "04ccbd75",
+  "text": "Leaves fall in November.",
+  "say": "Leaves fall in November.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "1bc2762a",
+  "text": "sweet potatoes",
+  "say": "sweet potatoes",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "94bb6d31",
+  "text": "Sweet potatoes are delicious.",
+  "say": "Sweet potatoes are delicious.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "0abc8da4",
+  "text": "pumpkins",
+  "say": "pumpkins",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "d0f913e2",
+  "text": "People carve pumpkins at Halloween.",
+  "say": "People carve pumpkins at Halloween.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "d9d2d60c",
+  "text": "mushrooms",
+  "say": "mushrooms",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "d5a27152",
+  "text": "We pick mushrooms in the forest.",
+  "say": "We pick mushrooms in the forest.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "24375f24",
+  "text": "apples",
+  "say": "apples",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "dc033a37",
+  "text": "Apples are an autumn fruit.",
+  "say": "Apples are an autumn fruit.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "5311f848",
+  "text": "oranges",
+  "say": "oranges",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "b3835c9e",
+  "text": "Oranges are a winter fruit.",
+  "say": "Oranges are a winter fruit.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "8e420701",
+  "text": "nuts",
+  "say": "nuts",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "dd3fd26d",
+  "text": "Panellets have nuts.",
+  "say": "Panellets have nuts.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "1823e152",
+  "text": "trees",
+  "say": "trees",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "b5041e4c",
+  "text": "The trees lose their leaves.",
+  "say": "The trees lose their leaves.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "8167e133",
+  "text": "plants",
+  "say": "plants",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "514298a0",
+  "text": "Plants grow in spring.",
+  "say": "Plants grow in spring.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "d7d7382f",
+  "text": "flowers",
+  "say": "flowers",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "636de87b",
+  "text": "There are flowers in spring.",
+  "say": "There are flowers in spring.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "264281a5",
+  "text": "excited",
+  "say": "excited",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "012615d2",
+  "text": "I'm excited about the party.",
+  "say": "I'm excited about the party.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "99863551",
+  "text": "happy",
+  "say": "happy",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "58ded243",
+  "text": "I'm happy at Christmas.",
+  "say": "I'm happy at Christmas.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "8728787f",
+  "text": "grateful",
+  "say": "grateful",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "3e90ad87",
+  "text": "I'm grateful for my family.",
+  "say": "I'm grateful for my family.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "8ec274c9",
+  "text": "proud",
+  "say": "proud",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "ad314aad",
+  "text": "I'm proud of our tradition.",
+  "say": "I'm proud of our tradition.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "3f32c75d",
+  "text": "scared",
+  "say": "scared",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "3742ceaa",
+  "text": "I'm scared of ghosts!",
+  "say": "I'm scared of ghosts!",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "49ef4c1c",
+  "text": "relaxed",
+  "say": "relaxed",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "adbbe8c3",
+  "text": "I feel relaxed at home.",
+  "say": "I feel relaxed at home.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "6e419e75",
+  "text": "seasonal",
+  "say": "seasonal",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "68b2803a",
+  "text": "Chestnuts are seasonal food.",
+  "say": "Chestnuts are seasonal food.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "96631017",
+  "text": "crop",
+  "say": "crop",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "0cd9cef9",
+  "text": "Rice is an important crop.",
+  "say": "Rice is an important crop.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "eb1f313a",
+  "text": "pick fruit",
+  "say": "pick fruit",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "bd5844a2",
+  "text": "We pick fruit in September.",
+  "say": "We pick fruit in September.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "e75e0ecd",
+  "text": "frost",
+  "say": "frost",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "211dbc63",
+  "text": "There's frost on the car.",
+  "say": "There's frost on the car.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "9eff10f4",
+  "text": "chilly",
+  "say": "chilly",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "70766916",
+  "text": "It's chilly: wear a jumper.",
+  "say": "It's chilly: wear a jumper.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "5ce4d2a4",
+  "text": "it gets dark early",
+  "say": "it gets dark early",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "ed2ce996",
+  "text": "In winter it gets dark early.",
+  "say": "In winter it gets dark early.",
+  "src": "4eso/seasons-and-celebrations/data/getting-started.js"
+ },
+ {
+  "key": "8be76191",
+  "text": "go to a festival",
+  "say": "go to a festival",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "87031df4",
+  "text": "We're going to go to a festival.",
+  "say": "We're going to go to a festival.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "2dc964f8",
+  "text": "I'll meet friends in the square.",
+  "say": "I'll meet friends in the square.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "040bd6ae",
+  "text": "book a room",
+  "say": "book a room",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "dcf6e6b5",
+  "text": "We need to book a room.",
+  "say": "We need to book a room.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "010004be",
+  "text": "buy tickets",
+  "say": "buy tickets",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "cddaf994",
+  "text": "Can you buy tickets?",
+  "say": "Can you buy tickets?",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "39b8d713",
+  "text": "invite people",
+  "say": "invite people",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "5a735840",
+  "text": "We're going to invite people.",
+  "say": "We're going to invite people.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "97f29f29",
+  "text": "organise",
+  "say": "organise",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "931c870b",
+  "text": "We're organising a celebration day.",
+  "say": "We're organising a celebration day.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "fdacf09c",
+  "text": "set up",
+  "say": "set up",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "8938aa41",
+  "text": "We set up the chairs at 9.",
+  "say": "We set up the chairs at 9.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "6fc6043f",
+  "text": "put up posters / decorations",
+  "say": "put up posters, decorations",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "fe5066ee",
+  "text": "Let's put up posters.",
+  "say": "Let's put up posters.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "8e5f6f1f",
+  "text": "send invitations",
+  "say": "send invitations",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "23fc3cbc",
+  "text": "We're sending invitations on Wednesday.",
+  "say": "We're sending invitations on Wednesday.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "29edea37",
+  "text": "make a timetable",
+  "say": "make a timetable",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "66916b50",
+  "text": "We need to make a timetable.",
+  "say": "We need to make a timetable.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "7d0c87bf",
+  "text": "run a stall / workshop",
+  "say": "run a stall, workshop",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "64562d1a",
+  "text": "Our class runs a food stall.",
+  "say": "Our class runs a food stall.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "8deca7ed",
+  "text": "take place",
+  "say": "take place",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "9d53ec5e",
+  "text": "It takes place in the hall.",
+  "say": "It takes place in the hall.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "a8b19dcf",
+  "text": "be held",
+  "say": "be held",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "4f5e77a6",
+  "text": "The event will be held on Friday.",
+  "say": "The event will be held on Friday.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "45f277c3",
+  "text": "book a band / a room",
+  "say": "book a band, a room",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "beddc7d7",
+  "text": "We booked a band.",
+  "say": "We booked a band.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "d708e74c",
+  "text": "once a year",
+  "say": "once a year",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "750851c4",
+  "text": "It happens once a year.",
+  "say": "It happens once a year.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "e917b4d8",
+  "text": "We decorate the hall.",
+  "say": "We decorate the hall.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "30e16d23",
+  "text": "the school hall",
+  "say": "the school hall",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "b0178323",
+  "text": "The event is in the school hall.",
+  "say": "The event is in the school hall.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "85abaeb1",
+  "text": "inclusive",
+  "say": "inclusive",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "dcc94942",
+  "text": "An inclusive event.",
+  "say": "An inclusive event.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "553ef145",
+  "text": "stereotype",
+  "say": "stereotype",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "fd268b0f",
+  "text": "Avoid stereotypes.",
+  "say": "Avoid stereotypes.",
+  "src": "4eso/seasons-and-celebrations/data/plan-the-day.js"
+ },
+ {
+  "key": "f8f4775b",
+  "text": "I can understand people explaining how they celebrate a festival (Mei's and Noah's videos).",
+  "say": "I can understand people explaining how they celebrate a festival.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "7e0607ad",
+  "text": "I can understand plans for an event: what, when, where and who does what.",
+  "say": "I can understand plans for an event: what, when, where and who does what.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "2dd56244",
+  "text": "I can explain the customs, dates and origins of a celebration to someone who does not know it.",
+  "say": "I can explain the customs, dates and origins of a celebration to someone who does not know it.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "105a6a1d",
+  "text": "I can present my part of the group video speaking clearly, without reading every word.",
+  "say": "I can present my part of the group video speaking clearly, without reading every word.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "44516883",
+  "text": "I can understand articles about celebrations: main ideas, details and new words from context.",
+  "say": "I can understand articles about celebrations: main ideas, details and new words from context.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "da551e9a",
+  "text": "I can tell whether a source is reliable, and I check each fact in two sources.",
+  "say": "I can tell whether a source is reliable, and I check each fact in two sources.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "bc946cbf",
+  "text": "I can write a plan for an event with future forms (going to, will, Present Continuous).",
+  "say": "I can write a plan for an event with future forms.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "e7fb3ef4",
+  "text": "I can write a formal email with the right greeting, register and closing.",
+  "say": "I can write a formal email with the right greeting, register and closing.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "fe454d22",
+  "text": "I can compare a celebration with a local one and talk about it with respect, without stereotypes.",
+  "say": "I can compare a celebration with a local one and talk about it with respect, without stereotypes.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "dc07d02a",
+  "text": "I can take notes in my own words and credit my sources.",
+  "say": "I can take notes in my own words and credit my sources.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "9ec5f2fd",
+  "text": "I do my part in the group and help us agree on decisions.",
+  "say": "I do my part in the group and help us agree on decisions.",
+  "src": "4eso/seasons-and-celebrations/data/reflect.js"
+ },
+ {
+  "key": "570f26d4",
+  "text": "on 31 October",
+  "say": "on 31 October",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "fefb0292",
+  "text": "The Castanyada is on 31 October.",
+  "say": "The Castanyada is on 31 October.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "c572750c",
+  "text": "in November",
+  "say": "in November",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "0abeafd5",
+  "text": "Thanksgiving is in November.",
+  "say": "Thanksgiving is in November.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "9fe1e014",
+  "text": "at Christmas",
+  "say": "at Christmas",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "a8af8ac8",
+  "text": "We get together at Christmas.",
+  "say": "We get together at Christmas.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "739583de",
+  "text": "at night",
+  "say": "at night",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "580a39fb",
+  "text": "The fireworks are at night.",
+  "say": "The fireworks are at night.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "e6db534d",
+  "text": "every year",
+  "say": "every year",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "03e09ba9",
+  "text": "the night before",
+  "say": "the night before",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "09229302",
+  "text": "We decorate the night before.",
+  "say": "We decorate the night before.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "3252e4ea",
+  "text": "the first",
+  "say": "the first",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "afe330f8",
+  "text": "on the first of November",
+  "say": "on the first of November",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "fa9b247d",
+  "text": "the twenty-fifth",
+  "say": "the twenty-fifth",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "a6de7a48",
+  "text": "on the twenty-fifth of December",
+  "say": "on the twenty-fifth of December",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "bc6b14f9",
+  "text": "both… and…",
+  "say": "both, and",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "c65d9dd6",
+  "text": "Both Diwali and Hanukkah use lights.",
+  "say": "Both Diwali and Hanukkah use lights.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "73d20fa7",
+  "text": "similar to",
+  "say": "similar to",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "d32e7938",
+  "text": "It's similar to a harvest festival.",
+  "say": "It's similar to a harvest festival.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "3fac1442",
+  "text": "different from",
+  "say": "different from",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "cc6f0251",
+  "text": "It's different from Christmas.",
+  "say": "It's different from Christmas.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "666989d8",
+  "text": "whereas",
+  "say": "whereas",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "550315e8",
+  "text": "Halloween is about costumes, whereas the Castanyada is about family.",
+  "say": "Halloween is about costumes, whereas the Castanyada is about family.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "2066cf06",
+  "text": "in the same way",
+  "say": "in the same way",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "ae6ee50c",
+  "text": "In the same way, we eat together.",
+  "say": "In the same way, we eat together.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "60d97bd1",
+  "text": "unlike",
+  "say": "unlike",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "1fc4d0aa",
+  "text": "Unlike Hanukkah, Diwali lasts five days.",
+  "say": "Unlike Hanukkah, Diwali lasts five days.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "c02113d1",
+  "text": "travel home for the holidays",
+  "say": "travel home for the holidays",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "7fc5b217",
+  "text": "Many people travel home for the holidays.",
+  "say": "Many people travel home for the holidays.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "ec23fdaf",
+  "text": "the town square",
+  "say": "the town square",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "6427c9da",
+  "text": "The parade ends in the town square.",
+  "say": "The parade ends in the town square.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "56e98db0",
+  "text": "the community centre",
+  "say": "the community centre",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "0ebc3e2c",
+  "text": "There's a party at the community centre.",
+  "say": "There's a party at the community centre.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "8ddb64ff",
+  "text": "crowded streets",
+  "say": "crowded streets",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "f3ef0e22",
+  "text": "At Christmas there are crowded streets.",
+  "say": "At Christmas there are crowded streets.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "03312a36",
+  "text": "commercialised",
+  "say": "commercialised",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "9d682237",
+  "text": "Halloween is very commercialised.",
+  "say": "Halloween is very commercialised.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "236a714c",
+  "text": "consumerism",
+  "say": "consumerism",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "6949cd85",
+  "text": "Some people criticise consumerism at Christmas.",
+  "say": "Some people criticise consumerism at Christmas.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "ee4fc9c2",
+  "text": "keep a tradition alive",
+  "say": "keep a tradition alive",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "52fdcec5",
+  "text": "Schools keep the tradition alive.",
+  "say": "Schools keep the tradition alive.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "23e8a395",
+  "text": "die out",
+  "say": "die out",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "7aadcadf",
+  "text": "Some customs die out.",
+  "say": "Some customs die out.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "c97787d0",
+  "text": "evolve",
+  "say": "evolve",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "fbd80b7d",
+  "text": "Traditions evolve.",
+  "say": "Traditions evolve.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "d18fea7f",
+  "text": "adapt",
+  "say": "adapt",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "6efdf77b",
+  "text": "People adapt old customs.",
+  "say": "People adapt old customs.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "b8e9e898",
+  "text": "reinvent",
+  "say": "reinvent",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "cbbc66be",
+  "text": "Young people reinvent traditions.",
+  "say": "Young people reinvent traditions.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "2bc1fc15",
+  "text": "date back to",
+  "say": "date back to",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "b6ebeca4",
+  "text": "It dates back to the 1600s.",
+  "say": "It dates back to the 1600s.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "804779b5",
+  "text": "cultural appropriation",
+  "say": "cultural appropriation",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "53a63681",
+  "text": "Wearing sacred symbols as a costume can be cultural appropriation.",
+  "say": "Wearing sacred symbols as a costume can be cultural appropriation.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "997801a6",
+  "text": "take something for granted",
+  "say": "take something for granted",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "38bf1e73",
+  "text": "We take our traditions for granted.",
+  "say": "We take our traditions for granted.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "c967d273",
+  "text": "contribute to",
+  "say": "contribute to",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "028a9391",
+  "text": "Everyone contributes to the meal.",
+  "say": "Everyone contributes to the meal.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "75881d34",
+  "text": "depend on",
+  "say": "depend on",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "4d977e2e",
+  "text": "The date depends on the moon.",
+  "say": "The date depends on the moon.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "38af2aef",
+  "text": "come from",
+  "say": "come from",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "bf4fba1e",
+  "text": "Halloween comes from Samhain.",
+  "say": "Halloween comes from Samhain.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "3d911be0",
+  "text": "be known for",
+  "say": "be known for",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "be3583ba",
+  "text": "Leicester is known for its Diwali lights.",
+  "say": "Leicester is known for its Diwali lights.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "b93ed0ea",
+  "text": "be associated with",
+  "say": "be associated with",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "e5e97bb7",
+  "text": "Pumpkins are associated with Halloween.",
+  "say": "Pumpkins are associated with Halloween.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "a50c03e9",
+  "text": "There's a parade.",
+  "say": "There's a parade.",
+  "src": "4eso/seasons-and-celebrations/data/where-traditions-come-from.js"
+ },
+ {
+  "key": "c3671a75",
+  "text": "Dear…",
+  "say": "Dear",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "7dbf98ca",
+  "text": "Dear Ms Puig,",
+  "say": "Dear Ms Puig",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "6c164e4b",
+  "text": "I am writing to…",
+  "say": "I am writing to",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "0206702e",
+  "text": "I am writing to propose a celebration day.",
+  "say": "I am writing to propose a celebration day.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "18a740f6",
+  "text": "We would like to…",
+  "say": "We would like to",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "c2e42fd3",
+  "text": "We would like to organise an event.",
+  "say": "We would like to organise an event.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "00763683",
+  "text": "Yours sincerely",
+  "say": "Yours sincerely",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "53c0eb08",
+  "text": "Yours sincerely, Omar",
+  "say": "Yours sincerely, Omar",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "6ae8212b",
+  "text": "Dear Mr / Ms…",
+  "say": "Dear Mr, Ms",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "8f01832d",
+  "text": "Dear Mr Roca,",
+  "say": "Dear Mr Roca",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "6f4fe221",
+  "text": "I am writing to propose…",
+  "say": "I am writing to propose",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "06c0da2e",
+  "text": "I am writing to propose an event.",
+  "say": "I am writing to propose an event.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "6790f68d",
+  "text": "Our plan includes…",
+  "say": "Our plan includes",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "a853f778",
+  "text": "Our plan includes four stalls.",
+  "say": "Our plan includes four stalls.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "72c89f62",
+  "text": "Could we use…?",
+  "say": "Could we use, ?",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "8cabcb32",
+  "text": "Could we use the hall?",
+  "say": "Could we use the hall?",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "a8f5ec42",
+  "text": "Please let us know if…",
+  "say": "Please let us know if",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "c8078f06",
+  "text": "Please let us know if you need more information.",
+  "say": "Please let us know if you need more information.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "c5e3ec9e",
+  "text": "I look forward to hearing from you",
+  "say": "I look forward to hearing from you",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "35cd9910",
+  "text": "I look forward to hearing from you.",
+  "say": "I look forward to hearing from you.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "948afa3f",
+  "text": "Kind regards",
+  "say": "Kind regards",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "ad5073fa",
+  "text": "Kind regards, Laia",
+  "say": "Kind regards, Laia",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "3eaa09b2",
+  "text": "request",
+  "say": "request",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "7b2977c5",
+  "text": "We request the use of the hall.",
+  "say": "We request the use of the hall.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "16501775",
+  "text": "propose",
+  "say": "propose",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "b2fa0204",
+  "text": "We propose a celebration day.",
+  "say": "We propose a celebration day.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "5a7abf77",
+  "text": "ensure",
+  "say": "ensure",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "144d5ce6",
+  "text": "We will ensure the hall is clean.",
+  "say": "We will ensure the hall is clean.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "3c4bba83",
+  "text": "appreciate",
+  "say": "appreciate",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "ff8e7857",
+  "text": "We appreciate your help.",
+  "say": "We appreciate your help.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "a48cad06",
+  "text": "consider",
+  "say": "consider",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "54369ae8",
+  "text": "Please consider our proposal.",
+  "say": "Please consider our proposal.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "ce297bf5",
+  "text": "I would be grateful if you could…",
+  "say": "I would be grateful if you could",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "5d449b76",
+  "text": "I would be grateful if you could reply soon.",
+  "say": "I would be grateful if you could reply soon.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "9b36b531",
+  "text": "We would appreciate the opportunity to…",
+  "say": "We would appreciate the opportunity to",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "1094c47b",
+  "text": "We would appreciate the opportunity to present our idea.",
+  "say": "We would appreciate the opportunity to present our idea.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "f782b9c1",
+  "text": "We set up the chairs.",
+  "say": "We set up the chairs.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "62807fcb",
+  "text": "run a stall",
+  "say": "run a stall",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "66ed3ba6",
+  "text": "Our class runs a stall.",
+  "say": "Our class runs a stall.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "aa4f6f01",
+  "text": "Schools keep traditions alive.",
+  "say": "Schools keep traditions alive.",
+  "src": "4eso/seasons-and-celebrations/data/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "7e6c9e81",
+  "text": "observe (a festival)",
+  "say": "observe",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "10108619",
+  "text": "Fewer families observe the fast strictly these days.",
+  "say": "Fewer families observe the fast strictly these days.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "ecde9a6b",
+  "text": "observance",
+  "say": "observance",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "193eacf3",
+  "text": "Religious observance has declined, but the festival survives.",
+  "say": "Religious observance has declined, but the festival survives.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "66124370",
+  "text": "festivities",
+  "say": "festivities",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "48ee8440",
+  "text": "The festivities go on until dawn.",
+  "say": "The festivities go on until dawn.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "dbf5e316",
+  "text": "revelry",
+  "say": "revelry",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8531a2fe",
+  "text": "The night of revelry ends with a fire run.",
+  "say": "The night of revelry ends with a fire run.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "f1ff0b67",
+  "text": "solemn",
+  "say": "solemn",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "f1df8f53",
+  "text": "All Saints' Day is a solemn occasion for many families.",
+  "say": "All Saints' Day is a solemn occasion for many families.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "848b864c",
+  "text": "jubilant",
+  "say": "jubilant",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "e9c8bde7",
+  "text": "Jubilant crowds filled the square at midnight.",
+  "say": "Jubilant crowds filled the square at midnight.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "9efb0ec4",
+  "text": "pagan",
+  "say": "pagan",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "a1235ed3",
+  "text": "Many winter customs have pagan origins.",
+  "say": "Many winter customs have pagan origins.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "a83bc0ec",
+  "text": "syncretism",
+  "say": "syncretism",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "df1e20b8",
+  "text": "Christmas is a textbook case of syncretism.",
+  "say": "Christmas is a textbook case of syncretism.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8056b03c",
+  "text": "steeped in tradition",
+  "say": "steeped in tradition",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "40698901",
+  "text": "The town is steeped in tradition.",
+  "say": "The town is steeped in tradition.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "e260750b",
+  "text": "time-honoured",
+  "say": "time-honoured",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "d24bf9f2",
+  "text": "a time-honoured recipe",
+  "say": "a time-honoured recipe",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "d1fe0419",
+  "text": "deeply rooted",
+  "say": "deeply rooted",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "4538d67a",
+  "text": "The custom is deeply rooted in rural life.",
+  "say": "The custom is deeply rooted in rural life.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "b181db5c",
+  "text": "ring in the New Year",
+  "say": "ring in the New Year",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "0cae6468",
+  "text": "We rang in the New Year in the main square.",
+  "say": "We rang in the New Year in the main square.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "bc688840",
+  "text": "push the boat out",
+  "say": "push the boat out",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "7b79c93f",
+  "text": "For my grandmother's eightieth we really pushed the boat out.",
+  "say": "For my grandmother's eightieth we really pushed the boat out.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "a8be7b7c",
+  "text": "go all out",
+  "say": "go all out",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8becc4ae",
+  "text": "Our street goes all out for Sant Joan.",
+  "say": "Our street goes all out for Sant Joan.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "317944cf",
+  "text": "a far cry from",
+  "say": "a far cry from",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "906aa891",
+  "text": "Today's Halloween is a far cry from the Celtic Samhain.",
+  "say": "Today's Halloween is a far cry from the Celtic Samhain.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8c09c5e5",
+  "text": "the festive spirit",
+  "say": "the festive spirit",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "95da0458",
+  "text": "Not everyone is in the festive spirit in December.",
+  "say": "Not everyone is in the festive spirit in December.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "602b6159",
+  "text": "celebratory",
+  "say": "celebratory",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "16507d22",
+  "text": "a celebratory dinner",
+  "say": "a celebratory dinner",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "f6dd9d67",
+  "text": "celebrant",
+  "say": "celebrant",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "8f727bc5",
+  "text": "The celebrant lit the first candle.",
+  "say": "The celebrant lit the first candle.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "b17c47d6",
+  "text": "traditionalist",
+  "say": "traditionalist",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "c1848c11",
+  "text": "Traditionalists complained about the new parade route.",
+  "say": "Traditionalists complained about the new parade route.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "21ac761c",
+  "text": "commercialisation",
+  "say": "commercialisation",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "87056b48",
+  "text": "the commercialisation of Christmas",
+  "say": "the commercialisation of Christmas",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "4223473a",
+  "text": "ritualistic",
+  "say": "ritualistic",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "a2ba9d34",
+  "text": "a ritualistic exchange of gifts",
+  "say": "a ritualistic exchange of gifts",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "5b8c3a4a",
+  "text": "reverence",
+  "say": "reverence",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "e7533c3c",
+  "text": "The candles are lit with reverence.",
+  "say": "The candles are lit with reverence.",
+  "src": "4eso/seasons-and-celebrations/data/native/celebrations-around-the-world.js"
+ },
+ {
+  "key": "49075557",
+  "text": "pull off",
+  "say": "pull off",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "fc0ca3c7",
+  "text": "Nobody thought we could pull it off in two weeks.",
+  "say": "Nobody thought we could pull it off in two weeks.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "3d4b023b",
+  "text": "iron out",
+  "say": "iron out",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "680ddd17",
+  "text": "We still need to iron out a few details.",
+  "say": "We still need to iron out a few details.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "6864b4a8",
+  "text": "liaise with",
+  "say": "liaise with",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "4caec904",
+  "text": "One student will liaise with the primary school.",
+  "say": "One student will liaise with the primary school.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "723c2b3c",
+  "text": "rope in",
+  "say": "rope in",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "25ee4f46",
+  "text": "We roped in my cousin's band.",
+  "say": "We roped in my cousin's band.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "b3875812",
+  "text": "oversee",
+  "say": "oversee",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "c84a13a0",
+  "text": "Mr Vidal has agreed to oversee the stalls.",
+  "say": "Mr Vidal has agreed to oversee the stalls.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "218eb122",
+  "text": "allocate",
+  "say": "allocate",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "ecb27cc5",
+  "text": "Each stall is allocated a table and two students.",
+  "say": "Each stall is allocated a table and two students.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "de71dfbf",
+  "text": "run smoothly",
+  "say": "run smoothly",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "58f5b3a9",
+  "text": "We want the day to run smoothly.",
+  "say": "We want the day to run smoothly.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "7d44ffcf",
+  "text": "contingency plan",
+  "say": "contingency plan",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "56a704ff",
+  "text": "Our contingency plan is to use the gym.",
+  "say": "Our contingency plan is to use the gym.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "0d9ef582",
+  "text": "a fallback",
+  "say": "a fallback",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "4511e38f",
+  "text": "The playground is our fallback if the hall is full.",
+  "say": "The playground is our fallback if the hall is full.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "4bb68ee9",
+  "text": "fall through",
+  "say": "fall through",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "7d6a7bed",
+  "text": "If the band falls through, we will use a playlist.",
+  "say": "If the band falls through, we will use a playlist.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "a24c73ee",
+  "text": "at short notice",
+  "say": "at short notice",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "e66ff73e",
+  "text": "Volunteers may be needed at short notice.",
+  "say": "Volunteers may be needed at short notice.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "ac6fc70f",
+  "text": "a bottleneck",
+  "say": "a bottleneck",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "c2b8a134",
+  "text": "The entrance could become a bottleneck.",
+  "say": "The entrance could become a bottleneck.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "2dbd5510",
+  "text": "logistics",
+  "say": "logistics",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "e840dc00",
+  "text": "The logistics are the hardest part.",
+  "say": "The logistics are the hardest part.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "f1286538",
+  "text": "an inclusive event",
+  "say": "an inclusive event",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "e29ac2de",
+  "text": "accommodate",
+  "say": "accommodate",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "dfd35abc",
+  "text": "We will accommodate dietary requirements.",
+  "say": "We will accommodate dietary requirements.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "15588fcd",
+  "text": "dietary requirements",
+  "say": "dietary requirements",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "eccfb149",
+  "text": "All food will be labelled for dietary requirements.",
+  "say": "All food will be labelled for dietary requirements.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "c12961d2",
+  "text": "opt out",
+  "say": "opt out",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "ac136b40",
+  "text": "Families who prefer not to take part can opt out.",
+  "say": "Families who prefer not to take part can opt out.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "9479ea32",
+  "text": "token",
+  "say": "token",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "2c182e78",
+  "text": "We want real participation, not a token gesture.",
+  "say": "We want real participation, not a token gesture.",
+  "src": "4eso/seasons-and-celebrations/data/native/plan-the-day.js"
+ },
+ {
+  "key": "c213c978",
+  "text": "stem from",
+  "say": "stem from",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "c07857d2",
+  "text": "The custom stems from a harvest ritual.",
+  "say": "The custom stems from a harvest ritual.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "e12ef6a8",
+  "text": "be rooted in",
+  "say": "be rooted in",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "6d6cb837",
+  "text": "Halloween is rooted in Samhain.",
+  "say": "Halloween is rooted in Samhain.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "97992486",
+  "text": "give rise to",
+  "say": "give rise to",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "e090a959",
+  "text": "Irish emigration gave rise to the pumpkin lantern.",
+  "say": "Irish emigration gave rise to the pumpkin lantern.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "6f2552d1",
+  "text": "The fair dates back to the 1300s.",
+  "say": "The fair dates back to the 1300s.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "00519f1b",
+  "text": "folklore",
+  "say": "folklore",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "bcadca53",
+  "text": "In local folklore, the spirits return that night.",
+  "say": "In local folklore, the spirits return that night.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "d7d433df",
+  "text": "an invented tradition",
+  "say": "an invented tradition",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "b9f5a444",
+  "text": "Many \"ancient\" Christmas customs are invented traditions.",
+  "say": "Many \"ancient\" Christmas customs are invented traditions.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "ce92940a",
+  "text": "evolve into",
+  "say": "evolve into",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "f4f77788",
+  "text": "A solemn vigil evolved into a street party.",
+  "say": "A solemn vigil evolved into a street party.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "02829d8d",
+  "text": "morph into",
+  "say": "morph into",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "c178efee",
+  "text": "Halloween has morphed into a shopping event.",
+  "say": "Halloween has morphed into a shopping event.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "5df2cb84",
+  "text": "supplant",
+  "say": "supplant",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "afc338df",
+  "text": "Pumpkins supplanted turnips.",
+  "say": "Pumpkins supplanted turnips.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "c622a0c5",
+  "text": "fall into disuse",
+  "say": "fall into disuse",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "3fe035f4",
+  "text": "The custom fell into disuse after the war.",
+  "say": "The custom fell into disuse after the war.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "2086cdf0",
+  "text": "revive",
+  "say": "revive",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "1e167e0c",
+  "text": "A local group revived the old dance.",
+  "say": "A local group revived the old dance.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "edfa120a",
+  "text": "dwindle",
+  "say": "dwindle",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "d526c3ef",
+  "text": "The number of people who observe the fast has dwindled.",
+  "say": "The number of people who observe the fast has dwindled.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "d0ce7277",
+  "text": "sanitise",
+  "say": "sanitise",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "eeec2aa7",
+  "text": "School plays often sanitise the Thanksgiving story.",
+  "say": "School plays often sanitise the Thanksgiving story.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "a5c0919d",
+  "text": "nostalgic",
+  "say": "nostalgic",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "a2080ec6",
+  "text": "My grandmother is nostalgic about the old Castanyada.",
+  "say": "My grandmother is nostalgic about the old Castanyada.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "be905d97",
+  "text": "sceptical",
+  "say": "sceptical",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "179aae94",
+  "text": "Historians are sceptical of the popular version.",
+  "say": "Historians are sceptical of the popular version.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "7184e0de",
+  "text": "contested",
+  "say": "contested",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "4125857e",
+  "text": "The meaning of Thanksgiving is contested.",
+  "say": "The meaning of Thanksgiving is contested.",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "997b13ba",
+  "text": "reverent",
+  "say": "reverent",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "fc8dacb4",
+  "text": "a reverent silence",
+  "say": "a reverent silence",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "61fb9f0d",
+  "text": "irreverent",
+  "say": "irreverent",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "2b9e2e42",
+  "text": "an irreverent take on Christmas",
+  "say": "an irreverent take on Christmas",
+  "src": "4eso/seasons-and-celebrations/data/native/where-traditions-come-from.js"
+ },
+ {
+  "key": "286c0258",
+  "text": "with a view to",
+  "say": "with a view to",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "f708ff08",
+  "text": "We are writing with a view to organising a celebration day.",
+  "say": "We are writing with a view to organising a celebration day.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "4a7b5fbf",
+  "text": "we would welcome the opportunity to",
+  "say": "we would welcome the opportunity to",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "32a78fa9",
+  "text": "We would welcome the opportunity to present our plan.",
+  "say": "We would welcome the opportunity to present our plan.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "0b39cb88",
+  "text": "grant permission",
+  "say": "grant permission",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "97ffab0f",
+  "text": "We hope you will grant permission for the event.",
+  "say": "We hope you will grant permission for the event.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "f2941371",
+  "text": "at no cost to",
+  "say": "at no cost to",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "380c824c",
+  "text": "The decorations will be made at no cost to the school.",
+  "say": "The decorations will be made at no cost to the school.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "b670c204",
+  "text": "feasible",
+  "say": "feasible",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "663c13e2",
+  "text": "We believe the plan is entirely feasible.",
+  "say": "We believe the plan is entirely feasible.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "929cd14b",
+  "text": "in light of",
+  "say": "in light of",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "5f63075d",
+  "text": "In light of last year's success, we propose…",
+  "say": "In light of last year's success, we propose",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "5e966d2c",
+  "text": "allay (concerns / fears)",
+  "say": "allay",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "ac4a83e6",
+  "text": "We hope to allay any concerns about supervision.",
+  "say": "We hope to allay any concerns about supervision.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "62f85725",
+  "text": "mindful of",
+  "say": "mindful of",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "97a25d9c",
+  "text": "We are mindful of the time this takes from lessons.",
+  "say": "We are mindful of the time this takes from lessons.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "6243178d",
+  "text": "safeguard",
+  "say": "safeguard",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "6b0f21a9",
+  "text": "Two teachers will safeguard the younger visitors.",
+  "say": "Two teachers will safeguard the younger visitors.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "05fcac21",
+  "text": "minimal disruption",
+  "say": "minimal disruption",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "02d90c7f",
+  "text": "The event will cause minimal disruption to lessons.",
+  "say": "The event will cause minimal disruption to lessons.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "11d31dce",
+  "text": "address (an issue)",
+  "say": "address",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "b72a4373",
+  "text": "We have addressed the issue of space.",
+  "say": "We have addressed the issue of space.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "2dc3b666",
+  "text": "foster",
+  "say": "foster",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "43bbfad0",
+  "text": "The event would foster mutual respect.",
+  "say": "The event would foster mutual respect.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "dc07f8a9",
+  "text": "enhance",
+  "say": "enhance",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "f03b32b7",
+  "text": "It would enhance the school's links with families.",
+  "say": "It would enhance the school's links with families.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "f731d635",
+  "text": "tangible",
+  "say": "tangible",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "57155fe8",
+  "text": "The benefits would be tangible.",
+  "say": "The benefits would be tangible.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "c9929aec",
+  "text": "far-reaching",
+  "say": "far-reaching",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "564d727d",
+  "text": "The effects could be far-reaching.",
+  "say": "The effects could be far-reaching.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "fc118f11",
+  "text": "a case in point",
+  "say": "a case in point",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "2878844f",
+  "text": "Last year's book week is a case in point.",
+  "say": "Last year's book week is a case in point.",
+  "src": "4eso/seasons-and-celebrations/data/native/write-to-the-head-teacher.js"
+ },
+ {
+  "key": "e6ce3f11",
+  "text": "shopping cart",
+  "say": "shopping cart",
+  "src": "flashcards"
+ },
+ {
+  "key": "a321c806",
+  "text": "visual output",
+  "say": "visual output",
+  "src": "flashcards"
+ },
+ {
+  "key": "40296205",
+  "text": "toggle",
+  "say": "toggle",
+  "src": "flashcards"
+ },
+ {
+  "key": "334bd0fc",
+  "text": "commit",
+  "say": "commit",
+  "src": "flashcards"
+ },
+ {
+  "key": "876fffdd",
+  "text": "push",
+  "say": "push",
+  "src": "flashcards"
+ },
+ {
+  "key": "3f24f812",
+  "text": "drop-down menu",
+  "say": "drop-down menu",
+  "src": "flashcards"
+ },
+ {
+  "key": "9358b94b",
+  "text": "roadmap",
+  "say": "roadmap",
+  "src": "flashcards"
+ },
+ {
+  "key": "02e055cf",
+  "text": "Morning",
+  "say": "Morning",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "ecc908c2",
+  "text": "wake up",
+  "say": "wake up",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "7c8376df",
+  "text": "go to the bathroom",
+  "say": "go to the bathroom",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "252f9272",
+  "text": "have a shower",
+  "say": "have a shower",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "cde6930f",
+  "text": "listen to the radio",
+  "say": "listen to the radio",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "1d56eddb",
+  "text": "Day & evening",
+  "say": "Day & evening",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2542ced4",
+  "text": "go to work / school",
+  "say": "go to work, school",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "01670440",
+  "text": "come home",
+  "say": "come home",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "1bac9385",
+  "text": "make dinner",
+  "say": "make dinner",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c2075ec9",
+  "text": "have dinner",
+  "say": "have dinner",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2c032e6f",
+  "text": "phone / call a friend",
+  "say": "phone, call a friend",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "65fe1876",
+  "text": "watch TV",
+  "say": "watch TV",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "be8a2c5f",
+  "text": "Home & free time",
+  "say": "Home & free time",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "115a4b42",
+  "text": "wash clothes",
+  "say": "wash clothes",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "ec8a7fee",
+  "text": "clean the house / your room",
+  "say": "clean the house, your room",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "4508ce70",
+  "text": "go for a walk",
+  "say": "go for a walk",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "87834641",
+  "text": "write emails / letters",
+  "say": "write emails, letters",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "12d242af",
+  "text": "watch a film",
+  "say": "watch a film",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "63b8192e",
+  "text": "go to the cinema",
+  "say": "go to the cinema",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "aff236fb",
+  "text": "read in bed",
+  "say": "read in bed",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "869c9315",
+  "text": "Time, transport & frequency",
+  "say": "Time, transport & frequency",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "9f97b33e",
+  "text": "by bus / train / car",
+  "say": "by bus, train, car",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "1d3f3978",
+  "text": "go on foot",
+  "say": "go on foot",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "925c9ae7",
+  "text": "walk home",
+  "say": "walk home",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "607cff46",
+  "text": "have a cup of tea / coffee",
+  "say": "have a cup of tea, coffee",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "d3201e85",
+  "text": "every morning / evening / weekend",
+  "say": "every morning, evening, weekend",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "5914ea31",
+  "text": "two or three times a week",
+  "say": "two or three times a week",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "6736afe4",
+  "text": "always",
+  "say": "always",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "9a6320f7",
+  "text": "often",
+  "say": "often",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "5d689621",
+  "text": "sometimes",
+  "say": "sometimes",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "0ac95089",
+  "text": "never",
+  "say": "never",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2fa62ca8",
+  "text": "Sleep",
+  "say": "Sleep",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "8d088c9a",
+  "text": "wake up / wake someone up",
+  "say": "wake up, wake someone up",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "06ba504f",
+  "text": "get up early",
+  "say": "get up early",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "38e621ab",
+  "text": "go to sleep / fall asleep",
+  "say": "go to sleep, fall asleep",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "214f8afa",
+  "text": "have an early / late night",
+  "say": "have an early, late night",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "cb423a1e",
+  "text": "get home",
+  "say": "get home",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "bd7cbfe9",
+  "text": "Food",
+  "say": "Food",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "73da84b3",
+  "text": "have cereal for breakfast",
+  "say": "have cereal for breakfast",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "6c077218",
+  "text": "have a light lunch",
+  "say": "have a light lunch",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "17265422",
+  "text": "have a snack",
+  "say": "have a snack",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "93861654",
+  "text": "have a main meal",
+  "say": "have a main meal",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "d0561d05",
+  "text": "feed the cat / dog",
+  "say": "feed the cat, dog",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "ed3c4e9a",
+  "text": "bother to cook",
+  "say": "bother to cook",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "527a6e7e",
+  "text": "get / order a takeaway",
+  "say": "get, order a takeaway",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c0a8029e",
+  "text": "Personal care",
+  "say": "Personal care",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "538c9b3f",
+  "text": "have a wash / a bath / a shave",
+  "say": "have a wash, a bath, a shave",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2fc2f9fc",
+  "text": "clean / brush your teeth",
+  "say": "clean, brush your teeth",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "6ce70697",
+  "text": "put on make-up",
+  "say": "put on make-up",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "37fd11b5",
+  "text": "Housework & errands",
+  "say": "Housework & errands",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "d0508bb0",
+  "text": "do the housework / washing / ironing / shopping",
+  "say": "do the housework, washing, ironing, shopping",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "111d5fcb",
+  "text": "make the bed",
+  "say": "make the bed",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "b0abd0a1",
+  "text": "go shopping",
+  "say": "go shopping",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "a12e9c5b",
+  "text": "run errands",
+  "say": "run errands",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "ce4fc33f",
+  "text": "stay in",
+  "say": "stay in",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "dd56da8b",
+  "text": "go out",
+  "say": "go out",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "d9bfb3d1",
+  "text": "eat out",
+  "say": "eat out",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "3de4f7fa",
+  "text": "friends come round",
+  "say": "friends come round",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c173ec96",
+  "text": "have a chat",
+  "say": "have a chat",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "fee3a1aa",
+  "text": "Time & reactions",
+  "say": "Time & reactions",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2a7da1df",
+  "text": "on weekdays",
+  "say": "on weekdays",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "cd5a9fbb",
+  "text": "straight away",
+  "say": "straight away",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "3de4d57b",
+  "text": "reply straight away",
+  "say": "reply straight away",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "cd216eef",
+  "text": "MAKE",
+  "say": "MAKE",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "79ccf6d0",
+  "text": "make arrangements",
+  "say": "make arrangements",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "28f238ec",
+  "text": "make a change",
+  "say": "make a change",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "6ca48b37",
+  "text": "make a choice",
+  "say": "make a choice",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "d4696839",
+  "text": "make a comment",
+  "say": "make a comment",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "0384e422",
+  "text": "make a decision",
+  "say": "make a decision",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "eab19ff0",
+  "text": "make an effort",
+  "say": "make an effort",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "7cf9b35f",
+  "text": "make an excuse",
+  "say": "make an excuse",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c1155162",
+  "text": "make friends",
+  "say": "make friends",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "f7c92e94",
+  "text": "make a mistake",
+  "say": "make a mistake",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2066a088",
+  "text": "make a phone call",
+  "say": "make a phone call",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "477c34ae",
+  "text": "make progress",
+  "say": "make progress",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "41ce86d4",
+  "text": "DO",
+  "say": "DO",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "22fc2d17",
+  "text": "do your best",
+  "say": "do your best",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "71c5bd3d",
+  "text": "do damage",
+  "say": "do damage",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "d3b2cffe",
+  "text": "do an experiment",
+  "say": "do an experiment",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "556b257f",
+  "text": "do exercises",
+  "say": "do exercises",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "0f8a1488",
+  "text": "do someone a favour",
+  "say": "do someone a favour",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2313f8a9",
+  "text": "do your hair",
+  "say": "do your hair",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "33293fc3",
+  "text": "do your homework",
+  "say": "do your homework",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "95e29033",
+  "text": "do the cooking / ironing / shopping / washing",
+  "say": "do the cooking, ironing, shopping, washing",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "ed42bd11",
+  "text": "do some work",
+  "say": "do some work",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "332038fb",
+  "text": "HAVE",
+  "say": "HAVE",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "1c495573",
+  "text": "have an accident",
+  "say": "have an accident",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2ae1ee93",
+  "text": "have an argument / a row",
+  "say": "have an argument, a row",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "137e945f",
+  "text": "have a break",
+  "say": "have a break",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "8c57a7c4",
+  "text": "have a conversation / chat",
+  "say": "have a conversation, chat",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "4a36e7ac",
+  "text": "have difficulty",
+  "say": "have difficulty",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "43387f5f",
+  "text": "have a dream / nightmare",
+  "say": "have a dream, nightmare",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c0081d86",
+  "text": "have fun / a good time",
+  "say": "have fun, a good time",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "4f8bfbc3",
+  "text": "have a look",
+  "say": "have a look",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "3d849004",
+  "text": "have a party",
+  "say": "have a party",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "5f21a597",
+  "text": "have a problem",
+  "say": "have a problem",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "b6f64042",
+  "text": "have a try / go",
+  "say": "have a try, go",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "df7f32da",
+  "text": "TAKE & PAY",
+  "say": "TAKE & PAY",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "f4e8c35f",
+  "text": "take a holiday / trip",
+  "say": "take a holiday, trip",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "590af5a8",
+  "text": "take the train / bus",
+  "say": "take the train, bus",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "f07fe113",
+  "text": "take a risk / chance",
+  "say": "take a risk, chance",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c33f5690",
+  "text": "take an interest in",
+  "say": "take an interest in",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "e48e3478",
+  "text": "take advantage of",
+  "say": "take advantage of",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "6fda29b0",
+  "text": "take action",
+  "say": "take action",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "017919bf",
+  "text": "pay attention",
+  "say": "pay attention",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "753b7bb2",
+  "text": "pay a compliment",
+  "say": "pay a compliment",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "61aefa5a",
+  "text": "pay tribute",
+  "say": "pay tribute",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "99432951",
+  "text": "I usually go to school on foot.",
+  "say": "I usually go to school on foot.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "3ed280c6",
+  "text": "I run errands with my dad on Saturday mornings.",
+  "say": "I run errands with my dad on Saturday mornings.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "bcea5789",
+  "text": "I make an effort to start my homework early.",
+  "say": "I make an effort to start my homework early.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "61c3764c",
+  "text": "I do my homework after a snack.",
+  "say": "I do my homework after a snack.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "7a90f9a4",
+  "text": "I have a short break after school.",
+  "say": "I have a short break after school.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "92a861a1",
+  "text": "I pay attention when the teacher explains something new.",
+  "say": "I pay attention when the teacher explains something new.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "4e70a7cc",
+  "text": "I brush my teeth after breakfast and before bed.",
+  "say": "I brush my teeth after breakfast and before bed.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "e246bf44",
+  "text": "On Fridays we order a takeaway pizza.",
+  "say": "On Fridays we order a takeaway pizza.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "17c64401",
+  "text": "I have an early night before a big exam.",
+  "say": "I have an early night before a big exam.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "a4ec4305",
+  "text": "I do my homework straight away after school.",
+  "say": "I do my homework straight away after school.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "04fc80fd",
+  "text": "I have a quick wash before breakfast.",
+  "say": "I have a quick wash before breakfast.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "01fb9585",
+  "text": "I call a friend after school.",
+  "say": "I call a friend after school.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "d5823739",
+  "text": "I always do my best in class.",
+  "say": "I always do my best in class.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "79347499",
+  "text": "I do my hair before I leave home.",
+  "say": "I do my hair before I leave home.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "5776b878",
+  "text": "Can you do me a favour, please?",
+  "say": "Can you do me a favour, please?",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "02d21814",
+  "text": "The storm did a lot of damage.",
+  "say": "The storm did a lot of damage.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "92037676",
+  "text": "I take an interest in music.",
+  "say": "I take an interest in music.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c7eeaaba",
+  "text": "I take advantage of the good weather to go out.",
+  "say": "I take advantage of the good weather to go out.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "cda6b904",
+  "text": "The class paid tribute to the old teacher.",
+  "say": "The class paid tribute to the old teacher.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "95d7603c",
+  "text": "My friend paid me a compliment on my project.",
+  "say": "My friend paid me a compliment on my project.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "305ebbf9",
+  "text": "I do some work before dinner.",
+  "say": "I do some work before dinner.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "33258ecd",
+  "text": "I go to school at eight.",
+  "say": "I go to school at eight.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "4e5d8ff5",
+  "text": "I wake up.",
+  "say": "I wake up.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "80b12601",
+  "text": "I get up.",
+  "say": "I get up.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "806b20f8",
+  "text": "I go to the bathroom.",
+  "say": "I go to the bathroom.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "96a99771",
+  "text": "I have a shower.",
+  "say": "I have a shower.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "885da3eb",
+  "text": "I have breakfast.",
+  "say": "I have breakfast.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "85e170b6",
+  "text": "I listen to the radio.",
+  "say": "I listen to the radio.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "478d4e77",
+  "text": "I come home.",
+  "say": "I come home.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "afc25794",
+  "text": "I make dinner.",
+  "say": "I make dinner.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "0b06e7e8",
+  "text": "I have dinner.",
+  "say": "I have dinner.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c841b2fb",
+  "text": "I watch TV.",
+  "say": "I watch TV.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "08630752",
+  "text": "I go to bed.",
+  "say": "I go to bed.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "a1a7cb5b",
+  "text": "I wash clothes.",
+  "say": "I wash clothes.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "1daa2fe0",
+  "text": "I clean the house.",
+  "say": "I clean the house.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "7c39275b",
+  "text": "I go for a walk.",
+  "say": "I go for a walk.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c50ed4ea",
+  "text": "I write emails.",
+  "say": "I write emails.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "f4f7e5a4",
+  "text": "I watch a film.",
+  "say": "I watch a film.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "33723def",
+  "text": "I go to the cinema.",
+  "say": "I go to the cinema.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "de992c7e",
+  "text": "I read in bed.",
+  "say": "I read in bed.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "51b3105a",
+  "text": "I go to school by bus.",
+  "say": "I go to school by bus.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "bd4cbd66",
+  "text": "I walk home.",
+  "say": "I walk home.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "84b38bbe",
+  "text": "I have a cup of tea.",
+  "say": "I have a cup of tea.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "c6a2eff7",
+  "text": "I read every morning.",
+  "say": "I read every morning.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "aec2fb06",
+  "text": "I do it two or three times a week.",
+  "say": "I do it two or three times a week.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "aa136abe",
+  "text": "I always have breakfast at home.",
+  "say": "I always have breakfast at home.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "e352c266",
+  "text": "I usually have breakfast at home.",
+  "say": "I usually have breakfast at home.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "bb6aedfb",
+  "text": "I often have breakfast at home.",
+  "say": "I often have breakfast at home.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "389fec79",
+  "text": "I sometimes have breakfast at home.",
+  "say": "I sometimes have breakfast at home.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "bc9b68dd",
+  "text": "I never have breakfast at home.",
+  "say": "I never have breakfast at home.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "252b11f0",
+  "text": "I get up early.",
+  "say": "I get up early.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2924bcc6",
+  "text": "I go to sleep.",
+  "say": "I go to sleep.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "8c4720b3",
+  "text": "I get home.",
+  "say": "I get home.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "5864090e",
+  "text": "I have cereal for breakfast.",
+  "say": "I have cereal for breakfast.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "0b459ab5",
+  "text": "I have a light lunch.",
+  "say": "I have a light lunch.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "18f2d967",
+  "text": "I have a snack.",
+  "say": "I have a snack.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "e15b17f9",
+  "text": "I have a main meal.",
+  "say": "I have a main meal.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "0c8f3d3f",
+  "text": "I feed the cat.",
+  "say": "I feed the cat.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "da8f857b",
+  "text": "I bother to cook.",
+  "say": "I bother to cook.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2172d4e0",
+  "text": "I put on make-up.",
+  "say": "I put on make-up.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "0e6491b7",
+  "text": "I do the housework.",
+  "say": "I do the housework.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "bdb27d94",
+  "text": "I make the bed.",
+  "say": "I make the bed.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "f5dca6cc",
+  "text": "I go shopping.",
+  "say": "I go shopping.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "e1ac5e4e",
+  "text": "I stay in.",
+  "say": "I stay in.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "5f317e74",
+  "text": "I go out.",
+  "say": "I go out.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2cf82a40",
+  "text": "I eat out.",
+  "say": "I eat out.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "44919278",
+  "text": "My friends come round.",
+  "say": "My friends come round.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "6228ca7d",
+  "text": "I have a chat.",
+  "say": "I have a chat.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "4590dc8c",
+  "text": "I do it on weekdays.",
+  "say": "I do it on weekdays.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "9d132585",
+  "text": "I do it at the weekend.",
+  "say": "I do it at the weekend.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "3a9c52de",
+  "text": "I do it once a week.",
+  "say": "I do it once a week.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "dc3e95ba",
+  "text": "I reply straight away.",
+  "say": "I reply straight away.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2e19b74b",
+  "text": "I make arrangements.",
+  "say": "I make arrangements.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "43afcdd3",
+  "text": "I make a change.",
+  "say": "I make a change.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "06ae1432",
+  "text": "I make a choice.",
+  "say": "I make a choice.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "6f328236",
+  "text": "I make a comment.",
+  "say": "I make a comment.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "dfe6431d",
+  "text": "I make a decision.",
+  "say": "I make a decision.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "eddb9984",
+  "text": "I make an excuse.",
+  "say": "I make an excuse.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "edcc69bb",
+  "text": "I make friends.",
+  "say": "I make friends.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "12fe5529",
+  "text": "I make a mistake.",
+  "say": "I make a mistake.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "9f3b925f",
+  "text": "I make a phone call.",
+  "say": "I make a phone call.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "6d616059",
+  "text": "I make progress.",
+  "say": "I make progress.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "eaa2f5c3",
+  "text": "I do an experiment.",
+  "say": "I do an experiment.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "42eeb940",
+  "text": "I do exercises.",
+  "say": "I do exercises.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "3ef8ae78",
+  "text": "I do the cooking.",
+  "say": "I do the cooking.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2068e820",
+  "text": "I have an accident.",
+  "say": "I have an accident.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "3e85bc4a",
+  "text": "I have an argument.",
+  "say": "I have an argument.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "54bf897a",
+  "text": "I have a conversation.",
+  "say": "I have a conversation.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "2fe1374f",
+  "text": "I have difficulty.",
+  "say": "I have difficulty.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "949d4e08",
+  "text": "I have a dream.",
+  "say": "I have a dream.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "0d086f27",
+  "text": "I have fun.",
+  "say": "I have fun.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "d65a2e5e",
+  "text": "I have a look.",
+  "say": "I have a look.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "279935cd",
+  "text": "I have a party.",
+  "say": "I have a party.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "d352feb8",
+  "text": "I have a problem.",
+  "say": "I have a problem.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "81e987aa",
+  "text": "I have a try.",
+  "say": "I have a try.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "1516e8aa",
+  "text": "I take a holiday.",
+  "say": "I take a holiday.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "e447bd48",
+  "text": "I take the train.",
+  "say": "I take the train.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "784eeb23",
+  "text": "I take a risk.",
+  "say": "I take a risk.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "9c335332",
+  "text": "I take photos.",
+  "say": "I take photos.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "02d83a9b",
+  "text": "I take action.",
+  "say": "I take action.",
+  "src": "2eso/my-real-routine/a-day-in-my-life.html"
+ },
+ {
+  "key": "4903f529",
+  "text": "Core habits",
+  "say": "Core habits",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "8469d022",
+  "text": "drink water",
+  "say": "drink water",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "52488c92",
+  "text": "eat fruit and vegetables",
+  "say": "eat fruit and vegetables",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "c8c5ec9e",
+  "text": "get enough sleep",
+  "say": "get enough sleep",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "d921e96a",
+  "text": "be active",
+  "say": "be active",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "32a2a561",
+  "text": "limit screen time",
+  "say": "limit screen time",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "267160ca",
+  "text": "Useful healthy choices",
+  "say": "Useful healthy choices",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "17276769",
+  "text": "stay hydrated",
+  "say": "stay hydrated",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "6814f4fb",
+  "text": "have a balanced meal",
+  "say": "have a balanced meal",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "fe113e76",
+  "text": "take screen breaks",
+  "say": "take screen breaks",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "07fd73ff",
+  "text": "wind down before bed",
+  "say": "wind down before bed",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "b5c262fa",
+  "text": "cut down on sugary drinks",
+  "say": "cut down on sugary drinks",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "7caffb90",
+  "text": "Reflect & improve",
+  "say": "Reflect & improve",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "6e5735aa",
+  "text": "make healthy choices",
+  "say": "make healthy choices",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "b79c5d19",
+  "text": "make an effort to",
+  "say": "make an effort to",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "f13791e0",
+  "text": "strike a balance",
+  "say": "strike a balance",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "894a6bb3",
+  "text": "stick to a routine",
+  "say": "stick to a routine",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "4addc730",
+  "text": "I have breakfast before school.",
+  "say": "I have breakfast before school.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "8c99c499",
+  "text": "I drink water during the school day.",
+  "say": "I drink water during the school day.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "bcdfe330",
+  "text": "I eat fruit and vegetables every day.",
+  "say": "I eat fruit and vegetables every day.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "10aeba65",
+  "text": "I try to get enough sleep on school nights.",
+  "say": "I try to get enough sleep on school nights.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "9ca216f0",
+  "text": "I am active after school.",
+  "say": "I am active after school.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "f5df31c4",
+  "text": "I limit screen time before bed.",
+  "say": "I limit screen time before bed.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "00a34f2b",
+  "text": "I carry water to stay hydrated.",
+  "say": "I carry water to stay hydrated.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "596e4849",
+  "text": "I try to have a balanced meal at lunch.",
+  "say": "I try to have a balanced meal at lunch.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "6295ef03",
+  "text": "I take screen breaks when I study.",
+  "say": "I take screen breaks when I study.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "698f81c9",
+  "text": "I read to wind down before bed.",
+  "say": "I read to wind down before bed.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "38ea8e4b",
+  "text": "I am trying to cut down on sugary drinks.",
+  "say": "I am trying to cut down on sugary drinks.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "162e334b",
+  "text": "I try to make healthy choices during the week.",
+  "say": "I try to make healthy choices during the week.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "dd0d2ba8",
+  "text": "I make an effort to go to bed earlier.",
+  "say": "I make an effort to go to bed earlier.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "9de79414",
+  "text": "I try to strike a balance between screens and being active.",
+  "say": "I try to strike a balance between screens and being active.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "506c3112",
+  "text": "I stick to a routine on school days.",
+  "say": "I stick to a routine on school days.",
+  "src": "2eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "69bae2eb",
+  "text": "I wake up at seven.",
+  "say": "I wake up at seven.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "244feb45",
+  "text": "I get up at 7:15.",
+  "say": "I get up at 7:15.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "522d8a18",
+  "text": "head out for school",
+  "say": "head out for school",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "f7308257",
+  "text": "I head out for school at eight.",
+  "say": "I head out for school at eight.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "c29236b5",
+  "text": "I get home at 4:30.",
+  "say": "I get home at 4:30.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "68c1fab5",
+  "text": "wind down",
+  "say": "wind down",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "efb0f89d",
+  "text": "I wind down with music.",
+  "say": "I wind down with music.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "fa6559b1",
+  "text": "turn in",
+  "say": "turn in",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "97a452ba",
+  "text": "I turn in at ten.",
+  "say": "I turn in at ten.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "fd9269d7",
+  "text": "sleep in",
+  "say": "sleep in",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "36f68d4f",
+  "text": "I sleep in on Saturdays.",
+  "say": "I sleep in on Saturdays.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "3f9a1c83",
+  "text": "wake up at + time",
+  "say": "wake up at, time",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "c0feec16",
+  "text": "Mia wakes up at seven.",
+  "say": "Mia wakes up at seven.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "5d3b1405",
+  "text": "get up at + time",
+  "say": "get up at, time",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "2294cfc6",
+  "text": "Leo gets up at 7:45.",
+  "say": "Leo gets up at 7:45.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "b413a636",
+  "text": "head out for + place",
+  "say": "head out for, place",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "7ac9d982",
+  "text": "Mia heads out for school at eight.",
+  "say": "Mia heads out for school at eight.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "978c5eff",
+  "text": "get home at + time",
+  "say": "get home at, time",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "ae430236",
+  "text": "Leo gets home at five.",
+  "say": "Leo gets home at five.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "795e862e",
+  "text": "wind down with + thing",
+  "say": "wind down with, thing",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "b83fb748",
+  "text": "Mia winds down with music.",
+  "say": "Mia winds down with music.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "fd768c09",
+  "text": "wind down by + verb-ing",
+  "say": "wind down by, verb-ing",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "5509073e",
+  "text": "Leo winds down by watching a short show.",
+  "say": "Leo winds down by watching a short show.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "6e3b7228",
+  "text": "turn in at + time",
+  "say": "turn in at, time",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "7868f176",
+  "text": "Leo turns in at half past nine.",
+  "say": "Leo turns in at half past nine.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "c88dc5af",
+  "text": "sleep in on + day",
+  "say": "sleep in on, day",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "8d223c80",
+  "text": "They sleep in on weekends.",
+  "say": "They sleep in on weekends.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "ea81eea2",
+  "text": "both",
+  "say": "both",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "ebd994c0",
+  "text": "They both sometimes sleep in.",
+  "say": "They both sometimes sleep in.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "60d56f8c",
+  "text": "but",
+  "say": "but",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "9c6b2052",
+  "text": "Mia gets home at 4:30, but Leo gets home at five.",
+  "say": "Mia gets home at 4:30, but Leo gets home at five.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "f3166193",
+  "text": "although",
+  "say": "although",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "591bdf0c",
+  "text": "Although their days are similar, Leo turns in earlier.",
+  "say": "Although their days are similar, Leo turns in earlier.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "0dc628ce",
+  "text": "while",
+  "say": "while",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "eedb0fde",
+  "text": "Mia winds down with music, while Leo watches a show.",
+  "say": "Mia winds down with music, while Leo watches a show.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "35a437dc",
+  "text": "earlier than / later than",
+  "say": "earlier than, later than",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "8e85fd95",
+  "text": "Mia gets home earlier than Leo.",
+  "say": "Mia gets home earlier than Leo.",
+  "src": "2eso/my-real-routine/same-day-different-person.html"
+ },
+ {
+  "key": "598ce244",
+  "text": "be physically active",
+  "say": "be physically active",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "a88d020e",
+  "text": "take regular breaks",
+  "say": "take regular breaks",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "0452ac4e",
+  "text": "manage stress",
+  "say": "manage stress",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "70861338",
+  "text": "Useful routines",
+  "say": "Useful routines",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "3ff81341",
+  "text": "maintain a balanced diet",
+  "say": "maintain a balanced diet",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "61eb6b20",
+  "text": "establish a sleep routine",
+  "say": "establish a sleep routine",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "ce80819c",
+  "text": "recharge",
+  "say": "recharge",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "d006d253",
+  "text": "Habit change",
+  "say": "Habit change",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "f7c2a2e9",
+  "text": "make conscious choices",
+  "say": "make conscious choices",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "865d447d",
+  "text": "build sustainable habits",
+  "say": "build sustainable habits",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "d39aa260",
+  "text": "strike a balance between",
+  "say": "strike a balance between",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "5bf29937",
+  "text": "make a realistic adjustment",
+  "say": "make a realistic adjustment",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "e8e5c061",
+  "text": "I carry a bottle of water to stay hydrated.",
+  "say": "I carry a bottle of water to stay hydrated.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "2da1e127",
+  "text": "I try to get enough sleep during the week.",
+  "say": "I try to get enough sleep during the week.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "2352d85d",
+  "text": "I try to be physically active most days.",
+  "say": "I try to be physically active most days.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "c982ae35",
+  "text": "I take regular breaks when I study.",
+  "say": "I take regular breaks when I study.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "737df420",
+  "text": "A short walk helps me manage stress.",
+  "say": "A short walk helps me manage stress.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "c97a7de6",
+  "text": "I try to maintain a balanced diet during the school week.",
+  "say": "I try to maintain a balanced diet during the school week.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "9605c54b",
+  "text": "A regular bedtime helps me establish a sleep routine.",
+  "say": "A regular bedtime helps me establish a sleep routine.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "1205e2ed",
+  "text": "I take screen breaks while studying.",
+  "say": "I take screen breaks while studying.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "ff00b197",
+  "text": "I take a short break after school to recharge.",
+  "say": "I take a short break after school to recharge.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "8d008837",
+  "text": "I make conscious choices about when I use my phone.",
+  "say": "I make conscious choices about when I use my phone.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "a519aaf8",
+  "text": "Small changes can help build sustainable habits.",
+  "say": "Small changes can help build sustainable habits.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "c7de93f9",
+  "text": "I try to strike a balance between schoolwork and rest.",
+  "say": "I try to strike a balance between schoolwork and rest.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "5e99a167",
+  "text": "I can make a realistic adjustment to my evening routine.",
+  "say": "I can make a realistic adjustment to my evening routine.",
+  "src": "4eso/my-real-routine/healthy-habits.html"
+ },
+ {
+  "key": "4fc18486",
+  "text": "the nights draw in",
+  "say": "the nights draw in",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "583bce61",
+  "text": "Once the clocks go back, the nights really draw in.",
+  "say": "Once the clocks go back, the nights really draw in.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "85cee55d",
+  "text": "a nip in the air",
+  "say": "a nip in the air",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "53c0b953",
+  "text": "There's a nip in the air this morning.",
+  "say": "There's a nip in the air this morning.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "99341468",
+  "text": "crisp",
+  "say": "crisp",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "ebe7275b",
+  "text": "a crisp autumn morning",
+  "say": "a crisp autumn morning",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "70ac7296",
+  "text": "a cold snap",
+  "say": "a cold snap",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "363e4ff0",
+  "text": "The cold snap killed the last tomatoes.",
+  "say": "The cold snap killed the last tomatoes.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "86594c4a",
+  "text": "an Indian summer",
+  "say": "an Indian summer",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "ccaedddc",
+  "text": "We had an Indian summer in October.",
+  "say": "We had an Indian summer in October.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "d6a8f979",
+  "text": "dank",
+  "say": "dank",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "94bf7306",
+  "text": "a dank November afternoon",
+  "say": "a dank November afternoon",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "1611aadd",
+  "text": "to wane",
+  "say": "to wane",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "0a93ee1d",
+  "text": "The light wanes by five o'clock.",
+  "say": "The light wanes by five o'clock.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "14737b49",
+  "text": "bountiful",
+  "say": "bountiful",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "7e6fced7",
+  "text": "a bountiful harvest",
+  "say": "a bountiful harvest",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "d9eccb62",
+  "text": "to forage",
+  "say": "to forage",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "fd036e9f",
+  "text": "We foraged for mushrooms and chestnuts.",
+  "say": "We foraged for mushrooms and chestnuts.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "3d6f86b3",
+  "text": "to gather in (the harvest)",
+  "say": "to gather in",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "56de22ff",
+  "text": "Farmers gathered in the grapes.",
+  "say": "Farmers gathered in the grapes.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "0b0741ff",
+  "text": "russet",
+  "say": "russet",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "67f58741",
+  "text": "russet leaves",
+  "say": "russet leaves",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "9882f81d",
+  "text": "mellow",
+  "say": "mellow",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "a39ab513",
+  "text": "the mellow light of late October",
+  "say": "the mellow light of late October",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "84f0ff82",
+  "text": "to hibernate",
+  "say": "to hibernate",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "edc3e126",
+  "text": "Hedgehogs hibernate in piles of leaves.",
+  "say": "Hedgehogs hibernate in piles of leaves.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "b6517d7d",
+  "text": "wistful",
+  "say": "wistful",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "f80531a5",
+  "text": "Autumn always makes me wistful.",
+  "say": "Autumn always makes me wistful.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "59440231",
+  "text": "to hunker down",
+  "say": "to hunker down",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "11b85bb2",
+  "text": "We hunker down at home when it gets cold.",
+  "say": "We hunker down at home when it gets cold.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "1df0e4f4",
+  "text": "a cosy evening by the fire",
+  "say": "a cosy evening by the fire",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "ed2d2f30",
+  "text": "the winter blues",
+  "say": "the winter blues",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "88b93418",
+  "text": "Light lamps help with the winter blues.",
+  "say": "Light lamps help with the winter blues.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "385045e8",
+  "text": "seasonal affective disorder",
+  "say": "seasonal affective disorder",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "31dde594",
+  "text": "SAD affects many people in northern countries.",
+  "say": "SAD affects many people in northern countries.",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "738f5ee1",
+  "text": "it starts getting dark earlier in the evening",
+  "say": "it starts getting dark earlier in the evening",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "12724898",
+  "text": "a slight coldness in the weather",
+  "say": "a slight coldness in the weather",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "4356b75b",
+  "text": "cold, dry and fresh (weather); firm and fresh (leaves, food)",
+  "say": "cold, dry and fresh; firm and fresh",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "0f674309",
+  "text": "a sudden short period of very cold weather",
+  "say": "a sudden short period of very cold weather",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "45773080",
+  "text": "a period of unusually warm weather in autumn",
+  "say": "a period of unusually warm weather in autumn",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "a9cd7d7a",
+  "text": "unpleasantly wet and cold",
+  "say": "unpleasantly wet and cold",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "00c13a59",
+  "text": "to become gradually smaller or weaker (light, interest)",
+  "say": "to become gradually smaller or weaker",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "d98bc4fe",
+  "text": "producing large amounts",
+  "say": "producing large amounts",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "de71415f",
+  "text": "to search for wild food",
+  "say": "to search for wild food",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "1fd1701a",
+  "text": "to collect crops when they are ready",
+  "say": "to collect crops when they are ready",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "5e42d411",
+  "text": "reddish-brown",
+  "say": "reddish-brown",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "0745fe3f",
+  "text": "soft, warm and gentle, not harsh",
+  "say": "soft, warm and gentle, not harsh",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "3430fc9a",
+  "text": "to sleep through the winter",
+  "say": "to sleep through the winter",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "630de655",
+  "text": "sadly thinking about something you cannot have or that has passed",
+  "say": "sadly thinking about something you cannot have or that has passed",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "f564232c",
+  "text": "to stay inside and prepare to wait for a long time",
+  "say": "to stay inside and prepare to wait for a long time",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "77e5a637",
+  "text": "comfortable, warm and relaxing",
+  "say": "comfortable, warm and relaxing",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "6c44e860",
+  "text": "a low mood some people feel when the days are short",
+  "say": "a low mood some people feel when the days are short",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ },
+ {
+  "key": "591ab203",
+  "text": "a kind of depression linked to the dark months",
+  "say": "a kind of depression linked to the dark months",
+  "src": "4eso/seasons-and-celebrations/getting-started.html"
+ }
+]
