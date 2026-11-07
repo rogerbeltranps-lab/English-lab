@@ -54,8 +54,7 @@
           <a class="chal" href="#final"><span class="k" data-ca="El teu repte · producte final">Your challenge · final product</span><b>A Celebration Day for our school</b><span class="d">In groups of 3–4, design a respectful celebration day at school around one tradition. Record a 2–3 minute video pitch with Google Slides (everyone speaks, faces and slides visible together) and write a formal email to the head teacher proposing the event.</span><span class="go" data-ca="Mira què has de fer →">See what to do →</span></a>
           <div class="tiles">
             <a class="tile nt" href="#notes"><span class="ti" aria-hidden="true">📝</span><span><b data-ca="Jocs i teoria · els teus apunts">Games and theory · your notes</b><small data-ca="jocs de classe: teoria, els teus apunts, resultats i què estudiar">class games: theory, your notes, results and what to study</small></span></a>
-            <a class="tile" href="#study"><span class="ti" aria-hidden="true">📚</span><span><b data-ca="Estudia">Study</b><small data-ca="resum, llibre de lectura, paraules i gramàtica">summary, reading book, words and grammar</small></span></a>
-            <button type="button" class="tile" id="shadowOpen" aria-label="Watch the shadowing video for the whole unit"><span class="ti" aria-hidden="true">🗣</span><span><b data-ca="Vídeo de shadowing">Shadowing video</b><small data-ca="tota la unitat · 6 minuts · repeteix en veu alta">the whole unit · 6 minutes · say it aloud</small></span></button>
+            <button type="button" class="tile wd" id="shadowOpen" aria-label="Watch the shadowing video for the whole unit"><span class="ti" aria-hidden="true">🗣</span><span><b data-ca="Vídeo de shadowing">Shadowing video</b><small data-ca="tota la unitat · 6 minuts · repeteix en veu alta">the whole unit · 6 minutes · say it aloud</small></span></button>
             <a class="tile wd" href="#about"><span class="ti" aria-hidden="true">ⓘ</span><span><b data-ca="Sobre aquesta LS">About this LS</b><small data-ca="què aprendràs i com t'avaluem">what you learn and how you are assessed</small></span></a>
             <a class="tile" href="../../shared/print/index.html" data-el-teacher hidden><span class="ti" aria-hidden="true">🖨</span><span><b>Paper worksheets</b><small>teacher only · print per route + keys</small></span></a>
           </div>
@@ -63,11 +62,10 @@
       </div>
     </section>
 
-    <!-- 📚 Study: the vocabulary and grammar summary and the reading book (el-cloud.js fills both with the student's route), then the language of the LS -->
-    <section class="place" data-place="study" hidden>
-      <h2 class="pt" data-ca="📚 Estudia">📚 Study</h2>
-      <article class="bigcard" data-el-study hidden style="background:#f0fdf4;border-color:#bbf7d0"></article>
-      <article class="bigcard" data-el-story hidden style="background:#fff7ed;border-color:#fed7aa"></article>
+    <!-- The grammar and vocabulary of this LS, never shown here: the board's 🔤 Grammar and vocabulary place reads these two lists (today.html,
+         langLists). No 📚 Study place any more (Roger, 7 Nov 2026: "the study section makes no sense, delete it"): the summary is on
+         Grammar and vocabulary, the reading book on 📖 Books. -->
+    <div data-ls-lists hidden>
       <div class="cols">
         <article class="bigcard">
         <h2>Grammar &amp; discourse</h2>
@@ -96,7 +94,7 @@
         </ul>
         </article>
       </div>
-    </section>
+    </div>
 
     <!-- ⓘ About this LS: objectives, how we work, competences and assessment criteria (from the programme) -->
     <section class="place" data-place="about" hidden>
