@@ -206,13 +206,15 @@ function nav(g,lss){
     // books of the LS, a section with grammar and vocabulary summary")
     +(cs.length?b(pl==="books"?" on":"","#books","📖",t("Llibres","Books"),cur("books"))+b(pl==="lang"?" on":"","#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary"),cur("lang")):"")
     +b("","lab/","🎲",t("Jocs","Games"))+b("","lab/practice.html","🎯",t("Practica","Practise"))
-    +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"')
+    // 🎬 hidden for now (Roger, 7 Nov 2026: "take this out for the moment"): set HOWTO_MENU=true to bring it back
+    +(HOWTO_MENU?b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"'):"")
     +b("","#help","❓",t("Ajuda","Help"))   // Help near the bottom of the menu (Roger, 7 Nov 2026: "only on the left menu at the bottom")
     +(APP()?"":b("","#phone","📱",t("Estudia amb el mòbil","Study on your phone")));   // under Help, off the board home (Roger, 7 Nov 2026)
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
 // tools/site-video (real screens of the site, no subtitles). A box on the board and a link in the menu.
+const HOWTO_MENU=false;   // the 🎬 How the website works item in the left menu (off for now, Roger 7 Nov 2026)
 const HOWTO="video/how-english-lab-works",HOWTO_V="20261102c";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
 // One video per language (Roger, 2 Nov 2026: "this videos could be merged … the original video with the changes"): the website
 // video now holds the whole board, part by part, on a sample student (tools/site-video/full.json).
