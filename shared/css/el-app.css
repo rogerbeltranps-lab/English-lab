@@ -120,10 +120,12 @@ body.elapp.ellab .nav-tabs,body.elapp.ellab .mobile-tabs{display:none!important}
 /* ---- learning paths on a computer: the path in a left column, the step on the right (Roger, 6 Nov 2026: "use a column on the left
    with info of the LP, and it must be super easy to understand"; el-app.js lpLayout) ---- */
 body.ellp2 header.hero{display:none!important}
-.ellpgrid{display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;align-items:start;max-width:1440px;margin:0 auto;padding:16px 24px 40px;box-sizing:border-box}
+/* the grid starts right after the side menu (not centred: on a wide screen the centring left a big empty strip between the menu and the
+   column; Roger, 7 Nov 2026: "here there's too much space") */
+.ellpgrid{display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;align-items:start;max-width:1600px;margin:0;padding:16px 24px 40px;box-sizing:border-box}
 body.ellp2 main#lp{max-width:none!important;width:auto!important;margin:0!important;padding:0!important;min-width:0}
 body.ellp2 .lp-body{display:block!important}
-.ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin}
+.ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin}
 .ellp-head{display:flex;flex-direction:column;gap:6px}
 .ellp-head .eyebrow{align-self:flex-start;font-size:11px!important;padding:4px 10px!important;margin:0!important}
 .ellp-head h1{font-size:1.6rem!important;line-height:1.15!important;margin:0!important;letter-spacing:-.01em;text-wrap:balance}
@@ -146,6 +148,16 @@ body.ellp2 .lp-body{display:block!important}
 .ellp-more .plan-card .instruction{display:block!important;margin:0 0 8px!important;font-size:.88rem!important}
 .ellp-more .plan-card input{width:100%!important;max-width:none!important;box-sizing:border-box}
 .ellp-more .lp-how{margin:0!important}
+/* nothing in the column may be wider than it: the open study guide (two tip cards side by side, a one-line pill) made it 380 px wide, so
+   the column scrolled sideways (a trackpad swipe) and its left side hid behind the menu (Roger, 7 Nov 2026: "this shouldn't happen") */
+.ellpside>*{min-width:0;max-width:100%}
+.ellpside .study-card{min-width:0;box-sizing:border-box}
+.ellpside .study-card summary{flex-wrap:wrap}
+.ellpside .study-card summary>span{min-width:0;overflow-wrap:anywhere}
+.ellpside .study-tips{grid-template-columns:minmax(0,1fr)!important}
+.ellpside .pill{white-space:normal;max-width:100%;box-sizing:border-box}
+.ellpside .panel-head{flex-wrap:wrap}
+.ellpside img,.ellpside video,.ellpside audio,.ellpside table{max-width:100%}
 
 /* the teacher's part of the column: class game, the level to look at, open sections, pull up, full screen */
 .ellp-teach{display:flex;flex-direction:column;gap:10px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px;box-shadow:0 1px 0 #e2e8f0}
