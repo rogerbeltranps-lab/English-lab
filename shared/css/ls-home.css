@@ -242,3 +242,9 @@ footer.lsf{color:var(--muted);font-size:13px;padding:24px 0 0}
 }
 /* a tile on its own row (LS2 About this LS, after Vocabulary games left the LS home: Roger, 7 Nov 2026) */
 .tile.wd{grid-column:1/-1;flex-direction:row;align-items:center;min-height:0;padding:14px 18px}
+/* 🧩 📚 Games and theory beside the LS title, in the space above Your challenge (Roger, 7 Nov 2026: "why this isnt here yet?"): the
+   header takes the home grid's two columns; on narrower screens the card goes under the question */
+.lshead.gmh{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:12px 22px;align-items:end}
+.lshead.gmh .lsht{min-width:0}
+.lshead .tile.gmt{grid-column:auto;margin:0}
+@media (max-width:1100px){.lshead.gmh{grid-template-columns:1fr}}
