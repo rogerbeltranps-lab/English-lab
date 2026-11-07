@@ -144,6 +144,16 @@
         es.filter(([,e])=>e.add&&ok(e.to)).sort((x,y)=>(x[1].at||0)-(y[1].at||0)).forEach(([key,e])=>{const nl=lab(e.to)+" · "+e.add+(e.from?" · not finished on "+lab(e.from):"");
           if(e.tabs&&e.tabs.length)tb[key]=e.tabs;place(gi,e.to,nl);ad[nl]={key,from:e.from||null};if(ok(e.from)&&e.shift)shift(gi,e.from,e.to,e.shift)})});
       return p},
+    // Past class days count as done (Roger, 7 Nov 2026: "If a student do sth that's all. It's done and ticked"; "If I dont do sth in class I
+    // drag it to the next day and that's all"): every item still on an agenda day before today (and the day itself, "@day") is ticked,
+    // unless the teacher unticked it (false). In memory only: ticks = teacherPlan/{group}.ticks, ag = the group's agenda (elAgendaOf);
+    // adds the missing keys (the day as their value) and returns them. Used by the dashboard, the Saturday email and the marking.
+    autoTicks(ls,ag,ticks,t){const out=[];if(!ag||!ag.days||!ticks)return out;t=t||today();
+      Object.keys(ag.days).concat(ag.exam&&!ag.days[ag.exam]?[ag.exam]:[]).forEach(d=>{if(!(d<t))return;
+        const its=[...(ag.days[d]||[]).filter(it=>it&&it!=="self"),...(ag.exam===d?["exam"]:[])];if(!its.length)return;
+        its.forEach(it=>{const k=ls+"|@"+d+"#"+it;if(!(k in ticks)){ticks[k]=d;out.push(k)}});
+        const k=ls+"|@"+d;if(!(k in ticks)&&its.every(it=>ticks[ls+"|@"+d+"#"+it])){ticks[k]=d;out.push(k)}});
+      return out},
     // a day the group has English by its timetable (EL_TIMETABLE in el-plan.js): true/false, or null without a timetable for it
     isClass(gid,d){const T=window.EL_TIMETABLE;if(!T||!T.groups||!T.groups[gid])return null;if((T.off||[]).some(o=>Array.isArray(o)?o[0]<=d&&d<=o[1]:o===d))return false;
       const dn=DAYS.en[day(d).getDay()];return T.groups[gid].some(s=>String(s).startsWith(dn+" "))},
