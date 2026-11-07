@@ -18,7 +18,7 @@ const FB="https://www.gstatic.com/firebasejs/10.14.1/";
 const FBM=await Promise.all([import(FB+"firebase-app.js"),import(FB+"firebase-auth.js"),import(FB+"firebase-firestore.js")])
   .catch(e=>{console.warn("Firebase could not load (offline?): the page works on its own, nothing is synced",e);return null});
 if(!FBM)await new Promise(()=>{});   // offline: stop here quietly, as the failed static import did before
-const [{initializeApp},A,{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot}]=FBM;
+const [{initializeApp},A,{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot,arrayUnion}]=FBM;
 
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
@@ -523,6 +523,10 @@ async function myAnnouncements(u){
   // scheduled ones (at = ms, Roger 2 Nov 2026: "program announcements") reach the student only from that time, dated then (card and board)
   return Object.values(out).filter(a=>!(a.at>Date.now())).map(a=>a.at?Object.assign(a,{created:a.at}):a);
 }
+// The student's answer to a private message (to:"one"; Roger, 7 Nov 2026: "they should be able to answer back"): one more thread item, read
+// now, sAt = when (the teacher's 15-minute email looks for new sAt). firestore.rules allows exactly this to the student it was sent to.
+function annReply(u,id,text){text=String(text||"").trim().slice(0,1000);if(!u||!text||AS)return Promise.reject(new Error("nothing to send"));
+  return updateDoc(doc(db,"announcements",id),{thread:arrayUnion({by:"s",uid:u.uid,text,at:Date.now()}),["read."+u.uid]:serverTimestamp(),sAt:serverTimestamp()})}
 // Problem reports (bottom bar "⚠️ Problema / Problem"): problems/{id}, read only by the teacher in the dashboard.
 // Catalan for Insecure and with no route; English for Safe and Daring (LS pages: the route; the board: its own language).
 // Outside an LS page (course pages, English Lab, Practice) the route is the one of the course's latest LS (homeLevel), so a Core or
@@ -968,7 +972,7 @@ onAuthStateChanged(auth,async u=>{
   // Announcements from the teacher to the student's group or to them (announcements/{id}): a card once each (shared/js/el-announce.js).
   if(u&&isStudent(u)&&!document.getElementById("el-announce"))import("./el-announce.js").then(m=>m.showAnnouncements({en:repEn(),
     load:()=>quiet("an",u,async()=>(await myAnnouncements(u)).filter(a=>!(a.read||{})[u.uid])),
-    done:id=>updateDoc(doc(db,"announcements",id),{["read."+u.uid]:serverTimestamp()})})).catch(e=>console.warn("announcements",e));
+    done:id=>updateDoc(doc(db,"announcements",id),{["read."+u.uid]:serverTimestamp()}),reply:(id,text)=>annReply(u,id,text)})).catch(e=>console.warn("announcements",e));
   // "Your exam results are ready": a card once per new set of exam marks, with a link to the board on that LS (shared/js/el-exam-notice.js).
   if(u&&isStudent(u)&&myGroup&&!seesAll(u)&&!document.getElementById("el-exam-notice"))loadScript("shared/js/el-grading.js",()=>window.EL_GRADING)
     .then(()=>import("./el-exam-notice.js")).then(m=>m.examNotice({course:courseOf(myGroup),en:repEn(),board:BOARD,
@@ -1010,4 +1014,4 @@ onAuthStateChanged(auth,async u=>{
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),annReply:(id,text)=>annReply(user,id,text),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};

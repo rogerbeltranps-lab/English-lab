@@ -140,7 +140,7 @@ details.agpast>summary{cursor:pointer;color:#3157d5;font-weight:700;margin:12px 
 <script src="shared/print/lp-list.js"></script>
 <script type="module">
 import {replyText,replyColor,MSG_MAX} from "./shared/js/el-reply.js";
-import {ANN_MAX,annMs,annHtml,annCardHtml,annCardStyle} from "./shared/js/el-announce.js";
+import {ANN_MAX,annMs,annLast,annHtml,annCardHtml,annCardStyle} from "./shared/js/el-announce.js";
 import {writing} from "./shared/js/el-corrections.js";
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
@@ -347,6 +347,12 @@ const api={
   // announcements/{id} = {text, to, label, groups, uids, created, read:{}}. Students read the ones for their group or for them (el-announce.js).
   annSend:o=>{const x=Object.assign({},o,{read:{},created:DEMO?Date.now():F.serverTimestamp()});if(DEMO){S.D.ann.push(Object.assign({id:"a"+Date.now().toString(36)},x));return}
     return F.setDoc(F.doc(F.collection(db(),"announcements")),x)},
+  // your answer to a student's reply on a private message: one more thread item, their read time removed (the card comes back to them),
+  // tDone = how many items you have dealt with (no "new answer" tag). annSeen: dealt with, no answer.
+  annAnswer:(id,u,text)=>{const a=S.D.ann.find(x=>x.id===id);if(!a)return;const it={by:"t",text,at:Date.now()},n=(a.thread||[]).length+1;
+    if(DEMO){a.thread=[...(a.thread||[]),it];a.tDone=n;if(a.read)delete a.read[u];return}
+    return F.updateDoc(F.doc(db(),"announcements",id),{thread:F.arrayUnion(it),["read."+u]:F.deleteField(),tDone:n})},
+  annSeen:id=>{const a=S.D.ann.find(x=>x.id===id);if(!a)return;const n=(a.thread||[]).length;if(DEMO){a.tDone=n;return}return F.updateDoc(F.doc(db(),"announcements",id),{tDone:n})},
   annDel:id=>DEMO?S.D.ann=S.D.ann.filter(x=>x.id!==id):F.deleteDoc(F.doc(db(),"announcements",id)),
   sgRead:(id,v)=>DEMO?S.D.sg.find(x=>x.id===id).read=v:put(["suggestions",id],{read:v}),
   sgDel:id=>DEMO?S.D.sg=S.D.sg.filter(x=>x.id!==id):F.deleteDoc(F.doc(db(),"suggestions",id)),
@@ -973,7 +979,7 @@ function classCard(grp,go){const c=nextClass(grp.id),y=sessOf(grp.id,c&&c.date),
     +(a?`<a class="${go?"":"s2"}" href="${esc(a.path)}" target="_blank" rel="noopener">Open it ↗</a>`:"")
     +`</div></div>`}
 // Home (the old 📅 Time plan tab): alerts, the next class of any group, a tile per group, the time plan of every group and the messages
-function homePage(){const t=ELWeek.today(),np=S.D.pb.filter(x=>!x.fixed).length,nw=(S.D.sg||[]).filter(x=>!x.read).length;
+function homePage(){const t=ELWeek.today(),np=S.D.pb.filter(x=>!x.fixed).length,nw=(S.D.sg||[]).filter(x=>!x.read).length,nr=msgNew().length;
   if(S.place==="week")return placeHead("Home","week")+satBox(GR.map(g=>g.id))+overview();
   if(S.place==="msgs")return placeHead("Home","msgs")+annBox()+pbBox()+sgBox();
   if(S.place==="tt")return ttPage();
@@ -981,13 +987,14 @@ function homePage(){const t=ELWeek.today(),np=S.D.pb.filter(x=>!x.fixed).length,
   const sat=isWkEnd(t)?GR.reduce((n,g)=>{const x=ELWeek.now(g.id);return n+(x?pending(Object.assign({gid:g.id},x)).length:0)},0):0;
   const al=(sat?tAlert("week","⚠",`Weekend check: ${plural(sat,"session")} not ticked`,"Check"):"")
     +(np?tAlert("msgs","⚠️",`${plural(np,"problem report")} from students`,"Read"):"")
-    +(nw?tAlert("msgs","💡",`${plural(nw,"new idea")} from students`,"Read","news"):"");
+    +(nw?tAlert("msgs","💡",`${plural(nw,"new idea")} from students`,"Read","news"):"")
+    +(nr?tAlert("msgs","✉️",`${plural(nr,"new answer")} to your messages`,"Read","news"):"");
   const c=nextClass(),cg=c&&GR.find(g=>g.id===c.gid);
   const gt=GR.map(g=>{const x=ELWeek.now(g.id),l=x&&EL_LS.find(y=>y.id===x.ls),ex=x&&ELWeek.exam(x.p,x.gi),n=ex?ELWeek.days(t,ex):null,b=x?behind(Object.assign({gid:g.id},x)).length:0;
     return tTile(null,"",esc(g.name),(l?lsLabel(l):"No time plan yet")+(n!=null&&n>=0?` · exam ${n===0?"today":n===1?"tomorrow":"in "+n+" days"}`:""),b?b+" not ticked":"",true,"c"+g.course,g.id)}).join("");
   const d=new Date(t+"T12:00").toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
   return `<div class="ph"><h1 class="hi">Hi, Roger${window.ELCheer?`! ${esc(ELCheer.teacher(t,S.cheer||0))} <button class="cheer" data-do="cheer" title="Another sentence">↻</button>`:""}</h1><p class="sub">${esc(d)}</p></div><div class="hgrid"><div class="hl">${al}${cg?classCard(cg,true):`<div class="cont idle"><span class="ck">Next class</span><span class="ct">No class in the next three weeks</span></div>`}</div>`
-    +`<div class="tiles">${gt}${corrTile()}${tTile("week","📅","Time plan","every group's week and exam day",sat?sat+" not ticked":"",true)}${tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw||"",!!np)}${tTile("tt","🗓","Timetable","your classes with each group, days off","",false)}</div></div>`}
+    +`<div class="tiles">${gt}${corrTile()}${tTile("week","📅","Time plan","every group's week and exam day",sat?sat+" not ticked":"",true)}${tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)}${tTile("tt","🗓","Timetable","your classes with each group, days off","",false)}</div></div>`}
 function render0(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g&&!(g==="none"&&((S.D.acc||{}).hidden||{})[s.uid])),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
@@ -1054,18 +1061,19 @@ function render0(){
     cov:()=>covPage(grp,ls)};
   if(place[S.place]){$("#main").innerHTML=placeHead(back,S.place)+place[S.place]()}
   else{S.place="home";
-    const np=S.D.pb.filter(x=>!x.fixed).length,nw=(S.D.sg||[]).filter(x=>!x.read).length,x=p&&gi>=0?{ls,p,gi,gid:grp.id}:null,nb=x?behind(x).length:0;
+    const np=S.D.pb.filter(x=>!x.fixed).length,nw=(S.D.sg||[]).filter(x=>!x.read).length,nr=msgNew(grp.id).length,x=p&&gi>=0?{ls,p,gi,gid:grp.id}:null,nb=x?behind(x).length:0;
     const al=lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
       +(nb?tAlert("plan","⏰",`${plural(nb,"earlier session")} not ticked`,"Tick them"):"")
       +(/❌/.test(todoH)?tAlert("todo","❌","Claude's marking is late","See"):"")
-      +(np?tAlert("msgs","⚠️",`${plural(np,"problem report")} from students`,"Read"):"");
+      +(np?tAlert("msgs","⚠️",`${plural(np,"problem report")} from students`,"Read"):"")
+      +(nr?tAlert("msgs","✉️",`${plural(nr,"new answer")} to your messages`,"Read","news"):"");
     $("#main").innerHTML=head+`<div class="hgrid"><div class="hl">${al}${classCard(grp)}</div><div class="tiles">`
       +tTile("plan","📅","Time plan","your agenda: drag learning paths to class days",nb?nb+" not ticked":"",true)
       +tTile("todo","✅","To do","comments, marking, possible copies, level requests",nTodo||"",/❌|Possible copy/.test(todoH))
       +tTile("paths","📈","Learning paths","progress, open and lock")
       +tTile("marks","📊","Marks","LS grade, criteria, self-assessment")
       +tTile("students","👥","Students","levels, team points, student list")
-      +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw||"",!!np)
+      +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
       +tTile("cov","🎯","Coverage","criteria, competences, grammar and lexicon worked, this LS and the year",(n=>n?n+" to check":"")(covGaps(grp,ls)),true)+`</div></div>`}
   const w=document.querySelector("#main .wrap"),h=w&&w.querySelector("thead tr");if(h)w.style.setProperty("--h1",h.offsetHeight+"px");
 
@@ -2418,14 +2426,15 @@ const annWho=a=>Object.values(S.P).filter(s=>!s.tester&&((a.groups||[]).includes
 const annMine=a=>S.g==="plan"||S.g==="none"||(a.groups||[]).includes(S.g)||annWho(a).some(s=>s.group===S.g);
 const annWhen=a=>{const ms=annMs(a.at||a.created);return ms?new Date(ms).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"just now"};
 function annBox(){
-  const L=(S.D.ann||[]).filter(annMine).sort((a,b)=>annMs(b.at||b.created)-annMs(a.at||a.created));
+  const last=a=>Math.max(annMs(a.at||a.created),annLast(a)),L=(S.D.ann||[]).filter(annMine).sort((a,b)=>msgWait(b)-msgWait(a)||last(b)-last(a));
   const li=a=>{const who=annWho(a),rd=who.filter(s=>(a.read||{})[s.uid]),no=who.filter(s=>!(a.read||{})[s.uid]);
+    if(a.to==="one")return `<li><small class="muted">✉️ Only for <b>${esc(a.label||"")}</b> · ${annWhen(a)} · ${who.length&&rd.length?"read ✓":"not read yet"}</small>${msgConv(a)}${msgBtns(a,msgStu(a))}<div style="margin-top:4px"><button class="g" data-do="anndel" data-id="${esc(a.id)}">Delete</button></div></li>`;
     return `<li><div class="hand annt">${annHtml(a.text)}</div><small class="muted">${a.to==="one"?"✉️ Only for":"📣 To"} <b>${esc(a.label||"")}</b> · ${annLater(a)?`<b style="color:#ea580c">⏰ scheduled for ${annWhen(a)}</b> (students don't see it yet)`:`${annWhen(a)} · `}${annLater(a)?"":who.length?`read by <b>${rd.length} of ${who.length}</b>`:"nobody on the list yet"}</small>
       ${no.length&&rd.length?`<details><summary class="muted" style="font-size:13px;font-weight:600">Not read yet (${no.length})</summary><small>${no.sort(byName).map(s=>name(s)+(s.away?' <span class="muted">(not signed in yet)</span>':"")).join(" · ")}</small></details>`:""}
       <div><button class="g" data-do="anndel" data-id="${esc(a.id)}">Delete</button></div></li>`};
   return `<div class="box" id="ann"><h2>📣 Announcements <small class="muted">to your students</small></h2>`
     +`<div class="bar"><button data-do="annnew" title="A message from you to one group, a whole course, every group or some students">📣 New announcement</button><span class="muted">Each student sees it once, at the top of the next page they open, and it stays in 📣 Announcements on their board.</span></div>`
-    +(L.length?fold("ann",`Sent <small class="muted">${L.length}${S.g==="plan"?"":" for this group"}</small>`,`<ul class="sgl annl">${L.map(li).join("")}</ul>`):"")+`</div>`;
+    +(L.length?fold("ann",`Sent <small class="muted">${L.length}${S.g==="plan"?"":" for this group"}</small>${(n=>n?` <b style="color:#0284c7">💬 ${plural(n,"new answer")}</b>`:"")(L.filter(msgWait).length)}`,`<ul class="sgl annl">${L.map(li).join("")}</ul>`,"",L.some(msgWait)):"")+`</div>`;
 }
 // The student videos as ready links for an announcement (Roger, 2 Nov 2026: tell students to watch "How English Lab works").
 // [chip title, line title, file name]: the English and Catalan videos of that name in HOW_VIDEOS (with its ?v=) become full web links (clickable on the card).
@@ -2663,26 +2672,44 @@ function stuPanel(u){redraw=null;
 // A student who has not signed in yet gets it by email only. No new reads: the messages already sent are in S.D.ann.
 const msgCa=s=>{const l=s.away?(s.ro&&s.ro.route||{}).level:level(s.uid,S.ls);return l?elCa(l):null};
 const msgSent=u=>(S.D.ann||[]).filter(a=>a.to==="one"&&(a.uids||[]).includes(u)).sort((a,b)=>annMs(b.at||b.created)-annMs(a.at||a.created));
-function msgLine(u){const s=S.P[u];if(!s||s.tester)return "";const L=msgSent(u),em=mailTo([s]).length;
+// Answers (Roger, 7 Nov 2026: "they should be able to answer back"): the student replies on the card or on their board (thread items by "s");
+// a reply you have not dealt with (tDone < thread length) is a "💬 New answer": alert on Home and the group page, badge on 💬 Messages,
+// tag in the student window and in Messages. ↩ Answer adds your item (by "t") and the card comes back to them; ✓ Seen just clears the tag.
+const msgStu=a=>(a.uids||[]).find(u=>S.P[u]&&!S.P[u].tester)||(a.uids||[])[0];
+const msgWait=a=>a.to==="one"&&(a.thread||[]).length>0&&a.thread[a.thread.length-1].by==="s"&&(a.tDone||0)<a.thread.length;
+const msgNew=gid=>(S.D.ann||[]).filter(a=>msgWait(a)&&(!gid||(S.P[msgStu(a)]||{}).group===gid));
+const msgWhen=ms=>new Date(ms).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+// the whole conversation as you see it: your message, then their answers (blue, their name) and yours (orange, "You")
+function msgConv(a){const st=S.P[msgStu(a)],who=st?name(st):"The student";
+  const b=(x,me)=>`<div style="margin:4px ${me?"28px 0 0":"0 0 28px"};padding:5px 10px;border-radius:8px;background:${me?"#fff7ed":"#e0f2fe"};border-left:4px solid ${me?"#ea580c":"#0284c7"};white-space:pre-wrap;overflow-wrap:anywhere"><small class="muted" style="display:block;font-weight:600">${me?"You":who} · ${msgWhen(x.at)}</small>${annHtml(x.text)}</div>`;
+  return b({text:a.text,at:annMs(a.at||a.created)||Date.now()},true)+(a.thread||[]).map(x=>b(x,x.by==="t")).join("")}
+// the buttons under a private message (student window and 💬 Messages)
+const msgBtns=(a,u)=>`<div class="bar" style="margin:4px 0 0">${msgWait(a)?'<b style="color:#0284c7">💬 New answer</b> ':""}<button class="${msgWait(a)?"":"g"}" data-do="msgnew" data-u="${esc(u)}" data-id="${esc(a.id)}">↩ Answer</button>${msgWait(a)?`<button class="g" data-do="msgseen" data-u="${esc(u)}" data-id="${esc(a.id)}" title="You read it and it needs no answer: the tag goes">✓ Seen, no answer needed</button>`:""}</div>`;
+function msgLine(u){const s=S.P[u];if(!s||s.tester)return "";const L=msgSent(u),em=mailTo([s]).length,nw=L.filter(msgWait).length;
   if(s.away&&!em)return "";
-  const li=a=>`<li><small class="muted">${annWhen(a)} · ${(a.read||{})[u]?"read ✓":"not read yet"}${a.mail?" · ✉️ emailed":""}</small><div class="hand annt" style="margin:2px 0 6px">${annHtml(a.text)}</div></li>`;
-  return `<div class="bar" style="margin:4px 0 8px"><button data-do="msgnew" data-u="${esc(u)}">✉️ Send a message</button><span class="muted">${s.away?"Not signed in yet: it goes by email only.":"Only for them: a notification on the site"+(em?" and an email.":".")}</span></div>`
-    +(L.length?`<details><summary style="font-size:1rem">✉️ Messages you sent them <small class="muted">(${L.length})</small></summary><ul class="sgl annl">${L.map(li).join("")}</ul></details>`:"")}
-function msgDialog(u){const s=S.P[u],ca=msgCa(s),em=mailTo([s])[0],en=ca!==true;
-  dlg(`<h3>✉️ Message to ${name(s)}</h3><p class="muted" style="margin:0 0 6px">${s.away?"Not signed in yet, so it goes only by email.":"Only this student sees it (and your test account)."}</p>
-    <label for="msgt">Your message <small class="muted">(up to ${ANN_MAX} characters; it goes exactly as you write it; a web link becomes clickable)</small></label>
-    <textarea id="msgt" maxlength="${ANN_MAX}" style="min-height:120px" placeholder="For example: Well done on your vlog script! Remember to record it before Friday."></textarea>
-    ${s.away?"":`<p class="muted" style="margin:6px 0 4px">What they see, once, at the top of the next page they open (the words around your message follow their route):</p>
+  const li=a=>`<li><small class="muted">${annWhen(a)} · ${(a.read||{})[u]?"read ✓":"not read yet"}${a.mail?" · ✉️ emailed":""}</small>${msgConv(a)}${msgBtns(a,u)}</li>`;
+  return `<div class="bar" style="margin:4px 0 8px"><button data-do="msgnew" data-u="${esc(u)}">✉️ Send a message</button><span class="muted">${s.away?"Not signed in yet: it goes by email only.":"Only for them: a notification on the site"+(em?" and an email.":".")+" They can answer it."}</span></div>`
+    +(L.length?`<details ${nw?"open":""}><summary style="font-size:1rem">✉️ Messages with them <small class="muted">(${L.length})</small>${nw?` <b style="color:#0284c7">💬 ${plural(nw,"new answer")}</b>`:""}</summary><ul class="sgl annl">${L.map(li).join("")}</ul></details>`:"")}
+// a new message (id empty) or your answer in an existing conversation (id)
+function msgDialog(u,id){const s=S.P[u],ca=msgCa(s),em=mailTo([s])[0],en=ca!==true,a=id&&(S.D.ann||[]).find(x=>x.id===id);if(!s)return;
+  dlg(`<h3>${a?"↩ Answer":"✉️ Message to"} ${name(s)}</h3><p class="muted" style="margin:0 0 6px">${s.away?"Not signed in yet, so it goes only by email.":"Only this student sees it (and your test account)."}</p>
+    ${a?`<div style="max-height:30vh;overflow:auto;margin-bottom:8px">${msgConv(a)}</div>`:""}
+    <label for="msgt">${a?"Your answer":"Your message"} <small class="muted">(up to ${ANN_MAX} characters; it goes exactly as you write it; a web link becomes clickable)</small></label>
+    <textarea id="msgt" maxlength="${ANN_MAX}" style="min-height:${a?90:120}px" placeholder="${a?"For example: Thanks! See you on Monday.":"For example: Well done on your vlog script! Remember to record it before Friday."}"></textarea>
+    ${s.away?"":`<p class="muted" style="margin:6px 0 4px">What they see, once, at the top of the next page they open (the words around your message follow their route; they can answer with ↩ Reply):</p>
     <div class="annc" id="msgp" style="${annCardStyle};max-width:440px"></div>`}
     ${em?`<label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="msgmail" style="width:auto;margin-right:6px;vertical-align:middle" checked ${s.away?"disabled":""}> ✉️ Also email it to <b>${esc(em)}</b> <small class="muted">(from your school account; you are asked before it goes)</small></label>`
       :`<p class="muted">No school email on the list for them, so no email: only the notification on the site.</p>`}
-    <div class="row" style="justify-content:flex-start"><button data-do="msgsend" data-u="${esc(u)}" id="msgsend" disabled>✉️ Send</button><button class="g" data-do="stu" data-u="${esc(u)}">Back</button></div>`);
-  const t=$("#msgt"),draw=()=>{const v=t.value.trim();if($("#msgp"))$("#msgp").innerHTML=annCardHtml({text:v,created:Date.now(),to:"one"},en,true);$("#msgsend").disabled=!v};
+    <div class="row" style="justify-content:flex-start"><button data-do="msgsend" data-u="${esc(u)}" data-id="${esc(id||"")}" id="msgsend" disabled>${a?"↩ Send the answer":"✉️ Send"}</button><button class="g" data-do="stu" data-u="${esc(u)}">Back</button></div>`);
+  const t=$("#msgt"),draw=()=>{const v=t.value.trim(),card=a?Object.assign({},a,{thread:[...(a.thread||[]),{by:"t",text:v||"…",at:Date.now()}]}):{text:v,created:Date.now(),to:"one"};
+    if($("#msgp")){$("#msgp").innerHTML=annCardHtml(card,en,true);const bd=$("#msgp [data-annbody]");if(bd)bd.scrollTop=bd.scrollHeight}$("#msgsend").disabled=!v};
   t.oninput=draw;draw();t.focus()}
-function msgSend(u){const s=S.P[u],text=$("#msgt").value.trim().slice(0,ANN_MAX);if(!s||!text)return;
+function msgSend(u,id){const s=S.P[u],text=$("#msgt").value.trim().slice(0,ANN_MAX),a=id&&(S.D.ann||[]).find(x=>x.id===id);if(!s||!text)return;
   const mail=!!($("#msgmail")&&$("#msgmail").checked),ca=msgCa(s),emails=mailTo([s]);
-  const subject=ca===true?"English Lab · ✉️ Missatge del teu professor":ca===false?"English Lab · ✉️ Message from your teacher":"English Lab · ✉️ Message from your teacher / Missatge del professor";
+  const subject=a?(ca===true?"English Lab · ✉️ El teu professor t'ha respost":ca===false?"English Lab · ✉️ Your teacher answered":"English Lab · ✉️ Your teacher answered / El professor t'ha respost")
+    :ca===true?"English Lab · ✉️ Missatge del teu professor":ca===false?"English Lab · ✉️ Message from your teacher":"English Lab · ✉️ Message from your teacher / Missatge del professor";
   const mailIt=(what,fail)=>mailNote(mailStudents(emails,subject,text+mailFoot(ca)),what,fail);
+  if(a){$("#dlg").close();act(api.annAnswer(a.id,u,text));if(mail&&emails.length)mailIt("Answer");return}
   if(s.away){if(!emails.length)return;$("#dlg").close();mailIt("Message","The email did not go, so nothing was sent (they have not signed in yet). Try again later.");return}
   const testers=Object.values(S.P).filter(x=>x.tester&&!x.away).map(x=>x.uid);
   const o=Object.assign({text,to:"one",label:fullName(s),groups:[],uids:[...new Set([u,...testers])]},mail&&emails.length?{mail:true,mailed:Date.now()}:{});
@@ -2934,7 +2961,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     sgopen:()=>{S.open.add("sugg");S.place="msgs";render();$("#sugg").scrollIntoView({behavior:"smooth"})},
-    annnew:()=>annDialog(),msgnew:()=>msgDialog(u),msgsend:()=>msgSend(u),annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
+    annnew:()=>annDialog(),msgnew:()=>msgDialog(u,k.id),msgsend:()=>msgSend(u,k.id),msgseen:()=>{const inStu=$("#dlg").open;act(api.annSeen(k.id)).then(()=>{if(inStu&&S.P[u])stuPanel(u)})},annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
     sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");S.place="msgs";render();$("#probs").scrollIntoView({behavior:"smooth"})},
