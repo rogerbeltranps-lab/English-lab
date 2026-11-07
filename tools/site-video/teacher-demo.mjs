@@ -49,6 +49,8 @@ for (const g of global.EL_GROUPS) {
     e.sections.forEach(([k, , mx]) => { sec[k] = { score: Math.round(Math.min(1, Math.max(0, skill + (rnd() - 0.5) * 0.3)) * mx), max: mx }; });
     const mark = e.sections.reduce((t, [k]) => t + sec[k].score, 0) / e.sections.reduce((t, [, , mx]) => t + mx, 0) * 10;
     D.rs[uid] = { [LS1[c] + '/assessment']: { ls: LS1[c], activity: LS1[c] + '/assessment', sections: sec } };
+    // LS1 final product: most presented (a mark), every fourth one 'No presentat' (0); no extra rnd() calls, so the rest of the demo stays the same
+    D.rs[uid][c + '/final-product'] = { ls: LS1[c], activity: c + '/final-product', max: 10, score: n % 4 ? Math.round((3 + skill * 6.5) * 10) / 10 : 0 };
     D.lv[uid] = { [LS1[c]]: { level: 'safe', by: 'teacher' }, [LS2[c]]: { level: cut(mark), by: 'teacher', why: 'exam', changed: Date.now() - 86400e3 } };
     // LS2 work in the open learning paths
     const pg = {};
