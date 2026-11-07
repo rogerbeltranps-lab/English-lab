@@ -99,10 +99,8 @@ var sectionNext = {
     const panel = document.getElementById(config.id);
     if (!panel) return;
     const select = document.getElementById('sessionJump');
-    const options = select ? [...select.options].filter(o => o.value) : [];
-    const here = options.findIndex(o => o.value === location.pathname.split('/').pop());
-    const target = options[here + 1] ? options[here + 1].value : 'index.html';
-    const hasNext = !!options[here + 1];
+    // read at the moment it is used: el-cloud.js trims the menu to the learning paths open for the student once it knows them
+    const nextOpt = () => { const options = select ? [...select.options].filter(o => o.value) : [], here = options.findIndex(o => o.value === location.pathname.split('/').pop()); return options[here + 1] || null; };
     const ca = () => /^(insecure|beginners)$/.test(config.level());
     const card = document.createElement('div');
     card.className = 'section-card section-next';
@@ -113,8 +111,8 @@ var sectionNext = {
     const yes = card.querySelector('.confirm-yes'), no = card.querySelector('.confirm-no'), question = card.querySelector('.q');
     const labels = () => {
       main.textContent = ca()
-        ? (hasNext ? 'Marca la secció com a feta i continua amb el següent Learning Path' : 'Marca la secció com a feta i torna a My Real Routine')
-        : (hasNext ? 'Mark section as done and continue to the next Learning Path' : 'Mark section as done and return to My Real Routine');
+        ? (nextOpt() ? 'Marca la secció com a feta i continua amb el següent Learning Path' : 'Marca la secció com a feta i torna a My Real Routine')
+        : (nextOpt() ? 'Mark section as done and continue to the next Learning Path' : 'Mark section as done and return to My Real Routine');
       question.textContent = ca()
         ? 'Has acabat i revisat totes les activitats d’aquesta secció?'
         : 'Have you finished and checked all the activities in this section?';
@@ -137,7 +135,7 @@ var sectionNext = {
       yes.focus();
     });
     no.addEventListener('click', () => { confirmBox.hidden = true; });
-    yes.addEventListener('click', () => { location.href = target; });
+    yes.addEventListener('click', () => { location.href = (nextOpt() || { value: 'index.html' }).value; });
     ['click', 'input', 'change'].forEach(type => document.addEventListener(type, () => setTimeout(labels, 60)));
     document.querySelectorAll('.route,.tab').forEach(r => r.addEventListener('click', () => setTimeout(() => { labels(); confirmBox.hidden = true; message.textContent = ''; }, 0)));
     labels();
