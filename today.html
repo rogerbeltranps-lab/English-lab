@@ -148,6 +148,20 @@ details.fv-how{margin-top:10px}details.fv-how>summary{cursor:pointer;color:var(-
 .fv-chip{display:inline-flex;align-items:center;gap:4px;background:var(--ks);color:var(--k);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:800;white-space:nowrap}
 .fv-cd{font-size:14px;color:#334155}.fv-crit small{color:#64748b;font-size:12.5px}
 .fv-cn{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:4px;font-size:14px;white-space:nowrap}.fv-cn .fv-bar{flex:1;margin:0;background:#f1f5f9}
+.fk-n{--k:#475569;--ks:#f1f5f9}
+.fv-no{font-size:1.1rem;color:#94a3b8;font-weight:700;letter-spacing:0}
+.fv-hm{font-size:2rem;white-space:nowrap}.fv-hm small{font-size:1rem;color:#64748b}
+.fv .tag{display:inline-block;margin:2px 0 4px}
+.fv-sm{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}.fv-sm .fv-big{font-size:1.6rem}.fv-sm .fv-sh{color:#0f172a}
+.fv-part.eq::before{content:"="!important}
+.fv-rv li{border-color:#c7d2fe;border-left-color:var(--c-dark)}.fv-rv .fv-n{background:var(--c-dark)}.fv-rv li a.go{align-self:flex-start;background:var(--c-dark);font-size:14px;padding:7px 14px;border-radius:10px}
+.fv-steps li{border-color:#e2e8f0;border-left-color:var(--k);background:var(--ks)}.fv-steps .fv-n{background:var(--k)}.fv-st{font-size:14px;font-weight:700;color:var(--k)}.fv-st small{font-weight:400;color:#475569}
+.fv-steps li a.go{background:var(--c-dark)}.fv-steps .ans{font-size:13.5px}
+.fv-rubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.fv-rub:not([class*="fk-"]){--k:var(--c-dark);--ks:var(--c-soft)}.fv-rub{display:flex;gap:12px;align-items:center;background:var(--ks);border-left:6px solid var(--k);border-radius:14px;padding:10px 12px}
+.fv-rub>span{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}.fv-rub small{color:#475569;font-size:13px}
+.fv-rw{font-size:1.5rem;font-weight:900;color:var(--k);white-space:nowrap}.fv-rw small{font-size:13px}
+.fv-info{display:flex;gap:10px;align-items:flex-start;margin:0;background:var(--c-soft);border-left:6px solid var(--c-dark);border-radius:14px;padding:12px 14px;font-size:15px}
 @media (max-width:760px){.fv-parts{flex-direction:column;gap:26px}.fv-part+.fv-part::before{left:50%;top:-24px;transform:translateX(-50%)}.box.fv{padding:14px}.fv-big{font-size:1.7rem}}
 </style>
 <nav class="mtabs nvs-m" aria-label="Menú"></nav><nav class="bnav" id="bnav" aria-label="Menú"></nav>
@@ -586,6 +600,8 @@ function workBox(){S.wmiss=new Set();if(all()||!D.me.group)return "";
       :`<p class="fv-ok"><span aria-hidden="true">🎉</span> ${t("Les tens totes fetes. Continua així!","You have done them all. Keep it up!")}</p>`)+`</div>`}
 // the heading and the cards of the visual boxes on 📊 My marks (fvHead, fvStat; CSS .fv-*), in the style of the LS page's ⓘ About this LS
 const fvHead=(i,h,sub)=>`<div class="fvh"><h2><span class="fvi" aria-hidden="true">${i}</span> ${h}</h2>${sub?`<span class="fvt">· ${sub}</span>`:""}</div>`;
+const fvK=c=>/^\d/.test(c)?"fk-"+c[0]:/^CD/.test(c)?"fk-d":/^CC/.test(c)?"fk-c":"fk-b",fvIc=c=>({1:"🤝",2:"🎧",3:"🗣",4:"📖",5:"✏️",6:"🔎"})[/^\d/.test(c)?c[0]:""]||(/^CD/.test(c)?"💻":/^CC/.test(c)?"🌍":"🧩");
+const fvMk=v=>v==null?`<span class="fv-no">${t("encara no","not yet")}</span>`:`${f1(v)} <small>/ 10</small>`;   // a mark out of 10 for .fv-big
 const fvStat=(k,i,label,big,foot)=>`<div class="fv-stat ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${label}</span><b class="fv-big">${big}</b>${foot?`<p>${foot}</p>`:""}</div>`;
 // 📌 The learning path the teacher has pulled up for my group (Roger, 2 Nov 2026: "students find it difficult to find the learning path"):
 // ls/{id}.push[group], the newest one whose path is open for the group (elPullFor in el-catalog.js). A big card at the very top of the board
@@ -635,15 +651,20 @@ const f1=n=>{const s=String(Math.round(n*10)/10);return EN?s:s.replace(".",",")}
 // The report's texts are written in the student's language (Catalan for Starter and Base, English for the others), as on the paper.
 const pts1=n=>f1(+(+n).toFixed(2)),bar=p=>`<span class="xbar"><span style="width:${Math.max(0,Math.min(100,p))}%;background:${col(p)}"></span></span>`;
 function examParts(e,sc){const got=e.sections.filter(([k])=>sc[k]&&sc[k].score!=null);if(!got.length)return "";
-  return `<div class="box"><h2>1 · ${t("Resultats per apartats","Results per part")}</h2><div class="wrap"><table class="xt"><thead><tr><th>${t("Apartat","Part")}</th><th>${t("Criteri","Criterion")}</th><th>${t("Punts","Points")}</th><th></th></tr></thead><tbody>`
-    +got.map(([k,n,mx,cs])=>{const m=+(sc[k].max||mx||e.max),v=+sc[k].score;return `<tr><td class="l"><b>${esc(n)}</b></td><td>${(cs||[]).map(pill).join("")}</td><td><b>${pts1(v)}</b> / ${m}</td><td class="l">${bar(v/m*100)}</td></tr>`}).join("")
-    +`</tbody></table></div></div>`}
+  const k=p=>p>=75?"fk-g":p>=50?"fk-a":"fk-r";
+  return `<div class="box fv">${fvHead("🧮","1 · "+t("Resultats per apartats","Results per part"))}<div class="fv-stats fv-sm">`
+    +got.map(([key,n,mx,cs])=>{const m=+(sc[key].max||mx||e.max),v=+sc[key].score,p=v/m*100;
+      return `<div class="fv-stat ${k(p)}"><span class="fv-sh">${esc(n)}</span><b class="fv-big">${pts1(v)} <small>/ ${m}</small></b><span class="fv-bar"><span style="width:${Math.max(0,Math.min(100,p))}%"></span></span>${(cs||[]).length?`<span>${(cs||[]).map(pill).join("")}</span>`:""}</div>`}).join("")
+    +`</div></div>`}
 function examCrit(e,sc){const by=elExamByCrit(e,sc).filter(o=>o.n);if(!by.length)return "";
-  return `<div class="box"><h2>2 · ${t("L'examen per criteris","Your exam by criteria")}</h2><table class="legend"><tbody>${by.map(o=>`<tr><td style="white-space:normal">${pill(o.c)} <b>${esc(elCompetence(o.c))}</b><br><span>${esc(easy(o.c))}</span><br><small class="muted">${t("Parts de l'examen","Exam parts")}: ${e.sections.filter(x=>(x[3]||[]).includes(o.c)).map(x=>x[1]).join(" + ")}</small></td><td style="white-space:nowrap;width:1%"><b style="color:${col(o.score/o.max*100)}">${f1(o.score/o.max*10)} / 10</b><br><small class="muted">${pts1(o.score)} / ${o.max} ${t("punts","points")}</small></td></tr>`).join("")}</tbody></table>`
-    +`<p class="muted" style="margin:6px 0 0">${elExamShared(e).length?t("Aquests apartats compten per a dos criteris: ","These sections count for two criteria: ")+esc(elExamShared(e).join(", "))+". ":""}${t("La nota de l'examen és el total de punts ÷ 10.","Your exam mark is all your points ÷ 10.")} ${t("Toca un codi per veure el text oficial del criteri.","Tap a code to see the official text of the criterion.")}</p></div>`}
+  return `<div class="box fv">${fvHead("📏","2 · "+t("L'examen per criteris","Your exam by criteria"))}<div class="fv-crits">`
+    +by.map(o=>`<button type="button" class="fv-crit ${fvK(o.c)}" data-do="crit" data-c="${esc(o.c)}"><span class="fv-ch"><span class="fv-chip"><span aria-hidden="true">${fvIc(o.c)}</span> ${esc(o.c)}</span><b>${esc(elCompetence(o.c))}</b></span>`
+      +`<span class="fv-cd">${esc(easy(o.c))}</span><small>${t("Parts de l'examen","Exam parts")}: ${esc(e.sections.filter(x=>(x[3]||[]).includes(o.c)).map(x=>x[1]).join(" + "))}</small>`
+      +`<span class="fv-cn"><span class="fv-bar"><span style="width:${Math.max(0,Math.min(100,o.score/o.max*100))}%"></span></span><span><b>${f1(o.score/o.max*10)}</b> / 10 <small>· ${pts1(o.score)} / ${o.max} ${t("punts","points")}</small></span></span></button>`).join("")
+    +`</div><p class="muted">${elExamShared(e).length?t("Aquests apartats compten per a dos criteris: ","These sections count for two criteria: ")+esc(elExamShared(e).join(", "))+". ":""}${t("La nota de l'examen és el total de punts ÷ 10.","Your exam mark is all your points ÷ 10.")} ${t("Toca un criteri per veure'n el text oficial.","Tap a criterion to see its official wording.")}</p></div>`}
 const lpLink=lp=>lp&&lp.href?`<a class="go" href="${esc(lp.href)}">${t("Repassa","Review")}: ${esc(lp.t||"")} →</a>`:lp&&lp.t?`<small class="muted">${t("Repassa","Review")}: ${esc(lp.t)}</small>`:"";
 function examQuestions(r){if(r.full)return examWhole(r);const qs=(r.questions||[]);if(!qs.length)return "";
-  return `<div class="box"><h2>3 · ${t("Preguntes que cal revisar","Questions to review")} <small class="muted">· ${qs.length}</small></h2><p class="muted">${t("Les preguntes on has perdut punts: la teva resposta, la correcta i per què.","The questions where you lost points: your answer, the right one and why.")}</p>`
+  return `<div class="box fv">${fvHead("❓","3 · "+t("Preguntes que cal revisar","Questions to review"),String(qs.length))}<p class="fvlead">${t("Les preguntes on has perdut punts: la teva resposta, la correcta i per què.","The questions where you lost points: your answer, the right one and why.")}</p>`
     +`<div class="wrap"><table class="xt corr"><thead><tr><th>${t("Pregunta","Question")}</th><th>${t("La teva resposta","Your answer")}</th><th>${t("Resposta correcta","Right answer")}</th><th>${t("Per què","Why")}</th></tr></thead><tbody>`
     +qs.map(q=>`<tr><td class="l"><small class="muted">Q${String(q.q).padStart(2,"0")} · ${esc(q.part||"")} · ${q.got!=null?pts1(q.got)+"/":""}${q.pts} ${t("punts","points")}</small><br>${esc(q.text||"")}</td><td class="l bad">${q.mine?`<s>${esc(q.mine)}</s>`:`<i>${t("en blanc","blank")}</i>`}</td><td class="l good">${esc(q.right||"")}</td><td class="l">${esc(q.why||"")}${q.lp?`<div class="rv">${lpLink(q.lp)}</div>`:""}</td></tr>`).join("")
     +`</tbody></table></div></div>`}
@@ -676,7 +697,7 @@ function examWhole(r){const qs=(r.questions||[]).slice().sort((a,b)=>a.q-b.q),x=
   const li=x.listening,rd=x.reading;   // the writing stays only in part 4, as before (Roger, 2 Nov 2026: "I want to keep the way they see the writing now … only add the missing questions")
   const intro=p=>p==="Listening"&&li?`<div class="xread">${li.about?`<p class="muted" style="margin-top:0">${esc(li.about)}</p>`:""}${li.text?`<details><summary>🎧 ${t("Llegeix el que vas escoltar (transcripció de l'àudio)","Read what you heard (the audio transcript)")}</summary><div class="tr">${paras(li.text)}</div></details>`:`<p class="muted" style="margin:0">${t("L'àudio no té transcripció escrita.","There is no written transcript of this audio.")}</p>`}</div>`
     :p==="Reading"&&rd?`<div class="xread"><h4>📖 ${esc(rd.title||"")}</h4>${paras(rd.body)}</div>`:"";
-  return `<div class="box xwhole" id="whole"><h2>3 · ${t("El teu examen, pregunta per pregunta","Your exam, question by question")}</h2>`
+  return `<div class="box fv xwhole" id="whole">${fvHead("❓","3 · "+t("El teu examen, pregunta per pregunta","Your exam, question by question"))}`
     +`<p class="muted">${t("Totes les preguntes del teu examen, amb el text que vas llegir. Les verdes les vas encertar; a les vermelles hi ha la resposta correcta i per què.","Every question of your exam, with the text you read. Green ones you got right; the red ones show the right answer and why.")}</p>`
     +`<div class="xf" role="radiogroup" aria-label="${t("Quines preguntes","Which questions")}"><input type="radio" name="xf" id="xf-all" checked><label for="xf-all">${t("Totes","All")} · ${qs.length}</label>`
     +`<input type="radio" name="xf" id="xf-ok"><label for="xf-ok">✓ ${t("Encertades","Right")} · ${okN}</label><input type="radio" name="xf" id="xf-bad"><label for="xf-bad">✗ ${t("Per revisar","To review")} · ${badN}</label></div>`
@@ -761,7 +782,7 @@ function examWriting(r,e){const w=r.writing;if(!w)return "";
       +`<p class="wrw wwt">⚖️ ${t(`<b>Pes:</b> aquest criteri és el ${wt} % del writing (${m} dels ${tot[1]} punts). Amb el teu nivell hi tens <b>${pts1(v)} de ${m} punts</b>.`,`<b>Weight:</b> this row is ${wt} % of the writing (${m} of its ${tot[1]} points). At your level it gives you <b>${pts1(v)} of ${m} points</b>.`)}</p>`
       +(v<m?`<p class="wrw">${mine.length?`✏️ ${t(mine.length>1?`Les errades d'aquest criteri a la taula de sota: núm. ${mine.join(", ")}.`:`L'errada d'aquest criteri a la taula de sota: núm. ${mine[0]}.`,mine.length>1?`The mistakes for this row in the table below: no. ${mine.join(", ")}.`:`The mistake for this row in the table below: no. ${mine[0]}.`)}`
         :id==="C1"?`💬 ${t("Mira el comentari del professor: et diu què faltava.","Read your teacher's comment: it tells you what was missing.")}`:""}</p>`:"")+`</div>`};
-  return `<div class="box"><h2>4 · ${t("El teu writing","Your writing")}</h2>`
+  return `<div class="box fv">${fvHead("✍️","4 · "+t("El teu writing","Your writing"))}`
     +(rub.length?`<h3>${t("Rúbrica","Rubric")} <small class="muted">· ${pts1(tot[0])} / ${tot[1]} ${t("punts","points")}</small></h3>`
       +(cp==="all"?`<p class="muted" style="margin:0 0 8px">${t("El writing es corregeix amb 4 criteris. Cadascun té 4 nivells (de 4/4 Excel·lent a 1/4 Insuficient). Aquí tens què es valora i què vol dir cada nivell, perquè sàpigues què has de fer la propera vegada. Toca el codi (5.1, 5.2) per veure el criteri oficial.","Your writing is marked on 4 rows. Each has 4 levels (from 4/4 Excellent to 1/4 Not enough). Here you can see what each row checks and what each level means, so you know what to do next time. Tap the code (5.1, 5.2) to see the official criterion.")}</p>`
         :rub.some(x=>/^\s*C[1-4]\b/.test(x[0]))?`<p class="muted" style="margin:0 0 8px">${t("El writing es corregeix amb 4 criteris. Cadascun té 4 nivells (de 4/4 Excel·lent a 1/4 Insuficient): hi veus què es valora, què vol dir cada nivell (el teu està marcat), quant pesa el criteri en la nota del writing i quines errades t'hi han tret punts. Toca el codi (5.1, 5.2) per veure el criteri oficial.","Your writing is marked on 4 rows. Each has 4 levels (from 4/4 Excellent to 1/4 Not enough): you can see what it checks, what each level means (yours is highlighted), how much the row weighs in your writing mark and which mistakes cost you points. Tap the code (5.1, 5.2) to see the official criterion.")}</p>`:"")
@@ -778,24 +799,25 @@ function examWriting(r,e){const w=r.writing;if(!w)return "";
     +(w.original||w.corrected?`<div class="wtexts">${w.original?`<div><h3>📝 ${t("El teu text","Your text")}</h3><p class="wtx">${esc(w.original)}</p></div>`:""}${w.corrected?`<div><h3>✅ ${t("El teu text corregit","Your text, corrected")}</h3><p class="wtx ok2">${esc(w.corrected).replace(/\*([^*\n]+)\*/g,"<b>$1</b>")}</p></div>`:""}</div>`:"")
     +`</div>`}
 function examReview(r){const xs=r.review||[];if(!xs.length)return "";
-  return `<div class="box"><h2>5 · ${t("Què has de repassar?","What should you review?")}</h2><ol class="rvl">${xs.map(x=>`<li><span>${esc(x.text)}</span> ${lpLink(x.lp)}</li>`).join("")}</ol></div>`}
+  return `<div class="box fv">${fvHead("🔁","5 · "+t("Què has de repassar?","What should you review?"))}<ol class="fv-miss fv-rv rvl">${xs.map((x,i)=>`<li><span class="fv-mh"><span class="fv-n">${String(i+1).padStart(2,"0")}</span><span>${esc(x.text)}</span></span>${lpLink(x.lp)}</li>`).join("")}</ol></div>`}
 // LS grade: in an LS where only the exam and the final product count (EL_GRADING[ls].only, LS1) the LS mark is worked out here;
 // in the others the exam is one block of the LS mark, which the teacher gives at the end.
 function examView(ls){const id=ls.id,g=(window.EL_GRADING||{})[id];if(!g||!g.exam)return `<div class="box"><p class="muted">${t("Aquesta LS no té examen.","This LS has no exam.")}</p></div>`;
   const e=g.exam,x=D.rs[id+"/assessment"]||{},sc=x.sections||{},rep=x.report||{},got=e.sections.filter(([k])=>sc[k]&&sc[k].score!=null);
   const m=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),exam=m?got.reduce((n,[k])=>n+(+sc[k].score),0)/m*10:null;
-  const big=v=>`<b style="font-size:1.3rem;color:${v==null?"#94a3b8":col(v*10)}">${v==null?"–":f1(v)+" / 10"}</b>`;
+  const big=v=>`<b class="fv-hm" style="color:${v==null?"#94a3b8":col(v*10)}">${v==null?"–":f1(v)+` <small>/ 10</small>`}</b>`;
   const ver=x.version?`<span class="tag">${t("Versió de l'examen","Exam version")}: ${esc(LV[x.version]||x.version)}${rep.model?" · Model "+esc(rep.model):""}</span>`:"";
   let head;
   if(g.only){const fp=D.rs[g.fp.a]||{},prod=fp.max?(fp.score||0)/fp.max*10:null,val={exam,fp:prod},
       total=exam!=null&&prod!=null?g.blocks.reduce((n,b)=>n+val[b.id]*b.w,0)/g.blocks.reduce((n,b)=>n+b.w,0):null,name={exam:t("Examen final","Final exam"),fp:t("Producte final","Final product")};
-    head=`<div class="box" id="exam"><h2>${t("Nota de la LS","LS grade")} ${ver}</h2><p class="muted">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><table class="legend"><tbody>`
-      +g.blocks.map(b=>`<tr><td><b>${name[b.id]}</b> <small class="muted">${b.w} %</small></td><td>${big(val[b.id])}${val[b.id]==null?`<br><small class="muted">${t("encara no hi ha nota","no mark yet")}</small>`:""}</td></tr>`).join("")
-      +`<tr><td><b>${t("Nota de la LS","LS mark")}</b></td><td>${big(total)}</td></tr></tbody></table></div>`}
+    const ic={exam:"📝",fp:"🎬"},kk={exam:"fk-i",fp:"fk-a"};
+    head=`<div class="box fv" id="exam">${fvHead("🎓",t("Nota de la LS","LS grade"))}${ver}<p class="fvlead">${t("En aquesta LS només compten l'examen final i el producte final.","In this LS only the final exam and the final product count.")}</p><div class="fv-parts">`
+      +g.blocks.map(b=>fvCard(kk[b.id]||"fk-b",ic[b.id]||"📊",name[b.id],t(`${b.w} % de la nota`,`${b.w} % of the mark`),val[b.id])).join("")
+      +fvCard("fk-b eq main","🎓",t("Nota de la LS","LS mark"),"100 %",total)+`</div></div>`}
   else{const w=(g.blocks.find(b=>b.id==="exam")||{}).w;
-    head=`<div class="box" id="exam"><div class="lphead"><div><h2>${t("Examen final","Final exam")} ${ver}</h2><p class="muted" style="margin:0">${w?t(`L'examen és el ${w} % de la nota de la LS. La resta (el producte final i la feina de la LS) la veus a «La meva avaluació formativa» › La meva nota de la LS fins ara.`,`The exam is ${w} % of your LS mark. The rest (the final product and your work in the LS) is in “My formative assessment” › My LS mark so far.`):""}</p></div>${big(exam)}</div></div>`}
+    head=`<div class="box fv" id="exam"><div class="lphead"><div>${fvHead("📝",t("Examen final","Final exam"))}${ver}<p class="fvlead" style="margin-bottom:0">${w?t(`L'examen és el ${w} % de la nota de la LS. La resta (el producte final i la feina de la LS) la veus a «La meva avaluació formativa» › La meva nota de la LS fins ara.`,`The exam is ${w} % of your LS mark. The rest (the final product and your work in the LS) is in “My formative assessment” › My LS mark so far.`):""}</p></div>${big(exam)}</div></div>`}
   if(!got.length){const p=(window.EL_PLAN||{})[id],ex=ELWeek.exam(p,ELWeek.col(p,D.me.group));
-    return head+`<div class="box notyet">📝 <b>${t("Encara no tens els resultats de l'examen.","Your exam results are not here yet.")}</b> ${ex?t(`Examen: ${when(ex)}. `,`Exam: ${when(ex)}. `):""}${t("Quan el professor l'hagi corregit, aquí veuràs la nota de cada part, els criteris, les preguntes que cal revisar i el teu writing corregit.","When your teacher has marked it, you will see here the mark of each part, the criteria, the questions to review and your writing corrected.")}</div>`}
+    return head+`<div class="box fv notyet">📝 <b>${t("Encara no tens els resultats de l'examen.","Your exam results are not here yet.")}</b> ${ex?t(`Examen: ${when(ex)}. `,`Exam: ${when(ex)}. `):""}${t("Quan el professor l'hagi corregit, aquí veuràs la nota de cada part, els criteris, les preguntes que cal revisar i el teu writing corregit.","When your teacher has marked it, you will see here the mark of each part, the criteria, the questions to review and your writing corrected.")}</div>`}
   return head+examParts(e,sc)+examCrit(e,sc)+examQuestions(rep)+examWriting(rep,e)+examReview(rep)}
 // My LS mark so far (Roger, 2 Nov 2026: "students should see their progress"): each block of EL_GRADING[ls] with its share and my mark
 // so far, out of 10. The teacher dashboard keeps the marks in results/{ls}__assessment .progress (progSync in teacher.html: only it can
@@ -853,6 +875,8 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
     +row(t("Producte final","Final product"),W("fp"),v.fp,v.fp==null?t("Al final de la LS","At the end of the LS"):"","pb")+det("fp")
     +`<tr class="tot"><td class="l"><b>${t("Nota de la LS fins ara","LS mark so far")}</b></td><td><b>100 %</b></td><td>${mark(total)}</td><td class="l">${bar(total)}</td></tr></tbody></table></div>`
     +`<p class="muted" style="margin:6px 0 0">${t("Les activitats que encara no toquen i les parts que encara no estan corregides no compten fins llavors.","Activities whose day has not come yet and parts not marked yet do not count until then.")}${p.at?" "+t(`Actualitzat: ${when(p.at)}`,`Updated: ${when(p.at)}`):""}</p></div>`}
+// a card with a mark out of 10 as its big number
+const fvCard=(k,i,name,sub,m)=>`<div class="fv-part ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${name}</span><small class="fv-ps">${sub}</small><b class="fv-big">${fvMk(m)}</b><span class="fv-bar"><span style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%"></span></span></div>`;
 // one part of the LS mark as a card: icon, name, when, its weight and the mark so far with a bar (progressBox)
 function fvPart(k,i,name,sub,w,m,tag){
   return `<div class="fv-part ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${name}</span><small class="fv-ps">${sub}</small>`
@@ -875,18 +899,24 @@ function fpView(ls,info){const g=EL_GRADING[ls.id],a=fpAct(ls),x=D.rs[a.id]||{},
   const W=(g.blocks.find(b=>b.id==="fp")||{}).w||0,m=fpMark(ls),d=fpDue(ls),open=info.status!=="closed",can=canDo(a,info)&&open,today=ELWeek.today();
   let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
   const rp=x.replies||{},ans=k=>[((x.answers||{})[k]||{}).t,rp[k]].filter(Boolean).join("\n\n"),href=k=>a.path.split("/").map(encodeURIComponent).join("/")+(k?"#"+encodeURIComponent(k):"");
-  const sts=(a.steps||[]).map(([sid,tt])=>{const h=sp[sid],late=!h&&d&&d<today;
-    return `<tr><td class="l"><b>${esc(tt)}</b>${ans(sid)?`<div class="ans">💬 <b>${t("Resposta del professor:","Teacher's answer:")}</b> ${esc(ans(sid))}</div>`:""}</td>`
-      +`<td class="l">${h?`<span class="s-ok">✔ ${t("Entregat","Handed in")}</span>${h.avg!=null?` <small class="muted">· ${t("autoavaluació","self-assessment")} ${h.avg}/4</small>`:""}`:late?`<span class="s-no">✗ ${t("No entregat","Not handed in")}</span>`:`<span class="s-off">${t("Encara no","Not yet")}</span>`}</td>`
-      +`<td>${can?`<a class="go" href="${href(sid)}">${h?t("Revisa","Review"):t("Fes-lo","Do it")} →</a>`:""}</td></tr>`}).join("");
+  // the steps as numbered cards: green handed in, red not handed in after the day, grey not yet (Roger, 7 Nov 2026: the About this LS style)
+  const st=(a.steps||[]),nIn=st.filter(([sid])=>sp[sid]).length;
+  const sts=st.map(([sid,tt],i)=>{const h=sp[sid],late=!h&&d&&d<today;
+    return `<li class="fv-step ${h?"fk-g":late?"fk-r":"fk-n"}"><span class="fv-mh"><span class="fv-n" aria-hidden="true">${h?"✔":late?"✗":"…"}</span><b>${esc(tt)}</b></span>`
+      +`<span class="fv-st">${h?`✔ ${t("Entregat","Handed in")}${h.avg!=null?` <small>· ${t("autoavaluació","self-assessment")} ${h.avg}/4</small>`:""}`:late?`✗ ${t("No entregat","Not handed in")}`:t("Encara no","Not yet")}</span>`
+      +(ans(sid)?`<div class="ans">💬 <b>${t("Resposta del professor:","Teacher's answer:")}</b> ${esc(ans(sid))}</div>`:"")
+      +(can?`<a class="go" href="${href(sid)}">${h?t("Revisa","Review"):t("Fes-lo","Do it")} →</a>`:"")+`</li>`}).join("");
   const sw=(g.fp.rows||[]).reduce((n,r)=>n+r.w,0),num=c=>/^\d+\.\d+$/.test(c),R=!g.fp.rows&&(window.EL_FP_RUBRICS||{})[a.id];
-  const rub=R?R.rows.map(r=>`<tr><td class="l"><b>${esc(r.name)}</b> <small class="muted">· ${esc(r.sub)}</small></td><td><b>${Math.round(W*r.w)/100} %</b></td></tr>`).join(""):(g.fp.rows||[]).map(r=>{const v=(P.fp||{})[r.step+"|"+r.c];return `<tr><td class="l"><b>${esc(r.name)}</b> ${num(r.c)?pill(r.c):""}</td><td><b>${Math.round(W*r.w/sw*100)/100} %</b></td>${TX?`<td>${v==null?`<span class="muted">${t("encara no","not yet")}</span>`:`<b style="color:${col(v*10)}">${f1(v)}</b> <small class="muted">/ 10</small>`}</td>`:""}</tr>`}).join("");
+  const rub=R?R.rows.map(r=>`<div class="fv-rub"><b class="fv-rw">${Math.round(W*r.w)/100} <small>%</small></b><span><b>${esc(r.name)}</b><small>${esc(r.sub)}</small></span></div>`).join(""):(g.fp.rows||[]).map(r=>{const v=(P.fp||{})[r.step+"|"+r.c];return `<div class="fv-rub ${num(r.c)?fvK(r.c):""}"><b class="fv-rw">${Math.round(W*r.w/sw*100)/100} <small>%</small></b><span><b>${esc(r.name)}</b>${num(r.c)?`<span class="fv-chip"><span aria-hidden="true">${fvIc(r.c)}</span> ${esc(r.c)}</span>`:""}${TX?`<small>Mark: ${v==null?"not yet":f1(v)+" / 10"}</small>`:""}</span></div>`}).join("");
   return `<div class="fhead"><h2>🎬 ${t("El meu producte final","My final product")} <small>· ${lsName(ls)}</small></h2><p>${t(`${esc(a.title.replace(/^[^:]*:\s*/,""))}: és el ${W} % de la nota de la LS. Aquí tens els passos, què has entregat i com es corregeix.`,`${esc(a.title.replace(/^[^:]*:\s*/,""))}: it is ${W} % of your LS mark. Here are its steps, what you have handed in and how it is marked.`)}</p></div>`
-    +`<div class="box"><div class="lphead"><div><h2>${esc(a.title)}</h2><small class="muted">${W} % ${t("de la nota de la LS","of your LS mark")}${d?` · ${t("fins al","due")} ${when(d)}`:""}</small></div><b style="font-size:1.3rem;color:${m==null?"#94a3b8":col(m*10)}">${m==null?t("encara no hi ha nota","no mark yet"):f1(m)+" / 10"}</b></div>`
-    +`<div class="row" style="margin-top:8px"><a class="go" href="${href("")}">${open?t("Obre el producte final","Open the final product"):t("Revisa el producte final","Review the final product")} →</a> ${g.only?"":`<a class="go" href="${href("rubric")}">📋 ${t("Rúbrica","Rubric")}</a>`}</div>`
+    +`<div class="box fv">${fvHead("🎬",esc(a.title))}<div class="fv-stats">`
+    +fvStat(m==null?"fk-n":"fk-b","🏁",t("La meva nota","My mark"),fvMk(m),m==null?t("quan el professor l'hagi corregit","once your teacher has marked it"):"")
+    +fvStat("fk-a","⚖️",t("Pes a la nota de la LS","Share of the LS mark"),`${W} <small>%</small>`,"")
+    +(st.length?fvStat(nIn===st.length?"fk-g":d&&d<today?"fk-r":"fk-n","📦",t("Passos entregats","Steps handed in"),`${nIn} <small>/ ${st.length}</small>`,d?t(`fins al ${when(d)}`,`due ${when(d)}`):""):d?fvStat("fk-n","📅",t("Data d'entrega","Due date"),esc(when(d)),""):"")+`</div>`
+    +`<div class="row" style="margin-top:12px"><a class="go" href="${href("")}">${open?t("Obre el producte final","Open the final product"):t("Revisa el producte final","Review the final product")} →</a> ${g.only?"":`<a class="go" href="${href("rubric")}">📋 ${t("Rúbrica","Rubric")}</a>`}</div>`
     +(x.feedback?`<label style="font-weight:600;display:block;margin-top:10px">${t("Feedback del professor","Your teacher's feedback")}</label>${fbBox(x.feedback,a.id)}`:"")+`</div>`
-    +(sts?`<div class="box"><h2>${t("Els passos","The steps")}</h2><div class="wrap"><table class="xt fpst"><thead><tr><th>${t("Pas","Step")}</th><th>${t("Estat","State")}</th><th></th></tr></thead><tbody>${sts}</tbody></table></div></div>`:"")
-    +(rub?`<div class="box"><h2>${t("Com es corregeix","How it is marked")}</h2>${R&&R.note?`<p class="muted" style="margin:0 0 6px">${esc(R.note)}</p>`:""}<div class="wrap"><table class="xt fpst"><thead><tr><th>${t("Part de la rúbrica","Rubric part")}</th><th>${t("Pes a la nota de la LS","Share of the LS mark")}</th>${TX&&!R?"<th>Mark</th>":""}</tr></thead><tbody>${rub}</tbody></table></div>`
+    +(sts?`<div class="box fv">${fvHead("🪜",t("Els passos","The steps"))}<ol class="fv-miss fv-steps fpst">${sts}</ol></div>`:"")
+    +(rub?`<div class="box fv">${fvHead("📋",t("Com es corregeix","How it is marked"))}<p class="fvlead">${t("Les parts de la rúbrica i quant pesa cadascuna a la nota de la LS.","The parts of the rubric and how much each one weighs in your LS mark.")}${R&&R.note?" "+esc(R.note):""}</p><div class="fv-rubs">${rub}</div>`
     +`<p class="muted" style="margin:6px 0 0">${t("El professor el corregeix amb la rúbrica quan l'has entregat.","Your teacher marks it with the rubric once you have handed it in.")}</p></div>`:"")}
 // Teacher feedback with a rubric (Roger, 4 Nov 2026: "they should see the rubric and the teacher's observations"): the feedback text
 // "Final mark…", the comment, then per part "Name (30%) · 7.5/10" with "✔ went well" and "➜ keep in mind" lines, shown as the comment
@@ -914,7 +944,7 @@ function fbRubric(R,parts,com){const lv=m=>Math.max(0,Math.min(4,Math.round(m/2.
         +((p.ok.length||p.todo.length)?`<div class="rbn">${p.ok.length?`<div>✔ ${esc(p.ok.join(" "))}</div>`:""}${p.todo.length?`<div>➜ ${esc(p.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
 // The formative tab of an LS where only the exam and the final product count (LS1): the final product has its own card (🎬, fpView).
 function onlyForm(id){
-  return `<div class="box"><p>${t("En aquesta LS no hi havia avaluació contínua: només compten l'examen (a «Els meus exàmens») i el producte final (a «El meu producte final»).","In this LS there was no continuous assessment: only the exam (in “My exams”) and the final product (in “My final product”) count.")}</p></div>`}
+  return `<div class="box fv"><p class="fv-info"><span aria-hidden="true">ℹ️</span><span>${t("En aquesta LS no hi havia avaluació contínua: només compten l'examen (a «Els meus exàmens») i el producte final (a «El meu producte final»).","In this LS there was no continuous assessment: only the exam (in “My exams”) and the final product (in “My final product”) count.")}</span></p></div>`}
 // Week plan and reminders (Roger, 25 Oct 2026), from the teacher's plan in el-plan.js (shared/js/el-week.js): this week's classes,
 // the activities due this week, the exam day and the whole plan, for the student's group; past-due activities not done are reminded on top.
 // "Done" = submitted or marked as done, or every scored step done. The final product is handed in on Classroom, so it is listed but never reminded.
@@ -1046,7 +1076,7 @@ async function sendAsk(){if(!S.want||AS)return;const reason=$("#why").value.repl
 function summary(list){
   if(!TX)list=list.filter(a=>canDo(a,D.ls[a.ls]||{})||D.rs[a.id]||doneSet(a).size);   // students never see a path that is not open (Roger, 7 Nov 2026)
   const rows=[...new Set(list.flatMap(a=>a.criteria))].sort().map(c=>{let s=0,m=0;list.forEach(a=>{const x=D.rs[a.id],y=a.graded&&a.criteria.includes(c)&&x&&x.max&&elScore(a,x,D.pg[a.ls]);if(y){s+=y.score;m+=y.max}});return {c,s,m}});
-  const k=c=>/^\d/.test(c)?"fk-"+c[0]:/^CD/.test(c)?"fk-d":/^CC/.test(c)?"fk-c":"fk-b",ic=c=>({1:"🤝",2:"🎧",3:"🗣",4:"📖",5:"✏️",6:"🔎"})[/^\d/.test(c)?c[0]:""]||(/^CD/.test(c)?"💻":/^CC/.test(c)?"🌍":"🧩");
+  const k=fvK,ic=fvIc;
   return `<div class="box fv crits">${fvHead("📏",t("Els meus criteris","My criteria"))}<p class="fvlead">${t("Quanta feina dels learning paths tens feta per a cada criteri, comptant també les activitats que encara no toquen. No és una nota: la teva nota és a «La meva nota de la LS fins ara», a dalt.","How much of the learning-path work for each criterion you have done, also counting the activities whose day has not come yet. It is not a mark: your mark is in “My LS mark so far”, above.")} <span class="fv-tip">${t("Toca un criteri per veure'n el text oficial.","Tap a criterion to see its official wording.")}</span></p><div class="fv-crits sum">`
     +rows.map(r=>{const lps=list.filter(a=>a.graded&&a.criteria.includes(r.c)).map(a=>esc(a.title)).join(" · "),p=r.m?Math.max(0,Math.min(100,r.s/r.m*100)):0;
       return `<button type="button" class="fv-crit ${k(r.c)}" data-do="crit" data-c="${esc(r.c)}"><span class="fv-ch"><span class="fv-chip"><span aria-hidden="true">${ic(r.c)}</span> ${esc(r.c)}</span><b>${esc(elCompetence(r.c))}</b></span>`
