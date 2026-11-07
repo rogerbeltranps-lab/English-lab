@@ -90,21 +90,42 @@
     try{S=S||await import(FS);
       const [info,q,g]=await Promise.all([(C.lsNow||C.lsInfo)(LS).catch(()=>({})),
         S.getDocs(S.query(S.collection(C.db,"students",who.uid,"notes"),S.where("ls","==",LS))).catch(e=>{console.warn("notes",e);return null}),
-        who.email?S.getDoc(S.doc(C.db,"myGames",who.email)).catch(e=>{console.warn("my games",e);return null}):null]);
+        who.email&&!mg?S.getDoc(S.doc(C.db,"myGames",who.email)).catch(e=>{console.warn("my games",e);return null}):null]);
       played=((info&&info.played)||{})[who.group||C.group()]||{};
       if(q)notes=q.docs.map(x=>Object.assign({id:x.id,parts:{}},x.data()));
-      if(g&&g.exists())mine=g.data().games||{};
+      if(mg)mine=mg;else if(g&&g.exists())mine=mg=g.data().games||{};
     }catch(e){console.warn("notes",e)}
     data={games:build(played,notes,mine)};busy=false;draw();
   }
+  // 🧩 📚 Games and theory card on the LS home, the board's card (Roger, 7 Nov 2026: "instead of this", the slim 📝 tile): the % right in this
+  // LS's grammar and vocabulary class games (elRing, el-catalog.js), Open → and 📝 Your notes, all opening #notes. One read of
+  // myGames/{email} per page (kept for #notes too); circles show "–" until there is a result, and for the teacher.
+  let mg=null,mgBusy=false;
+  function homeCard(){
+    const a=document.querySelector('a.tile.nt[href="#notes"]');if(!a||!window.elRing)return;
+    const g=Object.values(mg||{}).filter(x=>x&&x.ls===LS),st=window.elGameStats?elGameStats(g):{},tip=k=>window.elGameTip&&g.length?elGameTip(g,k,ca()):"";
+    a.classList.add("gm");
+    a.innerHTML=`<span class="gm-h"><span><b>${t("Jocs i teoria","Games and theory")}</b><small>${t("Mira els teus resultats i què has d'estudiar","See your results and what to study")}</small></span><span class="gm-open">${t("Obre","Open")} →</span></span>`
+      +`<span class="gm-row"><span class="gm-rings">${elRing(st.grammar??null,"🧩 "+t("Gramàtica","Grammar"),42,tip("grammar"))}${elRing(st.vocab??null,"📚 "+t("Vocabulari","Vocabulary"),42,tip("vocab"))}</span>`
+      +`<span class="gm-note"><i aria-hidden="true">📝</i>${t("Els teus apunts","Your notes")}</span></span>`;
+  }
+  async function loadMg(){
+    if(mg||mgBusy||!who||who.teacher||!who.email)return homeCard();
+    if(D){mg=D.myGames||{};return homeCard()}
+    mgBusy=true;homeCard();
+    try{S=S||await import(FS);const g=await S.getDoc(S.doc(window.ELCloud.db,"myGames",who.email));mg=g.exists()?g.data().games||{}:{}}catch(e){console.warn("my games",e);mg={}}
+    mgBusy=false;homeCard();
+  }
+  document.addEventListener("ellshome",homeCard);
   const here=()=>location.hash==="#notes";
   document.addEventListener("ellshome",()=>{if(here()||data)draw()});
   window.addEventListener("hashchange",()=>{if(here())load()});
   function setWho(u){
     const C=window.ELCloud,AS=C&&C.viewing;
     who=!u?null:AS?{uid:AS.uid,email:(AS.email||"").toLowerCase(),group:AS.group}:C.isTeacher(u)?{teacher:true}:{uid:u.uid,email:(u.email||"").toLowerCase(),own:true};
-    data=null;if(here())load();else draw();
+    data=null;mg=null;if(here())load();else draw();loadMg();
   }
-  if(D){who=D.role==="teacher"?{teacher:true}:{uid:"demo",own:D.role!=="as"};if(here())load();else draw();window.addEventListener("load",()=>{if(here())load()});return}
+  if(D){who=D.role==="teacher"?{teacher:true}:{uid:"demo",own:D.role!=="as"};mg=D.myGames||null;homeCard();if(here())load();else draw();window.addEventListener("load",()=>{if(here())load()});return}
+  homeCard();
   let tries=0;(function wait(){if(window.ELCloud&&ELCloud.onUser){ELCloud.onUser(setWho);return}if(++tries<300)setTimeout(wait,100)})();
 })();

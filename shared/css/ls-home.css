@@ -201,6 +201,15 @@ footer.lsf{color:var(--muted);font-size:13px;padding:24px 0 0}
 
 /* 📝 Your notes (Roger, 6 Nov 2026): the tile across the tile grid, and the place #notes (shared/js/el-notes.js) */
 .tile.nt{grid-column:1/-1;flex-direction:row;align-items:center;min-height:0;padding:14px 18px;border-color:color-mix(in srgb,var(--c) 35%,var(--line));background:var(--c-soft)}
+/* 🧩 📚 Games and theory card (el-notes.js homeCard), the board's card with its circles (Roger, 7 Nov 2026) */
+.tile.nt.gm{flex-direction:column;align-items:stretch;gap:10px;background:#fff;border-color:var(--line)}
+.tile.nt.gm:hover{border-color:var(--c)}
+.gm-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.gm-h b{font-size:18px}.gm-open{font-weight:800;color:var(--c-dark);white-space:nowrap;font-size:17px}
+.gm-row{display:flex;align-items:center;gap:10px}
+.gm-rings{display:flex;gap:8px 14px;flex-wrap:wrap;min-width:0}
+.gm-note{margin-left:auto;display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border:1px solid color-mix(in srgb,var(--c) 30%,var(--line));border-radius:12px;background:var(--c-soft);color:var(--c-dark);font-size:13px;font-weight:800;line-height:1.15;white-space:nowrap}
+.gm-note i{font-style:normal;font-size:20px}
 .nintro{max-width:820px}
 .ncard{margin:0 0 16px}.ncard h2{margin:2px 0 8px}
 .ncard .nlp{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--c-dark);background:var(--c-soft);border-radius:999px;padding:3px 10px}
