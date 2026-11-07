@@ -93,6 +93,10 @@
   // Students see only the learning paths the teacher has opened for their group (Roger, 6 Nov 2026: "I don't want students to see the
   // future LP as depending on the time left they might not do them"): not open yet and dropped ones are left out; the teacher and testers see all.
   // Nor one still behind a checkpoint (Roger, 7 Nov 2026: "they mustn't see that anything is locked"): the checkpoint is their next one.
+  // LS1 (My Real Routine, both courses) is the exception (Roger, 7 Nov 2026: "since we didn't do the calendar agenda stuff here the LP don't
+  // appear, but they did them all. So they should be here"): LS1 never had a Time plan, so students see every learning path of it, with their
+  // own progress (✓ done, or steps done when there are some), never a lock, whatever the open switches say. The Continue card still only offers open ones.
+  const ALL_LPS=/-my-real-routine$/.test(LS);
   function lpRows(S){
     let shown=0;
     $$("a.lp[data-a]").forEach(el=>{const li=el.closest("li")||el;li.hidden=false;
@@ -100,6 +104,11 @@
       el.classList.remove("done","locked","nextup","dropped");st.className="st";st.innerHTML="";
       if(!a||teach()){st.innerHTML=t("Obre","Open")+" →";shown++;return}
       const cp=!S.all&&!S.closed&&!a.manual&&elCheckpointMissing(a,doneOf,S.open);
+      if(ALL_LPS&&!S.all){shown++;const ks=elTabGroups(a,stepsOf(a)),ds=doneOf(a),n=ks.filter(g=>g.every(k=>ds.has(k))).length,isNext=S.next&&S.next.a.id===a.id;
+        if(ks.length&&(S.done(a)||n===ks.length)){el.classList.add("done");st.classList.add("ok");st.textContent="✓ "+t("Fet","Done")}
+        else if(isNext){el.classList.add("nextup");st.classList.add("next");st.textContent=t("Ara toca","Next")+(ks.length?" · "+n+"/"+ks.length:"")}
+        else if(n)st.innerHTML=`<span class="mb"><i style="width:${Math.round(n/ks.length*100)}%"></i></span>`+n+" / "+ks.length;   // no "0 / 10": much of LS1 was done before progress was saved online
+        return}
       if(!S.all&&(S.dropped.includes(a.id)||!S.open(a)||cp||(stepsOf(a).length&&!S.vis(a).length))){li.hidden=true;return}
       shown++;
       const ks=elTabGroups(a,S.vis(a)),ds=doneOf(a),n=ks.filter(g=>g.every(k=>ds.has(k))).length,isNext=S.next&&S.next.a.id===a.id;
