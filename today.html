@@ -188,7 +188,7 @@ function cell(a){
   return {t:v,c};
 }
 
-// Menu: my board, my course page with its LSs (the ones I can open) and English Lab. The teacher and testers get both courses.
+// Menu: my board, my course page with its LSs (the ones I can open), Games and Practise. The teacher and testers get both courses.
 const COURSES={"2eso":"2 ESO","4eso":"4 ESO"};
 const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName=l=>esc(l.title.replace(/^\S+ · /,""));
 function nav(g,lss){
@@ -197,7 +197,7 @@ function nav(g,lss){
   const b=(cls,h,ic,txt,x)=>`<a class="nv${cls}" href="${h}"${x||""}><span class="ic" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`;
   const html=b(" on","today.html","🏠",t("El meu tauler","My dashboard"),' aria-current="page"')
     +cs.map(c=>b("",`${c}/index.html`,"🗂",`${t("El meu curs","My course")} · ${COURSES[c]}`)+lss.filter(l=>l.course===c).map(l=>b(" sub",lsHref(l),"📚",lsName(l))).join("")).join("")
-    +b("","lab/","🧪","English Lab")+b("","lab/practice.html","🎯",t("Practica","Practise"))
+    +b("","lab/","🎲",t("Jocs","Games"))+b("","lab/practice.html","🎯",t("Practica","Practise"))
     +b("","#help","❓",t("Ajuda","Help"))
     +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"');
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
@@ -344,7 +344,7 @@ function marksHead(lss,ls){const tab=tabOf(ls),tb=(id,icon,ca,en,sub)=>`<button 
 function unitsBox(lss,ls,st,stTag){
   return `<div class="box"><div class="ugrid">${lss.map(l=>`<a class="ucard ${l.id===ls.id?"on":""}" href="${lsHref(l)}"><small>${esc(l.title.split(" · ")[0])} · ${lsState(l)}</small><b>${lsName(l)}</b><span>${t("Obre-la","Open it")} →</span></a>`).join("")}</div>`
     +`<div class="lvline"><span class="muted">${t("El teu nivell:","Your level:")}</span> ${levelTag(ls.course,elRouteOf(D.lv,ls.id).level)}${routeNote(ls.id,st)} ${stTag}</div>`
-    +`<div class="ulinks"><a href="${ls.course}/index.html">${t("El meu curs","My course")} · ${COURSES[ls.course]||""}</a><a href="lab/practice.html">${t("Practica","Practise")}</a><a href="lab/">English Lab</a></div></div>`}
+    +`<div class="ulinks"><a href="${ls.course}/index.html">${t("El meu curs","My course")} · ${COURSES[ls.course]||""}</a><a href="lab/practice.html">${t("Practica","Practise")}</a><a href="lab/">${t("Jocs","Games")}</a></div></div>`}
 // "Study on your phone" (Roger, 6 Nov 2026: "telling them that they can study using their cellphones if they attach the website on the screen"):
 // a card on the home (and in Help) that leads to the #phone place: the board on a phone, a QR code to open it from the Chromebook,
 // and step-by-step pictures to add English Lab to the home screen on Android (Chrome) and iPhone (Safari). Pictures in shared/img/phone/.
@@ -517,7 +517,7 @@ async function goLive(){
 }
 // Self-practice by level (Roger, 31 Oct 2026): lab/practice.html, with the student's level recommended.
 function practiceBox(ls){if(only(ls.id))return "";const lv=elRouteOf(D.lv,ls.id).level,k=lv?elCefr(ls.course,lv):"";
-  return `<div class="box study"><b>🏋️ ${t("Practica pel teu compte","Practise on your own")}${k?` · ${t("nivell","level")} ${esc(k)}`:""}</b><p class="muted">${t("Targetes de paraules, sentence builder, escoltes i shadowing de les teves LS, al teu nivell. Es corregeix sol i no compta per a la nota.","Word cards, sentence builder, listenings and shadowing from your LSs, at your level. It corrects itself and does not count for your mark.")}</p><div class="row"><a class="go" href="lab/practice.html">${t("Comença a practicar","Start practising")} →</a></div></div>`}
+  return `<div class="box study"><b>🏋️ ${t("Practica pel teu compte","Practise on your own")}${k?` · ${t("nivell","level")} ${esc(k)}`:""}</b><p class="muted">${t("El vocabulari i la gramàtica de les teves LS al teu nivell, i també sentence builder, escoltes i shadowing. Es corregeix sol i no compta per a la nota.","Vocabulary and grammar from your LSs at your level, plus sentence builder, listening and shadowing. It corrects itself and does not count for your mark.")}</p><div class="row"><a class="go" href="lab/practice.html">${t("Comença a practicar","Start practising")} →</a></div></div>`}
 // Vocabulary and grammar summary (Roger, 25 Oct 2026): an optional PDF per route; a student gets only their route's, the teacher and testers all three.
 function studyBox(ls){if(!ls.study||only(ls.id))return "";const lv=elRouteOf(D.lv,ls.id).level,a=r=>`<a class="go" href="${ls.study}${r==="beginners"&&!ls.starter?"insecure":r==="native"&&!ls.pro?"daring":r}.pdf" target="_blank" rel="noopener">📄 ${t("Obre el resum","Open the summary")}${all()?" · "+LV[r]:""} (PDF)</a>`;
   if(!all()&&!lv)return "";
