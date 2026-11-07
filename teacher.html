@@ -52,6 +52,11 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .tside .nv:hover{background:#eaf0ff;color:#3157d5}.tside .nv.on{background:#0f172a;color:#fff}.tside .nv.c2eso.on{background:#16a34a}.tside .nv.c4eso.on{background:#2563eb}
 .tside .nv small{font-weight:600;font-size:12px;opacity:.75}.tside .sep{height:1px;background:#e2e8f0;margin:8px 8px}.tside .lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:6px 12px 2px}
 .tside .nv.ann{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;margin-bottom:6px}.tside .nv.ann:hover{background:#ffedd5}
+/* 🛠 maintenance mode (mtDialog): the side menu button and the red bar on every page while it is on */
+.tside .nv.mton{background:#dc2626;color:#fff}.tside .nv.mton:hover{background:#b91c1c;color:#fff}.tside .nv small.mt{opacity:1;background:#fff;color:#b91c1c;border-radius:999px;padding:0 7px;font-weight:800}
+#mtbar:empty{display:none}#mtbar{margin-top:46px!important;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:#dc2626;color:#fff;border-radius:14px;padding:10px 14px;margin:0 0 10px;font-weight:700}
+#mtbar button{border:0;background:#fff;color:#b91c1c;border-radius:999px;padding:5px 14px;font-weight:800;cursor:pointer}#mtbar .g2{background:#fecaca}
+.mtprev{border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;padding:18px 14px;margin:8px 0}.mtprev .mt-box{font-size:14px}.mtprev .mt-box h1{font-size:20px}.mtprev .mt-ic{font-size:32px}
 .ph h1{font-size:2.1rem;letter-spacing:-.02em;margin:.25em 0 .1em}.ph .sub{font-size:16px;color:#475569;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}.ph .sub select{font-size:15px;padding:4px 6px;border-radius:8px}
 .ph h1.hi{max-width:1100px;line-height:1.15;text-wrap:pretty}.ph h1.hi .cheer{vertical-align:middle;border:0;background:#eef2ff;color:#3157d5;border-radius:999px;width:34px;height:34px;font-size:18px;font-weight:700;cursor:pointer;padding:0;margin-left:4px}.ph h1.hi .cheer:hover{background:#dbe4ff}
 .ph h1.pt{font-size:1.6rem}.crumb{margin:4px 0 0}.crumb a.back{display:inline-flex;align-items:center;color:#3157d5;font-weight:700;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px;font-size:16px}.crumb a.back:hover{background:#eaf0ff}
@@ -118,6 +123,7 @@ details.agpast>summary{cursor:pointer;color:#3157d5;font-weight:700;margin:12px 
 <div class="dhead"><h1>Teacher dashboard</h1></div><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p><script>/* the teacher who was signed in here last (el_who, el-cloud.js) sees it is loading, not a sign-in request (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="teacher")document.getElementById("msg").textContent="⏳ Loading your dashboard…"}catch(e){}</script>
 <div id="app" hidden>
 <p class="muted" id="loadbar" style="margin:0 0 8px"></p>
+<div id="mtbar"></div>
 <div id="classnow"></div>
 <div id="main"></div>
 </div></div></div>
@@ -219,6 +225,8 @@ async function loadLight(){const L={ls:{},tk:{},pb:[],sg:[],ann:[],ck:{},replies
     soft("accounts",F.getDoc(F.doc(db(),"settings","accounts")),c=>{L.acc=c.exists()?c.data():{}}),
     // ✏️ Corrections: a correction asked from the dashboard and the last marking run (settings/marking: request, run)
     soft("marking",F.getDoc(F.doc(db(),"settings","marking")),c=>{if(c.exists())L.mk=c.data()}),
+    // 🛠 maintenance mode (site/maintenance: on, note, since; mtDialog): students see only the maintenance message while it is on
+    soft("maintenance",F.getDoc(F.doc(db(),"site","maintenance")),c=>{L.mt=c.exists()?c.data():{}}),
     // sg = suggestions from students (suggestions/{id}: uid, email, name, group, page, text, created, read), sent with "💡 Idea" in the bottom bar
     soft("suggestions",ALL("suggestions"),q=>q.forEach(x=>L.sg.push(Object.assign({id:x.id},x.data())))),
     soft("problems",ALL("problems"),q=>q.forEach(x=>L.pb.push(Object.assign({id:x.id},x.data())))),
@@ -400,6 +408,7 @@ async function reread(){const ps=[...TOUCHED];TOUCHED.clear();const D=S.D;
     if(k[0]==="problemReplies"&&k.length===2)return x=>{if(x)D.replies[k[1]]=1;else delete D.replies[k[1]]};
     if(p==="settings/routes")return x=>{D.cuts=x||undefined};
     if(p==="settings/marking")return x=>{D.mk=x||null};
+    if(p==="site/maintenance")return x=>{D.mt=x||{}};
     if(k[0]==="ls"&&k.length===2)return "ls";
     return null};
   const fs=ps.map(one);if(!D||!RAW||!ps.length||ps.length>300||fs.some(f=>!f))return load();
@@ -995,9 +1004,11 @@ function render0(){
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g&&!(g==="none"&&((S.D.acc||{}).hidden||{})[s.uid])),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
   const nv=(g,lab,cls,tip,extra)=>`<button class="nv ${cls||""} ${S.g===g?"on":""}" data-do="tab" data-g="${g}" ${tip?`title="${tip}"`:""}>${lab}${extra||""}</button>`;
   $("#tabs").hidden=false;$("#shell").classList.add("on");
+  $("#mtbar").innerHTML=mtOn()?`🛠 Maintenance mode is ON: students only see the maintenance message and the worksheets.<button data-do="mtoff">Turn it off</button><button class="g2" data-do="mtdlg">See the message</button>`:"";
   $("#tabs").innerHTML=`<div class="brand">Teacher dashboard</div>`
     // 📣 always at hand (Roger, 2 Nov 2026: "where is the announcement?"): sent ones are in 💬 Messages
     +`<button class="nv ann" data-do="annnew" title="Send a message to one group, a whole course, every group or some students. Sent ones are in 💬 Messages">📣 Announcement</button>`
+    +`<button class="nv ${mtOn()?"mton":""}" data-do="mtdlg" title="Close the site to students for a while: they see a maintenance message with worksheets to print">🛠 Maintenance${mtOn()?'<small class="mt">ON</small>':""}</button>`
     +nv("plan","🏠 Home","","The next class, every group, the time plan of all groups and the messages")
     +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,esc(g.name),"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`)).join("")
     +(n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):"")
@@ -2469,6 +2480,34 @@ function annDialog(keep){
   t.oninput=draw;at.oninput=at.onchange=draw;$("#annatx").onclick=()=>{at.value="";draw()};
   document.querySelectorAll("#dlg [data-annu]").forEach(c=>c.onchange=()=>{c.checked?S.annSel.add(c.dataset.annu):S.annSel.delete(c.dataset.annu);draw()});
   draw();t.focus()}
+// 🛠 Maintenance mode (Roger, 7 Nov 2026: "que els estudiants no puguin entrar a la web, deixant un missatge que estic fent manteniment"):
+// site/maintenance = {on, note, since}. While it is on, every student page (el-cloud.js mtCheck) shows only the message of
+// shared/js/el-maintenance.js with the worksheets of the student's course and level (PDFS there); it opens again by itself when it goes
+// off. The teacher, the student view (👁) and the test account's "see everything" still get in. A page opened within 2 minutes of a
+// check that found it off can still open as usual (that saves a read per page).
+const mtOn=()=>!!(S.D&&S.D.mt&&S.D.mt.on);
+let MT=null;const mtMod=()=>MT?Promise.resolve(MT):import("./shared/js/el-maintenance.js").then(m=>MT=m);
+async function mtDialog(){const m=await mtMod(),x=(S.D&&S.D.mt)||{},on=!!x.on;
+  if(!document.getElementById("mtcss")){const st=document.createElement("style");st.id="mtcss";st.textContent=m.CSS;document.head.append(st)}   // the message's own look, for the preview
+  S.mtC=S.mtC||"2eso";S.mtR=m.ROUTES[S.mtC].includes(S.mtR)?S.mtR:"insecure";
+  const since=on&&x.since&&x.since.toDate?x.since.toDate().toLocaleString("en-GB",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"";
+  dlg(`<h3>🛠 Maintenance mode</h3>`
+    +(on?`<p class="hal late"><b>ON${since?" since "+esc(since):""}.</b> Students only see the message below.</p>`:`<p class="muted" style="margin:0 0 8px">While it is on, students can't use the site: every page they open shows only this message, with the worksheets of their course and level to download and print. When you turn it off, their page opens again by itself. You, the 👁 student view and your test account in “see everything” still get in.</p>`)
+    +`<label for="mtnote">A note for students <small class="muted">(optional, shown under the message exactly as you write it, e.g. “Back on Monday”)</small></label>
+    <textarea id="mtnote" maxlength="300" style="min-height:60px" placeholder="For example: Do the worksheet of LP1 for Monday."></textarea>
+    <p class="muted" style="margin:10px 0 4px">What students see:</p>
+    <div class="bar">${Object.keys(m.PDFS).map(c=>`<button type="button" class="chip ${S.mtC===c?"on":""}" data-mtc="${c}">${courseName(c)}</button>`).join("")} <span class="muted">·</span> ${m.ROUTES[S.mtC].map(r=>`<button type="button" class="chip ${S.mtR===r?"on":""}" data-mtr="${r}">${LV_NAME[r]}</button>`).join("")}</div>
+    <div class="mtprev" id="mtprev"></div>
+    <div class="row" style="justify-content:flex-start">${on?`<button data-do="mtoff">✅ Turn it off: open the site again</button><button class="g" data-do="mton">Save the note</button>`:`<button data-do="mton" style="background:#dc2626">🛠 Turn maintenance on</button>`}</div>`,true);
+  const t=$("#mtnote");t.value=S.mtNote!=null?S.mtNote:x.note||"";S.mtNote=null;
+  const draw=()=>{$("#mtprev").innerHTML=m.html({course:S.mtC,route:S.mtR,ca:elCa(S.mtR),note:t.value.trim(),root:new URL("./",location.href).href})};
+  t.oninput=draw;draw();
+  document.querySelectorAll("#dlg [data-mtc],#dlg [data-mtr]").forEach(b=>b.onclick=()=>{if(b.dataset.mtc)S.mtC=b.dataset.mtc;else S.mtR=b.dataset.mtr;S.mtNote=t.value;mtDialog()})}
+function mtSave(on){const t=$("#dlg").open&&$("#mtnote"),note=t?t.value.trim().slice(0,300):((S.D.mt||{}).note||"");
+  if(on&&!mtOn()&&!confirm("Turn maintenance on? Students will not be able to use the site until you turn it off."))return;
+  if(!on&&!confirm("Turn maintenance off? Students can use the site again."))return;
+  const was=mtOn(),o={on,note};if(on&&!was)o.since=DEMO?new Date():F.serverTimestamp();
+  S.D.mt=Object.assign({},S.D.mt,o);if($("#dlg").open)$("#dlg").close();act(put(["site","maintenance"],o))}
 // the "Send later" time in ms, or 0 for now (empty, or a time that has already passed)
 const annAtMs=()=>{const v=$("#annat")&&$("#annat").value,ms=v?+new Date(v):0;return ms>Date.now()?ms:0};
 function annToggle(v){
@@ -2917,7 +2956,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},gfs:()=>gfs(!S.gfs),"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     sgopen:()=>{S.open.add("sugg");S.place="msgs";render();$("#sugg").scrollIntoView({behavior:"smooth"})},
-    annnew:()=>annDialog(),annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
+    annnew:()=>annDialog(),mtdlg:()=>mtDialog(),mton:()=>mtSave(true),mtoff:()=>mtSave(false),annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
     sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");S.place="msgs";render();$("#probs").scrollIntoView({behavior:"smooth"})},

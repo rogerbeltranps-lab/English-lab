@@ -36,6 +36,11 @@ service cloud.firestore {
     match /settings/{id} {
       allow read, write: if isTeacher();
     }
+    // 🛠 maintenance mode (site/maintenance = {on, note, since}, the dashboard's switch): every page reads it, before or after sign-in; only the teacher writes it
+    match /site/{id} {
+      allow read: if true;
+      allow write: if isTeacher();
+    }
     match /assignments/{day} {
       allow read: if signedIn() || isTeacher();
       allow write: if isTeacher();
