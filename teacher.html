@@ -1630,9 +1630,11 @@ function gameRings(s){const g=GAMES[S.g];if(!g||g.busy||!s.email)return "";const
   const mine=g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done,title:x.title,day:x.day,lp:x.lp,ls:x.ls}:null}).filter(Boolean);
   if(!mine.length)return "";const st=elGameStats(mine),gl=(mine.find(x=>x.ls)||{}).ls||"",click="\nClick: every answer and the notes";
   // hover a circle = the games it counts; click = Results open on this student (Roger, 7 Nov 2026: "they should see grammar games, when they go to the percentage")
-  return `<a class="grings" href="lab/game/results.html?g=${encodeURIComponent(S.g)}${gl?"&ls="+encodeURIComponent(gl):""}&stu=${encodeURIComponent(em)}" target="_blank" rel="noopener" title="Class games of this LS: % right in 🧩 grammar and 📚 vocabulary (click for the answers and notes)"><span>🧩</span>${elRing(st.grammar,"",30,elGameTip(mine,"grammar")+click)}<span>📚</span>${elRing(st.vocab,"",30,elGameTip(mine,"vocab")+click)}</a>`+notesLink(s,gl||ls)}
+  return `<a class="grings" href="lab/game/results.html?g=${encodeURIComponent(S.g)}${gl?"&ls="+encodeURIComponent(gl):""}&stu=${encodeURIComponent(em)}" target="_blank" rel="noopener" title="Class games of this LS: % right in 🧩 grammar and 📚 vocabulary (click for the answers and notes)"><span>🧩</span>${elRing(st.grammar,"",30,elGameTip(mine,"grammar")+click)}<span>📚</span>${elRing(st.vocab,"",30,elGameTip(mine,"vocab")+click)}</a>`}
 // 📝 the student's notes of the class games (Roger, 7 Nov 2026: "can I see it here too? on the students list?"): the LS page's #notes place
-// (theory slides + their notes, results, what to study) in the read-only student view, as the student sees it (today.html?student=…&go=…)
+// (theory slides + their notes, results, what to study) in the read-only student view, as the student sees it (today.html?student=…&go=…).
+// Next to every student, also with no games or notes yet (Roger, 7 Nov 2026: "in any case I want it in blank"): the page is then empty.
+// S.ls is the LS id (gameResults' own ls field is the LS title, so it never matched EL_LS and the 📝 did not show)
 function notesLink(s,lsId){const l=(window.EL_LS||[]).find(x=>x.id===lsId);if(!l||!s.uid)return "";
   return `<a class="gnotes" href="today.html?student=${encodeURIComponent(s.uid)}&ls=${encodeURIComponent(l.id)}&go=${encodeURIComponent(lsHref(l)+"#notes")}" target="_blank" rel="noopener" title="Their notes: the theory from the class games with their notes, results and what to study (opens as they see it)">📝</a>`}
 function loadGames(){const g=S.g;if(!g||GAMES[g])return;if(DEMO){if(DEMO.games)GAMES[g]={list:DEMO.games.filter(x=>x.group===g)};return}GAMES[g]={busy:true,list:[]};
@@ -1680,7 +1682,7 @@ function progress(studs,list){
   h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
   let b="";const cols=list.reduce((n,a)=>n+(open(a)?lpCols(a).length+1:1),0);
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
-    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${gameRings(s)}</td>`;
+    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${gameRings(s)}${notesLink(s,S.ls)}</td>`;
     if(s.away){b+=`<tr class="away">${who}${awayRt(s)}<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
     b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
@@ -2819,7 +2821,7 @@ function rosterGames(studs){if(!studs||!studs.length||!S.g||S.g==="none")return 
   if(g.busy)return `<p class="muted">Loading the class games…</p>`;
   const rows=studs.filter(s=>!s.tester).map(s=>{const em=String(s.email||"").toLowerCase(),ls=S.ls||"";
     const mine=em?g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done}:null}).filter(Boolean):[];
-    return `<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td><td>${mine.length?gameRings(s):'<span class="muted">no class games yet</span>'}</td><td class="num">${mine.length}</td></tr>`}).join("");
+    return `<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td><td>${mine.length?gameRings(s):'<span class="muted">no class games yet</span>'}${notesLink(s,S.ls)}</td><td class="num">${mine.length}</td></tr>`}).join("");
   return `<h3 style="margin:4px 0 6px">🎮 Class games in this LS</h3><p class="muted">% right in the 🧩 grammar and 📚 vocabulary games of this LS. Click the circles for every answer and the notes (Results).</p>
     <div class="wrap"><table class="rgames"><tr><th class="stu">Student</th><th>🧩 grammar · 📚 vocabulary</th><th>Games</th></tr>${rows}</table></div>`}
 function rosterBox(studs){
