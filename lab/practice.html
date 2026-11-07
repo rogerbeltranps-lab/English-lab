@@ -304,7 +304,7 @@ async function render() {
   const g = ++gen;
   $('#app').innerHTML = header() + `<div class="empty">${t('Carregant…', 'Loading…')}</div>`;
   const x = await content(); if (g !== gen) return; X = x;
-  const n = { words: x.words.length, grammar: x.grammar.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length + x.ls.filter(l => l.shadowing).length };
+  const n = { words: x.words.length, grammar: x.grammar.length, build: x.build.length, listen: x.listen.length, shadow: x.shadow.length };
   $('#app').innerHTML = header() + filters(x)
     + `<div class="tabs" role="tablist">${TABS.map(([k, i, en, ca, sca, sen]) => `<button class="tab${/^(words|grammar)$/.test(k) ? ' big' : ''} ${S.tab === k ? 'on' : ''}" role="tab" aria-selected="${S.tab === k}" data-do="tab" data-v="${k}">${i} ${t(ca, en)} <small>${t(sca, sen)} · ${n[k]}</small></button>`).join('')}</div><div id="body"></div>`;
   ({ words, grammar, build, listen, shadow })[S.tab]();
@@ -487,16 +487,15 @@ function gcheck(count) {
   $('#gscore').textContent = sc + (ok === g.items.length ? ' 🎉' : '');
 }
 
-/* 🗣 Shadowing: the unit's shadowing video and every Learning Path clip (play, slower copy, hide the script, record yourself).
+/* 🗣 Shadowing: every Learning Path clip (play, slower copy, hide the script, record yourself). Not the whole-unit shadowing video
+   (Roger, 7 Nov 2026: "in the shadowing section of the practice, don't put the video of the entire classes"; it stays on the LS home).
    Marks + two modes (Roger, 7 Nov 2026, shared/js/el-shadow.js): stress, linking and ↗ ↘ on the script with a key and a show/hide
    button; 🔁 Listen and repeat (one sentence, time to say it, the next) or 🗣 Shadowing (all of it, speaking along). */
 let rec = null, PL = [];
 function shadow() {
-  const vids = X.ls.filter(l => l.shadowing);
-  if (!X.shadow.length && !vids.length) return $('#body').innerHTML = none();
+  if (!X.shadow.length) return $('#body').innerHTML = none();
   const ca = elCa(base(S.level));
   $('#body').innerHTML = `<div class="how"><b>${t('Com es fa', 'How it works')}</b> · ${t('1. Escolta i llegeix. 2. Murmura les paraules alhora. 3. Repeteix en veu alta just darrere la veu. 4. Amaga el text i fes-ho sense mirar. Millor amb auriculars.', '1. Listen and read. 2. Mumble the words along. 3. Say it aloud just behind the speaker. 4. Hide the script and do it without looking. Best with headphones.')}</div>`
-    + vids.map((l, i) => `<div class="card"><h3>🎬 ${all() ? t('Shadowing de tota la unitat', 'Shadowing for the whole unit') + ' · ' + esc(l.title.replace(/^\S+ · /, '')) : t('Vídeo de shadowing', 'Shadowing video') + (vids.length > 1 ? ' ' + (i + 1) : '')}</h3><p class="muted">${t('El vídeo t’espera després de cada frase.', 'The video waits for you after each sentence.')}</p><video controls preload="none" playsinline poster="${ROOT + esc(l.shadowing.replace(/\.mp4$/, '-poster.jpg'))}" src="${ROOT + esc(l.shadowing)}"></video></div>`).join('')
     + X.shadow.map((c, i) => `<div class="card"><h3>🗣 ${esc(c.title)}</h3><p class="muted">${srcLine(esc(c.lp) + ' · ')}${t('Vegades', 'Plays')}: <span id="sp${i}">${store.shadow[c.key] || 0}</span></p>${elShadow.bar(c, !EN, 'btn g sm')}
       ${c.video ? `<video id="sm${i}" preload="none" playsinline poster="${esc(c.poster || c.src.replace(/\.mp4$/, '-poster.jpg'))}"></video>` : `<audio id="sm${i}" preload="metadata"></audio>`}
       <div class="row"><button class="btn sm" data-do="splay" data-i="${i}">▶ ${t('Escolta el fragment', 'Play the clip')}</button><button class="btn g sm" data-do="sstop" data-i="${i}">■ Stop</button>
