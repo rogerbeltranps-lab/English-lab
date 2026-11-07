@@ -1,5 +1,8 @@
 // 📋 Today's agenda in class mode (Roger, 7 Nov 2026: "in class mode, I should have the day of the agenda so that I can click it and
-// students can see it on the board"). The class tab (el-cloud.js cmTeacher) gets a 📋 Today button on its chip: a panel with the group's
+// students can see it on the board"; then "I wanted fixed not floating" and "we don't need this menu in class mode so we can put today's
+// tasks there": it is docked in the left side menu, in place of its buttons (they come back when it is hidden or class mode ends); only a
+// narrow window or a phone, with no side menu, gets it floating above the chip). The class tab (el-cloud.js
+// cmTeacher) gets a 📋 Today button on its chip that shows or hides it: a panel with the group's
 // class day from the Time plan agenda (ls/{ls}.planEdits[group].agenda, the same list as the dashboard's day card, in the same order, with
 // the minutes). It opens by itself when class mode starts, so the projector shows the plan for the class. A click on a tab or a learning
 // path takes the class tab there and the students follow (class mode); a learning path or tab still locked for the group opens first.
@@ -20,7 +23,7 @@ function load(src,has){return has()?Promise.resolve():new Promise(r=>{const s=do
 const byId=id=>(window.EL_CATALOG||[]).find(a=>a.id===id);
 const secs=a=>((window.EL_SECTIONS||{})[a.id]||[]);
 const gameOf=id=>(window.EL_GAMES||[]).find(g=>g.id===id);
-function itName(a,p){if(isGame(p)){const g=gameOf(p.slice(5));return "🎮 "+(g?(window.elGameName?elGameName(g):g.title):p.slice(5))}const z=secs(a).find(q=>q[0]===p);return z?z[1]:p}
+function itName(a,p){if(isGame(p)){const g=gameOf(p.slice(5));return "🎮 "+String(g?(window.elGameName?elGameName(g):g.title):p.slice(5)).replace(/^LP\d+ · /,"")}const z=secs(a).find(q=>q[0]===p);return z?z[1]:p}
 // the day's items as the dashboard shows them: [{a (learning path or null), its}]; a day reordered by hand (ag.man[day]) keeps its order,
 // any other day groups each learning path's tabs; a learning path's tabs always follow the path's order (teacher.html agRuns, agTabOrder)
 function runs(ag,d){const its=((ag.days||{})[d]||[]).filter(it=>it!=="self"),man=!!(ag.man||{})[d],gs=[];
@@ -56,6 +59,15 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 #el-cmag .it.ex{background:#fee2e2;border-color:#fca5a5;cursor:default}#el-cmag .it.now{background:#4338ca;border-color:#4338ca;color:#fff}#el-cmag .it.now .go{color:#fff}
 #el-cmag .m{flex:none;border:1.5px solid #60a5fa;border-radius:999px;padding:1px 9px;font-size:14px;color:#1d4ed8;background:#fff}
 #el-cmag .it.now .m{border-color:#fff}#el-cmag .msg{color:#64748b;font-weight:500;margin:6px 2px}#el-cmag .err{color:#b91c1c}
+#el-cmag.dock{position:static;width:auto;max-height:none;overflow:visible;flex:none;box-shadow:none;border-width:1.5px;border-radius:14px;padding:10px;font-size:14px;margin:0}
+#el-cmag.dock .hd b{font-size:15px}#el-cmag.dock .hd .x{width:26px;height:26px;font-size:13px}#el-cmag.dock .tot{font-size:12.5px;margin-bottom:4px}
+#el-cmag.dock .lp{font-size:14px;margin:8px 0 2px;flex-wrap:wrap;gap:2px 6px}#el-cmag.dock .lp small{font-size:12px;margin-left:0}
+#el-cmag.dock .it{font-size:14px;padding:6px 8px;gap:6px;margin:4px 0;border-radius:11px;flex-wrap:wrap;line-height:1.25}#el-cmag.dock .it .go{font-size:12.5px}
+#el-cmag.dock .hd{flex-wrap:nowrap;gap:6px;margin-bottom:2px}#el-cmag.dock .hd b{font-size:14px;white-space:nowrap}#el-cmag.dock .hd .x{flex:none}
+#el-cmag.dock .it{flex-wrap:nowrap}#el-cmag.dock .it>span:not(.m):not(.go){flex:1;min-width:0}#el-cmag.dock .it .go{margin-left:0}
+#el-cmag.dock .m{order:3;font-size:11px;padding:0 5px;white-space:nowrap}#el-cmag.dock .msg{font-size:13px}#el-cmag.dock .hd small,#el-cmag.dock .gt{display:none}
+.elrail:has(#el-cmag),aside.side:has(#el-cmag){padding-bottom:76px!important;overflow-y:auto}
+.elrail:has(#el-cmag) .elside,.elrail:has(#el-cmag) .eln,aside.side:has(#el-cmag) .nvs{display:none!important}
 #el-cmvid{position:fixed;inset:0;z-index:2147481600;background:rgba(15,23,42,.92);display:grid;place-items:center;padding:20px}
 #el-cmvid video{max-width:100%;max-height:calc(100vh - 90px);border-radius:12px;background:#000}
 #el-cmvid button{position:absolute;top:14px;right:16px;border:0;border-radius:999px;padding:8px 16px;background:#fff;color:#1e1b4b;font:800 15px system-ui,sans-serif;cursor:pointer}`;
@@ -63,10 +75,18 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 // ctx: {db, doc, setDoc, lsInfo, root, g (group id), gname}
 export function setup(ctx){C=ctx}
 export function isOpen(){return !!box}
-export function close(){if(box){box.remove();box=null}want(false)}
+export function close(){if(box){box.remove();box=null}clearInterval(placeT);want(false)}
+// docked in the side menu: the LP pages' rail (el-app.js .elrail, redrawn now and then, so it is put back) or the LS home's aside.side;
+// only when that menu is shown wide (a computer), else floating
+let placeT=null;
+function host(){for(const el of document.querySelectorAll(".elrail,aside.side")){if(el.offsetWidth>=200&&getComputedStyle(el).display!=="none")return el}return null}
+function place(){if(!box)return;const h=host();
+  if(h){if(box.parentElement!==h)h.append(box);box.classList.add("dock")}
+  else{box.classList.remove("dock");if(box.parentElement!==document.body)document.body.append(box)}}
 export async function open(){if(!C)return;want(true);
   if(!document.getElementById("el-cmag-css")){const st=document.createElement("style");st.id="el-cmag-css";st.textContent=CSS;document.head.append(st)}
   if(!box){box=document.createElement("div");box.id="el-cmag";box.onclick=click;document.body.append(box)}
+  place();clearInterval(placeT);placeT=setInterval(place,800);   // the side menu can come or be redrawn after this
   box.innerHTML='<div class="hd"><b>📋 Today</b><button class="x" data-x="1" title="Close">✕</button></div><p class="msg">Loading the agenda…</p>';
   await Promise.all([load("shared/js/el-sections.js",()=>window.EL_SECTIONS),load("shared/js/el-plan.js",()=>window.EL_PLAN),load("shared/js/el-week.js",()=>window.ELWeek),load("lab/game/decks/index.js",()=>window.EL_GAMES)]);
   await draw()}
@@ -79,13 +99,13 @@ async function draw(){if(!box)return;
     if(ag.exam===D)body+=`<div class="it ex">📝 Exam</div>`;
     runs(ag,D).forEach(g=>{
       if(!g.a){g.its.forEach(it=>{const n=its.push({ls:x,it})-1,m=mn(it);tot+=m;const sh=it===SHD&&x.ls.shadowing;
-        body+=`<${sh?"button":"div"} class="it ${sh?"shd":"nt"}" ${sh?`data-i="${n}" title="Play the unit's shadowing video here (students stay where they are)"`:""}>${m?`<span class="m">${m} min</span>`:""}<span>${E(it.slice(5))}</span>${sh?'<span class="go">▶ Play</span>':""}</${sh?"button":"div"}>`});return}
+        body+=`<${sh?"button":"div"} class="it ${sh?"shd":"nt"}" ${sh?`data-i="${n}" title="Play the unit's shadowing video here (students stay where they are)"`:""}>${m?`<span class="m">${m} min</span>`:""}<span>${E(it.slice(5))}</span>${sh?'<span class="go">▶</span>':""}</${sh?"button":"div"}>`});return}
       const a=g.a,nos=g.its.length===1&&/#$/.test(g.its[0]),lt=g.its.reduce((s,it)=>s+mn(it),0);
       if(!nos)body+=`<div class="lp">${E((ag.lab||{})[a.id]||(window.elLpLabel?elLpLabel(a):a.title))}${lt?`<small>⏱ ${lt} min</small>`:""}</div>`;
       g.its.forEach(it=>{const p=it.slice(it.indexOf("#")+1),n=its.push({ls:x,it,a,p})-1,m=mn(it),gm=isGame(p),now=!gm&&hereIs(a,p);tot+=m;
-        body+=`<button class="it ${now?"now":""}" data-i="${n}" title="${gm?"Open the game board in a new tab":"Go there: "+E(C.gname)+" follows"}">${m?`<span class="m">${m} min</span>`:""}<span>${E(nos?(window.elLpLabel?elLpLabel(a):a.title):itName(a,p))}</span><span class="go">${now?"● now":gm?"🎮 Open ↗":"Go →"}</span></button>`})})});
+        body+=`<button class="it ${now?"now":""}" data-i="${n}" title="${gm?"Open the game board in a new tab":"Go there: "+E(C.gname)+" follows"}">${m?`<span class="m">${m} min</span>`:""}<span>${E(nos?(window.elLpLabel?elLpLabel(a):a.title):itName(a,p))}</span><span class="go ${now||gm?"":"gt"}">${now?"● now":gm?"↗":"Go →"}</span></button>`})})});
   const len=+((window.EL_TIMETABLE||{}).len)||60;
-  box.innerHTML=`<div class="hd"><b>📋 ${D===t?"Today":"Next class"} · ${E(dLab(D))}</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Close (📋 Today on the bar opens it again)">✕</button></div>`
+  box.innerHTML=`<div class="hd"><b>📋 ${D===t?"Today":"Next class"} · ${E(dLab(D))}</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Hide (📋 Today on the class mode bar shows it again)">✕</button></div>`
     +(tot?`<p class="tot ${tot>len?"over":""}">⏱ ${tot} of ${len} min planned</p>`:"")
     +(body||`<p class="msg">Nothing on the agenda${D===t?" today":""} for ${E(C.gname)}. Plan it in the dashboard's Time plan.</p>`);
   box._its=its}
