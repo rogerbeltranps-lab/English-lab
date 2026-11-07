@@ -94,7 +94,7 @@ window.LP = {
         ['Mei', 'It\'s December, so it\'s really cold, about three degrees, and it\'s cloudy.'],
         ['Mei', 'I\'m wearing a woolly hat, gloves and a big red jacket.'],
         ['Mei', 'Look! My brother Kai is skating behind me, and he\'s falling… again!'],
-        ['Mei', 'I usually come here on Sunday afternoons with my family, just for fun.']] } },
+        ['Mei', 'I usually come here on Sunday afternoons with my family, just for fun.']], marks: [["**Hi**‿**ev**eryone, ↗ I'm **Mei**, ↗ and **wel**come to my **Sat**urday **vlog**! ↘"], ["**Right** **now** I'm‿at the **ice** **rink**‿in the **town** **square**. ↘"], ["It's De**cem**ber, ↗ so it's **real**ly **cold**, ↗ a**bout** **three** de**grees**, ↗ and‿it's **cloud**y. ↘"], ["I'm **wear**ing‿a **wool**ly **hat**, ↗ **gloves**‿and‿a **big** **red** **jack**et. ↘"], ["**Look**! ↘ My **broth**er **Kai**‿is **skat**ing be**hind** me, ↗ and he's **fall**ing… ↗ a**gain**! ↘"], ["I **us**ually **come** **here**‿on **Sun**day after**noons** with my **fam**ily, ↗ **just** for **fun**. ↘"]], cues: [[0.73, 4.64, 0.74, 5.25], [4.99, 7.79, 5.74, 8.94], [8.29, 13.92, 9.98, 16.52], [14.24, 17.77, 16.98, 21.18], [17.91, 23.75, 21.66, 28.43], [24.16, 28.19, 29.37, 33.99]] } },
     { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Present Simple o Present Continuous?', en: 'Present Simple or Present Continuous?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [

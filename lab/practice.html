@@ -68,6 +68,7 @@
     @media (max-width:620px){.panel{padding:16px;border-radius:22px}.lv{min-width:0;flex:1 1 40%}.flash .en{font-size:1.5rem}}
   </style>
   <script src="../shared/js/el-catalog.js"></script>
+  <script src="../shared/js/el-shadow.js"></script>
   <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
 <body>
@@ -208,7 +209,7 @@ function extract(pg, lv) {
         out.listen.push({ key: at + '#' + p.id, title, lp, media, items });
       }
     }
-    if (p.type === 'shadow' && p.clip) { const c = p.clip; out.shadow.push({ key: at + '#' + p.id, title: c.title || tx(p.title), lp, src: pg.dir + c.src, slow: c.slow ? pg.dir + c.slow : null, t: c.t, ts: c.ts, lines: c.lines || [], video: !!c.video || /\.mp4$/.test(c.src), poster: c.poster ? pg.dir + c.poster : null }); }
+    if (p.type === 'shadow' && p.clip) { const c = p.clip; out.shadow.push({ key: at + '#' + p.id, title: c.title || tx(p.title), lp, src: pg.dir + c.src, slow: c.slow ? pg.dir + c.slow : null, t: c.t, ts: c.ts, lines: c.lines || [], marks: c.marks, cues: c.cues, video: !!c.video || /\.mp4$/.test(c.src), poster: c.poster ? pg.dir + c.poster : null }); }
     if ((p.type === 'speaking' || p.type === 'talk' || p.type === 'writing') && p.model) texts.push(byLevel(p.model, lv));
   });
   const seen = new Set();
@@ -392,22 +393,31 @@ function lcheck() {
   const sc2 = e.media.script; if (sc2 && sc2.length) $('#lscript').innerHTML = `<details style="margin-top:10px"><summary>${t('Mostra el text de l’escolta', 'Show the script')}</summary><div class="script">${sc2.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<b>' + esc(l[0]) + ':</b> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('')}</div></details>`;
 }
 
-/* 🗣 Shadowing: the unit's shadowing video and every Learning Path clip (play, slower copy, hide the script, record yourself) */
-let rec = null;
+/* 🗣 Shadowing: the unit's shadowing video and every Learning Path clip (play, slower copy, hide the script, record yourself).
+   Marks + two modes (Roger, 7 Nov 2026, shared/js/el-shadow.js): stress, linking and ↗ ↘ on the script with a key and a show/hide
+   button; 🔁 Listen and repeat (one sentence, time to say it, the next) or 🗣 Shadowing (all of it, speaking along). */
+let rec = null, PL = [];
 function shadow() {
   const vids = X.ls.filter(l => l.shadowing);
   if (!X.shadow.length && !vids.length) return $('#body').innerHTML = none();
   const ca = elCa(base(S.level));
   $('#body').innerHTML = `<div class="how"><b>${t('Com es fa', 'How it works')}</b> · ${t('1. Escolta i llegeix. 2. Murmura les paraules alhora. 3. Repeteix en veu alta just darrere la veu. 4. Amaga el text i fes-ho sense mirar. Millor amb auriculars.', '1. Listen and read. 2. Mumble the words along. 3. Say it aloud just behind the speaker. 4. Hide the script and do it without looking. Best with headphones.')}</div>`
     + vids.map((l, i) => `<div class="card"><h3>🎬 ${all() ? t('Shadowing de tota la unitat', 'Shadowing for the whole unit') + ' · ' + esc(l.title.replace(/^\S+ · /, '')) : t('Vídeo de shadowing', 'Shadowing video') + (vids.length > 1 ? ' ' + (i + 1) : '')}</h3><p class="muted">${t('El vídeo t’espera després de cada frase.', 'The video waits for you after each sentence.')}</p><video controls preload="none" playsinline poster="${ROOT + esc(l.shadowing.replace(/\.mp4$/, '-poster.jpg'))}" src="${ROOT + esc(l.shadowing)}"></video></div>`).join('')
-    + X.shadow.map((c, i) => `<div class="card"><h3>🗣 ${esc(c.title)}</h3><p class="muted">${srcLine(esc(c.lp) + ' · ')}${t('Vegades', 'Plays')}: <span id="sp${i}">${store.shadow[c.key] || 0}</span></p>
+    + X.shadow.map((c, i) => `<div class="card"><h3>🗣 ${esc(c.title)}</h3><p class="muted">${srcLine(esc(c.lp) + ' · ')}${t('Vegades', 'Plays')}: <span id="sp${i}">${store.shadow[c.key] || 0}</span></p>${elShadow.bar(c, !EN, 'btn g sm')}
       ${c.video ? `<video id="sm${i}" preload="none" playsinline poster="${esc(c.poster || c.src.replace(/\.mp4$/, '-poster.jpg'))}"></video>` : `<audio id="sm${i}" preload="metadata"></audio>`}
       <div class="row"><button class="btn sm" data-do="splay" data-i="${i}">▶ ${t('Escolta el fragment', 'Play the clip')}</button><button class="btn g sm" data-do="sstop" data-i="${i}">■ Stop</button>
       ${c.slow ? `<label><input type="checkbox" id="ss${i}" ${ca ? 'checked' : ''}> ${t('Més lent', 'Slower')}</label>` : ''}<button class="btn g sm" data-do="shide" data-i="${i}">${t('Amaga el text', 'Hide the script')}</button>
       <button class="btn g sm" data-do="srec" data-i="${i}" id="sr${i}">● ${t('Grava’t mentre sona', 'Record yourself while it plays')}</button></div>
-      <div class="script" id="st${i}">${c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<b>' + esc(l[0]) + ':</b> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('')}</div><audio id="sme${i}" controls hidden></audio><p class="muted" id="smsg${i}"></p></div>`).join('');
+      <div id="stt${i}">${elShadow.turnBox(!EN)}</div><div id="sk${i}">${elShadow.has(c) ? elShadow.key(!EN) : ''}</div>
+      <div class="script" id="st${i}">${elShadow.script(c, 'b')}</div><audio id="sme${i}" controls hidden></audio><p class="muted" id="smsg${i}"></p></div>`).join('');
+  const slowOn = (c, i) => !!(($('#ss' + i) || {}).checked && c.slow);
+  PL = X.shadow.map((c, i) => elShadow.player({ media: $('#sm' + i), clip: c, src: () => slowOn(c, i) ? c.slow : c.src, slow: () => slowOn(c, i), scriptEl: $('#st' + i), turnEl: $('#stt' + i + ' .shm-turn'), ca: !EN,
+    onStart: () => { PL.forEach((p, j) => j !== i && p.stop()); store.shadow[c.key] = (store.shadow[c.key] || 0) + 1; keep(); $('#sp' + i).textContent = store.shadow[c.key]; } }));
+  elShadow.bindBar($('#body'), { lines: [], marks: [], cues: [] }, !EN, () => PL.forEach((p, i) => { p.stop(); p.sync(); const m = $('#sm' + i); if (m) { m.pause(); m.ontimeupdate = null; } }));
 }
 function splay(i, done) {
+  if (!done && PL[i] && PL[i].has && elShadow.mode() === 'repeat') return PL[i].start(0);
+  if (PL[i]) PL[i].stop();
   const c = X.shadow[i], m = $('#sm' + i), slow = !!($('#ss' + i) || {}).checked && c.slow, src = slow ? c.slow : c.src, tt = (slow ? c.ts : c.t) || [0, 1e9];
   const go = () => { m.currentTime = tt[0]; m.play().catch(() => {}); m.ontimeupdate = () => { if (m.currentTime >= tt[1]) { m.pause(); m.ontimeupdate = null; done && done(); } }; m.onended = () => done && done(); };
   store.shadow[c.key] = (store.shadow[c.key] || 0) + 1; keep(); $('#sp' + i).textContent = store.shadow[c.key];
@@ -450,8 +460,8 @@ document.addEventListener('click', e => {
     ans: () => { ans[k.i] = +k.j; $$(`[data-do="ans"][data-i="${k.i}"]`).forEach((b, j) => b.classList.toggle('on', j === +k.j)); },
     lcheck,
     speed: () => { const e = X.listen.find(x => x.key === S.open), a = $('#aud'); a.src = k.v === '1' ? e.media.slow : e.media.src; a.currentTime = 0; $$('[data-do="speed"]').forEach(b => b.setAttribute('aria-pressed', b === el)); },
-    splay: () => splay(+k.i), sstop: () => { const m = $('#sm' + k.i); m.pause(); m.ontimeupdate = null; if (rec && rec.state === 'recording') rec.stop(); },
-    shide: () => { const s = $('#st' + k.i); s.hidden = !s.hidden; el.textContent = s.hidden ? t('Mostra el text', 'Show the script') : t('Amaga el text', 'Hide the script'); },
+    splay: () => splay(+k.i), sstop: () => { if (PL[+k.i]) PL[+k.i].stop(); const m = $('#sm' + k.i); m.pause(); m.ontimeupdate = null; if (rec && rec.state === 'recording') rec.stop(); },
+    shide: () => { const s = $('#st' + k.i); s.hidden = !s.hidden; $('#sk' + k.i).hidden = s.hidden; el.textContent = s.hidden ? t('Mostra el text', 'Show the script') : t('Amaga el text', 'Hide the script'); },
     srec: () => srec(+k.i)
   })[k.do]?.();
 });
