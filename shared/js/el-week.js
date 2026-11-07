@@ -61,7 +61,9 @@
     // what students see as homework (Roger, 6 Nov 2026: "I say when to do sth since otherwise is too much info … if we don't finish I can
     // say this is homework"): only the homework the teacher set on the dashboard (🏠 Set as homework, extra:true). The plan's "Homework by …"
     // and self-study lines are only suggestions on the teacher's dashboard. The board, el-todo.js, the Sunday email and the calendar use it.
-    studentHw(p,gi,added,from,days){return this.upcoming(p,gi,from,days,added).filter(x=>x.extra)},
+    // Homework planned ahead (Roger, 7 Nov 2026: "I want to plan that that will be homework"): one the teacher marked with 🏠 on a later
+    // class day (set = that day) reaches students only from that day: board, To do, Sunday email and calendar.
+    studentHw(p,gi,added,from,days){const t=today();return this.upcoming(p,gi,from,days,added).filter(x=>x.extra&&!(x.set&&x.set>t))},
     // calendar feed of a group (tools/gen-calendar.js writes calendar/<group id>.ics from this file): the .ics link and the link
     // that subscribes a Google Calendar to it once, so every later homework appears by itself
     calendar(gid,root){const ics=new URL("calendar/"+String(gid).toLowerCase()+".ics",root||location.href).href;
