@@ -48,10 +48,12 @@ window.EL_GRADING={
       // Where the teacher gives one-click levels: activity + step + criteria. group: given once per final-product group and copied to each member.
       // Only the video is marked in groups (Roger, 25 Oct 2026): the research card (6.1) is a level per student in round 1.
       // c may be a pseudo criterion with its own indicators (teamwork, process). The final product rows are in the final product dialog.
+      // Learning-path steps with a level (Reading log, Listening chart, Research card / Fact file) are atOnce (Roger, 7 Nov 2026: "why is that
+      // tick needed?"): marked in the Wednesday run after each hand-in, with no Time plan tick (students can only hand in what the teacher opened).
       moments:[
-        {a:LP2,step:"log",name:"Reading log",c:["4.1"]},
-        {a:LP3,step:"chart",name:"Listening chart",c:["2.2"]},
-        {a:LP4,step:"card",name:"Research card",c:["4.2","6.1","CC3 3.2"]},
+        {a:LP2,step:"log",name:"Reading log",c:["4.1"],atOnce:true},
+        {a:LP3,step:"chart",name:"Listening chart",c:["2.2"],atOnce:true},
+        {a:LP4,step:"card",name:"Research card",c:["4.2","6.1","CC3 3.2"],atOnce:true},
         {a:FP,step:"source",name:"1 · My source",c:["4.2"]},
         {a:FP,step:"research",name:"My research card (LP4 piece 3)",c:["6.1"]},
         {a:FP,step:"part",name:"3 · My part of the pitch",c:["3.2"]},
@@ -137,10 +139,12 @@ window.EL_GRADING={
       other:["6.2","CD2 2.2","CD4 4.5"],        // the 20 % block
       exam:{sections:[["listening","Listening",20,["2.2"]],["reading","Reading",20,["4.1"]],["vocabulary","Vocabulary",15,["4.1","5.1"]],["grammar","Grammar",15,["4.1","5.1"]],["writing","Writing",30,["5.1"]]],max:10,level:{step:"writing",c:"5.1"}},   // points of the real exam, /100 (grading.md, 25 Oct 2026)
       // One-click levels per student; the vlog is individual, so there are no group moments. "edit" (step 4) is where the vlog itself is marked (3.2, CD2 2.2).
+      // Learning-path steps with a level (Reading log, Listening chart, Research card / Fact file) are atOnce (Roger, 7 Nov 2026: "why is that
+      // tick needed?"): marked in the Wednesday run after each hand-in, with no Time plan tick (students can only hand in what the teacher opened).
       moments:[
-        {a:LP2,step:"log",name:"Reading log",c:["4.1"]},
-        {a:LP3,step:"chart",name:"Listening chart",c:["2.2"]},
-        {a:LP4,step:"factfile",name:"Fact file",c:["4.2","6.2"]},
+        {a:LP2,step:"log",name:"Reading log",c:["4.1"],atOnce:true},
+        {a:LP3,step:"chart",name:"Listening chart",c:["2.2"],atOnce:true},
+        {a:LP4,step:"factfile",name:"Fact file",c:["4.2","6.2"],atOnce:true},
         {a:FP,step:"source",name:"1 · My source",c:["4.2"]},
         {a:FP,step:"factfile",name:"My fact file and credits (LP4 piece 3 + last slide)",c:["6.2"]},
         {a:FP,step:"script",name:"3 · My script and slides",c:["5.1"]},
