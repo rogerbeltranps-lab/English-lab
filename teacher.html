@@ -1588,6 +1588,10 @@ const ptStuds=g=>Object.values(S.P).filter(s=>s.group===g&&!s.tester&&pkey(s)).s
 const ptBest=g=>Math.max(0,...ptStuds(g).map(ptOn));
 // activities of the term missing for the bonus (elMissing in el-points.js; Roger, 30 Oct 2026: without all the work done, no bonus)
 const ptMiss=s=>s.uid?elMissing(s.group,S.term,a=>isDone(s.uid,a),ls=>S.D.ls[ls]):null,ptGets=(s,best,m)=>m&&m.length?0:elBonus(ptOn(s),best);
+// the missing work in TABS (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!"; elTabsLeft in el-catalog.js), as the student's board:
+// [[activity, due day, [tab names]]] and the number of tabs
+const ptTabs=(s,m)=>(m||[]).map(([a,d])=>[a,d,elTabsLeft(a,doneSet(s.uid,a),(S.D.rs[s.uid]||{})[a.id]).filter(g=>g.length).map(g=>{const c=!isLS1(a)&&lpCols(a).find(x=>x.ks.includes(g[0]));return c?c.n:g[0]})]);
+const ptTabsN=(s,m)=>(m||[]).reduce((n,[a])=>n+elTabsLeft(a,doneSet(s.uid,a),(S.D.rs[s.uid]||{})[a.id]).length,0);
 // The bonus is in proportion to the best student with all the work done (Roger, 30 Oct 2026), not the best of everyone. The dashboard
 // works it out (only it sees every student's work) and keeps it in teams/{group}.bestOk.{term} for the student board; it rewrites it
 // whenever it renders and the value has changed, so it follows new work, new due days and point changes.
@@ -1604,7 +1608,7 @@ const pt={
 function ptCsv(g){
   const studs=ptStuds(g),best=ptBestOk(g),q=v=>'"'+String(v).replace(/"/g,'""')+'"';
   const rows=[["Student","Email","Points","All work done","Missing","Bonus"]].concat(studs.map(s=>{const p=ptOn(s),m=ptMiss(s);
-    return [fullName(s),s.email||"",p,!m?"not signed in":m.length?"no":"yes",(m||[]).map(([a])=>a.title).join(" · "),elNum(ptGets(s,best,m),"ca")]}));
+    return [fullName(s),s.email||"",p,!m?"not signed in":m.length?"no":"yes",ptTabs(s,m).map(([a,,ns])=>a.title+(ns.length?" ("+ns.join(", ")+")":"")).join(" · "),elNum(ptGets(s,best,m),"ca")]}));
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+rows.map(r=>r.map(q).join(";")).join("\r\n")],{type:"text/csv"}));
   a.download=`points-${g}-${S.term}.csv`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5e3);
 }
@@ -1612,8 +1616,9 @@ function pointsBox(g){
   const studs=ptStuds(g),term=S.term,best=ptBestOk(g),top=ptBest(g),now=elTerm();
   const terms=EL_TERMS.map(t=>`<button class="chip ${t.id===term?"on":""}" data-do="ptterm" data-t="${t.id}">${t.en}${t.id===now?" · now":""}</button>`).join("");
   let ok=0;
-  const work=m=>!m?'<span class="muted" title="Not signed in yet: no work saved">–</span>':m.length?`<span class="late" title="${esc(m.map(([a,d])=>a.title+" · due "+ELWeek.date(d)).join("\n"))}">✗ ${m.length} missing</span>`:(ok++,'<span class="ptok">✓ All done</span>');
-  const rows=studs.map(s=>{const p=ptOn(s),k=esc(pkey(s)),m=ptMiss(s),b=elBonus(p,best);return `<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td><td class="ptn"><button class="lv" data-do="ptadd" data-k="${k}" data-d="-1" ${p>0?"":"disabled"} aria-label="Remove a point">−</button> <b>${p}</b> <button class="lv" data-do="ptadd" data-k="${k}" data-d="1" aria-label="Add a point">+</button></td><td>${work(m)}</td><td>${m&&m.length&&b?`<s class="muted" title="No bonus until all the work is done">+${elNum(b)}</s> <b>+0</b>`:`<b>+${elNum(ptGets(s,best,m))}</b>`}</td></tr>`}).join("");
+  const work=(m,s)=>{if(!m)return '<span class="muted" title="Not signed in yet: no work saved">–</span>';if(!m.length)return ok++,'<span class="ptok">✓ All done</span>';const n=ptTabsN(s,m);   // in tabs, as on the student's board
+    return `<span class="late" title="${esc(ptTabs(s,m).map(([a,d,ns])=>a.title+" · due "+ELWeek.date(d)+(ns.length?": "+ns.join(", "):"")).join("\n"))}">✗ ${n} ${n===1?"tab":"tabs"} missing</span>`};
+  const rows=studs.map(s=>{const p=ptOn(s),k=esc(pkey(s)),m=ptMiss(s),b=elBonus(p,best);return `<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td><td class="ptn"><button class="lv" data-do="ptadd" data-k="${k}" data-d="-1" ${p>0?"":"disabled"} aria-label="Remove a point">−</button> <b>${p}</b> <button class="lv" data-do="ptadd" data-k="${k}" data-d="1" aria-label="Add a point">+</button></td><td>${work(m,s)}</td><td>${m&&m.length&&b?`<s class="muted" title="No bonus until all the work is done">+${elNum(b)}</s> <b>+0</b>`:`<b>+${elNum(ptGets(s,best,m))}</b>`}</td></tr>`}).join("");
   const body=(S.D.ptErr?'<p><b>The team points could not be read.</b> Publish the Firestore rules (they publish when the change reaches main) and reload.</p>':"")
     +`<p class="muted">Points from the <a href="lab/game/host.html" target="_blank">🎮 class games</a> (<a href="lab/game/results.html?g=${encodeURIComponent(g)}" target="_blank">📊 results by game and student</a>) (choose a game and the group: its signed-in students are taken into it) and the class presentations: open 📡 Class there, signed in with this account, and start the class for ${esc(GR.find(x=>x.id===g).name)}; students join from the Learning Path and every right answer they tap is +1. Bonus on the term grade = ${elNum(EL_POINTS_BONUS)} × the student's points ÷ the points of the best student in the group with all the work done (${best} in ${elTermName(term)}; the top score of everyone is ${top}), so it only adds; every term starts at 0. A change here (an absent student, a mistake) is for that student only. Students see their points and their bonus on their board.</p>`
     +`<p class="muted"><b>All the work done:</b> only a student who has done every activity due so far this term gets the bonus (activities of the time plan whose due day is past, in learning paths you opened for the group; done late still counts; the final product and homework do not). Hover “missing” for the list. Students see the same on their board.</p>`
