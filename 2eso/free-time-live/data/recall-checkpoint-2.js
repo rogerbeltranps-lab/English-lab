@@ -29,12 +29,14 @@ window.LP = {
     {
      "id": "c2-01",
      "r": "beginners",
-     "q": "I ___ to music on the bus. (escoltar)"
+     "q": "I ___ to music on the bus. (escoltar)",
+     "o": ["dancing", "listen", "play"]
     },
     {
      "id": "c2-02",
      "r": "beginners",
-     "q": "It’s 30 degrees. It’s very ___. (calor)"
+     "q": "It’s 30 degrees. It’s very ___. (calor)",
+     "o": ["windy", "cold", "hot"]
     },
     {
      "id": "c2-03",
@@ -44,17 +46,20 @@ window.LP = {
     {
      "id": "c2-04",
      "r": "beginners",
-     "q": "Write the -ing form: dance → ___"
+     "q": "Write the -ing form: dance → ___",
+     "o": ["danceing", "dances", "dancing"]
     },
     {
      "id": "c2-05",
      "r": "beginners",
-     "q": "I usually ___ (play) football on Saturdays."
+     "q": "I usually ___ (play) football on Saturdays.",
+     "o": ["are playing", "plays", "play"]
     },
     {
      "id": "c2-06",
      "r": "beginners",
-     "q": "Today I ___ (play) basketball."
+     "q": "Today I ___ (play) basketball.",
+     "o": ["am playing", "is playing", "play"]
     },
     {
      "id": "c2-07",
