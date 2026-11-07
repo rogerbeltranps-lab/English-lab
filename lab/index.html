@@ -206,12 +206,13 @@
       return { course: g.course, route: lv || 'insecure', set: !!lv, k: elCefr(g.course, lv || 'insecure') };
     }
     // which LSs a student may see (Roger: students never see locked items): their own course's LSs that are not hidden and are
-    // assigned to their group; the other course's (same CEFR step) only once open or closed. Cached reads of ls/{id}, no new ones.
+    // assigned to their group. Own course only (Roger, 7 Nov 2026: "here the same only their course"): no other-course games at the
+    // same CEFR step. Cached reads of ls/{id}, no new ones.
     async function visibleLs(){
       const g = groupId(), mineC = ((window.EL_GROUPS || []).find(x => x.id === g) || {}).course, ok = {};
       await Promise.all((window.EL_LS || []).map(async l => { let i = {}; try { i = (await lsInfo(l.id)) || {} } catch (e) {}
         const st = i.status || 'hidden';
-        ok[l.id] = l.course === mineC ? st !== 'hidden' && (!window.elLsForGroup || elLsForGroup(l, i, g)) : /^(open|closed)$/.test(st); }));
+        ok[l.id] = l.course === mineC && st !== 'hidden' && (!window.elLsForGroup || elLsForGroup(l, i, g)); }));
       return ok;
     }
 
@@ -221,7 +222,7 @@
       document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !canSwitch; });
       if (inside && !canSwitch && mine && mine.k) step = mine.k;
       if (!L.some(x => x.k === step)) step = (L[2] || L[0] || {}).k;
-      const st = L.find(x => x.k === step) || { pairs: [] }, courses = st.pairs.map(p => p[0]);
+      const st = L.find(x => x.k === step) || { pairs: [] }, courses = inside && !canSwitch && mine ? [mine.course] : st.pairs.map(p => p[0]);   // a student: own course only
       $('levelPick').hidden = !canSwitch;
       if (canSwitch) {
         $('levelPick').innerHTML = L.map(x => `<button type="button" class="level-btn ${x.k === step ? 'on' : ''}" data-step="${x.k}" aria-pressed="${x.k === step}"><strong>${x.k}</strong><span>${x.pairs.map(([c, lv]) => COURSES[c] + ' ' + name(lv)).join(' + ')}</span></button>`).join('');
@@ -239,11 +240,9 @@
       if (!inside) return;
       if (!early && user && !DEMO && (canSwitch || mine)) try { localStorage.setItem(LAST, JSON.stringify({ uid: user.uid, canSwitch, mine, lsOk })) } catch (e) {}
       $('levelTag').textContent = canSwitch ? step : t('El teu nivell: ', 'Your level: ') + step;
-      const other = !canSwitch && mine && courses.find(c => c !== mine.course);
       $('levelTag').hidden = canSwitch;   // the teacher sees the step on its button
-      $('levelNote').hidden = !canSwitch && !other;
-      $('levelNote').textContent = canSwitch ? st.pairs.map(([c, lv]) => COURSES[c] + ' ' + name(lv)).join(' + ')
-        : other ? t(`També hi tens els jocs dels alumnes de ${COURSES[other]} amb el teu nivell.`, `You also get the games of ${COURSES[other]} students at your level.`) : '';
+      $('levelNote').hidden = !canSwitch;
+      $('levelNote').textContent = canSwitch ? st.pairs.map(([c, lv]) => COURSES[c] + ' ' + name(lv)).join(' + ') : '';
       // a student: only the LSs they can open; until those are known (first drawing), the ones this browser showed last time
       const seen = early ? early.lsOk : lsOk;
       let n = 0;
