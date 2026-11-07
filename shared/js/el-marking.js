@@ -173,6 +173,9 @@ window.ELMark=(function(){
   // Clearly pasted (Roger, 4 Nov 2026: "when this happens and you see it on Wednesdays, you can automatically send redo"): most of the
   // text came in by pasting and little was typed. A possible copy like this is sent back at once by the Wednesday run (marks.mjs), with
   // the note above; any other possible copy still waits for the teacher. Never for the Pro route.
-  const pasted=t=>{t=t||{};const n=+t.n||0;return n>=40&&(+t.p||0)>=0.8*n&&(+t.k||0)<0.5*n};
+  // The keys count Backspace too (el-typing.js), so deleting part of a long paste looked like typing (Roger, 7 Nov 2026, on a text with
+  // 646 characters pasted for 383 kept, 271 keys in 16 s: "it's evident, why didn't you do it automatically?"): the characters pasted
+  // beyond the final text (p − n) were deleted, and those keys are not counted as typed.
+  const pasted=t=>{t=t||{};const n=+t.n||0,p=+t.p||0,typed=(+t.k||0)-Math.max(0,p-n);return n>=40&&p>=0.8*n&&typed<0.5*n};
   return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,q,open,asked,CV,commentSheet,parseComments,REDO,redoWhy,redoNote,pasted};
 })();

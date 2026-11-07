@@ -617,11 +617,18 @@ function tryCell(u,id,k){const f=firstOf(u,id,k),l=lastOf(u,id,k);if(!f&&!l)retu
 // · ⚠️ copy? (a possible copy waiting in the To do) · 🔁 redo · a level (NA · AS · AN · AE). LS1 writings stay not scored.
 const sigOf=t=>{let h=5381;for(const ch of String(t))h=(h*33+ch.codePointAt(0))>>>0;return h.toString(36)};
 const isWriting=(a,k,st)=>!(a.skip||[]).includes(k)&&(k==="write"||!!(((st||{}).steps||{})[k]||{}).w);
-function wrState(u,a,k){if(!window.ELMark)return null;const st=pstate(u,a);if(!isWriting(a,k,st))return null;
+// Every step Claude corrects opens the same way (Roger, 7 Nov 2026: "I want to be able to check the corrections so that I click and see
+// them, like the writings"): Speaking and Talk transcripts, the Reading log, Listening chart and other hand-ins with a level, and any
+// other text handed in (ELMark.fbItems), not only the writings. LS1 stays as it is (Roger: leave LS1 alone).
+const isCorrected=(a,k,st)=>{if(isWriting(a,k,st))return true;if(/-my-real-routine$/.test(a.ls))return false;
+  const g=(window.EL_GRADING||{})[a.ls]||{};if(g.only||(g.fp&&g.fp.a===a.id)||!window.ELMark)return false;
+  if((g.moments||[]).some(m=>m.a===a.id&&m.step===k&&!m.group))return !!(((st||{}).steps||{})[k]);
+  return !(a.skip||[]).includes(k)&&!!ELMark.fbItems(st,new Set(),/reflect$/.test(a.id)?"reflect":null)[k]};
+function wrState(u,a,k){if(!window.ELMark)return null;const st=pstate(u,a);if(!isCorrected(a,k,st))return null;
   const g=(window.EL_GRADING||{})[a.ls]||{};if(g.only)return null;
   const ms=(g.moments||[]).filter(m=>m.a===a.id),mo=ms.find(m=>m.step===k),x=res(u,a.id),fl=(x.flags||{})[k],today=ELWeek.today();
-  const it=mo?((st.steps||{})[k]?{fields:(st.steps[k].f||[]),date:st.steps[k].date}:null):ELMark.fbItems(st,new Set(ms.map(m=>m.step)))[k];
-  if(!it)return null;const day=String(it.date||"").slice(0,10),on=day?" on "+day:"",late=day&&ELMark.late(day,today);
+  const it=mo?((st.steps||{})[k]?{fields:(st.steps[k].f||[]),date:st.steps[k].date}:null):ELMark.fbItems(st,new Set(ms.map(m=>m.step)),/reflect$/.test(a.id)?"reflect":null)[k];
+  if(!it)return null;const day=tms(it.date)?ymd(tms(it.date)):"",on=day?" on "+day:"",late=day&&ELMark.late(day,today);
   if(fl&&!fl.done)return {i:"⚠️ copy?",t:"Possible copy: waiting for you in the To do"+(fl.why?" ("+fl.why+")":""),c:"wrc"};
   if(mo){const lv=Object.values((x.levels||{})[k]||{});const mk=(x.marked||{})[k],again=mk&&day&&String(mk).slice(0,10)<day;
     if(lv.length&&!again)return {i:lv.join(" "),t:"Level given"+(mk?" on "+String(mk).slice(0,10):""),c:"wrl"};
@@ -639,9 +646,10 @@ const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return w?`<br><small class="wr ${w
 const EN=(c,e)=>e,corrBox='margin:8px 0;padding:12px 14px;border:2px solid #16a34a;border-radius:14px;background:#f0fdf4;color:#0f172a;font:15px/1.5 system-ui,sans-serif';
 function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=res(u,aid),fl=(x.flags||{})[step];
   if(fl&&fl.why&&!fl.done)return cpOpen(u,aid,step);
-  const w=wrState(u,a,step)||{i:"",t:""},it=ELMark.fbItems(pstate(u,a))[step]||{fields:[]},f=it.fields||[],orig=String((f[0]||{}).v||"");
-  const t=(x.replies||{})[step],fs=(x.fbSig||{})[step],lv=Object.entries((x.levels||{})[step]||{}),old=!!t&&!!fs&&fs!=="redo"&&fs!==sigOf(JSON.stringify(f));
-  const mo=(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).some(m=>m.a===aid&&m.step===step),canBack=!!f.length&&!mo&&!(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")));
+  const w=wrState(u,a,step)||{i:"",t:""},it=ELMark.fbItems(pstate(u,a),new Set(),/reflect$/.test(aid)?"reflect":null)[step]||{fields:[]},f=it.fields||[],orig=String((f[0]||{}).v||"");
+  // rich: a correction with the table (✗ rows, ✅ corrected text) shows the first text inside it; plain feedback (a Reading log's comment) shows every answer below it
+  const t=(x.replies||{})[step],rich=/^(✗|✅) /m.test(String(t||"")),fs=(x.fbSig||{})[step],lv=Object.entries((x.levels||{})[step]||{}),old=!!t&&!!fs&&fs!=="redo"&&fs!==sigOf(JSON.stringify(f));
+  const mo=(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).some(m=>m.a===aid&&m.step===step),canBack=!!f.length&&!mo&&isWriting(a,step,pstate(u,a))&&!(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")));
   const on=v=>v?ELWeek.date(ymd(v)):"",log=it.ty?`<p class="muted">✍️ Writing log: ${esc(ELMark.tyText(it.ty))}</p>`:"";
   const back=fl&&fl.back&&fl.done==="redo"?`<p class="muted">↩ <b>You sent it back</b>${fl.at?" on "+on(fl.at):""}: “${esc(fl.back)}”</p>`:"";
   const copy=fl&&fl.why&&!fl.back?`<p class="muted">⚠️ <b>Possible copy</b>${fl.at?" on "+on(fl.at):""}: ${esc(fl.why)} · ${fl.done==="redo"?(fl.auto?"sent back automatically to redo (mostly pasted)":"you sent it back to redo"):"you accepted it as their work"}${fl.auto&&fl.done==="redo"&&canBack===false?` <button class="g mini" data-do="cpopen" data-u="${u}" data-a="${esc(aid)}" data-s="${esc(step)}" title="Open the check: Accept it if it is their own work">Check it</button>`:""}</p>`:"";
@@ -649,11 +657,12 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
     <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
-    ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(f.slice(1)))
+    ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
+      :lv.length?`<p><b>Handed in</b> <small class="muted">(marked with a level, no written comment)</small></p>${more(f)}`
       :`<p><b>Handed in</b> <small class="muted">(no correction yet: Claude corrects it in the Wednesday run)</small></p>${more(f)}`}
     ${canBack?backBox(u,aid,step,orig):""}
     <div class="row" style="justify-content:flex-start"><button class="g" data-do="cell" data-u="${u}" data-a="${esc(aid)}">All their work in this learning path</button></div>`,true);
-  if(t)writing($("#wrfix"),t,EN,old?"":orig)}
+  if(t)writing($("#wrfix"),t,EN,old||!rich?"":orig)}
 // ↩ Send it back (Roger, 4 Nov 2026, on a text filled with "c c c" to reach the minimum: "I want to be able to tell him that they need to
 // write the characters missing"): a message in the student's language (Catalan for Starter/Base, English for Core/Plus; ready-made for
 // the usual cases, editable) goes on top of the correction, the writing opens again on their page (flags[step] = {done: "redo", back,
@@ -1307,6 +1316,11 @@ function corrPage(){
       +`<span class="ct">${allNow?plural(allNow,"piece")+" waiting to be corrected":"Nothing is waiting"}</span>`
       +`<span class="cs">${st.st?`Last run: ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}. `:""}${allNow?"Don't want to wait until Wednesday? Claude can correct them now (every group).":"Everything students handed in is corrected."}</span>`
       +(allNow?`<div class="cgo"><button data-do="corrask">✏️ Correct everything waiting now</button></div>`:"")+`</div>`;
+  // The waiting list is worked out from the students' work this dashboard has loaded (Roger, 7 Nov 2026: "I don't understand this, didn't
+  // you correct this?": the page showed Friday night's copy, after Claude's Saturday runs had corrected it all). When a run started after
+  // a group's work was fetched, say so and offer to fetch it again (DEMO: never).
+  const ranAt=Math.max(tms((S.D.mk||{}).run&&S.D.mk.run.done),tms((S.D.mk||{}).run&&S.D.mk.run.started)),oldG=DEMO?[]:GR.filter(g=>ranAt&&(AT.g[g.id]||0)<ranAt),
+    stale=oldG.length?`<div class="hal" style="margin:0 0 10px;padding:10px 12px;border:2px solid #f59e0b;border-radius:12px;background:#fffbeb">⚠️ <b>These numbers may be old.</b> Claude corrected work on ${esc(corrWhen(ranAt))}, after this page fetched ${oldG.length===GR.length?"the students' work":esc(oldG.map(g=>g.name).join(", "))} (${esc(whenAt(Math.min(...oldG.map(g=>AT.g[g.id]||0))))}). Fetch it again to see what is really waiting. <button class="mini" data-load="all">🔄 Update all</button></div>`:"";
   const gchips=`<div class="bar"><span class="muted">Group:</span> `+["all",...GR.map(g=>g.id)].map(g=>`<button class="chip ${S.corrG===g?"on":""}" data-do="corrg" data-g="${g}">${g==="all"?"All groups":esc(GR.find(x=>x.id===g).name)}</button>`).join("")+`</div>`;
   const byG=(L,f)=>GR.filter(g=>L.some(i=>i.gid===g.id)).map(g=>{const is=L.filter(i=>i.gid===g.id);return f(g,is)}).join("");
   // Waiting, in plain words (Roger, 6 Nov 2026: "I need info that I can understand, so if there is work to correct, even if you correct it, I
@@ -1342,7 +1356,7 @@ function corrPage(){
       <li><b>When you ask in the English Lab chat</b> · fixes, new features and new audio.</li></ul>
     <h3>If Claude stopped</h3><p>Students could still do everything. Their writings would wait here without a correction and comments would stay unanswered. You can always do it by hand: open a hand-in and write your correction, or use 🤖 Marking sheet in a group's To do. Corrections stay the same whoever writes them.</p>`)}</div>`;
   return `<div class="ph"><h1>✏️ Corrections</h1><div class="sub">Writings, speaking and Talk transcripts, reflections and marked steps of every group · Claude corrects them every Wednesday</div></div>`
-    +`<div class="hgrid"><div class="hl">${card}${gchips}${waitB}</div><div class="hl">${infoB}${histB}</div></div>`}
+    +`<div class="hgrid"><div class="hl">${stale}${card}${gchips}${waitB}</div><div class="hl">${infoB}${histB}</div></div>`}
 function corrOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;const f=flagOf(k.u,k.a,k.s);
   if(k.k==="answer")return cellPanel(k.u,k.a);if(f&&f.why&&!f.done)return cpOpen(k.u,k.a,k.s);wrOpen(k.u,k.a,k.s)}
 // the menu badge and the Home tile: pieces waiting for the next run (red when some are late), ✏️ while Claude is correcting
