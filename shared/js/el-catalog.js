@@ -490,3 +490,33 @@ window.elStudentMenu=function(o){
     +b("help","",bq+"#help","❓",t("Ajuda","Help"))
     +(o.app?"":b("phone","",bq+"#phone","📱",t("Estudia amb el mòbil","Study on your phone")));
 };
+
+// The class tab (class mode, el-cloud.js cmTeacher) has no side menu (Roger, 7 Nov 2026: "when I stop the class this appears and I don't
+// need it. Plus it appears for a sec when the class is running"): this file runs before any menu is drawn (el-app.js .elrail on the
+// learning paths, el-ls-home.js .nvs on the LS home), so the browser tab opened with ?elcm= is marked at once (sessionStorage el_cmtab,
+// kept for the tab's life) and its menu buttons are never shown, not even for a moment. While class mode is on, the left column stays
+// as the place of 📋 Today (el-cm-agenda.js docks there); once it stops (html.elcmon taken off by cmTeacher's quit) the column goes too
+// and the page uses the whole width. Other tabs (the dashboard, a normal learning path page) keep their menu.
+(function () {
+  let tab = false, on = false;
+  try {
+    if (new URLSearchParams(location.search).has("elcm")) sessionStorage.setItem("el_cmtab", "1");
+    tab = sessionStorage.getItem("el_cmtab") === "1";
+    const o = JSON.parse(sessionStorage.getItem("el_cm") || "null");
+    on = new URLSearchParams(location.search).has("elcm") || !!(o && o.g && Date.now() < o.until);
+  } catch (e) {}
+  if (!tab) return;
+  const h = document.documentElement;
+  h.classList.add("elcmtab");
+  if (on) h.classList.add("elcmon");
+  const st = document.createElement("style");
+  st.id = "el-cmtab-css";
+  st.textContent = "html.elcmtab .elrail .elside,html.elcmtab .elrail .eln,html.elcmtab aside.side .nvs,"
+    + "html.elcmtab .elbar,html.elcmtab .nvs-m,html.elcmtab #bnav{display:none!important}"
+    + "html.elcmtab:not(.elcmon) .elrail,html.elcmtab:not(.elcmon) aside.side{display:none!important}"
+    + "html.elcmtab:not(.elcmon) body.elapp.elhas-rail{padding-left:0!important}"
+    + "html.elcmtab:not(.elcmon) .app{grid-template-columns:minmax(0,1fr)!important}"
+    // a narrow window: no room for the docked agenda (it floats above the chip), so no empty strip either
+    + "@media (max-width:980px){html.elcmtab .elrail{display:none!important}html.elcmtab body.elapp.elhas-rail{padding-left:0!important}}";
+  (document.head || h).append(st);
+})();

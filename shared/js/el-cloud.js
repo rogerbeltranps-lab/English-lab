@@ -945,7 +945,8 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   const agLoad=()=>agM?Promise.resolve(agM):import(new URL("shared/js/el-cm-agenda.js",ROOT).href).then(m=>{agM=m;m.setup({db,doc,setDoc,lsInfo,root:ROOT,g:o.g,gname:gn});return m});
   const agToggle=()=>agLoad().then(m=>m.isOpen()?m.close():m.open()).catch(e=>console.warn("agenda",e));
   const key=x=>x.u+"#"+x.p;
-  function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;if(agM)agM.close();if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
+  function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;if(agM)agM.close();document.documentElement.classList.remove("elcmon");   // the class tab drops its left column (el-catalog.js)
+  if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
   // class mode puts the group in full screen until it stops (Roger, 7 Nov 2026: "only when I go class mode outside my schedule … then I
   // press end class mode and I don't need that button"): the first move of this class mode also writes live/{group}.fs; Stop clears it
   // (inside a class of the timetable full screen stays on by itself, elFsEff)
