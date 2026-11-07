@@ -1578,9 +1578,10 @@ const canHw=a=>GR.some(g=>g.id===S.g)&&((window.EL_SECTIONS||{})[a.id]||[]).leng
 // grammar and vocabulary games of this LS (gameResults of the group, read once per dashboard load: one read per game played)
 const GAMES={};
 function gameRings(s){const g=GAMES[S.g];if(!g||g.busy||!s.email)return "";const em=String(s.email).toLowerCase(),ls=S.ls||"";
-  const mine=g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done}:null}).filter(Boolean);
-  if(!mine.length)return "";const st=elGameStats(mine);
-  return `<a class="grings" href="lab/game/results.html?g=${encodeURIComponent(S.g)}" target="_blank" rel="noopener" title="Class games of this LS: % right in 🧩 grammar and 📚 vocabulary (click for the answers and notes)"><span>🧩</span>${elRing(st.grammar,"",30)}<span>📚</span>${elRing(st.vocab,"",30)}</a>`}
+  const mine=g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done,title:x.title,day:x.day,lp:x.lp,ls:x.ls}:null}).filter(Boolean);
+  if(!mine.length)return "";const st=elGameStats(mine),gl=(mine.find(x=>x.ls)||{}).ls||"",click="\nClick: every answer and the notes";
+  // hover a circle = the games it counts; click = Results open on this student (Roger, 7 Nov 2026: "they should see grammar games, when they go to the percentage")
+  return `<a class="grings" href="lab/game/results.html?g=${encodeURIComponent(S.g)}${gl?"&ls="+encodeURIComponent(gl):""}&stu=${encodeURIComponent(em)}" target="_blank" rel="noopener" title="Class games of this LS: % right in 🧩 grammar and 📚 vocabulary (click for the answers and notes)"><span>🧩</span>${elRing(st.grammar,"",30,elGameTip(mine,"grammar")+click)}<span>📚</span>${elRing(st.vocab,"",30,elGameTip(mine,"vocab")+click)}</a>`}
 function loadGames(){const g=S.g;if(!g||GAMES[g])return;if(DEMO){if(DEMO.games)GAMES[g]={list:DEMO.games.filter(x=>x.group===g)};return}GAMES[g]={busy:true,list:[]};
   F.getDocs(F.query(F.collection(db(),"gameResults"),F.where("group","==",g))).then(q=>{
     const lsOf=x=>{const nm=String(x.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase(),l=(window.EL_LS||[]).find(y=>y.course===x.course&&y.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""};

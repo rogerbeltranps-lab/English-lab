@@ -116,7 +116,9 @@ async function load(){
     }
     R.all=R.games.map(skipOff).filter(x=>x.done||(x.nts||[]).length);pickLs();
   }catch(e){console.warn("results",e);R.err=e.message}
-  R.loading=false;R.sel="";R.stu="";draw();
+  // ?stu=email (a 🧩 📚 circle on the dashboard): that student open the first time, scrolled to
+  const st=P.get("stu");R.loading=false;R.sel="";R.stu=st&&!R.opened&&R.names[st.toLowerCase()]?st.toLowerCase():"";R.opened=true;draw();
+  if(R.stu){const r=app$.querySelector("tr.row.sel");if(r){r.scrollIntoView({block:"start"});scrollBy(0,-70)}}
 }
 // Questions nobody answered were skipped on the board (Roger, 6 Nov 2026: "if no student answered a question it is because I skipped it, so
 // it shouldn't count for the statistics"): they leave qs, done and every student's miss list (old games too: qs[].of = how many answered)
