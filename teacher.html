@@ -571,7 +571,7 @@ function cell(u,a){ // text + class of an activity's score cell
   if(x&&x.feedback)t+=" 💬";
   if(unanswered(u,a).length)t+=" ✉️";
   if(!a.manual&&x&&x.locked)t+=`<br><small class="muted">📤 submitted</small>`;else if(!a.manual&&x&&x.markedDone)t+=`<br><small class="muted">🟡 marked done</small>`;
-  const n=req.length-miss.length,tip=a.manual||!req.length?"":`${n} of ${req.length} steps done${a.graded?"\nScore = 1 point per step done: how much is done, not how well (not the LS mark)":""}${miss.length?"\nMissing: "+miss.join(", "):"\nAll done"}${x&&x.locked&&miss.length?"\nPressed Submit before finishing":""}`;
+  const n=req.length-miss.length,tip=a.manual||!req.length?"":`${n} of ${req.length} steps done${a.graded?"\nScore = 1 point per step done: how much is done, not how well (not the LS mark)":""}${miss.length?"\nMissing: "+miss.map(k=>tabName(a,k)).join(", "):"\nAll done"}${x&&x.locked&&miss.length?"\nPressed Submit before finishing":""}`;
   const cd=a.checkpoint&&cpDoc(u,a),ck=cd&&S.D.ck[a.keys[0]];   // secure checkpoint: marked here from the key (cpInject)
   if(cd&&!cd.redo&&ck){const m=cpMark(cd,ck);if(t==="–")t="✔";t+=`<br><small title="First try, marked with the answer key">1st try ${m.score}/${m.max}${cd.auto==="left"?" ⚡":""}</small>`}
   else if(x&&x.parts&&x.parts.first)t+=`<br><small title="First attempt (does not count)">1st try ${x.parts.first.score}/${x.parts.first.max}</small>`;
@@ -682,7 +682,7 @@ function onTime(u,id,step,g){const due=stepDueOf(id,step,g)||dueOf(id,g);if(!due
 // Averages: missing values (null) count 0 or are left out, as the "Missing work" switch says
 const avg=vs=>{vs=vs.map(v=>v==null?(S.zero?0:null):v).filter(v=>v!=null);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null};
 const wavg=ps=>{let s=0,w=0;ps.forEach(([v,x])=>{if(v==null){if(!S.zero)return;v=0}s+=v*x;w+=x});return w?s/w:null};
-const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).title||id)+" · "+k;
+const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).title||id)+" · "+esc(tabName(byId(id),k));
 // Grammar and vocabulary: weighted parts (EL_GRADING[ls].gv.parts). first: the average first-try score of those steps (checkpoints, recall
 // warm-ups: delayed retrieval); time: the share of those steps done by their session deadline (teaching plan), out of 10.
 // S.dueZero = a group id (progSync, the student board's mark so far; Roger, 2 Nov 2026: "students must understand that if they don't work
@@ -1591,22 +1591,46 @@ function loadGames(){const g=S.g;if(!g||GAMES[g])return;if(DEMO){if(DEMO.games)G
 const stepTab=(a,k)=>{const ids=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]);return ids.includes(k)?k:(k==="cards"||k==="practice")&&ids.includes("vocab")?"vocab":""};
 const stepLink=(a,k)=>{const t=stepTab(a,k),n=t&&(((window.EL_SECTIONS||{})[a.id]||[]).find(x=>x[0]===t)||[])[1];
   return `<a class="stl" href="${esc(a.path)}${t?"#"+esc(t):""}" target="_blank" rel="noopener" title="Open ${esc(a.title)}${n?" at the “"+esc(n)+"” tab":""}">${esc(k)}</a>`};
+// The columns are the tabs of the learning path (Roger, 7 Nov 2026: "practice, cards don't exist in the web"): one column per tab, with the
+// tab's own name and in the page's order (EL_SECTIONS), so the table reads like the path the student sees (Recall, Vocabulary, Reading …).
+// The Vocabulary tab holds two steps (its study cards and its sentences): one column, ✔ when both are done, "1 of 2" while one is missing.
+// A step with no tab of its own (a recall checkpoint) keeps its own column. Only the names and grouping change: the steps, the ✔, the tries
+// and the score are counted as before (a.points still counts the two vocabulary steps). LS1 keeps its step keys (Roger: leave LS1 alone).
+const isLS1=a=>/-my-real-routine$/.test(a.ls),STEPNM={check:"Checkpoint"},cap=k=>k.charAt(0).toUpperCase()+k.slice(1);
+const secName=(a,t)=>((((window.EL_SECTIONS||{})[a.id]||[]).find(x=>x[0]===t)||[])[1]||cap(t)).replace(/^\W+\s*/,"");
+const COLS=new Map();
+function lpCols(a){if(COLS.has(a.id))return COLS.get(a.id);const ks=steps(a);let out;
+  if(isLS1(a))out=ks.map(k=>({ks:[k],t:stepTab(a,k),n:k}));
+  else{const by=new Map(),rest=[];ks.forEach(k=>{const t=stepTab(a,k);if(t){if(!by.has(t))by.set(t,[]);by.get(t).push(k)}else rest.push(k)});
+    out=[...((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]).filter(t=>by.has(t)).map(t=>({ks:by.get(t),t,n:secName(a,t)})),...rest.map(k=>({ks:[k],t:"",n:STEPNM[k]||cap(k)}))]}
+  COLS.set(a.id,out);return out}
+// a step's name for Roger (tooltips, the student's activity dialog, the mark breakdown): its tab, "Vocabulary · study cards" / "· sentences" for the two vocabulary steps
+const tabName=(a,k)=>{if(!a||isLS1(a))return k;const c=lpCols(a).find(x=>x.ks.includes(k));if(!c)return k;
+  return c.ks.length>1?c.n+" · "+(k==="cards"?"study cards":k==="practice"?"sentences":k):c.n};
+const colSkip=(a,c)=>c.ks.every(k=>(a.skip||[]).includes(k));
+const colLink=(a,c)=>`<a class="stl" href="${esc(a.path)}${c.t?"#"+esc(c.t):""}" target="_blank" rel="noopener" title="Open ${esc(a.title)}${c.t?" at the “"+esc(c.n)+"” tab":""}${c.ks.length>1?" ("+c.ks.map(k=>tabName(a,k)).join(" + ")+")":""}">${esc(c.n)}</a>`;
+const colCrit=(a,c)=>{if(c.ks.length===1||colSkip(a,c))return stepCrit(a,c.ks[0]);const sc=(window.EL_STEP_CRITERIA||{})[a.id]||{};
+  const cs=[...new Set(c.ks.filter(k=>!(a.skip||[]).includes(k)).flatMap(k=>sc[k]||EL_EVIDENCE[k]||[]))];
+  return cs.map(pill).join("")||'<small class="muted" title="Language practice: no criterion linked">–</small>'};
+const colCell=(u,a,c,d)=>{const n=c.ks.filter(k=>d.has(k)).length;
+  return (n===c.ks.length?"✔":n?`<small title="${esc(c.ks.map(k=>tabName(a,k)+(d.has(k)?" ✔":": not done yet")).join("\n"))}">${n} of ${c.ks.length}</small>`:"")
+    +c.ks.map(k=>tryCell(u,a.id,k)+wrCell(u,a,k)).join("")};
 function progress(studs,list){
   loadGames();
-  const open=a=>!S.folded.has(a.id)&&steps(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
+  const open=a=>!S.folded.has(a.id)&&lpCols(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
   let h1=`<tr><th class="stu"${rs}>Student${GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small>':""}</th><th${rs}>Route</th>`,h2="<tr>";
-  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}${canHw(a)?` <button type="button" class="g mini lphw" data-do="lphw" data-a="${esc(a.id)}" title="Set some tabs of this learning path as homework">🏠 Homework</button>`:""}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} steps)`:pts(a)}</small>`;
-    if(open(a)){h1+=`<th class="lp first" colspan="${steps(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
-      h2+=steps(a).map((k,i)=>`<th class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${stepLink(a,k)}<br>${stepCrit(a,k)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
+  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}${canHw(a)?` <button type="button" class="g mini lphw" data-do="lphw" data-a="${esc(a.id)}" title="Set some tabs of this learning path as homework">🏠 Homework</button>`:""}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} ${lpCols(a).some(c=>c.ks.length>1)?"points: Vocabulary counts 2, its study cards and its sentences":"steps"})`:pts(a)}</small>`;
+    if(open(a)){h1+=`<th class="lp first" colspan="${lpCols(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
+      h2+=lpCols(a).map((c,i)=>`<th class="ac ${i?"":"first"} ${colSkip(a,c)?"skip":""}">${colLink(a,c)}<br>${colCrit(a,c)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
     else h1+=`<th class="lp first"${rs} data-do="fold" data-a="${a.id}">${head}</th>`});
   h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
-  let b="";const cols=list.reduce((n,a)=>n+(open(a)?steps(a).length+1:1),0);
+  let b="";const cols=list.reduce((n,a)=>n+(open(a)?lpCols(a).length+1:1),0);
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
     const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${gameRings(s)}</td>`;
     if(s.away){b+=`<tr class="away">${who}${awayRt(s)}<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
     b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
-      if(open(a))b+=steps(a).map((k,i)=>`<td class="ac ${i?"":"first"} ${(a.skip||[]).includes(k)?"skip":""}">${d.has(k)?"✔":""}${tryCell(s.uid,a.id,k)}${wrCell(s.uid,a,k)}</td>`).join("");
+      if(open(a))b+=lpCols(a).map((c,i)=>`<td class="ac ${i?"":"first"} ${colSkip(a,c)?"skip":""}">${colCell(s.uid,a,c,d)}</td>`).join("");
       b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}"${c.tip?` title="${esc(c.tip)}"`:""}>${c.t}</td>`;
       const y=a.graded&&x&&x.max&&scOf(s.uid,a);if(y){ts+=y.score;tm+=y.max}});
     b+=`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td></tr>`});
@@ -1935,7 +1959,7 @@ const lsGroups=id=>GR.filter(g=>g.course===(EL_LS.find(l=>l.id===id)||{}).course
 function legend(list){const cs=[...new Set(list.flatMap(a=>a.criteria))].sort();
   return `<table class="legend"><tbody>${cs.map(c=>`<tr><td>${pill(c)}</td><td><b>${esc(elCompetence(c))}</b><br>${esc(elCriterion(COURSE,c)||"–")}</td></tr>`).join("")}</tbody></table>`}
 function critPanel(c){redraw=null;
-  const list=acts(S.ls),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+k));
+  const list=acts(S.ls),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+tabName(a,k)));
   dlg(`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterion(COURSE,c)||"No text yet for this course.")}</p><label>Learning paths linked to it</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>Activities that give evidence</label><p>${st.map(esc).join(" · ")||"–"}</p>`);
 }
 function lsSettings(id){
@@ -2854,7 +2878,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const gx=!!G()&&!G().only&&a.ls===S.ls,nd=steps(a).filter(k=>!(a.skip||[]).includes(k)),nn=nd.filter(k=>d.has(k)).length,
     state=(nd.length&&!a.manual?(nn===nd.length?"✅ Every step done":`${nn} of ${nd.length} steps done`)+" · ":"")+(x.locked?"📤 Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)");
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(scOf(u,a)||{score:0}).score}/${a.points}`:""}</p>`
-    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${k}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
+    +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${esc(tabName(a,k))}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
     +(a.steps?handIns(u,a):"")
     +revisions(u,a)
     +levelRows(u,a)
