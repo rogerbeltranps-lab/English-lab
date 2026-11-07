@@ -138,33 +138,39 @@ function grab(html, name) {
   return null;
 }
 const PAGES = {};
+/* Faster (Roger, 7 Nov 2026: "it takes a while to pull all the info here"): the data files used to load one after another as <script>
+   tags (they all set window.LP). Now they are all fetched at once and each runs in its own scope with its own `window` (sandbox), so
+   none waits for another; a file that cannot run that way falls back to the old one-at-a-time <script> load. */
+const runData = txt => { const w = Object.create(window); w.LP = undefined; new Function('window', txt)(w); return w; };
+const fetchText = async url => { const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.text(); };
 function loadPage(a) {
   if (PAGES[a.id]) return PAGES[a.id];
   const dir = ROOT + a.path.replace(/[^/]+$/, ''), file = a.path.split('/').pop().replace(/\.html$/, '');
-  return PAGES[a.id] = serial(async () => {
-    window.LP = undefined;
-    if (await loadScript(dir + 'data/' + file + '.js') && window.LP && Array.isArray(window.LP.panels)) {
-      const LP = window.LP; window.LP = undefined;
-      return { kind: 'engine', a, dir, file, LP };
+  return PAGES[a.id] = (async () => {
+    let txt = null;
+    try { txt = await fetchText(dir + 'data/' + file + '.js'); } catch (e) {}
+    if (txt != null) {
+      let LP = null;
+      try { LP = runData(txt).LP; } catch (e) { LP = await serial(async () => { window.LP = undefined; const ok = await loadScript(dir + 'data/' + file + '.js'); const x = window.LP; window.LP = undefined; return ok ? x : null; }); }
+      if (LP && Array.isArray(LP.panels)) return { kind: 'engine', a, dir, file, LP };
     }
-    window.LP = undefined;
     try {
-      const html = await (await fetch(ROOT + a.path)).text();
+      const html = await fetchText(ROOT + a.path);
       if (!/const (vocabMap|levelInfo|listening)\s*=/.test(html)) return null;
       const src = (html.match(/<audio[^>]*>\s*<source src="([^"]+)"/) || [])[1];
       return { kind: 'ls1', a, dir, vocab: grab(html, 'vocabMap'), ca: grab(html, 'ca') || {}, ex: grab(html, 'examples') || {}, info: grab(html, 'levelInfo') || {}, listening: grab(html, 'listening'), audio: src ? new URL(src, new URL(ROOT + a.path, location.href)).href : null };
     } catch (e) { return null; }
-  });
+  })();
 }
 // Pro panels (data/native/<page>.js adds LP.native to the page's LP); only for an LS with Pro content (EL_LS pro:true)
 function loadNative(pg) {
   if (!pg || pg.kind !== 'engine') return Promise.resolve(pg);
   if (pg.nativeTried) return pg.nativeTried;
-  return pg.nativeTried = serial(async () => {
-    window.LP = pg.LP;
-    try { if (await loadScript(pg.dir + 'data/native/' + pg.file + '.js')) pg.native = pg.LP.native || null; } catch (e) {}
-    window.LP = undefined; return pg;
-  });
+  return pg.nativeTried = (async () => {
+    try { const txt = await fetchText(pg.dir + 'data/native/' + pg.file + '.js'), w = Object.create(window), LP = Object.assign({}, pg.LP);
+      w.LP = LP; new Function('window', txt)(w); pg.native = LP.native || null; } catch (e) {}
+    return pg;
+  })();
 }
 function panelsOf(pg, lv) {
   const P = pg.LP.panels || [], N = lv === 'native' && pg.native;
@@ -237,7 +243,7 @@ async function load(u) {
   if (DEMO) return { group: DEMO.group, lv: DEMO.levels || {}, ls: DEMO.ls || {} };
   const db = ELCloud.db, D = { group: ELCloud.viewGroup() || ELCloud.group(), lv: {}, ls: {} };
   try { if (ELCloud.levels) Object.assign(D.lv, await ELCloud.levels()); else (await F.getDocs(F.collection(db, 'students', u.uid, 'levels'))).forEach(l => D.lv[l.id] = l.data()); } catch (e) {}   // the read el-cloud.js already made
-  for (const l of EL_LS) D.ls[l.id] = await (ELCloud.lsNow || ELCloud.lsInfo)(l.id);   // lsNow: el-cloud.js's cached read of ls/{id}
+  await Promise.all(EL_LS.map(async l => { D.ls[l.id] = await (ELCloud.lsNow || ELCloud.lsInfo)(l.id); }));   // all at once   // lsNow: el-cloud.js's cached read of ls/{id}
   return D;
 }
 const myCourse = () => (EL_GROUPS.find(g => g.id === D.group) || {}).course || null;
