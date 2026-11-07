@@ -199,8 +199,8 @@ function nav(g,lss){
   const html=b(" on","today.html","🏠",t("El meu tauler","My dashboard"),' aria-current="page"')
     +cs.map(c=>b("",`${c}/index.html`,"🗂",`${t("El meu curs","My course")} · ${COURSES[c]}`)+lss.filter(l=>l.course===c).map(l=>b(" sub",lsHref(l),"📚",lsName(l))).join("")).join("")
     +b("","lab/","🎲",t("Jocs","Games"))+b("","lab/practice.html","🎯",t("Practica","Practise"))
-    +b("","#help","❓",t("Ajuda","Help"))
-    +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"');
+    +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"')
+    +b("","#help","❓",t("Ajuda","Help"));   // Help is the last item of the menu (Roger, 7 Nov 2026: "only on the left menu at the bottom")
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
@@ -254,8 +254,8 @@ function homeHtml(lss,ls,info){
   const tiles=tile("#todo","✅",t("Per fer","To do"),td.length?(td.length>1?t(`${td.length} learning paths oberts per acabar`,`${td.length} open learning paths to finish`):t("1 learning path obert per acabar","1 open learning path to finish")):t("Ho tens tot fet","All done"),td.length||"","")
     +tile("#homework","📝",t("Deures","Homework"),hwOpen.length?t("Per al ","For ")+when(hwOpen[0].x.date):t("No tens deures","No homework"),hwOpen.length||"","hw")
     +tile("#marks","📊",t("Les meves notes","My marks"),t("activitats, exàmens i producte final","activities, exams and final product"))
-    +tile("#units","📚","Learning Situations",t("resums, pràctica i el teu nivell","summaries, practice and your level"))
-    +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"),"","",true);
+    +tile("#units","📚","Learning Situations",t("resums, pràctica i el teu nivell","summaries, practice and your level"));
+  // no Help tile on the home: Help is already in the side menu and the phone bar (Roger, 7 Nov 2026: "we dont need this here")
   // the current LS right on the board, under Continue and the tiles (Roger, 7 Nov 2026: "students should see in their dashboard the current LS"): lsNowHtml
   return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`+lsNowHtml(ls,info,nx)}
 // 📚 The current LS on the board home (Roger, 7 Nov 2026: "I love this dashboard. However, students should see in their dashboard the
