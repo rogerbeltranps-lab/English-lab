@@ -234,7 +234,7 @@ function nextFor(ls,info){if(only(ls.id)||info.status==="closed")return null;
   for(const {a,d} of rows){if(a.manual||dr.includes(a.id)||!canDo(a,info)||isDone(a))continue;
     const cp=!AS&&elCheckpointMissing(a,doneSet,y=>canDo(y,info));if(cp)return {a:cp,cp:true};
     const ds=doneSet(a),ks=visSteps(a,info),k=ks.find(x=>!ds.has(x)&&!(a.skip||[]).includes(x)&&!secOff(a,info,x));if(k===undefined)continue;
-    return {a,k,nm:tabName(a.id,k),done:ks.filter(x=>ds.has(x)).length,total:ks.length,late:!!(d&&d<today)}}
+    const gs=tabGroups(a,ks);return {a,k,nm:tabName(a.id,k),done:gs.filter(g=>g.every(x=>ds.has(x))).length,total:gs.length,late:!!(d&&d<today)}}
   return null}
 function homeHtml(lss,ls,info){
   workBox();const miss=(S.wmiss?S.wmiss.size:0)+lateList(lss).length,me=U&&U.uid;
@@ -294,7 +294,7 @@ function lsNowHtml(ls,info,nx){
     if(a&&!every&&(dr.includes(a.id)||!canDo(a,info)))return "";
     shown++;
     let st="",cl="";
-    if(a){const ks=steps(a),ds=doneSet(a),n=ks.filter(k=>ds.has(k)).length,isNext=nx&&nx.a.id===a.id;
+    if(a){const ks=tabGroups(a,steps(a)),ds=doneSet(a),n=ks.filter(g=>g.every(k=>ds.has(k))).length,isNext=nx&&nx.a.id===a.id;
       // nothing locked on show (Roger, 7 Nov 2026: "They mustn't see that anything is locked. It's too much info"): no 🔒, no "checkpoint first";
       // dropped and not-open paths only appear for the teacher and testers (all()), as plain words
       if(dr.includes(a.id)){cl="drop";st=t("No cal fer-lo","Not needed")}
@@ -857,7 +857,7 @@ function todoBox(lss,ls,info){const xs=todoItems(lss),hws=hwList(ls,info).filter
   const hwOf=a=>hws.find(h=>h.acts.some(([y])=>y.id===a.id)),hwTab=(a,id)=>hws.some(h=>h.acts.some(([y,ps])=>y.id===a.id&&ps.includes(id)));
   const head=`<h2>✅ ${t("Per fer","To do")}</h2><p class="muted" style="margin:0 0 10px">${t("Tot el que el professor ha obert a classe i encara no has acabat. Clica una pestanya per anar-hi. Els <b>deures</b> són una altra cosa: només el que el professor posa com a deures (📝 Deures).","Everything your teacher has opened in class that you haven't finished yet. Click a tab to go straight to it. <b>Homework</b> is different: only what your teacher sets as homework (📝 Homework).")}</p>`;
   if(!xs.length)return `<div class="box todo">${head}<p class="ptok">✓ ${t("No tens res per fer: has acabat tot el que el professor ha obert.","Nothing to do: you have finished everything your teacher has opened.")}</p></div>`;
-  const li=x=>{const a=x.a,ds=doneSet(a),ks=visSteps(a,D.ls[x.l.id]||{}),n=ks.filter(k=>ds.has(k)).length,num=x.p&&x.gi>=0?lpNums(x.p,x.gi)(a):"",nm=(num?num+" · ":"")+a.title.split(/[:(]/)[0].trim(),h=hwOf(a);
+  const li=x=>{const a=x.a,ds=doneSet(a),ks=tabGroups(a,visSteps(a,D.ls[x.l.id]||{})),n=ks.filter(g=>g.every(k=>ds.has(k))).length,num=x.p&&x.gi>=0?lpNums(x.p,x.gi)(a):"",nm=(num?num+" · ":"")+a.title.split(/[:(]/)[0].trim(),h=hwOf(a);
     const tags=(h?` <span class="tdtag hw">📝 ${t("deures per al","homework for")} ${when(h.x.date)}</span>`:"");
     const chips=x.cp?`<a class="stp go2" href="${tabHref(x.cp)}">⏱ ${t(`Primer fes el ${esc(x.cp.title)} (sense apunts)`,`First do ${esc(x.cp.title)} (without notes)`)} →</a>`
       :x.tabs.length?x.tabs.map(([id,tn])=>`<a class="stp go2 ${hwTab(a,id)?"hwt":""}" href="${tabHref(a,id)}">${hwTab(a,id)?"📝 ":""}${esc(tn)} →</a>`).join("")
@@ -996,15 +996,15 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!AS&&all()))retur
     const vis=steps(a).filter(k=>AS||ds.has(k)||(can&&!secOff(a,info,k)));   // students: only the tabs they have done or can open
     if(!AS&&steps(a).length&&!vis.length)return "";   // open, but none of its sections yet
     const done=!a.manual&&isDone(a),x=D.rs[a.id]||{},late=!a.manual&&!done&&can&&!drop&&d&&d<today&&!steps(a).some(k=>secOff(a,info,k)),go=can&&!drop&&!done&&!a.manual&&open;
-    const tabs=steps(a).map(k=>{const sk=(a.skip||[]).includes(k),sd=stepDue(a,k),nm=tabName(a.id,k),off=secOff(a,info,k);
-      if(ds.has(k)){const w=at[k]?ymd(at[k]):"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}">✔ ${esc(nm)}</span>`}
-      if(!vis.includes(k))return "";
+    const tabs=tabGroups(a,steps(a)).map(g=>{const k=g.find(x=>!ds.has(x))||g[g.length-1],sk=g.every(x=>(a.skip||[]).includes(x)),sd=stepDue(a,k),nm=tabName(a.id,k),off=secOff(a,info,k);
+      if(g.every(x=>ds.has(x))){const w=g.map(x=>at[x]?ymd(at[x]):"").sort().pop()||"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}">✔ ${esc(nm)}</span>`}
+      if(!g.some(x=>vis.includes(x)))return "";
       const past=!sk&&can&&!drop&&sd&&sd<today,ln=go&&!off;
       if(ln&&!sk&&!next)next={a,k,nm,past};
       const tip=`${esc(nm)}: ${t("no fet","not done")}${sk?t(" (sense punts)"," (no points)"):""}${off?t(" (encara no està oberta)"," (not open yet)"):""}${sd?" · "+t("fins al","by")+" "+sd:""}${ln?" · "+t("clica per obrir-la","click to open it"):""}`;
       const lbl=`${off?"🔒":past?"✗":"·"} ${esc(nm)}`;
       return ln?`<a class="stp go2 ${past?"no":""}" href="${tabHref(a,k)}" title="${tip}">${lbl} →</a>`:`<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${tip}">${lbl}</span>`}).join("");
-    const hand=vis.length?`<small class="muted">${vis.filter(k=>ds.has(k)).length} / ${vis.length} ${vis.length===1?t("pestanya","tab"):t("pestanyes","tabs")}</small><br>`:"";
+    const vg=tabGroups(a,vis),hand=vis.length?`<small class="muted">${vg.filter(g=>g.every(k=>ds.has(k))).length} / ${vg.length} ${vg.length===1?t("pestanya","tab"):t("pestanyes","tabs")}</small><br>`:"";
     let st;
     if(drop){st=`<span class="s-off">✂ ${t("No compta (no hi vam tenir temps)","Dropped · not counted")}</span>`;n.off++}
     else if(a.manual){st=x.max?`<span class="s-ok">✔ ${t("Corregit","Marked")}</span>`:`<span class="s-off">${t("Es lliura al Classroom","Handed in on Classroom")}</span>`}
@@ -1027,7 +1027,11 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!AS&&all()))retur
     +`<div class="lpsum"><span>✔ ${n.done} ${t(n.done===1?"fet":"fets","done")}</span><span style="background:#fee2e2;color:#991b1b">⏰ ${n.miss} ${t(n.miss===1?"endarrerit":"endarrerits",n.miss===1?"missing past its day":"missing past their day")}</span><span>${n.todo} ${t("per fer","to do")}</span>${AS?`<span>🔒 ${n.off} not open</span>`:""}${AS?`<span>Counted so far: ${dn} of ${due.length} done</span>`:""}</div>`
     +`<div class="wrap"><table class="xt lpst"><thead><tr><th>Learning path</th><th>${t("Estat","State")}</th><th>${t("Pestanyes","Tabs")} <small class="muted">(✔ ${t("fet","done")} · <span style="color:#92400e">${t("taronja = després del seu dia","amber = after its day")}</span> · <span style="color:#991b1b">✗ ${t("falta i ja tocava","missing past its day")}</span>${AS?" · 🔒 not open":""})</small></th><th>${t("Punts","Score")}</th></tr></thead><tbody>${body}</tbody></table></div>`
     +(AS?`<p class="muted" style="margin:6px 0 0">“Counted” = its day in the time plan has passed, it is open and no section is still locked: these are the ones in “X of Y done this term” and in the bonus check. Click a score for the details, feedback and self-assessments.</p>`:"")+`</div>`}
-const tabName=(id,k)=>{const x=((window.EL_SECTIONS||{})[id]||[]).find(y=>y[0]===k);return x?x[1]:k.charAt(0).toUpperCase()+k.slice(1)};
+// a step's name = the name of the tab it lives in, as on the learning path (Roger, 7 Nov 2026: "make sure students see the same" as the
+// dashboard): the cards and practice steps are both the Vocabulary tab, never "Cards" or "Practice" (panelOf)
+const tabName=(id,k)=>{const xs=(window.EL_SECTIONS||{})[id]||[],p=xs.some(y=>y[0]===k)?k:(k==="cards"||k==="practice")&&xs.some(y=>y[0]==="vocab")?"vocab":k,x=xs.find(y=>y[0]===p);return x?x[1]:k==="check"?"Checkpoint":k.charAt(0).toUpperCase()+k.slice(1)};
+// steps grouped by their tab, in the path's order: [[step, …], …] (the Vocabulary tab holds two steps, done when both are)
+const tabGroups=(a,ks)=>elTabGroups(a,ks);
 async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
   ({ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative",fp:"final"}[k.t]||k.t))}catch(e){}render();document.querySelector(AS?".tabbody":".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(),want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});

@@ -1648,7 +1648,7 @@ function criteria(studs,list){
 // how it is marked and who marks it. Shares: exam sections by their points, final product rows by their weight, grammar and vocabulary
 // parts by their weight, other competences one equal share per English criterion (half steps, half your levels).
 function planTable(g){
-  const pc=n=>{const r=Math.round(n*100)/100;return (Number.isInteger(r)?r:r.toFixed(r*10%1?2:1))+" %"},sec=(id,k)=>{const s=((window.EL_SECTIONS||{})[id]||[]).find(x=>x[0]===k);return s?s[1]:k.charAt(0).toUpperCase()+k.slice(1)};
+  const pc=n=>{const r=Math.round(n*100)/100;return (Number.isInteger(r)?r:r.toFixed(r*10%1?2:1))+" %"},sec=(id,k)=>{const a=byId(id);if(a&&!isLS1(a))return tabName(a,k);const s=((window.EL_SECTIONS||{})[id]||[]).find(x=>x[0]===k);return s?s[1]:k.charAt(0).toUpperCase()+k.slice(1)};
   const lp=id=>esc(((byId(id)||{}).title||id).replace(/^Recall checkpoint\s*/i,"Checkpoint ")),it=([id,k])=>/checkpoint/.test(id)?lp(id):lp(id)+" · "+esc(sec(id,k));
   const list=xs=>{const by=new Map();xs.forEach(([id,k])=>{if(!by.has(id))by.set(id,[]);by.get(id).push(k)});
     return [...by].map(([id,ks])=>/checkpoint/.test(id)?lp(id):lp(id)+" <small class=\"muted\">("+ks.map(k=>esc(sec(id,k))).join(", ")+")</small>").join(" · ")};
