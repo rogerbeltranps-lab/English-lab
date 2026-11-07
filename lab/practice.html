@@ -529,8 +529,11 @@ async function srec(i) {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true }), chunks = [];
     rec = new MediaRecorder(stream); rec.ondataavailable = e => chunks.push(e.data);
     rec.onstop = () => { stream.getTracks().forEach(x => x.stop()); const a = $('#sme' + i); a.src = URL.createObjectURL(new Blob(chunks, { type: rec.mimeType || 'audio/webm' })); a.hidden = false; rec = null; btn.disabled = false; msg.textContent = t('Escolta’t i torna-ho a provar si vols. La gravació no s’envia enlloc.', 'Listen to yourself and try again if you like. The recording is not sent anywhere.'); };
-    rec.start(); btn.disabled = true; msg.textContent = t('Gravant… repeteix darrere la veu.', 'Recording… shadow the speaker.');
-    splay(i, () => { if (rec && rec.state === 'recording') rec.stop(); });
+    const end = () => { if (rec && rec.state === 'recording') rec.stop(); };
+    rec.start(); btn.disabled = true;
+    // Listen and repeat: the recording follows the pauses after each sentence, so the student's repeats are on it too
+    if (PL[i] && PL[i].has && elShadow.mode() === 'repeat') { msg.textContent = t('Gravant… repeteix cada frase quan s’aturi.', 'Recording… say each sentence when it stops.'); PL[i].start(0, end); }
+    else { msg.textContent = t('Gravant… repeteix darrere la veu.', 'Recording… shadow the speaker.'); splay(i, end); }
   } catch (e) { msg.textContent = t('No s’ha pogut fer servir el micròfon.', 'The microphone could not be used.'); rec = null; }
 }
 

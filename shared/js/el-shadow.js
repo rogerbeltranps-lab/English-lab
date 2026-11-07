@@ -86,7 +86,8 @@
      o = {media, clip, src: () => url, slow: () => bool, scriptEl, turnEl, ca, onStart, onEnd} */
   function player(o) {
     const m = o.media, c = o.clip, n = has(c) ? c.cues.length : 0;
-    let k = 0, run = false, endAt = 0, timer = null;
+    let k = 0, run = false, endAt = 0, timer = null, fin = null;
+    const done = () => { const f = fin; fin = null; if (f) f(); };
     const cue = i => { const x = c.cues[i]; return o.slow() ? [x[2], x[3]] : [x[0], x[1]]; };
     const light = i => { if (!o.scriptEl) return; o.scriptEl.querySelectorAll('.shm-x').forEach(e => e.classList.toggle('now', +e.dataset.k === i)); };
     const turn = (txt, secs) => {
@@ -113,7 +114,7 @@
       turn(o.ca ? '🗣 Ara tu: digues-ho en veu alta!' : '🗣 Your turn: say it aloud!', secs);
       timer = setTimeout(() => { timer = null; if (!run) return; if (k + 1 < n) say(k + 1); else finish(); }, secs * 1000);
     }
-    function finish() { run = false; clear(); light(-1); turn(o.ca ? '✓ Molt bé! Prem ▶ per tornar a començar.' : '✓ Well done! Press ▶ to start again.'); o.onEnd && o.onEnd(); }
+    function finish() { run = false; clear(); light(-1); turn(o.ca ? '✓ Molt bé! Prem ▶ per tornar a començar.' : '✓ Well done! Press ▶ to start again.'); o.onEnd && o.onEnd(); done(); }
     m.addEventListener('timeupdate', () => {
       if (run) { if (endAt && m.currentTime >= endAt) { endAt = 0; m.pause(); gap(); } return; }
       if (n && !m.paused) { let on = -1; for (let i = 0; i < n; i++) { const [a, b] = cue(i); if (m.currentTime >= a && m.currentTime < b) on = i; } light(on); }
@@ -124,8 +125,11 @@
     if (o.turnEl) { o.turnEl.querySelector('[data-shm-again]').onclick = () => run && say(k); o.turnEl.querySelector('[data-shm-next]').onclick = () => run && (k + 1 < n ? say(k + 1) : finish()); }
     const sync = () => { if (o.scriptEl) o.scriptEl.classList.toggle('shm-click', mode() === 'repeat' && n > 0); };
     sync();
-    function start(i) { if (!n) return false; run = true; o.onStart && o.onStart(); say(i || 0); return true; }
-    function stop() { if (run) { run = false; clear(); m.pause(); turn(''); } light(-1); }
+    /* then = called once when this run ends (last sentence done, Stop, another clip or a mode change): Record yourself uses it
+       to stop the mic, so the recording keeps the pauses and the student's own repeats (Roger, 7 Nov 2026: "it should stop and
+       wait for you too") */
+    function start(i, then) { if (!n) return false; done(); run = true; o.onStart && o.onStart(); fin = then || null; say(i || 0); return true; }
+    function stop() { if (run) { run = false; clear(); m.pause(); turn(''); } light(-1); done(); }
     return { start, stop, sync, running: () => run, again: () => run && say(k), next: () => run && (k + 1 < n ? say(k + 1) : finish()), has: n > 0 };
   }
 
