@@ -117,6 +117,8 @@ body.agdrag .agday:not(.off),body.agdrag .agl{outline:1px dashed #a5b4fc;outline
 .agg{display:flex;flex-direction:column;gap:4px}.agg.drp{opacity:.5}.agh b{font-size:13px}.agh input{margin:0}.aglk{font-size:12px;text-decoration:none;color:#4338ca}
 .agday .agcs{flex-direction:column;align-items:flex-start}.agday .agcs .agc{max-width:100%;box-sizing:border-box}.agday [data-oi],.agday [data-og]{position:relative}
 .agins-b::before,.agins-a::after{content:"";position:absolute;left:-2px;right:-2px;height:3px;border-radius:2px;background:#4f46e5;pointer-events:none}.agins-b::before{top:-4px}.agins-a::after{bottom:-4px}
+.agmin{appearance:none;-webkit-appearance:none;border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:999px;font:inherit;font-size:11px;line-height:16px;padding:0 6px;margin:0 2px 0 0;cursor:pointer;field-sizing:content;max-width:9em;flex:none}.agmin:not(.on){opacity:.6}.agmin:hover,.agmin:focus{opacity:1;border-color:#6366f1}
+.agmin.on{background:#e0f2fe;border-color:#0ea5e9;color:#075985;font-weight:700}.agtot{font-size:11.5px;color:#0369a1;font-weight:600;white-space:nowrap}.agtot.over{color:#b45309}.agtotd{margin-top:-4px}
 .agempty{color:#94a3b8;font-size:12px;margin:auto 0;text-align:center;border:1px dashed #cbd5e1;border-radius:10px;padding:10px}
 .agf{display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:2px;opacity:.45}.agday:hover .agf{opacity:1}.agf button{margin:0}
 .agself{font-size:12px;color:#7c2d12;background:#ffedd5;border-radius:8px;padding:2px 6px}
@@ -2260,6 +2262,7 @@ function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=s
   const tk=Object.assign({},seed?seed.tick:{}),on=(d,it)=>{const k=itKey(d,it);return k in tk?tk[k]:tkOf(x)[x.ls+"|"+k]||false};
   if(fn&&fn(ag,tk,on)===false)return;
   Object.keys(ag.days).forEach(d=>{if(!ag.days[d].some(it=>it!=="self"))delete ag.days[d]});
+  if(ag.min){Object.keys(ag.min).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1))||!(+ag.min[q]>0))delete ag.min[q]});if(!Object.keys(ag.min).length)delete ag.min}
   if(ag.man){Object.keys(ag.man).forEach(d=>{if(!ag.days[d])delete ag.man[d]});if(!Object.keys(ag.man).length)delete ag.man}
   if(ag.wk){Object.keys(ag.wk).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1)))delete ag.wk[q]});if(!Object.keys(ag.wk).length)delete ag.wk}
   acts(x.ls).forEach(a=>{if(!ag.lab[a.id])ag.lab[a.id]=agLab(x,a)});
@@ -2299,8 +2302,8 @@ const addIt=(ag,d,it)=>{const a=ag.days[d]=ag.days[d]||[];if(a.includes(it))retu
 function agMove(x,its,from,to,done){agSave(x,(ag,tk,on)=>{let n=0;its.forEach(it=>{
   const all=Object.keys(ag.days).filter(d=>ag.days[d].includes(it)),src=from?all.filter(d=>d===from):all.filter(d=>!on(d,it));
   if(!from&&!src.length&&all.length&&(done||!to))return;
-  let v=false,gw=null;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w&&!S.autoTk.has(x.ls+"|"+itKey(d,it))){v=w;tk[itKey(d,it)]=false}gw=gw||(ag.wk||{})[d+"|"+it]||null;rmIt(ag,d,it);n++});
-  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v;if(gw){ag.wk=ag.wk||{};ag.wk[to+"|"+it]=gw}}});
+  let v=false,gw=null,gm=null;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w&&!S.autoTk.has(x.ls+"|"+itKey(d,it))){v=w;tk[itKey(d,it)]=false}gw=gw||(ag.wk||{})[d+"|"+it]||null;gm=gm||(ag.min||{})[d+"|"+it]||null;rmIt(ag,d,it);n++});
+  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v;if(gw){ag.wk=ag.wk||{};ag.wk[to+"|"+it]=gw}if(gm){ag.min=ag.min||{};ag.min[to+"|"+it]=gm}}});
   return n>0})}
 const agItems=a=>secOf(a).length?itemsOf(a).map(z=>a.id+"#"+z[0]):[a.id+"#"];
 const nextClassDay=(x,d)=>ELWeek.classDays(x.gid,ELWeek.add(d,1),ELWeek.add(d,70))[0]||null;
@@ -2354,6 +2357,15 @@ const SHD="note:🎬 Shadowing with the whole class";   // no " · ": plan lines
 const shdUrl=ls=>{const l=(typeof EL_LS!=="undefined"?EL_LS:[]).find(z=>z.id===ls);return l&&l.shadowing?l.shadowing:""};
 const slotOf=(gid,d)=>{const T=window.EL_TIMETABLE,dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d+"T12:00").getDay()];
   const s=((T&&T.groups&&T.groups[gid])||[]).find(v=>String(v).startsWith(dn+" "));return s?String(s).slice(4):""};
+// Minutes for each item of a class day (Roger, 7 Nov 2026: "I want to be able to set the time I want to spend on each SLP since sometimes I
+// repeat a SLP only to review and I want to set like 5 minute review"): a small ⏱ menu on each tab, note and learning path without tabs on a
+// class day; the day's heading adds them up against the class length (EL_TIMETABLE.len) and a learning path's heading shows its tabs' total.
+// Stored in the agenda as min: {"day|item": minutes}; it goes with the item when it moves to another day. Teacher only, one write per change.
+const agMin=(ag,d,it)=>+((ag.min||{})[d+"|"+it])||0;
+const MINS=[5,10,15,20,25,30,40,45,50,60];
+const minSel=(x,d,it)=>{const v=agMin(agOf(x),d,it),os=[...new Set([...MINS,...(v?[v]:[])])].sort((a,b)=>a-b);
+  return `<select class="agmin ${v?"on":""}" data-do="agmin" data-d="${d}" data-it="${esc(it)}" data-gid="${x.gid}" data-ls="${x.ls}" title="Minutes in class${v?": "+v:""}" aria-label="Minutes in class">`
+    +`<option value="">⏱</option>${os.map(m=>`<option value="${m}" ${m===v?"selected":""}>${m} min</option>`).join("")}<option value="other">Other…</option>${v?`<option value="0">✕ No time</option>`:""}</select>`};
 // The day's items as they are shown, in groups: [{id (activity; "" for a note), its}]. A day whose order you changed by dragging (ag.man[day])
 // shows its items in the order you left them (a learning path shows twice when something sits between its tabs); any other day groups each
 // learning path's tabs in the path's own order.
@@ -2376,21 +2388,22 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
   const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
     return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
-      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${esc(label)}${/#/.test(it)?agTags(it):""}`
+      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${esc(label)}${/#/.test(it)?agTags(it):""}`
       +(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" title="Open the unit's shadowing video">▶</a>`:"")
       +(a&&p&&!isGame(p)?(()=>{const h=hwNext(x,d,it),o=!!h||hwS.has(it);return `<button type="button" class="aghw ${o?"on":""}" data-do="aghw1" data-d="${d}" data-it="${esc(it)}" ${D} aria-pressed="${o}" title="${h?"Homework for "+esc(ELWeek.date(h[1].by))+" · click to take it off":o?"Homework (see 🏠 Homework to remind)":"Make it homework for the next class"}">🏠</button>`})():"")
       +(a&&p?wkBtn(x,d,[it]):"")+(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
   const body=agRuns(ag,d).map(g=>{if(!g.id)return `<div class="agg" data-og="${esc(g.its[0])}">${g.its.map(it=>chip(it,it.slice(5))).join("")}</div>`;const a=byId(g.id);if(!a)return "";
     const nos=!secOf(a).length;
     return `<div class="agg ${dr.includes(a.id)?"drp":""}" data-og="${esc(g.its[0])}"><div class="agh" draggable="true" data-ag="day" data-a="${esc(a.id)}" data-its="${esc(JSON.stringify(g.its))}" ${nos?`data-oi="${esc(a.id+"#")}"`:""} data-from="${d}" ${D} title="Drag this learning path up or down to change the order, or to another day (its tabs of the day go with it)">`
-      +(nos?`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} ${tkOf(x)[x.ls+"|"+itKey(d,a.id+"#")]?"checked":""} title="Done in class">`:"<span class=\"agdot\">⠿</span>")
-      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>${wkBtn(x,d,g.its,true)}`
+      +(nos?`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} ${tkOf(x)[x.ls+"|"+itKey(d,a.id+"#")]?"checked":""} title="Done in class">${minSel(x,d,a.id+"#")}`:"<span class=\"agdot\">⠿</span>")
+      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>${wkBtn(x,d,g.its,true)}${nos?"":(m=>m?`<small class="agtot" title="Minutes of its tabs this day">⏱ ${m} min</small>`:"")(g.its.reduce((t,it)=>t+agMin(ag,d,it),0))}`
       +(nos?`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} title="Take it off this day">✕</button>`:"")+`</div>`
       +(nos?"":`<div class="agcs">${g.its.map(it=>chip(it,itName(it),a)).join("")}</div>`)+`</div>`}).join("");
   const hwOk=its.some(it=>{const a=byId(it.split("#")[0]);return a&&!isCp(a)&&!a.manual});
   const l=Object.entries(((x.p._added||{})[x.gi])||{}).find(([,v])=>v.key==="@"+d),ri=l?x.p.rows.findIndex(r=>lines(x,r).includes(l[0])):-1;
   return `<div class="agday ${d===t?"today":""} ${past?"past":""} ${done?"done":""} ${late?"late":""} ${c?"cpt":""}" data-agdrop="${d}" ${D}>`
     +`<div class="agdh"><b>${esc(dayLab(d))}</b><small>${esc(slotOf(x.gid,d))}</small>${d===t?`<span class="agt">Today</span>`:""}${done?`<span class="agok">✓ Done</span>`:late?`<span class="agwarn">⚠ not ticked</span>`:""}</div>`
+    +(m=>{if(!m)return "";const L=+((window.EL_TIMETABLE||{}).len)||60;return `<div class="agtot agtotd ${m>L?"over":""}" title="Minutes you set on this day's items · the class lasts ${L} min">⏱ ${m} of ${L} min planned${m>L?` · ${m-L} too many`:m<L?` · ${L-m} free`:""}</div>`})(its.reduce((t,it)=>t+agMin(ag,d,it),0))
     +(self?`<div class="agself">📚 Self-study (you are away) <button type="button" class="agx" data-do="agself" data-d="${d}" ${D} title="You teach this class yourself">✕</button></div>`:"")
     +(isEx?`<div class="agg">${chip("exam","📝 Exam")}</div>`:"")+body
     +(!its.length&&!isEx?`<p class="agempty">Drop a learning path or a tab here</p>`:"")
@@ -2469,7 +2482,7 @@ function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="mute
     +(pastW.length?`<details class="agpast"><summary>Earlier weeks (${pastW.length})</summary>${pastW.map(([m,dd])=>agWeek(x,m,dd)).join("")}</details>`:"")
     +now.map(([m,dd])=>agWeek(x,m,dd)).join("")
     +`<p><button type="button" class="g" data-do="agmore" ${`data-gid="${x.gid}" data-ls="${x.ls}"`}>＋ Show one more week</button></p>`
-    +`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Each class day of ${esc((GR.find(g=>g.id===x.gid)||{}).name||x.gid)} by your timetable. Drag a learning path (all the tabs not ticked yet), one tab, the exam or the final product steps from the list or from another day. Drag a tab, a note or a learning path up or down inside its day to change the order. Tick what you did in class: students see it in “What we've done”. 🔓/🔒 opens or closes a tab for the group. Students see as homework only what you set with 🏠 Homework. Due days move with the learning path's last class, and the exam day students see follows the 📝 Exam.</p></details>`
+    +`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Each class day of ${esc((GR.find(g=>g.id===x.gid)||{}).name||x.gid)} by your timetable. Drag a learning path (all the tabs not ticked yet), one tab, the exam or the final product steps from the list or from another day. Drag a tab, a note or a learning path up or down inside its day to change the order. ⏱ sets how many minutes each one takes in class; the day adds them up against the class length. Tick what you did in class: students see it in “What we've done”. 🔓/🔒 opens or closes a tab for the group. Students see as homework only what you set with 🏠 Homework. Due days move with the learning path's last class, and the exam day students see follows the 📝 Exam.</p></details>`
     +`</section></div>`}
 if(DEMO)window.EL_T=S;   // previews and tests look at the state
 // one tick (an item done in class) and the day's tick when all its items are done
@@ -3239,6 +3252,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
 $("#dlg").addEventListener("close",()=>redraw=null);
 document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);
 document.addEventListener("change",e=>{const t=e.target,k=t.dataset;
+  if(k.do==="agmin"){const x=planX(k.ls,k.gid);if(!agOf(x))return;let v=t.value;
+    if(v==="other"){v=Math.round(+String(prompt("Minutes for this in class (1–120):","")||"").replace(",","."));if(!(v>=1&&v<=120)){render();return}}
+    v=+v||0;agSave(x,g=>{g.min=Object.assign({},g.min);const q=k.d+"|"+k.it;if(v)g.min[q]=v;else delete g.min[q]});return}
   if(k.tt){const d=ttDraft();TTE.msg="";
     if(k.tt==="day"||k.tt==="time"){const row=t.closest(".ttslot"),dy=row.querySelector("select").value,[h,m]=(row.querySelector("input").value||"08:30").split(":");d.groups[k.gid][+k.i]=dy+" "+(+h)+":"+m}
     else if(k.tt==="len"){const v=Math.round(+t.value);if(v>=20&&v<=180)d.len=v}
