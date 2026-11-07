@@ -417,14 +417,15 @@ window.elGameStats=function(games){
   const pc=([a,b])=>b?Math.round(a/b*100):null;return {grammar:pc(t.grammar),vocab:pc(t.vocab),n:(games||[]).length}};
 // The games behind a circle (Roger, 7 Nov 2026: "they should see grammar games, when they go to the percentage"): the hover text of a 🧩 or
 // 📚 circle names its % and lists every game it counts, newest first, with that game's score. games = [{kind, r, of, title, day, lp}];
-// ca = Catalan (Starter and Base students). Plain text with line breaks (a title attribute).
+// ca = Catalan (Starter and Base students). Plain text with line breaks (a title attribute). Each game starts with its learning path
+// (Roger, 7 Nov 2026: "they should start with LP1 and the name they already have"): "• LP2 · Clothes, kit and weather".
 window.elGameTip=function(games,kind,ca){
   const T=ca?{grammar:"🧩 Jocs de gramàtica",vocab:"📚 Jocs de vocabulari",right:"encerts",none:"Encara cap joc"}:{grammar:"🧩 Grammar games",vocab:"📚 Vocabulary games",right:"right",none:"No games yet"};
   const l=(games||[]).filter(g=>g.kind===kind&&g.of).sort((a,b)=>String(b.day||"").localeCompare(String(a.day||""))),r=l.reduce((a,g)=>a+(g.r||0),0),of=l.reduce((a,g)=>a+g.of,0);
   if(!l.length)return `${T[kind]||kind}: ${T.none}`;
   const day=d=>{if(!d)return "";const x=new Date(d+"T12:00");return isNaN(x)?"":x.toLocaleDateString(ca?"ca":"en-GB",{day:"numeric",month:"short"})};
   const name=t=>String(t||"").replace(/^(Vocabulary|Grammar|Vocabulari|Gramàtica) · /,"");
-  return `${T[kind]}: ${Math.round(r/of*100)} % ${T.right} (${r} / ${of})\n`+l.map(g=>`• ${name(g.title)}${g.lp?" · "+String(g.lp).split(" · ")[0]:""}${day(g.day)?" · "+day(g.day):""}: ${g.r||0} / ${g.of} (${Math.round((g.r||0)/g.of*100)} %)`).join("\n")};
+  return `${T[kind]}: ${Math.round(r/of*100)} % ${T.right} (${r} / ${of})\n`+l.map(g=>`• ${g.lp?String(g.lp).split(" · ")[0]+" · ":""}${name(g.title)}${day(g.day)?" · "+day(g.day):""}: ${g.r||0} / ${g.of} (${Math.round((g.r||0)/g.of*100)} %)`).join("\n")};
 window.elRing=function(p,label,size,tip){
   const z=size||46,col=p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a",q=s=>String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
   return `<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle" title="${q(tip||label+": "+(p==null?"–":p+" %"))}"><span style="width:${z}px;height:${z}px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:conic-gradient(${col} ${(p||0)*3.6}deg,#e5e7eb 0)"><b style="width:${z-10}px;height:${z-10}px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 ${Math.round(z/3.6)}px/1 system-ui,sans-serif;color:#0f172a">${p==null?"–":p+"%"}</b></span>${label?`<span style="font-size:${Math.max(11,Math.round(z/3.6))}px;font-weight:700;line-height:1.15">${label}</span>`:""}</span>`};

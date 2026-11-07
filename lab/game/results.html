@@ -100,6 +100,8 @@ const R={user:null,teacher:false,g:P.get("g")||"",games:[],all:[],ls:P.get("ls")
 const pct=(a,b)=>b?Math.round(a/b*100):null,show=v=>v==null?"–":v+" %";
 const day=d=>{const x=new Date(d+"T12:00");return x.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})};
 const short=t=>String(t||"").replace(/^(Vocabulary|Grammar) · /,"");
+// a game's name starts with its learning path, "LP2 · Vocabulary · …" (decks/index.js elGameName, Roger 7 Nov 2026), saved results too
+const nm=x=>window.elGameName?elGameName(x):x.title;
 
 /* ---------- data ---------- */
 async function load(){
@@ -169,7 +171,7 @@ function draw(){
     ${R.games.some(x=>x.kind==="grammar")?`<div class="tile"><b style="color:var(--grammar)">${show(kindPct("grammar"))}</b><span>right in grammar games</span></div>`:""}
     <div class="tile"><b>${played.length} / ${st.length}</b><span>students who played</span></div></div>`;
   const items=R.games.map(x=>{const v=classPct(x),l=onList(x).length;
-    return {id:String(x.sid),act:"game",label:day(x.day),value:v,kind:x.kind in KIND?x.kind:"mixed",tip:`${x.title} · ${day(x.day)} · ${l} students · ${show(v)} right`}});
+    return {id:String(x.sid),act:"game",label:day(x.day),value:v,kind:x.kind in KIND?x.kind:"mixed",tip:`${nm(x)} · ${day(x.day)} · ${l} students · ${show(v)} right`}});
   const group=`<div class="card"><h2>The group, game by game</h2><p class="muted">% of right answers of the whole class in each game. Click a bar to see its questions and each student's answers.</p>${legend()}${columns(items)}${R.sel?gameDetail():""}</div>`;
   const sorted=[...st].sort(R.sort==="name"?(a,b)=>a.name.localeCompare(b.name):(a,b)=>(a[R.sort]??-1)-(b[R.sort]??-1)||a.name.localeCompare(b.name));
   const hasK=k=>R.games.some(x=>x.kind===k);
@@ -186,7 +188,7 @@ function draw(){
 function gameDetail(){
   const x=R.games.find(y=>String(y.sid)===R.sel);if(!x)return "";
   const list=onList(x),q=x.qs.map(z=>{const right=list.filter(s=>!s.miss.includes(z.n)).length;return {...z,p:pct(right,list.length)}});
-  return `<h2 style="margin-top:16px">${esc(x.title)} · ${day(x.day)}</h2><p class="muted">${list.length} students · ${x.done} of ${x.qn} questions shown · % right per question (the hardest in red)</p>
+  return `<h2 style="margin-top:16px">${esc(nm(x))} · ${day(x.day)}</h2><p class="muted">${list.length} students · ${x.done} of ${x.qn} questions shown · % right per question (the hardest in red)</p>
     <div class="hb">${q.map(z=>`<span class="t" title="${esc(z.q)}">${z.n}. ${esc(z.q)}</span><span class="trk"><i style="width:${z.p||0}%;background:var(--${x.kind in KIND?x.kind:"mixed"})"></i></span><span class="n${z.p<50?" low":""}">${show(z.p)}</span>`).join("")}</div>`
     +answersOf(x,list);
 }
@@ -204,14 +206,14 @@ function answersOf(x,list){
 }
 function stuDetail(s){
   const items=R.games.map(x=>{const y=x.stu.find(z=>z.e===s.e),v=y?pct(y.r,x.done):null,c=classPct(x);
-    return {label:day(x.day),value:v,avg:c,kind:x.kind in KIND?x.kind:"mixed",tip:`${x.title} · ${day(x.day)} · ${y?`${y.r} of ${x.done} right (${v} %)`:"absent"} · class ${show(c)}`}});
+    return {label:day(x.day),value:v,avg:c,kind:x.kind in KIND?x.kind:"mixed",tip:`${nm(x)} · ${day(x.day)} · ${y?`${y.r} of ${x.done} right (${v} %)`:"absent"} · class ${show(c)}`}});
   const last=[...R.games].reverse().map(x=>{const y=x.stu.find(z=>z.e===s.e);return y&&y.miss.length?{x,m:y.miss}:null}).filter(Boolean).slice(0,3);
   const det=R.games.map(x=>gameOf(x,s.e)).join("");
   return `<div style="padding:6px 0 10px">${det?`<p style="margin:4px 0"><b>${esc(s.name)}: answers and notes${R.ls?" · "+esc(R.ls):""}</b></p><div class="games">${det}</div>`:""}<b>${esc(s.name)}</b>, game by game ${legend('<span class="key"><i style="border-top:2px dashed var(--ink);height:0;border-radius:0"></i>Class</span>')}${columns(items)}
     ${last.length?`<p style="margin:14px 0 4px"><b>Questions to review</b> <span class="muted">(the last games with mistakes: what they answered and the right answer)</span></p>${last.map(({x,m})=>{
       const y=x.stu.find(z=>z.e===s.e),row=n=>{const q=x.qs.find(z=>z.n===n)||{},a=y&&y.ans?y.ans[n]:undefined;
         return `<li><span class="rq">${n}. ${esc(q.q||"question "+n)}</span><span class="ra">${y&&y.ans?`<span class="no">✗ ${a==null?"no answer":esc(a)}</span> → `:""}<b class="okk">${esc(q.ok||"")}</b></span></li>`};
-      return `<div class="rv"><p class="rvh"><b>${esc(short(x.title))}</b> <span class="muted">${day(x.day)} · ${m.length} to review</span></p><ul class="rvl">${m.slice(0,5).map(row).join("")}</ul>
+      return `<div class="rv"><p class="rvh"><b>${esc(nm(x))}</b> <span class="muted">${day(x.day)} · ${m.length} to review</span></p><ul class="rvl">${m.slice(0,5).map(row).join("")}</ul>
         ${m.length>5?`<details><summary class="muted">${m.length-5} more</summary><ul class="rvl">${m.slice(5).map(row).join("")}</ul></details>`:""}</div>`}).join("")}`:""}</div>`;
 }
 
@@ -219,12 +221,12 @@ function stuDetail(s){
 // latest game; games saved before 6 Nov 2026 have no answers or notes: only right or wrong)
 function gameOf(x,e){
   const y=x.stu.find(z=>z.e===e),last=x===R.games[R.games.length-1];
-  if(!y)return `<details class="gm"><summary><span>${esc(short(x.title))}</span><span class="muted">${day(x.day)}</span><span class="muted">absent</span></summary></details>`;
+  if(!y)return `<details class="gm"><summary><span>${esc(nm(x))}</span><span class="muted">${day(x.day)}</span><span class="muted">absent</span></summary></details>`;
   const v=pct(y.r,x.done),ans=y.ans||null,notes=y.notes||{},nts=x.nts||[];
   const rows=x.qs.map(q=>{const ok=!y.miss.includes(q.n),a=ans?ans[q.n]:undefined;
     return `<tr class="${ok?"ok":"no"}"><td class="num">${q.n}</td><td>${esc(q.q)}</td><td>${ans?(a==null?'<span class="muted">no answer</span>':esc(a)):'<span class="muted">–</span>'}</td><td class="mk">${ok?"✓":"✗"}</td><td class="muted">${ok?"":esc(q.ok||"")}</td></tr>`}).join("");
   const nt=nts.map(n=>`<div class="note"><b>${esc(n.topic)}</b>${notes[n.k]?`<p>${esc(notes[n.k]).replace(/\n/g,"<br>")}</p>`:'<p class="muted">No notes.</p>'}</div>`).join("");
-  return `<details class="gm"${last?" open":""}><summary><span>${esc(short(x.title))}</span><span class="muted">${day(x.day)}${x.lp?" · "+esc(x.lp):""}</span><span class="${v!=null&&v<50?"low":""}">${x.done?`${y.r} / ${x.done} (${v} %)`:""}</span></summary>
+  return `<details class="gm"${last?" open":""}><summary><span>${esc(nm(x))}</span><span class="muted">${day(x.day)}${x.lp?" · "+esc(x.lp):""}</span><span class="${v!=null&&v<50?"low":""}">${x.done?`${y.r} / ${x.done} (${v} %)`:""}</span></summary>
     ${x.done?`<table class="qa"><thead><tr><th>#</th><th>Question</th><th>Their answer</th><th></th><th>Right answer</th></tr></thead><tbody>${rows}</tbody></table>`:""}
     ${ans?"":`<p class="muted">This game was played before the answers were saved: only right or wrong.</p>`}
     ${nts.length?`<div class="notes"><p class="nh">📝 Notes</p>${nt}</div>`:""}</details>`;

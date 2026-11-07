@@ -1372,7 +1372,7 @@ function matTab(){
     const games=(window.EL_GAMES||[]).filter(g=>g.course===c).sort((x,y)=>((x.ls||"")+(x.lp||"")).localeCompare((y.ls||"")+(y.lp||""),"en",{numeric:true})),lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
       +`<h3>🎮 Class games</h3><p class="muted">Each learning path has a vocabulary game and a grammar game. ${a("lab/game/results.html?g="+(GR.find(g=>g.course===c)||{}).id,"📊 Results by group and student →","chip")}</p>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation · Learning Path</th><th></th></tr>`
-        +games.map(g=>`<tr><td>${esc(g.emoji||"")} ${esc(g.title)}</td><td>${esc(g.ls||"")}${g.lp?" · "+esc(g.lp):""}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
+        +games.map(g=>`<tr><td>${esc(g.emoji||"")} ${esc(elGameName(g))}</td><td>${esc(g.ls||"")}${g.lp?" · "+esc(g.lp):""}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
       +lss.map(l=>{const k=l.id.replace("-","/"),w=(window.LP_PRINT||{})[k],R=RP(l);
         // LS2 on (EL_LS starter: true): a Starter summary of its own, built from the Learning Paths (tools/lp-worksheets/build.mjs); LS1: Starter uses Base
         return `<h3>📄 ${esc(l.title)}</h3>`
@@ -2046,7 +2046,7 @@ function homeTabs(x,a){let m=HOME.get(x.p.rows);if(!m)HOME.set(x.p.rows,m=new Ma
 // not homework), ticked, sent ‹ › and chosen in ✏️ Change like a tab, and it opens the game board on that game. New games appear by themselves.
 const gamesOf=a=>{const l=EL_LS.find(y=>y.id===a.ls),lsT=l?l.title.split(" · ").pop().toLowerCase():"",t=shortT(a.title);
   return (window.EL_GAMES||[]).filter(g=>g.lp&&a.ls.startsWith(g.course+"-")&&String(g.ls||"").toLowerCase().endsWith(lsT)&&shortT(String(g.lp).split(" · ").pop())===t)
-    .map(g=>["game:"+g.id,"🎮 "+g.title.split(":")[0].trim(),g])};
+    .map(g=>["game:"+g.id,"🎮 "+(window.elGameName?elGameName(g):g.title),g])};   // "LP2 · Vocabulary · Clothes, kit and weather" (elGameName, Roger 7 Nov 2026)
 const itemsOf=a=>[...secOf(a),...gamesOf(a)],isGame=id=>/^game:/.test(id);
 function segTabs(x,a,seg,hw){const sec=secOf(a);if(!sec.length)return [];const said=namedTabs(a,seg);if(said.length)return said;
   const home=homeTabs(x,a),cls=sec.filter(z=>!home.has(z[0])),h=Math.ceil(cls.length/2),gm=hw||/\(2\/2\)/.test(seg)?[]:gamesOf(a);
