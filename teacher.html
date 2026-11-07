@@ -170,7 +170,7 @@ body.tp2on{max-width:none}body.tp2on .tshell{grid-template-columns:minmax(0,1fr)
 <script src="shared/print/lp-list.js"></script>
 <script type="module">
 import {replyText,replyColor,MSG_MAX} from "./shared/js/el-reply.js";
-import {ANN_MAX,annMs,annLast,annHtml,annCardHtml,annCardStyle} from "./shared/js/el-announce.js";
+import {ANN_MAX,annMs,annLast,annHtml,annText,annTranslate,annCardHtml,annCardStyle} from "./shared/js/el-announce.js";
 import {writing} from "./shared/js/el-corrections.js";
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
@@ -430,7 +430,7 @@ const mailTo=list=>[...new Set(list.filter(s=>s&&!s.tester).map(s=>String(s.emai
 const mailFoot=ca=>"\n\n"+(ca===true?"Entra amb el teu correu de l'institut: ":ca===false?"Sign in with your school email: ":"Sign in with your school email / Entra amb el teu correu de l'institut: ")+new URL("today.html",location.href).href+"\n\nRoger";
 async function mailStudents(emails,subject,body){if(DEMO||!emails.length)return 0;
   // Roger, 6 Nov 2026: "before sending a mail, I want the program to ask me if I want to send it"
-  if(!confirm("✉️ Send this email to "+emails.length+" student"+(emails.length===1?"":"s")+"?\n\n"+subject+"\n\n"+body.slice(0,400)+(body.length>400?"…":"")))return 0;const tok=await ELCloud.auth.currentUser.getIdToken();let n=0;
+  if(!confirm("✉️ Send this email to "+emails.length+" student"+(emails.length===1?"":"s")+"?\n\n"+subject+"\n\n"+body.slice(0,1600)+(body.length>1600?"…":"")))return 0;const tok=await ELCloud.auth.currentUser.getIdToken();let n=0;
   for(let i=0;i<emails.length;i+=45){const part=emails.slice(i,i+45);let j=null;
     try{const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:tok,bcc:part,subject,body,name:"Roger Beltran · English Lab"})});j=await r.json()}catch(e){throw new Error("the school mail script did not answer")}
     if(!j||!j.ok)throw new Error(j&&j.error==="not the teacher"?"the school mail script is the old version (update it: tools/notify/school-mail.gs)":(j&&j.error)||"no answer");n+=part.length}
@@ -2653,7 +2653,8 @@ function annBox(){
   const last=a=>Math.max(annMs(a.at||a.created),annLast(a)),L=(S.D.ann||[]).filter(annMine).sort((a,b)=>msgWait(b)-msgWait(a)||last(b)-last(a));
   const li=a=>{const who=annWho(a),rd=who.filter(s=>(a.read||{})[s.uid]),no=who.filter(s=>!(a.read||{})[s.uid]);
     if(a.to==="one")return `<li><small class="muted">✉️ Only for <b>${esc(a.label||"")}</b> · ${annWhen(a)} · ${who.length&&rd.length?"read ✓":"not read yet"}</small>${msgConv(a)}${msgBtns(a,msgStu(a))}<div style="margin-top:4px"><button class="g" data-do="anndel" data-id="${esc(a.id)}">Delete</button></div></li>`;
-    return `<li><div class="hand annt">${annHtml(a.text)}</div><small class="muted">${a.to==="one"?"✉️ Only for":"📣 To"} <b>${esc(a.label||"")}</b> · ${annLater(a)?`<b style="color:#ea580c">⏰ scheduled for ${annWhen(a)}</b> (students don't see it yet)`:`${annWhen(a)} · `}${annLater(a)?"":who.length?`read by <b>${rd.length} of ${who.length}</b>`:"nobody on the list yet"}</small>
+    const two=a.ca&&a.en?`<details class="ann2"><summary class="muted" style="font-size:13px;font-weight:600">🌐 Two versions: ${a.lang==="en"?"Catalan for Starter and Base":"English for Core, Plus and Pro"}</summary><div class="hand annt">${annHtml(a.lang==="en"?a.ca:a.en)}</div></details>`:"";
+    return `<li><div class="hand annt">${annHtml(a.text)}</div>${two}<small class="muted">${a.to==="one"?"✉️ Only for":"📣 To"} <b>${esc(a.label||"")}</b> · ${annLater(a)?`<b style="color:#ea580c">⏰ scheduled for ${annWhen(a)}</b> (students don't see it yet)`:`${annWhen(a)} · `}${annLater(a)?"":who.length?`read by <b>${rd.length} of ${who.length}</b>`:"nobody on the list yet"}</small>
       ${no.length&&rd.length?`<details><summary class="muted" style="font-size:13px;font-weight:600">Not read yet (${no.length})</summary><small>${no.sort(byName).map(s=>name(s)+(s.away?' <span class="muted">(not signed in yet)</span>':"")).join(" · ")}</small></details>`:""}
       <div><button class="g" data-do="anndel" data-id="${esc(a.id)}">Delete</button></div></li>`};
   return `<div class="box" id="ann"><h2>📣 Announcements <small class="muted">to your students</small></h2>`
@@ -2665,10 +2666,16 @@ function annBox(){
 const ANN_VIDEOS=[["How English Lab works","🎬 How English Lab works","how-english-lab-works"]];
 const annVideoText=([,title,f])=>{const all=HOW_VIDEOS.flatMap(g=>g[1]).map(v=>v[1]),url=k=>new URL(all.find(h=>h.startsWith(`video/${k}.mp4`))||`video/${k}.mp4`,location.href).href;
   return `${title}\nEnglish: ${url(f)}\nCatalà: ${url(f+"-ca")}`};
-function annDialog(keep){
-  const old=keep&&$("#annt")?$("#annt").value:"",inTab=GR.find(g=>g.id===S.g);
+// Which language the teacher writes in (Roger, 7 Nov 2026: Catalan, and it comes out in English for the groups that need it):
+// "ca" = his Catalan for Starter and Base + an English version for Core, Plus and Pro; "en" the other way round; "one" = one text for all.
+// The choice stays on this computer (el_annL).
+const ANN_LANGS=[["ca","Català (English for Core, Plus and Pro)","Starter and Base read your Catalan; Core, Plus and Pro read the English version"],["en","English (Català for Starter and Base)","Core, Plus and Pro read your English; Starter and Base read the Catalan version"],["one","One text for everyone","Everyone reads exactly what you write"]];
+const annLang=()=>{if(!S.annL)try{S.annL=localStorage.getItem("el_annL")}catch(e){}if(!ANN_LANGS.some(x=>x[0]===S.annL))S.annL="ca";return S.annL};
+function annDialog(keep){S.annSeq=S.annSeq||0;
+  const old=keep&&$("#annt")?$("#annt").value:"",old2=keep&&$("#annt2")?$("#annt2").value:keep?S.annT2||"":"",inTab=GR.find(g=>g.id===S.g);
   if(keep&&$("#annat"))S.annAt=$("#annat").value;if(keep&&$("#annmail"))S.annMail=$("#annmail").checked;
-  if(!keep){S.annG=new Set(inTab?[inTab.id]:GR.map(g=>g.id));S.annS=false;S.annSel=new Set();S.annAt="";S.annMail=false}
+  if(!keep){S.annG=new Set(inTab?[inTab.id]:GR.map(g=>g.id));S.annS=false;S.annSel=new Set();S.annAt="";S.annMail=false;S.annEd=false;S.annT2=""}
+  const L=annLang(),two=L!=="one",other=L==="ca"?"English":"Catalan";
   const on=v=>v==="s"?S.annS:!S.annS&&annIds(v).every(id=>S.annG.has(id));
   const opt=(v,l)=>`<button type="button" class="chip ${on(v)?"on":""}" data-do="annto" data-v="${v}">${on(v)&&v!=="s"?"✓ ":""}${esc(l)}</button>`;
   const studs=Object.values(S.P).filter(s=>!s.tester&&s.group&&(!inTab||s.group===inTab.id)).sort(byName);
@@ -2676,9 +2683,15 @@ function annDialog(keep){
       +L.map(s=>`<label class="ck" style="font-weight:400;display:inline-flex;gap:4px;margin:2px 10px 2px 0"><input type="checkbox" data-annu="${esc(s.uid)}" ${S.annSel.has(s.uid)?"checked":""} ${s.away?"disabled":""}>${name(s)}${s.away?' <small class="muted">(not signed in yet)</small>':""}</label>`).join(""):""}).join("")}</div>`:"";
   const pad=n=>String(n).padStart(2,"0"),loc=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   dlg(`<h3>📣 New announcement</h3><p class="muted" style="margin:0 0 6px">To <small>(tick as many groups as you like)</small></p><div class="bar">${GR.map(g=>opt("g:"+g.id,g.name)).join("")}${[...new Set(GR.map(g=>g.course))].map(c=>opt("c:"+c,courseName(c)+" (both groups)")).join("")}${opt("all","Every group")}${opt("s",inTab?"Some students of "+inTab.name:"Some students")}</div>${pick}
-    <label for="annt">Your message <small class="muted">(up to ${ANN_MAX} characters; it goes exactly as you write it, so use the language you want them to read; a web link becomes clickable)</small></label>
-    <textarea id="annt" maxlength="${ANN_MAX}" style="min-height:120px" placeholder="For example: Tomorrow we meet in the computer room. Bring your headphones!"></textarea>
+    <div class="bar" style="margin:8px 0 4px;align-items:center"><span class="muted">I write in:</span>${ANN_LANGS.map(([v,l,tip])=>`<button type="button" class="chip ${L===v?"on":""}" data-annl="${v}" title="${esc(tip)}">${L===v?"✓ ":""}${esc(l)}</button>`).join("")}</div>
+    <label for="annt">${L==="ca"?`Your message in Catalan <small class="muted">(Starter and Base read it as you write it; up to ${ANN_MAX} characters; a web link becomes clickable)</small>`
+      :L==="en"?`Your message in English <small class="muted">(Core, Plus and Pro read it as you write it; up to ${ANN_MAX} characters; a web link becomes clickable)</small>`
+      :`Your message <small class="muted">(up to ${ANN_MAX} characters; everyone gets it exactly as you write it, so use the language you want them to read; a web link becomes clickable)</small>`}</label>
+    <textarea id="annt" maxlength="${ANN_MAX}" style="min-height:120px" placeholder="${L==="ca"?"Per exemple: Demà anem a l'aula d'informàtica. Porteu auriculars!":"For example: Tomorrow we meet in the computer room. Bring your headphones!"}"></textarea>
     <div class="bar" style="margin:4px 0 0"><span class="muted">Add a video link:</span>${ANN_VIDEOS.map(([t],i)=>`<button type="button" class="chip" data-annv="${i}">🎬 ${esc(t)}</button>`).join("")}</div>
+    ${two?`<label for="annt2" style="margin-top:10px">🌐 ${other} version, for ${L==="ca"?"Core, Plus and Pro":"Starter and Base"} <small class="muted">(Google Translate writes it while you type; read it and change anything you like)</small></label>
+    <textarea id="annt2" maxlength="${ANN_MAX}" style="min-height:100px" placeholder="The ${other} version appears here."></textarea>
+    <div class="bar" style="margin:2px 0 0;align-items:center"><button type="button" class="g" id="anntr">↻ Translate again</button><small class="muted" id="annts"></small></div>`:""}
     <div class="bar" style="margin:8px 0 0;align-items:center"><label for="annat" style="margin:0">⏰ Send later <small class="muted">(optional: leave it empty to send now)</small></label>
       <input type="datetime-local" id="annat" min="${loc(new Date())}" value="${esc(S.annAt||"")}" style="width:auto"><button type="button" class="g" id="annatx" ${S.annAt?"":"hidden"}>✕ Send now instead</button></div>
     <p class="muted" id="anncount" style="margin:6px 0"></p>
@@ -2686,17 +2699,40 @@ function annDialog(keep){
     <div class="annprev"><div><small class="muted">Core, Plus and Pro</small><div class="annc" id="annp-en" style="${annCardStyle}"></div></div><div><small class="muted">Starter and Base</small><div class="annc" id="annp-ca" style="${annCardStyle}"></div></div></div>
     <label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="annmail" style="width:auto;margin-right:6px;vertical-align:middle" ${S.annMail?"checked":""}> ✉️ Also email it to them <small class="muted">(school email, from your school account; a scheduled one goes when the time comes, the next time this dashboard is open)</small></label>
     <div class="row" style="justify-content:flex-start"><button data-do="annsend" id="annsend" disabled>📣 Send</button></div>`,true);
-  const t=$("#annt"),at=$("#annat");t.value=old;
+  const t=$("#annt"),at=$("#annat"),t2=$("#annt2");t.value=old;if(t2)t2.value=old2;
+  // the other version (Roger, 7 Nov 2026): Google Translate fills it while he types (annTranslate, 0.7 s after the last key), until he
+  // changes it himself (S.annEd); ↻ Translate again writes it anew. Send waits while it translates and while it is empty.
+  const st=(h)=>{const e=$("#annts");if(e)e.innerHTML=h};
+  const tr=async()=>{if(!two||!$("#annt2"))return;const n=++S.annSeq,v=t.value.trim();clearTimeout(S.annTm);
+    if(!v){$("#annt2").value="";S.annT2="";S.annBusy=false;st("");draw();return}
+    S.annBusy=true;st("🌐 Translating…");draw();
+    try{const r=await annTranslate(v,L,L==="ca"?"en":"ca");if(n!==S.annSeq||!$("#annt2")||S.annEd)return;
+      $("#annt2").value=r.slice(0,ANN_MAX);S.annT2=$("#annt2").value;st("🌐 Translated by Google Translate. Read it and change anything you like.")}
+    catch(e){console.warn("translate",e);if(n===S.annSeq)st(`<b style="color:#b91c1c">⚠️ Google Translate did not answer.</b> Write the ${other} version yourself, press ↻ Translate again, or choose “One text for everyone”.`)}
+    finally{if(n===S.annSeq){S.annBusy=false;draw()}}};
+  const later_=()=>{if(!two)return;if(S.annEd){st(`✏️ You changed this version, so it no longer follows your message. Press ↻ Translate again to translate it anew.`);return}clearTimeout(S.annTm);S.annTm=setTimeout(tr,700)};
   const draw=()=>{const sel=[...S.annSel],who=S.annS?sel.filter(u=>S.P[u]):Object.values(S.P).filter(s=>!s.tester&&S.annG.has(s.group)),n=who.length,v=t.value.trim();
     const later=annAtMs(),when=later?new Date(later).toLocaleString("en-GB",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"";
     $("#anncount").innerHTML=n?`Goes to <b>${n} student${n===1?"":"s"}</b>${S.annS?"":" (also the ones who have not signed in yet: they see it when they do)"}. Your test account gets a copy.`:S.annS?"Tick the students who should get it.":S.annG.size?"Nobody on the list in those groups yet.":"Tick at least one group.";
     $("#annwhen").innerHTML=later?`What they see, once, at the top of the first page they open <b>from ${esc(when)}</b> (before then they don't see it; the words around your message follow their route):`
       :"What they see, once, at the top of the next page they open (the words around your message follow their route):";
-    [["en",true],["ca",false]].forEach(([k,en])=>$("#annp-"+k).innerHTML=annCardHtml({text:v,created:later||Date.now()},en,true));
+    const v2=t2?t2.value.trim():"",txt=en=>!two?v:(L==="en")===en?v:v2;
+    [["en",true],["ca",false]].forEach(([k,en])=>$("#annp-"+k).innerHTML=annCardHtml({text:txt(en),created:later||Date.now()},en,true));
     $("#annatx").hidden=!at.value;$("#annsend").textContent=later?"⏰ Schedule":"📣 Send";
-    $("#annsend").disabled=!v||!n};
-  document.querySelectorAll("#dlg [data-annv]").forEach(c=>c.onclick=()=>{const add=annVideoText(ANN_VIDEOS[+c.dataset.annv]);t.value=(t.value.trim()?t.value.trim()+"\n\n":"")+add;t.value=t.value.slice(0,ANN_MAX);draw();t.focus()});
-  t.oninput=draw;at.oninput=at.onchange=draw;$("#annatx").onclick=()=>{at.value="";draw()};
+    $("#annsend").disabled=!v||!n||(two&&(S.annBusy||!v2))};
+  document.querySelectorAll("#dlg [data-annv]").forEach(c=>c.onclick=()=>{const add=annVideoText(ANN_VIDEOS[+c.dataset.annv]),put=e=>e.value=((e.value.trim()?e.value.trim()+"\n\n":"")+add).slice(0,ANN_MAX);
+    put(t);if(t2&&S.annEd){put(t2);S.annT2=t2.value}else later_();draw();t.focus()});
+  document.querySelectorAll("#dlg [data-annl]").forEach(c=>c.onclick=()=>{if(c.dataset.annl===L)return;try{localStorage.setItem("el_annL",c.dataset.annl)}catch(e){}S.annL=c.dataset.annl;
+    // Català ⇄ English with both texts there: they swap places (his text becomes the version and the other way round), nothing is lost.
+    // From or to "One text for everyone": the message stays and the other version is translated anew.
+    const a=t.value,b=t2?t2.value:"",swap=two&&c.dataset.annl!=="one"&&b.trim();if(swap){t.value=b;t2.value=a}else if(t2)t2.value="";
+    S.annEd=false;S.annT2=swap?a:"";annDialog(true)});
+  // a new drawing of the dialog (a group ticked, the language changed): a translation still on its way is asked again for these boxes
+  const wasBusy=S.annBusy;S.annSeq++;S.annBusy=false;clearTimeout(S.annTm);
+  if(t2){t2.oninput=()=>{S.annEd=true;S.annT2=t2.value;S.annSeq++;S.annBusy=false;st("✏️ Changed by you. ↻ Translate again replaces it with a new translation.");draw()};
+    $("#anntr").onclick=()=>{S.annEd=false;tr()};
+    if(keep&&t.value.trim()&&!S.annEd&&(wasBusy||!t2.value.trim()))tr();else if(S.annEd)st("✏️ Changed by you. ↻ Translate again replaces it with a new translation.")}
+  t.oninput=()=>{draw();later_()};at.oninput=at.onchange=draw;$("#annatx").onclick=()=>{at.value="";draw()};
   document.querySelectorAll("#dlg [data-annu]").forEach(c=>c.onchange=()=>{c.checked?S.annSel.add(c.dataset.annu):S.annSel.delete(c.dataset.annu);draw()});
   draw();t.focus()}
 // 🛠 Maintenance mode (Roger, 7 Nov 2026: "que els estudiants no puguin entrar a la web, deixant un missatge que estic fent manteniment"):
@@ -2745,11 +2781,21 @@ function annSendNow(){
   if(S.annS&&!sel.length)return alert("Tick the students who should get it.");
   if(!S.annS&&!S.annG.size)return alert("Tick at least one group.");
   const testers=Object.values(S.P).filter(s=>s.tester&&!s.away).map(s=>s.uid),later=annAtMs();
-  const mail=$("#annmail")&&$("#annmail").checked,o=Object.assign({text,uids:[...new Set([...sel,...testers])]},annTarget(sel),later?{at:later}:{},mail?{mail:true}:{});
+  // two versions: text = what he wrote, ca for Starter and Base, en for Core, Plus and Pro (annText on the card, the board and the email)
+  const L=annLang(),t2=L!=="one"&&$("#annt2")?$("#annt2").value.trim().slice(0,ANN_MAX):"";
+  if(L!=="one"&&!t2)return alert(`The ${L==="ca"?"English":"Catalan"} version is empty: wait for the translation or write it yourself.`);
+  const two=L==="one"?{}:{lang:L,ca:L==="ca"?text:t2,en:L==="en"?text:t2};
+  const mail=$("#annmail")&&$("#annmail").checked,o=Object.assign({text,uids:[...new Set([...sel,...testers])]},two,annTarget(sel),later?{at:later}:{},mail?{mail:true}:{});
   if(mail&&!later)o.mailed=Date.now();
   $("#dlg").close();act(api.annSend(o));if(mail&&!later)mailNote(annMail(o),"Announcement")}
-// the announcement's email: to everyone it is for (annWho, also students not signed in yet), its text exactly as written
-const annMail=a=>mailStudents(mailTo(annWho(a)),"English Lab · 📣 Announcement / Anunci del professor",a.text+mailFoot(null));
+// the announcement's email: to everyone it is for (annWho, also students not signed in yet), the whole text exactly as written. With two
+// versions (ca, en) each student gets the one of their level, in two emails: Starter and Base (and anyone with no level yet) the Catalan
+// one, Core, Plus and Pro the English one. You are asked before each of them.
+async function annMail(a){
+  if(!(a.ca&&a.en))return mailStudents(mailTo(annWho(a)),"English Lab · 📣 Announcement / Anunci del professor",a.text+mailFoot(null));
+  const W=annWho(a),en=W.filter(s=>msgCa(s)===false),ca=W.filter(s=>msgCa(s)!==false);
+  return (await mailStudents(mailTo(ca),"English Lab · 📣 Anunci del professor",a.ca+mailFoot(true)))
+    +(await mailStudents(mailTo(en),"English Lab · 📣 Announcement from your teacher",a.en+mailFoot(false)))}
 // scheduled announcements with ✉️: emailed by the first dashboard open after their time; a transaction marks them mailed first, so two
 // open dashboards (Mac, PC, phone) never send it twice
 function annDue(){if(DEMO||S.annDue)return;const due=(S.D&&S.D.ann||[]).filter(a=>a.mail&&!a.mailed&&a.at&&annMs(a.at)<=Date.now());if(!due.length)return;S.annDue=true;
