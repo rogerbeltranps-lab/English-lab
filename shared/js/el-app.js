@@ -29,7 +29,11 @@
   // <html class="elgate"> stay hidden until html.elready (el-app.css), so the browser never paints the page's own old layout, the
   // menu without its styles or a half-moved learning path. html.elhold: the page adds elready itself (English Lab, after its first
   // drawing). el-app.css shows the page anyway after 1.5 s.
-  const ready = () => { if (!document.documentElement.classList.contains("elhold")) document.documentElement.classList.add("elready"); };
+  // Nobody signed in on this browser (no el_who): the page stays hidden until Firebase knows who it is (html.elwait; el-cloud.js
+  // shows it, with the Sign in screen for a signed-out visitor), so the page never flashes before the Sign in (Roger, 7 Nov 2026).
+  const ready = () => { const h = document.documentElement; if (h.classList.contains("elhold")) return;
+    let known = true; try { known = !!localStorage.getItem("el_who"); } catch (e) {}
+    h.classList.add(known ? "elready" : "elwait"); };
   if (!mode) { ready(); return; }
   if (!document.querySelector('link[href$="shared/css/el-app.css"]')) { const css = document.createElement("link"); css.rel = "stylesheet"; css.href = ROOT + "shared/css/el-app.css"; document.head.append(css); }
   const course0 = (path.match(/\/((?:2|4)eso)\//) || [])[1] || null;

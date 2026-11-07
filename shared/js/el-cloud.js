@@ -43,7 +43,9 @@ function mtHide(){if(mtO){mtO.remove();mtO=null}}
 const FB="https://www.gstatic.com/firebasejs/10.14.1/";
 const FBM=await Promise.all([import(FB+"firebase-app.js"),import(FB+"firebase-auth.js"),import(FB+"firebase-firestore.js")])
   .catch(e=>{console.warn("Firebase could not load (offline?): the page works on its own, nothing is synced",e);return null});
-if(!FBM)await new Promise(()=>{});   // offline: stop here quietly, as the failed static import did before
+// html.elwait (el-app.js, el-ls-home.js: nobody signed in on this browser): the page stays hidden until the sign-in is known
+const elShow=()=>{const h=document.documentElement;if(h.classList.contains("elwait"))h.classList.add("elready")};
+if(!FBM){elShow();await new Promise(()=>{})}   // offline: stop here quietly, as the failed static import did before
 const [{initializeApp},A,{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot,arrayUnion}]=FBM;
 
 const {getAuth,signOut,onAuthStateChanged}=A;
@@ -285,6 +287,7 @@ async function gate(u){
   }
   if(AS&&!lsId&&!onBoard)asBanner();   // course pages, English Lab, Practice: the student view's banner too
   if(!lsId||!window.EL_CATALOG)return;
+  if(!u&&!AS){signInBlock();return}   // signed out: the Sign in screen at once (it came after reading the LS, the same way)
   const info=await lsInfo(lsId),st=info.status;
   if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
   if(isTeacher(u)&&!AS){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);return}   // an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
@@ -1013,6 +1016,7 @@ onAuthStateChanged(auth,async u=>{
     else leaveAs(false);
   }
   user=u;authKnown=true;draw(u);
+  if(u)elShow();   // signed out: after gate, with the Sign in screen already on it
   if(u&&signInO){signInO.remove();signInO=null}
   // A student's first sign-in on this browser starts clean too: what is there was done by the teacher, a signed-out visitor or
   // another student, and this student's own work comes back from the cloud (pull).
@@ -1031,6 +1035,7 @@ onAuthStateChanged(auth,async u=>{
   document.querySelectorAll("[data-el-teacher]").forEach(e=>e.hidden=!isTeacher(u)||!!AS);   // teacher-only links (e.g. a class game on its learning path)
   menuLink(u);   // again after gate, which knows the route (the label follows its language)
   try{await gate(u)}catch(e){console.warn("gate",e)}
+  elShow();
   if(reloadIfStale())return;   // wiped on a page without progress sync
   if(u&&(isStudent(u)||AS)&&!myLevel&&!onBoard)await findHomeLevel(AS||u);
   if(AS&&!lsId&&!onBoard&&homeLevel)asBanner();   // again, with their level
