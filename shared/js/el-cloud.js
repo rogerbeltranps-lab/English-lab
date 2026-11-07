@@ -15,7 +15,7 @@ const ROOT=new URL("../../",import.meta.url);
 // when the sign-in is known, which is the same picture.
 loadScript("shared/js/el-app.js",()=>window.ELApp);   // the app menu on student pages (el-app.js: a strip of icon buttons, a phone's bottom bar)
 // 🛠 Maintenance mode (Roger, 7 Nov 2026; shared/js/el-maintenance.js has the message and the worksheets). The teacher's switch on the
-// dashboard writes site/maintenance = {on, note, since} (anyone can read it, only the teacher writes it). Students only: the teacher, the
+// dashboard writes site/maintenance = {on, note, pdfs, since} (anyone can read it, only the teacher writes it). Students only: the teacher, the
 // teacher's student view and the test account's "see everything" get in as usual. Reads: none for 2 minutes after a check that found it
 // off (el_mt in this browser), so a page opened from then on is covered within 2 minutes; otherwise one (a listener on that document,
 // whose first answer is the check). While it is on, the page saves nothing, keeps listening and opens again by itself when it goes off.
@@ -952,14 +952,14 @@ function mtCheck(u){
   return new Promise(res=>{let first=true,o=null;
     const off=()=>{mtPut({on:false});if(mtStop){mtStop();mtStop=null}};
     const stop=onSnapshot(doc(db,"site","maintenance"),async s=>{const d=s.exists()?s.data():{};
-      if(!first){if(!d.on){off();location.reload()}else if(o&&(d.note||"")!==o.note){o.note=d.note||"";mtPut(Object.assign({on:true},o));mtShow(o,isTester(u))}return}
+      if(!first){if(!d.on){off();location.reload()}else if(o&&((d.note||"")!==o.note||JSON.stringify(d.pdfs||null)!==JSON.stringify(o.pdfs))){o.note=d.note||"";o.pdfs=d.pdfs||null;mtPut(Object.assign({on:true},o));mtShow(o,isTester(u))}return}
       first=false;
       if(!d.on){off();mtHide();res(false);return}
       frozen=true;   // nothing typed behind the message is saved
       const g=myGroup||(myRoster||{}).group||"",mm=/^([24])eso/i.exec(g),course=courseOf(g)||(mm?mm[1]+"eso":null);
       const ls=(window.EL_LS||[]).filter(l=>l.course===course).pop();let route=null;
       try{if(ls&&window.elRouteOf)route=elRouteOf(await myLevels(u.uid),ls.id).level||null}catch(e){console.warn("route",e)}
-      o={course,route,ca:!route||(window.elCa?elCa(route):true),note:d.note||""};
+      o={course,route,ca:!route||(window.elCa?elCa(route):true),note:d.note||"",pdfs:d.pdfs||null};   // pdfs: what the teacher ticked
       mtPut(Object.assign({on:true},o));
       try{await mtShow(o,isTester(u))}catch(e){console.warn("maintenance",e)}
       remember(u);   // el_who: the next page shows the message at once
