@@ -43,15 +43,18 @@ window.ELMark=(function(){
           "CORRECTED TEXT: their whole text with only those mistakes fixed, everything else exactly as they wrote it; put every word you changed or added between *asterisks*.",
           "Starter and Base had more support and shorter tasks: be gentle, explain in very simple Catalan. No mistakes: say so in the comment and leave the mistakes out.",
           "COPYING: flag a text you think the student did not write themselves: far above what their route and exam writing mark suggest, translator-like (correct but unnatural, words or structures a learner at that level would not know), or mostly pasted according to its writing log. Never flag the Pro route for being too good. Still write the full correction: the teacher decides."]
-        :["Write as their teacher, in the first person, with no signature. Each correction: one thing done well; the two or three most useful mistakes, each with the correct form (quote their words → the right version); one thing to try next time. Keep it short (two to five sentences), warm and concrete, in the language given, for what their route asked (Starter and Base had more support and shorter tasks). A spoken transcript comes from speech recognition: do not correct spelling or punctuation there, only words and grammar. Empty work: tell them kindly to do it and hand it in again."]),""];
+        :["Write as their teacher, in the first person, with no signature. Each correction: one thing done well; the two or three most useful mistakes, each with the correct form (quote their words → the right version); one thing to try next time. Keep it short (two to five sentences), warm and concrete, in the language given, for what their route asked (Starter and Base had more support and shorter tasks). A spoken transcript comes from speech recognition: do not correct spelling or punctuation there, only words and grammar. Empty work: tell them kindly to do it and hand it in again.",
+          // Roger, 7 Nov 2026 (a Speaking transcript with 568 characters pasted got a normal correction): speech recognition never pastes,
+          // so a transcript with a [paste log] was typed or pasted, not spoken. Clearly pasted ones (ELMark.pasted) go back to redo at once.
+          "NOT SPOKEN: a line [paste log] means text was pasted into the transcript box (speech recognition never pastes). When most of the transcript was pasted, they did not speak it: still write the correction, and flag it."]),""];
     const body=o.students.flatMap(s=>[`=== ${s.code} · route ${s.route||"–"} · ${o.mode==="reply"?"answer":"correction"} in ${s.ca?"Catalan":"English"}${o.mode==="writing"&&s.exam?" · exam writing "+s.exam:""}`,
-      ...(o.mode==="writing"&&s.ty?[`[writing log] ${tyText(s.ty)}`]:[]),
+      ...(o.mode==="writing"&&s.ty?[`[writing log] ${tyText(s.ty)}`]:o.mode!=="reply"&&s.ty&&+s.ty.p>0?[`[paste log] ${tyText(s.ty)}`]:[]),
       ...(s.fields||[]).map(f=>`[${f.l}] ${String(f.v||"").replace(/\s+/g," ").trim()||"(empty)"}`),""]);
     const fmt=["ANSWER FORMAT (strict: the site reads it automatically). Reply with ONLY these lines, in a single code block, nothing before or after:",
       `${V} | ${o.aid} | ${o.step} | ${o.group}`,
       ...(o.mode==="writing"?["<code> | - | <comment> ## <their words> => <correct form> :: <why> ## <their words> => <correct form> :: <why> ## TEXT: <their text corrected, changes in *asterisks*>",
           "For a flagged text add a fourth part at the end of its line: <code> | - | <the correction as above> | COPY? <short reason for the teacher, in English>"]
-        :[`<code> | - | <the ${o.mode==="reply"?"answer":"correction"}, on one line>`]),
+        :[`<code> | - | <the ${o.mode==="reply"?"answer":"correction"}, on one line>`,...(o.mode==="reply"?[]:["For a transcript that was not spoken add a fourth part: <code> | - | <the correction> | COPY? pasted, not spoken"])]),
       "(one line per student, every code above, same order)","END",
       "Never write | inside the correction. Never add names."];
     return [...head,"STUDENTS",...body,...fmt].join("\n");
@@ -163,7 +166,8 @@ window.ELMark=(function(){
   function redoWhy(ty,why,ca){const t=ty||{},out=[],n=+t.n||0,p=+t.p||0,k=+t.k||0,sec=+t.s||0;
     const tm=sec<60?(ca?sec+" segons":sec+" seconds"):(m=>ca?m+(m===1?" minut":" minuts"):m+(m===1?" minute":" minutes"))(Math.max(1,Math.round(sec/60)));
     // p counts every paste, so it can be more than the text (pasted several times)
-    if(p>=20)out.push(p>=n?(ca?"has enganxat el text sencer en lloc d’escriure’l":"you pasted the whole text instead of writing it"):(ca?`has enganxat ${p} dels ${n} caràcters del text`:`you pasted ${p} of the ${n} characters of your text`));
+    if(p>=20&&/spoken/i.test(why||""))out.push(ca?"has enganxat el text en lloc de dir-lo amb el micròfon":"you pasted the text instead of saying it into the microphone");
+    else if(p>=20)out.push(p>=n?(ca?"has enganxat el text sencer en lloc d’escriure’l":"you pasted the whole text instead of writing it"):(ca?`has enganxat ${p} dels ${n} caràcters del text`:`you pasted ${p} of the ${n} characters of your text`));
     if(ty&&n&&k<n/2)out.push(ca?`només has escrit ${k} lletres amb el teclat per a un text de ${n}`:`you only typed ${k} keys for a text of ${n} characters`);
     if(ty&&sec&&(sec<180||p>=20))out.push(ca?`l’has fet en ${tm}`:`you did it in ${tm}`);
     if(/level|vocab|above|grammar/i.test(why||""))out.push(ca?"el nivell d’anglès és molt més alt del que fas servir normalment":"the English is far above the level you usually write at");

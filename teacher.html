@@ -647,13 +647,15 @@ const EN=(c,e)=>e,corrBox='margin:8px 0;padding:12px 14px;border:2px solid #16a3
 function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=res(u,aid),fl=(x.flags||{})[step];
   if(fl&&fl.why&&!fl.done)return cpOpen(u,aid,step);
   const w=wrState(u,a,step)||{i:"",t:""},it=ELMark.fbItems(pstate(u,a),new Set(),/reflect$/.test(aid)?"reflect":null)[step]||{fields:[]},f=it.fields||[],orig=String((f[0]||{}).v||"");
-  // rich: a correction with the table (✗ rows, ✅ corrected text) shows the first text inside it; plain feedback (a Reading log's comment) shows every answer below it
+  // Speaking and Talk (Roger, 7 Nov 2026: "what's going on here?" on "pasted 0 · 0 keys · 0 s"): their transcript comes from the microphone,
+// so the log shows only when something was pasted into it (then it was not spoken). Empty writing logs are left out too.
+// rich: a correction with the table (✗ rows, ✅ corrected text) shows the first text inside it; plain feedback (a Reading log's comment) shows every answer below it
   const t=(x.replies||{})[step],rich=/^(✗|✅) /m.test(String(t||"")),fs=(x.fbSig||{})[step],lv=Object.entries((x.levels||{})[step]||{}),old=!!t&&!!fs&&fs!=="redo"&&fs!==sigOf(JSON.stringify(f));
   const mo=(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).some(m=>m.a===aid&&m.step===step),canBack=!!f.length&&!mo&&isWriting(a,step,pstate(u,a))&&!(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")));
-  const on=v=>v?ELWeek.date(ymd(v)):"",log=it.ty?`<p class="muted">✍️ Writing log: ${esc(ELMark.tyText(it.ty))}</p>`:"";
+  const on=v=>v?ELWeek.date(ymd(v)):"",log=it.ty&&(/speak|talk/.test(step)?+it.ty.p>0:(it.ty.p||it.ty.k||it.ty.s))?`<p class="muted">${/speak|talk/.test(step)?"⚠️ Pasted into the transcript box (speech recognition never pastes)":"✍️ Writing log"}: ${esc(ELMark.tyText(it.ty))}</p>`:"";
   const back=fl&&fl.back&&fl.done==="redo"?`<p class="muted">↩ <b>You sent it back</b>${fl.at?" on "+on(fl.at):""}: “${esc(fl.back)}”</p>`:"";
   const copy=fl&&fl.why&&!fl.back?`<p class="muted">⚠️ <b>Possible copy</b>${fl.at?" on "+on(fl.at):""}: ${esc(fl.why)} · ${fl.done==="redo"?(fl.auto?"sent back automatically to redo (mostly pasted)":"you sent it back to redo"):"you accepted it as their work"}${fl.auto&&fl.done==="redo"&&canBack===false?` <button class="g mini" data-do="cpopen" data-u="${u}" data-a="${esc(aid)}" data-s="${esc(step)}" title="Open the check: Accept it if it is their own work">Check it</button>`:""}</p>`:"";
-  const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.map(y=>`<p><b>${esc(y.l)}</b></p>${text(y.v)}`).join("");
+  const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.map(y=>`<p><b>${esc(y.l==="Text"&&/speak|talk/.test(step)?"What they said (transcript)":y.l)}</b></p>${text(y.v)}`).join("");
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
     <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
