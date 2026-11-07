@@ -59,15 +59,21 @@
   const PLACES=["study","about","final","notes"];   // notes: 📝 Your notes from the class games (el-notes.js)
   // Go to the top only when the place changes, never on a redraw: the page draws again when Firebase answers and on every refresh, and that
   // threw the student back to the top while scrolling the Study place (Roger's screen recording, 7 Nov 2026)
-  let shownPlace=null;
+  // The jump is instant, never animated: ls-home.css has html{scroll-behavior:smooth}, so a plain scrollTo(0,0) first showed the new place
+  // at the old scroll (About opened at its criteria) and then slid up to the top (Roger's screen recording, 7 Nov 2026, 22:51).
+  // Back on the LS home, the page goes back to where the student was on it, not to where they were on About.
+  let shownPlace=null,homeY=0;
+  const jump=y=>{try{window.scrollTo({top:y,left:0,behavior:"instant"})}catch(e){window.scrollTo(0,y)}};
   function place(){
     // a place the page does not have (LS2 has no #study since 7 Nov 2026; an old link or bookmark) opens the LS home
-    const h=location.hash.slice(1),p=PLACES.includes(h)&&document.querySelector(`[data-place="${h}"]`)?h:"home",moved=p!==shownPlace;shownPlace=p;
+    const h=location.hash.slice(1),p=PLACES.includes(h)&&document.querySelector(`[data-place="${h}"]`)?h:"home",moved=p!==shownPlace,from=shownPlace;
+    if(moved&&from==="home")homeY=window.scrollY;
+    shownPlace=p;
     $$("[data-place]").forEach(s=>s.hidden=s.dataset.place!==p);
     const c=$("#crumb");
     if(c)c.innerHTML=p==="home"?`<a class="back" href="${teach()?dashHref():boardHref()}">‹ ${teach()?"Dashboard":t("El meu tauler","My dashboard")}</a>`
       :`<a class="back" href="#">‹ ${esc(lsName(ls))}</a>`;
-    if(moved&&p!=="home")window.scrollTo(0,0);
+    if(moved&&(from!==null||p!=="home"))jump(p==="home"?homeY:0);   // the first drawing of the LS home keeps the browser's own scroll
   }
 
   // ---- progress
@@ -161,6 +167,7 @@
     let lvs={};try{lvs=await C.levels()}catch(e){}
     const lv=window.elRouteOf?elRouteOf(lvs,LS).level:null;
     CA=(who.role==="student"||who.role==="as")&&(!lv||elCa(lv));
+    if(who.role==="as")try{const A=JSON.parse(sessionStorage.getItem("el_as")||"null");if(A&&A.uid===who.uid&&A.ca!==CA){A.ca=CA;sessionStorage.setItem("el_as",JSON.stringify(A))}}catch(e){}
     let info={},rs={};
     try{info=await (C.lsNow||C.lsInfo)(LS)}catch(e){}
     if(who.role!=="teacher")try{for(const r of Object.values(await C.results()))if(r&&r.activity)rs[r.activity]=r}catch(e){}
@@ -182,7 +189,8 @@
     const W=J(localStorage,"el_who");if(!W||!W.role)return;
     const A=W.role==="teacher"?J(sessionStorage,"el_as"):null;
     who=A&&A.uid?{role:"as",uid:A.uid}:{role:W.role};
-    CA=who.role==="student"&&W.ca!==false;
+    // the teacher's student view: the student's language, kept with el_as by the page before (el-cloud.js remember, the board, fromCloud below)
+    CA=who.role==="student"?W.ca!==false:who.role==="as"?A.ca!==false:false;
     const info=J(localStorage,"el_ls_"+LS),rc=who.role==="student"&&W.uid?J(localStorage,"el_rc_"+W.uid):null,rs={};
     if(rc&&rc.d)for(const r of Object.values(rc.d))if(r&&r.activity)rs[r.activity]=r;
     if(info||who.role==="teacher"||who.role==="tester"){

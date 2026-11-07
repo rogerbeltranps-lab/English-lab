@@ -1022,7 +1022,10 @@ function mtCheck(u){
 // Removed on sign-out and for an account that cannot come in. The teacher's student view keeps the teacher's own.
 function remember(u){try{
   if(!u){localStorage.removeItem("el_who");return}
-  if(AS||myRoster===null)return;
+  // the teacher's student view: the student's language goes with el_as (this tab), so the next page draws in it at once, not in the
+  // teacher's English first and Catalan two seconds later (Roger's screen recording, 7 Nov 2026, LS2 home as a Base student)
+  if(AS){const l=myLevel||homeLevel;if(l){const ca=elCa(l);if(AS.ca!==ca){AS.ca=ca;asSave(AS)}}return}
+  if(myRoster===null)return;
   const role=isTeacher(u)?"teacher":seesAll(u)?"tester":"student",l=myLevel||homeLevel;
   // a page that does not read the level (the board) keeps the language saved before: it wrote null, and the next page drew English first
   let was=null;try{was=JSON.parse(localStorage.getItem("el_who")||"null")}catch(e){}
