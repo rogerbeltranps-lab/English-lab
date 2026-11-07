@@ -53,7 +53,8 @@
     : W.role === "teacher" && AS0 && AS0.uid ? { role: "student", as: AS0.uid, group: AS0.group || null }
     : { role: W.role, group: W.group || null };
   if (who.group) who.course = who.group.slice(0, 4).toLowerCase();
-  let CA = !!W && W.role === "student" && W.ca !== false;   // a student with no level known yet: Catalan, as el-ls-home.js (Starter and Base)
+  // the teacher's student view (el_as): the student's language, kept with el_as (el-cloud.js), not the teacher's English first
+  let CA = !!W && (who.as ? AS0.ca !== false : W.role === "student" && W.ca !== false);   // a student with no level known yet: Catalan, as el-ls-home.js (Starter and Base)
   const t = (ca, en) => CA ? ca : en;
   const load = (src, has) => has() ? Promise.resolve() : new Promise(r => { const s = document.createElement("script"); s.src = ROOT + src; s.onload = s.onerror = r; document.head.append(s); });
   const lsHref = id => { const l = (window.EL_LS || []).find(x => x.id === id); return l ? ROOT + l.course + "/" + l.id.slice(l.course.length + 1) + "/index.html" : null; };
