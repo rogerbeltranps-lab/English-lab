@@ -266,7 +266,7 @@ const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
   // the same menu as every other student page: elStudentMenu in shared/js/el-catalog.js (Roger, 7 Nov 2026: "this should always be the same")
-  const pl=placeNow(),here={home:"board",books:"books",lang:"lang",help:"help",phone:"phone"}[pl]||"";
+  const pl=placeNow(),here={home:"board",marks:"marks",books:"books",lang:"lang",help:"help",phone:"phone"}[pl]||"";
   if(!all())try{localStorage.setItem("el_menu_ls",JSON.stringify(lss.map(l=>l.id)))}catch(e){}   // the other pages show the same LSs
   const html=elStudentMenu({root:"",courses:cs,lss,ca:lang()==="ca",board:location.search||"today.html",here,app:APP()});
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
@@ -322,7 +322,7 @@ function homeHtml(lss,ls,info){
   // ✅ To do (opened in class, not finished) and 🏠 Homework (only what the teacher set as homework) are two tiles (Roger, 6 Nov 2026)
   // 📊 My marks: its own card right under the blue one; the two together take the blue card's old height (Roger, 7 Nov 2026: "my marks
   // should be another cloud below the blue one but both should occupy what the blue one is doing now")
-  const marks=tile("#marks","📊",t("Les meves notes","My marks"),t("activitats, exàmens i producte final","activities, exams and final product"),"","",true);
+  // 📊 My marks is in the left menu, right under My dashboard, on every page (Roger, 7 Nov 2026), not a card here any more
   const tiles=tile("#todo","✅",t("Per fer","To do"),td.length?(td.length>1?t(`${td.length} learning paths oberts per acabar`,`${td.length} open learning paths to finish`):t("1 learning path obert per acabar","1 open learning path to finish")):t("Ho tens tot fet","All done"),td.length||"","")
     +tile("#homework","📝",t("Deures","Homework"),hwOpen.length?t("Per al ","For ")+when(hwOpen[0].x.date):t("No tens deures","No homework"),hwOpen.length||"","hw")
     ;
@@ -334,7 +334,7 @@ function homeHtml(lss,ls,info){
   const lv=ls&&elRouteOf(D.lv,ls.id).level,cefr=lv?elCefr(COURSE,lv):"";
   const lvBox=lv?`<div class="hlv" title="${esc(elCefr(COURSE,lv,true))}"><span class="i" aria-hidden="true">🎯</span><span><small>${t("El meu nivell","My level")}</small><b>${esc(LV[lv]||lv)}${cefr?` · ${esc(cefr)}`:""}</b></span></div>`:"";
   const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox;
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}${marks}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
 // vocabulary and grammar summary of the student's level (the same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS),
 // the teacher and testers every level. Nothing until the student has a level; no new Firestore reads.

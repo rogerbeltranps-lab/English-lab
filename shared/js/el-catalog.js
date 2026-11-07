@@ -455,7 +455,7 @@ window.elMenuLs=function(courses,group){
     .sort((a,b)=>(((info(b.id)||{}).status==="open")-((info(a.id)||{}).status==="open")));   // open LS first, as the board
 };
 // o: {root (site root URL, "" on today.html), courses:["4eso"], lss (LS list; default elMenuLs), group, ca (Catalan labels), board (the
-// board's URL, ?student= in the teacher's student view), here: "board"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"help"|"phone",
+// board's URL, ?student= in the teacher's student view), here: "board"|"marks"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"help"|"phone",
 // app (opened as a home-screen app: no 📱)} → the buttons' HTML (classes nv, nv sub, on; shared/css/el-app.css and ls-home.css)
 window.elStudentMenu=function(o){
   const R=o.root||"",t=(ca,en)=>o.ca?ca:en,cs=o.courses||[],CN={"2eso":"2 ESO","4eso":"4 ESO"},board=o.board||R+"today.html",here=o.here||"";
@@ -463,7 +463,9 @@ window.elStudentMenu=function(o){
   const b=(k,cls,h,ic,txt,x)=>{const on=k&&k===here;return `<a class="nv${cls}${on?" on":""}" href="${h}"${on?' aria-current="page"':""}${x||""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`};
   const bq=board.split("#")[0];
   // Practise right below My dashboard (Roger, 7 Nov 2026: "practice should be below my dashboard")
-  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
+  // 📊 My marks right below My dashboard, on every student page (Roger, 7 Nov 2026: "i si posem les meves notes a sota del meu taulell?
+  // i revisem que estigui allà sempre?"): the board's #marks place
+  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
     +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
       +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
     +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary")):"")
