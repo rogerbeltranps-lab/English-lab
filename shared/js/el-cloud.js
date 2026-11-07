@@ -2,15 +2,23 @@
 // route (set by the teacher), learning paths the teacher opens per group, once-only activities, points per completed action.
 import "./el-copyright.js";
 import "./el-route-names.js";
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {signIn} from "./el-signin.js";
-import {getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "./el-firebase.js";   // project config, school domains, teacher and testers
 import {report} from "./el-report.js";
 
 const SKIP=/^(el_|firebase|debug)/;
 const ROOT=new URL("../../",import.meta.url);
+// Pages open straight on the right version (Roger, 7 Nov 2026: "When I open a page, it loads old version for seconds and then it opens
+// the last version"). The Firebase SDK is loaded with import() after this point, not with static imports: those held back this whole file,
+// so the app menu (el-app.js) and the route names (el-route-names.js) waited for the SDK, and every page first showed its signed-out or
+// old look. The pages draw at once from el_who (who was signed in on this browser last, saved below in onAuthStateChanged) and redraw
+// when the sign-in is known, which is the same picture.
+loadScript("shared/js/el-app.js",()=>window.ELApp);   // the app menu on student pages (el-app.js: a strip of icon buttons, a phone's bottom bar)
+const FB="https://www.gstatic.com/firebasejs/10.14.1/";
+const FBM=await Promise.all([import(FB+"firebase-app.js"),import(FB+"firebase-auth.js"),import(FB+"firebase-firestore.js")])
+  .catch(e=>{console.warn("Firebase could not load (offline?): the page works on its own, nothing is synced",e);return null});
+if(!FBM)await new Promise(()=>{});   // offline: stop here quietly, as the failed static import did before
+const [{initializeApp},A,{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,collection,query,where,writeBatch,serverTimestamp,onSnapshot}]=FBM;
 
 const {getAuth,signOut,onAuthStateChanged}=A;
 const app=initializeApp(CONFIG),auth=getAuth(app),db=getFirestore(app);
@@ -91,7 +99,11 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
 async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
-  return {status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{}}}catch(e){return {status:"hidden",enabled:[],open:{}}}}
+  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{}};
+  lsKeep(id,o);return o}catch(e){return {status:"hidden",enabled:[],open:{}}}}
+// The last LS state read in this browser (el_ls_<id>: status, groups, open learning paths), only for a page's first drawing before the
+// sign-in is known (the LS home's learning paths, All Learning Situations). The page draws again with the state it reads now.
+function lsKeep(id,o){try{origSet.call(localStorage,"el_ls_"+id,JSON.stringify({status:o.status,enabled:o.enabled,groups:o.groups,open:o.open,done:o.done}))}catch(e){}}
 const lsStatus=async id=>(await lsInfo(id)).status;
 
 // Any key the pull changes marks the page stale, not only this activity's: the final product reads every product piece and Reflect
@@ -162,13 +174,13 @@ async function teacherLogin(){
   try{return (await A.signInWithPopup(auth,p)).user}catch(x){if(x&&x.code!=="auth/popup-closed-by-user")console.warn("sign in",x);return null}
 }
 async function refuse(u){
-  const mail=u.email;await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");
+  const mail=u.email;await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");localStorage.removeItem("el_who");
   const o=overlay('<div style="max-width:520px"><h1>Aquest compte no pot entrar</h1><p><b></b> no és a la llista d\'alumnes d\'English Lab. Entra amb el teu correu de l\'institut i la contrasenya que t\'ha donat el professor, o parla amb ell.</p><p><button style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit">Entra amb un altre compte</button></p></div>');
   o.style.zIndex=10001;o.querySelector("b").textContent=mail;o.querySelector("button").onclick=()=>{o.remove();login()};
 }
 // Shared school computers: never leak one student's local progress into another account.
 const wipeLocal=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!SKIP.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k));localStorage.removeItem(DIRTY);if(ks.length)stale=true};
-const logout=async()=>{await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");location.reload()};
+const logout=async()=>{await signOut(auth);wipeLocal();origSet.call(localStorage,"el_uid","");localStorage.removeItem("el_who");location.reload()};
 
 function banner(text,color,btn){
   const b=document.createElement("div");b.id="el-banner";
@@ -899,6 +911,14 @@ function bellWatch(cb){
     if(x&&Date.now()-x.t<MS){if(!c||x.t!==c.t){c=x;cb(x.l)}}else read()},60e3);
   return()=>clearInterval(t);
 }
+// Who was signed in on this browser last (el_who: uid, role, group, language), for each page's first drawing before the sign-in is known
+// (el-app.js, el-ls-home.js, today.html, teacher.html, lab/): the page opens on the right version, not the signed-out or a guessed one.
+// Removed on sign-out and for an account that cannot come in. The teacher's student view keeps the teacher's own.
+function remember(u){try{
+  if(!u){localStorage.removeItem("el_who");return}
+  if(AS||myRoster===null)return;
+  const role=isTeacher(u)?"teacher":seesAll(u)?"tester":"student",l=myLevel||homeLevel;
+  origSet.call(localStorage,"el_who",JSON.stringify({uid:u.uid,role,group:role==="student"?myGroup:null,ca:role==="student"?(l?elCa(l):null):false,t:Date.now()}))}catch(e){}}
 onAuthStateChanged(auth,async u=>{
   window.EL_VIEW_LEVEL=viewLevel(u);   // before anything reads a route (elRouteOf)
   // 👁 the teacher's student view of this tab: started by the student's board (today.html?student=uid), ended by the dashboard
@@ -980,11 +1000,11 @@ onAuthStateChanged(auth,async u=>{
   if(stopBell&&!isTeacher(u)){stopBell();stopBell=null;bellEl=null;draw(u)}
   if(isTeacher(u)&&!bellEl)import("./el-bell.js").then(m=>{if(bellEl||!isTeacher(user))return;
     bellEl=m.bell({dash:DASH,onDash,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
+  remember(u);
   listeners.forEach(f=>f(u));
   // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
   if(stopJoin){stopJoin();stopJoin=null}const jg=++joinGen;
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
-loadScript("shared/js/el-app.js",()=>window.ELApp);   // the app menu on student pages (el-app.js: a strip of icon buttons, a phone's bottom bar)
 window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};

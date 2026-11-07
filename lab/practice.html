@@ -68,6 +68,7 @@
     @media (max-width:620px){.panel{padding:16px;border-radius:22px}.lv{min-width:0;flex:1 1 40%}.flash .en{font-size:1.5rem}}
   </style>
   <script src="../shared/js/el-catalog.js"></script>
+  <link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
 <body>
   <nav class="mobile-tabs"><a class="tab-btn" href="../index.html">Home</a><a class="tab-btn" href="./">English Lab</a><a class="tab-btn active" href="practice.html" aria-current="page" data-pr>Practise</a></nav>
@@ -83,6 +84,8 @@
   </section></main>
   </div>
 
+<!-- the app menu at once, not after Firebase has loaded: the page opens on its real look (Roger, 7 Nov 2026) -->
+<script src="../shared/js/el-app.js"></script>
 <script type="module">
 /* Self-practice by level (Roger, 31 Oct 2026, thread "Build a self-practice area by level"): the word cards, sentence builder,
    listenings and shadowing of the student's LSs, organised by level (the route with its CEFR label, EL_CEFR in el-catalog.js) and

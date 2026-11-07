@@ -112,7 +112,7 @@ details.agpast>summary{cursor:pointer;color:#3157d5;font-weight:700;margin:12px 
 </style></head><body>
 <div id="fsctl"></div>
 <div class="tshell" id="shell"><nav class="tside" id="tabs" hidden></nav><div class="tpage">
-<div class="dhead"><h1>Teacher dashboard</h1></div><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p>
+<div class="dhead"><h1>Teacher dashboard</h1></div><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p><script>/* the teacher who was signed in here last (el_who, el-cloud.js) sees it is loading, not a sign-in request (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="teacher")document.getElementById("msg").textContent="⏳ Loading your dashboard…"}catch(e){}</script>
 <div id="app" hidden>
 <p class="muted" id="loadbar" style="margin:0 0 8px"></p>
 <div id="classnow"></div>

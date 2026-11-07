@@ -366,6 +366,7 @@ nav.menu-open .menu-toggle::after{content:"▴"}
 .muted-group{display:grid;gap:3px}
 .ls-dropdown{min-width:290px}
 </style>
+<link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
 <body>
 
@@ -502,6 +503,9 @@ nav.menu-open .menu-toggle::after{content:"▴"}
     }
   </script>
 
+<!-- the app menu at once, not after Firebase has loaded: the page opens on its real look (Roger, 7 Nov 2026) -->
+<script src="../shared/js/el-catalog.js"></script>
+<script src="../shared/js/el-app.js"></script>
 <script type="module" src="../shared/js/el-cloud.js"></script>
 </body>
 </html>

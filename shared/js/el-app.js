@@ -25,10 +25,18 @@
     : /\/(?:2|4)eso\/(index\.html)?$/.test(path) ? "course" : null;
   window.ELApp = { mode };
   if (!mode) return;
-  const css = document.createElement("link"); css.rel = "stylesheet"; css.href = ROOT + "shared/css/el-app.css"; document.head.append(css);
+  if (!document.querySelector('link[href$="shared/css/el-app.css"]')) { const css = document.createElement("link"); css.rel = "stylesheet"; css.href = ROOT + "shared/css/el-app.css"; document.head.append(css); }
   const course0 = (path.match(/\/((?:2|4)eso)\//) || [])[1] || null;
 
-  let who = { role: localStorage.getItem("el_uid") ? "student" : "none" }, CA = false;   // a student who signed in here before: no flash
+  // Who is signed in is known only once Firebase has loaded: until then the menu is drawn for who was signed in on this browser last
+  // (el_who, saved by el-cloud.js), so the page opens on its real look, not the signed-out one (Roger, 7 Nov 2026).
+  const W = (() => { try { return JSON.parse(localStorage.getItem("el_who") || "null"); } catch (e) { return null; } })();
+  const AS0 = (() => { try { return JSON.parse(sessionStorage.getItem("el_as") || "null"); } catch (e) { return null; } })();
+  let who = !W ? { role: localStorage.getItem("el_uid") ? "student" : "none" }
+    : W.role === "teacher" && AS0 && AS0.uid ? { role: "student", as: AS0.uid, group: AS0.group || null }
+    : { role: W.role, group: W.group || null };
+  if (who.group) who.course = who.group.slice(0, 4).toLowerCase();
+  let CA = !!W && W.role === "student" && W.ca === true;
   const t = (ca, en) => CA ? ca : en;
   const load = (src, has) => has() ? Promise.resolve() : new Promise(r => { const s = document.createElement("script"); s.src = ROOT + src; s.onload = s.onerror = r; document.head.append(s); });
   const lsHref = id => { const l = (window.EL_LS || []).find(x => x.id === id); return l ? ROOT + l.course + "/" + l.id.slice(l.course.length + 1) + "/index.html" : null; };
@@ -100,9 +108,10 @@
   // (all LSs)"): one list of the group's LSs, the one the group is doing now first and in the course colour, each with its number,
   // what it is about, whether it is now, open or closed, and one Open button. The page's own content stays for signed-out visitors.
   // No new reads: ELCloud.lsNow is the cached ls/{id} that el-cloud.js reads for the menus.
-  let allInfo = null, allBusy = false;
+  let allInfo = null, allBusy = false, allGen = 0;
   async function allLs() {
     if (mode !== "course") return;
+    const gen = ++allGen;
     const main = $("body>main:not(.elall)"), foot = $("body>footer");
     let box = $(".elall");
     if (who.role === "none" || !window.EL_LS) { if (box) box.hidden = true; if (main) main.hidden = false; if (foot) foot.hidden = false; return; }
@@ -112,25 +121,30 @@
       allBusy = true;
       const o = {}; await Promise.all(list.map(async l => { try { o[l.id] = await C.lsNow(l.id); } catch (e) { o[l.id] = {}; } }));
       allInfo = o; allBusy = false;
+      if (gen !== allGen) return allLs();   // a newer drawing came meanwhile (who is signed in is known now): draw once more, with the statuses
     }
-    const info = allInfo || {};
+    // before the statuses are read: the ones last read in this browser (el_ls_<id>, el-cloud.js), so the list does not change on screen
+    const kept = !allInfo && (() => { const o = {}; for (const l of list) { let x = null; try { x = JSON.parse(localStorage.getItem("el_ls_" + l.id) || "null"); } catch (e) {} if (!x) return null; o[l.id] = x; } return o; })();
+    const info = allInfo || kept || {}, known = !!(allInfo || kept);
     // what the page says about each LS (its card's text), by folder
     const about = {}; $$("a.card[href]").forEach(a => { const k = (a.getAttribute("href") || "").split("/")[0]; const p = a.querySelector("p"); if (p) about[k] = p.textContent.trim(); });
-    const st = id => { const s = (info[id] || {}).status; return s === "public" ? "open" : s || (allInfo ? "hidden" : "open"); };
-    const vis = list.filter(l => all || (st(l.id) !== "hidden" && (!window.elLsForGroup || !who.group || elLsForGroup(l, info[l.id] || {}, who.group))));
+    const st = id => { const s = (info[id] || {}).status; return s === "public" ? "open" : s || (known ? "hidden" : "open"); };
+    const vis = !all && !known ? [] : list.filter(l => all || (st(l.id) !== "hidden" && (!window.elLsForGroup || !who.group || elLsForGroup(l, info[l.id] || {}, who.group))));
     const now = who.group && window.ELWeek && (ELWeek.now(who.group) || {}).ls;
+    // looked up again after the wait above: two drawings at once each added a list (Roger, 7 Nov 2026: "why do I see the same info twice?")
+    box = $(".elall");
     if (!box) { box = document.createElement("main"); box.className = "elall"; (main || document.body.firstElementChild).before(box); }
     box.hidden = false; if (main) main.hidden = true; if (foot) foot.hidden = true;
     const CN = { "2eso": "2 ESO", "4eso": "4 ESO" };
     const row = l => {
       const n = list.indexOf(l) + 1, k = l.id.slice(c.length + 1), s = st(l.id), cur = l.id === now;
-      const chip = cur ? `<span class="ch now">${t("Ara", "Now")}</span>` : s === "closed" ? `<span class="ch cl">${t("Tancada · per repassar", "Closed · to review")}</span>` : s === "hidden" ? `<span class="ch hd">Hidden</span>` : `<span class="ch op">${t("Oberta", "Open")}</span>`;
+      const chip = !known && !cur ? "" : cur ? `<span class="ch now">${t("Ara", "Now")}</span>` : s === "closed" ? `<span class="ch cl">${t("Tancada · per repassar", "Closed · to review")}</span>` : s === "hidden" ? `<span class="ch hd">Hidden</span>` : `<span class="ch op">${t("Oberta", "Open")}</span>`;
       return `<a class="ells${cur ? " cur" : ""}" href="${ROOT + c + "/" + k + "/index.html"}"><span class="n">LS${n}</span><span class="t"><b>${esc(l.title.replace(/^\S+ · /, ""))}</b><small>${esc(about[k] || "")}</small></span>${chip}<span class="go">${t("Obre", "Open")} ›</span></a>`;
     };
     const order = vis.slice().sort((a, b) => (b.id === now) - (a.id === now));
     box.innerHTML = `<div class="elall-in"><h1>${t("Les meves Learning Situations", "My Learning Situations")}</h1>`
       + `<p class="sub">${CN[c] || ""}${who.group ? " · " + esc(who.group.replace(/^(\d)ESO/, "$1 ESO ")) : ""} · ${t("una per unitat; la de dalt és la que fem ara", "one per unit; the one at the top is the one we are doing now")}</p>`
-      + `<div class="ellist">${order.map(row).join("") || `<p class="sub">${t("Encara no hi ha cap Learning Situation oberta.", "No Learning Situation is open yet.")}</p>`}</div>`
+      + `<div class="ellist">${order.map(row).join("") || (!known && !all ? "" : `<p class="sub">${t("Encara no hi ha cap Learning Situation oberta.", "No Learning Situation is open yet.")}</p>`)}</div>`
       + `<p class="more">${t("N'aniran apareixent més durant el curs.", "More will appear during the year.")}</p></div>`;
   }
   function lpBar() {   // learning paths: the back link to the LS, as a button
@@ -221,7 +235,9 @@
   }
 
   const start = () => {
+    if (who.role === "teacher" && !who.as) $$("[data-el-teacher]").forEach(e => e.hidden = false);   // the teacher's links at once too (el-cloud.js sets them again)
     draw();
+    if (who.group) Promise.all([load("shared/js/el-plan.js", () => window.EL_PLAN), load("shared/js/el-week.js", () => window.ELWeek)]).then(() => draw());
     // the course's LSs and the time plan: static files, no reads
     load("shared/js/el-catalog.js", () => window.EL_LS).then(() => draw());
     let tries = 0;
