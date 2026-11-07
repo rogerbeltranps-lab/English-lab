@@ -31,6 +31,7 @@ html.elgate.elwait:not(.elready) body{animation-delay:8s}
 .side .nv.on::after,.elside .nv.on::after{color:#fff}
 .side .nv.sub,.elside .nv.sub{margin-left:16px;padding:6px 10px 6px 6px;font-size:14px;font-weight:650;border-radius:12px}
 .side .nv.sub .ic,.elside .nv.sub .ic{width:28px;height:28px;font-size:15px;border-radius:8px}
+.side .nv .ic.lsn,.elside .nv .ic.lsn{font-size:12px;font-weight:800;letter-spacing:-.02em}.side .nv.sub .ic.lsn,.elside .nv.sub .ic.lsn{font-size:10.5px}
 .side .nv.sub.on,.elside .nv.sub.on{background:#eaf0ff;border-color:#3157d5;color:#2443ad;box-shadow:none}
 .side .nv.sub.on .ic,.elside .nv.sub.on .ic{background:#fff}
 .side .nv.sub.on::after,.elside .nv.sub.on::after{color:#3157d5}

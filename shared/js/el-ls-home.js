@@ -14,7 +14,7 @@
   const LS=document.body.dataset.ls,ROOT=new URL("../../",location.href).href,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
   const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const ls=(window.EL_LS||[]).find(l=>l.id===LS)||{id:LS,course:LS.split("-")[0],title:document.title};
-  const COURSE=ls.course,CN={"2eso":"2 ESO","4eso":"4 ESO"},lsName=l=>l.title.replace(/^\S+ · /,"");
+  const COURSE=ls.course,CN={"2eso":"2 ESO","4eso":"4 ESO"},lsName=l=>window.elLsName?elLsName(l):l.title.replace(/^\S+ · /,"");
   const lsHref=l=>ROOT+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html";
   let CA=false;const t=(ca,en)=>CA?ca:en;
   let who={role:"none"};   // none (not known yet) · student · teacher · tester (sees everything) · as (the teacher's student view)
@@ -32,17 +32,18 @@
   const teach=()=>who.role==="teacher";
   function nav(){
     // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css): "🏠 My dashboard" → icon + label
-    const a=(h,txt,cls,cur)=>{const m=String(txt).match(/^(\p{Extended_Pictographic}\uFE0F?)\s*(.*)$/u),ic={"English Lab":"🧪",Practise:"🎯",Practica:"🎯"}[txt]||(m?m[1]:/^LS\d/.test(txt)?"📚":"🗂");
-      return `<a class="nv${cls?" "+cls:""}" href="${h}"${cur?' aria-current="page"':""}><span class="ic" aria-hidden="true">${ic}</span><span class="lb">${m?m[2]:txt}</span></a>`};
+    // an LS item ("LS2 · Free Time, Live!") shows its number in the icon box instead of 📚 (Roger, 7 Nov 2026: "instead of the book emoji")
+    const a=(h,txt,cls,cur)=>{const m=String(txt).match(/^(\p{Extended_Pictographic}\uFE0F?)\s*(.*)$/u)||String(txt).match(/^(LS\d+) · (.*)$/),ic={"English Lab":"🧪",Practise:"🎯",Practica:"🎯"}[txt]||(m?m[1]:"🗂");
+      return `<a class="nv${cls?" "+cls:""}" href="${h}"${cur?' aria-current="page"':""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${m?m[2]:txt}</span></a>`};
     let html;
     if(teach()||who.role==="tester"){
       const first=teach()?a(dashHref(),"📊 Dashboard"):a(boardHref(),"🏠 My dashboard");
       html=first+`<div class="nvsep"></div>`+["2eso","4eso"].map(c=>`<div class="nvh">${CN[c]}</div>`+a(ROOT+c+"/index.html",CN[c]+" · Learning Situations","sub")
-        +(window.EL_LS||[]).filter(l=>l.course===c).map((l,i)=>a(lsHref(l),"LS"+(i+1)+" · "+esc(lsName(l)),"sub"+(l.id===LS?" on":""),l.id===LS)).join("")).join("")
+        +(window.EL_LS||[]).filter(l=>l.course===c).map((l,i)=>a(lsHref(l),esc(lsName(l)),"sub"+(l.id===LS?" on":""),l.id===LS)).join("")).join("")
         +`<div class="nvsep"></div>`+a(ROOT+"lab/","🎲 "+t("Jocs","Games"))+a(ROOT+"lab/practice.html",t("Practica","Practise"));
     }else{
       html=a(boardHref(),"🏠 "+t("El meu tauler","My dashboard"))
-        +a("index.html","📚 "+esc(lsName(ls)),"on",true)
+        +a("index.html",esc(lsName(ls)),"on",true)
         +a(ROOT+COURSE+"/index.html","🗂 "+t("Totes les Learning Situations","All Learning Situations"))
         +a(ROOT+"lab/","🎲 "+t("Jocs","Games"))+a(ROOT+"lab/practice.html",t("Practica","Practise"))
         +a(ROOT+"today.html#help","❓ "+t("Ajuda","Help"));
