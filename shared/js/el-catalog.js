@@ -238,6 +238,13 @@ window.elSecLocked=function(a,info,gid){return secOf(info,"secLocked",gid,a)||[]
 // as one tab, done when both are (Roger, 7 Nov 2026: students see the same tabs and counts as the learning path and the dashboard).
 window.elTabGroups=function(a,ks){const xs=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]),m=new Map();
   ks.forEach(k=>{const p=xs.includes(k)?k:(k==="cards"||k==="practice")&&xs.includes("vocab")?"vocab":k;if(!m.has(p))m.set(p,[]);m.get(p).push(k)});return [...m.values()]};
+// Tabs still to do in a learning path (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!"): every count of missing work
+// (board banner, All my work done, My activities, the learning-paths table, the dashboard's Points box) counts TABS, not learning paths.
+// The tabs of its scored steps (EL_ACTIONS without a.skip, grouped by elTabGroups); one with no steps listed counts as 1 tab (its flag).
+window.elTabsOf=function(a){const ks=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));return ks.length?elTabGroups(a,ks):null};
+// the tabs not done as [[step, …], …] (done = Set of the student's done steps, r = results/{activity}); an activity with no steps: [] or [[]]
+window.elTabsLeft=function(a,done,r){const g=elTabsOf(a);return g?g.filter(x=>!x.every(k=>done.has(k))):elAllDone(a,done,r)?[]:[[]]};
+window.elTabsTotal=a=>{const g=elTabsOf(a);return g?g.length:1};
 window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
