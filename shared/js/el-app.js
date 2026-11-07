@@ -215,8 +215,25 @@
   // pick (a student sees only their own) or the sections bar
   function teachVis(teach) {
     const r = teach.querySelector(".routes");
-    const on = !!(teach.querySelector("[data-el-teacher]:not([hidden])") || teach.querySelector("#el-tsec") || (r && ![...r.querySelectorAll(".route")].some(x => x.style.display === "none")));
+    const on = !!(teach.querySelector("[data-el-teacher]:not([hidden])") || teach.querySelector("#el-tsec,#el-tsec-early") || (r && ![...r.querySelectorAll(".route")].some(x => x.style.display === "none")));
     if (teach.hidden === on) teach.hidden = !on;
+  }
+  // The teacher's sections card (el-cloud.js teacherSections: open sections, class mode, full screen) needs the LS document, so it came
+  // a second after the page and pushed the steps down (Roger, 7 Nov 2026: "and how can you fix this?"). It is drawn at once from the copy
+  // el-cloud.js keeps of its last drawing on this page (el_tsec_<page path>, this browser), with the 🔓/🔒 on the tabs; el-cloud.js puts
+  // the real one in the same place when it has read the LS (the same picture unless something changed meanwhile). Clicks wait for it.
+  function tsecEarly() {
+    if (mode !== "lp" || who.role !== "teacher" || who.as || document.getElementById("el-tsec") || document.getElementById("el-tsec-early")) return;
+    const rel = path.match(/\/((?:2|4)eso\/[^/]+\/[^/]+\.html)$/); if (!rel) return;   // the page's path from the course folder, as el-cloud.js relPath
+    let c = null; try { c = JSON.parse(localStorage.getItem("el_tsec_" + rel[1]) || "null"); } catch (e) {}
+    const t0 = $(".tab[data-panel]"), nav = t0 && t0.parentElement; if (!c || !c.h || !nav) return;
+    if (c.css && !document.getElementById("el-tsec-css")) { const st = document.createElement("style"); st.id = "el-tsec-css"; st.textContent = c.css; document.head.append(st); }
+    const bar = document.createElement("div"); bar.id = "el-tsec-early"; bar.className = "el-tsec"; bar.innerHTML = c.h;
+    const host = $(".eltsec-host"); if (host) host.append(bar); else nav.before(bar);
+    const all = c.all || [], off = c.off || [];
+    $$(".tab[data-panel]").forEach(t => { const id = t.dataset.panel; if (!all.includes(id) || t.querySelector(".el-tsw")) return; const on = !off.includes(id);
+      const sw = document.createElement("span"); sw.className = "el-tsw el-tsw-early" + (on ? "" : " off"); sw.textContent = on ? "🔓" : "🔒"; t.append(sw); t.classList.toggle("el-toff", !on); });
+    const teach = $(".ellp-teach"); if (teach) teachVis(teach);
   }
   function lpBack() {   // back to the page's own layout (the window got narrow)
     const grid = col.parentElement, lp = $("#lp"), hero = $("header.hero"), w = hero.querySelector(".wrap") || hero;
@@ -245,6 +262,7 @@
     ownLevel();
     lpBar();
     lpLayout();
+    tsecEarly();
     curLs = pickLs();
     const L = items();
     if (mode === "lab") side(L); else rail(L);
