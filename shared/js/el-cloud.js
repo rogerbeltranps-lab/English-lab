@@ -51,7 +51,7 @@ const myLevels=uid=>once("lv:"+uid,async()=>{const o={};(await getDocs(collectio
 const myDoc=uid=>once("me:"+uid,async()=>{const s=await getDoc(doc(db,"students",uid));return s.exists()?s.data():null});
 const origSet=Storage.prototype.setItem;
 let bellEl=null,stopBell=null,stopJoin=null,stopGame=null,joinGen=0,lockedKeys=[],myGroup=null,noSync=false,user=null,timer=null,syncing=false,frozen=false,myLevel=null,homeLevel=null,stale=false,pulled=false;
-const listeners=[];
+const listeners=[];let userDone=false;   // userDone: onAuthStateChanged has worked out group, level and gate (ELCloud.onUser)
 const isTeacher=u=>!!u&&TEACHERS.includes((u.email||"").toLowerCase());
 const isTester=u=>!!u&&TESTERS.includes((u.email||"").toLowerCase());
 // Testers can switch to the student view of one group (bottom bar): the site then behaves as for a listed student of that group.
@@ -239,7 +239,7 @@ function applyLevel(lvl,all){
   // A page without a Native button shows the Daring version.
   const mine=btns.find(b=>b.dataset.level===lvl)||(lvl==="beginners"?btns.find(b=>b.dataset.level==="insecure"):lvl==="native"?btns.find(b=>b.dataset.level==="daring"):null);
   if(mine&&!mine.classList.contains("active"))mine.click();
-  if(!all)btns.forEach(b=>{if(b!==mine)b.style.display="none"});
+  if(!all)btns.forEach(b=>{b.style.display=b===mine?"":"none"});   // el-app.js already showed only the active one: the student's own shows again
 }
 // Students only use their board, English Lab (lab/ and its practice page lab/practice.html), their own course page and the LSs assigned to their group.
 const BOARD0=new URL("today.html",ROOT).href,DASH=new URL("teacher.html",ROOT).href,onBoard=/\/today\.html$/.test(location.pathname),onLab=/\/lab\/(index\.html|practice\.html)?$/.test(location.pathname),
@@ -261,7 +261,7 @@ async function gate(u){
   if(!lsId||!window.EL_CATALOG)return;
   const info=await lsInfo(lsId),st=info.status;
   if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
-  if(isTeacher(u)&&!AS){banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);return}
+  if(isTeacher(u)&&!AS){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);return}   // an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
   if(AS)asBanner();
   else if(!u||!isStudent(u)){signInBlock();return}
   const tester=!AS&&seesAll(u),vg=!AS&&viewGroup(u);
@@ -562,7 +562,9 @@ function bar(){
   const el=document.createElement("div");el.id="el-cloud-bar";
   el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:10002;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;font:13px system-ui,sans-serif;box-shadow:0 2px 8px #0002;display:flex;gap:8px;align-items:center";
   document.body.appendChild(el);
-  return u=>{el.innerHTML="";
+  // until Firebase has said who is signed in, the chip stays empty: it showed "Not signed in · Sign in" for a second to a signed-in
+  // student on every page (Roger, 7 Nov 2026: "all pages still pop up in between")
+  return u=>{el.innerHTML="";el.style.visibility=authKnown?"":"hidden";if(!authKnown)return;
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
     if(!u)el.append("Not signed in ",b("Sign in",login));
     else if(AS){el.style.background="#fef3c7";el.style.borderColor="#f59e0b";el.append("👁 "+(AS.name||AS.email||"Student")+" ");
@@ -672,7 +674,7 @@ function storyCard(u){
     +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="native").map(x=>a(x.id)).join(""):a(lv==="native"?"daring":lv))+"</p></div></div>";
   el.hidden=false;
 }
-let draw=()=>{};
+let draw=()=>{},authKnown=false;
 const start=()=>{draw=bar();draw(user)};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start):start();
 new MutationObserver(()=>draw(user)).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});   // the board picks its language after loading
@@ -921,7 +923,10 @@ function remember(u){try{
   if(!u){localStorage.removeItem("el_who");return}
   if(AS||myRoster===null)return;
   const role=isTeacher(u)?"teacher":seesAll(u)?"tester":"student",l=myLevel||homeLevel;
-  origSet.call(localStorage,"el_who",JSON.stringify({uid:u.uid,role,group:role==="student"?myGroup:null,ca:role==="student"?(l?elCa(l):null):false,t:Date.now()}))}catch(e){}}
+  // a page that does not read the level (the board) keeps the language saved before: it wrote null, and the next page drew English first
+  let was=null;try{was=JSON.parse(localStorage.getItem("el_who")||"null")}catch(e){}
+  const ca=role!=="student"?false:l?elCa(l):was&&was.uid===u.uid&&typeof was.ca==="boolean"?was.ca:null;
+  origSet.call(localStorage,"el_who",JSON.stringify({uid:u.uid,role,group:role==="student"?myGroup:null,ca,t:Date.now()}))}catch(e){}}
 onAuthStateChanged(auth,async u=>{
   window.EL_VIEW_LEVEL=viewLevel(u);   // before anything reads a route (elRouteOf)
   // 👁 the teacher's student view of this tab: started by the student's board (today.html?student=uid), ended by the dashboard
@@ -935,7 +940,7 @@ onAuthStateChanged(auth,async u=>{
       myGroup=AS.group;if(lsId)frozen=true}   // nothing typed on the student's LS pages is kept
     else leaveAs(false);
   }
-  user=u;draw(u);
+  user=u;authKnown=true;draw(u);
   if(u&&signInO){signInO.remove();signInO=null}
   // A student's first sign-in on this browser starts clean too: what is there was done by the teacher, a signed-out visitor or
   // another student, and this student's own work comes back from the cloud (pull).
@@ -1004,10 +1009,10 @@ onAuthStateChanged(auth,async u=>{
   if(isTeacher(u)&&!bellEl)import("./el-bell.js").then(m=>{if(bellEl||!isTeacher(user))return;
     bellEl=m.bell({dash:DASH,onDash,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
   remember(u);
-  listeners.forEach(f=>f(u));
+  userDone=true;listeners.forEach(f=>f(u));
   // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
   if(stopJoin){stopJoin();stopJoin=null}const jg=++joinGen;
   if(u&&isStudent(u)&&myGroup&&document.querySelector("a.deck-link"))import("./el-live-join.js").then(m=>{if(jg===joinGen)stopJoin=m.liveJoin({db,group:myGroup})}).catch(e=>console.warn("live",e));
 });
 
-window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null)f(user)},get user(){return user}};
+window.ELCloud={submitActivity,auth,db,login,logout,isTeacher,isTester,isStudent,announcements:()=>user?myAnnouncements(user):Promise.resolve([]),viewGroup:()=>viewGroup(user),group:()=>myGroup,lsStatus,lsInfo:lsRead,lsNow:lsInfo,results:(fresh)=>AS?myResults(AS.uid,fresh):user?myResults(user.uid,fresh):Promise.resolve({}),levels:()=>AS?myLevels(AS.uid):user?myLevels(user.uid):Promise.resolve({}),get viewing(){return AS},get ca(){const l=myLevel||homeLevel;return l?elCa(l):null},onUser:f=>{listeners.push(f);if(user!==null&&userDone)f(user)},get user(){return user}};
