@@ -896,6 +896,9 @@ function loadCatalog(){return window.EL_CATALOG?Promise.resolve():new Promise(r=
 await loadCatalog();
 // Activities are matched by path, so pages with the same file name in different LSs keep separate results.
 const byPath=(window.EL_CATALOG||[]).find(x=>x.path===relPath);if(byPath)actId=byPath.id;
+// A page that is not in the catalog must not take the id of another LS's page with the same file name: the LS2 vocabulary games
+// (not in the catalog: always open, Roger 7 Nov 2026 "games should be available") were read as LS1's and locked as "not open yet".
+else if((window.EL_CATALOG||[]).some(x=>x.id===actId&&x.ls!==lsId))actId=relPath.replace(/\.html$/,"");
 
 // The 🔔 reads every problem report, so only the dashboard listens live (and keeps the copy el_bell up to date); other pages show
 // that copy while it is younger than 10 minutes and read the reports again at most every 10 minutes (Roger, 1 Nov 2026: reads limit).
