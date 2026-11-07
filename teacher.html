@@ -119,6 +119,8 @@ body.agdrag .agday:not(.off),body.agdrag .agl{outline:1px dashed #a5b4fc;outline
 .agins-b::before,.agins-a::after{content:"";position:absolute;left:-2px;right:-2px;height:3px;border-radius:2px;background:#4f46e5;pointer-events:none}.agins-b::before{top:-4px}.agins-a::after{bottom:-4px}
 .agmin{appearance:none;-webkit-appearance:none;border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:999px;font:inherit;font-size:11px;line-height:16px;padding:0 6px;margin:0 2px 0 0;cursor:pointer;field-sizing:content;max-width:9em;flex:none}.agmin:not(.on){opacity:.6}.agmin:hover,.agmin:focus{opacity:1;border-color:#6366f1}
 .agmin.on{background:#e0f2fe;border-color:#0ea5e9;color:#075985;font-weight:700}.agtot{font-size:11.5px;color:#0369a1;font-weight:600;white-space:nowrap}.agtot.over{color:#b45309}.agtotd{margin-top:-4px}
+#savest{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:60;font:600 13px system-ui,sans-serif;padding:6px 12px;border-radius:999px;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;box-shadow:0 2px 8px #0f172a1f}
+#savest.ok{background:#dcfce7;color:#166534;border-color:#86efac}#savest.slow,#savest.err{background:#ffedd5;color:#9a3412;border-color:#fb923c}
 .agempty{color:#94a3b8;font-size:12px;margin:auto 0;text-align:center;border:1px dashed #cbd5e1;border-radius:10px;padding:10px}
 .agf{display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:2px;opacity:.45}.agday:hover .agf{opacity:1}.agf button{margin:0}
 .agself{font-size:12px;color:#7c2d12;background:#ffedd5;border-radius:8px;padding:2px 6px}
@@ -166,10 +168,26 @@ if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gs
   // Every document the dashboard writes is noted (TOUCHED), so after a save act() reads back only those documents instead of the whole
   // database (Roger, 1 Nov 2026: the free plan's daily reads ran out; a full load reads every student's work, thousands of documents).
   const M=F,tk=r=>{try{TOUCHED.add(r.path)}catch(e){TOUCHED.add("?")}return r};
-  F=Object.assign({},M,{setDoc:(r,...x)=>M.setDoc(tk(r),...x),updateDoc:(r,...x)=>M.updateDoc(tk(r),...x),deleteDoc:r=>M.deleteDoc(tk(r)),
-    writeBatch:d=>{const w=M.writeBatch(d),o={set:w.set.bind(w),update:w.update.bind(w),delete:w.delete.bind(w)};
-      w.set=(r,...x)=>(o.set(tk(r),...x),w);w.update=(r,...x)=>(o.update(tk(r),...x),w);w.delete=r=>(o.delete(tk(r)),w);return w}})}
+  F=Object.assign({},M,{setDoc:(r,...x)=>SAVE.track(M.setDoc(tk(r),...x)),updateDoc:(r,...x)=>SAVE.track(M.updateDoc(tk(r),...x)),deleteDoc:r=>SAVE.track(M.deleteDoc(tk(r))),
+    writeBatch:d=>{const w=M.writeBatch(d),o={set:w.set.bind(w),update:w.update.bind(w),delete:w.delete.bind(w),commit:w.commit.bind(w)};
+      w.set=(r,...x)=>(o.set(tk(r),...x),w);w.update=(r,...x)=>(o.update(tk(r),...x),w);w.delete=r=>(o.delete(tk(r)),w);w.commit=()=>SAVE.track(o.commit());return w}})}
 const TOUCHED=new Set();
+// Save indicator (Roger, 7 Nov 2026: "I was organizing the week and it didn't hit firebase so I have to do it again"): every write the
+// dashboard sends is counted until the server confirms it. A pill at the bottom left says "Saving…", then "✓ Saved"; a write still not
+// confirmed after 4 s turns it orange ("⚠ Not saved yet · don't reload"): Firestore keeps retrying quietly when it cannot write (no
+// connection, the free plan's daily limit), the page shows the change but a reload loses it. Reloading or closing the tab asks first while
+// anything is unsaved.
+const SAVE={q:new Set(),t:null,get n(){return this.q.size},
+  track(p){if(!p||typeof p.then!=="function")return p;const k={at:Date.now()};this.q.add(k);this.draw();
+    const end=()=>{this.q.delete(k);if(!this.n)this.ok=Date.now();this.draw()};p.then(end,()=>{this.err=Date.now();end()});return p},
+  draw(){let el=document.getElementById("savest");if(!el){el=document.createElement("div");el.id="savest";el.setAttribute("role","status");el.setAttribute("aria-live","polite");document.body.appendChild(el)}
+    const now=Date.now(),old=Math.min(...[...this.q].map(k=>k.at)),slow=this.n&&now-old>=4000,
+      off=navigator.onLine===false,st=off?"slow":this.n?(slow?"slow":"busy"):this.err&&now-this.err<4000?"err":this.ok&&now-this.ok<2500?"ok":"";
+    el.className=st;el.hidden=!st;el.textContent=off?"📴 Offline · changes are not saved until you are back online"+(this.n?" ("+this.n+" waiting)":""):st==="slow"?"⚠ Not saved yet · don't reload, check your internet ("+this.n+" waiting)":st==="busy"?"Saving…":st==="err"?"⚠ Not saved":st==="ok"?"✓ Saved":"";
+    clearTimeout(this.t);if(st)this.t=setTimeout(()=>this.draw(),this.n&&!slow?Math.max(50,4000-(now-old)):1000)}};
+addEventListener("online",()=>SAVE.draw());addEventListener("offline",()=>SAVE.draw());
+window.addEventListener("beforeunload",e=>{if(SAVE.n){e.preventDefault();e.returnValue=""}});
+if(DEMO)window.EL_SAVE=SAVE;   // previews show the pill
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 // LV: Starter · Base · Core · Plus · Pro (Roger, 30 Oct 2026: only the new names, here too), each with its CEFR level for the course on
 // screen (Roger, 1 Nov 2026: "I need to see the levels like this: Plus B1"; EL_CEFR in el-catalog.js): 4 ESO "Core B1", 2 ESO "Core A2".
