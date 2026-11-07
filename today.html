@@ -71,7 +71,14 @@ a.hal{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:1
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:30px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:18px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
 .ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}a.ucard{border:2px solid #e2e8f0;border-radius:16px;padding:16px 18px;text-decoration:none;color:#0f172a;display:flex;flex-direction:column;gap:4px}a.ucard small{color:#64748b;font-size:13px}a.ucard b{font-size:19px}a.ucard span{color:#3157d5;font-weight:700;margin-top:6px}a.ucard.on{border-color:#3157d5;background:#f5f8ff}a.ucard:hover{border-color:#3157d5}
 .helpl{margin:6px 0 0;padding-left:20px}.helpl li{margin:6px 0}
-@media (max-width:900px){.hgrid{grid-template-columns:1fr}.cont .ct{font-size:24px}}
+/* both home columns end at the same line (Roger, 7 Nov 2026: "I want this to be aligned to make room on the page"): a compact left column
+   (slimmer alert, blue card with the bar and Continue on one row, one-line My marks) and the shorter column's last card stretches */
+@media (min-width:901px){.hgrid{align-items:stretch}.hl>.cont{flex:1 1 auto}.hr>.tiles{flex:1 1 auto;grid-auto-rows:1fr}.hr>.tiles>a.tile{height:100%}
+  .hl>a.hal{padding:10px 18px}.cont{padding:14px 22px;gap:4px;justify-content:center}.cont .ct{font-size:20px}.cont .cs{font-size:15px}
+  .cont .cbtns{align-items:center;gap:10px 18px}.cont .crow{flex:1 1 220px;max-width:none}.cont a.cgo{align-self:center;padding:8px 26px;font-size:17px}
+  .hl a.tile.wide{padding:10px 18px;gap:12px}.hl a.tile.wide .ti{font-size:24px}.hl a.tile.wide>span:last-child{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 10px}.hl a.tile.wide b{font-size:17px}.hl a.tile.wide small{margin:0}
+  .hr>a.hal.games{padding:12px 16px}a.hal.games .gtop .rings{gap:8px;flex-wrap:nowrap;font-size:14.5px}a.hal.games .gtop{gap:6px}a.hal.games .rings>span{gap:4px!important}a.hal.games .gnote{padding:4px 6px;font-size:12px}.hr .tiles a.tile{min-height:0;padding:14px 18px;gap:8px}.hr .tiles a.tile .ti{font-size:26px}}
+@media (max-width:900px){.hgrid{grid-template-columns:1fr}.cont .ct{font-size:24px}.cont .crow{flex:1 1 100%}}
 /* 📚 The current LS on the board home (Roger, 7 Nov 2026): learning paths with progress, the challenge and the LS tiles */
 .lsnow{margin-top:26px}.lsnh{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}.lsnt{min-width:0}.lsne{font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#3157d5}.lsnh h2{font-size:1.6rem;letter-spacing:-.02em;margin:.1em 0 0}.lsnh p{margin:2px 0 0;color:#64748b;font-size:15px}
 a.lsopen{color:#3157d5;font-weight:800;text-decoration:none;white-space:nowrap;padding:8px 12px;border-radius:12px}a.lsopen:hover{background:#eaf0ff}
@@ -84,7 +91,7 @@ a.lsr.next{border:2px solid #3157d5;background:#f5f8ff}a.lsr.next .n{background:
 .lstiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.lst{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px 14px;color:#0f172a;text-decoration:none;text-align:left;font:inherit;cursor:pointer;min-width:0}.lst:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}.lst.wide{grid-column:1/-1}.lst .ti{font-size:24px;line-height:1;flex:0 0 auto}.lst b{display:block;font-size:15.5px}.lst small{display:block;color:#64748b;font-size:13px;margin-top:1px}
 dialog.lsvid{border:0;border-radius:18px;padding:18px 20px;max-width:min(900px,94vw);width:900px}dialog.lsvid::backdrop{background:#0f172a99}.lsvh{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:18px}dialog.lsvid video{width:100%;border-radius:12px;background:#000}
 @media (max-width:900px){.lsng{grid-template-columns:1fr}}@media (max-width:640px){.lsnh h2{font-size:1.3rem}a.lsr{grid-template-columns:32px minmax(0,1fr);row-gap:4px}a.lsr .n{width:30px;height:30px}a.lsr .st{grid-column:2;justify-self:start}.lstiles{grid-template-columns:1fr}}
-.hr{display:flex;flex-direction:column;gap:14px}.phonebn{position:relative}.phonebn>a{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#eef2ff,#f0f9ff);border:1px solid #c7d2fe;border-radius:18px;padding:14px 44px 14px 16px;color:#0f172a;text-decoration:none}.phonebn>a:hover{border-color:#3157d5}.phonebn .pbi{font-size:30px}.phonebn b{display:block;font-size:16px}.phonebn small{display:block;color:#475569;font-size:13.5px;margin-top:2px}.phonebn .pbg{margin-left:auto;font-weight:800;color:#2443ad;white-space:nowrap}.phonebn .pbx{position:absolute;top:8px;right:8px;background:none;color:#64748b;padding:4px 8px;font-size:14px}
+.hr{display:flex;flex-direction:column;gap:14px}.phead{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap}.pht{flex:1 1 420px;min-width:0}#lvl:empty{display:none}.hlv{display:flex;align-items:center;gap:12px;padding:10px 20px;border-radius:16px;background:#eef2ff;border:1px solid #c7d2fe;color:#2443ad;white-space:nowrap}.hlv .i{font-size:28px;line-height:1}.hlv small{display:block;color:#475569;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}.hlv b{display:block;font-size:22px;line-height:1.2}.phonebn{position:relative}.phonebn>a{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#eef2ff,#f0f9ff);border:1px solid #c7d2fe;border-radius:18px;padding:14px 44px 14px 16px;color:#0f172a;text-decoration:none}.phonebn>a:hover{border-color:#3157d5}.phonebn .pbi{font-size:30px}.phonebn b{display:block;font-size:16px}.phonebn small{display:block;color:#475569;font-size:13.5px;margin-top:2px}.phonebn .pbg{margin-left:auto;font-weight:800;color:#2443ad;white-space:nowrap}.phonebn .pbx{position:absolute;top:8px;right:8px;background:none;color:#64748b;padding:4px 8px;font-size:14px}
 .phero{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:28px;align-items:center}.phero>img{width:100%;height:auto}.plead{font-size:18px;line-height:1.5;margin-top:0}.pqr{display:flex;gap:16px;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin-top:14px}.pqr img{flex:0 0 auto;background:#fff;border-radius:8px}.pinst{font-size:17px;font-weight:800;padding:14px 22px;border-radius:14px;background:#2443ad}
 details.psteps{border:1px solid #e2e8f0;border-radius:14px;padding:0 14px;margin:10px 0}details.psteps>summary{cursor:pointer;font-weight:800;font-size:17px;padding:12px 0}.pfig{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:4px 0 14px}.pfig figure{margin:0;display:flex;flex-direction:column;gap:8px}.pfig img{width:100%;height:auto}.pfig figcaption{font-size:14.5px;line-height:1.4}
 @media (max-width:900px){.phero{grid-template-columns:1fr}.phero>img{max-width:320px;margin:0 auto}.pfig{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:640px){.pqr{display:none}.phonebn>a{padding:12px 40px 12px 14px}}
@@ -94,14 +101,14 @@ details.psteps{border:1px solid #e2e8f0;border-radius:14px;padding:0 14px;margin
 #el-cloud-bar{position:static!important;margin:16px 14px 0;border-radius:14px!important;flex-wrap:wrap;justify-content:center}.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -4px 16px #0f172a14;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
 .bnav a{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;text-decoration:none;color:#64748b;font-size:11px;font-weight:700;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bnav a i{font-style:normal;font-size:22px;line-height:1}.bnav a.on{color:#2443ad;background:#eef2ff}.bnav a b{position:absolute;top:2px;right:calc(50% - 22px);background:#dc2626;color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;line-height:1.3}.bnav a b.hw{background:#0e7490}
 body[data-place="home"] .page h1{font-size:1.75rem;margin:.2em 0 .1em}body[data-place="home"] #sub{font-size:15px;margin:0 0 10px}#crumb a.back{display:none}.page h1{font-size:1.5rem;margin:.3em 0 .4em}
-.hl{gap:10px}a.hal{padding:12px 14px;font-size:15px}.cont{padding:18px;border-radius:20px}.cont .ct{font-size:21px}.cont .cs{font-size:15px}.cont a.cgo{align-self:stretch;text-align:center;padding:14px;flex:1 1 100%}
+.hl{gap:10px}.hlv{padding:6px 14px;margin-bottom:8px}.hlv .i{font-size:22px}.hlv b{font-size:18px}a.hal{padding:12px 14px;font-size:15px}.cont{padding:18px;border-radius:20px}.cont .ct{font-size:21px}.cont .cs{font-size:15px}.cont a.cgo{align-self:stretch;text-align:center;padding:14px;flex:1 1 100%}
 .tiles{gap:10px}a.tile{min-height:0;padding:14px;gap:6px}a.tile .ti{font-size:24px}a.tile b{font-size:16px}a.tile small{font-size:13px}
 .box{padding:14px}.ugrid{grid-template-columns:1fr}
 table.lpst,table.lpst tbody,table.lpst tr,table.lpst td{display:block;width:auto}table.lpst thead{display:none}table.lpst tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:10px 12px;background:#fff}table.lpst td{border:0!important;padding:3px 0!important;text-align:left!important}table.lpst td:empty{display:none}table.lpst td{background:transparent!important}table.lpst tr.miss{background:#fef2f2;border-color:#fca5a5}}</style>
 <nav class="mtabs nvs-m" aria-label="Menú"></nav><nav class="bnav" id="bnav" aria-label="Menú"></nav>
 <div class="app"><aside class="side"><div class="brand">English with Roger</div><nav class="nvs" aria-label="Menú"></nav></aside>
-<div class="page"><div id="crumb"></div><h1>El meu tauler</h1><p class="muted" id="sub">Carregant…</p><div id="note"></div><div id="main"></div></div></div>
-<script>/* the first words in the language of who was signed in here last (el_who, el-cloud.js), not Catalan for everyone (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&(w.role!=="student"||w.ca===false)){document.querySelector(".page>h1").textContent="My dashboard";document.getElementById("sub").textContent="Loading…"}}catch(e){}</script>
+<div class="page"><div id="crumb"></div><div class="phead"><div class="pht"><h1>El meu tauler</h1><p class="muted" id="sub">Carregant…</p></div><div id="lvl"></div></div><div id="note"></div><div id="main"></div></div></div>
+<script>/* the first words in the language of who was signed in here last (el_who, el-cloud.js), not Catalan for everyone (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&(w.role!=="student"||w.ca===false)){document.querySelector(".page h1").textContent="My dashboard";document.getElementById("sub").textContent="Loading…"}}catch(e){}</script>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script src="shared/js/el-catalog.js"></script>
 <script src="shared/js/el-sections.js"></script>
@@ -245,8 +252,9 @@ function homeHtml(lss,ls,info){
   const nx=nextFor(ls,info),{p,gi}=planOf(ls),num=p&&gi>=0&&nx?lpNums(p,gi)(nx.a):"";
   const cont=nx?`<div class="cont"><div class="ck">${t("Continua on ho vas deixar","Continue where you left off")}</div><div class="ct">${num?num+" · ":""}${esc(nx.a.title)}</div>`
       +`<div class="cs">${nx.cp?t("Primer fes aquest checkpoint, sense apunts.","First do this checkpoint, without notes."):t("Següent pas","Next step")+": <b>"+esc(nx.nm)+"</b>"}${nx.late?" · "+t("ja havia d'estar fet","it was due already"):""}</div>`
-      +(nx.total?`<div class="crow"><div class="cbar"><span style="width:${Math.round(nx.done/nx.total*100)}%"></span></div><span class="cn">${nx.done} / ${nx.total} ${t("passos","steps")}</span></div>`:"")
-      +`<div class="cbtns"><a class="cgo" href="${nx.cp?tabHref(nx.a):tabHref(nx.a,nx.k)}">▶ ${t("Continua","Continue")}</a></div></div>`
+      // the progress bar and the Continue button share one row, so the card is shorter (Roger, 7 Nov 2026: "aligned to make room on the page")
+      +`<div class="cbtns">${nx.total?`<div class="crow"><div class="cbar"><span style="width:${Math.round(nx.done/nx.total*100)}%"></span></div><span class="cn">${nx.done} / ${nx.total} ${t("passos","steps")}</span></div>`:""}`
+      +`<a class="cgo" href="${nx.cp?tabHref(nx.a):tabHref(nx.a,nx.k)}">▶ ${t("Continua","Continue")}</a></div></div>`
     :`<div class="cont done"><div class="ct">✓ ${t("Ho tens tot fet!","You're all done!")}</div><div class="cs">${t("No tens res pendent als learning paths oberts.","Nothing left to do in the open learning paths.")}</div><div class="cbtns"><a class="cgo" href="lab/practice.html">${t("Practica pel teu compte","Practise on your own")} →</a></div></div>`;
   const td=todoItems(lss),hws=hwList(ls,info),hwOpen=hws.filter(x=>!x.done);
   const tile=(h,i,b,sub,badge,cl,wide)=>`<a class="tile${wide?" wide":""}" href="${h}"><span class="ti"><span aria-hidden="true">${i}</span>${badge?`<span class="tb ${cl||""}">${badge}</span>`:""}</span><span><b>${b}</b><small>${sub}</small></span></a>`;
@@ -260,6 +268,11 @@ function homeHtml(lss,ls,info){
   // no Learning Situations tile on the home: the LSs, Books and Grammar and vocabulary are in the left menu (Roger, 7 Nov 2026: "I dont want this here")
   // no Help tile on the home: Help is already in the side menu and the phone bar (Roger, 7 Nov 2026: "we dont need this here")
   // the current LS right on the board, under Continue and the tiles (Roger, 7 Nov 2026: "students should see in their dashboard the current LS"): lsNowHtml
+  // 🎯 the student's level and route in the free space right of the greeting (Roger, 7 Nov 2026: "here I want their level
+  // and route"): the route name and its CEFR level, e.g. "Core · A2" (never the old route descriptions)
+  const lv=ls&&elRouteOf(D.lv,ls.id).level,cefr=lv?elCefr(COURSE,lv):"";
+  const lvBox=lv?`<div class="hlv" title="${esc(elCefr(COURSE,lv,true))}"><span class="i" aria-hidden="true">🎯</span><span><small>${t("El meu nivell","My level")}</small><b>${esc(LV[lv]||lv)}${cefr?` · ${esc(cefr)}`:""}</b></span></div>`:"";
+  const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox;
   return `<div class="hgrid"><div class="hl">${alerts}${cont}${marks}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
 // vocabulary and grammar summary of the student's level (the same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS),
@@ -338,7 +351,9 @@ function lsNowHtml(ls,info,nx){
   // 🧩 📚 the class games circles (gamesCard) take the place of the plain "Games and theory" tile when the student has played; the card
   // itself sits at the top of the board's right column, above the tiles (Roger, 7 Nov 2026: "could this be on the top-right side?")
   const gc=gamesCard(ls);
-  const tiles=L.tiles.filter(x=>!(x.notes&&gc)).map(x=>{const inner=`<span class="ti" aria-hidden="true">${esc(x.i)}</span><span><b>${tx(x.b)}</b><small>${tx(x.s)}</small></span>`;
+  // no 📚 Study and 🗣 Shadowing video tiles on the board (Roger, 7 Nov 2026: "these buttons at the bottom right are no longer necessary");
+  // they stay on the LS home page
+  const tiles=L.tiles.filter(x=>!(x.notes&&gc)&&!x.shadow&&!/#study$/.test(x.h)).map(x=>{const inner=`<span class="ti" aria-hidden="true">${esc(x.i)}</span><span><b>${tx(x.b)}</b><small>${tx(x.s)}</small></span>`;
     return x.shadow?(L.video?`<button type="button" class="lst" data-lsvid>${inner}</button>`:""):`<a class="lst${x.notes||/#about$/.test(x.h)?" wide":""}" href="${esc(x.h)}">${inner}</a>`}).join("");
   return `<section class="lsnow" id="lsNow">${head}<div class="lsng">${lps}<div class="lsnr">${chal}<div class="lstiles">${tiles}</div></div></div></section>`}
 // 🗣 the LS shadowing video opens here in a window, as on the LS page
@@ -436,7 +451,7 @@ function render(){
   const note=S.pick?t(`Has triat ${COURSES[S.pick]}, però ets de ${g.name}. Aquí tens les activitats del teu curs.`,`You chose ${COURSES[S.pick]}, but you are in ${g.name}. Here are the activities of your course.`):"";
   const place=placeNow(),cls=`<div id="pull">${pullBox()}</div><div id="live">${liveBox()}</div>`,noteBox=note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"";
   document.body.dataset.place=lss.length?place:"home";
-  if(!lss.length){$("#crumb").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
+  if(!lss.length){$("#crumb").innerHTML="";$("#lvl").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
     $("#note").innerHTML=cls+annBox()+noteBox+howBox();$("#main").innerHTML="";if(canReply())wireAnn();return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
   S.pend=[];   // no Submit any more (Roger, 6 Nov 2026): answers save on their own, Submit only froze the score
@@ -445,7 +460,7 @@ function render(){
   const pend="";
   if(place==="home"){$("#crumb").innerHTML="";$("h1").textContent=hello();$("#sub").innerHTML=homeSub(g,ls);
     $("#note").innerHTML=cls+noteBox;$("#main").innerHTML=pend+homeHtml(lss,ls,info)}
-  else{$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
+  else{$("#lvl").innerHTML="";$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
     $("#note").innerHTML=cls;$("#main").innerHTML=placeHtml(place,lss,ls,list,info,st,stTag,pend)}
   bnav(lss.length?place:"home",lss);
 
