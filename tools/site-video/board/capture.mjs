@@ -112,7 +112,7 @@ for (const S of STATES) {
     // final product tab
     qa('.t-fp .box').forEach((x, i) => add('fpbox' + i, x));
     add('fpsteps', q('.t-fp .fpst')); add('fpans', q('.t-fp .ans')); add('fpfeedback', q('.t-fp .fb'));
-    add('fprubric', qa('.t-fp .box').pop()); add('fpmark', q('.t-fp .lphead > b')); add('fpreview', q('.t-fp .fpst a.go'));
+    add('fprubric', qa('.t-fp .box').pop()); add('fpmark', q('.t-fp .fv-stat .fv-big')); add('fpreview', q('.t-fp .fpst a.go'));
     // exam tab
     qa('.t-exam > .box').forEach((x, i) => add('ex' + i, x));
     add('wrub', q('.wrub')); qa('.wrub .wr').forEach((x, i) => add('wr' + i, x));
