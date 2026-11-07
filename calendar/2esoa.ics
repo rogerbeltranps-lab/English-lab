@@ -42,6 +42,22 @@ URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
+UID:2esoa-2eso-free-time-live-hw-2026-11-12-m0o0bk@english-lab
+DTSTAMP:20261031T000000Z
+DTSTART;VALUE=DATE:20261110
+DTEND;VALUE=DATE:20261112
+SUMMARY:🏠 English homework for Thu 12 Nov: LP2 What are they doing?: Rea
+ ding log
+DESCRIPTION:LP2 What are they doing?: Reading log\nFor the English class on
+  Thu 12 Nov · Per a la classe d'anglès del dj. 12 nov..\nFree Time\, Liv
+ e!: https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/i
+ ndex.html\nMy board / El meu tauler: https://rogerbeltranps-lab.github.io/
+ English-lab/today.html
+URL:https://rogerbeltranps-lab.github.io/English-lab/2eso/free-time-live/in
+ dex.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
 UID:2esoa-2eso-free-time-live-exam-2026-11-20-1alhb@english-lab
 DTSTAMP:20261031T000000Z
 DTSTART;VALUE=DATE:20261120
