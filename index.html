@@ -4,13 +4,15 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- A student who was signed in on this browser last (el_who, el-cloud.js) goes to their board at once: el-cloud.js sends students
-       there anyway, but only after Firebase has loaded, so this page showed its Sign in buttons for a second or two first
-       (Roger, 7 Nov 2026: "all pages still pop up in between"). -->
-  <script>try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="student"&&!sessionStorage.getItem("el_as"))location.replace("today.html")}catch(e){}</script>
+  <!-- The home page is only a welcome page to sign in (Roger, 7 Nov 2026: "it makes no sense that this menu exists since we all go to
+       the dashboards. Maybe, we should have a welcome page to sign in"). Whoever was signed in on this browser last (el_who, el-cloud.js)
+       goes to their dashboard at once, before anything is drawn: the teacher to teacher.html, students and the test account to their
+       board (today.html). The script below sends them again once Firebase knows who is signed in. The teacher's Courses and Learning
+       Situations lists stay at index.html#courses and #learning. -->
+  <script>try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&!/^#(courses|learning)$/.test(location.hash))location.replace(w.role==="teacher"?"teacher.html":"today.html")}catch(e){}</script>
   <link rel="preload" as="image" href="avatar-roger.jpg">
-  <!-- The app menu (shared/js/el-app.js, mode "home"; Roger, 7 Nov 2026): side buttons on a computer, the bottom bar on a phone, instead
-       of this page's old side menu and row of tabs; <html class="elgate">: the page shows once the menu is drawn (el-app.css). -->
+  <!-- No menu on the welcome page; the teacher's #courses and #learning lists get the app menu (shared/js/el-app.js, mode "home"),
+       never the page's old side menu and row of tabs (el-app.css); <html class="elgate">: the page shows once it is drawn. -->
   <link rel="stylesheet" href="shared/css/el-app.css">
   <meta name="description" content="English with Roger — learning space for ESO and Batxillerat students." />
   <title>English with Roger</title>
@@ -417,7 +419,7 @@
       button.addEventListener('click', () => openTab(button.dataset.tab));
     });
     // the app menu (el-app.js) opens the panels with #home, #courses and #learning
-    addEventListener('hashchange', () => openTab(location.hash.slice(1) || 'home'));
+    addEventListener('hashchange', () => { if (!/^#(courses|learning)$/.test(location.hash) && window.ELCloud && ELCloud.user) location.replace(ELCloud.isTeacher(ELCloud.user) ? 'teacher.html' : 'today.html'); else openTab(location.hash.slice(1) || 'home'); });
 
     // 2 ESO / 4 ESO: a signed-out visitor signs in here, and el-cloud then takes the student to their board.
     // Before el-cloud has loaded, the link opens the course page, which asks for sign-in too.
@@ -428,10 +430,12 @@
     });
 
     await import('./shared/js/el-cloud.js');
-    // Students never stay on this page (el-cloud sends them to their board), so only the teacher and the tester get here signed in.
+    // Signed in: off to the dashboard (teacher) or the board (students, the test account); only the teacher's and the test account's
+    // Courses and Learning Situations lists (#courses, #learning) stay here.
     ELCloud.onUser(u => {
       const all = !ELCloud.viewing && (ELCloud.isTeacher(u) || (ELCloud.isTester(u) && !ELCloud.viewGroup()));
       document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !all; });
+      if (u && !(all && /^#(courses|learning)$/.test(location.hash))) { location.replace(ELCloud.isTeacher(u) && !ELCloud.viewing ? 'teacher.html' : 'today.html'); return; }
       if (all && location.hash.length > 1) openTab(location.hash.slice(1));
     });
   </script>
