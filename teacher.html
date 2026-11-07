@@ -182,9 +182,10 @@ const SAVE={q:new Set(),t:null,get n(){return this.q.size},
     const end=()=>{this.q.delete(k);if(!this.n)this.ok=Date.now();this.draw()};p.then(end,()=>{this.err=Date.now();end()});return p},
   draw(){let el=document.getElementById("savest");if(!el){el=document.createElement("div");el.id="savest";el.setAttribute("role","status");el.setAttribute("aria-live","polite");document.body.appendChild(el)}
     const now=Date.now(),old=Math.min(...[...this.q].map(k=>k.at)),slow=this.n&&now-old>=4000,
-      st=this.n?(slow?"slow":"busy"):this.err&&now-this.err<4000?"err":this.ok&&now-this.ok<2500?"ok":"";
-    el.className=st;el.hidden=!st;el.textContent=st==="slow"?"⚠ Not saved yet · don't reload, check your internet ("+this.n+" waiting)":st==="busy"?"Saving…":st==="err"?"⚠ Not saved":st==="ok"?"✓ Saved":"";
+      off=navigator.onLine===false,st=off?"slow":this.n?(slow?"slow":"busy"):this.err&&now-this.err<4000?"err":this.ok&&now-this.ok<2500?"ok":"";
+    el.className=st;el.hidden=!st;el.textContent=off?"📴 Offline · changes are not saved until you are back online"+(this.n?" ("+this.n+" waiting)":""):st==="slow"?"⚠ Not saved yet · don't reload, check your internet ("+this.n+" waiting)":st==="busy"?"Saving…":st==="err"?"⚠ Not saved":st==="ok"?"✓ Saved":"";
     clearTimeout(this.t);if(st)this.t=setTimeout(()=>this.draw(),this.n&&!slow?Math.max(50,4000-(now-old)):1000)}};
+addEventListener("online",()=>SAVE.draw());addEventListener("offline",()=>SAVE.draw());
 window.addEventListener("beforeunload",e=>{if(SAVE.n){e.preventDefault();e.returnValue=""}});
 if(DEMO)window.EL_SAVE=SAVE;   // previews show the pill
 const $=s=>document.querySelector(s),cat=EL_CATALOG,GR=EL_GROUPS,esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
