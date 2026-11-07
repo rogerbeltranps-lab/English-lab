@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
@@ -9,6 +9,9 @@
        (Roger, 7 Nov 2026: "all pages still pop up in between"). -->
   <script>try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="student"&&!sessionStorage.getItem("el_as"))location.replace("today.html")}catch(e){}</script>
   <link rel="preload" as="image" href="avatar-roger.jpg">
+  <!-- The app menu (shared/js/el-app.js, mode "home"; Roger, 7 Nov 2026): side buttons on a computer, the bottom bar on a phone, instead
+       of this page's old side menu and row of tabs; <html class="elgate">: the page shows once the menu is drawn (el-app.css). -->
+  <link rel="stylesheet" href="shared/css/el-app.css">
   <meta name="description" content="English with Roger — learning space for ESO and Batxillerat students." />
   <title>English with Roger</title>
   <style>
@@ -280,7 +283,7 @@
     }
   </style>
 </head>
-<body>
+<body class="elroot">
   <div class="mobile-tabs">
     <button class="tab-btn active" data-tab="home">Home</button>
     <button class="tab-btn" data-tab="courses" data-private hidden>Courses</button>
@@ -392,6 +395,7 @@
     </main>
   </div>
 
+  <script src="shared/js/el-app.js"></script>
   <script type="module">
     // English Lab has its own page (lab/), where students choose their level and sign in; old links still work.
     const initialTab = location.hash.slice(1);
@@ -412,6 +416,8 @@
     buttons.forEach(button => {
       button.addEventListener('click', () => openTab(button.dataset.tab));
     });
+    // the app menu (el-app.js) opens the panels with #home, #courses and #learning
+    addEventListener('hashchange', () => openTab(location.hash.slice(1) || 'home'));
 
     // 2 ESO / 4 ESO: a signed-out visitor signs in here, and el-cloud then takes the student to their board.
     // Before el-cloud has loaded, the link opens the course page, which asks for sign-in too.
@@ -426,7 +432,7 @@
     ELCloud.onUser(u => {
       const all = !ELCloud.viewing && (ELCloud.isTeacher(u) || (ELCloud.isTester(u) && !ELCloud.viewGroup()));
       document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !all; });
-      if (all && initialTab) openTab(initialTab);
+      if (all && location.hash.length > 1) openTab(location.hash.slice(1));
     });
   </script>
 </body>

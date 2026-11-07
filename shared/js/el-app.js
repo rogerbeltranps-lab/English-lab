@@ -6,6 +6,9 @@
 //   course · the course pages (2eso/, 4eso/: "All Learning Situations")
 //   games  · vocabulary games (<ls>/vocabulary-games.html)
 //   lab    · English Lab and Practise (lab/, lab/practice.html), which keep their side menu, now as buttons
+//   home   · the site's home page (index.html: visitors, the teacher and the test account; students go to their board), whose old
+//            side menu and phone row of tabs (Home · Dashboard · Courses · Learning Situations) go (Roger, 7 Nov 2026, on his phone:
+//            "a menu that shouldn't exist anymore"); its Courses and Learning Situations panels open from the menu (#courses, #learning)
 // It adds the LS home's side menu on the left (a computer: brand + wide buttons; a narrow window: a strip of icon buttons) or the
 // board's bottom bar (a phone):
 // 🏠 My dashboard · 📚 the LS · 🗂 All Learning Situations · 🧪 English Lab · 🎯 Practise · ❓ Help (the teacher: 📊 Dashboard and no Help).
@@ -23,7 +26,8 @@
     : $(".topbar #sessionJump") ? "lp"
     : /\/vocabulary-games\.html$/.test(path) ? "games"
     : /\/lab\/(index\.html|practice\.html)?$/.test(path) ? "lab"
-    : /\/(?:2|4)eso\/(index\.html)?$/.test(path) ? "course" : null;
+    : /\/(?:2|4)eso\/(index\.html)?$/.test(path) ? "course"
+    : document.body.classList.contains("elroot") ? "home" : null;
   window.ELApp = { mode };
   // The page shows once this file has drawn it (Roger, 7 Nov 2026, video: "all pages still pop up in between"): pages with
   // <html class="elgate"> stay hidden until html.elready (el-app.css), so the browser never paints the page's own old layout, the
@@ -33,6 +37,7 @@
   // shows it, with the Sign in screen for a signed-out visitor), so the page never flashes before the Sign in (Roger, 7 Nov 2026).
   const ready = () => { const h = document.documentElement; if (h.classList.contains("elhold")) return;
     let known = true; try { known = !!localStorage.getItem("el_who"); } catch (e) {}
+    if (mode === "home") known = true;   // the home page is the same for a signed-out visitor: it shows at once
     h.classList.add(known ? "elready" : "elwait"); };
   if (!mode) { ready(); return; }
   if (!document.querySelector('link[href$="shared/css/el-app.css"]')) { const css = document.createElement("link"); css.rel = "stylesheet"; css.href = ROOT + "shared/css/el-app.css"; document.head.append(css); }
@@ -69,7 +74,8 @@
     const dash = ROOT + "teacher.html" + (c ? "?course=" + c + (curLs ? "&ls=" + encodeURIComponent(curLs) : "") : "");
     const lsLink = curLs && lsHref(curLs), back = $(".topbar .brand>a.elback"), lsT = lsName(curLs) || (back && back.dataset.ls) || "";
     const lsN = (() => { const cl = (window.EL_LS || []).filter(l => l.id.split("-")[0] === (curLs || "").split("-")[0]); const i = cl.findIndex(l => l.id === curLs); return i >= 0 ? "LS" + (i + 1) : "LS"; })();
-    const here = mode === "lp" || mode === "games" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? "practise" : "lab";
+    const here = mode === "home" ? ((location.hash.match(/^#(courses|learning)$/) || [])[1] || "home")
+      : mode === "lp" || mode === "games" ? "ls" : mode === "course" ? "all" : /practice\.html$/.test(path) ? "practise" : "lab";
     const L = [];
     if (who.role === "none") {
       L.push(["home", "⌂", "Home", "Home", ROOT + "index.html"]);
@@ -81,6 +87,12 @@
       L.push(["lab", "🧪", "English Lab", "Lab", ROOT + "lab/"]);
       L.push(["practise", "🎯", t("Practica", "Practise"), t("Practica", "Practise"), ROOT + "lab/practice.html"]);
       if (!teach) L.push(["help", "❓", t("Ajuda", "Help"), t("Ajuda", "Help"), board + "#help"]);
+    }
+    if (mode === "home") {   // the home page: Home first; the teacher and the test account also get its Courses and Learning Situations panels
+      const H = ["home", "⌂", "Home", "Home", ROOT + "index.html#home"];
+      if (who.role === "none") L[0] = H; else L.unshift(H);
+      if (who.role === "teacher" || who.role === "tester") L.splice(2, 0, ["courses", "🏫", "Courses", "Courses", ROOT + "index.html#courses"],
+        ["learning", "📚", "Learning Situations", "LS", ROOT + "index.html#learning"]);
     }
     // the side menu names the LS as the LS home does: only its title (LS2 · … stays in the tooltip and the narrow strip says LS2)
     return L.map(([k, i, long, short, h]) => ({ k, i, long, short, h, side: k === "ls" && lsT ? lsT : long, on: k === here }));
@@ -251,6 +263,7 @@
     const t = $("#el-tsec"); if (t && nav) nav.before(t);
     grid.before(lp); grid.remove(); col = null; document.body.classList.remove("ellp2");
   }
+  if (mode === "home") addEventListener("hashchange", () => draw());   // Home · Courses · Learning Situations: the button that is on
   if (mode === "lp") {
     WIDE.addEventListener ? WIDE.addEventListener("change", () => lpLayout()) : WIDE.addListener(() => lpLayout());
     let busy = false;
@@ -259,7 +272,7 @@
   }
 
   function draw() {
-    const on = who.role !== "none" || mode === "lp" || mode === "games";   // course pages and English Lab keep the public look when signed out
+    const on = who.role !== "none" || mode === "lp" || mode === "games" || mode === "home";   // course pages and English Lab keep the public look when signed out
     document.body.classList.toggle("elapp", on);
     document.body.classList.add("el" + mode);
     if (!on) { $$(".elrail,.elbar,.elside,.elcrumb").forEach(e => e.remove()); document.body.classList.remove("elhas-rail", "elhas-bar"); return; }
