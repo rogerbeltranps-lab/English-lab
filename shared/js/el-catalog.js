@@ -201,6 +201,15 @@ window.elLpOpen=function(a,info,gid,raw){const o=info&&info.open&&info.open[gid]
 // later days. Homework the teacher set and a pull-up open it at once, as before. Page-only, like the section switches. raw (or
 // window.EL_RAW_OPEN, set by the dashboard) = the switches alone, for whatever writes them.
 const agToday=()=>window.ELWeek&&ELWeek.today?ELWeek.today():window.EL_TODAY||new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"});
+// 🖨 Print session (Roger, 7 Nov 2026: "print today's sections for those who don't have a Chromebook … also the games"; "the same here [the
+// Time plan's class day] in case I know it beforehand", "like print session"): the paper sheet of one class day, shared/print/today.html.
+// its = the day's agenda items in order; returns the link from the site root (learning path tabs, then each game; notes are left out).
+window.elPrintDay=function(its,gname,dlab){const by=new Map(),games=[];
+  (its||[]).forEach(it=>{it=String(it);const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;const id=it.slice(0,i),p=it.slice(i+1);
+    if(/^game:/.test(p)){if(!games.includes(p.slice(5)))games.push(p.slice(5));return}
+    const a=(window.EL_CATALOG||[]).find(x=>x.id===id);if(!a||!a.path)return;const k=a.path.replace(/\.html$/,"");if(!by.has(k))by.set(k,[]);if(p)by.get(k).push(p);else by.get(k).all=true});
+  const items=[...by].map(([k,ps])=>k+(ps.all?"":":"+ps.join("."))).join("|");
+  return "shared/print/today.html?items="+encodeURIComponent(items)+"&games="+encodeURIComponent(games.join(","))+"&g="+encodeURIComponent(gname||"")+"&d="+encodeURIComponent(dlab||"")};
 window.elAgendaOf=function(info,gid){const s=info&&info.planEdits&&info.planEdits[gid]&&info.planEdits[gid].agenda;if(!s)return null;
   try{const ag=typeof s==="string"?JSON.parse(s):s;return ag&&ag.days?ag:null}catch(e){return null}};
 const laterMemo=new WeakMap();   // per ls info and group: recomputed when the agenda, homework, pull-up or day changes
@@ -229,6 +238,13 @@ window.elSecLocked=function(a,info,gid){return secOf(info,"secLocked",gid,a)||[]
 // as one tab, done when both are (Roger, 7 Nov 2026: students see the same tabs and counts as the learning path and the dashboard).
 window.elTabGroups=function(a,ks){const xs=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]),m=new Map();
   ks.forEach(k=>{const p=xs.includes(k)?k:(k==="cards"||k==="practice")&&xs.includes("vocab")?"vocab":k;if(!m.has(p))m.set(p,[]);m.get(p).push(k)});return [...m.values()]};
+// Tabs still to do in a learning path (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!"): every count of missing work
+// (board banner, All my work done, My activities, the learning-paths table, the dashboard's Points box) counts TABS, not learning paths.
+// The tabs of its scored steps (EL_ACTIONS without a.skip, grouped by elTabGroups); one with no steps listed counts as 1 tab (its flag).
+window.elTabsOf=function(a){const ks=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));return ks.length?elTabGroups(a,ks):null};
+// the tabs not done as [[step, …], …] (done = Set of the student's done steps, r = results/{activity}); an activity with no steps: [] or [[]]
+window.elTabsLeft=function(a,done,r){const g=elTabsOf(a);return g?g.filter(x=>!x.every(k=>done.has(k))):elAllDone(a,done,r)?[]:[[]]};
+window.elTabsTotal=a=>{const g=elTabsOf(a);return g?g.length:1};
 window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
@@ -455,7 +471,7 @@ window.elMenuLs=function(courses,group){
     .sort((a,b)=>(((info(b.id)||{}).status==="open")-((info(a.id)||{}).status==="open")));   // open LS first, as the board
 };
 // o: {root (site root URL, "" on today.html), courses:["4eso"], lss (LS list; default elMenuLs), group, ca (Catalan labels), board (the
-// board's URL, ?student= in the teacher's student view), here: "board"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"help"|"phone",
+// board's URL, ?student= in the teacher's student view), here: "board"|"marks"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"help"|"phone",
 // app (opened as a home-screen app: no 📱)} → the buttons' HTML (classes nv, nv sub, on; shared/css/el-app.css and ls-home.css)
 window.elStudentMenu=function(o){
   const R=o.root||"",t=(ca,en)=>o.ca?ca:en,cs=o.courses||[],CN={"2eso":"2 ESO","4eso":"4 ESO"},board=o.board||R+"today.html",here=o.here||"";
@@ -463,7 +479,9 @@ window.elStudentMenu=function(o){
   const b=(k,cls,h,ic,txt,x)=>{const on=k&&k===here;return `<a class="nv${cls}${on?" on":""}" href="${h}"${on?' aria-current="page"':""}${x||""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`};
   const bq=board.split("#")[0];
   // Practise right below My dashboard (Roger, 7 Nov 2026: "practice should be below my dashboard")
-  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
+  // 📊 My marks right below My dashboard, on every student page (Roger, 7 Nov 2026: "i si posem les meves notes a sota del meu taulell?
+  // i revisem que estigui allà sempre?"): the board's #marks place
+  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
     +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
       +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
     +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary")):"")

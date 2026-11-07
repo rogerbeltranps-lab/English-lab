@@ -71,6 +71,12 @@ a.hal{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:1
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:30px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:18px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
 .ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}a.ucard{border:2px solid #e2e8f0;border-radius:16px;padding:16px 18px;text-decoration:none;color:#0f172a;display:flex;flex-direction:column;gap:4px}a.ucard small{color:#64748b;font-size:13px}a.ucard b{font-size:19px}a.ucard span{color:#3157d5;font-weight:700;margin-top:6px}a.ucard.on{border-color:#3157d5;background:#f5f8ff}a.ucard:hover{border-color:#3157d5}
 .helpl{margin:6px 0 0;padding-left:20px}.helpl li{margin:6px 0}
+/* ❓ Help: the picture guide (helpGuide) */
+.hguide h2{margin:.1em 0 .2em}details.hgp{border:1px solid #e2e8f0;border-radius:14px;margin:10px 0;background:#fff}details.hgp>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:14px;padding:12px 16px}
+details.hgp>summary::-webkit-details-marker{display:none}details.hgp>summary::after{content:"›";margin-left:auto;font-size:26px;color:#94a3b8;transition:transform .15s}details.hgp[open]>summary::after{transform:rotate(90deg)}
+.hgi{font-size:26px;width:44px;height:44px;border-radius:12px;background:#f1f5f9;display:grid;place-items:center;flex:none}.hgt{display:flex;flex-direction:column;min-width:0}.hgt b{font-size:17px}.hgt small{color:#64748b;font-size:14px}
+.hgb{padding:0 16px 16px}@media (min-width:1000px){.hgb{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:22px;align-items:start}.hgb ol.hgs{position:sticky;top:16px}}a.hgimg{display:block;margin:4px 0 12px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px #0f172a14}a.hgimg img{display:block;width:100%;height:auto}a.hgimg.narrow{max-width:260px}
+ol.hgs{margin:0;padding-left:22px;font-size:16px;line-height:1.5}ol.hgs li{margin:7px 0}
 /* both home columns end at the same line (Roger, 7 Nov 2026: "I want this to be aligned to make room on the page"): a compact left column
    (slimmer alert, blue card with the bar and Continue on one row, one-line My marks) and the shorter column's last card stretches */
 @media (min-width:901px){.hgrid{align-items:stretch}.hl>.cont{flex:1 1 auto}.hr>.tiles{flex:1 1 auto;grid-auto-rows:1fr}.hr>.tiles>a.tile{height:100%}
@@ -128,7 +134,7 @@ body[data-course="2eso"]{--c:#1f6b52;--c-dark:#174d3d;--c-soft:#e9f5ef}body[data
 .fv-miss{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
 .fv-miss li{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid #fecaca;border-left:6px solid #dc2626;border-radius:14px;padding:10px 12px}
 .fv-mh{display:flex;align-items:flex-start;gap:8px}.fv-mh b{font-size:15px;line-height:1.3}.fv-n{background:#dc2626;color:#fff;font-weight:900;border-radius:9px;padding:2px 7px;font-size:13px;flex:none}
-.fv-due{font-size:13.5px;color:#991b1b}.fv-miss a.go{align-self:flex-start;font-size:14px;padding:7px 14px;border-radius:10px;background:#b91c1c;margin-top:auto}
+.fv-due{font-size:13.5px;color:#991b1b}.fv-tabs{font-size:13.5px;color:#7f1d1d}.fv-miss a.go{align-self:flex-start;font-size:14px;padding:7px 14px;border-radius:10px;background:#b91c1c;margin-top:auto}
 .fv-ok{display:flex;align-items:center;gap:10px;background:#ecfdf3;border-left:6px solid #16a34a;border-radius:14px;padding:10px 14px;color:#166534;font-weight:700;margin:12px 0 0}
 .fv-warn{background:#fef2f2;border-left:6px solid #dc2626;border-radius:14px;padding:10px 14px;color:#991b1b;margin:12px 0 8px}
 .fv .muted{margin:10px 0 0}
@@ -266,26 +272,71 @@ const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
   // the same menu as every other student page: elStudentMenu in shared/js/el-catalog.js (Roger, 7 Nov 2026: "this should always be the same")
-  const pl=placeNow(),here={home:"board",books:"books",lang:"lang",help:"help",phone:"phone"}[pl]||"";
+  const pl=placeNow(),here={home:"board",marks:"marks",books:"books",lang:"lang",help:"help",phone:"phone"}[pl]||"";
   if(!all())try{localStorage.setItem("el_menu_ls",JSON.stringify(lss.map(l=>l.id)))}catch(e){}   // the other pages show the same LSs
   const html=elStudentMenu({root:"",courses:cs,lss,ca:lang()==="ca",board:location.search||"today.html",here,app:APP()});
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
-// "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
-// tools/site-video (real screens of the site, no subtitles). A box on the board and a link in the menu.
-const HOWTO="video/how-english-lab-works",HOWTO_V="20261102c";   // change HOWTO_V when the videos are rebuilt, so browsers fetch the new file
-// One video per language (Roger, 2 Nov 2026: "this videos could be merged … the original video with the changes"): the website
-// video now holds the whole board, part by part, on a sample student (tools/site-video/full.json).
-const vidRow=(icon,ca,en,dca,den,f,v)=>`<div class="hv"><div><b>${icon} ${t(ca,en)}</b> <span class="muted">· ${t(dca,den)}</span></div>`
-  +`<div class="row"><a class="go" href="${f}.mp4?v=${v}" target="_blank" rel="noopener">▶️ English</a> <a class="go" href="${f}-ca.mp4?v=${v}" target="_blank" rel="noopener">▶️ Català</a></div></div>`;
-const howBox=()=>`<div class="pend howto" style="background:#f5f3ff;border-color:#c4b5fd;flex-direction:column;align-items:stretch;gap:10px">`
-  +vidRow("🎬","Com funciona English Lab","How English Lab works","vídeo de 13 minuts: el tauler part per part, les Learning Situations, els learning paths i com moure't per la web","12-minute video: your board part by part, Learning Situations, learning paths and how to move around the website",HOWTO,HOWTO_V)+`</div>`;
+// ❓ Help: a picture guide instead of the old videos (Roger, 7 Nov 2026: "instead of the videos (which are obsolete) I need a guide
+// with images so that students can check it if they want it"). One folded part per place of the site, each with a real screenshot
+// (Chromebook size, invented sample students) and a few short steps, in the student's language. Pictures: shared/img/help/<id>-<ca|en>.webp,
+// made by tools/help-guide/capture.mjs; run it again when the student pages change a lot and change HELP_V so browsers fetch the new ones.
+// The old videos (video/how-english-lab-works*.mp4) stay in the repo for the teacher's Materials; students no longer see them.
+const HELP_V="20261107";
+const helpGuide=()=>{
+  const L=lang(),img=(id,alt,cls)=>`<a class="hgimg${cls?" "+cls:""}" href="shared/img/help/${id}-${L}.webp?v=${HELP_V}" target="_blank" rel="noopener" title="${t("Obre la imatge en gran","Open the picture full size")}"><img src="shared/img/help/${id}-${L}.webp?v=${HELP_V}" alt="${esc(alt)}" loading="lazy"></a>`;
+  const part=(icon,ti,sub,pics,steps)=>`<details class="hgp"><summary><span class="hgi" aria-hidden="true">${icon}</span><span class="hgt"><b>${ti}</b><small>${sub}</small></span></summary>`
+    +`<div class="hgb"><div class="hgpics">${pics}</div><ol class="hgs">${steps.map(s=>`<li>${s}</li>`).join("")}</ol></div></details>`;
+  const P=[
+    part("🏠",t("El meu tauler","My dashboard"),t("El primer que veus quan entres","The first thing you see when you sign in"),img("board",t("El tauler","The dashboard")),[
+      t("A dalt veus el teu <b>nivell</b> i els avisos: les <b>activitats que et falten</b> i els <b>anuncis del professor</b>.","At the top you see your <b>level</b> and the notices: the <b>activities you are missing</b> and the <b>announcements from your teacher</b>."),
+      t("Prem <b>▶ Continua</b> i aniràs directament al pas que et toca fer.","Press <b>▶ Continue</b> to go straight to your next step."),
+      t("<b>✅ Per fer</b>: els learning paths que el professor ha obert i encara no has acabat. <b>📝 Deures</b>: només el que el professor posa com a deures.","<b>✅ To do</b>: the learning paths your teacher has opened that you haven't finished. <b>📝 Homework</b>: only what your teacher sets as homework."),
+      t("A sota tens la teva <b>Learning Situation d'ara</b>: els seus learning paths i el teu repte (el producte final).","Below is your <b>Learning Situation now</b>: its learning paths and your challenge (the final product).")]),
+    part("☰",t("El menú","The menu"),t("Per anar a qualsevol lloc de la web","To go anywhere on the website"),img("menu",t("El menú de l'esquerra","The menu on the left"),"narrow"),[
+      t("El menú de l'esquerra és igual a totes les pàgines. Al mòbil el trobes a baix.","The menu on the left is the same on every page. On a phone it is at the bottom."),
+      t("<b>🏠 El meu tauler</b>: torna a l'inici. <b>📊 Les meves notes</b>: les teves activitats, notes i exàmens. <b>🎯 Practica</b>: practica pel teu compte.","<b>🏠 My dashboard</b>: back to the start. <b>📊 My marks</b>: your activities, marks and exams. <b>🎯 Practise</b>: practise on your own."),
+      t("<b>🗂 El meu curs</b> i a sota cada <b>LS</b>: obre la pàgina d'una Learning Situation.","<b>🗂 My course</b> and each <b>LS</b> below it: open the page of a Learning Situation."),
+      t("<b>📖 Llibres</b>, <b>🔤 Gramàtica i vocabulari</b> (els resums per estudiar), <b>🎲 Jocs</b>, <b>❓ Ajuda</b> (aquesta pàgina) i <b>📱 Estudia amb el mòbil</b>.","<b>📖 Books</b>, <b>🔤 Grammar and vocabulary</b> (summaries to study), <b>🎲 Games</b>, <b>❓ Help</b> (this page) and <b>📱 Study on your phone</b>.")]),
+    part("📚",t("La pàgina d'una LS","An LS page"),t("Els learning paths i el producte final","The learning paths and the final product"),img("ls",t("La pàgina de la LS","The LS page")),[
+      t("Fes els <b>learning paths</b> en ordre: cada un acaba amb una peça del teu producte final. Hi veus <b>✓ Fet</b> o quants passos portes.","Do the <b>learning paths</b> in order: each one ends with a piece of your final product. You see <b>✓ Done</b> or how many steps you have done."),
+      t("<b>▶ Continua</b> t'obre el learning path i el pas que et toca.","<b>▶ Continue</b> opens the learning path and the step you need to do."),
+      t("<b>El teu repte · Producte final</b> → <b>Mira què has de fer</b>: què has de fer i com t'avaluaran.","<b>Your challenge · Final product</b> → <b>See what to do</b>: what to do and how it is marked."),
+      t("També hi tens <b>Jocs i teoria</b>, el <b>vídeo de shadowing</b> i <b>Sobre aquesta LS</b> (què aprendràs i com t'avaluen).","There are also <b>Games and theory</b>, the <b>shadowing video</b> and <b>About this LS</b> (what you learn and how you are assessed).")]),
+    part("🧭",t("Un learning path","A learning path"),t("Pas a pas: respon i prem Comprova","Step by step: answer and press Check"),img("lp",t("Un pas d'un learning path, comprovat","A learning path step, checked")),[
+      t("A l'esquerra tens els <b>passos</b>. Quan n'acabes un, es posa <b>verd ✓</b>.","On the left are the <b>steps</b>. When you finish one, it turns <b>green ✓</b>."),
+      t("Llegeix la instrucció curta, respon i prem <b>Comprova</b>. Veuràs <b>Correcte!</b> o una pista per tornar-ho a provar.","Read the short instruction, answer and press <b>Check</b>. You see <b>Correct!</b> or a tip to try again."),
+      t("Un pas està fet quan has respost i comprovat <b>totes</b> les activitats.","A step is done when you have answered and checked <b>every</b> activity."),
+      t("Les respostes es desen soles: les tornes a veure un altre dia o en un altre aparell. Amb <b>↺ Torna a practicar</b> ho tornes a fer; el resultat d'abans es queda fins que tornes a prémer Comprova.","Your answers save on their own: you see them again another day or on another device. With <b>↺ Practise again</b> you can do it again; your old result stays until you press Check again."),
+      t("Quan entregues una <b>escriptura</b>, ja no es pot canviar. La correcció del professor apareix en el mateix pas.","When you hand in a <b>writing</b>, it can't be changed any more. Your teacher's correction appears in the same step.")]),
+    part("🃏",t("Les targetes (vocabulari)","Study cards (vocabulary)"),t("Per aprendre les paraules de cada learning path","To learn the words of each learning path"),img("cards",t("Les targetes d'estudi","The study cards")),[
+      t("Al pas <b>Vocabulari</b>, digues la paraula en veu alta i pensa què vol dir. Prem <b>🔊 Escolta</b> per sentir-la.","In the <b>Vocabulary</b> step, say the word aloud and think what it means. Press <b>🔊 Listen</b> to hear it."),
+      t("Clica la targeta per <b>girar-la</b> i veure què vol dir i un exemple. Si vols, escriu-ho abans i prem <b>Comprova i gira</b>.","Click the card to <b>turn it</b> and see the meaning and an example. If you want, type it first and press <b>Check and turn</b>."),
+      t("Prem <b>Ho sé ✓</b> quan ja te la saps. Pots canviar el sentit: <b>English → Català</b> o <b>Català → English</b>.","Press <b>Got it ✓</b> when you know it. You can change the direction: <b>English → Català</b> or <b>Català → English</b>.")]),
+    part("🧩",t("Jocs i teoria","Games and theory"),t("La teoria dels jocs de classe, els teus apunts i què has d'estudiar","The theory of the class games, your notes and what to study"),img("notes",t("Jocs i teoria","Games and theory")),[
+      t("Obre <b>Jocs i teoria</b> des del tauler o des de la pàgina de la LS. Els cercles et diuen el teu % de gramàtica i de vocabulari.","Open <b>Games and theory</b> from your dashboard or the LS page. The circles show your % in grammar and vocabulary."),
+      t("Hi ha cada joc de classe de la LS: la <b>teoria</b>, <b>els teus apunts</b> i el teu <b>resultat</b>.","Every class game of the LS is there: the <b>theory</b>, <b>your notes</b> and your <b>result</b>."),
+      t("<b>🎯 Què has d'estudiar</b> et diu les parts on t'has equivocat: clica-les per anar-hi. Mira també <b>les preguntes que has de revisar</b>.","<b>🎯 What to study</b> shows the parts you got wrong: click them to go there. Look at <b>the questions to look at again</b> too."),
+      t("Si no vas fer un joc, llegeix-ne la teoria i pren apunts en paper. Pots imprimir-ho tot amb <b>🖨 Imprimeix-ho</b>.","If you missed a game, read its theory and take notes on paper. You can print it all with <b>🖨 Print it</b>.")]),
+    part("📊",t("Les meves notes","My marks"),t("El que has fet, el que et falta i les teves notes","What you have done, what you are missing and your marks"),img("marks",t("Les meves notes","My marks"))+img("marks-lps",t("Els meus learning paths: fet i pendent","My learning paths: done and missing"))+img("marks-exam",t("La nota de la LS i l'examen","The LS mark and the exam")),[
+      t("<b>📋 Les meves activitats</b>: quantes n'has fet, quantes et falten i quant compten. Prem <b>Fes-la ara</b> per anar a una activitat que et falta.","<b>📋 My activities</b>: how many you have done, how many you are missing and how much they count. Press <b>Do it now</b> to go to a missing activity."),
+      t("Tria la <b>LS</b> i després una pestanya: <b>📈 La meva avaluació formativa</b>, <b>🎬 El meu producte final</b> o <b>📝 Els meus exàmens</b>.","Choose the <b>LS</b> and then a tab: <b>📈 My formative assessment</b>, <b>🎬 My final product</b> or <b>📝 My exams</b>."),
+      t("A l'avaluació formativa veus cada learning path: fet, pendent i la puntuació. Clica una pestanya que et falta per anar-hi directament.","In your formative assessment you see every learning path: done, missing and the score. Click a tab you are missing to go straight to it."),
+      t("A <b>Els meus exàmens</b> veus la nota de cada part, els criteris, les preguntes que has de repassar i la teva escriptura corregida.","In <b>My exams</b> you see the mark of each part, the criteria, the questions to review and your writing corrected."),
+      t("<b>🏆 Els meus punts</b>: guanyes punts responent bé a classe. Si tens tota la feina feta, sumen a la nota del trimestre.","<b>🏆 My points</b>: you win points by answering well in class. If you have all your work done, they add to your term grade.")]),
+    part("🎯",t("Practica","Practise"),t("Practica pel teu compte, al teu nivell","Practise on your own, at your level"),img("practise",t("Practica","Practise")),[
+      t("<b>Vocabulari</b> (targetes), <b>Gramàtica</b> (explicació i exercicis), <b>Sentence builder</b>, <b>Listening</b> i <b>Shadowing</b>, al teu nivell.","<b>Vocabulary</b> (word cards), <b>Grammar</b> (explanation and exercises), <b>Sentence builder</b>, <b>Listening</b> and <b>Shadowing</b>, at your level."),
+      t("Tot es corregeix sol i no s'entrega res: practica tant com vulguis.","Everything corrects itself and nothing is handed in: practise as much as you like.")]),
+    part("🎲",t("Jocs","Games"),t("Jocs de vocabulari de cada LS","Vocabulary games for each LS"),img("games",t("Jocs","Games")),[
+      t("Tria la LS i prem <b>Juga →</b>. Els jocs són al teu nivell.","Choose the LS and press <b>Play →</b>. The games are at your level.")]),
+  ];
+  return `<div class="box hguide"><h2>📘 ${t("Guia d'English Lab","English Lab guide")}</h2><p class="muted">${t("Obre una part per veure-la amb imatges. Clica una imatge per veure-la en gran.","Open a part to see it with pictures. Click a picture to see it full size.")}</p>${P.join("")}</div>`};
 // Simple board (Roger, 6 Nov 2026: "the menus have little information and when you go to a place you can find the info that you need";
 // the students work on Chromebooks; the site is for self-study and for class): the board opens on a home with only the class bar
 // (📌 pulled-up path, live presentation), one Continue button to the next step and four places. Each place keeps the boxes that were on
 // the board: ✅ To do (what the teacher has opened and I haven't finished, my activities, what we've done) and 🏠 Homework (only what the
 // teacher set as homework, and the calendar; Roger, 6 Nov 2026), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
-// the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (video, problems). A place is a hash
+// the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (picture guide, problems). A place is a hash
 // (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
 const PLACE_OF={todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
@@ -306,7 +357,7 @@ function nextFor(ls,info){if(only(ls.id)||info.status==="closed")return null;
     const gs=tabGroups(a,ks);return {a,k,nm:tabName(a.id,k),done:gs.filter(g=>g.every(x=>ds.has(x))).length,total:gs.length,late:!!(d&&d<today)}}
   return null}
 function homeHtml(lss,ls,info){
-  workBox();const miss=(S.wmiss?S.wmiss.size:0)+lateList(lss).length,me=U&&U.uid;
+  workBox();const miss=(S.wtabs||0)+tabsMiss(lateList(lss)),me=U&&U.uid;
   const unread=(D.ann||[]).filter(a=>String(a.text||"").trim()&&me&&!(a.read||{})[me]).length;
   const alerts=(miss?`<a class="hal late" href="#marks">⏰ <b>${miss>1?t(`Et falten ${miss} activitats`,`You have ${miss} activities missing`):t("Et falta 1 activitat","You have 1 activity missing")}</b><span>${miss>1?t("Mira-les","See them"):t("Mira-la","See it")} →</span></a>`:"")
     +(unread?`<a class="hal news" href="#news">📣 <b>${unread>1?t(`${unread} anuncis nous del professor`,`${unread} new announcements from your teacher`):t("1 anunci nou del professor","1 new announcement from your teacher")}</b><span>${t("Llegeix","Read")} →</span></a>`:"");
@@ -322,7 +373,7 @@ function homeHtml(lss,ls,info){
   // ✅ To do (opened in class, not finished) and 🏠 Homework (only what the teacher set as homework) are two tiles (Roger, 6 Nov 2026)
   // 📊 My marks: its own card right under the blue one; the two together take the blue card's old height (Roger, 7 Nov 2026: "my marks
   // should be another cloud below the blue one but both should occupy what the blue one is doing now")
-  const marks=tile("#marks","📊",t("Les meves notes","My marks"),t("activitats, exàmens i producte final","activities, exams and final product"),"","",true);
+  // 📊 My marks is in the left menu, right under My dashboard, on every page (Roger, 7 Nov 2026), not a card here any more
   const tiles=tile("#todo","✅",t("Per fer","To do"),td.length?(td.length>1?t(`${td.length} learning paths oberts per acabar`,`${td.length} open learning paths to finish`):t("1 learning path obert per acabar","1 open learning path to finish")):t("Ho tens tot fet","All done"),td.length||"","")
     +tile("#homework","📝",t("Deures","Homework"),hwOpen.length?t("Per al ","For ")+when(hwOpen[0].x.date):t("No tens deures","No homework"),hwOpen.length||"","hw")
     ;
@@ -334,7 +385,7 @@ function homeHtml(lss,ls,info){
   const lv=ls&&elRouteOf(D.lv,ls.id).level,cefr=lv?elCefr(COURSE,lv):"";
   const lvBox=lv?`<div class="hlv" title="${esc(elCefr(COURSE,lv,true))}"><span class="i" aria-hidden="true">🎯</span><span><small>${t("El meu nivell","My level")}</small><b>${esc(LV[lv]||lv)}${cefr?` · ${esc(cefr)}`:""}</b></span></div>`:"";
   const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox;
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}${marks}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
 // vocabulary and grammar summary of the student's level (the same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS),
 // the teacher and testers every level. Nothing until the student has a level; no new Firestore reads.
@@ -451,7 +502,7 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="books"||place==="lang"){const c=place==="books"?bookCard(ls):langCard(ls);
     return c?`<div class="rcards one">${c}</div>`:`<div class="box"><p class="muted">${place==="books"?t("Aquesta LS no té llibre de lectura.","This LS has no reading book."):t("Aquesta LS no té resum de gramàtica i vocabulari.","This LS has no grammar and vocabulary summary.")}${!all()&&!elRouteOf(D.lv,ls.id).level?" "+t("Apareixerà quan el professor et posi el nivell.","It will appear when your teacher sets your level."):""}</p></div>`}
   if(place==="news")return annBox()||`<div class="box"><p class="muted">${t("Encara no hi ha anuncis.","No announcements yet.")}</p></div>`;
-  return howBox()+phoneBanner(true)+`<div class="box"><b>${t("Alguna cosa no funciona?","Something isn't working?")}</b><ul class="helpl"><li>${t("Prem <b>⚠️ Problema</b> a baix de la pantalla i explica-ho: el professor ho veurà.","Press <b>⚠️ Problem</b> at the bottom of the screen and explain it: your teacher will see it.")}</li>`
+  return helpGuide()+phoneBanner(true)+`<div class="box"><b>${t("Alguna cosa no funciona?","Something isn't working?")}</b><ul class="helpl"><li>${t("Prem <b>⚠️ Problema</b> a baix de la pantalla i explica-ho: el professor ho veurà.","Press <b>⚠️ Problem</b> at the bottom of the screen and explain it: your teacher will see it.")}</li>`
     +`<li>${t("Tens una idea per millorar la web? Prem <b>💡 Idea</b>.","Have an idea to make the website better? Press <b>💡 Idea</b>.")}</li><li>${t("Si una pàgina es veu antiga, recarrega-la amb <b>Ctrl+Maj+R</b>.","If a page looks old, reload it with <b>Ctrl+Shift+R</b>.")}</li></ul></div>`}
 const lsState=l=>{const s=(D.ls[l.id]||{}).status;return s==="closed"?t("tancada · per repassar","closed · to revise"):s==="hidden"?t("oculta","hidden"):t("ara","now")};
 // 📊 My marks: the LS chips (when there are several) and the three tabs of an LS
@@ -519,7 +570,7 @@ function render(){
   const place=placeNow(),cls=`<div id="pull">${pullBox()}</div><div id="live">${liveBox()}</div>`,noteBox=note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"";
   document.body.dataset.place=lss.length?place:"home";
   if(!lss.length){$("#crumb").innerHTML="";$("#lvl").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
-    $("#note").innerHTML=cls+annBox()+noteBox+howBox();$("#main").innerHTML="";if(canReply())wireAnn();return}
+    $("#note").innerHTML=cls+annBox()+noteBox;$("#main").innerHTML="";if(canReply())wireAnn();return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;document.body.dataset.course=COURSE;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
   S.pend=[];   // no Submit any more (Roger, 6 Nov 2026): answers save on their own, Submit only froze the score
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
@@ -535,7 +586,7 @@ function render(){
 }
 // Phone bar (Roger, 6 Nov 2026): the same four places as the home tiles, always at the bottom of the screen.
 function bnav(place,lss){
-  const miss=lss.length?(S.wmiss?S.wmiss.size:0)+lateList(lss).length:0,it=[["home","#","🏠",t("Inici","Home")],["todo","#todo","✅",t("Per fer","To do")],["hw","#homework","📝",t("Deures","Homework")],["marks","#marks","📊",t("Notes","Marks")],["units","#units","📚","LS"],["help","#help","❓",t("Ajuda","Help")]];
+  const miss=lss.length?(S.wtabs||0)+tabsMiss(lateList(lss)):0,it=[["home","#","🏠",t("Inici","Home")],["todo","#todo","✅",t("Per fer","To do")],["hw","#homework","📝",t("Deures","Homework")],["marks","#marks","📊",t("Notes","Marks")],["units","#units","📚","LS"],["help","#help","❓",t("Ajuda","Help")]];
   const ls=EL_LS.find(l=>l.id===S.ls),nt=lss.length?todoItems(lss).length:0,nh=ls?hwList(ls,D.ls[ls.id]||{}).filter(x=>!x.done).length:0;
   $("#bnav").innerHTML=lss.length?it.map(([k,h,i,l])=>`<a href="${h}" class="${place===k?"on":""}"${place===k?' aria-current="page"':""}><i>${i}</i>${l}${k==="todo"&&nt?`<b>${nt}</b>`:k==="hw"&&nh?`<b class="hw">${nh}</b>`:""}</a>`).join(""):"";
 }
@@ -579,14 +630,14 @@ function pointsBox(){
   const p=D.pt||{},tm=D.tm||{},ok=tm.bestOk||{},bestOf=id=>Math.max(ok[id]!=null?+ok[id]:+(tm.best||{})[id]||0,+p[id]||0);
   const missOf=id=>all()?[]:elMissing(D.me.group,id,isDone,ls=>D.ls[ls]);
   if(!EL_TERMS.some(x=>+p[x.id]>0)&&!bestOf(elTerm()))return "";   // no points in my group yet
-  const L=lang(),term=elTerm(),mine=+p[term]||0,best=bestOf(term),miss=missOf(term),bonus=miss.length?0:elBonus(mine,best);
+  const L=lang(),term=elTerm(),mine=+p[term]||0,best=bestOf(term),miss=missOf(term),bonus=miss.length?0:elBonus(mine,best),nm=tabsMiss(miss);
   const past=EL_TERMS.filter(x=>x.id<term&&+p[x.id]>0).map(x=>`${elTermName(x.id,L)}: ${p[x.id]} ${t("punts","points")} → +${elNum(missOf(x.id).length?0:elBonus(+p[x.id],bestOf(x.id)),L)}`);
   const pb=Math.round(bonus/EL_POINTS_BONUS*100);
   return `<div class="box fv pts">${fvHead("🏆",t("Els meus punts","My points"),elTermName(term,L))}`
     +`<p class="fvlead">${t("Guanyes punts responent bé a classe. Si a més tens tota la feina feta, sumen un bonus a la nota del trimestre.","You win points by answering well in class. If you also have all your work done, they add a bonus to your term grade.")}</p>`
     +`<div class="fv-stats">`+fvStat("fk-a","🏆",t("Els meus punts","My points"),String(mine),best?t(`el màxim de la classe amb tota la feina feta: ${best}`,`top score in your class with all the work done: ${best}`):"")
     +fvStat("fk-v","➕",t("Bonus a la nota del trimestre","Bonus on my term grade"),`+${elNum(bonus,L)} <small>${t("de","of")} +${elNum(EL_POINTS_BONUS,L)}</small>`,`<span class="fv-bar"><span style="width:${pb}%"></span></span>`)
-    +(miss.length?fvStat("fk-r ptno","✗",t("Tota la feina feta","All my work done"),t("No","No"),t(`en falten ${miss.length}`,`${miss.length} missing`))
+    +(miss.length?fvStat("fk-r ptno","✗",t("Tota la feina feta","All my work done"),t("No","No"),t(`en falten ${nm}`,`${nm} missing`))
       :fvStat("fk-g ptyes","✓",t("Tota la feina feta","All my work done"),t("Sí","Yes"),t("el bonus compta","your bonus counts")))+`</div>`
     +(miss.length?`<div class="fv-warn">⏳ <b>${t("Sense tota la feina feta no tens el bonus.","No bonus without all your work done.")}</b> ${t(`Fes les activitats que et falten (a «Les meves activitats», a dalt) i recuperes el teu +${elNum(elBonus(mine,best),L)}.`,`Do your missing activities (in “My activities”, above) and you get your +${elNum(elBonus(mine,best),L)} back.`)}</div>`
       :`<p class="fv-ok"><span aria-hidden="true">🎉</span> ${t("Has fet totes les activitats d'aquest trimestre: el bonus compta.","You have done all the activities of this term: your bonus counts.")}</p>`)
@@ -596,20 +647,22 @@ function pointsBox(){
 // 4/10 … then a list of the activities missing"): below the bonus, the activities that count so far by the time plan (elDueWork, the same
 // rule as the bonus), how many are done, how much continuous assessment weighs in the current LS (elFormativeShare) and the missing ones.
 // It never says which activities are assessed (AGENTS.md: students are never told), only that their everyday work counts.
-function workBox(){S.wmiss=new Set();if(all()||!D.me.group)return "";
+function workBox(){S.wmiss=new Set();S.wtabs=0;if(all()||!D.me.group)return "";
   const L=lang(),term=elTerm(),due=elDueWork(D.me.group,term,ls=>D.ls[ls]);if(!due.length)return "";
-  const miss=due.filter(([a])=>!isDone(a)),done=due.length-miss.length,p=Math.round(done/due.length*100);miss.forEach(([a])=>S.wmiss.add(a.id));
+  // counted in tabs (activities), not learning paths (Roger, 7 Nov 2026): a path with 5 tabs not done is 5 missing
+  const miss=due.filter(([a])=>!isDone(a)),tot=due.reduce((n,[a])=>n+elTabsTotal(a),0),nm=tabsMiss(miss),done=tot-nm,p=tot?Math.round(done/tot*100):100;
+  miss.forEach(([a])=>S.wmiss.add(a.id));S.wtabs=nm;
   const cur=EL_LS.find(l=>l.id===(ELWeek.now(D.me.group)||{}).ls)||EL_LS.find(l=>l.id===S.ls),share=cur?elFormativeShare(cur.id):0,lsN=cur?lsName(cur):"";
   const k=p>=100?"fk-g":p>=50?"fk-a":"fk-r";
   return `<div class="box fv work">${fvHead("📋",t("Les meves activitats","My activities"),elTermName(term,L))}`
     +`<p class="fvlead">${share?t(`<b>La feina de cada dia compta.</b> Les activitats dels learning paths són la teva avaluació contínua: un <b>${share} %</b> de la nota de ${lsN}. Fes-les totes, i a temps, perquè compti sencera.`,`<b>Your everyday work counts.</b> The learning-path activities are your continuous assessment: <b>${share} %</b> of your ${lsN} mark. Do them all, and on time, so it counts in full.`)
       :t("<b>La feina de cada dia compta.</b> Les activitats dels learning paths són la teva avaluació contínua. Fes-les totes, i a temps.","<b>Your everyday work counts.</b> The learning-path activities are your continuous assessment. Do them all, and on time.")}</p>`
     +`<div class="fv-stats">`
-    +fvStat(k,"✅",t("Activitats fetes","Activities done"),`${done} <small>/ ${due.length}</small>`,`<span class="fv-bar"><span style="width:${p}%"></span></span>${t("segons l'agenda de classe","by the class plan")}`)
-    +fvStat(miss.length?"fk-r":"fk-g",miss.length?"⏳":"🎉",t("Activitats que et falten","Activities missing"),String(miss.length),miss.length?t("fes-les com més aviat millor","do them as soon as you can"):t("cap: molt bé!","none: well done!"))
+    +fvStat(k,"✅",t("Activitats fetes","Activities done"),`${done} <small>/ ${tot}</small>`,`<span class="fv-bar"><span style="width:${p}%"></span></span>${t("segons l'agenda de classe","by the class plan")}`)
+    +fvStat(miss.length?"fk-r":"fk-g",miss.length?"⏳":"🎉",t("Activitats que et falten","Activities missing"),String(nm),miss.length?t("fes-les com més aviat millor","do them as soon as you can"):t("cap: molt bé!","none: well done!"))
     +(share?fvStat("fk-b","📈",t("Avaluació contínua","Continuous assessment"),`${share} <small>%</small>`,t(`de la nota de ${lsN}`,`of your ${lsN} mark`)):"")+`</div>`
-    +(miss.length?`<div class="fv-missbox"><h3 class="fv-sub">⏳ ${miss.length>1?t(`Et falten ${miss.length} activitats`,`You have ${miss.length} activities missing`):t("Et falta 1 activitat","You have 1 activity missing")}</h3><ol class="fv-miss">`
-      +miss.map(([a,d],i)=>`<li><span class="fv-mh"><span class="fv-n">${String(i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span><span class="fv-due">📅 ${t("calia fer-la el","due on")} ${when(d)}</span><a class="go" href="${a.path}">${t("Fes-la ara","Do it now")} →</a></li>`).join("")+`</ol></div>`
+    +(miss.length?`<div class="fv-missbox"><h3 class="fv-sub">⏳ ${nm>1?t(`Et falten ${nm} activitats`,`You have ${nm} activities missing`):t("Et falta 1 activitat","You have 1 activity missing")}</h3><ol class="fv-miss">`
+      +miss.map(([a,d],i)=>{const ln=leftNames(a);return `<li><span class="fv-mh"><span class="fv-n">${String(i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span>${ln.length?`<span class="fv-tabs">⏳ ${nAct(ln.length)}: <b>${ln.map(esc).join(" · ")}</b></span>`:""}<span class="fv-due">📅 ${t("calia fer-la el","due on")} ${when(d)}</span><a class="go" href="${a.path}">${t("Fes-la ara","Do it now")} →</a></li>`}).join("")+`</ol></div>`
       :`<p class="fv-ok"><span aria-hidden="true">🎉</span> ${t("Les tens totes fetes. Continua així!","You have done them all. Keep it up!")}</p>`)+`</div>`}
 // the heading and the cards of the visual boxes on 📊 My marks (fvHead, fvStat; CSS .fv-*), in the style of the LS page's ⓘ About this LS
 const fvHead=(i,h,sub)=>`<div class="fvh"><h2><span class="fvi" aria-hidden="true">${i}</span> ${h}</h2>${sub?`<span class="fvt">· ${sub}</span>`:""}</div>`;
@@ -845,7 +898,8 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
   const cw=g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp"),cs=cw.filter(b=>v[b.id]!=null),cont=cs.length?cs.reduce((n,b)=>n+v[b.id]*b.w,0)/cs.reduce((n,b)=>n+b.w,0):null;
   const has=g.blocks.filter(b=>v[b.id]!=null),total=has.length?has.reduce((n,b)=>n+v[b.id]*b.w,0)/has.reduce((n,b)=>n+b.w,0):null;
   const pr=(ELWeek.plans(D.me.group)||[]).find(y=>y.ls===ls.id),exDay=pr?ELWeek.exam(pr.p,pr.gi):null;
-  const due=D.me.group?elDueWork(D.me.group,elTerm(),l=>D.ls[l]).filter(([a])=>a.ls===ls.id):[],done=due.filter(([a])=>isDone(a)).length;
+  // in tabs (activities), as everywhere on the board (Roger, 7 Nov 2026): due = tabs of the paths whose day has passed, done = those done
+  const dw=D.me.group?elDueWork(D.me.group,elTerm(),l=>D.ls[l]).filter(([a])=>a.ls===ls.id):[],due={length:dw.reduce((n,[a])=>n+elTabsTotal(a),0)},done=due.length-tabsMiss(dw);
   const mark=m=>m==null?`<span class="muted">${t("encara no","not yet")}</span>`:`<b style="color:${col(m*10)}">${f1(m)}</b> <small class="muted">/ 10</small>`;
   const bar=m=>`<span class="xbar"><span style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%;background:${m==null?"#e2e8f0":col(m*10)}"></span></span>`;
   const row=(name,w,m,note,cls="")=>`<tr class="${cls}"><td class="l"><b>${name}</b>${note?`<br><small class="muted">${note}</small>`:""}</td><td><b>${w} %</b></td><td>${mark(m)}</td><td class="l">${bar(m)}</td></tr>`;
@@ -964,6 +1018,11 @@ function onlyForm(id){
 // the activities due this week, the exam day and the whole plan, for the student's group; past-due activities not done are reminded on top.
 // "Done" = submitted or marked as done, or every scored step done. The final product is handed in on Classroom, so it is listed but never reminded.
 const isDone=a=>elAllDone(a,doneSet(a),D.rs[a.id]);   // every step done, not the Submit flag (el-catalog.js)
+// missing work is counted in TABS, not learning paths (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!"; elTabsLeft in
+// el-catalog.js): the tabs not done of a path, how many of a list of [[activity, day]], and their names (as on the learning path)
+const tabsLeft=a=>elTabsLeft(a,doneSet(a),D.rs[a.id]),tabsMiss=list=>list.reduce((n,[a])=>n+tabsLeft(a).length,0);
+const leftNames=a=>tabsLeft(a).filter(g=>g.length).map(g=>tabName(a.id,g[0]));
+const nAct=n=>n===1?t("1 activitat","1 activity"):t(`${n} activitats`,`${n} activities`);
 const lang=()=>EN?"en":"ca",when=d=>ELWeek.date(d,lang());
 // "Sections to finish" box removed (Roger, 2 Nov 2026: the learning paths table on 📈 shows every missing tab, with links).
 function lateList(lss){const today=ELWeek.today(),late=[];
@@ -1143,35 +1202,37 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     const vis=steps(a).filter(k=>TX||ds.has(k)||(can&&!secOff(a,info,k)));   // students: only the tabs they have done or can open
     if(!TX&&steps(a).length&&!vis.length)return "";   // open, but none of its sections yet
     const done=!a.manual&&isDone(a),x=D.rs[a.id]||{},late=!a.manual&&!done&&can&&!drop&&d&&d<today&&!steps(a).some(k=>secOff(a,info,k)),go=can&&!drop&&!done&&!a.manual&&open;
+    // the chips above the table count TABS (activities), not learning paths (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!")
     const tabs=tabGroups(a,steps(a)).map(g=>{const k=g.find(x=>!ds.has(x))||g[g.length-1],sk=g.every(x=>(a.skip||[]).includes(x)),sd=stepDue(a,k),nm=tabName(a.id,k),off=secOff(a,info,k);
-      if(g.every(x=>ds.has(x))){const w=g.map(x=>at[x]?ymd(at[x]):"").sort().pop()||"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}">✔ ${esc(nm)}</span>`}
+      const cnt=f=>{if(!a.manual&&!sk)n[f]++};
+      if(g.every(x=>ds.has(x))){cnt("done");const w=g.map(x=>at[x]?ymd(at[x]):"").sort().pop()||"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}">✔ ${esc(nm)}</span>`}
       if(!g.some(x=>vis.includes(x)))return "";
-      const past=!sk&&can&&!drop&&sd&&sd<today,ln=go&&!off;
+      const past=!sk&&can&&!drop&&sd&&sd<today,ln=go&&!off;cnt(drop||!can||off?"off":past?"miss":"todo");
       if(ln&&!sk&&!next)next={a,k,nm,past};
       const tip=`${esc(nm)}: ${t("no fet","not done")}${sk?t(" (sense punts)"," (no points)"):""}${off?t(" (encara no està oberta)"," (not open yet)"):""}${sd?" · "+t("fins al","by")+" "+sd:""}${ln?" · "+t("clica per obrir-la","click to open it"):""}`;
       const lbl=`${off?"🔒":past?"✗":"·"} ${esc(nm)}`;
       return ln?`<a class="stp go2 ${past?"no":""}" href="${tabHref(a,k)}" title="${tip}">${lbl} →</a>`:`<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${tip}">${lbl}</span>`}).join("");
     const vg=tabGroups(a,vis),hand=vis.length?`<small class="muted">${vg.filter(g=>g.every(k=>ds.has(k))).length} / ${vg.length} ${vg.length===1?t("pestanya","tab"):t("pestanyes","tabs")}</small><br>`:"";
     let st;
-    if(drop){st=`<span class="s-off">✂ ${t("No compta (no hi vam tenir temps)","Dropped · not counted")}</span>`;n.off++}
+    if(drop){st=`<span class="s-off">✂ ${t("No compta (no hi vam tenir temps)","Dropped · not counted")}</span>`}
     else if(a.manual){st=x.max?`<span class="s-ok">✔ ${t("Corregit","Marked")}</span>`:`<span class="s-off">${t("Es lliura al Classroom","Handed in on Classroom")}</span>`}
-    else if(done){st=`<span class="s-ok">✔ ${t("Fet","Done")}${x.locked?t(" · entregat"," · submitted"):""}</span>`;n.done++}
+    else if(done){st=`<span class="s-ok">✔ ${t("Fet","Done")}${x.locked?t(" · entregat"," · submitted"):""}</span>`}
     else if(!can&&!TX){st=`<span class="s-off">${t("Fet en part","Partly done")}</span>`}   // students: one they did some of and can't open now, no lock
-    else if(cp){st=`<span class="s-off">🔒 ${t(`Primer fes ${esc(cp.title)}`,`First do ${esc(cp.title)}`)}</span>`;n.off++}
-    else if(!can){st=`<span class="s-off">🔒 ${t("Encara no està oberta","Not open yet")}</span>`;n.off++}
-    else if(late){st=`<span class="s-no">⏰ ${t("Falta · calia fer-la el","Missing · was due")} ${when(d)}</span>`;n.miss++}
-    else{st=`<span class="s-td">${t("Per fer","To do")}${d?" · "+t("fins al","by")+" "+when(d):""}</span>`;n.todo++}
+    else if(cp){st=`<span class="s-off">🔒 ${t(`Primer fes ${esc(cp.title)}`,`First do ${esc(cp.title)}`)}</span>`}
+    else if(!can){st=`<span class="s-off">🔒 ${t("Encara no està oberta","Not open yet")}</span>`}
+    else if(late){st=`<span class="s-no">⏰ ${t("Falta · calia fer-la el","Missing · was due")} ${when(d)}</span>`}
+    else{st=`<span class="s-td">${t("Per fer","To do")}${d?" · "+t("fins al","by")+" "+when(d):""}</span>`}
     const c=cell(a);if(vis.length<steps(a).length&&!a.graded&&!a.manual)c.t=vis.filter(k=>ds.has(k)).length+"/"+vis.length+(x.feedback?" 💬":"");
     const title=can?`<a href="${tabHref(a)}">${esc(a.title)}</a>`:esc(a.title);
     return `<tr class="${late?"miss":""}"><td class="l"><b>${title}</b>${a.criteria.length?`<br>${a.criteria.filter(c=>/^\d/.test(c)).map(pill).join("")}`:""}${counted.has(a.id)?` <span class="tag" title="Its day has passed: it is in “X of Y done this term”">counted</span>`:""}</td><td class="l">${st}</td><td class="l">${hand}${tabs||`<small class="muted">–</small>`}</td><td class="sc ${c.c}" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr>`}).join("");
   if(!TX&&!body)return `<div class="box fv lps">${fvHead("🧭",t("Els meus learning paths: què he fet i què em falta","My learning paths: done and missing"),lsName(ls))}<p class="muted">${t("Aquí veuràs els learning paths que fem a classe.","The learning paths we do in class will appear here.")}</p></div>`;
-  const due=[...counted].filter(id=>list.some(a=>a.id===id)),dn=due.filter(id=>isDone(list.find(a=>a.id===id))).length;
+  const dueA=[...counted].map(id=>list.find(a=>a.id===id)).filter(Boolean),due={length:dueA.reduce((m,a)=>m+elTabsTotal(a),0)},dn=due.length-dueA.reduce((m,a)=>m+tabsLeft(a).length,0);   // in tabs
   const nx=next?`<div class="nextbox ${next.past?"late":""}"><div>👉 <b>${TX?"Next for this student":t("El següent que et toca","Next for you")}:</b> ${esc(next.a.title)} · <b>${esc(next.nm)}</b>${next.past?` <span class="s-no">· ${t("ja havia d'estar feta","it was due already")}</span>`:""}</div><a class="go" href="${tabHref(next.a,next.k)}">${t("Obre-la","Open it")} →</a></div>`
     :open?`<p class="ptok">✓ ${t("No tens res pendent als learning paths oberts. Molt bé!","Nothing left to do in the open learning paths. Well done!")}</p>`:"";
   return `<div class="box fv lps">${fvHead("🧭",t("Els meus learning paths: què he fet i què em falta","My learning paths: done and missing"),lsName(ls))}`
     +(TX?`<p class="tag" style="display:inline-block">👩‍🏫 Teacher view: the student sees this table without the “counted” tags.</p>`:`<p class="muted" style="margin:0 0 6px">${t("Clica una pestanya que et falta per anar-hi directament.","Click a tab you are missing to go straight to it.")}</p>`)
     +nx
-    +`<div class="lpsum"><span>✔ ${n.done} ${t(n.done===1?"fet":"fets","done")}</span><span style="background:#fee2e2;color:#991b1b">⏰ ${n.miss} ${t(n.miss===1?"endarrerit":"endarrerits",n.miss===1?"missing past its day":"missing past their day")}</span><span>${n.todo} ${t("per fer","to do")}</span>${TX?`<span>🔒 ${n.off} not open</span>`:""}${TX?`<span>Counted so far: ${dn} of ${due.length} done</span>`:""}</div>`
+    +`<div class="lpsum"><span>✔ ${nAct(n.done)} ${t(n.done===1?"feta":"fetes","done")}</span><span style="background:#fee2e2;color:#991b1b">⏰ ${n.miss} ${t(n.miss===1?"endarrerida":"endarrerides",n.miss===1?"missing past its day":"missing past their day")}</span><span>${n.todo} ${t("per fer","to do")}</span>${TX?`<span>🔒 ${n.off} not open</span>`:""}${TX?`<span>Counted so far: ${dn} of ${due.length} tabs done</span>`:""}</div>`
     +`<div class="wrap"><table class="xt lpst"><thead><tr><th>Learning path</th><th>${t("Estat","State")}</th><th>${t("Pestanyes","Tabs")} <small class="muted">(✔ ${t("fet","done")} · <span style="color:#92400e">${t("taronja = després del seu dia","amber = after its day")}</span> · <span style="color:#991b1b">✗ ${t("falta i ja tocava","missing past its day")}</span>${TX?" · 🔒 not open":""})</small></th><th>${t("Punts","Score")}</th></tr></thead><tbody>${body}</tbody></table></div>`
     +(TX?`<p class="muted" style="margin:6px 0 0">“Counted” = its day in the time plan has passed, it is open and no section is still locked: these are the ones in “X of Y done this term” and in the bonus check. Click a score for the details, feedback and self-assessments.</p>`:"")+`</div>`}
 // a step's name = the name of the tab it lives in, as on the learning path (Roger, 7 Nov 2026: "make sure students see the same" as the
