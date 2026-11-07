@@ -636,13 +636,12 @@ function bar(){
     const b=(t,f)=>{const x=document.createElement("button");x.textContent=t;x.onclick=f;x.style.cssText="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer";return x};
     if(!u)el.append("Not signed in ",b("Sign in",login));
     else if(AS){const ca=elCa(myLevel||homeLevel),no=()=>{};el.append((AS.name||AS.email||"")+" ");   // the student's own bar; its buttons do nothing here
-      const a=document.createElement("a");a.textContent=ca?"El meu tauler":"My dashboard";a.href=boardUrl();el.append(a," ");
-      if(!onLab){const l=document.createElement("a");l.textContent=ca?"Jocs":"Games";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
       const p=b("⚠️ "+(ca?"Problema":"Problem"),no);p.style.background="#b45309";el.append(p," ",b("💡 Idea",no)," ");
       const x=b("✕ Exit",asExit);x.style.background="#dc2626";x.title="Exit the student view: back to your dashboard";el.append(x)}
     else{el.append(u.displayName||u.email," ");
-      const a=document.createElement("a");a.textContent=isTeacher(u)?"Dashboard":"My dashboard";a.href=isTeacher(u)?dashHere:BOARD;el.append(a," ");
-      if(isStudent(u)&&!onLab){const l=document.createElement("a");l.textContent=elCa(myLevel||homeLevel)&&!AS?"Jocs":"Games";l.href=new URL("lab/",ROOT).href;el.append(l," ")}
+      // no "My dashboard" / "Games" links here for students: the left menu already has both (Roger, 7 Nov 2026: "we don't need this
+      // mini menu on the bottom"); the teacher keeps the Dashboard link
+      if(isTeacher(u)){const a=document.createElement("a");a.textContent="Dashboard";a.href=dashHere;el.append(a," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
       if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
