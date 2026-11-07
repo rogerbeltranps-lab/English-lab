@@ -1,6 +1,6 @@
 // 📋 Today's agenda in class mode (Roger, 7 Nov 2026: "in class mode, I should have the day of the agenda so that I can click it and
 // students can see it on the board"; then "I wanted fixed not floating" and "we don't need this menu in class mode so we can put today's
-// tasks there": it is docked in the left side menu, in place of its buttons (they come back when it is hidden or class mode ends); only a
+// tasks there": it is docked in the left side menu, in place of its buttons (the class tab never shows them, el-catalog.js); only a
 // narrow window or a phone, with no side menu, gets it floating above the chip). The class tab (el-cloud.js
 // cmTeacher) gets a 📋 Today button on its chip that shows or hides it: a panel with the group's
 // class day from the Time plan agenda (ls/{ls}.planEdits[group].agenda, the same list as the dashboard's day card, in the same order, with
@@ -126,7 +126,8 @@ async function go(x,b){const a=x.a,p=x.p||"",info=x.ls.info,g=C.g,ref=C.doc(C.db
     if(p&&lk.includes(p)){const k=a.id.replace("/","__"),rest=lk.filter(z=>z!==p),op=[...new Set([...((((info.secOpened||{})[g]||{})[k])||[]),p])];
       await C.setDoc(ref,{secLocked:{[g]:{[k]:rest}},secOpened:{[g]:{[k]:op}}},{merge:true})}}
   catch(err){b.disabled=false;const m=document.createElement("p");m.className="msg err";m.textContent="✗ Could not open it for "+C.gname+": "+(err.code||err.message||err);b.after(m);return}
-  close();
+  // docked, it stays (the class tab has no menu to show in its place, el-catalog.js) and its "now" mark moves; floating, it closes
+  if(box&&box.classList.contains("dock"))b.disabled=false;else close();
   const u=new URL(a.path,C.root);
   if(u.pathname===location.pathname){const t=p&&[...document.querySelectorAll(".tab[data-panel]")].find(z=>z.dataset.panel===p);if(t)t.click();else if(!p)window.scrollTo(0,0);return}
   location.href=u.href+(p?"#"+encodeURIComponent(p):"")}
