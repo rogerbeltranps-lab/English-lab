@@ -95,7 +95,25 @@ service cloud.firestore {
       allow update: if isTeacher() || (annForMe()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
         && request.resource.data.read.diff(resource.data.get('read', {})).affectedKeys().hasOnly([request.auth.uid])
-        && request.resource.data.read.get(request.auth.uid, null) is timestamp);
+        && request.resource.data.read.get(request.auth.uid, null) is timestamp) || annReply();
+    }
+    // a private message (to "one", sent from the student's window on the dashboard): the student it was sent to (or a tester) can answer
+    // (Roger, 7 Nov 2026: "they should be able to answer back"): exactly one more thread item {by 's', uid, text, at}, the rest unchanged,
+    // their own read time and sAt = now (the teacher's email looks for it).
+    function annItem(x) {
+      return x is map && x.keys().hasOnly(['by', 'uid', 'text', 'at']) && x.by == 's' && x.uid == request.auth.uid
+        && x.text is string && x.text.size() > 0 && x.text.size() <= 1000 && x.at is int;
+    }
+    function annReply() {
+      let old = resource.data.get('thread', []);
+      let nw = request.resource.data.get('thread', []);
+      return signedIn() && resource.data.get('to', '') == 'one' && request.auth.uid in resource.data.uids
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'thread', 'sAt'])
+        && request.resource.data.read.diff(resource.data.get('read', {})).affectedKeys().hasOnly([request.auth.uid])
+        && request.resource.data.read.get(request.auth.uid, null) is timestamp
+        && nw is list && nw.size() == old.size() + 1 && nw.size() <= 200 && (old.size() == 0 || nw[0:old.size()] == old)
+        && annItem(nw[old.size()])
+        && request.resource.data.sAt == request.time;
     }
     match /problemShots/{id} {
       allow create: if signedIn()

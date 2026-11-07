@@ -120,7 +120,7 @@ table.lpst,table.lpst tbody,table.lpst tr,table.lpst td{display:block;width:auto
 // Demo mode: a page that defines window.EL_DEMO_STUDENT before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_STUDENT;let F=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js")}
-import {annHtml,annDate,annMs,ANN_COLOR} from "./shared/js/el-announce.js";
+import {annHtml,annDate,annMs,annLast,annThreadHtml,annReplyForm,annWireReply,ANN_COLOR} from "./shared/js/el-announce.js";
 const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let EN=false;const t=(ca,en)=>EN?en:ca;
 let COURSE=null;   // course of the LS on screen: criteria texts depend on it
@@ -399,7 +399,7 @@ function render(){
   const place=placeNow(),cls=`<div id="pull">${pullBox()}</div><div id="live">${liveBox()}</div>`,noteBox=note?`<div class="pend" style="background:#fffbeb;border-color:#fcd34d">${esc(note)}</div>`:"";
   document.body.dataset.place=lss.length?place:"home";
   if(!lss.length){$("#crumb").innerHTML="";$("#sub").textContent=(g?g.name+" · ":"")+t("Encara no tens cap LS assignada. El professor t'avisarà quan puguis començar.","You don't have any LS yet. Your teacher will tell you when you can start.");
-    $("#note").innerHTML=cls+annBox()+noteBox+howBox();$("#main").innerHTML="";return}
+    $("#note").innerHTML=cls+annBox()+noteBox+howBox();$("#main").innerHTML="";if(canReply())wireAnn();return}
   const ls=EL_LS.find(l=>l.id===S.ls);COURSE=ls.course;const info=D.ls[ls.id]||{status:"hidden",enabled:[]},list=EL_CATALOG.filter(a=>a.ls===ls.id),st=info.status;
   S.pend=[];   // no Submit any more (Roger, 6 Nov 2026): answers save on their own, Submit only froze the score
   const stTag=st==="closed"?`<span class="tag">${t("tancada · només consulta","closed · view only")}</span>`:st==="hidden"?`<span class="tag">${t("oculta (només tu la veus)","hidden (only you can see it)")}</span>`:"";
@@ -411,6 +411,7 @@ function render(){
     $("#note").innerHTML=cls;$("#main").innerHTML=placeHtml(place,lss,ls,list,info,st,stTag,pend)}
   bnav(lss.length?place:"home",lss);
   if(AS)asBar(lss,ls);
+  if(canReply())wireAnn();
 }
 // Phone bar (Roger, 6 Nov 2026): the same four places as the home tiles, always at the bottom of the screen.
 function bnav(place,lss){
@@ -439,11 +440,17 @@ function tabBody(ls,list,info){const tab=tabOf(ls);
 // Announcements from the teacher (Roger, 31 Oct 2026; shared/js/el-announce.js): the ones sent to my group or to me, newest first.
 // Each one also comes once as a card at the top of the next page I open; here they stay so I can read them again.
 function annBox(){
-  const me=U&&U.uid,L=[...(D.ann||[])].filter(a=>String(a.text||"").trim()).sort((a,b)=>annMs(b.created)-annMs(a.created));if(!L.length)return "";
-  const recent=L.filter((a,i)=>i<3||Date.now()-annMs(a.created)<7*864e5).slice(0,5),older=L.slice(recent.length);
-  const li=a=>`<li><small class="muted">${esc(annDate(a.created,EN))}${me&&!(a.read||{})[me]?` · <b style="color:${ANN_COLOR}">${t("Nou","New")}</b>`:""}</small><div class="annt">${annHtml(a.text)}</div></li>`;
+  const me=U&&U.uid,L=[...(D.ann||[])].filter(a=>String(a.text||"").trim()).sort((a,b)=>annLast(b)-annLast(a));if(!L.length)return "";
+  const recent=L.filter((a,i)=>i<3||Date.now()-annLast(a)<7*864e5).slice(0,5),older=L.slice(recent.length);
+  // a private message (to:"one") shows the answers under it and ↩ Reply (Roger, 7 Nov 2026: "they should be able to answer back")
+  const conv=a=>a.to!=="one"?"":annThreadHtml(a,EN)+(canReply()?`<div style="margin-top:6px"><button type="button" class="g" data-annrep>↩ ${t("Respon","Reply")}</button></div>${annReplyForm(a.id,EN)}`:"");
+  const li=a=>`<li data-annid="${esc(a.id)}"><small class="muted">${esc(annDate(a.to==="one"?annLast(a):a.created,EN))}${a.to==="one"?` · ✉️ ${t("Només per a tu","Just for you")}`:""}${me&&!(a.read||{})[me]?` · <b style="color:${ANN_COLOR}">${t("Nou","New")}</b>`:""}</small><div class="annt">${annHtml(a.text)}</div>${conv(a)}</li>`;
   return `<div class="box ann"><h2>📣 ${t("Anuncis del professor","Announcements from your teacher")}</h2><ul>${recent.map(li).join("")}</ul>`
     +(older.length?`<details><summary class="muted">${t(`Anuncis anteriors (${older.length})`,`Older announcements (${older.length})`)}</summary><ul>${older.map(li).join("")}</ul></details>`:"")+`</div>`}
+const canReply=()=>!DEMO&&!AS&&!!U&&!!(window.ELCloud&&ELCloud.annReply);
+// after each render: the Reply forms of private messages on the board send the answer and show it at once
+function wireAnn(){document.querySelectorAll("li[data-annid]").forEach(li=>annWireReply(li,ELCloud.annReply,text=>{const a=(D.ann||[]).find(x=>x.id===li.dataset.annid);
+  if(a){a.thread=[...(a.thread||[]),{by:"s",uid:U.uid,text,at:Date.now()}];a.read=Object.assign({},a.read,{[U.uid]:Date.now()})}render()}))}
 // Points (Roger, 25–26 Oct 2026; shared/js/el-points.js): my points this term from the class presentations and the bonus they add to
 // my term grade so far (up to EL_POINTS_BONUS, in proportion to the best student of my group), and the rules.
 function pointsBox(){
