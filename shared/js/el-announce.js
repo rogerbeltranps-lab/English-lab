@@ -13,11 +13,12 @@ export function annHtml(text){
   return esc(String(text??"").slice(0,ANN_MAX)).replace(/\bhttps?:\/\/[^\s<>"]+[^\s<>".,;:!?)»”]/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
 }
 export const annDate=(x,en)=>{const ms=annMs(x);return ms?new Date(ms).toLocaleDateString(en?"en-GB":"ca-ES",{weekday:"short",day:"numeric",month:"short"}):""};
-export const annTitle=en=>en?"📣 Announcement from your teacher":"📣 Anunci del professor";
+// a private message to one student (to:"one", from the student's window on the dashboard, Roger 7 Nov 2026) has its own title
+export const annTitle=(en,one)=>one?(en?"✉️ Message from your teacher":"✉️ Missatge del teu professor"):en?"📣 Announcement from your teacher":"📣 Anunci del professor";
 // The card as HTML (the dashboard shows the same one as a preview). a = {text, created}.
 export function annCardHtml(a,en,preview){
   const d=annDate(a.created||Date.now(),en);
-  return `<b style="display:block;font-size:17px;margin-bottom:2px">${annTitle(en)}</b><small style="display:block;color:#64748b;margin-bottom:8px">${esc(d)}</small>`
+  return `<b style="display:block;font-size:17px;margin-bottom:2px">${annTitle(en,a.to==="one")}</b><small style="display:block;color:#64748b;margin-bottom:8px">${esc(d)}</small>`
     +`<div style="margin:0 0 10px;padding:8px 12px;border-left:4px solid ${ANN_COLOR};background:#fff7ed;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:45vh;overflow:auto">${String(a.text||"").trim()?annHtml(String(a.text).trim()):`<span style="color:#94a3b8">${preview?"Your message…":""}</span>`}</div>`
     +`<small style="display:block;color:#64748b;margin-bottom:10px">${en?"You can read it again in 📣 Announcements on your board.":"El pots tornar a llegir a 📣 Anuncis, al teu tauler."}</small>`
     +`<button type="button" style="border:0;background:#0f766e;color:#fff;border-radius:999px;padding:6px 18px;font:inherit;font-weight:600;cursor:pointer">${en?"OK":"D'acord"}</button>`;

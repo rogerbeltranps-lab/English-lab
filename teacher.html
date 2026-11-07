@@ -378,9 +378,9 @@ async function mailStudents(emails,subject,body){if(DEMO||!emails.length)return 
     if(!j||!j.ok)throw new Error(j&&j.error==="not the teacher"?"the school mail script is the old version (update it: tools/notify/school-mail.gs)":(j&&j.error)||"no answer");n+=part.length}
   return n}
 // sends in the background; a small note says how it went (the homework or announcement is saved either way)
-function mailNote(p,what){p.then(n=>{if(!n)return;const d=document.createElement("div");d.textContent="✉️ "+what+" emailed to "+n+" student"+(n===1?"":"s");
+function mailNote(p,what,fail){p.then(n=>{if(!n)return;const d=document.createElement("div");d.textContent="✉️ "+what+" emailed to "+n+" student"+(n===1?"":"s");
   d.style.cssText="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0f766e;color:#fff;padding:8px 16px;border-radius:999px;z-index:10010;font:600 14px system-ui";document.body.appendChild(d);setTimeout(()=>d.remove(),5000)})
-  .catch(e=>{console.warn("mail",e);alert("Saved, but the email to the students did not go: "+e.message+". They still see it on their board.")})}
+  .catch(e=>{console.warn("mail",e);alert(fail||"Saved, but the email to the students did not go: "+e.message+". They still see it on their board.")})}
 async function act(p){try{await p}catch(e){console.warn(e);alert("Could not save: "+e.message)}if(!DEMO)S.D=await reread();render()}
 // After a save: read back only the documents the dashboard wrote (TOUCHED). A full load() only when that cannot be done exactly: nothing
 // noted (a write made elsewhere), too many documents, or a kind of document whose effect on the screen is more than itself (progress and
@@ -2400,7 +2400,7 @@ const annWhen=a=>{const ms=annMs(a.at||a.created);return ms?new Date(ms).toLocal
 function annBox(){
   const L=(S.D.ann||[]).filter(annMine).sort((a,b)=>annMs(b.at||b.created)-annMs(a.at||a.created));
   const li=a=>{const who=annWho(a),rd=who.filter(s=>(a.read||{})[s.uid]),no=who.filter(s=>!(a.read||{})[s.uid]);
-    return `<li><div class="hand annt">${annHtml(a.text)}</div><small class="muted">📣 To <b>${esc(a.label||"")}</b> · ${annLater(a)?`<b style="color:#ea580c">⏰ scheduled for ${annWhen(a)}</b> (students don't see it yet)`:`${annWhen(a)} · `}${annLater(a)?"":who.length?`read by <b>${rd.length} of ${who.length}</b>`:"nobody on the list yet"}</small>
+    return `<li><div class="hand annt">${annHtml(a.text)}</div><small class="muted">${a.to==="one"?"✉️ Only for":"📣 To"} <b>${esc(a.label||"")}</b> · ${annLater(a)?`<b style="color:#ea580c">⏰ scheduled for ${annWhen(a)}</b> (students don't see it yet)`:`${annWhen(a)} · `}${annLater(a)?"":who.length?`read by <b>${rd.length} of ${who.length}</b>`:"nobody on the list yet"}</small>
       ${no.length&&rd.length?`<details><summary class="muted" style="font-size:13px;font-weight:600">Not read yet (${no.length})</summary><small>${no.sort(byName).map(s=>name(s)+(s.away?' <span class="muted">(not signed in yet)</span>':"")).join(" · ")}</small></details>`:""}
       <div><button class="g" data-do="anndel" data-id="${esc(a.id)}">Delete</button></div></li>`};
   return `<div class="box" id="ann"><h2>📣 Announcements <small class="muted">to your students</small></h2>`
@@ -2629,12 +2629,44 @@ function stuPanel(u){redraw=null;
   const s=S.P[u],ls=S.ls,l=level(u,ls),lsT=(EL_LS.find(x=>x.id===ls)||{}).title;
   const info=[s.email?esc(s.email):"<b>No email yet</b>: cannot sign in",s.ro&&s.ro.tutor?"Tutor: "+esc(s.ro.tutor):"",s.away?"not signed in yet":"",s.tester?"tester account":"",listed()&&!s.ro&&!s.tester?"<b>not on the student list</b>: cannot sign in":""].filter(Boolean).join(" · ");
   const entry=s.tester?"":`<details data-k="roform" ${s.ro&&s.email?"":"open"}><summary style="font-size:1rem">${s.ro?"Edit the list entry":"Add to the student list"}</summary>${roForm(s)}</details>`;
-  if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
-  dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>
+  if(s.away||!lsT||!s.group){dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>`+msgLine(u)+(s.group||!listed()?`<label>Group</label>${groupSel(u,s.group)}`:"")+entry);return}
+  dlg(`<h3>${name(s)}</h3><p class="muted">${info}</p>${msgLine(u)}
     <label>Group</label>${groupSel(u,s.group)}
     <label>Route in ${lsT}</label><select data-do="setroute" data-u="${u}"><option value="">– none –</option>${EL_LEVELS.map(x=>`<option value="${x.id}" ${x.id===l?"selected":""}>${LV[x.id]}</option>`).join("")}</select>${toldLine(u,ls)}
     <label>Learning paths</label><table><tbody>${acts(ls).map(a=>{const c=cell(u,a),x=(S.D.rs[u]||{})[a.id]||{};return `<tr><td style="text-align:left">${a.title} ${a.criteria.map(pill).join("")}${x.feedback?`<br><small class="muted">💬 ${esc(x.feedback)}</small>`:""}</td><td class="sc ${c.c}" data-do="cell" data-u="${u}" data-a="${a.id}">${c.t}</td></tr>`}).join("")}</tbody></table>`+entry);
 }
+// ---- a private message to one student (Roger, 7 Nov 2026: "I want to have the option of sending students messages through the app, and
+// then it would be a notification and they would receive an email with the message"). From the student's window (a name in any table):
+// ✉️ Send a message. It is an announcement only for them (announcements/{id} with to:"one", uids:[the student, testers]): they see it once
+// as a "✉️ Message from your teacher" card at the top of the next page they open, and it stays in 📣 Announcements on their board.
+// It is also emailed to their school address (the same school mail script as homework and announcements, mailStudents asks first).
+// A student who has not signed in yet gets it by email only. No new reads: the messages already sent are in S.D.ann.
+const msgCa=s=>{const l=s.away?(s.ro&&s.ro.route||{}).level:level(s.uid,S.ls);return l?elCa(l):null};
+const msgSent=u=>(S.D.ann||[]).filter(a=>a.to==="one"&&(a.uids||[]).includes(u)).sort((a,b)=>annMs(b.at||b.created)-annMs(a.at||a.created));
+function msgLine(u){const s=S.P[u];if(!s||s.tester)return "";const L=msgSent(u),em=mailTo([s]).length;
+  if(s.away&&!em)return "";
+  const li=a=>`<li><small class="muted">${annWhen(a)} · ${(a.read||{})[u]?"read ✓":"not read yet"}${a.mail?" · ✉️ emailed":""}</small><div class="hand annt" style="margin:2px 0 6px">${annHtml(a.text)}</div></li>`;
+  return `<div class="bar" style="margin:4px 0 8px"><button data-do="msgnew" data-u="${esc(u)}">✉️ Send a message</button><span class="muted">${s.away?"Not signed in yet: it goes by email only.":"Only for them: a notification on the site"+(em?" and an email.":".")}</span></div>`
+    +(L.length?`<details><summary style="font-size:1rem">✉️ Messages you sent them <small class="muted">(${L.length})</small></summary><ul class="sgl annl">${L.map(li).join("")}</ul></details>`:"")}
+function msgDialog(u){const s=S.P[u],ca=msgCa(s),em=mailTo([s])[0],en=ca!==true;
+  dlg(`<h3>✉️ Message to ${name(s)}</h3><p class="muted" style="margin:0 0 6px">${s.away?"Not signed in yet, so it goes only by email.":"Only this student sees it (and your test account)."}</p>
+    <label for="msgt">Your message <small class="muted">(up to ${ANN_MAX} characters; it goes exactly as you write it; a web link becomes clickable)</small></label>
+    <textarea id="msgt" maxlength="${ANN_MAX}" style="min-height:120px" placeholder="For example: Well done on your vlog script! Remember to record it before Friday."></textarea>
+    ${s.away?"":`<p class="muted" style="margin:6px 0 4px">What they see, once, at the top of the next page they open (the words around your message follow their route):</p>
+    <div class="annc" id="msgp" style="${annCardStyle};max-width:440px"></div>`}
+    ${em?`<label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="msgmail" style="width:auto;margin-right:6px;vertical-align:middle" checked ${s.away?"disabled":""}> ✉️ Also email it to <b>${esc(em)}</b> <small class="muted">(from your school account; you are asked before it goes)</small></label>`
+      :`<p class="muted">No school email on the list for them, so no email: only the notification on the site.</p>`}
+    <div class="row" style="justify-content:flex-start"><button data-do="msgsend" data-u="${esc(u)}" id="msgsend" disabled>✉️ Send</button><button class="g" data-do="stu" data-u="${esc(u)}">Back</button></div>`);
+  const t=$("#msgt"),draw=()=>{const v=t.value.trim();if($("#msgp"))$("#msgp").innerHTML=annCardHtml({text:v,created:Date.now(),to:"one"},en,true);$("#msgsend").disabled=!v};
+  t.oninput=draw;draw();t.focus()}
+function msgSend(u){const s=S.P[u],text=$("#msgt").value.trim().slice(0,ANN_MAX);if(!s||!text)return;
+  const mail=!!($("#msgmail")&&$("#msgmail").checked),ca=msgCa(s),emails=mailTo([s]);
+  const subject=ca===true?"English Lab · ✉️ Missatge del teu professor":ca===false?"English Lab · ✉️ Message from your teacher":"English Lab · ✉️ Message from your teacher / Missatge del professor";
+  const mailIt=(what,fail)=>mailNote(mailStudents(emails,subject,text+mailFoot(ca)),what,fail);
+  if(s.away){if(!emails.length)return;$("#dlg").close();mailIt("Message","The email did not go, so nothing was sent (they have not signed in yet). Try again later.");return}
+  const testers=Object.values(S.P).filter(x=>x.tester&&!x.away).map(x=>x.uid);
+  const o=Object.assign({text,to:"one",label:fullName(s),groups:[],uids:[...new Set([u,...testers])]},mail&&emails.length?{mail:true,mailed:Date.now()}:{});
+  $("#dlg").close();act(api.annSend(o));if(o.mail)mailIt("Message")}
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
   const gx=!!G()&&!G().only&&a.ls===S.ls,nd=steps(a).filter(k=>!(a.skip||[]).includes(k)),nn=nd.filter(k=>d.has(k)).length,
@@ -2882,7 +2914,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     rodel:()=>{const s=S.P[u];if(!confirm("Remove "+fullName(s)+" from the student list? They will not be able to sign in. Their work is kept."))return;$("#dlg").close();act(api.delRo(s.rid))},
     fold:()=>{S.folded.has(k.a)?S.folded.delete(k.a):S.folded.add(k.a);render()},unfold:()=>{S.folded.clear();render()},"fold-all":()=>{acts(S.ls).forEach(x=>S.folded.add(x.id));render()},
     sgopen:()=>{S.open.add("sugg");S.place="msgs";render();$("#sugg").scrollIntoView({behavior:"smooth"})},
-    annnew:()=>annDialog(),annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
+    annnew:()=>annDialog(),msgnew:()=>msgDialog(u),msgsend:()=>msgSend(u),annsend:()=>annSendNow(),annto:()=>{annToggle(k.v);annDialog(true)},
     anndel:()=>{if(confirm("Delete this announcement? Students will no longer see it on their board."))act(api.annDel(k.id))},
     sgread:()=>act(api.sgRead(k.id,!!k.v)),sgdel:()=>{if(confirm("Delete this suggestion?"))act(api.sgDel(k.id))},
     pbopen:()=>{S.open.add("probs");S.place="msgs";render();$("#probs").scrollIntoView({behavior:"smooth"})},

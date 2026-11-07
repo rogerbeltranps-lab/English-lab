@@ -367,7 +367,7 @@ function tabBody(ls,list,info){const tab=tabOf(ls);
 function annBox(){
   const me=U&&U.uid,L=[...(D.ann||[])].filter(a=>String(a.text||"").trim()).sort((a,b)=>annMs(b.created)-annMs(a.created));if(!L.length)return "";
   const recent=L.filter((a,i)=>i<3||Date.now()-annMs(a.created)<7*864e5).slice(0,5),older=L.slice(recent.length);
-  const li=a=>`<li><small class="muted">${esc(annDate(a.created,EN))}${me&&!(a.read||{})[me]?` · <b style="color:${ANN_COLOR}">${t("Nou","New")}</b>`:""}</small><div class="annt">${annHtml(a.text)}</div></li>`;
+  const li=a=>`<li><small class="muted">${esc(annDate(a.created,EN))}${a.to==="one"?` · ✉️ ${t("Només per a tu","Just for you")}`:""}${me&&!(a.read||{})[me]?` · <b style="color:${ANN_COLOR}">${t("Nou","New")}</b>`:""}</small><div class="annt">${annHtml(a.text)}</div></li>`;
   return `<div class="box ann"><h2>📣 ${t("Anuncis del professor","Announcements from your teacher")}</h2><ul>${recent.map(li).join("")}</ul>`
     +(older.length?`<details><summary class="muted">${t(`Anuncis anteriors (${older.length})`,`Older announcements (${older.length})`)}</summary><ul>${older.map(li).join("")}</ul></details>`:"")+`</div>`}
 // Points (Roger, 25–26 Oct 2026; shared/js/el-points.js): my points this term from the class presentations and the bonus they add to
