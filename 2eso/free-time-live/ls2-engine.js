@@ -1020,7 +1020,8 @@ var LS2 = (function () {
      completion, never by accuracy: state.shadow[id_route] = {plays, rate, pct, date}. Insecure and Beginners start on the slower copy.
      Marks + two modes (Roger, 7 Nov 2026): the script shows stressed words, linking and ↗ ↘ (clip.marks, key + show/hide), and
      🔁 Listen and repeat (clip.cues: one sentence, a pause to say it, the next) sits next to 🗣 Shadowing (shared/js/el-shadow.js).
-     A Listen and repeat run counts as a play. */
+     A Listen and repeat run counts as a play. Listening buttons carry data-vs, so they still work in the teacher's read-only student
+     view and in locked sections (el-cloud.js leaves [data-vs] on; Roger, 7 Nov 2026: "it's not working" in student view). */
   R.shadow = p => {
     const id = p.id, c = p.clip, SH = window.elShadow;
     const repeatHow = ca() ? ['Prem ▶: sentiràs una frase i l’àudio s’aturarà.', 'Digues la frase en veu alta: copia les síl·labes fortes, les paraules unides i la melodia (↗ ↘).', 'La frase següent sona sola. Amb ↺ Una altra vegada la tornes a sentir.', 'Després prova 🗣 Shadowing: tot el fragment seguit, parlant alhora.']
@@ -1032,10 +1033,10 @@ var LS2 = (function () {
       html: '<div class="section-card"><h3>' + (ca() ? 'Com es fa' : 'How it works') + '</h3><div id="' + id + 'How">' + howList(SH && SH.has(c) && SH.mode() === 'repeat' ? repeatHow : rounds) + '</div><p class="tiny">' + (ca() ? 'Millor amb auriculars.' : 'Best with headphones.') + '</p></div>' +
         '<div class="section-card"><strong>' + esc(c.title || 'Listening') + '</strong>' + (SH ? '<div id="' + id + 'Modes">' + SH.bar(c, ca(), 'btn secondary') + '</div>' : '') +
         (c.video ? '<video id="' + id + 'Media" preload="metadata" playsinline style="width:100%;border-radius:14px;margin:8px 0;background:#000"' + (c.poster ? ' poster="' + c.poster + '"' : '') + '></video>' : '<audio id="' + id + 'Media" preload="metadata"></audio>') +
-        '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn" type="button" id="' + id + 'Play">▶ ' + (ca() ? 'Escolta el fragment' : 'Play the clip') + '</button><button class="btn secondary" type="button" id="' + id + 'Stop">■ Stop</button>' +
-        '<button class="btn secondary" type="button" data-sh="' + id + '" data-slow="0">' + (ca() ? 'Velocitat normal' : 'Normal speed') + '</button><button class="btn secondary" type="button" data-sh="' + id + '" data-slow="1">' + (ca() ? 'Versió més lenta' : 'Slower version') + '</button>' +
+        '<div class="actions" style="justify-content:flex-start;align-items:center"><button class="btn" type="button" data-vs id="' + id + 'Play">▶ ' + (ca() ? 'Escolta el fragment' : 'Play the clip') + '</button><button class="btn secondary" type="button" data-vs id="' + id + 'Stop">■ Stop</button>' +
+        '<button class="btn secondary" type="button" data-vs data-sh="' + id + '" data-slow="0">' + (ca() ? 'Velocitat normal' : 'Normal speed') + '</button><button class="btn secondary" type="button" data-vs data-sh="' + id + '" data-slow="1">' + (ca() ? 'Versió més lenta' : 'Slower version') + '</button>' +
         '<span class="tiny" id="' + id + 'Count"></span></div>' + (SH ? '<div id="' + id + 'Turn">' + SH.turnBox(ca()) + '</div>' : '') +
-        '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" id="' + id + 'Hide">' + (ca() ? 'Amaga el text' : 'Hide the script') + '</button></div>' +
+        '<div class="actions" style="justify-content:flex-start"><button class="btn secondary" type="button" data-vs id="' + id + 'Hide">' + (ca() ? 'Amaga el text' : 'Hide the script') + '</button></div>' +
         '<div id="' + id + 'Key">' + (SH && SH.has(c) ? SH.key(ca()) : '') + '</div>' +
         '<div class="reading" id="' + id + 'Script">' + (SH ? SH.script(c, 'strong') : c.lines.map(l => '<p>' + (Array.isArray(l) && l.length > 1 ? '<strong>' + esc(l[0]) + ':</strong> ' + esc(l[1]) : esc(Array.isArray(l) ? l[0] : l)) + '</p>').join('')) + '</div></div>' +
         '<div class="section-card"><h3>' + (ca() ? 'Grava l’última vegada' : 'Record your last go') + '</h3><p class="instruction">' + (ca() ? 'Prem <strong>Grava i escolta</strong>: el fragment sona i tu el repeteixes darrere la veu. Amb Chrome veuràs quantes paraules del text ha entès l’ordinador. No compta per a la nota: és per veure com millores.' : 'Press <strong>Record and play</strong>: the clip plays and you shadow it. With Chrome you will see how many words of the script the computer caught. It is just for you, to see how you improve.') + '</p>' +

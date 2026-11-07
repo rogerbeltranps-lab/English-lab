@@ -6,7 +6,8 @@
    ‿ linked words, ↗ before a comma or a pause and at the end of yes/no questions, ↘ at the end of statements and wh- questions.
    clip.cues = [[from, to, slowFrom, slowTo], …] per sentence (tools/shadowing-marks/apply.py, pocketsphinx alignment).
    Marks on/off and the mode are remembered on the device (localStorage), never saved anywhere else. Clips without marks show the
-   plain script and only the Shadowing mode. */
+   plain script and only the Shadowing mode. Every button here carries data-vs: el-cloud.js keeps [data-vs] working in the read-only
+   student view and in locked sections, where listening is still allowed. */
 (function () {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const get = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } };
@@ -62,9 +63,9 @@
   // the bar: the two modes (when the clip has sentence times) + marks on/off. cls = the page's button class.
   function bar(c, ca, cls) {
     cls = cls || '';
-    const modes = has(c) ? '<span class="shm-mode" role="group" aria-label="Mode"><button type="button" class="' + cls + '" data-shm-mode="repeat">🔁 ' + (ca ? 'Escolta i repeteix' : 'Listen and repeat') + '</button>'
-      + '<button type="button" class="' + cls + '" data-shm-mode="shadow">🗣 Shadowing</button></span>' : '';
-    const tog = has(c) ? '<button type="button" class="' + cls + '" data-shm-marks>' + label(ca, marksOn()) + '</button>' : '';
+    const modes = has(c) ? '<span class="shm-mode" role="group" aria-label="Mode"><button type="button" class="' + cls + '" data-vs data-shm-mode="repeat">🔁 ' + (ca ? 'Escolta i repeteix' : 'Listen and repeat') + '</button>'
+      + '<button type="button" class="' + cls + '" data-vs data-shm-mode="shadow">🗣 Shadowing</button></span>' : '';
+    const tog = has(c) ? '<button type="button" class="' + cls + '" data-vs data-shm-marks>' + label(ca, marksOn()) + '</button>' : '';
     return '<div class="shm-bar">' + modes + tog + '</div>';
   }
   const mode = () => get('elShadowMode', 'repeat') === 'shadow' ? 'shadow' : 'repeat';
@@ -78,7 +79,7 @@
     show();
   }
   const turnBox = ca => '<div class="shm-turn" role="status"><span class="msg"></span><span class="bar"><i></i></span>'
-    + '<span class="btns"><button type="button" data-shm-again>↺ ' + (ca ? 'Una altra vegada' : 'Again') + '</button> <button type="button" data-shm-next>' + (ca ? 'Següent' : 'Next') + ' ⏭</button></span></div>';
+    + '<span class="btns"><button type="button" data-vs data-shm-again>↺ ' + (ca ? 'Una altra vegada' : 'Again') + '</button> <button type="button" data-vs data-shm-next>' + (ca ? 'Següent' : 'Next') + ' ⏭</button></span></div>';
 
   /* Listen and repeat: plays one sentence, stops, lights it up and gives time to say it (the sentence's length × 1.3 + 1.2 s,
      2.5–12 s), then plays the next. Also lights up the sentence being heard in Shadowing mode.
