@@ -37,6 +37,22 @@ These are already decided. A new LS keeps them unless Roger says otherwise.
 | Copyright | Everything students can download or print carries the line "© (year) Roger Beltran · English Lab · All rights reserved". |
 | Calendar | Dated sessions for each group, the exam day and a due date for each activity, shown on the dashboard and the student board. Students also have a "My week" button on every page with what to do, what is late and the homework. |
 
+## 1b. How a new LS looks on the site (Roger, 7 Nov 2026)
+
+Roger changed the look of the site on 7 Nov 2026 and said every new LS must keep it. The model is the LS2 home page (`4eso/seasons-and-celebrations/index.html`, `2eso/free-time-live/index.html`). Before Roger tries a new LS, Claude checks every line:
+
+- [ ] **Name with its number:** "LS3 · Title" in the page title, the heading, the back link and the menus (the number replaces the book emoji in the menu).
+- [ ] **No 📚 Study place** and no "List in the LS" link. The grammar and vocabulary lists stay hidden in the page for the board's 🔤 Grammar and vocabulary place, where the summary PDF is (🖨️ "Summary to download or print"). The reading book is on 📖 Books.
+- [ ] **🧩📚 Games and theory card beside the LS title**, above "Your challenge": the grammar and vocabulary circles, Open and 📝 Your notes.
+- [ ] **Tiles:** 📈 My formative assessment (where Study was; it opens this LS's formative tab on the board), 🗣 Shadowing video, ⓘ About this LS, 🖨 Paper worksheets (teacher only). No 🎮 Vocabulary games tile (the games stay in the Games menu).
+- [ ] **ⓘ About this LS is visual:** numbered objective cards with a verb icon, the "How will we work" step diagram and principle tiles, coloured competence tiles, assessment criteria as cards that open (official wording inside). No routes or Catalan help paragraph. One colour per competence everywhere: CE1 teal, CE2 blue, CE3 orange, CE4 green, CE5 purple, CE6 amber, CD indigo, CC pink.
+- [ ] **About opens at the top at once** (no sliding), and going back returns to where the student was.
+- [ ] **Students see only the learning paths the teacher has opened** (the teacher and testers see all).
+- [ ] **On the board (nothing to build, but check it works with the new LS):** 🧩📚 Games and theory · LS<n> card at the top right with this LS's results only, no 📌 pull-up card or bar (class mode takes students to the page), 🎯 My level box beside the greeting ("Core · A2"), the two home columns end on one line, no Study or Shadowing tiles, 📊 My marks, 🎬 Final product and 📝 Exams in the same visual card style as About.
+- [ ] **Flashcards speak with the Kokoro Heart voice** (American English), also when a card is turned; record the new LS's words for free. Listenings, Talk and dictation stay ElevenLabs. Practise word cards go full screen with 🔀 Shuffle.
+- [ ] **Students' left menu is the shared one** (My dashboard · Practise · My course and its LSs · Books · Grammar and vocabulary · Games · Help · Study on your phone). Practise and Games show only the student's own course.
+- [ ] **The teacher's student view** shows the page in the student's language from the first moment, with the red frame.
+
 ## 2. The steps, in order
 
 Each step ends with Roger's OK before the next one starts.
@@ -88,8 +104,10 @@ Read the [root AGENTS.md](../../AGENTS.md) and the [LS2 AGENTS.md](../4eso/ls2-s
 | 8 Grading | `grading.md`; `EL_GRADING[ls]` in `shared/js/el-grading.js` (with `marking` for the marking PDF per round); paste-ready brief in project files for `teacher.html` changes (English Lab project) |
 | 9 Calendar | `EL_PLAN[ls]` in `shared/js/el-plan.js` (`groups`, `g`, `exam`, `from`, `due`, `optional`); session lines written as `Mon 2 · LP2 Title (1/2) · …` so the "My week" list finds the days and activities |
 | 10 Exam | Project files only, never in the public repo: `ls<n>/exam/` (data, `make-docx.js`, Word + key, audio with no slow copy); sample exam page + `data/sample-exam.js` on the site |
-| 11 Study summary | `<ls>/downloads/ls<n>-vocabulary-grammar-{route}.pdf`, `study` in `EL_LS` (the board box and the `data-el-study` card in the LS page's Language & Knowledge tab show it); built from the Learning Paths' data with `node tools/lp-worksheets/build.mjs --summaries` once the LS is in `shared/print/lp-list.js` (every route, Starter too; `starter: true` in `EL_LS`); the copyright line is printed on every page |
+| 11 Study summary | `<ls>/downloads/ls<n>-vocabulary-grammar-{route}.pdf`, `study` in `EL_LS` (the board's 🔤 Grammar and vocabulary place shows it; LS pages have no Study place since 7 Nov 2026); built from the Learning Paths' data with `node tools/lp-worksheets/build.mjs --summaries` once the LS is in `shared/print/lp-list.js` (every route, Starter too; `starter: true` in `EL_LS`); the copyright line is printed on every page |
 | 12 Go live | PRs merged at Roger's OK; retarget stacked PRs to `main` once their base is merged |
+
+**Site look checklist (Part 1b), where each line lives:** copy an LS2 `index.html` (`body.lsh`, `ls-home.css`, `el-ls-home.js`, then `lab/game/decks/index.js`, `theory.js`, `el-notes.js` before `el-cloud.js`). Name: `elLsName`/`elLsNum` (`el-catalog.js`, order in `EL_LS`). Keep `<div data-ls-lists hidden>` with its two `.bigcard` lists (the board's 🔤 place reads it) and the class names the board reads (`ol.lps`, `a.chal`, `.tiles`, `#shadowDlg video`). Games and theory: `a.tile.nt.gmt` in `header.lshead.gmh` + `section[data-place="notes"]`, filled by `el-notes.js` `homeCard` (one `myGames` read). Formative tile: `a[data-el-formative]` (el-ls-home.js adds `?ls=…#formative`). About: `.ab-obj`, `.ab-flow`, `.ab-prin`, `.ab-comp k1…k6/kc`, `details.ab-crit` (CSS in `ls-home.css`). Board cards: `fvHead`/`fvStat`/`fvPart` + `.fv-*` in `today.html`. Flashcard voice: `node tools/voice/harvest.js` then `tools/voice/generate.py` (root `AGENTS.md`, "Flashcard voice"), commit `audio/voice/`. Menu: `elStudentMenu` in `el-catalog.js` only. Scroll: `scrollTo({behavior:"instant"})`; student-view language `el_as.ca`. PRs of 7 Nov 2026: #377–#402.
 
 **Goal and review card:** `ls2-engine.js` adds it by itself to every learning path page with a `recall` panel (`state.plan[route]`, `state.review[route]`; root `AGENTS.md`, "Goal and review"). A page that does not run on the engine, such as 4ESO LS2 *Getting started*, does not get it: build new pages on the engine, or add the card by hand.
 
