@@ -814,7 +814,7 @@ function lsWarn(ls,grp,assigned){
   return w.length?`<div class="box" style="border:2px solid #dc2626;background:#fef2f2">${w.map(x=>"<p>⚠️ "+x+"</p>").join("")}</div>`:"";
 }
 function render(){
-  render0();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0)}
+  render0();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0)}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
 // somewhere else, a message asks whether to go to the group or stay where I am"). The timetable is EL_TIMETABLE (el-plan.js), read by
 // ELWeek.classAt (from 5 minutes before the class). Opening the dashboard during a class goes straight to that group (and its current LS);
@@ -925,6 +925,21 @@ function ttPage(){const d=ttDraft(),dirty=JSON.stringify(elTTStore(d))!==JSON.st
 S.place="home";
 const PLACES={tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Marks"],students:["👥","Students"],msgs:["💬","Messages"],cov:["🎯","Coverage"],week:["📅","Time plan · all groups"]};
 const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=false;render();scrollTo(0,0)};
+// ---- the browser's Back button (Roger, 7 Nov 2026: "When I go back it brings me to other places; I wanted to go where this button takes
+// you"). The dashboard is one page, so Back used to leave it (e.g. to English Lab). Now each move to another screen (a place such as
+// 📈 Learning paths, a group, an LS, the whole year) adds a step to the browser's history: Back returns to the screen before it, e.g. from
+// 📈 Learning paths to the group's tiles, and only leaves the dashboard from the first screen. The ‹ link at the top of a place does the same
+// as Back when the screen before was that group's tiles (so a later Back does not open the place again). Live updates add no step.
+const navKey=()=>({g:S.g,p:S.place||"home",ls:S.ls||null,y:!!S.year});
+const navSame=(a,b)=>!!a&&!!b&&a.g===b.g&&a.p===b.p&&a.ls===b.ls&&a.y===b.y;
+function navSync(){const k=navKey(),h=history.state&&history.state.el?history.state:null;
+  if(S.navPop||!h){S.navPop=false;if(!navSame(k,h&&h.el))history.replaceState({el:k,prev:h?h.prev:null},"");return}
+  if(!navSame(k,h.el))history.pushState({el:k,prev:h.el},"")}
+function navBack(p){const h=history.state;   // the ‹ link: Back when the screen before is the one it opens
+  if(p==="home"&&h&&h.el&&navSame(h.prev,{g:S.g,p:"home",ls:S.ls||null,y:false})){history.back();return}
+  goPlace(p)}
+addEventListener("popstate",e=>{const h=e.state&&e.state.el;if(!h||!S.D)return;const d=$("#dlg");if(d&&d.open)d.close();
+  if(S.g!==h.g)S.tutor="all";S.g=h.g;S.place=h.p;S.ls=h.ls;S.year=h.y;S.navPop=true;render();scrollTo(0,0)});
 const tTile=(p,ic,t,sub,badge,late,cls,g)=>`<a class="tile ${cls||""}" href="#" ${g?`data-do="tab" data-g="${g}"`:`data-do="place" data-p="${p}"`}><span class="ti">${g?`<b>${t}</b>`:ic}${badge?`<span class="tb ${late?"late":""}">${badge}</span>`:""}</span><span>${g?"":`<b>${t}</b>`}<small>${sub}</small></span></a>`;
 const tAlert=(p,ic,txt,go,cls)=>`<a class="hal ${cls||"late"}" href="#" data-do="place" data-p="${p}">${ic} ${txt}<span>${go} →</span></a>`;
 const placeHead=(back,p)=>`<div class="ph"><p class="crumb"><a class="back" href="#" data-do="place" data-p="home">‹ ${back}</a></p><h1 class="pt">${PLACES[p]?PLACES[p].join(" "):""}</h1></div>`;
@@ -1027,9 +1042,14 @@ function render0(){
     plan:()=>AGOK(ls)&&p&&gi>=0&&agEnsure(planX(ls,grp.id))?agPage(planX(ls,grp.id),inG.filter(s=>!s.away&&!s.tester&&s.uid)):satBox([grp.id])+timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))+((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:""),
     todo:()=>cpBox(ls,grp,inG)+`<div class="box"><h2>To do</h2>${todoH}</div>`,
     paths:()=>lpBox(ls,grp)+`<div class="bar">${stuF}${G()&&!G().only?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:""}</div>`+lpAll+legendB+`<div class="box">${fold("settings","LS status and groups",lsSettings(ls))}</div>`,
-    marks:()=>`<div class="bar">${stuF}${G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:""}</div>`
-      +(G()&&G().only?gradeBox(shown):(G()?gradeBox(shown):"")+resultB)+selfBox(ls,grp,shown),
-    students:()=>`<div class="bar">${stuF}</div>`+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(),
+    // the route and tutor chips sit right above the student table they filter, under the mark explanation, which is the same for every
+    // route (Roger, 7 Nov 2026: "when I change the route nothing changes here"); they also filter the boxes below (criteria, self-assessment)
+    marks:()=>{const fb=`<div class="bar stuf"><span class="muted">Show students ·</span> ${stuF}</div>`;
+      return (G()&&G().marking?`<div class="bar"><button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button></div>`:"")
+      +(G()?gradeBox(shown,fb)+(G().only?"":resultB):fb+resultB)+selfBox(ls,grp,shown)},
+    // the route and tutor chips filter the students' grid right under them (Roger, 7 Nov 2026: "here, I should have this"); the boxes
+    // below it (routes, points, student list) are for the whole group
+    students:()=>`<div class="bar">${stuF}</div>`+lpAll+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(),
     msgs:()=>annBox()+pbBox()+sgBox(),
     cov:()=>covPage(grp,ls)};
   if(place[S.place]){$("#main").innerHTML=placeHead(back,S.place)+place[S.place]()}
@@ -1590,7 +1610,7 @@ function gradeAvg(AV,g,tm){if(!AV.length)return "";
     +g.blocks.map(b=>`<td><b>${f1(avg(rows,r=>r.val[b.id]))}</b></td>`).join("")+`<td class="first"><b>${f1(avg(rows,r=>r.total))}</b></td></tr>`;
   const both=AV.filter(did);
   return `<tfoot>${row("Class average",AV.length,AV)}${row("Average · did the exam and presented the final product",both.length,both)}</tfoot>`}
-function gradeBox(studs){
+function gradeBox(studs,fb=""){
   if(!S.gpOpen){S.gpOpen=1;S.open.add("gradeplan")}   // unfolded the first time on each visit
   const g=G(),fpA=g.fp.a,blk=id=>g.blocks.find(b=>b.id===id);
   const tm=hasTeams(),head=`<tr><th class="stu">Student</th><th>Route</th>${tm?"<th>Group</th>":""}${g.blocks.map(b=>`<th>${esc(b.name)}<br><small class="muted">${b.w} %</small></th>`).join("")}<th class="first">LS mark</th></tr>`;
@@ -1610,7 +1630,7 @@ function gradeBox(studs){
   return `<div class="box"><h2>LS grade</h2><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1" title="As in the grading plan: missing work counts 0 until it is handed in">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0" title="Mark so far: only what is done or assessed counts">not counted yet</button></div>`
     +fold("gradeplan","📊 What makes up the LS mark",planTable(g),"key")
     +fold("gradekey","How it is worked out",key,"key")
-    +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody>${gradeAvg(AV,g,tm)}</table></div>`:"")
+    +fb+(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody>${gradeAvg(AV,g,tm)}</table></div>`:fb?'<p class="muted">No students with this filter.</p>':"")
     +fold("exam","Exam marks",examTable(studs.filter(s=>!s.away)))+`</div>`;
 }
 // ---- Self-assessment at the end of the LS (Roger, 2 Nov 2026: "afegir una autoavaluació al final de la LS"). The LS's Reflect page has a
@@ -2838,7 +2858,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     if(from&&to&&from!==to&&!k.ls){const l=EL_LS.find(x=>x.id===S.ls);
       if(l&&l.course!==to.course){const m=EL_LS.filter(x=>x.course===to.course)[EL_LS.filter(x=>x.course===l.course).indexOf(l)];S.ls=m?m.id:null}}
     else if(S.g!==k.g||S.place!=="home"){S.place="home";S.year=false}
-    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();goPlace(k.p)},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
+    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();t.classList.contains("back")?navBack(k.p):goPlace(k.p)},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
     corrg:()=>{S.corrG=k.g;render()},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
     corrask:()=>act(api.mkAsk(true)),corrcancel:()=>act(api.mkAsk(false)),
