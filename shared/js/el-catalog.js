@@ -72,6 +72,9 @@ window.EL_LS=[
   {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4",story:{title:"Lantern Night",pdf:"4eso/seasons-and-celebrations/downloads/ls2-story-",key:"https://docs.google.com/document/d/1uc108nk9jxlfhAaJ0Z-vzAxZbq_qI_3dMHs3akKIu7A/edit"}},
   {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",starter:true,shadowing:"2eso/free-time-live/video/shadowing.mp4",story:{title:"Maya Live!",pdf:"2eso/free-time-live/downloads/ls2-story-",key:"https://docs.google.com/document/d/1rcikmXonPtG8HFXzcim26QEm0Rbe1X0LavRPOSUYtuk/edit"}}
 ];
+// The LS name with its number for students and the teacher (Roger, 7 Nov 2026: "we should see LS2 Free Time..."): "LS2 · Free Time, Live!".
+// The number is the LS's place in its course in EL_LS (LS1 first).
+window.elLsName=l=>{if(!l)return "";const c=(window.EL_LS||[]).filter(x=>x.course===l.course),i=c.findIndex(x=>x.id===l.id);return (i>=0?"LS"+(i+1)+" · ":"")+String(l.title||"").replace(/^\S+ · /,"")};
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";
   const A=(course,file,title,criteria,keys,points,o)=>(a=>(a.mode=a.mode||(a.graded&&!a.manual?"once":"practice"),a))(Object.assign({id:course+"/"+file.replace(".html",""),ls:course+"-my-real-routine",course,path:base(course)+file,title,criteria,keys,points,graded:true},o||{}));

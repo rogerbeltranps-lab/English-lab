@@ -14,7 +14,7 @@
   const LS=document.body.dataset.ls,ROOT=new URL("../../",location.href).href,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
   const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const ls=(window.EL_LS||[]).find(l=>l.id===LS)||{id:LS,course:LS.split("-")[0],title:document.title};
-  const COURSE=ls.course,CN={"2eso":"2 ESO","4eso":"4 ESO"},lsName=l=>l.title.replace(/^\S+ · /,"");
+  const COURSE=ls.course,CN={"2eso":"2 ESO","4eso":"4 ESO"},lsName=l=>window.elLsName?elLsName(l):l.title.replace(/^\S+ · /,"");
   const lsHref=l=>ROOT+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html";
   let CA=false;const t=(ca,en)=>CA?ca:en;
   let who={role:"none"};   // none (not known yet) · student · teacher · tester (sees everything) · as (the teacher's student view)
@@ -38,7 +38,7 @@
     if(teach()||who.role==="tester"){
       const first=teach()?a(dashHref(),"📊 Dashboard"):a(boardHref(),"🏠 My dashboard");
       html=first+`<div class="nvsep"></div>`+["2eso","4eso"].map(c=>`<div class="nvh">${CN[c]}</div>`+a(ROOT+c+"/index.html",CN[c]+" · Learning Situations","sub")
-        +(window.EL_LS||[]).filter(l=>l.course===c).map((l,i)=>a(lsHref(l),"LS"+(i+1)+" · "+esc(lsName(l)),"sub"+(l.id===LS?" on":""),l.id===LS)).join("")).join("")
+        +(window.EL_LS||[]).filter(l=>l.course===c).map((l,i)=>a(lsHref(l),esc(lsName(l)),"sub"+(l.id===LS?" on":""),l.id===LS)).join("")).join("")
         +`<div class="nvsep"></div>`+a(ROOT+"lab/","🎲 "+t("Jocs","Games"))+a(ROOT+"lab/practice.html",t("Practica","Practise"));
     }else{
       html=a(boardHref(),"🏠 "+t("El meu tauler","My dashboard"))

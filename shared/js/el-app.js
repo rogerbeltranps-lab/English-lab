@@ -93,7 +93,7 @@
     if (mode === "home" && (who.role === "teacher" || who.role === "tester"))   // the teacher's lists: Courses and Learning Situations after Dashboard
       L.splice(1, 0, ["courses", "🏫", "Courses", "Courses", ROOT + "index.html#courses"], ["learning", "📚", "Learning Situations", "LS", ROOT + "index.html#learning"]);
     // the side menu names the LS as the LS home does: only its title (LS2 · … stays in the tooltip and the narrow strip says LS2)
-    return L.map(([k, i, long, short, h]) => ({ k, i, long, short, h, side: k === "ls" && lsT ? lsT : long, on: k === here }));
+    return L.map(([k, i, long, short, h]) => ({ k, i, long, short, h, side: long, on: k === here }));
   }
 
   // ---- drawing

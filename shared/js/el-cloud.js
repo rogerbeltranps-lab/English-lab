@@ -690,7 +690,7 @@ async function sideMenu(u){
     const mk=(txt,h,sub)=>{const a=document.createElement("a");a.className="tab-btn";a.dataset.elSide="";a.href=h;a.textContent=txt;
       if(sub){a.title=sub;if(n.classList.contains("nav-tabs")){const s=document.createElement("small");s.textContent=sub;s.style.cssText="display:block;font-weight:600;opacity:.75;margin-top:2px";a.append(s)}}return a};
     const items=[];
-    if(cur)items.push(mk(ca?"Learning Situation actual":"Current Learning Situation",href(cur.course+"/"+cur.id.slice(cur.course.length+1)+"/index.html"),cur.title.replace(/^\S+ · /,"")));
+    if(cur)items.push(mk(ca?"Learning Situation actual":"Current Learning Situation",href(cur.course+"/"+cur.id.slice(cur.course.length+1)+"/index.html"),window.elLsName?elLsName(cur):cur.title.replace(/^\S+ · /,"")));
     items.push(mk(ca?"Totes les Learning Situations":"All Learning Situations",href(course+"/index.html")));
     const at=n.querySelector(":scope>[data-el-board]")||n.querySelector(":scope>.tab-btn:not([hidden])");
     items.forEach(i=>at?at.before(i):n.append(i));

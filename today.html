@@ -191,7 +191,7 @@ function cell(a){
 
 // Menu: my board, my course page with its LSs (the ones I can open), Games and Practise. The teacher and testers get both courses.
 const COURSES={"2eso":"2 ESO","4eso":"4 ESO"};
-const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName=l=>esc(l.title.replace(/^\S+ · /,""));
+const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`,lsName=l=>esc(elLsName(l));
 function nav(g,lss){
   const cs=all()?Object.keys(COURSES):g&&COURSES[g.course]?[g.course]:[];
   // every item is a button with an icon (Roger, 6 Nov 2026: "these things should look like buttons"; shared/css/el-app.css)
@@ -284,7 +284,7 @@ function lshGet(ls){
 function lsNowHtml(ls,info,nx){
   if(!ls||only(ls.id))return "";
   const L=lshGet(ls),num=EL_LS.filter(l=>l.course===ls.course).findIndex(l=>l.id===ls.id)+1,go=lsHref(ls);
-  const head=`<div class="lsnh"><div class="lsnt"><span class="lsne">${t("La teva Learning Situation ara","Your Learning Situation now")} · LS${num}</span><h2>${lsName(ls)}</h2>${L&&L.q?`<p>${esc(L.q)}</p>`:""}</div>`
+  const head=`<div class="lsnh"><div class="lsnt"><span class="lsne">${t("La teva Learning Situation ara","Your Learning Situation now")}</span><h2>${lsName(ls)}</h2>${L&&L.q?`<p>${esc(L.q)}</p>`:""}</div>`
     +`<a class="lsopen" href="${go}">${t("Obre la pàgina de la LS","Open the LS page")} →</a></div>`;
   if(!L)return `<section class="lsnow" id="lsNow">${head}<p class="muted">${t("Carregant la LS…","Loading the LS…")}</p></section>`;
   const tx=o=>o?esc(!EN&&o.ca?o.ca:o.en):"";
@@ -885,9 +885,9 @@ function weekBox(ls,info,noHw){const p=(window.EL_PLAN||{})[ls.id],gi=ELWeek.col
   const dr=((p._dropped||{})[gi]||[]).map(id=>EL_CATALOG.find(a=>a.id===id)).filter(Boolean);
   const drop=dr.length?`<p class="muted">✂ ${t("No entra a l'examen ni compta per a la nota (no hi vam tenir temps): ","Not in the exam and it does not count (we had no time for it): ")}${dr.map(a=>"<b>"+esc(a.title.split(/[:(]/)[0].trim())+"</b>").join(", ")}</p>`:"";
   const wk=n=>t("Setmana ","Week ")+(n+1);
-  if(!only(ls.id))return `<div class="box wkbox"><h2>${t("Què hem fet a classe","What we've done in class")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Els learning paths i les pestanyes que ja hem fet a classe. Si un dia no vas poder venir, mira-ho aquí i fes-ho a casa.","The learning paths and tabs we have already done in class. If you missed a class, check it here and do it at home.")}</p>${exam}${drop}${doneBox(ls,p,gi,info)}${noHw?"":hwBox(p,gi,info)}</div>`;
+  if(!only(ls.id))return `<div class="box wkbox"><h2>${t("Què hem fet a classe","What we've done in class")} <small>· ${esc(elLsName(ls))}</small></h2><p class="muted">${t("Els learning paths i les pestanyes que ja hem fet a classe. Si un dia no vas poder venir, mira-ho aquí i fes-ho a casa.","The learning paths and tabs we have already done in class. If you missed a class, check it here and do it at home.")}</p>${exam}${drop}${doneBox(ls,p,gi,info)}${noHw?"":hwBox(p,gi,info)}</div>`;
   const main=i>=0?weekHtml(p,gi,i,info,t("Aquesta setmana","This week")+" · "+wk(i),true):nx>=0?weekHtml(p,gi,nx,info,(nx===0?t("Comencem","We start"):t("Propera setmana","Next week"))+" · "+wk(nx),true):`<p class="muted">${t("El pla d'aquesta LS ja s'ha acabat.","The plan of this LS is over.")}</p>`;
-  return `<div class="box wkbox"><h2>${t("El meu pla setmanal","My week plan")} <small>· ${esc(ls.title.replace(/^\S+ · /,""))}</small></h2><p class="muted">${t("Què fem a classe i què has de fer cada setmana. Si un dia no pots venir, mira-ho aquí.","What we do in class and what you have to do every week. If you miss a class, check it here.")}</p>${exam}${drop}${hwBox(p,gi,info)}${main}`
+  return `<div class="box wkbox"><h2>${t("El meu pla setmanal","My week plan")} <small>· ${esc(elLsName(ls))}</small></h2><p class="muted">${t("Què fem a classe i què has de fer cada setmana. Si un dia no pots venir, mira-ho aquí.","What we do in class and what you have to do every week. If you miss a class, check it here.")}</p>${exam}${drop}${hwBox(p,gi,info)}${main}`
     +`<details class="all"><summary>${t("Tot el pla de la LS","The whole LS plan")}</summary>${p.rows.map((r,k)=>weekHtml(p,gi,k,info,wk(k),k===i)).join("")}</details></div>`}
 // What we've done so far (Roger, 4 Nov 2026: "Instead of having a to do list or what we'll do during the week, I want them [to] see what LP
 // and section we've done so far, when I tick them off in my planning"): replaces "This week" and the whole plan (not on LS1). The teacher's
