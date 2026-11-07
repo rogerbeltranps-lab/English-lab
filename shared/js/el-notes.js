@@ -75,6 +75,12 @@
     box.innerHTML=intro+`<p class="nprint"><button type="button" class="nbtn" id="notesPrint">🖨 ${t("Imprimeix-ho","Print it")}</button></p>`+data.games.map(card).join("");
   }
   document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#notesPrint"))window.print()});
+  // 🎯 What to study links jump to that theory part here (Roger, 7 Nov 2026: "this link doesn't take you to the slide"): a plain #nt-… link
+  // changed the hash, so the LS page left the #notes place for its home. Scroll instead, keep #notes, and light the part up for a moment.
+  document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href^="#nt-"]');if(!a)return;e.preventDefault();
+    const el=document.getElementById(a.getAttribute("href").slice(1));if(!el)return;
+    el.scrollIntoView({behavior:"smooth",block:"start"});el.classList.remove("nt-hit");void el.offsetWidth;el.classList.add("nt-hit");
+    setTimeout(()=>el.classList.remove("nt-hit"),2200)});
 
   async function load(){
     if(data||busy||!who||who.teacher)return draw();
