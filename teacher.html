@@ -816,8 +816,8 @@ function cmStart(gid,href,ls,aid,p){const now=Date.now(),until=elClassEnd(gid,no
   const u=new URL(t.href,location.href);u.searchParams.set("elcm",gid+"."+until);if(p)u.hash=p;
   if(DEMO){FSW.g=gid;FSW.x=Object.assign({},FSW.x,{go:{cm:true,u:t.href,p:p||"",pn:p?((EL_SECTIONS[t.a]||[]).find(z=>z[0]===p)||[])[1]||p:"",t:a?elLpLabel(a):"LS home",at:now,s:now,lock:true,until}});fsDraw();render();return}
   window.open(u.href,"_blank","noopener")}
-function cmStop(gid){if(DEMO){if(FSW.x)FSW.x=Object.assign({},FSW.x,{go:null});fsDraw();render();return}
-  F.setDoc(F.doc(db(),"live",gid),{go:null},{merge:true}).catch(x=>alert("Could not stop class mode: "+x.message))}
+function cmStop(gid){if(DEMO){if(FSW.x)FSW.x=Object.assign({},FSW.x,{go:null,fs:null});fsDraw();render();return}
+  F.setDoc(F.doc(db(),"live",gid),{go:null,fs:null},{merge:true}).catch(x=>alert("Could not stop class mode: "+x.message))}
 const cmTabBtn=(ls,gid,a,p)=>{const x=cmOf(gid),on=x&&x.p===p&&new URL(x.u,location.href).pathname===new URL(a.path,location.href).pathname,gn=(GR.find(g=>g.id===gid)||{}).name||gid;
   return `<button type="button" class="pin ${on?"on":""}" data-do="cmstart" data-gid="${gid}" data-href="${esc(a.path)}" data-ls="${ls}" data-a="${esc(a.id)}" data-p="${esc(p||"")}" title="${on?`${esc(gn)} is on this tab in class mode now`:`🎓 Class mode for ${esc(gn)} at this tab: opens it in a new tab and the students follow it`}">🎓</button>`};
 // ⛶ Full screen for the selected group (Roger, 5 Nov 2026: "put students in full screen mode when I say it and they don't have a way to get
@@ -876,8 +876,8 @@ function fsDraw(){const n=document.getElementById("fsctl");if(!n)return;const g=
   const inNow=new Set(w.inn.map(y=>y.e));if(FSMIN.g!==g.id){FSMIN.g=g.id;FSMIN.was=new Set()}
   if(FSMIN.min&&w.out.some(y=>FSMIN.was.has(y.e)))fsMinSet(false);FSMIN.was=inNow;
   const box=w.active||!!cmOf(g.id);n.className=box?"on":"";const min=w.active&&FSMIN.min,never=w.out.filter(y=>y.why==="never"),gone=w.out.filter(y=>y.why!=="never");
-  n.innerHTML=`<div class="fsrow">${svBtn()}${cmBtn(g)}<button type="button" class="fsbtn ${on?"on":""}" data-do="fsgroup" data-gid="${g.id}" title="${on?`Let ${esc(g.name)} leave full screen${cls?" for the rest of this class":""}`:`Put every open page of ${esc(g.name)} in full screen: they tap once to start, Esc does nothing (only holding it down leaves) and you see who is in and who is out here. During each class of your timetable it is on by itself and ends with the class. Not on recall checkpoints or the sample exam.`}">⛶ <span class="lg">Full screen </span>${esc(g.name)}: ${on?"on":"off"}${cls?`<span class="lg">${on?" (class)":" for this class"}</span>`:""}</button>${w.active?`<button type="button" class="fsbtn fsmin" data-do="fsmin" title="${min?"Show the names":"Make this small (it opens again when someone goes out)"}">${min?"▸":"▾"}</button>`:""}</div>${svPop()}${cmInfo(g)}`
-    +(w.active?`<div class="fsinfo">${w.game?`🎮 Class game: ${esc(w.title)}${on?" · ":""}`:""}${on?`until ${fsHm(ef.until)}${ef.auto?" (end of the class, by your timetable)":cls&&ef.until===elClassEnd(g.id,ef.at)?" (end of the class)":""}`:""}</div>
+  n.innerHTML=`<div class="fsrow">${svBtn()}${cmBtn(g)}<!-- no full screen button (Roger, 7 Nov 2026): on by itself in every class of the timetable and while class mode is on -->${w.active?`<button type="button" class="fsbtn fsmin" data-do="fsmin" title="${min?"Show the names":"Make this small (it opens again when someone goes out)"}">${min?"▸":"▾"}</button>`:""}</div>${svPop()}${cmInfo(g)}`
+    +(w.active?`<div class="fsinfo">${w.game?`🎮 Class game: ${esc(w.title)}${on?" · ":""}`:""}${on?`⛶ Full screen until ${fsHm(ef.until)}${ef.auto?" (end of the class, by your timetable)":cls&&ef.until===elClassEnd(g.id,ef.at)?" (end of the class)":""}`:""}</div>
       <div class="fssum"><b class="in">✓ ${w.inn.length} in</b> · <b class="out">✗ ${w.out.length} out</b> <span class="muted">of ${w.n}</span></div>`
       +(min?"":`<div class="fsleft">${gone.length?`<div class="fsout">${gone.map(y=>`<div>✗ <b>${esc(y.name)}</b> · ${fsWhy(y)}</div>`).join("")}</div>`:""}
         ${never.length?`<div class="fsnever">⚪ <b>Not connected (${never.length}):</b> ${never.map(y=>esc(y.name)).join(", ")}</div>`:""}
