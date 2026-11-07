@@ -1075,7 +1075,7 @@ var LS2 = (function () {
         $$('[data-rate="' + id + '"]').forEach(b => b.onclick = () => { sh.rate = +b.dataset.v; rate(); save(); });
         // the last go: the mic records while the clip plays; recognition counts the script words it heard (feedback only, never saved as a mark)
         const recMsg = $('#' + id + 'RecMsg'), recBtn = $('#' + id + 'Rec'), recStop = $('#' + id + 'RecStop');
-        recStop.onclick = () => { endAt = 0; halt(); };
+        recStop.onclick = () => { if (rp) rp.stop(); endAt = 0; halt(); };
         recBtn.onclick = async () => {
           if (processor) return; recBtn.disabled = true; if (rp) rp.stop();
           try {
@@ -1087,9 +1087,10 @@ var LS2 = (function () {
           } catch (e) { recBtn.disabled = false; recMsg.textContent = ca() ? 'No s’ha pogut fer servir el micròfon. Mira el missatge de sota.' : 'Microphone access was not available. See the message below.'; return; }
           let rec = null, heard = ''; const SR = SRC();
           if (SR) try { rec = new SR(); rec.lang = 'en-GB'; rec.continuous = true; rec.interimResults = false; rec.onresult = e => { for (let k = e.resultIndex; k < e.results.length; k++) if (e.results[k].isFinal) heard += ' ' + e.results[k][0].transcript; }; rec.start(); } catch (e) { rec = null; }
-          recStop.disabled = false; recMsg.textContent = ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.';
+          const rr = repeat();   // Listen and repeat: the recording follows the pauses after each sentence (Roger, 7 Nov 2026)
+          recStop.disabled = false; recMsg.textContent = rr ? (ca() ? 'Gravant… repeteix cada frase quan s’aturi.' : 'Recording… say each sentence when it stops.') : (ca() ? 'Gravant… repeteix darrere la veu.' : 'Recording… shadow the speaker.');
           (c.video ? m : recBtn).scrollIntoView({ behavior: 'smooth', block: 'center' });   // the video has to be in view to follow it
-          play(async () => {
+          const fin = async () => {
             recStop.disabled = true;
             try { if (rec) rec.stop(); } catch (e) {}
             if (processor) { processor.disconnect(); sourceNode.disconnect(); micStream.getTracks().forEach(t => t.stop()); await audioCtx.close(); processor = null; }
@@ -1102,7 +1103,8 @@ var LS2 = (function () {
               recMsg.textContent = SR && heard.trim() ? (ca() ? 'L’ordinador ha entès el ' + pct + ' % de les paraules. Escolta’t i torna-ho a provar si vols.' : 'The computer caught ' + pct + ' % of the words. Listen to yourself and try again if you like.')
                 : (ca() ? 'Gravació a punt. Escolta’t.' : 'Recording ready. Listen to yourself.') + (SR && window.elMic && window.elMic.srBroken() ? ' ' + window.elMic.text(window.elMic.srBroken()).split('. ')[0] + '.' : '');
             }, 900);
-          });
+          };
+          if (rr) rp.start(0, fin); else play(fin);
         };
         count(); mark(); rate();
         if (state.done[id]) { msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓ Pots tornar-ho a fer sempre que vulguis.' : 'Done ✓ You can do it again whenever you like.'; }
