@@ -3215,8 +3215,7 @@ document.addEventListener("click",async ev=>{const b=ev.target.closest("[data-lo
   try{S.D=await load(m);TOUCHED.clear();LIVE.since={};render()}catch(e){console.warn("load",e);alert("Could not fetch: "+e.message);loadBar()}});
 if(DEMO)start("Preview with sample students: nothing is saved.");
 else ELCloud.onUser(u=>{if(u&&ELCloud.isTeacher(u)){start("Hello, "+(u.displayName||u.email)+".");return}
-  // Nobody signed in on this browser any more (the home page sent the teacher here from el_who, but Google's sign-in had ended): a clear
-  // Sign in button in the middle, not "Loading…" or a tiny chip in the corner (Roger, 7 Nov 2026, Mac Chrome after the welcome page went live).
-  if(!u){const m=$("#msg");m.innerHTML='You are not signed in on this browser. <button type="button" style="margin-left:6px;border:0;background:#0f766e;color:#fff;border-radius:999px;padding:8px 18px;cursor:pointer;font:inherit;font-weight:700">Sign in with Google</button>';
-    m.querySelector("button").onclick=()=>ELCloud.login()}});
+  // Nobody signed in on this browser (Google's sign-in had ended, or a bookmark to the dashboard): the welcome page, where everyone signs in
+  // (Roger, 7 Nov 2026: "this should be the page"). el-cloud.js has already removed el_who, so the welcome page does not send it back here.
+  if(!u)location.replace("index.html")});
 </script></body></html>
