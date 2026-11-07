@@ -181,8 +181,8 @@ html,body{overflow-x:clip}
   </div>
   <div class="section-card">
     <h3 data-support-ca="Revisa la transcripció" data-support-en="Transcript">Transcript</h3>
-    <p class="instruction" data-support-ca="Amb Chrome, la transcripció es crea mentre graves. Escolta la gravació i comprova que el text diu el mateix. Corregeix-lo; si no apareix, escriu què has dit." data-support-en="With Chrome, a transcript is created automatically while you record. Listen to your recording and correct the transcript so it says what you said.">With Chrome, a transcript is created automatically while you record. Listen to your recording and correct the transcript so it says what you said.</p>
-    <textarea id="speechTranscript" placeholder="Your transcript will appear here. You can correct it."></textarea>
+    <p class="instruction" data-support-ca="Amb Chrome, la transcripció s’escriu sola mentre graves. No s’hi pot escriure: si no diu el que volies, torna’t a gravar." data-support-en="With Chrome, a transcript is written by itself while you record. You can’t type in it: if it is not what you wanted to say, record yourself again.">With Chrome, a transcript is written by itself while you record. You can’t type in it: if it is not what you wanted to say, record yourself again.</p>
+    <textarea id="speechTranscript" readonly placeholder="Your transcript will appear here while you speak."></textarea>
   </div>
   <div class="section-card">
     <h3 data-support-ca="Entrega-ho al professor" data-support-en="Hand it in">Hand it in</h3>
@@ -573,7 +573,7 @@ $('#handInSpeaking').onclick=()=>{
   const m=$('#speakingHandMsg');
   if(processor){m.className='feedback no';m.textContent=ca()?'Atura la gravació primer.':'Stop the recording first.';return}
   const tr=$('#speechTranscript').value.trim(),n=(tr.match(/\S+/g)||[]).length,min={beginners:8,insecure:12,safe:20,daring:30}[level]||12;
-  if(n<min){m.className='feedback no';m.textContent=ca()?'La transcripció té '+n+' paraules: grava’t fent tota la tasca (almenys '+min+' paraules). Si Chrome no l’ha escrita, escriu el que has dit.':'Your transcript has '+n+' words: record yourself doing the whole task (at least '+min+' words). If Chrome didn’t write it, type what you said.';return}
+  if(n<min){m.className='feedback no';m.textContent=ca()?'La transcripció té '+n+' paraules: grava’t fent tota la tasca (almenys '+min+' paraules). La transcripció s’escriu sola mentre parles: torna’t a gravar.':'Your transcript has '+n+' words: record yourself doing the whole task (at least '+min+' words). The transcript is written by itself while you speak: record yourself again.';return}
   state.steps=state.steps||{};
   state.steps.speak={level,title:'Speaking',ty:window.elTyping?elTyping.sum($('#speechTranscript').parentElement):null,f:[{l:ca()?'Transcripció':'Transcript',v:tr}],rate:[],avg:null,comment:'',date:new Date().toISOString()};
   complete('speak');$('#speakResult').classList.add('show');speakHanded();
