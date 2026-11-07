@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- A student who was signed in on this browser last (el_who, el-cloud.js) goes to their board at once: el-cloud.js sends students
-       there anyway, but only after Firebase has loaded, so this page showed its Sign in buttons for a second or two first
-       (Roger, 7 Nov 2026: "all pages still pop up in between"). -->
-  <script>try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="student"&&!sessionStorage.getItem("el_as"))location.replace("today.html")}catch(e){}</script>
+  <!-- The home page is only a welcome page to sign in (Roger, 7 Nov 2026: "it makes no sense that this menu exists since we all go to
+       the dashboards. Maybe, we should have a welcome page to sign in"). Whoever was signed in on this browser last (el_who, el-cloud.js)
+       goes to their dashboard at once, before anything is drawn: the teacher to teacher.html, students and the test account to their
+       board (today.html). The script below sends them again once Firebase knows who is signed in. The teacher's Courses and Learning
+       Situations lists stay at index.html#courses and #learning. -->
+  <script>try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&!/^#(courses|learning)$/.test(location.hash))location.replace(w.role==="teacher"?"teacher.html":"today.html")}catch(e){}</script>
   <link rel="preload" as="image" href="avatar-roger.jpg">
+  <!-- No menu on the welcome page; the teacher's #courses and #learning lists get the app menu (shared/js/el-app.js, mode "home"),
+       never the page's old side menu and row of tabs (el-app.css); <html class="elgate">: the page shows once it is drawn. -->
+  <link rel="stylesheet" href="shared/css/el-app.css">
   <meta name="description" content="English with Roger — learning space for ESO and Batxillerat students." />
   <title>English with Roger</title>
   <style>
@@ -240,9 +245,32 @@
     .course-btn:focus-visible{outline:3px solid var(--text);outline-offset:3px}
     .course-btn strong{font-size:1.8rem;letter-spacing:-.04em}
     .course-btn span{font-size:.9rem;font-weight:700;opacity:.9}
+    .course-btn.signin-btn{background:var(--accent);min-width:240px}
     .course-btn.c2eso{background:#557c68}
     .course-btn.c4eso{background:#55769f}
     .pick-note{margin:14px 0 0;color:var(--muted);font-size:.92rem}
+    /* What's inside (the welcome page) */
+    body.elroot .home-grid{min-height:0}
+    .feat-title{margin:44px 0 16px;font-size:1.6rem;letter-spacing:-.03em}
+    .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .feat{border:1px solid var(--line);border-radius:20px;padding:20px;background:#fff;text-align:left;font:inherit;color:inherit;cursor:pointer;display:flex;flex-direction:column;transition:.15s ease}
+    .feat:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:translateY(-2px)}
+    .feat:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+    .feat .see{margin-top:auto;padding-top:12px;color:var(--accent);font-weight:800;font-size:.9rem}
+    .feat-sub{margin:-8px 0 16px;color:var(--muted)}
+    dialog.shot{border:0;border-radius:20px;padding:0;width:min(1200px,calc(100% - 24px));max-height:calc(100vh - 24px);box-shadow:0 20px 60px rgba(0,0,0,.35);background:#fff;color:var(--text)}
+    dialog.shot::backdrop{background:rgba(15,23,42,.6)}
+    .shot-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:#fff;border-bottom:1px solid var(--line);z-index:1}
+    .shot-head h3{margin:0;font-size:1.15rem}
+    .shot-x{border:0;background:var(--accent-soft);color:var(--accent);width:40px;height:40px;border-radius:12px;font-size:18px;font-weight:800;cursor:pointer;flex:0 0 auto}
+    .shot-body{padding:16px;display:flex;flex-direction:column;gap:16px;align-items:center}
+    .shot-body img{display:block;max-width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+    .feat .fi{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--accent-soft);font-size:22px;margin-bottom:12px}
+    .feat h3{margin:0 0 6px;font-size:1.08rem;letter-spacing:-.01em}
+    .feat p{margin:0;color:var(--muted);line-height:1.5;font-size:.95rem}
+    @media (max-width:1100px){.feat-grid{grid-template-columns:repeat(3,1fr)}}
+    @media (max-width:820px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:620px){.feat-grid{grid-template-columns:1fr}.feat-title{margin-top:32px}}
     [hidden]{display:none!important}
 
     .mobile-tabs{display:none}
@@ -280,7 +308,7 @@
     }
   </style>
 </head>
-<body>
+<body class="elroot">
   <div class="mobile-tabs">
     <button class="tab-btn active" data-tab="home">Home</button>
     <button class="tab-btn" data-tab="courses" data-private hidden>Courses</button>
@@ -302,24 +330,52 @@
 
     <main class="content">
       <section class="panel active" id="home">
+        <!-- The welcome page (Roger, 7 Nov 2026): one Sign in button instead of 2 ESO / 4 ESO, and what the app is: teaching and learning
+             English by the Spanish and Catalan curriculum, through learning situations, competences and structured grammar and
+             vocabulary, with shadowing, flashcards and theory with games, and the teacher's tools to follow and keep students on task. -->
         <div class="home-grid">
           <div>
-            <span class="eyebrow">Learn · Practise · Create</span>
+            <span class="eyebrow">English Lab · ESO</span>
             <h1>Make your English real.</h1>
-            <p class="lead">Welcome to my English website. Choose your course and sign in with your school email and password to open your activities.</p>
+            <p class="lead">An app to <b>teach and learn English</b> in secondary school. It follows the <b>Spanish and Catalan curriculum</b> and is designed with a clear method: <b>learning situations</b>, <b>competences</b> and a structured plan of <b>grammar and vocabulary</b>, with every student working at their own level.</p>
             <div class="course-pick">
-              <a class="course-btn c2eso" href="2eso/index.html" data-course="2eso"><strong>2 ESO</strong><span>Sign in →</span></a>
-              <a class="course-btn c4eso" href="4eso/index.html" data-course="4eso"><strong>4 ESO</strong><span>Sign in →</span></a>
+              <a class="course-btn signin-btn" href="today.html"><strong>Sign in</strong><span>Open my dashboard →</span></a>
             </div>
-            <p class="pick-note">Use your school email (@ietramuntana.cat) and the password your teacher gave you.</p>
+            <p class="pick-note">Students: your school email (@ietramuntana.cat) and the password your teacher gave you.</p>
           </div>
 
           <aside class="intro-card">
             <img class="avatar" src="avatar-roger.jpg" alt="Roger avatar" />
             <h2>Hi, I'm Roger</h2>
-            <p>I’m an English and science teacher. This space brings together class materials, clear guidance and practical activities for ESO and Batxillerat students.</p>
+            <p>I’m a curious mind, always learning something new and looking for better ways to teach. I built English Lab so my students learn in a meaningful way, each at their own level, and I make sure they work on all four communicative skills equally: listening, reading, speaking and writing.</p>
           </aside>
         </div>
+
+        <h2 class="feat-title">What's inside</h2>
+        <p class="feat-sub">Tap a card to see it in the app.</p>
+        <div class="feat-grid">
+          <button type="button" class="feat" data-imgs="ls"><span class="fi" aria-hidden="true">📚</span><h3>Learning situations and competences</h3><p>Each unit is a learning situation with a real final product. Listening, reading, speaking and writing are worked equally, and marks are given by competence and criterion, as the curriculum asks.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="grammar"><span class="fi" aria-hidden="true">🧩</span><h3>Structured grammar and vocabulary</h3><p>Grammar and vocabulary come in a clear order, level by level, from A1 to B1+, with a study guide for every learning path and summaries to download.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="shadowing,level,games"><span class="fi" aria-hidden="true">🎧</span><h3>Shadowing, flashcards and games</h3><p>Shadowing for pronunciation and fluency, flashcards for vocabulary, and grammar theory that turns into class games played together.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="level"><span class="fi" aria-hidden="true">🎯</span><h3>Every student at their level</h3><p>Four levels (Starter, Base, Core and Plus) with the same goals, so every student works on the same topic at the level that fits them.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="corrected"><span class="fi" aria-hidden="true">✅</span><h3>Corrected straight away</h3><p>Activities are corrected automatically. Students see their answers and corrections at once, and they stay there when they come back.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="writing"><span class="fi" aria-hidden="true">✍️</span><h3>Writing with full corrections</h3><p>Every writing comes back with the mistakes underlined, a table with each mistake, its correction and why, and the text corrected.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="story"><span class="fi" aria-hidden="true">📖</span><h3>Stories to read in chapters</h3><p>A serial story for each course, one chapter per learning path and written in four levels, to keep reading at home.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="board"><span class="fi" aria-hidden="true">🏠</span><h3>Each student&#x27;s own board</h3><p>Every student has a board with what to do next, their mark so far, the teacher&#x27;s feedback and a self-assessment at the end of each unit.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="homework"><span class="fi" aria-hidden="true">🗓</span><h3>Homework with reminders</h3><p>The teacher sets homework from the dashboard. Students find it on their board and get a summary of the week by email.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="exam-mode"><span class="fi" aria-hidden="true">📝</span><h3>Exams in exam mode</h3><p>Exams are done in the app in exam mode: they open in full screen, and if a student leaves it, the exam is handed in.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="exam"><span class="fi" aria-hidden="true">📋</span><h3>Exam results by criterion</h3><p>After the exam, each student sees their mark for every criterion of the curriculum, explained in simple words.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="final"><span class="fi" aria-hidden="true">🎬</span><h3>Final product with a rubric</h3><p>Each unit ends with a final product marked with one clear rubric: students see their level shaded in each part and the teacher&#x27;s feedback.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="dashboard"><span class="fi" aria-hidden="true">📊</span><h3>The teacher&#x27;s dashboard</h3><p>One place for the teacher: the next class, every group, marks, corrections and messages from students.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="paths"><span class="fi" aria-hidden="true">📈</span><h3>The teacher follows every learning path</h3><p>The teacher sees what each student has done and what is missing, and opens or locks each learning path and section for each group.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="class"><span class="fi" aria-hidden="true">🔒</span><h3>Focused in class</h3><p>In class the app goes full screen: the teacher sees who is in the app and who has left it, and can take the whole group to the same activity, so students stay on task.</p><span class="see">See it →</span></button>
+          <button type="button" class="feat" data-imgs="phone"><span class="fi" aria-hidden="true">💻</span><h3>Chromebooks and phones</h3><p>Made for school Chromebooks, and it works on phones too, where students can add it to the home screen like an app.</p><span class="see">See it →</span></button>
+        </div>
+        <!-- Tap a card: its pictures (shared/img/home/*.webp, screenshots with sample students only, never real names) -->
+        <dialog class="shot" aria-label="Picture">
+          <div class="shot-head"><h3></h3><button type="button" class="shot-x" aria-label="Close">✕</button></div>
+          <div class="shot-body"></div>
+        </dialog>
       </section>
 
       <section class="panel" id="courses">
@@ -392,6 +448,7 @@
     </main>
   </div>
 
+  <script src="shared/js/el-app.js"></script>
   <script type="module">
     // English Lab has its own page (lab/), where students choose their level and sign in; old links still work.
     const initialTab = location.hash.slice(1);
@@ -412,21 +469,35 @@
     buttons.forEach(button => {
       button.addEventListener('click', () => openTab(button.dataset.tab));
     });
+    // What's inside: a card opens its pictures
+    const shot = document.querySelector('dialog.shot');
+    document.querySelectorAll('.feat[data-imgs]').forEach(card => card.addEventListener('click', () => {
+      shot.querySelector('h3').textContent = card.querySelector('h3').textContent;
+      const body = shot.querySelector('.shot-body'); body.innerHTML = '';
+      card.dataset.imgs.split(',').forEach(n => { const im = document.createElement('img'); im.src = 'shared/img/home/' + n + '.webp'; im.alt = card.querySelector('h3').textContent; im.loading = 'lazy'; body.append(im); });
+      shot.showModal(); shot.scrollTop = 0;
+    }));
+    shot.querySelector('.shot-x').addEventListener('click', () => shot.close());
+    shot.addEventListener('click', e => { if (e.target === shot) shot.close(); });
+    // the app menu (el-app.js) opens the panels with #home, #courses and #learning
+    addEventListener('hashchange', () => { if (!/^#(courses|learning)$/.test(location.hash) && window.ELCloud && ELCloud.user) location.replace(ELCloud.isTeacher(ELCloud.user) ? 'teacher.html' : 'today.html'); else openTab(location.hash.slice(1) || 'home'); });
 
-    // 2 ESO / 4 ESO: a signed-out visitor signs in here, and el-cloud then takes the student to their board.
-    // Before el-cloud has loaded, the link opens the course page, which asks for sign-in too.
-    document.querySelectorAll('.course-btn').forEach(link => {
+    // Sign in: the sign-in window here, and el-cloud then takes a student to their board and the teacher to the dashboard.
+    // Before el-cloud has loaded, the link opens the board, which asks for sign-in too.
+    document.querySelectorAll('.signin-btn').forEach(link => {
       link.addEventListener('click', event => {
-        if (window.ELCloud && !ELCloud.user) { event.preventDefault(); try { localStorage.setItem("el_pick", link.dataset.course); } catch (e) {} ELCloud.login(); }
+        if (window.ELCloud && !ELCloud.user) { event.preventDefault(); ELCloud.login(); }
       });
     });
 
     await import('./shared/js/el-cloud.js');
-    // Students never stay on this page (el-cloud sends them to their board), so only the teacher and the tester get here signed in.
+    // Signed in: off to the dashboard (teacher) or the board (students, the test account); only the teacher's and the test account's
+    // Courses and Learning Situations lists (#courses, #learning) stay here.
     ELCloud.onUser(u => {
       const all = !ELCloud.viewing && (ELCloud.isTeacher(u) || (ELCloud.isTester(u) && !ELCloud.viewGroup()));
       document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !all; });
-      if (all && initialTab) openTab(initialTab);
+      if (u && !(all && /^#(courses|learning)$/.test(location.hash))) { location.replace(ELCloud.isTeacher(u) && !ELCloud.viewing ? 'teacher.html' : 'today.html'); return; }
+      if (all && location.hash.length > 1) openTab(location.hash.slice(1));
     });
   </script>
 </body>
