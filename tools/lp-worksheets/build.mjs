@@ -59,10 +59,10 @@ for (const ls of ONLY_MT ? [] : Object.keys(LSS)) {
   for (const r of routesOf(ls)) await pdf(ls, '', r, false, path.join(ROOT, ls, 'downloads', `ls${n}-vocabulary-grammar-${r}.pdf`), 'summary');
   console.log('summaries', ls);
 }
-// Worksheets for maintenance mode: the student's route only, no answers.
+// Worksheets for maintenance mode: every learning path in MT.PDFS, every route, no answers.
 for (const [course, c] of ONLY_SUMMARIES ? [] : Object.entries(MT.PDFS)) {
   fs.mkdirSync(path.join(ROOT, c.ls, 'downloads', 'worksheets'), { recursive: true });
-  for (const [lp] of c.lps) for (const r of MT.ROUTES[course]) await pdf(c.ls, lp, r, false, path.join(ROOT, MT.pdfPath(course, lp, r)));
+  for (const lp of MT.worksheets(course)) for (const r of MT.ROUTES[course]) await pdf(c.ls, lp, r, false, path.join(ROOT, MT.pdfPath(course, lp, r)));
   console.log('maintenance worksheets', c.ls);
 }
 for (const [ls, lps] of ONLY_SUMMARIES || ONLY_MT ? [] : Object.entries(LSS)) {
