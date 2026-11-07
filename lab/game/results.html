@@ -63,6 +63,9 @@ table.st{border-collapse:collapse;width:100%}
 .tip{position:fixed;z-index:9;pointer-events:none;background:var(--ink);color:#fff;border-radius:8px;padding:6px 10px;font-size:.85em;max-width:280px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
 .demo{background:#fff4d6;border:1px solid #f1d28a;border-radius:12px;padding:8px 12px}
 .miss li{margin:3px 0}
+.rv{border:1px solid var(--line);border-radius:10px;padding:6px 12px;margin:6px 0}.rvh{margin:2px 0 4px}.rvl{list-style:none;margin:0;padding:0}
+.rvl li{display:grid;grid-template-columns:1fr minmax(180px,40%);gap:12px;padding:4px 0;border-top:1px solid var(--grid)}.rvl li:first-child{border-top:0}
+.rvl .no{color:#b3261e}.rvl .okk{color:#166534}.rv details summary{cursor:pointer;padding:4px 0}@media(max-width:700px){.rvl li{grid-template-columns:1fr}}
 @media (max-width:600px){.hb{grid-template-columns:minmax(0,1fr) 90px 40px}.mini{width:60px}}
 /* one student's games: answers and 📝 notes (Roger, 6 Nov 2026) */
 .games{display:flex;flex-direction:column;gap:8px;margin:6px 0 14px}
@@ -72,6 +75,9 @@ details.gm[open] summary{border-bottom:1px solid var(--line)}
 table.qa{border-collapse:collapse;width:100%;font-size:.92em}
 .qa th{text-align:left;color:var(--ink2);font-size:.85em;padding:5px 8px;border-bottom:1px solid var(--line)}
 .qa td{padding:5px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+.aq{border:1px solid var(--line);border-radius:10px;margin:6px 0;padding:6px 10px}.aq summary{cursor:pointer}
+.who{list-style:none;padding:4px 0 2px;margin:0;columns:2;column-gap:24px}.who li{padding:2px 0;break-inside:avoid}.who .mk{font-weight:700}
+.who li.ok .mk{color:#166534}.who li.no{color:#7f1d1d}.who li.no .mk{color:#b3261e}@media(max-width:700px){.who{columns:1}}
 .qa tr.no td{background:#fff5f4}.qa .mk{font-weight:700}.qa tr.ok .mk{color:#166534}.qa tr.no .mk{color:#b3261e}
 .gm .notes{padding:8px 12px 12px;background:#fffef7;border-top:1px solid var(--line);border-radius:0 0 12px 12px}
 .gm .nh{margin:0 0 4px;font-weight:700}.gm .note{margin:6px 0}.gm .note b{color:var(--accent)}.gm .note p{margin:2px 0 0;white-space:normal}
@@ -108,10 +114,15 @@ async function load(){
       const games=[];gs.forEach(d=>games.push(d.data()));games.sort((a,b)=>a.sid-b.sid);
       Object.assign(R,{games,names});
     }
-    R.all=R.games;pickLs();
+    R.all=R.games.map(skipOff).filter(x=>x.done||(x.nts||[]).length);pickLs();
   }catch(e){console.warn("results",e);R.err=e.message}
   R.loading=false;R.sel="";R.stu="";draw();
 }
+// Questions nobody answered were skipped on the board (Roger, 6 Nov 2026: "if no student answered a question it is because I skipped it, so
+// it shouldn't count for the statistics"): they leave qs, done and every student's miss list (old games too: qs[].of = how many answered)
+function skipOff(x){const sk=(x.qs||[]).filter(q=>q.of===0).map(q=>q.n);if(!sk.length)return x;
+  return {...x,qs:x.qs.filter(q=>!sk.includes(q.n)),done:Math.max(0,(x.done||0)-sk.length),skipped:sk.length,
+    stu:x.stu.map(s=>({...s,miss:(s.miss||[]).filter(n=>!sk.includes(n))}))}}
 // One LS at a time (Roger, 6 Nov 2026: each student's answers, performance and notes "of the LS … all together"): chips by the games' ls
 const lsList=()=>[...new Set(R.all.map(x=>x.ls||""))].filter(Boolean).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
 function pickLs(){const l=lsList();if(R.ls&&!l.includes(R.ls))R.ls="";R.games=R.ls?R.all.filter(x=>x.ls===R.ls):R.all}
@@ -140,7 +151,7 @@ function draw(){
   if(!DEMO&&!R.teacher){app$.innerHTML=`<h1>📊 Class game results</h1><p>Only the teacher can see this page.</p>`;return}
   const head=`<h1>📊 Class game results</h1>
     ${DEMO?`<p class="demo">Sample data with made-up students, to show how the page works. The real page fills itself as you play the games.</p>`:""}
-    <p class="muted">Every class game you play from the board is saved here: who got each question right. Only the questions whose answer you showed count; a student who didn't answer one gets it wrong.</p>
+    <p class="muted">Every class game you play from the board is saved here: who got each question right. Only the questions whose answer you showed count, and a question nobody answered (you skipped it) doesn't count; a student who didn't answer one gets it wrong.</p>
     <div class="bar">${GROUPS.map(g=>`<button class="chip${g.id===R.g?" on":""}" data-do="group" data-g="${g.id}">${esc(g.name)}</button>`).join("")}
     <a class="chip" href="host.html" style="text-decoration:none">🎮 Board</a></div>
     ${R.g&&lsList().length>1?`<div class="bar"><span class="muted">LS:</span><button class="chip${R.ls?"":" on"}" data-do="ls" data-l="">All</button>${lsList().map(l=>`<button class="chip${l===R.ls?" on":""}" data-do="ls" data-l="${esc(l)}">${esc(l)}</button>`).join("")}</div>`:""}`;
@@ -157,7 +168,7 @@ function draw(){
     <div class="tile"><b>${played.length} / ${st.length}</b><span>students who played</span></div></div>`;
   const items=R.games.map(x=>{const v=classPct(x),l=onList(x).length;
     return {id:String(x.sid),act:"game",label:day(x.day),value:v,kind:x.kind in KIND?x.kind:"mixed",tip:`${x.title} · ${day(x.day)} · ${l} students · ${show(v)} right`}});
-  const group=`<div class="card"><h2>The group, game by game</h2><p class="muted">% of right answers of the whole class in each game. Click a bar to see its questions.</p>${legend()}${columns(items)}${R.sel?gameDetail():""}</div>`;
+  const group=`<div class="card"><h2>The group, game by game</h2><p class="muted">% of right answers of the whole class in each game. Click a bar to see its questions and each student's answers.</p>${legend()}${columns(items)}${R.sel?gameDetail():""}</div>`;
   const sorted=[...st].sort(R.sort==="name"?(a,b)=>a.name.localeCompare(b.name):(a,b)=>(a[R.sort]??-1)-(b[R.sort]??-1)||a.name.localeCompare(b.name));
   const hasK=k=>R.games.some(x=>x.kind===k);
   const stuT=`<div class="card"><h2>Each student</h2><p class="muted">% right over the games they played. Click a student to see their games, their answers and their 📝 notes. Sort by a column with its heading.</p>
@@ -174,7 +185,20 @@ function gameDetail(){
   const x=R.games.find(y=>String(y.sid)===R.sel);if(!x)return "";
   const list=onList(x),q=x.qs.map(z=>{const right=list.filter(s=>!s.miss.includes(z.n)).length;return {...z,p:pct(right,list.length)}});
   return `<h2 style="margin-top:16px">${esc(x.title)} · ${day(x.day)}</h2><p class="muted">${list.length} students · ${x.done} of ${x.qn} questions shown · % right per question (the hardest in red)</p>
-    <div class="hb">${q.map(z=>`<span class="t" title="${esc(z.q)}">${z.n}. ${esc(z.q)}</span><span class="trk"><i style="width:${z.p||0}%;background:var(--${x.kind in KIND?x.kind:"mixed"})"></i></span><span class="n${z.p<50?" low":""}">${show(z.p)}</span>`).join("")}</div>`;
+    <div class="hb">${q.map(z=>`<span class="t" title="${esc(z.q)}">${z.n}. ${esc(z.q)}</span><span class="trk"><i style="width:${z.p||0}%;background:var(--${x.kind in KIND?x.kind:"mixed"})"></i></span><span class="n${z.p<50?" low":""}">${show(z.p)}</span>`).join("")}</div>`
+    +answersOf(x,list);
+}
+// every student's answers one by one (Roger, 6 Nov 2026: "here I want to be able to see the students' answers one by one"): one row per
+// question, one line per student with what they tapped or wrote, ✓ or ✗; the right answer on top. Students who didn't play aren't listed.
+function answersOf(x,list){
+  if(!x.done)return "";const ppl=[...list].sort((a,b)=>(R.names[a.e]||"").localeCompare(R.names[b.e]||"","ca"));
+  const old=!ppl.some(s=>s.ans);
+  const rows=x.qs.map(z=>{const by=ppl.map(s=>{const ok=!s.miss.includes(z.n),a=s.ans?s.ans[z.n]:undefined;
+      return `<li class="${ok?"ok":"no"}"><span class="mk">${ok?"✓":"✗"}</span> <b>${esc(R.names[s.e]||s.e)}</b>${old?"":`: ${a==null?'<span class="muted">no answer</span>':esc(a)}`}</li>`}).join("");
+    const nOk=ppl.filter(s=>!s.miss.includes(z.n)).length;
+    return `<details class="aq"><summary><b>${z.n}.</b> ${esc(z.q)} <span class="muted">· right answer: <b>${esc(z.ok||"")}</b> · ${nOk} / ${ppl.length} right</span></summary><ul class="who">${by}</ul></details>`}).join("");
+  return `<h3 style="margin:16px 0 4px">Each student's answers</h3><p class="muted">Open a question to see what every student answered.${x.skipped?` ${x.skipped} question${x.skipped>1?"s":""} nobody answered (skipped) ${x.skipped>1?"are":"is"} left out.`:""}${old?" This game was played before the answers were saved: only right or wrong.":""}</p>
+    <p><button type="button" class="chip" data-do="aqall">Open all</button></p><div class="aqs">${rows}</div>`;
 }
 function stuDetail(s){
   const items=R.games.map(x=>{const y=x.stu.find(z=>z.e===s.e),v=y?pct(y.r,x.done):null,c=classPct(x);
@@ -182,7 +206,11 @@ function stuDetail(s){
   const last=[...R.games].reverse().map(x=>{const y=x.stu.find(z=>z.e===s.e);return y&&y.miss.length?{x,m:y.miss}:null}).filter(Boolean).slice(0,3);
   const det=R.games.map(x=>gameOf(x,s.e)).join("");
   return `<div style="padding:6px 0 10px">${det?`<p style="margin:4px 0"><b>${esc(s.name)}: answers and notes${R.ls?" · "+esc(R.ls):""}</b></p><div class="games">${det}</div>`:""}<b>${esc(s.name)}</b>, game by game ${legend('<span class="key"><i style="border-top:2px dashed var(--ink);height:0;border-radius:0"></i>Class</span>')}${columns(items)}
-    ${last.length?`<p style="margin:12px 0 4px"><b>Questions to review</b> (the last games with mistakes):</p><ul class="miss">${last.map(({x,m})=>`<li><b>${esc(short(x.title))}</b> (${day(x.day)}): ${m.map(n=>{const q=x.qs.find(z=>z.n===n);return q?esc(q.q):"question "+n}).join(" · ")}</li>`).join("")}</ul>`:""}</div>`;
+    ${last.length?`<p style="margin:14px 0 4px"><b>Questions to review</b> <span class="muted">(the last games with mistakes: what they answered and the right answer)</span></p>${last.map(({x,m})=>{
+      const y=x.stu.find(z=>z.e===s.e),row=n=>{const q=x.qs.find(z=>z.n===n)||{},a=y&&y.ans?y.ans[n]:undefined;
+        return `<li><span class="rq">${n}. ${esc(q.q||"question "+n)}</span><span class="ra">${y&&y.ans?`<span class="no">✗ ${a==null?"no answer":esc(a)}</span> → `:""}<b class="okk">${esc(q.ok||"")}</b></span></li>`};
+      return `<div class="rv"><p class="rvh"><b>${esc(short(x.title))}</b> <span class="muted">${day(x.day)} · ${m.length} to review</span></p><ul class="rvl">${m.slice(0,5).map(row).join("")}</ul>
+        ${m.length>5?`<details><summary class="muted">${m.length-5} more</summary><ul class="rvl">${m.slice(5).map(row).join("")}</ul></details>`:""}</div>`}).join("")}`:""}</div>`;
 }
 
 // one game of one student: score, each question with their answer and the right one, and their 📝 notes (open by default for the
@@ -207,6 +235,7 @@ app$.addEventListener("click",async e=>{const b=e.target.closest("[data-do]");if
   if(d==="game"){R.sel=R.sel===b.dataset.id?"":b.dataset.id;draw()}
   if(d==="stu"){R.stu=R.stu===b.dataset.e?"":b.dataset.e;draw()}
   if(d==="sort"){R.sort=b.dataset.k;draw()}
+  if(d==="aqall"){const ds=[...app$.querySelectorAll(".aqs details")],o=!ds.every(x=>x.open);ds.forEach(x=>x.open=o);b.textContent=o?"Close all":"Open all"}
   if(d==="ls"){R.ls=b.dataset.l;pickLs();R.sel="";history.replaceState(null,"","?g="+R.g+(R.ls?"&ls="+encodeURIComponent(R.ls):"")+(DEMO?"&demo":""));draw()}
 });
 addEventListener("pointermove",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");
@@ -224,7 +253,7 @@ function demo(g){
     const stu=Object.keys(names).filter(()=>rnd()>.08).map((e,i)=>{const lv=.35+((i*37)%60)/100;const miss=[],ans={};for(let n=1;n<=done;n++){if(rnd()>Math.min(.97,skill*lv*1.35))miss.push(n);ans[n]=miss.includes(n)?"a wrong answer":"the right answer"}
       return {e,r:done-miss.length,a:done,miss,ans,notes:{p1:"Sample notes: the rule in my own words.\nExample 1. Example 2.\nThe mistake to avoid.",p2:i%3?"More sample notes.":""}}});
     return {group:g,deck:d.id,title:d.title,kind:d.kind,ls:d.ls,lp:d.lp,day:["2026-10-28","2026-10-29","2026-11-03","2026-11-04"][k],sid:k+1,qn,done,nts,
-      qs:Array.from({length:done},(_,n)=>({n:n+1,q:`Question ${n+1} of “${short(d.title)}”`,ok:"the right answer"})),stu}});
+      qs:Array.from({length:done},(_,n)=>({n:n+1,q:`Question ${n+1} of “${short(d.title)}”`,ok:"the right answer",of:k===0&&n===4?0:stu.length})),stu}});
   return {games,names};
 }
 

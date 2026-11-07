@@ -166,7 +166,8 @@ let savedSid=0;
 async function saveResults(){
   markPlayed();
   if(!H.g||!H.sid||savedSid===H.sid||!H.deck)return;
-  const qs=qList(),shown=qs.filter(i=>H.aw[i]);if(!shown.length&&!slides().some((s,i)=>isN(s)&&answered(i).length))return;
+  // a question nobody answered was skipped (Roger, 6 Nov 2026): it is not saved and never counts
+  const qs=qList(),shown=qs.filter(i=>H.aw[i]&&answered(i).length);if(!shown.length&&!slides().some((s,i)=>isN(s)&&answered(i).length))return;
   const meta=(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{},num=i=>qs.indexOf(i)+1;
   // each student's own answers (Roger, 6 Nov 2026: "I want to be able to see the answers of each student, their performance and their
   // notes of the LS"): ans {n: the option they tapped or what they wrote}, notes {p<k>: what they wrote on the 📝 notes slides}
