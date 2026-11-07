@@ -1032,7 +1032,9 @@ function render0(){
     marks:()=>{const fb=`<div class="bar stuf"><span class="muted">Show students ·</span> ${stuF}</div>`;
       return (G()&&G().marking?`<div class="bar"><button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button></div>`:"")
       +(G()?gradeBox(shown,fb)+(G().only?"":resultB):fb+resultB)+selfBox(ls,grp,shown)},
-    students:()=>`<div class="bar">${stuF}</div>`+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(),
+    // the route and tutor chips filter the students' grid right under them (Roger, 7 Nov 2026: "here, I should have this"); the boxes
+    // below it (routes, points, student list) are for the whole group
+    students:()=>`<div class="bar">${stuF}</div>`+lpAll+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(),
     msgs:()=>annBox()+pbBox()+sgBox(),
     cov:()=>covPage(grp,ls)};
   if(place[S.place]){$("#main").innerHTML=placeHead(back,S.place)+place[S.place]()}
