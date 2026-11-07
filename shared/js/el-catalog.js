@@ -439,3 +439,35 @@ window.elGameTip=function(games,kind,ca){
 window.elRing=function(p,label,size,tip){
   const z=size||46,col=p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a",q=s=>String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
   return `<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle" title="${q(tip||label+": "+(p==null?"–":p+" %"))}"><span style="width:${z}px;height:${z}px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:conic-gradient(${col} ${(p||0)*3.6}deg,#e5e7eb 0)"><b style="width:${z-10}px;height:${z-10}px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 ${Math.round(z/3.6)}px/1 system-ui,sans-serif;color:#0f172a">${p==null?"–":p+"%"}</b></span>${label?`<span style="font-size:${Math.max(11,Math.round(z/3.6))}px;font-weight:700;line-height:1.15">${label}</span>`:""}</span>`};
+// ---- The students' left menu, ONE for every student page (Roger, 7 Nov 2026: "this should always be the same"): the board (today.html),
+// the LS homes (el-ls-home.js) and Games, Practise, learning paths, vocabulary games, course pages (el-app.js) all draw it from here.
+// 🏠 My dashboard · 🗂 My course · N ESO + its LSs · 📖 Books · 🔤 Grammar and vocabulary · 🎲 Games · 🎯 Practise · (🎬 How the website
+// works, off for now) · ❓ Help · 📱 Study on your phone. The LSs: the ones the board showed last in this browser (el_menu_ls, saved by
+// today.html), else the course's LSs not hidden in the last read status (el_ls_<id>, el-cloud.js). No Firestore reads.
+window.EL_MENU_HOWTO=false;   // 🎬 How the website works in the menu: hidden for now (Roger, 7 Nov 2026: "take this out for the moment"); true brings it back
+window.elMenuLs=function(courses,group){
+  let ids=null;try{ids=JSON.parse(localStorage.getItem("el_menu_ls")||"null")}catch(e){}
+  const L=window.EL_LS||[];
+  if(Array.isArray(ids)&&ids.length){const s=ids.map(id=>L.find(l=>l.id===id)).filter(l=>l&&courses.includes(l.course));if(s.length)return s}   // the board's order
+  const st={},info=id=>{if(!(id in st))try{st[id]=JSON.parse(localStorage.getItem("el_ls_"+id)||"null")}catch(e){st[id]=null}return st[id]};
+  return L.filter(l=>{if(!courses.includes(l.course))return false;const i=info(l.id);
+    if(!i)return true;if(i.status==="hidden")return false;return !group||!window.elLsForGroup||elLsForGroup(l,i,group)})
+    .sort((a,b)=>(((info(b.id)||{}).status==="open")-((info(a.id)||{}).status==="open")));   // open LS first, as the board
+};
+// o: {root (site root URL, "" on today.html), courses:["4eso"], lss (LS list; default elMenuLs), group, ca (Catalan labels), board (the
+// board's URL, ?student= in the teacher's student view), here: "board"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"help"|"phone",
+// app (opened as a home-screen app: no 📱)} → the buttons' HTML (classes nv, nv sub, on; shared/css/el-app.css and ls-home.css)
+window.elStudentMenu=function(o){
+  const R=o.root||"",t=(ca,en)=>o.ca?ca:en,cs=o.courses||[],CN={"2eso":"2 ESO","4eso":"4 ESO"},board=o.board||R+"today.html",here=o.here||"";
+  const lss=o.lss||elMenuLs(cs,o.group),q=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const b=(k,cls,h,ic,txt,x)=>{const on=k&&k===here;return `<a class="nv${cls}${on?" on":""}" href="${h}"${on?' aria-current="page"':""}${x||""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`};
+  const bq=board.split("#")[0];
+  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))
+    +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
+      +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
+    +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary")):"")
+    +b("games","",R+"lab/","🎲",t("Jocs","Games"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
+    +(window.EL_MENU_HOWTO?b("","",`${R}video/how-english-lab-works${t("-ca","")}.mp4?v=20261102c`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"'):"")
+    +b("help","",bq+"#help","❓",t("Ajuda","Help"))
+    +(o.app?"":b("phone","",bq+"#phone","📱",t("Estudia amb el mòbil","Study on your phone")));
+};

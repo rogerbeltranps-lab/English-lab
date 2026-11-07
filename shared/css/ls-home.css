@@ -183,3 +183,5 @@ footer.lsf{color:var(--muted);font-size:13px;padding:24px 0 0}
   .nread{border:0;padding:0;background:none}
   .ncard{break-inside:auto;border:0;padding:0}.npart{break-inside:avoid}
 }
+/* a tile on its own row (LS2 About this LS, after Vocabulary games left the LS home: Roger, 7 Nov 2026) */
+.tile.wd{grid-column:1/-1;flex-direction:row;align-items:center;min-height:0;padding:14px 18px}
