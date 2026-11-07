@@ -1027,9 +1027,14 @@ function render0(){
     plan:()=>AGOK(ls)&&p&&gi>=0&&agEnsure(planX(ls,grp.id))?agPage(planX(ls,grp.id),inG.filter(s=>!s.away&&!s.tester&&s.uid)):satBox([grp.id])+timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))+((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:""),
     todo:()=>cpBox(ls,grp,inG)+`<div class="box"><h2>To do</h2>${todoH}</div>`,
     paths:()=>lpBox(ls,grp)+`<div class="bar">${stuF}${G()&&!G().only?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:""}</div>`+lpAll+legendB+`<div class="box">${fold("settings","LS status and groups",lsSettings(ls))}</div>`,
-    marks:()=>`<div class="bar">${stuF}${G()&&G().marking?` <button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button>`:""}</div>`
-      +(G()&&G().only?gradeBox(shown):(G()?gradeBox(shown):"")+resultB)+selfBox(ls,grp,shown),
-    students:()=>`<div class="bar">${stuF}</div>`+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(),
+    // the route and tutor chips sit right above the student table they filter, under the mark explanation, which is the same for every
+    // route (Roger, 7 Nov 2026: "when I change the route nothing changes here"); they also filter the boxes below (criteria, self-assessment)
+    marks:()=>{const fb=`<div class="bar stuf"><span class="muted">Show students ·</span> ${stuF}</div>`;
+      return (G()&&G().marking?`<div class="bar"><button data-do="pdfask" title="Every student's answers for one round of the final product, with the rubric of that round, to save as a PDF">📄 Marking PDF</button></div>`:"")
+      +(G()?gradeBox(shown,fb)+(G().only?"":resultB):fb+resultB)+selfBox(ls,grp,shown)},
+    // the route and tutor chips filter the students' grid right under them (Roger, 7 Nov 2026: "here, I should have this"); the boxes
+    // below it (routes, points, student list) are for the whole group
+    students:()=>`<div class="bar">${stuF}</div>`+lpAll+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(),
     msgs:()=>annBox()+pbBox()+sgBox(),
     cov:()=>covPage(grp,ls)};
   if(place[S.place]){$("#main").innerHTML=placeHead(back,S.place)+place[S.place]()}
@@ -1590,7 +1595,7 @@ function gradeAvg(AV,g,tm){if(!AV.length)return "";
     +g.blocks.map(b=>`<td><b>${f1(avg(rows,r=>r.val[b.id]))}</b></td>`).join("")+`<td class="first"><b>${f1(avg(rows,r=>r.total))}</b></td></tr>`;
   const both=AV.filter(did);
   return `<tfoot>${row("Class average",AV.length,AV)}${row("Average · did the exam and presented the final product",both.length,both)}</tfoot>`}
-function gradeBox(studs){
+function gradeBox(studs,fb=""){
   if(!S.gpOpen){S.gpOpen=1;S.open.add("gradeplan")}   // unfolded the first time on each visit
   const g=G(),fpA=g.fp.a,blk=id=>g.blocks.find(b=>b.id===id);
   const tm=hasTeams(),head=`<tr><th class="stu">Student</th><th>Route</th>${tm?"<th>Group</th>":""}${g.blocks.map(b=>`<th>${esc(b.name)}<br><small class="muted">${b.w} %</small></th>`).join("")}<th class="first">LS mark</th></tr>`;
@@ -1610,7 +1615,7 @@ function gradeBox(studs){
   return `<div class="box"><h2>LS grade</h2><div class="bar"><span class="muted">Missing work:</span> <button class="chip ${S.zero?"on":""}" data-do="zero" data-z="1" title="As in the grading plan: missing work counts 0 until it is handed in">counts 0</button><button class="chip ${S.zero?"":"on"}" data-do="zero" data-z="0" title="Mark so far: only what is done or assessed counts">not counted yet</button></div>`
     +fold("gradeplan","📊 What makes up the LS mark",planTable(g),"key")
     +fold("gradekey","How it is worked out",key,"key")
-    +(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody>${gradeAvg(AV,g,tm)}</table></div>`:"")
+    +fb+(studs.length?`<div class="wrap"><table><thead>${head}</thead><tbody>${body}</tbody>${gradeAvg(AV,g,tm)}</table></div>`:fb?'<p class="muted">No students with this filter.</p>':"")
     +fold("exam","Exam marks",examTable(studs.filter(s=>!s.away)))+`</div>`;
 }
 // ---- Self-assessment at the end of the LS (Roger, 2 Nov 2026: "afegir una autoavaluació al final de la LS"). The LS's Reflect page has a
