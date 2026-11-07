@@ -206,8 +206,9 @@ function nav(g,lss){
     // books of the LS, a section with grammar and vocabulary summary")
     +(cs.length?b(pl==="books"?" on":"","#books","📖",t("Llibres","Books"),cur("books"))+b(pl==="lang"?" on":"","#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary"),cur("lang")):"")
     +b("","lab/","🎲",t("Jocs","Games"))+b("","lab/practice.html","🎯",t("Practica","Practise"))
-    +b("","#help","❓",t("Ajuda","Help"))
-    +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"');
+    +b("",`${HOWTO}${t("-ca","")}.mp4?v=${HOWTO_V}`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"')
+    +b("","#help","❓",t("Ajuda","Help"))   // Help near the bottom of the menu (Roger, 7 Nov 2026: "only on the left menu at the bottom")
+    +(APP()?"":b("","#phone","📱",t("Estudia amb el mòbil","Study on your phone")));   // under Help, off the board home (Roger, 7 Nov 2026)
   document.querySelectorAll(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
 }
 // "How English Lab works" (Roger, 31 Oct 2026): a 5-minute video for students, in English (Amelia) and Catalan (Julian), made by
@@ -260,11 +261,11 @@ function homeHtml(lss,ls,info){
   // ✅ To do (opened in class, not finished) and 🏠 Homework (only what the teacher set as homework) are two tiles (Roger, 6 Nov 2026)
   const tiles=tile("#todo","✅",t("Per fer","To do"),td.length?(td.length>1?t(`${td.length} learning paths oberts per acabar`,`${td.length} open learning paths to finish`):t("1 learning path obert per acabar","1 open learning path to finish")):t("Ho tens tot fet","All done"),td.length||"","")
     +tile("#homework","📝",t("Deures","Homework"),hwOpen.length?t("Per al ","For ")+when(hwOpen[0].x.date):t("No tens deures","No homework"),hwOpen.length||"","hw")
-    +tile("#marks","📊",t("Les meves notes","My marks"),t("activitats, exàmens i producte final","activities, exams and final product"))
-    +tile("#units","📚","Learning Situations",t("resums, pràctica i el teu nivell","summaries, practice and your level"))
-    +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"),"","",true);
+    +tile("#marks","📊",t("Les meves notes","My marks"),t("activitats, exàmens i producte final","activities, exams and final product"),"","",true);   // wide: three tiles, no gap
+  // no Learning Situations tile on the home: the LSs, Books and Grammar and vocabulary are in the left menu (Roger, 7 Nov 2026: "I dont want this here")
+  // no Help tile on the home: Help is already in the side menu and the phone bar (Roger, 7 Nov 2026: "we dont need this here")
   // the current LS right on the board, under Continue and the tiles (Roger, 7 Nov 2026: "students should see in their dashboard the current LS"): lsNowHtml
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`+lsNowHtml(ls,info,nx)}
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
 // vocabulary and grammar summary of the student's level (the same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS),
 // the teacher and testers every level. Nothing until the student has a level; no new Firestore reads.
