@@ -257,7 +257,7 @@ function homeHtml(lss,ls,info){
     +tile("#units","📚","Learning Situations",t("resums, pràctica i el teu nivell","summaries, practice and your level"))
     +tile("#help","❓",t("Ajuda","Help"),t("com funciona la web","how the website works"),"","",true);
   // the current LS right on the board, under Continue and the tiles (Roger, 7 Nov 2026: "students should see in their dashboard the current LS"): lsNowHtml
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr"><div class="tiles">${tiles}</div>${phoneBanner()}</div></div>`+lsNowHtml(ls,info,nx)}
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr"><div class="tiles">${tiles}</div>${phoneBanner()}${gamesCard(ls)}</div></div>`+lsNowHtml(ls,info,nx)}
 // 📚 The current LS on the board home (Roger, 7 Nov 2026: "I love this dashboard. However, students should see in their dashboard the
 // current LS"): the LS home page's learning paths with the student's progress (only the ones the teacher has opened for the group, as on the
 // LS page), the final product challenge and the LS tiles (games and theory, study, vocabulary games, shadowing video, about this LS), so
@@ -306,11 +306,12 @@ function lsNowHtml(ls,info,nx){
     return `<li><a class="lsr ${cl}${r.cp?" cp":""}" href="${esc(r.h)}" title="${esc(r.d)}"><span class="n">${esc(r.n)}</span><span class="tt"><b>${esc(r.b)}</b><small>${esc(r.d)}</small></span><span class="st ${cl}">${st}</span></a></li>`}).join("");
   const lps=`<div class="box lsnl"><h3>Learning paths</h3>`+(shown?`<ol class="lsrows">${rows}</ol>`:`<p class="muted">${t("El professor obrirà els learning paths a classe, quan toqui.","Your teacher will open the learning paths in class, when it is time.")}</p>`)+`</div>`;
   const c=L.chal,chal=c?`<a class="lsch" href="${esc(c.h)}"><span class="k">${tx(c.k)}</span><b>${esc(c.b)}</b><span class="d">${esc(c.d)}</span><span class="go">${tx(c.go)}</span></a>`:"";
-  // 🧩 📚 the class games circles (gamesCard) take the place of the plain "Games and theory" tile when the student has played
+  // 🧩 📚 the class games circles (gamesCard) take the place of the plain "Games and theory" tile when the student has played; the card
+  // itself sits top right of the board, under the tiles and "Study on your phone" (Roger, 7 Nov 2026: "could this be on the top-right side?")
   const gc=gamesCard(ls);
   const tiles=L.tiles.filter(x=>!(x.notes&&gc)).map(x=>{const inner=`<span class="ti" aria-hidden="true">${esc(x.i)}</span><span><b>${tx(x.b)}</b><small>${tx(x.s)}</small></span>`;
     return x.shadow?(L.video?`<button type="button" class="lst" data-lsvid>${inner}</button>`:""):`<a class="lst${x.notes?" wide":""}" href="${esc(x.h)}">${inner}</a>`}).join("");
-  return `<section class="lsnow" id="lsNow">${head}<div class="lsng">${lps}<div class="lsnr">${chal}${gc}<div class="lstiles">${tiles}</div></div></div></section>`}
+  return `<section class="lsnow" id="lsNow">${head}<div class="lsng">${lps}<div class="lsnr">${chal}<div class="lstiles">${tiles}</div></div></div></section>`}
 // 🗣 the LS shadowing video opens here in a window, as on the LS page
 document.addEventListener("click",e=>{const b=e.target.closest("[data-lsvid]");if(!b)return;const ls=EL_LS.find(l=>l.id===S.ls),L=ls&&LSH[ls.id];if(!L||!L.video)return;
   let d=$("#lsVid");if(!d){d=document.createElement("dialog");d.id="lsVid";d.className="lsvid";document.body.appendChild(d);
