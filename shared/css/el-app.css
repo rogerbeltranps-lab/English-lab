@@ -5,6 +5,14 @@
       the LS home's side menu on the left on a computer (.elrail; icon strip in a narrow window), the board's bottom bar on a phone (.elbar), and on
       learning paths a light top bar instead of the dark one. Chromebook (1366×768) first. LS1 pages keep their design. */
 
+/* ---- 0. the page shows once it is drawn (Roger, 7 Nov 2026, video: "all pages still pop up in between") ----
+   A page with <html class="elgate"> stays hidden until el-app.js (or el-ls-home.js, English Lab) has drawn its real look and set
+   html.elready: the browser paints no old layout, no menu without its styles, no half-moved learning path. Pages opened from the site
+   keep the previous page on screen meanwhile (paint holding), so it reads as one step. If no script sets it, the page shows after 1.5 s. */
+html.elgate:not(.elready) body{visibility:hidden;animation:elshow 0s linear 1.5s forwards}
+@keyframes elshow{to{visibility:visible}}
+
+
 /* ---- 1. menu buttons (the board, the LS home, English Lab) ---- */
 .side .nvs,.elside{display:flex;flex-direction:column;gap:8px}
 .side .nv,.elside .nv{display:flex;align-items:center;gap:11px;padding:8px 12px 8px 8px;border-radius:14px;background:#fff;border:1px solid #e2e8f0;

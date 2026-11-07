@@ -34,22 +34,26 @@ window.LP = {
     {
      "id": "c3-02",
      "r": "beginners",
-     "q": "They ___ (wear) green T-shirts today."
+     "q": "They ___ (wear) green T-shirts today.",
+     "o": ["are wearing", "wear", "is wearing"]
     },
     {
      "id": "c3-03",
      "r": "beginners",
-     "q": "Look! It ___ (snow)."
+     "q": "Look! It ___ (snow).",
+     "o": ["is snowing", "are snowing", "snows"]
     },
     {
      "id": "c3-04",
      "r": "beginners",
-     "q": "She usually ___ (go) skating on Sundays."
+     "q": "She usually ___ (go) skating on Sundays.",
+     "o": ["is going", "goes", "go"]
     },
     {
      "id": "c3-05",
      "r": "beginners",
-     "q": "I love ___ (skate)."
+     "q": "I love ___ (skate).",
+     "o": ["skating", "skates", "skate"]
     },
     {
      "id": "c3-06",
@@ -59,12 +63,14 @@ window.LP = {
     {
      "id": "c3-07",
      "r": "beginners",
-     "q": "Tip: ___ a break every 30 minutes."
+     "q": "Tip: ___ a break every 30 minutes.",
+     "o": ["take", "taking", "takes"]
     },
     {
      "id": "c3-08",
      "r": "beginners",
-     "q": "Tip: ___ use your phone in bed."
+     "q": "Tip: ___ use your phone in bed.",
+     "o": ["not", "doesn't", "don't"]
     },
     {
      "id": "c3-09",

@@ -29,7 +29,8 @@ window.LP = {
     {
      "id": "c1-01",
      "r": "beginners",
-     "q": "She ___ (get) up at seven every day."
+     "q": "She ___ (get) up at seven every day.",
+     "o": ["gets", "get", "is getting"]
     },
     {
      "id": "c1-02",
@@ -39,7 +40,8 @@ window.LP = {
     {
      "id": "c1-03",
      "r": "beginners",
-     "q": "We go ___ at the skate park. (patinar)"
+     "q": "We go ___ at the skate park. (patinar)",
+     "o": ["helmet", "swimming", "skating"]
     },
     {
      "id": "c1-04",
@@ -49,12 +51,14 @@ window.LP = {
     {
      "id": "c1-05",
      "r": "beginners",
-     "q": "Look! Pol ___ (skate) on the ramp."
+     "q": "Look! Pol ___ (skate) on the ramp.",
+     "o": ["are skating", "skates", "is skating"]
     },
     {
      "id": "c1-06",
      "r": "beginners",
-     "q": "Write the -ing form: swim → ___"
+     "q": "Write the -ing form: swim → ___",
+     "o": ["swimming", "swims", "swiming"]
     },
     {
      "id": "c1-07",
@@ -64,7 +68,8 @@ window.LP = {
     {
      "id": "c1-08",
      "r": "beginners",
-     "q": "On your bike, always wear a ___. (casc)"
+     "q": "On your bike, always wear a ___. (casc)",
+     "o": ["helmet", "swimming", "skating"]
     },
     {
      "id": "c1-09",

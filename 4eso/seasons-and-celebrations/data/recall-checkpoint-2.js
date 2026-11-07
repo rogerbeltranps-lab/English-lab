@@ -34,7 +34,8 @@ window.LP = {
     {
      "id": "c2-02",
      "r": "beginners",
-     "q": "Children ___ up in costumes at Halloween."
+     "q": "Children ___ up in costumes at Halloween.",
+     "o": ["dressing", "dress", "dresses"]
     },
     {
      "id": "c2-03",
@@ -44,17 +45,20 @@ window.LP = {
     {
      "id": "c2-04",
      "r": "beginners",
-     "q": "The days get ___ in winter."
+     "q": "The days get ___ in winter.",
+     "o": ["shortest", "short", "shorter"]
     },
     {
      "id": "c2-05",
      "r": "beginners",
-     "q": "I like the Castanyada ___ we eat together."
+     "q": "I like the Castanyada ___ we eat together.",
+     "o": ["and", "but", "because"]
     },
     {
      "id": "c2-06",
      "r": "beginners",
-     "q": "The Castanyada takes place ___ 31 October."
+     "q": "The Castanyada takes place ___ 31 October.",
+     "o": ["at", "in", "on"]
     },
     {
      "id": "c2-07",
@@ -64,7 +68,8 @@ window.LP = {
     {
      "id": "c2-08",
      "r": "beginners",
-     "q": "___, we clean the house. Then we decorate it."
+     "q": "___, we clean the house. Then we decorate it.",
+     "o": ["finally", "first", "next"]
     },
     {
      "id": "c2-09",
