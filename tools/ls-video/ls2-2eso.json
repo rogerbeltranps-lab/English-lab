@@ -1,0 +1,273 @@
+{
+ "course": "2 ESO",
+ "ls": "LS2 · Free Time, Live!",
+ "folder": "2eso/free-time-live",
+ "out": "video/about-this-ls.mp4",
+ "speed": 0.9,
+ "theme": {
+  "accent": "#1f6b52",
+  "dark": "#174d3d",
+  "soft": "#e9f5ef",
+  "ink": "#16241f",
+  "muted": "#5c6f68",
+  "bg1": "#eef8f3",
+  "bg2": "#f7fbf9",
+  "hi": "#fff1b8"
+ },
+ "lines": [
+  {
+   "id": "a01",
+   "en": "Hi everyone! Welcome to LS2: Free Time, Live! In this short video, you'll see your goals, your final product, and the grammar and words you need.",
+   "slide": {
+    "type": "title",
+    "kicker": "2 ESO · Learning Situation 2",
+    "title": "Free Time, Live!",
+    "sub": "Goals · Final product · Grammar · Vocabulary",
+    "img": "video/mei-ice-rink-poster.jpg"
+   }
+  },
+  {
+   "id": "a02",
+   "en": "Our big question is: what do we really do in our free time? We look at hobbies and events, like a match, a concert or a Saturday at the skate park.",
+   "slide": {
+    "type": "question",
+    "kicker": "Our big question",
+    "text": "What do we <b>really</b> do in our free time?",
+    "chips": [
+     "hobbies",
+     "a match",
+     "a concert",
+     "the skate park"
+    ]
+   }
+  },
+  {
+   "id": "a03",
+   "en": "You have four goals. One: understand short vlogs, posts and web pages about hobbies. What are people doing now, and what do they usually do?",
+   "slide": {
+    "type": "goals",
+    "on": 0
+   }
+  },
+  {
+   "id": "a04",
+   "en": "Two: check if a web page is reliable. Who wrote it? When? Why? Then make a fact file and give credit to your sources.",
+   "slide": {
+    "type": "goals",
+    "on": 1
+   }
+  },
+  {
+   "id": "a05",
+   "en": "Three: speak live, like a vlogger. Say what people are doing now, and compare it with what they usually do.",
+   "slide": {
+    "type": "goals",
+    "on": 2
+   }
+  },
+  {
+   "id": "a06",
+   "en": "And four: write a vlog script, with tips for a healthy use of screens.",
+   "slide": {
+    "type": "goals",
+    "on": 3
+   }
+  },
+  {
+   "id": "a07",
+   "en": "At the end, you make your own Free Time Vlog: a video of one and a half to two minutes about a hobby or an event, with Google Slides and your face in a small window.",
+   "slide": {
+    "type": "card",
+    "kicker": "Final product",
+    "title": "Your Free Time Vlog",
+    "points": [
+     "a video of <b>1.5–2 minutes</b>",
+     "about <b>a hobby or an event</b>",
+     "Google Slides + <b>your face</b> in a small window"
+    ],
+    "img": "video/noah-bike-park-poster.jpg"
+   }
+  },
+  {
+   "id": "a08",
+   "en": "It has seven slides: hello, what is happening now, what usually happens, a photo or facts, your likes, your screen tips, and the credits.",
+   "slide": {
+    "type": "parts",
+    "kicker": "Final product · seven slides",
+    "items": [
+     "Hello!",
+     "Live now",
+     "Usually",
+     "Photo or facts",
+     "My likes",
+     "Screen tips",
+     "Credits + bye"
+    ]
+   }
+  },
+  {
+   "id": "a09",
+   "en": "You work step by step: choose a hobby or event, check your source, write your script, make your slides, record, improve one part, and submit it on Classroom. A vlog buddy helps you, but every vlog is your own.",
+   "slide": {
+    "type": "steps",
+    "kicker": "Final product · step by step",
+    "items": [
+     "Choose",
+     "Source",
+     "Script",
+     "Slides",
+     "Record",
+     "Improve",
+     "Submit"
+    ],
+    "note": "A vlog buddy helps you, but every vlog is <b>your own</b>."
+   }
+  },
+  {
+   "id": "a10",
+   "en": "The final product is twenty-five percent of your LS mark. Your vlog counts most. Then your script and slides, your source, your fact file, and your work on every step.",
+   "slide": {
+    "type": "marks",
+    "kicker": "Final product · 25 % of your LS mark",
+    "rows": [
+     [
+      "My vlog",
+      35
+     ],
+     [
+      "My script and slides",
+      25
+     ],
+     [
+      "My source",
+      15
+     ],
+     [
+      "My fact file and credits",
+      15
+     ],
+     [
+      "My work on every step",
+      10
+     ]
+    ]
+   }
+  },
+  {
+   "id": "a11",
+   "en": "Now, the grammar. The star of this LS is the Present Continuous: am, is or are, plus a verb ending in i-n-g. I'm watching a match. They're playing volleyball. Are you having fun? Yes, I am!",
+   "slide": {
+    "type": "grammar",
+    "kicker": "Grammar 1",
+    "title": "Present Continuous: <b>am / is / are + -ing</b>",
+    "examples": [
+     "I<b>'m watching</b> a match.",
+     "They<b>'re playing</b> volleyball.",
+     "<b>Are</b> you <b>having</b> fun? — Yes, I am!"
+    ],
+    "note": "now · right now · at the moment · today"
+   }
+  },
+  {
+   "id": "a12",
+   "en": "Careful with the spelling: dance, dancing. Swim, swimming. Play, playing.",
+   "slide": {
+    "type": "spell",
+    "kicker": "Grammar 1 · spelling",
+    "pairs": [
+     [
+      "dance",
+      "danc<b>ing</b>"
+     ],
+     [
+      "swim",
+      "swim<b>ming</b>"
+     ],
+     [
+      "play",
+      "play<b>ing</b>"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "a13",
+   "en": "Compare it with the Present Simple: the Present Simple for what you usually do, the Present Continuous for now. I usually play football on Saturdays, but today I'm watching a match. And some verbs, like like and know, never take i-n-g. Say: I like it.",
+   "slide": {
+    "type": "grammar",
+    "kicker": "Grammar 2",
+    "title": "Usually or now?",
+    "examples": [
+     "I <b>usually play</b> football on Saturdays,",
+     "but <b>today</b> I<b>'m watching</b> a match."
+    ],
+    "note": "Some verbs don't take -ing: I <b>like</b> it. (not <s>I'm liking it</s>) · know · want · prefer"
+   }
+  },
+  {
+   "id": "a15",
+   "en": "For likes, use love, like, don't like or hate, plus i-n-g: I love skating. And for screen tips, use imperatives: Take a break. Don't use your phone in bed.",
+   "slide": {
+    "type": "grammar",
+    "kicker": "Grammar 3",
+    "title": "Likes + <b>-ing</b> · Tips with imperatives",
+    "examples": [
+     "I <b>love skating</b>. I <b>hate getting up</b> early.",
+     "<b>Take</b> a break.",
+     "<b>Don't use</b> your phone in bed."
+    ],
+    "note": "love · like · don't like · hate + -ing"
+   }
+  },
+  {
+   "id": "a16",
+   "en": "And the words you need: free-time activities, like go swimming or do karate. Clothes and kit, like trainers or a helmet. The weather. Events, like a match or a festival. Time words, like now and at the moment. And screen words, like screen time.",
+   "slide": {
+    "type": "vocab",
+    "kicker": "Vocabulary",
+    "groups": [
+     [
+      "Free time",
+      "play basketball · go swimming · do karate"
+     ],
+     [
+      "Clothes and kit",
+      "trainers · tracksuit · helmet · cap"
+     ],
+     [
+      "Weather",
+      "It's sunny · It's raining · It's windy"
+     ],
+     [
+      "Events",
+      "a concert · a match · a festival"
+     ],
+     [
+      "Time words",
+      "now · at the moment · on Saturdays"
+     ],
+     [
+      "Screens",
+      "upload a video · screen time · take a break"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "a17",
+   "en": "Do the learning paths in order. Each one gives you a piece of your vlog, so at the end your vlog is easy to make. Have fun, and let's go live!",
+   "slide": {
+    "type": "end",
+    "title": "Let's go live!",
+    "text": "Do the learning paths in order: each one gives you a piece of your vlog.",
+    "img": "video/mei-ice-rink-poster.jpg"
+   }
+  }
+ ],
+ "goals": [
+  "<b>Understand</b> vlogs, posts and web pages about hobbies: what is happening now and what people usually do",
+  "<b>Check</b> if a web page is reliable, make a fact file and credit your sources",
+  "<b>Speak live</b> like a vlogger: now vs usually",
+  "<b>Write</b> a vlog script with tips for a healthy use of screens"
+ ]
+}

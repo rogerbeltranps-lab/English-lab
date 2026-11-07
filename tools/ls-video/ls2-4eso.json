@@ -1,0 +1,259 @@
+{
+ "course": "4 ESO",
+ "ls": "LS2 · Seasons & Celebrations",
+ "folder": "4eso/seasons-and-celebrations",
+ "out": "video/about-this-ls.mp4",
+ "speed": 0.95,
+ "theme": {
+  "accent": "#315f9f",
+  "dark": "#234777",
+  "soft": "#edf4ff",
+  "ink": "#151d2e",
+  "muted": "#5d6a80",
+  "bg1": "#eef3fd",
+  "bg2": "#f7f9fe",
+  "hi": "#ffe9c2"
+ },
+ "lines": [
+  {
+   "id": "b01",
+   "en": "Hi everyone! Welcome to LS2: Seasons and Celebrations. In this short video, you'll see your goals, your final product, and the grammar and vocabulary you'll need.",
+   "slide": {
+    "type": "title",
+    "kicker": "4 ESO · Learning Situation 2",
+    "title": "Seasons & Celebrations",
+    "sub": "Goals · Final product · Grammar · Vocabulary",
+    "img": "video/mei-lunar-new-year-poster.jpg"
+   }
+  },
+  {
+   "id": "b02",
+   "en": "Our big question is: why do we celebrate, and what can celebrations tell us about people, places and the natural world? From the Castanyada and Halloween to Thanksgiving, Diwali or Lunar New Year.",
+   "slide": {
+    "type": "question",
+    "kicker": "Our big question",
+    "text": "Why do we celebrate, and what can celebrations tell us about <b>people, places</b> and <b>the natural world</b>?",
+    "chips": [
+     "Castanyada",
+     "Halloween",
+     "Thanksgiving",
+     "Diwali",
+     "Lunar New Year"
+    ]
+   }
+  },
+  {
+   "id": "b03",
+   "en": "You have five goals. One: understand articles, videos and people explaining how they celebrate, and work out new words from context.",
+   "slide": {
+    "type": "goals",
+    "on": 0
+   }
+  },
+  {
+   "id": "b04",
+   "en": "Two: check information in at least two sources, decide if they're reliable, and credit them.",
+   "slide": {
+    "type": "goals",
+    "on": 1
+   }
+  },
+  {
+   "id": "b05",
+   "en": "Three: explain a celebration to people who don't know it: its customs, its dates, its origins, and what it means to the people who celebrate it.",
+   "slide": {
+    "type": "goals",
+    "on": 2
+   }
+  },
+  {
+   "id": "b06",
+   "en": "Four: compare it with a local celebration, find links between cultures, and avoid stereotypes.",
+   "slide": {
+    "type": "goals",
+    "on": 3
+   }
+  },
+  {
+   "id": "b07",
+   "en": "And five: plan a school celebration day, and propose it to the head teacher in a formal email.",
+   "slide": {
+    "type": "goals",
+    "on": 4
+   }
+  },
+  {
+   "id": "b08",
+   "en": "Your final product is a Celebration Day Proposal. In groups of three or four, you design a respectful celebration day at school around one tradition. Your group records a two to three minute video pitch with Google Slides, and everyone speaks. Then, each of you writes a formal email to the head teacher.",
+   "slide": {
+    "type": "card",
+    "kicker": "Final product",
+    "title": "A Celebration Day for our school",
+    "points": [
+     "groups of <b>3–4</b>, one tradition",
+     "a <b>2–3 minute video pitch</b> with Google Slides",
+     "everyone speaks, <b>faces visible</b>",
+     "your own <b>formal email</b> to the head teacher"
+    ],
+    "img": "video/noah-hanukkah-poster.jpg"
+   }
+  },
+  {
+   "id": "b09",
+   "en": "You work in steps: choose a celebration, research it, plan the day, make the slides, rehearse and record the pitch, and write the email. At every step, you hand in your own short task, so your teacher can see your work.",
+   "slide": {
+    "type": "steps",
+    "kicker": "Final product · step by step",
+    "items": [
+     "Choose",
+     "Research",
+     "Plan the day",
+     "Slides",
+     "Rehearse + record",
+     "Email"
+    ],
+    "note": "At every step you hand in <b>your own</b> short task."
+   }
+  },
+  {
+   "id": "b10",
+   "en": "The final product is twenty-five percent of your LS mark, and your mark is your own. Your part of the pitch counts most, then your email, your source, teamwork, and your work on every step.",
+   "slide": {
+    "type": "marks",
+    "kicker": "Final product · 25 % of your LS mark",
+    "rows": [
+     [
+      "My part of the pitch",
+      40
+     ],
+     [
+      "My formal email",
+      35
+     ],
+     [
+      "My source",
+      15
+     ],
+     [
+      "Teamwork",
+      5
+     ],
+     [
+      "My work on every step",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "b11",
+   "en": "Now, the grammar. To describe customs, use the Present Simple: People decorate their houses. Children dress up. And useful chunks: It is celebrated on the thirty-first of October. It takes place in November. Careful with on, in and at!",
+   "slide": {
+    "type": "grammar",
+    "kicker": "Grammar 1 · customs",
+    "title": "Present Simple + useful chunks",
+    "examples": [
+     "People <b>decorate</b> their houses. Children <b>dress up</b>.",
+     "It <b>is celebrated</b> on 31 October. It <b>takes place</b> in November.",
+     "<b>on</b> 31 October · <b>in</b> November · <b>at</b> Christmas"
+    ]
+   }
+  },
+  {
+   "id": "b12",
+   "en": "To explain origins, use the Past Simple and used to: It started in sixteen twenty-one. People used to light bonfires. And to add information, use relative clauses: a festival which marks the harvest, people who travel home.",
+   "slide": {
+    "type": "grammar",
+    "kicker": "Grammar 2 · origins and details",
+    "title": "Past Simple · used to · who / which / where",
+    "examples": [
+     "It <b>started</b> in 1621.",
+     "People <b>used to light</b> bonfires.",
+     "a festival <b>which</b> marks the harvest · people <b>who</b> travel home"
+    ]
+   }
+  },
+  {
+   "id": "b13",
+   "en": "To plan the day, you need the future. Going to for plans: We're going to decorate the hall. Will for decisions and predictions: I'll bring the music. Everyone will love it. The Present Continuous for arrangements: We're meeting the head teacher on Monday. And the Present Simple for timetables: The event starts at ten.",
+   "slide": {
+    "type": "grammar",
+    "kicker": "Grammar 3 · the future",
+    "title": "Which future?",
+    "examples": [
+     "plan: We<b>'re going to decorate</b> the hall.",
+     "decision: I<b>'ll bring</b> the music.",
+     "prediction: Everyone <b>will love</b> it.",
+     "arrangement: We<b>'re meeting</b> the head teacher on Monday.",
+     "timetable: The event <b>starts</b> at 10.00."
+    ]
+   }
+  },
+  {
+   "id": "b14",
+   "en": "For the email, be polite and formal: Dear Ms Smith, I am writing to propose a celebration day. Could we use the school hall? I look forward to hearing from you. And to compare cultures: both, similar to, different from, and whereas.",
+   "slide": {
+    "type": "grammar",
+    "kicker": "Grammar 4 · formal email and comparing",
+    "title": "Polite and formal",
+    "examples": [
+     "Dear Ms Smith, &nbsp; <b>I am writing to propose</b> …",
+     "<b>Could we use</b> the school hall?",
+     "<b>I look forward to hearing</b> from you. &nbsp; Yours sincerely,"
+    ],
+    "note": "both … and · similar to · different from · whereas"
+   }
+  },
+  {
+   "id": "b15",
+   "en": "And the vocabulary: seasons and weather, like chilly, or the days get shorter. Celebrations, like a parade, fireworks and decorations. Verbs, like dress up, light candles and get together. Feelings, like grateful and proud. And planning, like set up and send invitations.",
+   "slide": {
+    "type": "vocab",
+    "kicker": "Vocabulary",
+    "groups": [
+     [
+      "Seasons and weather",
+      "autumn · chilly · the days get shorter"
+     ],
+     [
+      "Celebrations",
+      "parade · fireworks · decorations · costume"
+     ],
+     [
+      "Verbs",
+      "dress up · light candles · get together"
+     ],
+     [
+      "Feelings",
+      "excited · grateful · proud"
+     ],
+     [
+      "Event planning",
+      "set up · send invitations · make a timetable"
+     ],
+     [
+      "Email",
+      "Dear … · I am writing to … · Yours sincerely"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "b16",
+   "en": "Do the learning paths in order: each one gives you a piece of your final product. So, which celebration will you bring to school? Let's celebrate!",
+   "slide": {
+    "type": "end",
+    "title": "Let's celebrate!",
+    "text": "Which celebration will <b>you</b> bring to school?",
+    "img": "video/halloween-castanyada-poster.jpg"
+   }
+  }
+ ],
+ "goals": [
+  "<b>Understand</b> articles, videos and people explaining how they celebrate; work out words from context",
+  "<b>Check</b> information in at least two sources, rate them and credit them",
+  "<b>Explain</b> a celebration: customs, dates, origins and what it means",
+  "<b>Compare</b> it with a local celebration and avoid stereotypes",
+  "<b>Plan</b> a school celebration day and propose it in a formal email"
+ ]
+}
