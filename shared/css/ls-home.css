@@ -119,7 +119,7 @@ a.btn:hover{background:var(--c)}
 .ab .ab-lead{color:var(--muted);margin:0 0 12px}
 .ab h2{font-size:1.3rem}
 .k1{--k:#0f766e;--ks:#ccfbf1}.k2{--k:#1d4ed8;--ks:#dbeafe}.k3{--k:#c2410c;--ks:#ffedd5}.k4{--k:#15803d;--ks:#dcfce7}
-.k5{--k:#7e22ce;--ks:#f3e8ff}.k6{--k:#a16207;--ks:#fef3c7}.kd{--k:#4338ca;--ks:#e0e7ff}.kc{--k:#be185d;--ks:#fce7f3}
+.k5{--k:#7e22ce;--ks:#f3e8ff}.k6{--k:#a16207;--ks:#fef3c7}.kd{--k:#4338ca;--ks:#e0e7ff}.kc{--k:#be185d;--ks:#fce7f3}.kp{--k:#0e7490;--ks:#cffafe}
 .ab-chip{display:inline-flex;align-items:center;gap:4px;background:var(--ks);color:var(--k);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:800;white-space:nowrap}
 .ab-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:8px}
 .ab-objs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
@@ -157,9 +157,13 @@ a.btn:hover{background:var(--c)}
 .ab-do{display:block;font-size:14px;margin-top:6px}
 .ab-do em{color:var(--muted)}
 .ab-off{margin:0;padding:8px 12px 12px;font-size:14px;background:var(--ks);border-radius:0 0 12px 0}
-@media (max-width:1100px){.ab-flow{grid-template-columns:repeat(3,minmax(0,1fr))}.ab-flow li:nth-child(4)::before{display:none}}
+/* LS1 (5 steps, criteria without an official-wording drop-down) */
+.ab-flow.f5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.ab-objs.l5{grid-template-columns:repeat(auto-fit,minmax(175px,1fr))}.l5 .ab-oh{align-items:flex-start;flex-wrap:wrap}.l5 .ab-oh b{font-size:16px;flex-basis:100%}
+.ab-crit .ab-in{display:block;padding:10px 12px}.ab-flat .ab-ch::after{content:none}
+@media (max-width:1100px){.ab-flow,.ab-flow.f5{grid-template-columns:repeat(3,minmax(0,1fr))}.ab-flow li:nth-child(4)::before{display:none}}
 @media (max-width:980px){.ab-crits{grid-template-columns:1fr}}
-@media (max-width:640px){.ab-flow{grid-template-columns:repeat(2,minmax(0,1fr))}.ab-flow li:nth-child(4)::before{display:block}.ab-flow li:nth-child(odd)::before{display:none}}
+@media (max-width:640px){.ab-flow,.ab-flow.f5{grid-template-columns:repeat(2,minmax(0,1fr))}.ab-flow li:nth-child(4)::before{display:block}.ab-flow li:nth-child(odd)::before{display:none}}
 @media print{.ab-crit{break-inside:avoid}}
 
 /* shadowing video window */
