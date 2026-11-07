@@ -462,11 +462,12 @@ window.elStudentMenu=function(o){
   const lss=o.lss||elMenuLs(cs,o.group),q=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const b=(k,cls,h,ic,txt,x)=>{const on=k&&k===here;return `<a class="nv${cls}${on?" on":""}" href="${h}"${on?' aria-current="page"':""}${x||""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`};
   const bq=board.split("#")[0];
-  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))
+  // Practise right below My dashboard (Roger, 7 Nov 2026: "practice should be below my dashboard")
+  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
     +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
       +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
     +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary")):"")
-    +b("games","",R+"lab/","🎲",t("Jocs","Games"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
+    +b("games","",R+"lab/","🎲",t("Jocs","Games"))
     +(window.EL_MENU_HOWTO?b("","",`${R}video/how-english-lab-works${t("-ca","")}.mp4?v=20261102c`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"'):"")
     +b("help","",bq+"#help","❓",t("Ajuda","Help"))
     +(o.app?"":b("phone","",bq+"#phone","📱",t("Estudia amb el mòbil","Study on your phone")));

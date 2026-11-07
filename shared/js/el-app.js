@@ -84,10 +84,11 @@
       L.push(["games", "🎲", "Games", "Games", ROOT + "lab/"]);
     } else {
       L.push(teach ? ["dash", "📊", "Dashboard", "Dashboard", dash] : ["board", "🏠", t("El meu tauler", "My dashboard"), t("El meu tauler", "My dashboard"), board]);
+      if (!teach) L.push(["practise", "🎯", t("Practica", "Practise"), t("Practica", "Practise"), ROOT + "lab/practice.html"]);   // students: Practise right below My dashboard (Roger, 7 Nov 2026)
       if (lsLink) L.push(["ls", "📚", lsN + (lsT ? " · " + lsT : ""), lsN, lsLink]);
       if (c) L.push(["all", "🗂", t("Totes les Learning Situations", "All Learning Situations"), t("Totes les LS", "All LS"), ROOT + c + "/index.html"]);
       L.push(["games", "🎲", t("Jocs", "Games"), t("Jocs", "Games"), ROOT + "lab/"]);
-      L.push(["practise", "🎯", t("Practica", "Practise"), t("Practica", "Practise"), ROOT + "lab/practice.html"]);
+      if (teach) L.push(["practise", "🎯", t("Practica", "Practise"), t("Practica", "Practise"), ROOT + "lab/practice.html"]);
       if (!teach) L.push(["help", "❓", t("Ajuda", "Help"), t("Ajuda", "Help"), board + "#help"]);
     }
     if (mode === "home" && (who.role === "teacher" || who.role === "tester"))   // the teacher's lists: Courses and Learning Situations after Dashboard
