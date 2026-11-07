@@ -324,7 +324,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-lsvid]");i
 function gamesCard(ls){
   const all=Object.values(D.mg||{}).filter(g=>ls&&g.ls===ls.id);if(!all.length||!window.elGameStats)return "";
   const st=elGameStats(all);
-  return `<a class="hal games" href="${lsHref(ls)}#notes"><span class="rings">${elRing(st.grammar,"🧩 "+t("Gramàtica","Grammar"))}${elRing(st.vocab,"📚 "+t("Vocabulari","Vocabulary"))}</span><em class="lt"><b>${t("Jocs i teoria","Games and theory")}</b><small>${t("Mira els teus resultats i què has d'estudiar","See your results and what to study")}</small></em><span>${t("Obre","Open")} →</span></a>`}
+  return `<a class="hal games" href="${lsHref(ls)}#notes"><span class="rings">${elRing(st.grammar,"🧩 "+t("Gramàtica","Grammar"),0,window.elGameTip?elGameTip(all,"grammar",t(1,0)):"")}${elRing(st.vocab,"📚 "+t("Vocabulari","Vocabulary"),0,window.elGameTip?elGameTip(all,"vocab",t(1,0)):"")}</span><em class="lt"><b>${t("Jocs i teoria","Games and theory")}</b><small>${t("Mira els teus resultats i què has d'estudiar","See your results and what to study")}</small></em><span>${t("Obre","Open")} →</span></a>`}
 function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="todo")return todoBox(lss,ls,info)+(only(ls.id)?"":weekBox(ls,info,true));
   if(place==="hw")return homeworkBox(ls,info);
