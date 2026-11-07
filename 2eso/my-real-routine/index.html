@@ -46,21 +46,18 @@
         <div class="hr">
           <a class="chal" href="#final"><span class="k" data-ca="El teu repte · producte final">Your challenge · final product</span><b>Present a classmate’s real routine</b><span class="d">Interview a classmate, prepare Google Slides and record a video with your face and slides visible together. All routes judge whether the routine is healthy; Daring also compares it with your own.</span><span class="go" data-ca="Mira què has de fer →">See what to do →</span></a>
           <div class="tiles">
-            <a class="tile" href="#study"><span class="ti" aria-hidden="true">📚</span><span><b data-ca="Estudia">Study</b><small data-ca="resum, paraules i gramàtica">summary, words and grammar</small></span></a>
             <a class="tile" href="vocabulary-games.html"><span class="ti" aria-hidden="true">🎮</span><span><b data-ca="Jocs de vocabulari">Vocabulary games</b><small>6 games · 3 routes</small></span></a>
             <a class="tile" href="sample-exam.html"><span class="ti" aria-hidden="true">📝</span><span><b data-ca="Examen de mostra">Sample exam</b><small>35 questions · 3 routes</small></span></a>
-            <a class="tile" href="#about"><span class="ti" aria-hidden="true">ⓘ</span><span><b data-ca="Sobre aquesta LS">About this LS</b><small data-ca="què aprendràs i com t'avaluem">what you learn and how you are assessed</small></span></a>
+            <a class="tile wd" href="#about"><span class="ti" aria-hidden="true">ⓘ</span><span><b data-ca="Sobre aquesta LS">About this LS</b><small data-ca="què aprendràs i com t'avaluem">what you learn and how you are assessed</small></span></a>
             <a class="tile" href="../../shared/print/index.html" data-el-teacher hidden><span class="ti" aria-hidden="true">🖨</span><span><b>Paper worksheets</b><small>teacher only · print per route + keys</small></span></a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 📚 Study: the vocabulary and grammar summary and the reading book (el-cloud.js fills both with the student's route), then the language of the LS -->
-    <section class="place" data-place="study" hidden>
-      <h2 class="pt" data-ca="📚 Estudia">📚 Study</h2>
-      <article class="bigcard" data-el-study hidden style="background:#f0fdf4;border-color:#bbf7d0"></article>
-      <article class="bigcard" data-el-story hidden style="background:#fff7ed;border-color:#fed7aa"></article>
+    <!-- The grammar and vocabulary of this LS, never shown here: the board's 🔤 Grammar and vocabulary place reads these lists (today.html,
+         langLists). No 📚 Study place any more (Roger, 7 Nov 2026: "we don't need this, nor do we need them in the other LS"). -->
+    <div data-ls-lists hidden>
       <div class="cols">
         <article class="bigcard">
         <h2>Grammar</h2>
@@ -83,7 +80,7 @@
         </ul>
         </article>
       </div>
-    </section>
+    </div>
 
     <!-- ⓘ About this LS: objectives, how we work, competences and assessment criteria (from the programme) -->
     <section class="place" data-place="about" hidden>
