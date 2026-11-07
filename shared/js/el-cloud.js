@@ -357,7 +357,7 @@ async function gate(u){
       if(confirm(ca?"Activitat marcada com a feta. Vols entregar-la ara? (La nota quedarà fixada.)":"Activity marked as done. Do you want to submit it now? (Your result will be fixed.)"))await rset(resultPayload(a,{locked:true,markedDone:true}));
       location.reload()}});
   }
-  pullBar(info,a,ca);
+  // no 📌 pull-up bar any more: 🎓 class mode takes students to the page (Roger, 7 Nov 2026: "we dont need this … in class mode I pull them up")
   openHashTab();
   // Work left in this browser that the cloud does not have yet (for example done while the LS was still "public") reaches the cloud now.
   push();
