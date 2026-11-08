@@ -186,6 +186,11 @@
   #tpmore .tpl span{flex:1;min-width:0}
   #tpmore .tpl small{display:block;color:#586174;font-size:12.5px;font-weight:500;margin:1px 0 0}
   #tpmore .tpl a::after{content:"";width:8px;height:8px;border-right:2px solid #94a3b8;border-top:2px solid #94a3b8;transform:rotate(45deg);margin-right:4px;flex:none}
+  /* the wide tables (Students, Marks…): the sticky name column narrow, the name on two lines, so the columns next to it show (it took
+     260 px of a 390 px screen: only Student and Route were visible) */
+  body.tph .wrap th.stu,body.tph .wrap td.stu{min-width:118px;width:118px;max-width:118px;white-space:normal;overflow-wrap:break-word;font-size:12.5px;line-height:1.25;padding:4px 5px}
+  body.tph .wrap td.stu a.gnotes{display:inline-block;margin:2px 0 0;font-size:12px}
+  body.tph .wrap td.gr .route{white-space:normal;display:inline-block;font-size:11px}
   /* the account bar (bell, Sign out) goes to the end of the page, as on the students' pages */
   body.tph #el-cloud-bar{position:static!important;margin:16px 0 0;border-radius:14px!important;flex-wrap:wrap;justify-content:center}
 }
