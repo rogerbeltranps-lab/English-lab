@@ -132,6 +132,20 @@
     const sh = x => x.k === "board" ? t("Inici", "Home") : x.short;   // the board's bottom bar says Home
     b.innerHTML = L.map(x => `<a${x.on ? ' class="on" aria-current="page"' : ""} href="${x.h}"><i aria-hidden="true">${x.i}</i><span>${esc(sh(x))}</span></a>`).join("");
     document.body.classList.add("elhas-bar");
+    // a student on a phone (≤640 px): the students' tab bar of every page instead (elPhoneTabs in el-catalog.js, el-phone.css; Roger, 8 Nov 2026),
+    // and Practise and Games as the two halves of its Practise tab
+    if (who.role === "student" && window.elPhoneTabs) {
+      const board = who.as ? ROOT + "today.html?student=" + encodeURIComponent(who.as) : ROOT + "today.html";
+      elPhoneTabs({ root: ROOT, board, ls: curLs, here: mode === "lab" ? "practise" : mode === "lp" || mode === "games" ? "ls" : "", ca: CA });
+      if (mode === "lab") {
+        const main = $("main.content");
+        let sg = $(".elpseg");
+        if (main && !sg) { sg = document.createElement("nav"); sg.className = "elpseg"; main.before(sg); }
+        if (sg) { const pr = /practice\.html$/.test(path);
+          sg.setAttribute("aria-label", t("Practica o jocs", "Practise or games"));
+          sg.innerHTML = `<a href="${ROOT}lab/practice.html"${pr ? ' class="on" aria-current="page"' : ""}>${t("Practica", "Practise")}</a><a href="${ROOT}lab/"${pr ? "" : ' class="on" aria-current="page"'}>${t("Jocs", "Games")}</a>`; }
+      }
+    }
   }
   function side(L) {   // Games and Practise: their side menu, as the board's buttons
     const tabs = $(".sidebar .nav-tabs");
@@ -293,7 +307,7 @@
       : who.role !== "none" || mode === "lp" || mode === "games";   // course pages and English Lab keep the public look when signed out
     document.body.classList.toggle("elapp", on);
     document.body.classList.add("el" + mode);
-    if (!on) { $$(".elrail,.elbar,.elside,.elcrumb").forEach(e => e.remove()); document.body.classList.remove("elhas-rail", "elhas-bar"); return; }
+    if (!on) { $$(".elrail,.elbar,.elside,.elcrumb,.elptabs,.elpseg").forEach(e => e.remove()); document.body.classList.remove("elhas-rail", "elhas-bar", "elptab"); return; }
     ownLevel();
     lpBar();
     lpLayout();

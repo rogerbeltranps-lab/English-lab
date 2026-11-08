@@ -491,6 +491,31 @@ window.elStudentMenu=function(o){
     +(o.app?"":b("phone","",bq+"#phone","📱",t("Estudia amb el mòbil","Study on your phone")));
 };
 
+// The phone's bottom tab bar for students (Roger, 8 Nov 2026: "la visió del mòbil necessita un gran remodelació … no ha de tenir
+// exactament el mateix que la visió web però sí la mateixa funcionalitat"; mockup option A): the same five tabs on every student page,
+// shown only at ≤640 px wide (shared/css/el-phone.css); a computer or a Chromebook never sees it. Home · To do · LSn (the LS page) ·
+// Practise (Practise and Games) · Me (the board's #me place: level, marks, books, help, problem, idea). The board keeps the To do and
+// Homework counts in localStorage (el_ptabs) so the other pages show the same badge with no Firestore read.
+// o: {root (site root URL), board (the board's URL, ?student= in the teacher's student view), ls (the LS object or id the LS tab opens),
+// here: "home"|"todo"|"ls"|"practise"|"me", ca (Catalan labels), todo (badge; default the board's last count)} → puts nav.elptabs on the page
+window.elPhoneTabs=function(o){
+  const R=o.root||"",t=(ca,en)=>o.ca?ca:en,bq=(o.board||R+"today.html").split("#")[0];
+  const L=typeof o.ls==="string"?(window.EL_LS||[]).find(l=>l.id===o.ls):o.ls;
+  const lsH=L?R+L.course+"/"+L.id.slice(L.course.length+1)+"/index.html":bq+"#units",lsN=(L&&window.elLsNum&&elLsNum(L))||"LS";
+  let n=o.todo;if(n==null)try{n=(JSON.parse(localStorage.getItem("el_ptabs")||"{}")||{}).todo||0}catch(e){n=0}
+  const sv=p=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  const I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',todo:'<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="m8 12 3 3 5-6"/>',
+    ls:'<path d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h12"/>',practise:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    me:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'};
+  const it=[["home",bq,t("Inici","Home")],["todo",bq+"#todo",t("Per fer","To do")],["ls",lsH,lsN],["practise",R+"lab/practice.html",t("Practica","Practise")],["me",bq+"#me",t("Jo","Me")]];
+  let b=document.querySelector("nav.elptabs");
+  if(!b){b=document.createElement("nav");b.className="elptabs";document.body.append(b)}
+  b.setAttribute("aria-label",t("Menú","Menu"));
+  b.innerHTML=it.map(([k,h,l])=>{const on=k===o.here;return `<a href="${h}"${on?' class="on" aria-current="page"':""}><span class="pi">${sv(I[k])}</span><span class="pl">${l}</span>${k==="todo"&&n?`<b>${n>99?"99+":n}</b>`:""}</a>`}).join("");
+  document.body.classList.add("elptab");
+  return b;
+};
+
 // On an LS (its home and its learning paths) the students' side menu is a strip of icons that opens over the page (Roger, 8 Nov 2026:
 // "when students are on the LS, to see better the screen, I want the menu to hide and only show the emoji or logos of each side. If the
 // mouse goes on the section the menu gets bigger"). el-app.js (.elrail) and el-ls-home.js (aside.side) set body.elmini and call this with
@@ -532,7 +557,7 @@ window.elMiniRail=function(r){
   const st = document.createElement("style");
   st.id = "el-cmtab-css";
   st.textContent = "html.elcmtab .elrail .elside,html.elcmtab .elrail .eln,html.elcmtab aside.side .nvs,"
-    + "html.elcmtab .elbar,html.elcmtab .nvs-m,html.elcmtab #bnav{display:none!important}"
+    + "html.elcmtab .elbar,html.elcmtab .nvs-m,html.elcmtab #bnav,html.elcmtab .elptabs{display:none!important}"
     + "html.elcmtab:not(.elcmon) .elrail,html.elcmtab:not(.elcmon) aside.side{display:none!important}"
     + "html.elcmtab:not(.elcmon) body.elapp.elhas-rail{padding-left:0!important}"
     + "html.elcmtab:not(.elcmon) .app{grid-template-columns:minmax(0,1fr)!important}"

@@ -1,0 +1,61 @@
+/* English Lab on a phone (Roger, 8 Nov 2026: "Al chrome es veu molt bé i no vull cap canvi però la visió del mòbil necessita una gran
+   remodelació … no ha de tenir exactament el mateix que la visió web però sí la mateixa funcionalitat"). He chose the app look of the
+   mockup (option A, https://claude.ai/artifact/WzvQoG2VFoRCpw3DTs1Uub): a bottom tab bar, stacked cards and touch-sized controls.
+   EVERY rule that changes a page is inside @media (max-width:640px): a computer or a Chromebook (≥641 px) must look exactly as before,
+   pixel for pixel (checked with screenshots before each change). Loaded by el-app.css (@import), so every student page has it; the
+   teacher dashboard links it itself.
+   1. Students' tab bar (elPhoneTabs in el-catalog.js): Home · To do · LSn · Practise · Me, on every student page. */
+.elptabs{display:none}
+@media (max-width:640px){
+  body.elptab .elptabs{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:9000;margin:0;background:rgba(255,255,255,.97);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid #e2e8f0;box-shadow:0 -2px 12px rgba(15,23,42,.06);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));font:700 11px/1.15 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+  body.elptab .elptabs a{flex:1 1 0;min-width:0;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    color:#586174;text-decoration:none;position:relative;-webkit-tap-highlight-color:transparent}
+  body.elptab .elptabs .pi{width:54px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+  body.elptab .elptabs .pl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  body.elptab .elptabs a.on{color:#2443ad}
+  body.elptab .elptabs a.on .pi{background:#e0e7ff}
+  body.elptab .elptabs a:active .pi{background:#eef2ff}
+  body.elptab .elptabs b{position:absolute;top:1px;left:calc(50% + 6px);background:#dc2626;color:#fff;border-radius:999px;font-size:10px;font-weight:800;padding:1px 6px;line-height:1.4}
+  /* the old bottom bars give way to it */
+  body.elptab #bnav,body.elptab .bnav,body.elptab .elbar{display:none!important}
+  body.elptab{padding-bottom:calc(74px + env(safe-area-inset-bottom))!important}
+  body.elptab #el-todo-btn{bottom:calc(86px + env(safe-area-inset-bottom))!important}
+  /* iPhone Safari zooms the whole page into a field whose text is smaller than 16 px (Roger's screenshot 3-safari-zooms-on-tap.png) */
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]):not([type=submit]),select,textarea{font-size:16px!important}
+}
+
+/* 2. Practise and Games: two halves of one tab (a switch at the top of both pages) */
+.elpseg{display:none}
+@media (max-width:640px){
+  body.elapp.ellab .app{align-content:start}   /* the switch is a row of the page's grid: it keeps its own height */
+  body .elpseg{display:flex;box-sizing:border-box;gap:4px;margin:12px 14px 0;padding:4px;background:#e8ecf3;border-radius:14px;font:700 14px/1.2 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+  body .elpseg a{flex:1;min-height:40px;padding:0 8px;font:700 14px/1.2 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#475569;text-decoration:none}
+  body .elpseg a.on{background:#fff;color:#0f172a;box-shadow:0 1px 4px rgba(15,23,42,.12)}
+}
+
+/* 3. The board's Me place (#me, today.html meBox: only the phone's Me tab opens it, so it has its look at any width) and the
+   To do / Homework switch (phone only) */
+.pseg{display:none}
+.pme{display:flex;flex-direction:column;gap:12px}
+.pme .pmeh{display:flex;align-items:center;gap:14px}
+.pme .pmea{width:56px;height:56px;flex:none;border-radius:50%;background:#3157d5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800}
+.pme .pmeh b{display:block;font-size:20px;line-height:1.2}
+.pme .pmeh small{color:#586174;font-size:14px}
+.pme .hlv{margin:0;white-space:normal}
+.pme h2{margin:6px 0 -4px;font-size:13px;font-weight:800;letter-spacing:.06em;color:#586174;text-transform:uppercase}
+.pme .pml{background:#fff;border:1px solid #e5e7eb;border-radius:18px;overflow:hidden}
+.pme .pml a,.pme .pml button{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:0 16px;box-sizing:border-box;border:0;border-top:1px solid #eef1f5;
+    border-radius:0;background:none;color:#0f172a;font:inherit;font-size:15px;font-weight:600;text-align:left;text-decoration:none;box-shadow:none;cursor:pointer}
+.pme .pml>:first-child{border-top:0}
+.pme .pml i{font-style:normal;font-size:20px;width:26px;text-align:center;flex:none}
+.pme .pml span{flex:1;min-width:0}
+.pme .pml small{display:block;color:#586174;font-size:12.5px;font-weight:500}
+.pme .pml a::after{content:"";width:8px;height:8px;border-right:2px solid #94a3b8;border-top:2px solid #94a3b8;transform:rotate(45deg);margin-right:4px;flex:none}
+@media (max-width:640px){
+  .pseg{display:flex;gap:4px;margin:0 0 12px;padding:4px;background:#e8ecf3;border-radius:14px}
+  body .pseg a{flex:1;min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;color:#475569;font-weight:700;font-size:14px;text-decoration:none}
+  body .pseg a.on{background:#fff;color:#0f172a;box-shadow:0 1px 4px rgba(15,23,42,.12)}
+  .pseg a em{font-style:normal;background:#dc2626;color:#fff;border-radius:999px;font-size:11px;padding:0 6px}
+}
