@@ -36,6 +36,20 @@ html.elgate.elwait:not(.elready) body{animation-delay:8s}
 .side .nv.sub.on .ic,.elside .nv.sub.on .ic{background:#fff}
 .side .nv.sub.on::after,.elside .nv.sub.on::after{color:#3157d5}
 .side .nvh{padding-top:10px}
+/* the sticky side menu is exactly one screen tall, padding included: with its padding added to 100vh it hung below the screen and its
+   top (the brand, My dashboard) slid away at the end of a page; when the menu is longer than the screen it scrolls on its own */
+.app>.side,.app>.sidebar{box-sizing:border-box;overflow-y:auto}
+/* a short screen (Chromebook, 1366×768: about 650 px of page under the browser bar): smaller buttons, so the whole menu fits and its
+   last items (Help, Study on your phone) are not cut off at the bottom (Roger, 8 Nov 2026: "students can't see the bottom side") */
+@media (min-width:981px) and (max-height:820px){
+  .side,.elrail{padding:14px 14px!important;gap:14px!important}
+  .side .nvs,.elside{gap:5px}
+  .side .nv,.elside .nv{padding:4px 10px 4px 5px;font-size:14px;gap:9px;line-height:1.2}
+  .side .nv .ic,.elside .nv .ic{width:28px;height:28px;font-size:15px;border-radius:8px}
+  .side .nv.sub,.elside .nv.sub{padding:3px 8px 3px 5px;font-size:13px}
+  .side .nv.sub .ic,.elside .nv.sub .ic{width:24px;height:24px;font-size:13px}
+  .side .nv::after,.elside .nv::after{font-size:17px}
+}
 /* phone/top scrolling rows keep the pill look (the board's .mtabs) */
 .mtabs .nv .ic{display:none}.mtabs .nv::after{content:none}
 
@@ -124,6 +138,10 @@ body.ellp2 header.hero{display:none!important}
    column; Roger, 7 Nov 2026: "here there's too much space") */
 .ellpgrid{display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;align-items:start;max-width:1600px;margin:0;padding:16px 24px 40px;box-sizing:border-box}
 body.ellp2 main#lp{max-width:none!important;width:auto!important;margin:0!important;padding:0!important;min-width:0}
+/* the room for the floating bottom bar (el-cloud.js keepBarSpace) goes under the step, inside the grid: below the grid it pushed the
+   sticky steps column up at the end of the page */
+body.ellp2 #el-cloud-bar-space{display:none}
+body.ellp2 main#lp{padding-bottom:var(--el-bar-space,0px)!important}
 body.ellp2 .lp-body{display:block!important}
 .ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin}
 .ellp-head{display:flex;flex-direction:column;gap:6px}
