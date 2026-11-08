@@ -673,7 +673,13 @@ function wrState(u,a,k){if(!window.ELMark)return null;const st=pstate(u,a);if(!i
   if(rp&&!fs)return {i:"✏️ answered",t:"You answered it by hand",c:"wrk"};
   if(fl&&fl.done==="redo"&&!(String(it.date||"")>String(fl.at||"")))return fl.back?{i:"↩ sent back",t:"You sent it back"+(fl.at?" on "+String(fl.at).slice(0,10):"")+": waiting for the new version",c:"wrc"}:{i:"🔁 redo",t:fl.auto?"Mostly pasted: sent back automatically on Wednesday to redo (note sent)":"Possible copy: sent back to redo (note sent)",c:"wrc"};
   return {i:late?"❌ late":fs?"📨 new":"📨 Wed",t:(fs?"New version handed in after the correction":"Handed in")+on+(late?": it should have been corrected in the last Wednesday run":": corrected in the Wednesday run"),c:late?"wrx":"wrw"}}
-const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return w?`<br><small class="wr ${w.c}" title="${esc(w.t)}: click to open" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button">${w.i}</small>`:""};
+// 🔊 the student's recording of a Speaking or Talk hand-in (Roger, 8 Nov 2026: "I should see an audio emoji which I can listen"): saved in
+// Teacher Studio › 04_Students (private) › Speaking recordings by the school Apps Script (el-mic.js upload); x.audio = {id, s}. It opens
+// in Drive, signed in as the teacher. No Firestore reads: it comes with the hand-in.
+const audioUrl=(id,p)=>"https://drive.google.com/file/d/"+encodeURIComponent(id)+"/"+(p||"view");
+const audioA=x=>x&&x.audio&&x.audio.id?` <a class="au" href="${audioUrl(x.audio.id)}" target="_blank" rel="noopener" title="Listen to the recording${x.audio.s?" ("+x.audio.s+" s)":""}" style="text-decoration:none">🔊</a>`:"";
+const audioBox=x=>x&&x.audio&&x.audio.id?`<p><b>🔊 Recording</b>${x.audio.s?` <small class="muted">(${x.audio.s} s)</small>`:""} · <a href="${audioUrl(x.audio.id)}" target="_blank" rel="noopener">open in Drive</a></p><iframe src="${audioUrl(x.audio.id,"preview")}" style="width:100%;height:90px;border:0" allow="autoplay"></iframe>`:"";
+const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return (w?`<br><small class="wr ${w.c}" title="${esc(w.t)}: click to open" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}" role="button">${w.i}</small>`:"")+audioA(((pstate(u,a)||{}).steps||{})[k])};
 // A write cell opens the correction (Roger, 4 Nov 2026: "I want to be able to click here and see the corrections"): Claude's correction
 // the way the student sees it (el-corrections.js writing(): their text with the mistakes underlined, the table Mistake · Correction · Why and
 // the corrected text), with the writing log; ⚠️ copy? opens the To do's Check dialog (the reason, the writing log, Accept or Redo in
@@ -692,7 +698,7 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
   const copy=fl&&fl.why&&!fl.back?`<p class="muted">⚠️ <b>Possible copy</b>${fl.at?" on "+on(fl.at):""}: ${esc(fl.why)} · ${fl.done==="redo"?(fl.auto?"sent back automatically to redo (mostly pasted)":"you sent it back to redo"):"you accepted it as their work"}${fl.auto&&fl.done==="redo"&&canBack===false?` <button class="g mini" data-do="cpopen" data-u="${u}" data-a="${esc(aid)}" data-s="${esc(step)}" title="Open the check: Accept it if it is their own work">Check it</button>`:""}</p>`:"";
   const text=v=>`<div class="hand"><p style="white-space:pre-wrap">${esc(v)}</p></div>`,more=ys=>ys.map(y=>`<p><b>${esc(y.l==="Text"&&/speak|talk/.test(step)?"What they said (transcript)":y.l)}</b></p>${text(y.v)}`).join("");
   dlg(`<h3>${esc(w.i)} · ${name(s)}</h3><p class="muted">${esc(cpName(aid,step))} · ${esc(actTitle(aid))} · route ${LV[level(u,S.ls)]||"–"}${it.date?" · handed in "+on(it.date):""}${mkExam(u)?` · exam writing ${esc(mkExam(u))}`:""}</p>
-    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}
+    <p class="muted">${esc(w.t)}.</p>${log}${copy}${back}${audioBox(((pstate(u,a)||{}).steps||{})[step])}
     ${lv.length?`<p>${lv.map(([c,l])=>`${cpill(c)} <b style="color:${LVCOL[l]}">${l}</b>`).join(" ")}</p>`:""}
     ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
       :lv.length?`<p><b>Handed in</b> <small class="muted">(marked with a level, no written comment)</small></p>${more(f)}`
@@ -2708,7 +2714,7 @@ function handIns(u,a){
     const wait=waits(x,xr,id),ca=cas[id]&&cas[id].q===ELMark.q(x)&&cas[id],ask=wait&&ELMark.asked(x,xr,id)&&xr.ask[id];
     return `<details ${wait?"open":""}><summary>${esc(title)} · ✓ ${x.avg!=null?"self-assessment "+x.avg+"/4":""}${x.comment?" 💬":""}${x.peers&&x.peers.length?" 👥":""}${wait?(ELMark.asked(x,xr,id)?" 🙋 Claude left it to you":" ✉️ waiting for an answer"):rp[id]&&!(xr.fbBy||{})[id]&&!(xr.fbSig||{})[id]?" · answered":ca?" · answered by Claude":x.comment?" · no reply needed":""}</summary><div class="hand">`
       +(id==="prep"?[1,2,3,4,5].map(n=>`<p><b>Piece ${n}:</b> ${pc[n]?esc(pc[n].text):'<span class="muted">not saved</span>'}</p>`).join(""):"")
-      +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")
+      +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")+audioBox(x)
       +(x.rate||[]).map(r=>`<p>${r.v}/4 · ${esc(r.s)}</p>`).join("")
       +(x.peers||[]).map(q=>`<p>👥 ${esc(q.name)}: ${q.r.map(r=>r.v+" "+esc(r.s)).join(" · ")}</p>`).join("")
       +(x.comment?`<p><b>Comment:</b> ${esc(x.comment)}</p>`:"")
@@ -3213,7 +3219,7 @@ const procLine=(s,fp)=>{const ps=procRows(s,fp),n=ps.filter(p=>p.x).length,late=
 function answer(s,a,k,o,fp){const x=handedIn(s.uid,a)[k],t=(a.steps.find(y=>y[0]===k)||[])[1]||k,title=a.id===fp.id?"Step "+t:a.title+" · "+t;
   if(!x)return `<div class="ans"><h4>${esc(title)}</h4><p class="muted">Not handed in yet.</p></div>`;
   return `<div class="ans"><h4>${esc(title)} <small class="muted">· handed in ${day(x.date)}${x.avg!=null?" · self-assessment "+x.avg+"/4":""}</small></h4>`
-    +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br><span class="v">${f.v?esc(f.v):'<span class="muted">(empty)</span>'}</span></p>`).join("")
+    +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br><span class="v">${f.v?esc(f.v):'<span class="muted">(empty)</span>'}</span></p>`).join("")+audioA(x)
     +(o.rate&&(x.rate||[]).length?`<p><b>Self-check</b></p><ul class="rate">${x.rate.map(q=>`<li>${q.v}/4 · ${esc(q.s)}</li>`).join("")}</ul>`:"")
     +(x.comment?`<p><b>Comment to you:</b> ${esc(x.comment)}</p>`:"")+`</div>`}
 // Rubric rows quoted from the route's rubric (Insecure in Catalan), four tick boxes per row. items: [row, who, note]
