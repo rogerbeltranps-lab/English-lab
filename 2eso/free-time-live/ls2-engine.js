@@ -879,6 +879,20 @@ var LS2 = (function () {
      typeInstead) and stays open after a reload (sp.typed); the hand-in says typed: true. */
   const srOff = () => !SRC() || !!(window.elMic && elMic.srBroken && elMic.srBroken());
   const typeIn = (ta, sp) => { if (!ta) return; if (sp && !sp.typed) { sp.typed = 1; save(); } if (window.elMic && elMic.typeInstead) elMic.typeInstead(ta); else ta.readOnly = false; };
+  /* The recording goes to the teacher too (Roger, 8 Nov 2026: "I want you to save audios … an audio emoji which I can listen"): after a
+     hand-in, el-mic.js uploads the last recording made with this step's Record button to the teacher's Drive (school Apps Script). The
+     step then keeps audio = {id (Drive file), s (seconds)}, and a transcript made from the audio (Gemini, when the script has a key) is
+     added as a second field, so Wednesday's correction reads what was really said. The hand-in never waits for it or fails because of it. */
+  const keepAudio = (id, btn, msg) => {
+    if (!window.elMic || !elMic.upload) return;
+    elMic.upload({ btn, step: id, title: ((state.steps || {})[id] || {}).title || id, level }).then(r => {
+      const h = (state.steps || {})[id]; if (!r || !h) return;
+      if (!r.ok) { msg.textContent += ' ' + (ca() ? '(La gravació no s’ha pogut desar: la transcripció sí que s’ha entregat.)' : '(The recording could not be saved: your transcript was handed in.)'); return; }
+      h.audio = { id: r.id, s: r.secs || null };
+      h.f = (h.f || []).filter(x => !x.rec); if (r.tr) h.f.push({ l: ca() ? 'Transcripció de la gravació' : 'Transcript of the recording', v: String(r.tr).slice(0, 6000), rec: 1 });
+      save(); msg.textContent += ' 🔊 ' + (ca() ? 'Gravació desada.' : 'Recording saved.');
+    }).catch(() => {});
+  };
   function stopSR() { srActive = false; if (srTimer) clearTimeout(srTimer); try { if (recognition) recognition.stop(); } catch (e) {} }
   function downloadWav() { if (!recUrl) return; const a = document.createElement('a'); a.href = recUrl; a.download = 'ls2-2eso-lp' + LP.n + '-' + level + '.wav'; document.body.appendChild(a); a.click(); a.remove(); }
   /* Speaking hands in to the teacher (Roger, 3 Nov 2026: "que no vam dir que els listenings s'enviaven a Claude?"): no ChatGPT and no
@@ -929,7 +943,7 @@ var LS2 = (function () {
         if (n < min) { msg.className = 'feedback no'; msg.textContent = ca() ? 'La transcripció té ' + n + ' paraules: grava’t fent tota la tasca (almenys ' + min + ' paraules). La transcripció s’escriu sola mentre parles: torna’t a gravar.' : 'Your transcript has ' + n + ' words: record yourself doing the whole task (at least ' + min + ' words). The transcript is written by itself while you speak: record yourself again.'; return; }
         state.steps = state.steps || {};
         state.steps[p.id] = { level, title: tx(p.title), typed: sp.typed ? true : undefined, ty: window.elTyping ? elTyping.sum($('#speechTranscript').parentElement) : null, f: [{ l: ca() ? 'Transcripció' : 'Transcript', v: tr }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
-        keepSp(); complete(p.id); save(); handed();
+        keepSp(); complete(p.id); save(); handed(); keepAudio(p.id, 'startRecord', msg);
       };
     }
   });
@@ -1049,6 +1063,7 @@ var LS2 = (function () {
           state.steps[id] = { level, title: tx(p.title), typed: !nat && sp.typed ? true : undefined, ty: window.elTyping ? elTyping.sum($('#' + id + 'Tr') && $('#' + id + 'Tr').parentElement) : null, f: [{ l: nat ? 'Plan' : (ca() ? 'Transcripció' : 'Transcript'), v: text() }], rate: [], avg: null, comment: '', date: new Date().toISOString() };
           complete(id); save();
           msg.className = 'feedback ok'; msg.textContent = ca() ? 'Entregada ✓ El professor et tornarà la correcció aquí mateix.' : 'Handed in ✓ Your teacher’s correction will appear right here.';
+          if (!nat) keepAudio(id, id + 'Start', msg);
         };
       }
     };

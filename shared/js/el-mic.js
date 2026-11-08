@@ -135,6 +135,45 @@
     const b = show(); place(b); b.querySelector('.bar i').style.width = '0'; b.querySelector('.lv').textContent = ''; b.querySelector('.s').textContent = ''; say(t); b.querySelector('details').open = true;
   }
 
+  /* ---------- Recordings kept for the teacher (Roger, 8 Nov 2026: "I want you to save audios … I should see an audio emoji which I can
+     listen"). Every recording is also compressed (Opus, about 240 KB a minute) while it runs; the last one stays in memory with the
+     button that started it. A Speaking or Talk hand-in then calls elMic.upload({btn, step, title}): the school Apps Script
+     (tools/notify/school-mail.gs, action "audio") checks the student's sign-in, saves it in the teacher's Drive (Teacher Studio ›
+     04_Students › Speaking recordings › group) and answers {ok, id, secs, tr}: tr = a transcript made from the audio by Gemini when the
+     script has a key. Nothing is uploaded unless the student hands in; one recording is uploaded once. ---------- */
+  let clip = null;
+  const RELAY = 'https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec';
+  const MAX_BYTES = 6e6;
+  function clipOf(s) {
+    if (!window.MediaRecorder) return;
+    const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'].find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (e) { return false; } });
+    if (!mime) return;
+    const tr = s.getAudioTracks()[0]; if (!tr) return;
+    const rec = new MediaRecorder(s, { mimeType: mime, audioBitsPerSecond: 32000 }), parts = [], t0 = Date.now(), btn = anchor && anchor.id || '';
+    let done = false;
+    rec.ondataavailable = e => { if (e.data && e.data.size) parts.push(e.data); };
+    rec.onstop = () => { const secs = Math.round((Date.now() - t0) / 1000), blob = new Blob(parts, { type: mime.split(';')[0] });
+      if (secs >= 2 && blob.size > 2000) clip = { blob, secs, mime: mime.split(';')[0], btn, at: new Date().toISOString(), res: null }; };
+    const end = () => { if (done) return; done = true; try { if (rec.state !== 'inactive') rec.stop(); } catch (e) {} };
+    const stop = tr.stop.bind(tr); tr.stop = () => { end(); stop(); };   // the recorders stop their tracks with track.stop(), which fires no event
+    tr.addEventListener('ended', end);
+    rec.start(1000);
+  }
+  const b64 = blob => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1] || ''); r.onerror = no; r.readAsDataURL(blob); });
+  async function upload(meta) {
+    meta = meta || {};
+    const c = clip, C = window.ELCloud, u = C && C.auth && C.auth.currentUser;
+    if (!c || (meta.btn && c.btn && c.btn !== meta.btn) || !u) return null;
+    if (c.res) return c.res;                                         // handed in again with the same recording
+    if (c.blob.size > MAX_BYTES) return { ok: false, error: 'too long' };
+    const body = { idToken: await u.getIdToken(), action: 'audio', mime: c.mime, secs: c.secs, data: await b64(c.blob),
+      meta: { page: location.pathname, step: meta.step || '', title: meta.title || '', level: meta.level || '', group: (C.group && C.group()) || '', at: c.at } };
+    const r = await fetch(RELAY, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify(body) });
+    const j = await r.json();
+    if (j && j.ok) c.res = j;
+    return j;
+  }
+
   /* ---------- getUserMedia ---------- */
   const md = navigator.mediaDevices;
   if (md && md.getUserMedia) {
@@ -149,6 +188,7 @@
         } else s = await orig(c);
       } catch (e) { if (audioOnly) blocked(e); throw e; }
       if (audioOnly) try { watch(s); } catch (e) {}
+      if (audioOnly) try { clipOf(s); } catch (e) {}
       return s;
     };
   }
@@ -195,5 +235,5 @@
     } catch (e) {}
   });
 
-  window.elMic = { srBroken: () => srDead, text: srText, show, say, typeInstead };
+  window.elMic = { srBroken: () => srDead, text: srText, show, say, typeInstead, upload, clip: () => clip };
 })();
