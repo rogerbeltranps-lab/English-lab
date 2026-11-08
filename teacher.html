@@ -1104,6 +1104,12 @@ function navBack(p){const h=history.state;   // the ‹ link: Back when the scre
   goPlace(p)}
 addEventListener("popstate",e=>{const h=e.state&&e.state.el;if(!h||!S.D)return;const d=$("#dlg");if(d&&d.open)d.close();
   if(S.g!==h.g)S.tutor="all";S.g=h.g;S.place=h.p;S.ls=h.ls;S.year=h.y;S.navPop=true;render();scrollTo(0,0)});
+// 🎮 Games and theory (Roger, 8 Nov 2026: "in here, I need to see their games and theory statistics button"): one more tile on the group
+// page, opening the class games' results of this group and LS (lab/game/results.html: who played each game, % right, every answer and the
+// 📝 theory notes) in a new tab. The LS filter there is the games' own LS name (EL_GAMES .ls), found as in gamesOf below.
+const gamesTile=(grp,ls)=>{const l=EL_LS.find(y=>y.id===ls),lsT=l?l.title.split(" · ").pop().toLowerCase():"",c=grp.course||(ls||"").split("-")[0];
+  const gs=(window.EL_GAMES||[]).filter(g=>g.course===c&&lsT&&String(g.ls||"").toLowerCase().endsWith(lsT)),gl=(gs[0]||{}).ls||"";
+  return `<a class="tile" href="lab/game/results.html?g=${encodeURIComponent(grp.id)}${gl?"&ls="+encodeURIComponent(gl):""}" target="_blank" rel="noopener"><span class="ti">🎮${gs.length?`<span class="tb">${gs.length} games</span>`:""}</span><span><b>Games and theory</b><small>${gs.length?"class games of this LS: % right, each student's answers and theory notes":"no class games in this LS yet: results of every LS"}</small></span></a>`};
 const tTile=(p,ic,t,sub,badge,late,cls,g)=>`<a class="tile ${cls||""}" href="#" ${g?`data-do="tab" data-g="${g}"`:`data-do="place" data-p="${p}"`}><span class="ti">${g?`<b>${t}</b>`:ic}${badge?`<span class="tb ${late?"late":""}">${badge}</span>`:""}</span><span>${g?"":`<b>${t}</b>`}<small>${sub}</small></span></a>`;
 const tAlert=(p,ic,txt,go,cls)=>`<a class="hal ${cls||"late"}" href="#" data-do="place" data-p="${p}">${ic} ${txt}<span>${go} →</span></a>`;
 const placeHead=(back,p)=>`<div class="ph"><p class="crumb"><a class="back" href="#" data-do="place" data-p="home">‹ ${back}</a></p><h1 class="pt">${PLACES[p]?PLACES[p].join(" "):""}</h1></div>`;
@@ -1241,7 +1247,8 @@ function render0(){
       +tTile("marks","📊","Marks","LS grade, criteria, self-assessment")
       +tTile("students","👥","Students","levels, team points, student list")
       +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
-      +tTile("cov","🎯","Coverage","criteria, competences, grammar and lexicon worked, this LS and the year",(n=>n?n+" to check":"")(covGaps(grp,ls)),true)+`</div>`}
+      +tTile("cov","🎯","Coverage","criteria, competences, grammar and lexicon worked, this LS and the year",(n=>n?n+" to check":"")(covGaps(grp,ls)),true)
+      +gamesTile(grp,ls)+`</div>`}
   document.body.classList.toggle("gfs",!!(S.gfs&&document.querySelector("#main .lpall .wrap")));
   const w=document.querySelector("#main .wrap"),h=w&&w.querySelector("thead tr");if(h)w.style.setProperty("--h1",h.offsetHeight+"px");
 
