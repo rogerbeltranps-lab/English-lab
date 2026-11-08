@@ -247,6 +247,12 @@
   /* the level, in the top right-hand corner */
   body.tph .pchip .plv{position:absolute;top:3px;right:5px;padding:0 5px;border-radius:99px;font-size:9.5px;line-height:13px;font-weight:700;letter-spacing:.01em;box-shadow:0 0 0 1px rgba(15,23,42,.08)}
   body.tph .pchip .pnm{display:block}
+  /* the two % in the bottom corners, in a stronger shade of each colour (Roger: "the percentage number … on the left bottom and right bottom") */
+  body.tph{--pg3:#b91c1c;--pv3:#1d4ed8}
+  body.tph .pchip:has(.ppc){padding-bottom:17px;min-height:54px}
+  body.tph .pchip .ppc{position:absolute;bottom:3px;font-size:11px;line-height:13px;font-weight:800;font-variant-numeric:tabular-nums}
+  body.tph .pchip .ppc.g{left:9px;color:var(--pg3)}
+  body.tph .pchip .ppc.v{right:9px;color:var(--pv3)}
   /* no Route column: the level is in the chip, and the sheet changes it */
   body.tph .wrap table:has(td.stu>.pchip) th.rtc,body.tph .wrap td.stu:has(>.pchip)+td{display:none}
   body.tph .pchip.none{border-style:dashed;background:#fff;color:#475569}
