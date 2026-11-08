@@ -99,7 +99,7 @@
       return ks.filter(k=>ds.has(k)||!(off.includes(k)||((k==="cards"||k==="practice")&&off.includes("vocab"))))};
     let next=null;
     if(!all&&!closed)for(const {a} of rows){if(a.manual||dropped.includes(a.id)||!open(a)||done(a)||!vis(a).some(k=>!doneOf(a).has(k)))continue;
-      const cp=elCheckpointMissing(a,doneOf,open);next=cp?{a:cp,cp:true}:{a};break}
+      const cp=elCheckpointMissing(a,doneOf,open),k=vis(a).find(x=>!doneOf(a).has(x)&&!(a.skip||[]).includes(x));next=cp?{a:cp,cp:true}:{a,k};break}
     return {open,done,dropped,next,all,closed,vis};
   }
   // Students see only the learning paths the teacher has opened for their group (Roger, 6 Nov 2026: "I don't want students to see the
@@ -138,6 +138,9 @@
     const c=$("#cont");if(!c)return;
     const lpNum=a=>{const el=$(`a.lp[data-a="${a.id}"] .n`);return el?el.textContent.trim():""};
     const href=a=>a.path.split("/").pop();
+    // a step's tab and name, from EL_SECTIONS (as panelOf / tabName in today.html)
+    const secs=a=>(window.EL_SECTIONS||{})[a.id]||[],panel=(a,k)=>secs(a).some(y=>y[0]===k)?k:(k==="cards"||k==="practice")&&secs(a).some(y=>y[0]==="vocab")?"vocab":k;
+    const secName=(a,k)=>{const x=secs(a).find(y=>y[0]===panel(a,k));return x?x[1]:k==="check"?"Checkpoint":k.charAt(0).toUpperCase()+k.slice(1)};
     if(teach()){c.className="cont teach";c.innerHTML=`<div class="ck">Teacher view</div><div class="ct">Every learning path is open for you</div>`
       +`<div class="cs">Students see only the learning paths you have opened for them, with ✓ done, steps done and their next one (never anything locked).</div><a class="cgo" href="${dashHref()}">📊 Open ${esc(lsName(ls))} on the dashboard</a>`;c.hidden=false;return}
     if(S.closed){c.className="cont done";c.innerHTML=`<div class="ct">${t("Aquesta LS ja està tancada","This LS is closed")}</div><div class="cs">${t("Pots repassar el que vas fer i el feedback del professor.","You can review what you did and your teacher's feedback.")}</div><a class="cgo" href="${boardHref()}#marks">📊 ${t("Les meves notes","My marks")} →</a>`;c.hidden=false;return}
@@ -147,13 +150,37 @@
     const ks=elTabGroups(nx.a,S.vis(nx.a)),ds=doneOf(nx.a),n=ks.filter(g=>g.every(k=>ds.has(k))).length,num=lpNum(nx.a),title=nx.a.title.replace(/\s*\(warm-up\)$/,"");
     c.className="cont";
     c.innerHTML=`<div class="ck">${n?t("Continua on ho vas deixar","Continue where you left off"):t("El següent learning path","Your next learning path")}</div><div class="ct">${num&&/^\d+$/.test(num)?"LP"+num+" · ":""}${esc(title)}</div>`
-      +`<div class="cs">${nx.cp?t("Primer fes aquest checkpoint, sense apunts: obre el que ve després.","First do this checkpoint, without notes: it opens what comes next."):t("El learning path et marca el pas que toca.","The learning path shows you the next step.")}</div>`
-      +(ks.length?`<div class="crow"><div class="cbar"><span style="width:${Math.round(n/ks.length*100)}%"></span></div><span class="cn">${n} / ${ks.length} ${t("passos","steps")}</span></div>`:"")
-      +`<a class="cgo" href="${href(nx.a)}">▶ ${n?t("Continua","Continue"):t("Comença","Start")}</a>`;
+      // the next step by name, as on the student board (Roger, 8 Nov 2026: "this was very useful")
+      +`<div class="cs">${nx.cp?t("Primer fes aquest checkpoint, sense apunts: obre el que ve després.","First do this checkpoint, without notes: it opens what comes next."):nx.k?t("Següent pas","Next step")+": <b>"+esc(secName(nx.a,nx.k))+"</b>":t("El learning path et marca el pas que toca.","The learning path shows you the next step.")}</div>`
+      // bar, steps and the button on one row, as on the board (Roger, 8 Nov 2026: "the same but shorter ... the bar is very visual")
+      +`<div class="cbtns">`+(ks.length?`<div class="crow"><div class="cbar"><span style="width:${Math.round(n/ks.length*100)}%"></span></div><span class="cn">${n} / ${ks.length} ${t("passos","steps")}</span></div>`:"")
+      +`<a class="cgo" href="${href(nx.a)}${nx.k?"#"+encodeURIComponent(panel(nx.a,nx.k)):""}">▶ ${n?t("Continua","Continue"):t("Comença","Start")}</a></div>`;
     c.hidden=false;
   }
+  // ⓘ About this LS as a banner under the LS heading, the same card as on the student board (today.html aboutHtml; Roger, 8 Nov 2026:
+  // "and this should also be here"): goals as verb chips, competences in their colours, how many goals, competences and criteria, and
+  // Find out → the About place. Read from this page's About place; the About tile goes, as on the board. LS1 stays as it is.
+  function aboutBanner(){
+    if(ALL_LPS)return;
+    const ab=$('[data-place="about"]'),head=$('[data-place="home"] .lshead');if(!ab||!head)return;
+    const tile=$('.tiles a.tile[href="#about"]');if(tile)tile.hidden=true;
+    const tx=e=>e?e.textContent.replace(/\s+/g," ").trim():"";
+    const objs=[...ab.querySelectorAll(".ab-obj .ab-oh")].map(h=>({i:tx(h.querySelector(".ab-oi")),v:tx(h.querySelector("b"))})).filter(o=>o.v);
+    const comps=[...ab.querySelectorAll(".ab-comp")].map(e=>({k:([...e.classList].find(c=>/^k[0-9a-z]$/.test(c))||"").slice(1),i:tx(e.querySelector(".ab-ci")),n:tx(e.querySelector("b")).replace(/\s*\(.*\)\s*$/,"")})).filter(c=>c.n);
+    const crit=ab.querySelectorAll(".ab-crit").length;
+    const n=(k,ca1,en1,ca,en)=>k?`<span><b>${k}</b> ${k===1?t(ca1,en1):t(ca,en)}</span>`:"";
+    const nums=n(objs.length,"objectiu","goal","objectius","goals")+n(comps.length,"competència","competence","competències","competences")+n(crit,"criteri d'avaluació","assessment criterion","criteris d'avaluació","assessment criteria");
+    const ob=objs.map(o=>`<span class="abo">${o.i?`<i aria-hidden="true">${esc(o.i)}</i>`:""}${esc(o.v)}</span>`).join("");
+    const cp=comps.map(c=>`<span class="abc fk-${esc(c.k||"b")}">${c.i?`<i aria-hidden="true">${esc(c.i)}</i>`:""}${esc(c.n)}</span>`).join("");
+    let a=document.getElementById("lsAbout");if(!a){a=document.createElement("a");a.id="lsAbout";a.className="lsab";a.href="#about";head.after(a)}
+    a.innerHTML=`<span class="abi" aria-hidden="true">🧭</span>`
+      +`<span class="abt"><span class="abk">ⓘ ${t("Sobre aquesta LS","About this LS")}</span><b>${t("Què aprendràs i com t'avaluarem","What you will learn and how you are assessed")}</b>`
+      +(nums?`<span class="abn">${nums}</span>`:"")+`</span>`
+      +(ob||cp?`<span class="abx">${ob?`<span class="abr"><em>🎯 ${t("Objectius","Goals")}</em>${ob}</span>`:""}${cp?`<span class="abr"><em>🧩 ${t("Competències","Competences")}</em>${cp}</span>`:""}</span>`:"")
+      +`<span class="abgo">${t("Descobreix-ho","Find out")} →</span>`;
+  }
   function draw(){
-    lang();nav();place();
+    lang();nav();place();aboutBanner();
     // 📈 My formative assessment tile (Roger, 7 Nov 2026: "instead of study, my formative assessment"): the board's formative tab of this LS
     $$("[data-el-formative]").forEach(e=>{const b=boardHref();e.href=b+(b.includes("?")?"&":"?")+"ls="+encodeURIComponent(LS)+"#formative"});
     if(ST){const S=status();lpRows(S);contCard(S)}
