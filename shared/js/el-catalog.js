@@ -7,6 +7,7 @@
 // writing of every learning path is handed in to the teacher and corrected (Roger, 1 Nov 2026: "now we will mark the writings"), so it is a
 // scored step like the others: never put "write" in skip for a new LS.
 // manual:true = scored by the teacher (not by counting actions); delivered through Google Classroom, not in this site.
+// video:true = its video is uploaded on its own page (Submit tab, shared/js/el-video.js, into the teacher's Drive; Roger, 8 Nov 2026), not on Classroom.
 // steps: final-product steps (id, title) whose hand-ins (state.steps in the page's key) the dashboard shows; pieces: product-pieces key.
 // mode: "practice" = repeatable, "once" = can be submitted a single time.
 // self: the id of the LS's self-assessment panel (shared/js/el-self.js, on the Reflect page; Roger, 2 Nov 2026): the dashboard's Self-assessment box reads it.
@@ -111,7 +112,7 @@ window.EL_CATALOG=(function(){
         L("write-to-the-head-teacher.html","Write to the head teacher",["4.1","5.1","3.2","CC1 1.3"],"ls2Email4ESO",11,{steps:[["talk","Talk"]]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint44ESO",1,C),
         L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam4ESO",7,{graded:false}),
-        L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","3.2","4.2","5.1","6.1","CC1 1.3","CC3 3.2"],"ls2FinalProduct4ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
+        L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","3.2","4.2","5.1","6.1","CC1 1.3","CC3 3.2"],"ls2FinalProduct4ESO",0,{manual:true,video:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect4ESO",2,{graded:false,self:"self"})
       ];
     })(),
@@ -131,7 +132,7 @@ window.EL_CATALOG=(function(){
         L("write-your-vlog-script.html","Write your vlog script",["4.1","5.1","3.2"],"ls2Script2ESO",11,{steps:[["talk","Talk"]]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint42ESO",1,C),
         L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam2ESO",7,{graded:false}),
-        L("free-time-vlog.html","Final product: Free Time Vlog",["3.2","4.2","5.1","6.2","CD2 2.2","CD4 4.5"],"ls2FinalProduct2ESO",0,{manual:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["slides","2 · My slides"],["script","3 · My script"],["edit","4 · Record and edit"],["feedback","Feedback for my buddy"],["tips","5 · My tip"]],pieces:"ls2Products2ESO"}),
+        L("free-time-vlog.html","Final product: Free Time Vlog",["3.2","4.2","5.1","6.2","CD2 2.2","CD4 4.5"],"ls2FinalProduct2ESO",0,{manual:true,video:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["slides","2 · My slides"],["script","3 · My script"],["edit","4 · Record and edit"],["feedback","Feedback for my buddy"],["tips","5 · My tip"]],pieces:"ls2Products2ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect2ESO",2,{graded:false,self:"self"})
       ];
     })()

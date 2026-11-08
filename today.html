@@ -1124,7 +1124,7 @@ function lateBox(lss){const late=lateList(lss);if(!late.length)return "";
 function dueList(p,gi,i,info){const today=ELWeek.today(),ds=ELWeek.dueIn(p,gi,i).map(([id,d])=>[EL_CATALOG.find(x=>x.id===id),d]).filter(([a])=>a);
   if(!ds.length)return "";
   return `<ul class="due">${ds.map(([a,d])=>{const can=canDo(a,info),done=!a.manual&&isDone(a);
-    const st=a.manual?`<span class="tag">${t("es lliura al Classroom","handed in on Classroom")}</span>`:done?`<span class="ok">✔ ${t("Fet","Done")}</span>`:!can?`<small class="muted">🔒 ${t("encara no està oberta","not open yet")}</small>`:d<today?`<span class="lt">${t("Endarrerida","Late")}</span>`:`<span class="td">${t("Pendent","To do")}</span>`;
+    const st=a.manual?`<span class="tag">${a.video?t("el vídeo es puja a la seva pàgina","upload the video on its page"):t("es lliura al Classroom","handed in on Classroom")}</span>`:done?`<span class="ok">✔ ${t("Fet","Done")}</span>`:!can?`<small class="muted">🔒 ${t("encara no està oberta","not open yet")}</small>`:d<today?`<span class="lt">${t("Endarrerida","Late")}</span>`:`<span class="td">${t("Pendent","To do")}</span>`;
     return `<li><span>${esc(a.title)} <small class="muted">· ${t("fins al","by")} ${when(d)}</small></span>${st}${done?"":` <a class="go ${can?"":"off"}" href="${a.path}">${t("Obre","Open")}</a>`}</li>`}).join("")}</ul>`}
 function weekHtml(p,gi,i,info,title,now){const r=p.rows[i];if(!r)return "";const due=dueList(p,gi,i,info);
   return `<div class="wk ${now?"now":""}"><b>${title}</b> <small class="muted">${ELWeek.week(r,lang())}</small><div><small class="muted">${t("A classe:","In class:")}</small></div><div class="s">${esc(ELWeek.line(r.g?r.g[gi]||"":r.what||"",lang()))}</div>${r.note?`<div class="n">${esc(r.note)}</div>`:""}`
@@ -1276,7 +1276,7 @@ function detail(id){
     // the teacher's corrections of this path's steps (writing, speaking, Talk, logs…: results.replies; the final product's are listed above)
     +(()=>{const own=new Set((a.steps||[]).map(([sid])=>sid)),cs=Object.entries(rp).filter(([k,v])=>v&&!own.has(k));
       return cs.length?`<label>${t("Correccions del professor","Your teacher's corrections")}</label>`+cs.map(([k,v])=>`<div class="ans">✏️ <b>${esc(({write:t("Escriptura","Writing"),speak:"Speaking",talk:"Talk",reflect:t("Reflexió","Reflection")})[k]||k)}:</b> ${esc(v)} <a href="${a.path.split("/").map(encodeURIComponent).join("/")}#${encodeURIComponent(k)}">${t("Obre","Open")} →</a></div>`).join(""):""})()
-    +(a.manual&&a.graded?`<p class="muted">${t("Aquesta activitat es lliura pel Google Classroom i la puntua el professor.","This activity is handed in through Google Classroom and marked by your teacher.")}</p>`:"")
+    +(a.manual&&a.graded?`<p class="muted">${a.video?t("El vídeo es puja a la pestanya Entrega d’aquesta activitat i el puntua el professor.","The video is uploaded in this activity’s Submit tab and marked by your teacher."):t("Aquesta activitat es lliura pel Google Classroom i la puntua el professor.","This activity is handed in through Google Classroom and marked by your teacher.")}</p>`:"")
     +`<div class="row"><button class="g" data-do="close">${t("Tanca","Close")}</button><a class="go ${can?"":"off"}" href="${a.path}" style="padding:6px 12px;font-size:14px">${info.status==="closed"?t("Revisa","Review"):t("Obre","Open")}</a></div>`;
   if(!$("#dlg").open)$("#dlg").showModal();
 }
@@ -1320,7 +1320,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     const vg=tabGroups(a,vis),hand=vis.length?`<small class="muted">${vg.filter(g=>g.every(k=>ds.has(k))).length} / ${vg.length} ${vg.length===1?t("pestanya","tab"):t("pestanyes","tabs")}</small><br>`:"";
     let st;
     if(drop){st=`<span class="s-off">✂ ${t("No compta (no hi vam tenir temps)","Dropped · not counted")}</span>`}
-    else if(a.manual){st=x.max?`<span class="s-ok">✔ ${t("Corregit","Marked")}</span>`:`<span class="s-off">${t("Es lliura al Classroom","Handed in on Classroom")}</span>`}
+    else if(a.manual){st=x.max?`<span class="s-ok">✔ ${t("Corregit","Marked")}</span>`:`<span class="s-off">${a.video?t("Puja el vídeo a la seva pàgina","Upload the video on its page"):t("Es lliura al Classroom","Handed in on Classroom")}</span>`}
     else if(done){st=`<span class="s-ok">✔ ${t("Fet","Done")}${x.locked?t(" · entregat"," · submitted"):""}</span>`}
     else if(!can&&!TX){st=`<span class="s-off">${t("Fet en part","Partly done")}</span>`}   // students: one they did some of and can't open now, no lock
     else if(cp){st=`<span class="s-off">🔒 ${t(`Primer fes ${esc(cp.title)}`,`First do ${esc(cp.title)}`)}</span>`}

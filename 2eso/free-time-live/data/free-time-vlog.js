@@ -1,5 +1,5 @@
 /* 2 ESO · LS2 · Final product: Free Time Vlog (from the 2 ESO programme). Individual vlog (Roger, 25 Oct 2026); a same-route vlog buddy shares research
-   and gives feedback, nothing is marked in pairs. The video goes to Google Classroom; the script is pasted in step 3, so it is in the teacher's marking PDF.
+   and gives feedback, nothing is marked in pairs. The video is uploaded on this page (Submit tab, into the teacher's Drive); the script is pasted in step 3, so it is in the teacher's marking PDF.
    Marked by the teacher in two rounds (docs/2eso/ls2-free-time-live/final-product-assessment.md). */
 (function () {
   const pieceNames = { 1: 'Piece 1 · In this photo…', 2: 'Piece 2 · Usually… but today…', 3: 'Piece 3 · Fact file', 4: 'Piece 4 · Likes and screen tips', 5: 'Piece 5 · Vlog script' };
@@ -122,12 +122,14 @@
           safe: ['Face and slides are visible; clear voice', 'Now vs usually is clear', 'Three screen tips with imperatives', 'Photos and sources are credited'],
           daring: ['Face and slides are visible; clear voice', 'Now vs usually is clear, with a temporary situation', 'Three tips with reasons', 'Photos and sources are credited']
         } },
-      { id: 'submit', type: 'checklist', tab: { ca: 'Entrega', en: 'Submit' }, title: { ca: 'Entrega el producte final', en: 'Submit the final product' },
-        intro: { ca: 'El vídeo s’entrega al Google Classroom i el guió, al pas 3 d’aquesta pàgina. El professor ho puntua.', en: 'The video goes to Google Classroom and the script to step 3 on this page. Your teacher marks them.' },
+      // The vlog is uploaded here, into the teacher's Drive (Roger, 8 Nov 2026), no longer on Classroom: shared/js/el-video.js
+      { id: 'submit', type: 'checklist', video: true, videoActivity: '2eso/ls2-free-time-vlog', videoTitle: { ca: 'Free Time Vlog', en: 'Free Time Vlog' },
+        tab: { ca: 'Entrega', en: 'Submit' }, title: { ca: 'Entrega el producte final', en: 'Submit the final product' },
+        intro: { ca: 'Puja el vídeo aquí mateix i enganxa el guió al pas 3 d’aquesta pàgina. El professor ho puntua.', en: 'Upload your video right here and paste the script in step 3 on this page. Your teacher marks them.' },
         items: {
-          insecure: ['He pujat el vídeo (o l’enllaç) al Classroom', 'He enganxat el meu guió final al pas 3', 'He entregat el pas 4'],
-          safe: ['I have uploaded my video (or its link) to Classroom', 'I have pasted my final script in step 3', 'I have handed in step 4'],
-          daring: ['I have uploaded my video (or its link) to Classroom', 'I have pasted my final script in step 3', 'I have handed in step 4']
+          insecure: ['He pujat el meu vídeo aquí a dalt', 'He enganxat el meu guió final al pas 3', 'He entregat el pas 4'],
+          safe: ['I have uploaded my video above', 'I have pasted my final script in step 3', 'I have handed in step 4'],
+          daring: ['I have uploaded my video above', 'I have pasted my final script in step 3', 'I have handed in step 4']
         } },
       { id: 'tips', type: 'step', tab: { ca: 'Pas 5 · El meu consell', en: 'Step 5 · My tip' }, title: { ca: 'El consell de pantalla que aplico', en: 'The screen tip I am applying' },
         intro: { ca: 'Després d’entregar. Dels consells del teu vlog, quin apliques tu? Explica com va.', en: 'After you submit. Of the tips in your vlog, which one are you applying? Say how it is going.' },

@@ -1,4 +1,4 @@
-/* LS2 · Final product: Celebration Day Proposal (from the LS2 programme). The video goes to Google Classroom; the email is pasted in step 4,
+/* LS2 · Final product: Celebration Day Proposal (from the LS2 programme). The group video is uploaded on this page by one member (Submit tab, into the teacher's Drive); the email is pasted in step 4,
    so it is in the teacher's marking PDF. Marked by the teacher in two rounds (docs/4eso/ls2-seasons-and-celebrations/final-product-assessment.md). */
 (function () {
   const pieceNames = { 1: 'Piece 1 · Description', 2: 'Piece 2 · Our celebration', 3: 'Piece 3 · Research card', 4: 'Piece 4 · Event plan', 5: 'Piece 5 · Email' };
@@ -110,12 +110,14 @@
           safe: ['Everyone speaks; faces and slides are visible', 'Three sources are credited', 'The celebration is presented with respect', 'They name a stereotype and show how they avoid it', 'The plan of the day is clear'],
           daring: ['Everyone speaks; faces and slides are visible', 'Three sources are credited', 'The celebration is presented with respect', 'They name a stereotype and show how they avoid it', 'The plan of the day is clear']
         } },
-      { id: 'submit', type: 'checklist', tab: { ca: 'Entrega', en: 'Submit' }, title: { ca: 'Entrega el producte final', en: 'Submit the final product' },
-        intro: { ca: 'El vídeo s’entrega al Google Classroom i el correu, al pas 4 d’aquesta pàgina. El professor ho puntua.', en: 'The video goes to Google Classroom and the email to step 4 on this page. Your teacher marks them.' },
+      // The group video is uploaded here by one member, into the teacher's Drive (Roger, 8 Nov 2026), no longer on Classroom: shared/js/el-video.js
+      { id: 'submit', type: 'checklist', video: 'group', videoActivity: '4eso/ls2-celebration-day-proposal', videoTitle: { ca: 'Celebration Day Proposal', en: 'Celebration Day Proposal' },
+        tab: { ca: 'Entrega', en: 'Submit' }, title: { ca: 'Entrega el producte final', en: 'Submit the final product' },
+        intro: { ca: 'Una persona del grup puja el vídeo aquí mateix; cadascú enganxa el seu correu al pas 4 d’aquesta pàgina. El professor ho puntua.', en: 'One person in the group uploads the video right here; each of you pastes your own email in step 4 on this page. Your teacher marks them.' },
         items: {
-          insecure: ['He pujat el vídeo del grup (o l’enllaç) al Classroom', 'He enganxat el meu correu final al pas 4'],
-          safe: ['I have uploaded the group video (or its link) to Classroom', 'I have pasted my final email in step 4'],
-          daring: ['I have uploaded the group video (or its link) to Classroom', 'I have pasted my final email in step 4']
+          insecure: ['El vídeo del grup està pujat aquí a dalt (per mi o per un company)', 'He enganxat el meu correu final al pas 4'],
+          safe: ['Our group video is uploaded above (by me or a teammate)', 'I have pasted my final email in step 4'],
+          daring: ['Our group video is uploaded above (by me or a teammate)', 'I have pasted my final email in step 4']
         } },
       { id: 'team', type: 'step', tab: { ca: 'Pas 5 · Treball en equip', en: 'Step 5 · Teamwork' }, title: { ca: 'Treball en equip: reflexió i valoració dels companys', en: 'Teamwork: reflection and rating your teammates' },
         intro: { ca: 'Després d’entregar. Només el professor veu les teves respostes.', en: 'After you submit. Only your teacher sees your answers.' },
