@@ -199,6 +199,14 @@
    a shade with the percentage of the grammar and from the right to the middle another shade with the [vocabulary]"): each name is a chip
    "Roger C."; its left half fills from the left edge with 🧩 grammar %, its right half from the right edge with 📚 vocabulary % (class games
    of this LS). A tap opens a sheet with the name and first surname, both %, details, notes and answers. On a computer nothing changes. */
+/* 8b. The 👁 Student / 🎓 Class buttons on a phone (Roger, 8 Nov 2026, iPhone: they looked blurred: Safari on iOS 26 blurs the top
+   edge of the page, where they were fixed). They are in More (See the site as a student, Class mode) and on the group's Next class
+   card, so the phone hides them; while class mode is on or the student-view list is open, the box shows above the tab bar. */
+@media (max-width:640px){
+  body.tph #fsctl:not(.on):not(:has(.svpop)):not(:has(.fsbtn.on)){display:none}
+  body.tph #fsctl{top:auto;bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+  body.tph .tshell,body.tph .dhead{padding-top:28px!important}   /* a little room under Safari's blurred top edge */
+}
 /* 9b. The side-by-side board's "Full screen" on a phone (Roger, 8 Nov 2026: Safari on an iPhone has no full screen for pages): a focus
    view, body.tpfoc, that leaves the board alone on the screen: no tab bar, group switch, Student/Class buttons or page heading. */
 @media (max-width:640px){

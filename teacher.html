@@ -922,7 +922,7 @@ function phoneBar(){
         if(w==="chip"){TPH.chip=b.dataset.u;TPH.more=true;tphMore();return}
         if(w==="more"){TPH.more=!TPH.more||!!TPH.chip;TPH.chip=null;tphMore();return}
         TPH.more=false;TPH.chip=null;
-        if(w==="sv"){const v=document.querySelector('#fsctl [data-do="sview"]');tphMore();if(v)v.click();return}
+        if(w==="sv"||w==="cm"){const v=document.querySelector(w==="sv"?'#fsctl [data-do="sview"]':'#fsctl .cmbtn');tphMore();if(v)v.click();return}
         S.g="plan";S.place=w;S.year=false;render();scrollTo(0,0);return}
       if(TPH.more&&(!inM||e.target.closest("[data-do],a[href]")||e.target===inM)){TPH.more=false;TPH.chip=null;tphMore()}});
     document.addEventListener("keydown",e=>{if(e.key==="Escape"&&TPH.more){TPH.more=false;TPH.chip=null;tphMore()}});
@@ -961,7 +961,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   if(!TPH.more){m.innerHTML="";return}
   const r=(a,ic,t,sub)=>`<a href="#" ${a}><i aria-hidden="true">${ic}</i><span>${t}${sub?`<small>${sub}</small>`:""}</span></a>`,none=Object.values(S.P||{}).some(s=>!s.tester&&!s.group);
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
-    +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}</div>`
+    +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
     +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}</div>`
     +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
     +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
