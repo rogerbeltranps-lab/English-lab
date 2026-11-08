@@ -78,7 +78,8 @@ function doPost(e) {
   if (m.action === "video_chunk") return out(videoChunk(m));
   if (m.action === "video_status") return out(videoStatus(m));
   if (m.action === "fp_watch") return out(m.idToken && isTeacher(m.idToken) ? fpWatch(m) : {ok: false, error: "not the teacher"});
-  if (m.action === "fp_classroom") return out(m.idToken && isTeacher(m.idToken) ? fpClassroom(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_classroom") { if (!(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: "not the teacher"});
+    try { return out(fpClassroom(m)); } catch (x) { return out({ok: false, error: "Classroom: " + String(x && x.message || x).slice(0, 300)}); } }
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
   const clean = l => [].concat(l || []).map(a => String(a).trim()).filter(ok);
