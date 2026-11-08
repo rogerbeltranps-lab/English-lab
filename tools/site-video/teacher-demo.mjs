@@ -83,6 +83,16 @@ D.lv[a4[3].uid][LS2['4eso']] = Object.assign(D.lv[a4[3].uid][LS2['4eso']], { lev
 D.pb.push({ id: 'p1', uid: a4[5].uid, group: '4ESOA', kind: 'media', text: 'The audio of the listening does not play.', page: '4eso/seasons-and-celebrations/celebrations-around-the-world.html', title: 'Celebrations around the world', section: 'Listening', route: 'safe', device: 'Chromebook', created: Date.now() - 2 * 3600e3 });
 D.pb.push({ id: 'p2', uid: a4[9].uid, group: '4ESOA', kind: 'marking', text: '"It takes place in autumn" is marked wrong.', page: '4eso/seasons-and-celebrations/celebrations-around-the-world.html', title: 'Celebrations around the world', section: 'Grammar', route: 'insecure', device: 'Windows', created: Date.now() - 26 * 3600e3 });
 D.sg.push({ id: 's1', uid: a4[7].uid, group: '4ESOA', text: 'Could we have more vocabulary games for each Learning Path?', page: 'lab/index.html', created: Date.now() - 5 * 3600e3 });
+// the class games of LS2 (gameResults): a vocabulary and a grammar game for LP1-LP3 in every group, a few students absent from each
+const LS2T = { '2eso': 'LS2 · Free Time, Live!', '4eso': 'LS2 · Seasons & Celebrations' };
+D.games = [];
+for (const g of global.EL_GROUPS) {
+  const studs = Object.values(D.st).filter((s) => s.group === g.id), skill = Object.fromEntries(studs.map((s) => [s.email, [0.35 + rnd() * 0.65, 0.35 + rnd() * 0.65]]));
+  [1, 2, 3].forEach((lp) => ['vocab', 'grammar'].forEach((kind) => { const done = 10;
+    D.games.push({ group: g.id, course: g.course, kind, lsId: LS2[g.course], ls: LS2T[g.course], lp: 'LP' + lp, title: (kind === 'vocab' ? 'Vocabulary' : 'Grammar') + ' · LP' + lp, day: '2026-11-0' + (2 + lp), done,
+      stu: studs.filter(() => rnd() > 0.12).map((s) => ({ e: s.email.toLowerCase(), r: Math.min(done, Math.round(done * skill[s.email][kind === 'vocab' ? 1 : 0] * (0.8 + rnd() * 0.4))) })) });
+  }));
+}
 
 // none of the invented names may be a real student's (the private list, if it is on this machine)
 const LIST = process.env.EL_STUDENT_LIST;
