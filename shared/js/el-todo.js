@@ -43,11 +43,13 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
     const left=Object.entries(tg).flatMap(([id,ps])=>{const a=acts.find(y=>y.id===id);if(!a)return [];const d=doneOf(a),all=((window.EL_SECTIONS||{})[a.id]||[]).map(z=>z[0]).filter(k=>elSecSteps(a,k).length);
       return ((ps&&ps.length)?ps:all.length?all:[""]).filter(k=>k?!elSecSteps(a,k).every(z=>d.has(z)):!isDone(a)).map(k=>[a,k])});
     return {x,done:Object.keys(tg).length>0&&!left.length,href:left.length?href(left[0][0],left[0][1]):null}});
-  function counts(){return todo().length}   // the same number as the ✅ To do tile on the board
+  // the homework (set by the teacher) a learning path belongs to, for its 📝 homework by … tag; otherwise 🏫 in class (Roger, 8 Nov 2026)
+  const hwOf=a=>{const xs=W.studentHw(p,gi,((info||{}).homework||{})[group]);for(const x of xs){const tg=window.elHwTargets?elHwTargets(x,ls,p,gi)||{}:{};if(tg[a.id])return x}return null};
+  function counts(){return todo().reduce((n,x)=>n+(x.tabs.length||1),0)}   // activities (tabs), the same number as the ✅ To do tile on the board and 📋 My activities (late + opened)
   function panel(){const ex=W.exam(p,gi),n=ex?W.days(today,ex):null,td=todo(),hw=hws();
     const exam=ex&&n>=0?`<div class="ex">📝 ${t("Examen","Exam")}: ${W.date(ex,lang)}${n>1?t(` · d'aquí a ${n} dies`,` · in ${n} days`):n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
     const hwh=hw.length?`<div class="hw"><b>📝 ${t("Deures","Homework")}</b><ul>${hw.map(h=>`<li class="${h.done?"dn":""}"><span class="tt">${esc(W.taskText(h.x,lang))}</span>${h.done?`<span class="ok">✔ ${t("Fet","Done")}</span>`:h.href?`<a href="${h.href}">${t("Obre","Open")}</a>`:""}</li>${h.x.msg?`<li><details class="hwmsg"><summary>${t("Instruccions","Instructions")}</summary><div>${esc(h.x.msg).replace(/https?:\/\/[^\s<]+/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`)}</div></details></li>`:""}`).join("")}</ul></div>`:"";
-    const tdh=td.length?`<ul>${td.map(x=>{const a=x.a;return `<li class="it"><span class="tt"><b>${esc(num(a)+a.title.split(/[:(]/)[0].trim())}</b>`
+    const tdh=td.length?`<ul>${td.map(x=>{const a=x.a;return `<li class="it"><span class="tt"><b>${esc(num(a)+a.title.split(/[:(]/)[0].trim())}</b>${x.late?` <span class="lt">⏰ ${t("endarrerida","late")}</span>`:hwOf(a)?` <span class="hwt">📝 ${t("deures per al","homework by")} ${W.date(hwOf(a).date,lang)}</span>`:` <span class="cls">🏫 ${t("a classe","in class")}</span>`}`
         +(x.cp?`<br><small>⏱ ${t(`Primer fes el ${esc(x.cp.title)}`,`First do ${esc(x.cp.title)}`)}</small>`:x.tabs.length?`<br>${x.tabs.map(([id,nm])=>`<a class="tb" href="${href(a,id)}">${esc(nm)}</a>`).join(" ")}`:"")
         +`</span>${x.cp?`<a href="${href(x.cp)}">${t("Obre","Open")}</a>`:x.tabs.length?"":`<a href="${href(a)}">${t("Obre","Open")}</a>`}</li>`}).join("")}</ul>`
       :`<p class="cl">✓ ${t("Has acabat tot el que el professor ha obert.","You have finished everything your teacher has opened.")}</p>`;
@@ -68,7 +70,7 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
 #el-todo .tt{flex:1}#el-todo li.dn .tt{color:#64748b}
 #el-todo li a,#el-todo .la a{font-size:12px;color:#4338ca;border:1px solid #c7d2fe;border-radius:6px;padding:1px 7px;text-decoration:none;white-space:nowrap}
 #el-todo .ok{color:#16a34a;font-weight:600;font-size:12px;white-space:nowrap}#el-todo .td{color:#b45309;font-weight:600;font-size:12px;white-space:nowrap}
-#el-todo .lt{color:#b91c1c;font-weight:600;font-size:12px;white-space:nowrap}#el-todo .tg{color:#64748b;font-size:12px}
+#el-todo .lt{color:#b91c1c;font-weight:600;font-size:12px;white-space:nowrap}#el-todo .hwt{color:#0e7490;font-weight:600;font-size:12px;white-space:nowrap}#el-todo .cls{color:#4338ca;font-weight:600;font-size:12px;white-space:nowrap}#el-todo .tg{color:#64748b;font-size:12px}
 #el-todo .hwmsg summary{cursor:pointer;font-size:12px}#el-todo .hwmsg div{white-space:pre-wrap;font-size:12px;overflow-wrap:anywhere}#el-todo .hw{background:#ecfeff;color:#155e75;border-radius:8px;padding:5px 8px;margin-bottom:6px;font-size:13px}#el-todo .hw .cal{display:inline-block;margin-top:4px;font-size:12px;color:#0e7490;border:1px solid #a5f3fc;border-radius:6px;padding:1px 7px;text-decoration:none}
 #el-todo .ex{background:#fef3c7;border-radius:8px;padding:4px 8px;margin:2px 0 6px;font-size:13px}
 #el-todo .sp{background:#e0e7ff;color:#3730a3;border-radius:8px;padding:5px 8px;margin-bottom:6px;font-size:13px}
