@@ -393,7 +393,12 @@ var LS2 = (function () {
       (p.practice ? '<div class="section-card"><h3>' + (p.practiceMode === 'listen' ? (ca() ? 'Escolta i completa' : 'Listen and complete') : (ca() ? 'Completa les frases' : 'Complete the sentences')) + '</h3>' + (p.practiceMode ? '<p class="instruction">' + modeHow(p.practiceMode) + '</p>' : '') + '<div id="vocabPractice"></div><div class="actions"><button class="btn" type="button" id="vocabCheck">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn('vocab') + '</div><div class="result" id="vocabResult"></div></div>' : ''),
     bind() {
       const groups = forLevel(p.groups);
-      $('#vocabGroups').innerHTML = groups.map(g => '<article class="vocab-group"><h3>' + g.g + '</h3><div class="chips">' + g.items.map(x => '<span class="chip" tabindex="0">' + x[0] + '<span class="chip-tooltip"><b>' + x[1] + '</b>' + x[2] + '</span></span>').join('') + '</div></article>').join('');
+      /* Review words (Roger, 8 Nov 2026: "no flashcards that don't appear on the list"): the English → Català deck adds p.review
+         (words from earlier Learning Paths), so Explora shows them too, in one "Review" box per earlier path, after this path's words. */
+      const revGroups = []; forLevel(p.review || []).forEach(g => { const o = revGroups.find(x => x.g === g.g); if (o) o.items = o.items.concat(g.items); else revGroups.push({ g: g.g, items: g.items.slice() }); });
+      const chipsHtml = items => '<div class="chips">' + items.map(x => '<span class="chip" tabindex="0">' + x[0] + '<span class="chip-tooltip"><b>' + x[1] + '</b>' + x[2] + '</span></span>').join('') + '</div>';
+      $('#vocabGroups').innerHTML = groups.map(g => '<article class="vocab-group"><h3>' + g.g + '</h3>' + chipsHtml(g.items) + '</article>').join('') +
+        revGroups.map(g => '<article class="vocab-group vocab-review" style="border-style:dashed"><h3>🔁 ' + (ca() ? 'Repàs · ' : 'Review · ') + g.g + '</h3>' + chipsHtml(g.items) + '</article>').join('');
       /* Catalan → English (research audit, Roger 26 Oct 2026): the card shows the Catalan, the student types (or says) the English, then turns it.
          It uses the core words of the panel (p.core: a list of English words, or one list per route) and, until the LS project marks them,
          every word of the Learning Path. state.cardDir remembers the direction.
