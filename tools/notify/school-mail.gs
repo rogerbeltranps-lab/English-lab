@@ -15,8 +15,9 @@
 //      {idToken, action: "audio", mime, secs, data (base64), meta: {page, step, title, level, group, at}} sent by the student's page right
 //      after a hand-in (shared/js/el-mic.js upload). Only a signed-in school account (or the teacher) may send it, at most 40 a day each and
 //      6 MB each. It is saved in the teacher's Drive (AUDIO_FOLDER below: Teacher Studio › 04_Students (private) › Speaking recordings, shared
-//      with this school account as Editor), in a folder per group, and only the teacher can open it. With GEMINI_KEY, Gemini also writes a
-//      transcript from the audio, which the page adds to the hand-in for Wednesday's correction. Answer: {ok, id, secs, tr}.
+//      with this school account as Editor), in a folder per group, and only the teacher can open it. With GEMINI_KEY, Gemini also listens to it: a
+//      transcript and kind notes on the task and pronunciation, which the page adds to the hand-in for Wednesday's correction.
+//      Answer: {ok, id, secs, tr, notes}.
 // Safety: a request without the right KEY or the teacher's sign-in is refused (the link alone is not enough); it only sends to school
 // addresses (@ietramuntana.cat) and the teacher's Gmail, at most 50 people per request, within Google's daily limit.
 // KEY: a long random text, the same here and in SCHOOL_MAIL_KEY; never in the repo (this copy has a placeholder and refuses the Action).
@@ -112,27 +113,48 @@ function saveAudio(m) {
   const stamp = Utilities.formatDate(new Date(), "Europe/Madrid", "yyyy-MM-dd HH.mm");
   const file = folder.createFile(Utilities.newBlob(Utilities.base64Decode(data), mime, stamp + " · " + clean(name) + " · " + page + " · " + clean(meta.title || meta.step) + "." + ext));
   file.setDescription(JSON.stringify({email: who.email, group: meta.group || "", page: meta.page || "", step: meta.step || "", level: meta.level || "", secs: m.secs || null}));
-  return {ok: true, id: file.getId(), secs: Number(m.secs) || null, tr: transcribe(data, mime)};
+  const g = transcribe(data, mime, meta);
+  return {ok: true, id: file.getId(), secs: Number(m.secs) || null, tr: g.tr, notes: g.notes};
 }
 
-// Gemini writes down what the student said, word for word with their mistakes ("" without a key or when it fails: the hand-in keeps
-// the browser's transcript). Tried as audio first, then as video/webm, which Gemini also reads.
-function transcribe(data, mime) {
-  if (!GEMINI_KEY || GEMINI_KEY === "PASTE-THE-GEMINI-KEY-HERE") return "";
-  const ask = "This is a recording of a secondary-school student doing an English speaking task. Write down exactly what the student says, " +
-    "word for word, in English, keeping their mistakes, hesitations like \"em\" left out. Do not correct, translate or comment. Leave out any " +
-    "question read by a computer voice. If the student says nothing, answer with nothing.";
+// Gemini listens to the recording (Roger, 8 Nov 2026: "gemini can give feedback itself with a proper prompt per each activity, we need him
+// not to be very strict … focus on if the student did well the task and pronunciation"). One call per recording, with the activity's own
+// task (meta.task, sent by the page) and the student's route: it writes down what they said word for word (tr) and gives short, kind notes
+// on the task and on pronunciation (notes). Both go into the hand-in; Wednesday's correction (in the teacher's voice) is written from them.
+// {tr: "", notes: ""} without a key or when it fails: the hand-in keeps the browser's transcript. Tried as audio first, then as video/webm.
+const ROUTE = {beginners: "Starter (A1, a lot of support)", insecure: "Base (A2-, support)", safe: "Core (A2)", daring: "Plus (A2+/B1)", native: "Pro"};
+function transcribe(data, mime, meta) {
+  const none = {tr: "", notes: ""};
+  if (!GEMINI_KEY || GEMINI_KEY === "PASTE-THE-GEMINI-KEY-HERE") return none;
+  meta = meta || {};
+  const ask = [
+    "You are helping an English teacher at a secondary school in Catalonia (students aged 12-16). This is a recording of one student doing a speaking task from a learning path.",
+    "These tasks are for learning, not exams: be encouraging and NOT strict. What matters is whether they did the task and how understandable their pronunciation is. Ignore small grammar slips unless they block the meaning, and ignore hesitations.",
+    "The student's level: " + (ROUTE[meta.level] || "A2") + ". The task they were given: \"" + String(meta.task || meta.title || "a short speaking task").slice(0, 1500) + "\".",
+    "If a computer voice reads questions in the recording, those are not the student: leave them out.",
+    "Answer in JSON with these keys:",
+    "transcript: exactly what the student says, word for word, in English, keeping their mistakes (empty if they say nothing);",
+    "task: one or two sentences on how well they did the task (what they covered, anything important missing);",
+    "pronunciation: what was clear, then at most three words or sounds to practise, each as: the word → how to say it (simple respelling, e.g. 'usually → YOO-zhoo-uh-lee');",
+    "well_done: one specific thing they did well;",
+    "next_time: one small, concrete tip.",
+    "Write task, pronunciation, well_done and next_time in English, short and kind."
+  ].join("\n");
   const url = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent?key=" + GEMINI_KEY;
   for (const mt of [mime, mime === "audio/webm" ? "video/webm" : null].filter(Boolean)) {
     try {
       const r = UrlFetchApp.fetch(url, {method: "post", contentType: "application/json", muteHttpExceptions: true,
-        payload: JSON.stringify({contents: [{parts: [{inline_data: {mime_type: mt, data}}, {text: ask}]}], generationConfig: {temperature: 0}})});
+        payload: JSON.stringify({contents: [{parts: [{inline_data: {mime_type: mt, data}}, {text: ask}]}],
+          generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
       if (r.getResponseCode() !== 200) continue;
-      const j = JSON.parse(r.getContentText()), parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
-      return parts.map(p => p.text || "").join("").trim().slice(0, 6000);
+      const j = JSON.parse(r.getContentText()), t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
+      const o = JSON.parse(t), s = v => String(v || "").trim();
+      const notes = [["Task", o.task], ["Pronunciation", o.pronunciation], ["Well done", o.well_done], ["Next time", o.next_time]]
+        .filter(x => s(x[1])).map(x => x[0] + ": " + s(x[1])).join("\n");
+      return {tr: s(o.transcript).slice(0, 6000), notes: notes.slice(0, 3000)};
     } catch (x) {}
   }
-  return "";
+  return none;
 }
 
 // any English Lab account: {email, name} from a real, unexpired sign-in token of this Firebase project, checked by Google; null otherwise

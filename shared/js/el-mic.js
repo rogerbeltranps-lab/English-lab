@@ -167,7 +167,7 @@
     if (c.res) return c.res;                                         // handed in again with the same recording
     if (c.blob.size > MAX_BYTES) return { ok: false, error: 'too long' };
     const body = { idToken: await u.getIdToken(), action: 'audio', mime: c.mime, secs: c.secs, data: await b64(c.blob),
-      meta: { page: location.pathname, step: meta.step || '', title: meta.title || '', level: meta.level || '', group: (C.group && C.group()) || '', at: c.at } };
+      meta: { page: location.pathname, step: meta.step || '', title: meta.title || '', level: meta.level || '', task: String(meta.task || '').replace(/\s+/g, ' ').trim().slice(0, 1500), group: (C.group && C.group()) || '', at: c.at } };
     const r = await fetch(RELAY, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify(body) });
     const j = await r.json();
     if (j && j.ok) c.res = j;
