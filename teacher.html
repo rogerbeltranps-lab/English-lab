@@ -2679,6 +2679,8 @@ function tp2Page(grp,ls,studs){const pr=tp2Pair(grp),l=EL_LS.find(y=>y.id===ls),
   return `<div class="tp2bar"><b>📋 ${esc(pr.map(g=>g.name).join(" + "))}</b><span class="muted">${l?esc(lsLabel(l)):""} · drag inside each group; drag a note to the other group to copy it; every change saves as in its own 📅 Time plan</span><span class="sp"></span>`
     +`<button class="g" data-do="tp2fs" title="Browser full screen on or off (Esc also leaves it)">⛶ Full screen</button><button data-do="tp2x" title="Back to ${esc(grp.name)}'s Time plan">✕ Close</button></div>`
     +`<div class="tp2">${pr.map(col).join("")}</div>`}
+// "Earlier weeks" keeps its open/closed state through every redraw (Roger, 8 Nov 2026, screen recording: ticking 🏠 on a tab with Earlier
+// weeks open closed it again, and the page seemed to jump down two weeks)
 function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="muted">No time plan for this group in this LS yet.</p></div>`;
   const t=ELWeek.today(),ws=agWeeks(x,(S.agExt||{})[x.ls+"|"+x.gid]||0),tm=new Date(t+"T12:00").getDay(),cur=ELWeek.add(t,-((tm+6)%7));
   const pastW=ws.filter(([m])=>m<cur),now=ws.filter(([m])=>m>=cur),ag=agOf(x);
@@ -2686,10 +2688,10 @@ function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="mute
   return agBars(x)+`<div class="agw">${agList(x,studs)}<section class="agr">`
     +hwTag(x)
     +(late.length?`<div class="aglate"><h3>⚠ Not ticked yet (${late.length})</h3><p class="muted">Tick what you did. Drag the rest to a later day, or ⏭ Next class.</p><div class="agdays">${late.map(d=>agDay(x,d,true)).join("")}</div></div>`:"")
-    +(pastW.length?`<details class="agpast"><summary>Earlier weeks (${pastW.length})</summary>${pastW.map(([m,dd])=>agWeek(x,m,dd)).join("")}</details>`:"")
+    +(pastW.length?`<details class="agpast" data-k="agpast|${x.ls}|${x.gid}" ${S.open.has("agpast|"+x.ls+"|"+x.gid)?"open":""}><summary>Earlier weeks (${pastW.length})</summary>${pastW.map(([m,dd])=>agWeek(x,m,dd)).join("")}</details>`:"")
     +now.map(([m,dd])=>agWeek(x,m,dd)).join("")
     +`<p><button type="button" class="g" data-do="agmore" ${`data-gid="${x.gid}" data-ls="${x.ls}"`}>＋ Show one more week</button></p>`
-    +`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Each class day of ${esc((GR.find(g=>g.id===x.gid)||{}).name||x.gid)} by your timetable. Drag a learning path (all the tabs not ticked yet), one tab, the exam or the final product steps from the list or from another day. Drag a game, a note or a learning path up or down inside its day to change the order (tabs keep the learning path's order). ⏱ sets how many minutes each one takes in class; the day adds them up against the class length. Tick what you did in class: students see it in “What we've done”. 🔓/🔒 opens or closes a tab for the group. Students see as homework only what you set with 🏠 Homework. Due days move with the learning path's last class, and the exam day students see follows the 📝 Exam.</p></details>`
+    +`<details class="how" data-k="aghow" ${S.open.has("aghow")?"open":""}><summary>ⓘ How it works</summary><p class="muted">Each class day of ${esc((GR.find(g=>g.id===x.gid)||{}).name||x.gid)} by your timetable. Drag a learning path (all the tabs not ticked yet), one tab, the exam or the final product steps from the list or from another day. Drag a game, a note or a learning path up or down inside its day to change the order (tabs keep the learning path's order). ⏱ sets how many minutes each one takes in class; the day adds them up against the class length. Tick what you did in class: students see it in “What we've done”. 🔓/🔒 opens or closes a tab for the group. Students see as homework only what you set with 🏠 Homework. Due days move with the learning path's last class, and the exam day students see follows the 📝 Exam.</p></details>`
     +`</section></div>`}
 if(DEMO)window.EL_T=S;   // previews and tests look at the state
 // one tick (an item done in class) and the day's tick when all its items are done
