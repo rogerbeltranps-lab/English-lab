@@ -34,6 +34,12 @@
 //      → {ok, draft: {reading: {verdict, note}, rows: [{level 0-4 or null, why}], feedback, well_done, next_time}}. The video goes from Drive
 //      to the Gemini Files API in pieces (Apps Script alone takes ~50 MB) and is deleted from Gemini as soon as the answer comes back. The
 //      dashboard shows the draft next to the video; the teacher approves it or asks for a change (change + prev: Gemini watches again).
+//   9. Final products handed in on Google Classroom (Roger, 8 Nov 2026: "some are links and the names are in here, what can we do?"):
+//      {idToken (teacher), action: "fp_classroom", group, workId?} → {ok, course, works: [{id, title}], work, subs: [{email, name, state,
+//      items: [{kind: "drive" | "youtube" | "link", id, url, title, mime}]}]}: this school account's class for the group (its name contains
+//      the group, e.g. "English 2ESOA 26-27"), its assignments called "final product" (newest first) and every student's attachments, so the
+//      dashboard can match them to students by email and Gemini can watch the videos (Drive files and Drive or YouTube links). Needs the
+//      Google Classroom API service in this script (Editor › Services › + › Google Classroom API › Add).
 //   8. Gemini spending this month for the dashboard: {idToken (teacher), action: "gemini_usage"} → {ok, months} (see addUsage below).
 // Safety: a request without the right KEY or the teacher's sign-in is refused (the link alone is not enough); it only sends to school
 // addresses (@ietramuntana.cat) and the teacher's Gmail, at most 50 people per request, within Google's daily limit.
@@ -72,6 +78,7 @@ function doPost(e) {
   if (m.action === "video_chunk") return out(videoChunk(m));
   if (m.action === "video_status") return out(videoStatus(m));
   if (m.action === "fp_watch") return out(m.idToken && isTeacher(m.idToken) ? fpWatch(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_classroom") return out(m.idToken && isTeacher(m.idToken) ? fpClassroom(m) : {ok: false, error: "not the teacher"});
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
   const clean = l => [].concat(l || []).map(a => String(a).trim()).filter(ok);
@@ -321,12 +328,15 @@ const FP_LEVEL = {beginners: "Starter", insecure: "Base", safe: "Core", daring: 
 function fpWatch(m) {
   if (!GEMINI_KEY || GEMINI_KEY === "PASTE-THE-GEMINI-KEY-HERE") return {ok: false, error: "no Gemini key in the school script"};
   const t0 = Date.now(), ask = m.ask || {}, rows = [].concat(ask.rows || []).slice(0, 12);
+  const G = "https://generativelanguage.googleapis.com";
+  // A YouTube link (a Classroom hand-in): Gemini watches it from YouTube itself (public or unlisted videos only); nothing is uploaded.
+  const yt = String(m.youtube || "").match(/^https:\/\/(www\.|m\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)[\w-]{6,}/);
+  if (yt) return fpAsk(m, ask, rows, {file_uri: yt[0]}, () => {});
   let file;
   try { file = DriveApp.getFileById(String(m.fileId || "")); } catch (x) { return {ok: false, error: "the school account cannot open that video"}; }
   const size = file.getSize(), mime = file.getMimeType();
   if (!/^video\//.test(mime)) return {ok: false, error: "that file is not a video (" + mime + ")"};
   if (size > 2e9) return {ok: false, error: "the video is over 2 GB"};
-  const G = "https://generativelanguage.googleapis.com";
   // 1. a resumable upload to the Gemini Files API, fed from Drive 16 MB at a time
   const s = UrlFetchApp.fetch(G + "/upload/v1beta/files?key=" + GEMINI_KEY, {method: "post", contentType: "application/json", muteHttpExceptions: true,
     headers: {"X-Goog-Upload-Protocol": "resumable", "X-Goog-Upload-Command": "start", "X-Goog-Upload-Header-Content-Length": String(size), "X-Goog-Upload-Header-Content-Type": mime},
@@ -356,11 +366,17 @@ function fpWatch(m) {
       gfile = JSON.parse(UrlFetchApp.fetch(G + "/v1beta/" + gfile.name + "?key=" + GEMINI_KEY, {muteHttpExceptions: true}).getContentText() || "{}");
     }
     if (gfile.state !== "ACTIVE") return {ok: false, error: "Gemini could not read the video"};
-    // 3. one question with the rubric
+  } catch (x) { del(); return {ok: false, error: "Gemini could not open the video: try again"}; }
+  return fpAsk(m, ask, rows, {mime_type: gfile.mimeType || mime, file_uri: gfile.uri}, del);
+}
+// 3. one question with the rubric about the video (fd = Gemini's file_data); del() removes the uploaded copy from Gemini afterwards
+function fpAsk(m, ask, rows, fd, del) {
+  const G = "https://generativelanguage.googleapis.com";
+  try {
     const r = UrlFetchApp.fetch(G + "/v1beta/models/" + FP_MODEL + ":generateContent?key=" + GEMINI_KEY, {method: "post", contentType: "application/json", muteHttpExceptions: true,
-      payload: JSON.stringify({contents: [{parts: [{file_data: {mime_type: gfile.mimeType || mime, file_uri: gfile.uri}}, {text: fpPrompt(ask, rows, m.prev, m.change)}]}],
+      payload: JSON.stringify({contents: [{parts: [{file_data: fd}, {text: fpPrompt(ask, rows, m.prev, m.change)}]}],
         generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
-    if (r.getResponseCode() !== 200) return {ok: false, error: "Gemini did not answer (HTTP " + r.getResponseCode() + ")"};
+    if (r.getResponseCode() !== 200) return {ok: false, error: "Gemini did not answer (HTTP " + r.getResponseCode() + ")" + (fd.mime_type ? "" : ": the YouTube video may be private")};
     const j = JSON.parse(r.getContentText());
     addUsage(FP_MODEL, "video", j);
     const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
@@ -429,4 +445,40 @@ function geminiUsage() {
   const months = Object.keys(all).filter(k => /^gemini:\d{4}-\d{2}$/.test(k)).sort().reverse().slice(0, 12)
     .map(k => { const c = JSON.parse(all[k]); return {month: k.slice(7), eur: Math.round((c.eur || 0) * 100) / 100, calls: c.calls || 0, audio: c.audio || 0, video: c.video || 0}; });
   return {ok: true, months};
+}
+
+// ---- 9. Final products handed in on Google Classroom (see the top): read-only, nothing is changed in Classroom
+function fpClassroom(m) {
+  if (typeof Classroom === "undefined") return {ok: false, error: "add the Google Classroom API service to the school script (Editor › Services › + › Google Classroom API)"};
+  const g = String(m.group || "").replace(/\s/g, "").toUpperCase(), flat = t => String(t || "").replace(/\s/g, "").toUpperCase();
+  const courses = (Classroom.Courses.list({teacherId: "me", courseStates: ["ACTIVE"], pageSize: 50}).courses || []).filter(c => g && flat(c.name).includes(g));
+  if (!courses.length) return {ok: false, error: "no Classroom class with " + g + " in its name"};
+  const c = courses[0];
+  const works = (Classroom.Courses.CourseWork.list(c.id, {pageSize: 100, orderBy: "updateTime desc"}).courseWork || [])
+    .filter(w => /final\s*(product|task)|producte\s*final|vlog/i.test(w.title || "")).map(w => ({id: w.id, title: w.title}));
+  if (!works.length) return {ok: false, error: "no assignment called Final product in " + c.name};
+  const w = works.find(x => x.id === m.workId) || works[0];
+  const people = {};
+  let tok;
+  do { const r = Classroom.Courses.Students.list(c.id, {pageSize: 100, pageToken: tok}); (r.students || []).forEach(st => people[st.userId] = st.profile || {}); tok = r.nextPageToken; } while (tok);
+  const subs = [];
+  tok = undefined;
+  do {
+    const r = Classroom.Courses.CourseWork.StudentSubmissions.list(c.id, w.id, {pageSize: 100, pageToken: tok});
+    (r.studentSubmissions || []).forEach(x => {
+      const pr = people[x.userId] || {}, items = [];
+      ((x.assignmentSubmission || {}).attachments || []).forEach(a => {
+        if (a.driveFile) { let mime = ""; try { mime = DriveApp.getFileById(a.driveFile.id).getMimeType(); } catch (e) { mime = "no access"; }
+          items.push({kind: "drive", id: a.driveFile.id, title: a.driveFile.title || "", url: a.driveFile.alternateLink || "", mime}); }
+        else if (a.youTubeVideo) items.push({kind: "youtube", id: a.youTubeVideo.id, title: a.youTubeVideo.title || "", url: "https://www.youtube.com/watch?v=" + a.youTubeVideo.id});
+        else if (a.link) { const u = String(a.link.url || ""), d = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]{20,})/), y = u.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w-]{6,})/);
+          if (d) { let mime = ""; try { mime = DriveApp.getFileById(d[1]).getMimeType(); } catch (e) { mime = "no access"; } items.push({kind: "drive", id: d[1], title: a.link.title || "", url: u, mime}); }
+          else if (y) items.push({kind: "youtube", id: y[1], title: a.link.title || "", url: "https://www.youtube.com/watch?v=" + y[1]});
+          else items.push({kind: "link", title: a.link.title || "", url: u}); }
+      });
+      subs.push({email: String(pr.emailAddress || "").toLowerCase(), name: (pr.name || {}).fullName || "", state: x.state || "", late: !!x.late, items});
+    });
+    tok = r.nextPageToken;
+  } while (tok);
+  return {ok: true, course: c.name, works, work: w, subs};
 }
