@@ -59,3 +59,17 @@
   body .pseg a.on{background:#fff;color:#0f172a;box-shadow:0 1px 4px rgba(15,23,42,.12)}
   .pseg a em{font-style:normal;background:#dc2626;color:#fff;border-radius:999px;font-size:11px;padding:0 6px}
 }
+
+/* 4. My level on the board's home and on Me (Roger, 8 Nov 2026: "there's an empty space next to level"): on a phone the box takes the
+   whole row, with ✋ Ask for a level change as a button on its right instead of a link under it */
+@media (max-width:640px){
+  #lvl{flex:1 1 100%;min-width:0}
+  #lvl .hlv,.pme .hlv{display:flex;width:100%;box-sizing:border-box;white-space:normal;margin:0}
+  #lvl .hlv>span:last-child,.pme .hlv>span:last-child{flex:1;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:center}
+  #lvl .hlv>span:last-child>*,.pme .hlv>span:last-child>*{grid-column:1}
+  #lvl .hlv>span:last-child>.hask,.pme .hlv>span:last-child>.hask{grid-column:2;grid-row:1/span 2;position:static;opacity:1;pointer-events:auto;margin:0;padding:9px 12px;border-radius:999px;
+    background:#2443ad;color:#fff;font-size:13px;font-weight:700;text-decoration:none;white-space:normal;max-width:min(150px,40vw);text-align:center;box-shadow:none;line-height:1.25}
+  #lvl .hlv>span:last-child>small,#lvl .hlv>span:last-child>b,.pme .hlv>span:last-child>small,.pme .hlv>span:last-child>b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #lvl .hlv>span:last-child>small,.pme .hlv>span:last-child>small{font-size:12px}
+  #lvl .hlv .hask:before,.pme .hlv .hask:before{display:none}
+}
