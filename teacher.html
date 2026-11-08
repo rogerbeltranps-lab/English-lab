@@ -57,7 +57,10 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .tside .nv.mton{background:#dc2626;color:#fff}.tside .nv.mton:hover{background:#b91c1c;color:#fff}.tside .nv small.mt{opacity:1;background:#fff;color:#b91c1c;border-radius:999px;padding:0 7px;font-weight:800}
 #mtbar:empty{display:none}#mtbar{margin-top:46px!important;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:#dc2626;color:#fff;border-radius:14px;padding:10px 14px;margin:0 0 10px;font-weight:700}
 #mtbar button{border:0;background:#fff;color:#b91c1c;border-radius:999px;padding:5px 14px;font-weight:800;cursor:pointer}#mtbar .g2{background:#fecaca}
-.mtpick{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 18px}.mtpick label{display:block;font-weight:400;margin:3px 0}.mtpick input{width:auto;margin-right:6px;vertical-align:middle}
+.mtpick{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:10px 18px}.mtgrid{border-collapse:collapse;width:100%;font-size:14px}
+.mtgrid th,.mtgrid td{padding:2px 4px;text-align:center;border-bottom:1px solid #f1f5f9}.mtgrid th:first-child,.mtgrid td:first-child{text-align:left}
+.mtgrid th:first-child{font-weight:400}.mtgrid input{margin:0;cursor:pointer;width:16px;height:16px}.mtgrid tbody tr:hover{background:#f8fafc}
+.mtall{border:0;background:none;padding:2px 0;font:inherit;color:#0f172a;cursor:pointer;text-align:left}.mtall:hover{color:#1d4ed8;text-decoration:underline}th .mtall{font-weight:700;font-size:13px}
 .mtprev{border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;padding:18px 14px;margin:8px 0}.mtprev .mt-box{font-size:14px}.mtprev .mt-box h1{font-size:20px}.mtprev .mt-ic{font-size:32px}
 .ph h1{font-size:2.1rem;letter-spacing:-.02em;margin:.25em 0 .1em}.ph .sub{font-size:16px;color:#475569;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}.ph .sub select{font-size:15px;padding:4px 6px;border-radius:8px}
 .ph h1.hi{max-width:1100px;line-height:1.15;text-wrap:pretty}.ph h1.hi .cheer{vertical-align:middle;border:0;background:#eef2ff;color:#3157d5;border-radius:999px;width:34px;height:34px;font-size:18px;font-weight:700;cursor:pointer;padding:0;margin-left:4px}.ph h1.hi .cheer:hover{background:#dbe4ff}
@@ -2844,16 +2847,18 @@ function annDialog(keep){S.annSeq=S.annSeq||0;
   document.querySelectorAll("#dlg [data-annu]").forEach(c=>c.onchange=()=>{c.checked?S.annSel.add(c.dataset.annu):S.annSel.delete(c.dataset.annu);draw()});
   draw();t.focus()}
 // 🛠 Maintenance mode (Roger, 7 Nov 2026: "que els estudiants no puguin entrar a la web, deixant un missatge que estic fent manteniment"):
-// site/maintenance = {on, note, pdfs, since}. While it is on, every student page (el-cloud.js mtCheck) shows only the message of
+// site/maintenance = {on, note, pdfs, since} (pdfs = {course: {route: [item ids]}}, ticked level by level). While it is on, every student page (el-cloud.js mtCheck) shows only the message of
 // shared/js/el-maintenance.js with the worksheets of the student's course and level (PDFS there); it opens again by itself when it goes
 // off. The teacher, the student view (👁) and the test account's "see everything" still get in. A page opened within 2 minutes of a
 // check that found it off can still open as usual (that saves a read per page).
 const mtOn=()=>!!(S.D&&S.D.mt&&S.D.mt.on);
 let MT=null;const mtMod=()=>MT?Promise.resolve(MT):import("./shared/js/el-maintenance.js").then(m=>MT=m);
 async function mtDialog(keep){const m=await mtMod(),x=(S.D&&S.D.mt)||{},on=!!x.on;
-  // the PDFs students can download (Roger, 7 Nov 2026: "make possible to select the pdf that they can download"): ticked per course,
-  // kept while the dialog is open (S.mtP), saved with Turn on / Save changes as site/maintenance.pdfs = {course: [item ids]}
-  if(!keep||!S.mtP)S.mtP=Object.fromEntries(Object.keys(m.PDFS).map(c=>[c,new Set(m.chosen(c,x.pdfs).map(i=>i[0]))]));
+  // the PDFs students can download (Roger, 7 Nov 2026: "make possible to select the pdf that they can download"), ticked per course and
+  // level (Roger, 8 Nov 2026: "aquí he de poder posar tots els nivells, que l'alumne vegi el pdf en funció del nivell que tingui"): a grid
+  // of items x levels, kept while the dialog is open (S.mtP = {course: {route: Set}}), saved with Turn on / Save changes as
+  // site/maintenance.pdfs = {course: {route: [item ids]}}. Each student sees the items ticked for their own level, in their level's version.
+  if(!keep||!S.mtP)S.mtP=Object.fromEntries(Object.keys(m.PDFS).map(c=>[c,Object.fromEntries(m.ROUTES[c].map(r=>[r,new Set(m.chosen(c,x.pdfs,r).map(i=>i[0]))]))]));
   if(!document.getElementById("mtcss")){const st=document.createElement("style");st.id="mtcss";st.textContent=m.CSS;document.head.append(st)}   // the message's own look, for the preview
   S.mtC=S.mtC||"2eso";S.mtR=m.ROUTES[S.mtC].includes(S.mtR)?S.mtR:"insecure";
   const since=on&&x.since&&x.since.toDate?x.since.toDate().toLocaleString("en-GB",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"";
@@ -2861,18 +2866,26 @@ async function mtDialog(keep){const m=await mtMod(),x=(S.D&&S.D.mt)||{},on=!!x.o
     +(on?`<p class="hal late"><b>ON${since?" since "+esc(since):""}.</b> Students only see the message below.</p>`:`<p class="muted" style="margin:0 0 8px">While it is on, students can't use the site: every page they open shows only this message, with the PDFs you tick below (their own course and level) to download and print. When you turn it off, their page opens again by itself. You, the 👁 student view and your test account in “see everything” still get in.</p>`)
     +`<label for="mtnote">A note for students <small class="muted">(optional, shown under the message exactly as you write it, e.g. “Back on Monday”)</small></label>
     <textarea id="mtnote" maxlength="300" style="min-height:60px" placeholder="For example: Do the worksheet of LP1 for Monday."></textarea>
-    <p style="margin:10px 0 4px"><b>PDFs they can download</b> <small class="muted">(each student gets the one of their own level; worksheets have no answers)</small></p>
-    <div class="mtpick">${Object.entries(m.PDFS).map(([c,v])=>`<div><b>${courseName(c)}</b> <small class="muted">${esc(v.name)}</small>${v.items.map(([id,tt])=>`<label><input type="checkbox" data-mtp="${c}|${id}" ${S.mtP[c].has(id)?"checked":""}> ${esc(tt)}</label>`).join("")}</div>`).join("")}</div>
+    <p style="margin:10px 0 4px"><b>PDFs they can download, level by level</b> <small class="muted">(each student only sees what is ticked in their level's column, in their level's version; worksheets have no answers. Click a name or a level to tick the whole row or column.)</small></p>
+    <div class="mtpick">${Object.entries(m.PDFS).map(([c,v])=>`<table class="mtgrid"><thead><tr><th><b>${courseName(c)}</b> <small class="muted">${esc(v.name)}</small></th>${m.ROUTES[c].map(r=>`<th><button type="button" class="mtall" data-mtcol="${c}|${r}" title="Tick or untick everything for ${LV_NAME[r]}">${LV_NAME[r]}</button></th>`).join("")}</tr></thead><tbody>${v.items.map(([id,tt])=>`<tr><td><button type="button" class="mtall" data-mtrow="${c}|${id}" title="Tick or untick it for every level">${esc(tt)}</button></td>${m.ROUTES[c].map(r=>`<td><input type="checkbox" data-mtp="${c}|${r}|${id}" title="${esc(tt)} · ${LV_NAME[r]}" ${S.mtP[c][r].has(id)?"checked":""}></td>`).join("")}</tr>`).join("")}</tbody></table>`).join("")}</div>
     <p class="muted" style="margin:10px 0 4px">What students see:</p>
-    <div class="bar">${Object.keys(m.PDFS).map(c=>`<button type="button" class="chip ${S.mtC===c?"on":""}" data-mtc="${c}">${courseName(c)}</button>`).join("")} <span class="muted">·</span> ${m.ROUTES[S.mtC].map(r=>`<button type="button" class="chip ${S.mtR===r?"on":""}" data-mtr="${r}">${LV_NAME[r]}</button>`).join("")}</div>
+    <div class="bar" id="mtwho"></div>
     <div class="mtprev" id="mtprev"></div>
     <div class="row" style="justify-content:flex-start">${on?`<button data-do="mtoff">✅ Turn it off: open the site again</button><button class="g" data-do="mton">Save changes</button>`:`<button data-do="mton" style="background:#dc2626">🛠 Turn maintenance on</button>`}</div>`,true);
   const t=$("#mtnote");t.value=S.mtNote!=null?S.mtNote:x.note||"";S.mtNote=null;
-  const draw=()=>{$("#mtprev").innerHTML=m.html({course:S.mtC,route:S.mtR,ca:elCa(S.mtR),note:t.value.trim(),pdfs:mtPdfs(),root:new URL("./",location.href).href})};
+  // the preview follows the last box clicked (its course and level); the chips choose any course and level too
+  const draw=()=>{if(!m.ROUTES[S.mtC].includes(S.mtR))S.mtR="insecure";
+    $("#mtwho").innerHTML=`${Object.keys(m.PDFS).map(c=>`<button type="button" class="chip ${S.mtC===c?"on":""}" data-mtc="${c}">${courseName(c)}</button>`).join("")} <span class="muted">·</span> ${m.ROUTES[S.mtC].map(r=>`<button type="button" class="chip ${S.mtR===r?"on":""}" data-mtr="${r}">${LV_NAME[r]}</button>`).join("")}`;
+    $("#mtwho").querySelectorAll("[data-mtc],[data-mtr]").forEach(b=>b.onclick=()=>{if(b.dataset.mtc)S.mtC=b.dataset.mtc;else S.mtR=b.dataset.mtr;draw()});
+    $("#mtprev").innerHTML=m.html({course:S.mtC,route:S.mtR,ca:elCa(S.mtR),note:t.value.trim(),pdfs:mtPdfs(),root:new URL("./",location.href).href})};
   t.oninput=draw;draw();
-  document.querySelectorAll("#dlg [data-mtp]").forEach(b=>b.onchange=()=>{const [c,id]=b.dataset.mtp.split("|");b.checked?S.mtP[c].add(id):S.mtP[c].delete(id);if(c!==S.mtC){S.mtC=c;S.mtNote=t.value;mtDialog(true)}else draw()});
-  document.querySelectorAll("#dlg [data-mtc],#dlg [data-mtr]").forEach(b=>b.onclick=()=>{if(b.dataset.mtc)S.mtC=b.dataset.mtc;else S.mtR=b.dataset.mtr;S.mtNote=t.value;mtDialog(true)})}
-const mtPdfs=()=>Object.fromEntries(Object.entries(S.mtP||{}).map(([c,v])=>[c,[...v]]));
+  const boxes=sel=>[...document.querySelectorAll("#dlg [data-mtp]")].filter(b=>sel(b.dataset.mtp.split("|"))),
+    set=(b,on)=>{const [c,r,id]=b.dataset.mtp.split("|");b.checked=on;on?S.mtP[c][r].add(id):S.mtP[c][r].delete(id)};
+  document.querySelectorAll("#dlg [data-mtp]").forEach(b=>b.onchange=()=>{set(b,b.checked);[S.mtC,S.mtR]=b.dataset.mtp.split("|");draw()});
+  // a name ticks (or unticks, if all are ticked) that item for every level; a level ticks (or unticks) everything in its column
+  document.querySelectorAll("#dlg [data-mtrow],#dlg [data-mtcol]").forEach(h=>h.onclick=()=>{const row=!!h.dataset.mtrow,[c,k]=(h.dataset.mtrow||h.dataset.mtcol).split("|"),
+    bs=boxes(([bc,br,bid])=>bc===c&&(row?bid===k:br===k)),on=!bs.every(b=>b.checked);bs.forEach(b=>set(b,on));S.mtC=c;if(!row)S.mtR=k;draw()})}
+const mtPdfs=()=>Object.fromEntries(Object.entries(S.mtP||{}).map(([c,v])=>[c,Object.fromEntries(Object.entries(v).map(([r,x])=>[r,[...x]]))]));
 function mtSave(on){const t=$("#dlg").open&&$("#mtnote"),note=t?t.value.trim().slice(0,300):((S.D.mt||{}).note||"");
   if(on&&!mtOn()&&!confirm("Turn maintenance on? Students will not be able to use the site until you turn it off."))return;
   if(!on&&!confirm("Turn maintenance off? Students can use the site again."))return;

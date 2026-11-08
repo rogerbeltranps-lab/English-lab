@@ -7,8 +7,8 @@
 // No DOM work at the top level: tools/lp-worksheets/build.mjs imports PDFS in Node to print the files.
 
 // What students can download (Roger, 7 Nov 2026: "make possible to select the pdf that they can download"): the teacher ticks the items
-// in the dashboard's 🛠 Maintenance dialog (site/maintenance.pdfs = {course: [item ids]}); nothing saved yet = DEFAULT. Each student gets
-// the PDF of their own level only. Items: a learning path's paper worksheet (no answer keys: the repo is public; recall checkpoints are
+// in the dashboard's 🛠 Maintenance dialog, level by level (site/maintenance.pdfs = {course: {route: [item ids]}}); nothing saved yet =
+// DEFAULT for every level. Each student gets the items ticked for their own level, in their level's version only. Items: a learning path's paper worksheet (no answer keys: the repo is public; recall checkpoints are
 // left out, their questions stay secure), the vocabulary and grammar summary and the reading story (both already in the LS's downloads).
 // The worksheets are printed into <ls>/downloads/worksheets/ by
 //   node tools/lp-worksheets/build.mjs --maintenance
@@ -35,9 +35,13 @@ export const pdfPath = (course, item, route) => {
   if (item === "story") return `${ls}/downloads/ls2-story-${route === "native" ? "daring" : route}.pdf`;   // Pro reads Plus
   return `${ls}/downloads/worksheets/${item}-${route}.pdf`;
 };
-// the items a course shows: the teacher's choice (in the catalogue's order), or DEFAULT when nothing was saved
-export const chosen = (course, pdfs) => { const c = PDFS[course]; if (!c) return [];
-  const want = pdfs && Array.isArray(pdfs[course]) ? pdfs[course] : DEFAULT[course]; return c.items.filter(x => want.includes(x[0])); };
+// the items a course shows to one level: the teacher's choice (in the catalogue's order), or DEFAULT when nothing was saved.
+// Per level (Roger, 8 Nov 2026: "aquí he de poder posar tots els nivells, que l'alumne vegi el pdf en funció del nivell que tingui"):
+// pdfs[course] = {route: [item ids]}, each level its own list; the older form, pdfs[course] = [item ids], is the same list for every level.
+export const chosen = (course, pdfs, route) => { const c = PDFS[course]; if (!c) return [];
+  const p = pdfs && pdfs[course], r = routeFor(course, route);
+  const want = Array.isArray(p) ? p : p && typeof p === "object" ? (Array.isArray(p[r]) ? p[r] : []) : DEFAULT[course];
+  return c.items.filter(x => want.includes(x[0])); };
 // The level a student without one works on (as on the learning paths): Base
 export const routeFor = (course, route) => (ROUTES[course] || []).includes(route) ? route : "insecure";
 
@@ -59,7 +63,7 @@ export function html(o) {
     w: "Meanwhile, you can download and print these materials to work on paper:",
     lv: "Your level", out: "Sign out"
   };
-  const items = chosen(o.course, o.pdfs);
+  const items = chosen(o.course, o.pdfs, r);
   const list = c && items.length ? `<p class="mt-w">${T.w}</p><p class="mt-ls">${esc(c.name)} · ${T.lv}: <b>${NAMES[r]}</b></p><div class="mt-pdfs">`
     + items.map(([id, t, tca]) => `<a class="mt-pdf" href="${esc(root + pdfPath(o.course, id, r))}" target="_blank" rel="noopener"><span>${id === "story" ? "📖" : "📄"}</span><b>${esc(ca && tca || t)}</b><small>PDF</small></a>`).join("")
     + `</div>` : "";
