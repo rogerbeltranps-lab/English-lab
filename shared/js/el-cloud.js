@@ -1138,7 +1138,7 @@ onAuthStateChanged(auth,async u=>{
   // The teacher's 🔔 in the bottom bar: open problem reports from all groups on every page (live on the dashboard, bellWatch) (shared/js/el-bell.js).
   if(stopBell&&!isTeacher(u)){stopBell();stopBell=null;bellEl=null;draw(u)}
   if(isTeacher(u)&&!bellEl)import("./el-bell.js").then(m=>{if(bellEl||!isTeacher(user))return;
-    bellEl=m.bell({dash:DASH,onDash,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
+    bellEl=m.bell({dash:DASH,onDash,me:()=>(user||{}).uid,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
   remember(u);
   userDone=true;listeners.forEach(f=>f(u));
   // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
