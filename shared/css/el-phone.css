@@ -199,6 +199,13 @@
    a shade with the percentage of the grammar and from the right to the middle another shade with the [vocabulary]"): each name is a chip
    "Roger C."; its left half fills from the left edge with 🧩 grammar %, its right half from the right edge with 📚 vocabulary % (class games
    of this LS). A tap opens a sheet with the name and first surname, both %, details, notes and answers. On a computer nothing changes. */
+/* 9b. The side-by-side board's "Full screen" on a phone (Roger, 8 Nov 2026: Safari on an iPhone has no full screen for pages): a focus
+   view, body.tpfoc, that leaves the board alone on the screen: no tab bar, group switch, Student/Class buttons or page heading. */
+@media (max-width:640px){
+  body.tph.tpfoc #tptabs,body.tph.tpfoc #main>.tpseg,body.tph.tpfoc #main>.ph,body.tph.tpfoc #fsctl,body.tph.tpfoc #el-cloud-bar,
+  body.tph.tpfoc .tp2bar>.muted{display:none!important}
+  body.tph.tpfoc{padding-bottom:0!important}
+}
 .pchip,.pkey{display:none}
 @media (max-width:640px){
   body.tph .wrap td.stu:has(>.pchip)>:not(.pchip){display:none}
