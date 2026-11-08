@@ -3223,6 +3223,10 @@ function fpgSave(a,u,d){(FPG.d[a.id]=FPG.d[a.id]||{})[u]=d;return put(["settings
 async function fpgCall(body){const tok=await ELCloud.auth.currentUser.getIdToken();
   const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify(Object.assign({idToken:tok},body))});
   const j=await r.json();if(!j||!j.ok)throw new Error(j&&j.error==="nothing to send"?"the school script is the old version: paste tools/notify/school-mail.gs and deploy a new version":(j&&j.error)||"no answer");return j}
+// Classroom videos belong to the students' school accounts and are shared with the teacher's school account, not his Gmail (Roger, 9 Nov 2026:
+// "it'd be super cool if I could see the preview"): their preview and Drive link open with the school account (it must be signed in in this
+// Chrome too: Google account menu › Add another account). Videos uploaded on the site are in his own Drive and open as they are.
+const FPG_SCHOOL="roger.beltran@ietramuntana.cat";
 const FPG_READ={speaks:["🟢","Speaks freely"],partly:["🟡","Reads in parts"],reads:["🔴","Reads"]};
 const fpgLv=n=>n==null?"–":n===0?"No evidence":"Level "+n;
 // a row's mark out of 10: Gemini's own (in steps of 0.5, kept inside the level by the school script) or, in older drafts, level × 2.5;
@@ -3234,9 +3238,9 @@ function fpgBox(u,a){if(!fpgIs(a))return "";setTimeout(()=>fpgLoad(a).then(()=>f
 const fpgRefresh=a=>{const b=$("#fpg");if(b&&b.dataset.u)fpgFill(b.dataset.u,a)};
 function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;const v=fpgVideo(u,a),R=fpgRubric(a),d=(FPG.d[a.id]||{})[u],busy=FPG.busy[u+"|"+a.id];
   let h=`<h4 style="margin:0 0 6px">🎬 The video and Gemini's draft <button class="g" data-fpg="cost" style="float:right;font-size:12px;padding:2px 8px">💶 Gemini this month</button></h4>`;
-  const yid=v&&v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],open=v?(yid?v.youtube:`https://drive.google.com/file/d/${esc(v.id)}/view`):"";
-  if(v)h+=`<p class="muted" style="margin:0 0 6px">${esc(v.name||"Video")}${v.size?" · "+Math.round(v.size/1e6)+" MB":""}${v.at?" · uploaded "+day(v.at):""}${v.by?" · uploaded by "+name(v.by)+" (group video)":""} · <a href="${esc(open)}" target="_blank" rel="noopener">${yid?"Open on YouTube":"Open in Drive"} ↗</a></p>
-    <div style="position:relative;padding-top:56.25%;background:#0f172a;border-radius:8px;overflow:hidden"><iframe src="${yid?"https://www.youtube.com/embed/"+esc(yid):`https://drive.google.com/file/d/${esc(v.id)}/preview`}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>`;
+  const yid=v&&v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],au=v&&v.link?"?authuser="+encodeURIComponent(FPG_SCHOOL):"",open=v?(yid?v.youtube:`https://drive.google.com/file/d/${esc(v.id)}/view${au}`):"";
+  if(v)h+=`<p class="muted" style="margin:0 0 6px">${esc(v.name||"Video")}${v.size?" · "+Math.round(v.size/1e6)+" MB":""}${v.at?" · uploaded "+day(v.at):""}${v.by?" · uploaded by "+name(v.by)+" (group video)":""} · <a href="${esc(open)}" target="_blank" rel="noopener">${yid?"Open on YouTube":"Open in Drive"} ↗</a>${au&&!yid?`<br><small>Opens with the school account (${FPG_SCHOOL}). If it asks for access, add that account to this Chrome: your photo at the top right of Google › Add another account.</small>`:""}</p>
+    <div style="position:relative;padding-top:56.25%;background:#0f172a;border-radius:8px;overflow:hidden"><iframe src="${yid?"https://www.youtube.com/embed/"+esc(yid):`https://drive.google.com/file/d/${esc(v.id)}/preview${au}`}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>`;
   else{const c=fpgClsOf(u);h+=c?`<p class="muted">On Classroom: ${c.items.length?c.items.map(i=>i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title||i.kind)}</a>`:esc(i.title||i.kind)).join(" · ")+" — "+esc(c.why):"nothing handed in"}.</p>`
     :`<p class="muted">No video uploaded on the site yet. <button class="g" data-fpg="cls" data-u="${u}" data-a="${esc(a.id)}">📥 Look on Classroom</button> or paste a Drive link:</p>`}
   h+=`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:6px">${v&&!v.link?"":`<input id="fpglink" placeholder="https://drive.google.com/file/d/…" style="flex:1;min-width:220px">`}`
