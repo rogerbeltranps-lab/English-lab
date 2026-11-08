@@ -1293,6 +1293,10 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
   const dueOf=a=>gi>=0?ELWeek.due(p,a.id,gi):null,stepDue=(a,k)=>{const sd=p&&p.stepDue&&p.stepDue[a.id]&&p.stepDue[a.id][k];return (sd&&sd[gi])||dueOf(a)};
   const rows=list.map((a,i)=>({a,i,d:dueOf(a)})).sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i);
   const n={done:0,miss:0,todo:0,off:0};let next=null;
+  // what is still to do says "in class" unless the teacher set it as homework (Roger, 8 Nov 2026: "some students think these are homework
+  // because they see that they have to do them. But I had planned them for next class"): never "To do · by <the path's day>", which
+  // students read as homework. Homework = only what the teacher set (hwList, 📝 Homework); the plan's day stays in the teacher's view.
+  const hws=hwList(ls,info).filter(h=>!h.done),hwOf=a=>hws.find(h=>h.acts.some(([y])=>y.id===a.id));
   const body=rows.map(({a,d})=>{const ds=doneSet(a),at=stateOf(a).doneAt||{},drop=dr.includes(a.id),cp=!TX&&open&&canDo(a,info)&&elCheckpointMissing(a,doneSet,y=>canDo(y,info)),can=canDo(a,info)&&!cp;
     if(!TX&&!can&&!ds.size&&!D.rs[a.id])return "";   // students never see a learning path they cannot open yet (Roger, 7 Nov 2026: "they mustn't see that anything is locked")
     const vis=steps(a).filter(k=>TX||ds.has(k)||(can&&!secOff(a,info,k)));   // students: only the tabs they have done or can open
@@ -1305,7 +1309,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
       if(!g.some(x=>vis.includes(x)))return "";
       const past=!sk&&can&&!drop&&sd&&sd<today,ln=go&&!off;cnt(drop||!can||off?"off":past?"miss":"todo");
       if(ln&&!sk&&!next)next={a,k,nm,past};
-      const tip=`${esc(nm)}: ${t("no fet","not done")}${sk?t(" (sense punts)"," (no points)"):""}${off?t(" (encara no està oberta)"," (not open yet)"):""}${sd?" · "+t("fins al","by")+" "+sd:""}${ln?" · "+t("clica per obrir-la","click to open it"):""}`;
+      const tip=`${esc(nm)}: ${t("no fet","not done")}${sk?t(" (sense punts)"," (no points)"):""}${off?t(" (encara no està oberta)"," (not open yet)"):""}${sd&&(TX||past)?" · "+t("fins al","by")+" "+sd:""}${ln?" · "+t("clica per obrir-la","click to open it"):""}`;
       const lbl=`${off?"🔒":past?"✗":"·"} ${esc(nm)}`;
       return ln?`<a class="stp go2 ${past?"no":""}" href="${tabHref(a,k)}" title="${tip}">${lbl} →</a>`:`<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${tip}">${lbl}</span>`}).join("");
     const vg=tabGroups(a,vis),hand=vis.length?`<small class="muted">${vg.filter(g=>g.every(k=>ds.has(k))).length} / ${vg.length} ${vg.length===1?t("pestanya","tab"):t("pestanyes","tabs")}</small><br>`:"";
@@ -1317,7 +1321,8 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     else if(cp){st=`<span class="s-off">🔒 ${t(`Primer fes ${esc(cp.title)}`,`First do ${esc(cp.title)}`)}</span>`}
     else if(!can){st=`<span class="s-off">🔒 ${t("Encara no està oberta","Not open yet")}</span>`}
     else if(late){st=`<span class="s-no">⏰ ${t("Falta · calia fer-la el","Missing · was due")} ${when(d)}</span>`}
-    else{st=`<span class="s-td">${t("Per fer","To do")}${d?" · "+t("fins al","by")+" "+when(d):""}</span>`}
+    else{const h=hwOf(a);st=h?`<span class="s-td">📝 ${t("Deures per al","Homework by")} ${when(h.x.date)}</span>`:`<span class="s-td">🏫 ${t("Per fer a classe","To do in class")}</span>`;
+      if(TX&&d&&!h)st+=`<br><small class="muted">plan: ${when(d)} (students don't see this date)</small>`}
     const c=cell(a);if(vis.length<steps(a).length&&!a.graded&&!a.manual)c.t=vis.filter(k=>ds.has(k)).length+"/"+vis.length+(x.feedback?" 💬":"");
     const title=can?`<a href="${tabHref(a)}">${esc(a.title)}</a>`:esc(a.title);
     return `<tr class="${late?"miss":""}"><td class="l"><b>${title}</b>${a.criteria.length?`<br>${a.criteria.filter(c=>/^\d/.test(c)).map(pill).join("")}`:""}${counted.has(a.id)?` <span class="tag" title="Its day has passed: it is in “X of Y done this term”">counted</span>`:""}</td><td class="l">${st}</td><td class="l">${hand}${tabs||`<small class="muted">–</small>`}</td><td class="sc ${c.c}" data-do="cell" data-a="${a.id}" title="${t("Clica per veure'n el detall","Click to see the details")}">${c.t}</td></tr>`}).join("");
