@@ -213,6 +213,8 @@
   /* the level, in the top right-hand corner */
   body.tph .pchip .plv{position:absolute;top:3px;right:5px;padding:0 5px;border-radius:99px;font-size:9.5px;line-height:13px;font-weight:700;letter-spacing:.01em;box-shadow:0 0 0 1px rgba(15,23,42,.08)}
   body.tph .pchip .pnm{display:block}
+  /* no Route column: the level is in the chip, and the sheet changes it */
+  body.tph .wrap table:has(td.stu>.pchip) th.rtc,body.tph .wrap td.stu:has(>.pchip)+td{display:none}
   body.tph .pchip.none{border-style:dashed;background:#fff;color:#475569}
   body.tph .pchip:active{filter:brightness(.95)}
   /* the key above the chips: 🧩 on the left half, 📚 on the right */
