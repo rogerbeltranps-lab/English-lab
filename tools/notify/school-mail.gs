@@ -383,33 +383,59 @@ function fpAsk(m, ask, rows, fd, del) {
     const o = JSON.parse(t), str = v => String(v || "").trim(), lv = v => v === null || v === undefined || v === "" ? null : Math.max(0, Math.min(4, Math.round(Number(v)))) ;
     const verdict = ["speaks", "partly", "reads"].includes(o.reading && o.reading.verdict) ? o.reading.verdict : "partly";
     return {ok: true, model: FP_MODEL, draft: {reading: {verdict, note: str(o.reading && o.reading.note).slice(0, 600)},
-      rows: rows.map((x, i) => { const g = [].concat(o.rows || []).find(y => Number(y.n) === i + 1) || {}; return {level: isNaN(lv(g.level)) ? null : lv(g.level), why: str(g.why).slice(0, 700), good: str(g.good).slice(0, 300), improve: str(g.improve).slice(0, 300)}; }),
-      feedback: str(o.feedback).slice(0, 2500), well_done: str(o.well_done).slice(0, 400), next_time: str(o.next_time).slice(0, 400), secs: Number(o.seconds) || null}};
+      rows: rows.map((x, i) => { const g = [].concat(o.rows || []).find(y => Number(y.n) === i + 1) || {}, l = isNaN(lv(g.level)) ? null : lv(g.level);
+        return {level: l, mark: m.ask && m.ask.marks ? fpRowMark(l, g.mark) : null, why: str(g.why).slice(0, 700), good: str(g.good).slice(0, 400), improve: str(g.improve).slice(0, 400)}; }),
+      feedback: str(o.feedback).slice(0, 2500), well_done: str(o.well_done).slice(0, 400), next_time: str(o.next_time).slice(0, 400), secs: Number(o.seconds) || null,
+      sounds: [].concat(o.sounds || []).slice(0, 12).map(x => ({word: str(x && x.word).slice(0, 40), heard: str(x && x.heard).slice(0, 60), tip: str(x && x.tip).slice(0, 120)})).filter(x => x.word)}};
   } catch (x) { return {ok: false, error: "Gemini's answer could not be read: try again"}; }
   finally { del(); }
 }
+// Agreed with Roger, 8 Nov 2026: "I want the feedback to be positive and friendly. I assume they will all read and we have to suggest that they
+// try not to do it. If we are very strict the grades will be very low. On the other hand I don't want to give grades they don't deserve", with
+// his model draft for Martín (4 ESO LS1): a mark out of 10 per row with its level (3+ = top of level 3), What went well / To keep in mind with
+// the student's real words, and a warm teacher comment by first name. Plus (22:39) "a list of the words that they mispronounce like walk
+// (pronouncing the L) … not for the students individually but to create a listen and repeat video to correct that in class" (sounds:
+// teacher only; the video itself is made without Gemini).
+// a row's mark out of 10 (steps of 0.5) kept inside its level's band, so the level the student board shades (mark ÷ 2.5 rounded) is the same
+const FP_BAND = [[0, 0], [1.5, 3.5], [4, 6], [6.5, 8.5], [9, 10]];
+function fpRowMark(level, mark) {
+  if (level === null) return null;
+  const b = FP_BAND[level], n = Math.round(Number(mark) * 2) / 2;
+  return isNaN(n) ? b[1] : Math.max(b[0], Math.min(b[1], n));
+}
 function fpPrompt(ask, rows, prev, change) {
+  const marks = !!ask.marks, first = String(ask.student || "").trim().split(/\s+/)[0] || "the student";
   const lines = [
-    "You are helping an English teacher at a secondary school in Catalonia (students aged 12-16) mark a student's final product video.",
-    "Course: " + String(ask.course || "ESO").slice(0, 40) + ". Everyone is marked on ONE rubric at about " + String(ask.level || "A2+").slice(0, 20) + " level (the student's own route: " + (FP_LEVEL[ask.route] || "not set") + ").",
+    "You are helping Roger, an English teacher at a secondary school in Catalonia, mark a final product video by a student aged 12-16.",
+    "Course: " + String(ask.course || "ESO").slice(0, 40) + ". Every student is marked on the SAME rubric, at about " + String(ask.level || "A2+").slice(0, 20) + " level.",
     "The task: " + String(ask.task || "a short video presentation in English with slides").slice(0, 1500),
-    ask.group ? "It is a GROUP video. The student being marked is " + String(ask.student || "").slice(0, 60) + ". Judge the group rows on the whole video and the individual rows on that student's part; if you cannot tell which person they are, say so in the reading note and judge the group." : "The student is " + String(ask.student || "the student").slice(0, 60) + ".",
-    "Watch and listen to the whole video. Check carefully whether the student SPEAKS freely or READS (eyes down on notes or a screen, reading intonation, reading the slides word for word).",
-    "The rubric rows (each has levels 4 = very good, 3 = good, 2 = fair, 1 = developing, 0 = no evidence):"
+    ask.group ? "It is a GROUP video. The student being marked is " + String(ask.student || "").slice(0, 60) + ". Judge the group rows on the whole video and the individual rows on that student's part; if you cannot tell which person they are, say so in the reading note and judge the group." : "The student is " + String(ask.student || "the student").slice(0, 60) + " (call them " + first + ").",
+    "Watch and listen to the whole video.",
+    "",
+    "HOW ROGER WANTS IT MARKED",
+    "- Be positive, friendly and encouraging, AND honest. Give the level the video really shows: never a higher one the student has not earned, and do not be harsh either. If they would fail only because you were very strict, you are being too strict.",
+    "- Most students this age read part of their presentation. That is expected. Say how much they read in the reading check, let it count only in the row about speaking without reading (Speaking), and do not lower other rows because of it. If they read, the feedback always gives a kind, practical tip to try not to read next time (e.g. use the slides only as prompts, rehearse a few times, look at the camera).",
+    "- Judge the language at the course level: small slips are normal. Quote the student's real words in quotation marks, with the correct form, e.g. \"he also have breakfast\" → \"he also has breakfast\". Praise with real examples too (verbs, expressions, connectors they used).",
+    "- A row that cannot be judged from the video (for example a written hand-in, notes, sources or process steps) gets level null.",
+    "",
+    "The rubric rows (levels: 4 = very good, 3 = good, 2 = fair, 1 = developing, 0 = no evidence):"
   ];
   rows.forEach((r, i) => {
     lines.push((i + 1) + ". " + String(r.name || "").slice(0, 80) + (r.sub ? " (" + String(r.sub).slice(0, 120) + ")" : "") + (r.w ? " · " + r.w + " %" : ""));
     [].concat(r.d || []).slice(0, 4).forEach((d, k) => lines.push("   level " + (k + 1) + ": " + String(d).slice(0, 600)));
   });
   lines.push(
-    "Be fair and kind, as a teacher who knows these are young learners, but follow the rubric. A row that cannot be judged from the video (for example a written hand-in, sources or process steps) gets level null.",
+    "",
     "Answer in JSON with these keys:",
-    "reading: {verdict: \"speaks\" | \"partly\" | \"reads\", note: one or two sentences with evidence and times, e.g. 'reads the slides from 0:40 to 1:20'};",
-    "rows: a list with one item per rubric row: {n: the row number, level: 0-4 or null, why: one or two sentences for the teacher with what you saw or heard (times help), good: one short sentence to the student on what went well in this row, improve: one short sentence to the student on what to improve (empty if nothing)};",
-    "feedback: 3 to 5 short sentences to the student (you = the student), in simple English, warm and specific, written as their teacher; never mention AI, Gemini or a rubric number;",
-    "well_done: one specific thing they did well; next_time: one small, concrete tip; seconds: the length of the video in seconds."
+    "reading: {verdict: \"speaks\" | \"partly\" | \"reads\", note: one or two sentences for Roger with evidence and times, e.g. 'reads the slides from 0:40 to 1:20'};",
+    "rows: a list with one item per rubric row: {n: the row number, level: 0-4 or null (the level whose description fits best)" +
+      (marks ? ", mark: the row's mark out of 10 in steps of 0.5, inside its level: level 4 = 9 to 10, level 3 = 6.5 to 8.5, level 2 = 4 to 6, level 1 = 1.5 to 3.5, level 0 = 0 (use the top of the level when the student is close to the next level)" : "") +
+      ", why: one or two sentences for Roger with what you saw or heard (times help), good: 'What went well', one or two short specific sentences with real examples from the video, improve: 'To keep in mind', one short specific sentence with the real words and the correct form (empty if there is nothing to improve)};",
+    "feedback: Roger's comment to the student, 3 or 4 sentences in simple English, written as their teacher to them (you): start warmly with their first name (e.g. 'Great work, " + first + "!'), say specifically what was good, then give one or two concrete things for next time (the reading tip if they read). Never mention AI, Gemini, a rubric, levels or marks;",
+    "well_done: one specific thing they did well; next_time: one small, concrete tip; seconds: the length of the video in seconds;",
+    "sounds: for Roger only, NOT for the student (he collects them from the whole class to make a listen-and-repeat video): a list of up to 12 English words the student mispronounced in a way that matters, typical of Catalan and Spanish speakers, e.g. 'walk' with the L sounded, 'vegetables' with 4 syllables, 'clothes' as 2 syllables, a silent -ed sounded ('watched' as 'watch-ed'), 'v' and 'b' the same. Each item: {word: the word as written, heard: how the student said it in IPA, e.g. '/wɔːlk/', tip: the correct British pronunciation in IPA and a very short note, e.g. '/wɔːk/ (the L is silent)'}. Only words you clearly heard; an empty list if there are none. Do not mention these in the feedback."
   );
-  if (change) lines.push("", "You already gave this draft: " + JSON.stringify(prev || {}).slice(0, 6000), "The teacher disagrees and says: \"" + String(change).slice(0, 1500) + "\". Watch again and give the whole draft again following the teacher's instruction exactly.");
+  if (change) lines.push("", "You already gave this draft: " + JSON.stringify(prev || {}).slice(0, 6000), "Roger disagrees and says: \"" + String(change).slice(0, 1500) + "\". Watch again and give the whole draft again following his instruction exactly.");
   return lines.join("\n");
 }
 
