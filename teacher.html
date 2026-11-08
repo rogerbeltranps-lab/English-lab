@@ -111,6 +111,7 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .agday.today{border:2px solid #3157d5;box-shadow:0 4px 14px #3157d51f}.agday.done{background:#f0fdf4;border-color:#bbf7d0}.agday.late{border-color:#fdba74;background:#fffbeb}
 .agday.off{background:#f1f5f9;border-style:dashed;min-height:0;color:#94a3b8}.agday.cpt{min-height:0}
 .agover{outline:3px dashed #3157d5;outline-offset:2px;background:#eef2ff!important}
+.agday.agcopy{outline:3px dashed #16a34a;outline-offset:2px;background:#f0fdf4!important;position:relative}.agday.agcopy::after{content:"＋ Copy here";position:absolute;top:-11px;right:12px;background:#16a34a;color:#fff;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700;pointer-events:none}
 body.agdrag .agday:not(.off),body.agdrag .agl{outline:1px dashed #a5b4fc;outline-offset:1px}
 .agdh{display:flex;align-items:baseline;gap:6px}.agdh b{font-size:14px}.agdh small{color:#64748b}
 .agt{background:#3157d5;color:#fff;border-radius:999px;padding:0 8px;font-size:11px;font-weight:700}.agok{color:#15803d;font-size:12px;font-weight:700;margin-left:auto}.agwarn{color:#b45309;font-size:12px;font-weight:700;margin-left:auto}
@@ -1287,7 +1288,19 @@ const tms=v=>!v?0:typeof v==="number"?v:typeof v==="string"?(Date.parse(v)||0):t
 const ckOf=(step,it)=>step==="speak"||/speak/.test(step)?"speak":step==="talk"||/talk/.test(step)?"talk":it&&it.mode==="reply"||step==="reflect"?"reflect":step==="write"||it&&it.mode==="writing"?"write":"other";
 // a step's name in any LS (cpName only knows the LS on screen)
 const corrNm=(aid,step)=>{const a=byId(aid),m=a&&(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).find(x=>x.a===aid&&x.step===step);return m?m.name:({write:"Writing",speak:"Speaking",talk:"Talk",reflect:"Reflection"})[step]||step};
-const CORR={d:null,t:0,v:null,mkT:0};S.corrG="all";S.corrN=6;S.corrV="stu";S.corrShut=new Set();
+const CORR={d:null,t:0,v:null,mkT:0,busy:false,failT:0};
+// Fresh after every run (Roger, 8 Nov 2026: "yesterday you said there were no corrections waiting but now I see corrections pending, why?"):
+// the waiting list is worked out from the copy of the students' work kept in this browser, and that copy was from Mon 2 Nov, before
+// Claude's Saturday runs, so it still showed 25 pieces Claude had already corrected. Now a group whose copy is older than Claude's last
+// run (settings/marking.run, a light read) is fetched again by itself, once per run, and no number is shown until it is in. A failed
+// fetch is tried again after 5 minutes; meanwhile the old note with 🔄 Update all is shown.
+const corrRanAt=()=>{const r=((S.D||{}).mk||{}).run||{};return Math.max(tms(r.done),tms(r.started))};
+// AT.corr = the run the last such fetch was for (kept with the copy), so a computer clock a few minutes behind never fetches twice
+const corrOld=()=>{const t=corrRanAt();return DEMO||!t||!RAW||(AT.corr||0)>=t?[]:GR.filter(g=>(AT.g[g.id]||0)<t)};
+async function corrFresh(){const old=corrOld();if(!old.length||CORR.busy||Date.now()-CORR.failT<5*60e3)return;CORR.busy=true;CORR.failT=0;const t=corrRanAt();
+  try{if(old.length===GR.length)S.D=await load("all");else{await Promise.all(old.map(g=>loadGroup(g.id)));S.D=build(S.D)}AT.corr=t;saveCache();LIVE.since={}}
+  catch(e){console.warn("corrections fetch",e);CORR.failT=Date.now()}
+  CORR.busy=false;LIVE.pend=true;liveDraw();loadBar()}S.corrG="all";S.corrN=6;S.corrV="stu";S.corrShut=new Set();
 document.addEventListener("toggle",e=>{const g=e.target.dataset&&e.target.dataset.cs;if(g)e.target.open?S.corrShut.delete(g):S.corrShut.add(g)},true);
 function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
   const wait=[],done=[],today=ELWeek.today(),day=v=>{const t=tms(v);return t?ymd(t):""};
@@ -1339,11 +1352,13 @@ function corrLines(L){const by={};L.forEach(i=>{const key=i.k+"|"+i.aid+"|"+i.st
 const corrCount=L=>Object.keys(CK).map(k=>{const n=L.filter(i=>i.k===k).length;return n?`<span class="cnum">${CK[k][0]} <b>${n}</b> ${n===1?CK[k][1].toLowerCase():CK[k][2]}</span>`:""}).join("");
 function corrPage(){
   if(!DEMO&&Date.now()-CORR.mkT>60e3){CORR.mkT=Date.now();F.getDoc(F.doc(db(),"settings","marking")).then(d=>{const v=d.exists()?d.data():null;if(JSON.stringify(plainT(v))!==JSON.stringify(plainT(S.D.mk||null))){S.D.mk=v;if(S.g==="corr")render()}}).catch(e=>console.warn("marking",e))}
+  corrFresh();const chk=CORR.busy||corrOld().length&&!CORR.failT;   // fetching the work again after a run: no old numbers
   const {wait,done}=corrScan(),gf=i=>S.corrG==="all"||i.gid===S.corrG,W=wait.filter(gf),Dn=done.filter(gf);
   const now=W.filter(i=>i.k!=="copy"&&i.ready),later=W.filter(i=>i.k==="level"&&!i.ready),you=W.filter(i=>i.k==="copy"),late=now.filter(i=>i.late);
   const allNow=wait.filter(i=>i.k!=="copy"&&i.ready).length,st=corrState(),nx=corrNext(),RUN=`<a href="https://claude.ai/code/routines" target="_blank" rel="noopener">scheduled tasks on claude.ai ↗</a>`;
   // the big card
-  const card=st.s==="running"?`<div class="cont"><span class="ck">Claude is correcting now</span><span class="ct">Started ${esc(corrWhen(st.st))}</span><span class="cs">${st.via==="request"?"You asked for it here.":"The weekly Wednesday run."} It usually takes 20 to 60 minutes. The corrections appear below as they are saved, and students see each one in that step of their learning path.</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button></div></div>`
+  const card=chk&&st.s!=="running"&&st.s!=="asked"?`<div class="cont"><span class="ck">Checking</span><span class="ct">⏳ Fetching your students' latest work…</span><span class="cs">Claude corrected work on ${esc(corrWhen(corrRanAt()))}. The list below shows what is really waiting as soon as the work is in (a few seconds).</span></div>`
+    :st.s==="running"?`<div class="cont"><span class="ck">Claude is correcting now</span><span class="ct">Started ${esc(corrWhen(st.st))}</span><span class="cs">${st.via==="request"?"You asked for it here.":"The weekly Wednesday run."} It usually takes 20 to 60 minutes. The corrections appear below as they are saved, and students see each one in that step of their learning path.</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button></div></div>`
     :st.s==="asked"?`<div class="cont ${st.slow?"idle":""}"><span class="ck">${st.slow?"Not started yet":"Starting now"}</span><span class="ct">Asked ${esc(corrWhen(st.rq))}</span><span class="cs">${corrAskMsg(st,RUN)}</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button><button class="s2" data-do="corrcancel">✕ Cancel the request</button></div></div>`
     :`<div class="cont ${allNow?"":"done"}"><span class="ck">Next correction · ${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Wednesday"} · about 15:00</span>`
       +`<span class="ct">${allNow?plural(allNow,"piece")+" waiting to be corrected":"Nothing is waiting"}</span>`
@@ -1352,8 +1367,8 @@ function corrPage(){
   // The waiting list is worked out from the students' work this dashboard has loaded (Roger, 7 Nov 2026: "I don't understand this, didn't
   // you correct this?": the page showed Friday night's copy, after Claude's Saturday runs had corrected it all). When a run started after
   // a group's work was fetched, say so and offer to fetch it again (DEMO: never).
-  const ranAt=Math.max(tms((S.D.mk||{}).run&&S.D.mk.run.done),tms((S.D.mk||{}).run&&S.D.mk.run.started)),oldG=DEMO?[]:GR.filter(g=>ranAt&&(AT.g[g.id]||0)<ranAt),
-    stale=oldG.length?`<div class="hal" style="margin:0 0 10px;padding:10px 12px;border:2px solid #f59e0b;border-radius:12px;background:#fffbeb">⚠️ <b>These numbers may be old.</b> Claude corrected work on ${esc(corrWhen(ranAt))}, after this page fetched ${oldG.length===GR.length?"the students' work":esc(oldG.map(g=>g.name).join(", "))} (${esc(whenAt(Math.min(...oldG.map(g=>AT.g[g.id]||0))))}). Fetch it again to see what is really waiting. <button class="mini" data-load="all">🔄 Update all</button></div>`:"";
+  const ranAt=Math.max(tms((S.D.mk||{}).run&&S.D.mk.run.done),tms((S.D.mk||{}).run&&S.D.mk.run.started)),oldG=DEMO||chk?[]:GR.filter(g=>ranAt&&(AT.g[g.id]||0)<ranAt),
+    stale=oldG.length?`<div class="hal" style="margin:0 0 10px;padding:10px 12px;border:2px solid #f59e0b;border-radius:12px;background:#fffbeb">⚠️ <b>These numbers may be old.</b> The page could not fetch the latest work by itself. Claude corrected work on ${esc(corrWhen(ranAt))}, after this page fetched ${oldG.length===GR.length?"the students' work":esc(oldG.map(g=>g.name).join(", "))} (${esc(whenAt(Math.min(...oldG.map(g=>AT.g[g.id]||0))))}). Fetch it again to see what is really waiting. <button class="mini" data-load="all">🔄 Update all</button></div>`:"";
   const gchips=`<div class="bar"><span class="muted">Group:</span> `+["all",...GR.map(g=>g.id)].map(g=>`<button class="chip ${S.corrG===g?"on":""}" data-do="corrg" data-g="${g}">${g==="all"?"All groups":esc(GR.find(x=>x.id===g).name)}</button>`).join("")+`</div>`;
   const byG=(L,f)=>GR.filter(g=>L.some(i=>i.gid===g.id)).map(g=>{const is=L.filter(i=>i.gid===g.id);return f(g,is)}).join("");
   // Waiting, in plain words (Roger, 6 Nov 2026: "I need info that I can understand, so if there is work to correct, even if you correct it, I
@@ -1364,13 +1379,13 @@ function corrPage(){
   const stuRows=L=>{const by={};L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});return Object.values(by).sort((p,q)=>byName(S.P[p[0].u]||{},S.P[q[0].u]||{})).map(is=>{const s=S.P[is[0].u],first=Math.min(...is.map(i=>i.at).filter(Boolean));
     return `<div class="cstu"><div class="cst"><b>${s?name(s):"?"}</b> <span class="muted">is waiting for ${plural(is.length,"correction")}${isFinite(first)?" · handed in since "+esc(ELWeek.date(ymd(first))):""}</span>${fixB("Correct it now","Claude corrects everything that is waiting now ("+fullName(s||{})+"'s work too): it starts within a few minutes")}</div><div class="cwho">${is.map(itemB).join("")}</div></div>`}).join("")};
   const laterB=later.length?`<details class="cgrp" data-k="cwlater" ${S.open.has("cwlater")?"open":""}><summary><b>⏳ Not ready yet: ${plural(later.length,"marked step")}</b></summary><p class="muted">Steps with a level (reading log, listening chart…) are marked one week after you tick their session in the time plan, so everyone had time to hand them in. The button does not mark them earlier.</p>${corrLines(later)}</details>`:"";
-  const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length?fixB("Correct everything now","Claude corrects everything that is waiting now, in every group: it starts within a few minutes"):""}</div>`
+  const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length&&!chk?fixB("Correct everything now","Claude corrects everything that is waiting now, in every group: it starts within a few minutes"):""}</div>`
     +`<p class="muted">Everything students handed in that has no correction yet. Claude corrects it on Wednesday, or now if you press the button. Click a piece to see what they wrote.</p>`
-    +(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything now, or tell Claude in the English Lab chat.</p>`:"")+view
+    +(chk?`<p class="muted">⏳ Fetching the latest work…</p></div>`:"")+(chk?"":(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything now, or tell Claude in the English Lab chat.</p>`:"")+view
     +(S.corrV==="act"
       ?(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.open.has("cw"+g.id)?"open":""} data-k="cw${g.id}"><summary><b>${esc(g.name)}</b> ${corrCount(is)}</summary>${corrLines(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`)
       :(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.corrShut.has(g.id)?"":"open"} data-cs="${g.id}"><summary><b>${esc(g.name)}</b> <span class="muted">· ${plural(new Set(is.map(i=>i.u)).size,"student")} waiting</span></summary>${stuRows(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`))+laterB
-    +(you.length?`<h3>⚠️ Waiting for you: ${you.length===1?"1 possible copy":you.length+" possible copies"}</h3><p class="muted">Claude does not correct these: check each one (Accept or Redo). They are also in each group's To do.</p>${corrLines(you)}`:"")+`</div>`;
+    +(you.length?`<h3>⚠️ Waiting for you: ${you.length===1?"1 possible copy":you.length+" possible copies"}</h3><p class="muted">Claude does not correct these: check each one (Accept or Redo). They are also in each group's To do.</p>${corrLines(you)}`:"")+`</div>`);
   // history by day
   const days=[...new Set(Dn.map(i=>ymd(i.at)))].filter(d=>d&&d!=="1970-01-01"),shown=days.slice(0,S.corrN);
   const histB=`<div class="box"><h2>Last corrections</h2><p class="muted">What Claude corrected and when. Click a name to see the correction the student got.</p>`
@@ -1393,10 +1408,10 @@ function corrPage(){
 function corrOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;const f=flagOf(k.u,k.a,k.s);
   if(k.k==="answer")return cellPanel(k.u,k.a);if(f&&f.why&&!f.done)return cpOpen(k.u,k.a,k.s);wrOpen(k.u,k.a,k.s)}
 // the menu badge and the Home tile: pieces waiting for the next run (red when some are late), ✏️ while Claude is correcting
-const corrN=()=>{try{const w=corrScan().wait.filter(i=>i.k!=="copy"&&i.ready);return {n:w.length,late:w.some(i=>i.late)}}catch(e){console.warn("corrections",e);return {n:0}}};
-const corrBadge=()=>{const c=corrN();return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
+const corrN=()=>{if(CORR.busy||corrOld().length&&!CORR.failT)return {n:0,chk:true};try{const w=corrScan().wait.filter(i=>i.k!=="copy"&&i.ready);return {n:w.length,late:w.some(i=>i.late)}}catch(e){console.warn("corrections",e);return {n:0}}};
+const corrBadge=()=>{const c=corrN();if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
 function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
-  const sub=st.s==="running"?"Claude is correcting now":st.s==="asked"?"you asked for a correction":(c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Wednesday")+" 15:00";
+  const sub=st.s==="running"?"Claude is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Wednesday")+" 15:00";
   return `<a class="tile" href="#" data-do="tab" data-g="corr"><span class="ti">✏️${c.n?`<span class="tb ${c.late?"late":""}">${c.n} waiting</span>`:""}</span><span><b>Corrections</b><small>${esc(sub)}</small></span></a>`}
 // ---- question analysis (Roger, 26 Oct 2026: "spot the questions that are better answered and the ones that are more difficult… by
 // levels… understand my students' needs"): the first try of every question of an LS by route and group (shared/js/el-items.js).
@@ -2436,7 +2451,7 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
   const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
-    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)?"Drag it to another day, or back to the list on the left (tabs keep the learning path's order)":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
+    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)?"Drag it to another day, or back to the list on the left (tabs keep the learning path's order)":/^note:/.test(it)&&S.place==="plan2"?"Drag it up or down to change the order, to another day, or to the other group to copy it":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
       +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${esc(label)}${/#/.test(it)?agTags(it):""}`
       +(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" title="Open the unit's shadowing video">▶</a>`:"")
       +(a&&p&&!isGame(p)?(()=>{const h=hwNext(x,d,it),o=!!h||hwS.has(it);return `<button type="button" class="aghw ${o?"on":""}" data-do="aghw1" data-d="${d}" data-it="${esc(it)}" ${D} aria-pressed="${o}" title="${h?"Homework for "+esc(ELWeek.date(h[1].by))+(d>ELWeek.today()?" · planned: students see it from "+esc(ELWeek.date(d)):"")+" · click to take it off":o?"Homework · click to take this tab off it":"Make it homework for the next class"}">🏠</button>`})():"")
@@ -2536,7 +2551,7 @@ function tp2Full(on){const d=document,fe=d.fullscreenElement||d.webkitFullscreen
 function tp2Page(grp,ls,studs){const pr=tp2Pair(grp),l=EL_LS.find(y=>y.id===ls),D=S.D;
   const col=g=>{const x=planX(ls,g.id),st=studs.filter(s=>s.group===g.id&&!s.away&&!s.tester&&s.uid).sort(byName),ok=elLsForGroup(l,D.ls[ls],g.id);
     return `<section class="tp2col c${g.course}"><h2>${esc(g.name)}</h2>${!ok?`<p class="muted">This LS is not assigned to ${esc(g.name)}.</p>`:AGOK(ls)&&x.p&&x.gi>=0&&agEnsure(x)?agPage(x,st):`<p class="muted">No time plan for ${esc(g.name)} in this LS yet.</p>`}</section>`};
-  return `<div class="tp2bar"><b>📋 ${esc(pr.map(g=>g.name).join(" + "))}</b><span class="muted">${l?esc(lsLabel(l)):""} · drag inside each group; every change saves as in its own 📅 Time plan</span><span class="sp"></span>`
+  return `<div class="tp2bar"><b>📋 ${esc(pr.map(g=>g.name).join(" + "))}</b><span class="muted">${l?esc(lsLabel(l)):""} · drag inside each group; drag a note to the other group to copy it; every change saves as in its own 📅 Time plan</span><span class="sp"></span>`
     +`<button class="g" data-do="tp2fs" title="Browser full screen on or off (Esc also leaves it)">⛶ Full screen</button><button data-do="tp2x" title="Back to ${esc(grp.name)}'s Time plan">✕ Close</button></div>`
     +`<div class="tp2">${pr.map(col).join("")}</div>`}
 function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="muted">No time plan for this group in this LS yet.</p></div>`;
@@ -2557,20 +2572,35 @@ function agTick(x,d,it,v){const ag=agOf(x);if(!ag)return;const tk={[itKey(d,it)]
   if(!!tkOf(x)[x.ls+"|@"+d]!==all)tk["@"+d]=all?ELWeek.today():false;quick(api.ticks(x.gid,x.ls,tk))}
 // drag and drop (a laptop or desktop: HTML drag events)
 let AGD=null;
-document.addEventListener("dragstart",e=>{const el=e.target.closest&&e.target.closest("[data-ag]");if(!el)return;AGD=Object.assign({},el.dataset);e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain",el.dataset.ag)}catch(_){}setTimeout(()=>document.body.classList.add("agdrag"),0)});
+document.addEventListener("dragstart",e=>{const el=e.target.closest&&e.target.closest("[data-ag]");if(!el)return;AGD=Object.assign({},el.dataset);e.dataTransfer.effectAllowed=agNote(AGD)?"copyMove":"move";try{e.dataTransfer.setData("text/plain",el.dataset.ag)}catch(_){}setTimeout(()=>document.body.classList.add("agdrag"),0)});
 const agInsOff=()=>document.querySelectorAll(".agins-b,.agins-a").forEach(q=>q.classList.remove("agins-b","agins-a"));
+// Copy a note to the other group (Roger, 8 Nov 2026: "I want to be able to drag notes and when I drag them from a group to another it makes a
+// copy"): on the 📋 side-by-side board, a note on a class day (✎ Note or 🎬 Shadowing) dropped on a class day of another group is copied
+// there, where the blue line shows, with its ⏱ minutes; the original stays. Same note already on that day: nothing. One write.
+const agNote=k=>!!k&&k.ag==="it"&&!!k.from&&/^note:/.test(k.it||"");
+const agCopyTo=(k,z)=>agNote(k)&&!!z.dataset.agdrop&&!!z.dataset.gid&&z.dataset.gid!==k.gid;
+function agCopy(k,z,before){const d=z.dataset.agdrop,x=planX(z.dataset.ls,z.dataset.gid),src=agOf(planX(k.ls,k.gid))||{},m=+((src.min||{})[k.from+"|"+k.it])||0;
+  if(!x.p||x.gi<0||((agOf(x)||{days:{}}).days[d]||[]).includes(k.it))return;
+  agSave(x,g=>{const old=g.days[d]||[];if(old.includes(k.it))return false;const cur=agRuns(g,d).flatMap(r=>r.its);
+    if(before&&cur.includes(before)){const i=cur.indexOf(before);g.days[d]=[...cur.slice(0,i),k.it,...cur.slice(i),...old.filter(it=>!cur.includes(it))];g.man=Object.assign({},g.man,{[d]:1})}
+    else addIt(g,d,k.it);
+    if(m){g.min=Object.assign({},g.min,{[d+"|"+k.it]:m})}})}
 // up or down inside its own day: the item it goes before ("" = at the end), shown by a blue line
 const agSame=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&(k.ag==="it"&&!isTab(k.it)||k.ag==="day");
 const agFixed=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&k.ag==="it"&&isTab(k.it);   // a tab inside its own day: nothing to do
 function agInsAt(z,k,e){const els=[...z.querySelectorAll(k.ag==="day"?"[data-og]":"[data-oi]")];if(!els.length)return null;
   const el=els.find(q=>{const r=q.getBoundingClientRect();return e.clientY<r.top+r.height/2});agInsOff();
   if(el){el.classList.add("agins-b");return el.dataset.og||el.dataset.oi}els[els.length-1].classList.add("agins-a");return ""}
-document.addEventListener("dragend",()=>{AGD=null;document.body.classList.remove("agdrag");agInsOff();document.querySelectorAll(".agover").forEach(z=>z.classList.remove("agover"))});
-document.addEventListener("dragover",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;if(agFixed(AGD,z)){agInsOff();z.classList.remove("agover");return}e.preventDefault();e.dataTransfer.dropEffect="move";
+document.addEventListener("dragend",()=>{AGD=null;document.body.classList.remove("agdrag");agInsOff();document.querySelectorAll(".agover,.agcopy").forEach(z=>z.classList.remove("agover","agcopy"))});
+document.addEventListener("dragover",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");document.querySelectorAll(".agcopy").forEach(q=>{if(q!==z)q.classList.remove("agcopy")});
+  if(z&&agCopyTo(AGD,z)){e.preventDefault();e.dataTransfer.dropEffect="copy";document.querySelectorAll(".agover").forEach(q=>q.classList.remove("agover"));z.classList.add("agcopy");const v=agInsAt(z,AGD,e);AGD.ins=v==null?"":v;return}
+  if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;if(agFixed(AGD,z)){agInsOff();z.classList.remove("agover");return}e.preventDefault();e.dataTransfer.dropEffect="move";
   document.querySelectorAll(".agover").forEach(q=>{if(q!==z)q.classList.remove("agover")});
   if(agSame(AGD,z)){z.classList.remove("agover");const v=agInsAt(z,AGD,e);if(v!=null)AGD.ins=v;return}agInsOff();z.classList.add("agover")});
-document.addEventListener("dragleave",e=>{const z=e.target.closest&&e.target.closest("[data-agdrop]");if(z&&!z.contains(e.relatedTarget)){z.classList.remove("agover");agInsOff()}});
-document.addEventListener("drop",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");
+document.addEventListener("dragleave",e=>{const z=e.target.closest&&e.target.closest("[data-agdrop]");if(z&&!z.contains(e.relatedTarget)){z.classList.remove("agover","agcopy");agInsOff()}});
+document.addEventListener("drop",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");
+  if(z&&agCopyTo(AGD,z)){e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");agInsOff();z.classList.remove("agcopy");if(!S.D.tkOk)return alert("Your ticks did not load: reload the page before changing the agenda.");return agCopy(k,z,k.ins)}
+  if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");
   agInsOff();if(!S.D.tkOk)return alert("Your ticks did not load: reload the page before changing the agenda.");
   if(agSame(k,z)){if(k.ins!=null)agReorder(k,k.from,k.ins);return}agDrop(k,z.dataset.agdrop)});
 // Writing and speaking revisions (LS2 engine, research audit 26 Oct 2026): state.drafts[key] = the first version sent for AI feedback
@@ -3407,7 +3437,7 @@ const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if
   // the first time: during a class, open on its group, unless a link asked for a group, course or LS (then the bar asks)
   TOUCHED.clear();
   if(!CLS.ready){CLS.ready=true;const c=classNow();if(c&&CLS.done!==c.key&&!CLS.link&&S.g!==c.gid&&GR.some(g=>g.id===c.gid)){classGo(c);if(location.hash==="#probs")toProbs();return}}
-  render();if(location.hash==="#probs")toProbs()};
+  render();corrFresh();if(location.hash==="#probs")toProbs()};
 // "Students' work in 2ESO B: as of 10:42" and the buttons that fetch it (load: "Update <group>" one group, "Update all" everything)
 const whenAt=t=>{if(!t)return "never";const d=new Date(t),today=new Date().toDateString()===d.toDateString();
   return (today?"":d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+" ")+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})};
