@@ -635,7 +635,12 @@ const reportProblem=u=>report({en:repEn(),save:o=>{
   const {shot,shotFrom}=o,ref=doc(collection(db,"problems")),b=writeBatch(db);delete o.shot;delete o.shotFrom;
   b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,ls:lsId,activity:actId,route:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()}));
   if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
-  return b.commit()}});
+  return b.commit().then(r=>{wakeFixer(u);return r})}});
+// Roger, 8 Nov 2026 ("read it straightaway … fix it and answer the student"): once the report is saved, the school Apps Script
+// (tools/notify/school-mail.gs, action "problem") starts the scheduled task that reads new reports, checked with the student's own
+// sign-in; fire and forget, nothing shown, nothing read. Without it the task still runs every hour.
+const FIXER_URL="https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec";
+const wakeFixer=u=>{try{u.getIdToken().then(t=>fetch(FIXER_URL,{method:"POST",mode:"no-cors",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:t,action:"problem"})})).catch(()=>{})}catch(e){}};
 
 // Suggestions to improve the site (bottom bar "💡 Idea"): suggestions/{id}, read only by the teacher in the dashboard. Same language as the Problem window.
 function suggest(u){

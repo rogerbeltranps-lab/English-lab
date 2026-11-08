@@ -11,6 +11,10 @@
 //      only every few hours): {idToken or key, action: "mark", at} starts the scheduled task "English Lab: mark and correct" on claude.ai
 //      through its API trigger (MARK_TASK_TOKEN below), once per request (at = settings/marking.request.at) and never twice within 10 minutes.
 //      Sent by the dashboard when the teacher presses the button, and by the GitHub Action "Marking on request" as a backup (with the key).
+//   4. A student's ⚠️ Problem report (Roger, 8 Nov 2026: "read it straightaway … fix it and answer the student"): {idToken, action:
+//      "problem"} from the student's page right after the report is saved (shared/js/el-cloud.js). Any signed-in English Lab account may
+//      ask (checked with Google like the teacher's); it starts the scheduled task "English Lab: problem reports" through its API trigger
+//      (PROBLEM_TASK_TOKEN below) at most once every 3 minutes and 30 times a day. The task also runs every hour, so nothing is lost.
 //   5. A student's Speaking or Talk recording (Roger, 8 Nov 2026: "I want you to save audios … an audio emoji which I can listen"):
 //      {idToken, action: "audio", mime, secs, data (base64), meta: {page, step, title, level, group, at}} sent by the student's page right
 //      after a hand-in (shared/js/el-mic.js upload). Only a signed-in school account (or the teacher) may send it, at most 40 a day each and
@@ -35,6 +39,10 @@ const AUDIO_FOLDER = "1O_TFIuX433T03sMhD6tMIFx8NcO-NqlF";
 // improve its products). Never in the repo. Without it the recording is saved but not transcribed.
 const GEMINI_KEY = "PASTE-THE-GEMINI-KEY-HERE";
 const GEMINI_MODEL = "gemini-2.5-flash";
+// PROBLEM_TASK_TOKEN: the API token of the scheduled task "English Lab: problem reports" (claude.ai/code/routines > that task > API trigger >
+// Generate token). Never in the repo; without it students' reports wait for the task's hourly run.
+const PROBLEM_TASK_TOKEN = "PASTE-THE-TOKEN-HERE";
+const PROBLEM_TASK_URL = "https://api.anthropic.com/v1/claude_code/routines/trig_01GrbR641ty9PsPJYeF8ifm9/fire";
 const FIREBASE_WEB_KEY = "AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE";   // English Lab's public web key (shared/js/el-firebase.js), not a secret
 
 function doPost(e) {
@@ -45,6 +53,7 @@ function doPost(e) {
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
   const clean = l => [].concat(l || []).map(a => String(a).trim()).filter(ok);
   const keyOk = KEY.length >= 20 && KEY !== "PUT-THE-KEY-HERE" && m.key === KEY;
+  if (m.action === "problem") return out(keyOk || (m.idToken && isUser(m.idToken)) ? startProblems() : {ok: false, error: "not signed in"});
   if (!keyOk && !(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: m.idToken ? "not the teacher" : "wrong key"});
   if (m.action === "mark") return out(startMarking(m.at));
   const to = clean(m.to), bcc = clean(m.bcc);
@@ -77,10 +86,39 @@ function startMarking(at) {
   } finally { lock.releaseLock(); }
 }
 
+// A student's problem report: start "English Lab: problem reports" now, unless it started less than 3 minutes ago (that run reads every
+// open report) or already 30 times today. {ok: true, started} or {ok: true, already} or {ok: false, error}.
+function startProblems() {
+  if (!PROBLEM_TASK_TOKEN || PROBLEM_TASK_TOKEN === "PASTE-THE-TOKEN-HERE") return {ok: false, error: "no task token"};
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(20000)) return {ok: false, error: "busy, try again"};
+  try {
+    const P = PropertiesService.getScriptProperties(), last = Number(P.getProperty("problemAt") || 0);
+    const day = Utilities.formatDate(new Date(), "Europe/Madrid", "yyyy-MM-dd"), n = P.getProperty("problemDay") === day ? Number(P.getProperty("problemN") || 0) : 0;
+    if (Date.now() - last < 3 * 60e3 || n >= 30) return {ok: true, already: new Date(last).toISOString()};
+    const r = UrlFetchApp.fetch(PROBLEM_TASK_URL, {method: "post", contentType: "application/json", payload: "{}", muteHttpExceptions: true,
+      headers: {authorization: "Bearer " + PROBLEM_TASK_TOKEN, "anthropic-beta": "experimental-cc-routine-2026-04-01", "anthropic-version": "2023-06-01"}});
+    const code = r.getResponseCode();
+    if (code < 200 || code >= 300) return {ok: false, error: "the task did not start (HTTP " + code + ")"};
+    P.setProperties({problemAt: String(Date.now()), problemDay: day, problemN: String(n + 1)});
+    return {ok: true, started: new Date().toISOString()};
+  } finally { lock.releaseLock(); }
+}
+
+// any English Lab account (student, tester or teacher): a real, unexpired sign-in token of this Firebase project, checked by Google
+function isUser(idToken) {
+  try {
+    const r = UrlFetchApp.fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + FIREBASE_WEB_KEY,
+      {method: "post", contentType: "application/json", payload: JSON.stringify({idToken: String(idToken)}), muteHttpExceptions: true});
+    return r.getResponseCode() === 200 && !!(JSON.parse(r.getContentText()).users || [])[0];
+  } catch (x) { return false; }
+}
+
 // Run this once from the editor after pasting the token (Allow if Google asks): it only checks the token is there, it starts nothing.
 function testMarkToken() {
   PropertiesService.getScriptProperties().getProperty("markAt");
-  Logger.log(MARK_TASK_TOKEN && MARK_TASK_TOKEN !== "PASTE-THE-TOKEN-HERE" ? "Token pasted ✅" : "No token yet: paste it in MARK_TASK_TOKEN");
+  Logger.log(MARK_TASK_TOKEN && MARK_TASK_TOKEN !== "PASTE-THE-TOKEN-HERE" ? "Marking token pasted ✅" : "No marking token yet: paste it in MARK_TASK_TOKEN");
+  Logger.log(PROBLEM_TASK_TOKEN && PROBLEM_TASK_TOKEN !== "PASTE-THE-TOKEN-HERE" ? "Problem reports token pasted ✅" : "No problem reports token yet: paste it in PROBLEM_TASK_TOKEN");
 }
 
 // the teacher's Firebase sign-in, checked by Google: a real, unexpired token of roger.beltranps@gmail.com with a verified email
