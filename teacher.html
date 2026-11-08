@@ -72,7 +72,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .cstu{padding:9px 0;border-top:1px solid #eef2f7}.cst{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:2px 0 6px}.cst .cfix,.chead .cfix,.cst .cask,.chead .cask{margin-left:auto}
 button.cfix{background:#3157d5;color:#fff;border:0;border-radius:10px;padding:5px 12px;font-weight:700;cursor:pointer}button.cfix:hover{background:#2443ad}.cask{margin-left:auto;color:#15803d;font-weight:700;font-size:14px}
 .cnum{display:inline-block;margin:2px 10px 0 0;font-size:14px;color:#334155;white-space:nowrap}details.cgrp,details.cday{border-top:1px solid #e2e8f0;padding:8px 0}details.cgrp>summary,details.cday>summary{cursor:pointer}details.cday h3{margin:10px 0 2px;font-size:.95rem;color:#475569}
-p.hal{display:block;padding:10px 14px;border-radius:12px}p.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}.tside .nv small.late{opacity:1;color:#b91c1c;font-weight:800}
+p.hal{display:block;padding:10px 14px;border-radius:12px}p.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}.tside .nv small.ask{opacity:1;background:#fef3c7;color:#92400e;border-radius:999px;padding:0 6px;font-weight:800}.nv small.late{opacity:1;color:#b91c1c;font-weight:800}
 a.hal{display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:16px;text-decoration:none;font-size:16px}a.hal span{margin-left:auto;font-weight:800;white-space:nowrap}a.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}a.hal.news{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}a.hal:hover{filter:brightness(.97)}
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;color:#0f172a;text-decoration:none;min-height:112px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:28px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:17px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
@@ -1086,7 +1086,7 @@ function render0(){
     +`<button class="nv ann" data-do="annnew" title="Send a message to one group, a whole course, every group or some students. Sent ones are in 💬 Messages">📣 Announcement</button>`
     +`<button class="nv ${mtOn()?"mton":""}" data-do="mtdlg" title="Close the site to students for a while: they see a maintenance message with worksheets to print">🛠 Maintenance${mtOn()?'<small class="mt">ON</small>':""}</button>`
     +nv("plan","🏠 Home","","The next class, every group, the time plan of all groups and the messages")
-    +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,esc(g.name),"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`)).join("")
+    +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,esc(g.name),"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`+askBadge(inGr(g.id).filter(s=>!s.away).reduce((n,s)=>n+lvAsks(s.uid).length,0)))).join("")
     +(n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):"")
     +`<div class="sep"></div>`
     +nv("corr","✏️ Corrections","","What Claude corrected and when, what is still waiting, and Correct everything waiting now",corrBadge())
@@ -1148,6 +1148,7 @@ function render0(){
     const al=lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
       +(nb?tAlert("plan","⏰",`${plural(nb,"earlier session")} not ticked`,"Tick them"):"")
       +(/❌/.test(todoH)?tAlert("todo","❌","Claude's marking is late","See"):"")
+      +((n=>n?tAlert("todo","🎯",`${plural(n,"level change request")} from students`,"Answer","news"):"")((todoH.match(/<li>🎯/g)||[]).length))
       +(np?tAlert("msgs","⚠️",`${plural(np,"problem report")} from students`,"Read"):"")
       +(nr?tAlert("msgs","✉️",`${plural(nr,"new answer")} to your messages`,"Read","news"):"");
     $("#main").innerHTML=head+`<div class="hgrid"><div class="hl">${al}${classCard(grp)}</div><div class="tiles">`
@@ -1409,6 +1410,9 @@ function corrOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;const f=flagOf(k.u
   if(k.k==="answer")return cellPanel(k.u,k.a);if(f&&f.why&&!f.done)return cpOpen(k.u,k.a,k.s);wrOpen(k.u,k.a,k.s)}
 // the menu badge and the Home tile: pieces waiting for the next run (red when some are late), ✏️ while Claude is correcting
 const corrN=()=>{if(CORR.busy||corrOld().length&&!CORR.failT)return {n:0,chk:true};try{const w=corrScan().wait.filter(i=>i.k!=="copy"&&i.ready);return {n:w.length,late:w.some(i=>i.late)}}catch(e){console.warn("corrections",e);return {n:0}}};
+// 🎯 level change requests a student sent from their board or LS page (levels/{ls}.request, already loaded for every student: no new reads)
+const lvAsks=u=>Object.entries(S.D.lv[u]||{}).filter(([id,l])=>l&&l.request&&EL_LS.some(x=>x.id===id));
+const askBadge=n=>n?` <small class="ask" title="${n} level change request${n>1?"s":""}: see the group's To do">🎯${n}</small>`:"";
 const corrBadge=()=>{const c=corrN();if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
 function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
   const sub=st.s==="running"?"Claude is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Wednesday")+" 15:00";
@@ -1504,8 +1508,9 @@ function todo(studs,ls,list){   // studs: signed-in students only. Final product
   // 🙋 Claude handed it to you (ask[step]); ✉️ Claude answers it in the Friday run, or you do it first
   studs.forEach(s=>list.forEach(a=>unanswered(s.uid,a).forEach(([id,t])=>{const h=handedIn(s.uid,a)[id],x=(S.D.rs[s.uid]||{})[a.id]||{},k=ELMark.asked(h,x,id)&&x.ask[id];
     out.push(`${k?"🙋":"✉️"} <b>${name(s)}</b> ${k?"needs you on":"commented on"} <b>${esc(t)}</b> (${esc(a.title)}): “${esc(h.comment)}”${k?` <small class="muted">· Claude: ${esc(k.why)}</small>`:` <small class="muted" title="Claude answers students' comments every Friday at 15:00">· Claude answers it on Friday</small>`} <button data-do="cell" data-u="${s.uid}" data-a="${a.id}">Answer</button> <button class="g" data-do="noreply" data-u="${s.uid}" data-a="${a.id}" data-s="${id}" title="Take it off this list without answering (the student sees nothing)">No reply needed</button>`)})));
-  studs.forEach(s=>{const l=(S.D.lv[s.uid]||{})[ls];
-    if(l&&l.request)out.push(`🔁 <b>${name(s)}</b> asks to change route: ${route(elRouteOf(S.D.lv[s.uid],ls).level)} → ${route(l.request)}${l.reason?` · “${esc(l.reason)}”`:""} <button data-do="acc" data-u="${s.uid}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}">Decline</button>`)});
+  // from any LS of the course, not only the one on screen: the board's 🎯 My level asks in the student's current LS (Roger, 8 Nov 2026)
+  studs.forEach(s=>lvAsks(s.uid).forEach(([id,l])=>
+    out.push(`🎯 <b>${name(s)}</b> asks for a level change: ${route(elRouteOf(S.D.lv[s.uid],id).level)} → ${route(l.request)}${l.reason?` · “${esc(l.reason)}”`:' <small class="muted">· no reason given</small>'}${id!==ls?` <small class="muted">· in ${lsName(id)}</small>`:""} <button data-do="acc" data-u="${s.uid}" data-ls="${id}" data-to="${l.request}">Accept</button> <button class="g" data-do="rej" data-u="${s.uid}" data-ls="${id}">Decline</button>`)));
   const grp=GR.find(g=>g.id===S.g),mk=grp?mkTodoItems(grp):[];mk.filter(x=>x.now).forEach(x=>out.push(x.h));if(grp)out.push(...cpItems(grp));
   const np=S.D.pb.filter(x=>!x.fixed).length;
   if(np)out.push(`⚠️ ${np} open problem report${np>1?"s":""} from students (all groups) <button data-do="pbopen">Read</button>`);
@@ -3362,7 +3367,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
         :`<h3>Delete this report?</h3><p class="muted">Deleting it means you checked it and the site is right. You can send ${esc(x.name||"the student")} a thank-you note; they see it once, the next time they open a page:</p>${pbNote(x,"thanks")}
         <div class="row" style="justify-content:flex-start"><button data-do="pbdelok" data-id="${esc(x.id)}" data-t="1">💌 Delete and thank the student</button><button class="g" data-do="pbdelok" data-id="${esc(x.id)}">Delete without a message</button></div>`)},
     pbdelok:()=>{$("#dlg").close();act(api.pbDel(k.id,!!k.t))},
-    acc:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.to))},rej:()=>{$("#dlg").close();act(api.reject(u,S.ls))},
+    acc:()=>{$("#dlg").close();act(api.setLevel(u,k.ls||S.ls,k.to))},rej:()=>{$("#dlg").close();act(api.reject(u,k.ls||S.ls))},
     rt:()=>rtPanel(u),rtlist:()=>rtListPanel(u),setlist:()=>{$("#dlg").close();act(api.listRoute(S.P[u].rid,k.r||null,S.ls))},
     rton:()=>{S.rtOn[u]=t.checked;render()},
     cutdef:()=>quick(api.cuts(GR.find(g=>g.id===S.g).course,Object.assign({},EL_ROUTE_CUTS[GR.find(g=>g.id===S.g).course]))),
