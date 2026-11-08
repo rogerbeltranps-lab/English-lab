@@ -657,6 +657,13 @@ function workBox(lss){S.wmiss=new Set();S.wtabs=0;if(all()||!D.me.group)return "
   // opened by the teacher and not late yet. Late + opened = the ✅ To do count (todoCount).
   const miss=lss?[...miss0,...lateList(lss)]:miss0,nm=tabsMiss(miss),lateIds=new Set(miss.map(([a])=>a.id));
   const open=lss?todoItems(lss).filter(x=>!lateIds.has(x.a.id)):[],no=open.reduce((n,x)=>n+todoTabs(x),0);
+  // what an opened one is for (Roger, 8 Nov 2026: "say to do in class or homework by … if it's homework"): 📝 homework by its day when the
+  // teacher set it (or some of its tabs) as homework (hwList), else 🏫 to do in class
+  const hwBy={},hwFor=x=>{const k=x.l.id;if(!hwBy[k])hwBy[k]=hwList(x.l,D.ls[k]||{}).filter(h=>!h.done);
+    for(const h of hwBy[k]){const e=h.acts.find(([y])=>y.id===x.a.id);if(e)return {h,ps:e[1]}}return null};
+  const openWhat=x=>{const w=hwFor(x);if(!w)return `🏫 ${t("Per fer a classe","To do in class")}`;
+    const nm=w.ps.length?": "+w.ps.map(id=>(x.tabs.find(z=>z[0]===id)||[])[1]).filter(Boolean).map(esc).join(" · "):"";
+    return `📝 ${t("Deures per al","Homework by")} ${when(w.h.x.date)}${nm}`};
   if(!due.length&&!miss.length&&!open.length)return "";
   const cur=EL_LS.find(l=>l.id===(ELWeek.now(D.me.group)||{}).ls)||EL_LS.find(l=>l.id===S.ls),share=cur?elFormativeShare(cur.id):0,lsN=cur?lsName(cur):"";
   const k=p>=100?"fk-g":p>=50?"fk-a":"fk-r";
@@ -666,11 +673,11 @@ function workBox(lss){S.wmiss=new Set();S.wtabs=0;if(all()||!D.me.group)return "
     +`<div class="fv-stats">`
     +(tot?fvStat(k,"✅",t("Activitats fetes","Activities done"),`${done} <small>/ ${tot}</small>`,`<span class="fv-bar"><span style="width:${p}%"></span></span>${t("de les que ja havien d'estar fetes","of the ones that were due")}`):"")
     +fvStat(miss.length?"fk-r":"fk-g",miss.length?"⏰":"🎉",t("Activitats endarrerides","Late activities"),String(nm),miss.length?t("ja havien d'estar fetes: fes-les ara","past their day: do them now"):t("cap: molt bé!","none: well done!"))
-    +fvStat(no?"fk-i":"fk-g","📂",t("Obertes, per acabar","Opened, still to do"),String(no),no?t("el professor les ha obert; encara no van tard","your teacher opened them; not late yet"):t("cap","none"))
+    +fvStat(no?"fk-i":"fk-g","📂",t("Obertes, per acabar","Opened, still to do"),String(no),no?t("a classe, o deures si el professor ho diu","in class, or homework if your teacher says so"):t("cap","none"))
     +(share?fvStat("fk-b","📈",t("Avaluació contínua","Continuous assessment"),`${share} <small>%</small>`,t(`de la nota de ${lsN}`,`of your ${lsN} mark`)):"")+`</div>`
     +(miss.length||open.length?`<div class="fv-missbox"><h3 class="fv-sub">📌 ${t(`Tens ${nAct(nm+no)} per fer`,`You have ${nAct(nm+no)} to do`)}${miss.length?` <small>· ⏰ ${nm} ${t(nm===1?"endarrerida":"endarrerides","late")}</small>`:""}</h3><ol class="fv-miss">`
       +miss.map(([a,d],i)=>{const ln=leftNames(a);return `<li><span class="fv-mh"><span class="fv-n">${String(i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span>${ln.length?`<span class="fv-tabs">⏳ ${nAct(ln.length)}: <b>${ln.map(esc).join(" · ")}</b></span>`:""}<span class="fv-due">⏰ ${t("Endarrerida: calia fer-la el","Late: due on")} ${when(d)}</span><a class="go" href="${a.path}">${t("Fes-la ara","Do it now")} →</a></li>`}).join("")
-      +open.map((x,i)=>{const a=x.a,ln=x.tabs.map(z=>z[1]);return `<li class="op"><span class="fv-mh"><span class="fv-n">${String(miss.length+i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span>${ln.length?`<span class="fv-tabs">⏳ ${nAct(ln.length)}: <b>${ln.map(esc).join(" · ")}</b></span>`:""}<span class="fv-due">📂 ${t("Oberta pel professor · encara no va tard","Opened by your teacher · not late yet")}</span><a class="go" href="${x.cp?tabHref(x.cp):x.tabs.length?tabHref(a,x.tabs[0][0]):tabHref(a)}">${t("Fes-la","Do it")} →</a></li>`}).join("")+`</ol></div>`
+      +open.map((x,i)=>{const a=x.a,ln=x.tabs.map(z=>z[1]);return `<li class="op"><span class="fv-mh"><span class="fv-n">${String(miss.length+i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span>${ln.length?`<span class="fv-tabs">⏳ ${nAct(ln.length)}: <b>${ln.map(esc).join(" · ")}</b></span>`:""}<span class="fv-due">${openWhat(x)}</span><a class="go" href="${x.cp?tabHref(x.cp):x.tabs.length?tabHref(a,x.tabs[0][0]):tabHref(a)}">${t("Fes-la","Do it")} →</a></li>`}).join("")+`</ol></div>`
       :`<p class="fv-ok"><span aria-hidden="true">🎉</span> ${t("Les tens totes fetes. Continua així!","You have done them all. Keep it up!")}</p>`)+`</div>`}
 // the heading and the cards of the visual boxes on 📊 My marks (fvHead, fvStat; CSS .fv-*), in the style of the LS page's ⓘ About this LS
 const fvHead=(i,h,sub)=>`<div class="fvh"><h2><span class="fvi" aria-hidden="true">${i}</span> ${h}</h2>${sub?`<span class="fvt">· ${sub}</span>`:""}</div>`;
