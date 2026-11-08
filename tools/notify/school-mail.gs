@@ -510,8 +510,11 @@ function fpClassroom(m) {
   return {ok: true, course: c.name, works, work: w, subs};
 }
 
-// Run once from the editor (Classroom API service added): Google asks for the Classroom permission (tick every box) and the log lists the
-// classes. Without that permission fp_classroom answers "No tienes permiso para llamar a classroom.courses.list" (Roger, 9 Nov 2026).
+// Run once from the editor (Classroom API service added): Google asks for the Classroom permission (tick every box; requireAllScopes asks for all of them at once, as Google may grant
+// them one by one) and the log lists the 2ESOA assignments. Without that permission fp_classroom answers "No tienes permiso para llamar a classroom.courses.list" (Roger, 9 Nov 2026).
 function testClassroom() {
-  Logger.log((Classroom.Courses.list({teacherId: "me", pageSize: 20}).courses || []).map(c => c.name).join(" · "));
+  ScriptApp.requireAllScopes(ScriptApp.AuthMode.FULL);
+  const c = (Classroom.Courses.list({teacherId: "me", pageSize: 20}).courses || []).find(x => /2ESOA/.test(x.name.replace(/\s/g, "")));
+  Logger.log(c.name + ": " + (Classroom.Courses.CourseWork.list(c.id, {pageSize: 20}).courseWork || []).map(x => x.title).join(" · "));
+  Logger.log("Students: " + (Classroom.Courses.Students.list(c.id, {pageSize: 50}).students || []).length);
 }
