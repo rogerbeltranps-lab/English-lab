@@ -65,7 +65,7 @@ a.hal{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:1
 .todo .tdl,.hwlist{list-style:none;margin:0;padding:0}.todo .tdl li{border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin:0 0 10px;background:#fff}.todo .tdl li.late{border-color:#fca5a5;background:#fff7f7}
 .todo .tdh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-bottom:8px}.todo .tdh b{font-size:17px}.todo .tdh b a{color:#1e3a8a;text-decoration:none}.todo .tdh b a:hover{text-decoration:underline}
 .todo .chips{display:flex;flex-wrap:wrap;gap:6px}.todo .stp{display:inline-block;font-size:14px;font-weight:600;border-radius:999px;padding:6px 13px;border:1px solid #99f6e4;background:#f0fdfa;color:#0f766e;text-decoration:none;white-space:nowrap}.todo a.stp:hover{outline:2px solid currentColor}.todo li.late .stp{border-color:#fca5a5;background:#fee2e2;color:#991b1b}.todo .stp.hwt{background:#ecfeff;border-color:#67e8f9;color:#155e75}.tdls{font-size:15px;margin:12px 0 8px;color:#475569}
-.tdtag{font-size:13px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}.tdtag.late{background:#fee2e2;color:#991b1b}.tdtag.hw{background:#cffafe;color:#155e75}
+.tdtag{font-size:13px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}.tdtag.late{background:#fee2e2;color:#991b1b}.tdtag.hw{background:#cffafe;color:#155e75}.tdtag.cls{background:#e0e7ff;color:#3730a3}
 .hwlist li{border:1px solid #a5f3fc;background:#f0fdff;border-radius:14px;padding:12px 14px;margin:0 0 10px}.hwlist li.dn{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
 .hwl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}.hwl .hwi{font-size:20px}.hwl .hwt{flex:1 1 260px;font-weight:600}.hwl .ok{color:#16a34a;font-weight:700}.hwl .td{color:#b45309;font-weight:700}.hwlist .hwmsg{margin-top:6px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px;color:#0f172a;text-decoration:none;min-height:120px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:30px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:18px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
@@ -134,7 +134,7 @@ body[data-course="2eso"]{--c:#1f6b52;--c-dark:#174d3d;--c-soft:#e9f5ef}body[data
 .fv-miss{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
 .fv-miss li{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid #fecaca;border-left:6px solid #dc2626;border-radius:14px;padding:10px 12px}
 .fv-mh{display:flex;align-items:flex-start;gap:8px}.fv-mh b{font-size:15px;line-height:1.3}.fv-n{background:#dc2626;color:#fff;font-weight:900;border-radius:9px;padding:2px 7px;font-size:13px;flex:none}
-.fv-due{font-size:13.5px;color:#991b1b}.fv-miss li.op{border-color:#c7d2fe;border-left-color:#4f46e5}.fv-miss li.op .fv-n{background:#4f46e5}.fv-miss li.op .fv-due{color:#3730a3}.fv-miss li.op .fv-tabs{color:#312e81}.fv-miss li.op a.go{background:#4f46e5}.fv-sub small{font-weight:600;font-size:.85em;color:#b91c1c}.fv-tabs{font-size:13.5px;color:#7f1d1d}.fv-miss a.go{align-self:flex-start;font-size:14px;padding:7px 14px;border-radius:10px;background:#b91c1c;margin-top:auto}
+.fv-due{font-size:13.5px;color:#991b1b}.fv-open{margin:12px 0 0;font-size:14.5px;color:#3730a3}.fv-open a{font-weight:700;color:#4338ca}.fv-tabs{font-size:13.5px;color:#7f1d1d}.fv-miss a.go{align-self:flex-start;font-size:14px;padding:7px 14px;border-radius:10px;background:#b91c1c;margin-top:auto}
 .fv-ok{display:flex;align-items:center;gap:10px;background:#ecfdf3;border-left:6px solid #16a34a;border-radius:14px;padding:10px 14px;color:#166534;font-weight:700;margin:12px 0 0}
 .fv-warn{background:#fef2f2;border-left:6px solid #dc2626;border-radius:14px;padding:10px 14px;color:#991b1b;margin:12px 0 8px}
 .fv .muted{margin:10px 0 0}
@@ -652,19 +652,13 @@ function workBox(lss){S.wmiss=new Set();S.wtabs=0;if(all()||!D.me.group)return "
   // counted in tabs (activities), not learning paths (Roger, 7 Nov 2026): a path with 5 tabs not done is 5 missing
   const miss0=due.filter(([a])=>!isDone(a)),tot=due.reduce((n,[a])=>n+elTabsTotal(a),0),done=tot-tabsMiss(miss0),p=tot?Math.round(done/tot*100):100;
   miss0.forEach(([a])=>S.wmiss.add(a.id));S.wtabs=tabsMiss(miss0);
-  // Late and still to do, the same lists as ✅ To do (Roger, 8 Nov 2026: "I dont understand why the activities pending dont match here"):
-  // ⏰ late = past their day in the class plan (elMissing + lateList, as the home banner), 📂 opened = the rest of ✅ To do (elTodoList),
-  // opened by the teacher and not late yet. Late + opened = the ✅ To do count (todoCount).
+  // Only ⏰ late work here (Roger, 8 Nov 2026: "I dont understand why the activities pending dont match here", then "here only late
+  // activities"): past their day in the class plan (elMissing + lateList, the home banner's number). The opened ones not late yet are
+  // in ✅ To do (elTodoList), with 🏫 in class or 📝 homework by …; one line here says how many and links there. Late + opened = To do.
   const miss=lss?[...miss0,...lateList(lss)]:miss0,nm=tabsMiss(miss),lateIds=new Set(miss.map(([a])=>a.id));
   const open=lss?todoItems(lss).filter(x=>!lateIds.has(x.a.id)):[],no=open.reduce((n,x)=>n+todoTabs(x),0);
-  // what an opened one is for (Roger, 8 Nov 2026: "say to do in class or homework by … if it's homework"): 📝 homework by its day when the
-  // teacher set it (or some of its tabs) as homework (hwList), else 🏫 to do in class
-  const hwBy={},hwFor=x=>{const k=x.l.id;if(!hwBy[k])hwBy[k]=hwList(x.l,D.ls[k]||{}).filter(h=>!h.done);
-    for(const h of hwBy[k]){const e=h.acts.find(([y])=>y.id===x.a.id);if(e)return {h,ps:e[1]}}return null};
-  const openWhat=x=>{const w=hwFor(x);if(!w)return `🏫 ${t("Per fer a classe","To do in class")}`;
-    const nm=w.ps.length?": "+w.ps.map(id=>(x.tabs.find(z=>z[0]===id)||[])[1]).filter(Boolean).map(esc).join(" · "):"";
-    return `📝 ${t("Deures per al","Homework by")} ${when(w.h.x.date)}${nm}`};
-  if(!due.length&&!miss.length&&!open.length)return "";
+  if(!due.length&&!miss.length)return "";
+  const openLine=no?`<p class="fv-open">📂 ${t(`A més, ${nAct(no)} ${no>1?"obertes que encara no van":"oberta que encara no va"} tard`,`Plus ${nAct(no)} opened that ${no>1?"are":"is"} not late yet`)}: <a href="#todo">✅ ${t("Per fer","To do")} →</a></p>`:"";
   const cur=EL_LS.find(l=>l.id===(ELWeek.now(D.me.group)||{}).ls)||EL_LS.find(l=>l.id===S.ls),share=cur?elFormativeShare(cur.id):0,lsN=cur?lsName(cur):"";
   const k=p>=100?"fk-g":p>=50?"fk-a":"fk-r";
   return `<div class="box fv work">${fvHead("📋",t("Les meves activitats","My activities"),elTermName(term,L))}`
@@ -673,12 +667,10 @@ function workBox(lss){S.wmiss=new Set();S.wtabs=0;if(all()||!D.me.group)return "
     +`<div class="fv-stats">`
     +(tot?fvStat(k,"✅",t("Activitats fetes","Activities done"),`${done} <small>/ ${tot}</small>`,`<span class="fv-bar"><span style="width:${p}%"></span></span>${t("de les que ja havien d'estar fetes","of the ones that were due")}`):"")
     +fvStat(miss.length?"fk-r":"fk-g",miss.length?"⏰":"🎉",t("Activitats endarrerides","Late activities"),String(nm),miss.length?t("ja havien d'estar fetes: fes-les ara","past their day: do them now"):t("cap: molt bé!","none: well done!"))
-    +fvStat(no?"fk-i":"fk-g","📂",t("Obertes, per acabar","Opened, still to do"),String(no),no?t("a classe, o deures si el professor ho diu","in class, or homework if your teacher says so"):t("cap","none"))
     +(share?fvStat("fk-b","📈",t("Avaluació contínua","Continuous assessment"),`${share} <small>%</small>`,t(`de la nota de ${lsN}`,`of your ${lsN} mark`)):"")+`</div>`
-    +(miss.length||open.length?`<div class="fv-missbox"><h3 class="fv-sub">📌 ${t(`Tens ${nAct(nm+no)} per fer`,`You have ${nAct(nm+no)} to do`)}${miss.length?` <small>· ⏰ ${nm} ${t(nm===1?"endarrerida":"endarrerides","late")}</small>`:""}</h3><ol class="fv-miss">`
-      +miss.map(([a,d],i)=>{const ln=leftNames(a);return `<li><span class="fv-mh"><span class="fv-n">${String(i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span>${ln.length?`<span class="fv-tabs">⏳ ${nAct(ln.length)}: <b>${ln.map(esc).join(" · ")}</b></span>`:""}<span class="fv-due">⏰ ${t("Endarrerida: calia fer-la el","Late: due on")} ${when(d)}</span><a class="go" href="${a.path}">${t("Fes-la ara","Do it now")} →</a></li>`}).join("")
-      +open.map((x,i)=>{const a=x.a,ln=x.tabs.map(z=>z[1]);return `<li class="op"><span class="fv-mh"><span class="fv-n">${String(miss.length+i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span>${ln.length?`<span class="fv-tabs">⏳ ${nAct(ln.length)}: <b>${ln.map(esc).join(" · ")}</b></span>`:""}<span class="fv-due">${openWhat(x)}</span><a class="go" href="${x.cp?tabHref(x.cp):x.tabs.length?tabHref(a,x.tabs[0][0]):tabHref(a)}">${t("Fes-la","Do it")} →</a></li>`}).join("")+`</ol></div>`
-      :`<p class="fv-ok"><span aria-hidden="true">🎉</span> ${t("Les tens totes fetes. Continua així!","You have done them all. Keep it up!")}</p>`)+`</div>`}
+    +(miss.length?`<div class="fv-missbox"><h3 class="fv-sub">⏰ ${nm>1?t(`Tens ${nm} activitats endarrerides`,`You have ${nm} late activities`):t("Tens 1 activitat endarrerida","You have 1 late activity")}</h3><ol class="fv-miss">`
+      +miss.map(([a,d],i)=>{const ln=leftNames(a);return `<li><span class="fv-mh"><span class="fv-n">${String(i+1).padStart(2,"0")}</span><b>${esc(a.title)}</b></span>${ln.length?`<span class="fv-tabs">⏳ ${nAct(ln.length)}: <b>${ln.map(esc).join(" · ")}</b></span>`:""}<span class="fv-due">📅 ${t("calia fer-la el","due on")} ${when(d)}</span><a class="go" href="${a.path}">${t("Fes-la ara","Do it now")} →</a></li>`}).join("")+`</ol></div>`+openLine
+      :`<p class="fv-ok"><span aria-hidden="true">🎉</span> ${t("No en tens cap d'endarrerida. Continua així!","Nothing late. Keep it up!")}</p>`+openLine)+`</div>`}
 // the heading and the cards of the visual boxes on 📊 My marks (fvHead, fvStat; CSS .fv-*), in the style of the LS page's ⓘ About this LS
 const fvHead=(i,h,sub)=>`<div class="fvh"><h2><span class="fvi" aria-hidden="true">${i}</span> ${h}</h2>${sub?`<span class="fvt">· ${sub}</span>`:""}</div>`;
 const fvK=c=>/^\d/.test(c)?"fk-"+c[0]:/^CD/.test(c)?"fk-d":/^CC/.test(c)?"fk-c":"fk-b",fvIc=c=>({1:"🤝",2:"🎧",3:"🗣",4:"📖",5:"✏️",6:"🔎"})[/^\d/.test(c)?c[0]:""]||(/^CD/.test(c)?"💻":/^CC/.test(c)?"🌍":"🧩");
@@ -1088,7 +1080,8 @@ function todoBox(lss,ls,info){const xs=todoItems(lss),hws=hwList(ls,info).filter
   const head=`<h2>✅ ${t("Per fer","To do")}</h2><p class="muted" style="margin:0 0 10px">${t("Tot el que el professor ha obert a classe i encara no has acabat. Clica una pestanya per anar-hi. Els <b>deures</b> són una altra cosa: només el que el professor posa com a deures (📝 Deures).","Everything your teacher has opened in class that you haven't finished yet. Click a tab to go straight to it. <b>Homework</b> is different: only what your teacher sets as homework (📝 Homework).")}</p>`;
   if(!xs.length)return `<div class="box todo">${head}<p class="ptok">✓ ${t("No tens res per fer: has acabat tot el que el professor ha obert.","Nothing to do: you have finished everything your teacher has opened.")}</p></div>`;
   const li=x=>{const a=x.a,ds=doneSet(a),ks=tabGroups(a,visSteps(a,D.ls[x.l.id]||{})),n=ks.filter(g=>g.every(k=>ds.has(k))).length,num=x.p&&x.gi>=0?lpNums(x.p,x.gi)(a):"",nm=(num?num+" · ":"")+a.title.split(/[:(]/)[0].trim(),h=hwOf(a);
-    const tags=(x.late?` <span class="tdtag late">⏰ ${t("endarrerida","late")}</span>`:"")+(h?` <span class="tdtag hw">📝 ${t("deures per al","homework for")} ${when(h.x.date)}</span>`:"");
+    // each path says when it is for (Roger, 8 Nov 2026: "say to do in class or homework by … if it's homework"): ⏰ late, 📝 homework by its day, else 🏫 in class
+    const tags=(x.late?` <span class="tdtag late">⏰ ${t("endarrerida","late")}</span>`:"")+(h?` <span class="tdtag hw">📝 ${t("deures per al","homework by")} ${when(h.x.date)}</span>`:x.late?"":` <span class="tdtag cls">🏫 ${t("a classe","in class")}</span>`);
     const chips=x.cp?`<a class="stp go2" href="${tabHref(x.cp)}">⏱ ${t(`Primer fes el ${esc(x.cp.title)} (sense apunts)`,`First do ${esc(x.cp.title)} (without notes)`)} →</a>`
       :x.tabs.length?x.tabs.map(([id,tn])=>`<a class="stp go2 ${hwTab(a,id)?"hwt":""}" href="${tabHref(a,id)}">${hwTab(a,id)?"📝 ":""}${esc(tn)} →</a>`).join("")
       :`<a class="stp go2" href="${tabHref(a)}">${t("Obre-la","Open it")} →</a>`;
