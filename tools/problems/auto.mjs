@@ -9,7 +9,9 @@
 //        the bug is fixed and merged: the student gets the ✅ fixed card (problemReplies/{id}, kind "fixed", the same note as the dashboard's
 //        "✅ Mark as fixed", in the report's language), with --msg as the teacher's own words under it (≤1000 characters, Roger's voice, the
 //        report's language, never AI); the report is marked fixed, msg kept in problems/{id}.msgs like "✅ Send and mark as fixed", and
-//        problems/{id}.auto = {verdict:"fixed", note, at} (note = what was fixed + PR, for Roger; the dashboard shows it).
+//        problems/{id}.auto = {verdict:"fixed", note, at (timestamp)} (note = what was fixed + PR, for Roger; the dashboard shows it). The
+//        GitHub Action "English Lab emails" (notify.mjs --instant) then sends Roger the "⚠️ IMPORTANT" email: run it at once with
+//        workflow_dispatch, send = "new reports and ideas to me" (its 15-minute schedule is only the backup).
 //   node tools/problems/auto.mjs leave <id> --note "..." [--apply]
 //        not a technical bug (design, pedagogy, marking, a route, unclear…): nothing is sent to the student and the report stays open for
 //        Roger with problems/{id}.auto = {verdict:"roger", note, at}, so later runs skip it.
@@ -47,7 +49,7 @@ const plain=v=>v==null?null:"stringValue" in v?v.stringValue:"integerValue" in v
   :"arrayValue" in v?(v.arrayValue.values||[]).map(plain):null;
 const doc=d=>d?Object.fromEntries(Object.entries(d.fields||{}).map(([k,x])=>[k,plain(x)])):null;
 const fsv=x=>x==null?{nullValue:null}:typeof x==="string"?{stringValue:x}:typeof x==="number"?(Number.isInteger(x)?{integerValue:String(x)}:{doubleValue:x})
-  :typeof x==="boolean"?{booleanValue:x}:Array.isArray(x)?{arrayValue:{values:x.map(fsv)}}:{mapValue:{fields:Object.fromEntries(Object.entries(x).map(([k,v])=>[k,fsv(v)]))}};
+  :typeof x==="boolean"?{booleanValue:x}:x instanceof Date?{timestampValue:x.toISOString()}:Array.isArray(x)?{arrayValue:{values:x.map(fsv)}}:{mapValue:{fields:Object.fromEntries(Object.entries(x).map(([k,v])=>[k,fsv(v)]))}};
 async function list(coll){const out=[];let t="";do{const j=await api("GET",DOCS+coll+"?pageSize=300"+(t?"&pageToken="+t:""));(j?.documents||[]).forEach(d=>out.push(Object.assign({id:d.name.split("/").pop()},doc(d))));t=j?.nextPageToken||""}while(t);return out}
 const when=x=>Date.parse(x.created||"")||0;
 
@@ -75,14 +77,14 @@ if(cmd==="fixed"||cmd==="leave"){
   if(cmd==="leave"&&!note)throw new Error("leave needs --note \"why Roger should look at it\"");
   const writes=[];
   if(cmd==="leave"){
-    writes.push({update:{name:BASE+"/problems/"+id,fields:{auto:fsv({verdict:"roger",note,at:now})}},updateMask:{fieldPaths:["auto"]}});
+    writes.push({update:{name:BASE+"/problems/"+id,fields:{auto:fsv({verdict:"roger",note,at:new Date(now)})}},updateMask:{fieldPaths:["auto"]}});
   }else{
     const msg=String(opt("--msg")||"").trim().slice(0,MSG_MAX),en=!!x.route&&!elCa(x.route);
     const reply={uid:x.uid,kind:"fixed",what:x.kind||"other",text:String(x.text||"").slice(0,300),where:String((/^(com estudiar|how to study)$/i.test(x.section||"")?"":x.section)||x.title||"").slice(0,200),en};   // "How to study" = the folded Study guide (reports before PR #290), not where they were
     if(msg)reply.msg=msg;
     writes.push({update:{name:BASE+"/problemReplies/"+id,fields:Object.fromEntries(Object.entries(reply).map(([k,v])=>[k,fsv(v)]))},
       updateTransforms:[{fieldPath:"created",setToServerValue:"REQUEST_TIME"}]});
-    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv({verdict:"fixed",note,at:now})}},updateMask:{fieldPaths:["fixed","auto"]}};
+    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv({verdict:"fixed",note,at:new Date(now)})}},updateMask:{fieldPaths:["fixed","auto"]}};
     if(msg)w.updateTransforms=[{fieldPath:"msgs",appendMissingElements:{values:[fsv({text:msg,at:now,rid:id,fix:true})]}}];
     writes.push(w);
     console.log("Student card ("+(en?"English":"Catalan")+"): ✅ fixed"+(msg?" + message: "+JSON.stringify(msg):""));

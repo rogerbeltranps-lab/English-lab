@@ -30,12 +30,13 @@ environment, which has `FIREBASE_SERVICE_ACCOUNT` with write access). The tool i
    you…" in the report's language (Catalan for Beginners, Insecure and no route, English for Safe and Daring; the tool says which). `--msg`
    adds one or two plain sentences in that language, in Roger's voice: what was wrong and what they see now ("Tenies raó: …", "You were
    right: …"). Never mention AI, Claude, PRs or code. If they must reload, say so ("Recarrega la pàgina").
-5. Email Roger once per run with every report fixed in that run (Gmail connector, from and to `roger.beltranps@gmail.com`):
-   subject **`⚠️ IMPORTANT · English Lab: N problem report(s) fixed automatically`**; body: for each report the student, group, what they
-   said, what was wrong, the PR link (or "already fixed by …"), and the message the student got; at the end the reports left for him with
-   their notes, and the dashboard link https://rogerbeltranps-lab.github.io/English-lab/teacher.html#probs. Then add the labels `IMPORTANT`
-   and `STARRED` to the sent message so it stands out (Gmail has no "high priority" flag). A run that only left reports for Roger sends no
-   email (the 15-minute alert already told him about the new report; the dashboard shows the note).
+5. Roger's email: `auto.mjs fixed` saves `problems/{id}.auto.at`; the GitHub Action **"English Lab emails"** (`tools/notify/notify.mjs
+   --instant`, from the school account) sends him one email for every report fixed since its last check, subject
+   **`⚠️ IMPORTANT · English Lab: N problem report(s) fixed automatically`**, with the student, what they said, what was wrong (the note),
+   the message they got and the dashboard link. Start it at once after the last `fixed` of the run: GitHub MCP `actions_run_trigger`
+   (method `run_workflow`, workflow `teacher-emails.yml`, ref `main`, inputs `{"send": "new reports and ideas to me"}`); its 15-minute
+   schedule is only the backup (GitHub often runs it late). Reports left for Roger get no extra email: the 15-minute alert already told him
+   about each new report, and the dashboard shows the note.
 
 ## Costs and limits
 
