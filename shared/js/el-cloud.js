@@ -331,7 +331,7 @@ async function gate(u){
   // Students always see their own answers (Roger, 26 Oct 2026): with saved work it opens read-only instead of the block.
   if(a&&!tester&&!elLpOpen(a,info,myGroup)&&saved){freeze();banner(ca?"Aquí pots veure les teves respostes, però ara no les pots canviar.":"Here you can see your answers, but you can't change them now.","#92400e");return}
   if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.",ca);return}
-  if(a&&!tester){const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn);trimJump(a,info,myGroup)}
+  if(a&&!tester){const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn,elSecSoon(a,info,myGroup,dn));trimJump(a,info,myGroup)}
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
   const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));
   if(cp&&saved){freeze();banner(ca?"Per continuar aquesta activitat, primer acaba el "+cp.title+". Mentrestant pots veure les teves respostes.":"To go on with this activity, first finish "+cp.title+". Meanwhile you can see your answers.","#92400e",{t:(ca?"Obre el ":"Open ")+cp.title+" →",f:()=>{location.href=new URL(cp.path,ROOT).href}});return}
@@ -427,13 +427,27 @@ function hasWork(a){return !!a&&a.keys.some(k=>{const v=localStorage.getItem(k);
 // anything is locked, it's too much info"): a locked section they have done nothing in is not shown at all (tab and panel hidden, a click
 // on it from a Next button or a link does nothing), and one they did shows with a plain "look back at your answers" note, no 🔒.
 // Pages re-render (LS2 engine), so it is applied again on every change.
-function lockSections(ids,ca,a,done){
-  if(!ids.length)return;
-  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k)),hide=ids.filter(id=>!did(id)),ro=ids.filter(did);
+// 🏫 To do in class (elSecSoon in el-catalog.js; Roger, 8 Nov 2026: "students can see it but can't write any answer nor play any video until
+// it's class time", "a blue shadow and a legend saying to do in class"): a tab planned for a later class day is shown, not hidden, with a
+// blue shadow, a 🏫 on its tab and a note with the day; nothing in it can be answered, pressed or played (audio, video, YouTube) until then.
+// soon = {panel id: day}. It counts in the page's progress (it is not hidden), so the path never looks finished with tabs still to come.
+function lockSections(ids,ca,a,done,soon){
+  if(!ids.length)return;soon=soon||{};
+  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k)),cls=ids.filter(id=>id in soon),hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
   window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];if(window.elProgress)window.elProgress();   // the LS2 page's progress counts only the steps shown
   const note=ca?"Aquí pots repassar les teves respostes.":"Here you can look back at your answers.";
+  const day=d=>{try{return new Date(d+"T12:00:00").toLocaleDateString(ca?"ca-ES":"en-GB",{weekday:"short",day:"numeric",month:"short"})}catch(e){return d}};
+  // a tab the teacher moved to a later day after the student had started it (Roger, 8 Nov 2026: "we froze the page until the calendar allows
+  // to edit but their answers get saved"): the same, with their answers kept and shown; it opens to change them on that day
+  const cnote=id=>"🏫 "+(ca?"Per fer a classe":"To do in class")+(soon[id]?" · "+day(soon[id]):"")+". "
+    +(did(id)?(ca?"Les teves respostes estan desades: les podràs continuar i canviar a classe. Fins llavors no es pot respondre ni posar els àudios o vídeos.":"Your answers are saved: you can carry on and change them in class. Until then you can't answer or play the audio or videos.")
+      :(ca?"Ara ja ho pots mirar, però ho farem junts a classe: encara no pots respondre ni posar els àudios o vídeos.":"You can look at it now, but we'll do it together in class: you can't answer it or play the audio or videos yet."));
   const st=document.createElement("style");st.textContent=".panel.el-sec-off>:not(.el-sec-note){pointer-events:none}.panel.el-sec-off :is(audio,video,summary,[data-vs]){pointer-events:auto}"
+    +".panel.el-sec-cls>:not(.el-sec-note){pointer-events:none}.panel.el-sec-cls{box-shadow:0 0 0 3px #93c5fd,0 0 26px 4px #bfdbfecc!important;border-radius:16px}"
+    +".panel.el-sec-cls .el-sec-note{background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd}.tab.el-sec-cls{box-shadow:inset 0 0 0 2px #93c5fd;background:#eff6ff}.tab.el-sec-cls .tl::after{content:\" 🏫\"}"
     +".tab.el-sec-hide,.panel.el-sec-hide{display:none!important}.el-sec-note{margin:0 0 14px;padding:10px 14px;border-radius:10px;background:#f1f5f9;color:#334155;font-weight:600}";document.head.append(st);
+  // nothing plays in a tab for class: a play started some other way (keyboard, script) stops at once
+  if(cls.length)document.addEventListener("play",e=>{const m=e.target;if(m&&m.closest&&m.closest(".panel.el-sec-cls")){m.pause();try{m.currentTime=0}catch(x){}}},true);
   // a hidden tab never opens: a click on it (the "Mark section as done" button of the section before it, a #link) opens the next tab shown, if any
   const shownAfter=t=>{const ts=[...document.querySelectorAll(".tab[data-panel]")];return ts.slice(ts.indexOf(t)+1).find(x=>!x.classList.contains("el-sec-hide"))};
   document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest(".tab.el-sec-hide");if(!t)return;e.preventDefault();e.stopImmediatePropagation();const n=shownAfter(t);if(n)n.click()},true);
@@ -444,10 +458,16 @@ function lockSections(ids,ca,a,done){
     const on=document.querySelector(".tab.active.el-sec-hide");if(on){const f=[...document.querySelectorAll(".tab[data-panel]")].find(t=>!t.classList.contains("el-sec-hide"));if(f){on.classList.remove("active");f.click()}}
     // no "Mark section as done" button that leads nowhere: the last section shown keeps none
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{if(t.classList.contains("el-sec-hide"))return;const p=document.getElementById(t.dataset.panel),c=p&&p.querySelector(".section-next");if(c)c.style.display=shownAfter(t)?"":"none"});
+    cls.forEach(id=>{document.querySelectorAll(`.tab[data-panel="${id}"]`).forEach(t=>{if(!t.classList.contains("el-sec-cls")){t.classList.add("el-sec-cls");t.title=cnote(id)}});
+      const p=document.getElementById(id);if(!p||!p.classList.contains("panel"))return;p.classList.add("el-sec-cls");
+      if(!p.querySelector(":scope>.el-sec-note")){const n=document.createElement("div");n.className="el-sec-note";n.textContent=cnote(id);p.prepend(n)}
+      p.querySelectorAll("input,textarea,select,button,audio,video,iframe,[contenteditable]").forEach(e=>{if(e.matches("audio,video")){e.pause&&e.pause();e.removeAttribute("autoplay");e.controls=false;e.tabIndex=-1;return}
+        if(e.matches("iframe")){e.tabIndex=-1;return}if(e.matches("[contenteditable]")){e.contentEditable="false";return}if(!e.disabled){e.disabled=true;e.tabIndex=-1}})});
     ro.forEach(id=>{const p=document.getElementById(id);if(!p||!p.classList.contains("panel"))return;p.classList.add("el-sec-off");
       if(!p.querySelector(":scope>.el-sec-note")){const n=document.createElement("div");n.className="el-sec-note";n.textContent=note;p.prepend(n)}
       p.querySelectorAll("input,textarea,select,button:not([data-vs])").forEach(e=>{if(!e.disabled){e.disabled=true;e.tabIndex=-1}})})};
-  apply();new MutationObserver(apply).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["disabled"]});
+  apply();if(cls.length&&window.elProgress)window.elProgress();   // again, now the tabs for class are marked: never the "next" one
+  new MutationObserver(apply).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["disabled"]});
 }
 // The "Learning Path" menu at the top of an LS2 page lists only the paths a student can open (or did some of): never one still
 // closed or waiting for a checkpoint (Roger, 7 Nov 2026: "they mustn't see that anything is locked").
