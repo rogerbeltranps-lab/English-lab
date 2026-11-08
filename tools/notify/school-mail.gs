@@ -59,7 +59,7 @@ const PROBLEM_TASK_URL = "https://api.anthropic.com/v1/claude_code/routines/trig
 // Final product videos (Teacher Studio › 04_Students (private) › Final product videos): share it with this school account as Editor first.
 const VIDEO_FOLDER = "1BPlHZKxr7Ba2HEMSBid8StCi49-6Yg9y";
 // The model that watches final product videos: "gemini-2.5-flash" (about €0.02 a 3-minute video) or "gemini-2.5-pro" (better judge, ~€0.07).
-const FP_MODEL = "gemini-2.5-flash";
+const FP_MODEL = "gemini-2.5-pro";   // Roger 8 Nov 2026: Pro for final product videos, Flash for speaking recordings
 const FIREBASE_WEB_KEY = "AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE";   // English Lab's public web key (shared/js/el-firebase.js), not a secret
 
 function doPost(e) {
