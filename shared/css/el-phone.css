@@ -72,4 +72,29 @@
   #lvl .hlv>span:last-child>small,#lvl .hlv>span:last-child>b,.pme .hlv>span:last-child>small,.pme .hlv>span:last-child>b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #lvl .hlv>span:last-child>small,.pme .hlv>span:last-child>small{font-size:12px}
   #lvl .hlv .hask:before,.pme .hlv .hask:before{display:none}
+/* 5. The board's home on a phone (today.html, body[data-place=home]): only what is for today. The LS's own cards (About this LS, the
+   challenge, formative, the 4-minute video) are on the LS tab, and Games and theory on Me, so the home is a short screen: hello, alerts,
+   Continue, To do and Homework, and the learning paths list (Roger, 8 Nov 2026, mockup option A). */
+@media (max-width:640px){
+  body[data-place="home"] .phead h1{font-size:24px;line-height:1.2;letter-spacing:-.02em}
+  body[data-place="home"] .hl>.hlv,body[data-place="home"] #lvl .hlv{padding:6px 12px;gap:8px;border-radius:12px}
+  body[data-place="home"] a.hal.games{display:none}
+  body[data-place="home"] #lsNow .lsab,body[data-place="home"] #lsNow .lsnr,body[data-place="home"] #lsNow .lsnh p{display:none}
+  body[data-place="home"] #lsNow .lsnh{margin-bottom:8px}
+  body[data-place="home"] #lsNow li:has(>a.lsr.ok){display:none}   /* done paths: on the LS tab; the home lists what is left */
+  body[data-place="home"] #lsNow .lsnh h2{font-size:1.2rem}
+}
+
+/* 6. The LS page on a phone (ls-home.css, body.lsh): the heading, then Continue and the learning paths, then About this LS, the challenge
+   and the other cards (on a computer About comes first). Games and theory comes after the learning paths. */
+@media (max-width:640px){
+  body.lsh section[data-place="home"]{display:flex;flex-direction:column}
+  body.lsh section[data-place="home"]>.lshead{display:contents}
+  body.lsh section[data-place="home"]>.lshead>.lsht{order:1}
+  body.lsh section[data-place="home"]>.hgrid{display:contents}
+  body.lsh section[data-place="home"]>.hgrid>.hl{order:2;margin-top:14px}
+  body.lsh section[data-place="home"]>.lshead>.gmt{order:3;margin-top:14px}
+  body.lsh section[data-place="home"]>#lsAbout{order:4;margin-top:14px}
+  body.lsh section[data-place="home"]>.hgrid>.hr{order:5;margin-top:14px}
+  body.lsh section[data-place="home"]>:not(.lshead):not(.hgrid):not(#lsAbout){order:6}
 }
