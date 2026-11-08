@@ -80,6 +80,8 @@ a.hal{display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:1
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;color:#0f172a;text-decoration:none;min-height:112px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:28px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:17px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
 .cov .cvt{width:100%}.cov .cvt td,.cov .cvt th{text-align:left;vertical-align:top}.cov .cvt th.cvc,.cov .cvt td.cvc{text-align:center;min-width:58px}.cov td.cvc small{display:block;font-size:11px;color:#475569;line-height:1.2}.cov td.cvk small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#64748b;font-size:12px;max-width:380px;white-space:normal;line-height:1.3}.cov .cvw{overflow-x:auto}.cve .t1{color:#166534;font-weight:600}.cve .t0{color:#64748b}.cov td.cvk{white-space:normal;min-width:220px}.cov tr.cvsec td{background:#f1f5f9;font-weight:700}.cov .cdot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:0}.cvb{display:inline-block;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:600;white-space:nowrap}.cvsum{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.cve{display:inline-block;font-size:13px;line-height:1.35;border:1px solid #cbd5e1;border-radius:8px;padding:1px 7px;margin:1px;background:#fff}.cve.ok{background:#dcfce7;border-color:#86efac}.cve.dr{background:#fff7ed;border-color:#fdba74;text-decoration:line-through}.cve a{color:inherit;text-decoration:none}.cve a:hover{text-decoration:underline}.cov td.cvy{white-space:nowrap;font-size:13px}
+.tiles.wide{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:1180px){.tiles.wide{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.tiles.wide{grid-template-columns:repeat(2,minmax(0,1fr))}}.gal{display:flex;flex-direction:column;gap:12px;margin:0 0 16px}.gal:empty{display:none}
+table.fpt td,table.fpt th{text-align:left;vertical-align:middle}table.fpt td.n{white-space:nowrap}
 a.tile.c2eso{border-left:6px solid #16a34a}a.tile.c4eso{border-left:6px solid #2563eb}a.tile.c2eso .ti b,a.tile.c4eso .ti b{font-size:20px}
 details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;font-size:14px;cursor:pointer}
 @media (max-width:980px){.tshell{grid-template-columns:1fr;gap:6px}.tside{position:sticky;top:0;z-index:20;flex-direction:row;overflow-x:auto;max-height:none;padding:8px 0;background:rgba(248,250,252,.96);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb}
@@ -1053,10 +1055,10 @@ function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S
 // ---- Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"; the student board's rule: "the menus have
 // little information and when you go to a place you can find the info that you need"). A side menu (Home, the groups, Questions, Materials,
 // Reference) and, for Home and each group, a page with only a few red alerts, ONE big card for the class (now or next, by EL_TIMETABLE, with
-// its session from the time plan and 🎓 Class mode) and tiles. Each tile opens a place that holds the boxes of the old long page, unchanged:
+// its session from the time plan and 🎓 Class mode; Home only since 8 Nov 2026) and tiles. Each tile opens a place that holds the boxes of the old long page, unchanged:
 // group: 📅 Time plan (weekend check, this week, teaching plan) · ✅ To do (checkpoints, To do) · 📈 Learning paths (open and lock,
 // the progress grid, criteria legend, LS status) · 📊 Marks (LS grade, criteria result, self-assessment) · 👥 Students (levels, team points,
-// student list) · 💬 Messages (announcements, problems, ideas); Home: 📅 Time plan of every group · 💬 Messages. S.place = the place on
+// student list) · 🎬 Final product (mark it) · 💬 Messages (announcements, problems, ideas); Home: 📅 Time plan of every group · 💬 Messages. S.place = the place on
 // screen ("home" = the tiles); changing tab goes back to the tiles. A ‹ link at the top of each place goes back.
 // ---- 🗓 Timetable (Roger, 6 Nov 2026: "I want a section where the teacher can add the schedule"): Home > 🗓 Timetable. The classes of
 // each group (day + start time), how long a class lasts and the days without classes (holidays). Saved in settings/timetable (only the
@@ -1085,7 +1087,7 @@ function ttPage(){const d=ttDraft(),dirty=JSON.stringify(elTTStore(d))!==JSON.st
     +`<h3>Days without classes</h3><p class="muted">Holidays and days off: no class, no full screen.</p><div class="ttoff">${d.off.map(([a,b],i)=>`<span class="ttslot"><input type="date" data-tt="from" data-i="${i}" value="${a}"> to <input type="date" data-tt="to" data-i="${i}" value="${b}"><button type="button" class="ttx" data-do="ttoffdel" data-i="${i}" title="Remove">✕</button></span>`).join("")}<button type="button" class="ttadd" data-do="ttoffadd">＋ Add days off</button></div>`
     +`<div class="bar"><button data-do="ttsave" ${dirty?"":"disabled"}>💾 Save the timetable</button>${dirty?` <button class="g" data-do="ttundo">Undo changes</button>`:""}${TTE.msg?` <span class="ttmsg">${TTE.msg}</span>`:""}</div></div>`}
 S.place="home";
-const PLACES={tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Marks"],students:["👥","Students"],msgs:["💬","Messages"],cov:["🎯","Coverage"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"]};
+const PLACES={tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Marks"],students:["👥","Students"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"]};
 const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=false;render();scrollTo(0,0)};
 // ---- the browser's Back button (Roger, 7 Nov 2026: "When I go back it brings me to other places; I wanted to go where this button takes
 // you"). The dashboard is one page, so Back used to leave it (e.g. to English Lab). Now each move to another screen (a place such as
@@ -1217,6 +1219,7 @@ function render0(){
     students:()=>`<div class="bar">${stuF}</div>`+lpAll+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(shown),
     msgs:()=>annBox()+pbBox()+sgBox(),
     cov:()=>covPage(grp,ls),
+    fp:()=>fpPage(grp,ls,list,inG.filter(s=>!s.away&&!s.tester)),
     plan2:()=>tp2Page(grp,ls,studs)};
   if(place[S.place]){$("#main").innerHTML=placeHead(back,S.place)+place[S.place]()}
   else{S.place="home";
@@ -1227,18 +1230,50 @@ function render0(){
       +((n=>n?tAlert("todo","🎯",`${plural(n,"level change request")} from students`,"Answer","news"):"")((todoH.match(/<li>🎯/g)||[]).length))
       +(np?tAlert("msgs","⚠️",`${plural(np,"problem report")} from students`,"Read"):"")
       +(nr?tAlert("msgs","✉️",`${plural(nr,"new answer")} to your messages`,"Read","news"):"");
-    $("#main").innerHTML=head+`<div class="hgrid"><div class="hl">${al}${classCard(grp)}</div><div class="tiles">`
+    // no big class card here (Roger, 8 Nov 2026: "the blue box in here is useless, take it out and rearrange the buttons, and add a final
+    // product access there to mark students work (in all LS)"): the alerts, then every tile in one wide grid; 🎓 Class mode stays in the top bar
+    const fa=fpAct(ls,list),fw=fa?fpWaiting(fa,inG.filter(s=>!s.away&&!s.tester)):0;
+    $("#main").innerHTML=head+`<div class="gal">${al}</div><div class="tiles wide">`
       +tTile("plan","📅","Time plan","your agenda: drag learning paths to class days",nb?nb+" not ticked":"",true)
       +tTile("todo","✅","To do","comments, marking, possible copies, level requests",nTodo||"",/❌|Possible copy/.test(todoH))
       +tTile("paths","📈","Learning paths","progress, open and lock")
+      +tTile("fp","🎬","Final product",fa?"mark the students' work: videos, Gemini's drafts, your marks":"this LS has no final product on the site",fw?fw+" to approve":"",false)
       +tTile("marks","📊","Marks","LS grade, criteria, self-assessment")
       +tTile("students","👥","Students","levels, team points, student list")
       +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
-      +tTile("cov","🎯","Coverage","criteria, competences, grammar and lexicon worked, this LS and the year",(n=>n?n+" to check":"")(covGaps(grp,ls)),true)+`</div></div>`}
+      +tTile("cov","🎯","Coverage","criteria, competences, grammar and lexicon worked, this LS and the year",(n=>n?n+" to check":"")(covGaps(grp,ls)),true)+`</div>`}
   document.body.classList.toggle("gfs",!!(S.gfs&&document.querySelector("#main .lpall .wrap")));
   const w=document.querySelector("#main .wrap"),h=w&&w.querySelector("thead tr");if(h)w.style.setProperty("--h1",h.offsetHeight+"px");
 
 }
+// ---- 🎬 Final product (Roger, 8 Nov 2026: "add a final product access there to mark students work (in all LS)"): a tile on the group page
+// that opens a list of the group's students for the selected LS's final product: video handed in, Gemini's draft, your mark, and a button that
+// opens the usual final product dialog (🎬 Gemini, watch it · ✅ Approve). 📥 Draft the whole group from Classroom is at the top, so no need to
+// scroll the learning paths table. Gemini's drafts are one settings doc per final product (read once, cached in FPG.d).
+const fpAct=(ls,list)=>{const g=(window.EL_GRADING||{})[ls]||{};return (g.fp&&byId(g.fp.a))||(list||acts(ls)).find(a=>a.manual&&a.graded)||(list||acts(ls)).find(a=>a.manual)||null};
+const fpMarked=(u,a)=>{const x=res(u,a.id),g=(window.EL_GRADING||{})[a.ls]||{};if(x.max)return true;
+  return !!(g.fp&&g.fp.a===a.id&&!g.fp.mark&&g.fp.rows.length&&g.fp.rows.every(r=>lvOf(u,a.id,r.step,r.c)))};
+// Gemini drafts not approved yet (0 until the drafts doc is read; reading it re-draws the page once)
+function fpWaiting(a,studs){if(!FPG.d[a.id]){if(!DEMO&&!FPG.ld[a.id]){FPG.ld[a.id]=1;fpgLoad(a).then(()=>{if(S.g&&GR.some(g=>g.id===S.g))render()}).catch(()=>{})}return 0}
+  const d=FPG.d[a.id];return studs.filter(s=>d[s.uid]&&d[s.uid].draft&&!d[s.uid].approved&&!fpMarked(s.uid,a)).length}
+const fpBulkH=(a,u)=>FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button data-fpg="bulk" data-u="${u}" data-a="${esc(a.id)}">📥 Draft the whole group from Classroom</button> <span class="muted">Gemini watches every video handed in on Classroom, one after another (keep this page open), and lists the ones it couldn't reach.</span>`;
+function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().sort(byName);
+  if(!a)return `<div class="box"><p class="muted">This LS has no final product on the site yet.</p></div>`;
+  fpWaiting(a,studs);const d=FPG.d[a.id]||{},R=fpgRubric(a),g=(window.EL_GRADING||{})[ls]||{},lv=g.fp&&g.fp.a===a.id&&!g.fp.mark?g.fp.rows:null;
+  const on=studs.filter(s=>s.uid),nm=on.filter(s=>fpMarked(s.uid,a)).length,nv=on.filter(s=>fpgVideo(s.uid,a)).length,nd=on.filter(s=>(d[s.uid]||{}).draft).length;
+  const mark=u=>{const x=res(u,a.id);if(lv)return lv.map(r=>{const v=lvOf(u,a.id,r.step,r.c);return `<td>${v?`<b>${esc(v)}</b>`:`<span class="muted">–</span>`}</td>`}).join("");return `<td>${x.max?`<b>${x.score}/${x.max}</b>`:`<span class="muted">–</span>`}</td>`};
+  const vid=u=>{const v=fpgVideo(u,a);return v?(v.by?"👥 group video":v.cls?"📥 on Classroom":v.link?"🔗 link":"✅ on the site"):`<span class="muted">–</span>`};
+  const dr=u=>{const x=d[u];if(!x)return `<span class="muted">–</span>`;if(FPG.busy[u+"|"+a.id])return "⏳ watching";if(x.error&&!x.draft)return `<span style="color:#b91c1c">⚠️ error</span>`;
+    return x.draft?(x.approved||fpMarked(u,a)?"✅ approved":"🟡 to approve"):`<span class="muted">–</span>`};
+  return `<div class="box"><h2>${esc(a.title)} <a class="lsgo" href="${esc(a.path)}" target="_blank" rel="noopener" style="font-size:14px">Open it ↗</a></h2>`
+    +`<p class="muted">${nm} of ${on.length} marked · ${nv} video${nv===1?"":"s"} found · ${nd} Gemini draft${nd===1?"":"s"}. Click a student to watch the video, ask Gemini, approve its draft or mark it yourself.</p>`
+    +(R&&!a.video&&on.length?`<p id="fpbulk" style="margin:8px 0">${fpBulkH(a,on[0].uid)}</p>`:"")
+    +(R?"":`<p class="muted">This final product has no rubric on the site yet, so Gemini cannot draft it: mark it yourself in each student's dialog.</p>`)
+    +`<p style="margin:6px 0"><button class="g" data-fpg="cost">💶 Gemini this month</button></p>`
+    +`<div class="wrap"><table class="fpt"><thead><tr><th>Student</th><th>Video</th><th>Gemini</th>${lv?lv.map(r=>`<th><small>${esc(r.name)}</small></th>`).join(""):"<th>Mark</th>"}<th></th></tr></thead><tbody>`
+    +studs.map(s=>s.uid?`<tr><td class="n"><a href="#" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a></td><td>${vid(s.uid)}</td><td>${dr(s.uid)}</td>${mark(s.uid)}<td><button class="g mini" data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}">${fpMarked(s.uid,a)?"Open":"Mark"}</button></td></tr>`
+      :`<tr class="muted"><td class="n">${name(s)}</td><td colspan="${lv?lv.length+3:4}"><small>not signed in yet</small></td></tr>`).join("")
+    +`</tbody></table></div></div>`}
 // ---- 🎯 Coverage (Roger, 6 Nov 2026: "another section where we can see if we have worked all the assessment criteria and competences
 // planned for each LS and the year plan. Also, the grammar and the lexicon … so we can add some grammar in other LS if necessary"). A tile
 // on the group page. Planned = the annual programme (EL_REF.prog: criteria per LS) and the Drive grammar and lexicon maps (EL_REF.grammar /
@@ -2644,6 +2679,8 @@ function tp2Page(grp,ls,studs){const pr=tp2Pair(grp),l=EL_LS.find(y=>y.id===ls),
   return `<div class="tp2bar"><b>📋 ${esc(pr.map(g=>g.name).join(" + "))}</b><span class="muted">${l?esc(lsLabel(l)):""} · drag inside each group; drag a note to the other group to copy it; every change saves as in its own 📅 Time plan</span><span class="sp"></span>`
     +`<button class="g" data-do="tp2fs" title="Browser full screen on or off (Esc also leaves it)">⛶ Full screen</button><button data-do="tp2x" title="Back to ${esc(grp.name)}'s Time plan">✕ Close</button></div>`
     +`<div class="tp2">${pr.map(col).join("")}</div>`}
+// "Earlier weeks" keeps its open/closed state through every redraw (Roger, 8 Nov 2026, screen recording: ticking 🏠 on a tab with Earlier
+// weeks open closed it again, and the page seemed to jump down two weeks)
 function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="muted">No time plan for this group in this LS yet.</p></div>`;
   const t=ELWeek.today(),ws=agWeeks(x,(S.agExt||{})[x.ls+"|"+x.gid]||0),tm=new Date(t+"T12:00").getDay(),cur=ELWeek.add(t,-((tm+6)%7));
   const pastW=ws.filter(([m])=>m<cur),now=ws.filter(([m])=>m>=cur),ag=agOf(x);
@@ -2651,10 +2688,10 @@ function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="mute
   return agBars(x)+`<div class="agw">${agList(x,studs)}<section class="agr">`
     +hwTag(x)
     +(late.length?`<div class="aglate"><h3>⚠ Not ticked yet (${late.length})</h3><p class="muted">Tick what you did. Drag the rest to a later day, or ⏭ Next class.</p><div class="agdays">${late.map(d=>agDay(x,d,true)).join("")}</div></div>`:"")
-    +(pastW.length?`<details class="agpast"><summary>Earlier weeks (${pastW.length})</summary>${pastW.map(([m,dd])=>agWeek(x,m,dd)).join("")}</details>`:"")
+    +(pastW.length?`<details class="agpast" data-k="agpast|${x.ls}|${x.gid}" ${S.open.has("agpast|"+x.ls+"|"+x.gid)?"open":""}><summary>Earlier weeks (${pastW.length})</summary>${pastW.map(([m,dd])=>agWeek(x,m,dd)).join("")}</details>`:"")
     +now.map(([m,dd])=>agWeek(x,m,dd)).join("")
     +`<p><button type="button" class="g" data-do="agmore" ${`data-gid="${x.gid}" data-ls="${x.ls}"`}>＋ Show one more week</button></p>`
-    +`<details class="how"><summary>ⓘ How it works</summary><p class="muted">Each class day of ${esc((GR.find(g=>g.id===x.gid)||{}).name||x.gid)} by your timetable. Drag a learning path (all the tabs not ticked yet), one tab, the exam or the final product steps from the list or from another day. Drag a game, a note or a learning path up or down inside its day to change the order (tabs keep the learning path's order). ⏱ sets how many minutes each one takes in class; the day adds them up against the class length. Tick what you did in class: students see it in “What we've done”. 🔓/🔒 opens or closes a tab for the group. Students see as homework only what you set with 🏠 Homework. Due days move with the learning path's last class, and the exam day students see follows the 📝 Exam.</p></details>`
+    +`<details class="how" data-k="aghow" ${S.open.has("aghow")?"open":""}><summary>ⓘ How it works</summary><p class="muted">Each class day of ${esc((GR.find(g=>g.id===x.gid)||{}).name||x.gid)} by your timetable. Drag a learning path (all the tabs not ticked yet), one tab, the exam or the final product steps from the list or from another day. Drag a game, a note or a learning path up or down inside its day to change the order (tabs keep the learning path's order). ⏱ sets how many minutes each one takes in class; the day adds them up against the class length. Tick what you did in class: students see it in “What we've done”. 🔓/🔒 opens or closes a tab for the group. Students see as homework only what you set with 🏠 Homework. Due days move with the learning path's last class, and the exam day students see follows the 📝 Exam.</p></details>`
     +`</section></div>`}
 if(DEMO)window.EL_T=S;   // previews and tests look at the state
 // one tick (an item done in class) and the day's tick when all its items are done
@@ -3201,7 +3238,7 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
 // feedback and saves, as the Save button does). The school Apps Script does the watching (tools/notify/school-mail.gs, action fp_watch: the
 // video goes from Drive to Gemini and is deleted from Gemini at once). Drafts: settings/fp__{activity} {[uid]: draft} (teacher only; read when
 // a dialog opens). 💶 the month's Gemini spending: action gemini_usage.
-const FPG={d:{},busy:{},cost:null,cls:{},bulk:null};
+const FPG={d:{},busy:{},cost:null,cls:{},bulk:null,ld:{}};
 const fpgDoc=id=>"fp__"+id.replace(/[^\w-]/g,"_");
 const fpgIs=a=>!!a&&a.manual&&a.graded&&(((G()||{}).fp||{}).a===a.id||!!(window.EL_FP_RUBRICS||{})[a.id]);
 const fpgFile=v=>{const m=String(v||"").match(/(?:\/d\/|[?&]id=|^)([\w-]{25,})/);return m?m[1]:""};
@@ -3235,7 +3272,7 @@ const fpgRow=g=>g.level==null?null:g.mark!=null?g.mark:g.level*2.5;
 const fpgPlus=g=>{const m=fpgRow(g);return g.level==null?"–":g.level===0?"No evidence":"Level "+g.level+(g.mark!=null&&g.level<4&&m>=[0,3,5.5,8][g.level]?"+":"")};
 // the box in the final product dialog (filled once the drafts are read)
 function fpgBox(u,a){if(!fpgIs(a))return "";setTimeout(()=>fpgLoad(a).then(()=>fpgFill(u,a)));return `<div id="fpg" class="fpg" data-u="${u}"><p class="muted">🎬 Loading the video and Gemini's draft…</p></div>`}
-const fpgRefresh=a=>{const b=$("#fpg");if(b&&b.dataset.u)fpgFill(b.dataset.u,a)};
+const fpgRefresh=a=>{const b=$("#fpg");if(b&&b.dataset.u)fpgFill(b.dataset.u,a);const n=$("#fpbulk");if(n&&FPG.bulk)n.innerHTML=fpBulkH(a,"")};
 function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;const v=fpgVideo(u,a),R=fpgRubric(a),d=(FPG.d[a.id]||{})[u],busy=FPG.busy[u+"|"+a.id];
   let h=`<h4 style="margin:0 0 6px">🎬 The video and Gemini's draft <button class="g" data-fpg="cost" style="float:right;font-size:12px;padding:2px 8px">💶 Gemini this month</button></h4>`;
   const yid=v&&v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],au=v&&v.link?"?authuser="+encodeURIComponent(FPG_SCHOOL):"",open=v?(yid?v.youtube:`https://drive.google.com/file/d/${esc(v.id)}/view${au}`):"";
@@ -3307,7 +3344,7 @@ async function fpgBulk(u,a){const g=(S.P[u]||{}).group;if(!g||FPG.bulk)return;
     FPG.bulk.note=`Gemini is watching ${i} of ${studs.length}: ${fullName(s)} (about 1–3 minutes each; keep this page open)`;fpgRefresh(a);
     const ok=await fpgWatch(s.uid,a,"",Object.assign({link:true},x.watch));
     (ok?rep.done:rep.failed).push({s,err:ok?"":(((FPG.d[a.id]||{})[s.uid]||{}).error||"")})}
-  FPG.bulk=null;fpgReport(c,rep,a)}
+  FPG.bulk=null;if(S.place==="fp")render();fpgReport(c,rep,a)}
 function fpgReport(c,rep,a){const li=(arr,f)=>arr.length?`<ul>${arr.map(f).join("")}</ul>`:`<p class="muted">None.</p>`,nm=s=>`<a data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a>`;
   dlg(`<h3>📥 Classroom final products · ${esc(c.course)}</h3><p class="muted">${esc((c.work||{}).title||"")}</p>`
     +`<h4>✅ Drafted now (${rep.done.length})</h4>`+li(rep.done,r=>`<li>${nm(r.s)}</li>`)
