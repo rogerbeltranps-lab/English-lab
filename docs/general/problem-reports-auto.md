@@ -9,11 +9,12 @@ environment, which has `FIREBASE_SERVICE_ACCOUNT` with write access). The tool i
 
 ## When it runs
 
-- **At once:** when a student's report is saved, their page asks the school Apps Script (`tools/notify/school-mail.gs`, action
-  `problem`, checked with the student's own sign-in) to start the task through its API trigger (`PROBLEM_TASK_TOKEN`), at most once every
-  3 minutes and 30 times a day. Needs the token pasted in the script (claude.ai/code/routines → "English Lab: problem reports" → API
-  trigger → Generate token) and a new deployment version.
-- **Every hour** from 7:00 to 22:00 Madrid time, as a backup (and the only way until the token is in the script).
+Only when a student sends a report (Roger, 8 Nov 2026: "I want you to be triggered only when there's a problem"). The task is
+**"English Lab: problem reports (instant)"**, with no schedule. When a report is saved, the student's page asks the school Apps Script
+(`tools/notify/school-mail.gs`, action `problem`, checked with the student's own sign-in) to start the task through its API trigger
+(`PROBLEM_TASK_TOKEN`, Roger's live script only), at most once every 3 minutes and 30 times a day. A report sent less than 3 minutes after
+the last start sets a one-off Apps Script timer (`startProblemsLater`) that starts the task again when the 3 minutes are over. The old
+hourly task "English Lab: problem reports" is switched off.
 
 ## Each run
 
@@ -50,6 +51,6 @@ environment, which has `FIREBASE_SERVICE_ACCOUNT` with write access). The tool i
 
 - Firestore: one list of `problems` (a few dozen documents) per run, plus a screenshot per new report. Never list students or results
   for a report unless the bug needs it, then only that student's documents.
-- Runs only in the day (Madrid), see the task's schedule. A run with nothing new ends after one command.
+- Runs only when a student reports something. A run with nothing new ends after one command.
 - The dashboard shows each report's note in ⚠️ Problem reports ("🤖 Fixed automatically" / "🤖 Left for you"); Reopen and Delete work as
   before.
