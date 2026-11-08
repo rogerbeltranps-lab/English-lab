@@ -1,3 +1,4 @@
+@import url("el-phone.css");   /* the phone look (≤640 px only): tab bar, Me place, touch sizes; el-phone.css */
 /* English Lab as an app (Roger, 6 Nov 2026: "I want everything to look like an app for them even though they connect through a
    Chromebook most of the time"; "these things should look like buttons"; "it's not my activities but my dashboard").
    1. The side menu of the board (today.html), the LS home (ls-home.css) and English Lab: every item is a button with an icon.

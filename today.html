@@ -352,9 +352,9 @@ const helpGuide=()=>{
 // teacher set as homework, and the calendar; Roger, 6 Nov 2026), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
 // the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (picture guide, problems). A place is a hash
 // (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
-const PLACE_OF={todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang"};
+const PLACE_OF={me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
-const placeTitle=p=>({todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Gramàtica i vocabulari","Grammar and vocabulary")})[p];
+const placeTitle=p=>({me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Gramàtica i vocabulari","Grammar and vocabulary")})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
 const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0];const end=window.ELCheer?ELCheer.student(D.me.email||D.me.name||"",ELWeek.today(),EN):t("espero que tinguis un dia genial! ☺️","hope you are having a great day! ☺️");
   return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
@@ -370,6 +370,36 @@ function nextFor(ls,info){if(only(ls.id)||info.status==="closed")return null;
     const ds=doneSet(a),ks=visSteps(a,info),k=ks.find(x=>!ds.has(x)&&!(a.skip||[]).includes(x)&&!secOff(a,info,x));if(k===undefined)continue;
     const gs=tabGroups(a,ks);return {a,k,nm:tabName(a.id,k),done:gs.filter(g=>g.every(x=>ds.has(x))).length,total:gs.length,late:!!(d&&d<today)}}
   return null}
+// 🎯 My level (with ✋ Ask for a level change): the board's home and the phone's Me place (meBox)
+function levelBox(ls){
+  const lv=ls&&elRouteOf(D.lv,ls.id).level,cefr=lv?elCefr(COURSE,lv):"";
+  // ✋ Ask for a level change (Roger, 8 Nov 2026: "when they hover the button they can ask for a level change"): in an open LS the box is a
+  // button; hovering it shows the ask under it (always shown on touch screens), a click opens the same request dialog as the LS page
+  // (levels/{ls}.request, no new reads); the teacher answers it on the dashboard. A pending request stays on the box.
+  const ask=lv&&canAsk(ls.id),req=ask&&(D.lv[ls.id]||{}).request,
+    lvIn=`<span class="i" aria-hidden="true">🎯</span><span><small>${t("El meu nivell","My level")}</small><b>${esc(LV[lv]||lv)}${cefr?` · ${esc(cefr)}`:""}</b>`
+      +(req?`<em class="hpend">⏳ ${t("Has demanat","You asked for")} ${esc(LV[req]||req)}</em>`:"");
+  const lvBox=!lv?"":ask?`<button type="button" class="hlv ask" data-do="asklv" data-ls="${ls.id}">${lvIn}<em class="hask">${req?t("✋ Canvia la petició","✋ Change your request"):t("✋ Demana un canvi de nivell","✋ Ask for a level change")}</em></span></button>`
+    :`<div class="hlv" title="${esc(elCefr(COURSE,lv,true))}">${lvIn}</span></div>`;
+  return lvBox}
+// 👤 Me (the phone's Me tab, #me; Roger, 8 Nov 2026, phone remodel): who I am and my level, then every place of the side menu that the
+// phone's five tabs do not have (marks, LSs, books, grammar, games, help, phone, announcements) and the bar's ⚠️ Problem and 💡 Idea.
+// Only links to places that already exist: nothing new is read.
+function meBox(lss,ls){
+  const g=EL_GROUPS.find(x=>x.id===D.me.group),n=String(D.me.name||"").trim(),nm=n.includes(",")?n.split(",").reverse().join(" ").trim():n,
+    ini=nm.split(/[\s@]+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join("")||"🙂",
+    r=(h,i,l,sub,x)=>`<a href="${h}"${x||""}><i aria-hidden="true">${i}</i><span>${l}${sub?`<small>${sub}</small>`:""}</span></a>`,
+    bt=(w,i,l)=>`<button type="button" data-do="pbar" data-w="${w}"><i aria-hidden="true">${i}</i><span>${l}</span></button>`;
+  return `<div class="pme"><div class="pmeh"><span class="pmea" aria-hidden="true">${esc(ini)}</span><div><b>${esc(nm)}</b><small>${esc(g?g.name:"")}${ls?" · "+lsName(ls):""}</small></div></div>`
+    +levelBox(ls)
+    +`<h2>${t("Les meves notes","My marks")}</h2><div class="pml">`+r("#marks","📊",t("Les meves notes","My marks"),t("nota de la LS, exàmens, producte final","LS grade, exams, final product"))
+    +r("#formative","📈",t("La meva avaluació formativa","My formative assessment"),t("les activitats i la teva puntuació","your activities and your score"))
+    +(ls?r(lsHref(ls)+"#notes","🧩",t("Jocs i teoria","Games and theory"),t("resultats dels jocs i les teves notes","game results and your notes")):"")+`</div>`
+    +`<h2>${t("Més","More")}</h2><div class="pml">`+r("#units","🗂",t("Les meves Learning Situations","My Learning Situations"))
+    +r("#news","📣",t("Anuncis del professor","Announcements from your teacher"))
+    +r("#books","📖",t("Llibres","Books"))+r("#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary"))
+    +r("lab/","🎲",t("Jocs","Games"))+r("#help","❓",t("Ajuda","Help"))+(APP()?"":r("#phone","📱",t("Estudia amb el mòbil","Study on your phone")))
+    +(AS||DEMO?"":bt("prob","⚠️",t("Avisa d'un problema","Report a problem"))+bt("idea","💡",t("Envia una idea","Send an idea")))+`</div></div>`}
 function homeHtml(lss,ls,info){
   workBox(lss);const miss=(S.wtabs||0)+tabsMiss(lateList(lss)),me=U&&U.uid;
   const unread=(D.ann||[]).filter(a=>String(a.text||"").trim()&&me&&!(a.read||{})[me]).length;
@@ -396,15 +426,7 @@ function homeHtml(lss,ls,info){
   // the current LS right on the board, under Continue and the tiles (Roger, 7 Nov 2026: "students should see in their dashboard the current LS"): lsNowHtml
   // 🎯 the student's level and route in the free space right of the greeting (Roger, 7 Nov 2026: "here I want their level
   // and route"): the route name and its CEFR level, e.g. "Core · A2" (never the old route descriptions)
-  const lv=ls&&elRouteOf(D.lv,ls.id).level,cefr=lv?elCefr(COURSE,lv):"";
-  // ✋ Ask for a level change (Roger, 8 Nov 2026: "when they hover the button they can ask for a level change"): in an open LS the box is a
-  // button; hovering it shows the ask under it (always shown on touch screens), a click opens the same request dialog as the LS page
-  // (levels/{ls}.request, no new reads); the teacher answers it on the dashboard. A pending request stays on the box.
-  const ask=lv&&canAsk(ls.id),req=ask&&(D.lv[ls.id]||{}).request,
-    lvIn=`<span class="i" aria-hidden="true">🎯</span><span><small>${t("El meu nivell","My level")}</small><b>${esc(LV[lv]||lv)}${cefr?` · ${esc(cefr)}`:""}</b>`
-      +(req?`<em class="hpend">⏳ ${t("Has demanat","You asked for")} ${esc(LV[req]||req)}</em>`:"");
-  const lvBox=!lv?"":ask?`<button type="button" class="hlv ask" data-do="asklv" data-ls="${ls.id}">${lvIn}<em class="hask">${req?t("✋ Canvia la petició","✋ Change your request"):t("✋ Demana un canvi de nivell","✋ Ask for a level change")}</em></span></button>`
-    :`<div class="hlv" title="${esc(elCefr(COURSE,lv,true))}">${lvIn}</span></div>`;
+  const lvBox=levelBox(ls);
   const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox;
   return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
@@ -538,8 +560,9 @@ function gamesCard(ls){
   const st=elGameStats(all);
   return `<a class="hal games" href="${lsHref(ls)}#notes"><em class="lt"><b>${t("Jocs i teoria","Games and theory")}${tag?` <span class="glsn">· ${esc(tag)}</span>`:""}</b><small>${t("Mira els teus resultats i què has d'estudiar","See your results and what to study")}</small></em><span class="gopen">${t("Obre","Open")} →</span><span class="gtop"><span class="rings">${elRing(st.grammar??null,"🧩 "+t("Gramàtica","Grammar"),0,window.elGameTip&&all.length?elGameTip(all,"grammar",t(1,0)):"")}${elRing(st.vocab??null,"📚 "+t("Vocabulari","Vocabulary"),0,window.elGameTip&&all.length?elGameTip(all,"vocab",t(1,0)):"")}</span><b class="gnote" title="${t("Teoria dels jocs i els teus apunts","Theory from the games and your notes")}"><i aria-hidden="true">📝</i>${t("Els teus apunts","Your notes")}</b></span></a>`}
 function placeHtml(place,lss,ls,list,info,st,stTag,pend){
-  if(place==="todo")return todoBox(lss,ls,info)+(only(ls.id)?"":weekBox(ls,info,true));
-  if(place==="hw")return homeworkBox(ls,info);
+  if(place==="todo")return pseg("todo",lss,ls)+todoBox(lss,ls,info)+(only(ls.id)?"":weekBox(ls,info,true));
+  if(place==="hw")return pseg("hw",lss,ls)+homeworkBox(ls,info);
+  if(place==="me")return meBox(lss,ls);
   if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";return pend+workBox(lss)+marksHead(lss,ls)+`<div id="ptbox">${pointsBox()}</div>`+tabBody(ls,list,info)}   // 📋 My activities: what counts for the mark (Roger, 6 Nov 2026: not under To do)
   if(place==="units")return unitsBox(lss,ls,st,stTag)+(bookCard(ls)?`<div class="rcards one" style="margin:0 0 14px">${bookCard(ls)}</div>`:"")+studyBox(ls)+practiceBox(ls);   // the book here too: phones have no side menu
   if(place==="phone")return phoneBox();
@@ -637,7 +660,15 @@ function bnav(place,lss){
   const miss=lss.length?(S.wtabs||0)+tabsMiss(lateList(lss)):0,it=[["home","#","🏠",t("Inici","Home")],["todo","#todo","✅",t("Per fer","To do")],["hw","#homework","📝",t("Deures","Homework")],["marks","#marks","📊",t("Notes","Marks")],["units","#units","📚","LS"],["help","#help","❓",t("Ajuda","Help")]];
   const ls=EL_LS.find(l=>l.id===S.ls),nt=lss.length?todoItems(lss).reduce((n,x)=>n+todoTabs(x),0):0,nh=ls?hwList(ls,D.ls[ls.id]||{}).filter(x=>!x.done).length:0;
   $("#bnav").innerHTML=lss.length?it.map(([k,h,i,l])=>`<a href="${h}" class="${place===k?"on":""}"${place===k?' aria-current="page"':""}><i>${i}</i>${l}${k==="todo"&&nt?`<b>${nt}</b>`:k==="hw"&&nh?`<b class="hw">${nh}</b>`:""}</a>`).join(""):"";
+  // the phone's tab bar (≤640 px; el-phone.css): Home · To do · LSn · Practise · Me (Roger, 8 Nov 2026, phone remodel); it replaces the bar
+  // above on a phone. The counts stay in this browser so the LS page and the learning paths show the same To do badge with no read.
+  if(window.elPhoneTabs&&lss.length){if(!AS&&!DEMO)try{localStorage.setItem("el_ptabs",JSON.stringify({todo:nt,hw:nh}))}catch(e){}
+    elPhoneTabs({root:"",board:location.search||"today.html",ls,here:place==="hw"?"todo":PLACE_TAB[place]||"me",ca:lang()==="ca",todo:nt})}
 }
+const PLACE_TAB={home:"home",todo:"todo",me:"me"};
+// the phone's To do tab holds both lists: a switch on top of ✅ To do and 🏠 Homework (hidden on a computer, el-phone.css .pseg)
+const pseg=(on,lss,ls)=>{const nt=todoItems(lss).reduce((n,x)=>n+todoTabs(x),0),nh=hwList(ls,D.ls[ls.id]||{}).filter(x=>!x.done).length;
+  return `<nav class="pseg" aria-label="${t("Mostra","Show")}"><a href="#todo"${on==="todo"?' class="on" aria-current="page"':""}>${t("Per fer","To do")}${nt?`<em>${nt}</em>`:""}</a><a href="#homework"${on==="hw"?' class="on" aria-current="page"':""}>${t("Deures","Homework")}${nh?`<em>${nh}</em>`:""}</a></nav>`};
 // The LS report (Roger, 1 Nov 2026: "the idea is that I don't need to make [the LS1 reports] again since all the info could be on their
 // student board"): a big LS picker and three tabs per LS. 🗓 My week (plan, homework, summary, practice), 📈 My formative assessment
 // (the learning-path grids and the summary of my criteria) and 📝 My exams (the LS grade, the exam per part and per criterion and the
@@ -1307,7 +1338,7 @@ const tabName=(id,k)=>{const xs=(window.EL_SECTIONS||{})[id]||[],p=xs.some(y=>y[
 const tabGroups=(a,ks)=>elTabGroups(a,ks);
 async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
-  ({ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative",fp:"final"}[k.t]||k.t))}catch(e){}render();document.querySelector(AS?".tabbody":".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(S.ls),asklv:()=>AS||askPanel(k.ls),want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
+  ({ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative",fp:"final"}[k.t]||k.t))}catch(e){}render();document.querySelector(AS?".tabbody":".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(S.ls),asklv:()=>AS||askPanel(k.ls),pbar:()=>{const w=k.w==='idea'?'💡':'⚠️',b=[...document.querySelectorAll('#el-cloud-bar button')].find(x=>x.textContent.startsWith(w));if(b)b.click()},want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
 addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;render();scrollTo(0,0)});   // a place of the board (placeNow)
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
