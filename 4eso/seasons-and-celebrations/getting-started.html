@@ -580,6 +580,12 @@ $('#handInSpeaking').onclick=()=>{
   state.steps=state.steps||{};
   state.steps.speak={level,title:'Speaking',typed:((state.speak||{}).gs||{}).typed?true:undefined,ty:window.elTyping?elTyping.sum($('#speechTranscript').parentElement):null,f:[{l:ca()?'Transcripció':'Transcript',v:tr}],rate:[],avg:null,comment:'',date:new Date().toISOString()};
   complete('speak');$('#speakResult').classList.add('show');speakHanded();
+  // the recording goes to the teacher's Drive too (Roger, 8 Nov 2026; el-mic.js upload, as ls2-engine.js keepAudio)
+  if(window.elMic&&elMic.upload)elMic.upload({btn:'startRecord',step:'speak',title:'Speaking',level,task:$('#speakTask').textContent}).then(r=>{const h=(state.steps||{}).speak;if(!r||!h)return;
+    if(!r.ok&&!/^too /.test(r.error||''))return;
+    if(!r.ok){m.textContent+=' '+(ca()?'(La gravació no s’ha pogut desar: la transcripció sí que s’ha entregat.)':'(The recording could not be saved: your transcript was handed in.)');return}
+    h.audio={id:r.id,s:r.secs||null};h.f=(h.f||[]).filter(x=>!x.rec);if(r.tr)h.f.push({l:ca()?'Transcripció de la gravació':'Transcript of the recording',v:String(r.tr).slice(0,6000),rec:1});if(r.notes)h.f.push({l:'Notes from the recording (task and pronunciation)',v:String(r.notes).slice(0,3000),rec:1});
+    save();m.textContent+=' 🔊 '+(ca()?'Gravació desada.':'Recording saved.')}).catch(()=>{});
 };
 speakHanded();
 // the plan and the transcript stay (state.speak.gs, as state.speak in ls2-engine.js; Roger, 6 Nov 2026: "they must see them with their
