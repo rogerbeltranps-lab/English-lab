@@ -233,6 +233,9 @@
   /* Roger: "The column 'planned in' is not necessary" (the status badge already says ➕ when it is not planned there) */
   body.tph .cvt:not(:has(td.cvc)) td[data-l^="Planned in"]{display:none}
 }
+/* 9d. The 🧭 Routes from the LS1 exam box is not on a phone (Roger, 8 Nov 2026: "I don't need this table in the mobile version"): a level
+   is still set or changed from the student's chip → Level. */
+@media (max-width:640px){body.tph .box.rtbox{display:none}}
 .pchip,.pkey{display:none}
 @media (max-width:640px){
   body.tph .wrap td.stu:has(>.pchip)>:not(.pchip){display:none}
