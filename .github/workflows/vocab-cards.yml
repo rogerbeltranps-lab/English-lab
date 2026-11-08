@@ -1,0 +1,19 @@
+name: Study cards on the word list
+# Every study card must be on the Explora word list, for every route (Roger, 8 Nov 2026). tools/vocab-cards/check.mjs
+on:
+  pull_request:
+    paths: ['*/*/data/**', '*/*/ls2-engine.js', 'tools/vocab-cards/**']
+  push:
+    branches: [main]
+    paths: ['*/*/data/**', '*/*/ls2-engine.js', 'tools/vocab-cards/**']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node tools/vocab-cards/check.mjs
