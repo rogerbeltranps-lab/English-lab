@@ -1348,7 +1348,8 @@ else ELCloud.onUser(async u=>{U=u;
   if(!u){location.replace("index.html");return}
   // the student view of this tab (el-cloud.js, el_as) keeps the board on that student when the URL has no ?student
   const sp=new URLSearchParams(location.search).get("student")||(ELCloud.viewing||{}).uid;AS=sp&&ELCloud.isTeacher(u)?sp:null;
-  // the dashboard's 📝 next to a student (teacher.html notesLink): the student view is now on in this tab, so go on to that LS page (only an LS home)
-  const go=new URLSearchParams(location.search).get("go");if(AS&&go&&/^(2|4)eso\/[\w-]+\/index\.html(#[\w-]+)?$/.test(go)){location.replace(go);return}
+  // the dashboard's 📝 next to a student (teacher.html notesLink) and the page of a ⚠️ problem / 💡 suggestion (pageHref): the student view is
+  // now on in this tab, so go on to that page of the site (a relative .html path with its #place; never another site, never back here)
+  const go=new URLSearchParams(location.search).get("go");if(AS&&go&&/^\w[\w./-]*\.html(#[\w.:%-]*)?$/.test(go)&&!go.includes("..")&&!/^today\.html/.test(go)){location.replace(go);return}
   D=await load(u);render();if(!AS)goLive();if(location.hash==="#exam")setTimeout(()=>document.querySelector(AS?".tabbody":"#exam")?.scrollIntoView({block:"start"}),0)});
 </script></body></html>

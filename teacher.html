@@ -2910,12 +2910,20 @@ function annDue(){if(DEMO||S.annDue)return;const due=(S.D&&S.D.ann||[]).filter(a
   (async()=>{for(const a of due){const ref=F.doc(db(),"announcements",a.id);
     const mine=await F.runTransaction(db(),async tx=>{const d=await tx.get(ref);if(!d.exists()||d.data().mailed)return false;tx.update(ref,{mailed:Date.now()});return true}).catch(e=>{console.warn("annDue",e);return false});
     a.mailed=true;if(mine)mailNote(annMail(a),"A scheduled announcement")}})().finally(()=>S.annDue=false)}
+// The page a student reported from (⚠️ problems, 💡 suggestions) opens in the read-only student view of THAT student, at that page and
+// place (Roger, 8 Nov 2026: "al clickar el link d'un alumne del problems es pensa que soc un alumne"): the plain link opened the teacher's
+// own board. today.html?student=uid starts the view in the new tab and &go= goes on to the page (today.html: the board, with its #place).
+const pageHref=x=>{const p=String(x.page||"");if(!/^\w[\w./-]*(#[\w.:%-]*)?$/.test(p)||p.includes(".."))return null;
+  if(!x.uid||(!DEMO&&x.uid===((window.ELCloud&&ELCloud.user)||{}).uid))return p;   // the teacher's own test report: the page itself
+  const q="today.html?student="+encodeURIComponent(x.uid)+(x.ls?"&ls="+encodeURIComponent(x.ls):"");
+  return /^today\.html(#|$)/.test(p)?q+p.slice(10):q+"&go="+encodeURIComponent(p)};
+const pageLink=(x,label)=>{const h=pageHref(x);return h?`<a href="${esc(h)}" target="_blank" rel="noopener" title="Open this page as ${esc((S.P||{})[x.uid]?fullName(S.P[x.uid]):x.name||"the student")} sees it (read-only student view)">${label}</a>`:label};
 // Suggestions from students (all groups): new ones first, then newest first. Read ones stay until you delete them.
 const sgWhen=x=>x.created?(x.created.toDate?x.created.toDate():new Date(x.created)):null;
 function sgBox(){
   const L=[...(S.D.sg||[])].sort((a,b)=>(!!a.read-!!b.read)||((sgWhen(b)||0)-(sgWhen(a)||0))),nw=L.filter(x=>!x.read).length;
   const who=x=>S.P[x.uid]?name(S.P[x.uid]):esc(x.name||x.email),gr=x=>(GR.find(g=>g.id===x.group)||{}).name;
-  const li=x=>{const w=sgWhen(x);return `<li class="${x.read?"read":""}"><div class="hand">${esc(x.text)}</div><small class="muted">${x.read?"":"<b>New</b> · "}${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.page&&/^[\w./-]+$/.test(x.page)?` · <a href="${esc(x.page)}" target="_blank">${esc(x.page)}</a>`:x.page?" · "+esc(x.page):""}</small>
+  const li=x=>{const w=sgWhen(x);return `<li class="${x.read?"read":""}"><div class="hand">${esc(x.text)}</div><small class="muted">${x.read?"":"<b>New</b> · "}${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.page?" · "+pageLink(x,esc(x.page)):""}</small>
     <button class="g" data-do="sgread" data-id="${esc(x.id)}" data-v="${x.read?"":"1"}">${x.read?"Mark as new":"Mark as read"}</button> <button class="g" data-do="sgdel" data-id="${esc(x.id)}">Delete</button></li>`};
   return `<div class="box" id="sugg">${fold("sugg",`💡 Suggestions from students <small class="muted">${nw?`<b>${nw} new</b> · `:""}${L.length} in total</small>`,
     `<p class="muted">Students (and the tester) send them with 💡 Idea in the bottom bar of any page, in Catalan or English depending on their route. You see the student, group, page and time.</p>`+(L.length?`<ul class="sgl">${L.map(li).join("")}</ul>`:'<p class="muted">No suggestions yet.</p>'))}</div>`;
@@ -2926,7 +2934,7 @@ function pbBox(){
   const li=x=>{const w=pbWhen(x),where=[x.title||x.page,x.section].filter(Boolean).join(" › ");
     return `<li class="${x.fixed?"fixed":""}"><b>${esc(PB_KIND[x.kind]||x.kind)}</b>${x.fixed?' <span class="tag">Fixed</span>':""}${x.text?`<div class="hand">${esc(x.text)}</div>`:""}
     <small class="muted">${w?w.toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · ":""}${who(x)}${gr(x)?" · "+gr(x):""}${x.route?" · "+route(x.route):""}<br>
-    ${x.page?"📍 "+(/^[\w./-]+(#.*)?$/.test(x.page)?`<a href="${esc(x.page)}" target="_blank">${esc(where)}</a>`:esc(where)):""}${x.device?" · "+esc(x.device):""}</small>
+    ${x.page?"📍 "+pageLink(x,esc(where)):""}${x.device?" · "+esc(x.device):""}</small>
     ${pbSent(x)}${(x.errors||[]).length?`<details><summary>Errors the page logged (${x.errors.length})</summary>${x.errors.map(e=>`<code>${esc(e)}</code>`).join("")}</details>`:""}
     <div>${x.fixed?"":`<button data-do="pbclaude" data-id="${esc(x.id)}" title="Copy everything in this report and open the English Lab project, to start a thread that fixes it">🤖 Fix with Claude</button> `}${x.shot?`<button data-do="pbshot" data-id="${esc(x.id)}">📷 Screenshot</button> `:""}<button data-do="pbmsg" data-id="${esc(x.id)}" title="Write to the student: they see your words on a card the next time they open a page">💬 Answer</button> <button class="g" data-do="pbfix" data-id="${esc(x.id)}" data-v="${x.fixed?"":"1"}" title="${x.fixed?"Open it again (an unread ✅ note to the student is taken back)":"The student gets a ✅ note saying it is fixed, the next time they open a page"}">${x.fixed?"Reopen":"✅ Mark as fixed"}</button> <button class="g" data-do="pbdel" data-id="${esc(x.id)}">Delete</button></div></li>`};
   return `<div class="box" id="probs">${fold("probs",`⚠️ Problem reports <small class="muted">${np?`<b>${np} open</b> · `:""}${L.length} in total</small>`,
