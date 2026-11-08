@@ -252,7 +252,7 @@ body.elapp.elcourse .elcrumb{max-width:980px}
    Esc closes it. The mouse opens it after a short pause (a mouse passing by does not), and it closes a moment after the mouse leaves.
    It opens OVER the page, so the page never moves. Chromebook (1366×768) first: one button size that fits its short screen, the same
    height closed and open (the icon under the mouse stays under it). A computer only (≥981 px): narrower windows keep their strip or top
-   row, phones the bottom bar. LS1's home keeps its wide menu. ---- */
+   row, phones the bottom bar. Every LS, LS1's home too (Roger, 8 Nov 2026: "the menu should collapse in every LS"). ---- */
 .elmtop{display:none}
 @media (min-width:981px){
   body.elmini{--elrail:72px;--elopen:300px}
