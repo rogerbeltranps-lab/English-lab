@@ -1569,7 +1569,7 @@ function routesBox(grp,studs){const c=grp.course,src=srcLs(c),later=src?EL_LS.fi
         return `<tr><td><input type="checkbox" data-do="rton" data-u="${r.s.uid}" ${r.on?"checked":""} ${r.pick?"":"disabled"}></td><td class="stu">${name(r.s)}</td><td>${ex}</td><td>${route(r.now.level)}</td><td>${sel(r)}${r.pick&&r.pick!==r.sug&&r.ex?(r.pick==="native"&&r.now.level==="native"&&S.rtPick[r.s.uid]===undefined?' <small class="muted" title="Pro is never given by a mark: pick another route to change it">Pro kept</small>':' <small class="muted" title="Changed by you">✎</small>'):""}${same?' <small class="muted">same</small>':""}</td></tr>`}).join("")
       +`</tbody></table></div>`:'<p class="muted">No signed-in students in this group yet.</p>')
     +(away.length?`<p class="muted">Not signed in yet (click their Route cell in the grid to set the route they get when they first sign in): ${away.map(name).join(" · ")}</p>`:"");
-  return `<div class="box">${fold("routes","🧭 Routes from the LS1 exam",body)}</div>`}
+  return `<div class="box rtbox">${fold("routes","🧭 Routes from the LS1 exam",body)}</div>`}
 function todo(studs,ls,list){   // studs: signed-in students only. Final product items and route requests from the students' boards (Roger, 30 Oct 2026); submissions without feedback are not listed (Roger, 2026-10-24)
   const out=[],course=(EL_LS.find(l=>l.id===ls)||{}).course;
   // 🙋 Claude handed it to you (ask[step]); ✉️ Claude answers it in the Friday run, or you do it first
@@ -3003,8 +3003,8 @@ function rosterGames(studs){if(!studs||!studs.length||!S.g||S.g==="none")return 
   const rows=studs.filter(s=>!s.tester).map(s=>{const em=String(s.email||"").toLowerCase(),ls=S.ls||"";
     const mine=em?g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done}:null}).filter(Boolean):[];
     return `<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td><td>${mine.length?gameRings(s):'<span class="muted">no class games yet</span>'}${notesLink(s,S.ls)}</td><td class="num">${mine.length}</td></tr>`}).join("");
-  return `<h3 style="margin:4px 0 6px">🎮 Class games in this LS</h3><p class="muted">% right in the 🧩 grammar and 📚 vocabulary games of this LS. Click the circles for every answer and the notes (Results).</p>
-    <div class="wrap"><table class="rgames"><tr><th class="stu">Student</th><th>🧩 grammar · 📚 vocabulary</th><th>Games</th></tr>${rows}</table></div>`}
+  return `<div class="rgbox"><h3 style="margin:4px 0 6px">🎮 Class games in this LS</h3><p class="muted">% right in the 🧩 grammar and 📚 vocabulary games of this LS. Click the circles for every answer and the notes (Results).</p>
+    <div class="wrap"><table class="rgames"><tr><th class="stu">Student</th><th>🧩 grammar · 📚 vocabulary</th><th>Games</th></tr>${rows}</table></div></div>`}
 function rosterBox(studs){
   const ro=Object.values(S.D.ro),noMail=ro.filter(r=>!r.email);
   const body=rosterGames(studs)+(S.D.roErr?'<p><b>The student list could not be read.</b> Publish the Firestore rules (<code>firebase deploy --only firestore:rules</code>) and reload.</p>':"")
