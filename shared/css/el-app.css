@@ -226,3 +226,47 @@ body.elapp.elcourse .elcrumb{max-width:980px}
   a.ells .ch{grid-column:2;justify-self:start}
   a.ells .go{grid-column:1/-1;text-align:center}
 }
+
+/* ---- 3. on an LS (its home, its learning paths, its vocabulary games) a student's side menu is a strip of icons that opens over the
+   page (Roger, 8 Nov 2026: "when students are on the LS, to see better the screen, I want the menu to hide and only show the emoji or
+   logos of each side. If the mouse goes on the section the menu gets bigger"). el-app.js (.elrail) and el-ls-home.js (aside.side) set
+   body.elmini; elMiniRail (el-catalog.js) adds ☰ before the brand: a tap on it opens or closes the menu (touch screens), a tap outside or
+   Esc closes it. The mouse opens it after a short pause (a mouse passing by does not), and it closes a moment after the mouse leaves.
+   It opens OVER the page, so the page never moves. Chromebook (1366×768) first: one button size that fits its short screen, the same
+   height closed and open (the icon under the mouse stays under it). A computer only (≥981 px): narrower windows keep their strip or top
+   row, phones the bottom bar. LS1's home keeps its wide menu. ---- */
+.elmtop{display:none}
+@media (min-width:981px){
+  body.elmini{--elrail:72px;--elopen:300px}
+  body.lsh.elmini .app{grid-template-columns:var(--elrail) minmax(0,1fr)}
+  body.elmini .elrail,body.lsh.elmini .app>aside.side{width:var(--elrail)!important;padding:14px 12px!important;gap:12px!important;overflow-x:hidden!important;overflow-y:auto;
+    z-index:60;scrollbar-width:none;transition:width .18s ease .3s,box-shadow .18s ease .3s}
+  body.elmini .elrail::-webkit-scrollbar,body.lsh.elmini .app>aside.side::-webkit-scrollbar{display:none}
+  body.elmini .elrail.elopen,body.lsh.elmini .app>aside.side.elopen,
+  body.elmini .elrail:has(:focus-visible),body.lsh.elmini .app>aside.side:has(:focus-visible){width:var(--elopen)!important;box-shadow:10px 0 30px rgba(15,23,42,.14)!important;transition-delay:0s}
+  /* the top row: ☰ in the icon column, the brand beside it when open */
+  body.elmini .elmtop{display:flex;align-items:center;gap:8px;flex:0 0 auto;min-height:40px;white-space:nowrap}
+  body.elmini .elmt{flex:0 0 48px;width:48px;height:40px;display:grid;place-items:center;padding:0;border:0;border-radius:12px;background:transparent;color:#334155;font:22px/1 system-ui,sans-serif;cursor:pointer}
+  body.elmini .elmt:hover,body.elmini .elopen .elmt{background:#eef2ff;color:#3157d5}
+  body.elmini .elmtop>a{padding:0!important;opacity:0;transition:opacity .12s ease}
+  /* the buttons: icon only while closed (the label and › are cut off by the button's edge) */
+  body.elmini .elrail .elside,body.lsh.elmini aside.side .nvs{gap:6px}
+  body.elmini .elrail .nv,body.lsh.elmini aside.side .nv{width:auto!important;min-width:0;padding:5px 10px 5px 7px;gap:10px;font-size:14.5px;line-height:1.2;white-space:nowrap;overflow:hidden;
+    transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease,background .12s ease,margin .18s ease .3s,padding .18s ease .3s}
+  body.elmini .elrail .nv .ic,body.lsh.elmini aside.side .nv .ic{width:32px;height:32px;font-size:17px;border-radius:10px}
+  body.elmini .elrail .nv .ic.lsn,body.lsh.elmini aside.side .nv .ic.lsn{font-size:11.5px}
+  body.elmini .elrail .nv .lb,body.lsh.elmini aside.side .nv .lb{overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .1s ease}
+  body.elmini .elrail .nv::after,body.lsh.elmini aside.side .nv::after{font-size:18px;opacity:0;transition:opacity .1s ease}
+  body.elmini .elrail .nv.sub,body.lsh.elmini aside.side .nv.sub{margin-left:0!important;padding:4px 8px 4px 10px;font-size:13.5px}
+  body.elmini .elrail .nv.sub .ic,body.lsh.elmini aside.side .nv.sub .ic{width:26px;height:26px;font-size:14px;border-radius:8px}
+  body.elmini .elrail .nv.sub .ic.lsn,body.lsh.elmini aside.side .nv.sub .ic.lsn{font-size:10.5px}
+  /* open: brand, labels and › come in; an LS goes in under its course again */
+  body.elmini :is(.elrail,aside.side):is(.elopen,:has(:focus-visible)) :is(.elmtop>a,.nv .lb,.nv::after){opacity:1;transition-delay:.12s}
+  body.elmini :is(.elrail,aside.side):is(.elopen,:has(:focus-visible)) .nv.sub{margin-left:14px!important;padding-left:6px;transition-delay:0s}
+}
+/* the mouse opens it: after a short pause, so a mouse crossing to the page does not */
+@media (min-width:981px) and (hover:hover){
+  body.elmini .elrail:hover,body.lsh.elmini .app>aside.side:hover{width:var(--elopen)!important;box-shadow:10px 0 30px rgba(15,23,42,.14)!important;transition-delay:.15s}
+  body.elmini :is(.elrail,aside.side):hover :is(.elmtop>a,.nv .lb,.nv::after){opacity:1;transition-delay:.27s}
+  body.elmini :is(.elrail,aside.side):hover .nv.sub{margin-left:14px!important;padding-left:6px;transition-delay:.15s}
+}
