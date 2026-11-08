@@ -2982,8 +2982,8 @@ function rosterGames(studs){if(!studs||!studs.length||!S.g||S.g==="none")return 
   const rows=studs.filter(s=>!s.tester).map(s=>{const em=String(s.email||"").toLowerCase(),ls=S.ls||"";
     const mine=em?g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done}:null}).filter(Boolean):[];
     return `<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td><td>${mine.length?gameRings(s):'<span class="muted">no class games yet</span>'}${notesLink(s,S.ls)}</td><td class="num">${mine.length}</td></tr>`}).join("");
-  return `<h3 style="margin:4px 0 6px">🎮 Class games in this LS</h3><p class="muted">% right in the 🧩 grammar and 📚 vocabulary games of this LS. Click the circles for every answer and the notes (Results).</p>
-    <div class="wrap"><table class="rgames"><tr><th class="stu">Student</th><th>🧩 grammar · 📚 vocabulary</th><th>Games</th></tr>${rows}</table></div>`}
+  return `<div class="rgbox"><h3 style="margin:4px 0 6px">🎮 Class games in this LS</h3><p class="muted">% right in the 🧩 grammar and 📚 vocabulary games of this LS. Click the circles for every answer and the notes (Results).</p>
+    <div class="wrap"><table class="rgames"><tr><th class="stu">Student</th><th>🧩 grammar · 📚 vocabulary</th><th>Games</th></tr>${rows}</table></div></div>`}
 function rosterBox(studs){
   const ro=Object.values(S.D.ro),noMail=ro.filter(r=>!r.email);
   const body=rosterGames(studs)+(S.D.roErr?'<p><b>The student list could not be read.</b> Publish the Firestore rules (<code>firebase deploy --only firestore:rules</code>) and reload.</p>':"")
