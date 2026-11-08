@@ -3225,6 +3225,10 @@ async function fpgCall(body){const tok=await ELCloud.auth.currentUser.getIdToken
   const j=await r.json();if(!j||!j.ok)throw new Error(j&&j.error==="nothing to send"?"the school script is the old version: paste tools/notify/school-mail.gs and deploy a new version":(j&&j.error)||"no answer");return j}
 const FPG_READ={speaks:["🟢","Speaks freely"],partly:["🟡","Reads in parts"],reads:["🔴","Reads"]};
 const fpgLv=n=>n==null?"–":n===0?"No evidence":"Level "+n;
+// a row's mark out of 10: Gemini's own (in steps of 0.5, kept inside the level by the school script) or, in older drafts, level × 2.5;
+// "3+" = the top of level 3 (8 or 8.5), as in Roger's model draft for Martín
+const fpgRow=g=>g.level==null?null:g.mark!=null?g.mark:g.level*2.5;
+const fpgPlus=g=>{const m=fpgRow(g);return g.level==null?"–":g.level===0?"No evidence":"Level "+g.level+(g.mark!=null&&g.level<4&&m>=[0,3,5.5,8][g.level]?"+":"")};
 // the box in the final product dialog (filled once the drafts are read)
 function fpgBox(u,a){if(!fpgIs(a))return "";setTimeout(()=>fpgLoad(a).then(()=>fpgFill(u,a)));return `<div id="fpg" class="fpg" data-u="${u}"><p class="muted">🎬 Loading the video and Gemini's draft…</p></div>`}
 const fpgRefresh=a=>{const b=$("#fpg");if(b&&b.dataset.u)fpgFill(b.dataset.u,a)};
@@ -3243,8 +3247,9 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
   if(d&&d.draft&&R){const x=d.draft,rd=FPG_READ[(x.reading||{}).verdict]||FPG_READ.partly;
     h+=`<p style="margin:10px 0 4px"><b>${rd[0]} ${rd[1]}</b>${x.reading&&x.reading.note?` · ${esc(x.reading.note)}`:""}</p>`
       +`<table class="lvt"><thead><tr><th style="text-align:left">Row</th><th>Gemini</th><th style="text-align:left">What it saw</th></tr></thead><tbody>`
-      +R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};return `<tr><td style="text-align:left">${esc(r.name)} <small class="muted">${r.w?r.w+" %":""}</small></td><td><b>${fpgLv(g.level)}</b></td><td style="text-align:left"><small>${esc(g.why||"")}</small></td></tr>`}).join("")
+      +R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};return `<tr><td style="text-align:left">${esc(r.name)} <small class="muted">${r.w?r.w+" %":""}</small></td><td><b>${R.kind==="mark"&&g.level!=null?fpgRow(g)+"/10 · "+fpgPlus(g):fpgLv(g.level)}</b></td><td style="text-align:left"><small>${esc(g.why||"")}</small></td></tr>`}).join("")
       +`</tbody></table>`+(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")
+      +(x.sounds&&x.sounds.length?`<p style="margin:8px 0 2px"><b>🗣️ Words said wrong</b> <small class="muted">(only for you, never shown to the student)</small> <button class="g" data-fpg="sounds" data-u="${u}" data-a="${esc(a.id)}" style="font-size:12px;padding:2px 8px">List for the whole group</button></p><p style="margin:0 0 6px"><small>${x.sounds.map(w=>`<b>${esc(w.word)}</b>${w.heard?" (said “"+esc(w.heard)+"”)":""}`).join(" · ")}</small></p>`:"")
       +`<label>Feedback for the student (Gemini's draft: you can change it below before approving)</label><div class="fb" style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px">${esc(fpgText(R,x))}</div>`
       +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
       +`<div class="row" style="justify-content:flex-start;gap:6px"><button data-fpg="ok" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✅ Approve: use it and save</button></div>`
@@ -3252,17 +3257,17 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
       +`<div class="row" style="justify-content:flex-start"><button class="g" data-fpg="change" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✏️ Ask Gemini to change it</button></div>`}
   box.innerHTML=h}
 // LS1: mark /10 = levels × 2.5 weighted by the rows (rows Gemini could not judge are left out)
-function fpgMark(R,x){let s=0,w=0;R.rows.forEach((r,i)=>{const l=((x.rows||[])[i]||{}).level;if(l!=null){s+=l*2.5*r.w;w+=r.w}});return w?Math.round(s/w*10)/10:null}
+function fpgMark(R,x){let s=0,w=0;R.rows.forEach((r,i)=>{const m=fpgRow((x.rows||[])[i]||{});if(m!=null){s+=m*r.w;w+=r.w}});return w?Math.round(s/w*10)/10:null}
 // the feedback text the student gets: LS1 in the "Name (30%) · 7.5/10" + ✔/➜ lines the student board shades on the rubric (fbBox in today.html)
 function fpgText(R,x){const top=[x.feedback,x.well_done&&"Well done: "+x.well_done,x.next_time&&"Next time: "+x.next_time].filter(Boolean).join("\n");
   if(R.kind!=="mark")return top;
-  return top+"\n\n"+R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};if(g.level==null)return "";return `${r.name} (${r.w}%) · ${g.level*2.5}/10`+(g.good?"\n✔ "+g.good:"")+(g.improve?"\n➜ "+g.improve:"")}).filter(Boolean).join("\n")}
+  return top+"\n\n"+R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};if(g.level==null)return "";return `${r.name} (${r.w}%) · ${fpgRow(g)}/10`+(g.good?"\n✔ "+g.good:"")+(g.improve?"\n➜ "+g.improve:"")}).filter(Boolean).join("\n")}
 async function fpgWatch(u,a,change,src){const R=fpgRubric(a),k=u+"|"+a.id;if(!R||FPG.busy[k])return false;
   const link=!src&&$("#fpglink")&&$("#fpglink").value.trim(),fid=link?fpgFile(link):"";if(link&&!fid){alert("That is not a Drive link to a file.");return false}
   let v=src||fpgVideo(u,a);if(fid)v={id:fid,link:true};if(!v){alert("No video yet: the student uploads it on the final product page (Submit tab), or look on Classroom, or paste a Drive link.");return false}
   const s=S.P[u],old=(FPG.d[a.id]||{})[u]||{},g=G()||{},cs=a.ls.startsWith("2eso")?"2 ESO":"4 ESO",ls1=/my-real-routine/.test(a.ls);
   const ask={course:cs,level:ls1&&cs==="2 ESO"?"A1":"A2+",route:level(u,a.ls),student:fullName(s),group:!!teamOf(u,a.id)||/proposal/.test(a.id),
-    task:a.title+(R.title?" · "+R.title:""),rows:R.rows.map(({name,sub,w,d})=>({name,sub,w,d}))};
+    task:a.title+(R.title?" · "+R.title:""),marks:R.kind==="mark",rows:R.rows.map(({name,sub,w,d})=>({name,sub,w,d}))};
   FPG.busy[k]=true;fpgFill(u,a);
   const keep={fileId:v.link&&v.id?v.id:(old.fileId||null),youtube:v.youtube||old.youtube||null,fileName:v.link&&v.name?v.name:(old.fileName||null)};
   let d;try{const j=await fpgCall({action:"fp_watch",fileId:v.id||"",youtube:v.youtube||"",ask,prev:change?old.draft:null,change:change||""});
@@ -3308,7 +3313,8 @@ function fpgReport(c,rep,a){const li=(arr,f)=>arr.length?`<ul>${arr.map(f).join(
     +(rep.had.length?`<h4>Already drafted before (${rep.had.length})</h4><p>${rep.had.map(nm).join(" · ")}</p>`:"")
     +`<h4>Nothing handed in on Classroom (${rep.none.length})</h4><p>${rep.none.length?rep.none.map(nm).join(" · "):'<span class="muted">None.</span>'}</p>`
     +(rep.other.length?`<p class="muted">On Classroom but not on the student list here: ${rep.other.map(esc).join(", ")}.</p>`:"")
-    +`<p class="muted">Click a name to open their final product, watch the video and approve or change Gemini's draft.</p>`,true)}
+    +`<p class="muted">Click a name to open their final product, watch the video and approve or change Gemini's draft.</p>`
+    +(rep.done.length||rep.had.length?`<p><button class="g" data-fpg="sounds" data-u="${(rep.done[0]||{s:rep.had[0]}).s.uid}" data-a="${esc(a.id)}">🗣️ Words said wrong in the whole group</button></p>`:""),true)}
 // Approve: LS2 levels on the rows (group rows on every member of the final product group, as the dialog's group buttons do), LS1 the mark;
 // the feedback box gets the draft (or what the teacher wrote there already, if it differs), then the dialog's own Save
 function fpgApprove(u,a){const R=fpgRubric(a),d=((FPG.d[a.id]||{})[u]||{}),x=d.draft;if(!R||!x)return;
@@ -3327,7 +3333,18 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-fpg]");if(
     fpgClsLoad(g).then(()=>fpgFill(k.u,a),e=>{alert("Classroom could not be read: "+e.message);fpgFill(k.u,a)})}
   else if(k.fpg==="change"){const c=$("#fpgchg").value.trim();if(!c)return alert("Write what Gemini should change.");fpgWatch(k.u,a,c)}
   else if(k.fpg==="ok")fpgApprove(k.u,a);
-  else if(k.fpg==="cost")fpgCost()});
+  else if(k.fpg==="cost")fpgCost();
+  else if(k.fpg==="sounds")fpgSounds(k.u,a)});
+// 🗣️ Words said wrong in the whole group (Roger, 8 Nov 2026: "a list of the words that they mispronounce like walk (pronouncing the L) …
+// not for the students individually but to create a listen and repeat video to correct that in class"; the video is made without Gemini):
+// every drafted final product of the group, most common word first. Teacher only: never in the student's feedback.
+function fpgSounds(u,a){const g=(S.P[u]||{}).group,D=FPG.d[a.id]||{},W={};
+  Object.keys(D).forEach(v=>{const s=S.P[v];if(!s||s.group!==g)return;((D[v].draft||{}).sounds||[]).forEach(x=>{const k=String(x.word||"").toLowerCase().trim();if(!k)return;
+    const w=W[k]=W[k]||{word:x.word,tip:x.tip||"",heard:new Set(),who:[]};if(x.heard)w.heard.add(x.heard);if(!w.tip&&x.tip)w.tip=x.tip;if(!w.who.includes(v))w.who.push(v)})});
+  const L=Object.values(W).sort((p,q)=>q.who.length-p.who.length||p.word.localeCompare(q.word)),n=Object.keys(D).filter(v=>(S.P[v]||{}).group===g&&D[v].draft).length;
+  dlg(`<h3>🗣️ Words said wrong · ${esc(g||"")}</h3><p class="muted">${esc(a.title)} · from ${n} video${n===1?"":"s"} Gemini has watched. For your listen-and-repeat video in class: the students never see this list.</p>`
+    +(L.length?`<table><thead><tr><th style="text-align:left">Word</th><th style="text-align:left">How they said it</th><th style="text-align:left">How to say it</th><th>Students</th></tr></thead><tbody>${L.map(w=>`<tr><td style="text-align:left"><b>${esc(w.word)}</b></td><td style="text-align:left">${[...w.heard].map(esc).join(", ")}</td><td style="text-align:left">${esc(w.tip)}</td><td title="${w.who.map(v=>esc(fullName(S.P[v]))).join(", ")}">${w.who.length}</td></tr>`).join("")}</tbody></table>
+      <label>The words to copy</label><textarea rows="3" readonly onclick="this.select()">${esc(L.map(w=>w.word).join(", "))}</textarea>`:`<p class="muted">No words yet: Gemini lists them when it watches a video (drafts made before this list existed have none: 🔄 Watch again).</p>`),true)}
 // 💶 Gemini this month (every recording transcribed and every video watched; the school script adds up Google's token counts)
 async function fpgCost(){dlg(`<h3>💶 Gemini spending</h3><p id="fpgc" class="muted">Asking the school script…</p>`);
   try{const j=FPG.cost||(FPG.cost=await fpgCall({action:"gemini_usage"})),ms=j.months||[];
