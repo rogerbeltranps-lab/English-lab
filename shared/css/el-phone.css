@@ -199,6 +199,40 @@
    a shade with the percentage of the grammar and from the right to the middle another shade with the [vocabulary]"): each name is a chip
    "Roger C."; its left half fills from the left edge with 🧩 grammar %, its right half from the right edge with 📚 vocabulary % (class games
    of this LS). A tap opens a sheet with the name and first surname, both %, details, notes and answers. On a computer nothing changes. */
+/* 8b. The 👁 Student / 🎓 Class buttons on a phone (Roger, 8 Nov 2026, iPhone: they looked blurred: Safari on iOS 26 blurs the top
+   edge of the page, where they were fixed). They are in More (See the site as a student, Class mode) and on the group's Next class
+   card, so the phone hides them; while class mode is on or the student-view list is open, the box shows above the tab bar. */
+@media (max-width:640px){
+  body.tph #fsctl:not(.on):not(:has(.svpop)):not(:has(.fsbtn.on)){display:none}
+  body.tph #fsctl{top:auto;bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+  body.tph .tshell,body.tph .dhead{padding-top:28px!important}   /* a little room under Safari's blurred top edge */
+}
+/* 9b. The side-by-side board's "Full screen" on a phone (Roger, 8 Nov 2026: Safari on an iPhone has no full screen for pages): a focus
+   view, body.tpfoc, that leaves the board alone on the screen: no tab bar, group switch, Student/Class buttons or page heading. */
+@media (max-width:640px){
+  body.tph.tpfoc #tptabs,body.tph.tpfoc #main>.tpseg,body.tph.tpfoc #main>.ph,body.tph.tpfoc #fsctl,body.tph.tpfoc #el-cloud-bar,
+  body.tph.tpfoc .tp2bar>.muted{display:none!important}
+  body.tph.tpfoc{padding-bottom:0!important}
+}
+/* 9c. 🎯 Coverage on a phone (Roger, 8 Nov 2026: "Put this below the competences"): the tables of one LS become cards: the criterion
+   (or grammar point / lexical area) with its full text first, then Where it is worked and Status under it (no Planned in), each with its
+   name (data-l), no sideways scrolling. The whole-year grids (td.cvc, one column per LS) stay tables. */
+@media (max-width:640px){
+  body.tph .cvw:has(.cvt:not(:has(td.cvc))){overflow:visible}
+  body.tph .cvt:not(:has(td.cvc)),body.tph .cvt:not(:has(td.cvc)) tbody{display:block;width:auto;min-width:0}
+  body.tph .cvt:not(:has(td.cvc)) thead{display:none}
+  body.tph .cvt:not(:has(td.cvc)) tr{display:block;margin:0 0 10px;border:1px solid #e2e8f0;border-radius:14px;background:#fff;padding:10px 12px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  body.tph .cvt:not(:has(td.cvc)) tr.cvsec{border:0;box-shadow:none;background:none;padding:10px 2px 2px;margin:4px 0 6px;font-size:16px}
+  body.tph .cvt:not(:has(td.cvc)) td{display:block;border:0!important;padding:3px 0;background:none;white-space:normal;min-width:0;width:auto;text-align:left}
+  body.tph .cvt:not(:has(td.cvc)) tr.cvsec td{padding:0}
+  body.tph .cvt:not(:has(td.cvc)) td.cvk{padding-bottom:6px;font-size:15px}
+  body.tph .cvt:not(:has(td.cvc)) td.cvk small{display:block;-webkit-line-clamp:unset;max-width:none;overflow:visible;font-size:13.5px;line-height:1.4;margin-top:3px}
+  body.tph .cvt:not(:has(td.cvc)) td[data-l]{border-top:1px solid #f1f5f9!important;padding-top:6px}
+  body.tph .cvt:not(:has(td.cvc)) td[data-l]::before{content:attr(data-l);display:block;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#64748b;margin-bottom:3px}
+  body.tph .cvt:not(:has(td.cvc)) td[data-l="CEFR"]:empty{display:none}
+  /* Roger: "The column 'planned in' is not necessary" (the status badge already says ➕ when it is not planned there) */
+  body.tph .cvt:not(:has(td.cvc)) td[data-l^="Planned in"]{display:none}
+}
 .pchip,.pkey{display:none}
 @media (max-width:640px){
   body.tph .wrap td.stu:has(>.pchip)>:not(.pchip){display:none}

@@ -901,7 +901,7 @@ function autoTicks(){if(!S.D||!S.D.tkOk)return;const t=ELWeek.today();
   Object.entries(S.D.ls||{}).forEach(([ls,info])=>{if(/-my-real-routine$/.test(ls))return;GR.forEach(g=>{const ag=elAgendaOf(info,g.id);if(!ag)return;
     const m=((S.D.tk[g.id]=S.D.tk[g.id]||{}).ticks=S.D.tk[g.id].ticks||{});ELWeek.autoTicks(ls,ag,m,t).forEach(k=>S.autoTk.add(k))})})}
 function render(){
-  autoTicks();render0();document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
+  autoTicks();render0();document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
 // ---- the dashboard on a phone (Roger, 8 Nov 2026: "la visió del mòbil necessita una gran remodelació"; mockup option A): a tab bar at the
 // bottom, Home · Groups · Corrections · Messages · More, instead of the row of menu buttons at the top; a 2A · 2B · 4A · 4B switch at the top
 // of a group's pages (the place stays: 2ESO A's Marks → 2ESO B's Marks). More opens a sheet with the rest of the menu (announcement, student
@@ -922,7 +922,7 @@ function phoneBar(){
         if(w==="chip"){TPH.chip=b.dataset.u;TPH.more=true;tphMore();return}
         if(w==="more"){TPH.more=!TPH.more||!!TPH.chip;TPH.chip=null;tphMore();return}
         TPH.more=false;TPH.chip=null;
-        if(w==="sv"){const v=document.querySelector('#fsctl [data-do="sview"]');tphMore();if(v)v.click();return}
+        if(w==="sv"||w==="cm"){const v=document.querySelector(w==="sv"?'#fsctl [data-do="sview"]':'#fsctl .cmbtn');tphMore();if(v)v.click();return}
         S.g="plan";S.place=w;S.year=false;render();scrollTo(0,0);return}
       if(TPH.more&&(!inM||e.target.closest("[data-do],a[href]")||e.target===inM)){TPH.more=false;TPH.chip=null;tphMore()}});
     document.addEventListener("keydown",e=>{if(e.key==="Escape"&&TPH.more){TPH.more=false;TPH.chip=null;tphMore()}});
@@ -961,7 +961,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   if(!TPH.more){m.innerHTML="";return}
   const r=(a,ic,t,sub)=>`<a href="#" ${a}><i aria-hidden="true">${ic}</i><span>${t}${sub?`<small>${sub}</small>`:""}</span></a>`,none=Object.values(S.P||{}).some(s=>!s.tester&&!s.group);
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
-    +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}</div>`
+    +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
     +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}</div>`
     +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
     +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
@@ -1296,7 +1296,7 @@ function covPage(grp,ls){const C=covCtx(grp),lsHead=N=>[...Array(N)].map((_,i)=>
     if(o.v==="ls"){const plan=cvPlanned(grp.course,c.n),ids=[...new Set([...plan,...c.acts.flatMap(a=>Object.values((window.EL_STEP_CRITERIA||{})[a.id]||{}).flat().concat(a.criteria||[]))].filter(k=>compOf(k)))].sort(cvNum);
       const rows=ids.map(k=>{const ev=cvCritEv(c,k),p=plan.includes(k),st=cvStat(c,p,ev)||"todo";return {k,ev,p,st}});
       let last="";const tr=rows.filter(r=>keep(r.st)).map(r=>{const cp=compOf(r.k),h=cp!==last?(last=cp,`<tr class="cvsec"><td colspan="4"><i class="cdot" style="background:${compCol(cp)}"></i> ${esc(compName(cp))} <small class="muted">· ${rows.filter(x=>compOf(x.k)===cp&&x.st==="done").length} of ${rows.filter(x=>compOf(x.k)===cp).length} worked</small></td></tr>`):"";
-        return h+`<tr><td class="cvk"><b>${esc(r.k)}</b><small title="${esc(cvCritText(grp.course,r.k))}">${esc(cvCritText(grp.course,r.k))}</small></td><td>${r.p?"Programme":'<span class="muted">not in the programme</span>'}</td><td>${cvEv(r.ev)||'<span class="muted">—</span>'}</td><td>${cvBadge(r.st,!r.p&&r.ev.length)}</td></tr>`}).join("");
+        return h+`<tr><td class="cvk"><b>${esc(r.k)}</b><small title="${esc(cvCritText(grp.course,r.k))}">${esc(cvCritText(grp.course,r.k))}</small></td><td data-l="Planned in">${r.p?"Programme":'<span class="muted">not in the programme</span>'}</td><td data-l="Where it is worked">${cvEv(r.ev)||'<span class="muted">—</span>'}</td><td data-l="Status">${cvBadge(r.st,!r.p&&r.ev.length)}</td></tr>`}).join("");
       body=cvCount(rows.map(r=>r.st))+(tr?`<div class="cvw"><table class="cvt"><thead><tr><th>Criterion</th><th>Planned in</th><th>Where it is worked (✓ done with ${esc(grp.name)})</th><th>Status</th></tr></thead><tbody>${tr}</tbody></table></div>`:`<p class="muted">Everything planned is worked. 🎉</p>`)}
     else{const N=Math.max(6,C.length),all=[...new Set([...[...Array(N)].flatMap((_,i)=>cvPlanned(grp.course,i+1)),...C.flatMap(x=>x.acts.flatMap(a=>Object.values((window.EL_STEP_CRITERIA||{})[a.id]||{}).flat().concat(a.criteria||[])))].filter(k=>compOf(k)))].sort(cvNum);
       const rows=all.map(k=>{const cells=[...Array(N)].map((_,i)=>{const x=C[i],p=cvPlanned(grp.course,i+1).includes(k);if(!x)return {st:p?"plan":"",p,ev:[]};const ev=cvCritEv(x,k);return {st:cvStat(x,p,ev),p,ev,extra:!p&&ev.length>0}});
@@ -1308,7 +1308,7 @@ function covPage(grp,ls){const C=covCtx(grp),lsHead=N=>[...Array(N)].map((_,i)=>
   }else{const rows=cvRows(o.t),what=o.t==="gram"?"Grammar point":"Lexical area";
     if(o.v==="ls"){let sec="";const tr=rows.map(r=>{if(r.sec){sec=r.sec;return ""}const z=cvMapCell(c,o.t,r,ci);if(!z.st||!keep(z.st))return "";
         const h=sec?`<tr class="cvsec"><td colspan="5">${esc(sec)}</td></tr>`:"";sec="";
-        return h+`<tr><td class="cvk"><b>${esc(r.s)}</b></td><td>${esc(r.cefr||"")}</td><td>${z.planned?esc(cvPart(r.c[ci],c.n)||"LS"+c.n):'<span class="muted">not in the map for this LS</span>'}</td><td>${z.whole?`<span class="muted">the whole LS${c.finished?" (finished)":""}</span>`:cvEv(z.ev)||'<span class="muted">—</span>'}</td><td>${cvBadge(z.st,z.extra)}</td></tr>`}).join("");
+        return h+`<tr><td class="cvk"><b>${esc(r.s)}</b></td><td data-l="CEFR">${esc(r.cefr||"")}</td><td data-l="Planned in the map">${z.planned?esc(cvPart(r.c[ci],c.n)||"LS"+c.n):'<span class="muted">not in the map for this LS</span>'}</td><td data-l="Where it is worked">${z.whole?`<span class="muted">the whole LS${c.finished?" (finished)":""}</span>`:cvEv(z.ev)||'<span class="muted">—</span>'}</td><td data-l="Status">${cvBadge(z.st,z.extra)}</td></tr>`}).join("");
       const sts=rows.filter(r=>!r.sec).map(r=>cvMapCell(c,o.t,r,ci).st);
       body=cvCount(sts)+(tr?`<div class="cvw"><table class="cvt"><thead><tr><th>${what}</th><th>CEFR</th><th>Planned in the map</th><th>Where it is worked (✓ done with ${esc(grp.name)})</th><th>Status</th></tr></thead><tbody>${tr}</tbody></table></div>`:`<p class="muted">Everything planned is worked. 🎉</p>`)}
     else{const N=Math.max(6,C.length);let sec="";
@@ -2617,6 +2617,13 @@ const tp2Btn=g=>{const pr=tp2Pair(g);return pr.length>1?`<div class="bar"><butto
 function tp2Btns(){const by={};GR.forEach(g=>(by[g.course]=by[g.course]||[]).push(g));
   const b=Object.values(by).filter(gs=>gs.length>1).map(gs=>{const x=ELWeek.now(gs[0].id);return `<button data-do="tp2go" data-g="${gs[0].id}" ${x?`data-ls="${x.ls}"`:""} title="Open the planning board: ${esc(gs.map(g=>g.name).join(" and "))} side by side, full screen">📋 Plan ${esc(gs.map(g=>g.name).join(" + "))}</button>`}).join(" ");
   return b?`<div class="bar wkbar">${b}</div>`:""}
+// on a phone (Roger, 8 Nov 2026, iPhone: "The full screen button doesn't work": Safari on an iPhone has no full screen for pages) the
+// button is a focus view instead: body.tpfoc hides the tab bar, the group switch, the Student/Class buttons and the page heading
+// (shared/css/el-phone.css, section 8), the board keeps the whole screen; the same button (✕ Exit full screen), ✕ Close or Esc leave it.
+const tp2Phone=()=>matchMedia("(max-width:640px)").matches;
+function tp2Foc(){const on=!!(S.tp2foc&&document.querySelector("#main .tp2"));if(!on)S.tp2foc=false;document.body.classList.toggle("tpfoc",on);
+  const b=document.querySelector('#main .tp2bar [data-do="tp2fs"]');if(b)b.textContent=on?"✕ Exit full screen":"⛶ Full screen"}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&S.tp2foc&&!document.getElementById("dlg").open){S.tp2foc=false;tp2Foc()}});
 function tp2Full(on){const d=document,fe=d.fullscreenElement||d.webkitFullscreenElement;if(on===false&&!fe)return;
   try{if(fe)(d.exitFullscreen||d.webkitExitFullscreen).call(d);else{const r=d.documentElement;(r.requestFullscreen||r.webkitRequestFullscreen).call(r)}}catch(e){}}
 function tp2Page(grp,ls,studs){const pr=tp2Pair(grp),l=EL_LS.find(y=>y.id===ls),D=S.D;
@@ -3312,7 +3319,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     if(from&&to&&from!==to&&!k.ls){const l=EL_LS.find(x=>x.id===S.ls);
       if(l&&l.course!==to.course){const m=EL_LS.filter(x=>x.course===to.course)[EL_LS.filter(x=>x.course===l.course).indexOf(l)];S.ls=m?m.id:null}}
     else if(S.g!==k.g||S.place!=="home"){S.place="home";S.year=false}
-    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();t.classList.contains("back")?navBack(k.p):goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}goPlace("plan2")},tp2fs:()=>tp2Full(),tp2x:()=>{tp2Full(false);goPlace("plan")},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
+    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();t.classList.contains("back")?navBack(k.p):goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}goPlace("plan2")},tp2fs:()=>{if(tp2Phone()){S.tp2foc=!S.tp2foc;tp2Foc();scrollTo(0,0);return}tp2Full()},tp2x:()=>{S.tp2foc=false;tp2Full(false);goPlace("plan")},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
     corrg:()=>{S.corrG=k.g;render()},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
     corrask:()=>act(api.mkAsk(true)),corrcancel:()=>act(api.mkAsk(false)),
