@@ -142,6 +142,13 @@
   body.elapp.ellp .panel.active>.section-next .btn[aria-disabled="true"]{opacity:1!important;background:#e2e8f0!important;border-color:#e2e8f0!important;color:#475569!important;box-shadow:none!important}
   body.elapp.ellp .panel.active>.section-next .feedback{margin:0 0 8px;font-size:14px}
   body.elapp.ellp .panel.active>.section-next .feedback:empty{display:none}
+  /* it records nothing (the activities do; section-next.js): it only opens the next step once every activity is checked, so on a phone it
+     says what it does (Roger's rule: no manual ticks) */
+  body.elapp.ellp .panel.active>.section-next>.actions>.btn{font-size:0!important}
+  body.elapp.ellp .panel.active>.section-next>.actions>.btn::after{content:"Next step ›";font-size:16px}
+  html.el-ca body.elapp.ellp .panel.active>.section-next>.actions>.btn::after{content:"Pas següent ›"}
+  body.elapp.ellp .panel.active>.section-next>.actions>.btn.main::after{content:"Finish and continue ›"}
+  html.el-ca body.elapp.ellp .panel.active>.section-next>.actions>.btn.main::after{content:"Acaba i continua ›"}
   body.elapp.ellp{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
   /* each activity's Check and Redo: touch-sized */
   body.elapp.ellp .panel .actions>.btn{min-height:46px}
