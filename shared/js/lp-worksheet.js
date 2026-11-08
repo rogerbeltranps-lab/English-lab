@@ -10,6 +10,9 @@
   const LS = { 'free-time-live': 'Free Time, Live!', 'seasons-and-celebrations': 'Seasons & Celebrations' };
   const q = new URLSearchParams(location.search);
   const ls = q.get('ls') || '', lp = q.get('lp') || '', level = ROUTES.includes(q.get('route')) ? q.get('route') : 'insecure', key = q.get('key') === '1';
+  // tabs=a,b: only those tabs (panel ids), no goal, review or study guide; bare=1: no name line or note (Roger, 7 Nov 2026: "print today's
+  // sections for those who don't have a Chromebook": shared/print/today.html puts several of these on one sheet)
+  const tabs = (q.get('tabs') || '').split(',').filter(Boolean), bare = q.get('bare') === '1';
   const base = '../../' + ls + '/';
   const ca = level === 'insecure' || level === 'beginners';
   const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
@@ -120,7 +123,10 @@
   const chat = () => '<div class="chat">' + forLevel(readingChat).map(([w, l]) => '<p><b>' + esc(w) + ':</b> ' + l + '</p>').join('') + '</div>';
 
   const R = {};
-  R.recall = p => gaps(forLevel(p.items), p.secure ? null : p.id);
+  // secure checkpoints: Starter's three options are in the data (item.o, tools/checkpoint-keys/starter-options.cjs), as on the screen
+  R.recall = p => { const its = forLevel(p.items);
+    if (!p.secure || level !== 'beginners' || !its.some(it => Array.isArray(it.o))) return gaps(its, p.secure ? null : p.id);
+    return '<p class="tiny">Tria la resposta correcta entre les tres opcions i escriu-la al buit (o encercla la lletra).</p><ol class="items">' + its.map(it => gapped(it, it.o || null)).join('') + '</ol>'; };
   R.typed = p => (p.groups ? table(p) : '') + (p.explain ? '<div class="box"><b>' + T('Com funciona', 'How it works') + '</b>' + forLevel(p.explain).map(e => '<div>' + tx(e) + '</div>').join('') + '</div>' : '') + gaps(forLevel(p.items), p.id);
   // ★ marks the panel's core words for the route (p.core, as the engine's Català → English cards); review: earlier paths' words.
   function table(p) {
@@ -187,6 +193,7 @@
 
   function header(LP) {
     const course = ls.split('/')[0], name = LS[ls.split('/')[1]] || '';
+    if (bare) return '<header class="sheet-head part-head"><h1>' + (typeof LP.n === 'number' ? 'Learning Path ' + LP.n + ' · ' : '') + LP.title + '</h1></header>';
     return '<header class="sheet-head"><div class="who"><span>' + T('Nom', 'Name') + ': </span><span>' + T('Grup', 'Group') + ': </span><span>' + T('Data', 'Date') + ': </span></div>' +
       '<p class="eyebrow">' + (COURSE[course] || '') + ' · ' + name + ' · ' + T('Ruta', 'Route') + ' ' + STUDENT[level] + (key ? ' · ' + T('SOLUCIONS', 'ANSWER KEY') : '') + '</p>' +
       '<h1>' + (typeof LP.n === 'number' ? 'Learning Path ' + LP.n + ' · ' : '') + LP.title + '</h1>' +
@@ -263,6 +270,7 @@
     if (level === 'native') await load(base + 'data/native/' + lp + '.js').catch(() => {});
     await load(base + 'data/study/' + lp + '.js').catch(() => {});
     usePanels();
+    if (tabs.length) LP.panels = LP.panels.filter(p => tabs.includes(p.id));
     document.title = LP.title + ' · ' + STUDENT[level] + (key ? ' · key' : '');
     const parts = LP.panels.map(p => {
       const body = (R[p.type] || (() => null))(p);
@@ -271,8 +279,8 @@
       return '<section class="step"><div class="head"><h2><span class="num">' + n + '</span>' + tx(p.title || p.tab) + '</h2>' +
         (p.intro ? '<p class="intro">' + tx(p.intro) + '</p>' : '') + '</div>' + body + '</section>';
     }).join('');
-    const reflective = LP.panels.some(p => p.id === 'recall');
-    const study = studyGuide();
+    const reflective = !tabs.length && LP.panels.some(p => p.id === 'recall');
+    const study = tabs.length ? '' : studyGuide();
     let tr = '';
     for (const [i, t] of transcripts.entries()) tr += '<div class="tr"><h3>' + T('Transcripció ', 'Transcript ') + (i + 1) + ' · ' + esc(t.title) + '</h3>' + (t.script || await vtt(base + t.vtt)) + '</div>';
     const out = document.getElementById('sheet');

@@ -5,710 +5,136 @@
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>4 ESO · My Real Routine</title>
-  <style>
-    :root{
-      --bg:#f7f8fa;
-      --surface:#ffffff;
-      --text:#172033;
-      --muted:#687180;
-      --line:#e3e7ed;
-      --accent:#6d86ad;
-      --accent-dark:#506c98;
-      --accent-soft:#eef3fa;
-      --shadow:0 14px 36px rgba(35,50,76,.07);
-      --radius:22px;
-    }
-
-    *{box-sizing:border-box}
-
-    body{
-      margin:0;
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      line-height:1.5
-    }
-
-    a{color:inherit;text-decoration:none}
-
-    .wrap{
-      width:min(1120px,calc(100% - 32px));
-      margin:auto
-    }
-
-    header{
-      position:sticky;
-      top:0;
-      z-index:20;
-      background:rgba(247,248,250,.96);
-      backdrop-filter:blur(14px);
-      border-bottom:1px solid var(--line)
-    }
-
-    nav{
-      min-height:70px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:20px
-    }
-
-    .brand{font-weight:800;letter-spacing:-.03em;white-space:nowrap}
-
-    .navlinks{
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap:6px;
-      flex-wrap:wrap
-    }
-
-    .navlinks > a,
-    .nav-menu > summary{
-      padding:9px 12px;
-      border-radius:12px;
-      color:var(--muted);
-      font-weight:650;
-      cursor:pointer;
-      list-style:none;
-      user-select:none
-    }
-
-    .nav-menu > summary::-webkit-details-marker{display:none}
-
-    .navlinks > a:hover,
-    .nav-menu > summary:hover,
-    .nav-menu[open] > summary{
-      background:var(--surface);
-      color:var(--text)
-    }
-
-    .nav-menu{position:relative}
-
-    .nav-menu > summary::after{
-      content:" ▾";
-      font-size:.74em
-    }
-
-    .dropdown{
-      position:absolute;
-      top:calc(100% + 8px);
-      right:0;
-      min-width:220px;
-      padding:8px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      background:var(--surface);
-      box-shadow:var(--shadow)
-    }
-
-    .dropdown a,
-    .dropdown .disabled{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      padding:10px 11px;
-      border-radius:10px;
-      font-size:.94rem
-    }
-
-    .dropdown a:hover{
-      background:var(--accent-soft);
-      color:var(--accent-dark)
-    }
-
-    .dropdown a.current{
-      background:var(--accent-soft);
-      color:var(--accent-dark);
-      font-weight:800
-    }
-
-    .dropdown .disabled{
-      color:#a1a8ae;
-      cursor:default
-    }
-
-    .soon{
-      font-size:.72rem;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.04em
-    }
-
-    .hero{
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:40px;
-      align-items:center;
-      padding:62px 0 34px
-    }
-
-    .eyebrow{
-      display:inline-block;
-      padding:8px 12px;
-      border-radius:999px;
-      background:var(--accent-soft);
-      color:var(--accent-dark);
-      font-size:.8rem;
-      font-weight:800;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-      margin-bottom:18px
-    }
-
-    h1{
-      margin:0;
-      font-size:clamp(3rem,7vw,5.4rem);
-      line-height:.96;
-      letter-spacing:-.055em
-    }
-
-    .hero p{
-      margin:22px 0 0;
-      max-width:660px;
-      color:var(--muted);
-      font-size:1.06rem
-    }
-
-    .hero-card{
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:30px;
-      padding:30px;
-      box-shadow:var(--shadow)
-    }
-
-    .hero-card .kicker{
-      font-size:.78rem;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      color:var(--accent-dark)
-    }
-
-    .hero-card h2{
-      margin:10px 0 8px;
-      font-size:1.8rem;
-      letter-spacing:-.04em
-    }
-
-    .hero-card p{
-      margin:0;
-      color:var(--muted);
-      font-size:.96rem
-    }
-
-    .tabs{
-      display:flex;
-      gap:10px;
-      overflow-x:auto;
-      padding:14px 0 28px;
-      scrollbar-width:none
-    }
-
-    .tabs::-webkit-scrollbar{display:none}
-
-    .tabbtn{
-      border:1px solid var(--line);
-      background:var(--surface);
-      padding:11px 15px;
-      border-radius:14px;
-      font:inherit;
-      font-weight:700;
-      color:var(--muted);
-      cursor:pointer;
-      white-space:nowrap;
-      transition:.2s ease
-    }
-
-    .tabs label.tabbtn{display:inline-block}
-    .tabbtn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 6px 18px rgba(35,50,76,.06)
-    }
-
-    .tabbtn.active{
-      background:var(--accent-soft);
-      border-color:#d4ddea;
-      color:var(--accent-dark)
-    }
-
-    .panel{
-      display:none;
-      padding-bottom:60px
-    }
-
-    .panel.active{display:none}
-
-    .tab-radio{
-      position:absolute;
-      opacity:0;
-      pointer-events:none
-    }
-
-    #tab-overview:checked ~ .tabs label[for="tab-overview"],
-    #tab-learning-path:checked ~ .tabs label[for="tab-learning-path"],
-    #tab-language:checked ~ .tabs label[for="tab-language"],
-    #tab-final:checked ~ .tabs label[for="tab-final"]{
-      background:var(--accent-soft);
-      border-color:var(--accent);
-      color:var(--accent-dark)
-    }
-
-    #tab-overview:checked ~ #overview,
-    #tab-learning-path:checked ~ #learning-path,
-    #tab-language:checked ~ #language,
-    #tab-final:checked ~ #final{
-      display:block
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px
-    }
-
-    .card{
-      display:block;
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:24px;
-      box-shadow:0 5px 18px rgba(35,50,76,.03);
-      cursor:pointer;
-      transition:.2s ease;
-      min-height:250px
-    }
-
-    .card:hover{
-      transform:translateY(-3px);
-      box-shadow:var(--shadow);
-      border-color:#cfd9e8
-    }
-
-    .card:focus-visible{
-      outline:3px solid var(--accent-soft);
-      outline-offset:3px
-    }
-
-    .num{
-      width:40px;
-      height:40px;
-      border-radius:12px;
-      background:var(--accent-soft);
-      color:var(--accent-dark);
-      display:grid;
-      place-items:center;
-      font-weight:800;
-      margin-bottom:20px
-    }
-
-    .card h3{
-      margin:0 0 8px;
-      font-size:1.22rem;
-      letter-spacing:-.03em
-    }
-
-    .card p{
-      margin:0;
-      color:var(--muted)
-    }
-
-    .card .link{
-      display:inline-block;
-      margin-top:18px;
-      color:var(--accent-dark);
-      font-weight:800
-    }
-
-    .overview{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:20px
-    }
-
-    .bigcard{
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:28px
-    }
-
-    .bigcard h2{
-      margin:0 0 10px;
-      font-size:1.7rem;
-      letter-spacing:-.04em
-    }
-
-    .bigcard p{color:var(--muted)}
-
-    .checklist{
-      padding:0;
-      margin:18px 0 0;
-      list-style:none
-    }
-
-    .checklist li{
-      padding:9px 0;
-      border-bottom:1px solid var(--line);
-      color:var(--muted)
-    }
-
-    .checklist li:last-child{border-bottom:0}
-
-    footer{
-      border-top:1px solid var(--line);
-      padding:28px 0 34px;
-      color:var(--muted);
-      font-size:.9rem
-    }
-
-
-    .curriculum-card{margin-top:20px}
-    .challenge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
-    .route-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-    .route-box h3{margin:8px 0 8px}
-    .route-box p{color:var(--muted)}
-    .route-box ul{margin:14px 0 0;padding-left:20px;color:var(--muted)}
-    .route-box li{margin:6px 0}
-    .route-tag{display:inline-block;padding:6px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dark);font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
-    .daring-box{border-color:var(--accent)}
-    .assessment-box{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
-    .assessment-box h3{margin:0 0 14px;font-size:1.3rem}
-    .assessment-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-    .assessment-grid>div{background:var(--accent-soft);border-radius:14px;padding:14px}
-    .assessment-grid strong{display:block;color:var(--accent-dark);margin-bottom:6px}
-    .assessment-grid span{display:block;color:var(--muted);font-size:.88rem}
-    .assessment-note{margin:16px 0 0;color:var(--muted);font-size:.92rem}
-
-    .menu-toggle{
-  display:none;
-  align-items:center;
-  gap:8px;
-  padding:9px 14px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--surface);
-  color:var(--text);
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
-.menu-toggle::after{content:"▾";font-size:.8em}
-nav.menu-open .menu-toggle::after{content:"▴"}
-
-    @media(max-width:820px){
-      .hero{grid-template-columns:1fr}
-      .grid{grid-template-columns:1fr}
-      .overview{grid-template-columns:1fr}
-      .challenge-grid{grid-template-columns:1fr}
-      .assessment-grid{grid-template-columns:1fr}
-      nav{align-items:center;padding:10px 0;min-height:60px}
-      .menu-toggle{display:inline-flex}
-      .navlinks{
-        display:none;
-        position:absolute;
-        top:100%;
-        left:0;
-        right:0;
-        flex-direction:column;
-        align-items:stretch;
-        flex-wrap:nowrap;
-        gap:2px;
-        padding:10px 16px 14px;
-        max-height:calc(100vh - 70px);
-        overflow-y:auto;
-        background:var(--surface);
-        border-bottom:1px solid var(--line);
-        box-shadow:var(--shadow);
-      }
-      nav.menu-open .navlinks{display:flex}
-      .navlinks > a,.nav-menu > summary{padding:12px 12px}
-      .dropdown{position:static;min-width:0;margin:4px 0 6px;box-shadow:none;background:transparent}
-      .ls-dropdown{min-width:0}
-    }
-  
-.course-group{padding:7px 8px;border-bottom:1px solid var(--line)}
-.course-group:last-child{border-bottom:0}
-.course-link,.ls-link{display:block!important;border-radius:10px;padding:9px 10px!important}
-.course-link{font-weight:850}
-.ls-link{font-size:.92rem;padding-left:18px!important}
-.muted-group{display:grid;gap:3px}
-.ls-dropdown{min-width:290px}
-
-    /* Keep the optional sample exam visible on the opening Overview screen. */
-    /* Compact, equal-sized practice links, together under the LS introduction. */
-    .hero-quick-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:500px;margin-top:16px}
-    .hero-quick-links .sample-exam-hero-link{display:flex;align-items:center;justify-content:space-between;min-width:0;min-height:58px;margin:0;padding:10px 12px;gap:8px;background:var(--accent-dark);color:#fff;border:1px solid var(--accent-dark);border-radius:11px;text-decoration:none;box-shadow:0 4px 14px rgba(30,50,60,.12);transition:transform .15s,box-shadow .15s}
-    .hero-quick-links .sample-exam-hero-link:hover{color:#fff;transform:translateY(-2px);box-shadow:0 7px 18px rgba(30,50,60,.17)}
-    .hero-quick-links .sample-exam-hero-link:focus-visible{outline:3px solid #f7bf60;outline-offset:3px}
-    .hero-quick-links .sample-exam-hero-link strong{display:block;font-size:.85rem;line-height:1.25;font-weight:800}
-    .hero-quick-links .sample-exam-hero-link small{display:block;font-size:.7rem;line-height:1.3;font-weight:550;color:#eef5ff;margin-top:4px}
-    .hero-quick-links .hero-link-arrow{font-size:1.05rem;line-height:1;flex-shrink:0}
-    @media(max-width:420px){.hero-quick-links{grid-template-columns:1fr;max-width:280px}.hero-quick-links .sample-exam-hero-link{min-height:52px}}
-</style>
+  <!-- LS home in the student board's style (Roger, 6 Nov 2026): side menu, Continue card, learning paths with progress, tiles and places.
+       Layout: shared/css/ls-home.css · menus, progress and Catalan labels: shared/js/el-ls-home.js. Content stays in this file. -->
+  <link rel="stylesheet" href="../../shared/css/ls-home.css">
+  <style>:root{--c:#315f9f;--c-dark:#234777;--c-soft:#edf4ff}</style>
 </head>
 
-<body>
-  <header>
-    <div class="wrap">
-      <nav>
-        <a class="brand" href="../../index.html">English with Roger</a>
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
-        <div class="navlinks" id="site-menu">
-          <a href="../../index.html">Home</a>
-          <details class="nav-menu">
-            <summary>Learning Situations</summary>
-            <div class="dropdown ls-dropdown">
-              <div class="course-group">
-                <a class="course-link" href="../../2eso/index.html">2 ESO</a>
-                <a class="ls-link" href="../../2eso/my-real-routine/index.html">↳ LS1 · My Real Routine</a>
-                <a class="ls-link" href="../../2eso/free-time-live/index.html">↳ LS2 · Free Time, Live!</a>
-              </div>
-              <div class="course-group">
-                <a class="course-link current" href="../../4eso/index.html">4 ESO <span>✓</span></a>
-                <a class="ls-link current" href="index.html">↳ LS1 · My Real Routine</a>
-                <a class="ls-link" href="../seasons-and-celebrations/index.html">↳ LS2 · Seasons &amp; Celebrations</a>
-              </div>
-              <div class="course-group muted-group">
-                <span class="disabled">1 ESO <span class="soon">Soon</span></span>
-                <span class="disabled">3 ESO <span class="soon">Soon</span></span>
-                <span class="disabled">1 BATX <span class="soon">Soon</span></span>
-                
-              <div class="course-group">
-                <a class="course-link" href="../../2btx/biologia/metabolisme/">2 BATX</a>
-                <a class="ls-link" href="../../2btx/biologia/metabolisme/">↳ Biologia · Metabolisme</a>
-              </div>
-              </div>
-            </div>
-          </details>
-          <a href="../../lab/">English Lab</a>
-        </div>
-      </nav>
-    </div>
-  </header>
+<body class="lsh" data-ls="4eso-my-real-routine">
+<nav class="mtabs nvs-m" aria-label="Menu"></nav><nav class="bnav" id="bnav" aria-label="Menu"></nav>
+<div class="app">
+  <aside class="side"><a class="brand" href="../../index.html">English with Roger</a><nav class="nvs" aria-label="Menu"></nav></aside>
+  <main class="page">
+    <div class="crumb" id="crumb"></div>
 
-  <main class="wrap">
-    <section class="hero">
-      <div>
+    <!-- Home: the LS, one Continue card, the learning paths and four tiles -->
+    <section data-place="home">
+      <header class="lshead">
         <span class="eyebrow">4 ESO · Learning Situation</span>
         <h1>My Real Routine</h1>
-        <p class="intro">En Insecure trobaràs instruccions i ajuda en català: observa els models i practica pas a pas. L’anglès és la llengua dels textos i de la teva producció. Safe redueix l’ajuda i Daring demana més autonomia. Segueix el Learning Path en ordre i prepara les diapositives i el vídeo final amb la guia de Final Product.</p>
-        <p>
-          Use richer, more natural English to describe everyday life, habits,
-          commuting, responsibilities and the way people unwind.
-        </p>
-        <div class="hero-quick-links" aria-label="Extra practice">
-          <a class="sample-exam-hero-link" href="sample-exam.html" aria-label="Open 4 ESO sample exam">
-            <span><strong>Sample Exam</strong><small>35 questions · 3 routes</small></span>
-            <span class="hero-link-arrow" aria-hidden="true">→</span>
-          </a>
-          <a class="sample-exam-hero-link" href="vocabulary-games.html" aria-label="Open 4 ESO vocabulary games">
-            <span><strong>Vocabulary Games</strong><small>6 games · 3 routes</small></span>
-            <span class="hero-link-arrow" aria-hidden="true">→</span>
-          </a>
+        <p class="q">Use richer, more natural English to describe everyday life, habits,
+          commuting, responsibilities and the way people unwind.</p>
+      </header>
+      <div class="hgrid">
+        <div class="hl">
+          <div class="cont" id="cont" hidden></div>
+          <section class="box" aria-labelledby="lpsTitle">
+            <h2 id="lpsTitle" data-ca="Learning paths">Learning paths</h2>
+            <p class="muted" data-ca="Fes-los en ordre: cada un acaba amb una peça del producte final.">Do them in order: each one ends with a piece of your final product.</p>
+            <p class="muted" id="lpsNone" hidden data-ca="El professor obrirà els learning paths a classe, quan toqui.">Your teacher will open the learning paths in class, when it is time.</p>
+            <ol class="lps">
+          <li><a class="lp" href="getting-started.html" data-a="4eso/getting-started" title="Introduce the challenge and activate prior knowledge."><span class="n">1</span><span class="t"><b>Getting started</b><small>Introduce the challenge and activate prior knowledge.</small></span><span class="st"></span></a></li>
+          <li><a class="lp" href="a-day-in-real-life.html" data-a="4eso/a-day-in-real-life" title="Work with realistic routines, commuting and daily responsibilities."><span class="n">2</span><span class="t"><b>A day in real life</b><small>Work with realistic routines, commuting and daily responsibilities.</small></span><span class="st"></span></a></li>
+          <li><a class="lp" href="useful-expressions.html" data-a="4eso/useful-expressions" title="Practise natural phrasal verbs and idiomatic chunks in context."><span class="n">3</span><span class="t"><b>Useful expressions</b><small>Practise natural phrasal verbs and idiomatic chunks in context.</small></span><span class="st"></span></a></li>
+          <li><a class="lp" href="grammar-phrasal-verbs.html" data-a="4eso/grammar-phrasal-verbs" title="Review the Present Simple and learn how separable and fixed phrasal verbs work in real sentences."><span class="n">4</span><span class="t"><b>Present Simple & Phrasal verbs</b><small>Review the Present Simple and learn how separable and fixed phrasal verbs work in real sentences.</small></span><span class="st"></span></a></li>
+          <li><a class="lp" href="healthy-habits.html" data-a="4eso/healthy-habits" title="Explore food, hydration, sleep, movement, stress and screen habits, then reflect on balance and wellbeing."><span class="n">5</span><span class="t"><b>Healthy habits</b><small>Explore food, hydration, sleep, movement, stress and screen habits, then reflect on balance and wellbeing.</small></span><span class="st"></span></a></li>
+          <li><a class="lp" href="final-product.html?v=20261025-fp" data-a="4eso/final-product" title="Interview a classmate, prepare Google Slides and record a camera-and-slides video with a health reflection. Safe and Daring also compare both routines."><span class="n">6</span><span class="t"><b>Final product</b><small>Interview a classmate, prepare Google Slides and record a camera-and-slides video with a health reflection. Safe and Daring also compare both routines.</small></span><span class="st"></span></a></li>
+            </ol>
+          </section>
+        </div>
+        <div class="hr">
+          <a class="chal" href="#final"><span class="k" data-ca="El teu repte · producte final">Your challenge · final product</span><b>Compare real routines and reflect on habits</b><span class="d">Interview a classmate, prepare Google Slides and record your face and slides together. All routes reflect on health; Safe and Daring compare both routines.</span><span class="go" data-ca="Mira què has de fer →">See what to do →</span></a>
+          <div class="tiles">
+            <a class="tile" href="vocabulary-games.html"><span class="ti" aria-hidden="true">🎮</span><span><b data-ca="Jocs de vocabulari">Vocabulary games</b><small>6 games · 3 routes</small></span></a>
+            <a class="tile" href="sample-exam.html"><span class="ti" aria-hidden="true">📝</span><span><b data-ca="Examen de mostra">Sample exam</b><small>35 questions · 3 routes</small></span></a>
+            <a class="tile wd" href="#about"><span class="ti" aria-hidden="true">ⓘ</span><span><b data-ca="Sobre aquesta LS">About this LS</b><small data-ca="què aprendràs i com t'avaluem">what you learn and how you are assessed</small></span></a>
+            <a class="tile" href="../../shared/print/index.html" data-el-teacher hidden><span class="ti" aria-hidden="true">🖨</span><span><b>Paper worksheets</b><small>teacher only · print per route + keys</small></span></a>
+          </div>
         </div>
       </div>
-
-      <aside class="hero-card">
-        <div class="kicker">Your challenge</div>
-        <h2>Compare real routines and reflect on habits</h2>
-        <p>
-          Interview a classmate, prepare Google Slides and record your face and slides together. All routes reflect on health; Safe and Daring compare both routines.
-        </p>
-      </aside>
     </section>
 
-    <input class="tab-radio" type="radio" name="ls-tab" id="tab-overview" checked>
-    <input class="tab-radio" type="radio" name="ls-tab" id="tab-learning-path">
-    <input class="tab-radio" type="radio" name="ls-tab" id="tab-language">
-    <input class="tab-radio" type="radio" name="ls-tab" id="tab-final">
-
-    <div class="tabs">
-      <label class="tabbtn" for="tab-overview">Overview</label>
-      <label class="tabbtn" for="tab-learning-path">Learning Path</label>
-      <label class="tabbtn" for="tab-language">Language &amp; Knowledge</label>
-      <label class="tabbtn" for="tab-final">Final Product</label>
+    <!-- The grammar and vocabulary of this LS, never shown here: the board's 🔤 Grammar and vocabulary place reads these lists (today.html,
+         langLists). No 📚 Study place any more (Roger, 7 Nov 2026: "we don't need this, nor do we need them in the other LS"). -->
+    <div data-ls-lists hidden>
+      <div class="cols">
+        <article class="bigcard">
+        <h2>Grammar &amp; discourse</h2>
+        <ul class="checklist">
+        <li>Present Simple in natural contexts</li>
+        <li>Past Simple when relevant</li>
+        <li>Cause: because</li>
+        <li>Contrast: but, although, whereas, however</li>
+        <li>Consequence: so, as a result</li>
+        </ul>
+        </article>
+        <article class="bigcard">
+        <h2>Vocabulary &amp; expressions</h2>
+        <ul class="checklist">
+        <li>head out, set off, catch up on</li>
+        <li>get down to, knock off</li>
+        <li>rush hour, hit the road</li>
+        <li>bite the bullet, call it a day</li>
+        <li>Evening and unwinding expressions</li>
+        </ul>
+        </article>
+      </div>
     </div>
 
-    <section class="panel" id="overview">
-      <div class="overview">
-        <article class="bigcard">
-          <h2>What will you learn?</h2>
-          <p>
-            You will develop more natural and flexible English for describing your
-            own routine and another person’s routine in real contexts.
-          </p>
-          <ul class="checklist">
-            <li>Natural Present Simple in context</li>
-            <li>Richer routine and commute vocabulary</li>
-            <li>Phrasal verbs and idiomatic expressions</li>
-            <li>Cause, contrast and consequence</li>
-            <li>More developed speaking and writing</li>
-          </ul>
-        </article>
-
-        <article class="bigcard">
-          <h2>How will we work?</h2>
-          <p>Realistic texts, listening, language noticing and progressive production.</p>
-          <ul class="checklist">
-            <li>Listen to authentic-style routines</li>
-            <li>Notice useful chunks</li>
-            <li>Practise shadowing and pronunciation</li>
-            <li>Build richer spoken and written answers</li>
-            <li>Reflect and improve your final version</li>
-          </ul>
-        </article>
-      </div>
-      <div class="overview">
-        <article class="bigcard curriculum-card">
-          <h2>Curriculum competences</h2>
-          <p>This Learning Situation develops the Catalan curriculum for Foreign Language through a more autonomous, comparative and reflective challenge.</p>
-          <ul class="checklist">
-            <li><strong>CE3 · Oral communication:</strong> describe, compare and explain routines using a clear, coherent spoken text.</li>
-            <li><strong>CE5 · Written & multimodal production:</strong> create and revise a coherent Google Slides presentation for a real audience.</li>
-            <li><strong>CPSAA · Personal, social & learning to learn:</strong> reflect critically on routines, balance and wellbeing.</li>
-            <li><strong>Digital competence:</strong> plan, create and communicate a multimodal product responsibly.</li>
-          </ul>
-        </article>
-
-        <article class="bigcard curriculum-card">
-          <h2>How the challenge is assessed</h2>
-          <p>The final product is connected directly to these assessment criteria:</p>
-          <ul class="checklist">
-            <li><strong>3.1:</strong> produce a structured, coherent oral text to describe, compare, explain and justify ideas.</li>
-            <li><strong>3.2:</strong> plan, produce and review the presentation using appropriate strategies and digital resources.</li>
-            <li><strong>3.3:</strong> interact and collaborate actively and respectfully with a classmate.</li>
-            <li><strong>5.1:</strong> write and publish a coherent, accurate multimodal text of appropriate length in Google Slides.</li>
-            <li><strong>5.2:</strong> plan, produce and revise the written product with increasing autonomy.</li>
-          </ul>
-        </article>
-      </div>
+    <!-- ⓘ About this LS: objectives, how we work, competences and assessment criteria (from the programme) -->
+    <section class="place" data-place="about" hidden>
+      <h2 class="pt" data-ca="ⓘ Sobre aquesta LS">ⓘ About this LS</h2>
+      <!-- Visual layout like LS2 (Roger, 7 Nov 2026: "el mateix per aquesta"): numbered learning cards, a step diagram, coloured
+           competence tiles and criteria cards. Styles: .ab-* in shared/css/ls-home.css. LS1 content kept, word for word. -->
+      <article class="bigcard ab"><h2 data-ca="🎯 Què aprendràs?">🎯 What will you learn?</h2><p class="ab-lead">You will develop more natural and flexible English for describing your own routine and another person’s routine in real contexts.</p><div class="ab-objs l5">
+        <div class="ab-obj"><div class="ab-oh"><span class="ab-on">1</span><span class="ab-oi" aria-hidden="true">⏰</span><b>Natural Present Simple in context</b></div></div>
+        <div class="ab-obj"><div class="ab-oh"><span class="ab-on">2</span><span class="ab-oi" aria-hidden="true">🚌</span><b>Richer routine and commute vocabulary</b></div></div>
+        <div class="ab-obj"><div class="ab-oh"><span class="ab-on">3</span><span class="ab-oi" aria-hidden="true">🧩</span><b>Phrasal verbs and idiomatic expressions</b></div></div>
+        <div class="ab-obj"><div class="ab-oh"><span class="ab-on">4</span><span class="ab-oi" aria-hidden="true">🔗</span><b>Cause, contrast and consequence</b></div></div>
+        <div class="ab-obj"><div class="ab-oh"><span class="ab-on">5</span><span class="ab-oi" aria-hidden="true">💬</span><b>More developed speaking and writing</b></div><div class="ab-chips"><span class="ab-chip k3"><span aria-hidden="true">🗣</span> CE3</span><span class="ab-chip k5"><span aria-hidden="true">✏️</span> CE5</span></div></div>
+      </div></article>
+      <article class="bigcard ab"><h2 data-ca="🧭 Com treballarem?">🧭 How will we work?</h2><p class="ab-lead">Realistic texts, listening, language noticing and progressive production.</p><ol class="ab-flow f5">
+        <li><span class="ab-si" aria-hidden="true">🎧</span><span class="ab-sn">1</span><b>Listen to authentic-style routines</b></li>
+        <li><span class="ab-si" aria-hidden="true">🔍</span><span class="ab-sn">2</span><b>Notice useful chunks</b></li>
+        <li><span class="ab-si" aria-hidden="true">🗣</span><span class="ab-sn">3</span><b>Practise shadowing and pronunciation</b></li>
+        <li><span class="ab-si" aria-hidden="true">🧱</span><span class="ab-sn">4</span><b>Build richer spoken and written answers</b></li>
+        <li><span class="ab-si" aria-hidden="true">🪞</span><span class="ab-sn">5</span><b>Reflect and improve your final version</b></li>
+      </ol></article>
+      <article class="bigcard ab"><h2 data-ca="🧩 Competències del currículum">🧩 Curriculum competences</h2><p class="ab-lead">This Learning Situation develops the Catalan curriculum for Foreign Language through a more autonomous, comparative and reflective challenge.</p><div class="ab-comps">
+        <div class="ab-comp k3"><span class="ab-ci" aria-hidden="true">🗣</span><div><span class="ab-cc">CE3</span><b>Oral communication</b><p>describe, compare and explain routines using a clear, coherent spoken text.</p></div></div>
+        <div class="ab-comp k5"><span class="ab-ci" aria-hidden="true">✏️</span><div><span class="ab-cc">CE5</span><b>Written &amp; multimodal production</b><p>create and revise a coherent Google Slides presentation for a real audience.</p></div></div>
+        <div class="ab-comp kp"><span class="ab-ci" aria-hidden="true">🌱</span><div><span class="ab-cc">CPSAA</span><b>Personal, social &amp; learning to learn</b><p>reflect critically on routines, balance and wellbeing.</p></div></div>
+        <div class="ab-comp kd"><span class="ab-ci" aria-hidden="true">💻</span><div><b>Digital competence</b><p>plan, create and communicate a multimodal product responsibly.</p></div></div>
+      </div></article>
+      <article class="bigcard ab"><h2 data-ca="📏 Com s’avalua el repte">📏 How the challenge is assessed</h2><p class="ab-lead">The final product is connected directly to these assessment criteria:</p><div class="ab-crits">
+        <div class="ab-crit ab-flat k3"><div class="ab-in"><span class="ab-ch"><span class="ab-chip k3"><span aria-hidden="true">🗣</span> 3.1</span><b>Oral communication</b></span><span class="ab-do">produce a structured, coherent oral text to describe, compare, explain and justify ideas.</span></div></div>
+        <div class="ab-crit ab-flat k3"><div class="ab-in"><span class="ab-ch"><span class="ab-chip k3"><span aria-hidden="true">🗣</span> 3.2</span><b>Oral communication</b></span><span class="ab-do">plan, produce and review the presentation using appropriate strategies and digital resources.</span></div></div>
+        <div class="ab-crit ab-flat k3"><div class="ab-in"><span class="ab-ch"><span class="ab-chip k3"><span aria-hidden="true">🗣</span> 3.3</span><b>Oral communication</b></span><span class="ab-do">interact and collaborate actively and respectfully with a classmate.</span></div></div>
+        <div class="ab-crit ab-flat k5"><div class="ab-in"><span class="ab-ch"><span class="ab-chip k5"><span aria-hidden="true">✏️</span> 5.1</span><b>Writing</b></span><span class="ab-do">write and publish a coherent, accurate multimodal text of appropriate length in Google Slides.</span></div></div>
+        <div class="ab-crit ab-flat k5"><div class="ab-in"><span class="ab-ch"><span class="ab-chip k5"><span aria-hidden="true">✏️</span> 5.2</span><b>Writing</b></span><span class="ab-do">plan, produce and revise the written product with increasing autonomy.</span></div></div>
+      </div></article>
     </section>
 
-    <section class="panel" id="learning-path">
-      <div class="grid">
-
-        <a class="card step-card" href="getting-started.html" data-step="Getting started">
-          <div class="num">1</div>
-          <h3>Getting started</h3>
-          <p>Introduce the challenge and activate prior knowledge.</p>
-          <span class="link">Open →</span>
-        </a>
-
-        <a class="card step-card" href="a-day-in-real-life.html" data-step="A day in real life">
-          <div class="num">2</div>
-          <h3>A day in real life</h3>
-          <p>Work with realistic routines, commuting and daily responsibilities.</p>
-          <span class="link">Open →</span>
-        </a>
-
-        <a class="card step-card" href="useful-expressions.html" data-step="Useful expressions">
-          <div class="num">3</div>
-          <h3>Useful expressions</h3>
-          <p>Practise natural phrasal verbs and idiomatic chunks in context.</p>
-          <span class="link">Open →</span>
-        </a>
-
-        <a class="card step-card" href="grammar-phrasal-verbs.html" data-step="Present Simple &amp; Phrasal verbs">
-          <div class="num">4</div>
-          <h3>Present Simple &amp; Phrasal verbs</h3>
-          <p>Review the Present Simple and learn how separable and fixed phrasal verbs work in real sentences.</p>
-          <span class="link">Open →</span>
-        </a>
-
-        <a class="card step-card" href="healthy-habits.html" data-step="Healthy habits">
-          <div class="num">5</div>
-          <h3>Healthy habits</h3>
-          <p>Explore food, hydration, sleep, movement, stress and screen habits, then reflect on balance and wellbeing.</p>
-          <span class="link">Open →</span>
-        </a>
-
-<a class="card step-card" href="final-product.html?v=20261025-fp" id="final-card">
-          <div class="num">6</div>
-          <h3>Final product</h3>
-          <p>Interview a classmate, prepare Google Slides and record a camera-and-slides video with a health reflection. Safe and Daring also compare both routines.</p>
-          <span class="link">Open →</span>
-        </a>
-      </div>
-    </section>
-
-    <section class="panel" id="language">
-      <!-- Vocabulary and grammar summary: el-cloud.js fills it with the student's route PDF (teacher and testers: all three). -->
-      <article class="bigcard" data-el-study hidden style="margin-bottom:20px;background:#f0fdf4;border-color:#bbf7d0"></article>
-      <div class="overview">
-        <article class="bigcard">
-          <h2>Grammar &amp; discourse</h2>
-          <ul class="checklist">
-            <li>Present Simple in natural contexts</li>
-            <li>Past Simple when relevant</li>
-            <li>Cause: because</li>
-            <li>Contrast: but, although, whereas, however</li>
-            <li>Consequence: so, as a result</li>
-          </ul>
-        </article>
-
-        <article class="bigcard">
-          <h2>Vocabulary &amp; expressions</h2>
-          <ul class="checklist">
-            <li>head out, set off, catch up on</li>
-            <li>get down to, knock off</li>
-            <li>rush hour, hit the road</li>
-            <li>bite the bullet, call it a day</li>
-            <li>Evening and unwinding expressions</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section class="panel" id="final">
+    <!-- 🎬 Final product: a short card, everything else is on the final product page (Roger, 25 Oct 2026) -->
+    <section class="place" data-place="final" hidden>
+      <h2 class="pt" data-ca="🎬 El producte final">🎬 Final product</h2>
       <div class="bigcard">
-        <span class="eyebrow">Final challenge</span>
         <h2>Describe, compare and reflect</h2>
         <p>Use a real classmate interview to prepare Google Slides and a camera-and-slides video. Describe the classmate in every route, add comparison in Safe and Daring, and justify a health reflection at your route’s level.</p>
-        <p>The final product page has everything in one place: a model final product for your route, your task, what counts in the final assessment and the steps.</p>
-        <p><a href="final-product.html?v=20261025-fp" style="display:inline-block;padding:12px 18px;border-radius:12px;background:var(--accent-dark);color:white;font-weight:800;text-decoration:none">Open the final product →</a></p>
+<p>The final product page has everything in one place: a model final product for your route, your task, what counts in the final assessment and the steps.</p>
+<p><a href="final-product.html?v=20261025-fp" class="btn">Open the final product →</a></p>
       </div>
     </section>
+
+    <footer class="lsf">English with Roger · 4 ESO · My Real Routine</footer>
   </main>
+</div>
 
-  <footer>
-    <div class="wrap">English with Roger · 4 ESO · My Real Routine</div>
-  </footer>
-
-  <script>
-    const navMenus = [...document.querySelectorAll('.nav-menu')];
-
-    navMenus.forEach(menu => {
-      menu.addEventListener('toggle', () => {
-        if (!menu.open) return;
-        navMenus.forEach(other => {
-          if (other !== menu) other.open = false;
-        });
-      });
-    });
-
-    document.addEventListener('click', event => {
-      if (event.target.closest('.nav-menu')) return;
-      navMenus.forEach(menu => menu.open = false);
-    });
-
-      const siteNav=document.querySelector('header nav');
-    const menuToggle=siteNav&&siteNav.querySelector('.menu-toggle');
-    if(menuToggle){
-      menuToggle.addEventListener('click',event=>{
-        event.stopPropagation();
-        const open=siteNav.classList.toggle('menu-open');
-        menuToggle.setAttribute('aria-expanded',open);
-      });
-      document.addEventListener('click',event=>{
-        if(event.target.closest('header nav'))return;
-        siteNav.classList.remove('menu-open');
-        menuToggle.setAttribute('aria-expanded','false');
-      });
-    }
-  </script>
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-plan.js"></script>
+<script src="../../shared/js/el-week.js"></script>
+<script src="../../shared/js/el-ls-home.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Today's class on paper</title>
+<link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
+<!-- 🖨 Today's class on paper (Roger, 7 Nov 2026: "I want to be able to print today's sections for those who don't have a Chromebook in a
+     sheet of paper (also the games since they can answer on a sheet of paper)"). Opened from 📋 Today in class mode (el-cm-agenda.js):
+     ?items=<ls>/<lp>:<tab>.<tab>|…&games=<deck>,…&g=<group name>&d=<day label>&route=<route>&key=1
+     Each learning path is the paper worksheet (worksheet.html with tabs= and bare=1, loaded in a hidden frame and copied here, transcripts
+     moved to the end); each class game is a quiz: its questions with a / b / c / d to circle (the right option shuffled), written ones with a
+     line, its explanation slides as "Remember" boxes. key=1 prints the answers. Teacher only (teacher-gate.js), like the worksheets. -->
+<style>
+@page{size:A4;margin:14mm 14mm 16mm}
+*{box-sizing:border-box}
+body{margin:0;background:#eef1f4;color:#1d2830;font:10.5pt/1.45 Arial,Helvetica,sans-serif}
+#sheet{max-width:200mm;margin:16px auto;padding:14mm;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.toolbar{max-width:200mm;margin:16px auto 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:14px Arial,Helvetica,sans-serif}
+.toolbar b{margin-right:4px}.toolbar .sp{flex:1}
+.toolbar button{font:inherit;padding:7px 14px;border-radius:8px;border:1px solid #9aa7b1;background:#fff;cursor:pointer}
+.toolbar button.on{background:#1d2830;color:#fff;border-color:#1d2830}.toolbar button.pr{background:#1f5f8b;color:#fff;border-color:#1f5f8b}
+@media print{body{background:#fff}#sheet{margin:0;padding:0;max-width:none;box-shadow:none}.toolbar{display:none}}
+.part{margin-top:18px}.part .part-head{border-bottom:1.5px solid #1d2830;padding-bottom:4px;margin-bottom:6px}.part .part-head h1{font-size:14pt;margin:0}
+.game .q{margin:0 0 10px;break-inside:avoid}.game .why{display:none}.is-key .game .why{display:block;font-size:9pt;color:#5f6b73}
+.game .opts{display:flex;flex-wrap:wrap;gap:3px 22px;margin-top:3px}.game .em{font-size:12pt;margin-right:4px}
+.missing{color:#b3261e;font-style:italic}
+iframe.ws{position:absolute;width:800px;height:600px;left:-9999px;top:0;border:0}
+body.locked>*:not(#gate){display:none!important}
+#gate{display:none;max-width:420px;margin:60px auto;padding:20px;background:#fff;border:1px solid #c5ced5;border-radius:12px;font:15px/1.5 Arial,Helvetica,sans-serif;text-align:center}
+body.locked #gate{display:block}
+#gate button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #1f5f8b;background:#1f5f8b;color:#fff;cursor:pointer}
+</style>
+</head>
+<body class="locked">
+<div id="gate"></div>
+<div class="toolbar" id="bar"></div>
+<main id="sheet">Loading…</main>
+<script>
+(function () {
+  const q = new URLSearchParams(location.search);
+  const ROUTES = ['beginners', 'insecure', 'safe', 'daring'], NAME = { beginners: 'Starter', insecure: 'Base', safe: 'Core', daring: 'Plus', native: 'Pro' };
+  const route = ROUTES.concat('native').includes(q.get('route')) ? q.get('route') : 'insecure', key = q.get('key') === '1';
+  const ca = route === 'insecure' || route === 'beginners', T = (c, e) => ca ? c : e;
+  const items = (q.get('items') || '').split('|').filter(Boolean).map(s => { const i = s.indexOf(':'), p = i < 0 ? s : s.slice(0, i), t = i < 0 ? '' : s.slice(i + 1); const k = p.lastIndexOf('/'); return { ls: p.slice(0, k), lp: p.slice(k + 1), tabs: t.split('.').filter(Boolean) }; });
+  const games = (q.get('games') || '').split(',').filter(Boolean);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const md = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/_{3,}/g, '<span class="gap"></span>');
+  const hash = t => { let h = 7; for (const c of String(t)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+  // the level and the key: a click reloads the sheet
+  const bar = document.getElementById('bar'), go = o => { const u = new URL(location.href); Object.entries(o).forEach(([k, v]) => v == null ? u.searchParams.delete(k) : u.searchParams.set(k, v)); location.href = u.href; };
+  bar.innerHTML = '<b>Level</b>' + ROUTES.map(r => '<button type="button" data-r="' + r + '" class="' + (r === route ? 'on' : '') + '">' + NAME[r] + '</button>').join('') +
+    '<button type="button" data-k="1" class="' + (key ? 'on' : '') + '">🔑 Answer key</button><span class="sp"></span><button type="button" class="pr" onclick="print()">🖨 Print</button>';
+  bar.onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.r) go({ route: b.dataset.r }); else if (b.dataset.k) go({ key: key ? null : '1' }); };
+
+  const frame = (src) => new Promise(ok => { const f = document.createElement('iframe'); f.className = 'ws'; f.src = src; document.body.append(f);
+    const t0 = Date.now(), iv = setInterval(() => { let d = null; try { d = f.contentDocument; } catch (e) {} const r = d && d.body && d.body.dataset.ready;
+      if (r || Date.now() - t0 > 20000) { clearInterval(iv); ok({ f, d, ok: r === '1' }); } }, 150); });
+  const loadDeck = id => new Promise(ok => { let deck = null; window.ELGameDeck = d => { deck = d; }; const s = document.createElement('script');
+    s.src = '../../lab/game/decks/' + encodeURIComponent(id) + '.js'; s.onload = () => ok(deck); s.onerror = () => ok(null); document.head.append(s); });
+  function quiz(id, d) {
+    if (!d) return '<section class="part game"><p class="missing">No game ' + esc(id) + '</p></section>';
+    let n = 0;
+    const body = (d.slides || []).map(s => {
+      if (s.theory) return key ? '' : '<div class="box"><b>' + T('Recorda', 'Remember') + ': ' + md(s.theory) + '</b>' + (s.lines || []).map(l => '<div>' + md(l) + '</div>').join('') + '</div>';
+      if (!s.q) return '';
+      n++;
+      let opts = '';
+      if (s.options) { const right = s.options[0], o = s.options.slice().sort((a, b) => hash(s.q + a) - hash(s.q + b));
+        opts = '<div class="opts">' + o.map((x, i) => '<span class="opt' + (x === right ? ' right' : '') + '">' + 'abcd'[i] + ') ' + md(x) + '</span>').join('') + '</div>'; }
+      else if (s.write) opts = key ? '<div class="key-line">' + esc([].concat(s.write)[0]) + '</div>' : /_{3,}/.test(s.q) ? '' : '<div class="lines"><span></span></div>';   // a gap is where they write
+      return '<li class="q">' + (s.img ? '<span class="em">' + esc(s.img) + '</span>' : '') + md(s.q) + opts + (s.why ? '<div class="why">' + md(s.why) + '</div>' : '') + '</li>';
+    }).join('');
+    return '<section class="part game"><header class="sheet-head part-head"><h1>🎮 ' + esc((d.title || id)) + '</h1></header>' +
+      (key ? '' : '<p class="intro">' + T('Encercla la lletra de la resposta correcta o escriu-la a la línia.', 'Circle the letter of the right answer or write it on the line.') + '</p>') + '<ol class="items">' + body.replace(/<div class="box">/g, '</ol><div class="box">').replace(/(<\/div>)(?=<li)/g, '$1<ol class="items" start="__">') + '</ol></section>';
+  }
+  async function run() {
+    const out = document.getElementById('sheet'), parts = [], trs = [];
+    let styled = false;
+    for (const it of items) {
+      const src = 'worksheet.html?ls=' + encodeURIComponent(it.ls) + '&lp=' + encodeURIComponent(it.lp) + '&route=' + route + (key ? '&key=1' : '') + (it.tabs.length ? '&tabs=' + encodeURIComponent(it.tabs.join(',')) : '') + '&bare=1';
+      const r = await frame(src);
+      if (!r.ok || !r.d) { parts.push('<section class="part"><p class="missing">' + esc(it.lp) + ': ' + T('no hi ha versió en paper', 'no paper version') + '</p></section>'); continue; }
+      if (!styled) { r.d.querySelectorAll('style').forEach(s => { const st = document.createElement('style'); st.textContent = s.textContent.replace(/body\.locked[^}]*}/g, ''); document.head.prepend(st); }); styled = true; }
+      const sh = r.d.getElementById('sheet'); sh.querySelectorAll('.transcripts').forEach(t => { t.querySelectorAll('.tr').forEach(x => trs.push(x.outerHTML)); t.remove(); });
+      parts.push('<section class="part">' + sh.innerHTML + '</section>'); r.f.remove();
+    }
+    for (const id of games) parts.push(quiz(id, await loadDeck(id)));
+    const title = T('La classe d’avui', 'Today’s class') + (q.get('d') ? ' · ' + esc(q.get('d')) : '');
+    document.title = title.replace(/<[^>]+>/g, '') + ' · ' + NAME[route] + (key ? ' · key' : '');
+    out.innerHTML = '<header class="sheet-head"><div class="who"><span>' + T('Nom', 'Name') + ': </span><span>' + T('Grup', 'Group') + ': ' + esc(q.get('g') || '') + '</span><span>' + T('Data', 'Date') + ': </span></div>' +
+      '<p class="eyebrow">' + T('Nivell', 'Level') + ' ' + NAME[route] + (key ? ' · ' + T('SOLUCIONS', 'ANSWER KEY') : '') + '</p><h1>' + title + '</h1>' +
+      (key ? '' : '<p class="note">✏️ ' + T('Fitxa en paper: fes les mateixes activitats que a l’ordinador. Escriu les respostes i encercla la lletra de l’opció correcta.', 'Paper worksheet: do the same activities as on the computer. Write your answers and circle the letter of the right option.') + '</p>') + '</header>' +
+      (parts.join('') || '<p class="missing">' + T('Avui no hi ha res per imprimir.', 'Nothing to print today.') + '</p>') +
+      (trs.length ? '<section class="step transcripts"><h2>' + T('Transcripcions (només si no pots escoltar l’àudio)', 'Transcripts (only if you cannot listen)') + '</h2>' + trs.join('') + '</section>' : '');
+    // numbering of a game's questions carries on after each "Remember" box
+    out.querySelectorAll('.game').forEach(g => { let k = 0; g.querySelectorAll('ol.items').forEach(o => { if (o.getAttribute('start') === '__') o.setAttribute('start', k + 1); k += o.querySelectorAll(':scope>li').length; if (!o.children.length) o.remove(); }); });
+    if (key) out.classList.add('is-key');
+    document.body.dataset.ready = '1';
+  }
+  run().catch(e => { document.getElementById('sheet').textContent = 'Could not make the sheet: ' + e.message; console.error(e); });
+})();
+</script>
+<script src="../js/el-copyright.js"></script>
+<script type="module" src="teacher-gate.js"></script>
+</body>
+</html>

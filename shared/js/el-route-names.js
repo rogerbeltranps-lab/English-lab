@@ -2,7 +2,7 @@
 // Starter · Base · Core · Plus · Pro, never Beginners · Insecure · Safe · Daring · Native. Code ids, data and docs keep the old names.
 // Rather than edit every page and every text (plans, rubrics, tips), this script relabels whole, capitalised words in the visible text,
 // titles, aria-labels and placeholders, now and whenever a page re-renders. Loaded by el-cloud.js, by teacher.html and, on pages
-// without el-cloud.js, next to el-copyright.js.
+// without el-cloud.js, next to el-copyright.js; LS2 pages load it first thing in the body so the old names never show (Roger, 7 Nov 2026).
 (function () {
   if (window.EL_ROUTE_RENAME) return;
   const MAP = window.EL_ROUTE_RENAME = { Beginners: 'Starter', Insecure: 'Base', Safe: 'Core', Daring: 'Plus', Native: 'Pro' };
@@ -29,7 +29,7 @@
   }
   function start() {
     if (TEST.test(document.title)) document.title = swap(document.title);
-    fix(document.body);
+    if (document.body) fix(document.body);
     new MutationObserver(ms => {
       for (const m of ms) {
         if (m.type === 'childList') m.addedNodes.forEach(fix);
@@ -39,5 +39,8 @@
       if (TEST.test(document.title)) document.title = swap(document.title);
     }).observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS });
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+  // At once, also while the page is still loading (a page that loads this file at the top of its body): every element the page or its
+  // scripts add from now on is relabelled before it is drawn, so the old names never show (Roger, 7 Nov 2026). Once more when parsed.
+  start();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => fix(document.body));
 })();

@@ -17,7 +17,7 @@ window.LP = {
         { r: 'daring', q: 'To remember and honour an important event: to c___', a: ['commemorate'] }
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Dates, comparar i canviar', en: 'Dates, comparing and change' },
-      intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
+      intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       receptive: 'pilgrims · feast · harvest festival',
       core: { beginners: ['on 31 October', 'in November', 'at Christmas', 'at night', 'every year'], insecure: ['on 31 October', 'in November', 'at Christmas', 'at night', 'every year', 'once a year', 'the night before', 'the first', 'the twenty-fifth'], safe: ['on 31 October', 'in November', 'at Christmas', 'every year', 'once a year', 'the night before', 'the first', 'the twenty-fifth', 'both… and…', 'similar to', 'different from', 'whereas', 'in the same way', 'unlike', 'travel home for the holidays', 'the town square', 'the community centre', 'crowded streets', 'contribute to', 'depend on', 'come from', 'be known for', 'be associated with'], daring: ['once a year', 'the night before', 'both… and…', 'similar to', 'different from', 'whereas', 'unlike', 'commercialised', 'consumerism', 'keep a tradition alive', 'die out', 'evolve', 'adapt', 'date back to', 'stereotype', 'inclusive', 'take something for granted', 'contribute to', 'depend on', 'be associated with'] },
       groups: [
@@ -47,7 +47,7 @@ window.LP = {
         { r: 'daring', q: 'Some people think Christmas is too ___: it’s all about buying things.', a: ['commercialised', 'commercialized'] },
         { r: 'safe', q: 'Spain is known ___ its summer festivals.', a: ['for'] }
       ] },
-    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: The story behind two autumn celebrations', pill: { ca: 'Pòdcast · 80 %', en: 'Podcast · 80 %' },
+    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: The story behind two autumn celebrations', pill: { ca: 'Pòdcast', en: 'Podcast' },
       intro: { ca: 'Escolta el pòdcast una vegada per saber de quines dues festes parla. Després llegeix les preguntes i torna’l a escoltar.', en: 'Listen once to find the two celebrations. Then read the questions and listen again.' },
       media: { audio: 'audio/culture-bites-origins.mp3', title: 'Culture Bites: the story behind two autumn celebrations', script: [
         ['Emma', 'Welcome back to Culture Bites. Today: where do two famous autumn celebrations come from? Let’s start with Halloween.'],
@@ -103,8 +103,8 @@ window.LP = {
         ['Emma', 'Now, Thanksgiving. It takes place on the fourth Thursday of November, and this year that’s the twenty-sixth.'],
         ['Sam', 'The story usually starts in 1621. A group of English settlers, the Pilgrims, had a harvest feast with the Wampanoag people, who lived in the area. It lasted three days.'],
         ['Emma', 'But it didn’t become a national holiday until 1863, when President Abraham Lincoln made it official.'],
-        ['Sam', 'Today families travel home, get together and share a big meal, usually with turkey. Many people say what they are grateful for.']] } },
-    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Connectors, orígens i comparacions', en: 'Origins, relatives and comparing' }, pill: '80 %',
+        ['Sam', 'Today families travel home, get together and share a big meal, usually with turkey. Many people say what they are grateful for.']], marks: [["**Now**, ↗ Thanks**giv**ing. ↘", "It **takes** **place**‿on the **fourth** **Thurs**day of No**vem**ber, ↗ and **this** **year** that’s the twenty-**sixth**. ↘"], ["The **sto**ry **us**ually **starts**‿in **1621**. ↘", "A **group**‿of **Eng**lish **set**tlers, ↗ the **Pil**grims, ↗ had‿a **har**vest **feast** with the Wampa**no**ag **peo**ple, ↗ who **lived**‿in the **ar**ea. ↘", "It **last**ed **three** **days**. ↘"], ["But it **did**n’t be**come**‿a **na**tional **hol**iday un**til** **1863**, ↗ when **Pres**ident **A**braham **Lin**coln **made**‿it of**fi**cial. ↘"], ["To**day** **fam**ilies **trav**el **home**, ↗ get to**geth**er‿and **share**‿a **big** **meal**, ↗ **us**ually with **tur**key. ↘", "**Man**y **peo**ple **say** what they‿are **grate**ful for. ↘"]], cues: [[53.2, 54.86, 64.73, 66.66], [55.03, 60.22, 66.87, 72.88], [60.51, 64.16, 73.68, 77.95], [64.35, 71.72, 78.2, 86.76], [72.26, 74.36, 87.5, 89.97], [74.5, 81.12, 90.48, 98.29], [81.25, 88.33, 98.8, 107.02], [88.86, 91.91, 107.71, 111.26]] } },
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Connectors, orígens i comparacions', en: 'Origins, relatives and comparing' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>Connectors:</strong> First, Then, Finally per ordenar; and, also per afegir; but per contrastar; because per donar una raó.', en: '<strong>Connectors:</strong> First, Then, Finally; and, also, but, because.' },
@@ -140,7 +140,7 @@ window.LP = {
         { r: 'daring', q: 'Many families love the feast. ___, some Native Americans see it as a day of mourning. (3 words)', a: ['on the other hand'], en: 'Contrast between two sentences.' },
         { r: 'daring', q: 'Correct the word: “Diwali, that is celebrated in autumn, is known as the festival of lights.” → ___', a: ['which'], en: 'Non-defining relatives never use that.' }
       ] },
-    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Barreja de formes: decideix primer quina necessites.', en: 'Mixed forms: decide which one you need first.' },
       items: [
         { q: 'We celebrate it ___ 26 November.', a: ['on'] },

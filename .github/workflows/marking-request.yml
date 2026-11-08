@@ -1,0 +1,55 @@
+# Marking on request (Roger, 6 Nov 2026), free (GitHub Actions in a public repo): every 15 minutes, if the teacher pressed
+# ✏️ Correct everything waiting now on the dashboard (settings/marking.request), it starts the scheduled task "English Lab: mark and correct"
+# on claude.ai at once (tools/marking/request.mjs). Secrets: FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM (read-only, already there) and
+# MARK_TASK_TOKEN (the scheduled task's API trigger token). Since 7 Nov 2026 the dashboard starts the task itself through the school
+# Apps Script (the token lives there) and this is the backup: GitHub runs this schedule only every few hours, not every 15 minutes. It asks
+# the school script first (SCHOOL_MAIL_URL + SCHOOL_MAIL_KEY), then MARK_TASK_TOKEN. The log shows no names (it is public).
+name: Marking on request
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: marking-request
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  start:
+    if: github.repository == 'rogerbeltranps-lab/English-lab'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ENGLISH_LAB_IETM }}
+      SCHOOL_MAIL_URL: ${{ secrets.SCHOOL_MAIL_URL }}
+      SCHOOL_MAIL_KEY: ${{ secrets.SCHOOL_MAIL_KEY }}
+      MARK_TASK_TOKEN: ${{ secrets.MARK_TASK_TOKEN }}
+      MARK_TASK_URL: ${{ secrets.MARK_TASK_URL }}
+      MARK_STATE: .mark-state.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/notify
+            tools/marking
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # the request already started, kept between runs (the newest cache whose name starts with marking-request-)
+      - uses: actions/cache/restore@v4
+        with:
+          path: .mark-state.json
+          key: marking-request-${{ github.run_id }}
+          restore-keys: marking-request-
+      - name: Start the marking if it was asked for
+        id: start
+        run: node tools/marking/request.mjs
+      - if: steps.start.outputs.fired == '1'
+        uses: actions/cache/save@v4
+        with:
+          path: .mark-state.json
+          key: marking-request-${{ github.run_id }}-${{ github.run_attempt }}

@@ -19,7 +19,7 @@ window.LP = {
         { r: 'daring', q: 'I ___ skating to cycling. (preferir)', a: ['prefer'] }
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'M’agrada, no m’agrada i consells de pantalla', en: 'Likes, dislikes and screen tips' },
-      intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
+      intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       core: { beginners: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'my favourite', 'take a break', 'switch off your phone', 'go outside'], insecure: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside'], safe: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'my favourite', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well'], daring: ['I love + -ing', 'I like + -ing', 'I don’t like + -ing', 'I hate + -ing', 'I don’t mind + -ing', 'take a break', 'switch off your phone', 'put your phone away', 'don’t use your phone in bed', 'go outside', 'set a time limit', 'turn off notifications', 'keep your phone out of your bedroom', 'screen time', 'sleep well', 'addictive', 'concentrate', 'instead of', 'a habit', 'healthy / unhealthy'] },
       groups: [
         { g: 'Likes and dislikes (+ -ing)', items: [['I love + -ing', 'm’encanta', 'I love skating.'], ['I like + -ing', 'm’agrada', 'I like drawing comics.'], ['I don’t like + -ing', 'no m’agrada', 'I don’t like getting up early.'], ['I hate + -ing', 'odio', 'I hate losing!'], ['I don’t mind + -ing', 'no m’importa', 'I don’t mind training in the rain.'], ['my favourite', 'el meu preferit', 'Skating is my favourite hobby.']] },
@@ -47,7 +47,7 @@ window.LP = {
         { r: 'daring', q: 'Go outside ___ of watching videos all afternoon.', a: ['instead'] },
         { r: 'daring', q: 'I can’t ___ on my homework with my phone next to me.', a: ['concentrate'] }
       ] },
-    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Screen Smart', pill: { ca: 'Ràdio · 80 %', en: 'Radio · 80 %' },
+    { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Screen Smart', pill: { ca: 'Ràdio', en: 'Radio' },
       intro: { ca: 'Un programa de ràdio per a joves dona consells sobre les pantalles. Escolta una vegada per comptar quants consells dona. Després llegeix les preguntes i torna a escoltar.', en: 'A radio programme for teenagers gives screen tips. Listen once to count the tips. Then read the questions and listen again.' },
       media: { audio: 'audio/screen-smart.mp3', title: 'Screen Smart (School Radio)', script: [
         ['Presenter', '[warm] Good afternoon, this is Screen Smart on School Radio. Today we’re talking about phones and free time. Last week, we asked four hundred students about their screen time, and the average is three and a half hours a day. That’s more than twenty-four hours a week!'],
@@ -71,7 +71,7 @@ window.LP = {
         { r: 'daring', q: 'Why does the presenter say “That’s more than twenty-four hours a week”?', o: ['to show that three and a half hours a day is a lot', 'to say that a week has 24 hours', 'to explain the timer'] },
         { r: 'daring', q: 'Which sentence from the programme is an imperative?', o: ['“Put your phone away and enjoy the afternoon!”', '“The average is three and a half hours a day.”', '“I hate feeling tired in the morning.”'] }
       ] },
-    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: el dissabte del Noah', en: 'Listen again: Noah’s Saturday' }, pill: { ca: 'Vídeo · 80 %', en: 'Video · 80 %' },
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: el dissabte del Noah', en: 'Listen again: Noah’s Saturday' }, pill: { ca: 'Vídeo', en: 'Video' },
       intro: { ca: 'Mira el vlog del Noah de l’LP3. Ara fixa’t en el que li agrada, el que fa normalment i com fa servir la càmera.', en: 'Watch Noah’s vlog from LP3 again. Now notice what he likes, what he usually does and how he uses the camera.' },
       media: { videos: [{ base: 'video/noah-bike-park', title: 'Noah: Saturday at the bike park' }], videoCredit: 'Illustrated video made for English Lab. Voices generated with ElevenLabs.' },
       chunks: ['it’s perfect for riding', 'I’m holding the camera'],
@@ -92,8 +92,8 @@ window.LP = {
       clip: { title: 'Screen Smart (School Radio)', src: 'audio/screen-smart.mp3', slow: 'audio/screen-smart-slow.mp3', t: [26.95, 61.39], ts: [32.35, 73.46], lines: [
         ['Presenter', 'Tip number one: take a break. After thirty minutes on a screen, stop for five minutes. Stand up, look out of the window, drink some water.'],
         ['Presenter', 'Tip number two: set a time limit. Decide how long you want to play, for example one hour, and use the timer on your phone. When it rings, stop.'],
-        ['Presenter', 'Tip number three: switch off your phone one hour before you go to sleep, and keep it out of your bedroom. The light from the screen tells your brain that it is still daytime, so you don’t sleep well.']] } },
-    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'like + -ing i imperatius', en: 'like + -ing and imperatives' }, pill: '80 %',
+        ['Presenter', 'Tip number three: switch off your phone one hour before you go to sleep, and keep it out of your bedroom. The light from the screen tells your brain that it is still daytime, so you don’t sleep well.']], marks: [["**Tip** **num**ber **one**: **take**‿a **break**. ↘", "**Af**ter **thir**ty **min**utes‿on a **screen**, ↗ **stop** for **five** **min**utes. ↘", "**Stand**‿**up**, ↗ **look**‿**out** of the **win**dow, ↗ **drink** some **wa**ter. ↘"], ["**Tip** **num**ber **two**: **set**‿a **time** **lim**it. ↘", "De**cide** how **long** you **want** to **play**, ↗ for ex**am**ple **one** **hour**, ↗ and **use** the **tim**er‿on your **phone**. ↘", "**When**‿it **rings**, ↗ **stop**. ↘"], ["**Tip** **num**ber **three**: **switch**‿**off** your **phone** **one** **hour** be**fore** you **go** to **sleep**, ↗ and **keep**‿it‿**out** of your **bed**room. ↘", "The **light** from the **screen** **tells** your **brain** that‿it is **still** **day**time, ↗ so you **don’t** **sleep** **well**. ↘"]], cues: [[27.08, 29.83, 32.49, 35.64], [30.26, 33.89, 36.16, 40.43], [34.11, 37.5, 40.75, 44.69], [37.69, 40.52, 45.34, 48.61], [40.66, 46.22, 48.83, 55.33], [46.37, 48.29, 55.52, 57.8], [48.46, 55.37, 58.35, 66.4], [55.88, 61.29, 67.07, 73.36]] } },
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'like + -ing i imperatius', en: 'like + -ing and imperatives' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>like / love / hate / don’t mind + verb-ing:</strong> <em>I love skating. She hates losing. We don’t like getting up early.</em> Pregunta: <em>Do you like playing online?</em> La mateixa ortografia de -ing que al Present Continuous (<em>swimming, dancing</em>).', en: '<strong>like / love / hate / don’t mind + verb-ing:</strong> <em>I love skating. She hates losing. We don’t like getting up early.</em> Question: <em>Do you like playing online?</em> Same -ing spelling as the Present Continuous (<em>swimming, dancing</em>).' },
@@ -124,7 +124,7 @@ window.LP = {
         { r: 'daring', q: 'One hour of games a day is ___: you don’t need more. (suficient)', a: ['enough'], en: 'enough after the adjective or alone.' },
         { r: 'daring', q: 'Correct the mistake: “Don’t to use your phone in bed.” → ___ use your phone in bed.', a: ["don't", 'do not'], en: 'Don’t + base verb, no “to”.' }
       ] },
-    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Barreja de formes: -ing després de like, Present Continuous, Present Simple o imperatiu?', en: 'Mixed forms: -ing after like, Present Continuous, Present Simple or imperative?' },
       items: [
         { q: 'I love dancing, and right now I ___ (dance) in my room!', a: ['am dancing', "'m dancing"], ca: 'right now → am dancing.', en: 'right now → am dancing.' },

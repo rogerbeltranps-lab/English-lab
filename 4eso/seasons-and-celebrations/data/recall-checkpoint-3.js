@@ -29,17 +29,20 @@ window.LP = {
     {
      "id": "c3-01",
      "r": "beginners",
-     "q": "\"We need music.\" \"I ___ bring my speaker.\""
+     "q": "\"We need music.\" \"I ___ bring my speaker.\"",
+     "o": ["will", "is going to", "going to"]
     },
     {
      "id": "c3-02",
      "r": "beginners",
-     "q": "___ ___ ___ food and music."
+     "q": "___ ___ ___ food and music.",
+     "o": ["there will be", "there is will", "will there be"]
     },
     {
      "id": "c3-03",
      "r": "beginners",
-     "q": "We ___ ___ ___ decorate the hall. (plan)"
+     "q": "We ___ ___ ___ decorate the hall. (plan)",
+     "o": ["will", "are going to", "there will be"]
     },
     {
      "id": "c3-04",
@@ -49,7 +52,8 @@ window.LP = {
     {
      "id": "c3-05",
      "r": "beginners",
-     "q": "Diwali is the festival of ___."
+     "q": "Diwali is the festival of ___.",
+     "o": ["chestnuts", "colours", "lights"]
     },
     {
      "id": "c3-06",
@@ -59,12 +63,14 @@ window.LP = {
     {
      "id": "c3-07",
      "r": "beginners",
-     "q": "We visit our relatives ___ Christmas."
+     "q": "We visit our relatives ___ Christmas.",
+     "o": ["at", "in", "on"]
     },
     {
      "id": "c3-08",
      "r": "beginners",
-     "q": "People roast ___ at the Castanyada."
+     "q": "People roast ___ at the Castanyada.",
+     "o": ["turkey", "pumpkins", "chestnuts"]
     },
     {
      "id": "c3-09",

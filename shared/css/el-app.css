@@ -1,0 +1,290 @@
+/* English Lab as an app (Roger, 6 Nov 2026: "I want everything to look like an app for them even though they connect through a
+   Chromebook most of the time"; "these things should look like buttons"; "it's not my activities but my dashboard").
+   1. The side menu of the board (today.html), the LS home (ls-home.css) and English Lab: every item is a button with an icon.
+   2. el-app.js: the same menu on every other student page (learning paths, course pages, English Lab, Practise, vocabulary games):
+      the LS home's side menu on the left on a computer (.elrail; icon strip in a narrow window), the board's bottom bar on a phone (.elbar), and on
+      learning paths a light top bar instead of the dark one. Chromebook (1366×768) first. LS1 pages keep their design. */
+
+/* ---- 0. the page shows once it is drawn (Roger, 7 Nov 2026, video: "all pages still pop up in between") ----
+   A page with <html class="elgate"> stays hidden until el-app.js (or el-ls-home.js, English Lab) has drawn its real look and set
+   html.elready: the browser paints no old layout, no menu without its styles, no half-moved learning path. Pages opened from the site
+   keep the previous page on screen meanwhile (paint holding), so it reads as one step. If no script sets it, the page shows after 1.5 s. */
+html.elgate:not(.elready) body{visibility:hidden;animation:elshow 0s linear 1.5s forwards}
+/* html.elwait: nobody signed in on this browser; el-cloud.js shows the page once Firebase knows who it is (the Sign in screen for a
+   signed-out visitor, with no page before it). If that never comes, the page shows after 8 s. */
+html.elgate.elwait:not(.elready) body{animation-delay:8s}
+@keyframes elshow{to{visibility:visible}}
+
+
+/* ---- 1. menu buttons (the board, the LS home, English Lab) ---- */
+.side .nvs,.elside{display:flex;flex-direction:column;gap:8px}
+.side .nv,.elside .nv{display:flex;align-items:center;gap:11px;padding:8px 12px 8px 8px;border-radius:14px;background:#fff;border:1px solid #e2e8f0;
+  box-shadow:0 1px 0 #e2e8f0,0 2px 6px rgba(15,23,42,.05);color:#1e293b;font-weight:700;font-size:15px;line-height:1.25;text-decoration:none;
+  transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease,background .12s ease}
+.side .nv .ic,.elside .nv .ic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#eef2ff;font-size:18px;line-height:1}
+.side .nv .lb,.elside .nv .lb{flex:1 1 auto;min-width:0}
+.side .nv::after,.elside .nv::after{content:"›";flex:0 0 auto;margin-left:auto;color:#94a3b8;font-size:20px;font-weight:600;line-height:1}
+.side .nv:hover,.elside .nv:hover{border-color:#3157d5;background:#fff;color:#3157d5;transform:translateY(-1px);box-shadow:0 1px 0 #c7d2fe,0 6px 14px rgba(49,87,213,.14)}
+.side .nv:active,.elside .nv:active{transform:translateY(1px);box-shadow:0 1px 2px rgba(15,23,42,.08)}
+.side .nv.on,.elside .nv.on{background:#3157d5;border-color:#3157d5;color:#fff;box-shadow:0 1px 0 #2443ad,0 6px 14px rgba(49,87,213,.25)}
+.side .nv.on .ic,.elside .nv.on .ic{background:rgba(255,255,255,.2)}
+.side .nv.on::after,.elside .nv.on::after{color:#fff}
+.side .nv.sub,.elside .nv.sub{margin-left:16px;padding:6px 10px 6px 6px;font-size:14px;font-weight:650;border-radius:12px}
+.side .nv.sub .ic,.elside .nv.sub .ic{width:28px;height:28px;font-size:15px;border-radius:8px}
+.side .nv .ic.lsn,.elside .nv .ic.lsn{font-size:12px;font-weight:800;letter-spacing:-.02em}.side .nv.sub .ic.lsn,.elside .nv.sub .ic.lsn{font-size:10.5px}
+.side .nv.sub.on,.elside .nv.sub.on{background:#eaf0ff;border-color:#3157d5;color:#2443ad;box-shadow:none}
+.side .nv.sub.on .ic,.elside .nv.sub.on .ic{background:#fff}
+.side .nv.sub.on::after,.elside .nv.sub.on::after{color:#3157d5}
+.side .nvh{padding-top:10px}
+/* the sticky side menu is exactly one screen tall, padding included: with its padding added to 100vh it hung below the screen and its
+   top (the brand, My dashboard) slid away at the end of a page; when the menu is longer than the screen it scrolls on its own */
+.app>.side,.app>.sidebar{box-sizing:border-box;overflow-y:auto}
+/* a short screen (Chromebook, 1366×768: about 650 px of page under the browser bar): smaller buttons, so the whole menu fits and its
+   last items (Help, Study on your phone) are not cut off at the bottom (Roger, 8 Nov 2026: "students can't see the bottom side") */
+@media (min-width:981px) and (max-height:820px){
+  .side,.elrail{padding:14px 14px!important;gap:14px!important}
+  .side .nvs,.elside{gap:5px}
+  .side .nv,.elside .nv{padding:4px 10px 4px 5px;font-size:14px;gap:9px;line-height:1.2}
+  .side .nv .ic,.elside .nv .ic{width:28px;height:28px;font-size:15px;border-radius:8px}
+  .side .nv.sub,.elside .nv.sub{padding:3px 8px 3px 5px;font-size:13px}
+  .side .nv.sub .ic,.elside .nv.sub .ic{width:24px;height:24px;font-size:13px}
+  .side .nv::after,.elside .nv::after{font-size:17px}
+}
+/* phone/top scrolling rows keep the pill look (the board's .mtabs) */
+.mtabs .nv .ic{display:none}.mtabs .nv::after{content:none}
+
+/* ---- 2. el-app.js: the side menu on the left. A computer (Chromebook): the LS home's menu, brand + wide buttons (.elw, the same .nv
+   buttons as above; Roger, 7 Nov 2026: "the format should be the same (buttons)"); a narrow window (641–980 px, where the LS home
+   drops its side menu too): the strip of icon buttons (.eln); a phone: the bottom bar ---- */
+body.elapp{--elrail:240px}
+.elrail{position:fixed!important;left:0;top:0;bottom:0;width:var(--elrail)!important;height:auto!important;margin:0!important;z-index:40;background:#fff!important;border:0!important;border-right:1px solid #e5e7eb!important;padding:24px 18px!important;
+  display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:stretch!important;flex-wrap:nowrap!important;gap:24px!important;overflow-y:auto;box-sizing:border-box;font:13px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:none!important;text-align:left}
+.elrail .elr-brand{display:block;padding:0 10px;font-weight:800;font-size:1.1rem;letter-spacing:-.03em;line-height:1.5;color:#0f172a!important;text-decoration:none!important;background:none!important;border:0!important}
+.elrail .elw .nv{margin:0!important;width:auto!important;box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",sans-serif!important}
+.elrail .eln{display:none}
+.elrail a.elr{box-sizing:border-box;width:100%;margin:0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px 8px;border-radius:14px;background:#fff;border:1px solid #e2e8f0;
+  box-shadow:0 1px 0 #e2e8f0,0 2px 6px rgba(15,23,42,.05);color:#334155;text-decoration:none;font-weight:700;font-size:11.5px;text-align:center;
+  transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+.elrail a.elr i{font-style:normal;font-size:21px;line-height:1;width:36px;height:30px;display:grid;place-items:center;border-radius:10px;background:#eef2ff}
+.elrail a.elr span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;max-width:100%;overflow:hidden;line-height:1.15;overflow-wrap:anywhere}
+.elrail a.elr:hover{border-color:#3157d5;color:#3157d5;background:#fff;transform:translateY(-1px);box-shadow:0 1px 0 #c7d2fe,0 6px 14px rgba(49,87,213,.14)}
+.elrail a.elr.on{background:#3157d5;border-color:#3157d5;color:#fff}
+.elrail a.elr.on i{background:rgba(255,255,255,.2)}
+@media (max-width:980px){
+  body.elapp{--elrail:92px}
+  .elrail{padding:12px 8px!important;gap:8px!important}
+  .elrail .elr-brand,.elrail .elw{display:none!important}
+  .elrail .eln{display:flex;flex-direction:column;gap:8px}
+}
+body.elapp.elhas-rail{padding-left:var(--elrail)!important}
+
+/* the phone's bottom bar (the board's bnav) */
+.elbar{display:none}
+@media (max-width:640px){
+  body.elapp.elhas-rail{padding-left:0!important}
+  .elrail{display:none!important}
+  .elbar{display:flex!important;flex-direction:row!important;justify-content:space-around;margin:0!important;position:fixed!important;left:0;right:0;bottom:0;z-index:9000;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -4px 14px rgba(15,23,42,.08);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));font:11px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif}
+  .elbar a{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 2px;border-radius:12px;color:#475569;text-decoration:none;font-weight:700}
+  .elbar a i{font-style:normal;font-size:20px;line-height:1}
+  .elbar a span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .elbar a.on{background:#eaf0ff;color:#3157d5}
+  body.elapp.elhas-bar{padding-bottom:72px!important}
+  /* the account bar (Problem, Idea) goes to the end of the page, as on the board; the floating buttons sit above the bottom bar */
+  body.elapp.elhas-bar #el-cloud-bar{position:static!important;margin:16px 14px 0;border-radius:14px!important;flex-wrap:wrap;justify-content:center}
+  body.elapp.elhas-bar #el-todo-btn{bottom:84px!important}
+}
+
+/* ---- learning paths: a light app bar instead of the dark top bar ---- */
+body.elapp.ellp .topbar{background:rgba(255,255,255,.97)!important;box-shadow:0 1px 0 #e2e8f0,0 4px 14px rgba(15,23,42,.05)!important;backdrop-filter:blur(8px);color:#0f172a}
+body.elapp.ellp .topbar .toprow{min-height:58px;padding-top:8px;padding-bottom:8px;gap:14px}
+body.elapp.ellp .topbar .brand{gap:8px}
+body.elapp.ellp .topbar .brand>a{color:var(--dark,#234777)!important;background:#fff;border:1px solid #dbe5f1;border-radius:12px;padding:8px 14px;font-weight:800;text-decoration:none;
+  box-shadow:0 1px 0 #dbe5f1;white-space:nowrap;max-width:340px;overflow:hidden;text-overflow:ellipsis}
+body.elapp.ellp .topbar .brand>a:hover{border-color:var(--accent,#315f9f);background:var(--soft,#edf4ff)}
+body.elapp.ellp .topbar .brand>a.lp-home-link{display:none!important}   /* the strip on the left has My dashboard */
+body.elapp.ellp .topbar .brand>a.elback::before{content:"‹ ";font-size:1.15em}
+body.elapp.ellp .topbar .session-jump label{color:#64748b!important}
+body.elapp.ellp .topbar .session-jump select{background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;border-radius:12px!important;font-weight:700}
+body.elapp.ellp .topbar .progress-label,body.elapp.ellp .topbar .progress-row{color:#475569!important}
+body.elapp.ellp .topbar .progress-track{background:#e2e8f0!important}
+body.elapp.ellp .topbar .progress-bar{background:var(--accent,#315f9f)!important}
+@media (min-width:900px){body.elapp.ellp .topbar .toprow{flex-wrap:nowrap!important;padding:8px 0!important}body.elapp.ellp .topbar .session-jump{order:0!important;width:auto!important;margin-left:auto!important}body.elapp.ellp .topbar .progress-shell{margin-left:0!important}}
+body.elapp.ellp .hero{padding:16px 0 12px!important}
+/* a student sees only their own level: it is already in the top bar next to the steps done, so the single level card goes */
+body.elapp.ellp .routes:has(.route[style*="none"]){display:none!important}
+body.elapp.ellp .hero h1{font-size:clamp(1.8rem,2.8vw,2.4rem)!important}
+@media (max-width:640px){body.elapp.ellp .topbar .brand>a{max-width:none;padding:7px 11px}}
+
+/* ---- course pages and vocabulary games: the strip replaces the site header for signed-in users ---- */
+body.elapp.elcourse>header,body.elapp.elgames .site-header>.home-link,body.elapp.elgames .site-header>[data-el-board]{display:none!important}
+.elcrumb{max-width:1180px;margin:14px auto 0;padding:0 24px}
+.elcrumb a{display:inline-flex;align-items:center;gap:4px;color:#3157d5;font:700 16px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;text-decoration:none;padding:8px 12px 8px 4px;border-radius:10px}
+.elcrumb a:hover{background:#eaf0ff}
+
+/* ---- the home page (index.html): a welcome page to sign in, never its old side menu and phone row of tabs (Roger, 7 Nov 2026);
+   the teacher's Courses and Learning Situations lists get the app menu ---- */
+body.elroot .sidebar,body.elroot .mobile-tabs{display:none!important}
+body.elroot .app{display:block!important}
+body.elroot:not(.elapp) #el-cloud-bar{display:none!important}
+
+/* ---- English Lab and Practise: their side menu becomes the button menu ---- */
+body.elapp.ellab .nav-tabs,body.elapp.ellab .mobile-tabs{display:none!important}
+
+/* ---- learning paths on a computer: the path in a left column, the step on the right (Roger, 6 Nov 2026: "use a column on the left
+   with info of the LP, and it must be super easy to understand"; el-app.js lpLayout) ---- */
+body.ellp2 header.hero{display:none!important}
+/* the grid starts right after the side menu (not centred: on a wide screen the centring left a big empty strip between the menu and the
+   column; Roger, 7 Nov 2026: "here there's too much space") */
+.ellpgrid{display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;align-items:start;max-width:1600px;margin:0;padding:16px 24px 40px;box-sizing:border-box}
+body.ellp2 main#lp{max-width:none!important;width:auto!important;margin:0!important;padding:0!important;min-width:0}
+/* the room for the floating bottom bar (el-cloud.js keepBarSpace) goes under the step, inside the grid: below the grid it pushed the
+   sticky steps column up at the end of the page */
+body.ellp2 #el-cloud-bar-space{display:none}
+body.ellp2 main#lp{padding-bottom:var(--el-bar-space,0px)!important}
+body.ellp2 .lp-body{display:block!important}
+.ellpside{position:sticky;top:70px;max-height:calc(100vh - 80px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;padding:0 4px 12px 0;scrollbar-width:thin}
+.ellp-head{display:flex;flex-direction:column;gap:6px}
+.ellp-head .eyebrow{align-self:flex-start;font-size:11px!important;padding:4px 10px!important;margin:0!important}
+.ellp-head h1{font-size:1.6rem!important;line-height:1.15!important;margin:0!important;letter-spacing:-.01em;text-wrap:balance}
+.ellp-head .lead{font-size:.95rem!important;line-height:1.45!important;margin:0!important;color:var(--muted,#687386)}
+.ellp-prog{background:#fff;border:1px solid var(--line,#dbe5f1);border-radius:14px;padding:10px 12px}
+.ellp-prog .ellp-pl{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#64748b;margin-bottom:4px}
+.ellp-prog .progress-shell{width:100%;margin:0!important;flex:none!important}
+.ellp-prog .progress-label{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-weight:700;color:#1e293b}
+.ellp-prog .progress-track{height:9px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin-top:6px}
+.ellp-prog .progress-bar{height:100%;width:0;border-radius:99px;background:var(--accent,#315f9f);transition:width .25s ease}
+.ellp-steps nav.tabs{display:flex!important;flex-direction:column!important;gap:6px!important;position:static!important;overflow:visible!important;padding:0!important;margin:0!important;box-shadow:none!important;background:none!important}
+.ellp-steps .tab{display:flex!important;align-items:center;gap:10px;width:100%;text-align:left;white-space:normal;padding:10px 12px!important;border-radius:12px!important;box-sizing:border-box}
+.ellp-steps .tab.next:not(.active)::after{content:attr(data-next);margin-left:auto;font-size:.7rem;letter-spacing:.06em;color:var(--accent,#315f9f)}
+.ellp-steps .tab .el-tsw{margin-left:auto}
+.ellp-more{display:flex;flex-direction:column;gap:10px}
+.ellp-more .lp-top{display:flex!important;flex-direction:column;gap:10px;margin:0!important}
+.ellp-more .lp-top>*,.ellp-more .plan-card{margin:0!important}
+.ellp-more .plan-card{padding:12px 14px!important}
+.ellp-more .plan-card h3{display:block!important;font-size:.95rem!important;margin:0 0 4px!important}
+.ellp-more .plan-card .instruction{display:block!important;margin:0 0 8px!important;font-size:.88rem!important}
+.ellp-more .plan-card input{width:100%!important;max-width:none!important;box-sizing:border-box}
+.ellp-more .lp-how{margin:0!important}
+/* nothing in the column may be wider than it: the open study guide (two tip cards side by side, a one-line pill) made it 380 px wide, so
+   the column scrolled sideways (a trackpad swipe) and its left side hid behind the menu (Roger, 7 Nov 2026: "this shouldn't happen") */
+.ellpside>*{min-width:0;max-width:100%}
+.ellpside .study-card{min-width:0;box-sizing:border-box}
+.ellpside .study-card summary{flex-wrap:wrap}
+.ellpside .study-card summary>span{min-width:0;overflow-wrap:anywhere}
+.ellpside .study-tips{grid-template-columns:minmax(0,1fr)!important}
+.ellpside .pill{white-space:normal;max-width:100%;box-sizing:border-box}
+.ellpside .panel-head{flex-wrap:wrap}
+.ellpside img,.ellpside video,.ellpside audio,.ellpside table{max-width:100%}
+
+/* the teacher's part of the column: class game, the level to look at, open sections, pull up, full screen */
+.ellp-teach{display:flex;flex-direction:column;gap:10px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px;box-shadow:0 1px 0 #e2e8f0}
+.ellp-teach .ellp-th{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64748b}
+.ellp-teach>[data-el-teacher]{margin:0!important}
+.ellp-teach>[data-el-teacher] span{display:flex!important;flex-direction:column!important;gap:6px!important;align-items:stretch!important}
+.ellp-teach>[data-el-teacher] a{display:flex!important;width:100%;box-sizing:border-box;padding:10px 12px!important;border-radius:12px!important;font-size:14px!important;line-height:1.25}
+.ellp-teach>[data-el-teacher] a small{display:none}
+.ellp-teach .routes{display:flex!important;flex-wrap:wrap;gap:4px;margin:0!important;padding:4px;background:#f1f5f9;border-radius:12px}
+.ellp-teach .routes::before{content:"Level";flex-basis:100%;font-size:12px;font-weight:700;color:#475569;padding:2px 6px}
+.ellp-teach .routes .route{flex:1 1 0;min-width:0;min-height:0!important;padding:6px 4px!important;border:0!important;border-radius:9px!important;background:transparent!important;box-shadow:none!important;text-align:center;display:flex!important;flex-direction:column;gap:0;align-items:center}
+.ellp-teach .routes .route strong{font-size:13px!important}
+.ellp-teach .routes .route span{font-size:11px!important}
+.ellp-teach .routes .route.active{background:#fff!important;box-shadow:0 1px 3px rgba(15,23,42,.15)!important}
+.ellp-teach .routes .route.active strong{color:var(--accent,#315f9f)!important}
+.ellp-teach .el-tsec{margin:0!important;padding:0!important;border:0!important;background:none!important;display:flex;flex-direction:column;gap:8px;font-size:13.5px!important;color:#1e293b!important}
+.ellp-teach .el-tsec .r{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0!important;padding:0!important;border:0!important}
+.ellp-teach .el-tsec .r>b{flex-basis:100%;font-size:12px;font-weight:700;color:#475569;margin:0}
+.ellp-teach .el-tsec .r>span:not(.now):not(.m){font-size:12.5px;color:#475569}
+.ellp-teach .el-tsec small{display:none!important}
+.ellp-teach .el-tsec button{border:1px solid #cbd5e1!important;background:#fff!important;color:#1e293b!important;border-radius:10px!important;padding:6px 10px!important;font:600 13px system-ui,sans-serif!important;text-decoration:none!important;box-shadow:0 1px 0 #e2e8f0}
+.ellp-teach .el-tsec button:hover{border-color:var(--accent,#315f9f)!important}
+.ellp-teach .el-tsec button.on{background:var(--accent,#315f9f)!important;border-color:var(--accent,#315f9f)!important;color:#fff!important}
+.ellp-teach .el-tsec .pl button[data-pull]:not(.g){background:#0f766e!important;border-color:#0f766e!important;color:#fff!important}
+.ellp-teach .el-tsec .pl button.fs.on{background:#1e293b!important;color:#fff!important}
+.ellp-teach .el-tsec .w{order:-1;margin:0!important;padding:8px 10px!important;border-radius:10px;background:#fef2f2;color:#991b1b;font-weight:700;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.ellp-teach .el-tsec .w button{margin:0!important;background:#991b1b!important;border-color:#991b1b!important;color:#fff!important}
+.ellp-teach .el-tsec .now{font-size:12.5px}
+/* the teacher-mode strip at the very top: the column says Teacher */
+body.ellp2.elteach #el-banner{display:none!important}
+/* order in the column: the path, progress, (the teacher's tools), the steps, then how it works, the study guide and my goal */
+.ellp-head{order:0}.ellp-prog{order:1}.ellp-teach{order:2}.ellp-steps{order:3}.ellp-more{order:4}
+.ellp-teach[hidden],.ellpside [hidden]{display:none!important}
+
+/* ---- My Learning Situations (the course page for a signed-in user; el-app.js allLs) ---- */
+main.elall{display:block;font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a}
+main.elall[hidden]{display:none!important}
+.elall-in{max-width:980px;margin:0 auto;padding:6px 24px 48px}
+.elall h1{font-size:2rem;letter-spacing:-.02em;margin:8px 0 4px}
+.elall .sub{color:#64748b;margin:0 0 18px;font-size:16px}
+.ellist{display:flex;flex-direction:column;gap:10px}
+a.ells{display:grid;grid-template-columns:56px minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:14px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;
+  text-decoration:none;color:inherit;box-shadow:0 1px 0 #e2e8f0,0 2px 6px rgba(15,23,42,.05);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+a.ells:hover{border-color:#3157d5;transform:translateY(-1px);box-shadow:0 1px 0 #c7d2fe,0 8px 18px rgba(49,87,213,.14)}
+a.ells .n{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:17px;background:#eef2ff;color:#2443ad}
+a.ells .t{min-width:0}
+a.ells .t b{display:block;font-size:18px;line-height:1.25}
+a.ells .t small{display:block;color:#64748b;font-size:14px;margin-top:2px}
+a.ells .ch{font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 12px;white-space:nowrap}
+a.ells .ch.now{background:#3157d5;color:#fff}
+a.ells .ch.op{background:#dcfce7;color:#166534}
+a.ells .ch.cl{background:#f1f5f9;color:#475569}
+a.ells .ch.hd{background:#fef3c7;color:#92400e}
+a.ells .go{font-weight:800;color:#3157d5;white-space:nowrap;padding:9px 16px;border-radius:12px;background:#eaf0ff}
+a.ells.cur{border:2px solid #3157d5;padding:18px;grid-template-columns:64px minmax(0,1fr) auto auto}
+a.ells.cur .n{background:#3157d5;color:#fff;width:64px;height:64px;font-size:19px}
+a.ells.cur .t b{font-size:21px}
+a.ells.cur .go{background:#3157d5;color:#fff}
+.elall .more{color:#94a3b8;margin:16px 2px 0;font-size:14px}
+body.elapp.elcourse .elcrumb{max-width:980px}
+@media (max-width:640px){
+  .elall-in{padding:4px 16px 24px}.elall h1{font-size:1.6rem}
+  a.ells{grid-template-columns:48px minmax(0,1fr);row-gap:8px}
+  a.ells .n,a.ells.cur .n{width:48px;height:48px;font-size:16px}
+  a.ells.cur{grid-template-columns:48px minmax(0,1fr);padding:14px}
+  a.ells .ch{grid-column:2;justify-self:start}
+  a.ells .go{grid-column:1/-1;text-align:center}
+}
+
+/* ---- 3. on an LS (its home, its learning paths, its vocabulary games) a student's side menu is a strip of icons that opens over the
+   page (Roger, 8 Nov 2026: "when students are on the LS, to see better the screen, I want the menu to hide and only show the emoji or
+   logos of each side. If the mouse goes on the section the menu gets bigger"). el-app.js (.elrail) and el-ls-home.js (aside.side) set
+   body.elmini; elMiniRail (el-catalog.js) adds ☰ before the brand: a tap on it opens or closes the menu (touch screens), a tap outside or
+   Esc closes it. The mouse opens it after a short pause (a mouse passing by does not), and it closes a moment after the mouse leaves.
+   It opens OVER the page, so the page never moves. Chromebook (1366×768) first: one button size that fits its short screen, the same
+   height closed and open (the icon under the mouse stays under it). A computer only (≥981 px): narrower windows keep their strip or top
+   row, phones the bottom bar. LS1's home keeps its wide menu. ---- */
+.elmtop{display:none}
+@media (min-width:981px){
+  body.elmini{--elrail:72px;--elopen:300px}
+  body.lsh.elmini .app{grid-template-columns:var(--elrail) minmax(0,1fr)}
+  body.elmini .elrail,body.lsh.elmini .app>aside.side{width:var(--elrail)!important;padding:14px 12px!important;gap:12px!important;overflow-x:hidden!important;overflow-y:auto;
+    z-index:60;scrollbar-width:none;transition:width .18s ease .3s,box-shadow .18s ease .3s}
+  body.elmini .elrail::-webkit-scrollbar,body.lsh.elmini .app>aside.side::-webkit-scrollbar{display:none}
+  body.elmini .elrail.elopen,body.lsh.elmini .app>aside.side.elopen,
+  body.elmini .elrail:has(:focus-visible),body.lsh.elmini .app>aside.side:has(:focus-visible){width:var(--elopen)!important;box-shadow:10px 0 30px rgba(15,23,42,.14)!important;transition-delay:0s}
+  /* the top row: ☰ in the icon column, the brand beside it when open */
+  body.elmini .elmtop{display:flex;align-items:center;gap:8px;flex:0 0 auto;min-height:40px;white-space:nowrap}
+  body.elmini .elmt{flex:0 0 48px;width:48px;height:40px;display:grid;place-items:center;padding:0;border:0;border-radius:12px;background:transparent;color:#334155;font:22px/1 system-ui,sans-serif;cursor:pointer}
+  body.elmini .elmt:hover,body.elmini .elopen .elmt{background:#eef2ff;color:#3157d5}
+  body.elmini .elmtop>a{padding:0!important;opacity:0;transition:opacity .12s ease}
+  /* the buttons: icon only while closed (the label and › are cut off by the button's edge) */
+  body.elmini .elrail .elside,body.lsh.elmini aside.side .nvs{gap:6px}
+  body.elmini .elrail .nv,body.lsh.elmini aside.side .nv{width:auto!important;min-width:0;padding:5px 10px 5px 7px;gap:10px;font-size:14.5px;line-height:1.2;white-space:nowrap;overflow:hidden;
+    transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease,background .12s ease,margin .18s ease .3s,padding .18s ease .3s}
+  body.elmini .elrail .nv .ic,body.lsh.elmini aside.side .nv .ic{width:32px;height:32px;font-size:17px;border-radius:10px}
+  body.elmini .elrail .nv .ic.lsn,body.lsh.elmini aside.side .nv .ic.lsn{font-size:11.5px}
+  body.elmini .elrail .nv .lb,body.lsh.elmini aside.side .nv .lb{overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .1s ease}
+  body.elmini .elrail .nv::after,body.lsh.elmini aside.side .nv::after{font-size:18px;opacity:0;transition:opacity .1s ease}
+  body.elmini .elrail .nv.sub,body.lsh.elmini aside.side .nv.sub{margin-left:0!important;padding:4px 8px 4px 10px;font-size:13.5px}
+  body.elmini .elrail .nv.sub .ic,body.lsh.elmini aside.side .nv.sub .ic{width:26px;height:26px;font-size:14px;border-radius:8px}
+  body.elmini .elrail .nv.sub .ic.lsn,body.lsh.elmini aside.side .nv.sub .ic.lsn{font-size:10.5px}
+  /* open: brand, labels and › come in; an LS goes in under its course again */
+  body.elmini :is(.elrail,aside.side):is(.elopen,:has(:focus-visible)) :is(.elmtop>a,.nv .lb,.nv::after){opacity:1;transition-delay:.12s}
+  body.elmini :is(.elrail,aside.side):is(.elopen,:has(:focus-visible)) .nv.sub{margin-left:14px!important;padding-left:6px;transition-delay:0s}
+}
+/* the mouse opens it: after a short pause, so a mouse crossing to the page does not */
+@media (min-width:981px) and (hover:hover){
+  body.elmini .elrail:hover,body.lsh.elmini .app>aside.side:hover{width:var(--elopen)!important;box-shadow:10px 0 30px rgba(15,23,42,.14)!important;transition-delay:.15s}
+  body.elmini :is(.elrail,aside.side):hover :is(.elmtop>a,.nv .lb,.nv::after){opacity:1;transition-delay:.27s}
+  body.elmini :is(.elrail,aside.side):hover .nv.sub{margin-left:14px!important;padding-left:6px;transition-delay:.15s}
+}

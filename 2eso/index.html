@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
@@ -367,6 +367,7 @@ nav.menu-open .menu-toggle::after{content:"▴"}
 .muted-group{display:grid;gap:3px}
 .ls-dropdown{min-width:290px}
 </style>
+<link rel="stylesheet" href="../shared/css/el-app.css">
 </head>
 <body>
 
@@ -404,7 +405,7 @@ nav.menu-open .menu-toggle::after{content:"▴"}
             </div>
           </details>
 
-          <a href="../lab/">English Lab</a>
+          <a href="../lab/">Games</a>
         </div>
       </nav>
     </div>
@@ -420,7 +421,7 @@ nav.menu-open .menu-toggle::after{content:"▴"}
 
       <aside class="hero-card">
         <div class="label">Current Learning Situation</div>
-        <h2>Free Time, Live!</h2>
+        <h2>LS2 · Free Time, Live!</h2>
         <p>Hobbies, events and the weather, live: Present Continuous vs Present Simple, reliable sources, screen tips and your own Free Time Vlog.</p>
       </aside>
     </section>
@@ -440,7 +441,7 @@ nav.menu-open .menu-toggle::after{content:"▴"}
         <a class="card" href="my-real-routine/index.html">
           <div>
             <span class="tag">Done</span>
-            <h3>My Real Routine</h3>
+            <h3>LS1 · My Real Routine</h3>
             <p>Everyday routines, Present Simple, useful expressions and communication.</p>
           </div>
           <span class="arrow">Open Learning Situation →</span>
@@ -449,7 +450,7 @@ nav.menu-open .menu-toggle::after{content:"▴"}
         <a class="card current" href="free-time-live/index.html">
           <div>
             <span class="tag">Current</span>
-            <h3>Free Time, Live!</h3>
+            <h3>LS2 · Free Time, Live!</h3>
             <p>Hobbies, events and the weather, live: what people are doing now and what they usually do, reliable sources, screen tips and your own vlog.</p>
           </div>
           <span class="arrow">Open Learning Situation →</span>
@@ -503,6 +504,11 @@ nav.menu-open .menu-toggle::after{content:"▴"}
     }
   </script>
 
+<!-- the app menu at once, not after Firebase has loaded: the page opens on its real look (Roger, 7 Nov 2026) -->
+<script src="../shared/js/el-catalog.js"></script>
+<script src="../shared/js/el-plan.js"></script>
+<script src="../shared/js/el-week.js"></script><!-- the time plan at once: the LS the group is doing now is first from the start, not moved up a second later (Roger, 7 Nov 2026) -->
+<script src="../shared/js/el-app.js"></script>
 <script type="module" src="../shared/js/el-cloud.js"></script>
 </body>
 </html>

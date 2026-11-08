@@ -11,12 +11,18 @@
 //        reads the EL-MARKS v1 answer and saves the levels (students/{uid}/results/{activity}.levels[step][criterion]), as the dashboard's
 //        level buttons do; --feedback also saves each line's feedback as the teacher's answer to the student (replies[step]).
 //        Without --apply it only prints what would change. A line with "COPY? reason" (a possible copy) saves no level: it is kept as
-//        results/{activity}.flags[step] = {why, lv, fb, at} for the teacher to accept or send back in the dashboard's To do.
+//        results/{activity}.flags[step] = {why, lv, fb, at} for the teacher to accept or send back in the dashboard's To do, unless it was
+//        clearly pasted (ELMark.pasted, not the Pro route): then it is sent back at once (done "redo", auto) with the Redo note and its reason.
 //        Feedback is marked fbBy[step] = "marking", so it never counts as the answer to a student's comment.
 //   node tools/marking/marks.mjs comments                                  the comments sheet: every student comment on a hand-in still
 //        waiting for an answer (ELMark.open, not handed to the teacher), all groups, with the hand-in and the content file to read
 //   node tools/marking/marks.mjs answer <answer file> [--apply]             saves the EL-ANSWERS v1 answer: ANSWER → answers[step] =
 //        {t, q, at} (the student sees it as the teacher's answer), FORYOU → ask[step] = {why, q, at} (🙋 in the dashboard's To do)
+// The dashboard's ✏️ Corrections (Roger, 6 Nov 2026) shows when each piece was corrected and where the run is: fb-apply saves
+// results/{activity}.fbAt[step] = when the correction was sent; `ready` (the first step of the scheduled task "English Lab: mark and
+// correct") saves settings/marking.run = {started, via: "request" when the teacher asked for it with ✏️ Correct everything waiting now
+// (settings/marking.request.at is newer than the last start), else "schedule"}; `audit` (its last step) saves run.done, only for a run
+// started in the last 12 hours and not finished (the Friday audit alone changes nothing). --no-run: `ready` saves nothing (a test).
 // Sign-in: FIREBASE_SERVICE_ACCOUNT (the service account's JSON key, an environment secret of the cloud environment, never in the repo),
 // else the Firebase CLI login on Roger's PC (as tools/exam-marks). Group = EL_GROUPS id (2ESOA…); activity = catalogue id
 // (2eso/ls2-what-are-they-doing); step = the moment's step (log, chart, card, factfile). The answer file holds no names.
@@ -32,6 +38,11 @@ const ctx={console};ctx.window=ctx;if(process.env.EL_TODAY)ctx.EL_TODAY=process.
 vm.createContext(ctx);
 for(const f of ["el-catalog.js","el-criteria.js","el-plan.js","el-week.js","el-grading.js","el-marking.js"])vm.runInContext(fs.readFileSync(path.join(ROOT,"shared/js",f),"utf8"),ctx,{filename:f});
 const W=ctx.window,CA_RT=["beginners","insecure"];
+// A possible copy that was clearly pasted (ELMark.pasted: most of the text pasted, little typed) is sent back at once instead of waiting
+// in the teacher's To do (Roger, 4 Nov 2026: "when this happens and you see it on Wednesdays, you can automatically send redo"): the flag
+// is saved as done "redo" (auto) and the student gets the Redo note with the reason from the writing log (ELMark.redoNote). Never the Pro route.
+const autoRedo=(route,ty)=>route!=="native"&&W.ELMark.pasted(ty);
+const redoNote=(route,ty,why)=>W.ELMark.redoNote(ty,why,!route||CA_RT.includes(route));
 
 async function token(){
   const sa=process.env.FIREBASE_SERVICE_ACCOUNT;
@@ -135,18 +146,23 @@ async function comments(){const out=[],names=Object.fromEntries((W.EL_LEVELS||[]
   return out}
 
 // sessions the teacher moved to another day on the dashboard (ls/{id}.planEdits): due days and session lines follow, as on the dashboard
-for(const ls of Object.keys(W.EL_PLAN||{})){const d=doc(await api("GET",DOCS+"ls/"+encodeURIComponent(ls)).catch(()=>null))||{};if(d.planEdits)W.ELWeek.applyEdits(ls,d.planEdits)}
+const PE={};for(const ls of Object.keys(W.EL_PLAN||{})){const d=doc(await api("GET",DOCS+"ls/"+encodeURIComponent(ls)).catch(()=>null))||{};PE[ls]=d.planEdits||{};if(d.planEdits)W.ELWeek.applyEdits(ls,d.planEdits)}
+// a group's ticks, with the past class days of its agendas counted as done (ELWeek.autoTicks, as on the dashboard)
+async function ticksOf(grp){const t=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
+  for(const [ls,pe] of Object.entries(PE)){const a=(pe[grp.id]||{}).agenda;if(!a)continue;let ag=null;try{ag=typeof a==="string"?JSON.parse(a):a}catch(e){}W.ELWeek.autoTicks(ls,ag,t)}return t}
 const [cmd,...rest]=process.argv.slice(2),flags=new Set(rest.filter(x=>x.startsWith("--"))),args=rest.filter(x=>!x.startsWith("--"));
 const grpOf=id=>{const g=W.EL_GROUPS.find(x=>x.id===id);if(!g)throw new Error("No group "+id);return g};
 const momentOf=(aid,step)=>{const a=W.EL_CATALOG.find(x=>x.id===aid),m=a&&moments(a.ls).find(x=>x.a===aid&&x.step===step);if(!m)throw new Error("No marking step "+aid+" · "+step);return m};
 if(cmd==="ready"){const today=W.ELWeek.today();
-  for(const grp of W.EL_GROUPS){const ticks=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
+  if(!flags.has("--no-run")){const mk=doc(await api("GET",DOCS+"settings/marking"))||{},rq=Date.parse((mk.request||{}).at||"")||0,st=Date.parse((mk.run||{}).started||"")||0,via=rq>st?"request":"schedule";
+    await api("PATCH",DOCS+"settings/marking?updateMask.fieldPaths=run",{fields:{run:fsv({started:new Date().toISOString(),via})}});console.log("RUN started ("+(via==="request"?"asked from the dashboard":"scheduled")+")")}
+  for(const grp of W.EL_GROUPS){const ticks=await ticksOf(grp);
     for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
       const rows=await todo(grp,m);if(!rows.length)continue;const r=readyOf(grp,ls,m,ticks),now=!!(r.from&&today>=r.from);
       console.log([now?"READY":"wait ",grp.id,m.a,m.step,rows.length+" to mark",r.from?"from "+r.from:r.line?"session not ticked: "+r.line:"no session in the plan"].join(" · "))}}}
 else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026: "a command to audit what you do and warn me if it's not working")
   const today=W.ELWeek.today(),days=(a,b)=>Math.round((Date.parse(a)-Date.parse(b))/864e5),problems=[],remind=[],ok=[];
-  for(const grp of W.EL_GROUPS){const ticks=(doc(await api("GET",DOCS+"teacherPlan/"+grp.id))||{}).ticks||{};
+  for(const grp of W.EL_GROUPS){const ticks=await ticksOf(grp);
     for(const ls of Object.keys(W.EL_GRADING).filter(l=>l.startsWith(grp.course+"-")))for(const m of moments(ls)){
       const a=W.EL_CATALOG.find(x=>x.id===m.a),rows=await todo(grp,m),r=readyOf(grp,ls,m,ticks);
       // a late hand-in counts from the day it came in, not from when the step was ready
@@ -164,6 +180,8 @@ else if(cmd==="audit"){   // is the weekly marking working? (Roger, 31 Oct 2026:
   console.log(`AUDIT ${today}: ${problems.length?"PROBLEMS":"OK"}`);
   problems.forEach(x=>console.log("❌ "+x));remind.forEach(x=>console.log("⏰ "+x));ok.forEach(x=>console.log("🤖 to mark now: "+x));
   if(!problems.length&&!remind.length&&!ok.length)console.log("Nothing waiting: every hand-in that is ready has a level.");
+  {const run=(doc(await api("GET",DOCS+"settings/marking"))||{}).run||{},st=Date.parse(run.started||"")||0,dn=Date.parse(run.done||"")||0;   // the end of a run (see the top)
+    if(st&&dn<st&&Date.now()-st<12*3600e3){await api("PATCH",DOCS+"settings/marking?updateMask.fieldPaths=run.done",{fields:{run:fsv({done:new Date().toISOString()})}});console.log("RUN done")}}
   if(problems.length)process.exitCode=2}
 else if(cmd==="fb-ready"){   // pieces waiting for a correction without a level, per group, activity and step
   for(const grp of W.EL_GROUPS)for(const a of fbActs(grp.course)){const t=await fbTodo(grp,a);for(const [step,rows] of Object.entries(t))console.log(["FEEDBACK",grp.id,a.id,step,rows.length+" to correct"].join(" · "))}}
@@ -174,27 +192,35 @@ else if(cmd==="fb-apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),a=W.EL_C
   const rk=a.id.replace("/","__");
   for(const x of r.rows){const row=sh.codes.get(x.code);if(!x.fb){r.bad.push(x.code+" (no feedback)");continue}
     if(row.mode==="writing")x.fb=W.ELMark.fbText(x.fb);   // comment + table of mistakes + the corrected text (el-corrections.js shows the table)
-    console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+(x.flag?"⚠️ POSSIBLE COPY (to the To do, not sent): "+x.flag+" · ":"")+x.fb.replace(/\n+/g," / "));if(!flags.has("--apply"))continue;
+    const auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
+    console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+(auto?"↺ MOSTLY PASTED: sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+") · ":x.flag?"⚠️ POSSIBLE COPY (to the To do, not sent): "+x.flag+" · ":"")+x.fb.replace(/\n+/g," / "));if(!flags.has("--apply"))continue;
+    if(auto){const at=new Date().toISOString();   // as the dashboard's Redo: the writing opens again, its next hand-in is corrected again
+      await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step),fp("replies",step),fp("fbSig",step),fp("fbAt",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+        {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},fbAt:fsv({[step]:at}),flags:fsv({[step]:{why:x.flag,lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at,done:"redo",auto:true}}),replies:fsv({[step]:redoNote(row.route,row.h.ty,x.flag)}),fbSig:fsv({[step]:"redo"})}});continue}
     if(x.flag){await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),   // the teacher accepts it (the correction is sent) or asks for it again in class
       {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},flags:fsv({[step]:{why:x.flag,lv:{},fb:x.fb,v:row.v,f:row.h.f,ty:row.h.ty||null,at:new Date().toISOString()}})}});continue}
-    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("replies",step),fp("fbSig",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
-      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},replies:fsv({[step]:x.fb}),fbSig:fsv({[step]:row.v})}})}
-  console.log(`\n${flags.has("--apply")?"Sent":"Would send"}: ${r.rows.filter(x=>x.fb&&!x.flag).length} · possible copies: ${r.rows.filter(x=>x.flag).length} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
+    const at=new Date().toISOString();
+    await api("PATCH",DOCS+`students/${row.s.uid}/results/${rk}?`+["ls","activity","updated",fp("replies",step),fp("fbSig",step),fp("fbAt",step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+      {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},replies:fsv({[step]:x.fb}),fbSig:fsv({[step]:row.v}),fbAt:fsv({[step]:at})}})}
+  console.log(`\n${flags.has("--apply")?"Sent":"Would send"}: ${r.rows.filter(x=>x.fb&&!x.flag).length} · sent back automatically (mostly pasted): ${r.rows.filter(x=>x.auto).length} · possible copies for the teacher: ${r.rows.filter(x=>x.flag&&!x.auto).length} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else if(cmd==="sheet"){const [gid,aid,step]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m);
   console.log(rows.length?sheetOf(grp,m,rows).text:"Nothing to mark: every hand-in has a level.")}
 else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(aid,step),rows=await todo(grp,m),sh=sheetOf(grp,m,rows);
   const r=W.ELMark.parse(fs.readFileSync(file,"utf8"),{aid:m.a,step:m.step,crits:m.c,codes:sh.codes});if(r.err)throw new Error(r.err);
   const a=W.EL_CATALOG.find(x=>x.id===m.a),rk=a.id.replace("/","__");
-  for(const x of r.rows){const s=sh.codes.get(x.code).s,fb=flags.has("--feedback")&&x.fb;
-    console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+(x.flag?" · ⚠️ POSSIBLE COPY (no level, to the To do): "+x.flag:fb?" · feedback: "+x.fb:""));
+  for(const x of r.rows){const row=sh.codes.get(x.code),s=row.s,fb=flags.has("--feedback")&&x.fb,auto=!!x.flag&&autoRedo(row.route,row.h.ty);x.auto=auto;
+    console.log((flags.has("--apply")?"✓ ":"→ ")+x.code+" · "+Object.entries(x.lv).map(([c,l])=>c+"="+l).join(" ")+(auto?" · ↺ MOSTLY PASTED: no level, sent back to redo (note: "+redoNote(row.route,row.h.ty,x.flag)+")":x.flag?" · ⚠️ POSSIBLE COPY (no level, to the To do): "+x.flag:fb?" · feedback: "+x.fb:""));
     if(!flags.has("--apply"))continue;
+    if(auto){const at=new Date().toISOString();   // as the dashboard's Redo on a level moment: no level, the note, the next hand-in goes back to the sheet
+      await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",m.step),fp("replies",m.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
+        {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:at},flags:fsv({[m.step]:{why:x.flag,lv:x.lv,fb:fb?x.fb:"",at,done:"redo",auto:true}}),replies:fsv({[m.step]:redoNote(row.route,row.h.ty,x.flag)})}});continue}
     if(x.flag){await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+["ls","activity","updated",fp("flags",m.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
       {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},flags:fsv({[m.step]:{why:x.flag,lv:x.lv,fb:fb?x.fb:"",at:new Date().toISOString()}})}});continue}
     const paths=["ls","activity","updated",...m.c.map(c=>fp("levels",m.step,c)),fp("marked",m.step),...(fb?[fp("replies",m.step),fp("fbBy",m.step)]:[])];
     await api("PATCH",DOCS+`students/${s.uid}/results/${rk}?`+paths.map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
       {fields:{ls:fsv(a.ls),activity:fsv(a.id),updated:{timestampValue:new Date().toISOString()},levels:fsv({[m.step]:x.lv}),marked:fsv({[m.step]:new Date().toISOString()}),...(fb?{replies:fsv({[m.step]:x.fb}),fbBy:fsv({[m.step]:"marking"})}:{})}})}
-  const nf=r.rows.filter(x=>x.flag).length;
-  console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length-nf} · possible copies for the teacher: ${nf} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
+  const nf=r.rows.filter(x=>x.flag).length,na=r.rows.filter(x=>x.auto).length;
+  console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length-nf} · sent back automatically (mostly pasted): ${na} · possible copies for the teacher: ${nf-na} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else if(cmd==="comments"||cmd==="answer"){const its=await comments();
   if(cmd==="comments")console.log(its.length?W.ELMark.commentSheet({date:W.ELWeek.today(),items:its}):"No comments waiting for an answer.");
   else{const r=W.ELMark.parseComments(fs.readFileSync(args[0],"utf8"),{items:its});if(r.err)throw new Error(r.err);const now=new Date().toISOString();

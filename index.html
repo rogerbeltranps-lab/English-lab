@@ -1,9 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- The home page is only a welcome page to sign in (Roger, 7 Nov 2026: "it makes no sense that this menu exists since we all go to
+       the dashboards. Maybe, we should have a welcome page to sign in"). Whoever was signed in on this browser last (el_who, el-cloud.js)
+       goes to their dashboard at once, before anything is drawn: the teacher to teacher.html, students and the test account to their
+       board (today.html). The script below sends them again once Firebase knows who is signed in. The teacher's Courses and Learning
+       Situations lists stay at index.html#courses and #learning. -->
+  <script>try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&!/^#(courses|learning)$/.test(location.hash))location.replace(w.role==="teacher"?"teacher.html":"today.html")}catch(e){}</script>
+  <link rel="preload" as="image" href="avatar-roger.jpg">
+  <!-- No menu on the welcome page; the teacher's #courses and #learning lists get the app menu (shared/js/el-app.js, mode "home"),
+       never the page's old side menu and row of tabs (el-app.css); <html class="elgate">: the page shows once it is drawn. -->
+  <link rel="stylesheet" href="shared/css/el-app.css">
   <meta name="description" content="English with Roger — learning space for ESO and Batxillerat students." />
   <title>English with Roger</title>
   <style>
@@ -235,9 +245,16 @@
     .course-btn:focus-visible{outline:3px solid var(--text);outline-offset:3px}
     .course-btn strong{font-size:1.8rem;letter-spacing:-.04em}
     .course-btn span{font-size:.9rem;font-weight:700;opacity:.9}
+    .course-btn.signin-btn{background:var(--accent);min-width:240px}
     .course-btn.c2eso{background:#557c68}
     .course-btn.c4eso{background:#55769f}
     .pick-note{margin:14px 0 0;color:var(--muted);font-size:.92rem}
+    /* What's inside (the welcome page) */
+    body.elroot .home-grid{min-height:0}
+    .feat-title{margin:44px 0 16px;font-size:1.6rem;letter-spacing:-.03em}
+    .feat-list{margin:0;padding-left:1.3em;max-width:760px;display:grid;gap:10px;font-size:1.05rem;line-height:1.55}
+    .feat-list li::marker{color:var(--accent)}
+    @media (max-width:620px){.feat-title{margin-top:32px}}
     [hidden]{display:none!important}
 
     .mobile-tabs{display:none}
@@ -275,12 +292,12 @@
     }
   </style>
 </head>
-<body>
+<body class="elroot">
   <div class="mobile-tabs">
     <button class="tab-btn active" data-tab="home">Home</button>
     <button class="tab-btn" data-tab="courses" data-private hidden>Courses</button>
     <button class="tab-btn" data-tab="learning" data-private hidden>Learning Situations</button>
-    <a class="tab-btn" href="lab/">English Lab</a>
+    <a class="tab-btn" href="lab/">Games</a>
   </div>
 
   <div class="app">
@@ -290,31 +307,53 @@
         <button class="tab-btn active" data-tab="home">Home</button>
         <button class="tab-btn" data-tab="courses" data-private hidden>Courses</button>
         <button class="tab-btn" data-tab="learning" data-private hidden>Learning Situations</button>
-        <a class="tab-btn" href="lab/">English Lab</a>
+        <a class="tab-btn" href="lab/">Games</a>
       </nav>
       <div class="sidebar-note">Choose a section. The page changes here without scrolling down through everything.</div>
     </aside>
 
     <main class="content">
       <section class="panel active" id="home">
+        <!-- The welcome page (Roger, 7 Nov 2026): one Sign in button instead of 2 ESO / 4 ESO, and what the app is: teaching and learning
+             English by the Spanish and Catalan curriculum, through learning situations, competences and structured grammar and
+             vocabulary, with shadowing, flashcards and theory with games, and the teacher's tools to follow and keep students on task. -->
         <div class="home-grid">
           <div>
-            <span class="eyebrow">Learn · Practise · Create</span>
+            <span class="eyebrow">English Lab · ESO</span>
             <h1>Make your English real.</h1>
-            <p class="lead">Welcome to my English website. Choose your course and sign in with your school email and password to open your activities.</p>
+            <p class="lead">An app to <b>teach and learn English</b> in secondary school. It follows the <b>Spanish and Catalan curriculum</b> and is designed with a clear method: <b>learning situations</b>, <b>competences</b> and a structured plan of <b>grammar and vocabulary</b>, with every student working at their own level.</p>
             <div class="course-pick">
-              <a class="course-btn c2eso" href="2eso/index.html" data-course="2eso"><strong>2 ESO</strong><span>Sign in →</span></a>
-              <a class="course-btn c4eso" href="4eso/index.html" data-course="4eso"><strong>4 ESO</strong><span>Sign in →</span></a>
+              <a class="course-btn signin-btn" href="today.html"><strong>Sign in</strong><span>Open my dashboard →</span></a>
             </div>
-            <p class="pick-note">Use your school email (@ietramuntana.cat) and the password your teacher gave you.</p>
+            <p class="pick-note">Students: your school email (@ietramuntana.cat) and the password your teacher gave you.</p>
           </div>
 
           <aside class="intro-card">
             <img class="avatar" src="avatar-roger.jpg" alt="Roger avatar" />
             <h2>Hi, I'm Roger</h2>
-            <p>I’m an English and science teacher. This space brings together class materials, clear guidance and practical activities for ESO and Batxillerat students.</p>
+            <p>I’m a curious mind, always learning something new and looking for better ways to teach. I built English Lab so my students learn in a meaningful way, each at their own level, and I make sure they work on all four communicative skills equally: listening, reading, speaking and writing.</p>
           </aside>
         </div>
+
+        <h2 class="feat-title">What's inside</h2>
+        <ul class="feat-list">
+          <li>Each unit is a learning situation with a real final product, and marks are given by competence and criterion, as the curriculum asks.</li>
+          <li>Listening, reading, speaking and writing are worked equally in every unit.</li>
+          <li>Grammar and vocabulary come in a clear order, level by level, from A1 to B1+, with a study guide and summaries for every learning path.</li>
+          <li>Shadowing shows stressed words, linking and the melody, and flashcards and class games help students learn vocabulary and grammar.</li>
+          <li>Every student works on the same topic at their own level: Starter, Base, Core or Plus.</li>
+          <li>Activities are corrected automatically, and students keep seeing their answers and corrections when they come back.</li>
+          <li>Every writing comes back with the mistakes underlined, each one corrected and explained.</li>
+          <li>A serial story for each course, in four levels, keeps students reading at home.</li>
+          <li>Each student has their own board with what to do next, their mark so far and the teacher&#x27;s feedback.</li>
+          <li>The teacher sets homework from the dashboard, and students get a summary of the week by email.</li>
+          <li>Exams are done in the app.</li>
+          <li>After an exam, each student sees their mark for every criterion, explained in simple words.</li>
+          <li>Each unit ends with a final product marked with one clear rubric.</li>
+          <li>The teacher plans every group&#x27;s classes on an agenda and sees marks, corrections and messages in one place.</li>
+          <li>The teacher sees what each student has done and opens each learning path when the group is ready.</li>
+          <li>It works on school Chromebooks and on phones.</li>
+        </ul>
       </section>
 
       <section class="panel" id="courses">
@@ -360,25 +399,25 @@
 
           <a class="ls-card" href="2eso/my-real-routine/index.html">
             <span class="badge">2 ESO</span>
-            <h3>My Real Routine</h3>
+            <h3>LS1 · My Real Routine</h3>
             <p>Everyday routines, Present Simple, useful expressions and communication.</p>
             <span class="arrow">Open Learning Situation →</span>
           </a>
           <a class="ls-card" href="2eso/free-time-live/index.html">
             <span class="badge">2 ESO</span>
-            <h3>Free Time, Live!</h3>
+            <h3>LS2 · Free Time, Live!</h3>
             <p>Hobbies, events and the weather, live: what people are doing now and what they usually do, and your own vlog.</p>
             <span class="arrow">Open Learning Situation →</span>
           </a>
           <a class="ls-card" href="4eso/my-real-routine/index.html">
             <span class="badge">4 ESO</span>
-            <h3>My Real Routine</h3>
+            <h3>LS1 · My Real Routine</h3>
             <p>More natural language, richer expressions, speaking and writing challenges.</p>
             <span class="arrow">Open Learning Situation →</span>
           </a>
           <a class="ls-card" href="4eso/seasons-and-celebrations/index.html">
             <span class="badge">4 ESO</span>
-            <h3>Seasons &amp; Celebrations</h3>
+            <h3>LS2 · Seasons &amp; Celebrations</h3>
             <p>Why do we celebrate? Traditions, origins, plans and a Celebration Day proposal.</p>
             <span class="arrow">Open Learning Situation →</span>
           </a>
@@ -387,6 +426,7 @@
     </main>
   </div>
 
+  <script src="shared/js/el-app.js"></script>
   <script type="module">
     // English Lab has its own page (lab/), where students choose their level and sign in; old links still work.
     const initialTab = location.hash.slice(1);
@@ -407,21 +447,25 @@
     buttons.forEach(button => {
       button.addEventListener('click', () => openTab(button.dataset.tab));
     });
+    // the app menu (el-app.js) opens the panels with #home, #courses and #learning
+    addEventListener('hashchange', () => { if (!/^#(courses|learning)$/.test(location.hash) && window.ELCloud && ELCloud.user) location.replace(ELCloud.isTeacher(ELCloud.user) ? 'teacher.html' : 'today.html'); else openTab(location.hash.slice(1) || 'home'); });
 
-    // 2 ESO / 4 ESO: a signed-out visitor signs in here, and el-cloud then takes the student to their board.
-    // Before el-cloud has loaded, the link opens the course page, which asks for sign-in too.
-    document.querySelectorAll('.course-btn').forEach(link => {
+    // Sign in: the sign-in window here, and el-cloud then takes a student to their board and the teacher to the dashboard.
+    // Before el-cloud has loaded, the link opens the board, which asks for sign-in too.
+    document.querySelectorAll('.signin-btn').forEach(link => {
       link.addEventListener('click', event => {
-        if (window.ELCloud && !ELCloud.user) { event.preventDefault(); try { localStorage.setItem("el_pick", link.dataset.course); } catch (e) {} ELCloud.login(); }
+        if (window.ELCloud && !ELCloud.user) { event.preventDefault(); ELCloud.login(); }
       });
     });
 
     await import('./shared/js/el-cloud.js');
-    // Students never stay on this page (el-cloud sends them to their board), so only the teacher and the tester get here signed in.
+    // Signed in: off to the dashboard (teacher) or the board (students, the test account); only the teacher's and the test account's
+    // Courses and Learning Situations lists (#courses, #learning) stay here.
     ELCloud.onUser(u => {
-      const all = ELCloud.isTeacher(u) || (ELCloud.isTester(u) && !ELCloud.viewGroup());
+      const all = !ELCloud.viewing && (ELCloud.isTeacher(u) || (ELCloud.isTester(u) && !ELCloud.viewGroup()));
       document.querySelectorAll('[data-private]').forEach(b => { b.hidden = !all; });
-      if (all && initialTab) openTab(initialTab);
+      if (u && !(all && /^#(courses|learning)$/.test(location.hash))) { location.replace(ELCloud.isTeacher(u) && !ELCloud.viewing ? 'teacher.html' : 'today.html'); return; }
+      if (all && location.hash.length > 1) openTab(location.hash.slice(1));
     });
   </script>
 </body>

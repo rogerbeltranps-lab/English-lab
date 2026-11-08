@@ -76,7 +76,7 @@ window.EL_PLAN={
     ],
     extra:"Every recall checkpoint is done in class, 10 minutes (Roger, 1 Nov 2026), and each one counts with its first try. Students need every checkpoint to open the next Learning Path (enable it with the Learning Path). The exam is on Mon 23 Nov for both groups, so both get a catch-up class. LP3, LP5 and LP6 now also have Talk (and LP5–LP6 Listen again, 30 Oct): what does not fit in their two classes is finished at home (students do these alone with headphones) or in the catch-up class; the dates do not change. “Self-study” classes fall on the teacher's medical appointments: students work on the Learning Path on their own with the substitute and finish it as homework. 4ESO-B has five final product classes (4ESO-A six), so its teamwork and Reflect are homework. Until the exam, a class runs: checkpoint 10 min (or shadowing 5 min) · game-theory 10 (class A only) · together 10 (class A the path\u2019s listening on the projector, class B its reading or video chart, then students answer that step) · the path on their route 30\u201340 (the writing piece stays in class) · no final Blooket. Speaking, Talk, Listen again and one go of Shadowing are homework (Roger, 31 Oct 2026).",
     tips:[
-      ["Homework by","Remind them at the end of the class. Students see it on their board (🏠 Homework), in My week and in their Google Calendar if they subscribed; the dashboard lists it under “Homework to remind”."],
+      ["Homework by","A plan idea: students do not see it (Roger, 6 Nov 2026). If you don't finish in class, press 🏠 Set as homework next to it under “Homework to remind” (or on the session): then they see it on their board, in the ✅ To do button, in the Sunday email and in their calendar."],
       ["self-study","You are away (medical appointment): leave the substitute the Learning Path link. Students work on their own and finish it as homework for the next class. Nothing that needs you (checkpoints, groups, sample exam, rehearsals) is planned on these days."],
       ["LP1 Getting started","Start with the recall warm-up (My Real Routine) with no notes and before any review. Play the origins video for everyone; Insecure students can switch to the slow copy. End with “Which celebrations would you like to explore?”: you use the answers to form the groups next week."],
       ["LP2 Celebrations around the world","Practice, grammar and mixed practice count only as done on time, so let them retry freely; accuracy comes from the warm-ups and checkpoints. The reading has one text per route. The reading log is a hand-in: give it a level (NA · AS · AN · AE) on the dashboard, because it is the only level for 4.1 (the exam gives a score)."],
@@ -170,7 +170,7 @@ window.EL_PLAN={
     ],
     extra:"Rearranged on 30 Oct: LP2 had not started yet (and 2ESO-A had not done LP1), and LP2–LP6 now have Talk and Listen again. The exam stays on Fri 20 Nov and the final product starts the week after. From 3 Nov each group has 8 classes before the exam: 2ESO-B does LP2, LP3 and LP5 in two classes each and LP6 in one; 2ESO-A also does LP1, so its LP5 is one class too. What does not fit in class (usually Talk, Listen again and Speaking, which students do alone with headphones) is homework by the date shown. Every checkpoint is the first 10 minutes of the class that opens the next Learning Path and counts with its first try. Students need every checkpoint to open the next Learning Path (enable it with the Learning Path). “Self-study” classes fall on the teacher's medical appointments: students work on the Learning Path on their own with the substitute and finish it as homework. 2ESO-B starts the LS with two self-study classes: take a few minutes on Tue 3 Nov for doubts, after checkpoint 1. Until the exam, a class runs: checkpoint 10 min (or shadowing 5 min) · game-theory 10 (class A only) · together 10 (class A the path\u2019s listening on the projector, class B its reading or video chart, then students answer that step) · the path on their route 30\u201340 (the writing piece stays in class) · no final Blooket. Speaking, Talk, Listen again and one go of Shadowing are homework (Roger, 31 Oct 2026).",
     tips:[
-      ["Homework by","Remind them at the end of the class. Students see it on their board (🏠 Homework), in My week and in their Google Calendar if they subscribed; the dashboard lists it under “Homework to remind”."],
+      ["Homework by","A plan idea: students do not see it (Roger, 6 Nov 2026). If you don't finish in class, press 🏠 Set as homework next to it under “Homework to remind” (or on the session): then they see it on their board, in the ✅ To do button, in the Sunday email and in their calendar."],
       ["self-study","You are away (medical appointment): leave the substitute the Learning Path link. Students work on their own and finish it as homework for the next class. Nothing that needs you (checkpoints, groups, sample exam, rehearsals) is planned on these days."],
       ["LP1 Getting started","Start with the recall warm-up (My Real Routine: routine verbs, Present Simple) with no notes. Warm-ups and checkpoints count with their first try (students are not told); practice only needs to be done on time. “Where are you?” is at Safe level for everyone; Insecure has the slow copy."],
       ["LP2 What are they doing?","Present Continuous with clothes, kit and weather. The reading log is a hand-in: give it a level (NA · AS · AN · AE) on the dashboard, because it is the only level for 4.1 (the exam gives a score)."],
@@ -210,5 +210,18 @@ window.EL_PLAN={
 window.EL_TIMETABLE={
   groups:{"4ESOA":["Mon 8:30","Wed 12:00","Fri 13:00"],"4ESOB":["Mon 15:00","Tue 9:30","Wed 10:30"],
     "2ESOA":["Tue 12:00","Thu 12:00","Fri 8:30"],"2ESOB":["Tue 10:30","Thu 8:30","Fri 9:30"]},
-  off:["2026-10-30",["2026-12-07","2026-12-08"],["2026-12-15","2026-12-18"],["2026-12-22","2027-01-07"]]
+  off:["2026-10-30",["2026-12-07","2026-12-08"],["2026-12-15","2026-12-18"],["2026-12-22","2027-01-07"]],
+  len:60   // minutes a class lasts
 };
+// 🗓 This is the starting timetable. The teacher edits it on the dashboard (🗓 Timetable, Roger 6 Nov 2026): it is saved in
+// settings/timetable (the dashboard reads it and replaces this one) and each group's part in live/{group}.tt (student pages).
+// End of the group's class going on at `at` (ms; from 5 minutes before it starts until it ends), as a time in ms, or null when the group
+// has no class then. A pull-up made during a class is released when that class ends (Roger, 5 Nov 2026: "when I finish a class, this
+// should be released"): the teacher writes it as `until` on the pull-up (ls/{id}.push[group], live/{group}.go).
+window.elClassEnd=function(gid,at){const T=window.EL_TIMETABLE,d=new Date(at||Date.now());if(!T||!T.groups||!T.groups[gid])return null;
+  const ymd=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  if((T.off||[]).some(o=>Array.isArray(o)?o[0]<=ymd&&ymd<=o[1]:o===ymd))return null;
+  const dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()],m=d.getHours()*60+d.getMinutes();
+  for(const sl of T.groups[gid]){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const s=+x[2]*60+ +x[3];
+    const len=+T.len||60;if(m>=s-5&&m<s+len){const e=new Date(d);e.setHours(0,0,0,0);return e.getTime()+(s+len)*60e3}}
+  return null};

@@ -83,9 +83,9 @@ for (const S of STATES) {
     add('side', q('aside.side')); add('nav', q('aside.side .nvs')); add('livebox', q('#live .pend')); add('livego', q('#live .pend a.go'));
     add('gonote', q('.gonote')); add('gocount', q('.gonote .c'));
     add('h1', q('h1')); add('sub', q('#sub')); add('pull', q('.pullcard')); add('pullgo', q('.pullcard .pc-go'));
-    add('ann', q('.box.ann')); add('points', q('#ptbox .box')); add('work', q('.box.work')); add('workbar', q('.box.work .wkgrid'));
-    add('workmiss', q('.box.work .ptmiss')); add('howto', qa('#note .pend').find((x) => /🎬/.test(x.textContent)));
-    add('late', q('.pend.late')); add('ptno', q('#ptbox .ptno')); add('ptmissbox', q('#ptbox .ptmiss'));
+    add('ann', q('.box.ann')); add('points', q('#ptbox .box')); add('work', q('.box.work')); add('workbar', q('.box.work .fv-stats'));
+    add('workmiss', q('.box.work .fv-missbox')); add('howto', qa('#note .pend').find((x) => /🎬/.test(x.textContent)));
+    add('late', q('.pend.late')); add('ptno', q('#ptbox .ptno')); add('ptmissbox', q('#ptbox .fv-warn'));
     add('lscard', q('.lscard')); add('lspick', q('.lspick')); add('lvline', q('.lvline')); add('btabs', q('.btabs'));
     qa('.lsbtn').forEach((x, i) => add('lsbtn' + i, x));
     qa('.btab').forEach((x) => add('tab-' + [...x.classList].find((c) => c.startsWith('b-')).slice(2), x));
@@ -112,7 +112,7 @@ for (const S of STATES) {
     // final product tab
     qa('.t-fp .box').forEach((x, i) => add('fpbox' + i, x));
     add('fpsteps', q('.t-fp .fpst')); add('fpans', q('.t-fp .ans')); add('fpfeedback', q('.t-fp .fb'));
-    add('fprubric', qa('.t-fp .box').pop()); add('fpmark', q('.t-fp .lphead > b')); add('fpreview', q('.t-fp .fpst a.go'));
+    add('fprubric', qa('.t-fp .box').pop()); add('fpmark', q('.t-fp .fv-stat .fv-big')); add('fpreview', q('.t-fp .fpst a.go'));
     // exam tab
     qa('.t-exam > .box').forEach((x, i) => add('ex' + i, x));
     add('wrub', q('.wrub')); qa('.wrub .wr').forEach((x, i) => add('wr' + i, x));

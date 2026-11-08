@@ -14,7 +14,7 @@ window.LP.native = {
     ] },
 
   vocab: { type: 'vocab', tab: 'Vocabulary', title: 'C2 vocabulary: origins and change',
-    intro: 'Explore, go through the cards and complete the sentences (80 %). These words let you talk about how traditions begin, change and survive.',
+    intro: 'Explore, go through the cards and complete the sentences. These words let you talk about how traditions begin, change and survive.',
     receptive: 'antiquarian · revivalist · palimpsest · vestigial · Christianised',
     groups: [
       { g: 'Origins', items: [
@@ -53,7 +53,7 @@ window.LP.native = {
       { q: 'Halloween is rooted ___ the Celtic festival of Samhain.', a: ['in'] }
     ] },
 
-  listen: { type: 'mc', tab: 'Listening', title: 'Listening: The story behind two autumn celebrations', pill: 'Podcast · 80 %',
+  listen: { type: 'mc', tab: 'Listening', title: 'Listening: The story behind two autumn celebrations', pill: 'Podcast',
     intro: 'The same podcast as your class, with C2 Proficiency Listening questions (Parts 1 and 3): purpose, attitude and what the speakers imply. Listen once, read the questions, then listen again.',
     media: { audio: 'audio/culture-bites-origins.mp3', title: 'Culture Bites: the story behind two autumn celebrations' },
     items: [
@@ -77,7 +77,7 @@ window.LP.native = {
     ],
     rate: ['I went beyond what the speakers say directly', 'I named a technique, with a quote', 'My comparison is about meaning, not just facts'] },
 
-  grammar: { type: 'typed', tab: 'Grammar', title: 'Talking about the past at C2: reporting, would, participle clauses', pill: '80 %',
+  grammar: { type: 'typed', tab: 'Grammar', title: 'Talking about the past at C2: reporting, would, participle clauses', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Key word transformations (Reading and Use of English, Part 4). Complete the second sentence with 3–8 words, including the word in CAPITALS.',
     explain: [
       '<strong>Impersonal reporting</strong> for uncertain history: <em>It is believed that… · Halloween is thought to have originated in… · The custom is said to date back to…</em> (perfect infinitive for the past).',
@@ -98,7 +98,7 @@ window.LP.native = {
       { q: 'The festival changed a lot because of emigration. RESULT → The festival changed a lot ___ emigration.', a: ['as a result of'], en: 'as a result of.' }
     ] },
 
-  mixed: { type: 'typed', tab: 'Word formation', title: 'Word formation: Inventing tradition', pill: '80 %',
+  mixed: { type: 'typed', tab: 'Word formation', title: 'Word formation: Inventing tradition', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
     intro: 'Reading and Use of English, Part 3: form a word from the word in CAPITALS to fit each gap. Check the part of speech, the prefix (often negative) and the plural.',
     explain: [
       '<div class="reading" style="font-weight:400">Many customs we think of as ancient are, in fact, (1) ___ (SURPRISE) recent. The historian Eric Hobsbawm called them “invented traditions”: practices that claim (2) ___ (CONTINUE) with the past but were created to give a group a sense of (3) ___ (BELONG). The Scottish kilt in its modern form, for example, owes more to the nineteenth century than to any (4) ___ (ANCESTOR) clan custom. None of this makes such traditions (5) ___ (MEANING). Their (6) ___ (ATTRACT) lies precisely in the fact that they feel old, and the (7) ___ (WILLING) of people to embrace them says a great deal about our need for roots. Critics who dismiss them as mere (8) ___ (FABRICATE) miss the point.</div>'

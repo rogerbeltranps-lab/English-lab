@@ -4,39 +4,24 @@ PRODID:-//English Lab//Homework//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 X-WR-CALNAME:English · 4ESO A
-X-WR-CALDESC:Homework, classes on your own and exams of 4ESO A (English Lab
- )
+X-WR-CALDESC:Homework and exams of 4ESO A (English Lab)
 X-WR-TIMEZONE:Europe/Madrid
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 X-PUBLISHED-TTL:PT6H
 BEGIN:VEVENT
-UID:4esoa-4eso-seasons-and-celebrations-hw-2026-11-13-4fcl8x@english-lab
+UID:4esoa-4eso-seasons-and-celebrations-hw-2026-11-09-kbcm3k@english-lab
 DTSTAMP:20261031T000000Z
-DTSTART;VALUE=DATE:20261111
-DTEND;VALUE=DATE:20261113
-SUMMARY:🏠 English homework for Fri 13 Nov: LP5 Speaking\, Talk and Liste
- n again
-DESCRIPTION:LP5 Speaking\, Talk and Listen again\nFor the English class on 
- Fri 13 Nov · Per a la classe d'anglès del dv. 13 nov..\nSeasons & Celebr
- ations: https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-
- celebrations/index.html\nMy board / El meu tauler: https://rogerbeltranps-
- lab.github.io/English-lab/today.html
-URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
- rations/index.html
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
-UID:4esoa-4eso-seasons-and-celebrations-hw-2026-11-18-13ccvbm@english-lab
-DTSTAMP:20261031T000000Z
-DTSTART;VALUE=DATE:20261116
-DTEND;VALUE=DATE:20261118
-SUMMARY:🏠 English homework for Wed 18 Nov: LP6 Speaking\, Talk and Liste
- n again
-DESCRIPTION:LP6 Speaking\, Talk and Listen again\nFor the English class on 
- Wed 18 Nov · Per a la classe d'anglès del dc. 18 nov..\nSeasons & Celebr
- ations: https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-
- celebrations/index.html\nMy board / El meu tauler: https://rogerbeltranps-
- lab.github.io/English-lab/today.html
+DTSTART;VALUE=DATE:20261106
+DTEND;VALUE=DATE:20261109
+SUMMARY:🏠 English homework for Mon 9 Nov: LP3 Where traditions come from
+ : Recall\, Vocabulary\, Listening\, Listening chart\, Shadowing\, Grammar\
+ , Mixed\, Writing\, Speaking\, Talk
+DESCRIPTION:LP3 Where traditions come from: Recall\, Vocabulary\, Listening
+ \, Listening chart\, Shadowing\, Grammar\, Mixed\, Writing\, Speaking\, Ta
+ lk\nFor the English class on Mon 9 Nov · Per a la classe d'anglès del dl
+ . 9 nov..\nSeasons & Celebrations: https://rogerbeltranps-lab.github.io/En
+ glish-lab/4eso/seasons-and-celebrations/index.html\nMy board / El meu taul
+ er: https://rogerbeltranps-lab.github.io/English-lab/today.html
 URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
  rations/index.html
 TRANSP:TRANSPARENT

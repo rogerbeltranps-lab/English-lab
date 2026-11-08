@@ -74,3 +74,11 @@ var learningSupport = {
     document.head.appendChild(e);
   });
 })();
+
+// 🔊 Flashcard voice (Roger, 7 Nov 2026): every Learning Path page loads this file, so it brings shared/js/el-voice.js (Listen buttons
+// under each #flashcard, recorded Kokoro voice from audio/voice/).
+(function () {
+  if (window.ELVoice || document.querySelector('script[src*="el-voice.js"]')) return;
+  const me = document.currentScript && document.currentScript.src; if (!me) return;
+  const s = document.createElement('script'); s.src = new URL('el-voice.js', me).href; document.head.appendChild(s);
+})();

@@ -18,7 +18,7 @@ window.LP = {
         { r: 'daring', q: 'I ___ (prefer) skating to cycling.', a: ['prefer'] }
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Tecnologia i pantalles', en: 'Technology and screens' },
-      intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
+      intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       receptive: 'livestream · subscribers · highlights',
       core: { beginners: ['watch videos', 'take photos', 'chat with friends', 'send a message'], insecure: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message'], safe: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message', 'upload a video', 'follow a channel', 'download an app', 'search online', 'check a website', 'screen time', 'social media'], daring: ['watch videos', 'play online', 'chat with friends', 'take photos', 'record a video', 'send a message', 'upload a video', 'follow a channel', 'download an app', 'search online', 'check a website', 'screen time', 'social media', 'a reliable source', 'the author', 'up to date', 'an advert', 'credit a source'] },
       groups: [
@@ -44,7 +44,7 @@ window.LP = {
         { r: 'daring', q: 'Is this page ___ ___ date? It says “2019”.', a: ['up to'] },
         { r: 'daring', q: 'This page is not information: it’s an ___ for trainers.', a: ['advert', 'advertisement', 'ad'] }
       ] },
-    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Can you trust this page?', pill: '80 %',
+    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Can you trust this page?', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Aquest text t’explica com saber si una pàgina web és fiable. Llegeix-lo i respon.', en: 'This text explains how to know if a web page is reliable. Read it and answer.' },
       media: { text: {
         beginners: '<p>You want facts for your vlog. Before you use a web page, ask four questions.</p><p><strong>1. Who is the author?</strong> Look for a name: a club, a museum, a school. No name? Be careful.</p><p><strong>2. When is it from?</strong> Look for a date. Old pages have old information.</p><p><strong>3. Why is it there?</strong> Some pages inform you. Other pages want your money: a shop says “the best skateboard in the world”.</p><p><strong>4. What type of website is it?</strong> An official website or an encyclopedia is better than a video with no sources.</p><p>At the end of your vlog, credit your source and your photos: the title, the website and the year.</p><p class="tiny"><strong>Paraules:</strong> author = autor/a · be careful = ves amb compte · date = data · money = diners · credit = cita · source = font</p>',
@@ -65,7 +65,7 @@ window.LP = {
         { r: 'daring', q: '“Its opinion is not a fact” means…', o: ['What the shop says is not necessarily true.', 'The shop is always right.', 'Opinions are not allowed online.'] }
       ] },
     // LS criterion 4.2: rate pages as reliable or not with reasons from the checklist (author, date, purpose, type of website).
-    { id: 'sources', type: 'mc', tab: { ca: 'Fonts', en: 'Sources' }, title: { ca: 'Fiable o no fiable?', en: 'Reliable or not?' }, pill: '80 %',
+    { id: 'sources', type: 'mc', tab: { ca: 'Fonts', en: 'Sources' }, title: { ca: 'Fiable o no fiable?', en: 'Reliable or not?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Per a cada pàgina, tria l’opció correcta. Llegeix l’explicació després de comprovar: són les raons de la llista (autor, data, propòsit, tipus de web).', en: 'Choose for each page. Read the explanation after you check: the reasons come from the checklist (author, date, purpose, type of website).' },
       items: [
         { q: 'The Catalan Skateboarding Federation’s website: “Rules of skateboarding competitions”, updated 2026.', o: ['Reliable', 'Not reliable'], ex: { ca: 'Autor conegut (una federació), data recent, propòsit: informar.', en: 'Known author (a federation), recent date, purpose: to inform.' } },
@@ -77,7 +77,7 @@ window.LP = {
         { r: 'safe', q: 'A famous player’s social media post: “Our match is on Sunday at 6, come!”', o: ['Reliable for the time of the match, but check the rest', 'Not reliable for anything'], ex: { en: 'The author knows the match, but a post is not a source for facts about the sport.' } },
         { r: 'daring', q: 'A blog called “Skate Life” by a 15-year-old fan, no dates, no sources.', o: ['Not reliable: no dates or sources, even if the author loves skating', 'Reliable: the author is a real skater'], ex: { en: 'Loving a hobby is not the same as checking facts; no dates, no sources.' } }
       ] },
-    { id: 'credit', type: 'mc', tab: { ca: 'Crèdits', en: 'Credits' }, title: { ca: 'Cita les fonts i les fotos', en: 'Credit your sources and photos' }, pill: '80 %',
+    { id: 'credit', type: 'mc', tab: { ca: 'Crèdits', en: 'Credits' }, title: { ca: 'Cita les fonts i les fotos', en: 'Credit your sources and photos' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Ordre: <strong>"Títol de la pàgina", web, any.</strong> Per a una foto: <strong>Photo: nom o web.</strong> Exemple: <em>"Rules of skateboarding competitions", Catalan Skateboarding Federation, 2026.</em>', en: 'Order: <strong>"Title of the page", website, year.</strong> For a photo: <strong>Photo: name or website.</strong> Example: <em>"Rules of skateboarding competitions", Catalan Skateboarding Federation, 2026.</em>' },
       items: [
         { q: 'Which credit line is in the right order?', o: ['"Basketball", Encyclopedia website, 2026.', '2026, Basketball, Encyclopedia website.', 'Encyclopedia website Basketball 2026'] },
@@ -85,7 +85,7 @@ window.LP = {
         { q: 'Which is the right way to credit a photo you did not take?', o: ['Photo: Marta Vila (Climb Up Club).', 'No credit: it is only a photo.', 'Photo: me.'] },
         { r: 'safe', q: 'Where do the credits go in your vlog?', o: ['on the last slide', 'on the first slide', 'nowhere'] }
       ] },
-    { id: 'again', type: 'mc', tab: { ca: 'Escolta una font', en: 'Listen to a source' }, title: { ca: 'Escolta: fets o opinions?', en: 'Listen: facts or opinions?' }, pill: { ca: 'Ràdio · 80 %', en: 'Radio · 80 %' },
+    { id: 'again', type: 'mc', tab: { ca: 'Escolta una font', en: 'Listen to a source' }, title: { ca: 'Escolta: fets o opinions?', en: 'Listen: facts or opinions?' }, pill: { ca: 'Ràdio', en: 'Radio' },
       intro: { ca: 'Escolta la ràdio de l’LP2 com un investigador: qui parla, quins fets dona i què és opinió.', en: 'Listen to the LP2 radio like a researcher: who is speaking, what facts do they give and what is opinion?' },
       media: { audio: 'audio/live-from-the-sports-hall.mp3', title: 'Live from the sports hall', script: [
         ['Emma', '[excited] Hello and welcome to School Radio! We’re at the sports hall and the big match is starting: the Blue Team against the Green Team. Sam, what’s happening?'],
@@ -113,7 +113,7 @@ window.LP = {
       clip: { title: 'Live from the sports hall', src: 'audio/live-from-the-sports-hall.mp3', slow: 'audio/live-from-the-sports-hall-slow.mp3', t: [37.04, 69.96], ts: [42.83, 80.96], lines: [
         ['Sam', 'And the match is starting! Number seven, Marc, has the ball. He’s running… he’s jumping… and he scores! Two points for the Blue Team!'],
         ['Emma', 'Marc usually plays as a defender, but today he’s playing as a forward. And it’s working!'],
-        ['Sam', 'Now the Green Team has the ball. Their captain, Júlia, is passing to number four… she’s shooting… and she misses. The Blue Team is winning, six to two.']] } },
+        ['Sam', 'Now the Green Team has the ball. Their captain, Júlia, is passing to number four… she’s shooting… and she misses. The Blue Team is winning, six to two.']], marks: [["And the **match**‿is **start**ing! ↘", "**Num**ber **sev**en, ↗ **Marc**, ↗ has the **ball**. ↘", "He’s **run**ning… ↗ he’s **jump**ing… ↗ and he **scores**! ↘", "**Two** **points** for the **Blue** **Team**! ↘"], ["**Marc** **us**ually **plays**‿as‿a de**fend**er, ↗ but to**day** he’s **play**ing as a **for**ward. ↘", "And‿it’s **work**ing! ↘"], ["**Now** the **Green** **Team** has the **ball**. ↘", "Their **cap**tain, ↗ **Jú**lia, ↗ is **pass**ing to **num**ber **four**… ↗ she’s **shoot**ing… ↗ and she **miss**es. ↘", "The **Blue** **Team**‿is **win**ning, ↗ **six** to **two**. ↘"]], cues: [[37.17, 39.11, 42.96, 45.22], [39.24, 41.62, 45.38, 48.16], [41.69, 45.95, 48.26, 53.27], [45.96, 48.24, 53.3, 55.9], [49.16, 53.98, 56.85, 62.44], [54.13, 55.97, 62.6, 64.78], [57.14, 59.49, 66.0, 68.71], [59.68, 66.07, 68.98, 76.41], [66.6, 69.86, 77.13, 80.86]] } },
     { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: d’on ho has tret?', en: 'Talk: where did you find it?' },
       intro: { ca: 'El teu company de vlog et pregunta per la font de la teva fitxa.', en: 'Your vlog buddy asks you about the source for your fact file.' },
       task: { beginners: 'Respon amb frases curtes: el nom de la web, qui l’ha escrit i si és fiable.', insecure: 'Respon amb frases completes sobre la teva font: el nom, qui l’ha escrit, la data i si és fiable.', safe: 'Answer about your real source. Give reasons: who wrote it, when, and one fact you found.', daring: 'Answer about your real source, give reasons and say how you checked a fact in a second source.' },

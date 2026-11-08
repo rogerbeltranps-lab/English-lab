@@ -70,8 +70,8 @@ export async function firestore(){
     get:async p=>doc(await api("GET",BASE+"/"+p)),
     // every document of a collection (or subcollection path): [[id, data]]
     list:async p=>{const out=[];let tok="";do{const j=await api("GET",BASE+"/"+p+"?pageSize=300"+(tok?"&pageToken="+tok:""));(j?.documents||[]).forEach(d=>out.push([d.name.split("/").pop(),doc(d)]));tok=j?.nextPageToken||""}while(tok);return out},
-    // documents of a top-level collection with created >= from
-    since:async(coll,from)=>((await api("POST",BASE+":runQuery",{structuredQuery:{from:[{collectionId:coll}],
-      where:{fieldFilter:{field:{fieldPath:"created"},op:"GREATER_THAN_OR_EQUAL",value:{timestampValue:from}}},orderBy:[{field:{fieldPath:"created"}}]}}))||[])
+    // documents of a top-level collection with created (or another timestamp field) >= from
+    since:async(coll,from,field="created")=>((await api("POST",BASE+":runQuery",{structuredQuery:{from:[{collectionId:coll}],
+      where:{fieldFilter:{field:{fieldPath:field},op:"GREATER_THAN_OR_EQUAL",value:{timestampValue:from}}},orderBy:[{field:{fieldPath:field}}]}}))||[])
       .filter(x=>x.document).map(x=>Object.assign({id:x.document.name.split("/").pop()},doc(x.document)))};
 }

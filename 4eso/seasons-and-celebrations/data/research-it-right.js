@@ -16,7 +16,7 @@ window.LP = {
         { r: 'daring', q: 'Diwali, ___ is celebrated in autumn, is the festival of lights.', a: ['which'] },
         { r: 'daring', q: '___ it started in Europe, Halloween is popular in the USA.', a: ['although', 'even though'] }
       ] },
-    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Check it before you share it', pill: '80 %',
+    { id: 'read', type: 'mc', tab: 'Reading', title: 'Reading: Check it before you share it', pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Aquest text t’explica com saber si una font és fiable. Llegeix-lo i respon.', en: 'This text explains how to know if a source is reliable. Read it and answer.' },
       media: { text: {
         beginners: '<p>Before you put information on a slide, check it. Ask four questions.</p><p><strong>1. Who wrote it?</strong> Look for a name: an author, a museum, a university or an official website. No name? Be careful.</p><p><strong>2. When is it from?</strong> Diwali, Hanukkah and Lunar New Year change their date every year. Check that the information is for this year.</p><p><strong>3. Why did they write it?</strong> Some pages inform you. Other pages want to sell you something, like costumes.</p><p><strong>4. Do other pages say the same?</strong> Find each fact in at least two good sources.</p><p>At the end, write your sources: the title, the website and the year. Don’t copy sentences: write your own.</p><p class="tiny"><strong>Paraules:</strong> check = comprovar · author = autor/a · source = font · sell = vendre · fact = fet, dada</p>',
@@ -33,7 +33,7 @@ window.LP = {
         { r: 'daring', q: 'What should you do if two reliable sources disagree?', o: ['choose the more reliable one or say that they disagree', 'use the first one you found', 'invent the answer'] },
         { r: 'daring', q: 'Which sentence avoids a stereotype?', o: ['Many families in China celebrate with a reunion dinner.', 'All Chinese people eat dumplings at New Year.', 'Chinese people always wear red.'] }
       ] },
-    { id: 'sources', type: 'mc', tab: { ca: 'Fonts', en: 'Sources' }, title: { ca: 'Fiable, cal comprovar-ho o no fiable?', en: 'Reliable, check it, or not reliable?' }, pill: '80 %',
+    { id: 'sources', type: 'mc', tab: { ca: 'Fonts', en: 'Sources' }, title: { ca: 'Fiable, cal comprovar-ho o no fiable?', en: 'Reliable, check it, or not reliable?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Per a cada font, tria l’opció correcta. Llegeix l’explicació després de comprovar.', en: 'Choose for each source. Read the explanation after you check.' },
       items: [
         { q: 'A page about Diwali on a national museum’s website, author named, updated 2025.', o: ['Reliable', 'Check it', 'Not reliable'], ex: { ca: 'Organització coneguda, autor i data recent.', en: 'Known organisation, author and recent date.' } },
@@ -44,7 +44,7 @@ window.LP = {
         { q: 'The Catalan government’s culture website on the Castanyada.', o: ['Reliable', 'Check it', 'Not reliable'], ex: { ca: 'Font oficial.', en: 'An official source.' } },
         { r: 'insecure', only: ['insecure'], q: 'A classmate’s blog, no date, with facts copied from a video.', o: ['Not reliable', 'Reliable', 'Check it'], ex: { ca: 'Sense data ni fonts, i copiat d’un vídeo.', en: 'No date, no sources, and copied from a video.' } }
       ] },
-    { id: 'respect', type: 'mc', tab: { ca: 'Respecte', en: 'Respect' }, title: { ca: 'Informació, no creença', en: 'Information, not belief' }, pill: '80 %',
+    { id: 'respect', type: 'mc', tab: { ca: 'Respecte', en: 'Respect' }, title: { ca: 'Informació, no creença', en: 'Information, not belief' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Tria la versió que explica la celebració com a informació i amb respecte.', en: 'Choose the version that presents the celebration as information, respectfully.' },
       items: [
         { q: '“During Diwali, light wins over darkness.”', o: ['For many Hindus, Diwali celebrates light winning over darkness.', 'Diwali makes light win over darkness.', 'Diwali is when darkness disappears.'], ex: { ca: '“For many Hindus…” diu qui ho creu.', en: '“For many Hindus…” says who believes it.' } },
@@ -53,7 +53,7 @@ window.LP = {
         { q: '“People in China all eat dumplings.”', o: ['Many families in northern China eat dumplings at Lunar New Year.', 'All Chinese people eat dumplings.', 'Chinese people only eat dumplings.'], ex: { ca: 'Evita generalitzar: “many families”.', en: 'Avoids generalising: “many families”.' } },
         { r: 'insecure', only: ['insecure'], q: '“Thanksgiving is just a day to eat too much.”', o: ['In the USA, families share a big meal at Thanksgiving to give thanks.', 'Thanksgiving is a day to eat too much.', 'Americans only eat turkey.'], ex: { ca: 'Explica el sentit de la festa sense jutjar.', en: 'It explains the meaning without judging.' } }
       ] },
-    { id: 'notes', type: 'mc', tab: { ca: 'Notes', en: 'Notes' }, title: { ca: 'Notes, no còpies', en: 'Notes, not copies' }, pill: '80 %',
+    { id: 'notes', type: 'mc', tab: { ca: 'Notes', en: 'Notes' }, title: { ca: 'Notes, no còpies', en: 'Notes, not copies' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Tria les millors notes: paraules clau, no frases copiades.', en: 'Choose the best notes: key words, not copied sentences.' },
       items: [
         { q: '“Lunar New Year is celebrated in China, Vietnam and Korea in late January or February.”', o: ['LNY: China, Vietnam, Korea · late Jan / Feb', 'Lunar New Year is celebrated in China, Vietnam and Korea in late January or February.', 'LNY: China · summer'] },
@@ -61,14 +61,14 @@ window.LP = {
         { q: '“The first Thanksgiving was a three-day harvest feast in 1621.”', o: ['1st Thanksgiving: 1621 · harvest feast · 3 days', 'The first Thanksgiving was a three-day harvest feast in 1621.', 'Thanksgiving: 1863 · 1 day'] },
         { r: 'insecure', only: ['insecure'], q: '“At the Castanyada, people in Catalonia eat roast chestnuts, sweet potatoes and panellets on 31 October.”', o: ['Castanyada: 31 Oct · chestnuts, sweet potatoes, panellets', 'At the Castanyada, people in Catalonia eat roast chestnuts, sweet potatoes and panellets.', 'Castanyada: 1 Nov · turkey'] }
       ] },
-    { id: 'credit', type: 'mc', tab: { ca: 'Crèdits', en: 'Credits' }, title: { ca: 'Cita les fonts', en: 'Credit your sources' }, pill: '80 %',
+    { id: 'credit', type: 'mc', tab: { ca: 'Crèdits', en: 'Credits' }, title: { ca: 'Cita les fonts', en: 'Credit your sources' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Ordre: <strong>"Títol de la pàgina", web o autor, any.</strong> Exemple: <em>"The Castanyada", Catalan culture website, 2025.</em>', en: 'Order: <strong>"Title of the page", website or author, year.</strong> Example: <em>"The Castanyada", Catalan culture website, 2025.</em>' },
       items: [
         { q: 'Which credit line is in the right order?', o: ['"Diwali", Encyclopedia website, 2024.', '2024, Diwali, Encyclopedia website.', 'Encyclopedia website 2024 "Diwali"'] },
         { q: 'Which credit line is complete?', o: ['"Thanksgiving history", History museum website, 2025.', '"Thanksgiving history".', 'I found it on the internet.'] },
         { r: 'insecure', only: ['insecure'], q: 'Which credit line is right for a video?', o: ['"Diwali in two minutes", BBC video, 2023.', 'A video I watched.', 'YouTube.'] }
       ] },
-    { id: 'again', type: 'mc', tab: { ca: 'Escolta una font', en: 'Listen to a source' }, title: { ca: 'Escolta: un pòdcast també és una font', en: 'Listen: a podcast is a source too' }, pill: { ca: 'Pòdcast · 80 %', en: 'Podcast · 80 %' },
+    { id: 'again', type: 'mc', tab: { ca: 'Escolta una font', en: 'Listen to a source' }, title: { ca: 'Escolta: un pòdcast també és una font', en: 'Listen: a podcast is a source too' }, pill: { ca: 'Pòdcast', en: 'Podcast' },
       intro: { ca: 'Escolta el pòdcast de l’LP3 com un investigador: quins fets dona, quins comprovaries i com parla de les creences.', en: 'Listen to the LP3 podcast like a researcher: what facts does it give, which ones would you check, and how does it talk about beliefs?' },
       media: { audio: 'audio/culture-bites-origins.mp3', title: 'Culture Bites: the story behind two autumn celebrations', script: [
         ['Emma', 'Welcome back to Culture Bites. Today: where do two famous autumn celebrations come from? Let’s start with Halloween.'],
@@ -103,7 +103,7 @@ window.LP = {
         ['Emma', 'Welcome back to Culture Bites. Today: where do two famous autumn celebrations come from? Let’s start with Halloween.'],
         ['Sam', 'Halloween comes from an old Celtic festival called Samhain. It took place in Ireland and Scotland more than two thousand years ago, at the end of the harvest and the start of winter.'],
         ['Emma', 'And people believed that on that night, the spirits of the dead came back.'],
-        ['Sam', 'Exactly. So people used to light bonfires and wear masks to hide from the spirits. And here’s a surprise: they didn’t use pumpkins. They used to carve turnips!']] } },
+        ['Sam', 'Exactly. So people used to light bonfires and wear masks to hide from the spirits. And here’s a surprise: they didn’t use pumpkins. They used to carve turnips!']], marks: [["**Wel**come **back** to **Cul**ture **Bites**. ↘", "To**day**: **where** do **two** **fa**mous **au**tumn cele**bra**tions **come** from? ↘", "Let’s **start** with Hallo**ween**. ↘"], ["Hallo**ween** **comes** from‿an **old** **Cel**tic **fes**tival called **Sam**hain. ↘", "It **took** **place**‿in **Ire**land and **Scot**land **more** than **two** **thou**sand **years** a**go**, ↗ at the **end**‿of the **har**vest and the **start** of **win**ter. ↘"], ["And **peo**ple be**lieved** that‿on that **night**, ↗ the **spir**its‿of the **dead** came **back**. ↘"], ["Ex**act**ly. ↘ So **peo**ple used to **light** **bon**fires‿and wear **masks** to **hide** from the **spir**its. ↘", "And **here’s**‿a sur**prise**: they **did**n’t **use** **pump**kins. ↘", "They **used**‿to **carve** **tur**nips! ↘"]], cues: [[0, 2.05, 0, 2.41], [2.07, 6.48, 2.45, 7.56], [6.9, 8.72, 8.11, 10.28], [8.88, 13.06, 10.85, 15.72], [13.25, 20.37, 15.95, 24.27], [20.6, 25.55, 24.97, 30.58], [25.7, 31.48, 31.3, 38.02], [31.71, 35.39, 38.38, 42.69], [35.54, 37.77, 42.88, 45.42]] } },
     { id: 'talk', type: 'talk', tab: { ca: 'Conversa', en: 'Talk' }, title: { ca: 'Conversa: és fiable?', en: 'Talk: can we trust it?' },
       intro: { ca: 'Un company et pregunta per la font que has trobat per a la fitxa de recerca.', en: 'A teammate asks you about the source you found for your research card.' },
       task: { beginners: 'Respon amb frases curtes: on l’has trobat, qui l’ha escrit i si és fiable.', insecure: 'Respon amb frases completes sobre la teva font: on és, qui l’ha escrit, de quan és i si és fiable.', safe: 'Answer each question about your real source. Give reasons: who wrote it, when, and how you checked the facts.', daring: 'Answer about your real source with reasons and evidence, and explain what you do when two sources disagree.' },

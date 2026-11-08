@@ -1,5 +1,5 @@
 // English Lab class game (Roger, 26 Oct 2026): what the board (host.html) and the player (play.html) share. window.ELGame:
-//   md(text)        a deck's text as HTML: **word** is highlighted, ___ is a gap (everything else is escaped)
+//   md(text)        a deck's text as HTML: **word** is highlighted, ~~word~~ is crossed out (a mistake), ___ is a gap (everything else is escaped)
 //   pic(img)        a picture: an emoji, or an image file (a path or https address)
 //   shuffle(n,seed) the order of n options for one question of one game (the same on every reload)
 //   norm(text)      a written answer made comparable: lower case, straight apostrophes, single spaces, no full stop at the end
@@ -11,7 +11,7 @@
 //   bg()            the floating shapes behind the page
 (function(){
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b class="k">$1</b>').replace(/_{3,}/g,'<span class="gap"></span>');
+const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b class="k">$1</b>').replace(/~~(.+?)~~/g,'<s class="no">$1</s>').replace(/_{3,}/g,'<span class="gap"></span>');
 const pic=s=>!s?"":/^(https?:|\.{0,2}\/)|\.(png|jpe?g|gif|svg|webp)$/i.test(s)?`<img src="${esc(s)}" alt="">`:esc(s);
 const norm=s=>String(s??"").toLowerCase().replace(/[\u2018\u2019\u02bc`´]/g,"'").replace(/\s+/g," ").trim().replace(/[.!?]+$/,"").trim();
 const right=(s,ok)=>s!=null&&Array.isArray(ok)&&ok.includes(norm(s));

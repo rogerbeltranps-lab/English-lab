@@ -17,7 +17,7 @@ window.LP = {
         { r: 'daring', q: 'Lincoln, ___ was president in 1863, made Thanksgiving official.', a: ['who'] }
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Llenguatge del correu formal', en: 'Formal email language' },
-      intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
+      intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       core: { beginners: ['Dear…', 'We would like to…', 'Yours sincerely'], insecure: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely'], safe: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely', 'Dear Mr / Ms…', 'I am writing to propose…', 'Our plan includes…', 'Could we use…?', 'Please let us know if…', 'I look forward to hearing from you', 'Kind regards'], daring: ['Dear…', 'I am writing to…', 'We would like to…', 'Yours sincerely', 'Dear Mr / Ms…', 'I am writing to propose…', 'Our plan includes…', 'Could we use…?', 'Please let us know if…', 'I look forward to hearing from you', 'Kind regards', 'request', 'propose', 'ensure', 'appreciate', 'consider', 'I would be grateful if you could…', 'We would appreciate the opportunity to…'] },
       groups: [
         { g: 'Email chunks', items: [['Dear…', 'Benvolgut/da…', 'Dear Ms Puig,'], ['I am writing to…', 'Us escric per…', 'I am writing to propose a celebration day.'], ['We would like to…', 'Ens agradaria…', 'We would like to organise an event.'], ['Yours sincerely', 'Atentament', 'Yours sincerely, Omar']] },
@@ -40,7 +40,7 @@ window.LP = {
         { r: 'daring', q: 'I would be ___ if you could reply before Friday.', a: ['grateful'] },
         { r: 'daring', q: 'We would ___ the opportunity to present our idea.', a: ['appreciate'] }
       ] },
-    { id: 'read', type: 'mc', tab: 'Reading', title: { ca: 'Reading: un correu model', en: 'Reading: a model email' }, pill: '80 %',
+    { id: 'read', type: 'mc', tab: 'Reading', title: { ca: 'Reading: un correu model', en: 'Reading: a model email' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix el correu i fixa’t en com s’organitza: per què escriu, el pla, les peticions i el tancament.', en: 'Read the email and notice how it is organised: purpose, plan, requests, closing.' },
       media: { text: {
         beginners: '<p><strong>Subject:</strong> Lights of the World Day</p><p>Dear Ms Puig,</p><p>I am writing to propose a celebration day for our school on Friday 11 December.</p><p>Our class would like to organise a “Lights of the World Day” about four festivals of light. The event will take place in the school hall from 10.00 to 13.30. There will be four stalls, music and food. To make everyone feel welcome, we will explain the customs in simple words and invite families.</p><p>Could we use the school hall on that day?</p><p>I look forward to hearing from you.</p><p>Yours sincerely,<br>Omar Haddad<br>4t ESO B</p><p class="tiny"><strong>Paraules:</strong> propose = proposar · take place = tenir lloc · stall = parada · customs = costums · invite = convidar</p>',
@@ -59,7 +59,7 @@ window.LP = {
         { r: 'daring', q: 'Which worry might the head teacher still have?', o: ['who pays for the food and materials', 'the date of Diwali', 'the name of the event'] },
         { r: 'daring', q: 'Which concern does Omar answer before the head teacher asks?', o: ['who will supervise the students', 'who pays for the materials', 'whether the date is a holiday'] }
       ] },
-    { id: 'register', type: 'mc', tab: { ca: 'Registre', en: 'Register' }, title: { ca: 'Formal o informal?', en: 'Formal or informal?' }, pill: '80 %',
+    { id: 'register', type: 'mc', tab: { ca: 'Registre', en: 'Register' }, title: { ca: 'Formal o informal?', en: 'Formal or informal?' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Tria la versió formal per al correu a la direcció.', en: 'Choose the formal version for the email to the head teacher.' },
       items: [
         { q: 'Hi!', o: ['Dear Ms Puig,', 'Hey Ms Puig!', 'Hello there!'] },
@@ -71,7 +71,7 @@ window.LP = {
         { r: 'safe', q: 'Tell us if you need more stuff.', o: ['Please let us know if you need more information.', 'Tell us if you want more stuff.', 'Need more stuff? Tell us.'] },
         { r: 'daring', q: 'Answer before Friday, OK?', o: ['I would be grateful if you could reply before Friday.', 'Reply before Friday, OK?', 'You must answer before Friday.'] }
       ] },
-    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: els fets per al correu', en: 'Listen again: the facts for your email' }, pill: { ca: 'Àudio · 80 %', en: 'Audio · 80 %' },
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: els fets per al correu', en: 'Listen again: the facts for your email' }, pill: { ca: 'Àudio', en: 'Audio' },
       intro: { ca: 'Escolta la reunió de l’LP5 i comprova els fets que la directora necessita saber. Els faràs servir al correu.', en: 'Listen to the LP5 meeting and check the facts the head teacher needs. You will use them in your email.' },
       media: { audio: 'audio/student-council-meeting.mp3', title: 'Student council meeting', script: [
         ['Laia', 'OK, everyone. We’re meeting the head teacher on Monday, so we need a plan today.'],
@@ -115,8 +115,8 @@ window.LP = {
         ['Omar', 'We’re sending them on Wednesday. We’re going to invite families and the primary school.'],
         ['Laia', 'OK. One problem: the hall is small. What if it rains and everyone is inside?'],
         ['Omar', 'Don’t worry. We’ll use the gym too.'],
-        ['Laia', 'Good idea. I think it’ll be the best day of the term!']] } },
-    { id: 'grammar', type: 'typed', mode: 'say', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Peticions educades', en: 'Polite requests' }, pill: '80 %',
+        ['Laia', 'Good idea. I think it’ll be the best day of the term!']], marks: [["**Great**. ↘ And **mu**sic? ↗"], ["My **cou**sin **plays**‿in‿a **band**. ↘", "I’ll **call**‿him to**night**. ↘"], ["**Per**fect. ↘ **Who’s** going to put‿**up** the deco**ra**tions? ↘"], ["**Class** **4B**‿is going to **make** **pa**per **lan**terns‿in **Art**. ↘"], ["And the invi**ta**tions? ↗"], ["We’re **send**ing them‿on **Wednes**day. ↘", "We’re going to in**vite** **fam**ilies and the **pri**mary **school**. ↘"], ["O**K**. ↘ **One** **prob**lem: the **hall**‿is **small**. ↘", "**What**‿if‿it **rains** and **ev**eryone‿is in**side**? ↘"], ["**Don’t** **wor**ry. ↘ We’ll **use** the **gym** **too**. ↘"], ["**Good**‿i**dea**. ↘ I **think**‿it’ll be the **best** **day** of the **term**! ↘"]], cues: [[34.88, 36.73, 43.88, 45.97], [37.02, 38.64, 46.74, 48.63], [38.62, 39.84, 48.63, 50.1], [39.99, 43.39, 50.6, 54.5], [43.74, 47.25, 55.38, 59.54], [47.38, 48.95, 60.01, 61.86], [49.12, 50.97, 62.42, 64.56], [51.14, 54.11, 64.78, 68.25], [54.31, 58.58, 68.88, 73.84], [58.81, 61.95, 74.14, 77.76], [64.01, 66.37, 80.65, 83.43], [66.52, 70.09, 83.97, 88.07]] } },
+    { id: 'grammar', type: 'typed', mode: 'say', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Peticions educades', en: 'Polite requests' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa.', en: 'Read how it works and complete.' },
       explain: [
         { ca: '<strong>would like to</strong> + verb per demanar amb educació: <em>We would like to organise…</em>', en: '<strong>would like to</strong> + verb: <em>We would like to organise…</em>' },

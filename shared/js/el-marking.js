@@ -43,15 +43,18 @@ window.ELMark=(function(){
           "CORRECTED TEXT: their whole text with only those mistakes fixed, everything else exactly as they wrote it; put every word you changed or added between *asterisks*.",
           "Starter and Base had more support and shorter tasks: be gentle, explain in very simple Catalan. No mistakes: say so in the comment and leave the mistakes out.",
           "COPYING: flag a text you think the student did not write themselves: far above what their route and exam writing mark suggest, translator-like (correct but unnatural, words or structures a learner at that level would not know), or mostly pasted according to its writing log. Never flag the Pro route for being too good. Still write the full correction: the teacher decides."]
-        :["Write as their teacher, in the first person, with no signature. Each correction: one thing done well; the two or three most useful mistakes, each with the correct form (quote their words → the right version); one thing to try next time. Keep it short (two to five sentences), warm and concrete, in the language given, for what their route asked (Starter and Base had more support and shorter tasks). A spoken transcript comes from speech recognition: do not correct spelling or punctuation there, only words and grammar. Empty work: tell them kindly to do it and hand it in again."]),""];
+        :["Write as their teacher, in the first person, with no signature. Each correction: one thing done well; the two or three most useful mistakes, each with the correct form (quote their words → the right version); one thing to try next time. Keep it short (two to five sentences), warm and concrete, in the language given, for what their route asked (Starter and Base had more support and shorter tasks). A spoken transcript comes from speech recognition: do not correct spelling or punctuation there, only words and grammar. Empty work: tell them kindly to do it and hand it in again.",
+          // Roger, 7 Nov 2026 (a Speaking transcript with 568 characters pasted got a normal correction): speech recognition never pastes,
+          // so a transcript with a [paste log] was typed or pasted, not spoken. Clearly pasted ones (ELMark.pasted) go back to redo at once.
+          "NOT SPOKEN: a line [paste log] means text was pasted into the transcript box (speech recognition never pastes). When most of the transcript was pasted, they did not speak it: still write the correction, and flag it."]),""];
     const body=o.students.flatMap(s=>[`=== ${s.code} · route ${s.route||"–"} · ${o.mode==="reply"?"answer":"correction"} in ${s.ca?"Catalan":"English"}${o.mode==="writing"&&s.exam?" · exam writing "+s.exam:""}`,
-      ...(o.mode==="writing"&&s.ty?[`[writing log] ${tyText(s.ty)}`]:[]),
+      ...(o.mode==="writing"&&s.ty?[`[writing log] ${tyText(s.ty)}`]:o.mode!=="reply"&&s.ty&&+s.ty.p>0?[`[paste log] ${tyText(s.ty)}`]:[]),
       ...(s.fields||[]).map(f=>`[${f.l}] ${String(f.v||"").replace(/\s+/g," ").trim()||"(empty)"}`),""]);
     const fmt=["ANSWER FORMAT (strict: the site reads it automatically). Reply with ONLY these lines, in a single code block, nothing before or after:",
       `${V} | ${o.aid} | ${o.step} | ${o.group}`,
       ...(o.mode==="writing"?["<code> | - | <comment> ## <their words> => <correct form> :: <why> ## <their words> => <correct form> :: <why> ## TEXT: <their text corrected, changes in *asterisks*>",
           "For a flagged text add a fourth part at the end of its line: <code> | - | <the correction as above> | COPY? <short reason for the teacher, in English>"]
-        :[`<code> | - | <the ${o.mode==="reply"?"answer":"correction"}, on one line>`]),
+        :[`<code> | - | <the ${o.mode==="reply"?"answer":"correction"}, on one line>`,...(o.mode==="reply"?[]:["For a transcript that was not spoken add a fourth part: <code> | - | <the correction> | COPY? pasted, not spoken"])]),
       "(one line per student, every code above, same order)","END",
       "Never write | inside the correction. Never add names."];
     return [...head,"STUDENTS",...body,...fmt].join("\n");
@@ -97,7 +100,8 @@ window.ELMark=(function(){
   // "LPn") ticked in the time plan, plus 7 days. Ticks keep the day they were ticked; an older tick (true) counts from the due day.
   // o = {p: EL_PLAN[ls], gi: the group's column, due, title, ticks: teacherPlan/{group}.ticks, ls}
   // A moment with atOnce: true (writings and Talk transcripts, from LS3; Roger, 1 Nov 2026) is ready the day it is handed in: Claude
-  // marks it in the next Wednesday run, with no tick needed. from is long past, so each hand-in counts from the day it came in (ELMark.late).
+  // marks it in the next Wednesday run, with no tick needed. Since 7 Nov 2026 every learning-path level step (Reading log, Listening chart,
+  // Research card / Fact file) is atOnce too; only the final product steps still wait for a tick. from is long past, so each hand-in counts from the day it came in (ELMark.late).
   function ready(o){const W=window.ELWeek;if(o.atOnce)return {due:o.due||null,line:null,done:null,from:"2000-01-01",atOnce:true};
     if(!o.p||!o.due||o.gi<0)return {};
     const lines=r=>String(r.g?r.g[o.gi]||"":r.what||"").split("\n").filter(Boolean);
@@ -105,6 +109,8 @@ window.ELMark=(function(){
     const key=String(o.title||"").split(":")[0].toLowerCase().slice(0,14);let n=null,line=null;
     o.p.rows.forEach(r=>lines(r).forEach(l=>{const q=!n&&l.toLowerCase().includes(key)&&/\bLP(\d+)\b/.exec(l);if(q)n=q[1]}));   // "LP2 What are they doing? (1/2)" … "LP2 (2/2)"
     o.p.rows.forEach(r=>lines(r).forEach(l=>{if(date(r,l)===o.due&&(l.toLowerCase().includes(key)||n&&new RegExp("\\bLP"+n+"\\b").test(l)))line=l}));
+    // the agenda (dashboard, 6 Nov 2026) has no "Homework by …" line on the due day: then the last class that names it, before or on that day
+    if(!line){let best=null;o.p.rows.forEach(r=>lines(r).forEach(l=>{const d=date(r,l);if(d&&d<=o.due&&(l.toLowerCase().includes(key)||n&&new RegExp("\\bLP"+n+"\\b").test(l))&&(!best||d>=best))best=d,line=l}))}
     const mv=line&&((o.p._moved||{})[o.gi]||{})[line],ad=line&&((o.p._added||{})[o.gi]||{})[line],tk=o.ticks||{},t=line&&(tk[o.ls+"|"+line]||mv&&tk[o.ls+"|"+mv.orig]||ad&&tk[o.ls+"|"+ad.key]),   // a moved session keeps a tick given before the move
           done=t?(typeof t==="string"?t:o.due):null;
     return {due:o.due,line,done,from:done?W.add(done,7):null};
@@ -153,5 +159,27 @@ window.ELMark=(function(){
       seen.add(p[0]);rows.push({id:p[0],code:p[1],step:p[2],kind:k,text:p.slice(4).join(" ").trim()})}
     return {rows,bad,missing:[...by.keys()].filter(c=>!seen.has(c))};
   }
-  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,q,open,asked,CV,commentSheet,parseComments};
+  // Redo (Roger, 4 Nov 2026): the note a student gets when a possible copy is sent back, with the reason from the writing log
+  // ("when I send redo I want students see why, like text copied in 1 minute"), in their language (ca = Starter, Base or no route).
+  // Used by the dashboard's Check dialog (editable there) and by tools/marking/marks.mjs (automatic redo, below).
+  const REDO={ca:"El professor vol que tornis a fer aquesta tasca, amb les teves paraules. Després entrega-la una altra vegada.",en:"Your teacher would like you to do this task again, in your own words. Then hand it in again."};   // not "in class" (Roger, 4 Nov 2026: "simply redo")
+  function redoWhy(ty,why,ca){const t=ty||{},out=[],n=+t.n||0,p=+t.p||0,k=+t.k||0,sec=+t.s||0;
+    const tm=sec<60?(ca?sec+" segons":sec+" seconds"):(m=>ca?m+(m===1?" minut":" minuts"):m+(m===1?" minute":" minutes"))(Math.max(1,Math.round(sec/60)));
+    // p counts every paste, so it can be more than the text (pasted several times)
+    if(p>=20&&/spoken/i.test(why||""))out.push(ca?"has enganxat el text en lloc de dir-lo amb el micròfon":"you pasted the text instead of saying it into the microphone");
+    else if(p>=20)out.push(p>=n?(ca?"has enganxat el text sencer en lloc d’escriure’l":"you pasted the whole text instead of writing it"):(ca?`has enganxat ${p} dels ${n} caràcters del text`:`you pasted ${p} of the ${n} characters of your text`));
+    if(ty&&n&&k<n/2&&!/spoken/i.test(why||""))out.push(ca?`només has escrit ${k} lletres amb el teclat per a un text de ${n}`:`you only typed ${k} keys for a text of ${n} characters`);
+    if(ty&&sec&&(sec<180||p>=20))out.push(ca?`l’has fet en ${tm}`:`you did it in ${tm}`);
+    if(/level|vocab|above|grammar/i.test(why||""))out.push(ca?"el nivell d’anglès és molt més alt del que fas servir normalment":"the English is far above the level you usually write at");
+    if(!out.length)out.push(ca?"el text no sembla escrit per tu":"the text doesn't look like your own writing");
+    return (ca?"Per què: ":"Why: ")+(out.length>1?out.slice(0,-1).join(", ")+(ca?" i ":" and ")+out[out.length-1]:out[0])+"."}
+  const redoNote=(ty,why,ca)=>(ca?REDO.ca:REDO.en)+" "+redoWhy(ty,why,ca);
+  // Clearly pasted (Roger, 4 Nov 2026: "when this happens and you see it on Wednesdays, you can automatically send redo"): most of the
+  // text came in by pasting and little was typed. A possible copy like this is sent back at once by the Wednesday run (marks.mjs), with
+  // the note above; any other possible copy still waits for the teacher. Never for the Pro route.
+  // The keys count Backspace too (el-typing.js), so deleting part of a long paste looked like typing (Roger, 7 Nov 2026, on a text with
+  // 646 characters pasted for 383 kept, 271 keys in 16 s: "it's evident, why didn't you do it automatically?"): the characters pasted
+  // beyond the final text (p − n) were deleted, and those keys are not counted as typed.
+  const pasted=t=>{t=t||{};const n=+t.n||0,p=+t.p||0,typed=(+t.k||0)-Math.max(0,p-n);return n>=40&&p>=0.8*n&&typed<0.5*n};
+  return {V,codes,sheet,parse,ready,lastRun,late,tyText,fbItems,fbText,q,open,asked,CV,commentSheet,parseComments,REDO,redoWhy,redoNote,pasted};
 })();

@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
 <meta charset="utf-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#315f9f">
-<title>Learning Path 1 · Getting started · Seasons &amp; Celebrations</title>
+<title>Learning Path 1 · Getting started · LS2 · Seasons &amp; Celebrations</title>
 <link rel="stylesheet" href="../../shared/css/layout.css">
 <link rel="stylesheet" href="../../shared/css/topbar.css">
 <link rel="stylesheet" href="../../shared/css/activities.css">
@@ -60,10 +60,14 @@ html,body{overflow-x:clip}
 .btn.secondary.active{background:var(--accent);color:#fff!important;border-color:var(--accent)!important}
 </style>
 <link rel="stylesheet" href="../../shared/css/lp-theme-4eso.css">
+<!-- the learning path look of the LS2 engine pages (ls2-engine.js init, the same rules): the "How it works" fold, the steps with a tick and NEXT, the phone strip -->
+<style id="trackNoteCss">#lp>.lp-top>div>*{margin:0!important}.lp-how{margin:0 0 14px;background:#fff;border:1px solid var(--line,#dbe5f1);border-radius:14px;padding:0 14px}.lp-how>summary{cursor:pointer;padding:12px 0;font-weight:750;color:var(--dark,#234777)}.lp-how .track-note{margin:0 0 12px}.tab .tn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:24px;height:24px;border-radius:999px;font-size:.85rem}.tab.done .tn{background:#16a34a!important;color:#fff!important;font-size:0}.tab.done .tn::after{content:"✓";font-size:.85rem}.tab.next:not(.active){box-shadow:inset 0 0 0 2px var(--accent,#315f9f)}@media (min-width:1000px){.lp-body{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;align-items:start}.lp-body>.el-tsec{grid-column:1/-1}.lp-body>.tabs{flex-direction:column;overflow:visible;position:sticky;top:76px;padding:0;gap:6px}.lp-body .tab{display:flex;align-items:center;gap:10px;text-align:left;white-space:normal;padding:11px 13px}.lp-body .tab.next:not(.active)::after{content:attr(data-next);margin-left:auto;font-size:.7rem;letter-spacing:.06em;color:var(--accent,#315f9f)}}.lp-top{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;align-items:start;margin:0 0 14px}.lp-top>*{margin:0!important}.routes:has(.route[style*="none"]){display:flex;flex-wrap:wrap}.routes:has(.route[style*="none"]) .route{flex:0 0 auto;padding:8px 16px;min-height:0}.hero{padding:24px 0 18px!important}.hero h1{font-size:clamp(2rem,3.4vw,2.8rem)!important;margin:.15em 0 .2em!important}.lp-top+.plan-card{padding:12px 16px!important;margin-bottom:14px}.lp-top+.plan-card h3{display:inline;font-size:1rem;margin:0}.lp-top+.plan-card .instruction{display:inline;margin:0 0 0 6px;font-size:.92rem}.lp-top+.plan-card input{display:block;width:100%;box-sizing:border-box;margin-top:8px}@media (max-width:640px){.topbar{position:static!important}.hero{padding:14px 0 10px!important}.hero h1{font-size:1.75rem!important}.hero .lead{font-size:.98rem;margin:.2em 0 .6em}.hero .eyebrow{font-size:.72rem}.lp-body>.tabs{position:sticky;top:0;z-index:25;margin:0 -16px 10px;padding:8px 16px;background:var(--bg,#f4f7fb);box-shadow:0 6px 10px -8px #0f172a40;gap:6px;scrollbar-width:none}.lp-body>.tabs::-webkit-scrollbar{display:none}.lp-body .tab{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;font-size:.92rem;border-radius:11px}.lp-body .tab .tn{min-width:22px;height:22px}.panel{padding:16px!important;border-radius:16px!important}.panel-head h2{font-size:1.35rem}.lp-how>summary{padding:11px 0}}</style>
+<link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu's styles before the first paint (Roger, 7 Nov 2026) -->
 </head>
 <body>
+<script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws (Roger, 7 Nov 2026) -->
 <div class="topbar"><div class="wrap toprow">
-  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← Seasons &amp; Celebrations</a><span class="brand-mark">1</span><span class="brand-title">Getting started<small>4 ESO · Seasons &amp; Celebrations · Learning Path 1</small></span></div>
+  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← LS2 · Seasons &amp; Celebrations</a><span class="brand-mark">1</span><span class="brand-title">Getting started<small>4 ESO · LS2 · Seasons &amp; Celebrations · Learning Path 1</small></span></div>
   <div class="session-jump">
       <label for="sessionJump">Learning Path</label>
       <select id="sessionJump" aria-label="Go to another Learning Path session">
@@ -77,7 +81,7 @@ html,body{overflow-x:clip}
   <span class="eyebrow">Learning Path 1 · Warm-up</span>
   <h1>Getting started: Castanyada &amp; Halloween</h1>
   <p class="lead">Remember what you learnt in My Real Routine, learn autumn words, listen to a real video about Halloween and talk about autumn where you live.</p>
-  <p data-el-teacher hidden><a href="../../lab/game/host.html?deck=4eso-autumn-words&amp;from=/English-lab/4eso/seasons-and-celebrations/getting-started.html" style="display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:14px;background:#3d1d8f;color:#fff;font-weight:800;text-decoration:none">🎮 Start the class game: Autumn words, choose it, write it <small style="font-weight:600;opacity:.8">· teacher only</small></a></p>
+  <p data-el-teacher hidden><span style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><a href="../../lab/game/host.html?deck=4eso-ls2-lp1-vocab&amp;from=/English-lab/4eso/seasons-and-celebrations/getting-started.html" style="display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:14px;background:#3d1d8f;color:#fff;font-weight:800;text-decoration:none">🎮 📚 Vocabulary game</a> <a href="../../lab/game/host.html?deck=4eso-ls2-lp1-grammar&amp;from=/English-lab/4eso/seasons-and-celebrations/getting-started.html" style="display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:14px;background:#3d1d8f;color:#fff;font-weight:800;text-decoration:none">🎮 🧩 Grammar game</a> <small style="font-weight:600;opacity:.8">· class games, teacher only</small></span></p>
   <div class="warm-note"><strong>Remember before you look.</strong> Start with the recall quiz without notes: trying to remember is what makes you learn.</div>
   <div class="routes">
     <button class="route" data-level="beginners"><strong>Beginners</strong><span>A1</span></button>
@@ -87,39 +91,44 @@ html,body{overflow-x:clip}
     <button class="route" data-level="native"><strong>Native</strong><span>C2</span></button></div>
 </div></header>
 
-<main class="wrap">
-<div id="trackNote"></div><div id="planBox"></div><div id="studyBox"></div>
-<nav class="tabs" aria-label="Warm-up sections">
-  <button class="tab active" data-panel="recall">1 Recall</button>
-  <button class="tab" data-panel="words">2 Autumn words</button>
-  <button class="tab" data-panel="read">3 Reading</button>
-  <button class="tab" data-panel="listen">4 Listening</button>
-  <button class="tab" data-panel="speak">5 Speaking</button>
+<!-- the same parts as the LS2 engine pages draw in #lp (Roger, 7 Nov 2026: "this doesn't match the new style"), so el-app.js puts the
+     path in the left column on a computer: .lp-top (how it works + study guide), the goal card, .lp-body (steps + panels) -->
+<main class="wrap" id="lp">
+<div class="lp-top"><div id="trackNote"></div><div id="studyBox"></div></div>
+<div class="section-card plan-card" id="planBox"></div>
+<div class="lp-body">
+<nav class="tabs" aria-label="Sections">
+  <button class="tab active" data-panel="recall"><span class="tn">1</span> <span class="tl">Recall</span></button>
+  <button class="tab" data-panel="words"><span class="tn">2</span> <span class="tl" data-support-ca="Paraules de tardor" data-support-en="Autumn words">Autumn words</span></button>
+  <button class="tab" data-panel="read"><span class="tn">3</span> <span class="tl">Reading</span></button>
+  <button class="tab" data-panel="listen"><span class="tn">4</span> <span class="tl">Listening</span></button>
+  <button class="tab" data-panel="speak"><span class="tn">5</span> <span class="tl">Speaking</span></button>
 </nav>
+<div class="lp-panels">
 
 <section class="panel active" id="recall">
   <div class="panel-head"><div><h2>Recall: My Real Routine</h2><p class="instruction" data-support-ca="Escriu la resposta sense mirar apunts. No passa res si no te'n recordes: intentar recordar és el que t'ajuda a aprendre. Després llegeix el feedback." data-support-en="Type the answers without looking at your notes. Trying to remember is what helps you learn. Then read the feedback.">Type the answers without looking at your notes. Trying to remember is what helps you learn. Then read the feedback.</p></div><span class="pill">No notes · 3 min</span></div>
   <div class="section-card"><div id="recallList"></div>
-    <div class="actions"><button class="btn" id="checkRecall" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againRecall" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
+    <div class="actions"><button class="btn" id="checkRecall" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againRecall" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
     <div class="result" id="recallResult"></div></div>
 </section>
 
 <section class="panel" id="words">
-  <div class="panel-head"><div><h2>Autumn words</h2><p class="instruction" data-support-ca="Passa el ratolí (o toca) cada paraula per veure què vol dir. Després completa les frases: necessites un 80 % per completar el pas." data-support-en="Hover over (or tap) each word to see its meaning. Then complete the sentences: you need 80 % to complete the step.">Hover over (or tap) each word to see its meaning. Then complete the sentences: you need 80 % to complete the step.</p></div><span class="pill" id="wordsPill"></span></div>
+  <div class="panel-head"><div><h2>Autumn words</h2><p class="instruction" data-support-ca="Passa el ratolí (o toca) cada paraula per veure què vol dir. Després completa les frases: respon-les totes per completar el pas." data-support-en="Hover over (or tap) each word to see its meaning. Then complete the sentences: answer them all to complete the step.">Hover over (or tap) each word to see its meaning. Then complete the sentences: answer them all to complete the step.</p></div><span class="pill" id="wordsPill"></span></div>
   <div class="section-card"><div class="vocab-groups" id="vocabGroups"></div></div>
   <div class="section-card" id="caCards"></div>
   <div class="section-card"><h3 data-support-ca="Completa les frases" data-support-en="Complete the sentences">Complete the sentences</h3>
     <div id="practiceList"></div>
-    <div class="actions"><button class="btn" id="checkPractice" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againPractice" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
+    <div class="actions"><button class="btn" id="checkPractice" type="button" data-support-ca="Comprova" data-support-en="Check">Check</button> <button class="btn secondary" id="againPractice" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
     <div class="result" id="practiceResult"></div></div>
 </section>
 
 <section class="panel" id="read">
-  <div class="panel-head"><div><h2 id="readTitle">Reading: Autumn in two places</h2><p class="instruction" id="readHow" data-support-ca="Llegeix el xat entre la Núria (Catalunya) i en Josh (Manchester) una vegada per entendre de què parlen. Després llegeix les preguntes i busca al text la frase que respon cada una. Necessites un 80 % per completar el pas." data-support-en="Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.">Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. You need 80 % to complete the step.</p></div><span class="pill" id="readPill">80 %</span></div>
+  <div class="panel-head"><div><h2 id="readTitle">Reading: Autumn in two places</h2><p class="instruction" id="readHow" data-support-ca="Llegeix el xat entre la Núria (Catalunya) i en Josh (Manchester) una vegada per entendre de què parlen. Després llegeix les preguntes i busca al text la frase que respon cada una. Respon-les totes per completar el pas." data-support-en="Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. Answer them all to complete the step.">Read the chat between Núria (Catalonia) and Josh (Manchester) once for the main idea. Then read the questions and find the sentence that answers each one. Answer them all to complete the step.</p></div><span class="pill" id="readPill">80 %</span></div>
   <div class="section-card">
     <div class="chat" id="readText"></div>
     <form id="readForm"></form>
-    <div class="actions"><button class="btn" id="checkRead" type="button" data-support-ca="Comprova el reading" data-support-en="Check reading">Check reading</button> <button class="btn secondary" id="againRead" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
+    <div class="actions"><button class="btn" id="checkRead" type="button" data-support-ca="Comprova el reading" data-support-en="Check reading">Check reading</button> <button class="btn secondary" id="againRead" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
     <div class="result" id="readResult"></div>
   </div>
 </section>
@@ -136,7 +145,7 @@ html,body{overflow-x:clip}
     <p class="tiny" style="color:var(--muted)">Illustrated video made for English Lab. Voices generated with ElevenLabs.</p>
     <div id="gsGist"></div>
     <form id="listenForm"></form>
-    <div class="actions"><button class="btn" id="checkListen" type="button" data-support-ca="Comprova el listening" data-support-en="Check listening">Check listening</button> <button class="btn secondary" id="againListen" type="button" data-support-ca="Torna-ho a fer" data-support-en="Do it again">Do it again</button></div>
+    <div class="actions"><button class="btn" id="checkListen" type="button" data-support-ca="Comprova el listening" data-support-en="Check listening">Check listening</button> <button class="btn secondary" id="againListen" type="button" data-support-ca="↺ Torna a practicar" data-support-en="↺ Practise again">↺ Practise again</button></div>
     <div class="result" id="listenResult"></div>
     <div id="gsDict"></div>
     <div id="gsRealVideo"></div>
@@ -172,17 +181,18 @@ html,body{overflow-x:clip}
   </div>
   <div class="section-card">
     <h3 data-support-ca="Revisa la transcripció" data-support-en="Transcript">Transcript</h3>
-    <p class="instruction" data-support-ca="Amb Chrome, la transcripció es crea mentre graves. Escolta la gravació i comprova que el text diu el mateix. Corregeix-lo; si no apareix, escriu què has dit." data-support-en="With Chrome, a transcript is created automatically while you record. Check it before asking for feedback.">With Chrome, a transcript is created automatically while you record. Check it before asking for feedback.</p>
-    <textarea id="speechTranscript" placeholder="Your transcript will appear here. You can correct it."></textarea>
+    <p class="instruction" data-support-ca="Amb Chrome, la transcripció s’escriu sola mentre graves. No s’hi pot escriure: si no diu el que volies, torna’t a gravar." data-support-en="With Chrome, a transcript is written by itself while you record. You can’t type in it: if it is not what you wanted to say, record yourself again.">With Chrome, a transcript is written by itself while you record. You can’t type in it: if it is not what you wanted to say, record yourself again.</p>
+    <textarea id="speechTranscript" readonly placeholder="Your transcript will appear here while you speak."></textarea>
   </div>
   <div class="section-card">
-    <h3 data-support-ca="Demana feedback" data-support-en="Get feedback">Get feedback</h3>
-    <p class="instruction" data-support-ca="Prem &lt;strong&gt;Corregeix amb IA&lt;/strong&gt;: es descarrega el WAV i s’obre ChatGPT amb la petició preparada. Adjunta el WAV i prem Envia. Llegeix el perquè de les correccions i torna a practicar." data-support-en="When you press &lt;strong&gt;Correct with AI&lt;/strong&gt;, the WAV will download automatically and ChatGPT will open with the prompt prepared. Attach the WAV and press Send.">When you press <strong>Correct with AI</strong>, the WAV will download automatically and ChatGPT will open with the prompt prepared. Attach the WAV and press Send.</p>
-    <div class="actions"><button class="btn" id="prepareSpeakingFeedback" type="button" disabled data-support-ca="Corregeix amb IA ↗" data-support-en="Correct with AI ↗">Correct with AI ↗</button></div>
-    <p class="tiny" id="speakingCopyStatus"></p>
+    <h3 data-support-ca="Entrega-ho al professor" data-support-en="Hand it in">Hand it in</h3>
+    <p class="instruction" data-support-ca="Quan la transcripció digui el que has dit, prem &lt;strong&gt;Entrega al professor&lt;/strong&gt;. El professor et tornarà la correcció aquí mateix. Si després et tornes a gravar millor, torna-la a entregar." data-support-en="When the transcript says what you said, press &lt;strong&gt;Hand it in to my teacher&lt;/strong&gt;. Your teacher’s correction will appear right here. If you record a better version later, hand it in again.">When the transcript says what you said, press <strong>Hand it in to my teacher</strong>. Your teacher’s correction will appear right here. If you record a better version later, hand it in again.</p>
+    <div class="actions"><button class="btn" id="handInSpeaking" type="button" data-support-ca="Entrega al professor" data-support-en="Hand it in to my teacher">Hand it in to my teacher</button></div>
+    <p class="feedback" id="speakingHandMsg"></p>
   </div>
-  <div class="result" id="speakResult" data-support-ca="Has acabat l’escalfament. Revisa una correcció i prova de dir la frase millorada." data-support-en="Warm-up complete. You are ready for the next Learning Path.">Warm-up complete. You are ready for the next Learning Path.</div>
+  <div class="result" id="speakResult" data-support-ca="Has acabat l’escalfament. Entrega la transcripció al professor: et tornarà la correcció aquí mateix." data-support-en="Warm-up complete. You are ready for the next Learning Path.">Warm-up complete. You are ready for the next Learning Path.</div>
 </section>
+</div></div>
 
 <div id="reviewBox"></div>
 <p class="footer-note">Your answers and progress are saved separately for each route.</p>
@@ -210,6 +220,8 @@ const state=Object.assign({done:{},choices:[]},JSON.parse(localStorage.getItem(s
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const STEPS=["recall","words","read","listen","speak"];
 function save(){localStorage.setItem(storageKey,JSON.stringify(state));localStorage.setItem(storageKey+"Level",level);updateProgress()}
+// checked earlier with every question answered but under the old 80 %: done now, on the day of that check (Roger, 6 Nov 2026)
+function doneFrom(k){if(state.done[k])return;const d=((state.last||{})[k]||(state.tries||{})[k]||{}).date;if(!d)return;state.done[k]=true;state.doneAt=state.doneAt||{};if(!state.doneAt[k])state.doneAt[k]=d;save()}
 function complete(k){if(!state.done[k]){state.done[k]=true;state.doneAt=state.doneAt||{};state.doneAt[k]=new Date().toISOString()}save()}
 // tries[k]: first check of a step; last[k]: latest check (the teacher dashboard shows both; recall keeps its first try in first[route])
 function attempt(k,score,max){const t={score,max,level,date:new Date().toISOString()};state.tries=state.tries||{};if(k!=="recall"&&!state.tries[k])state.tries[k]=t;state.last=state.last||{};state.last[k]=t;save()}
@@ -219,18 +231,46 @@ function firstItems(k,src,items,got){state.items=state.items||{};const key=k+"_"
   state.items[key]={level,date:new Date().toISOString(),q:items.map(it=>src.indexOf(it)),ok:got.map(g=>g[0]?1:0),a:got.map(g=>g[1])};save()}
 const gotTyped=(items,prefix)=>items.map((it,i)=>{const v=$("#"+prefix+i).value;return [it.a.some(a=>norm(a)===norm(v)),String(v||"").trim().slice(0,40)]});
 const gotRadio=(items,name)=>items.map((_,i)=>{const c=document.querySelector('input[name="'+name+i+'"]:checked');return [!!c&&+c.value===0,c?+c.value:null]});
-function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / "+STEPS.length;$("#progressBar").style.width=(n/STEPS.length*100)+"%"}
+function updateProgress(){const n=STEPS.filter(k=>state.done[k]).length;$("#progressLabel").textContent=level[0].toUpperCase()+level.slice(1);$("#progressText").textContent=n+" / "+STEPS.length;$("#progressBar").style.width=(n/STEPS.length*100)+"%";markTabs()}
+// the list of steps as on the LS2 engine pages (ls2-engine.js markTabs): a tick on each step done, the first one not done marked NEXT;
+// on a phone the open step stays in view in the strip of steps
+function markTabs(){let next=false;STEPS.forEach(k=>{const t=document.querySelector('.tab[data-panel="'+k+'"]');if(!t)return;const d=!!state.done[k];t.classList.toggle("done",d);t.classList.toggle("next",!d&&!next);t.dataset.next=ca()?"SEGÜENT":"NEXT";if(!d)next=true});
+  const a=$(".lp-body>.tabs .tab.active");if(a&&innerWidth<1000&&markTabs.on!==a.dataset.panel){markTabs.on=a.dataset.panel;a.parentNode.scrollLeft=a.offsetLeft-a.parentNode.offsetLeft-16}}
 const ca=()=>level==="insecure"||level==="beginners";
 const need=n=>Math.ceil(n*0.8);
+// a step is done once every question is answered and checked, whatever the score (Roger, 6 Nov 2026); the score still shows
+const allIn=(prefix,n)=>{for(let i=0;i<n;i++){const r=document.querySelector('input[name="'+prefix+i+'"]');if(r){if(!document.querySelector('input[name="'+prefix+i+'"]:checked'))return false}else{const t=document.getElementById(prefix+i);if(t&&!String(t.value).trim())return false}}return true};
 // Answers and feedback stay (Roger, 26 Oct 2026): a checked step keeps its answers (state.ans[step] = {l: route, v: answers}) and shows
 // its feedback again on every visit, without counting another try, until the student presses "Do it again" next to Check.
 // Answers not checked yet stay too (state.typing[step], saved as the student types or chooses): a student typed the recall,
 // opened another page and came back to an empty page (problem report, 26 Oct 2026).
-function keepAns(k,v){state.ans=state.ans||{};state.ans[k]={l:level,v};if(state.typing)delete state.typing[k];save()}
-function kept(k){const a=state.ans&&state.ans[k];return a&&a.l===level?a.v:null}
+// Answers follow a level change (Roger, 3 Nov 2026: "si faig un canvi de nivell a mig LP l'alumne ha de guardar les activitats que hagi fet"):
+// answers saved at another route used to disappear. Each answer now goes back on the same question (q: the questions' text, saved with
+// the answers; older saves rebuild that list from their route); the route's new questions stay empty. done and the first try never change.
+const qid=it=>String(it&&(it.id||it.q)||"");
+function keepAns(k,v,items){delete fresh[k];state.ans=state.ans||{};state.ans[k]={l:level,v,q:(items||[]).map(qid)};if(state.typing)delete state.typing[k];save()}
+// a = {l, v, q?}; items = this route's questions; name/base = the list (nat(name, base)) for rebuilding an older save's questions
+function moveAns(a,items,name,base){
+  if(!a)return null;if(!items)return a.l===level?a.v:null;
+  if(a.l===level&&!(a.q&&a.q.length))return a.v;
+  const from=a.q&&a.q.length?a.q:base?forLevel(a.l==="native"&&window.GS_NATIVE&&GS_NATIVE[name]?GS_NATIVE[name]:base,a.l).map(qid):null;if(!from)return null;
+  const used={};let hit=0;const v=items.map(it=>{const j=from.findIndex((x,n)=>x===qid(it)&&!used[n]);if(j<0)return null;used[j]=1;hit++;return a.v[j]});
+  if(!hit)return null;if(a.l!==level)movedFrom[name||""]=v.some(x=>x==null)?2:1;return v;
+}
+const movedFrom={};
+function kept(k,items,name,base){return fresh[k]?null:moveAns(state.ans&&state.ans[k],items,name,base)}
 function keepTyping(k,v){state.typing=state.typing||{};state.typing[k]={l:level,v};save()}
-function typing(k){const a=state.typing&&state.typing[k];return a&&a.l===level?a.v:null}
-function again(k,render){if(state.ans)delete state.ans[k];if(state.typing)delete state.typing[k];save();render()}
+function typing(k,items,name,base){return moveAns(state.typing&&state.typing[k],items,name,base)}
+// a note under the result when the answers come from another level; a step already done stays done
+function movedNote(sel,step,fresh){const el=$(sel);if(!el)return;const done=state.done[step];
+  if(done)el.textContent=el.textContent.replace(/ · (You need \d+ to complete the step\.|Necessites \d+ per completar el pas\.)/,ca()?" · Pas completat ✓":" · Step complete ✓");
+  if(done&&!/✓/.test(el.textContent))el.textContent+=ca()?" · Pas completat ✓":" · Step complete ✓";
+  const p=document.createElement("span");p.style.cssText="display:block;margin-top:6px;font-weight:400";
+  p.textContent=ca()?"🔁 Has canviat de nivell. Les respostes que ja havies fet hi són"+(done?" i aquest pas continua fet ✓."+(fresh?" Les preguntes buides són noves del teu nivell: les pots fer per practicar.":""):"."+(fresh?" Respon també les preguntes buides per completar el pas.":""))
+    :"🔁 Your level has changed. The answers you had already given are here"+(done?" and this step stays done ✓."+(fresh?" The empty questions are new at your level: you can do them to practise.":""):"."+(fresh?" Answer the empty questions too to complete the step.":""));
+  el.appendChild(p);el.classList.add("show")}
+// ↺ Practise again (Roger, 6 Nov 2026): empty boxes for a new try; the last checked answers stay saved until the new try is checked
+const fresh={};function again(k,render){fresh[k]=1;if(state.typing)delete state.typing[k];save();render()}
 const typedVals=(items,prefix)=>items.map((_,i)=>$("#"+prefix+i).value);
 const radioVals=(items,name)=>items.map((_,i)=>{const c=document.querySelector('input[name="'+name+i+'"]:checked');return c?c.value:null});
 function fillTyped(items,prefix,v){items.forEach((_,i)=>{$("#"+prefix+i).value=v[i]||""})}
@@ -247,27 +287,27 @@ function checkTyped(items,prefix,result,key,explain){
     f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(v===""?(ca()?"Escriu una resposta.":"Type an answer."):(ca()?"Encara no. ":"Not yet. ")+(explain?(ca()?"Resposta: <strong>"+it.a[0]+"</strong>. "+(it.ca||it.en||""):"Answer: <strong>"+it.a[0]+"</strong>. "+(it.en||it.ca||"")):(ca()?"Revisa la paraula al vocabulari de dalt i torna-ho a provar.":"Check the word list above and try again.")));
     f.className="feedback "+(ok?"ok":"no")});
   const n=items.length;
-  $(result).textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):(ca()?" · Necessites "+need(n)+" per completar el pas.":" · You need "+need(n)+" to complete the step."));
+  $(result).textContent=score+" / "+n+(ca()?" correctes":" correct")+(allIn(prefix,n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):(ca()?" · Respon totes les preguntes per completar el pas.":" · Answer every question to complete the step."));
   $(result).classList.add("show");
   return score;
 }
 let recallItems=[],practiceItems=[];
-function renderRecall(){recallItems=forLevel(nat("recall",recall),level);renderTyped("#recallList",recallItems,"rc");$("#recallResult").classList.remove("show");const v=kept("recall"),t=typing("recall");if(v){fillTyped(recallItems,"rc",v);doRecall(false)}else if(t)fillTyped(recallItems,"rc",t)}
+function renderRecall(){recallItems=forLevel(nat("recall",recall),level);renderTyped("#recallList",recallItems,"rc");$("#recallResult").classList.remove("show");delete movedFrom.recall;const v=kept("recall",recallItems,"recall",recall),t=v?null:typing("recall",recallItems,"recall",recall);if(v){fillTyped(recallItems,"rc",v);doRecall(false);if(movedFrom.recall)movedNote("#recallResult","recall",movedFrom.recall===2)}else if(t)fillTyped(recallItems,"rc",t)}
 $("#recallList").oninput=()=>keepTyping("recall",typedVals(recallItems,"rc"));
 // Recall is low stakes: done when submitted, whatever the score. count=false only shows the kept answers again.
 function doRecall(count){const s=checkTyped(recallItems,"rc","#recallResult",null,true);if(count){firstItems("recall",nat("recall",recall),recallItems,gotTyped(recallItems,"rc"));state.first=Object.assign({},state.recall,state.first);if(!state.first[level])state.first[level]={score:s,max:recallItems.length,date:new Date().toISOString()};attempt("recall",s,recallItems.length)}$("#recallResult").textContent=s+" / "+recallItems.length+(ca()?" correctes · Pas completat ✓ Llegeix el feedback de les que has fallat.":" correct · Step complete ✓ Read the feedback for the ones you missed.");if(count)complete("recall")}
-$("#checkRecall").onclick=()=>{doRecall(true);keepAns("recall",typedVals(recallItems,"rc"))};
+$("#checkRecall").onclick=()=>{doRecall(true);keepAns("recall",typedVals(recallItems,"rc"),recallItems)};
 $("#againRecall").onclick=()=>again("recall",renderRecall);
 
 function renderWords(){
   $("#wordsPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";
   $("#vocabGroups").innerHTML=forLevel(nat("vocab",vocab),level).map(g=>'<article class="vocab-group"><h3>'+g.g+'</h3><div class="chips">'+g.items.map(x=>'<span class="chip" tabindex="0">'+x[0]+'<span class="chip-tooltip"><b>'+x[1]+'</b>'+x[2]+'</span></span>').join("")+'</div></article>').join("");
   practiceItems=forLevel(nat("practice",practice),level);renderTyped("#practiceList",practiceItems,"pr");$("#practiceResult").classList.remove("show");
-  const v=kept("words"),t=typing("words");if(v){fillTyped(practiceItems,"pr",v);doPractice(false)}else if(t)fillTyped(practiceItems,"pr",t);
+  delete movedFrom.practice;const v=kept("words",practiceItems,"practice",practice),t=v?null:typing("words",practiceItems,"practice",practice);if(v){fillTyped(practiceItems,"pr",v);doPractice(false);if(movedFrom.practice)movedNote("#practiceResult","words",movedFrom.practice===2)}else if(t)fillTyped(practiceItems,"pr",t);
 }
 $("#practiceList").oninput=()=>keepTyping("words",typedVals(practiceItems,"pr"));
-function doPractice(count){const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(count){firstItems("words",nat("practice",practice),practiceItems,gotTyped(practiceItems,"pr"));attempt("words",s,practiceItems.length);if(s>=need(practiceItems.length))complete("words")}}
-$("#checkPractice").onclick=()=>{doPractice(true);keepAns("words",typedVals(practiceItems,"pr"))};
+function doPractice(count){const s=checkTyped(practiceItems,"pr","#practiceResult",null,false);if(count){firstItems("words",nat("practice",practice),practiceItems,gotTyped(practiceItems,"pr"));attempt("words",s,practiceItems.length);if(allIn("pr",practiceItems.length))complete("words")}else if(allIn("pr",practiceItems.length))doneFrom("words")}
+$("#checkPractice").onclick=()=>{doPractice(true);keepAns("words",typedVals(practiceItems,"pr"),practiceItems)};
 $("#againPractice").onclick=()=>again("words",renderWords);
 
 let readItems=[];
@@ -275,19 +315,19 @@ function renderRead(){
   const chat=readingChat[level]||readingChat.insecure;
   // Pro reads an essay, not the chat (problem report 2 Nov 2026): its own title and instruction; the other routes get the original back.
   {const h=$("#readHow"),t=$("#readTitle");if(!h.dataset.chatEn)h.dataset.chatEn=h.getAttribute("data-support-en");
-   const en=N()?"Read the essay once for the writer’s argument. Then answer: the questions test attitude, implication and meaning, not facts you can simply find. You need 80 % to complete the step.":h.dataset.chatEn;
+   const en=N()?"Read the essay once for the writer’s argument. Then answer: the questions test attitude, implication and meaning, not facts you can simply find. Answer them all to complete the step.":h.dataset.chatEn;
    h.setAttribute("data-support-en",en);if(N())h.textContent=en;t.textContent=N()?"Reading: In praise of the in-between season":"Reading: Autumn in two places"}
   if(N())$("#readText").innerHTML=GS_NATIVE.readingHtml;else $("#readText").innerHTML=(level==="beginners"?'<p class="tiny" style="margin:0 0 10px"><strong>Paraules:</strong> mild = suau · dark = fosc · sweets = dolços · costumes = disfresses · skeleton = esquelet · leaves = fulles</p>':"")+chat.map(([w,t])=>'<div class="msg '+w.toLowerCase()+'"><b>'+w+'</b>'+t+'</div>').join("");
   readItems=forLevel(nat("readingQs",readingQs),level);const f=$("#readForm");f.innerHTML="";
   readItems.forEach((q,i)=>{const box=document.createElement("div");box.className="question";
     box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="rd'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="rdf'+i+'"></div>';f.appendChild(box)});
   $("#readResult").classList.remove("show");
-  const v=kept("read"),t=typing("read");if(v){fillRadio(readItems,"rd",v);doRead(false)}else if(t)fillRadio(readItems,"rd",t);
+  delete movedFrom.readingQs;const v=kept("read",readItems,"readingQs",readingQs),t=v?null:typing("read",readItems,"readingQs",readingQs);if(v){fillRadio(readItems,"rd",v);doRead(false);if(movedFrom.readingQs)movedNote("#readResult","read",movedFrom.readingQs===2)}else if(t)fillRadio(readItems,"rd",t);
 }
 $("#readForm").onchange=()=>keepTyping("read",radioVals(readItems,"rd"));
 function doRead(count){let score=0;readItems.forEach((q,i)=>{const c=document.querySelector('input[name="rd'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#rdf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,false);f.className="feedback "+(ok?"ok":"no")});
-  const n=readItems.length;if(count){firstItems("read",nat("readingQs",readingQs),readItems,gotRadio(readItems,"rd"));attempt("read",score,n)}$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(count&&score>=need(n))complete("read")}
-$("#checkRead").onclick=()=>{doRead(true);keepAns("read",radioVals(readItems,"rd"))};
+  const n=readItems.length;if(count){firstItems("read",nat("readingQs",readingQs),readItems,gotRadio(readItems,"rd"));attempt("read",score,n)}$("#readResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(allIn("rd",n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#readResult").classList.add("show");if(allIn("rd",n)){if(count)complete("read");else doneFrom("read")}}
+$("#checkRead").onclick=()=>{doRead(true);keepAns("read",radioVals(readItems,"rd"),readItems)};
 $("#againRead").onclick=()=>again("read",renderRead);
 let listenItems=[];
 function renderListen(){
@@ -295,19 +335,20 @@ function renderListen(){
   listenItems.forEach((q,i)=>{const box=document.createElement("div");box.className="question";
     box.innerHTML='<p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="l'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="lf'+i+'"></div>';f.appendChild(box)});
   $("#listenResult").classList.remove("show");
-  const v=kept("listen"),t=typing("listen");if(v){fillRadio(listenItems,"l",v);doListen(false)}else if(t)fillRadio(listenItems,"l",t);
+  delete movedFrom.listening;const v=kept("listen",listenItems,"listening",listening),t=v?null:typing("listen",listenItems,"listening",listening);if(v){fillRadio(listenItems,"l",v);doListen(false);if(movedFrom.listening)movedNote("#listenResult","listen",movedFrom.listening===2)}else if(t)fillRadio(listenItems,"l",t);
 }
 $("#listenForm").onchange=()=>keepTyping("listen",radioVals(listenItems,"l"));
 function doListen(count){let score=0;listenItems.forEach((q,i)=>{const c=document.querySelector('input[name="l'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)score++;const f=$("#lf"+i);f.textContent=learningSupport.evidence(level,ok,c,q.o[0],ca()?q.h:null,true);f.className="feedback "+(ok?"ok":"no")});
-  const n=listenItems.length;if(count){firstItems("listen",nat("listening",listening),listenItems,gotRadio(listenItems,"l"));attempt("listen",score,n)}$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(score>=need(n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(count&&score>=need(n))complete("listen")}
-$("#checkListen").onclick=()=>{doListen(true);keepAns("listen",radioVals(listenItems,"l"))};
+  const n=listenItems.length;if(count){firstItems("listen",nat("listening",listening),listenItems,gotRadio(listenItems,"l"));attempt("listen",score,n)}$("#listenResult").textContent=score+" / "+n+(ca()?" correctes":" correct")+(allIn("l",n)?(ca()?" · Pas completat ✓":" · Step complete ✓"):"");$("#listenResult").classList.add("show");if(allIn("l",n)){if(count)complete("listen");else doneFrom("listen")}}
+$("#checkListen").onclick=()=>{doListen(true);keepAns("listen",radioVals(listenItems,"l"),listenItems)};
 $("#againListen").onclick=()=>again("listen",renderListen);
 // Native: a real native-speed video with C2 questions (GS_NATIVE.video), an extra under the listening. Not a step: it never changes progress.
 function renderRealVideo(){const box=$("#gsRealVideo"),V=N()&&GS_NATIVE.video;box.innerHTML="";if(!V)return;
   box.innerHTML='<h3 style="margin-top:22px">🎬 '+V.heading+'</h3><p class="instruction">'+V.intro+'</p><div style="position:relative;padding-top:56.25%;margin:12px 0;border-radius:14px;overflow:hidden;background:#000"><iframe src="https://www.youtube-nocookie.com/embed/'+V.youtube+'" title="'+V.title+'" style="position:absolute;inset:0;width:100%;height:100%" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><p class="tiny">'+V.credit+' <a href="https://www.youtube.com/watch?v='+V.youtube+'" target="_blank" rel="noopener">Open on YouTube ↗</a></p><form id="rvForm"></form><div class="actions"><button class="btn" type="button" id="rvCheck">Check</button></div><div class="result" id="rvResult"></div>';
   $("#rvForm").innerHTML=V.items.map((q,i)=>'<div class="question"><p class="q-title">'+(i+1)+'. '+q.q+'</p><div class="options">'+learningSupport.shuffledIndexes(q.o.length).map(j=>'<label class="option"><input type="radio" name="rv'+i+'" value="'+j+'"><span>'+q.o[j]+'</span></label>').join("")+'</div><div class="feedback" id="rvf'+i+'"></div></div>').join("");
   const doRv=()=>{let s=0;V.items.forEach((q,i)=>{const c=document.querySelector('input[name="rv'+i+'"]:checked'),ok=!!c&&+c.value===0;if(ok)s++;const f=$("#rvf"+i);f.textContent=c?(ok?"Correct! ":"Not yet. ")+(q.ex||""):"";f.className="feedback "+(ok?"ok":"no")});$("#rvResult").textContent=s+" / "+V.items.length+" correct";$("#rvResult").classList.add("show")};
-  const v=kept("realvideo");if(v){fillRadio(V.items,"rv",v);doRv()}
+  const v=kept("realvideo"),t=v?null:typing("realvideo");if(v){fillRadio(V.items,"rv",v);doRv()}else if(t)fillRadio(V.items,"rv",t);
+  $("#rvForm").onchange=()=>keepTyping("realvideo",radioVals(V.items,"rv"));   // chosen but not checked yet stays too (Roger, 6 Nov 2026)
   $("#rvCheck").onclick=()=>{doRv();keepAns("realvideo",radioVals(V.items,"rv"))}}
 
 function renderSpeak(){$("#speakPill").textContent=level[0].toUpperCase()+level.slice(1)+" route";
@@ -343,11 +384,14 @@ $("#vidNormal").onclick=()=>setVideo(false);$("#vidSlow").onclick=()=>setVideo(t
 // Tracking note, goal and review cards: the same as on the LS2 engine pages (ls2-engine.js trackNote, planCard, reviewCard, bindPlan;
 // state.plan[route], state.review[route], shown to the teacher in the activity dialog). Never a step, never marked.
 function renderPlan(){
-  $("#trackNote").innerHTML='<p class="track-note">'+(ca()
-    ?'📋 <strong>El professor fa el seguiment de totes les activitats que fas.</strong> Algunes s’avaluaran i seran la teva avaluació contínua, que és una part de la nota. Fes cada activitat tu sol/a i sense apunts la primera vegada; després la pots repetir per practicar. Acaba-les a temps: mira «El meu pla setmanal» al teu tauler.'
-    :'📋 <strong>Your teacher keeps track of all the activities you do.</strong> Some of them will be assessed and make up your continuous assessment, which is part of your mark. Do each activity on your own and without notes the first time; you can repeat it later to practise. Finish them on time: check “My week plan” on your board.')+'</p>';
-  $("#planBox").innerHTML='<div class="section-card plan-card"><h3>🎯 '+(ca()?'El meu objectiu':'My goal')+'</h3><p class="instruction">'+(ca()?'Abans de començar: pensa en el teu últim recall o checkpoint. Què vols millorar en aquest Learning Path?':'Before you start: think about your last recall or checkpoint. What do you want to get better at in this Learning Path?')+'</p>'
-    +'<input type="text" class="typed" id="lpGoal" maxlength="200" placeholder="'+(ca()?'Per exemple: recordar les paraules noves sense mirar.':'For example: remember the new words without looking.')+'"></div>';
+  // "How this learning path works" fold, as ls2-engine.js howTo(): the hero's warm-up note and the tracking note
+  const warm=document.querySelector(".hero .warm-note");if(warm)warm.hidden=true;
+  $("#trackNote").innerHTML='<details class="lp-how"><summary>ⓘ '+(ca()?'Com funciona aquest learning path':'How this learning path works')+'</summary>'
+    +(warm?'<p class="track-note">💡 '+warm.innerHTML+'</p>':'')+'<p class="track-note">'+(ca()
+    ?'📋 <strong>El professor fa el seguiment de totes les activitats que fas.</strong> Algunes s’avaluaran i seran la teva avaluació contínua, que és una part de la nota. Fes cada activitat tu sol/a i sense apunts la primera vegada; després la pots repetir per practicar. Acaba-les a temps: mira «Deures» al teu tauler.'
+    :'📋 <strong>Your teacher keeps track of all the activities you do.</strong> Some of them will be assessed and make up your continuous assessment, which is part of your mark. Do each activity on your own and without notes the first time; you can repeat it later to practise. Finish them on time: check “Homework” on your board.')+'</p></details>';
+  $("#planBox").innerHTML='<h3>🎯 '+(ca()?'El meu objectiu':'My goal')+'</h3><p class="instruction">'+(ca()?'Abans de començar: pensa en el teu últim recall o checkpoint. Què vols millorar en aquest Learning Path?':'Before you start: think about your last recall or checkpoint. What do you want to get better at in this Learning Path?')+'</p>'
+    +'<input type="text" class="typed" id="lpGoal" maxlength="200" placeholder="'+(ca()?'Per exemple: recordar les paraules noves sense mirar.':'For example: remember the new words without looking.')+'">';
   $("#reviewBox").innerHTML='<div class="section-card plan-card"><h3>🔁 '+(ca()?'Com m’ha anat':'How did it go?')+'</h3>'
     +'<label class="field"><strong>'+(ca()?'Què m’ha ajudat més?':'What helped me most?')+'</strong><input type="text" class="typed" id="lpHelped" maxlength="200"></label>'
     +'<label class="field"><strong>'+(ca()?'Què he de repassar?':'What do I need to review?')+'</strong><input type="text" class="typed" id="lpReview" maxlength="200"></label>'
@@ -385,7 +429,7 @@ function renderCaCards(){
   $("#flashcard").onclick=()=>$("#flashcard").classList.toggle("flipped");
   $("#flashcard").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#flashcard").classList.toggle("flipped")}};
   window.renderCards=function(){};flashcardSet.cards=[];flashcardSet.lastLevel=null;flashcardSet.config=null;
-  flashcardSet.init({cards:cardDeck,level:()=>level,complete:()=>{state.cardsDone=true;save()},isDone:()=>!!state.cardsDone});
+  flashcardSet.init({cards:cardDeck,level:()=>level,complete:()=>{state.cardsDone=true;save()},isDone:()=>!!state.cardsDone,always:true});
   if(c){
     const check=()=>{const card=flashcardSet.cards[flashcardSet.index];if(!card)return;const v=norm($("#cardType").value),ok=!!v&&String(card[1]).split(/\s*[\/,;]\s*/).some(a=>norm(a.replace(/\([^)]*\)/g,""))===v||norm(a)===v);
       $("#cardTypeMsg").className="feedback "+(ok?"ok":"no");
@@ -399,12 +443,18 @@ function renderDict(){
   const chunks=lpPanel("listen").chunks||[];if(!chunks.length){$("#gsDict").innerHTML="";return}
   $("#gsDict").innerHTML='<h3 style="margin-top:22px">✍️ '+(ca()?'Microdictat':'Micro-dictation')+'</h3><p class="instruction">'+(ca()?'Escolta cada fragment del listening (pots repetir-lo) i escriu-lo exactament.':'Listen to each bit from the listening (you can play it again) and write it exactly.')+'</p>'
     +chunks.map((c,i)=>'<div class="question"><div class="actions"><button class="btn secondary" type="button" data-say="'+i+'">▶ '+(ca()?'Escolta':'Listen')+' '+(i+1)+'</button><button class="btn secondary" type="button" data-slow="'+i+'">🐢 '+(ca()?'Més a poc a poc':'Slower')+'</button></div><input type="text" class="typed" id="gsD'+i+'" autocomplete="off" autocapitalize="off" spellcheck="false" style="width:100%;max-width:440px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit"><div class="feedback" id="gsDf'+i+'"></div></div>').join("")
-    +'<div class="actions"><button class="btn" type="button" id="gsDCheck">'+(ca()?'Comprova':'Check')+'</button></div>';
+    +'<div class="actions"><button class="btn" type="button" id="gsDCheck">'+(ca()?'Comprova':'Check')+'</button> <button class="btn secondary" type="button" id="gsDAgain">↺ '+(ca()?'Torna a practicar':'Practise again')+'</button></div>';
   const say=(t,rate)=>{const s=window.speechSynthesis;if(!s)return;s.cancel();const u=new SpeechSynthesisUtterance(t),v=s.getVoices().find(x=>/^en(-|_)GB/i.test(x.lang))||s.getVoices().find(x=>/^en(-|_)/i.test(x.lang));u.lang="en-GB";if(v)u.voice=v;u.rate=rate;s.speak(u)};
-  state.dict=state.dict||{};const kept=state.dict.listen||[];
-  chunks.forEach((c,i)=>{$('[data-say="'+i+'"]').onclick=()=>say(c,.9);$('[data-slow="'+i+'"]').onclick=()=>say(c,.6);$("#gsD"+i).value=kept[i]||""});
-  $("#gsDCheck").onclick=()=>{state.dict.listen=chunks.map((c,i)=>{const v=$("#gsD"+i).value,ok=norm(v)===norm(c),f=$("#gsDf"+i);f.className="feedback "+(ok?"ok":"no");
-    f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(ca()?"Era: ":"It was: ")+"<strong>"+c+"</strong>"+(ca()?". Compara-ho paraula per paraula.":". Compare it word by word.");return v});save()};
+  // checked answers come back with their feedback; typed but not checked yet stays too (state.dictT.listen; Roger, 6 Nov 2026)
+  state.dict=state.dict||{};state.dictT=state.dictT||{};const kept=state.dict.listen||[],typedD=kept.some(v=>v)?[]:state.dictT.listen||[];
+  chunks.forEach((c,i)=>{$('[data-say="'+i+'"]').onclick=()=>say(c,.9);$('[data-slow="'+i+'"]').onclick=()=>say(c,.6);$("#gsD"+i).value=kept[i]||typedD[i]||"";
+    $("#gsD"+i).oninput=()=>{state.dictT.listen=chunks.map((x,j)=>$("#gsD"+j).value);save()}});
+  const show=()=>chunks.map((c,i)=>{const v=$("#gsD"+i).value,ok=norm(v)===norm(c),f=$("#gsDf"+i);f.className="feedback "+(ok?"ok":"no");
+    f.innerHTML=ok?(ca()?"Correcte!":"Correct!"):(ca()?"Era: ":"It was: ")+"<strong>"+c+"</strong>"+(ca()?". Compara-ho paraula per paraula.":". Compare it word by word.");return v});
+  $("#gsDCheck").onclick=()=>{state.dict.listen=show();delete state.dictT.listen;save()};
+  // only the dictation (Roger, 4 Nov 2026: redo one activity, keep the others' answers)
+  $("#gsDAgain").onclick=()=>{delete state.dictT.listen;save();chunks.forEach((c,i)=>{$("#gsD"+i).value="";const f=$("#gsDf"+i);f.textContent="";f.className="feedback"})};
+  if(kept.some(v=>v))show();
 }
 // Listening cycle (research audit, Roger 27 Oct 2026): a copy of ls2-engine.js predictHtml/gistHtml/bindCycle; saved in state.cycle.listen.
 function renderCycle(){
@@ -419,10 +469,10 @@ function renderCycle(){
   pr.onchange=()=>{c.predict=pr.value.trim();save()};g.onchange=()=>{c.gist=g.value.trim();save()};
   hb.forEach(b=>b.onclick=()=>{c.heard=b.dataset.heard;save();mark()});
 }
-function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderCycle();renderRecall();renderWords();renderRead();renderListen();renderRealVideo();renderSpeak();renderChoices();learningSupport.apply(level);if(N())$("#speak .panel-head .instruction").textContent="Plan a C2 Proficiency long turn in writing: no recording.";updateProgress()}
+function renderAll(){setVideo(ca());renderPlan();renderCaCards();renderDict();renderCycle();renderRecall();renderWords();renderRead();renderListen();renderRealVideo();renderSpeak();renderChoices();learningSupport.apply(level);speakHanded();if(N())$("#speak .panel-head .instruction").textContent="Plan a C2 Proficiency long turn in writing: no recording.";updateProgress()}
 function setLevel(x){level=x;$$(".route").forEach(b=>b.classList.toggle("active",b.dataset.level===x));save();renderAll()}
 $$(".route").forEach(b=>b.onclick=()=>setLevel(b.dataset.level));
-$$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");window.scrollTo({top:document.querySelector("main").offsetTop-64,behavior:"smooth"})});
+$$(".tab").forEach(t=>t.onclick=()=>{$$(".tab,.panel").forEach(x=>x.classList.remove("active"));t.classList.add("active");$("#"+t.dataset.panel).classList.add("active");markTabs();const top=innerWidth<=640?$(".lp-body").getBoundingClientRect().top+scrollY:$("#lp").offsetTop-64;if(innerWidth>640||scrollY>top)window.scrollTo({top,behavior:"smooth"})});
 
 let audioCtx,sourceNode,processor,micStream,pcm=[],recSampleRate=44100,recordBlob=null,recordUrl=null;
 let recognition=null,speechTranscribingActive=false,speechRestartTimer=null,speechFinalText='';
@@ -463,7 +513,7 @@ function startSpeechTranscription(){
           const t=e.results[i][0].transcript;
           if(e.results[i].isFinal)speechFinalText+=t.trim()+' ';else interim+=t;
         }
-        $('#speechTranscript').value=(speechFinalText+interim).trim();
+        $('#speechTranscript').value=(speechFinalText+interim).trim();keepSpeak();
       };
       recognition.onend=()=>{if(speechTranscribingActive)speechRestartTimer=setTimeout(launch,180)};
       recognition.start();
@@ -485,7 +535,7 @@ $('#startRecord').onclick=async()=>{
     startSpeechTranscription();
     $('#recordStatus').textContent='Recording… speak now.';
     $('#startRecord').disabled=true;$('#stopRecord').disabled=false;
-    $('#downloadWav').disabled=true;$('#prepareSpeakingFeedback').disabled=true;
+    $('#downloadWav').disabled=true;
   }catch(e){
     $('#recordStatus').textContent='Microphone access was not available. Allow microphone permission and try again.';
   }
@@ -501,8 +551,8 @@ $('#stopRecord').onclick=async()=>{
   if(recordUrl)URL.revokeObjectURL(recordUrl);
   recordUrl=URL.createObjectURL(recordBlob);
   $('#recordedAudio').src=recordUrl;$('#recordedAudio').style.display='block';
-  $('#downloadWav').disabled=false;$('#prepareSpeakingFeedback').disabled=false;
-  $('#recordStatus').textContent='Recording ready. Listen to it before asking for feedback.';
+  $('#downloadWav').disabled=false;
+  $('#recordStatus').textContent=ca()?'Gravació a punt. Escolta-la, revisa la transcripció i entrega-la al professor.':'Recording ready. Listen to it, check the transcript and hand it in to your teacher.';
   $('#startRecord').disabled=false;$('#stopRecord').disabled=true;
   processor=null;
   complete('speak');$('#speakResult').classList.add('show');
@@ -515,49 +565,26 @@ function downloadWarmupWav(){
 }
 $('#downloadWav').onclick=downloadWarmupWav;
 
-function speakingPrompt(){
-  const tr=$('#speechTranscript').value.trim();
-  return `IMPORTANT: ENCARA NO DONIS FEEDBACK SI NO HI HA CAP ÀUDIO ADJUNT. Espera que l'usuari adjunti l'àudio. Si aquest missatge arriba abans que l'àudio, respon només: "Adjunta l'àudio i l'escoltaré."
-
-Quan l'àudio estigui adjunt, escolta'l i actua com a professor d'anglès de 4t d'ESO dins de la Learning Situation “Seasons & Celebrations”, Learning Path 1 “Getting started: Castanyada & Halloween”.
-
-Nivell: ${level[0].toUpperCase()+level.slice(1)}.
-Tasca: ${speakTask[level]}
-
-${tr?`Transcripció automàtica de suport (pot contenir errors):
-"${tr}"
-
-Primer escolta l'àudio i dona prioritat al que realment s'hi sent.`:'No hi ha transcripció automàtica disponible. Escolta l’àudio abans de donar feedback.'}
-
-${learningSupport.aiLanguage(level)} No posis nota numèrica. Respon només amb aquests apartats:
-1. 📝 Transcripció — escriu què diu realment l'alumne.
-2. ✅ Què ha fet bé — una o dues coses concretes.
-3. 🔧 Què ha de corregir — màxim 2 errors importants; escriu exactament com ho hauria de dir.
-4. 🗣️ Pronunciació — comenta només un problema clar; si no n'hi ha, digues que s'entén bé.
-5. 📋 Instruccions — indica breument si ha complert la tasca.
-6. 🎯 Un següent pas — una sola millora concreta.`;
-}
-
-function copyPromptNow(text){
-  const ta=document.createElement('textarea');
-  ta.value=text;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';ta.style.pointerEvents='none';
-  document.body.appendChild(ta);ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);
-  let ok=false;try{ok=document.execCommand('copy')}catch(e){}
-  ta.remove();return ok;
-}
-
-$('#prepareSpeakingFeedback').onclick=()=>{
-  if(!recordBlob){alert('Record your speaking first.');return}
-  const p=speakingPrompt();
-  const chatUrl='https://chatgpt.com/?prompt='+encodeURIComponent(p);
-  const chatWindow=window.open(chatUrl,'_blank','noopener,noreferrer');
-  downloadWarmupWav();
-  let copied=copyPromptNow(p);
-  if(!copied&&navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(p).catch(()=>{});
-  $('#speakingCopyStatus').textContent=chatWindow
-    ?'✓ WAV downloaded · ChatGPT opened with the prompt prepared. Attach the WAV and press Send.'
-    :'The browser blocked the ChatGPT tab. Allow pop-ups and try again.';
+// Speaking hands in to the teacher (Roger, 3 Nov 2026: no ChatGPT, no audio): the checked transcript is handed in like a step
+// (state.steps.speak, as in ls2-engine.js R.speaking) and corrected in the Wednesday run; the correction shows at the top of this tab.
+function speakHanded(){const h=(state.steps||{}).speak,m=$('#speakingHandMsg');if(!h||h.level==='native'){m.textContent='';return}
+  m.className='feedback ok';m.textContent=ca()?'Entregada el '+new Date(h.date).toLocaleDateString()+'. El professor et tornarà la correcció aquí mateix. Si et tornes a gravar millor, torna-la a entregar.':'Handed in on '+new Date(h.date).toLocaleDateString()+'. Your teacher’s correction will appear right here. If you record a better version, hand it in again.'}
+$('#handInSpeaking').onclick=()=>{
+  const m=$('#speakingHandMsg');
+  if(processor){m.className='feedback no';m.textContent=ca()?'Atura la gravació primer.':'Stop the recording first.';return}
+  const tr=$('#speechTranscript').value.trim(),n=(tr.match(/\S+/g)||[]).length,min={beginners:8,insecure:12,safe:20,daring:30}[level]||12;
+  if(n<min){m.className='feedback no';m.textContent=ca()?'La transcripció té '+n+' paraules: grava’t fent tota la tasca (almenys '+min+' paraules). La transcripció s’escriu sola mentre parles: torna’t a gravar.':'Your transcript has '+n+' words: record yourself doing the whole task (at least '+min+' words). The transcript is written by itself while you speak: record yourself again.';return}
+  state.steps=state.steps||{};
+  state.steps.speak={level,title:'Speaking',ty:window.elTyping?elTyping.sum($('#speechTranscript').parentElement):null,f:[{l:ca()?'Transcripció':'Transcript',v:tr}],rate:[],avg:null,comment:'',date:new Date().toISOString()};
+  complete('speak');$('#speakResult').classList.add('show');speakHanded();
 };
+speakHanded();
+// the plan and the transcript stay (state.speak.gs, as state.speak in ls2-engine.js; Roger, 6 Nov 2026: "they must see them with their
+// responses"); a recording itself is never saved. A transcript handed in before this came back from the hand-in.
+function keepSpeak(){state.speak=state.speak||{};state.speak.gs={plan:$('#speakPlan').value,tr:$('#speechTranscript').value};save()}
+(()=>{const g=(state.speak||{}).gs||{},h=(state.steps||{}).speak,hv=h&&h.level!=='native'&&h.f&&h.f[0]?h.f[0].v:'';
+  $('#speakPlan').value=g.plan||'';$('#speechTranscript').value=g.tr||hv||'';
+  $('#speakPlan').addEventListener('input',keepSpeak);$('#speechTranscript').addEventListener('input',keepSpeak)})();
 
 renderAll();
 
@@ -568,12 +595,15 @@ if(sessionJump){sessionJump.addEventListener('change',()=>{const target=sessionJ
 <script>
 sectionNext.init({level:()=>level,panels:[
  {id:'recall',done:()=>!!state.done.recall,detail:ca=>ca?'Prem «Comprova» al recall.':'Press “Check” in the recall quiz.'},
- {id:'words',done:()=>!!state.done.words,detail:ca=>ca?'Encerta almenys el 80 % de les frases.':'Get at least 80 % of the sentences right.'},
- {id:'read',done:()=>!!state.done.read,detail:ca=>ca?'Encerta almenys el 80 % del reading.':'Get at least 80 % of the reading right.'},
- {id:'listen',done:()=>!!state.done.listen,detail:ca=>ca?'Encerta almenys el 80 % del listening.':'Get at least 80 % of the listening right.'}
+ {id:'words',done:()=>!!state.done.words,detail:ca=>ca?'Respon i comprova totes les frases.':'Answer and check all the sentences.'},
+ {id:'read',done:()=>!!state.done.read,detail:ca=>ca?'Respon i comprova totes les preguntes del reading.':'Answer and check all the reading questions.'},
+ {id:'listen',done:()=>!!state.done.listen,detail:ca=>ca?'Respon i comprova totes les preguntes del listening.':'Answer and check all the listening questions.'}
 ]});
 sectionNext.final({id:'speak',level:()=>level,done:()=>!!state.done.speak,detail:ca=>ca?'Grava el teu àudio i atura la gravació.':'Record your audio and stop the recording.'});
 </script>
+<!-- the app menu and the learning path's left column at once, before the browser paints: no old look first (Roger, 7 Nov 2026) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

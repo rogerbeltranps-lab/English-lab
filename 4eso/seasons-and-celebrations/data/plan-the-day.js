@@ -17,7 +17,7 @@ window.LP = {
         { r: 'daring', q: '___ it is commercialised, it’s still fun.', a: ['although', 'even though'] }
       ] },
     { id: 'vocab', type: 'vocab', practiceMode: 'listen', tab: { ca: 'Vocabulari', en: 'Vocabulary' }, title: { ca: 'Organitzar un esdeveniment', en: 'Planning an event' },
-      intro: { ca: 'Explora, practica amb les targetes i completa les frases (80 %).', en: 'Explore, practise with the cards and complete the sentences (80 %).' },
+      intro: { ca: 'Explora, practica amb les targetes i completa les frases.', en: 'Explore, practise with the cards and complete the sentences.' },
       core: { beginners: ['meet friends', 'buy tickets', 'invite people'], insecure: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people'], safe: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people', 'organise', 'set up', 'put up posters / decorations', 'send invitations', 'make a timetable', 'run a stall / workshop', 'take place', 'be held', 'book a band / a room'], daring: ['go to a festival', 'meet friends', 'book a room', 'buy tickets', 'invite people', 'organise', 'set up', 'put up posters / decorations', 'send invitations', 'make a timetable', 'run a stall / workshop', 'take place', 'be held', 'book a band / a room'] },
       groups: [
         { g: 'Plans', items: [['go to a festival', 'anar a un festival', 'We’re going to go to a festival.'], ['meet friends', 'quedar amb amics', 'I’ll meet friends in the square.'], ['book a room', 'reservar una sala', 'We need to book a room.'], ['buy tickets', 'comprar entrades', 'Can you buy tickets?'], ['invite people', 'convidar gent', 'We’re going to invite people.']] },
@@ -38,7 +38,7 @@ window.LP = {
         { r: 'safe', q: 'We need to make a ___ so everyone knows what happens and when.', a: ['timetable'] },
         { r: 'safe', q: 'The event will be ___ in the school hall.', a: ['held'] }
       ] },
-    { id: 'listen', type: 'mc', tab: 'Listening', title: { ca: 'Listening: reunió del consell d’alumnes', en: 'Listening: student council meeting' }, pill: '80 %',
+    { id: 'listen', type: 'mc', tab: 'Listening', title: { ca: 'Listening: reunió del consell d’alumnes', en: 'Listening: student council meeting' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Escolta la reunió una vegada per la idea general i una altra per als detalls.', en: 'Listen once for the general idea and again for the details.' },
       media: { audio: 'audio/student-council-meeting.mp3', title: 'Student council meeting', script: [
         ['Laia', 'OK, everyone. We’re meeting the head teacher on Monday, so we need a plan today.'],
@@ -71,7 +71,7 @@ window.LP = {
         { r: 'daring', q: '“I’ll call him tonight.” This is…', o: ['a decision made now', 'an arrangement', 'a timetable'] },
         { r: 'daring', q: '“We’re sending them on Wednesday.” This is…', o: ['an arrangement', 'a prediction', 'a decision made now'] }
       ] },
-    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: com es prepara una celebració', en: 'Listen again: getting ready for a celebration' }, pill: { ca: 'Vídeo · 80 %', en: 'Video · 80 %' },
+    { id: 'again', type: 'mc', tab: { ca: 'Torna a escoltar', en: 'Listen again' }, title: { ca: 'Torna a escoltar: com es prepara una celebració', en: 'Listen again: getting ready for a celebration' }, pill: { ca: 'Vídeo', en: 'Video' },
       intro: { ca: 'Escolta la Mei de l’LP3: com es prepara la seva família i qui fa què. T’ajudarà a planificar el vostre dia.', en: 'Listen to Mei from LP3: how does her family get ready, and who does what? It will help you plan your day.' },
       media: { videos: [{ base: 'video/mei-lunar-new-year', title: 'Mei: Lunar New Year' }], videoCredit: 'Illustrated video made for English Lab. Voices generated with ElevenLabs.' },
       chunks: ['we clean the whole flat', 'We make dumplings together'],
@@ -97,8 +97,8 @@ window.LP = {
         ['Laia', 'Where’s it going to take place?'],
         ['Omar', 'In the school hall. There will be four stalls, one for each festival.'],
         ['Laia', 'What about food?'],
-        ['Omar', 'I’ll ask the families. I think a lot of parents will help.']] } },
-    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Formes de futur', en: 'Future forms' }, pill: '80 %',
+        ['Omar', 'I’ll ask the families. I think a lot of parents will help.']], marks: [["O**K**, ↗ **ev**eryone. ↘", "We’re **meet**ing the **head** teacher on **Mon**day, ↗ so we need‿a **plan** to**day**. ↘"], ["**Right**. ↘ The e**vent**‿is going to be a**bout** **fes**tivals‿of **light**: Di**wa**li, ↗ **Ha**nukkah, ↗ **Lu**nar New **Year** and **Christ**mas. ↘"], ["**Good**. ↘ **When**‿is‿it? ↘"], ["It’s‿on **Fri**day the e**lev**enth of De**cem**ber. ↘", "**School** **fin**ishes‿at **two**, ↗ so the e**vent** **starts**‿at **ten** and **fin**ishes at **one** **thir**ty. ↘"], ["**Where’s**‿it going to take **place**? ↘"], ["In the **school** **hall**. ↘", "There will be **four** **stalls**, ↗ one for‿**each** **fes**tival. ↘"], ["What‿a**bout** **food**? ↘"], ["I’ll‿**ask** the **fam**ilies. ↘", "I **think**‿a **lot**‿of **par**ents will **help**. ↘"]], cues: [[0.03, 1.28, 0.05, 1.5], [1.27, 5.08, 1.5, 5.97], [5.25, 12.75, 6.54, 15.41], [12.88, 14.75, 15.9, 18.01], [14.96, 17.17, 18.68, 21.25], [17.25, 22.13, 21.36, 27.06], [22.38, 24.42, 27.76, 29.99], [24.65, 26.12, 30.79, 32.49], [26.26, 29.27, 32.68, 36.24], [29.41, 30.87, 36.75, 38.47], [31.02, 32.39, 38.98, 40.56], [32.4, 34.22, 40.61, 42.68]] } },
+    { id: 'grammar', type: 'typed', mode: 'listen', tab: { ca: 'Gramàtica', en: 'Grammar' }, title: { ca: 'Formes de futur', en: 'Future forms' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Llegeix com funciona i completa. Si falles dues vegades, veuràs la resposta.', en: 'Read how it works and complete. After two wrong tries you will see the answer.' },
       explain: [
         { ca: '<strong>going to</strong> per a plans que ja tens (<em>We’re going to decorate the hall.</em>) · <strong>will</strong> per a decisions que prens ara i ofertes (<em>I’ll bring the music.</em>) · <strong>There will be</strong> + nom (<em>There will be music and food.</em>).', en: '<strong>going to</strong> for plans you already have (<em>We’re going to decorate the hall.</em>) · <strong>will</strong> for decisions made now and offers (<em>I’ll bring the music.</em>) · <strong>There will be</strong> + noun (<em>There will be music and food.</em>).' },
@@ -125,7 +125,7 @@ window.LP = {
         { r: 'daring', q: '“Nobody has a speaker.” “Don’t worry, I ___ ___ (bring) mine.”', a: ['will bring', "'ll bring"], en: 'Offered now → will.' },
         { r: 'daring', q: 'Correct it: “We will meet the head teacher on Monday at 9. It’s in her diary.” → We ___ ___ the head teacher on Monday at 9.', a: ['are meeting', "'re meeting"], en: 'It is already arranged, so Present Continuous, not will.' }
       ] },
-    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Quin futur?', en: 'Which future?' }, title: { ca: 'Quin futur? (barrejat)', en: 'Which future? (mixed)' }, pill: '80 %',
+    { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Quin futur?', en: 'Which future?' }, title: { ca: 'Quin futur? (barrejat)', en: 'Which future? (mixed)' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Pensa per què: decisió ara, pla, oferta…', en: 'Think why: decision now, plan, arrangement, timetable or prediction.' },
       items: [
         { q: '“The printer doesn’t work.” “OK, I ___ ask the office.”', a: ['will', "'ll"], ca: 'Decisió ara.', en: 'Decision now.' },

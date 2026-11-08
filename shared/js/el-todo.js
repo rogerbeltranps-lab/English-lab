@@ -1,20 +1,15 @@
-// Floating weekly to-do list (Roger, 25 Oct 2026): a "📋 My week" button on every page a signed-in student opens
-// (board, course page, LS pages, activities, English Lab). It opens this week's class days of the student's group,
-// from the teaching plan in el-plan.js (through el-week.js): per day, the activities worked on or due that day
-// (✔ Done / To do / Late, with Open), what else happens in class, the exam day and late work from earlier weeks.
-// Optional activities (`optional` in el-plan.js, same shape as `due`) show as homework and are never late (students are not told
-// they are optional or how they count: Roger, 26 Oct 2026; checkpoints open the next Learning Path anyway).
+// Floating ✅ To do button (Roger, 25 Oct 2026 as "📋 My week"; since 6 Nov 2026 only what the teacher opens: "I don't [want] students [to]
+// see anything as to do nor the week. I say when to do sth since otherwise is too much info. I open sections or an LP and if we don't finish
+// I can say this is homework"). On every page a signed-in student opens (board, course page, LS pages, activities, English Lab): the exam
+// day, 📝 the homework the teacher set on the dashboard (ELWeek.studentHw, with ✔ Done or Open) and the learning paths and tabs the teacher
+// has opened for the group that the student has not finished (elTodoList in el-catalog.js), each tab a link. No week plan, no plan dates.
 // Loaded by el-cloud.js for students and testers: start({db,user,group,root,lsId,seesAll,results,levels,lsInfo}); the last three are
-// el-cloud.js's shared reads (one per page, results from the 30-minute copy), so the list costs no reads of its own. Catalan for Insecure.
+// el-cloud.js's shared reads (one per page, results from the 30-minute copy), so the list costs no reads of its own. Catalan for Starter/Base.
 import {doc,getDoc,collection,getDocs} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const load=src=>new Promise(r=>{const s=document.createElement("script");s.src=src;s.onload=r;s.onerror=r;document.head.append(s)});
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{Storage.prototype.setItem.call(localStorage,k,v)}catch(e){}}};
-const DAY={en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],ca:["Diumenge","Dilluns","Dimarts","Dimecres","Dijous","Divendres","Dissabte"]};
-const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-// "Getting started: Castanyada & Halloween (warm-up)" → "getting started"
-const short=t=>String(t).split(/[:(]/)[0].trim().toLowerCase();
 
 export async function start({db,user,group,root,lsId,seesAll,results,levels,lsInfo}){
   if(!group)return;
@@ -37,65 +32,28 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
   const acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls);
   // On a page of this LS the local progress is the freshest; elsewhere the synced copy.
   const prog=k=>lsId===ls?store.get(k):((pg&&pg.data)||{})[k];
-  const isDone=a=>{const r=rs[a.id]||{};if(r.locked||r.markedDone)return true;
-    const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));
-    const req=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));return req.length>0&&req.every(k=>d.has(k))};
+  const isDone=a=>{const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));(window.elCorrected?elCorrected(a,rs[a.id]):[]).forEach(k=>d.add(k));return window.elAllDone(a,d,rs[a.id])};   // every step, not the Submit flag
   const canDo=a=>seesAll||window.elLpOpen(a,info,group);   // learning paths the teacher has opened for the group
-  // sections the teacher has opened and the student has not finished: on the list until they are done (elSecPending in el-catalog.js)
-  const doneOf=a=>{const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));return d};
-  const secs=()=>seesAll?[]:acts.filter(canDo).flatMap(a=>window.elSecPending(a,info,group,doneOf(a)).map(([id,name])=>[a,id,name]));
-  const opt=id=>p.optional&&p.optional[id]&&p.optional[id][gi]||null;
-  // "LP3" in a session line → the activity named next to it somewhere in the plan ("LP3 Where traditions come from")
-  const lp={};p.rows.forEach(r=>(r.g?r.g[gi]||"":r.what||"").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(m,n,name)=>{const a=acts.find(a=>short(a.title).startsWith(name.trim().toLowerCase())||name.trim().toLowerCase().startsWith(short(a.title)));if(a)lp[n]=a}));
-  const mentions=seg=>{const s=seg.toLowerCase(),out=acts.filter(a=>s.includes(short(a.title)));const n=seg.match(/\bLP(\d+)\b/);if(n&&lp[n[1]]&&!out.includes(lp[n[1]]))out.push(lp[n[1]]);return out};
-
-  function week(){
-    const r=p.rows[i],end=W.add(r.from,6),days={},extra=[];
-    const dayOf=d=>days[d]||(days[d]={items:[],cls:[]});
-    (r.g?r.g[gi]||"":r.what||"").split("\n").filter(Boolean).forEach(line=>{
-      const m=line.match(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat) \d+ · (.*)$/);
-      if(!m){if(!/^Homework by /.test(line))extra.push(line);return}   // homework lines are in the 🏠 box
-      const d=W.add(r.from,(WD.indexOf(m[1])+6)%7),dd=dayOf(d);
-      m[2].split(" · ").forEach(seg=>{const as=mentions(seg);
-        if(!as.length){dd.cls.push(seg);return}
-        as.forEach(a=>{if(!dd.items.some(it=>it.a===a))dd.items.push({a,part:(seg.match(/\((\d\/\d)\)/)||[])[1]||""})})})});
-    // activities due (or optional) this week land on their day even if the line does not name them
-    acts.forEach(a=>{const due=W.due(p,a.id,gi),o=opt(a.id);[[due,false],[o,true]].forEach(([d,optional])=>{if(!d||d<r.from||d>end)return;
-      const dd=dayOf(d),it=dd.items.find(it=>it.a===a);if(it)it.optional=optional;else dd.items.push({a,optional,part:""})})});
-    Object.values(days).forEach(dd=>dd.items.forEach(it=>it.due=W.due(p,it.a.id,gi)));
-    return {r,days,extra};
-  }
-  const lateOnes=from=>acts.filter(a=>{const d=W.due(p,a.id,gi);return d&&d<from&&d<today&&!a.manual&&canDo(a)&&!isDone(a)});
-
-  function status(it,d){const a=it.a;
-    if(a.manual)return `<span class="tg">${t("al Classroom","on Classroom")}</span>`;
-    if(isDone(a))return `<span class="ok">✔ ${t("Fet","Done")}</span>`;
-    if(!canDo(a))return `<span class="tg">${t("el professor l'obrirà","your teacher will open it")}</span>`;
-    if(it.optional)return `<span class="tg">${t("deures","homework")}</span>`;
-    if(it.due&&it.due<today)return `<span class="lt">${t("Endarrerida","Late")}</span>`;
-    return it.part&&it.due!==d?"":`<span class="td">${t("Per fer","To do")}</span>`}
-  const href=a=>new URL(a.path,root).href;
-  const item=(it,d)=>{const a=it.a,done=!a.manual&&isDone(a);
-    return `<li class="${done?"dn":""}"><span class="ck">${done?"✅":"⬜"}</span><span class="tt">${esc(a.title.split(/[:(]/)[0].trim())}${it.part?` <small>(${it.part})</small>`:""}</span>${status(it,d)}${done||!canDo(a)?"":`<a href="${href(a)}">${t("Obre","Open")}</a>`}</li>`};
-
-  function counts(){const {days}=week(),from=p.rows[i].from;let n=lateOnes(from).length+secs().length;
-    Object.entries(days).forEach(([d,dd])=>dd.items.forEach(it=>{if(it.due===d&&!it.optional&&!it.a.manual&&canDo(it.a)&&!isDone(it.a))n++}));return n}
-
-  function panel(){const {r,days,extra}=week(),late=lateOnes(r.from),ex=W.exam(p,gi),n=ex?W.days(today,ex):null;
+  const doneOf=a=>{const d=new Set();a.keys.forEach(k=>window.elDoneSet(prog(k)).forEach(s=>d.add(s)));(window.elCorrected?elCorrected(a,rs[a.id]):[]).forEach(k=>d.add(k));return d};
+  const lp=window.elLpNumMap?elLpNumMap(ls,p,gi):{},num=a=>{const n=Object.keys(lp).find(k=>lp[k]===a);return n?"LP"+n+" · ":""};
+  const href=(a,id)=>new URL(a.path,root).href+(id?"#"+encodeURIComponent(id):"");
+  // ✅ what the teacher has opened and I haven't finished (elTodoList), and 📝 only the homework the teacher set (ELWeek.studentHw)
+  const todo=()=>seesAll?[]:window.elTodoList(ls,info,group,doneOf,isDone,p,gi);
+  const hws=()=>W.studentHw(p,gi,((info||{}).homework||{})[group]).map(x=>{const tg=window.elHwTargets?elHwTargets(x,ls,p,gi)||{}:{};
+    const left=Object.entries(tg).flatMap(([id,ps])=>{const a=acts.find(y=>y.id===id);if(!a)return [];const d=doneOf(a),all=((window.EL_SECTIONS||{})[a.id]||[]).map(z=>z[0]).filter(k=>elSecSteps(a,k).length);
+      return ((ps&&ps.length)?ps:all.length?all:[""]).filter(k=>k?!elSecSteps(a,k).every(z=>d.has(z)):!isDone(a)).map(k=>[a,k])});
+    return {x,done:Object.keys(tg).length>0&&!left.length,href:left.length?href(left[0][0],left[0][1]):null}});
+  function counts(){return todo().length}   // the same number as the ✅ To do tile on the board
+  function panel(){const ex=W.exam(p,gi),n=ex?W.days(today,ex):null,td=todo(),hw=hws();
     const exam=ex&&n>=0?`<div class="ex">📝 ${t("Examen","Exam")}: ${W.date(ex,lang)}${n>1?t(` · d'aquí a ${n} dies`,` · in ${n} days`):n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
-    const lt=late.length?`<div class="la"><b>⏰ ${t("Endarrerides","Late")}</b><ul>${late.map(a=>`<li><span class="tt">${esc(a.title.split(/[:(]/)[0].trim())} <small>· ${W.date(W.due(p,a.id,gi),lang)}</small></span><a href="${href(a)}">${t("Fes-la","Do it")}</a></li>`).join("")}</ul></div>`:"";
-    const sc=secs(),sp=sc.length?`<div class="sp"><b>📌 ${t("Seccions per acabar","Sections to finish")}</b><ul>${sc.map(([a,id,name])=>`<li><span class="tt">${esc(a.title.split(/[:(]/)[0].trim())} · ${esc(name)}</span><a href="${href(a)}#${id}">${t("Obre","Open")}</a></li>`).join("")}</ul></div>`:"";
-    const ds=Object.keys(days).sort().map(d=>{const dd=days[d],dt=new Date(d+"T12:00");
-      return `<div class="dy ${d===today?"now":""}"><h4>${DAY[lang][dt.getDay()]} ${dt.getDate()}${d===today?` <i>· ${t("avui","today")}</i>`:""}</h4>`
-        +(dd.items.length?`<ul>${dd.items.map(it=>item(it,d)).join("")}</ul>`:"")
-        +(dd.cls.length?`<div class="cl">${t("A classe:","In class:")} ${esc(dd.cls.join(" · "))}</div>`:"")+`</div>`}).join("");
-    const hws=W.upcoming(p,gi,null,null,((info||{}).homework||{})[group]),cal=W.calendar(group,root);
-    const hw=`<div class="hw"><b>🏠 ${t("Deures i classes pel teu compte","Homework and classes on your own")}</b>`+(hws.length?`<ul>${hws.map(x=>`<li><span class="tt">${x.kind==="self"?"📚":"🏠"} ${esc(W.taskText(x,lang))}</span>${x.extra?`<a href="${W.gcalLink(x,lang)}" target="_blank" rel="noopener">📅</a>`:""}<${x.msg?`<details class="hwmsg"><summary>${t("Instruccions","Instructions")}</summary><div>${esc(x.msg).replace(/https?:\/\/[^\s<]+/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`)}</div></details>`:""}</li>`).join("")}</ul>`:`<div class="cl">${t("No tens deures per als propers dies.","No homework for the next few days.")}</div>`)
-      +`<a class="cal" href="${cal.google}" target="_blank" rel="noopener">📅 ${t("Afegeix-ho al meu Google Calendar","Add it to my Google Calendar")}</a></div>`;
-    const head=i===W.row(p)?t("La meva setmana","My week"):i===0?t("Comencem","We start"):t("Propera setmana","Next week");
-    return `<div class="hd"><b>📋 ${head} · ${W.week(r,lang)}</b><button type="button" data-x aria-label="${t("Tanca","Close")}">✕</button></div><div class="bd">${exam}${hw}${lt}${sp}${ds||`<p class="cl">${t("Aquesta setmana no hi ha classes previstes.","No classes planned this week.")}</p>`}`
-      +extra.map(e=>`<div class="cl">${esc(W.line(e,lang))}</div>`).join("")+(r.note?`<div class="cl">ℹ️ ${esc(r.note)}</div>`:"")
-      +`<a class="all" href="${new URL("today.html",root).href}">${t("Tot el pla al meu tauler","The whole plan on my board")} →</a></div>`}
+    const hwh=hw.length?`<div class="hw"><b>📝 ${t("Deures","Homework")}</b><ul>${hw.map(h=>`<li class="${h.done?"dn":""}"><span class="tt">${esc(W.taskText(h.x,lang))}</span>${h.done?`<span class="ok">✔ ${t("Fet","Done")}</span>`:h.href?`<a href="${h.href}">${t("Obre","Open")}</a>`:""}</li>${h.x.msg?`<li><details class="hwmsg"><summary>${t("Instruccions","Instructions")}</summary><div>${esc(h.x.msg).replace(/https?:\/\/[^\s<]+/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`)}</div></details></li>`:""}`).join("")}</ul></div>`:"";
+    const tdh=td.length?`<ul>${td.map(x=>{const a=x.a;return `<li class="it"><span class="tt"><b>${esc(num(a)+a.title.split(/[:(]/)[0].trim())}</b>`
+        +(x.cp?`<br><small>⏱ ${t(`Primer fes el ${esc(x.cp.title)}`,`First do ${esc(x.cp.title)}`)}</small>`:x.tabs.length?`<br>${x.tabs.map(([id,nm])=>`<a class="tb" href="${href(a,id)}">${esc(nm)}</a>`).join(" ")}`:"")
+        +`</span>${x.cp?`<a href="${href(x.cp)}">${t("Obre","Open")}</a>`:x.tabs.length?"":`<a href="${href(a)}">${t("Obre","Open")}</a>`}</li>`}).join("")}</ul>`
+      :`<p class="cl">✓ ${t("Has acabat tot el que el professor ha obert.","You have finished everything your teacher has opened.")}</p>`;
+    return `<div class="hd"><b>✅ ${t("Per fer","To do")}</b><button type="button" data-x aria-label="${t("Tanca","Close")}">✕</button></div><div class="bd">${exam}${hwh}`
+      +`<div class="sub">${t("El que el professor ha obert i encara no has acabat:","What your teacher has opened and you haven't finished:")}</div>${tdh}`
+      +`<a class="all" href="${new URL("today.html#todo",root).href}">${t("Al meu tauler","On my board")} →</a></div>`}
 
   const css=document.createElement("style");css.textContent=`
 #el-todo-btn{position:fixed;right:10px;bottom:56px;z-index:10001;border:0;border-radius:999px;background:#4f46e5;color:#fff;padding:8px 14px;font:600 14px system-ui,sans-serif;box-shadow:0 4px 14px #0f172a40;cursor:pointer}
@@ -118,19 +76,19 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
 #el-todo .dy{margin:7px 0 9px}#el-todo h4{margin:0 0 3px;font-size:12px;color:#4338ca;text-transform:uppercase;letter-spacing:.03em}
 #el-todo h4 i{color:#16a34a;font-style:normal}#el-todo .dy.now{background:#f0fdf4;border-radius:8px;padding:4px 6px;margin-left:-6px;margin-right:-6px}
 #el-todo .cl{color:#64748b;font-size:12px;margin:2px 0 0 25px}#el-todo .bd>.cl{margin-left:0}
+#el-todo .sub{font-size:12px;color:#475569;margin:4px 0 2px}#el-todo li.it{align-items:flex-start;border-bottom:1px solid #f1f5f9;padding:5px 0}#el-todo a.tb{display:inline-block;margin:3px 3px 0 0;font-size:12px;color:#0f766e;border:1px solid #99f6e4;background:#f0fdfa;border-radius:999px;padding:1px 8px;text-decoration:none}
 #el-todo .all{display:block;margin-top:8px;font-size:12px;color:#4338ca}
 @media print{#el-todo,#el-todo-btn{display:none}}`;
   document.head.append(css);
   const btn=document.createElement("button"),box=document.createElement("div");
-  btn.id="el-todo-btn";btn.type="button";box.id="el-todo";box.setAttribute("role","dialog");box.setAttribute("aria-label",t("La meva setmana","My week"));
+  btn.id="el-todo-btn";btn.type="button";box.id="el-todo";box.setAttribute("role","dialog");box.setAttribute("aria-label",t("Per fer","To do"));
   document.body.append(box,btn);
-  const draw=()=>{const n=counts();btn.innerHTML=`📋 ${t("La meva setmana","My week")}${n?`<span class="n">${n} ${t("per fer","to do")}</span>`:""}`;if(!box.hidden)box.innerHTML=panel()};
+  const draw=()=>{const n=counts();btn.innerHTML=`✅ ${t("Per fer","To do")}${n?`<span class="n">${n}</span>`:""}`;if(!box.hidden)box.innerHTML=panel()};
   const show=o=>{box.hidden=!o;store.set("el_todo_open",o?"1":"0");draw()};
   btn.onclick=()=>show(box.hidden);
   box.addEventListener("click",e=>{if(e.target.closest("[data-x]"))show(false)});
-  // Closed unless the student left it open; it opens by itself once at the start of each new week.
-  const wk=p.rows[i].from,seen=store.get("el_todo_week")===wk;store.set("el_todo_week",wk);
-  box.hidden=seen?store.get("el_todo_open")!=="1":false;
+  // Closed unless the student left it open (no more "once a week": there is no week plan for students, Roger 6 Nov 2026).
+  box.hidden=store.get("el_todo_open")!=="1";
   draw();
   // progress made on this page shows when the student comes back to the tab or reopens the list
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)draw()});

@@ -92,9 +92,14 @@ window.ELStudy = (function () {
 
   function bind(a) {
     api = a; clearInterval(timer); if (!api.LP.study) return;
+    // On a computer el-app.js moves the guide into the left column after each redraw, so for a moment the previous guide (earlier in
+    // the page) is still there with the same ids: drop it, or the buttons below would be bound to it (route change: Check did nothing,
+    // and on Native the missing reading block threw and stopped the steps from opening).
+    const cards = [...document.querySelectorAll('.study-card')], cur = document.querySelector('#lp .study-card') || cards[cards.length - 1];
+    cards.forEach(c => { if (c !== cur) c.remove(); });
     ['listen', 'read', 'vocab', 'grammar'].forEach(k => {
-      const b = $('[data-study-check="' + k + '"]'); if (!b) return;
-      const s = src(k), items = mine(Array.isArray(s) ? s : s.items), id = 'study_' + k;
+      const b = $('[data-study-check="' + k + '"]'), s = src(k); if (!b || !s) return;
+      const items = mine(Array.isArray(s) ? s : s.items), id = 'study_' + k;
       b.onclick = () => {
         let right = 0, got = 0, max = 0;
         items.forEach((x, i) => {

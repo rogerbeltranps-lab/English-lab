@@ -29,17 +29,20 @@ window.LP = {
     {
      "id": "c4-01",
      "r": "beginners",
-     "q": "Formal ending: Yours ___"
+     "q": "Formal ending: Yours ___",
+     "o": ["sincere", "faithful", "sincerely"]
     },
     {
      "id": "c4-02",
      "r": "beginners",
-     "q": "We would ___ to organise a celebration day."
+     "q": "We would ___ to organise a celebration day.",
+     "o": ["liking", "like", "likes"]
     },
     {
      "id": "c4-03",
      "r": "beginners",
-     "q": "I am writing ___ propose a celebration day."
+     "q": "I am writing ___ propose a celebration day.",
+     "o": ["for", "that", "to"]
     },
     {
      "id": "c4-04",
@@ -49,17 +52,20 @@ window.LP = {
     {
      "id": "c4-05",
      "r": "beginners",
-     "q": "___ will be four stalls."
+     "q": "___ will be four stalls.",
+     "o": ["they", "there", "it"]
     },
     {
      "id": "c4-06",
      "r": "beginners",
-     "q": "Hanukkah usually takes place ___ December."
+     "q": "Hanukkah usually takes place ___ December.",
+     "o": ["at", "in", "on"]
     },
     {
      "id": "c4-07",
      "r": "beginners",
-     "q": "She ___ (go) to bed at eleven."
+     "q": "She ___ (go) to bed at eleven.",
+     "o": ["is going", "goes", "go"]
     },
     {
      "id": "c4-08",

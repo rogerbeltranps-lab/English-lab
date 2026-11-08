@@ -1,6 +1,7 @@
 // Teacher emails (Roger, 1 Nov 2026: "when I have messages as a teacher on the app, that I receive a mail" … "a mail on Saturday with that info
 // would be enough" … "if it's free, receiving notifications on my mail is not a bad idea"). Run by .github/workflows/teacher-emails.yml:
-//   --instant (every 15 minutes in the day): the ⚠️ Problem reports (problems) and 💡 Ideas (suggestions) sent since the last check, in one email.
+//   --instant (every 15 minutes in the day): the ⚠️ Problem reports (problems), 💡 Ideas (suggestions) and ✉️ students' answers to your private
+//   messages (announcements with sAt, Roger 7 Nov 2026) sent since the last check, in one email.
 //   no flag (Saturday morning, after the Friday 19:37 marking audit): ONE email with
 //     1. the class sessions not ticked, per group: the same list as the dashboard's "⚠ Weekend check" (pending() in teacher.html: sessions before
 //        today, not ticked in teacherPlan/{group}.ticks, not set as homework, not "Homework by …", "moved to" or self-study lines). Left
@@ -45,13 +46,19 @@ if(INSTANT){
   if(!last){last=new Date(Date.now()-20*60000).toISOString();console.log("No saved last check: looking back 20 minutes.")}
   const t=d=>new Date(d).getTime(),inWin=x=>t(x.created)>t(last)&&t(x.created)<=t(now);
   const [probs,ideas]=(await Promise.all([since("problems",last),since("suggestions",last)])).map(l=>l.filter(inWin));
-  console.log("New since the last check: "+probs.length+" problem report(s), "+ideas.length+" idea(s).");   // counts only: the log is public
-  if(probs.length||ideas.length){
+  // answers to private messages: sAt (server time) is the student's last reply; the email quotes their answers since your last one (at most 3)
+  const tail=th=>{const i=th.map(x=>x.by).lastIndexOf("t");return th.slice(i+1).filter(x=>x.by==="s").slice(-3)};
+  const answers=(await since("announcements",last,"sAt")).filter(a=>t(a.sAt)>t(last)&&t(a.sAt)<=t(now)).map(a=>Object.assign(a,{newOnes:tail(a.thread||[])})).filter(a=>a.newOnes.length);
+  console.log("New since the last check: "+probs.length+" problem report(s), "+ideas.length+" idea(s), "+answers.length+" answer(s).");   // counts only: the log is public
+  if(probs.length||ideas.length||answers.length){
     const out=[];
+    if(answers.length)out.push("✉️ ANSWERS TO YOUR MESSAGES","",...answers.map(a=>["• "+(a.label||"A student")+" answered your message",
+      "   You wrote: “"+String(a.text||"").trim().replace(/\s*\n\s*/g," / ").slice(0,200)+"”",
+      ...a.newOnes.map(x=>"   "+time(x.at)+": “"+String(x.text).trim().replace(/\s*\n\s*/g," / ")+"”")].join("\n")+"\n"),"Answer them: "+SITE+"teacher.html (💬 Messages)","");
     if(probs.length)out.push("⚠️ NEW PROBLEM REPORTS","",...probs.map(probBlock),"Open them: "+SITE+"teacher.html#probs","");
     if(ideas.length)out.push("💡 NEW IDEAS","",...ideas.map(ideaBlock),"Open them: "+SITE+"teacher.html","");
     out.push("—","English Lab checks every 15 minutes from 7:00 to 23:00. Students do not see this email.");
-    await sendMail("English Lab: "+[probs.length?n(probs.length,"new problem report","new problem reports"):"",ideas.length?n(ideas.length,"new idea","new ideas"):""].filter(Boolean).join(" and "),out.join("\n"))}
+    await sendMail("English Lab: "+[answers.length?n(answers.length,"answer to your messages","answers to your messages"):"",probs.length?n(probs.length,"new problem report","new problem reports"):"",ideas.length?n(ideas.length,"new idea","new ideas"):""].filter(Boolean).join(" and "),out.join("\n"))}
   if(!DRY)fs.writeFileSync(STATE,JSON.stringify({lastAt:now}));
   process.exit(0);
 }
@@ -60,7 +67,11 @@ if(INSTANT){
 const ticks={},hw={};
 await Promise.all(W.EL_GROUPS.map(async g=>{ticks[g.id]=(await db.get("teacherPlan/"+g.id)||{}).ticks||{}}));
 const plans=W.EL_GROUPS.map(g=>{const n=WK.now(g.id);return n?Object.assign({gid:g.id,name:g.name},n):null}).filter(Boolean);
-await Promise.all([...new Set(plans.map(x=>x.ls))].map(async ls=>{const d=await db.get("ls/"+encodeURIComponent(ls))||{};hw[ls]=d.homework||{};if(d.planEdits)WK.applyEdits(ls,d.planEdits)}));   // sessions moved on the dashboard
+const pe={};
+await Promise.all([...new Set(plans.map(x=>x.ls))].map(async ls=>{const d=await db.get("ls/"+encodeURIComponent(ls))||{};hw[ls]=d.homework||{};pe[ls]=d.planEdits||{};if(d.planEdits)WK.applyEdits(ls,d.planEdits)}));   // sessions moved on the dashboard
+// past class days of the agenda count as done (ELWeek.autoTicks, as on the dashboard): only what is still on an old day of a group without an agenda shows here
+const agOf=(ls,gid)=>{const s=((pe[ls]||{})[gid]||{}).agenda;if(!s)return null;try{return typeof s==="string"?JSON.parse(s):s}catch(e){return null}};
+plans.forEach(x=>WK.autoTicks(x.ls,agOf(x.ls,x.gid),ticks[x.gid],TODAY));
 const lines=(x,r)=>String(r.g?r.g[x.gi]||"":r.what||"").split("\n").filter(Boolean);
 const lineDate=(r,l)=>{const m=/^\w{3} (\d{1,2})\b/.exec(l);if(!m||!r.from)return null;for(let j=0;j<7;j++){const d=WK.add(r.from,j);if(+d.slice(8)===+m[1])return d}return null};
 const ticked=(x,l)=>{const o=((x.p._moved||{})[x.gi]||{})[l],a=((x.p._added||{})[x.gi]||{})[l];return !!(ticks[x.gid][x.ls+"|"+l]||o&&ticks[x.gid][x.ls+"|"+o.orig]||a&&ticks[x.gid][x.ls+"|"+a.key])};   // a moved session keeps a tick given before the move

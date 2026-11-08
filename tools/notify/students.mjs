@@ -1,8 +1,8 @@
 // Students' Sunday summary (Roger, 1 Nov 2026: "the same for the students. However they can't receive mails outside of the school domain";
 // chose "Weekly summary on Sunday"). Run by .github/workflows/teacher-emails.yml every Sunday evening: one email per student, from the
 // teacher's school account (SCHOOL_MAIL_URL, see lib.mjs; school accounts only receive mail from the school domain), with
-//   1. their homework and self-study classes for the coming week (Mon to Sun): ELWeek.upcoming with the plan's lines and the homework the
-//      teacher set from the dashboard (ls/{id}.homework[group]), exactly what the student board lists;
+//   1. their homework for the coming week (Mon to Sun): only the homework the teacher set from the dashboard (ls/{id}.homework[group],
+//      ELWeek.studentHw; never the plan's lines since 6 Nov 2026), exactly what the student board lists;
 //   2. what the teacher answered or corrected in the last 7 days, as pointers only (activity · step): answers to their comments
 //      (results.answers[step].at), corrections and marking feedback (results.replies[step] on a results doc updated this week) and answers to
 //      their problem reports (problemReplies). They read the words on their board.
@@ -41,7 +41,7 @@ for(const s of (TEST?studs.slice(0,1):studs)){
   const plan=plans[s.group],ls=plan&&plan.ls;
   const lvs=Object.fromEntries(await db.list("students/"+s.uid+"/levels")),route=ls?W.elRouteOf(lvs,ls).level:null,ca=!route||CA_ROUTES.includes(route),lang=ca?"ca":"en",T=(c,e)=>ca?c:e;
   // 1. the coming week
-  const tasks=plan&&lsInfo[ls]&&lsInfo[ls].status!=="hidden"?WK.upcoming(plan.p,plan.gi,MON,6,(lsInfo[ls].homework||{})[s.group]):[];
+  const tasks=plan&&lsInfo[ls]&&lsInfo[ls].status!=="hidden"?WK.studentHw(plan.p,plan.gi,(lsInfo[ls].homework||{})[s.group],MON,6):[];   // only homework set on the dashboard (Roger, 6 Nov 2026)
   // 2. the teacher's answers and corrections this week
   const news=[];
   for(const [,r] of await db.list("students/"+s.uid+"/results")){const a=act(r.activity),title=a?a.title:r.activity||"";
@@ -51,7 +51,7 @@ for(const s of (TEST?studs.slice(0,1):studs)){
   const uniq=[...new Set(news)];
   if(!tasks.length&&!uniq.length){skipped++;continue}
   const out=[T("Hola ","Hi ")+s.first+",","",T("Això és el que tens aquesta setmana a English Lab:","This is your English Lab week:"),""];
-  if(tasks.length)out.push(T("🏠 DEURES I CLASSES PEL TEU COMPTE","🏠 HOMEWORK AND CLASSES ON YOUR OWN"),...tasks.map(x=>"• "+WK.taskText(x,lang)),"");
+  if(tasks.length)out.push(T("🏠 DEURES","🏠 HOMEWORK"),...tasks.map(x=>"• "+WK.taskText(x,lang)),"");
   if(uniq.length)out.push(T("✉️ T'HE CONTESTAT O CORREGIT","✉️ I ANSWERED OR CORRECTED"),...uniq.map(x=>"• "+x),T("Ho tens tot al teu tauler.","It is all on your board."),"");
   out.push(T("Entra amb el teu correu de l'institut: ","Sign in with your school email: ")+SITE+"today.html","",T("Bona setmana!","Have a good week!"),"Roger");
   const subject=T("English Lab: la teva setmana del "+WK.date(MON,"ca"),"English Lab: your week from "+WK.date(MON,"en"));

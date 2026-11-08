@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
 <meta charset="utf-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1f6b52">
-<title>Recall checkpoint 2 · Free Time, Live!</title>
+<title>Recall checkpoint 2 · LS2 · Free Time, Live!</title>
 <link rel="stylesheet" href="../../shared/css/layout.css">
 <link rel="stylesheet" href="../../shared/css/topbar.css">
 <link rel="stylesheet" href="../../shared/css/activities.css">
@@ -57,10 +57,12 @@ html,body{overflow-x:clip}
 .speak-support{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:760px){.speak-support{grid-template-columns:1fr}}
 .audio-card[hidden],.audio-row[hidden],audio[hidden]{display:none!important}
 </style>
+<link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu's styles before the first paint (Roger, 7 Nov 2026) -->
 </head>
 <body>
+<script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws (Roger, 7 Nov 2026) -->
 <div class="topbar"><div class="wrap toprow">
-  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← Free Time, Live!</a><span class="brand-mark">C2</span><span class="brand-title">Recall checkpoint 2<small>2 ESO · Free Time, Live!</small></span></div>
+  <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← LS2 · Free Time, Live!</a><span class="brand-mark">C2</span><span class="brand-title">Recall checkpoint 2<small>2 ESO · LS2 · Free Time, Live!</small></span></div>
   <div class="session-jump"><label for="sessionJump">Learning Path</label><select id="sessionJump" aria-label="Go to another Learning Path"></select></div>
   <div class="progress-shell"><div class="progress-label"><span id="progressLabel">Insecure</span><span id="progressText">0 / 0</span></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
 </div></div>
@@ -87,6 +89,9 @@ html,body{overflow-x:clip}
 <script src="ls2-engine.js"></script>
 <script src="data/recall-checkpoint-2.js"></script>
 <script>LS2.init(window.LP);</script>
+<!-- the app menu and the learning path's left column at once, before the browser paints: no old look first (Roger, 7 Nov 2026) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

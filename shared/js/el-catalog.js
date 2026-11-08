@@ -28,6 +28,11 @@ window.EL_CEFR={"2eso":{beginners:["A1","A1","A1"],insecure:["A1+","A1+ / A2 ini
 window.elCefr=(c,lv,full)=>{const x=((window.EL_CEFR[c]||{})[lv])||((window.EL_CEFR[c]||{})[lv==="native"?"daring":lv]);return x?(full?x[2]:x[0]):""};
 // "2ESO Starter (A1)": what students read as their level (board, English Lab, practice page, level notice)
 window.elLevelLabel=(c,lv)=>{const n=((window.EL_LEVELS||[]).find(l=>l.id===lv)||{}).name||lv;if(!lv)return "";const k=elCefr(c,lv);return (c?c.toUpperCase()+" ":"")+n+(k?" ("+k+")":"")};
+// English Lab by level, not by course (Roger, 6 Nov 2026: "hauria d'estar per nivells no per cursos"): one ladder of CEFR steps; each step
+// is every [course, route] whose level is that step (A1 = 2 ESO Starter + 4 ESO Starter, A2 = 2 ESO Core + 4 ESO Base...), so students of
+// the same level in both courses share the practice. [{k:"A2", pairs:[["2eso","safe"],["4eso","insecure"]]}, ...]
+window.elLadder=()=>{const o={};Object.keys(window.EL_CEFR).forEach(c=>Object.keys(window.EL_CEFR[c]).forEach(lv=>{const k=window.EL_CEFR[c][lv][0];(o[k]=o[k]||[]).push([c,lv])}));
+  return ["A1","A1+","A2","A2+","B1","B1+","B2","C1","C2"].filter(k=>o[k]).map(k=>({k,pairs:o[k]}))};
 window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructions in Catalan
 // The student's route in an LS. The teacher sets routes (Roger, 26 Oct 2026: from the LS1 exam mark, on the dashboard). An LS with
 // no route of its own takes the latest route set in an earlier LS of the same course (EL_LS order), so a route carries over to every
@@ -67,6 +72,11 @@ window.EL_LS=[
   {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4",story:{title:"Lantern Night",pdf:"4eso/seasons-and-celebrations/downloads/ls2-story-",key:"https://docs.google.com/document/d/1uc108nk9jxlfhAaJ0Z-vzAxZbq_qI_3dMHs3akKIu7A/edit"}},
   {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",starter:true,shadowing:"2eso/free-time-live/video/shadowing.mp4",story:{title:"Maya Live!",pdf:"2eso/free-time-live/downloads/ls2-story-",key:"https://docs.google.com/document/d/1rcikmXonPtG8HFXzcim26QEm0Rbe1X0LavRPOSUYtuk/edit"}}
 ];
+// The LS name with its number for students and the teacher (Roger, 7 Nov 2026: "we should see LS2 Free Time..."): "LS2 · Free Time, Live!".
+// The number is the LS's place in its course in EL_LS (LS1 first).
+// elLsNum(l) = "LS2": menus show it in the icon box instead of 📚 (Roger, 7 Nov 2026: "instead of the book emoji").
+window.elLsNum=l=>{if(!l)return "";const i=(window.EL_LS||[]).filter(x=>x.course===l.course).findIndex(x=>x.id===l.id);return i>=0?"LS"+(i+1):""};
+window.elLsName=l=>{if(!l)return "";const c=(window.EL_LS||[]).filter(x=>x.course===l.course),i=c.findIndex(x=>x.id===l.id);return (i>=0?"LS"+(i+1)+" · ":"")+String(l.title||"").replace(/^\S+ · /,"")};
 window.EL_CATALOG=(function(){
   const base=c=>c+"/my-real-routine/";
   const A=(course,file,title,criteria,keys,points,o)=>(a=>(a.mode=a.mode||(a.graded&&!a.manual?"once":"practice"),a))(Object.assign({id:course+"/"+file.replace(".html",""),ls:course+"-my-real-routine",course,path:base(course)+file,title,criteria,keys,points,graded:true},o||{}));
@@ -131,11 +141,33 @@ window.EL_CATALOG=(function(){
 window.elDone=function(str,skip){skip=skip||[];const s=new Set();try{(function w(o){if(o&&typeof o==="object"){for(const k in o){if(k==="done"&&o[k]&&typeof o[k]==="object"){for(const d in o[k])if(o[k][d]&&!skip.includes(d))s.add(d)}else w(o[k])}}})(JSON.parse(str))}catch(e){}return s.size};
 // Points of an activity from the current localStorage (capped at the activity's total).
 window.elPoints=function(a,get){const g=get||(k=>localStorage.getItem(k));let n=0;a.keys.forEach(k=>n+=elDone(g(k),a.skip));return Math.min(n,a.points)};
-// An activity's score on the dashboards: the saved result (results/{activity}.score of max), or, when it was saved before the activity's
-// points changed (the LS2 writings became scored on 1 Nov 2026: 9 → 10 points), the same count made again from the saved progress
-// (pg = the LS's progress data), so the score is right before the student opens the page again. → {score, max} or null.
-window.elScore=function(a,x,pg){if(!x)return null;if(a.manual||!a.graded||!x.max||x.max===a.points||!pg||!a.keys.some(k=>pg[k]))return {score:x.score||0,max:x.max||a.points};
+// An activity's score on the dashboards: 1 point per step done (elPoints, the count the page itself saves), counted again from the saved
+// progress (pg = the LS's progress data) whenever it is there, so it always matches the ✔ steps. The saved result
+// (results/{activity}.score of max) can be older: a student who pressed Submit with 1 step done kept 1/10 for good, because
+// firestore.rules freeze a submitted result, while the progress kept growing (Roger, 4 Nov 2026: "I don't understand this score").
+// The saved result is used only when there is no progress, and always for the final product (the teacher's mark). → {score, max} or null.
+window.elScore=function(a,x,pg){if(a.manual||!a.graded||!pg||!a.keys.some(k=>pg[k]))return x?{score:x.score||0,max:x.max||a.points}:null;
   return {score:elPoints(a,k=>pg[k]||null),max:a.points}};
+// Steps the teacher has corrected (results/{activity}.replies[step]) that the progress does not mark as done (Roger, 4 Nov 2026: "he did it
+// but he sees that, why?"). Before 1 Nov a writing went to ChatGPT first and was done only once the final version was saved; many students
+// stopped after the draft, and the Wednesday run corrects drafts too (fbItems in el-marking.js). A corrected step counts as done, unless
+// the teacher sent it back to redo (flags[step].done = "redo"). → [step ids]
+window.elCorrected=function(a,r){const rp=(r&&r.replies)||{},fl=(r&&r.flags)||{};
+  return ((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>String(rp[k]||"").trim()&&!(fl[k]&&fl[k].done==="redo"))};
+// The same in a student's loaded progress, in memory only (nothing is saved): pg = {ls: {key: state JSON}}, rs = {activity id: result}.
+// Each corrected step gets done[step] and, when it has none, doneAt[step] = the day the text was first saved (draft or final version).
+window.elInjectCorrected=function(pg,rs){if(!pg||!rs)return;(window.EL_CATALOG||[]).forEach(a=>{if(a.manual||!a.keys||!a.keys.length)return;
+  const ks=elCorrected(a,rs[a.id]);if(!ks.length)return;const L=pg[a.ls];if(!L)return;let st;try{st=JSON.parse(L[a.keys[0]]||"{}")}catch(e){return}
+  let ch=false;ks.forEach(k=>{if((st.done||{})[k])return;(st.done=st.done||{})[k]=true;ch=true;
+    const at=[st.drafts,st.finals].flatMap(o=>Object.entries(o||{}).filter(([x])=>x===k||x.indexOf(k+"_")===0).map(([,v])=>v&&v.at)).filter(Boolean).sort()[0]||((st.steps||{})[k]||{}).date;
+    if(at)(st.doneAt=st.doneAt||{})[k]=(st.doneAt||{})[k]||at});
+  if(ch)L[a.keys[0]]=JSON.stringify(st)})};
+// Every step of a learning path done (Roger, 4 Nov 2026: "some students have that they did everything and that the bonus counts, however
+// this is not true"): the steps themselves (EL_ACTIONS without the not-scored ones), never the Submit or "Mark as done" flag, which a
+// student can press with 1 step of 10 done. done = Set of the student's done steps, r = results/{activity}; an activity with no steps
+// listed falls back to the flag. Used by the bonus (All work), the student's missing list and every ✅ Done.
+window.elAllDone=function(a,done,r){const req=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));
+  if(req.length)return req.every(k=>done.has(k));r=r||{};return !!(r.locked||r.markedDone)};
 window.elToday=function(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 
 // Actions (steps) inside each activity, as recorded in the "done" maps. 'note' = not scored.
@@ -159,7 +191,42 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
 // of an LS for each group (dashboard → LS settings), stored as ls/{id}.open[group] = [activity ids]. A group without that list keeps the
 // old rule: practice always open, graded activities only when in ls/{id}.enabled. elLpLocks gives what firestore.rules check:
 // locked[group] (activity ids, for results) and lockedKeys[group] (their saved keys, for progress; key + "Level" is the route the page keeps).
-window.elLpOpen=function(a,info,gid){const o=info&&info.open&&info.open[gid];return Array.isArray(o)?o.includes(a.id):!a.graded||((info&&info.enabled)||[]).includes(a.id)};
+window.elLpOpen=function(a,info,gid,raw){const o=info&&info.open&&info.open[gid];
+  if(!(Array.isArray(o)?o.includes(a.id):!a.graded||((info&&info.enabled)||[]).includes(a.id)))return false;
+  return raw||window.EL_RAW_OPEN||!elPlanLater(info,gid).acts.has(a.id)};
+// The Time plan opens on the class day (Roger, 7 Nov 2026: "the SLPs will be automatically open the day the group has class and it's on my
+// plan"; "If I don't do sth in class I drag it to the next day and that's all"). Dragging a learning path or tab onto a class day still opens
+// it for the group (rules level, so saving works on that day without anyone writing); on the students' screens it stays closed until that
+// day: a learning path whose items on the agenda (ls/{id}.planEdits[group].agenda) are all on later days, and a tab whose items are all on
+// later days. Homework the teacher set and a pull-up open it at once, as before. Page-only, like the section switches. raw (or
+// window.EL_RAW_OPEN, set by the dashboard) = the switches alone, for whatever writes them.
+const agToday=()=>window.ELWeek&&ELWeek.today?ELWeek.today():window.EL_TODAY||new Date().toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"});
+// 🖨 Print session (Roger, 7 Nov 2026: "print today's sections for those who don't have a Chromebook … also the games"; "the same here [the
+// Time plan's class day] in case I know it beforehand", "like print session"): the paper sheet of one class day, shared/print/today.html.
+// its = the day's agenda items in order; returns the link from the site root (learning path tabs, then each game; notes are left out).
+window.elPrintDay=function(its,gname,dlab){const by=new Map(),games=[];
+  (its||[]).forEach(it=>{it=String(it);const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;const id=it.slice(0,i),p=it.slice(i+1);
+    if(/^game:/.test(p)){if(!games.includes(p.slice(5)))games.push(p.slice(5));return}
+    const a=(window.EL_CATALOG||[]).find(x=>x.id===id);if(!a||!a.path)return;const k=a.path.replace(/\.html$/,"");if(!by.has(k))by.set(k,[]);if(p)by.get(k).push(p);else by.get(k).all=true});
+  const items=[...by].map(([k,ps])=>k+(ps.all?"":":"+ps.join("."))).join("|");
+  return "shared/print/today.html?items="+encodeURIComponent(items)+"&games="+encodeURIComponent(games.join(","))+"&g="+encodeURIComponent(gname||"")+"&d="+encodeURIComponent(dlab||"")};
+window.elAgendaOf=function(info,gid){const s=info&&info.planEdits&&info.planEdits[gid]&&info.planEdits[gid].agenda;if(!s)return null;
+  try{const ag=typeof s==="string"?JSON.parse(s):s;return ag&&ag.days?ag:null}catch(e){return null}};
+const laterMemo=new WeakMap();   // per ls info and group: recomputed when the agenda, homework, pull-up or day changes
+window.elPlanLater=function(info,gid,today){const none={acts:new Set(),tabs:{}};if(!info||typeof info!=="object")return none;
+  const ag=elAgendaOf(info,gid);if(!ag)return none;today=today||agToday();
+  const src=info.planEdits[gid].agenda,mm=laterMemo.get(info)||{},m=mm[gid];if(m&&m.today===today&&m.src===src&&m.hw===info.homework&&m.push===info.push)return m.v;
+  const first={},tabFirst={};
+  Object.entries(ag.days).forEach(([d,its])=>(its||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0)return;const id=it.slice(0,i),p=it.slice(i+1);
+    if(!first[id]||d<first[id])first[id]=d;if(p){const k=id+"#"+p;if(!tabFirst[k]||d<tabFirst[k])tabFirst[k]=d}}));
+  const free=new Set();   // opened at once by the teacher: homework and a pull-up; the sample exam stays open for revising (Roger, 7 Nov 2026: "I want them to see the sample exam")
+  Object.keys(first).forEach(id=>{if(/sample-exam$/.test(id))free.add(id)});Object.keys(tabFirst).forEach(k=>{if(/sample-exam#/.test(k))free.add(k)});
+  // homework planned for a later class day (set > today) frees nothing until that day (Roger, 7 Nov 2026)
+  Object.values(((info.homework||{})[gid])||{}).forEach(h=>{if(!h||!h.tabs||typeof h.tabs!=="object"||h.set&&h.set>today)return;Object.entries(h.tabs).forEach(([id,ps])=>{free.add(id);(ps||[]).forEach(p=>free.add(id+"#"+p))})});
+  const pu=(info.push||{})[gid];if(pu&&pu.a){free.add(pu.a);if(pu.p)free.add(pu.a+"#"+pu.p)}
+  const v={acts:new Set(Object.keys(first).filter(id=>first[id]>today&&!free.has(id))),tabs:{}};
+  Object.entries(tabFirst).forEach(([k,d])=>{if(d<=today||free.has(k))return;const [id,p]=[k.slice(0,k.indexOf("#")),k.slice(k.indexOf("#")+1)];(v.tabs[id]=v.tabs[id]||[]).push(p)});
+  mm[gid]={today,src,hw:info.homework,push:info.push,v};laterMemo.set(info,mm);return v};
 // Sections inside a learning path (Roger, 26 Oct 2026: "even in the learning path, I want to open these sections as I teach"): the section
 // tabs the teacher has locked for a group, ls/{id}.secLocked[group][activity id with "/" as "__"] = panel ids (EL_SECTIONS in el-sections.js),
 // and the ones opened at some point, ls/{id}.secOpened[group][same key]. None locked = every section open. A locked section is read-only
@@ -167,27 +234,128 @@ window.elLpOpen=function(a,info,gid){const o=info&&info.open&&info.open[gid];ret
 const secKey=a=>a.id.replace("/","__"),secOf=(info,f,gid,a)=>{const g=info&&info[f]&&info[f][gid];return g&&g[secKey(a)]};
 window.elSecLocked=function(a,info,gid){return secOf(info,"secLocked",gid,a)||[]};
 // Steps a section holds (EL_ACTIONS keys): its panel id, or the cards and practice steps for a vocabulary section; none for info panels.
+// Steps grouped by the tab they live in, in the path's order: [[step, …], …]. The Vocabulary tab holds two steps (cards, practice) and counts
+// as one tab, done when both are (Roger, 7 Nov 2026: students see the same tabs and counts as the learning path and the dashboard).
+window.elTabGroups=function(a,ks){const xs=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]),m=new Map();
+  ks.forEach(k=>{const p=xs.includes(k)?k:(k==="cards"||k==="practice")&&xs.includes("vocab")?"vocab":k;if(!m.has(p))m.set(p,[]);m.get(p).push(k)});return [...m.values()]};
+// Tabs still to do in a learning path (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!"): every count of missing work
+// (board banner, All my work done, My activities, the learning-paths table, the dashboard's Points box) counts TABS, not learning paths.
+// The tabs of its scored steps (EL_ACTIONS without a.skip, grouped by elTabGroups); one with no steps listed counts as 1 tab (its flag).
+window.elTabsOf=function(a){const ks=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));return ks.length?elTabGroups(a,ks):null};
+// the tabs not done as [[step, …], …] (done = Set of the student's done steps, r = results/{activity}); an activity with no steps: [] or [[]]
+window.elTabsLeft=function(a,done,r){const g=elTabsOf(a);return g?g.filter(x=>!x.every(k=>done.has(k))):elAllDone(a,done,r)?[]:[[]]};
+window.elTabsTotal=a=>{const g=elTabsOf(a);return g?g.length:1};
 window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
 // again stays open for a student who has not finished it; it is read-only for everyone else. done = Set of the student's done steps.
-window.elSecLockedFor=function(a,info,gid,done){const op=secOf(info,"secOpened",gid,a)||[];return elSecLocked(a,info,gid).filter(id=>!(op.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done)))};
+window.elSecLockedFor=function(a,info,gid,done){const op=secOf(info,"secOpened",gid,a)||[],lk=elSecLocked(a,info,gid).filter(id=>!(op.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done)));
+  if(window.EL_RAW_OPEN)return lk;const later=elPlanLater(info,gid).tabs[a.id]||[];return [...new Set([...lk,...later])]};   // + tabs planned for a later class day (elPlanLater)
 // Sections still to finish (the to-do list): only in a learning path where the teacher uses the section switches, a section that is open
 // or was opened before, holds steps and has some not done. Returns [[panel id, name]].
-window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk))return [];const op=secOf(info,"secOpened",gid,a)||[];
-  return ((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>(!lk.includes(id)||op.includes(id))&&elSecSteps(a,id).length&&!secDone(a,id,done))};
+window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk))return [];const op=secOf(info,"secOpened",gid,a)||[],later=window.EL_RAW_OPEN?[]:elPlanLater(info,gid).tabs[a.id]||[];
+  return ((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>(!lk.includes(id)||op.includes(id))&&!later.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done))};
+// ✅ To do (Roger, 6 Nov 2026: "When I open a section it must be set as to do. So in each class I open a section or LP and they see it as
+// to do. They are only homework if I say so (I can say that a LP is homework or only a section)"): every learning path of an open LS that
+// the teacher has opened for the group (elLpOpen) and the student has not finished, with its tabs that are open for them (elSecLockedFor:
+// not locked, or opened before and not finished) and hold steps not done yet. Opening is enough: nothing else to set. Dropped paths and the
+// final product handed in on Classroom are left out. Homework is separate: only what the teacher sets with 🏠 Set as homework (elHwTargets).
+// The board's ✅ To do and the floating ✅ To do button (el-todo.js) use it. p, gi = the group's plan (or null, -1); doneOf(a) = Set of the
+// student's done steps; isDone(a) = every step done. Returns [{a, tabs: [[panel id, name]], due, late, cp}] in the order of the plan
+// (due day, then the LS's order); cp = the recall checkpoint to do first (elCheckpointMissing), or null.
+window.elTodoList=function(ls,info,gid,doneOf,isDone,p,gi){const st=info&&info.status==="public"?"open":info&&info.status;if(st!=="open"||!gid)return [];
+  const W=window.ELWeek,today=W?W.today():new Date().toISOString().slice(0,10),dr=(p&&gi>=0&&(p._dropped||{})[gi])||[],due=a=>p&&gi>=0&&W?W.due(p,a.id,gi):null;
+  return (window.EL_CATALOG||[]).filter(a=>a.ls===ls).map((a,i)=>({a,i,d:due(a)})).filter(({a})=>!a.manual&&!dr.includes(a.id)&&elLpOpen(a,info,gid)&&!isDone(a))
+    .sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i)
+    .map(({a,d})=>{const done=doneOf(a),secs=(window.EL_SECTIONS||{})[a.id]||[],off=secs.length?elSecLockedFor(a,info,gid,done):[];
+      const tabs=secs.filter(([id])=>!off.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done));
+      if(secs.length&&!tabs.length)return null;   // what is open is done; the rest is still locked
+      return {a,tabs,due:d,late:!!(d&&d<today),cp:elCheckpointMissing(a,doneOf,y=>elLpOpen(y,info,gid))}}).filter(Boolean)};
+// "LP3" in the group's plan → its learning path ("LP3 Where traditions come from" somewhere in the plan): {"3": activity}
+window.elLpNumMap=function(ls,p,gi){const m={},acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls),sh=x=>String(x).split(/[:(]/)[0].trim().toLowerCase();
+  ((p&&p.rows)||[]).forEach(r=>String(r.g?r.g[gi]||"":r.what||"").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,n,name)=>{const nm=name.trim().toLowerCase(),a=acts.find(y=>sh(y.title).startsWith(nm)||nm.startsWith(sh(y.title)));if(a&&!m[n])m[n]=a}));
+  return m};
+// What a homework covers (🏠 Homework on the board and in el-todo.js): {activity id: [panel ids]} ([] = the whole learning path), or null.
+// x = an item of ELWeek.tasks. Homework set on the dashboard since 6 Nov 2026 saves it (x.tabs); older ones and the plan's "Homework by …"
+// lines are read from their text: "LP3 Speaking and Talk", "LP3 Where traditions come from: Speaking, Talk" (tab names of that path; none
+// named = the whole path; words in brackets are left out, e.g. "(Speaking and Talk after the exam)").
+window.elHwTargets=function(x,ls,p,gi){if(!x||x.kind!=="hw")return null;if(x.tabs&&typeof x.tabs==="object"&&Object.keys(x.tabs).length)return x.tabs;
+  const m=elLpNumMap(ls,p,gi),out={},txt=String(x.text||"").replace(/\([^)]*\)/g," "),parts=txt.split(/(?=\bLP\d+\b)/);
+  parts.forEach(seg=>{const n=(seg.match(/^LP(\d+)\b/)||[])[1],a=n&&m[n];if(!a)return;const s=seg.replace(/^LP\d+\s*/,"").toLowerCase();
+    const ids=((window.EL_SECTIONS||{})[a.id]||[]).filter(([id,nm])=>elSecSteps(a,id).length&&new RegExp("(^|[^a-z])"+String(nm).toLowerCase().replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"($|[^a-z])").test(s)).map(z=>z[0]);
+    out[a.id]=[...new Set([...(out[a.id]||[]),...ids])]});
+  return Object.keys(out).length?out:null};
 // Pull up a learning path (Roger, 2 Nov 2026: "students find it difficult to find the learning path … I go to the LS and pull it up for the
 // A or B group"): the teacher puts one learning path (and maybe one of its tabs) on a group's screens from the dashboard, the Time plan or
 // the learning path page in teacher mode. ls/{id}.push[group] = {a: activity id, p: panel id or "", pn: tab name, t: label "LP3 …", at: ms}
 // or null (taken down). Students get a big "Open it" card on their board and a bar on every page of that LS. The newest one counts, while
 // its learning path is open for the group, and for EL_PULL_DAYS days at most. infos = {lsId: ls info} (lsInfo in el-cloud.js).
+// A pull-up made during a class carries until = the end of that class (elClassEnd in el-plan.js): then it is over, like "Release them".
 window.EL_PULL_DAYS=7;
+window.elPullLive=x=>!!(x&&x.a&&x.at&&Date.now()-x.at<EL_PULL_DAYS*864e5&&!(x.until&&Date.now()>=x.until));
 window.elPullFor=function(infos,gid){let best=null;
-  for(const [ls,info] of Object.entries(infos||{})){const x=info&&info.push&&info.push[gid];if(!x||!x.a||!x.at||Date.now()-x.at>EL_PULL_DAYS*864e5)continue;
+  for(const [ls,info] of Object.entries(infos||{})){const x=info&&info.push&&info.push[gid];if(!elPullLive(x))continue;
     const a=(window.EL_CATALOG||[]).find(y=>y.id===x.a),l=(window.EL_LS||[]).find(y=>y.id===ls);
     if(!a||(info.status||"hidden")==="hidden"||!elLsForGroup(l,info,gid)||!elLpOpen(a,info,gid))continue;
     if(!best||x.at>best.at)best=Object.assign({ls,act:a},x)}
   return best};
+// ⛶ 📴 Who left full screen and who is not connected in class (Roger, 6 Nov 2026: "when they are playing a game, I want them to be in full
+// screen too; if I pull them they should be in full screen. If they disconnect, the teacher's board shows it"). x = live/{group} (fs, the
+// class game: game, on, phase, sid, at), left = live/{group}/fsLeft docs {name, at, pull, n}, here = live/{group}/here docs {name, seen, off}
+// (every student page beats every EL_BEAT_MS while full screen or a game is on; off:true when the page is hidden: lid closed, other window).
+// A session is the full screen (fs.at) and/or the game (sid). Not connected = beat during this session, then off or no beat for EL_HERE_MS.
+window.EL_BEAT_MS=60e3;window.EL_HERE_MS=150e3;
+const elMs=t=>t&&t.toMillis?t.toMillis():typeof t==="number"?t:0;
+window.elFsOn=f=>!!(f&&f.on&&f.at&&Date.now()<(f.until||f.at+70*60e3));
+// 🗓 The timetable of a group (Roger, 6 Nov 2026: "according to the teacher's timetable students should go full screen when they have
+// class"; "I want a section where the teacher can add the schedule"): tt = {slots: ["Tue 12:00", …], off: ["YYYY-MM-DD" | [from, to]],
+// len: minutes}. The teacher edits it on the dashboard (🗓 Timetable: settings/timetable) and every group's copy goes into live/{group}.tt,
+// the document every student page already listens to, so students need no extra read. elTT(gid) = the group's tt from window.EL_TIMETABLE.
+window.elTT=gid=>{const T=window.EL_TIMETABLE;return T&&T.groups&&T.groups[gid]?{slots:T.groups[gid],off:T.off||[],len:T.len||60}:null};
+// days off as [from, to] pairs: "YYYY-MM-DD", ["from", "to"] or "from/to" (Firestore keeps no arrays inside arrays, so stored ones use "from/to")
+window.elOffList=off=>(off||[]).map(o=>Array.isArray(o)?[o[0],o[1]||o[0]]:String(o).includes("/")?String(o).split("/"):[String(o),String(o)]);
+window.elTTStore=T=>({groups:Object.assign({},T.groups),off:elOffList(T.off).map(([a,b])=>a===b?a:a+"/"+b),len:+T.len||60});
+window.elTTRead=o=>({groups:Object.assign({},o.groups),off:elOffList(o.off).map(([a,b])=>a===b?a:[a,b]),len:+o.len||60});
+// the class going on at `at` (ms): {start, end} in ms, from 5 minutes before it starts until it ends, or null (no class, a day off)
+window.elSlotNow=function(tt,at){if(!tt||!tt.slots)return null;const d=new Date(at||Date.now()),len=+tt.len||60;
+  const ymd=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  if(elOffList(tt.off).some(o=>o[0]<=ymd&&ymd<=o[1]))return null;
+  const dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()],m=d.getHours()*60+d.getMinutes(),z=new Date(d);z.setHours(0,0,0,0);
+  for(const sl of tt.slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const s=+x[2]*60+ +x[3];
+    if(m>=s-5&&m<s+len)return {start:z.getTime()+s*60e3,end:z.getTime()+(s+len)*60e3}}
+  return null};
+// ⛶ Full screen by the timetable (Roger, 6 Nov 2026: "no need to release since they get released after the class"): during a class of the
+// group it is on by itself ({on, at: the start of the class, until: its end, auto: true}) and it ends with the class. The teacher's switch
+// (live/{group}.fs) still counts: {on: true, …} turns it on outside a class; {on: false, off: true, until: end of the class} switches it
+// off for that class only. Returns the full screen in force now, or null.
+window.elFsEff=function(fs,tt,at){const now=at||Date.now(),c=elSlotNow(tt,now);
+  if(fs&&fs.at&&now<(fs.until||fs.at+70*60e3)){if(fs.on)return fs;if(fs.off&&c&&fs.until>=c.end)return null}
+  return c?{on:true,at:c.start,until:c.end,auto:true}:null};
+// 🎓 Class mode (Roger, 6 Nov 2026: "instead of pulling students to the LS, I want to go class mode, and this makes students go wherever
+// you are in the LS"): live/{group}.go = {cm: true, u: page path from the site root, p: tab or "", pn: tab name, t: page title, at, s: when
+// class mode started, lock: true, until}. Written by the teacher's class tab each time it moves (el-cloud.js cmSend); open student pages go there.
+window.elCmOn=g=>!!(g&&g.cm&&g.u&&g.at&&Date.now()<(g.until||g.at+70*60e3));
+window.elGameOn=x=>!!(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-elMs(x.at)<10*60e3);
+window.elClassWatch=function(x,left,here){const fs=x&&x.fs,fo=elFsOn(fs),go=elGameOn(x),now=Date.now(),keys=[];
+  if(fo)keys.push(fs.at);if(x&&x.sid&&(go||fo&&x.sid>=fs.at))keys.push(x.sid);
+  if(!keys.length)return {active:false,fs:false,game:false,left:[],off:[]};
+  const t0=Math.min(...keys)-60e3;   // a minute for the difference between the teacher's clock and the server's
+  return {active:true,fs:fo,game:go,title:go?x.title||"":"",t0,
+    left:(left||[]).filter(y=>keys.includes(y.pull)).sort((p,q)=>elMs(q.at)-elMs(p.at)),
+    off:(here||[]).filter(y=>elMs(y.seen)>=t0&&(y.off||now-elMs(y.seen)>EL_HERE_MS)).sort((p,q)=>elMs(q.seen)-elMs(p.seen))}};
+// The whole group, in or out (Roger, 6 Nov 2026: "I want to see not who's left but who is in and who is out … the students we have"):
+// roster = [{e: email, name}] (the group's student list; anyone else who beat in this session is added). here and left docs carry e (their id).
+// In = connected now and in full screen (here.fs: true also where the page needs none: checkpoints, iPhones). Out, with why:
+// "full" out of full screen (left: when and how many times), "lost" no beat for EL_HERE_MS, "closed" screen closed or another window,
+// "never" not connected in this session (absent, not signed in, or on a page that does not load el-cloud.js).
+window.elClassRoll=function(x,left,here,roster){const w=elClassWatch(x,left,here);w.inn=[];w.out=[];if(!w.active)return w;const now=Date.now();
+  const H={},Lf={},who=new Map();(here||[]).forEach(y=>{if(y.e)H[y.e]=y});w.left.forEach(y=>{if(y.e)Lf[y.e]=y});
+  (roster||[]).forEach(r=>who.set(r.e,r.name||r.e.split("@")[0]));
+  Object.values(H).forEach(y=>{if(!who.has(y.e)&&elMs(y.seen)>=w.t0)who.set(y.e,y.name||y.e.split("@")[0])});
+  for(const [e,name] of who){const h=H[e],l=Lf[e],seen=h&&elMs(h.seen)>=w.t0?elMs(h.seen):0,live=seen&&!h.off&&now-seen<=EL_HERE_MS,o={e,name,left:l||null,seen};
+    if(live&&h.fs!==false)w.inn.push(o);else{o.why=live?"full":seen?(h.off?"closed":"lost"):"never";w.out.push(o)}}
+  const rank={full:0,closed:1,lost:2,never:3},az=(a,b)=>a.name.localeCompare(b.name);
+  w.inn.sort(az);w.out.sort((a,b)=>rank[a.why]-rank[b.why]||az(a,b));w.n=who.size;return w};
 // "LP3 Where traditions come from": the number the time plan gives the learning path (EL_PLAN text "LP3 Where traditions …"), else its short title.
 window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh(a.title),lo=st.toLowerCase(),p=(window.EL_PLAN||{})[a.ls];let n=null;
   if(p)(p.rows||[]).forEach(r=>[].concat(r.g||r.what||[]).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,k,nm)=>{nm=nm.trim().toLowerCase();if(!n&&nm&&(lo.startsWith(nm)||nm.startsWith(lo)))n=k}));
@@ -265,3 +433,110 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;
 // vocabulary or grammar step with none of its own (recall, words, cards, practice, grammar, mixed, vocab) gives evidence for 4.1 and 5.1.
 (function(){const UOE=["recall","words","cards","practice","grammar","mixed","vocab"];
   Object.keys(window.EL_STEP_CRITERIA).forEach(id=>{const sc=window.EL_STEP_CRITERIA[id];(window.EL_ACTIONS[id]||[]).forEach(k=>{if(UOE.includes(k)&&!sc[k])sc[k]=["4.1","5.1"]})})})();
+
+// 🧩 📚 Class game circles (Roger, 6 Nov 2026: "a kind of circle with a percentage on the board saying something like games and theory,
+// click to see your performance and what to study … two, grammar and vocabulary, and I want those circles next to the students in the
+// list"). elGameStats(games) takes class game results [{kind, r, of}] (myGames on the student board, gameResults on the dashboard) and gives
+// {grammar, vocab} = % right (null when none played); elRing(p, label, size) draws one circle (inline styles, any page).
+window.elGameStats=function(games){
+  const t={grammar:[0,0],vocab:[0,0]};(games||[]).forEach(g=>{const k=t[g.kind];if(k&&g.of){k[0]+=g.r||0;k[1]+=g.of}});
+  const pc=([a,b])=>b?Math.round(a/b*100):null;return {grammar:pc(t.grammar),vocab:pc(t.vocab),n:(games||[]).length}};
+// The games behind a circle (Roger, 7 Nov 2026: "they should see grammar games, when they go to the percentage"): the hover text of a 🧩 or
+// 📚 circle names its % and lists every game it counts, newest first, with that game's score. games = [{kind, r, of, title, day, lp}];
+// ca = Catalan (Starter and Base students). Plain text with line breaks (a title attribute). Each game starts with its learning path
+// (Roger, 7 Nov 2026: "they should start with LP1 and the name they already have"): "• LP2 · Clothes, kit and weather".
+window.elGameTip=function(games,kind,ca){
+  const T=ca?{grammar:"🧩 Jocs de gramàtica",vocab:"📚 Jocs de vocabulari",right:"encerts",none:"Encara cap joc"}:{grammar:"🧩 Grammar games",vocab:"📚 Vocabulary games",right:"right",none:"No games yet"};
+  const l=(games||[]).filter(g=>g.kind===kind&&g.of).sort((a,b)=>String(b.day||"").localeCompare(String(a.day||""))),r=l.reduce((a,g)=>a+(g.r||0),0),of=l.reduce((a,g)=>a+g.of,0);
+  if(!l.length)return `${T[kind]||kind}: ${T.none}`;
+  const day=d=>{if(!d)return "";const x=new Date(d+"T12:00");return isNaN(x)?"":x.toLocaleDateString(ca?"ca":"en-GB",{day:"numeric",month:"short"})};
+  const name=t=>String(t||"").replace(/^(Vocabulary|Grammar|Vocabulari|Gramàtica) · /,"");
+  return `${T[kind]}: ${Math.round(r/of*100)} % ${T.right} (${r} / ${of})\n`+l.map(g=>`• ${g.lp?String(g.lp).split(" · ")[0]+" · ":""}${name(g.title)}${day(g.day)?" · "+day(g.day):""}: ${g.r||0} / ${g.of} (${Math.round((g.r||0)/g.of*100)} %)`).join("\n")};
+window.elRing=function(p,label,size,tip){
+  const z=size||46,col=p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a",q=s=>String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+  return `<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle" title="${q(tip||label+": "+(p==null?"–":p+" %"))}"><span style="width:${z}px;height:${z}px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:conic-gradient(${col} ${(p||0)*3.6}deg,#e5e7eb 0)"><b style="width:${z-10}px;height:${z-10}px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 ${Math.round(z/3.6)}px/1 system-ui,sans-serif;color:#0f172a">${p==null?"–":p+"%"}</b></span>${label?`<span style="font-size:${Math.max(11,Math.round(z/3.6))}px;font-weight:700;line-height:1.15">${label}</span>`:""}</span>`};
+// ---- The students' left menu, ONE for every student page (Roger, 7 Nov 2026: "this should always be the same"): the board (today.html),
+// the LS homes (el-ls-home.js) and Games, Practise, learning paths, vocabulary games, course pages (el-app.js) all draw it from here.
+// 🏠 My dashboard · 🗂 My course · N ESO + its LSs · 📖 Books · 🔤 Grammar and vocabulary · 🎲 Games · 🎯 Practise · (🎬 How the website
+// works, off for now) · ❓ Help · 📱 Study on your phone. The LSs: the ones the board showed last in this browser (el_menu_ls, saved by
+// today.html), else the course's LSs not hidden in the last read status (el_ls_<id>, el-cloud.js). No Firestore reads.
+window.EL_MENU_HOWTO=false;   // 🎬 How the website works in the menu: hidden for now (Roger, 7 Nov 2026: "take this out for the moment"); true brings it back
+window.elMenuLs=function(courses,group){
+  let ids=null;try{ids=JSON.parse(localStorage.getItem("el_menu_ls")||"null")}catch(e){}
+  const L=window.EL_LS||[];
+  if(Array.isArray(ids)&&ids.length){const s=ids.map(id=>L.find(l=>l.id===id)).filter(l=>l&&courses.includes(l.course));if(s.length)return s}   // the board's order
+  const st={},info=id=>{if(!(id in st))try{st[id]=JSON.parse(localStorage.getItem("el_ls_"+id)||"null")}catch(e){st[id]=null}return st[id]};
+  return L.filter(l=>{if(!courses.includes(l.course))return false;const i=info(l.id);
+    if(!i)return true;if(i.status==="hidden")return false;return !group||!window.elLsForGroup||elLsForGroup(l,i,group)})
+    .sort((a,b)=>(((info(b.id)||{}).status==="open")-((info(a.id)||{}).status==="open")));   // open LS first, as the board
+};
+// o: {root (site root URL, "" on today.html), courses:["4eso"], lss (LS list; default elMenuLs), group, ca (Catalan labels), board (the
+// board's URL, ?student= in the teacher's student view), here: "board"|"marks"|"course:<c>"|"ls:<id>"|"books"|"lang"|"games"|"practise"|"help"|"phone",
+// app (opened as a home-screen app: no 📱)} → the buttons' HTML (classes nv, nv sub, on; shared/css/el-app.css and ls-home.css)
+window.elStudentMenu=function(o){
+  const R=o.root||"",t=(ca,en)=>o.ca?ca:en,cs=o.courses||[],CN={"2eso":"2 ESO","4eso":"4 ESO"},board=o.board||R+"today.html",here=o.here||"";
+  const lss=o.lss||elMenuLs(cs,o.group),q=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const b=(k,cls,h,ic,txt,x)=>{const on=k&&k===here;return `<a class="nv${cls}${on?" on":""}" href="${h}"${on?' aria-current="page"':""}${x||""}><span class="ic${/^LS\d/.test(ic)?" lsn":""}" aria-hidden="true">${ic}</span><span class="lb">${txt}</span></a>`};
+  const bq=board.split("#")[0];
+  // Practise right below My dashboard (Roger, 7 Nov 2026: "practice should be below my dashboard")
+  // 📊 My marks right below My dashboard, on every student page (Roger, 7 Nov 2026: "i si posem les meves notes a sota del meu taulell?
+  // i revisem que estigui allà sempre?"): the board's #marks place
+  return b("board","",bq,"🏠",t("El meu tauler","My dashboard"))+b("marks","",bq+"#marks","📊",t("Les meves notes","My marks"))+b("practise","",R+"lab/practice.html","🎯",t("Practica","Practise"))
+    +cs.map(c=>b("course:"+c,"",R+c+"/index.html","🗂",`${t("El meu curs","My course")} · ${CN[c]}`)
+      +lss.filter(l=>l.course===c).map(l=>b("ls:"+l.id," sub",R+l.course+"/"+l.id.slice(l.course.length+1)+"/index.html",elLsNum(l)||"📚",q(String(l.title).replace(/^\S+ · /,"")))).join("")).join("")
+    +(cs.length?b("books","",bq+"#books","📖",t("Llibres","Books"))+b("lang","",bq+"#language","🔤",t("Gramàtica i vocabulari","Grammar and vocabulary")):"")
+    +b("games","",R+"lab/","🎲",t("Jocs","Games"))
+    +(window.EL_MENU_HOWTO?b("","",`${R}video/how-english-lab-works${t("-ca","")}.mp4?v=20261102c`,"🎬",t("Com funciona la web","How the website works"),' target="_blank" rel="noopener"'):"")
+    +b("help","",bq+"#help","❓",t("Ajuda","Help"))
+    +(o.app?"":b("phone","",bq+"#phone","📱",t("Estudia amb el mòbil","Study on your phone")));
+};
+
+// On an LS (its home and its learning paths) the students' side menu is a strip of icons that opens over the page (Roger, 8 Nov 2026:
+// "when students are on the LS, to see better the screen, I want the menu to hide and only show the emoji or logos of each side. If the
+// mouse goes on the section the menu gets bigger"). el-app.js (.elrail) and el-ls-home.js (aside.side) set body.elmini and call this with
+// the menu: it puts a ☰ button before the brand. The mouse opens the menu (el-app.css, section 3); ☰ opens or closes it with a tap (a
+// touch screen has no mouse to point with), a tap outside or Esc closes it. Calling it again after the menu is redrawn is fine.
+window.elMiniRail=function(r){
+  if(!r)return;
+  if(!r.querySelector(":scope>.elmtop")){
+    const top=document.createElement("div"),br=r.querySelector(":scope>.elr-brand,:scope>.brand");top.className="elmtop";
+    top.innerHTML=`<button type="button" class="elmt" aria-label="Menu" title="Menu"><span aria-hidden="true">☰</span></button>`;
+    r.prepend(top);if(br)top.append(br);
+  }
+  const set=o=>{r.classList.toggle("elopen",o);const b=r.querySelector(".elmt");if(b)b.setAttribute("aria-expanded",o?"true":"false")};
+  set(r.classList.contains("elopen"));
+  if(r.dataset.elmini)return;r.dataset.elmini="1";
+  r.addEventListener("click",e=>{if(e.target.closest(".elmt")){e.preventDefault();set(!r.classList.contains("elopen"))}});
+  document.addEventListener("click",e=>{if(r.classList.contains("elopen")&&!r.contains(e.target))set(false)},true);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&r.classList.contains("elopen"))set(false)});
+};
+
+// The class tab (class mode, el-cloud.js cmTeacher) has no side menu (Roger, 7 Nov 2026: "when I stop the class this appears and I don't
+// need it. Plus it appears for a sec when the class is running"): this file runs before any menu is drawn (el-app.js .elrail on the
+// learning paths, el-ls-home.js .nvs on the LS home), so the browser tab opened with ?elcm= is marked at once (sessionStorage el_cmtab,
+// kept for the tab's life) and its menu buttons are never shown, not even for a moment. While class mode is on, the left column stays
+// as the place of 📋 Today (el-cm-agenda.js docks there); once it stops (html.elcmon taken off by cmTeacher's quit) the column goes too
+// and the page uses the whole width. Other tabs (the dashboard, a normal learning path page) keep their menu.
+(function () {
+  let tab = false, on = false;
+  try {
+    if (new URLSearchParams(location.search).has("elcm")) sessionStorage.setItem("el_cmtab", "1");
+    tab = sessionStorage.getItem("el_cmtab") === "1";
+    const o = JSON.parse(sessionStorage.getItem("el_cm") || "null");
+    on = new URLSearchParams(location.search).has("elcm") || !!(o && o.g && Date.now() < o.until);
+  } catch (e) {}
+  if (!tab) return;
+  const h = document.documentElement;
+  h.classList.add("elcmtab");
+  if (on) h.classList.add("elcmon");
+  const st = document.createElement("style");
+  st.id = "el-cmtab-css";
+  st.textContent = "html.elcmtab .elrail .elside,html.elcmtab .elrail .eln,html.elcmtab aside.side .nvs,"
+    + "html.elcmtab .elbar,html.elcmtab .nvs-m,html.elcmtab #bnav{display:none!important}"
+    + "html.elcmtab:not(.elcmon) .elrail,html.elcmtab:not(.elcmon) aside.side{display:none!important}"
+    + "html.elcmtab:not(.elcmon) body.elapp.elhas-rail{padding-left:0!important}"
+    + "html.elcmtab:not(.elcmon) .app{grid-template-columns:minmax(0,1fr)!important}"
+    // a narrow window: no room for the docked agenda (it floats above the chip), so no empty strip either
+    + "@media (max-width:980px){html.elcmtab .elrail{display:none!important}html.elcmtab body.elapp.elhas-rail{padding-left:0!important}}";
+  (document.head || h).append(st);
+})();
