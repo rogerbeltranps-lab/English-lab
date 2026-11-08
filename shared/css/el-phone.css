@@ -72,6 +72,8 @@
   #lvl .hlv>span:last-child>small,#lvl .hlv>span:last-child>b,.pme .hlv>span:last-child>small,.pme .hlv>span:last-child>b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #lvl .hlv>span:last-child>small,.pme .hlv>span:last-child>small{font-size:12px}
   #lvl .hlv .hask:before,.pme .hlv .hask:before{display:none}
+}
+
 /* 5. The board's home on a phone (today.html, body[data-place=home]): only what is for today. The LS's own cards (About this LS, the
    challenge, formative, the 4-minute video) are on the LS tab, and Games and theory on Me, so the home is a short screen: hello, alerts,
    Continue, To do and Homework, and the learning paths list (Roger, 8 Nov 2026, mockup option A). */
@@ -97,4 +99,57 @@
   body.lsh section[data-place="home"]>#lsAbout{order:4;margin-top:14px}
   body.lsh section[data-place="home"]>.hgrid>.hr{order:5;margin-top:14px}
   body.lsh section[data-place="home"]>:not(.lshead):not(.hgrid):not(#lsAbout){order:6}
+}
+
+/* 7. A learning path on a phone: one screen for the step (el-app.js lpPhone; Roger, 8 Nov 2026, mockup option A). A slim bar at the top
+   (‹ back to the LS, the path's name and progress, ⓘ, ⋯), the steps as chips under it, the step's next button as a bar at the bottom,
+   no tab bar. ⓘ (body.elpinfo) shows the path's About view instead of the steps: the hero, how it works, the study guide, my goal and
+   the list of paths. Nothing is moved, only hidden and shown, so a computer is untouched (.elplh is display:none there). */
+.elplh{display:none}
+@media (max-width:640px){
+  body.elapp.ellp .elplh{display:flex;align-items:center;gap:2px;position:sticky;top:0;z-index:8000;height:56px;box-sizing:border-box;padding:0 4px;margin:0;
+    background:rgba(255,255,255,.97);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e5e7eb;color:#0f172a;
+    font:15px/1.2 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+  body.elapp.ellp .elplh .ib{flex:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;border-radius:12px;background:none;
+    color:#334155;padding:0;text-decoration:none;cursor:pointer;box-shadow:none;-webkit-tap-highlight-color:transparent}
+  body.elapp.ellp .elplh .ib:active{background:#eef2ff}
+  body.elapp.ellp .elplh .ib[hidden]{display:none}
+  body.elapp.ellp .elplh .inf svg+svg,body.elpinfo .elplh .inf svg:first-child{display:none}
+  body.elapp.elpinfo .elplh .inf svg+svg{display:block}
+  body.elapp.elpinfo .elplh .inf{background:#e0e7ff;color:#2443ad}
+  body.elapp.ellp .elplh .tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding-left:2px}
+  .elplh .tt small{font-size:12px;font-weight:700;color:#586174;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .elplh .tt b{font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .elplh .mm{position:absolute;top:52px;right:8px;min-width:230px;display:flex;flex-direction:column;padding:6px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;
+    box-shadow:0 12px 30px rgba(15,23,42,.18)}
+  .elplh .mm[hidden]{display:none}
+  body.elapp.ellp .elplh .mm button{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 12px;border:0;border-radius:10px;background:none;box-shadow:none;
+    font:inherit;font-weight:700;color:#0f172a;text-align:left;cursor:pointer}
+  .elplh .mm button:active{background:#f1f5f9}
+  .elplh .mm i{font-style:normal;font-size:18px;width:24px;text-align:center}
+  /* the step view: the bar replaces the top bar and the hero; how it works, the study guide and my goal are behind ⓘ; no tab bar */
+  body.elapp.ellp:not(.elpinfo) .topbar,body.elapp.ellp:not(.elpinfo) header.hero,body.elapp.ellp:not(.elpinfo) #lp>.lp-top,
+  body.elapp.ellp:not(.elpinfo) #lp>.plan-card:has(#lpGoal){display:none!important}
+  body.elapp.ellp .elptabs,body.elapp.ellp .elbar{display:none!important}
+  body.elapp.ellp main{padding-top:12px}
+  /* the steps' chips stay under the bar */
+  body.elapp.ellp .lp-body>.tabs{top:56px!important}
+  /* the step's next button ("Mark section as done") is the bar at the bottom */
+  body.elapp.ellp .panel.active>.section-next{position:fixed;left:0;right:0;bottom:0;z-index:8500;margin:0!important;border:0!important;border-top:1px solid #e5e7eb!important;
+    border-radius:0!important;background:#fff!important;box-shadow:0 -2px 12px rgba(15,23,42,.06)!important;padding:10px 16px calc(10px + env(safe-area-inset-bottom))!important}
+  body.elapp.ellp .panel.active>.section-next .actions{margin:0!important}
+  body.elapp.ellp .panel.active>.section-next .btn{width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:800}
+  body.elapp.ellp .panel.active>.section-next .btn[aria-disabled="true"]{opacity:1!important;background:#e2e8f0!important;border-color:#e2e8f0!important;color:#475569!important;box-shadow:none!important}
+  body.elapp.ellp .panel.active>.section-next .feedback{margin:0 0 8px;font-size:14px}
+  body.elapp.ellp .panel.active>.section-next .feedback:empty{display:none}
+  body.elapp.ellp{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
+  /* each activity's Check and Redo: touch-sized */
+  body.elapp.ellp .panel .actions>.btn{min-height:46px}
+  /* the About view (ⓘ): the path, how it works, the study guide, my goal and the other paths; the steps are hidden */
+  body.elpinfo .lp-body,body.elpinfo main.wrap>nav.tabs,body.elpinfo main.wrap>.panel,body.elpinfo #lp>.plan-card:not(:has(#lpGoal)),body.elpinfo .footer-note,
+  body.elpinfo .topbar .brand,body.elpinfo .topbar .progress-shell,body.elpinfo #el-cloud-bar{display:none!important}
+  body.elpinfo .topbar{position:static!important;box-shadow:none!important;background:none!important}
+  body.elpinfo .topbar .toprow{min-height:0;padding-top:12px;padding-bottom:0}
+  body.elpinfo .topbar .session-jump{width:100%}
+  body.elpinfo .topbar .session-jump select{width:100%;min-height:48px}
 }

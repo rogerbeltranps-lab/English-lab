@@ -294,6 +294,62 @@
     const t = $("#el-tsec"); if (t && nav) nav.before(t);
     grid.before(lp); grid.remove(); col = null; document.body.classList.remove("ellp2");
   }
+  // ---- a learning path on a phone (≤640 px; el-phone.css section 7, Roger 8 Nov 2026, mockup option A): one screen for the step.
+  // A slim top bar (‹ back to the LS, the path's name and progress, ⓘ about this path, ⋯ problem or idea) instead of the top bar and
+  // the hero, the steps as chips under it, the step's next button as a bar at the bottom and no tab bar. ⓘ turns the page into the
+  // path's About view (what it is, how it works, the study guide, my goal, the other paths) and back. Only CSS hides and shows: the
+  // engine redraws #lp on every route change, so nothing is moved. On a computer the bar is display:none.
+  function lpPhone() {
+    if (mode !== "lp") return;
+    let h = $(".elplh");
+    if (!h) {
+      h = document.createElement("header"); h.className = "elplh";
+      const sv = (d, f) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="${f ? "currentColor" : "none"}" stroke="${f ? "none" : "currentColor"}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+      h.innerHTML = `<a class="ib bk">${sv('<path d="m15 5-7 7 7 7"/>')}</a><div class="tt"><small></small><b></b></div>`
+        + `<button class="ib inf" type="button" aria-expanded="false">${sv('<circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.5v.01"/>')}${sv('<path d="M6 6l12 12M18 6 6 18"/>')}</button>`
+        + `<button class="ib mo" type="button" aria-haspopup="true" aria-expanded="false">${sv('<circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/>', 1)}</button><div class="mm" hidden></div>`;
+      document.body.prepend(h);
+      let y = 0;
+      const info = on => {
+        if (on) { y = scrollY; const how = $(".lp-how"); if (how) how.open = true; }
+        document.body.classList.toggle("elpinfo", on);
+        lpPhone();
+        scrollTo(0, on ? 0 : y);
+      };
+      const mm = h.querySelector(".mm"), mo = h.querySelector(".mo");
+      const menu = on => { mm.hidden = !on; mo.setAttribute("aria-expanded", on ? "true" : "false"); };
+      h.addEventListener("click", e => {
+        if (e.target.closest(".inf")) { menu(false); info(!document.body.classList.contains("elpinfo")); }
+        else if (e.target.closest(".mo")) menu(mm.hidden);
+        else { const b = e.target.closest("[data-w]"); if (!b) return; menu(false);
+          const w = b.dataset.w === "idea" ? "💡" : "⚠️", x = $$("#el-cloud-bar button").find(z => z.textContent.startsWith(w)); if (x) x.click(); }
+      });
+      document.addEventListener("click", e => {
+        if (!mm.hidden && !e.target.closest(".elplh")) menu(false);
+        // a step chip tapped in the About view goes back to the steps
+        if (e.target.closest(".tab") && document.body.classList.contains("elpinfo")) info(false);
+      });
+      document.addEventListener("keydown", e => { if (e.key === "Escape") menu(false); });
+      // the progress text changes as the student works: keep the bar's line in step
+      const pt = $("#progressText");
+      if (pt && window.MutationObserver) new MutationObserver(() => lpPhone()).observe(pt, { childList: true, characterData: true, subtree: true });
+    }
+    const back = $(".topbar .brand>a.elback"), bk = h.querySelector(".bk");
+    bk.href = back ? back.href : (curLs && lsHref(curLs)) || ROOT + "today.html";
+    bk.setAttribute("aria-label", t("Torna a ", "Back to ") + (back ? back.dataset.ls || back.textContent : "LS").trim());
+    const h1 = $("header.hero h1") || $(".ellp-head h1") || $("h1"), sj = $("#sessionJump"), op = sj && sj.selectedOptions && sj.selectedOptions[0];
+    const n = op && (op.textContent.match(/^\s*(\d+)\s*·/) || [])[1];
+    const lab = $("#progressLabel"), pt = $("#progressText");
+    h.querySelector(".tt b").textContent = h1 ? h1.textContent.trim() : document.title;
+    h.querySelector(".tt small").textContent = [n ? "LP" + n : "", lab && lab.textContent.trim(), pt && pt.textContent.trim()].filter(Boolean).join(" · ");
+    const inf = h.querySelector(".inf"), on = document.body.classList.contains("elpinfo");
+    inf.setAttribute("aria-expanded", on ? "true" : "false");
+    inf.setAttribute("aria-label", on ? t("Torna al pas", "Back to the step") : t("Sobre aquest learning path: com funciona, guia d'estudi, el meu objectiu", "About this learning path: how it works, study guide, my goal"));
+    // ⋯ only for a signed-in student: Problem and Idea are the buttons of their account bar (el-cloud.js)
+    const mo = h.querySelector(".mo");
+    mo.hidden = !(who.role === "student" && !who.as); mo.setAttribute("aria-label", t("Més: avisa d'un problema, envia una idea", "More: report a problem, send an idea"));
+    h.querySelector(".mm").innerHTML = `<button type="button" data-w="pb"><i aria-hidden="true">⚠️</i>${t("Avisa d'un problema", "Report a problem")}</button><button type="button" data-w="idea"><i aria-hidden="true">💡</i>${t("Envia una idea", "Send an idea")}</button>`;
+  }
   if (mode === "home") addEventListener("hashchange", () => draw());   // Home · Courses · Learning Situations: the button that is on
   if (mode === "lp") {
     WIDE.addEventListener ? WIDE.addEventListener("change", () => lpLayout()) : WIDE.addListener(() => lpLayout());
@@ -307,12 +363,13 @@
       : who.role !== "none" || mode === "lp" || mode === "games";   // course pages and English Lab keep the public look when signed out
     document.body.classList.toggle("elapp", on);
     document.body.classList.add("el" + mode);
-    if (!on) { $$(".elrail,.elbar,.elside,.elcrumb,.elptabs,.elpseg").forEach(e => e.remove()); document.body.classList.remove("elhas-rail", "elhas-bar", "elptab"); return; }
+    if (!on) { $$(".elrail,.elbar,.elside,.elcrumb,.elptabs,.elpseg,.elplh").forEach(e => e.remove()); document.body.classList.remove("elhas-rail", "elhas-bar", "elptab", "elpinfo"); return; }
     ownLevel();
     lpBar();
     lpLayout();
     tsecEarly();
     curLs = pickLs();
+    lpPhone();
     const L = items();
     if (mode === "lab") side(L); else rail(L);
     bar(L);
