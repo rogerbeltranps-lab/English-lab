@@ -7,6 +7,14 @@ informed though via mail, with an important subject."
 This file is the routine of the scheduled task **"English Lab: problem reports"** (a fresh Claude session in the English Lab cloud
 environment, which has `FIREBASE_SERVICE_ACCOUNT` with write access). The tool is `tools/problems/auto.mjs`.
 
+## When it runs
+
+- **At once:** when a student's report is saved, their page asks the school Apps Script (`tools/notify/school-mail.gs`, action
+  `problem`, checked with the student's own sign-in) to start the task through its API trigger (`PROBLEM_TASK_TOKEN`), at most once every
+  3 minutes and 30 times a day. Needs the token pasted in the script (claude.ai/code/routines → "English Lab: problem reports" → API
+  trigger → Generate token) and a new deployment version.
+- **Every hour** from 7:00 to 22:00 Madrid time, as a backup (and the only way until the token is in the script).
+
 ## Each run
 
 1. `git pull`, then `node tools/problems/auto.mjs open`. "Nothing new" → stop at once (no email, no PR, nothing else read).
