@@ -221,10 +221,12 @@ const keepTpg=()=>{try{localStorage.setItem("el_t_tpg",JSON.stringify(S.tpg))}ca
 // the class going on now (see classCheck below); link: the dashboard was opened from a link to a course, LS or group
 const CLS={link:false,ready:false,done:(()=>{try{return sessionStorage.getItem("el_t_class")}catch(e){return null}})(),info:null};
 const LAST=(()=>{try{return JSON.parse(localStorage.getItem("el_t_last"))||{}}catch(e){return {}}})();
+const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStorage.setItem("el_t_tab","1");return !!v}catch(e){return false}})();   // true = this tab already had the dashboard open (reload)
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(gOf(LAST.g)||["plan","corr","qa","mat","ref","none"].includes(LAST.g))S.g=LAST.g;
+  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","mat","ref","none"].includes(LAST.g)))S.g=LAST.g;
+  else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   CLS.link=q.has("course")||q.has("ls")||q.has("g");
   if(q.has("course")||q.has("ls")||q.has("g"))history.replaceState(null,"",location.pathname+location.hash)})();
