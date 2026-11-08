@@ -167,6 +167,17 @@
     : code === 'audio-capture' ? T('La transcripció automàtica no troba el micròfon. Escriu tu el que has dit.', 'The automatic transcript can’t reach the microphone. Type what you said.')
     : code === 'language-not-supported' ? T('Aquest navegador no fa transcripcions en anglès. Escriu tu el que has dit.', 'This browser can’t transcribe English. Type what you said.')
     : T('El navegador no deixa fer la transcripció automàtica. Permet el micròfon (icona de l’esquerra de la barra d’adreces) i prem Recarrega. Mentrestant, escriu tu el que has dit.', 'The browser is not allowing the automatic transcript. Allow the microphone (icon at the left of the address bar) and press Reload. Meanwhile, type what you said.');
+  /* Typing instead (Roger, 8 Nov 2026, Aina 2ESO B could not hand in her speaking): transcript boxes are read-only (textarea[data-sr-box]),
+     so when the automatic transcript can't work they open for typing, with a note above them. Pages call typeInstead(box) when there is
+     no speech recognition or a recording ends with no transcript; a hard error opens every box on the page. */
+  const typeNote = () => T('La transcripció automàtica no ha funcionat en aquest ordinador. Escolta la teva gravació i escriu aquí el que has dit. Després, entrega-ho.', 'The automatic transcript didn’t work on this computer. Listen to your recording and type here what you said. Then hand it in.');
+  function typeInstead(ta) {
+    if (!ta || !ta.readOnly) return false;
+    ta.readOnly = false; ta.dataset.typed = '1'; ta.style.background = '';
+    let n = ta.previousElementSibling;
+    if (!n || !n.classList.contains('sr-type-note')) { n = document.createElement('p'); n.className = 'feedback no sr-type-note'; ta.insertAdjacentElement('beforebegin', n); }
+    n.textContent = typeNote(); return true;
+  }
   ['SpeechRecognition', 'webkitSpeechRecognition'].forEach(n => {
     const O = window[n]; if (!O) return;
     try {
@@ -175,7 +186,7 @@
           super();
           this.addEventListener('error', e => {
             const code = e && e.error;
-            if (['not-allowed', 'service-not-allowed', 'network', 'audio-capture', 'language-not-supported'].includes(code)) { srDead = code; say(srText(code), 'sr'); }
+            if (['not-allowed', 'service-not-allowed', 'network', 'audio-capture', 'language-not-supported'].includes(code)) { srDead = code; say(srText(code), 'sr'); document.querySelectorAll('textarea[data-sr-box]').forEach(typeInstead); }
           });
         }
         start() { if (srDead) { say(srText(srDead), 'sr'); return; } return super.start(); }   // no endless retries after a hard error
@@ -184,5 +195,5 @@
     } catch (e) {}
   });
 
-  window.elMic = { srBroken: () => srDead, text: srText, show, say };
+  window.elMic = { srBroken: () => srDead, text: srText, show, say, typeInstead };
 })();

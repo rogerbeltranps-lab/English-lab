@@ -182,7 +182,7 @@ html,body{overflow-x:clip}
   <div class="section-card">
     <h3 data-support-ca="Revisa la transcripció" data-support-en="Transcript">Transcript</h3>
     <p class="instruction" data-support-ca="Amb Chrome, la transcripció s’escriu sola mentre graves. No s’hi pot escriure: si no diu el que volies, torna’t a gravar." data-support-en="With Chrome, a transcript is written by itself while you record. You can’t type in it: if it is not what you wanted to say, record yourself again.">With Chrome, a transcript is written by itself while you record. You can’t type in it: if it is not what you wanted to say, record yourself again.</p>
-    <textarea id="speechTranscript" readonly placeholder="Your transcript will appear here while you speak."></textarea>
+    <textarea id="speechTranscript" data-sr-box readonly placeholder="Your transcript will appear here while you speak."></textarea>
   </div>
   <div class="section-card">
     <h3 data-support-ca="Entrega-ho al professor" data-support-en="Hand it in">Hand it in</h3>
@@ -556,7 +556,10 @@ $('#stopRecord').onclick=async()=>{
   $('#startRecord').disabled=false;$('#stopRecord').disabled=true;
   processor=null;
   complete('speak');$('#speakResult').classList.add('show');
+  // no transcript at all: type it instead (Roger, 8 Nov 2026, as ls2-engine.js typeIn)
+  setTimeout(()=>{if(!$('#speechTranscript').value.trim()){$('#recordStatus').textContent+=' '+(ca()?'No s’ha creat cap transcripció: escolta la gravació i escriu a la casella el que has dit.':'No transcript was made: listen to your recording and type what you said in the box.');speakTypeIn()}},1500);
 };
+function speakTypeIn(){const ta=$('#speechTranscript');state.speak=state.speak||{};state.speak.gs=state.speak.gs||{};if(!state.speak.gs.typed){state.speak.gs.typed=1;save()}if(window.elMic&&elMic.typeInstead)elMic.typeInstead(ta);else ta.readOnly=false}
 
 function downloadWarmupWav(){
   if(!recordBlob||!recordUrl)return;
@@ -575,16 +578,17 @@ $('#handInSpeaking').onclick=()=>{
   const tr=$('#speechTranscript').value.trim(),n=(tr.match(/\S+/g)||[]).length,min={beginners:8,insecure:12,safe:20,daring:30}[level]||12;
   if(n<min){m.className='feedback no';m.textContent=ca()?'La transcripció té '+n+' paraules: grava’t fent tota la tasca (almenys '+min+' paraules). La transcripció s’escriu sola mentre parles: torna’t a gravar.':'Your transcript has '+n+' words: record yourself doing the whole task (at least '+min+' words). The transcript is written by itself while you speak: record yourself again.';return}
   state.steps=state.steps||{};
-  state.steps.speak={level,title:'Speaking',ty:window.elTyping?elTyping.sum($('#speechTranscript').parentElement):null,f:[{l:ca()?'Transcripció':'Transcript',v:tr}],rate:[],avg:null,comment:'',date:new Date().toISOString()};
+  state.steps.speak={level,title:'Speaking',typed:((state.speak||{}).gs||{}).typed?true:undefined,ty:window.elTyping?elTyping.sum($('#speechTranscript').parentElement):null,f:[{l:ca()?'Transcripció':'Transcript',v:tr}],rate:[],avg:null,comment:'',date:new Date().toISOString()};
   complete('speak');$('#speakResult').classList.add('show');speakHanded();
 };
 speakHanded();
 // the plan and the transcript stay (state.speak.gs, as state.speak in ls2-engine.js; Roger, 6 Nov 2026: "they must see them with their
 // responses"); a recording itself is never saved. A transcript handed in before this came back from the hand-in.
-function keepSpeak(){state.speak=state.speak||{};state.speak.gs={plan:$('#speakPlan').value,tr:$('#speechTranscript').value};save()}
+function keepSpeak(){state.speak=state.speak||{};const t=(state.speak.gs||{}).typed;state.speak.gs={plan:$('#speakPlan').value,tr:$('#speechTranscript').value};if(t)state.speak.gs.typed=t;save()}
 (()=>{const g=(state.speak||{}).gs||{},h=(state.steps||{}).speak,hv=h&&h.level!=='native'&&h.f&&h.f[0]?h.f[0].v:'';
   $('#speakPlan').value=g.plan||'';$('#speechTranscript').value=g.tr||hv||'';
-  $('#speakPlan').addEventListener('input',keepSpeak);$('#speechTranscript').addEventListener('input',keepSpeak)})();
+  $('#speakPlan').addEventListener('input',keepSpeak);$('#speechTranscript').addEventListener('input',keepSpeak);
+  if(g.typed||!(window.SpeechRecognition||window.webkitSpeechRecognition)||(window.elMic&&elMic.srBroken&&elMic.srBroken()))speakTypeIn()})();
 
 renderAll();
 
