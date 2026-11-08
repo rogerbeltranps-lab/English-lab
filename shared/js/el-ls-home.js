@@ -97,12 +97,16 @@
     const done=a=>elAllDone(a,doneOf(a),ST.rs[a.id]);
     const rows=acts().map((a,i)=>({a,i,d:dueOf(a)})).sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i);
     // the steps a student sees: the ones done or in a section open for them (a section the teacher has not opened is never counted)
-    const vis=a=>{const ks=stepsOf(a);if(all||closed)return ks;const ds=doneOf(a),off=elSecLockedFor(a,info,g,ds);
-      return ks.filter(k=>ds.has(k)||!(off.includes(k)||((k==="cards"||k==="practice")&&off.includes("vocab"))))};
+    // + the tabs 🏫 for a later class (elSecSoon): shown and counted, but never the next step until their day
+    const offOf=a=>elSecLockedFor(a,info,g,doneOf(a)),soonOf=a=>elSoonSteps(a,elSecSoon(a,info,g,doneOf(a)));
+    const isOff=(off,k)=>off.includes(k)||((k==="cards"||k==="practice")&&off.includes("vocab"));
+    const can=a=>{const ks=stepsOf(a);if(all||closed)return ks;const ds=doneOf(a),off=offOf(a);return ks.filter(k=>ds.has(k)||!isOff(off,k))};
+    const vis=a=>{const ks=stepsOf(a);if(all||closed)return ks;const ds=doneOf(a),off=offOf(a),soon=soonOf(a);return ks.filter(k=>ds.has(k)||!isOff(off,k)||soon.includes(k))};
     let next=null;
-    if(!all&&!closed)for(const {a} of rows){if(a.manual||dropped.includes(a.id)||!open(a)||done(a)||!vis(a).some(k=>!doneOf(a).has(k)))continue;
-      const cp=elCheckpointMissing(a,doneOf,open),k=vis(a).find(x=>!doneOf(a).has(x)&&!(a.skip||[]).includes(x));next=cp?{a:cp,cp:true}:{a,k};break}
-    return {open,done,dropped,next,all,closed,vis};
+    if(!all&&!closed)for(const {a} of rows){if(a.manual||dropped.includes(a.id)||!open(a)||done(a)||!can(a).some(k=>!doneOf(a).has(k)))continue;
+      const cp=elCheckpointMissing(a,doneOf,open),k=can(a).find(x=>!doneOf(a).has(x)&&!(a.skip||[]).includes(x));next=cp?{a:cp,cp:true}:{a,k};break}
+    const soonAny=!all&&!closed&&rows.some(({a})=>open(a)&&!dropped.includes(a.id)&&soonOf(a).some(k=>!doneOf(a).has(k)));
+    return {open,done,dropped,next,all,closed,vis,soonAny};
   }
   // Students see only the learning paths the teacher has opened for their group (Roger, 6 Nov 2026: "I don't want students to see the
   // future LP as depending on the time left they might not do them"): not open yet and dropped ones are left out; the teacher and testers see all.
@@ -148,7 +152,7 @@
     if(S.closed){c.className="cont done";c.innerHTML=`<div class="ct">${t("Aquesta LS ja està tancada","This LS is closed")}</div><div class="cs">${t("Pots repassar el que vas fer i el feedback del professor.","You can review what you did and your teacher's feedback.")}</div><a class="cgo" href="${boardHref()}#marks">📊 ${t("Les meves notes","My marks")} →</a>`;c.hidden=false;return}
     if(S.all){c.hidden=true;return}
     const nx=S.next;
-    if(!nx){c.className="cont done";c.innerHTML=`<div class="ct">✓ ${t("Ho tens tot fet!","You're all done!")}</div><div class="cs">${t("No tens res pendent als learning paths oberts.","Nothing left to do in the open learning paths.")}</div><a class="cgo" href="${ROOT}lab/practice.html">${t("Practica pel teu compte","Practise on your own")} →</a>`;c.hidden=false;return}
+    if(!nx){c.className="cont done";c.innerHTML=`<div class="ct">✓ ${S.soonAny?t("Ho tens tot fet, de moment!","All done for now!"):t("Ho tens tot fet!","You're all done!")}</div><div class="cs">${S.soonAny?t("De moment no tens res pendent: la resta la farem a classe 🏫.","Nothing left to do for now: we'll do the rest in class 🏫."):t("No tens res pendent als learning paths oberts.","Nothing left to do in the open learning paths.")}</div><a class="cgo" href="${ROOT}lab/practice.html">${t("Practica pel teu compte","Practise on your own")} →</a>`;c.hidden=false;return}
     const ks=elTabGroups(nx.a,S.vis(nx.a)),ds=doneOf(nx.a),n=ks.filter(g=>g.every(k=>ds.has(k))).length,num=lpNum(nx.a),title=nx.a.title.replace(/\s*\(warm-up\)$/,"");
     c.className="cont";
     c.innerHTML=`<div class="ck">${n?t("Continua on ho vas deixar","Continue where you left off"):t("El següent learning path","Your next learning path")}</div><div class="ct">${num&&/^\d+$/.test(num)?"LP"+num+" · ":""}${esc(title)}</div>`

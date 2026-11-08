@@ -212,10 +212,24 @@ window.elPrintDay=function(its,gname,dlab){const by=new Map(),games=[];
   return "shared/print/today.html?items="+encodeURIComponent(items)+"&games="+encodeURIComponent(games.join(","))+"&g="+encodeURIComponent(gname||"")+"&d="+encodeURIComponent(dlab||"")};
 window.elAgendaOf=function(info,gid){const s=info&&info.planEdits&&info.planEdits[gid]&&info.planEdits[gid].agenda;if(!s)return null;
   try{const ag=typeof s==="string"?JSON.parse(s):s;return ag&&ag.days?ag:null}catch(e){return null}};
+window.elAgToday=()=>agToday();
+// 5 minutes before the class (Roger, 8 Nov 2026: "cannot be unfrozen 5 minutes before the class?"): what the Time plan puts on today opens
+// for students 5 minutes before the group's class starts by its timetable, not in the morning. The timetable: the group's live/{group}.tt
+// (el-cloud.js keeps it in window.EL_LIVE_TT and this browser, el_tt_<group>, so the next page knows it at once), else EL_TIMETABLE
+// (el-plan.js). No class of the group that day by the timetable (or no timetable at all): it opens with the day, as before.
+window.elTTFor=function(gid){const L=window.EL_LIVE_TT;if(L&&L[gid]&&L[gid].slots)return L[gid];
+  try{const c=JSON.parse(localStorage.getItem("el_tt_"+gid)||"null");if(c&&c.slots)return c}catch(e){}return window.elTT?elTT(gid):null};
+// when the plan's items of `day` (YYYY-MM-DD) open for the group: 5 minutes before its first class that day (ms), or null (no class by the timetable)
+window.elClassOpenAt=function(gid,day){const tt=elTTFor(gid);if(!tt||!tt.slots||!day)return null;
+  if(elOffList(tt.off).some(o=>o[0]<=day&&day<=o[1]))return null;
+  const z=new Date(day+"T00:00:00"),dn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][z.getDay()];let best=null;
+  for(const sl of tt.slots){const x=String(sl).match(/^(\w{3}) (\d{1,2}):(\d\d)$/);if(!x||x[1]!==dn)continue;const t=z.getTime()+(+x[2]*60+ +x[3]-5)*60e3;if(best==null||t<best)best=t}
+  return best};
 const laterMemo=new WeakMap();   // per ls info and group: recomputed when the agenda, homework, pull-up or day changes
 window.elPlanLater=function(info,gid,today){const none={acts:new Set(),tabs:{}};if(!info||typeof info!=="object")return none;
-  const ag=elAgendaOf(info,gid);if(!ag)return none;today=today||agToday();
-  const src=info.planEdits[gid].agenda,mm=laterMemo.get(info)||{},m=mm[gid];if(m&&m.today===today&&m.src===src&&m.hw===info.homework&&m.push===info.push)return m.v;
+  const ag=elAgendaOf(info,gid);if(!ag)return none;const real=!today;today=today||agToday();
+  const op=real?elClassOpenAt(gid,today):null,early=op!=null&&Date.now()<op,after=(d,x)=>d>today||(early&&d===today);   // today's items wait for the class
+  const src=info.planEdits[gid].agenda,mm=laterMemo.get(info)||{},m=mm[gid];if(m&&m.today===today&&m.early===early&&m.src===src&&m.hw===info.homework&&m.push===info.push)return m.v;
   const first={},tabFirst={};
   Object.entries(ag.days).forEach(([d,its])=>(its||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0)return;const id=it.slice(0,i),p=it.slice(i+1);
     if(!first[id]||d<first[id])first[id]=d;if(p){const k=id+"#"+p;if(!tabFirst[k]||d<tabFirst[k])tabFirst[k]=d}}));
@@ -224,9 +238,9 @@ window.elPlanLater=function(info,gid,today){const none={acts:new Set(),tabs:{}};
   // homework planned for a later class day (set > today) frees nothing until that day (Roger, 7 Nov 2026)
   Object.values(((info.homework||{})[gid])||{}).forEach(h=>{if(!h||!h.tabs||typeof h.tabs!=="object"||h.set&&h.set>today)return;Object.entries(h.tabs).forEach(([id,ps])=>{free.add(id);(ps||[]).forEach(p=>free.add(id+"#"+p))})});
   const pu=(info.push||{})[gid];if(pu&&pu.a){free.add(pu.a);if(pu.p)free.add(pu.a+"#"+pu.p)}
-  const v={acts:new Set(Object.keys(first).filter(id=>first[id]>today&&!free.has(id))),tabs:{}};
-  Object.entries(tabFirst).forEach(([k,d])=>{if(d<=today||free.has(k))return;const [id,p]=[k.slice(0,k.indexOf("#")),k.slice(k.indexOf("#")+1)];(v.tabs[id]=v.tabs[id]||[]).push(p)});
-  mm[gid]={today,src,hw:info.homework,push:info.push,v};laterMemo.set(info,mm);return v};
+  const v={acts:new Set(Object.keys(first).filter(id=>after(first[id])&&!free.has(id))),tabs:{}};
+  Object.entries(tabFirst).forEach(([k,d])=>{if(!after(d)||free.has(k))return;const [id,p]=[k.slice(0,k.indexOf("#")),k.slice(k.indexOf("#")+1)];(v.tabs[id]=v.tabs[id]||[]).push(p)});
+  mm[gid]={today,early,src,hw:info.homework,push:info.push,v};laterMemo.set(info,mm);return v};
 // Sections inside a learning path (Roger, 26 Oct 2026: "even in the learning path, I want to open these sections as I teach"): the section
 // tabs the teacher has locked for a group, ls/{id}.secLocked[group][activity id with "/" as "__"] = panel ids (EL_SECTIONS in el-sections.js),
 // and the ones opened at some point, ls/{id}.secOpened[group][same key]. None locked = every section open. A locked section is read-only
@@ -249,8 +263,19 @@ window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];retu
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
 // again stays open for a student who has not finished it; it is read-only for everyone else. done = Set of the student's done steps.
-window.elSecLockedFor=function(a,info,gid,done){const op=secOf(info,"secOpened",gid,a)||[],lk=elSecLocked(a,info,gid).filter(id=>!(op.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done)));
+const secLk=(a,info,gid,done)=>{const op=secOf(info,"secOpened",gid,a)||[];return elSecLocked(a,info,gid).filter(id=>!(op.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done)))};
+window.elSecLockedFor=function(a,info,gid,done){const lk=secLk(a,info,gid,done);
   if(window.EL_RAW_OPEN)return lk;const later=elPlanLater(info,gid).tabs[a.id]||[];return [...new Set([...lk,...later])]};   // + tabs planned for a later class day (elPlanLater)
+// 🏫 To do in class (Roger, 8 Nov 2026: "students can see it but can't write any answer nor play any video until it's class time"; "a blue
+// shadow and a legend saying to do in class"): a tab of an open learning path that the Time plan puts on a later class day (elPlanLater) is
+// SHOWN, read-only, until that day; a tab the teacher locked with the section switches stays hidden. Still not doable, so it is never in
+// ✅ To do or the "next" step (elSecLockedFor keeps it), but it counts in the path's tabs, so a path is never "done" with tabs still to come.
+// Returns {panel id: the class day it is planned for (YYYY-MM-DD)}.
+window.elSecSoon=function(a,info,gid,done){if(window.EL_RAW_OPEN||!a)return {};const later=elPlanLater(info,gid).tabs[a.id]||[];if(!later.length)return {};
+  const lk=secLk(a,info,gid,done),ag=elAgendaOf(info,gid),today=agToday(),o={};
+  later.forEach(p=>{if(lk.includes(p))return;let d=null;Object.entries((ag&&ag.days)||{}).forEach(([dd,its])=>{if(dd>=today&&(its||[]).includes(a.id+"#"+p)&&(!d||dd<d))d=dd});o[p]=d});return o};
+// the steps of those tabs (elSecSteps), for counting
+window.elSoonSteps=function(a,soon){return Object.keys(soon||{}).flatMap(id=>elSecSteps(a,id))};
 // Sections still to finish (the to-do list): only in a learning path where the teacher uses the section switches, a section that is open
 // or was opened before, holds steps and has some not done. Returns [[panel id, name]].
 window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk))return [];const op=secOf(info,"secOpened",gid,a)||[],later=window.EL_RAW_OPEN?[]:elPlanLater(info,gid).tabs[a.id]||[];
