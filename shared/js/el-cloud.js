@@ -626,10 +626,24 @@ function suggest(u){
   document.body.append(d);d.showModal();ta.focus();
 }
 
+// BAR-SPACE-START
+// The bar floats over the bottom right corner, so at the end of a page it covered the last card (Roger, 8 Nov 2026: "students can't
+// see the bottom side": the board's "About this LS"). An empty block as tall as the bar is kept at the end of the page while the bar
+// floats, so the page scrolls on until everything is above it. None when the bar sits in the page (phones) or is hidden.
+// Pages with a sticky side menu (.app: the board, LS homes, English Lab, Practise) get it at the end of the main column, not of the
+// page: below .app it pushed the side menu up and cut off its top.
+function keepBarSpace(el){
+  const sp=document.createElement("div");sp.id="el-cloud-bar-space";sp.setAttribute("aria-hidden","true");sp.style.cssText="height:0;pointer-events:none";
+  (document.querySelector(".app>.page,.app>main")||document.body).appendChild(sp);
+  const fit=()=>{const cs=getComputedStyle(el),h=cs.position==="fixed"&&cs.display!=="none"?Math.ceil(el.getBoundingClientRect().height)+24:0;
+    sp.style.height=h+"px";document.documentElement.style.setProperty("--el-bar-space",h+"px")};   // learning paths use the variable (el-app.css)
+  fit();addEventListener("resize",fit);if(window.ResizeObserver)new ResizeObserver(fit).observe(el);
+}
+// BAR-SPACE-END
 function bar(){
   const el=document.createElement("div");el.id="el-cloud-bar";
   el.style.cssText="position:fixed;right:10px;bottom:10px;z-index:10002;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;font:13px system-ui,sans-serif;box-shadow:0 2px 8px #0002;display:flex;gap:8px;align-items:center";
-  document.body.appendChild(el);
+  document.body.appendChild(el);keepBarSpace(el);
   // until Firebase has said who is signed in, the chip stays empty: it showed "Not signed in · Sign in" for a second to a signed-in
   // student on every page (Roger, 7 Nov 2026: "all pages still pop up in between")
   return u=>{el.innerHTML="";el.style.visibility=authKnown?"":"hidden";if(!authKnown)return;
