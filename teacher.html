@@ -165,6 +165,7 @@ body.tp2on{max-width:none}body.tp2on .tshell{grid-template-columns:minmax(0,1fr)
 <script src="shared/js/el-cheer.js"></script>
 <script src="shared/js/el-marking.js"></script>
 <script src="shared/js/el-grading.js"></script>
+<script src="shared/js/el-fp-rubrics.js"></script>
 <script src="shared/js/el-comp-map.js"></script>
 <script src="shared/js/el-reference-data.js"></script>
 <script src="shared/js/el-reference.js"></script>
@@ -1437,7 +1438,7 @@ function corrPage(){
     :`<div class="cont ${allNow?"":"done"}"><span class="ck">Next correction · ${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Wednesday"} · about 15:00</span>`
       +`<span class="ct">${allNow?plural(allNow,"piece")+" waiting to be corrected":"Nothing is waiting"}</span>`
       +`<span class="cs">${st.st?`Last run: ${esc(corrWhen(st.st))}${st.via==="request"?" (you asked for it)":""}. `:""}${allNow?"Don't want to wait until Wednesday? Claude can correct them now (every group).":"Everything students handed in is corrected."}</span>`
-      +(allNow?`<div class="cgo"><button data-do="corrask">✏️ Correct everything waiting now</button></div>`:"")+`</div>`;
+      +(allNow?`<div class="cgo"><button data-do="corrask">✏️ Correct everything waiting now</button></div>`:"")+`<div class="cgo"><button class="g" data-fpg="cost" title="What Gemini cost this month: speaking recordings transcribed and final product videos watched">💶 Gemini this month</button></div>`+`</div>`;
   // The waiting list is worked out from the students' work this dashboard has loaded (Roger, 7 Nov 2026: "I don't understand this, didn't
   // you correct this?": the page showed Friday night's copy, after Claude's Saturday runs had corrected it all). When a run started after
   // a group's work was fetched, say so and offer to fetch it again (DEMO: never).
@@ -3184,10 +3185,105 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
     +(a.steps?handIns(u,a):"")
     +revisions(u,a)
     +levelRows(u,a)
+    +fpgBox(u,a)
     +(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
     +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea>`
     +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`);
 }
+
+// ---- 🎬 Gemini watches the final product video (Roger, 8 Nov 2026: "I give the video to Gemini and Gemini gives me the feedback, then if I
+// disagree I tell him to change whatever … gemini can even see if the students are reading"; "then I'd watch the videos and I'd approve it or
+// not"). In a final product's dialog: the video (uploaded by the student on the page, state.steps.video, or by a teammate for a group video;
+// an older Classroom video by pasting its Drive link), Gemini's draft (reading or speaking, a level and a note per rubric row, feedback in the
+// teacher's voice), "Ask Gemini to change" (Gemini watches again with the teacher's words) and Approve (fills the levels or the mark and the
+// feedback and saves, as the Save button does). The school Apps Script does the watching (tools/notify/school-mail.gs, action fp_watch: the
+// video goes from Drive to Gemini and is deleted from Gemini at once). Drafts: settings/fp__{activity} {[uid]: draft} (teacher only; read when
+// a dialog opens). 💶 the month's Gemini spending: action gemini_usage.
+const FPG={d:{},busy:{},cost:null};
+const fpgDoc=id=>"fp__"+id.replace(/[^\w-]/g,"_");
+const fpgIs=a=>!!a&&a.manual&&a.graded&&(((G()||{}).fp||{}).a===a.id||!!(window.EL_FP_RUBRICS||{})[a.id]);
+const fpgFile=v=>{const m=String(v||"").match(/(?:\/d\/|[?&]id=|^)([\w-]{25,})/);return m?m[1]:""};
+// the video: the student's own upload, else a teammate's (group video), else a Drive link the teacher pasted (kept in the draft)
+function fpgVideo(u,a){const own=(handedIn(u,a).video||{}).video;if(own)return {id:own.id,name:own.name,size:own.size,at:own.at,by:null};
+  const s=S.P[u],t=teamOf(u,a.id);if(t)for(const m of teamMates(a.id,t,s.group)){const v=(handedIn(m.uid,a).video||{}).video;if(v)return {id:v.id,name:v.name,size:v.size,at:v.at,by:m}}
+  const d=(FPG.d[a.id]||{})[u];return d&&d.fileId?{id:d.fileId,name:"Video from a link",by:null,link:true}:null}
+// the rubric Gemini marks with: LS2 = the final product rows of el-grading.js with their indicators (NA … AE = level 1 … 4, the same
+// for every route: one rubric for everyone); LS1 = EL_FP_RUBRICS (descriptors listed from Very good down, so reversed)
+function fpgRubric(a){const g=G()||{},R=(window.EL_FP_RUBRICS||{})[a.id];
+  if(g.fp&&g.fp.a===a.id&&!g.fp.mark)return {kind:"levels",rows:g.fp.rows.map(r=>({name:r.name,sub:r.c,w:r.w,d:(g.ind||{})[r.c]||[],step:r.step,c:r.c}))};
+  if(R)return {kind:"mark",title:R.title,rows:R.rows.map(r=>({name:r.name,sub:r.sub,w:r.w,d:r.d.slice().reverse()}))};
+  return null}
+async function fpgLoad(a){if(FPG.d[a.id]||DEMO)return FPG.d[a.id]=FPG.d[a.id]||{};
+  try{const c=await F.getDoc(F.doc(db(),"settings",fpgDoc(a.id)));FPG.d[a.id]=c.exists()?c.data():{}}catch(e){console.warn("fp drafts",e);FPG.d[a.id]={}}return FPG.d[a.id]}
+function fpgSave(a,u,d){(FPG.d[a.id]=FPG.d[a.id]||{})[u]=d;return put(["settings",fpgDoc(a.id)],{[u]:d})}
+async function fpgCall(body){const tok=await ELCloud.auth.currentUser.getIdToken();
+  const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify(Object.assign({idToken:tok},body))});
+  const j=await r.json();if(!j||!j.ok)throw new Error(j&&j.error==="nothing to send"?"the school script is the old version: paste tools/notify/school-mail.gs and deploy a new version":(j&&j.error)||"no answer");return j}
+const FPG_READ={speaks:["🟢","Speaks freely"],partly:["🟡","Reads in parts"],reads:["🔴","Reads"]};
+const fpgLv=n=>n==null?"–":n===0?"No evidence":"Level "+n;
+// the box in the final product dialog (filled once the drafts are read)
+function fpgBox(u,a){if(!fpgIs(a))return "";setTimeout(()=>fpgLoad(a).then(()=>fpgFill(u,a)));return `<div id="fpg" class="fpg"><p class="muted">🎬 Loading the video and Gemini's draft…</p></div>`}
+function fpgFill(u,a){const box=$("#fpg");if(!box)return;const v=fpgVideo(u,a),R=fpgRubric(a),d=(FPG.d[a.id]||{})[u],busy=FPG.busy[u+"|"+a.id];
+  let h=`<h4 style="margin:0 0 6px">🎬 The video and Gemini's draft <button class="g" data-fpg="cost" style="float:right;font-size:12px;padding:2px 8px">💶 Gemini this month</button></h4>`;
+  if(v)h+=`<p class="muted" style="margin:0 0 6px">${esc(v.name||"Video")}${v.size?" · "+Math.round(v.size/1e6)+" MB":""}${v.at?" · uploaded "+day(v.at):""}${v.by?" · uploaded by "+name(v.by)+" (group video)":""} · <a href="https://drive.google.com/file/d/${esc(v.id)}/view" target="_blank" rel="noopener">Open in Drive ↗</a></p>
+    <div style="position:relative;padding-top:56.25%;background:#0f172a;border-radius:8px;overflow:hidden"><iframe src="https://drive.google.com/file/d/${esc(v.id)}/preview" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>`;
+  else h+=`<p class="muted">No video uploaded on the site yet. For a video handed in on Classroom, paste its Drive link:</p>`;
+  h+=`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:6px">${v&&!v.link?"":`<input id="fpglink" placeholder="https://drive.google.com/file/d/…" style="flex:1;min-width:220px">`}`
+    +(R?`<button data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>${d&&d.draft?"🔄 Watch again":"🎬 Gemini, watch it"}</button>`:`<span class="muted">This final product has no rubric on the site yet, so Gemini cannot mark it.</span>`)+`</div>`;
+  if(busy)h+=`<p class="muted">⏳ Gemini is watching the video (about 1–3 minutes; you can close this window, the draft is kept).</p>`;
+  if(d&&d.error)h+=`<p class="bad" style="color:#b91c1c">⚠️ ${esc(d.error)}</p>`;
+  if(d&&d.draft&&R){const x=d.draft,rd=FPG_READ[(x.reading||{}).verdict]||FPG_READ.partly;
+    h+=`<p style="margin:10px 0 4px"><b>${rd[0]} ${rd[1]}</b>${x.reading&&x.reading.note?` · ${esc(x.reading.note)}`:""}</p>`
+      +`<table class="lvt"><thead><tr><th style="text-align:left">Row</th><th>Gemini</th><th style="text-align:left">What it saw</th></tr></thead><tbody>`
+      +R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};return `<tr><td style="text-align:left">${esc(r.name)} <small class="muted">${r.w?r.w+" %":""}</small></td><td><b>${fpgLv(g.level)}</b></td><td style="text-align:left"><small>${esc(g.why||"")}</small></td></tr>`}).join("")
+      +`</tbody></table>`+(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")
+      +`<label>Feedback for the student (Gemini's draft: you can change it below before approving)</label><div class="fb" style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px">${esc(fpgText(R,x))}</div>`
+      +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
+      +`<div class="row" style="justify-content:flex-start;gap:6px"><button data-fpg="ok" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✅ Approve: use it and save</button></div>`
+      +`<label>Not right? Tell Gemini what to change</label><textarea id="fpgchg" rows="2" placeholder="e.g. She doesn't read, she only looks at the slides; Language should be Level 3"></textarea>`
+      +`<div class="row" style="justify-content:flex-start"><button class="g" data-fpg="change" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✏️ Ask Gemini to change it</button></div>`}
+  box.innerHTML=h}
+// LS1: mark /10 = levels × 2.5 weighted by the rows (rows Gemini could not judge are left out)
+function fpgMark(R,x){let s=0,w=0;R.rows.forEach((r,i)=>{const l=((x.rows||[])[i]||{}).level;if(l!=null){s+=l*2.5*r.w;w+=r.w}});return w?Math.round(s/w*10)/10:null}
+// the feedback text the student gets: LS1 in the "Name (30%) · 7.5/10" + ✔/➜ lines the student board shades on the rubric (fbBox in today.html)
+function fpgText(R,x){const top=[x.feedback,x.well_done&&"Well done: "+x.well_done,x.next_time&&"Next time: "+x.next_time].filter(Boolean).join("\n");
+  if(R.kind!=="mark")return top;
+  return top+"\n\n"+R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};if(g.level==null)return "";return `${r.name} (${r.w}%) · ${g.level*2.5}/10`+(g.good?"\n✔ "+g.good:"")+(g.improve?"\n➜ "+g.improve:"")}).filter(Boolean).join("\n")}
+async function fpgWatch(u,a,change){const R=fpgRubric(a),k=u+"|"+a.id;if(!R||FPG.busy[k])return;
+  const link=$("#fpglink")&&$("#fpglink").value.trim(),fid=link?fpgFile(link):"";if(link&&!fid)return alert("That is not a Drive link to a file.");
+  let v=fpgVideo(u,a);if(fid)v={id:fid,link:true};if(!v)return alert("No video yet: the student uploads it on the final product page (Submit tab), or paste a Drive link.");
+  const s=S.P[u],old=(FPG.d[a.id]||{})[u]||{},g=G()||{},cs=a.ls.startsWith("2eso")?"2 ESO":"4 ESO",ls1=/my-real-routine/.test(a.ls);
+  const ask={course:cs,level:ls1&&cs==="2 ESO"?"A1":"A2+",route:level(u,a.ls),student:fullName(s),group:!!teamOf(u,a.id)||/proposal/.test(a.id),
+    task:a.title+(R.title?" · "+R.title:""),rows:R.rows.map(({name,sub,w,d})=>({name,sub,w,d}))};
+  FPG.busy[k]=true;fpgFill(u,a);
+  let d;try{const j=await fpgCall({action:"fp_watch",fileId:v.id,ask,prev:change?old.draft:null,change:change||""});
+    d={at:new Date().toISOString(),fileId:v.link?v.id:(old.fileId||null),draft:j.draft,model:j.model||"",changes:change?[...(old.changes||[]),change]:[]}}
+  catch(e){d=Object.assign({},old,{error:"Gemini could not watch it: "+e.message+".",at:old.at||new Date().toISOString(),fileId:v.link?v.id:(old.fileId||null)})}
+  if(!d.error)delete d.error;FPG.busy[k]=false;FPG.cost=null;
+  try{await fpgSave(a,u,d)}catch(e){console.warn("fp draft save",e)}
+  fpgFill(u,a)}
+// Approve: LS2 levels on the rows (group rows on every member of the final product group, as the dialog's group buttons do), LS1 the mark;
+// the feedback box gets the draft (or what the teacher wrote there already, if it differs), then the dialog's own Save
+function fpgApprove(u,a){const R=fpgRubric(a),d=((FPG.d[a.id]||{})[u]||{}),x=d.draft;if(!R||!x)return;
+  if(R.kind==="levels"){const s=S.P[u],ms=[s,...teamMates(a.id,teamOf(u,a.id),s.group).filter(m=>m.uid!==u)],ps=[];
+    R.rows.forEach((r,i)=>{const l=((x.rows||[])[i]||{}).level;if(!l)return;const deg=EL_DEGREES[l-1];
+      if(r.step==="group")ms.forEach(m=>ps.push(patch(m.uid,a.id,{levels:{group:{[r.c]:deg}}})));else ps.push(patch(u,a.id,{levels:{[r.step]:{[r.c]:deg}}}))});
+    Promise.all(ps).catch(e=>alert("Could not save the levels: "+e.message))}
+  else{const m=fpgMark(R,x);if(m!=null&&$("#fsc")){$("#fsc").value=m;$("#fmx").value=10}}
+  const fb=$("#ffb");if(fb&&!fb.value.trim())fb.value=fpgText(R,x);else if(fb&&fb.value.trim()!==fpgText(R,x).trim()&&confirm("Replace what is in the feedback box with Gemini's feedback?"))fb.value=fpgText(R,x);
+  d.approved=new Date().toISOString();fpgSave(a,u,d).catch(()=>{});
+  const sv=$('#dlgc button[data-do="save"]');if(sv)sv.click()}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-fpg]");if(!b)return;const k=b.dataset,a=cat.find(x=>x.id===k.a);
+  if(k.fpg==="watch")fpgWatch(k.u,a,"");
+  else if(k.fpg==="change"){const c=$("#fpgchg").value.trim();if(!c)return alert("Write what Gemini should change.");fpgWatch(k.u,a,c)}
+  else if(k.fpg==="ok")fpgApprove(k.u,a);
+  else if(k.fpg==="cost")fpgCost()});
+// 💶 Gemini this month (every recording transcribed and every video watched; the school script adds up Google's token counts)
+async function fpgCost(){dlg(`<h3>💶 Gemini spending</h3><p id="fpgc" class="muted">Asking the school script…</p>`);
+  try{const j=FPG.cost||(FPG.cost=await fpgCall({action:"gemini_usage"})),ms=j.months||[];
+    $("#fpgc").outerHTML=ms.length?`<table><thead><tr><th style="text-align:left">Month</th><th>About</th><th>Videos watched</th><th>Recordings</th></tr></thead><tbody>${ms.map(m=>`<tr><td style="text-align:left">${esc(m.month)}</td><td><b>€${m.eur.toFixed(2)}</b></td><td>${m.video}</td><td>${m.audio}</td></tr>`).join("")}</tbody></table><p class="muted">An estimate from Google's own token counts at the paid prices. The exact bill is in Google AI Studio › Billing.</p>`
+      :`<p class="muted">No Gemini calls counted yet (counting starts with this version of the school script).</p>`}
+  catch(e){FPG.cost=null;$("#fpgc").textContent="Could not ask: "+e.message}}
 
 // ---- marking PDF per round (EL_GRADING[ls].marking; root AGENTS.md "Teacher dashboard"): a print view with every student's answers for one
 // round of the final product and the rubric rows of that round (round, group, video in the LS's rubric data), as each route sees them. Saves nothing.
