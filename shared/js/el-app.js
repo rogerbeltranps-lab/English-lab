@@ -116,10 +116,15 @@
     if (!r) { r = document.createElement("nav"); r.className = "elrail"; r.setAttribute("aria-label", "Menu"); document.body.prepend(r); }
     // a computer (Chromebook): the LS home's side menu, brand + wide buttons with labels and › (Roger, 7 Nov 2026: "the format should be
     // the same (buttons)"); a narrow window (641–980 px): the strip of icon buttons; a phone: the bottom bar (bar below)
+    // a student on an LS (its learning paths, its vocabulary games): the menu is a strip of icons that opens when the mouse is on it
+    // (Roger, 8 Nov 2026: "to see better the screen"; elMiniRail in el-catalog.js, el-app.css section 3)
+    const sm = stuMenu(), mini = !!sm && !!curLs && (mode === "lp" || mode === "games") && !!window.elMiniRail;
+    document.body.classList.toggle("elmini", mini);
     r.innerHTML = `<a class="elr-brand" href="${ROOT}index.html">English with Roger</a>`
-      + `<div class="elside elw">${stuMenu() || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`
+      + `<div class="elside elw">${sm || L.map(x => `<a class="nv${x.on ? " on" : ""}" href="${x.h}"${x.on ? ' aria-current="page"' : ""}><span class="ic${x.si !== x.i ? " lsn" : ""}" aria-hidden="true">${x.si}</span><span class="lb">${esc(x.side)}</span></a>`).join("")}</div>`
       + `<div class="eln">${L.map(x => `<a class="elr${x.on ? " on" : ""}" href="${x.h}" title="${esc(x.long)}"${x.on ? ' aria-current="page"' : ""}><i aria-hidden="true">${x.i}</i><span>${esc(x.short)}</span></a>`).join("")}</div>`;
     document.body.classList.add("elhas-rail");
+    if (mini) elMiniRail(r); else r.classList.remove("elopen");
   }
   function bar(L) {
     let b = $(".elbar");

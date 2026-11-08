@@ -52,6 +52,10 @@
     }
     $$(".nvs,.nvs-m").forEach(n=>n.innerHTML=html);
     const stu=!teach()&&who.role!=="tester";document.body.classList.toggle("stu",stu);
+    // a student on the LS: the side menu is a strip of icons that opens when the mouse is on it (Roger, 8 Nov 2026: "to see better the
+    // screen"; elMiniRail in el-catalog.js, el-app.css section 3). LS1's home keeps its wide menu (leave LS1 alone).
+    const mini=stu&&!!window.elMiniRail&&!(window.elLsNum&&elLsNum(ls)==="LS1");document.body.classList.toggle("elmini",mini);
+    if(mini)elMiniRail($("aside.side"));
     const b=$("#bnav");if(b)b.innerHTML=stu?[["","🏠",t("Inici","Home")],["#todo","✅",t("Per fer","To do")],["#homework","📝",t("Deures","Homework")],["#marks","📊",t("Notes","Marks")],[null,"📚","LS"],["#help","❓",t("Ajuda","Help")]]
       .map(([h,i,l])=>h===null?`<a class="on" aria-current="page" href="#"><i>${i}</i>${l}</a>`:`<a href="${boardHref()}${h}"><i>${i}</i>${l}</a>`).join(""):"";
   }

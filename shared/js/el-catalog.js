@@ -491,6 +491,26 @@ window.elStudentMenu=function(o){
     +(o.app?"":b("phone","",bq+"#phone","📱",t("Estudia amb el mòbil","Study on your phone")));
 };
 
+// On an LS (its home and its learning paths) the students' side menu is a strip of icons that opens over the page (Roger, 8 Nov 2026:
+// "when students are on the LS, to see better the screen, I want the menu to hide and only show the emoji or logos of each side. If the
+// mouse goes on the section the menu gets bigger"). el-app.js (.elrail) and el-ls-home.js (aside.side) set body.elmini and call this with
+// the menu: it puts a ☰ button before the brand. The mouse opens the menu (el-app.css, section 3); ☰ opens or closes it with a tap (a
+// touch screen has no mouse to point with), a tap outside or Esc closes it. Calling it again after the menu is redrawn is fine.
+window.elMiniRail=function(r){
+  if(!r)return;
+  if(!r.querySelector(":scope>.elmtop")){
+    const top=document.createElement("div"),br=r.querySelector(":scope>.elr-brand,:scope>.brand");top.className="elmtop";
+    top.innerHTML=`<button type="button" class="elmt" aria-label="Menu" title="Menu"><span aria-hidden="true">☰</span></button>`;
+    r.prepend(top);if(br)top.append(br);
+  }
+  const set=o=>{r.classList.toggle("elopen",o);const b=r.querySelector(".elmt");if(b)b.setAttribute("aria-expanded",o?"true":"false")};
+  set(r.classList.contains("elopen"));
+  if(r.dataset.elmini)return;r.dataset.elmini="1";
+  r.addEventListener("click",e=>{if(e.target.closest(".elmt")){e.preventDefault();set(!r.classList.contains("elopen"))}});
+  document.addEventListener("click",e=>{if(r.classList.contains("elopen")&&!r.contains(e.target))set(false)},true);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&r.classList.contains("elopen"))set(false)});
+};
+
 // The class tab (class mode, el-cloud.js cmTeacher) has no side menu (Roger, 7 Nov 2026: "when I stop the class this appears and I don't
 // need it. Plus it appears for a sec when the class is running"): this file runs before any menu is drawn (el-app.js .elrail on the
 // learning paths, el-ls-home.js .nvs on the LS home), so the browser tab opened with ?elcm= is marked at once (sessionStorage el_cmtab,
