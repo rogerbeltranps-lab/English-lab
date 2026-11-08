@@ -1287,7 +1287,19 @@ const tms=v=>!v?0:typeof v==="number"?v:typeof v==="string"?(Date.parse(v)||0):t
 const ckOf=(step,it)=>step==="speak"||/speak/.test(step)?"speak":step==="talk"||/talk/.test(step)?"talk":it&&it.mode==="reply"||step==="reflect"?"reflect":step==="write"||it&&it.mode==="writing"?"write":"other";
 // a step's name in any LS (cpName only knows the LS on screen)
 const corrNm=(aid,step)=>{const a=byId(aid),m=a&&(((window.EL_GRADING||{})[a.ls]||{}).moments||[]).find(x=>x.a===aid&&x.step===step);return m?m.name:({write:"Writing",speak:"Speaking",talk:"Talk",reflect:"Reflection"})[step]||step};
-const CORR={d:null,t:0,v:null,mkT:0};S.corrG="all";S.corrN=6;S.corrV="stu";S.corrShut=new Set();
+const CORR={d:null,t:0,v:null,mkT:0,busy:false,failT:0};
+// Fresh after every run (Roger, 8 Nov 2026: "yesterday you said there were no corrections waiting but now I see corrections pending, why?"):
+// the waiting list is worked out from the copy of the students' work kept in this browser, and that copy was from Mon 2 Nov, before
+// Claude's Saturday runs, so it still showed 25 pieces Claude had already corrected. Now a group whose copy is older than Claude's last
+// run (settings/marking.run, a light read) is fetched again by itself, once per run, and no number is shown until it is in. A failed
+// fetch is tried again after 5 minutes; meanwhile the old note with 🔄 Update all is shown.
+const corrRanAt=()=>{const r=((S.D||{}).mk||{}).run||{};return Math.max(tms(r.done),tms(r.started))};
+// AT.corr = the run the last such fetch was for (kept with the copy), so a computer clock a few minutes behind never fetches twice
+const corrOld=()=>{const t=corrRanAt();return DEMO||!t||!RAW||(AT.corr||0)>=t?[]:GR.filter(g=>(AT.g[g.id]||0)<t)};
+async function corrFresh(){const old=corrOld();if(!old.length||CORR.busy||Date.now()-CORR.failT<5*60e3)return;CORR.busy=true;CORR.failT=0;const t=corrRanAt();
+  try{if(old.length===GR.length)S.D=await load("all");else{await Promise.all(old.map(g=>loadGroup(g.id)));S.D=build(S.D)}AT.corr=t;saveCache();LIVE.since={}}
+  catch(e){console.warn("corrections fetch",e);CORR.failT=Date.now()}
+  CORR.busy=false;LIVE.pend=true;liveDraw();loadBar()}S.corrG="all";S.corrN=6;S.corrV="stu";S.corrShut=new Set();
 document.addEventListener("toggle",e=>{const g=e.target.dataset&&e.target.dataset.cs;if(g)e.target.open?S.corrShut.delete(g):S.corrShut.add(g)},true);
 function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
   const wait=[],done=[],today=ELWeek.today(),day=v=>{const t=tms(v);return t?ymd(t):""};
@@ -1339,11 +1351,13 @@ function corrLines(L){const by={};L.forEach(i=>{const key=i.k+"|"+i.aid+"|"+i.st
 const corrCount=L=>Object.keys(CK).map(k=>{const n=L.filter(i=>i.k===k).length;return n?`<span class="cnum">${CK[k][0]} <b>${n}</b> ${n===1?CK[k][1].toLowerCase():CK[k][2]}</span>`:""}).join("");
 function corrPage(){
   if(!DEMO&&Date.now()-CORR.mkT>60e3){CORR.mkT=Date.now();F.getDoc(F.doc(db(),"settings","marking")).then(d=>{const v=d.exists()?d.data():null;if(JSON.stringify(plainT(v))!==JSON.stringify(plainT(S.D.mk||null))){S.D.mk=v;if(S.g==="corr")render()}}).catch(e=>console.warn("marking",e))}
+  corrFresh();const chk=CORR.busy||corrOld().length&&!CORR.failT;   // fetching the work again after a run: no old numbers
   const {wait,done}=corrScan(),gf=i=>S.corrG==="all"||i.gid===S.corrG,W=wait.filter(gf),Dn=done.filter(gf);
   const now=W.filter(i=>i.k!=="copy"&&i.ready),later=W.filter(i=>i.k==="level"&&!i.ready),you=W.filter(i=>i.k==="copy"),late=now.filter(i=>i.late);
   const allNow=wait.filter(i=>i.k!=="copy"&&i.ready).length,st=corrState(),nx=corrNext(),RUN=`<a href="https://claude.ai/code/routines" target="_blank" rel="noopener">scheduled tasks on claude.ai ↗</a>`;
   // the big card
-  const card=st.s==="running"?`<div class="cont"><span class="ck">Claude is correcting now</span><span class="ct">Started ${esc(corrWhen(st.st))}</span><span class="cs">${st.via==="request"?"You asked for it here.":"The weekly Wednesday run."} It usually takes 20 to 60 minutes. The corrections appear below as they are saved, and students see each one in that step of their learning path.</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button></div></div>`
+  const card=chk&&st.s!=="running"&&st.s!=="asked"?`<div class="cont"><span class="ck">Checking</span><span class="ct">⏳ Fetching your students' latest work…</span><span class="cs">Claude corrected work on ${esc(corrWhen(corrRanAt()))}. The list below shows what is really waiting as soon as the work is in (a few seconds).</span></div>`
+    :st.s==="running"?`<div class="cont"><span class="ck">Claude is correcting now</span><span class="ct">Started ${esc(corrWhen(st.st))}</span><span class="cs">${st.via==="request"?"You asked for it here.":"The weekly Wednesday run."} It usually takes 20 to 60 minutes. The corrections appear below as they are saved, and students see each one in that step of their learning path.</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button></div></div>`
     :st.s==="asked"?`<div class="cont ${st.slow?"idle":""}"><span class="ck">${st.slow?"Not started yet":"Starting now"}</span><span class="ct">Asked ${esc(corrWhen(st.rq))}</span><span class="cs">${corrAskMsg(st,RUN)}</span><div class="cgo"><button data-do="corrcheck">↻ Check again</button><button class="s2" data-do="corrcancel">✕ Cancel the request</button></div></div>`
     :`<div class="cont ${allNow?"":"done"}"><span class="ck">Next correction · ${nx?esc(nx.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"short"})):"Wednesday"} · about 15:00</span>`
       +`<span class="ct">${allNow?plural(allNow,"piece")+" waiting to be corrected":"Nothing is waiting"}</span>`
@@ -1352,8 +1366,8 @@ function corrPage(){
   // The waiting list is worked out from the students' work this dashboard has loaded (Roger, 7 Nov 2026: "I don't understand this, didn't
   // you correct this?": the page showed Friday night's copy, after Claude's Saturday runs had corrected it all). When a run started after
   // a group's work was fetched, say so and offer to fetch it again (DEMO: never).
-  const ranAt=Math.max(tms((S.D.mk||{}).run&&S.D.mk.run.done),tms((S.D.mk||{}).run&&S.D.mk.run.started)),oldG=DEMO?[]:GR.filter(g=>ranAt&&(AT.g[g.id]||0)<ranAt),
-    stale=oldG.length?`<div class="hal" style="margin:0 0 10px;padding:10px 12px;border:2px solid #f59e0b;border-radius:12px;background:#fffbeb">⚠️ <b>These numbers may be old.</b> Claude corrected work on ${esc(corrWhen(ranAt))}, after this page fetched ${oldG.length===GR.length?"the students' work":esc(oldG.map(g=>g.name).join(", "))} (${esc(whenAt(Math.min(...oldG.map(g=>AT.g[g.id]||0))))}). Fetch it again to see what is really waiting. <button class="mini" data-load="all">🔄 Update all</button></div>`:"";
+  const ranAt=Math.max(tms((S.D.mk||{}).run&&S.D.mk.run.done),tms((S.D.mk||{}).run&&S.D.mk.run.started)),oldG=DEMO||chk?[]:GR.filter(g=>ranAt&&(AT.g[g.id]||0)<ranAt),
+    stale=oldG.length?`<div class="hal" style="margin:0 0 10px;padding:10px 12px;border:2px solid #f59e0b;border-radius:12px;background:#fffbeb">⚠️ <b>These numbers may be old.</b> The page could not fetch the latest work by itself. Claude corrected work on ${esc(corrWhen(ranAt))}, after this page fetched ${oldG.length===GR.length?"the students' work":esc(oldG.map(g=>g.name).join(", "))} (${esc(whenAt(Math.min(...oldG.map(g=>AT.g[g.id]||0))))}). Fetch it again to see what is really waiting. <button class="mini" data-load="all">🔄 Update all</button></div>`:"";
   const gchips=`<div class="bar"><span class="muted">Group:</span> `+["all",...GR.map(g=>g.id)].map(g=>`<button class="chip ${S.corrG===g?"on":""}" data-do="corrg" data-g="${g}">${g==="all"?"All groups":esc(GR.find(x=>x.id===g).name)}</button>`).join("")+`</div>`;
   const byG=(L,f)=>GR.filter(g=>L.some(i=>i.gid===g.id)).map(g=>{const is=L.filter(i=>i.gid===g.id);return f(g,is)}).join("");
   // Waiting, in plain words (Roger, 6 Nov 2026: "I need info that I can understand, so if there is work to correct, even if you correct it, I
@@ -1364,13 +1378,13 @@ function corrPage(){
   const stuRows=L=>{const by={};L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});return Object.values(by).sort((p,q)=>byName(S.P[p[0].u]||{},S.P[q[0].u]||{})).map(is=>{const s=S.P[is[0].u],first=Math.min(...is.map(i=>i.at).filter(Boolean));
     return `<div class="cstu"><div class="cst"><b>${s?name(s):"?"}</b> <span class="muted">is waiting for ${plural(is.length,"correction")}${isFinite(first)?" · handed in since "+esc(ELWeek.date(ymd(first))):""}</span>${fixB("Correct it now","Claude corrects everything that is waiting now ("+fullName(s||{})+"'s work too): it starts within a few minutes")}</div><div class="cwho">${is.map(itemB).join("")}</div></div>`}).join("")};
   const laterB=later.length?`<details class="cgrp" data-k="cwlater" ${S.open.has("cwlater")?"open":""}><summary><b>⏳ Not ready yet: ${plural(later.length,"marked step")}</b></summary><p class="muted">Steps with a level (reading log, listening chart…) are marked one week after you tick their session in the time plan, so everyone had time to hand them in. The button does not mark them earlier.</p>${corrLines(later)}</details>`:"";
-  const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length?fixB("Correct everything now","Claude corrects everything that is waiting now, in every group: it starts within a few minutes"):""}</div>`
+  const waitB=`<div class="box"><div class="chead"><h2 style="margin:0">Waiting to be corrected</h2>${now.length&&!chk?fixB("Correct everything now","Claude corrects everything that is waiting now, in every group: it starts within a few minutes"):""}</div>`
     +`<p class="muted">Everything students handed in that has no correction yet. Claude corrects it on Wednesday, or now if you press the button. Click a piece to see what they wrote.</p>`
-    +(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything now, or tell Claude in the English Lab chat.</p>`:"")+view
+    +(chk?`<p class="muted">⏳ Fetching the latest work…</p></div>`:"")+(chk?"":(late.length?`<p class="hal late" style="margin:6px 0">❌ ${plural(late.length,"piece")} should have been corrected in the last Wednesday run. Press ✏️ Correct everything now, or tell Claude in the English Lab chat.</p>`:"")+view
     +(S.corrV==="act"
       ?(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.open.has("cw"+g.id)?"open":""} data-k="cw${g.id}"><summary><b>${esc(g.name)}</b> ${corrCount(is)}</summary>${corrLines(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`)
       :(now.length?byG(now,(g,is)=>`<details class="cgrp" ${S.corrShut.has(g.id)?"":"open"} data-cs="${g.id}"><summary><b>${esc(g.name)}</b> <span class="muted">· ${plural(new Set(is.map(i=>i.u)).size,"student")} waiting</span></summary>${stuRows(is)}</details>`):`<p class="muted">Nothing waiting${S.corrG==="all"?"":" in this group"}.</p>`))+laterB
-    +(you.length?`<h3>⚠️ Waiting for you: ${you.length===1?"1 possible copy":you.length+" possible copies"}</h3><p class="muted">Claude does not correct these: check each one (Accept or Redo). They are also in each group's To do.</p>${corrLines(you)}`:"")+`</div>`;
+    +(you.length?`<h3>⚠️ Waiting for you: ${you.length===1?"1 possible copy":you.length+" possible copies"}</h3><p class="muted">Claude does not correct these: check each one (Accept or Redo). They are also in each group's To do.</p>${corrLines(you)}`:"")+`</div>`);
   // history by day
   const days=[...new Set(Dn.map(i=>ymd(i.at)))].filter(d=>d&&d!=="1970-01-01"),shown=days.slice(0,S.corrN);
   const histB=`<div class="box"><h2>Last corrections</h2><p class="muted">What Claude corrected and when. Click a name to see the correction the student got.</p>`
@@ -1393,10 +1407,10 @@ function corrPage(){
 function corrOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;const f=flagOf(k.u,k.a,k.s);
   if(k.k==="answer")return cellPanel(k.u,k.a);if(f&&f.why&&!f.done)return cpOpen(k.u,k.a,k.s);wrOpen(k.u,k.a,k.s)}
 // the menu badge and the Home tile: pieces waiting for the next run (red when some are late), ✏️ while Claude is correcting
-const corrN=()=>{try{const w=corrScan().wait.filter(i=>i.k!=="copy"&&i.ready);return {n:w.length,late:w.some(i=>i.late)}}catch(e){console.warn("corrections",e);return {n:0}}};
-const corrBadge=()=>{const c=corrN();return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
+const corrN=()=>{if(CORR.busy||corrOld().length&&!CORR.failT)return {n:0,chk:true};try{const w=corrScan().wait.filter(i=>i.k!=="copy"&&i.ready);return {n:w.length,late:w.some(i=>i.late)}}catch(e){console.warn("corrections",e);return {n:0}}};
+const corrBadge=()=>{const c=corrN();if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
 function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
-  const sub=st.s==="running"?"Claude is correcting now":st.s==="asked"?"you asked for a correction":(c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Wednesday")+" 15:00";
+  const sub=st.s==="running"?"Claude is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Wednesday")+" 15:00";
   return `<a class="tile" href="#" data-do="tab" data-g="corr"><span class="ti">✏️${c.n?`<span class="tb ${c.late?"late":""}">${c.n} waiting</span>`:""}</span><span><b>Corrections</b><small>${esc(sub)}</small></span></a>`}
 // ---- question analysis (Roger, 26 Oct 2026: "spot the questions that are better answered and the ones that are more difficult… by
 // levels… understand my students' needs"): the first try of every question of an LS by route and group (shared/js/el-items.js).
@@ -3407,7 +3421,7 @@ const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if
   // the first time: during a class, open on its group, unless a link asked for a group, course or LS (then the bar asks)
   TOUCHED.clear();
   if(!CLS.ready){CLS.ready=true;const c=classNow();if(c&&CLS.done!==c.key&&!CLS.link&&S.g!==c.gid&&GR.some(g=>g.id===c.gid)){classGo(c);if(location.hash==="#probs")toProbs();return}}
-  render();if(location.hash==="#probs")toProbs()};
+  render();corrFresh();if(location.hash==="#probs")toProbs()};
 // "Students' work in 2ESO B: as of 10:42" and the buttons that fetch it (load: "Update <group>" one group, "Update all" everything)
 const whenAt=t=>{if(!t)return "never";const d=new Date(t),today=new Date().toDateString()===d.toDateString();
   return (today?"":d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+" ")+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})};
