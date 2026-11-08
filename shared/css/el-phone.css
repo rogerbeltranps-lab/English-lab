@@ -186,6 +186,48 @@
   #tpmore .tpl span{flex:1;min-width:0}
   #tpmore .tpl small{display:block;color:#586174;font-size:12.5px;font-weight:500;margin:1px 0 0}
   #tpmore .tpl a::after{content:"";width:8px;height:8px;border-right:2px solid #94a3b8;border-top:2px solid #94a3b8;transform:rotate(45deg);margin-right:4px;flex:none}
+  /* the wide tables (Students, Marks…): the sticky name column narrow, the name on two lines, so the columns next to it show (it took
+     260 px of a 390 px screen: only Student and Route were visible) */
+  body.tph .wrap th.stu,body.tph .wrap td.stu{min-width:118px;width:118px;max-width:118px;white-space:normal;overflow-wrap:break-word;font-size:12.5px;line-height:1.25;padding:4px 5px}
+  body.tph .wrap td.stu a.gnotes{display:inline-block;margin:2px 0 0;font-size:12px}
+  body.tph .wrap td.gr .route{white-space:normal;display:inline-block;font-size:11px}
   /* the account bar (bell, Sign out) goes to the end of the page, as on the students' pages */
   body.tph #el-cloud-bar{position:static!important;margin:16px 0 0;border-radius:14px!important;flex-wrap:wrap;justify-content:center}
+}
+
+/* 9. Students table on a phone (teacher.html pChip; Roger, 8 Nov 2026: "I need the names to be like an icon … from the left to the middle
+   a shade with the percentage of the grammar and from the right to the middle another shade with the [vocabulary]"): each name is a chip
+   "Roger C."; its left half fills from the left edge with 🧩 grammar %, its right half from the right edge with 📚 vocabulary % (class games
+   of this LS). A tap opens a sheet with the name and first surname, both %, details, notes and answers. On a computer nothing changes. */
+.pchip,.pkey{display:none}
+@media (max-width:640px){
+  body.tph .wrap td.stu:has(>.pchip)>:not(.pchip){display:none}
+  body.tph .wrap td.stu:has(>.pchip){vertical-align:middle}
+  /* the shade colours: --pg grammar, --pv vocabulary (chips and key), --pg2/--pv2 the bars in the sheet */
+  body.tph{--pg:#fca5a5;--pv:#93c5fd;--pgk:#fee2e2;--pvk:#dbeafe;--pg2:#ef4444;--pv2:#3b82f6}
+  body.tph .pchip{display:block;position:relative;width:100%;min-height:44px;margin:0;padding:13px 8px 3px;box-sizing:border-box;border:1px solid #c7d2fe;border-radius:14px;
+    font:700 13px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a;text-align:center;cursor:pointer;box-shadow:none;
+    background:linear-gradient(to right,var(--pg) 0 calc(var(--g) / 2),transparent 0) left/100% 100% no-repeat,
+      linear-gradient(to left,var(--pv) 0 calc(var(--v) / 2),transparent 0) right/100% 100% no-repeat,#fff}
+  body.tph .pchip:not(:has(.plv)){padding-top:3px}
+  /* the level, in the top right-hand corner */
+  body.tph .pchip .plv{position:absolute;top:3px;right:5px;padding:0 5px;border-radius:99px;font-size:9.5px;line-height:13px;font-weight:700;letter-spacing:.01em;box-shadow:0 0 0 1px rgba(15,23,42,.08)}
+  body.tph .pchip .pnm{display:block}
+  /* no Route column: the level is in the chip, and the sheet changes it */
+  body.tph .wrap table:has(td.stu>.pchip) th.rtc,body.tph .wrap td.stu:has(>.pchip)+td{display:none}
+  body.tph .pchip.none{border-style:dashed;background:#fff;color:#475569}
+  body.tph .pchip:active{filter:brightness(.95)}
+  /* the key above the chips: 🧩 on the left half, 📚 on the right */
+  body.tph .wrap th.stu .pkey{display:flex;justify-content:space-between;margin:6px 0 0;padding:2px 8px;border-radius:999px;
+    background:linear-gradient(to right,var(--pgk) 50%,var(--pvk) 50%)}
+  body.tph .wrap th.stu .pkey i{font-style:normal;font-size:13px}
+  body.tph .wrap th.stu br+small.muted{display:none}
+  /* the student's sheet */
+  #tpmore .tpsub{margin:0 4px 6px;color:#586174;font-size:13.5px}
+  #tpmore .tpbars{padding:6px 14px}
+  #tpmore .pbar{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;padding:8px 0;font-size:15px;font-weight:700;color:#0f172a}
+  #tpmore .pbar+.pbar{border-top:1px solid #eef1f5}
+  #tpmore .pbar i{grid-column:1/-1;width:auto;height:8px;border-radius:99px;background:#e5e7eb;overflow:hidden}
+  #tpmore .pbar em{display:block;height:100%;border-radius:99px}
+  #tpmore .tpl+.tpl{margin-top:10px}
 }

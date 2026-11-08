@@ -907,7 +907,7 @@ function render(){
 // of a group's pages (the place stays: 2ESO A's Marks → 2ESO B's Marks). More opens a sheet with the rest of the menu (announcement, student
 // view, time plan of all groups, timetable, questions, materials, reference, how it works, maintenance). Everything it shows is display:none
 // on a computer (shared/css/el-phone.css, section 8): the menu, the pages and the buttons are the same ones, with their own data-do actions.
-const TPH={g:null,more:false};
+const TPH={g:null,more:false,chip:null};
 const tphIcon=p=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TPH_I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',groups:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/>',
   corr:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',msgs:'<path d="M4 5h16v11H9l-5 4z"/>',more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>'};
@@ -919,12 +919,13 @@ function phoneBar(){
     const m=document.createElement("div");m.id="tpmore";m.hidden=true;document.body.append(m);document.body.classList.add("elptab","tph");
     document.addEventListener("click",e=>{const b=e.target.closest("[data-tph]"),inM=e.target.closest("#tpmore");
       if(b){e.preventDefault();const w=b.dataset.tph;
-        if(w==="more"){TPH.more=!TPH.more;tphMore();return}
-        TPH.more=false;
+        if(w==="chip"){TPH.chip=b.dataset.u;TPH.more=true;tphMore();return}
+        if(w==="more"){TPH.more=!TPH.more||!!TPH.chip;TPH.chip=null;tphMore();return}
+        TPH.more=false;TPH.chip=null;
         if(w==="sv"){const v=document.querySelector('#fsctl [data-do="sview"]');tphMore();if(v)v.click();return}
         S.g="plan";S.place=w;S.year=false;render();scrollTo(0,0);return}
-      if(TPH.more&&(!inM||e.target.closest("[data-do]")||e.target===inM)){TPH.more=false;tphMore()}});
-    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&TPH.more){TPH.more=false;tphMore()}});
+      if(TPH.more&&(!inM||e.target.closest("[data-do],a[href]")||e.target===inM)){TPH.more=false;TPH.chip=null;tphMore()}});
+    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&TPH.more){TPH.more=false;TPH.chip=null;tphMore()}});
   }
   const np=S.D?S.D.pb.filter(x=>!x.fixed).length+(S.D.sg||[]).filter(x=>!x.read).length+msgNew().length:0,cn=corrN().n||0;
   const isG=GR.some(g=>g.id===S.g),here=S.g==="plan"?(S.place==="msgs"?"msgs":"home"):isG?"groups":S.g==="corr"?"corr":"more";
@@ -936,8 +937,26 @@ function phoneBar(){
     sg.innerHTML=GR.map(g=>`<a href="#" data-do="tab" data-g="${g.id}"${g.id===S.g?' class="on" aria-current="page"':""}>${esc(g.name.replace(/^(\d)ESO\s*/,"$1"))}</a>`).join("");main.prepend(sg)}
   tphMore();
 }
+// a student on a phone (Roger, 8 Nov 2026: "I need the names to be like an icon. Only the names and the first letter of the surname. And when I
+// touch it I could see the entire name and first surname. Then from the left to the middle a shade with the percentage of the grammar and
+// from the right to the middle another shade with the [vocabulary]"): a chip "Roger C." in the Students table; its left half fills from
+// the left edge with the % right in the 🧩 grammar class games of this LS, its right half from the right edge with 📚 vocabulary (the
+// same numbers as the circles on a computer). A tap opens a sheet: name and first surname, both %, the student's details, notes, answers.
+const shortName=s=>{const n=nameOf(s);return n?{short:n.first+(n.surname1?" "+n.surname1.charAt(0)+".":""),mid:n.first+(n.surname1?" "+n.surname1:"")}:{short:fullName(s),mid:fullName(s)}};
+function pChip(s){const n=shortName(s),G=gameMine(s),g=G&&G.st.grammar,v=G&&G.st.vocab,lv=level(s.uid,S.ls),rq=((S.D.lv[s.uid]||{})[S.ls]||{}).request;
+  return `<button type="button" class="pchip${G?"":" none"}" data-tph="chip" data-u="${esc(s.uid)}" style="--g:${g||0}%;--v:${v||0}%" aria-label="${esc(n.mid)}${lv?", "+LV[lv]:""}${rq?", asks for "+LV[rq]:""}${G?`: grammar ${g==null?"–":g+" %"}, vocabulary ${v==null?"–":v+" %"}`:""}">${lv||rq?`<span class="plv r-${lv||"none"}" aria-hidden="true">${lv?LV[lv]:"–"}${rq?" 🔁":""}</span>`:""}<span class="pnm">${esc(n.short)}</span></button>`}
+// the Level row of the sheet does what a click on the Route cell does (rt, or rtlist for a student who has not signed in yet)
+function lvRow(s){const u=s.uid,lv=level(u,S.ls),rq=((S.D.lv[u]||{})[S.ls]||{}).request,w=s.away?(s.ro&&s.email?"rtlist":""):"rt";if(!w)return "";
+  const wait=s.away&&s.ro.route;
+  return `<a href="#" data-do="${w}" data-u="${esc(u)}"><i aria-hidden="true">🎯</i><span>Level: ${s.away?(wait?LV[wait.level]+" ⏳":"–"):lv?LV[lv]:"–"}<small>${rq?"asks for "+LV[rq]+" · tap to answer":s.away?"the level they get when they first sign in":"tap to change it"}</small></span></a>`}
+function chipSheet(u){const s=S.P[u];if(!s)return "";const n=shortName(s),G=gameMine(s),bar=(ic,t,p,c)=>`<div class="pbar"><span>${ic} ${t}</span><b>${p==null?"–":p+" %"}</b><i><em style="width:${p||0}%;background:${c}"></em></i></div>`;
+  const r=(a,ic,t,sub)=>`<a ${a}><i aria-hidden="true">${ic}</i><span>${t}${sub?`<small>${sub}</small>`:""}</span></a>`,nl=notesLink(s,S.ls).match(/href="([^"]*)"/);
+  return `<div class="tpsh" role="dialog" aria-label="${esc(n.mid)}"><div class="tph">${esc(n.mid)}</div><p class="tpsub">${name(s)}${level(u,S.ls)?" · "+route(level(u,S.ls)):""}</p>`
+    +(G?`<h2>Class games of this LS</h2><div class="tpl tpbars">${bar("🧩","Grammar",G.st.grammar,"var(--pg2)")}${bar("📚","Vocabulary",G.st.vocab,"var(--pv2)")}</div>`:`<p class="tpsub">No class games of this LS yet.</p>`)
+    +`<div class="tpl">${lvRow(s)}${r(`href="#" data-do="stu" data-u="${esc(u)}"`,"👤","Student details","level, work, marks, contact")}${nl?r(`href="${nl[1]}" target="_blank" rel="noopener"`,"📝","Their notes","the theory of the class games, as they see it"):""}${G?r(`href="${esc(G.href)}" target="_blank" rel="noopener"`,"🎮","Game answers","every answer in the class games"):""}</div></div>`}
 function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidden=!TPH.more;
-  document.querySelectorAll("#tptabs a").forEach(a=>{const on=TPH.more?a.dataset.tph==="more":a.dataset.here==="1";a.classList.toggle("on",on);on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
+  if(TPH.more&&TPH.chip){m.innerHTML=chipSheet(TPH.chip);return}
+  document.querySelectorAll("#tptabs a").forEach(a=>{const on=TPH.more&&!TPH.chip?a.dataset.tph==="more":a.dataset.here==="1";a.classList.toggle("on",on);on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
   const mo=document.querySelector('#tptabs [data-tph="more"]');if(mo)mo.setAttribute("aria-expanded",TPH.more?"true":"false");
   if(!TPH.more){m.innerHTML="";return}
   const r=(a,ic,t,sub)=>`<a href="#" ${a}><i aria-hidden="true">${ic}</i><span>${t}${sub?`<small>${sub}</small>`:""}</span></a>`,none=Object.values(S.P||{}).some(s=>!s.tester&&!s.group);
@@ -1696,9 +1715,11 @@ const canHw=a=>GR.some(g=>g.id===S.g)&&((window.EL_SECTIONS||{})[a.id]||[]).leng
 // 🧩 📚 class game circles next to each student (Roger, 6 Nov 2026: "I want those circles next to the students in the list"): % right in the
 // grammar and vocabulary games of this LS (gameResults of the group, read once per dashboard load: one read per game played)
 const GAMES={};
-function gameRings(s){const g=GAMES[S.g];if(!g||g.busy||!s.email)return "";const em=String(s.email).toLowerCase(),ls=S.ls||"";
+function gameMine(s){const g=GAMES[S.g];if(!g||g.busy||!s.email)return null;const em=String(s.email).toLowerCase(),ls=S.ls||"";
   const mine=g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done,title:x.title,day:x.day,lp:x.lp,ls:x.ls}:null}).filter(Boolean);
-  if(!mine.length)return "";const st=elGameStats(mine),gl=(mine.find(x=>x.ls)||{}).ls||"",click="\nClick: every answer and the notes";
+  if(!mine.length)return null;const gl=(mine.find(x=>x.ls)||{}).ls||"";
+  return {mine,st:elGameStats(mine),em,href:`lab/game/results.html?g=${encodeURIComponent(S.g)}${gl?"&ls="+encodeURIComponent(gl):""}&stu=${encodeURIComponent(em)}`}}
+function gameRings(s){const G=gameMine(s);if(!G)return "";const {mine,st,em}=G,gl=(mine.find(x=>x.ls)||{}).ls||"",click="\nClick: every answer and the notes";
   // hover a circle = the games it counts; click = Results open on this student (Roger, 7 Nov 2026: "they should see grammar games, when they go to the percentage")
   return `<a class="grings" href="lab/game/results.html?g=${encodeURIComponent(S.g)}${gl?"&ls="+encodeURIComponent(gl):""}&stu=${encodeURIComponent(em)}" target="_blank" rel="noopener" title="Class games of this LS: % right in 🧩 grammar and 📚 vocabulary (click for the answers and notes)"><span>🧩</span>${elRing(st.grammar,"",30,elGameTip(mine,"grammar")+click)}<span>📚</span>${elRing(st.vocab,"",30,elGameTip(mine,"vocab")+click)}</a>`}
 // 📝 the student's notes of the class games (Roger, 7 Nov 2026: "can I see it here too? on the students list?"): the LS page's #notes place
@@ -1744,7 +1765,7 @@ const colCell=(u,a,c,d)=>{const n=c.ks.filter(k=>d.has(k)).length;
 function progress(studs,list){
   loadGames();
   const open=a=>!S.folded.has(a.id)&&lpCols(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
-  let h1=`<tr><th class="stu"${rs}>Student${GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small>':""}</th><th${rs}>Route</th>`,h2="<tr>";
+  let h1=`<tr><th class="stu"${rs}>Student${GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small><span class="pkey" aria-hidden="true"><i class="g">🧩</i><i class="v">📚</i></span>':""}</th><th class="rtc"${rs}>Route</th>`,h2="<tr>";
   list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}${canHw(a)?` <button type="button" class="g mini lphw" data-do="lphw" data-a="${esc(a.id)}" title="Set some tabs of this learning path as homework">🏠 Homework</button>`:""}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} ${lpCols(a).some(c=>c.ks.length>1)?"points: Vocabulary counts 2, its study cards and its sentences":"steps"})`:pts(a)}</small>`;
     if(open(a)){h1+=`<th class="lp first" colspan="${lpCols(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
       h2+=lpCols(a).map((c,i)=>`<th class="ac ${i?"":"first"} ${colSkip(a,c)?"skip":""}">${colLink(a,c)}<br>${colCrit(a,c)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
@@ -1752,7 +1773,7 @@ function progress(studs,list){
   h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
   let b="";const cols=list.reduce((n,a)=>n+(open(a)?lpCols(a).length+1:1),0);
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
-    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${gameRings(s)}${notesLink(s,S.ls)}</td>`;
+    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${gameRings(s)}${notesLink(s,S.ls)}${pChip(s)}</td>`;
     if(s.away){b+=`<tr class="away">${who}${awayRt(s)}<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
     b+=`<tr>${who}${rtCell(s.uid)}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
