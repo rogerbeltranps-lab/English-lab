@@ -122,17 +122,21 @@ function body(s, line) {
     const voice = path.join(VOICE, line.id + '.mp3');
     const a = SILENT ? null : voice;
     if (a && !fs.existsSync(a)) throw new Error('missing voice ' + a + ' (use --silent for a preview)');
-    const len = a ? dur(a) : line.en.split(/\s+/).length / 2.35;
+    const words = line.en.split(/\s+/).length;
+    const raw = a ? dur(a) : words / 2.35;
+    const wpm = words / raw * 60;
+    const tempo = a && wpm > 170 ? Math.max(0.8, 160 / wpm) : 1;   // a fast take is slowed to about 160 words a minute
+    const len = raw / tempo;
     const d = +(LEAD + len + TAIL).toFixed(2);
     const seg = path.join(work, line.id + '.mp4');
     const vf = `fps=${FPS},format=yuv420p,fade=t=in:st=0:d=0.25,fade=t=out:st=${(d - 0.2).toFixed(2)}:d=0.2`;
     const audio = a
-      ? ['-i', a, '-filter_complex', `[1:a]aresample=44100,aformat=channel_layouts=stereo,adelay=${LEAD * 1000}|${LEAD * 1000},apad[a]`, '-map', '0:v', '-map', '[a]']
+      ? ['-i', a, '-filter_complex', `[1:a]aresample=44100,aformat=channel_layouts=stereo,${tempo < 1 ? 'atempo=' + tempo.toFixed(3) + ',' : ''}adelay=${LEAD * 1000}|${LEAD * 1000},apad[a]`, '-map', '0:v', '-map', '[a]']
       : ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo', '-map', '0:v', '-map', '1:a'];
     ff(['-loop', '1', '-framerate', String(FPS), '-i', png, ...audio, '-vf', vf, '-t', String(d),
       '-c:v', 'libx264', '-preset', 'medium', '-tune', 'stillimage', '-crf', '24', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', seg]);
     parts.push(seg); total += d;
-    console.log(line.id, d.toFixed(1) + 's');
+    console.log(line.id, d.toFixed(1) + 's', tempo < 1 ? 'slowed ×' + tempo.toFixed(2) : '');
   }
   await browser.close();
   const list = path.join(work, 'list.txt');
