@@ -147,10 +147,15 @@ async function pull(){
 // The page's own script read localStorage before this file knew whose it is. After a wipe (another account) or a pull that
 // changed it, reload once so the page shows this student's progress, not the old one, and never saves the old one back
 // (a Daring student saw "2 / 5" from someone else's steps, Roger 26 Oct 2026). Returns true when it reloads.
+// It is called twice on a page (in gate, then after it): once this page has started reloading, the second call must not read
+// its own el_reload as "already reloaded" and remove it, or the next load reloads again, for ever (Roger, 8 Nov 2026: a 4 ESO
+// student's tab kept reloading on LP3, whose page marks a finished step done as it opens, so every pull found it changed).
+let reloading=false;
 function reloadIfStale(){
+  if(reloading)return true;
   const again=sessionStorage.getItem("el_reload")===location.pathname;sessionStorage.removeItem("el_reload");
   if(!stale||again){stale=false;return false}   // once only, never a loop
-  sessionStorage.setItem("el_reload",location.pathname);frozen=true;location.reload();return true;
+  reloading=true;sessionStorage.setItem("el_reload",location.pathname);frozen=true;location.reload();return true;
 }
 function resultPayload(a,extra){const sc=elPoints(a),parts=typeof window.EL_RESULT_PARTS==="function"?window.EL_RESULT_PARTS():null;return Object.assign({ls:lsId,activity:a.id,score:sc,max:a.points,done:sc,updated:serverTimestamp()},parts?{parts}:{},extra||{})}
 // Nothing is sent before this page has pulled the student's progress: a save made while signing in (a slow connection) would
@@ -1133,7 +1138,7 @@ onAuthStateChanged(auth,async u=>{
   // The teacher's 🔔 in the bottom bar: open problem reports from all groups on every page (live on the dashboard, bellWatch) (shared/js/el-bell.js).
   if(stopBell&&!isTeacher(u)){stopBell();stopBell=null;bellEl=null;draw(u)}
   if(isTeacher(u)&&!bellEl)import("./el-bell.js").then(m=>{if(bellEl||!isTeacher(user))return;
-    bellEl=m.bell({dash:DASH,onDash,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
+    bellEl=m.bell({dash:DASH,onDash,me:()=>(user||{}).uid,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
   remember(u);
   userDone=true;listeners.forEach(f=>f(u));
   // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
