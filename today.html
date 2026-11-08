@@ -600,7 +600,7 @@ function phoneBanner(always){
   if(APP()||(!always&&seen))return "";
   return `<div class="phonebn"><a href="#phone"><span class="pbi" aria-hidden="true">📱</span><span><b>${t("Estudia també amb el mòbil","Study on your phone too")}</b><small>${t("Posa English Lab a la pantalla d'inici del mòbil i obre'l com una aplicació.","Put English Lab on your phone's home screen and open it like an app.")}</small></span><span class="pbg">${t("Com","How")} →</span></a>${always?"":`<button class="pbx" data-phone-x title="${t("Amaga","Hide")}" aria-label="${t("Amaga","Hide")}">✕</button>`}</div>`}
 function phoneBox(){
-  const L=lang(),im=(n,alt)=>`<img src="shared/img/phone/${n}.webp?v=2" alt="${esc(alt)}" loading="lazy">`,ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  const L=lang(),im=(n,alt)=>`<img src="shared/img/phone/${n}.webp?v=3" alt="${esc(alt)}" loading="lazy">`,ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
   const fig=(n,c)=>`<figure>${im(n,c)}<figcaption>${c}</figcaption></figure>`;
   const done=t("Fet! Toca la icona d'English Lab per estudiar.","Done! Tap the English Lab icon to study.");
   const and=`<details class="psteps" ${ios?"":"open"}><summary>🤖 Android · Chrome</summary><div class="pfig">`

@@ -32,8 +32,9 @@ for (const LANG of ['en', 'ca']) {
   await page.waitForTimeout(1500);
   await page.evaluate((lv) => { const b = document.querySelector(`button.route[data-level="${lv}"]`); if (b) b.click() }, P.level);
   await page.waitForTimeout(800);
-  // the step strip at the top of the screen, with the first step under it
-  await page.evaluate(() => { const n = document.querySelector('nav.tabs, .tabs'); if (n) scrollTo(0, n.getBoundingClientRect().top + scrollY - 12) });
+  // the step strip at the top of the screen, with the first step under it (on a phone the LP opens in focus mode, header.elplh:
+  // the page top is already the bar, the steps and the first step)
+  await page.evaluate(() => { if (document.querySelector('header.elplh')) return scrollTo(0, 0); const n = document.querySelector('nav.tabs, .tabs'); if (n) scrollTo(0, n.getBoundingClientRect().top + scrollY - 12) });
   await page.waitForTimeout(400);
   await page.screenshot({ path: path.join(OUT, `lp-${LANG}.png`) });
   console.log('shot lp', LANG);
