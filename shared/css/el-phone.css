@@ -203,15 +203,21 @@
 @media (max-width:640px){
   body.tph .wrap td.stu:has(>.pchip)>:not(.pchip){display:none}
   body.tph .wrap td.stu:has(>.pchip){vertical-align:middle}
-  body.tph .pchip{display:block;position:relative;width:100%;min-height:38px;margin:0;padding:0 8px;box-sizing:border-box;border:1px solid #c7d2fe;border-radius:999px;
+  /* the shade colours: --pg grammar, --pv vocabulary (chips and key), --pg2/--pv2 the bars in the sheet */
+  body.tph{--pg:#c4b5fd;--pv:#99f6e4;--pgk:#ede9fe;--pvk:#ccfbf1;--pg2:#8b5cf6;--pv2:#14b8a6}
+  body.tph .pchip{display:block;position:relative;width:100%;min-height:44px;margin:0;padding:13px 8px 3px;box-sizing:border-box;border:1px solid #c7d2fe;border-radius:14px;
     font:700 13px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a;text-align:center;cursor:pointer;box-shadow:none;
-    background:linear-gradient(to right,#c4b5fd 0 calc(var(--g) / 2),transparent 0) left/100% 100% no-repeat,
-      linear-gradient(to left,#99f6e4 0 calc(var(--v) / 2),transparent 0) right/100% 100% no-repeat,#fff}
+    background:linear-gradient(to right,var(--pg) 0 calc(var(--g) / 2),transparent 0) left/100% 100% no-repeat,
+      linear-gradient(to left,var(--pv) 0 calc(var(--v) / 2),transparent 0) right/100% 100% no-repeat,#fff}
+  body.tph .pchip:not(:has(.plv)){padding-top:3px}
+  /* the level, in the top right-hand corner */
+  body.tph .pchip .plv{position:absolute;top:3px;right:5px;padding:0 5px;border-radius:99px;font-size:9.5px;line-height:13px;font-weight:700;letter-spacing:.01em;box-shadow:0 0 0 1px rgba(15,23,42,.08)}
+  body.tph .pchip .pnm{display:block}
   body.tph .pchip.none{border-style:dashed;background:#fff;color:#475569}
   body.tph .pchip:active{filter:brightness(.95)}
   /* the key above the chips: 🧩 on the left half, 📚 on the right */
   body.tph .wrap th.stu .pkey{display:flex;justify-content:space-between;margin:6px 0 0;padding:2px 8px;border-radius:999px;
-    background:linear-gradient(to right,#ede9fe 50%,#ccfbf1 50%)}
+    background:linear-gradient(to right,var(--pgk) 50%,var(--pvk) 50%)}
   body.tph .wrap th.stu .pkey i{font-style:normal;font-size:13px}
   body.tph .wrap th.stu br+small.muted{display:none}
   /* the student's sheet */
