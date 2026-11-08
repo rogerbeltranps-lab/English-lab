@@ -139,7 +139,8 @@ body.tp2on{max-width:none}body.tp2on .tshell{grid-template-columns:minmax(0,1fr)
 @media(max-width:1250px){.tp2 .agw{grid-template-columns:1fr}.tp2 .agl{position:static;max-height:320px}}
 @media(max-width:760px){.tp2{grid-template-columns:1fr}}
 @media(max-width:1100px){.agw{grid-template-columns:1fr}.agl{position:static;max-height:none}}
-</style></head><body>
+</style>
+<link rel="stylesheet" href="shared/css/el-phone.css"></head><body>
 <div id="fsctl"></div>
 <div class="tshell" id="shell"><nav class="tside" id="tabs" hidden></nav><div class="tpage">
 <div class="dhead"><h1>Teacher dashboard</h1></div><p class="muted" id="msg">Sign in with your teacher account (button at the bottom right).</p><script>/* the teacher who was signed in here last (el_who, el-cloud.js) sees it is loading, not a sign-in request (Roger, 7 Nov 2026) */try{const w=JSON.parse(localStorage.getItem("el_who")||"null");if(w&&w.role==="teacher")document.getElementById("msg").textContent="⏳ Loading your dashboard…"}catch(e){}</script>
@@ -900,7 +901,51 @@ function autoTicks(){if(!S.D||!S.D.tkOk)return;const t=ELWeek.today();
   Object.entries(S.D.ls||{}).forEach(([ls,info])=>{if(/-my-real-routine$/.test(ls))return;GR.forEach(g=>{const ag=elAgendaOf(info,g.id);if(!ag)return;
     const m=((S.D.tk[g.id]=S.D.tk[g.id]||{}).ticks=S.D.tk[g.id].ticks||{});ELWeek.autoTicks(ls,ag,m,t).forEach(k=>S.autoTk.add(k))})})}
 function render(){
-  autoTicks();render0();document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0)}
+  autoTicks();render0();document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
+// ---- the dashboard on a phone (Roger, 8 Nov 2026: "la visió del mòbil necessita una gran remodelació"; mockup option A): a tab bar at the
+// bottom, Home · Groups · Corrections · Messages · More, instead of the row of menu buttons at the top; a 2A · 2B · 4A · 4B switch at the top
+// of a group's pages (the place stays: 2ESO A's Marks → 2ESO B's Marks). More opens a sheet with the rest of the menu (announcement, student
+// view, time plan of all groups, timetable, questions, materials, reference, how it works, maintenance). Everything it shows is display:none
+// on a computer (shared/css/el-phone.css, section 8): the menu, the pages and the buttons are the same ones, with their own data-do actions.
+const TPH={g:null,more:false};
+const tphIcon=p=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const TPH_I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',groups:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/>',
+  corr:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',msgs:'<path d="M4 5h16v11H9l-5 4z"/>',more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>'};
+function phoneBar(){
+  if(GR.some(g=>g.id===S.g))TPH.g=S.g;
+  if(!TPH.g){const l=GR.find(g=>g.id===LAST.g);TPH.g=(l||GR[0]).id}
+  let n=document.getElementById("tptabs");
+  if(!n){n=document.createElement("nav");n.id="tptabs";n.className="elptabs";n.setAttribute("aria-label","Dashboard menu");document.body.append(n);
+    const m=document.createElement("div");m.id="tpmore";m.hidden=true;document.body.append(m);document.body.classList.add("elptab","tph");
+    document.addEventListener("click",e=>{const b=e.target.closest("[data-tph]"),inM=e.target.closest("#tpmore");
+      if(b){e.preventDefault();const w=b.dataset.tph;
+        if(w==="more"){TPH.more=!TPH.more;tphMore();return}
+        TPH.more=false;
+        if(w==="sv"){const v=document.querySelector('#fsctl [data-do="sview"]');tphMore();if(v)v.click();return}
+        S.g="plan";S.place=w;S.year=false;render();scrollTo(0,0);return}
+      if(TPH.more&&(!inM||e.target.closest("[data-do]")||e.target===inM)){TPH.more=false;tphMore()}});
+    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&TPH.more){TPH.more=false;tphMore()}});
+  }
+  const np=S.D?S.D.pb.filter(x=>!x.fixed).length+(S.D.sg||[]).filter(x=>!x.read).length+msgNew().length:0,cn=corrN().n||0;
+  const isG=GR.some(g=>g.id===S.g),here=S.g==="plan"?(S.place==="msgs"?"msgs":"home"):isG?"groups":S.g==="corr"?"corr":"more";
+  const it=[["home","Home",'data-tph="home"'],["groups","Groups",`data-do="tab" data-g="${TPH.g}"`],["corr","Corrections",'data-do="tab" data-g="corr"',cn],["msgs","Messages",'data-tph="msgs"',np],["more","More",'data-tph="more" aria-haspopup="true"']];
+  n.innerHTML=it.map(([k,l,a,c])=>{const on=TPH.more?k==="more":k===here;return `<a href="#" ${a}${k===here?' data-here="1"':""}${on?' class="on" aria-current="page"':""}><span class="pi">${tphIcon(TPH_I[k])}</span><span class="pl">${l}</span>${c?`<b>${c>99?"99+":c}</b>`:""}</a>`}).join("");
+  // a group's pages: the switch between the four groups at the top
+  const main=document.getElementById("main");
+  if(isG&&main&&!main.querySelector(":scope>.tpseg")){const sg=document.createElement("nav");sg.className="tpseg";sg.setAttribute("aria-label","Groups");
+    sg.innerHTML=GR.map(g=>`<a href="#" data-do="tab" data-g="${g.id}"${g.id===S.g?' class="on" aria-current="page"':""}>${esc(g.name.replace(/^(\d)ESO\s*/,"$1"))}</a>`).join("");main.prepend(sg)}
+  tphMore();
+}
+function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidden=!TPH.more;
+  document.querySelectorAll("#tptabs a").forEach(a=>{const on=TPH.more?a.dataset.tph==="more":a.dataset.here==="1";a.classList.toggle("on",on);on?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
+  const mo=document.querySelector('#tptabs [data-tph="more"]');if(mo)mo.setAttribute("aria-expanded",TPH.more?"true":"false");
+  if(!TPH.more){m.innerHTML="";return}
+  const r=(a,ic,t,sub)=>`<a href="#" ${a}><i aria-hidden="true">${ic}</i><span>${t}${sub?`<small>${sub}</small>`:""}</span></a>`,none=Object.values(S.P||{}).some(s=>!s.tester&&!s.group);
+  m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
+    +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}</div>`
+    +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}</div>`
+    +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
+    +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
 // somewhere else, a message asks whether to go to the group or stay where I am"). The timetable is EL_TIMETABLE (el-plan.js), read by
 // ELWeek.classAt (from 5 minutes before the class). Opening the dashboard during a class goes straight to that group (and its current LS);

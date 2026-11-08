@@ -160,3 +160,32 @@
   body.elpinfo .topbar .session-jump{width:100%}
   body.elpinfo .topbar .session-jump select{width:100%;min-height:48px}
 }
+
+/* 8. The teacher dashboard on a phone (teacher.html phoneBar, which links this file; Roger, 8 Nov 2026, mockup option A): the tab bar of
+   section 1 (Home · Groups · Corrections · Messages · More) instead of the row of menu buttons at the top, a 2A · 2B · 4A · 4B switch on a
+   group's pages, and More as a sheet over the page with the rest of the menu. */
+.tpseg,#tpmore{display:none}
+@media (max-width:640px){
+  body.tph #tabs{display:none!important}
+  body.tph .tpseg{display:flex;gap:4px;margin:0 0 10px;padding:4px;background:#e8ecf3;border-radius:14px}
+  body.tph .tpseg a{flex:1;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#475569;font-weight:700;font-size:15px;text-decoration:none}
+  body.tph .tpseg a.on{background:#fff;color:#0f172a;box-shadow:0 1px 4px rgba(15,23,42,.12)}
+  /* Home: a group per row (two side by side squeezed the name and its badge) */
+  body.tph .tiles>a.tile.c2eso,body.tph .tiles>a.tile.c4eso{grid-column:1/-1;min-height:0;padding:14px 16px;gap:6px}
+  body.tph #tpmore:not([hidden]){display:block;position:fixed;inset:0;z-index:8990;background:rgba(15,23,42,.42)}
+  #tpmore .tpsh{position:absolute;left:0;right:0;bottom:0;max-height:84vh;overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box;background:#f5f7fb;
+    border-radius:22px 22px 0 0;padding:6px 14px calc(86px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(15,23,42,.18);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+  #tpmore .tpsh::before{content:"";display:block;width:40px;height:5px;border-radius:99px;background:#cbd5e1;margin:4px auto 6px}
+  #tpmore .tph{font-size:20px;font-weight:800;color:#0f172a;margin:2px 4px 4px}
+  #tpmore h2{margin:14px 4px 6px;font-size:12px;font-weight:800;letter-spacing:.06em;color:#586174;text-transform:uppercase}
+  #tpmore .tpl{background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden}
+  body.tph #tpmore .tpl a{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 14px;box-sizing:border-box;border-top:1px solid #eef1f5;color:#0f172a;
+    text-decoration:none;font-size:15px;font-weight:700}
+  #tpmore .tpl>a:first-child{border-top:0}
+  #tpmore .tpl i{font-style:normal;font-size:20px;width:26px;text-align:center;flex:none}
+  #tpmore .tpl span{flex:1;min-width:0}
+  #tpmore .tpl small{display:block;color:#586174;font-size:12.5px;font-weight:500;margin:1px 0 0}
+  #tpmore .tpl a::after{content:"";width:8px;height:8px;border-right:2px solid #94a3b8;border-top:2px solid #94a3b8;transform:rotate(45deg);margin-right:4px;flex:none}
+  /* the account bar (bell, Sign out) goes to the end of the page, as on the students' pages */
+  body.tph #el-cloud-bar{position:static!important;margin:16px 0 0;border-radius:14px!important;flex-wrap:wrap;justify-content:center}
+}
