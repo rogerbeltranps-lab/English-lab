@@ -111,6 +111,7 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .agday.today{border:2px solid #3157d5;box-shadow:0 4px 14px #3157d51f}.agday.done{background:#f0fdf4;border-color:#bbf7d0}.agday.late{border-color:#fdba74;background:#fffbeb}
 .agday.off{background:#f1f5f9;border-style:dashed;min-height:0;color:#94a3b8}.agday.cpt{min-height:0}
 .agover{outline:3px dashed #3157d5;outline-offset:2px;background:#eef2ff!important}
+.agday.agcopy{outline:3px dashed #16a34a;outline-offset:2px;background:#f0fdf4!important;position:relative}.agday.agcopy::after{content:"＋ Copy here";position:absolute;top:-11px;right:12px;background:#16a34a;color:#fff;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700;pointer-events:none}
 body.agdrag .agday:not(.off),body.agdrag .agl{outline:1px dashed #a5b4fc;outline-offset:1px}
 .agdh{display:flex;align-items:baseline;gap:6px}.agdh b{font-size:14px}.agdh small{color:#64748b}
 .agt{background:#3157d5;color:#fff;border-radius:999px;padding:0 8px;font-size:11px;font-weight:700}.agok{color:#15803d;font-size:12px;font-weight:700;margin-left:auto}.agwarn{color:#b45309;font-size:12px;font-weight:700;margin-left:auto}
@@ -2450,7 +2451,7 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
   const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
-    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)?"Drag it to another day, or back to the list on the left (tabs keep the learning path's order)":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
+    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)?"Drag it to another day, or back to the list on the left (tabs keep the learning path's order)":/^note:/.test(it)&&S.place==="plan2"?"Drag it up or down to change the order, to another day, or to the other group to copy it":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
       +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${esc(label)}${/#/.test(it)?agTags(it):""}`
       +(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" title="Open the unit's shadowing video">▶</a>`:"")
       +(a&&p&&!isGame(p)?(()=>{const h=hwNext(x,d,it),o=!!h||hwS.has(it);return `<button type="button" class="aghw ${o?"on":""}" data-do="aghw1" data-d="${d}" data-it="${esc(it)}" ${D} aria-pressed="${o}" title="${h?"Homework for "+esc(ELWeek.date(h[1].by))+(d>ELWeek.today()?" · planned: students see it from "+esc(ELWeek.date(d)):"")+" · click to take it off":o?"Homework · click to take this tab off it":"Make it homework for the next class"}">🏠</button>`})():"")
@@ -2550,7 +2551,7 @@ function tp2Full(on){const d=document,fe=d.fullscreenElement||d.webkitFullscreen
 function tp2Page(grp,ls,studs){const pr=tp2Pair(grp),l=EL_LS.find(y=>y.id===ls),D=S.D;
   const col=g=>{const x=planX(ls,g.id),st=studs.filter(s=>s.group===g.id&&!s.away&&!s.tester&&s.uid).sort(byName),ok=elLsForGroup(l,D.ls[ls],g.id);
     return `<section class="tp2col c${g.course}"><h2>${esc(g.name)}</h2>${!ok?`<p class="muted">This LS is not assigned to ${esc(g.name)}.</p>`:AGOK(ls)&&x.p&&x.gi>=0&&agEnsure(x)?agPage(x,st):`<p class="muted">No time plan for ${esc(g.name)} in this LS yet.</p>`}</section>`};
-  return `<div class="tp2bar"><b>📋 ${esc(pr.map(g=>g.name).join(" + "))}</b><span class="muted">${l?esc(lsLabel(l)):""} · drag inside each group; every change saves as in its own 📅 Time plan</span><span class="sp"></span>`
+  return `<div class="tp2bar"><b>📋 ${esc(pr.map(g=>g.name).join(" + "))}</b><span class="muted">${l?esc(lsLabel(l)):""} · drag inside each group; drag a note to the other group to copy it; every change saves as in its own 📅 Time plan</span><span class="sp"></span>`
     +`<button class="g" data-do="tp2fs" title="Browser full screen on or off (Esc also leaves it)">⛶ Full screen</button><button data-do="tp2x" title="Back to ${esc(grp.name)}'s Time plan">✕ Close</button></div>`
     +`<div class="tp2">${pr.map(col).join("")}</div>`}
 function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="muted">No time plan for this group in this LS yet.</p></div>`;
@@ -2571,20 +2572,35 @@ function agTick(x,d,it,v){const ag=agOf(x);if(!ag)return;const tk={[itKey(d,it)]
   if(!!tkOf(x)[x.ls+"|@"+d]!==all)tk["@"+d]=all?ELWeek.today():false;quick(api.ticks(x.gid,x.ls,tk))}
 // drag and drop (a laptop or desktop: HTML drag events)
 let AGD=null;
-document.addEventListener("dragstart",e=>{const el=e.target.closest&&e.target.closest("[data-ag]");if(!el)return;AGD=Object.assign({},el.dataset);e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain",el.dataset.ag)}catch(_){}setTimeout(()=>document.body.classList.add("agdrag"),0)});
+document.addEventListener("dragstart",e=>{const el=e.target.closest&&e.target.closest("[data-ag]");if(!el)return;AGD=Object.assign({},el.dataset);e.dataTransfer.effectAllowed=agNote(AGD)?"copyMove":"move";try{e.dataTransfer.setData("text/plain",el.dataset.ag)}catch(_){}setTimeout(()=>document.body.classList.add("agdrag"),0)});
 const agInsOff=()=>document.querySelectorAll(".agins-b,.agins-a").forEach(q=>q.classList.remove("agins-b","agins-a"));
+// Copy a note to the other group (Roger, 8 Nov 2026: "I want to be able to drag notes and when I drag them from a group to another it makes a
+// copy"): on the 📋 side-by-side board, a note on a class day (✎ Note or 🎬 Shadowing) dropped on a class day of another group is copied
+// there, where the blue line shows, with its ⏱ minutes; the original stays. Same note already on that day: nothing. One write.
+const agNote=k=>!!k&&k.ag==="it"&&!!k.from&&/^note:/.test(k.it||"");
+const agCopyTo=(k,z)=>agNote(k)&&!!z.dataset.agdrop&&!!z.dataset.gid&&z.dataset.gid!==k.gid;
+function agCopy(k,z,before){const d=z.dataset.agdrop,x=planX(z.dataset.ls,z.dataset.gid),src=agOf(planX(k.ls,k.gid))||{},m=+((src.min||{})[k.from+"|"+k.it])||0;
+  if(!x.p||x.gi<0||((agOf(x)||{days:{}}).days[d]||[]).includes(k.it))return;
+  agSave(x,g=>{const old=g.days[d]||[];if(old.includes(k.it))return false;const cur=agRuns(g,d).flatMap(r=>r.its);
+    if(before&&cur.includes(before)){const i=cur.indexOf(before);g.days[d]=[...cur.slice(0,i),k.it,...cur.slice(i),...old.filter(it=>!cur.includes(it))];g.man=Object.assign({},g.man,{[d]:1})}
+    else addIt(g,d,k.it);
+    if(m){g.min=Object.assign({},g.min,{[d+"|"+k.it]:m})}})}
 // up or down inside its own day: the item it goes before ("" = at the end), shown by a blue line
 const agSame=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&(k.ag==="it"&&!isTab(k.it)||k.ag==="day");
 const agFixed=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&k.ag==="it"&&isTab(k.it);   // a tab inside its own day: nothing to do
 function agInsAt(z,k,e){const els=[...z.querySelectorAll(k.ag==="day"?"[data-og]":"[data-oi]")];if(!els.length)return null;
   const el=els.find(q=>{const r=q.getBoundingClientRect();return e.clientY<r.top+r.height/2});agInsOff();
   if(el){el.classList.add("agins-b");return el.dataset.og||el.dataset.oi}els[els.length-1].classList.add("agins-a");return ""}
-document.addEventListener("dragend",()=>{AGD=null;document.body.classList.remove("agdrag");agInsOff();document.querySelectorAll(".agover").forEach(z=>z.classList.remove("agover"))});
-document.addEventListener("dragover",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;if(agFixed(AGD,z)){agInsOff();z.classList.remove("agover");return}e.preventDefault();e.dataTransfer.dropEffect="move";
+document.addEventListener("dragend",()=>{AGD=null;document.body.classList.remove("agdrag");agInsOff();document.querySelectorAll(".agover,.agcopy").forEach(z=>z.classList.remove("agover","agcopy"))});
+document.addEventListener("dragover",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");document.querySelectorAll(".agcopy").forEach(q=>{if(q!==z)q.classList.remove("agcopy")});
+  if(z&&agCopyTo(AGD,z)){e.preventDefault();e.dataTransfer.dropEffect="copy";document.querySelectorAll(".agover").forEach(q=>q.classList.remove("agover"));z.classList.add("agcopy");const v=agInsAt(z,AGD,e);AGD.ins=v==null?"":v;return}
+  if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;if(agFixed(AGD,z)){agInsOff();z.classList.remove("agover");return}e.preventDefault();e.dataTransfer.dropEffect="move";
   document.querySelectorAll(".agover").forEach(q=>{if(q!==z)q.classList.remove("agover")});
   if(agSame(AGD,z)){z.classList.remove("agover");const v=agInsAt(z,AGD,e);if(v!=null)AGD.ins=v;return}agInsOff();z.classList.add("agover")});
-document.addEventListener("dragleave",e=>{const z=e.target.closest&&e.target.closest("[data-agdrop]");if(z&&!z.contains(e.relatedTarget)){z.classList.remove("agover");agInsOff()}});
-document.addEventListener("drop",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");
+document.addEventListener("dragleave",e=>{const z=e.target.closest&&e.target.closest("[data-agdrop]");if(z&&!z.contains(e.relatedTarget)){z.classList.remove("agover","agcopy");agInsOff()}});
+document.addEventListener("drop",e=>{const z=AGD&&e.target.closest&&e.target.closest("[data-agdrop]");
+  if(z&&agCopyTo(AGD,z)){e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");agInsOff();z.classList.remove("agcopy");if(!S.D.tkOk)return alert("Your ticks did not load: reload the page before changing the agenda.");return agCopy(k,z,k.ins)}
+  if(!z||z.dataset.gid!==AGD.gid||z.dataset.ls!==AGD.ls)return;e.preventDefault();const k=AGD;AGD=null;document.body.classList.remove("agdrag");
   agInsOff();if(!S.D.tkOk)return alert("Your ticks did not load: reload the page before changing the agenda.");
   if(agSame(k,z)){if(k.ins!=null)agReorder(k,k.from,k.ins);return}agDrop(k,z.dataset.agdrop)});
 // Writing and speaking revisions (LS2 engine, research audit 26 Oct 2026): state.drafts[key] = the first version sent for AI feedback
