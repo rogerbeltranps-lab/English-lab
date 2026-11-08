@@ -51,15 +51,16 @@ const AUDIO_FOLDER = "1O_TFIuX433T03sMhD6tMIFx8NcO-NqlF";
 // GEMINI_KEY: a Gemini API key (aistudio.google.com > Get API key, on a project with billing: on the free tier Google may use the audio to
 // improve its products). Never in the repo. Without it the recording is saved but not transcribed.
 const GEMINI_KEY = "PASTE-THE-GEMINI-KEY-HERE";
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-flash-latest";   // Google's newest Flash (Gemini 3.8 Flash on 8 Nov 2026); 2.5 is closed to new users
 // PROBLEM_TASK_TOKEN: the API token of the scheduled task "English Lab: problem reports" (claude.ai/code/routines > that task > API trigger >
 // Generate token). Never in the repo; without it students' reports wait for the task's hourly run.
 const PROBLEM_TASK_TOKEN = "PASTE-THE-TOKEN-HERE";
 const PROBLEM_TASK_URL = "https://api.anthropic.com/v1/claude_code/routines/trig_01GrbR641ty9PsPJYeF8ifm9/fire";
 // Final product videos (Teacher Studio › 04_Students (private) › Final product videos): share it with this school account as Editor first.
 const VIDEO_FOLDER = "1BPlHZKxr7Ba2HEMSBid8StCi49-6Yg9y";
-// The model that watches final product videos: "gemini-2.5-flash" (about €0.02 a 3-minute video) or "gemini-2.5-pro" (better judge, ~€0.07).
-const FP_MODEL = "gemini-2.5-pro";   // Roger 8 Nov 2026: Pro for final product videos, Flash for speaking recordings
+// The model that watches final product videos (Roger 8 Nov 2026: Pro for videos, Flash for speaking). "gemini-pro-latest" = Google's newest Pro
+// (Gemini 3.1 Pro on 8 Nov 2026), about €0.10 a 3-minute video; "gemini-flash-latest" is about €0.03.
+const FP_MODEL = "gemini-pro-latest";
 const FIREBASE_WEB_KEY = "AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE";   // English Lab's public web key (shared/js/el-firebase.js), not a secret
 
 function doPost(e) {
@@ -405,11 +406,12 @@ function testVideosFolder() {
 // adds its cost from Google's own token count (usageMetadata) to the month's total in this script's properties; the dashboard asks for it
 // ({idToken (teacher), action: "gemini_usage"} → {ok, months: [{month, eur, calls, audio, video}]}, newest first). Paid-tier prices in US$
 // per million tokens (ai.google.dev/pricing, Nov 2026); thinking tokens are billed as output. An estimate: Google's billing page is exact.
-const PRICES = {"gemini-2.5-flash": {text: 0.30, audio: 1.00, out: 2.50}, "gemini-2.5-pro": {text: 1.25, audio: 1.25, out: 10.00}};
+const PRICES = {"gemini-flash-latest": {text: 0.50, audio: 1.00, out: 3.00}, "gemini-pro-latest": {text: 2.00, audio: 2.00, out: 12.00},
+  "gemini-2.5-flash": {text: 0.30, audio: 1.00, out: 2.50}, "gemini-2.5-pro": {text: 1.25, audio: 1.25, out: 10.00}};
 const EUR_PER_USD = 0.87;
 function addUsage(model, kind, j) {
   try {
-    const u = j.usageMetadata || {}, p = PRICES[model] || PRICES["gemini-2.5-flash"];
+    const u = j.usageMetadata || {}, p = PRICES[model] || PRICES["gemini-pro-latest"];
     const det = [].concat(u.promptTokensDetails || []), audio = det.filter(d => d.modality === "AUDIO").reduce((a, d) => a + (d.tokenCount || 0), 0);
     const input = (u.promptTokenCount || 0) - audio, out = (u.candidatesTokenCount || 0) + (u.thoughtsTokenCount || 0);
     const eur = (input * p.text + audio * p.audio + out * p.out) / 1e6 * EUR_PER_USD;
