@@ -331,7 +331,7 @@ async function gate(u){
   // Students always see their own answers (Roger, 26 Oct 2026): with saved work it opens read-only instead of the block.
   if(a&&!tester&&!elLpOpen(a,info,myGroup)&&saved){freeze();banner(ca?"Aquí pots veure les teves respostes, però ara no les pots canviar.":"Here you can see your answers, but you can't change them now.","#92400e");return}
   if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.",ca);return}
-  if(a&&!tester){const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn,elSecSoon(a,info,myGroup,dn));trimJump(a,info,myGroup)}
+  if(a&&!tester){const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn,elSecSoon(a,info,myGroup,dn),myGroup);trimJump(a,info,myGroup)}
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
   const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));
   if(cp&&saved){freeze();banner(ca?"Per continuar aquesta activitat, primer acaba el "+cp.title+". Mentrestant pots veure les teves respostes.":"To go on with this activity, first finish "+cp.title+". Meanwhile you can see your answers.","#92400e",{t:(ca?"Obre el ":"Open ")+cp.title+" →",f:()=>{location.href=new URL(cp.path,ROOT).href}});return}
@@ -431,12 +431,13 @@ function hasWork(a){return !!a&&a.keys.some(k=>{const v=localStorage.getItem(k);
 // it's class time", "a blue shadow and a legend saying to do in class"): a tab planned for a later class day is shown, not hidden, with a
 // blue shadow, a 🏫 on its tab and a note with the day; nothing in it can be answered, pressed or played (audio, video, YouTube) until then.
 // soon = {panel id: day}. It counts in the page's progress (it is not hidden), so the path never looks finished with tabs still to come.
-function lockSections(ids,ca,a,done,soon){
+function lockSections(ids,ca,a,done,soon,gid){
   if(!ids.length)return;soon=soon||{};
-  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k)),cls=ids.filter(id=>id in soon),hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
+  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k));let cls=ids.filter(id=>id in soon);const hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
   window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];if(window.elProgress)window.elProgress();   // the LS2 page's progress counts only the steps shown
   const note=ca?"Aquí pots repassar les teves respostes.":"Here you can look back at your answers.";
-  const day=d=>{try{return new Date(d+"T12:00:00").toLocaleDateString(ca?"ca-ES":"en-GB",{weekday:"short",day:"numeric",month:"short"})}catch(e){return d}};
+  const today=elAgToday(),openAt=gid?elClassOpenAt(gid,today):null,hm=ms=>{const d=new Date(ms);return d.getHours()+":"+String(d.getMinutes()).padStart(2,"0")};
+  const day=d=>d===today?(ca?"avui":"today")+(openAt?(ca?" a les ":" at ")+hm(openAt+5*60e3):""):(()=>{try{return new Date(d+"T12:00:00").toLocaleDateString(ca?"ca-ES":"en-GB",{weekday:"short",day:"numeric",month:"short"})}catch(e){return d}})();
   // a tab the teacher moved to a later day after the student had started it (Roger, 8 Nov 2026: "we froze the page until the calendar allows
   // to edit but their answers get saved"): the same, with their answers kept and shown; it opens to change them on that day
   const cnote=id=>"🏫 "+(ca?"Per fer a classe":"To do in class")+(soon[id]?" · "+day(soon[id]):"")+". "
@@ -461,12 +462,20 @@ function lockSections(ids,ca,a,done,soon){
     cls.forEach(id=>{document.querySelectorAll(`.tab[data-panel="${id}"]`).forEach(t=>{if(!t.classList.contains("el-sec-cls")){t.classList.add("el-sec-cls");t.title=cnote(id)}});
       const p=document.getElementById(id);if(!p||!p.classList.contains("panel"))return;p.classList.add("el-sec-cls");
       if(!p.querySelector(":scope>.el-sec-note")){const n=document.createElement("div");n.className="el-sec-note";n.textContent=cnote(id);p.prepend(n)}
-      p.querySelectorAll("input,textarea,select,button,audio,video,iframe,[contenteditable]").forEach(e=>{if(e.matches("audio,video")){e.pause&&e.pause();e.removeAttribute("autoplay");e.controls=false;e.tabIndex=-1;return}
-        if(e.matches("iframe")){e.tabIndex=-1;return}if(e.matches("[contenteditable]")){e.contentEditable="false";return}if(!e.disabled){e.disabled=true;e.tabIndex=-1}})});
+      p.querySelectorAll("input,textarea,select,button,audio,video,iframe,[contenteditable]").forEach(e=>{if(e.matches("audio,video")){if(!e.dataset.elcls)e.dataset.elcls=e.controls?"m1":"m0";e.pause&&e.pause();e.removeAttribute("autoplay");e.controls=false;e.tabIndex=-1;return}
+        if(e.matches("iframe")){if(!e.dataset.elcls)e.dataset.elcls="f";e.tabIndex=-1;return}if(e.matches("[contenteditable]")){e.dataset.elcls="e";e.contentEditable="false";return}if(!e.disabled){e.dataset.elcls="d";e.disabled=true;e.tabIndex=-1}})});
     ro.forEach(id=>{const p=document.getElementById(id);if(!p||!p.classList.contains("panel"))return;p.classList.add("el-sec-off");
       if(!p.querySelector(":scope>.el-sec-note")){const n=document.createElement("div");n.className="el-sec-note";n.textContent=note;p.prepend(n)}
       p.querySelectorAll("input,textarea,select,button:not([data-vs])").forEach(e=>{if(!e.disabled){e.disabled=true;e.tabIndex=-1}})})};
   apply();if(cls.length&&window.elProgress)window.elProgress();   // again, now the tabs for class are marked: never the "next" one
+  // today's tabs for class open by themselves 5 minutes before the class (elClassOpenAt), on this page too: what was frozen is given back
+  const now0=cls.filter(id=>soon[id]===today);
+  if(now0.length&&openAt&&openAt>Date.now()&&openAt-Date.now()<18*3600e3)setTimeout(()=>{cls=cls.filter(id=>!now0.includes(id));
+    now0.forEach(id=>{document.querySelectorAll(`.tab[data-panel="${id}"]`).forEach(t=>{t.classList.remove("el-sec-cls");t.removeAttribute("title")});
+      const p=document.getElementById(id);if(!p)return;p.classList.remove("el-sec-cls");const n=p.querySelector(":scope>.el-sec-note");if(n)n.remove();
+      p.querySelectorAll("[data-elcls]").forEach(e=>{const k=e.dataset.elcls;delete e.dataset.elcls;e.removeAttribute("tabindex");
+        if(k==="d")e.disabled=false;else if(k==="e")e.contentEditable="true";else if(k==="m1")e.controls=true})});
+    if(window.elProgress)window.elProgress()},openAt-Date.now());
   new MutationObserver(apply).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["disabled"]});
 }
 // The "Learning Path" menu at the top of an LS2 page lists only the paths a student can open (or did some of): never one still
@@ -797,7 +806,7 @@ function gamePush(u){
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
     if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
-    const f=first,run=()=>{goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;fsRefresh();fsCheck()};first=false;
+    const f=first,run=()=>{goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
 }
@@ -867,6 +876,8 @@ const fsCan=()=>!!(FD.fullscreenEnabled||FD.webkitFullscreenEnabled),fsIs=()=>!!
 // FSG = the full screen in force: the teacher's switch (FSL = live/{group}.fs) or the group's class by the timetable (TT = live/{group}.tt),
 // elFsEff in el-catalog.js (Roger, 6 Nov 2026: "according to the teacher's timetable students should go full screen when they have class")
 let fsWas=false,FSG=null,FSL=null,TT=null;
+// the group's timetable for "5 minutes before the class" (elClassOpenAt in el-catalog.js): kept for this page and the next ones in this browser
+function keepTT(tt){if(!tt||!tt.slots||!myGroup)return;(window.EL_LIVE_TT=window.EL_LIVE_TT||{})[myGroup]=tt;try{localStorage.setItem("el_tt_"+myGroup,JSON.stringify(tt))}catch(e){}}
 function fsRefresh(){const was=FSG&&FSG.at;FSG=myGroup?elFsEff(FSL,TT):null;if((FSG&&FSG.at)!==was)beatAt=0}
 const fsKey=()=>"el_fs_"+(FSG&&FSG.at);
 const fsSS=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}};
