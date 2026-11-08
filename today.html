@@ -86,7 +86,21 @@ ol.hgs{margin:0;padding-left:22px;font-size:16px;line-height:1.5}ol.hgs li{margi
   .hr>a.hal.games{padding:12px 14px}a.hal.games .gtop .rings{gap:6px 10px;flex-wrap:wrap;font-size:13.5px;min-width:0}a.hal.games .gtop{min-width:0}a.hal.games .gnote{flex:none}a.hal.games .gtop{gap:6px}a.hal.games .rings>span{gap:4px!important}a.hal.games .gnote{padding:4px 6px;font-size:12px}.hr .tiles a.tile{min-height:0;padding:14px 18px;gap:8px}.hr .tiles a.tile .ti{font-size:26px}}
 @media (max-width:900px){.hgrid{grid-template-columns:1fr}.cont .ct{font-size:24px}.cont .crow{flex:1 1 100%}}
 /* 📚 The current LS on the board home (Roger, 7 Nov 2026): learning paths with progress, the challenge and the LS tiles */
-.lsnow{margin-top:26px}.lsnh{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}.lsnt{min-width:0}.lsne{font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#3157d5}.lsnh h2{font-size:1.6rem;letter-spacing:-.02em;margin:.1em 0 0}.lsnh p{margin:2px 0 0;color:#64748b;font-size:15px}
+.lsnow{margin-top:26px}
+/* ⓘ About this LS banner under the LS heading (aboutHtml) */
+.fk-p{--k:#0e7490;--ks:#cffafe}
+a.lsab{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1.7fr) auto;align-items:center;gap:14px 18px;margin:0 0 16px;padding:14px 18px;border-radius:18px;border:1px solid #e2e8f0;border-left:6px solid var(--c);background:linear-gradient(100deg,var(--c-soft),#fff 70%);color:#0f172a;text-decoration:none;box-shadow:0 2px 10px #0f172a0d;transition:box-shadow .15s,transform .15s}
+a.lsab:hover{box-shadow:0 8px 22px #0f172a1f;transform:translateY(-1px)}a.lsab:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+a.lsab .abi{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:#fff;box-shadow:inset 0 0 0 2px var(--c)}
+a.lsab .abt{display:flex;flex-direction:column;gap:2px;min-width:0}a.lsab .abk{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--c-dark)}a.lsab .abt b{font-size:17px;line-height:1.25}
+a.lsab .abn{display:flex;flex-wrap:wrap;gap:2px 10px;color:#475569;font-size:13.5px}a.lsab .abn b{color:var(--c-dark);font-size:15px}
+a.lsab .abx{display:flex;flex-direction:column;gap:7px;min-width:0}a.lsab .abr{display:flex;flex-wrap:wrap;align-items:center;gap:5px}a.lsab .abr em{font-style:normal;font-size:12.5px;font-weight:700;color:#64748b;margin-right:2px}
+a.lsab .abo,a.lsab .abc{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+a.lsab .abo{background:#fff;border:1px solid #cbd5e1;color:#0f172a}a.lsab .abc{background:var(--ks);color:var(--k)}a.lsab .abo i,a.lsab .abc i{font-style:normal}
+a.lsab .abgo{background:var(--c);color:#fff;font-weight:800;font-size:14.5px;padding:10px 16px;border-radius:12px;white-space:nowrap}a.lsab:hover .abgo{background:var(--c-dark)}
+@media (max-width:1150px){a.lsab{grid-template-columns:auto minmax(0,1fr) auto}a.lsab .abx{grid-column:1/-1;grid-row:2}}
+@media (max-width:640px){a.lsab{grid-template-columns:auto minmax(0,1fr);padding:12px 14px;gap:10px 12px}a.lsab .abi{width:44px;height:44px;font-size:23px}a.lsab .abgo{grid-column:1/-1;text-align:center}a.lsab .abo,a.lsab .abc{white-space:normal}a.lsab .abr+.abr{display:none}}
+.lsnh{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}.lsnt{min-width:0}.lsne{font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#3157d5}.lsnh h2{font-size:1.6rem;letter-spacing:-.02em;margin:.1em 0 0}.lsnh p{margin:2px 0 0;color:#64748b;font-size:15px}
 a.lsopen{color:#3157d5;font-weight:800;text-decoration:none;white-space:nowrap;padding:8px 12px;border-radius:12px}a.lsopen:hover{background:#eaf0ff}
 .lsng{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}.lsnl{margin:0;border-radius:18px;padding:16px 18px}.lsnl h3{margin:0 0 10px;font-size:18px}
 ol.lsrows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}a.lsr{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid #e2e8f0;border-radius:14px;padding:9px 12px;text-decoration:none;color:#0f172a;background:#fff}a.lsr:hover{border-color:#3157d5}
@@ -429,7 +443,14 @@ function lshParse(ls,html){
     lsv:(v=>v?{src:abs(v.getAttribute("src")),poster:v.getAttribute("poster")?abs(v.getAttribute("poster")):""}:null)(e.classList.contains("vid")&&e.querySelector("video"))}));
   // 🔤 the Study place's two lists (Grammar & discourse, Vocabulary & expressions) for the board's Grammar and vocabulary place
   const study=[...doc.querySelectorAll('[data-ls-lists] .bigcard,[data-place="study"] .cols .bigcard')].map(e=>({h:tx(e.querySelector("h2")),li:[...e.querySelectorAll("li")].map(tx)})).filter(x=>x.h&&x.li.length);
-  return {lps,tiles,study,q:tx(doc.querySelector(".lshead .q")),chal:c?{k:both(c.querySelector(".k")),b:tx(c.querySelector("b")),d:tx(c.querySelector(".d")),go:both(c.querySelector(".go")),h:abs(c.getAttribute("href"))}:null,
+  // ⓘ About this LS, as a banner under the LS heading (Roger, 8 Nov 2026: "put this under the heading of the LS and make it more
+  // interesting"): the place's goals (verb icon + verb), coloured competences and how many criteria, read from <section data-place="about">
+  const ab=doc.querySelector('[data-place="about"]'),abt=doc.querySelector('.tiles a.tile[href="#about"]');
+  const about=ab?{h:abs("#about"),b:abt?both(abt.querySelector("b")):null,s:abt?both(abt.querySelector("small")):null,
+    objs:[...ab.querySelectorAll(".ab-obj .ab-oh")].map(h=>({i:tx(h.querySelector(".ab-oi")),v:tx(h.querySelector("b"))})).filter(o=>o.v),
+    comps:[...ab.querySelectorAll(".ab-comp")].map(e=>({k:([...e.classList].find(c=>/^k[0-9a-z]$/.test(c))||"").slice(1),i:tx(e.querySelector(".ab-ci")),n:tx(e.querySelector("b")).replace(/\s*\(.*\)\s*$/,"")})).filter(c=>c.n),
+    crit:ab.querySelectorAll(".ab-crit").length}:null;
+  return {lps,tiles,study,about,q:tx(doc.querySelector(".lshead .q")),chal:c?{k:both(c.querySelector(".k")),b:tx(c.querySelector("b")),d:tx(c.querySelector(".d")),go:both(c.querySelector(".go")),h:abs(c.getAttribute("href"))}:null,
     video:v?{src:abs(v.getAttribute("src")),poster:v.getAttribute("poster")?abs(v.getAttribute("poster")):""}:null};
 }
 function lshGet(ls){
@@ -468,10 +489,27 @@ function lsNowHtml(ls,info,nx){
   // card above (Roger, 7 Nov 2026: "this box should be wider and aligned with the rest")
   // no 📚 Study and 🗣 Shadowing video tiles on the board (Roger, 7 Nov 2026: "these buttons at the bottom right are no longer necessary");
   // they stay on the LS home page
-  const tiles=L.tiles.filter(x=>!x.notes&&!x.shadow&&!/#study$/.test(x.h)).map(x=>{const inner=`<span class="ti" aria-hidden="true">${esc(x.i)}</span><span><b>${tx(x.b)}</b><small>${tx(x.s)}</small></span>`;
+  // ⓘ About this LS is not a tile here any more: it is the banner under the heading (aboutHtml)
+  const tiles=L.tiles.filter(x=>!x.notes&&!x.shadow&&!/#(study|about)$/.test(x.h)).map(x=>{const inner=`<span class="ti" aria-hidden="true">${esc(x.i)}</span><span><b>${tx(x.b)}</b><small>${tx(x.s)}</small></span>`;
     if(x.lsv)return `<div class="lst wide lsvc"><div class="lsvch">${inner}</div><video controls preload="none" playsinline${x.lsv.poster?` poster="${esc(x.lsv.poster)}"`:""} src="${esc(x.lsv.src)}"></video></div>`;
     return x.shadow?(L.video?`<button type="button" class="lst" data-lsvid>${inner}</button>`:""):`<a class="lst wide" href="${esc(x.h)}">${inner}</a>`}).join("");
-  return `<section class="lsnow" id="lsNow">${head}<div class="lsng">${lps}<div class="lsnr">${chal}<div class="lstiles">${tiles}</div></div></div></section>`}
+  return `<section class="lsnow" id="lsNow">${head}${aboutHtml(L)}<div class="lsng">${lps}<div class="lsnr">${chal}<div class="lstiles">${tiles}</div></div></div></section>`}
+// ⓘ About this LS under the LS heading (Roger, 8 Nov 2026: "put this under the heading of the LS and make it more interesting"): one wide,
+// coloured card with an icon, a short teaser (how many goals, competences and criteria), the goals as verb chips and the competences in their
+// colours (as on the About place: CE1 teal · CE2 blue · CE3 orange · CE4 green · CE5 purple · CE6 amber · CD indigo · CC pink). It opens the
+// LS page's About place. An LS page without the About place details (or an old copy in this browser) shows the card without the chips.
+function aboutHtml(L){
+  const A=L.about||(()=>{const x=L.tiles.find(x=>/#about$/.test(x.h));return x?{h:x.h,b:x.b,s:x.s,objs:[],comps:[],crit:0}:null})();
+  if(!A)return "";
+  const n=(k,ca1,en1,ca,en)=>k?`<span><b>${k}</b> ${k===1?t(ca1,en1):t(ca,en)}</span>`:"";
+  const nums=n(A.objs.length,"objectiu","goal","objectius","goals")+n(A.comps.length,"competència","competence","competències","competences")+n(A.crit,"criteri d'avaluació","assessment criterion","criteris d'avaluació","assessment criteria");
+  const ob=A.objs.map(o=>`<span class="abo">${o.i?`<i aria-hidden="true">${esc(o.i)}</i>`:""}${esc(o.v)}</span>`).join("");
+  const cp=A.comps.map(c=>`<span class="abc fk-${esc(c.k||"b")}">${c.i?`<i aria-hidden="true">${esc(c.i)}</i>`:""}${esc(c.n)}</span>`).join("");
+  return `<a class="lsab" href="${esc(A.h)}"><span class="abi" aria-hidden="true">🧭</span>`
+    +`<span class="abt"><span class="abk">ⓘ ${t("Sobre aquesta LS","About this LS")}</span><b>${t("Què aprendràs i com t'avaluarem","What you will learn and how you are assessed")}</b>`
+    +(nums?`<span class="abn">${nums}</span>`:"")+`</span>`
+    +(ob||cp?`<span class="abx">${ob?`<span class="abr"><em>🎯 ${t("Objectius","Goals")}</em>${ob}</span>`:""}${cp?`<span class="abr"><em>🧩 ${t("Competències","Competences")}</em>${cp}</span>`:""}</span>`:"")
+    +`<span class="abgo">${t("Descobreix-ho","Find out")} →</span></a>`}
 // 🗣 the LS shadowing video opens here in a window, as on the LS page
 document.addEventListener("click",e=>{const b=e.target.closest("[data-lsvid]");if(!b)return;const ls=EL_LS.find(l=>l.id===S.ls),L=ls&&LSH[ls.id];if(!L||!L.video)return;
   let d=$("#lsVid");if(!d){d=document.createElement("dialog");d.id="lsVid";d.className="lsvid";document.body.appendChild(d);
