@@ -274,3 +274,7 @@ a.lsab .abo{background:#fff;border:1px solid #cbd5e1;color:var(--ink)}a.lsab .ab
 a.lsab .abgo{background:var(--c);color:#fff;font-weight:800;font-size:14.5px;padding:10px 16px;border-radius:12px;white-space:nowrap}a.lsab:hover .abgo{background:var(--c-dark)}
 @media (max-width:1150px){a.lsab{grid-template-columns:auto minmax(0,1fr) auto}a.lsab .abx{grid-column:1/-1;grid-row:2}}
 @media (max-width:640px){a.lsab{grid-template-columns:auto minmax(0,1fr);padding:12px 14px;gap:10px 12px}a.lsab .abi{width:44px;height:44px;font-size:23px}a.lsab .abgo{grid-column:1/-1;text-align:center}a.lsab .abo,a.lsab .abc{white-space:normal}a.lsab .abr+.abr{display:none}}
+/* 🎮 Class games played (teacher's view of #notes, el-notes.js teacherTable) */
+.tp{margin:0 0 16px}.tp h2{margin:0 0 6px}.tp-wrap{overflow-x:auto}.tp-t{width:100%;min-width:560px}.tp-t td,.tp-t th{white-space:nowrap}
+.tp-t td:nth-child(2){white-space:normal}.tp-yes{color:#166534;font-weight:700}.tp-no{color:#991b1b;font-weight:700;background:#fef2f2}
+.tp-play{padding:4px 10px;font-size:13px;text-decoration:none}

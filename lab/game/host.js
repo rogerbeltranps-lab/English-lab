@@ -160,8 +160,24 @@ async function award(i){
 // slide or the end. Students already read their LS's ls doc on every page (el-cloud.js lsInfo), so 📝 Your notes shows the theory of
 // every game their group played, with their own notes when they took them (el-notes.js). No extra reads.
 let playedSid=0;
+// Which groups played each game (Roger, 8 Nov 2026: "I need to know if the games-theory have been played in a class to make sure they all
+// do them"): the game list and the group buttons show ✓ + day per group, from the same ls/{id}.played. One read per LS that has games,
+// once per board load (PL = {deck: {group: ms}}); a game played here is added at once.
+let PL=null,plBusy=false;
+async function loadPlayed(){
+  if(PL||plBusy||!H.teacher)return;plBusy=true;const out={};
+  const lsIds=[...new Set((window.EL_GAMES||[]).map(d=>{const nm=String(d.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();
+    const l=(window.EL_LS||[]).find(x=>x.course===d.course&&x.title.replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm);return l?l.id:""}).filter(Boolean))];
+  await Promise.all(lsIds.map(async id=>{try{const d=await S.getDoc(S.doc(db,"ls",id)),p=(d.exists()&&d.data().played)||{};
+    for(const g in p)for(const k in p[g])(out[k]=out[k]||{})[g]=p[g][k]}catch(e){console.warn("played",e)}}));
+  PL=out;plBusy=false;draw();
+}
+const plDay=ms=>new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+const plLine=d=>{if(!PL)return "";const gs=(window.EL_GROUPS||[]).filter(g=>g.course===d.course),p=PL[d.id]||{};
+  return `<br><small class="pl">${gs.map(g=>p[g.id]?`<span class="pl-y">✓ ${esc(g.name)}</span>`:`<span class="pl-n">✗ ${esc(g.name)}</span>`).join(" ")}</small>`};
 function markPlayed(){
   const id=lsId();if(!id||!H.g||!H.sid||playedSid===H.sid||!H.deck||H.deck.notes===false)return;playedSid=H.sid;
+  if(PL&&!(PL[H.deckId]||{})[H.g])(PL[H.deckId]=PL[H.deckId]||{})[H.g]=H.sid;
   S.setDoc(S.doc(db,"ls",id),{played:{[H.g]:{[H.deckId]:H.sid}}},{merge:true}).catch(e=>{playedSid=0;console.warn("played",e)});
 }
 let savedSid=0;
@@ -270,14 +286,15 @@ function draw(){
   if(!H.deck){
     // Games by course (2 ESO, 4 ESO), then by LS, then by learning path (Roger, 30 Oct 2026: "organised by course and LS").
     const list=window.EL_GAMES||[],by=(a,k)=>[...new Set(a.map(d=>d[k]||""))].sort((x,y)=>x.localeCompare(y,"en",{numeric:true}));
-    const card=d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(elGameName(d))}${d.lp?`<br><small style="opacity:.7">${esc(d.lp)}</small>`:""}</span></button>`;
+    const card=d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(elGameName(d))}${d.lp?`<br><small style="opacity:.7">${esc(d.lp)}</small>`:""}${plLine(d)}</span></button>`;loadPlayed();
     const cols=by(list,"course").map(c=>{const g=list.filter(d=>d.course===c);
       return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${g.filter(d=>(d.ls||"")===l).sort((a,b)=>(a.lp||"").localeCompare(b.lp||"","en",{numeric:true})).map(card).join("")}</div>`).join("")}</section>`}).join("");
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game. All games are at Safe level. Each learning path has a 📚 vocabulary game and a 🧩 grammar game.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.phase==="pick"||!H.g){
+    loadPlayed();
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(gName())}</h1><p class="sub">${slides().length} slides · ${qList().length} questions. Start the game for a group: its students are taken into it.</p>
-      <div class="picks">${gs.map(g=>`<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}</button>`).join("")}</div>
+      <div class="picks">${gs.map(g=>{const w=PL&&(PL[H.deckId]||{})[g.id];return `<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}${PL?`<br><small class="pl">${w?`<span class="pl-y">✓ played ${esc(plDay(w))}</span>`:`<span class="pl-n">not played yet</span>`}</small>`:""}</button>`}).join("")}</div>
       <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
   if(H.phase==="lobby"){

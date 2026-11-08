@@ -65,10 +65,31 @@
       ${g.when?`<span class="muted nt-day">${t("Joc de classe","Class game")} · ${day(g.when)}</span>`:""}</div>${badge}</div>${study}${parts}</article>`;
   }
 
+  // 🎮 Which group played which game (Roger, 8 Nov 2026: "I need to know if the games-theory have been played in a class to make sure they
+  // all do them"): the teacher's view of this place is a table, one row per class game of this LS (index.js), one column per group of the
+  // course, ✓ + day from ls/{id}.played or "Not yet" with ▶ Play (the board on that game). Same ls doc read as the students' view.
+  let tPlayed=null;
+  function teacherTable(){
+    const ls=(window.EL_LS||[]).find(l=>l.id===LS)||{},nm=String(ls.title||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase();
+    const games=(window.EL_GAMES||[]).filter(g=>g.course===ls.course&&String(g.ls||"").replace(/^[^·]*·\s*/,"").trim().toLowerCase()===nm)
+      .sort((a,b)=>lpNum(a.lp)-lpNum(b.lp)||(a.kind==="vocab"?0:1)-(b.kind==="vocab"?0:1));
+    const groups=(window.EL_GROUPS||[]).filter(g=>g.course===ls.course);
+    if(!games.length||!groups.length)return "";
+    if(!tPlayed)return `<article class="bigcard"><h2>🎮 Class games played</h2><p class="muted">Loading…</p></article>`;
+    const back=encodeURIComponent(location.pathname);
+    const missing=groups.map(g=>({g,n:games.filter(d=>!(tPlayed[g.id]||{})[d.id]).length}));
+    const rows=games.map(d=>`<tr><td><span class="nlp">${esc(String(d.lp||"").replace(/\s*·.*/,""))}</span></td><td>${kindIcon(d.kind)} ${esc(String(d.title).replace(/^(Grammar|Vocabulary) · /,""))}</td>`
+      +groups.map(g=>{const w=(tPlayed[g.id]||{})[d.id];return w?`<td class="tp-yes">✓ ${esc(day(w))}</td>`:`<td class="tp-no">Not yet</td>`}).join("")
+      +`<td><a class="nbtn tp-play" href="../../lab/game/host.html?deck=${encodeURIComponent(d.id)}&from=${back}">▶ Play</a></td></tr>`).join("");
+    return `<article class="bigcard tp"><h2>🎮 Class games played</h2><p class="muted">Every class game of this LS and the groups that played it (the board saves it on the first 📝 notes slide or at the end). ${
+      missing.map(x=>`<b>${esc(x.g.name)}</b>: ${x.n?`${x.n} not played yet`:"all played ✓"}`).join(" · ")}</p>
+      <div class="tp-wrap"><table class="nt-t tp-t"><thead><tr><th>Path</th><th>Game</th>${groups.map(g=>`<th>${esc(g.name)}</th>`).join("")}<th></th></tr></thead><tbody>${rows}</tbody></table></div></article>`;
+  }
+
   function draw(){
     const box=$("#notesBox");if(!box)return;
     if(!who){box.innerHTML=`<p class="muted">${t("Entra per veure els teus apunts.","Sign in to see your notes.")}</p>`;return}
-    if(who.teacher){box.innerHTML=`<article class="bigcard"><p>Each student sees here every class game of this LS that their group played: a copy of the theory, their own notes below it (read only), their result and what to study. Students who missed a game get its theory without notes. You see every student's answers, marks and notes together on the <a href="../../lab/game/results.html">📊 game results</a> page (click a student), or this page as they see it with 👁 Student view.</p></article>`;return}
+    if(who.teacher){box.innerHTML=teacherTable()+`<article class="bigcard"><p>Each student sees here every class game of this LS that their group played: a copy of the theory, their own notes below it (read only), their result and what to study. Students who missed a game get its theory without notes. You see every student's answers, marks and notes together on the <a href="../../lab/game/results.html">📊 game results</a> page (click a student), or this page as they see it with 👁 Student view.</p></article>`;return}
     if(!data){box.innerHTML=`<p class="muted">${t("Carregant…","Loading…")}</p>`;return}
     const intro=`<p class="muted nintro">${t("Aquí tens cada joc de classe d'aquesta LS: la teoria, els teus apunts de <b>📝 Pren apunts</b> a sota, el teu resultat i què has d'estudiar.","Here is every class game of this LS: the theory, your notes from <b>📝 Take your notes</b> below it, your result and what to study.")}</p>`;
     if(!data.games.length){box.innerHTML=intro+`<article class="bigcard nempty"><span aria-hidden="true">📝</span><p>${t("Encara no heu fet cap joc de classe en aquesta LS.","Your class hasn't played any class game in this LS yet.")}</p></article>`;return}
@@ -83,7 +104,10 @@
     setTimeout(()=>el.classList.remove("nt-hit"),2200)});
 
   async function load(){
-    if(data||busy||!who||who.teacher)return draw();
+    if(who&&who.teacher){if(tPlayed||busy)return draw();
+      if(D){tPlayed=D.playedAll||{};return draw()}
+      busy=true;draw();try{const i=await window.ELCloud.lsInfo(LS);tPlayed=(i&&i.played)||{}}catch(e){console.warn("played",e);tPlayed={}}busy=false;return draw()}
+    if(data||busy||!who)return draw();
     if(D){data={games:build(D.played||{},(D.notes||[]).map(x=>Object.assign({parts:{}},x)),D.myGames||{})};return draw()}
     busy=true;draw();
     const C=window.ELCloud;let played={},notes=[],mine={};
@@ -123,7 +147,7 @@
   function setWho(u){
     const C=window.ELCloud,AS=C&&C.viewing;
     who=!u?null:AS?{uid:AS.uid,email:(AS.email||"").toLowerCase(),group:AS.group}:C.isTeacher(u)?{teacher:true}:{uid:u.uid,email:(u.email||"").toLowerCase(),own:true};
-    data=null;mg=null;if(here())load();else draw();loadMg();
+    data=null;mg=null;tPlayed=null;if(here())load();else draw();loadMg();
   }
   if(D){who=D.role==="teacher"?{teacher:true}:{uid:"demo",own:D.role!=="as"};mg=D.myGames||null;homeCard();if(here())load();else draw();window.addEventListener("load",()=>{if(here())load()});return}
   homeCard();
