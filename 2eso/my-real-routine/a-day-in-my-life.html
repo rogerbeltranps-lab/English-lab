@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
 <meta charset="utf-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
@@ -77,8 +77,10 @@ html,body{overflow-x:clip}
 }
 </style>
 <link rel="stylesheet" href="../../shared/css/lp-theme-2eso.css">
+<link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu and the LS2 learning path layout before the first paint (Roger, 8 Nov 2026) -->
 </head>
 <body>
+<script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws -->
 <div class="topbar"><div class="wrap toprow">
   <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html" style="color:white;text-decoration:none;font-weight:800;margin-right:8px;">← My Real Routine</a>
   <span class="brand-mark">2</span>
@@ -694,6 +696,7 @@ if(sessionAccessSelect&&sessionAccessGo){
 }
 </script>
 <script src="../../shared/js/section-next.js"></script>
+<script src="../../shared/js/ls1-lp.js"></script><!-- the LS2 learning path layout (Roger, 8 Nov 2026) -->
 <script>
 sectionNext.init({level:()=>level,panels:[
  {id:'vocabulary',done:()=>{const d=state().done;return !!(d.explore&&d.cards)},detail:ca=>{const d=state().done;return sectionNext.list(ca,[[d.explore,'prem «Ja les he explorat ✓»','press “I explored them ✓”'],[d.cards,'gira les '+cardGoal()+' targetes i marca «Ho sé» ('+gotSet.size+'/'+cardGoal()+')','flip the '+cardGoal()+' cards and choose “Got it” ('+gotSet.size+'/'+cardGoal()+')']])}},
@@ -706,6 +709,9 @@ sectionNext.undo({button:document.getElementById('finishExplore'),level:()=>leve
 sectionNext.gateExplore({button:document.getElementById('finishExplore'),container:document.getElementById('vocabGroups'),level:()=>level,isDone:()=>!!state().done.explore});
 sectionNext.final({id:'speaking',level:()=>level,done:()=>!!state().done.speaking,detail:ca=>ca?'Grava el teu àudio i atura la gravació.':'Record your audio and stop the recording.'});
 </script>
+<!-- the app menu and the learning path's left column at once, before the browser paints (as the LS2 pages) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

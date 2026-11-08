@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
   <meta charset="UTF-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
@@ -191,8 +191,10 @@ html,body{overflow-x:clip}
 }
 </style>
 <link rel="stylesheet" href="../../shared/css/lp-theme-4eso.css">
+<link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu and the LS2 learning path layout before the first paint (Roger, 8 Nov 2026) -->
 </head>
 <body>
+<script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws -->
   <div class="topbar"><div class="wrap toprow">
   <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html" style="color:inherit;text-decoration:none">← My Real Routine</a><span class="logo">3</span><span class="lp-title">Phrasal verbs in a daily routine<small>4 ESO · My Real Routine · Learning Path 3</small></span></div>
   <div class="session-jump"><label for="sessionJump">Learning Path</label><select id="sessionJump" aria-label="Go to another Learning Path session">
@@ -843,6 +845,7 @@ if(sessionAccessSelect&&sessionAccessGo){
 </script>
 <script src="../../shared/js/flashcard-set.js"></script>
 <script src="../../shared/js/section-next.js"></script>
+<script src="../../shared/js/ls1-lp.js"></script><!-- the LS2 learning path layout (Roger, 8 Nov 2026) -->
 <script>
 flashcardSet.init({level:()=>level,cards:()=>levels[level].cards,complete:()=>complete('cards'),isDone:()=>!!ls().done.cards});
 sectionNext.init({level:()=>level,panels:[
@@ -856,6 +859,9 @@ sectionNext.undo({button:document.getElementById('finishWriting'),level:()=>leve
 sectionNext.undo({button:document.getElementById('finishSpeak'),level:()=>level,isDone:()=>!!ls().done.speak,undo:()=>{delete ls().done.speak;$('#speakResult').classList.remove('show');save()}});
 sectionNext.final({id:'speak',level:()=>level,done:()=>!!ls().done.speak,detail:ca=>ca?'Escriu el pla i prem el botó per comprovar-lo.':'Write your plan and use the button to check it.'});
 </script>
+<!-- the app menu and the learning path's left column at once, before the browser paints (as the LS2 pages) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en" class="elgate"><head><meta charset="utf-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1f6b52"><title>2 ESO · Present Simple</title>
 <link rel="stylesheet" href="../../shared/css/layout.css"><link rel="stylesheet" href="../../shared/css/topbar.css"><link rel="stylesheet" href="../../shared/css/activities.css">
 <style>:root{--accent:#1f6b52;--dark:#174d3d;--soft:#e9f5ef;--soft2:#d8eee3;--cream:#fbfcf8;--ink:#20312b;--muted:#66766f;--line:#d8e6df;--shadow:0 14px 38px rgba(31,107,82,.10)}
@@ -17,7 +17,9 @@
 .object{text-decoration:underline;text-underline-offset:4px}
 @media(max-width:760px){.mini-card input,.mini-card select{min-width:0}}
 </style><link rel="stylesheet" href="../../shared/css/lp-theme-2eso.css">
-<style>.deck-link{display:inline-flex;align-items:center;gap:12px;margin:4px 0 18px;padding:12px 18px 12px 12px;border-radius:14px;background:var(--accent);color:#fff;text-decoration:none;box-shadow:var(--shadow);max-width:100%}.deck-link:hover{background:var(--dark)}.deck-link:focus-visible{outline:3px solid var(--dark);outline-offset:3px}.deck-link-icon{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.18);flex:0 0 auto;font-size:.9rem}.deck-link strong{display:block;font-weight:800}.deck-link small{display:block;opacity:.85;font-size:.85rem}</style></head><body>
+<style>.deck-link{display:inline-flex;align-items:center;gap:12px;margin:4px 0 18px;padding:12px 18px 12px 12px;border-radius:14px;background:var(--accent);color:#fff;text-decoration:none;box-shadow:var(--shadow);max-width:100%}.deck-link:hover{background:var(--dark)}.deck-link:focus-visible{outline:3px solid var(--dark);outline-offset:3px}.deck-link-icon{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.18);flex:0 0 auto;font-size:.9rem}.deck-link strong{display:block;font-weight:800}.deck-link small{display:block;opacity:.85;font-size:.85rem}</style><link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu and the LS2 learning path layout before the first paint (Roger, 8 Nov 2026) -->
+</head><body>
+<script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws -->
 <div class="topbar"><div class="wrap toprow">
   <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← My Real Routine</a><span class="brand-mark">4</span><span class="brand-title">Present Simple<small>2 ESO · My Real Routine · Learning Path 4</small></span></div>
   <div class="session-jump">
@@ -756,10 +758,14 @@ $('#productionText').oninput=()=>{routeState().production=$('#productionText').v
 $('#resetRoute').onclick=()=>{if(confirm(level==='insecure'?'Vols reiniciar només aquesta ruta de gramàtica?':'Reset only this grammar route?')){delete stored[level];render();save()}};
 $('#sessionJump').onchange=e=>{if(e.target.value)location.href=e.target.value};render();
 </script><script src="../../shared/js/section-next.js"></script>
+<script src="../../shared/js/ls1-lp.js"></script><!-- the LS2 learning path layout (Roger, 8 Nov 2026) -->
 <script>
 sectionNext.init({level:()=>level,panels:['recognise','controlled','transform','edit','produce'].map(id=>({id,done:()=>!!routeState().done[id],detail:ca=>ca?'Comprova cada resposta fins que totes siguin correctes.':'Check each answer until all are correct.'}))});
 sectionNext.undo({button:document.getElementById('checkProduction'),level:()=>level,isDone:()=>!!routeState().done.produce,undo:()=>{routeState().done.produce=false;document.getElementById('productionFeedback').textContent='';save()}});
 sectionNext.final({id:'selfcheck',level:()=>level,done:()=>!!routeState().done.selfcheck,detail:ca=>ca?'Comprova cada resposta fins que totes siguin correctes.':'Check each answer until all are correct.'});
 </script>
+<!-- the app menu and the learning path's left column at once, before the browser paints (as the LS2 pages) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body></html>
