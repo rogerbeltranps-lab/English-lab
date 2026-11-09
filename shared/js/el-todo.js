@@ -51,12 +51,12 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
   function panel(){const ex=W.exam(p,gi),n=ex?W.days(today,ex):null,td=todo(),hw=hws();
     const exam=ex&&n>=0?`<div class="ex">📝 ${t("Examen","Exam")}: ${W.date(ex,lang)}${n>1?t(` · d'aquí a ${n} dies`,` · in ${n} days`):n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
     const hwh=hw.length?`<div class="hw"><b>📝 ${t("Deures","Homework")}</b><ul>${hw.map(h=>`<li class="${h.done?"dn":""}"><span class="tt">${esc(W.taskText(h.x,lang))}</span>${h.done?`<span class="ok">✔ ${t("Fet","Done")}</span>`:h.href?`<a href="${h.href}">${t("Obre","Open")}</a>`:""}</li>${h.x.msg?`<li><details class="hwmsg"><summary>${t("Instruccions","Instructions")}</summary><div>${esc(h.x.msg).replace(/https?:\/\/[^\s<]+/g,u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`)}</div></details></li>`:""}`).join("")}</ul></div>`:"";
-    const tdh=td.length?`<ul>${td.map(x=>{const a=x.a;return `<li class="it"><span class="tt"><b>${esc(num(a)+a.title.split(/[:(]/)[0].trim())}</b>${x.late?` <span class="lt">⏰ ${t("endarrerida","late")}</span>`:hwOf(a)?` <span class="hwt">📝 ${t("deures per al","homework by")} ${W.date(hwOf(a).date,lang)}</span>`:` <span class="cls">🏫 ${t("a classe","in class")}</span>`}`
+    const tdh=td.length?`<ul>${td.map(x=>{const a=x.a;return `<li class="it"><span class="tt"><b>${esc(num(a)+a.title.split(/[:(]/)[0].trim())}</b>${x.late?` <span class="lt">⏰ ${t("endarrerida","late")}</span>`:hwOf(a)?` <span class="hwt">📝 ${t("deures per al","homework by")} ${W.date(hwOf(a).date,lang)}</span>`:` <span class="cls">🏫 ${t("de classe","from class")}</span>`}`
         +(x.cp?`<br><small>⏱ ${t(`Primer fes el ${esc(x.cp.title)}`,`First do ${esc(x.cp.title)}`)}</small>`:x.tabs.length?`<br>${x.tabs.map(([id,nm])=>`<a class="tb" href="${href(a,id)}">${esc(nm)}</a>`).join(" ")}`:"")
         +`</span>${x.cp?`<a href="${href(x.cp)}">${t("Obre","Open")}</a>`:x.tabs.length?"":`<a href="${href(a)}">${t("Obre","Open")}</a>`}</li>`}).join("")}</ul>`
-      :`<p class="cl">✓ ${t("Has acabat tot el que el professor ha obert.","You have finished everything your teacher has opened.")}</p>`;
+      :`<p class="cl">✓ ${t("Has acabat tot el que vam fer a classe.","You have finished everything we did in class.")}</p>`;
     return `<div class="hd"><b>✅ ${t("Per fer","To do")}</b><button type="button" data-x aria-label="${t("Tanca","Close")}">✕</button></div><div class="bd">${exam}${hwh}`
-      +`<div class="sub">${t("El que el professor ha obert i encara no has acabat:","What your teacher has opened and you haven't finished:")}</div>${tdh}`
+      +`<div class="sub">${t("El que vam fer a classe abans d'avui i encara no has acabat:","What we did in class before today and you haven't finished:")}</div>${tdh}`
       +opt()
       +`<a class="all" href="${new URL("today.html#todo",root).href}">${t("Al meu tauler","On my board")} →</a></div>`}
 

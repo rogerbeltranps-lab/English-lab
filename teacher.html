@@ -117,6 +117,7 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .aghw{background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:0 4px;margin:0 0 0 2px;font-size:11px;line-height:16px;cursor:pointer;filter:grayscale(1);opacity:.6}.aghw:hover,.aghw:focus{opacity:1}.aghw.on{filter:none;opacity:1;background:#cffafe;border-color:#06b6d4}
 .agiw{background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:999px;padding:0 5px;margin:0 0 0 2px;font-size:11px;line-height:16px;cursor:pointer;white-space:nowrap}.agiw:hover{border-color:#6366f1}.agiw.g{background:#fef3c7;border-color:#f59e0b;color:#92400e}.agiw.m{background:#f1f5f9}.agh .agiw{font-size:12px;padding:0 6px}.agiwk{background:#fef3c7;border:1px solid #f59e0b;border-radius:999px;padding:0 4px;font-weight:400}
 .agc.grp{background:#fffbeb;border-color:#fcd34d;color:#92400e}.agc.shd{font-style:normal;font-weight:600;background:#f5f3ff;border-color:#c4b5fd;color:#5b21b6}.agla.shd{background:#f5f3ff;border-color:#c4b5fd}.agla.shd b{color:#5b21b6}
+.agcp{background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:999px;padding:0 5px;margin:0 0 0 2px;font-size:11px;line-height:16px;cursor:pointer}.agcp:hover,.agcp:focus{border-color:#6366f1;color:#4338ca}.agday .agh .agcp{opacity:.55}.agday .agh:hover .agcp,.agday .agcp:focus{opacity:1}.agg.agsolo .agc{border-style:dashed;flex-wrap:wrap;border-radius:14px}.agsl{color:#64748b;font-weight:400;font-size:12px;margin-right:2px}.agcpl label{display:flex;gap:6px;align-items:center;margin:4px 0}
 .agx{background:none;color:#94a3b8;border:0;padding:0 2px;margin:0;font-size:12px;cursor:pointer;line-height:1}.agx:hover{color:#dc2626}
 .agwk h3{font-size:15px;margin:16px 0 6px;color:#334155}
 .agdays{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;align-items:stretch}
@@ -2532,6 +2533,7 @@ function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=s
   if(ag.min){Object.keys(ag.min).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1))||!(+ag.min[q]>0))delete ag.min[q]});if(!Object.keys(ag.min).length)delete ag.min}
   if(ag.man){Object.keys(ag.man).forEach(d=>{if(!ag.days[d])delete ag.man[d]});if(!Object.keys(ag.man).length)delete ag.man}
   if(ag.wk){Object.keys(ag.wk).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1)))delete ag.wk[q]});if(!Object.keys(ag.wk).length)delete ag.wk}
+  if(ag.solo){Object.keys(ag.solo).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1)))delete ag.solo[q]});if(!Object.keys(ag.solo).length)delete ag.solo}
   acts(x.ls).forEach(a=>{if(!ag.lab[a.id])ag.lab[a.id]=agLab(x,a)});
   const ps=[api.planEdit(x.ls,x.gid,"agenda",JSON.stringify(ag))];
   const touched=new Set([...agDays(ag),...Object.keys(tkOf(x)).filter(k=>k.startsWith(x.ls+"|@")&&!k.includes("#")).map(k=>k.slice(x.ls.length+2))]);
@@ -2569,8 +2571,8 @@ const addIt=(ag,d,it)=>{const a=ag.days[d]=ag.days[d]||[];if(a.includes(it))retu
 function agMove(x,its,from,to,done){agSave(x,(ag,tk,on)=>{let n=0;its.forEach(it=>{
   const all=Object.keys(ag.days).filter(d=>ag.days[d].includes(it)),src=from?all.filter(d=>d===from):all.filter(d=>!on(d,it));
   if(!from&&!src.length&&all.length&&(done||!to))return;
-  let v=false,gw=null,gm=null;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w&&!S.autoTk.has(x.ls+"|"+itKey(d,it))){v=w;tk[itKey(d,it)]=false}gw=gw||(ag.wk||{})[d+"|"+it]||null;gm=gm||(ag.min||{})[d+"|"+it]||null;rmIt(ag,d,it);n++});
-  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v;if(gw){ag.wk=ag.wk||{};ag.wk[to+"|"+it]=gw}if(gm){ag.min=ag.min||{};ag.min[to+"|"+it]=gm}}});
+  let v=false,gw=null,gm=null,gs=null;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w&&!S.autoTk.has(x.ls+"|"+itKey(d,it))){v=w;tk[itKey(d,it)]=false}gw=gw||(ag.wk||{})[d+"|"+it]||null;gm=gm||(ag.min||{})[d+"|"+it]||null;gs=gs||(ag.solo||{})[d+"|"+it]||null;rmIt(ag,d,it);n++});
+  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v;if(gw){ag.wk=ag.wk||{};ag.wk[to+"|"+it]=gw}if(gm){ag.min=ag.min||{};ag.min[to+"|"+it]=gm}if(gs){ag.solo=ag.solo||{};ag.solo[to+"|"+it]=gs}}});
   return n>0})}
 const agItems=a=>secOf(a).length?itemsOf(a).map(z=>a.id+"#"+z[0]):[a.id+"#"];
 const nextClassDay=(x,d)=>ELWeek.classDays(x.gid,ELWeek.add(d,1),ELWeek.add(d,70))[0]||null;
@@ -2638,13 +2640,18 @@ const minSel=(x,d,it)=>{const v=agMin(agOf(x),d,it),os=[...new Set([...MINS,...(
 // learning path's tabs in the path's own order. The tabs (SLPs) of a learning path always keep the path's order, on every day (Roger, 7 Nov 2026:
 // "SLP should always be in order, the only thing that I can move are the LP and games"): only games, notes and whole learning paths move.
 const isTab=it=>{const i=it.indexOf("#");return !/^note:/.test(it)&&i>0&&i<it.length-1&&!isGame(it.slice(i+1))};
-function agTabOrder(its){const out=its.slice(),by={};
-  out.forEach((it,i)=>{if(!isTab(it))return;const id=it.split("#")[0];(by[id]=by[id]||[]).push(i)});
+// A tab out of its learning path's box (Roger, 9 Nov 2026: "I want to be able to take a SLP out of the box, in this case the shadowing"):
+// a tab dragged up or down inside its own day leaves the box and stands on its own where the blue line shows ("LP3 · Shadowing", dashed),
+// so it can go before or after anything else of the day; ⤺ puts it back in its box. The one exception to "tabs keep the path's order".
+// Stored in the agenda as solo: {"day|item": 1}; it goes with the tab when it moves to another day. One write per change.
+const agSolo=(ag,d,it)=>!!(ag.solo||{})[d+"|"+it];
+function agTabOrder(its,solo){const out=its.slice(),by={};
+  out.forEach((it,i)=>{if(!isTab(it)||solo&&solo(it))return;const id=it.split("#")[0];(by[id]=by[id]||[]).push(i)});
   Object.entries(by).forEach(([id,pos])=>{const a=byId(id);if(!a)return;const sec=itemsOf(a).map(z=>z[0]),ord=it=>{const i=sec.indexOf(it.slice(it.indexOf("#")+1));return i<0?99:i};
     pos.map(i=>out[i]).sort((p,q)=>ord(p)-ord(q)).forEach((it,j)=>{out[pos[j]]=it})});
   return out}
-function agRuns(ag,d){const man=!!(ag.man||{})[d],gs=[];
-  agTabOrder((ag.days||{})[d]||[]).forEach(it=>{if(it==="self")return;const id=/^note:/.test(it)?"":it.split("#")[0],g=id&&(man?[gs[gs.length-1]]:gs).find(z=>z&&z.id===id);if(g)g.its.push(it);else gs.push({id,its:[it]})});
+function agRuns(ag,d){const man=!!(ag.man||{})[d],gs=[],so=it=>agSolo(ag,d,it);
+  agTabOrder((ag.days||{})[d]||[],so).forEach(it=>{if(it==="self")return;if(so(it)&&isTab(it))return gs.push({id:"",solo:it.split("#")[0],its:[it]});const id=/^note:/.test(it)?"":it.split("#")[0],g=id&&(man?[gs[gs.length-1]]:gs).find(z=>z&&z.id===id);if(g)g.its.push(it);else gs.push({id,its:[it]})});
   if(!man)gs.forEach(g=>{const a=g.id&&byId(g.id);if(!a)return;const sec=itemsOf(a).map(z=>z[0]),ord=it=>{const i=sec.indexOf(it.slice(it.indexOf("#")+1));return i<0?99:i};g.its.sort((p,q)=>ord(p)-ord(q))});
   return gs}
 // Change the order inside a day (Roger, 7 Nov 2026: "I want to be able to change the order here by dragging up or down"): a game, a note
@@ -2652,10 +2659,11 @@ function agRuns(ag,d){const man=!!(ag.man||{})[d],gs=[];
 // keeps the order from then on (ag.man[day] = 1), and the students' plan line for the day follows it. One write, ticks untouched.
 function agReorder(k,d,before){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)return;
   const cur=agRuns(ag,d).flatMap(g=>g.its);let mv=[];try{mv=k.ag==="day"?JSON.parse(k.its||"[]"):[k.it]}catch(e){}
-  mv=cur.filter(it=>mv.includes(it));if(!mv.length||before&&mv.includes(before))return;
+  mv=cur.filter(it=>mv.includes(it));const out=k.ag==="it"&&isTab(k.it)&&!agSolo(ag,d,k.it);   // a tab in its box: it leaves the box
+  if(out&&before===k.it)before=cur[cur.indexOf(k.it)+1]||"";if(!mv.length||before&&mv.includes(before))return;
   const rest=cur.filter(it=>!mv.includes(it)),i=before&&rest.includes(before)?rest.indexOf(before):rest.length,nw=[...rest.slice(0,i),...mv,...rest.slice(i)];
-  if(nw.join("\n")===cur.join("\n"))return;
-  agSave(x,g=>{const old=g.days[d]||[];g.days[d]=[...nw,...old.filter(it=>!nw.includes(it))];g.man=Object.assign({},g.man,{[d]:1})})}
+  if(!out&&nw.join("\n")===cur.join("\n"))return;
+  agSave(x,g=>{const old=g.days[d]||[];g.days[d]=[...nw,...old.filter(it=>!nw.includes(it))];g.man=Object.assign({},g.man,{[d]:1});if(out)g.solo=Object.assign({},g.solo,{[d+"|"+k.it]:1})})}
 // 🎮 Played by this group? (Roger, 8-9 Nov 2026: "i need the same information here", as on the learning path's game buttons): on a class
 // game in the Time plan, ✓ + the day the group played it on the game board, or "not played yet". From ls/{id}.played[group][deck]
 // (lab/game/host.js markPlayed), already in the LS doc the dashboard reads: no extra reads.
@@ -2665,17 +2673,20 @@ const agPl=(x,p,sh)=>{if(!isGame(p))return "";const ms=(((S.D.ls[x.ls]||{}).play
 function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.days[d]||[]),isEx=ag.exam===d,self=its.includes("self"),tkb=dayIts(ag,d);
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
-  const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
-    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)?"Drag it to another day, or back to the list on the left (tabs keep the learning path's order)":/^note:/.test(it)&&S.place==="plan2"?"Drag it up or down to change the order, to another day, or to the other group to copy it":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
-      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${esc(label)}${/#/.test(it)?agTags(it):""}${a&&p?agPl(x,p,1):""}`
+  const sis=agSis(x),cpB=(its,a)=>sis?`<button type="button" class="agcp" data-do="agcp" data-d="${d}" data-its="${esc(JSON.stringify(its))}" ${D} title="Copy ${a?"it":"this"} to ${esc(sis.name)}'s matching class">⧉</button>`:"";
+  const chip=(it,label,a,solo)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
+    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)&&solo?"Drag it up or down, to another day, or back to the list on the left · ⤺ puts it back in its learning path's box":isTab(it)?"Drag it up or down to take it out of its learning path's box, to another day, or back to the list on the left":/^note:/.test(it)&&S.place==="plan2"?"Drag it up or down to change the order, to another day, or to the other group to copy it":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
+      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${solo?`<span><span class="agsl">${esc(solo)} ·</span> ${esc(label)}</span>`:esc(label)}${/#/.test(it)?agTags(it):""}${a&&p?agPl(x,p,1):""}`
       +(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" data-elvid="1" title="Play the unit's shadowing video here (the list of who left stays on top)">▶</a>`:"")
       +(a&&p&&!isGame(p)?(()=>{const h=hwNext(x,d,it),o=!!h||hwS.has(it);return `<button type="button" class="aghw ${o?"on":""}" data-do="aghw1" data-d="${d}" data-it="${esc(it)}" ${D} aria-pressed="${o}" title="${h?"Homework for "+esc(ELWeek.date(h[1].by))+(d>ELWeek.today()?" · planned: students see it from "+esc(ELWeek.date(d)):"")+" · click to take it off":o?"Homework · click to take this tab off it":"Make it homework for the next class"}">🏠</button>`})():"")
-      +(a&&p?wkBtn(x,d,[it]):"")+(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
-  const body=agRuns(ag,d).map(g=>{if(!g.id)return `<div class="agg" data-og="${esc(g.its[0])}">${g.its.map(it=>chip(it,it.slice(5))).join("")}</div>`;const a=byId(g.id);if(!a)return "";
+      +(a&&p?wkBtn(x,d,[it]):"")+(a&&p?secSw(x,a,p):"")+(solo?`<button type="button" class="agcp" data-do="agunsolo" data-d="${d}" data-it="${esc(it)}" ${D} title="Put it back in its learning path's box">⤺</button>`:"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
+  const body=agRuns(ag,d).map(g=>{if(g.solo){const a=byId(g.solo);if(!a)return "";const it=g.its[0],lp=((ag.lab||{})[a.id]||agLab(x,a)).match(/^(LP\d+|Final product)/);
+      return `<div class="agg agsolo" data-og="${esc(it)}">${chip(it,itName(it),a,lp?lp[1]:shortTi(a))}</div>`}
+    if(!g.id)return `<div class="agg" data-og="${esc(g.its[0])}">${g.its.map(it=>chip(it,it.slice(5))).join("")}</div>`;const a=byId(g.id);if(!a)return "";
     const nos=!secOf(a).length;
     return `<div class="agg ${dr.includes(a.id)?"drp":""}" data-og="${esc(g.its[0])}"><div class="agh" draggable="true" data-ag="day" data-a="${esc(a.id)}" data-its="${esc(JSON.stringify(g.its))}" ${nos?`data-oi="${esc(a.id+"#")}"`:""} data-from="${d}" ${D} title="Drag this learning path up or down to change the order, or to another day (its tabs of the day go with it)">`
       +(nos?`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} ${tkOf(x)[x.ls+"|"+itKey(d,a.id+"#")]?"checked":""} title="Done in class">${minSel(x,d,a.id+"#")}`:"<span class=\"agdot\">⠿</span>")
-      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>${wkBtn(x,d,g.its,true)}${nos?"":(m=>m?`<small class="agtot" title="Minutes of its tabs this day">⏱ ${m} min</small>`:"")(g.its.reduce((t,it)=>t+agMin(ag,d,it),0))}`
+      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>${wkBtn(x,d,g.its,true)}${cpB(g.its,a)}${nos?"":(m=>m?`<small class="agtot" title="Minutes of its tabs this day">⏱ ${m} min</small>`:"")(g.its.reduce((t,it)=>t+agMin(ag,d,it),0))}`
       +(nos?`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} title="Take it off this day">✕</button>`:"")+`</div>`
       +(nos?"":`<div class="agcs">${g.its.map(it=>chip(it,itName(it),a)).join("")}</div>`)+`</div>`}).join("");
   const hwOk=its.some(it=>{const a=byId(it.split("#")[0]);return a&&!isCp(a)&&!a.manual});
@@ -2689,6 +2700,7 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
     +`<div class="agf">${hwOk&&l&&ri>=0?`<button type="button" class="g mini" data-do="sethw" data-i="${ri}" data-line="${esc(l[0])}" ${D} title="Students see it as homework (with a ready message)">🏠 Homework</button>`:""}`
     +(tkb.some(it=>it!=="exam"&&!tkOf(x)[x.ls+"|"+itKey(d,it)])?`<button type="button" class="g mini" data-do="agnext" data-d="${d}" ${D} title="Send what is not ticked to the next class">⏭ Next class</button>`:"")
     +`<button type="button" class="g mini" data-do="agnote" data-d="${d}" ${D} title="Add a short note to this day">✎ Note</button>`
+    +(sis&&its.some(it=>it!=="self")?`<button type="button" class="g mini" data-do="agcp" data-d="${d}" ${D} title="Copy this class to ${esc(sis.name)}'s matching class (you choose what and which day)">⧉ Copy to ${esc(sis.name)}</button>`:"")
     +(its.some(it=>/#/.test(it)&&!/^note:/.test(it))?`<button type="button" class="g mini" data-do="agprint" data-d="${d}" ${D} title="This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key">🖨 Print session</button>`:"")+`</div></div>`}
 // the class days to show, by week: [[monday, [days]]]; holidays the timetable has a class on are listed too ("no class")
 function agWeeks(x,extra){const ag=agOf(x),sp=ELWeek.span(x.p)||[ELWeek.today(),ELWeek.today()],ds=agDays(ag),first=[sp[0],ds[0]].filter(Boolean).sort()[0];
@@ -2792,6 +2804,32 @@ function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="mute
     +`</section></div>`}
 if(DEMO)window.EL_T=S;   // previews and tests look at the state
 // one tick (an item done in class) and the day's tick when all its items are done
+// ⧉ Copy to the other group of the same course (Roger, 9 Nov 2026: "have a copy button that only paste onto the other group of the same
+// level"): on a class day (⧉ Copy to 4ESO A) or a learning path's heading (⧉, only that path's tabs). A small window lists the items,
+// all ticked, and that group's class days, with its matching class chosen (the same class of the week: 2nd class ↔ 2nd class; else the next
+// one). The copies keep the order, ⏱ minutes, 👤/👥 and "out of the box"; ticks and homework stay behind; what is already on that day is
+// left alone. Like a drop, it opens those learning paths and tabs for that group. Only for the other group of the course (EL_GROUPS course).
+const agSis=x=>{const g=GR.find(z=>z.id===x.gid),o=g&&GR.find(z=>z.course===g.course&&z.id!==g.id);if(!o)return null;const y=planX(x.ls,o.id);return y.p&&y.gi>=0?o:null};
+const wkMon=d=>ELWeek.add(d,-((new Date(d+"T12:00").getDay()+6)%7));
+function agSisDay(gid,sid,d){const m=wkMon(d),e=ELWeek.add(m,6),mine=ELWeek.classDays(gid,m,e),hers=ELWeek.classDays(sid,m,e),i=mine.indexOf(d);
+  return hers.length?hers[Math.min(Math.max(i,0),hers.length-1)]:ELWeek.classDays(sid,d,ELWeek.add(d,30))[0]||null}
+function agCpDlg(x,d,only){const ag=agOf(x),sis=agSis(x);if(!ag||!sis)return;
+  const all=agRuns(ag,d).flatMap(g=>g.its),its=only&&only.length?all.filter(it=>only.includes(it)):all;if(!its.length)return;
+  const def=agSisDay(x.gid,sis.id,d),days=ELWeek.classDays(sis.id,wkMon(ELWeek.add(d,-7)),ELWeek.add(wkMon(d),34));if(def&&!days.includes(def))days.push(def);days.sort();
+  const y=planX(x.ls,sis.id),there=d2=>((agOf(y)||{days:{}}).days[d2]||[]);
+  dlg(`<h2>⧉ Copy to ${esc(sis.name)}</h2><p class="muted">From ${esc(GR.find(g=>g.id===x.gid).name)} · ${esc(ELWeek.date(d))}. Untick what you don't want.</p>`
+    +`<div class="agcpl">${its.map(it=>{const a=byId(it.split("#")[0]),L=a&&((ag.lab||{})[a.id]||agLab(x,a)),lb=/^note:/.test(it)?it.slice(5):a&&isTab(it)?L.replace(/^(LP\d+).*/,"$1")+" · "+itName(it):a?L:itName(it);
+      return `<label><input type="checkbox" name="agcpi" value="${esc(it)}" checked> ${esc(lb)}</label>`}).join("")}</div>`
+    +`<p><label>to ${esc(sis.name)}'s class on <select id="agcpd">${days.map(v=>`<option value="${v}" ${v===def?"selected":""}>${esc(ELWeek.date(v))} ${esc(slotOf(sis.id,v))}${there(v).length?" · has "+there(v).filter(i=>i!=="self").length+" item(s)":""}${v===def?" (matching class)":""}</option>`).join("")}</select></label></p>`
+    +`<div class="row"><button data-do="agcpgo" data-d="${d}" data-sid="${sis.id}" data-gid="${x.gid}" data-ls="${x.ls}">⧉ Copy</button></div>`)}
+function agCpGo(x,d,its,sid,to){const src=agOf(x);if(!src||!S.D.tkOk)return;const y=planX(x.ls,sid);if(!y.p||y.gi<0)return;
+  const cur=agRuns(src,d).flatMap(g=>g.its),list=cur.filter(it=>its.includes(it)&&it!=="exam"&&it!=="self");if(!list.length)return;
+  const add=list.filter(it=>!((agOf(y)||{days:{}}).days[to]||[]).includes(it));
+  if(!add.length)return alert("It is already on that day.");
+  agSave(y,g=>{const man=!!(src.man||{})[d];if(man){g.days[to]=agRuns(g,to).flatMap(r=>r.its).concat((g.days[to]||[]).filter(it=>it==="self"));g.man=Object.assign({},g.man,{[to]:1})}   // the order you left on your day
+    add.forEach(it=>{if(man||/^note:/.test(it))(g.days[to]=g.days[to]||[]).push(it);else addIt(g,to,it)});
+    add.forEach(it=>{const q=d+"|"+it,r=to+"|"+it;if((src.min||{})[q])g.min=Object.assign({},g.min,{[r]:src.min[q]});if((src.wk||{})[q])g.wk=Object.assign({},g.wk,{[r]:src.wk[q]});if((src.solo||{})[q])g.solo=Object.assign({},g.solo,{[r]:1})})});
+  agOpenSync(y,add.filter(it=>/#/.test(it)&&!/^note:/.test(it)),to)}
 function agTick(x,d,it,v){const ag=agOf(x);if(!ag)return;const tk={[itKey(d,it)]:v?ELWeek.today():false},on=i=>i===it?v:!!tkOf(x)[x.ls+"|"+itKey(d,i)],its=dayIts(ag,d),all=its.length>0&&its.every(on);
   if(!!tkOf(x)[x.ls+"|@"+d]!==all)tk["@"+d]=all?ELWeek.today():false;quick(api.ticks(x.gid,x.ls,tk))}
 // drag and drop (a laptop or desktop: HTML drag events)
@@ -2810,8 +2848,8 @@ function agCopy(k,z,before){const d=z.dataset.agdrop,x=planX(z.dataset.ls,z.data
     else addIt(g,d,k.it);
     if(m){g.min=Object.assign({},g.min,{[d+"|"+k.it]:m})}})}
 // up or down inside its own day: the item it goes before ("" = at the end), shown by a blue line
-const agSame=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&(k.ag==="it"&&!isTab(k.it)||k.ag==="day");
-const agFixed=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&k.ag==="it"&&isTab(k.it);   // a tab inside its own day: nothing to do
+const agSame=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&(k.ag==="it"||k.ag==="day");   // a tab too: it leaves its learning path's box (agReorder)
+const agFixed=()=>false;
 function agInsAt(z,k,e){const els=[...z.querySelectorAll(k.ag==="day"?"[data-og]":"[data-oi]")];if(!els.length)return null;
   const el=els.find(q=>{const r=q.getBoundingClientRect();return e.clientY<r.top+r.height/2});agInsOff();
   if(el){el.classList.add("agins-b");return el.dataset.og||el.dataset.oi}els[els.length-1].classList.add("agins-a");return ""}
@@ -3758,6 +3796,10 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       const its=k.a?((ag.days||{})[k.d]||[]).filter(it=>it.split("#")[0]===k.a):[k.it],allG=its.every(it=>agG(ag,k.d,it));
       agSave(x,g=>{g.wk=g.wk||{};its.forEach(it=>{const q=k.d+"|"+it;if(allG)delete g.wk[q];else g.wk[q]="g"})})},
     agrm:()=>{e.preventDefault();e.stopPropagation();agMove(planX(k.ls,k.gid),[k.it],k.d,"")},
+    agunsolo:()=>{e.preventDefault();e.stopPropagation();agSave(planX(k.ls,k.gid),g=>{if(!g.solo)return false;delete g.solo[k.d+"|"+k.it]})},
+    agcp:()=>{e.preventDefault();e.stopPropagation();let its=null;try{its=k.its?JSON.parse(k.its):null}catch(_){}agCpDlg(planX(k.ls,k.gid),k.d,its)},
+    agcpgo:()=>{e.preventDefault();const its=[...document.querySelectorAll("#dlgc [name=agcpi]:checked")].map(i=>i.value),to=($("#agcpd")||{}).value;if(!its.length||!to)return;
+      $("#dlg").close();agCpGo(planX(k.ls,k.gid),k.d,its,k.sid,to)},
     agnext:()=>{e.preventDefault();const x=planX(k.ls,k.gid),ag=agOf(x),nd=nextClassDay(x,k.d);if(!nd)return alert("No later class in the timetable.");
       agMove(x,((ag.days||{})[k.d]||[]).filter(it=>it!=="self"&&!tkOf(x)[x.ls+"|"+itKey(k.d,it)]),k.d,nd)},
     agprint:()=>{e.preventDefault();const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)return;   // 🖨 the day on paper (elPrintDay in el-catalog.js)
