@@ -3636,8 +3636,8 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
     +revisions(u,a)
     +levelRows(u,a)
     +fpgBox(u,a)
-    +(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
-    +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea>`
+    +`<div id="fpman">`+(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
+    +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea></div>`
     +(a.manual?fpStuRub(u,a):"")
     +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`,a.manual&&!!fpRub(a));
 }
@@ -3709,14 +3709,15 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
   if(d&&d.error)h+=`<p class="bad" style="color:#b91c1c">⚠️ ${esc(d.error)}</p>`;
   if(d&&d.draft&&R){const x=d.draft,rd=FPG_READ[(x.reading||{}).verdict]||FPG_READ.partly;
     h+=`<p style="margin:10px 0 4px"><b>${rd[0]} ${rd[1]}</b>${x.reading&&x.reading.note?` · ${esc(x.reading.note)}`:""}</p>`
-      +(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x)
+      +(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x,u)
       +(x.sounds&&x.sounds.length?`<p style="margin:8px 0 2px"><b>🗣️ Words said wrong</b> <small class="muted">(only for you, never shown to the student)</small> <button class="g" data-fpg="sounds" data-u="${u}" data-a="${esc(a.id)}" style="font-size:12px;padding:2px 8px">List for the whole group</button></p><p style="margin:0 0 6px"><small>${x.sounds.map(w=>`<b>${esc(w.word)}</b>${w.heard?" (said “"+esc(w.heard)+"”)":""}`).join(" · ")}</small></p>`:"")
-      +`<label>Feedback for the student (Gemini's draft: you can change it below before approving)</label><div class="fb" style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px">${esc(fpgText(R,x))}</div>`
+      +`<label>Comment for the student <small class="muted">(you can change it; the ✔ ➜ of each row above are added under it)</small></label><textarea id="fpgfb" rows="4" data-u="${u}" data-a="${esc(a.id)}">${esc(fpgTop(x))}</textarea>`
       +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
       +`<div class="row" style="justify-content:flex-start;gap:6px"><button data-fpg="ok" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✅ Approve: use it and save</button></div>`
       +`<label>Not right? Tell Gemini what to change</label><textarea id="fpgchg" rows="2" placeholder="e.g. She doesn't read, she only looks at the slides; Language should be Level 3"></textarea>`
       +`<div class="row" style="justify-content:flex-start"><button class="g" data-fpg="change" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✏️ Ask Gemini to change it</button></div>`}
-  box.innerHTML=h}
+  box.innerHTML=h;const man=$("#fpman"),gem=!!(d&&d.draft&&R);if(man)man.hidden=gem;
+  const sv=$('#dlgc button[data-do="save"]');if(sv)sv.hidden=gem}   // with a draft, ✅ Approve is the save (it still clicks this hidden button)
 // 📋 The final product rubric with a level shaded in each row (Roger, 9 Nov 2026: "here I should be able to see their rubric like they do
 // … and also when gemini gives feedback"): in the final product dialog, the student's rubric as their 📊 My marks shows it (LS1: the parts
 // of the saved feedback, "Name (30%) · 7.5/10" + ✔/➜, on EL_FP_RUBRICS, as fbRubric in today.html; LS2: your levels on the rows, with the
@@ -3734,11 +3735,13 @@ function fbParts(txt){const H=/^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ 
     if(cur)(cur.todo.length?cur.todo:cur.ok).push(t)});return parts}
 const rbIdx=m=>4-Math.max(0,Math.min(4,Math.round(m/2.5)));   // mark /10 → index in the levels (0 = top, 4 = No evidence)
 // sel[i] = {L: index in N.levels, m: mark /10 or null, ok, todo}; tag = "you" (the student's) or "Gemini"
-function rubH(N,sel,tag){const last=N.levels.length-1,gm=tag!=="you";
-  return N.rows.map((r,i)=>{const x=sel[i]||{},L=x.L==null?-1:x.L;
+function rubH(N,sel,tag,ck){const last=N.levels.length-1,gm=tag!=="you",
+    at=(i,k)=>ck?` data-fpgl="${i}:${k}" data-u="${ck.u}" data-a="${esc(ck.a)}" title="Use this level" style="cursor:pointer"`:"";
+  return N.rows.map((r,i)=>{const x=sel[i]||{},L=x.L==null?-1:x.L,tg=x.tag||tag;
     return `<div class="rbrow"><div class="rbh"><b>${esc(r.name)}</b> <small class="muted">· ${esc(r.sub)}${r.w?" · "+r.w+" %":""}</small><span class="rbm">${x.m!=null?`<b>${f1(x.m)}</b><small class="muted">/10</small> · `:""}<small class="muted">${L>=0?esc(N.levels[L]):"not marked"}</small></span></div>`
-      +`<div class="rbg">${r.d.map((d,k)=>`<div class="rbc${k===L?" on"+(gm?" gm":""):""}"><b>${esc(N.levels[k])}</b>${r.pts?` <small class="muted">${r.pts[k]} pts</small>`:""}${k===L?` <span class="rby">◀ ${esc(tag)}</span>`:""}<div>${esc(d)}</div></div>`).join("")}</div>`
-      +(L===last&&L>=r.d.length?`<div class="rbc on${gm?" gm":""}" style="margin-top:6px"><b>${esc(N.levels[last])}</b> <span class="rby">◀ ${esc(tag)}</span></div>`:"")
+      +`<div class="rbg">${r.d.map((d,k)=>`<div class="rbc${k===L?" on"+(gm?" gm":""):""}"${at(i,k)}><b>${esc(N.levels[k])}</b>${r.pts?` <small class="muted">${r.pts[k]} pts</small>`:""}${k===L?` <span class="rby">◀ ${esc(tg)}</span>`:""}<div>${esc(d)}</div></div>`).join("")}</div>`
+      +(L===last&&L>=r.d.length?`<div class="rbc on${gm?" gm":""}" style="margin-top:6px"${at(i,last)}><b>${esc(N.levels[last])}</b> <span class="rby">◀ ${esc(tg)}</span></div>`
+        :ck&&last>=r.d.length?`<div class="rbc" style="margin-top:6px;padding:2px 8px;display:inline-block"${at(i,last)}><small>${esc(N.levels[last])}</small></div>`:"")
       +((x.ok&&x.ok.length)||(x.todo&&x.todo.length)||x.why?`<div class="rbn">${x.why?`<div class="muted">👀 ${esc(x.why)} <small>(only for you)</small></div>`:""}${x.ok&&x.ok.length?`<div>✔ ${esc(x.ok.join(" "))}</div>`:""}${x.todo&&x.todo.length?`<div>➜ ${esc(x.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
 // the student's rubric, as they see it (LS1 from the saved feedback; LS2 from your levels)
 function fpStuRub(u,a){const N=fpRub(a),x=res(u,a.id);if(!N)return "";let sel,lead;
@@ -3749,16 +3752,23 @@ function fpStuRub(u,a){const N=fpRub(a),x=res(u,a.id);if(!N)return "";let sel,le
     if(!sel.some(z=>z.L>=0))return "";lead="Your level on each row of the rubric (NA · AS · AN · AE), with its indicators."}
   return `<details class="rbbox" open><summary>📋 Their rubric, as they see it</summary><p class="muted" style="margin:4px 0">${lead}</p>${rubH(N,sel,"you")}</details>`}
 // Gemini's draft on the same rubric
-function fpGemRub(a,x){const N=fpRub(a);if(!N||!x)return "";
-  const sel=N.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};if(g.level==null)return {L:-1};
-    if(N.kind==="mark"){const m=fpgRow(g);return {L:m==null?-1:rbIdx(m),m,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[],why:g.why||""}}
-    return {L:g.level===0?4:4-g.level,m:g.level?g.level*2.5:null,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[],why:g.why||""}});
+// Roger, 9 Nov 2026: "I should be able to select a square and make the changes here": a click on a level square sets that row (◀ you),
+// the mark is recalculated and ✅ Approve saves it (fpgPick)
+function fpGemRub(a,x,u){const N=fpRub(a);if(!N||!x)return "";
+  const sel=N.rows.map((r,i)=>{const g=(x.rows||[])[i]||{},nt={ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[],why:g.why||"",tag:g.byYou?"you":""};if(g.level==null)return Object.assign({L:-1},nt);
+    if(N.kind==="mark"){const m=fpgRow(g);return Object.assign({L:m==null?-1:rbIdx(m),m},nt)}
+    return Object.assign({L:g.level===0?4:4-g.level,m:g.level?g.level*2.5:null},nt)});
   // Roger, 9 Nov 2026: "I need to see the feedback like this" (the student's shaded rubric): it replaces the table, open, with the 👀 notes
-  return `<div class="rbbox"><p class="muted" style="margin:4px 0">📋 Gemini's draft on the rubric: the level it proposes in each row (blue), 👀 why (only for you), ✔ ➜ what the student will read. Nothing changes until you ✅ Approve.</p>${rubH(N,sel,"Gemini")}</div>`}
+  return `<div class="rbbox"><p class="muted" style="margin:4px 0">📋 Gemini's draft on the rubric: the level it proposes in each row (blue), 👀 why (only for you), ✔ ➜ what the student will read. Click a square to change a level. Nothing is saved for the student until you ✅ Approve.</p>${rubH(N,sel,"Gemini",u?{u,a:a.id}:null)}</div>`}
+const FPG_MID=[0,2.5,5,7.5,9.5];   // a level picked by hand: the middle of its band (FP_BAND in the school script)
+function fpgPick(u,a,i,k){const d=(FPG.d[a.id]||{})[u];if(!d||!d.draft)return;const N=fpRub(a),rows=d.draft.rows=d.draft.rows||[],g=rows[i]=rows[i]||{};
+  const lv=Math.max(0,Math.min(4,4-k));if(g.level===lv&&g.byYou)return;g.level=lv;g.mark=N&&N.kind==="mark"?FPG_MID[lv]:null;g.byYou=true;
+  d.approved=null;fpgFill(u,a);Promise.resolve().then(()=>fpgSave(a,u,d)).catch(e=>console.warn("fp pick",e))}
 // LS1: mark /10 = levels × 2.5 weighted by the rows (rows Gemini could not judge are left out)
 function fpgMark(R,x){let s=0,w=0;R.rows.forEach((r,i)=>{const m=fpgRow((x.rows||[])[i]||{});if(m!=null){s+=m*r.w;w+=r.w}});return w?Math.round(s/w*10)/10:null}
 // the feedback text the student gets: LS1 in the "Name (30%) · 7.5/10" + ✔/➜ lines the student board shades on the rubric (fbBox in today.html)
-function fpgText(R,x){const top=[x.feedback,x.well_done&&"Well done: "+x.well_done,x.next_time&&"Next time: "+x.next_time].filter(Boolean).join("\n");
+const fpgTop=x=>x.top!=null?x.top:[x.feedback,x.well_done&&"Well done: "+x.well_done,x.next_time&&"Next time: "+x.next_time].filter(Boolean).join("\n");
+function fpgText(R,x){const top=fpgTop(x);
   if(R.kind!=="mark")return top;
   return top+"\n\n"+R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};if(g.level==null)return "";return `${r.name} (${r.w}%) · ${fpgRow(g)}/10`+(g.good?"\n✔ "+g.good:"")+(g.improve?"\n➜ "+g.improve:"")}).filter(Boolean).join("\n")}
 async function fpgWatch(u,a,change,src){const R=fpgRubric(a),k=u+"|"+a.id;if(!R||FPG.busy[k])return false;
@@ -3873,9 +3883,11 @@ function fpgApprove(u,a){const R=fpgRubric(a),d=((FPG.d[a.id]||{})[u]||{}),x=d.d
       if(r.step==="group")ms.forEach(m=>ps.push(patch(m.uid,a.id,{levels:{group:{[r.c]:deg}}})));else ps.push(patch(u,a.id,{levels:{[r.step]:{[r.c]:deg}}}))});
     Promise.all(ps).catch(e=>alert("Could not save the levels: "+e.message))}
   else{const m=fpgMark(R,x);if(m!=null&&$("#fsc")){$("#fsc").value=m;$("#fmx").value=10}}
-  const fb=$("#ffb");if(fb&&!fb.value.trim())fb.value=fpgText(R,x);else if(fb&&fb.value.trim()!==fpgText(R,x).trim()&&confirm("Replace what is in the feedback box with Gemini's feedback?"))fb.value=fpgText(R,x);
+  const t=$("#fpgfb");if(t)x.top=t.value.trim();const fb=$("#ffb");if(fb)fb.value=fpgText(R,x);
   d.approved=new Date().toISOString();fpgSave(a,u,d).catch(()=>{});
   const sv=$('#dlgc button[data-do="save"]');if(sv)sv.click()}
+document.addEventListener("click",e=>{const c=e.target.closest("[data-fpgl]");if(!c)return;const [i,k]=c.dataset.fpgl.split(":").map(Number);fpgPick(c.dataset.u,cat.find(x=>x.id===c.dataset.a),i,k)});
+document.addEventListener("change",e=>{const t=e.target;if(t.id!=="fpgfb")return;const a=cat.find(x=>x.id===t.dataset.a),d=a&&(FPG.d[a.id]||{})[t.dataset.u];if(!d||!d.draft)return;d.draft.top=t.value.trim();Promise.resolve().then(()=>fpgSave(a,t.dataset.u,d)).catch(()=>{})});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-fpg]");if(!b)return;const k=b.dataset,a=cat.find(x=>x.id===k.a);
   if(k.fpg==="watch")fpgWatch(k.u,a,"");
   else if(k.fpg==="bulk")fpgBulk(k.u,a);
