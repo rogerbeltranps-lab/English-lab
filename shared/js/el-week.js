@@ -11,7 +11,10 @@
   const span=p=>{const fs=((p&&p.rows)||[]).map(r=>r.from).filter(Boolean).sort();return fs.length?[fs[0],add(fs[fs.length-1],6)]:null};
   // column of a group (EL_GROUPS id or name) in a plan; -1 if the plan is not for that group
   const col=(p,gid)=>{const g=(window.EL_GROUPS||[]).find(x=>x.id===gid||x.name===gid);return g&&p&&p.groups?p.groups.findIndex(x=>key(x)===key(g.name)):-1};
-  const due=(p,id,gi)=>p&&p.due&&p.due[id]&&p.due[id][gi]||null;
+  // an optional activity (EL_CATALOG optional: the sample exam) has no due day for students or the bonus: never late, never missing, never
+  // "to do by" (Roger, 9 Nov 2026: "I don't want [it] to appear as homework … not counting it as homework, to do in class, not done")
+  const opt=id=>(window.EL_CATALOG||[]).some(a=>a.id===id&&a.optional);
+  const due=(p,id,gi)=>p&&p.due&&p.due[id]&&p.due[id][gi]&&!opt(id)?p.due[id][gi]:null;
   const DAYS={en:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],ca:["dg.","dl.","dt.","dc.","dj.","dv.","ds."]};
   const MON={en:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],ca:["gen.","febr.","març","abr.","maig","juny","jul.","ag.","set.","oct.","nov.","des."]};
   const L=lang=>lang==="ca"?"ca":"en";
@@ -68,10 +71,10 @@
     // that subscribes a Google Calendar to it once, so every later homework appears by itself
     calendar(gid,root){const ics=new URL("calendar/"+String(gid).toLowerCase()+".ics",root||location.href).href;
       return {ics,google:"https://calendar.google.com/calendar/r?cid="+encodeURIComponent(ics.replace(/^https?:/,"webcal:"))}},
-    // a Google Calendar link that adds one homework (for the ones the teacher set from the dashboard)
-    gcalLink(x,lang){const ca=L(lang)==="ca",d=s=>s.replace(/-/g,""),start=x.set&&x.set<x.date?x.set:add(x.date,-1);
-      return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent((ca?"🏠 Deures d'anglès: ":"🏠 English homework: ")+x.text)
-        +"&dates="+d(start)+"/"+d(x.date)+"&details="+encodeURIComponent((ca?"Per a la classe del ":"For the class on ")+this.date(x.date,lang))},
+    // "📅 Add to my calendar" (Roger, 9 Nov 2026: only on the homework, the exam and a final product deadline, from the students' Class agenda):
+    // a Google Calendar link that adds one all-day event on day `date` (YYYY-MM-DD) with that title; Google asks the student to save it
+    gcalDay(title,date,details){const d=s=>s.replace(/-/g,"");
+      return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(title)+"&dates="+d(date)+"/"+d(add(date,1))+(details?"&details="+encodeURIComponent(details):"")},
     // one homework or self-study item as text for students ("by Tue 10 Nov · …", Catalan for Starter and Base)
     taskText(x,lang){const ca=L(lang)==="ca";
       return x.kind==="self"?(ca?"Classe pel teu compte":"Class on your own")+" ("+this.date(x.date,lang)+") · "+x.text+" · "+(ca?"treballa amb auriculars i acaba-ho a casa":"work with headphones and finish it at home")
@@ -116,7 +119,7 @@
         if(ag&&ag.days){p._ag[gi]=ag;p.rows.forEach(r=>set(r,gi,[]));const lb=ag.lab||{},last={};
           const ds=Object.keys(ag.days).filter(ok);if(ok(ag.exam)&&!ds.includes(ag.exam))ds.push(ag.exam);ds.sort();
           ds.forEach(d=>{const its=(ag.days[d]||[]).filter(Boolean),segs=[],seen=new Set(),tabs=[];
-            its.forEach(it=>{if(it==="self")return;if(/^note:/.test(it)){segs.push(it.slice(5));return}const id=it.split("#")[0];last[id]=d;
+            its.forEach(it=>{if(it==="self")return;if(/^note:/.test(it)){segs.push(it.slice(5));return}const id=it.split("#")[0];if(!/#game:/.test(it))last[id]=d;   // a class game of a path played later is not that path's day (Roger, 9 Nov 2026: Biel's LP1 and LP2 were not late)
               if(/#./.test(it))tabs.push(it);if(!seen.has(id)){seen.add(id);segs.push(lb[id]||id)}});
             if(ag.exam===d)segs.push("EXAM");if(!segs.length)return;
             const nl=lab(d)+" · "+segs.join(" · ")+(its.includes("self")?" · self-study":"");place(gi,d,nl);ad[nl]={key:"@"+d,from:null};tb["@"+d]=tabs});

@@ -240,11 +240,33 @@ footer.lsf{color:var(--muted);font-size:13px;padding:24px 0 0}
 .nt-t td{padding:4px 8px;border:1px solid #e6dcff;vertical-align:top}
 .nt-w{background:#fff4d6;border-left:4px solid #f5b400;border-radius:8px;padding:4px 10px}.nt-ca{background:#eef6ff;border-radius:8px;padding:4px 10px;color:#1e3a8a}
 .nt-my{margin-top:8px}.nt-lab{display:block;font-size:13px;font-weight:800;color:var(--c-dark);margin-bottom:4px}.nt-none{margin:0}
+/* 🎯 What's in the exam (el-exam.js + el-notes.js; Roger, 9 Nov 2026): one card per learning path done, folds for key terms, grammar and games */
+.ex-top .ex-date{font-size:18px;margin:0 0 6px}.ex-top p{margin:6px 0}
+.ex-drop{background:#f8fafc;border:1px dashed var(--line);border-radius:12px;padding:8px 12px;color:var(--muted)}
+.ex-btns{display:flex;flex-wrap:wrap;gap:8px}.ex-btns a.nbtn{text-decoration:none;color:var(--c-dark)}
+.nbtn.on{background:var(--c-dark);border-color:var(--c-dark);color:#fff}
+.ex-lp .nt-head a.nbtn{text-decoration:none;color:var(--c-dark);flex:0 0 auto}
+.ex-tabs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 6px}.ex-tabs .nt-lab{width:100%;margin:0}
+.ex-tab{display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700}.ex-tab small{font-weight:600;opacity:.8}
+.ex-sec,.ngame{border:1px solid var(--line);border-radius:14px;margin:10px 0 0;background:#fff}
+.ex-sec>summary,.ngame>summary{cursor:pointer;padding:11px 14px;font-weight:800;font-size:16px;list-style-position:inside}
+.ngame>summary{display:flex;justify-content:space-between;align-items:center;gap:10px;list-style:none}.ngame>summary::before{content:"▸";color:var(--c-dark);margin-right:2px}.ngame[open]>summary::before{content:"▾"}
+.ngame>summary .ng-t{flex:1 1 auto;min-width:0}.ngame>summary .nt-day{font-weight:600;display:block}
+.ex-sec[open],.ngame[open]{padding:0 14px 12px}.ex-sec[open]>summary,.ngame[open]>summary{margin:0 -14px;border-bottom:1px solid var(--line)}
+.ex-sec h4{margin:12px 0 6px;color:var(--c-dark);font-size:15px}
+.ex-terms{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.ex-terms li{border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:#fbfcff;line-height:1.3}
+.ex-terms .ex-ca{color:#1e3a8a}.ex-terms .ex-ca::before{content:"· ";color:var(--muted)}
+.ex-terms small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.ex-rule{background:#faf8ff;border:1px solid #e9e3fb;border-radius:12px;padding:8px 12px;margin:6px 0}
+.ex-games{margin-top:12px}.ex-games .nt-lab{margin:0}
+.ex-pick h2{margin-bottom:4px}
 @media print{
   .side,.mtabs,.bnav,.crumb,.nprint,.nintro{display:none!important}
   body.lsh{background:#fff}.app{display:block}.page{padding:0}
   .nread{border:0;padding:0;background:none}
   .ncard{break-inside:auto;border:0;padding:0}.npart{break-inside:avoid}
+  .ex-btns,.ex-lp .nt-head a.nbtn,.ex-pick{display:none!important}.ex-terms li{break-inside:avoid}
 }
 /* a tile on its own row (LS2 About this LS, after Vocabulary games left the LS home: Roger, 7 Nov 2026) */
 .tile.wd{grid-column:1/-1;flex-direction:row;align-items:center;min-height:0;padding:14px 18px}

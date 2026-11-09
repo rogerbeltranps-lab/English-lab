@@ -133,7 +133,8 @@ async function go(x,b){const a=x.a,p=x.p||"",info=x.ls.info,g=C.g,ref=C.doc(C.db
   const u=new URL(a.path,C.root);
   if(u.pathname===location.pathname){const t=p&&[...document.querySelectorAll(".tab[data-panel]")].find(z=>z.dataset.panel===p);if(t)t.click();else if(!p)window.scrollTo(0,0);return}
   location.href=u.href+(p?"#"+encodeURIComponent(p):"")}
-function play(src){if(vid)vid.remove();vid=document.createElement("div");vid.id="el-cmvid";
+// the video plays over the page with ⛶ Full screen that keeps the list of who left on top (elPlayVideo in el-catalog.js; Roger, 9 Nov 2026)
+function play(src){if(window.elPlayVideo){vid=window.elPlayVideo(src);return}if(vid)vid.remove();vid=document.createElement("div");vid.id="el-cmvid";
   vid.innerHTML='<video controls autoplay playsinline></video><button type="button">✕ Close the video</button>';vid.querySelector("video").src=src;
   vid.querySelector("button").onclick=()=>{vid.remove();vid=null};document.body.append(vid)}
 // the "now" mark follows the class tab (a tab clicked on the page)

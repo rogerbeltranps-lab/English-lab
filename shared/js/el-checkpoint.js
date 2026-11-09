@@ -201,8 +201,33 @@ window.ELCheckpoint = (function () {
       box().innerHTML = '<h3>' + fb.score + ' / ' + fb.max + t(' correctes', ' correct') + '</h3><p class="instruction">' + t('Llegeix la correcció i repassa el que has fallat.', 'Read the corrections and review what you missed.') + '</p>' +
         d.ids.map((id, i) => { const it = byId(id) || {}, ok = fb.ok[i], w = (fb.why || [])[i] || {}, why = ca() ? (w.ca || w.en || '') : (w.en || w.ca || '');
           return '<div class="cp-fb"><p class="q-title">' + (i + 1) + '. ' + (it.q || '') + '</p><p>' + t('La teva resposta: ', 'Your answer: ') + '<strong>' + esc(d.answers[i] || '–') + '</strong> <span class="' + (ok ? 'ok">✓' : 'no">✗') + '</span></p>' +
-            (ok ? '' : '<p>' + t('Resposta: ', 'Answer: ') + '<strong>' + esc((fb.right || [])[i] || '') + '</strong>' + (why ? ' · ' + esc(why) : '') + '</p>') + '</div>'; }).join('') + testerBtn();
+            (ok ? '' : '<p>' + t('Resposta: ', 'Answer: ') + '<strong>' + esc((fb.right || [])[i] || '') + '</strong>' + (why ? ' · ' + esc(why) : '') + '</p>') + '</div>'; }).join('') +
+        '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Prac">🔁 ' + t('Torna a practicar', 'Practise again') + '</button></div>' + testerBtn();
+      document.getElementById(p.id + 'Prac').onclick = () => practise(d);
       bindTester();
+    }
+    // practice after the released feedback (Roger, 9 Nov 2026: "can they do the checkpoint again without it counting?"): the student's own
+    // questions in a new order, checked on the page against the answers the feedback already showed; nothing is saved or sent, the first try stays
+    const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[“”"]/g, '').replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+    function practise(d) {
+      stop(); const fb = d.fb, right = {}; d.ids.forEach((id, i) => { right[id] = (fb.right || [])[i] || ''; });
+      const ids = shuffle(d.ids.filter(id => right[id] && byId(id)));
+      box().innerHTML = '<h3>🔁 ' + t('Practica', 'Practice') + '</h3><p class="instruction">' + t('Les mateixes preguntes en un altre ordre. Escriu i prem Comprova.', 'The same questions in a new order. Type your answers and press Check.') + '</p>' +
+        ids.map((id, i) => { const it = byId(id), picks = d.level === 'beginners' && Array.isArray(it.o) && it.o.length > 1 ? it.o : null;
+          return '<div class="cp-fb" data-pid="' + esc(id) + '"><p class="q-title">' + (i + 1) + '. ' + it.q + '</p>' +
+            (picks ? '<div class="actions pick-row" style="justify-content:flex-start">' + picks.map(o => '<button class="btn secondary" type="button" data-pp="' + esc(o) + '">' + esc(o) + '</button>').join('') + '</div>' : '') +
+            '<input type="text" class="typed" autocomplete="off" autocapitalize="off" spellcheck="false"' + (picks ? ' readonly placeholder="' + t('Tria una opció', 'Choose an option') + '"' : '') + ' aria-label="' + t('La teva resposta', 'Your answer') + '"> <span class="pr"></span><p class="pa" hidden></p></div>'; }).join('') +
+        '<div class="actions"><button class="btn" type="button" id="' + p.id + 'PCheck">' + t('Comprova', 'Check') + '</button> <button class="btn secondary" type="button" id="' + p.id + 'PBack">← ' + t('Torna a la correcció', 'Back to my corrections') + '</button></div><p class="instruction" id="' + p.id + 'PScore"></p>';
+      const b = box();
+      b.querySelectorAll('[data-pp]').forEach(x => x.onclick = () => { const row = x.closest('[data-pid]'); row.querySelector('input').value = x.dataset.pp;
+        row.querySelectorAll('[data-pp]').forEach(y => { const on2 = y === x; y.style.setProperty('background', on2 ? 'var(--accent)' : '', on2 ? 'important' : ''); y.style.setProperty('color', on2 ? '#fff' : '', on2 ? 'important' : ''); }); });
+      document.getElementById(p.id + 'PCheck').onclick = () => { let n = 0;
+        b.querySelectorAll('[data-pid]').forEach(row => { const id = row.dataset.pid, v = row.querySelector('input').value, ok = !!norm(v) && norm(v) === norm(right[id]); if (ok) n++;
+          const r = row.querySelector('.pr'), a = row.querySelector('.pa'); r.className = 'pr ' + (ok ? 'ok' : 'no'); r.textContent = ok ? '✓' : '✗';
+          a.hidden = ok; a.innerHTML = ok ? '' : t('Resposta: ', 'Answer: ') + '<strong>' + esc(right[id]) + '</strong>'; });
+        document.getElementById(p.id + 'PScore').textContent = n + ' / ' + ids.length + t(' correctes', ' correct'); };
+      document.getElementById(p.id + 'PBack').onclick = () => sent(d);
+      setTimeout(() => { const f = b.querySelector('input:not([readonly])'); if (f) f.focus(); }, 50);
     }
     // done the old way (before 31 Oct 2026, answers checked on the page): that try stays, nothing to do again
     function legacy() {
