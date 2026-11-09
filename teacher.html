@@ -568,15 +568,19 @@ function cpGap(u,a,d,K){if(!d||d.redo||!K)return null;const m=cpMark(d,K);if(!m.
   const v=m.score/m.max*100,g=v-us.v;if(Math.abs(g)<CP_GAP)return null;const r=x=>Math.round(x)+" %";
   return {up:g>0,t:`${g>0?"Much higher":"Much lower"} than usual: this checkpoint ${r(v)} · ${us.exam!=null?"exam marks "+r(us.exam):"no exam mark yet"} · ${us.warm!=null?"recall warm-ups "+r(us.warm):"no warm-ups yet"}`}}
 function cpBox(ls,grp,studs){
-  const cps=acts(ls).filter(a=>a.checkpoint);if(!cps.length)return "";const D=S.D;
+  const cps=acts(ls).filter(a=>a.checkpoint);if(!cps.length)return "";const D=S.D;cpSync(ls,grp,studs);
   const head=cps.map(a=>{const K=D.ck[a.keys[0]],docs=studs.map(s=>cpDoc(s.uid,a)).filter(d=>d&&!d.redo),n=docs.filter(d=>cpStale(d,K)).length;
-    return `<th>${esc(a.title.replace(/^Recall checkpoint/,"C"))}<br>${!K?'<small style="color:#dc2626">⚠ no answer key</small>':!docs.length?'<small class="muted">nothing sent</small>':n?`<button data-do="cprel" data-a="${a.id}" title="Students in ${grp.name} who sent it see their mark and corrections">📣 Release feedback (${n})</button>`:'<small class="muted">✓ all released</small>'}</th>`}).join("");
+    const shown=elCpShown(a,D.ls[ls],grp.id),kids=studs.filter(s=>!s.tester&&!s.away).length,sent=docs.filter(d=>!studs.find(s=>s.tester&&cpDoc(s.uid,a)===d)).length;
+    return `<th>${esc(a.title.replace(/^Recall checkpoint/,"C"))}<br>${!K?'<small style="color:#dc2626">⚠ no answer key</small>'
+      :shown?(n?`<button data-do="cprel" data-a="${a.id}" title="Send the corrections again (after accepting an answer)">📣 Update answers (${n})</button><br>`:"")+'<small class="muted">✓ answers shown · closed</small>'
+      :!docs.length?'<small class="muted">nothing sent</small>'
+      :`<button data-do="cprel" data-a="${a.id}" data-n="${kids-sent}" title="Students in ${grp.name} see their questions, answers and corrections, and nobody in the group can do it any more">📣 Show answers · close it</button><br><small class="muted">${sent}/${kids} sent · they see only their score</small>`}</th>`}).join("");
   const rows=studs.filter(s=>!s.tester||cps.some(a=>cpDoc(s.uid,a))).map(s=>`<tr><td style="text-align:left">${name(s)}</td>${cps.map(a=>{const d=cpDoc(s.uid,a),K=D.ck[a.keys[0]];
       if(!d)return '<td class="muted">–</td>';if(d.redo)return `<td data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="You let them do it again">↺ again</td>`;
       const m=cpMark(d,K),glances=(d.leaves||[]).length,secs=(d.times||[]).reduce((x,y)=>x+(+y||0),0);
       const gp=cpGap(s.uid,a,d,K);
       return `<td class="sc" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="${gp?esc(gp.t)+" · ":""}Click for the answers"${gp&&gp.up?' style="background:#fff4e5"':""}>${gp?(gp.up?"⚠️ ":"↓ "):""}${K?m.score+"/"+m.max:"?"}${d.auto==="left"?' <span title="Sent automatically: left the page">⚡</span>':""}${glances?` <span title="Left the page ${glances} time(s) for less than 2 s">👀${glances}</span>`:""}<br><small class="muted">${Math.round(secs/60*10)/10} min${d.fb&&!cpStale(d,K)?" · ✓ released":""}</small></td>`}).join("")}</tr>`).join("");
-  const body=`<p class="muted">Each student does each checkpoint once: one question at a time, ${45} s each, no going back, nothing to copy or paste. If they leave the page (another tab, window or app) for more than 2 seconds it is sent at once (⚡). 👀 = left for less than 2 s. Students see their mark and corrections only after you press <b>📣 Release feedback</b>; press it again after accepting an answer. Click a cell for the answers, to accept an answer or to let a student do it again.</p>`
+  const body=`<p class="muted">Each student does each checkpoint once: one question at a time, ${45} s each, no going back, nothing to copy or paste. If they leave the page (another tab, window or app) for more than 2 seconds it is sent at once (⚡). 👀 = left for less than 2 s. Students first see only their score. Their questions, answers and corrections appear when every student in the group has sent it, or when you press <b>📣 Show answers</b>; from then on nobody in the group can do it. Press <b>📣 Update answers</b> after accepting an answer. Click a cell for the answers, to accept an answer or to let a student do it again.</p>`
     +`<div class="wrap"><table class="acts"><tr><th>Student</th>${head}</tr>${rows}</table></div>`;
   const warn=studs.flatMap(s=>cps.map(a=>{const d=cpDoc(s.uid,a),g=cpGap(s.uid,a,d,D.ck[a.keys[0]]);return g&&g.up?`<li><b>${name(s)}</b> · ${esc(a.title)}: ${esc(g.t)} <button class="g" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}">See the answers</button></li>`:""})).filter(Boolean);
   const gapNote=`<p class="muted">⚠️ = ${CP_GAP} points or more above the student's usual marks (the average of their exam marks so far and their recall warm-ups in this LS); ↓ = that much below. Worth a look, not proof.</p>`;
@@ -593,10 +597,29 @@ function cpDlg(u,a){
     +`<table><tr><th>#</th><th>Question</th><th>Answer</th><th></th><th>Time</th><th></th></tr>${rows}</table>`
     +(d.redo?"":`<div class="row"><button data-do="cpredo" data-u="${u}" data-a="${a.id}" title="Their answers are discarded and they do it again (new questions, new order)">↺ Let them do it again</button></div>`),true);
 }
-api.cpRelease=(a,studs)=>{const K=S.D.ck[a.keys[0]],ops=[];
-  studs.forEach(s=>{const d=cpDoc(s.uid,a);if(!cpStale(d,K))return;const m=cpMark(d,K);
-    const fb={score:m.score,max:m.max,ok:m.ok,right:d.ids.map(id=>(cpAccepted(K,id)||[""])[0]),why:d.ids.map(id=>{const k=K.items[id]||{};return {ca:k.ca||"",en:k.en||""}}),at:new Date().toISOString()};
-    d.fb=fb;if(!DEMO)ops.push(put(["students",s.uid,"checkpoints",a.keys[0]],{fb}))});return Promise.all(ops)};
+// 📣 Show answers (Roger, 9 Nov 2026: "We first only show score and when all students or I say show (but then nobody can do the checkpoint)"):
+// each student who sent it gets fb (mark, corrections and now the questions too, for ✅ My checkpoints on the board), and the checkpoint
+// is closed for the group: ls/{id}.cpShown[group][activity] (elCpShown in el-catalog.js; firestore.rules refuse a new try).
+const cpFb=(d,K)=>{const m=cpMark(d,K);return {score:m.score,max:m.max,ok:m.ok,right:d.ids.map(id=>(cpAccepted(K,id)||[""])[0]),why:d.ids.map(id=>{const k=K.items[id]||{};return {ca:k.ca||"",en:k.en||""}}),q:d.ids.map(id=>String((K.items[id]||{}).q||"")),at:new Date().toISOString()}};
+api.cpRelease=(a,studs,gid)=>{const K=S.D.ck[a.keys[0]],ops=[];
+  studs.forEach(s=>{const d=cpDoc(s.uid,a);if(!cpStale(d,K))return;const fb=cpFb(d,K);
+    d.fb=fb;if(!DEMO)ops.push(put(["students",s.uid,"checkpoints",a.keys[0]],{fb}))});
+  if(gid&&!elCpShown(a,S.D.ls[a.ls],gid)){const i=S.D.ls[a.ls]=S.D.ls[a.ls]||{},at=new Date().toISOString();i.cpShown=i.cpShown||{};(i.cpShown[gid]=i.cpShown[gid]||{})[a.id]=at;
+    if(!DEMO)ops.push(put(["ls",a.ls],{cpShown:{[gid]:{[a.id]:at}}}))}
+  return Promise.all(ops)};
+// The score first (same message): when the dashboard shows a group's checkpoints, each try not shown yet gets its mark, sc = {score,max}
+// (students only see "7 / 8 correct"; the key stays teacher-only), and a try shown before the questions were saved with it gets them.
+// When every student of the group has sent it, the answers are shown at once (as 📣 Show answers). Only what changed is written.
+const CPSYNC=new Set();
+function cpSync(ls,grp,studs){if(DEMO||!window.ELCloud||!ELCloud.isTeacher(ELCloud.user))return;const key0=ls+"|"+grp.id;if(CPSYNC.has(key0))return;CPSYNC.add(key0);
+  const ops=[],info=S.D.ls[ls]||{},kids=studs.filter(s=>!s.tester&&!s.away&&s.group===grp.id);
+  acts(ls).filter(a=>a.checkpoint).forEach(a=>{const K=S.D.ck[a.keys[0]];if(!K)return;
+    const docs=kids.map(s=>[s,cpDoc(s.uid,a)]).filter(([,d])=>d&&!d.redo);
+    docs.forEach(([s,d])=>{const m=cpMark(d,K),ref=["students",s.uid,"checkpoints",a.keys[0]];
+      if(!d.sc||d.sc.score!==m.score||d.sc.max!==m.max){d.sc={score:m.score,max:m.max};ops.push(put(ref,{sc:d.sc}))}
+      if(d.fb&&!d.fb.q){d.fb.q=d.ids.map(id=>String((K.items[id]||{}).q||""));ops.push(put(ref,{fb:{q:d.fb.q}}))}});
+    if(kids.length&&docs.length===kids.length&&!elCpShown(a,info,grp.id)&&elLpOpen(a,info,grp.id,true))ops.push(api.cpRelease(a,studs,grp.id))});
+  if(ops.length)Promise.all(ops).then(()=>render(),e=>console.warn("checkpoint scores",e))}
 api.cpAccept=(a,id,v)=>{const key=a.keys[0],K=S.D.ck[key],k=K.items[id];k.extra=[...new Set((k.extra||[]).concat(v))];if(DEMO)return;
   return F.setDoc(F.doc(db(),"cpKeys",key),{items:{[id]:{extra:k.extra}}},{merge:true})};
 api.cpRedo=(u,a)=>{const d=cpDoc(u,a);d.redo=true;return DEMO?null:F.setDoc(F.doc(db(),"students",u,"checkpoints",a.keys[0]),{redo:true},{merge:true})};
@@ -4217,12 +4240,13 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       act(api.secLock(S.ls,S.g,a.id,(EL_SECTIONS[a.id]||[]).map(x=>x[0]).filter(id=>off.has(id))))},
     secset:()=>act(api.secLock(S.ls,S.g,k.a,k.v==="1"?[]:(EL_SECTIONS[k.a]||[]).map(x=>x[0]))),
     cpdlg:()=>cpDlg(u,a),
-    cprel:()=>act(api.cpRelease(a,Object.values(S.P).filter(s=>s.group===S.g||s.tester))),
+    cprel:()=>{const n=+k.n||0;if(k.n!=null&&!confirm(`Show ${a.title} answers to ${(EL_GROUPS.find(g=>g.id===S.g)||{}).name||S.g}?\n\nEach student sees their questions, answers and corrections, and nobody in the group can do it any more`+(n?` (${n} student${n>1?"s have":" has"} not done it yet).`:".")))return;
+      act(api.cpRelease(a,Object.values(S.P).filter(s=>s.group===S.g||s.tester),S.g))},
     cpacc:()=>{Promise.resolve(api.cpAccept(a,k.i,k.v)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});cpInject(S.D);render();cpDlg(u,a)},
     acclink:()=>{const sel=$("#lnk-"+CSS.escape(k.u)),rid=sel&&sel.value;if(!rid)return alert("First choose who it is.");const ro=S.D.ro[rid];
       if(!confirm(`Link this account and its work to ${[ro.first,ro.surname1].join(" ")} (${ro.group})?`))return;act(api.accLink(k.u,rid))},
     acchide:()=>quick(api.accHide(k.u,true)),accshow:()=>quick(api.accHide(k.u,false)),
-    cpredo:()=>{if(!confirm("Let this student do the checkpoint again? Their answers are discarded."))return;$("#dlg").close();act(api.cpRedo(u,a))}
+    cpredo:()=>{if(!confirm("Let this student do the checkpoint again? Their answers are discarded."+(elCpShown(a,S.D.ls[a.ls],S.g)?"\n\nThe answers are already shown to this group, so it stays closed for them.":"")))return;$("#dlg").close();act(api.cpRedo(u,a))}
   })[k.do]?.()});
 $("#dlg").addEventListener("close",()=>redraw=null);
 document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);

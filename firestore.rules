@@ -16,6 +16,7 @@ service cloud.firestore {
     function lsOpen(ls) { return exists(/databases/$(database)/documents/ls/$(ls)) && get(/databases/$(database)/documents/ls/$(ls)).data.status in ['open', 'public']; }   // 'public' was removed from the dashboard (26 Oct 2026); a stored one counts as open
     // learning paths the teacher has locked for the student's group (dashboard; elLpLocks in shared/js/el-catalog.js): ls/{id}.locked[group] = activity ids,
     // ls/{id}.lockedKeys[group] = the progress keys they save. A group without the lists has nothing locked here.
+    // ls/{id}.cpShown[group] = {activity id: when}: checkpoints whose answers the group has seen; `in` on that map checks its keys.
     function lockedFor(ls, field) { return get(/databases/$(database)/documents/ls/$(ls)).data.get(field, {}).get(rosterGroup(), []); }
     function progressChanged() { return request.resource.data.get('data', {}).diff(resource == null ? {} : resource.data.get('data', {})).affectedKeys(); }
 
@@ -255,7 +256,8 @@ service cloud.firestore {
             && request.resource.data.ids is list && request.resource.data.ids.size() <= 40
             && request.resource.data.answers is list && request.resource.data.answers.size() <= 40
             && ((lsOpen(request.resource.data.ls) && lsForMe(request.resource.data.ls, uid)
-                  && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'locked'))) || isTester());
+                  && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'locked'))
+                  && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'cpShown'))) || isTester());
         }
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow create: if signedIn() && request.auth.uid == uid && cpOk();
