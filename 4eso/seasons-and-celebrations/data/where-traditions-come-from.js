@@ -50,15 +50,7 @@ window.LP = {
         { r: 'safe', q: 'At Christmas the ___ streets are full of people.', a: ['crowded'] },
         { r: 'daring', q: 'Halloween ___ back to an old Celtic festival.', a: ['dates'] },
         { r: 'daring', q: 'Some people think Christmas is too ___: it’s all about buying things.', a: ['commercialised', 'commercialized'] },
-        { r: 'safe', q: 'Spain is known ___ its summer festivals.', a: ['for'] },
-        { q: 'The children can’t sleep: they are very ___ about the party.', a: ['excited'], d: ['exciting', 'bored'] },
-        { q: 'The speech was very long and ___.', a: ['boring'], d: ['bored', 'exciting'] },
-        { q: 'After dancing all night, we were very ___.', a: ['tired'], d: ['tiring', 'boring'] },
-        { r: 'insecure', q: 'The story behind Halloween is really ___.', a: ['interesting'], d: ['interested', 'tired'] },
-        { r: 'insecure', q: 'We were ___ by the Diwali lights: we had never seen anything like them.', a: ['amazed'], d: ['amazing', 'bored'] },
-        { r: 'insecure', q: 'It rained all day, so the parade was ___.', a: ['disappointing'], d: ['disappointed', 'exciting'] },
-        { r: 'safe', q: 'Many people are ___ to learn that the first jack-o’-lanterns were turnips.', a: ['surprised'], d: ['surprising', 'interesting'] },
-        { r: 'safe', q: 'I’m not very ___ in costumes, but I love the food.', a: ['interested'], d: ['interesting', 'excited'] }
+        { r: 'safe', q: 'Spain is known ___ its summer festivals.', a: ['for'] }
       ] },
     { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: The story behind two autumn celebrations', pill: { ca: 'Pòdcast', en: 'Podcast' },
       intro: { ca: 'Escolta el pòdcast una vegada per saber de quines dues festes parla. Després llegeix les preguntes i torna’l a escoltar.', en: 'Listen once to find the two celebrations. Then read the questions and listen again.' },
@@ -124,7 +116,8 @@ window.LP = {
         { r: 'safe', en: '<strong>Past Simple</strong> for one finished event (<em>It started in 1621. Lincoln made it official in 1863.</em>) · <strong>used to</strong> for past habits that are not true now (<em>People used to carve turnips.</em>). Negative: <em>didn’t use to</em>. Question: <em>Did… use to…?</em>' },
         { r: 'safe', en: '<strong>Defining relatives:</strong> a festival <em>which / that</em>…, people <em>who</em>…, a place <em>where</em>…, the day <em>when</em>… · <strong>Comparing:</strong> both… and, whereas, while, similar to, different from, unlike.' },
         { r: 'daring', en: '<strong>Non-defining relatives</strong> add extra information between commas, with <em>which / who</em> (never <em>that</em>): <em>Diwali, which is celebrated in autumn, is known as the festival of lights.</em> · <strong>Concession:</strong> although, even though, on the other hand.' },
-        { r: 'insecure', only: ['insecure'], ca: '<strong>Costums (repàs de la ruta Base):</strong> It takes place in November. · It is held on 31 October. · En negatiu: We don’t work on 25 December. My cousins don’t celebrate Halloween.', en: '<strong>Customs (Base review):</strong> It takes place in November. · It is held on 31 October. · Negative: We don’t work on 25 December.' }
+        { r: 'insecure', only: ['insecure'], ca: '<strong>Costums (repàs de la ruta Base):</strong> It takes place in November. · It is held on 31 October. · En negatiu: We don’t work on 25 December. My cousins don’t celebrate Halloween.', en: '<strong>Customs (Base review):</strong> It takes place in November. · It is held on 31 October. · Negative: We don’t work on 25 December.' },
+        { ca: '<strong>Sentiments: -ed o -ing?</strong> <em>-ed</em> = com et sents tu (<em>I’m bored.</em>) · <em>-ing</em> = com és la cosa (<em>The speech is boring.</em>)', en: '<strong>Feelings: -ed or -ing?</strong> <em>-ed</em> = how you feel (<em>I’m bored.</em>) · <em>-ing</em> = what the thing is like (<em>The speech is boring.</em>)' }
       ],
       items: [
         { q: 'I love Halloween ___ I can dress up.', a: ['because'], ca: 'Dona una raó.', en: 'It gives a reason.' },
@@ -151,7 +144,16 @@ window.LP = {
         { r: 'daring', q: 'Join: Abraham Lincoln made it official. He was president in 1863. → Abraham Lincoln, ___ ___ ___ ___ ___, made it official.', a: ['who was president in 1863'], en: 'Non-defining relative with who.' },
         { r: 'daring', q: '___ Halloween started in Europe, it is now very popular in the USA.', a: ['although', 'even though'], en: 'Concession.' },
         { r: 'daring', q: 'Many families love the feast. ___, some Native Americans see it as a day of mourning. (3 words)', a: ['on the other hand'], en: 'Contrast between two sentences.' },
-        { r: 'daring', q: 'Correct the word: “Diwali, that is celebrated in autumn, is known as the festival of lights.” → ___', a: ['which'], en: 'Non-defining relatives never use that.' }
+        { r: 'daring', q: 'Correct the word: “Diwali, that is celebrated in autumn, is known as the festival of lights.” → ___', a: ['which'], en: 'Non-defining relatives never use that.' },
+        /* feelings -ed / -ing (Roger, 9 Nov 2026: in Grammar, not in Vocabulary, because many students had already done the vocabulary sentences) */
+        { q: 'The children can’t sleep: they are very ___ about the party.', a: ['excited'], d: ['exciting', 'bored'], ca: 'Com et sents: -ed.', en: 'How you feel: -ed.' },
+        { q: 'The speech was very long and ___.', a: ['boring'], d: ['bored', 'exciting'], ca: 'Com és la cosa: -ing.', en: 'What it is like: -ing.' },
+        { q: 'After dancing all night, we were very ___.', a: ['tired'], d: ['tiring', 'boring'], ca: 'Com et sents: -ed.', en: 'How you feel: -ed.' },
+        { r: 'insecure', q: 'The story behind Halloween is really ___.', a: ['interesting'], d: ['interested', 'tired'], ca: 'Com és la cosa: -ing.', en: 'What it is like: -ing.' },
+        { r: 'insecure', q: 'We were ___ by the Diwali lights: we had never seen anything like them.', a: ['amazed'], d: ['amazing', 'bored'], ca: 'Com us vau sentir: -ed.', en: 'How you felt: -ed.' },
+        { r: 'insecure', q: 'It rained all day, so the parade was ___.', a: ['disappointing'], d: ['disappointed', 'exciting'], ca: 'Com va ser la desfilada: -ing.', en: 'What the parade was like: -ing.' },
+        { r: 'safe', q: 'Many people are ___ to learn that the first jack-o’-lanterns were turnips.', a: ['surprised'], d: ['surprising', 'interesting'], ca: 'Com se senten: -ed.', en: 'How they feel: -ed.' },
+        { r: 'safe', q: 'I’m not very ___ in costumes, but I love the food.', a: ['interested'], d: ['interesting', 'excited'], ca: 'Com et sents: interested in.', en: 'How you feel: interested in.' }
       ] },
     { id: 'mixed', type: 'typed', mode: 'say', tab: { ca: 'Barreja', en: 'Mixed' }, title: { ca: 'Pràctica barrejada', en: 'Mixed practice: choose the form' }, pill: { ca: 'Respon-ho tot', en: 'Answer all' },
       intro: { ca: 'Barreja de formes: decideix primer quina necessites.', en: 'Mixed forms: decide which one you need first.' },

@@ -280,14 +280,6 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 8. [D] Halloween ___ back to an old Celtic festival. → *dates*
 9. [D] Some people think Christmas is too ___: it's all about buying things. → *commercialised*
 10. [S] Spain is known ___ its summer festivals. → *for*
-11. [B] The children can't sleep: they are very ___ about the party. → *excited*
-12. [B] The speech was very long and ___. → *boring*
-13. [B] After dancing all night, we were very ___. → *tired*
-14. [I] The story behind Halloween is really ___. → *interesting*
-15. [I] We were ___ by the Diwali lights: we had never seen anything like them. → *amazed*
-16. [I] It rained all day, so the parade was ___. → *disappointing*
-17. [S] Many people are ___ to learn that the first jack-o'-lanterns were turnips. → *surprised*
-18. [S] I'm not very ___ in costumes, but I love the food. → *interested*
 
 ### Listening: *The story behind two autumn celebrations* (podcast, about 2 min 30 s)
 
@@ -357,6 +349,17 @@ Two illustrated videos made for English Lab ("How I celebrate"), each with a slo
 20. ___ Halloween started in Europe, it is now very popular in the USA. → *Although / Even though*
 21. Many families love the feast. ___, some Native Americans see it as a day of mourning. → *On the other hand / However*
 22. Correct the mistake: *Diwali, that is celebrated in autumn, is known as the festival of lights.* → *which*
+
+**[B] Feelings: -ed or -ing?** (all routes, 9 Nov 2026; in Grammar because many students had already done the Vocabulary sentences) *-ed* = how you feel (*I'm bored.*) · *-ing* = what the thing is like (*The speech is boring.*)
+
+23. [B] The children can't sleep: they are very ___ about the party. → *excited*
+24. [B] The speech was very long and ___. → *boring*
+25. [B] After dancing all night, we were very ___. → *tired*
+26. [I] The story behind Halloween is really ___. → *interesting*
+27. [I] We were ___ by the Diwali lights: we had never seen anything like them. → *amazed*
+28. [I] It rained all day, so the parade was ___. → *disappointing*
+29. [S] Many people are ___ to learn that the first jack-o'-lanterns were turnips. → *surprised*
+30. [S] I'm not very ___ in costumes, but I love the food. → *interested*
 
 ### Mixed practice (choose the form)
 

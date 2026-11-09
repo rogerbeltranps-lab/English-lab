@@ -309,7 +309,7 @@ var LS2 = (function () {
     const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
     if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false }; }
     const m = moveTo(items, from, a.v, prefix, a.tries); if (!m) return null;
-    Object.assign(tries, m.tries); return { v: m.v, moved: !m.same, fresh: m.v.some(x => x == null) };
+    Object.assign(tries, m.tries); return { v: m.v, moved: !m.same, fresh: m.v.some(x => x == null), added: L === level };
   }
   // answers typed but not checked yet: this route's, else the fullest from another route, moved onto this route's questions
   function typed(id, prefix, items, src) {
@@ -320,13 +320,17 @@ var LS2 = (function () {
     return m && n(m.v) ? m.v : null;
   }
   // a note under the result when the answers come from another level; a step already done stays done
-  function movedNote(id, fresh) {
+  // added: same level, so the activity itself changed (new questions added to it; Roger, 9 Nov 2026: -ed / -ing in 4 ESO LS2 LP3)
+  function movedNote(id, fresh, added) {
     const el = $('#' + id + 'Result'); if (!el) return;
     const done = state.done[id === 'vocab' ? 'practice' : id];
     if (done) el.textContent = el.textContent.replace(/ · (You need \d+ to complete the step\.|Necessites \d+ per completar el pas\.|Answer every question to complete the step\.|Respon totes les preguntes per completar el pas\.)/, ca() ? ' · Pas completat ✓' : ' · Step complete ✓');
     if (done && !/✓/.test(el.textContent)) el.textContent += ca() ? ' · Pas completat ✓' : ' · Step complete ✓';
     const p = document.createElement('span'); p.className = 'moved-note'; p.style.cssText = 'display:block;margin-top:6px;font-weight:400';
-    p.textContent = ca()
+    p.textContent = added ? (ca()
+      ? '✨ He afegit preguntes noves a aquesta activitat. Les respostes que ja havies fet hi són' + (done ? ' i aquest pas continua fet ✓. Pots fer les noves per practicar.' : ': respon també les preguntes buides per completar el pas.')
+      : '✨ I’ve added new questions to this activity. The answers you had already given are here' + (done ? ' and this step stays done ✓. You can do the new ones to practise.' : ': answer the empty questions too to complete the step.'))
+      : ca()
       ? '🔁 Has canviat de nivell. Les respostes que ja havies fet hi són' + (done ? ' i aquest pas continua fet ✓.' + (fresh ? ' Les preguntes buides són noves del teu nivell: les pots fer per practicar.' : '') : '.' + (fresh ? ' Respon també les preguntes buides per completar el pas.' : ''))
       : '🔁 Your level has changed. The answers you had already given are here' + (done ? ' and this step stays done ✓.' + (fresh ? ' The empty questions are new at your level: you can do them to practise.' : '') : '.' + (fresh ? ' Answer the empty questions too to complete the step.' : ''));
     el.appendChild(p); el.classList.add('show');
@@ -349,7 +353,7 @@ var LS2 = (function () {
     $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix), items); };
     $('#' + id + 'Again').onclick = () => { forget(id, prefix); clearStep(id, listId); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
-    const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh); } else if (t) fill(items, prefix, t);
+    const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
   }
 
   /* ---------- redo one activity (Roger, 2 Nov 2026: "I don't want them restart the whole learning path"; 4 Nov 2026: "I only want
