@@ -44,7 +44,6 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 .ptteam{display:inline-flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:10px;padding:3px 6px;margin:2px;background:#f8fafc}.ptteam input{width:120px;font:inherit;padding:2px 4px}.ptteam button{padding:1px 7px}.ptwrap{overflow:auto;border:1px solid #e2e8f0;border-radius:8px;max-width:640px}table.pts{width:100%}table.pts td.ptn{white-space:nowrap}table.pts button:disabled{opacity:.35;cursor:default}input.ex.over{outline:2px solid #dc2626;background:#fef2f2}ul.sgl{list-style:none;padding:0;margin:6px 0}ul.sgl li{margin:10px 0;border-left:3px solid #0f766e;padding-left:10px}ul.sgl li.read{border-color:#cbd5e1}ul.sgl li.read .hand{color:#64748b}table.plan td{vertical-align:top;text-align:left;white-space:normal}table.plan td.pc{text-align:center;white-space:nowrap}table.plan tr.pb td{background:#f1f5f9;border-top:2px solid #cbd5e1}table.plan td.in{padding-left:22px}
 #loadbar .live{color:#166534}.cnow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-radius:12px;padding:8px 12px;margin:6px 0}.cnow.ask{background:#fef3c7;border:2px solid #f59e0b}.cnow.info{background:#ecfdf5;border:1px solid #86efac;font-size:14px}.cnow .x{background:none;color:#475569;padding:0 6px;margin-left:auto}
 .who{display:inline-block;border-radius:999px;padding:1px 8px;font-size:12px;white-space:nowrap}.who.a{background:#dcfce7;color:#166534}.who.y{background:#e0e7ff;color:#3730a3}
-.rgames td,.rgames th{padding:4px 10px;text-align:left}.rgames td.num{text-align:center}.rgames .grings{margin-left:0}
 tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .gnotes{display:inline-grid;place-items:center;width:30px;height:30px;margin-left:6px;vertical-align:middle;border:1px solid #c7d2fe;border-radius:8px;background:#eef2ff;text-decoration:none;font-size:16px}.gnotes:hover{background:#e0e7ff;border-color:#3157d5}.grings{display:inline-flex;align-items:center;gap:3px;margin-left:8px;vertical-align:middle;text-decoration:none;font-size:13px}
 </style>
@@ -1262,7 +1261,8 @@ function render0(){
   const place={
     plan:()=>AGOK(ls)&&p&&gi>=0&&agEnsure(planX(ls,grp.id))?tp2Btn(grp)+agPage(planX(ls,grp.id),inG.filter(s=>!s.away&&!s.tester&&s.uid)):satBox([grp.id])+timeBox(ls,grp,inG.filter(s=>!s.away&&!s.tester))+((window.EL_PLAN||{})[ls]?`<div class="box">${fold("plan","Teaching plan",plan(EL_PLAN[ls],grp))}</div>`:""),
     todo:()=>cpBox(ls,grp,inG)+`<div class="box"><h2>To do</h2>${todoH}</div>`,
-    paths:()=>lpBox(ls,grp)+`<div class="bar">${stuF}${G()&&!G().only?` <button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button>`:""}</div>`+lpAll+legendB+`<div class="box">${fold("settings","LS status and groups",lsSettings(ls))}</div>`,
+    // (Roger, 9 Nov 2026) the assessment criteria at the top; no Learning paths and activities table here: it is in 👥 Students
+    paths:()=>legendB+lpBox(ls,grp)+(G()&&!G().only?`<div class="bar"><button class="g" data-do="qago" title="Which questions this group answers well or badly the first time, by route">🔎 Questions</button></div>`:"")+`<div class="box">${fold("settings","LS status and groups",lsSettings(ls))}</div>`,
     // the route and tutor chips sit right above the student table they filter, under the mark explanation, which is the same for every
     // route (Roger, 7 Nov 2026: "when I change the route nothing changes here"); they also filter the boxes below (criteria, self-assessment)
     marks:()=>{const fb=`<div class="bar stuf"><span class="muted">Show students ·</span> ${stuF}</div>`;
@@ -1291,10 +1291,10 @@ function render0(){
     $("#main").innerHTML=head+`<div class="gal">${al}</div><div class="tiles wide">`
       +tTile("plan","📅","Time plan","your agenda: drag learning paths to class days",nb?nb+" not ticked":"",true)
       +tTile("todo","✅","To do","comments, marking, possible copies, level requests",nTodo||"",/❌|Possible copy/.test(todoH))
-      +tTile("paths","📈","Learning paths","progress, open and lock")
+      +tTile("paths","📈","Learning paths","open and lock, assessment criteria")
       +tTile("fp","🎬","Final product",fa?"mark the students' work: videos, Gemini's drafts, your marks":"this LS has no final product on the site",fw?fw+" to approve":"",false)
       +tTile("marks","📊","Marks","LS grade, criteria, self-assessment")
-      +tTile("students","👥","Students","levels, team points, student list")
+      +tTile("students","👥","Students","progress, levels, team points, student list")
       +tTile("att","🙋","Attendance","who was absent or late in each class: the register")
       +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
       +tTile("cov","🎯","Coverage","criteria, competences, grammar and lexicon worked, this LS and the year",(n=>n?n+" to check":"")(covGaps(grp,ls)),true)
@@ -3104,18 +3104,11 @@ function pbClaude(id){
     <button class="g" data-do="pbcopy" title="Copies the text and opens the English Lab project in a new browser tab; paste it in the project chat to start a thread">📋 Copy and open the project in the browser</button></div>
     <p class="muted" id="pbmsg">Both buttons copy the text and open the English Lab project. Paste it in the project chat (Cmd+V or Ctrl+V) and press Enter to start a thread.</p>`,true)}
 // ---- student list (roster): import from Excel, add, edit, remove
-// 🧩 📚 class game circles in the Student list (Roger, 6 Nov 2026: "here I should have this", on 👥 Students › Student list): one row per
-// student of the group (the page's filters apply), click the name for the student, the circles open Results (same data as gameRings)
-function rosterGames(studs){if(!studs||!studs.length||!S.g||S.g==="none")return "";loadGames();const g=GAMES[S.g];if(!g)return "";
-  if(g.busy)return `<p class="muted">Loading the class games…</p>`;
-  const rows=studs.filter(s=>!s.tester).map(s=>{const em=String(s.email||"").toLowerCase(),ls=S.ls||"";
-    const mine=em?g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done}:null}).filter(Boolean):[];
-    return `<tr><td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a></td><td>${mine.length?gameRings(s):'<span class="muted">no class games yet</span>'}${notesLink(s,S.ls)}</td><td class="num">${mine.length}</td></tr>`}).join("");
-  return `<div class="rgbox"><h3 style="margin:4px 0 6px">🎮 Class games in this LS</h3><p class="muted">% right in the 🧩 grammar and 📚 vocabulary games of this LS. Click the circles for every answer and the notes (Results).</p>
-    <div class="wrap"><table class="rgames"><tr><th class="stu">Student</th><th>🧩 grammar · 📚 vocabulary</th><th>Games</th></tr>${rows}</table></div></div>`}
+// (Roger, 9 Nov 2026: "here I have repeated info") no separate 🎮 Class games table in the Student list: the 🧩 📚 circles and 📝 notes are
+// next to every name in the Learning paths table above; hover a circle for every game the student played.
 function rosterBox(studs){
   const ro=Object.values(S.D.ro),noMail=ro.filter(r=>!r.email);
-  const body=rosterGames(studs)+(S.D.roErr?'<p><b>The student list could not be read.</b> Publish the Firestore rules (<code>firebase deploy --only firestore:rules</code>) and reload.</p>':"")
+  const body=(S.D.roErr?'<p><b>The student list could not be read.</b> Publish the Firestore rules (<code>firebase deploy --only firestore:rules</code>) and reload.</p>':"")
     +`<p class="muted">${ro.length?`<b>${ro.length} students</b>: `+GR.map(g=>g.name+" "+ro.filter(r=>r.group===g.id).length).join(" · ")+".":"No student list yet."} Only students on this list (and the tester account) can sign in, and the list sets their group. It is stored in Firebase, never in the website's repository.</p>`
     +(noMail.length?`<p>Without an email, so they cannot sign in yet: ${noMail.map(r=>esc(fullName({ro:r}))).join(" · ")}. Click the name in the table to add it.</p>`:"")
     +`<div class="bar"><label class="btn">Import from Excel<input type="file" accept=".xlsx,.xls,.csv" data-do="import" hidden></label><button class="g" data-do="addstu">Add a student</button></div>`
