@@ -1422,6 +1422,18 @@ var LS2 = (function () {
     usePanels();
     try { state = JSON.parse(localStorage.getItem(LP.key) || '{}'); } catch (e) { state = {}; }
     state.done = state.done || {};
+    /* Do it again after new questions (Roger, 9 Nov 2026: "the students who did the grammar need to do it again and it's like they didn't
+       do that. No messages to those students"): a panel with redoBefore (a date) quietly clears the work a student checked before that date
+       (done, first and last try, answers, first-try items, typing), so the step is to do again and nothing old counts. Nothing is shown. */
+    LP.panels.forEach(p => {
+      if (!p.redoBefore) return; const k = p.id, d = [(state.doneAt || {})[k], ((state.tries || {})[k] || {}).date, ((state.last || {})[k] || {}).date].filter(Boolean);
+      if (!d.length || !d.some(x => x < p.redoBefore)) return;
+      delete state.done[k]; ['doneAt', 'tries', 'last', 'ans'].forEach(f => { if (state[f]) delete state[f][k]; });
+      ['items', 'typing'].forEach(f => { if (state[f]) Object.keys(state[f]).forEach(x => { if (x.startsWith(k + '_')) delete state[f][x]; }); });
+      localStorage.setItem(LP.key, JSON.stringify(state));
+      // the cloud copy gets it with a normal save once the page has pulled the student's progress (el-cloud.js loads after this)
+      setTimeout(() => { try { save(); } catch (e) {} }, 4000);
+    });
     const sel = $('#sessionJump');
     if (sel) { const here = location.pathname.split('/').pop(); sel.innerHTML = PAGES.map(([f, t]) => '<option value="' + f + '"' + (f === here ? ' selected' : '') + '>' + t + '</option>').join(''); sel.onchange = () => { location.href = sel.value; }; }
     $$('.route').forEach(b => { b.classList.toggle('active', b.dataset.level === level); b.onclick = () => { level = b.dataset.level; usePanels(); $$('.route').forEach(x => x.classList.toggle('active', x === b)); save(); render(); learningSupport.apply(level); }; });

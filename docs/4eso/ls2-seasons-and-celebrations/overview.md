@@ -350,7 +350,7 @@ Two illustrated videos made for English Lab ("How I celebrate"), each with a slo
 21. Many families love the feast. ___, some Native Americans see it as a day of mourning. → *On the other hand / However*
 22. Correct the mistake: *Diwali, that is celebrated in autumn, is known as the festival of lights.* → *which*
 
-**[B] Feelings: -ed or -ing?** (all routes, 9 Nov 2026; in Grammar because many students had already done the Vocabulary sentences) *-ed* = how you feel (*I'm bored.*) · *-ing* = what the thing is like (*The speech is boring.*)
+**[B] Feelings: -ed or -ing?** (all routes, 9 Nov 2026; in Grammar because many students had already done the Vocabulary sentences; Grammar checked before 9 Nov 21:00 UTC is quietly cleared: to do again, old work does not count, redoBefore) *-ed* = how you feel (*I'm bored.*) · *-ing* = what the thing is like (*The speech is boring.*)
 
 23. [B] The children can't sleep: they are very ___ about the party. → *excited*
 24. [B] The speech was very long and ___. → *boring*
