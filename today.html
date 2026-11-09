@@ -1082,6 +1082,13 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
 // daily work by the criteria of its steps, other competences), with the student's marks from the board's data (exam sections, progress
 // .parts from the dashboard, a confirmed final[c] degree wins). Each piece goes in the term of its report block (EL_PLAN .report), else of
 // its date, else of its LS. English competences only (transversals are not in the English mark). Never which activities count.
+// the names of exam parts and final-product rows (EL_GRADING, in English) in Catalan for Starter and Base (Roger, 9 Nov 2026: "base and starter need it in Catalan")
+const NMCA={"Listening":"Comprensió oral","Reading":"Comprensió lectora","Vocabulary":"Vocabulari","Grammar":"Gramàtica","Writing":"Expressió escrita",
+  "Vocabulary · choose":"Vocabulari · triar","Vocabulary · complete":"Vocabulari · completar","Grammar · choose":"Gramàtica · triar","Grammar · complete":"Gramàtica · completar",
+  "Writing · task":"Writing · la tasca","Writing · grammar":"Writing · gramàtica","Writing · vocabulary":"Writing · vocabulari","Writing · organisation":"Writing · organització",
+  "My part":"La meva part","My email":"El meu correu","My source":"La meva font","My research card":"La meva fitxa de recerca","Video: what it means (group)":"Vídeo: què significa (grup)",
+  "Video: local link (group)":"Vídeo: relació amb el nostre entorn (grup)","My vlog":"El meu vlog","My script and slides":"El meu guió i les diapositives","My fact file and credits":"La meva fitxa i els crèdits"};
+const nmT=n=>EN?n:NMCA[n]||n;
 function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)return [];
   const x=D.rs[l.id+"/assessment"]||{},pr=x.progress||{},P=pr.parts||{},sc=x.sections||{},fin=x.final||{},SC=window.EL_STEP_CRITERIA||{};
   const p=(window.EL_PLAN||{})[l.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1,rep=(p&&p.report)||{},nT=EL_TERMS.length;
@@ -1095,9 +1102,9 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
     if(b.id==="exam"&&g.exam){const e=g.exam,tot=e.sections.reduce((n,[k])=>n+secMax(e,k),0),gvc=Object.keys(gvS);
       pcs=e.sections.flatMap(([k,sn,,cs])=>{cs=cs||Object.keys(g.evidence||{}).filter(c=>g.evidence[c].e.some(y=>y&&(y.exam===k||(y[0]==="exam"&&y[1]===k))));
         if(!cs.length&&e.level&&e.level.step===k)cs=[e.level.c];if(!cs.length)cs=gvc;const y=sc[k];
-        return spread(cs,w*secMax(e,k)/tot,y&&y.score!=null?y.score/(+(y.max||secMax(e,k)))*10:null,["📝 "+t("Examen","Exam"),sn])})}
+        return spread(cs,w*secMax(e,k)/tot,y&&y.score!=null?y.score/(+(y.max||secMax(e,k)))*10:null,["📝 "+t("Examen","Exam"),nmT(sn)])})}
     else if(b.id==="fp"&&g.fp){const f=g.fp;if(f.mark)pcs=spread(((EL_CATALOG.find(a=>a.id===f.a)||{}).criteria)||[],w,fpM(),["🎬 "+t("Producte final","Final product"),""]);
-      else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??null,src:["🎬 "+t("Producte final","Final product"),r.name]}))}}
+      else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??null,src:["🎬 "+t("Producte final","Final product"),nmT(r.name)]}))}}
     else if(b.id==="gv"){const tw=Object.values(gvS).reduce((n,v)=>n+v,0);pcs=Object.entries(gvS).map(([c,n])=>({c,w:w*n/tw,m:pr.gv??null,src:["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]}))}
     else if(b.id==="other")pcs=spread(g.other||[],w,null,["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]).map(y=>Object.assign(y,{m:(P.other||{})[y.c]??null}));
     pcs.forEach(y=>{if(!/^\d+\.\d/.test(String(y.c)))return;   // English criteria only ("5.1"); transversals and process/teamwork out
@@ -1146,10 +1153,10 @@ function gvBox(ls2,tm){const TH=window.EL_GAME_THEORY;if(!TH){if(!S.thLoading){S
   const work=rows.filter(r=>r.pc!=null&&r.pc<60).concat(ex.filter(x=>x.pc<60));
   return `<div class="box fv gvbox">${fvHead("📚",t("Gramàtica i vocabulari","Grammar and vocabulary"),esc(EL_TERMS[tm-1][EN?"en":"ca"]))}`
     +`<p class="fvlead">${t("Què saps de cada tema de gramàtica i vocabulari, pels jocs de classe i l'examen, i què has de repassar.","What you know about each grammar and vocabulary topic, from the class games and the exam, and what to review.")}</p>`
-    +(work.length?`<div class="cpsum"><span class="cps bad">🔁 ${t("Repassa primer","Review first")}: <b>${work.map(x=>esc(x.title||x.n)).join(", ")}</b></span></div>`:rows.length||ex.length?`<div class="cpsum"><span class="cps ok">💪 ${t("Molt bé: cap tema per sota del 60 %","Well done: no topic under 60 %")}</span></div>`:"")
+    +(work.length?`<div class="cpsum"><span class="cps bad">🔁 ${t("Repassa primer","Review first")}: <b>${work.map(x=>esc(x.title||nmT(x.n))).join(", ")}</b></span></div>`:rows.length||ex.length?`<div class="cpsum"><span class="cps ok">💪 ${t("Molt bé: cap tema per sota del 60 %","Well done: no topic under 60 %")}</span></div>`:"")
     +`<div class="wrap"><table class="xt gvt"><thead><tr><th>${t("Tema","Topic")}</th><th>${t("Encerts","Right")}</th><th></th><th></th></tr></thead><tbody>`
     +rows.map(r=>`<tr><td class="l"><span class="gvk">${r.kind==="grammar"?"🧩 "+t("Gramàtica","Grammar"):"📚 "+t("Vocabulari","Vocabulary")} · ${esc(elLsNum(r.l))} LP${esc(r.lp||"")}</span><b>${esc(r.title)}</b>${r.miss.length&&r.pc!=null&&r.pc<80?`<ul class="gvmiss">${r.miss.map(m=>`<li>${esc(m.q)} <s>${esc(m.a||"")}</s> → <b>${esc(m.ok||"")}</b></li>`).join("")}</ul>`:""}<small class="muted">🎲 ${t("Jocs de classe","Class games")}</small></td><td><b style="color:${col(r.pc||0)}">${r.pc==null?"–":Math.round(r.pc)+" %"}</b>${bar(r.pc)}</td><td>${st(r.pc)}</td><td><a class="g pgo" href="${lsHref(r.l)}#notes">${t("Estudia","Study")} →</a></td></tr>`).join("")
-    +ex.map(x=>`<tr><td class="l"><span class="gvk">📝 ${t("Examen","Exam")} · ${esc(elLsNum(x.l))}</span><b>${esc(x.n)}</b><small class="muted">${f1(x.s)} / ${x.m} ${t("punts","points")}</small></td><td><b style="color:${col(x.pc)}">${Math.round(x.pc)} %</b>${bar(x.pc)}</td><td>${st(x.pc)}</td><td><button type="button" class="g pgo" data-do="pgo" data-ls="${x.l.id}" data-h="exam">${t("Mira-ho","See it")} →</button></td></tr>`).join("")
+    +ex.map(x=>`<tr><td class="l"><span class="gvk">📝 ${t("Examen","Exam")} · ${esc(elLsNum(x.l))}</span><b>${esc(nmT(x.n))}</b><small class="muted">${f1(x.s)} / ${x.m} ${t("punts","points")}</small></td><td><b style="color:${col(x.pc)}">${Math.round(x.pc)} %</b>${bar(x.pc)}</td><td>${st(x.pc)}</td><td><button type="button" class="g pgo" data-do="pgo" data-ls="${x.l.id}" data-h="exam">${t("Mira-ho","See it")} →</button></td></tr>`).join("")
     +`</tbody></table></div></div>`}
 // 🎓 My progress (Roger, 9 Nov 2026: "students need to have a table with their results on the dashboard so that they can understand better
 // their progress. There they can choose term (and they see their 2 LS that they will have, not yet prepared)"; "name it progress"):
@@ -1178,7 +1185,7 @@ function progressPlace(lss,ls){
   return `<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",esc(EL_TERMS[tm-1][EN?"en":"ca"]),these.map(r=>"LS"+r.n).join(" · "))}</div>`
     +`<p class="fvlead">${t("Les teves notes de cada Learning Situation, trimestre a trimestre. Tria un trimestre:","Your marks in each Learning Situation, term by term. Choose a term:")}</p>`
     +`<div class="pgterms" role="group" aria-label="${t("Trimestre","Term")}">${EL_TERMS.map((_,i)=>chip(i+1)).join("")}</div>`
-    +(these.length?`<div class="wrap"><table class="xt pgt-t"><thead><tr><th>Learning Situation</th><th>📚 ${t("Feina diària","Daily work")}</th><th>📝 ${t("Examen","Exam")}</th><th>🎬 ${t("Producte final","Final product")}</th><th>🎓 ${t("Nota de la LS","LS mark")}</th><th></th></tr></thead><tbody>${these.map(row).join("")}</tbody></table></div>`
+    +(these.length?`<div class="wrap"><table class="xt pgt-t"><thead><tr><th>${t("Situació d'aprenentatge","Learning Situation")}</th><th>📚 ${t("Feina diària","Daily work")}</th><th>📝 ${t("Examen","Exam")}</th><th>🎬 ${t("Producte final","Final product")}</th><th>🎓 ${t("Nota de la LS","LS mark")}</th><th></th></tr></thead><tbody>${these.map(row).join("")}</tbody></table></div>`
       :`<p class="muted">${t("Aquest trimestre encara no té cap LS.","This term has no LS yet.")}</p>`)
     +`<p class="muted pgfoot">${t("La nota de cada LS es fa amb la teva feina diària als learning paths, l'examen i el producte final (el pes de cada part és a sota de la nota). Una LS que encara fas mostra la nota fins ara: canvia cada dia amb la teva feina.","Each LS mark is made of your daily work in the learning paths, the exam and the final product (each part's weight is under its mark). An LS you are doing now shows your mark so far: it changes every day with your work.")}${nc?" "+t(nc>1?`Les ${nc} LS que vénen encara no estan preparades.`:"La LS que ve encara no està preparada.",nc>1?`The ${nc} LSs still to come are not ready yet.`:"The LS still to come is not ready yet."):""}</p></div>`
     +compBox(rows.filter(r=>r.l).map(r=>r.l),tm)+gvBox(nd.map(r=>r.l),tm)}
