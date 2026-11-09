@@ -382,6 +382,43 @@ window.elClassRoll=function(x,left,here,roster){const w=elClassWatch(x,left,here
     if(live&&h.fs!==false)w.inn.push(o);else{o.why=live?"full":seen?(h.off?"closed":"lost"):"never";w.out.push(o)}}
   const rank={full:0,closed:1,lost:2,never:3},az=(a,b)=>a.name.localeCompare(b.name);
   w.inn.sort(az);w.out.sort((a,b)=>rank[a.why]-rank[b.why]||az(a,b));w.n=who.size;return w};
+// Who left, for the teacher's panels (Roger, 9 Nov 2026: "I need to know who disconnects, and I need their names to be there … even when
+// we are watching a video"): gone = out now (out of full screen, screen closed, lost connection), back = left full screen in this class and
+// came back. Both stay named on the dashboard panel (#fsctl) and the class tab's panel (el-cloud.js #el-fsfloat), also when made small.
+window.elWhoLeft=w=>({gone:(w.out||[]).filter(y=>y.why!=="never"),back:(w.inn||[]).filter(y=>y.left),never:(w.out||[]).filter(y=>y.why==="never")});
+// 🎬 Videos under the panel: a video's own ⛶ full screen would hide the page and the panel with it, so on a teacher page with the panel
+// showing, a video that goes full screen comes back into the page, fills the screen there (.el-bigvid) and the page goes full screen
+// instead: the panel stays on top of the video. ✕ Smaller or Esc puts it back. elPlayVideo(src) plays a video over the page (the unit's
+// shadowing video from the dashboard's agenda or the class tab's 📋 Today), with ⛶ Full screen that does the same. No reads, no writes.
+(function(){if(window.elPlayVideo)return;const d=document,R=d.documentElement,fsEl=()=>d.fullscreenElement||d.webkitFullscreenElement;
+  const watch=()=>!!(d.getElementById("el-fsfloat")||d.querySelector("#fsctl.on"));
+  const css=()=>{if(d.getElementById("el-vidcss"))return;const s=d.createElement("style");s.id="el-vidcss";s.textContent=
+    ".el-bigvid{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;z-index:2147482000!important;background:#000!important;object-fit:contain}"
+    +"html.el-vid-on #fsctl{z-index:2147483000}#el-bigx{position:fixed;top:12px;left:14px;z-index:2147482500;border:0;border-radius:999px;padding:8px 16px;background:#fff;color:#1e1b4b;font:800 15px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px #0006}"
+    +"#el-vid{position:fixed;inset:0;z-index:2147481600;background:rgba(15,23,42,.92);display:grid;place-items:center;padding:60px 20px 20px}"
+    +"#el-vid video{max-width:100%;max-height:calc(100vh - 90px);border-radius:12px;background:#000}"
+    +"#el-vid .el-vbar{position:absolute;top:14px;left:16px;display:flex;gap:8px}#el-vid .el-vbar button{border:0;border-radius:999px;padding:8px 16px;background:#fff;color:#1e1b4b;font:800 15px system-ui,sans-serif;cursor:pointer}";
+    d.head.append(s)};
+  let big=null,mine=false,swap=false;
+  const on=()=>R.classList.toggle("el-vid-on",!!(big||d.getElementById("el-vid")));
+  const pageFs=()=>{if(fsEl())return Promise.resolve();const r=R.requestFullscreen||R.webkitRequestFullscreen;if(!r)return Promise.reject();
+    try{const p=r.call(R);mine=true;return p&&p.then?p.catch(e=>{mine=false;throw e}):Promise.resolve()}catch(e){mine=false;return Promise.reject(e)}};
+  function bigOn(v){css();if(big&&big!==v)bigOff(true);big=v;v.classList.add("el-bigvid");
+    if(!d.getElementById("el-bigx")){const b=d.createElement("button");b.id="el-bigx";b.type="button";b.textContent="✕ Smaller";b.title="Back to the page (Esc)";b.onclick=()=>bigOff();d.body.append(b)}on()}
+  function bigOff(keepFs){if(big)big.classList.remove("el-bigvid");big=null;const b=d.getElementById("el-bigx");if(b)b.remove();
+    if(!keepFs&&mine&&fsEl()){mine=false;const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d);if(x&&x.catch)x.catch(()=>{})}on()}
+  ["fullscreenchange","webkitfullscreenchange"].forEach(ev=>d.addEventListener(ev,()=>{const f=fsEl();if(swap)return;
+    if(f&&(f.tagName==="VIDEO"||f.tagName==="IFRAME")&&watch()){swap=true;const x=(d.exitFullscreen||d.webkitExitFullscreen).call(d),v=f;
+      Promise.resolve(x).catch(()=>{}).then(()=>{bigOn(v);return pageFs()}).catch(()=>{}).then(()=>{swap=false})}
+    else if(!f){mine=false;if(big)bigOff(true)}}));
+  d.addEventListener("keydown",e=>{if(e.key==="Escape"&&big&&!fsEl())bigOff()});
+  window.elPlayVideo=function(src){css();const old=d.getElementById("el-vid");if(old)old.remove();const o=d.createElement("div");o.id="el-vid";
+    o.innerHTML='<div class="el-vbar"><button type="button" data-x="1">✕ Close the video</button><button type="button" data-fs="1" title="The video fills the screen; the list of who left stays on top">⛶ Full screen</button></div><video controls autoplay playsinline></video>';
+    const v=o.querySelector("video");v.src=src;
+    o.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.x){if(big===v)bigOff();o.remove();on()}else{bigOn(v);pageFs().catch(()=>{})}};
+    d.body.append(o);on();return o};
+  // links marked data-elvid play over the page instead of opening the video file in a new tab
+  d.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("a[data-elvid]");if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;e.preventDefault();window.elPlayVideo(a.href)})})();
 // "LP3 Where traditions come from": the number the time plan gives the learning path (EL_PLAN text "LP3 Where traditions …"), else its short title.
 window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh(a.title),lo=st.toLowerCase(),p=(window.EL_PLAN||{})[a.ls];let n=null;
   if(p)(p.rows||[]).forEach(r=>[].concat(r.g||r.what||[]).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,k,nm)=>{nm=nm.trim().toLowerCase();if(!n&&nm&&(lo.startsWith(nm)||nm.startsWith(lo)))n=k}));

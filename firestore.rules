@@ -36,6 +36,10 @@ service cloud.firestore {
     match /settings/{id} {
       allow read, write: if isTeacher();
     }
+    // 🙋 Attendance (Roger, 9 Nov 2026): one document per class ({group}_{day}_{hhmm}), saved from the class panels; only the teacher
+    match /attendance/{id} {
+      allow read, write: if isTeacher();
+    }
     // 🛠 maintenance mode (site/maintenance = {on, note, since}, the dashboard's switch): every page reads it, before or after sign-in; only the teacher writes it
     match /site/{id} {
       allow read: if true;
