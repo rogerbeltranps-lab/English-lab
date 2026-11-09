@@ -6,7 +6,7 @@
 ELGameDeck({
   title:"Vocabulary · Celebrations around the world",
   slides:[
-    {theory:"Traditions: what people do",img:"🧧",lines:[
+    {theory:"Traditions: what people do",point:"Tradition verbs (gather, exchange gifts…)",pointCa:"Verbs de tradicions (gather, exchange gifts…)",img:"🧧",lines:[
       "**get together** / **gather** (meet as a group) · **share a meal** · **exchange gifts** · **make a wish**",
       "**take part in** (participate) · **look forward to** (feel excited about something that is coming)",
       "**pass down** (give to the next generation) · **mark an occasion** (show that a day is special)"]},
@@ -17,7 +17,7 @@ ELGameDeck({
     {q:"I always look forward ___ the Castanyada: roasted chestnuts and panellets!",img:"🌰",options:["to","for","at","on"],why:"**look forward to** something."},
     {q:"Hundreds of students take ___ in the Carnival parade. (p...)",img:"🎭",write:["part"],why:"**take part in** = participate."},
     {q:"Fireworks ___ the occasion at midnight.",img:"🎆",options:["mark","make","do","take"],why:"**mark an occasion** = show that a moment is special."},
-    {theory:"Describing a celebration",img:"🏮",lines:[
+    {theory:"Describing a celebration",point:"Describing a celebration (festive, crowded…)",pointCa:"Descriure una festa (festive, crowded…)",img:"🏮",lines:[
       "**religious** (Hanukkah, Diwali) ↔ **secular** (not religious: New Year's Eve) · **traditional**",
       "**local** (one town) ↔ **worldwide** (all over the world) · **family-friendly** (good for all ages)",
       "**colourful** · **crowded** (full of people) · **festive** (happy, like a party) · **meaningful** (important for you)"]},
@@ -27,7 +27,7 @@ ELGameDeck({
     {q:"There are activities for children, parents and grandparents. It's a ___ event.",img:"👨‍👩‍👧",options:["family-friendly","crowded","secular","local"],why:"**family-friendly** = good for all the family."},
     {q:"Red lanterns, dragon costumes, bright lights: the streets are very ___. (c...)",img:"🏮",write:["colourful","colorful"],why:"**colourful** (UK) = **colorful** (US)."},
     {q:"All Saints' Day is ___ for my family: it helps us remember my grandparents.",img:"💛",options:["meaningful","crowded","worldwide","festive"],why:"**meaningful** = important, with a special meaning."},
-    {theory:"Words from four celebrations",img:"🪔",lines:[
+    {theory:"Words from four celebrations",point:"Celebration words (diyas, lanterns, parade…)",pointCa:"Paraules de festes (diyas, lanterns, parade…)",img:"🪔",lines:[
       "Diwali: **diyas** (small oil lamps) · Hanukkah: a **menorah** (a candle holder)",
       "Lunar New Year: red **lanterns**, a **reunion dinner** (the whole family together) · Christmas: an **Advent calendar**, the **Caga Tió**",
       "Everywhere: a **parade**, **fireworks**, **decorations**, **relatives** (family members), **guests**"]},

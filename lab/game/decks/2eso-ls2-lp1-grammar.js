@@ -7,7 +7,7 @@
 ELGameDeck({
   title:"Grammar · Present Simple: how often?",
   slides:[
-    {theory:"The Present Simple: habits",img:"🔁",step:true,lines:[
+    {theory:"The Present Simple: habits",point:"Present Simple: he / she / it + -s",pointCa:"Present Simple: la -s de he / she / it",img:"🔁",step:true,lines:[
       "We use the **Present Simple** for things we do **often**, **usually** or **every week**.",
       {table:[["I / you / we / they","he / she / it"],["I **play** football.","Hugo **plays** football."],["We **go** skating.","Marta **goes** skating."],["They **don't draw**.","She **doesn't draw**."]]},
       {watch:"After **doesn't**, no -s: She doesn't ~~plays~~ **play**."}],
@@ -21,7 +21,7 @@ ELGameDeck({
     {q:"Hugo ___ video games on school days.",img:"🎮",options:["doesn't play","don't play","doesn't plays","not play"],why:"he → **doesn't** + verb with no -s."},
     {q:"Aina ___ (study) English with an app every day.",img:"📚",write:["studies"],why:"consonant + y → stud**ies**."},
     {q:"Which sentence is correct?",img:"🛹",options:["Pol goes skating and has a new board.","Pol go skating and have a new board.","Pol goes skating and haves a new board.","Pol gos skating and has a new board."],why:"go → **goes**, have → **has**."},
-    {theory:"Questions and short answers",img:"❓",step:true,lines:[
+    {theory:"Questions and short answers",point:"Present Simple: questions and short answers",pointCa:"Present Simple: preguntes i respostes curtes",img:"❓",step:true,lines:[
       {table:[["Question","Short answer"],["**Do** you **play** the guitar?","Yes, I **do**. / No, I **don't**."],["**Does** she **go** swimming?","Yes, she **does**. / No, she **doesn't**."],["**Where do** they **train**?","At the sports centre."]]},
       "Question word + **do / does** + subject + verb: **When does** Marta **practise**?",
       {watch:"The -s goes to **does**: Does she ~~goes~~ **go**?"}],
@@ -31,7 +31,7 @@ ELGameDeck({
     {q:"Where ___ you meet your friends? — In the square.",img:"📍",write:["do"],why:"you → Where **do** you meet…?"},
     {q:"Which question is correct?",img:"⏱️",options:["What time does the match start?","What time does the match starts?","What time the match starts?","What time do the match start?"],why:"**does** + the match + **start** (no -s)."},
     {q:"Does Hugo like football? — Yes, he ___.",img:"⚽",write:["does"],why:"Does…? → Yes, he **does**."},
-    {theory:"How often? Adverbs of frequency",img:"📅",step:true,lines:[
+    {theory:"How often? Adverbs of frequency",point:"Adverbs of frequency (always, usually…)",pointCa:"Adverbis de freqüència (always, usually…)",img:"📅",step:true,lines:[
       "**always** 100 % · **usually** · **often** · **sometimes** · **never** 0 %",
       {table:[["Where does it go?","Example"],["**before** most verbs","She **usually goes** skating."],["**after** be (am / is / are)","She **is always** late."]]},
       "Expressions of time go at the **end**: I go swimming **once a week**. We train **twice a week**.",

@@ -7,7 +7,7 @@
 ELGameDeck({
   title:"Vocabulary · Now or usually? Time words and sport",
   slides:[
-    {theory:"Now or usually? Time words",img:"⏱️",lines:[
+    {theory:"Now or usually? Time words",point:"Time words: now or usually?",pointCa:"Paraules de temps: ara o normalment?",img:"⏱️",lines:[
       "**Now:** now · **right now** (ara mateix) · **at the moment** · today · **this weekend** · Look! · Listen!",
       "**Usually:** usually · always · never · **every weekend** · **on Saturday mornings** · **in winter** / in summer",
       "**How often?** once a week · **twice** a week (two times) · every day · **as usual** (like always)"]},
@@ -18,7 +18,7 @@ ELGameDeck({
     {q:"Leo is winning, as ___! He always wins.",img:"🏆",options:["usual","always","normal","often"],why:"**as usual** = like always."},
     {q:"We train ___ a week: on Tuesdays and Thursdays. (tw...)",img:"📅",write:["twice"],why:"**twice** = two times. Once (1) · twice (2) · three times (3)."},
     {q:"My dad ___ gets up late: he's always up at six!",img:"⏰",options:["never","always","usually","often"],why:"**never** ↔ always."},
-    {theory:"Doing sport",img:"🚴",lines:[
+    {theory:"Doing sport",point:"Sport words (practise, train, race…)",pointCa:"Paraules d'esport (practise, train, race…)",img:"🚴",lines:[
       "**practise** (do something again and again to get better) · **train** (prepare for a match or a race)",
       "**watch a match** · **go to a concert** · a **race** (who is the fastest?) · **ride** a bike · **film** a video",
       "the **ice rink** (for skating) · the **bike park** · the **temperature** is three **degrees**"]},
@@ -28,7 +28,7 @@ ELGameDeck({
     {q:"Noah isn't riding today: he's ___ the race with his camera. (f...)",img:"🎥",write:["filming"],why:"**film** = make a video."},
     {q:"Where do people go ice skating?",img:"⛸️",options:["an ice rink","a bike park","a swimming pool","a sports hall"],why:"An **ice rink** is for skating."},
     {q:"I usually ___ the match on TV with my family. (w...)",img:"📺",write:["watch"],why:"**watch** a match, a video, a show."},
-    {theory:"State verbs: what they mean",img:"🧠",lines:[
+    {theory:"State verbs: what they mean",point:"State verbs: what they mean",pointCa:"Verbs d'estat: què volen dir",img:"🧠",lines:[
       "**know** (saber, conèixer) · **need** (necessitar) · **want** (voler) · **prefer** (preferir)",
       "**believe** (creure) · **understand** (entendre) · **mean** (voler dir): What does \"crowd\" **mean**?",
       "Vlog words: a **livestream** (a live video) · **subscribers** (people who follow a channel) · **highlights**"]},

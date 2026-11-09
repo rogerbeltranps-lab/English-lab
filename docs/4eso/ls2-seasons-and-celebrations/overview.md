@@ -263,6 +263,9 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 - [S] **Places & travel:** travel home for the holidays; the town square; the community centre; the school hall; crowded streets
 - [D] **Change & debate:** commercialised; consumerism; keep a tradition alive; die out; evolve; adapt; reinvent; date back to; cultural appropriation; stereotype; inclusive; take something for granted
 - [S] **Verb + preposition:** contribute to; depend on; come from; be known for; be associated with (Safe since 31 Oct 2026: the programme gives verb + preposition to Safe and Daring)
+- [B] **Feelings, -ed = how you feel · -ing = what it is like** (all routes, 9 Nov 2026: the lexicon map plans "Sentiments i emocions (-ed / -ing)" in LS2): excited / exciting; bored / boring; tired / tiring
+- [I] **More feelings, -ed or -ing?:** interested (in) / interesting; amazed / amazing; disappointed / disappointing
+- [S] **Surprised or surprising?:** surprised / surprising
 - Receptive: pilgrims; feast; harvest festival
 
 ### Practice (80 %)
@@ -346,6 +349,17 @@ Two illustrated videos made for English Lab ("How I celebrate"), each with a slo
 20. ___ Halloween started in Europe, it is now very popular in the USA. → *Although / Even though*
 21. Many families love the feast. ___, some Native Americans see it as a day of mourning. → *On the other hand / However*
 22. Correct the mistake: *Diwali, that is celebrated in autumn, is known as the festival of lights.* → *which*
+
+**[B] Feelings: -ed or -ing?** (all routes, 9 Nov 2026; in Grammar because many students had already done the Vocabulary sentences; Grammar checked before 9 Nov 21:00 UTC is quietly cleared: to do again, old work does not count, redoBefore) *-ed* = how you feel (*I'm bored.*) · *-ing* = what the thing is like (*The speech is boring.*)
+
+23. [B] The children can't sleep: they are very ___ about the party. → *excited*
+24. [B] The speech was very long and ___. → *boring*
+25. [B] After dancing all night, we were very ___. → *tired*
+26. [I] The story behind Halloween is really ___. → *interesting*
+27. [I] We were ___ by the Diwali lights: we had never seen anything like them. → *amazed*
+28. [I] It rained all day, so the parade was ___. → *disappointing*
+29. [S] Many people are ___ to learn that the first jack-o'-lanterns were turnips. → *surprised*
+30. [S] I'm not very ___ in costumes, but I love the food. → *interested*
 
 ### Mixed practice (choose the form)
 

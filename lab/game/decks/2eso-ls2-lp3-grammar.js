@@ -7,7 +7,7 @@
 ELGameDeck({
   title:"Grammar · Present Simple or Present Continuous?",
   slides:[
-    {theory:"Usually or now?",img:"🔄",step:true,wide:true,lines:[
+    {theory:"Usually or now?",point:"Present Simple or Present Continuous?",pointCa:"Present Simple o Present Continuous?",img:"🔄",step:true,wide:true,lines:[
       {table:[["","Present Simple","Present Continuous"],["Use","habits, things that are always true","actions happening **now**"],["Form","I **play** · she **plays**","I**'m playing** · she**'s playing**"],["Time words","**usually**, always, never, every weekend, on Sundays, in winter","**now**, right now, at the moment, today, this weekend, Look!, Listen!"]]},
       "Mei **usually comes** to the ice rink on Sunday afternoons. **Right now** she**'s practising** her turns.",
       {watch:"Habit + now in one sentence: I **usually go** swimming, **but today** I**'m watching** a match."}],
@@ -17,7 +17,7 @@ ELGameDeck({
     {q:"Which time expression goes with the Present Continuous?",img:"⏱️",options:["at the moment","every weekend","usually","on Saturday mornings"],why:"**at the moment** = now. The others are habits."},
     {q:"In summer we ___ (swim) in the sea every day.",img:"🏖️",write:["swim"],why:"**every day** → a habit → **swim**."},
     {q:"I usually wear trainers, but today I ___ boots.",img:"👢",options:["am wearing","wear","wears","wearing"],why:"**but today** → now → **am wearing**."},
-    {theory:"Questions and negatives",img:"❓",step:true,wide:true,lines:[
+    {theory:"Questions and negatives",point:"Questions and negatives: do / does or am / is / are",pointCa:"Preguntes i negatives: do / does o am / is / are",img:"❓",step:true,wide:true,lines:[
       {table:[["","Present Simple (do / does)","Present Continuous (am / is / are)"],["Negative","Noah **doesn't ride** on Mondays.","Noah **isn't riding** today."],["Question","**Do** you **train** on Tuesdays?","What **are** you **doing**?"],["Short answer","Yes, I **do**. / No, she **doesn't**.","Yes, I **am**. / No, he **isn't**."]]},
       "**How often** do you go skating? — **Twice a week.**",
       {watch:"Don't mix them: ~~Do you watching~~ → **Are** you **watching**? · ~~Is she like~~ → **Does** she **like**?"}],
@@ -27,7 +27,7 @@ ELGameDeck({
     {q:"What ___ Kai doing at the moment? — He's falling!",img:"⛸️",options:["is","does","do","are"],why:"Now: What **is** Kai **doing**?"},
     {q:"Mei's dad ___ (not / go) skating in winter: it's too cold.",img:"🥶",write:["doesn't go","does not go"],why:"A habit, he → **doesn't go** (no -s after doesn't)."},
     {q:"Which question is correct?",img:"✅",options:["Are you watching the match now?","Do you watching the match now?","Are you watch the match now?","Do you are watching the match now?"],why:"Now → **Are** you **watching**…?"},
-    {theory:"State verbs: never -ing",img:"🧠",step:true,lines:[
+    {theory:"State verbs: never -ing",point:"State verbs (like, want, know…): never -ing",pointCa:"Verbs d'estat (like, want, know…): mai -ing",img:"🧠",step:true,lines:[
       "Some verbs are **states** (feelings, thoughts), not actions: **like, love, hate, want, need, know, prefer, understand, believe, mean**.",
       "We use them in the **Present Simple**, even for now: I **want** a new helmet now. **Do** you **understand**?",
       {watch:"~~I'm needing new gloves~~ → I **need** new gloves. · ~~Are you knowing~~ → **Do** you **know**?"},
@@ -37,7 +37,7 @@ ELGameDeck({
     {q:"She ___ (prefer) skating to cycling.",img:"⛸️",write:["prefers"],why:"**prefer** is a state verb: she prefer**s**."},
     {q:"Which sentence is correct?",img:"✅",options:["Do you know the rules of this game?","Are you knowing the rules of this game?","Do you knowing the rules of this game?","Are you know the rules of this game?"],why:"**know** is a state verb: **Do** you **know**…?"},
     {q:"I ___ (not / understand) this exercise. Can you help me?",img:"🤔",write:["don't understand","do not understand"],why:"**understand** is a state verb → **don't understand**."},
-    {theory:"Not only this second: temporary",img:"📆",step:true,lines:[
+    {theory:"Not only this second: temporary",point:"Present Continuous: temporary things and plans",pointCa:"Present Continuous: coses temporals i plans",img:"📆",step:true,lines:[
       "The Present Continuous is also for things that are true **for a short time**: **This month** I**'m training** for a race.",
       "My cousin **is staying** with us **this week**. (Usually she lives in Lleida.)",
       {watch:"Plans: **This weekend** we**'re going** to a concert. **Next week** I**'m racing** too."}],
