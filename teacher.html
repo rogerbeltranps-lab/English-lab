@@ -142,9 +142,6 @@ body.agdrag .agday:not(.off),body.agdrag .agl{outline:1px dashed #a5b4fc;outline
 .aglate{background:#fffbeb;border:1px solid #fcd34d;border-radius:16px;padding:10px 12px;margin:8px 0}.aglate h3{margin:0;color:#b45309;font-size:15px}.aglate p{margin:2px 0 8px;font-size:13px}
 details.agpast>summary{cursor:pointer;color:#3157d5;font-weight:700;margin:12px 0 4px}
 .tpc .agdays{grid-template-columns:1fr}
-.agboth{background:#fff;color:#334155;border:2px solid #cbd5e1}.agboth.on{background:#7c3aed;color:#fff;border-color:#7c3aed}
-.agbothn{background:#f5f3ff;border:1px solid #c4b5fd;color:#4c1d95;border-radius:12px;padding:6px 10px;margin:4px 0 10px;font-size:14px}
-.agsisd{font-size:12px;font-weight:700;color:#6d28d9;background:#ede9fe;border-radius:8px;padding:1px 6px;margin:2px 0 4px;align-self:flex-start;width:fit-content}
 /* 📋 Plan both groups side by side (Roger, 7 Nov 2026): the board fills the screen, side menu hidden */
 body.tp2on{max-width:none}body.tp2on .tshell{grid-template-columns:minmax(0,1fr)}body.tp2on #tabs,body.tp2on #mtbar,body.tp2on #classnow,body.tp2on #loadbar{display:none!important}
 .tp2bar{position:sticky;top:0;z-index:6;display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:rgba(248,250,252,.96);backdrop-filter:blur(8px);padding:6px 0 8px;border-bottom:1px solid #e2e8f0;margin-bottom:10px}.tp2bar b{font-size:1.05rem}.tp2bar .sp{flex:1}
@@ -2545,7 +2542,6 @@ const dayIts=(ag,d)=>[...((ag.days||{})[d]||[]).filter(it=>it!=="self"),...(ag.e
 // saves the agenda after fn(ag, ticks to write, on(day, item)) changed it, and keeps "ls|@day" = every item of the day ticked
 function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=seed.ag}else ag=JSON.parse(JSON.stringify(ag));
   const tk=Object.assign({},seed?seed.tick:{}),on=(d,it)=>{const k=itKey(d,it);return k in tk?tk[k]:tkOf(x)[x.ls+"|"+k]||false};
-  const old0=agBothOn(x,quiet)?JSON.parse(JSON.stringify(ag)):null;   // 🔗 both groups: what it was, to do the same in the other group
   if(fn&&fn(ag,tk,on)===false)return;
   Object.keys(ag.days).forEach(d=>{if(!ag.days[d].some(it=>it!=="self"))delete ag.days[d]});
   if(ag.min){Object.keys(ag.min).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1))||!(+ag.min[q]>0))delete ag.min[q]});if(!Object.keys(ag.min).length)delete ag.min}
@@ -2557,7 +2553,7 @@ function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=s
   const touched=new Set([...agDays(ag),...Object.keys(tkOf(x)).filter(k=>k.startsWith(x.ls+"|@")&&!k.includes("#")).map(k=>k.slice(x.ls.length+2))]);
   touched.forEach(d=>{const its=dayIts(ag,d),all=its.length>0&&its.every(it=>on(d,it)),cur=tkOf(x)[x.ls+"|@"+d];if(!!cur!==all)tk["@"+d]=all?ELWeek.today():false});
   if(Object.keys(tk).length)ps.push(api.ticks(x.gid,x.ls,tk));
-  if(quiet)return Promise.all(ps).catch(e=>console.warn("agenda",e));quick(ps);if(old0)agMirror(x,old0,ag)}
+  if(quiet)return Promise.all(ps).catch(e=>console.warn("agenda",e));quick(ps)}
 // the first time a group's Time plan opens: its agenda from the plan (one write; nothing happens on the students' side)
 const agEnsure=x=>{if(!agOf(x)&&x.p&&x.gi>=0&&AGOK(x.ls)&&S.D.tkOk)agSave(x,null,true);agPrune(x);agHwSync(x);return agOf(x)};
 // Homework tabs on their class day (Roger, 7 Nov 2026: "even if I said that they were homework they should appear there"): the tabs of a
@@ -2621,8 +2617,7 @@ function agOpenSync(x,its,to){const info=S.D.ls[x.ls]||{},ag=agOf(x)||{days:{}},
       else if(ids.length){const add=ids.filter(z=>!lk.includes(z)&&!left.includes(aid+"#"+z));if(add.length)ps.push(api.secLock(x.ls,gid,aid,[...lk,...add]))}}});
   if(open.join("|")!==was){ps.unshift(api.lpOpen(x.ls,gid,open));
     if(!DEMO){const i=S.D.ls[x.ls]=S.D.ls[x.ls]||{status:"hidden",enabled:[]},L=elLpLocks(x.ls,open);i.open=Object.assign({},i.open,{[gid]:open});i.locked=Object.assign({},i.locked,{[gid]:L.locked})}}   // on screen at once
-  if(ps.length)quick(ps);
-  if(agBothOn(x)){const sis=agSis(x);agMirOnce(()=>agOpenSync(planX(x.ls,sis.id),its,to?agSisDay(x.gid,sis.id,to)||to:to))}}
+  if(ps.length)quick(ps)}
 // ---- what the agenda shows
 const hwItems=x=>{const s=new Set(),t=ELWeek.today();Object.values(hwOf(x)||{}).forEach(h=>{if(!h||!h.by||h.by<ELWeek.add(t,-14))return;
   Object.entries((typeof elHwTargets==="function"?elHwTargets({kind:"hw",text:h.text,tabs:h.tabs},x.ls,x.p,x.gi):h.tabs)||{}).forEach(([id,ps])=>{const a=byId(id);if(!a)return;(ps&&ps.length?ps:secOf(a).map(z=>z[0])).forEach(p=>s.add(id+"#"+p));if(!secOf(a).length)s.add(id+"#")})});return s};
@@ -2712,7 +2707,6 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
   const l=Object.entries(((x.p._added||{})[x.gi])||{}).find(([,v])=>v.key==="@"+d),ri=l?x.p.rows.findIndex(r=>lines(x,r).includes(l[0])):-1;
   return `<div class="agday ${d===t?"today":""} ${past?"past":""} ${done?"done":""} ${late?"late":""} ${c?"cpt":""}" data-agdrop="${d}" ${D}>`
     +`<div class="agdh"><b>${esc(dayLab(d))}</b><small>${esc(slotOf(x.gid,d))}</small>${d===t?`<span class="agt">Today</span>`:""}${done?`<span class="agok">✓ Done</span>`:late?`<span class="agwarn">⚠ not ticked</span>`:""}</div>`
-    +`${agBothOn(x)?(v=>v?`<div class="agsisd" title="With 🔗 both groups on, what you do on this day is also done in ${esc(sis.name)} on this class">🔗 also ${esc(sis.name.replace(/\s?ESO\s?/i,""))} · ${esc(dayLab(v))} ${esc(slotOf(sis.id,v))}</div>`:"")(agSisDay(x.gid,sis.id,d)):""}`
     +(m=>{if(!m)return "";const L=+((window.EL_TIMETABLE||{}).len)||60;return `<div class="agtot agtotd ${m>L?"over":""}" title="Minutes you set on this day's items · the class lasts ${L} min">⏱ ${m} of ${L} min planned${m>L?` · ${m-L} too many`:m<L?` · ${L-m} free`:""}</div>`})(its.reduce((t,it)=>t+agMin(ag,d,it),0))
     +(self?`<div class="agself">📚 Self-study (you are away) <button type="button" class="agx" data-do="agself" data-d="${d}" ${D} title="You teach this class yourself">✕</button></div>`:"")
     +(isEx?`<div class="agg">${chip("exam","📝 Exam")}</div>`:"")+body
@@ -2790,10 +2784,7 @@ function agBars(x){const ag=agOf(x),dr=(x.p._dropped||{})[x.gi]||[],ok=it=>!dr.i
 // courses and their SLP and LP"). The group's 📅 Time plan stays as it is; 📋 opens a board with the course's groups side by side, each one its own
 // agenda (list of LPs and tabs + class days), all the Time plan rules unchanged. Drags stay inside their own group (data-gid). Side menu hidden.
 const tp2Pair=g=>GR.filter(x=>x.course===g.course);
-const tp2Btn=g=>{const pr=tp2Pair(g);if(pr.length<2)return "";const o=pr.find(z=>z.id!==g.id),on=!!S.agBoth&&!!agSis(planX(S.ls,g.id));
-  return `<div class="bar"><button data-do="tp2go" title="A board with ${esc(pr.map(x=>x.name).join(" and "))} side by side, full screen, to plan both at once">📋 Plan ${esc(pr.map(x=>x.name).join(" + "))} side by side</button>`
-    +`<button type="button" class="agboth ${on?"on":""}" data-do="agboth" aria-pressed="${on}" title="${on?"Click to plan "+esc(g.name)+" on its own again":"Everything you do here is also done in "+esc(o.name)+", on its matching class"}">🔗 ${esc(g.name)} + ${esc(o.name)} together: <b>${on?"ON":"OFF"}</b></button></div>`
-    +(on?`<p class="agbothn">🔗 <b>Both groups:</b> what you drag, move, take off, ⏱, 👤/👥, ✎ notes, ⏰ deadlines, 🏠 homework and the 📝 exam day also change in <b>${esc(o.name)}</b>, on its matching class (shown on each day). Ticks stay per group.</p>`:"")};
+const tp2Btn=g=>{const pr=tp2Pair(g);return pr.length>1?`<div class="bar"><button data-do="tp2go" title="A board with ${esc(pr.map(x=>x.name).join(" and "))} side by side, full screen, to plan both at once">📋 Plan ${esc(pr.map(x=>x.name).join(" + "))} side by side</button></div>`:""};
 function tp2Btns(){const by={};GR.forEach(g=>(by[g.course]=by[g.course]||[]).push(g));
   const b=Object.values(by).filter(gs=>gs.length>1).map(gs=>{const x=ELWeek.now(gs[0].id);return `<button data-do="tp2go" data-g="${gs[0].id}" ${x?`data-ls="${x.ls}"`:""} title="Open the planning board: ${esc(gs.map(g=>g.name).join(" and "))} side by side, full screen">📋 Plan ${esc(gs.map(g=>g.name).join(" + "))}</button>`}).join(" ");
   return b?`<div class="bar wkbar">${b}</div>`:""}
@@ -2846,8 +2837,7 @@ function agCpDlg(x,d,only){const ag=agOf(x),sis=agSis(x);if(!ag||!sis)return;
       return `<label><input type="checkbox" name="agcpi" value="${esc(it)}" checked> ${esc(lb)}</label>`}).join("")}</div>`
     +`<p><label>to ${esc(sis.name)}'s class on <select id="agcpd">${days.map(v=>`<option value="${v}" ${v===def?"selected":""}>${esc(ELWeek.date(v))} ${esc(slotOf(sis.id,v))}${there(v).length?" · has "+there(v).filter(i=>i!=="self").length+" item(s)":""}${v===def?" (matching class)":""}</option>`).join("")}</select></label></p>`
     +`<div class="row"><button data-do="agcpgo" data-d="${d}" data-sid="${sis.id}" data-gid="${x.gid}" data-ls="${x.ls}">⧉ Copy</button></div>`)}
-function agCpGo(x,d,its,sid,to){return agMirOnce(()=>agCpGo1(x,d,its,sid,to))}
-function agCpGo1(x,d,its,sid,to){const src=agOf(x);if(!src||!S.D.tkOk)return;const y=planX(x.ls,sid);if(!y.p||y.gi<0)return;
+function agCpGo(x,d,its,sid,to){const src=agOf(x);if(!src||!S.D.tkOk)return;const y=planX(x.ls,sid);if(!y.p||y.gi<0)return;
   const cur=agRuns(src,d).flatMap(g=>g.its),list=cur.filter(it=>its.includes(it)&&it!=="exam"&&it!=="self");if(!list.length)return;
   const add=list.filter(it=>!((agOf(y)||{days:{}}).days[to]||[]).includes(it));
   if(!add.length)return alert("It is already on that day.");
@@ -2857,35 +2847,6 @@ function agCpGo1(x,d,its,sid,to){const src=agOf(x);if(!src||!S.D.tkOk)return;con
   agOpenSync(y,add.filter(it=>/#/.test(it)&&!/^note:/.test(it)),to)}
 function agTick(x,d,it,v){const ag=agOf(x);if(!ag)return;const tk={[itKey(d,it)]:v?ELWeek.today():false},on=i=>i===it?v:!!tkOf(x)[x.ls+"|"+itKey(d,i)],its=dayIts(ag,d),all=its.length>0&&its.every(on);
   if(!!tkOf(x)[x.ls+"|@"+d]!==all)tk["@"+d]=all?ELWeek.today():false;quick(api.ticks(x.gid,x.ls,tk))}
-// 🔗 Plan both groups at once (Roger, 9 Nov 2026, in 4ESO B's Time plan: "even though I'm in 4B, I want to be able to press a button and do
-// 4A and 4B at the same time"): a switch next to 📋 side by side. While it is on, every change made in one group's 📅 Time plan is made in
-// the other group of the course too, on its matching class (the same class of the week, agSisDay): a learning path or tab dropped on a day,
-// moved, taken off or ⏭ sent to the next class, the order of a day, a tab out of its box, ⏱ minutes, 👤/👥, ✎ notes, ⏰ deadlines,
-// 🎬 shadowing, the 📝 exam day, 🏠 homework (that group's next class as its day) and opening or locking what was dropped. Ticks (done in
-// class) stay per group. Only in the 📅 Time plan (not on the 📋 side-by-side board, where both groups are there already, nor from other
-// pages) and never for the automatic writes (quiet).
-// The switch is remembered on this computer (el_agboth). What it does: the change in this group is compared with how it was (agMirror)
-// and the same change is applied to the other group's agenda in one write, so what was different there stays as it was.
-try{S.agBoth=localStorage.getItem("el_agboth")==="1"}catch(e){S.agBoth=false}
-const agBothOn=(x,quiet)=>!quiet&&!!S.agBoth&&!S.agMir&&S.place==="plan"&&!!agSis(x);
-function agMirOnce(f){const was=S.agMir;S.agMir=1;try{return f()}finally{S.agMir=was}}
-function agMirror(x,o,n){const sis=agSis(x);if(!sis)return;const y=planX(x.ls,sis.id),M=d=>agSisDay(x.gid,sis.id,d);
-  const od=o.days||{},nd=n.days||{},rem=[],add=[],ord=[],fs=[];
-  new Set([...Object.keys(od),...Object.keys(nd)]).forEach(d=>{const a=(od[d]||[]).filter(it=>it!=="self"),b=(nd[d]||[]).filter(it=>it!=="self");
-    a.filter(it=>!b.includes(it)).forEach(it=>rem.push([d,it]));b.filter(it=>!a.includes(it)).forEach(it=>add.push([d,it]));
-    const both=b.filter(it=>a.includes(it));if((n.man||{})[d]&&(!(o.man||{})[d]||both.join("\n")!==a.filter(it=>b.includes(it)).join("\n")||add.some(z=>z[0]===d)))ord.push(d)});
-  ["min","wk","solo"].forEach(f=>{const A=o[f]||{},B=n[f]||{};new Set([...Object.keys(A),...Object.keys(B)]).forEach(q=>{if(A[q]!==B[q]){const i=q.indexOf("|");fs.push([f,q.slice(0,i),q.slice(i+1),B[q]])}})});
-  const ex=n.exam&&n.exam!==o.exam?M(n.exam):null;
-  if(!rem.length&&!add.length&&!ord.length&&!fs.length&&!ex)return;
-  agMirOnce(()=>agSave(y,(g,tk,on)=>{
-    rem.forEach(([d,it])=>{const sd=M(d);if(sd&&!on(sd,it))rmIt(g,sd,it)});
-    add.forEach(([d,it])=>{const sd=M(d);if(!sd)return;
-      if(!/^note:/.test(it))Object.keys(g.days).forEach(d2=>{if(d2!==sd&&g.days[d2].includes(it)&&!on(d2,it))rmIt(g,d2,it)});   // moved there: it leaves the other day
-      addIt(g,sd,it)});
-    ord.forEach(d=>{const sd=M(d);if(!sd||!g.days[sd])return;const src=(nd[d]||[]).filter(it=>it!=="self"),cur=g.days[sd];
-      g.days[sd]=[...src.filter(it=>cur.includes(it)),...cur.filter(it=>!src.includes(it))];g.man=Object.assign({},g.man,{[sd]:1})});
-    fs.forEach(([f,d,it,v])=>{const sd=M(d);if(!sd)return;g[f]=Object.assign({},g[f]);if(v==null)delete g[f][sd+"|"+it];else g[f][sd+"|"+it]=v});
-    if(ex){const v=g.exam&&g.exam!==ex&&on(g.exam,"exam");if(v){tk[itKey(g.exam,"exam")]=false;tk[itKey(ex,"exam")]=v}g.exam=ex}}))}
 // drag and drop (a laptop or desktop: HTML drag events)
 let AGD=null;
 document.addEventListener("dragstart",e=>{const el=e.target.closest&&e.target.closest("[data-ag]");if(!el)return;AGD=Object.assign({},el.dataset);e.dataTransfer.effectAllowed=agNote(AGD)?"copyMove":"move";try{e.dataTransfer.setData("text/plain",el.dataset.ag)}catch(_){}setTimeout(()=>document.body.classList.add("agdrag"),0)});
@@ -3740,7 +3701,6 @@ function hwOpen(x,text,from,line,pre){const gid=x.gid,next=x.p.rows.flatMap(rr=>
     +`<label class="field">For the class on <input type="date" id="hw-by" value="${next}"></label>`
     +`<label class="field">📨 Message for students <small class="muted">(ready to copy to Classroom or email; they also see it on their board)</small> <select id="hw-lang"><option value="both">English + Català</option><option value="en">English</option><option value="ca">Català</option></select><br><textarea id="hw-msg" rows="12" style="width:100%;font-size:13px;font-weight:400"></textarea></label>`
     +`<label style="display:block;font-weight:400;margin:8px 0"><input type="checkbox" id="hw-mail" style="width:auto;margin-right:6px;vertical-align:middle"> ✉️ Also email this message to the students of ${esc((GR.find(g=>g.id===gid)||{}).name||gid)} <small class="muted">(school email, from your school account)</small></label>`
-    +(agBothOn(x)?`<p class="agbothn">🔗 Both groups is on: ${esc(agSis(x).name)} gets the same homework, by its matching class.</p>`:"")
     +`<div class="row"><button data-do="hwsave" data-gid="${gid}" data-ls="${x.ls}" data-set="${from}" data-line="${esc(line||"")}">Set as homework</button> <button class="g" data-do="hwcopy">📋 Copy the message</button> <span id="hw-copied" class="muted"></span></div>`);
   S.hwX={x,dirty:false,textDirty:false,base:text,tabs:{},pre:pre||null};hwTabs();hwFill()}
 // What the homework covers (Roger, 6 Nov 2026: "I can say that a LP is homework or only a section"), saved with it as tabs = {activity id:
@@ -3804,27 +3764,6 @@ document.addEventListener("click",e=>{if(!SV.open)return;const a=e.target.closes
   setTimeout(()=>{SV.open=false;fsDraw()},0)});   // 👁 Student view list closes on a tap outside it or once a student is opened
 document.addEventListener("input",e=>{if(e.target.id==="pe-day")peWarn()});
 document.addEventListener("change",e=>{if(e.target.classList.contains("petab"))e.target.closest("label").classList.toggle("on",e.target.checked)});
-// a tab's 🏠 switch on day d of group x (want: true on / false off / undefined switch): the writes to make, or null
-function agHw1(x,d,it,want){const i=it.indexOf("#"),a=byId(it.slice(0,i)),p=it.slice(i+1);if(!a)return null;
-      // one tab as homework for the next class (Roger, 7 Nov 2026: "I could say at the end of the class, this SLP is homework for next class"):
-      // like 🏠 Set as homework with only that tab and the next class of the group as its day; students see it in their Homework box
-      // a switch (Roger: "so there should be another switch to transform them as homework"): on again = off, the homework goes
-      const cur=hwNext(x,d,it);if(want!=null&&want===!!(cur||hwItems(x).has(it)))return [];if(cur)return [api.hw(x.ls,x.gid,cur[0],null)];
-      // part of a bigger homework (Roger, 7 Nov 2026: "this shouldn't be like this, I should be able to do it here"): the 🏠 takes only this tab
-      // off it, no alert; the homework keeps its other tabs (saved again under a new id, so the tab really goes) or goes if none is left
-      if(hwItems(x).has(it)){const ps=[],ids=[];Object.entries(hwOf(x)||{}).forEach(([id,h])=>{if(!h)return;
-          const tg=(typeof elHwTargets==="function"?elHwTargets({kind:"hw",text:h.text,tabs:h.tabs},x.ls,x.p,x.gi):h.tabs)||{},ts=tg[a.id];if(!ts)return;
-          const all=ts.length?ts:secOf(a).map(z=>z[0]);if(!all.includes(p))return;
-          const left=Object.assign({},tg,{[a.id]:all.filter(z=>z!==p)});if(!left[a.id].length)delete left[a.id];
-          ps.push(api.hw(x.ls,x.gid,id,null));if(!Object.keys(left).length)return;
-          const nm=itName(it),m=String(h.text||"").match(/^(.*?: )(.+)$/),its=m?m[2].split(/, | and /):[];
-          const text=m&&its.includes(nm)?m[1]+its.filter(z=>z!==nm).join(", "):h.text,nid="h"+Date.now().toString(36)+ids.length,o=Object.assign({},h,{text,tabs:left});delete o.at;
-          ids.push(nid);ps.push(api.hw(x.ls,x.gid,nid,o))});
-        if(ids.length&&agOf(x))agSave(x,g=>{g.hwIn=[...(g.hwIn||[]),...ids]},true);
-        return ps}
-      const by=nextClassDay(x,d);if(!by){alert("No later class in the timetable"+(want!=null?" for "+((GR.find(g=>g.id===x.gid)||{}).name||""):"")+".");return want!=null?[]:null}const text=agLab(x,a)+": "+itName(it),tabs={[a.id]:[p]};
-      if(S.agHw)S.agHw.delete(x.ls+"|"+x.gid);
-      return [api.hw(x.ls,x.gid,"h"+Date.now().toString(36)+(want!=null?"b":""),{text,by,set:d,tabs,next:true}),...hwUnlock(x.ls,x.gid,tabs)]}
 // ---- events
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
   ({tab:()=>{e.preventDefault();
@@ -3848,11 +3787,26 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       quick(api.planEdit(k.ls,k.gid,"nohw:"+k.line,k.v==="1"?{noHw:true,at:Date.now()}:null))},   // a plan's "Homework by …" line removed for this group (planEdits "nohw:<line>")
     pledit:()=>{e.preventDefault();peOpen(planX(k.ls,k.gid),+k.i,k.line)},
     agtick:()=>{e.stopPropagation();agTick(planX(k.ls,k.gid),k.d,k.it,t.checked)},
-    aghw1:()=>{e.preventDefault();e.stopPropagation();const x=planX(k.ls,k.gid),want=!(hwNext(x,k.d,k.it)||hwItems(x).has(k.it)),ps=agHw1(x,k.d,k.it);if(!ps)return;
-      // 🔗 both groups: the other group gets the same (on or off) on its matching class
-      if(agBothOn(x)){const sis=agSis(x),sd=agSisDay(x.gid,sis.id,k.d);if(sd)ps.push(...(agHw1(planX(x.ls,sis.id),sd,k.it,want)||[]))}
-      if(ps.length)act(Promise.all(ps))},
-    agboth:()=>{e.preventDefault();S.agBoth=!S.agBoth;try{localStorage.setItem("el_agboth",S.agBoth?"1":"0")}catch(_){}render()},
+    aghw1:()=>{e.preventDefault();e.stopPropagation();const x=planX(k.ls,k.gid),i=k.it.indexOf("#"),a=byId(k.it.slice(0,i)),p=k.it.slice(i+1);if(!a)return;
+      // one tab as homework for the next class (Roger, 7 Nov 2026: "I could say at the end of the class, this SLP is homework for next class"):
+      // like 🏠 Set as homework with only that tab and the next class of the group as its day; students see it in their Homework box
+      // a switch (Roger: "so there should be another switch to transform them as homework"): on again = off, the homework goes
+      const cur=hwNext(x,k.d,k.it);if(cur)return act(api.hw(x.ls,x.gid,cur[0],null));
+      // part of a bigger homework (Roger, 7 Nov 2026: "this shouldn't be like this, I should be able to do it here"): the 🏠 takes only this tab
+      // off it, no alert; the homework keeps its other tabs (saved again under a new id, so the tab really goes) or goes if none is left
+      if(hwItems(x).has(k.it)){const ps=[],ids=[];Object.entries(hwOf(x)||{}).forEach(([id,h])=>{if(!h)return;
+          const tg=(typeof elHwTargets==="function"?elHwTargets({kind:"hw",text:h.text,tabs:h.tabs},x.ls,x.p,x.gi):h.tabs)||{},ts=tg[a.id];if(!ts)return;
+          const all=ts.length?ts:secOf(a).map(z=>z[0]);if(!all.includes(p))return;
+          const left=Object.assign({},tg,{[a.id]:all.filter(z=>z!==p)});if(!left[a.id].length)delete left[a.id];
+          ps.push(api.hw(x.ls,x.gid,id,null));if(!Object.keys(left).length)return;
+          const nm=itName(k.it),m=String(h.text||"").match(/^(.*?: )(.+)$/),its=m?m[2].split(/, | and /):[];
+          const text=m&&its.includes(nm)?m[1]+its.filter(z=>z!==nm).join(", "):h.text,nid="h"+Date.now().toString(36)+ids.length,o=Object.assign({},h,{text,tabs:left});delete o.at;
+          ids.push(nid);ps.push(api.hw(x.ls,x.gid,nid,o))});
+        if(ids.length&&agOf(x))agSave(x,g=>{g.hwIn=[...(g.hwIn||[]),...ids]},true);
+        return ps.length?act(Promise.all(ps)):undefined}
+      const by=nextClassDay(x,k.d);if(!by)return alert("No later class in the timetable.");const text=agLab(x,a)+": "+itName(k.it),tabs={[a.id]:[p]};
+      if(S.agHw)S.agHw.delete(x.ls+"|"+x.gid);
+      act(Promise.all([api.hw(x.ls,x.gid,"h"+Date.now().toString(36),{text,by,set:k.d,tabs,next:true}),...hwUnlock(x.ls,x.gid,tabs)]))},
     agwk:()=>{e.preventDefault();e.stopPropagation();const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)return;
       const its=k.a?((ag.days||{})[k.d]||[]).filter(it=>it.split("#")[0]===k.a):[k.it],allG=its.every(it=>agG(ag,k.d,it));
       agSave(x,g=>{g.wk=g.wk||{};its.forEach(it=>{const q=k.d+"|"+it;if(allG)delete g.wk[q];else g.wk[q]="g"})})},
@@ -3912,15 +3866,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       if(mail){const ca=lang==="ca"?true:lang==="en"?false:null,day=ELWeek.date(by,ca?"ca":"en");
         mailNote(mailStudents(mailTo(Object.values(S.P).filter(s=>s.group===k.gid)),ca?"English Lab · Deures per al "+day:ca===false?"English Lab · Homework for "+day:"English Lab · Homework / Deures: "+day,(msg||text)+mailFoot(ca)),"Homework")}
       if(S.agHw)S.agHw.delete(k.ls+"|"+k.gid);   // its tabs go on their class day (agHwSync)
-      const ps=[api.hw(k.ls,k.gid,"h"+Date.now().toString(36),Object.assign({text,by,set:k.set},msg?{msg}:{},k.line?{line:k.line}:{},Object.keys(tabs).length?{tabs}:{})),...hwUnlock(k.ls,k.gid,tabs)];
-      // 🔗 both groups: the same homework for the other group, from its matching class to its matching class (and the email, if ticked)
-      const x=planX(k.ls,k.gid);if(agBothOn(x)){const sis=agSis(x),M=d=>agSisDay(k.gid,sis.id,d),set2=M(k.set),by2=M(by)||by;
-        if(set2&&by2>set2){if(S.agHw)S.agHw.delete(k.ls+"|"+sis.id);
-          const msg2=msg&&["en","ca"].reduce((t,l)=>t.split(ELWeek.date(by,l)).join(ELWeek.date(by2,l)),msg);
-          ps.push(api.hw(k.ls,sis.id,"h"+Date.now().toString(36)+"b",Object.assign({text,by:by2,set:set2},msg2?{msg:msg2}:{},Object.keys(tabs).length?{tabs}:{})),...hwUnlock(k.ls,sis.id,tabs));
-          if(mail){const ca=lang==="ca"?true:lang==="en"?false:null,day=ELWeek.date(by2,ca?"ca":"en");
-            mailNote(mailStudents(mailTo(Object.values(S.P).filter(s=>s.group===sis.id)),ca?"English Lab · Deures per al "+day:ca===false?"English Lab · Homework for "+day:"English Lab · Homework / Deures: "+day,(msg2||text)+mailFoot(ca)),"Homework")}}}
-      act(Promise.all(ps))},
+      act(Promise.all([api.hw(k.ls,k.gid,"h"+Date.now().toString(36),Object.assign({text,by,set:k.set},msg?{msg}:{},k.line?{line:k.line}:{},Object.keys(tabs).length?{tabs}:{})),...hwUnlock(k.ls,k.gid,tabs)]))},
     hwdel:()=>{if(!confirm("Remove this homework? Students will no longer see it."))return;act(api.hw(k.ls,k.gid,k.id,null))},
     mkopen:()=>mkPanel(k.a,k.s),mkcheck:()=>mkCheck(),mksave:()=>mkSave(),cpopen:()=>cpOpen(k.u,k.a,k.s),wrop:()=>wrOpen(k.u,k.a,k.s),wrback:()=>wrBack(k.u,k.a,k.s),wrmsg:()=>{const b=$("#wrback");if(b)b.value=k.v},cpok:()=>cpDone(true),cpback:()=>cpDone(false),   // not "cpredo": that name is the checkpoint's "Let them do it again" (Roger, 4 Nov 2026: Redo in class did nothing)
     
