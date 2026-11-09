@@ -813,6 +813,7 @@ function lpBox(ls,grp){
   const body=`<details class="how"><summary>ⓘ How it works</summary><p class="muted">${grp.name} can only do the open ones. A locked learning path shows “not open yet” on the student's board and page, and nothing is saved in it. Open each recall checkpoint together with the learning path after it (a locked checkpoint does not block the next one). Under “Sections” you can also open the tabs inside a learning path one by one as you teach (or with 🔓/🔒 on each tab of the learning path page, in teacher mode, and in the Time plan): students see a locked section read-only, with their saved answers. A section you have opened stays on the to-do list of every student who has not finished it, and they can still do it after you lock it again. It works while the LS is Open.${(info.status||"hidden")==="hidden"?` <b style="color:#dc2626">The LS is Hidden now, so students cannot open any of them: open the LS first (red box above).</b>`:""}${set?"":` <b>Not set for ${grp.name} yet:</b> practice activities are open and graded ones only if they were enabled before; your first click saves the list for this group.`}</p></details>`
     +`<table class="acts"><tr><th>Learning path</th><th>Sections</th><th>${grp.name}</th></tr>`+list.map(a=>{const on=elLpOpen(a,info,grp.id),secs=(window.EL_SECTIONS||{})[a.id]||[],off=elSecLocked(a,info,grp.id);
       const was=((((info.secOpened||{})[grp.id])||{})[a.id.replace("/","__")])||[];
+      if(a.optional)return `<tr><td>${esc(a.title)} ${a.criteria.map(pill).join("")} <small class="muted">(optional practice)</small></td><td style="text-align:left"><small class="muted">Every tab always open · never To do, homework, late or missing · not in any score</small></td><td><button type="button" class="tog yes" title="Always open for every group (Roger, 9 Nov 2026): students practise it when they want">✔ Always open</button></td></tr>`;
       const sec=secs.length?secs.map(([id,t])=>`<button class="sec ${off.includes(id)?"off":""}" data-do="sec" data-a="${a.id}" data-p="${id}" title="${off.includes(id)?(was.includes(id)&&elSecSteps(a,id).length?"Locked (opened before): read-only for students who finished it; students who have not finished it can still do it. Click to open it":"Locked: students see it read-only. Click to open it"):"Open: click to lock it"}">${off.includes(id)?"🔒":"✔"} ${esc(t)}</button>`).join("")
         +` <button class="secall" data-do="secset" data-a="${a.id}" data-v="1">open all</button><button class="secall" data-do="secset" data-a="${a.id}" data-v="0">lock all</button>`:'<small class="muted">–</small>';
       return `<tr><td>${esc(a.title)} ${a.criteria.map(pill).join("")}${a.checkpoint?' <small class="muted">(checkpoint)</small>':a.graded?"":' <small class="muted">(practice)</small>'}</td><td style="text-align:left">${sec}</td><td><button class="tog ${on?"yes":"no"}" data-do="lp" data-a="${a.id}">${on?"✔ Open":"🔒 Locked"}</button></td></tr>`}).join("")+`</table>`
@@ -3556,7 +3557,7 @@ function hwOpen(x,text,from,line,pre){const gid=x.gid,next=x.p.rows.flatMap(rr=>
 // [panel ids]} ([] = the whole learning path; elHwTargets): the tabs ticked in the dialog, else the tabs the text names, else all of it.
 // Students see ✔ Done / Open on it and 📝 on those tabs in their ✅ To do. Recall checkpoints never go home (noCp).
 function hwCover(h,text){const out={};if(!h)return out;
-  lineActs(h.x,text).filter(([a])=>!isCp(a)&&!a.manual).forEach(([a])=>{const tk=h.tabs[a.id]||[],said=text.split(" · ").filter(seg=>lineActs(h.x,seg).some(([b])=>b===a)).flatMap(seg=>namedTabs(a,seg).map(z=>z[0]));
+  lineActs(h.x,text).filter(([a])=>!isCp(a)&&!a.manual&&!a.optional).forEach(([a])=>{const tk=h.tabs[a.id]||[],said=text.split(" · ").filter(seg=>lineActs(h.x,seg).some(([b])=>b===a)).flatMap(seg=>namedTabs(a,seg).map(z=>z[0]));
     out[a.id]=tk.length?tk:[...new Set(said)]});return out}
 // Homework must be doable: a learning path or tab still locked for the group opens when it is set as homework (like 🎓 Class mode).
 function hwUnlock(ls,gid,tabs){const info=S.D.ls[ls]||{},ps=[];let open=acts(ls).filter(x=>elLpOpen(x,info,gid)).map(x=>x.id);
@@ -3565,8 +3566,8 @@ function hwUnlock(ls,gid,tabs){const info=S.D.ls[ls]||{},ps=[];let open=acts(ls)
     const lk=elSecLocked(a,info,gid),keep=ids.length?lk.filter(z=>!ids.includes(z)):[];if(keep.length!==lk.length)ps.push(api.secLock(ls,gid,aid,keep))});
   if(open.some(id=>!elLpOpen(byId(id),info,gid)))ps.unshift(api.lpOpen(ls,gid,open));return ps}
 // the activities of the homework text that have tabs: [[activity, label]]; from the table, the learning path even before the text names it
-const hwActs=h=>{const as=lineActs(h.x,$("#hw-text").value).filter(([a])=>((window.EL_SECTIONS||{})[a.id]||[]).length);
-  if(h.pre&&!as.some(([a])=>a.id===h.pre)){const a=cat.find(y=>y.id===h.pre);if(a&&(EL_SECTIONS[a.id]||[]).length&&!h.textDirty)as.unshift([a,a.title])}return as};
+const hwActs=h=>{const as=lineActs(h.x,$("#hw-text").value).filter(([a])=>!a.optional&&((window.EL_SECTIONS||{})[a.id]||[]).length);   // optional practice (the sample exam) is never homework
+  if(h.pre&&!as.some(([a])=>a.id===h.pre)){const a=cat.find(y=>y.id===h.pre);if(a&&!a.optional&&(EL_SECTIONS[a.id]||[]).length&&!h.textDirty)as.unshift([a,a.title])}return as};
 function hwTabs(){const h=S.hwX,el=$("#hw-tabs");if(!h||!el)return;const as=hwActs(h);
   el.innerHTML=as.length?`<div class="field">Which tabs? <small class="muted">(tick the tabs they do at home; none ticked = what the text says)</small>`+as.map(([a,lab])=>{const on=h.tabs[a.id]||[];
     return `<div class="hwtabs"><b>${esc(/^LP\d/.test(lab)?lab+" · "+a.title.split(/[:(]/)[0].trim():a.title.split(/[:(]/)[0].trim())}</b> `
@@ -3820,8 +3821,14 @@ const toProbs=async id=>{if(!S.D)return;try{await api.pbLoad()}catch(e){console.
 addEventListener("el-probs",e=>toProbs(e.detail));
 const hashPb=()=>{const h=location.hash;return h==="#probs"?"":h.startsWith("#pb-")?decodeURIComponent(h.slice(4)):null};
 // While the data comes in, the page says so (it used to stay blank under "Hello"); if a read fails, it says that too, with a Try again button.
+// Optional practice is never locked (elLpLocks; Roger, 9 Nov 2026: the sample exam always open): a group whose saved ls/{id}.locked list
+// still holds one (saved before) is written again once, so firestore.rules let students save their answers in it.
+function optHeal(D){if(DEMO||!D||!D.ls)return;const ps=[];
+  Object.entries(D.ls).forEach(([ls,info])=>Object.entries((info&&info.locked)||{}).forEach(([g,ids])=>{
+    if(!Array.isArray(ids)||!ids.some(id=>elOptional(byId(id))))return;const op=(info.open||{})[g];ps.push(api.lpOpen(ls,g,Array.isArray(op)?op:[]))}));
+  if(ps.length)Promise.all(ps).catch(e=>console.warn("optHeal",e))}
 const start=async(hello)=>{$("#app").hidden=false;$("#msg").textContent=hello;if(!S.D)$("#main").innerHTML='<p class="muted" id="loading">⏳ Loading your groups and students…</p>';
-  try{S.D=await load();ttApply(S.D)}catch(e){console.warn("load",e);if(!S.D){$("#main").innerHTML='<p><b>The dashboard could not load.</b> Check the connection and try again.</p><p><button id="retry">Try again</button></p>';$("#retry").onclick=()=>start(hello)}return}
+  try{S.D=await load();ttApply(S.D);optHeal(S.D)}catch(e){console.warn("load",e);if(!S.D){$("#main").innerHTML='<p><b>The dashboard could not load.</b> Check the connection and try again.</p><p><button id="retry">Try again</button></p>';$("#retry").onclick=()=>start(hello)}return}
   // the first time: during a class, open on its group, unless a link asked for a group, course or LS (then the bar asks)
   TOUCHED.clear();
   if(!CLS.ready){CLS.ready=true;const c=classNow();if(c&&CLS.done!==c.key&&!CLS.link&&S.g!==c.gid&&GR.some(g=>g.id===c.gid)){classGo(c);if(hashPb()!=null)toProbs(hashPb());return}}

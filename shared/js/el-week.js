@@ -11,7 +11,10 @@
   const span=p=>{const fs=((p&&p.rows)||[]).map(r=>r.from).filter(Boolean).sort();return fs.length?[fs[0],add(fs[fs.length-1],6)]:null};
   // column of a group (EL_GROUPS id or name) in a plan; -1 if the plan is not for that group
   const col=(p,gid)=>{const g=(window.EL_GROUPS||[]).find(x=>x.id===gid||x.name===gid);return g&&p&&p.groups?p.groups.findIndex(x=>key(x)===key(g.name)):-1};
-  const due=(p,id,gi)=>p&&p.due&&p.due[id]&&p.due[id][gi]||null;
+  // an optional activity (EL_CATALOG optional: the sample exam) has no due day for students or the bonus: never late, never missing, never
+  // "to do by" (Roger, 9 Nov 2026: "I don't want [it] to appear as homework … not counting it as homework, to do in class, not done")
+  const opt=id=>(window.EL_CATALOG||[]).some(a=>a.id===id&&a.optional);
+  const due=(p,id,gi)=>p&&p.due&&p.due[id]&&p.due[id][gi]&&!opt(id)?p.due[id][gi]:null;
   const DAYS={en:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],ca:["dg.","dl.","dt.","dc.","dj.","dv.","ds."]};
   const MON={en:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],ca:["gen.","febr.","març","abr.","maig","juny","jul.","ag.","set.","oct.","nov.","des."]};
   const L=lang=>lang==="ca"?"ca":"en";

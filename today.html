@@ -368,7 +368,7 @@ function homeSub(g,ls){const {p,gi}=planOf(ls),ex=gi>=0?ELWeek.exam(p,gi):null,n
 function nextFor(ls,info){if(only(ls.id)||info.status==="closed")return null;
   const {p,gi}=planOf(ls),dr=(gi>=0&&(p._dropped||{})[gi])||[],today=ELWeek.today(),dueOf=a=>gi>=0?ELWeek.due(p,a.id,gi):null;
   const rows=EL_CATALOG.filter(a=>a.ls===ls.id).map((a,i)=>({a,i,d:dueOf(a)})).sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i);
-  for(const {a,d} of rows){if(a.manual||dr.includes(a.id)||!canDo(a,info)||isDone(a))continue;
+  for(const {a,d} of rows){if(a.manual||a.optional||dr.includes(a.id)||!canDo(a,info)||isDone(a))continue;   // optional practice (the sample exam) is never the next step
     const cp=!TX&&elCheckpointMissing(a,doneSet,y=>canDo(y,info));if(cp)return {a:cp,cp:true};
     const ds=doneSet(a),ks=visSteps(a,info),k=ks.find(x=>!ds.has(x)&&!(a.skip||[]).includes(x)&&!secOff(a,info,x));if(k===undefined)continue;
     const gs=tabGroups(a,ks);return {a,k,nm:tabName(a.id,k),done:gs.filter(g=>g.every(x=>ds.has(x))).length,total:gs.length,late:!!(d&&d<today)}}
@@ -1307,13 +1307,13 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     const done=!a.manual&&isDone(a),x=D.rs[a.id]||{},late=!a.manual&&!done&&can&&!drop&&d&&d<today&&!steps(a).some(k=>secOff(a,info,k)),go=can&&!drop&&!done&&!a.manual&&open;
     // the chips above the table count TABS (activities), not learning paths (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!")
     const tabs=tabGroups(a,steps(a)).map(g=>{const k=g.find(x=>!ds.has(x))||g[g.length-1],sk=g.every(x=>(a.skip||[]).includes(x)),sd=stepDue(a,k),nm=tabName(a.id,k),off=secOff(a,info,k);
-      const cnt=f=>{if(!a.manual&&!sk)n[f]++};
+      const cnt=f=>{if(!a.manual&&!sk&&!a.optional)n[f]++};   // optional practice (the sample exam) is never counted as done, missing or to do
       if(g.every(x=>ds.has(x))){cnt("done");const w=g.map(x=>at[x]?ymd(at[x]):"").sort().pop()||"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}">✔ ${esc(nm)}</span>`}
       if(!g.some(x=>vis.includes(x)))return "";
       if(can&&!drop&&g.some(x=>soonK(a,info,x))){cnt("off");const sd2=soonOf(a,info)[panelOf(a,g[0])];
         return `<span class="stp cls" title="${esc(nm)}: ${t("per fer a classe","to do in class")}${sd2?" · "+when(sd2):""}">🏫 ${esc(nm)}${sd2?` <small>· ${when(sd2)}</small>`:""}</span>`}
       const past=!sk&&can&&!drop&&sd&&sd<today,ln=go&&!off;cnt(drop||!can||off?"off":past?"miss":"todo");
-      if(ln&&!sk&&!next)next={a,k,nm,past};
+      if(ln&&!sk&&!next&&!a.optional)next={a,k,nm,past};
       const tip=`${esc(nm)}: ${t("no fet","not done")}${sk?t(" (sense punts)"," (no points)"):""}${off?t(" (encara no està oberta)"," (not open yet)"):""}${sd&&(TX||past)?" · "+t("fins al","by")+" "+sd:""}${ln?" · "+t("clica per obrir-la","click to open it"):""}`;
       const lbl=`${off?"🔒":past?"✗":"·"} ${esc(nm)}`;
       return ln?`<a class="stp go2 ${past?"no":""}" href="${tabHref(a,k)}" title="${tip}">${lbl} →</a>`:`<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${tip}">${lbl}</span>`}).join("");
@@ -1325,6 +1325,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     else if(!can&&!TX){st=`<span class="s-off">${t("Fet en part","Partly done")}</span>`}   // students: one they did some of and can't open now, no lock
     else if(cp){st=`<span class="s-off">🔒 ${t(`Primer fes ${esc(cp.title)}`,`First do ${esc(cp.title)}`)}</span>`}
     else if(!can){st=`<span class="s-off">🔒 ${t("Encara no està oberta","Not open yet")}</span>`}
+    else if(a.optional){st=`<span class="s-ok" style="color:#0e7490">💪 ${t("Opcional · per practicar l'examen","Optional · exam practice")}</span>`}
     else if(late){st=`<span class="s-no">⏰ ${t("Falta · calia fer-la el","Missing · was due")} ${when(d)}</span>`}
     else{const h=hwOf(a);st=h?`<span class="s-td">📝 ${t("Deures per al","Homework by")} ${when(h.x.date)}</span>`:`<span class="s-td">🏫 ${t("Per fer a classe","To do in class")}</span>`;
       if(TX&&d&&!h)st+=`<br><small class="muted">plan: ${when(d)} (students don't see this date)</small>`}
