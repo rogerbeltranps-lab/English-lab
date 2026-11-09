@@ -22,7 +22,20 @@ const gameOn=()=>!!(x&&x.game&&x.on&&fresh(x.at));
 const score=()=>Object.entries((x&&x.keys)||{}).filter(([i,ok])=>Array.isArray(ok)?G.right(mine[i],ok):mine[i]===ok).length;
 const first=()=>((user&&user.displayName)||"").split(" ")[0]||(user&&user.email||"").split("@")[0];
 
-const top=()=>`<div class="top">${!gameOn()||x.phase==="end"?`<a class="btn go" href="${esc(FROM)}">← Back</a>`:""}<span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>${user?`<span class="pill" title="${esc(user.email)}">👤 ${esc(first())}</span>`:""}
+// 🎓 Back to the class only when the teacher says so (Roger, 9 Nov 2026: "students when they get out of the game [...] should only be able
+// to go to the class where they had been pulled up and when I say so"). While the group is in class mode (live/{group}.go, el-cloud.js
+// cmTeacher) the player has no ← Back: at the end of the game they stay here, in full screen, with "Your teacher will take you back to
+// the class", until the teacher's 🎓 Back to class mode on the board (live/{group}.cmBack, host.js) or the class tab moving on after
+// the game (go.at): then they go to the class page by themselves. The student pages send a student who was in the game and left it
+// before that back here (el-cloud.js gamePush, localStorage el_game_in). It ends with the class mode (⏹ Stop or the end of the class).
+const cmOn=()=>{const g=x&&x.go;return !!(g&&g.cm&&g.u&&g.at&&g.lock&&Date.now()<(g.until||g.at+70*60e3))};
+const playing=()=>gameOn()&&x.phase!=="end";
+const cmFree=()=>cmOn()&&(+x.cmBack||0)>(+x.sid||0)||cmOn()&&!playing()&&+x.go.at>(+x.sid||0);
+let cmGone=false;
+function cmBack(){if(cmGone||!cmFree())return;cmGone=true;try{localStorage.removeItem("el_game_in")}catch(e){}
+  const u=new URL("../../"+x.go.u,location.href);u.hash=x.go.p||"";
+  bye=true;Promise.resolve(saveNotes()).finally(()=>location.replace(u.href))}
+const top=()=>`<div class="top">${(!gameOn()||x.phase==="end")&&!cmOn()?`<a class="btn go" href="${esc(FROM)}">← Back</a>`:""}<span class="pill">🎮 ${esc(x&&gameOn()?x.title:"Class game")}</span>${x&&gameOn()&&x.qt?`<span class="pill">✓ ${score()}</span>`:""}<span class="sp"></span>${user?`<span class="pill" title="${esc(user.email)}">👤 ${esc(first())}</span>`:""}
   <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`;
 const page=(h,cls)=>{app$.innerHTML=top()+`<div class="main"><div class="center ${cls||""}"><div>${h}</div></div></div>`};
 
@@ -30,7 +43,9 @@ function draw(){
   if(!user)return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>Sign in with your school email and password to join the game.<br><span class="note">Entra amb el correu de l'institut i la contrasenya.</span></p><p><button class="btn go" data-do="signin">Sign in · Entra</button></p></div>`);
   if(TEACHERS.includes((user.email||"").toLowerCase()))return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>This is the students' screen. The game starts from the board.</p><p><a class="btn go" href="host.html">Open the board</a></p></div>`);
   if(!group)return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>You are not on a class list yet. Ask your teacher.</p></div>`);
-  if(!gameOn())return page(`<div class="emo pop">⏳</div><p class="big">${x&&x.game&&x.phase==="end"?"The game is over":"Waiting for your teacher…"}</p><p class="mid">The game opens here by itself.</p>`);
+  if(cmFree()){cmBack();return page(`<div class="emo pop">🎓</div><p class="big">${esc(T("Back to the class…","Tornem a la classe…"))}</p>`)}
+  const cmWait=cmOn()?`<p class="mid">🎓 ${esc(T("Stay here: your teacher will take you back to the class.","Queda't aquí: el professor et tornarà a la classe."))}</p>`:"";
+  if(!gameOn())return page(`<div class="emo pop">⏳</div><p class="big">${x&&x.game&&x.phase==="end"?"The game is over":"Waiting for your teacher…"}</p>${cmWait||'<p class="mid">The game opens here by itself.</p>'}`);
   const ph=x.phase,i=String(x.i),q=x.q||{},n=(q.opts||[]).length;
   if(NT.dirty&&!(ph==="notes"&&x.sid+":"+i===NT.k))saveNotes();   // the teacher went on: what they wrote is saved
   if(ph==="notes")return notesView();
@@ -38,7 +53,7 @@ function draw(){
   if(ph==="theory")return page(`<div class="emo pop">${pic(x.th&&x.th.img)||"👀"}</div><p class="big">Look at the board</p><p class="mid">${md(x.th&&x.th.title)}</p>`);
   if(ph==="end"){const s=score(),t=x.qt||0;
     if(shown!==x.sid+":end"){shown=x.sid+":end";G.fx("fanfare");if(s>0)G.confetti()}
-    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p>`)}
+    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p>${typeof x.cp==="number"?G.ring(x.cp,"👥 "+T("The class got right","La classe ha encertat"),"min(26vh,190px)"):""}${cmWait}`)}
   if(ph==="q"&&q.write&&mine[i]==null){const k=x.sid+":"+i,v=draft.k===k?draft.v:"";
     app$.innerHTML=top()+`<div class="main"><div class="card qcard slidein">${md(q.text)}</div>
       <form class="wform slidein" data-k="${esc(k)}"><label for="wa">✏️ Write the missing words <span class="note">Escriu només les paraules que falten</span></label>
@@ -142,7 +157,7 @@ async function join(){
     if(d.exists()&&d.data().sid===sid)mine=Object.assign({},d.data().a);
     else{mine={};await S.setDoc(ref,{sid,a:{},at:S.serverTimestamp()})}
   }catch(e){console.warn("join",e);mine={}}
-  if(join.busy===sid){mySid=sid;draw()}
+  if(join.busy===sid){mySid=sid;try{localStorage.setItem("el_game_in",String(sid))}catch(e){}draw()}
 }
 
 A.onAuthStateChanged(auth,async u=>{
@@ -171,7 +186,7 @@ const fsOnG=f=>!!(f&&f.on&&f.at&&Date.now()<(f.until||f.at+70*60e3));
 const pullKey=()=>fsOnG(x&&x.fs)?x.fs.at:x&&x.sid;
 const ss=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}};
 let fsWas=false,bye=false;addEventListener("beforeunload",()=>{bye=true});addEventListener("pagehide",()=>{bye=true});   // ← Back: not leaving
-const fsWanted=()=>!!(user&&group&&!isT()&&gameOn()&&x.phase!=="end"&&fsCan());
+const fsWanted=()=>!!(user&&group&&!isT()&&fsCan()&&(gameOn()&&x.phase!=="end"||cmOn()));   // in class mode it stays on after the game too
 function fsLeft(){const pk=pullKey();if(!pk)return;const k="el_fs_"+pk+"_n",n=(+ss(k)||0)+1;ss(k,String(n));
   S.setDoc(S.doc(db,"live",group,"fsLeft",(user.email||"").toLowerCase()),{name:user.displayName||user.email||"",at:S.serverTimestamp(),pull:pk,n},{merge:true}).catch(e=>console.warn("full screen",e))}
 function fsGo(){try{const lk=()=>{try{if(navigator.keyboard&&navigator.keyboard.lock)navigator.keyboard.lock(["Escape"]).catch(()=>{})}catch(e){}},

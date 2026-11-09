@@ -107,5 +107,9 @@ function bg(){const d=document.createElement("div");d.className="bgfx";d.setAttr
   d.innerHTML=Array.from({length:14},(_,i)=>`<i style="left:${(i*7.3+3)%100}%;width:${40+(i*17)%70}px;height:${40+(i*17)%70}px;animation-duration:${14+(i*5)%16}s;animation-delay:-${(i*3.7)%18}s"></i>`).join("");
   document.body.prepend(d)}
 
-window.ELGame={esc,md,pic,norm,right,shuffle,music,fx,sound,confetti,bg};
+// 👥 The class's % right as a big ring (Roger, 9 Nov 2026: "with a big circle that changes colours according to the proximity to the 100"):
+// the ring fills to the % and its colour goes from red (0) through orange and yellow to green (100). Board and player end screens.
+function ring(pct,label,size){const p=Math.max(0,Math.min(100,Math.round(+pct||0))),c=`hsl(${Math.round(p<50?p*.6:30+(p-50)*2)} 85% 50%)`;
+  return `<div class="cring pop" style="--p:${p};--c:${c};--s:${size||"200px"}"><div class="in"><b>${p}<small>%</small></b>${label?`<span>${esc(label)}</span>`:""}</div></div>`}
+window.ELGame={esc,md,pic,norm,right,shuffle,music,fx,sound,confetti,bg,ring};
 })();

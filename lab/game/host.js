@@ -29,7 +29,31 @@ const BACK=(()=>{
   let b=lp(URLP.get("from")||"")||(fromDash?"":lp(document.referrer));
   try{if(b||fromDash)sessionStorage.setItem("elGameBack",b);else b=sessionStorage.getItem("elGameBack")||""}catch(e){}
   return b})();
-const backBtn=()=>BACK?`<a class="btn ghost" href="${esc(BACK)}">← Learning Path</a> `:"";
+const backBtn=()=>cmGroup()?cmBtn()+" ":BACK?`<a class="btn ghost" href="${esc(BACK)}">← Learning Path</a> `:"";
+// 🎓 Back to class mode (Roger, 9 Nov 2026: "when we play a game I should be able to go to the class mode where I came from and students
+// [...] should only be able to go to the class where they had been pulled up and when I say so"). The class tab (el-cloud.js cmTeacher,
+// sessionStorage el_cm) opens the game in itself (📋 Today, el-cm-agenda.js; a game button on a learning path page): this board then
+// shows 🎓 Back to class mode, which ends the game (results saved), writes live/{group}.cmBack = now (the students waiting in the player
+// go back to the class page, play.js) and takes this tab back to the page and tab it came from, still in class mode (el_cm_last).
+// A board opened in another tab while the group is in class mode (live/{group}.go, read once when the game starts) gets the button too:
+// it sends the students back and closes this tab (or goes to the class page if the browser keeps it open).
+const CMT=(()=>{try{const o=JSON.parse(sessionStorage.getItem("el_cm")||"null");return o&&o.g&&Date.now()<o.until?o:null}catch(e){return null}})();
+let CMG=null,CMGg="",cmArm=0,cmBusy=false;
+const cmGroup=()=>CMT?CMT.g:CMGg&&window.elCmOn&&elCmOn(CMG)?CMGg:"";
+function cmHome(){let x=null;if(CMT){try{x=JSON.parse(sessionStorage.getItem("el_cm_last")||"null")}catch(e){}}else x=CMG;
+  if(!x||!x.u)return new URL(BACK||"../../teacher.html",location.href).href;
+  const u=new URL("../../"+x.u,location.href);u.hash=x.p||"";return u.href}
+const cmPlaying=()=>!!(H.sid&&H.phase!=="end");
+const cmBtn=()=>cmGroup()?`<button class="btn cm" data-do="cmback" title="End the game and take ${esc(groupName(cmGroup()))} back to the class page with you">${cmBusy?"Going back…":cmPlaying()&&Date.now()-cmArm<3000?"Tap again: end the game and go back":"🎓 Back to class mode"}</button>`:"";
+async function backToClass(){const g=cmGroup();if(!g||cmBusy)return;cmBusy=true;draw();
+  const was=H.g,sid=H.sid;
+  if(sid){try{await saveResults()}catch(e){console.warn("results",e)}if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
+    Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{}});keep()}
+  const w={cmBack:Date.now()};if(sid&&was===g)Object.assign(w,{on:false,at:S.serverTimestamp()});
+  try{await S.setDoc(S.doc(db,"live",g),w,{merge:true});if(sid&&was&&was!==g)await S.setDoc(S.doc(db,"live",was),{on:false,at:S.serverTimestamp()},{merge:true})}
+  catch(e){cmBusy=false;H.err="⚠ The students were not sent back: "+e.message;draw();return}
+  const to=cmHome();if(CMT){location.href=to;return}
+  try{window.close()}catch(e){}setTimeout(()=>{location.href=to},400)}
 const tab={get(){try{return JSON.parse(sessionStorage.getItem("elGame")||"null")}catch(e){return null}},set(v){try{sessionStorage.setItem("elGame",JSON.stringify(v))}catch(e){}}};
 
 // H: the game on this board. deckId, deck (the deck file's content), g (group), sid (this game: the time it started), i (slide; -1 lobby),
@@ -104,7 +128,9 @@ function live(){
   }
   // only the game's own fields: a pull-up (go) and the group's full screen (fs) stay as they are (Roger, 6 Nov 2026), so after the game
   // the students are kept and in full screen again; a field the slide does not use (q, th, ok, nt) is removed
-  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D,nt:D},base);
+  // the end: the class's % right, as on the board's 🏁 Well done!, also on the students' screens (Roger, 9 Nov 2026: "I want the percentage of the class at the end too")
+  if(H.phase==="end"){const P=Object.keys(H.players),tot=P.length*qs.length,right=P.reduce((t,em)=>t+Object.values(H.aw).filter(l=>l.includes(em)).length,0);if(tot)base.cp=Math.round(right/tot*100)}
+  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D,nt:D,cp:D},base);
   S.setDoc(S.doc(db,"live",H.g),data,{mergeFields:Object.keys(data)}).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()});
 }
 function liveOff(g){if(g)S.setDoc(S.doc(db,"live",g),{on:false,at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}
@@ -112,6 +138,7 @@ addEventListener("pagehide",()=>{if(H.g&&H.sid&&H.teacher)liveOff(H.g)});   // a
 
 async function startGroup(){
   const g=H.g;H.err="";H.players={};
+  if(!CMT)S.getDoc(S.doc(db,"live",g)).then(d=>{CMG=d.exists()&&d.data().go||null;CMGg=g;if(cmGroup())draw()}).catch(e=>console.warn("class mode",e));
   try{
     const [ro,pt]=await Promise.all([S.getDocs(S.query(S.collection(db,"roster"),S.where("group","==",g))),S.getDocs(S.collection(db,"points"))]);
     const names={},keys=new Set();
@@ -274,7 +301,7 @@ const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1,s0=cur();
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}
   ${H.phase==="show"&&s0&&!isQ(s0)&&s0.ca?`<button class="btn ghost${caOn()?" on":""}" data-do="ca" title="Catalan help on this slide (C)">CA</button>`:""}
   <button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
-  <button class="btn ghost" data-do="end" title="End the game for everyone">${Date.now()-endArm<3000?"Tap again to end":"■ End"}</button>${strip}</div>`};
+  ${H.phase!=="end"?cmBtn():""}<button class="btn ghost" data-do="end" title="End the game for everyone">${Date.now()-endArm<3000?"Tap again to end":"■ End"}</button>${strip}</div>`};
 // one block of a theory slide: text, a table {table} or a warning {watch} (also the small copy on the notes slide)
 function blockHtml(l,hid,fresh){
   if(l&&l.table){const [h,...r]=l.table;return `<table class="tt${fresh}"${hid}><thead><tr>${h.map(c=>`<th>${md(c)}</th>`).join("")}</tr></thead><tbody>${r.map(x=>`<tr>${x.map(c=>`<td>${md(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
@@ -312,7 +339,7 @@ function draw(){
     const rank=P.map(em=>({em,n:score(em)})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n||nameOf(a.em).localeCompare(nameOf(b.em))).slice(0,3);
     const tot=P.length*qs,right=P.reduce((t,em)=>t+score(em),0),pod=[rank[1],rank[0],rank[2]],cls=["p2","p1","p3"],medal=["🥈","🥇","🥉"];
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
-      <h1 class="logo pop">🏁 Well done!</h1><p class="sub">${tot?`The class got <b>${Math.round(right/tot*100)} %</b> right.`:""} Every right answer is +1 point.</p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap">${tot?G.ring(right/tot*100,"the class got right","170px"):""}<div style="flex:0 1 auto"><h1 class="logo pop" style="margin:0">🏁 Well done!</h1><p class="sub">Every right answer is +1 point.</p></div></div>
       ${rank.length?"":`<p class="card msg" style="margin:1em auto">No right answers this time. Next time!</p>`}<div class="podium"${rank.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm">${esc(nameOf(x.em))}<br><span class="sc">${x.n} right</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
       <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a> ${backBtn()}</p></div></div></div>`;return}
   if(!isQ(s)&&!isN(s)){
@@ -370,6 +397,7 @@ app$.addEventListener("click",async e=>{
   if(d==="who"){WHO.open=!WHO.open;drawTop()}
   if(d==="end"){if(Date.now()-endArm<3000)endGame();else{endArm=Date.now();b.textContent="Tap again to end";setTimeout(()=>{if(b.isConnected)b.textContent="■ End"},3000)}}
   if(d==="finish")endGame();
+  if(d==="cmback"){if(cmPlaying()&&Date.now()-cmArm>=3000){cmArm=Date.now();draw();setTimeout(()=>{if(Date.now()-cmArm>=3000)draw()},3100)}else backToClass()}
   if(d==="again"){const g=H.g;startGame(g)}
 });
 
