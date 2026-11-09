@@ -3715,7 +3715,10 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
       +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
       +`<div class="row" style="justify-content:flex-start;gap:6px"><button data-fpg="ok" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✅ Approve: use it and save</button></div>`
       +`<label>Not right? Tell Gemini what to change</label><textarea id="fpgchg" rows="2" placeholder="e.g. She doesn't read, she only looks at the slides; Language should be Level 3"></textarea>`
-      +`<div class="row" style="justify-content:flex-start"><button class="g" data-fpg="change" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✏️ Ask Gemini to change it</button></div>`}
+      +`<div class="row" style="justify-content:flex-start"><button class="g" data-fpg="change" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>${busy?"⏳ Gemini is watching it again…":"✏️ Ask Gemini to change it"}</button></div>`
+      // Roger, 9 Nov 2026: "I can't send this to Gemini" — the progress and any error were only at the top of the box, out of sight: shown here too
+      +(busy?`<p class="muted" id="fpgst">⏳ Sent. Gemini is watching the video again with your words (about 1–3 minutes). The new draft appears above when it is done; you can close this window.</p>`:"")
+      +(d.error?`<p id="fpgst" style="color:#b91c1c">⚠️ ${esc(d.error)}</p>`:"")}
   box.innerHTML=h;const man=$("#fpman"),gem=!!(d&&d.draft&&R);if(man)man.hidden=gem;
   const sv=$('#dlgc button[data-do="save"]');if(sv)sv.hidden=gem}   // with a draft, ✅ Approve is the save (it still clicks this hidden button)
 // 📋 The final product rubric with a level shaded in each row (Roger, 9 Nov 2026: "here I should be able to see their rubric like they do
@@ -3894,7 +3897,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-fpg]");if(
   else if(k.fpg==="folder")fpgFolder(k.u,a);
   else if(k.fpg==="cls"){const g=(S.P[k.u]||{}).group;b.disabled=true;b.textContent="📥 Reading Classroom…";
     fpgClsLoad(g).then(()=>fpgFill(k.u,a),e=>{alert("Classroom could not be read: "+e.message);fpgFill(k.u,a)})}
-  else if(k.fpg==="change"){const c=$("#fpgchg").value.trim();if(!c)return alert("Write what Gemini should change.");fpgWatch(k.u,a,c)}
+  else if(k.fpg==="change"){const c=$("#fpgchg").value.trim();if(!c)return alert("Write what Gemini should change.");fpgWatch(k.u,a,c).then(()=>{const st=$("#fpgst");if(st)st.scrollIntoView({block:"nearest"})});setTimeout(()=>{const st=$("#fpgst");if(st)st.scrollIntoView({block:"nearest"})},50)}
   else if(k.fpg==="ok")fpgApprove(k.u,a);
   else if(k.fpg==="cost")fpgCost();
   else if(k.fpg==="sounds")fpgSounds(k.u,a);
