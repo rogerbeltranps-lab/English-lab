@@ -6,7 +6,7 @@
 ELGameDeck({
   title:"Grammar · Customs, dates and It is celebrated",
   slides:[
-    {theory:"Customs: the Present Simple",img:"🪔",step:true,wide:true,lines:[
+    {theory:"Customs: the Present Simple",point:"Present Simple for customs",pointCa:"Present Simple per als costums",img:"🪔",step:true,wide:true,lines:[
       "Customs happen **every year**, so we use the **Present Simple**.",
       {table:[["people / families / we / they","he / she / it · my family · Diwali"],["People **light** candles.","Hanukkah **lasts** eight nights."],["We **don't work** on 1 January.","My family **doesn't celebrate** Halloween."],["**Do** you **decorate** the house?","**Does** your town **have** a parade?"]]},
       {watch:"**my family**, **the town**, **everybody** = it → verb + -s: Everybody **eats** twelve grapes."}],
@@ -16,7 +16,7 @@ ELGameDeck({
     {q:"On New Year's Eve everybody ___ twelve grapes at midnight.",img:"🍇",options:["eats","eat","are eating","eating"],why:"**everybody** = he / she → eat**s**."},
     {q:"My family ___ (not / celebrate) Halloween, but we love the Castanyada.",img:"🎃",write:["doesn't celebrate","does not celebrate"],why:"My family = it → **doesn't celebrate** (no -s after doesn't)."},
     {q:"___ your town have a parade at Carnival? — Yes, it does.",img:"🎭",write:["does"],why:"your town = it → **Does** …? — Yes, it does."},
-    {theory:"When? on, in, at",img:"📅",step:true,wide:true,lines:[
+    {theory:"When? on, in, at",point:"Prepositions of time: on, in, at",pointCa:"Preposicions de temps: on, in, at",img:"📅",step:true,wide:true,lines:[
       {table:[["on","in","at"],["a date or a day","a month, a season, a year","a festival time, night, a clock time"],["**on** 31 October","**in** November","**at** Christmas"],["**on** New Year's Eve","**in** winter","**at** night"],["**on** Sunday","**in** 2026","**at** midnight"]]},
       {watch:"**on** Christmas Day (one day) · **at** Christmas (the holiday time)."}],
       ca:["on + data o dia · in + mes, estació o any · at + període de festa, la nit o una hora.","on Christmas Day (el dia), però at Christmas (les festes)."]},
@@ -25,7 +25,7 @@ ELGameDeck({
     {q:"Lunar New Year is celebrated ___ late January or February.",img:"🏮",options:["in","on","at","for"],why:"A month → **in**."},
     {q:"The fireworks start ___ midnight.",img:"🎆",write:["at"],why:"A clock time → **at** midnight."},
     {q:"Which is correct?",img:"🎁",options:["We open our presents on Christmas Day.","We open our presents at Christmas Day.","We open our presents in Christmas Day.","We open our presents on the Christmas."],why:"One day → **on** Christmas Day."},
-    {theory:"It is celebrated · It takes place · It is held",img:"🗓️",step:true,wide:true,lines:[
+    {theory:"It is celebrated · It takes place · It is held",point:"It is celebrated · It takes place · It is held",pointCa:"It is celebrated · It takes place · It is held",img:"🗓️",step:true,wide:true,lines:[
       "To say **when** and **where** a celebration happens, use these chunks:",
       {table:[["Chunk","Example"],["It **is celebrated** in / on…","Diwali **is celebrated** all over the world."],["It **takes place** in / on…","Hanukkah **takes place** in December."],["It **is held** in / on…","The Three Kings parade **is held** on 5 January."]]},
       "**is celebrated**, **is held** = is / are + past participle: we talk about the celebration, not the people.",

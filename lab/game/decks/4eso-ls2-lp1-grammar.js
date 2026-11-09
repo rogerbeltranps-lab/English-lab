@@ -7,7 +7,7 @@
 ELGameDeck({
   title:"Grammar · Talking about change",
   slides:[
-    {theory:"get + comparative = a change",img:"🌇",step:true,lines:[
+    {theory:"get + comparative = a change",point:"get + comparative (it gets colder)",pointCa:"get + comparatiu (it gets colder)",img:"🌇",step:true,lines:[
       "Read: “**In autumn the days get shorter.**” What does it mean?",
       "Every day is a bit shorter than the day before: **get** + comparative = something **changes**.",
       "It **gets colder**. The nights **get longer**. The streets **get more crowded** at Christmas.",
@@ -23,7 +23,7 @@ ELGameDeck({
     {q:"Our town gets ___ at Christmas: lots of people come to the market.",img:"🛍️",options:["more crowded","crowdeder","crowded more","most crowded"],why:"crowded is long → **more crowded**."},
     {q:"The weather gets ___ (bad) in November: more rain and more wind.",img:"🌧️",write:["worse"],why:"bad → **worse** (irregular)."},
     {q:"Which is correct?",img:"🌬️",options:["It gets wetter and windier.","It gets weter and windyer.","It gets more wet and more windyer.","It gets wettier and windier."],why:"wet → we**tt**er · windy → wind**ier**."},
-    {theory:"Every autumn or right now?",img:"🍁",step:true,wide:true,lines:[
+    {theory:"Every autumn or right now?",point:"Present Simple or Present Continuous?",pointCa:"Present Simple o Present Continuous?",img:"🍁",step:true,wide:true,lines:[
       {table:[["Present Simple: every year, in general","Present Continuous: now, these days"],["In autumn the days **get** shorter.","Look! It**'s getting** dark."],["The leaves **fall** in November.","The leaves **are falling** right now."],["It usually **rains** a lot in Manchester.","It**'s raining** at the moment."]]},
       "Present Simple + **usually**, **always**, **every year**, **in autumn** · Present Continuous + **now**, **at the moment**, **these days**, **Look!**",
       {watch:"**It's getting colder** = it's changing now, day by day."}],
@@ -33,7 +33,7 @@ ELGameDeck({
     {q:"Every year the clocks ___ back at the end of October.",img:"🕰️",options:["go","are going","goes","is going"],why:"**every year** → Present Simple: the clocks **go** back."},
     {q:"Come to the park! The leaves ___ (fall) and it looks amazing right now.",img:"🍂",write:["are falling","'re falling"],why:"**right now** → the leaves **are falling**."},
     {q:"These days the weather ___ colder and colder.",img:"🌡️",options:["is getting","gets usually","get","getting"],why:"**these days** + a change now → **is getting** colder and colder."},
-    {theory:"Feelings: adjective + preposition (+ -ing)",img:"🎃",step:true,wide:true,lines:[
+    {theory:"Feelings: adjective + preposition (+ -ing)",point:"Adjective + preposition + -ing (excited about going)",pointCa:"Adjectiu + preposició + -ing (excited about going)",img:"🎃",step:true,wide:true,lines:[
       {table:[["Adjective + preposition","+ noun","+ verb-ing"],["scared **of**","scared of **the dark**","scared of **walking** home alone"],["excited **about**","excited about **Halloween**","excited about **dressing** up"],["proud **of**","proud of **our tradition**","proud of **making** panellets"],["grateful **for**","grateful for **my family**","grateful for **having** a cosy home"]]},
       {watch:"After a preposition, the verb takes **-ing**: excited about ~~go~~ **going**."}],
       ca:["Després d'una preposició (of, about, for…), el verb va en -ing: excited about going."]},

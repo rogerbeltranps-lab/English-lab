@@ -74,9 +74,29 @@ table.pgt-t td.pgtot b{font-size:1.55rem}.pgtot .xbar{display:block;margin:5px a
 .cpn{font-weight:800;color:var(--k);min-width:34px}.cpt{flex:1;font-size:14px;color:#334155}.cpt small{display:block;color:#64748b;font-size:12.5px;margin-top:2px}
 .cpm{display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:nowrap}.cpm b{font-size:1.2rem}
 .dg{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:1px 8px;white-space:nowrap}.dg-ae{background:#ede9fe;color:#5b21b6}.dg-an{background:#dbeafe;color:#1e40af}.dg-as{background:#dcfce7;color:#166534}.dg-na{background:#fee2e2;color:#991b1b}
-table.gvt td{vertical-align:middle;text-align:center}table.gvt td.l{text-align:left}table.gvt td.l>b{display:block;font-size:15.5px}table.gvt a.pgo{display:inline-block;background:#e2e8f0;border-radius:8px;padding:6px 12px;text-decoration:none;color:#0f172a;font-weight:600}table.gvt a.pgo:hover{background:#cbd5e1}.gvk{font-size:12.5px;color:#64748b;font-weight:700}table.gvt td small{display:block}table.gvt td .xbar{display:block;margin:4px auto 0;width:90px}
-.gvmiss{margin:4px 0 2px;padding-left:18px;font-size:13px;color:#7c2d12}.gvmiss s{color:#b91c1c}
-@media (max-width:640px){.cpgrid{grid-template-columns:1fr}table.gvt,table.gvt tbody,table.gvt tr,table.gvt td{display:block;width:auto}table.gvt thead{display:none}table.gvt tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:8px 12px}table.gvt td{border:0!important;padding:3px 0!important;text-align:left!important}table.gvt td .xbar{display:inline-block;margin:0 0 0 8px}}
+/* 📚 Grammar and vocabulary (gvBox): one card per class game, its points under it, and ✏️ Fix my mistakes (fixPanel) */
+.gvlist{display:flex;flex-direction:column;gap:10px}.gvrow{display:grid;grid-template-columns:minmax(0,1fr) 110px 130px 220px;align-items:center;gap:10px}
+.gvcols{font-size:13px;font-weight:800;color:#475569;padding:0 14px}.gvcols span:nth-child(2){text-align:center}
+.gvtopic{border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;background:#fff}.gvhead{padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+.gvtopic.grammar .gvhead{border-left:5px solid #0f766e}.gvtopic.vocab .gvhead{border-left:5px solid #7e22ce}.gvtopic.exam .gvhead{border-left:5px solid #c2410c}
+.gvname{display:flex;flex-direction:column;min-width:0}.gvname>b{font-size:16px}.gvk{font-size:12.5px;color:#64748b;font-weight:700}
+.gvpc{display:flex;flex-direction:column;align-items:center;gap:3px}.gvpc b{font-size:15px}.gvpc .xbar{width:90px}.gvhead .gvpc b{font-size:18px}
+.gvrow>.dg,.gvrow>.pgna{justify-self:center}.gvrow>a.pgo,.gvrow>button.pgo,.gvfix,.gvok{justify-self:end}
+.gvhead a.pgo{display:inline-block;background:#e2e8f0;border-radius:8px;padding:6px 12px;text-decoration:none;color:#0f172a;font-weight:600}.gvhead a.pgo:hover{background:#cbd5e1}
+.gvpts{list-style:none;margin:0;padding:0}.gvpts li{padding:7px 14px 7px 30px;border-top:1px solid #f1f5f9}.gvpts li:first-child{border-top:0}.gvpn{font-size:14.5px;color:#1e293b;font-weight:600}.gvpn small{font-weight:400}
+.gvfix{background:#fff7ed;border:2px solid #fb923c;color:#9a3412;border-radius:10px;padding:5px 12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}.gvfix:hover{background:#ffedd5}
+.gvfix.done{background:#f0fdf4;border-color:#86efac;color:#166534;font-weight:600}.gvok{font-size:13px;color:#166534;font-weight:600}.cps.fix{background:#fff7ed;color:#9a3412;font-weight:700}
+dialog.fxd{max-width:640px}.fxpt{margin:2px 0 10px;display:flex;flex-direction:column}.fxpt b{font-size:16px}.fxprog{display:flex;align-items:center;gap:10px;font-size:13px;color:#475569;font-weight:700}.fxprog .xbar{flex:1}
+.fxcard{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin:10px 0}.fxq{font-size:18px;line-height:1.5;margin:0 0 8px}
+.fxgap{display:inline-block;min-width:60px;border-bottom:2px solid #0f766e;text-align:center;padding:0 6px}.fxgap.bad{background:#fee2e2;color:#b91c1c;border-color:#b91c1c}.fxgap.ok{background:#dcfce7;color:#166534;font-weight:700}
+.fxhint{font-size:14px;color:#475569;margin:6px 0}.fxform{display:flex;gap:8px}.fxform input{flex:1;font:inherit;font-size:17px;padding:8px 10px;border:2px solid #cbd5e1;border-radius:10px}.fxform input:focus{border-color:#0f766e;outline:0}
+.fxopts{display:flex;flex-direction:column;gap:8px}.fxopt{font:inherit;font-size:16px;text-align:left;background:#fff;border:2px solid #cbd5e1;border-radius:10px;padding:9px 12px;cursor:pointer}.fxopt:hover:not(:disabled){border-color:#0f766e}.fxopt:disabled{opacity:1;color:#334155;cursor:default}.fxopt.ok{background:#dcfce7;border-color:#16a34a;color:#14532d;font-weight:700}.fxopt.was{color:#b91c1c;text-decoration:line-through}.fxend+.row a.g{background:#e2e8f0;color:#0f172a;border-radius:8px;padding:8px 14px;text-decoration:none;font-weight:600}.fxopt.no{background:#fee2e2;border-color:#dc2626}
+.fxfb{margin:10px 0 0;font-weight:700;font-size:15px}.fxfb.ok{color:#166534}.fxfb.no{color:#b91c1c}.fxfb.show{color:#1e40af}
+.fxrule{background:#fffbeb;border-radius:10px;padding:8px 12px}.fxrule summary{cursor:pointer;font-weight:700;color:#92400e}.fxsl{margin-top:8px;font-size:14px}.fxsl p,.fxsl ul{margin:4px 0}.fxw{color:#9a3412}
+.fxtb{border-collapse:collapse;font-size:13px;margin:4px 0}.fxtb th,.fxtb td{border:1px solid #fde68a;padding:3px 6px;text-align:left}.fxtb th{background:#fef3c7}
+.fxend{text-align:center;padding:16px 0 4px}.fxend b{display:block;font-size:18px}.fxbig{font-size:44px;display:block}
+@media (max-width:640px){.cpgrid{grid-template-columns:1fr}.gvcols{display:none}.gvrow{grid-template-columns:minmax(0,1fr) auto;gap:6px 10px}.gvrow>.gvname{grid-column:1/-1}.gvpc{flex-direction:row;justify-self:start}.gvpc .xbar{width:70px}
+  .gvrow>.dg,.gvrow>.pgna{justify-self:end}.gvrow>a.pgo,.gvrow>button.pgo,.gvfix,.gvok{grid-column:1/-1;justify-self:start}.gvpts li{padding-left:18px}}
 </style></head><body>
 <style>/* Menu as on Home and English Lab: side menu on a computer, top menu on a phone */
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
@@ -1176,27 +1196,91 @@ function compBox(ls2,tm){const ps=ls2.flatMap(compPieces).filter(y=>!tm||y.term=
     +(any&&(top.length||low.length)?`<div class="cpsum">${top.length?`<span class="cps ok">💪 ${t("El teu punt fort","Your strongest")}: <b>${top.map(c=>esc(c)+" "+esc((CPN[c.split(".")[0]]||[])[EN?1:0]||"").toLowerCase()).join(", ")}</b></span>`:""}${low.length?`<span class="cps bad">🎯 ${t("Treballa més","Work more on")}: <b>${low.map(c=>esc(c)+" "+esc((CPN[c.split(".")[0]]||[])[EN?1:0]||"").toLowerCase()).join(", ")}</b></span>`:""}</div>`:"")
     +(any?"":`<p class="muted" style="margin:0 0 12px">${tm?t("Encara no hi ha notes d'aquest trimestre. Apareixeran quan facis la feina i el professor la corregeixi.","There are no marks for this term yet. They will appear when you do the work and your teacher marks it."):t("Encara no hi ha notes. Apareixeran quan facis la feina i el professor la corregeixi.","There are no marks yet. They will appear when you do the work and your teacher marks it.")}</p>`)
     +`<div class="cpgrid">${ks.map(card).join("")}</div></div>`}
-// 📚 Grammar and vocabulary in 🎓 My progress (same message: "focusing on grammar and vocabulary"): for each learning path of the term's LSs,
-// its grammar and its vocabulary topic (the class-game theory, lab/game/decks/theory.js, loaded here only) with the % right in the class
-// games (myGames, D.mg), the last mistakes made in them (what to study) and a link to the LS's 📝 notes; then the exam's vocabulary and grammar parts.
-// Only what the student has played or done: never a learning path that is not open yet.
+// 📚 Grammar and vocabulary in 🎓 My progress (same message: "focusing on grammar and vocabulary"; Roger, 9 Nov 2026: "shouldnt we put the
+// kind of grammar and performace like present simple, and then a button to spot the mistakes and correct stuff?"): for each learning path
+// of the term's LSs, its grammar and its vocabulary class game (the class-game theory, lab/game/decks/theory.js, loaded here only) with the
+// % right in the games (myGames, D.mg) and, under it, each grammar or vocabulary point it practises (the theory parts: parts[].name, the
+// student's misses miss[].p of the questions shown pn[p], or parts[].n for older games) with its own %, and ✏️ Fix my mistakes: the
+// student's wrong answers of that point, one by one, to correct (fixPanel). Then the exam's vocabulary and grammar parts, per LS.
+// Only what the student has played or done: never a learning path that is not open yet. Nothing here counts for the marks.
+const GVFIX="el_gvfix";
+const gvFixed=()=>{try{return JSON.parse(localStorage.getItem(GVFIX)||"{}")}catch(e){return {}}};
+const gvKey=(k,m)=>k+"|"+m.q+"|"+m.ok;
 function gvBox(ls2,tm){const TH=window.EL_GAME_THEORY;if(!TH){if(!S.thLoading){S.thLoading=1;const sc=document.createElement("script");sc.src="lab/game/decks/theory.js";sc.onload=()=>render();document.head.appendChild(sc)}return ""}
-  const rows=[];ls2.forEach(l=>{const pre=`${l.course}-${(elLsNum(l)||"").toLowerCase()}-lp`,mg=Object.values(D.mg||{}).filter(g=>g&&g.ls===l.id);
-    Object.keys(TH).filter(k=>k.startsWith(pre)).sort((a,b)=>a.localeCompare(b,"en",{numeric:true})).forEach(k=>{const kind=/grammar$/.test(k)?"grammar":"vocab",gs=mg.filter(g=>g.deck===k);if(!gs.length)return;
-      const r=gs.reduce((n,g)=>n+(+g.r||0),0),of=gs.reduce((n,g)=>n+(+g.of||0),0);
-      rows.push({l,k,kind,lp:(k.match(/-lp(\d+)-/)||[])[1],title:String(TH[k].title||"").replace(/^(Grammar|Vocabulary) · /,""),pc:of?r/of*100:null,miss:gs.flatMap(g=>g.miss||[]).filter(m=>m&&m.q).slice(-3)})})});
-  const ex=ls2.flatMap(l=>{const g=(window.EL_GRADING||{})[l.id],e=g&&g.exam,sc=(D.rs[l.id+"/assessment"]||{}).sections||{};return e?e.sections.filter(([k,n])=>/vocab|grammar/i.test(k+" "+n)&&sc[k]&&sc[k].score!=null).map(([k,n,mx])=>({l,n,pc:+sc[k].score/(+(sc[k].max||mx||e.max))*100,s:+sc[k].score,m:+(sc[k].max||mx||e.max)})):[]});
+  const FX=gvFixed(),rows=[];S.gv={};
+  ls2.forEach(l=>{const pre=`${l.course}-${(elLsNum(l)||"").toLowerCase()}-lp`,mg=Object.values(D.mg||{}).filter(g=>g&&g.ls===l.id);
+    Object.keys(TH).filter(k=>k.startsWith(pre)).sort((a,b)=>a.localeCompare(b,"en",{numeric:true})).forEach(k=>{const kind=/grammar$/.test(k)?"grammar":"vocab",gs=mg.filter(g=>g.deck===k).sort((a,b)=>(+a.sid||0)-(+b.sid||0));if(!gs.length)return;
+      const T=TH[k],parts=T.parts||[],sumN=parts.reduce((n,p)=>n+(+p.n||0),0),r=gs.reduce((n,g)=>n+(+g.r||0),0),of=gs.reduce((n,g)=>n+(+g.of||0),0);
+      // each point: questions shown (pn, or the deck's share for a game saved before pn) and the misses (the last time each question was missed)
+      const pts=parts.map(p=>({k:p.k,name:(EN?p.name:p.nameCa)||p.name||p.slides.map(s=>s.theory).join(" · "),slides:p.slides,of:0,bad:0,miss:new Map()}));
+      gs.forEach(g=>{const ms=(g.miss||[]).filter(m=>m&&m.q);pts.forEach(P=>{const nb=ms.filter(m=>m.p===P.k).length,sh=g.pn?+(g.pn[P.k]||0):sumN?(+(parts.find(x=>x.k===P.k)||{}).n||0)*(+g.of||0)/sumN:0;
+        P.of+=Math.max(sh,nb);P.bad+=nb;ms.filter(m=>m.p===P.k).forEach(m=>{P.miss.delete(m.q+"|"+m.ok);P.miss.set(m.q+"|"+m.ok,m)})})});
+      pts.forEach(P=>{P.pc=P.of>0?Math.max(0,(P.of-P.bad)/P.of*100):null;P.miss=[...P.miss.values()];P.left=P.miss.filter(m=>!FX[gvKey(k,m)]).length});
+      const row={l,k,kind,lp:(k.match(/-lp(\d+)-/)||[])[1],title:String(T.title||"").replace(/^(Grammar|Vocabulary) · /,""),pc:of?r/of*100:null,pts:pts.filter(P=>P.of>0||P.miss.length)};
+      rows.push(row);S.gv[k]=row})});
+  const ex=ls2.map(l=>{const g=(window.EL_GRADING||{})[l.id],e=g&&g.exam,sc=(D.rs[l.id+"/assessment"]||{}).sections||{};
+    const ps=e?e.sections.filter(([k,n])=>/vocab|grammar/i.test(k+" "+n)&&sc[k]&&sc[k].score!=null).map(([k,n,mx])=>({name:nmT(n),pc:+sc[k].score/(+(sc[k].max||mx||e.max))*100,s:+sc[k].score,m:+(sc[k].max||mx||e.max)})):[];
+    return ps.length?{l,pts:ps,pc:ps.reduce((n,x)=>n+x.s,0)/ps.reduce((n,x)=>n+x.m,0)*100}:null}).filter(Boolean);
   if(!rows.length&&!ex.length)return "";
-  const st=pc=>pc==null?"":pc>=80?`<span class="dg dg-ae">✅ ${t("Ho saps","You know it")}</span>`:pc>=60?`<span class="dg dg-an">👍 ${t("Gairebé","Nearly there")}</span>`:`<span class="dg dg-na">🔁 ${t("Treballa-ho","Work on it")}</span>`;
+  const st=pc=>pc==null?`<span class="pgna">${t("encara no","not yet")}</span>`:pc>=80?`<span class="dg dg-ae">✅ ${t("Ho saps","You know it")}</span>`:pc>=60?`<span class="dg dg-an">👍 ${t("Gairebé","Nearly there")}</span>`:`<span class="dg dg-na">🔁 ${t("Treballa-ho","Work on it")}</span>`;
   const bar=pc=>`<span class="xbar"><span style="width:${pc==null?0:Math.max(0,Math.min(100,pc))}%;background:${pc==null?"#e2e8f0":col(pc)}"></span></span>`;
-  const work=rows.filter(r=>r.pc!=null&&r.pc<60).concat(ex.filter(x=>x.pc<60));
+  const pcB=pc=>`<span class="gvpc"><b style="color:${pc==null?"#94a3b8":col(pc)}">${pc==null?"–":Math.round(pc)+" %"}</b>${bar(pc)}</span>`;
+  const fixB=(k,P)=>!P.miss.length?`<span class="gvok">${P.pc!=null&&P.pc>=100?"🌟 "+t("Cap error","No mistakes"):""}</span>`
+    :P.left?`<button type="button" class="gvfix" data-do="gvfix" data-k="${esc(k)}" data-p="${esc(P.k)}">✏️ ${P.left>1?t(`Corregeix els ${P.left} errors`,`Fix my ${P.left} mistakes`):t("Corregeix l'error","Fix my mistake")}</button>`
+    :`<button type="button" class="gvfix done" data-do="gvfix" data-k="${esc(k)}" data-p="${esc(P.k)}" title="${t("Torna-ho a fer","Do it again")}">✅ ${t("Corregits","Fixed")} · ↺</button>`;
+  const work=rows.flatMap(r=>r.pts.filter(P=>P.pc!=null&&P.pc<60).map(P=>P.name)).concat(ex.flatMap(x=>x.pts.filter(P=>P.pc<60).map(P=>P.name+" ("+t("examen","exam")+" "+elLsNum(x.l)+")")));
+  const nFix=rows.reduce((n,r)=>n+r.pts.reduce((m,P)=>m+P.left,0),0);
+  const topic=r=>`<div class="gvtopic ${r.kind}"><div class="gvrow gvhead"><span class="gvname"><span class="gvk">${r.kind==="grammar"?"🧩 "+t("Gramàtica","Grammar"):"📚 "+t("Vocabulari","Vocabulary")} · ${esc(elLsNum(r.l))} LP${esc(r.lp||"")} · 🎲 ${t("jocs de classe","class games")}</span><b>${esc(r.title)}</b></span>${pcB(r.pc)}${st(r.pc)}<a class="g pgo" href="${lsHref(r.l)}#notes">📖 ${t("Estudia","Study")} →</a></div>`
+    +`<ul class="gvpts">${r.pts.map(P=>`<li class="gvrow"><span class="gvname gvpn">${esc(P.name)}</span>${pcB(P.pc)}${st(P.pc)}${fixB(r.k,P)}</li>`).join("")}</ul></div>`;
+  const exam=x=>`<div class="gvtopic exam"><div class="gvrow gvhead"><span class="gvname"><span class="gvk">📝 ${t("Examen","Exam")} · ${esc(elLsNum(x.l))}</span><b>${t("Vocabulari i gramàtica de l'examen","Exam vocabulary and grammar")}</b></span>${pcB(x.pc)}${st(x.pc)}<button type="button" class="g pgo" data-do="pgo" data-ls="${x.l.id}" data-h="exam">${t("Mira-ho","See it")} →</button></div>`
+    +`<ul class="gvpts">${x.pts.map(P=>`<li class="gvrow"><span class="gvname gvpn">${esc(P.name)} <small class="muted">${f1(P.s)} / ${P.m} ${t("punts","points")}</small></span>${pcB(P.pc)}${st(P.pc)}<span></span></li>`).join("")}</ul></div>`;
   return `<div class="box fv gvbox">${fvHead("📚",t("Gramàtica i vocabulari","Grammar and vocabulary"),esc(tmName(tm)))}`
-    +`<p class="fvlead">${t("Què saps de cada tema de gramàtica i vocabulari, pels jocs de classe i l'examen, i què has de repassar.","What you know about each grammar and vocabulary topic, from the class games and the exam, and what to review.")}</p>`
-    +(work.length?`<div class="cpsum"><span class="cps bad">🔁 ${t("Repassa primer","Review first")}: <b>${work.map(x=>esc(x.title||nmT(x.n))).join(", ")}</b></span></div>`:rows.length||ex.length?`<div class="cpsum"><span class="cps ok">💪 ${t("Molt bé: cap tema per sota del 60 %","Well done: no topic under 60 %")}</span></div>`:"")
-    +`<div class="wrap"><table class="xt gvt"><thead><tr><th>${t("Tema","Topic")}</th><th>${t("Encerts","Right")}</th><th></th><th></th></tr></thead><tbody>`
-    +rows.map(r=>`<tr><td class="l"><span class="gvk">${r.kind==="grammar"?"🧩 "+t("Gramàtica","Grammar"):"📚 "+t("Vocabulari","Vocabulary")} · ${esc(elLsNum(r.l))} LP${esc(r.lp||"")}</span><b>${esc(r.title)}</b>${r.miss.length&&r.pc!=null&&r.pc<80?`<ul class="gvmiss">${r.miss.map(m=>`<li>${esc(m.q)} <s>${esc(m.a||"")}</s> → <b>${esc(m.ok||"")}</b></li>`).join("")}</ul>`:""}<small class="muted">🎲 ${t("Jocs de classe","Class games")}</small></td><td><b style="color:${col(r.pc||0)}">${r.pc==null?"–":Math.round(r.pc)+" %"}</b>${bar(r.pc)}</td><td>${st(r.pc)}</td><td><a class="g pgo" href="${lsHref(r.l)}#notes">${t("Estudia","Study")} →</a></td></tr>`).join("")
-    +ex.map(x=>`<tr><td class="l"><span class="gvk">📝 ${t("Examen","Exam")} · ${esc(elLsNum(x.l))}</span><b>${esc(nmT(x.n))}</b><small class="muted">${f1(x.s)} / ${x.m} ${t("punts","points")}</small></td><td><b style="color:${col(x.pc)}">${Math.round(x.pc)} %</b>${bar(x.pc)}</td><td>${st(x.pc)}</td><td><button type="button" class="g pgo" data-do="pgo" data-ls="${x.l.id}" data-h="exam">${t("Mira-ho","See it")} →</button></td></tr>`).join("")
-    +`</tbody></table></div></div>`}
+    +`<p class="fvlead">${t("Com vas en cada punt de gramàtica i vocabulari, pels jocs de classe i l'examen. Amb <b>✏️ Corregeix</b> tornes a fer les preguntes que vas fallar i les corregeixes tu.","How you are doing in each grammar and vocabulary point, from the class games and the exam. With <b>✏️ Fix my mistakes</b> you see the questions you got wrong and correct them yourself.")}</p>`
+    +`<div class="cpsum">${work.length?`<span class="cps bad">🔁 ${t("Repassa primer","Review first")}: <b>${work.map(esc).join(" · ")}</b></span>`:`<span class="cps ok">💪 ${t("Molt bé: cap punt per sota del 60 %","Well done: no point under 60 %")}</span>`}${nFix?`<span class="cps fix">✏️ ${nFix===1?t("1 error per corregir","1 mistake to fix"):t(`${nFix} errors per corregir`,`${nFix} mistakes to fix`)}</span>`:""}</div>`
+    +`<div class="gvlist"><div class="gvrow gvcols" aria-hidden="true"><span>${t("Punt de gramàtica o vocabulari","Grammar or vocabulary point")}</span><span>${t("Encerts","Right")}</span><span></span><span></span></div>${rows.map(topic).join("")}${ex.map(exam).join("")}</div></div>`}
+// ✏️ Fix my mistakes (Roger, 9 Nov 2026: "a button to spot the mistakes and correct stuff"): the student's wrong answers of one point, one
+// at a time. A gap: the sentence with their wrong answer crossed out in the gap, and they write the right words (the gap only or the whole
+// sentence; 's = is, n't = not…). "Which is correct?": their answer and the right one, to choose. Wrong once: the rule opens and they try
+// again; wrong twice: the right answer, and on. Fixed ones are kept on this device only (localStorage el_gvfix); nothing is saved online
+// and nothing counts for the marks. The rule = the point's theory slides (Catalan help for Starter and Base).
+const fxNorm=s=>" "+String(s??"").toLowerCase().replace(/[‘’ʼ`´]/g,"'").replace(/\bcan't\b/g,"cannot").replace(/\bwon't\b/g,"will not").replace(/n't\b/g," not")
+  .replace(/'s\b/g," is").replace(/'re\b/g," are").replace(/'m\b/g," am").replace(/'ll\b/g," will").replace(/'ve\b/g," have").replace(/[.,!?;:"“”()…]/g," ").replace(/\s+/g," ").trim();
+const fxMd=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/~~(.+?)~~/g,"<s>$1</s>");
+const fxRule=sl=>sl.map(s=>`<div class="fxsl"><b>${esc(s.img||"")} ${esc(s.theory)}</b>`+(!EN&&s.ca?`<ul>${s.ca.map(c=>`<li>${fxMd(c)}</li>`).join("")}</ul>`:"")
+  +(s.lines||[]).map(x=>typeof x==="string"?`<p>${fxMd(x)}</p>`:x.table?`<table class="fxtb">${x.table.map((r,i)=>`<tr>${r.map(c=>i?`<td>${fxMd(c)}</td>`:`<th>${fxMd(c)}</th>`).join("")}</tr>`).join("")}</table>`:x.watch?`<p class="fxw">⚠️ ${fxMd(x.watch)}</p>`:"").join("")+`</div>`).join("");
+document.getElementById("dlg")?.addEventListener("close",()=>{if(!S.fx)return;S.fx=null;$("#dlg").classList.remove("fxd");const y=scrollY;render();scrollTo(0,y)});
+function fixPanel(k,p){const R=(S.gv||{})[k],P=R&&R.pts.find(x=>x.k===p);if(!P)return;
+  const FX=gvFixed(),todo=P.miss.filter(m=>!FX[gvKey(k,m)]);
+  S.fx={k,P,R,items:(todo.length?todo:P.miss).slice(),i:0,tries:0,state:"ask",right:0};drawFix();if(!$("#dlg").open)$("#dlg").showModal()}
+function drawFix(){const F=S.fx;if(!F)return;const P=F.P,n=F.items.length,m=F.items[F.i],dlg=$("#dlg");dlg.classList.add("fxd");
+  const head=`<h3>✏️ ${t("Corregeix els teus errors","Fix your mistakes")}</h3><p class="fxpt"><span class="gvk">${F.R.kind==="grammar"?"🧩 "+t("Gramàtica","Grammar"):"📚 "+t("Vocabulari","Vocabulary")} · ${esc(elLsNum(F.R.l))} LP${esc(F.R.lp||"")}</span><b>${esc(P.name)}</b></p>`;
+  const rule=open=>`<details class="fxrule"${open?" open":""}><summary>📖 ${t("Recorda la regla","Remember the rule")}</summary>${fxRule(P.slides||[])}</details>`;
+  if(F.state==="end"){$("#dlgc").innerHTML=head+`<div class="fxend"><span class="fxbig">🎉</span><b>${F.right===n?t("Perfecte! Els has corregit tots.","Perfect! You fixed them all."):F.right?t(`Fet! N'has corregit ${F.right} de ${n} tu sol.`,`Done! You fixed ${F.right} of ${n} by yourself.`):t("Fet! Ara ja saps les respostes correctes.","Done! Now you know the right answers.")}</b><p class="muted">${F.right<n?t("Els que no has encertat queden per corregir: torna-hi d'aquí a una estona i prova de fer-los tu sol.","The ones you didn't get right are still to fix: come back later and try to do them by yourself."):t("Torna-hi d'aquí a uns dies per recordar-ho bé.","Come back in a few days to remember it well.")}</p></div>`
+    +`<div class="row"><a class="g" href="${lsHref(F.R.l)}#notes">📖 ${t("Estudia la teoria","Study the theory")}</a><button class="g" data-do="fxagain">↺ ${t("Torna-hi","Again")}</button><button class="sub" data-do="fxclose">${t("Tanca","Close")}</button></div>`;return}
+  const gap=/_{2,}/.test(m.q),wrong=m.a&&fxNorm(m.a)!==fxNorm(m.ok),choice=!gap&&wrong,ord=choice?((m.q+m.ok).length%2?[m.ok,m.a]:[m.a,m.ok]):null;
+  const sent=gap?esc(m.q).replace(/_{2,}/,F.state==="ok"||F.state==="show"?`<span class="fxgap ok">${esc(m.ok)}</span>`:wrong?`<span class="fxgap bad"><s>${esc(m.a)}</s></span>`:`<span class="fxgap">____</span>`):esc(m.q);
+  const fb={ok:`<p class="fxfb ok">✅ ${t("Molt bé!","Well done!")}</p>`,no:`<p class="fxfb no">❌ ${t("Encara no. Llegeix la regla i torna-ho a provar.","Not yet. Read the rule and try again.")}</p>`,
+    show:`<p class="fxfb show">💡 ${t("La resposta correcta","The right answer")}: <b>${esc(m.ok)}</b></p>`}[F.state]||"";
+  const done=F.state==="ok"||F.state==="show";
+  $("#dlgc").innerHTML=head+`<div class="fxprog"><span>${t("Error","Mistake")} ${F.i+1} ${t("de","of")} ${n}</span><span class="xbar"><span style="width:${F.i/n*100}%;background:#0f766e"></span></span></div>`
+    +`<div class="fxcard"><p class="fxq">${sent}</p>`
+    +(choice?`<p class="fxhint">${t("Quina és la correcta? Una és la que vas triar al joc.","Which one is correct? One of them is what you chose in the game.")}</p><div class="fxopts">${ord.map((o,j)=>`<button type="button" class="fxopt${done&&o===m.ok?" ok":done&&o!==m.ok?" was":""}${F.state==="no"&&F.pick===j?" no":""}" data-do="fxpick" data-j="${j}"${done?" disabled":""}>${esc(o)}</button>`).join("")}</div>`
+      :`<p class="fxhint">${wrong?t("Al joc vas posar la paraula ratllada. Escriu la correcta:","In the game you wrote the crossed-out words. Write the right ones:"):t("Aquesta no la vas contestar. Escriu les paraules que falten:","You didn't answer this one. Write the missing words:")}</p>`
+        +`<form class="fxform" data-fx="1"><input id="fxin" autocomplete="off" spellcheck="false" ${done?"disabled":""} value="${esc(F.typed||"")}" aria-label="${t("La teva resposta","Your answer")}"><button class="sub" type="submit" ${done?"disabled":""}>${t("Comprova","Check")}</button></form>`)
+    +fb+`</div>`+rule(F.state==="no"||F.state==="show")
+    +`<div class="row"><button class="g" data-do="fxclose">${t("Tanca","Close")}</button>${done?`<button class="sub" data-do="fxnext">${F.i+1<n?t("Següent","Next")+" →":t("Acaba","Finish")+" ✓"}</button>`:""}</div>`;
+  const inp=$("#fxin");if(inp&&!done)setTimeout(()=>inp.focus(),30);else setTimeout(()=>$('[data-do="fxnext"]')?.focus(),30)}
+function fxAnswer(ok,pick){const F=S.fx,m=F.items[F.i];F.pick=pick;
+  if(ok){F.state="ok";if(!F.tries)F.right++;if(!AS)try{const o=gvFixed();o[gvKey(F.k,m)]=Date.now();localStorage.setItem(GVFIX,JSON.stringify(o))}catch(e){}}
+  else{F.tries++;F.state=F.tries>=2?"show":"no"}
+  drawFix()}
+document.addEventListener("submit",e=>{if(!e.target.matches("form[data-fx]"))return;e.preventDefault();const F=S.fx;if(!F)return;const m=F.items[F.i],v=$("#fxin").value;if(!v.trim())return;F.typed=v;
+  const a=fxNorm(v),ok=a===fxNorm(m.ok)||a===fxNorm(m.q.replace(/_{2,}/,m.ok))||a===fxNorm(m.q.replace(/_{2,}/,m.ok).replace(/\s*\([^)]*\)/g,""));fxAnswer(ok)});
+function fxDo(d){const F=S.fx;if(!F)return;
+  if(d.do==="fxpick"){const m=F.items[F.i],ord=((m.q+m.ok).length%2?[m.ok,m.a]:[m.a,m.ok]);fxAnswer(ord[+d.j]===m.ok,+d.j);if(F.state==="no"){F.state="show";drawFix()}}
+  else if(d.do==="fxnext"){F.typed="";F.tries=0;F.pick=null;if(F.i+1<F.items.length){F.i++;F.state="ask"}else F.state="end";drawFix()}
+  else if(d.do==="fxagain"){F.items=F.P.miss.slice();F.i=0;F.tries=0;F.right=0;F.typed="";F.state="ask";drawFix()}
+  else if(d.do==="fxclose"){$("#dlg").close()}}
 // 🎓 My progress (Roger, 9 Nov 2026: "students need to have a table with their results on the dashboard so that they can understand better
 // their progress. There they can choose term (and they see their 2 LS that they will have, not yet prepared)"; "name it progress"):
 // today.html#progress. Term chips (the current one first chosen) and one row per LS of that term: daily work, exam, final product and the
@@ -1592,7 +1676,7 @@ const tabName=(id,k)=>{const xs=(window.EL_SECTIONS||{})[id]||[],p=xs.some(y=>y[
 const tabGroups=(a,ks)=>elTabGroups(a,ks);
 async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
-  ({pterm:()=>{S.pterm=+k.t;render()},pgo:()=>{S.ls=k.ls;S.tab=null;location.hash=k.h},ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative",fp:"final"}[k.t]||k.t))}catch(e){}render();document.querySelector(AS?".tabbody":".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(S.ls),asklv:()=>AS||askPanel(k.ls),pbar:()=>{const w=k.w==='idea'?'💡':'⚠️',b=[...document.querySelectorAll('#el-cloud-bar button')].find(x=>x.textContent.startsWith(w));if(b)b.click()},want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
+  ({gvfix:()=>fixPanel(k.k,k.p),fxpick:()=>fxDo(k),fxnext:()=>fxDo(k),fxagain:()=>fxDo(k),fxclose:()=>fxDo(k),pterm:()=>{S.pterm=+k.t;render()},pgo:()=>{S.ls=k.ls;S.tab=null;location.hash=k.h},ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative",fp:"final"}[k.t]||k.t))}catch(e){}render();document.querySelector(AS?".tabbody":".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(S.ls),asklv:()=>AS||askPanel(k.ls),pbar:()=>{const w=k.w==='idea'?'💡':'⚠️',b=[...document.querySelectorAll('#el-cloud-bar button')].find(x=>x.textContent.startsWith(w));if(b)b.click()},want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
 addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;render();scrollTo(0,0)});   // a place of the board (placeNow)
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});
