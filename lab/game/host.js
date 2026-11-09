@@ -235,9 +235,11 @@ async function saveResults(){
   // the LS page's 📝 Your notes reads it once (shared/js/el-notes.js) and puts it with the theory and their notes.
   if(!shown.length)return;
   const partOf=i=>{for(let j=i-1;j>=0;j--)if(isN(slides()[j]))return "p"+slides()[j].notes;return ""};
+  // pn = how many shown questions practised each notes part (Roger, 9 Nov 2026: the student's % per grammar or vocabulary point in 🎓 My progress)
+  const pn={};shown.forEach(i=>{const p=partOf(i);if(p)pn[p]=(pn[p]||0)+1});
   try{const w=S.writeBatch(db),key=H.g+"_"+H.sid;
     stu.forEach(x=>{const miss=x.miss.map(n=>{const i=qs[n-1],q=doc.qs.find(z=>z.n===n)||{};return {n,q:q.q||"",a:x.ans[n]==null?"":x.ans[n],ok:q.ok||"",p:partOf(i)}});
-      w.set(S.doc(db,"myGames",x.e),{games:{[key]:{deck:H.deckId,title:H.deck.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid,r:x.r,of:shown.length,miss}},updated:S.serverTimestamp()},{merge:true})});
+      w.set(S.doc(db,"myGames",x.e),{games:{[key]:{deck:H.deckId,title:H.deck.title,kind:doc.kind,ls:lsId(),lp:doc.lp,day,sid:H.sid,r:x.r,of:shown.length,pn,miss}},updated:S.serverTimestamp()},{merge:true})});
     await w.commit()}catch(e){console.warn("my games",e);H.err="⚠ Students' results not saved: "+e.message;draw()}
 }
 let autoT=null;

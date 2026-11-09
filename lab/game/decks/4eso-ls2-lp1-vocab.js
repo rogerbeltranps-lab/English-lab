@@ -6,7 +6,7 @@
 ELGameDeck({
   title:"Vocabulary · Autumn words",
   slides:[
-    {theory:"What's the weather like?",img:"🌫️",lines:[
+    {theory:"What's the weather like?",point:"Weather words (chilly, mild, foggy…)",pointCa:"Paraules del temps (chilly, mild, foggy…)",img:"🌫️",lines:[
       "noun + **-y**: sun → **sunny** · cloud → **cloudy** · wind → **windy** · fog → **foggy** (sun and fog double the letter)",
       "From cold to hot: **cold** → **chilly** / **cool** → **mild** → **warm** → **hot**. It's **mild** = not hot and not cold.",
       "**Frost** = ice on cars and grass on a very cold morning. In the USA autumn is **fall**."]},
@@ -16,7 +16,7 @@ ELGameDeck({
     {q:"It's ___ outside: wear a jumper. (ch...)",img:"🧥",write:["chilly"],why:"**chilly** = quite cold."},
     {q:"Which is the right order, from cold to hot?",img:"🌡️",options:["cold, cool, mild, warm, hot","cool, cold, warm, mild, hot","cold, mild, cool, hot, warm","mild, cold, cool, warm, hot"],why:"cold → cool → mild → warm → hot."},
     {q:"In the USA, autumn is called ___.",img:"🇺🇸",write:["fall"],why:"autumn (UK) = **fall** (US)."},
-    {theory:"Autumn changes and the harvest",img:"🍂",lines:[
+    {theory:"Autumn changes and the harvest",point:"Autumn changes and the harvest",pointCa:"Els canvis de la tardor i la collita",img:"🍂",lines:[
       "At the end of October **the clocks go back** one hour, so **it gets dark early**.",
       "**Leaves change colour** and then **leaves fall** from the trees.",
       "**Harvest** = the time farmers collect the **crops**. **Seasonal** food grows at this time of year: we **pick** mushrooms and apples."]},
@@ -26,7 +26,7 @@ ELGameDeck({
     {q:"Farmers collect the ___ at harvest time. (cr...)",img:"🌾",write:["crops"],why:"**crops** = the plants farmers grow, like wheat or grapes."},
     {q:"Chestnuts and mushrooms are ___ food: they grow at this time of year.",img:"🍄",options:["seasonal","season","seasonly","seasoned"],why:"**seasonal** (adjective) = typical of one season."},
     {q:"Last Sunday we went to a farm to ___ apples. (p...)",img:"🍎",write:["pick"],why:"**pick fruit** = take it from the tree."},
-    {theory:"Halloween, the Castanyada and feelings",img:"🌰",lines:[
+    {theory:"Halloween, the Castanyada and feelings",point:"Halloween, the Castanyada and feelings",pointCa:"Halloween, la Castanyada i els sentiments",img:"🌰",lines:[
       "We **roast** chestnuts and sweet potatoes and eat **panellets**. People **carve** pumpkins, and children go **trick or treating**.",
       "Feelings with a preposition: **grateful for** · **proud of** · **scared of** · **excited about**",
       "A warm, comfortable room is **cosy** · calm and happy = **relaxed**"]},

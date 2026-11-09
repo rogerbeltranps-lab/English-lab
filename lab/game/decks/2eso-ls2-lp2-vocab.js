@@ -6,7 +6,7 @@
 ELGameDeck({
   title:"Vocabulary · Clothes, kit and weather",
   slides:[
-    {theory:"Clothes and kit",img:"🧢",lines:[
+    {theory:"Clothes and kit",point:"Clothes and kit",pointCa:"Roba i equipament",img:"🧢",lines:[
       "**T-shirt** · **shorts** · **trainers** (sports shoes) · **tracksuit** (sports jacket and trousers)",
       "**cap** (for the sun) · **helmet** (protects your head on a bike)",
       "**wear a uniform** (the same clothes for the whole team) · **wear a costume** (to look like someone else)"]},
@@ -16,7 +16,7 @@ ELGameDeck({
     {q:"It's cold, so she's training in the park in a warm ___. (tr...)",img:"🏃‍♀️",write:["tracksuit"],why:"A **tracksuit** = a sports jacket and trousers."},
     {q:"The Blue Team is wearing their new white ___.",img:"👕",options:["uniform","costume","helmet","cap"],why:"A team wears a **uniform**: the same clothes for everybody."},
     {q:"Put on a ___: the sun is very strong today. (c...)",img:"☀️",write:["cap"],why:"A **cap** protects you from the sun."},
-    {theory:"What's the weather like?",img:"🌦️",lines:[
+    {theory:"What's the weather like?",point:"The weather",pointCa:"El temps",img:"🌦️",lines:[
       "It's **sunny** · **cloudy** · **windy** · It's **raining** · It's **snowing**",
       "It's **foggy** (you can't see far) · **stormy** (thunder and lightning) · **freezing** (very, very cold)",
       "It's 25 **degrees**. · **What's the weather like?** — It's sunny."]},
@@ -25,7 +25,7 @@ ELGameDeck({
     {q:"There's thunder and lightning, so the fair is closed. It's ___.",img:"⛈️",options:["stormy","foggy","sunny","freezing"],why:"**stormy** = there's a storm."},
     {q:"Look at the trees moving! It's very ___. (w...)",img:"🌬️",write:["windy"],why:"wind → **windy**."},
     {q:"It's really hot today: it's 32 ___.",img:"🌡️",options:["degrees","grades","points","minutes"],why:"We measure temperature in **degrees**."},
-    {theory:"At the event",img:"🏟️",lines:[
+    {theory:"At the event",point:"At the event (match, crowd, score…)",pointCa:"Esdeveniments (match, crowd, score…)",img:"🏟️",lines:[
       "a **match** · a **tournament** (many teams) · a **competition** · a **concert** · a **fair**",
       "**win** / **lose** a match · **score** a goal · **warm up** (get ready with some exercise) · **take part in** (participate)",
       "the **crowd** (all the people watching) **cheers** · **half-time** (the break in the middle) · the **highlights**"]},
