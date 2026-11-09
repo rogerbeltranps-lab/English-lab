@@ -3762,7 +3762,9 @@ function fpgClsPick(x){const items=x.items||[],vid=items.find(i=>i.kind==="drive
   const watch=vid?{id:vid.id,name:vid.title||"Classroom video"}:yt?{youtube:yt.url,name:yt.title||"YouTube video"}:null;
   const why=watch?"":!items.length?"nothing attached":items.some(i=>i.mime==="no access")?"a file the school account cannot open (ask the student to share it)"
     :items.some(i=>/vnd\.google-apps\.vid/.test(i.mime||""))?"a Google Vids video (open it and download it as mp4)":items.some(i=>i.kind==="link")?"a link Gemini cannot open (e.g. Canva)":"no video file (slides or a document only)";
-  return {items,watch,why,name:x.name,state:x.state}}
+  // 🔄 Google Vids / Slides / Docs: the school script turns them into an mp4 or a PDF first (fp_convert), Vids first, at most 2 per student
+  const conv=watch?[]:items.filter(i=>i.kind==="drive"&&/vnd\.google-apps\.(vid|presentation|document)/.test(i.mime||"")).sort((p,q)=>(/\.vid/.test(q.mime)?1:0)-(/\.vid/.test(p.mime)?1:0)).slice(0,2);
+  return {items,watch,why,conv,name:x.name,state:x.state}}
 async function fpgClsLoad(group){if(FPG.cls[group])return FPG.cls[group];
   const j=await fpgCall({action:"fp_classroom",group}),by={};(j.subs||[]).forEach(x=>{if(x.email)by[x.email]=fpgClsPick(x)});
   return FPG.cls[group]={course:j.course,work:j.work,by,subs:j.subs||[]}}
@@ -3775,8 +3777,13 @@ async function fpgBulk(u,a){const g=(S.P[u]||{}).group;if(!g||FPG.bulk)return;
   await fpgLoad(a);let i=0;
   for(const s of studs){i++;const x=fpgClsOf(s.uid),old=(FPG.d[a.id]||{})[s.uid];
     if(!x||!x.items.length){rep.none.push(s);continue}
+    if(old&&old.draft&&(x.watch||(x.conv||[]).length)){rep.had.push(s);continue}
+    if(!x.watch&&(x.conv||[]).length){const ids=[];let err="";
+      for(const it of x.conv){FPG.bulk.note=`Converting ${i} of ${studs.length}: ${fullName(s)} · ${it.title||"file"} (Google Vids → mp4, slides → PDF; keep this page open)`;fpgRefresh(a);
+        try{const j=await fpgCall({action:"fp_convert",fileId:it.id,student:fullName(s)});ids.push(j.id)}catch(e){err=e.message}}
+      if(!ids.length){rep.unreach.push({s,x:Object.assign({},x,{why:"could not be converted: "+err})});continue}
+      x.watch={id:ids[0],ids:ids.slice(1),name:x.conv.map(it=>it.title||"file").join(" + ")+" (converted)"};}
     if(!x.watch){rep.unreach.push({s,x});continue}
-    if(old&&old.draft){rep.had.push(s);continue}
     FPG.bulk.note=`Gemini is watching ${i} of ${studs.length}: ${fullName(s)} (about 1–3 minutes each; keep this page open)`;fpgRefresh(a);
     const ok=await fpgWatch(s.uid,a,"",Object.assign({link:true},x.watch));
     (ok?rep.done:rep.failed).push({s,err:ok?"":(((FPG.d[a.id]||{})[s.uid]||{}).error||"")})}
