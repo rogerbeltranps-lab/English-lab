@@ -47,6 +47,24 @@ hourly task "English Lab: problem reports" is switched off.
    schedule is only the backup (GitHub often runs it late). Reports left for Roger get no extra email: the 15-minute alert already told him
    about each new report, and the dashboard shows the note.
 
+## Students' comments, answered at once (Roger, 9 Nov 2026)
+
+"I want you to answer straight away but I want to see what you said and be able to edit … or remove it if I want to." The same task
+answers students' comments on their hand-ins as soon as they send them. When a student's page saves a new comment (not only "no
+problem": `elNoComment`), `shared/js/el-cloud.js` sets `students/{uid}.commented` and starts this task the same way as a report
+(action `problem`, so the same 3-minute and 30-a-day limits, and no new token).
+
+Each run, after the reports (or instead of them, when `auto.mjs open` says "Nothing new"):
+
+1. `node tools/marking/marks.mjs comments --new`. "No new comments." → nothing else to do for comments.
+2. Otherwise answer the sheet exactly as the Friday task does (`/mnt/project-files/claude-answers-preview/daily-answers-task-prompt.md`):
+   read the content file and the hand-in, write as Roger in the first person, never mention AI, Catalan for Starter, Base and no route,
+   English for Core, Plus and Pro, FORYOU for anything that needs Roger. Write the EL-ANSWERS v1 file in the scratchpad and run
+   `node tools/marking/marks.mjs answer <file> --new --apply` (it saves `settings/marking.cmtRun`, so the next run skips them).
+3. No email for comments: Roger sees each answer in the dashboard (group To do: "🗨️ Claude answered N comments this week", and the
+   tab cell in 👥 Students), where he can edit it or 🗑 remove it (the student then sees no answer and Claude does not answer that
+   comment again). The Friday 15:00 task still answers any comment left.
+
 ## Costs and limits
 
 - Firestore: one list of `problems` (a few dozen documents) per run, plus a screenshot per new report. Never list students or results

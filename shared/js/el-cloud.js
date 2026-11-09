@@ -138,7 +138,7 @@ const lsStatus=async id=>(await lsInfo(id)).status;
 // reads the checkpoints, so they must reload too to show the student's saved answers (Roger, 26 Oct 2026: answers always come back).
 async function pull(){
   const s=await getDoc(progressRef()).catch(()=>null);
-  if(s&&s.exists()){const cloud=s.data().data||{};syncing=true;
+  if(s&&s.exists()){const cloud=s.data().data||{};syncing=true;cmtSeen=cmtSigs(cloud);
     const d=dirty();
     for(const k in cloud){if(d[k]&&localStorage.getItem(k)!=null)continue;if(localStorage.getItem(k)!==cloud[k]){origSet.call(localStorage,k,cloud[k]);stale=true}}
     syncing=false}
@@ -166,6 +166,14 @@ function push(){
   timer=setTimeout(send,1500);
 }
 let meAt=0;
+// A new comment on a handed-in step (state.steps[step].comment, not only "no problem": elNoComment) that the cloud copy did not have yet:
+// once it is saved, students/{uid}.commented is set and the school Apps Script starts the scheduled task that answers it (Roger, 9 Nov
+// 2026: "I want you to answer straight away"; the same start as a problem report, wakeFixer). The task reads only the students with
+// a newer `commented` (tools/marking/marks.mjs comments --new), so a run reads a handful of documents.
+let cmtSeen=null;
+function cmtSigs(o){const out=new Set();for(const k in o){const v=o[k];if(typeof v!=="string"||v.charAt(0)!=="{"||v.indexOf('"comment"')<0)continue;
+  let st;try{st=JSON.parse(v).steps}catch(e){continue}
+  for(const id in st||{}){const c=String((st[id]||{}).comment||"").trim();if(c&&!(window.elNoComment&&elNoComment(c)))out.add(k+"|"+id+"|"+c)}}return out}
 async function send(){
   timer=null;
   try{
@@ -173,6 +181,8 @@ async function send(){
     // students/{uid} (name, email, last active) at most every 5 minutes, not on every save: the free plan also has 20,000 writes a day
     if(Date.now()-meAt>5*60e3){await setDoc(doc(db,"students",user.uid),{name:user.displayName||"",email:user.email,updated:serverTimestamp()},{merge:true});meAt=Date.now()}
     await setDoc(progressRef(),{data:snap,updated:serverTimestamp()},{merge:true});
+    {const now=cmtSigs(snap),was=cmtSeen||new Set(),fresh=[...now].some(x=>!was.has(x));cmtSeen=now;
+      if(fresh){await setDoc(doc(db,"students",user.uid),{commented:serverTimestamp()},{merge:true}).catch(e=>console.warn("comment",e));wakeFixer(user)}}
     // saved: these keys are no longer newer here than in the cloud (keys of a locked learning path can never be sent)
     const d=dirty();for(const k in d)if(snap[k]===localStorage.getItem(k)||lockedKeys.includes(k))delete d[k];setDirty(d);
     const a=window.EL_CATALOG&&actId&&EL_CATALOG.find(x=>x.id===actId);
