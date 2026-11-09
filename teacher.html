@@ -3686,9 +3686,7 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
   if(d&&d.error)h+=`<p class="bad" style="color:#b91c1c">⚠️ ${esc(d.error)}</p>`;
   if(d&&d.draft&&R){const x=d.draft,rd=FPG_READ[(x.reading||{}).verdict]||FPG_READ.partly;
     h+=`<p style="margin:10px 0 4px"><b>${rd[0]} ${rd[1]}</b>${x.reading&&x.reading.note?` · ${esc(x.reading.note)}`:""}</p>`
-      +`<table class="lvt"><thead><tr><th style="text-align:left">Row</th><th>Gemini</th><th style="text-align:left">Comments: 👀 only for you · ✔ ➜ for the student</th></tr></thead><tbody>`
-      +R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};return `<tr><td style="text-align:left">${esc(r.name)} <small class="muted">${r.w?r.w+" %":""}</small></td><td><b>${R.kind==="mark"&&g.level!=null?fpgRow(g)+"/10 · "+fpgPlus(g):fpgLv(g.level)}</b></td><td style="text-align:left"><small class="muted">👀 ${esc(g.why||"")}</small>${g.good?`<br><small>✔ ${esc(g.good)}</small>`:""}${g.improve?`<br><small>➜ ${esc(g.improve)}</small>`:""}</td></tr>`}).join("")
-      +`</tbody></table>`+(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x)
+      +(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x)
       +(x.sounds&&x.sounds.length?`<p style="margin:8px 0 2px"><b>🗣️ Words said wrong</b> <small class="muted">(only for you, never shown to the student)</small> <button class="g" data-fpg="sounds" data-u="${u}" data-a="${esc(a.id)}" style="font-size:12px;padding:2px 8px">List for the whole group</button></p><p style="margin:0 0 6px"><small>${x.sounds.map(w=>`<b>${esc(w.word)}</b>${w.heard?" (said “"+esc(w.heard)+"”)":""}`).join(" · ")}</small></p>`:"")
       +`<label>Feedback for the student (Gemini's draft: you can change it below before approving)</label><div class="fb" style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px">${esc(fpgText(R,x))}</div>`
       +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
@@ -3718,7 +3716,7 @@ function rubH(N,sel,tag){const last=N.levels.length-1,gm=tag!=="you";
     return `<div class="rbrow"><div class="rbh"><b>${esc(r.name)}</b> <small class="muted">· ${esc(r.sub)}${r.w?" · "+r.w+" %":""}</small><span class="rbm">${x.m!=null?`<b>${f1(x.m)}</b><small class="muted">/10</small> · `:""}<small class="muted">${L>=0?esc(N.levels[L]):"not marked"}</small></span></div>`
       +`<div class="rbg">${r.d.map((d,k)=>`<div class="rbc${k===L?" on"+(gm?" gm":""):""}"><b>${esc(N.levels[k])}</b>${r.pts?` <small class="muted">${r.pts[k]} pts</small>`:""}${k===L?` <span class="rby">◀ ${esc(tag)}</span>`:""}<div>${esc(d)}</div></div>`).join("")}</div>`
       +(L===last&&L>=r.d.length?`<div class="rbc on${gm?" gm":""}" style="margin-top:6px"><b>${esc(N.levels[last])}</b> <span class="rby">◀ ${esc(tag)}</span></div>`:"")
-      +((x.ok&&x.ok.length)||(x.todo&&x.todo.length)?`<div class="rbn">${x.ok&&x.ok.length?`<div>✔ ${esc(x.ok.join(" "))}</div>`:""}${x.todo&&x.todo.length?`<div>➜ ${esc(x.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
+      +((x.ok&&x.ok.length)||(x.todo&&x.todo.length)||x.why?`<div class="rbn">${x.why?`<div class="muted">👀 ${esc(x.why)} <small>(only for you)</small></div>`:""}${x.ok&&x.ok.length?`<div>✔ ${esc(x.ok.join(" "))}</div>`:""}${x.todo&&x.todo.length?`<div>➜ ${esc(x.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
 // the student's rubric, as they see it (LS1 from the saved feedback; LS2 from your levels)
 function fpStuRub(u,a){const N=fpRub(a),x=res(u,a.id);if(!N)return "";let sel,lead;
   if(N.kind==="mark"){const P=fbParts(x.feedback);if(!x.feedback)return "";
@@ -3730,9 +3728,10 @@ function fpStuRub(u,a){const N=fpRub(a),x=res(u,a.id);if(!N)return "";let sel,le
 // Gemini's draft on the same rubric
 function fpGemRub(a,x){const N=fpRub(a);if(!N||!x)return "";
   const sel=N.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};if(g.level==null)return {L:-1};
-    if(N.kind==="mark"){const m=fpgRow(g);return {L:m==null?-1:rbIdx(m),m,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[]}}
-    return {L:g.level===0?4:4-g.level,m:g.level?g.level*2.5:null,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[]}});
-  return `<details class="rbbox"><summary>📋 Gemini's draft on the rubric</summary><p class="muted" style="margin:4px 0">The level Gemini proposes in each row (blue), with what it would tell the student. Nothing changes until you ✅ Approve.</p>${rubH(N,sel,"Gemini")}</details>`}
+    if(N.kind==="mark"){const m=fpgRow(g);return {L:m==null?-1:rbIdx(m),m,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[],why:g.why||""}}
+    return {L:g.level===0?4:4-g.level,m:g.level?g.level*2.5:null,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[],why:g.why||""}});
+  // Roger, 9 Nov 2026: "I need to see the feedback like this" (the student's shaded rubric): it replaces the table, open, with the 👀 notes
+  return `<div class="rbbox"><p class="muted" style="margin:4px 0">📋 Gemini's draft on the rubric: the level it proposes in each row (blue), 👀 why (only for you), ✔ ➜ what the student will read. Nothing changes until you ✅ Approve.</p>${rubH(N,sel,"Gemini")}</div>`}
 // LS1: mark /10 = levels × 2.5 weighted by the rows (rows Gemini could not judge are left out)
 function fpgMark(R,x){let s=0,w=0;R.rows.forEach((r,i)=>{const m=fpgRow((x.rows||[])[i]||{});if(m!=null){s+=m*r.w;w+=r.w}});return w?Math.round(s/w*10)/10:null}
 // the feedback text the student gets: LS1 in the "Name (30%) · 7.5/10" + ✔/➜ lines the student board shades on the rubric (fbBox in today.html)
@@ -3795,7 +3794,9 @@ function fpgClsPick(x){const items=x.items||[],vid=items.find(i=>i.kind==="drive
   const watch=vid?{id:vid.id,name:vid.title||"Classroom video"}:yt?{youtube:yt.url,name:yt.title||"YouTube video"}:null;
   const why=watch?"":!items.length?"nothing attached":items.some(i=>i.mime==="no access")?"a file the school account cannot open (ask the student to share it)"
     :items.some(i=>/vnd\.google-apps\.vid/.test(i.mime||""))?"a Google Vids video (open it and download it as mp4)":items.some(i=>i.kind==="link")?"a link Gemini cannot open (e.g. Canva)":"no video file (slides or a document only)";
-  return {items,watch,why,name:x.name,state:x.state}}
+  // 🔄 Google Vids / Slides / Docs: the school script turns them into an mp4 or a PDF first (fp_convert), Vids first, at most 2 per student
+  const conv=watch?[]:items.filter(i=>i.kind==="drive"&&/vnd\.google-apps\.(vid|presentation|document)/.test(i.mime||"")).sort((p,q)=>(/\.vid/.test(q.mime)?1:0)-(/\.vid/.test(p.mime)?1:0)).slice(0,2);
+  return {items,watch,why,conv,name:x.name,state:x.state}}
 async function fpgClsLoad(group){if(FPG.cls[group])return FPG.cls[group];
   const j=await fpgCall({action:"fp_classroom",group}),by={};(j.subs||[]).forEach(x=>{if(x.email)by[x.email]=fpgClsPick(x)});
   return FPG.cls[group]={course:j.course,work:j.work,by,subs:j.subs||[]}}
@@ -3808,8 +3809,13 @@ async function fpgBulk(u,a){const g=(S.P[u]||{}).group;if(!g||FPG.bulk)return;
   await fpgLoad(a);let i=0;
   for(const s of studs){i++;const x=fpgClsOf(s.uid),old=(FPG.d[a.id]||{})[s.uid];
     if(!x||!x.items.length){rep.none.push(s);continue}
+    if(old&&old.draft&&(x.watch||(x.conv||[]).length)){rep.had.push(s);continue}
+    if(!x.watch&&(x.conv||[]).length){const ids=[];let err="";
+      for(const it of x.conv){FPG.bulk.note=`Converting ${i} of ${studs.length}: ${fullName(s)} · ${it.title||"file"} (Google Vids → mp4, slides → PDF; keep this page open)`;fpgRefresh(a);
+        try{const j=await fpgCall({action:"fp_convert",fileId:it.id,student:fullName(s)});ids.push(j.id)}catch(e){err=e.message}}
+      if(!ids.length){rep.unreach.push({s,x:Object.assign({},x,{why:"could not be converted: "+err})});continue}
+      x.watch={id:ids[0],ids:ids.slice(1),name:x.conv.map(it=>it.title||"file").join(" + ")+" (converted)"};}
     if(!x.watch){rep.unreach.push({s,x});continue}
-    if(old&&old.draft){rep.had.push(s);continue}
     FPG.bulk.note=`Gemini is watching ${i} of ${studs.length}: ${fullName(s)} (about 1–3 minutes each; keep this page open)`;fpgRefresh(a);
     const ok=await fpgWatch(s.uid,a,"",Object.assign({link:true},x.watch));
     (ok?rep.done:rep.failed).push({s,err:ok?"":(((FPG.d[a.id]||{})[s.uid]||{}).error||"")})}
