@@ -4,7 +4,7 @@
 <style>body{font:15px system-ui,sans-serif;max-width:1400px;margin:0 auto;padding:16px;background:#f8fafc;color:#0f172a}h1,h2{margin:.6em 0 .3em}h2{font-size:1.15rem}.box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin:12px 0}.muted{color:#64748b}small{font-weight:400}
 button{background:#0f766e;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:14px}button.g{background:#e2e8f0;color:#0f172a}a[data-do]{color:#0f766e;cursor:pointer;text-decoration:underline dotted}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.tab{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;padding:8px 16px;font-weight:600}.tab small{color:#64748b;margin-left:4px}.tab.c2eso.on{background:#16a34a;border-color:#16a34a;color:#fff}.tab.c4eso.on{background:#2563eb;border-color:#2563eb;color:#fff}.tab.cnone.on{background:#64748b;border-color:#64748b;color:#fff}.tab.on small{color:#fff}
-.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}a.lsgo{background:#0f766e;color:#fff;border-radius:8px;padding:4px 12px;font-size:14px;font-weight:600;text-decoration:none}a.lsgo:hover{background:#115e59}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}.chip{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:999px;padding:3px 12px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}.chip.dim:not(.on){color:#64748b;border-style:dashed}.lsbar{margin:2px 0 10px}#stans td{white-space:normal}td.ac.st{cursor:pointer}td.ac.st:hover{outline:2px solid #0f766e;outline-offset:-2px}td.pt{white-space:nowrap}td.gcol{white-space:nowrap}a.ptm{cursor:pointer;text-decoration:underline dotted}td.gcol .grings{margin-left:0}td.exm{background:#f8fafc}a.lsgo{background:#0f766e;color:#fff;border-radius:8px;padding:4px 12px;font-size:14px;font-weight:600;text-decoration:none}a.lsgo:hover{background:#115e59}
 .pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 6px;margin:1px}.ce1{background:#fce7f3;color:#9d174d}.ce2{background:#dcfce7;color:#166534}.ce3{background:#e0f2fe;color:#075985}.ce4{background:#ede9fe;color:#5b21b6}.ce5{background:#ffedd5;color:#9a3412}.ce6{background:#fef9c3;color:#854d0e}.ceC{background:#e2e8f0;color:#334155}
 table.plan td,table.plan th{text-align:left;vertical-align:top}table.plan tr.t td{background:#f1f5f9;font-weight:700}table.plan tr.now td{background:#ecfdf5}
 table.mat{width:100%}table.mat td,table.mat th{text-align:left;vertical-align:top}a.chip{text-decoration:none;display:inline-block;margin:1px}.box h3{margin:14px 0 6px;font-size:1rem}
@@ -20,7 +20,7 @@ table.qa td.ql,table.qa th.ql{text-align:left;max-width:440px;white-space:normal
 .attt td button{border:0;background:none;font:inherit;cursor:pointer;padding:2px 6px;border-radius:8px;min-width:34px}.attt .at-ok button{color:#94a3b8}.attt .at-abs button{background:#fee2e2;color:#b91c1c;font-weight:800}.attt .at-late button{background:#ffedd5;color:#c2410c;font-weight:700}
 .attt .at-a{color:#b91c1c}.attt .at-l{color:#c2410c}.attt .att-sum td{color:#64748b;font-size:12px}
 #fsctl .fsnever{margin-top:6px;color:#475569}#fsctl .fsin{margin-top:6px;color:#166534}#fsctl button.fsmin{padding:6px 10px}#fsctl button.svbtn{border-color:#3157d5;color:#3157d5}#fsctl button.svbtn.on{background:#3157d5;color:#fff}#fsctl .svpop{margin-top:8px;background:#fff;border:2px solid #3157d5;border-radius:14px;padding:10px 12px;box-shadow:0 8px 24px #0003;text-align:left;width:min(420px,calc(100vw - 24px));margin-left:auto}#fsctl.on .svpop{margin-left:0}#fsctl .svh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:16px}#fsctl button.svx{background:none;border:0;font-size:18px;color:#475569;padding:2px 6px;box-shadow:none}#fsctl .svg{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px}#fsctl .svg button{background:#fff;border:1px solid #cbd5e1;color:#1e293b;border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px;box-shadow:none}#fsctl .svg button.on{background:#3157d5;border-color:#3157d5;color:#fff}#fsctl .svnote{margin:6px 0;color:#475569;font-size:13px;line-height:1.4}#fsctl .svlist{max-height:min(52vh,420px);overflow:auto;border-top:1px solid #e2e8f0}#fsctl .svlist a{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px solid #f1f5f9;color:#1e293b;text-decoration:none;font-size:15px}#fsctl .svlist a:hover{background:#eef2ff}@media(max-width:640px){#fsctl .svpop{width:auto}}
-.pullbox .pick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.pullbox .chip.on{background:#0f766e;color:#fff;border-color:#0f766e}.tabmv{border:0;background:none;color:#64748b;cursor:pointer;padding:0 2px;font-size:13px;font-weight:700}.tabmv:hover{color:#1d4ed8}.dtabs .tk{white-space:nowrap}.dtabs .tk.on a{color:#64748b;text-decoration:line-through}label.ck .dtabs input{width:13px;height:13px;margin:0 3px 0 0;vertical-align:-2px}label.ck.on .dtabs .tk a{text-decoration:line-through}.nav button{margin-left:2px}.cfrom{color:#b45309;font-weight:600}.satw{border:2px solid #f59e0b;background:#fffbeb}.satw h2{color:#b45309}ul.tips{margin:0 0 4px 28px;padding:0;list-style:none;font-size:13px;color:#475569}ul.tips li{margin:2px 0}.sethw{margin-left:6px;font-size:12px;padding:1px 7px;opacity:.55}label.ck:hover .sethw{opacity:1}button.mini{font-size:12px;padding:0 6px}.hwtabs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:4px 0 8px}.hwtabs b{margin-right:4px}.hwtabs label.chip{display:inline-flex;gap:4px;align-items:center;margin:0;font-weight:400;font-size:13px;cursor:pointer;padding:2px 10px}.hwtabs label.chip input{margin:0}th .lphw{font-size:12px;padding:1px 7px;margin-left:6px;vertical-align:middle;background:#ecfeff;border:1px solid #67e8f9;color:#0e7490;font-weight:600}th .lphw:hover{background:#cffafe}a.lplink{font-size:12px;margin-left:6px;color:#4338ca;border:1px solid #c7d2fe;border-radius:6px;padding:0 6px;text-decoration:none;white-space:nowrap}a.lplink:hover{background:#eef2ff}.hwr{background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;padding:6px 10px;margin:6px 0;font-size:14px}.hwr ul{list-style:none;margin:3px 0;padding:0}.behind{color:#b45309;font-size:13px;margin:4px 0}.wkbar .chip.past{color:#94a3b8}.wkbar .chip small{margin-left:4px}.wk .n{color:#b45309;font-size:13px}ul.due{margin:4px 0;padding-left:18px}ul.due li{margin:3px 0}.late{color:#b91c1c;font-weight:600}.ptok{color:#15803d;font-weight:600}.hand{background:#f8fafc;border-radius:8px;padding:4px 10px;margin:4px 0;white-space:pre-wrap}.hand p{margin:.3em 0}
+.pullbox .pick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.pullbox .chip.on{background:#0f766e;color:#fff;border-color:#0f766e}.tabmv{border:0;background:none;color:#64748b;cursor:pointer;padding:0 2px;font-size:13px;font-weight:700}.tabmv:hover{color:#1d4ed8}.dtabs .tk{white-space:nowrap}.dtabs .tk.on a{color:#64748b;text-decoration:line-through}label.ck .dtabs input{width:13px;height:13px;margin:0 3px 0 0;vertical-align:-2px}label.ck.on .dtabs .tk a{text-decoration:line-through}.nav button{margin-left:2px}.cfrom{color:#b45309;font-weight:600}.satw{border:2px solid #f59e0b;background:#fffbeb}.satw h2{color:#b45309}ul.tips{margin:0 0 4px 28px;padding:0;list-style:none;font-size:13px;color:#475569}ul.tips li{margin:2px 0}.sethw{margin-left:6px;font-size:12px;padding:1px 7px;opacity:.55}label.ck:hover .sethw{opacity:1}button.mini{font-size:12px;padding:0 6px}.hwtabs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:4px 0 8px}.hwtabs b{margin-right:4px}.hwtabs label.chip{display:inline-flex;gap:4px;align-items:center;margin:0;font-weight:400;font-size:13px;cursor:pointer;padding:2px 10px}.hwtabs label.chip input{margin:0}th .lphw{font-size:12px;padding:1px 7px;margin-left:6px;vertical-align:middle;background:#ecfeff;border:1px solid #67e8f9;color:#0e7490;font-weight:600}th .lphw:hover{background:#cffafe}.tabhw{margin:0 0 0 3px;padding:0 3px;font-size:12px;line-height:16px;background:none;border-color:transparent;opacity:.5}.tabhw:hover{opacity:1;background:#cffafe;border-color:#67e8f9}.tabhw.on{opacity:1;background:#ecfeff;border-color:#0e7490}a.lplink{font-size:12px;margin-left:6px;color:#4338ca;border:1px solid #c7d2fe;border-radius:6px;padding:0 6px;text-decoration:none;white-space:nowrap}a.lplink:hover{background:#eef2ff}.hwr{background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;padding:6px 10px;margin:6px 0;font-size:14px}.hwr ul{list-style:none;margin:3px 0;padding:0}.behind{color:#b45309;font-size:13px;margin:4px 0}.wkbar .chip.past{color:#94a3b8}.wkbar .chip small{margin-left:4px}.wk .n{color:#b45309;font-size:13px}ul.due{margin:4px 0;padding-left:18px}ul.due li{margin:3px 0}.late{color:#b91c1c;font-weight:600}.ptok{color:#15803d;font-weight:600}.hand{background:#f8fafc;border-radius:8px;padding:4px 10px;margin:4px 0;white-space:pre-wrap}.hand p{margin:.3em 0}
 .route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-beginners{background:#ffe4e6;color:#9f1239}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-native{background:#e0f2fe;color:#075985}.r-daring{background:#ede9fe;color:#5b21b6}.r-none{color:#94a3b8}
 .wrap{overflow:auto;max-height:75vh;border:1px solid #e2e8f0;border-radius:8px}table{border-collapse:separate;border-spacing:0;font-size:13px}th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:4px 6px;text-align:center;background:#fff}
 thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;vertical-align:top}thead tr+tr th{top:var(--h1,52px)}.stu{position:sticky;left:0;z-index:1;text-align:left;min-width:150px;white-space:nowrap}thead .stu{z-index:3}
@@ -117,6 +117,7 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .aghw{background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:0 4px;margin:0 0 0 2px;font-size:11px;line-height:16px;cursor:pointer;filter:grayscale(1);opacity:.6}.aghw:hover,.aghw:focus{opacity:1}.aghw.on{filter:none;opacity:1;background:#cffafe;border-color:#06b6d4}
 .agiw{background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:999px;padding:0 5px;margin:0 0 0 2px;font-size:11px;line-height:16px;cursor:pointer;white-space:nowrap}.agiw:hover{border-color:#6366f1}.agiw.g{background:#fef3c7;border-color:#f59e0b;color:#92400e}.agiw.m{background:#f1f5f9}.agh .agiw{font-size:12px;padding:0 6px}.agiwk{background:#fef3c7;border:1px solid #f59e0b;border-radius:999px;padding:0 4px;font-weight:400}
 .agc.grp{background:#fffbeb;border-color:#fcd34d;color:#92400e}.agc.shd{font-style:normal;font-weight:600;background:#f5f3ff;border-color:#c4b5fd;color:#5b21b6}.agla.shd{background:#f5f3ff;border-color:#c4b5fd}.agla.shd b{color:#5b21b6}
+.agcp{background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:999px;padding:0 5px;margin:0 0 0 2px;font-size:11px;line-height:16px;cursor:pointer}.agcp:hover,.agcp:focus{border-color:#6366f1;color:#4338ca}.agday .agh .agcp{opacity:.55}.agday .agh:hover .agcp,.agday .agcp:focus{opacity:1}.agg.agsolo .agc{border-style:dashed;flex-wrap:wrap;border-radius:14px}.agsl{color:#64748b;font-weight:400;font-size:12px;margin-right:2px}.agcpl label{display:flex;gap:6px;align-items:center;margin:4px 0}
 .agx{background:none;color:#94a3b8;border:0;padding:0 2px;margin:0;font-size:12px;cursor:pointer;line-height:1}.agx:hover{color:#dc2626}
 .agwk h3{font-size:15px;margin:16px 0 6px;color:#334155}
 .agdays{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;align-items:stretch}
@@ -1165,6 +1166,15 @@ const tTile=(p,ic,t,sub,badge,late,cls,g)=>`<a class="tile ${cls||""}" href="#" 
 const tAlert=(p,ic,txt,go,cls)=>`<a class="hal ${cls||"late"}" href="#" data-do="place" data-p="${p}">${ic} ${txt}<span>${go} →</span></a>`;
 const placeHead=(back,p)=>`<div class="ph"><p class="crumb"><a class="back" href="#" data-do="place" data-p="home">‹ ${back}</a></p><h1 class="pt">${PLACES[p]?PLACES[p].join(" "):""}</h1></div>`;
 const plural=(n,w)=>n+" "+w+(n===1?"":"s");
+// the LS chips under a place's title (Roger, 9 Nov 2026: "when I enter in each button in there I need to be able to change the LS"): every LS
+// of the group's course; a Hidden LS or one not assigned to the group says so on hover and shows lighter
+const lsChip=(l,on,mine)=>{const hid=((S.D.ls[l.id]||{}).status||"hidden")==="hidden",off=!mine(l);
+  return `<button class="chip lsc ${on?"on":""} ${hid||off?"dim":""}" data-do="lspick" data-ls="${l.id}" title="${lsLabel(l)}${hid?" · Hidden":""}${off?" · not assigned to this group":""}">${lsLabel(l)}</button>`};
+const lsChips=(lss,ls,mine)=>`<div class="bar lsbar"><span class="muted">LS:</span> ${lss.map(l=>lsChip(l,l.id===ls,mine)).join("")}</div>`;
+// 👥 Students: the term (its points, and the LSs it offers) and the LS (its learning paths)
+function stuBar(grp,lss,mine){const now=elTerm(),inT=lss.filter(l=>"t"+lsTerm(l)===S.term);
+  return `<div class="bar lsbar"><span class="muted">Term:</span> ${EL_TERMS.map(t=>`<button class="chip ${t.id===S.term?"on":""}" data-do="stuterm" data-t="${t.id}">${esc(t.en)}${t.id===now?" · now":""}</button>`).join("")}`
+    +`<span class="muted" style="margin-left:10px">LS:</span> ${inT.length?inT.map(l=>lsChip(l,l.id===S.ls,mine)).join(""):`<span class="muted">no LS in ${esc(elTermName(S.term))} yet: the table shows the points only</span>`}</div>`}
 // the group's next class by the timetable (or the one going on now): {gid, date, start, end, now}
 function nextClass(gid){const T=window.EL_TIMETABLE;if(!T||!T.groups)return null;const now=window.EL_NOW?new Date(window.EL_NOW):new Date(),m0=now.getHours()*60+now.getMinutes();
   const off=d=>(T.off||[]).some(o=>Array.isArray(o)?o[0]<=d&&d<=o[1]:o===d),DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],hm=x=>Math.floor(x/60)+":"+String(x%60).padStart(2,"0");
@@ -1257,8 +1267,12 @@ function render0(){
   if(S.year){$("#main").innerHTML=placeHead(grp.name,"")+`<div class="bar">${filters}</div>`+yearView(grp,shown);return}
   const back=grp.name+" · "+lsLabel(EL_LS.find(l=>l.id===ls));
   const todoH=todo(inG.filter(s=>!s.away),ls,list),nTodo=(todoH.match(/<li>/g)||[]).length;
-  const lpAll=`<div class="box lpall">${G()&&G().only?`<details data-k="lpall" ${S.open.has("lpall")?"open":""}><summary>Learning paths and activities <small class="muted">(practice: not graded in this LS)</small></summary>`:"<h2>Learning paths and activities</h2>"}${fold("key","Key",`<p class="muted">Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo), where ↩ Send it back asks the student to change it and hand it in again (↩ sent back until they do). Grey rows: on the student list, not signed in yet.</p>`,"key")}
-      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button>${shown.length?gzBar():""}${shown.length?`<button class="g gfsb" data-do="gfs" title="${S.gfs?"Back to the dashboard (Esc)":"Show this table on the whole screen"}">${S.gfs?"✕ Exit full screen":"⛶ Table full screen"}</button>`:""}</div>${shown.length?`<div class="wrap">${progress(shown,list)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}${G()&&G().only?"</details>":""}</div>`;
+  // 👥 Students is the group's place across LSs and terms (Roger, 9 Nov 2026: "I want to be able to choose the LS, the term (1, 2, or 3)
+  // and in each term the points in the same table … the students section is like a transversal place not only of the LS"): the term picks
+  // the points columns (and the LSs offered), the LS picks the learning path columns. A term with no LS yet shows the points only.
+  const stuTermLs=lss.filter(l=>"t"+lsTerm(l)===S.term),stuList=S.place==="students"&&!stuTermLs.some(l=>l.id===ls)?[]:list;
+  const lpAll=`<div class="box lpall"><h2>${stuList.length?"Learning paths and activities":"Points"}${stuList.length&&G()&&G().only?' <small class="muted">(this LS\'s learning paths are practice: not graded)</small>':""}</h2>${fold("pthow","How points work",ptHow(S.g),"key")}${fold("key","Key",`<p class="muted"><b>Click any tab cell</b> to see what the student answered there (every question with their first try, what is on the page now and the right answer; a checkpoint shows its answers), and 👁 to open it as they see it. <b>📝 Exam</b>: click a mark for the points of each section. <b>Points, All work and Bonus</b> are of the term chosen above. Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo), where ↩ Send it back asks the student to change it and hand it in again (↩ sent back until they do). Grey rows: on the student list, not signed in yet.</p>`,"key")}
+      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button>${shown.length?gzBar():""}${shown.length?`<button class="g gfsb" data-do="gfs" title="${S.gfs?"Back to the dashboard (Esc)":"Show this table on the whole screen"}">${S.gfs?"✕ Exit full screen":"⛶ Table full screen"}</button>`:""}</div>${shown.length?`<div class="wrap">${progress(shown,stuList,S.place==="students")}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}</div>`;
   const legendB=`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`;
   const resultB=(G()&&G().only?"":`<div class="box">${G()&&G().evidence?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
       :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`);
@@ -1274,13 +1288,15 @@ function render0(){
       +(G()?gradeBox(shown,fb)+(G().only?"":resultB):fb+resultB)+selfBox(ls,grp,shown)},
     // the route and tutor chips filter the students' grid right under them (Roger, 7 Nov 2026: "here, I should have this"); the boxes
     // below it (routes, points, student list) are for the whole group
-    students:()=>`<div class="bar">${stuF}</div>`+lpAll+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(shown),
+    students:()=>stuBar(grp,lss,mine)+`<div class="bar">${stuF}</div>`+lpAll+routesBox(grp,inG.filter(s=>!s.tester))+rosterBox(shown),
     msgs:()=>annBox()+pbBox()+sgBox(),
     cov:()=>covPage(grp,ls),
     att:()=>attPage(grp),
     fp:()=>fpPage(grp,ls,list,inG.filter(s=>!s.away&&!s.tester)),
     plan2:()=>tp2Page(grp,ls,studs)};
-  if(place[S.place]){$("#main").innerHTML=placeHead(back,S.place)+place[S.place]()}
+  // the LS can be changed inside every place (Roger, 9 Nov 2026: "when I enter in each button in there I need to be able to change the
+  // LS"): chips under the title; the group-wide places (Students, Attendance, Messages) have no LS in their link back
+  if(place[S.place]){const wide=["students","att","msgs"].includes(S.place);$("#main").innerHTML=placeHead(wide?grp.name:back,S.place)+(wide?"":lsChips(lss,ls,mine))+place[S.place]()}
   else{S.place="home";
     const np=S.D.pb.filter(x=>!x.fixed).length,nw=(S.D.sg||[]).filter(x=>!x.read).length,nr=msgNew(grp.id).length,x=p&&gi>=0?{ls,p,gi,gid:grp.id}:null,nb=x?behind(x).length:0;
     const al=lsWarn(ls,grp,mine(EL_LS.find(l=>l.id===ls)))
@@ -1298,7 +1314,7 @@ function render0(){
       +tTile("paths","📈","Learning paths","open and lock, assessment criteria")
       +tTile("fp","🎬","Final product",fa?"mark the students' work: videos, Gemini's drafts, your marks":"this LS has no final product on the site",fw?fw+" to approve":"",false)
       +tTile("marks","📊","Marks","LS grade, criteria, self-assessment")
-      +tTile("students","👥","Students","progress, levels, team points, student list")
+      +tTile("students","👥","Students","every LS and term: progress, answers, exam, points, levels, student list")
       +tTile("att","🙋","Attendance","who was absent or late in each class: the register")
       +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
       +tTile("cov","🎯","Coverage","criteria, competences, grammar and lexicon worked, this LS and the year",(n=>n?n+" to check":"")(covGaps(grp,ls)),true)
@@ -1805,20 +1821,41 @@ function ptCsv(g){
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+rows.map(r=>r.map(q).join(";")).join("\r\n")],{type:"text/csv"}));
   a.download=`points-${g}-${S.term}.csv`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5e3);
 }
-function pointsBox(g){
-  const studs=ptStuds(g),term=S.term,best=ptBestOk(g),top=ptBest(g),now=elTerm();
-  const terms=EL_TERMS.map(t=>`<button class="chip ${t.id===term?"on":""}" data-do="ptterm" data-t="${t.id}">${t.en}${t.id===now?" · now":""}</button>`).join("");
-  let ok=0;
-  const work=(m,s)=>{if(!m)return '<span class="muted" title="Not signed in yet: no work saved">–</span>';if(!m.length)return ok++,'<span class="ptok">✓ All done</span>';const n=ptTabsN(s,m);   // in tabs, as on the student's board
-    return `<span class="late" title="${esc(ptTabs(s,m).map(([a,d,ns])=>a.title+" · due "+ELWeek.date(d)+(ns.length?": "+ns.join(", "):"")).join("\n"))}">✗ ${n} ${n===1?"tab":"tabs"} missing</span>`};
-  const rows=studs.map(s=>{const p=ptOn(s),k=esc(pkey(s)),m=ptMiss(s),b=elBonus(p,best);return `<tr class="${s.away?"away":""}"><td class="stu">${name(s)}</td><td class="ptn"><button class="lv" data-do="ptadd" data-k="${k}" data-d="-1" ${p>0?"":"disabled"} aria-label="Remove a point">−</button> <b>${p}</b> <button class="lv" data-do="ptadd" data-k="${k}" data-d="1" aria-label="Add a point">+</button></td><td>${work(m,s)}</td><td>${m&&m.length&&b?`<s class="muted" title="No bonus until all the work is done">+${elNum(b)}</s> <b>+0</b>`:`<b>+${elNum(ptGets(s,best,m))}</b>`}</td></tr>`}).join("");
-  const body=(S.D.ptErr?'<p><b>The team points could not be read.</b> Publish the Firestore rules (they publish when the change reaches main) and reload.</p>':"")
-    +`<p class="muted">Points from the <a href="lab/game/host.html" target="_blank">🎮 class games</a> (<a href="lab/game/results.html?g=${encodeURIComponent(g)}" target="_blank">📊 results by game and student</a>) (choose a game and the group: its signed-in students are taken into it) and the class presentations: open 📡 Class there, signed in with this account, and start the class for ${esc(GR.find(x=>x.id===g).name)}; students join from the Learning Path and every right answer they tap is +1. Bonus on the term grade = ${elNum(EL_POINTS_BONUS)} × the student's points ÷ the points of the best student in the group with all the work done (${best} in ${elTermName(term)}; the top score of everyone is ${top}), so it only adds; every term starts at 0. A change here (an absent student, a mistake) is for that student only. Students see their points and their bonus on their board.</p>`
-    +`<p class="muted"><b>All the work done:</b> only a student who has done every activity due so far this term gets the bonus (activities of the time plan whose due day is past, in learning paths you opened for the group; done late still counts; the final product and homework do not). Hover “missing” for the list. Students see the same on their board.</p>`
-    +`<div class="bar"><span class="muted">Term:</span> ${terms}${studs.length?` <button class="chip" data-do="ptcsv" title="Download this group's points and bonuses (CSV, opens in a spreadsheet)">⬇ Export</button>`:""}</div>`
-    +(studs.length?`<div class="ptwrap"><table class="pts"><thead><tr><th class="stu">Student</th><th>Points</th><th>All work</th><th>Bonus</th></tr></thead><tbody>${rows}</tbody></table></div><p class="muted">${ok} of ${studs.length} with all the work done in ${elTermName(term)}.</p>`:'<p class="muted">No students in this group.</p>');
-  return `<div class="box">${fold("points",`Points <small class="muted">· ${elTermName(term)} · best with all the work done ${best}</small>`,body)}</div>`;
-}
+// The Points explanation and ⬇ Export (the points themselves are columns of the Students table: ptCols). Roger, 9 Nov 2026: "in each term
+// the points in the same table".
+function ptHow(g){const term=S.term,best=ptBestOk(g),top=ptBest(g),studs=ptStuds(g),ok=studs.filter(ptOk).length;
+  return (S.D.ptErr?'<p><b>The team points could not be read.</b> Publish the Firestore rules (they publish when the change reaches main) and reload.</p>':"")
+    +`<p class="muted">Points from the <a href="lab/game/host.html" target="_blank">🎮 class games</a> (<a href="lab/game/results.html?g=${encodeURIComponent(g)}" target="_blank">📊 results by game and student</a>) and the class presentations: every right answer a student taps is +1. Use − and + in the table for an absent student or a mistake (for that student only). Bonus on the term grade = ${elNum(EL_POINTS_BONUS)} × the student's points ÷ the points of the best student in the group with all the work done (${best} in ${elTermName(term)}; the top score of everyone is ${top}), so it only adds; every term starts at 0. Students see their points and their bonus on their board.</p>`
+    +`<p class="muted"><b>All work:</b> only a student who has done every activity due so far in the term gets the bonus (activities of the time plan whose due day is past, in learning paths you opened for the group, in every LS of the term; done late still counts; the final product and homework do not). Hover “missing” for the list. ${ok} of ${studs.length} with all the work done in ${elTermName(term)}.</p>`
+    +(studs.length?`<div class="bar"><button class="chip" data-do="ptcsv" title="Download this group's points and bonuses (CSV, opens in a spreadsheet)">⬇ Export ${esc(elTermName(term))}</button></div>`:"")}
+// the points columns of one student row (Points − n +, All work, Bonus) for the term on screen; best = ptBestOk(group), worked out once
+function ptCols(s,best){if(s.tester||!pkey(s))return `<td class="first pt">–</td><td class="pt">–</td><td class="pt">–</td>`;
+  const p=ptOn(s),k=esc(pkey(s)),m=ptMiss(s),b=elBonus(p,best),n=m&&m.length?ptTabsN(s,m):0;
+  const work=!m?'<span class="muted" title="Not signed in yet: no work saved">–</span>':!m.length?'<span class="ptok">✓ All done</span>'
+    :`<a class="late ptm" role="button" data-do="ptmiss" data-u="${s.uid}" title="${esc(ptTabs(s,m).map(([a,d,ns])=>a.title+" · due "+ELWeek.date(d)+(ns.length?": "+ns.join(", "):"")).join("\n"))}\nClick: the list, with each tab to open">✗ ${n} ${n===1?"tab":"tabs"} missing</a>`;
+  return `<td class="first pt ptn"><button class="lv" data-do="ptadd" data-k="${k}" data-d="-1" ${p>0?"":"disabled"} aria-label="Remove a point">−</button> <b>${p}</b> <button class="lv" data-do="ptadd" data-k="${k}" data-d="1" aria-label="Add a point">+</button></td>`
+    +`<td class="pt">${work}</td><td class="pt">${m&&m.length&&b?`<s class="muted" title="No bonus until all the work is done">+${elNum(b)}</s> <b>+0</b>`:`<b>+${elNum(ptGets(s,best,m))}</b>`}</td>`}
+// ✗ n tabs missing opens the list (Roger, 9 Nov 2026: "when I press missing I should be able to see it"): every learning path due so far
+// in the term with the tabs still missing, oldest first, each tab a link to that tab in the read-only student view (what they did so far)
+function ptMissDlg(u){const s=S.P[u];if(!s)return;const m=ptMiss(s)||[];redraw=null;
+  const rows=m.map(([a,d])=>{const left=elTabsLeft(a,doneSet(u,a),(S.D.rs[u]||{})[a.id]).filter(g=>g.length);
+    const tab=g=>{const c=!isLS1(a)&&lpCols(a).find(x=>x.ks.includes(g[0])),t=c?c.t:stepTab(a,g[0]);return `<a class="chip" href="${seeAs(u,a,t)}" target="_blank" rel="noopener" title="Open this tab as ${esc(fullName(s))} sees it (read-only)">${esc(c?c.n:g[0])}</a>`};
+    return `<tr><td style="text-align:left"><b>${esc(a.title)}</b><br><small class="muted">${lsLabel(EL_LS.find(l=>l.id===a.ls))} · due ${esc(ELWeek.date(d))}</small></td><td style="text-align:left">${left.map(tab).join(" ")||'<span class="muted">–</span>'}</td></tr>`}).join("");
+  dlg(`<h3>✗ Missing work · ${name(s)}</h3><p class="muted">${esc(elTermName(S.term))}: the learning paths due so far that are not finished (every LS of the term), with the tabs still to do. Click a tab to open it as they see it. Until they are done there is no points bonus.</p>`
+    +(rows?`<table><thead><tr><th style="text-align:left">Learning path</th><th style="text-align:left">Tabs missing</th></tr></thead><tbody>${rows}</tbody></table>`:'<p>✓ Nothing missing.</p>'),true)}
+// 📝 Exam column of the Students table: the exam mark of the LS on screen (sections typed in 📊 Marks or imported); click = exDlg
+const exOf=ls=>((window.EL_GRADING||{})[ls]||{}).exam||null;
+function exCell(u,ls){const e=exOf(ls),m=examMark(u,ls);if(!e)return "";
+  return `<td class="first sc exm" data-do="exdlg" data-u="${u}" title="Click: the exam section by section">${m?`<b>${f1(m.mark)}</b>${m.n<m.of?`<br><small class="muted">${m.n} of ${m.of} sections</small>`:""}`:'<span class="muted">not yet</span>'}</td>`}
+function exDlg(u){const s=S.P[u],ls=S.ls,e=exOf(ls),l=EL_LS.find(x=>x.id===ls);if(!s||!e)return;redraw=null;
+  const x=res(u,asId(ls)),sc=x.sections||{},m=examMark(u,ls),bc=elExamByCrit(e,sc),cr=exCrits(e),p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,s.group):-1,ex=gi>=0?ELWeek.exam(p,gi):null;
+  dlg(`<h3>📝 Exam · ${lsLabel(l)}</h3><p class="muted">${name(s)} · exam version ${esc(LV[x.version]||x.version||"not set")}${ex?" · on "+esc(ELWeek.date(ex)):""}</p>`
+    +`<p><b>Exam mark: ${m?f1(m.mark)+" / 10":"not entered yet"}</b>${m&&m.n<m.of?` <span class="muted">(${m.n} of ${m.of} sections entered)</span>`:""}</p>`
+    +`<table><thead><tr><th style="text-align:left">Section</th><th>Criteria</th><th>Points</th></tr></thead><tbody>${e.sections.map(([k,n,mx,cs])=>{const y=sc[k];return `<tr><td style="text-align:left">${esc(n)}</td><td>${cs?secPills(cs):""}</td><td>${y&&y.score!=null?`<b>${y.score}</b> / ${y.max??mx}`:'<span class="muted">–</span>'}</td></tr>`}).join("")}</tbody></table>`
+    +(e.level?`<p>Writing level ${pill(e.level.c)}: <b>${((x.levels||{})[e.level.step]||{})[e.level.c]||"–"}</b></p>`:"")
+    +(cr.length&&m?`<p class="muted">By criterion: ${cr.map(c=>{const o=bc.find(y=>y.c===c);return pill(c)+" "+f1(critMark(o))}).join(" · ")}</p>`:"")
+    +`<p class="muted">The exam is done on paper, so the site keeps each section's points, not the answers. Type or change the points in 📊 Marks. The 📄 report is the exam page of the student's board, as they see it.</p>`
+    +`<div class="row" style="justify-content:flex-start"><a class="btn" href="today.html?student=${encodeURIComponent(u)}&ls=${encodeURIComponent(ls)}#exam" target="_blank" rel="noopener">📄 Their exam report</a></div>`,true)}
 // 🏠 on a learning path's heading (set some of its tabs as homework): a group tab whose time plan has this LS, and a page with tabs
 const canHw=a=>GR.some(g=>g.id===S.g)&&((window.EL_SECTIONS||{})[a.id]||[]).length>0&&ELWeek.col((window.EL_PLAN||{})[a.ls],S.g)>=0;
 // 🧩 📚 class game circles next to each student (Roger, 6 Nov 2026: "I want those circles next to the students in the list"): % right in the
@@ -1871,22 +1908,29 @@ const colCrit=(a,c)=>{if(c.ks.length===1||colSkip(a,c))return stepCrit(a,c.ks[0]
 const colCell=(u,a,c,d)=>{const n=c.ks.filter(k=>d.has(k)).length;
   return (n===c.ks.length?"✔":n?`<small title="${esc(c.ks.map(k=>tabName(a,k)+(d.has(k)?" ✔":": not done yet")).join("\n"))}">${n} of ${c.ks.length}</small>`:"")
     +c.ks.map(k=>tryCell(u,a.id,k)+wrCell(u,a,k)).join("")};
-function progress(studs,list){
-  loadGames();
+function progress(studs,list,stu){
+  loadGames();const ex=stu&&list.length&&exOf(S.ls),best=stu?ptBestOk(S.g):0;
   const open=a=>!S.folded.has(a.id)&&lpCols(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
-  let h1=`<tr><th class="stu"${rs}>Student${GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small><span class="pkey" aria-hidden="true"><i class="g">🧩</i><i class="v">📚</i></span>':""}</th><th class="rtc"${rs}>Route</th>`,h2="<tr>";
-  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}${canHw(a)?` <button type="button" class="g mini lphw" data-do="lphw" data-a="${esc(a.id)}" title="Set some tabs of this learning path as homework">🏠 Homework</button>`:""}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} ${lpCols(a).some(c=>c.ks.length>1)?"points: Vocabulary counts 2, its study cards and its sentences":"steps"})`:pts(a)}</small>`;
+  // 🧩 📚 class game circles: in Students a column of their own after the points (Roger, 9 Nov 2026: "I want the circles of percentage of
+  // the grammar and vocab too … here"), so an LS with no class games saved says so instead of showing nothing
+  const gc=stu&&list.length>0,gl=GAMES[S.g],gAny=gc&&gl&&!gl.busy&&Object.values(S.P).some(s=>s.group===S.g&&gameMine(s));
+  let h1=`<tr><th class="stu"${rs}>Student${!stu&&GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small><span class="pkey" aria-hidden="true"><i class="g">🧩</i><i class="v">📚</i></span>':""}</th><th class="rtc"${rs}>Route</th>`+(stu?`<th class="first"${rs} title="Team points of ${esc(elTermName(S.term))} (− / + for an absent student or a mistake)">Points<br><small class="muted">${esc(elTermName(S.term))}</small></th><th${rs}>All work</th><th${rs}>Bonus</th>`:"")+(gc?`<th class="first" style="min-width:118px"${rs} title="% right in the class games of this LS. Hover a circle for the games, click it for every answer and the notes">Class games<br><small class="muted">🧩 grammar · 📚 vocabulary</small>${gl&&!gl.busy&&!gAny?`<br><small class="muted">none saved in this LS yet</small>`:""}</th>`:"")+(ex?`<th class="first"${rs} title="The exam of this LS (out of 10). Click a mark for the sections">📝 Exam</th>`:""),h2="<tr>";
+  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} ${lpCols(a).some(c=>c.ks.length>1)?"points: Vocabulary counts 2, its study cards and its sentences":"steps"})`:pts(a)}</small>`;
     if(open(a)){h1+=`<th class="lp first" colspan="${lpCols(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
-      h2+=lpCols(a).map((c,i)=>`<th class="ac ${i?"":"first"} ${colSkip(a,c)?"skip":""}">${colLink(a,c)}<br>${colCrit(a,c)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
+      // 🏠 per tab (Roger, 9 Nov 2026: "the homework button should only be per SLP"): one small 🏠 on each tab's column, not on the learning
+      // path's heading; it opens Set as homework with only that tab ticked. Filled when the tab is already in a homework of the group.
+      const hx=canHw(a)&&!isCp(a)?planX(a.ls,S.g):null,hs=hx?hwItems(hx):null;
+      h2+=lpCols(a).map((c,i)=>`<th class="ac ${i?"":"first"} ${colSkip(a,c)?"skip":""}">${colLink(a,c)}${hx&&c.t?`<button type="button" class="g mini tabhw${hs.has(a.id+"#"+c.t)?" on":""}" data-do="lphw" data-a="${esc(a.id)}" data-t="${esc(c.t)}" title="${hs.has(a.id+"#"+c.t)?"Already homework for this group · click to set it again":"Set this tab as homework"}">🏠</button>`:""}${isLS1(a)?"":"<br>"+colCrit(a,c)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
     else h1+=`<th class="lp first"${rs} data-do="fold" data-a="${a.id}">${head}</th>`});
   h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
   let b="";const cols=list.reduce((n,a)=>n+(open(a)?lpCols(a).length+1:1),0);
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
-    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${gameRings(s)}${notesLink(s,S.ls)}${pChip(s)}</td>`;
-    if(s.away){b+=`<tr class="away">${who}${awayRt(s)}<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td><td class="first">–</td></tr>`;return}
-    b+=`<tr>${who}${rtCell(s.uid)}`;
+    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${stu?"":gameRings(s)}${notesLink(s,S.ls)}${pChip(s)}</td>`;
+    const pc=(stu?ptCols(s,best):"")+(gc?`<td class="first gcol">${s.away?"–":gl&&gl.busy?'<small class="muted">loading…</small>':gameRings(s)||'<small class="muted">–</small>'}</td>`:"");
+    if(s.away){b+=`<tr class="away">${who}${awayRt(s)}${pc}${ex?'<td class="first">–</td>':""}${cols?`<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td>`:""}<td class="first">–</td></tr>`;return}
+    b+=`<tr>${who}${rtCell(s.uid)}${pc}${ex?exCell(s.uid,S.ls):""}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
-      if(open(a))b+=lpCols(a).map((c,i)=>`<td class="ac ${i?"":"first"} ${colSkip(a,c)?"skip":""}">${colCell(s.uid,a,c,d)}</td>`).join("");
+      if(open(a))b+=lpCols(a).map((c,i)=>`<td class="ac st ${i?"":"first"} ${colSkip(a,c)?"skip":""}" data-do="step" data-u="${s.uid}" data-a="${esc(a.id)}" data-c="${i}">${colCell(s.uid,a,c,d)}</td>`).join("");
       b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}"${c.tip?` title="${esc(c.tip)}"`:""}>${c.t}</td>`;
       const y=a.graded&&x&&x.max&&scOf(s.uid,a);if(y){ts+=y.score;tm+=y.max}});
     b+=`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td></tr>`});
@@ -2423,6 +2467,7 @@ function weeks(x){const p=x.p,i=ELWeek.row(p,wkOpen()),sp=ELWeek.span(p),t=wkOpe
   return nx>=0?`<p class="muted">No classes planned this week.</p>`+weekRow(x,nx,"Next"):`<p class="muted">This plan ended on ${ELWeek.date(sp[1])}.</p>`}
 // Group tab: the time plan of the LS on screen, with how many students have done each activity due this week or before
 function timeBox(ls,grp,studs){const p=(window.EL_PLAN||{})[ls],gi=ELWeek.col(p,grp.id),x={ls,p,gi,gid:grp.id};
+  if((!p||gi<0)&&/-my-real-routine$/.test(ls))return `<div class="box"><h2>Time plan</h2><p class="muted">LS1 was taught before the time plan was on the site, so it has no agenda here. Its learning paths, exam and final product are in 👥 Students and 📊 Marks.</p></div>`;
   if(!p||gi<0)return `<div class="box"><h2>Time plan</h2><p class="muted">No time plan for ${esc(grp.name)} in this LS yet. Add it to <code>shared/js/el-plan.js</code> (groups, exam, due and the weeks with their <code>from</code> date).</p></div>`;
   const t=ELWeek.today(),i=ELWeek.row(p),end=i>=0?ELWeek.add(p.rows[i].from,6):t;
   const due=Object.keys(p.due||{}).map(id=>[byId(id),ELWeek.due(p,id,gi)]).filter(([a,d])=>a&&d&&d<=end&&!a.manual).sort((x,y)=>x[1]<y[1]?-1:1);
@@ -2502,6 +2547,7 @@ function agSave(x,fn,quiet){let ag=agOf(x),seed=null;if(!ag){seed=agSeed(x);ag=s
   if(ag.min){Object.keys(ag.min).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1))||!(+ag.min[q]>0))delete ag.min[q]});if(!Object.keys(ag.min).length)delete ag.min}
   if(ag.man){Object.keys(ag.man).forEach(d=>{if(!ag.days[d])delete ag.man[d]});if(!Object.keys(ag.man).length)delete ag.man}
   if(ag.wk){Object.keys(ag.wk).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1)))delete ag.wk[q]});if(!Object.keys(ag.wk).length)delete ag.wk}
+  if(ag.solo){Object.keys(ag.solo).forEach(q=>{const i=q.indexOf("|");if(!(ag.days[q.slice(0,i)]||[]).includes(q.slice(i+1)))delete ag.solo[q]});if(!Object.keys(ag.solo).length)delete ag.solo}
   acts(x.ls).forEach(a=>{if(!ag.lab[a.id])ag.lab[a.id]=agLab(x,a)});
   const ps=[api.planEdit(x.ls,x.gid,"agenda",JSON.stringify(ag))];
   const touched=new Set([...agDays(ag),...Object.keys(tkOf(x)).filter(k=>k.startsWith(x.ls+"|@")&&!k.includes("#")).map(k=>k.slice(x.ls.length+2))]);
@@ -2539,8 +2585,8 @@ const addIt=(ag,d,it)=>{const a=ag.days[d]=ag.days[d]||[];if(a.includes(it))retu
 function agMove(x,its,from,to,done){agSave(x,(ag,tk,on)=>{let n=0;its.forEach(it=>{
   const all=Object.keys(ag.days).filter(d=>ag.days[d].includes(it)),src=from?all.filter(d=>d===from):all.filter(d=>!on(d,it));
   if(!from&&!src.length&&all.length&&(done||!to))return;
-  let v=false,gw=null,gm=null;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w&&!S.autoTk.has(x.ls+"|"+itKey(d,it))){v=w;tk[itKey(d,it)]=false}gw=gw||(ag.wk||{})[d+"|"+it]||null;gm=gm||(ag.min||{})[d+"|"+it]||null;rmIt(ag,d,it);n++});
-  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v;if(gw){ag.wk=ag.wk||{};ag.wk[to+"|"+it]=gw}if(gm){ag.min=ag.min||{};ag.min[to+"|"+it]=gm}}});
+  let v=false,gw=null,gm=null,gs=null;src.forEach(d=>{if(d===to)return;const w=on(d,it);if(w&&!S.autoTk.has(x.ls+"|"+itKey(d,it))){v=w;tk[itKey(d,it)]=false}gw=gw||(ag.wk||{})[d+"|"+it]||null;gm=gm||(ag.min||{})[d+"|"+it]||null;gs=gs||(ag.solo||{})[d+"|"+it]||null;rmIt(ag,d,it);n++});
+  if(to&&!src.includes(to)&&!(ag.days[to]||[]).includes(it)){addIt(ag,to,it);n++;if(v)tk[itKey(to,it)]=v;if(gw){ag.wk=ag.wk||{};ag.wk[to+"|"+it]=gw}if(gm){ag.min=ag.min||{};ag.min[to+"|"+it]=gm}if(gs){ag.solo=ag.solo||{};ag.solo[to+"|"+it]=gs}}});
   return n>0})}
 const agItems=a=>secOf(a).length?itemsOf(a).map(z=>a.id+"#"+z[0]):[a.id+"#"];
 const nextClassDay=(x,d)=>ELWeek.classDays(x.gid,ELWeek.add(d,1),ELWeek.add(d,70))[0]||null;
@@ -2608,13 +2654,18 @@ const minSel=(x,d,it)=>{const v=agMin(agOf(x),d,it),os=[...new Set([...MINS,...(
 // learning path's tabs in the path's own order. The tabs (SLPs) of a learning path always keep the path's order, on every day (Roger, 7 Nov 2026:
 // "SLP should always be in order, the only thing that I can move are the LP and games"): only games, notes and whole learning paths move.
 const isTab=it=>{const i=it.indexOf("#");return !/^note:/.test(it)&&i>0&&i<it.length-1&&!isGame(it.slice(i+1))};
-function agTabOrder(its){const out=its.slice(),by={};
-  out.forEach((it,i)=>{if(!isTab(it))return;const id=it.split("#")[0];(by[id]=by[id]||[]).push(i)});
+// A tab out of its learning path's box (Roger, 9 Nov 2026: "I want to be able to take a SLP out of the box, in this case the shadowing"):
+// a tab dragged up or down inside its own day leaves the box and stands on its own where the blue line shows ("LP3 · Shadowing", dashed),
+// so it can go before or after anything else of the day; ⤺ puts it back in its box. The one exception to "tabs keep the path's order".
+// Stored in the agenda as solo: {"day|item": 1}; it goes with the tab when it moves to another day. One write per change.
+const agSolo=(ag,d,it)=>!!(ag.solo||{})[d+"|"+it];
+function agTabOrder(its,solo){const out=its.slice(),by={};
+  out.forEach((it,i)=>{if(!isTab(it)||solo&&solo(it))return;const id=it.split("#")[0];(by[id]=by[id]||[]).push(i)});
   Object.entries(by).forEach(([id,pos])=>{const a=byId(id);if(!a)return;const sec=itemsOf(a).map(z=>z[0]),ord=it=>{const i=sec.indexOf(it.slice(it.indexOf("#")+1));return i<0?99:i};
     pos.map(i=>out[i]).sort((p,q)=>ord(p)-ord(q)).forEach((it,j)=>{out[pos[j]]=it})});
   return out}
-function agRuns(ag,d){const man=!!(ag.man||{})[d],gs=[];
-  agTabOrder((ag.days||{})[d]||[]).forEach(it=>{if(it==="self")return;const id=/^note:/.test(it)?"":it.split("#")[0],g=id&&(man?[gs[gs.length-1]]:gs).find(z=>z&&z.id===id);if(g)g.its.push(it);else gs.push({id,its:[it]})});
+function agRuns(ag,d){const man=!!(ag.man||{})[d],gs=[],so=it=>agSolo(ag,d,it);
+  agTabOrder((ag.days||{})[d]||[],so).forEach(it=>{if(it==="self")return;if(so(it)&&isTab(it))return gs.push({id:"",solo:it.split("#")[0],its:[it]});const id=/^note:/.test(it)?"":it.split("#")[0],g=id&&(man?[gs[gs.length-1]]:gs).find(z=>z&&z.id===id);if(g)g.its.push(it);else gs.push({id,its:[it]})});
   if(!man)gs.forEach(g=>{const a=g.id&&byId(g.id);if(!a)return;const sec=itemsOf(a).map(z=>z[0]),ord=it=>{const i=sec.indexOf(it.slice(it.indexOf("#")+1));return i<0?99:i};g.its.sort((p,q)=>ord(p)-ord(q))});
   return gs}
 // Change the order inside a day (Roger, 7 Nov 2026: "I want to be able to change the order here by dragging up or down"): a game, a note
@@ -2622,10 +2673,11 @@ function agRuns(ag,d){const man=!!(ag.man||{})[d],gs=[];
 // keeps the order from then on (ag.man[day] = 1), and the students' plan line for the day follows it. One write, ticks untouched.
 function agReorder(k,d,before){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)return;
   const cur=agRuns(ag,d).flatMap(g=>g.its);let mv=[];try{mv=k.ag==="day"?JSON.parse(k.its||"[]"):[k.it]}catch(e){}
-  mv=cur.filter(it=>mv.includes(it));if(!mv.length||before&&mv.includes(before))return;
+  mv=cur.filter(it=>mv.includes(it));const out=k.ag==="it"&&isTab(k.it)&&!agSolo(ag,d,k.it);   // a tab in its box: it leaves the box
+  if(out&&before===k.it)before=cur[cur.indexOf(k.it)+1]||"";if(!mv.length||before&&mv.includes(before))return;
   const rest=cur.filter(it=>!mv.includes(it)),i=before&&rest.includes(before)?rest.indexOf(before):rest.length,nw=[...rest.slice(0,i),...mv,...rest.slice(i)];
-  if(nw.join("\n")===cur.join("\n"))return;
-  agSave(x,g=>{const old=g.days[d]||[];g.days[d]=[...nw,...old.filter(it=>!nw.includes(it))];g.man=Object.assign({},g.man,{[d]:1})})}
+  if(!out&&nw.join("\n")===cur.join("\n"))return;
+  agSave(x,g=>{const old=g.days[d]||[];g.days[d]=[...nw,...old.filter(it=>!nw.includes(it))];g.man=Object.assign({},g.man,{[d]:1});if(out)g.solo=Object.assign({},g.solo,{[d+"|"+k.it]:1})})}
 // 🎮 Played by this group? (Roger, 8-9 Nov 2026: "i need the same information here", as on the learning path's game buttons): on a class
 // game in the Time plan, ✓ + the day the group played it on the game board, or "not played yet". From ls/{id}.played[group][deck]
 // (lab/game/host.js markPlayed), already in the LS doc the dashboard reads: no extra reads.
@@ -2635,17 +2687,20 @@ const agPl=(x,p,sh)=>{if(!isGame(p))return "";const ms=(((S.D.ls[x.ls]||{}).play
 function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.days[d]||[]),isEx=ag.exam===d,self=its.includes("self"),tkb=dayIts(ag,d);
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
-  const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
-    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${/^note:⏰/.test(it)?"dl":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)?"Drag it to another day, or back to the list on the left (tabs keep the learning path's order)":/^note:/.test(it)&&S.place==="plan2"?"Drag it up or down to change the order, to another day, or to the other group to copy it":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
-      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"||/^note:⏰/.test(it)?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${esc(label)}${/#/.test(it)?agTags(it):""}${a&&p?agPl(x,p,1):""}`
+  const sis=agSis(x),cpB=(its,a)=>sis?`<button type="button" class="agcp" data-do="agcp" data-d="${d}" data-its="${esc(JSON.stringify(its))}" ${D} title="Copy ${a?"it":"this"} to ${esc(sis.name)}'s matching class">⧉</button>`:"";
+  const chip=(it,label,a,solo)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
+    return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${/^note:⏰/.test(it)?"dl":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)&&solo?"Drag it up or down, to another day, or back to the list on the left · ⤺ puts it back in its learning path's box":isTab(it)?"Drag it up or down to take it out of its learning path's box, to another day, or back to the list on the left":/^note:/.test(it)&&S.place==="plan2"?"Drag it up or down to change the order, to another day, or to the other group to copy it":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
+      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"||/^note:⏰/.test(it)?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${solo?`<span><span class="agsl">${esc(solo)} ·</span> ${esc(label)}</span>`:esc(label)}${/#/.test(it)?agTags(it):""}${a&&p?agPl(x,p,1):""}`
       +(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" data-elvid="1" title="Play the unit's shadowing video here (the list of who left stays on top)">▶</a>`:"")
       +(a&&p&&!isGame(p)?(()=>{const h=hwNext(x,d,it),o=!!h||hwS.has(it);return `<button type="button" class="aghw ${o?"on":""}" data-do="aghw1" data-d="${d}" data-it="${esc(it)}" ${D} aria-pressed="${o}" title="${h?"Homework for "+esc(ELWeek.date(h[1].by))+(d>ELWeek.today()?" · planned: students see it from "+esc(ELWeek.date(d)):"")+" · click to take it off":o?"Homework · click to take this tab off it":"Make it homework for the next class"}">🏠</button>`})():"")
-      +(a&&p?wkBtn(x,d,[it]):"")+(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
-  const body=agRuns(ag,d).map(g=>{if(!g.id)return `<div class="agg" data-og="${esc(g.its[0])}">${g.its.map(it=>chip(it,it.slice(5))).join("")}</div>`;const a=byId(g.id);if(!a)return "";
+      +(a&&p?wkBtn(x,d,[it]):"")+(a&&p?secSw(x,a,p):"")+(solo?`<button type="button" class="agcp" data-do="agunsolo" data-d="${d}" data-it="${esc(it)}" ${D} title="Put it back in its learning path's box">⤺</button>`:"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
+  const body=agRuns(ag,d).map(g=>{if(g.solo){const a=byId(g.solo);if(!a)return "";const it=g.its[0],lp=((ag.lab||{})[a.id]||agLab(x,a)).match(/^(LP\d+|Final product)/);
+      return `<div class="agg agsolo" data-og="${esc(it)}">${chip(it,itName(it),a,lp?lp[1]:shortTi(a))}</div>`}
+    if(!g.id)return `<div class="agg" data-og="${esc(g.its[0])}">${g.its.map(it=>chip(it,it.slice(5))).join("")}</div>`;const a=byId(g.id);if(!a)return "";
     const nos=!secOf(a).length;
     return `<div class="agg ${dr.includes(a.id)?"drp":""}" data-og="${esc(g.its[0])}"><div class="agh" draggable="true" data-ag="day" data-a="${esc(a.id)}" data-its="${esc(JSON.stringify(g.its))}" ${nos?`data-oi="${esc(a.id+"#")}"`:""} data-from="${d}" ${D} title="Drag this learning path up or down to change the order, or to another day (its tabs of the day go with it)">`
       +(nos?`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} ${tkOf(x)[x.ls+"|"+itKey(d,a.id+"#")]?"checked":""} title="Done in class">${minSel(x,d,a.id+"#")}`:"<span class=\"agdot\">⠿</span>")
-      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>${wkBtn(x,d,g.its,true)}${nos?"":(m=>m?`<small class="agtot" title="Minutes of its tabs this day">⏱ ${m} min</small>`:"")(g.its.reduce((t,it)=>t+agMin(ag,d,it),0))}`
+      +`<b>${esc((ag.lab||{})[a.id]||agLab(x,a))}</b>${dr.includes(a.id)?` <small>✂ dropped</small>`:""} <a class="aglk" href="${esc(a.path)}" target="_blank" rel="noopener" title="Open it">↗</a>${wkBtn(x,d,g.its,true)}${cpB(g.its,a)}${nos?"":(m=>m?`<small class="agtot" title="Minutes of its tabs this day">⏱ ${m} min</small>`:"")(g.its.reduce((t,it)=>t+agMin(ag,d,it),0))}`
       +(nos?`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(a.id+"#")}" ${D} title="Take it off this day">✕</button>`:"")+`</div>`
       +(nos?"":`<div class="agcs">${g.its.map(it=>chip(it,itName(it),a)).join("")}</div>`)+`</div>`}).join("");
   const hwOk=its.some(it=>{const a=byId(it.split("#")[0]);return a&&!isCp(a)&&!a.manual});
@@ -2660,6 +2715,7 @@ function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.d
     +(tkb.some(it=>it!=="exam"&&!tkOf(x)[x.ls+"|"+itKey(d,it)])?`<button type="button" class="g mini" data-do="agnext" data-d="${d}" ${D} title="Send what is not ticked to the next class">⏭ Next class</button>`:"")
     +`<button type="button" class="g mini" data-do="agnote" data-d="${d}" ${D} title="Add a short note to this day">✎ Note</button>`
     +`<button type="button" class="g mini" data-do="agdue" data-d="${d}" ${D} title="Add a deadline to this day (e.g. the final product): students see it in their Class agenda with a 📅 Add to your calendar button">⏰ Deadline</button>`
+    +(sis&&its.some(it=>it!=="self")?`<button type="button" class="g mini" data-do="agcp" data-d="${d}" ${D} title="Copy this class to ${esc(sis.name)}'s matching class (you choose what and which day)">⧉ Copy to ${esc(sis.name)}</button>`:"")
     +(its.some(it=>/#/.test(it)&&!/^note:/.test(it))?`<button type="button" class="g mini" data-do="agprint" data-d="${d}" ${D} title="This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key">🖨 Print session</button>`:"")+`</div></div>`}
 // the class days to show, by week: [[monday, [days]]]; holidays the timetable has a class on are listed too ("no class")
 function agWeeks(x,extra){const ag=agOf(x),sp=ELWeek.span(x.p)||[ELWeek.today(),ELWeek.today()],ds=agDays(ag),first=[sp[0],ds[0]].filter(Boolean).sort()[0];
@@ -2763,6 +2819,32 @@ function agPage(x,studs){if(!agEnsure(x))return `<div class="box"><p class="mute
     +`</section></div>`}
 if(DEMO)window.EL_T=S;   // previews and tests look at the state
 // one tick (an item done in class) and the day's tick when all its items are done
+// ⧉ Copy to the other group of the same course (Roger, 9 Nov 2026: "have a copy button that only paste onto the other group of the same
+// level"): on a class day (⧉ Copy to 4ESO A) or a learning path's heading (⧉, only that path's tabs). A small window lists the items,
+// all ticked, and that group's class days, with its matching class chosen (the same class of the week: 2nd class ↔ 2nd class; else the next
+// one). The copies keep the order, ⏱ minutes, 👤/👥 and "out of the box"; ticks and homework stay behind; what is already on that day is
+// left alone. Like a drop, it opens those learning paths and tabs for that group. Only for the other group of the course (EL_GROUPS course).
+const agSis=x=>{const g=GR.find(z=>z.id===x.gid),o=g&&GR.find(z=>z.course===g.course&&z.id!==g.id);if(!o)return null;const y=planX(x.ls,o.id);return y.p&&y.gi>=0?o:null};
+const wkMon=d=>ELWeek.add(d,-((new Date(d+"T12:00").getDay()+6)%7));
+function agSisDay(gid,sid,d){const m=wkMon(d),e=ELWeek.add(m,6),mine=ELWeek.classDays(gid,m,e),hers=ELWeek.classDays(sid,m,e),i=mine.indexOf(d);
+  return hers.length?hers[Math.min(Math.max(i,0),hers.length-1)]:ELWeek.classDays(sid,d,ELWeek.add(d,30))[0]||null}
+function agCpDlg(x,d,only){const ag=agOf(x),sis=agSis(x);if(!ag||!sis)return;
+  const all=agRuns(ag,d).flatMap(g=>g.its),its=only&&only.length?all.filter(it=>only.includes(it)):all;if(!its.length)return;
+  const def=agSisDay(x.gid,sis.id,d),days=ELWeek.classDays(sis.id,wkMon(ELWeek.add(d,-7)),ELWeek.add(wkMon(d),34));if(def&&!days.includes(def))days.push(def);days.sort();
+  const y=planX(x.ls,sis.id),there=d2=>((agOf(y)||{days:{}}).days[d2]||[]);
+  dlg(`<h2>⧉ Copy to ${esc(sis.name)}</h2><p class="muted">From ${esc(GR.find(g=>g.id===x.gid).name)} · ${esc(ELWeek.date(d))}. Untick what you don't want.</p>`
+    +`<div class="agcpl">${its.map(it=>{const a=byId(it.split("#")[0]),L=a&&((ag.lab||{})[a.id]||agLab(x,a)),lb=/^note:/.test(it)?it.slice(5):a&&isTab(it)?L.replace(/^(LP\d+).*/,"$1")+" · "+itName(it):a?L:itName(it);
+      return `<label><input type="checkbox" name="agcpi" value="${esc(it)}" checked> ${esc(lb)}</label>`}).join("")}</div>`
+    +`<p><label>to ${esc(sis.name)}'s class on <select id="agcpd">${days.map(v=>`<option value="${v}" ${v===def?"selected":""}>${esc(ELWeek.date(v))} ${esc(slotOf(sis.id,v))}${there(v).length?" · has "+there(v).filter(i=>i!=="self").length+" item(s)":""}${v===def?" (matching class)":""}</option>`).join("")}</select></label></p>`
+    +`<div class="row"><button data-do="agcpgo" data-d="${d}" data-sid="${sis.id}" data-gid="${x.gid}" data-ls="${x.ls}">⧉ Copy</button></div>`)}
+function agCpGo(x,d,its,sid,to){const src=agOf(x);if(!src||!S.D.tkOk)return;const y=planX(x.ls,sid);if(!y.p||y.gi<0)return;
+  const cur=agRuns(src,d).flatMap(g=>g.its),list=cur.filter(it=>its.includes(it)&&it!=="exam"&&it!=="self");if(!list.length)return;
+  const add=list.filter(it=>!((agOf(y)||{days:{}}).days[to]||[]).includes(it));
+  if(!add.length)return alert("It is already on that day.");
+  agSave(y,g=>{const man=!!(src.man||{})[d];if(man){g.days[to]=agRuns(g,to).flatMap(r=>r.its).concat((g.days[to]||[]).filter(it=>it==="self"));g.man=Object.assign({},g.man,{[to]:1})}   // the order you left on your day
+    add.forEach(it=>{if(man||/^note:/.test(it))(g.days[to]=g.days[to]||[]).push(it);else addIt(g,to,it)});
+    add.forEach(it=>{const q=d+"|"+it,r=to+"|"+it;if((src.min||{})[q])g.min=Object.assign({},g.min,{[r]:src.min[q]});if((src.wk||{})[q])g.wk=Object.assign({},g.wk,{[r]:src.wk[q]});if((src.solo||{})[q])g.solo=Object.assign({},g.solo,{[r]:1})})});
+  agOpenSync(y,add.filter(it=>/#/.test(it)&&!/^note:/.test(it)),to)}
 function agTick(x,d,it,v){const ag=agOf(x);if(!ag)return;const tk={[itKey(d,it)]:v?ELWeek.today():false},on=i=>i===it?v:!!tkOf(x)[x.ls+"|"+itKey(d,i)],its=dayIts(ag,d),all=its.length>0&&its.every(on);
   if(!!tkOf(x)[x.ls+"|@"+d]!==all)tk["@"+d]=all?ELWeek.today():false;quick(api.ticks(x.gid,x.ls,tk))}
 // drag and drop (a laptop or desktop: HTML drag events)
@@ -2781,8 +2863,8 @@ function agCopy(k,z,before){const d=z.dataset.agdrop,x=planX(z.dataset.ls,z.data
     else addIt(g,d,k.it);
     if(m){g.min=Object.assign({},g.min,{[d+"|"+k.it]:m})}})}
 // up or down inside its own day: the item it goes before ("" = at the end), shown by a blue line
-const agSame=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&(k.ag==="it"&&!isTab(k.it)||k.ag==="day");
-const agFixed=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&k.ag==="it"&&isTab(k.it);   // a tab inside its own day: nothing to do
+const agSame=(k,z)=>!!k.from&&k.from===z.dataset.agdrop&&(k.ag==="it"||k.ag==="day");   // a tab too: it leaves its learning path's box (agReorder)
+const agFixed=()=>false;
 function agInsAt(z,k,e){const els=[...z.querySelectorAll(k.ag==="day"?"[data-og]":"[data-oi]")];if(!els.length)return null;
   const el=els.find(q=>{const r=q.getBoundingClientRect();return e.clientY<r.top+r.height/2});agInsOff();
   if(el){el.classList.add("agins-b");return el.dataset.og||el.dataset.oi}els[els.length-1].classList.add("agins-a");return ""}
@@ -3299,6 +3381,52 @@ function msgSend(u,id){const s=S.P[u],text=$("#msgt").value.trim().slice(0,ANN_M
   const testers=Object.values(S.P).filter(x=>x.tester&&!x.away).map(x=>x.uid);
   const o=Object.assign({text,to:"one",label:fullName(s),groups:[],uids:[...new Set([u,...testers])]},mail&&emails.length?{mail:true,mailed:Date.now()}:{});
   $("#dlg").close();act(api.annSend(o));if(o.mail)mailIt("Message")}
+// What a student answered in one tab (Roger, 9 Nov 2026: "when I press a result I want to be able to see what the students answered (all
+// even check point and exam)"): a step cell of the Students table opens this. The steps of the tab (done, first try, latest), what they
+// handed in (writing, speaking transcript, log, recording), and every question with their answer: the first check (state.items, as the
+// 🔎 Questions analysis) and what is on the page now (state.ans), with the right answer. The questions come from the page's data file
+// (ELItems.bank, fetched once per LS from the site, no Firestore reads). A secure checkpoint opens its answers dialog (cpDlg). Every
+// dialog has 👁 See it as they do: the page at that tab in the read-only student view, with their saved answers and the corrections.
+const ROUTES_ALL=["beginners","insecure","safe","daring"];
+const forLv=(src,l)=>!src?[]:Array.isArray(src)?src.filter(x=>ROUTES_ALL.indexOf(x.r||"beginners")<=ROUTES_ALL.indexOf(l)&&(!x.only||x.only.includes(l))):(src[l]||(l==="beginners"?src.insecure:l==="native"?src.daring:null)||[]);
+const aTxt=o=>String(o==null?"":typeof o==="string"||typeof o==="number"?o:(o.en||o.ca||"")).replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/\s+/g," ").trim();
+const ansN=v=>String(v||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[“”"]/g,"").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
+const seeAs=(u,a,tab)=>`today.html?student=${encodeURIComponent(u)}&ls=${encodeURIComponent(a.ls)}&go=${encodeURIComponent(a.path+(tab?"#"+tab:""))}`;
+function stepPanel(u,id,ci){const s=S.P[u],a=byId(id);if(!s||!a)return;const c=lpCols(a)[ci];if(!c)return;
+  if(a.checkpoint&&c.ks.includes("check")&&cpDoc(u,a))return cpDlg(u,a);
+  redraw=()=>stepPanel(u,id,ci);
+  const st=pstate(u,a),d=doneSet(u,a),gx=!isLS1(a),wx=c.ks.some(k=>wrState(u,a,k));
+  const rows=c.ks.map(k=>{const f=firstOf(u,id,k),l=lastOf(u,id,k),dd=doneAt(u,id,k),w=wrState(u,a,k);
+    return `<tr><td style="text-align:left">${esc(tabName(a,k))}</td><td>${(a.skip||[]).includes(k)?'<small class="muted">not scored</small>':d.has(k)?"✔"+(dd&&dd!==true?` <small class="muted">${esc(ymd(dd))}</small>`:""):'<span class="muted">not done yet</span>'}</td>${gx?`<td>${f?trySc(f):"–"}</td><td>${l?trySc(l):"–"}</td>`:""}${!wx?"":`<td>${w?`<a role="button" style="cursor:pointer" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}">${w.i} open</a>`:""}</td>`}</tr>`}).join("");
+  const hand=c.ks.map(k=>{const x=(st.steps||{})[k];if(!x)return "";return `<div class="hand"><p class="muted" style="margin:0"><b>Handed in · ${esc(tabName(a,k))}</b>${x.date?" · "+esc(ymd(x.date)):""}</p>`+(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")+audioBox(x)+(x.rate||[]).map(r=>`<p>${r.v}/4 · ${esc(r.s)}</p>`).join("")+(x.comment?`<p>💬 ${esc(x.comment)}</p>`:"")+`</div>`}).join("");
+  dlg(`<h3>${esc(a.title)} · ${esc(c.n)}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))}</p>`
+    +`<div class="row" style="justify-content:flex-start;margin:4px 0 8px"><a class="btn" href="${seeAs(u,a,c.t)}" target="_blank" rel="noopener" title="Opens this tab as ${esc(fullName(s))} sees it, read-only: their saved answers and the corrections">👁 See it as they do</a></div>`
+    +`<table><thead><tr><th style="text-align:left">Step</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th>":""}${wx?"<th>Writing</th>":""}</tr></thead><tbody>${rows}</tbody></table>`
+    +hand+(gx?`<div id="stans" data-k="${esc(u+"|"+id+"|"+ci)}"><p class="muted">Loading the questions…</p></div>`
+      :`<p class="muted">LS1 pages keep each answer inside the page, not question by question for the dashboard: 👁 See it as they do opens the page with everything they wrote.</p>`),true);
+  if(gx){const go=B=>{QA[a.ls]=B;stAns(u,a,c,B)};QA[a.ls]?go(QA[a.ls]):ELItems.bank(a.ls,acts(a.ls)).then(go).catch(e=>{const b=$("#stans");if(b)b.innerHTML='<p class="muted">Could not load the questions: '+esc(e.message)+"</p>"})}}
+function stAns(u,a,c,B){const box=$("#stans");if(!box||box.dataset.k!==u+"|"+a.id+"|"+lpCols(a).indexOf(c))return;
+  const x=B.acts.find(y=>y.a.id===a.id),st=pstate(u,a),stepP=P=>P.step||(P.type==="vocab"?"practice":P.id);
+  const ps=x?x.panels.filter(P=>c.ks.includes(stepP(P))||c.ks.includes(P.id)||(c.t&&P.id===c.t)):[];
+  if(!ps.length){box.innerHTML=`<p class="muted">No questions with set answers in this tab (open answers are under “Handed in”, or in 👁 See it as they do).</p>`;return}
+  const right=it=>it.o?aTxt(it.o[0]):aTxt((it.a||[])[0]),shown=(it,v)=>v==null||v===""?'<span class="muted">(blank)</span>':esc(it.o?aTxt(it.o[+v]):String(v)),
+    ok=(it,v)=>v==null||v===""?false:it.o?+v===0:(it.a||[]).some(z=>ansN(z)===ansN(v));
+  box.innerHTML=ps.map(P=>{
+    // first check: one record per route the student did it at (the earliest counts)
+    const R=ROUTES_ALL.concat("native").map(l=>(st.items||{})[P.id+"_"+l]).filter(r=>r&&Array.isArray(r.q)).sort((p,q)=>String(p.date||"").localeCompare(String(q.date||"")))[0];
+    const A=(st.ans||{})[P.stay];const lv=(A&&A.l)||(R&&R.level)||level(u,a.ls)||"insecure",items=forLv(P.src,lv);
+    const first=new Map();if(R){const its=Array.isArray(P.src)?P.src:forLv(P.src,R.level);R.q.forEach((qi,j)=>{const it=its[qi];if(it)first.set(it,{ok:R.ok[j],v:(R.a||[])[j]})})}
+    const now=new Map();if(A&&Array.isArray(A.v)&&A.v.length===items.length)items.forEach((it,i)=>now.set(it,A.v[i]));
+    const list=items.length?items:[...first.keys()];if(!list.length)return "";
+    const anyNow=now.size>0,anyFirst=first.size>0;
+    const tr=list.map((it,i)=>{const f=first.get(it),n=now.get(it),same=f&&anyNow&&String(f.v??"")===String(n??"");
+      return `<tr><td>${i+1}</td><td style="text-align:left">${esc(aTxt(it.q||it.p||it.s||""))||'<span class="muted">–</span>'}</td>`
+        +(anyFirst?`<td style="text-align:left">${f?`${f.ok?"✓":"✗"} ${shown(it,f.v)}`:'<span class="muted">–</span>'}</td>`:"")
+        +(anyNow?`<td style="text-align:left">${n===undefined?'<span class="muted">–</span>':same?'<span class="muted">same</span>':`${ok(it,n)?"✓":"✗"} ${shown(it,n)}`}</td>`:"")
+        +`<td style="text-align:left"><small>${esc(right(it))}</small></td></tr>`}).join("");
+    return `<h4 style="margin:12px 0 4px">${esc(P.title)} <small class="muted">· ${esc(LV[lv]||lv)}</small></h4>`
+      +(anyFirst||anyNow?`<table class="qa"><thead><tr><th>#</th><th style="text-align:left">Question</th>${anyFirst?'<th style="text-align:left" title="Their first check: what counts">First try</th>':""}${anyNow?'<th style="text-align:left" title="What is on the page now (after Redo or later checks)">Now</th>':""}<th style="text-align:left">Right answer</th></tr></thead><tbody>${tr}</tbody></table>`
+        :`<p class="muted">Not answered yet.</p>`)}).join("")||`<p class="muted">Not answered yet.</p>`}
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
   const gx=!!G()&&!G().only&&a.ls===S.ls,nd=steps(a).filter(k=>!(a.skip||[]).includes(k)),nn=nd.filter(k=>d.has(k)).length,
@@ -3683,6 +3811,10 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       const its=k.a?((ag.days||{})[k.d]||[]).filter(it=>it.split("#")[0]===k.a):[k.it],allG=its.every(it=>agG(ag,k.d,it));
       agSave(x,g=>{g.wk=g.wk||{};its.forEach(it=>{const q=k.d+"|"+it;if(allG)delete g.wk[q];else g.wk[q]="g"})})},
     agrm:()=>{e.preventDefault();e.stopPropagation();agMove(planX(k.ls,k.gid),[k.it],k.d,"")},
+    agunsolo:()=>{e.preventDefault();e.stopPropagation();agSave(planX(k.ls,k.gid),g=>{if(!g.solo)return false;delete g.solo[k.d+"|"+k.it]})},
+    agcp:()=>{e.preventDefault();e.stopPropagation();let its=null;try{its=k.its?JSON.parse(k.its):null}catch(_){}agCpDlg(planX(k.ls,k.gid),k.d,its)},
+    agcpgo:()=>{e.preventDefault();const its=[...document.querySelectorAll("#dlgc [name=agcpi]:checked")].map(i=>i.value),to=($("#agcpd")||{}).value;if(!its.length||!to)return;
+      $("#dlg").close();agCpGo(planX(k.ls,k.gid),k.d,its,k.sid,to)},
     agnext:()=>{e.preventDefault();const x=planX(k.ls,k.gid),ag=agOf(x),nd=nextClassDay(x,k.d);if(!nd)return alert("No later class in the timetable.");
       agMove(x,((ag.days||{})[k.d]||[]).filter(it=>it!=="self"&&!tkOf(x)[x.ls+"|"+itKey(k.d,it)]),k.d,nd)},
     agprint:()=>{e.preventDefault();const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)return;   // 🖨 the day on paper (elPrintDay in el-catalog.js)
@@ -3723,7 +3855,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       const all=dayTabs(x,l).every(([b,,ts])=>ts.every(z=>tabOn(x,l,b,z[0])));if(all!==was)ps.push(api.tick(x.gid,x.ls,o,all));quick(ps)},
     pesave:()=>peSave(false),pereset:()=>peSave(true),
     lphw:()=>{e.preventDefault();e.stopPropagation();const a=cat.find(y=>y.id===k.a),x=planX(a.ls,S.g),lab=(Object.entries(lpMap(x)).find(([,b])=>b===a)||[])[0];
-      hwOpen(x,(lab?"LP"+lab+" ":"")+a.title.split(/[:(]/)[0].trim(),ELWeek.today(),null,a.id)},
+      hwOpen(x,(lab?"LP"+lab+" ":"")+a.title.split(/[:(]/)[0].trim(),ELWeek.today(),null,a.id);
+      if(k.t&&S.hwX){S.hwX.tabs[a.id]=[k.t];hwTabs();hwTabsDone()}},   // 🏠 on a tab's column: only that tab ticked
     hwtabs:()=>{const h=S.hwX;if(!h)return;e.preventDefault();const on=k.v==="all";(window.EL_SECTIONS[k.a]||[]).forEach(([id])=>{const s=(h.tabs[k.a]=h.tabs[k.a]||[]);if(on&&!s.includes(id))s.push(id);if(!on)h.tabs[k.a]=[]});hwTabsDone()},
     hwcopy:()=>{e.preventDefault();const v=k.msg!=null?k.msg:$("#hw-msg").value;const ok=()=>{const c=k.msg!=null?t:$("#hw-copied");if(k.msg!=null){const o=t.textContent;t.textContent="✓ Copied";setTimeout(()=>t.textContent=o,1500)}else c.textContent="✓ Copied: paste it in Classroom"};
       (navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(ok,()=>{const ta=document.createElement("textarea");ta.value=v;document.body.append(ta);ta.select();document.execCommand("copy");ta.remove();ok()})},
@@ -3801,7 +3934,12 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
     status:()=>{if(k.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;act(api.ls(S.ls,{status:k.s}))},
     assign:()=>{const l=EL_LS.find(x=>x.id===S.ls),info=S.D.ls[S.ls],set=new Set(lsGroups(S.ls).filter(g=>elLsForGroup(l,info,g.id)).map(g=>g.id));set.has(k.g)?set.delete(k.g):set.add(k.g);act(api.ls(S.ls,{groups:[...set]}))},
-    ptterm:()=>{S.term=k.t;render()},ptcsv:()=>ptCsv(S.g),ptadd:()=>quick(pt.add(k.k,S.g,+k.d)),
+    ptterm:()=>{S.term=k.t;render()},
+    lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=false;if(S.place==="students")S.term="t"+lsTerm(l);render()},
+    stuterm:()=>{S.term=k.t;const g=GR.find(x=>x.id===S.g),inT=g?EL_LS.filter(l=>l.course===g.course&&"t"+lsTerm(l)===k.t):[];
+      if(inT.length&&!inT.some(l=>l.id===S.ls)){const mine=l=>elLsForGroup(l,S.D.ls[l.id],S.g);S.ls=(inT.filter(l=>mine(l)&&(S.D.ls[l.id]||{}).status==="open").pop()||inT.filter(mine).pop()||inT[inT.length-1]).id}
+      render()},
+    exdlg:()=>exDlg(u),ptmiss:()=>ptMissDlg(u),step:()=>{if(e.target.closest("a"))return;stepPanel(u,k.a,+k.c)},ptcsv:()=>ptCsv(S.g),ptadd:()=>quick(pt.add(k.k,S.g,+k.d)),
     lp:()=>{const info=S.D.ls[S.ls],open=new Set(acts(S.ls).filter(a=>elLpOpen(a,info,S.g)).map(a=>a.id));open.has(k.a)?open.delete(k.a):open.add(k.a);
       act(api.lpOpen(S.ls,S.g,acts(S.ls).filter(a=>open.has(a.id)).map(a=>a.id)))},
     lpset:()=>act(api.lpOpen(S.ls,S.g,k.v==="1"?acts(S.ls).map(a=>a.id):[])),
