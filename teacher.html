@@ -702,6 +702,7 @@ const wrCell=(u,a,k)=>{const w=wrState(u,a,k);return (w?`<br><small class="wr ${
 const EN=(c,e)=>e,corrBox='margin:8px 0;padding:12px 14px;border:2px solid #16a34a;border-radius:14px;background:#f0fdf4;color:#0f172a;font:15px/1.5 system-ui,sans-serif';
 function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=res(u,aid),fl=(x.flags||{})[step];
   if(fl&&fl.why&&!fl.done)return cpOpen(u,aid,step);
+  redraw=()=>wrOpen(u,aid,step);   // drawn again after Send answer / Update Claude's answer / No reply needed (cmtBox)
   const w=wrState(u,a,step)||{i:"",t:""},it=ELMark.fbItems(pstate(u,a),new Set(),/reflect$/.test(aid)?"reflect":null)[step]||{fields:[]},f=it.fields||[],orig=String((f[0]||{}).v||"");
   // Speaking and Talk (Roger, 7 Nov 2026: "what's going on here?" on "pasted 0 · 0 keys · 0 s"): their transcript comes from the microphone,
 // so the log shows only when something was pasted into it (then it was not spoken). Empty writing logs are left out too.
@@ -718,6 +719,7 @@ function wrOpen(u,aid,step){const a=byId(aid),s=S.P[u];if(!a||!s)return;const x=
     ${t?(old?`<p><b>📨 New version</b> (not corrected yet)</p>${more(f)}<p><b>✏️ Correction of the previous version</b></p>`:`<p><b>${fs==="redo"?"↺ Message sent":"✏️ Correction sent"}</b> <small class="muted">(the student sees it at the top of this step)</small></p>`)+`<div id="wrfix" style="${corrBox}"></div>`+(old?"":more(rich?f.slice(1):f))
       :lv.length?`<p><b>Handed in</b> <small class="muted">(marked with a level, no written comment)</small></p>${more(f)}`
       :`<p><b>Handed in</b> <small class="muted">(no correction yet: Claude corrects it in the Wednesday run)</small></p>${more(f)}`}
+    ${(h=>h&&(ELMark.q(h)||cmtCa(x,h,step))?`<div class="hand" style="border-left:4px solid #2563eb">${cmtBox(u,a,step,h,true)}</div>`:"")(((pstate(u,a)||{}).steps||{})[step])}
     ${canBack?backBox(u,aid,step,orig):""}
     <div class="row" style="justify-content:flex-start"><button class="g" data-do="cell" data-u="${u}" data-a="${esc(aid)}">All their work in this learning path</button></div>`,true);
   if(t)writing($("#wrfix"),t,EN,old||!rich?"":orig)}
@@ -1907,7 +1909,12 @@ const colCrit=(a,c)=>{if(c.ks.length===1||colSkip(a,c))return stepCrit(a,c.ks[0]
   return cs.map(pill).join("")||'<small class="muted" title="Language practice: no criterion linked">–</small>'};
 const colCell=(u,a,c,d)=>{const n=c.ks.filter(k=>d.has(k)).length;
   return (n===c.ks.length?"✔":n?`<small title="${esc(c.ks.map(k=>tabName(a,k)+(d.has(k)?" ✔":": not done yet")).join("\n"))}">${n} of ${c.ks.length}</small>`:"")
-    +c.ks.map(k=>tryCell(u,a.id,k)+wrCell(u,a,k)).join("")};
+    +c.ks.map(k=>tryCell(u,a.id,k)+wrCell(u,a,k)+cmtCell(u,a,k)).join("")};
+// a comment on a handed-in tab: ✉️ waiting for an answer, 🗨️ answered (by Claude or you); the cell opens it (stepPanel → cmtBox)
+const cmtCell=(u,a,k)=>{const h=((pstate(u,a)||{}).steps||{})[k];if(!h||!ELMark.q(h)||window.elNoComment&&elNoComment(ELMark.q(h)))return "";const xr=res(u,a.id);
+  return waits(h,xr,k)?`<br><small title="💬 Comment waiting for an answer (Claude answers it on Friday): click to see it">✉️ comment</small>`
+    :cmtCa(xr,h,k)?`<br><small title="💬 Claude answered their comment: click to see the answer">🗨️ answered</small>`
+    :(xr.replies||{})[k]?`<br><small title="💬 You answered their comment: click to see it">🗨️ answered</small>`:""};
 function progress(studs,list,stu){
   loadGames();const ex=stu&&list.length&&exOf(S.ls),best=stu?ptBestOk(S.g):0;
   const open=a=>!S.folded.has(a.id)&&lpCols(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
@@ -2897,20 +2904,27 @@ function revisions(u,a){const st=pstate(u,a),dr=st.drafts||{},fi=st.finals||{},t
       +(!d&&!f?para(tx[k]):"")+corrOf(u,a,step)+`</div></details>`}).join("")+refl}
 // the correction Claude sent for a step (results.replies[step]; tools/marking/marks.mjs), shown under the student's work
 const corrOf=(u,a,step)=>{const t=(res(u,a.id).replies||{})[step];return t?`<p class="muted" style="border-left:3px solid #16a34a;padding-left:8px">✏️ <b>Correction sent:</b> ${esc(t)}</p>`:""};
+// The student's comment on a handed-in step and the answers to it: Claude's (the Friday run, results.answers[step] = {t, q, at}) and
+// yours (results.replies[step]). In the activity's panel (handIns) and in a tab cell's panel of the table (stepPanel; Roger, 9 Nov 2026:
+// "I want to see the answers if I click it here"). Nothing new is read: it is the results the dashboard already has.
+const cmtCa=(xr,x,id)=>{const c=(xr.answers||{})[id];return c&&c.q===ELMark.q(x)&&c};
+function cmtBox(u,a,id,x,lite){const xr=res(u,a.id),rp=xr.replies||{},wait=waits(x,xr,id),ca=cmtCa(xr,x,id),ask=wait&&ELMark.asked(x,xr,id)&&xr.ask[id],fb=(xr.fbBy||{})[id]||(xr.fbSig||{})[id];
+  return (x.comment?`<p><b>💬 Comment:</b> ${esc(x.comment)}</p>`:"")
+    +(ask?`<p>🙋 <b>Claude left it to you:</b> ${esc(ask.why)}</p>`:wait?`<p class="muted">✉️ Not answered yet: Claude answers it on Friday at 15:00, or answer it yourself below.</p>`:"")
+    +(ca?`<p><b>🤖 Claude's answer</b> <small class="muted">(the student sees it as your answer${ca.at?" · "+esc(ymd(tms(ca.at))):""}${ca.edited?"; edited by you":""})</small></p><textarea id="ca-${id}" style="min-height:60px">${esc(ca.t)}</textarea><div class="row" style="margin-top:4px"><button class="g" data-do="casave" data-u="${u}" data-a="${a.id}" data-s="${id}">Update Claude's answer</button></div>`:"")
+    // lite (the correction dialog, wrOpen): what was sent for the step is already above it, so the box to answer shows only when nothing was sent
+    +(lite&&rp[id]?(wait?`<div class="row" style="margin-top:4px"><button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button></div>`:""):`<p><b>${fb?"🤖 Correction of the work (sent by Claude)":ca?"Your own answer (optional)":"Your answer"}</b> <small class="muted">(the student sees it on their page)</small></p><textarea id="rp-${id}" style="min-height:60px">${esc(rp[id]||"")}</textarea><div class="row" style="margin-top:4px"><button data-do="replysave" data-u="${u}" data-a="${a.id}" data-s="${id}">${rp[id]?"Update answer":"Send answer"}</button>${wait?` <button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button>`:""}</div>`)}
 // Final product hand-ins (catalogue `steps`): saved by the page in state.steps of its progress key; pieces in a.pieces.
 function handIns(u,a){
   const p=(S.D.pg[u]||{})[a.ls]||{},J=k=>{try{return JSON.parse(p[k]||"{}")}catch(e){return {}}},sp=J(a.keys[0]).steps||{},pc=a.pieces?J(a.pieces):{},xr=(S.D.rs[u]||{})[a.id]||{},rp=xr.replies||{},cas=xr.answers||{};
   return `<label>Hand-ins and self-assessment</label>`+a.steps.map(([id,title])=>{const x=sp[id];if(!x)return `<details><summary class="muted">${esc(title)} · not handed in</summary></details>`;
-    const wait=waits(x,xr,id),ca=cas[id]&&cas[id].q===ELMark.q(x)&&cas[id],ask=wait&&ELMark.asked(x,xr,id)&&xr.ask[id];
+    const wait=waits(x,xr,id),ca=cmtCa(xr,x,id);
     return `<details ${wait?"open":""}><summary>${esc(title)} · ✓ ${x.avg!=null?"self-assessment "+x.avg+"/4":""}${x.comment?" 💬":""}${x.peers&&x.peers.length?" 👥":""}${wait?(ELMark.asked(x,xr,id)?" 🙋 Claude left it to you":" ✉️ waiting for an answer"):rp[id]&&!(xr.fbBy||{})[id]&&!(xr.fbSig||{})[id]?" · answered":ca?" · answered by Claude":x.comment?" · no reply needed":""}</summary><div class="hand">`
       +(id==="prep"?[1,2,3,4,5].map(n=>`<p><b>Piece ${n}:</b> ${pc[n]?esc(pc[n].text):'<span class="muted">not saved</span>'}</p>`).join(""):"")
       +(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")+audioBox(x)
       +(x.rate||[]).map(r=>`<p>${r.v}/4 · ${esc(r.s)}</p>`).join("")
       +(x.peers||[]).map(q=>`<p>👥 ${esc(q.name)}: ${q.r.map(r=>r.v+" "+esc(r.s)).join(" · ")}</p>`).join("")
-      +(x.comment?`<p><b>Comment:</b> ${esc(x.comment)}</p>`:"")
-      +(ask?`<p>🙋 <b>Claude left it to you:</b> ${esc(ask.why)}</p>`:"")
-      +(ca?`<p><b>🤖 Claude's answer</b> <small class="muted">(the student sees it as your answer${ca.edited?"; edited by you":""})</small></p><textarea id="ca-${id}" style="min-height:60px">${esc(ca.t)}</textarea><div class="row" style="margin-top:4px"><button class="g" data-do="casave" data-u="${u}" data-a="${a.id}" data-s="${id}">Update Claude's answer</button></div>`:"")
-      +`<p><b>${(xr.fbBy||{})[id]||(xr.fbSig||{})[id]?"🤖 Correction of the work (sent by Claude)":ca?"Your own answer (optional)":"Your answer"}</b> <small class="muted">(the student sees it on their page)</small></p><textarea id="rp-${id}" style="min-height:60px">${esc(rp[id]||"")}</textarea><div class="row" style="margin-top:4px"><button data-do="replysave" data-u="${u}" data-a="${a.id}" data-s="${id}">${rp[id]?"Update answer":"Send answer"}</button>${wait?` <button class="g" data-do="noreply" data-u="${u}" data-a="${a.id}" data-s="${id}" title="Take it off your To do list without answering (the student sees nothing)">No reply needed</button>`:""}</div></div></details>`}).join("");
+      +cmtBox(u,a,id,x)+`</div></details>`}).join("");
 }
 const groupSel=(u,g)=>`<select data-do="group" data-u="${u}"><option value="">– choose –</option>${GR.map(x=>`<option value="${x.id}" ${x.id===g?"selected":""}>${x.name}</option>`).join("")}</select>`;
 function noGroup(studs){
@@ -3398,7 +3412,7 @@ function stepPanel(u,id,ci){const s=S.P[u],a=byId(id);if(!s||!a)return;const c=l
   const st=pstate(u,a),d=doneSet(u,a),gx=!isLS1(a),wx=c.ks.some(k=>wrState(u,a,k));
   const rows=c.ks.map(k=>{const f=firstOf(u,id,k),l=lastOf(u,id,k),dd=doneAt(u,id,k),w=wrState(u,a,k);
     return `<tr><td style="text-align:left">${esc(tabName(a,k))}</td><td>${(a.skip||[]).includes(k)?'<small class="muted">not scored</small>':d.has(k)?"✔"+(dd&&dd!==true?` <small class="muted">${esc(ymd(dd))}</small>`:""):'<span class="muted">not done yet</span>'}</td>${gx?`<td>${f?trySc(f):"–"}</td><td>${l?trySc(l):"–"}</td>`:""}${!wx?"":`<td>${w?`<a role="button" style="cursor:pointer" data-do="wrop" data-u="${u}" data-a="${esc(a.id)}" data-s="${esc(k)}">${w.i} open</a>`:""}</td>`}</tr>`}).join("");
-  const hand=c.ks.map(k=>{const x=(st.steps||{})[k];if(!x)return "";return `<div class="hand"><p class="muted" style="margin:0"><b>Handed in · ${esc(tabName(a,k))}</b>${x.date?" · "+esc(ymd(x.date)):""}</p>`+(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")+audioBox(x)+(x.rate||[]).map(r=>`<p>${r.v}/4 · ${esc(r.s)}</p>`).join("")+(x.comment?`<p>💬 ${esc(x.comment)}</p>`:"")+`</div>`}).join("");
+  const hand=c.ks.map(k=>{const x=(st.steps||{})[k];if(!x)return "";return `<div class="hand"><p class="muted" style="margin:0"><b>Handed in · ${esc(tabName(a,k))}</b>${x.date?" · "+esc(ymd(x.date)):""}</p>`+(x.f||[]).map(f=>`<p><b>${esc(f.l)}</b><br>${esc(f.v)}</p>`).join("")+audioBox(x)+(x.rate||[]).map(r=>`<p>${r.v}/4 · ${esc(r.s)}</p>`).join("")+(x.comment||cmtCa(res(u,a.id),x,k)?cmtBox(u,a,k,x):"")+`</div>`}).join("");
   dlg(`<h3>${esc(a.title)} · ${esc(c.n)}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))}</p>`
     +`<div class="row" style="justify-content:flex-start;margin:4px 0 8px"><a class="btn" href="${seeAs(u,a,c.t)}" target="_blank" rel="noopener" title="Opens this tab as ${esc(fullName(s))} sees it, read-only: their saved answers and the corrections">👁 See it as they do</a></div>`
     +`<table><thead><tr><th style="text-align:left">Step</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th>":""}${wx?"<th>Writing</th>":""}</tr></thead><tbody>${rows}</tbody></table>`
@@ -3927,9 +3941,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       quick(patch(u,k.a,{team:v||null,levels:{group:mate?Object.assign({},res(mate.uid,k.a).levels.group):null}}))},
     fin:()=>{const id=asId(S.ls),cur=(res(u,id).final||{})[k.c];quick(patch(u,id,{final:{[k.c]:cur===k.l?null:k.l}}))},
     examsave:()=>{quick(saveExam($("#main")));exDirty.clear()},examsave1:()=>{quick(saveExam($("#dlgc")));exDirty.clear()},
-    noreply:()=>{const open=$("#dlg").open;act(api.noReply(u,a,k.s)).then(()=>{if(open)cellPanel(u,a.id)})},
-    casave:()=>{const v=$("#ca-"+k.s).value.trim();if(!v)return;act(api.claudeAns(u,a,k.s,v)).then(()=>cellPanel(u,a.id))},
-    replysave:()=>{const v=$("#rp-"+k.s).value.trim();if(!v)return;act(api.reply(u,a,k.s,v)).then(()=>cellPanel(u,a.id))},
+    noreply:()=>{const open=$("#dlg").open;act(api.noReply(u,a,k.s)).then(()=>{if(open)(redraw||(()=>cellPanel(u,a.id)))()})},
+    casave:()=>{const v=$("#ca-"+k.s).value.trim();if(!v)return;act(api.claudeAns(u,a,k.s,v)).then(()=>(redraw||(()=>cellPanel(u,a.id)))())},
+    replysave:()=>{const v=$("#rp-"+k.s).value.trim();if(!v)return;act(api.reply(u,a,k.s,v)).then(()=>(redraw||(()=>cellPanel(u,a.id)))())},
     save:()=>{const o={feedback:$("#ffb").value};if(a.manual){const sc=$("#fsc").value,mx=$("#fmx").value;if(sc!==""&&mx!==""&&!isNaN(+sc)&&!isNaN(+mx)){o.score=+sc;o.max=+mx}}$("#dlg").close();act(api.result(u,a,o))},
     reopen:()=>{if(!confirm("Allow the student to redo and resubmit this activity? Their progress is kept; they will have to mark it as done again."))return;$("#dlg").close();act(api.result(u,a,{locked:false,markedDone:false,reopenedAt:DEMO?Date.now():F.serverTimestamp()}))},
     status:()=>{if(k.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;act(api.ls(S.ls,{status:k.s}))},
