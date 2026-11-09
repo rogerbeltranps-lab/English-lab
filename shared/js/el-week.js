@@ -119,7 +119,7 @@
         if(ag&&ag.days){p._ag[gi]=ag;p.rows.forEach(r=>set(r,gi,[]));const lb=ag.lab||{},last={};
           const ds=Object.keys(ag.days).filter(ok);if(ok(ag.exam)&&!ds.includes(ag.exam))ds.push(ag.exam);ds.sort();
           ds.forEach(d=>{const its=(ag.days[d]||[]).filter(Boolean),segs=[],seen=new Set(),tabs=[];
-            its.forEach(it=>{if(it==="self")return;if(/^note:/.test(it)){segs.push(it.slice(5));return}const id=it.split("#")[0];last[id]=d;
+            its.forEach(it=>{if(it==="self")return;if(/^note:/.test(it)){segs.push(it.slice(5));return}const id=it.split("#")[0];if(!/#game:/.test(it))last[id]=d;   // a class game of a path played later is not that path's day (Roger, 9 Nov 2026: Biel's LP1 and LP2 were not late)
               if(/#./.test(it))tabs.push(it);if(!seen.has(id)){seen.add(id);segs.push(lb[id]||id)}});
             if(ag.exam===d)segs.push("EXAM");if(!segs.length)return;
             const nl=lab(d)+" · "+segs.join(" · ")+(its.includes("self")?" · self-study":"");place(gi,d,nl);ad[nl]={key:"@"+d,from:null};tb["@"+d]=tabs});
