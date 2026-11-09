@@ -56,7 +56,7 @@ for(const s of studs){
       if(r.progress&&r.progress.fp!=null&&fp[r.ls]==null)fp[r.ls]=Math.round(r.progress.fp*10)/10;
       continue}
     if(fpOf[r.activity]&&r.score!=null&&r.max){fp[fpOf[r.activity]]=Math.round(r.score/r.max*100)/10;continue}
-    Object.entries(r.answers||{}).forEach(([k,x])=>{if(x&&x.at)note("a:"+r.activity+":"+k,String(x.at),["💬",T("Resposta al teu comentari: ","Answer to your comment: ")+title+" · "+stepName(a,k),""])});
+    Object.entries(r.answers||{}).forEach(([k,x])=>{if(x&&x.t&&x.at)note("a:"+r.activity+":"+k,String(x.at),["💬",T("Resposta al teu comentari: ","Answer to your comment: ")+title+" · "+stepName(a,k),""])});
     Object.entries(r.replies||{}).forEach(([k,x])=>{if(String(x||"").trim())note("r:"+r.activity+":"+k,hash(x),["✏️",T("Correcció: ","Correction: ")+title+" · "+stepName(a,k),""])});
   }
   Object.entries(fp).forEach(([ls,m])=>note("f:"+ls,String(m),["🎬",T("Nota del producte final: ","Final product mark: ")+lsName(ls),"?ls="+encodeURIComponent(ls)]));

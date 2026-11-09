@@ -18,6 +18,8 @@
 //        waiting for an answer (ELMark.open, not handed to the teacher), all groups, with the hand-in and the content file to read
 //   node tools/marking/marks.mjs answer <answer file> [--apply]             saves the EL-ANSWERS v1 answer: ANSWER → answers[step] =
 //        {t, q, at} (the student sees it as the teacher's answer), FORYOU → ask[step] = {why, q, at} (🙋 in the dashboard's To do)
+//   comments --new / answer <file> --new [--apply]   the same, only for the students who saved a new comment since the last instant run
+//        ("No new comments." and nothing else read when there is none): the instant run of "English Lab: problem reports (instant)"
 // The dashboard's ✏️ Corrections (Roger, 6 Nov 2026) shows when each piece was corrected and where the run is: fb-apply saves
 // results/{activity}.fbAt[step] = when the correction was sent; `ready` (the first step of the scheduled task "English Lab: mark and
 // correct") saves settings/marking.run = {started, via: "request" when the teacher asked for it with ✏️ Correct everything waiting now
@@ -74,8 +76,18 @@ const fsv=x=>x==null?{nullValue:null}:typeof x==="string"?{stringValue:x}:typeof
 const fp=(...ks)=>ks.map(k=>/^[A-Za-z_][A-Za-z_0-9]*$/.test(k)?k:"`"+k.replace(/`/g,"\\`")+"`").join(".");
 async function list(coll){const out=[];let t="";do{const j=await api("GET",DOCS+coll+"?pageSize=300"+(t?"&pageToken="+t:""));(j?.documents||[]).forEach(d=>out.push([d.name.split("/").pop(),doc(d)]));t=j?.nextPageToken||""}while(t);return out}
 
+// --new (comments and answer; the instant run, Roger 9 Nov 2026: "I want you to answer straight away"): only the students whose page saved
+// a new comment since the last instant run (students/{uid}.commented, set by el-cloud.js) are read, so a run reads a few documents.
+// settings/marking.cmtRun = the newest `commented` already handled; `answer --apply --new` (or `comments --new` with nothing waiting) moves it on.
+const NEW=process.argv.includes("--new")&&["comments","answer"].includes(process.argv[2]);let NEWS=null;
+if(NEW){const since=(doc(await api("GET",DOCS+"settings/marking"))||{}).cmtRun||"1970-01-01T00:00:00Z";
+  const q=await api("POST",DOCS.replace(/\/$/,"")+":runQuery",{structuredQuery:{from:[{collectionId:"students"}],where:{fieldFilter:{field:{fieldPath:"commented"},op:"GREATER_THAN",value:{timestampValue:since}}}}});
+  NEWS=(q||[]).filter(x=>x.document).map(x=>[x.document.name.split("/").pop(),doc(x.document)]);
+  if(!NEWS.length){console.log("No new comments.");process.exit(0)}}
+const cmtDone=async()=>{const t=NEWS.map(([,s])=>s.commented).sort().pop();if(t)await api("PATCH",DOCS+"settings/marking?updateMask.fieldPaths=cmtRun",{fields:{cmtRun:fsv(t)}})};
 // students of a group: the student list's group decides (as on the dashboard), testers left out
-const roster=Object.fromEntries(await list("roster")),studs=(await list("students")).map(([uid,s])=>({uid,...s,group:(roster[(s.email||"").toLowerCase()]||{}).group||s.group}));
+const roster=NEW?Object.fromEntries(await Promise.all(NEWS.map(async([,s])=>{const e=(s.email||"").toLowerCase();return [e,e?doc(await api("GET",DOCS+"roster/"+encodeURIComponent(e)))||{}:{}]})))
+  :Object.fromEntries(await list("roster")),studs=(NEW?NEWS:await list("students")).map(([uid,s])=>({uid,...s,group:(roster[(s.email||"").toLowerCase()]||{}).group||s.group}));
 const TESTERS=JSON.parse((/TESTERS=(\[[^\]]*\])/.exec(fs.readFileSync(path.join(ROOT,"shared/js/el-firebase.js"),"utf8"))||[,"[]"])[1]),isTester=s=>TESTERS.includes((s.email||"").toLowerCase());   // as ELCloud.isTester
 const cache={};
 const once=(k,f)=>cache[k]||(cache[k]=f());   // each document read once per run
@@ -222,11 +234,12 @@ else if(cmd==="apply"){const [gid,aid,step,file]=args,grp=grpOf(gid),m=momentOf(
   const nf=r.rows.filter(x=>x.flag).length,na=r.rows.filter(x=>x.auto).length;
   console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.length-nf} · sent back automatically (mostly pasted): ${na} · possible copies for the teacher: ${nf-na} · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}
 else if(cmd==="comments"||cmd==="answer"){const its=await comments();
-  if(cmd==="comments")console.log(its.length?W.ELMark.commentSheet({date:W.ELWeek.today(),items:its}):"No comments waiting for an answer.");
+  if(cmd==="comments"){console.log(its.length?W.ELMark.commentSheet({date:W.ELWeek.today(),items:its}):"No comments waiting for an answer.");if(NEW&&!its.length)await cmtDone()}
   else{const r=W.ELMark.parseComments(fs.readFileSync(args[0],"utf8"),{items:its});if(r.err)throw new Error(r.err);const now=new Date().toISOString();
     for(const x of r.rows){const i=its.find(y=>y.id===x.id),f=x.kind==="ANSWER"?"answers":"ask",v=x.kind==="ANSWER"?{t:x.text,q:i.comment,at:now}:{why:x.text,q:i.comment,at:now};
       console.log((flags.has("--apply")?"✓ ":"→ ")+x.id+" · "+x.code+" · "+i.aid+" · "+x.step+" · "+(x.kind==="ANSWER"?"answer: ":"🙋 for the teacher: ")+x.text);
       if(flags.has("--apply"))await api("PATCH",DOCS+`students/${i.uid}/results/${i.aid.replace("/","__")}?`+["ls","activity","updated",fp(f,x.step)].map(p=>"updateMask.fieldPaths="+encodeURIComponent(p)).join("&"),
         {fields:{ls:fsv(i.lsId),activity:fsv(i.aid),updated:{timestampValue:now},[f]:fsv({[x.step]:v})}})}
+    if(NEW&&flags.has("--apply"))await cmtDone();
     console.log(`\n${flags.has("--apply")?"Saved":"Would save"}: ${r.rows.filter(x=>x.kind==="ANSWER").length} answers · ${r.rows.filter(x=>x.kind==="FORYOU").length} for the teacher · no line: ${r.missing.length} · lines left out: ${r.bad.length}${flags.has("--apply")?"":"\nNothing written: run again with --apply."}`)}}
 else{console.log("Usage: node tools/marking/marks.mjs ready | audit | fb-ready | fb-sheet <group> <activity> <step> | fb-apply <group> <activity> <step> <answer file> [--apply] | sheet <group> <activity> <step> | apply <group> <activity> <step> <answer file> [--apply] [--feedback] | comments | answer <answer file> [--apply]");process.exit(1)}
