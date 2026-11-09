@@ -77,6 +77,11 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .cont{background:#3157d5;color:#fff;border-radius:22px;padding:26px 28px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 24px #3157d533}.cont .ck{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d6e0ff}
 .cont .ct{font-size:28px;font-weight:800;line-height:1.15;letter-spacing:-.01em}.cont .cs{font-size:16px;color:#e3e9ff}.cont .cs b{color:#fff}.cont .crow{display:flex;align-items:center;gap:12px;max-width:520px}.cont .cbar{flex:1;height:10px;border-radius:999px;background:#2443ad;overflow:hidden}.cont .cbar span{display:block;height:100%;background:#fff;border-radius:999px}.cont .cn{font-size:14px;font-weight:700;white-space:nowrap}
 .cont .cgo{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}.cont .cgo a,.cont .cgo button{background:#fff;color:#2443ad;border:0;border-radius:14px;padding:13px 26px;font-size:17px;font-weight:800;text-decoration:none;margin:0;cursor:pointer}.cont .cgo .s2{background:#2443ad;color:#fff}.cont .cgo .rel{background:#fee2e2;color:#991b1b}.cont .cgo a:hover,.cont .cgo button:hover{outline:3px solid #c7d4ff}
+.nxc{background:#fff;border:1px solid #e2e8f0;border-radius:22px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}.nxc h2{margin:0 0 2px;font-size:19px}
+.nxr{display:grid;grid-template-columns:196px minmax(0,1fr);gap:14px;align-items:start;border:1px solid #e2e8f0;border-left:6px solid #2563eb;border-radius:14px;padding:10px 12px}.nxr.c2eso{border-left-color:#16a34a}.nxr.first{background:#eef3ff;border-color:#c7d4ff;border-left-color:#3157d5}.nxr.first.c2eso{background:#effbf3;border-color:#bbe5c8;border-left-color:#16a34a}
+.nxw{display:flex;flex-direction:column;gap:2px}.nxw b{font-size:18px}.nxw span{font-size:14px;color:#334155;font-weight:600}.nxw small{color:#7c3aed;font-weight:700}.nxnow{background:#dc2626;color:#fff;border-radius:999px;padding:0 7px;font-size:12px}
+.nxi{font-size:14px;color:#334155;min-width:0;line-height:1.5;padding-top:2px}.nxi>span{display:inline}.nxi>span+span:before{content:"  •  ";color:#94a3b8;font-weight:800;white-space:pre}.nxi b{color:#0f172a}.nxi .nt{color:#475569;font-style:italic}.nxi .nt b{font-weight:600;color:#475569}.nxi>span.nxe{color:#64748b;font-style:italic}.nxm{display:block;color:#64748b;font-size:13px;margin-top:3px}.nxm.over{color:#b91c1c;font-weight:700}
+.nxb{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.nxb button{margin:0;white-space:nowrap;border-radius:10px;font-weight:800;padding:6px 10px;font-size:13px}@media(max-width:760px){.nxr{grid-template-columns:1fr}}
 .cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done .cgo a,.cont.done .cgo button{color:#166534}.cont.done .cgo .s2{background:#166534;color:#fff}.cont.idle{background:#334155;box-shadow:none}
 .cline{padding:7px 0;border-top:1px solid #eef2f7}.cwho{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}details.cgrp details.cgrp,details.cday details.cgrp{margin-left:14px}
 .chip.cchip{font-size:13px;padding:2px 10px;cursor:pointer}.chip.cchip:hover{border-color:#3157d5;color:#2443ad}.chip.cchip.late{border-color:#fca5a5;background:#fef2f2;color:#991b1b}
@@ -1192,24 +1197,33 @@ function nextClass(gid){const T=window.EL_TIMETABLE;if(!T||!T.groups)return null
 function sessOf(gid,date){const n=ELWeek.now(gid);if(!n)return null;const x=Object.assign({gid},n),t=ELWeek.today();
   const all=x.p.rows.flatMap((r,i)=>lines(x,r).filter(l=>!/^Homework by /.test(l)).map(l=>({i,l,d:lineDate(r,l)}))).filter(y=>y.d);
   const y=(date&&all.find(y=>y.d===date))||all.find(y=>y.d>=t&&!ticked(x,y.l));return y?Object.assign({x},y):null}
-// the big card: the class now or next for one group (go: a "Go to <group>" button, for Home)
-function classCard(grp,go){const c=nextClass(grp.id),y=sessOf(grp.id,c&&c.date),t=ELWeek.today();
-  const when=c?(c.now?`In class now · ${c.start}–${c.end}`:`Next class · ${c.date===t?"today":ELWeek.date(c.date)} · ${c.start}`):"Next session",
-        goB=go?`<button data-do="tab" data-g="${grp.id}">▶ Go to ${esc(grp.name)}</button>`:"";
-  if(!y)return `<div class="cont idle"><span class="ck">${when}</span><span class="ct">${esc(grp.name)}</span><span class="cs">No session for this class in the time plan.</span><div class="cgo">${goB}</div></div>`;
-  const {x,l}=y,text=l.replace(/^\w{3} \d{1,2} · /,""),dt=dayTabs(x,l),as=lineActs(x,l),a=(dt[0]||as[0]||[])[0],on=ticked(x,l);
-  const studs=Object.values(S.P).filter(s=>s.group===grp.id&&!s.tester&&!s.away&&s.uid),nd=a?studs.filter(s=>isDone(s.uid,a)).length:0;
-  const tabs=dt.flatMap(([,lab,ts])=>ts.filter(z=>!isGame(z[0])).map(z=>esc(z[1]))),cm=cmOf(grp.id);
-  const date=y.d===t?"today":ELWeek.date(y.d);
-  return `<div class="cont ${on?"done":""}"><span class="ck">${go?esc(grp.name)+" · ":""}${when}${c&&c.date!==y.d?` · session of ${date}`:""}</span>`
-    +`<span class="ct">${esc(text)}</span>`
-    +(tabs.length?`<span class="cs">Tabs: <b>${tabs.join(" · ")}</b></span>`:"")
-    +(a&&studs.length?`<div class="crow"><div class="cbar"><span style="width:${Math.round(nd/studs.length*100)}%"></span></div><span class="cn">${nd} / ${studs.length} students finished ${esc((dt[0]||as[0])[1]||a.title)}</span></div>`:"")
-    +(on?`<span class="cs">✓ Ticked as done in the time plan.</span>`:"")
-    +`<div class="cgo">${goB}${a&&!go&&!/-my-real-routine$/.test(x.ls)&&!a.inClass?(cm?`<button class="rel" data-do="cmstop" data-gid="${grp.id}">⏹ Stop class mode</button>`:`<button data-do="cmstart" data-gid="${grp.id}" data-href="${esc(a.path)}" data-ls="${x.ls}" data-a="${a.id}" title="Opens it in a new tab for the projector: every student of ${esc(grp.name)} follows that tab (page and tab) until you stop it or the class ends. This tab stays free.">🎓 Class mode</button>`):""}`
-    +(a?`<a class="${go?"":"s2"}" href="${esc(a.path)}" target="_blank" rel="noopener">Open it ↗</a>`:"")
-    +`</div></div>`}
-// Home (the old 📅 Time plan tab): alerts, the next class of any group, a tile per group, the time plan of every group and the messages
+// 🗓 Next classes on Home (Roger, 9 Nov 2026: "I dont find this useful" about the old big card, which showed one group's "session" from the
+// plan, jumped to a later week when that class had nothing on it, and only had "Go to <group>"): one row per group, soonest first, with its
+// next class by the timetable and exactly what is on the agenda that day (learning paths with their tabs, games, notes, the exam; never a
+// later day), the minutes planned, 🎓 Class mode (opens on the day's first tab; the class tab shows the day's agenda) and 📅 Plan (the
+// group's Time plan). Nothing planned: it says so. No extra reads: the agenda is in the LS documents the dashboard already has.
+function nxItems(x,d){const ag=agOf(x);
+  if(!ag){const y=sessOf(x.gid,d);return y&&y.d===d?[{t:y.l.replace(/^\w{3} \d{1,2} · /,""),s:[]}]:[]}
+  const out=agRuns(ag,d).map(g=>{if(g.solo){const a=byId(g.solo);return a?{t:((ag.lab||{})[a.id]||agLab(x,a)),s:[itName(g.its[0])]}:null}
+    if(!g.id)return {t:g.its.map(it=>it.slice(5)).join(" · "),s:[],n:1};const a=byId(g.id);if(!a)return null;
+    return {t:(ag.lab||{})[a.id]||agLab(x,a),s:g.its.filter(it=>it.indexOf("#")<it.length-1).map(itName),a}}).filter(Boolean);
+  if(ag.exam===d)out.push({t:"📝 Exam",s:[]});return out}
+function nxFirst(x,d){const ag=agOf(x);   // where class mode starts: the day's first tab, else its first learning path, else the LS home
+  for(const it of (ag&&agRuns(ag,d).flatMap(g=>g.its))||[]){if(/^note:/.test(it))continue;const i=it.indexOf("#"),a=byId(it.slice(0,i)),p=it.slice(i+1);
+    if(a&&!isGame(p)&&!a.inClass)return {href:a.path,ls:x.ls,a:a.id,p}}
+  const l=EL_LS.find(z=>z.id===x.ls);return {href:l?l.course+"/"+l.id.slice(l.course.length+1)+"/index.html":"index.html",ls:x.ls,a:"",p:""}}
+function nextBox(){const t=ELWeek.today(),T=window.EL_TIMETABLE||{},len=+T.len||60;
+  const rows=GR.map(g=>{const c=nextClass(g.id);return c&&{g,c}}).filter(Boolean).sort((a,b)=>(a.c.date+" "+a.c.start.padStart(5,"0")).localeCompare(b.c.date+" "+b.c.start.padStart(5,"0")));
+  if(!rows.length)return `<div class="cont idle"><span class="ck">Next classes</span><span class="ct">No class in the next three weeks</span></div>`;
+  return `<div class="nxc"><h2>🗓 Your next classes</h2>`+rows.map(({g,c},i)=>{const n=ELWeek.now(g.id),x=n&&Object.assign({gid:g.id},n),its=x?nxItems(x,c.date):[],ag=x&&agOf(x);
+    const self=!!(ag&&(ag.days[c.date]||[]).includes("self")),min=ag?(ag.days[c.date]||[]).reduce((s,it)=>s+agMin(ag,c.date,it),0):0;
+    const when=c.now?`<b class="nxnow">Now</b> ${c.start}–${c.end}`:`${c.date===t?"Today":c.date===ELWeek.add(t,1)?"Tomorrow":ELWeek.date(c.date)} · ${c.start}`;
+    const f=x&&its.some(z=>!z.n)?nxFirst(x,c.date):null,mx=x&&/-my-real-routine$/.test(x.ls);
+    return `<div class="nxr c${g.course} ${i?"":"first"}"><div class="nxw"><b>${esc(g.name)}</b><span>${when}</span>${self?`<small>self-study</small>`:""}<div class="nxb">${f&&!mx?`<button data-do="cmstart" data-gid="${g.id}" data-href="${esc(f.href)}" data-ls="${f.ls}" data-a="${esc(f.a)}" data-p="${esc(f.p)}" title="Opens it in a new tab for the projector, with this day's agenda: every student of ${esc(g.name)} follows that tab until you stop it or the class ends. This tab stays free.">🎓 Class mode</button>`:""}<button class="g" data-do="gplan" data-g="${g.id}" title="${esc(g.name)}'s Time plan">📅 ${its.length?"Plan":"Plan it"}</button></div></div>`
+      +`<div class="nxi">${its.length?its.map(z=>`<span class="${z.n?"nt":""}"><b>${esc(z.t)}</b>${z.s.length?": "+z.s.map(esc).join(" · "):""}</span>`).join("")
+        +(min?`<small class="nxm ${min>len?"over":""}">⏱ ${min} of ${len} min planned</small>`:""):`<span class="nxe">Nothing planned for this class yet</span>`}</div>`
+      +`</div>`}).join("")+`</div>`}
+// Home (the old 📅 Time plan tab): alerts, the next class of each group, a tile per group, the time plan of every group and the messages
 function homePage(){const t=ELWeek.today(),np=S.D.pb.filter(x=>!x.fixed).length,nw=(S.D.sg||[]).filter(x=>!x.read).length,nr=msgNew().length;
   if(S.place==="week")return placeHead("Home","week")+satBox(GR.map(g=>g.id))+overview();
   if(S.place==="msgs")return placeHead("Home","msgs")+annBox()+pbBox()+sgBox();
@@ -1220,11 +1234,10 @@ function homePage(){const t=ELWeek.today(),np=S.D.pb.filter(x=>!x.fixed).length,
     +(np?tAlert("msgs","⚠️",`${plural(np,"problem report")} from students`,"Read"):"")
     +(nw?tAlert("msgs","💡",`${plural(nw,"new idea")} from students`,"Read","news"):"")
     +(nr?tAlert("msgs","✉️",`${plural(nr,"new answer")} to your messages`,"Read","news"):"");
-  const c=nextClass(),cg=c&&GR.find(g=>g.id===c.gid);
   const gt=GR.map(g=>{const x=ELWeek.now(g.id),l=x&&EL_LS.find(y=>y.id===x.ls),ex=x&&ELWeek.exam(x.p,x.gi),n=ex?ELWeek.days(t,ex):null,b=x?behind(Object.assign({gid:g.id},x)).length:0;
     return tTile(null,"",esc(g.name),(l?lsLabel(l):"No time plan yet")+(n!=null&&n>=0?` · exam ${n===0?"today":n===1?"tomorrow":"in "+n+" days"}`:""),b?b+" not ticked":"",true,"c"+g.course,g.id)}).join("");
   const d=new Date(t+"T12:00").toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
-  return `<div class="ph"><h1 class="hi">Hi, Roger${window.ELCheer?`! ${esc(ELCheer.teacher(t,S.cheer||0))} <button class="cheer" data-do="cheer" title="Another sentence">↻</button>`:""}</h1><p class="sub">${esc(d)}</p></div><div class="hgrid"><div class="hl">${al}${cg?classCard(cg,true):`<div class="cont idle"><span class="ck">Next class</span><span class="ct">No class in the next three weeks</span></div>`}</div>`
+  return `<div class="ph"><h1 class="hi">Hi, Roger${window.ELCheer?`! ${esc(ELCheer.teacher(t,S.cheer||0))} <button class="cheer" data-do="cheer" title="Another sentence">↻</button>`:""}</h1><p class="sub">${esc(d)}</p></div><div class="hgrid"><div class="hl">${al}${nextBox()}</div>`
     +`<div class="tiles">${gt}${corrTile()}${tTile("week","📅","Time plan","every group's week and exam day",sat?sat+" not ticked":"",true)}${tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)}${tTile("tt","🗓","Timetable","your classes with each group, days off","",false)}</div></div>`}
 function render0(){
   const D=S.D;S.P=people();
@@ -3800,7 +3813,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     if(from&&to&&from!==to&&!k.ls){const l=EL_LS.find(x=>x.id===S.ls);
       if(l&&l.course!==to.course){const m=EL_LS.filter(x=>x.course===to.course)[EL_LS.filter(x=>x.course===l.course).indexOf(l)];S.ls=m?m.id:null}}
     else if(S.g!==k.g||S.place!=="home"){S.place="home";S.year=false}
-    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();t.classList.contains("back")?navBack(k.p):goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}goPlace("plan2")},tp2fs:()=>{if(tp2Phone()){S.tp2foc=!S.tp2foc;tp2Foc();scrollTo(0,0);return}tp2Full()},tp2x:()=>{S.tp2foc=false;tp2Full(false);goPlace("plan")},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
+    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();t.classList.contains("back")?navBack(k.p):goPlace(k.p)},gplan:()=>{e.preventDefault();S.g=k.g;S.tutor="all";S.ls=null;S.year=false;goPlace("plan")},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}goPlace("plan2")},tp2fs:()=>{if(tp2Phone()){S.tp2foc=!S.tp2foc;tp2Foc();scrollTo(0,0);return}tp2Full()},tp2x:()=>{S.tp2foc=false;tp2Full(false);goPlace("plan")},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
     corrg:()=>{S.corrG=k.g;render()},corrv:()=>{S.corrV=k.v;render()},corrmore:()=>{S.corrN+=6;render()},corropen:()=>corrOpen(k),
     corrask:()=>act(api.mkAsk(true)),corrcancel:()=>act(api.mkAsk(false)),
