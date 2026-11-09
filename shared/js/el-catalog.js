@@ -203,6 +203,7 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
 window.elOptional=a=>!!(a&&a.optional);
 window.elLpOpen=function(a,info,gid,raw){if(a&&a.optional)return true;const o=info&&info.open&&info.open[gid];
   if(!(Array.isArray(o)?o.includes(a.id):!a.graded||((info&&info.enabled)||[]).includes(a.id)))return false;
+  if(!raw&&!window.EL_RAW_OPEN&&elCpShown(a,info,gid))return false;   // a checkpoint whose answers are shown is closed: nobody can do it any more
   return raw||window.EL_RAW_OPEN||!elPlanLater(info,gid).acts.has(a.id)};
 // The Time plan opens on the class day (Roger, 7 Nov 2026: "the SLPs will be automatically open the day the group has class and it's on my
 // plan"; "If I don't do sth in class I drag it to the next day and that's all"). Dragging a learning path or tab onto a class day still opens
@@ -464,6 +465,10 @@ window.elWhoLeft=w=>({gone:(w.out||[]).filter(y=>y.why!=="never"),back:(w.inn||[
 window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh(a.title),lo=st.toLowerCase(),p=(window.EL_PLAN||{})[a.ls];let n=null;
   if(p)(p.rows||[]).forEach(r=>[].concat(r.g||r.what||[]).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,k,nm)=>{nm=nm.trim().toLowerCase();if(!n&&nm&&(lo.startsWith(nm)||nm.startsWith(lo)))n=k}));
   return (n?"LP"+n+" ":"")+st};
+// Recall checkpoint answers shown to a group (Roger, 9 Nov 2026: "when all students or I say show (but then nobody can do the checkpoint)"):
+// ls/{id}.cpShown[group][activity id] = when. Students then see their questions, answers and corrections (today.html ✅ My checkpoints)
+// and the checkpoint is closed for that group (elLpOpen, firestore.rules), so it no longer blocks what comes after it.
+window.elCpShown=(a,info,gid)=>!!(a&&a.checkpoint&&info&&info.cpShown&&info.cpShown[gid]&&info.cpShown[gid][a.id]);
 window.elLpLocks=function(ls,open){const shut=(window.EL_CATALOG||[]).filter(a=>a.ls===ls&&!a.optional&&!open.includes(a.id));   // optional: never locked
   return {locked:shut.map(a=>a.id),lockedKeys:shut.flatMap(a=>a.keys.flatMap(k=>[k,k+"Level"]))}};
 // Recall checkpoints open the way (Roger, 26 Oct 2026): an activity that comes after a checkpoint in its LS (catalogue order = LS page
