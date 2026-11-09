@@ -3630,11 +3630,21 @@ const fpgPlus=g=>{const m=fpgRow(g);return g.level==null?"–":g.level===0?"No e
 // the box in the final product dialog (filled once the drafts are read)
 function fpgBox(u,a){if(!fpgIs(a))return "";setTimeout(()=>fpgLoad(a).then(()=>fpgFill(u,a)));return `<div id="fpg" class="fpg" data-u="${u}"><p class="muted">🎬 Loading the video and Gemini's draft…</p></div>`}
 const fpgRefresh=a=>{const b=$("#fpg");if(b&&b.dataset.u)fpgFill(b.dataset.u,a);const n=$("#fpbulk");if(n&&FPG.bulk)n.innerHTML=fpBulkH(a,"")};
+// ▶ a Classroom or pasted Drive file plays from a copy in his own Final product videos folder (Roger, 9 Nov 2026: "I can't see the videos":
+// those files are shared only with the school account, the dashboard runs on his Gmail, Drive's player said "You need access"). The school
+// script makes the copy once (action fp_copy; a file his Gmail owns comes back as it is) and the copy's id is kept with the draft (viewId).
+FPG.view={};
+function fpgPlay(u,a,v){if(!v||!v.link||!v.id||(DEMO&&!window.EL_DEMO_FPCOPY))return {id:v&&v.id};const d=(FPG.d[a.id]||{})[u]||{};
+  if(d.viewId&&d.viewOf===v.id)return {id:d.viewId};const k=v.id,x=FPG.view[k];if(x&&x.id)return {id:x.id};if(x&&x.err)return {err:x.err};
+  if(!x){FPG.view[k]={busy:1};fpgCall({action:"fp_copy",fileId:v.id}).then(j=>{FPG.view[k]={id:j.id};const o=Object.assign({},(FPG.d[a.id]||{})[u]||{},{viewId:j.id,viewOf:v.id});
+    return fpgSave(a,u,o)},e=>{FPG.view[k]={err:e.message}}).catch(e=>console.warn("fp copy",e)).then(()=>fpgFill(u,a))}
+  return {busy:1}}
 function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;const v=fpgVideo(u,a),R=fpgRubric(a),d=(FPG.d[a.id]||{})[u],busy=FPG.busy[u+"|"+a.id];
   let h=`<h4 style="margin:0 0 6px">🎬 The video and Gemini's draft <button class="g" data-fpg="cost" style="float:right;font-size:12px;padding:2px 8px">💶 Gemini this month</button></h4>`;
-  const yid=v&&v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],au=v&&v.link?"?authuser="+encodeURIComponent(FPG_SCHOOL):"",open=v?(yid?v.youtube:`https://drive.google.com/file/d/${esc(v.id)}/view${au}`):"";
-  if(v)h+=`<p class="muted" style="margin:0 0 6px">${esc(v.name||"Video")}${v.size?" · "+Math.round(v.size/1e6)+" MB":""}${v.at?" · uploaded "+day(v.at):""}${v.by?" · uploaded by "+name(v.by)+" (group video)":""} · <a href="${esc(open)}" target="_blank" rel="noopener">${yid?"Open on YouTube":"Open in Drive"} ↗</a>${au&&!yid?`<br><small>Opens with the school account (${FPG_SCHOOL}). If it asks for access, add that account to this Chrome: your photo at the top right of Google › Add another account.</small>`:""}</p>
-    <div style="position:relative;padding-top:56.25%;background:#0f172a;border-radius:8px;overflow:hidden"><iframe src="${yid?"https://www.youtube.com/embed/"+esc(yid):`https://drive.google.com/file/d/${esc(v.id)}/preview${au}`}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>`;
+  const yid=v&&v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],pl=v&&!yid?fpgPlay(u,a,v):{},
+    pid=pl.id||(v&&v.id),au=v&&v.link&&!pl.id?"?authuser="+encodeURIComponent(FPG_SCHOOL):"",open=v?(yid?v.youtube:`https://drive.google.com/file/d/${esc(pid)}/view${au}`):"";
+  if(v)h+=`<p class="muted" style="margin:0 0 6px">${esc(v.name||"Video")}${v.size?" · "+Math.round(v.size/1e6)+" MB":""}${v.at?" · uploaded "+day(v.at):""}${v.by?" · uploaded by "+name(v.by)+" (group video)":""} · <a href="${esc(open)}" target="_blank" rel="noopener">${yid?"Open on YouTube":"Open in Drive"} ↗</a>${pl.busy?`<br><small>⏳ Making a copy in your Final product videos folder so you can play it here (a few seconds)…</small>`:pl.err?`<br><small>⚠️ No copy to play here (${esc(pl.err)}): it opens with the school account (${FPG_SCHOOL}).</small>`:""}</p>
+    <div style="position:relative;padding-top:56.25%;background:#0f172a;border-radius:8px;overflow:hidden">${pl.busy?"":`<iframe src="${yid?"https://www.youtube.com/embed/"+esc(yid):`https://drive.google.com/file/d/${esc(pid)}/preview${au}`}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>`}</div>`;
   else{const c=fpgClsOf(u);h+=c?`<p class="muted">On Classroom: ${c.items.length?c.items.map(i=>i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title||i.kind)}</a>`:esc(i.title||i.kind)).join(" · ")+" — "+esc(c.why):"nothing handed in"}.</p>`
     :`<p class="muted">No video uploaded on the site yet. <button class="g" data-fpg="cls" data-u="${u}" data-a="${esc(a.id)}">📥 Look on Classroom</button> or paste a Drive link:</p>`}
   h+=`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:6px">${v&&!v.link?"":`<input id="fpglink" placeholder="https://drive.google.com/file/d/…" style="flex:1;min-width:220px">`}`

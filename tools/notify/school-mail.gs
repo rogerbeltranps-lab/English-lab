@@ -79,6 +79,7 @@ function doPost(e) {
   if (m.action === "video_chunk") return out(videoChunk(m));
   if (m.action === "video_status") return out(videoStatus(m));
   if (m.action === "fp_watch") return out(m.idToken && isTeacher(m.idToken) ? fpWatch(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_copy") return out(m.idToken && isTeacher(m.idToken) ? fpCopy(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_folder") return out(m.idToken && isTeacher(m.idToken) ? fpFolder(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_classroom") { if (!(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: "not the teacher"});
     try { return out(fpClassroom(m)); } catch (x) { return out({ok: false, error: "Classroom: " + String(x && x.message || x).slice(0, 300)}); } }
@@ -513,6 +514,24 @@ function geminiUsage() {
 // ---- 9. Final products handed in on Google Classroom (see the top): read-only, nothing is changed in Classroom
 // 📁 a Drive folder of final products the teacher collected himself (Roger, 9 Nov 2026: the 2 ESO A videos that were not on Classroom, each
 // file named after its student): the files the school account can open in it, for the dashboard to match to the students by name
+// ▶ a Classroom video the teacher's Gmail can play (Roger, 9 Nov 2026: "I can't see the videos"): the students' files are shared only with
+// this school account, and the dashboard runs on his Gmail, so Drive's player said "You need access". A copy goes into Final product videos ›
+// Classroom copies (his own folder, so his Gmail can open it; one copy per file, found again by the original id in its name). A file his Gmail
+// already owns is played as it is. He deletes these with the rest once a year.
+function fpCopy(m) {
+  const id = String(m.fileId || "");
+  let f;
+  try { f = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the school account cannot open that file"}; }
+  try { const o = f.getOwner(); if (o && /@gmail\.com$/i.test(o.getEmail())) return {ok: true, id}; } catch (x) {}
+  let root, dir;
+  try { root = DriveApp.getFolderById(VIDEO_FOLDER); } catch (x) { return {ok: false, error: "no access to the videos folder"}; }
+  const it = root.getFoldersByName("Classroom copies");
+  dir = it.hasNext() ? it.next() : root.createFolder("Classroom copies");
+  const tag = "[" + id + "]", old = dir.searchFiles("title contains '" + tag.replace(/'/g, "") + "' and trashed = false");
+  if (old.hasNext()) return {ok: true, id: old.next().getId()};
+  const c = f.makeCopy(f.getName().replace(/(\.[a-z0-9]{2,4})?$/i, " " + tag + "$1"), dir);
+  return {ok: true, id: c.getId()};
+}
 function fpFolder(m) {
   let f;
   try { f = DriveApp.getFolderById(String(m.folderId || "")); } catch (x) { return {ok: false, error: "the school account cannot open that folder: share it with " + Session.getActiveUser().getEmail()}; }
