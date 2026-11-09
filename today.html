@@ -62,6 +62,7 @@ table.pgt-t td.pgtot b{font-size:1.55rem}.pgtot .xbar{display:block;margin:5px a
 @media (max-width:640px){table.pgt-t,table.pgt-t tbody,table.pgt-t tr,table.pgt-t td{display:block;width:auto}table.pgt-t thead{display:none}
   table.pgt-t tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:8px 12px}table.pgt-t tr.now{background:#eff6ff;border-color:#bfdbfe}table.pgt-t tr.soon{background:#f8fafc}table.pgt-t td{border:0!important;padding:3px 0!important;text-align:left!important}
   table.pgt-t td:empty{display:none}table.pgt-t td[data-h]::before{content:attr(data-h);display:inline-block;min-width:120px;color:#475569;font-size:13px}table.pgt-t td small{display:inline;margin-left:6px}.pgtot .xbar{display:inline-block;margin:0 0 0 8px}.pgt{min-width:0;flex:1 1 40%}}
+.pgtm{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}.pgtm small{color:#475569;font-weight:700;font-size:13px}.pgtm>b{font-size:2rem;line-height:1.1}.pgtm>b small{font-size:1rem;color:#64748b}
 .cpsum{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.cps{border-radius:10px;padding:7px 12px;font-size:14.5px}.cps.ok{background:#dcfce7;color:#14532d}.cps.bad{background:#fff7ed;color:#9a3412;border:1px solid #fdba74}
 .cpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px}
 .cpc{background:var(--ks);border-radius:14px;padding:12px 14px;border-top:5px solid var(--k)}.cpc.none{opacity:.75}
@@ -1109,7 +1110,18 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
     else if(b.id==="other")pcs=spread(g.other||[],w,null,["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]).map(y=>Object.assign(y,{m:(P.other||{})[y.c]??null}));
     pcs.forEach(y=>{if(!/^\d+\.\d/.test(String(y.c)))return;   // English criteria only ("5.1"); transversals and process/teamwork out
       if(fin[y.c])y.m=EL_DEGREE_MARK[fin[y.c]]??y.m;y.term=term;y.ls=l;out.push(y)})});
+  // "by how much it is worked", as the dashboard (teacher.html lsWork/byWork): each competence's share of the LS is how many steps of the LS
+  // activities work on its criteria (a step with two criteria counts half for each); the pieces keep their proportions inside their competence.
+  // It moves weight between competences and between LSs, exactly as on the dashboard, so the marks here match its whole-year view.
+  const wk={};let any=false;EL_CATALOG.filter(a=>a.ls===l.id).forEach(a=>{const st=SC[a.id];if(!st)return;any=true;
+    Object.values(st).forEach(cs=>{const en=cs.filter(c=>/^\d+\.\d/.test(String(c)));en.forEach(c=>{const k=String(c).split(".")[0];wk[k]=(wk[k]||0)+1/en.length})})});
+  if(any){const pw={};out.forEach(y=>{const k=String(y.c).split(".")[0];pw[k]=(pw[k]||0)+y.w});
+    const ks=Object.keys(pw).filter(k=>wk[k]),tw=ks.reduce((n,k)=>n+wk[k],0),tot=Object.values(pw).reduce((n,v)=>n+v,0);
+    if(tw)out.forEach(y=>{const k=String(y.c).split(".")[0];y.w=wk[k]?y.w/pw[k]*wk[k]/tw*tot:0})}
   return out}
+// the term mark (Roger, 9 Nov 2026, decision card "Yes, show the term mark"): as the dashboard's whole-year view (byComp(...).mark): the
+// competences' marks weighted by their share, i.e. every piece of the term with a mark, weighted
+const termMark=ps=>{const h=ps.filter(y=>y.m!=null&&y.w>0),w=h.reduce((n,y)=>n+y.w,0);return w?h.reduce((n,y)=>n+y.m*y.w,0)/w:null};
 // competences of some pieces: {k: {m, crit: {c: {m, w, src}}}}; a mark is the weighted average of the pieces that have one
 function compOfPieces(ps){const o={};ps.forEach(y=>{const k=String(y.c).split(".")[0],K=o[k]=o[k]||{w:0,sw:0,sm:0,crit:{}},C=K.crit[y.c]=K.crit[y.c]||{w:0,sw:0,sm:0,src:new Map()};
     K.w+=y.w;C.w+=y.w;if(!C.src.has(y.src[0]))C.src.set(y.src[0],new Set());if(y.src[1])C.src.get(y.src[0]).add(y.src[1]);if(y.m!=null){K.sw+=y.w;K.sm+=y.m*y.w;C.sw+=y.w;C.sm+=y.m*y.w}});
@@ -1182,12 +1194,14 @@ function progressPlace(lss,ls){
       +`<td class="pgtot"${H("🎓","Nota de la LS","LS mark")}>${tot==null?`<span class="pgna">${t("encara no","not yet")}</span>`:`<b style="color:${col(tot*10)}">${f1(tot)}</b> <small>/ 10</small>`}<span class="xbar"><span style="width:${tot==null?0:Math.max(0,Math.min(100,tot*10))}%;background:${tot==null?"#e2e8f0":col(tot*10)}"></span></span></td>`
       +`<td><button type="button" class="g pgo" data-do="pgo" data-ls="${r.l.id}" data-h="${M.only?"exam":"formative"}">${t("Detalls","Details")} →</button></td></tr>`};
   const nd=these.filter(r=>r.st!=="coming"),nc=these.length-nd.length;
-  return `<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",esc(EL_TERMS[tm-1][EN?"en":"ca"]),these.map(r=>"LS"+r.n).join(" · "))}</div>`
+  const TM=termMark(rows.filter(r=>r.l).flatMap(r=>compPieces(r.l)).filter(y=>y.term===tm)),TD=degOf(TM);
+  return `<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",esc(EL_TERMS[tm-1][EN?"en":"ca"]),these.map(r=>"LS"+r.n).join(" · "))}`
+    +`<div class="pgtm"><small>${tm>=now?t("Nota del trimestre fins ara","Term mark so far"):t("Nota del trimestre","Term mark")}</small>${TM==null?`<span class="pgna">${t("encara no","not yet")}</span>`:`<b style="color:${col(TM*10)}">${f1(TM)} <small>/ 10</small></b><span class="dg dg-${TD[0]}">${TD[1]}</span>`}</div></div>`
     +`<p class="fvlead">${t("Les teves notes de cada Learning Situation, trimestre a trimestre. Tria un trimestre:","Your marks in each Learning Situation, term by term. Choose a term:")}</p>`
     +`<div class="pgterms" role="group" aria-label="${t("Trimestre","Term")}">${EL_TERMS.map((_,i)=>chip(i+1)).join("")}</div>`
     +(these.length?`<div class="wrap"><table class="xt pgt-t"><thead><tr><th>${t("Situació d'aprenentatge","Learning Situation")}</th><th>📚 ${t("Feina diària","Daily work")}</th><th>📝 ${t("Examen","Exam")}</th><th>🎬 ${t("Producte final","Final product")}</th><th>🎓 ${t("Nota de la LS","LS mark")}</th><th></th></tr></thead><tbody>${these.map(row).join("")}</tbody></table></div>`
       :`<p class="muted">${t("Aquest trimestre encara no té cap LS.","This term has no LS yet.")}</p>`)
-    +`<p class="muted pgfoot">${t("La nota de cada LS es fa amb la teva feina diària als learning paths, l'examen i el producte final (el pes de cada part és a sota de la nota). Una LS que encara fas mostra la nota fins ara: canvia cada dia amb la teva feina.","Each LS mark is made of your daily work in the learning paths, the exam and the final product (each part's weight is under its mark). An LS you are doing now shows your mark so far: it changes every day with your work.")}${nc?" "+t(nc>1?`Les ${nc} LS que vénen encara no estan preparades.`:"La LS que ve encara no està preparada.",nc>1?`The ${nc} LSs still to come are not ready yet.`:"The LS still to come is not ready yet."):""}</p></div>`
+    +`<p class="muted pgfoot">${t("La nota de cada LS es fa amb la teva feina diària als learning paths, l'examen i el producte final (el pes de cada part és a sota de la nota). Una LS que encara fas mostra la nota fins ara: canvia cada dia amb la teva feina.","Each LS mark is made of your daily work in the learning paths, the exam and the final product (each part's weight is under its mark). An LS you are doing now shows your mark so far: it changes every day with your work.")} ${t("La nota del trimestre surt de les teves competències (a sota): cada una compta segons quant s'ha treballat aquest trimestre.","Your term mark comes from your competences (below): each one counts as much as it has been worked this term.")}${nc?" "+t(nc>1?`Les ${nc} LS que vénen encara no estan preparades.`:"La LS que ve encara no està preparada.",nc>1?`The ${nc} LSs still to come are not ready yet.`:"The LS still to come is not ready yet."):""}</p></div>`
     +compBox(rows.filter(r=>r.l).map(r=>r.l),tm)+gvBox(nd.map(r=>r.l),tm)}
 // a card with a mark out of 10 as its big number
 const fvCard=(k,i,name,sub,m)=>`<div class="fv-part ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${name}</span><small class="fv-ps">${sub}</small><b class="fv-big">${fvMk(m)}</b><span class="fv-bar"><span style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%"></span></span></div>`;
