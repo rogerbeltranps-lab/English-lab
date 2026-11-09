@@ -15,6 +15,10 @@ table.qa td.ql,table.qa th.ql{text-align:left;max-width:440px;white-space:normal
 .pin.on{filter:none;opacity:1;background:#ccfbf1;border-color:#0f766e}.pin:hover{outline:2px solid #0f766e;filter:none;opacity:1}
 .pullbox{border:2px solid #0f766e;background:#f0fdfa}.pullbox h2{color:#0f766e}.pullbox .pnow{background:#fff;border:1px solid #99f6e4;border-radius:10px;padding:8px 12px;margin:0 0 8px}
 .pullbox button.rel{background:#b91c1c;color:#fff;font-weight:700}.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}#fsctl{position:fixed;top:10px;right:12px;z-index:1000;text-align:right;max-width:min(720px,calc(100vw - 24px))}#fsctl.on{background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px #0003;text-align:left}#fsctl button.fsbtn{background:#fff;color:#1e293b;border:2px solid #1e293b;font-weight:800;font-size:15px;padding:6px 14px;box-shadow:0 2px 8px #0002}#fsctl button.fsbtn.on{background:#1e293b;color:#fff;box-shadow:none}#fsctl .fsrow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center}#fsctl.on .fsrow{justify-content:flex-start}#fsctl button.cmbtn{border-color:#4338ca;color:#4338ca}#fsctl button.cmbtn.on{background:#4338ca;color:#fff}#fsctl .cmbtn .sm{display:none}#fsctl .cminfo{color:#3730a3}#fsctl .relok{color:#166534;font-weight:700;text-align:right}@media(max-width:640px){body:has(#fsctl .fsrow) .dhead{padding-top:44px}#fsctl{top:6px;right:8px;left:8px;max-width:none}#fsctl .fsrow{flex-wrap:nowrap;gap:6px}#fsctl button.fsbtn{font-size:13px;padding:5px 9px;white-space:nowrap}#fsctl .fsbtn .lg{display:none}#fsctl .cmbtn .sm{display:inline}#fsctl.on{left:8px}}#fsctl .fsinfo{margin-top:4px;color:#475569;font-size:13px}#fsctl .fsleft{margin-top:6px;color:#9a3412;font-size:14px;max-height:40vh;overflow:auto;line-height:1.5}#fsctl .fssum{margin-top:6px;font-size:15px}#fsctl .fssum .in{color:#166534}#fsctl .fssum .out{color:#b91c1c}#fsctl .fsout{color:#b91c1c}#fsctl .fsout div{margin:1px 0}#fsctl .fsback{margin-top:4px;color:#c2410c}#fsctl .fsback small{color:#9a3412;font-weight:500}
+.attw{overflow:auto;max-height:70vh}.attt{border-collapse:collapse;font-size:14px}.attt th,.attt td{border-bottom:1px solid #e2e8f0;padding:3px 6px;text-align:center;white-space:nowrap}
+.attt th{position:sticky;top:0;background:#f8fafc;z-index:2;font-size:12px;line-height:1.2}.attt .stu{position:sticky;left:0;background:#fff;text-align:left;z-index:1;font-weight:600}.attt th.stu{z-index:3;background:#f8fafc}
+.attt td button{border:0;background:none;font:inherit;cursor:pointer;padding:2px 6px;border-radius:8px;min-width:34px}.attt .at-ok button{color:#94a3b8}.attt .at-abs button{background:#fee2e2;color:#b91c1c;font-weight:800}.attt .at-late button{background:#ffedd5;color:#c2410c;font-weight:700}
+.attt .at-a{color:#b91c1c}.attt .at-l{color:#c2410c}.attt .att-sum td{color:#64748b;font-size:12px}
 #fsctl .fsnever{margin-top:6px;color:#475569}#fsctl .fsin{margin-top:6px;color:#166534}#fsctl button.fsmin{padding:6px 10px}#fsctl button.svbtn{border-color:#3157d5;color:#3157d5}#fsctl button.svbtn.on{background:#3157d5;color:#fff}#fsctl .svpop{margin-top:8px;background:#fff;border:2px solid #3157d5;border-radius:14px;padding:10px 12px;box-shadow:0 8px 24px #0003;text-align:left;width:min(420px,calc(100vw - 24px));margin-left:auto}#fsctl.on .svpop{margin-left:0}#fsctl .svh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:16px}#fsctl button.svx{background:none;border:0;font-size:18px;color:#475569;padding:2px 6px;box-shadow:none}#fsctl .svg{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px}#fsctl .svg button{background:#fff;border:1px solid #cbd5e1;color:#1e293b;border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px;box-shadow:none}#fsctl .svg button.on{background:#3157d5;border-color:#3157d5;color:#fff}#fsctl .svnote{margin:6px 0;color:#475569;font-size:13px;line-height:1.4}#fsctl .svlist{max-height:min(52vh,420px);overflow:auto;border-top:1px solid #e2e8f0}#fsctl .svlist a{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px solid #f1f5f9;color:#1e293b;text-decoration:none;font-size:15px}#fsctl .svlist a:hover{background:#eef2ff}@media(max-width:640px){#fsctl .svpop{width:auto}}
 .pullbox .pick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.pullbox .chip.on{background:#0f766e;color:#fff;border-color:#0f766e}.tabmv{border:0;background:none;color:#64748b;cursor:pointer;padding:0 2px;font-size:13px;font-weight:700}.tabmv:hover{color:#1d4ed8}.dtabs .tk{white-space:nowrap}.dtabs .tk.on a{color:#64748b;text-decoration:line-through}label.ck .dtabs input{width:13px;height:13px;margin:0 3px 0 0;vertical-align:-2px}label.ck.on .dtabs .tk a{text-decoration:line-through}.nav button{margin-left:2px}.cfrom{color:#b45309;font-weight:600}.satw{border:2px solid #f59e0b;background:#fffbeb}.satw h2{color:#b45309}ul.tips{margin:0 0 4px 28px;padding:0;list-style:none;font-size:13px;color:#475569}ul.tips li{margin:2px 0}.sethw{margin-left:6px;font-size:12px;padding:1px 7px;opacity:.55}label.ck:hover .sethw{opacity:1}button.mini{font-size:12px;padding:0 6px}.hwtabs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:4px 0 8px}.hwtabs b{margin-right:4px}.hwtabs label.chip{display:inline-flex;gap:4px;align-items:center;margin:0;font-weight:400;font-size:13px;cursor:pointer;padding:2px 10px}.hwtabs label.chip input{margin:0}th .lphw{font-size:12px;padding:1px 7px;margin-left:6px;vertical-align:middle;background:#ecfeff;border:1px solid #67e8f9;color:#0e7490;font-weight:600}th .lphw:hover{background:#cffafe}a.lplink{font-size:12px;margin-left:6px;color:#4338ca;border:1px solid #c7d2fe;border-radius:6px;padding:0 6px;text-decoration:none;white-space:nowrap}a.lplink:hover{background:#eef2ff}.hwr{background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;padding:6px 10px;margin:6px 0;font-size:14px}.hwr ul{list-style:none;margin:3px 0;padding:0}.behind{color:#b45309;font-size:13px;margin:4px 0}.wkbar .chip.past{color:#94a3b8}.wkbar .chip small{margin-left:4px}.wk .n{color:#b45309;font-size:13px}ul.due{margin:4px 0;padding-left:18px}ul.due li{margin:3px 0}.late{color:#b91c1c;font-weight:600}.ptok{color:#15803d;font-weight:600}.hand{background:#f8fafc;border-radius:8px;padding:4px 10px;margin:4px 0;white-space:pre-wrap}.hand p{margin:.3em 0}
 .route{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}.r-beginners{background:#ffe4e6;color:#9f1239}.r-insecure{background:#fef3c7;color:#92400e}.r-safe{background:#dcfce7;color:#166534}.r-native{background:#e0f2fe;color:#075985}.r-daring{background:#ede9fe;color:#5b21b6}.r-none{color:#94a3b8}
@@ -181,6 +185,7 @@ body.tp2on{max-width:none}body.tp2on .tshell{grid-template-columns:minmax(0,1fr)
 import {replyText,replyColor,MSG_MAX} from "./shared/js/el-reply.js";
 import {ANN_MAX,annMs,annLast,annHtml,annText,annTranslate,annCardHtml,annCardStyle} from "./shared/js/el-announce.js";
 import {writing} from "./shared/js/el-corrections.js";
+import {attClass,attWatch,attView,attClick,attLate,attId,ymd as attYmd,hm as attHm} from "./shared/js/el-attend.js";
 // Demo mode: a page that defines window.EL_DEMO_DATA before this script gets sample data and no Firebase.
 const DEMO=window.EL_DEMO_DATA;let F=null,db=null;
 if(!DEMO){await import("./shared/js/el-cloud.js");F=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");db=()=>ELCloud.db;
@@ -893,16 +898,22 @@ function fsDraw(){const n=document.getElementById("fsctl");if(!n)return;const g=
   const inNow=new Set(w.inn.map(y=>y.e));if(FSMIN.g!==g.id){FSMIN.g=g.id;FSMIN.was=new Set()}
   if(FSMIN.min&&w.out.some(y=>FSMIN.was.has(y.e)))fsMinSet(false);FSMIN.was=inNow;
   const box=w.active||!!cmOf(g.id);n.className=box?"on":"";const min=w.active&&FSMIN.min,{gone,back,never}=elWhoLeft(w);
+  // 🙋 attendance of this class (el-attend.js): who has no beat is "not here" until it is saved, then "absent"; out = only who left
+  const aS=w.active&&!DEMO?attClass(g.id,elTT(g.id),ef,w):0;FSW.att={g:g.id,start:aS,w};const aR=aS?attWatch(attApi(),g.id,aS,fsDraw):undefined;
+  if(aS)attLate(attApi(),g.id,aS,w);const av=aS?attView(w,aR,min):{n:never.length,label:"not here",html:""};
   n.innerHTML=`<div class="fsrow">${svBtn()}${cmBtn(g)}<!-- no full screen button (Roger, 7 Nov 2026): on by itself in every class of the timetable and while class mode is on -->${w.active?`<button type="button" class="fsbtn fsmin" data-do="fsmin" title="${min?"Show everybody":"Make this small: the names of who left stay (it opens again when someone goes out)"}">${min?"▸":"▾"}</button>`:""}</div>${svPop()}${cmInfo(g)}`
     +(w.active?`<div class="fsinfo">${w.game?`🎮 Class game: ${esc(w.title)}${on?" · ":""}`:""}${on?`⛶ Full screen until ${fsHm(ef.until)}${ef.auto?" (end of the class, by your timetable)":cls&&ef.until===elClassEnd(g.id,ef.at)?" (end of the class)":""}`:""}</div>
-      <div class="fssum"><b class="in">✓ ${w.inn.length} in</b> · <b class="out">✗ ${w.out.length} out</b> <span class="muted">of ${w.n}</span></div>`
+      <div class="fssum"><b class="in">✓ ${w.inn.length} in</b> · <b class="out">✗ ${gone.length} left</b> · <span class="${av.label==="absent"?"out":"muted"}">${av.label==="absent"?"🙋":"⚪"} ${av.n} ${av.label}</span> <span class="muted">of ${w.n}</span></div>${av.html}`
       // who left stays named, also small and over a video (Roger, 9 Nov 2026: "I need their names to be there"): out now in red,
       // left full screen and came back in orange (when, how many times); the rest of the list only when not small
       +`<div class="fsleft">${gone.length?`<div class="fsout">${gone.map(y=>`<div>✗ <b>${esc(y.name)}</b> · ${fsWhy(y)}</div>`).join("")}</div>`:""}
         ${back.length?`<div class="fsback">↩ <b>Left and came back (${back.length}):</b> ${back.map(y=>`<b>${esc(y.name)}</b> <small>(${y.left.n>1?y.left.n+"×, last ":""}${fsHm(y.left.at)})</small>`).join(", ")}</div>`:""}
-        ${min?(never.length?`<div class="fsnever">⚪ ${never.length} not connected</div>`:"")
-        :`${never.length?`<div class="fsnever">⚪ <b>Not connected (${never.length}):</b> ${never.map(y=>esc(y.name)).join(", ")}</div>`:""}
+        ${min||av.html?"":`${never.length?`<div class="fsnever">⚪ <b>Not here (${never.length}):</b> ${never.map(y=>esc(y.name)).join(", ")}</div>`:""}`}
+        ${min?"":`
         ${w.inn.length?`<div class="fsin">✓ <b>In (${w.inn.length}):</b> ${w.inn.map(y=>esc(y.name)).join(", ")}</div>`:`<div class="fsin muted">Nobody is in yet: they tap their screen to go full screen.</div>`}`}</div>`:"");svKeep(n)}
+const attApi=()=>({db:db(),doc:F.doc,setDoc:F.setDoc,onSnapshot:F.onSnapshot,deleteField:F.deleteField});
+document.addEventListener("click",e=>{const b=e.target.closest("#fsctl [data-att]");if(!b||!FSW.att)return;e.preventDefault();const a=FSW.att;
+  attClick(b,attApi(),a.g,a.start,a.w,fsRoster(a.g)).then(r=>{if(r)fsDraw()})});
 setInterval(()=>{if(FSW.g){fsListen();fsDraw()}},30e3);   // turns on and off with the classes of the timetable, shows who stopped beating
 function lsWarn(ls,grp,assigned){
   const st=(S.D.ls[ls]||{}).status||"hidden",w=[];
@@ -1092,7 +1103,7 @@ function ttPage(){const d=ttDraft(),dirty=JSON.stringify(elTTStore(d))!==JSON.st
     +`<h3>Days without classes</h3><p class="muted">Holidays and days off: no class, no full screen.</p><div class="ttoff">${d.off.map(([a,b],i)=>`<span class="ttslot"><input type="date" data-tt="from" data-i="${i}" value="${a}"> to <input type="date" data-tt="to" data-i="${i}" value="${b}"><button type="button" class="ttx" data-do="ttoffdel" data-i="${i}" title="Remove">✕</button></span>`).join("")}<button type="button" class="ttadd" data-do="ttoffadd">＋ Add days off</button></div>`
     +`<div class="bar"><button data-do="ttsave" ${dirty?"":"disabled"}>💾 Save the timetable</button>${dirty?` <button class="g" data-do="ttundo">Undo changes</button>`:""}${TTE.msg?` <span class="ttmsg">${TTE.msg}</span>`:""}</div></div>`}
 S.place="home";
-const PLACES={tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Marks"],students:["👥","Students"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"]};
+const PLACES={att:["🙋","Attendance"],tt:["🗓","Timetable"],plan:["📅","Time plan"],todo:["✅","To do"],paths:["📈","Learning paths"],marks:["📊","Marks"],students:["👥","Students"],msgs:["💬","Messages"],cov:["🎯","Coverage"],fp:["🎬","Final product"],week:["📅","Time plan · all groups"],plan2:["📋","Plan both groups"]};
 const goPlace=p=>{S.place=p||"home";if(S.place==="home")S.year=false;render();scrollTo(0,0)};
 // ---- the browser's Back button (Roger, 7 Nov 2026: "When I go back it brings me to other places; I wanted to go where this button takes
 // you"). The dashboard is one page, so Back used to leave it (e.g. to English Lab). Now each move to another screen (a place such as
@@ -1109,6 +1120,33 @@ function navBack(p){const h=history.state;   // the ‹ link: Back when the scre
   goPlace(p)}
 addEventListener("popstate",e=>{const h=e.state&&e.state.el;if(!h||!S.D)return;const d=$("#dlg");if(d&&d.open)d.close();
   if(S.g!==h.g)S.tutor="all";S.g=h.g;S.place=h.p;S.ls=h.ls;S.year=h.y;S.navPop=true;render();scrollTo(0,0)});
+// 🙋 Attendance register (Roger, 9 Nov 2026: "I want a register of the attendance from now on in my dashboard"): the group's classes saved
+// from the class panel (🙋 Save attendance, el-attend.js), one column per class, one row per student of the list: ✓ here, ✗ absent,
+// ⏰ late (the time they connected). A tap on a cell changes it (✓ → ✗ → ⏰ → ✓), one write. Reads the group's documents once per visit (🔄 again).
+const ATT={g:null,list:null,busy:false,err:""};
+function attLoad(gid,force){if(!force&&ATT.g===gid&&(ATT.list||ATT.busy))return;ATT.g=gid;ATT.list=null;ATT.err="";
+  if(DEMO){ATT.list=[];return}ATT.busy=true;
+  F.getDocs(F.query(F.collection(db(),"attendance"),F.where("group","==",gid))).then(q=>{if(ATT.g===gid)ATT.list=q.docs.map(d=>Object.assign({id:d.id},d.data())).sort((a,b)=>a.start-b.start)},
+    e=>{console.warn("attendance",e);if(ATT.g===gid){ATT.err=e.code||e.message||String(e);ATT.list=[]}}).then(()=>{ATT.busy=false;if(S.place==="att"&&S.g===gid)render()})}
+const attSt=(r,e)=>(r.late||{})[e]?"late":(r.absent||{})[e]?"abs":"ok";
+function attPage(grp){attLoad(grp.id);
+  const head=`<div class="bar"><button class="g" data-do="attre">🔄 Update</button> <span class="muted">Saved from the class panel at the start of each class (🙋 Save attendance). Tap a cell to change it: ✓ here → ✗ absent → ⏰ late.</span></div>`;
+  if(!ATT.list)return head+`<div class="box"><p class="muted">Loading the register…</p></div>`;
+  const L=ATT.list,who=new Map(fsRoster(grp.id).map(r=>[r.e,r.name]));
+  L.forEach(r=>{Object.entries(r.absent||{}).forEach(([e,n])=>{if(!who.has(e))who.set(e,n)});Object.keys(r.late||{}).forEach(e=>{if(!who.has(e))who.set(e,(r.names||{})[e]||e.split("@")[0])})});
+  const rows=[...who].sort((a,b)=>a[1].localeCompare(b[1]));
+  if(!L.length)return head+`<div class="box"><p>${ATT.err?"⚠️ Could not read the register: "+esc(ATT.err):"No attendance saved for "+esc(grp.name)+" yet."}</p><p class="muted">During a class, the panel at the top right lists who is not here with <b>🙋 Save attendance</b>. Students who connect later are marked late by themselves.</p></div>`;
+  const DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],th=r=>{const d=new Date(r.start);return `<th title="${esc(r.day)} ${attHm(r.start)}">${DN[d.getDay()]}<br>${d.getDate()}/${d.getMonth()+1}<br><small>${attHm(r.start)}</small></th>`};
+  const cell=(r,e)=>{const s=attSt(r,e),t=s==="late"?"⏰ "+attHm(r.late[e]):s==="abs"?"✗":"✓";return `<td class="at-${s}"><button type="button" data-do="attcell" data-id="${esc(r.id)}" data-e="${esc(e)}" title="${s==="ok"?"Here":s==="abs"?"Absent":"Late"}: tap to change">${t}</button></td>`};
+  const tot=e=>{const a=L.filter(r=>attSt(r,e)==="abs").length,l=L.filter(r=>attSt(r,e)==="late").length;return `<td class="att-tot">${a?`<b class="at-a">✗ ${a}</b>`:""}${a&&l?" · ":""}${l?`<b class="at-l">⏰ ${l}</b>`:""}${a||l?"":`<span class="muted">—</span>`}</td>`};
+  return head+`<div class="box"><div class="wrap attw"><table class="attt"><tr><th class="stu">Student</th><th>Total</th>${L.map(th).join("")}</tr>`
+    +rows.map(([e,n])=>`<tr><td class="stu">${esc(n)}</td>${tot(e)}${L.map(r=>cell(r,e)).join("")}</tr>`).join("")
+    +`<tr class="att-sum"><td class="stu">Absent · late</td><td></td>${L.map(r=>`<td>${Object.keys(r.absent||{}).length} · ${Object.keys(r.late||{}).length}</td>`).join("")}</tr></table></div></div>`}
+function attCell(id,e){const r=(ATT.list||[]).find(x=>x.id===id);if(!r)return;const s=attSt(r,e),nx=s==="ok"?"abs":s==="abs"?"late":"ok",D=F.deleteField();
+  const nm=fsRoster(r.group).find(x=>x.e===e),name=(nm&&nm.name)||(r.names||{})[e]||(r.absent||{})[e]||e.split("@")[0];
+  r.absent=Object.assign({},r.absent);r.late=Object.assign({},r.late);delete r.absent[e];delete r.late[e];
+  const w={absent:{[e]:D},late:{[e]:D}};if(nx==="abs"){r.absent[e]=name;w.absent[e]=name}if(nx==="late"){r.late[e]=r.start;w.late[e]=r.start}
+  render();F.setDoc(F.doc(db(),"attendance",id),w,{merge:true}).catch(x=>{console.warn("attendance",x);alert("Not saved: "+(x.code||x.message||x));attLoad(r.group,true)})}
 // 🎮 Games and theory (Roger, 8 Nov 2026: "in here, I need to see their games and theory statistics button"): one more tile on the group
 // page, opening the class games' results of this group and LS (lab/game/results.html: who played each game, % right, every answer and the
 // 📝 theory notes) in a new tab. The LS filter there is the games' own LS name (EL_GAMES .ls), found as in gamesOf below.
@@ -1230,6 +1268,7 @@ function render0(){
     students:()=>`<div class="bar">${stuF}</div>`+lpAll+routesBox(grp,inG.filter(s=>!s.tester))+pointsBox(S.g)+rosterBox(shown),
     msgs:()=>annBox()+pbBox()+sgBox(),
     cov:()=>covPage(grp,ls),
+    att:()=>attPage(grp),
     fp:()=>fpPage(grp,ls,list,inG.filter(s=>!s.away&&!s.tester)),
     plan2:()=>tp2Page(grp,ls,studs)};
   if(place[S.place]){$("#main").innerHTML=placeHead(back,S.place)+place[S.place]()}
@@ -1251,6 +1290,7 @@ function render0(){
       +tTile("fp","🎬","Final product",fa?"mark the students' work: videos, Gemini's drafts, your marks":"this LS has no final product on the site",fw?fw+" to approve":"",false)
       +tTile("marks","📊","Marks","LS grade, criteria, self-assessment")
       +tTile("students","👥","Students","levels, team points, student list")
+      +tTile("att","🙋","Attendance","who was absent or late in each class: the register")
       +tTile("msgs","💬","Messages","announcements, problems, ideas",np+nw+nr||"",!!np)
       +tTile("cov","🎯","Coverage","criteria, competences, grammar and lexicon worked, this LS and the year",(n=>n?n+" to check":"")(covGaps(grp,ls)),true)
       +gamesTile(grp,ls)+`</div>`}
@@ -3634,6 +3674,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     sview:()=>{e.preventDefault();SV.open=!SV.open;SV.top=0;if(SV.open)SV.g=null;fsDraw()},
     svgroup:()=>{e.preventDefault();SV.g=k.g;SV.top=0;fsDraw()},
     fsmin:()=>{e.preventDefault();fsMinSet(!FSMIN.min);fsDraw()},
+    attre:()=>{e.preventDefault();attLoad(S.g,true);render()},
+    attcell:()=>{e.preventDefault();attCell(k.id,k.e)},
     // during a class (by the timetable) it is on by itself: switching it off = {on:false, off:true, until: the end of the class}, for this class only
     fsgroup:()=>{e.preventDefault();const now=Date.now(),c=elSlotNow(elTT(k.gid),now),v=fsEff(k.gid)?(c?{on:false,off:true,at:now,until:c.end}:null):{on:true,at:now,until:c?c.end:now+70*60e3};
       if(DEMO){FSW.g=k.gid;FSW.fs=v;fsDraw();return}F.setDoc(F.doc(db(),"live",k.gid),{fs:v},{merge:true}).catch(x=>alert("Could not save: "+x.message))},

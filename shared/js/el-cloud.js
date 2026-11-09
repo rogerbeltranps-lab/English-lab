@@ -549,20 +549,27 @@ async function teacherSections(info){
   const fsRoll=()=>{const w=elClassRoll(Object.assign({},fsLive,{fs:fsE()}),fsList,fsHere,fsRo[g]||[]),now=new Set(w.inn.map(y=>y.e));
     if(fsMin.on&&!cmRead()&&w.out.some(y=>fsMin.was.has(y.e)))fsMin.on=false;fsMin.was=now;return w};
   const fsWhy=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+fsHm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+fsHm(y.seen):y.why==="lost"?"lost connection · since "+fsHm(y.seen):"not connected";
+  let AT=null;const atApi=()=>({db,doc,setDoc,onSnapshot,deleteField:FBM[2].deleteField}),attRedraw=()=>draw();
   function fsFloat(w){let f=document.getElementById("el-fsfloat");if(!w.active){if(f)f.remove();return}
     if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147483000;max-width:min(420px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
-      f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.min){fsMin.on=!fsMin.on;draw()}else fsToggle()};document.body.append(f)}
+      f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.att){if(AT&&AT.cur)AT.m.attClick(b,atApi(),g,AT.cur,AT.w,fsRo[g]||[]).then(r=>{if(r)draw()});return}
+        if(b.dataset.min){fsMin.on=!fsMin.on;draw()}else fsToggle()};document.body.append(f)}
+    // 🙋 attendance of this class (el-attend.js, loaded only here): "not here" until saved, then "absent"; ✗ counts only who left
+    if(!AT){AT={m:null};import("./el-attend.js").then(m=>{AT.m=m;draw()}).catch(e=>console.warn("attendance",e))}
+    const aS=AT.m?AT.m.attClass(g,fsTT(),fsE(),w):0;AT.cur=aS;AT.w=w;const aR=aS?AT.m.attWatch(atApi(),g,aS,attRedraw):undefined;
+    if(aS)AT.m.attLate(atApi(),g,aS,w);
     const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;",{gone,back,never}=elWhoLeft(w);
+    const av=aS?AT.m.attView(w,aR,fsMin.on):{n:never.length,label:"not here",html:""};
     const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+'<button data-min="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(fsMin.on?"Show everybody":"Make this small: the names of who left stay")+'">'+(fsMin.on?"▸":"▾")+'</button></span></div>'
       +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsE().until)+(fsE().auto?' (class, by your timetable)':''):'')+'</div>'
-      +'<div style="margin-top:4px;font-size:15px"><b style="color:#166534">✓ '+w.inn.length+' in</b> · <b style="color:#b91c1c">✗ '+w.out.length+' out</b> <span style="color:#64748b;font-weight:500">of '+w.n+'</span></div>'
+      +'<div style="margin-top:4px;font-size:15px"><b style="color:#166534">✓ '+w.inn.length+' in</b> · <b style="color:#b91c1c">✗ '+gone.length+' left</b> · <span style="color:'+(av.label==="absent"?"#b91c1c":"#64748b")+';font-weight:600">'+(av.label==="absent"?"🙋 ":"⚪ ")+av.n+' '+av.label+'</span> <span style="color:#64748b;font-weight:500">of '+w.n+'</span></div>'+av.html
       // who left stays named, also small, on the projector and over a video (Roger, 9 Nov 2026: "I need their names to be there … even when
       // we are watching a video"; elWhoLeft and elPlayVideo in el-catalog.js): out now in red, left and came back in orange; the rest when not small
       +'<div style="margin-top:6px;max-height:'+(fsMin.on?'30vh':'40vh')+';overflow:auto;line-height:1.5">'
         +gone.map(y=>'<div style="color:#b91c1c">✗ <b>'+E(y.name)+'</b> · '+fsWhy(y)+'</div>').join("")
         +(back.length?'<div style="color:#c2410c;margin-top:4px">↩ Left and came back ('+back.length+'): '+back.map(y=>'<b>'+E(y.name)+'</b> <span style="font-weight:500;font-size:12px">('+(y.left.n>1?y.left.n+'×, last ':'')+fsHm(y.left.at)+')</span>').join(", ")+'</div>':'')
-        +(fsMin.on?(never.length?'<div style="color:#475569;margin-top:4px;font-size:13px">⚪ '+never.length+' not connected</div>':'')
-        :(never.length?'<div style="color:#475569;margin-top:4px">⚪ Not connected ('+never.length+'): '+never.map(y=>E(y.name)).join(", ")+'</div>':'')
+        +(fsMin.on?''
+        :(never.length&&!av.html?'<div style="color:#475569;margin-top:4px">⚪ Not here ('+never.length+'): '+never.map(y=>E(y.name)).join(", ")+'</div>':'')
         +(w.inn.length?'<div style="color:#166534;margin-top:4px">✓ In ('+w.inn.length+'): '+w.inn.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b;margin-top:4px">Nobody is in yet: they tap their screen to go full screen.</div>'))+'</div>';
     if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
   // no full screen button any more (Roger, 7 Nov 2026): it is on during every class of the timetable and while class mode is on
