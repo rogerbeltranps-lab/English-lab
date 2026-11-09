@@ -42,7 +42,10 @@ window.elCa=l=>l==="beginners"||l==="insecure";   // routes that read instructio
 // students can no longer write it). A route the teacher set, in any LS of the course, wins over it.
 // A hand-in comment that only says "no problem" (no, none, res, cap problema...) needs no answer (Roger, 30 Oct 2026)
 window.elNoComment=function(c){const t=String(c||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z' ]+/g," ").replace(/\s+/g," ").trim().replace(/ (thanks|thank you|gracies|gracias)$/,"");
+  // "No, all is okk" (4ESOA, 9 Nov 2026): a leading "no", "ok" with extra k's and "all is ok/fine/good/clear" count too
+  const u=t.replace(/^(no|nope) (?=.)/,"").replace(/\bok+\b/g,"ok").replace(/\bokey\b/g,"okay");
   return !t||/^(no|nope|none|nothing|nada|res|cap|ninguno|no comment|all good|ok|okay|fine|everything (is )?(ok|fine)|tot be|todo bien)$/.test(t)
+    ||/^((it'?s|it is|all|everything|everything'?s|all is|all was|everything (is|was)|it was) )?(ok|okay|fine|good|clear|right|perfect|correct)( for me)?$/.test(u)||/^(tot (esta |estava )?(be|clar|correcte)|todo (esta |estaba )?(bien|claro|correcto))$/.test(u)
     ||/^(no|i (do not|don't|dont) have|i have no|i had no|we (do not|don't|dont) have|we have no|we had no|no tinc|no tenim|no he tingut|no hem tingut|no tengo|no tenemos|no he tenido|no hemos tenido|cap|ningun|ninguno)( any| cap| ningun| ninguno)? (problem(s|a|es|as)?|questions?|dubtes?|dudas?|comments?|comentaris?|comentarios?)( at all)?$/.test(t)};
 // A student's level (route): ONE level per course, the same in every LS (Roger, 1 Nov 2026: "why doesn't it show everywhere if I make a
 // change?"). It is the route the teacher set most recently in ANY LS of the course (levels/{ls}.changed, or .updated on older docs);
