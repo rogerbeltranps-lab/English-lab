@@ -64,7 +64,7 @@ table.pgt-t td.pgtot b{font-size:1.55rem}.pgtot .xbar{display:block;margin:5px a
 @media (max-width:640px){table.pgt-t,table.pgt-t tbody,table.pgt-t tr,table.pgt-t td{display:block;width:auto}table.pgt-t thead{display:none}
   table.pgt-t tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:8px 12px}table.pgt-t tr.now{background:#eff6ff;border-color:#bfdbfe}table.pgt-t tr.soon{background:#f8fafc}table.pgt-t td{border:0!important;padding:3px 0!important;text-align:left!important}
   table.pgt-t td:empty{display:none}table.pgt-t td[data-h]::before{content:attr(data-h);display:inline-block;min-width:120px;color:#475569;font-size:13px}table.pgt-t td small{display:inline;margin-left:6px}.pgtot .xbar{display:inline-block;margin:0 0 0 8px}.pgt{min-width:0;flex:1 1 40%}}
-.pgtm{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}.pgtm small{color:#475569;font-weight:700;font-size:13px}.pgtm>b{font-size:2rem;line-height:1.1}.pgtm>b small{font-size:1rem;color:#64748b}
+.pgtms{display:flex;gap:22px;align-items:flex-start}.pgtm .xbar{width:90px;height:7px}.pgdn small{white-space:nowrap}.pgdn .xbar{display:block;margin:5px auto 0;width:96px}.pgtm{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}.pgtm small{color:#475569;font-weight:700;font-size:13px}.pgtm>b{font-size:2rem;line-height:1.1}.pgtm>b small{font-size:1rem;color:#64748b}
 .cpsum{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.cps{border-radius:10px;padding:7px 12px;font-size:14.5px}.cps.ok{background:#dcfce7;color:#14532d}.cps.bad{background:#fff7ed;color:#9a3412;border:1px solid #fdba74}
 .cpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px}
 .cpc{background:var(--ks);border-radius:14px;padding:12px 14px;border-top:5px solid var(--k)}.cpc.none{opacity:.75}
@@ -1018,14 +1018,35 @@ function examView(ls){const id=ls.id,g=(window.EL_GRADING||{})[id];if(!g||!g.exa
 // It never lists which activities count (AGENTS.md: students are never told), only the blocks.
 // The marks of one LS, out of 10 (null = not yet): the same numbers as 📈 My LS mark so far (progressBox) and, in an LS where only the exam
 // and the final product count (LS1, EL_GRADING[ls].only), as 📝 LS grade (examView). Used by progressBox and by 🎓 My progress (progressPlace).
+// ✅ Tasks done (Roger, 9 Nov 2026: "add the percentage of the tasks done too taking into account the value they have on the LS and on the
+// term"; "if they didn't do sth it counts like a 0 … like activities on the SLP, but they can have the grade of the daily work average"):
+// each part of the LS mark counts by its weight, only once its day has passed (or the LS is closed): daily work = the share of its SLPs (tabs)
+// done by their day, the final product = the share of its steps handed in (or its mark), the exam = done once it has a mark (an exam not
+// marked yet is left out: the board cannot tell it from an absence). tm: only the parts that go in that term (as the term mark).
+const blockTerm=(l,bid,date)=>{const p=(window.EL_PLAN||{})[l.id],rep=(p&&p.report)||{},nT=EL_TERMS.length;
+  return +rep[bid]||(date?EL_TERMS.findIndex(y=>y.id===elTerm(date))+1:0)||Math.min(nT,l.term||Math.ceil((EL_LS.filter(y=>y.course===l.course).indexOf(l)+1)/2))};
+// the final product not handed in at all after its day (or in a closed LS): it counts 0 (Roger, 9 Nov 2026), as a missing SLP does
+function fpMissed(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.fp||!hasFp(l))return false;const a=fpAct(l),x=D.rs[a.id]||{},d=fpDue(l),closed=(D.ls[l.id]||{}).status==="closed";
+  if(!(closed||(d&&d<ELWeek.today())))return false;let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
+  return !Object.keys(sp).length&&x.score==null&&fpMark(l)==null}
+function lsDone(l,tm){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)return null;const today=ELWeek.today(),closed=(D.ls[l.id]||{}).status==="closed",W=id=>(g.blocks.find(b=>b.id===id)||{}).w||0,parts=[];
+  const p=(window.EL_PLAN||{})[l.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;
+  const share=elFormativeShare(l.id);if(share&&D.me.group&&(!tm||blockTerm(l,"gv")===tm)){
+    const dw=EL_TERMS.flatMap(T=>elDueWork(D.me.group,T.id,x=>D.ls[x])).filter(([a])=>a.ls===l.id),due=dw.reduce((n,[a])=>n+elTabsTotal(a),0);
+    if(due)parts.push({k:"daily",w:share,f:(due-tabsMiss(dw))/due,n:due-tabsMiss(dw),of:due})}
+  if(g.exam&&(!tm||blockTerm(l,"exam",gi>=0?ELWeek.exam(p,gi):null)===tm)){const sc=(D.rs[l.id+"/assessment"]||{}).sections||{};if(g.exam.sections.some(([k])=>sc[k]&&sc[k].score!=null))parts.push({k:"exam",w:W("exam"),f:1})}
+  if(hasFp(l)&&(!tm||blockTerm(l,"fp",fpDue(l))===tm)){const a=fpAct(l),x=D.rs[a.id]||{},d=fpDue(l),due=closed||(d&&d<today);let sp={};try{sp=JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}").steps||{}}catch(e){}
+    const st=a.steps||[],f=st.length?st.filter(([sid])=>sp[sid]).length/st.length:x.score!=null||fpMark(l)!=null?1:0;
+    if(due||f>=1)parts.push({k:"fp",w:W("fp"),f})}
+  const w=parts.reduce((n,x)=>n+x.w,0);return {parts,w,pct:w?parts.reduce((n,x)=>n+x.w*x.f,0)/w*100:null}}
 function lsMarks(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||!g.blocks)return null;
   const x=D.rs[ls.id+"/assessment"]||{},p=x.progress||{},e=g.exam,sc=x.sections||{},got=e?e.sections.filter(([k])=>sc[k]&&sc[k].score!=null):[];
   const em=got.reduce((n,[k,,mx])=>n+(+(sc[k].max||mx||e.max)),0),W=id=>(g.blocks.find(b=>b.id===id)||{}).w||0;
-  if(g.only){const exam=em?got.reduce((n,[k])=>n+(+sc[k].score),0)/em*10:null,f=g.fp&&D.rs[g.fp.a]||{},fp=f.max?(f.score||0)/f.max*10:null,val={exam,fp};
+  if(g.only){const exam=em?got.reduce((n,[k])=>n+(+sc[k].score),0)/em*10:null,f=g.fp&&D.rs[g.fp.a]||{},fp=f.max?(f.score||0)/f.max*10:fpMissed(ls)?0:null,val={exam,fp};
     const total=exam!=null&&fp!=null?g.blocks.reduce((n,b)=>n+val[b.id]*b.w,0)/g.blocks.reduce((n,b)=>n+b.w,0):null;
     return {only:true,exam,fp,daily:null,total,w:{daily:0,exam:W("exam"),fp:W("fp")}}}
   const exam=em?got.reduce((n,[k])=>n+(+sc[k].score),0)/em*10:p.exam??null;
-  const v={exam,fp:p.fp??null,gv:p.gv??null,other:p.other??null};
+  const v={exam,fp:p.fp??(fpMissed(ls)?0:null),gv:p.gv??null,other:p.other??null};
   const cw=g.blocks.filter(b=>b.id!=="exam"&&b.id!=="fp"),cs=cw.filter(b=>v[b.id]!=null),cont=cs.length?cs.reduce((n,b)=>n+v[b.id]*b.w,0)/cs.reduce((n,b)=>n+b.w,0):null;
   const has=g.blocks.filter(b=>v[b.id]!=null),total=has.length?has.reduce((n,b)=>n+v[b.id]*b.w,0)/has.reduce((n,b)=>n+b.w,0):null;
   return {exam,fp:v.fp,daily:cont,total,v,w:{daily:elFormativeShare(ls.id),exam:W("exam"),fp:W("fp")}}}
@@ -1101,14 +1122,14 @@ function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)re
   const gvS={};if(g.gv)g.gv.parts.forEach(q=>(q.first||q.time||[]).forEach(([id,k])=>(((SC[id]||{})[k])||[]).forEach(c=>gvS[c]=(gvS[c]||0)+1)));
   const ids={fp:[g.fp&&g.fp.a],gv:g.gv?g.gv.parts.flatMap(q=>(q.first||q.time||[]).map(y=>y[0])):[],other:(g.other||[]).flatMap(c=>[...((g.auto||{})[c]||[]),...((g.teacher||{})[c]||[])].map(y=>y[0]))};
   const secMax=(e,k)=>{const y=e.sections.find(z=>z[0]===k);return y&&y[2]||e.max},spread=(cs,w,m,src)=>cs.map(c=>({c,w:w/cs.length,m,src}));
-  const fpM=()=>{const f=D.rs[g.fp.a]||{};return pr.fp??(f.max?(f.score||0)/f.max*10:null)},out=[];
+  const fz=fpMissed(l)?0:null,fpM=()=>{const f=D.rs[g.fp.a]||{};return pr.fp??(f.max?(f.score||0)/f.max*10:fz)},out=[];
   g.blocks.forEach(b=>{const date=b.id==="exam"?(gi>=0?ELWeek.exam(p,gi):null):last((ids[b.id]||[]).filter(Boolean)),term=+rep[b.id]||(date?termOfDay(date):lsT),w=b.w;let pcs=[];
     if(b.id==="exam"&&g.exam){const e=g.exam,tot=e.sections.reduce((n,[k])=>n+secMax(e,k),0),gvc=Object.keys(gvS);
       pcs=e.sections.flatMap(([k,sn,,cs])=>{cs=cs||Object.keys(g.evidence||{}).filter(c=>g.evidence[c].e.some(y=>y&&(y.exam===k||(y[0]==="exam"&&y[1]===k))));
         if(!cs.length&&e.level&&e.level.step===k)cs=[e.level.c];if(!cs.length)cs=gvc;const y=sc[k];
         return spread(cs,w*secMax(e,k)/tot,y&&y.score!=null?y.score/(+(y.max||secMax(e,k)))*10:null,["📝 "+t("Examen","Exam"),nmT(sn)])})}
     else if(b.id==="fp"&&g.fp){const f=g.fp;if(f.mark)pcs=spread(((EL_CATALOG.find(a=>a.id===f.a)||{}).criteria)||[],w,fpM(),["🎬 "+t("Producte final","Final product"),""]);
-      else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??null,src:["🎬 "+t("Producte final","Final product"),nmT(r.name)]}))}}
+      else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??fz,src:["🎬 "+t("Producte final","Final product"),nmT(r.name)]}))}}
     else if(b.id==="gv"){const tw=Object.values(gvS).reduce((n,v)=>n+v,0);pcs=Object.entries(gvS).map(([c,n])=>({c,w:w*n/tw,m:pr.gv??null,src:["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]}))}
     else if(b.id==="other")pcs=spread(g.other||[],w,null,["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]).map(y=>Object.assign(y,{m:(P.other||{})[y.c]??null}));
     pcs.forEach(y=>{if(!/^\d+\.\d/.test(String(y.c)))return;   // English criteria only ("5.1"); transversals and process/teamwork out
@@ -1190,21 +1211,23 @@ function progressPlace(lss,ls){
   const mk=(m,w,none)=>none?`<span class="pgna">—</span><small>${none}</small>`:`${m==null?`<span class="pgna">${t("encara no","not yet")}</span>`:`<b style="color:${col(m*10)}">${f1(m)}</b>`}${w?`<small>${w} % ${t("de la nota","of the mark")}</small>`:""}`;
   const stTag={done:`<span class="pgs done">✅ ${t("Acabada","Finished")}</span>`,now:`<span class="pgs now">▶ ${t("Ara","Now")} · ${t("nota fins ara","mark so far")}</span>`,coming:`<span class="pgs soon">🔜 ${t("Aviat","Coming soon")}</span>`};
   const row=r=>{const L=`<td class="l"><span class="pgn">LS${r.n}</span><span class="pgnm"><b>${esc(r.name||t("Learning Situation","Learning Situation"))}</b>${stTag[r.st]}</span></td>`;
-    if(r.st==="coming")return `<tr class="soon">${L}<td colspan="4" class="l pgsoon">${t("El professor encara l'està preparant. Quan la comencis, aquí hi veuràs les teves notes.","Your teacher is still preparing it. When you start it, your marks will be here.")}</td><td></td></tr>`;
-    const M=r.M||{w:{}},tot=M.total;
+    if(r.st==="coming")return `<tr class="soon">${L}<td colspan="5" class="l pgsoon">${t("El professor encara l'està preparant. Quan la comencis, aquí hi veuràs les teves notes.","Your teacher is still preparing it. When you start it, your marks will be here.")}</td><td></td></tr>`;
+    const M=r.M||{w:{}},tot=M.total,TD=lsDone(r.l),dn=TD&&TD.pct,dp=TD&&TD.parts.find(x=>x.k==="daily");
     const H=(k,ca,en)=>` data-h="${k} ${t(ca,en)}"`;
     return `<tr class="${r.st}">${L}<td${H("📚","Feina diària","Daily work")}>${mk(M.daily,M.w.daily,M.only?t("no compta en aquesta LS","not in this LS"):"")}</td><td${H("📝","Examen","Exam")}>${mk(M.exam,M.w.exam)}</td><td${H("🎬","Producte final","Final product")}>${mk(M.fp,M.w.fp)}</td>`
       +`<td class="pgtot"${H("🎓","Nota de la LS","LS mark")}>${tot==null?`<span class="pgna">${t("encara no","not yet")}</span>`:`<b style="color:${col(tot*10)}">${f1(tot)}</b> <small>/ 10</small>`}<span class="xbar"><span style="width:${tot==null?0:Math.max(0,Math.min(100,tot*10))}%;background:${tot==null?"#e2e8f0":col(tot*10)}"></span></span></td>`
+      +`<td class="pgdn"${H("✅","Tasques fetes","Tasks done")}>${dn==null?`<span class="pgna">${t("encara cap","none due yet")}</span>`:`<b style="color:${col(dn)}">${Math.round(dn)} %</b><span class="xbar"><span style="width:${Math.max(0,Math.min(100,dn))}%;background:${col(dn)}"></span></span>${dp?`<small>${dp.n} ${t("de","of")} ${dp.of} SLP</small>`:""}`}</td>`
       +`<td><button type="button" class="g pgo" data-do="pgo" data-ls="${r.l.id}" data-h="${M.only?"exam":"formative"}">${t("Detalls","Details")} →</button></td></tr>`};
   const nd=these.filter(r=>r.st!=="coming"),nc=these.length-nd.length;
   const TM=termMark(rows.filter(r=>r.l).flatMap(r=>compPieces(r.l)).filter(y=>y.term===tm)),TD=degOf(TM);
+  const tp=rows.filter(r=>r.l).map(r=>lsDone(r.l,tm)).filter(Boolean).flatMap(x=>x.parts),tw=tp.reduce((n,x)=>n+x.w,0),TP=tw?tp.reduce((n,x)=>n+x.w*x.f,0)/tw*100:null;
   return `<div class="box fv pgbox"><div class="lphead">${fvHead("🎓",esc(EL_TERMS[tm-1][EN?"en":"ca"]),these.map(r=>"LS"+r.n).join(" · "))}`
-    +`<div class="pgtm"><small>${tm>=now?t("Nota del trimestre fins ara","Term mark so far"):t("Nota del trimestre","Term mark")}</small>${TM==null?`<span class="pgna">${t("encara no","not yet")}</span>`:`<b style="color:${col(TM*10)}">${f1(TM)} <small>/ 10</small></b><span class="dg dg-${TD[0]}">${TD[1]}</span>`}</div></div>`
+    +`<div class="pgtms"><div class="pgtm"><small>${t("Tasques fetes","Tasks done")}</small>${TP==null?`<span class="pgna">${t("encara cap","none due yet")}</span>`:`<b style="color:${col(TP)}">${Math.round(TP)} %</b>`}<span class="xbar"><span style="width:${TP==null?0:Math.max(0,Math.min(100,TP))}%;background:${TP==null?"#e2e8f0":col(TP)}"></span></span></div><div class="pgtm"><small>${tm>=now?t("Nota del trimestre fins ara","Term mark so far"):t("Nota del trimestre","Term mark")}</small>${TM==null?`<span class="pgna">${t("encara no","not yet")}</span>`:`<b style="color:${col(TM*10)}">${f1(TM)} <small>/ 10</small></b><span class="dg dg-${TD[0]}">${TD[1]}</span>`}</div></div></div>`
     +`<p class="fvlead">${t("Les teves notes de cada Learning Situation, trimestre a trimestre. Tria un trimestre:","Your marks in each Learning Situation, term by term. Choose a term:")}</p>`
     +`<div class="pgterms" role="group" aria-label="${t("Trimestre","Term")}">${EL_TERMS.map((_,i)=>chip(i+1)).join("")}</div>`
-    +(these.length?`<div class="wrap"><table class="xt pgt-t"><thead><tr><th>${t("Situació d'aprenentatge","Learning Situation")}</th><th>📚 ${t("Feina diària","Daily work")}</th><th>📝 ${t("Examen","Exam")}</th><th>🎬 ${t("Producte final","Final product")}</th><th>🎓 ${t("Nota de la LS","LS mark")}</th><th></th></tr></thead><tbody>${these.map(row).join("")}</tbody></table></div>`
+    +(these.length?`<div class="wrap"><table class="xt pgt-t"><thead><tr><th>${t("Situació d'aprenentatge","Learning Situation")}</th><th>📚 ${t("Feina diària","Daily work")}</th><th>📝 ${t("Examen","Exam")}</th><th>🎬 ${t("Producte final","Final product")}</th><th>🎓 ${t("Nota de la LS","LS mark")}</th><th title="${t("Cada part compta segons el seu valor a la nota","Each part counts by its value in the mark")}">✅ ${t("Tasques fetes","Tasks done")}</th><th></th></tr></thead><tbody>${these.map(row).join("")}</tbody></table></div>`
       :`<p class="muted">${t("Aquest trimestre encara no té cap LS.","This term has no LS yet.")}</p>`)
-    +`<p class="muted pgfoot">${t("La nota de cada LS es fa amb la teva feina diària als learning paths, l'examen i el producte final (el pes de cada part és a sota de la nota). Una LS que encara fas mostra la nota fins ara: canvia cada dia amb la teva feina.","Each LS mark is made of your daily work in the learning paths, the exam and the final product (each part's weight is under its mark). An LS you are doing now shows your mark so far: it changes every day with your work.")} ${t("La nota del trimestre surt de les teves competències (a sota): cada una compta segons quant s'ha treballat aquest trimestre.","Your term mark comes from your competences (below): each one counts as much as it has been worked this term.")}${nc?" "+t(nc>1?`Les ${nc} LS que vénen encara no estan preparades.`:"La LS que ve encara no està preparada.",nc>1?`The ${nc} LSs still to come are not ready yet.`:"The LS still to come is not ready yet."):""}</p></div>`
+    +`<p class="muted pgfoot">${t("La nota de cada LS es fa amb la teva feina diària als learning paths, l'examen i el producte final (el pes de cada part és a sota de la nota). Una LS que encara fas mostra la nota fins ara: canvia cada dia amb la teva feina.","Each LS mark is made of your daily work in the learning paths, the exam and the final product (each part's weight is under its mark). An LS you are doing now shows your mark so far: it changes every day with your work.")} ${t("La nota del trimestre surt de les teves competències (a sota): cada una compta segons quant s'ha treballat aquest trimestre.","Your term mark comes from your competences (below): each one counts as much as it has been worked this term.")} ${t("<b>Tasques fetes</b>: cada part compta pel seu valor a la nota (la feina diària, per les SLP fetes el dia que tocava; el producte final, pels passos entregats; l'examen, quan té nota). Només compta el que ja havia d'estar fet, i el que no has fet compta 0, també a la nota.","<b>Tasks done</b>: each part counts by its value in the mark (daily work by the SLPs done by their day, the final product by the steps handed in, the exam once it is marked). Only what was already due counts, and what you have not done counts 0, in the mark too.")}${nc?" "+t(nc>1?`Les ${nc} LS que vénen encara no estan preparades.`:"La LS que ve encara no està preparada.",nc>1?`The ${nc} LSs still to come are not ready yet.`:"The LS still to come is not ready yet."):""}</p></div>`
     +compBox(rows.filter(r=>r.l).map(r=>r.l),tm)+gvBox(nd.map(r=>r.l),tm)}
 // a card with a mark out of 10 as its big number
 const fvCard=(k,i,name,sub,m)=>`<div class="fv-part ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${name}</span><small class="fv-ps">${sub}</small><b class="fv-big">${fvMk(m)}</b><span class="fv-bar"><span style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%"></span></span></div>`;
