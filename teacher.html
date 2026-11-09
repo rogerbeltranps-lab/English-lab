@@ -107,7 +107,7 @@ details.how{margin:4px 0 10px}details.how>summary{color:#3157d5;font-weight:700;
 .agdot{color:#94a3b8;font-size:14px;cursor:grab;user-select:none}
 .agcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .agc{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;line-height:1.35;border:1px solid #c7d4ff;background:#eef2ff;color:#1e3a8a;border-radius:999px;padding:2px 8px;cursor:grab;user-select:none}
-.agc small{color:#64748b;font-size:11px}.agtg{display:inline-flex;gap:2px;margin-left:2px}.agtg i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.aglh .agtg{margin-left:6px;vertical-align:1px}.agkey{font-size:11.5px;color:#64748b;margin:4px 0 8px}.agkey i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.agc input{margin:0;width:13px;height:13px;cursor:pointer}.agc .tabsec{margin-left:0}
+.agc small{color:#64748b;font-size:11px}.agpl{font-size:10.5px;font-weight:700;border-radius:999px;padding:0 6px;white-space:nowrap}.agpl.y{background:#dcfce7;color:#166534}.agpl.n{background:#fee2e2;color:#991b1b}.agtg{display:inline-flex;gap:2px;margin-left:2px}.agtg i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.aglh .agtg{margin-left:6px;vertical-align:1px}.agkey{font-size:11.5px;color:#64748b;margin:4px 0 8px}.agkey i{font-style:normal;font-size:9.5px;font-weight:700;color:#fff;border-radius:4px;padding:0 3px;line-height:14px}.agc input{margin:0;width:13px;height:13px;cursor:pointer}.agc .tabsec{margin-left:0}
 .agc.np{background:#fff;border:1px dashed #94a3b8;color:#475569}.agc.on{background:#dcfce7;border-color:#86efac;color:#166534}.agc.hw{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
 .agc.ex{background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700}.agc.nt{background:#fef08a;border-color:#eab308;color:#713f12;font-weight:600;border-radius:10px;box-shadow:0 1px 2px #a1620726}
 .agday .agc .tabsec:not(.off),.agday .agc .agx,.agday .agh .agx{opacity:0}.agday .agc:hover .tabsec,.agday .agc:hover .agx,.agday .agh:hover .agx,.agday .agc .agx:focus{opacity:1}
@@ -930,8 +930,12 @@ S.autoTk=new Set();
 function autoTicks(){if(!S.D||!S.D.tkOk)return;const t=ELWeek.today();
   Object.entries(S.D.ls||{}).forEach(([ls,info])=>{if(/-my-real-routine$/.test(ls))return;GR.forEach(g=>{const ag=elAgendaOf(info,g.id);if(!ag)return;
     const m=((S.D.tk[g.id]=S.D.tk[g.id]||{}).ticks=S.D.tk[g.id].ticks||{});ELWeek.autoTicks(ls,ag,m,t).forEach(k=>S.autoTk.add(k))})})}
+// the Time plan's left list (its own scroll box) keeps its place through every redraw (Roger, 9 Nov 2026: "the left column jumps to the
+// top when I make changes on the agenda"); one per group and LS, so the 📋 side-by-side board keeps both
+const aglKey=n=>n.dataset.gid+"|"+n.dataset.ls;
 function render(){
-  autoTicks();render0();document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
+  const aglTop={};document.querySelectorAll("#main aside.agl").forEach(n=>{aglTop[aglKey(n)]=n.scrollTop});
+  autoTicks();render0();document.querySelectorAll("#main aside.agl").forEach(n=>{const v=aglTop[aglKey(n)];if(v)n.scrollTop=v});document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
 // ---- the dashboard on a phone (Roger, 8 Nov 2026: "la visió del mòbil necessita una gran remodelació"; mockup option A): a tab bar at the
 // bottom, Home · Groups · Corrections · Messages · More, instead of the row of menu buttons at the top; a 2A · 2B · 4A · 4B switch at the top
 // of a group's pages (the place stays: 2ESO A's Marks → 2ESO B's Marks). More opens a sheet with the rest of the menu (announcement, student
@@ -2616,13 +2620,18 @@ function agReorder(k,d,before){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)retur
   const rest=cur.filter(it=>!mv.includes(it)),i=before&&rest.includes(before)?rest.indexOf(before):rest.length,nw=[...rest.slice(0,i),...mv,...rest.slice(i)];
   if(nw.join("\n")===cur.join("\n"))return;
   agSave(x,g=>{const old=g.days[d]||[];g.days[d]=[...nw,...old.filter(it=>!nw.includes(it))];g.man=Object.assign({},g.man,{[d]:1})})}
+// 🎮 Played by this group? (Roger, 8-9 Nov 2026: "i need the same information here", as on the learning path's game buttons): on a class
+// game in the Time plan, ✓ + the day the group played it on the game board, or "not played yet". From ls/{id}.played[group][deck]
+// (lab/game/host.js markPlayed), already in the LS doc the dashboard reads: no extra reads.
+const agPl=(x,p,sh)=>{if(!isGame(p))return "";const ms=(((S.D.ls[x.ls]||{}).played||{})[x.gid]||{})[p.slice(5)];
+  return ms?`<b class="agpl y" title="Played on the game board with this group">✓ ${sh?"":"played "}${esc(new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}</b>`:`<b class="agpl n" title="Not played on the game board with this group yet">✗ ${sh?"not yet":"not played yet"}</b>`};
 // one class day: its items grouped by activity, each with a tick box, drag handle and ✕; c = compact (Home, weekend check)
 function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.days[d]||[]),isEx=ag.exam===d,self=its.includes("self"),tkb=dayIts(ag,d);
   const done=tkb.length&&tkb.every(it=>tkOf(x)[x.ls+"|"+itKey(d,it)]),past=d<t,late=past&&tkb.some(it=>!tkOf(x)[x.ls+"|"+itKey(d,it)]);
   const D=`data-gid="${x.gid}" data-ls="${x.ls}"`,dr=(x.p._dropped||{})[x.gi]||[];
   const chip=(it,label,a)=>{const on=!!tkOf(x)[x.ls+"|"+itKey(d,it)],p=it.slice(it.indexOf("#")+1);
     return `<span class="agc ${on?"on":""} ${it==="exam"?"ex":""} ${/^note:/.test(it)?"nt":""} ${it===SHD?"shd":""} ${a&&p&&agG(agOf(x),d,it)?"grp":""}" draggable="true" data-ag="${it==="exam"?"exam":"it"}" data-it="${esc(it)}" ${it==="exam"?"":`data-oi="${esc(it)}"`} data-from="${d}" ${D} title="${it==="exam"?"Drag it to another day":isTab(it)?"Drag it to another day, or back to the list on the left (tabs keep the learning path's order)":/^note:/.test(it)&&S.place==="plan2"?"Drag it up or down to change the order, to another day, or to the other group to copy it":"Drag it up or down to change the order, to another day, or back to the list on the left"}">`
-      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${esc(label)}${/#/.test(it)?agTags(it):""}`
+      +`<input type="checkbox" data-do="agtick" data-d="${d}" data-it="${esc(it)}" ${D} ${on?"checked":""} title="Done in class">${it==="exam"?"":minSel(x,d,it)}${hwS.has(it)&&!(a&&p&&!isGame(p))?`<span title="Homework">🏠</span>`:""}${esc(label)}${/#/.test(it)?agTags(it):""}${a&&p?agPl(x,p,1):""}`
       +(it===SHD&&shdUrl(x.ls)?` <a class="aglk" href="${esc(shdUrl(x.ls))}" target="_blank" rel="noopener" data-elvid="1" title="Play the unit's shadowing video here (the list of who left stays on top)">▶</a>`:"")
       +(a&&p&&!isGame(p)?(()=>{const h=hwNext(x,d,it),o=!!h||hwS.has(it);return `<button type="button" class="aghw ${o?"on":""}" data-do="aghw1" data-d="${d}" data-it="${esc(it)}" ${D} aria-pressed="${o}" title="${h?"Homework for "+esc(ELWeek.date(h[1].by))+(d>ELWeek.today()?" · planned: students see it from "+esc(ELWeek.date(d)):"")+" · click to take it off":o?"Homework · click to take this tab off it":"Make it homework for the next class"}">🏠</button>`})():"")
       +(a&&p?wkBtn(x,d,[it]):"")+(a&&p?secSw(x,a,p):"")+(it==="exam"?"":`<button type="button" class="agx" data-do="agrm" data-d="${d}" data-it="${esc(it)}" ${D} title="Take it off this day">✕</button>`)+`</span>`};
@@ -2670,7 +2679,7 @@ function agList(x,studs){const ag=agOf(x),info=S.D.ls[x.ls]||{},hw=hwItems(x),dr
       +`<small>${ds.length?ds.map(sm).join(" · "):"not on the agenda"}${!nos&&ds.length&&left?` · ${left} tab${left===1?"":"s"} not planned`:""}${open?"":" · 🔒 locked"}${nd!=null?` · ${nd}/${studs.length} done`:""}</small></span>`
       +(isLpA(a)&&!/-my-real-routine$/.test(x.ls)?`<button type="button" class="agx" data-do="lpdrop" data-a="${esc(a.id)}" data-v="${drop?0:1}" ${D} title="${drop?"Count it again":"Drop it for this group: not counted, not in the exam"}">${drop?"↩":"✂"}</button>`:"")+`</div>`
       +(nos?"":`<div class="agcs">${itemsOf(a).map(([p,nm])=>{const it=a.id+"#"+p,w=where[it]||[],s=st(it,w);
-        return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${s==="np"?"Not on the agenda: drag it to a day":s==="hw"?"Set as homework":"On "+w.map(sm).join(", ")}">${s==="on"?"✓ ":s==="hw"?"🏠 ":""}${esc(nm)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:""}${agTags(it)}</span>`}).join("")}</div>`)+`</div>`}});
+        return `<span class="agc ${s}" draggable="true" data-ag="it" data-it="${esc(it)}" data-from="" ${D} title="${s==="np"?"Not on the agenda: drag it to a day":s==="hw"?"Set as homework":"On "+w.map(sm).join(", ")}">${s==="on"?"✓ ":s==="hw"?"🏠 ":""}${esc(nm)}${w.length&&s!=="on"?`<small>${esc(sm(w[0]))}</small>`:""}${agTags(it)}${agPl(x,p)}</span>`}).join("")}</div>`)+`</div>`}});
   // only the learning paths opened for the group (Roger, 6 Nov 2026: "here I only want the SLPs I opened since they are the only ones done
   // so far"); the ones not opened yet fold into "Not opened yet", still there to drag to a day
   const shut=rows.filter(r=>!r.open),k="agshut"+x.ls+x.gid;
@@ -3402,6 +3411,7 @@ async function fpgBulk(u,a){const g=(S.P[u]||{}).group;if(!g||FPG.bulk)return;
 function fpgKeep(a,g,c,rep){const k="_r_"+g,o={at:new Date().toISOString(),course:c.course||"",title:(c.work||{}).title||"",
     done:rep.done.map(r=>r.s.uid),failed:rep.failed.map(r=>({u:r.s.uid,err:r.err||""})),unreach:rep.unreach.map(r=>({u:r.s.uid,why:r.x.why,items:r.x.items.map(i=>({kind:i.kind,title:i.title||"",url:i.url||""}))})),
     none:rep.none.map(s=>s.uid),had:rep.had.map(s=>s.uid),other:rep.other};
+  (FPG.d[a.id]=FPG.d[a.id]||{})[k]=o;   // in memory first, so the page drawn right after the run already has the button
   Promise.resolve().then(()=>fpgSave(a,k,o)).catch(e=>console.warn("fp report save",e))}
 function fpgLast(a,g){const o=(FPG.d[a.id]||{})["_r_"+g];if(!o)return;const P=u=>S.P[u]||{uid:u,name:u};
   fpgReport({course:o.course+" · "+day(o.at),work:{title:o.title}},{done:o.done.map(u=>({s:P(u)})),failed:o.failed.map(x=>({s:P(x.u),err:x.err})),
