@@ -310,7 +310,7 @@ var LS2 = (function () {
     const L = a.l || checkLevel(id), from = a.q && a.q.length ? a.q : L ? qsAt(L, src) : null;
     if (!from) { if (a.v.length !== items.length) return null; Object.assign(tries, a.tries || {}); return { v: a.v, moved: false }; }
     const m = moveTo(items, from, a.v, prefix, a.tries); if (!m) return null;
-    Object.assign(tries, m.tries); return { v: m.v, moved: !m.same, fresh: m.v.some(x => x == null) };
+    Object.assign(tries, m.tries); return { v: m.v, moved: !m.same, fresh: m.v.some(x => x == null), added: L === level };
   }
   // answers typed but not checked yet: this route's, else the fullest from another route, moved onto this route's questions
   function typed(id, prefix, items, src) {
@@ -321,13 +321,17 @@ var LS2 = (function () {
     return m && n(m.v) ? m.v : null;
   }
   // a note under the result when the answers come from another level; a step already done stays done
-  function movedNote(id, fresh) {
+  // added: same level, so the activity itself changed (new questions added to it; Roger, 9 Nov 2026: -ed / -ing in 4 ESO LS2 LP3)
+  function movedNote(id, fresh, added) {
     const el = $('#' + id + 'Result'); if (!el) return;
     const done = state.done[id === 'vocab' ? 'practice' : id];
     if (done) el.textContent = el.textContent.replace(/ · (You need \d+ to complete the step\.|Necessites \d+ per completar el pas\.|Answer every question to complete the step\.|Respon totes les preguntes per completar el pas\.)/, ca() ? ' · Pas completat ✓' : ' · Step complete ✓');
     if (done && !/✓/.test(el.textContent)) el.textContent += ca() ? ' · Pas completat ✓' : ' · Step complete ✓';
     const p = document.createElement('span'); p.className = 'moved-note'; p.style.cssText = 'display:block;margin-top:6px;font-weight:400';
-    p.textContent = ca()
+    p.textContent = added ? (ca()
+      ? '✨ He afegit preguntes noves a aquesta activitat. Les respostes que ja havies fet hi són' + (done ? ' i aquest pas continua fet ✓. Pots fer les noves per practicar.' : ': respon també les preguntes buides per completar el pas.')
+      : '✨ I’ve added new questions to this activity. The answers you had already given are here' + (done ? ' and this step stays done ✓. You can do the new ones to practise.' : ': answer the empty questions too to complete the step.'))
+      : ca()
       ? '🔁 Has canviat de nivell. Les respostes que ja havies fet hi són' + (done ? ' i aquest pas continua fet ✓.' + (fresh ? ' Les preguntes buides són noves del teu nivell: les pots fer per practicar.' : '') : '.' + (fresh ? ' Respon també les preguntes buides per completar el pas.' : ''))
       : '🔁 Your level has changed. The answers you had already given are here' + (done ? ' and this step stays done ✓.' + (fresh ? ' The empty questions are new at your level: you can do them to practise.' : '') : '.' + (fresh ? ' Answer the empty questions too to complete the step.' : ''));
     el.appendChild(p); el.classList.add('show');
@@ -350,7 +354,7 @@ var LS2 = (function () {
     $('#' + id + 'Check').onclick = () => { check(true); keep(id, prefix, vals(items, prefix), items); };
     $('#' + id + 'Again').onclick = () => { forget(id, prefix); clearStep(id, listId); };
     $('#' + listId).oninput = $('#' + listId).onchange = () => { state.typing = state.typing || {}; state.typing[id + '_' + level] = vals(items, prefix); save(); };
-    const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh); } else if (t) fill(items, prefix, t);
+    const k = kept(id, prefix, items, src), t = k ? null : typed(id, prefix, items, src); if (k) { fill(items, prefix, k.v); check(false); if (k.moved) movedNote(id, k.fresh, k.added); } else if (t) fill(items, prefix, t);
   }
 
   /* ---------- redo one activity (Roger, 2 Nov 2026: "I don't want them restart the whole learning path"; 4 Nov 2026: "I only want
@@ -1418,6 +1422,18 @@ var LS2 = (function () {
     usePanels();
     try { state = JSON.parse(localStorage.getItem(LP.key) || '{}'); } catch (e) { state = {}; }
     state.done = state.done || {};
+    /* Do it again after new questions (Roger, 9 Nov 2026: "the students who did the grammar need to do it again and it's like they didn't
+       do that. No messages to those students"): a panel with redoBefore (a date) quietly clears the work a student checked before that date
+       (done, first and last try, answers, first-try items, typing), so the step is to do again and nothing old counts. Nothing is shown. */
+    LP.panels.forEach(p => {
+      if (!p.redoBefore) return; const k = p.id, d = [(state.doneAt || {})[k], ((state.tries || {})[k] || {}).date, ((state.last || {})[k] || {}).date].filter(Boolean);
+      if (!d.length || !d.some(x => x < p.redoBefore)) return;
+      delete state.done[k]; ['doneAt', 'tries', 'last', 'ans'].forEach(f => { if (state[f]) delete state[f][k]; });
+      ['items', 'typing'].forEach(f => { if (state[f]) Object.keys(state[f]).forEach(x => { if (x.startsWith(k + '_')) delete state[f][x]; }); });
+      localStorage.setItem(LP.key, JSON.stringify(state));
+      // the cloud copy gets it with a normal save once the page has pulled the student's progress (el-cloud.js loads after this)
+      setTimeout(() => { try { save(); } catch (e) {} }, 4000);
+    });
     const sel = $('#sessionJump');
     if (sel) { const here = location.pathname.split('/').pop(); sel.innerHTML = PAGES.map(([f, t]) => '<option value="' + f + '"' + (f === here ? ' selected' : '') + '>' + t + '</option>').join(''); sel.onchange = () => { location.href = sel.value; }; }
     $$('.route').forEach(b => { b.classList.toggle('active', b.dataset.level === level); b.onclick = () => { level = b.dataset.level; usePanels(); $$('.route').forEach(x => x.classList.toggle('active', x === b)); save(); render(); learningSupport.apply(level); }; });
