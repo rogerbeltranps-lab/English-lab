@@ -1263,7 +1263,7 @@ const fpMarked=(u,a)=>{const x=res(u,a.id),g=(window.EL_GRADING||{})[a.ls]||{};i
 // Gemini drafts not approved yet (0 until the drafts doc is read; reading it re-draws the page once)
 function fpWaiting(a,studs){if(!FPG.d[a.id]){if(!DEMO&&!FPG.ld[a.id]){FPG.ld[a.id]=1;fpgLoad(a).then(()=>{if(S.g&&GR.some(g=>g.id===S.g))render()}).catch(()=>{})}return 0}
   const d=FPG.d[a.id];return studs.filter(s=>d[s.uid]&&d[s.uid].draft&&!d[s.uid].approved&&!fpMarked(s.uid,a)).length}
-const fpBulkH=(a,u)=>FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button data-fpg="bulk" data-u="${u}" data-a="${esc(a.id)}">📥 Draft the whole group from Classroom</button> <span class="muted">Gemini watches every video handed in on Classroom, one after another (keep this page open), and lists the ones it couldn't reach.</span>`;
+const fpBulkH=(a,u)=>FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button data-fpg="bulk" data-u="${u}" data-a="${esc(a.id)}">📥 Draft the whole group from Classroom</button>${fpgLastB(a,u)} <span class="muted">Gemini watches every video handed in on Classroom, one after another (keep this page open), and lists the ones it couldn't reach.</span>`;
 function fpPage(grp,ls,list,studs){const a=fpAct(ls,list);studs=studs.slice().sort(byName);
   if(!a)return `<div class="box"><p class="muted">This LS has no final product on the site yet.</p></div>`;
   fpWaiting(a,studs);const d=FPG.d[a.id]||{},R=fpgRubric(a),g=(window.EL_GRADING||{})[ls]||{},lv=g.fp&&g.fp.a===a.id&&!g.fp.mark?g.fp.rows:null;
@@ -3267,6 +3267,10 @@ function fpgSave(a,u,d){(FPG.d[a.id]=FPG.d[a.id]||{})[u]=d;return put(["settings
 async function fpgCall(body){const tok=await ELCloud.auth.currentUser.getIdToken();
   const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify(Object.assign({idToken:tok},body))});
   const j=await r.json();if(!j||!j.ok)throw new Error(j&&j.error==="nothing to send"?"the school script is the old version: paste tools/notify/school-mail.gs and deploy a new version":(j&&j.error)||"no answer");return j}
+// Classroom videos belong to the students' school accounts and are shared with the teacher's school account, not his Gmail (Roger, 9 Nov 2026:
+// "it'd be super cool if I could see the preview"): their preview and Drive link open with the school account (it must be signed in in this
+// Chrome too: Google account menu › Add another account). Videos uploaded on the site are in his own Drive and open as they are.
+const FPG_SCHOOL="roger.beltran@ietramuntana.cat";
 const FPG_READ={speaks:["🟢","Speaks freely"],partly:["🟡","Reads in parts"],reads:["🔴","Reads"]};
 const fpgLv=n=>n==null?"–":n===0?"No evidence":"Level "+n;
 // a row's mark out of 10: Gemini's own (in steps of 0.5, kept inside the level by the school script) or, in older drafts, level × 2.5;
@@ -3278,14 +3282,14 @@ function fpgBox(u,a){if(!fpgIs(a))return "";setTimeout(()=>fpgLoad(a).then(()=>f
 const fpgRefresh=a=>{const b=$("#fpg");if(b&&b.dataset.u)fpgFill(b.dataset.u,a);const n=$("#fpbulk");if(n&&FPG.bulk)n.innerHTML=fpBulkH(a,"")};
 function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;const v=fpgVideo(u,a),R=fpgRubric(a),d=(FPG.d[a.id]||{})[u],busy=FPG.busy[u+"|"+a.id];
   let h=`<h4 style="margin:0 0 6px">🎬 The video and Gemini's draft <button class="g" data-fpg="cost" style="float:right;font-size:12px;padding:2px 8px">💶 Gemini this month</button></h4>`;
-  const yid=v&&v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],open=v?(yid?v.youtube:`https://drive.google.com/file/d/${esc(v.id)}/view`):"";
-  if(v)h+=`<p class="muted" style="margin:0 0 6px">${esc(v.name||"Video")}${v.size?" · "+Math.round(v.size/1e6)+" MB":""}${v.at?" · uploaded "+day(v.at):""}${v.by?" · uploaded by "+name(v.by)+" (group video)":""} · <a href="${esc(open)}" target="_blank" rel="noopener">${yid?"Open on YouTube":"Open in Drive"} ↗</a></p>
-    <div style="position:relative;padding-top:56.25%;background:#0f172a;border-radius:8px;overflow:hidden"><iframe src="${yid?"https://www.youtube.com/embed/"+esc(yid):`https://drive.google.com/file/d/${esc(v.id)}/preview`}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>`;
+  const yid=v&&v.youtube&&(v.youtube.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/)||[])[1],au=v&&v.link?"?authuser="+encodeURIComponent(FPG_SCHOOL):"",open=v?(yid?v.youtube:`https://drive.google.com/file/d/${esc(v.id)}/view${au}`):"";
+  if(v)h+=`<p class="muted" style="margin:0 0 6px">${esc(v.name||"Video")}${v.size?" · "+Math.round(v.size/1e6)+" MB":""}${v.at?" · uploaded "+day(v.at):""}${v.by?" · uploaded by "+name(v.by)+" (group video)":""} · <a href="${esc(open)}" target="_blank" rel="noopener">${yid?"Open on YouTube":"Open in Drive"} ↗</a>${au&&!yid?`<br><small>Opens with the school account (${FPG_SCHOOL}). If it asks for access, add that account to this Chrome: your photo at the top right of Google › Add another account.</small>`:""}</p>
+    <div style="position:relative;padding-top:56.25%;background:#0f172a;border-radius:8px;overflow:hidden"><iframe src="${yid?"https://www.youtube.com/embed/"+esc(yid):`https://drive.google.com/file/d/${esc(v.id)}/preview${au}`}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>`;
   else{const c=fpgClsOf(u);h+=c?`<p class="muted">On Classroom: ${c.items.length?c.items.map(i=>i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title||i.kind)}</a>`:esc(i.title||i.kind)).join(" · ")+" — "+esc(c.why):"nothing handed in"}.</p>`
     :`<p class="muted">No video uploaded on the site yet. <button class="g" data-fpg="cls" data-u="${u}" data-a="${esc(a.id)}">📥 Look on Classroom</button> or paste a Drive link:</p>`}
   h+=`<div class="row" style="justify-content:flex-start;gap:6px;margin-top:6px">${v&&!v.link?"":`<input id="fpglink" placeholder="https://drive.google.com/file/d/…" style="flex:1;min-width:220px">`}`
     +(R?`<button data-fpg="watch" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>${d&&d.draft?"🔄 Watch again":"🎬 Gemini, watch it"}</button>`:`<span class="muted">This final product has no rubric on the site yet, so Gemini cannot mark it.</span>`)+`</div>`
-    +(R&&a.manual&&!a.video?`<p class="muted" style="margin:6px 0 0">${FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button class="g" data-fpg="bulk" data-u="${u}" data-a="${esc(a.id)}">📥 Draft the whole group from Classroom</button> Gemini watches every video handed in on Classroom, one after another, and lists the ones it couldn't reach.`}</p>`:"");
+    +(R&&a.manual&&!a.video?`<p class="muted" style="margin:6px 0 0">${FPG.bulk?`⏳ ${esc(FPG.bulk.note)}`:`<button class="g" data-fpg="bulk" data-u="${u}" data-a="${esc(a.id)}">📥 Draft the whole group from Classroom</button>${fpgLastB(a,u)} Gemini watches every video handed in on Classroom, one after another, and lists the ones it couldn't reach.`}</p>`:"");
   if(busy)h+=`<p class="muted">⏳ Gemini is watching the video (about 1–3 minutes; you can close this window, the draft is kept).</p>`;
   if(d&&d.error)h+=`<p class="bad" style="color:#b91c1c">⚠️ ${esc(d.error)}</p>`;
   if(d&&d.draft&&R){const x=d.draft,rd=FPG_READ[(x.reading||{}).verdict]||FPG_READ.partly;
@@ -3347,7 +3351,17 @@ async function fpgBulk(u,a){const g=(S.P[u]||{}).group;if(!g||FPG.bulk)return;
     FPG.bulk.note=`Gemini is watching ${i} of ${studs.length}: ${fullName(s)} (about 1–3 minutes each; keep this page open)`;fpgRefresh(a);
     const ok=await fpgWatch(s.uid,a,"",Object.assign({link:true},x.watch));
     (ok?rep.done:rep.failed).push({s,err:ok?"":(((FPG.d[a.id]||{})[s.uid]||{}).error||"")})}
-  FPG.bulk=null;if(S.place==="fp")render();fpgReport(c,rep,a)}
+  FPG.bulk=null;fpgKeep(a,g,c,rep);if(S.place==="fp")render();fpgReport(c,rep,a)}
+// the last report of each group is kept in the drafts doc (key "_r_{group}", teacher only) so it can be opened again (Roger, 9 Nov 2026:
+// "if I close this, will I see it somewhere?"): 📋 Last Classroom report next to 📥 Draft the whole group
+function fpgKeep(a,g,c,rep){const k="_r_"+g,o={at:new Date().toISOString(),course:c.course||"",title:(c.work||{}).title||"",
+    done:rep.done.map(r=>r.s.uid),failed:rep.failed.map(r=>({u:r.s.uid,err:r.err||""})),unreach:rep.unreach.map(r=>({u:r.s.uid,why:r.x.why,items:r.x.items.map(i=>({kind:i.kind,title:i.title||"",url:i.url||""}))})),
+    none:rep.none.map(s=>s.uid),had:rep.had.map(s=>s.uid),other:rep.other};
+  Promise.resolve().then(()=>fpgSave(a,k,o)).catch(e=>console.warn("fp report save",e))}
+function fpgLast(a,g){const o=(FPG.d[a.id]||{})["_r_"+g];if(!o)return;const P=u=>S.P[u]||{uid:u,name:u};
+  fpgReport({course:o.course+" · "+day(o.at),work:{title:o.title}},{done:o.done.map(u=>({s:P(u)})),failed:o.failed.map(x=>({s:P(x.u),err:x.err})),
+    unreach:o.unreach.map(x=>({s:P(x.u),x:{why:x.why,items:x.items}})),none:o.none.map(P),had:o.had.map(P),other:o.other||[]},a)}
+const fpgLastB=(a,u)=>{const g=(S.P[u]||{}).group,o=g&&(FPG.d[a.id]||{})["_r_"+g];return o?` <button class="g" data-fpg="last" data-u="${u}" data-a="${esc(a.id)}">📋 Last Classroom report <small>(${day(o.at)})</small></button>`:""};
 function fpgReport(c,rep,a){const li=(arr,f)=>arr.length?`<ul>${arr.map(f).join("")}</ul>`:`<p class="muted">None.</p>`,nm=s=>`<a data-do="cell" data-u="${s.uid}" data-a="${esc(a.id)}">${name(s)}</a>`;
   dlg(`<h3>📥 Classroom final products · ${esc(c.course)}</h3><p class="muted">${esc((c.work||{}).title||"")}</p>`
     +`<h4>✅ Drafted now (${rep.done.length})</h4>`+li(rep.done,r=>`<li>${nm(r.s)}</li>`)
@@ -3378,7 +3392,8 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-fpg]");if(
   else if(k.fpg==="change"){const c=$("#fpgchg").value.trim();if(!c)return alert("Write what Gemini should change.");fpgWatch(k.u,a,c)}
   else if(k.fpg==="ok")fpgApprove(k.u,a);
   else if(k.fpg==="cost")fpgCost();
-  else if(k.fpg==="sounds")fpgSounds(k.u,a)});
+  else if(k.fpg==="sounds")fpgSounds(k.u,a);
+  else if(k.fpg==="last")fpgLast(a,(S.P[k.u]||{}).group)});
 // 🗣️ Words said wrong in the whole group (Roger, 8 Nov 2026: "a list of the words that they mispronounce like walk (pronouncing the L) …
 // not for the students individually but to create a listen and repeat video to correct that in class"; the video is made without Gemini):
 // every drafted final product of the group, most common word first. Teacher only: never in the student's feedback.

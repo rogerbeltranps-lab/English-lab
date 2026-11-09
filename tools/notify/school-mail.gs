@@ -78,7 +78,8 @@ function doPost(e) {
   if (m.action === "video_chunk") return out(videoChunk(m));
   if (m.action === "video_status") return out(videoStatus(m));
   if (m.action === "fp_watch") return out(m.idToken && isTeacher(m.idToken) ? fpWatch(m) : {ok: false, error: "not the teacher"});
-  if (m.action === "fp_classroom") return out(m.idToken && isTeacher(m.idToken) ? fpClassroom(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_classroom") { if (!(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: "not the teacher"});
+    try { return out(fpClassroom(m)); } catch (x) { return out({ok: false, error: "Classroom: " + String(x && x.message || x).slice(0, 300)}); } }
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
   const ok = a => ALLOWED.test(a) || a.toLowerCase() === TEACHER;
   const clean = l => [].concat(l || []).map(a => String(a).trim()).filter(ok);
@@ -507,4 +508,13 @@ function fpClassroom(m) {
     tok = r.nextPageToken;
   } while (tok);
   return {ok: true, course: c.name, works, work: w, subs};
+}
+
+// Run once from the editor (Classroom API service added): Google asks for the Classroom permission (tick every box; requireAllScopes asks for all of them at once, as Google may grant
+// them one by one) and the log lists the 2ESOA assignments. Without that permission fp_classroom answers "No tienes permiso para llamar a classroom.courses.list" (Roger, 9 Nov 2026).
+function testClassroom() {
+  ScriptApp.requireAllScopes(ScriptApp.AuthMode.FULL);
+  const c = (Classroom.Courses.list({teacherId: "me", pageSize: 20}).courses || []).find(x => /2ESOA/.test(x.name.replace(/\s/g, "")));
+  Logger.log(c.name + ": " + (Classroom.Courses.CourseWork.list(c.id, {pageSize: 20}).courseWork || []).map(x => x.title).join(" · "));
+  Logger.log("Students: " + (Classroom.Courses.Students.list(c.id, {pageSize: 50}).students || []).length);
 }
