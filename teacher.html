@@ -3362,6 +3362,7 @@ async function fpgBulk(u,a){const g=(S.P[u]||{}).group;if(!g||FPG.bulk)return;
 function fpgKeep(a,g,c,rep){const k="_r_"+g,o={at:new Date().toISOString(),course:c.course||"",title:(c.work||{}).title||"",
     done:rep.done.map(r=>r.s.uid),failed:rep.failed.map(r=>({u:r.s.uid,err:r.err||""})),unreach:rep.unreach.map(r=>({u:r.s.uid,why:r.x.why,items:r.x.items.map(i=>({kind:i.kind,title:i.title||"",url:i.url||""}))})),
     none:rep.none.map(s=>s.uid),had:rep.had.map(s=>s.uid),other:rep.other};
+  (FPG.d[a.id]=FPG.d[a.id]||{})[k]=o;   // in memory first, so the page drawn right after the run already has the button
   Promise.resolve().then(()=>fpgSave(a,k,o)).catch(e=>console.warn("fp report save",e))}
 function fpgLast(a,g){const o=(FPG.d[a.id]||{})["_r_"+g];if(!o)return;const P=u=>S.P[u]||{uid:u,name:u};
   fpgReport({course:o.course+" · "+day(o.at),work:{title:o.title}},{done:o.done.map(u=>({s:P(u)})),failed:o.failed.map(x=>({s:P(x.u),err:x.err})),
