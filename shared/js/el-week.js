@@ -71,10 +71,10 @@
     // that subscribes a Google Calendar to it once, so every later homework appears by itself
     calendar(gid,root){const ics=new URL("calendar/"+String(gid).toLowerCase()+".ics",root||location.href).href;
       return {ics,google:"https://calendar.google.com/calendar/r?cid="+encodeURIComponent(ics.replace(/^https?:/,"webcal:"))}},
-    // a Google Calendar link that adds one homework (for the ones the teacher set from the dashboard)
-    gcalLink(x,lang){const ca=L(lang)==="ca",d=s=>s.replace(/-/g,""),start=x.set&&x.set<x.date?x.set:add(x.date,-1);
-      return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent((ca?"🏠 Deures d'anglès: ":"🏠 English homework: ")+x.text)
-        +"&dates="+d(start)+"/"+d(x.date)+"&details="+encodeURIComponent((ca?"Per a la classe del ":"For the class on ")+this.date(x.date,lang))},
+    // "📅 Add to my calendar" (Roger, 9 Nov 2026: only on the homework, the exam and a final product deadline, from the students' Class agenda):
+    // a Google Calendar link that adds one all-day event on day `date` (YYYY-MM-DD) with that title; Google asks the student to save it
+    gcalDay(title,date,details){const d=s=>s.replace(/-/g,"");
+      return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(title)+"&dates="+d(date)+"/"+d(add(date,1))+(details?"&details="+encodeURIComponent(details):"")},
     // one homework or self-study item as text for students ("by Tue 10 Nov · …", Catalan for Starter and Base)
     taskText(x,lang){const ca=L(lang)==="ca";
       return x.kind==="self"?(ca?"Classe pel teu compte":"Class on your own")+" ("+this.date(x.date,lang)+") · "+x.text+" · "+(ca?"treballa amb auriculars i acaba-ho a casa":"work with headphones and finish it at home")
