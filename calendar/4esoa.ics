@@ -9,19 +9,17 @@ X-WR-TIMEZONE:Europe/Madrid
 REFRESH-INTERVAL;VALUE=DURATION:PT6H
 X-PUBLISHED-TTL:PT6H
 BEGIN:VEVENT
-UID:4esoa-4eso-seasons-and-celebrations-hw-2026-11-09-kbcm3k@english-lab
+UID:4esoa-4eso-seasons-and-celebrations-hw-2026-11-13-1pqsj0@english-lab
 DTSTAMP:20261031T000000Z
-DTSTART;VALUE=DATE:20261106
-DTEND;VALUE=DATE:20261109
-SUMMARY:🏠 English homework for Mon 9 Nov: LP3 Where traditions come from
- : Recall\, Vocabulary\, Listening\, Listening chart\, Shadowing\, Grammar\
- , Mixed\, Writing\, Speaking\, Talk
-DESCRIPTION:LP3 Where traditions come from: Recall\, Vocabulary\, Listening
- \, Listening chart\, Shadowing\, Grammar\, Mixed\, Writing\, Speaking\, Ta
- lk\nFor the English class on Mon 9 Nov · Per a la classe d'anglès del dl
- . 9 nov..\nSeasons & Celebrations: https://rogerbeltranps-lab.github.io/En
- glish-lab/4eso/seasons-and-celebrations/index.html\nMy board / El meu taul
- er: https://rogerbeltranps-lab.github.io/English-lab/today.html
+DTSTART;VALUE=DATE:20261111
+DTEND;VALUE=DATE:20261113
+SUMMARY:🏠 English homework for Fri 13 Nov: LP3 Where traditions come fro
+ m: Listening chart
+DESCRIPTION:LP3 Where traditions come from: Listening chart\nFor the Englis
+ h class on Fri 13 Nov · Per a la classe d'anglès del dv. 13 nov..\nSeaso
+ ns & Celebrations: https://rogerbeltranps-lab.github.io/English-lab/4eso/s
+ easons-and-celebrations/index.html\nMy board / El meu tauler: https://roge
+ rbeltranps-lab.github.io/English-lab/today.html
 URL:https://rogerbeltranps-lab.github.io/English-lab/4eso/seasons-and-celeb
  rations/index.html
 TRANSP:TRANSPARENT
