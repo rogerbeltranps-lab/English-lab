@@ -32,7 +32,7 @@ window.elDueWork=function(gid,term,infoOf){
   const [from,to]=elTermSpan(term),today=ELWeek.today(),out=[];
   ELWeek.plans(gid).forEach(x=>{const info=infoOf(x.ls)||{status:"hidden"};if(info.status==="hidden")return;
     Object.keys(x.p.due||{}).forEach(id=>{const a=(window.EL_CATALOG||[]).find(y=>y.id===id),d=ELWeek.due(x.p,id,x.gi);
-      if(!a||!d||a.manual||d<=from||d>to||d>=today||!elLpOpen(a,info,gid)||elSecLocked(a,info,gid).length)return;
+      if(!a||!d||a.manual||d<=from||d>to||d>=today||!elLpOpen(a,info,gid)||elSecNeverOpened(a,info,gid).length)return;
       out.push([a,d])})});
   return out.sort((a,b)=>a[1]<b[1]?-1:1)};
 window.elMissing=(gid,term,isDone,infoOf)=>elDueWork(gid,term,infoOf).filter(([a])=>!isDone(a));

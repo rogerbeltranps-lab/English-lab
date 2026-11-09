@@ -271,6 +271,8 @@ window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];retu
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
 // again stays open for a student who has not finished it; it is read-only for everyone else. done = Set of the student's done steps.
+// sections locked now that were never opened for the group (a section opened before and locked again was taught: its work is due)
+window.elSecNeverOpened=function(a,info,gid){const op=secOf(info,"secOpened",gid,a)||[];return elSecLocked(a,info,gid).filter(id=>!op.includes(id))};
 const secLk=(a,info,gid,done)=>{const op=secOf(info,"secOpened",gid,a)||[];return elSecLocked(a,info,gid).filter(id=>!(op.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done)))};
 // Not planned yet = for class too (Roger, 9 Nov 2026: "If it's to do in class it shouldn't appear here and if they browse it and see it open
 // they can only see it not do it"): when the group has an agenda, a tab of an open learning path that is on no class day at all (nor ticked
