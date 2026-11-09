@@ -160,8 +160,16 @@ table.shortnm .stu{min-width:0;width:72px;max-width:72px;white-space:normal;text
 .tp2sb{margin:0 0 8px}.tp2ch{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px}
 .tp2sr{position:sticky;top:58px;max-height:calc(100vh - 66px);display:flex;flex-direction:column}.tp2sr .lpall{margin:0;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 .tp2sr .lpall>h2{margin:.1em 0 .2em;font-size:1.1rem}.tp2sr .lpall .wrap{flex:1;min-height:0;max-height:none}
-.tp2s .tp2:not(.one) .agw{grid-template-columns:1fr}.tp2s .tp2:not(.one) .agl{position:static;max-height:300px}
-@media(max-width:900px){.tp2s{grid-template-columns:1fr}.tp2sr{position:static;max-height:none}.tp2sr .lpall .wrap{max-height:75vh}}
+/* (Roger, 9 Nov 2026: "scroll up and that the weeks go up and see further days and seeing this"): beside the students' table each group
+   column is one screen high; its skills bars and its list of learning paths stay on top and only the weeks scroll under them, so an LP can
+   be dragged to a later day without losing the list */
+.tp2s .tp2col{position:sticky;top:58px;height:calc(100vh - 66px);display:flex;flex-direction:column;overflow:hidden}
+.tp2s .tp2col>h2,.tp2s .tp2col>.agbars{flex:none}.tp2s .tp2col>.agbars{margin-bottom:6px}
+.tp2s .agw{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px}
+.tp2s .agl{position:static;flex:none;max-height:34%;overflow:auto}
+.tp2s .agr{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-right:4px}
+.tp2s .tp2.one .agw{display:grid;grid-template-columns:220px minmax(0,1fr);grid-template-rows:minmax(0,1fr)}.tp2s .tp2.one .agl{max-height:none;height:100%}.tp2s .tp2.one .agr{height:100%}
+@media(max-width:900px){.tp2s .tp2col{position:static;height:auto;display:block}.tp2s .agw{display:grid}.tp2s .agr{overflow:visible}.tp2s{grid-template-columns:1fr}.tp2sr{position:static;max-height:none}.tp2sr .lpall .wrap{max-height:75vh}}
 @media(max-width:1100px){.agw{grid-template-columns:1fr}.agl{position:static;max-height:none}}
 </style>
 <link rel="stylesheet" href="shared/css/el-phone.css"></head><body>
@@ -964,7 +972,11 @@ function autoTicks(){if(!S.D||!S.D.tkOk)return;const t=ELWeek.today();
 const aglKey=n=>n.dataset.gid+"|"+n.dataset.ls;
 function render(){
   const aglTop={};document.querySelectorAll("#main aside.agl").forEach(n=>{aglTop[aglKey(n)]=n.scrollTop});
-  autoTicks();render0();document.querySelectorAll("#main aside.agl").forEach(n=>{const v=aglTop[aglKey(n)];if(v)n.scrollTop=v});document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
+  // 📊 beside the plan, each group's weeks and the students' table scroll inside their own boxes: a redraw (every drop) keeps where they were
+  const inTop={};document.querySelectorAll("#main .tp2s .agl+.agr").forEach(n=>{inTop["r|"+aglKey(n.previousElementSibling)]=[n.scrollTop,0]});
+  {const w=document.querySelector("#main .tp2s .lpall .wrap");if(w)inTop.w=[w.scrollTop,w.scrollLeft]}
+  autoTicks();render0();document.querySelectorAll("#main aside.agl").forEach(n=>{const v=aglTop[aglKey(n)];if(v)n.scrollTop=v;const r=n.nextElementSibling,q=inTop["r|"+aglKey(n)];if(q&&r&&r.classList.contains("agr"))r.scrollTop=q[0]});
+  {const w=document.querySelector("#main .tp2s .lpall .wrap");if(w&&inTop.w){w.scrollTop=inTop.w[0];w.scrollLeft=inTop.w[1]}}document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
 // ---- the dashboard on a phone (Roger, 8 Nov 2026: "la visió del mòbil necessita una gran remodelació"; mockup option A): a tab bar at the
 // bottom, Home · Groups · Corrections · Messages · More, instead of the row of menu buttons at the top; a 2A · 2B · 4A · 4B switch at the top
 // of a group's pages (the place stays: 2ESO A's Marks → 2ESO B's Marks). More opens a sheet with the rest of the menu (announcement, student
