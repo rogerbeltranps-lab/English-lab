@@ -18,7 +18,8 @@ hourly task "English Lab: problem reports" is switched off.
 
 ## Each run
 
-1. `git pull`, then `node tools/problems/auto.mjs open`. "Nothing new" → stop at once (no email, no PR, nothing else read).
+1. `git pull`, then `node tools/problems/auto.mjs open`. "Nothing new" (no open report and no new comment) → stop at once (no email, no PR,
+   nothing else read). A line "NEW COMMENTS" → also do "Students' comments, answered at once" below (after the reports, if any).
 2. For each report: read everything it holds, look at the screenshot file it prints (shots from before 6 Nov 2026 can show the folded
    Study guide over the page; the section "Com estudiar / How to study" then means nothing), open the page's code and data, and look at the
    student's own documents only if needed (`students/{uid}/progress`, `results`). Decide:
@@ -54,7 +55,8 @@ answers students' comments on their hand-ins as soon as they send them. When a s
 problem": `elNoComment`), `shared/js/el-cloud.js` sets `students/{uid}.commented` and starts this task the same way as a report
 (action `problem`, so the same 3-minute and 30-a-day limits, and no new token).
 
-Each run, after the reports (or instead of them, when `auto.mjs open` says "Nothing new"):
+`auto.mjs open` says so with a line "NEW COMMENTS: n student(s)…" (one query; then it does not say "Nothing new"). Each run with that
+line, after the reports (or alone, when there is no open report):
 
 1. `node tools/marking/marks.mjs comments --new`. "No new comments." → nothing else to do for comments.
 2. Otherwise answer the sheet exactly as the Friday task does (`/mnt/project-files/claude-answers-preview/daily-answers-task-prompt.md`):
