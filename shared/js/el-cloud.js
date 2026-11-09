@@ -841,13 +841,19 @@ new MutationObserver(()=>draw(user)).observe(document.documentElement,{attribute
 // Class game (lab/game, Roger 26 Oct 2026): while the teacher's board runs a game for the student's group (live/{group}, host.js), a
 // signed-in student is taken into it (lab/game/play.html) from whatever page they are on, and goes back here with the player's Leave.
 const GAME=new URL("lab/game/play.html",ROOT),onGame=location.pathname===GAME.pathname;
+// 🎓 In class mode, a student who was in the game waits in the player after it until the teacher sends the group back to the class
+// (Roger, 9 Nov 2026: "only [...] when I say so"; lab/game/play.js, host.js): leaving it before that (Back key, a link) brings them back
+// there. Released by the board's 🎓 Back to class mode (live/{group}.cmBack) or the class tab moving on after the game (go.at), or when
+// class mode ends. el_game_in = the game the player joined in this browser (play.js).
+const cmHold=x=>{if(!x||!x.game||!x.sid||!elCmOn(x.go)||!x.go.lock)return false;let k="";try{k=localStorage.getItem("el_game_in")||""}catch(e){}
+  return k===String(x.sid)&&+x.sid>(+x.cmBack||0)&&+x.sid>+x.go.at};
 function gamePush(u){
   if(stopGame){stopGame();stopGame=null}
   if(!u||!isStudent(u)||!myGroup||onGame)return;
   let first=true;
   stopGame=onSnapshot(doc(db,"live",myGroup),s=>{const x=s.exists()?s.data():null,ms=x&&x.at&&x.at.toMillis?x.at.toMillis():0;
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
-    if(x&&x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
+    if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
     const f=first,run=()=>{goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},

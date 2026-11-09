@@ -6,7 +6,7 @@
 // class day from the Time plan agenda (ls/{ls}.planEdits[group].agenda, the same list as the dashboard's day card, in the same order, with
 // the minutes). It opens by itself when class mode starts, so the projector shows the plan for the class. A click on a tab or a learning
 // path takes the class tab there and the students follow (class mode); a learning path or tab still locked for the group opens first.
-// 🎮 a game opens the game board in a new tab (students join it as usual); 🎬 Shadowing plays the unit's video over the class tab (the
+// 🎮 a game opens the game board in this class tab (students join it as usual; 🎓 Back to class mode on the board comes back); 🎬 Shadowing plays the unit's video over the class tab (the
 // students stay where they are); other notes are only shown. Reads: the course's LS documents, once per page (the cached ls/{id} read),
 // and only while the panel is open. No writes, except opening a locked learning path or tab.
 const K="el_cm_ag";
@@ -104,7 +104,7 @@ async function draw(){if(!box)return;
       const a=g.a,nos=g.its.length===1&&/#$/.test(g.its[0]),lt=g.its.reduce((s,it)=>s+mn(it),0);
       if(!nos)body+=`<div class="lp">${E((ag.lab||{})[a.id]||(window.elLpLabel?elLpLabel(a):a.title))}${lt?`<small>⏱ ${lt} min</small>`:""}</div>`;
       g.its.forEach(it=>{const p=it.slice(it.indexOf("#")+1),n=its.push({ls:x,it,a,p})-1,m=mn(it),gm=isGame(p),now=!gm&&hereIs(a,p);tot+=m;
-        body+=`<button class="it ${now?"now":""}" data-i="${n}" title="${gm?"Open the game board in a new tab":"Go there: "+E(C.gname)+" follows"}">${m?`<span class="m">${m} min</span>`:""}<span>${E(nos?(window.elLpLabel?elLpLabel(a):a.title):itName(a,p))}</span><span class="go ${now||gm?"":"gt"}">${now?"● now":gm?"↗":"Go →"}</span></button>`})})});
+        body+=`<button class="it ${now?"now":""}" data-i="${n}" title="${gm?"Open the game board here (🎓 Back to class mode brings you back)":"Go there: "+E(C.gname)+" follows"}">${m?`<span class="m">${m} min</span>`:""}<span>${E(nos?(window.elLpLabel?elLpLabel(a):a.title):itName(a,p))}</span><span class="go ${now||gm?"":"gt"}">${now?"● now":gm?"▶ Play":"Go →"}</span></button>`})})});
   const len=+((window.EL_TIMETABLE||{}).len)||60;
   box.innerHTML=`<div class="hd"><b>📋 ${D===t?"Today":"Next class"} · ${E(dLab(D))}</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Hide (📋 Today on the class mode bar shows it again)">✕</button></div>`
     +(its.some(x=>x.a)?`<button class="pr" data-pr="1" title="This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key">🖨 Print session</button>`:"")
@@ -115,7 +115,9 @@ function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dat
   if(b.dataset.pr){const its=(box._its||[]).filter(x=>x.a).map(x=>x.it);window.open(new URL(elPrintDay(its,C.gname,dLab(D)),C.root).href,"_blank","noopener");return}
   const x=(box._its||[])[+b.dataset.i];if(!x)return;
   if(x.it===SHD)return play(new URL(x.ls.ls.shadowing,C.root).href);
-  if(isGame(x.p)){window.open(new URL("lab/game/host.html?deck="+encodeURIComponent(x.p.slice(5))+"&g="+encodeURIComponent(C.g),C.root).href,"_blank","noopener");return}
+  // the game opens in this class tab (Roger, 9 Nov 2026: "when we play a game I should be able to go to the class mode where I came
+  // from"): the board's 🎓 Back to class mode brings the tab back to this page and tab, still in class mode (lab/game/host.js)
+  if(isGame(x.p)){location.href=new URL("lab/game/host.html?deck="+encodeURIComponent(x.p.slice(5))+"&g="+encodeURIComponent(C.g)+"&from="+encodeURIComponent(location.pathname),C.root).href;return}
   go(x,b)}
 // to a tab or a learning path: opened first if it is still locked for the group (as Start class mode on the dashboard does), then the class
 // tab goes there (same page: only the tab changes) and cmTeacher sends it to the students
