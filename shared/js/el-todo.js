@@ -45,6 +45,8 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
     return {x,done:Object.keys(tg).length>0&&!left.length,href:left.length?href(left[0][0],left[0][1]):null}});
   // the homework (set by the teacher) a learning path belongs to, for its 📝 homework by … tag; otherwise 🏫 in class (Roger, 8 Nov 2026)
   const hwOf=a=>{const xs=W.studentHw(p,gi,((info||{}).homework||{})[group]);for(const x of xs){const tg=window.elHwTargets?elHwTargets(x,ls,p,gi)||{}:{};if(tg[a.id])return x}return null};
+  // 🎯 Test yourself (Roger, 9 Nov 2026: the sample exam is optional, never a to-do item): the LS's optional practice, as a link under the list
+  const opt=()=>seesAll?"":acts.filter(a=>a.optional&&canDo(a)).map(a=>`<div class="sub">🎯 ${t("Posa't a prova (opcional)","Test yourself (optional)")}</div><ul><li class="it"><span class="tt">${esc(a.title)}</span><a href="${href(a)}">${t("Obre","Open")}</a></li></ul>`).join("");
   function counts(){return todo().reduce((n,x)=>n+(x.tabs.length||1),0)}   // activities (tabs), the same number as the ✅ To do tile on the board and 📋 My activities (late + opened)
   function panel(){const ex=W.exam(p,gi),n=ex?W.days(today,ex):null,td=todo(),hw=hws();
     const exam=ex&&n>=0?`<div class="ex">📝 ${t("Examen","Exam")}: ${W.date(ex,lang)}${n>1?t(` · d'aquí a ${n} dies`,` · in ${n} days`):n===1?t(" · demà"," · tomorrow"):t(" · avui"," · today")}</div>`:"";
@@ -55,6 +57,7 @@ export async function start({db,user,group,root,lsId,seesAll,results,levels,lsIn
       :`<p class="cl">✓ ${t("Has acabat tot el que el professor ha obert.","You have finished everything your teacher has opened.")}</p>`;
     return `<div class="hd"><b>✅ ${t("Per fer","To do")}</b><button type="button" data-x aria-label="${t("Tanca","Close")}">✕</button></div><div class="bd">${exam}${hwh}`
       +`<div class="sub">${t("El que el professor ha obert i encara no has acabat:","What your teacher has opened and you haven't finished:")}</div>${tdh}`
+      +opt()
       +`<a class="all" href="${new URL("today.html#todo",root).href}">${t("Al meu tauler","On my board")} →</a></div>`}
 
   const css=document.createElement("style");css.textContent=`

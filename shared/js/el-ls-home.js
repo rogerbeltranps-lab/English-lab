@@ -103,7 +103,7 @@
     const can=a=>{const ks=stepsOf(a);if(all||closed)return ks;const ds=doneOf(a),off=offOf(a);return ks.filter(k=>ds.has(k)||!isOff(off,k))};
     const vis=a=>{const ks=stepsOf(a);if(all||closed)return ks;const ds=doneOf(a),off=offOf(a),soon=soonOf(a);return ks.filter(k=>ds.has(k)||!isOff(off,k)||soon.includes(k))};
     let next=null;
-    if(!all&&!closed)for(const {a} of rows){if(a.manual||dropped.includes(a.id)||!open(a)||done(a)||!can(a).some(k=>!doneOf(a).has(k)))continue;
+    if(!all&&!closed)for(const {a} of rows){if(a.manual||a.optional||dropped.includes(a.id)||!open(a)||done(a)||!can(a).some(k=>!doneOf(a).has(k)))continue;
       const cp=elCheckpointMissing(a,doneOf,open),k=can(a).find(x=>!doneOf(a).has(x)&&!(a.skip||[]).includes(x));next=cp?{a:cp,cp:true}:{a,k};break}
     const soonAny=!all&&!closed&&rows.some(({a})=>open(a)&&!dropped.includes(a.id)&&soonOf(a).some(k=>!doneOf(a).has(k)));
     return {open,done,dropped,next,all,closed,vis,soonAny};
