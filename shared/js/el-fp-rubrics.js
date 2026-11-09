@@ -37,4 +37,40 @@ window.EL_FP_RUBRICS={
         "I rehearse, make a test video, watch it and improve it. At the end of the video I say in one sentence what I improved (e.g. 'After my test video, I spoke more slowly.'), and the change shows.",
         "At the end of the video I say what I improved, but the change hardly shows or the sentence is unclear.",
         "I don't say what I improved, but the video shows I rehearsed: few pauses and I look little at my notes.",
+        "Nothing shows rehearsal or review: I read, stop often, or the video has problems a review would have caught (sound, camera, slides)."]}]},
+  // LS1 2 ESO (Roger, 5 and 8 Nov 2026: "the rubric for the 2ESO videos … should appear like the one of 4th of ESO"): one A1 rubric for everyone,
+  // the PDF LS1-2ESO-final-product-rubric-A1.pdf / Google Doc "LS1 2ESO Final product rubric (one level A1)"; same rows, weights and points as 4 ESO.
+  "2eso/final-product":{title:"LS1 2 ESO · Final product: My Real Routine (video)",
+    note:"One rubric for everyone, about A1. You describe your classmate's routine; no comparison with your own routine is needed. Total 80 points; mark out of 10 = points ÷ 8.",
+    levels:["Very good","Good","Fair","Developing","No evidence"],
+    rows:[
+      {name:"Speaking",sub:"Oral explanation of the routine",w:30,pts:[24,18,12,6,0],d:[
+        "I explain at least 4 ideas about my classmate's routine in order (morning, after school, evening). I speak slowly, I am easy to understand and I only glance at the slides (I don't read full sentences).",
+        "I explain at least 4 ideas in order and I am easy to understand, but I read 1–2 full sentences.",
+        "I explain only 2–3 ideas, or I don't follow the order (morning, after school, evening), or I read more than 2 full sentences; the main message can be understood.",
+        "I explain only 1 idea, or I read everything, or I cannot be understood."]},
+      {name:"Language",sub:"Present Simple and routine expressions",w:20,pts:[16,12,8,4,0],d:[
+        "I use he/she + Present Simple in my sentences about my classmate (e.g. She wakes up at seven.) with at most 1 mistake (e.g. forgetting the -s), and at least 4 studied routine expressions.",
+        "I use he/she + Present Simple with 2–3 mistakes (e.g. forgetting the -s) and at least 3 studied routine expressions.",
+        "I make 4–5 mistakes with he/she + Present Simple, or use only 1–2 studied routine expressions.",
+        "I make 6 or more mistakes with he/she or use no studied expressions; it is hard to understand what I mean."]},
+      {name:"Google Slides",sub:"Content and visual support",w:10,pts:[8,6,4,2,0],d:[
+        "All 5 slides are there (Title, Morning, After school, Evening, Health reflection). Each has short English sentences (2 lines at most) and an image or icon. The reflection slide says if the routine is healthy, partly healthy or not very healthy.",
+        "All 5 slides are there, but 1 has no image or icon, or has a long paragraph.",
+        "Only 3 or 4 of the 5 slides are there, or 2 or more have long paragraphs or no image.",
+        "Only 2 or fewer slides are there, or the text is too small or too long to read."]},
+      {name:"Pronunciation & intonation",sub:"Shadowing: my voice goes up and down",w:15,pts:[12,9,6,3,0],d:[
+        "My voice goes up and down as in the shadowing videos: I stress the important words, I pause between ideas and my voice goes down at the end of them. I am easy to understand almost all the time.",
+        "My voice goes up and down in most of the presentation, but some sentences are flat or some pauses are strange. I am easy to understand.",
+        "My voice is quite flat and I stress few important words. Some pauses don't help to follow the ideas, but the main message is understood.",
+        "I speak almost always in the same tone, with no clear pauses, or my intonation and pronunciation make the message hard to understand."]},
+      {name:"Interview & reflection",sub:"Interaction and healthy habits",w:15,pts:[12,9,6,3,0],d:[
+        "My notes have my classmate's actions, times and habits (food, drink, activity or screens). I say I think his/her routine is… because… and give at least 1 real detail from the interview as a reason.",
+        "My notes have only 2 of the 3 elements (actions, times, habits), but my judgement has a reason with at least 1 real detail from the interview.",
+        "My judgement has only a general reason (e.g. 'because it is good'), with no interview detail.",
+        "There is no judgement or reason, or I talk about the person's body or weight instead of habits."]},
+      {name:"Learning strategies",sub:"CE9 9.2: rehearse, review and improve",w:10,pts:[8,6,4,2,0],d:[
+        "I rehearse, make a test video, watch it and improve it. At the end of the video I say in one sentence what I improved (e.g. After my test video, I spoke more slowly.), and the change shows.",
+        "At the end of the video I say what I improved, but the change hardly shows or the sentence is unclear.",
+        "I don't say what I improved, but the video shows I rehearsed: few pauses and I look little at my notes.",
         "Nothing shows rehearsal or review: I read, stop often, or the video has problems a review would have caught (sound, camera, slides)."]}]}};

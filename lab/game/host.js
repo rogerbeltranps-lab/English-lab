@@ -263,15 +263,18 @@ function endGame(){
 
 /* ---------- screens ---------- */
 const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1,s0=cur();
-  const w=who(),gone=w.out.filter(y=>y.why!=="never"),never=w.out.filter(y=>y.why==="never");
+  const w=who(),{gone,back,never}=elWhoLeft(w);
+  // who left stays named on the board, without a tap (Roger, 9 Nov 2026: "and even in game mode"; elWhoLeft in el-catalog.js):
+  // out now in red, left full screen and came back in orange; the pill still opens the whole list
+  const strip=w.active&&(gone.length||back.length)?`<div class="wholeft">${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("")}${back.length?`<span class="b">↩ Left and came back: ${back.map(y=>`<b>${esc(y.name)}</b> <small>(${y.left.n>1?y.left.n+"×, last ":""}${hm(y.left.at)})</small>`).join(", ")}</span>`:""}</div>`:"";
   const box=WHO.open&&w.active?`<div class="whobox pop">${gone.length?`<p>${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("<br>")}</p>`:""}${never.length?`<p class="nv">⚪ Not in the game (${never.length}): ${never.map(y=>esc(y.name)).join(", ")}</p>`:""}<p class="i">✓ In (${w.inn.length}): ${w.inn.map(y=>esc(y.name)).join(", ")||"nobody yet"}</p></div>`:"";
   return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">🎮 ${Object.keys(H.players).length}</span>
-  ${w.active?`<button class="pill who${w.out.length?" warn":""}" data-do="who" title="Who is in full screen and connected, and who is out (tap to show or hide the names)">✓ ${w.inn.length} in · ✗ ${w.out.length} out</button>`:""}${box}
+  ${w.active?`<button class="pill who${gone.length?" warn":""}" data-do="who" title="Who is in full screen and connected, who left and who is not in the game (tap to show or hide the names)">✓ ${w.inn.length} in · ✗ ${gone.length} left${never.length?` · ⚪ ${never.length} not here`:""}</button>`:""}${box}
   ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}`:isN(cur())?"📝 Notes":"Theory"}</span>`:""}<span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}
   ${H.phase==="show"&&s0&&!isQ(s0)&&s0.ca?`<button class="btn ghost${caOn()?" on":""}" data-do="ca" title="Catalan help on this slide (C)">CA</button>`:""}
   <button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
-  <button class="btn ghost" data-do="end" title="End the game for everyone">${Date.now()-endArm<3000?"Tap again to end":"■ End"}</button></div>`};
+  <button class="btn ghost" data-do="end" title="End the game for everyone">${Date.now()-endArm<3000?"Tap again to end":"■ End"}</button>${strip}</div>`};
 // one block of a theory slide: text, a table {table} or a warning {watch} (also the small copy on the notes slide)
 function blockHtml(l,hid,fresh){
   if(l&&l.table){const [h,...r]=l.table;return `<table class="tt${fresh}"${hid}><thead><tr>${h.map(c=>`<th>${md(c)}</th>`).join("")}</tr></thead><tbody>${r.map(x=>`<tr>${x.map(c=>`<td>${md(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}

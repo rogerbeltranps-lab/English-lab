@@ -836,15 +836,24 @@ var LS2 = (function () {
   // Static content; html may be a function so it can read saved work. Not a step.
   R.info = p => ({ html: '<div class="section-card">' + (typeof p.html === 'function' ? p.html(level) : tx(p.html)) + '</div>', bind() { if (p.after) p.after(level); } });
 
+  /* p.video (final product, Roger 8 Nov 2026: "students load the final product on the web"): an "Upload your video" card above the list
+     (shared/js/el-video.js). The upload is kept as the hand-in state.steps.video ({video: {id, name, size, at}}, no fields, so the
+     Wednesday correction skips it); the dashboard plays it and Gemini watches it. p.video === 'group': any member may upload the group's
+     video, so Done does not wait for it; otherwise Done waits for the upload. */
   R.checklist = p => ({
-    html: '<div class="section-card"><div class="options" id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Ok">' + (ca() ? 'Fet ✓' : 'Done ✓') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>',
+    html: (p.video ? '<div id="' + p.id + 'Video"></div>' : '') + '<div class="section-card"><div class="options" id="' + p.id + 'List"></div><div class="actions"><button class="btn" type="button" id="' + p.id + 'Ok">' + (ca() ? 'Fet ✓' : 'Done ✓') + '</button></div><p class="feedback" id="' + p.id + 'Msg"></p></div>',
     bind() {
       state.ticks = state.ticks || {};
       const items = byLevel(p.items) || [], key = p.id + '_' + level;
       $('#' + p.id + 'List').innerHTML = items.map((c, i) => '<label class="option"><input type="checkbox" data-i="' + i + '"' + ((state.ticks[key] || [])[i] ? ' checked' : '') + '><span>' + c + '</span></label>').join('');
       $$('#' + p.id + 'List input').forEach(b => b.onchange = () => { state.ticks[key] = $$('#' + p.id + 'List input').map(x => x.checked); save(); });
+      state.steps = state.steps || {};
+      if (p.video && window.elVideo) elVideo.mount($('#' + p.id + 'Video'), { ca: ca(), saved: (state.steps.video || {}).video,
+        meta: { activity: p.videoActivity || '', level, title: tx(p.videoTitle || { ca: 'Producte final', en: 'Final product' }) },
+        onDone: v => { state.steps.video = { level, title: ca() ? 'El meu vídeo' : 'My video', f: [], video: v, rate: [], avg: null, comment: '', date: v.at }; save(); } });
       $('#' + p.id + 'Ok').onclick = () => {
         const boxes = $$('#' + p.id + 'List input'), msg = $('#' + p.id + 'Msg');
+        if (p.video === true && window.elVideo && !(state.steps.video || {}).video) { msg.className = 'feedback no'; msg.textContent = ca() ? 'Primer puja el teu vídeo a dalt.' : 'Upload your video above first.'; return; }
         if (boxes.some(b => !b.checked)) { msg.className = 'feedback no'; msg.textContent = learningSupport.missing(level, boxes); return; }
         msg.className = 'feedback ok'; msg.textContent = ca() ? 'Fet ✓' : 'Done ✓'; complete(p.id);
       };

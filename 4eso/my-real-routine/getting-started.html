@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
 <meta charset="utf-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
@@ -36,8 +36,10 @@
 #speak .record-status{padding:10px 12px;border-radius:11px;background:#f4f7fb;color:#5e6f86;border:1px solid var(--line)}
 </style>
 <link rel="stylesheet" href="../../shared/css/lp-theme-4eso.css">
+<link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu and the LS2 learning path layout before the first paint (Roger, 8 Nov 2026) -->
 </head>
 <body>
+<script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws -->
 <div class="topbar"><div class="wrap toprow">
   <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← My Real Routine</a><span class="brand-mark">1</span><span class="brand-title">Getting started<small>4 ESO · My Real Routine · Learning Path 1</small></span></div>
   <div class="session-jump">
@@ -365,6 +367,7 @@ if(sessionAccessSelect&&sessionAccessGo){
 }
 </script>
 <script src="../../shared/js/section-next.js"></script>
+<script src="../../shared/js/ls1-lp.js"></script><!-- the LS2 learning path layout (Roger, 8 Nov 2026) -->
 <script>
 sectionNext.init({level:()=>level,panels:[
  {id:'quick',done:()=>!!state.done.quick,detail:ca=>ca?'Prem «Ja he triat ✓».':'Press “Done ✓”.'},
@@ -374,6 +377,9 @@ sectionNext.init({level:()=>level,panels:[
 sectionNext.undo({button:document.getElementById('finishQuick'),level:()=>level,isDone:()=>!!state.done.quick,undo:()=>{delete state.done.quick;save();document.getElementById('quickResult').classList.remove('show')}});
 sectionNext.final({id:'speak',level:()=>level,done:()=>!!state.done.speak,detail:ca=>ca?'Grava el teu àudio i atura la gravació.':'Record your audio and stop the recording.'});
 </script>
+<!-- the app menu and the learning path's left column at once, before the browser paints (as the LS2 pages) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

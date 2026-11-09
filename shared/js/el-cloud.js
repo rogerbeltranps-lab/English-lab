@@ -302,7 +302,7 @@ async function gate(u){
   if(!u&&!AS){signInBlock();return}   // signed out: the Sign in screen at once (it came after reading the LS, the same way)
   const info=await lsInfo(lsId),st=info.status;
   if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
-  if(isTeacher(u)&&!AS){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);if(!/-my-real-routine$/.test(lsId))openHashTab();return}   // the tab in the link (dashboard column names, Roger 7 Nov 2026: "should go to the SLP not the LP"); an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
+  if(isTeacher(u)&&!AS){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);if(!/-my-real-routine$/.test(lsId)){openHashTab();teacherCore()}return}   // the tab in the link (dashboard column names, Roger 7 Nov 2026: "should go to the SLP not the LP"); an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
   if(AS)asBanner();
   else if(!u||!isStudent(u)){signInBlock();return}
   const tester=!AS&&seesAll(u),vg=!AS&&viewGroup(u);
@@ -503,6 +503,7 @@ async function teacherSections(info){
     +".el-tsec button.on{background:#4338ca;color:#fff;border-color:#4338ca}.el-tsec button.g{background:none;border-color:transparent;text-decoration:underline;font-weight:500}.el-tsec small{display:block;color:#475569;margin-top:6px}"
     +".el-tsec .w{margin-top:8px;padding:6px 10px;border-radius:8px;background:#fef2f2;color:#991b1b;font-weight:600}.el-tsec .w button{margin-left:6px}.el-tsec .m{margin-left:6px;color:#15803d;font-weight:600}.el-tsec .m.err{color:#b91c1c}"
     +".el-tsec .pl{margin-top:8px;padding-top:8px;border-top:1px dashed #a5b4fc}.el-tsec .pl button[data-cm]:not(.g){background:#0f766e;border-color:#0f766e;color:#fff}.el-tsec .now{color:#0f766e;font-weight:700}.el-tsec .pl button.fs.on{background:#1e293b;border-color:#1e293b;color:#fff}.el-tsec .fsl{flex-basis:100%;font-size:13px;color:#9a3412;font-weight:600}"
+    +".el-gpl{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:2px;font:600 12px system-ui,sans-serif}.el-gpl em{font-style:normal;padding:1px 8px;border-radius:999px;background:#fee2e2;color:#991b1b}.el-gpl em.y{background:#dcfce7;color:#166534}.el-gpl b{font-weight:800}"
     +".tab .el-tsw{display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;font-size:12px;line-height:18px;background:#dcfce7;border:1px solid #86efac;cursor:pointer;vertical-align:1px}"
     +".tab .el-tsw.off{background:#fee2e2;border-color:#fca5a5}.tab .el-tsw:hover{outline:2px solid #6366f1}.tab.el-toff{border-style:dashed!important;opacity:.75}";
   document.head.append(st);
@@ -543,26 +544,47 @@ async function teacherSections(info){
   // while the group is in full screen, the same state and list stay fixed at the top right of the page, also when scrolling (Roger, 5 Nov 2026)
   // the whole group, in or out (Roger, 6 Nov 2026), as on the dashboard: the group's student list (read once), ▾ makes it small,
   // and it opens again by itself when a student who was in goes out (elClassRoll in el-catalog.js)
-  // in the class tab (on the projector) the panel stays small: counts only, the names one tap away
+  // in the class tab (on the projector) the panel starts small: the counts and who left by name, everybody one tap away
   const fsRo={},fsMin={on:!!cmRead(),was:new Set()},E=t=>String(t==null?"":t).replace(/</g,"&lt;");
   const fsRoll=()=>{const w=elClassRoll(Object.assign({},fsLive,{fs:fsE()}),fsList,fsHere,fsRo[g]||[]),now=new Set(w.inn.map(y=>y.e));
     if(fsMin.on&&!cmRead()&&w.out.some(y=>fsMin.was.has(y.e)))fsMin.on=false;fsMin.was=now;return w};
   const fsWhy=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+fsHm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+fsHm(y.seen):y.why==="lost"?"lost connection · since "+fsHm(y.seen):"not connected";
+  let AT=null;const atApi=()=>({db,doc,setDoc,onSnapshot,deleteField:FBM[2].deleteField}),attRedraw=()=>draw();
   function fsFloat(w){let f=document.getElementById("el-fsfloat");if(!w.active){if(f)f.remove();return}
-    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147481000;max-width:min(380px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
-      f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.min){fsMin.on=!fsMin.on;draw()}else fsToggle()};document.body.append(f)}
-    const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;",gone=w.out.filter(y=>y.why!=="never"),never=w.out.filter(y=>y.why==="never");
-    const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+'<button data-min="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(fsMin.on?"Show the names":"Make this small (it opens again when someone goes out)")+'">'+(fsMin.on?"▸":"▾")+'</button></span></div>'
+    if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147483000;max-width:min(420px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
+      f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.att){if(AT&&AT.cur)AT.m.attClick(b,atApi(),g,AT.cur,AT.w,fsRo[g]||[]).then(r=>{if(r)draw()});return}
+        if(b.dataset.min){fsMin.on=!fsMin.on;draw()}else fsToggle()};document.body.append(f)}
+    // 🙋 attendance of this class (el-attend.js, loaded only here): "not here" until saved, then "absent"; ✗ counts only who left
+    if(!AT){AT={m:null};import("./el-attend.js").then(m=>{AT.m=m;draw()}).catch(e=>console.warn("attendance",e))}
+    const aS=AT.m?AT.m.attClass(g,fsTT(),fsE(),w):0;AT.cur=aS;AT.w=w;const aR=aS?AT.m.attWatch(atApi(),g,aS,attRedraw):undefined;
+    if(aS)AT.m.attLate(atApi(),g,aS,w);
+    const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;",{gone,back,never}=elWhoLeft(w);
+    const av=aS?AT.m.attView(w,aR,fsMin.on):{n:never.length,label:"not here",html:""};
+    const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+'<button data-min="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(fsMin.on?"Show everybody":"Make this small: the names of who left stay")+'">'+(fsMin.on?"▸":"▾")+'</button></span></div>'
       +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsE().until)+(fsE().auto?' (class, by your timetable)':''):'')+'</div>'
-      +'<div style="margin-top:4px;font-size:15px"><b style="color:#166534">✓ '+w.inn.length+' in</b> · <b style="color:#b91c1c">✗ '+w.out.length+' out</b> <span style="color:#64748b;font-weight:500">of '+w.n+'</span></div>'
-      +(fsMin.on?'':'<div style="margin-top:6px;max-height:40vh;overflow:auto;line-height:1.5">'
+      +'<div style="margin-top:4px;font-size:15px"><b style="color:#166534">✓ '+w.inn.length+' in</b> · <b style="color:#b91c1c">✗ '+gone.length+' left</b> · <span style="color:'+(av.label==="absent"?"#b91c1c":"#64748b")+';font-weight:600">'+(av.label==="absent"?"🙋 ":"⚪ ")+av.n+' '+av.label+'</span> <span style="color:#64748b;font-weight:500">of '+w.n+'</span></div>'+av.html
+      // who left stays named, also small, on the projector and over a video (Roger, 9 Nov 2026: "I need their names to be there … even when
+      // we are watching a video"; elWhoLeft and elPlayVideo in el-catalog.js): out now in red, left and came back in orange; the rest when not small
+      +'<div style="margin-top:6px;max-height:'+(fsMin.on?'30vh':'40vh')+';overflow:auto;line-height:1.5">'
         +gone.map(y=>'<div style="color:#b91c1c">✗ <b>'+E(y.name)+'</b> · '+fsWhy(y)+'</div>').join("")
-        +(never.length?'<div style="color:#475569;margin-top:4px">⚪ Not connected ('+never.length+'): '+never.map(y=>E(y.name)).join(", ")+'</div>':'')
-        +(w.inn.length?'<div style="color:#166534;margin-top:4px">✓ In ('+w.inn.length+'): '+w.inn.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b;margin-top:4px">Nobody is in yet: they tap their screen to go full screen.</div>')+'</div>');
+        +(back.length?'<div style="color:#c2410c;margin-top:4px">↩ Left and came back ('+back.length+'): '+back.map(y=>'<b>'+E(y.name)+'</b> <span style="font-weight:500;font-size:12px">('+(y.left.n>1?y.left.n+'×, last ':'')+fsHm(y.left.at)+')</span>').join(", ")+'</div>':'')
+        +(fsMin.on?''
+        :(never.length&&!av.html?'<div style="color:#475569;margin-top:4px">⚪ Not here ('+never.length+'): '+never.map(y=>E(y.name)).join(", ")+'</div>':'')
+        +(w.inn.length?'<div style="color:#166534;margin-top:4px">✓ In ('+w.inn.length+'): '+w.inn.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b;margin-top:4px">Nobody is in yet: they tap their screen to go full screen.</div>'))+'</div>';
     if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}
   // no full screen button any more (Roger, 7 Nov 2026): it is on during every class of the timetable and while class mode is on
   function fsRow(w){const x=fsE(),on=!!x;
     return (w.active?'<div class="fsl">⛶ Full screen '+gname(g)+' · '+(on?'until '+fsHm(x.until):'🎮 in a game')+' · ✓ '+w.inn.length+' in · ✗ '+w.out.length+' out'+(w.out.length&&!cmRead()?': '+w.out.map(y=>E(y.name)+" ("+fsWhy(y)+")").join(" · "):"")+'</div>':"")}
+  // Has the group played this learning path's class games? (Roger, 8 Nov 2026: "see whether the group has played the games of the LP"):
+  // under each 🎮 game button, every group of the course with ✓ + the day it was played or ✗ not yet, the group picked above in bold.
+  // From ls/{id}.played[group][deck] (written by the game board, lab/game/host.js markPlayed), already in the LS doc this page reads: no extra reads.
+  const plDay=ms=>new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  function gamesPlayed(){const P=info.played||{};
+    document.querySelectorAll('a[href*="host.html?deck="]').forEach(a=>{let id="";try{id=new URL(a.href).searchParams.get("deck")||""}catch(e){}if(!id)return;
+      let s=a.querySelector(".el-gpl");if(!s){s=document.createElement("div");s.className="el-gpl";a.style.flexWrap="wrap";a.append(s)}
+      const h=grs.map(x=>{const ms=(P[x.id]||{})[id],nm=x.id===g?"<b>"+E(x.name)+"</b>":E(x.name);
+        return ms?'<em class="y">✓ '+nm+' · '+plDay(ms)+'</em>':'<em class="n">✗ '+nm+' · not yet</em>'}).join("");
+      if(s.dataset.h!==h){s.dataset.h=h;s.innerHTML=h;s.title="Played in class by each group (✓ day / ✗ not yet)"}})}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
   function cmRow(){fsWatch();const x=fsLive&&fsLive.go,on=elCmOn(x),me=cmRead(),mine=me&&me.g===g;
     return '<div class="r pl"><b>🎓 Class mode for '+gname(g)+'</b>'
@@ -590,6 +612,7 @@ async function teacherSections(info){
       +(elLpOpen(a,info,g,true)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
     if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html;try{origSet.call(localStorage,"el_tsec_"+relPath,JSON.stringify({h:html,css:st.textContent,all,off}))}catch(e){}}   // for el-app.js tsecEarly on the next visit
     fsFloat(fsRoll())
+    gamesPlayed();
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);
       let sw=t.querySelector(".el-tsw");if(!sw){sw=document.createElement("span");sw.className="el-tsw";sw.setAttribute("role","button");
         sw.onclick=e=>{e.stopPropagation();e.preventDefault();toggle(id)};t.append(sw)}
@@ -597,6 +620,11 @@ async function teacherSections(info){
       if(sw.textContent!==tx)sw.textContent=tx;if(sw.title!==ti)sw.title=ti;sw.classList.toggle("off",!on);t.classList.toggle("el-toff",!on)})}
   draw();new MutationObserver(()=>draw()).observe(document.body,{childList:true,subtree:true});
 }
+// Core by default for the teacher (Roger, 8 Nov 2026: "is it possible to see core as a default"): a learning path opens on the Core (B1)
+// route in teacher mode, whatever level was picked last time; the Level buttons still switch it for this visit. Students keep their
+// own route (applyLevel), and with none yet Base. Waits for the page's route buttons to be ready (ls2-engine.js init sets onclick).
+function teacherCore(){let n=0;const go=()=>{const b=document.querySelector('.route[data-level="safe"]');
+  if(b&&b.onclick){if(!b.classList.contains("active"))b.click();return}if(++n<60)setTimeout(go,150)};go()}
 // A link to a section (activity.html#read, from the to-do list) opens that tab once the page is ready.
 function openHashTab(){const id=decodeURIComponent(location.hash.slice(1));if(!id)return;const t=[...document.querySelectorAll(".tab[data-panel]")].find(x=>x.dataset.panel===id);if(t)t.click()}
 addEventListener("hashchange",openHashTab);
