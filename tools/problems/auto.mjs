@@ -55,7 +55,12 @@ const when=x=>Date.parse(x.created||"")||0;
 
 if(cmd==="open"){
   const L=(await list("problems")).filter(x=>!x.fixed&&(flag("--all")||!x.auto)).sort((a,b)=>when(a)-when(b));
-  console.log(L.length?L.length+" open report(s)"+(flag("--all")?"":" not looked at yet")+".":"Nothing new: no open report to look at.");
+  // students' new comments (Roger, 9 Nov 2026: "I want you to answer straight away"): the same task answers them. One query: students whose
+  // page saved a comment after settings/marking.cmtRun (el-cloud.js sets students/{uid}.commented; marks.mjs comments --new reads them).
+  const since=(doc(await api("GET",DOCS+"settings/marking"))||{}).cmtRun||"1970-01-01T00:00:00Z";
+  const nc=((await api("POST",DOCS.replace(/\/$/,"")+":runQuery",{structuredQuery:{from:[{collectionId:"students"}],where:{fieldFilter:{field:{fieldPath:"commented"},op:"GREATER_THAN",value:{timestampValue:since}}}}}))||[]).filter(x=>x.document).length;
+  console.log(L.length?L.length+" open report(s)"+(flag("--all")?"":" not looked at yet")+".":nc?"No open report to look at.":"Nothing new: no open report to look at and no new comment.");
+  if(nc)console.log(`NEW COMMENTS: ${nc} student(s) wrote a comment since the last run. Answer them: docs/general/problem-reports-auto.md, section "Students' comments, answered at once" (node tools/marking/marks.mjs comments --new).`);
   for(const x of L){
     const en=!!x.route&&!elCa(x.route);
     console.log("\n=== "+x.id+" · "+(x.created||"?")+" · "+(x.name||"?")+" ("+(x.group||"no group")+", route "+(x.route||"none")+" → answer in "+(en?"English":"Catalan")+")");
