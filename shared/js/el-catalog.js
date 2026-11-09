@@ -295,13 +295,27 @@ window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gi
 // The board's ✅ To do and the floating ✅ To do button (el-todo.js) use it. p, gi = the group's plan (or null, -1); doneOf(a) = Set of the
 // student's done steps; isDone(a) = every step done. Returns [{a, tabs: [[panel id, name]], due, late, cp}] in the order of the plan
 // (due day, then the LS's order); cp = the recall checkpoint to do first (elCheckpointMissing), or null.
+// Only what was due before today's class (Roger, 9 Nov 2026: "it only should be on the list what was due before today's class. What I plan
+// to do in class and I put it on the agenda and stays open they think that it's homework and that they have to do it"): when the group has
+// a Time plan agenda, a tab is in ✅ To do only if it was on a class day before today (the agenda, or ticked as done in class: ls/{id}.done)
+// or the teacher set it as homework (from its set day). Open tabs planned for today or later, or on no class day, are not To do.
+// Returns {acts: Set of whole paths, tabs: {activity id: Set of panel ids}}, or null when the group has no agenda (then opened = To do).
+window.elDueBefore=function(info,gid,today){const ag=elAgendaOf(info,gid);if(!ag)return null;today=today||agToday();
+  const v={acts:new Set(),tabs:{}},add=(it,d)=>{if(d!==true&&(!d||d>=today))return;it=String(it);const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;
+    const id=it.slice(0,i),p=it.slice(i+1);if(/^game:/.test(p))return;if(!p)v.acts.add(id);else (v.tabs[id]=v.tabs[id]||new Set()).add(p)};
+  Object.entries(ag.days||{}).forEach(([d,its])=>(its||[]).forEach(it=>add(it,d)));
+  Object.entries(((info.done||{})[gid])||{}).forEach(([k,d])=>add(k,d));
+  Object.values(((info.homework||{})[gid])||{}).forEach(h=>{if(!h||!h.tabs||typeof h.tabs!=="object"||h.set&&h.set>today)return;
+    Object.entries(h.tabs).forEach(([id,ps])=>{if(!ps||!ps.length)v.acts.add(id);else ps.forEach(p=>add(id+"#"+p,true))})});
+  return v};
 window.elTodoList=function(ls,info,gid,doneOf,isDone,p,gi){const st=info&&info.status==="public"?"open":info&&info.status;if(st!=="open"||!gid)return [];
   const W=window.ELWeek,today=W?W.today():new Date().toISOString().slice(0,10),dr=(p&&gi>=0&&(p._dropped||{})[gi])||[],due=a=>p&&gi>=0&&W?W.due(p,a.id,gi):null;
-  return (window.EL_CATALOG||[]).filter(a=>a.ls===ls).map((a,i)=>({a,i,d:due(a)})).filter(({a})=>!a.manual&&!a.optional&&!dr.includes(a.id)&&elLpOpen(a,info,gid)&&!isDone(a))
+  const db=window.EL_RAW_OPEN?null:elDueBefore(info,gid),dueA=a=>!db||db.acts.has(a.id)||!!db.tabs[a.id],dueT=(a,id)=>!db||db.acts.has(a.id)||!!(db.tabs[a.id]&&db.tabs[a.id].has(id));
+  return (window.EL_CATALOG||[]).filter(a=>a.ls===ls).map((a,i)=>({a,i,d:due(a)})).filter(({a})=>!a.manual&&!a.optional&&!dr.includes(a.id)&&elLpOpen(a,info,gid)&&!isDone(a)&&dueA(a))
     .sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i)
     .map(({a,d})=>{const done=doneOf(a),secs=(window.EL_SECTIONS||{})[a.id]||[],off=secs.length?elSecLockedFor(a,info,gid,done):[];
-      const tabs=secs.filter(([id])=>!off.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done));
-      if(secs.length&&!tabs.length)return null;   // what is open is done; the rest is still locked
+      const tabs=secs.filter(([id])=>!off.includes(id)&&dueT(a,id)&&elSecSteps(a,id).length&&!secDone(a,id,done));
+      if(secs.length&&!tabs.length)return null;   // what is open and due is done; the rest is still locked or for a later class
       return {a,tabs,due:d,late:!!(d&&d<today),cp:elCheckpointMissing(a,doneOf,y=>elLpOpen(y,info,gid))}}).filter(Boolean)};
 // "LP3" in the group's plan → its learning path ("LP3 Where traditions come from" somewhere in the plan): {"3": activity}
 window.elLpNumMap=function(ls,p,gi){const m={},acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls),sh=x=>String(x).split(/[:(]/)[0].trim().toLowerCase();
@@ -398,7 +412,8 @@ window.elWhoLeft=w=>({gone:(w.out||[]).filter(y=>y.why!=="never"),back:(w.inn||[
 // showing, a video that goes full screen comes back into the page, fills the screen there (.el-bigvid) and the page goes full screen
 // instead: the panel stays on top of the video. ✕ Smaller or Esc puts it back. elPlayVideo(src) plays a video over the page (the unit's
 // shadowing video from the dashboard's agenda or the class tab's 📋 Today), with ⛶ Full screen that does the same. No reads, no writes.
-(function(){if(window.elPlayVideo)return;const d=document,R=d.documentElement,fsEl=()=>d.fullscreenElement||d.webkitFullscreenElement;
+(function(){if(window.elPlayVideo||typeof document==="undefined")return;   // no page (the email tools load this file in Node)
+  const d=document,R=d.documentElement,fsEl=()=>d.fullscreenElement||d.webkitFullscreenElement;
   const watch=()=>!!(d.getElementById("el-fsfloat")||d.querySelector("#fsctl.on"));
   const css=()=>{if(d.getElementById("el-vidcss"))return;const s=d.createElement("style");s.id="el-vidcss";s.textContent=
     ".el-bigvid{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;z-index:2147482000!important;background:#000!important;object-fit:contain}"
