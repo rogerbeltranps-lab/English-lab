@@ -1553,8 +1553,9 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
       const past=!sk&&can&&!drop&&sd&&sd<today,ln=go&&!off;cnt(drop||!can||off?"off":past?"miss":"todo");
       if(ln&&!sk&&!next&&!a.optional)next={a,k,nm,past};
       const tip=`${esc(nm)}: ${t("no fet","not done")}${sk?t(" (sense punts)"," (no points)"):""}${off?t(" (encara no està oberta)"," (not open yet)"):""}${sd&&(TX||past)?" · "+t("fins al","by")+" "+sd:""}${ln?" · "+t("clica per obrir-la","click to open it"):""}`;
-      const lbl=`${off?"🔒":past?"✗":"·"} ${esc(nm)}`;
-      return ln?`<a class="stp go2 ${past?"no":""}" href="${tabHref(a,k)}" title="${tip}">${lbl} →</a>`:`<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${tip}">${lbl}</span>`}).join("");
+      const red=past||(ln&&!sk&&dueB(a));   // done in class and missing: red too (Roger, 9 Nov 2026)
+      const lbl=`${off?"🔒":red?"✗":"·"} ${esc(nm)}`;
+      return ln?`<a class="stp go2 ${red?"no":""}" href="${tabHref(a,k)}" title="${tip}">${lbl} →</a>`:`<span class="stp ${past?"no":""} ${off||sk?"off":""}" title="${tip}">${lbl}</span>`}).join("");
     const vg=tabGroups(a,vis),hand=vis.length?`<small class="muted">${vg.filter(g=>g.every(k=>ds.has(k))).length} / ${vg.length} ${vg.length===1?t("pestanya","tab"):t("pestanyes","tabs")}</small><br>`:"";
     let st;
     if(drop){st=`<span class="s-off">✂ ${t("No compta (no hi vam tenir temps)","Dropped · not counted")}</span>`}
