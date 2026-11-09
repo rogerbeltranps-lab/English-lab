@@ -914,8 +914,12 @@ S.autoTk=new Set();
 function autoTicks(){if(!S.D||!S.D.tkOk)return;const t=ELWeek.today();
   Object.entries(S.D.ls||{}).forEach(([ls,info])=>{if(/-my-real-routine$/.test(ls))return;GR.forEach(g=>{const ag=elAgendaOf(info,g.id);if(!ag)return;
     const m=((S.D.tk[g.id]=S.D.tk[g.id]||{}).ticks=S.D.tk[g.id].ticks||{});ELWeek.autoTicks(ls,ag,m,t).forEach(k=>S.autoTk.add(k))})})}
+// the Time plan's left list (its own scroll box) keeps its place through every redraw (Roger, 9 Nov 2026: "the left column jumps to the
+// top when I make changes on the agenda"); one per group and LS, so the 📋 side-by-side board keeps both
+const aglKey=n=>n.dataset.gid+"|"+n.dataset.ls;
 function render(){
-  autoTicks();render0();document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
+  const aglTop={};document.querySelectorAll("#main aside.agl").forEach(n=>{aglTop[aglKey(n)]=n.scrollTop});
+  autoTicks();render0();document.querySelectorAll("#main aside.agl").forEach(n=>{const v=aglTop[aglKey(n)];if(v)n.scrollTop=v});document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
 // ---- the dashboard on a phone (Roger, 8 Nov 2026: "la visió del mòbil necessita una gran remodelació"; mockup option A): a tab bar at the
 // bottom, Home · Groups · Corrections · Messages · More, instead of the row of menu buttons at the top; a 2A · 2B · 4A · 4B switch at the top
 // of a group's pages (the place stays: 2ESO A's Marks → 2ESO B's Marks). More opens a sheet with the rest of the menu (announcement, student
