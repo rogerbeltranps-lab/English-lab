@@ -45,7 +45,9 @@ window.ELCheckpoint = (function () {
     const html = '<div class="section-card cp-box" id="' + p.id + 'Cp"><p class="tiny">' + t('Carregant…', 'Loading…') + '</p></div>' +
       '<style>.cp-box .cp-q{font-size:1.15rem;font-weight:700;margin:10px 0 12px;-webkit-user-select:none;user-select:none}.cp-box .cp-bar{height:8px;border-radius:9px;background:#e8eef7;overflow:hidden;margin:6px 0 4px}' +
       '.cp-box .cp-bar i{display:block;height:100%;background:var(--accent,#315f9f);transition:width .25s linear}.cp-box .cp-bar i.low{background:#d9534f}.cp-box .cp-rules{margin:8px 0 14px;padding-left:20px;line-height:1.6}' +
-      '.cp-box .cp-fb{border-top:1px solid var(--line,#dbe5f1);padding:10px 0}.cp-box .cp-fb .ok{color:#16a34a}.cp-box .cp-fb .no{color:#b42318}.cp-box .cp-warn{background:#fff4e5;border:1px solid #f5b971;border-radius:13px;padding:10px 14px;margin:6px 0 12px}.cp-box .cp-warn h3{margin:0;color:#8a4b00}.cp-box .cp-ok{display:flex;gap:8px;align-items:center;font-weight:700;margin:6px 0}.cp-box .cp-esc{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;border-radius:11px;padding:9px 12px;margin-top:10px;font-weight:600}.cp-veil{position:fixed;inset:0;background:#0f172a;color:#fff;display:flex;flex-direction:column;gap:18px;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;z-index:999;text-align:center;padding:20px}</style>';
+      '.cp-box .cp-fb{border-top:1px solid var(--line,#dbe5f1);padding:10px 0}.cp-box .cp-fb .ok{color:#16a34a}.cp-box .cp-fb .no{color:#b42318}.cp-box .cp-warn{background:#fff4e5;border:1px solid #f5b971;border-radius:13px;padding:10px 14px;margin:6px 0 12px}.cp-box .cp-warn h3{margin:0;color:#8a4b00}.cp-box .cp-ok{display:flex;gap:8px;align-items:center;font-weight:700;margin:6px 0}.cp-box .cp-esc{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;border-radius:11px;padding:9px 12px;margin-top:10px;font-weight:600}.cp-veil{position:fixed;inset:0;background:#0f172a;color:#fff;display:flex;flex-direction:column;gap:18px;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;z-index:999;text-align:center;padding:20px}' +
+      '.cp-box .cp-end{margin-left:auto}.cp-box .actions[hidden],.cp-box .cp-sure[hidden]{display:none!important}.cp-box .cp-sure{background:#fff4e5;border:2px solid #f5b971;border-radius:13px;padding:10px 14px;margin-top:10px}.cp-box .cp-sure p{margin:0 0 8px;line-height:1.5}' +
+      '.cp-box .cp-sure .cp-yes{margin-left:auto;background:#b42318!important;border-color:#b42318!important;color:#fff!important}.cp-box .cp-sure .cp-yes:disabled{opacity:.45}</style>';
 
     function box() { return document.getElementById(p.id + 'Cp'); }
     function draw() {   // the route's questions: all of them, or a draw of secure.n[route] from the bank, in a new order
@@ -97,18 +99,36 @@ window.ELCheckpoint = (function () {
         '<div class="question" style="margin:0"><input type="text" class="typed" id="' + p.id + 'In" autocomplete="off" autocapitalize="off" spellcheck="false"' + (picks ? ' readonly placeholder="' + t('Tria una opció', 'Choose an option') + '"' : '') + ' aria-label="' + t('La teva resposta', 'Your answer') + '"></div>' +
         (picks ? '<div class="actions pick-row" style="justify-content:flex-start">' + picks.map(o => '<button class="btn secondary" type="button" data-cp-pick="' + esc(o) + '">' + esc(o) + '</button>').join('') + '</div>' : '') +
         '<div class="actions"><button class="btn" type="button" id="' + p.id + 'Next">' + (last ? t('Envia', 'Send') : t('Següent →', 'Next →')) + '</button>' +
-        (last ? '' : ' <button class="btn secondary" type="button" id="' + p.id + 'End">' + t('Entrega', 'Turn in') + '</button>') + '</div><p class="cp-esc" id="' + p.id + 'Esc" hidden></p>';
+        (last ? '' : '<button class="btn secondary cp-end" type="button" id="' + p.id + 'End">🏁 ' + t('Entrega ja', 'Turn in now') + '</button>') + '</div>' +
+        (last ? '' : '<div class="cp-sure" id="' + p.id + 'Sure" hidden></div>') + '<p class="cp-esc" id="' + p.id + 'Esc" hidden></p>';
       const inp = document.getElementById(p.id + 'In'), bar = document.getElementById(p.id + 'Bar');
       inp.value = (c.draft && c.draft.i === c.i ? c.draft.v : '') || '';
       inp.oninput = () => { c.draft = { i: c.i, v: inp.value }; api.save(); };
       const lit = () => b.querySelectorAll('[data-cp-pick]').forEach(x => { const on2 = !!inp.value && x.dataset.cpPick === inp.value; x.setAttribute('aria-pressed', on2); x.style.setProperty('background', on2 ? 'var(--accent)' : '', on2 ? 'important' : ''); x.style.setProperty('color', on2 ? '#fff' : '', on2 ? 'important' : ''); });
       b.querySelectorAll('[data-cp-pick]').forEach(x => x.onclick = () => { inp.value = x.dataset.cpPick; inp.oninput(); lit(); });
       lit();
-      inp.onkeydown = e => { if (e.key === 'Enter') next(); };
+      inp.onkeydown = e => { if (e.key === 'Enter' && (!sureB || sureB.hidden)) next(); };
       document.getElementById(p.id + 'Next').onclick = () => next();
-      // Turn in (Roger, 1 Nov 2026: "don't allow them to exit with Esc, only with a button that says turn in"): asks once, then sends
-      const endB = document.getElementById(p.id + 'End');
-      if (endB) endB.onclick = () => { if (endB.dataset.sure) { c.answers[c.i] = String(inp.value || '').trim().slice(0, 80); c.times[c.i] = Math.round((Date.now() - c.qAt) / 1000); c.i = c.ids.length; api.save(); return send(null); } endB.dataset.sure = '1'; endB.textContent = t('Segur? Sí, entrega', 'Sure? Yes, turn it in'); endB.className = 'btn'; };
+      // Turn in (Roger, 1 Nov 2026: "don't allow them to exit with Esc, only with a button that says turn in"): asks first, then sends.
+      // The question (Roger, 9 Nov 2026: Víctor and Martí, 4ESOA, sent theirs by mistake: the old "Sure? Yes, turn it in" was the same button
+      // turning blue like Next, so a second click sent it): Turn in sits on the far right, away from Next; it opens an orange box that says
+      // how many questions are left; "No, go on" is where Next was and has the focus (a double click or Enter keeps them in the checkpoint);
+      // "Yes, turn it in" is red and only works after 2 seconds.
+      const endB = document.getElementById(p.id + 'End'), sureB = document.getElementById(p.id + 'Sure'), acts = endB && endB.parentNode;
+      if (endB) endB.onclick = () => {
+        const n = c.ids.length - c.i;   // this one and the ones after it
+        acts.hidden = true; sureB.hidden = false;
+        sureB.innerHTML = '<p><strong>⚠️ ' + t('Vols entregar ja el checkpoint?', 'Turn in your checkpoint now?') + '</strong><br>' +
+          t('Et queden <b>' + n + '</b> pregunt' + (n === 1 ? 'a' : 'es') + ' per contestar (aquesta inclosa). Si l’entregues, ja no hi podràs tornar.',
+            'You still have <b>' + n + '</b> question' + (n === 1 ? '' : 's') + ' to answer (this one too). Once you turn it in, you can’t come back.') + '</p>' +
+          '<div class="actions"><button class="btn" type="button" data-cp="no">← ' + t('No, continua', 'No, go on') + '</button>' +
+          '<button class="btn cp-yes" type="button" data-cp="yes" disabled>' + t('Sí, entrega-ho', 'Yes, turn it in') + '</button></div>';
+        const no = sureB.querySelector('[data-cp="no"]'), yes = sureB.querySelector('[data-cp="yes"]');
+        no.onclick = () => { sureB.hidden = true; sureB.innerHTML = ''; acts.hidden = false; inp.focus(); };
+        yes.onclick = () => { if (yes.disabled) return; c.answers[c.i] = String(inp.value || '').trim().slice(0, 80); c.times[c.i] = Math.round((Date.now() - c.qAt) / 1000); c.i = c.ids.length; api.save(); send(null); };
+        setTimeout(() => { if (yes.isConnected) yes.disabled = false; }, 2000);
+        no.focus();
+      };
       // Esc pressed: a warning instead of leaving (holding Esc still leaves full screen, and that sends it)
       on(document, 'keydown', e => { if (e.key !== 'Escape') return; e.preventDefault(); const w = document.getElementById(p.id + 'Esc'); if (!w) return;
         w.hidden = false; w.innerHTML = '⚠️ ' + t('Si surts de la pantalla completa, el checkpoint s’envia i ja no el podràs continuar. Per acabar, fes servir <strong>Entrega</strong>.', 'If you leave full screen, your checkpoint is sent and you can’t go on with it. To finish, use <strong>Turn in</strong>.'); });
