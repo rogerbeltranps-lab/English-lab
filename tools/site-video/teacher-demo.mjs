@@ -21,6 +21,8 @@ const FIRST = ['Aina', 'Pol', 'Martina', 'Marc', 'Júlia', 'Jan', 'Laia', 'Biel'
 const SUR = ['Puigdollers', 'Serrallonga', 'Vilalta', 'Ferrerons', 'Solanes', 'Rocamora', 'Ponsatí', 'Masdéu', 'Rierola', 'Fontcuberta', 'Costabella',
   'Boschmonar', 'Vilaplana', 'Campdepadrós', 'Salavedra', 'Pratdesaba', 'Collbató', 'Mirambell', 'Torrebadella', 'Garcies', 'Martorellas', 'Sentmenat'];
 global.window = global;
+// el-catalog.js sets up the video player on load: a bare document is enough in Node
+global.document = global.document || { documentElement: { classList: { toggle() {} } }, addEventListener() {}, getElementById: () => null, querySelector: () => null };
 for (const f of ['el-catalog', 'el-sections', 'el-criteria', 'el-plan', 'el-week', 'el-grading', 'el-points']) require(path.join(ROOT, 'shared/js', f + '.js'));
 const CAT = global.EL_CATALOG, ACT = global.EL_ACTIONS;
 

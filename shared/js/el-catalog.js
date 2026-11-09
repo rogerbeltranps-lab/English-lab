@@ -111,7 +111,7 @@ window.EL_CATALOG=(function(){
         L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint34ESO",1,C),
         L("write-to-the-head-teacher.html","Write to the head teacher",["4.1","5.1","3.2","CC1 1.3"],"ls2Email4ESO",11,{steps:[["talk","Talk"]]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint44ESO",1,C),
-        L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam4ESO",7,{graded:false}),
+        L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam4ESO",7,{graded:false,optional:true}),
         L("celebration-day-proposal.html","Final product: Celebration Day Proposal",["1.1","1.2","3.2","4.2","5.1","6.1","CC1 1.3","CC3 3.2"],"ls2FinalProduct4ESO",0,{manual:true,video:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["contribution","2 · My contribution"],["part","3 · My part"],["email","4 · My email"],["feedback","Feedback to a group"],["team","5 · Teamwork"]],pieces:"ls2Products4ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect4ESO",2,{graded:false,self:"self"})
       ];
@@ -131,7 +131,7 @@ window.EL_CATALOG=(function(){
         L("recall-checkpoint-3.html","Recall checkpoint 3",["4.1","5.1"],"ls2Checkpoint32ESO",1,C),
         L("write-your-vlog-script.html","Write your vlog script",["4.1","5.1","3.2"],"ls2Script2ESO",11,{steps:[["talk","Talk"]]}),
         L("recall-checkpoint-4.html","Recall checkpoint 4",["4.1","5.1"],"ls2Checkpoint42ESO",1,C),
-        L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam2ESO",7,{graded:false}),
+        L("sample-exam.html","Sample exam",["2.2","4.1","5.1"],"ls2SampleExam2ESO",7,{graded:false,optional:true}),
         L("free-time-vlog.html","Final product: Free Time Vlog",["3.2","4.2","5.1","6.2","CD2 2.2","CD4 4.5"],"ls2FinalProduct2ESO",0,{manual:true,video:true,steps:[["prep","0 · My pieces"],["source","1 · My source"],["slides","2 · My slides"],["script","3 · My script"],["edit","4 · Record and edit"],["feedback","Feedback for my buddy"],["tips","5 · My tip"]],pieces:"ls2Products2ESO"}),
         L("reflect.html","Reflect",[],"ls2Reflect2ESO",2,{graded:false,self:"self"})
       ];
@@ -192,7 +192,13 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
 // of an LS for each group (dashboard → LS settings), stored as ls/{id}.open[group] = [activity ids]. A group without that list keeps the
 // old rule: practice always open, graded activities only when in ls/{id}.enabled. elLpLocks gives what firestore.rules check:
 // locked[group] (activity ids, for results) and lockedKeys[group] (their saved keys, for progress; key + "Level" is the route the page keeps).
-window.elLpOpen=function(a,info,gid,raw){const o=info&&info.open&&info.open[gid];
+// Optional practice (Roger, 9 Nov 2026: "I want all the students to be able to practise the sample exam, however I don't want it to appear
+// as homework … always leave the sample exam open but not counting it as homework, to do in class or not done"): an activity with
+// optional:true in EL_CATALOG (the sample exam of every LS) is always open for every group of an LS that is not hidden, whatever the
+// open switches, the section switches, the Time plan or the recall checkpoints say. It is never in ✅ To do, never homework, never late or
+// missing, never the "next" step, and its tabs are never counted in done/missing work (no due day: ELWeek.due).
+window.elOptional=a=>!!(a&&a.optional);
+window.elLpOpen=function(a,info,gid,raw){if(a&&a.optional)return true;const o=info&&info.open&&info.open[gid];
   if(!(Array.isArray(o)?o.includes(a.id):!a.graded||((info&&info.enabled)||[]).includes(a.id)))return false;
   return raw||window.EL_RAW_OPEN||!elPlanLater(info,gid).acts.has(a.id)};
 // The Time plan opens on the class day (Roger, 7 Nov 2026: "the SLPs will be automatically open the day the group has class and it's on my
@@ -230,7 +236,7 @@ const laterMemo=new WeakMap();   // per ls info and group: recomputed when the a
 window.elPlanLater=function(info,gid,today){const none={acts:new Set(),tabs:{}};if(!info||typeof info!=="object")return none;
   const ag=elAgendaOf(info,gid);if(!ag)return none;const real=!today;today=today||agToday();
   const op=real?elClassOpenAt(gid,today):null,early=op!=null&&Date.now()<op,after=(d,x)=>d>today||(early&&d===today);   // today's items wait for the class
-  const src=info.planEdits[gid].agenda,mm=laterMemo.get(info)||{},m=mm[gid];if(m&&m.today===today&&m.early===early&&m.src===src&&m.hw===info.homework&&m.push===info.push)return m.v;
+  const src=info.planEdits[gid].agenda,mm=laterMemo.get(info)||{},m=mm[gid];if(m&&m.today===today&&m.early===early&&m.src===src&&m.hw===info.homework&&m.push===info.push&&m.done===info.done)return m.v;
   const first={},tabFirst={};
   Object.entries(ag.days).forEach(([d,its])=>(its||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0)return;const id=it.slice(0,i),p=it.slice(i+1);
     if(!first[id]||d<first[id])first[id]=d;if(p){const k=id+"#"+p;if(!tabFirst[k]||d<tabFirst[k])tabFirst[k]=d}}));
@@ -239,15 +245,16 @@ window.elPlanLater=function(info,gid,today){const none={acts:new Set(),tabs:{}};
   // homework planned for a later class day (set > today) frees nothing until that day (Roger, 7 Nov 2026)
   Object.values(((info.homework||{})[gid])||{}).forEach(h=>{if(!h||!h.tabs||typeof h.tabs!=="object"||h.set&&h.set>today)return;Object.entries(h.tabs).forEach(([id,ps])=>{free.add(id);(ps||[]).forEach(p=>free.add(id+"#"+p))})});
   const pu=(info.push||{})[gid];if(pu&&pu.a){free.add(pu.a);if(pu.p)free.add(pu.a+"#"+pu.p)}
-  const v={acts:new Set(Object.keys(first).filter(id=>after(first[id])&&!free.has(id))),tabs:{}};
+  const v={acts:new Set(Object.keys(first).filter(id=>after(first[id])&&!free.has(id))),tabs:{},free,planned:new Set([...Object.keys(tabFirst),...Object.keys(((info.done||{})[gid])||{})]),
+    whole:new Set(Object.values(ag.days).flatMap(its=>(its||[]).map(String).filter(it=>it.endsWith("#")).map(it=>it.slice(0,-1))))};
   Object.entries(tabFirst).forEach(([k,d])=>{if(!after(d)||free.has(k))return;const [id,p]=[k.slice(0,k.indexOf("#")),k.slice(k.indexOf("#")+1)];(v.tabs[id]=v.tabs[id]||[]).push(p)});
-  mm[gid]={today,early,src,hw:info.homework,push:info.push,v};laterMemo.set(info,mm);return v};
+  mm[gid]={today,early,src,hw:info.homework,push:info.push,done:info.done,v};laterMemo.set(info,mm);return v};
 // Sections inside a learning path (Roger, 26 Oct 2026: "even in the learning path, I want to open these sections as I teach"): the section
 // tabs the teacher has locked for a group, ls/{id}.secLocked[group][activity id with "/" as "__"] = panel ids (EL_SECTIONS in el-sections.js),
 // and the ones opened at some point, ls/{id}.secOpened[group][same key]. None locked = every section open. A locked section is read-only
 // on the page (el-cloud.js lockSections): students see it with their saved answers. The saved state is one JSON per page, so the rules cannot check them.
 const secKey=a=>a.id.replace("/","__"),secOf=(info,f,gid,a)=>{const g=info&&info[f]&&info[f][gid];return g&&g[secKey(a)]};
-window.elSecLocked=function(a,info,gid){return secOf(info,"secLocked",gid,a)||[]};
+window.elSecLocked=function(a,info,gid){return a&&a.optional?[]:secOf(info,"secLocked",gid,a)||[]};   // optional: every tab open
 // Steps a section holds (EL_ACTIONS keys): its panel id, or the cards and practice steps for a vocabulary section; none for info panels.
 // Steps grouped by the tab they live in, in the path's order: [[step, …], …]. The Vocabulary tab holds two steps (cards, practice) and counts
 // as one tab, done when both are (Roger, 7 Nov 2026: students see the same tabs and counts as the learning path and the dashboard).
@@ -265,21 +272,30 @@ const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.eve
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
 // again stays open for a student who has not finished it; it is read-only for everyone else. done = Set of the student's done steps.
 const secLk=(a,info,gid,done)=>{const op=secOf(info,"secOpened",gid,a)||[];return elSecLocked(a,info,gid).filter(id=>!(op.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done)))};
+// Not planned yet = for class too (Roger, 9 Nov 2026: "If it's to do in class it shouldn't appear here and if they browse it and see it open
+// they can only see it not do it"): when the group has an agenda, a tab of an open learning path that is on no class day at all (nor ticked
+// as done in class, set as homework or pulled up; nor a path planned whole) is 🏫 for class too: shown read-only, never To do, like a tab
+// planned for a later day (it gets no day on its note). The tabs for a later day + these: [panel id].
+const laterTabs=(a,info,gid)=>{const L=elPlanLater(info,gid),later=L.tabs[a.id]||[];if(!L.planned||!a||a.optional||L.free.has(a.id)||L.whole.has(a.id))return later;
+  const S=(window.EL_SECTIONS||{})[a.id],ids=S?S.map(x=>x[0]):[...new Set(((window.EL_ACTIONS||{})[a.id]||[]).map(k=>k==="cards"||k==="practice"?"vocab":k))];   // LP pages load no el-sections.js
+  const un=ids.filter(id=>elSecSteps(a,id).length&&!L.planned.has(a.id+"#"+id)&&!L.free.has(a.id+"#"+id));
+  return un.length?[...new Set([...later,...un])]:later};
+window.elLaterTabs=laterTabs;
 window.elSecLockedFor=function(a,info,gid,done){const lk=secLk(a,info,gid,done);
-  if(window.EL_RAW_OPEN)return lk;const later=elPlanLater(info,gid).tabs[a.id]||[];return [...new Set([...lk,...later])]};   // + tabs planned for a later class day (elPlanLater)
+  if(window.EL_RAW_OPEN)return lk;const later=laterTabs(a,info,gid);return [...new Set([...lk,...later])]};   // + tabs for a later class day or not planned yet (laterTabs)
 // 🏫 To do in class (Roger, 8 Nov 2026: "students can see it but can't write any answer nor play any video until it's class time"; "a blue
 // shadow and a legend saying to do in class"): a tab of an open learning path that the Time plan puts on a later class day (elPlanLater) is
 // SHOWN, read-only, until that day; a tab the teacher locked with the section switches stays hidden. Still not doable, so it is never in
 // ✅ To do or the "next" step (elSecLockedFor keeps it), but it counts in the path's tabs, so a path is never "done" with tabs still to come.
 // Returns {panel id: the class day it is planned for (YYYY-MM-DD)}.
-window.elSecSoon=function(a,info,gid,done){if(window.EL_RAW_OPEN||!a)return {};const later=elPlanLater(info,gid).tabs[a.id]||[];if(!later.length)return {};
+window.elSecSoon=function(a,info,gid,done){if(window.EL_RAW_OPEN||!a||a.optional)return {};const later=laterTabs(a,info,gid);if(!later.length)return {};
   const lk=secLk(a,info,gid,done),ag=elAgendaOf(info,gid),today=agToday(),o={};
   later.forEach(p=>{if(lk.includes(p))return;let d=null;Object.entries((ag&&ag.days)||{}).forEach(([dd,its])=>{if(dd>=today&&(its||[]).includes(a.id+"#"+p)&&(!d||dd<d))d=dd});o[p]=d});return o};
 // the steps of those tabs (elSecSteps), for counting
 window.elSoonSteps=function(a,soon){return Object.keys(soon||{}).flatMap(id=>elSecSteps(a,id))};
 // Sections still to finish (the to-do list): only in a learning path where the teacher uses the section switches, a section that is open
 // or was opened before, holds steps and has some not done. Returns [[panel id, name]].
-window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk))return [];const op=secOf(info,"secOpened",gid,a)||[],later=window.EL_RAW_OPEN?[]:elPlanLater(info,gid).tabs[a.id]||[];
+window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gid,a);if(!Array.isArray(lk)||a.optional)return [];const op=secOf(info,"secOpened",gid,a)||[],later=window.EL_RAW_OPEN?[]:laterTabs(a,info,gid);
   return ((window.EL_SECTIONS||{})[a.id]||[]).filter(([id])=>(!lk.includes(id)||op.includes(id))&&!later.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done))};
 // ✅ To do (Roger, 6 Nov 2026: "When I open a section it must be set as to do. So in each class I open a section or LP and they see it as
 // to do. They are only homework if I say so (I can say that a LP is homework or only a section)"): every learning path of an open LS that
@@ -289,13 +305,27 @@ window.elSecPending=function(a,info,gid,done){const lk=secOf(info,"secLocked",gi
 // The board's ✅ To do and the floating ✅ To do button (el-todo.js) use it. p, gi = the group's plan (or null, -1); doneOf(a) = Set of the
 // student's done steps; isDone(a) = every step done. Returns [{a, tabs: [[panel id, name]], due, late, cp}] in the order of the plan
 // (due day, then the LS's order); cp = the recall checkpoint to do first (elCheckpointMissing), or null.
+// Only what was due before today's class (Roger, 9 Nov 2026: "it only should be on the list what was due before today's class. What I plan
+// to do in class and I put it on the agenda and stays open they think that it's homework and that they have to do it"): when the group has
+// a Time plan agenda, a tab is in ✅ To do only if it was on a class day before today (the agenda, or ticked as done in class: ls/{id}.done)
+// or the teacher set it as homework (from its set day). Open tabs planned for today or later, or on no class day, are not To do.
+// Returns {acts: Set of whole paths, tabs: {activity id: Set of panel ids}}, or null when the group has no agenda (then opened = To do).
+window.elDueBefore=function(info,gid,today){const ag=elAgendaOf(info,gid);if(!ag)return null;today=today||agToday();
+  const v={acts:new Set(),tabs:{}},add=(it,d)=>{if(d!==true&&(!d||d>=today))return;it=String(it);const i=it.indexOf("#");if(i<0||/^note:/.test(it))return;
+    const id=it.slice(0,i),p=it.slice(i+1);if(/^game:/.test(p))return;if(!p)v.acts.add(id);else (v.tabs[id]=v.tabs[id]||new Set()).add(p)};
+  Object.entries(ag.days||{}).forEach(([d,its])=>(its||[]).forEach(it=>add(it,d)));
+  Object.entries(((info.done||{})[gid])||{}).forEach(([k,d])=>add(k,d));
+  Object.values(((info.homework||{})[gid])||{}).forEach(h=>{if(!h||!h.tabs||typeof h.tabs!=="object"||h.set&&h.set>today)return;
+    Object.entries(h.tabs).forEach(([id,ps])=>{if(!ps||!ps.length)v.acts.add(id);else ps.forEach(p=>add(id+"#"+p,true))})});
+  return v};
 window.elTodoList=function(ls,info,gid,doneOf,isDone,p,gi){const st=info&&info.status==="public"?"open":info&&info.status;if(st!=="open"||!gid)return [];
   const W=window.ELWeek,today=W?W.today():new Date().toISOString().slice(0,10),dr=(p&&gi>=0&&(p._dropped||{})[gi])||[],due=a=>p&&gi>=0&&W?W.due(p,a.id,gi):null;
-  return (window.EL_CATALOG||[]).filter(a=>a.ls===ls).map((a,i)=>({a,i,d:due(a)})).filter(({a})=>!a.manual&&!dr.includes(a.id)&&elLpOpen(a,info,gid)&&!isDone(a))
+  const db=window.EL_RAW_OPEN?null:elDueBefore(info,gid),dueA=a=>!db||db.acts.has(a.id)||!!db.tabs[a.id],dueT=(a,id)=>!db||db.acts.has(a.id)||!!(db.tabs[a.id]&&db.tabs[a.id].has(id));
+  return (window.EL_CATALOG||[]).filter(a=>a.ls===ls).map((a,i)=>({a,i,d:due(a)})).filter(({a})=>!a.manual&&!a.optional&&!dr.includes(a.id)&&elLpOpen(a,info,gid)&&!isDone(a)&&dueA(a))
     .sort((x,y)=>(x.d||"~")<(y.d||"~")?-1:(x.d||"~")>(y.d||"~")?1:x.i-y.i)
     .map(({a,d})=>{const done=doneOf(a),secs=(window.EL_SECTIONS||{})[a.id]||[],off=secs.length?elSecLockedFor(a,info,gid,done):[];
-      const tabs=secs.filter(([id])=>!off.includes(id)&&elSecSteps(a,id).length&&!secDone(a,id,done));
-      if(secs.length&&!tabs.length)return null;   // what is open is done; the rest is still locked
+      const tabs=secs.filter(([id])=>!off.includes(id)&&dueT(a,id)&&elSecSteps(a,id).length&&!secDone(a,id,done));
+      if(secs.length&&!tabs.length)return null;   // what is open and due is done; the rest is still locked or for a later class
       return {a,tabs,due:d,late:!!(d&&d<today),cp:elCheckpointMissing(a,doneOf,y=>elLpOpen(y,info,gid))}}).filter(Boolean)};
 // "LP3" in the group's plan → its learning path ("LP3 Where traditions come from" somewhere in the plan): {"3": activity}
 window.elLpNumMap=function(ls,p,gi){const m={},acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls),sh=x=>String(x).split(/[:(]/)[0].trim().toLowerCase();
@@ -305,12 +335,14 @@ window.elLpNumMap=function(ls,p,gi){const m={},acts=(window.EL_CATALOG||[]).filt
 // x = an item of ELWeek.tasks. Homework set on the dashboard since 6 Nov 2026 saves it (x.tabs); older ones and the plan's "Homework by …"
 // lines are read from their text: "LP3 Speaking and Talk", "LP3 Where traditions come from: Speaking, Talk" (tab names of that path; none
 // named = the whole path; words in brackets are left out, e.g. "(Speaking and Talk after the exam)").
-window.elHwTargets=function(x,ls,p,gi){if(!x||x.kind!=="hw")return null;if(x.tabs&&typeof x.tabs==="object"&&Object.keys(x.tabs).length)return x.tabs;
+window.elHwTargets=function(x,ls,p,gi){if(!x||x.kind!=="hw")return null;
+  const noOpt=o=>{const r={};Object.entries(o||{}).forEach(([id,ps])=>{if(!elOptional((window.EL_CATALOG||[]).find(a=>a.id===id)))r[id]=ps});return Object.keys(r).length?r:null};   // optional practice is never homework
+  if(x.tabs&&typeof x.tabs==="object"&&Object.keys(x.tabs).length)return noOpt(x.tabs);
   const m=elLpNumMap(ls,p,gi),out={},txt=String(x.text||"").replace(/\([^)]*\)/g," "),parts=txt.split(/(?=\bLP\d+\b)/);
   parts.forEach(seg=>{const n=(seg.match(/^LP(\d+)\b/)||[])[1],a=n&&m[n];if(!a)return;const s=seg.replace(/^LP\d+\s*/,"").toLowerCase();
     const ids=((window.EL_SECTIONS||{})[a.id]||[]).filter(([id,nm])=>elSecSteps(a,id).length&&new RegExp("(^|[^a-z])"+String(nm).toLowerCase().replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"($|[^a-z])").test(s)).map(z=>z[0]);
     out[a.id]=[...new Set([...(out[a.id]||[]),...ids])]});
-  return Object.keys(out).length?out:null};
+  return noOpt(out)};
 // Pull up a learning path (Roger, 2 Nov 2026: "students find it difficult to find the learning path … I go to the LS and pull it up for the
 // A or B group"): the teacher puts one learning path (and maybe one of its tabs) on a group's screens from the dashboard, the Time plan or
 // the learning path page in teacher mode. ls/{id}.push[group] = {a: activity id, p: panel id or "", pn: tab name, t: label "LP3 …", at: ms}
@@ -390,7 +422,8 @@ window.elWhoLeft=w=>({gone:(w.out||[]).filter(y=>y.why!=="never"),back:(w.inn||[
 // showing, a video that goes full screen comes back into the page, fills the screen there (.el-bigvid) and the page goes full screen
 // instead: the panel stays on top of the video. ✕ Smaller or Esc puts it back. elPlayVideo(src) plays a video over the page (the unit's
 // shadowing video from the dashboard's agenda or the class tab's 📋 Today), with ⛶ Full screen that does the same. No reads, no writes.
-(function(){if(window.elPlayVideo)return;const d=document,R=d.documentElement,fsEl=()=>d.fullscreenElement||d.webkitFullscreenElement;
+(function(){if(window.elPlayVideo||typeof document==="undefined")return;   // no page (the email tools load this file in Node)
+  const d=document,R=d.documentElement,fsEl=()=>d.fullscreenElement||d.webkitFullscreenElement;
   const watch=()=>!!(d.getElementById("el-fsfloat")||d.querySelector("#fsctl.on"));
   const css=()=>{if(d.getElementById("el-vidcss"))return;const s=d.createElement("style");s.id="el-vidcss";s.textContent=
     ".el-bigvid{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;z-index:2147482000!important;background:#000!important;object-fit:contain}"
@@ -423,12 +456,12 @@ window.elWhoLeft=w=>({gone:(w.out||[]).filter(y=>y.why!=="never"),back:(w.inn||[
 window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh(a.title),lo=st.toLowerCase(),p=(window.EL_PLAN||{})[a.ls];let n=null;
   if(p)(p.rows||[]).forEach(r=>[].concat(r.g||r.what||[]).join("\n").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,k,nm)=>{nm=nm.trim().toLowerCase();if(!n&&nm&&(lo.startsWith(nm)||nm.startsWith(lo)))n=k}));
   return (n?"LP"+n+" ":"")+st};
-window.elLpLocks=function(ls,open){const shut=(window.EL_CATALOG||[]).filter(a=>a.ls===ls&&!open.includes(a.id));
+window.elLpLocks=function(ls,open){const shut=(window.EL_CATALOG||[]).filter(a=>a.ls===ls&&!a.optional&&!open.includes(a.id));   // optional: never locked
   return {locked:shut.map(a=>a.id),lockedKeys:shut.flatMap(a=>a.keys.flatMap(k=>[k,k+"Level"]))}};
 // Recall checkpoints open the way (Roger, 26 Oct 2026): an activity that comes after a checkpoint in its LS (catalogue order = LS page
 // order) opens only when every earlier checkpoint is done. Only checkpoints the student can do count (enabled(x)), so a checkpoint the
 // teacher has not enabled yet never blocks; the final product (manual) is never blocked. done(x) = Set of the student's done steps of x.
-window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual)return null;const list=(window.EL_CATALOG||[]).filter(x=>x.ls===a.ls),i=list.indexOf(a);
+window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)return null;const list=(window.EL_CATALOG||[]).filter(x=>x.ls===a.ls),i=list.indexOf(a);
   return i<0?null:list.slice(0,i).find(x=>x.checkpoint&&enabled(x)&&!(window.EL_ACTIONS[x.id]||["check"]).every(k=>done(x).has(k)))||null};
 // LS2 4ESO Seasons & Celebrations: steps per page (as ls2-engine.js records them) and the criterion each step gives evidence for,
 // by the skill it practises (docs/4eso/ls2-seasons-and-celebrations/assessment-criteria.md). Recall, vocabulary and grammar steps are language practice.
