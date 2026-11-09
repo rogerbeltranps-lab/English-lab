@@ -7,7 +7,7 @@
 ELGameDeck({
   title:"Grammar · Present Continuous",
   slides:[
-    {theory:"What's happening now?",img:"🎥",step:true,lines:[
+    {theory:"What's happening now?",point:"Present Continuous: am / is / are + -ing",pointCa:"Present Continuous: am / is / are + -ing",img:"🎥",step:true,lines:[
       "We use the **Present Continuous** for actions happening **now**.",
       {table:[["","am / is / are","verb + -ing"],["I","**am** ('m)","watching the match."],["He / She / It","**is** ('s)","climbing the red route."],["We / You / They","**are** ('re)","cheering."]]},
       "Time words: **now** · **right now** · **at the moment** · **today** · **Look!** · **Listen!**",
@@ -17,7 +17,7 @@ ELGameDeck({
     {q:"Listen! The crowd ___ (cheer) for the Blue Team.",img:"📣",write:["is cheering","'s cheering"],why:"**The crowd** is one group → **is cheering**."},
     {q:"I ___ the highlights right now.",img:"📺",options:["am watching","is watching","watching","am watch"],why:"I → **am** + watch**ing**."},
     {q:"Emma and Sam ___ (talk) on School Radio.",img:"🎙️",write:["are talking","'re talking"],why:"Emma and Sam = they → **are talking**."},
-    {theory:"How to write the -ing form",img:"✏️",step:true,lines:[
+    {theory:"How to write the -ing form",point:"Spelling the -ing form",pointCa:"Com s'escriu la forma -ing",img:"✏️",step:true,lines:[
       {table:[["The verb…","Rule","Examples"],["most verbs","+ **-ing**","play → play**ing** · cheer → cheer**ing** · study → study**ing**"],["ends in -e","drop the **-e**","dance → danc**ing** · write → writ**ing** · take → tak**ing**"],["one vowel + one consonant","**double** it","run → ru**nn**ing · swim → swi**mm**ing · win → wi**nn**ing · get → ge**tt**ing"]]},
       {watch:"Two vowels: no double: read → **reading** (not ~~readding~~)."}],
       ca:["La majoria: + -ing. Si acaba en -e, treu la -e.","Una vocal + una consonant al final: dobla la consonant (run → running)."]},
@@ -25,7 +25,7 @@ ELGameDeck({
     {q:"Which -ing form is correct?",img:"🖊️",options:["writing","writting","writeing","writng"],why:"write → drop the **-e** → writing (one t)."},
     {q:"Write the -ing form: take → ___",img:"📸",write:["taking"],why:"take → drop the **-e** → taking."},
     {q:"Our team isn't ___ today: the score is 2–6.",img:"😞",options:["winning","wining","wineing","winnig"],why:"win → wi**nn**ing: double the n."},
-    {theory:"Negatives: not now",img:"🚫",step:true,lines:[
+    {theory:"Negatives: not now",point:"Present Continuous: negatives and questions",pointCa:"Present Continuous: negatives i preguntes",img:"🚫",step:true,lines:[
       {table:[["Positive","Negative"],["I**'m** playing.","I**'m not** playing."],["She**'s** playing.","She **isn't** playing."],["They**'re** playing.","They **aren't** playing."]]},
       "It's raining, so we **aren't playing** outside. The Green Team **isn't winning**.",
       {watch:"~~I amn't~~ → I**'m not**."}],
