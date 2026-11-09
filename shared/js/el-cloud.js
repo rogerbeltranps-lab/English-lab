@@ -949,6 +949,7 @@ function hereTick(){if(!fsOnG())return;const k=fsOk();if(k!==fsOkWas&&fsOkWas!==
 document.addEventListener("visibilitychange",()=>{if(!fsOnG())return;if(document.visibilityState==="hidden"){if(!fsBye)hereBeat(true)}else hereBeat(false)});
 FD.addEventListener("fullscreenchange",()=>{fsCheck();hereTick()});FD.addEventListener("webkitfullscreenchange",()=>{fsCheck();hereTick()});
 function goTo(g,first){
+  cmCheer(g);   // 🌟 the first 4 minutes of class mode (gone when it stops)
   const was=LOCK;LOCK=lockOn(g)?g:null;
   if(was&&!LOCK){lockBar();lockFree();return}
   if(g&&g.until&&Date.now()>=g.until)return;   // the class it was made in is over
@@ -1003,6 +1004,28 @@ function cmGo(g){
     lockBar();return}
   goMove(url,(g.t||"")+(g.pn?" · "+g.pn:""),seen,seen?2:3,"🎓");
 }
+// 🌟 The student's encouraging sentence in class mode (Roger, 9 Nov 2026: "when they are on class mode they don't see the sentence where I
+// tell them positive things, can you make it visible for 4 minutes once I start the class mode? on the top of their screen"): the same
+// "Hi Pau, …" line as their board (ELCheer.student in el-cheer.js, Catalan for Starter/Base), in a bar at the top of whatever page class
+// mode takes them to, for the first 4 minutes after the teacher started it (go.s), then it goes away. No extra reads or writes.
+const CHEER_MS=4*60e3;let cheerT=0,cheerPad=null;
+function cheerOff(){clearInterval(cheerT);const x=document.getElementById("el-cmcheer");if(x)x.remove();if(cheerPad!==null){document.body.style.paddingTop=cheerPad;cheerPad=null}}
+function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&&g.s?g.s+CHEER_MS:0;
+  if(!end||Date.now()>=end||!user||!isStudent(user)||AS){if(was)cheerOff();return}
+  if(was&&was.dataset.s===String(g.s))return;
+  loadScript("shared/js/el-cheer.js",()=>window.ELCheer).then(()=>{if(!window.ELCheer||Date.now()>=end)return;
+    const n=String(user.displayName||"").trim(),f=n.includes(",")?n.split(",")[1].trim().split(/\s+/)[0]:n.split(/[\s@]+/)[0],ca=lockCa();
+    const d=new Date(),day=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    const txt=(ca?"Hola":"Hi")+(f?" "+f:"")+", "+ELCheer.student((user.email||n).toLowerCase(),day,!ca);
+    let b=document.getElementById("el-cmcheer");if(!b){b=document.createElement("div");b.id="el-cmcheer";b.setAttribute("role","status");
+      // just under the 🎓 class mode bar (el-lock, lockBar), above the page; the page moves down by its height while it shows
+      b.style.cssText="position:fixed;left:0;right:0;top:0;z-index:2147481990;display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px;background:linear-gradient(90deg,#4338ca,#7c3aed);color:#fff;font:800 clamp(18px,2.3vw,28px)/1.25 system-ui,sans-serif;text-align:center;box-shadow:0 4px 14px rgba(67,56,202,.3)";
+      document.body.append(b)}
+    b.dataset.s=String(g.s);b.innerHTML='<span aria-hidden="true">🌟</span><span class="t"></span>';b.querySelector(".t").textContent=txt;
+    if(cheerPad===null)cheerPad=document.body.style.paddingTop||"";
+    const place=()=>{if(Date.now()>=end)return cheerOff();const l=document.getElementById("el-lock"),top=l?l.offsetHeight:0;b.style.top=top+"px";
+      document.body.style.paddingTop=(top+b.offsetHeight)+"px"};
+    clearInterval(cheerT);place();cheerT=setInterval(place,1000)})}
 // The teacher's class tab: opened by "🎓 Class mode" on the dashboard or the learning path page with ?elcm=<group>.<until ms>; this browser
 // tab keeps it (sessionStorage el_cm = {g, s, until}), so the dashboard in the other tab never moves the students. Every second it looks
 // at the page and its open tab, and once they have stayed the same for a second (quick clicks through tabs are not sent) and differ from
