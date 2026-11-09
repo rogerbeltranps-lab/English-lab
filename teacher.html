@@ -582,15 +582,18 @@ function cpBox(ls,grp,studs){
   const gapNote=`<p class="muted">⚠️ = ${CP_GAP} points or more above the student's usual marks (the average of their exam marks so far and their recall warm-ups in this LS); ↓ = that much below. Worth a look, not proof.</p>`;
   return `<div class="box">${fold("cpbox",`🛡️ Recall checkpoints · ${grp.name}${warn.length?` <small style="color:#b45309">· ⚠️ ${warn.length} far above usual</small>`:""}`,(warn.length?`<div class="warnbox" style="background:#fff4e5;border:1px solid #f5b971;border-radius:10px;padding:8px 12px;margin:6px 0"><b>⚠️ Much higher than their usual marks</b><ul style="margin:4px 0">${warn.join("")}</ul></div>`:"")+body+gapNote)}</div>`;
 }
-function cpDlg(u,a){
-  const d=cpDoc(u,a),K=S.D.ck[a.keys[0]],s=S.P[u];if(!d)return;const m=cpMark(d,K);
+// the student's answers, one row per question: right/wrong, the right answer, time, ✓ Accept (also in the marks popup, cellPanel)
+function cpAnsTable(u,a){const d=cpDoc(u,a),K=S.D.ck[a.keys[0]];if(!d)return "";const m=cpMark(d,K);
   const rows=d.ids.map((id,i)=>{const k=(K&&K.items||{})[id]||{},v=(d.answers||[])[i]||"";
     return `<tr><td>${i+1}</td><td style="text-align:left">${k.q||esc(id)}</td><td><b>${esc(v)||'<span class="muted">(blank)</span>'}</b></td><td>${m.ok[i]?"✓":"✗"}${m.ok[i]?"":`<br><small class="muted">${esc((cpAccepted(K,id)||[]).join(" / "))}</small>`}</td><td>${(d.times||[])[i]||0} s</td><td>${!m.ok[i]&&cpNorm(v)?`<button class="g" data-do="cpacc" data-u="${u}" data-a="${a.id}" data-i="${id}" data-v="${esc(v)}" title="Accept this answer for every student">✓ Accept</button>`:""}</td></tr>`}).join("");
+  return `<table><tr><th>#</th><th>Question</th><th>Answer</th><th>Right?</th><th>Time</th><th></th></tr>${rows}</table>`}
+function cpDlg(u,a){redraw=null;
+  const d=cpDoc(u,a),K=S.D.ck[a.keys[0]],s=S.P[u];if(!d)return;const m=cpMark(d,K);
   const lv=(d.leaves||[]).map(l=>`${esc((cpDate(l.at)||"").slice(11,19))} (${Math.round(l.ms/100)/10} s)`).join(", ");
   dlg(`<h3>${esc(a.title)} · ${name(s)}</h3><p class="muted">Route ${esc(LV[d.level]||d.level)} · started ${esc((d.started||"").replace("T"," ").slice(0,16))} · ${d.redo?"<b>let do again</b>":d.auto==="left"?"<b>⚡ sent automatically: left the page</b>":"sent"} · ${K?m.score+"/"+m.max:"no answer key yet"}${d.fb?` · released ${d.fb.score}/${d.fb.max}`:" · not released"}</p>`
     +(lv?`<p class="muted">👀 Left for less than 2 s: ${lv}</p>`:"")
     +(cpGap(u,a,d,K)?`<p style="color:#b45309">${cpGap(u,a,d,K).up?"⚠️":"↓"} ${esc(cpGap(u,a,d,K).t)}</p>`:"")
-    +`<table><tr><th>#</th><th>Question</th><th>Answer</th><th></th><th>Time</th><th></th></tr>${rows}</table>`
+    +cpAnsTable(u,a)
     +(d.redo?"":`<div class="row"><button data-do="cpredo" data-u="${u}" data-a="${a.id}" title="Their answers are discarded and they do it again (new questions, new order)">↺ Let them do it again</button></div>`),true);
 }
 api.cpRelease=(a,studs)=>{const K=S.D.ck[a.keys[0]],ops=[];
@@ -3603,12 +3606,22 @@ function stAns(u,a,c,B){const box=$("#stans");if(!box||box.dataset.k!==u+"|"+a.i
     return `<h4 style="margin:12px 0 4px">${esc(P.title)} <small class="muted">· ${esc(LV[lv]||lv)}</small></h4>`
       +(anyFirst||anyNow?`<table class="qa"><thead><tr><th>#</th><th style="text-align:left">Question</th>${anyFirst?'<th style="text-align:left" title="Their first check: what counts">First try</th>':""}${anyNow?'<th style="text-align:left" title="What is on the page now (after Redo or later checks)">Now</th>':""}<th style="text-align:left">Right answer</th></tr></thead><tbody>${tr}</tbody></table>`
         :`<p class="muted">Not answered yet.</p>`)}).join("")||`<p class="muted">Not answered yet.</p>`}
+// Recall checkpoint in the marks popup (Roger, 9 Nov 2026: "I need to see their results of the checkpoints like here"): mark + each answer
+function cpPanel(u,a){const d=cpDoc(u,a),K=S.D.ck[a.keys[0]];
+  if(!d)return `<h4 style="margin:12px 0 4px">Checkpoint answers</h4><p class="muted">Not sent yet.</p>`;
+  if(d.redo)return `<h4 style="margin:12px 0 4px">Checkpoint answers</h4><p class="muted">↺ You let them do it again: nothing sent since.</p>`;
+  const m=cpMark(d,K),gp=cpGap(u,a,d,K);
+  return `<h4 style="margin:12px 0 4px">Checkpoint answers · ${K?`<b>${m.score}/${m.max}</b> right`:"no answer key yet"} <small class="muted">· ${esc(LV[d.level]||d.level)}${d.auto==="left"?" · ⚡ sent automatically: left the page":""}${d.fb&&!cpStale(d,K)?" · ✓ feedback released":" · feedback not released"}</small></h4>`
+    +(gp?`<p style="color:#b45309">${gp.up?"⚠️":"↓"} ${esc(gp.t)}</p>`:"")
+    +cpAnsTable(u,a)
+    +`<div class="row"><button class="g" data-do="cpdlg" data-u="${u}" data-a="${a.id}" title="Times away from the page and ↺ Let them do it again">More: leaves, let them do it again</button></div>`}
 function cellPanel(u,id){redraw=()=>cellPanel(u,id);
   const s=S.P[u],a=cat.find(x=>x.id===id),x=(S.D.rs[u]||{})[id]||{},d=doneSet(u,a);
   const gx=!!G()&&!G().only&&a.ls===S.ls,nd=steps(a).filter(k=>!(a.skip||[]).includes(k)),nn=nd.filter(k=>d.has(k)).length,
     state=(nd.length&&!a.manual?(nn===nd.length?"✅ Every step done":`${nn} of ${nd.length} steps done`)+" · ":"")+(x.locked?"📤 Submitted":x.markedDone?"🟡 Marked as done, not submitted":a.graded?"Not submitted yet":"Not graded (practice)");
   dlg(`<h3>${a.title}</h3><p class="muted">${name(s)} · ${route(level(u,a.ls))} · ${a.criteria.map(pill).join("")} · ${pts(a)}</p><p><b>${state}</b>${a.graded&&!a.manual?` · ${(scOf(u,a)||{score:0}).score}/${a.points}`:""}</p>`
     +(steps(a).length?`<table><thead><tr><th style="text-align:left">Activity</th><th>Criterion</th><th>Done</th>${gx?"<th>First try</th><th>Latest</th><th>On time</th>":""}</tr></thead><tbody>${steps(a).map(k=>{const f=gx&&firstOf(u,id,k),t=gx&&onTime(u,id,k,s.group),dd=gx&&doneAt(u,id,k);return `<tr><td style="text-align:left">${esc(tabName(a,k))}</td><td>${stepCrit(a,k)}</td><td>${d.has(k)?"✔":"–"}${(w=>w?" · "+esc(w.i):"")(wrState(u,a,k))}</td>${gx?`<td>${f?f.score+"/"+f.max:"–"}</td><td>${(l=>l?trySc(l):"–")(lastOf(u,id,k))}</td><td title="${esc((dd&&dd!==true?"done "+ymd(dd):"")+(dueOf(id,s.group)?" · due "+dueOf(id,s.group):""))}">${t===1?"✔":t===0?"late":"–"}</td>`:""}</tr>`}).join("")}</tbody></table>`:"")
+    +(a.checkpoint?cpPanel(u,a):"")
     +(a.steps?handIns(u,a):"")
     +revisions(u,a)
     +levelRows(u,a)
@@ -4212,7 +4225,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     secset:()=>act(api.secLock(S.ls,S.g,k.a,k.v==="1"?[]:(EL_SECTIONS[k.a]||[]).map(x=>x[0]))),
     cpdlg:()=>cpDlg(u,a),
     cprel:()=>act(api.cpRelease(a,Object.values(S.P).filter(s=>s.group===S.g||s.tester))),
-    cpacc:()=>{Promise.resolve(api.cpAccept(a,k.i,k.v)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});cpInject(S.D);render();cpDlg(u,a)},
+    cpacc:()=>{Promise.resolve(api.cpAccept(a,k.i,k.v)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});cpInject(S.D);render();(redraw||(()=>cpDlg(u,a)))()},
     acclink:()=>{const sel=$("#lnk-"+CSS.escape(k.u)),rid=sel&&sel.value;if(!rid)return alert("First choose who it is.");const ro=S.D.ro[rid];
       if(!confirm(`Link this account and its work to ${[ro.first,ro.surname1].join(" ")} (${ro.group})?`))return;act(api.accLink(k.u,rid))},
     acchide:()=>quick(api.accHide(k.u,true)),accshow:()=>quick(api.accHide(k.u,false)),
