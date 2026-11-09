@@ -2800,7 +2800,7 @@ function tp2Full(on){const d=document,fe=d.fullscreenElement||d.webkitFullscreen
 function tp2Page(grp,ls,studs){const pr=tp2Pair(grp),l=EL_LS.find(y=>y.id===ls),D=S.D;
   const col=g=>{const x=planX(ls,g.id),st=studs.filter(s=>s.group===g.id&&!s.away&&!s.tester&&s.uid).sort(byName),ok=elLsForGroup(l,D.ls[ls],g.id);
     return `<section class="tp2col c${g.course}"><h2>${esc(g.name)}</h2>${!ok?`<p class="muted">This LS is not assigned to ${esc(g.name)}.</p>`:AGOK(ls)&&x.p&&x.gi>=0&&agEnsure(x)?agPage(x,st):`<p class="muted">No time plan for ${esc(g.name)} in this LS yet.</p>`}</section>`};
-  return `<div class="tp2bar"><b>📋 ${esc(pr.map(g=>g.name).join(" + "))}</b><span class="muted">${l?esc(lsLabel(l)):""} · drag inside each group; drag a note to the other group to copy it; every change saves as in its own 📅 Time plan</span><span class="sp"></span>`
+  return `<div class="tp2bar"><b>📋 ${esc(pr.map(g=>g.name).join(" + "))}</b><span class="muted">${l?lsLabel(l):""} · drag inside each group; drag a note to the other group to copy it; every change saves as in its own 📅 Time plan</span><span class="sp"></span>`
     +`<button class="g" data-do="tp2fs" title="Browser full screen on or off (Esc also leaves it)">⛶ Full screen</button><button data-do="tp2x" title="Back to ${esc(grp.name)}'s Time plan">✕ Close</button></div>`
     +`<div class="tp2">${pr.map(col).join("")}</div>`}
 // "Earlier weeks" keeps its open/closed state through every redraw (Roger, 8 Nov 2026, screen recording: ticking 🏠 on a tab with Earlier
