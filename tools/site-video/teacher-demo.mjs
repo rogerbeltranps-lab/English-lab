@@ -92,7 +92,9 @@ for (const g of global.EL_GROUPS) {
   const studs = Object.values(D.st).filter((s) => s.group === g.id), skill = Object.fromEntries(studs.map((s) => [s.email, [0.35 + rnd() * 0.65, 0.35 + rnd() * 0.65]]));
   [1, 2, 3].forEach((lp) => ['vocab', 'grammar'].forEach((kind) => { const done = 10;
     D.games.push({ group: g.id, course: g.course, kind, lsId: LS2[g.course], ls: LS2T[g.course], lp: 'LP' + lp, title: (kind === 'vocab' ? 'Vocabulary' : 'Grammar') + ' · LP' + lp, day: '2026-11-0' + (2 + lp), done,
-      stu: studs.filter(() => rnd() > 0.12).map((s) => ({ e: s.email.toLowerCase(), r: Math.min(done, Math.round(done * skill[s.email][kind === 'vocab' ? 1 : 0] * (0.8 + rnd() * 0.4))) })) });
+      // a = questions answered: everyone all of them, except one late arrival per game (3 of 10, so that game is left out of their mark)
+      stu: studs.filter(() => rnd() > 0.12).map((s, i) => { const r = Math.min(done, Math.round(done * skill[s.email][kind === 'vocab' ? 1 : 0] * (0.8 + rnd() * 0.4))), late = i === lp + 2;
+        return { e: s.email.toLowerCase(), r: late ? Math.min(r, 3) : r, a: late ? 3 : done }; }) });
   }));
 }
 

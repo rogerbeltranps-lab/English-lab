@@ -764,9 +764,17 @@ const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).
 // S.dueZero = a group id (progSync, the student board's mark so far; Roger, 2 Nov 2026: "students must understand that if they don't work
 // daily their grades are low"): a missing piece counts 0 once its day in the time plan has passed, and is left out before that.
 const missZ=(v,id,k)=>{if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()?0:null};
-function gvBlock(u,g){const parts=G().gv.parts.map(p=>({...p,v:p.first?avg(p.first.map(([id,k])=>missZ(pct(firstOf(u,id,k)),id,k)))
+// Class games part (games:true; Roger, 9 Nov 2026: "the performance in those games should be counted"): % right in the grammar and vocabulary
+// class games of the LS on screen, out of 10, all games pooled (the 🧩📚 circles' %). A game is counted only when the student answered at least
+// half of its questions (a late arrival or a dropped connection is left out); a student who played none has no value, and the part then drops
+// out even with "Missing work counts 0" (they cannot play a class game at home). stuGames(u) = {v, list:[{title, kind, lp, day, r, of, a, out}]}.
+function stuGames(u){loadGames();const s=S.P[u],gl=GAMES[S.g];if(!s||!s.email||!gl||gl.busy)return {v:null,list:[]};const em=String(s.email).toLowerCase(),ls=S.ls||"";
+  const list=gl.list.filter(x=>!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{title:x.title,kind:x.kind,lp:x.lp,day:x.day,r:y.r||0,of:x.done,a:y.a||0,out:(y.a||0)*2<x.done}:null}).filter(Boolean)
+    .sort((a,b)=>String(a.day).localeCompare(String(b.day)));
+  const inn=list.filter(x=>!x.out),of=inn.reduce((n,x)=>n+x.of,0);return {v:of?inn.reduce((n,x)=>n+x.r,0)/of*10:null,list}}
+function gvBlock(u,g){const parts=G().gv.parts.map(p=>({...p,v:p.games?stuGames(u).v:p.first?avg(p.first.map(([id,k])=>missZ(pct(firstOf(u,id,k)),id,k)))
     :avg(p.time.map(([id,k])=>{const o=onTime(u,id,k,g);return o===undefined?o:missZ(o==null?null:o*10,id,k)}).filter(x=>x!==undefined))}));
-  return {mark:wavg(parts.map(p=>[p.v,p.w])),parts}}
+  return {mark:wavg(parts.filter(p=>!p.games||p.v!=null).map(p=>[p.v,p.w])),parts}}
 const gvSum=B=>(B.gv.parts||[]).map(p=>p.name+" "+f1(p.v)+" × "+p.w+" %").join(" + ");
 function otherCrit(u,c){const g=G();
   const auto=avg((g.auto[c]||[]).map(([id,k,first])=>missZ(first?pct(firstOf(u,id,k)):doneAt(u,id,k)?10:null,id,k)));
@@ -1075,6 +1083,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)liveTick()
 // (a missing piece counts 0 once its day has passed, S.dueZero; not marked yet is left out) in results/{ls}__assessment .progress = {exam, fp, gv, other, total, at}, out of 10,
 // and rewrites them only when they change. Only for the group on screen, fetched in this visit, in an LS with continuous assessment.
 function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S.g)))return;
+  if(g.gv&&g.gv.parts.some(p=>p.games)){loadGames();if(!GAMES[S.g]||GAMES[S.g].busy)return}   // the class games part: wait for the group's games (loadGames renders again)
   const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
   try{Object.values(S.P||{}).filter(s=>s&&s.uid&&!s.away&&(s.group===S.g||s.tester)).forEach(s=>{S.dueZero=s.group||S.g;const {B,total}=grade(s);
     const p={exam:r1(B.exam),fp:r1(B.fp),gv:r1(B.gv&&B.gv.mark),other:r1(B.other),total:r1(total)},cur=res(s.uid,id).progress||{};
@@ -2016,7 +2025,7 @@ function planTable(g){
   // grammar and vocabulary
   if(g.gv){const gw=g.gv.parts.reduce((a,p)=>a+p.w,0);
     rows+=head("gv",esc((g.blocks.find(b=>b.id==="gv")||{}).name||"Grammar and vocabulary"),"Learning-path work, marked by the site.")
-      +g.gv.parts.map(p=>`<tr><td class="in">${esc(p.name)}</td><td class="pc">${pc(W("gv")*p.w/gw)}</td><td>${p.first?"Score of the <b>first try</b> only (what they remember from earlier paths): ":"<b>Done by the class deadline</b> in the Time plan (not the score): "}${list(p.first||p.time)}</td><td>${auto}</td></tr>`).join("")}
+      +g.gv.parts.map(p=>`<tr><td class="in">${esc(p.name)}</td><td class="pc">${pc(W("gv")*p.w/gw)}</td><td>${p.games?"<b>% right</b> in the 🧩 grammar and 📚 vocabulary class games of this LS (the circles in 👥 Students). A game they missed, or answered fewer than half of its questions, is left out, never 0.":(p.first?"Score of the <b>first try</b> only (what they remember from earlier paths): ":"<b>Done by the class deadline</b> in the Time plan (not the score): ")+list(p.first||p.time)}</td><td>${auto}</td></tr>`).join("")}
   // other competences
   if(g.other){const cs=engOther(g),n=cs.length;
     rows+=head("other","Other competences",`Only learning-path work. ${n>1?n+" criteria, an equal share each. For each one":"1 criterion, the whole block. For it"}: the steps done (or their first-try score) and, where there is one, your level on a learning-path piece (half and half). Final product levels on these criteria do not count here.`)
@@ -3327,12 +3336,15 @@ function dlg(html,wide){$("#dlg").style.maxWidth=wide?"820px":"";$("#dlgc").inne
 let redraw=null;   // the open assessment dialog, drawn again after a one-click change (typed text, open sections and scroll are kept)
 function again(){const d=$("#dlg"),c=$("#dlgc");if(!d.open||!redraw)return;const f=()=>[...c.querySelectorAll("textarea,input:not([type=checkbox])")],vals=f().map(e=>e.value),op=[...c.querySelectorAll("details")].map(x=>x.open),top=d.scrollTop;
   redraw();const now=f();if(now.length===vals.length)now.forEach((e,i)=>e.value=vals[i]);[...c.querySelectorAll("details")].forEach((x,i)=>{if(op[i]!=null)x.open=op[i]});d.scrollTop=top}
+// the class games part in the grade panel: one row per game of the LS (right / questions, left out when they answered under half)
+const gameRows=(u,row)=>{const G=stuGames(u);return G.list.length?G.list.map(x=>row((x.kind==="grammar"?"🧩 ":x.kind==="vocab"?"📚 ":"🎮 ")+esc(String(x.lp||"").split(" · ")[0]+" · "+x.title),x.r+"/"+x.of,
+  esc(x.day||"")+(x.out?` · left out: answered ${x.a} of ${x.of}`:""))).join(""):row('<span class="muted">No class games played yet</span>',"–",GAMES[S.g]&&GAMES[S.g].busy?"loading…":"left out, not 0")};
 // A student's LS grade, block by block, with the exam marks
 function gradePanel(u){redraw=()=>gradePanel(u);
   const s=S.P[u],g=G(),{B,total}=grade(s),id=asId(S.ls),x=res(u,id),sc=x.sections||{},e=g.exam,fpA=g.fp.a;
   const row=(l,v,extra)=>`<tr><td style="text-align:left">${l}</td><td>${v}</td><td style="text-align:left"><small class="muted">${extra||""}</small></td></tr>`;
-  const gvRows=!g.gv?"":g.gv.parts.map(p=>`<tr><th colspan="3" style="text-align:left">${esc(p.name)} · ${p.w} % · <b>${f1((B.gv.parts.find(x=>x.id===p.id)||{}).v)}</b></th></tr>`+(p.first||p.time).map(([a,k])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
-    return row(stepName(a,k),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===0?" late":""):""))}).join("")).join("");
+  const gvRows=!g.gv?"":g.gv.parts.map(p=>`<tr><th colspan="3" style="text-align:left">${esc(p.name)} · ${p.w} % · <b>${f1((B.gv.parts.find(x=>x.id===p.id)||{}).v)}</b></th></tr>`+(p.games?gameRows(u,row):(p.first||p.time).map(([a,k])=>{const f=firstOf(u,a,k),d=doneAt(u,a,k),t=onTime(u,a,k,s.group),due=dueOf(a,s.group);
+    return row(stepName(a,k),f?f.score+"/"+f.max:"–",(d?"done"+(d===true?"":" "+ymd(d)):"not done")+(due?" · due "+due+(t===1?" ✔ on time":t===0?" late":""):""))}).join(""))).join("");
   const blk=(id,title,mark,body)=>`<details data-k="gp-${id}" ${S.open.has("gp-"+id)?"open":""}><summary style="font-size:1rem">${title} · <b data-live="${id}">${f1(mark)}</b></summary>${body}</details>`;
   const otherTable=cs=>`<table><thead><tr><th>Criterion</th><th>Steps (auto)</th><th>Levels</th><th>Mark</th></tr></thead><tbody>${cs.map(c=>{const o=otherCrit(u,c);
       const at=(g.auto[c]||[]).map(([a,k,f])=>stepName(a,k)+": "+(f?(firstOf(u,a,k)?"first try "+firstOf(u,a,k).score+"/"+firstOf(u,a,k).max:"–"):doneAt(u,a,k)?"done":"not done")).join("\n"),
