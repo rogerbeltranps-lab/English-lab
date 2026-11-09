@@ -22,7 +22,7 @@ const f=await firestore(),m=(await f.get("settings/marking"))||{},q=m.request||{
 const rq=Date.parse(q.at||"")||0,st=Date.parse((m.run||{}).started||"")||0;
 let state={};try{state=JSON.parse(fs.readFileSync(STATE,"utf8"))}catch(e){}
 if(!rq||rq<=st){console.log("No correction asked for.");process.exit(0)}
-if(q.fired){console.log("Already started from the dashboard ("+q.fired+"): waiting for the run to begin.");process.exit(0)}
+if(q.fired&&(Date.parse(q.fired)||0)>=rq-60e3){console.log("Already started from the dashboard ("+q.fired+"): waiting for the run to begin.");process.exit(0)}
 if(rq<=(state.fired||0)){console.log("Already started for the request of "+new Date(rq).toISOString()+": waiting for the run to begin.");process.exit(0)}
 if(Date.now()-rq>2*864e5){console.log("The request is older than 2 days: left.");process.exit(0)}
 if(DRY){console.log("Would start the marking task now.");process.exit(0)}
