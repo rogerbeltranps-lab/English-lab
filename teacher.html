@@ -34,6 +34,7 @@ th.lp{cursor:pointer;min-width:90px;background:#e2e8f0}th.lp:hover{background:#c
 td.sc{cursor:pointer;font-weight:600;white-space:nowrap}td.sc:hover{outline:2px solid #0f766e;outline-offset:-2px}td.sub{background:#dcfce7}td.mark{background:#fef9c3}td.na{color:#94a3b8;font-weight:400}
 ul.todo{margin:4px 0;padding-left:18px}ul.todo li{margin:6px 0}
 .annl .annt{white-space:pre-wrap;overflow-wrap:anywhere;border-left:4px solid #ea580c;background:#fff7ed}.annprev{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:10px}
+.rbbox{margin:10px 0}.rbbox summary{cursor:pointer;font-weight:600}.rbrow{border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;margin:8px 0}.rbh{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}.rbm{margin-left:auto}.rbg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:6px}.rbc{border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;font-size:.85rem;color:#64748b;background:#fff}.rbc.on{background:#fef3c7;border:2px solid #d97706;color:#1e293b}.rbc.on.gm{background:#dbeafe;border-color:#2563eb}.rby{color:#b45309;font-weight:700;font-size:.8rem}.rbc.gm .rby{color:#1d4ed8}.rbn{margin-top:6px;font-size:.9rem}.rbn div{margin-top:2px}th.lsb,td.lsb{border-left:3px solid #334155!important}th.lssum{background:#eef2ff}small.lstag{background:#334155;color:#fff;border-radius:4px;padding:0 4px;font-weight:700}
 dialog{border:0;border-radius:14px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 10px 40px #0004}dialog::backdrop{background:#0f172a66}.dlg{padding:16px 18px}.dlg h3{margin:0 0 4px}.dlg label{display:block;margin:10px 0 4px;font-weight:600}.dlg textarea{width:100%;min-height:90px;box-sizing:border-box;font:inherit}.dlg input,.dlg select{font:inherit;padding:4px}.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.dlg table{width:100%}
 .lscard{border:1px solid #cbd5e1;border-radius:12px;padding:12px 14px;margin:12px 0;background:#fff}.badge{color:#fff;border-radius:999px;padding:4px 12px;font-weight:600;font-size:13px}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}button.opt{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:10px;text-align:left;padding:8px 10px;display:block}button.opt small{display:block;color:#64748b;margin-top:2px}button.opt.sel{font-weight:600}table.acts{width:100%}table.acts td:first-child{text-align:left}button.tog{min-width:150px;font-weight:600}button.tog.yes{background:#16a34a}button.tog.no{background:#e2e8f0;color:#475569}button.sec{background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-size:13px}button.sec.off{background:#e2e8f0;color:#475569;border-color:#cbd5e1}button.secall{background:none;color:#0f766e;padding:2px 6px;font-size:12px;text-decoration:underline}
 .ycards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:10px;margin:8px 0}.ycard{border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;background:#f8fafc}.ycard ul{margin:6px 0;padding-left:18px}.ycard li{margin:2px 0}.yfree{border-style:dashed;background:#fff}.yterm.ynow{border:2px solid #0f766e}.cbar{display:flex;height:26px;border-radius:8px;overflow:hidden;margin:6px 0 4px;background:#e2e8f0}.cbar span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;border-right:1px solid #fff}.cbar span:last-child{border-right:0}.clegend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:#475569;margin-bottom:6px}.clegend i,i.cdot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
@@ -1180,7 +1181,7 @@ const lsChips=(lss,ls,mine)=>`<div class="bar lsbar"><span class="muted">LS:</sp
 // 👥 Students: the term (its points, and the LSs it offers) and the LS (its learning paths)
 function stuBar(grp,lss,mine){const now=elTerm(),inT=lss.filter(l=>"t"+lsTerm(l)===S.term);
   return `<div class="bar lsbar"><span class="muted">Term:</span> ${EL_TERMS.map(t=>`<button class="chip ${t.id===S.term?"on":""}" data-do="stuterm" data-t="${t.id}">${esc(t.en)}${t.id===now?" · now":""}</button>`).join("")}`
-    +`<span class="muted" style="margin-left:10px">LS:</span> ${inT.length?inT.map(l=>lsChip(l,l.id===S.ls,mine)).join(""):`<span class="muted">no LS in ${esc(elTermName(S.term))} yet: the table shows the points only</span>`}</div>`}
+    +`<span class="muted" style="margin-left:10px">LS:</span> ${inT.length?inT.map(l=>lsChip(l,!(S.stuBoth&&inT.length>1)&&l.id===S.ls,mine)).join("")+(inT.length>1?`<button class="chip ${S.stuBoth?"on":""}" data-do="lsboth" title="Every LS of ${esc(elTermName(S.term))} in one table: their summaries side by side, then each LS's learning paths">Both LSs</button>`:""):`<span class="muted">no LS in ${esc(elTermName(S.term))} yet: the table shows the points only</span>`}</div>`}
 // the group's next class by the timetable (or the one going on now): {gid, date, start, end, now}
 function nextClass(gid){const T=window.EL_TIMETABLE;if(!T||!T.groups)return null;const now=window.EL_NOW?new Date(window.EL_NOW):new Date(),m0=now.getHours()*60+now.getMinutes();
   const off=d=>(T.off||[]).some(o=>Array.isArray(o)?o[0]<=d&&d<=o[1]:o===d),DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],hm=x=>Math.floor(x/60)+":"+String(x%60).padStart(2,"0");
@@ -1276,9 +1277,11 @@ function render0(){
   // 👥 Students is the group's place across LSs and terms (Roger, 9 Nov 2026: "I want to be able to choose the LS, the term (1, 2, or 3)
   // and in each term the points in the same table … the students section is like a transversal place not only of the LS"): the term picks
   // the points columns (and the LSs offered), the LS picks the learning path columns. A term with no LS yet shows the points only.
-  const stuTermLs=lss.filter(l=>"t"+lsTerm(l)===S.term),stuList=S.place==="students"&&!stuTermLs.some(l=>l.id===ls)?[]:list;
-  const lpAll=`<div class="box lpall"><h2>${stuList.length?"Learning paths and activities":"Points"}${stuList.length&&G()&&G().only?' <small class="muted">(this LS\'s learning paths are practice: not graded)</small>':""}</h2>${fold("pthow","How points work",ptHow(S.g),"key")}${fold("key","Key",`<p class="muted"><b>Click any tab cell</b> to see what the student answered there (every question with their first try, what is on the page now and the right answer; a checkpoint shows its answers), and 👁 to open it as they see it. <b>📝 Exam</b>: click a mark for the points of each section. <b>Points, All work and Bonus</b> are of the term chosen above. Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo), where ↩ Send it back asks the student to change it and hand it in again (↩ sent back until they do). Grey rows: on the student list, not signed in yet.</p>`,"key")}
-      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button>${shown.length?gzBar():""}${shown.length?`<button class="g gfsb" data-do="gfs" title="${S.gfs?"Back to the dashboard (Esc)":"Show this table on the whole screen"}">${S.gfs?"✕ Exit full screen":"⛶ Table full screen"}</button>`:""}</div>${shown.length?`<div class="wrap">${progress(shown,stuList,S.place==="students")}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}</div>`;
+  const stuTermLs=lss.filter(l=>"t"+lsTerm(l)===S.term),stuBoth=S.place==="students"&&S.stuBoth&&stuTermLs.length>1,stuIds=stuBoth?stuTermLs.map(l=>l.id):[ls],
+    stuList=stuBoth?stuIds.flatMap(acts):S.place==="students"&&!stuTermLs.some(l=>l.id===ls)?[]:list,
+    stuOnly=stuIds.filter(id=>(gradingFor(id,S.g)||{}).only).map(id=>lsLabel(EL_LS.find(l=>l.id===id)).split(" · ")[0]);
+  const lpAll=`<div class="box lpall"><h2>${stuList.length?"Learning paths and activities":"Points"}${stuList.length&&stuOnly.length?` <small class="muted">(${stuBoth?esc(stuOnly.join(", "))+(stuOnly.length>1?"'":"'s"):"this LS's"} learning paths are practice: not graded)</small>`:""}</h2>${fold("pthow","How points work",ptHow(S.g),"key")}${fold("key","Key",`<p class="muted"><b>Click any tab cell</b> to see what the student answered there (every question with their first try, what is on the page now and the right answer; a checkpoint shows its answers), and 👁 to open it as they see it. <b>📝 Exam</b>: click a mark for the points of each section. <b>Points, All work and Bonus</b> are of the term chosen above. Click a learning path to fold or unfold its activities. Each activity shows the assessment criterion it gives evidence for (proposal pending your review); – means language practice with no criterion. Click a score to see the detail, give feedback or mark it. Click a student for their email, tutor, group and route. Click a route to change it at any time: a student has one level, the same in every LS (set every route at once in “Routes from the LS1 exam”). <b>Score</b> = 1 point for each step done (the ✔ in the step columns): it shows how much of the path is done, not how well, and it is not the LS mark (that uses the first try of the checkpoints and the tabs done by the class deadline). Hover a score to see the missing steps. ✅ green = every step done (only this counts as done for the bonus and the missing lists) · 📤 submitted = the student pressed Submit (it does not mean everything is done) · 🟡 marked done = pressed Mark as done · 💬 has feedback · ✉️ a final product comment waits for your answer. <b>write</b> (the writing of each learning path, handed in to you and corrected by Claude on Wednesday): 📨 Wed waiting for Wednesday · 📨 new handed in again after the correction · ✏️ corrected · ⚠️ copy? possible copy in the To do · 🔁 redo · ❌ late (missed the last Wednesday run) · NA/AS/AN/AE the level, when the writing is a level moment. Click any of them to open the writing and its correction (⚠️ copy? opens the check: why, the writing log, Accept or Redo), where ↩ Send it back asks the student to change it and hand it in again (↩ sent back until they do). Grey rows: on the student list, not signed in yet.</p>`,"key")}
+      <div class="bar"><button class="g" data-do="unfold">Unfold all</button><button class="g" data-do="fold-all">Fold all</button>${shown.length?gzBar():""}${shown.length?`<button class="g gfsb" data-do="gfs" title="${S.gfs?"Back to the dashboard (Esc)":"Show this table on the whole screen"}">${S.gfs?"✕ Exit full screen":"⛶ Table full screen"}</button>`:""}</div>${shown.length?`<div class="wrap">${progress(shown,stuList,S.place==="students",stuIds)}</div>`:'<p class="muted">No students in this group'+(S.route==="all"&&S.tutor==="all"?listed()?" on the student list.":" yet. Import the student list (below) so every student appears.":" with this filter.")+"</p>"}</div>`;
   const legendB=`<div class="box">${fold("legend","Assessment criteria in this LS",`<p class="muted">Click a criterion anywhere on the page to read it and see which activities give evidence for it.</p>${legend(list)}`)}</div>`;
   const resultB=(G()&&G().only?"":`<div class="box">${G()&&G().evidence?fold("result","Result per assessment criterion",`<p class="muted">The degree each student reaches in every LS criterion. <span class="sug">AN?</span> is the suggestion from the evidence (teacher levels; an exam score adds to a level but never sets 4.1 or 2.2 alone; the later piece weighs ${G().later} times the earlier one). Click a cell to see the evidence and confirm or change it: confirmed degrees show in colour with ✓. Scale NA 2.5 · AS 5 · AN 7.5 · AE 10; under 5 NA · 5–6.9 AS · 7–8.9 AN · 9–10 AE.</p>${shown.length?`<div class="wrap">${degrees(shown)}</div>`:""}`)
       :fold("result","Result per assessment criterion",`<p class="muted">Sum of the points of the graded activities linked to each criterion. The final product counts with the mark you enter.</p>${shown.length?`<div class="wrap">${criteria(shown,list)}</div>`:""}`)}</div>`);
@@ -1864,11 +1867,13 @@ function ptMissDlg(u){const s=S.P[u];if(!s)return;const m=ptMiss(s)||[];redraw=n
     return `<tr><td style="text-align:left"><b>${esc(a.title)}</b><br><small class="muted">${lsLabel(EL_LS.find(l=>l.id===a.ls))} · due ${esc(ELWeek.date(d))}</small></td><td style="text-align:left">${left.map(tab).join(" ")||'<span class="muted">–</span>'}</td></tr>`}).join("");
   dlg(`<h3>✗ Missing work · ${name(s)}</h3><p class="muted">${esc(elTermName(S.term))}: the learning paths due so far that are not finished (every LS of the term), with the tabs still to do. Click a tab to open it as they see it. Until they are done there is no points bonus.</p>`
     +(rows?`<table><thead><tr><th style="text-align:left">Learning path</th><th style="text-align:left">Tabs missing</th></tr></thead><tbody>${rows}</tbody></table>`:'<p>✓ Nothing missing.</p>'),true)}
+// Both LSs: a click on a learning path of the other LS makes it the LS on screen first (the dialogs read G(), the grading of S.ls)
+function bothLs(id){const a=byId(id);if(a&&S.place==="students"&&S.stuBoth&&a.ls!==S.ls)S.ls=a.ls}
 // 📝 Exam column of the Students table: the exam mark of the LS on screen (sections typed in 📊 Marks or imported); click = exDlg
 const exOf=ls=>((window.EL_GRADING||{})[ls]||{}).exam||null;
 function exCell(u,ls){const e=exOf(ls),m=examMark(u,ls);if(!e)return "";
-  return `<td class="first sc exm" data-do="exdlg" data-u="${u}" title="Click: the exam section by section">${m?`<b>${f1(m.mark)}</b>${m.n<m.of?`<br><small class="muted">${m.n} of ${m.of} sections</small>`:""}`:'<span class="muted">not yet</span>'}</td>`}
-function exDlg(u){const s=S.P[u],ls=S.ls,e=exOf(ls),l=EL_LS.find(x=>x.id===ls);if(!s||!e)return;redraw=null;
+  return `<td class="first sc exm" data-do="exdlg" data-u="${u}" data-ls="${esc(ls)}" title="Click: the exam section by section">${m?`<b>${f1(m.mark)}</b>${m.n<m.of?`<br><small class="muted">${m.n} of ${m.of} sections</small>`:""}`:'<span class="muted">not yet</span>'}</td>`}
+function exDlg(u,lsId){const s=S.P[u],ls=lsId||S.ls,e=exOf(ls),l=EL_LS.find(x=>x.id===ls);if(!s||!e)return;redraw=null;
   const x=res(u,asId(ls)),sc=x.sections||{},m=examMark(u,ls),bc=elExamByCrit(e,sc),cr=exCrits(e),p=(window.EL_PLAN||{})[ls],gi=p?ELWeek.col(p,s.group):-1,ex=gi>=0?ELWeek.exam(p,gi):null;
   dlg(`<h3>📝 Exam · ${lsLabel(l)}</h3><p class="muted">${name(s)} · exam version ${esc(LV[x.version]||x.version||"not set")}${ex?" · on "+esc(ELWeek.date(ex)):""}</p>`
     +`<p><b>Exam mark: ${m?f1(m.mark)+" / 10":"not entered yet"}</b>${m&&m.n<m.of?` <span class="muted">(${m.n} of ${m.of} sections entered)</span>`:""}</p>`
@@ -1882,11 +1887,11 @@ const canHw=a=>GR.some(g=>g.id===S.g)&&((window.EL_SECTIONS||{})[a.id]||[]).leng
 // 🧩 📚 class game circles next to each student (Roger, 6 Nov 2026: "I want those circles next to the students in the list"): % right in the
 // grammar and vocabulary games of this LS (gameResults of the group, read once per dashboard load: one read per game played)
 const GAMES={};
-function gameMine(s){const g=GAMES[S.g];if(!g||g.busy||!s.email)return null;const em=String(s.email).toLowerCase(),ls=S.ls||"";
+function gameMine(s,lsId){const g=GAMES[S.g];if(!g||g.busy||!s.email)return null;const em=String(s.email).toLowerCase(),ls=lsId||S.ls||"";
   const mine=g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done,title:x.title,day:x.day,lp:x.lp,ls:x.ls}:null}).filter(Boolean);
   if(!mine.length)return null;const gl=(mine.find(x=>x.ls)||{}).ls||"";
   return {mine,st:elGameStats(mine),em,href:`lab/game/results.html?g=${encodeURIComponent(S.g)}${gl?"&ls="+encodeURIComponent(gl):""}&stu=${encodeURIComponent(em)}`}}
-function gameRings(s){const G=gameMine(s);if(!G)return "";const {mine,st,em}=G,gl=(mine.find(x=>x.ls)||{}).ls||"",click="\nClick: every answer and the notes";
+function gameRings(s,lsId){const G=gameMine(s,lsId);if(!G)return "";const {mine,st,em}=G,gl=(mine.find(x=>x.ls)||{}).ls||"",click="\nClick: every answer and the notes";
   // hover a circle = the games it counts; click = Results open on this student (Roger, 7 Nov 2026: "they should see grammar games, when they go to the percentage")
   return `<a class="grings" href="lab/game/results.html?g=${encodeURIComponent(S.g)}${gl?"&ls="+encodeURIComponent(gl):""}&stu=${encodeURIComponent(em)}" target="_blank" rel="noopener" title="Class games of this LS: % right in 🧩 grammar and 📚 vocabulary (click for the answers and notes)"><span>🧩</span>${elRing(st.grammar,"",30,elGameTip(mine,"grammar")+click)}<span>📚</span>${elRing(st.vocab,"",30,elGameTip(mine,"vocab")+click)}</a>`}
 // 📝 the student's notes of the class games (Roger, 7 Nov 2026: "can I see it here too? on the students list?"): the LS page's #notes place
@@ -1934,32 +1939,49 @@ const cmtCell=(u,a,k)=>{const h=((pstate(u,a)||{}).steps||{})[k];if(!h||!ELMark.
   return waits(h,xr,k)?`<br><small title="💬 Comment waiting for an answer (Claude answers it in a few minutes): click to see it">✉️ comment</small>`
     :cmtCa(xr,h,k)?`<br><small title="💬 Claude answered their comment: click to see the answer">🗨️ answered</small>`
     :(xr.replies||{})[k]?`<br><small title="💬 You answered their comment: click to see it">🗨️ answered</small>`:""};
-function progress(studs,list,stu){
-  loadGames();const ex=stu&&list.length&&exOf(S.ls),best=stu?ptBestOk(S.g):0;
-  const open=a=>!S.folded.has(a.id)&&lpCols(a).length>0,any=list.some(open),rs=any?' rowspan="2"':"";
+function progress(studs,list,stu,ids){
+  ids=ids&&ids.length?ids:[S.ls];const multi=stu&&ids.length>1;
+  loadGames();const ex=stu&&list.length&&!multi&&exOf(S.ls),best=stu?ptBestOk(S.g):0;
+  // 🎬 in Students the final product shows only its Score (Roger, 9 Nov 2026: "on final product we only need the final product score")
+  const fpIds=new Set(stu?ids.map(id=>(fpAct(id)||{}).id).filter(Boolean):[]);
+  const open=a=>!fpIds.has(a.id)&&!S.folded.has(a.id)&&lpCols(a).length>0,any=list.some(open)||multi,rs=any?' rowspan="2"':"";
+  // Both LSs (Roger, 9 Nov 2026: "on the left the LS1 summary and by its side on the right the LS2 summary, and following the LS1 details
+  // and then LS2"): the term's points once, then one summary block per LS (class games, exam, total), then each LS's learning paths
+  const lsOf=id=>EL_LS.find(l=>l.id===id),lsShort=id=>{const l=lsOf(id);return l?lsLabel(l).split(" · ")[0]:id},
+    firstLp=new Set(ids.map(id=>(list.find(a=>a.ls===id)||{}).id).filter(Boolean)),lsb=a=>multi&&firstLp.has(a.id)?" lsb":"",
+    sumCols=id=>[{k:"g"},...(exOf(id)?[{k:"e"}]:[]),{k:"t"}],
+    lsTot=(u,id)=>{let ts=0,tm=0;const r=S.D.rs[u]||{};list.forEach(a=>{if(a.ls!==id)return;const x=r[a.id],y=a.graded&&x&&x.max&&scOf(u,a);if(y){ts+=y.score;tm+=y.max}});return {ts,tm}};
   // 🧩 📚 class game circles: in Students a column of their own after the points (Roger, 9 Nov 2026: "I want the circles of percentage of
   // the grammar and vocab too … here"), so an LS with no class games saved says so instead of showing nothing
   const gc=stu&&list.length>0,gl=GAMES[S.g],gAny=gc&&gl&&!gl.busy&&Object.values(S.P).some(s=>s.group===S.g&&gameMine(s));
-  let h1=`<tr><th class="stu"${rs}>Student${!stu&&GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small><span class="pkey" aria-hidden="true"><i class="g">🧩</i><i class="v">📚</i></span>':""}</th><th class="rtc"${rs}>Route</th>`+(stu?`<th class="first"${rs} title="Team points of ${esc(elTermName(S.term))} (− / + for an absent student or a mistake)">Points<br><small class="muted">${esc(elTermName(S.term))}</small></th><th${rs}>All work</th><th${rs}>Bonus</th>`:"")+(gc?`<th class="first" style="min-width:118px"${rs} title="% right in the class games of this LS. Hover a circle for the games, click it for every answer and the notes">Class games<br><small class="muted">🧩 grammar · 📚 vocabulary</small>${gl&&!gl.busy&&!gAny?`<br><small class="muted">none saved in this LS yet</small>`:""}</th>`:"")+(ex?`<th class="first"${rs} title="The exam of this LS (out of 10). Click a mark for the sections">📝 Exam</th>`:""),h2="<tr>";
-  list.forEach(a=>{const head=`${open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} ${lpCols(a).some(c=>c.ks.length>1)?"points: Vocabulary counts 2, its study cards and its sentences":"steps"})`:pts(a)}</small>`;
-    if(open(a)){h1+=`<th class="lp first" colspan="${lpCols(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
+  let h1=`<tr><th class="stu"${rs}>Student${!stu&&GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small><span class="pkey" aria-hidden="true"><i class="g">🧩</i><i class="v">📚</i></span>':""}</th><th class="rtc"${rs}>Route</th>`+(stu?`<th class="first"${rs} title="Team points of ${esc(elTermName(S.term))} (− / + for an absent student or a mistake)">Points<br><small class="muted">${esc(elTermName(S.term))}</small></th><th${rs}>All work</th><th${rs}>Bonus</th>`:"")+(gc&&!multi?`<th class="first" style="min-width:118px"${rs} title="% right in the class games of this LS. Hover a circle for the games, click it for every answer and the notes">Class games<br><small class="muted">🧩 grammar · 📚 vocabulary</small>${gl&&!gl.busy&&!gAny?`<br><small class="muted">none saved in this LS yet</small>`:""}</th>`:"")+(ex?`<th class="first"${rs} title="The exam of this LS (out of 10). Click a mark for the sections">📝 Exam</th>`:""),h2="<tr>";
+  if(multi)ids.forEach(id=>{const sc=sumCols(id),none=gl&&!gl.busy&&!Object.values(S.P).some(s=>s.group===S.g&&gameMine(s,id));
+    h1+=`<th class="first lsb lssum" colspan="${sc.length}">${lsLabel(lsOf(id))}<br><small class="muted">summary</small></th>`;
+    h2+=sc.map((c,i)=>c.k==="g"?`<th class="${i?"":"first lsb"}" style="min-width:118px" title="% right in the class games of ${esc(lsShort(id))}. Click a circle for every answer and the notes; 📝 their notes">Class games<br><small class="muted">🧩 · 📚</small>${none?`<br><small class="muted">none saved yet</small>`:""}</th>`
+      :c.k==="e"?`<th title="The exam of ${esc(lsShort(id))} (out of 10). Click a mark for the sections">📝 Exam</th>`
+      :`<th title="${esc(lsShort(id))}: the points of its graded learning paths (as the Total column of one LS), or the steps done when they are practice">Total</th>`).join("")});
+  list.forEach(a=>{const fpo=fpIds.has(a.id),head=`${multi?`<small class="lstag">${esc(lsShort(a.ls))}</small> `:""}${fpo?"🎬":open(a)?"▾":"▸"} ${elLpOpen(a,S.D.ls[a.ls],S.g)?"":'<span title="Locked for this group">🔒</span> '}${a.title}<br>${a.criteria.map(pill).join("")}<br><small class="muted">${a.graded&&!a.manual&&!a.checkpoint&&steps(a).length>1?`Score: 1 point per step done (${a.points} ${lpCols(a).some(c=>c.ks.length>1)?"points: Vocabulary counts 2, its study cards and its sentences":"steps"})`:pts(a)}</small>`;
+    if(open(a)){h1+=`<th class="lp first${lsb(a)}" colspan="${lpCols(a).length+1}" data-do="fold" data-a="${a.id}">${head}</th>`;
       // 🏠 per tab (Roger, 9 Nov 2026: "the homework button should only be per SLP"): one small 🏠 on each tab's column, not on the learning
       // path's heading; it opens Set as homework with only that tab ticked. Filled when the tab is already in a homework of the group.
       const hx=canHw(a)&&!isCp(a)?planX(a.ls,S.g):null,hs=hx?hwItems(hx):null;
       h2+=lpCols(a).map((c,i)=>`<th class="ac ${i?"":"first"} ${colSkip(a,c)?"skip":""}">${colLink(a,c)}${hx&&c.t?`<button type="button" class="g mini tabhw${hs.has(a.id+"#"+c.t)?" on":""}" data-do="lphw" data-a="${esc(a.id)}" data-t="${esc(c.t)}" title="${hs.has(a.id+"#"+c.t)?"Already homework for this group · click to set it again":"Set this tab as homework"}">🏠</button>`:""}${isLS1(a)?"":"<br>"+colCrit(a,c)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
-    else h1+=`<th class="lp first"${rs} data-do="fold" data-a="${a.id}">${head}</th>`});
-  h1+=`<th class="first"${rs}>Total</th></tr>`;h2+="</tr>";
+    else h1+=`<th class="lp first${lsb(a)}"${rs}${fpo?' title="Final product: only its score here (open it in 🎬 Final product)"':` data-do="fold" data-a="${a.id}"`}>${head}</th>`});
+  h1+=(multi?"":`<th class="first"${rs}>Total</th>`)+"</tr>";h2+="</tr>";
   let b="";const cols=list.reduce((n,a)=>n+(open(a)?lpCols(a).length+1:1),0);
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
-    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${stu?"":gameRings(s)}${notesLink(s,S.ls)}${pChip(s)}</td>`;
-    const pc=(stu?ptCols(s,best):"")+(gc?`<td class="first gcol">${s.away?"–":gl&&gl.busy?'<small class="muted">loading…</small>':gameRings(s)||'<small class="muted">–</small>'}</td>`:"");
-    if(s.away){b+=`<tr class="away">${who}${awayRt(s)}${pc}${ex?'<td class="first">–</td>':""}${cols?`<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td>`:""}<td class="first">–</td></tr>`;return}
+    const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}">${name(s)}</a>${s.tester?'<span class="tag">tester</span>':""}${stu?"":gameRings(s)}${multi?"":notesLink(s,S.ls)}${pChip(s)}</td>`;
+    const gcell=(id,cl)=>`<td class="first gcol${cl||""}">${s.away?"–":gl&&gl.busy?'<small class="muted">loading…</small>':(gameRings(s,id)||'<small class="muted">–</small>')+(multi?" "+notesLink(s,id):"")}</td>`;
+    const pc=(stu?ptCols(s,best):"")+(gc&&!multi?gcell(S.ls):"")+(multi?ids.map(id=>sumCols(id).map((c,i)=>c.k==="g"?gcell(id," lsb"):c.k==="e"?(s.away?"<td>–</td>":exCell(s.uid,id).replace('class="first ','class="')):(()=>{if(s.away)return "<td>–</td>";const {ts,tm}=lsTot(s.uid,id);
+      if(tm)return `<td><b>${ts}/${tm}</b><br><small>${Math.round(ts/tm*100)}%</small></td>`;let n=0,N=0;list.forEach(a=>{if(a.ls!==id||a.manual)return;const d=doneSet(s.uid,a),st=steps(a);N+=st.length;n+=st.filter(k=>d.has(k)).length});
+      return `<td title="Steps done in the learning paths of ${esc(lsShort(id))} (practice, not graded)">${N?`<b>${n}/${N}</b><br><small class="muted">steps</small>`:"–"}</td>`})()).join("")).join(""):"");
+    if(s.away){b+=`<tr class="away">${who}${awayRt(s)}${pc}${ex?'<td class="first">–</td>':""}${cols?`<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td>`:""}${multi?"":'<td class="first">–</td>'}</tr>`;return}
     b+=`<tr>${who}${rtCell(s.uid)}${pc}${ex?exCell(s.uid,S.ls):""}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
-      if(open(a))b+=lpCols(a).map((c,i)=>`<td class="ac st ${i?"":"first"} ${colSkip(a,c)?"skip":""}" data-do="step" data-u="${s.uid}" data-a="${esc(a.id)}" data-c="${i}">${colCell(s.uid,a,c,d)}</td>`).join("");
-      b+=`<td class="sc ${c.c} ${open(a)?"":"first"}" data-do="cell" data-u="${s.uid}" data-a="${a.id}"${c.tip?` title="${esc(c.tip)}"`:""}>${c.t}</td>`;
+      if(open(a))b+=lpCols(a).map((c,i)=>`<td class="ac st ${i?"":"first"+lsb(a)} ${colSkip(a,c)?"skip":""}" data-do="step" data-u="${s.uid}" data-a="${esc(a.id)}" data-c="${i}">${colCell(s.uid,a,c,d)}</td>`).join("");
+      b+=`<td class="sc ${c.c} ${open(a)?"":"first"+lsb(a)}" data-do="cell" data-u="${s.uid}" data-a="${a.id}"${c.tip?` title="${esc(c.tip)}"`:""}>${c.t}</td>`;
       const y=a.graded&&x&&x.max&&scOf(s.uid,a);if(y){ts+=y.score;tm+=y.max}});
-    b+=`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td></tr>`});
+    b+=(multi?"":`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td>`)+"</tr>"});
   return `<table><thead>${h1}${any?h2:""}</thead><tbody>${b}</tbody></table>`;
 }
 function criteria(studs,list){
@@ -3474,7 +3496,8 @@ function cellPanel(u,id){redraw=()=>cellPanel(u,id);
     +fpgBox(u,a)
     +(a.manual?`<label>Mark</label><input id="fsc" type="number" step="0.5" style="width:80px" value="${x.score??""}"> out of <input id="fmx" type="number" style="width:80px" value="${x.max??10}">`:"")
     +`<label>Feedback for the student</label><textarea id="ffb">${esc(x.feedback||"")}</textarea>`
-    +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`);
+    +(a.manual?fpStuRub(u,a):"")
+    +`<div class="row">${x.locked?`<button class="g" data-do="reopen" data-u="${u}" data-a="${id}" title="The student keeps their progress and has to mark it as done again">Allow resubmission</button>`:""}<button data-do="save" data-u="${u}" data-a="${id}">Save</button></div>`,a.manual&&!!fpRub(a));
 }
 
 // ---- 🎬 Gemini watches the final product video (Roger, 8 Nov 2026: "I give the video to Gemini and Gemini gives me the feedback, then if I
@@ -3501,7 +3524,7 @@ function fpgRubric(a){const g=G()||{},R=(window.EL_FP_RUBRICS||{})[a.id];
   if(g.fp&&g.fp.a===a.id&&!g.fp.mark)return {kind:"levels",rows:g.fp.rows.map(r=>({name:r.name,sub:r.c,w:r.w,d:(g.ind||{})[r.c]||[],step:r.step,c:r.c}))};
   if(R)return {kind:"mark",title:R.title,rows:R.rows.map(r=>({name:r.name,sub:r.sub,w:r.w,d:r.d.slice().reverse()}))};
   return null}
-async function fpgLoad(a){if(FPG.d[a.id]||DEMO)return FPG.d[a.id]=FPG.d[a.id]||{};
+async function fpgLoad(a){if(FPG.d[a.id]||DEMO)return FPG.d[a.id]=FPG.d[a.id]||(DEMO&&DEMO.fpg||{})[a.id]||{};
   try{const c=await F.getDoc(F.doc(db(),"settings",fpgDoc(a.id)));FPG.d[a.id]=c.exists()?c.data():{}}catch(e){console.warn("fp drafts",e);FPG.d[a.id]={}}return FPG.d[a.id]}
 function fpgSave(a,u,d){(FPG.d[a.id]=FPG.d[a.id]||{})[u]=d;return put(["settings",fpgDoc(a.id)],{[u]:d})}
 async function fpgCall(body){const tok=await ELCloud.auth.currentUser.getIdToken();
@@ -3536,7 +3559,7 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
     h+=`<p style="margin:10px 0 4px"><b>${rd[0]} ${rd[1]}</b>${x.reading&&x.reading.note?` · ${esc(x.reading.note)}`:""}</p>`
       +`<table class="lvt"><thead><tr><th style="text-align:left">Row</th><th>Gemini</th><th style="text-align:left">Comments: 👀 only for you · ✔ ➜ for the student</th></tr></thead><tbody>`
       +R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};return `<tr><td style="text-align:left">${esc(r.name)} <small class="muted">${r.w?r.w+" %":""}</small></td><td><b>${R.kind==="mark"&&g.level!=null?fpgRow(g)+"/10 · "+fpgPlus(g):fpgLv(g.level)}</b></td><td style="text-align:left"><small class="muted">👀 ${esc(g.why||"")}</small>${g.good?`<br><small>✔ ${esc(g.good)}</small>`:""}${g.improve?`<br><small>➜ ${esc(g.improve)}</small>`:""}</td></tr>`}).join("")
-      +`</tbody></table>`+(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")
+      +`</tbody></table>`+(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x)
       +(x.sounds&&x.sounds.length?`<p style="margin:8px 0 2px"><b>🗣️ Words said wrong</b> <small class="muted">(only for you, never shown to the student)</small> <button class="g" data-fpg="sounds" data-u="${u}" data-a="${esc(a.id)}" style="font-size:12px;padding:2px 8px">List for the whole group</button></p><p style="margin:0 0 6px"><small>${x.sounds.map(w=>`<b>${esc(w.word)}</b>${w.heard?" (said “"+esc(w.heard)+"”)":""}`).join(" · ")}</small></p>`:"")
       +`<label>Feedback for the student (Gemini's draft: you can change it below before approving)</label><div class="fb" style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px">${esc(fpgText(R,x))}</div>`
       +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
@@ -3544,6 +3567,43 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
       +`<label>Not right? Tell Gemini what to change</label><textarea id="fpgchg" rows="2" placeholder="e.g. She doesn't read, she only looks at the slides; Language should be Level 3"></textarea>`
       +`<div class="row" style="justify-content:flex-start"><button class="g" data-fpg="change" data-u="${u}" data-a="${esc(a.id)}" ${busy?"disabled":""}>✏️ Ask Gemini to change it</button></div>`}
   box.innerHTML=h}
+// 📋 The final product rubric with a level shaded in each row (Roger, 9 Nov 2026: "here I should be able to see their rubric like they do
+// … and also when gemini gives feedback"): in the final product dialog, the student's rubric as their 📊 My marks shows it (LS1: the parts
+// of the saved feedback, "Name (30%) · 7.5/10" + ✔/➜, on EL_FP_RUBRICS, as fbRubric in today.html; LS2: your levels on the rows, with the
+// indicators), and Gemini's draft on the same rubric. Levels top to bottom; the last one ("No evidence") has no descriptor.
+function fpRub(a){const R=(window.EL_FP_RUBRICS||{})[a.id],g=gradingFor(a.ls,S.g)||{};
+  if(g.fp&&g.fp.a===a.id&&!g.fp.mark&&(g.fp.rows||[]).length)return {kind:"levels",levels:["AE","AN","AS","NA","No evidence"],
+    rows:g.fp.rows.map(r=>({name:r.name,sub:r.c,w:r.w,d:((g.ind||{})[r.c]||[]).slice().reverse(),step:r.step,c:r.c}))};
+  if(R)return {kind:"mark",levels:R.levels,note:R.note||"",rows:R.rows.map(r=>({name:r.name,sub:r.sub,w:r.w,d:r.d,pts:r.pts}))};
+  return null}
+// the feedback text cut into its parts, as fbBox in today.html does
+function fbParts(txt){const H=/^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/,parts=[];let cur=null;
+  String(txt||"").split("\n").forEach(l=>{const t=l.trim();if(!t||/^Final mark:/i.test(t))return;const h=t.match(H);
+    if(h){cur={m:parseFloat(h[3].replace(",",".")),ok:[],todo:[]};parts.push(cur);return}
+    if(cur&&/^✔/.test(t)){cur.ok.push(t.replace(/^✔\s*/,""));return}if(cur&&/^➜/.test(t)){cur.todo.push(t.replace(/^➜\s*/,""));return}
+    if(cur)(cur.todo.length?cur.todo:cur.ok).push(t)});return parts}
+const rbIdx=m=>4-Math.max(0,Math.min(4,Math.round(m/2.5)));   // mark /10 → index in the levels (0 = top, 4 = No evidence)
+// sel[i] = {L: index in N.levels, m: mark /10 or null, ok, todo}; tag = "you" (the student's) or "Gemini"
+function rubH(N,sel,tag){const last=N.levels.length-1,gm=tag!=="you";
+  return N.rows.map((r,i)=>{const x=sel[i]||{},L=x.L==null?-1:x.L;
+    return `<div class="rbrow"><div class="rbh"><b>${esc(r.name)}</b> <small class="muted">· ${esc(r.sub)}${r.w?" · "+r.w+" %":""}</small><span class="rbm">${x.m!=null?`<b>${f1(x.m)}</b><small class="muted">/10</small> · `:""}<small class="muted">${L>=0?esc(N.levels[L]):"not marked"}</small></span></div>`
+      +`<div class="rbg">${r.d.map((d,k)=>`<div class="rbc${k===L?" on"+(gm?" gm":""):""}"><b>${esc(N.levels[k])}</b>${r.pts?` <small class="muted">${r.pts[k]} pts</small>`:""}${k===L?` <span class="rby">◀ ${esc(tag)}</span>`:""}<div>${esc(d)}</div></div>`).join("")}</div>`
+      +(L===last&&L>=r.d.length?`<div class="rbc on${gm?" gm":""}" style="margin-top:6px"><b>${esc(N.levels[last])}</b> <span class="rby">◀ ${esc(tag)}</span></div>`:"")
+      +((x.ok&&x.ok.length)||(x.todo&&x.todo.length)?`<div class="rbn">${x.ok&&x.ok.length?`<div>✔ ${esc(x.ok.join(" "))}</div>`:""}${x.todo&&x.todo.length?`<div>➜ ${esc(x.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
+// the student's rubric, as they see it (LS1 from the saved feedback; LS2 from your levels)
+function fpStuRub(u,a){const N=fpRub(a),x=res(u,a.id);if(!N)return "";let sel,lead;
+  if(N.kind==="mark"){const P=fbParts(x.feedback);if(!x.feedback)return "";
+    if(P.length!==N.rows.length)return `<details class="rbbox"><summary>📋 Their rubric, as they see it</summary><p class="muted">The saved feedback has no part marks (“Speaking (30%) · 7.5/10” lines), so they see it as plain text, with no rubric shaded.</p></details>`;
+    sel=P.map(p=>({L:rbIdx(p.m),m:p.m,ok:p.ok,todo:p.todo}));lead=`What they see in 📊 My marks under your feedback: their level in each part shaded. ${esc(N.note)}`}
+  else{sel=N.rows.map(r=>{const l=lvOf(u,a.id,r.step,r.c),L=N.levels.indexOf(l);return {L:L>=0?L:-1,m:l?lvMark(l):null}});
+    if(!sel.some(z=>z.L>=0))return "";lead="Your level on each row of the rubric (NA · AS · AN · AE), with its indicators."}
+  return `<details class="rbbox" open><summary>📋 Their rubric, as they see it</summary><p class="muted" style="margin:4px 0">${lead}</p>${rubH(N,sel,"you")}</details>`}
+// Gemini's draft on the same rubric
+function fpGemRub(a,x){const N=fpRub(a);if(!N||!x)return "";
+  const sel=N.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};if(g.level==null)return {L:-1};
+    if(N.kind==="mark"){const m=fpgRow(g);return {L:m==null?-1:rbIdx(m),m,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[]}}
+    return {L:g.level===0?4:4-g.level,m:g.level?g.level*2.5:null,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[]}});
+  return `<details class="rbbox"><summary>📋 Gemini's draft on the rubric</summary><p class="muted" style="margin:4px 0">The level Gemini proposes in each row (blue), with what it would tell the student. Nothing changes until you ✅ Approve.</p>${rubH(N,sel,"Gemini")}</details>`}
 // LS1: mark /10 = levels × 2.5 weighted by the rows (rows Gemini could not judge are left out)
 function fpgMark(R,x){let s=0,w=0;R.rows.forEach((r,i)=>{const m=fpgRow((x.rows||[])[i]||{});if(m!=null){s+=m*r.w;w+=r.w}});return w?Math.round(s/w*10)/10:null}
 // the feedback text the student gets: LS1 in the "Name (30%) · 7.5/10" + ✔/➜ lines the student board shades on the rubric (fbBox in today.html)
@@ -3949,7 +4009,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     rtapply:()=>{const c=GR.find(g=>g.id===S.g).course,src=srcLs(c),to=S.rtTo,ps=rtRows(c,src,to,Object.values(S.P).filter(s=>s.group===S.g&&!s.tester)).filter(r=>r.on).map(r=>[r.s.uid,r.pick]);
       if(!ps.length||!confirm(`Set the route of ${ps.length} student${ps.length===1?"":"s"} in ${EL_LS.find(l=>l.id===to).title} and send each one a notice with their level? Their work so far is kept.`))return;
       S.rtPick={};S.rtOn={};S.rtAll=false;act(api.setLevels(to,ps,"exam"))},rtall:()=>{S.rtAll=!S.rtAll;S.rtOn={};render()},setrt:()=>{$("#dlg").close();act(api.setLevel(u,S.ls,k.r))},
-    crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>cellPanel(u,k.a),close:()=>$("#dlg").close(),
+    crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>{bothLs(k.a);cellPanel(u,k.a)},close:()=>$("#dlg").close(),
     qa:()=>{if(k.f==="g")S.qa.g=k.v;else if(k.f==="all")S.qa.f.all=true;else{S.qa.f[k.f]=k.v;S.qa.f.all=false}render()},
     qago:()=>{S.qa.ls=S.ls;S.qa.g=S.g;S.g="qa";S.place="home";render();scrollTo(0,0)},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
@@ -3973,11 +4033,12 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     status:()=>{if(k.s==="closed"&&!confirm("Close the LS: students will no longer be able to change anything. Continue?"))return;act(api.ls(S.ls,{status:k.s}))},
     assign:()=>{const l=EL_LS.find(x=>x.id===S.ls),info=S.D.ls[S.ls],set=new Set(lsGroups(S.ls).filter(g=>elLsForGroup(l,info,g.id)).map(g=>g.id));set.has(k.g)?set.delete(k.g):set.add(k.g);act(api.ls(S.ls,{groups:[...set]}))},
     ptterm:()=>{S.term=k.t;render()},
-    lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=false;if(S.place==="students")S.term="t"+lsTerm(l);render()},
+    lspick:()=>{const l=EL_LS.find(x=>x.id===k.ls);if(!l)return;S.ls=l.id;S.year=false;S.stuBoth=false;if(S.place==="students")S.term="t"+lsTerm(l);render()},
+    lsboth:()=>{S.stuBoth=true;render()},
     stuterm:()=>{S.term=k.t;const g=GR.find(x=>x.id===S.g),inT=g?EL_LS.filter(l=>l.course===g.course&&"t"+lsTerm(l)===k.t):[];
       if(inT.length&&!inT.some(l=>l.id===S.ls)){const mine=l=>elLsForGroup(l,S.D.ls[l.id],S.g);S.ls=(inT.filter(l=>mine(l)&&(S.D.ls[l.id]||{}).status==="open").pop()||inT.filter(mine).pop()||inT[inT.length-1]).id}
       render()},
-    exdlg:()=>exDlg(u),ptmiss:()=>ptMissDlg(u),step:()=>{if(e.target.closest("a"))return;stepPanel(u,k.a,+k.c)},ptcsv:()=>ptCsv(S.g),ptadd:()=>quick(pt.add(k.k,S.g,+k.d)),
+    exdlg:()=>exDlg(u,k.ls),ptmiss:()=>ptMissDlg(u),step:()=>{if(e.target.closest("a"))return;bothLs(k.a);stepPanel(u,k.a,+k.c)},ptcsv:()=>ptCsv(S.g),ptadd:()=>quick(pt.add(k.k,S.g,+k.d)),
     lp:()=>{const info=S.D.ls[S.ls],open=new Set(acts(S.ls).filter(a=>elLpOpen(a,info,S.g)).map(a=>a.id));open.has(k.a)?open.delete(k.a):open.add(k.a);
       act(api.lpOpen(S.ls,S.g,acts(S.ls).filter(a=>open.has(a.id)).map(a=>a.id)))},
     lpset:()=>act(api.lpOpen(S.ls,S.g,k.v==="1"?acts(S.ls).map(a=>a.id):[])),
