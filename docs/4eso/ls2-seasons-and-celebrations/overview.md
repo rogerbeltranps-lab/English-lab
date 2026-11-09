@@ -263,6 +263,9 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 - [S] **Places & travel:** travel home for the holidays; the town square; the community centre; the school hall; crowded streets
 - [D] **Change & debate:** commercialised; consumerism; keep a tradition alive; die out; evolve; adapt; reinvent; date back to; cultural appropriation; stereotype; inclusive; take something for granted
 - [S] **Verb + preposition:** contribute to; depend on; come from; be known for; be associated with (Safe since 31 Oct 2026: the programme gives verb + preposition to Safe and Daring)
+- [B] **Feelings, -ed = how you feel · -ing = what it is like** (all routes, 9 Nov 2026: the lexicon map plans "Sentiments i emocions (-ed / -ing)" in LS2): excited / exciting; bored / boring; tired / tiring
+- [I] **More feelings, -ed or -ing?:** interested (in) / interesting; amazed / amazing; disappointed / disappointing
+- [S] **Surprised or surprising?:** surprised / surprising
 - Receptive: pilgrims; feast; harvest festival
 
 ### Practice (80 %)
@@ -277,6 +280,14 @@ Record your explanation of the same celebration: **Insecure 45–60 s** (frame) 
 8. [D] Halloween ___ back to an old Celtic festival. → *dates*
 9. [D] Some people think Christmas is too ___: it's all about buying things. → *commercialised*
 10. [S] Spain is known ___ its summer festivals. → *for*
+11. [B] The children can't sleep: they are very ___ about the party. → *excited*
+12. [B] The speech was very long and ___. → *boring*
+13. [B] After dancing all night, we were very ___. → *tired*
+14. [I] The story behind Halloween is really ___. → *interesting*
+15. [I] We were ___ by the Diwali lights: we had never seen anything like them. → *amazed*
+16. [I] It rained all day, so the parade was ___. → *disappointing*
+17. [S] Many people are ___ to learn that the first jack-o'-lanterns were turnips. → *surprised*
+18. [S] I'm not very ___ in costumes, but I love the food. → *interested*
 
 ### Listening: *The story behind two autumn celebrations* (podcast, about 2 min 30 s)
 
