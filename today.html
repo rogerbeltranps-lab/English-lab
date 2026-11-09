@@ -1157,10 +1157,21 @@ function hwList(ls,info){const {p,gi}=planOf(ls);if(gi<0||only(ls.id)||!D.me.gro
     const left=acts.flatMap(([a,ps])=>{const ds=doneSet(a),all=((window.EL_SECTIONS||{})[a.id]||[]).map(z=>z[0]).filter(id=>elSecSteps(a,id).length);
       return (ps.length?ps:all.length?all:[""]).filter(id=>id?!tabDone(a,id,ds):!isDone(a)).map(id=>[a,id])});
     return {x,acts,done:acts.length>0&&!left.length,href:left.length?tabHref(left[0][0],left[0][1]||undefined):acts.length?tabHref(acts[0][0]):null,can:acts.every(([a,ps])=>canDo(a,info)&&!ps.some(id=>secOff(a,info,id)))}})}   // a tab still locked: "not open yet"
+// 🎯 Test yourself (Roger, 9 Nov 2026: "the sample exam shouldn't be a to do list, it's optional. We could leave it here saying sth like
+// test yourself"): under ✅ To do, the optional practice (the sample exam, optional in EL_CATALOG) of every open LS of my group, never as a
+// to-do item: its tabs done so far and a link. Nothing when the LS is not open.
+function testCard(lss){if(!D.me.group)return "";
+  const xs=lss.filter(l=>!only(l.id)).flatMap(l=>{const info=D.ls[l.id]||{},st=info.status==="public"?"open":info.status;
+    return st==="open"&&elLsForGroup(l,info,D.me.group)?EL_CATALOG.filter(a=>a.ls===l.id&&a.optional&&canDo(a,info)).map(a=>[a,l]):[]});
+  if(!xs.length)return "";const many=new Set(xs.map(x=>x[1].id)).size>1;
+  return `<div style="margin-top:12px;border:1px dashed #67e8f9;background:#ecfeff;border-radius:12px;padding:10px 14px"><b style="color:#155e75">🎯 ${t("Posa't a prova","Test yourself")}</b> <small class="muted">(${t("opcional","optional")})</small>`
+    +`<p class="muted" style="margin:4px 0 8px">${t("El mateix format que l'examen de veritat. Fes-lo quan vulguis per veure com ho portes: no són deures, no és per fer a classe i mai no queda endarrerit.","The same format as the real exam. Do it whenever you want to see how ready you are: it is not homework, not for class and never late.")}</p>`
+    +xs.map(([a,l])=>{const ds=doneSet(a),gs=tabGroups(a,steps(a)),n=gs.filter(g=>g.every(k=>ds.has(k))).length;
+      return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0"><b>📝 ${esc(a.title)}${many?` <small class="muted">· ${lsName(l)}</small>`:""}</b><small class="muted">${n} / ${gs.length} ${t("pestanyes fetes","tabs done")}</small><a class="go" href="${tabHref(a)}">${n?t("Continua","Continue"):t("Prova-ho","Try it")} →</a></div>`}).join("")+`</div>`}
 function todoBox(lss,ls,info){const xs=todoItems(lss),hws=hwList(ls,info).filter(h=>!h.done),many=new Set(xs.map(x=>x.l.id)).size>1;
   const hwOf=a=>hws.find(h=>h.acts.some(([y])=>y.id===a.id)),hwTab=(a,id)=>hws.some(h=>h.acts.some(([y,ps])=>y.id===a.id&&ps.includes(id)));
   const head=`<h2>✅ ${t("Per fer","To do")}</h2><p class="muted" style="margin:0 0 10px">${t("Tot el que el professor ha obert a classe i encara no has acabat. Clica una pestanya per anar-hi. Els <b>deures</b> són una altra cosa: només el que el professor posa com a deures (📝 Deures).","Everything your teacher has opened in class that you haven't finished yet. Click a tab to go straight to it. <b>Homework</b> is different: only what your teacher sets as homework (📝 Homework).")}</p>`;
-  if(!xs.length)return `<div class="box todo">${head}<p class="ptok">✓ ${t("No tens res per fer: has acabat tot el que el professor ha obert.","Nothing to do: you have finished everything your teacher has opened.")}</p></div>`;
+  if(!xs.length)return `<div class="box todo">${head}<p class="ptok">✓ ${t("No tens res per fer: has acabat tot el que el professor ha obert.","Nothing to do: you have finished everything your teacher has opened.")}</p>${testCard(lss)}</div>`;
   const li=x=>{const a=x.a,ds=doneSet(a),ks=tabGroups(a,visSteps(a,D.ls[x.l.id]||{})),n=ks.filter(g=>g.every(k=>ds.has(k))).length,num=x.p&&x.gi>=0?lpNums(x.p,x.gi)(a):"",nm=(num?num+" · ":"")+a.title.split(/[:(]/)[0].trim(),h=hwOf(a);
     // each path says when it is for (Roger, 8 Nov 2026: "say to do in class or homework by … if it's homework"): ⏰ late, 📝 homework by its day, else 🏫 in class
     const tags=(x.late?` <span class="tdtag late">⏰ ${t("endarrerida","late")}</span>`:"")+(h?` <span class="tdtag hw">📝 ${t("deures per al","homework by")} ${when(h.x.date)}</span>`:x.late?"":` <span class="tdtag cls">🏫 ${t("a classe","in class")}</span>`);
@@ -1168,7 +1179,7 @@ function todoBox(lss,ls,info){const xs=todoItems(lss),hws=hwList(ls,info).filter
       :x.tabs.length?x.tabs.map(([id,tn])=>`<a class="stp go2 ${hwTab(a,id)?"hwt":""}" href="${tabHref(a,id)}">${hwTab(a,id)?"📝 ":""}${esc(tn)} →</a>`).join("")
       :`<a class="stp go2" href="${tabHref(a)}">${t("Obre-la","Open it")} →</a>`;
     return `<li><div class="tdh"><b><a href="${tabHref(a)}">${esc(nm)}</a></b>${ks.length>1?` <small class="muted">· ${n} / ${ks.length} ${t("passos fets","steps done")}</small>`:""}${tags}</div><div class="chips">${chips}</div></li>`};
-  return `<div class="box todo">${head}${many?lss.filter(l=>xs.some(x=>x.l.id===l.id)).map(l=>`<h3 class="tdls">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</h3><ul class="tdl">${xs.filter(x=>x.l.id===l.id).map(li).join("")}</ul>`).join(""):`<ul class="tdl">${xs.map(li).join("")}</ul>`}</div>`}
+  return `<div class="box todo">${head}${many?lss.filter(l=>xs.some(x=>x.l.id===l.id)).map(l=>`<h3 class="tdls">${esc(l.title.split(" · ")[0])} · ${lsName(l)}</h3><ul class="tdl">${xs.filter(x=>x.l.id===l.id).map(li).join("")}</ul>`).join(""):`<ul class="tdl">${xs.map(li).join("")}</ul>`}${testCard(lss)}</div>`}
 // 📝 Homework (Roger, 6 Nov 2026: "They are only homework if I say so"): only what the teacher set as homework (a learning path or some of
 // its tabs, 🏠 Set as homework on the dashboard; never the plan's "Homework by …" lines: ELWeek.studentHw), with the day it is for, ✔ when I have done it, a
 // button to the first tab still to do, the teacher's instructions and the calendar. LS1 keeps its old week plan.
