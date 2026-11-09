@@ -339,7 +339,7 @@ function draw(){
     const rank=P.map(em=>({em,n:score(em)})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n||nameOf(a.em).localeCompare(nameOf(b.em))).slice(0,3);
     const tot=P.length*qs,right=P.reduce((t,em)=>t+score(em),0),pod=[rank[1],rank[0],rank[2]],cls=["p2","p1","p3"],medal=["🥈","🥇","🥉"];
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
-      <h1 class="logo pop">🏁 Well done!</h1><p class="sub">${tot?`The class got <b>${Math.round(right/tot*100)} %</b> right.`:""} Every right answer is +1 point.</p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap">${tot?G.ring(right/tot*100,"the class got right","170px"):""}<div style="flex:0 1 auto"><h1 class="logo pop" style="margin:0">🏁 Well done!</h1><p class="sub">Every right answer is +1 point.</p></div></div>
       ${rank.length?"":`<p class="card msg" style="margin:1em auto">No right answers this time. Next time!</p>`}<div class="podium"${rank.length?"":" hidden"}>${pod.map((x,k)=>x?`<div class="${cls[k]} slidein" style="animation-delay:${[.8,1.6,0][k]}s"><span class="nm">${esc(nameOf(x.em))}<br><span class="sc">${x.n} right</span></span><span class="blk">${medal[k]}</span></div>`:"<div></div>").join("")}</div>
       <p><button class="btn go" data-do="finish">Finish</button> <button class="btn ghost" data-do="again">Play again</button> <a class="btn ghost" href="results.html?g=${encodeURIComponent(H.g)}" target="_blank" rel="noopener">📊 Results</a> ${backBtn()}</p></div></div></div>`;return}
   if(!isQ(s)&&!isN(s)){
