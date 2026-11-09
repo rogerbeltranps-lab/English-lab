@@ -128,7 +128,9 @@ function live(){
   }
   // only the game's own fields: a pull-up (go) and the group's full screen (fs) stay as they are (Roger, 6 Nov 2026), so after the game
   // the students are kept and in full screen again; a field the slide does not use (q, th, ok, nt) is removed
-  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D,nt:D},base);
+  // the end: the class's % right, as on the board's 🏁 Well done!, also on the students' screens (Roger, 9 Nov 2026: "I want the percentage of the class at the end too")
+  if(H.phase==="end"){const P=Object.keys(H.players),tot=P.length*qs.length,right=P.reduce((t,em)=>t+Object.values(H.aw).filter(l=>l.includes(em)).length,0);if(tot)base.cp=Math.round(right/tot*100)}
+  const D=S.deleteField(),data=Object.assign({q:D,th:D,ok:D,nt:D,cp:D},base);
   S.setDoc(S.doc(db,"live",H.g),data,{mergeFields:Object.keys(data)}).catch(e=>{console.warn("live",e);H.err="⚠ The students can't see the game: "+e.message;draw()});
 }
 function liveOff(g){if(g)S.setDoc(S.doc(db,"live",g),{on:false,at:S.serverTimestamp()},{merge:true}).catch(e=>console.warn("live",e))}

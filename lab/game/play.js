@@ -53,7 +53,7 @@ function draw(){
   if(ph==="theory")return page(`<div class="emo pop">${pic(x.th&&x.th.img)||"👀"}</div><p class="big">Look at the board</p><p class="mid">${md(x.th&&x.th.title)}</p>`);
   if(ph==="end"){const s=score(),t=x.qt||0;
     if(shown!==x.sid+":end"){shown=x.sid+":end";G.fx("fanfare");if(s>0)G.confetti()}
-    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p>${cmWait}`)}
+    return page(`<div class="emo pop">${s>=t*.8?"🏆":s>=t/2?"⭐":"💪"}</div><p class="big">You got ${s} / ${t} right</p><p class="mid">+${s} point${s===1?"":"s"} · Well done!</p>${typeof x.cp==="number"?`<p class="mid">👥 ${esc(T("The class got "+x.cp+" % right","La classe ha encertat el "+x.cp+" %"))}</p>`:""}${cmWait}`)}
   if(ph==="q"&&q.write&&mine[i]==null){const k=x.sid+":"+i,v=draft.k===k?draft.v:"";
     app$.innerHTML=top()+`<div class="main"><div class="card qcard slidein">${md(q.text)}</div>
       <form class="wform slidein" data-k="${esc(k)}"><label for="wa">✏️ Write the missing words <span class="note">Escriu només les paraules que falten</span></label>
