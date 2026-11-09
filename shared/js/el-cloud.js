@@ -440,7 +440,7 @@ function lockSections(ids,ca,a,done,soon,gid){
   const day=d=>d===today?(ca?"avui":"today")+(openAt?(ca?" a les ":" at ")+hm(openAt+5*60e3):""):(()=>{try{return new Date(d+"T12:00:00").toLocaleDateString(ca?"ca-ES":"en-GB",{weekday:"short",day:"numeric",month:"short"})}catch(e){return d}})();
   // a tab the teacher moved to a later day after the student had started it (Roger, 8 Nov 2026: "we froze the page until the calendar allows
   // to edit but their answers get saved"): the same, with their answers kept and shown; it opens to change them on that day
-  const cnote=id=>"🏫 "+(ca?"Per fer a classe":"To do in class")+(soon[id]?" · "+day(soon[id]):"")+". "
+  const cnote=id=>"🏫 "+(ca?"Ho farem a classe":"We'll do it in class")+(soon[id]?" · "+day(soon[id]):"")+". "
     +(did(id)?(ca?"Les teves respostes estan desades: les podràs continuar i canviar a classe. Fins llavors no es pot respondre ni posar els àudios o vídeos.":"Your answers are saved: you can carry on and change them in class. Until then you can't answer or play the audio or videos.")
       :(ca?"Ara ja ho pots mirar, però ho farem junts a classe: encara no pots respondre ni posar els àudios o vídeos.":"You can look at it now, but we'll do it together in class: you can't answer it or play the audio or videos yet."));
   const st=document.createElement("style");st.textContent=".panel.el-sec-off>:not(.el-sec-note){pointer-events:none}.panel.el-sec-off :is(audio,video,summary,[data-vs]){pointer-events:auto}"
