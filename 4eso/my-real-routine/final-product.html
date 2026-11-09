@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="elgate">
 <head>
 <meta charset="utf-8">
   <link rel="icon" type="image/png" href="/English-lab/favicon-192.png"><link rel="apple-touch-icon" href="/English-lab/apple-touch-icon.png"><link rel="manifest" href="/English-lab/site.webmanifest">
@@ -37,8 +37,10 @@ main{padding:22px 0 60px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 
 @media(max-width:600px){.hero-topline{align-items:flex-start}.hero-quick-actions{justify-content:flex-start}.hero-quick-actions a{font-size:.76rem;padding:7px 9px}}
 </style>
 <link rel="stylesheet" href="../../shared/css/lp-theme-4eso.css">
+<link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu and the LS2 learning path layout before the first paint (Roger, 8 Nov 2026) -->
 </head>
 <body>
+<script src="../../shared/js/el-route-names.js"></script><!-- level names at once, before the page draws -->
 <div class="topbar"><div class="wrap toprow">
   <div class="brand"><a class="lp-home-link" href="/English-lab/index.html">⌂ Home</a><a href="index.html">← My Real Routine</a><span class="brand-mark">6</span><span class="brand-title">Final product<small>4 ESO · My Real Routine · Learning Path 6</small></span></div>
   <div class="session-jump">
@@ -306,11 +308,15 @@ $('#sessionJump').onchange=e=>{if(e.target.value)location.href=e.target.value};r
 
 </script>
 <script src="../../shared/js/section-next.js"></script>
+<script src="../../shared/js/ls1-lp.js"></script><!-- the LS2 learning path layout (Roger, 8 Nov 2026) -->
 <script>
 sectionNext.init({level:()=>level,panels:[['interview','interview'],['notes','notes'],['site','slides'],['prepare','prepare'],['record','record'],['review','review']].map(([id,key])=>({id,done:()=>!!state.done[key],detail:ca=>ca?'Completa el pas i marca’n les comprovacions.':'Complete this step and tick its checks.'}))});
 [['[data-complete="interview"]','interview'],['[data-complete="notes"]','notes'],['#finishSite','slides'],['[data-complete="prepare"]','prepare'],['#finishRecording','record'],['#finishReview','review'],['#finishFinal','submit']].forEach(([sel,key])=>sectionNext.undo({button:document.querySelector(sel),level:()=>level,isDone:()=>!!state.done[key],undo:()=>{delete state.done[key];$$('.result').forEach(x=>x.classList.remove('show'));save()}}));
 sectionNext.final({id:'submit',level:()=>level,done:()=>!!state.done.submit,detail:ca=>ca?'Completa les comprovacions i confirma el lliurament.':'Complete the checks and confirm the submission.'});
 </script>
+<!-- the app menu and the learning path's left column at once, before the browser paints (as the LS2 pages) -->
+<script src="../../shared/js/el-catalog.js"></script>
+<script src="../../shared/js/el-app.js"></script>
 <script type="module" src="../../shared/js/el-cloud.js"></script>
 </body>
 </html>

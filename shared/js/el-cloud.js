@@ -302,7 +302,7 @@ async function gate(u){
   if(!u&&!AS){signInBlock();return}   // signed out: the Sign in screen at once (it came after reading the LS, the same way)
   const info=await lsInfo(lsId),st=info.status;
   if(isStudent(u)&&!seesAll(u)&&Array.isArray(info.open[myGroup]))lockedKeys=elLpLocks(lsId,info.open[myGroup]).lockedKeys;
-  if(isTeacher(u)&&!AS){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);if(!/-my-real-routine$/.test(lsId))openHashTab();return}   // the tab in the link (dashboard column names, Roger 7 Nov 2026: "should go to the SLP not the LP"); an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
+  if(isTeacher(u)&&!AS){if(st!=="open")banner("Teacher mode · LS "+lsId+": "+st,"#475569");teacherSections(info);if(!/-my-real-routine$/.test(lsId)){openHashTab();teacherCore()}return}   // the tab in the link (dashboard column names, Roger 7 Nov 2026: "should go to the SLP not the LP"); an open LS: no bar that pushes the page down a second after it opened (Roger, 7 Nov 2026); hidden or closed: the bar says so
   if(AS)asBanner();
   else if(!u||!isStudent(u)){signInBlock();return}
   const tester=!AS&&seesAll(u),vg=!AS&&viewGroup(u);
@@ -503,6 +503,7 @@ async function teacherSections(info){
     +".el-tsec button.on{background:#4338ca;color:#fff;border-color:#4338ca}.el-tsec button.g{background:none;border-color:transparent;text-decoration:underline;font-weight:500}.el-tsec small{display:block;color:#475569;margin-top:6px}"
     +".el-tsec .w{margin-top:8px;padding:6px 10px;border-radius:8px;background:#fef2f2;color:#991b1b;font-weight:600}.el-tsec .w button{margin-left:6px}.el-tsec .m{margin-left:6px;color:#15803d;font-weight:600}.el-tsec .m.err{color:#b91c1c}"
     +".el-tsec .pl{margin-top:8px;padding-top:8px;border-top:1px dashed #a5b4fc}.el-tsec .pl button[data-cm]:not(.g){background:#0f766e;border-color:#0f766e;color:#fff}.el-tsec .now{color:#0f766e;font-weight:700}.el-tsec .pl button.fs.on{background:#1e293b;border-color:#1e293b;color:#fff}.el-tsec .fsl{flex-basis:100%;font-size:13px;color:#9a3412;font-weight:600}"
+    +".el-gpl{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:2px;font:600 12px system-ui,sans-serif}.el-gpl em{font-style:normal;padding:1px 8px;border-radius:999px;background:#fee2e2;color:#991b1b}.el-gpl em.y{background:#dcfce7;color:#166534}.el-gpl b{font-weight:800}"
     +".tab .el-tsw{display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;font-size:12px;line-height:18px;background:#dcfce7;border:1px solid #86efac;cursor:pointer;vertical-align:1px}"
     +".tab .el-tsw.off{background:#fee2e2;border-color:#fca5a5}.tab .el-tsw:hover{outline:2px solid #6366f1}.tab.el-toff{border-style:dashed!important;opacity:.75}";
   document.head.append(st);
@@ -563,6 +564,16 @@ async function teacherSections(info){
   // no full screen button any more (Roger, 7 Nov 2026): it is on during every class of the timetable and while class mode is on
   function fsRow(w){const x=fsE(),on=!!x;
     return (w.active?'<div class="fsl">⛶ Full screen '+gname(g)+' · '+(on?'until '+fsHm(x.until):'🎮 in a game')+' · ✓ '+w.inn.length+' in · ✗ '+w.out.length+' out'+(w.out.length&&!cmRead()?': '+w.out.map(y=>E(y.name)+" ("+fsWhy(y)+")").join(" · "):"")+'</div>':"")}
+  // Has the group played this learning path's class games? (Roger, 8 Nov 2026: "see whether the group has played the games of the LP"):
+  // under each 🎮 game button, every group of the course with ✓ + the day it was played or ✗ not yet, the group picked above in bold.
+  // From ls/{id}.played[group][deck] (written by the game board, lab/game/host.js markPlayed), already in the LS doc this page reads: no extra reads.
+  const plDay=ms=>new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  function gamesPlayed(){const P=info.played||{};
+    document.querySelectorAll('a[href*="host.html?deck="]').forEach(a=>{let id="";try{id=new URL(a.href).searchParams.get("deck")||""}catch(e){}if(!id)return;
+      let s=a.querySelector(".el-gpl");if(!s){s=document.createElement("div");s.className="el-gpl";a.style.flexWrap="wrap";a.append(s)}
+      const h=grs.map(x=>{const ms=(P[x.id]||{})[id],nm=x.id===g?"<b>"+E(x.name)+"</b>":E(x.name);
+        return ms?'<em class="y">✓ '+nm+' · '+plDay(ms)+'</em>':'<em class="n">✗ '+nm+' · not yet</em>'}).join("");
+      if(s.dataset.h!==h){s.dataset.h=h;s.innerHTML=h;s.title="Played in class by each group (✓ day / ✗ not yet)"}})}
   const toggle=id=>{const off=new Set(locked());off.has(id)?off.delete(id):off.add(id);save(all.filter(x=>off.has(x)))};
   function cmRow(){fsWatch();const x=fsLive&&fsLive.go,on=elCmOn(x),me=cmRead(),mine=me&&me.g===g;
     return '<div class="r pl"><b>🎓 Class mode for '+gname(g)+'</b>'
@@ -590,6 +601,7 @@ async function teacherSections(info){
       +(elLpOpen(a,info,g,true)?"":'<div class="w">⚠️ This whole learning path is locked for '+gname(g)+': students cannot open it yet.<button data-lp="1">✔ Open it for '+gname(g)+'</button></div>');
     if(bar.dataset.h!==html){bar.innerHTML=html;bar.dataset.h=html;try{origSet.call(localStorage,"el_tsec_"+relPath,JSON.stringify({h:html,css:st.textContent,all,off}))}catch(e){}}   // for el-app.js tsecEarly on the next visit
     fsFloat(fsRoll())
+    gamesPlayed();
     document.querySelectorAll(".tab[data-panel]").forEach(t=>{const id=t.dataset.panel;if(!all.includes(id))return;const on=!off.includes(id);
       let sw=t.querySelector(".el-tsw");if(!sw){sw=document.createElement("span");sw.className="el-tsw";sw.setAttribute("role","button");
         sw.onclick=e=>{e.stopPropagation();e.preventDefault();toggle(id)};t.append(sw)}
@@ -597,6 +609,11 @@ async function teacherSections(info){
       if(sw.textContent!==tx)sw.textContent=tx;if(sw.title!==ti)sw.title=ti;sw.classList.toggle("off",!on);t.classList.toggle("el-toff",!on)})}
   draw();new MutationObserver(()=>draw()).observe(document.body,{childList:true,subtree:true});
 }
+// Core by default for the teacher (Roger, 8 Nov 2026: "is it possible to see core as a default"): a learning path opens on the Core (B1)
+// route in teacher mode, whatever level was picked last time; the Level buttons still switch it for this visit. Students keep their
+// own route (applyLevel), and with none yet Base. Waits for the page's route buttons to be ready (ls2-engine.js init sets onclick).
+function teacherCore(){let n=0;const go=()=>{const b=document.querySelector('.route[data-level="safe"]');
+  if(b&&b.onclick){if(!b.classList.contains("active"))b.click();return}if(++n<60)setTimeout(go,150)};go()}
 // A link to a section (activity.html#read, from the to-do list) opens that tab once the page is ready.
 function openHashTab(){const id=decodeURIComponent(location.hash.slice(1));if(!id)return;const t=[...document.querySelectorAll(".tab[data-panel]")].find(x=>x.dataset.panel===id);if(t)t.click()}
 addEventListener("hashchange",openHashTab);

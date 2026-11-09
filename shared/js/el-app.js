@@ -22,7 +22,9 @@
   const ROOT = new URL("../../", document.currentScript ? document.currentScript.src : location.href).href;
   const path = location.pathname, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const LS1 = /\/my-real-routine\//.test(path);
+  // LS1 learning paths (the pages with the path selector) look like LS2 (Roger, 8 Nov 2026: "Make LP and SLP of the LS1 look like the
+  // LS2"; ls1-lp.js gives them the engine's parts); the rest of LS1 (home, games, models, rubric, sample exam) keeps its design
+  const LS1 = /\/my-real-routine\//.test(path) && !$(".topbar #sessionJump");
   const m = path.match(/\/((?:2|4)eso)\/([^/]+)\/[^/]*$/), lsHere = m && !LS1 ? m[1] + "-" + m[2] : null;
   const mode = LS1 || /\/(today|teacher)\.html$/.test(path) || document.body.classList.contains("lsh") ? null
     : $(".topbar #sessionJump") ? "lp"
