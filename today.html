@@ -1365,7 +1365,7 @@ function testCard(lss){if(!D.me.group)return "";
       return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0"><b>📝 ${esc(a.title)}${many?` <small class="muted">· ${lsName(l)}</small>`:""}</b><small class="muted">${n} / ${gs.length} ${t("pestanyes fetes","tabs done")}</small><a class="go" href="${tabHref(a)}">${n?t("Continua","Continue"):t("Prova-ho","Try it")} →</a></div>`}).join("")+`</div>`}
 function todoBox(lss,ls,info){const xs=todoItems(lss),hws=hwList(ls,info).filter(h=>!h.done),many=new Set(xs.map(x=>x.l.id)).size>1;
   const hwOf=a=>hws.find(h=>h.acts.some(([y])=>y.id===a.id)),hwTab=(a,id)=>hws.some(h=>h.acts.some(([y,ps])=>y.id===a.id&&ps.includes(id)));
-  const head=`<h2>✅ ${t("Per fer","To do")}</h2><p class="muted" style="margin:0 0 10px">${t("El que vam fer a classe abans d'avui i encara no has acabat. Clica una pestanya per anar-hi. El que farem avui a classe o més endavant no surt aquí. Els <b>deures</b> són una altra cosa: només el que el professor posa com a deures (📝 Deures).","What we did in class before today that you haven't finished yet. Click a tab to go straight to it. What we will do in today's class or later is not here. <b>Homework</b> is different: only what your teacher sets as homework (📝 Homework).")}</p>`;
+  const head=`<h2>✅ ${t("Per fer","To do")}</h2><p class="muted" style="margin:0 0 10px">${t("El que ja hem fet a classe i encara no has acabat (el d'avui, quan s'acaba la classe): si no vas venir, fes-ho a casa. Clica una pestanya per anar-hi. El que encara no hem fet a classe no surt aquí. Els <b>deures</b> són una altra cosa: només el que el professor posa com a deures (📝 Deures).","What we have already done in class that you haven't finished yet (today's, once the class is over): if you missed the class, do it at home. Click a tab to go straight to it. What we haven't done in class yet is not here. <b>Homework</b> is different: only what your teacher sets as homework (📝 Homework).")}</p>`;
   if(!xs.length)return `<div class="box todo">${head}<p class="ptok">✓ ${t("No tens res per fer: has acabat tot el que vam fer a classe.","Nothing to do: you have finished everything we did in class.")}</p>${testCard(lss)}</div>`;
   const li=x=>{const a=x.a,ds=doneSet(a),ks=tabGroups(a,visSteps(a,D.ls[x.l.id]||{})),n=ks.filter(g=>g.every(k=>ds.has(k))).length,num=x.p&&x.gi>=0?lpNums(x.p,x.gi)(a):"",nm=(num?num+" · ":"")+a.title.split(/[:(]/)[0].trim(),h=hwOf(a);
     // each path says when it is for (Roger, 8 Nov 2026: "say to do in class or homework by … if it's homework"): ⏰ late, 📝 homework by its day, else 🏫 in class
@@ -1534,6 +1534,8 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
   const hws=hwList(ls,info).filter(h=>!h.done),hwOf=a=>hws.find(h=>h.acts.some(([y])=>y.id===a.id));
   // LP1, LP2… before each path, the numbers of the group's plan (Roger, 9 Nov 2026: "I need the numbers of the Learning Path LP1. Getting started")
   const lpN=p&&gi>=0?lpNums(p,gi):()=>"";
+  // done in class already (a class day before now, ticked, or set as homework: elDueBefore): to do on their own, not "we'll do it in class"
+  const db=D.me.group&&!window.EL_RAW_OPEN?elDueBefore(info,D.me.group):null,dueB=a=>!!db&&(db.acts.has(a.id)||!!db.tabs[a.id]);
   const body=rows.map(({a,d})=>{const ds=doneSet(a),at=stateOf(a).doneAt||{},drop=dr.includes(a.id),cp=!TX&&open&&canDo(a,info)&&elCheckpointMissing(a,doneSet,y=>canDo(y,info)),can=canDo(a,info)&&!cp;
     if(!TX&&!can&&!ds.size&&!D.rs[a.id])return "";   // students never see a learning path they cannot open yet (Roger, 7 Nov 2026: "they mustn't see that anything is locked")
     const vis=steps(a).filter(k=>TX||ds.has(k)||(can&&(!secOff(a,info,k)||soonK(a,info,k))));   // students: only the tabs they have done or can open, + 🏫 the ones for a later class
@@ -1561,7 +1563,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     else if(!can){st=`<span class="s-off">🔒 ${t("Encara no està oberta","Not open yet")}</span>`}
     else if(a.optional){st=`<span class="s-ok" style="color:#0e7490">💪 ${t("Opcional · per practicar l'examen","Optional · exam practice")}</span>`}
     else if(late){st=`<span class="s-no">⏰ ${t("Falta · calia fer-la el","Missing · was due")} ${when(d)}</span>`}
-    else{const h=hwOf(a);st=h?`<span class="s-td">📝 ${t("Deures per al","Homework by")} ${when(h.x.date)}</span>`:`<span class="s-td">🏫 ${t("Ho farem a classe","We'll do it in class")}</span>`;
+    else{const h=hwOf(a);st=h?`<span class="s-td">📝 ${t("Deures per al","Homework by")} ${when(h.x.date)}</span>`:dueB(a)?`<span class="s-td">✅ ${t("Per fer · ja l'hem fet a classe","To do · we did it in class")}</span>`:`<span class="s-td">🏫 ${t("Ho farem a classe","We'll do it in class")}</span>`;
       if(TX&&d&&!h)st+=`<br><small class="muted">plan: ${when(d)} (students don't see this date)</small>`}
     const c=cell(a);if(vis.length<steps(a).length&&!a.graded&&!a.manual)c.t=vis.filter(k=>ds.has(k)).length+"/"+vis.length+(x.feedback?" 💬":"");
     const num=lpN(a),title=(num?`<span class="lpno">${num}</span> `:"")+(can?`<a href="${tabHref(a)}">${esc(a.title)}</a>`:esc(a.title));
