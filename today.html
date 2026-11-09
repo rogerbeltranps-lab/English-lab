@@ -62,6 +62,18 @@ table.pgt-t td.pgtot b{font-size:1.55rem}.pgtot .xbar{display:block;margin:5px a
 @media (max-width:640px){table.pgt-t,table.pgt-t tbody,table.pgt-t tr,table.pgt-t td{display:block;width:auto}table.pgt-t thead{display:none}
   table.pgt-t tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:8px 12px}table.pgt-t tr.now{background:#eff6ff;border-color:#bfdbfe}table.pgt-t tr.soon{background:#f8fafc}table.pgt-t td{border:0!important;padding:3px 0!important;text-align:left!important}
   table.pgt-t td:empty{display:none}table.pgt-t td[data-h]::before{content:attr(data-h);display:inline-block;min-width:120px;color:#475569;font-size:13px}table.pgt-t td small{display:inline;margin-left:6px}.pgtot .xbar{display:inline-block;margin:0 0 0 8px}.pgt{min-width:0;flex:1 1 40%}}
+.cpsum{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.cps{border-radius:10px;padding:7px 12px;font-size:14.5px}.cps.ok{background:#dcfce7;color:#14532d}.cps.bad{background:#fff7ed;color:#9a3412;border:1px solid #fdba74}
+.cpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px}
+.cpc{background:var(--ks);border-radius:14px;padding:12px 14px;border-top:5px solid var(--k)}.cpc.none{opacity:.75}
+.cph{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.cph>b{font-size:16px;color:var(--k)}.cph .cpm{margin-left:auto}.cph .cpm b{font-size:1.5rem}
+.cpc .fv-bar{display:block;margin:6px 0 4px}.cpl{list-style:none;margin:0;padding:0}.cpl li{border-top:1px solid rgba(15,23,42,.08)}
+.cpcr{display:flex;align-items:flex-start;gap:10px;width:100%;background:none;border:0;padding:8px 2px;text-align:left;font:inherit;color:inherit;cursor:pointer}.cpcr:hover{background:rgba(255,255,255,.6)}
+.cpn{font-weight:800;color:var(--k);min-width:34px}.cpt{flex:1;font-size:14px;color:#334155}.cpt small{display:block;color:#64748b;font-size:12.5px;margin-top:2px}
+.cpm{display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:nowrap}.cpm b{font-size:1.2rem}
+.dg{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:1px 8px;white-space:nowrap}.dg-ae{background:#ede9fe;color:#5b21b6}.dg-an{background:#dbeafe;color:#1e40af}.dg-as{background:#dcfce7;color:#166534}.dg-na{background:#fee2e2;color:#991b1b}
+table.gvt td{vertical-align:middle;text-align:center}table.gvt td.l{text-align:left}table.gvt td.l>b{display:block;font-size:15.5px}table.gvt a.pgo{display:inline-block;background:#e2e8f0;border-radius:8px;padding:6px 12px;text-decoration:none;color:#0f172a;font-weight:600}table.gvt a.pgo:hover{background:#cbd5e1}.gvk{font-size:12.5px;color:#64748b;font-weight:700}table.gvt td small{display:block}table.gvt td .xbar{display:block;margin:4px auto 0;width:90px}
+.gvmiss{margin:4px 0 2px;padding-left:18px;font-size:13px;color:#7c2d12}.gvmiss s{color:#b91c1c}
+@media (max-width:640px){.cpgrid{grid-template-columns:1fr}table.gvt,table.gvt tbody,table.gvt tr,table.gvt td{display:block;width:auto}table.gvt thead{display:none}table.gvt tr{border:1px solid #e2e8f0;border-radius:14px;margin:0 0 10px;padding:8px 12px}table.gvt td{border:0!important;padding:3px 0!important;text-align:left!important}table.gvt td .xbar{display:inline-block;margin:0 0 0 8px}}
 </style></head><body>
 <style>/* Menu as on Home and English Lab: side menu on a computer, top menu on a phone */
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid #e5e7eb;padding:24px 18px;display:flex;flex-direction:column;gap:24px;overflow:auto}
@@ -1064,6 +1076,81 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
     +row(t("Producte final","Final product"),W("fp"),v.fp,v.fp==null?t("Al final de la LS","At the end of the LS"):"","pb")+det("fp")
     +`<tr class="tot"><td class="l"><b>${t("Nota de la LS fins ara","LS mark so far")}</b></td><td><b>100 %</b></td><td>${mark(total)}</td><td class="l">${bar(total)}</td></tr></tbody></table></div>`
     +`<p class="muted" style="margin:6px 0 0">${t("Les activitats que encara no toquen i les parts que encara no estan corregides no compten fins llavors.","Activities whose day has not come yet and parts not marked yet do not count until then.")}${p.at?" "+t(`Actualitzat: ${when(p.at)}`,`Updated: ${when(p.at)}`):""}</p></div>`}
+// 🧩 My competences in 🎓 My progress (Roger, 9 Nov 2026: "show them the grades of their assessment criteria - competences (that are related
+// to the work done). So that they understand what they have learnt and what they need to work on"). The same pieces as the dashboard's
+// whole-year view (teacher.html pieces/byComp): each block of EL_GRADING[ls] is spread over its criteria (exam sections, final-product rows,
+// daily work by the criteria of its steps, other competences), with the student's marks from the board's data (exam sections, progress
+// .parts from the dashboard, a confirmed final[c] degree wins). Each piece goes in the term of its report block (EL_PLAN .report), else of
+// its date, else of its LS. English competences only (transversals are not in the English mark). Never which activities count.
+function compPieces(l){const g=(window.EL_GRADING||{})[l.id];if(!g||!g.blocks)return [];
+  const x=D.rs[l.id+"/assessment"]||{},pr=x.progress||{},P=pr.parts||{},sc=x.sections||{},fin=x.final||{},SC=window.EL_STEP_CRITERIA||{};
+  const p=(window.EL_PLAN||{})[l.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1,rep=(p&&p.report)||{},nT=EL_TERMS.length;
+  const lsT=Math.min(nT,l.term||Math.ceil((EL_LS.filter(y=>y.course===l.course).indexOf(l)+1)/2));
+  const termOfDay=d=>EL_TERMS.findIndex(y=>y.id===elTerm(d))+1,last=ids=>gi<0?null:[...new Set(ids)].map(id=>ELWeek.due(p,id,gi)).filter(Boolean).sort().pop()||null;
+  const gvS={};if(g.gv)g.gv.parts.forEach(q=>(q.first||q.time||[]).forEach(([id,k])=>(((SC[id]||{})[k])||[]).forEach(c=>gvS[c]=(gvS[c]||0)+1)));
+  const ids={fp:[g.fp&&g.fp.a],gv:g.gv?g.gv.parts.flatMap(q=>(q.first||q.time||[]).map(y=>y[0])):[],other:(g.other||[]).flatMap(c=>[...((g.auto||{})[c]||[]),...((g.teacher||{})[c]||[])].map(y=>y[0]))};
+  const secMax=(e,k)=>{const y=e.sections.find(z=>z[0]===k);return y&&y[2]||e.max},spread=(cs,w,m,src)=>cs.map(c=>({c,w:w/cs.length,m,src}));
+  const fpM=()=>{const f=D.rs[g.fp.a]||{};return pr.fp??(f.max?(f.score||0)/f.max*10:null)},out=[];
+  g.blocks.forEach(b=>{const date=b.id==="exam"?(gi>=0?ELWeek.exam(p,gi):null):last((ids[b.id]||[]).filter(Boolean)),term=+rep[b.id]||(date?termOfDay(date):lsT),w=b.w;let pcs=[];
+    if(b.id==="exam"&&g.exam){const e=g.exam,tot=e.sections.reduce((n,[k])=>n+secMax(e,k),0),gvc=Object.keys(gvS);
+      pcs=e.sections.flatMap(([k,sn,,cs])=>{cs=cs||Object.keys(g.evidence||{}).filter(c=>g.evidence[c].e.some(y=>y&&(y.exam===k||(y[0]==="exam"&&y[1]===k))));
+        if(!cs.length&&e.level&&e.level.step===k)cs=[e.level.c];if(!cs.length)cs=gvc;const y=sc[k];
+        return spread(cs,w*secMax(e,k)/tot,y&&y.score!=null?y.score/(+(y.max||secMax(e,k)))*10:null,["📝 "+t("Examen","Exam"),sn])})}
+    else if(b.id==="fp"&&g.fp){const f=g.fp;if(f.mark)pcs=spread(((EL_CATALOG.find(a=>a.id===f.a)||{}).criteria)||[],w,fpM(),["🎬 "+t("Producte final","Final product"),""]);
+      else{const tw=f.rows.reduce((n,r)=>n+r.w,0);pcs=f.rows.map(r=>({c:r.c,w:w*r.w/tw,m:(P.fp||{})[r.step+"|"+r.c]??null,src:["🎬 "+t("Producte final","Final product"),r.name]}))}}
+    else if(b.id==="gv"){const tw=Object.values(gvS).reduce((n,v)=>n+v,0);pcs=Object.entries(gvS).map(([c,n])=>({c,w:w*n/tw,m:pr.gv??null,src:["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]}))}
+    else if(b.id==="other")pcs=spread(g.other||[],w,null,["📚 "+t("Feina diària als learning paths","Daily work in the learning paths"),""]).map(y=>Object.assign(y,{m:(P.other||{})[y.c]??null}));
+    pcs.forEach(y=>{if(!/^\d+\.\d/.test(String(y.c)))return;   // English criteria only ("5.1"); transversals and process/teamwork out
+      if(fin[y.c])y.m=EL_DEGREE_MARK[fin[y.c]]??y.m;y.term=term;y.ls=l;out.push(y)})});
+  return out}
+// competences of some pieces: {k: {m, crit: {c: {m, w, src}}}}; a mark is the weighted average of the pieces that have one
+function compOfPieces(ps){const o={};ps.forEach(y=>{const k=String(y.c).split(".")[0],K=o[k]=o[k]||{w:0,sw:0,sm:0,crit:{}},C=K.crit[y.c]=K.crit[y.c]||{w:0,sw:0,sm:0,src:new Map()};
+    K.w+=y.w;C.w+=y.w;if(!C.src.has(y.src[0]))C.src.set(y.src[0],new Set());if(y.src[1])C.src.get(y.src[0]).add(y.src[1]);if(y.m!=null){K.sw+=y.w;K.sm+=y.m*y.w;C.sw+=y.w;C.sm+=y.m*y.w}});
+  Object.values(o).forEach(K=>{K.m=K.sw?K.sm/K.sw:null;Object.values(K.crit).forEach(C=>C.m=C.sw?C.sm/C.sw:null)});return o}
+// the four official degrees (DOIGC: NA / AS / AN / AE), in words students understand
+const degOf=m=>(m=m==null?null:Math.round(m*10)/10,m==null?null:m>=9?["ae",t("Excel·lent","Excellent")]:m>=7?["an",t("Notable","Very good")]:m>=5?["as",t("Assolit","Achieved")]:["na",t("Encara no assolit","Not achieved yet")]);
+// the English competences in the student's language, with their colours (CE1–CE6 as the board's pills, fk-1…fk-6)
+const CPN={1:["Interculturalitat","Cultures and respect"],2:["Comprensió oral","Listening"],3:["Expressió oral","Speaking"],4:["Comprensió escrita","Reading"],5:["Expressió escrita","Writing"],
+  6:["Recerca i informació","Research and information"],7:["Lectura","Reading for pleasure"],8:["Mediació","Mediation"],9:["Aprendre a aprendre","Learning to learn"],10:["Comunicació ètica","Ethical communication"]};
+const CPC={1:["#0f766e","#ccfbf1"],2:["#1d4ed8","#dbeafe"],3:["#c2410c","#ffedd5"],4:["#15803d","#dcfce7"],5:["#7e22ce","#f3e8ff"],6:["#a16207","#fef3c7"],7:["#0e7490","#cffafe"],8:["#4338ca","#e0e7ff"],9:["#be123c","#ffe4e6"],10:["#4d7c0f","#ecfccb"]};
+const CPI={1:"🤝",2:"🎧",3:"🗣",4:"📖",5:"✏️",6:"🔎",7:"📚",8:"🔁",9:"🧠",10:"💬"};
+function compBox(ls2,tm){const ps=ls2.flatMap(compPieces).filter(y=>y.term===tm),o=compOfPieces(ps),ks=Object.keys(o).sort((a,b)=>a-b);if(!ks.length)return "";
+  const any=ks.some(k=>o[k].m!=null),mk=m=>m==null?`<span class="pgna">${t("encara no","not yet")}</span>`:`<b style="color:${col(m*10)}">${f1(m)}</b>`,
+    dg=m=>{const d=degOf(m);return d?`<span class="dg dg-${d[0]}">${d[1]}</span>`:""};
+  const card=k=>{const K=o[k],cs=Object.keys(K.crit).sort((a,b)=>String(a).localeCompare(String(b),"en",{numeric:true}));
+    const cc=CPC[k]||["#475569","#f1f5f9"];
+    return `<div class="cpc ${K.m==null?"none":""}" style="--k:${cc[0]};--ks:${cc[1]}"><div class="cph"><span class="fv-chip"><span aria-hidden="true">${CPI[k]||"🧩"}</span> CE${k}</span><b>${esc((CPN[k]||[])[EN?1:0]||String(EL_COMPETENCES[k]||"").replace(/^CE\d+ · /,""))}</b><span class="cpm">${mk(K.m)}${dg(K.m)}</span></div>`
+      +`<span class="fv-bar"><span style="width:${K.m==null?0:Math.max(0,Math.min(100,K.m*10))}%"></span></span>`
+      +`<ul class="cpl">${cs.map(c=>{const C=K.crit[c];return `<li><button type="button" class="cpcr" data-do="crit" data-c="${esc(c)}"><span class="cpn">${esc(c)}</span><span class="cpt">${esc(easy(c))}<small>📍 ${[...C.src].map(([g,n])=>esc(g)+(n.size?" ("+[...n].map(esc).join(", ")+")":"")).join(" · ")}</small></span><span class="cpm">${mk(C.m)}${dg(C.m)}</span></button></li>`}).join("")}</ul></div>`};
+  // the 3 strongest criteria and the 2 weakest (every one under 5 too): what you have learnt and what to work on most
+  const all=ks.flatMap(k=>Object.entries(o[k].crit).filter(([,C])=>C.m!=null).map(([c,C])=>({c,m:C.m}))).sort((a,b)=>b.m-a.m);
+  const top=all.slice(0,3).filter(x=>x.m>=5).map(x=>x.c),low=[...new Set([...all.filter(x=>x.m<5),...all.slice(3).slice(-2)].map(x=>x.c))].filter(c=>!top.includes(c));
+  return `<div class="box fv cpbox">${fvHead("🧩",t("Les meves competències","My competences"),esc(EL_TERMS[tm-1][EN?"en":"ca"]))}`
+    +`<p class="fvlead">${t("La nota de cada criteri d'avaluació, amb la feina que hi has fet aquest trimestre: l'examen, el producte final i la feina diària. Així veus què has après i què has de treballar.","The mark of each assessment criterion, from the work you have done on it this term: the exam, the final product and your daily work. This is how you see what you have learnt and what you need to work on.")} <span class="fv-tip">${t("Toca un criteri per veure què vol dir.","Tap a criterion to see what it means.")}</span></p>`
+    +(any&&(top.length||low.length)?`<div class="cpsum">${top.length?`<span class="cps ok">💪 ${t("El teu punt fort","Your strongest")}: <b>${top.map(c=>esc(c)+" "+esc((CPN[c.split(".")[0]]||[])[EN?1:0]||"").toLowerCase()).join(", ")}</b></span>`:""}${low.length?`<span class="cps bad">🎯 ${t("Treballa més","Work more on")}: <b>${low.map(c=>esc(c)+" "+esc((CPN[c.split(".")[0]]||[])[EN?1:0]||"").toLowerCase()).join(", ")}</b></span>`:""}</div>`:"")
+    +(any?"":`<p class="muted" style="margin:0 0 12px">${t("Encara no hi ha notes d'aquest trimestre. Apareixeran quan facis la feina i el professor la corregeixi.","There are no marks for this term yet. They will appear when you do the work and your teacher marks it.")}</p>`)
+    +`<div class="cpgrid">${ks.map(card).join("")}</div></div>`}
+// 📚 Grammar and vocabulary in 🎓 My progress (same message: "focusing on grammar and vocabulary"): for each learning path of the term's LSs,
+// its grammar and its vocabulary topic (the class-game theory, lab/game/decks/theory.js, loaded here only) with the % right in the class
+// games (myGames, D.mg), the last mistakes made in them (what to study) and a link to the LS's 📝 notes; then the exam's vocabulary and grammar parts.
+// Only what the student has played or done: never a learning path that is not open yet.
+function gvBox(ls2,tm){const TH=window.EL_GAME_THEORY;if(!TH){if(!S.thLoading){S.thLoading=1;const sc=document.createElement("script");sc.src="lab/game/decks/theory.js";sc.onload=()=>render();document.head.appendChild(sc)}return ""}
+  const rows=[];ls2.forEach(l=>{const pre=`${l.course}-${(elLsNum(l)||"").toLowerCase()}-lp`,mg=Object.values(D.mg||{}).filter(g=>g&&g.ls===l.id);
+    Object.keys(TH).filter(k=>k.startsWith(pre)).sort((a,b)=>a.localeCompare(b,"en",{numeric:true})).forEach(k=>{const kind=/grammar$/.test(k)?"grammar":"vocab",gs=mg.filter(g=>g.deck===k);if(!gs.length)return;
+      const r=gs.reduce((n,g)=>n+(+g.r||0),0),of=gs.reduce((n,g)=>n+(+g.of||0),0);
+      rows.push({l,k,kind,lp:(k.match(/-lp(\d+)-/)||[])[1],title:String(TH[k].title||"").replace(/^(Grammar|Vocabulary) · /,""),pc:of?r/of*100:null,miss:gs.flatMap(g=>g.miss||[]).filter(m=>m&&m.q).slice(-3)})})});
+  const ex=ls2.flatMap(l=>{const g=(window.EL_GRADING||{})[l.id],e=g&&g.exam,sc=(D.rs[l.id+"/assessment"]||{}).sections||{};return e?e.sections.filter(([k,n])=>/vocab|grammar/i.test(k+" "+n)&&sc[k]&&sc[k].score!=null).map(([k,n,mx])=>({l,n,pc:+sc[k].score/(+(sc[k].max||mx||e.max))*100,s:+sc[k].score,m:+(sc[k].max||mx||e.max)})):[]});
+  if(!rows.length&&!ex.length)return "";
+  const st=pc=>pc==null?"":pc>=80?`<span class="dg dg-ae">✅ ${t("Ho saps","You know it")}</span>`:pc>=60?`<span class="dg dg-an">👍 ${t("Gairebé","Nearly there")}</span>`:`<span class="dg dg-na">🔁 ${t("Treballa-ho","Work on it")}</span>`;
+  const bar=pc=>`<span class="xbar"><span style="width:${pc==null?0:Math.max(0,Math.min(100,pc))}%;background:${pc==null?"#e2e8f0":col(pc)}"></span></span>`;
+  const work=rows.filter(r=>r.pc!=null&&r.pc<60).concat(ex.filter(x=>x.pc<60));
+  return `<div class="box fv gvbox">${fvHead("📚",t("Gramàtica i vocabulari","Grammar and vocabulary"),esc(EL_TERMS[tm-1][EN?"en":"ca"]))}`
+    +`<p class="fvlead">${t("Què saps de cada tema de gramàtica i vocabulari, pels jocs de classe i l'examen, i què has de repassar.","What you know about each grammar and vocabulary topic, from the class games and the exam, and what to review.")}</p>`
+    +(work.length?`<div class="cpsum"><span class="cps bad">🔁 ${t("Repassa primer","Review first")}: <b>${work.map(x=>esc(x.title||x.n)).join(", ")}</b></span></div>`:rows.length||ex.length?`<div class="cpsum"><span class="cps ok">💪 ${t("Molt bé: cap tema per sota del 60 %","Well done: no topic under 60 %")}</span></div>`:"")
+    +`<div class="wrap"><table class="xt gvt"><thead><tr><th>${t("Tema","Topic")}</th><th>${t("Encerts","Right")}</th><th></th><th></th></tr></thead><tbody>`
+    +rows.map(r=>`<tr><td class="l"><span class="gvk">${r.kind==="grammar"?"🧩 "+t("Gramàtica","Grammar"):"📚 "+t("Vocabulari","Vocabulary")} · ${esc(elLsNum(r.l))} LP${esc(r.lp||"")}</span><b>${esc(r.title)}</b>${r.miss.length&&r.pc!=null&&r.pc<80?`<ul class="gvmiss">${r.miss.map(m=>`<li>${esc(m.q)} <s>${esc(m.a||"")}</s> → <b>${esc(m.ok||"")}</b></li>`).join("")}</ul>`:""}<small class="muted">🎲 ${t("Jocs de classe","Class games")}</small></td><td><b style="color:${col(r.pc||0)}">${r.pc==null?"–":Math.round(r.pc)+" %"}</b>${bar(r.pc)}</td><td>${st(r.pc)}</td><td><a class="g pgo" href="${lsHref(r.l)}#notes">${t("Estudia","Study")} →</a></td></tr>`).join("")
+    +ex.map(x=>`<tr><td class="l"><span class="gvk">📝 ${t("Examen","Exam")} · ${esc(elLsNum(x.l))}</span><b>${esc(x.n)}</b><small class="muted">${f1(x.s)} / ${x.m} ${t("punts","points")}</small></td><td><b style="color:${col(x.pc)}">${Math.round(x.pc)} %</b>${bar(x.pc)}</td><td>${st(x.pc)}</td><td><button type="button" class="g pgo" data-do="pgo" data-ls="${x.l.id}" data-h="exam">${t("Mira-ho","See it")} →</button></td></tr>`).join("")
+    +`</tbody></table></div></div>`}
 // 🎓 My progress (Roger, 9 Nov 2026: "students need to have a table with their results on the dashboard so that they can understand better
 // their progress. There they can choose term (and they see their 2 LS that they will have, not yet prepared)"; "name it progress"):
 // today.html#progress. Term chips (the current one first chosen) and one row per LS of that term: daily work, exam, final product and the
@@ -1093,7 +1180,8 @@ function progressPlace(lss,ls){
     +`<div class="pgterms" role="group" aria-label="${t("Trimestre","Term")}">${EL_TERMS.map((_,i)=>chip(i+1)).join("")}</div>`
     +(these.length?`<div class="wrap"><table class="xt pgt-t"><thead><tr><th>Learning Situation</th><th>📚 ${t("Feina diària","Daily work")}</th><th>📝 ${t("Examen","Exam")}</th><th>🎬 ${t("Producte final","Final product")}</th><th>🎓 ${t("Nota de la LS","LS mark")}</th><th></th></tr></thead><tbody>${these.map(row).join("")}</tbody></table></div>`
       :`<p class="muted">${t("Aquest trimestre encara no té cap LS.","This term has no LS yet.")}</p>`)
-    +`<p class="muted pgfoot">${t("La nota de cada LS es fa amb la teva feina diària als learning paths, l'examen i el producte final (el pes de cada part és a sota de la nota). Una LS que encara fas mostra la nota fins ara: canvia cada dia amb la teva feina.","Each LS mark is made of your daily work in the learning paths, the exam and the final product (each part's weight is under its mark). An LS you are doing now shows your mark so far: it changes every day with your work.")}${nc?" "+t(nc>1?`Les ${nc} LS que vénen encara no estan preparades.`:"La LS que ve encara no està preparada.",nc>1?`The ${nc} LSs still to come are not ready yet.`:"The LS still to come is not ready yet."):""}</p></div>`}
+    +`<p class="muted pgfoot">${t("La nota de cada LS es fa amb la teva feina diària als learning paths, l'examen i el producte final (el pes de cada part és a sota de la nota). Una LS que encara fas mostra la nota fins ara: canvia cada dia amb la teva feina.","Each LS mark is made of your daily work in the learning paths, the exam and the final product (each part's weight is under its mark). An LS you are doing now shows your mark so far: it changes every day with your work.")}${nc?" "+t(nc>1?`Les ${nc} LS que vénen encara no estan preparades.`:"La LS que ve encara no està preparada.",nc>1?`The ${nc} LSs still to come are not ready yet.`:"The LS still to come is not ready yet."):""}</p></div>`
+    +compBox(rows.filter(r=>r.l).map(r=>r.l),tm)+gvBox(nd.map(r=>r.l),tm)}
 // a card with a mark out of 10 as its big number
 const fvCard=(k,i,name,sub,m)=>`<div class="fv-part ${k}"><span class="fv-sh"><span class="fv-si" aria-hidden="true">${i}</span>${name}</span><small class="fv-ps">${sub}</small><b class="fv-big">${fvMk(m)}</b><span class="fv-bar"><span style="width:${m==null?0:Math.max(0,Math.min(100,m*10))}%"></span></span></div>`;
 // one part of the LS mark as a card: icon, name, when, its weight and the mark so far with a bar (progressBox)
