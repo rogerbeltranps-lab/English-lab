@@ -350,7 +350,9 @@ function fpWatch(m) {
   let file;
   try { file = DriveApp.getFileById(String(m.fileId || "")); } catch (x) { return {ok: false, error: "the school account cannot open that video"}; }
   const size = file.getSize(), mime = file.getMimeType();
-  if (!/^video\//.test(mime)) return {ok: false, error: "that file is not a video (" + mime + ")"};
+  // Roger, 9 Nov 2026: two 2 ESO A final products were handed in as a PDF and as an audio file: Gemini reads those too (the prompt says what it got)
+  if (!/^(video|audio)\//.test(mime) && mime !== "application/pdf") return {ok: false, error: "that file is not a video, an audio or a PDF (" + mime + ")"};
+  ask.media = /^audio\//.test(mime) ? "audio" : mime === "application/pdf" ? "pdf" : "video";
   if (size > 2e9) return {ok: false, error: "the video is over 2 GB"};
   // 1. a resumable upload to the Gemini Files API, fed from Drive 16 MB at a time
   const s = UrlFetchApp.fetch(G + "/upload/v1beta/files?key=" + GEMINI_KEY, {method: "post", contentType: "application/json", muteHttpExceptions: true,
@@ -425,7 +427,9 @@ function fpPrompt(ask, rows, prev, change) {
     "Course: " + String(ask.course || "ESO").slice(0, 40) + ". Every student is marked on the SAME rubric, at about " + String(ask.level || "A2+").slice(0, 20) + " level.",
     "The task: " + String(ask.task || "a short video presentation in English with slides").slice(0, 1500),
     ask.group ? "It is a GROUP video. The student being marked is " + String(ask.student || "").slice(0, 60) + ". Judge the group rows on the whole video and the individual rows on that student's part; if you cannot tell which person they are, say so in the reading note and judge the group." : "The student is " + String(ask.student || "the student").slice(0, 60) + " (call them " + first + ").",
-    "Watch and listen to the whole video.",
+    ask.media === "audio" ? "This hand-in is an AUDIO recording only (no picture, no slides). Listen to the whole recording. Rows about slides, pictures or anything visual get level null; say in the reading note that it is audio only and judge reading from how it sounds."
+      : ask.media === "pdf" ? "This hand-in is a PDF only (no sound, no video). Read the whole document. Rows about speaking, pronunciation, fluency or speaking without reading get level null; the reading verdict is \"partly\" and its note says there is no recording to hear. Do not list any sounds."
+      : "Watch and listen to the whole video.",
     "",
     "HOW ROGER WANTS IT MARKED",
     "- Be positive, friendly and encouraging, AND honest. Give the level the video really shows: never a higher one the student has not earned, and do not be harsh either. If they would fail only because you were very strict, you are being too strict.",

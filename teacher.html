@@ -3714,9 +3714,10 @@ async function fpgWatch(u,a,change,src){const R=fpgRubric(a),k=u+"|"+a.id;if(!R|
 // ---- 📥 Classroom hand-ins (Roger, 8 Nov 2026: "some are links and the names are in here, what can we do?" … "you tell me the videos that you
 // couldn't reach"): the school script lists the group's Classroom "Final product" hand-ins (action fp_classroom: student email, name and
 // attachments), matched to the students here by email. Watchable: a Drive video file (or a Drive link to one the school account can open) or a
-// YouTube link; anything else (Canva, Google Vids, slides, a link to a private file) is listed for Roger to watch himself.
+// YouTube link, or else a Drive audio file or PDF (Roger, 9 Nov 2026: one 2 ESO A hand-in was a PDF, one an audio); anything else (Canva,
+// Google Vids, slides, a link to a private file) is listed for Roger to watch himself.
 const fpgClsOf=u=>{const s=S.P[u],c=s&&FPG.cls[s.group];if(!c)return null;const e=String(s.email||"").toLowerCase();return c.by[e]||null};
-function fpgClsPick(x){const items=x.items||[],vid=items.find(i=>i.kind==="drive"&&/^video\//.test(i.mime||"")),yt=items.find(i=>i.kind==="youtube");
+function fpgClsPick(x){const items=x.items||[],vid=items.find(i=>i.kind==="drive"&&/^video\//.test(i.mime||""))||items.find(i=>i.kind==="drive"&&(/^audio\//.test(i.mime||"")||i.mime==="application/pdf")),yt=items.find(i=>i.kind==="youtube");
   const watch=vid?{id:vid.id,name:vid.title||"Classroom video"}:yt?{youtube:yt.url,name:yt.title||"YouTube video"}:null;
   const why=watch?"":!items.length?"nothing attached":items.some(i=>i.mime==="no access")?"a file the school account cannot open (ask the student to share it)"
     :items.some(i=>/vnd\.google-apps\.vid/.test(i.mime||""))?"a Google Vids video (open it and download it as mp4)":items.some(i=>i.kind==="link")?"a link Gemini cannot open (e.g. Canva)":"no video file (slides or a document only)";
