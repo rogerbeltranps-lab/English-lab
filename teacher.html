@@ -3654,9 +3654,7 @@ function fpgFill(u,a){const box=$("#fpg");if(!box||box.dataset.u!==u)return;cons
   if(d&&d.error)h+=`<p class="bad" style="color:#b91c1c">⚠️ ${esc(d.error)}</p>`;
   if(d&&d.draft&&R){const x=d.draft,rd=FPG_READ[(x.reading||{}).verdict]||FPG_READ.partly;
     h+=`<p style="margin:10px 0 4px"><b>${rd[0]} ${rd[1]}</b>${x.reading&&x.reading.note?` · ${esc(x.reading.note)}`:""}</p>`
-      +`<table class="lvt"><thead><tr><th style="text-align:left">Row</th><th>Gemini</th><th style="text-align:left">Comments: 👀 only for you · ✔ ➜ for the student</th></tr></thead><tbody>`
-      +R.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};return `<tr><td style="text-align:left">${esc(r.name)} <small class="muted">${r.w?r.w+" %":""}</small></td><td><b>${R.kind==="mark"&&g.level!=null?fpgRow(g)+"/10 · "+fpgPlus(g):fpgLv(g.level)}</b></td><td style="text-align:left"><small class="muted">👀 ${esc(g.why||"")}</small>${g.good?`<br><small>✔ ${esc(g.good)}</small>`:""}${g.improve?`<br><small>➜ ${esc(g.improve)}</small>`:""}</td></tr>`}).join("")
-      +`</tbody></table>`+(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x)
+      +(R.kind==="mark"?`<p><b>Mark from these levels: ${fpgMark(R,x)??"–"}/10</b></p>`:"")+fpGemRub(a,x)
       +(x.sounds&&x.sounds.length?`<p style="margin:8px 0 2px"><b>🗣️ Words said wrong</b> <small class="muted">(only for you, never shown to the student)</small> <button class="g" data-fpg="sounds" data-u="${u}" data-a="${esc(a.id)}" style="font-size:12px;padding:2px 8px">List for the whole group</button></p><p style="margin:0 0 6px"><small>${x.sounds.map(w=>`<b>${esc(w.word)}</b>${w.heard?" (said “"+esc(w.heard)+"”)":""}`).join(" · ")}</small></p>`:"")
       +`<label>Feedback for the student (Gemini's draft: you can change it below before approving)</label><div class="fb" style="white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px">${esc(fpgText(R,x))}</div>`
       +`<p class="muted" style="margin:4px 0">Drafted ${day(d.at)}${d.changes&&d.changes.length?" · your changes: "+d.changes.map(c=>"“"+esc(c)+"”").join(" · "):""}${d.model?" · "+esc(d.model):""}${d.approved?" · ✅ approved "+day(d.approved):""}</p>`
@@ -3686,7 +3684,7 @@ function rubH(N,sel,tag){const last=N.levels.length-1,gm=tag!=="you";
     return `<div class="rbrow"><div class="rbh"><b>${esc(r.name)}</b> <small class="muted">· ${esc(r.sub)}${r.w?" · "+r.w+" %":""}</small><span class="rbm">${x.m!=null?`<b>${f1(x.m)}</b><small class="muted">/10</small> · `:""}<small class="muted">${L>=0?esc(N.levels[L]):"not marked"}</small></span></div>`
       +`<div class="rbg">${r.d.map((d,k)=>`<div class="rbc${k===L?" on"+(gm?" gm":""):""}"><b>${esc(N.levels[k])}</b>${r.pts?` <small class="muted">${r.pts[k]} pts</small>`:""}${k===L?` <span class="rby">◀ ${esc(tag)}</span>`:""}<div>${esc(d)}</div></div>`).join("")}</div>`
       +(L===last&&L>=r.d.length?`<div class="rbc on${gm?" gm":""}" style="margin-top:6px"><b>${esc(N.levels[last])}</b> <span class="rby">◀ ${esc(tag)}</span></div>`:"")
-      +((x.ok&&x.ok.length)||(x.todo&&x.todo.length)?`<div class="rbn">${x.ok&&x.ok.length?`<div>✔ ${esc(x.ok.join(" "))}</div>`:""}${x.todo&&x.todo.length?`<div>➜ ${esc(x.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
+      +((x.ok&&x.ok.length)||(x.todo&&x.todo.length)||x.why?`<div class="rbn">${x.why?`<div class="muted">👀 ${esc(x.why)} <small>(only for you)</small></div>`:""}${x.ok&&x.ok.length?`<div>✔ ${esc(x.ok.join(" "))}</div>`:""}${x.todo&&x.todo.length?`<div>➜ ${esc(x.todo.join(" "))}</div>`:""}</div>`:"")+`</div>`}).join("")}
 // the student's rubric, as they see it (LS1 from the saved feedback; LS2 from your levels)
 function fpStuRub(u,a){const N=fpRub(a),x=res(u,a.id);if(!N)return "";let sel,lead;
   if(N.kind==="mark"){const P=fbParts(x.feedback);if(!x.feedback)return "";
@@ -3698,9 +3696,10 @@ function fpStuRub(u,a){const N=fpRub(a),x=res(u,a.id);if(!N)return "";let sel,le
 // Gemini's draft on the same rubric
 function fpGemRub(a,x){const N=fpRub(a);if(!N||!x)return "";
   const sel=N.rows.map((r,i)=>{const g=(x.rows||[])[i]||{};if(g.level==null)return {L:-1};
-    if(N.kind==="mark"){const m=fpgRow(g);return {L:m==null?-1:rbIdx(m),m,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[]}}
-    return {L:g.level===0?4:4-g.level,m:g.level?g.level*2.5:null,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[]}});
-  return `<details class="rbbox"><summary>📋 Gemini's draft on the rubric</summary><p class="muted" style="margin:4px 0">The level Gemini proposes in each row (blue), with what it would tell the student. Nothing changes until you ✅ Approve.</p>${rubH(N,sel,"Gemini")}</details>`}
+    if(N.kind==="mark"){const m=fpgRow(g);return {L:m==null?-1:rbIdx(m),m,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[],why:g.why||""}}
+    return {L:g.level===0?4:4-g.level,m:g.level?g.level*2.5:null,ok:g.good?[g.good]:[],todo:g.improve?[g.improve]:[],why:g.why||""}});
+  // Roger, 9 Nov 2026: "I need to see the feedback like this" (the student's shaded rubric): it replaces the table, open, with the 👀 notes
+  return `<div class="rbbox"><p class="muted" style="margin:4px 0">📋 Gemini's draft on the rubric: the level it proposes in each row (blue), 👀 why (only for you), ✔ ➜ what the student will read. Nothing changes until you ✅ Approve.</p>${rubH(N,sel,"Gemini")}</div>`}
 // LS1: mark /10 = levels × 2.5 weighted by the rows (rows Gemini could not judge are left out)
 function fpgMark(R,x){let s=0,w=0;R.rows.forEach((r,i)=>{const m=fpgRow((x.rows||[])[i]||{});if(m!=null){s+=m*r.w;w+=r.w}});return w?Math.round(s/w*10)/10:null}
 // the feedback text the student gets: LS1 in the "Name (30%) · 7.5/10" + ✔/➜ lines the student board shades on the rubric (fbBox in today.html)
