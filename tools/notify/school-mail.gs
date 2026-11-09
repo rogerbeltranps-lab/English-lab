@@ -14,7 +14,8 @@
 //   4. A student's ⚠️ Problem report (Roger, 8 Nov 2026: "read it straightaway … fix it and answer the student"): {idToken, action:
 //      "problem"} from the student's page right after the report is saved (shared/js/el-cloud.js). Any signed-in English Lab account may
 //      ask (checked with Google like the teacher's); it starts the scheduled task "English Lab: problem reports" through its API trigger
-//      (PROBLEM_TASK_TOKEN below) at most once every 3 minutes and 30 times a day. The task also runs every hour, so nothing is lost.
+//      (PROBLEM_TASK_TOKEN below) at most once every 3 minutes and 30 times a day. A report sent while the task started less than 3 minutes ago starts it again
+//      3 minutes later by itself (startProblemsLater), so nothing is lost. The task has no schedule: it runs only for reports.
 //   5. A student's Speaking or Talk recording (Roger, 8 Nov 2026: "I want you to save audios … an audio emoji which I can listen"):
 //      {idToken, action: "audio", mime, secs, data (base64), meta: {page, step, title, level, group, at}} sent by the student's page right
 //      after a hand-in (shared/js/el-mic.js upload). Only a signed-in school account (or the teacher) may send it, at most 40 a day each and
@@ -58,10 +59,10 @@ const AUDIO_FOLDER = "1O_TFIuX433T03sMhD6tMIFx8NcO-NqlF";
 // improve its products). Never in the repo. Without it the recording is saved but not transcribed.
 const GEMINI_KEY = "PASTE-THE-GEMINI-KEY-HERE";
 const GEMINI_MODEL = "gemini-flash-latest";   // Google's newest Flash (Gemini 3.8 Flash on 8 Nov 2026); 2.5 is closed to new users
-// PROBLEM_TASK_TOKEN: the API token of the scheduled task "English Lab: problem reports" (claude.ai/code/routines > that task > API trigger >
-// Generate token). Never in the repo; without it students' reports wait for the task's hourly run.
+// PROBLEM_TASK_TOKEN: the API token of the scheduled task "English Lab: problem reports (instant)" (claude.ai/code/routines > that task > API trigger >
+// Generate token). Never in the repo; without it students' reports wait until Roger answers them on the dashboard.
 const PROBLEM_TASK_TOKEN = "PASTE-THE-TOKEN-HERE";
-const PROBLEM_TASK_URL = "https://api.anthropic.com/v1/claude_code/routines/trig_01GrbR641ty9PsPJYeF8ifm9/fire";
+const PROBLEM_TASK_URL = "https://api.anthropic.com/v1/claude_code/routines/trig_019JfVaVpNJdhGnFTsMxcWYg/fire";
 // Final product videos (Teacher Studio › 04_Students (private) › Final product videos): share it with this school account as Editor first.
 const VIDEO_FOLDER = "1BPlHZKxr7Ba2HEMSBid8StCi49-6Yg9y";
 // The model that watches final product videos (Roger 8 Nov 2026: Pro for videos, Flash for speaking). "gemini-pro-latest" = Google's newest Pro
@@ -126,7 +127,7 @@ function startProblems() {
   try {
     const P = PropertiesService.getScriptProperties(), last = Number(P.getProperty("problemAt") || 0);
     const day = Utilities.formatDate(new Date(), "Europe/Madrid", "yyyy-MM-dd"), n = P.getProperty("problemDay") === day ? Number(P.getProperty("problemN") || 0) : 0;
-    if (Date.now() - last < 3 * 60e3 || n >= 30) return {ok: true, already: new Date(last).toISOString()};
+    if (Date.now() - last < 3 * 60e3 || n >= 30) { if (n < 30) problemsLater(last); return {ok: true, already: new Date(last).toISOString()}; }
     const r = UrlFetchApp.fetch(PROBLEM_TASK_URL, {method: "post", contentType: "application/json", payload: "{}", muteHttpExceptions: true,
       headers: {authorization: "Bearer " + PROBLEM_TASK_TOKEN, "anthropic-beta": "experimental-cc-routine-2026-04-01", "anthropic-version": "2023-06-01"}});
     const code = r.getResponseCode();
@@ -134,6 +135,19 @@ function startProblems() {
     P.setProperties({problemAt: String(Date.now()), problemDay: day, problemN: String(n + 1)});
     return {ok: true, started: new Date().toISOString()};
   } finally { lock.releaseLock(); }
+}
+
+// A report came in while the last run was less than 3 minutes old (it may have read the list before this report): start the task once more
+// when the 3 minutes are over, with one Apps Script timer (never two at a time).
+function problemsLater(last) {
+  try {
+    if (ScriptApp.getProjectTriggers().some(t => t.getHandlerFunction() === "startProblemsLater")) return;
+    ScriptApp.newTrigger("startProblemsLater").timeBased().after(Math.max(60e3, last + 3 * 60e3 - Date.now() + 30e3)).create();
+  } catch (x) {}
+}
+function startProblemsLater() {
+  ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === "startProblemsLater").forEach(t => ScriptApp.deleteTrigger(t));
+  startProblems();
 }
 
 // any English Lab account (student, tester or teacher): a real, unexpired sign-in token of this Firebase project, checked by Google
