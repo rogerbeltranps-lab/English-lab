@@ -65,9 +65,11 @@ const PROBLEM_TASK_TOKEN = "PASTE-THE-TOKEN-HERE";
 const PROBLEM_TASK_URL = "https://api.anthropic.com/v1/claude_code/routines/trig_019JfVaVpNJdhGnFTsMxcWYg/fire";
 // Final product videos (Teacher Studio › 04_Students (private) › Final product videos): share it with this school account as Editor first.
 const VIDEO_FOLDER = "1BPlHZKxr7Ba2HEMSBid8StCi49-6Yg9y";
-// The model that watches final product videos (Roger 8 Nov 2026: Pro for videos, Flash for speaking). "gemini-pro-latest" = Google's newest Pro
-// (Gemini 3.1 Pro on 8 Nov 2026), about €0.10 a 3-minute video; "gemini-flash-latest" is about €0.03.
-const FP_MODEL = "gemini-pro-latest";
+// The model that watches final product videos (Roger 8 Nov 2026: Pro for videos, Flash for speaking). v18 (Roger, 10 Nov 2026: "gemini was
+// completely mistaken" about Ashot and Hajra, 2 ESO A): "gemini-pro-latest" turned out to be Gemini 3.1 Pro Preview (January 2026), so the
+// videos now go to Google's flagship Gemini 4 Argon, with sharper frames (MEDIA_RESOLUTION_HIGH) and the default temperature 1.0 that Google
+// advises for Gemini 3 and later. About €0.07 a 100-second video (introductory price; Google doubles it on 1 Dec 2026).
+const FP_MODEL = "gemini-4-argon";
 const FIREBASE_WEB_KEY = "AIzaSyCdO9ygUg8GzhfKsmqJKBg7-k_BDE3ZvKE";   // English Lab's public web key (shared/js/el-firebase.js), not a secret
 
 function doPost(e) {
@@ -411,7 +413,7 @@ function fpAsk(m, ask, rows, fd, del) {
   try {
     const r = UrlFetchApp.fetch(G + "/v1beta/models/" + FP_MODEL + ":generateContent?key=" + GEMINI_KEY, {method: "post", contentType: "application/json", muteHttpExceptions: true,
       payload: JSON.stringify({contents: [{parts: [].concat(fd).map(f => ({file_data: f})).concat([{text: fpPrompt(ask, rows, m.prev, m.change)}])}],
-        generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
+        generationConfig: {temperature: 1.0, mediaResolution: "MEDIA_RESOLUTION_HIGH", responseMimeType: "application/json"}})});
     if (r.getResponseCode() !== 200) return {ok: false, error: "Gemini did not answer (HTTP " + r.getResponseCode() + ")" + ([].concat(fd)[0].mime_type ? "" : ": the YouTube video may be private")};
     const j = JSON.parse(r.getContentText());
     addUsage(FP_MODEL, "video", j);
@@ -440,6 +442,9 @@ function fpRowMark(level, mark) {
   return isNaN(n) ? b[1] : Math.max(b[0], Math.min(b[1], n));
 }
 function fpPrompt(ask, rows, prev, change) {
+  // the dashboard sends "Surname1 Surname2, First" (v18: Gemini called Hajra Zaman "Zaman"): turn it into "First Surname1 Surname2"
+  const nm = String(ask.student || "").trim(), cm = nm.indexOf(",");
+  if (cm > 0) ask = Object.assign({}, ask, {student: (nm.slice(cm + 1).trim() + " " + nm.slice(0, cm).trim()).trim()});
   const marks = !!ask.marks, first = String(ask.student || "").trim().split(/\s+/)[0] || "the student";
   const lines = [
     "You are helping Roger, an English teacher at a secondary school in Catalonia, mark a final product video by a student aged 12-16.",
@@ -488,6 +493,7 @@ function testVideosFolder() {
 // ({idToken (teacher), action: "gemini_usage"} → {ok, months: [{month, eur, calls, audio, video}]}, newest first). Paid-tier prices in US$
 // per million tokens (ai.google.dev/pricing, Nov 2026); thinking tokens are billed as output. An estimate: Google's billing page is exact.
 const PRICES = {"gemini-flash-latest": {text: 0.50, audio: 1.00, out: 3.00}, "gemini-pro-latest": {text: 2.00, audio: 2.00, out: 12.00},
+  "gemini-4-argon": {text: 2.00, audio: 2.00, out: 10.00},   // introductory price until 30 Nov 2026; from 1 Dec: text/audio 4.00, out 20.00
   "gemini-2.5-flash": {text: 0.30, audio: 1.00, out: 2.50}, "gemini-2.5-pro": {text: 1.25, audio: 1.25, out: 10.00}};
 const EUR_PER_USD = 0.87;
 function addUsage(model, kind, j) {
