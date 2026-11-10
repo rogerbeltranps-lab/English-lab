@@ -34,6 +34,11 @@ service cloud.firestore {
     match /cpKeys/{key} {
       allow read, write: if isTeacher();
     }
+    // hashes of the accepted answers (teacher.html cpHashSync): a student reads them only after sending that checkpoint, to see the score at once
+    match /cpHash/{key} {
+      allow read: if isTeacher() || (signedIn() && exists(/databases/$(database)/documents/students/$(request.auth.uid)/checkpoints/$(key)));
+      allow write: if isTeacher();
+    }
     match /settings/{id} {
       allow read, write: if isTeacher();
     }
