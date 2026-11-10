@@ -72,6 +72,10 @@ const cur=()=>slides()[H.i];
 const isQ=s=>!!(s&&s.q);
 const isW=s=>!!(s&&s.q&&s.write);   // a written question
 const isN=s=>!!(s&&!s.q&&typeof s.notes==="number");   // a 📝 Take your notes slide (withNotes)
+// what the 2 sentences use (Roger, 10 Nov 2026: "ask them to write 2 sentences using the vocabulary or grammar structures learnt and whatever
+// they need to remember better the theory explained"): the game's kind (decks/index.js), or the end of its id
+const noteWhat=(kind,id)=>{kind=kind||(/-vocab$/.test(id||"")?"vocab":/-grammar$/.test(id||"")?"grammar":"");
+  return kind==="vocab"?"<b>the new words</b>":kind==="grammar"?"<b>the grammar structures</b> you have learnt":"<b>the new words or grammar</b>"};
 const meta=()=>(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{};
 // the game's name starts with its learning path: "LP2 · Vocabulary · Clothes, kit and weather" (decks/index.js elGameName, Roger 7 Nov 2026)
 const gName=()=>meta().lp?elGameName(H.deckId):H.deck.title;
@@ -121,7 +125,7 @@ function live(){
   const s=cur(),qs=qList(),base={on:true,game:true,deck:location.pathname,title:gName(),sid:H.sid,phase:H.phase==="show"?(isQ(s)?"q":isN(s)?"notes":"theory"):H.phase,
     i:H.i,qn:qs.indexOf(H.i)+1,qt:qs.length,keys:H.keys,at:S.serverTimestamp()};
   if(s&&H.phase!=="end"&&H.phase!=="lobby"){
-    if(isN(s)){const m=meta();base.nt={k:s.notes,topics:s.topics,deck:H.deckId,ls:lsId(),lp:m.lp||"",title:H.deck.title,course:m.course||""}}
+    if(isN(s)){const m=meta();base.nt={k:s.notes,topics:s.topics,deck:H.deckId,ls:lsId(),lp:m.lp||"",title:H.deck.title,course:m.course||"",kind:m.kind||""}}
     else if(isW(s))base.q={text:s.q,img:s.img||"",write:true};
     else if(isQ(s))base.q={text:s.q,img:s.img||"",opts:order(H.i).map(k=>s.options[k])};else base.th={title:s.theory||"",img:s.img||""};
     if(H.phase==="reveal")base.ok=isW(s)?s.write[0]:okAt(H.i);
@@ -353,7 +357,7 @@ function draw(){
   if(isN(s)){   // 📝 Take your notes: the theory of the run again, small, while the students write on their devices
     const recap=s.from.map(i=>slides()[i]).map(t=>`<section><h3>${pic(t.img)} ${md(t.theory)}</h3>${(t.lines||[]).map(l=>blockHtml(l,"","")).join("")}</section>`).join("");
     app$.innerHTML=top()+`<div class="main"><div class="card notes slidein"><div class="nhead"><span class="nemo">📝</span><div><h2>Take your notes</h2>
-      <p>On your Chromebook, in your own words: <b>the rule</b>, <b>two examples</b> and <b>the mistake to avoid</b>. They are saved on your LS page, in <b>📝 Your notes</b>.</p></div>
+      <p>On your Chromebook: write <b>2 sentences</b> of your own using ${noteWhat(meta().kind,H.deckId)}, and <b>anything that helps you remember</b> the theory. They are saved on your LS page, in <b>📝 Your notes</b>.</p></div>
       <div class="stat"><b>${n}</b>writing${P.length?` / ${P.length}`:""}</div></div><div class="recap">${recap}</div></div>
       <div style="text-align:right"><button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}
   if(isW(s)){
