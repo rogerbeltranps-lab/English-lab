@@ -79,6 +79,9 @@ function doPost(e) {
   if (m.action === "video_chunk") return out(videoChunk(m));
   if (m.action === "video_status") return out(videoStatus(m));
   if (m.action === "fp_watch") return out(m.idToken && isTeacher(m.idToken) ? fpWatch(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_convert") return out(m.idToken && isTeacher(m.idToken) ? fpConvert(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_copy") return out(m.idToken && isTeacher(m.idToken) ? fpCopy(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_folder") return out(m.idToken && isTeacher(m.idToken) ? fpFolder(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_classroom") { if (!(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: "not the teacher"});
     try { return out(fpClassroom(m)); } catch (x) { return out({ok: false, error: "Classroom: " + String(x && x.message || x).slice(0, 300)}); } }
   if (m.action === "gemini_usage") return out(m.idToken && isTeacher(m.idToken) ? geminiUsage() : {ok: false, error: "not the teacher"});
@@ -347,10 +350,28 @@ function fpWatch(m) {
   // A YouTube link (a Classroom hand-in): Gemini watches it from YouTube itself (public or unlisted videos only); nothing is uploaded.
   const yt = String(m.youtube || "").match(/^https:\/\/(www\.|m\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)[\w-]{6,}/);
   if (yt) return fpAsk(m, ask, rows, {file_uri: yt[0]}, () => {});
+  // Roger, 9 Nov 2026: two 2 ESO A final products were handed in as a PDF and as an audio file, and one student sent her slides (PDF) and her
+  // voice (mp4) separately: Gemini gets up to 3 files of one student together (fileIds), video, audio or PDF, and the prompt says what it got
+  const ids = [String(m.fileId || "")].concat([].concat(m.fileIds || []).map(String)).filter((x, k, a) => x && a.indexOf(x) === k).slice(0, 3);
+  if (!ids.length) return {ok: false, error: "no file"};
+  const got = [], dels = [], delAll = () => dels.forEach(f => f());
+  for (const id of ids) {
+    const r = fpSend(id, t0);
+    if (!r.ok) { delAll(); return r; }
+    got.push(r); dels.push(r.del);
+  }
+  const kinds = got.map(r => r.kind);
+  ask.media = kinds.includes("video") ? (kinds.includes("pdf") ? "video+pdf" : "video") : kinds.includes("audio") ? (kinds.includes("pdf") ? "audio+pdf" : "audio") : "pdf";
+  return fpAsk(m, ask, rows, got.map(r => r.fd), delAll);
+}
+// one Drive file (video, audio or PDF) sent to the Gemini Files API: {ok, fd: file_data, kind, del} or {ok: false, error}
+function fpSend(id, t0) {
+  const G = "https://generativelanguage.googleapis.com";
   let file;
-  try { file = DriveApp.getFileById(String(m.fileId || "")); } catch (x) { return {ok: false, error: "the school account cannot open that video"}; }
+  try { file = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the school account cannot open that file"}; }
   const size = file.getSize(), mime = file.getMimeType();
-  if (!/^video\//.test(mime)) return {ok: false, error: "that file is not a video (" + mime + ")"};
+  if (!/^(video|audio)\//.test(mime) && mime !== "application/pdf") return {ok: false, error: "that file is not a video, an audio or a PDF (" + mime + ")"};
+  const kind = /^audio\//.test(mime) ? "audio" : mime === "application/pdf" ? "pdf" : "video";
   if (size > 2e9) return {ok: false, error: "the video is over 2 GB"};
   // 1. a resumable upload to the Gemini Files API, fed from Drive 16 MB at a time
   const s = UrlFetchApp.fetch(G + "/upload/v1beta/files?key=" + GEMINI_KEY, {method: "post", contentType: "application/json", muteHttpExceptions: true,
@@ -382,16 +403,16 @@ function fpWatch(m) {
     }
     if (gfile.state !== "ACTIVE") return {ok: false, error: "Gemini could not read the video"};
   } catch (x) { del(); return {ok: false, error: "Gemini could not open the video: try again"}; }
-  return fpAsk(m, ask, rows, {mime_type: gfile.mimeType || mime, file_uri: gfile.uri}, del);
+  return {ok: true, kind, fd: {mime_type: gfile.mimeType || mime, file_uri: gfile.uri}, del};
 }
 // 3. one question with the rubric about the video (fd = Gemini's file_data); del() removes the uploaded copy from Gemini afterwards
 function fpAsk(m, ask, rows, fd, del) {
   const G = "https://generativelanguage.googleapis.com";
   try {
     const r = UrlFetchApp.fetch(G + "/v1beta/models/" + FP_MODEL + ":generateContent?key=" + GEMINI_KEY, {method: "post", contentType: "application/json", muteHttpExceptions: true,
-      payload: JSON.stringify({contents: [{parts: [{file_data: fd}, {text: fpPrompt(ask, rows, m.prev, m.change)}]}],
+      payload: JSON.stringify({contents: [{parts: [].concat(fd).map(f => ({file_data: f})).concat([{text: fpPrompt(ask, rows, m.prev, m.change)}])}],
         generationConfig: {temperature: 0.2, responseMimeType: "application/json"}})});
-    if (r.getResponseCode() !== 200) return {ok: false, error: "Gemini did not answer (HTTP " + r.getResponseCode() + ")" + (fd.mime_type ? "" : ": the YouTube video may be private")};
+    if (r.getResponseCode() !== 200) return {ok: false, error: "Gemini did not answer (HTTP " + r.getResponseCode() + ")" + ([].concat(fd)[0].mime_type ? "" : ": the YouTube video may be private")};
     const j = JSON.parse(r.getContentText());
     addUsage(FP_MODEL, "video", j);
     const t = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || "").join("");
@@ -425,7 +446,10 @@ function fpPrompt(ask, rows, prev, change) {
     "Course: " + String(ask.course || "ESO").slice(0, 40) + ". Every student is marked on the SAME rubric, at about " + String(ask.level || "A2+").slice(0, 20) + " level.",
     "The task: " + String(ask.task || "a short video presentation in English with slides").slice(0, 1500),
     ask.group ? "It is a GROUP video. The student being marked is " + String(ask.student || "").slice(0, 60) + ". Judge the group rows on the whole video and the individual rows on that student's part; if you cannot tell which person they are, say so in the reading note and judge the group." : "The student is " + String(ask.student || "the student").slice(0, 60) + " (call them " + first + ").",
-    "Watch and listen to the whole video.",
+    ask.media === "audio" ? "This hand-in is an AUDIO recording only (no picture, no slides). Listen to the whole recording. Rows about slides, pictures or anything visual get level null; say in the reading note that it is audio only and judge reading from how it sounds."
+      : ask.media === "pdf" ? "This hand-in is a PDF only (no sound, no video). Read the whole document. Rows about speaking, pronunciation, fluency or speaking without reading get level null; the reading verdict is \"partly\" and its note says there is no recording to hear. Do not list any sounds."
+      : ask.media === "video+pdf" || ask.media === "audio+pdf" ? "This hand-in has two parts: the student's slides as a PDF and the student's " + (ask.media === "video+pdf" ? "video" : "voice recording (audio only)") + ". Look at the whole PDF and listen to the whole recording, and judge them together as one presentation."
+      : "Watch and listen to the whole video.",
     "",
     "HOW ROGER WANTS IT MARKED",
     "- Be positive, friendly and encouraging, AND honest. Give the level the video really shows: never a higher one the student has not earned, and do not be harsh either. If they would fail only because you were very strict, you are being too strict.",
@@ -489,6 +513,68 @@ function geminiUsage() {
 }
 
 // ---- 9. Final products handed in on Google Classroom (see the top): read-only, nothing is changed in Classroom
+// 📁 a Drive folder of final products the teacher collected himself (Roger, 9 Nov 2026: the 2 ESO A videos that were not on Classroom, each
+// file named after its student): the files the school account can open in it, for the dashboard to match to the students by name
+// ▶ a Classroom video the teacher's Gmail can play (Roger, 9 Nov 2026: "I can't see the videos"): the students' files are shared only with
+// this school account, and the dashboard runs on his Gmail, so Drive's player said "You need access". A copy goes into Final product videos ›
+// Classroom copies (his own folder, so his Gmail can open it; one copy per file, found again by the original id in its name). A file his Gmail
+// already owns is played as it is. He deletes these with the rest once a year.
+function fpCopy(m) {
+  const id = String(m.fileId || "");
+  let f;
+  try { f = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the school account cannot open that file"}; }
+  try { const o = f.getOwner(); if (o && /@gmail\.com$/i.test(o.getEmail())) return {ok: true, id}; } catch (x) {}
+  let root, dir;
+  try { root = DriveApp.getFolderById(VIDEO_FOLDER); } catch (x) { return {ok: false, error: "no access to the videos folder"}; }
+  const it = root.getFoldersByName("Classroom copies");
+  dir = it.hasNext() ? it.next() : root.createFolder("Classroom copies");
+  for (const ps = f.getParents(); ps.hasNext();) { const pid = ps.next().getId(); if (pid === dir.getId() || pid === VIDEO_FOLDER) return {ok: true, id}; }   // already in his folder
+  const tag = "[" + id + "]", old = dir.searchFiles("title contains '" + tag.replace(/'/g, "") + "' and trashed = false");
+  if (old.hasNext()) return {ok: true, id: old.next().getId()};
+  const c = f.makeCopy(f.getName().replace(/(\.[a-z0-9]{2,4})?$/i, " " + tag + "$1"), dir);
+  return {ok: true, id: c.getId()};
+}
+// 🔄 a Classroom hand-in Gemini cannot read as it is (Roger, 9 Nov 2026: "aren't you able to download the videos one by one?" on the 2 ESO B
+// report: Google Vids videos, slides, documents): a Google Vids video becomes an mp4 and Google Slides or a Google Doc becomes a PDF, saved in
+// Final product videos › Classroom copies as "Student name - title" (found again by the original id in the name, so it is made once). The
+// dashboard then gives that file to Gemini. A Vids video too big to export this way (over ~50 MB) is reported, to download by hand.
+function fpConvert(m) {
+  const id = String(m.fileId || ""), who = String(m.student || "").replace(/[\\/:*?"<>|]/g, " ").slice(0, 60);
+  let f;
+  try { f = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the school account cannot open that file"}; }
+  const mime = f.getMimeType();
+  let root, dir;
+  try { root = DriveApp.getFolderById(VIDEO_FOLDER); } catch (x) { return {ok: false, error: "no access to the videos folder"}; }
+  const it = root.getFoldersByName("Classroom copies");
+  dir = it.hasNext() ? it.next() : root.createFolder("Classroom copies");
+  const tag = "[" + id + "]", old = dir.searchFiles("title contains '" + tag.replace(/'/g, "") + "' and trashed = false");
+  if (old.hasNext()) { const o = old.next(); return {ok: true, id: o.getId(), mime: o.getMimeType()}; }
+  const name = (who ? who + " - " : "") + f.getName().slice(0, 80) + " " + tag;
+  try {
+    if (/vnd\.google-apps\.(presentation|document|spreadsheet|drawing)$/.test(mime)) {
+      const c = dir.createFile(f.getAs("application/pdf").setName(name + ".pdf"));
+      return {ok: true, id: c.getId(), mime: "application/pdf"};
+    }
+    if (/vnd\.google-apps\.vid/.test(mime)) {
+      const tok = ScriptApp.getOAuthToken(), meta = UrlFetchApp.fetch("https://www.googleapis.com/drive/v3/files/" + id + "?fields=exportLinks&supportsAllDrives=true",
+        {headers: {Authorization: "Bearer " + tok}, muteHttpExceptions: true});
+      const links = (JSON.parse(meta.getContentText() || "{}").exportLinks) || {}, url = links["video/mp4"];
+      if (!url) return {ok: false, error: "Google Vids does not offer an mp4 of this video: open it and download it as mp4"};
+      const r = UrlFetchApp.fetch(url, {headers: {Authorization: "Bearer " + tok}, muteHttpExceptions: true, followRedirects: true});
+      if (r.getResponseCode() !== 200) return {ok: false, error: "Google Vids did not give the mp4 (HTTP " + r.getResponseCode() + "): open it and download it as mp4"};
+      const c = dir.createFile(r.getBlob().setName(name + ".mp4").setContentType("video/mp4"));
+      return {ok: true, id: c.getId(), mime: "video/mp4"};
+    }
+  } catch (x) { return {ok: false, error: "it could not be converted (" + String(x.message || x).slice(0, 120) + ")"}; }
+  return {ok: false, error: "nothing to convert (" + mime + ")"};
+}
+function fpFolder(m) {
+  let f;
+  try { f = DriveApp.getFolderById(String(m.folderId || "")); } catch (x) { return {ok: false, error: "the school account cannot open that folder: share it with " + Session.getActiveUser().getEmail()}; }
+  const files = [], it = f.getFiles();
+  while (it.hasNext() && files.length < 80) { const x = it.next(); files.push({id: x.getId(), name: x.getName(), mime: x.getMimeType(), size: x.getSize()}); }
+  return {ok: true, folder: f.getName(), files};
+}
 function fpClassroom(m) {
   if (typeof Classroom === "undefined") return {ok: false, error: "add the Google Classroom API service to the school script (Editor › Services › + › Google Classroom API)"};
   const g = String(m.group || "").replace(/\s/g, "").toUpperCase(), flat = t => String(t || "").replace(/\s/g, "").toUpperCase();

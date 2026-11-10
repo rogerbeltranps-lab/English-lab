@@ -78,8 +78,12 @@ window.EL_GRADING={
       gv:{parts:[
         {id:"cp",name:"Recall checkpoints (first try)",sn:"remember",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
         {id:"warm",name:"Recall warm-ups (first try)",sn:"remember",w:2.5,first:[[LP1,"recall"],[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
-        {id:"time",name:"Practice done on time",sn:"practice",w:7.5,time:[[LP1,"words"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],
+        {id:"time",name:"Practice done on time",sn:"practice",w:5,time:[[LP1,"words"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],
           [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"],[LP6,"register"]]},
+        // Class games (Roger, 9 Nov 2026: "the performance in those games should be counted on performance of the students when it comes to
+        // vocab and grammar, apart from giving points"): % right in this LS's grammar and vocabulary class games (gameResults, the same % as
+        // the 🧩📚 circles), 2.5 % taken from practice done on time (7.5 → 5). A game the student missed or answered under half of is left out, never 0.
+        {id:"games",name:"Class games (% right)",sn:"games",w:2.5,games:true},
         // Skills work (Roger, 2 Nov 2026: daily work = all the learning-path work): the reading, listening, speaking and writing tabs, done on time
         {id:"skills",name:"Skills work done on time (reading, listening, speaking, writing)",sn:"skills",w:15,time:[[LP1,"read"],[LP1,"listen"],[LP1,"speak"],[LP2,"read"],[LP2,"log"],[LP2,"listen"],[LP2,"write"],[LP2,"speak"],
           [LP3,"listen"],[LP3,"chart"],[LP3,"shadow"],[LP3,"write"],[LP3,"speak"],[LP3,"talk"],[LP4,"read"],[LP4,"sources"],[LP4,"again"],[LP4,"shadow"],[LP4,"talk"],
@@ -162,8 +166,12 @@ window.EL_GRADING={
       gv:{parts:[
         {id:"cp",name:"Recall checkpoints (first try)",sn:"remember",w:10,first:[[CP(1),"check"],[CP(2),"check"],[CP(3),"check"],[CP(4),"check"]]},
         {id:"warm",name:"Recall warm-ups (first try)",sn:"remember",w:2.5,first:[[LP1,"recall"],[LP2,"recall"],[LP3,"recall"],[LP4,"recall"],[LP5,"recall"],[LP6,"recall"]]},
-        {id:"time",name:"Practice done on time",sn:"practice",w:7.5,time:[[LP1,"practice"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"practice"],
+        {id:"time",name:"Practice done on time",sn:"practice",w:5,time:[[LP1,"practice"],[LP2,"practice"],[LP2,"grammar"],[LP2,"mixed"],[LP3,"practice"],[LP3,"grammar"],[LP3,"mixed"],[LP4,"practice"],
           [LP5,"practice"],[LP5,"grammar"],[LP5,"mixed"],[LP6,"practice"],[LP6,"grammar"]]},
+        // Class games (Roger, 9 Nov 2026: "the performance in those games should be counted on performance of the students when it comes to
+        // vocab and grammar, apart from giving points"): % right in this LS's grammar and vocabulary class games (gameResults, the same % as
+        // the 🧩📚 circles), 2.5 % taken from practice done on time (7.5 → 5). A game the student missed or answered under half of is left out, never 0.
+        {id:"games",name:"Class games (% right)",sn:"games",w:2.5,games:true},
         // Skills work (Roger, 2 Nov 2026, as in 4ESO LS2): the reading, listening, speaking and writing tabs, done on time
         {id:"skills",name:"Skills work done on time (reading, listening, speaking, writing)",sn:"skills",w:15,time:[[LP1,"read"],[LP1,"listen"],[LP1,"speak"],[LP2,"read"],[LP2,"log"],[LP2,"listen"],[LP2,"again"],[LP2,"shadow"],[LP2,"write"],[LP2,"speak"],[LP2,"talk"],
           [LP3,"listen"],[LP3,"chart"],[LP3,"shadow"],[LP3,"write"],[LP3,"speak"],[LP3,"talk"],[LP4,"read"],[LP4,"sources"],[LP4,"again"],[LP4,"shadow"],[LP4,"talk"],

@@ -55,6 +55,7 @@ window.EL_COVER = {
       "Casa, poble/ciutat i llocs": ["4eso/ls2-where-traditions-come-from#vocab"],
       "Menjar, begudes i compres": ["4eso/ls2-getting-started#words", "4eso/ls2-celebrations-around-the-world#vocab"],
       "Oci, esdeveniments i temps atmosfèric": ["4eso/ls2-getting-started#words"],
+      "Sentiments i emocions": ["4eso/ls2-getting-started#words", "4eso/ls2-where-traditions-come-from#vocab"],
       "Animals, natura i paisatge": ["4eso/ls2-getting-started#words"],
       "Plans, sortides i reptes": ["4eso/ls2-plan-the-day#vocab"],
       "Cultures i opinions": ["4eso/ls2-celebrations-around-the-world#vocab", "4eso/ls2-where-traditions-come-from#vocab"],
