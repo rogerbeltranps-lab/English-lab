@@ -178,6 +178,39 @@ body.ellp2 .lp-body{display:block!important}
 .ellpside .pill{white-space:normal;max-width:100%;box-sizing:border-box}
 .ellpside .panel-head{flex-wrap:wrap}
 .ellpside img,.ellpside video,.ellpside audio,.ellpside table{max-width:100%}
+/* a narrower, more compact column so the step on the right gets more room on a Chromebook (Roger, 10 Nov 2026: "can you make this
+   smaller like this?"): 320 -> 250 px, smaller title, steps and cards */
+.ellpgrid{grid-template-columns:250px minmax(0,1fr);gap:20px}
+.ellpside{gap:9px}
+.ellp-head{gap:4px}
+.ellp-head .eyebrow{font-size:10px!important;padding:3px 8px!important}
+.ellp-head h1{font-size:1.25rem!important}
+.ellp-head .lead{font-size:.82rem!important;line-height:1.4!important}
+.ellp-prog{padding:8px 10px;border-radius:12px}
+.ellp-prog .ellp-pl{font-size:10px;margin-bottom:2px}
+.ellp-prog .progress-label{font-size:13px}
+.ellp-prog .progress-track{height:7px;margin-top:4px}
+.ellp-steps nav.tabs{gap:4px!important}
+.ellp-steps .tab{gap:8px;padding:6px 10px!important;border-radius:10px!important;font-size:14px!important;line-height:1.25}
+.ellp-steps .tab .tn{min-width:20px!important;height:20px!important}
+.ellp-steps .tab:not(.done) .tn{font-size:.75rem!important}
+.ellp-steps .tab.done .tn::after{font-size:.75rem!important}
+.ellp-steps .tab.next:not(.active)::after{font-size:.62rem}
+.ellp-more{gap:8px}
+.ellpside .lp-how{padding:0 10px!important;border-radius:12px!important}
+.ellpside .lp-how>summary{padding:7px 0!important;font-size:13px}
+.ellpside .study-card{padding:10px 12px!important;border-radius:12px!important}
+.ellpside .study-card summary{font-size:.88rem!important;gap:4px 8px!important}
+.ellpside .study-card summary small{font-size:.78rem}
+.ellp-more .plan-card{padding:10px 12px!important;border-radius:12px!important}
+.ellp-more .plan-card h3{font-size:.88rem!important}
+.ellp-more .plan-card .instruction{font-size:.8rem!important;line-height:1.4}
+.ellp-more .plan-card input{font-size:.85rem!important;padding:7px 9px!important}
+.ellp-teach{padding:10px;gap:8px}
+.ellp-teach .routes .route{padding:5px 2px!important}
+.ellp-teach .routes{gap:2px;padding:3px}
+.ellp-teach .routes .route strong{font-size:11.5px!important}
+.ellp-teach .routes .route span{font-size:10px!important}
 
 /* the teacher's part of the column: class game, the level to look at, open sections, pull up, full screen */
 .ellp-teach{display:flex;flex-direction:column;gap:10px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px;box-shadow:0 1px 0 #e2e8f0}
