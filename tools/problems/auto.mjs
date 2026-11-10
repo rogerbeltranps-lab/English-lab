@@ -12,9 +12,13 @@
 //        problems/{id}.auto = {verdict:"fixed", note, at (timestamp)} (note = what was fixed + PR, for Roger; the dashboard shows it). The
 //        GitHub Action "English Lab emails" (notify.mjs --instant) then sends Roger the "⚠️ IMPORTANT" email: run it at once with
 //        workflow_dispatch, send = "new reports and ideas to me" (its 15-minute schedule is only the backup).
-//   node tools/problems/auto.mjs leave <id> --note "..." [--apply]
-//        not a technical bug (design, pedagogy, marking, a route, unclear…): nothing is sent to the student and the report stays open for
-//        Roger with problems/{id}.auto = {verdict:"roger", note, at}, so later runs skip it.
+//   node tools/problems/auto.mjs leave <id> --status nobug|you|fixed --note "..." --reply "..." [--todo "..."] [--apply]
+//        not fixed by Claude (design, pedagogy, marking, a route, unclear…): nothing is sent to the student and the report stays open for
+//        Roger with problems/{id}.auto = {verdict:"roger", status, note, reply, todo, at}, so later runs skip it. Roger, 10 Nov 2026: "I need
+//        you to tell me if the problems are fixed and a suggested message to send with a button". status: "fixed" (it is right now, e.g. a
+//        mark Roger already recalculated), "nobug" (the site works as it should: the answer explains it), "you" (Roger must do something:
+//        --todo says what, in one short line). --reply = the suggested answer to the student (≤1000 characters, Roger's voice, the report's
+//        language, never AI): the dashboard shows it with a one-click send button. Run it again on the same report to change it.
 // Without --apply it only prints what it would write. Sign-in: FIREBASE_SERVICE_ACCOUNT (the cloud environment's secret, can write).
 // Reads: one list of problems (a few dozen documents) + one screenshot per new report. Personal data stays in Firestore and the session.
 import fs from "node:fs";
@@ -67,7 +71,7 @@ if(cmd==="open"){
     console.log("kind: "+x.kind+"\nwords: "+(x.text?JSON.stringify(x.text):"(none)")+"\npage: "+x.page+"\ntitle: "+x.title+"\nsection: "+x.section+"\nls: "+x.ls+" · activity: "+x.activity+"\ndevice: "+x.device);
     if((x.errors||[]).length)console.log("errors:\n  "+x.errors.map(e=>typeof e==="string"?e:JSON.stringify(e)).join("\n  "));
     if((x.msgs||[]).length)console.log("already answered: "+x.msgs.map(m=>JSON.stringify(m.text)).join(" | "));
-    if(x.auto)console.log("looked at: "+x.auto.verdict+" · "+x.auto.note);
+    if(x.auto)console.log("looked at: "+(x.auto.status||x.auto.verdict)+" · "+x.auto.note+(x.auto.todo?" · first: "+x.auto.todo:"")+(x.auto.reply?" · suggested reply: "+JSON.stringify(x.auto.reply):""));
     if(x.shot){const s=doc(await api("GET",DOCS+"problemShots/"+x.id));if(s&&s.img){const f=path.join(os.tmpdir(),"problem-"+x.id+".jpg");fs.writeFileSync(f,Buffer.from(s.img.split(",")[1],"base64"));console.log("screenshot: "+f+" (careful: shots taken before 6 Nov 2026 can show the folded Study guide over the page)")}}
     console.log("live page: https://rogerbeltranps-lab.github.io/English-lab/"+String(x.page||"").replace(/^\//,""));
   }
@@ -82,14 +86,19 @@ if(cmd==="fixed"||cmd==="leave"){
   if(cmd==="leave"&&!note)throw new Error("leave needs --note \"why Roger should look at it\"");
   const writes=[];
   if(cmd==="leave"){
-    writes.push({update:{name:BASE+"/problems/"+id,fields:{auto:fsv({verdict:"roger",note,at:new Date(now)})}},updateMask:{fieldPaths:["auto"]}});
+    const status=opt("--status")||"you",reply=String(opt("--reply")||"").trim().slice(0,MSG_MAX),todo=String(opt("--todo")||"").trim().slice(0,200);
+    if(!["fixed","nobug","you"].includes(status))throw new Error("--status must be fixed, nobug or you");
+    if(!reply)console.log("(no --reply: Roger gets no suggested answer to send; add one unless there is nothing to tell the student)");
+    const a={verdict:"roger",status,note,at:new Date(now)};if(reply)a.reply=reply;if(todo)a.todo=todo;
+    writes.push({update:{name:BASE+"/problems/"+id,fields:{auto:fsv(a)}},updateMask:{fieldPaths:["auto"]}});
+    console.log("Status: "+status+(todo?" · first: "+todo:"")+(reply?"\nSuggested reply ("+(!!x.route&&!elCa(x.route)?"English":"Catalan")+"): "+JSON.stringify(reply):""));
   }else{
     const msg=String(opt("--msg")||"").trim().slice(0,MSG_MAX),en=!!x.route&&!elCa(x.route);
     const reply={uid:x.uid,kind:"fixed",what:x.kind||"other",text:String(x.text||"").slice(0,300),where:String((/^(com estudiar|how to study)$/i.test(x.section||"")?"":x.section)||x.title||"").slice(0,200),en};   // "How to study" = the folded Study guide (reports before PR #290), not where they were
     if(msg)reply.msg=msg;
     writes.push({update:{name:BASE+"/problemReplies/"+id,fields:Object.fromEntries(Object.entries(reply).map(([k,v])=>[k,fsv(v)]))},
       updateTransforms:[{fieldPath:"created",setToServerValue:"REQUEST_TIME"}]});
-    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv({verdict:"fixed",note,at:new Date(now)})}},updateMask:{fieldPaths:["fixed","auto"]}};
+    const w={update:{name:BASE+"/problems/"+id,fields:{fixed:fsv(true),auto:fsv(Object.assign({verdict:"fixed",status:"fixed",note,at:new Date(now)},msg?{reply:msg}:{}))}},updateMask:{fieldPaths:["fixed","auto"]}};
     if(msg)w.updateTransforms=[{fieldPath:"msgs",appendMissingElements:{values:[fsv({text:msg,at:now,rid:id,fix:true})]}}];
     writes.push(w);
     console.log("Student card ("+(en?"English":"Catalan")+"): ✅ fixed"+(msg?" + message: "+JSON.stringify(msg):""));
@@ -101,5 +110,5 @@ if(cmd==="fixed"||cmd==="leave"){
   process.exit(0);
 }
 
-console.log("Usage: node tools/problems/auto.mjs open [--all] | fixed <id> [--msg \"...\"] [--note \"...\"] [--apply] | leave <id> --note \"...\" [--apply]");
+console.log("Usage: node tools/problems/auto.mjs open [--all] | fixed <id> [--msg \"...\"] [--note \"...\"] [--apply] | leave <id> --status nobug|you|fixed --note \"...\" --reply \"...\" [--todo \"...\"] [--apply]");
 process.exit(1);
