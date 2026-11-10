@@ -79,6 +79,7 @@ function doPost(e) {
   if (m.action === "video_chunk") return out(videoChunk(m));
   if (m.action === "video_status") return out(videoStatus(m));
   if (m.action === "fp_watch") return out(m.idToken && isTeacher(m.idToken) ? fpWatch(m) : {ok: false, error: "not the teacher"});
+  if (m.action === "fp_convert") return out(m.idToken && isTeacher(m.idToken) ? fpConvert(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_copy") return out(m.idToken && isTeacher(m.idToken) ? fpCopy(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_folder") return out(m.idToken && isTeacher(m.idToken) ? fpFolder(m) : {ok: false, error: "not the teacher"});
   if (m.action === "fp_classroom") { if (!(m.idToken && isTeacher(m.idToken))) return out({ok: false, error: "not the teacher"});
@@ -527,10 +528,45 @@ function fpCopy(m) {
   try { root = DriveApp.getFolderById(VIDEO_FOLDER); } catch (x) { return {ok: false, error: "no access to the videos folder"}; }
   const it = root.getFoldersByName("Classroom copies");
   dir = it.hasNext() ? it.next() : root.createFolder("Classroom copies");
+  for (const ps = f.getParents(); ps.hasNext();) { const pid = ps.next().getId(); if (pid === dir.getId() || pid === VIDEO_FOLDER) return {ok: true, id}; }   // already in his folder
   const tag = "[" + id + "]", old = dir.searchFiles("title contains '" + tag.replace(/'/g, "") + "' and trashed = false");
   if (old.hasNext()) return {ok: true, id: old.next().getId()};
   const c = f.makeCopy(f.getName().replace(/(\.[a-z0-9]{2,4})?$/i, " " + tag + "$1"), dir);
   return {ok: true, id: c.getId()};
+}
+// 🔄 a Classroom hand-in Gemini cannot read as it is (Roger, 9 Nov 2026: "aren't you able to download the videos one by one?" on the 2 ESO B
+// report: Google Vids videos, slides, documents): a Google Vids video becomes an mp4 and Google Slides or a Google Doc becomes a PDF, saved in
+// Final product videos › Classroom copies as "Student name - title" (found again by the original id in the name, so it is made once). The
+// dashboard then gives that file to Gemini. A Vids video too big to export this way (over ~50 MB) is reported, to download by hand.
+function fpConvert(m) {
+  const id = String(m.fileId || ""), who = String(m.student || "").replace(/[\\/:*?"<>|]/g, " ").slice(0, 60);
+  let f;
+  try { f = DriveApp.getFileById(id); } catch (x) { return {ok: false, error: "the school account cannot open that file"}; }
+  const mime = f.getMimeType();
+  let root, dir;
+  try { root = DriveApp.getFolderById(VIDEO_FOLDER); } catch (x) { return {ok: false, error: "no access to the videos folder"}; }
+  const it = root.getFoldersByName("Classroom copies");
+  dir = it.hasNext() ? it.next() : root.createFolder("Classroom copies");
+  const tag = "[" + id + "]", old = dir.searchFiles("title contains '" + tag.replace(/'/g, "") + "' and trashed = false");
+  if (old.hasNext()) { const o = old.next(); return {ok: true, id: o.getId(), mime: o.getMimeType()}; }
+  const name = (who ? who + " - " : "") + f.getName().slice(0, 80) + " " + tag;
+  try {
+    if (/vnd\.google-apps\.(presentation|document|spreadsheet|drawing)$/.test(mime)) {
+      const c = dir.createFile(f.getAs("application/pdf").setName(name + ".pdf"));
+      return {ok: true, id: c.getId(), mime: "application/pdf"};
+    }
+    if (/vnd\.google-apps\.vid/.test(mime)) {
+      const tok = ScriptApp.getOAuthToken(), meta = UrlFetchApp.fetch("https://www.googleapis.com/drive/v3/files/" + id + "?fields=exportLinks&supportsAllDrives=true",
+        {headers: {Authorization: "Bearer " + tok}, muteHttpExceptions: true});
+      const links = (JSON.parse(meta.getContentText() || "{}").exportLinks) || {}, url = links["video/mp4"];
+      if (!url) return {ok: false, error: "Google Vids does not offer an mp4 of this video: open it and download it as mp4"};
+      const r = UrlFetchApp.fetch(url, {headers: {Authorization: "Bearer " + tok}, muteHttpExceptions: true, followRedirects: true});
+      if (r.getResponseCode() !== 200) return {ok: false, error: "Google Vids did not give the mp4 (HTTP " + r.getResponseCode() + "): open it and download it as mp4"};
+      const c = dir.createFile(r.getBlob().setName(name + ".mp4").setContentType("video/mp4"));
+      return {ok: true, id: c.getId(), mime: "video/mp4"};
+    }
+  } catch (x) { return {ok: false, error: "it could not be converted (" + String(x.message || x).slice(0, 120) + ")"}; }
+  return {ok: false, error: "nothing to convert (" + mime + ")"};
 }
 function fpFolder(m) {
   let f;

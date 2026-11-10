@@ -88,6 +88,14 @@ function draw(){
 // them after they do them in the formative games"). The same game played again brings back what they wrote (one read per game). The text
 // also goes to the game's answers doc (a:{slide: text}): the board counts who is writing and saves it with the results for the teacher.
 const NT={k:"",pk:"",i:"",meta:null,v:"",dirty:false,t:0,docs:{},sent:{},st:""};
+// what to write (Roger, 10 Nov 2026: "ask them to write 2 sentences using the vocabulary or grammar structures learnt and whatever they
+// need to remember better the theory explained"): vocabulary or grammar by the game's kind (live nt.kind; older boards: the end of the deck id)
+function noteAsk(nt){   // English, and the Catalan help smaller below it (ca=0: English only, ca=1: Catalan only)
+  const kind=nt.kind||(/-vocab$/.test(nt.deck||"")?"vocab":/-grammar$/.test(nt.deck||"")?"grammar":"");
+  const en=`Write <b>2 sentences</b> of your own using ${kind==="vocab"?"the new words":kind==="grammar"?"the grammar structures you have learnt":"the new words or grammar"}, and <b>anything that helps you remember</b> the theory.`;
+  const ca=`Escriu <b>2 frases</b> teves amb ${kind==="vocab"?"el vocabulari nou":kind==="grammar"?"les estructures gramaticals que has après":"el vocabulari o la gramàtica nous"}, i <b>tot el que t'ajudi a recordar</b> la teoria.`;
+  return CA==="1"?ca:CA==="0"?en:`${en}<small>${ca}</small>`;
+}
 const noteRef=deck=>S.doc(db,"students",user.uid,"notes",deck);
 async function notesLoad(deck){
   if(NT.docs[deck]!==undefined||!user)return;NT.docs[deck]=null;
@@ -120,8 +128,9 @@ function notesView(){
     :l&&l.watch?`<p class="w">⚠️ ${md(l.watch)}</p>`:`<p>${md(l)}</p>`;
   const thHtml=th?`<div class="nth">${th.slides.map(s=>`<h4>${md(s.theory)}</h4>${(s.lines||[]).map(bl).join("")}`).join("")}</div>`:"";
   app$.innerHTML=top()+`<div class="main"><form class="nform slidein${th?" two":""}" data-k="${esc(k)}"><div class="nhead"><span class="nemo">📝</span><div><label for="nt" class="nlab">${esc(T("Take your notes:","Pren apunts:"))}</label>
+      <p class="nask">${noteAsk(nt)}</p>
       ${tp.length?`<div class="ntop">${tp.map(t=>`<span>${md(t)}</span>`).join("")}</div>`:""}</div></div>${thHtml}
-      <textarea id="nt" data-k="${esc(k)}" maxlength="3000" spellcheck="false" placeholder="${esc(T("In your own words: the rule, two examples and the mistake to avoid. Look at the board.","Amb les teves paraules: la regla, dos exemples i l'error que has d'evitar. Mira la pissarra."))}">${esc(NT.v)}</textarea>
+      <textarea id="nt" data-k="${esc(k)}" maxlength="3000" spellcheck="false" placeholder="${esc(CA==="1"?"1. …\n2. …\nPer recordar: …":"1. …\n2. …\nTo remember: …")}">${esc(NT.v)}</textarea>
       <p class="nst" id="ntst"></p></form></div>`;
   noteState(null);
   const t=document.getElementById("nt");t.focus();t.setSelectionRange(t.value.length,t.value.length);

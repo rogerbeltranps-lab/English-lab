@@ -28,8 +28,8 @@ hourly task "English Lab: problem reports" is switched off.
      plainly correct for that item, a marking run that missed a hand-in) → fix it.
    - **Not technical** (design wishes, what to teach or practise, how hard something is, a mark or correction the student disagrees with,
      routes and levels, deadlines, personal matters), **unclear** (you cannot find or reproduce a bug), or a fix that would change LS1
-     content or design (Roger: leave LS1 alone) → `node tools/problems/auto.mjs leave <id> --note "…" --apply`: one or two sentences for
-     Roger, saying what the student means and why it is his call. Nothing is sent to the student.
+     content or design (Roger: leave LS1 alone) → `node tools/problems/auto.mjs leave <id> --status … --note "…" --reply "…" [--todo "…"]
+     --apply`. Nothing is sent to the student: Roger sends it with one click (see "Status and suggested reply" below).
    - Already fixed by an earlier change → no PR; answer it as fixed (step 4), naming the PR or date in the note.
 3. Fix: a branch `claude/problem-<short id>` from `main`, the smallest change that fixes it, following `AGENTS.md`, plus a line in
    `AGENTS.md` if it sets a rule ("(problem report, <group>, <date>)"). Run the repo's checks that apply (`node tools/vocab-cards/check.mjs`,
@@ -47,6 +47,22 @@ hourly task "English Lab: problem reports" is switched off.
    (method `run_workflow`, workflow `teacher-emails.yml`, ref `main`, inputs `{"send": "new reports and ideas to me"}`); its 15-minute
    schedule is only the backup (GitHub often runs it late). Reports left for Roger get no extra email: the 15-minute alert already told him
    about each new report, and the dashboard shows the note.
+
+## Status and suggested reply (Roger, 10 Nov 2026)
+
+"I need you to tell me if the problems are fixed and a suggested message to send with a button." Every report left for Roger gets:
+
+- `--status`: **`fixed`** (it is right now: a mark Roger already recalculated, a redo he already gave, a change already merged),
+  **`nobug`** (the site works as it was built to; an explanation is all the student needs), or **`you`** (Roger must do something first:
+  a redo, 📣 Show answers, a roster name, a decision). The dashboard shows it as ✅ Fixed / 👍 Not a bug / ✋ Needs you.
+- `--note`: one or two sentences for Roger (what the student means, what you checked, the numbers).
+- `--todo` (only with `you`): what Roger must do first, one short line ("Press ↺ Let them do it again on her checkpoint 1 score").
+- `--reply`: the answer to the student, in the report's language (the tool says which), Roger's voice, first person, plain and kind,
+  two or three short sentences; never AI, Claude, PRs or code. Write it so it is true once the todo is done.
+
+In ⚠️ Problem reports the reply has **📨 Send…** (fixed → the ✅ fixed card with it; nobug → the message card and the report closes;
+you → the message card, the report stays open) and **✏️ Edit first** (opens 💬 Answer with the text). Run `leave` again on the same
+report to change it (`open --all` shows the current one).
 
 ## Students' comments, answered at once (Roger, 9 Nov 2026)
 
@@ -72,5 +88,4 @@ line, after the reports (or alone, when there is no open report):
 - Firestore: one list of `problems` (a few dozen documents) per run, plus a screenshot per new report. Never list students or results
   for a report unless the bug needs it, then only that student's documents.
 - Runs only when a student reports something. A run with nothing new ends after one command.
-- The dashboard shows each report's note in ⚠️ Problem reports ("🤖 Fixed automatically" / "🤖 Left for you"); Reopen and Delete work as
-  before.
+- The dashboard shows each report's status, note and suggested reply in ⚠️ Problem reports; Reopen and Delete work as before.
