@@ -51,7 +51,7 @@ button.lv{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:6
 .who{display:inline-block;border-radius:999px;padding:1px 8px;font-size:12px;white-space:nowrap}.who.a{background:#dcfce7;color:#166534}.who.y{background:#e0e7ff;color:#3730a3}
 tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .gnotes{display:inline-grid;place-items:center;width:30px;height:30px;margin-left:6px;vertical-align:middle;border:1px solid #c7d2fe;border-radius:8px;background:#eef2ff;text-decoration:none;font-size:16px}.gnotes:hover{background:#e0e7ff;border-color:#3157d5}.grings{display:inline-flex;align-items:center;gap:3px;margin-left:8px;vertical-align:middle;text-decoration:none;font-size:13px}
-</style>
+.indrub{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0 2px}.ir{border:1.5px solid;border-radius:9px;padding:6px 8px;font-size:12.5px;line-height:1.35;color:#334155}.ir b{display:block;font-size:12px;margin-bottom:2px}.ir b small{font-weight:600;color:#64748b}.ir-na{border-color:#fca5a5;background:#fef2f2}.ir-na b{color:#991b1b}.ir-as{border-color:#86efac;background:#f0fdf4}.ir-as b{color:#166534}.ir-an{border-color:#93c5fd;background:#eff6ff}.ir-an b{color:#1e40af}.ir-ae{border-color:#c4b5fd;background:#f5f3ff}.ir-ae b{color:#5b21b6}@media (max-width:900px){.indrub{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>
 <style>/* Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"): a side menu, a home with a few
    alerts, one big card for the class and tiles; every box of the old long page lives inside one place behind a tile */
 .tshell{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;align-items:start}.tpage{min-width:0}
@@ -2443,11 +2443,16 @@ function degrees(studs){const g=G(),cs=[...g.key,...g.other];
 const lsHref=l=>`${l.course}/${l.id.slice(l.course.length+1)}/index.html`;   // same path as the student board's LS buttons
 const lsGroups=id=>GR.filter(g=>g.course===(EL_LS.find(l=>l.id===id)||{}).course);
 // Criteria of the LS with their text, and the detail of one criterion
+// The LS indicators of a criterion as a four-level rubric, NA → AE (Roger, 10 Nov 2026: the indicators under each criterion here too).
+// Catalan (indCa) when the LS has it, else the English ind; each level starts with what the student can do, numbers in brackets.
+const IRL=[["na","No assoliment","< 5"],["as","Assoliment satisfactori","5–6,9"],["an","Assoliment notable","7–8,9"],["ae","Assoliment excel·lent","9–10"]];
+function indRub(c){const g=(window.EL_GRADING||{})[S.ls]||{},I=(g.indCa||{})[c]||(g.ind||{})[c];if(!Array.isArray(I)||I.length!==4)return "";
+  return `<div class="indrub">${IRL.map(([k,n,r],j)=>`<div class="ir ir-${k}"><b>${n} <small>${r}</small></b><span>${esc(I[j])}</span></div>`).join("")}</div>`}
 function legend(list){const cs=[...new Set(list.flatMap(a=>a.criteria))].sort();
-  return `<table class="legend"><tbody>${cs.map(c=>`<tr><td>${pill(c)}</td><td><b>${esc(elCompetence(c))}</b><br>${esc(elCriterion(COURSE,c)||"–")}</td></tr>`).join("")}</tbody></table>`}
+  return `<table class="legend"><tbody>${cs.map(c=>`<tr><td>${pill(c)}</td><td><b>${esc(elCompetence(c))}</b><br>${esc(elCriterion(COURSE,c)||"–")}${indRub(c)}</td></tr>`).join("")}</tbody></table>`}
 function critPanel(c){redraw=null;
   const list=acts(S.ls),lp=list.filter(a=>a.criteria.includes(c)),st=list.flatMap(a=>steps(a).filter(k=>!(a.skip||[]).includes(k)&&stepCrit(a,k).includes('data-c="'+c+'"')).map(k=>a.title+" · "+tabName(a,k)));
-  dlg(`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterion(COURSE,c)||"No text yet for this course.")}</p><label>Learning paths linked to it</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>Activities that give evidence</label><p>${st.map(esc).join(" · ")||"–"}</p>`);
+  dlg(`<h3>${pill(c)} ${esc(elCompetence(c))}</h3><p>${esc(elCriterion(COURSE,c)||"No text yet for this course.")}</p>${indRub(c)?`<label>Indicators in this LS</label>${indRub(c)}`:""}<label>Learning paths linked to it</label><p>${lp.map(a=>esc(a.title)).join(" · ")||"–"}</p><label>Activities that give evidence</label><p>${st.map(esc).join(" · ")||"–"}</p>`);
 }
 function lsSettings(id){
   const info=S.D.ls[id]||{status:"hidden",enabled:[]},st=info.status;
