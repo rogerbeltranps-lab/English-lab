@@ -812,10 +812,14 @@ const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).
 // warm-ups: delayed retrieval); time: the share of those steps done by their session deadline (teaching plan), out of 10.
 // S.dueZero = a group id (progSync, the student board's mark so far; Roger, 2 Nov 2026: "students must understand that if they don't work
 // daily their grades are low"): a missing piece counts 0 once its day in the time plan has passed, and is left out before that.
-// Only work the group could do counts 0 (problem report, 2ESOB, 10 Nov 2026: a recall checkpoint still locked for the group counted 0 and
-// pulled the whole daily-work mark down): a path not open for the group (its open switch) or a tab never opened for it is left out, as on the board.
-const canDoZ=(id,k,g)=>{const a=byId(id),info=(S.D&&S.D.ls||{})[S.ls]||{};if(!a)return false;if(!elLpOpen(a,info,g,true))return false;
-  return !elSecNeverOpened(a,info,g).some(sec=>sec===k||elSecSteps(a,sec).includes(k))};
+// Only what was done in class counts 0 (problem report, 2ESOB, 10 Nov 2026: a recall checkpoint still locked for the group counted 0 and
+// pulled the whole daily-work mark down; Roger: "it only should count what I ticked we've done in class"): a missing piece counts 0 only when
+// its tab (or, for a path without tabs such as a recall checkpoint, the path) is ticked as done in the Time plan (doneMap, the same as
+// ls/{ls}.done[group]) and its day has passed. Anything not ticked yet is left out. S.tickZ = the group's ticks, set by progSync.
+const canDoZ=(id,k,g)=>{const a=byId(id);if(!a)return false;
+  let dm=S.tickZ&&S.tickZ.g===g?S.tickZ.m:null;if(!dm){dm=(((S.D&&S.D.ls||{})[S.ls]||{}).done||{})[g]||{};try{if(S.D&&S.D.tkOk)dm=doneMap(planX(S.ls,g))}catch(e){}S.tickZ={g,m:dm}}
+  const secs=secOf(a).map(z=>z[0]);if(!secs.length)return !!dm[a.id+"#"];
+  return secs.some(sec=>(sec===k||elSecSteps(a,sec).includes(k))&&!!dm[a.id+"#"+sec])};
 const missZ=(v,id,k)=>{if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()&&canDoZ(id,k,S.dueZero)?0:null};
 // Class games part (games:true; Roger, 9 Nov 2026: "the performance in those games should be counted"): % right in the grammar and vocabulary
 // class games of the LS on screen, out of 10, all games pooled (the 🧩📚 circles' %). A game is counted only when the student answered at least
@@ -1141,7 +1145,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)liveTick()
 // and rewrites them only when they change. Only for the group on screen, fetched in this visit, in an LS with continuous assessment.
 function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S.g)))return;
   if(g.gv&&g.gv.parts.some(p=>p.games)){loadGames();if(!GAMES[S.g]||GAMES[S.g].busy)return}   // the class games part: wait for the group's games (loadGames renders again)
-  const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
+  S.tickZ=null;const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
   try{Object.values(S.P||{}).filter(s=>s&&s.uid&&!s.away&&(s.group===S.g||s.tester)).forEach(s=>{S.dueZero=s.group||S.g;const {B,total}=grade(s);
     const p={exam:r1(B.exam),fp:r1(B.fp),gv:r1(B.gv&&B.gv.mark),other:r1(B.other),total:r1(total)},cur=res(s.uid,id).progress||{};
     // the pieces of each block, for the teacher's view of the student's board (today.html?student=…; Roger, 2 Nov 2026)
@@ -1149,7 +1153,7 @@ function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S
       fp:g.fp&&!g.fp.mark?Object.fromEntries(g.fp.rows.map(x=>[x.step+"|"+x.c,r1(lvMark(lvOf(s.uid,g.fp.a,x.step,x.c)))])):{}};p.parts=parts;
     if(K.every(k=>(cur[k]??null)===p[k])&&Object.entries(parts).every(([k,o])=>Object.entries(o).every(([c,v])=>(((cur.parts||{})[k]||{})[c]??null)===v)))return;p.at=ymd(Date.now());
     const w=patch(s.uid,id,{progress:p});if(w&&w.catch)w.catch(e=>console.warn("progress",e))})}
-  finally{S.zero=z;S.dueZero=null}}
+  finally{S.zero=z;S.dueZero=null;S.tickZ=null}}
 // ---- Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"; the student board's rule: "the menus have
 // little information and when you go to a place you can find the info that you need"). A side menu (Home, the groups, Questions, Materials,
 // Reference) and, for Home and each group, a page with only a few red alerts, ONE big card for the class (now or next, by EL_TIMETABLE, with
