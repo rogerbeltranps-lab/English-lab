@@ -576,16 +576,21 @@ function cpBox(ls,grp,studs){
   const cps=acts(ls).filter(a=>a.checkpoint);if(!cps.length)return "";const D=S.D;cpSync(ls,grp,studs);
   const head=cps.map(a=>{const K=D.ck[a.keys[0]],docs=studs.map(s=>cpDoc(s.uid,a)).filter(d=>d&&!d.redo),n=docs.filter(d=>cpStale(d,K)).length;
     const shown=elCpShown(a,D.ls[ls],grp.id),kids=studs.filter(s=>!s.tester&&!s.away).length,sent=docs.filter(d=>!studs.find(s=>s.tester&&cpDoc(s.uid,a)===d)).length;
+    // 🔒 Close and 📣 Show answers apart (Roger, 10 Nov 2026: "Separate Close and Show"); 📣 Update answers whenever corrections already
+    // sent are out of date after ✓ Accept, shown or not (Roger, 10 Nov 2026: "I dont see the update button")
+    const closed=!shown&&elCpClosed(a,D.ls[ls],grp.id),old=docs.filter(d=>d.fb&&cpStale(d,K)).length;
+    const upd=old?`<button class="g" data-do="cpupd" data-a="${a.id}" title="Students who already have their corrections get them again with the answers you accepted">📣 Update answers (${old})</button><br>`:"";
     return `<th>${esc(a.title.replace(/^Recall checkpoint/,"C"))}<br>${!K?'<small style="color:#dc2626">⚠ no answer key</small>'
-      :shown?(n?`<button data-do="cprel" data-a="${a.id}" title="Send the corrections again (after accepting an answer)">📣 Update answers (${n})</button><br>`:"")+'<small class="muted">✓ answers shown · closed</small>'
-      :!docs.length?'<small class="muted">nothing sent</small>'
-      :`<button data-do="cprel" data-a="${a.id}" data-n="${kids-sent}" title="Students in ${grp.name} see their questions, answers and corrections, and nobody in the group can do it any more">📣 Show answers · close it</button><br><small class="muted">${sent}/${kids} sent · they see only their score</small>`}</th>`}).join("");
+      :shown?upd+'<small class="muted">✓ answers shown · closed</small>'
+      :upd+(closed?`<small style="color:#b45309;font-weight:700">🔒 closed</small> <button class="g" data-do="cpclose" data-a="${a.id}" data-v="0" title="Students in ${grp.name} who have not done it can do it again">🔓 Reopen</button>`
+          :`<button class="g" data-do="cpclose" data-a="${a.id}" data-v="1" title="Nobody else in ${grp.name} can start it; the answers stay hidden">🔒 Close</button>`)
+      +(docs.length?` <button data-do="cprel" data-a="${a.id}" data-n="${closed?0:kids-sent}" title="Students in ${grp.name} see their questions, answers and corrections${closed?"":", and nobody in the group can do it any more"}">📣 Show answers</button><br><small class="muted">${sent}/${kids} sent · they see only their score</small>`:'<br><small class="muted">nothing sent</small>')}</th>`}).join("");
   const rows=studs.filter(s=>!s.tester||cps.some(a=>cpDoc(s.uid,a))).map(s=>`<tr><td style="text-align:left">${name(s)}</td>${cps.map(a=>{const d=cpDoc(s.uid,a),K=D.ck[a.keys[0]];
       if(!d)return '<td class="muted">–</td>';if(d.redo)return `<td data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="You let them do it again">↺ again</td>`;
       const m=cpMark(d,K),glances=(d.leaves||[]).length,secs=(d.times||[]).reduce((x,y)=>x+(+y||0),0);
       const gp=cpGap(s.uid,a,d,K);
       return `<td class="sc" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="${gp?esc(gp.t)+" · ":""}Click for the answers"${gp&&gp.up?' style="background:#fff4e5"':""}>${gp?(gp.up?"⚠️ ":"↓ "):""}${K?m.score+"/"+m.max:"?"}${d.auto==="left"?' <span title="Sent automatically: left the page">⚡</span>':""}${glances?` <span title="Left the page ${glances} time(s) for less than 2 s">👀${glances}</span>`:""}<br><small class="muted">${Math.round(secs/60*10)/10} min${d.fb&&!cpStale(d,K)?" · ✓ released":""}</small></td>`}).join("")}</tr>`).join("");
-  const body=`<p class="muted">Each student does each checkpoint once: one question at a time, ${45} s each, no going back, nothing to copy or paste. If they leave the page (another tab, window or app) for more than 2 seconds it is sent at once (⚡). 👀 = left for less than 2 s. Students first see only their score. Their questions, answers and corrections appear when every student in the group has sent it, or when you press <b>📣 Show answers</b>; from then on nobody in the group can do it. Press <b>📣 Update answers</b> after accepting an answer. Click a cell for the answers, to accept an answer or to let a student do it again.</p>`
+  const body=`<p class="muted">Each student does each checkpoint once: one question at a time, ${45} s each, no going back, nothing to copy or paste. If they leave the page (another tab, window or app) for more than 2 seconds it is sent at once (⚡). 👀 = left for less than 2 s. Students see their score as soon as they send it. <b>🔒 Close</b> stops new tries (answers stay hidden; 🔓 Reopen undoes it). Their questions, answers and corrections appear when every student in the group has sent it, or when you press <b>📣 Show answers</b>; from then on nobody in the group can do it. <b>📣 Update answers</b> appears after you accept an answer, for the students who already have their corrections. Click a cell for the answers, to accept an answer or to let a student do it again.</p>`
     +`<div class="wrap"><table class="acts"><tr><th>Student</th>${head}</tr>${rows}</table></div>`;
   const warn=studs.flatMap(s=>cps.map(a=>{const d=cpDoc(s.uid,a),g=cpGap(s.uid,a,d,D.ck[a.keys[0]]);return g&&g.up?`<li><b>${name(s)}</b> · ${esc(a.title)}: ${esc(g.t)} <button class="g" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}">See the answers</button></li>`:""})).filter(Boolean);
   const gapNote=`<p class="muted">⚠️ = ${CP_GAP} points or more above the student's usual marks (the average of their exam marks so far and their recall warm-ups in this LS); ↓ = that much below. Worth a look, not proof.</p>`;
@@ -606,8 +611,11 @@ function cpDlg(u,a){
 // each student who sent it gets fb (mark, corrections and now the questions too, for ✅ My checkpoints on the board), and the checkpoint
 // is closed for the group: ls/{id}.cpShown[group][activity] (elCpShown in el-catalog.js; firestore.rules refuse a new try).
 const cpFb=(d,K)=>{const m=cpMark(d,K);return {score:m.score,max:m.max,ok:m.ok,right:d.ids.map(id=>(cpAccepted(K,id)||[""])[0]),why:d.ids.map(id=>{const k=K.items[id]||{};return {ca:k.ca||"",en:k.en||""}}),q:d.ids.map(id=>String((K.items[id]||{}).q||"")),at:new Date().toISOString()}};
-api.cpRelease=(a,studs,gid)=>{const K=S.D.ck[a.keys[0]],ops=[];
-  studs.forEach(s=>{const d=cpDoc(s.uid,a);if(!cpStale(d,K))return;const fb=cpFb(d,K);
+// 🔒 Close without showing (Roger, 10 Nov 2026): ls/{id}.cpClosed[group][activity]; 🔓 Reopen removes it (only while the answers are hidden)
+api.cpClose=(a,gid,on)=>{const i=S.D.ls[a.ls]=S.D.ls[a.ls]||{},at=new Date().toISOString();i.cpClosed=i.cpClosed||{};const g=i.cpClosed[gid]=i.cpClosed[gid]||{};
+  if(on)g[a.id]=at;else delete g[a.id];return DEMO?null:put(["ls",a.ls],{cpClosed:{[gid]:{[a.id]:on?at:F.deleteField()}}})};
+api.cpRelease=(a,studs,gid,onlyOld)=>{const K=S.D.ck[a.keys[0]],ops=[];
+  studs.forEach(s=>{const d=cpDoc(s.uid,a);if(!cpStale(d,K)||(onlyOld&&!d.fb))return;const fb=cpFb(d,K);
     d.fb=fb;if(!DEMO)ops.push(put(["students",s.uid,"checkpoints",a.keys[0]],{fb}))});
   if(gid&&!elCpShown(a,S.D.ls[a.ls],gid)){const i=S.D.ls[a.ls]=S.D.ls[a.ls]||{},at=new Date().toISOString();i.cpShown=i.cpShown||{};(i.cpShown[gid]=i.cpShown[gid]||{})[a.id]=at;
     if(!DEMO)ops.push(put(["ls",a.ls],{cpShown:{[gid]:{[a.id]:at}}}))}
@@ -4330,6 +4338,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
       act(api.secLock(S.ls,S.g,a.id,(EL_SECTIONS[a.id]||[]).map(x=>x[0]).filter(id=>off.has(id))))},
     secset:()=>act(api.secLock(S.ls,S.g,k.a,k.v==="1"?[]:(EL_SECTIONS[k.a]||[]).map(x=>x[0]))),
     cpdlg:()=>cpDlg(u,a),
+    cpupd:()=>act(api.cpRelease(a,Object.values(S.P).filter(s=>s.group===S.g||s.tester),null,true)),
+    cpclose:()=>{if(k.v==="1"&&!confirm(`Close ${a.title} for ${(EL_GROUPS.find(g=>g.id===S.g)||{}).name||S.g}?\n\nNobody else can start it. The answers stay hidden until you press 📣 Show answers. You can reopen it.`))return;act(api.cpClose(a,S.g,k.v==="1"))},
     cprel:()=>{const n=+k.n||0;if(k.n!=null&&!confirm(`Show ${a.title} answers to ${(EL_GROUPS.find(g=>g.id===S.g)||{}).name||S.g}?\n\nEach student sees their questions, answers and corrections, and nobody in the group can do it any more`+(n?` (${n} student${n>1?"s have":" has"} not done it yet).`:".")))return;
       act(api.cpRelease(a,Object.values(S.P).filter(s=>s.group===S.g||s.tester),S.g))},
     cpacc:()=>{Promise.resolve(api.cpAccept(a,k.i,k.v)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});cpInject(S.D);render();cpDlg(u,a)},

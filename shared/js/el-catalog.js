@@ -203,7 +203,7 @@ window.elDoneSet=function(str){const s=new Set();try{(function w(o){if(o&&typeof
 window.elOptional=a=>!!(a&&a.optional);
 window.elLpOpen=function(a,info,gid,raw){if(a&&a.optional)return true;const o=info&&info.open&&info.open[gid];
   if(!(Array.isArray(o)?o.includes(a.id):!a.graded||((info&&info.enabled)||[]).includes(a.id)))return false;
-  if(!raw&&!window.EL_RAW_OPEN&&elCpShown(a,info,gid))return false;   // a checkpoint whose answers are shown is closed: nobody can do it any more
+  if(!raw&&!window.EL_RAW_OPEN&&elCpClosed(a,info,gid))return false;   // a checkpoint whose answers are shown is closed: nobody can do it any more
   return raw||window.EL_RAW_OPEN||!elPlanLater(info,gid).acts.has(a.id)};
 // The Time plan opens on the class day (Roger, 7 Nov 2026: "the SLPs will be automatically open the day the group has class and it's on my
 // plan"; "If I don't do sth in class I drag it to the next day and that's all"). Dragging a learning path or tab onto a class day still opens
@@ -500,6 +500,8 @@ window.elCpScore=async(h,key,ids,answers)=>{if(!h||!h.items||!Array.isArray(ids)
   for(let i=0;i<ids.length;i++){const v=(answers||[])[i];if(!elCpNorm(v))continue;const L=h.items[ids[i]]||[];if(L.includes(await elCpHash(key,ids[i],v)))n++}
   return {score:n,max:ids.length}};
 window.elCpShown=(a,info,gid)=>!!(a&&a.checkpoint&&info&&info.cpShown&&info.cpShown[gid]&&info.cpShown[gid][a.id]);
+// 🔒 closed by the teacher without showing the answers (ls/{id}.cpClosed[group][activity]; Roger, 10 Nov 2026), or shown: nobody can start it
+window.elCpClosed=(a,info,gid)=>elCpShown(a,info,gid)||!!(a&&a.checkpoint&&info&&info.cpClosed&&info.cpClosed[gid]&&info.cpClosed[gid][a.id]);
 window.elLpLocks=function(ls,open){const shut=(window.EL_CATALOG||[]).filter(a=>a.ls===ls&&!a.optional&&!open.includes(a.id));   // optional: never locked
   return {locked:shut.map(a=>a.id),lockedKeys:shut.flatMap(a=>a.keys.flatMap(k=>[k,k+"Level"]))}};
 // Recall checkpoints open the way (Roger, 26 Oct 2026): an activity that comes after a checkpoint in its LS (catalogue order = LS page
