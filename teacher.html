@@ -412,8 +412,11 @@ const api={
   // Since 7 Nov 2026 the button also starts the task at once through the school Apps Script (markStart); request.fired = when it did, so
   // the GitHub Action (the backup, which GitHub runs only every few hours) does not start it again.
   mkAsk:async on=>{const v=on?{at:new Date().toISOString(),by:"dashboard"}:null;S.D.mk=Object.assign({},S.D.mk);if(v)S.D.mk.request=v;else delete S.D.mk.request;CORR.mkT=Date.now();
-    if(DEMO){if(v)v.fired=new Date().toISOString();return}await put(["settings","marking"],{request:v||F.deleteField()});if(!v)return;
-    const r=await markStart(v.at);CORR.start=r;if(r.ok){v.fired=r.started||r.already;await put(["settings","marking"],{request:{fired:v.fired}})}},
+    // a new request clears the last one's fired/err (9 Nov 2026: setDoc merge kept the fired of 7 Nov, so a press that did not start
+    // showed "Claude got it at 17:53" and the GitHub backup thought it had started); err = why the school script did not start it
+    if(DEMO){if(v)v.fired=new Date().toISOString();return}await put(["settings","marking"],{request:v?Object.assign({},v,{fired:F.deleteField(),err:F.deleteField()}):F.deleteField()});if(!v)return;
+    const r=await markStart(v.at);CORR.start=r;if(r.ok){v.fired=r.started||r.already;await put(["settings","marking"],{request:{fired:v.fired}})}
+    else{v.err=r.error||"no answer";await put(["settings","marking"],{request:{err:v.err}})}},
   mkRead:async()=>{if(DEMO)return;const d=await F.getDoc(F.doc(db(),"settings","marking"));S.D.mk=d.exists()?d.data():null;CORR.mkT=Date.now()},
   reject:(u,ls)=>{const l=S.D.lv[u][ls],to=l.request;if(DEMO){delete l.request;delete l.reason;l.declined=to;return}return put(["students",u,"levels",ls],{request:F.deleteField(),reason:F.deleteField(),declined:to,declinedAt:F.serverTimestamp()})},
   result:(u,a,o)=>{o=Object.assign({ls:a.ls,activity:a.id},o);if(DEMO){const r=(S.D.rs[u]=S.D.rs[u]||{});r[a.id]=Object.assign(r[a.id]||{},o);return}return put(["students",u,"results",resKey(a.id)],o)},
@@ -1627,7 +1630,7 @@ function corrScan(){if(CORR.d===S.D&&Date.now()-CORR.t<4000)return CORR.v;
   done.sort((p,q)=>q.at-p.at);CORR.d=S.D;CORR.t=Date.now();CORR.v={wait,done};return CORR.v}
 // the next scheduled run: Wednesday at about 15:00 (Madrid time; the scheduled task starts at 14:43)
 // what the asked card says: started at once by the school script (fd), or why not and what to do
-function corrAskMsg(st,RUN){const e=(CORR.start||{}).error,why=e==="no task token"?"the task's token is not in your school script yet"
+function corrAskMsg(st,RUN){const e=(CORR.start||{}).error||((S.D.mk||{}).request||{}).err,why=e==="no task token"?"the task's token is not in your school script yet"
     :e==="old script"?"your school script is the old version":e?"the school script said: "+esc(e):"";
   if(st.fd&&!st.slow)return `Claude got it at ${esc(new Date(st.fd).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))} and is starting. In a few minutes this card says <b>Claude is correcting now</b> (press ↻ Check again). It corrects everything that is waiting, in every group.`;
   if(st.fd)return `Claude got it at ${esc(new Date(st.fd).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))} but has not started after 20 minutes. Open ${RUN}, choose <b>English Lab: mark and correct</b> and press <b>Run now</b>.`;
@@ -1639,7 +1642,7 @@ const corrDay=v=>new Date(v).toLocaleDateString("en-GB",{weekday:"long",day:"num
 // where the request is: {s: "asked" | "running" | "done" | "idle", ...}
 function corrState(){const m=S.D.mk||{},rq=tms((m.request||{}).at),run=m.run||{},st=tms(run.started),dn=tms(run.done),now=Date.now();
   if(st&&dn<st&&now-st<12*3600e3)return {s:"running",st,via:run.via};
-  if(rq&&rq>st){const fd=tms((m.request||{}).fired);return {s:"asked",rq,fd,slow:fd?now-Math.max(fd,rq)>20*60e3:true}}
+  if(rq&&rq>st){let fd=tms((m.request||{}).fired);if(fd&&fd<rq-60e3)fd=0;return {s:"asked",rq,fd,slow:fd?now-Math.max(fd,rq)>20*60e3:true}}
   return {s:st?"done":"idle",st,dn,via:run.via}}
 const corrChips=(L,more)=>{const by={};L.forEach(i=>{(by[i.u]=by[i.u]||[]).push(i)});return Object.values(by).map(is=>{const i=is[0],s=S.P[i.u];
   return `<button class="chip mini cchip ${is.some(x=>x.late)?"late":""}" data-do="corropen" data-u="${i.u}" data-a="${esc(i.aid)}" data-s="${esc(i.step)}" data-k="${i.k}" title="Open it">${s?name(s):"?"}${is.length>1?` ×${is.length}`:""}${is.some(x=>x.late)?" ❌":""}</button>`}).join("")+(more||"")};
