@@ -427,6 +427,27 @@ window.elClassRoll=function(x,left,here,roster){const w=elClassWatch(x,left,here
 // we are watching a video"): gone = out now (out of full screen, screen closed, lost connection), back = left full screen in this class and
 // came back. Both stay named on the dashboard panel (#fsctl) and the class tab's panel (el-cloud.js #el-fsfloat), also when made small.
 window.elWhoLeft=w=>({gone:(w.out||[]).filter(y=>y.why!=="never"),back:(w.inn||[]).filter(y=>y.left),never:(w.out||[]).filter(y=>y.why==="never")});
+// One short line of counts, names only on a tap (Roger, 10 Nov 2026: "this was too big and I couldn't see the screen! And during the games
+// students played to log in and out so that their name appeared. I only need … who is in the class and who is not and see the numbers
+// (then if I click I see the names)"): "✓ 25 in · ✗ 2 left · ⚪ 3 not here of 30", each count a button (data-wl) that opens its names under
+// the line; a second tap (or another count) closes it. Nothing is named on the screen (the projector) until the teacher taps a count.
+// o = {open: "in"|"left"|"nh"|null, av: el-attend.js attView (its html is the 🙋 attendance chips + Save, or the saved list), why: y => text,
+// hm: ms => "hh:mm"}. Returns {line, list} (inline styles: the dashboard, the class tab and the game board all use it). No reads, no writes.
+window.elWhoLine=function(w,o){o=o||{};const {gone,back,never}=elWhoLeft(w),E=t=>String(t==null?"":t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+  const av=o.av||{n:never.length,label:"not here",html:""},abs=av.label==="absent",why=o.why||(()=>""),hm=o.hm||(()=>"");
+  const b=(k,col,txt,tip)=>{const on=o.open===k;return '<button type="button" data-wl="'+k+'" aria-expanded="'+on+'" title="'+tip+'" style="border:1.5px solid '+col+';border-radius:999px;padding:2px 10px;margin:1px 0;cursor:pointer;font:700 14px system-ui,sans-serif;'+(on?'background:'+col+';color:#fff':'background:#fff;color:'+col)+'">'+txt+'</button>'};
+  const line='<div class="el-wl" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px">'
+    +b("in","#166534","✓ "+w.inn.length+" in","Who is in: tap to see the names")
+    +b("left","#b91c1c","✗ "+gone.length+" left"+(back.length?' <span style="font-weight:600">· ↩ '+back.length+'</span>':""),"Who left (and who left and came back): tap to see the names")
+    +b("nh",abs?"#b91c1c":"#64748b",(abs?"🙋 ":"⚪ ")+av.n+" "+av.label,abs?"Attendance saved: tap to see who is absent or late, or change it":"Not connected in this class: tap to see the names"+(av.html?" and save the attendance":""))
+    +'<span style="color:#64748b;font:500 13px system-ui,sans-serif">of '+(w.n||0)+'</span></div>';
+  const box=h=>'<div class="el-wlbox" style="margin-top:6px;max-height:40vh;overflow:auto;line-height:1.5;font:500 14px system-ui,sans-serif;color:#1e293b;text-align:left">'+h+'</div>';
+  let list="";
+  if(o.open==="in")list=box(w.inn.length?'<div style="color:#166534">✓ <b>In ('+w.inn.length+'):</b> '+w.inn.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b">Nobody is in yet: they tap their screen to go full screen.</div>');
+  else if(o.open==="left")list=box((gone.length?gone.map(y=>'<div style="color:#b91c1c">✗ <b>'+E(y.name)+'</b> · '+why(y)+'</div>').join(""):'<div style="color:#64748b">Nobody has left.</div>')
+    +(back.length?'<div style="color:#c2410c;margin-top:4px">↩ <b>Left and came back ('+back.length+'):</b> '+back.map(y=>'<b>'+E(y.name)+'</b> <small>('+(y.left.n>1?y.left.n+'×, last ':'')+hm(y.left.at)+')</small>').join(", ")+'</div>':""));
+  else if(o.open==="nh")list=av.html?box(av.html):box(never.length?'<div style="color:#475569">⚪ <b>Not here ('+never.length+'):</b> '+never.map(y=>E(y.name)).join(", ")+'</div>':'<div style="color:#64748b">Everybody is connected.</div>');
+  return {line,list}};
 // 🎬 Videos under the panel: a video's own ⛶ full screen would hide the page and the panel with it, so on a teacher page with the panel
 // showing, a video that goes full screen comes back into the page, fills the screen there (.el-bigvid) and the page goes full screen
 // instead: the panel stays on top of the video. ✕ Smaller or Esc puts it back. elPlayVideo(src) plays a video over the page (the unit's

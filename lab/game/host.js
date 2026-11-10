@@ -72,6 +72,10 @@ const cur=()=>slides()[H.i];
 const isQ=s=>!!(s&&s.q);
 const isW=s=>!!(s&&s.q&&s.write);   // a written question
 const isN=s=>!!(s&&!s.q&&typeof s.notes==="number");   // a 📝 Take your notes slide (withNotes)
+// what the 2 sentences use (Roger, 10 Nov 2026: "ask them to write 2 sentences using the vocabulary or grammar structures learnt and whatever
+// they need to remember better the theory explained"): the game's kind (decks/index.js), or the end of its id
+const noteWhat=(kind,id)=>{kind=kind||(/-vocab$/.test(id||"")?"vocab":/-grammar$/.test(id||"")?"grammar":"");
+  return kind==="vocab"?"<b>the new words</b>":kind==="grammar"?"<b>the grammar structures</b> you have learnt":"<b>the new words or grammar</b>"};
 const meta=()=>(window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{};
 // the game's name starts with its learning path: "LP2 · Vocabulary · Clothes, kit and weather" (decks/index.js elGameName, Roger 7 Nov 2026)
 const gName=()=>meta().lp?elGameName(H.deckId):H.deck.title;
@@ -121,7 +125,7 @@ function live(){
   const s=cur(),qs=qList(),base={on:true,game:true,deck:location.pathname,title:gName(),sid:H.sid,phase:H.phase==="show"?(isQ(s)?"q":isN(s)?"notes":"theory"):H.phase,
     i:H.i,qn:qs.indexOf(H.i)+1,qt:qs.length,keys:H.keys,at:S.serverTimestamp()};
   if(s&&H.phase!=="end"&&H.phase!=="lobby"){
-    if(isN(s)){const m=meta();base.nt={k:s.notes,topics:s.topics,deck:H.deckId,ls:lsId(),lp:m.lp||"",title:H.deck.title,course:m.course||""}}
+    if(isN(s)){const m=meta();base.nt={k:s.notes,topics:s.topics,deck:H.deckId,ls:lsId(),lp:m.lp||"",title:H.deck.title,course:m.course||"",kind:m.kind||""}}
     else if(isW(s))base.q={text:s.q,img:s.img||"",write:true};
     else if(isQ(s))base.q={text:s.q,img:s.img||"",opts:order(H.i).map(k=>s.options[k])};else base.th={title:s.theory||"",img:s.img||""};
     if(H.phase==="reveal")base.ok=isW(s)?s.write[0]:okAt(H.i);
@@ -293,17 +297,16 @@ function endGame(){
 /* ---------- screens ---------- */
 const top=()=>{const qs=qList(),qn=qs.indexOf(H.i)+1,s0=cur();
   const w=who(),{gone,back,never}=elWhoLeft(w);
-  // who left stays named on the board, without a tap (Roger, 9 Nov 2026: "and even in game mode"; elWhoLeft in el-catalog.js):
-  // out now in red, left full screen and came back in orange; the pill still opens the whole list
-  const strip=w.active&&(gone.length||back.length)?`<div class="wholeft">${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("")}${back.length?`<span class="b">↩ Left and came back: ${back.map(y=>`<b>${esc(y.name)}</b> <small>(${y.left.n>1?y.left.n+"×, last ":""}${hm(y.left.at)})</small>`).join(", ")}</span>`:""}</div>`:"";
-  const box=WHO.open&&w.active?`<div class="whobox pop">${gone.length?`<p>${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("<br>")}</p>`:""}${never.length?`<p class="nv">⚪ Not in the game (${never.length}): ${never.map(y=>esc(y.name)).join(", ")}</p>`:""}<p class="i">✓ In (${w.inn.length}): ${w.inn.map(y=>esc(y.name)).join(", ")||"nobody yet"}</p></div>`:"";
+  // only the counts on the board (Roger, 10 Nov 2026: "during the games students played to log in and out so that their name appeared"):
+  // the names (who left, who came back, who is not here, who is in) open only when the teacher taps the pill (WHO.open)
+  const box=WHO.open&&w.active?`<div class="whobox pop">${gone.length?`<p>${gone.map(y=>`<span class="o">✗ <b>${esc(y.name)}</b> · ${why(y)}</span>`).join("<br>")}</p>`:""}${back.length?`<p class="bk">↩ Left and came back (${back.length}): ${back.map(y=>`<b>${esc(y.name)}</b> <small>(${y.left.n>1?y.left.n+"×, last ":""}${hm(y.left.at)})</small>`).join(", ")}</p>`:""}${never.length?`<p class="nv">⚪ Not in the game (${never.length}): ${never.map(y=>esc(y.name)).join(", ")}</p>`:""}<p class="i">✓ In (${w.inn.length}): ${w.inn.map(y=>esc(y.name)).join(", ")||"nobody yet"}</p></div>`:"";
   return `<div class="top"><span class="pill">📡 ${esc(groupName(H.g))}</span><span class="pill">🎮 ${Object.keys(H.players).length}</span>
-  ${w.active?`<button class="pill who${gone.length?" warn":""}" data-do="who" title="Who is in full screen and connected, who left and who is not in the game (tap to show or hide the names)">✓ ${w.inn.length} in · ✗ ${gone.length} left${never.length?` · ⚪ ${never.length} not here`:""}</button>`:""}${box}
+  ${w.active?`<button class="pill who${gone.length?" warn":""}" data-do="who" title="Who is in full screen and connected, who left and who is not in the game (tap to show or hide the names)">✓ ${w.inn.length} in · ✗ ${gone.length} left${back.length?` · ↩ ${back.length}`:""}${never.length?` · ⚪ ${never.length} not here`:""}</button>`:""}${box}
   ${H.i>=0&&H.phase!=="end"?`<span class="pill">${qn?`${isW(cur())?"✏️ ":""}Question ${qn} / ${qs.length}`:isN(cur())?"📝 Notes":"Theory"}</span>`:""}<span class="sp"></span>
   ${H.err?`<span class="pill" style="background:#b3261e">${esc(H.err)}</span>`:""}
   ${H.phase==="show"&&s0&&!isQ(s0)&&s0.ca?`<button class="btn ghost${caOn()?" on":""}" data-do="ca" title="Catalan help on this slide (C)">CA</button>`:""}
   <button class="btn ghost" data-do="mute" title="Music and sounds (M)">${G.sound()?"🔊":"🔇"}</button>
-  ${H.phase!=="end"?cmBtn():""}<button class="btn ghost" data-do="end" title="End the game for everyone">${Date.now()-endArm<3000?"Tap again to end":"■ End"}</button>${strip}</div>`};
+  ${H.phase!=="end"?cmBtn():""}<button class="btn ghost" data-do="end" title="End the game for everyone">${Date.now()-endArm<3000?"Tap again to end":"■ End"}</button></div>`};
 // one block of a theory slide: text, a table {table} or a warning {watch} (also the small copy on the notes slide)
 function blockHtml(l,hid,fresh){
   if(l&&l.table){const [h,...r]=l.table;return `<table class="tt${fresh}"${hid}><thead><tr>${h.map(c=>`<th>${md(c)}</th>`).join("")}</tr></thead><tbody>${r.map(x=>`<tr>${x.map(c=>`<td>${md(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`}
@@ -354,7 +357,7 @@ function draw(){
   if(isN(s)){   // 📝 Take your notes: the theory of the run again, small, while the students write on their devices
     const recap=s.from.map(i=>slides()[i]).map(t=>`<section><h3>${pic(t.img)} ${md(t.theory)}</h3>${(t.lines||[]).map(l=>blockHtml(l,"","")).join("")}</section>`).join("");
     app$.innerHTML=top()+`<div class="main"><div class="card notes slidein"><div class="nhead"><span class="nemo">📝</span><div><h2>Take your notes</h2>
-      <p>On your Chromebook, in your own words: <b>the rule</b>, <b>two examples</b> and <b>the mistake to avoid</b>. They are saved on your LS page, in <b>📝 Your notes</b>.</p></div>
+      <p>On your Chromebook: write <b>2 sentences</b> of your own using ${noteWhat(meta().kind,H.deckId)}, and <b>anything that helps you remember</b> the theory. They are saved on your LS page, in <b>📝 Your notes</b>.</p></div>
       <div class="stat"><b>${n}</b>writing${P.length?` / ${P.length}`:""}</div></div><div class="recap">${recap}</div></div>
       <div style="text-align:right"><button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}
   if(isW(s)){

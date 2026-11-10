@@ -812,7 +812,15 @@ const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).
 // warm-ups: delayed retrieval); time: the share of those steps done by their session deadline (teaching plan), out of 10.
 // S.dueZero = a group id (progSync, the student board's mark so far; Roger, 2 Nov 2026: "students must understand that if they don't work
 // daily their grades are low"): a missing piece counts 0 once its day in the time plan has passed, and is left out before that.
-const missZ=(v,id,k)=>{if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()?0:null};
+// Only what was done in class counts 0 (problem report, 2ESOB, 10 Nov 2026: a recall checkpoint still locked for the group counted 0 and
+// pulled the whole daily-work mark down; Roger: "it only should count what I ticked we've done in class"): a missing piece counts 0 only when
+// its tab (or, for a path without tabs such as a recall checkpoint, the path) is ticked as done in the Time plan (doneMap, the same as
+// ls/{ls}.done[group]) and its day has passed. Anything not ticked yet is left out. S.tickZ = the group's ticks, set by progSync.
+const canDoZ=(id,k,g)=>{const a=byId(id);if(!a)return false;
+  let dm=S.tickZ&&S.tickZ.g===g?S.tickZ.m:null;if(!dm){dm=(((S.D&&S.D.ls||{})[S.ls]||{}).done||{})[g]||{};try{if(S.D&&S.D.tkOk)dm=doneMap(planX(S.ls,g))}catch(e){}S.tickZ={g,m:dm}}
+  const secs=secOf(a).map(z=>z[0]);if(!secs.length)return !!dm[a.id+"#"];
+  return secs.some(sec=>(sec===k||elSecSteps(a,sec).includes(k))&&!!dm[a.id+"#"+sec])};
+const missZ=(v,id,k)=>{if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()&&canDoZ(id,k,S.dueZero)?0:null};
 // Class games part (games:true; Roger, 9 Nov 2026: "the performance in those games should be counted"): % right in the grammar and vocabulary
 // class games of the LS on screen, out of 10, all games pooled (the 🧩📚 circles' %). A game is counted only when the student answered at least
 // half of its questions (a late arrival or a dropped connection is left out); a student who played none has no value, and the part then drops
@@ -952,9 +960,8 @@ function svPop(){if(!SV.open)return "";const g=GR.find(x=>x.id===SV.g)||GR.find(
 const svKeep=n=>{const l=n.querySelector(".svlist");if(!l)return;l.scrollTop=SV.top||0;l.onscroll=()=>{SV.top=l.scrollTop}};
 // The whole group, in or out (Roger, 6 Nov 2026: "I want to see not who's left but who is in and who is out … I need to be able to minimise
 // the message but every time somebody gets out it gets bigger again"): the group's student list (roster) by elClassRoll in el-catalog.js;
-// ▾ makes the panel small (kept in this browser), and it opens again by itself when a student who was in goes out.
-const FSMIN={min:(()=>{try{return localStorage.getItem("el_t_fsmin")==="1"}catch(e){return false}})(),was:new Set(),g:null};
-const fsMinSet=v=>{FSMIN.min=v;try{localStorage.setItem("el_t_fsmin",v?"1":"0")}catch(e){}};
+// Since 10 Nov 2026 only one line of counts (elWhoLine): the names open under it on a tap, nothing opens by itself (no ▾ any more).
+const FSWL={open:null,g:null,hide:(()=>{try{return localStorage.getItem("el_t_fshide")==="1"}catch(e){return false}})()};   // hide: only the buttons stay, 👥 n/N shows it again (Roger, 10 Nov 2026: "can I hide the message?")   // the count whose names are open under the line (elWhoLine): "in", "left", "nh" or null
 const fsRoster=gid=>Object.entries((S.D&&S.D.ro)||{}).filter(([,r])=>r&&r.group===gid).map(([e,r])=>({e,name:(r.first||r.name||e.split("@")[0])+(r.surname1?" "+r.surname1:"")}));
 const fsWhy=y=>y.why==="full"?"out of full screen"+(y.left?` · left ${fsHm(y.left.at)}${y.left.n>1?` (${y.left.n}×)`:""}`:""):y.why==="closed"?`screen closed or another window · since ${fsHm(y.seen)}`:`lost connection · since ${fsHm(y.seen)}`;
 // 🎓 the class mode button (or ⏹ Stop and where the class tab is) of the group shown
@@ -963,25 +970,19 @@ const cmBtn=g=>{const c=cmOf(g.id);return c?`<button type="button" class="fsbtn 
 const cmInfo=g=>{const c=cmOf(g.id),ef=fsEff(g.id);return c?`<div class="fsinfo cminfo">🎓 <b>Class mode:</b> ${esc(g.name)} follows your class tab · now on <b>${esc(c.t||c.u)}${c.pn?" · "+esc(c.pn):""}</b>${ef&&ef.until===c.until?"":` · until ${fsHm(c.until)}`}</div>`:""};
 function fsDraw(){const n=document.getElementById("fsctl");if(!n)return;const g=GR.find(x=>x.id===fsGroup());if(!g){n.innerHTML=`<div class="fsrow">${svBtn()}</div>${svPop()}`;n.className="";svKeep(n);return}
   const ef=fsEff(g.id),on=!!ef,cls=!!elSlotNow(elTT(g.id)),w=FSW.g===g.id?elClassRoll(Object.assign({},FSW.x,{fs:ef}),FSW.list,FSW.here,fsRoster(g.id)):{active:false,inn:[],out:[]};
-  // opens again when someone who was in goes out
-  const inNow=new Set(w.inn.map(y=>y.e));if(FSMIN.g!==g.id){FSMIN.g=g.id;FSMIN.was=new Set()}
-  if(FSMIN.min&&w.out.some(y=>FSMIN.was.has(y.e)))fsMinSet(false);FSMIN.was=inNow;
-  const box=w.active||!!cmOf(g.id);n.className=box?"on":"";const min=w.active&&FSMIN.min,{gone,back,never}=elWhoLeft(w);
+  if(FSWL.g!==g.id){FSWL.g=g.id;FSWL.open=null}
+  const box=(w.active||!!cmOf(g.id))&&!FSWL.hide;n.className=box?"on":"";
   // 🙋 attendance of this class (el-attend.js): who has no beat is "not here" until it is saved, then "absent"; out = only who left
   const aS=w.active&&!DEMO?attClass(g.id,elTT(g.id),ef,w):0;FSW.att={g:g.id,start:aS,w};const aR=aS?attWatch(attApi(),g.id,aS,fsDraw):undefined;
-  if(aS)attLate(attApi(),g.id,aS,w);const av=aS?attView(w,aR,min):{n:never.length,label:"not here",html:""};
-  n.innerHTML=`<div class="fsrow">${svBtn()}${cmBtn(g)}<!-- no full screen button (Roger, 7 Nov 2026): on by itself in every class of the timetable and while class mode is on -->${w.active?`<button type="button" class="fsbtn fsmin" data-do="fsmin" title="${min?"Show everybody":"Make this small: the names of who left stay (it opens again when someone goes out)"}">${min?"▸":"▾"}</button>`:""}</div>${svPop()}${cmInfo(g)}`
-    +(w.active?`<div class="fsinfo">${w.game?`🎮 Class game: ${esc(w.title)}${on?" · ":""}`:""}${on?`⛶ Full screen until ${fsHm(ef.until)}${ef.auto?" (end of the class, by your timetable)":cls&&ef.until===elClassEnd(g.id,ef.at)?" (end of the class)":""}`:""}</div>
-      <div class="fssum"><b class="in">✓ ${w.inn.length} in</b> · <b class="out">✗ ${gone.length} left</b> · <span class="${av.label==="absent"?"out":"muted"}">${av.label==="absent"?"🙋":"⚪"} ${av.n} ${av.label}</span> <span class="muted">of ${w.n}</span></div>${av.html}`
-      // who left stays named, also small and over a video (Roger, 9 Nov 2026: "I need their names to be there"): out now in red,
-      // left full screen and came back in orange (when, how many times); the rest of the list only when not small
-      +`<div class="fsleft">${gone.length?`<div class="fsout">${gone.map(y=>`<div>✗ <b>${esc(y.name)}</b> · ${fsWhy(y)}</div>`).join("")}</div>`:""}
-        ${back.length?`<div class="fsback">↩ <b>Left and came back (${back.length}):</b> ${back.map(y=>`<b>${esc(y.name)}</b> <small>(${y.left.n>1?y.left.n+"×, last ":""}${fsHm(y.left.at)})</small>`).join(", ")}</div>`:""}
-        ${min||av.html?"":`${never.length?`<div class="fsnever">⚪ <b>Not here (${never.length}):</b> ${never.map(y=>esc(y.name)).join(", ")}</div>`:""}`}
-        ${min?"":`
-        ${w.inn.length?`<div class="fsin">✓ <b>In (${w.inn.length}):</b> ${w.inn.map(y=>esc(y.name)).join(", ")}</div>`:`<div class="fsin muted">Nobody is in yet: they tap their screen to go full screen.</div>`}`}</div>`:"");svKeep(n)}
+  if(aS)attLate(attApi(),g.id,aS,w);const av=aS?attView(w,aR,false):undefined;
+  // one short line of counts, the names only when a count is tapped (Roger, 10 Nov 2026: "this was too big and I couldn't see the screen";
+  // elWhoLine in el-catalog.js): nothing pops up by itself any more, so leaving and coming back no longer puts a name on the screen
+  const wl=w.active?elWhoLine(w,{open:FSWL.open,av,why:fsWhy,hm:fsHm}):null;
+  n.innerHTML=`<div class="fsrow">${svBtn()}${cmBtn(g)}<!-- no full screen button (Roger, 7 Nov 2026): on by itself in every class of the timetable and while class mode is on -->${w.active?`<button type="button" class="fsbtn fsmin" data-do="fshide" title="${FSWL.hide?"Show who is in, who left and who is not here":"Hide this message (the buttons stay)"}">${FSWL.hide?`👥 ${w.inn.length}/${w.n}`:"✕ Hide"}</button>`:""}</div>${svPop()}${FSWL.hide?"":cmInfo(g)}`
+    +(w.active&&!FSWL.hide?`<div class="fsinfo">${w.game?`🎮 Class game: ${esc(w.title)}${on?" · ":""}`:""}${on?`⛶ Full screen until ${fsHm(ef.until)}${ef.auto?" (end of the class, by your timetable)":cls&&ef.until===elClassEnd(g.id,ef.at)?" (end of the class)":""}`:""}</div>${wl.line}${wl.list}`:"");svKeep(n)}
 const attApi=()=>({db:db(),doc:F.doc,setDoc:F.setDoc,onSnapshot:F.onSnapshot,deleteField:F.deleteField});
-document.addEventListener("click",e=>{const b=e.target.closest("#fsctl [data-att]");if(!b||!FSW.att)return;e.preventDefault();const a=FSW.att;
+document.addEventListener("click",e=>{const c=e.target.closest("#fsctl [data-wl]");if(c){e.preventDefault();FSWL.open=FSWL.open===c.dataset.wl?null:c.dataset.wl;fsDraw();return}
+  const b=e.target.closest("#fsctl [data-att]");if(!b||!FSW.att)return;e.preventDefault();const a=FSW.att;
   attClick(b,attApi(),a.g,a.start,a.w,fsRoster(a.g)).then(r=>{if(r)fsDraw()})});
 setInterval(()=>{if(FSW.g){fsListen();fsDraw()}},30e3);   // turns on and off with the classes of the timetable, shows who stopped beating
 function lsWarn(ls,grp,assigned){
@@ -1137,7 +1138,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)liveTick()
 // and rewrites them only when they change. Only for the group on screen, fetched in this visit, in an LS with continuous assessment.
 function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S.g)))return;
   if(g.gv&&g.gv.parts.some(p=>p.games)){loadGames();if(!GAMES[S.g]||GAMES[S.g].busy)return}   // the class games part: wait for the group's games (loadGames renders again)
-  const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
+  S.tickZ=null;const id=asId(S.ls),r1=v=>v==null||isNaN(v)?null:Math.round(v*10)/10,K=["exam","fp","gv","other","total"],z=S.zero;S.zero=false;
   try{Object.values(S.P||{}).filter(s=>s&&s.uid&&!s.away&&(s.group===S.g||s.tester)).forEach(s=>{S.dueZero=s.group||S.g;const {B,total}=grade(s);
     const p={exam:r1(B.exam),fp:r1(B.fp),gv:r1(B.gv&&B.gv.mark),other:r1(B.other),total:r1(total)},cur=res(s.uid,id).progress||{};
     // the pieces of each block, for the teacher's view of the student's board (today.html?student=…; Roger, 2 Nov 2026)
@@ -1145,7 +1146,7 @@ function progSync(){const g=G();if(!g||g.only||S.year||!S.g||!(DEMO||FRESH.has(S
       fp:g.fp&&!g.fp.mark?Object.fromEntries(g.fp.rows.map(x=>[x.step+"|"+x.c,r1(lvMark(lvOf(s.uid,g.fp.a,x.step,x.c)))])):{}};p.parts=parts;
     if(K.every(k=>(cur[k]??null)===p[k])&&Object.entries(parts).every(([k,o])=>Object.entries(o).every(([c,v])=>(((cur.parts||{})[k]||{})[c]??null)===v)))return;p.at=ymd(Date.now());
     const w=patch(s.uid,id,{progress:p});if(w&&w.catch)w.catch(e=>console.warn("progress",e))})}
-  finally{S.zero=z;S.dueZero=null}}
+  finally{S.zero=z;S.dueZero=null;S.tickZ=null}}
 // ---- Simple dashboard (Roger, 6 Nov 2026: "make the teacher's board style like the students"; the student board's rule: "the menus have
 // little information and when you go to a place you can find the info that you need"). A side menu (Home, the groups, Questions, Materials,
 // Reference) and, for Home and each group, a page with only a few red alerts, ONE big card for the class (now or next, by EL_TIMETABLE, with
@@ -4151,9 +4152,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     ttsave:()=>{e.preventDefault();const d=ttDraft();Object.values(d.groups).forEach(ttSort);d.off.sort((a,b)=>a[0]<b[0]?-1:1);
       const T=elTTRead(elTTStore(d));TTE.msg="Saving…";render();
       (DEMO?Promise.resolve():ttSave(T)).then(()=>{window.EL_TIMETABLE=T;TTE.d=null;TTE.msg="✓ Saved: students' pages use it from now on";render()},x=>{TTE.msg="✗ Not saved: "+esc(x.message);render()})},
+    fshide:()=>{e.preventDefault();FSWL.hide=!FSWL.hide;try{localStorage.setItem("el_t_fshide",FSWL.hide?"1":"0")}catch(x){}fsDraw()},
     sview:()=>{e.preventDefault();SV.open=!SV.open;SV.top=0;if(SV.open)SV.g=null;fsDraw()},
     svgroup:()=>{e.preventDefault();SV.g=k.g;SV.top=0;fsDraw()},
-    fsmin:()=>{e.preventDefault();fsMinSet(!FSMIN.min);fsDraw()},
     attre:()=>{e.preventDefault();attLoad(S.g,true);render()},
     attcell:()=>{e.preventDefault();attCell(k.id,k.e)},
     // during a class (by the timetable) it is on by itself: switching it off = {on:false, off:true, until: the end of the class}, for this class only
