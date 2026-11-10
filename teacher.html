@@ -578,18 +578,21 @@ function cpBox(ls,grp,studs){
     const shown=elCpShown(a,D.ls[ls],grp.id),kids=studs.filter(s=>!s.tester&&!s.away).length,sent=docs.filter(d=>!studs.find(s=>s.tester&&cpDoc(s.uid,a)===d)).length;
     // 🔒 Close and 📣 Show answers apart (Roger, 10 Nov 2026: "Separate Close and Show"); 📣 Update answers whenever corrections already
     // sent are out of date after ✓ Accept, shown or not (Roger, 10 Nov 2026: "I dont see the update button")
-    const closed=!shown&&elCpClosed(a,D.ls[ls],grp.id),old=docs.filter(d=>d.fb&&cpStale(d,K)).length;
+    const rel=docs.filter(d=>d.fb).length,closed=!shown&&elCpClosed(a,D.ls[ls],grp.id),old=docs.filter(d=>d.fb&&cpStale(d,K)).length;
     const upd=old?`<button class="g" data-do="cpupd" data-a="${a.id}" title="Students who already have their corrections get them again with the answers you accepted">📣 Update answers (${old})</button><br>`:"";
-    return `<th>${esc(a.title.replace(/^Recall checkpoint/,"C"))}<br>${!K?'<small style="color:#dc2626">⚠ no answer key</small>'
-      :shown?upd+'<small class="muted">✓ answers shown · closed</small>'
-      :upd+(closed?`<small style="color:#b45309;font-weight:700">🔒 closed</small> <button class="g" data-do="cpclose" data-a="${a.id}" data-v="0" title="Students in ${grp.name} who have not done it can do it again">🔓 Reopen</button>`
+    // the state in one coloured line on top (Roger, 10 Nov 2026: "here I can't see if the answers are open or closed")
+    const pill=(bg,fg,txt)=>`<span style="display:inline-block;background:${bg};color:${fg};border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;margin:3px 0">${txt}</span>`;
+    const stat=shown?pill("#ede9fe","#5b21b6","👁 Answers shown · 🔒 closed"):closed?pill("#fef3c7","#92400e","🔒 Closed · 🙈 answers hidden"):pill("#dcfce7","#166534","🟢 Open · 🙈 answers hidden");
+    return `<th>${esc(a.title.replace(/^Recall checkpoint/,"C"))}<br>${K?stat+"<br>":""}${!K?'<small style="color:#dc2626">⚠ no answer key</small>'
+      :shown?upd
+      :upd+(closed?`<button class="g" data-do="cpclose" data-a="${a.id}" data-v="0" title="Students in ${grp.name} who have not done it can do it again">🔓 Reopen</button>`
           :`<button class="g" data-do="cpclose" data-a="${a.id}" data-v="1" title="Nobody else in ${grp.name} can start it; the answers stay hidden">🔒 Close</button>`)
-      +(docs.length?` <button data-do="cprel" data-a="${a.id}" data-n="${closed?0:kids-sent}" title="Students in ${grp.name} see their questions, answers and corrections${closed?"":", and nobody in the group can do it any more"}">📣 Show answers</button><br><small class="muted">${sent}/${kids} sent · they see only their score</small>`:'<br><small class="muted">nothing sent</small>')}</th>`}).join("");
+      +(docs.length?` <button data-do="cprel" data-a="${a.id}" data-n="${closed?0:kids-sent}" title="Students in ${grp.name} see their questions, answers and corrections${closed?"":", and nobody in the group can do it any more"}">📣 Show answers</button><br><small class="muted">${sent}/${kids} sent${rel?` · 👁 ${rel} already see their answers`:" · they see only their score"}</small>`:'<br><small class="muted">nothing sent</small>')}</th>`}).join("");
   const rows=studs.filter(s=>!s.tester||cps.some(a=>cpDoc(s.uid,a))).map(s=>`<tr><td style="text-align:left">${name(s)}</td>${cps.map(a=>{const d=cpDoc(s.uid,a),K=D.ck[a.keys[0]];
       if(!d)return '<td class="muted">–</td>';if(d.redo)return `<td data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="You let them do it again">↺ again</td>`;
       const m=cpMark(d,K),glances=(d.leaves||[]).length,secs=(d.times||[]).reduce((x,y)=>x+(+y||0),0);
       const gp=cpGap(s.uid,a,d,K);
-      return `<td class="sc" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="${gp?esc(gp.t)+" · ":""}Click for the answers"${gp&&gp.up?' style="background:#fff4e5"':""}>${gp?(gp.up?"⚠️ ":"↓ "):""}${K?m.score+"/"+m.max:"?"}${d.auto==="left"?' <span title="Sent automatically: left the page">⚡</span>':""}${glances?` <span title="Left the page ${glances} time(s) for less than 2 s">👀${glances}</span>`:""}<br><small class="muted">${Math.round(secs/60*10)/10} min${d.fb&&!cpStale(d,K)?" · ✓ released":""}</small></td>`}).join("")}</tr>`).join("");
+      return `<td class="sc" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="${gp?esc(gp.t)+" · ":""}Click for the answers"${gp&&gp.up?' style="background:#fff4e5"':""}>${gp?(gp.up?"⚠️ ":"↓ "):""}${K?m.score+"/"+m.max:"?"}${d.auto==="left"?' <span title="Sent automatically: left the page">⚡</span>':""}${glances?` <span title="Left the page ${glances} time(s) for less than 2 s">👀${glances}</span>`:""}<br><small class="muted">${Math.round(secs/60*10)/10} min${d.fb?(cpStale(d,K)?" · 👁 sees old answers":" · 👁 sees answers"):" · 🙈 score only"}</small></td>`}).join("")}</tr>`).join("");
   const body=`<p class="muted">Each student does each checkpoint once: one question at a time, ${45} s each, no going back, nothing to copy or paste. If they leave the page (another tab, window or app) for more than 2 seconds it is sent at once (⚡). 👀 = left for less than 2 s. Students see their score as soon as they send it. <b>🔒 Close</b> stops new tries (answers stay hidden; 🔓 Reopen undoes it). Their questions, answers and corrections appear when every student in the group has sent it, or when you press <b>📣 Show answers</b>; from then on nobody in the group can do it. <b>📣 Update answers</b> appears after you accept an answer, for the students who already have their corrections. Click a cell for the answers, to accept an answer or to let a student do it again.</p>`
     +`<div class="wrap"><table class="acts"><tr><th>Student</th>${head}</tr>${rows}</table></div>`;
   const warn=studs.flatMap(s=>cps.map(a=>{const d=cpDoc(s.uid,a),g=cpGap(s.uid,a,d,D.ck[a.keys[0]]);return g&&g.up?`<li><b>${name(s)}</b> · ${esc(a.title)}: ${esc(g.t)} <button class="g" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}">See the answers</button></li>`:""})).filter(Boolean);
@@ -830,7 +833,10 @@ function stepDueOf(id,step,g){const p=(window.EL_PLAN||{})[S.ls],sd=p&&p.stepDue
 const LATE=0.5;
 function onTime(u,id,step,g){const due=stepDueOf(id,step,g)||dueOf(id,g);if(!due)return undefined;const d=doneAt(u,id,step);return d==null?null:d===true||ymd(d)<=due?1:LATE}
 // Averages: missing values (null) count 0 or are left out, as the "Missing work" switch says
-const avg=vs=>{vs=vs.map(v=>v==null?(S.zero?0:null):v).filter(v=>v!=null);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null};
+// undefined = always left out, whatever the switch: a recall checkpoint the student did not do (Roger, 10 Nov 2026: "if a student is ill,
+// and he doesn't do it we don't take that into account"; chose "Left out for everyone"): never 0, their other checkpoints count as usual
+const isCpStep=(id,k)=>k==="check"&&!!(byId(id)||{}).checkpoint;
+const avg=vs=>{vs=vs.filter(v=>v!==undefined).map(v=>v==null?(S.zero?0:null):v).filter(v=>v!=null);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null};
 const wavg=ps=>{let s=0,w=0;ps.forEach(([v,x])=>{if(v==null){if(!S.zero)return;v=0}s+=v*x;w+=x});return w?s/w:null};
 const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).title||id)+" · "+esc(tabName(byId(id),k));
 // Grammar and vocabulary: weighted parts (EL_GRADING[ls].gv.parts). first: the average first-try score of those steps (checkpoints, recall
@@ -845,7 +851,7 @@ const canDoZ=(id,k,g)=>{const a=byId(id);if(!a)return false;
   let dm=S.tickZ&&S.tickZ.g===g?S.tickZ.m:null;if(!dm){dm=(((S.D&&S.D.ls||{})[S.ls]||{}).done||{})[g]||{};try{if(S.D&&S.D.tkOk)dm=doneMap(planX(S.ls,g))}catch(e){}S.tickZ={g,m:dm}}
   const secs=secOf(a).map(z=>z[0]);if(!secs.length)return !!dm[a.id+"#"];
   return secs.some(sec=>(sec===k||elSecSteps(a,sec).includes(k))&&!!dm[a.id+"#"+sec])};
-const missZ=(v,id,k)=>{if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()&&canDoZ(id,k,S.dueZero)?0:null};
+const missZ=(v,id,k)=>{if(v==null&&isCpStep(id,k))return undefined;if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()&&canDoZ(id,k,S.dueZero)?0:null};
 // Class games part (games:true; Roger, 9 Nov 2026: "the performance in those games should be counted"): % right in the grammar and vocabulary
 // class games of the LS on screen, out of 10, all games pooled (the 🧩📚 circles' %). A game is counted only when the student answered at least
 // half of its questions (a late arrival or a dropped connection is left out); a student who played none has no value, and the part then drops
@@ -856,13 +862,15 @@ function stuGames(u){loadGames();const s=S.P[u],gl=GAMES[S.g];if(!s||!s.email||!
   const inn=list.filter(x=>!x.out),of=inn.reduce((n,x)=>n+x.of,0);return {v:of?inn.reduce((n,x)=>n+x.r,0)/of*10:null,list}}
 function gvBlock(u,g){const parts=G().gv.parts.map(p=>({...p,v:p.games?stuGames(u).v:p.first?avg(p.first.map(([id,k])=>missZ(pct(firstOf(u,id,k)),id,k)))
     :avg(p.time.map(([id,k])=>{const o=onTime(u,id,k,g);return o===undefined?o:missZ(o==null?null:o*10,id,k)}).filter(x=>x!==undefined))}));
-  return {mark:wavg(parts.filter(p=>!p.games||p.v!=null).map(p=>[p.v,p.w])),parts}}
+  // a part made only of checkpoints, none done (ill on every one): left out too, never 0
+  return {mark:wavg(parts.filter(p=>(!p.games||p.v!=null)&&!(p.v==null&&p.first&&p.first.every(([id,k])=>isCpStep(id,k)))).map(p=>[p.v,p.w])),parts}}
 const gvSum=B=>(B.gv.parts||[]).map(p=>p.name+" "+f1(p.v)+" × "+p.w+" %").join(" + ");
 function otherCrit(u,c){const g=G();
   const auto=avg((g.auto[c]||[]).map(([id,k,first])=>missZ(first?pct(firstOf(u,id,k)):doneAt(u,id,k)?10:null,id,k)));
   const teacher=avg((g.teacher[c]||[]).map(([id,k])=>lvMark(lvOf(u,id,k,c))));
   // a half with no pieces drops out (1.1 and 1.2 in 4ESO LS2 have only steps), so it never counts 0
-  return {auto,teacher,mark:wavg([[auto,(g.auto[c]||[]).length?1:0],[teacher,(g.teacher[c]||[]).length?1:0]].filter(x=>x[1]))}}
+  const onlyCp=auto==null&&(g.auto[c]||[]).length&&(g.auto[c]||[]).every(([id,k])=>isCpStep(id,k));   // only missed checkpoints: left out
+  return {auto,teacher,mark:wavg([[auto,(g.auto[c]||[]).length&&!onlyCp?1:0],[teacher,(g.teacher[c]||[]).length?1:0]].filter(x=>x[1]))}}
 // Transversal competences (Roger, 30 Oct 2026): the CC, CD, CPSAA and entrepreneurial criteria in EL_GRADING[ls].other are assessed and
 // shown apart, but they never count in the LS mark: the 20 % block is the English integrated competences only.
 const isTransC=c=>/^(CC|CD|CPSAA|CE)\s?\d/.test(String(c)),engOther=g=>(g.other||[]).filter(c=>!isTransC(c)),transOther=g=>(g.other||[]).filter(isTransC);
@@ -2161,7 +2169,7 @@ function planTable(g){
   // grammar and vocabulary
   if(g.gv){const gw=g.gv.parts.reduce((a,p)=>a+p.w,0);
     rows+=head("gv",esc((g.blocks.find(b=>b.id==="gv")||{}).name||"Grammar and vocabulary"),"Learning-path work, marked by the site.")
-      +g.gv.parts.map(p=>`<tr><td class="in">${esc(p.name)}</td><td class="pc">${pc(W("gv")*p.w/gw)}</td><td>${p.games?"<b>% right</b> in the 🧩 grammar and 📚 vocabulary class games of this LS (the circles in 👥 Students). A game they missed, or answered fewer than half of its questions, is left out, never 0.":(p.first?"Score of the <b>first try</b> only (what they remember from earlier paths): ":"<b>Done by the class deadline</b> in the Time plan (not the score): ")+list(p.first||p.time)}</td><td>${auto}</td></tr>`).join("")}
+      +g.gv.parts.map(p=>`<tr><td class="in">${esc(p.name)}</td><td class="pc">${pc(W("gv")*p.w/gw)}</td><td>${p.games?"<b>% right</b> in the 🧩 grammar and 📚 vocabulary class games of this LS (the circles in 👥 Students). A game they missed, or answered fewer than half of its questions, is left out, never 0.":(p.first?"Score of the <b>first try</b> only (what they remember from earlier paths)"+(p.first.some(([id,k])=>isCpStep(id,k))?"; a checkpoint a student did not do (ill, absent) is left out, never 0":"")+": ":"<b>Done by the class deadline</b> in the Time plan (not the score): ")+list(p.first||p.time)}</td><td>${auto}</td></tr>`).join("")}
   // other competences
   if(g.other){const cs=engOther(g),n=cs.length;
     rows+=head("other","Other competences",`Only learning-path work. ${n>1?n+" criteria, an equal share each. For each one":"1 criterion, the whole block. For it"}: the steps done (or their first-try score) and, where there is one, your level on a learning-path piece (half and half). Final product levels on these criteria do not count here.`)
