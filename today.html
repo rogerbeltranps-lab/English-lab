@@ -26,9 +26,16 @@ table.prt tr.daily td{background:#dcfce7!important}table.prt tr.pb td{background
 .wkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:6px 0}.wkgrid>div{background:#eff6ff;border-radius:10px;padding:8px 10px}.wkgrid>div.wno{background:#fef2f2}.wkgrid>div.wyes{background:#f0fdf4}.wkgrid b{display:block;font-size:1.4rem}.wbar{margin-bottom:8px}
 .ptgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:6px 0}.ptgrid>div{background:#fffbeb;border-radius:10px;padding:8px 10px}.ptgrid b{display:block;font-size:1.4rem}.ptgrid b small{font-size:13px;font-weight:400}.ptbar{height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin:6px 0}.ptbar span{display:block;height:100%;background:#f59e0b}.ptmiss{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:8px 12px;color:#991b1b;margin:6px 0}.ptmiss ul{margin:6px 0 0;padding-left:18px;color:#0f172a}.ptmiss li{margin:4px 0}.ptok{color:#15803d;font-weight:600}.ptgrid>div.ptno{background:#fee2e2;color:#991b1b}.ptgrid>div.ptyes{background:#dcfce7;color:#166534}
 ol.ptrank{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4px 0 8px}ol.ptrank li{border:1px solid #e2e8f0;border-radius:999px;padding:2px 10px;font-size:13px}ol.ptrank li.me{border-color:#f59e0b;background:#fffbeb;font-weight:600}ul.ptrules{list-style:none;padding:0;margin:6px 0}ul.ptrules li{margin:5px 0}.pend.live{background:#eff6ff;border-color:#93c5fd;flex-wrap:wrap}.pend.live a.go{padding:10px 16px;font-size:15px}
+/* the LS box stays in sight at the top of 📊 My marks (Roger, 9 Nov 2026); a phone keeps it in the flow (little room) */
+@media (min-width:641px){body[data-place="marks"] .lscard{position:sticky;top:0;z-index:20;margin-top:0;padding:10px 12px}body[data-place="marks"] .lscard .btabs{margin-top:8px;gap:8px}body[data-place="marks"] .lscard .btab{padding:8px 12px}body[data-place="marks"] .lscard .lsbtn{padding:6px 14px}body[data-place="marks"] .lscard .btab .bi{font-size:22px}}
+.tabbody{scroll-margin-top:var(--lsh,16px)}
+.cpl{display:grid;gap:12px}.cpc{background:#fff!important;border:1px solid #e2e8f0!important;border-left:6px solid var(--k,#94a3b8)!important;border-radius:14px;padding:12px 14px}.cpc h3{margin:0;font-size:1.05rem;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.cpc .cps{margin-left:auto;font-size:1.5rem;font-weight:900;color:var(--k)}
+.cpc .cpw{margin:6px 0 0;color:#475569;font-size:14px}.cpq{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}.cpq li{background:#f8fafc;border-radius:10px;padding:8px 12px;border-left:4px solid #16a34a}.cpq li.no{border-left-color:#dc2626;background:#fef2f2}
+.cpq .q{font-weight:700;display:block;margin-bottom:2px}.cpq .ok{color:#15803d;font-weight:800}.cpq .x{color:#b91c1c;font-weight:800}.cpq .why{display:block;color:#475569;font-size:13.5px;margin-top:2px}
+.stp small.sc{font-weight:700;opacity:.85;margin-left:3px}
 .lscard{border:2px solid #3157d5;box-shadow:0 4px 16px #3157d51a}.lscard h2{margin:0 0 10px}.lspick{display:flex;gap:10px;flex-wrap:wrap}.lsbtn{background:#fff;color:#0f172a;border:2px solid #cbd5e1;border-radius:14px;padding:10px 18px;font-size:17px;font-weight:700;text-align:left;display:flex;flex-direction:column;gap:2px}.lsbtn small{font-size:12px;font-weight:500;color:#64748b}.lsbtn.on{background:#3157d5;border-color:#3157d5;color:#fff}.lsbtn.on small{color:#dbe4ff}.lsbtn:not(.on):hover{border-color:#3157d5}
 .lvline{margin:10px 0 4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}.lsopen{margin-left:auto}.btabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px}.btab{display:flex;gap:10px;align-items:center;text-align:left;background:#f8fafc;color:#0f172a;border:2px solid #e2e8f0;border-radius:14px;padding:12px 14px}.btab .bi{font-size:26px}.btab b{display:block;font-size:16px}.btab small{color:#64748b;font-size:12.5px}
-.btab.b-week.on{background:#0f766e;border-color:#0f766e;color:#fff}.btab.b-form.on{background:#ea580c;border-color:#ea580c;color:#fff}.btab.b-exam.on{background:#7c3aed;border-color:#7c3aed;color:#fff}.btab.b-fp.on{background:#b45309;border-color:#b45309;color:#fff}.btab.on small{color:#fff;opacity:.9}a.btab.b-prog{text-decoration:none;background:var(--c-soft,#eff6ff);border-color:#93c5fd}a.btab.b-prog:hover{border-color:#2563eb}.btab:not(.on):hover{border-color:#94a3b8}
+.btab.b-week.on{background:#0f766e;border-color:#0f766e;color:#fff}.btab.b-form.on{background:#ea580c;border-color:#ea580c;color:#fff}.btab.b-exam.on{background:#7c3aed;border-color:#7c3aed;color:#fff}.btab.b-fp.on{background:#b45309;border-color:#b45309;color:#fff}.btab.b-cp.on{background:#0e7490;border-color:#0e7490;color:#fff}.btab.on small{color:#fff;opacity:.9}a.btab.b-prog{text-decoration:none;background:var(--c-soft,#eff6ff);border-color:#93c5fd}a.btab.b-prog:hover{border-color:#2563eb}.btab:not(.on):hover{border-color:#94a3b8}
 .tabbody{border-radius:14px}.t-form{background:#fff7ed;border:2px solid #fdba74;padding:2px 12px 8px}.t-exam{background:#f5f3ff;border:2px solid #c4b5fd;padding:2px 12px 8px}.fhead h2{margin:12px 0 2px;color:#9a3412}.fhead p{margin:0 0 6px;color:#9a3412}
 .xt{width:100%}.xt th{text-align:left}.xt td.l{text-align:left;vertical-align:top}.xbar{display:inline-block;width:120px;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;vertical-align:middle}.xbar span{display:block;height:100%}
 .corr thead th{color:#166534;background:#f0fdf4}.corr td.bad{color:#b91c1c}.corr td.good{color:#15803d;font-weight:600}.rv{margin-top:6px}.t-exam h3{font-size:1rem;margin:14px 0 6px}.wtexts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wtx{white-space:pre-wrap;background:#f8fafc;border-radius:10px;padding:10px 12px;margin:0;line-height:1.5}.wtx.ok2{background:#f0fdf4}.wtx.ok2 b{color:#15803d;text-decoration:underline}
@@ -410,7 +417,7 @@ const helpGuide=()=>{
 // teacher set as homework, and the calendar; Roger, 6 Nov 2026), 📊 My marks (the 📈 / 🎬 / 📝 tabs and
 // the points), 📚 Learning Situations (open an LS, level, summaries, practice) and ❓ Help (picture guide, problems). A place is a hash
 // (#todo, #homework, #marks, #units, #help, #news; the old #formative, #final, #exam and #week open their place), so Back returns home.
-const PLACE_OF={progress:"progress",me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang"};
+const PLACE_OF={progress:"progress",me:"me",todo:"todo",homework:"hw",week:"todo",marks:"marks",formative:"marks",final:"marks",exam:"marks",checkpoints:"marks",units:"units",help:"help",news:"news",phone:"phone",books:"books",language:"lang"};
 const placeNow=()=>PLACE_OF[location.hash.slice(1)]||"home";
 const placeTitle=p=>({progress:t("El meu progrés","My progress"),me:t("Jo","Me"),todo:t("Per fer","To do"),hw:t("Deures","Homework"),marks:t("Les meves notes","My marks"),units:"Learning Situations",help:t("Ajuda","Help"),news:t("Anuncis del professor","Announcements from your teacher"),phone:t("Estudia amb el mòbil","Study on your phone"),books:"📖 "+t("Llibres","Books"),lang:"🔤 "+t("Gramàtica i vocabulari","Grammar and vocabulary")})[p];
 // the first name: "Surname Surname, Name" on the student list, else the first word
@@ -622,7 +629,8 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
   if(place==="hw")return pseg("hw",lss,ls)+homeworkBox(ls,info);
   if(place==="me")return meBox(lss,ls);
   if(place==="progress")return progressPlace(lss,ls);
-  if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";return pend+workBox(lss)+marksHead(lss,ls)+`<div id="ptbox">${pointsBox()}</div>`+tabBody(ls,list,info)}   // 📋 My activities: what counts for the mark (Roger, 6 Nov 2026: not under To do)
+  // the LS box on top, always in sight, and 📋 My activities just below it (Roger, 9 Nov 2026: "I need this at the top always visible and my activities just bellow")
+  if(place==="marks"){if(tabOf(ls)==="week")S.tab="form";return pend+marksHead(lss,ls)+workBox(lss)+`<div id="ptbox">${pointsBox()}</div>`+tabBody(ls,list,info)}   // 📋 My activities: what counts for the mark (Roger, 6 Nov 2026: not under To do)
   if(place==="units")return unitsBox(lss,ls,st,stTag)+(bookCard(ls)?`<div class="rcards one" style="margin:0 0 14px">${bookCard(ls)}</div>`:"")+studyBox(ls)+practiceBox(ls);   // the book here too: phones have no side menu
   if(place==="phone")return phoneBox();
   // 🔤 every LS of the student, the newest on top (Roger, 7 Nov 2026: "They see on top the LS2 and then below the LS1 with the same")
@@ -636,9 +644,10 @@ function placeHtml(place,lss,ls,list,info,st,stTag,pend){
     +`<li>${t("Tens una idea per millorar la web? Prem <b>💡 Idea</b>.","Have an idea to make the website better? Press <b>💡 Idea</b>.")}</li><li>${t("Si una pàgina es veu antiga, recarrega-la amb <b>Ctrl+Maj+R</b>.","If a page looks old, reload it with <b>Ctrl+Shift+R</b>.")}</li></ul></div>`}
 const lsState=l=>{const s=(D.ls[l.id]||{}).status;return s==="closed"?t("tancada · per repassar","closed · to revise"):s==="hidden"?t("oculta","hidden"):t("ara","now")};
 // 📊 My marks: the LS chips (when there are several) and the three tabs of an LS
-function marksHead(lss,ls){const tab=tabOf(ls),tb=(id,icon,ca,en,sub)=>`<button class="btab b-${id} ${tab===id?"on":""}" data-do="tab" data-t="${id}"><span class="bi">${icon}</span><span><b>${t(ca,en)}</b><small>${sub}</small></span></button>`;
+function marksHead(lss,ls){if(EL_CATALOG.some(a=>a.ls===ls.id&&a.checkpoint))cpLoad();const tab=tabOf(ls),tb=(id,icon,ca,en,sub)=>`<button class="btab b-${id} ${tab===id?"on":""}" data-do="tab" data-t="${id}"><span class="bi">${icon}</span><span><b>${t(ca,en)}</b><small>${sub}</small></span></button>`;
   return `<div class="box lscard">`+(lss.length>1?`<div class="lspick">${lss.map(l=>`<button class="lsbtn ${l.id===ls.id?"on":""}" data-do="ls" data-ls="${l.id}"><small>${esc(l.title.split(" · ")[0])} · ${lsState(l)}</small>${lsName(l)}</button>`).join("")}</div>`:"")
     +`<div class="btabs" role="tablist">`+tb("form","📈","La meva avaluació formativa","My formative assessment",t("activitats dels learning paths","learning-path activities"))
+    +(cpList(ls).length?tb("cp","🎯","Els meus checkpoints","My checkpoints",cpSub(ls)):"")
     +(hasFp(ls)?tb("fp","🎬","El meu producte final","My final product",fpSub(ls)):"")+tb("exam","📝","Els meus exàmens","My exams",examSub(ls))
     +`<a class="btab b-prog" href="#progress"><span class="bi">🎓</span><span><b>${t("El meu progrés","My progress")}</b><small>${t("totes les LS, per trimestres i l'any","all your LSs, by term and year")}</small></span></a>`+`</div></div>`}   // 🎓 My progress as the fourth tile (Roger, 9 Nov 2026: "put this here", no separate banner)
 // 📚 Learning Situations: one card per LS to open it, and my level (with the request to change it)
@@ -712,6 +721,7 @@ function render(){
   else{$("#lvl").innerHTML="";$("#crumb").innerHTML=`<a class="back" href="#">‹ ${t("Inici","Home")}</a>`;$("h1").textContent=placeTitle(place);$("#sub").textContent="";
     $("#note").innerHTML=cls;$("#main").innerHTML=placeHtml(place,lss,ls,list,info,st,stTag,pend)}
   bnav(lss.length?place:"home",lss);
+  const lc=document.querySelector(".lscard");if(lc&&getComputedStyle(lc).position==="sticky")document.documentElement.style.setProperty("--lsh",(lc.offsetHeight+12)+"px");
 
   if(canReply())wireAnn();
 }
@@ -735,15 +745,44 @@ const pseg=(on,lss,ls)=>{const nt=todoItems(lss).reduce((n,x)=>n+todoTabs(x),0),
 // exam report: questions to review, the writing with its rubric and corrections, what to review). The exam is only on its tab
 // (today.html#exam, also the link of the "results are ready" card); #formative and #week open the other two.
 const TABS=["week","form","fp","exam"];
-function tabOf(ls){const h=location.hash.slice(1),m={exam:"exam",formative:"form",week:"week",final:"fp"}[h];if(m==="fp"&&!hasFp(ls))m="form";
+function tabOf(ls){const h=location.hash.slice(1);let m={exam:"exam",formative:"form",week:"week",final:"fp",checkpoints:"cp"}[h];if((m==="fp"&&!hasFp(ls))||(m==="cp"&&!cpList(ls).length))m="form";
+  if(S.tab==="cp"&&S.tabLs===ls.id&&!cpList(ls).length)S.tab="form";
   if(S.tab&&S.tabLs===ls.id)return S.tab;S.tabLs=ls.id;
   if(m&&!S.hashUsed){S.hashUsed=true;return S.tab=m}
   return S.tab=only(ls.id)||(D.ls[ls.id]||{}).status==="closed"?"exam":"form"}   // 📈 My formative assessment is the main tab (Roger, 2 Nov 2026)
 const hasWeek=ls=>{const p=(window.EL_PLAN||{})[ls.id];return !only(ls.id)||!!(p&&ELWeek.col(p,D.me.group)>=0&&ELWeek.span(p))};
+// 🎯 My checkpoints (Roger, 9 Nov 2026: "checkpoints must appear between My formative assessment and My final product, students should be
+// able to see their questions, answers and feedback. We first only show score and when all students or I say show"). The student's own tries,
+// students/{uid}/checkpoints (read once, when the tab opens): sc = the score the dashboard wrote; fb = the questions, answers and
+// corrections, once the teacher shows them (teacher.html cpRelease) or every student of the group has done it (cpSync). Only the
+// checkpoints the student can open or has done (nothing locked on show); never which ones count.
+const cpList=ls=>EL_CATALOG.filter(a=>a.ls===ls.id&&a.checkpoint&&(cpOf(a)||canDo(a,D.ls[ls.id]||{})));
+const cpOf=a=>{const d=(D.cpd||{})[a.keys[0]];return d&&!d.redo?d:null};
+function cpSub(ls){const L=cpList(ls);if(!D.cpd)return t("preguntes, respostes i correcció","questions, answers and corrections");
+  const n=L.filter(cpOf).length;return t(`${n} de ${L.length} fets`,`${n} of ${L.length} done`)}
+let CPLOAD=null;
+function cpLoad(){if(D.cpd||CPLOAD)return;if(DEMO||!U||!F){D.cpd=D.cpd||{};return}const sid=AS||U.uid;
+  CPLOAD=F.getDocs(F.collection(ELCloud.db,"students",sid,"checkpoints")).then(q=>{const o={};q.forEach(x=>o[x.id]=x.data());D.cpd=o},e=>{console.warn("checkpoints",e);D.cpd={}}).then(()=>render())}
+function cpView(ls,info){
+  if(!D.cpd)cpLoad();if(!D.cpd){return `<div class="box fv"><p class="muted">${t("Carregant…","Loading…")}</p></div>`}
+  const L=cpList(ls),open=info.status!=="closed";
+  const card=(a,i)=>{const d=cpOf(a),fb=d&&d.fb,sc=fb||(d&&d.sc),num=(a.title.match(/\d+/)||[i+1])[0],nm=t("Checkpoint ","Checkpoint ")+num;
+    const pc=sc&&sc.max?sc.score/sc.max:null,k=pc==null?"":pc>=.8?"fk-g":pc>=.5?"fk-a":"fk-r";
+    let body;
+    if(!d)body=`<p class="cpw">${canDo(a,info)&&open?`${t("Encara no l'has fet.","You haven't done it yet.")} <a href="${tabHref(a)}">${t("Fes-lo ara","Do it now")} →</a>`:t("No el vas fer.","You didn't do it.")}</p>`;
+    else if(!sc)body=`<p class="cpw">✓ ${t("Enviat. Aviat hi veuràs la teva puntuació.","Sent. Your score will appear here soon.")}</p>`;
+    else if(!fb)body=`<p class="cpw">⏳ ${t("Les preguntes, les teves respostes i la correcció apareixeran aquí quan tota la classe l'hagi fet o quan el professor les mostri.","The questions, your answers and the corrections will appear here when the whole class has done it or when your teacher shows them.")}</p>`;
+    else body=`<ol class="cpq">${(d.ids||[]).map((id,j)=>{const ok=(fb.ok||[])[j],w=(fb.why||[])[j]||{},why=EN?(w.en||w.ca||""):(w.ca||w.en||""),q=(fb.q||[])[j];
+        return `<li class="${ok?"":"no"}"><span class="q">${j+1}. ${q?esc(q):t("Pregunta","Question")+" "+(j+1)}</span>${t("La teva resposta","Your answer")}: <b>${esc((d.answers||[])[j]||"–")}</b> <span class="${ok?"ok":"x"}">${ok?"✓":"✗"}</span>`
+          +(ok?"":`<br>${t("Resposta correcta","Right answer")}: <b>${esc((fb.right||[])[j]||"")}</b>${why?`<span class="why">💡 ${esc(why)}</span>`:""}`)+`</li>`}).join("")}</ol>`;
+    return `<div class="cpc ${k}"><h3>🎯 ${esc(nm)}${sc?`<span class="cps">${sc.score} / ${sc.max}</span>`:""}</h3>${body}</div>`};
+  return `<div class="fhead"><h2>🎯 ${t("Els meus checkpoints","My checkpoints")} <small>· ${lsName(ls)}</small></h2><p>${t("Primer hi veuràs la teva puntuació. Després, les preguntes, les teves respostes i la correcció: repassa el que has fallat.","First you see your score. Then the questions, your answers and the corrections: review what you got wrong.")}</p></div>`
+    +(L.length?`<div class="cpl">${L.map(card).join("")}</div>`:`<div class="box fv"><p class="muted">${t("Encara no hi ha checkpoints.","No checkpoints yet.")}</p></div>`)}
 function examSub(ls){const x=(D.rs[ls.id+"/assessment"]||{}).sections||{};return Object.values(x).some(y=>y&&y.score!=null)?t("resultats i informe","results and report"):t("encara no hi ha resultats","no results yet")}
 function tabBody(ls,list,info){const tab=tabOf(ls);
   if(tab==="week")return `<div class="tabbody">${studyBox(ls)+practiceBox(ls)+weekBox(ls,info)||`<p class="muted">${t("Aquesta LS no té pla setmanal.","This LS has no week plan.")}</p>`}</div>`;
   if(tab==="fp"&&hasFp(ls))return `<div class="tabbody t-fp">${fpView(ls,info)}</div>`;
+  if(tab==="cp")return `<div class="tabbody t-cp">${cpView(ls,info)}</div>`;
   if(tab==="exam")return `<div class="tabbody t-exam">${examView(ls)}</div>`;   // the mark so far and the learning paths are on 📈 (Roger, 2 Nov 2026)
   return `<div class="tabbody t-form"><div class="fhead"><h2>📈 ${t("La meva avaluació formativa","My formative assessment")} <small>· ${lsName(ls)}</small></h2><p>${t("Totes les activitats dels learning paths, el que has fet i la teva puntuació. Mira-ho sovint: és la teva feina de cada dia.","All the learning-path activities, what you have done and your score. Check it often: it is your everyday work.")}</p></div>`+lpStatus(ls,list,info)+progressBox(ls)
     +(only(ls.id)?onlyForm(ls.id):summary(list))+`</div>`}   // the old per-path grids are gone: the table on top has the same and more (Roger, 2 Nov 2026)
@@ -1607,6 +1646,14 @@ function detail(id){
 // that opens that tab (path#panel, el-cloud.js openHashTab), and "👉 Next" proposes the first one to do (Roger, 2 Nov 2026: "you can click
 // the learning paths you haven't done yet and it proposes them to you"). Students get it too, without the teacher's "counted" tag
 // (AGENTS.md: students are never told which activities count); the teacher's view (?student=…) adds it.
+// a step's score as on the dashboard's progress table (Roger, 9 Nov 2026: "students should be able to see their results this way"):
+// the first time → the latest ("7/8 → 10/10"), one score when they are the same. A checkpoint shows the score the teacher's dashboard gave it.
+function stepSc(a,k){const sc=x=>x.score+"/"+x.max;
+  if(k==="check"&&a.checkpoint){const d=cpOf(a),m=d&&(d.fb||d.sc);return m&&m.max?{t:sc(m),tip:sc(m)}:null}
+  const st=stateOf(a),fr=k==="recall"?(st.first||st.recall||{}):{},f=(st.tries||{})[k]||fr[elRouteOf(D.lv,a.ls).level]||Object.values(fr)[0]||null,l=(st.last||{})[k]||null;
+  const ok=x=>x&&x.max>0&&x.score!=null;if(!ok(f)&&!ok(l))return null;
+  if(!ok(f)||!ok(l)||(f.score===l.score&&f.max===l.max)){const m=ok(f)?f:l;return {t:sc(m),tip:sc(m)}}
+  return {t:sc(f)+" → "+sc(l),tip:t(`${sc(f)} i després ${sc(l)}`,`${sc(f)}, then ${sc(l)}`)}}
 const stateOf=a=>{try{return JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}")}catch(e){return {}}};
 const ymd=v=>{const d=new Date(v);return isNaN(d)?"":d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 // the panel a step lives in: its own, or the vocabulary panel for the cards and practice steps (elSecSteps)
@@ -1634,7 +1681,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     // the chips above the table count TABS (activities), not learning paths (Roger, 7 Nov 2026: "it says she's missing one but she's missing 5!")
     const tabs=tabGroups(a,steps(a)).map(g=>{const k=g.find(x=>!ds.has(x))||g[g.length-1],sk=g.every(x=>(a.skip||[]).includes(x)),sd=stepDue(a,k),nm=tabName(a.id,k),off=secOff(a,info,k);
       const cnt=f=>{if(!a.manual&&!sk&&!a.optional)n[f]++};   // optional practice (the sample exam) is never counted as done, missing or to do
-      if(g.every(x=>ds.has(x))){cnt("done");const w=g.map(x=>at[x]?ymd(at[x]):"").sort().pop()||"",lt=w&&sd&&w>sd;return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}">✔ ${esc(nm)}</span>`}
+      if(g.every(x=>ds.has(x))){cnt("done");const w=g.map(x=>at[x]?ymd(at[x]):"").sort().pop()||"",lt=w&&sd&&w>sd,sc=g.map(x=>stepSc(a,x)).find(Boolean);return `<span class="stp ${lt?"lt":"ok"}" title="${esc(nm)}: ${t("fet","done")}${w?" "+w:""}${lt?t(" (després del seu dia, "," (after its day, ")+sd+")":""}${sc?" · "+sc.tip:""}">✔ ${esc(nm)}${sc?` <small class="sc">${sc.t}</small>`:""}</span>`}
       if(!g.some(x=>vis.includes(x)))return "";
       if(can&&!drop&&g.some(x=>soonK(a,info,x))){cnt("off");const sd2=soonOf(a,info)[panelOf(a,g[0])];
         return `<span class="stp cls" title="${esc(nm)}: ${t("ho farem a classe","we'll do it in class")}${sd2?" · "+when(sd2):""}">🏫 ${esc(nm)}${sd2?` <small>· ${when(sd2)}</small>`:""}</span>`}
@@ -1676,7 +1723,7 @@ const tabName=(id,k)=>{const xs=(window.EL_SECTIONS||{})[id]||[],p=xs.some(y=>y[
 const tabGroups=(a,ks)=>elTabGroups(a,ks);
 async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-do]");if(!el)return;const k=el.dataset,a=EL_CATALOG.find(x=>x.id===k.a);
-  ({gvfix:()=>fixPanel(k.k,k.p),fxpick:()=>fxDo(k),fxnext:()=>fxDo(k),fxagain:()=>fxDo(k),fxclose:()=>fxDo(k),pterm:()=>{S.pterm=+k.t;render()},pgo:()=>{S.ls=k.ls;S.tab=null;location.hash=k.h},ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative",fp:"final"}[k.t]||k.t))}catch(e){}render();document.querySelector(AS?".tabbody":".lscard")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(S.ls),asklv:()=>AS||askPanel(k.ls),pbar:()=>{const w=k.w==='idea'?'💡':'⚠️',b=[...document.querySelectorAll('#el-cloud-bar button')].find(x=>x.textContent.startsWith(w));if(b)b.click()},want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
+  ({gvfix:()=>fixPanel(k.k,k.p),fxpick:()=>fxDo(k),fxnext:()=>fxDo(k),fxagain:()=>fxDo(k),fxclose:()=>fxDo(k),pterm:()=>{S.pterm=+k.t;render()},pgo:()=>{S.ls=k.ls;S.tab=null;location.hash=k.h},ls:()=>{S.ls=k.ls;S.tab=null;render()},view:()=>{S.view=k.v;render()},tab:()=>{S.tab=k.t;S.tabLs=S.ls;try{history.replaceState(null,"",location.pathname+location.search+"#"+({form:"formative",fp:"final",cp:"checkpoints"}[k.t]||k.t))}catch(e){}render();document.querySelector(".tabbody")?.scrollIntoView({block:"start",behavior:"smooth"})},    crit:()=>critPanel(k.c),cell:()=>detail(k.a),close:()=>$("#dlg").close(),ask:()=>AS||askPanel(S.ls),asklv:()=>AS||askPanel(k.ls),pbar:()=>{const w=k.w==='idea'?'💡':'⚠️',b=[...document.querySelectorAll('#el-cloud-bar button')].find(x=>x.textContent.startsWith(w));if(b)b.click()},want:()=>want(k.r),send:sendAsk,submit:()=>submitMany([a]),suball:()=>submitMany(S.pend)})[k.do]?.()});
 
 addEventListener("hashchange",()=>{if(!D)return;S.tab=null;S.hashUsed=false;render();scrollTo(0,0)});   // a place of the board (placeNow)
 addEventListener("el-ann-read",e=>{const a=D&&(D.ann||[]).find(x=>x.id===e.detail);if(a&&U){a.read=Object.assign({},a.read,{[U.uid]:Date.now()});render()}});

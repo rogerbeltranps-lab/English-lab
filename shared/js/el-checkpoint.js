@@ -193,7 +193,9 @@ window.ELCheckpoint = (function () {
       stop(); const c = st(), fb = d && d.fb;
       if (!fb) {
         box().innerHTML = '<h3>✓ ' + t('Enviat', 'Sent') + '</h3>' + (c.auto === 'left' || (d && d.auto === 'left') ? '<p class="instruction">' + t('S’ha enviat quan has sortit de la pàgina.', 'It was sent when you left the page.') + '</p>' : '') +
-          '<p>' + t('Ja pots fer el següent Learning Path. Veuràs la correcció quan el professor la publiqui.', 'You can go on to the next Learning Path. You will see the corrections when your teacher shares them.') + '</p>' + testerBtn();
+          // the score first (Roger, 9 Nov 2026): sc is written by the dashboard; the questions and corrections come later (fb)
+          (d && d.sc ? '<p class="cp-sc"><strong style="font-size:1.3rem">' + d.sc.score + ' / ' + d.sc.max + t(' correctes', ' correct') + '</strong></p>' : '') +
+          '<p>' + t('Ja pots fer el següent Learning Path. Veuràs les preguntes i la correcció quan el professor la publiqui.', 'You can go on to the next Learning Path. You will see the questions and the corrections when your teacher shares them.') + '</p>' + testerBtn();
         return bindTester();
       }
       // released: the student's answers with the corrections; the first try is kept for Reflect and the board (the dashboard marks from the key)
