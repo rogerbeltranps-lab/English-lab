@@ -1024,7 +1024,7 @@ function render(){
   const inTop={};document.querySelectorAll("#main .tp2s .agl+.agr").forEach(n=>{inTop["r|"+aglKey(n.previousElementSibling)]=[n.scrollTop,0]});
   {const w=document.querySelector("#main .tp2s .lpall .wrap");if(w)inTop.w=[w.scrollTop,w.scrollLeft]}
   autoTicks();render0();document.querySelectorAll("#main aside.agl").forEach(n=>{const v=aglTop[aglKey(n)];if(v)n.scrollTop=v;const r=n.nextElementSibling,q=inTop["r|"+aglKey(n)];if(q&&r&&r.classList.contains("agr"))r.scrollTop=q[0]});
-  {const w=document.querySelector("#main .tp2s .lpall .wrap");if(w&&inTop.w){w.scrollTop=inTop.w[0];w.scrollLeft=inTop.w[1]}}document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
+  {const w=document.querySelector("#main .tp2s .lpall .wrap");if(w&&inTop.w){w.scrollTop=inTop.w[0];w.scrollLeft=inTop.w[1]}}document.body.classList.toggle("tp2on",!!document.querySelector("#main .tp2"));tp2Foc();navSync();keepLast();annDue();ptSync();progSync();doneLater();loadBar();setTimeout(()=>autoDay().then(autoGroup),1500);fsWatch(fsGroup());fsDraw();if(CLS.ready)classCheck();if(CLS.ready&&liveOn()&&LIVE.gid!==S.g)setTimeout(()=>liveTick(),0);phoneBar()}
 // ---- the dashboard on a phone (Roger, 8 Nov 2026: "la visió del mòbil necessita una gran remodelació"; mockup option A): a tab bar at the
 // bottom, Home · Groups · Corrections · Messages · More, instead of the row of menu buttons at the top; a 2A · 2B · 4A · 4B switch at the top
 // of a group's pages (the place stays: 2ESO A's Marks → 2ESO B's Marks). More opens a sheet with the rest of the menu (announcement, student
@@ -1146,6 +1146,36 @@ async function liveTick(force){const c=liveOn();
   catch(e){console.warn("live",e);LIVE.err=true;LIVE.at=t0;loadBar()}   // tried again at the next round
   LIVE.busy=false;liveDraw()}
 setInterval(()=>liveTick(),15e3);
+// ---- automatic update (Roger, 10 Nov 2026: "I want to update my dashboard automatically but … in a sustainable way"). Two cheap rules, so
+// the marks students see (progSync) follow without 🔄 Update:
+// 1. The group on screen: when its copy was not fetched in this visit (FRESH) or is over 30 minutes old (AUTO.ms), the page asks Firestore
+//    only for that group's work that CHANGED since the copy (progress, results updated > copy time, checkpoints sent > copy time, as
+//    liveTick does): about 3 reads per student plus the changed documents (~100 for a group, against ~900 for 🔄 Update). Then the group
+//    counts as fetched, so its marks so far are worked out again and saved.
+// 2. Once a day, the first open of the dashboard on a day after the last full fetch (AT.all) does one full fetch (as "Update all", ~3,600
+//    reads) in the background: the student list, levels and points, which rule 1 does not read. The buttons stay for "now".
+const AUTO={ms:30*60e3,busy:false,day:false,wait:{}};
+async function autoGroup(){const gid=S.g;
+  if(DEMO||!RAW||!S.D||!gid||!GR.some(g=>g.id===gid)||document.hidden||AUTO.busy||LIVE.busy||liveOn())return;
+  const at=AT.g[gid]||0;if(FRESH.has(gid)&&Date.now()-at<AUTO.ms||Date.now()<(AUTO.wait[gid]||0))return;
+  AUTO.busy=true;const t0=Date.now();
+  try{if(!at)await loadGroup(gid);   // never fetched on this computer: the whole group
+    else{const base=at-180e3,ms=x=>x&&typeof x.toMillis==="function"?x.toMillis():0,
+        q=(u,n,f)=>F.getDocs(F.query(F.collection(db(),"students",u,n),F.where(f,">",F.Timestamp.fromMillis(base))));
+      const uids=Object.values(RAW.st).filter(s=>s.group===gid&&s.uid).map(s=>s.uid);
+      await Promise.all(uids.map(async u=>{const [p,r,k]=await Promise.all([q(u,"progress","updated"),q(u,"results","updated"),q(u,"checkpoints","sent").catch(e=>{console.warn("auto checkpoints",e);return null})]);
+        p.forEach(d=>{const x=d.data();(RAW.pg[u]=RAW.pg[u]||{})[d.id]=x.data||{}});
+        r.forEach(d=>{const x=d.data();(RAW.rs[u]=RAW.rs[u]||{})[x.activity||d.id.replace("__","/")]=x});
+        if(k)k.forEach(d=>{(RAW.cp[u]=RAW.cp[u]||{})[d.id]=d.data()})}));
+      AT.g[gid]=t0;FRESH.add(gid)}
+    saveCache();if(S.g===gid){S.D=build(S.D);LIVE.pend=true}}
+  catch(e){console.warn("auto update",e);AUTO.wait[gid]=t0+5*60e3}   // failed: try again in 5 minutes
+  AUTO.busy=false;liveDraw()}
+async function autoDay(){if(DEMO||AUTO.day||AUTO.busy||LIVE.busy||!RAW||!S.D||document.hidden)return;
+  if(AT.all&&new Date(AT.all).toDateString()===new Date().toDateString())return;
+  AUTO.day=true;AUTO.busy=true;try{S.D=await load("all");LIVE.since={};LIVE.pend=true}catch(e){console.warn("daily update",e)}AUTO.busy=false;liveDraw()}
+setInterval(()=>{autoDay().then(autoGroup)},60e3);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)autoDay().then(autoGroup)});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)liveTick()});
 // LS mark so far for the student board (Roger, 2 Nov 2026: "students should see their progress"). Only the dashboard can work out the
 // continuous-assessment blocks (secure checkpoints are marked here with the teacher-only keys), so it keeps each student's marks so far
