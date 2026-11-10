@@ -812,7 +812,11 @@ const pct=f=>f&&f.max?f.score/f.max*10:null,stepName=(id,k)=>esc((byId(id)||{}).
 // warm-ups: delayed retrieval); time: the share of those steps done by their session deadline (teaching plan), out of 10.
 // S.dueZero = a group id (progSync, the student board's mark so far; Roger, 2 Nov 2026: "students must understand that if they don't work
 // daily their grades are low"): a missing piece counts 0 once its day in the time plan has passed, and is left out before that.
-const missZ=(v,id,k)=>{if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()?0:null};
+// Only work the group could do counts 0 (problem report, 2ESOB, 10 Nov 2026: a recall checkpoint still locked for the group counted 0 and
+// pulled the whole daily-work mark down): a path not open for the group (its open switch) or a tab never opened for it is left out, as on the board.
+const canDoZ=(id,k,g)=>{const a=byId(id),info=(S.D&&S.D.ls||{})[S.ls]||{};if(!a)return false;if(!elLpOpen(a,info,g,true))return false;
+  return !elSecNeverOpened(a,info,g).some(sec=>sec===k||elSecSteps(a,sec).includes(k))};
+const missZ=(v,id,k)=>{if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()&&canDoZ(id,k,S.dueZero)?0:null};
 // Class games part (games:true; Roger, 9 Nov 2026: "the performance in those games should be counted"): % right in the grammar and vocabulary
 // class games of the LS on screen, out of 10, all games pooled (the 🧩📚 circles' %). A game is counted only when the student answered at least
 // half of its questions (a late arrival or a dropped connection is left out); a student who played none has no value, and the part then drops
