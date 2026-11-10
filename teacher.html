@@ -2445,9 +2445,10 @@ const lsGroups=id=>GR.filter(g=>g.course===(EL_LS.find(l=>l.id===id)||{}).course
 // Criteria of the LS with their text, and the detail of one criterion
 // The LS indicators of a criterion as a four-level rubric, NA → AE (Roger, 10 Nov 2026: the indicators under each criterion here too).
 // Catalan (indCa) when the LS has it, else the English ind; each level starts with what the student can do, numbers in brackets.
-const IRL=[["na","No assoliment","< 5"],["as","Assoliment satisfactori","5–6,9"],["an","Assoliment notable","7–8,9"],["ae","Assoliment excel·lent","9–10"]];
+// Excel·lent on the left (Roger, 10 Nov 2026); j = index into the NA→AE indicator array.
+const IRL=[["ae","Excel·lent","9–10",3],["an","Notable","7–8,9",2],["as","Satisfactori","5–6,9",1],["na","No satisfactori","< 5",0]];
 function indRub(c){const g=(window.EL_GRADING||{})[S.ls]||{},I=(g.indCa||{})[c]||(g.ind||{})[c];if(!Array.isArray(I)||I.length!==4)return "";
-  return `<div class="indrub">${IRL.map(([k,n,r],j)=>`<div class="ir ir-${k}"><b>${n} <small>${r}</small></b><span>${esc(I[j])}</span></div>`).join("")}</div>`}
+  return `<div class="indrub">${IRL.map(([k,n,r,j])=>`<div class="ir ir-${k}"><b>${n} <small>${r}</small></b><span>${esc(I[j])}</span></div>`).join("")}</div>`}
 function legend(list){const cs=[...new Set(list.flatMap(a=>a.criteria))].sort();
   return `<table class="legend"><tbody>${cs.map(c=>`<tr><td>${pill(c)}</td><td><b>${esc(elCompetence(c))}</b><br>${esc(elCriterion(COURSE,c)||"–")}${indRub(c)}</td></tr>`).join("")}</tbody></table>`}
 function critPanel(c){redraw=null;
