@@ -262,7 +262,8 @@ service cloud.firestore {
             && request.resource.data.answers is list && request.resource.data.answers.size() <= 40
             && ((lsOpen(request.resource.data.ls) && lsForMe(request.resource.data.ls, uid)
                   && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'locked'))
-                  && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'cpShown'))) || isTester());
+                  && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'cpShown'))
+                  && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'cpClosed'))) || isTester());
         }
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
         allow create: if signedIn() && request.auth.uid == uid && cpOk();
