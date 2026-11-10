@@ -489,6 +489,16 @@ window.elLpLabel=function(a){const sh=t=>String(t).split(/[:(]/)[0].trim(),st=sh
 // Recall checkpoint answers shown to a group (Roger, 9 Nov 2026: "when all students or I say show (but then nobody can do the checkpoint)"):
 // ls/{id}.cpShown[group][activity id] = when. Students then see their questions, answers and corrections (today.html ✅ My checkpoints)
 // and the checkpoint is closed for that group (elLpOpen, firestore.rules), so it no longer blocks what comes after it.
+// The score as soon as a checkpoint is sent (Roger, 10 Nov 2026: "I want students see their scores when they finish the checkpoint"):
+// cpHash/{page key} = {items:{id:[hashes of the accepted answers]}}, written by the dashboard from the answer key and readable by a student
+// only once they have sent that checkpoint (firestore.rules). The page hashes the student's own answers the same way and counts the
+// matches: the score, never which answers were right (that comes with 📣 Show answers). Same normalising as teacher.html cpNorm.
+window.elCpNorm=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[“”"]/g,"").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
+window.elCpHash=async(key,id,v)=>{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(key+"|"+id+"|"+elCpNorm(v)));
+  return [...new Uint8Array(b)].slice(0,10).map(x=>x.toString(16).padStart(2,"0")).join("")};
+window.elCpScore=async(h,key,ids,answers)=>{if(!h||!h.items||!Array.isArray(ids)||!ids.length)return null;let n=0;
+  for(let i=0;i<ids.length;i++){const v=(answers||[])[i];if(!elCpNorm(v))continue;const L=h.items[ids[i]]||[];if(L.includes(await elCpHash(key,ids[i],v)))n++}
+  return {score:n,max:ids.length}};
 window.elCpShown=(a,info,gid)=>!!(a&&a.checkpoint&&info&&info.cpShown&&info.cpShown[gid]&&info.cpShown[gid][a.id]);
 window.elLpLocks=function(ls,open){const shut=(window.EL_CATALOG||[]).filter(a=>a.ls===ls&&!a.optional&&!open.includes(a.id));   // optional: never locked
   return {locked:shut.map(a=>a.id),lockedKeys:shut.flatMap(a=>a.keys.flatMap(k=>[k,k+"Level"]))}};

@@ -762,7 +762,10 @@ function cpSub(ls){const L=cpList(ls);if(!D.cpd)return t("preguntes, respostes i
   const n=L.filter(cpOf).length;return t(`${n} de ${L.length} fets`,`${n} of ${L.length} done`)}
 let CPLOAD=null;
 function cpLoad(){if(D.cpd||CPLOAD)return;if(DEMO||!U||!F){D.cpd=D.cpd||{};return}const sid=AS||U.uid;
-  CPLOAD=F.getDocs(F.collection(ELCloud.db,"students",sid,"checkpoints")).then(q=>{const o={};q.forEach(x=>o[x.id]=x.data());D.cpd=o},e=>{console.warn("checkpoints",e);D.cpd={}}).then(()=>render())}
+  CPLOAD=F.getDocs(F.collection(ELCloud.db,"students",sid,"checkpoints")).then(async q=>{const o={};q.forEach(x=>o[x.id]=x.data());
+    // a try the dashboard has not scored yet: the score from the answer hashes, at once (Roger, 10 Nov 2026; elCpScore in el-catalog.js)
+    for(const [k,d] of Object.entries(o))if(d&&!d.redo&&!d.sc&&!d.fb&&window.elCpScore)try{const h=await F.getDoc(F.doc(ELCloud.db,"cpHash",k));if(h.exists())d.sc=await elCpScore(h.data(),k,d.ids,d.answers)||undefined}catch(e){console.warn("checkpoint score",k,e)}
+    D.cpd=o},e=>{console.warn("checkpoints",e);D.cpd={}}).then(()=>render())}
 function cpView(ls,info){
   if(!D.cpd)cpLoad();if(!D.cpd){return `<div class="box fv"><p class="muted">${t("Carregant…","Loading…")}</p></div>`}
   const L=cpList(ls),open=info.status!=="closed";

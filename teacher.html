@@ -541,7 +541,7 @@ function cpMark(d,K){const ok=(d.ids||[]).map((id,i)=>{const acc=cpAccepted(K,id
 // corrected steps count as done (elInjectCorrected in el-catalog.js; in memory only)
 function corrInject(D){Object.keys(D.rs||{}).forEach(u=>elInjectCorrected((D.pg||{})[u],D.rs[u]))}
 function cpInject(D){
-  window.EL_CP_KEYS=D.ck;const cat=window.EL_CATALOG||[];
+  window.EL_CP_KEYS=D.ck;if(!DEMO&&D.ck&&Object.keys(D.ck).length)setTimeout(cpHashAll,500);const cat=window.EL_CATALOG||[];
   Object.keys(D.ck||{}).forEach(key=>{const a=cat.find(x=>(x.keys||[])[0]===key);if(!a)return;const K=D.ck[key];
     Object.keys(Object.assign({},D.pg,D.cp)).forEach(u=>{const d=((D.cp||{})[u]||{})[key];if(!(((D.pg[u]||{})[a.ls]||{})[key])&&!d)return;const pg=D.pg[u]=D.pg[u]||{},L=pg[a.ls]=pg[a.ls]||{};
       let st;try{st=JSON.parse(L[key]||"{}")}catch(e){st={}}
@@ -611,7 +611,17 @@ api.cpRelease=(a,studs,gid)=>{const K=S.D.ck[a.keys[0]],ops=[];
 // (students only see "7 / 8 correct"; the key stays teacher-only), and a try shown before the questions were saved with it gets them.
 // When every student of the group has sent it, the answers are shown at once (as 📣 Show answers). Only what changed is written.
 const CPSYNC=new Set();
-function cpSync(ls,grp,studs){if(DEMO||!window.ELCloud||!ELCloud.isTeacher(ELCloud.user))return;const key0=ls+"|"+grp.id;if(CPSYNC.has(key0))return;CPSYNC.add(key0);
+// the hashes students check their score against as soon as they send (elCpScore in el-catalog.js): cpHash/{key}, rewritten when the
+// accepted answers change (cpKeys.hv = a short signature of them, so no extra read tells whether it is up to date)
+const cpSig=K=>{const j=JSON.stringify(Object.keys(K.items||{}).sort().map(id=>[id,cpAccepted(K,id)]));let h=5381;for(let i=0;i<j.length;i++)h=(h*33+j.charCodeAt(i))>>>0;return "v1-"+h.toString(36)};
+async function cpHashSync(key,force){const K=S.D.ck[key];if(DEMO||!K||!K.items)return;const sig=cpSig(K);if(!force&&K.hv===sig)return;
+  const items={};for(const id of Object.keys(K.items))items[id]=await Promise.all([...new Set((cpAccepted(K,id)||[]).map(cpNorm))].map(v=>elCpHash(key,id,v)));
+  await F.setDoc(F.doc(db(),"cpHash",key),{items,at:F.serverTimestamp()});await F.setDoc(F.doc(db(),"cpKeys",key),{hv:sig},{merge:true});K.hv=sig}
+var CPHASHED=false;   // once per dashboard load, as soon as the keys are there (cpInject)
+function cpHashAll(){if(CPHASHED||DEMO||!window.ELCloud||!ELCloud.isTeacher(ELCloud.user)||!S.D||!S.D.ck)return;CPHASHED=true;
+  Object.keys(S.D.ck).forEach(k=>cpHashSync(k).catch(e=>console.warn("checkpoint hashes",k,e)))}
+function cpSync(ls,grp,studs){if(DEMO||!window.ELCloud||!ELCloud.isTeacher(ELCloud.user))return;
+  const key0=ls+"|"+grp.id;if(CPSYNC.has(key0))return;CPSYNC.add(key0);
   const ops=[],info=S.D.ls[ls]||{},kids=studs.filter(s=>!s.tester&&!s.away&&s.group===grp.id);
   acts(ls).filter(a=>a.checkpoint).forEach(a=>{const K=S.D.ck[a.keys[0]];if(!K)return;
     const docs=kids.map(s=>[s,cpDoc(s.uid,a)]).filter(([,d])=>d&&!d.redo);
@@ -621,7 +631,7 @@ function cpSync(ls,grp,studs){if(DEMO||!window.ELCloud||!ELCloud.isTeacher(ELClo
     if(kids.length&&docs.length===kids.length&&!elCpShown(a,info,grp.id)&&elLpOpen(a,info,grp.id,true))ops.push(api.cpRelease(a,studs,grp.id))});
   if(ops.length)Promise.all(ops).then(()=>render(),e=>console.warn("checkpoint scores",e))}
 api.cpAccept=(a,id,v)=>{const key=a.keys[0],K=S.D.ck[key],k=K.items[id];k.extra=[...new Set((k.extra||[]).concat(v))];if(DEMO)return;
-  return F.setDoc(F.doc(db(),"cpKeys",key),{items:{[id]:{extra:k.extra}}},{merge:true})};
+  return F.setDoc(F.doc(db(),"cpKeys",key),{items:{[id]:{extra:k.extra}}},{merge:true}).then(()=>cpHashSync(key,true))};
 api.cpRedo=(u,a)=>{const d=cpDoc(u,a);d.redo=true;return DEMO?null:F.setDoc(F.doc(db(),"students",u,"checkpoints",a.keys[0]),{redo:true},{merge:true})};
 function quick(ps){Promise.all([].concat(ps)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});render();again()}
 
