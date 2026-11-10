@@ -80,11 +80,11 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .cont .cgo{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}.cont .cgo a,.cont .cgo button{background:#fff;color:#2443ad;border:0;border-radius:14px;padding:13px 26px;font-size:17px;font-weight:800;text-decoration:none;margin:0;cursor:pointer}.cont .cgo .s2{background:#2443ad;color:#fff}.cont .cgo .rel{background:#fee2e2;color:#991b1b}.cont .cgo a:hover,.cont .cgo button:hover{outline:3px solid #c7d4ff}
 .brfs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}@media(max-width:1100px){.brfs{grid-template-columns:1fr}}
 .brf{background:#fff;border:1px solid #e2e8f0;border-left:6px solid #2563eb;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}.brf.c2eso{border-left-color:#16a34a}
-.brf .bhd{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:#0f172a}.brf .bhd b{font-size:21px}.brf .bhd span{font-size:13px;color:#64748b}.brf .bhd:hover b{color:#3157d5}
+.bcols,.bcol{display:flex;flex-direction:column;gap:8px;min-width:0}.brf.one{margin:0 0 16px}.brf.one .bcols{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px}@media(max-width:1000px){.brf.one .bcols{grid-template-columns:1fr}}.brf.one .bhd b{font-size:18px}.brf .bhd{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:#0f172a}.brf .bhd b{font-size:21px}.brf .bhd span{font-size:13px;color:#64748b}.brf .bhd:hover b{color:#3157d5}
 .brf h3{margin:6px 0 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#64748b}.brf h3 small{text-transform:none;letter-spacing:0;font-weight:400}
 .blps{display:flex;flex-direction:column;gap:5px}.blps a.blp,.blps a.blp *{text-decoration:none;color:#0f172a}.blp{display:grid;grid-template-columns:minmax(0,1fr) 110px 44px 82px;gap:8px;align-items:center;font-size:13px;border-radius:8px;padding:2px 4px}.blp:hover{background:#f1f5f9}
 .blp .bln{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.blp b{text-align:right;font-variant-numeric:tabular-nums}.blps a.blp small{color:#64748b;font-variant-numeric:tabular-nums}.bbar{height:9px;border-radius:999px;background:#e2e8f0;overflow:hidden}.bbar i{display:block;height:100%;border-radius:999px}
-.bsts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.bst{display:flex;align-items:center;gap:8px;font-size:13px}.bst span{display:flex;flex-direction:column}.bst small{color:#64748b}
+.bsts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.brf a.bst,.brf a.bex,.brf a.bst *,.brf a.bex *{text-decoration:none}.brf a.bst,.brf a.bex{color:#0f172a}.bst,.bex{border-radius:10px;padding:3px 5px;margin:-3px -5px}.bst:hover,.bex:hover,.blp:hover{background:#eef3ff}.bst{display:flex;align-items:center;gap:8px;font-size:13px}.bst span{display:flex;flex-direction:column}.bst small{color:#64748b}
 .bexs{display:flex;flex-direction:column;gap:3px;font-size:14px}.bex small{color:#64748b}
 .tside .nv.on.off{background:none;color:inherit}
 .cont.done{background:#15803d;box-shadow:0 8px 24px #15803d33}.cont.done .cgo a,.cont.done .cgo button{color:#166534}.cont.done .cgo .s2{background:#166534;color:#fff}.cont.idle{background:#334155;box-shadow:none}
@@ -1267,7 +1267,7 @@ function sessOf(gid,date){const n=ELWeek.now(gid);if(!n)return null;const x=Obje
 // Averages of what exists: missing work is left out here (it is not 0), so the numbers read "how well", the bars "how much".
 const avgP=v=>v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null;
 function withLsG(ls,gid,fn){const o=[S.ls,S.g,S.zero,COURSE];S.ls=ls;S.g=gid;S.zero=false;COURSE=ls.split("-")[0];try{return fn()}finally{[S.ls,S.g,S.zero,COURSE]=o}}
-function brief(g){const n=ELWeek.now(g.id),ls=n&&n.ls,info=(S.D.ls[ls]||{}),x=n&&Object.assign({gid:g.id},n);
+function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.ls,info=(S.D.ls[ls]||{}),x=n&&n.p&&Object.assign({gid:g.id},n);
   const studs=Object.values(S.P).filter(s=>s.group===g.id&&!s.tester&&!s.away&&s.uid),as=ls?acts(ls).filter(a=>elLpOpen(a,info,g.id)):[];
   const lps=as.filter(a=>!a.checkpoint&&!/sample exam/i.test(a.title)).map(a=>{const req=((window.EL_ACTIONS||{})[a.id]||[]).filter(k=>!(a.skip||[]).includes(k));
     const share=studs.map(s=>{if(!req.length)return isDone(s.uid,a)?100:0;const d=doneSet(s.uid,a);return req.filter(k=>d.has(k)).length/req.length*100});
@@ -1282,17 +1282,19 @@ function brief(g){const n=ELWeek.now(g.id),ls=n&&n.ls,info=(S.D.ls[ls]||{}),x=n&
     return {l,ex:ex.reduce((a,b)=>a+b,0)/ex.length,n:ex.length,ls:tot.length?tot.reduce((a,b)=>a+b,0)/tot.length:null,ln:tot.length}});
   return {ls,studs,lps,cp:avgP(cpV),cpN:cpV.length,cpT:cps.length,ft:avgP(ftV),ftN:ftV.length,gs,gn,games:!!G0&&!G0.busy,exams}}
 const bCol=p=>p==null?"#cbd5e1":p<50?"#dc2626":p<80?"#d97706":"#16a34a";
-function briefBox(g){const b=brief(g),t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&ELWeek.now(g.id),ex=xp&&ELWeek.exam(xp.p,xp.gi),dn=ex!=null?ELWeek.days(t,ex):null;
+function briefBox(g,ls0){const b=brief(g,ls0),t=ELWeek.today(),l=EL_LS.find(y=>y.id===b.ls),xp=b.ls&&(ls0?planX(ls0,g.id):ELWeek.now(g.id)),ex=xp&&xp.p&&xp.gi>=0?ELWeek.exam(xp.p,xp.gi):null,dn=ex!=null?ELWeek.days(t,ex):null;
   const c=nextClass(g.id),when=c?(c.now?`in class now · ${c.start}–${c.end}`:`next class ${c.date===t?"today":c.date===ELWeek.add(t,1)?"tomorrow":ELWeek.date(c.date)} · ${c.start}`):"";
-  const N=b.studs.length,stat=(ic,lab,p,tip)=>`<div class="bst" title="${esc(tip)}">${elRing(p,"",40,tip)}<span><b>${ic} ${lab}</b><small>${p==null?"nothing yet":p+" % right"}</small></span></div>`;
-  const lps=b.lps.length?b.lps.map(z=>`<a class="blp" href="#" data-do="bgo" data-g="${g.id}" data-p="students" title="${esc(z.lab)}: on average ${z.pc??0} % of its steps done · ${z.fin} of ${N} students finished every step"><span class="bln">${esc(z.lab)}</span><span class="bbar"><i style="width:${z.pc||0}%;background:${bCol(z.pc)}"></i></span><b>${z.pc??0} %</b><small>${z.fin}/${N} finished</small></a>`).join("")
+  const N=b.studs.length,stat=(ic,lab,p,tip,go)=>`<a class="bst" href="${go.href||"#"}" ${go.href?`target="_blank" rel="noopener"`:`data-do="bgo" data-g="${g.id}" data-p="${go.p}" data-ls="${b.ls}"`} title="${esc(tip)} · ${esc(go.t)}">${elRing(p,"",40,tip)}<span><b>${ic} ${lab}</b><small>${p==null?"nothing yet":p+" % right"}</small></span></a>`;
+  const gl=((window.EL_GAMES||[]).find(z=>z.course===g.course&&l&&String(z.ls||"").toLowerCase().endsWith(l.title.split(" · ").pop().toLowerCase()))||{}).ls||"",
+    gres={href:`lab/game/results.html?g=${encodeURIComponent(g.id)}${gl?"&ls="+encodeURIComponent(gl):""}`,t:"click: the games' results (new tab)"};
+  const lps=b.lps.length?b.lps.map(z=>`<a class="blp" href="#" data-do="bgo" data-g="${g.id}" data-p="students" data-ls="${b.ls}" data-lp="${esc(z.a.id)}" title="Open it in ${esc(g.name)}'s Students table · ${esc(z.lab)}: on average ${z.pc??0} % of its steps done · ${z.fin} of ${N} students finished every step"><span class="bln">${esc(z.lab)}</span><span class="bbar"><i style="width:${z.pc||0}%;background:${bCol(z.pc)}"></i></span><b>${z.pc??0} %</b><small>${z.fin}/${N} finished</small></a>`).join("")
     :`<p class="muted">No learning path open for ${esc(g.name)} yet.</p>`;
-  const exs=b.exams.map(e=>`<span class="bex"><b>${lsLabel(e.l).split(" · ")[0]}</b> ${e.ex==null?`<span class="muted">exam not marked yet</span>`:`exam <b>${f1(e.ex)}</b> <small>(${e.n})</small>${e.ls!=null?` · LS mark <b>${f1(e.ls)}</b> <small>(${e.ln})</small>`:""}`}</span>`).join("");
-  return `<div class="brf c${g.course}"><a class="bhd" href="#" data-do="tab" data-g="${g.id}" title="Open ${esc(g.name)}"><b>${esc(g.name)}</b><span>${l?lsLabel(l):"No time plan yet"}${dn!=null&&dn>=0?` · exam ${dn===0?"today":dn===1?"tomorrow":"in "+dn+" days"}`:""}${when?" · "+when:""} · ${N} students</span></a>`
-    +`<h3>Work done in each learning path</h3><div class="blps">${lps}</div>`
-    +`<h3>First tries</h3><div class="bsts">${stat("🎯","Checkpoints",b.cp,b.cpN?`Recall checkpoints of this LS, first try: ${b.cp} % right on average (${b.cpN} tries)`:"No checkpoint done yet")}${stat("✏️","Activities",b.ft,b.ftN?`First try of the auto-corrected steps of the open learning paths: ${b.ft} % right on average (${b.ftN} steps)`:"No first tries yet")}`
-    +`${stat("🧩","Grammar games",b.gs.grammar,b.games?(b.gn("grammar")?`Class grammar games of this LS: ${b.gs.grammar} % right (${b.gn("grammar")} games)`:"No grammar game played yet"):"Loading the games…")}${stat("📚","Vocabulary games",b.gs.vocab,b.games?(b.gn("vocab")?`Class vocabulary games of this LS: ${b.gs.vocab} % right (${b.gn("vocab")} games)`:"No vocabulary game played yet"):"Loading the games…")}</div>`
-    +`<h3>Marks <small class="muted">· average out of 10 (students)</small></h3><div class="bexs">${exs||`<span class="muted">No exam in this course yet.</span>`}</div></div>`}
+  const exs=b.exams.map(e=>`<a class="bex" href="#" data-do="bgo" data-g="${g.id}" data-p="marks" data-ls="${e.l.id}" title="Open ${esc(g.name)}'s marks for ${lsLabel(e.l)}"><b>${lsLabel(e.l).split(" · ")[0]}</b> ${e.ex==null?`<span class="muted">exam not marked yet</span>`:`exam <b>${f1(e.ex)}</b> <small>(${e.n})</small>${e.ls!=null?` · LS mark <b>${f1(e.ls)}</b> <small>(${e.ln})</small>`:""}`}</a>`).join("");
+  return `<div class="brf c${g.course} ${ls0?"one":""}">${ls0?`<div class="bhd"><b>📊 How ${esc(g.name)} is doing</b><span>`:`<a class="bhd" href="#" data-do="tab" data-g="${g.id}" title="Open ${esc(g.name)}"><b>${esc(g.name)}</b><span>`}${l?lsLabel(l):"No time plan yet"}${dn!=null&&dn>=0?` · exam ${dn===0?"today":dn===1?"tomorrow":"in "+dn+" days"}`:""}${when?" · "+when:""} · ${N} students</span>${ls0?"</div>":"</a>"}`
+    +`<div class="bcols"><div class="bcol"><h3>Work done in each learning path</h3><div class="blps">${lps}</div></div><div class="bcol">`
+    +`<h3>First tries</h3><div class="bsts">${stat("🎯","Checkpoints",b.cp,b.cpN?`Recall checkpoints of this LS, first try: ${b.cp} % right on average (${b.cpN} tries)`:"No checkpoint done yet",{p:"todo",t:"click: each student's checkpoints"})}${stat("✏️","Activities",b.ft,b.ftN?`First try of the auto-corrected steps of the open learning paths: ${b.ft} % right on average (${b.ftN} steps)`:"No first tries yet",{p:"qa",t:"click: which questions they get right or wrong the first time"})}`
+    +`${stat("🧩","Grammar games",b.gs.grammar,b.games?(b.gn("grammar")?`Class grammar games of this LS: ${b.gs.grammar} % right (${b.gn("grammar")} games)`:"No grammar game played yet"):"Loading the games…",gres)}${stat("📚","Vocabulary games",b.gs.vocab,b.games?(b.gn("vocab")?`Class vocabulary games of this LS: ${b.gs.vocab} % right (${b.gn("vocab")} games)`:"No vocabulary game played yet"):"Loading the games…",gres)}</div>`
+    +`<h3>Marks <small class="muted">· average out of 10 (students)</small></h3><div class="bexs">${exs||`<span class="muted">No exam in this course yet.</span>`}</div></div></div></div>`}
 // Home (the old 📅 Time plan tab): alerts, the next class of each group, a tile per group, the time plan of every group and the messages
 function homePage(){const t=ELWeek.today(),np=S.D.pb.filter(x=>!x.fixed).length,nw=(S.D.sg||[]).filter(x=>!x.read).length,nr=msgNew().length;
   if(S.place==="week")return placeHead("Home","week")+satBox(GR.map(g=>g.id))+overview();
@@ -1307,7 +1309,7 @@ function homePage(){const t=ELWeek.today(),np=S.D.pb.filter(x=>!x.fixed).length,
   GR.forEach(g=>loadGames(g.id));
   const d=new Date(t+"T12:00").toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
   return `<div class="ph"><h1 class="hi">Hi, Roger${window.ELCheer?`! ${esc(ELCheer.teacher(t,S.cheer||0))} <button class="cheer" data-do="cheer" title="Another sentence">↻</button>`:""}</h1><p class="sub">${esc(d)}</p></div>`
-    +(al?`<div class="gal">${al}</div>`:"")+`<div class="brfs">${GR.map(briefBox).join("")}</div>`}
+    +(al?`<div class="gal">${al}</div>`:"")+`<div class="brfs">${GR.map(g=>briefBox(g)).join("")}</div>`}
 function render0(){
   const D=S.D;S.P=people();
   const studs=Object.values(S.P),inGr=g=>studs.filter(s=>!s.tester&&(s.group||"none")===g&&!(g==="none"&&((S.D.acc||{}).hidden||{})[s.uid])),n=g=>inGr(g).length,cnt=g=>listed()?inGr(g).filter(s=>!s.away).length+"/"+n(g):n(g);
@@ -1403,7 +1405,9 @@ function render0(){
     // no big class card here (Roger, 8 Nov 2026: "the blue box in here is useless, take it out and rearrange the buttons, and add a final
     // product access there to mark students work (in all LS)"): the alerts, then every tile in one wide grid; 🎓 Class mode stays in the top bar
     const fa=fpAct(ls,list),fw=fa?fpWaiting(fa,inG.filter(s=>!s.away&&!s.tester)):0;
-    $("#main").innerHTML=head+`<div class="gal">${al}</div><div class="tiles wide">`
+    // the class briefing of Home for this group and LS (Roger, 10 Nov 2026: "vull que aquesta info estigui aqui"), above the tiles
+    loadGames(grp.id);
+    $("#main").innerHTML=head+`<div class="gal">${al}</div>${briefBox(grp,ls)}<div class="tiles wide">`
       +tTile("plan","📅","Time plan","your agenda: drag learning paths to class days",nb?nb+" not ticked":"",true)
       +tTile("todo","✅","To do","comments, marking, possible copies, level requests",nTodo||"",/❌|Possible copy/.test(todoH))
       +tTile("paths","📈","Learning paths","open and lock, assessment criteria")
@@ -4074,7 +4078,12 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     if(from&&to&&from!==to&&!k.ls){const l=EL_LS.find(x=>x.id===S.ls);
       if(l&&l.course!==to.course){const m=EL_LS.filter(x=>x.course===to.course)[EL_LS.filter(x=>x.course===l.course).indexOf(l)];S.ls=m?m.id:null}}
     else if(S.g!==k.g||S.place!=="home"){S.place="home";S.year=false}
-    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();if(k.p==="cov"&&t.classList.contains("tile"))S.cov.auto=true;t.classList.contains("back")?navBack(k.p):goPlace(k.p)},bgo:()=>{e.preventDefault();S.g=k.g;S.tutor="all";S.ls=null;S.year=false;goPlace(k.p)},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),shortnm:()=>shortnm(),tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>{if(tp2Phone()){S.tp2foc=!S.tp2foc;tp2Foc();scrollTo(0,0);return}tp2Full()},tp2x:()=>{S.tp2foc=false;S.tp2prog=false;S.tp2one="";tp2Full(false);goPlace("plan")},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
+    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();if(k.p==="cov"&&t.classList.contains("tile"))S.cov.auto=true;t.classList.contains("back")?navBack(k.p):goPlace(k.p)},bgo:()=>{e.preventDefault();S.tutor="all";S.year=false;S.stuBoth=false;
+      if(k.p==="qa"){S.qa.ls=k.ls;S.qa.g=k.g;S.g="qa";S.place="home";render();scrollTo(0,0);return}
+      S.g=k.g;S.ls=k.ls||null;const l=EL_LS.find(x=>x.id===k.ls);if(l)S.term="t"+lsTerm(l);
+      if(k.lp){acts(k.ls).forEach(x=>{if(x.id!==k.lp)S.folded.add(x.id)});S.folded.delete(k.lp)}if(k.p==="todo")S.open.add("cpbox");
+      goPlace(k.p);if(k.lp)requestAnimationFrame(()=>{const t=document.querySelector("#main .lpall"),h=[...document.querySelectorAll("#main th.lp[data-a]")].find(x=>x.dataset.a===k.lp);
+        if(t)t.scrollIntoView({block:"start"});if(h)h.scrollIntoView({block:"nearest",inline:"center"})})},hplace:()=>{e.preventDefault();S.g="plan";S.tutor="all";goPlace(k.p)},tp2go:()=>{e.preventDefault();if(k.g){S.g=k.g;S.tutor="all";S.ls=k.ls||null;S.year=false}if(k.prog){S.tp2prog=true;S.tp2one=S.g}goPlace("plan2")},tp2prog:()=>{S.tp2prog=!S.tp2prog;render()},nosum:()=>nosum(),shortnm:()=>shortnm(),tp2one:()=>{S.tp2one=k.g;render()},tp2pg:()=>{if(S.g!==k.g){S.g=k.g;S.tutor="all";render()}},tp2fs:()=>{if(tp2Phone()){S.tp2foc=!S.tp2foc;tp2Foc();scrollTo(0,0);return}tp2Full()},tp2x:()=>{S.tp2foc=false;S.tp2prog=false;S.tp2one="";tp2Full(false);goPlace("plan")},cov:()=>{if(k.k==="gaps")S.cov.gaps=t.checked;else S.cov[k.k]=k.v;render()},
     covgo:()=>{Object.assign(S.cov,{t:k.t,v:"ls",gaps:false});render();const r=[...document.querySelectorAll("#main tr[data-cvk]")].find(x=>x.dataset.cvk===k.k);
       if(r){r.scrollIntoView({behavior:"smooth",block:"center"});r.classList.remove("cvflash");void r.offsetWidth;r.classList.add("cvflash")}},route:()=>{S.route=k.r;render()},tutor:()=>{S.tutor=k.t;render()},reload:()=>act(),cheer:()=>{S.cheer=(S.cheer||0)+1;render()},
     tick:()=>quick(api.tick(k.gid,k.ls,k.line,t.checked)),
