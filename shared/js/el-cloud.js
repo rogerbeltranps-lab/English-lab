@@ -557,21 +557,24 @@ async function teacherSections(info){
   // in the class tab (on the projector) the panel starts small: the counts and who left by name, everybody one tap away
   // since 10 Nov 2026 (Roger: "this was too big and I couldn't see the screen … students played to log in and out so that their name appeared"):
   // one line of counts (elWhoLine in el-catalog.js), the names open under it only when the teacher taps a count (fsWl.open)
-  const fsRo={},fsWl={open:null},E=t=>String(t==null?"":t).replace(/</g,"&lt;");
+  const fsRo={},fsWl={open:null,hide:false},E=t=>String(t==null?"":t).replace(/</g,"&lt;");
   const fsRoll=()=>elClassRoll(Object.assign({},fsLive,{fs:fsE()}),fsList,fsHere,fsRo[g]||[]);
   const fsWhy=y=>y.why==="full"?"out of full screen"+(y.left?" · left "+fsHm(y.left.at)+(y.left.n>1?" ("+y.left.n+"×)":""):""):y.why==="closed"?"screen closed or another window · since "+fsHm(y.seen):y.why==="lost"?"lost connection · since "+fsHm(y.seen):"not connected";
   let AT=null;const atApi=()=>({db,doc,setDoc,onSnapshot,deleteField:FBM[2].deleteField}),attRedraw=()=>draw();
   function fsFloat(w){let f=document.getElementById("el-fsfloat");if(!w.active){if(f)f.remove();return}
     if(!f){f=document.createElement("div");f.id="el-fsfloat";f.style.cssText="position:fixed;top:10px;right:12px;z-index:2147483000;max-width:min(420px,calc(100vw - 24px));background:#fff;border:2px solid #1e293b;border-radius:14px;padding:8px 12px;box-shadow:0 6px 20px rgba(0,0,0,.2);font:600 14px system-ui,sans-serif;color:#1e293b";
       f.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.att){if(AT&&AT.cur)AT.m.attClick(b,atApi(),g,AT.cur,AT.w,fsRo[g]||[]).then(r=>{if(r)draw()});return}
-        if(b.dataset.wl){fsWl.open=fsWl.open===b.dataset.wl?null:b.dataset.wl;draw()}else fsToggle()};document.body.append(f)}
+        if(b.dataset.hide){fsWl.hide=!fsWl.hide;draw()}else if(b.dataset.wl){fsWl.open=fsWl.open===b.dataset.wl?null:b.dataset.wl;draw()}else fsToggle()};document.body.append(f)}
     // 🙋 attendance of this class (el-attend.js, loaded only here): "not here" until saved, then "absent"; ✗ counts only who left
     if(!AT){AT={m:null};import("./el-attend.js").then(m=>{AT.m=m;draw()}).catch(e=>console.warn("attendance",e))}
     const aS=AT.m?AT.m.attClass(g,fsTT(),fsE(),w):0;AT.cur=aS;AT.w=w;const aR=aS?AT.m.attWatch(atApi(),g,aS,attRedraw):undefined;
     if(aS)AT.m.attLate(atApi(),g,aS,w);
     const bs="border:1px solid #1e293b;border-radius:999px;padding:3px 10px;cursor:pointer;font:700 12px system-ui;";
     const av=aS?AT.m.attView(w,aR,false):undefined,wl=elWhoLine(w,{open:fsWl.open,av,why:fsWhy,hm:fsHm});
-    const h='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button>':'')+'</span></div>'
+    // ✕ Hide (Roger, 10 Nov 2026: "can I hide the message?"): only a small 👥 in/of chip stays, a tap shows the panel again (this tab only)
+    const hb='<button data-hide="1" style="'+bs+'background:#fff;color:#1e293b" title="'+(fsWl.hide?"Show who is in, who left and who is not here":"Hide this message")+'">'+(fsWl.hide?'👥 '+w.inn.length+'/'+w.n:'✕ Hide')+'</button>';
+    f.style.padding=fsWl.hide?"4px 6px":"8px 12px";
+    const h=fsWl.hide?hb:'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>'+(w.fs?'⛶ '+gname(g)+' in full screen':'🎮 '+gname(g)+' is playing')+'</b><span>'+(w.fs?'<button style="'+bs+'background:#1e293b;color:#fff">Switch off</button> ':'')+hb+'</span></div>'
       +'<div style="color:#475569;font-size:12px;margin-top:2px">'+(w.game?'🎮 Class game: '+E(w.title)+(w.fs?' · ':''):'')+(w.fs?'until '+fsHm(fsE().until)+(fsE().auto?' (class, by your timetable)':''):'')+'</div>'
       +wl.line+wl.list;
     if(f.dataset.h!==h){f.dataset.h=h;f.innerHTML=h}}

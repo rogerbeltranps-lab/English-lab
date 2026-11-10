@@ -957,7 +957,7 @@ const svKeep=n=>{const l=n.querySelector(".svlist");if(!l)return;l.scrollTop=SV.
 // The whole group, in or out (Roger, 6 Nov 2026: "I want to see not who's left but who is in and who is out … I need to be able to minimise
 // the message but every time somebody gets out it gets bigger again"): the group's student list (roster) by elClassRoll in el-catalog.js;
 // Since 10 Nov 2026 only one line of counts (elWhoLine): the names open under it on a tap, nothing opens by itself (no ▾ any more).
-const FSWL={open:null,g:null};   // the count whose names are open under the line (elWhoLine): "in", "left", "nh" or null
+const FSWL={open:null,g:null,hide:(()=>{try{return localStorage.getItem("el_t_fshide")==="1"}catch(e){return false}})()};   // hide: only the buttons stay, 👥 n/N shows it again (Roger, 10 Nov 2026: "can I hide the message?")   // the count whose names are open under the line (elWhoLine): "in", "left", "nh" or null
 const fsRoster=gid=>Object.entries((S.D&&S.D.ro)||{}).filter(([,r])=>r&&r.group===gid).map(([e,r])=>({e,name:(r.first||r.name||e.split("@")[0])+(r.surname1?" "+r.surname1:"")}));
 const fsWhy=y=>y.why==="full"?"out of full screen"+(y.left?` · left ${fsHm(y.left.at)}${y.left.n>1?` (${y.left.n}×)`:""}`:""):y.why==="closed"?`screen closed or another window · since ${fsHm(y.seen)}`:`lost connection · since ${fsHm(y.seen)}`;
 // 🎓 the class mode button (or ⏹ Stop and where the class tab is) of the group shown
@@ -967,15 +967,15 @@ const cmInfo=g=>{const c=cmOf(g.id),ef=fsEff(g.id);return c?`<div class="fsinfo 
 function fsDraw(){const n=document.getElementById("fsctl");if(!n)return;const g=GR.find(x=>x.id===fsGroup());if(!g){n.innerHTML=`<div class="fsrow">${svBtn()}</div>${svPop()}`;n.className="";svKeep(n);return}
   const ef=fsEff(g.id),on=!!ef,cls=!!elSlotNow(elTT(g.id)),w=FSW.g===g.id?elClassRoll(Object.assign({},FSW.x,{fs:ef}),FSW.list,FSW.here,fsRoster(g.id)):{active:false,inn:[],out:[]};
   if(FSWL.g!==g.id){FSWL.g=g.id;FSWL.open=null}
-  const box=w.active||!!cmOf(g.id);n.className=box?"on":"";
+  const box=(w.active||!!cmOf(g.id))&&!FSWL.hide;n.className=box?"on":"";
   // 🙋 attendance of this class (el-attend.js): who has no beat is "not here" until it is saved, then "absent"; out = only who left
   const aS=w.active&&!DEMO?attClass(g.id,elTT(g.id),ef,w):0;FSW.att={g:g.id,start:aS,w};const aR=aS?attWatch(attApi(),g.id,aS,fsDraw):undefined;
   if(aS)attLate(attApi(),g.id,aS,w);const av=aS?attView(w,aR,false):undefined;
   // one short line of counts, the names only when a count is tapped (Roger, 10 Nov 2026: "this was too big and I couldn't see the screen";
   // elWhoLine in el-catalog.js): nothing pops up by itself any more, so leaving and coming back no longer puts a name on the screen
   const wl=w.active?elWhoLine(w,{open:FSWL.open,av,why:fsWhy,hm:fsHm}):null;
-  n.innerHTML=`<div class="fsrow">${svBtn()}${cmBtn(g)}<!-- no full screen button (Roger, 7 Nov 2026): on by itself in every class of the timetable and while class mode is on --></div>${svPop()}${cmInfo(g)}`
-    +(w.active?`<div class="fsinfo">${w.game?`🎮 Class game: ${esc(w.title)}${on?" · ":""}`:""}${on?`⛶ Full screen until ${fsHm(ef.until)}${ef.auto?" (end of the class, by your timetable)":cls&&ef.until===elClassEnd(g.id,ef.at)?" (end of the class)":""}`:""}</div>${wl.line}${wl.list}`:"");svKeep(n)}
+  n.innerHTML=`<div class="fsrow">${svBtn()}${cmBtn(g)}<!-- no full screen button (Roger, 7 Nov 2026): on by itself in every class of the timetable and while class mode is on -->${w.active?`<button type="button" class="fsbtn fsmin" data-do="fshide" title="${FSWL.hide?"Show who is in, who left and who is not here":"Hide this message (the buttons stay)"}">${FSWL.hide?`👥 ${w.inn.length}/${w.n}`:"✕ Hide"}</button>`:""}</div>${svPop()}${FSWL.hide?"":cmInfo(g)}`
+    +(w.active&&!FSWL.hide?`<div class="fsinfo">${w.game?`🎮 Class game: ${esc(w.title)}${on?" · ":""}`:""}${on?`⛶ Full screen until ${fsHm(ef.until)}${ef.auto?" (end of the class, by your timetable)":cls&&ef.until===elClassEnd(g.id,ef.at)?" (end of the class)":""}`:""}</div>${wl.line}${wl.list}`:"");svKeep(n)}
 const attApi=()=>({db:db(),doc:F.doc,setDoc:F.setDoc,onSnapshot:F.onSnapshot,deleteField:F.deleteField});
 document.addEventListener("click",e=>{const c=e.target.closest("#fsctl [data-wl]");if(c){e.preventDefault();FSWL.open=FSWL.open===c.dataset.wl?null:c.dataset.wl;fsDraw();return}
   const b=e.target.closest("#fsctl [data-att]");if(!b||!FSW.att)return;e.preventDefault();const a=FSW.att;
@@ -4139,6 +4139,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     ttsave:()=>{e.preventDefault();const d=ttDraft();Object.values(d.groups).forEach(ttSort);d.off.sort((a,b)=>a[0]<b[0]?-1:1);
       const T=elTTRead(elTTStore(d));TTE.msg="Saving…";render();
       (DEMO?Promise.resolve():ttSave(T)).then(()=>{window.EL_TIMETABLE=T;TTE.d=null;TTE.msg="✓ Saved: students' pages use it from now on";render()},x=>{TTE.msg="✗ Not saved: "+esc(x.message);render()})},
+    fshide:()=>{e.preventDefault();FSWL.hide=!FSWL.hide;try{localStorage.setItem("el_t_fshide",FSWL.hide?"1":"0")}catch(x){}fsDraw()},
     sview:()=>{e.preventDefault();SV.open=!SV.open;SV.top=0;if(SV.open)SV.g=null;fsDraw()},
     svgroup:()=>{e.preventDefault();SV.g=k.g;SV.top=0;fsDraw()},
     attre:()=>{e.preventDefault();attLoad(S.g,true);render()},
