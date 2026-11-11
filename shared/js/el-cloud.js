@@ -123,11 +123,13 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 // homework (set from the dashboard) and planEdits (sessions moved to another day, tabs per session) came later: they were not copied
 // here, so the dashboard and the student board lost the homework set from the dashboard after a reload. planEdits is applied to the
 // time plan (ELWeek.applyEdits) as soon as it is read.
+// cpShown/cpClosed (closed recall checkpoints, elCpClosed) are kept too: without them a closed checkpoint still looked open on LP pages, so a
+// student who missed it could start it (the send was refused) and every later learning path asked for it first (problem report, 4ESOB, 11 Nov).
 // once per page here; ELCloud.lsInfo (the dashboard, after it changes an LS) always reads the server.
 const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
 async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
-  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{},cpShown:d.cpShown||{},cpClosed:d.cpClosed||{}};   // cpShown/cpClosed: a closed recall checkpoint (elCpClosed) can't be started and no longer blocks what comes after it (problem report, 4ESOB, 11 Nov)
+  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{},cpShown:d.cpShown||{},cpClosed:d.cpClosed||{}};
   lsKeep(id,o);return o}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 // The last LS state read in this browser (el_ls_<id>: status, groups, open learning paths), only for a page's first drawing before the
 // sign-in is known (the LS home's learning paths, All Learning Situations). The page draws again with the state it reads now.
