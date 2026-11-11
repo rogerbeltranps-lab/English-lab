@@ -184,6 +184,7 @@ window.ELCheckpoint = (function () {
         console.warn('checkpoint', e);
         // already in the cloud (sent from another device or before a reload): that copy counts
         try { const F = await fsLib(), d = cloud() && await F.getDoc(ref(F, key)); if (d && d.exists() && !d.data().redo) { c.ok = true; api.save(); api.complete(p.id); return sent(d.data()); } } catch (x) {}
+        if (await isClosed()) return closed();
         box().innerHTML = '<p class="feedback no">' + t('No s’ha pogut enviar. Comprova la connexió i torna-ho a provar.', 'It couldn’t be sent. Check your connection and try again.') + '</p><div class="actions"><button class="btn" type="button" id="' + p.id + 'Retry">' + t('Torna-ho a enviar', 'Send again') + '</button></div>';
         document.getElementById(p.id + 'Retry').onclick = () => send(null);
       }
@@ -254,6 +255,13 @@ window.ELCheckpoint = (function () {
         const s = api.state; s.cp = {}; if (s.first) delete s.first[api.level()]; if (s.done) delete s.done[p.id]; api.save(); intro(); };
     }
 
+    // closed by the teacher (🔒 Close or 📣 Show answers: ls/{id}.cpClosed / cpShown, elCpClosed): it can't be started or sent any more
+    // (firestore.rules refuse it), so the page says so instead of "couldn't be sent" (problem report, 4ESOB, 11 Nov 2026)
+    async function isClosed() { try { const A = act(key), C = window.ELCloud; if (!A || !C || !C.lsNow || !window.elCpClosed || C.viewing) return false;
+      return window.elCpClosed(A, await C.lsNow(A.ls), C.group()); } catch (e) { return false; } }
+    function closed() { stop(); exitFull();
+      box().innerHTML = '<h3>🔒 ' + t('Aquest checkpoint ja està tancat', 'This checkpoint is closed') + '</h3><p>' + t('El professor l’ha tancat per al teu grup, així que ja no es pot fer ni enviar. No et bloqueja: pots continuar amb el següent Learning Path.', 'Your teacher has closed it for your group, so it can’t be done or sent any more. It doesn’t block you: you can go on to the next Learning Path.') + '</p>'; }
+
     function waitCloud(f) { let n = 0, done = false; const once = () => { if (!done) { done = true; f(); } };
       const go = () => { if (cloud()) return once(); if (window.ELCloud && window.ELCloud.onUser) window.ELCloud.onUser(u => u && once()); else if (n++ < 120) setTimeout(go, 500); }; go(); }
 
@@ -265,7 +273,7 @@ window.ELCheckpoint = (function () {
         // except a reload in the first seconds with nothing answered (the page reloads itself once after sign-in): it goes on
         if (!c.i && !c.draft && !(c.leaves || []).length && Date.now() - Date.parse(c.started) < 15000) { delete c.away; api.save(); return run(); }
         box().innerHTML = '<p>' + t('Enviant…', 'Sending…') + '</p>';
-        return waitCloud(() => send('left'));
+        return waitCloud(async () => (await isClosed()) ? closed() : send('left'));
       }
       box().innerHTML = '<p class="tiny">' + t('Carregant…', 'Loading…') + '</p>';
       waitCloud(async () => {
@@ -275,6 +283,7 @@ window.ELCheckpoint = (function () {
           if (d) { if (!c.ok) { Object.assign(c, { ok: true, sentAt: c.sentAt || new Date().toISOString(), level: d.level, ids: d.ids }); api.save(); } if (!(api.state.done || {})[p.id]) api.complete(p.id); return sent(d); }
           if (c.sentAt) return send(c.auto || null);   // sent here but never reached the cloud: try again
           if (!c.ids && ((api.state.done || {})[p.id] || Object.keys(api.state.first || {}).length)) return legacy();   // done before it was secure: it stays done
+          if (await isClosed()) return closed();   // no answers in the cloud and closed: nothing to start
           intro();
         } catch (e) { console.warn('checkpoint', e); if (c.sentAt) sent(); else intro(); }
       });
