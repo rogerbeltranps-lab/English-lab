@@ -982,11 +982,12 @@ const fsGroup=()=>GR.some(x=>x.id===S.g)?S.g:FSW.g||((window.ELWeek&&ELWeek.clas
 // 👁 Student view (Roger, 6 Nov 2026: "I want to have a button to see the web as student on the top bar"): next to 🔓 Release all,
 // it opens a list of a group's students (the group in class or open, other groups one tap away); a name opens that student's board
 // in a new tab in the read-only student view (today.html?student=…, el-cloud.js el_as): every page then shows the site as they see it.
+// It never passes the LS picked on the dashboard (a 4 ESO B tab left on LS1 opened their board on LS1): today.html picks the current LS by the time plan.
 const SV={open:false,g:null};
 const svBtn=()=>`<button type="button" class="fsbtn svbtn ${SV.open?"on":""}" data-do="sview" title="See the site as one of your students sees it: read-only, opens in a new tab">👁 Student<span class="lg"> view</span></button>`;
 function svPop(){if(!SV.open)return "";const g=GR.find(x=>x.id===SV.g)||GR.find(x=>x.id===fsGroup())||GR[0];if(!g)return "";
   const all=Object.values(S.P||{}).filter(s=>s.group===g.id&&!s.tester&&!s.away),studs=all.filter(s=>s.uid).sort(byName),
-    l=EL_LS.find(x=>x.id===S.ls&&x.course===g.course),q=l?"&ls="+encodeURIComponent(l.id):"",
+    l=EL_LS.find(x=>x.id===S.ls&&x.course===g.course),q="",   // no ?ls=: the board opens on the group's current LS, as the student sees it (Roger, 11 Nov 2026: "perquè li apareix la LS1?")
     out=Object.values((S.D&&S.D.ro)||{}).filter(r=>r&&r.group===g.id).length-studs.length;
   return `<div class="svpop"><div class="svh"><b>👁 See the site as a student</b><button type="button" class="svx" data-do="sview" title="Close">✕</button></div>
     <div class="svg">${GR.map(x=>`<button type="button" class="${x.id===g.id?"on":""}" data-do="svgroup" data-g="${x.id}">${esc(x.name)}</button>`).join("")}</div>
