@@ -484,9 +484,11 @@ const api={
 const MAIL_URL="https://script.google.com/macros/s/AKfycbyG8C2d9UN7Ped1Z3MfjRR_k3WCPpWiXVI2m3FFpuW9MUD8OLh9epTwsYrcR0RkrN0GIA/exec";
 const mailTo=list=>[...new Set(list.filter(s=>s&&!s.tester).map(s=>String(s.email||"").trim().toLowerCase()).filter(e=>/^[^@\s,]+@ietramuntana\.cat$/.test(e)))];
 const mailFoot=ca=>"\n\n"+(ca===true?"Entra amb el teu correu de l'institut: ":ca===false?"Sign in with your school email: ":"Sign in with your school email / Entra amb el teu correu de l'institut: ")+new URL("today.html",location.href).href+"\n\nRoger";
-async function mailStudents(emails,subject,body){if(DEMO||!emails.length)return 0;
-  // Roger, 6 Nov 2026: "before sending a mail, I want the program to ask me if I want to send it"
-  if(!confirm("✉️ Send this email to "+emails.length+" student"+(emails.length===1?"":"s")+"?\n\n"+subject+"\n\n"+body.slice(0,1600)+(body.length>1600?"…":"")))return 0;const tok=await ELCloud.auth.currentUser.getIdToken();let n=0;
+async function mailStudents(emails,subject,body,who){if(DEMO||!emails.length)return 0;
+  // Roger, 6 Nov 2026: "before sending a mail, I want the program to ask me if I want to send it". who = a line saying which students
+  // this email is for, when an announcement goes in two emails (Roger, 9 Nov 2026: "tinc més que 12 alumnes": the Catalan one said only
+  // "12 students", with no word that the English one for the other 16 came next)
+  if(!confirm((who||"✉️ Send this email to "+emails.length+" student"+(emails.length===1?"":"s")+"?")+"\n\n"+subject+"\n\n"+body.slice(0,1600)+(body.length>1600?"…":"")))return 0;const tok=await ELCloud.auth.currentUser.getIdToken();let n=0;
   for(let i=0;i<emails.length;i+=45){const part=emails.slice(i,i+45);let j=null;
     try{const r=await fetch(MAIL_URL,{method:"POST",headers:{"content-type":"text/plain"},body:JSON.stringify({idToken:tok,bcc:part,subject,body,name:"Roger Beltran · English Lab"})});j=await r.json()}catch(e){throw new Error("the school mail script did not answer")}
     if(!j||!j.ok)throw new Error(j&&j.error==="not the teacher"?"the school mail script is the old version (update it: tools/notify/school-mail.gs)":(j&&j.error)||"no answer");n+=part.length}
@@ -3361,9 +3363,15 @@ function annSendNow(){
 // one, Core, Plus and Pro the English one. You are asked before each of them.
 async function annMail(a){
   if(!(a.ca&&a.en))return mailStudents(mailTo(annWho(a)),"English Lab · 📣 Announcement / Anunci del professor",a.text+mailFoot(null));
-  const W=annWho(a),en=W.filter(s=>msgCa(s)===false),ca=W.filter(s=>msgCa(s)!==false);
-  return (await mailStudents(mailTo(ca),"English Lab · 📣 Anunci del professor",a.ca+mailFoot(true)))
-    +(await mailStudents(mailTo(en),"English Lab · 📣 Announcement from your teacher",a.en+mailFoot(false)))}
+  const W=annWho(a),en=W.filter(s=>msgCa(s)===false),ca=W.filter(s=>msgCa(s)!==false),me=mailTo(ca),mn=mailTo(en),all=mailTo(W).length,
+    pl=n=>n+" student"+(n===1?"":"s"),both=me.length&&mn.length,
+    no=W.length-all?`\n(${pl(W.length-all)} of the ${W.length} have no school email and only see it on their board.)`:"";
+  const line=(n,lang,lv,i,rest)=>`✉️ ${both?`Email ${i} of 2: `:""}the ${lang} version to ${pl(n)} (${lv}), of the ${pl(all)} it is for.`
+    +(rest?`\n${rest}`:"")+(i===1||!me.length?no:"");
+  return (await mailStudents(me,"English Lab · 📣 Anunci del professor",a.ca+mailFoot(true),
+      line(me.length,"Catalan","Starter, Base or no level yet",1,both?`After this, you will be asked about the English version for the other ${pl(mn.length)} (Core, Plus, Pro).`:"")+"\nSend it?"))
+    +(await mailStudents(mn,"English Lab · 📣 Announcement from your teacher",a.en+mailFoot(false),
+      line(mn.length,"English","Core, Plus or Pro",2,"")+"\nSend it?"))}
 // scheduled announcements with ✉️: emailed by the first dashboard open after their time; a transaction marks them mailed first, so two
 // open dashboards (Mac, PC, phone) never send it twice
 function annDue(){if(DEMO||S.annDue)return;const due=(S.D&&S.D.ann||[]).filter(a=>a.mail&&!a.mailed&&a.at&&annMs(a.at)<=Date.now());if(!due.length)return;S.annDue=true;
