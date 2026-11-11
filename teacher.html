@@ -2100,6 +2100,11 @@ const cmtCell=(u,a,k)=>{const h=((pstate(u,a)||{}).steps||{})[k];if(!h||!ELMark.
 function progress(studs,list,stu,ids){
   ids=ids&&ids.length?ids:[S.ls];const multi=stu&&ids.length>1;
   loadGames();const ex=stu&&list.length&&!multi&&exOf(S.ls),best=stu?ptBestOk(S.g):0;
+  const lsG=ex?G():null,lsM=!!(lsG&&lsG.only),lsW=lsM?lsG.blocks.map(b=>(b.id==="fp"?"final product":b.name.replace(/^Final /,"").toLowerCase())+" "+b.w+" %").join(" · "):"";
+  // LS1 Total = the LS mark (grade(): exam and final product by their weights); "–" until both are in (unless missing counts 0)
+  const lsCell=s=>{const {B,total}=grade(s),miss=lsG.blocks.filter(b=>B[b.id]==null).map(b=>b.id==="fp"?"final product":"exam");
+    if(miss.length&&!S.zero)return `<td class="first" title="The LS mark needs the exam and the final product">–<br><small class="muted">no ${miss.join(", no ")} yet</small></td>`;
+    return `<td class="first" title="${esc(lsG.blocks.map(b=>(b.id==="fp"?"Final product":"Exam")+" "+f1(B[b.id])+" × "+b.w+" %").join(" + ")+" = "+f1(total))}"><b>${f1(total)}</b>/10<br><small>${deg(elDegree(total))}</small></td>`};
   // 🎬 in Students the final product shows only its Score (Roger, 9 Nov 2026: "on final product we only need the final product score")
   const fpIds=new Set(stu?ids.map(id=>(fpAct(id)||{}).id).filter(Boolean):[]);
   const open=a=>!fpIds.has(a.id)&&!S.folded.has(a.id)&&lpCols(a).length>0,any=list.some(open)||multi,rs=any?' rowspan="2"':"";
@@ -2112,7 +2117,7 @@ function progress(studs,list,stu,ids){
   // 🧩 📚 class game circles: in Students a column of their own after the points (Roger, 9 Nov 2026: "I want the circles of percentage of
   // the grammar and vocab too … here"), so an LS with no class games saved says so instead of showing nothing
   const gc=stu&&list.length>0,gl=GAMES[S.g],gAny=gc&&gl&&!gl.busy&&Object.values(S.P).some(s=>s.group===S.g&&gameMine(s));
-  let h1=`<tr><th class="stu"${rs}>Student${!stu&&GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small><span class="pkey" aria-hidden="true"><i class="g">🧩</i><i class="v">📚</i></span>':""}</th><th class="rtc"${rs}>Route</th>`+(stu?`<th class="first"${rs} title="Team points of ${esc(elTermName(S.term))} (− / + for an absent student or a mistake)">Points<br><small class="muted">${esc(elTermName(S.term))}</small></th><th${rs}>All work</th><th${rs}>Bonus</th>`:"")+(gc&&!multi?`<th class="first" style="min-width:118px"${rs} title="% right in the class games of this LS. Hover a circle for the games, click it for every answer and the notes">Class games<br><small class="muted">🧩 grammar · 📚 vocabulary</small>${gl&&!gl.busy&&!gAny?`<br><small class="muted">none saved in this LS yet</small>`:""}</th>`:"")+(ex?`<th class="first"${rs} title="The exam of this LS (out of 10). Click a mark for the sections">📝 Exam</th>`:""),h2="<tr>";
+  let h1=`<tr><th class="stu"${rs}>Student${!stu&&GAMES[S.g]&&GAMES[S.g].list.length?'<br><small class="muted">class games: 🧩 grammar · 📚 vocabulary</small><span class="pkey" aria-hidden="true"><i class="g">🧩</i><i class="v">📚</i></span>':""}</th><th class="rtc"${rs}>Route</th>`+(stu?`<th class="first"${rs} title="Team points of ${esc(elTermName(S.term))} (− / + for an absent student or a mistake)">Points<br><small class="muted">${esc(elTermName(S.term))}</small></th><th${rs}>All work</th><th${rs}>Bonus</th>`:"")+(gc&&!multi?`<th class="first" style="min-width:118px"${rs} title="% right in the class games of this LS. Hover a circle for the games, click it for every answer and the notes">Class games<br><small class="muted">🧩 grammar · 📚 vocabulary</small>${gl&&!gl.busy&&!gAny?`<br><small class="muted">none saved in this LS yet</small>`:""}</th>`:""),h2="<tr>";
   if(multi)ids.forEach(id=>{const sc=sumCols(id),none=gl&&!gl.busy&&!Object.values(S.P).some(s=>s.group===S.g&&gameMine(s,id));
     h1+=`<th class="first lsb lssum" colspan="${sc.length}">${lsLabel(lsOf(id))}<br><small class="muted">summary</small></th>`;
     h2+=sc.map((c,i)=>c.k==="g"?`<th class="${i?"":"first lsb"}" style="min-width:118px" title="% right in the class games of ${esc(lsShort(id))}. Click a circle for every answer and the notes; 📝 their notes">Class games<br><small class="muted">🧩 · 📚</small>${none?`<br><small class="muted">none saved yet</small>`:""}</th>`
@@ -2125,7 +2130,10 @@ function progress(studs,list,stu,ids){
       const hx=canHw(a)&&!isCp(a)?planX(a.ls,S.g):null,hs=hx?hwItems(hx):null;
       h2+=lpCols(a).map((c,i)=>`<th class="ac ${i?"":"first"} ${colSkip(a,c)?"skip":""}">${colLink(a,c)}${hx&&c.t?`<button type="button" class="g mini tabhw${hs.has(a.id+"#"+c.t)?" on":""}" data-do="lphw" data-a="${esc(a.id)}" data-t="${esc(c.t)}" title="${hs.has(a.id+"#"+c.t)?"Already homework for this group · click to set it again":"Set this tab as homework"}">🏠</button>`:""}${isLS1(a)?"":"<br>"+colCrit(a,c)}</th>`).join("")+`<th class="sc" title="${a.graded&&!a.manual?"1 point for each step the student has done (✔ in the columns on the left). It shows how much of the path is done, not how well, and it is not the LS mark. ✅ = every step done.":"Steps done (practice, not graded). ✅ = every step done."}">Score</th>`}
     else h1+=`<th class="lp first${lsb(a)}"${rs}${fpo?' title="Final product: only its score here (open it in 🎬 Final product)"':` data-do="fold" data-a="${a.id}"`}>${head}</th>`});
-  h1+=(multi?"":`<th class="first"${rs}>Total</th>`)+"</tr>";h2+="</tr>";
+  // 📝 Exam beside Total, after the learning paths (Roger, 11 Nov 2026: "where is the exam?"): with ◧ Hide Route, Points… it was hidden with
+  // the summary columns; now it always shows. LS1 (only an exam and a final product: G().only) has Total = the LS mark, exam 75 · FP 25.
+  h1+=(multi?"":(ex?`<th class="first"${rs} title="The exam of this LS (out of 10). Click a mark for the sections">📝 Exam</th>`:"")
+    +(lsM?`<th class="first"${rs} style="white-space:nowrap" title="The LS mark out of 10: ${esc(lsW)}. Hover a mark for the sum">Total<br><small class="muted">LS mark</small><br><small class="muted">${esc(lsG.blocks.map(b=>(b.id==="fp"?"FP":"exam")+" "+b.w).join(" · "))}</small></th>`:`<th class="first"${rs}>Total</th>`))+"</tr>";h2+="</tr>";
   let b="";const cols=list.reduce((n,a)=>n+(open(a)?lpCols(a).length+1:1),0);
   studs.forEach(s=>{const r=S.D.rs[s.uid]||{};let ts=0,tm=0;
     const who=`<td class="stu"><a data-do="stu" data-u="${s.uid}"><span class="nmf">${name(s)}</span><span class="nms" title="${name(s)}">${esc(shortName(s).short)}</span></a>${s.tester?'<span class="tag">tester</span>':""}${stu?"":gameRings(s)}${multi?"":notesLink(s,S.ls)}${pChip(s)}</td>`;
@@ -2133,13 +2141,13 @@ function progress(studs,list,stu,ids){
     const pc=(stu?ptCols(s,best):"")+(gc&&!multi?gcell(S.ls):"")+(multi?ids.map(id=>sumCols(id).map((c,i)=>c.k==="g"?gcell(id," lsb"):c.k==="e"?(s.away?"<td>–</td>":exCell(s.uid,id).replace('class="first ','class="')):(()=>{if(s.away)return "<td>–</td>";const {ts,tm}=lsTot(s.uid,id);
       if(tm)return `<td><b>${ts}/${tm}</b><br><small>${Math.round(ts/tm*100)}%</small></td>`;let n=0,N=0;list.forEach(a=>{if(a.ls!==id||a.manual)return;const d=doneSet(s.uid,a),st=steps(a);N+=st.length;n+=st.filter(k=>d.has(k)).length});
       return `<td title="Steps done in the learning paths of ${esc(lsShort(id))} (practice, not graded)">${N?`<b>${n}/${N}</b><br><small class="muted">steps</small>`:"–"}</td>`})()).join("")).join(""):"");
-    if(s.away){b+=`<tr class="away">${who}${awayRt(s)}${pc}${ex?'<td class="first">–</td>':""}${cols?`<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td>`:""}${multi?"":'<td class="first">–</td>'}</tr>`;return}
-    b+=`<tr>${who}${rtCell(s.uid)}${pc}${ex?exCell(s.uid,S.ls):""}`;
+    if(s.away){b+=`<tr class="away">${who}${awayRt(s)}${pc}${cols?`<td colspan="${cols}" class="first" style="text-align:left">${s.email?"Not signed in yet":"No email yet: cannot sign in (click the name to add it)"}</td>`:""}${multi?"":(ex?'<td class="first">–</td>':"")+'<td class="first">–</td>'}</tr>`;return}
+    b+=`<tr>${who}${rtCell(s.uid)}${pc}`;
     list.forEach(a=>{const d=doneSet(s.uid,a),x=r[a.id],c=cell(s.uid,a);
       if(open(a))b+=lpCols(a).map((c,i)=>`<td class="ac st ${i?"":"first"+lsb(a)} ${colSkip(a,c)?"skip":""}" data-do="step" data-u="${s.uid}" data-a="${esc(a.id)}" data-c="${i}">${colCell(s.uid,a,c,d)}</td>`).join("");
       b+=`<td class="sc ${c.c} ${open(a)?"":"first"+lsb(a)}" data-do="cell" data-u="${s.uid}" data-a="${a.id}"${c.tip?` title="${esc(c.tip)}"`:""}>${c.t}</td>`;
       const y=a.graded&&x&&x.max&&scOf(s.uid,a);if(y){ts+=y.score;tm+=y.max}});
-    b+=(multi?"":`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td>`)+"</tr>"});
+    b+=(multi?"":(ex?exCell(s.uid,S.ls):"")+(lsM?lsCell(s):`<td class="first"><b>${tm?ts+"/"+tm:"–"}</b>${tm?"<br><small>"+Math.round(ts/tm*100)+"%</small>":""}</td>`))+"</tr>"});
   return `<table><thead>${h1}${any?h2:""}</thead><tbody>${b}</tbody></table>`;
 }
 function criteria(studs,list){
