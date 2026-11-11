@@ -589,7 +589,8 @@ function cpBox(ls,grp,studs){
           :`<button class="g" data-do="cpclose" data-a="${a.id}" data-v="1" title="Nobody else in ${grp.name} can start it; the answers stay hidden">🔒 Close</button>`)
       +(docs.length?` <button data-do="cprel" data-a="${a.id}" data-n="${closed?0:kids-sent}" title="Students in ${grp.name} see their questions, answers and corrections${closed?"":", and nobody in the group can do it any more"}">📣 Show answers</button><br><small class="muted">${sent}/${kids} sent${rel?` · 👁 ${rel} already see their answers`:" · they see only their score"}</small>`:'<br><small class="muted">nothing sent</small>')}</th>`}).join("");
   const rows=studs.filter(s=>!s.tester||cps.some(a=>cpDoc(s.uid,a))).map(s=>`<tr><td style="text-align:left">${name(s)}</td>${cps.map(a=>{const d=cpDoc(s.uid,a),K=D.ck[a.keys[0]];
-      if(!d)return '<td class="muted">–</td>';if(d.redo)return `<td data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="You let them do it again">↺ again</td>`;
+      // closed or shown for the group: ↺ lets only this student do it (Roger, 11 Nov 2026: "deixa fer el checkpoint a l'Ayman")
+      if(!d)return !s.tester&&K&&elCpClosed(a,D.ls[ls],grp.id)?`<td class="muted" data-do="cpredo" data-u="${s.uid}" data-a="${a.id}" title="Not done. Click to let only this student do it (closed for the rest of the group)" style="cursor:pointer">– <small>↺</small></td>`:'<td class="muted">–</td>';if(d.redo)return `<td data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="You let them do it again">↺ again</td>`;
       const m=cpMark(d,K),glances=(d.leaves||[]).length,secs=(d.times||[]).reduce((x,y)=>x+(+y||0),0);
       const gp=cpGap(s.uid,a,d,K);
       return `<td class="sc" data-do="cpdlg" data-u="${s.uid}" data-a="${a.id}" title="${gp?esc(gp.t)+" · ":""}Click for the answers"${gp&&gp.up?' style="background:#fff4e5"':""}>${gp?(gp.up?"⚠️ ":"↓ "):""}${K?m.score+"/"+m.max:"?"}${d.auto==="left"?' <span title="Sent automatically: left the page">⚡</span>':""}${glances?` <span title="Left the page ${glances} time(s) for less than 2 s">👀${glances}</span>`:""}<br><small class="muted">${Math.round(secs/60*10)/10} min${d.fb?(cpStale(d,K)?" · 👁 sees old answers":" · 👁 sees answers"):" · 🙈 score only"}</small></td>`}).join("")}</tr>`).join("");
@@ -646,12 +647,14 @@ function cpSync(ls,grp,studs){if(DEMO||!window.ELCloud||!ELCloud.isTeacher(ELClo
     const docs=kids.map(s=>[s,cpDoc(s.uid,a)]).filter(([,d])=>d&&!d.redo);
     docs.forEach(([s,d])=>{const m=cpMark(d,K),ref=["students",s.uid,"checkpoints",a.keys[0]];
       if(!d.sc||d.sc.score!==m.score||d.sc.max!==m.max){d.sc={score:m.score,max:m.max};ops.push(put(ref,{sc:d.sc}))}
-      if(d.fb&&!d.fb.q){d.fb.q=d.ids.map(id=>String((K.items[id]||{}).q||""));ops.push(put(ref,{fb:{q:d.fb.q}}))}});
+      if(d.fb&&!d.fb.q){d.fb.q=d.ids.map(id=>String((K.items[id]||{}).q||""));ops.push(put(ref,{fb:{q:d.fb.q}}))}
+      // the answers are already shown to the group: a try sent later (↺ let only this student do it) gets its corrections too
+      if(!d.fb&&elCpShown(a,info,grp.id)){d.fb=cpFb(d,K);ops.push(put(ref,{fb:d.fb}))}});
     if(kids.length&&docs.length===kids.length&&!elCpShown(a,info,grp.id)&&elLpOpen(a,info,grp.id,true))ops.push(api.cpRelease(a,studs,grp.id))});
   if(ops.length)Promise.all(ops).then(()=>render(),e=>console.warn("checkpoint scores",e))}
 api.cpAccept=(a,id,v)=>{const key=a.keys[0],K=S.D.ck[key],k=K.items[id];k.extra=[...new Set((k.extra||[]).concat(v))];if(DEMO)return;
   return F.setDoc(F.doc(db(),"cpKeys",key),{items:{[id]:{extra:k.extra}}},{merge:true}).then(()=>cpHashSync(key,true))};
-api.cpRedo=(u,a)=>{const d=cpDoc(u,a);d.redo=true;return DEMO?null:F.setDoc(F.doc(db(),"students",u,"checkpoints",a.keys[0]),{redo:true},{merge:true})};
+api.cpRedo=(u,a)=>{const d=cpDoc(u,a);if(d)d.redo=true;return DEMO?null:F.setDoc(F.doc(db(),"students",u,"checkpoints",a.keys[0]),{redo:true},{merge:true})};
 function quick(ps){Promise.all([].concat(ps)).catch(e=>{console.warn(e);alert("Could not save: "+e.message)});render();again()}
 
 // ---- helpers
@@ -4370,7 +4373,7 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     acclink:()=>{const sel=$("#lnk-"+CSS.escape(k.u)),rid=sel&&sel.value;if(!rid)return alert("First choose who it is.");const ro=S.D.ro[rid];
       if(!confirm(`Link this account and its work to ${[ro.first,ro.surname1].join(" ")} (${ro.group})?`))return;act(api.accLink(k.u,rid))},
     acchide:()=>quick(api.accHide(k.u,true)),accshow:()=>quick(api.accHide(k.u,false)),
-    cpredo:()=>{if(!confirm("Let this student do the checkpoint again? Their answers are discarded."+(elCpShown(a,S.D.ls[a.ls],S.g)?"\n\nThe answers are already shown to this group, so it stays closed for them.":"")))return;$("#dlg").close();act(api.cpRedo(u,a))}
+    cpredo:()=>{const had=!!cpDoc(u,a);if(!confirm((had?"Let this student do the checkpoint again? Their answers are discarded.":"Let this student do the checkpoint? They have not done it yet.")+(elCpClosed(a,S.D.ls[a.ls],S.g)?"\n\nIt opens for this student only: it stays closed for the rest of the group.":"")))return;$("#dlg").close();act(api.cpRedo(u,a))}
   })[k.do]?.()});
 $("#dlg").addEventListener("close",()=>redraw=null);
 document.addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)e.target.open?S.open.add(k):S.open.delete(k)},true);

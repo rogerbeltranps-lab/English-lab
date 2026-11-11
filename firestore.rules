@@ -254,20 +254,22 @@ service cloud.firestore {
       // secure recall checkpoints (shared/js/el-checkpoint.js; Roger, 31 Oct 2026: “make sure they don't cheat”): the answers are sent once.
       // A student creates the doc (only while the LS and that checkpoint are open for their group) and can never change it, except when the
       // teacher has let them do it again (redo: true). The corrections (fb) and redo are written by the teacher only; testers may delete their own.
+      // redo: true also opens it for that student alone when it is closed or shown for the group (letMe; Roger, 11 Nov 2026: "deixa fer el
+      // checkpoint a l'Ayman"): the teacher writes {redo: true} for a student who never sent it, or after their try.
       match /checkpoints/{key} {
-        function cpOk() {
+        function cpOk(letMe) {
           return request.resource.data.keys().hasOnly(['ls','activity','key','level','ids','answers','times','leaves','auto','started','sent'])
             && request.resource.data.key == key && request.resource.data.sent == request.time
             && request.resource.data.ids is list && request.resource.data.ids.size() <= 40
             && request.resource.data.answers is list && request.resource.data.answers.size() <= 40
             && ((lsOpen(request.resource.data.ls) && lsForMe(request.resource.data.ls, uid)
                   && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'locked'))
-                  && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'cpShown'))
-                  && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'cpClosed'))) || isTester());
+                  && (letMe || (!(request.resource.data.activity in lockedFor(request.resource.data.ls, 'cpShown'))
+                    && !(request.resource.data.activity in lockedFor(request.resource.data.ls, 'cpClosed'))))) || isTester());
         }
         allow read: if (signedIn() && request.auth.uid == uid) || isTeacher();
-        allow create: if signedIn() && request.auth.uid == uid && cpOk();
-        allow update: if signedIn() && request.auth.uid == uid && resource.data.get('redo', false) == true && cpOk();
+        allow create: if signedIn() && request.auth.uid == uid && cpOk(false);
+        allow update: if signedIn() && request.auth.uid == uid && resource.data.get('redo', false) == true && cpOk(true);
         allow delete: if isTester() && request.auth.uid == uid;
         allow write: if isTeacher();
       }
