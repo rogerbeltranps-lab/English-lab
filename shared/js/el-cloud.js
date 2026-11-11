@@ -127,7 +127,7 @@ const lsSt=s=>s==="public"?"open":s||"hidden";
 const lsInfo=id=>once("ls:"+id,()=>lsRead(id));
 async function lsRead(id){try{const s=await getDoc(doc(db,"ls",id));if(!s.exists())return {status:"hidden",enabled:[],groups:null,open:{}};const d=s.data();
   if(d.planEdits&&window.ELWeek&&ELWeek.applyEdits)ELWeek.applyEdits(id,d.planEdits);
-  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{}};
+  const o={status:lsSt(d.status),enabled:d.enabled||[],groups:d.groups||null,open:d.open||{},secLocked:d.secLocked||{},secOpened:d.secOpened||{},homework:d.homework||{},planEdits:d.planEdits||{},push:d.push||{},done:d.done||{},played:d.played||{},cpShown:d.cpShown||{},cpClosed:d.cpClosed||{}};   // cpShown/cpClosed: a closed recall checkpoint (elCpClosed) can't be started and no longer blocks what comes after it (problem report, 4ESOB, 11 Nov)
   lsKeep(id,o);return o}catch(e){return {status:"hidden",enabled:[],open:{}}}}
 // The last LS state read in this browser (el_ls_<id>: status, groups, open learning paths), only for a page's first drawing before the
 // sign-in is known (the LS home's learning paths, All Learning Situations). The page draws again with the state it reads now.
