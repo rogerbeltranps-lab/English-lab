@@ -341,8 +341,13 @@ async function gate(u){
   const ca=elCa(lvl);
   // Learning paths open per group (elLpOpen in el-catalog.js): a locked one shows a block and saves nothing.
   // Students always see their own answers (Roger, 26 Oct 2026): with saved work it opens read-only instead of the block.
-  if(a&&!tester&&!elLpOpen(a,info,myGroup)&&saved){freeze();banner(ca?"Aquí pots veure les teves respostes, però ara no les pots canviar.":"Here you can see your answers, but you can't change them now.","#92400e");return}
-  if(a&&!tester&&!elLpOpen(a,info,myGroup)){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.",ca);return}
+  // ↺ Let them do it (Roger, 11 Nov 2026: one student may still do a recall checkpoint that is closed or shown for the group): the
+  // teacher's redo:true on that student's try opens it for them alone (firestore.rules cpOk letMe); one read, only on such a page
+  let open=!a||elLpOpen(a,info,myGroup);
+  if(!open&&!tester&&!AS&&a.checkpoint&&elLpOpen(a,info,myGroup,true)&&elCpClosed(a,info,myGroup)){
+    try{const s=await getDoc(doc(db,"students",u.uid,"checkpoints",a.keys[0]));if(s.exists()&&s.data().redo)open=true}catch(e){console.warn("checkpoint",e)}}
+  if(a&&!tester&&!open&&saved){freeze();banner(ca?"Aquí pots veure les teves respostes, però ara no les pots canviar.":"Here you can see your answers, but you can't change them now.","#92400e");return}
+  if(a&&!tester&&!open){frozen=true;block(ca?"Aquesta activitat encara no està oberta":"This activity is not open yet",ca?"El professor l'obrirà a classe quan toqui fer-la.":"Your teacher will open it in class when it is time to do it.",ca);return}
   if(a&&!tester){const dn=new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));lockSections(elSecLockedFor(a,info,myGroup,dn),ca,a,dn,elSecSoon(a,info,myGroup,dn),myGroup);trimJump(a,info,myGroup)}
   // A recall checkpoint must be done before what comes after it in the LS (elCheckpointMissing in el-catalog.js).
   const cp=!tester&&elCheckpointMissing(a,x=>elDoneSet(localStorage.getItem(x.keys[0])),x=>elLpOpen(x,info,myGroup));

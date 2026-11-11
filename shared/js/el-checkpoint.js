@@ -258,7 +258,9 @@ window.ELCheckpoint = (function () {
     // closed by the teacher (🔒 Close or 📣 Show answers: ls/{id}.cpClosed / cpShown, elCpClosed): it can't be started or sent any more
     // (firestore.rules refuse it), so the page says so instead of "couldn't be sent" (problem report, 4ESOB, 11 Nov 2026)
     async function isClosed() { try { const A = act(key), C = window.ELCloud; if (!A || !C || !C.lsNow || !window.elCpClosed || C.viewing) return false;
-      return window.elCpClosed(A, await C.lsNow(A.ls), C.group()); } catch (e) { return false; } }
+      if (!window.elCpClosed(A, await C.lsNow(A.ls), C.group())) return false;
+      // ↺ the teacher let this student do it (redo: true): open for them alone (firestore.rules cpOk letMe; Roger, 11 Nov 2026)
+      const F = await fsLib(), d = cloud() && await F.getDoc(ref(F, key)); return !(d && d.exists() && d.data().redo); } catch (e) { return false; } }
     function closed() { stop(); exitFull();
       box().innerHTML = '<h3>🔒 ' + t('Aquest checkpoint ja està tancat', 'This checkpoint is closed') + '</h3><p>' + t('El professor l’ha tancat per al teu grup, així que ja no es pot fer ni enviar. No et bloqueja: pots continuar amb el següent Learning Path.', 'Your teacher has closed it for your group, so it can’t be done or sent any more. It doesn’t block you: you can go on to the next Learning Path.') + '</p>'; }
 
@@ -279,7 +281,7 @@ window.ELCheckpoint = (function () {
       waitCloud(async () => {
         try {
           const F = await fsLib(), s = await F.getDoc(ref(F, key)), d = s.exists() ? s.data() : null;
-          if (d && d.redo) { if (c.sentAt) { api.state.cp = {}; if (api.state.done) delete api.state.done[p.id]; api.save(); } return intro(t('El professor t’ha deixat tornar a fer aquest checkpoint.', 'Your teacher has let you do this checkpoint again.')); }
+          if (d && d.redo) { if (c.sentAt) { api.state.cp = {}; if (api.state.done) delete api.state.done[p.id]; api.save(); } return intro(d.answers ? t('El professor t’ha deixat tornar a fer aquest checkpoint.', 'Your teacher has let you do this checkpoint again.') : t('El professor t’ha obert aquest checkpoint: ja el pots fer.', 'Your teacher has opened this checkpoint for you: you can do it now.')); }
           if (d) { if (!c.ok) { Object.assign(c, { ok: true, sentAt: c.sentAt || new Date().toISOString(), level: d.level, ids: d.ids }); api.save(); } if (!(api.state.done || {})[p.id]) api.complete(p.id); return sent(d); }
           if (c.sentAt) return send(c.auto || null);   // sent here but never reached the cloud: try again
           if (!c.ids && ((api.state.done || {})[p.id] || Object.keys(api.state.first || {}).length)) return legacy();   // done before it was secure: it stays done
