@@ -276,6 +276,11 @@ function go(to){
   keep();live();draw();autoReveal();
 }
 function more(){H.step++;keep();G.fx("tap");draw()}
+// ⏭ Skip to the questions (Roger, 11 Nov 2026, playing a game again: "I can review the theory or just skip it and go to the questions"): on a
+// theory or 📝 notes slide, jump to the next question, past the rest of this run of theory and its notes slide. Key: S.
+const nextQ=()=>{for(let j=H.i+1;j<slides().length;j++)if(isQ(slides()[j]))return j;return -1};
+function skipTheory(){const j=nextQ();if(j<0||H.phase!=="show"||isQ(cur()))return;H.i=j-1;go("next")}
+const skipBtn=()=>nextQ()>=0?`<button class="btn ghost" data-do="skipth" title="Skip the theory and go straight to the next question (key S)">⏭ Skip to the questions<span class="kbd">S</span></button> `:"";
 function primary(){
   if(H.phase==="lobby")go("next");
   else if(H.phase==="show")isQ(cur())?go("reveal"):moreToShow()?more():go("next");
@@ -283,6 +288,7 @@ function primary(){
 }
 addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,select,textarea"))return;
   if([" ","Enter","ArrowRight","PageDown"].includes(e.key)){e.preventDefault();primary()}
+  else if((e.key==="s"||e.key==="S")&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&H.teacher&&H.phase==="show"&&!isQ(cur())){e.preventDefault();skipTheory()}
   if(e.key==="m"||e.key==="M"){G.sound(!G.sound());draw()}
   if((e.key==="c"||e.key==="C")&&H.phase==="show"&&cur()&&cur().ca){caOn(!caOn());draw()}});
 
@@ -352,14 +358,14 @@ function draw(){
     const block=(l,k)=>blockHtml(l,k>=n?' style="visibility:hidden"':"",s.step&&k===n-1&&k>0?" pop":"");
     app$.innerHTML=top()+`<div class="main"><div class="card theory slidein${s.wide?" wide":""}"><div class="pic">${pic(s.img)}</div><div class="tx"><h2>${md(s.theory)}</h2>${bl.map(block).join("")}
       ${ca.length&&caOn()?`<div class="ca pop"><b>En català</b>${ca.map(l=>`<p>${md(l)}</p>`).join("")}</div>`:""}</div></div>
-      <div style="text-align:right">${moreToShow()?`<span class="stepn">${n} / ${bl.length}</span> <button class="btn go" data-do="more">Show more ▼<span class="kbd">Space</span></button>`:`<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button>`}</div></div>`;return}
+      <div style="text-align:right">${skipBtn()}${moreToShow()?`<span class="stepn">${n} / ${bl.length}</span> <button class="btn go" data-do="more">Show more ▼<span class="kbd">Space</span></button>`:`<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button>`}</div></div>`;return}
   const rev=H.phase==="reveal",n=answered(H.i).length;
   if(isN(s)){   // 📝 Take your notes: the theory of the run again, small, while the students write on their devices
     const recap=s.from.map(i=>slides()[i]).map(t=>`<section><h3>${pic(t.img)} ${md(t.theory)}</h3>${(t.lines||[]).map(l=>blockHtml(l,"","")).join("")}</section>`).join("");
     app$.innerHTML=top()+`<div class="main"><div class="card notes slidein"><div class="nhead"><span class="nemo">📝</span><div><h2>Take your notes</h2>
       <p>On your Chromebook: write <b>2 sentences</b> of your own using ${noteWhat(meta().kind,H.deckId)}, and <b>anything that helps you remember</b> the theory. They are saved on your LS page, in <b>📝 Your notes</b>.</p></div>
       <div class="stat"><b>${n}</b>writing${P.length?` / ${P.length}`:""}</div></div><div class="recap">${recap}</div></div>
-      <div style="text-align:right"><button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}
+      <div style="text-align:right">${skipBtn()}<button class="btn go" data-do="next">Next ▶<span class="kbd">Space</span></button></div></div>`;return}
   if(isW(s)){
     const ok=accepted(H.i),wrong={};
     answered(H.i).forEach(a=>{if(!G.right(a[H.i],ok)){const t=G.norm(a[H.i]);wrong[t]=(wrong[t]||0)+1}});
@@ -395,6 +401,7 @@ app$.addEventListener("click",async e=>{
   if(d==="decks"){H.deck=null;H.deckId="";history.replaceState(null,"",location.pathname);draw()}
   if(d==="group")startGame(b.dataset.g);
   if(d==="next")go("next");
+  if(d==="skipth")skipTheory();
   if(d==="more")more();
   if(d==="ca"){caOn(!caOn());draw()}
   if(d==="reveal")go("reveal");

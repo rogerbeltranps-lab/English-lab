@@ -625,7 +625,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-lsvid]");i
 // and always shown (circles "–" until the student has played).
 function gamesCard(ls){
   if(!ls||!window.elGameStats||!window.elRing)return "";
-  const all=Object.values(D.mg||{}).filter(g=>g&&g.ls===ls.id),tag=window.elLsNum?elLsNum(ls):"";
+  const all=elLatestGames(Object.values(D.mg||{}).filter(g=>g&&g.ls===ls.id)),tag=window.elLsNum?elLsNum(ls):"";
   const st=elGameStats(all);
   return `<a class="hal games" href="${lsHref(ls)}#notes"><em class="lt"><b>🎯 ${t("Què entra a l'examen","What's in the exam")}${tag?` <span class="glsn">· ${esc(tag)}</span>`:""}</b><small>${t("El que hem fet, paraules clau, teoria dels jocs i els teus apunts","What we've done, key terms, theory from the games and your notes")}</small></em><span class="gopen">${t("Obre","Open")} →</span><span class="gtop"><span class="rings">${elRing(st.grammar??null,"🧩 "+t("Gramàtica","Grammar"),0,window.elGameTip&&all.length?elGameTip(all,"grammar",t(1,0)):"")}${elRing(st.vocab??null,"📚 "+t("Vocabulari","Vocabulary"),0,window.elGameTip&&all.length?elGameTip(all,"vocab",t(1,0)):"")}</span><b class="gnote" title="${t("Teoria dels jocs i els teus apunts","Theory from the games and your notes")}"><i aria-hidden="true">📝</i>${t("Els teus apunts","Your notes")}</b></span></a>`}
 function placeHtml(place,lss,ls,list,info,st,stTag,pend){
@@ -1147,7 +1147,7 @@ function progressBox(ls){const g=(window.EL_GRADING||{})[ls.id];if(!g||g.only||!
   // words (part.sn; parts with the same sn are one row, weights added, marks averaged by weight), never which activities are checkpoints or "first try"
   const SN={remember:[t("🧠 Recordar el vocabulari i la gramàtica","🧠 Remembering vocabulary and grammar"),t("Els repassos de cada learning path: quant recordes quan hi tornes","The recall activities in each learning path: how much you remember when you come back to it")],
       practice:[t("✍️ Practicar vocabulari i gramàtica","✍️ Practising vocabulary and grammar"),t("Les pestanyes de pràctica, fetes el dia que toca","The practice tabs, done by their day")],
-      games:[t("🎮 Jocs de classe","🎮 Class games"),t("El percentatge d'encerts als jocs de gramàtica i vocabulari que fem a classe. Si un dia no hi ets, aquell joc no compta.","Your % right in the grammar and vocabulary games we play in class. If you miss one, that game does not count.")],
+      games:[t("🎮 Jocs de classe","🎮 Class games"),t("El percentatge d'encerts als jocs de gramàtica i vocabulari que fem a classe. Si un dia no hi ets, aquell joc no compta. Si en tornem a jugar un, compta l'última vegada.","Your % right in the grammar and vocabulary games we play in class. If you miss one, that game does not count. If we play one again, the last time counts.")],
       skills:[t("🎧 Escoltar, llegir, parlar i escriure","🎧 Listening, reading, speaking and writing"),t("Les pestanyes d'escoltar, llegir, parlar, escriure i conversar, fetes el dia que toca: la part més gran","The listening, reading, speaking, writing and talk tabs, done by their day: the biggest part")]};
   const stu=()=>{if(!g.gv)return "";const sw=g.gv.parts.reduce((n,x)=>n+x.w,0),by=new Map();
     g.gv.parts.forEach(x=>{const k=x.sn||x.id;if(!by.has(k))by.set(k,{w:0,mw:0,ms:0,x});const y=by.get(k),m=(P.gv||{})[x.id];y.w+=x.w;if(m!=null){y.mw+=x.w;y.ms+=m*x.w}});
