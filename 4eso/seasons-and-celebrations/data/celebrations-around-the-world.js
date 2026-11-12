@@ -64,23 +64,23 @@ window.LP = {
       ] },
     // LS criterion 4.1: a reading log on two of the four texts (what, when, where, main customs, two words inferred from context). The teacher sees it on the dashboard.
     { id: 'log', type: 'step', tab: { ca: 'Registre de lectura', en: 'Reading log' }, title: { ca: 'Registre de lectura: dues celebracions', en: 'Reading log: two celebrations' }, pill: { ca: 'Ho veu el professor', en: 'Your teacher sees it' },
-      intro: { ca: 'Torna a llegir el text i omple el registre de <strong>Diwali</strong> i de <strong>Lunar New Year</strong>. Escriu notes curtes amb les teves paraules, no frases copiades.', en: 'Read the text again and log <strong>two of the four celebrations</strong> (you choose). Write short notes in your own words, not copied sentences.' },
-      html: { ca: '<div class="model"><strong>Exemple (Hanukkah):</strong> festa jueva · desembre · 8 nits · a casa, amb la família<br><strong>Costums:</strong> encenen una espelma més cada nit · mengen menjar fet amb oli<br><strong>Paraula:</strong> <em>menorah</em> = un canelobre per a espelmes. Pista: el text diu “a special candle holder”.</div>',
+      intro: { ca: 'Torna a llegir el text i omple el registre de <strong>Diwali</strong> i de <strong>Lunar New Year</strong>. Escriu notes curtes <strong>en anglès</strong>, amb les teves paraules, no frases copiades. Les preguntes estan en català per ajudar-te, però <strong>escriu les respostes en anglès</strong>.', en: 'Read the text again and log <strong>two of the four celebrations</strong> (you choose). Write short notes <strong>in English</strong>, in your own words, not copied sentences.' },
+      html: { ca: '<div class="model"><strong>Exemple de notes en anglès (Hanukkah):</strong> Jewish festival · December · eight nights · at home, with the family<br><strong>Costums:</strong> one more candle every night · food cooked in oil<br><strong>Paraula:</strong> <em>menorah</em> = a candle holder. Pista: “families light one more candle on a menorah”.</div>',
         en: '<div class="model"><strong>Model (Hanukkah):</strong> Jewish festival · December · eight nights · at home, with the family<br><strong>Customs:</strong> one more candle every night · food cooked in oil<br><strong>Word:</strong> <em>menorah</em> = a candle holder. Clue: “families light one more candle on a menorah”.</div>' },
       fields: [
-        { id: 'w1', label: { ca: 'Diwali: què és, quan i on', en: 'Text 1: which celebration? What is it, when and where?' }, rows: 2 },
-        { id: 'c1', label: { ca: 'Diwali: els costums principals (2–3)', en: 'Text 1: the main customs (2–3)' }, rows: 2 },
-        { r: 'insecure', id: 'w2', label: { ca: 'Lunar New Year: què és, quan i on', en: 'Text 2: which celebration? What is it, when and where?' }, rows: 2 },
-        { r: 'insecure', id: 'c2', label: { ca: 'Lunar New Year: els costums principals (2–3)', en: 'Text 2: the main customs (2–3)' }, rows: 2 },
-        { id: 'v1', label: { ca: 'Paraula 1 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 1 you worked out from context: the word, what it means and the clue in the text' }, rows: 2 },
-        { r: 'insecure', id: 'v2', label: { ca: 'Paraula 2 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 2 you worked out from context: the word, what it means and the clue in the text' }, rows: 2 },
-        { r: 'daring', id: 'why', label: 'Why does one of these customs matter to the people who celebrate it? (The text does not say it directly: explain how you know.)', rows: 2 }
+        { id: 'w1', label: { ca: 'Diwali: què és, quan i on', en: 'Text 1: which celebration? What is it, when and where?' }, ph: 'A … festival · in … · in …', rows: 2 },
+        { id: 'c1', label: { ca: 'Diwali: els costums principals (2–3)', en: 'Text 1: the main customs (2–3)' }, ph: 'People … · They …', rows: 2 },
+        { r: 'insecure', id: 'w2', label: { ca: 'Lunar New Year: què és, quan i on', en: 'Text 2: which celebration? What is it, when and where?' }, ph: 'A … festival · in … · in …', rows: 2 },
+        { r: 'insecure', id: 'c2', label: { ca: 'Lunar New Year: els costums principals (2–3)', en: 'Text 2: the main customs (2–3)' }, ph: 'People … · They …', rows: 2 },
+        { id: 'v1', label: { ca: 'Paraula 1 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 1 you worked out from context: the word, what it means and the clue in the text' }, ph: '… = … · Clue: “…”', rows: 2 },
+        { r: 'insecure', id: 'v2', label: { ca: 'Paraula 2 que has entès pel context: la paraula, què vol dir i quina pista del text t’ho diu', en: 'Word 2 you worked out from context: the word, what it means and the clue in the text' }, ph: '… = … · Clue: “…”', rows: 2 },
+        { r: 'daring', id: 'why', label: 'Why does one of these customs matter to the people who celebrate it? (The text does not say it directly: explain how you know.)', ph: 'It matters because … · I know because the text says …', rows: 2 }
       ],
       rate: {
-        beginners: ['He escrit notes curtes amb les meves paraules', 'He triat els costums principals de Diwali', 'He entès una paraula pel context'],
-        insecure: ['He escrit notes curtes amb les meves paraules', 'He triat els costums principals, no detalls petits', 'He entès dues paraules pel context'],
-        safe: ['My notes are short and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context'],
-        daring: ['My notes are short and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context and can explain the clue']
+        beginners: ['He escrit notes curtes en anglès, amb les meves paraules', 'He triat els costums principals de Diwali', 'He entès una paraula pel context'],
+        insecure: ['He escrit notes curtes en anglès, amb les meves paraules', 'He triat els costums principals, no detalls petits', 'He entès dues paraules pel context'],
+        safe: ['My notes are short, in English and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context'],
+        daring: ['My notes are short, in English and in my own words', 'I chose the main customs, not small details', 'I worked out two words from context and can explain the clue']
       } },
     { id: 'listen', type: 'mc', tab: 'Listening', title: { ca: 'Listening real: Happy Diwali', en: 'Real listening: Happy Diwali' }, pill: { ca: 'Vídeo real · BBC', en: 'Real video · BBC' },
       intro: { ca: 'Vídeo real de la BBC (British Council). Mira’l una vegada per la idea general i una altra per als detalls. No cal entendre totes les paraules.', en: 'A real BBC video (British Council). Watch once for the general idea and again for the details. You don’t need every word.' },
