@@ -93,7 +93,7 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .cstu{padding:9px 0;border-top:1px solid #eef2f7}.cst{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.chead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:2px 0 6px}.cst .cfix,.chead .cfix,.cst .cask,.chead .cask{margin-left:auto}
 button.cfix{background:#3157d5;color:#fff;border:0;border-radius:10px;padding:5px 12px;font-weight:700;cursor:pointer}button.cfix:hover{background:#2443ad}.cask{margin-left:auto;color:#15803d;font-weight:700;font-size:14px}
 .cnum{display:inline-block;margin:2px 10px 0 0;font-size:14px;color:#334155;white-space:nowrap}details.cgrp,details.cday{border-top:1px solid #e2e8f0;padding:8px 0}details.cgrp>summary,details.cday>summary{cursor:pointer}details.cday h3{margin:10px 0 2px;font-size:.95rem;color:#475569}
-p.hal{display:block;padding:10px 14px;border-radius:12px}p.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}.tside .nv small.ask{opacity:1;background:#fef3c7;color:#92400e;border-radius:999px;padding:0 6px;font-weight:800}.nv small.late{opacity:1;color:#b91c1c;font-weight:800}
+li.askhi{background:#fef3c7;border-radius:8px;transition:background .4s}p.hal{display:block;padding:10px 14px;border-radius:12px}p.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}.tside .nv .gn{white-space:nowrap;margin-right:auto}.tside .nv small.ask{cursor:pointer;white-space:nowrap;margin-left:-2px;opacity:1;background:#fef3c7;color:#92400e;border-radius:999px;padding:0 6px;font-weight:800}.nv small.late{opacity:1;color:#b91c1c;font-weight:800}
 a.hal{display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:16px;text-decoration:none;font-size:16px}a.hal span{margin-left:auto;font-weight:800;white-space:nowrap}a.hal.late{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}a.hal.news{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}a.hal:hover{filter:brightness(.97)}
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}a.tile{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;color:#0f172a;text-decoration:none;min-height:112px;box-sizing:border-box}a.tile:hover{border-color:#3157d5;box-shadow:0 4px 14px #3157d51f}
 a.tile .ti{display:flex;justify-content:space-between;align-items:center;font-size:28px;line-height:1}a.tile .tb{font-size:13px;font-weight:700;color:#fff;background:#3157d5;border-radius:999px;padding:3px 9px}a.tile .tb.late{background:#dc2626}a.tile b{font-size:17px}a.tile small{color:#64748b;font-size:14px;display:block;margin-top:2px}
@@ -1395,7 +1395,7 @@ function render0(){
     +`<button class="nv ann" data-do="annnew" title="Send a message to one group, a whole course, every group or some students. Sent ones are in 💬 Messages">📣 Announcement</button>`
     +`<button class="nv ${mtOn()?"mton":""}" data-do="mtdlg" title="Close the site to students for a while: they see a maintenance message with worksheets to print">🛠 Maintenance${mtOn()?'<small class="mt">ON</small>':""}</button>`
     +nv("plan","🏠 Home",S.g==="plan"&&(S.place||"home")!=="home"?"off":"","How each class is doing: work done in each learning path, first tries, games and marks")
-    +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,esc(g.name),"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`+askBadge(inGr(g.id).filter(s=>!s.away).reduce((n,s)=>n+lvAsks(s.uid).length,0)))).join("")
+    +`<div class="lab">Groups</div>`+GR.map(g=>nv(g.id,`<span class="gn">${esc(g.name)}</span>`,"c"+g.course,listed()?"Signed in / on the student list":"Students",`<small>${cnt(g.id)}</small>`+askBadge(inGr(g.id).filter(s=>!s.away).reduce((n,s)=>n+lvAsks(s.uid).length,0),g.id))).join("")
     +(n("none")||S.g==="none"?nv("none",listed()?"Not on the list":"No group","cnone","",`<small>${n("none")}</small>`):"")
     +`<div class="sep"></div>`
     +nv("corr","✏️ Corrections","","What Claude corrected and when, what is still waiting, and Correct everything waiting now",corrBadge())
@@ -1782,7 +1782,8 @@ function corrOpen(k){const a=byId(k.a);if(!a)return;S.ls=a.ls;const f=flagOf(k.u
 const corrN=()=>{if(CORR.busy||corrOld().length&&!CORR.failT)return {n:0,chk:true};try{const w=corrScan().wait.filter(i=>i.k!=="copy"&&i.ready);return {n:w.length,late:w.some(i=>i.late)}}catch(e){console.warn("corrections",e);return {n:0}}};
 // 🎯 level change requests a student sent from their board or LS page (levels/{ls}.request, already loaded for every student: no new reads)
 const lvAsks=u=>Object.entries(S.D.lv[u]||{}).filter(([id,l])=>l&&l.request&&EL_LS.some(x=>x.id===id));
-const askBadge=n=>n?` <small class="ask" title="${n} level change request${n>1?"s":""}: see the group's To do">🎯${n}</small>`:"";
+// the badge says what it is and opens the request itself (Roger, 10 Nov 2026: "I dont understand the target on the 2a")
+const askBadge=(n,g)=>n?` <small class="ask" data-do="ask" data-g="${g}" role="link" title="${n} student${n>1?"s":""} asked for a level change: click to answer (Accept or Decline in the group's To do)">🎯 ${n} level ask${n>1?"s":""}</small>`:"";
 const corrBadge=()=>{const c=corrN();if(c.chk)return `<small title="Fetching the latest work">⏳</small>`;return c.n?`<small class="${c.late?"late":""}" title="${c.n} waiting to be corrected">${c.n}</small>`:""};
 function corrTile(){const c=corrN(),st=corrState(),nx=corrNext();
   const sub=st.s==="running"?"Claude is correcting now":st.s==="asked"?"you asked for a correction":(c.chk?"checking what is waiting · ":c.n?c.n+" waiting · ":"")+"next: "+(nx?nx.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"Wednesday")+" 15:00";
@@ -4197,7 +4198,10 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     if(from&&to&&from!==to&&!k.ls){const l=EL_LS.find(x=>x.id===S.ls);
       if(l&&l.course!==to.course){const m=EL_LS.filter(x=>x.course===to.course)[EL_LS.filter(x=>x.course===l.course).indexOf(l)];S.ls=m?m.id:null}}
     else if(S.g!==k.g||S.place!=="home"){S.place="home";S.year=false}
-    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},place:()=>{e.preventDefault();if(k.p==="cov"&&t.classList.contains("tile"))S.cov.auto=true;t.classList.contains("back")?navBack(k.p):goPlace(k.p)},bgo:()=>{e.preventDefault();S.tutor="all";S.year=false;S.stuBoth=false;
+    S.g=k.g;S.tutor="all";if(k.ls)S.ls=k.ls;render();scrollTo(0,0)},ask:()=>{e.preventDefault();e.stopPropagation();S.g=k.g;S.tutor="all";S.year=false;S.place="todo";render();
+    const li=[...document.querySelectorAll("li")].find(l=>l.textContent.trim().startsWith("🎯"));
+    if(li){li.scrollIntoView({block:"center"});li.classList.add("askhi");setTimeout(()=>li.classList.remove("askhi"),2500)}else scrollTo(0,0)},
+    place:()=>{e.preventDefault();if(k.p==="cov"&&t.classList.contains("tile"))S.cov.auto=true;t.classList.contains("back")?navBack(k.p):goPlace(k.p)},bgo:()=>{e.preventDefault();S.tutor="all";S.year=false;S.stuBoth=false;
       if(k.p==="qa"){S.qa.ls=k.ls;S.qa.g=k.g;S.g="qa";S.place="home";render();scrollTo(0,0);return}
       S.g=k.g;S.ls=k.ls||null;const l=EL_LS.find(x=>x.id===k.ls);if(l)S.term="t"+lsTerm(l);
       if(k.lp){acts(k.ls).forEach(x=>{if(x.id!==k.lp)S.folded.add(x.id)});S.folded.delete(k.lp)}if(k.p==="todo")S.open.add("cpbox");
