@@ -8,7 +8,8 @@
 <link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
 <!-- ✅ Correct together (Roger, 12 Nov 2026): the class corrects a reading on the projector, every level at once.
      ?ls=<course>/<ls folder>&lp=<data file>&tab=read|log[&g=<group id>][&embed=1]
-     Opened from the class tab (✅ Correct on the class mode bar, on a Reading or Reading log tab) or from 📋 Today; embed=1: it sits over
+     The Reading tab starts with 📖 Read together (one level's version, a paragraph at a time) and ⏱ Your turn (a countdown while each
+     student answers their own level), then the questions. Opened from the class tab (✅ Correct on the class mode bar, on a Reading or Reading log tab) or from 📋 Today; embed=1: it sits over
      the class tab (shared/correct/open.js) and ✕ Close takes it away. Teacher only. Reads the Learning Path's data (never changes it) and,
      with a group, the students' saved answers once (one read per student) for "Right in the class". correct.js draws it. -->
 <style>
@@ -52,6 +53,15 @@ table.log{border-collapse:collapse;width:100%;table-layout:fixed}
 .bar button.pri{background:#ffd34d;color:var(--ink)}.bar button:disabled{opacity:.4;cursor:default}
 .bar .keys{color:#8fb0c2;font-size:13px}
 .msg{color:#fff;padding:30px;font-size:18px}
+.chip.lvb{border:0;cursor:pointer;font-family:inherit}.chip.lvb:hover{outline:2px solid var(--blue)}
+.rt{max-width:1050px}.rt p{font-size:23px;line-height:1.6;margin:0 0 14px;padding:4px 12px;border-left:5px solid transparent;border-radius:6px;cursor:pointer}
+.rt.focus p{opacity:.4}.rt.focus p.cur{opacity:1;border-left-color:#ffd34d;background:#fffbea}
+.timer{font-size:120px;font-weight:800;line-height:1.1;margin:10px 0;font-variant-numeric:tabular-nums}.timer.up{color:#b91c1c}
+.tbtn{display:flex;gap:8px;flex-wrap:wrap}.tbtn button,.sm{font:700 16px system-ui,sans-serif;padding:8px 16px;border-radius:10px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.tbtn button.on{border-color:var(--blue);color:var(--blue)}.tbtn .pri2{background:#ffd34d;border-color:#ffd34d}.sm{font-size:14px;padding:4px 12px;margin-left:8px}
+.ca{font-size:18px;color:var(--muted);margin:-6px 0 4px}.done{font-size:18px;margin-top:18px}
+#tmini{font-weight:800;color:#ffd34d;font-variant-numeric:tabular-nums}
+@media (max-width:900px){.rt p{font-size:19px}.timer{font-size:80px}}
 @media (max-width:900px){.where{grid-template-columns:1fr 1fr}h1{font-size:26px}.ans{font-size:22px}.class{float:none;text-align:left;max-width:none;margin:0 0 8px}.bar .keys{display:none}}
 @media (max-width:560px){.where{grid-template-columns:1fr}.top{padding:8px 16px}main{padding:10px 16px}.card{padding:14px 16px}.log td.lab{width:34%}}
 body.locked>*:not(#gate){display:none!important}
@@ -62,7 +72,7 @@ body.locked #gate{display:block}
 </head>
 <body class="locked">
 <div id="gate"></div>
-<div class="top"><b>✅ Correct together</b><span class="sub" id="sub"></span><span class="sp"></span><div class="dots" id="dots"></div></div>
+<div class="top"><b>✅ Correct together</b><span class="sub" id="sub"></span><span id="tmini"></span><span class="sp"></span><div class="dots" id="dots"></div></div>
 <main><div class="msg" id="out">Loading…</div></main>
 <div class="bar" id="bar"></div>
 <script src="../js/el-catalog.js"></script>

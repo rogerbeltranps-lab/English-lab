@@ -11,7 +11,13 @@ const base="../../"+LS+"/";
 const load=src=>new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=no;document.head.append(s)});
 const tx=o=>o==null?"":typeof o==="string"?o:(o.en||o.ca||"");
 
-let slides=[],at=0,shown=new Set(),LP=null,CLASS=null;   // CLASS: {n students, by: {panel|qid|route: [values]}}
+let slides=[],at=0,shown=new Set(),LP=null,CLASS=null,CTX=null;   // CLASS: {n students, by: {panel|qid|route: [values]}}
+/* 📖 Read together, then ⏱ Your turn (Roger, 12 Nov 2026: "can we read together instead of everyone having a different text, and then
+   leave time for each one to do their level"): before the questions, one level's version of the text on the projector, a paragraph at a
+   time (all the levels have the same text, longer as the level goes up), then a countdown while each student answers their own level's
+   questions on the Chromebook, with their own text there. RL: the version read together (kept per course in this browser). */
+const RL_K="el_rt_level_"+course;let RL="insecure",RP=-1;try{const v=localStorage.getItem(RL_K);if(ROUTES.includes(v))RL=v}catch(e){}
+const TM={len:600,left:600,on:false,iv:null};
 
 async function build(){
   if(!/^[24]eso\/[a-z0-9-]+$/.test(LS)||!/^[a-z0-9-]+$/.test(LPF))throw new Error("Which reading? The link has no learning path.");
@@ -22,6 +28,7 @@ async function build(){
   const ctx={LP,key:LS+"/"+LPF,routes:ROUTES,chat,notes,textPanel:read};
   const panels=[read,log].filter(p=>p&&(p.items||p.fields));
   panels.forEach(p=>{slides=slides.concat(X.slidesFor(ctx,p,false))});
+  CTX=ctx;if(read&&read.media&&read.media.text&&read.items)slides.unshift({kind:"readall",panel:"read"},{kind:"turn",panel:"read"});
   // Pro (4 ESO): its own essay and questions, last; only when the group has a Pro student (or no group is given)
   if(course==="4eso"){
     try{await load(base+"data/native/"+LPF+".js")}catch(e){}
@@ -37,16 +44,16 @@ async function classAnswers(){
   if(!G)return null;
   const app=getApps()[0]||initializeApp(CONFIG),db=getFirestore(app),lsId=LS.replace("/","-");
   const st=await getDocs(query(collection(db,"students"),where("group","==",G)));
-  const by={},lv={};let n=0;
+  const by={},lv={};let n=0,done=0;
   await Promise.all(st.docs.map(async s=>{
     const p=await getDoc(doc(db,"students",s.id,"progress",lsId)).catch(()=>null);
     const d=p&&p.exists()?(p.data().data||{}):{};let state=null;try{state=JSON.parse(d[LP.key]||"null")}catch(e){}
     const L=d[LP.key+"Level"]||null;if(L)lv[L]=(lv[L]||0)+1;
-    if(!state||!state.ans)return;n++;
+    if(!state||!state.ans)return;n++;if(state.ans.read)done++;
     Object.entries(state.ans).forEach(([pid,a])=>{if(!a||!Array.isArray(a.v)||!Array.isArray(a.q))return;
       a.q.forEach((q,i)=>{const v=a.v[i];if(v==null||v==="")return;const k=pid+"|"+q+"|"+(a.l||"");(by[k]=by[k]||[]).push(v)})});
   }));
-  return {n,by,lv,students:st.size};
+  return {n,by,lv,done,students:st.size};
 }
 // right / answered for one question: MC answers are the option's place in the data (0 = the right one), typed ones are compared as text
 function tally(panel,qid,routes,item){
@@ -96,24 +103,52 @@ function logSlide(s,open){
       return `<tr><td class="lab">${esc(r.label)}${lab}</td>${r.cells.map(c=>c===null?'<td class="na">not in your log</td>':!open?'<td class="hid">…</td>':`<td>${esc(c)||"—"}</td>`).join("")}</tr>`}).join("")+
     `</tbody></table>`+(has?"":`<p class="hint">No model notes yet for this log.</p>`);
 }
-const label=s=>s.kind==="log"?"📝":s.pro?"P"+(slides.filter(x=>x.pro).indexOf(s)+1):String(slides.filter(x=>!x.pro&&x.kind!=="log"&&x.panel===s.panel).indexOf(s)+1);
+function readAll(){
+  const t=X.textFor(CTX,LP.panels.find(p=>p.id==="read"),RL),paras=[];
+  t.units.forEach(u=>{const last=paras[paras.length-1];if(last&&last.p===u.p&&!t.chat)last.s.push(u.s);else paras.push({p:u.p,s:[u.s],who:u.who})});
+  return `<div class="chips"><span class="chip all">📖 Read together</span>${ROUTES.map(r=>`<button class="chip lvb ${r===RL?"on":""}" data-rl="${r}" title="Read the ${NAME[r]} version together">${NAME[r]}</button>`).join("")}</div>`+
+    `<div class="rt ${RP>=0?"focus":""}">`+paras.map((x,i)=>`<p class="${i===RP?"cur":""}" data-rp="${i}">${x.who?"<b>"+esc(x.who)+":</b> ":""}${x.s.map(esc).join(" ")}</p>`).join("")+`</div>`+
+    `<p class="hint">Everyone reads the ${NAME[RL]} version now. Core and Plus have a few more details in their own text on the Chromebook.</p>`;
+}
+const mmss=n=>Math.floor(n/60)+":"+String(n%60).padStart(2,"0");
+function turn(){
+  const who=G&&CLASS?`<p class="done">✅ ${CLASS.done} of ${CLASS.students} have checked the reading <button class="sm" data-k="who">🔄 Update</button></p>`:G?`<p class="done"><button class="sm" data-k="who">🔄 Who has finished?</button></p>`:"";
+  return `<div class="chips"><span class="chip all">⏱ Your turn</span></div><h1>Answer the questions of your level on your Chromebook</h1>`+
+    `<p class="ca">Respon les preguntes del teu nivell al Chromebook. Pots tornar a llegir el teu text.</p>`+
+    `<div class="timer ${TM.left<=0?"up":""}" id="tbig">${TM.left<=0?"⏰ Time!":mmss(TM.left)}</div>`+
+    `<div class="tbtn"><button data-k="tgo" class="pri2">${TM.on?"⏸ Pause":TM.left<TM.len&&TM.left>0?"▶ Go on":"▶ Start"}</button>${[5,10,15].map(m=>`<button data-tm="${m}" class="${TM.len===m*60?"on":""}">${m} min</button>`).join("")}<button data-tm="+1">+1 min</button></div>`+who;
+}
+function tick(){if(!TM.on)return;TM.left=Math.max(0,TM.left-1);if(!TM.left){TM.on=false;clearInterval(TM.iv)}
+  const b=$("tbig");if(b){b.textContent=TM.left?mmss(TM.left):"⏰ Time!";b.classList.toggle("up",!TM.left)}
+  const m=$("tmini");if(m)m.textContent=(TM.on||TM.left<TM.len)&&!(slides[at]&&slides[at].kind==="turn")?"⏱ "+(TM.left?mmss(TM.left):"Time!"):"";
+  if(!TM.on&&slides[at]&&slides[at].kind==="turn")draw()}
+function timer(k){if(k==="tgo"){TM.on=!TM.on&&TM.left>0;clearInterval(TM.iv);if(TM.on)TM.iv=setInterval(tick,1000)}
+  else if(k==="+1"){TM.left+=60;TM.len=Math.max(TM.len,TM.left)}else{TM.len=TM.left=+k*60;TM.on=false;clearInterval(TM.iv)}draw()}
+const label=s=>s.kind==="readall"?"📖":s.kind==="turn"?"⏱":s.kind==="log"?"📝":s.pro?"P"+(slides.filter(x=>x.pro).indexOf(s)+1):String(slides.filter(x=>!x.pro&&/shared|own/.test(x.kind)&&x.panel===s.panel).indexOf(s)+1);
 function draw(){
   const s=slides[at],open=shown.has(at);
-  $("out").outerHTML=`<div class="card" id="out">${!s?"":s.kind==="log"?logSlide(s,open):s.kind==="own"?own(s,open):shared(s,open)}</div>`;
+  $("out").outerHTML=`<div class="card" id="out">${!s?"":s.kind==="readall"?readAll():s.kind==="turn"?turn():s.kind==="log"?logSlide(s,open):s.kind==="own"?own(s,open):shared(s,open)}</div>`;
+  const m=$("tmini");if(m)m.textContent=(TM.on||TM.left<TM.len)&&s&&s.kind!=="turn"?"⏱ "+(TM.left?mmss(TM.left):"Time!"):"";
   let lastPanel=null;
   $("dots").innerHTML=slides.map((x,i)=>{const gap=lastPanel&&lastPanel!==x.panel+(x.pro?"p":"")?'<span class="gap"></span>':"";lastPanel=x.panel+(x.pro?"p":"");
-    return gap+`<button data-i="${i}" class="${i===at?"now":shown.has(i)?"seen":""}" title="${x.kind==="log"?"Reading log":x.pro?"Pro":x.panel==="log"?"Reading log":"Reading"}">${label(x)}</button>`}).join("");
+    return gap+`<button data-i="${i}" class="${i===at?"now":shown.has(i)?"seen":""}" title="${x.kind==="readall"?"Read together":x.kind==="turn"?"Your turn: each level answers":x.kind==="log"?"Reading log":x.pro?"Pro":x.panel==="log"?"Reading log":"Reading"}">${label(x)}</button>`}).join("");
+  const plain=s&&(s.kind==="readall"||s.kind==="turn"),last=s&&s.kind==="readall"?document.querySelectorAll(".rt p").length-1:0;
   $("bar").innerHTML=`<button data-k="back" ${at?"":"disabled"}>◀ Back</button>`+
-    (open?`<button class="pri" data-k="next" ${at<slides.length-1?"":"disabled"}>Next ▶</button>`:`<button class="pri" data-k="show">👁 ${s&&s.kind==="log"?"Show the model notes":"Show the answer"}</button>`+`<button data-k="next" ${at<slides.length-1?"":"disabled"}>Next ▶</button>`)+
+    (plain?(s.kind==="readall"&&RP<last?`<button class="pri" data-k="para">▶ ${RP<0?"Start reading":"Next paragraph"}</button><button data-k="next">Skip ▶</button>`:`<button class="pri" data-k="next">Next ▶</button>`):open?`<button class="pri" data-k="next" ${at<slides.length-1?"":"disabled"}>Next ▶</button>`:`<button class="pri" data-k="show">👁 ${s&&s.kind==="log"?"Show the model notes":"Show the answer"}</button>`+`<button data-k="next" ${at<slides.length-1?"":"disabled"}>Next ▶</button>`)+
     `<button data-k="close">✕ Close</button><span class="keys">Space: show / next · ← →</span>`;
-  document.querySelector("main").scrollTop=0;
+  const cur=document.querySelector(".rt p.cur");if(cur)cur.scrollIntoView({block:"center"});else document.querySelector("main").scrollTop=0;
 }
-function act(k){if(k==="back"&&at>0)at--;else if(k==="next"&&at<slides.length-1)at++;else if(k==="show")shown.add(at);else if(k==="close")return closeIt();draw()}
+function act(k){if(k==="para"){const n=document.querySelectorAll(".rt p").length;if(RP<n-1)RP++;else if(at<slides.length-1)at++;}
+  else if(k==="who"){classAnswers().then(c=>{CLASS=c;draw()}).catch(e=>console.warn("class answers",e));return}
+  else if(k==="tgo")return timer(k);
+  else if(k==="back"&&at>0)at--;else if(k==="next"&&at<slides.length-1)at++;else if(k==="show")shown.add(at);else if(k==="close")return closeIt();draw()}
 function closeIt(){if(EMBED&&parent!==window)parent.postMessage({elCorrect:"close"},location.origin);else if(history.length>1)history.back();else window.close()}
-document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.i!=null){at=+b.dataset.i;draw()}else if(b.dataset.k)act(b.dataset.k)});
+document.addEventListener("click",e=>{const p=e.target.closest(".rt p[data-rp]");if(p){RP=+p.dataset.rp;return draw()}
+  const b=e.target.closest("button");if(!b)return;if(b.dataset.i!=null){at=+b.dataset.i;draw()}else if(b.dataset.rl){RL=b.dataset.rl;try{localStorage.setItem(RL_K,RL)}catch(x){}draw()}
+  else if(b.dataset.tm)timer(b.dataset.tm==="+1"?"+1":b.dataset.tm);else if(b.dataset.k)act(b.dataset.k)});
 document.addEventListener("keydown",e=>{if(e.target.closest("input,textarea"))return;
   if(e.key==="ArrowRight"||e.key==="PageDown")act("next");else if(e.key==="ArrowLeft"||e.key==="PageUp")act("back");
-  else if(e.key===" "||e.key==="Enter"){e.preventDefault();act(shown.has(at)?"next":"show")}else if(e.key==="Escape")act("close")});
+  else if(e.key===" "||e.key==="Enter"){e.preventDefault();const k=(slides[at]||{}).kind;act(k==="readall"?"para":k==="turn"||shown.has(at)?"next":"show")}else if(e.key==="Escape")act("close")});
 
 async function run(){
   await build();
@@ -126,7 +161,7 @@ async function run(){
   try{CLASS=await classAnswers()}catch(e){console.warn("class answers",e)}
   if(slides.pro&&(!CLASS||CLASS.lv.native))slides=slides.concat(slides.pro);
   if(!slides.length){$("out").textContent="This step has no questions to correct together.";return}
-  const i=slides.findIndex(s=>s.panel===TAB&&!s.pro);at=i<0?0:i;
+  const i=slides.findIndex(s=>s.panel===TAB&&!s.pro);at=i<0?0:i;   // the Reading tab starts with 📖 Read together
   draw();
 }
 // after the teacher's sign-in (teacher-gate.js shows the sign-in box until then)
