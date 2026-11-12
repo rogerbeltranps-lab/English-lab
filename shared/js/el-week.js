@@ -127,6 +127,13 @@
           const mv1=(id,v)=>v&&ag.base&&ag.base[id]&&last[id]&&last[id]!==ag.base[id]?this.shiftClass(gid,ag.base[id],v,last[id]):v;
           [["due","due0"],["optional","opt0"]].forEach(([f,f0])=>Object.entries(ag[f0]||{}).forEach(([id,v])=>{if(dr.includes(id))return;if(!p[f])p[f]={};if(!p[f][id])p[f][id]=p.groups.map(()=>null);p[f][id][gi]=mv1(id,v)}));
           Object.entries(ag.step0||{}).forEach(([id,o])=>{if(dr.includes(id)||!p.stepDue||!p.stepDue[id])return;Object.entries(o||{}).forEach(([st,v])=>{const a=p.stepDue[id][st];if(a)a[gi]=mv1(id,v)})});
+          // 📖 Book (Roger, 12 Nov 2026: "a Book LP with a section per chapter, and we allocate time on the agenda"): a path with agendaDue in
+          // EL_CATALOG has no dates in the plan, so each of its tabs is due on the day it sits on this group's agenda (stepDue) and the path on
+          // its last day (due); a tab not on the agenda has no deadline and never counts as missing.
+          const tday={};ds.forEach(d=>(ag.days[d]||[]).forEach(it=>{const m=/^([^#]+)#(?!game:)(.+)$/.exec(it||"");if(m)(tday[m[1]]=tday[m[1]]||{})[m[2]]=d}));
+          ((typeof window!=="undefined"&&window.EL_CATALOG)||[]).filter(a=>a.agendaDue&&a.ls===ls&&!dr.includes(a.id)&&tday[a.id]).forEach(a=>{const o=tday[a.id];
+            if(!p.due)p.due={};if(!p.due[a.id])p.due[a.id]=p.groups.map(()=>null);p.due[a.id][gi]=Object.values(o).sort().pop();
+            if(!p.stepDue)p.stepDue={};const sd=p.stepDue[a.id]=p.stepDue[a.id]||{};Object.entries(o).forEach(([k,d])=>{if(!sd[k])sd[k]=p.groups.map(()=>null);sd[k][gi]=d})});
           return}
         es.filter(([k,e])=>!e.add&&!/^(drop|noself|nohw):/.test(k)).forEach(([orig,e])=>{if(e.tabs&&e.tabs.length)tb[orig]=e.tabs;if(!ok(e.to))return;
           const ri=p.rows.findIndex(r=>r.from&&get(r,gi).includes(orig));if(ri<0)return;const old=this.lineDay(p.rows[ri].from,orig);if(!old||old===e.to)return;

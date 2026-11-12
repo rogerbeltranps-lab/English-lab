@@ -2743,7 +2743,8 @@ const shortTi=a=>a.title.split(/[:(]/)[0].trim();
 const isLpA=a=>!/checkpoint|sample exam|final product|reflect/i.test(a.title);
 // "LP3 Now or usually?" (its number in the plan, else its place among the LS's learning paths), "Final product", else the short title
 function agLab(x,a){if(/final product/i.test(a.title))return "Final product";
-  const n=(Object.entries(lpMap(x)).find(([,b])=>b===a)||[])[0]||(isLpA(a)?String(acts(x.ls).filter(isLpA).indexOf(a)+1):null);
+  if(a.agendaDue)return "📖 "+a.title;   // the Book (Roger, 12 Nov 2026): no LP number, and it never shifts the others' numbers
+  const n=(Object.entries(lpMap(x)).find(([,b])=>b===a)||[])[0]||(isLpA(a)?String(acts(x.ls).filter(b=>isLpA(b)&&!b.agendaDue).indexOf(a)+1):null);
   return n?"LP"+n+" "+shortTi(a):shortTi(a)}
 // a tab named on its own in a plan line ("Step 1 My source", "Fact file"): "activity#panel"
 function secHit(x,seg){const s=nrm(seg);let best=null;

@@ -105,6 +105,8 @@ window.EL_CATALOG=(function(){
       const C={mode:"practice",checkpoint:true};   // recall checkpoint: opens the way to what comes after it (elCheckpointMissing)
       return [
         L("getting-started.html","Getting started: Castanyada & Halloween (warm-up)",["4.1","2.2"],"ls2GettingStarted4ESO",5,{graded:false}),
+        // 📖 Book (Roger, 12 Nov 2026): the LS reading story, a tab per chapter (tools/reading-story/lp.py); its tabs are due on their day on the Time plan agenda (agendaDue, el-week.js). Before checkpoint 1, so no checkpoint ever closes it.
+        L("book.html","Book: Lantern Night",["4.1"],"ls2Book4ESO",6,{agendaDue:true}),
         L("celebrations-around-the-world.html","Celebrations around the world",["4.1","2.2","5.1","3.2","1.1"],"ls2Celebrations4ESO",10,{steps:[["log","Reading log"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint14ESO",1,C),
         L("where-traditions-come-from.html","Where traditions come from",["2.2","5.1","1.2","3.2"],"ls2Traditions4ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
@@ -125,6 +127,8 @@ window.EL_CATALOG=(function(){
       const C={mode:"practice",checkpoint:true};   // recall checkpoint: opens the way to what comes after it (elCheckpointMissing)
       return [
         L("getting-started.html","Getting started: what do you do in your free time? (warm-up)",["4.1","2.2"],"ls2GettingStarted2ESO",6,{graded:false}),
+        // 📖 Book (Roger, 12 Nov 2026): the LS reading story, a tab per chapter (tools/reading-story/lp.py); its tabs are due on their day on the Time plan agenda (agendaDue, el-week.js). Before checkpoint 1, so no checkpoint ever closes it.
+        L("book.html","Book: Maya Live!",["4.1"],"ls2Book2ESO",6,{agendaDue:true}),
         L("what-are-they-doing.html","What are they doing?",["4.1","2.2","5.1","3.2"],"ls2Doing2ESO",13,{steps:[["log","Reading log"],["talk","Talk"]]}),
         L("recall-checkpoint-1.html","Recall checkpoint 1",["4.1","5.1"],"ls2Checkpoint12ESO",1,C),
         L("now-or-usually.html","Now or usually?",["2.2","5.1","3.2"],"ls2NowUsually2ESO",11,{steps:[["chart","Listening chart"],["talk","Talk"]]}),
@@ -515,6 +519,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]};
   Object.assign(window.EL_ACTIONS,{
     "4eso/ls2-getting-started":["recall","words","read","listen","speak"],
+    "4eso/ls2-book":["ch1","ch2","ch3","ch4","ch5","ch6"],
     "4eso/ls2-celebrations-around-the-world":[...LP,"read","log","listen","grammar","mixed","write","speak"],
     "4eso/ls2-where-traditions-come-from":[...LP,"listen","chart","shadow","grammar","mixed","write","speak","talk"],
     "4eso/ls2-research-it-right":["recall","read","sources","respect","notes","credit","again","shadow","talk","card"],
@@ -531,6 +536,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   const LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"],SH=["2.2","3.2"];   // shadowing: half listening, half speaking
   window.EL_STEP_CRITERIA={
     "4eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
+    "4eso/ls2-book":{ch1:["4.1"],ch2:["4.1"],ch3:["4.1"],ch4:["4.1"],ch5:["4.1"],ch6:["4.1"]},
     "4eso/ls2-celebrations-around-the-world":{read:["4.1"],log:["4.1"],listen:["2.2"],write:["5.1"],speak:["3.2","1.1"]},
     "4eso/ls2-where-traditions-come-from":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1","1.2"],speak:["3.2","1.2"],talk:S},
     "4eso/ls2-research-it-right":{shadow:SH,read:["4.2"],sources:["4.2"],respect:["1.2","CC3 3.2"],notes:["6.1"],credit:["6.1"],again:["2.2"],talk:S,card:["4.2","6.1","CC3 3.2"]},
@@ -547,6 +553,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   const LP=["recall","cards","practice"],ck={check:["4.1","5.1"]},LW=["2.2","5.1"],S=["3.2"],RS=["4.1","3.2"],SH=["2.2","3.2"];
   Object.assign(window.EL_ACTIONS,{
     "2eso/ls2-getting-started":[...LP,"read","listen","speak"],
+    "2eso/ls2-book":["ch1","ch2","ch3","ch4","ch5","ch6"],
     "2eso/ls2-what-are-they-doing":[...LP,"read","log","listen","again","shadow","grammar","mixed","write","speak","talk"],
     "2eso/ls2-now-or-usually":[...LP,"listen","chart","shadow","grammar","mixed","write","speak","talk"],
     "2eso/ls2-check-the-source":[...LP,"read","sources","credit","again","shadow","talk","factfile"],
@@ -559,6 +566,7 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
   });
   Object.assign(window.EL_STEP_CRITERIA,{
     "2eso/ls2-getting-started":{read:["4.1"],listen:["2.2"],speak:[]},
+    "2eso/ls2-book":{ch1:["4.1"],ch2:["4.1"],ch3:["4.1"],ch4:["4.1"],ch5:["4.1"],ch6:["4.1"]},
     "2eso/ls2-what-are-they-doing":{shadow:SH,cards:RS,read:["4.1"],log:["4.1"],listen:["2.2"],again:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-now-or-usually":{shadow:SH,cards:RS,listen:["2.2"],chart:["2.2"],practice:LW,grammar:LW,mixed:S,write:["5.1"],speak:["3.2"],talk:S},
     "2eso/ls2-check-the-source":{shadow:SH,cards:RS,read:["4.2"],sources:["4.2"],credit:["6.2"],practice:LW,again:["2.2"],talk:S,factfile:["4.2","6.2"]},
