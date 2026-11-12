@@ -9,6 +9,7 @@ var LS2 = (function () {
   const ROUTES = ['beginners', 'insecure', 'safe', 'daring', 'native'];
   const PAGES = [
     ['getting-started.html', '1 · Getting started'],
+    ['book.html', '📖 Book · Lantern Night'],
     ['celebrations-around-the-world.html', '2 · Celebrations around the world'],
     ['recall-checkpoint-1.html', 'Recall checkpoint 1'],
     ['where-traditions-come-from.html', '3 · Where traditions come from'],
@@ -593,29 +594,55 @@ var LS2 = (function () {
     if (kept.some(v => v)) show();
   }
   R.mc = p => ({
-    html: '<div class="section-card">' + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
+    html: '<div class="section-card">' + guessBackHtml(p) + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
     bind() {
       bindAudio(p); bindCycle(p); bindDict(p);
-      const items = forLevel(p.items), f = $('#' + p.id + 'Form');
-      f.innerHTML = items.map((q, i) => '<div class="question"><p class="q-title">' + (i + 1) + '. ' + q.q + '</p><div class="options">' +
+      const items = forLevel(p.items), f = $('#' + p.id + 'Form'), scored = items.filter(q => !q.guess).length;
+      f.innerHTML = items.map((q, i) => '<div class="question' + (q.guess ? ' guess-q' : '') + '"><p class="q-title">' + (i + 1) + '. ' + (q.guess ? '🔮 ' : '') + q.q + (q.qca && ca() ? ' <span class="q-ca">[' + q.qca + ']</span>' : '') + '</p><div class="options">' +
         learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + p.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') +
         '</div><div class="feedback" id="' + p.id + 'f' + i + '"></div></div>').join('');
       stays(p.id, p.id, p.id + 'Form', items, count => {
         let score = 0; const g = [];
         items.forEach((q, i) => {
           const c = document.querySelector('input[name="' + p.id + i + '"]:checked'), ok = !!c && +c.value === 0, fb = $('#' + p.id + 'f' + i);
-          if (ok) score++; g.push([ok, c ? +c.value : null]);
+          g.push([ok, c ? +c.value : null]);
+          if (q.guess) { fb.textContent = c ? guessSaved(p) : (ca() ? 'Tria una resposta.' : 'Choose an answer.'); fb.className = 'feedback ' + (c ? 'ok' : 'no'); return; }
+          if (ok) score++;
           fb.textContent = q.ex && c ? (ok ? (ca() ? 'Correcte! ' : 'Correct! ') : (ca() ? 'Encara no. ' : 'Not yet. ')) + tx(q.ex)
             : learningSupport.evidence(level, ok, c, q.o[0], ca() ? q.h : null, !!(p.media && (p.media.audio || p.media.youtube)));
           fb.className = 'feedback ' + (ok ? 'ok' : 'no');
         });
-        if (count) { firstTry(p.id, score, items.length); firstItems(p.id, p.items, items, g); }
+        if (count) { firstTry(p.id, score, scored); firstItems(p.id, p.items, items, g); }
         const ok = answered(items, p.id);
-        result($('#' + p.id + 'Result'), score, items.length, ok);
+        result($('#' + p.id + 'Result'), score, scored, ok);
         if (ok) { if (count) complete(p.id); else doneFrom(p.id, p.id); };
+        guessBack(p); LP.panels.filter(x => x.prev === p.id).forEach(guessBack);
       }, p.items);
+      guessBack(p);
     }
   });
+  /* 📖 Book chapters (Roger, 12 Nov 2026: "a Book LP with a section per chapter"; book.html, data/book.js from tools/reading-story/lp.py).
+     An mc item with guess: true ("What happens next? Guess!") is saved like any answer but never marked or scored: the step's score is
+     the other questions. The next chapter (p.prev = the chapter before) opens with the student's guess and, once it is checked, says
+     whether the guess was right (the right option is the first, as in every mc item). */
+  function guessSaved(p) {
+    const next = LP.panels.some(x => x.prev === p.id);
+    return next ? (ca() ? 'Desat! Ho descobriràs al capítol següent.' : 'Saved! You’ll find out in the next chapter.') : (ca() ? 'Desat! En parlarem a classe.' : 'Saved! We’ll talk about it in class.');
+  }
+  function guessBackHtml(p) { return p.prev ? '<div class="guess-back" id="' + p.id + 'Back" hidden></div>' : ''; }
+  function guessBack(p) {
+    const el = $('#' + p.id + 'Back'); if (!el) return;
+    const pp = LP.panels.find(x => x.id === p.prev), its = pp ? forLevel(pp.items) : [], gi = its.findIndex(q => q.guess);
+    if (gi < 0) { el.hidden = true; return; }
+    const a = (state.ans || {})[pp.id], k = a && a.q ? a.q.indexOf(qid(its[gi])) : gi, v = a && a.v && k >= 0 ? a.v[k] : null, q = its[gi], n = tx(pp.tab);
+    const mine = v != null && q.o[v] != null ? q.o[v] : null;
+    let h = '<strong>🔮 ' + q.q + '</strong><br>';
+    if (mine == null) h += ca() ? 'Al ' + n.toLowerCase() + ' no vas triar cap resposta. Llegeix i descobreix què passa!' : 'You didn’t guess in ' + n + '. Read and find out what happens!';
+    else h += (ca() ? 'Al ' + n.toLowerCase() + ' vas dir: ' : 'In ' + n + ' you guessed: ') + '<b>' + mine + '</b>. ';
+    if (mine != null && !state.done[p.id]) h += ca() ? 'Llegeix i descobreix si l’has encertat!' : 'Read and find out if you were right!';
+    else if (mine != null) h += +v === 0 ? (ca() ? '✓ Ho has endevinat!' : '✓ You guessed right!') : (ca() ? 'Aquesta vegada no: era <b>' + q.o[0] + '</b>.' : 'Not this time: it was <b>' + q.o[0] + '</b>.');
+    el.innerHTML = h; el.hidden = false;
+  }
 
   R.typed = p => ({
     html: (p.explain ? '<div class="section-card worked"><h3>' + (ca() ? 'Com funciona' : 'How it works') + '</h3>' + forLevel(p.explain).map(e => '<div class="model">' + tx(e) + '</div>').join('') + '</div>' : '') +
