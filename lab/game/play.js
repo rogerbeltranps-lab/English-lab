@@ -10,11 +10,13 @@ import * as A from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"
 import * as S from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {CONFIG,DOMAINS,TEACHERS,TESTERS} from "../../shared/js/el-firebase.js";
 import {signIn} from "../../shared/js/el-signin.js";
+import {cbPlayer} from "./cb-play.js";
 
 const G=window.ELGame,{esc,md,pic}=G;
 const app=getApps()[0]||initializeApp(CONFIG),auth=A.getAuth(app),db=S.getFirestore(app);
 const app$=document.getElementById("app");G.bg();
 const P=new URLSearchParams(location.search),FROM=(P.get("from")||"").startsWith("/")?P.get("from"):new URL("../../today.html",location.href).pathname;
+let joined=null,CBP=null;   // 🕵️ Code Breakers (cb-play.js): what this game's answers doc held when the student joined (a reload goes on from there)
 let user=null,group=(P.get("g")||"").replace(/[^\w-]/g,""),x=null,ref=null,mySid=0,mine={},tester=false,stop=null,shown="",draft={k:"",v:""};
 
 const fresh=at=>{const ms=at&&(at.toMillis?at.toMillis():+at);return !!ms&&Date.now()-ms<10*60e3};
@@ -45,6 +47,8 @@ function draw(){
   if(!group)return page(`<div class="card msg pop"><h2>🎮 Class game</h2><p>You are not on a class list yet. Ask your teacher.</p></div>`);
   if(cmFree()){cmBack();return page(`<div class="emo pop">🎓</div><p class="big">${esc(T("Back to the class…","Tornem a la classe…"))}</p>`)}
   const cmWait=cmOn()?`<p class="mid">🎓 ${esc(T("Stay here: your teacher will take you back to the class.","Queda't aquí: el professor et tornarà a la classe."))}</p>`:"";
+  document.body.classList.toggle("cb",!!(x&&gameOn()&&x.mode==="cb"));
+  if(gameOn()&&x.mode==="cb"){if(mySid!==x.sid)return page(`<div class="emo pop">🕵️</div><p class="big">Code Breakers</p>`);return cb().draw()}
   if(!gameOn())return page(`<div class="emo pop">⏳</div><p class="big">${x&&x.game&&x.phase==="end"?"The game is over":"Waiting for your teacher…"}</p>${cmWait||'<p class="mid">The game opens here by itself.</p>'}`);
   const ph=x.phase,i=String(x.i),q=x.q||{},n=(q.opts||[]).length;
   if(NT.dirty&&!(ph==="notes"&&x.sid+":"+i===NT.k))saveNotes();   // the teacher went on: what they wrote is saved
@@ -159,12 +163,16 @@ app$.addEventListener("click",async e=>{
   if(b.dataset.do==="signin"){try{await signIn({auth,A,domain:DOMAINS[0]})}catch(err){console.warn("sign in",err)}}
 });
 
+// 🕵️ Code Breakers (Roger, 11 Nov 2026): live/{group}.mode "cb" = each student at their own pace; cb-play.js draws the screen
+function cb(){if(!CBP)CBP=cbPlayer({S,G,esc,md,pic,T,app$,user:()=>user,x:()=>x,ref:()=>ref,mySid:()=>mySid,saved:()=>joined,first,
+  cmWait:()=>cmOn()?`<p class="mid">🎓 ${esc(T("Stay here: your teacher will take you back to the class.","Queda't aquí: el professor et tornarà a la classe."))}</p>`:"",
+  active:()=>gameOn()&&mySid===x.sid});return CBP}
 // A new game: start with no answers; the same game again (a reload): keep mine.
 async function join(){
   if(!ref||!gameOn()||x.sid===mySid||join.busy===x.sid)return;const sid=join.busy=x.sid;
   try{const d=await S.getDoc(ref);
-    if(d.exists()&&d.data().sid===sid)mine=Object.assign({},d.data().a);
-    else{mine={};await S.setDoc(ref,{sid,a:{},at:S.serverTimestamp()})}
+    if(d.exists()&&d.data().sid===sid){mine=Object.assign({},d.data().a);joined=d.data()}
+    else{mine={};joined=null;await S.setDoc(ref,{sid,a:{},at:S.serverTimestamp()})}
   }catch(e){console.warn("join",e);mine={}}
   if(join.busy===sid){mySid=sid;try{localStorage.setItem("el_game_in",String(sid))}catch(e){}draw()}
 }
