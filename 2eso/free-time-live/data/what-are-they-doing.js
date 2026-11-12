@@ -73,24 +73,24 @@ window.LP = {
       ] },
     // LS criterion 4.1: a reading log on two posts or web pages: what people are doing, where and when, what they usually do, and the purpose (inform, invite, sell).
     { id: 'log', type: 'step', tab: { ca: 'Registre de lectura', en: 'Reading log' }, title: { ca: 'Registre de lectura: els dos textos', en: 'Reading log: the two texts' }, pill: { ca: 'Ho veu el professor', en: 'Your teacher sees it' },
-      intro: { ca: 'Torna a llegir els dos textos i omple el registre amb notes curtes (paraules clau, no frases copiades). El professor el veu al seu tauler.', en: 'Read the two texts again and fill in the log with short notes (key words, not copied sentences). Your teacher sees it on the dashboard.' },
-      html: { ca: '<div class="model"><strong>Propòsit:</strong> <em>to inform</em> (informar: explica què passa) · <em>to invite</em> (convidar: vol que hi vagis o ho provis) · <em>to sell</em> (vendre: vol que compris alguna cosa). Un text pot tenir dos propòsits.</div>', en: '<div class="model"><strong>Purpose:</strong> <em>to inform</em> (it tells you what is happening) · <em>to invite</em> (it wants you to come or try) · <em>to sell</em> (it wants you to buy something). A text can have two purposes.</div>' },
+      intro: { ca: 'Torna a llegir els dos textos i omple el registre amb notes curtes <strong>en anglès</strong> (paraules clau, no frases copiades). Les preguntes estan en català per ajudar-te, però <strong>escriu les respostes en anglès</strong>. El professor el veu al seu tauler.', en: 'Read the two texts again and fill in the log with short notes <strong>in English</strong> (key words, not copied sentences). Your teacher sees it on the dashboard.' },
+      html: { ca: '<div class="model"><strong>Propòsit:</strong> <em>to inform</em> (informar: explica què passa) · <em>to invite</em> (convidar: vol que hi vagis o ho provis) · <em>to sell</em> (vendre: vol que compris alguna cosa). Un text pot tenir dos propòsits.<br><strong>Exemple de nota en anglès:</strong> <em>to invite · “Come and try!”</em></div>', en: '<div class="model"><strong>Purpose:</strong> <em>to inform</em> (it tells you what is happening) · <em>to invite</em> (it wants you to come or try) · <em>to sell</em> (it wants you to buy something). A text can have two purposes.<br><strong>Example note:</strong> <em>to invite · “Come and try!”</em></div>' },
       fields: [
-        { id: 'a1', label: { ca: 'Text A: què està fent la gent ara? (dues coses)', en: 'Text A: what are people doing now? (two things)' }, rows: 2 },
-        { id: 'a2', label: { ca: 'Text A: on i quan', en: 'Text A: where and when' }, rows: 1 },
-        { id: 'a3', label: { ca: 'Text A: què fan normalment?', en: 'Text A: what do they usually do?' }, rows: 1 },
-        { r: 'insecure', id: 'a4', label: { ca: 'Text A: propòsit (to inform / to invite / to sell) i una paraula del text que ho mostra', en: 'Text A: purpose (to inform / to invite / to sell) and one word from the text that shows it' }, rows: 2 },
-        { r: 'insecure', id: 'b1', label: { ca: 'Text B: què farà la gent? (dues coses)', en: 'Text B: what will people do there? (two things)' }, rows: 2 },
-        { id: 'b2', label: { ca: 'Text B: on i quan', en: 'Text B: where and when' }, rows: 1 },
-        { r: 'insecure', id: 'b4', label: { ca: 'Text B: propòsit (to inform / to invite / to sell) i una paraula del text que ho mostra', en: 'Text B: purpose (to inform / to invite / to sell) and one word from the text that shows it' }, rows: 2 },
-        { r: 'safe', id: 'word', label: 'A word you did not know in text A or B: what does it mean, and how did the context help you?', rows: 2 },
-        { r: 'daring', id: 'cmp', label: 'Compare the two texts: how is the language of a post different from the language of a web page that sells something?', rows: 2 }
+        { id: 'a1', label: { ca: 'Text A: què està fent la gent ara? (dues coses)', en: 'Text A: what are people doing now? (two things)' }, ph: 'They are …ing … · He is …ing …', rows: 2 },
+        { id: 'a2', label: { ca: 'Text A: on i quan', en: 'Text A: where and when' }, ph: 'At the … · on …', rows: 1 },
+        { id: 'a3', label: { ca: 'Text A: què fan normalment?', en: 'Text A: what do they usually do?' }, ph: 'They usually …', rows: 1 },
+        { r: 'insecure', id: 'a4', label: { ca: 'Text A: propòsit (to inform / to invite / to sell) i una paraula del text que ho mostra', en: 'Text A: purpose (to inform / to invite / to sell) and one word from the text that shows it' }, ph: 'To … · “…”', rows: 2 },
+        { r: 'insecure', id: 'b1', label: { ca: 'Text B: què farà la gent? (dues coses)', en: 'Text B: what will people do there? (two things)' }, ph: 'People can … · They get …', rows: 2 },
+        { id: 'b2', label: { ca: 'Text B: on i quan', en: 'Text B: where and when' }, ph: 'In … · on … at …', rows: 1 },
+        { r: 'insecure', id: 'b4', label: { ca: 'Text B: propòsit (to inform / to invite / to sell) i una paraula del text que ho mostra', en: 'Text B: purpose (to inform / to invite / to sell) and one word from the text that shows it' }, ph: 'To … · “…”', rows: 2 },
+        { r: 'safe', id: 'word', label: 'A word you did not know in text A or B: what does it mean, and how did the context help you?', ph: '“…” means … · The clue is …', rows: 2 },
+        { r: 'daring', id: 'cmp', label: 'Compare the two texts: how is the language of a post different from the language of a web page that sells something?', ph: 'The post is … · The web page …', rows: 2 }
       ],
       rate: {
-        beginners: ['He escrit notes curtes, no frases copiades', 'Sé què fa la gent ara i què fa normalment al text A', 'Sé on i quan passa cada text'],
-        insecure: ['He escrit notes curtes, no frases copiades', 'Sé què fa la gent ara i què fa normalment al text A', 'He dit el propòsit de cada text amb una paraula que ho mostra'],
-        safe: ['I wrote short notes in my own words', 'I noted what people are doing and what they usually do', 'I gave the purpose of each text with evidence from the text', 'I worked out a new word from its context'],
-        daring: ['I wrote short notes in my own words', 'I noted what people are doing and what they usually do', 'I gave the purpose of each text with precise evidence', 'I compared how the two texts use language']
+        beginners: ['He escrit notes curtes en anglès, no frases copiades', 'Sé què fa la gent ara i què fa normalment al text A', 'Sé on i quan passa cada text'],
+        insecure: ['He escrit notes curtes en anglès, no frases copiades', 'Sé què fa la gent ara i què fa normalment al text A', 'He dit el propòsit de cada text amb una paraula que ho mostra'],
+        safe: ['I wrote short notes in English, in my own words', 'I noted what people are doing and what they usually do', 'I gave the purpose of each text with evidence from the text', 'I worked out a new word from its context'],
+        daring: ['I wrote short notes in English, in my own words', 'I noted what people are doing and what they usually do', 'I gave the purpose of each text with precise evidence', 'I compared how the two texts use language']
       } },
     { id: 'listen', type: 'mc', tab: 'Listening', title: 'Listening: Live from the sports hall', pill: { ca: 'Àudio', en: 'Audio' },
       intro: { ca: 'L’Emma i el Sam retransmeten en directe un partit de bàsquet de l’escola. Escolta una vegada per saber qui guanya. Després llegeix les preguntes i torna a escoltar.', en: 'Emma and Sam are reporting live from a school basketball match. Listen once to find out who is winning. Then read the questions and listen again.' },
