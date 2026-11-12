@@ -362,7 +362,7 @@
   const FSOK = mode === "lp" && !/\/my-real-routine\//.test(path) && !/\/(recall-checkpoint[^/]*|sample-exam)\.html$/.test(path);   // not a recall checkpoint or the sample exam: they have their own full screen (leaving it hands them in)
   let fsMine = false;
   const fsDoc = () => document.fullscreenElement || document.webkitFullscreenElement;
-  function slpTabs() { return $$(".tab[data-panel]").filter(b => !b.classList.contains("el-sec-hide") && !b.hidden && b.style.display !== "none"); }
+  function slpTabs() { return $$(".tab[data-panel]").filter(b => !b.classList.contains("el-sec-hide") && !b.classList.contains("el-cm-hide") && !b.hidden && b.style.display !== "none"); }
   function slpFs(on) {
     const B = document.body, was = B.classList.contains("elslpfs");
     if (on === undefined) on = was;
