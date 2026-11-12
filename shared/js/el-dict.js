@@ -144,6 +144,8 @@
     + '.eldict-tipbox div{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}.eldict-tipbox button{border:0;border-radius:10px;padding:8px 13px;font-weight:800;font-family:inherit;cursor:pointer;background:#fff;color:#20312b}.eldict-tipbox button.go{background:#9fd8bf}'
     + '@keyframes eldictIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}.eldict-fab.hint{animation:eldictPulse 1.6s ease-in-out 3}@keyframes eldictPulse{50%{box-shadow:0 0 0 10px rgba(31,107,82,.25),0 8px 24px rgba(15,23,42,.22)}}'
     + 'body.elslpfs .eldict-tipbox{bottom:140px}'
+    + '.eldict-fab.intop{position:static;flex:0 0 auto;margin-left:auto;padding:9px 16px 9px 13px;font-size:.95rem;box-shadow:0 2px 8px rgba(15,23,42,.16);z-index:auto}'
+    + '.eldict-tipbox.up::after{bottom:auto;top:-9px;right:10px;border-top:0;border-bottom:9px solid #20312b}'
     + '@media (max-width:640px){.eldict-tipbox{right:10px;bottom:146px}.eldict-tipbox::after{right:28px}}'
     + '@media (max-width:640px){.eldict-fab{right:12px;bottom:84px;padding:12px 13px}.eldict-fab b{display:none}.eldict{left:8px;right:8px;width:auto;bottom:140px;max-height:calc(100vh - 160px)}}@media (pointer:coarse){.eldict-tip.dbl{display:none}}'
     + '@media print{.eldict-fab,.eldict{display:none!important}}';
@@ -190,21 +192,34 @@
   }
   /* Stacked above the other floating buttons bottom right (✅ To do, the account bar) instead of on top of them (Roger, 12 Nov 2026:
      "on és el diccionari?"): its height is measured, so it follows the To do button on a Chromebook and on a phone. */
+  /* Where the button sits (Roger, 12 Nov 2026: "pot posar-lo a dalt a la dreta ja que ara els alumnes tenen un espai en buit? ... make sure
+     it doesn't hide any other thing"): in the top bar, on the right (the Learning Path dropdown there is hidden since #537), on a computer;
+     its window and the first-time bubble open under it. On a phone, and in the step's full screen view (no top bar), it floats bottom
+     right, stacked above the other floating buttons there (✅ To do, the account bar, the full screen bar) instead of on top of them. */
   function place() {
     if (fab.hidden) return;
-    var top = innerHeight, vw = innerWidth;
+    var row = d.querySelector('.topbar .toprow'), bar = row && row.closest('.topbar');
+    var top = !!row && innerWidth > 640 && !d.body.classList.contains('elslpfs') && getComputedStyle(bar).display !== 'none';
+    if (top && fab.parentNode !== row) { row.appendChild(fab); fab.classList.add('intop'); fab.style.bottom = ''; }
+    if (!top && fab.parentNode !== d.body) { d.body.appendChild(fab); fab.classList.remove('intop'); }
+    if (top) {
+      var r = fab.getBoundingClientRect(), y = Math.max(8, Math.round(r.bottom + 10)), x = Math.max(8, Math.round(innerWidth - r.right));
+      box.style.top = y + 'px'; box.style.bottom = 'auto'; box.style.right = x + 'px'; box.style.maxHeight = 'calc(100vh - ' + (y + 16) + 'px)';
+      // the bubble hangs to the left of the button, so the step's own buttons under it (⛶ Full screen) stay visible
+      if (tip) { tip.style.top = (y + 2) + 'px'; tip.style.bottom = 'auto'; tip.style.right = Math.max(8, Math.round(innerWidth - r.left - 22)) + 'px'; tip.classList.add('up'); }
+      return;
+    }
+    var low = innerHeight, vw = innerWidth;
     ['#el-todo-btn', '#el-cloud-bar', '.elslpbar'].forEach(function (q) {
       var e = d.querySelector(q); if (!e || e.hidden) return;
       var cs = getComputedStyle(e); if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden') return;
-      var r = e.getBoundingClientRect(); if (!r.height || r.right < vw * .6 || r.top < innerHeight * .5) return;   // only what sits bottom right
-      top = Math.min(top, r.top);
+      var rr = e.getBoundingClientRect(); if (!rr.height || rr.right < vw * .6 || rr.top < innerHeight * .5) return;   // only what sits bottom right
+      low = Math.min(low, rr.top);
     });
-    var b = Math.round(innerHeight - top + 10); if (b < 14) b = 14;
-    if (fab.style.bottom !== b + 'px') {
-      fab.style.bottom = b + 'px';
-      box.style.bottom = (b + 60) + 'px'; box.style.maxHeight = 'calc(100vh - ' + (b + 80) + 'px)';
-    }
-    if (tip) tip.style.bottom = (b + 66) + 'px';
+    var b = Math.round(innerHeight - low + 10); if (b < 14) b = 14;
+    fab.style.bottom = b + 'px';
+    box.style.top = ''; box.style.right = ''; box.style.bottom = (b + 60) + 'px'; box.style.maxHeight = 'calc(100vh - ' + (b + 80) + 'px)';
+    if (tip) { tip.style.top = ''; tip.style.right = ''; tip.style.bottom = (b + 66) + 'px'; tip.classList.remove('up'); }
   }
   /* The first time a student meets it (Roger, 12 Nov 2026: "when they enter the first time, either in class mode or when doing the
      activities, I want a message telling them that they have a dictionary in case they need to look up any word they don't understand"):
@@ -239,7 +254,7 @@
       box.querySelector('.eldict-x').onclick = close;
       box.querySelector('form').onsubmit = function (e) { e.preventDefault(); look(inp.value); };
     }
-    box.hidden = false; if (!seen()) seenNow();
+    box.hidden = false; if (!seen()) seenNow(); place();
     if (q) { inp.value = q; look(q); } else { if (!last) showRecent(); setTimeout(function () { inp.focus(); inp.select && inp.select(); }, 30); }
   }
   function close() { if (box) box.hidden = true; }
