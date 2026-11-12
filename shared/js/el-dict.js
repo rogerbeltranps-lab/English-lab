@@ -1,11 +1,12 @@
-// 📖 Dictionary on the learning path steps (Roger, 12 Nov 2026: "és possible que els alumnes tinguin una pantalla emergent en els SLP on
+// 🔍 Dictionary on the learning path steps (🔍, not 📖: 📖 is Books in the menu) (Roger, 12 Nov 2026: "és possible que els alumnes tinguin una pantalla emergent en els SLP on
 // puguin buscar paraules i traduccions de l'anglès?"). Loaded by el-app.js on LS2 learning paths (not LS1, recall checkpoints, the sample
-// exam, the final product or Reflect). A 📖 button bottom left opens a small window: the student types a word (English or Catalan) or
+// exam, the final product or Reflect). A 🔍 button bottom right (above the account bar) opens a small window: the student types a word (English or Catalan) or
 // double-clicks a word on the page.
 //  1. This LS's word list first (every vocabulary panel of every learning path of the LS, from its data/*.js: English, Catalan, example).
 //  2. Then, if the word isn't there (or "More meanings"), free online sources, no key, nothing paid, no Claude: Google Translate's free
 //     endpoint (the same one the announcements use) for the translation, and dictionaryapi.dev for a short English meaning.
-// It never gives answers away: words or short phrases only (max 3 words, 40 characters); hidden on Recall steps ("No notes"); a Catalan
+// It never gives answers away: words, phrasal verbs or short expressions only (max 4 words online; up to 6 when the expression is on the
+// LS's list; 60 characters); hidden on Recall steps ("No notes"); a Catalan
 // word whose English is an answer of an activity on this page shows "Try it yourself first" instead. Chrome page translate and
 // copy/paste stay blocked (el-nocopy.js). Nothing is saved in the cloud; the last 8 lookups stay in this browser (el_dict_recent).
 (function () {
@@ -122,9 +123,9 @@
   }
 
   // ---- the window ----
-  var css = '.eldict-fab{position:fixed;left:18px;bottom:18px;z-index:9000;display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:11px 18px 11px 14px;background:var(--accent,#1f6b52);color:#fff;font:800 1rem/1 inherit;font-family:inherit;box-shadow:0 8px 24px rgba(15,23,42,.22);cursor:pointer}'
+  var css = '.eldict-fab{position:fixed;right:18px;bottom:calc(var(--el-bar-space,0px) + 14px);z-index:9000;display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:11px 18px 11px 14px;background:var(--accent,#1f6b52);color:#fff;font:800 1rem/1 inherit;font-family:inherit;box-shadow:0 8px 24px rgba(15,23,42,.22);cursor:pointer}'
     + '.eldict-fab i{font-style:normal;font-size:1.25rem}.eldict-fab:hover{filter:brightness(1.08)}.eldict-fab[hidden],.eldict[hidden]{display:none!important}'
-    + '.eldict{position:fixed;left:18px;bottom:76px;z-index:9001;width:380px;max-width:calc(100vw - 24px);max-height:min(560px,calc(100vh - 100px));display:flex;flex-direction:column;background:#fff;border:1px solid #d8e6df;border-radius:18px;box-shadow:0 18px 48px rgba(15,23,42,.25);color:#20312b;font-family:inherit;overflow:hidden}'
+    + '.eldict{position:fixed;right:18px;bottom:calc(var(--el-bar-space,0px) + 74px);z-index:9001;width:380px;max-width:calc(100vw - 24px);max-height:min(560px,calc(100vh - 100px));display:flex;flex-direction:column;background:#fff;border:1px solid #d8e6df;border-radius:18px;box-shadow:0 18px 48px rgba(15,23,42,.25);color:#20312b;font-family:inherit;overflow:hidden}'
     + '.eldict-h{display:flex;align-items:center;gap:8px;padding:12px 12px 10px 16px;background:var(--soft,#e9f5ef);font-weight:850;font-size:1.05rem}.eldict-h span{flex:1}'
     + '.eldict-x{border:0;background:#fff;border-radius:10px;width:34px;height:34px;font-size:1.05rem;cursor:pointer;color:#20312b}'
     + '.eldict-f{display:flex;gap:8px;padding:12px 14px 6px}.eldict-f input{flex:1;min-width:0;border:2px solid #d8e6df;border-radius:12px;padding:10px 12px;font:600 1.02rem inherit;font-family:inherit;color:#20312b;-webkit-user-select:text;user-select:text}'
@@ -136,8 +137,15 @@
     + '.eldict-def{margin-top:6px;font-size:.9rem;line-height:1.4}.eldict-def i{color:#66766f}.eldict-more{margin-top:10px;border:1px solid #d8e6df;background:#fff;border-radius:11px;padding:7px 12px;font-weight:750;font-family:inherit;cursor:pointer;color:var(--dark,#174d3d)}'
     + '.eldict-msg{margin-top:10px;padding:11px 13px;border-radius:13px;background:#fff8e1;border:1px solid #f3d27a;color:#5b4300;font-size:.95rem;line-height:1.4}.eldict-msg.no{background:#fdecec;border-color:#f3b4b4;color:#7a1d1d}'
     + '.eldict-rec{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.eldict-rec span{font-size:.78rem;color:#66766f;width:100%}.eldict-rec button{border:1px solid #d8e6df;background:#fff;border-radius:999px;padding:4px 10px;font-family:inherit;cursor:pointer;color:#20312b}'
-    + 'body.elslpfs .eldict-fab{bottom:76px}'
-    + '@media (max-width:640px){.eldict-fab{left:auto;right:12px;bottom:84px;padding:12px 13px}.eldict-fab b{display:none}.eldict{left:8px;right:8px;width:auto;bottom:140px;max-height:calc(100vh - 160px)}}@media (pointer:coarse){.eldict-tip.dbl{display:none}}'
+    + 'body.elslpfs .eldict-fab{bottom:76px}body.elslpfs .eldict{bottom:134px}'
+    + '.eldict-tipbox{position:fixed;right:18px;bottom:calc(var(--el-bar-space,0px) + 80px);z-index:9002;width:320px;max-width:calc(100vw - 24px);background:#20312b;color:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 14px 40px rgba(15,23,42,.35);font-family:inherit;line-height:1.45;animation:eldictIn .35s ease-out}'
+    + '.eldict-tipbox::after{content:"";position:absolute;right:40px;bottom:-9px;border:9px solid transparent;border-bottom:0;border-top-color:#20312b}'
+    + '.eldict-tipbox b{display:block;font-size:1.08rem;margin-bottom:4px}.eldict-tipbox p{margin:0 0 4px;font-size:.96rem}.eldict-tipbox small{display:block;color:#cfe3da;font-size:.85rem}'
+    + '.eldict-tipbox div{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}.eldict-tipbox button{border:0;border-radius:10px;padding:8px 13px;font-weight:800;font-family:inherit;cursor:pointer;background:#fff;color:#20312b}.eldict-tipbox button.go{background:#9fd8bf}'
+    + '@keyframes eldictIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}.eldict-fab.hint{animation:eldictPulse 1.6s ease-in-out 3}@keyframes eldictPulse{50%{box-shadow:0 0 0 10px rgba(31,107,82,.25),0 8px 24px rgba(15,23,42,.22)}}'
+    + 'body.elslpfs .eldict-tipbox{bottom:140px}'
+    + '@media (max-width:640px){.eldict-tipbox{right:10px;bottom:146px}.eldict-tipbox::after{right:28px}}'
+    + '@media (max-width:640px){.eldict-fab{right:12px;bottom:84px;padding:12px 13px}.eldict-fab b{display:none}.eldict{left:8px;right:8px;width:auto;bottom:140px;max-height:calc(100vh - 160px)}}@media (pointer:coarse){.eldict-tip.dbl{display:none}}'
     + '@media print{.eldict-fab,.eldict{display:none!important}}';
   var fab, box, inp, out, last = '';
   function recent() { try { return JSON.parse(localStorage.getItem('el_dict_recent') || '[]') || []; } catch (e) { return []; } }
@@ -155,7 +163,7 @@
     label(); setInterval(vis, 800); vis();
   }
   function label() {
-    fab.innerHTML = '<i aria-hidden="true">📖</i><b>' + t('Diccionari', 'Dictionary') + '</b>';
+    fab.innerHTML = '<i aria-hidden="true">🔍</i><b>' + t('Diccionari', 'Dictionary') + '</b>';
     fab.title = t('Busca una paraula en anglès o en català', 'Look up a word in English or Catalan');
   }
   function wordAt(x, y) {
@@ -177,10 +185,32 @@
     var off = noNotes;
     if (fab.hidden !== off) { fab.hidden = off; if (off) close(); }
     if (fab.querySelector('b').textContent !== t('Diccionari', 'Dictionary')) label();
+    hint(!off);
+  }
+  /* The first time a student meets it (Roger, 12 Nov 2026: "when they enter the first time, either in class mode or when doing the
+     activities, I want a message telling them that they have a dictionary in case they need to look up any word they don't understand"):
+     a bubble over the 🔍 button on the first learning path step where it shows, until they press Got it / Try it or open the dictionary.
+     Once per student on this browser (el_dict_seen_<uid>: el_ keys stay after a sign-out and are not synced). */
+  var tip = null, since = Date.now();
+  function seenKey() { var u = ''; try { u = (JSON.parse(localStorage.getItem('el_who') || 'null') || {}).uid || ''; } catch (e) {} return 'el_dict_seen' + (u ? '_' + u : ''); }
+  function seen() { try { return !!localStorage.getItem(seenKey()); } catch (e) { return true; } }
+  function seenNow() { try { localStorage.setItem(seenKey(), String(Date.now())); } catch (e) {} if (tip) { tip.remove(); tip = null; } fab.classList.remove('hint'); }
+  function hint(on) {
+    if (!on || seen() || Date.now() - since < 1500 || !box.hidden) { if (tip && (!on || !box.hidden)) { tip.remove(); tip = null; fab.classList.remove('hint'); } return; }
+    if (tip && tip.dataset.ca === String(ca())) return;
+    if (tip) tip.remove();
+    tip = d.createElement('div'); tip.className = 'eldict-tipbox notranslate'; tip.setAttribute('role', 'status'); tip.dataset.ca = String(ca());
+    tip.innerHTML = '<b>🔍 ' + t('Tens un diccionari!', 'You have a dictionary!') + '</b>'
+      + '<p>' + t('Si no entens una paraula, busca-la aquí: en anglès o en català.', 'If you don’t understand a word, look it up here, in English or Catalan.') + '</p>'
+      + '<small>' + t('També pots fer doble clic a qualsevol paraula de la pàgina.', 'You can also double-click any word on the page.') + '</small>'
+      + '<div><button type="button" class="ok">' + t('D’acord', 'Got it') + '</button><button type="button" class="go">' + t('Prova’l', 'Try it') + '</button></div>';
+    d.body.appendChild(tip); fab.classList.add('hint');
+    tip.querySelector('.ok').onclick = seenNow;
+    tip.querySelector('.go').onclick = function () { seenNow(); open(''); };
   }
   function head() {
-    return '<div class="eldict-h"><span>📖 ' + t('Diccionari', 'Dictionary') + '</span><button type="button" class="eldict-x" aria-label="' + t('Tanca', 'Close') + '">✕</button></div>'
-      + '<form class="eldict-f" autocomplete="off"><input type="search" maxlength="40" spellcheck="false" placeholder="' + esc(MODE === 'en-ca' ? t('Escriu una paraula en anglès', 'Type an English word') : t('Paraula en anglès o en català', 'A word in English or Catalan')) + '"><button type="submit">' + t('Busca', 'Look up') + '</button></form>'
+    return '<div class="eldict-h"><span>🔍 ' + t('Diccionari', 'Dictionary') + '</span><button type="button" class="eldict-x" aria-label="' + t('Tanca', 'Close') + '">✕</button></div>'
+      + '<form class="eldict-f" autocomplete="off"><input type="search" maxlength="60" spellcheck="false" placeholder="' + esc(MODE === 'en-ca' ? t('Escriu una paraula en anglès', 'Type an English word') : t('Paraula en anglès o en català', 'A word in English or Catalan')) + '"><button type="submit">' + t('Busca', 'Look up') + '</button></form>'
       + '<div class="eldict-tip dbl">' + t('Consell: fes doble clic a qualsevol paraula de la pàgina.', 'Tip: double-click any word on the page.') + '</div><div class="eldict-b" aria-live="polite"></div>';
   }
   function open(q) {
@@ -190,7 +220,7 @@
       box.querySelector('.eldict-x').onclick = close;
       box.querySelector('form').onsubmit = function (e) { e.preventDefault(); look(inp.value); };
     }
-    box.hidden = false;
+    box.hidden = false; if (!seen()) seenNow();
     if (q) { inp.value = q; look(q); } else { if (!last) showRecent(); setTimeout(function () { inp.focus(); inp.select && inp.select(); }, 30); }
   }
   function close() { if (box) box.hidden = true; }
@@ -209,7 +239,9 @@
   function look(q) {
     q = String(q || '').replace(/\s+/g, ' ').trim(); last = q;
     if (!q) { showRecent(); return; }
-    if (q.split(' ').length > 3 || q.length > 40) { out.innerHTML = msg(t('Només paraules o expressions curtes (fins a 3 paraules). Per a frases senceres, busca-hi les paraules una a una.', 'Only words or short phrases (up to 3 words). For a whole sentence, look up its words one by one.'), true); return; }
+    // phrasal verbs and expressions (Roger, 12 Nov 2026): up to 4 words online; longer expressions only when they are on the LS's list
+    var nw = q.split(' ').length, long = msg(t('Només paraules o expressions curtes (fins a 4 paraules). Per a frases senceres, busca-hi les paraules una a una.', 'Only words, phrasal verbs or short expressions (up to 4 words). For a whole sentence, look up its words one by one.'), true);
+    if (nw > 6 || q.length > 60) { out.innerHTML = long; return; }
     var my = ++seq; out.innerHTML = '<div class="eldict-tip" style="padding:10px 2px">' + t('Buscant…', 'Looking up…') + '</div>';
     loaded.then(function () {
       if (my !== seq) return;
@@ -222,6 +254,7 @@
       });
       if (hidden && !html) { out.innerHTML = tryIt(); wire(); return; }   // its English is an answer here: no online look-up either
       var exact = hits.some(function (h) { return h.s >= 4; });
+      if (nw > 4) { out.innerHTML = exact ? html : long; wire(); return; }
       if (MODE === 'ls') { out.innerHTML = html || msg(t('Aquesta paraula no és al vocabulari d’aquesta LS.', 'This word isn’t in this LS’s vocabulary.')); wire(); return; }
       if (hidden) { out.innerHTML = html; wire(); return; }
       if (html && exact) { out.innerHTML = html + '<button type="button" class="eldict-more" data-q="' + esc(q) + '">🌐 ' + t('Més significats', 'More meanings') + '</button>'; wire(); return; }
@@ -249,7 +282,7 @@
       // the same word back (festival, hotel, piano… or a typo): show it only if the English dictionary knows it
       if (r.same && !r.more.length) { meaning(en).then(function (m) { if (my !== seq) return; if (m && r.dir === 'en') { slot.innerHTML = card(m); wire(); } else none(); }); return; }
       slot.innerHTML = card(null); wire();
-      if (en.split(' ').length <= 2) meaning(en).then(function (m) { if (my === seq && m) { slot.innerHTML = card(m); wire(); } });
+      if (en.split(' ').length <= 3) meaning(en).then(function (m) { if (my === seq && m) { slot.innerHTML = card(m); wire(); } });
     }).catch(function () {
       if (my === seq) slot.innerHTML = msg(t('Ara no puc connectar amb el diccionari en línia. Torna-ho a provar d’aquí a una estona.', 'I can’t reach the online dictionary right now. Try again in a moment.'), true);
     });
