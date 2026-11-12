@@ -147,7 +147,7 @@ function draw(){
   if(!H.user){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>🕵️ Code Breakers</h2><p>This is the teacher's board. Sign in with the teacher's account.</p><p><button class="btn go" data-do="signin">Sign in with Google</button></p></div></div>`;return}
   if(!H.teacher){app$.innerHTML=`<div class="center"><div class="card msg pop"><h2>🕵️ Code Breakers</h2><p>This is the teacher's board. When your teacher starts the game, it opens by itself on your screen.</p><p><a class="btn go" href="play.html">Go to the game screen</a></p></div></div>`;return}
   if(!H.games.length){   // choose a learning path
-    const L=window.EL_GAMES||[],lps=[];L.forEach(d=>{const k=lpKeyOf(d);if(!lps.some(x=>x.k===k))lps.push({k,d})});
+    const L=window.EL_GAMES||[],lps=[];L.forEach(d=>{const k=lpKeyOf(d);if(!/-lp[1-3]$/.test(k))return;if(!lps.some(x=>x.k===k))lps.push({k,d})});
     const by=c=>lps.filter(x=>x.d.course===c).sort((a,b)=>(a.d.ls+a.d.lp).localeCompare(b.d.ls+b.d.lp,"en",{numeric:true}));
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🕵️ Code Breakers</h1><p class="sub">Choose a learning path: its vocabulary and grammar questions, each student at their own pace.</p>
       <div class="courses">${["2eso","4eso"].map(c=>`<section class="course"><h2>${c==="2eso"?"2 ESO":"4 ESO"}</h2><div class="picks">${by(c).map(x=>`<button class="btn deckbtn" data-do="lp" data-k="${esc(x.k)}"><span class="e">🕵️</span><span>${esc(x.d.lp)}<br><small style="opacity:.7">${esc(x.d.ls)}</small></span></button>`).join("")}</div></section>`).join("")}</div>

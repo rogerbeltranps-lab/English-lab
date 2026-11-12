@@ -1812,7 +1812,9 @@ function matTab(){
     const games=(window.EL_GAMES||[]).filter(g=>g.course===c).sort((x,y)=>((x.ls||"")+(x.lp||"")).localeCompare((y.ls||"")+(y.lp||""),"en",{numeric:true})),lss=EL_LS.filter(l=>l.course===c);
     return `<div class="box"><h2>${name}</h2>`
       +`<h3>🎮 Class games</h3><p class="muted">Each learning path has a vocabulary game and a grammar game. ${a("lab/game/results.html?g="+(GR.find(g=>g.course===c)||{}).id,"📊 Results by group and student →","chip")}</p>`+(games.length?`<div class="qwrap"><table class="mat"><tr><th>Game</th><th>Learning Situation · Learning Path</th><th></th></tr>`
-        +games.map(g=>`<tr><td>${esc(g.emoji||"")} ${esc(elGameName(g))}</td><td>${esc(g.ls||"")}${g.lp?" · "+esc(g.lp):""}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
+        +games.map((g,i)=>{const k=g.id.replace(/-(vocab|grammar)$/,""),last=g.lp&&/-lp[1-3]$/.test(k)&&!(games[i+1]&&games[i+1].ls===g.ls&&games[i+1].lp===g.lp);   // + 🕵️ Code Breakers after each LP1–3 pair
+          return `<tr><td>${esc(g.emoji||"")} ${esc(elGameName(g))}</td><td>${esc(g.ls||"")}${g.lp?" · "+esc(g.lp):""}</td><td>${a("lab/game/host.html?deck="+encodeURIComponent(g.id),"Open the board →","btn")}</td></tr>`
+            +(last?`<tr><td>🕵️ ${esc(String(g.lp).split(" · ")[0])} · Code Breakers <small class="muted">(vocabulary + grammar, each at their own pace)</small></td><td>${esc(g.ls||"")} · ${esc(g.lp)}</td><td>${a("lab/game/codebreakers.html?lp="+encodeURIComponent(k),"Open the board →","btn")}</td></tr>`:"")}).join("")+`</table></div>`:`<p class="muted">No games yet.</p>`)
       +lss.map(l=>{const k=l.id.replace("-","/"),w=(window.LP_PRINT||{})[k],R=RP(l);
         // LS2 on (EL_LS starter: true): a Starter summary of its own, built from the Learning Paths (tools/lp-worksheets/build.mjs); LS1: Starter uses Base
         return `<h3>📄 ${esc(l.title)}</h3>`
@@ -2578,10 +2580,14 @@ function homeTabs(x,a){let m=HOME.get(x.p.rows);if(!m)HOME.set(x.p.rows,m=new Ma
 // not homework), ticked, sent ‹ › and chosen in ✏️ Change like a tab, and it opens the game board on that game. New games appear by themselves.
 const gamesOf=a=>{const l=EL_LS.find(y=>y.id===a.ls),lsT=l?l.title.split(" · ").pop().toLowerCase():"",t=shortT(a.title);
   return (window.EL_GAMES||[]).filter(g=>g.lp&&a.ls.startsWith(g.course+"-")&&String(g.ls||"").toLowerCase().endsWith(lsT)&&shortT(String(g.lp).split(" · ").pop())===t)
-    .map(g=>["game:"+g.id,"🎮 "+(window.elGameName?elGameName(g):g.title),g])};   // "LP2 · Vocabulary · Clothes, kit and weather" (elGameName, Roger 7 Nov 2026)
+    .map(g=>["game:"+g.id,"🎮 "+(window.elGameName?elGameName(g):g.title),g])
+    // 🕵️ Code Breakers (Roger, 12 Nov 2026: "it should be possible to schedule it on the agenda"): the path's two games as one hacking round,
+    // "game:cb-<course>-ls<n>-lp<n>" (lab/game/codebreakers.html?lp=…); LP1–LP3 only for now; offered in ✏️ Change and the agenda, never put in a class by itself (segTabs)
+    .flatMap((z,i,all)=>{const k=z[2].id.replace(/-(vocab|grammar)$/,"");return i===all.length-1&&/-lp[1-3]$/.test(k)?[z,["game:cb-"+k,"🕵️ "+String(z[2].lp).split(" · ")[0]+" · Code Breakers",{id:"cb-"+k,lp:z[2].lp,cb:true}]]:[z]})};   // "LP2 · Vocabulary · Clothes, kit and weather" (elGameName, Roger 7 Nov 2026)
+const isCb=id=>/^game:cb-/.test(id||""),gameHref=id=>isCb(id)?"lab/game/codebreakers.html?lp="+encodeURIComponent(id.slice(8)):"lab/game/host.html?deck="+encodeURIComponent(id.slice(5));
 const itemsOf=a=>[...secOf(a),...gamesOf(a)],isGame=id=>/^game:/.test(id);
 function segTabs(x,a,seg,hw){const sec=secOf(a);if(!sec.length)return [];const said=namedTabs(a,seg);if(said.length)return said;
-  const home=homeTabs(x,a),cls=sec.filter(z=>!home.has(z[0])),h=Math.ceil(cls.length/2),gm=hw||/\(2\/2\)/.test(seg)?[]:gamesOf(a);
+  const home=homeTabs(x,a),cls=sec.filter(z=>!home.has(z[0])),h=Math.ceil(cls.length/2),gm=hw||/\(2\/2\)/.test(seg)?[]:gamesOf(a).filter(z=>!isCb(z[0]));
   return /\(1\/2\)/.test(seg)?[...gm,...cls.slice(0,h)]:/\(2\/2\)/.test(seg)?cls.slice(h):[...gm,...cls]}
 // [[activity, label, [[panel, name]…], chosen by the teacher]] for a session line; plain = the plan's rule, ignoring the teacher's choice
 function dayTabs(x,l,plain){const c=plain?null:((x.p._tabs||{})[x.gi]||{})[origOf(x,l)],out=[];
@@ -2624,7 +2630,7 @@ const secSw=(x,a,id)=>{if(isGame(id)||a.optional||/-my-real-routine$/.test(x.ls)
 const tabsHtml=(x,l,i)=>{const d=dayTabs(x,l).filter(z=>z[2].length||z[3]),cps=/^Homework by /.test(l)?[]:lineActs(x,l).filter(([a])=>/checkpoint/i.test(a.title));
   if(!d.length&&!cps.length)return "";const ck=!/^Homework by /.test(l),all=ticked(x,l),full=(a,lab)=>/^LP\d/.test(lab)?lab+" "+a.title.split(/[:(]/)[0].trim():lab;
   return `<small class="dtabs">${cps.map(([a])=>`⏱ <b>${esc(a.title.split(/[:(]/)[0].trim())}</b>: its own page, about 10 minutes, no tabs`).join("<br>")}${cps.length&&d.length?"<br>":""}${d.map(([a,lab,ts])=>`📑 <b>${esc(full(a,lab))}</b>${ck&&!/-my-real-routine$/.test(x.ls)&&!isGame(a.id)?cmTabBtn(x.ls,x.gid,a,""):""}: ${ts.length?ts.map(([id,n])=>{const on=all||tabOn(x,l,a,id);
-    return `<span class="tk ${on?"on":""}">${ck?`<input type="checkbox" class="tabck" data-do="tabtick" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" data-a="${esc(a.id)}" data-p="${esc(id)}" ${on?"checked":""} title="Done in class">`:""}<a href="${isGame(id)?"lab/game/host.html?deck="+encodeURIComponent(id.slice(5)):esc(a.path)+"#"+esc(id)}" target="_blank" rel="noopener" title="${isGame(id)?"Open the game board on this game":"Open this tab"}">${esc(n)}</a>${secSw(x,a,id)}${ck&&!isGame(id)&&!/-my-real-routine$/.test(x.ls)?cmTabBtn(x.ls,x.gid,a,id):""}${ck&&!on?["-1","1"].map(v=>`<button type="button" class="tabmv" data-do="sendto" data-dir="${v}" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" data-only="${esc(a.id+"#"+id)}" title="Send only this tab to the ${v>0?"next":"previous"} class">${v>0?"›":"‹"}</button>`).join(""):""}</span>`}).join(" · "):'<i class="muted">none</i>'}`).join("<br>")}${d.some(z=>z[3])?' <span class="muted">(your choice)</span>':""}</small>`};
+    return `<span class="tk ${on?"on":""}">${ck?`<input type="checkbox" class="tabck" data-do="tabtick" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" data-a="${esc(a.id)}" data-p="${esc(id)}" ${on?"checked":""} title="Done in class">`:""}<a href="${isGame(id)?gameHref(id):esc(a.path)+"#"+esc(id)}" target="_blank" rel="noopener" title="${isGame(id)?"Open the game board on this game":"Open this tab"}">${esc(n)}</a>${secSw(x,a,id)}${ck&&!isGame(id)&&!/-my-real-routine$/.test(x.ls)?cmTabBtn(x.ls,x.gid,a,id):""}${ck&&!on?["-1","1"].map(v=>`<button type="button" class="tabmv" data-do="sendto" data-dir="${v}" data-gid="${x.gid}" data-ls="${x.ls}" data-i="${i}" data-line="${esc(l)}" data-only="${esc(a.id+"#"+id)}" title="Send only this tab to the ${v>0?"next":"previous"} class">${v>0?"›":"‹"}</button>`).join(""):""}</span>`}).join(" · "):'<i class="muted">none</i>'}`).join("<br>")}${d.some(z=>z[3])?' <span class="muted">(your choice)</span>':""}</small>`};
 // ⏭ Next class / ⏮ Previous class (Roger, 1 Nov 2026: "if I can't do a learning path, I just send it to the next day" … "and also back"):
 // the group's next (or previous) class in the plan. Nothing ticked: the whole session moves there. Some tabs ticked: this session keeps them
 // (and is ticked) and the unticked tabs go there as a new line "LP3 Where traditions come from · not finished on Wed 4" (planEdits "+id" with
@@ -2943,7 +2949,7 @@ function agReorder(k,d,before){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag)retur
 // 🎮 Played by this group? (Roger, 8-9 Nov 2026: "i need the same information here", as on the learning path's game buttons): on a class
 // game in the Time plan, ✓ + the day the group played it on the game board, or "not played yet". From ls/{id}.played[group][deck]
 // (lab/game/host.js markPlayed), already in the LS doc the dashboard reads: no extra reads.
-const agPl=(x,p,sh)=>{if(!isGame(p))return "";const ms=(((S.D.ls[x.ls]||{}).played||{})[x.gid]||{})[p.slice(5)];
+const agPl=(x,p,sh)=>{if(!isGame(p)||isCb(p))return "";const ms=(((S.D.ls[x.ls]||{}).played||{})[x.gid]||{})[p.slice(5)];
   return ms?`<b class="agpl y" title="Played on the game board with this group">✓ ${sh?"":"played "}${esc(new Date(+ms).toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}</b>`:`<b class="agpl n" title="Not played on the game board with this group yet">✗ ${sh?"not yet":"not played yet"}</b>`};
 // one class day: its items grouped by activity, each with a tick box, drag handle and ✕; c = compact (Home, weekend check)
 function agDay(x,d,c){const ag=agOf(x),hwS=hwItems(x),t=ELWeek.today(),its=(ag.days[d]||[]),isEx=ag.exam===d,self=its.includes("self"),tkb=dayIts(ag,d);
