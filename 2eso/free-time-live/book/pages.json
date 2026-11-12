@@ -100,28 +100,23 @@
   ],
   "2": [
    "book/daring-05.webp",
-   "book/daring-06.webp",
-   "book/daring-07.webp"
+   "book/daring-06.webp"
   ],
   "3": [
-   "book/daring-08.webp",
+   "book/daring-07.webp",
+   "book/daring-08.webp"
+  ],
+  "4": [
    "book/daring-09.webp",
    "book/daring-10.webp"
   ],
-  "4": [
-   "book/daring-11.webp",
-   "book/daring-12.webp",
-   "book/daring-13.webp"
-  ],
   "5": [
-   "book/daring-14.webp",
-   "book/daring-15.webp",
-   "book/daring-16.webp"
+   "book/daring-11.webp",
+   "book/daring-12.webp"
   ],
   "6": [
-   "book/daring-17.webp",
-   "book/daring-18.webp",
-   "book/daring-19.webp"
+   "book/daring-13.webp",
+   "book/daring-14.webp"
   ]
  }
 }

@@ -17,8 +17,8 @@ window.LP = {
     "ca": "Amb LP1"
    },
    "intro": {
-    "en": "Read the chapter in the book: turn the pages with ▶ or a tap, and press ⤢ to read it full screen. Then answer below: one question about the story and one guess about what happens next.",
-    "ca": "Llegeix el capítol al llibre: gira les pàgines amb ▶ o tocant-les, i prem ⤢ per llegir-lo a pantalla completa. Després respon a sota: una pregunta sobre la història i una endevinalla sobre què passarà."
+    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
    },
    "book": true,
    "media": {
@@ -86,8 +86,8 @@ window.LP = {
     "ca": "Amb LP2"
    },
    "intro": {
-    "en": "Read the chapter in the book: turn the pages with ▶ or a tap, and press ⤢ to read it full screen. Then answer below: one question about the story and one guess about what happens next.",
-    "ca": "Llegeix el capítol al llibre: gira les pàgines amb ▶ o tocant-les, i prem ⤢ per llegir-lo a pantalla completa. Després respon a sota: una pregunta sobre la història i una endevinalla sobre què passarà."
+    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
    },
    "book": true,
    "media": {
@@ -106,8 +106,7 @@ window.LP = {
      ],
      "daring": [
       "book/daring-05.webp",
-      "book/daring-06.webp",
-      "book/daring-07.webp"
+      "book/daring-06.webp"
      ]
     }
    },
@@ -149,8 +148,8 @@ window.LP = {
     "ca": "Amb LP3"
    },
    "intro": {
-    "en": "Read the chapter in the book: turn the pages with ▶ or a tap, and press ⤢ to read it full screen. Then answer below: one question about the story and one guess about what happens next.",
-    "ca": "Llegeix el capítol al llibre: gira les pàgines amb ▶ o tocant-les, i prem ⤢ per llegir-lo a pantalla completa. Després respon a sota: una pregunta sobre la història i una endevinalla sobre què passarà."
+    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
    },
    "book": true,
    "media": {
@@ -168,9 +167,8 @@ window.LP = {
       "book/safe-08.webp"
      ],
      "daring": [
-      "book/daring-08.webp",
-      "book/daring-09.webp",
-      "book/daring-10.webp"
+      "book/daring-07.webp",
+      "book/daring-08.webp"
      ]
     }
    },
@@ -212,8 +210,8 @@ window.LP = {
     "ca": "Amb LP4"
    },
    "intro": {
-    "en": "Read the chapter in the book: turn the pages with ▶ or a tap, and press ⤢ to read it full screen. Then answer below: one question about the story and one guess about what happens next.",
-    "ca": "Llegeix el capítol al llibre: gira les pàgines amb ▶ o tocant-les, i prem ⤢ per llegir-lo a pantalla completa. Després respon a sota: una pregunta sobre la història i una endevinalla sobre què passarà."
+    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
    },
    "book": true,
    "media": {
@@ -231,9 +229,8 @@ window.LP = {
       "book/safe-10.webp"
      ],
      "daring": [
-      "book/daring-11.webp",
-      "book/daring-12.webp",
-      "book/daring-13.webp"
+      "book/daring-09.webp",
+      "book/daring-10.webp"
      ]
     }
    },
@@ -275,8 +272,8 @@ window.LP = {
     "ca": "Amb LP5"
    },
    "intro": {
-    "en": "Read the chapter in the book: turn the pages with ▶ or a tap, and press ⤢ to read it full screen. Then answer below: one question about the story and one guess about what happens next.",
-    "ca": "Llegeix el capítol al llibre: gira les pàgines amb ▶ o tocant-les, i prem ⤢ per llegir-lo a pantalla completa. Després respon a sota: una pregunta sobre la història i una endevinalla sobre què passarà."
+    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
    },
    "book": true,
    "media": {
@@ -294,9 +291,8 @@ window.LP = {
       "book/safe-12.webp"
      ],
      "daring": [
-      "book/daring-14.webp",
-      "book/daring-15.webp",
-      "book/daring-16.webp"
+      "book/daring-11.webp",
+      "book/daring-12.webp"
      ]
     }
    },
@@ -338,8 +334,8 @@ window.LP = {
     "ca": "Amb LP6"
    },
    "intro": {
-    "en": "Read the chapter in the book: turn the pages with ▶ or a tap, and press ⤢ to read it full screen. Then answer below: one question about the story and one guess about what happens next.",
-    "ca": "Llegeix el capítol al llibre: gira les pàgines amb ▶ o tocant-les, i prem ⤢ per llegir-lo a pantalla completa. Després respon a sota: una pregunta sobre la història i una endevinalla sobre què passarà."
+    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
    },
    "book": true,
    "media": {
@@ -357,9 +353,8 @@ window.LP = {
       "book/safe-14.webp"
      ],
      "daring": [
-      "book/daring-17.webp",
-      "book/daring-18.webp",
-      "book/daring-19.webp"
+      "book/daring-13.webp",
+      "book/daring-14.webp"
      ]
     }
    },

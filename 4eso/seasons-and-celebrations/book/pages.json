@@ -21,12 +21,11 @@
    "book/beginners-10.webp"
   ],
   "5": [
-   "book/beginners-11.webp",
-   "book/beginners-12.webp"
+   "book/beginners-11.webp"
   ],
   "6": [
-   "book/beginners-13.webp",
-   "book/beginners-14.webp"
+   "book/beginners-12.webp",
+   "book/beginners-13.webp"
   ]
  },
  "insecure": {
@@ -66,33 +65,27 @@
   ],
   "1": [
    "book/safe-03.webp",
-   "book/safe-04.webp",
-   "book/safe-05.webp"
+   "book/safe-04.webp"
   ],
   "2": [
-   "book/safe-06.webp",
+   "book/safe-05.webp",
+   "book/safe-06.webp"
+  ],
+  "3": [
    "book/safe-07.webp",
    "book/safe-08.webp"
   ],
-  "3": [
-   "book/safe-09.webp",
-   "book/safe-10.webp",
-   "book/safe-11.webp"
-  ],
   "4": [
-   "book/safe-12.webp",
-   "book/safe-13.webp",
-   "book/safe-14.webp"
+   "book/safe-09.webp",
+   "book/safe-10.webp"
   ],
   "5": [
-   "book/safe-15.webp",
-   "book/safe-16.webp",
-   "book/safe-17.webp"
+   "book/safe-11.webp",
+   "book/safe-12.webp"
   ],
   "6": [
-   "book/safe-18.webp",
-   "book/safe-19.webp",
-   "book/safe-20.webp"
+   "book/safe-13.webp",
+   "book/safe-14.webp"
   ]
  },
  "daring": {
