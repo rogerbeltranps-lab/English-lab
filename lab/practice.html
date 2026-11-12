@@ -545,7 +545,7 @@ function splay(i, done) {
   if (!done && PL[i] && PL[i].has && elShadow.mode() === 'repeat') return PL[i].start(0);
   if (PL[i]) PL[i].stop();
   const c = X.shadow[i], m = $('#sm' + i), slow = !!($('#ss' + i) || {}).checked && c.slow, src = slow ? c.slow : c.src, tt = (slow ? c.ts : c.t) || [0, 1e9];
-  const go = () => { m.currentTime = tt[0]; m.play().catch(() => {}); m.ontimeupdate = () => { if (m.currentTime >= tt[1]) { m.pause(); m.ontimeupdate = null; done && done(); } }; m.onended = () => done && done(); };
+  const go = () => { elShadow.lead(m, tt[0]); m.play().catch(() => {}); m.ontimeupdate = () => { if (m.currentTime >= tt[1]) { m.pause(); m.ontimeupdate = null; done && done(); } }; m.onended = () => done && done(); };
   store.shadow[c.key] = (store.shadow[c.key] || 0) + 1; keep(); $('#sp' + i).textContent = store.shadow[c.key];
   if (m.src !== new URL(src, location.href).href) { m.src = src; m.addEventListener('loadedmetadata', go, { once: true }); m.load(); } else go();
 }
