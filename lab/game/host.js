@@ -61,8 +61,8 @@ const tab={get(){try{return JSON.parse(sessionStorage.getItem("elGame")||"null")
 // pts {email: points this term} for the group's best, players {email: answers} of this game.
 const H={user:null,teacher:false,deckId:URLP.get("deck")||"",deck:null,g:"",sid:0,i:-1,phase:"pick",step:0,keys:{},aw:{},names:{},pts:{},players:{},term:elTerm(),err:""};
 const saved=tab.get();
-if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved.deckId))Object.assign(H,{deckId:saved.deckId,g:saved.g,sid:saved.sid,i:saved.i,phase:saved.phase,step:saved.step||0,keys:saved.keys||{},aw:saved.aw||{}});
-const keep=()=>tab.set(H.sid?{deckId:H.deckId,g:H.g,sid:H.sid,i:H.i,phase:H.phase,step:H.step,keys:H.keys,aw:H.aw}:null);
+if(saved&&saved.sid&&Date.now()-saved.sid<4*3600e3&&(!H.deckId||H.deckId===saved.deckId))Object.assign(H,{deckId:saved.deckId,g:saved.g,sid:saved.sid,i:saved.i,phase:saved.phase,step:saved.step||0,keys:saved.keys||{},aw:saved.aw||{},rp:saved.rp});
+const keep=()=>tab.set(H.sid?{deckId:H.deckId,g:H.g,sid:H.sid,i:H.i,phase:H.phase,step:H.step,keys:H.keys,aw:H.aw,rp:H.rp}:null);
 // Catalan help on the theory slides (Roger, 5 Nov 2026: the grammar games explain the grammar "so that students understand it"):
 // off by default (the games are at Safe level, in English); CA on the board or the C key shows a slide's ca lines. Kept in this browser.
 const caOn=v=>{try{if(v!=null)localStorage.setItem("el_game_ca",v?"on":"off");return localStorage.getItem("el_game_ca")==="on"}catch(e){return !!v}};
@@ -271,7 +271,9 @@ function go(to){
   if(to==="reveal"){H.phase="reveal";award(H.i);G.music("");G.fx("reveal");setTimeout(()=>G.fx(H.aw[H.i]&&H.aw[H.i].length?"right":"wrong"),700)}
   else if(to==="next"){
     if(H.i+1>=slides().length){H.phase="end";saveResults();G.music("");G.fx("drum");setTimeout(()=>{G.fx("fanfare");G.confetti()},1700)}
-    else{H.i++;H.phase="show";H.step=1;G.fx("next");G.music(isQ(cur())?"think":"");if(isN(cur()))markPlayed()}
+    else{if(H.i<0){decideRp();if(H.rp===undefined)H.rp=false}
+      let j=H.i+1;if(H.rp&&!isQ(slides()[j])){let k=j;while(k<slides().length&&!isQ(slides()[k]))k++;if(k<slides().length)j=k}
+      H.i=j;H.phase="show";H.step=1;G.fx("next");G.music(isQ(cur())?"think":"");if(isN(cur()))markPlayed()}
   }
   keep();live();draw();autoReveal();
 }
@@ -279,6 +281,13 @@ function more(){H.step++;keep();G.fx("tap");draw()}
 // ⏭ Skip to the questions (Roger, 11 Nov 2026, playing a game again: "I can review the theory or just skip it and go to the questions"): on a
 // theory or 📝 notes slide, jump to the next question, past the rest of this run of theory and its notes slide. Key: S.
 const nextQ=()=>{for(let j=H.i+1;j<slides().length;j++)if(isQ(slides()[j]))return j;return -1};
+// 🔁 A game the group has played before goes straight to the questions (Roger, 12 Nov 2026, on the whiteboard: "2nd time we play a game,
+// no theory slides"): H.rp (replay) is on when ls/{id}.played (PL) already has this game for this group from an earlier game, or after
+// "Play again". Then Next jumps over every theory and 📝 notes slide (the notes were taken the first time; absent students have the
+// theory on their LS page anyway). The lobby says so and has 📖 Show the theory to turn it off for this game. undefined = not decided yet
+// (PL still loading): decided when PL arrives, or at Start.
+const playedBefore=()=>{const w=PL&&(PL[H.deckId]||{})[H.g];return w&&+w!==H.sid?+w:0};
+const decideRp=()=>{if(H.rp===undefined&&PL){H.rp=!!playedBefore();keep()}};
 function skipTheory(){const j=nextQ();if(j<0||H.phase!=="show"||isQ(cur()))return;H.i=j-1;go("next")}
 const skipBtn=()=>nextQ()>=0?`<button class="btn ghost" data-do="skipth" title="Skip the theory and go straight to the next question (key S)">⏭ Skip to the questions<span class="kbd">S</span></button> `:"";
 function primary(){
@@ -292,12 +301,12 @@ addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,sele
   if(e.key==="m"||e.key==="M"){G.sound(!G.sound());draw()}
   if((e.key==="c"||e.key==="C")&&H.phase==="show"&&cur()&&cur().ca){caOn(!caOn());draw()}});
 
-function startGame(g){
-  H.g=g;H.sid=Date.now();H.i=-1;H.phase="lobby";H.keys={};H.aw={};keep();G.music("lobby");startGroup();
+function startGame(g,again){
+  H.g=g;H.sid=Date.now();H.i=-1;H.phase="lobby";H.keys={};H.aw={};H.rp=again?true:undefined;H.ag=!!again;decideRp();keep();G.music("lobby");startGroup();
 }
 function endGame(){
   const g=H.g;saveResults();liveOff(g);if(ansStop)ansStop();ansStop=null;whoStop();clearInterval(liveBeat);G.music("");
-  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{}});keep();draw();
+  Object.assign(H,{g:"",sid:0,i:-1,phase:"pick",keys:{},aw:{},players:{},rp:undefined});keep();draw();
 }
 
 /* ---------- screens ---------- */
@@ -339,10 +348,13 @@ function draw(){
       <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
   if(H.phase==="lobby"){
+    loadPlayed();decideRp();const pb=playedBefore(),again=!pb&&H.ag;
+    const rpLine=pb||again?`<p class="rp pop">${H.rp?`🔁 ${pb?`Played on ${esc(plDay(pb))}`:"Played again"}: no theory slides, straight to the questions.`:"📖 The theory slides will be shown again."}
+      <button class="btn ghost" data-do="rp">${H.rp?"📖 Show the theory":"⏭ Skip the theory"}</button></p>`:"";
     app$.innerHTML=top()+`<div class="main"><div class="center" style="padding:0"><div style="width:100%">
       <h1 class="logo pop">${esc(gName())}</h1>
       <div class="join"><div class="card">💻 Sign in on your Chromebook: the game opens by itself.</div><div class="count">🎮 ${P.length} player${P.length===1?"":"s"}</div>
-        <button class="btn go" data-do="next" style="font-size:1.2em">Start ▶</button></div>
+        <button class="btn go" data-do="next" style="font-size:1.2em">Start ▶</button></div>${rpLine}
       <div class="names">${P.sort((a,b)=>nameOf(a).localeCompare(nameOf(b))).map(em=>`<span${seen.has(em)?"":' class="pop"'}>${esc(nameOf(em))}</span>`).join("")||'<span style="background:none;color:#fff;box-shadow:none;opacity:.8">Waiting for students…</span>'}</div>
     </div></div></div>`;P.forEach(em=>seen.add(em));return}
   if(H.phase==="end"){
@@ -410,7 +422,8 @@ app$.addEventListener("click",async e=>{
   if(d==="end"){if(Date.now()-endArm<3000)endGame();else{endArm=Date.now();b.textContent="Tap again to end";setTimeout(()=>{if(b.isConnected)b.textContent="■ End"},3000)}}
   if(d==="finish")endGame();
   if(d==="cmback"){if(cmPlaying()&&Date.now()-cmArm>=3000){cmArm=Date.now();draw();setTimeout(()=>{if(Date.now()-cmArm>=3000)draw()},3100)}else backToClass()}
-  if(d==="again"){const g=H.g;startGame(g)}
+  if(d==="again"){const g=H.g;startGame(g,true)}
+  if(d==="rp"){H.rp=!H.rp;keep();draw()}
 });
 
 A.onAuthStateChanged(auth,async u=>{
