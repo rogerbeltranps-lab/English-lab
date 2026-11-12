@@ -352,11 +352,80 @@
     mo.hidden = !(who.role === "student" && !who.as); mo.setAttribute("aria-label", t("Més: avisa d'un problema, envia una idea", "More: report a problem, send an idea"));
     h.querySelector(".mm").innerHTML = `<button type="button" data-w="pb"><i aria-hidden="true">⚠️</i>${t("Avisa d'un problema", "Report a problem")}</button><button type="button" data-w="idea"><i aria-hidden="true">💡</i>${t("Envia una idea", "Send an idea")}</button>`;
   }
+  // ---- ⛶ one step (an "SLP") full screen (Roger, 12 Nov 2026, whiteboard: "Fullscreen SLP"): a ⛶ button in each step's heading
+  // shows only that step, wide, with the browser in full screen: no menu, no top bar, no left column. A slim bar on top keeps the
+  // path's name and the step, ‹ Previous / Next › (the step buttons of the column, so locked and hidden steps stay as they are) and
+  // ✕ Exit. Esc leaves too. It stays on while the student moves between steps (the engine redraws #lp: only the buttons are added
+  // again). For the projector in class and for students on a Chromebook. LS2 on (LS1 stays as it is); not on a phone (one screen already).
+  // When class mode had the browser in full screen already, ✕ leaves only this view: the browser stays in full screen. Not on a
+  // recall checkpoint or the sample exam (they have their own full screen, and leaving it hands them in).
+  const FSOK = mode === "lp" && !/\/my-real-routine\//.test(path) && !/\/(recall-checkpoint[^/]*|sample-exam)\.html$/.test(path);   // not a recall checkpoint or the sample exam: they have their own full screen (leaving it hands them in)
+  let fsMine = false;
+  const fsDoc = () => document.fullscreenElement || document.webkitFullscreenElement;
+  function slpTabs() { return $$(".tab[data-panel]").filter(b => !b.classList.contains("el-sec-hide") && !b.hidden && b.style.display !== "none"); }
+  function slpFs(on) {
+    const B = document.body, was = B.classList.contains("elslpfs");
+    if (on === undefined) on = was;
+    if (on && !was) {
+      if (!fsDoc()) { const E = document.documentElement, rq = E.requestFullscreen || E.webkitRequestFullscreen;
+        try { const r = rq && rq.call(E); fsMine = !!rq; if (r && r.catch) r.catch(() => { fsMine = false; }); } catch (e) { fsMine = false; } }
+    }
+    if (!on && was) {
+      if (fsMine && fsDoc()) { try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) {} }
+      fsMine = false;
+    }
+    B.classList.toggle("elslpfs", !!on);
+    slpDraw();
+    if (on !== was) scrollTo(0, 0);
+  }
+  function slpDraw() {
+    if (!FSOK) return;
+    const on = document.body.classList.contains("elslpfs");
+    // the ⛶ button in every step's heading (the engine draws them again on each redraw)
+    $$(".lp-panels>.panel>.panel-head").forEach(h => {
+      let b = h.querySelector(":scope>.elslpgo");
+      if (!b) { b = document.createElement("button"); b.type = "button"; b.className = "elslpgo"; b.addEventListener("click", () => slpFs(true)); h.append(b); }
+      const lab = t("⛶ Pantalla completa", "⛶ Full screen");
+      if (b.textContent !== lab) { b.textContent = lab; b.title = t("Mostra només aquest pas, a pantalla completa", "Show only this step, full screen"); }
+    });
+    let bar = $(".elslpbar");
+    if (!on) { if (bar) bar.hidden = true; return; }
+    if (!bar) {
+      bar = document.createElement("div"); bar.className = "elslpbar"; bar.setAttribute("role", "toolbar");
+      bar.innerHTML = '<div class="tt"><small></small><b></b></div><div class="go"><button type="button" class="pv"></button><button type="button" class="nx"></button><button type="button" class="ex"></button></div>';
+      bar.addEventListener("click", e => {
+        if (e.target.closest(".ex")) return slpFs(false);
+        const d = e.target.closest(".pv") ? -1 : e.target.closest(".nx") ? 1 : 0; if (!d) return;
+        const L = slpTabs(), i = L.findIndex(x => x.classList.contains("active")), n = L[i + d];
+        if (n) { n.click(); scrollTo(0, 0); slpDraw(); }
+      });
+      document.body.append(bar);
+    }
+    bar.hidden = false;
+    const L = slpTabs(), i = L.findIndex(x => x.classList.contains("active")), a = L[i];
+    const h1 = $(".ellp-head h1") || $("header.hero h1"), sj = $("#sessionJump"), op = sj && sj.selectedOptions && sj.selectedOptions[0];
+    const n = op && (op.textContent.match(/^\s*(\d+)\s*·/) || [])[1];
+    bar.querySelector(".tt small").textContent = (n ? "LP" + n + " · " : "") + (h1 ? h1.textContent.trim() : "");
+    bar.querySelector(".tt b").textContent = a ? (i + 1) + " / " + L.length + " · " + ((a.querySelector(".tl") || a).textContent.trim()) : "";
+    const pv = bar.querySelector(".pv"), nx = bar.querySelector(".nx"), ex = bar.querySelector(".ex");
+    pv.textContent = t("‹ Anterior", "‹ Previous"); nx.textContent = t("Següent ›", "Next ›"); ex.textContent = t("✕ Surt", "✕ Exit");
+    ex.title = t("Surt de la pantalla completa (Esc)", "Leave full screen (Esc)");
+    pv.disabled = i <= 0; nx.disabled = i < 0 || i >= L.length - 1;
+  }
+  if (FSOK) {
+    // the browser left full screen (Esc, or F11 on a Chromebook): leave this view too, unless class mode keeps the browser in full screen
+    const fc = () => { if (!fsDoc() && fsMine && document.body.classList.contains("elslpfs")) { fsMine = false; slpFs(false); } };
+    document.addEventListener("fullscreenchange", fc); document.addEventListener("webkitfullscreenchange", fc);
+    // Esc while the browser stays in full screen (class mode): leave this view
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !fsMine && document.body.classList.contains("elslpfs") && !e.defaultPrevented) slpFs(false); });
+    // a step chosen any other way (the engine's Next step button, the teacher's class tab): the bar follows
+    document.addEventListener("click", e => { if (e.target.closest(".tab[data-panel],.section-next button") && document.body.classList.contains("elslpfs")) setTimeout(() => { slpDraw(); scrollTo(0, 0); }, 0); });
+  }
   if (mode === "home") addEventListener("hashchange", () => draw());   // Home · Courses · Learning Situations: the button that is on
   if (mode === "lp") {
     WIDE.addEventListener ? WIDE.addEventListener("change", () => lpLayout()) : WIDE.addListener(() => lpLayout());
     let busy = false;
-    new MutationObserver(() => { if (busy) return; busy = true; try { lpLayout(); } finally { busy = false; } })
+    new MutationObserver(() => { if (busy) return; busy = true; try { lpLayout(); slpDraw(); } finally { busy = false; } })
       .observe(document.getElementById("lp") || document.body, { childList: true });
   }
 
@@ -372,6 +441,7 @@
     tsecEarly();
     curLs = pickLs();
     lpPhone();
+    slpDraw();
     const L = items();
     if (mode === "lab") side(L); else rail(L);
     bar(L);
