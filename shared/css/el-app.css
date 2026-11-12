@@ -108,8 +108,8 @@ body.elapp.ellp .topbar .brand>a.elback::before{content:"‹ ";font-size:1.15em}
 body.elapp.ellp .topbar .toprow:has(.session-jump) .brand>:is(.logo,.lp-title){display:none!important}   /* LS1 learning paths: the path's number and name are in the column (as LS2) */
 /* the "Learning Path" menu at the top right goes (Roger, 12 Nov 2026: "this dropdown menu is not necessary any more"): the column,
    the LS page and Continue already lead to each path. It stays in the page, hidden: el-app.js reads the path's number from it and
-   section-next.js the next path */
-body.elapp .topbar .session-jump{display:none!important}
+   section-next.js the next path. LS1 keeps it (leave LS1 alone): its learning paths are the pages that load ls1-lp.js */
+body.elapp:not(:has(script[src*="ls1-lp.js"])) .topbar .session-jump{display:none!important}
 body.elapp.ellp .topbar .session-jump label{color:#64748b!important}
 body.elapp.ellp .topbar .session-jump select{background:#fff!important;color:#0f172a!important;border:1px solid #cbd5e1!important;border-radius:12px!important;font-weight:700}
 body.elapp.ellp .topbar .progress-label,body.elapp.ellp .topbar .progress-row{color:#475569!important}
