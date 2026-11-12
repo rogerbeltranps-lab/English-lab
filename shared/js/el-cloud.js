@@ -872,10 +872,25 @@ function gamePush(u){
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
     if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
-    const f=first,run=()=>{goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsCheck()};first=false;
+    const f=first,run=()=>{rtFollow(x&&x.rt);goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
 }
+// 📖 Read together (shared/correct/, Roger 12 Nov 2026: their screens follow the teacher's paragraph): live/{group}.rt = {u, k, n, chat, at}
+// marks block k of the reading on this page (the same block of the student's own level's text; a chat with another number of messages
+// gets the same place in it), and scrolls to it when it moves. Nothing is written; null or another page clears it.
+let rtNow=null,rtKey="";
+function rtFollow(rt){rtNow=rt||null;
+  document.querySelectorAll(".el-rt-cur").forEach(e=>e.classList.remove("el-rt-cur"));
+  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3)return;
+  const box=[...document.querySelectorAll(".reading,#readText")].find(e=>e.offsetParent!==null);if(!box)return;
+  const bl=[...box.children].filter(e=>!e.classList.contains("tiny"));if(!bl.length)return;
+  const i=rt.chat&&bl.length!==rt.n?Math.round(rt.k*(bl.length-1)/Math.max(1,rt.n-1)):Math.min(rt.k,bl.length-1),el=bl[i];
+  if(!document.getElementById("el-rt-css")){const st=document.createElement("style");st.id="el-rt-css";
+    st.textContent=".el-rt-cur{background:#fff7cc!important;box-shadow:0 0 0 4px #ffd34d;border-radius:8px;transition:background .3s}";document.head.append(st)}
+  el.classList.add("el-rt-cur");const k=rt.u+"|"+rt.k;if(k!==rtKey){rtKey=k;el.scrollIntoView({block:"center",behavior:"smooth"})}}
+// the reading tab opened after the teacher moved on still gets the mark
+document.addEventListener("click",e=>{if(rtNow&&e.target.closest(".tab"))setTimeout(()=>{rtKey="";rtFollow(rtNow)},120)});
 // 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
 // the teacher's pull-up also writes live/{group}.go = {a, p, pn, t, at} (the document this page already listens to for class games, so
 // no extra reads). Every student page that is open goes to that learning path (and tab) after a 5-second notice that saves their work
