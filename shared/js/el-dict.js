@@ -186,6 +186,25 @@
     if (fab.hidden !== off) { fab.hidden = off; if (off) close(); }
     if (fab.querySelector('b').textContent !== t('Diccionari', 'Dictionary')) label();
     hint(!off);
+    place();
+  }
+  /* Stacked above the other floating buttons bottom right (✅ To do, the account bar) instead of on top of them (Roger, 12 Nov 2026:
+     "on és el diccionari?"): its height is measured, so it follows the To do button on a Chromebook and on a phone. */
+  function place() {
+    if (fab.hidden) return;
+    var top = innerHeight, vw = innerWidth;
+    ['#el-todo-btn', '#el-cloud-bar', '.elslpbar'].forEach(function (q) {
+      var e = d.querySelector(q); if (!e || e.hidden) return;
+      var cs = getComputedStyle(e); if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden') return;
+      var r = e.getBoundingClientRect(); if (!r.height || r.right < vw * .6 || r.top < innerHeight * .5) return;   // only what sits bottom right
+      top = Math.min(top, r.top);
+    });
+    var b = Math.round(innerHeight - top + 10); if (b < 14) b = 14;
+    if (fab.style.bottom !== b + 'px') {
+      fab.style.bottom = b + 'px';
+      box.style.bottom = (b + 60) + 'px'; box.style.maxHeight = 'calc(100vh - ' + (b + 80) + 'px)';
+    }
+    if (tip) tip.style.bottom = (b + 66) + 'px';
   }
   /* The first time a student meets it (Roger, 12 Nov 2026: "when they enter the first time, either in class mode or when doing the
      activities, I want a message telling them that they have a dictionary in case they need to look up any word they don't understand"):
@@ -204,7 +223,7 @@
       + '<p>' + t('Si no entens una paraula, busca-la aquí: en anglès o en català.', 'If you don’t understand a word, look it up here, in English or Catalan.') + '</p>'
       + '<small>' + t('També pots fer doble clic a qualsevol paraula de la pàgina.', 'You can also double-click any word on the page.') + '</small>'
       + '<div><button type="button" class="ok">' + t('D’acord', 'Got it') + '</button><button type="button" class="go">' + t('Prova’l', 'Try it') + '</button></div>';
-    d.body.appendChild(tip); fab.classList.add('hint');
+    d.body.appendChild(tip); fab.classList.add('hint'); place();
     tip.querySelector('.ok').onclick = seenNow;
     tip.querySelector('.go').onclick = function () { seenNow(); open(''); };
   }
