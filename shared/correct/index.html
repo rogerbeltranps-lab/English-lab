@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" class="notranslate" translate="no">
+<head>
+<meta charset="utf-8"><meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Correct together</title>
+<link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
+<!-- ✅ Correct together (Roger, 12 Nov 2026): the class corrects a reading on the projector, every level at once.
+     ?ls=<course>/<ls folder>&lp=<data file>&tab=read|log[&g=<group id>][&embed=1]
+     Opened from the class tab (✅ Correct on the class mode bar, on a Reading or Reading log tab) or from 📋 Today; embed=1: it sits over
+     the class tab (shared/correct/open.js) and ✕ Close takes it away. Teacher only. Reads the Learning Path's data (never changes it) and,
+     with a group, the students' saved answers once (one read per student) for "Right in the class". correct.js draws it. -->
+<style>
+:root{--bg:#0f2a3a;--bar:#0b1f2b;--card:#fff;--ink:#13222c;--muted:#5f6b73;--line:#e3e7eb;--ok:#1f6b40;--okbg:#e9f7ef;--okb:#2e8b57;--blue:#2b4fa8;--bluebg:#dfe9ff;--mark:#ffe680;--dot:#24485c}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;overflow:hidden}
+.top{display:flex;align-items:center;gap:14px;padding:10px 20px;color:#fff;background:var(--bar);flex:none;flex-wrap:wrap}
+.top b{font-size:19px;white-space:nowrap}.top .sub{opacity:.8;font-size:15px;min-width:0}.top .sp{flex:1}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dots button{min-width:28px;height:28px;border-radius:14px;border:0;display:grid;place-items:center;font:700 13px system-ui,sans-serif;background:var(--dot);color:#cfe3ee;cursor:pointer;padding:0 8px}
+.dots button.seen{background:#2e8b57;color:#fff}.dots button.now{background:#ffd34d;color:var(--ink)}
+.dots .gap{width:10px}
+main{flex:1;min-height:0;overflow:auto;padding:14px 20px}
+.card{background:var(--card);border-radius:18px;padding:20px 24px;min-height:100%}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
+.chip{padding:3px 11px;border-radius:999px;font-weight:700;font-size:14px;background:#eef0f3;color:#9aa4ad}
+.chip.on{background:var(--bluebg);color:var(--blue)}.chip.all{background:#e3f4ea;color:var(--ok)}.chip.pro{background:#f3e8ff;color:#6b21a8}
+h1{font-size:34px;line-height:1.2;margin:4px 0 14px}
+.ans{display:inline-flex;align-items:center;gap:10px;font-size:28px;font-weight:800;color:var(--ok);background:var(--okbg);border:3px solid var(--okb);border-radius:14px;padding:8px 18px}
+.ans.hid{color:#9aa4ad;background:#f4f6f8;border-color:#d5dbe0;border-style:dashed}
+.alt{font-size:15px;color:var(--muted);margin-top:6px}
+.hint{font-size:14px;color:var(--muted);margin:8px 0 14px}
+.class{float:right;text-align:right;font-size:14px;color:var(--muted);margin-left:16px;max-width:300px}.class .big{font-size:30px;font-weight:800;color:var(--ink);line-height:1.1}
+.wh{font-weight:700;font-size:16px;margin:4px 0 8px}
+.where{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:12px}
+.col{border:2px solid var(--line);border-radius:12px;padding:10px 13px;font-size:17px;line-height:1.45}
+.col h3{margin:0 0 6px;font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--blue);display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.col h3 small{font-size:12px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600}
+.col .q{font-weight:700;margin:0 0 6px}.col .a{font-weight:800;color:var(--ok);margin:0 0 8px}.col .a.hid{color:#b5bcc2}
+.col .txt{font-size:16px;color:#2c3a44}.col .none{color:#b5bcc2;font-style:italic}
+.col .n{font-size:13px;color:var(--muted);margin-top:6px}
+mark{background:var(--mark);padding:1px 3px;border-radius:4px;color:inherit}
+table.log{border-collapse:collapse;width:100%;table-layout:fixed}
+.log th,.log td{border:2px solid var(--line);padding:8px 10px;font-size:16px;vertical-align:top;text-align:left;line-height:1.35;overflow-wrap:anywhere}
+.log th{background:#f4f6f8;font-size:14px;color:var(--blue)}.log td.lab{font-weight:700;width:24%}
+.log td.na{background:#f8f9fa;color:#b5bcc2;font-style:italic}.log td.hid{color:#b5bcc2}
+.tag{display:inline-block;font-size:12px;font-weight:700;color:var(--blue);background:var(--bluebg);border-radius:999px;padding:1px 8px;margin-left:4px}
+.bar{display:flex;gap:10px;justify-content:center;align-items:center;padding:10px;background:var(--bar);flex:none;flex-wrap:wrap}
+.bar button{font:700 16px system-ui,sans-serif;padding:9px 20px;border-radius:10px;border:0;background:var(--dot);color:#fff;cursor:pointer}
+.bar button.pri{background:#ffd34d;color:var(--ink)}.bar button:disabled{opacity:.4;cursor:default}
+.bar .keys{color:#8fb0c2;font-size:13px}
+.msg{color:#fff;padding:30px;font-size:18px}
+@media (max-width:900px){.where{grid-template-columns:1fr 1fr}h1{font-size:26px}.ans{font-size:22px}.class{float:none;text-align:left;max-width:none;margin:0 0 8px}.bar .keys{display:none}}
+@media (max-width:560px){.where{grid-template-columns:1fr}.top{padding:8px 16px}main{padding:10px 16px}.card{padding:14px 16px}.log td.lab{width:34%}}
+body.locked>*:not(#gate){display:none!important}
+#gate{display:none;max-width:420px;margin:60px auto;padding:20px;background:#fff;border-radius:12px;font:15px/1.5 system-ui,sans-serif;text-align:center}
+body.locked #gate{display:block}
+#gate button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #1f5f8b;background:#1f5f8b;color:#fff;cursor:pointer}
+</style>
+</head>
+<body class="locked">
+<div id="gate"></div>
+<div class="top"><b>✅ Correct together</b><span class="sub" id="sub"></span><span class="sp"></span><div class="dots" id="dots"></div></div>
+<main><div class="msg" id="out">Loading…</div></main>
+<div class="bar" id="bar"></div>
+<script src="../js/el-catalog.js"></script>
+<script src="correct-core.js"></script>
+<script src="notes.js"></script>
+<script type="module" src="../print/teacher-gate.js"></script>
+<script type="module" src="correct.js"></script>
+</body>
+</html>
