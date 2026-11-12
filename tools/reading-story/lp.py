@@ -6,9 +6,9 @@ Run: python3 tools/reading-story/lp.py
 Source: the same tools/reading-story/<course>-<ls>.md as the PDFs (build.py). Output: <LS folder>/data/book.js, read by
 <LS folder>/book.html (ls2-engine.js): one tab per chapter (ch1 … ch6) with the book's own pages for the student's route (Starter,
 Base, Core, Plus; Pro reads Plus), shown as a book that turns its pages (shared/js/el-book.js; the pictures and book/pages.json come
-from build.py --web, run it first), and the chapter's two questions: "Did you understand?" (checked, the right option first as
-in every mc panel) and "What happens next? Guess!" (guess: saved, never marked; the next chapter shows the guess and, after its
-check, whether it was right). KEYS = the right options of the Drive teacher copies (✓), the same in every route.
+from build.py --web, run it first), and the chapter's two questions as the book's last page, answered on the page, once
+(ls2-engine.js bookPanel): "Did you understand?" (checked, the right option first as in every mc panel) and "What happens next?
+Guess!" (guess: saved, never marked; the next chapter shows the guess and, after its check, whether it was right). KEYS = the right options of the Drive teacher copies (✓), the same in every route.
 """
 import json, os, re, sys
 
@@ -76,8 +76,8 @@ def build(b):
             items.append(it)
         p = {"id": "ch%d" % ch["n"], "type": "mc", "tab": {"en": "Chapter %d" % ch["n"], "ca": "Capítol %d" % ch["n"]},
              "title": typo("Chapter %d · %s" % (ch["n"], ch["title"])), "pill": lp_of(b["lps"][k]),
-             "intro": {"en": "Read the chapter in the book: turn the pages with ▶ or a tap, and press ⤢ to read it full screen. Then answer below: one question about the story and one guess about what happens next.",
-                       "ca": "Llegeix el capítol al llibre: gira les pàgines amb ▶ o tocant-les, i prem ⤢ per llegir-lo a pantalla completa. Després respon a sota: una pregunta sobre la història i una endevinalla sobre què passarà."},
+             "intro": {"en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
+                       "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."},
              "book": True, "media": {"pages": pages}, "items": items}
         if k:
             p["prev"] = "ch%d" % chapters[k - 1]["n"]

@@ -171,12 +171,12 @@ def body_html(b, lv, name, chapters, web=False):
     intro = ["<section class=\"intro page\"><h2>How to read this book</h2>",
              "<p>Read one chapter a week at home, with the Learning Path it goes with. Read it once for the story, then again more slowly.</p>",
              "<p>The words in the box at the start help you. They are <span class=\"gl\">underlined</span> in the story.</p>",
-             ("<p>At the end of each chapter, answer the two questions below the book: tap one answer for each. In class we talk about the chapter for ten minutes and see who guessed what happens next.</p>" if web else
+             ("<p>At the end of each chapter, turn the page to answer two questions: tap one answer for each and press Check. You answer only once, so think before you check! In class we talk about the chapter for ten minutes and see who guessed what happens next.</p>" if web else
               "<p>At the end of each chapter, circle one answer to each question. In class we talk about the chapter for ten minutes and see who guessed what happens next.</p>")]
     if ca:
         intro += ["<p class=\"ca\">Llegeix un capítol cada setmana a casa, amb el Learning Path que li toca. Llegeix-lo una vegada per entendre la història i una altra més a poc a poc.</p>",
                   "<p class=\"ca\">Les paraules del requadre de l'inici t'ajuden: estan subratllades a la història.</p>",
-                  ("<p class=\"ca\">Al final de cada capítol, respon les dues preguntes de sota del llibre: toca una resposta a cada una. A classe en parlem deu minuts i mirem qui ha endevinat què passa després.</p>" if web else
+                  ("<p class=\"ca\">Al final de cada capítol, gira la pàgina per respondre dues preguntes: toca una resposta a cada una i prem Comprova. Només pots respondre una vegada: pensa-hi bé abans de comprovar! A classe en parlem deu minuts i mirem qui ha endevinat què passa després.</p>" if web else
                    "<p class=\"ca\">Al final de cada capítol, encercla una resposta a cada pregunta. A classe en parlem deu minuts i mirem qui ha endevinat què passa després.</p>")]
     intro.append("<div class=\"toc\"><h2>Contents</h2><ol>")
     for ch in chapters:
@@ -191,17 +191,19 @@ def body_html(b, lv, name, chapters, web=False):
             s.append("<div class=\"words\"><h3>Words to help you%s</h3><ul>%s</ul></div>" % (" · Paraules que t'ajuden" if ca else "",
                      "".join("<li><b>%s</b> = <i>%s</i></li>" % (esc(w), esc(g)) for w, g in L["words"])))
         s.append("<div class=\"text\">" + "".join("<p>%s</p>" % esc(p) for p in paras) + "</div>")
-        how = ("Answer below the book: tap one answer for each question.%s" % (" · Respon a sota del llibre: toca una resposta a cada pregunta." if ca else "")) if web else \
-              ("Circle one answer for each question.%s" % (" · Encercla una resposta a cada pregunta." if ca else ""))
-        s.append("<div class=\"think\"><h3>Think about it</h3><div class=\"how\">%s</div>" % how)
-        for lab, q in (("1 · Did you understand?" + (" · Ho has entès?" if ca else ""), L["gist"]), ("2 · What happens next? Guess!" + (" · Què passarà? Endevina-ho!" if ca else ""), L["next"])):
+        # on the web the questions are the book's last page, answered on the page itself (ELBook end page, ls2-engine.js)
+        how = "Circle one answer for each question.%s" % (" · Encercla una resposta a cada pregunta." if ca else "")
+        if not web:
+            s.append("<div class=\"think\"><h3>Think about it</h3><div class=\"how\">%s</div>" % how)
+        for lab, q in () if web else (("1 · Did you understand?" + (" · Ho has entès?" if ca else ""), L["gist"]), ("2 · What happens next? Guess!" + (" · Què passarà? Endevina-ho!" if ca else ""), L["next"])):
             if not q:
                 continue
             qt, qca = q["q"]
             s.append("<div class=\"q\"><div class=\"qt\"><span class=\"lab\">%s</span>%s%s</div><ul>%s</ul></div>" % (lab, esc(qt),
                      ("<span class=\"ca\">%s</span>" % esc(qca)) if (qca and ca) else "",
                      "".join("<li><span>%s</span>%s</li>" % ("ABCD"[i], esc(o)) for i, o in enumerate(q.get("opts", [])))))
-        s.append("</div>")
+        if not web:
+            s.append("</div>")
         if k == len(chapters) - 1:
             s.append("<div class=\"end\">%s</div>" % esc(b["ending"]))
         s.append("</section>")
@@ -242,8 +244,8 @@ def main():
 
 def main_web():
     """Page pictures for the 📖 Book learning path (Roger, 12 Nov 2026: "I want students to see the pages of the book as a PDF … the
-    feeling that they are reading a book, with the images"; "the feeling of turning pages"). The same books with the web wording (answer
-    below the book, not "circle"), printed and turned into one WebP picture per page: <LS folder>/book/<route>-NN.webp, and
+    feeling that they are reading a book, with the images"; "the feeling of turning pages"). The same books with the web wording (no
+    "Think about it": the questions are the last page of each chapter, answered on the page), printed and turned into one WebP picture per page: <LS folder>/book/<route>-NN.webp, and
     <LS folder>/book/pages.json = {route: {"cover": [pages], "1": [pages of chapter 1], …}} for lp.py. Needs pdftoppm and Pillow."""
     from PIL import Image
     copy = copyright_line()

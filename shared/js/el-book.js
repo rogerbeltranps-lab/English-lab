@@ -3,8 +3,14 @@
    amazing"). ELBook.mount(el, pages, opts) draws the chapter's page pictures (<LS>/book/<route>-NN.webp, made by
    tools/reading-story/build.py --web) as an open book: two pages side by side on a computer, one on a phone, and the page turns like
    paper (a 3D leaf) with the arrows, a tap on the left or right page, a swipe or the keyboard. ⤢ opens it full screen to read;
-   🔍 shows one page as wide as the screen. After the last page the arrow becomes "Questions ⬇" (opts.onEnd).
-   opts: {ca: Catalan labels, title: the chapter's name (alt text), onEnd()}. Used by ls2-engine.js (media.pages) on book.html. */
+   🔍 shows one page as wide as the screen.
+   The questions are the book's last page (Roger, 12 Nov 2026: "can we make them do the activity in full screen (the book) and that they
+   press the options there?"): opts.end is a live element (the engine's form) shown as a page after the pictures. While it is on screen
+   the page taps don't turn (the options take the taps); during a turn the moving paper shows a copy of it.
+   Full screen is the browser's (on <html>, so going from one chapter to the next keeps it) plus a cover over the page; it leaves the
+   browser's full screen only if it entered it (class mode keeps its own).
+   opts: {ca: Catalan labels, title: the chapter's name (alt text), end: element, atEnd(): the end page is on screen}.
+   Returns {open(), close(keepBrowserFullScreen), isFull()}. Used by ls2-engine.js on book.html. */
 (function () {
   const R = 210 / 148;   // A5
   const css = `
@@ -21,6 +27,8 @@
 .elb-r::after{background:linear-gradient(to right,rgba(0,0,0,.18),rgba(0,0,0,0) 7%)}
 .elb.single .elb-r::after{background:linear-gradient(to right,rgba(0,0,0,.10),rgba(0,0,0,0) 4%)}
 .elb-page.blank img{visibility:hidden}
+.elb-page.html img,.elb-face.html img{display:none}
+.elb-hit.off{display:none}
 .elb-leaf{display:none;transform-style:preserve-3d;z-index:3;transition:transform .75s cubic-bezier(.45,.05,.3,1)}
 .elb-leaf.on{display:block}
 .elb-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--paper);overflow:hidden}
@@ -37,22 +45,57 @@
 .elb-bar .elb-go{background:var(--accent,#1f6b52);color:#fff;border-color:transparent}
 .elb-bar .elb-n{min-width:120px;text-align:center;color:var(--muted,#66766f);font-weight:700;font-variant-numeric:tabular-nums}
 .elb-tip{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(20,28,25,.82);color:#fff;border-radius:999px;padding:8px 16px;font-weight:800;font-size:.92rem;z-index:5;pointer-events:none;white-space:nowrap}
-.elb.full{position:fixed;inset:0;z-index:2000;margin:0;background:#2b2621;display:flex;flex-direction:column;justify-content:center;padding:10px max(10px,env(safe-area-inset-right,0px)) 10px max(10px,env(safe-area-inset-left,0px))}
+.elb.full{position:fixed;inset:0;z-index:9600;margin:0;background:#2b2621;display:flex;flex-direction:column;justify-content:center;padding:10px max(10px,env(safe-area-inset-right,0px)) 10px max(10px,env(safe-area-inset-left,0px))}
 .elb.full .elb-stage{background:transparent;padding:0;flex:1;align-items:center;min-height:0}
 .elb.full .elb-bar{margin-top:8px}.elb.full .elb-bar button{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.18)}
 .elb.full .elb-bar .elb-go{background:var(--accent,#1f6b52)}.elb.full .elb-bar .elb-n{color:#e8e1d6}
 .elb.full .elb-tip{display:none}
 .elb.zoom .elb-stage{overflow:auto;align-items:flex-start}
 html.elb-lock{overflow:hidden}
+.elb-q{--bk:#c8622a;position:absolute;inset:0;overflow:auto;padding:7% 8% 6%;background:var(--paper);color:#22262a;text-align:left;font-family:Caladea,Georgia,'Times New Roman',serif;font-size:max(12px,calc(var(--pw)*.034));line-height:1.35}
+.elb-q *{box-sizing:border-box}
+.elbq-top{font:700 .6em/1.2 Inter,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8a8f94;margin:0 0 1.1em}
+.elb-q .elbq-k{font:800 .78em/1.2 Inter,system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--bk);border-top:2px solid var(--bk);padding-top:.8em;margin:0 0 .35em}
+.elbq-how{font:.7em/1.4 Inter,system-ui,sans-serif;color:#6b7280;margin:0 0 1.1em}
+.elb-q .question{margin:0 0 .9em;padding:0;border:0;background:none;box-shadow:none}
+.elbq-lab{font:700 .64em/1.3 Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;margin:0 0 .25em}
+.elb-q .q-title{font-weight:700;color:#17463a;font-size:1.06em;margin:0;line-height:1.3}
+.elbq-ca{font-style:italic;color:#5b6168;font-size:.88em;margin:.1em 0 0}
+.elb-q .options{display:flex;flex-direction:column;gap:.1em;margin:.4em 0 0}
+.elb-q .option{position:relative;display:flex;align-items:center;gap:.6em;margin:0;padding:.24em .5em;border-radius:.5em;cursor:pointer;border:1px solid transparent;background:transparent;font-weight:400;box-shadow:none;min-height:0}
+.elb-q .option input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.elbq-l{flex:0 0 auto;width:2.2em;height:2.2em;border:1.5px solid var(--bk);border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 .68em Inter,system-ui,sans-serif;color:var(--bk);background:#fff}
+.elb-q:not(.locked) .option:hover{background:rgba(200,98,42,.07)}
+.elb-q .option:has(input:checked){background:rgba(200,98,42,.10);border-color:rgba(200,98,42,.35)}
+.elb-q .option:has(input:checked) .elbq-l{background:var(--bk);color:#fff}
+.elb-q .option:has(input:focus-visible){outline:2px solid var(--bk);outline-offset:1px}
+.elb-q .option.right,.elb-q .option.right:has(input:checked){background:#e3f4ea;border-color:#86c9a0}.elb-q .option.right .elbq-l,.elb-q .option.right:has(input:checked) .elbq-l{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
+.elb-q .option.wrong,.elb-q .option.wrong:has(input:checked){background:#fde8e6;border-color:#f0a59c}.elb-q .option.wrong .elbq-l,.elb-q .option.wrong:has(input:checked) .elbq-l{background:#c0392b;border-color:#c0392b;color:#fff}
+.elb-q.locked .option{cursor:default}
+.elb-q .feedback{font:600 .74em/1.35 Inter,system-ui,sans-serif;margin:.4em 0 0;padding:0;background:none;border:0}
+.elb-q .feedback:empty{display:none}.elb-q .feedback.ok{color:#17703f}.elb-q .feedback.no{color:#b3261e}
+.elb-q .actions{display:flex;gap:.6em;flex-wrap:wrap;margin:.7em 0 0}
+.elb-q [hidden]{display:none!important}
+.elb-q .btn{font:800 .8em/1.2 Inter,system-ui,sans-serif;padding:.7em 1.2em;border-radius:.7em;min-height:0;text-decoration:none;display:inline-flex;align-items:center;cursor:pointer}
+.elb-q .result{font:700 .76em/1.35 Inter,system-ui,sans-serif;margin:.4em 0 0;padding:.6em .8em;border-radius:.6em;background:#f1f6f3;color:#17463a;border:0}
+.elb-q .result:not(.show){display:none}
+.elbq-after{margin-top:.6em}.elbq-after .actions{margin-top:.5em}.elbq-after[hidden]{display:none}
+.elbq-end{font:700 .8em/1.35 Inter,system-ui,sans-serif;color:#17463a;margin:0}
+.elb-q .guess-back{font:.7em/1.45 Inter,system-ui,sans-serif;background:#fff4e8;border:1px solid #f3cfa8;border-radius:.6em;padding:.6em .8em;margin:0 0 1.1em;color:#5b3a12}
 @media (max-width:520px){.elb-stage{padding:10px 4px 8px}.elb-bar{gap:6px}.elb-bar button{padding:8px 11px;min-height:40px}.elb-bar .elb-n{min-width:0;flex-basis:100%;order:-1}}
 @media (prefers-reduced-motion:reduce){.elb-leaf,.elb-face::after{transition:none}}
 `;
   const T = (ca, a, b) => ca ? a : b;
+  let fsMine = false;   // the browser's full screen is this script's (so it leaves it); one for every book of the page
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
   function mount(el, pages, o) {
     o = o || {};
-    if (!el || !pages || !pages.length) return;
+    if (!el || !pages || !pages.length) return null;
+    const endEl = o.end || null;
+    if (endEl && endEl.parentNode) endEl.parentNode.removeChild(endEl);
     if (!document.getElementById('elBookCss')) document.head.insertAdjacentHTML('beforeend', '<style id="elBookCss">' + css + '</style>');
-    const ca = !!o.ca, n = pages.length, alt = k => (o.title || 'Book') + ' · ' + T(ca, 'pàgina ', 'page ') + (k + 1);
+    const all = endEl ? pages.concat([endEl]) : pages.slice();
+    const ca = !!o.ca, n = all.length, alt = k => (o.title || 'Book') + ' · ' + T(ca, 'pàgina ', 'page ') + (k + 1);
     el.className = 'elb'; el.tabIndex = 0;
     el.setAttribute('role', 'region'); el.setAttribute('aria-label', T(ca, 'Llibre', 'Book'));
     el.innerHTML = '<div class="elb-stage"><div class="elb-book">' +
@@ -64,21 +107,34 @@ html.elb-lock{overflow:hidden}
       '<div class="elb-bar"><button type="button" class="elb-p">◀ ' + T(ca, 'Enrere', 'Back') + '</button><span class="elb-n"></span>' +
       '<button type="button" class="elb-x elb-go">' + T(ca, 'Gira la pàgina', 'Turn the page') + ' ▶</button>' +
       '<button type="button" class="elb-z" hidden>🔍 ' + T(ca, 'Més gran', 'Bigger') + '</button>' +
-      '<button type="button" class="elb-f">⤢ ' + T(ca, 'Pantalla completa', 'Full screen') + '</button></div>';
+      '<button type="button" class="elb-f">⤢ ' + T(ca, 'Pantalla completa', 'Full screen') + '</button></div><div class="elb-hold" hidden></div>';
     const q = s => el.querySelector(s), L = q('.elb-l'), Rp = q('.elb-r'), leaf = q('.elb-leaf'), book = q('.elb-book'), stage = q('.elb-stage');
-    const nb = q('.elb-n'), bp = q('.elb-p'), bx = q('.elb-x'), bz = q('.elb-z'), bf = q('.elb-f'), tip = q('.elb-tip');
+    const nb = q('.elb-n'), bp = q('.elb-p'), bx = q('.elb-x'), bz = q('.elb-z'), bf = q('.elb-f'), tip = q('.elb-tip'), hold = q('.elb-hold');
+    if (endEl) hold.appendChild(endEl);
     let i = 0, busy = false, full = false, zoom = false, single = false, seen = false;
-    const set = (box, k) => { const im = box.querySelector('img'); box.classList.toggle('blank', k == null || k < 0 || k >= n); if (k != null && k >= 0 && k < n) { im.src = pages[k]; im.alt = alt(k); } else im.removeAttribute('src'); };
+    // the end page on the moving paper: a copy without ids or names (the live form stays where the engine finds it)
+    const copyOf = x => { const c = x.cloneNode(true); c.classList.add('elb-copy'); c.removeAttribute('id'); c.querySelectorAll('[id],[name]').forEach(e => { e.removeAttribute('id'); e.removeAttribute('name'); }); c.querySelectorAll('input,button,a').forEach(e => { e.tabIndex = -1; if ('disabled' in e) e.disabled = true; }); return c; };
+    const set = (box, k) => {
+      const im = box.querySelector('img'), pg = k != null && k >= 0 && k < n ? all[k] : null, live = pg && typeof pg !== 'string' ? pg : null;
+      Array.from(box.children).forEach(c => { if (c === endEl) hold.appendChild(c); else if (c.classList.contains('elb-copy')) c.remove(); });
+      box.classList.toggle('blank', !pg); box.classList.toggle('html', !!live);
+      if (!pg || live) im.removeAttribute('src');
+      if (live) box.appendChild(box.classList.contains('elb-face') ? copyOf(live) : live);
+      else if (pg) { im.src = pg; im.alt = alt(k); }
+    };
     pages.forEach(src => { const im = new Image(); im.decoding = 'async'; im.src = src; });   // a chapter is 2–5 pages: load them all, so a turn never waits
     const step = () => single ? 1 : 2;
     function draw() {
       if (single) { set(Rp, i); set(L, null); } else { set(L, i); set(Rp, i + 1); }
-      const last = Math.min(n, i + step());
-      nb.textContent = (single || last - i === 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + last) + T(ca, ' de ', ' of ') + n;
+      const last = Math.min(n, i + step()), qs = endEl && last === n && (single || last - i === 1);
+      nb.textContent = qs ? T(ca, 'Preguntes', 'Questions') : (single || last - i === 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + last) + T(ca, ' de ', ' of ') + (endEl ? n - 1 : n);
       bp.disabled = i === 0; q('.elb-hit.prev').disabled = i === 0;
-      const end = i + step() >= n;
-      bx.textContent = end ? (o.onEnd ? T(ca, 'Preguntes ⬇', 'Questions ⬇') : T(ca, 'Fi', 'The end')) : T(ca, 'Gira la pàgina', 'Turn the page') + ' ▶';
-      bx.disabled = end && !o.onEnd;
+      const end = i + step() >= n, onEnd = endEl && last === n;
+      // the end page takes the taps (its options); the arrows, the keys and a swipe still turn
+      q('.elb-hit.prev').classList.toggle('off', !!onEnd); q('.elb-hit.next').classList.toggle('off', !!onEnd);
+      bx.textContent = end ? T(ca, 'Fi', 'The end') : (endEl && i + 2 * step() >= n ? T(ca, 'Preguntes', 'Questions') + ' ▶' : T(ca, 'Gira la pàgina', 'Turn the page') + ' ▶');
+      bx.disabled = end; bx.hidden = end && !!endEl;
+      if (onEnd && o.atEnd) o.atEnd();
     }
     function fit() {
       const W = full ? innerWidth - 20 : el.clientWidth - 16, H = full ? innerHeight - (q('.elb-bar').offsetHeight + 30) : Math.min(innerHeight * 0.82, 760);
@@ -99,7 +155,7 @@ html.elb-lock{overflow:hidden}
     function turn(dir) {
       if (busy) return;
       const s = step(), to = i + dir * s;
-      if (dir > 0 && i + s >= n) { if (o.onEnd) { if (full) toggleFull(false, true); setTimeout(o.onEnd, 60); } return; }
+      if (dir > 0 && i + s >= n) return;
       if (dir < 0 && i === 0) return;
       seen = true; tip.hidden = true;
       if (!motion()) { i = Math.max(0, to); draw(); return; }
@@ -126,24 +182,30 @@ html.elb-lock{overflow:hidden}
       leaf.addEventListener('transitionend', function h(e) { if (e.target !== leaf) return; leaf.removeEventListener('transitionend', h); end(); });
       setTimeout(end, 1000);
     }
-    function toggleFull(on, stay) {
+    function toggleFull(on, stay, keepFs) {
       full = on == null ? !full : on;
       if (!full) zoom = false;
       el.classList.toggle('full', full); document.documentElement.classList.toggle('elb-lock', full);
       bf.textContent = full ? '✕ ' + T(ca, 'Tanca', 'Close') : '⤢ ' + T(ca, 'Pantalla completa', 'Full screen');
-      try { if (full && el.requestFullscreen && !document.fullscreenElement) el.requestFullscreen().catch(() => {}); else if (!full && document.fullscreenElement === el) document.exitFullscreen().catch(() => {}); } catch (e) {}
-      fit(); el.focus({ preventScroll: true });
+      const E = document.documentElement, rq = E.requestFullscreen || E.webkitRequestFullscreen;
+      try {
+        if (full && !fsEl() && rq) { fsMine = true; const r = rq.call(E); if (r && r.catch) r.catch(() => { fsMine = false; }); }
+        else if (!full && !keepFs && fsMine && fsEl()) { fsMine = false; (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+      } catch (e) { fsMine = false; }
+      fit(); if (full) el.focus({ preventScroll: true });
       if (!full && !stay) el.scrollIntoView({ block: 'nearest' });
     }
-    document.addEventListener('fullscreenchange', () => { if (full && document.fullscreenElement !== el) toggleFull(false); else fit(); });
+    const fc = () => { if (!fsEl()) { if (full && fsMine) { fsMine = false; toggleFull(false); } else if (!full) fsMine = false; } fit(); };
+    document.addEventListener('fullscreenchange', fc); document.addEventListener('webkitfullscreenchange', fc);
     bp.onclick = () => turn(-1); bx.onclick = () => turn(1); bf.onclick = () => toggleFull();
     bz.onclick = () => { zoom = !zoom; fit(); stage.scrollTop = 0; };
     q('.elb-hit.prev').onclick = () => turn(-1);
     q('.elb-hit.next').onclick = () => { if (!full && !seen && innerWidth >= 700) { seen = true; toggleFull(true); return; } turn(1); };
     el.addEventListener('keydown', e => {
+      if (e.key !== 'Escape' && e.target.closest && e.target.closest('input,button,a,textarea,select') && e.target !== el) return;   // the end page's options and buttons keep their keys
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || (e.key === ' ' && full)) { e.preventDefault(); turn(1); }
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); turn(-1); }
-      else if (e.key === 'Escape' && full) toggleFull(false);
+      else if (e.key === 'Escape' && full) { e.preventDefault(); toggleFull(false); }
     });
     let sx = null, sy = null;
     book.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; });
@@ -151,6 +213,12 @@ html.elb-lock{overflow:hidden}
     if (window.ResizeObserver) new ResizeObserver(() => fit()).observe(el); else addEventListener('resize', fit);
     addEventListener('resize', () => { if (full) fit(); });
     fit();
+    return {
+      open() { if (!full) { seen = true; toggleFull(true); } },
+      close(keepFs) { if (full) toggleFull(false, true, keepFs); },
+      isFull: () => full,
+      toEnd() { i = single ? n - 1 : (n - 1) - ((n - 1) % 2); draw(); }
+    };
   }
   window.ELBook = { mount };
 })();

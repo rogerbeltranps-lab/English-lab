@@ -593,11 +593,10 @@ var LS2 = (function () {
     };
     if (kept.some(v => v)) show();
   }
-  R.mc = p => ({
+  R.mc = p => p.book ? bookPanel(p) : ({
     html: '<div class="section-card">' + guessBackHtml(p) + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
     bind() {
       bindAudio(p); bindCycle(p); bindDict(p);
-      if (p.media && p.media.pages && window.ELBook) ELBook.mount($('#' + p.id + 'Book'), byLevel(p.media.pages), { ca: ca(), title: tx(p.title), onEnd: () => { const q = $('#' + p.id + 'Form'); if (q) q.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
       const items = forLevel(p.items), f = $('#' + p.id + 'Form'), scored = items.filter(q => !q.guess).length;
       f.innerHTML = items.map((q, i) => '<div class="question' + (q.guess ? ' guess-q' : '') + '"><p class="q-title">' + (i + 1) + '. ' + (q.guess ? '🔮 ' : '') + q.q + (q.qca && ca() ? ' <span class="q-ca">[' + q.qca + ']</span>' : '') + '</p><div class="options">' +
         learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + p.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') +
@@ -626,6 +625,90 @@ var LS2 = (function () {
      An mc item with guess: true ("What happens next? Guess!") is saved like any answer but never marked or scored: the step's score is
      the other questions. The next chapter (p.prev = the chapter before) opens with the student's guess and, once it is checked, says
      whether the guess was right (the right option is the first, as in every mc item). */
+  /* Answered in the book (Roger, 12 Nov 2026: "can we make them do the activity in full screen (the book) and that they press the options
+     there? and then they get the feedback? they can only do it once and when they finish, they can go to the other chapter or leave the
+     LP"). The questions are the book's last page (ELBook opts.end): the student taps an option on the page and presses Check, which works
+     only when both are answered and counts once: the feedback stays on the page (the right option green, a wrong one red) and nothing can
+     be changed or done again (no ↺). Then "Chapter n ▶" opens the next chapter (still full screen if the book was), when its tab is open
+     for the student, and "Leave the Book" goes back to the LS page. */
+  function bookPanel(p) {
+    const T2 = (a, b) => ca() ? a : b, id = p.id;
+    const page = '<div class="elb-q" id="' + id + 'QPage"><div class="elbq-top">' + esc(tx(p.title)) + '</div>' + guessBackHtml(p) +
+      '<h3 class="elbq-k">Think about it</h3><p class="elbq-how" id="' + id + 'How">' + T2('Toca una resposta a cada pregunta i prem Comprova. Només ho pots fer una vegada!', 'Tap one answer for each question and press Check. You can only do it once!') + '</p>' +
+      '<form id="' + id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + id + 'Check">' + T2('Comprova', 'Check') + '</button>' + againBtn(id) + '</div>' +
+      '<div class="result" id="' + id + 'Result"></div><div class="elbq-after" id="' + id + 'After" hidden></div></div>';
+    let book = null;
+    const lab = q => q.guess ? '2 · What happens next? Guess!' + T2(' · Què passarà? Endevina-ho!', '') : '1 · Did you understand?' + T2(' · Ho has entès?', '');
+    function lock() {
+      const pg = $('#' + id + 'QPage'); pg.classList.add('locked');
+      $$('#' + id + 'Form input').forEach(x => { x.disabled = true; });
+      $('#' + id + 'Check').hidden = true; $('#' + id + 'How').hidden = true;
+      after();
+    }
+    function nextOf() {
+      const nx = LP.panels.find(x => x.prev === id), tab = nx && document.querySelector('.tab[data-panel="' + nx.id + '"]');
+      const open = !!tab && !tab.hidden && !tab.classList.contains('el-sec-hide') && !tab.classList.contains('el-sec-cls') && tab.style.display !== 'none';
+      return { nx, tab, open };
+    }
+    function after() {
+      const el = $('#' + id + 'After'); if (!el || !$('#' + id + 'QPage').classList.contains('locked')) return;
+      const { nx, tab, open } = nextOf();
+      const h = (!nx ? '<p class="elbq-end">🎉 ' + T2('Has acabat el llibre! En parlarem a classe.', 'You’ve finished the book! We’ll talk about it in class.') + '</p>'
+        : !open ? '<p class="elbq-end">' + T2('El ' + esc(tx(nx.tab)).toLowerCase() + ' encara no està obert: el teu professor el posarà a l’agenda.', esc(tx(nx.tab)) + ' isn’t open yet: your teacher will put it on the agenda.') + '</p>' : '') +
+        '<div class="actions">' + (nx && open ? '<button class="btn" type="button" data-go="next">' + esc(tx(nx.tab)) + ' ▶</button>' : '') +
+        '<a class="btn secondary" href="index.html">' + T2('Surt del llibre', 'Leave the Book') + '</a></div>';
+      if (el.innerHTML !== h) el.innerHTML = h;
+      el.hidden = false;
+      const b = el.querySelector('[data-go]');
+      if (b) b.onclick = () => {
+        const full = book && book.isFull();
+        if (book) book.close(true);   // the browser stays in full screen for the next chapter
+        tab.click();
+        if (full && nx._book) nx._book.open();
+        else { const n = $('#' + nx.id + 'Book'); if (n) n.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+      };
+    }
+    return {
+      html: '<div class="section-card"><div class="el-book" id="' + id + 'Book">' + page + '</div></div>',
+      bind() {
+        const items = forLevel(p.items), scored = items.filter(q => !q.guess).length;
+        $('#' + id + 'Form').innerHTML = items.map((q, i) => '<div class="question' + (q.guess ? ' guess-q' : '') + '"><p class="elbq-lab">' + lab(q) + '</p><p class="q-title">' + q.q + '</p>' +
+          (q.qca && ca() ? '<p class="elbq-ca">' + q.qca + '</p>' : '') + '<div class="options">' +
+          learningSupport.shuffledIndexes(q.o.length).map((j, n) => '<label class="option"><input type="radio" name="' + id + i + '" value="' + j + '"><b class="elbq-l">' + 'ABCD'[n] + '</b><span>' + q.o[j] + '</span></label>').join('') +
+          '</div><div class="feedback" id="' + id + 'f' + i + '"></div></div>').join('');
+        $('#' + id + 'Again').hidden = true; $('#' + id + 'Again').style.display = 'none';
+        const pages = p.media && p.media.pages ? byLevel(p.media.pages) : [];
+        if (window.ELBook) book = p._book = ELBook.mount($('#' + id + 'Book'), pages, { ca: ca(), title: tx(p.title), end: $('#' + id + 'QPage'), atEnd: after });
+        stays(id, id, id + 'Form', items, count => {
+          let score = 0; const g = [];
+          items.forEach((q, i) => {
+            const c = document.querySelector('input[name="' + id + i + '"]:checked'), ok = !!c && +c.value === 0, fb = $('#' + id + 'f' + i);
+            g.push([ok, c ? +c.value : null]);
+            $$('input[name="' + id + i + '"]').forEach(x => { const l = x.closest('.option'); l.classList.toggle('right', !q.guess && +x.value === 0); l.classList.toggle('wrong', !q.guess && x.checked && +x.value !== 0); });
+            if (q.guess) { fb.textContent = c ? '🔮 ' + guessSaved(p) : ''; fb.className = 'feedback ok'; return; }
+            if (ok) score++;
+            fb.textContent = ok ? T2('✓ Correcte!', '✓ Correct!') : T2('✗ No és aquesta: la resposta és «' + q.o[0] + '».', '✗ Not this one: the answer is “' + q.o[0] + '”.');
+            fb.className = 'feedback ' + (ok ? 'ok' : 'no');
+          });
+          if (count) { firstTry(id, score, scored); firstItems(id, p.items, items, g); }
+          const ok = answered(items, id);
+          result($('#' + id + 'Result'), score, scored, ok);
+          if (ok) { if (count) complete(id); else doneFrom(id, id); }
+          guessBack(p); LP.panels.filter(x => x.prev === id).forEach(guessBack);
+          lock();
+        }, p.items);
+        // one try: Check only with every question answered
+        const btn = $('#' + id + 'Check'), go = btn.onclick;
+        btn.onclick = () => {
+          const miss = items.findIndex((q, i) => !document.querySelector('input[name="' + id + i + '"]:checked'));
+          if (miss >= 0) { const fb = $('#' + id + 'f' + miss); fb.textContent = T2('Tria una resposta abans de comprovar.', 'Choose an answer before you check.'); fb.className = 'feedback no'; return; }
+          go();
+        };
+        $('#' + id + 'Form').addEventListener('change', e => { const fb = e.target.closest('.question') && e.target.closest('.question').querySelector('.feedback.no'); if (fb && !$('#' + id + 'QPage').classList.contains('locked')) { fb.textContent = ''; fb.className = 'feedback'; } });
+        guessBack(p);
+      }
+    };
+  }
   function guessSaved(p) {
     const next = LP.panels.some(x => x.prev === p.id);
     return next ? (ca() ? 'Desat! Ho descobriràs al capítol següent.' : 'Saved! You’ll find out in the next chapter.') : (ca() ? 'Desat! En parlarem a classe.' : 'Saved! We’ll talk about it in class.');
