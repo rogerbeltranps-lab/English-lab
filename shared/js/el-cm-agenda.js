@@ -129,7 +129,14 @@ export function close(){if(box){box.remove();box=null}clearInterval(placeT);want
 // the scripts and the agendas, also with the panel closed: the class tab needs today's steps for live/{group}.go (plan)
 let ready=null;
 const scripts=()=>Promise.all([load("shared/js/el-sections.js",()=>window.EL_SECTIONS),load("shared/js/el-plan.js",()=>window.EL_PLAN),load("shared/js/el-week.js",()=>window.ELWeek),load("lab/game/decks/index.js",()=>window.EL_GAMES)]);
-export function init(){return ready||(ready=(async()=>{await scripts();L=await agendas()})().catch(e=>{ready=null;throw e}))}
+export function init(){return ready||(ready=(async()=>{await scripts();L=await agendas();await bookOpen()})().catch(e=>{ready=null;throw e}))}
+// ⚡ I've finished (Roger, 12 Nov 2026: fast finishers go on with "the book section"): the 📖 Book learning path of each LS with steps
+// today. Class mode opens it for the group (rules level, so the answers save; ensureOpen, once) and names it on live/{group}.go.ff; the
+// students' ⚡ I've finished (el-cloud.js ffGo) opens its next chapter for a student who has done today's open steps. Its chapters keep
+// their Time plan days for everyone else (🏫 until then).
+const bookOf=x=>(window.EL_CATALOG||[]).find(a=>a.ls===x.ls.id&&/\/book\.html$/.test(a.path||""));
+const todayLs=()=>{const t=today();return (L||[]).filter(x=>((x.ag.days||{})[t]||[]).some(it=>it!=="self"&&!/^note:/.test(it)&&it.indexOf("#")>0))};
+async function bookOpen(){for(const x of todayLs()){const a=bookOf(x);if(a&&window.elLpOpen&&!elLpOpen(a,x.info,C.g,true))try{await ensureOpen(x,a,"")}catch(e){console.warn("book",e)}}}
 // 👥 the steps students may work on now (as well as the class tab's own step), for this class mode in this browser tab
 const EN_K="el_cm_en";let EN=new Set();
 function enLoad(){try{const o=JSON.parse(sessionStorage.getItem(EN_K)||"null");EN=new Set(o&&o.s===C.s&&Array.isArray(o.en)?o.en:[])}catch(e){EN=new Set()}}
@@ -143,7 +150,8 @@ const lpShort=(x,a)=>{const l=String(lpLab(x,a));return (l.match(/^LP\d+/)||[l])
 const stepName=z=>z.p?itName(z.a,z.p):lpLab(z.x,z.a);
 // what the class tab writes on live/{group}.go: vis = today's steps ("path#tab", "path#" = the whole page), ps = the 👥 ones [{u, p, n}]
 export function plan(){if(!L)return null;const its=todayItems().filter(z=>!isGame(z.p));
-  return {vis:its.map(z=>z.a.path+"#"+z.p),ps:its.filter(z=>EN.has(z.it)).map(z=>({u:z.a.path,p:z.p,n:lpShort(z.x,z.a)+(z.p?" · "+itName(z.a,z.p):"")}))}}
+  const ff=todayLs().map(x=>[x,bookOf(x)]).filter(([x,a])=>a&&window.elLpOpen&&elLpOpen(a,x.info,C.g,true)).map(([,a])=>a.path);
+  return {vis:its.map(z=>z.a.path+"#"+z.p),ps:its.filter(z=>EN.has(z.it)).map(z=>({u:z.a.path,p:z.p,n:lpShort(z.x,z.a)+(z.p?" · "+itName(z.a,z.p):"")})),ff}}
 export const hasToday=()=>todayItems().length>0;
 // 🏠 the homework made for one tab on day d for the next class (the Time plan's 🏠 switch, teacher.html hwNext): [id, homework] or null
 const hwOf=x=>(((x.info||{}).homework||{})[C.g])||{};

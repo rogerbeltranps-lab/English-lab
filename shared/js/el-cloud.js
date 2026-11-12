@@ -344,6 +344,8 @@ async function gate(u){
   // ↺ Let them do it (Roger, 11 Nov 2026: one student may still do a recall checkpoint that is closed or shown for the group): the
   // teacher's redo:true on that student's try opens it for them alone (firestore.rules cpOk letMe); one read, only on such a page
   let open=!a||elLpOpen(a,info,myGroup);
+  const ffp=a&&!tester&&!AS?ffPage():[];if(!open&&ffp.length&&elLpOpen(a,info,myGroup,true))open=true;   // ⚡ I've finished: the Book chapter given to this student in class mode
+  if(ffp.length){window.EL_CM_FREE=window.EL_CM_FREE||new Set();ffp.forEach(p=>window.EL_CM_FREE.add(p))}
   if(!open&&!tester&&!AS&&a.checkpoint&&elLpOpen(a,info,myGroup,true)&&elCpClosed(a,info,myGroup)){
     try{const s=await getDoc(doc(db,"students",u.uid,"checkpoints",a.keys[0]));if(s.exists()&&s.data().redo)open=true}catch(e){console.warn("checkpoint",e)}}
   if(a&&!tester&&!open&&saved){freeze();banner(ca?"Aquí pots veure les teves respostes, però ara no les pots canviar.":"Here you can see your answers, but you can't change them now.","#92400e");return}
@@ -911,8 +913,46 @@ const cmUrl=g=>{const u=new URL(g.u,ROOT);u.hash=g.p||"";return u},lockHere=()=>
 // only see the SLP planned for the class", so on those learning path pages every other tab is hidden while class mode lasts (cmTabs).
 const onPage=u=>{try{return new URL(u,ROOT).pathname===location.pathname}catch(e){return false}};
 function cmEn(g){if(!g||!g.cm)return [];const t=String(g.t||""),out=[{u:g.u,p:g.p||"",n:(t.match(/^LP\d+/)||[t])[0]+(g.pn?" · "+String(g.pn).replace(/^\d+\s+/,""):""),me:true}];
-  (Array.isArray(g.ps)?g.ps:[]).forEach(x=>{if(x&&x.u&&!out.some(y=>y.u===x.u&&y.p===(x.p||"")))out.push({u:x.u,p:x.p||"",n:x.n||x.p||""})});return out}
+  (Array.isArray(g.ps)?g.ps:[]).forEach(x=>{if(x&&x.u&&!out.some(y=>y.u===x.u&&y.p===(x.p||"")))out.push({u:x.u,p:x.p||"",n:x.n||x.p||""})});
+  const f=ffRead(g);if(f)f.ps.forEach(p=>{if(!out.some(y=>y.u===f.u&&y.p===p))out.push({u:f.u,p,n:ffName(p,lockCa()),ff:true})});return out}
 const cmHere=g=>cmEn(g).filter(x=>onPage(x.u));
+// the tab the student is on: the active tab, or the panel shown when the page opened on a #tab link without marking a tab (the bar then
+// said "Go there" to a student already on the teacher's tab)
+const curPanel=()=>{const t=document.querySelector(".tab.active[data-panel]");if(t)return t.dataset.panel;const p=document.querySelector(".panel.active[id]");return p?p.id:null};
+// ⚡ I've finished (Roger, 12 Nov 2026: "I want to allow doing further activities planned on the agenda for fast finishers", then "yes add
+// I've finished but that brings them to the book section"): in class mode the student's 🎓 bar has ⚡ I've finished. Once every step open
+// for the class (cmEn: the teacher's step and the 👥 ones) is done on this student's progress, it takes them to the 📖 Book learning path
+// of the LS, at the first chapter they have not done, opened for them alone while this class mode lasts (sessionStorage el_cm_ff =
+// {s, until, u, ps: [chapters]}; page-only, like the Time plan's 🏫 tabs: the class tab opens the Book path for the group at the rules
+// level and names it on live/{group}.go.ff, el-cm-agenda.js). Not finished: a note says what is left. The chapter counts as one more open
+// step for them (a chip on the bar, not moved by the teacher's next move), and ⚡ again after it gives the next chapter. After the class
+// those chapters are as the Time plan says again (🏫 read-only until their day, answers kept).
+const FF_K="el_cm_ff";
+function ffRead(g){if(!g||!g.cm)return null;try{const o=JSON.parse(sessionStorage.getItem(FF_K)||"null");return o&&o.s===g.s&&o.u&&Array.isArray(o.ps)?o:null}catch(e){return null}}
+// the chapters granted on this page while that class mode lasts (known before live/{group} is read: the page's first locks)
+function ffPage(){try{const o=JSON.parse(sessionStorage.getItem(FF_K)||"null");return o&&o.u&&Array.isArray(o.ps)&&Date.now()<+o.until&&onPage(o.u)?o.ps:[]}catch(e){return []}}
+const ffName=(p,ca)=>"📖 "+(ca?"Llibre · Capítol ":"Book · Chapter ")+String(p).replace(/^ch/,"");
+const samePath=(a,b)=>{try{return new URL(a,ROOT).pathname===new URL(b,ROOT).pathname}catch(e){return false}};
+const ffAct=u=>(window.EL_CATALOG||[]).find(y=>y.path&&samePath(y.path,u));
+const ffDoneSet=a=>new Set(a.keys.flatMap(k=>[...elDoneSet(localStorage.getItem(k))]));
+// a step of the class done on this student's progress (a page with no steps, such as a game, holds nobody back)
+function ffDone(x){const a=ffAct(x.u);if(!a)return true;const sk=a.skip||[],ks=(x.p?elSecSteps(a,x.p):((window.EL_ACTIONS||{})[a.id]||[])).filter(k=>!sk.includes(k));
+  if(!ks.length)return true;const d=ffDoneSet(a);return ks.every(k=>d.has(k))}
+// the Book path the class tab offers (go.ff = [path]): the one of this page's LS, else the first
+function ffBook(g){const ps=g&&g.cm&&Array.isArray(g.ff)?g.ff:[];if(!ps.length)return null;const as=ps.map(ffAct).filter(Boolean);return as.find(a=>a.ls===lsId)||as[0]||null}
+function ffGo(){const g=LOCK;if(!g||!g.cm)return;const ca=lockCa(),bk=ffBook(g);if(!bk)return;
+  const left=cmEn(g).filter(x=>!ffDone(x));
+  if(left.length){lockToast((ca?"✋ Primer acaba: ":"✋ First finish: ")+left.map(x=>x.n||x.p).join(", "));return}
+  const d=ffDoneSet(bk),nx=((window.EL_ACTIONS||{})[bk.id]||[]).find(k=>!d.has(k));
+  if(!nx){lockToast(ca?"🎉 Ja has llegit tot el llibre! Ajuda un company o repassa la feina d'avui.":"🎉 You've read the whole book! Help a classmate or look back at today's work.");return}
+  const f=ffRead(g)&&samePath(ffRead(g).u,bk.path)?ffRead(g):{s:g.s,u:bk.path,ps:[]};f.until=g.until||Date.now()+60*60e3;if(!f.ps.includes(nx))f.ps.push(nx);
+  try{sessionStorage.setItem(FF_K,JSON.stringify(f))}catch(e){}
+  if(onPage(bk.path)){window.EL_CM_FREE=window.EL_CM_FREE||new Set();window.EL_CM_FREE.add(nx);if(window.elSecFree)elSecFree([nx])}
+  b0();cmJump({u:bk.path,p:nx})}
+const b0=()=>{const b=document.getElementById("el-lock");if(b)b.dataset.h=""};   // the bar is drawn again (a new chip)
+function ffBtn(b,ca){const x=document.createElement("button");x.dataset.ff="1";x.textContent=ca?"⚡ He acabat":"⚡ I've finished";
+  x.title=ca?"Has fet tot el d'avui? Continua amb el llibre":"Done with everything for now? Go on with the book";
+  x.style.cssText="border:0;border-radius:999px;padding:6px 16px;background:#facc15;color:#422006;font:800 14px system-ui,sans-serif;cursor:pointer";b.append(x)}
 // may the student open this tab now (a step the teacher opened on this page, or the one they were already on)
 const cmTabOk=p=>{const h=cmHere(LOCK);return h.some(x=>!x.p||x.p===p)||p===lockFrom};
 window.elCmTabOk=p=>!LOCK||!LOCK.cm||!lockHere()||cmTabOk(p);   // ⛶ one step full screen (el-app.js): Previous / Next only through these
@@ -935,19 +975,20 @@ function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-t
   clearTimeout(lockToast.t);lockToast.t=setTimeout(()=>n.remove(),3500)}
 function lockBar(){let b=document.getElementById("el-lock");
   if(!lockHere()){if(b)b.remove();return}
-  const ca=lockCa(),at=document.querySelector(".tab.active[data-panel]"),cur=at&&at.dataset.panel,g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
+  const ca=lockCa(),cur=curPanel(),g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
   if(!b){b=document.createElement("div");b.id="el-lock";b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
-    b.onclick=e=>{const x=e.target.closest("button");if(!x)return;if(x.dataset.k){const y=cmEn(LOCK)[+x.dataset.k];if(y)cmJump(y);return}const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
+    b.onclick=e=>{const x=e.target.closest("button");if(!x)return;if(x.dataset.ff)return ffGo();if(x.dataset.k){const y=cmEn(LOCK)[+x.dataset.k];if(y)cmJump(y);return}const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
   const en=cmEn(g);
   if(en.length>1){   // several steps open: a chip for each, the one the student is on marked
-    const at2=en.findIndex(x=>onPage(x.u)&&(!x.p||x.p===cur)),h2="m|"+ca+"|"+at2+"|"+en.map(x=>x.u+"#"+x.p+"#"+x.n).join("|");if(b.dataset.h===h2)return;b.dataset.h=h2;
+    const ff=!!ffBook(g),at2=en.findIndex(x=>onPage(x.u)&&(!x.p||x.p===cur)),h2="m|"+ca+"|"+ff+"|"+at2+"|"+en.map(x=>x.u+"#"+x.p+"#"+x.n).join("|");if(b.dataset.h===h2)return;b.dataset.h=h2;
     b.textContent="🎓 "+(ca?"Mode classe · pots treballar a:":"Class mode · you can work on:")+" ";
     en.forEach((x,i)=>{const c=document.createElement("button");c.dataset.k=String(i);c.textContent=(i===at2?"● ":"")+(x.n||x.p);
-      c.style.cssText="border:2px solid #fff;border-radius:999px;padding:5px 14px;font:800 14px system-ui,sans-serif;cursor:pointer;"+(i===at2?"background:#fff;color:#0f766e":"background:#0f766e;color:#fff");b.append(c)});return}
+      c.style.cssText="border:2px solid #fff;border-radius:999px;padding:5px 14px;font:800 14px system-ui,sans-serif;cursor:pointer;"+(i===at2?"background:#fff;color:#0f766e":"background:#0f766e;color:#fff");b.append(c)});if(ff)ffBtn(b,ca);return}
   const off=g.p&&cur!==g.p,h=(g.cm?"🎓 "+(ca?"Mode classe: segueixes el professor":"Class mode: you follow your teacher"):"🔒 "+(ca?"El professor et manté aquí":"Your teacher is keeping you here"))+(g.p?(ca?": pestanya ":": tab ")+(g.pn||g.p):"")
     +(off?(ca?". Acaba el que estàs fent i ves-hi.":". Finish what you are doing and go there."):"")+"|"+(off?(ca?"Ves-hi":"Go there")+" →":"");
-  if(b.dataset.h!==h){b.dataset.h=h;const [t,btn]=h.split("|");b.textContent=t+" ";if(btn){const x=document.createElement("button");x.textContent=btn;
-    x.style.cssText="background:#fff;color:#0f766e;border:0;border-radius:999px;padding:6px 16px;font-weight:800;cursor:pointer";b.append(x)}}}
+  const ff=!!ffBook(g);
+  if(b.dataset.h!==h+ff){b.dataset.h=h+ff;const [t,btn]=h.split("|");b.textContent=t+" ";if(btn){const x=document.createElement("button");x.textContent=btn;
+    x.style.cssText="background:#fff;color:#0f766e;border:0;border-radius:999px;padding:6px 16px;font-weight:800;cursor:pointer";b.append(x)}if(ff)ffBtn(b,ca)}}
 // clicks on the kept page: links that leave it, and other tabs when the teacher chose one
 document.addEventListener("click",e=>{if(!lockHere())return;
   const t=e.target.closest&&e.target.closest(".tab[data-panel]");
@@ -1071,7 +1112,7 @@ function cmGo(g){
   // step open here); on another page with none, to the teacher's page as before
   const h=cmHere(g),multi=cmEn(g).length>1;
   if(h.length){lockFrom=null;cmFree(g);
-    const at=document.querySelector(".tab.active[data-panel]"),cur=at&&at.dataset.panel,stay=multi&&h.some(x=>!x.p||x.p===cur);
+    const at=document.querySelector(".tab.active[data-panel]"),cur=curPanel(),stay=multi&&h.some(x=>!x.p||x.p===cur);
     const p=location.pathname===url.pathname?g.p:h[0].p,t=!stay&&p&&document.querySelector('.tab[data-panel="'+CSS.escape(p)+'"]');
     if(t&&t!==at){try{const f=document.activeElement;if(f&&f!==document.body&&f.blur)f.blur()}catch(e){}t.click()}
     cmStudentTabs();lockBar();return}
@@ -1125,7 +1166,7 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   const agToggle=()=>agLoad().then(m=>m.isOpen()?m.close():m.open()).catch(e=>console.warn("agenda",e));
   // today's steps and the 👥 ones (el-cm-agenda.js plan) go with every move; the module loads at once, the panel shown or not
   agLoad().then(m=>m.init()).catch(e=>console.warn("agenda",e));
-  const key=x=>x.u+"#"+x.p+"|"+JSON.stringify(x.ps||[])+"|"+(x.vis||[]).join(",");
+  const key=x=>x.u+"#"+x.p+"|"+JSON.stringify(x.ps||[])+"|"+(x.vis||[]).join(",")+"|"+(x.ff||[]).join(",");
   // ✅ Correct (Roger, 12 Nov 2026: correct the reading with the whole class, every level): on a Reading or Reading log tab of an LS2-on
   // learning path, shared/correct/ over this tab (shared/correct/open.js); the students stay on the tab, nothing is sent
   let crM=null;const crLoad=()=>crM?Promise.resolve(crM):import(new URL("shared/correct/open.js",ROOT).href).then(m=>crM=m);
@@ -1158,7 +1199,7 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
     const pl=agM&&agM.plan?agM.plan():null;
     // only today's steps on this page for the class tab too: a tab now hidden goes to the first one shown
     if(pl&&cmTabs(pl.vis,[])){const at=document.querySelector(".tab.active[data-panel]");if(at&&at.classList.contains("el-cm-hide")){const f=[...document.querySelectorAll(".tab[data-panel]")].find(t=>!t.classList.contains("el-cm-hide")&&!t.classList.contains("el-sec-hide"));if(f)f.click()}}
-    const x=state();Object.assign(x,{ps:pl?pl.ps.filter(y=>!(onPage(y.u)&&y.p===x.p)):[],vis:pl?pl.vis:[]});const k=key(x);   // always both: go is merged
+    const x=state();Object.assign(x,{ps:pl?pl.ps.filter(y=>!(onPage(y.u)&&y.p===x.p)):[],vis:pl?pl.vis:[],ff:pl&&pl.ff?pl.ff:[]});const k=key(x);   // always both: go is merged
     if(k!==seen){seen=k;since=Date.now();return}
     if(Date.now()-since>=1000&&(!last||key(last)!==k||last.pn!==x.pn))send(x)},500);
 }
