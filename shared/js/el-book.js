@@ -127,7 +127,8 @@ html.elb-lock{overflow:hidden}
     function draw() {
       if (single) { set(Rp, i); set(L, null); } else { set(L, i); set(Rp, i + 1); }
       const last = Math.min(n, i + step()), qs = endEl && last === n && (single || last - i === 1);
-      nb.textContent = qs ? T(ca, 'Preguntes', 'Questions') : (single || last - i === 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + last) + T(ca, ' de ', ' of ') + (endEl ? n - 1 : n);
+      const lt = endEl ? Math.min(last, n - 1) : last;   // the last picture on screen (the questions page is not counted as a page)
+      nb.textContent = qs ? T(ca, 'Preguntes', 'Questions') : (single || lt - i <= 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + lt) + T(ca, ' de ', ' of ') + (endEl ? n - 1 : n) + (endEl && last === n ? ' · ' + T(ca, 'Preguntes', 'Questions') : '');
       bp.disabled = i === 0; q('.elb-hit.prev').disabled = i === 0;
       const end = i + step() >= n, onEnd = endEl && last === n;
       // the end page takes the taps (its options); the arrows, the keys and a swipe still turn

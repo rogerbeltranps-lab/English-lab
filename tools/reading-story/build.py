@@ -13,12 +13,12 @@ import datetime, html, json, os, re, subprocess, sys, tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
-from story import parse, LEVELS          # noqa: E402
+from story import parse, levels_of      # noqa: E402
 from paragraphs import paragraphs        # noqa: E402
 from pypdf import PdfReader, PdfWriter   # noqa: E402
 
 CEFR = {"2eso": {"beginners": "A1", "insecure": "A1+", "safe": "A2", "daring": "A2+"},
-        "4eso": {"beginners": "A1", "insecure": "A2", "safe": "B1", "daring": "B1+"}}   # = EL_CEFR in el-catalog.js
+        "4eso": {"beginners": "A1", "insecure": "A2", "safe": "B1", "daring": "B1+", "native": "C2"}}   # = EL_CEFR in el-catalog.js
 
 # lps: the site's Learning Path numbers of each chapter, for the web pages (the .md's "LPn" lines follow the LS design, where 4 ESO
 # counts Getting started as LP0; the PDFs keep those). Same as lp.py.
@@ -145,7 +145,7 @@ COVER_CSS = """
 
 
 def vars_css(b, lv):
-    fs, lh = {"beginners": ("12.5pt", "1.6"), "insecure": ("12pt", "1.55"), "safe": ("11.5pt", "1.5"), "daring": ("11pt", "1.48")}[lv]
+    fs, lh = {"beginners": ("12.5pt", "1.6"), "insecure": ("12pt", "1.55"), "safe": ("11.5pt", "1.5"), "daring": ("11pt", "1.48"), "native": ("10.5pt", "1.45")}[lv]
     return ":root{--ink:%s;--accent:%s;--soft:%s;--line:%s;--night:%s;--fs:%s;--lh:%s}" % (b["ink"], b["accent"], b["soft"], b["line"], b["night"], fs, lh)
 
 
@@ -218,7 +218,7 @@ def main():
     for b in BOOKS:
         chapters = parse(os.path.join(HERE, b["src"] + ".md"))
         img = "file://" + os.path.join(HERE, b["src"] + "-cover.jpg")
-        for lv, name in LEVELS:
+        for lv, name in levels_of(chapters):
             base = os.path.join(tmp, "%s-%s" % (b["src"], lv))
             open(base + "-cover.html", "w", encoding="utf-8").write(cover_html(b, lv, name, img, copy))
             open(base + "-body.html", "w", encoding="utf-8").write(body_html(b, lv, name, chapters))
@@ -254,7 +254,7 @@ def main_web():
     for b in BOOKS:
         chapters = parse(os.path.join(HERE, b["src"] + ".md"))
         img = "file://" + os.path.join(HERE, b["src"] + "-cover.jpg")
-        for lv, name in LEVELS:
+        for lv, name in levels_of(chapters):
             base = os.path.join(tmp, "%s-%s" % (b["src"], lv))
             open(base + "-cover.html", "w", encoding="utf-8").write(cover_html(b, lv, name, img, copy))
             open(base + "-body.html", "w", encoding="utf-8").write(body_html(b, lv, name, chapters, web=True))

@@ -73,7 +73,7 @@ window.elLsForGroup=function(ls,info,gid){const g=(window.EL_GROUPS||[]).find(x=
 window.EL_LS=[
   {id:"2eso-my-real-routine",course:"2eso",title:"2ESO · My Real Routine",study:"2eso/my-real-routine/downloads/ls1-vocabulary-grammar-"},
   {id:"4eso-my-real-routine",course:"4eso",title:"4ESO · My Real Routine",study:"4eso/my-real-routine/downloads/ls1-vocabulary-grammar-",pro:true},
-  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4",story:{title:"Lantern Night",pdf:"4eso/seasons-and-celebrations/downloads/ls2-story-",key:"https://docs.google.com/document/d/1uc108nk9jxlfhAaJ0Z-vzAxZbq_qI_3dMHs3akKIu7A/edit"}},
+  {id:"4eso-seasons-and-celebrations",course:"4eso",title:"4ESO · Seasons & Celebrations",study:"4eso/seasons-and-celebrations/downloads/ls2-vocabulary-grammar-",pro:true,starter:true,shadowing:"4eso/seasons-and-celebrations/video/shadowing.mp4",story:{title:"Lantern Night",pro:true,pdf:"4eso/seasons-and-celebrations/downloads/ls2-story-",key:"https://docs.google.com/document/d/1uc108nk9jxlfhAaJ0Z-vzAxZbq_qI_3dMHs3akKIu7A/edit"}},
   {id:"2eso-free-time-live",course:"2eso",title:"2ESO · Free Time, Live!",study:"2eso/free-time-live/downloads/ls2-vocabulary-grammar-",starter:true,shadowing:"2eso/free-time-live/video/shadowing.mp4",story:{title:"Maya Live!",pdf:"2eso/free-time-live/downloads/ls2-story-",key:"https://docs.google.com/document/d/1rcikmXonPtG8HFXzcim26QEm0Rbe1X0LavRPOSUYtuk/edit"}}
 ];
 // The LS name with its number for students and the teacher (Roger, 7 Nov 2026: "we should see LS2 Free Time..."): "LS2 · Free Time, Live!".

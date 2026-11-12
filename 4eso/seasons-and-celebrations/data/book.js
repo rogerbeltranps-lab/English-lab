@@ -47,6 +47,13 @@ window.LP = {
       "book/daring-03.webp",
       "book/daring-04.webp",
       "book/daring-05.webp"
+     ],
+     "native": [
+      "book/native-01.webp",
+      "book/native-02.webp",
+      "book/native-03.webp",
+      "book/native-04.webp",
+      "book/native-05.webp"
      ]
     }
    },
@@ -109,6 +116,11 @@ window.LP = {
       "book/daring-06.webp",
       "book/daring-07.webp",
       "book/daring-08.webp"
+     ],
+     "native": [
+      "book/native-06.webp",
+      "book/native-07.webp",
+      "book/native-08.webp"
      ]
     }
    },
@@ -172,6 +184,11 @@ window.LP = {
       "book/daring-09.webp",
       "book/daring-10.webp",
       "book/daring-11.webp"
+     ],
+     "native": [
+      "book/native-09.webp",
+      "book/native-10.webp",
+      "book/native-11.webp"
      ]
     }
    },
@@ -235,6 +252,11 @@ window.LP = {
       "book/daring-12.webp",
       "book/daring-13.webp",
       "book/daring-14.webp"
+     ],
+     "native": [
+      "book/native-12.webp",
+      "book/native-13.webp",
+      "book/native-14.webp"
      ]
     }
    },
@@ -297,6 +319,11 @@ window.LP = {
       "book/daring-15.webp",
       "book/daring-16.webp",
       "book/daring-17.webp"
+     ],
+     "native": [
+      "book/native-15.webp",
+      "book/native-16.webp",
+      "book/native-17.webp"
      ]
     }
    },
@@ -360,6 +387,11 @@ window.LP = {
       "book/daring-18.webp",
       "book/daring-19.webp",
       "book/daring-20.webp"
+     ],
+     "native": [
+      "book/native-18.webp",
+      "book/native-19.webp",
+      "book/native-20.webp"
      ]
     }
    },
