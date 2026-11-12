@@ -903,15 +903,20 @@ function rtExtras(box,h){if(typeof CSS==="undefined"||!CSS.highlights||typeof Hi
       else{const r=new Range();r.setStart(n,m.index);r.setEnd(n,m.index+m[0].length);hl.add(r);last=r;c++}}
     last=null}
   if(c)CSS.highlights.set("el-rt-new",hl);return c}
-function rtFollow(rt){rtNow=rt||null;
-  document.querySelectorAll(".el-rt-cur").forEach(e=>e.classList.remove("el-rt-cur"));
-  if(typeof CSS!=="undefined"&&CSS.highlights)CSS.highlights.delete("el-rt-new");
-  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){rtRestore();return}
-  const box=[...document.querySelectorAll(".reading,#readText")].find(e=>e.offsetParent!==null);if(!box)return;
-  if(!document.getElementById("el-rt-css")){const st=document.createElement("style");st.id="el-rt-css";
+function rtCss(){if(!document.getElementById("el-rt-css")){const st=document.createElement("style");st.id="el-rt-css";
     st.textContent=".el-rt-cur{background:#fff7cc!important;box-shadow:0 0 0 4px #ffd34d;border-radius:8px;transition:background .3s}"+
       "#el-rt-note{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#fff7cc;border:2px solid #ffd34d;font:700 15px system-ui,sans-serif;color:#713f12}"+
-      "#el-rt-note.x{background:#dcfce7;border-color:#22c55e;color:#14532d}::highlight(el-rt-new){background-color:#bbf7d0;text-decoration:underline 2px #16a34a}";document.head.append(st)}
+      "#el-rt-note.x{background:#dcfce7;border-color:#22c55e;color:#14532d}::highlight(el-rt-new){background-color:#bbf7d0;text-decoration:underline 2px #16a34a}"+
+      ".el-rt-newbox{background:#dcfce7!important;box-shadow:0 0 0 3px #22c55e;border-radius:8px}.el-rt-newbox::before{content:'🆕 ';font-weight:800}";document.head.append(st)}}
+function rtNote(box,cls,txt){let n=document.getElementById("el-rt-note");if(!n){n=document.createElement("p");n.id="el-rt-note";box.before(n)}n.className=cls;n.textContent=txt}
+function rtFollow(rt){rtNow=rt||null;
+  document.querySelectorAll(".el-rt-cur").forEach(e=>e.classList.remove("el-rt-cur"));
+  document.querySelectorAll(".el-rt-newbox").forEach(e=>e.classList.remove("el-rt-newbox"));
+  if(typeof CSS!=="undefined"&&CSS.highlights)CSS.highlights.delete("el-rt-new");
+  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){rtRestore();return}
+  if(rt.p)return rtGram(rt);
+  const box=[...document.querySelectorAll(".reading,#readText")].find(e=>e.offsetParent!==null);if(!box)return;
+  rtCss();
   if(rt.x){rtRestore();const c=rtExtras(box,rt.h);if(c){const n=document.createElement("p");n.id="el-rt-note";n.className="x";box.before(n);
       n.textContent=lockCa()?"🆕 Les paraules en verd són el que el teu text diu de més que el que hem llegit junts: llegeix-les ara, abans de respondre.":"🆕 The green words are what your text says that we didn't read together: read them now, before you answer."}
     return}
@@ -925,6 +930,28 @@ function rtFollow(rt){rtNow=rt||null;
   const bl=[...box.children].filter(e=>!e.classList.contains("tiny"));if(!bl.length)return;
   const i=rt.chat&&bl.length!==rt.n?Math.round(rt.k*(bl.length-1)/Math.max(1,rt.n-1)):Math.min(rt.k,bl.length-1),el=bl[i];
   el.classList.add("el-rt-cur");const k=rt.u+"|"+rt.k;if(k!==rtKey){rtKey=k;el.scrollIntoView({block:"center",behavior:"smooth"})}}
+/* 📘 Grammar together (shared/correct/ tab=grammar; Roger, 12 Nov 2026: "the same we did with the reading but with the grammar section"):
+   rt = {u, p: the step ("grammar"), k: the box explained now (-1 before the first), n, l, h: the boxes in English, hc: in Catalan, at}.
+   The step's "How it works" card shows the projector's boxes (hc for a student who has the page in Catalan, Base and Starter) and marks
+   box k. From ⏱ Your turn on, rt = {u, p, k: -1, x: 1, hs: the text of every box seen together}: the student's own boxes are back and
+   the ones not seen together go green, to read before the exercise. Only what the card shows changes; nothing is saved. */
+const rtNorm=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[^a-zà-ÿ0-9']+/g," ").trim();
+function rtGram(rt){
+  const box=[...document.querySelectorAll("#"+String(rt.p).replace(/[^a-z0-9_-]/gi,"")+" .section-card.worked")].find(e=>e.offsetParent!==null);if(!box)return;
+  rtCss();const ca=lockCa();
+  if(rt.x){rtRestore();const hs=new Set(rt.hs||[]);let c=0;
+    box.querySelectorAll(".model").forEach(m=>{if(!hs.has(rtNorm(m.textContent))){m.classList.add("el-rt-newbox");c++}});
+    if(c)rtNote(box,"x",ca?"🆕 Els requadres en verd són del teu nivell i no els hem vist junts: llegeix-los ara, abans de començar.":"🆕 The green boxes are for your level and we didn't see them together: read them now, before you start.");
+    return}
+  const h=ca&&rt.hc?rt.hc:rt.h;
+  if(typeof h==="string"&&h){
+    if(box!==rtBox){rtRestore();rtBox=box;rtOrig=box.innerHTML}
+    const sig="g|"+rt.l+"|"+(ca?1:0)+"|"+h.length+"|"+h.slice(0,80);
+    if(sig!==rtSig){box.innerHTML=h;rtSig=sig;
+      rtNote(box,"",ca?"📘 Aprenem junts: ara tothom veu la mateixa explicació que a la pissarra. La del teu nivell torna quan hagis de practicar.":"📘 Learning together: everyone sees the same explanation as on the board now. Your level's comes back when it's time to practise.")}}
+  if(!(rt.k>=0))return;
+  const bl=[...box.querySelectorAll(".model")];if(!bl.length)return;
+  const el=bl[Math.min(rt.k,bl.length-1)];el.classList.add("el-rt-cur");const k=rt.u+"|g|"+rt.k;if(k!==rtKey){rtKey=k;el.scrollIntoView({block:"center",behavior:"smooth"})}}
 // the reading tab opened after the teacher moved on still gets the text and the mark (the page may draw the box again)
 document.addEventListener("click",e=>{if(rtNow&&e.target.closest(".tab"))setTimeout(()=>{rtKey="";if(rtBox&&!rtBox.isConnected){rtBox=null;rtOrig=null;rtSig=""}if(rtBox&&rtBox.offsetParent===null)rtSig="";rtFollow(rtNow)},120)});
 // 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
@@ -1222,7 +1249,7 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   // learning path, shared/correct/ over this tab (shared/correct/open.js); the students stay on the tab, nothing is sent
   let crM=null;const crLoad=()=>crM?Promise.resolve(crM):import(new URL("shared/correct/open.js",ROOT).href).then(m=>crM=m);
   const crRe=/^[24]eso\/(?!my-real-routine\/)[a-z0-9-]+\/[a-z0-9-]+\.html$/;
-  const crHere=()=>{const x=state();return crRe.test(x.u)&&(x.p==="read"||x.p==="log")};
+  const crHere=()=>{const x=state();return crRe.test(x.u)&&(x.p==="read"||x.p==="log"||x.p==="grammar"&&(window.EL_CORRECT_GRAMMAR||[]).includes(x.u.replace(/\.html$/,"")))};   // 📘 grammar: LS2 LP3 first
   const crOpen=()=>crLoad().then(m=>{const x=state(),r=m.readingOf(x.u,x.p);if(r)m.openCorrect(ROOT,Object.assign({tab:x.p,g:o.g},r))}).catch(e=>console.warn("correct",e));
   function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;if(agM)agM.close();document.documentElement.classList.remove("elcmon");   // the class tab drops its left column (el-catalog.js)
   cmTabs(null);if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
@@ -1241,7 +1268,7 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   function draw(err){if(!chip){chip=document.createElement("div");chip.id="el-cmchip";
       chip.style.cssText="position:fixed;left:12px;bottom:12px;z-index:2147481500;display:flex;gap:10px;align-items:center;max-width:calc(100vw - 24px);padding:8px 10px 8px 14px;border-radius:999px;background:#4338ca;color:#fff;font:700 14px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.25)";
       chip.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.ag)return agToggle();if(b.dataset.cr)return crOpen();stopNow()};document.body.append(chip)}
-    chip.innerHTML='<span>🎓 Class mode · '+gn+' follows this tab · until '+hm(o.until)+(err?' · '+String(err).replace(/</g,"&lt;"):'')+'</span><button data-ag="1" title="Today\'s class on your Time plan: click a tab to go there with the class" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">📋 Today</button>'+(crHere()?'<button data-cr="1" title="Correct this reading with the whole class on the projector: every level at once, question by question (the students stay here)" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">✅ Correct</button>':'')+'<button style="border:0;border-radius:999px;padding:5px 12px;background:#fff;color:#4338ca;font:800 13px system-ui;cursor:pointer">⏹ Stop</button>'}
+    chip.innerHTML='<span>🎓 Class mode · '+gn+' follows this tab · until '+hm(o.until)+(err?' · '+String(err).replace(/</g,"&lt;"):'')+'</span><button data-ag="1" title="Today\'s class on your Time plan: click a tab to go there with the class" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">📋 Today</button>'+(crHere()?'<button data-cr="1" title="'+(state().p==="grammar"?"Explain and correct this grammar with the whole class on the projector: every level at once, sentence by sentence (the students stay here)":"Correct this reading with the whole class on the projector: every level at once, question by question (the students stay here)")+'" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">✅ Correct</button>':'')+'<button style="border:0;border-radius:999px;padding:5px 12px;background:#fff;color:#4338ca;font:800 13px system-ui;cursor:pointer">⏹ Stop</button>'}
   draw();
   try{if(sessionStorage.getItem("el_cm_ag")==="1")agToggle()}catch(e){}
   // stopped from the dashboard or another class tab started later

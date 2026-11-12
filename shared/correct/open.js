@@ -1,9 +1,10 @@
 // ✅ Correct together over the class tab (Roger, 12 Nov 2026): shared/correct/index.html in a full-window frame on top of the page,
 // so the class tab stays on its tab underneath and the students stay where they are (nothing is sent to them). ✕ Close in the frame
 // (or Esc) takes it away. Used by the class mode bar (el-cloud.js cmTeacher) and 📋 Today (el-cm-agenda.js).
-// readingOf(path, tab): {ls, lp} when the page is an LS2-on learning path and the tab a Reading or a Reading log, else null.
+// readingOf(path, tab): {ls, lp} when the page is an LS2-on learning path and the tab a Reading or a Reading log, or its Grammar tab
+// when the page is in EL_CORRECT_GRAMMAR (el-catalog.js; 📘 grammar together, LS2 LP3 first), else null.
 export function readingOf(path,tab){const m=/^([24]eso\/(?!my-real-routine\/)[a-z0-9-]+)\/([a-z0-9-]+)\.html$/.exec(path||"");
-  return m&&(tab==="read"||tab==="log")?{ls:m[1],lp:m[2]}:null}
+  return m&&(tab==="read"||tab==="log"||tab==="grammar"&&(window.EL_CORRECT_GRAMMAR||[]).includes(m[1]+"/"+m[2]))?{ls:m[1],lp:m[2]}:null}
 let fr=null;
 export function openCorrect(root,{ls,lp,tab,g}){
   if(fr)fr.remove();
