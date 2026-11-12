@@ -144,19 +144,50 @@
     + '.eldict-tipbox div{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}.eldict-tipbox button{border:0;border-radius:10px;padding:8px 13px;font-weight:800;font-family:inherit;cursor:pointer;background:#fff;color:#20312b}.eldict-tipbox button.go{background:#9fd8bf}'
     + '@keyframes eldictIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}.eldict-fab.hint{animation:eldictPulse 1.6s ease-in-out 3}@keyframes eldictPulse{50%{box-shadow:0 0 0 10px rgba(31,107,82,.25),0 8px 24px rgba(15,23,42,.22)}}'
     + 'body.elslpfs .eldict-tipbox{bottom:140px}'
+    + '.eldict-fab.wiggle{animation:eldictWiggle 3.5s ease-in-out infinite}.eldict-fab.wiggle.hint{animation:eldictWiggle 3.5s ease-in-out infinite,eldictPulse 1.6s ease-in-out 3}'
+    + '@keyframes eldictWiggle{0%,78%,100%{transform:none}82%{transform:rotate(-7deg) scale(1.06)}86%{transform:rotate(6deg) scale(1.06)}90%{transform:rotate(-4deg)}94%{transform:rotate(2deg)}}'
+    + '.eldict-fab.mini{width:48px;height:48px;padding:0;justify-content:center;border-radius:50%}.eldict-fab.mini i{font-size:1.35rem}.eldict-fab.intop.mini{width:44px;height:44px;padding:0}'
+    + '.eldict-fab{touch-action:none;-webkit-user-select:none;user-select:none}.eldict-fab.moved{position:fixed!important;margin:0}.eldict-fab.dragging{cursor:grabbing;animation:none;transform:scale(1.08);box-shadow:0 14px 34px rgba(15,23,42,.35)}'
+    + '@media (prefers-reduced-motion:reduce){.eldict-fab.wiggle,.eldict-fab.wiggle.hint{animation:none}}'
     + '.eldict-fab.intop{position:static;flex:0 0 auto;margin-left:auto;padding:9px 16px 9px 13px;font-size:.95rem;box-shadow:0 2px 8px rgba(15,23,42,.16);z-index:auto}'
     + '.eldict-tipbox.up::after{bottom:auto;top:-9px;right:10px;border-top:0;border-bottom:9px solid #20312b}'
     + '@media (max-width:640px){.eldict-tipbox{right:10px;bottom:146px}.eldict-tipbox::after{right:28px}}'
     + '@media (max-width:640px){.eldict-fab{right:12px;bottom:84px;padding:12px 13px}.eldict-fab b{display:none}.eldict{left:8px;right:8px;width:auto;bottom:140px;max-height:calc(100vh - 160px)}}@media (pointer:coarse){.eldict-tip.dbl{display:none}}'
     + '@media print{.eldict-fab,.eldict{display:none!important}}';
-  var fab, box, inp, out, last = '';
+  var fab, box, inp, out, last = '', dragging = false, dragged = false;
   function recent() { try { return JSON.parse(localStorage.getItem('el_dict_recent') || '[]') || []; } catch (e) { return []; } }
   function remember(q) { try { var r = recent().filter(function (x) { return norm(x) !== norm(q); }); r.unshift(q); localStorage.setItem('el_dict_recent', JSON.stringify(r.slice(0, 8))); } catch (e) {} }
   function build() {
     var st = d.createElement('style'); st.id = 'eldictCss'; st.textContent = css; d.head.appendChild(st);
     fab = d.createElement('button'); fab.type = 'button'; fab.className = 'eldict-fab notranslate'; d.body.appendChild(fab);
     box = d.createElement('div'); box.className = 'eldict notranslate'; box.hidden = true; box.setAttribute('role', 'dialog'); d.body.appendChild(box);
-    fab.onclick = function () { box.hidden ? open('') : close(); };
+    fab.onclick = function (e) { if (dragged) { dragged = false; e.preventDefault(); return; } box.hidden ? open('') : close(); };
+    fab.addEventListener('pointerdown', function (e) {
+      if (e.button) return; var r = fab.getBoundingClientRect(), sx = e.clientX, sy = e.clientY, dx = sx - r.left, dy = sy - r.top, id = e.pointerId;
+      function mv(ev) {
+        if (ev.pointerId !== id) return;
+        if (!dragging && Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 7) return;
+        if (!dragging) {
+          dragging = true; close(); if (tip) { tip.remove(); tip = null; }
+          if (fab.parentNode !== d.body) { d.body.appendChild(fab); fab.classList.remove('intop'); }
+          fab.classList.add('moved', 'dragging'); try { fab.setPointerCapture(id); } catch (x) {}
+        }
+        var w = fab.offsetWidth, h = fab.offsetHeight;
+        fab.style.left = clamp(ev.clientX - dx, 6, innerWidth - w - 6) + 'px'; fab.style.top = clamp(ev.clientY - dy, 6, innerHeight - h - 6) + 'px';
+        fab.style.right = 'auto'; fab.style.bottom = 'auto'; ev.preventDefault();
+      }
+      function up(ev) {
+        if (ev.pointerId !== id) return;
+        removeEventListener('pointermove', mv, true); removeEventListener('pointerup', up, true); removeEventListener('pointercancel', up, true);
+        if (!dragging) return;
+        dragging = false; dragged = true; fab.classList.remove('dragging'); setTimeout(function () { dragged = false; }, 400);
+        var r2 = fab.getBoundingClientRect();
+        try { localStorage.setItem(posKey(), JSON.stringify({ x: +((r2.left + r2.width / 2) / innerWidth).toFixed(4), y: +((r2.top + r2.height / 2) / innerHeight).toFixed(4) })); } catch (x) {}
+        if (!seen()) seenNow();
+        place();
+      }
+      addEventListener('pointermove', mv, true); addEventListener('pointerup', up, true); addEventListener('pointercancel', up, true);
+    });
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) close(); });
     d.addEventListener('dblclick', function (e) {   // double-click a word on the page (not in the answer boxes or the dictionary)
       if (fab.hidden || box.contains(e.target) || (e.target.closest && e.target.closest('input,textarea,select,[contenteditable],video,audio,.eldict-fab'))) return;
@@ -164,9 +195,18 @@
     });
     label(); setInterval(vis, 800); vis();
   }
+  /* Until a student uses it, it wiggles now and then and says "Dictionary"; from the first time they open it (button or double-click),
+     it is only the 🔍 (Roger, 12 Nov 2026: "pots fer que es mogui? i que es faci petit com la lupa el primer cop que el toques o el facis
+     servir?"). Per student on this browser: el_dict_used_<uid>. */
+  function usedKey() { return seenKey().replace('el_dict_seen', 'el_dict_used'); }
+  function used() { try { return !!localStorage.getItem(usedKey()); } catch (e) { return false; } }
   function label() {
-    fab.innerHTML = '<i aria-hidden="true">🔍</i><b>' + t('Diccionari', 'Dictionary') + '</b>';
-    fab.title = t('Busca una paraula en anglès o en català', 'Look up a word in English or Catalan');
+    var u = used(), k = (u ? 'm' : 'f') + ca();
+    if (fab.dataset.k === k) return; fab.dataset.k = k;
+    fab.innerHTML = '<i aria-hidden="true">🔍</i>' + (u ? '' : '<b>' + t('Diccionari', 'Dictionary') + '</b>');
+    fab.title = t('Diccionari: busca una paraula en anglès o en català', 'Dictionary: look up a word in English or Catalan');
+    fab.setAttribute('aria-label', fab.title);
+    fab.classList.toggle('mini', u); fab.classList.toggle('wiggle', !u);
   }
   function wordAt(x, y) {
     var r = d.caretRangeFromPoint ? d.caretRangeFromPoint(x, y) : null, node, off;
@@ -186,7 +226,7 @@
     var p = activeStep(), noNotes = !!p && (p.id === 'recall' || p.type === 'recall');
     var off = noNotes;
     if (fab.hidden !== off) { fab.hidden = off; if (off) close(); }
-    if (fab.querySelector('b').textContent !== t('Diccionari', 'Dictionary')) label();
+    label();
     hint(!off);
     place();
   }
@@ -196,8 +236,37 @@
      it doesn't hide any other thing"): in the top bar, on the right (the Learning Path dropdown there is hidden since #537), on a computer;
      its window and the first-time bubble open under it. On a phone, and in the step's full screen view (no top bar), it floats bottom
      right, stacked above the other floating buttons there (✅ To do, the account bar, the full screen bar) instead of on top of them. */
+  /* Students can drag it anywhere (Roger, 12 Nov 2026: "pots fer que es mogui?"): a press that moves more than 6 px drags it instead of
+     opening it; where they leave it is kept for this student on this browser (el_dict_pos_<uid>, centre as a share of the window, so it
+     stays on screen on another size) and wins over the top bar / bottom right places. */
+  function posKey() { return seenKey().replace('el_dict_seen', 'el_dict_pos'); }
+  function getPos() { try { var p = JSON.parse(localStorage.getItem(posKey()) || 'null'); return p && p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1 ? p : null; } catch (e) { return null; } }
+  var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
+  function around() {   // the window and the bubble next to a button the student moved: under it in the top half, above it in the bottom half
+    var r = fab.getBoundingClientRect(), below = r.top + r.height / 2 < innerHeight / 2;
+    var bw = Math.min(380, innerWidth - 24), bx = clamp(innerWidth - r.right, 8, innerWidth - bw - 8);
+    box.style.right = bx + 'px';
+    if (below) { box.style.top = Math.round(r.bottom + 10) + 'px'; box.style.bottom = 'auto'; box.style.maxHeight = 'calc(100vh - ' + Math.round(r.bottom + 26) + 'px)'; }
+    else { box.style.top = 'auto'; box.style.bottom = Math.round(innerHeight - r.top + 10) + 'px'; box.style.maxHeight = 'calc(100vh - ' + Math.round(innerHeight - r.top + 26) + 'px)'; }
+    if (tip) {
+      var tw = Math.min(320, innerWidth - 24), tx = clamp(innerWidth - r.right - 4, 8, innerWidth - tw - 8);
+      tip.style.right = tx + 'px'; tip.classList.toggle('up', below);
+      if (below) { tip.style.top = Math.round(r.bottom + 12) + 'px'; tip.style.bottom = 'auto'; } else { tip.style.top = 'auto'; tip.style.bottom = Math.round(innerHeight - r.top + 12) + 'px'; }
+    }
+  }
   function place() {
-    if (fab.hidden) return;
+    if (fab.hidden || dragging) return;
+    var pos = getPos();
+    fab.classList.toggle('moved', !!pos);
+    if (pos) {
+      if (fab.parentNode !== d.body) { d.body.appendChild(fab); fab.classList.remove('intop'); }
+      var w = fab.offsetWidth || 48, h = fab.offsetHeight || 48;
+      fab.style.left = Math.round(clamp(pos.x * innerWidth - w / 2, 6, innerWidth - w - 6)) + 'px';
+      fab.style.top = Math.round(clamp(pos.y * innerHeight - h / 2, 6, innerHeight - h - 6)) + 'px';
+      fab.style.right = 'auto'; fab.style.bottom = 'auto';
+      around(); return;
+    }
+    fab.style.left = ''; fab.style.top = ''; fab.style.right = '';
     var row = d.querySelector('.topbar .toprow'), bar = row && row.closest('.topbar');
     var top = !!row && innerWidth > 640 && !d.body.classList.contains('elslpfs') && getComputedStyle(bar).display !== 'none';
     if (top && fab.parentNode !== row) { row.appendChild(fab); fab.classList.add('intop'); fab.style.bottom = ''; }
@@ -254,7 +323,9 @@
       box.querySelector('.eldict-x').onclick = close;
       box.querySelector('form').onsubmit = function (e) { e.preventDefault(); look(inp.value); };
     }
-    box.hidden = false; if (!seen()) seenNow(); place();
+    box.hidden = false; if (!seen()) seenNow();
+    if (!used()) { try { localStorage.setItem(usedKey(), String(Date.now())); } catch (e) {} label(); }
+    place();
     if (q) { inp.value = q; look(q); } else { if (!last) showRecent(); setTimeout(function () { inp.focus(); inp.select && inp.select(); }, 30); }
   }
   function close() { if (box) box.hidden = true; }
