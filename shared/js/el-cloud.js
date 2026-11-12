@@ -449,8 +449,9 @@ function hasWork(a){return !!a&&a.keys.some(k=>{const v=localStorage.getItem(k);
 // blue shadow, a 🏫 on its tab and a note with the day; nothing in it can be answered, pressed or played (audio, video, YouTube) until then.
 // soon = {panel id: day}. It counts in the page's progress (it is not hidden), so the path never looks finished with tabs still to come.
 function lockSections(ids,ca,a,done,soon,gid){
+  const fr=window.EL_CM_FREE;if(fr)ids=ids.filter(id=>!fr.has(id));   // steps class mode opened for the student now (cmFree)
   if(!ids.length)return;soon=soon||{};
-  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k));let cls=ids.filter(id=>id in soon);const hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
+  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k));let cls=ids.filter(id=>id in soon),hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
   window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];if(window.elProgress)window.elProgress();   // the LS2 page's progress counts only the steps shown
   const note=ca?"Aquí pots repassar les teves respostes.":"Here you can look back at your answers.";
   const today=elAgToday(),openAt=gid?elClassOpenAt(gid,today):null,hm=ms=>{const d=new Date(ms);return d.getHours()+":"+String(d.getMinutes()).padStart(2,"0")};
@@ -483,7 +484,7 @@ function lockSections(ids,ca,a,done,soon,gid){
         if(e.matches("iframe")){if(!e.dataset.elcls)e.dataset.elcls="f";e.tabIndex=-1;return}if(e.matches("[contenteditable]")){e.dataset.elcls="e";e.contentEditable="false";return}if(!e.disabled){e.dataset.elcls="d";e.disabled=true;e.tabIndex=-1}})});
     ro.forEach(id=>{const p=document.getElementById(id);if(!p||!p.classList.contains("panel"))return;p.classList.add("el-sec-off");
       if(!p.querySelector(":scope>.el-sec-note")){const n=document.createElement("div");n.className="el-sec-note";n.textContent=note;p.prepend(n)}
-      p.querySelectorAll("input,textarea,select,button:not([data-vs])").forEach(e=>{if(!e.disabled){e.disabled=true;e.tabIndex=-1}})})};
+      p.querySelectorAll("input,textarea,select,button:not([data-vs])").forEach(e=>{if(!e.disabled){e.dataset.elro="1";e.disabled=true;e.tabIndex=-1}})})};
   apply();if(cls.length&&window.elProgress)window.elProgress();   // again, now the tabs for class are marked: never the "next" one
   // today's tabs for class open by themselves 5 minutes before the class (elClassOpenAt), on this page too: what was frozen is given back
   const now0=cls.filter(id=>soon[id]===today);
@@ -494,6 +495,16 @@ function lockSections(ids,ca,a,done,soon,gid){
         if(k==="d")e.disabled=false;else if(k==="e")e.contentEditable="true";else if(k==="m1")e.controls=true})});
     if(window.elProgress)window.elProgress()},openAt-Date.now());
   new MutationObserver(apply).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["disabled"]});
+  // 🎓 class mode opens steps for the class there and then (Roger, 12 Nov 2026: steps added during the class, several steps at once): they
+  // are given back in place, hidden, 🏫 or read-only as they were, so nothing reloads (el-cloud.js cmFree; the agenda says so after a reload)
+  window.elSecFree=list=>{const f=(list||[]).filter(id=>hide.includes(id)||cls.includes(id)||ro.includes(id));if(!f.length)return;
+    hide=hide.filter(id=>!f.includes(id));cls=cls.filter(id=>!f.includes(id));ro=ro.filter(id=>!f.includes(id));
+    f.forEach(id=>{document.querySelectorAll(`.tab[data-panel="${id}"]`).forEach(t=>{t.classList.remove("el-sec-hide","el-sec-cls");t.removeAttribute("title")});
+      const p=document.getElementById(id);if(!p)return;p.classList.remove("el-sec-hide","el-sec-cls","el-sec-off");const n=p.querySelector(":scope>.el-sec-note");if(n)n.remove();
+      p.querySelectorAll("[data-elcls]").forEach(e=>{const k=e.dataset.elcls;delete e.dataset.elcls;e.removeAttribute("tabindex");
+        if(k==="d")e.disabled=false;else if(k==="e")e.contentEditable="true";else if(k==="m1")e.controls=true});
+      p.querySelectorAll("[data-elro]").forEach(e=>{delete e.dataset.elro;e.removeAttribute("tabindex");e.disabled=false})});
+    window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];apply();if(window.elProgress)window.elProgress()};
 }
 // The "Learning Path" menu at the top of an LS2 page lists only the paths a student can open (or did some of): never one still
 // closed or waiting for a checkpoint (Roger, 7 Nov 2026: "they mustn't see that anything is locked").
@@ -892,7 +903,32 @@ const lockOn=g=>!!(g&&g.lock&&(g.a||g.cm&&g.u)&&g.at&&(g.cm?elCmOn(g):Date.now()
 // read before the first pull-up or full screen message on pages that do not know it, such as the board)
 const lockCa=()=>{const lv=myLevel||homeLevel;return !!lv&&elCa(lv)};
 let lvTried=false;
-const cmUrl=g=>{const u=new URL(g.u,ROOT);u.hash=g.p||"";return u},lockHere=()=>!!LOCK&&(LOCK.cm?location.pathname===cmUrl(LOCK).pathname:actId===LOCK.a);
+const cmUrl=g=>{const u=new URL(g.u,ROOT);u.hash=g.p||"";return u},lockHere=()=>!!LOCK&&(LOCK.cm?cmHere(LOCK).length>0:actId===LOCK.a);
+// 🎓 Several steps at once (Roger, 12 Nov 2026: "let me enable more than one SLP at once since there are times where students need to navigate
+// them"): go.ps = [{u, p, n}] lists the steps the teacher opened with 👥 in 📋 Today (el-cm-agenda.js), the class tab's own step always
+// counts too. Students may work on any of them: they are not moved while they are on one, and a row of chips on the class mode bar takes
+// them from one to another (other pages too). go.vis = today's steps on the Time plan ("path#tab", "path#" a whole page): "me and they should
+// only see the SLP planned for the class", so on those learning path pages every other tab is hidden while class mode lasts (cmTabs).
+const onPage=u=>{try{return new URL(u,ROOT).pathname===location.pathname}catch(e){return false}};
+function cmEn(g){if(!g||!g.cm)return [];const t=String(g.t||""),out=[{u:g.u,p:g.p||"",n:(t.match(/^LP\d+/)||[t])[0]+(g.pn?" · "+String(g.pn).replace(/^\d+\s+/,""):""),me:true}];
+  (Array.isArray(g.ps)?g.ps:[]).forEach(x=>{if(x&&x.u&&!out.some(y=>y.u===x.u&&y.p===(x.p||"")))out.push({u:x.u,p:x.p||"",n:x.n||x.p||""})});return out}
+const cmHere=g=>cmEn(g).filter(x=>onPage(x.u));
+// may the student open this tab now (a step the teacher opened on this page, or the one they were already on)
+const cmTabOk=p=>{const h=cmHere(LOCK);return h.some(x=>!x.p||x.p===p)||p===lockFrom};
+window.elCmTabOk=p=>!LOCK||!LOCK.cm||!lockHere()||cmTabOk(p);   // ⛶ one step full screen (el-app.js): Previous / Next only through these
+// only today's steps on a learning path page (students and the class tab): keep = panel ids shown in any case
+function cmTabs(vis,keep){const ts=[...document.querySelectorAll(".tab[data-panel]")];if(!ts.length&&!document.querySelector(".el-cm-hide"))return;
+  const pv=(Array.isArray(vis)?vis:[]).map(String).filter(k=>onPage(k.slice(0,k.indexOf("#")))).map(k=>k.slice(k.indexOf("#")+1)),on=pv.length>0&&!pv.includes(""),ok=new Set([...pv,...(keep||[])]);
+  if(on&&!document.getElementById("el-cm-hide-css")){const st=document.createElement("style");st.id="el-cm-hide-css";st.textContent=".tab.el-cm-hide{display:none!important}";document.head.append(st)}
+  ts.forEach(t=>{const x=on&&!ok.has(t.dataset.panel);if(t.classList.contains("el-cm-hide")!==x)t.classList.toggle("el-cm-hide",x)});
+  return on}
+// the steps opened for the class on this page are given back if this student's page had them hidden, 🏫 or read-only (lockSections)
+function cmFree(g){const ps=cmHere(g).map(x=>x.p).filter(Boolean);if(!ps.length)return;const f=window.EL_CM_FREE=window.EL_CM_FREE||new Set(),nw=ps.filter(p=>!f.has(p));
+  if(!nw.length)return;nw.forEach(p=>f.add(p));if(window.elSecFree)elSecFree(nw)}
+// a chip of the bar: the tab on this page, or the work saved and that page
+async function cmJump(x){if(onPage(x.u)){const t=x.p&&document.querySelector('.tab[data-panel="'+CSS.escape(x.p)+'"]');if(t){lockFrom=null;t.click()}else window.scrollTo(0,0);return}
+  try{const f=document.activeElement;if(f&&f!==document.body&&f.blur)f.blur()}catch(e){}
+  try{if(timer){clearTimeout(timer);await send()}}catch(e){console.warn("go",e)}const u=new URL(x.u,ROOT);u.hash=x.p||"";location.href=u.href}
 function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-toast");if(!n){n=document.createElement("div");n.id="el-lock-toast";
   n.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:2147483001;max-width:92vw;padding:12px 18px;border-radius:12px;background:#7f1d1d;color:#fff;font:600 15px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.3);text-align:center";document.body.append(n)}
   n.textContent=t||(ca?"🔒 El professor t'ha fet venir aquí: no pots anar a cap altra part de la web fins que et deixi anar.":"🔒 Your teacher brought you here: you can't go to any other part of the website until they let you go.");
@@ -901,7 +937,13 @@ function lockBar(){let b=document.getElementById("el-lock");
   if(!lockHere()){if(b)b.remove();return}
   const ca=lockCa(),at=document.querySelector(".tab.active[data-panel]"),cur=at&&at.dataset.panel,g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
   if(!b){b=document.createElement("div");b.id="el-lock";b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
-    b.onclick=e=>{const x=e.target.closest("button");if(!x)return;const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
+    b.onclick=e=>{const x=e.target.closest("button");if(!x)return;if(x.dataset.k){const y=cmEn(LOCK)[+x.dataset.k];if(y)cmJump(y);return}const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
+  const en=cmEn(g);
+  if(en.length>1){   // several steps open: a chip for each, the one the student is on marked
+    const at2=en.findIndex(x=>onPage(x.u)&&(!x.p||x.p===cur)),h2="m|"+ca+"|"+at2+"|"+en.map(x=>x.u+"#"+x.p+"#"+x.n).join("|");if(b.dataset.h===h2)return;b.dataset.h=h2;
+    b.textContent="🎓 "+(ca?"Mode classe · pots treballar a:":"Class mode · you can work on:")+" ";
+    en.forEach((x,i)=>{const c=document.createElement("button");c.dataset.k=String(i);c.textContent=(i===at2?"● ":"")+(x.n||x.p);
+      c.style.cssText="border:2px solid #fff;border-radius:999px;padding:5px 14px;font:800 14px system-ui,sans-serif;cursor:pointer;"+(i===at2?"background:#fff;color:#0f766e":"background:#0f766e;color:#fff");b.append(c)});return}
   const off=g.p&&cur!==g.p,h=(g.cm?"🎓 "+(ca?"Mode classe: segueixes el professor":"Class mode: you follow your teacher"):"🔒 "+(ca?"El professor et manté aquí":"Your teacher is keeping you here"))+(g.p?(ca?": pestanya ":": tab ")+(g.pn||g.p):"")
     +(off?(ca?". Acaba el que estàs fent i ves-hi.":". Finish what you are doing and go there."):"")+"|"+(off?(ca?"Ves-hi":"Go there")+" →":"");
   if(b.dataset.h!==h){b.dataset.h=h;const [t,btn]=h.split("|");b.textContent=t+" ";if(btn){const x=document.createElement("button");x.textContent=btn;
@@ -909,13 +951,20 @@ function lockBar(){let b=document.getElementById("el-lock");
 // clicks on the kept page: links that leave it, and other tabs when the teacher chose one
 document.addEventListener("click",e=>{if(!lockHere())return;
   const t=e.target.closest&&e.target.closest(".tab[data-panel]");
-  if(t&&LOCK.p&&t.dataset.panel!==LOCK.p&&t.dataset.panel!==lockFrom){e.preventDefault();e.stopImmediatePropagation();lockToast((lockCa()?"🔒 Ara toca la pestanya ":"🔒 Now it is the tab ")+(LOCK.pn||LOCK.p)+(lockCa()?": el professor l'obrirà quan toqui.":": your teacher will open the next one."));return}
+  if(t&&(LOCK.cm?!cmTabOk(t.dataset.panel):LOCK.p&&t.dataset.panel!==LOCK.p&&t.dataset.panel!==lockFrom)){e.preventDefault();e.stopImmediatePropagation();
+    const en=cmEn(LOCK);lockToast(en.length>1?(lockCa()?"🔒 Ara pots treballar a: ":"🔒 Now you can work on: ")+en.map(x=>x.n||x.p).join(", "):(lockCa()?"🔒 Ara toca la pestanya ":"🔒 Now it is the tab ")+(LOCK.pn||LOCK.p)+(lockCa()?": el professor l'obrirà quan toqui.":": your teacher will open the next one."));return}
   const a=e.target.closest&&e.target.closest("a[href]");if(!a)return;let u;try{u=new URL(a.href,location.href)}catch(x){return}
   if(u.origin===location.origin&&u.pathname===location.pathname)return;   // a tab or a link on this page
+  if(LOCK.cm&&u.origin===location.origin&&cmEn(LOCK).some(x=>new URL(x.u,ROOT).pathname===u.pathname))return;   // another step the teacher opened
   if(/\.(pdf|mp3|mp4|m4a|png|jpe?g)$/i.test(u.pathname))return;   // study PDFs, audio and video of the path
   e.preventDefault();e.stopImmediatePropagation();lockToast()},true);
 const lockFree=()=>lockToast(lockCa()?"🔓 El professor t'ha deixat anar: ja pots moure't per la web.":"🔓 Your teacher has let you go: you can move around the website again.");
-setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();fsRefresh();fsCheck();hereTick()},1000);   // the class is over (until) or LOCK_MS passed
+setInterval(()=>{if(LOCK&&!lockOn(LOCK)){LOCK=null;lockBar();lockFree()}else if(LOCK)lockBar();cmStudentTabs();fsRefresh();fsCheck();hereTick()},1000);
+// the student's tabs in class mode (only today's steps); after class mode every tab is back
+function cmStudentTabs(){const g=LOCK&&LOCK.cm?LOCK:null;if(!g){cmTabs(null);return}
+  if(!cmTabs(g.vis,cmHere(g).map(x=>x.p)))return;
+  const at=document.querySelector(".tab.active[data-panel]");if(!at||!at.classList.contains("el-cm-hide"))return;
+  const h=cmHere(g),p=(h.find(x=>x.me)||h[0]||{}).p,t=p&&document.querySelector('.tab[data-panel="'+CSS.escape(p)+'"]');if(t){lockFrom=null;t.click()}}   // the class is over (until) or LOCK_MS passed
 // ⛶ Full screen in class (Roger, 5 Nov 2026: "put students in full screen mode when I say it and they don't have a way to get out"; then
 // "make the selected group go full screen" from the top right of the dashboard): live/{group}.fs = {on, at, until} (the doc gamePush
 // already listens to). While it is on, every page of the site covers itself until the student taps it (a browser only goes full screen
@@ -1018,10 +1067,14 @@ function cmGo(g){
   if(here&&(here.checkpoint||/sample-exam$/.test(here.id))||/[?&]live=/.test(location.search)||!LOCK)return;
   const url=cmUrl(g),k="el_go_"+g.at;let seen=false;try{seen=!!localStorage.getItem(k)}catch(e){}
   try{origSet.call(localStorage,k,"1")}catch(e){}
-  if(location.pathname===url.pathname){lockFrom=null;
-    const t=g.p&&document.querySelector('.tab[data-panel="'+CSS.escape(g.p)+'"]'),at=document.querySelector(".tab.active[data-panel]");
+  // several steps open (go.ps): a student on one of them stays there; on this page but on another tab, to the teacher's tab (or the first
+  // step open here); on another page with none, to the teacher's page as before
+  const h=cmHere(g),multi=cmEn(g).length>1;
+  if(h.length){lockFrom=null;cmFree(g);
+    const at=document.querySelector(".tab.active[data-panel]"),cur=at&&at.dataset.panel,stay=multi&&h.some(x=>!x.p||x.p===cur);
+    const p=location.pathname===url.pathname?g.p:h[0].p,t=!stay&&p&&document.querySelector('.tab[data-panel="'+CSS.escape(p)+'"]');
     if(t&&t!==at){try{const f=document.activeElement;if(f&&f!==document.body&&f.blur)f.blur()}catch(e){}t.click()}
-    lockBar();return}
+    cmStudentTabs();lockBar();return}
   goMove(url,(g.t||"")+(g.pn?" · "+g.pn:""),seen,seen?2:3,"🎓");
 }
 // 🌟 The student's encouraging sentence in class mode (Roger, 9 Nov 2026: "when they are on class mode they don't see the sentence where I
@@ -1044,7 +1097,7 @@ function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&
     b.dataset.s=String(g.s);b.innerHTML='<span aria-hidden="true">🌟</span><span class="t"></span>';b.querySelector(".t").textContent=txt;
     if(cheerPad===null)cheerPad=document.body.style.paddingTop||"";
     const place=()=>{if(Date.now()>=end)return cheerOff();const l=document.getElementById("el-lock"),top=l?l.offsetHeight:0;b.style.top=top+"px";
-      document.body.style.paddingTop=(top+b.offsetHeight)+"px"};
+      if(!document.body.classList.contains("elslpfs"))document.body.style.paddingTop=(top+b.offsetHeight)+"px"};
     clearInterval(cheerT);place();cheerT=setInterval(place,1000)})}
 // The teacher's class tab: opened by "🎓 Class mode" on the dashboard or the learning path page with ?elcm=<group>.<until ms>; this browser
 // tab keeps it (sessionStorage el_cm = {g, s, until}), so the dashboard in the other tab never moves the students. Every second it looks
@@ -1068,9 +1121,11 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   try{last=JSON.parse(sessionStorage.getItem(CM_K+"_last")||"null")}catch(e){}
   // 📋 Today (el-cm-agenda.js): the group's class day from the Time plan agenda, clickable; open when class mode starts and on every next
   // page until it is closed (Roger, 7 Nov 2026: "in class mode, I should have the day of the agenda so that I can click it")
-  const agLoad=()=>agM?Promise.resolve(agM):import(new URL("shared/js/el-cm-agenda.js",ROOT).href).then(m=>{agM=m;m.setup({db,doc,setDoc,lsInfo,root:ROOT,g:o.g,gname:gn});return m});
+  const agLoad=()=>agM?Promise.resolve(agM):import(new URL("shared/js/el-cm-agenda.js",ROOT).href).then(m=>{agM=m;m.setup({db,doc,setDoc,getDoc,deleteField:FBM[2].deleteField,serverTimestamp,lsInfo,root:ROOT,g:o.g,gname:gn,s:o.s});return m});
   const agToggle=()=>agLoad().then(m=>m.isOpen()?m.close():m.open()).catch(e=>console.warn("agenda",e));
-  const key=x=>x.u+"#"+x.p;
+  // today's steps and the 👥 ones (el-cm-agenda.js plan) go with every move; the module loads at once, the panel shown or not
+  agLoad().then(m=>m.init()).catch(e=>console.warn("agenda",e));
+  const key=x=>x.u+"#"+x.p+"|"+JSON.stringify(x.ps||[])+"|"+(x.vis||[]).join(",");
   // ✅ Correct (Roger, 12 Nov 2026: correct the reading with the whole class, every level): on a Reading or Reading log tab of an LS2-on
   // learning path, shared/correct/ over this tab (shared/correct/open.js); the students stay on the tab, nothing is sent
   let crM=null;const crLoad=()=>crM?Promise.resolve(crM):import(new URL("shared/correct/open.js",ROOT).href).then(m=>crM=m);
@@ -1078,7 +1133,12 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   const crHere=()=>{const x=state();return crRe.test(x.u)&&(x.p==="read"||x.p==="log")};
   const crOpen=()=>crLoad().then(m=>{const x=state(),r=m.readingOf(x.u,x.p);if(r)m.openCorrect(ROOT,Object.assign({tab:x.p,g:o.g},r))}).catch(e=>console.warn("correct",e));
   function quit(why){clearInterval(iv);if(stop)stop();cmEnd();cmOn=false;if(agM)agM.close();document.documentElement.classList.remove("elcmon");   // the class tab drops its left column (el-catalog.js)
-  if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
+  cmTabs(null);if(chip){chip.innerHTML="🎓 Class mode ended"+(why?" · "+why:"");setTimeout(()=>chip&&chip.remove(),4000)}}
+  // ⏹ Stop: first the end-of-class window (✔ Finished / ⏭ Next class / 🏠 Homework for today's steps, el-cm-agenda.js wrapUp; Roger, 12 Nov
+  // 2026), then the students are let go. ↩ Back to class keeps class mode on.
+  let ending=false;
+  async function stopNow(){if(ending)return;ending=true;let r="none";try{const m=await agLoad();r=await m.wrapUp(true)}catch(e){console.warn("class mode",e)}ending=false;
+    if(r==="back")return;setDoc(doc(db,"live",o.g),{go:null,fs:null},{merge:true}).catch(x=>console.warn("class mode",x));quit(r==="saved"?"stopped · saved on your Time plan":"stopped")}
   // class mode puts the group in full screen until it stops (Roger, 7 Nov 2026: "only when I go class mode outside my schedule … then I
   // press end class mode and I don't need that button"): the first move of this class mode also writes live/{group}.fs; Stop clears it
   // (inside a class of the timetable full screen stays on by itself, elFsEff)
@@ -1088,13 +1148,17 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
     try{await setDoc(doc(db,"live",o.g),w,{merge:true});if(w.fs)try{sessionStorage.setItem(CM_K+"_fs",String(o.s))}catch(e){}draw();if(agM)agM.refresh()}catch(e){console.warn("class mode",e);last=null;draw("✗ Not sent: "+(e.code||e.message||e))}}
   function draw(err){if(!chip){chip=document.createElement("div");chip.id="el-cmchip";
       chip.style.cssText="position:fixed;left:12px;bottom:12px;z-index:2147481500;display:flex;gap:10px;align-items:center;max-width:calc(100vw - 24px);padding:8px 10px 8px 14px;border-radius:999px;background:#4338ca;color:#fff;font:700 14px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.25)";
-      chip.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.ag)return agToggle();if(b.dataset.cr)return crOpen();setDoc(doc(db,"live",o.g),{go:null,fs:null},{merge:true}).catch(x=>console.warn("class mode",x));quit("stopped")};document.body.append(chip)}
+      chip.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.ag)return agToggle();if(b.dataset.cr)return crOpen();stopNow()};document.body.append(chip)}
     chip.innerHTML='<span>🎓 Class mode · '+gn+' follows this tab · until '+hm(o.until)+(err?' · '+String(err).replace(/</g,"&lt;"):'')+'</span><button data-ag="1" title="Today\'s class on your Time plan: click a tab to go there with the class" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">📋 Today</button>'+(crHere()?'<button data-cr="1" title="Correct this reading with the whole class on the projector: every level at once, question by question (the students stay here)" style="border:1px solid #fff;border-radius:999px;padding:5px 12px;background:#4338ca;color:#fff;font:800 13px system-ui;cursor:pointer">✅ Correct</button>':'')+'<button style="border:0;border-radius:999px;padding:5px 12px;background:#fff;color:#4338ca;font:800 13px system-ui;cursor:pointer">⏹ Stop</button>'}
   draw();
   try{if(sessionStorage.getItem("el_cm_ag")==="1")agToggle()}catch(e){}
   // stopped from the dashboard or another class tab started later
   stop=onSnapshot(doc(db,"live",o.g),s=>{const g=s.exists()?s.data().go:null;if(s.metadata.hasPendingWrites||!last)return;if(!g||!g.cm||g.s!==o.s)quit(g&&g.cm?"another tab took over":"stopped")},e=>console.warn("class mode",e));
-  const iv=setInterval(()=>{if(!cmRead())return quit("the class is over");const x=state(),k=key(x);
+  const iv=setInterval(()=>{if(!cmRead()){quit("the class is over");if(agM&&!ending){ending=true;agM.wrapUp(false).catch(e=>console.warn("class mode",e))}return}
+    const pl=agM&&agM.plan?agM.plan():null;
+    // only today's steps on this page for the class tab too: a tab now hidden goes to the first one shown
+    if(pl&&cmTabs(pl.vis,[])){const at=document.querySelector(".tab.active[data-panel]");if(at&&at.classList.contains("el-cm-hide")){const f=[...document.querySelectorAll(".tab[data-panel]")].find(t=>!t.classList.contains("el-cm-hide")&&!t.classList.contains("el-sec-hide"));if(f)f.click()}}
+    const x=state();Object.assign(x,{ps:pl?pl.ps.filter(y=>!(onPage(y.u)&&y.p===x.p)):[],vis:pl?pl.vis:[]});const k=key(x);   // always both: go is merged
     if(k!==seen){seen=k;since=Date.now();return}
     if(Date.now()-since>=1000&&(!last||key(last)!==k||last.pn!==x.pn))send(x)},500);
 }
