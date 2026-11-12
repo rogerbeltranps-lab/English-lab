@@ -915,6 +915,7 @@ function cmEn(g){if(!g||!g.cm)return [];const t=String(g.t||""),out=[{u:g.u,p:g.
 const cmHere=g=>cmEn(g).filter(x=>onPage(x.u));
 // may the student open this tab now (a step the teacher opened on this page, or the one they were already on)
 const cmTabOk=p=>{const h=cmHere(LOCK);return h.some(x=>!x.p||x.p===p)||p===lockFrom};
+window.elCmTabOk=p=>!LOCK||!LOCK.cm||!lockHere()||cmTabOk(p);   // ⛶ one step full screen (el-app.js): Previous / Next only through these
 // only today's steps on a learning path page (students and the class tab): keep = panel ids shown in any case
 function cmTabs(vis,keep){const ts=[...document.querySelectorAll(".tab[data-panel]")];if(!ts.length&&!document.querySelector(".el-cm-hide"))return;
   const pv=(Array.isArray(vis)?vis:[]).map(String).filter(k=>onPage(k.slice(0,k.indexOf("#")))).map(k=>k.slice(k.indexOf("#")+1)),on=pv.length>0&&!pv.includes(""),ok=new Set([...pv,...(keep||[])]);
@@ -1096,7 +1097,7 @@ function cmCheer(g){const was=document.getElementById("el-cmcheer"),end=g&&g.cm&
     b.dataset.s=String(g.s);b.innerHTML='<span aria-hidden="true">🌟</span><span class="t"></span>';b.querySelector(".t").textContent=txt;
     if(cheerPad===null)cheerPad=document.body.style.paddingTop||"";
     const place=()=>{if(Date.now()>=end)return cheerOff();const l=document.getElementById("el-lock"),top=l?l.offsetHeight:0;b.style.top=top+"px";
-      document.body.style.paddingTop=(top+b.offsetHeight)+"px"};
+      if(!document.body.classList.contains("elslpfs"))document.body.style.paddingTop=(top+b.offsetHeight)+"px"};
     clearInterval(cheerT);place();cheerT=setInterval(place,1000)})}
 // The teacher's class tab: opened by "🎓 Class mode" on the dashboard or the learning path page with ?elcm=<group>.<until ms>; this browser
 // tab keeps it (sessionStorage el_cm = {g, s, until}), so the dashboard in the other tab never moves the students. Every second it looks

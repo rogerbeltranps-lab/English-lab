@@ -362,7 +362,15 @@
   const FSOK = mode === "lp" && !/\/my-real-routine\//.test(path) && !/\/(recall-checkpoint[^/]*|sample-exam)\.html$/.test(path);   // not a recall checkpoint or the sample exam: they have their own full screen (leaving it hands them in)
   let fsMine = false;
   const fsDoc = () => document.fullscreenElement || document.webkitFullscreenElement;
-  function slpTabs() { return $$(".tab[data-panel]").filter(b => !b.classList.contains("el-sec-hide") && !b.classList.contains("el-cm-hide") && !b.hidden && b.style.display !== "none"); }
+  // in class mode only the steps the teacher opened (window.elCmTabOk, el-cloud.js)
+  function slpTabs() { const ok = window.elCmTabOk; return $$(".tab[data-panel]").filter(b => !b.classList.contains("el-sec-hide") && !b.classList.contains("el-cm-hide") && !b.hidden && b.style.display !== "none" && (!ok || ok(b.dataset.panel))); }
+  // under the class mode bars at the top of a student's screen (🎓 #el-lock, 🌟 #el-cmcheer, el-cloud.js), not behind them
+  function slpTop() { let y = 0; ["el-lock", "el-cmcheer"].forEach(id => { const x = document.getElementById(id); if (x && x.offsetHeight) y = Math.max(y, x.getBoundingClientRect().bottom); }); return Math.round(y); }
+  let slpT = 0;
+  function slpPlace() { const bar = $(".elslpbar"), on = document.body.classList.contains("elslpfs");
+    if (!on) { clearInterval(slpT); slpT = 0; document.body.style.removeProperty("padding-top"); if (bar) bar.style.top = ""; return; }
+    const y = slpTop(); if (bar) bar.style.top = y + "px"; document.body.style.setProperty("padding-top", (y + 58) + "px", "important");
+    if (!slpT) slpT = setInterval(slpPlace, 1000); }
   function slpFs(on) {
     const B = document.body, was = B.classList.contains("elslpfs");
     if (on === undefined) on = was;
@@ -375,7 +383,7 @@
       fsMine = false;
     }
     B.classList.toggle("elslpfs", !!on);
-    slpDraw();
+    slpDraw(); slpPlace();
     if (on !== was) scrollTo(0, 0);
   }
   function slpDraw() {
