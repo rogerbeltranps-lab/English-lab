@@ -120,16 +120,26 @@ function readAll(){
   return `<div class="chips"><span class="chip all">📖 Read together</span>${ROUTES.map(r=>`<button class="chip lvb ${r===RL?"on":""}" data-rl="${r}" title="Read the ${NAME[r]} version together">${NAME[r]}</button>`).join("")}</div>`+
     `<div class="rt ${RP>=0?"focus":""}">`+B.list.map((h,b)=>`<p class="${RP>=0&&st[RP]&&st[RP].b===b?"cur":""}">`+
       st.map((x,i)=>x.b!==b?"":(x.br?"<br>":(x.h||i===0||st[i-1].b!==b?"":" "))+`<span data-rp="${i}" class="${i===RP?"now":""}">${x.h||esc(x.s)}</span>`).join("")+`</p>`).join("")+`</div>`+
-    `<p class="hint">Everyone reads the ${NAME[RL]} version now. Core and Plus have a few more details in their own text on the Chromebook.${G?" Their screens follow the yellow paragraph. Space, → or a click: next sentence.":""}</p>`;
+    `<p class="hint">Everyone reads the ${NAME[RL]} version now.${G?" Every Chromebook shows this same text now and follows the yellow paragraph; their own level's text comes back for ⏱ Your turn, with the words the ${NAME[RL]} text doesn't have in green. Space, → or a click: next sentence.":""}</p>`;
 }
 /* 📖 the students' screens follow the paragraph (Roger, 12 Nov 2026: "yes go ahead"): live/{group}.rt = {u: the page, k: block, n: blocks,
-   chat, at}, written only when the paragraph changes (one small write a paragraph, not a sentence; the students' pages already listen to live/{group},
+   chat, l: level, h: the text, at}, written only when the paragraph or the level changes (one small write a paragraph, not a sentence; the students' pages already listen to live/{group},
    el-cloud.js rtFollow); null when the reading is left or the screen closes */
 let rtLast="";
 function rtSend(){
   if(!G)return Promise.resolve();
-  const s=slides[at],on=s&&s.kind==="readall"&&RP>=0,B=on?blocks():null,st=on?steps(B):[];
-  const v=on&&st[RP]?{u:LS+"/"+LPF+".html",k:st[RP].b,n:B.list.length,chat:B.chat,at:Date.now()}:null,key=v?v.u+"|"+v.k+"|"+v.n:"";
+  const s=slides[at],on=s&&s.kind==="readall",B=on?blocks():null,st=on?steps(B):[];
+  // after the reading (⏱ Your turn and the questions): x, each Chromebook has its own text back with the words the shared text did not
+  // have marked green (el-cloud.js rtExtras), so Core and Plus read their extra details before answering (Roger: "if they read different texts…")
+  const ri=slides.findIndex(x=>x.kind==="readall"),after=s&&ri>=0&&at>ri;
+  if(after){const tx=X.textFor(CTX,LP.panels.find(p=>p.id==="read"),RL),v={u:LS+"/"+LPF+".html",k:-1,x:1,l:RL,h:tx.chat?tx.units.map(u=>esc(u.who)+": "+esc(u.s)).join("<br>"):tx.html,at:Date.now()},key=v.u+"|x|"+v.l;
+    if(key===rtLast)return Promise.resolve();rtLast=key;
+    return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{merge:true}).catch(e=>console.warn("read together",e))}
+  // h: the text read together, which every Chromebook shows instead of its own level's text until the reading is left (Roger, 12 Nov
+  // 2026: "but again, the text is not the same for everyone"); a chat goes as the page's own messages (4 ESO Getting started)
+  const h=!on?"":B.chat?X.textFor(CTX,LP.panels.find(p=>p.id==="read"),RL).units.map(u=>`<div class="msg ${esc(u.who.toLowerCase())}"><b>${esc(u.who)}</b>${esc(u.s)}</div>`).join("")
+    :X.byLevel(LP.panels.find(p=>p.id==="read").media.text,RL)||"";
+  const v=on?{u:LS+"/"+LPF+".html",k:st[RP]?st[RP].b:-1,n:B.list.length,chat:B.chat,l:RL,h,at:Date.now()}:null,key=v?v.u+"|"+v.k+"|"+v.n+"|"+v.l:"";
   if(key===rtLast)return Promise.resolve();rtLast=key;
   return setDoc(doc(getFirestore(getApps()[0]),"live",G),{rt:v},{merge:true}).catch(e=>console.warn("read together",e));
 }
@@ -138,6 +148,7 @@ function turn(){
   const who=G&&CLASS?`<p class="done">✅ ${CLASS.done} of ${CLASS.students} have checked the reading <button class="sm" data-k="who">🔄 Update</button></p>`:G?`<p class="done"><button class="sm" data-k="who">🔄 Who has finished?</button></p>`:"";
   return `<div class="chips"><span class="chip all">⏱ Your turn</span></div><h1>Answer the questions of your level on your Chromebook</h1>`+
     `<p class="ca">Respon les preguntes del teu nivell al Chromebook. Pots tornar a llegir el teu text.</p>`+
+    (G?`<p class="ca">🆕 First read the <b style="background:#bbf7d0;color:#14532d;padding:0 4px;border-radius:4px">green words</b>: what your text says that the ${NAME[RL]} text didn't. · Primer llegeix les paraules en verd.</p>`:"")+
     `<div class="timer ${TM.left<=0?"up":""}" id="tbig">${TM.left<=0?"⏰ Time!":mmss(TM.left)}</div>`+
     `<div class="tbtn"><button data-k="tgo" class="pri2">${TM.on?"⏸ Pause":TM.left<TM.len&&TM.left>0?"▶ Go on":"▶ Start"}</button>${[5,10,15].map(m=>`<button data-tm="${m}" class="${TM.len===m*60?"on":""}">${m} min</button>`).join("")}<button data-tm="+1">+1 min</button></div>`+who;
 }
