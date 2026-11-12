@@ -872,10 +872,61 @@ function gamePush(u){
     // the player goes full screen too (Roger, 6 Nov 2026) and speaks Catalan only to Starter and Base: ca=1|0 (the level is read first if needed)
     if(x&&(x.game&&x.on&&x.phase!=="end"&&Date.now()-ms<10*60e3||cmHold(x))){const g=()=>{location.href=GAME.href+"?g="+encodeURIComponent(myGroup)+"&from="+encodeURIComponent(location.pathname+location.search)+(myLevel||homeLevel?"&ca="+(lockCa()?1:0):"")};
       if(!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(g)}else g();return}
-    const f=first,run=()=>{goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsCheck()};first=false;
+    const f=first,run=()=>{rtFollow(x&&x.rt);goTo(x&&x.go,f);FSL=(x&&x.fs)||null;TT=(x&&x.tt)||null;keepTT(TT);fsRefresh();fsCheck()};first=false;
     if(x&&(x.go||x.fs||elSlotNow(x.tt))&&!myLevel&&!homeLevel&&!lvTried&&user&&!AS){lvTried=true;findHomeLevel(user).finally(run)}else run()},
     e=>console.warn("game",e));
 }
+// 📖 Read together (shared/correct/, Roger 12 Nov 2026: "can we read together instead of everyone having a different text" and "but
+// again, the text is not the same for everyone"): live/{group}.rt = {u, k, n, chat, l, h, at}. While it names this page, the reading box
+// shows h, the one text the class reads on the projector, instead of the student's own level's text, with a note, and marks block k
+// (the teacher's paragraph; -1 before the first). When rt is cleared (⏱ Your turn, or the screen closed) the student's own text comes
+// back, so each one answers their own level. Nothing is written and nothing saved changes: only what the box shows.
+let rtNow=null,rtKey="",rtBox=null,rtOrig=null,rtSig="";
+function rtRestore(){if(rtBox&&rtOrig!=null&&rtBox.isConnected)rtBox.innerHTML=rtOrig;rtBox=null;rtOrig=null;rtSig="";
+  const n=document.getElementById("el-rt-note");if(n)n.remove()}
+// 🆕 After reading together (rt.x, from ⏱ Your turn on): the student's own text is back, and the words it has that the shared text did
+// not (the extra details of a Core or Plus version) are marked green, so the student reads those on their own before answering
+// (Roger, 12 Nov 2026: "if they read different texts…"). A CSS highlight: the page's text and answers are not touched.
+const RT_STOP=new Set("a an the and or but of to in on at for from with by is are was were be it its this that there here i you he she we they me him her us them my your his our their not no as so if than then too very can will just also do does did have has had".split(" "));
+const rtStem=w=>w.replace(/'s$/,"").replace(/ies$/,"y").replace(/(ing|ed|es|s)$/,"").replace(/(.)\1$/,"$1");
+function rtExtras(box,h){if(typeof CSS==="undefined"||!CSS.highlights||typeof Highlight==="undefined")return 0;
+  CSS.highlights.delete("el-rt-new");if(!box||!h)return 0;
+  const seen=new Set((new DOMParser().parseFromString(h.replace(/<[^>]*>/g," "),"text/html").body.textContent.toLowerCase().replace(/[’‘]/g,"'").match(/[a-zà-ÿ0-9']+/g)||[]).map(rtStem));
+  const hl=new Highlight(),tw=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);let n,c=0,last=null;
+  while((n=tw.nextNode())){if(n.parentElement&&n.parentElement.closest(".tiny,script,style,button"))continue;
+    const re=/[A-Za-zÀ-ÿ0-9'’]+/g,t=n.nodeValue;let m;
+    while((m=re.exec(t))){const w=m[0].toLowerCase().replace(/’/g,"'");
+      if(RT_STOP.has(w)||seen.has(rtStem(w))||(w.length<2&&!/\d/.test(w)))continue;
+      // joined to the previous new word when only spaces, commas or little words are between them ("ten to twelve")
+      const gap=last&&last.endContainer===n?t.slice(last.endOffset,m.index):null;
+      if(gap!=null&&gap.length<14&&/^[\s,'’-]*$/.test(gap.replace(/[A-Za-z]+/g,x=>RT_STOP.has(x.toLowerCase())?" ":"#")))last.setEnd(n,m.index+m[0].length);
+      else{const r=new Range();r.setStart(n,m.index);r.setEnd(n,m.index+m[0].length);hl.add(r);last=r;c++}}
+    last=null}
+  if(c)CSS.highlights.set("el-rt-new",hl);return c}
+function rtFollow(rt){rtNow=rt||null;
+  document.querySelectorAll(".el-rt-cur").forEach(e=>e.classList.remove("el-rt-cur"));
+  if(typeof CSS!=="undefined"&&CSS.highlights)CSS.highlights.delete("el-rt-new");
+  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){rtRestore();return}
+  const box=[...document.querySelectorAll(".reading,#readText")].find(e=>e.offsetParent!==null);if(!box)return;
+  if(!document.getElementById("el-rt-css")){const st=document.createElement("style");st.id="el-rt-css";
+    st.textContent=".el-rt-cur{background:#fff7cc!important;box-shadow:0 0 0 4px #ffd34d;border-radius:8px;transition:background .3s}"+
+      "#el-rt-note{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#fff7cc;border:2px solid #ffd34d;font:700 15px system-ui,sans-serif;color:#713f12}"+
+      "#el-rt-note.x{background:#dcfce7;border-color:#22c55e;color:#14532d}::highlight(el-rt-new){background-color:#bbf7d0;text-decoration:underline 2px #16a34a}";document.head.append(st)}
+  if(rt.x){rtRestore();const c=rtExtras(box,rt.h);if(c){const n=document.createElement("p");n.id="el-rt-note";n.className="x";box.before(n);
+      n.textContent=lockCa()?"🆕 Les paraules en verd són el que el teu text diu de més que el que hem llegit junts: llegeix-les ara, abans de respondre.":"🆕 The green words are what your text says that we didn't read together: read them now, before you answer."}
+    return}
+  if(typeof rt.h==="string"&&rt.h){
+    if(box!==rtBox){rtRestore();rtBox=box;rtOrig=box.innerHTML}
+    const sig=rt.l+"|"+rt.h.length+"|"+rt.h.slice(0,80);
+    if(sig!==rtSig){box.innerHTML=rt.h;rtSig=sig;let n=document.getElementById("el-rt-note");
+      if(!n){n=document.createElement("p");n.id="el-rt-note";box.before(n)}
+      n.textContent=lockCa()?"📖 Llegim junts: ara tothom té el mateix text que a la pissarra. El teu text torna quan hagis de respondre.":"📖 Reading together: everyone has the same text as on the board now. Your own text comes back when it's time to answer."}}
+  if(!(rt.k>=0))return;
+  const bl=[...box.children].filter(e=>!e.classList.contains("tiny"));if(!bl.length)return;
+  const i=rt.chat&&bl.length!==rt.n?Math.round(rt.k*(bl.length-1)/Math.max(1,rt.n-1)):Math.min(rt.k,bl.length-1),el=bl[i];
+  el.classList.add("el-rt-cur");const k=rt.u+"|"+rt.k;if(k!==rtKey){rtKey=k;el.scrollIntoView({block:"center",behavior:"smooth"})}}
+// the reading tab opened after the teacher moved on still gets the text and the mark (the page may draw the box again)
+document.addEventListener("click",e=>{if(rtNow&&e.target.closest(".tab"))setTimeout(()=>{rtKey="";if(rtBox&&!rtBox.isConnected){rtBox=null;rtOrig=null;rtSig=""}if(rtBox&&rtBox.offsetParent===null)rtSig="";rtFollow(rtNow)},120)});
 // 📌 Pull up takes the students there (Roger, 2 Nov 2026: "I want to literally pull them up, not only a message but make them go there"):
 // the teacher's pull-up also writes live/{group}.go = {a, p, pn, t, at} (the document this page already listens to for class games, so
 // no extra reads). Every student page that is open goes to that learning path (and tab) after a 5-second notice that saves their work
