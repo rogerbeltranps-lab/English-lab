@@ -9,6 +9,7 @@
 // 🎮 a game opens the game board in this class tab (students join it as usual; 🎓 Back to class mode on the board comes back); 🎬 Shadowing plays the unit's video over the class tab (the
 // students stay where they are); other notes are only shown. Reads: the course's LS documents, once per page (the cached ls/{id} read),
 // and only while the panel is open. No writes, except opening a locked learning path or tab.
+import {readingOf,openCorrect} from "../correct/open.js";
 const K="el_cm_ag";
 const E=t=>String(t==null?"":t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const SHD="note:🎬 Shadowing with the whole class";
@@ -56,6 +57,8 @@ const CSS=`#el-cmag{position:fixed;left:12px;bottom:68px;z-index:2147481400;widt
 #el-cmag .lp{display:flex;align-items:center;gap:8px;margin:10px 2px 4px;font-weight:800;font-size:17px}#el-cmag .lp small{margin-left:auto;color:#1d4ed8;font-weight:700;font-size:14px}
 #el-cmag .it{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:5px 0;padding:8px 12px;border:1.5px solid #c7d2fe;border-radius:14px;background:#eef2ff;color:#1e1b4b;font:600 16px system-ui,sans-serif;cursor:pointer}
 #el-cmag .it:hover{border-color:#4338ca;background:#e0e7ff}#el-cmag .it .go{margin-left:auto;color:#4338ca;font-weight:800;white-space:nowrap}
+#el-cmag .crt{display:block;margin:-2px 0 6px auto;padding:3px 10px;border:1.5px solid #86efac;border-radius:999px;background:#f0fdf4;color:#166534;font:700 13px system-ui,sans-serif;cursor:pointer}#el-cmag .crt:hover{border-color:#16a34a}
+#el-cmag.dock .crt{font-size:12px;padding:2px 8px}
 #el-cmag .it.nt{background:#fef9c3;border-color:#fde047;cursor:default}#el-cmag .it.shd{background:#f3e8ff;border-color:#d8b4fe;color:#5b21b6;cursor:pointer}
 #el-cmag .it.ex{background:#fee2e2;border-color:#fca5a5;cursor:default}#el-cmag .it.now{background:#4338ca;border-color:#4338ca;color:#fff}#el-cmag .it.now .go{color:#fff}
 #el-cmag .m{flex:none;border:1.5px solid #60a5fa;border-radius:999px;padding:1px 9px;font-size:14px;color:#1d4ed8;background:#fff}
@@ -104,7 +107,8 @@ async function draw(){if(!box)return;
       const a=g.a,nos=g.its.length===1&&/#$/.test(g.its[0]),lt=g.its.reduce((s,it)=>s+mn(it),0);
       if(!nos)body+=`<div class="lp">${E((ag.lab||{})[a.id]||(window.elLpLabel?elLpLabel(a):a.title))}${lt?`<small>⏱ ${lt} min</small>`:""}</div>`;
       g.its.forEach(it=>{const p=it.slice(it.indexOf("#")+1),n=its.push({ls:x,it,a,p})-1,m=mn(it),gm=isGame(p),now=!gm&&hereIs(a,p);tot+=m;
-        body+=`<button class="it ${now?"now":""}" data-i="${n}" title="${gm?"Open the game board here (🎓 Back to class mode brings you back)":"Go there: "+E(C.gname)+" follows"}">${m?`<span class="m">${m} min</span>`:""}<span>${E(nos?(window.elLpLabel?elLpLabel(a):a.title):itName(a,p))}</span><span class="go ${now||gm?"":"gt"}">${now?"● now":gm?"▶ Play":"Go →"}</span></button>`})})});
+        body+=`<button class="it ${now?"now":""}" data-i="${n}" title="${gm?"Open the game board here (🎓 Back to class mode brings you back)":"Go there: "+E(C.gname)+" follows"}">${m?`<span class="m">${m} min</span>`:""}<span>${E(nos?(window.elLpLabel?elLpLabel(a):a.title):itName(a,p))}</span><span class="go ${now||gm?"":"gt"}">${now?"● now":gm?"▶ Play":"Go →"}</span></button>`+
+          (readingOf(a.path,p)?`<button class="crt" data-c="${n}" title="Correct this reading with the whole class on the projector: every level at once, question by question (the students stay where they are)">✅ Correct together</button>`:"")})})});
   const len=+((window.EL_TIMETABLE||{}).len)||60;
   box.innerHTML=`<div class="hd"><b>📋 ${D===t?"Today":"Next class"} · ${E(dLab(D))}</b><small>${E(C.gname)}</small><button class="x" data-x="1" title="Hide (📋 Today on the class mode bar shows it again)">✕</button></div>`
     +(its.some(x=>x.a)?`<button class="pr" data-pr="1" title="This class on paper, for students without a Chromebook: its tabs and games, per level, with an answer key">🖨 Print session</button>`:"")
@@ -113,6 +117,8 @@ async function draw(){if(!box)return;
   box._its=its}
 function click(e){const b=e.target.closest("button");if(!b||!box)return;if(b.dataset.x)return close();
   if(b.dataset.pr){const its=(box._its||[]).filter(x=>x.a).map(x=>x.it);window.open(new URL(elPrintDay(its,C.gname,dLab(D)),C.root).href,"_blank","noopener");return}
+  // ✅ Correct together (Roger, 12 Nov 2026): the reading's correction over this tab (shared/correct/open.js); nothing moves for the students
+  if(b.dataset.c!=null){const y=(box._its||[])[+b.dataset.c],r=y&&readingOf(y.a.path,y.p);if(r)openCorrect(C.root,Object.assign({tab:y.p,g:C.g},r));return}
   const x=(box._its||[])[+b.dataset.i];if(!x)return;
   if(x.it===SHD)return play(new URL(x.ls.ls.shadowing,C.root).href);
   // the game opens in this class tab (Roger, 9 Nov 2026: "when we play a game I should be able to go to the class mode where I came
