@@ -387,6 +387,7 @@
     if (who.group) Promise.all([load("shared/js/el-plan.js", () => window.EL_PLAN), load("shared/js/el-week.js", () => window.ELWeek)]).then(() => draw());
     // the course's LSs and the time plan: static files, no reads
     load("shared/js/el-catalog.js", () => window.EL_LS).then(() => draw());
+    if (mode === "lp") load("shared/js/el-dict.js", () => window.ELDict);   // 📖 Dictionary on LS2 learning paths (Roger, 12 Nov 2026)
     let tries = 0;
     (function wait() {
       const C = window.ELCloud;
