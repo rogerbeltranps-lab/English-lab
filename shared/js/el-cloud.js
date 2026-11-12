@@ -916,6 +916,9 @@ function cmEn(g){if(!g||!g.cm)return [];const t=String(g.t||""),out=[{u:g.u,p:g.
   (Array.isArray(g.ps)?g.ps:[]).forEach(x=>{if(x&&x.u&&!out.some(y=>y.u===x.u&&y.p===(x.p||"")))out.push({u:x.u,p:x.p||"",n:x.n||x.p||""})});
   const f=ffRead(g);if(f)f.ps.forEach(p=>{if(!out.some(y=>y.u===f.u&&y.p===p))out.push({u:f.u,p,n:ffName(p,lockCa()),ff:true})});return out}
 const cmHere=g=>cmEn(g).filter(x=>onPage(x.u));
+// the tab the student is on: the active tab, or the panel shown when the page opened on a #tab link without marking a tab (the bar then
+// said "Go there" to a student already on the teacher's tab)
+const curPanel=()=>{const t=document.querySelector(".tab.active[data-panel]");if(t)return t.dataset.panel;const p=document.querySelector(".panel.active[id]");return p?p.id:null};
 // ⚡ I've finished (Roger, 12 Nov 2026: "I want to allow doing further activities planned on the agenda for fast finishers", then "yes add
 // I've finished but that brings them to the book section"): in class mode the student's 🎓 bar has ⚡ I've finished. Once every step open
 // for the class (cmEn: the teacher's step and the 👥 ones) is done on this student's progress, it takes them to the 📖 Book learning path
@@ -972,7 +975,7 @@ function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-t
   clearTimeout(lockToast.t);lockToast.t=setTimeout(()=>n.remove(),3500)}
 function lockBar(){let b=document.getElementById("el-lock");
   if(!lockHere()){if(b)b.remove();return}
-  const ca=lockCa(),at=document.querySelector(".tab.active[data-panel]"),cur=at&&at.dataset.panel,g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
+  const ca=lockCa(),cur=curPanel(),g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
   if(!b){b=document.createElement("div");b.id="el-lock";b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
     b.onclick=e=>{const x=e.target.closest("button");if(!x)return;if(x.dataset.ff)return ffGo();if(x.dataset.k){const y=cmEn(LOCK)[+x.dataset.k];if(y)cmJump(y);return}const t=document.querySelector('.tab[data-panel="'+CSS.escape(LOCK.p)+'"]');if(t){lockFrom=null;t.click()}};document.body.prepend(b);const old=document.getElementById("el-pull");if(old)old.remove()}
   const en=cmEn(g);
@@ -1109,7 +1112,7 @@ function cmGo(g){
   // step open here); on another page with none, to the teacher's page as before
   const h=cmHere(g),multi=cmEn(g).length>1;
   if(h.length){lockFrom=null;cmFree(g);
-    const at=document.querySelector(".tab.active[data-panel]"),cur=at&&at.dataset.panel,stay=multi&&h.some(x=>!x.p||x.p===cur);
+    const at=document.querySelector(".tab.active[data-panel]"),cur=curPanel(),stay=multi&&h.some(x=>!x.p||x.p===cur);
     const p=location.pathname===url.pathname?g.p:h[0].p,t=!stay&&p&&document.querySelector('.tab[data-panel="'+CSS.escape(p)+'"]');
     if(t&&t!==at){try{const f=document.activeElement;if(f&&f!==document.body&&f.blur)f.blur()}catch(e){}t.click()}
     cmStudentTabs();lockBar();return}
