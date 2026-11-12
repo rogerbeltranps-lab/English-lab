@@ -32,7 +32,7 @@ export const worksheets = course => PDFS[course].items.filter(x => x[0] !== "sum
 export const pdfPath = (course, item, route) => {
   const ls = PDFS[course].ls;
   if (item === "summary") return `${ls}/downloads/ls2-vocabulary-grammar-${route}.pdf`;
-  if (item === "story") return `${ls}/downloads/ls2-story-${route === "native" ? "daring" : route}.pdf`;   // Pro reads Plus
+  if (item === "story") return `${ls}/downloads/ls2-story-${route}.pdf`;   // 4 ESO Pro has its own C2 book (ls2-story-native.pdf, 12 Nov 2026)
   return `${ls}/downloads/worksheets/${item}-${route}.pdf`;
 };
 // the items a course shows to one level: the teacher's choice (in the catalogue's order), or DEFAULT when nothing was saved.

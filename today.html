@@ -502,10 +502,10 @@ function homeHtml(lss,ls,info){
 // vocabulary and grammar summary of the student's level (the same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS),
 // the teacher and testers every level. Nothing until the student has a level; no new Firestore reads.
 const rcBtn=(h,tx)=>`<a class="rgo" href="${h}" target="_blank" rel="noopener">${tx}</a>`,rcOk=(ls,any)=>{if(!ls||!any&&only(ls.id))return null;const lv=elRouteOf(D.lv,ls.id).level;return all()||lv?{lv,every:all()}:null};
-function bookCard(ls){const o=rcOk(ls);if(!o||!ls.story)return "";const s=ls.story,r=x=>x==="native"?"daring":x;
+function bookCard(ls){const o=rcOk(ls);if(!o||!ls.story)return "";const s=ls.story,r=x=>x==="native"&&!s.pro?"daring":x;   // story.pro: a C2 book for Pro (else Pro reads Plus)
   return `<div class="rcard book"><img src="${s.pdf}cover.jpg" alt="" loading="lazy"><div class="rb"><span class="rk">📖 ${t("El llibre d'aquesta LS","The book of this LS")}</span><b>${esc(s.title)}</b>`
     +`<p>${t("Una història en sis capítols. Llegeix un capítol cada setmana a casa.","A story in six chapters. Read one chapter a week at home.")}</p>`
-    +`<div class="rrow">${o.every?EL_LEVELS.filter(x=>x.id!=="native").map(x=>rcBtn(`${s.pdf}${x.id}.pdf`,`📖 ${LV[x.id]}`)).join(""):rcBtn(`${s.pdf}${r(o.lv)}.pdf`,`📖 ${t("Obre el teu llibre","Open your book")}`)}</div></div></div>`}
+    +`<div class="rrow">${o.every?EL_LEVELS.filter(x=>x.id!=="native"||s.pro).map(x=>rcBtn(`${s.pdf}${x.id}.pdf`,`📖 ${LV[x.id]}`)).join(""):rcBtn(`${s.pdf}${r(o.lv)}.pdf`,`📖 ${t("Obre el teu llibre","Open your book")}`)}</div></div></div>`}
 // 🔤 under the summary, the LS Study place's two lists (Roger, 7 Nov 2026: "this should be here just below"), with only the lines of the
 // student's level: untagged lines for everyone, "Safe: …" / "(Safe, Daring)" lines from that level up (Core lines for Core, Plus and Pro;
 // Plus lines for Plus and Pro); the tag is dropped for the student. The teacher and testers see every line with the new level names.
