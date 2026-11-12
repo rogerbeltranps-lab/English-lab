@@ -846,8 +846,8 @@ function storyCard(u){
   el.innerHTML='<div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap"><img src="'+new URL(s.pdf+"cover.jpg",ROOT).href+'" alt="" style="width:120px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.18)">'
     +'<div style="flex:1;min-width:220px"><h2>📖 '+(ca?"Història per llegir":"Reading story")+" · "+s.title+"</h2><p>"
     +(ca?"Un misteri en sis capítols. Llegeix un capítol cada setmana a casa, amb el seu Learning Path. A classe en parlem deu minuts.":"A story in six chapters. Read one chapter a week at home, with its Learning Path. In class we talk about it for ten minutes.")
-    +(every?"":" <b>"+elLevelLabel(ls.course,lv==="native"?"daring":lv)+"</b>")
-    +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="native").map(x=>a(x.id)).join(""):a(lv==="native"?"daring":lv))+"</p></div></div>";
+    +(every?"":" <b>"+elLevelLabel(ls.course,lv==="native"&&!s.pro?"daring":lv)+"</b>")
+    +"</p><p>"+(every?EL_LEVELS.filter(x=>x.id!=="native"||s.pro).map(x=>a(x.id)).join(""):a(lv==="native"&&!s.pro?"daring":lv))+"</p></div></div>";   // story.pro: a C2 book for Pro (else Pro reads Plus)
   el.hidden=false;
 }
 let draw=()=>{},authKnown=false;

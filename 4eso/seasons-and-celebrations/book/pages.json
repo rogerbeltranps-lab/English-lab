@@ -123,5 +123,41 @@
    "book/daring-19.webp",
    "book/daring-20.webp"
   ]
+ },
+ "native": {
+  "cover": [
+   "book/native-01.webp",
+   "book/native-02.webp"
+  ],
+  "1": [
+   "book/native-03.webp",
+   "book/native-04.webp",
+   "book/native-05.webp"
+  ],
+  "2": [
+   "book/native-06.webp",
+   "book/native-07.webp",
+   "book/native-08.webp"
+  ],
+  "3": [
+   "book/native-09.webp",
+   "book/native-10.webp",
+   "book/native-11.webp"
+  ],
+  "4": [
+   "book/native-12.webp",
+   "book/native-13.webp",
+   "book/native-14.webp"
+  ],
+  "5": [
+   "book/native-15.webp",
+   "book/native-16.webp",
+   "book/native-17.webp"
+  ],
+  "6": [
+   "book/native-18.webp",
+   "book/native-19.webp",
+   "book/native-20.webp"
+  ]
  }
 }

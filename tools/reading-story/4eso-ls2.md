@@ -92,6 +92,33 @@ What happens next? What do Josh and Núria find at the library?
 
 A. An old phone · B. A poster for Lantern Night in 1974 · C. A letter from Canada dated today
 
+## Pro · 876 words
+
+Núria Puig's first impression of Ashby, when her train pulled in on Saturday 24 October, was less of a town than of a weather system. Rain slanted across the platform, the sky had settled into a shade of grey that seemed almost deliberate, and Josh Green was waiting beneath an umbrella so small it was barely more than a gesture. "Welcome to the north of England," he said, with the solemnity of a tour guide. "The rain comes included. No extra charge." "I packed a raincoat," Núria replied, "but nobody warned me to pack a boat." Months of online chats had made them friends of a sort, yet meeting in person carried a faint awkwardness that neither of them quite knew what to do with.
+
+She was fifteen and was to spend the rest of the autumn term with the Greens. Her new life ran on a timetable that seemed to have been set at least three hours ahead of her body: lessons began earlier than at home, dinner was served at six and, to compound the confusion, the clocks went back on her very first weekend. "Six o'clock?" she asked Josh's mother, Helen, unable to keep the disbelief out of her voice. "In Catalonia we'd barely have finished our afternoon snack." "Stick around," Josh said. "By nine you'll be ready for a second dinner, and nobody here will judge you." The household consisted of Helen, Josh, his younger sister Amy and their grandmother Margaret, whom no one had called anything but Gran for as long as Josh could remember.
+
+Gran was the sort of person who seemed perfectly present and somehow elsewhere at the same time. She spent hours in the garden whatever the weather, pruning plants that, to Núria's untrained eye, did not need pruning, and at four o'clock every afternoon she made a pot of tea and sat by the window, gazing at the street as though expecting someone. Núria found herself cataloguing the differences between the two worlds she now lived in: the light lunch, the early darkness, the way English people apologised to furniture they had bumped into. None of it was better or worse than home, she wrote to her parents; it was simply another way of arranging a day, and living inside it was teaching her more than any textbook had. Still, she would have traded a great deal for a late dinner and a single afternoon of sunshine.
+
+Halloween arrived in a flurry of plastic cobwebs. Amy insisted on going as a witch, and Josh carved a pumpkin whose expression, Núria observed, was less terrifying than mildly exhausted. In return she introduced the family to the Castanyada, which falls on the same weekend in Catalonia. "We roast chestnuts and sweet potatoes, and we make panellets, little almond cakes covered in pine nuts," she explained. "Both festivals bring families together at the same time of year, but the mood couldn't be more different. Yours is about being frightened; ours is mostly about being full." "Could I dress up as a chestnut?" Amy asked. "With enough imagination," said Núria, "you could dress up as anything." Helen, sensing a culinary project, announced that they would make panellets the following day. "There should be some old baking trays somewhere in the attic."
+
+After dinner, Josh and Núria climbed the narrow stairs. The attic smelled of dust and forgotten summers. Boxes were stacked against every wall: tangled Christmas lights, a lamp with a broken shade, toys that had outlived the interest of several generations. While Josh rummaged for baking trays, Núria's attention was caught by something wedged beneath the small window: a paper lantern, red and gold, its colours faded almost to rust and cream. Faded as it was, it had clearly been made by someone who cared. "This is beautiful," she murmured, turning it in the half-light. "And there's writing on it." In careful black ink, someone had written: "M. — Lantern Night, at the old bridge. I'll wait for you. T."
+
+"What's Lantern Night?" Núria asked. Josh frowned. "I've lived here my whole life, and I've never heard of it. Gran will know, though. She's practically the town's unofficial archive." They carried the lantern downstairs. Gran was in her usual chair, tea in hand, and she looked up with a smile that faltered the instant she saw what they were holding. "Where on earth did you find that?" she asked, very quietly. "In the attic," said Josh. "Who are M and T?" For several seconds Gran did not move at all. Then, almost imperceptibly, her hands began to tremble. She set her cup down on its saucer with exaggerated care and rose to her feet.
+
+"Please put that back where you found it," she said. Her voice was calm; her face was anything but. She left the room before either of them could summon another question. "I think," Núria said slowly, "we may have stumbled on something important." "Important?" Josh stared at the abandoned cup. "My gran has just walked out on a perfectly good cup of tea. In fifteen years, I have never once seen that happen." They looked down at the lantern again. Somebody, a long time ago, had promised to wait at the old bridge, and Gran knew exactly who.
+
+Words: faded = having lost its brightness over time · rummaged = searched untidily through things · wedged = stuck tightly in a narrow space · faltered = suddenly became weaker or less sure · imperceptibly = so slightly that it is hard to notice
+
+Gist: What makes Gran upset?
+
+A. An old lantern with a message · B. A pumpkin costume · C. Núria’s homework
+
+What happens next? What do Josh and Núria find at the library?
+
+A. An old phone · B. A poster for Lantern Night in 1974 · C. A letter from Canada dated today
+
+
 # Chapter 2 · A poster from 1974
 
 LP1 · Celebrations around the world
@@ -187,6 +214,33 @@ A. They held a parade to the old bridge · B. They went on a school trip to Lond
 What happens next? Who is M on the lantern?
 
 A. Mrs Okafor · B. Amy · C. Gran, whose name was Margaret Hall
+
+## Pro · 834 words
+
+Gran did not come down to breakfast the next morning, which was unheard of: she was invariably the first one up, the kettle already singing by the time anybody else stumbled into the kitchen. Josh and Núria exchanged a look in which guilt and curiosity were mixed in roughly equal measure. "We mustn't upset her again," Núria said. "But that lantern has a history, and I'd like to know what it is." "Then we need Mrs Okafor," Josh replied. "She runs the local history room at the library, and if something happened in this town, she either remembers it or has filed it." The library was part of the community centre on the town square, where volunteers were already hanging autumn garlands from the lamp posts.
+
+Mrs Okafor was pinning photographs of local traditions to a display board when they came in. The moment she caught sight of the red and gold lantern, she stopped mid-gesture. "Well, now," she said softly. "There's something I haven't laid eyes on in a very long time. Wherever did you find it?" When Josh had explained, she led them into a back room lined with filing cabinets, where the library kept posters, photographs and decades of newspaper cuttings. She lifted down a heavy album, turned its pages with the reverence of someone handling a sacred text, and stopped at a poster that had yellowed with age.
+
+"ASHBY LANTERN NIGHT — SATURDAY 16 NOVEMBER 1974 — PARADE FROM THE TOWN SQUARE TO THE OLD BRIDGE — LIVE MUSIC, HOT FOOD — BRING YOUR LANTERN!" "I've never heard of any festival like this," Josh said. "Hardly surprising," said Mrs Okafor. "It had died out long before you were born. But for the best part of a century, Lantern Night was the one evening that brought the whole town together. It began as a harvest custom: families made paper lanterns, gathered in the square and walked in procession down to the bridge, where they lit candles and made a wish for the winter ahead."
+
+"So it was never just a party," Núria said. "It was a way of holding the community together." "Precisely. Customs change shape, but the reasons people celebrate tend to be remarkably stubborn." Núria found herself describing the Castanyada, with its chestnuts, sweet potatoes and panellets shared on the same autumn weekend as Halloween, and the conversation drifted to Diwali, when families light diyas, and to the Lantern Festival that closes the Chinese New Year. "Each has its own history and meaning," Mrs Okafor cautioned, "and it would be a mistake to treat them as interchangeable. But it's striking how often people turn to light when the nights draw in." Some traditions survived, she added, only because schools, families and local groups had gone to the trouble of keeping them alive. "A tradition isn't an exhibit in a glass case. It exists only for as long as people are prepared to take part in it."
+
+Josh tapped the date on the poster. "So what happened in 1974? Why was this the last one?" Mrs Okafor consulted a folder of handwritten notes. "A violent storm blew in on the day of the festival. The wind damaged the old bridge so badly that the parade had to be called off, and the council closed the bridge altogether. Nobody managed to organise the festival the following year, and the year after that it was quietly forgotten. It didn't help that the young man who did most of the organising left Ashby barely a week after the storm."
+
+"Who was he?" Núria asked. "Tom Barker. Twenty-one years old, full of ideas, and on his way to a job in Canada." "That's a long way to go," said Josh. "It was a great deal further in those days," Mrs Okafor said. "No instant messages, no video calls. You wrote letters and waited weeks for a reply. Some people kept in touch for the rest of their lives; others drifted apart without ever quite meaning to." Núria looked down at the lantern in her hands. The message had seemed charming the night before; now it felt almost unbearably heavy. "M. — Lantern Night, at the old bridge. I'll wait for you. T." "T is Tom," she said. "The storm wrecked the parade, and a week later he was gone."
+
+"Which leaves us with M," Josh said, and his voice had lost its usual lightness. "And with the question of why Gran looked as if she'd seen a ghost." Mrs Okafor slid the poster back into its sleeve. "It sounds to me as though you have one more chapter of history to uncover," she said. "Only make sure you check your facts, and not just the stories people tell you. Memory is a wonderful thing, but it isn't always a reliable witness." As they stepped back out into the drizzle, Núria realised that the real mystery had never been the festival at all. It was the person who had promised to wait at the bridge, and the person who, perhaps, had never arrived.
+
+Words: unheard of = never known or done before · reverence = deep respect · died out = stopped existing completely · drifted apart = gradually became less close · witness = a person who saw something and can describe it
+
+Gist: What did people do at Lantern Night?
+
+A. They held a parade to the old bridge · B. They went on a school trip to London · C. They played a football match
+
+What happens next? Who is M on the lantern?
+
+A. Mrs Okafor · B. Amy · C. Gran, whose name was Margaret Hall
+
 
 # Chapter 3 · Who is M?
 
@@ -284,6 +338,33 @@ What happens next? What permission will the group need?
 
 A. Permission to use the old bridge · B. Permission to travel to Canada · C. Permission to change schools
 
+## Pro · 746 words
+
+That evening the kitchen table became an incident room. The lantern sat between them like a piece of evidence, and Josh's laptop glowed with a long column of search results. "Rule number one," Núria announced. "We don't believe the first exciting thing we read. For every source we ask: who wrote it, when, and how do they know?" "You've turned my kitchen into a forensics lab," Josh said. "Good. Now stop admiring my methods and find me some facts."
+
+The first result was a site called Ashby Memories, where an anonymous user claimed that Lantern Night had been abandoned after a bitter feud between two families over money. There was no date, no name and not a single reference. "It could be true," Josh ventured. "It could," Núria conceded, "but at the moment it's gossip with a website. Nothing here counts as evidence." Next came a social media page crammed with old photographs, one of which showed families carrying lanterns across the bridge. It was a lovely image, but nobody had recorded who took it, or when. "So we can describe what's in it," Núria said, "but we can't date it, and we certainly can't build an argument on it."
+
+Then they found the digital archive of the local paper, the Ashby Herald, and the tone of the evening changed. Here was an article with a date, 17 November 1974, a named journalist and a headline that left little room for interpretation: "STORM CLOSES OLD BRIDGE." It reported that Lantern Night had been cancelled the previous evening after gale-force winds damaged the bridge, which the council had closed as a precaution. It also mentioned Tom Barker, the festival's twenty-one-year-old organiser, who was due to leave for Canada the following week. "That matches what Mrs Okafor told us almost word for word," Josh said. "Which is reassuring," Núria replied. "It doesn't tell us everything, but at least it's a source we can verify."
+
+Beside the article was a grainy photograph of a young woman holding a red and gold lantern. The caption read: "Margaret Hall, 19, helps Tom Barker organise Lantern Night." Josh leaned so close to the screen that his nose almost touched it. "Hall," he said. "Margaret Hall. That was Gran's name before she married Grandad." "And the message is addressed to M," said Núria. "Tom was going to wait for Margaret at the bridge." For a long moment, neither of them spoke. The outline of the story was coming into focus, yet the details that mattered most remained stubbornly out of reach. Had Margaret intended to go? Had she arrived too late? Had she ever seen Tom again?
+
+"We can't fill in the gaps ourselves," Josh said eventually. "It's her story. If she wants to tell it, she'll tell it." "Agreed," said Núria. "We wait until she's ready." She copied the date of the article, the journalist's name and the wording of the caption into her notebook, taking care to keep established facts in one column and speculation in another. Then, quite suddenly, her expression changed. "What if," she said, "we brought Lantern Night back?" Josh stared at her. "Brought it back? As in, organised an entire festival?" "Why not? Your school has a hall, the town has a square, and the old bridge is still standing. We could run lantern-making workshops, invite families and give the tradition a second life."
+
+"That," said Josh, "is an enormous amount of work. And it's practically November." "We've got roughly six weeks. That's enough, provided we're organised." "Having enough time and being organised are not the same thing," Josh pointed out, though he was smiling now. Núria pictured Gran walking through Ashby with her lantern held high. Whatever had happened in 1974, the festival had never belonged to one family; it belonged to the whole town. Reviving it would not answer every question about that night, but it might give people a reason to dust off their own memories and share them.
+
+They agreed that the festival should not be a museum piece. Older residents could share what they remembered, while newer neighbours could contribute music, food and decorations of their own. There was a great deal still to check, but for the first time the idea had begun to resemble a project rather than a daydream. Josh opened a blank document and typed a heading in capitals: "LANTERN NIGHT: CAN WE DO IT?" He looked up. "Obstacle number one," he said. "We're going to need permission to use the bridge."
+
+Words: feud = a long, bitter quarrel · anonymous = by someone whose name is not known · caption = the words printed under a picture · speculation = ideas formed without firm evidence · reviving = bringing back into use
+
+Gist: Which source gives the most reliable evidence?
+
+A. An anonymous forum · B. A dated newspaper article with a journalist’s name · C. A photo without a date
+
+What happens next? What permission will the group need?
+
+A. Permission to use the old bridge · B. Permission to travel to Canada · C. Permission to change schools
+
+
 # Chapter 4 · Plan the day
 
 LP4 · Future forms and organising an event
@@ -379,6 +460,31 @@ A. Money for fireworks · B. A new bus · C. Permission to use the bridge
 What happens next? What will Gran do after seeing the poster?
 
 A. Tell the teenagers her story · B. Leave Ashby forever · C. Stop the school project immediately
+
+## Pro · 797 words
+
+On Monday morning, Josh and Núria cornered Priya and Callum in the school dining room. Núria laid a notebook on the table with the air of a general unfolding a battle map. "We're bringing Lantern Night back," she said. "Saturday 12 December." Callum studied the date as though it had personally insulted him. "Six weeks? It takes me six weeks to choose a font." "Then you'd better choose faster," said Priya, already reaching for a pen. "I'll draw up a timetable." The division of labour fell into place with surprising ease. Callum would design posters for the school and the town square; Priya would put together the programme and persuade her uncle's band to play; Josh would approach the head teacher, Mr Davies, on Wednesday; and Núria would write the invitations and look into the state of the old bridge.
+
+"There's one thing we need to get right from the start," Núria said. "It's a local tradition, but it has to feel inclusive. Nobody should feel like a guest at someone else's party, whatever they normally celebrate at this time of year." "We could invite families to bring their own autumn and winter traditions," Priya suggested. "It doesn't need to be a carbon copy of 1974." By the end of lunch, a shape had emerged: a free lantern-making workshop in the school hall, food stalls in the square, a parade through the town and music at the bridge. Open flames were ruled out at once; in a crowded street, battery lights were the only sensible option. "It's bound to rain," Callum remarked. "We might as well rename it Umbrella Night." "If it rains," said Josh, "you can design that poster too."
+
+On Wednesday, Mr Davies listened with the patience of a man who had heard many ambitious proposals from teenagers, most of which had dissolved within a week. This one, however, seemed genuinely to move him; he had grown up hearing about Lantern Night and regarded it as part of the town's heritage. "The hall is free on Saturday afternoon," he said. "You're welcome to use it for the workshop, and I'll put you in touch with the community centre." Together they settled on a schedule. At four, families would gather in the hall to make lanterns. At half past five, the food stalls would open in the square. At six, the parade would set off for the old bridge, and at seven, the band would play while people made their wishes.
+
+"We'll need a contingency plan for bad weather," Priya added. "The hall could stay open for anyone who'd rather not walk." The bridge, however, was a problem of a different order. It had been closed after the storm of 1974, and responsibility for it lay with the council. "We can't march half the town across a bridge without permission," Josh said. "And what if it still isn't safe?" "Then we change the route," Núria replied. "But first, we ask. The whole point is to bring people together, not to put them in danger." She volunteered to write a formal email, drawing on the phrases they had practised in English lessons: "I am writing to propose…", "We would like to…", "Would it be possible to…?" She drafted the request that afternoon but held it back until the group had approved the timetable.
+
+Before going home, they ran through their tasks one last time. Priya had the schedule, Callum the posters, Josh the teachers, and Núria the formal request. Each of them knew exactly what came next, and they agreed to review their progress together rather than leave the hardest jobs to whoever was too polite to refuse. That evening, Callum sent through his design: a deep indigo sky scattered with hundreds of tiny lights and, across the top, a headline that made them all grin: "ASHBY LANTERN NIGHT IS BACK!" Josh printed a copy and propped it against the fruit bowl on the kitchen table.
+
+Gran noticed it the moment she walked in. She put on her reading glasses and read every word slowly, as though each one had to be weighed before it could be accepted. Nobody dared to break the silence. "I remember that bridge," she said at last. Something shifted in her expression when her eyes returned to the name of the festival. Josh opened his mouth to explain, but Gran looked straight at him, and the words died in his throat. "Who told you about Tom?" she asked. In that instant, Núria understood that their project was not merely a school activity or a piece of local history. It was woven into Gran's own life, and some threads, once pulled, might hurt. She found herself wondering, with a sudden flicker of anxiety, how Gran would feel when she learned how much they had already discovered.
+
+Words: division of labour = the way work is shared between people · inclusive = welcoming to everyone · heritage = the traditions and history a community values · contingency plan = a plan for something that might go wrong · flicker = a brief, weak appearance of a feeling
+
+Gist: What must they ask the council?
+
+A. Money for fireworks · B. A new bus · C. Permission to use the bridge
+
+What happens next? What will Gran do after seeing the poster?
+
+A. Tell the teenagers her story · B. Leave Ashby forever · C. Stop the school project immediately
+
 
 # Chapter 5 · Gran's story
 
@@ -476,6 +582,31 @@ What happens next? What will Tom do after Josh contacts him?
 
 A. Delete the message · B. Send a photo of Australia · C. Come to Lantern Night
 
+## Pro · 868 words
+
+For a while after Gran's question, the only sound in the kitchen was the hum of the fridge. Josh had opened his mouth, but it was Núria who spoke. "We found a lantern in the attic," she said carefully. "Then we went to the library, and we read a newspaper article about Lantern Night. We're sorry if we upset you. We never meant to pry." Gran lowered herself into a chair and laid the poster flat on the table. For some time she studied its scattered lights, as if they were stars she was trying to name. "Tom Barker was the boy next door," she began at last. "We walked to school together every morning for years. Every autumn we'd spend weeks scheming about the festival. He had the most wonderful ideas, and I was the one who made sure they actually happened."
+
+"That sounds familiar," Josh murmured, glancing at Núria. Gran's mouth twitched. "Perhaps it does. I was nineteen and Tom was twenty-one. We'd been close friends for as long as either of us could remember, and somewhere along the way, without either of us quite noticing, we became rather more than friends." In 1974, she explained, Tom had been offered a teaching post at a school in Canada, and he had asked Margaret to go with him. It was the kind of opportunity that comes once in a lifetime, yet the thought of leaving her family and the town she loved filled her with a dread she could not argue herself out of. For weeks they circled the question without ever landing on an answer.
+
+"Tom knew how much Lantern Night meant to me," Gran went on. "So he wrote that message on my lantern. He would wait for me at the bridge on the night of the festival, and I could give him my answer there." "And then the storm hit," said Josh. "It was the worst weather I can remember. My father flatly refused to let me out of the house. By the time I managed to slip away and reach the bridge, it had already been closed because of the damage. Tom wasn't there. A week later he was on a plane to Toronto. We exchanged a handful of letters, but letters were slow, and words on paper never quite say what you mean. Eventually, without either of us deciding it, we simply stopped writing."
+
+"Do you regret staying?" Núria asked gently. Gran considered the question for so long that Núria began to fear she had overstepped. "I missed Tom, of course I did," she said finally. "But a few years later I met your grandad, and we built a very happy life together. I wouldn't trade that for anything. Life doesn't hand us only one possible happy ending, you know. It's rather more generous than that." Josh looked at the lantern. "Then why keep it hidden away?" "Because I didn't know how to explain everything it stood for. That festival was part of my youth, and part of the town's life too. When it disappeared, the lantern became a reminder of both the loveliest and the most painful things I'd known. It was easier to leave it in the dark."
+
+Núria described the celebration they had in mind. She made a point of stressing that everyone would be welcome, that every arrangement was being checked for safety, and that the aim was to honour the town's history, not to put Gran's private story on display. "Would you like to help us?" she asked. Gran was quiet for a moment. Then she nodded. "Yes," she said. "I would very much appreciate the chance to see Lantern Night again." Later that evening, Núria finished her email to Councillor Hughes. She opened formally: "I am writing to propose the return of Lantern Night, a local tradition which used to take place every autumn." She outlined the free workshop, the food stalls, the music and the parade planned for Saturday 12 December, asked whether the bridge might be used between six and eight, and offered to submit a detailed safety plan. She signed off with "I look forward to hearing from you" and "Kind regards", then read the whole thing through twice. A well-crafted request, she knew, could be the difference between a charming idea and an event that actually happened.
+
+Meanwhile, Josh had been searching for Tom Barker in Canada. There were dozens of results, but one profile stopped him in his tracks: Tom Barker, a retired teacher from Toronto, aged seventy-three. In the photograph, an elderly man was holding a red and gold lantern. Josh hesitated, his finger hovering over the keyboard. The last thing he wanted was to ambush Gran with a ghost from her past, or to hurt her all over again. In the end he decided to write something kind and careful: he would ask Tom whether he might like to hear about the festival, and he would make no promises about Gran. He attached Callum's poster and typed: "Hello. My name is Josh Green. I think you knew my gran, Margaret Hall, many years ago…" Then he sat staring at the screen for a very long time before he finally pressed send.
+
+Words: pry = to try to find out about someone's private life · dread = a strong fear of something that may happen · overstepped = went further than was acceptable · hesitated = paused because he was unsure · ambush = to surprise someone in an unwelcome way
+
+Gist: Why did Margaret miss Tom at the bridge?
+
+A. She forgot the date · B. The storm and her father kept her home, and the bridge closed · C. Tom went to a different town
+
+What happens next? What will Tom do after Josh contacts him?
+
+A. Delete the message · B. Send a photo of Australia · C. Come to Lantern Night
+
+
 # Chapter 6 · Lantern Night
 
 Final product · A celebration day
@@ -561,6 +692,30 @@ The festival wasn't about showing everybody their own story; it was about giving
 The next morning, the Ashby Herald printed a photograph under the title "LANTERN NIGHT RETURNS". The article explained the festival's history and said that the council, local volunteers and the school planned to hold it again next December. Josh showed Núria the newspaper. "So, are you coming back next year?" "Yes," she said. "And next time I'm making twice as many panellets." "Make three times as many," he replied. "I know our town."
 
 Words: safety arrangements = mesures de seguretat · guided = van guiar · disbelief = incredulitat · volunteers = voluntaris · community = comunitat
+
+Gist: Who appears at the old bridge?
+
+A. Tom Barker with a lantern · B. A television presenter · C. The mayor in a witch costume
+
+What happens next? What does the town plan to do next December?
+
+A. Close the bridge again · B. Celebrate Lantern Night again · C. Cancel all winter festivals
+
+## Pro · 803 words
+
+Two replies arrived the following week, and both of them mattered. Councillor Hughes wrote to Núria to confirm that the old bridge, which had been fully repaired in 2009, could be used for the parade, provided the agreed safety arrangements were followed to the letter. Tom Barker answered Josh too. Josh read the message three times, then disappeared to his room to phone Tom in private, and emerged wearing an expression that he clearly believed was neutral. "You're smiling at your phone again," Núria observed. "I may know something you don't," Josh replied. "That," said Núria, "is a dangerous thing to say to someone who has just solved a fifty-year-old mystery."
+
+Saturday 12 December dawned under a fog so thick that the far side of the square had simply ceased to exist. Callum stood at the window of the school hall, surveying the gloom. "Congratulations, everyone," he said. "We're about to host the first festival in history that nobody can actually see." "It's nine o'clock in the morning," Priya said. "Give the weather a chance to redeem itself." By lunchtime, as if chastened, the fog had begun to lift. The group went through the timetable one final time, double-checked the arrangements for the bridge and made sure there were enough volunteers to guide the crowd. Real flames had been ruled out weeks before; the parade would glow with battery lights instead. Everyone wanted the evening to be beautiful, but not at the expense of being safe and welcoming.
+
+By four o'clock the hall was packed. Some of the older residents remembered the original Lantern Night and drifted from table to table, swapping stories; others were discovering the tradition for the first time and were none the less enthusiastic for it. Children bent over paper and glue, producing lanterns of startling originality. Priya's uncle's band played in the corner, and the food tables served steaming soup and seasonal treats. Núria handed round panellets, explaining to anyone who would listen how they were eaten during the Castanyada. "They're vanishing faster than the tickets," Callum remarked. "It's a free festival," Priya reminded him. "There are no tickets." "Exactly my point. And the panellets are still vanishing faster."
+
+At half past five, the crowd assembled in the square, a swaying constellation of lanterns in every colour imaginable. Some were simple, some were exquisite, and one bore an uncanny resemblance to a giant pumpkin. Gran arrived carrying the red and gold lantern that had spent more than fifty years in the attic. "Are you ready?" Josh asked her. "More than ready," she said, though her hands were not quite steady. At six o'clock, the parade set off. Points of light wound slowly through the darkened streets. Núria held up her phone so that her family in Catalonia could share the moment. "Look," she said. "This is Lantern Night!" Her little brother was beside himself with delight: "It's like the Castanyada, but everyone's got a lamp!"
+
+When the procession reached the old bridge, the volunteers guided people across in an orderly stream. Halfway over, Gran stopped and looked towards the far bank. A tall, elderly man stood there, holding a lantern that was the twin of her own. "Hello, Margaret," he said. "I'm sorry I'm late." Gran stared at him in utter disbelief. "Tom Barker?" "The very same," he said. "Though I'm afraid I walk a good deal more slowly these days." "Only fifty-two years late," she said. And then they were both laughing, and the people around them, sensing that something extraordinary was taking place, began to applaud. Josh stepped back quietly, leaving the two of them to decide how much of this moment they wished to share. Gran and Tom stood talking in low voices, oblivious to the music. The festival had never been about turning their story into a spectacle; it was about giving the town back a tradition it had almost lost.
+
+Later, Núria switched on the small light inside her lantern and made a wish: that Lantern Night would be celebrated every year from now on, and that it would always find room for new neighbours. She looked around at the music, the food and the faces of people who had worked side by side to make the evening possible, and it struck her that an old tradition had found a new home in the community. The next morning, the Ashby Herald ran a photograph beneath the headline "LANTERN NIGHT RETURNS". The article recounted the festival's history and reported that the council, local volunteers and the school intended to hold it again the following December. Josh slid the paper across the breakfast table. "So," he said, "are you coming back next year?" "Definitely," said Núria. "And this time I'm making twice as many panellets." "Make it three times," Josh said. "Trust me. I know this town."
+
+Words: to the letter = exactly, in every detail · chastened = sorry for having behaved badly · uncanny = strange in a way that is hard to explain · disbelief = the feeling of not being able to believe something · oblivious = not aware of what is happening around you
 
 Gist: Who appears at the old bridge?
 

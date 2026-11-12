@@ -5,7 +5,7 @@ allocate time on the agenda … there should appear the chapters of the book").
 Run: python3 tools/reading-story/lp.py
 Source: the same tools/reading-story/<course>-<ls>.md as the PDFs (build.py). Output: <LS folder>/data/book.js, read by
 <LS folder>/book.html (ls2-engine.js): one tab per chapter (ch1 … ch6) with the book's own pages for the student's route (Starter,
-Base, Core, Plus; Pro reads Plus), shown as a book that turns its pages (shared/js/el-book.js; the pictures and book/pages.json come
+Base, Core, Plus; Pro has its own C2 book where the .md has one, else reads Plus), shown as a book that turns its pages (shared/js/el-book.js; the pictures and book/pages.json come
 from build.py --web, run it first), and the chapter's two questions as the book's last page, answered on the page, once
 (ls2-engine.js bookPanel): "Did you understand?" (checked, the right option first as in every mc panel) and "What happens next?
 Guess!" (guess: saved, never marked; the next chapter shows the guess and, after its check, whether it was right). KEYS = the right options of the Drive teacher copies (✓), the same in every route.
@@ -15,7 +15,7 @@ import json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
-from story import parse, LEVELS          # noqa: E402
+from story import parse, levels_of      # noqa: E402
 
 # keys: (gist, next) right option per chapter, 0 = A (Drive: Reading story teacher copies, ✓). lps: the site's Learning Path numbers
 # of each chapter (the .md's "LPn" lines follow the LS design, where 4 ESO counts Getting started as LP0).
@@ -51,18 +51,18 @@ def build(b):
     chapters = parse(os.path.join(HERE, b["src"] + ".md"))
     man = json.load(open(os.path.join(ROOT, b["dir"], "book", "pages.json"), encoding="utf-8"))
     assert len(chapters) == len(b["keys"]), b["src"]
-    panels = []
+    panels, levels = [], levels_of(chapters)
     for k, ch in enumerate(chapters):
         core = ch["levels"]["Core"]
         # the book's own pages (build.py --web): chapter 1 opens with the cover and "How to read this book"
-        pages = {lv: (man[lv]["cover"] if k == 0 else []) + man[lv][str(ch["n"])] for lv, _ in LEVELS}
+        pages = {lv: (man[lv]["cover"] if k == 0 else []) + man[lv][str(ch["n"])] for lv, _ in levels}
         items = []
         for which, key, label in (("gist", b["keys"][k][0], None), ("next", b["keys"][k][1], "guess")):
             # the questions and options are the same in every route; Catalan from the Starter/Base copy
             q = core[which]
             if not q:
                 continue
-            for lv, name in LEVELS:
+            for lv, name in levels:
                 o = ch["levels"][name][which]
                 assert o and o["opts"] == q["opts"], (b["src"], ch["n"], name, which)
             qca = ch["levels"]["Base"][which]["q"][1]
