@@ -4,8 +4,9 @@ allocate time on the agenda … there should appear the chapters of the book").
 
 Run: python3 tools/reading-story/lp.py
 Source: the same tools/reading-story/<course>-<ls>.md as the PDFs (build.py). Output: <LS folder>/data/book.js, read by
-<LS folder>/book.html (ls2-engine.js): one tab per chapter (ch1 … ch6) with the chapter text of the student's route (Starter, Base,
-Core, Plus; Pro reads Plus), the words box and the chapter's two questions: "Did you understand?" (checked, the right option first as
+<LS folder>/book.html (ls2-engine.js): one tab per chapter (ch1 … ch6) with the book's own pages for the student's route (Starter,
+Base, Core, Plus; Pro reads Plus), shown as a book that turns its pages (shared/js/el-book.js; the pictures and book/pages.json come
+from build.py --web, run it first), and the chapter's two questions: "Did you understand?" (checked, the right option first as
 in every mc panel) and "What happens next? Guess!" (guess: saved, never marked; the next chapter shows the guess and, after its
 check, whether it was right). KEYS = the right options of the Drive teacher copies (✓), the same in every route.
 """
@@ -15,8 +16,6 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 from story import parse, LEVELS          # noqa: E402
-from paragraphs import paragraphs        # noqa: E402
-import html as H                         # noqa: E402
 
 # keys: (gist, next) right option per chapter, 0 = A (Drive: Reading story teacher copies, ✓). lps: the site's Learning Path numbers
 # of each chapter (the .md's "LPn" lines follow the LS design, where 4 ESO counts Getting started as LP0).
@@ -41,25 +40,6 @@ def typo(s):
     return "".join(out)
 
 
-def esc(s):
-    return H.escape(typo(s), quote=False).replace("\x01", "<u>").replace("\x02", "</u>")
-
-
-def mark_words(paras, words):
-    """Underline the first use of each glossed word in the chapter text (as build.py)."""
-    done = set()
-    for w, _ in words:
-        key = w.strip()
-        pat = re.compile(r"(?<![\w\x01])(" + re.escape(key) + r"(?:s|es)?)(?![\w])", re.I)
-        for k, p in enumerate(paras):
-            m = pat.search(p)
-            if m and key not in done:
-                paras[k] = p[:m.start()] + "\x01" + m.group(1) + "\x02" + p[m.end():]
-                done.add(key)
-                break
-    return paras
-
-
 def lp_of(n):
     if n == "fp":
         return {"en": "With the final product", "ca": "Amb el producte final"}
@@ -67,22 +47,15 @@ def lp_of(n):
     return {"en": "With " + t, "ca": "Amb " + t}
 
 
-def text_html(L, ca):
-    paras = mark_words(paragraphs(L["paras"]), L["words"])
-    w = ""
-    if L["words"]:
-        w = ('<div class="book-words"><strong>' + ("Paraules que t’ajuden" if ca else "Words to help you") + '</strong><ul>'
-             + "".join("<li><b>%s</b> = <i>%s</i></li>" % (esc(a), esc(b)) for a, b in L["words"]) + "</ul></div>")
-    return w + '<div class="book-text">' + "".join("<p>%s</p>" % esc(p) for p in paras) + "</div>"
-
-
 def build(b):
     chapters = parse(os.path.join(HERE, b["src"] + ".md"))
+    man = json.load(open(os.path.join(ROOT, b["dir"], "book", "pages.json"), encoding="utf-8"))
     assert len(chapters) == len(b["keys"]), b["src"]
     panels = []
     for k, ch in enumerate(chapters):
         core = ch["levels"]["Core"]
-        text = {lv: text_html(ch["levels"][name], lv in ("beginners", "insecure")) for lv, name in LEVELS}
+        # the book's own pages (build.py --web): chapter 1 opens with the cover and "How to read this book"
+        pages = {lv: (man[lv]["cover"] if k == 0 else []) + man[lv][str(ch["n"])] for lv, _ in LEVELS}
         items = []
         for which, key, label in (("gist", b["keys"][k][0], None), ("next", b["keys"][k][1], "guess")):
             # the questions and options are the same in every route; Catalan from the Starter/Base copy
@@ -103,9 +76,9 @@ def build(b):
             items.append(it)
         p = {"id": "ch%d" % ch["n"], "type": "mc", "tab": {"en": "Chapter %d" % ch["n"], "ca": "Capítol %d" % ch["n"]},
              "title": typo("Chapter %d · %s" % (ch["n"], ch["title"])), "pill": lp_of(b["lps"][k]),
-             "intro": {"en": "Read the chapter once for the story, then again more slowly. Then answer: one question about the story and one guess about what happens next.",
-                       "ca": "Llegeix el capítol una vegada per entendre la història i una altra més a poc a poc. Després respon: una pregunta sobre la història i una endevinalla sobre què passarà."},
-             "book": True, "media": {"text": text}, "items": items}
+             "intro": {"en": "Read the chapter in the book: turn the pages with ▶ or a tap, and press ⤢ to read it full screen. Then answer below: one question about the story and one guess about what happens next.",
+                       "ca": "Llegeix el capítol al llibre: gira les pàgines amb ▶ o tocant-les, i prem ⤢ per llegir-lo a pantalla completa. Després respon a sota: una pregunta sobre la història i una endevinalla sobre què passarà."},
+             "book": True, "media": {"pages": pages}, "items": items}
         if k:
             p["prev"] = "ch%d" % chapters[k - 1]["n"]
         panels.append(p)

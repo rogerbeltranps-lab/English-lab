@@ -58,16 +58,11 @@ html,body{overflow-x:clip}
 .audio-card[hidden],.audio-row[hidden],audio[hidden]{display:none!important}
 </style>
 <style>
-/* 📖 Book (tools/reading-story/lp.py): the chapter reads like the book */
-.reading:has(.book-text){padding:22px 26px;line-height:1.8}
-.book-words{margin:0 0 16px;padding:12px 14px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)}
-.book-words strong{display:block;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dark);margin-bottom:6px}
-.book-words ul{list-style:none;margin:0;padding:0;columns:2;column-gap:20px}.book-words li{break-inside:avoid;padding:2px 0}.book-words i{color:var(--muted)}
-.book-text{font-size:1.08rem;max-width:68ch}.book-text p{margin:0 0 .75em}.book-text u{text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px}
+/* 📖 Book: the chapter's pages as a book (shared/js/el-book.js); the questions below it */
+#lp .panel .section-card:has(.el-book){padding:12px}
 .q-ca{font-weight:500;color:var(--muted);font-style:italic}
 .guess-q{border-top:1px dashed var(--line);padding-top:12px}
 .guess-back{margin:0 0 14px;padding:12px 14px;border-radius:12px;background:#fff8e1;border:1px solid #f3d27a;color:#5b4300;line-height:1.5}
-@media(max-width:640px){.reading:has(.book-text){padding:0;border:0;background:none}.book-words ul{columns:1}}
 </style>
 <link rel="stylesheet" href="../../shared/css/el-app.css"><!-- the app menu's styles before the first paint (Roger, 7 Nov 2026) -->
 </head>
@@ -96,6 +91,7 @@ html,body{overflow-x:clip}
 <script src="../../shared/js/flashcard-set.js"></script>
 <script src="../../shared/js/section-next.js"></script>
 <script src="../../shared/js/el-grading.js"></script>
+<script src="../../shared/js/el-book.js"></script>
 <script src="ls2-engine.js"></script>
 <script src="data/book.js"></script>
 <script>LS2.init(window.LP);</script>

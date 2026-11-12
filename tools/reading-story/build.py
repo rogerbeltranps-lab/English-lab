@@ -20,11 +20,13 @@ from pypdf import PdfReader, PdfWriter   # noqa: E402
 CEFR = {"2eso": {"beginners": "A1", "insecure": "A1+", "safe": "A2", "daring": "A2+"},
         "4eso": {"beginners": "A1", "insecure": "A2", "safe": "B1", "daring": "B1+"}}   # = EL_CEFR in el-catalog.js
 
+# lps: the site's Learning Path numbers of each chapter, for the web pages (the .md's "LPn" lines follow the LS design, where 4 ESO
+# counts Getting started as LP0; the PDFs keep those). Same as lp.py.
 BOOKS = [
-    {"src": "2eso-ls2", "course": "2eso", "out": "2eso/free-time-live/downloads/ls2-story-", "title": "Maya Live!",
+    {"src": "2eso-ls2", "course": "2eso", "lps": [[1], [2], [3], [4], [5], [6]], "out": "2eso/free-time-live/downloads/ls2-story-", "title": "Maya Live!",
      "tagline": "A mystery at the skate park", "ls": "2 ESO · Free Time, Live! · LS2", "ending": "To be continued…",
      "ink": "#0f3d3e", "accent": "#e8590c", "soft": "#fff4ea", "line": "#f6c9a6", "night": "#103638"},
-    {"src": "4eso-ls2", "course": "4eso", "out": "4eso/seasons-and-celebrations/downloads/ls2-story-", "title": "Lantern Night",
+    {"src": "4eso-ls2", "course": "4eso", "lps": [[1], [2], [3, 4], [5], [6], "fp"], "out": "4eso/seasons-and-celebrations/downloads/ls2-story-", "title": "Lantern Night",
      "tagline": "An old lantern. A lost tradition. A secret waiting to be told.", "ls": "4 ESO · Seasons & Celebrations · LS2",
      "ending": "The end", "ink": "#4a1020", "accent": "#b4232f", "soft": "#fbf3e4", "line": "#ecd3a3", "night": "#24090f"},
 ]
@@ -156,30 +158,42 @@ def cover_html(b, lv, name, img, copy):
                                               CEFR[b["course"]][lv], esc(b["ls"]), esc(copy))
 
 
-def body_html(b, lv, name, chapters):
+def site_label(n, the=False):
+    if n == "fp":
+        return "the final product" if the else "Final product"
+    n = [str(x) for x in n]
+    return ("Learning Paths " + ", ".join(n[:-1]) + " and " + n[-1]) if len(n) > 1 else "Learning Path " + n[0]
+
+
+def body_html(b, lv, name, chapters, web=False):
+    lpl = (lambda ch, the=False: site_label(b["lps"][ch["n"] - 1], the)) if web else (lambda ch, the=False: lp_label(ch["lp"], the))
     ca = lv in ("beginners", "insecure")
     intro = ["<section class=\"intro page\"><h2>How to read this book</h2>",
              "<p>Read one chapter a week at home, with the Learning Path it goes with. Read it once for the story, then again more slowly.</p>",
              "<p>The words in the box at the start help you. They are <span class=\"gl\">underlined</span> in the story.</p>",
-             "<p>At the end of each chapter, circle one answer to each question. In class we talk about the chapter for ten minutes and see who guessed what happens next.</p>"]
+             ("<p>At the end of each chapter, answer the two questions below the book: tap one answer for each. In class we talk about the chapter for ten minutes and see who guessed what happens next.</p>" if web else
+              "<p>At the end of each chapter, circle one answer to each question. In class we talk about the chapter for ten minutes and see who guessed what happens next.</p>")]
     if ca:
         intro += ["<p class=\"ca\">Llegeix un capítol cada setmana a casa, amb el Learning Path que li toca. Llegeix-lo una vegada per entendre la història i una altra més a poc a poc.</p>",
                   "<p class=\"ca\">Les paraules del requadre de l'inici t'ajuden: estan subratllades a la història.</p>",
-                  "<p class=\"ca\">Al final de cada capítol, encercla una resposta a cada pregunta. A classe en parlem deu minuts i mirem qui ha endevinat què passa després.</p>"]
+                  ("<p class=\"ca\">Al final de cada capítol, respon les dues preguntes de sota del llibre: toca una resposta a cada una. A classe en parlem deu minuts i mirem qui ha endevinat què passa després.</p>" if web else
+                   "<p class=\"ca\">Al final de cada capítol, encercla una resposta a cada pregunta. A classe en parlem deu minuts i mirem qui ha endevinat què passa després.</p>")]
     intro.append("<div class=\"toc\"><h2>Contents</h2><ol>")
     for ch in chapters:
-        intro.append("<li><span class=\"n\">%d</span><span class=\"t\">%s</span><span class=\"lp\">%s</span></li>" % (ch["n"], esc(ch["title"]), lp_label(ch["lp"])))
+        intro.append("<li><span class=\"n\">%d</span><span class=\"t\">%s</span><span class=\"lp\">%s</span></li>" % (ch["n"], esc(ch["title"]), lpl(ch)))
     intro.append("</ol></div></section>")
     out = []
     for k, ch in enumerate(chapters):
         L = ch["levels"][name]
         paras = mark_words(paragraphs(L["paras"]), L["words"])
-        s = ["<section class=\"chapter\"><div class=\"kicker\">Chapter %d</div><h1>%s</h1><div class=\"lpl\">Read it with %s</div>" % (ch["n"], esc(ch["title"]), lp_label(ch["lp"], True))]
+        s = ["<section class=\"chapter\"><div class=\"kicker\">Chapter %d</div><h1>%s</h1><div class=\"lpl\">Read it with %s</div>" % (ch["n"], esc(ch["title"]), lpl(ch, True))]
         if L["words"]:
             s.append("<div class=\"words\"><h3>Words to help you%s</h3><ul>%s</ul></div>" % (" · Paraules que t'ajuden" if ca else "",
                      "".join("<li><b>%s</b> = <i>%s</i></li>" % (esc(w), esc(g)) for w, g in L["words"])))
         s.append("<div class=\"text\">" + "".join("<p>%s</p>" % esc(p) for p in paras) + "</div>")
-        s.append("<div class=\"think\"><h3>Think about it</h3><div class=\"how\">Circle one answer for each question.%s</div>" % (" · Encercla una resposta a cada pregunta." if ca else ""))
+        how = ("Answer below the book: tap one answer for each question.%s" % (" · Respon a sota del llibre: toca una resposta a cada pregunta." if ca else "")) if web else \
+              ("Circle one answer for each question.%s" % (" · Encercla una resposta a cada pregunta." if ca else ""))
+        s.append("<div class=\"think\"><h3>Think about it</h3><div class=\"how\">%s</div>" % how)
         for lab, q in (("1 · Did you understand?" + (" · Ho has entès?" if ca else ""), L["gist"]), ("2 · What happens next? Guess!" + (" · Què passarà? Endevina-ho!" if ca else ""), L["next"])):
             if not q:
                 continue
@@ -226,5 +240,56 @@ def main():
         print("built", os.path.relpath(out, ROOT), len(w.pages), "pages")
 
 
+def main_web():
+    """Page pictures for the 📖 Book learning path (Roger, 12 Nov 2026: "I want students to see the pages of the book as a PDF … the
+    feeling that they are reading a book, with the images"; "the feeling of turning pages"). The same books with the web wording (answer
+    below the book, not "circle"), printed and turned into one WebP picture per page: <LS folder>/book/<route>-NN.webp, and
+    <LS folder>/book/pages.json = {route: {"cover": [pages], "1": [pages of chapter 1], …}} for lp.py. Needs pdftoppm and Pillow."""
+    from PIL import Image
+    copy = copyright_line()
+    tmp = tempfile.mkdtemp(prefix="story-web-")
+    jobs, made = [], []
+    for b in BOOKS:
+        chapters = parse(os.path.join(HERE, b["src"] + ".md"))
+        img = "file://" + os.path.join(HERE, b["src"] + "-cover.jpg")
+        for lv, name in LEVELS:
+            base = os.path.join(tmp, "%s-%s" % (b["src"], lv))
+            open(base + "-cover.html", "w", encoding="utf-8").write(cover_html(b, lv, name, img, copy))
+            open(base + "-body.html", "w", encoding="utf-8").write(body_html(b, lv, name, chapters, web=True))
+            head = "%s · %s %s (%s)" % (b["title"], b["course"].upper(), name, CEFR[b["course"]][lv])
+            jobs.append({"html": base + "-cover.html", "pdf": base + "-cover.pdf", "footer": False})
+            jobs.append({"html": base + "-body.html", "pdf": base + "-body.pdf", "footer": True, "head": head, "copy": copy})
+            made.append((b, lv, base))
+    jf = os.path.join(tmp, "jobs.json")
+    json.dump(jobs, open(jf, "w"))
+    subprocess.run(["node", os.path.join(HERE, "print.mjs"), jf], check=True)
+    for b in BOOKS:
+        out = os.path.join(ROOT, os.path.dirname(os.path.dirname(b["out"])), "book")
+        os.makedirs(out, exist_ok=True)
+        for f in os.listdir(out):
+            if f.endswith(".webp"):
+                os.remove(os.path.join(out, f))
+        man = {}
+        for bb, lv, base in made:
+            if bb is not b:
+                continue
+            pngs = []
+            for part in ("-cover", "-body"):
+                subprocess.run(["pdftoppm", "-q", "-png", "-scale-to-x", "1000", "-scale-to-y", "-1", base + part + ".pdf", base + part], check=True)
+                pngs += sorted(os.path.join(tmp, f) for f in os.listdir(tmp) if f.startswith(os.path.basename(base + part) + "-") and f.endswith(".png"))
+            texts = [""] + [p.extract_text() or "" for p in PdfReader(base + "-body.pdf").pages]
+            m, cur = {"cover": []}, "cover"
+            for i, png in enumerate(pngs):
+                hit = re.search(r"CHAPTER\s+(\d+)", texts[i]) if i else None
+                if hit:
+                    cur = hit.group(1)
+                rel = "%s-%02d.webp" % (lv, i + 1)
+                Image.open(png).convert("RGB").save(os.path.join(out, rel), "WEBP", quality=78, method=6)
+                m.setdefault(cur, []).append("book/" + rel)
+            man[lv] = m
+        json.dump(man, open(os.path.join(out, "pages.json"), "w"), indent=1)
+        print("pages", os.path.relpath(out, ROOT), {lv: sum(len(v) for v in m.values()) for lv, m in man.items()})
+
+
 if __name__ == "__main__":
-    main()
+    main_web() if "--web" in sys.argv else main()

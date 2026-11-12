@@ -470,6 +470,7 @@ var LS2 = (function () {
     const m = p.media || {};
     let h = '';
     if (m.text) h += '<div class="reading">' + byLevel(m.text) + '</div>'; // a string, or one text per route
+    if (m.pages) h += '<div class="el-book" id="' + p.id + 'Book"></div>';   // 📖 the book's page pictures, one list per route (shared/js/el-book.js)
     if (m.youtube) h += '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' + m.youtube + '" title="' + esc(m.title || 'Video') + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>' +
       '<div class="actions"><a class="btn secondary" href="https://www.youtube.com/watch?v=' + m.youtube + '" target="_blank" rel="noopener">Open on YouTube ↗</a></div>' + (m.credit ? '<p class="tiny">' + m.credit + '</p>' : '');
     // Local videos (normal + "-slow" copy, WebVTT subtitles, poster), e.g. the listening chart: media.videos = [{ base: 'video/name', title }]
@@ -597,6 +598,7 @@ var LS2 = (function () {
     html: '<div class="section-card">' + guessBackHtml(p) + predictHtml(p) + mediaHtml(p) + gistHtml(p) + '<form id="' + p.id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + p.id + 'Check">' + (ca() ? 'Comprova' : 'Check') + '</button>' + againBtn(p.id) + '</div><div class="result" id="' + p.id + 'Result"></div></div>' + dictHtml(p),
     bind() {
       bindAudio(p); bindCycle(p); bindDict(p);
+      if (p.media && p.media.pages && window.ELBook) ELBook.mount($('#' + p.id + 'Book'), byLevel(p.media.pages), { ca: ca(), title: tx(p.title), onEnd: () => { const q = $('#' + p.id + 'Form'); if (q) q.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
       const items = forLevel(p.items), f = $('#' + p.id + 'Form'), scored = items.filter(q => !q.guess).length;
       f.innerHTML = items.map((q, i) => '<div class="question' + (q.guess ? ' guess-q' : '') + '"><p class="q-title">' + (i + 1) + '. ' + (q.guess ? '🔮 ' : '') + q.q + (q.qca && ca() ? ' <span class="q-ca">[' + q.qca + ']</span>' : '') + '</p><div class="options">' +
         learningSupport.shuffledIndexes(q.o.length).map(j => '<label class="option"><input type="radio" name="' + p.id + i + '" value="' + j + '"><span>' + q.o[j] + '</span></label>').join('') +
