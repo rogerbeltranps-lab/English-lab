@@ -861,11 +861,12 @@ const missZ=(v,id,k)=>{if(v==null&&isCpStep(id,k))return undefined;if(v!=null||!
 // Class games part (games:true; Roger, 9 Nov 2026: "the performance in those games should be counted"): % right in the grammar and vocabulary
 // class games of the LS on screen, out of 10, all games pooled (the 🧩📚 circles' %). A game is counted only when the student answered at least
 // half of its questions (a late arrival or a dropped connection is left out); a student who played none has no value, and the part then drops
-// out even with "Missing work counts 0" (they cannot play a class game at home). A game played again: only the latest play the student
+// out even with "Missing work counts 0" (they cannot play a class game at home). 🕵️ Code Breakers rounds (x.cb): each student goes at their own pace, so their % is over
+// the questions they answered (y.a) and a round counts from 3 answers. A game played again: only the latest play the student
 // counted in (answered at least half) counts; the earlier ones show as replaced (Roger, 11 Nov 2026: "the last version of the answers is the
 // good one"). stuGames(u) = {v, list:[{title, kind, lp, day, r, of, a, out, old}]}.
 function stuGames(u){loadGames();const s=S.P[u],gl=GAMES[S.g];if(!s||!s.email||!gl||gl.busy)return {v:null,list:[]};const em=String(s.email).toLowerCase(),ls=S.ls||"";
-  const list=gl.list.filter(x=>!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{title:x.title,kind:x.kind,lp:x.lp,day:x.day,deck:x.deck,sid:x.sid,r:y.r||0,of:x.done,a:y.a||0,out:(y.a||0)*2<x.done}:null}).filter(Boolean)
+  const list=gl.list.filter(x=>!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{title:x.title,kind:x.kind,lp:x.lp,day:x.day,deck:x.deck,sid:x.sid,mode:x.mode,r:y.r||0,of:x.cb?y.a||0:x.done,a:y.a||0,out:x.cb?(y.a||0)<3:(y.a||0)*2<x.done}:null}).filter(Boolean)
     .sort((a,b)=>(+a.sid||0)-(+b.sid||0)||String(a.day).localeCompare(String(b.day)));
   const keep=new Set(elLatestGames(list.filter(x=>!x.out)));list.forEach(x=>{if(!x.out&&!keep.has(x))x.old=true});
   const inn=[...keep],of=inn.reduce((n,x)=>n+x.of,0);return {v:of?inn.reduce((n,x)=>n+x.r,0)/of*10:null,list}}
@@ -1349,7 +1350,7 @@ function brief(g,ls0){const n=ls0?planX(ls0,g.id):ELWeek.now(g.id),ls=ls0||n&&n.
   const ftV=studs.flatMap(s=>as.filter(a=>!a.checkpoint).flatMap(a=>{const st=pstate(s.uid,a);return [...Object.values(st.tries||{}),...(st.tries&&st.tries.recall?[]:[firstOf(s.uid,a.id,"recall")])]})
     .filter(t=>t&&t.max).map(t=>t.score/t.max*100));
   const G0=GAMES[g.id],gl=G0&&!G0.busy?G0.list.filter(z=>!z.lsId||z.lsId===ls):[],ems=new Set(studs.map(s=>String(s.email||"").toLowerCase()));
-  const gs=elGameStats(gl.flatMap(z=>(z.stu||[]).filter(y=>ems.has(y.e)).map(y=>({kind:z.kind,r:y.r,of:z.done})))),gn=k=>gl.filter(z=>z.kind===k).length;
+  const gs=elGameStats(gl.flatMap(z=>(z.stu||[]).filter(y=>ems.has(y.e)).map(y=>({kind:z.kind,r:y.r,of:z.cb?y.a||0:z.done})))),gn=k=>gl.filter(z=>z.kind===k).length;
   const exams=EL_LS.filter(l=>l.course===g.course&&(EL_GRADING[l.id]||{}).exam).map(l=>{const ex=studs.map(s=>examMark(s.uid,l.id)).filter(Boolean).map(m=>m.mark);
     if(!ex.length)return {l,ex:null,n:0};const tot=withLsG(l.id,g.id,()=>studs.map(s=>{const r=grade(s);return G().blocks.every(b=>(b.id==="gv"?r.B.gv.mark:r.B[b.id])!=null)?r.total:null}).filter(v=>v!=null));
     return {l,ex:ex.reduce((a,b)=>a+b,0)/ex.length,n:ex.length,ls:tot.length?tot.reduce((a,b)=>a+b,0)/tot.length:null,ln:tot.length}});
@@ -2058,7 +2059,7 @@ const canHw=a=>GR.some(g=>g.id===S.g)&&((window.EL_SECTIONS||{})[a.id]||[]).leng
 // grammar and vocabulary games of this LS (gameResults of the group, read once per dashboard load: one read per game played)
 const GAMES={};
 function gameMine(s,lsId){const g=GAMES[S.g];if(!g||g.busy||!s.email)return null;const em=String(s.email).toLowerCase(),ls=lsId||S.ls||"";
-  let mine=g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.done,title:x.title,day:x.day,lp:x.lp,ls:x.ls,deck:x.deck,sid:x.sid}:null}).filter(Boolean);
+  let mine=g.list.filter(x=>!ls||!x.lsId||x.lsId===ls).map(x=>{const y=(x.stu||[]).find(z=>z.e===em);return y?{kind:x.kind,r:y.r,of:x.cb?y.a||0:x.done,title:x.title,day:x.day,lp:x.lp,ls:x.ls,deck:x.deck,sid:x.sid,mode:x.mode}:null}).filter(Boolean);
   if(!mine.length)return null;mine=elLatestGames(mine);   /* a game played again: only its latest play (Roger, 11 Nov 2026) */const gl=(mine.find(x=>x.ls)||{}).ls||"";
   return {mine,st:elGameStats(mine),em,href:`lab/game/results.html?g=${encodeURIComponent(S.g)}${gl?"&ls="+encodeURIComponent(gl):""}&stu=${encodeURIComponent(em)}`}}
 function gameRings(s,lsId){const G=gameMine(s,lsId);if(!G)return "";const {mine,st,em}=G,gl=(mine.find(x=>x.ls)||{}).ls||"",click="\nClick: every answer and the notes";

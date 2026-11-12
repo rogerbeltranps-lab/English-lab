@@ -591,8 +591,9 @@ window.elCheckpointMissing=function(a,done,enabled){if(!a||a.manual||a.optional)
 // A class game played again (Roger, 11 Nov 2026: "the last version of the answers is the good one and therefore we are assessing the competences
 // better"): only the latest play of each game (deck) counts. elLatestGames(games) keeps, for each deck, the game with the highest sid (start time);
 // games without a deck are all kept. Used for the 🧩📚 circles (dashboard and board) and the class games part of the LS mark.
+// 🕵️ Code Breakers rounds (mode "cb", lab/game/cb-host.js) count next to the class game of the same deck: the latest round replaces only an earlier round.
 window.elLatestGames=function(games){const best=new Map(),rest=[];(games||[]).forEach(g=>{if(!g||!g.deck){if(g)rest.push(g);return}
-  const b=best.get(g.deck);if(!b||(+g.sid||0)>(+b.sid||0))best.set(g.deck,g)});return [...best.values(),...rest]};
+  const k=g.deck+(g.mode==="cb"?"#cb":""),b=best.get(k);if(!b||(+g.sid||0)>(+b.sid||0))best.set(k,g)});return [...best.values(),...rest]};
 window.elGameStats=function(games){
   const t={grammar:[0,0],vocab:[0,0]};(games||[]).forEach(g=>{const k=t[g.kind];if(k&&g.of){k[0]+=g.r||0;k[1]+=g.of}});
   const pc=([a,b])=>b?Math.round(a/b*100):null;return {grammar:pc(t.grammar),vocab:pc(t.vocab),n:(games||[]).length}};

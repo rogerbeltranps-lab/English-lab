@@ -101,7 +101,10 @@ const pct=(a,b)=>b?Math.round(a/b*100):null,show=v=>v==null?"–":v+" %";
 const day=d=>{const x=new Date(d+"T12:00");return x.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})};
 const short=t=>String(t||"").replace(/^(Vocabulary|Grammar) · /,"");
 // a game's name starts with its learning path, "LP2 · Vocabulary · …" (decks/index.js elGameName, Roger 7 Nov 2026), saved results too
-const nm=x=>window.elGameName?elGameName(x):x.title;
+const nm=x=>(window.elGameName?elGameName(x):x.title)+(x.cb?" · 🕵️ Code Breakers":"");
+// 🕵️ Code Breakers rounds (x.cb, lab/game/cb-host.js): each student answers at their own pace, so a student's % is over the questions THEY
+// answered (s.a) and a question counts only for the students who answered it (s.ans has it)
+const den=(x,s)=>x.cb?s.a||0:x.done,asked=(x,s,n)=>!x.cb||!!(s.ans&&s.ans[n]!=null);
 
 /* ---------- data ---------- */
 async function load(){
@@ -132,13 +135,13 @@ const lsList=()=>[...new Set(R.all.map(x=>x.ls||""))].filter(Boolean).sort((a,b)
 function pickLs(){const l=lsList();if(R.ls&&!l.includes(R.ls))R.ls="";R.games=R.ls?R.all.filter(x=>x.ls===R.ls):R.all}
 // a game's numbers, students on the list only (a tester's answers never count)
 const onList=x=>x.stu.filter(s=>R.names[s.e]);
-const classPct=x=>{const l=onList(x);return pct(l.reduce((t,s)=>t+s.r,0),l.length*x.done)};
+const classPct=x=>{const l=onList(x);return pct(l.reduce((t,s)=>t+s.r,0),l.reduce((t,s)=>t+den(x,s),0))};
 function perStudent(){
   return Object.entries(R.names).map(([e,name])=>{const t={all:[0,0],vocab:[0,0],grammar:[0,0],mixed:[0,0]};let n=0;
-    R.games.forEach(x=>{const s=x.stu.find(y=>y.e===e);if(!s)return;n++;t.all[0]+=s.r;t.all[1]+=x.done;const k=t[x.kind]||t.mixed;k[0]+=s.r;k[1]+=x.done});
+    R.games.forEach(x=>{const s=x.stu.find(y=>y.e===e);if(!s)return;n++;t.all[0]+=s.r;t.all[1]+=den(x,s);const k=t[x.kind]||t.mixed;k[0]+=s.r;k[1]+=den(x,s)});
     return {e,name,n,all:pct(...t.all),vocab:pct(...t.vocab),grammar:pct(...t.grammar),mixed:pct(...t.mixed)}});
 }
-const kindPct=k=>{let r=0,o=0;R.games.filter(x=>x.kind===k).forEach(x=>onList(x).forEach(s=>{r+=s.r;o+=x.done}));return pct(r,o)};
+const kindPct=k=>{let r=0,o=0;R.games.filter(x=>x.kind===k).forEach(x=>onList(x).forEach(s=>{r+=s.r;o+=den(x,s)}));return pct(r,o)};
 
 /* ---------- drawing ---------- */
 function columns(items,avgLine){   // items: [{id, label, value (0-100 | null), kind, tip}]
@@ -164,7 +167,7 @@ function draw(){
   if(R.err){app$.innerHTML=head+`<p><b>The results could not be read.</b> ${esc(R.err)}. If the page is new, the Firestore rules publish when the change reaches main; then reload.</p>`;return}
   if(!R.games.length){app$.innerHTML=head+`<div class="card"><p>No games saved for this group yet. Play a game from the board and its results appear here when it ends.</p></div>`;return}
   const st=perStudent(),played=st.filter(s=>s.n);
-  let r=0,o=0;R.games.forEach(x=>onList(x).forEach(s=>{r+=s.r;o+=x.done}));
+  let r=0,o=0;R.games.forEach(x=>onList(x).forEach(s=>{r+=s.r;o+=den(x,s)}));
   const tiles=`<div class="tiles"><div class="tile"><b>${R.games.length}</b><span>games played</span></div>
     <div class="tile"><b>${show(pct(r,o))}</b><span>right, all games</span></div>
     ${R.games.some(x=>x.kind==="vocab")?`<div class="tile"><b style="color:var(--vocab)">${show(kindPct("vocab"))}</b><span>right in vocabulary games</span></div>`:""}
@@ -187,8 +190,8 @@ function draw(){
 }
 function gameDetail(){
   const x=R.games.find(y=>String(y.sid)===R.sel);if(!x)return "";
-  const list=onList(x),q=x.qs.map(z=>{const right=list.filter(s=>!s.miss.includes(z.n)).length;return {...z,p:pct(right,list.length)}});
-  return `<h2 style="margin-top:16px">${esc(nm(x))} · ${day(x.day)}</h2><p class="muted">${list.length} students · ${x.done} of ${x.qn} questions shown · % right per question (the hardest in red)</p>
+  const list=onList(x),q=x.qs.map(z=>{const l=list.filter(s=>asked(x,s,z.n)),right=l.filter(s=>!s.miss.includes(z.n)).length;return {...z,p:pct(right,l.length)}});
+  return `<h2 style="margin-top:16px">${esc(nm(x))} · ${day(x.day)}</h2><p class="muted">${list.length} students · ${x.done} of ${x.qn} questions ${x.cb?"answered (each student at their own pace)":"shown"} · % right per question (the hardest in red)</p>
     <div class="hb">${q.map(z=>`<span class="t" title="${esc(z.q)}">${z.n}. ${esc(z.q)}</span><span class="trk"><i style="width:${z.p||0}%;background:var(--${x.kind in KIND?x.kind:"mixed"})"></i></span><span class="n${z.p<50?" low":""}">${show(z.p)}</span>`).join("")}</div>`
     +answersOf(x,list);
 }
@@ -197,16 +200,16 @@ function gameDetail(){
 function answersOf(x,list){
   if(!x.done)return "";const ppl=[...list].sort((a,b)=>(R.names[a.e]||"").localeCompare(R.names[b.e]||"","ca"));
   const old=!ppl.some(s=>s.ans);
-  const rows=x.qs.map(z=>{const by=ppl.map(s=>{const ok=!s.miss.includes(z.n),a=s.ans?s.ans[z.n]:undefined;
+  const rows=x.qs.map(z=>{const pz=ppl.filter(s=>asked(x,s,z.n)),by=pz.map(s=>{const ok=!s.miss.includes(z.n),a=s.ans?s.ans[z.n]:undefined;
       return `<li class="${ok?"ok":"no"}"><span class="mk">${ok?"✓":"✗"}</span> <b>${esc(R.names[s.e]||s.e)}</b>${old?"":`: ${a==null?'<span class="muted">no answer</span>':esc(a)}`}</li>`}).join("");
-    const nOk=ppl.filter(s=>!s.miss.includes(z.n)).length;
-    return `<details class="aq"><summary><b>${z.n}.</b> ${esc(z.q)} <span class="muted">· right answer: <b>${esc(z.ok||"")}</b> · ${nOk} / ${ppl.length} right</span></summary><ul class="who">${by}</ul></details>`}).join("");
+    const nOk=pz.filter(s=>!s.miss.includes(z.n)).length;
+    return `<details class="aq"><summary><b>${z.n}.</b> ${esc(z.q)} <span class="muted">· right answer: <b>${esc(z.ok||"")}</b> · ${nOk} / ${pz.length} right</span></summary><ul class="who">${by}</ul></details>`}).join("");
   return `<h3 style="margin:16px 0 4px">Each student's answers</h3><p class="muted">Open a question to see what every student answered.${x.skipped?` ${x.skipped} question${x.skipped>1?"s":""} nobody answered (skipped) ${x.skipped>1?"are":"is"} left out.`:""}${old?" This game was played before the answers were saved: only right or wrong.":""}</p>
     <p><button type="button" class="chip" data-do="aqall">Open all</button></p><div class="aqs">${rows}</div>`;
 }
 function stuDetail(s){
-  const items=R.games.map(x=>{const y=x.stu.find(z=>z.e===s.e),v=y?pct(y.r,x.done):null,c=classPct(x);
-    return {label:day(x.day),value:v,avg:c,kind:x.kind in KIND?x.kind:"mixed",tip:`${nm(x)} · ${day(x.day)} · ${y?`${y.r} of ${x.done} right (${v} %)`:"absent"} · class ${show(c)}`}});
+  const items=R.games.map(x=>{const y=x.stu.find(z=>z.e===s.e),v=y?pct(y.r,den(x,y)):null,c=classPct(x);
+    return {label:day(x.day),value:v,avg:c,kind:x.kind in KIND?x.kind:"mixed",tip:`${nm(x)} · ${day(x.day)} · ${y?`${y.r} of ${den(x,y)} right (${v} %)`:"absent"} · class ${show(c)}`}});
   const last=[...R.games].reverse().map(x=>{const y=x.stu.find(z=>z.e===s.e);return y&&y.miss.length?{x,m:y.miss}:null}).filter(Boolean).slice(0,3);
   const det=R.games.map(x=>gameOf(x,s.e)).join("");
   return `<div style="padding:6px 0 10px">${det?`<p style="margin:4px 0"><b>${esc(s.name)}: answers and notes${R.ls?" · "+esc(R.ls):""}</b></p><div class="games">${det}</div>`:""}<b>${esc(s.name)}</b>, game by game ${legend('<span class="key"><i style="border-top:2px dashed var(--ink);height:0;border-radius:0"></i>Class</span>')}${columns(items)}
@@ -222,11 +225,11 @@ function stuDetail(s){
 function gameOf(x,e){
   const y=x.stu.find(z=>z.e===e),last=x===R.games[R.games.length-1];
   if(!y)return `<details class="gm"><summary><span>${esc(nm(x))}</span><span class="muted">${day(x.day)}</span><span class="muted">absent</span></summary></details>`;
-  const v=pct(y.r,x.done),ans=y.ans||null,notes=y.notes||{},nts=x.nts||[];
-  const rows=x.qs.map(q=>{const ok=!y.miss.includes(q.n),a=ans?ans[q.n]:undefined;
+  const v=pct(y.r,den(x,y)),ans=y.ans||null,notes=y.notes||{},nts=x.nts||[];
+  const rows=x.qs.filter(q=>asked(x,y,q.n)).map(q=>{const ok=!y.miss.includes(q.n),a=ans?ans[q.n]:undefined;
     return `<tr class="${ok?"ok":"no"}"><td class="num">${q.n}</td><td>${esc(q.q)}</td><td>${ans?(a==null?'<span class="muted">no answer</span>':esc(a)):'<span class="muted">–</span>'}</td><td class="mk">${ok?"✓":"✗"}</td><td class="muted">${ok?"":esc(q.ok||"")}</td></tr>`}).join("");
   const nt=nts.map(n=>`<div class="note"><b>${esc(n.topic)}</b>${notes[n.k]?`<p>${esc(notes[n.k]).replace(/\n/g,"<br>")}</p>`:'<p class="muted">No notes.</p>'}</div>`).join("");
-  return `<details class="gm"${last?" open":""}><summary><span>${esc(nm(x))}</span><span class="muted">${day(x.day)}${x.lp?" · "+esc(x.lp):""}</span><span class="${v!=null&&v<50?"low":""}">${x.done?`${y.r} / ${x.done} (${v} %)`:""}</span></summary>
+  return `<details class="gm"${last?" open":""}><summary><span>${esc(nm(x))}</span><span class="muted">${day(x.day)}${x.lp?" · "+esc(x.lp):""}</span><span class="${v!=null&&v<50?"low":""}">${x.done?`${y.r} / ${den(x,y)} (${v} %)`:""}</span></summary>
     ${x.done?`<table class="qa"><thead><tr><th>#</th><th>Question</th><th>Their answer</th><th></th><th>Right answer</th></tr></thead><tbody>${rows}</tbody></table>`:""}
     ${ans?"":`<p class="muted">This game was played before the answers were saved: only right or wrong.</p>`}
     ${nts.length?`<div class="notes"><p class="nh">📝 Notes</p>${nt}</div>`:""}</details>`;

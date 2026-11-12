@@ -158,7 +158,7 @@ service cloud.firestore {
       allow read: if isTeacher() || inGroup(group);
       allow write: if isTeacher();
     }
-    // class quiz: live/{group}/answers/{email} = {sid, a:{question: value}, at}. Each student of the group writes their own answers
+    // class quiz: live/{group}/answers/{email} = {sid, a:{question: value}, at} (+ cb: the student's 🕵️ Code Breakers game, lab/game/cb-play.js). Each student of the group writes their own answers
     // while following the presentation and reads them back (to keep them when they come back to the same class); only the teacher
     // reads everyone's (the projector shows the counts). Testers answer too (Roger, 26 Oct 2026: to see the game and the bonus work
     // with his school account); their points never count for the group's best (lab/game/host.js, el-deck-points.js use the student list).
@@ -166,8 +166,9 @@ service cloud.firestore {
       allow read, write: if isTeacher();
       allow get: if school() && email == myEmail();
       allow create, update: if inGroup(group) && email == myEmail()
-        && request.resource.data.keys().hasOnly(['sid', 'a', 'at'])
-        && request.resource.data.sid is number && request.resource.data.a is map && request.resource.data.a.size() <= 300;
+        && request.resource.data.keys().hasOnly(['sid', 'a', 'at', 'cb'])
+        && request.resource.data.sid is number && request.resource.data.a is map && request.resource.data.a.size() <= 300
+        && (!('cb' in request.resource.data) || request.resource.data.cb is map && request.resource.data.cb.size() <= 20);
     }
     // class game results (Roger, 5 Nov 2026): gameResults/{group}_{sid}, one per game played, written by the board (lab/game/host.js)
     // and read by the results page (lab/game/results.html). Students' marks per game: only the teacher.

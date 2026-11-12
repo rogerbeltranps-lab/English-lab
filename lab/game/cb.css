@@ -1,0 +1,66 @@
+/* 🕵️ Code Breakers (Roger, 11–12 Nov 2026): our own hacking look on top of game.css: a dark screen with green code, for the board
+   (codebreakers.html) and the player (play.html, while live/{group}.mode is "cb"; cb-play.js adds body.cb). */
+body.cb{--stage:#06141f;--stage2:#0c2f3a;--hk:#38f28a;--hk2:#22d3ee;background:radial-gradient(120% 90% at 20% 0%,var(--stage2),var(--stage) 62%,#020a10)}
+body.cb #el-fs{background:#06141f!important}
+body.cb .bgfx i{background:var(--hk);opacity:.06}
+body.cb::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.07;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,var(--hk) 3px 4px)}
+.cbmono,.cbbits b,.cbtime,.cbrow .bt,.cbkey{font-family:ui-monospace,"Cascadia Mono","Roboto Mono",Menlo,monospace;letter-spacing:.02em}
+body.cb .btn.go{background:var(--hk);color:#04210f}
+body.cb b.k{color:#0f766e}
+
+/* player */
+.cbtop .pill{background:rgba(56,242,138,.12);border:1px solid rgba(56,242,138,.35)}
+.cbbits{font-size:1.15em}.cbbits b{color:var(--hk)}
+.cbbits.bump{animation:bump .5s cubic-bezier(.2,1.6,.4,1)}@keyframes bump{40%{transform:scale(1.25)}}
+.cbtime.low,.cbtop .cbtime.low{color:#fca5a5;border-color:#f87171}
+.cbsh{color:var(--hk2)}
+.cbmain .qcard{margin-top:4px}
+.cbpic{font-size:clamp(40px,8vh,80px);max-height:12vh;text-align:center}
+.cbpw{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:18px 0}
+.cbword{font:700 clamp(22px,2.6vw,34px) ui-monospace,Menlo,monospace;padding:.5em 1.1em;background:#0b2530;color:var(--hk);border:2px solid var(--hk);box-shadow:0 0 18px rgba(56,242,138,.25)}
+.cbword.on{background:var(--hk);color:#04210f}
+.cbkey{color:var(--hk);font-size:1.15em}
+.cbfiles{display:flex;gap:clamp(12px,3vw,36px);justify-content:center;margin:18px 0}
+.cbfile{width:clamp(130px,18vw,220px);aspect-ratio:1/1.05;border:0;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  background:#0b2530;color:#fff;font:700 clamp(20px,2.4vw,30px) var(--f);border:2px solid rgba(56,242,138,.5);box-shadow:0 0 22px rgba(56,242,138,.18),inset 0 -6px 0 rgba(0,0,0,.3)}
+button.cbfile:hover{transform:translateY(-4px);border-color:var(--hk)}
+.cbfile .fe{font-size:clamp(54px,7vw,90px);line-height:1}
+.cbfile.dim{opacity:.35;filter:grayscale(.5)}
+.cbfile.mine{border-color:var(--gold);box-shadow:0 0 34px rgba(255,200,61,.55)}
+.cbfile.k-virus.mine{border-color:#f87171;box-shadow:0 0 34px rgba(248,113,113,.6)}
+.cbres{background:#7f1d1d}.cbwhy{max-width:900px;margin-left:auto;margin-right:auto}
+.cbh{text-align:center;margin:.2em 0 .4em}
+.cbpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;overflow:auto;min-height:0;flex:1;align-content:start}
+.cbp{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:10px;text-align:left;padding:10px 14px;border-radius:16px;
+  border:2px solid rgba(56,242,138,.45);background:#0b2530;color:#fff;font:600 20px var(--f)}
+.cbp .av{grid-row:1/3;font-size:40px}.cbp .nm{font-weight:700}.cbp .bt{grid-column:2;color:var(--hk);font-family:ui-monospace,Menlo,monospace}.cbp .sh{grid-row:1/3;grid-column:3;font-size:26px}
+.cbp:hover:not(:disabled){border-color:var(--hk);transform:translateY(-2px)}.cbp:disabled{opacity:.35;cursor:default}
+.cbclue{max-width:900px;margin:12px auto;padding:.7em 1.1em;font-size:clamp(20px,2.4vw,30px);font-weight:600}.cbclue small{display:block;font-size:.55em;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2em}
+.cbspin{animation:cbspin 1s ease-in-out infinite}@keyframes cbspin{50%{transform:scale(1.15) rotate(-6deg)}}
+.cbprog{width:min(420px,80vw);height:16px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:16px auto}
+.cbprog i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--hk),var(--hk2));transform-origin:left;animation:cbprog 1.8s ease-out both}@keyframes cbprog{from{transform:scaleX(0)}}
+.cbtoast{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:40;max-width:min(92vw,720px);padding:14px 22px;border-radius:16px;background:#0b2530;border:2px solid var(--hk2);
+  color:#fff;font-size:clamp(18px,2vw,24px);font-weight:600;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.cbtoast.bad{border-color:#f87171;background:#3b0d0d}
+@media (prefers-reduced-motion: reduce){.cbspin,.cbprog i,.cbbits.bump{animation:none}}
+
+/* board */
+.cbmins{display:flex;gap:.5em;align-items:center;justify-content:center;flex-wrap:wrap;margin:.8em 0}.cbmins span{font-weight:700;margin-right:.3em}
+.cbplay{gap:.6em}
+.cbhead{display:flex;align-items:center;justify-content:center;gap:1.4em;flex-wrap:wrap}
+.cbhead .cbtime{font-size:3.2em;font-weight:700;color:var(--hk);text-shadow:0 0 24px rgba(56,242,138,.45);line-height:1}
+.cbhead .cbtime.low{color:#fca5a5;text-shadow:0 0 24px rgba(248,113,113,.5)}
+.cbstat{font-size:1.2em;opacity:.95}.cbstat b{color:var(--hk)}
+.cbcols{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:1em}
+.cbrank{padding:.5em .9em;overflow:hidden;background:#0b2530;color:#fff;border:2px solid rgba(56,242,138,.35);box-shadow:0 0 30px rgba(56,242,138,.12)}
+.cbrow{display:grid;grid-template-columns:1.6em 1.6em minmax(6em,9em) 1fr 4.2em;align-items:center;gap:.5em;padding:.18em 0;font-size:1.05em}
+.cbrow .rk{opacity:.7;text-align:right}.cbrow .av{font-size:1.2em}.cbrow .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbrow .trk{height:.8em;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}.cbrow .trk i{display:block;height:100%;background:linear-gradient(90deg,var(--hk),var(--hk2));transition:width .6s}
+.cbrow .bt{text-align:right;color:var(--hk);font-weight:700}
+.cbrow:nth-child(1) .nm{color:var(--gold)}
+.cbfeed{display:flex;flex-direction:column;gap:.5em;overflow:hidden;min-height:0}
+.cbev{background:rgba(11,37,48,.92);border:2px solid rgba(34,211,238,.35);border-radius:14px;padding:.45em .8em;font-size:1em}
+.cbev.hack{border-color:var(--gold)}.cbev.bad{border-color:#f87171}.cbev.good{border-color:var(--hk)}.cbev.shield{border-color:var(--hk2)}
+.cbpod .blk{color:var(--ink)}
+.lpn{max-width:28em;overflow:hidden;text-overflow:ellipsis}
