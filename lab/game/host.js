@@ -336,18 +336,18 @@ function draw(){
   if(!H.deck){
     // Games by course (2 ESO, 4 ESO), then by LS, then by learning path (Roger, 30 Oct 2026: "organised by course and LS").
     const list=window.EL_GAMES||[],by=(a,k)=>[...new Set(a.map(d=>d[k]||""))].sort((x,y)=>x.localeCompare(y,"en",{numeric:true}));
-    // 🕵️ Code Breakers (Roger, 11 Nov 2026): after the two games of each learning path, the same path as a hacking game (codebreakers.html)
+    // 🕵️ Code Breakers (Roger, 11 Nov 2026): after the two games of each learning path (LP1–LP3 only for now, Roger 12 Nov 2026), the same path as a hacking game (codebreakers.html)
     const cbCard=d=>`<a class="btn deckbtn cbbtn slidein" href="codebreakers.html?deck=${encodeURIComponent(d.id)}${BACK?"&from="+encodeURIComponent(BACK):""}"><span class="e">🕵️</span><span>${esc(String(d.lp).split(" · ")[0])} · Code Breakers<br><small style="opacity:.75">vocabulary + grammar, each at their own pace</small></span></a>`;
     const card=d=>`<button class="btn deckbtn slidein" data-do="deck" data-id="${esc(d.id)}"><span class="e">${esc(d.emoji||"🎮")}</span><span>${esc(elGameName(d))}${d.lp?`<br><small style="opacity:.7">${esc(d.lp)}</small>`:""}${plLine(d)}</span></button>`;loadPlayed();
     const cols=by(list,"course").map(c=>{const g=list.filter(d=>d.course===c);
-      return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${g.filter(d=>(d.ls||"")===l).sort((a,b)=>(a.lp||"").localeCompare(b.lp||"","en",{numeric:true})).map((d,k,a)=>card(d)+(d.lp&&(!a[k+1]||a[k+1].lp!==d.lp)?cbCard(d):"")).join("")}</div>`).join("")}</section>`}).join("");
+      return `<section class="course"><h2>${c==="2eso"?"2 ESO":c==="4eso"?"4 ESO":esc(c)}</h2>${by(g,"ls").map(l=>`${l?`<h3>${esc(l)}</h3>`:""}<div class="picks">${g.filter(d=>(d.ls||"")===l).sort((a,b)=>(a.lp||"").localeCompare(b.lp||"","en",{numeric:true})).map((d,k,a)=>card(d)+(d.lp&&/-lp[1-3]-/.test(d.id)&&(!a[k+1]||a[k+1].lp!==d.lp)?cbCard(d):"")).join("")}</div>`).join("")}</section>`}).join("");
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">🎮 Class game</h1><p class="sub">Choose a game. All games are at Safe level. Each learning path has a 📚 vocabulary game and a 🧩 grammar game.</p>${cols?`<div class="courses">${cols}</div>`:"<p>No games yet.</p>"}<p>${backBtn()}<a class="btn ghost" href="results.html" target="_blank" rel="noopener">📊 Results</a> <a class="btn ghost" href="../../teacher.html">← Dashboard</a></p></div></div>`;return}
   if(H.phase==="pick"||!H.g){
     loadPlayed();
     const course=H.deck.course||((window.EL_GAMES||[]).find(d=>d.id===H.deckId)||{}).course,gs=(window.EL_GROUPS||[]).filter(g=>!course||g.course===course);   // the game's course (decks/index.js)
     app$.innerHTML=`<div class="center"><div><h1 class="logo pop">${esc(gName())}</h1><p class="sub">${slides().length} slides · ${qList().length} questions. Start the game for a group: its students are taken into it.</p>
       <div class="picks">${gs.map(g=>{const w=PL&&(PL[H.deckId]||{})[g.id];return `<button class="btn go deckbtn" data-do="group" data-g="${g.id}">▶ ${esc(g.name)}${PL?`<br><small class="pl">${w?`<span class="pl-y">✓ played ${esc(plDay(w))}</span>`:`<span class="pl-n">not played yet</span>`}</small>`:""}</button>`}).join("")}</div>
-      ${meta().lp?`<p><a class="btn deckbtn cbbtn" style="display:inline-flex" href="codebreakers.html?deck=${encodeURIComponent(H.deckId)}${BACK?"&from="+encodeURIComponent(BACK):""}">🕵️ Play ${esc(String(meta().lp).split(" · ")[0])} as Code Breakers <small style="opacity:.75;margin-left:.4em">(vocabulary + grammar, no theory)</small></a></p>`:""}
+      ${meta().lp&&/-lp[1-3]-/.test(H.deckId)?`<p><a class="btn deckbtn cbbtn" style="display:inline-flex" href="codebreakers.html?deck=${encodeURIComponent(H.deckId)}${BACK?"&from="+encodeURIComponent(BACK):""}">🕵️ Play ${esc(String(meta().lp).split(" · ")[0])} as Code Breakers <small style="opacity:.75;margin-left:.4em">(vocabulary + grammar, no theory)</small></a></p>`:""}
       <p>${backBtn()}<button class="btn ghost" data-do="decks">← Other games</button> <a class="btn ghost" href="../../teacher.html${course?"?course="+course:""}">← Dashboard</a></p></div></div>`;return}
   const s=cur(),P=Object.keys(H.players);
   if(H.phase==="lobby"){
