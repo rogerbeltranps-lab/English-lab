@@ -452,8 +452,13 @@ function hasWork(a){return !!a&&a.keys.some(k=>{const v=localStorage.getItem(k);
 // soon = {panel id: day}. It counts in the page's progress (it is not hidden), so the path never looks finished with tabs still to come.
 function lockSections(ids,ca,a,done,soon,gid){
   const fr=window.EL_CM_FREE;if(fr)ids=ids.filter(id=>!fr.has(id));   // steps class mode opened for the student now (cmFree)
-  if(!ids.length)return;soon=soon||{};
-  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k));let cls=ids.filter(id=>id in soon),hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
+  const did=id=>!!a&&!!done&&elSecSteps(a,id).some(k=>done.has(k));
+  // 📖 Book: keep reading (Roger, 13 Nov 2026: "when they have finished, to continue reading as many chapters as wanted"): a chapter done
+  // and the one after it are open for this student, whatever the agenda says (not on it yet, or 🏫 for a later class), so a fast reader
+  // goes on chapter after chapter and can always turn the pages of one read before; the first chapter opens as the Time plan says
+  const bk=a&&/\/ls2-book$/.test(a.id)?((window.EL_ACTIONS||{})[a.id]||[]):null;
+  if(bk)ids=ids.filter(id=>{const i=bk.indexOf(id);return !(i>=0&&(did(id)||i>0&&did(bk[i-1])))});
+  if(!ids.length)return;soon=soon||{};let cls=ids.filter(id=>id in soon),hide=ids.filter(id=>!did(id)&&!(id in soon)),ro=ids.filter(id=>did(id)&&!(id in soon));
   window.EL_HIDDEN_STEPS=a?hide.flatMap(id=>elSecSteps(a,id)):[];if(window.elProgress)window.elProgress();   // the LS2 page's progress counts only the steps shown
   const note=ca?"Aquí pots repassar les teves respostes.":"Here you can look back at your answers.";
   const today=elAgToday(),openAt=gid?elClassOpenAt(gid,today):null,hm=ms=>{const d=new Date(ms);return d.getHours()+":"+String(d.getMinutes()).padStart(2,"0")};
@@ -1072,6 +1077,12 @@ function ffGo(){const g=LOCK;if(!g||!g.cm)return;const ca=lockCa(),bk=ffBook(g);
   if(onPage(bk.path)){window.EL_CM_FREE=window.EL_CM_FREE||new Set();window.EL_CM_FREE.add(nx);if(window.elSecFree)elSecFree([nx])}
   b0();cmJump({u:bk.path,p:nx})}
 const b0=()=>{const b=document.getElementById("el-lock");if(b)b.dataset.h=""};   // the bar is drawn again (a new chip)
+// 📖 Book, "Chapter n ▶" after a chapter's questions (ls2-engine.js bookPanel): the next chapter opens for this student there and then (a
+// hidden or 🏫 tab given back, lockSections keeps it open after a reload); in class mode it is one more chapter granted like ⚡ I've finished
+window.elBookMore=id=>{const a=(window.EL_CATALOG||[]).find(x=>x.id===actId);if(!a||!/\/ls2-book$/.test(a.id)||!id)return;
+  const g=LOCK;if(g&&g.cm&&lockOn(g)){const r=ffRead(g),f=r&&onPage(r.u)?r:{s:g.s,u:a.path,ps:[]};f.until=g.until||Date.now()+60*60e3;if(!f.ps.includes(id))f.ps.push(id);
+    try{sessionStorage.setItem(FF_K,JSON.stringify(f))}catch(e){}b0();lockBar()}
+  window.EL_CM_FREE=window.EL_CM_FREE||new Set();window.EL_CM_FREE.add(id);if(window.elSecFree)elSecFree([id]);if(g&&g.cm)cmStudentTabs()};
 function ffBtn(b,ca){const x=document.createElement("button");x.dataset.ff="1";x.textContent=ca?"⚡ He acabat":"⚡ I've finished";
   x.title=ca?"Has fet tot el d'avui? Continua amb el llibre":"Done with everything for now? Go on with the book";
   x.style.cssText="border:0;border-radius:999px;padding:6px 16px;background:#facc15;color:#422006;font:800 14px system-ui,sans-serif;cursor:pointer";b.append(x)}

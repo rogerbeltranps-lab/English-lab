@@ -2,7 +2,7 @@
    feeling that they are reading a book, with the images they had"; "and if you could make the feeling of turning pages, that'd be
    amazing"). ELBook.mount(el, pages, opts) draws the chapter's page pictures (<LS>/book/<route>-NN.webp, made by
    tools/reading-story/build.py --web) as an open book: two pages side by side on a computer, one on a phone, and the page turns like
-   paper (a 3D leaf) with the arrows, a tap on the left or right page, a swipe or the keyboard. ⤢ opens it full screen to read;
+   paper (a 3D leaf) with the arrows, a tap on the left or right page, dragging the page with a finger or the mouse, or the keyboard. ⤢ opens it full screen to read;
    🔍 shows one page as wide as the screen.
    The questions are the book's last page (Roger, 12 Nov 2026: "can we make them do the activity in full screen (the book) and that they
    press the options there?"): opts.end is a live element (the engine's form) shown as a page after the pictures. While it is on screen
@@ -19,6 +19,8 @@
 .elb-stage{display:flex;justify-content:center;padding:18px 8px 10px;background:var(--desk);border-radius:16px;perspective:2600px}
 .elb-book{position:relative;width:calc(var(--pw)*2);height:var(--ph);box-shadow:0 18px 40px rgba(0,0,0,.28);border-radius:3px;background:var(--paper)}
 .elb.single .elb-book{width:var(--pw)}
+.elb-book{touch-action:pan-y;user-select:none;-webkit-user-select:none}.elb.zoom .elb-book{touch-action:auto}
+.elb-hit.prev,.elb-hit.next{cursor:grab}.elb-hit:active{cursor:grabbing}
 .elb-page,.elb-leaf{position:absolute;top:0;width:var(--pw);height:var(--ph);background:var(--paper)}
 .elb-page img,.elb-face img{display:block;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .elb-l{left:0}.elb-r{left:var(--pw)}.elb.single .elb-l{display:none}.elb.single .elb-r{left:0}
@@ -38,7 +40,7 @@
 .elb-back::after{background:linear-gradient(to right,rgba(0,0,0,.28),rgba(0,0,0,0) 45%)}
 .elb-leaf.turn .elb-face::after{opacity:1}
 .elb-hit{position:absolute;top:0;bottom:0;width:50%;border:0;background:transparent;cursor:pointer;z-index:4;padding:0}
-.elb-hit.prev{left:0;cursor:w-resize}.elb-hit.next{right:0;cursor:e-resize}.elb-hit:disabled{cursor:default}
+.elb-hit.prev{left:0}.elb-hit.next{right:0}.elb-hit:disabled{cursor:default}
 .elb-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin-top:10px}
 .elb-bar button{border:1px solid var(--line,#d8e6df);background:#fff;color:var(--dark,#174d3d);border-radius:12px;padding:9px 14px;font:inherit;font-weight:800;cursor:pointer;min-height:42px}
 .elb-bar button:disabled{opacity:.4;cursor:default}
@@ -131,7 +133,7 @@ html.elb-lock{overflow:hidden}
       nb.textContent = qs ? T(ca, 'Preguntes', 'Questions') : (single || lt - i <= 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + lt) + T(ca, ' de ', ' of ') + (endEl ? n - 1 : n) + (endEl && last === n ? ' · ' + T(ca, 'Preguntes', 'Questions') : '');
       bp.disabled = i === 0; q('.elb-hit.prev').disabled = i === 0;
       const end = i + step() >= n, onEnd = endEl && last === n;
-      // the end page takes the taps (its options); the arrows, the keys and a swipe still turn
+      // the end page takes the taps (its options); the arrows, the keys and dragging the page still turn
       q('.elb-hit.prev').classList.toggle('off', !!onEnd); q('.elb-hit.next').classList.toggle('off', !!onEnd);
       bx.textContent = end ? T(ca, 'Fi', 'The end') : (endEl && i + 2 * step() >= n ? T(ca, 'Preguntes', 'Questions') + ' ▶' : T(ca, 'Gira la pàgina', 'Turn the page') + ' ▶');
       bx.disabled = end; bx.hidden = end && !!endEl;
@@ -153,36 +155,85 @@ html.elb-lock{overflow:hidden}
     }
     const motion = () => !matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Turning: the leaf is the page that moves; under it the pages that the turn uncovers are already in place.
-    function turn(dir) {
-      if (busy) return;
+    // setup(dir) puts the leaf at its start (a0) and returns where it ends (a1); go() moves it to the end or back to the start.
+    function setup(dir) {
       const s = step(), to = i + dir * s;
-      if (dir > 0 && i + s >= n) return;
-      if (dir < 0 && i === 0) return;
+      if (dir > 0 && i + s >= n) return null;
+      if (dir < 0 && i === 0) return null;
       seen = true; tip.hidden = true;
-      if (!motion()) { i = Math.max(0, to); draw(); return; }
-      busy = true;
       const front = leaf.querySelector('.elb-front'), back = leaf.querySelector('.elb-back');
       leaf.style.transition = 'none'; leaf.classList.remove('turn');
+      let a0 = 0, a1;
       if (single) {
         leaf.style.left = '0'; leaf.style.transformOrigin = 'left center';
         // one page: the page lifts away to the left until it is edge-on (no back to show), or comes back over the page
-        if (dir > 0) { set(front, i); set(back, null); set(Rp, to); leaf.style.transform = 'rotateY(0deg)'; }
-        else { set(front, to); set(back, null); leaf.style.transform = 'rotateY(-90deg)'; }
+        if (dir > 0) { set(front, i); set(back, null); set(Rp, to); a1 = -90; }
+        else { set(front, to); set(back, null); a0 = -90; a1 = 0; }
       } else if (dir > 0) {
         leaf.style.left = 'var(--pw)'; leaf.style.transformOrigin = 'left center';
-        set(front, i + 1); set(back, i + 2); set(Rp, i + 3); leaf.style.transform = 'rotateY(0deg)';
+        set(front, i + 1); set(back, i + 2); set(Rp, i + 3); a1 = -180;
       } else {
         leaf.style.left = '0'; leaf.style.transformOrigin = 'right center';
-        set(front, i); set(back, i - 1); set(L, i - 2); leaf.style.transform = 'rotateY(0deg)';
+        set(front, i); set(back, i - 1); set(L, i - 2); a1 = 180;
       }
+      leaf.style.transform = 'rotateY(' + a0 + 'deg)';
       leaf.classList.add('on'); void leaf.offsetWidth;
-      leaf.style.transition = ''; leaf.classList.add('turn');
-      leaf.style.transform = single ? (dir > 0 ? 'rotateY(-90deg)' : 'rotateY(0deg)') : (dir > 0 ? 'rotateY(-180deg)' : 'rotateY(180deg)');
-      let done = false;
-      const end = () => { if (done) return; done = true; i = to; draw(); leaf.classList.remove('on', 'turn'); busy = false; };
-      leaf.addEventListener('transitionend', function h(e) { if (e.target !== leaf) return; leaf.removeEventListener('transitionend', h); end(); });
-      setTimeout(end, 1000);
+      return { to, a0, a1 };
     }
+    function go(t, all, sec) {
+      busy = true;
+      leaf.style.transition = 'transform ' + sec + 's cubic-bezier(.3,.1,.3,1)'; leaf.classList.add('turn');
+      leaf.style.transform = 'rotateY(' + (all ? t.a1 : t.a0) + 'deg)';
+      let done = false;
+      const end = () => { if (done) return; done = true; if (all) i = t.to; draw(); leaf.classList.remove('on', 'turn'); leaf.style.transition = ''; busy = false; };
+      leaf.addEventListener('transitionend', function h(e) { if (e.target !== leaf) return; leaf.removeEventListener('transitionend', h); end(); });
+      setTimeout(end, sec * 1000 + 300);
+    }
+    function turn(dir) {
+      if (busy || drag) return;
+      if (!motion()) { const s = step(); if ((dir > 0 && i + s >= n) || (dir < 0 && i === 0)) return; seen = true; tip.hidden = true; i = Math.max(0, i + dir * s); draw(); return; }
+      const t = setup(dir); if (t) { leaf.style.transition = ''; go(t, true, .75); }
+    }
+    // Dragging the page (Roger, 13 Nov 2026: "I want them to pass pages by dragging them"): with a finger or the mouse the paper follows
+    // the hand, its edge where the hand is; let go past a third of the way (or with a quick flick) and it turns, before that it falls back.
+    // A tap still turns (or opens full screen the first time); the end page's options and buttons keep their taps.
+    let drag = null, noClick = 0;
+    const angle = (d, p) => single ? (d > 0 ? -Math.acos(1 - p) : -Math.acos(p)) : (d > 0 ? -1 : 1) * Math.acos(1 - 2 * p);
+    book.addEventListener('pointerdown', e => {
+      if (busy || drag || zoom || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      if (e.target.closest && e.target.closest('.elb-q :is(label,input,button,a,select,textarea)')) return;
+      const r = book.getBoundingClientRect();
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, rx: e.clientX - r.left, w: r.width, t: null, p: 0, hist: [[e.timeStamp, e.clientX]] };
+    });
+    book.addEventListener('pointermove', e => {
+      const d = drag; if (!d || e.pointerId !== d.id) return;
+      const dx = e.clientX - d.x, dy = e.clientY - d.y;
+      if (!d.t) {
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+        if (Math.abs(dx) < Math.abs(dy) * 1.2) { drag = null; return; }   // up and down: the page scrolls (the questions page)
+        d.dir = dx < 0 ? 1 : -1; d.t = setup(d.dir);
+        if (!d.t) { drag = null; return; }   // nothing to turn that way
+        busy = true;
+        try { book.setPointerCapture(e.pointerId); } catch (x) { }
+        if (motion()) leaf.classList.add('turn');
+      }
+      e.preventDefault();
+      const room = d.dir > 0 ? d.rx : d.w - d.rx, pw = d.w / (single ? 1 : 2);
+      d.p = Math.max(0, Math.min(1, (d.dir > 0 ? -dx : dx) / Math.max(room, pw * .5)));
+      leaf.style.transform = 'rotateY(' + angle(d.dir, d.p) * 180 / Math.PI + 'deg)';
+      d.hist.push([e.timeStamp, e.clientX]); if (d.hist.length > 6) d.hist.shift();
+    });
+    const drop = e => {
+      const d = drag; if (!d || e.pointerId !== d.id) return;
+      drag = null; if (!d.t) return;
+      noClick = Date.now() + 400;   // the tap that ends a drag is not a tap on the page
+      const h = d.hist, a = h[0], b = h[h.length - 1], v = b[0] > a[0] ? (b[1] - a[1]) / (b[0] - a[0]) : 0;   // px per ms, + to the right
+      const flick = (d.dir > 0 ? -v : v) > .45 && d.p > .04, back = (d.dir > 0 ? v : -v) > .45;
+      const all = e.type !== 'pointercancel' && !back && (d.p > .33 || flick);
+      busy = false; go(d.t, all, all ? .22 + .45 * (1 - d.p) : .18 + .35 * d.p);
+    };
+    book.addEventListener('pointerup', drop); book.addEventListener('pointercancel', drop);
+    book.addEventListener('click', e => { if (Date.now() < noClick) { e.preventDefault(); e.stopPropagation(); } }, true);
     function toggleFull(on, stay, keepFs) {
       full = on == null ? !full : on;
       if (!full) zoom = false;
@@ -208,9 +259,6 @@ html.elb-lock{overflow:hidden}
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); turn(-1); }
       else if (e.key === 'Escape' && full) { e.preventDefault(); toggleFull(false); }
     });
-    let sx = null, sy = null;
-    book.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; });
-    book.addEventListener('pointerup', e => { if (sx == null) return; const dx = e.clientX - sx, dy = e.clientY - sy; sx = null; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5 && !zoom) { e.preventDefault(); turn(dx < 0 ? 1 : -1); } });
     if (window.ResizeObserver) new ResizeObserver(() => fit()).observe(el); else addEventListener('resize', fit);
     addEventListener('resize', () => { if (full) fit(); });
     fit();

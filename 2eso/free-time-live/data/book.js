@@ -17,8 +17,8 @@ window.LP = {
     "ca": "Amb LP1"
    },
    "intro": {
-    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
-    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
+    "en": "Tap the book to read it full screen. Turn the pages like a real book: drag them with your finger or the mouse (or use ▶). The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once. Then, if you want, go on reading the next chapter.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa. Gira les pàgines com en un llibre de veritat: arrossega-les amb el dit o el ratolí (o fes servir ▶). L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada. Després, si vols, continua llegint el capítol següent."
    },
    "book": true,
    "media": {
@@ -86,8 +86,8 @@ window.LP = {
     "ca": "Amb LP2"
    },
    "intro": {
-    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
-    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
+    "en": "Tap the book to read it full screen. Turn the pages like a real book: drag them with your finger or the mouse (or use ▶). The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once. Then, if you want, go on reading the next chapter.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa. Gira les pàgines com en un llibre de veritat: arrossega-les amb el dit o el ratolí (o fes servir ▶). L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada. Després, si vols, continua llegint el capítol següent."
    },
    "book": true,
    "media": {
@@ -148,8 +148,8 @@ window.LP = {
     "ca": "Amb LP3"
    },
    "intro": {
-    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
-    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
+    "en": "Tap the book to read it full screen. Turn the pages like a real book: drag them with your finger or the mouse (or use ▶). The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once. Then, if you want, go on reading the next chapter.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa. Gira les pàgines com en un llibre de veritat: arrossega-les amb el dit o el ratolí (o fes servir ▶). L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada. Després, si vols, continua llegint el capítol següent."
    },
    "book": true,
    "media": {
@@ -210,8 +210,8 @@ window.LP = {
     "ca": "Amb LP4"
    },
    "intro": {
-    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
-    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
+    "en": "Tap the book to read it full screen. Turn the pages like a real book: drag them with your finger or the mouse (or use ▶). The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once. Then, if you want, go on reading the next chapter.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa. Gira les pàgines com en un llibre de veritat: arrossega-les amb el dit o el ratolí (o fes servir ▶). L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada. Després, si vols, continua llegint el capítol següent."
    },
    "book": true,
    "media": {
@@ -272,8 +272,8 @@ window.LP = {
     "ca": "Amb LP5"
    },
    "intro": {
-    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
-    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
+    "en": "Tap the book to read it full screen. Turn the pages like a real book: drag them with your finger or the mouse (or use ▶). The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once. Then, if you want, go on reading the next chapter.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa. Gira les pàgines com en un llibre de veritat: arrossega-les amb el dit o el ratolí (o fes servir ▶). L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada. Després, si vols, continua llegint el capítol següent."
    },
    "book": true,
    "media": {
@@ -334,8 +334,8 @@ window.LP = {
     "ca": "Amb LP6"
    },
    "intro": {
-    "en": "Tap the book to read it full screen and turn the pages with ▶, a tap or a swipe. The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once.",
-    "ca": "Toca el llibre per llegir-lo a pantalla completa i gira les pàgines amb ▶, tocant-les o lliscant el dit. L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada."
+    "en": "Tap the book to read it full screen. Turn the pages like a real book: drag them with your finger or the mouse (or use ▶). The last page has two questions: one about the story and one guess about what happens next. Tap your answers and check: you can do it only once. Then, if you want, go on reading the next chapter.",
+    "ca": "Toca el llibre per llegir-lo a pantalla completa. Gira les pàgines com en un llibre de veritat: arrossega-les amb el dit o el ratolí (o fes servir ▶). L’última pàgina té dues preguntes: una sobre la història i una endevinalla sobre què passarà. Toca les respostes i comprova: només ho pots fer una vegada. Després, si vols, continua llegint el capítol següent."
    },
    "book": true,
    "media": {

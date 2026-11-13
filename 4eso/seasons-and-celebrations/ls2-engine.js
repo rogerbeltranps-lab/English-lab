@@ -675,15 +675,19 @@ var LS2 = (function () {
     function after() {
       const el = $('#' + id + 'After'); if (!el || !$('#' + id + 'QPage').classList.contains('locked')) return;
       const { nx, tab, open } = nextOf();
+      // keep reading (Roger, 13 Nov 2026: "when they have finished, to continue reading as many chapters as wanted"): a chapter done
+      // always offers the next one, even one not on the agenda yet or planned for a later class; el-cloud.js elBookMore opens it
+      const more = !!nx && (open || !!window.elBookMore);
       const h = (!nx ? '<p class="elbq-end">🎉 ' + T2('Has acabat el llibre! En parlarem a classe.', 'You’ve finished the book! We’ll talk about it in class.') + '</p>'
-        : !open ? '<p class="elbq-end">' + T2('El ' + esc(tx(nx.tab)).toLowerCase() + ' encara no està obert: el teu professor el posarà a l’agenda.', esc(tx(nx.tab)) + ' isn’t open yet: your teacher will put it on the agenda.') + '</p>' : '') +
-        '<div class="actions">' + (nx && open ? '<button class="btn" type="button" data-go="next">' + esc(tx(nx.tab)) + ' ▶</button>' : '') +
+        : !more ? '' : '<p class="elbq-end">' + T2('Vols continuar llegint? Pots passar al ' + esc(tx(nx.tab)).toLowerCase() + ' ara mateix.', 'Want to keep reading? You can go on to ' + esc(tx(nx.tab)) + ' now.') + '</p>') +
+        '<div class="actions">' + (more ? '<button class="btn" type="button" data-go="next">' + esc(tx(nx.tab)) + ' ▶</button>' : '') +
         '<a class="btn secondary" href="index.html">' + T2('Surt del llibre', 'Leave the Book') + '</a></div>';
       if (el.innerHTML !== h) el.innerHTML = h;
       el.hidden = false;
       const b = el.querySelector('[data-go]');
       if (b) b.onclick = () => {
         const full = book && book.isFull();
+        if (window.elBookMore) window.elBookMore(nx.id);   // opened for this student (hidden or 🏫 tab, class mode)
         if (book) book.close(true);   // the browser stays in full screen for the next chapter
         tab.click();
         if (full && nx._book) nx._book.open();
