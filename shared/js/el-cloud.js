@@ -722,11 +722,14 @@ function annReply(u,id,text){text=String(text||"").trim().slice(0,1000);if(!u||!
 // Plus student gets the Problem window and the cards in English there too. The board keeps its own language (the LS on screen).
 const repEn=()=>{const l=myLevel||homeLevel;return l?!elCa(l):onBoard&&document.documentElement.lang==="en"};
 // A screenshot goes in its own document (problemShots/{same id}), so the dashboard loads it only when the teacher opens it.
-const reportProblem=u=>report({en:repEn(),save:o=>{
+// The teacher has the same button (Roger, 13 Nov 2026: "I need a problem button available for the teacher"): on the dashboard, the class tab
+// and every page, in English. The report says teacher:true (firestore.rules: only the teacher's own account) and the group is the class
+// mode's group on the class tab; the same instant task reads it (docs/general/problem-reports-auto.md, "The teacher's own reports").
+const reportProblem=u=>{const tch=isTeacher(u)&&!AS;return report({en:repEn(),teacher:tch,save:o=>{
   const {shot,shotFrom}=o,ref=doc(collection(db,"problems")),b=writeBatch(db);delete o.shot;delete o.shotFrom;
-  b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:myGroup||null,ls:lsId,activity:actId,route:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()}));
+  b.set(ref,Object.assign(o,{uid:u.uid,email:(u.email||"").toLowerCase(),name:u.displayName||"",group:tch?((cmRead()||{}).g||null):myGroup||null,ls:lsId,activity:actId,route:tch?null:myLevel,shot:shot?shotFrom:null,created:serverTimestamp()},tch?{teacher:true}:{}));
   if(shot)b.set(doc(db,"problemShots",ref.id),{uid:u.uid,img:shot,created:serverTimestamp()});
-  return b.commit().then(r=>{wakeFixer(u);return r})}});
+  return b.commit().then(r=>{wakeFixer(u);return r})}})};
 // Roger, 8 Nov 2026 ("read it straightaway … fix it and answer the student"): once the report is saved, the school Apps Script
 // (tools/notify/school-mail.gs, action "problem") starts the scheduled task that reads new reports, checked with the student's own
 // sign-in; fire and forget, nothing shown, nothing read. Without it the task still runs every hour.
@@ -787,6 +790,7 @@ function bar(){
       // mini menu on the bottom"); the teacher keeps the Dashboard link
       if(isTeacher(u)){const a=document.createElement("a");a.textContent="Dashboard";a.href=dashHere;el.append(a," ")}
       if(isStudent(u)){const p=b("⚠️ "+(repEn()?"Problem":"Problema"),()=>reportProblem(u));p.style.background="#b45309";p.title=repEn()?"Report a problem: something on the website does not work":"Avisa d'un problema: alguna cosa de la web no funciona";el.append(p," ")}
+      else if(isTeacher(u)){const p=b("⚠️ Problem",()=>reportProblem(u));p.style.background="#b45309";p.title="Report a problem on this page: Claude looks at it straight away (technical ones are fixed and you get an email)";el.append(p," ")}
       if(isStudent(u)){const i=b("💡 Idea",()=>suggest(u));i.title=repEn()?"Suggest an improvement to the website":"Suggereix una millora per a la web";el.append(i," ")}
       if(isTeacher(u)&&bellEl)el.append(bellEl," ");
       if(isTester(u)){const s=document.createElement("select");s.title="Tester: see the site as a student of this group";
