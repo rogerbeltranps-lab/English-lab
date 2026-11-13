@@ -53,6 +53,15 @@ tfoot tr.avg td{background:#f1f5f9;border-top:2px solid #94a3b8}
 .gnotes{display:inline-grid;place-items:center;width:30px;height:30px;margin-left:6px;vertical-align:middle;border:1px solid #c7d2fe;border-radius:8px;background:#eef2ff;text-decoration:none;font-size:16px}.gnotes:hover{background:#e0e7ff;border-color:#3157d5}.grings{display:inline-flex;align-items:center;gap:3px;margin-left:8px;vertical-align:middle;text-decoration:none;font-size:13px}
 .indrub{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0 2px}.ir{border:1.5px solid;border-radius:9px;padding:6px 8px;font-size:12.5px;line-height:1.35;color:#334155}.ir b{display:block;font-size:12px;margin-bottom:2px}.ir b small{font-weight:600;color:#64748b}.ir-na{border-color:#fca5a5;background:#fef2f2}.ir-na b{color:#991b1b}.ir-as{border-color:#86efac;background:#f0fdf4}.ir-as b{color:#166534}.ir-an{border-color:#93c5fd;background:#eff6ff}.ir-an b{color:#1e40af}.ir-ae{border-color:#c4b5fd;background:#f5f3ff}.ir-ae b{color:#5b21b6}@media (max-width:900px){.indrub{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* 📊 Class results */
+.vtabs{display:flex;gap:6px;margin:0 0 12px}.vtabs button{border:1.5px solid #cbd5e1;background:#fff;border-radius:999px;padding:7px 14px;font:inherit;font-weight:700;cursor:pointer;color:#0f172a}.vtabs button.on{background:#0f766e;border-color:#0f766e;color:#fff}
+.vsum{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.vsum span{flex:1 1 200px}.vbig{font-size:1.8rem;color:#16a34a}.vchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}.vcount{font-weight:600;color:#475569;font-size:.85rem;margin-left:6px}
+.vt{width:100%;border-collapse:collapse;font-size:14px}.vt th{text-align:left;font-size:12px;color:#64748b;font-weight:700;padding:6px 8px;border-bottom:1.5px solid #e2e8f0}.vt td{text-align:left;padding:7px 8px;}.vt td.nw{white-space:nowrap}.vt td{border-bottom:1px solid #f1f5f9;vertical-align:top}
+.vt .lnk{border:0;background:none;padding:0;font:inherit;font-weight:700;color:#0f172a;cursor:pointer;text-align:left}.vt .lnk:hover{color:#0f766e;text-decoration:underline}.vt a{color:#0369a1;text-decoration:none}.vt a:hover{text-decoration:underline}
+.vdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px #bbf7d0;margin-right:8px;vertical-align:middle}.vdot.idle{background:#facc15;box-shadow:0 0 0 3px #fef9c3}.vnow{color:#16a34a;font-weight:700}
+.vearly{margin:10px 0 0;font-size:13px;color:#475569;line-height:2}.vearly .chip small{color:#64748b;margin-left:4px}.vrow{cursor:pointer}.vrow:hover td{background:#f8fafc}.vrow.on td{background:#f0fdfa}.vtop{color:#475569;font-size:13px}
+.vdet td{background:#f8fafc}.vvis{margin:4px 0 10px}.vvis ul{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:3px}.vvis li{display:flex;justify-content:space-between;gap:12px;max-width:640px;padding:3px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;font-size:13px}.vvis li small{color:#64748b;white-space:nowrap}
+.vnav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.vnav>button{border:1.5px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:4px 12px;font:inherit;font-weight:700;cursor:pointer}.vnav>button:disabled{opacity:.4;cursor:default}.vnav input{font:inherit;padding:4px 6px;border:1.5px solid #cbd5e1;border-radius:8px}.vnote{font-size:12px}
+@media (max-width:640px){.vt th:nth-child(3),.vt td:nth-child(3){display:none}.vtop{display:none}.vt{font-size:13px}.vt td.nw{white-space:normal}}
 .crg{display:flex;flex-wrap:wrap;gap:10px}.crgc{display:grid;gap:2px;text-align:left;min-width:170px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;font:inherit;color:#0f172a;flex:0 1 170px}
 .crgc.on{border-color:#2563eb;box-shadow:0 0 0 2px #bfdbfe}.crgc.all{place-content:center;color:#2563eb;font-weight:600}.crgc small{color:#64748b}.crbig{font-size:26px;font-weight:800;line-height:1.1}
 .crsp{display:flex;align-items:flex-end;gap:3px;height:34px;margin-top:4px}.crsp i{display:block;width:10px;border-radius:3px 3px 0 0}
@@ -279,7 +288,7 @@ const TAB_BACK=(()=>{try{const v=sessionStorage.getItem("el_t_tab");sessionStora
 (()=>{const q=new URLSearchParams(location.search),gOf=id=>GR.find(g=>g.id===id),c=q.get("course"),ls=EL_LS.find(l=>l.id===q.get("ls")),cs=Object.assign({},LAST.c);
   if(gOf(q.get("g")))S.g=q.get("g");
   else if(c&&GR.some(g=>g.course===c))S.g=gOf(cs[c])&&gOf(cs[c]).course===c?cs[c]:GR.find(g=>g.course===c).id;
-  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","mat","ref","lss","none"].includes(LAST.g)))S.g=LAST.g;
+  else if(TAB_BACK&&(gOf(LAST.g)||["plan","corr","qa","cres","online","mat","ref","lss","none"].includes(LAST.g)))S.g=LAST.g;
   else S.g="plan";   // a new visit (sign-in, new tab) opens on 🏠 Home; a reload in the same tab goes back where you were (Roger, 8 Nov 2026)
   if(ls)S.ls=ls.id;else if(LAST.ls&&Date.now()-(LAST.t||0)<3*3600e3){S.ls=LAST.ls;S.year=!!LAST.year}   // render() swaps an LS of another course for the group's current one
   CLS.link=q.has("course")||q.has("ls")||q.has("g");
@@ -1137,7 +1146,7 @@ function tphMore(){const m=document.getElementById("tpmore");if(!m)return;m.hidd
   const r=(a,ic,t,sub)=>`<a href="#" ${a}><i aria-hidden="true">${ic}</i><span>${t}${sub?`<small>${sub}</small>`:""}</span></a>`,none=Object.values(S.P||{}).some(s=>!s.tester&&!s.group);
   m.innerHTML=`<div class="tpsh" role="dialog" aria-label="More"><div class="tph">More</div>`
     +`<h2>In class</h2><div class="tpl">${r('data-do="annnew"',"📣","New announcement","to a group, a course, everyone or some students")}${r('data-tph="sv"',"👁","See the site as a student","read-only, in a new tab")}${(cmb=>cmb?r('data-tph="cm"',"🎓",cmb.classList.contains("on")?"Stop class mode":"Class mode",esc(((GR.find(g=>g.id===cmb.dataset.gid)||{}).name||"")+" · every student follows the class page")):"")(document.querySelector("#fsctl .cmbtn"))}</div>`
-    +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}${r('data-do="tab" data-g="cres"',"📊","Class results","grammar and reading together, lesson by lesson")}</div>`
+    +`<h2>Plan</h2><div class="tpl">${r('data-tph="week"',"📅","Time plan · all groups","every group's week and exam day")}${r('data-tph="tt"',"🗓","Timetable","your classes with each group, days off")}${r('data-do="tab" data-g="qa"',"🔎","Questions","answered well or badly the first time")}${r('data-do="tab" data-g="cres"',"📊","Class results","grammar and reading together, lesson by lesson")}${r('data-do="tab" data-g="online"',"🟢","Online","who is on the site now, visit history")}</div>`
     +`<h2>Materials</h2><div class="tpl">${r('data-do="tab" data-g="lss"',"🧭","Learning situations","every LS by course: learning paths, groups, materials")}${r('data-do="tab" data-g="mat"',"📚","Materials","class games, worksheets, study PDFs")}${r('data-do="tab" data-g="ref"',"📖","Reference","competences, criteria, grammar and lexicon")}${r('data-do="tab" data-g="mat"',"🎬","How it works","videos for teachers and students")}</div>`
     +`<h2>Site</h2><div class="tpl">${r('data-do="mtdlg"',"🛠","Maintenance",mtOn()?"ON: students see the maintenance message":"off")}${none?r('data-do="tab" data-g="none"',"❔",listed()?"Not on the list":"No group",""):""}</div></div>`}
 // ---- the group in class now (Roger, 2 Nov 2026: "when I open the dashboard, the group I have at that hour should be selected; if I'm
@@ -1430,6 +1439,7 @@ function render0(){
     +hp("msgs","💬 Messages","Announcements, problems and ideas",(()=>{const np=S.D.pb.filter(x=>!x.fixed).length,m=np+(S.D.sg||[]).filter(x=>!x.read).length+msgNew().length;return m?`<small class="${np?"late":""}">${m}</small>`:""})())
     +hp("tt","🗓 Timetable","Your classes with each group, days off","")
     +nv("qa","🔎 Questions","","Which questions students answer well or badly the first time, by route and group")
+    +nv("online","🟢 Online","","Who is on English Lab now, and the history of visits: when, for how long, which pages")
     +nv("cres","📊 Class results","","Grammar and reading together, lesson by lesson: who did it and the % right on their first check")
     +nv("mat","📚 Materials","","Class games, paper worksheets and study PDFs of every LS")
     +nv("ref","📖 Reference","","Competences, criteria (also cross-curricular), grammar and lexicon across 1r–4t ESO, and the LS where each is worked")
@@ -1438,6 +1448,8 @@ function render0(){
   if(S.g==="corr"){$("#main").innerHTML=corrPage();return}
   if(S.g==="qa"){$("#main").innerHTML=qaTab();return}
   if(S.g==="cres"){$("#main").innerHTML=crPage();return}
+  if(S.g!=="online")visUnwatch();
+  if(S.g==="online"){$("#main").innerHTML=onlinePage();return}
   if(S.g==="mat"){$("#main").innerHTML=matTab();return}
   if(S.g==="lss"){$("#main").innerHTML=lssPage();return}
   if(S.g==="ref"){$("#main").innerHTML=window.ELRef?ELRef.view():`<div class="box"><p class="muted">Loading…</p></div>`;return}
@@ -1927,6 +1939,93 @@ function crPage(){crLoad();
       `<span class="crbig" style="color:${col(S2.pct)}">${pc(S2.pct)}</span><span class="crm">✅ ${S2.done||0} of ${S2.n||0} checked${S2.work?" · ✏ "+S2.work+" working":""}${S2.none?" · — "+S2.none+" not started":""}</span><span class="crx">${open?"▲":"▼"}</span></button>${body}</div>`};
   return head+groups+`<div class="box"><h2>Lessons${gsel!=="all"?" · "+esc(gname(gsel)):""}</h2>`+show.map(one).join("")+`</div>`;
 }
+/* ---- 🟢 Online now + 🕘 Visit history (Roger, 13 Nov 2026: "Is it possible to see who is conected on the website? … And I want to have a
+   historial"). Each student's pages write visits/{day}_{uid} (shared/js/el-visits.js): where they are now (page, title, last = the latest
+   beat, at most 4 minutes apart while a page is on screen) and that day's visits with the minutes on each page. Only the teacher reads them.
+   Reads: 🟢 Online now listens to today's documents only while it is on screen and the dashboard is visible (one read per student at first,
+   then one per beat); 🕘 History reads one day (one read per student who came that day) or one student's days, when asked. */
+const ON_MS=6*60e3;let VIS={live:null,stop:null,days:{},stu:{}};S.on=S.on||{v:"now",day:null,g:"all",open:null,stu:null};
+const visDay=ms=>{try{return new Date(ms).toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"})}catch(e){return new Date(ms).toISOString().slice(0,10)}};
+const visMs=v=>v==null?0:typeof v.toMillis==="function"?v.toMillis():typeof v==="number"?v:v.seconds?v.seconds*1000:+new Date(v)||0;
+const visList=q=>q.docs.map(d=>Object.assign({id:d.id},d.data()));
+function visWatch(){if(VIS.stop||document.visibilityState!=="visible")return;
+  if(DEMO){VIS.live=(DEMO.visits||[]).filter(x=>x.day===visDay(Date.now()));return}
+  VIS.stop=F.onSnapshot(F.query(F.collection(db(),"visits"),F.where("day","==",visDay(Date.now()))),q=>{VIS.live=visList(q);VIS.days[visDay(Date.now())]=VIS.live;
+    clearTimeout(VIS.t);VIS.t=setTimeout(()=>{if(S.g==="online")render()},400)},e=>{console.warn("visits",e);VIS.err=true;VIS.live=VIS.live||[];if(S.g==="online")render()})}
+function visUnwatch(){if(VIS.stop){VIS.stop();VIS.stop=null}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState!=="visible")visUnwatch();else if(S.D&&S.g==="online"&&S.on.v==="now")visWatch()});
+setInterval(()=>{if(S.D&&S.g==="online"&&S.on.v==="now"&&document.visibilityState==="visible"&&!document.querySelector("#dlg[open]"))render()},30e3);   // "2 min ago" moves on
+function visDayLoad(day){if(VIS.days[day]||(VIS.busy||{})[day])return;VIS.busy=VIS.busy||{};
+  if(DEMO){VIS.days[day]=(DEMO.visits||[]).filter(x=>x.day===day);return}
+  VIS.busy[day]=1;F.getDocs(F.query(F.collection(db(),"visits"),F.where("day","==",day))).then(q=>{VIS.days[day]=visList(q);delete VIS.busy[day];if(S.g==="online")render()})
+    .catch(e=>{console.warn("visits",e);VIS.days[day]=[];VIS.days[day].err=true;delete VIS.busy[day];if(S.g==="online")render()})}
+function visStuLoad(uid){if(VIS.stu[uid]||(VIS.busy||{})["u"+uid])return;VIS.busy=VIS.busy||{};
+  if(DEMO){VIS.stu[uid]=(DEMO.visits||[]).filter(x=>x.uid===uid);return}
+  VIS.busy["u"+uid]=1;F.getDocs(F.query(F.collection(db(),"visits"),F.where("uid","==",uid))).then(q=>{VIS.stu[uid]=visList(q);delete VIS.busy["u"+uid];if(S.g==="online")render()})
+    .catch(e=>{console.warn("visits",e);VIS.stu[uid]=[];delete VIS.busy["u"+uid];if(S.g==="online")render()})}
+// one day's document → its visits (oldest first) with the minutes per page
+function visSum(x){const t=x.t||{},vs=Object.values(x.s||{}).filter(v=>v&&v.a).sort((a,b)=>a.a-b.a).map(v=>{
+    const p=Object.entries(v.p||{}).map(([k,s])=>({k,s:+s||0,n:(t[k]||{}).n||k,u:(t[k]||{}).u||""})).sort((a,b)=>b.s-a.s);
+    return {a:v.a,b:Math.max(v.b||v.a,v.a),p,sec:p.reduce((n,q)=>n+q.s,0)}});
+  const last=visMs(x.last);if(vs.length&&last>vs[vs.length-1].b&&last-vs[vs.length-1].b<ON_MS)vs[vs.length-1].b=last;
+  const pages={};vs.forEach(v=>v.p.forEach(q=>{const o=pages[q.k]||(pages[q.k]={n:q.n,u:q.u,s:0});o.s+=q.s}));
+  return {vs,sec:vs.reduce((n,v)=>n+v.sec,0),first:vs.length?vs[0].a:last,lastSeen:Math.max(last,vs.length?vs[vs.length-1].b:0),pages:Object.values(pages).sort((a,b)=>b.s-a.s)}}
+const visT=ms=>new Date(ms).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Madrid"});
+const visDur=s=>{const m=Math.round(s/60);return m<1?"<1 min":m<60?m+" min":Math.floor(m/60)+" h "+String(m%60).padStart(2,"0")+" min"};
+const visAgo=ms=>{const m=Math.floor((Date.now()-ms)/60e3);return m<1?"now":m+" min ago"};
+function visWho(x){const P=S.P||{};let s=P[x.uid];if(!s&&x.email)s=Object.values(P).find(p=>(p.email||p.rid||"").toLowerCase()===x.email);return s}
+const visName=x=>{const s=visWho(x);return s?fullName(s):x.name||x.email||x.uid};
+const visGroup=x=>{const s=visWho(x);return x.tester||(s&&s.tester)?"test":(s&&s.group)||x.group||"none"};
+const visLink=(u,n)=>u?`<a href="${esc(u)}" target="_blank" rel="noopener" title="Open this page">${esc(n)} ↗</a>`:esc(n);
+function visGroups(list,gsel){const gs=GR.filter(g=>gsel==="all"||g.id===gsel).map(g=>({id:g.id,name:g.name}));
+  if(gsel==="all"&&list.some(x=>visGroup(x)==="test"))gs.push({id:"test",name:"🧪 Test account"});
+  if(gsel==="all"&&list.some(x=>visGroup(x)==="none"))gs.push({id:"none",name:"No group"});return gs}
+const visChips=(gsel,f)=>`<div class="vchips">${[["all","Every group"]].concat(GR.map(g=>[g.id,g.name])).map(([id,n])=>`<button class="chip ${gsel===id?"on":""}" data-do="vg" data-g="${id}">${esc(n)}</button>`).join(" ")}</div>`;
+function onlinePage(){const v=S.on.v,gsel=S.on.g;
+  if(v==="now")visWatch();else visUnwatch();
+  const tabs=`<div class="vtabs"><button class="${v==="now"?"on":""}" data-do="vv" data-v="now">🟢 Online now</button><button class="${v==="hist"?"on":""}" data-do="vv" data-v="hist">🕘 Visit history</button></div>`;
+  const head=`<div class="ph"><h1>${v==="now"?"🟢 Online now":"🕘 Visit history"}</h1><p class="sub">${v==="now"?"Students with a page of English Lab open on screen in the last 6 minutes, and the page they are on. It updates by itself.":"When each student was on English Lab, for how long and on which pages, day by day."}</p></div>`+tabs;
+  return head+(v==="now"?visNow(gsel):S.on.stu?visStu(S.on.stu):visHist(gsel))}
+function visNow(gsel){
+  if(!VIS.live)return `<div class="box"><p class="muted">Loading…</p></div>`;
+  if(VIS.err&&!VIS.live.length)return `<div class="box"><p class="muted">Could not read who is online. Reload the page (Ctrl+Shift+R) and try again.</p></div>`;
+  const now=Date.now(),L=VIS.live.map(x=>Object.assign({x,sum:visSum(x)})),on=o=>now-visMs(o.x.last)<ON_MS;
+  const gs=visGroups(VIS.live,gsel);
+  const tot=L.filter(o=>on(o)&&visGroup(o.x)!=="test").length;
+  const box=g=>{const mine=L.filter(o=>visGroup(o.x)===g.id),ons=mine.filter(on).sort((a,b)=>visName(a.x).localeCompare(visName(b.x),"ca")),off=mine.filter(o=>!on(o)).sort((a,b)=>visMs(b.x.last)-visMs(a.x.last));
+    const ro=Object.values(S.P||{}).filter(s=>!s.tester&&s.group===g.id).length;
+    const row=o=>{const cur=o.sum.vs[o.sum.vs.length-1],ago=visAgo(visMs(o.x.last));
+      return `<tr><td><span class="vdot ${Date.now()-visMs(o.x.last)>4.5*60e3?"idle":""}" title="${Date.now()-visMs(o.x.last)>4.5*60e3?"No sign for a few minutes: the page may be closed or hidden":"Page open on screen"}"></span><button class="lnk" data-do="vstu" data-u="${esc(o.x.uid)}" title="Every day of ${esc(visName(o.x))}">${esc(visName(o.x))}</button></td><td>${visLink(o.x.page,o.x.title||o.x.page||"–")}</td><td class="nw">${cur?"since "+visT(cur.a):""}</td><td class="nw">${visDur(o.sum.sec)} today</td><td class="nw ${ago==="now"?"vnow":"muted"}">${ago}</td></tr>`};
+    return `<div class="box vbox"><h2>${esc(g.name)} <small class="vcount">🟢 ${ons.length} online${g.id!=="test"&&g.id!=="none"&&ro?" of "+ro:""}</small></h2>`
+      +(ons.length?`<table class="vt"><thead><tr><th>Student</th><th>On this page</th><th>This visit</th><th>Time</th><th>Last seen</th></tr></thead><tbody>${ons.map(row).join("")}</tbody></table>`:`<p class="muted">Nobody online now.</p>`)
+      +(off.length?`<p class="vearly"><b>Earlier today:</b> ${off.map(o=>`<button class="chip" data-do="vstu" data-u="${esc(o.x.uid)}" title="${esc(visDur(o.sum.sec))} · last seen ${visT(o.sum.lastSeen)}">${esc(visName(o.x))} <small>${visT(o.sum.first)}–${visT(o.sum.lastSeen)}</small></button>`).join(" ")}</p>`:"")+`</div>`};
+  return `<div class="box vsum"><b class="vbig">🟢 ${tot}</b> <span>${tot===1?"student":"students"} online now · ${L.filter(o=>visGroup(o.x)!=="test").length} on the site today</span></div>`+visChips(gsel)+gs.map(box).join("")}
+function visHist(gsel){const today=visDay(Date.now()),day=S.on.day||today;visDayLoad(day);
+  const shift=n=>{const d=new Date(day+"T12:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+  const nav=`<div class="box vnav"><button data-do="vday" data-d="${shift(-1)}" title="The day before">‹</button><input type="date" id="vday" value="${day}" max="${today}"><button data-do="vday" data-d="${shift(1)}" ${day>=today?"disabled":""} title="The day after">›</button>`
+    +`<b>${esc(new Date(day+"T12:00").toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</b>${day!==today?` <button class="g" data-do="vday" data-d="${today}">Today</button>`:""}</div>`;
+  const list=VIS.days[day];if(!list)return nav+`<div class="box"><p class="muted">Loading…</p></div>`;
+  const L=list.map(x=>({x,sum:visSum(x)})),gs=visGroups(list,gsel);
+  const box=g=>{const mine=L.filter(o=>visGroup(o.x)===g.id).sort((a,b)=>a.sum.first-b.sum.first),here=new Set(mine.map(o=>o.x.uid));
+    const away=g.id==="test"||g.id==="none"?[]:Object.values(S.P||{}).filter(s=>!s.tester&&s.group===g.id&&!here.has(s.uid)).sort(byName);
+    const row=o=>{const open=S.on.open===o.x.id,top=o.sum.pages.slice(0,3);
+      return `<tr class="vrow ${open?"on":""}" data-do="vopen" data-id="${esc(o.x.id)}"><td><button class="lnk" data-do="vstu" data-u="${esc(o.x.uid)}" title="Every day of ${esc(visName(o.x))}">${esc(visName(o.x))}</button></td><td class="nw">${visT(o.sum.first)}–${visT(o.sum.lastSeen)}</td><td class="nw"><b>${visDur(o.sum.sec)}</b></td><td>${o.sum.vs.length}</td><td class="vtop">${top.map(p=>esc(p.n)).join(" · ")}${o.sum.pages.length>3?` <small class="muted">+${o.sum.pages.length-3}</small>`:""}</td><td class="crx">${open?"▲":"▼"}</td></tr>`
+        +(open?`<tr class="vdet"><td colspan="6">${visDetail(o.sum)}</td></tr>`:"")};
+    return `<div class="box vbox"><h2>${esc(g.name)} <small class="vcount">${mine.length} on the site</small></h2>`
+      +(mine.length?`<div class="qwrap"><table class="vt"><thead><tr><th>Student</th><th>From – to</th><th>Time</th><th>Visits</th><th>Pages most used</th><th></th></tr></thead><tbody>${mine.map(row).join("")}</tbody></table></div>`:`<p class="muted">Nobody this day.</p>`)
+      +(away.length&&mine.length?`<p class="vearly"><b>Not on the site:</b> ${away.map(s=>esc(fullName(s))).join(" · ")}</p>`:"")+`</div>`};
+  return nav+visChips(gsel)+(list.err?`<div class="box"><p class="muted">Could not read this day.</p></div>`:"")+gs.map(box).join("")
+    +`<p class="muted vnote">Saved from 13 Nov 2026 on. The time counts only while a page is on screen; a visit ends after 10 minutes away.</p>`}
+const visDetail=sum=>sum.vs.map(v=>`<div class="vvis"><b>${visT(v.a)}–${visT(v.b)}</b> <small class="muted">${visDur(v.sec)}</small><ul>${v.p.map(p=>`<li><span>${visLink(p.u,p.n)}</span><small>${visDur(p.s)}</small></li>`).join("")}</ul></div>`).join("");
+function visStu(uid){visStuLoad(uid);const list=VIS.stu[uid],s=(S.P||{})[uid];
+  const back=`<p class="crumb"><a class="back" href="#" data-do="vstu" data-u="">‹ Back to ${S.on.day?esc(new Date(S.on.day+"T12:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"})):"the day"}</a></p>`;
+  if(!list)return back+`<div class="box"><p class="muted">Loading…</p></div>`;
+  const L=list.map(x=>({x,sum:visSum(x)})).sort((a,b)=>b.x.day.localeCompare(a.x.day)),nm=s?fullName(s):L[0]?visName(L[0].x):uid;
+  const tot=L.reduce((n,o)=>n+o.sum.sec,0);
+  return back+`<div class="box vbox"><h2>${esc(nm)} <small class="vcount">${plural(L.length,"day")} · ${visDur(tot)} in all</small></h2>`
+    +(L.length?`<table class="vt"><thead><tr><th>Day</th><th>From – to</th><th>Time</th><th>Visits</th><th></th></tr></thead><tbody>${L.map(o=>{const open=S.on.open===o.x.id;
+      return `<tr class="vrow ${open?"on":""}" data-do="vopen" data-id="${esc(o.x.id)}"><td><b>${esc(new Date(o.x.day+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}))}</b></td><td class="nw">${visT(o.sum.first)}–${visT(o.sum.lastSeen)}</td><td class="nw"><b>${visDur(o.sum.sec)}</b></td><td>${o.sum.vs.length}</td><td class="crx">${open?"▲":"▼"}</td></tr>`
+        +(open?`<tr class="vdet"><td colspan="5">${visDetail(o.sum)}</td></tr>`:"")}).join("")}</tbody></table>`:`<p class="muted">No visits saved yet.</p>`)+`</div>`}
 function qaTab(){
   const lss=EL_LS.filter(l=>!((window.EL_GRADING||{})[l.id]||{}).only);
   if(!lss.some(l=>l.id===S.qa.ls))S.qa.ls=(lss.filter(l=>(S.D.ls[l.id]||{}).status==="open").pop()||lss[lss.length-1]).id;
@@ -4342,6 +4441,7 @@ function peSave(reset){const h=S.peX;if(!h)return;const {x,o}=h;
 document.addEventListener("click",e=>{if(!SV.open)return;const a=e.target.closest("#fsctl");if(a&&!e.target.closest("[data-sv]"))return;
   setTimeout(()=>{SV.open=false;fsDraw()},0)});   // 👁 Student view list closes on a tap outside it or once a student is opened
 document.addEventListener("input",e=>{if(e.target.id==="pe-day")peWarn()});
+document.addEventListener("change",e=>{if(e.target.id==="vday"&&e.target.value){S.on.day=e.target.value;S.on.open=null;render()}});
 document.addEventListener("change",e=>{if(e.target.classList.contains("petab"))e.target.closest("label").classList.toggle("on",e.target.checked)});
 // ---- events
 document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!t||t.tagName==="SELECT")return;const k=t.dataset,u=k.u,a=k.a&&cat.find(x=>x.id===k.a);
@@ -4509,7 +4609,9 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-do]");if(!
     crit:()=>critPanel(k.c),stu:()=>stuPanel(u),cell:()=>{bothLs(k.a);cellPanel(u,k.a)},close:()=>$("#dlg").close(),
     qa:()=>{if(k.f==="g")S.qa.g=k.v;else if(k.f==="all")S.qa.f.all=true;else{S.qa.f[k.f]=k.v;S.qa.f.all=false}render()},
     qago:()=>{S.qa.ls=S.ls;S.qa.g=S.g;S.g="qa";S.place="home";render();scrollTo(0,0)},
-    crg:()=>{S.cr.g=k.g;render()},cro:()=>{S.cr.open=S.cr.open===k.id?null:k.id;render()},
+    crg:()=>{S.cr.g=k.g;render()},
+    vv:()=>{S.on.v=k.v;S.on.stu=null;S.on.open=null;render()},vg:()=>{S.on.g=k.g;render()},vday:()=>{S.on.day=k.d;S.on.open=null;render()},
+    vopen:()=>{if(e.target.closest("a[href]:not([data-do])"))return;S.on.open=S.on.open===k.id?null:k.id;render()},vstu:()=>{e.preventDefault();S.on.stu=k.u||null;S.on.open=null;if(k.u)S.on.v="hist";render();scrollTo(0,0)},cro:()=>{S.cr.open=S.cr.open===k.id?null:k.id;render()},
     pdfask:()=>pdfAsk(),pdf:()=>{$("#dlg").close();markingPdf(k.r)},pdfprint:()=>print(),pdfback:()=>{document.body.classList.remove("pdfmode");$("#pdf").innerHTML=""},
     // assessment: one click saves and redraws
     grade:()=>gradePanel(u),ygrade:()=>{S.ls=k.ls;gradePanel(u)},ycomp:()=>compPanel(u,k.s,k.k,k.tr==="1"),yshare:()=>{S.yShare=k.v;render()},yls:()=>{S.year=false;S.ls=k.ls;render();scrollTo(0,0)},deg:()=>degPanel(u,k.c),zero:()=>{S.zero=k.z==="1";render();again()},

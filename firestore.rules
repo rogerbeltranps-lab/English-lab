@@ -216,6 +216,26 @@ service cloud.firestore {
         && request.resource.data.name is string && request.resource.data.name.size() <= 120
         && request.resource.data.seen == request.time && request.resource.data.off is bool && request.resource.data.get('fs', true) is bool;
     }
+    // 🟢 Online now + 🕘 Visit history (Roger, 13 Nov 2026: "Is it possible to see who is conected on the website? … And I want to have a historial"):
+    // visits/{day}_{uid} = {uid, email, name, group, day, tester?, last, page, title, s: visits of that day with seconds per page, t: page titles},
+    // written by the student's own pages (shared/js/el-visits.js: a beat when a page opens, at most one a minute, and every 4 minutes on screen).
+    // Only the teacher reads or deletes them.
+    match /visits/{id} {
+      allow read, delete: if isTeacher();
+      allow create, update: if signedIn()
+        && id == request.resource.data.day + '_' + request.auth.uid
+        && request.resource.data.day is string && request.resource.data.day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.keys().hasOnly(['uid','email','name','group','day','tester','last','page','title','s','t'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == myEmail()
+        && request.resource.data.last == request.time
+        && (isTester() || request.resource.data.get('group', null) == rosterGroup())
+        && request.resource.data.get('group', null) in [null, '2ESOA', '2ESOB', '4ESOA', '4ESOB']
+        && request.resource.data.get('tester', false) == isTester()
+        && shortText(request.resource.data.get('name', null), 200) && shortText(request.resource.data.get('page', null), 300) && shortText(request.resource.data.get('title', null), 200)
+        && request.resource.data.s is map && request.resource.data.s.size() <= 60
+        && request.resource.data.t is map && request.resource.data.t.size() <= 200;
+    }
     match /buzz/{group} {
       allow read: if isTeacher() || inGroup(group);
       allow write: if isTeacher();
