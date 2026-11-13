@@ -386,10 +386,10 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
    the margin and the page number are not drawn there. Only colours change here (the pages are measured before), so nothing moves. */
 .nb-page.nb-cvp,.nb-face.nb-cvp{background:var(--cv)}
 .nb-page.nb-cvp .nb-paper,.nb-face.nb-cvp .nb-paper{background:radial-gradient(120% 90% at 30% 20%,rgba(255,255,255,.10),transparent 60%),var(--cv-pat),linear-gradient(90deg,var(--cv-dk) 0 40px,rgba(0,0,0,.25) 40px 43px,var(--cv) 43px);color:#fff}
-/* 🎨 the student's cover (Roger, 13 Nov 2026: "Make it possible to change the design and colors of the cover"): .nb data-cv (colour) and
+/* 🎨 the student's cover (Roger, 13 Nov 2026: "Make it possible to change the design and colors of the cover"; green by default: "Set green as a default"): .nb data-cv (colour) and
    data-cvd (design), chosen with 🎨 My cover (el-notebook.js cvPick) */
-.nb{--cv:#1f3c73;--cv-dk:#132a55;--cv-pat:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(0,0,0,.05) 0 2px,transparent 2px 5px)}
-.nb[data-cv="red"]{--cv:#8e2430;--cv-dk:#5e1620}.nb[data-cv="green"]{--cv:#1f5c3f;--cv-dk:#123b28}.nb[data-cv="purple"]{--cv:#4a2c6e;--cv-dk:#2f1a48}
+.nb{--cv:#1f5c3f;--cv-dk:#123b28;--cv-pat:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(0,0,0,.05) 0 2px,transparent 2px 5px)}
+.nb[data-cv="blue"]{--cv:#1f3c73;--cv-dk:#132a55}.nb[data-cv="red"]{--cv:#8e2430;--cv-dk:#5e1620}.nb[data-cv="green"]{--cv:#1f5c3f;--cv-dk:#123b28}.nb[data-cv="purple"]{--cv:#4a2c6e;--cv-dk:#2f1a48}
 .nb[data-cv="black"]{--cv:#2a2d33;--cv-dk:#15171b}.nb[data-cv="pink"]{--cv:#a3365f;--cv-dk:#6d203e}.nb[data-cv="orange"]{--cv:#a8501c;--cv-dk:#6e3211}.nb[data-cv="teal"]{--cv:#1d5e66;--cv-dk:#103c42}
 .nb[data-cvd="dots"]{--cv-pat:radial-gradient(rgba(255,255,255,.16) 2px,transparent 2.6px) 0 0/18px 18px}
 .nb[data-cvd="stripes"]{--cv-pat:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 14px,transparent 14px 28px)}
