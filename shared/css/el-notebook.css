@@ -285,3 +285,51 @@ html.el-nb-plain .nb-stitle,html.el-nb-plain .nb-add input{font-family:var(--nb-
 @keyframes nbShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .nb-close{font-weight:700}
 @media (prefers-reduced-motion:reduce){.nb-shake{animation:none}}
+/* words on the pages can be selected to mark them (el-nocopy.js turns selection off on student pages; copying stays blocked) */
+.nb .nb-paper .nb-blk:not(.nb-note){-webkit-user-select:text;user-select:text}
+.nb .nb-ui,.nb .nb-stamp,.nb .nb-postit{-webkit-user-select:none;user-select:none}
+/* 📌 a post-it on top of each section of a learning path */
+.nb-postit{display:inline-block;margin:26px 0 6px -6px;padding:4px 16px 5px 12px;font:700 25px/30px var(--nb-hand);color:#2b2b2b;background:#ffe082;box-shadow:2px 3px 6px rgba(0,0,0,.14);transform:rotate(-1.6deg);border-radius:2px 2px 12px 2px}
+.nb-postit small{font:600 17px var(--nb-hand);color:#6b5d3a;margin-left:10px}
+.nb-blk:first-of-type>.nb-postit,.nb-cont .nb-postit{margin-top:12px}
+.nb-postit.k-vocab,.nb-stab.k-vocab{background:#c5e1a5}.nb-postit.k-grammar,.nb-stab.k-grammar{background:#b3e5fc}.nb-postit.k-read,.nb-stab.k-read{background:#ffccbc}
+.nb-postit.k-listen,.nb-stab.k-listen{background:#e1bee7}.nb-postit.k-other,.nb-stab.k-other{background:#ffe082}
+html.el-nb-plain .nb-postit{font-size:18px}
+/* ✏️ the student's answers, corrected in red pen */
+.nb-work{margin:14px 0 8px}
+.nb-wh{font:700 23px/32px var(--nb-hand);color:var(--nb-black)}
+.nb-wh small{font-weight:500;font-size:18px;color:var(--nb-pencil)}
+.nb-ans{margin:0;padding-left:30px;font:500 21px/32px var(--nb-hand);color:var(--nb-black)}
+.nb-ans li{margin:0;padding:0}
+.nb-ans li::marker{color:var(--nb-pencil)}
+.nb-giv{color:var(--nb-ink);font:600 23px/1 var(--nb-hand)}
+.nb-corr{position:relative;display:inline-block;padding-top:14px;line-height:18px}
+.nb-corr s.nb-giv{text-decoration:line-through;text-decoration-color:var(--nb-red);text-decoration-thickness:2.5px}
+.nb-fix{position:absolute;left:4px;top:-6px;white-space:nowrap;font:700 19px/1 "Kalam",var(--nb-teacher);color:var(--nb-red);transform:rotate(-4deg)}
+.nb-fix.in{position:static;display:inline;white-space:normal;transform:none;margin-left:2px}
+.nb-x{text-decoration:line-through;text-decoration-color:var(--nb-red);text-decoration-thickness:2.5px}
+.nb-tick,.nb-cross{font-style:normal;font:700 24px/1 var(--nb-teacher);color:var(--nb-red);margin-left:4px}
+.nb-tick{color:var(--nb-green)}
+.nb-arrow{color:var(--nb-pencil)}
+html.el-nb-plain .nb-ans,html.el-nb-plain .nb-giv{font-size:16px}html.el-nb-plain .nb-fix{font-size:14px}
+/* 📌 the sections of the learning path on the screen, sticking out of the book's right edge */
+.nb-side{position:absolute;right:-34px;top:26px;bottom:26px;width:34px;display:flex;flex-direction:column;gap:6px;z-index:1;pointer-events:none}
+.nb-stab{pointer-events:auto;writing-mode:vertical-rl;border:0;border-radius:0 8px 8px 0;padding:10px 4px 10px 6px;font:700 17px/1 var(--nb-hand);color:#2b2b2b;cursor:pointer;box-shadow:2px 1px 3px rgba(0,0,0,.12);max-height:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transform:translateX(-6px);transition:transform .15s}
+.nb-stab.on,.nb-stab:hover{transform:none}
+.nb-stab:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+@media (min-width:900px){.nb-spread{margin-right:30px}}
+@media (max-width:899px){.nb-side{display:none}}
+@media print{.nb-side{display:none!important}}
+/* 🟨 notes as post-its */
+.nb-notes.nb-pi{width:auto;max-width:430px;padding:10px 16px 12px;margin:8px 0 8px 6px;box-shadow:2px 4px 8px rgba(0,0,0,.15);transform:rotate(-1deg);border-radius:2px 2px 14px 2px}
+.nb-notes.pi-y{background:#fff59d}.nb-notes.pi-p{background:#f8bbd0}.nb-notes.pi-g{background:#c8e6c9}.nb-notes.pi-b{background:#bbdefb}
+.nb-note:nth-of-type(even) .nb-notes.nb-pi{transform:rotate(1.2deg)}
+.nb-pis{display:inline-flex;gap:4px;margin-left:6px}
+.nb-pib{width:26px;height:26px;border-radius:5px;border:2px solid #d5dce5;cursor:pointer;padding:0}
+.nb-pib[aria-pressed="true"]{border-color:#1f4fb5;box-shadow:0 0 0 2px #fff inset}
+.nb-pib.pi-n{background:repeating-linear-gradient(#fffef8 0 6px,#c7d9ee 6px 7px)}.nb-pib.pi-y{background:#fff59d}.nb-pib.pi-p{background:#f8bbd0}.nb-pib.pi-g{background:#c8e6c9}.nb-pib.pi-b{background:#bbdefb}
+.nb-ed-sheet[data-pi="y"] .nb-paper{background-color:#fff9c4}.nb-ed-sheet[data-pi="p"] .nb-paper{background-color:#fce4ec}.nb-ed-sheet[data-pi="g"] .nb-paper{background-color:#e8f5e9}.nb-ed-sheet[data-pi="b"] .nb-paper{background-color:#e3f2fd}
+/* 🔍 the dictionary floats over the notebook, in the free corner under the book */
+html.el-nb-full .eldict-fab{z-index:2147482500!important;position:fixed!important;left:auto!important;top:auto!important;right:18px!important;bottom:4px!important}
+html.el-nb-full .eldict,html.el-nb-full .eldict-tipbox{z-index:2147482600!important}
+@media (max-width:899px){.nb-bt.nb-bt-n{width:56px}}

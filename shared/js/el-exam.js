@@ -48,22 +48,50 @@ window.ELExam = (function () {
     for (const a of lps()) {
       if (pl.dropped.includes(a.id)) { dropped.push(a); continue; }
       const secs = (window.EL_SECTIONS || {})[a.id] || [], tabs = secs.filter(([id]) => done && done[a.id + '#' + id]).map(([id, name]) => ({ id, name, day: done[a.id + '#' + id] }));
-      if (!tabs.length && !(played && played[a.n])) continue;
+      const st = mine0(a.id), tried = st && st.items && Object.keys(st.items).length;
+      if (!tabs.length && !(played && played[a.n]) && !tried) continue;
       const LP = await lpData(a.href, level === 'native');
       const panels = ((LP && LP.panels) || []).map(p => level === 'native' && LP.native && LP.native[p.id] ? Object.assign({ id: p.id }, LP.native[p.id]) : p);
       const on = new Set(tabs.map(x => x.id)), mine = panels.filter(p => on.has(p.id));
-      const terms = [], grammar = [];
-      mine.forEach(p => {
-        if (Array.isArray(p.groups) && p.type !== 'self') forLevel(p.groups, level).forEach(g => {
-          const items = (g.items || []).filter(Array.isArray).map(x => ({ en: x[0], ca: x[1], ex: x[2] }));
-          if (items.length) terms.push({ g: tx(g.g), items });
-        });
-        const ex = forLevel(p.explain, level).map(tx).filter(Boolean);
-        if (ex.length) grammar.push({ title: tx(p.title), boxes: ex });
+      const terms = [], grammar = [], parts = [];
+      const termsOf = p => Array.isArray(p.groups) && p.type !== 'self' ? forLevel(p.groups, level).map(g => ({ g: tx(g.g), items: (g.items || []).filter(Array.isArray).map(x => ({ en: x[0], ca: x[1], ex: x[2] })) })).filter(g => g.items.length) : [];
+      const gramOf = p => { const ex = forLevel(p.explain, level).map(tx).filter(Boolean); return ex.length ? [{ title: tx(p.title), boxes: ex }] : []; };
+      mine.forEach(p => { terms.push(...termsOf(p)); grammar.push(...gramOf(p)); });
+      // 📓 the notebook, tab by tab in the learning path's order: what was done in class (key terms, how it works) and the student's own
+      // answers to the activities, their first try only, as the teacher would correct them (Roger, 13 Nov 2026)
+      panels.forEach(p => {
+        const sec = secs.find(([id]) => id === p.id), tab = tabs.find(x => x.id === p.id), work = firstTry(p, st, tx);
+        if (!tab && !work) return;
+        parts.push({ id: p.id, name: sec ? sec[1] : tx(p.tab) || tx(p.title), title: tx(p.title), day: tab ? tab.day : null, kind: p.type === 'vocab' || (Array.isArray(p.groups) && !p.explain) ? 'vocab' : p.explain ? 'grammar' : /read|book/i.test(p.id + ' ' + tx(p.tab)) ? 'read' : /listen/i.test(p.id) ? 'listen' : 'other',
+          terms: tab ? termsOf(p) : [], grammar: tab ? gramOf(p) : [], work });
       });
-      out.push(Object.assign({}, a, { tabs, terms, grammar }));
+      out.push(Object.assign({}, a, { tabs, terms, grammar, parts }));
     }
     return { lps: out, dropped, exam: pl.exam, sample: sample() };
+  }
+  // the student's own state of a learning path (the engine's localStorage, kept in sync by el-cloud.js): its first catalog key
+  function mine0(id) {
+    const a = (window.EL_CATALOG || []).find(x => x.id === id), k = a && a.keys && a.keys[0]; if (!k) return null;
+    try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; }
+  }
+  /* A panel's first check (ls2-engine.js firstItems: state.items[panel_route] = {level, date, q: the question's place in the list, ok, a:
+     what was typed, or the option chosen with 0 = the right one}): the questions with the student's answers, the right ones, ✓ / ✗.
+     The vocabulary practice is kept under "vocab". Only the first try, whatever the route it was done at. */
+  function firstTry(p, st, tx) {
+    const IT = (st && st.items) || {}, id = p.type === 'vocab' ? 'vocab' : p.id, src = p.type === 'vocab' ? p.practice : p.items;
+    if (!src) return null;
+    const rec = Object.keys(IT).filter(k => k.slice(0, id.length + 1) === id + '_' && ROUTES.includes(k.slice(id.length + 1))).map(k => IT[k]).filter(r => r && Array.isArray(r.q))
+      .sort((x, y) => String(x.date || '').localeCompare(String(y.date || '')))[0];
+    if (!rec) return null;
+    const list = Array.isArray(src) ? src : forLevel(src, rec.level);
+    const qs = rec.q.map((qi, j) => {
+      const it = list[qi]; if (!it || typeof it !== 'object') return null;
+      const mc = Array.isArray(it.o), a = (rec.a || [])[j];
+      return { q: tx(it.q), mc, right: mc ? tx(it.o[0]) : tx(Array.isArray(it.a) ? it.a[0] : it.a), given: mc ? (a == null ? '' : tx(it.o[+a])) : String(a == null ? '' : a), ok: !!(rec.ok || [])[j], guess: !!it.guess };
+    }).filter(Boolean);
+    if (!qs.length) return null;
+    const scored = qs.filter(x => !x.guess);
+    return { day: String(rec.date || '').slice(0, 10), qs, right: scored.filter(x => x.ok).length, of: scored.length };
   }
   return { build, lps, plan, ROUTES };
 })();

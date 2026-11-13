@@ -14,7 +14,7 @@
   var MODE = 'both';   // 'both': EN ↔ CA, LS list + online · 'en-ca': English → Catalan only · 'ls': this LS's word list only
   var d = document, path = location.pathname, here = path.split('/').pop() || 'index.html';
   var base = path.slice(0, path.lastIndexOf('/') + 1);
-  if (!/\/(?:2|4)eso\/[^/]+\/[^/]+\.html$/.test(path) || /\/my-real-routine\//.test(path)) return;
+  if (!/\/(?:2|4)eso\/[^/]+\/(?:[^/]+\.html)?$/.test(path) || /\/my-real-routine\//.test(path)) return;   // a learning path, or the LS page (📓 the notebook loads it)
   if (/^(recall-checkpoint-\d+|sample-exam|reflect)\.html$/.test(here)) return;
   var ELD = window.ELDict = { words: [], answers: [] };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
@@ -59,12 +59,13 @@
     var pages = [], re = /\['([\w-]+\.html)',\s*'(\d+)\s*·\s*([^']*)'\]/g, m;
     while ((m = re.exec(eng))) pages.push({ f: m[1], n: +m[2], fp: /final product/i.test(m[3]) });
     var me = pages.filter(function (p) { return p.f === here; })[0];
-    if (!pages.length || !me || me.fp) return false;   // not a learning path of an LS2-engine LS (or its final product)
+    var home = here === 'index.html';   // the LS page: 📓 the notebook (el-notebook.js loads this file there)
+    if (!pages.length || (!me && !home) || (me && me.fp)) return false;   // not a learning path of an LS2-engine LS (or its final product)
     return Promise.all(pages.map(function (p) {
       return fetch(base + 'data/' + p.f.replace(/\.html$/, '.js')).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; });
     })).then(function (srcs) {   // in the LS's order, so a word is labelled with the first learning path that has it
       srcs.forEach(function (src, i) { if (!src) return; var x = run(src); harvest(x, pages[i].n); if (pages[i].f === here) answers(x); });
-      if (window.LP) answers(window.LP); return true;
+      if (window.LP && !home) answers(window.LP); return true;
     });
   });
 
@@ -199,7 +200,8 @@
      it is only the 🔍 (Roger, 12 Nov 2026: "pots fer que es mogui? i que es faci petit com la lupa el primer cop que el toques o el facis
      servir?"). Per student on this browser: el_dict_used_<uid>. */
   function usedKey() { return seenKey().replace('el_dict_seen', 'el_dict_used'); }
-  function used() { try { return !!localStorage.getItem(usedKey()); } catch (e) { return false; } }
+  // only the 🔍, always (Roger, 13 Nov 2026: "que el diccionari, només la lupa, surti flotant sempre"): no "Dictionary" label, no wiggle
+  function used() { return true; }
   function label() {
     var u = used(), k = (u ? 'm' : 'f') + ca();
     if (fab.dataset.k === k) return; fab.dataset.k = k;
@@ -268,7 +270,7 @@
     }
     fab.style.left = ''; fab.style.top = ''; fab.style.right = '';
     var row = d.querySelector('.topbar .toprow'), bar = row && row.closest('.topbar');
-    var top = !!row && innerWidth > 640 && !d.body.classList.contains('elslpfs') && getComputedStyle(bar).display !== 'none';
+    var top = false;   // always floating (Roger, 13 Nov 2026), no longer in the top bar
     if (top && fab.parentNode !== row) { row.appendChild(fab); fab.classList.add('intop'); fab.style.bottom = ''; }
     if (!top && fab.parentNode !== d.body) { d.body.appendChild(fab); fab.classList.remove('intop'); }
     if (top) {

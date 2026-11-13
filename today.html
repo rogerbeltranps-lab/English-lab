@@ -128,6 +128,11 @@ a.hal.games.nbk::before{content:"";position:absolute;left:7px;top:10px;bottom:10
 a.hal.games.nbk .lt b{font:700 27px/1.15 var(--nb-hand,cursive);color:#23262b}a.hal.games.nbk .glsn{font-family:var(--nb-hand,cursive)}
 a.hal.games.nbk small{font:500 19px/1.25 var(--nb-hand,cursive);color:#5f6874}a.hal.games.nbk .gopen{font:700 20px var(--nb-hand,cursive);color:#1f4fb5}
 a.hal.games.nbk .gnote{background:#fffef8;border-color:#1f4fb5;color:#1f4fb5}a.hal.games.nbk:hover{border-color:#1f4fb5}
+.nbswap .hl>a.hal.games.nbk{flex:1 1 auto;align-content:center;padding:22px 26px 22px 70px!important;background:linear-gradient(90deg,transparent 54px,#ef9a9a 54px 56px,transparent 56px),repeating-linear-gradient(#fffef8 0 35px,#c7d9ee 35px 36px)}
+.nbswap a.hal.games.nbk::before{left:14px;width:28px;background:radial-gradient(circle at 14px 50%,#fffef8 0 5px,#8a939d 5.5px 8.5px,transparent 9px) 0 0/28px 34px repeat-y}
+.nbswap a.hal.games.nbk .lt b{font-size:42px;line-height:1.05}.nbswap a.hal.games.nbk small{font-size:24px;line-height:1.3;margin-top:4px}.nbswap a.hal.games.nbk .gopen{font-size:28px}
+.nbswap a.hal.games.nbk .gtop{margin-top:14px!important}.nbswap a.hal.games.nbk .gnote{font-size:15px;padding:8px 14px}.nbswap a.hal.games.nbk .gnote i{font-size:28px}
+.nbswap .hr>.cont{padding:16px 18px;gap:6px}.nbswap .hr>.cont .ct{font-size:18px}.nbswap .hr>.cont .cs{font-size:14px}.nbswap .hr>.cont a.cgo{padding:10px 16px}
 .rcards{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;max-width:760px}.rls{margin:18px 0 34px}.rls+.rls{border-top:2px solid #e2e8f0;padding-top:22px}.rlsh{font-size:1.45rem;letter-spacing:-.01em;margin:0 0 12px}.rlists{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:1100px;margin-top:14px}.rlist{margin:0;border-radius:18px;padding:18px 22px}.rlist h3{margin:0 0 8px;font-size:19px}.rlist ul{margin:0;padding:0;list-style:none}.rlist li{padding:9px 0;border-top:1px solid #e2e8f0;font-size:15.5px;line-height:1.45}.rlist li:first-child{border-top:0}@media (max-width:900px){.rlists{grid-template-columns:1fr}}.rcards.one .rcard{padding:24px 26px}.rcards.one img{width:130px}@media (max-width:600px){.rcard{flex-wrap:wrap}.rcards.one .rcard{padding:18px}}.rcard{display:flex;gap:16px;align-items:flex-start;border-radius:18px;padding:18px 20px;border:1px solid}.rcard.book{background:#fff7ed;border-color:#fed7aa}.rcard.lang{background:#f0fdf4;border-color:#bbf7d0}
 .rcard img{width:78px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.18);flex:none}.rcard .rb{display:flex;flex-direction:column;gap:4px;min-width:0}.rcard .rk{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9a3412}.rcard.lang .rk{color:#166534}.rcard b{font-size:19px}.rcard p{margin:2px 0 6px;color:#475569;font-size:14px}
 .rrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}a.rgo{background:#c2410c;color:#fff;border-radius:12px;padding:10px 16px;font-weight:800;text-decoration:none;font-size:15px}.rcard.lang a.rgo{background:#15803d}a.rgo:hover{outline:3px solid #fdba74}.rcard.lang a.rgo:hover{outline-color:#86efac}.rcards:has(.rcard.lang){max-width:1100px}.rcards.one .rcard.lang{align-items:center;padding:12px 18px;gap:14px}.rcard.lang .rpi{font-size:30px;line-height:1;flex:none}.rcard.lang .rb{flex:1 1 220px;gap:2px}.rcard.lang b{font-size:17px}.rcard.lang p{margin:0;font-size:14px}.rcard.lang .rrow{flex:none}a.rlk{color:#166534;font-weight:700;text-decoration:none;font-size:14px;padding:8px 4px}a.rlk:hover{text-decoration:underline}
@@ -503,7 +508,11 @@ function homeHtml(lss,ls,info){
   // and route"): the route name and its CEFR level, e.g. "Core · A2" (never the old route descriptions)
   const lvBox=levelBox(ls);
   const lvEl=document.getElementById("lvl");if(lvEl)lvEl.innerHTML=lvBox;
-  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gamesCard(ls)}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
+  // 📓 from LS2 on the notebook takes the big place on the left and ▶ Continue goes to the right (Roger, 13 Nov 2026: "que la llibreta
+  // estigui on està el requadre blau")
+  const gc=gamesCard(ls);
+  if(/class="hal games nbk"/.test(gc))return `<div class="hgrid nbswap"><div class="hl">${alerts}${gc}</div><div class="hr">${cont}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx);
+  return `<div class="hgrid"><div class="hl">${alerts}${cont}</div><div class="hr">${gc}<div class="tiles">${tiles}</div></div></div>`+lsNowHtml(ls,info,nx)}
 // 📖 Books and 🔤 Grammar and vocabulary, two places in the left menu (#books, #language; Roger, 7 Nov 2026): the LS reading book and the
 // vocabulary and grammar summary of the student's level (the same PDFs as the LS page's 📚 Study place, ls.story and ls.study in EL_LS),
 // the teacher and testers every level. Nothing until the student has a level; no new Firestore reads.
