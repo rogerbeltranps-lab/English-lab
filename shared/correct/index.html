@@ -7,7 +7,8 @@
 <title>Correct together</title>
 <link rel="icon" type="image/png" href="/English-lab/favicon-192.png">
 <!-- ✅ Correct together (Roger, 12 Nov 2026): the class corrects a reading on the projector, every level at once.
-     ?ls=<course>/<ls folder>&lp=<data file>&tab=read|log[&g=<group id>][&embed=1]
+     ?ls=<course>/<ls folder>&lp=<data file>&tab=read|log|grammar[&g=<group id>][&embed=1]
+     tab=grammar (pages in EL_CORRECT_GRAMMAR, el-catalog.js): 📘 How it works together, ⏱ Your turn, then the sentences one by one.
      The Reading tab starts with 📖 Read together (one level's version, a paragraph at a time) and ⏱ Your turn (a countdown while each
      student answers their own level), then the questions. Opened from the class tab (✅ Correct on the class mode bar, on a Reading or Reading log tab) or from 📋 Today; embed=1: it sits over
      the class tab (shared/correct/open.js) and ✕ Close takes it away. Teacher only. Reads the Learning Path's data (never changes it) and,
@@ -61,6 +62,16 @@ table.log{border-collapse:collapse;width:100%;table-layout:fixed}
 .tbtn button.on{border-color:var(--blue);color:var(--blue)}.tbtn .pri2{background:#ffd34d;border-color:#ffd34d}.sm{font-size:14px;padding:4px 12px;margin-left:8px}
 .ca{font-size:18px;color:var(--muted);margin:-6px 0 4px}.done{font-size:18px;margin-top:18px}
 #tmini{font-weight:800;color:#ffd34d;font-variant-numeric:tabular-nums}
+/* 📘 grammar: the explanation boxes, then one gap-fill sentence a slide */
+h1.gt{font-size:26px;margin:2px 0 12px}
+.gxs{max-width:1100px;display:grid;gap:10px}.gx{border:2px solid var(--line);border-left:6px solid var(--line);border-radius:12px;padding:10px 16px;font-size:21px;line-height:1.5;cursor:pointer}
+.gx .chip{font-size:13px;margin-bottom:4px;display:inline-block}.gx .en em{color:#1d4ed8;font-style:normal;font-weight:600}
+.gxs.focus .gx{opacity:.5}.gxs.focus .gx.now{opacity:1;border-color:#ffd34d;border-left-color:#f5b800;background:#fffbea}
+.cax{font-size:15px;color:var(--muted);margin-top:4px}.cax em{font-style:normal}
+h1.gq{font-size:36px;line-height:1.35;font-weight:700}h1.gq .blank{color:#9aa4ad;letter-spacing:1px}h1.gq .fa{color:var(--ok);background:var(--okbg);border-bottom:3px solid var(--okb);border-radius:6px;padding:0 6px}
+h1.gq .cue{font-size:.6em;color:var(--muted);font-weight:600}
+.why{font-size:20px;margin:14px 0 6px;padding:10px 14px;border-radius:12px;background:#fff7e0;border:2px solid #f5d27a;max-width:1000px}
+@media (max-width:900px){.gx{font-size:17px}h1.gq{font-size:26px}}
 @media (max-width:900px){.rt p{font-size:19px}.timer{font-size:80px}}
 @media (max-width:900px){.where{grid-template-columns:1fr 1fr}h1{font-size:26px}.ans{font-size:22px}.class{float:none;text-align:left;max-width:none;margin:0 0 8px}.bar .keys{display:none}}
 @media (max-width:560px){.where{grid-template-columns:1fr}.top{padding:8px 16px}main{padding:10px 16px}.card{padding:14px 16px}.log td.lab{width:34%}}

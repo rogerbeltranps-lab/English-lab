@@ -340,6 +340,10 @@ window.elTodoList=function(ls,info,gid,doneOf,isDone,p,gi){const st=info&&info.s
       const tabs=secs.filter(([id])=>!off.includes(id)&&dueT(a,id)&&elSecSteps(a,id).length&&!secDone(a,id,done));
       if(secs.length&&!tabs.length)return null;   // what is open and due is done; the rest is still locked or for a later class
       return {a,tabs,due:d,late:!!(d&&d<today),cp:elCheckpointMissing(a,doneOf,y=>elLpOpen(y,info,gid))}}).filter(Boolean)};
+// 📘 Grammar together (Roger, 12 Nov 2026: "the same we did with the reading but with the grammar section. Start with the grammar of the
+// LP3, LS2"): the learning paths ("<course>/<ls folder>/<page>") whose Grammar tab gets ✅ Correct (shared/correct/, tab=grammar).
+// Another one: add it here (its grammar step: type typed, explain boxes and items with r: tags, like LP3).
+window.EL_CORRECT_GRAMMAR=["2eso/free-time-live/now-or-usually","4eso/seasons-and-celebrations/where-traditions-come-from"];
 // "LP3" in the group's plan → its learning path ("LP3 Where traditions come from" somewhere in the plan): {"3": activity}
 window.elLpNumMap=function(ls,p,gi){const m={},acts=(window.EL_CATALOG||[]).filter(a=>a.ls===ls),sh=x=>String(x).split(/[:(]/)[0].trim().toLowerCase();
   ((p&&p.rows)||[]).forEach(r=>String(r.g?r.g[gi]||"":r.what||"").replace(/LP(\d+) ([A-Z][^(\n·]*)/g,(_,n,name)=>{const nm=name.trim().toLowerCase(),a=acts.find(y=>sh(y.title).startsWith(nm)||nm.startsWith(sh(y.title)));if(a&&!m[n])m[n]=a}));

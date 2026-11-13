@@ -134,7 +134,36 @@
     return html;
   }
 
-  const api = { ROUTES, NAME, byLevel, forLevel, qid, esc, plain, units, evidence, slidesFor, snippet, textFor, answerOf };
+  /* ---------- grammar (Roger, 12 Nov 2026: "the same we did with the reading but with the grammar section", LS2 LP3 first) ---------- */
+  // the "How it works" boxes of a grammar step (panel.explain, r: / only: tags like the questions), each with the levels that have it:
+  // Everyone first, then Base, Core+, Plus (the data's order inside each group), the same order as the question slides
+  function boxesFor(explain, routes) {
+    return (explain || []).map((e, n) => ({ n, en: typeof e === 'string' ? e : (e.en || e.ca || ''), ca: typeof e === 'string' ? '' : (e.ca || ''), on: routes.filter(r => forLevel([e], r).length) }))
+      .filter(b => b.on.length).map(b => Object.assign(b, { all: b.on.length === routes.length }))
+      .sort((a, b) => (a.all ? -1 : ri(a.on[0])) - (b.all ? -1 : ri(b.on[0])) || a.n - b.n);
+  }
+  const boxLabel = (b, routes) => b.all ? 'Everyone' : b.on.length === 1 ? NAME[b.on[0]] + (b.on[0] !== routes[routes.length - 1] ? ' only' : '') : NAME[b.on[0]] + '+';
+  // the sentence of a gap-fill with the answer in its gap(s), as HTML: one gap (or a run of gaps "___ ___") takes the whole answer; gaps
+  // apart ("___ you usually ___ (train)") take a word each when the answer has as many words. A word the sentence writes with a capital
+  // ("November") keeps it; an answer that starts the sentence gets one. Cues in brackets ("(take)", "(té lloc)") are made small.
+  // open false: the gaps stay as gaps.
+  function fill(q, ans, open) {
+    const RUN = /_{2,}(?:\s+_{2,})*/g, runs = String(q).match(RUN) || [], caps = {};
+    String(q).replace(/[a-z,] ([A-Z][a-zà-ÿ]{2,})/g, (m, w) => { caps[w.toLowerCase()] = w; });
+    const words = String(ans || '').trim().split(/\s+/).map(w => caps[w.toLowerCase()] || w);
+    let i = 0;
+    const put = runs.length > 1 && words.length === runs.length ? () => words[i++] : () => (i++ ? '' : words.join(' '));
+    let h = esc(q).replace(RUN, (m, at, all) => {
+      if (!open) return '<span class="blank">' + m.replace(/_+/g, '______') + '</span>';
+      let w = put(); if (!w) return '…';
+      if (/(^|[.!?—→:]\s*|^[“"]?)$/.test(all.slice(0, at).replace(/<[^>]*>/g, '')) && !/^\s*$/.test(w)) w = w[0].toUpperCase() + w.slice(1);
+      return '<b class="fa">' + esc(w) + '</b>';
+    });
+    return h.replace(/\(([^()]{1,40})\)/g, '<small class="cue">($1)</small>');
+  }
+  const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/[^a-zà-ÿ0-9']+/g, ' ').trim();
+
+  const api = { ROUTES, NAME, byLevel, forLevel, qid, esc, plain, units, evidence, slidesFor, snippet, textFor, answerOf, boxesFor, boxLabel, fill, norm };
   root.ELCorrect = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -226,7 +226,7 @@ async function draw(){if(!box)return;
       if(!nos)body+=`<div class="lp">${E(lpLab(x,a))}${lt?`<small>⏱ ${lt} min</small>`:""}</div>`;
       g.its.forEach(it=>{const p=it.slice(it.indexOf("#")+1),n=its.push({ls:x,it,a,p})-1,m=mn(it),gm=isGame(p),now=!gm&&hereIs(a,p);tot+=m;
         const hw=live&&p&&!gm&&hwNext(x,D,it);
-        const cr=readingOf(a.path,p)?`<button class="crt" data-c="${n}" title="Correct this reading with the whole class on the projector: every level at once, question by question (the students stay where they are)">✅ Correct together</button>`:"";
+        const cr=readingOf(a.path,p)?`<button class="crt" data-c="${n}" title="${p==="grammar"?"Explain and correct this grammar with the whole class on the projector: every level at once, sentence by sentence":"Correct this reading with the whole class on the projector: every level at once, question by question"} (the students stay where they are)">✅ Correct together</button>`:"";
         const btn=`<button class="it ${now?"now":""}" data-i="${n}" title="${gm?"Open the game board here (🎓 Back to class mode brings you back)":"Go there: "+E(C.gname)+" follows"}">${m?`<span class="m">${m} min</span>`:""}<span>${E(nos?lpLab(x,a):itName(a,p))}${hw?'<i class="hwb" title="Homework for next class">🏠</i>':""}</span><span class="go ${now||gm?"":"gt"}">${now?"● now":gm?"▶ Play":"Go →"}</span></button>`;
         if(!live||gm){body+=btn+cr;return}
         nTab++;const on=EN.has(it),nd=nextDay(D);
