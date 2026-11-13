@@ -963,19 +963,76 @@ function rtCss(){if(!document.getElementById("el-rt-css")){const st=document.cre
     st.textContent=".el-rt-cur{background:#fff7cc!important;box-shadow:0 0 0 4px #ffd34d;border-radius:8px;transition:background .3s}"+
       "#el-rt-note{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#fff7cc;border:2px solid #ffd34d;font:700 15px system-ui,sans-serif;color:#713f12}"+
       "#el-rt-note.x{background:#dcfce7;border-color:#22c55e;color:#14532d}::highlight(el-rt-new){background-color:#bbf7d0;text-decoration:underline 2px #16a34a}"+
-      ".el-rt-newbox{background:#dcfce7!important;box-shadow:0 0 0 3px #22c55e;border-radius:8px}.el-rt-newbox::before{content:'🆕 ';font-weight:800}";document.head.append(st)}}
+      ".el-rt-newbox{background:#dcfce7!important;box-shadow:0 0 0 3px #22c55e;border-radius:8px}.el-rt-newbox::before{content:'🆕 ';font-weight:800}"+
+      ".el-rc-cur{box-shadow:0 0 0 4px #ffd34d!important;border-radius:12px;background:#fffbea!important}"+
+      "#el-rc-card{position:fixed;right:16px;bottom:16px;z-index:2147481000;width:400px;max-width:calc(100vw - 32px);max-height:70vh;overflow:auto;background:#fff;border-radius:14px;border:3px solid #6366f1;box-shadow:0 10px 30px rgba(15,23,42,.3);font:16px/1.45 system-ui,sans-serif;color:#13222c}"+
+      "#el-rc-card .h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 12px;background:#6366f1;color:#fff;font-weight:800;cursor:move;touch-action:none;user-select:none;position:sticky;top:0}"+
+      "#el-rc-card .b{padding:10px 14px}#el-rc-card p{margin:0 0 6px}#el-rc-card .q{font-weight:700}#el-rc-card .w{color:#5f6b73}"+
+      "#el-rc-card.ok{border-color:#2e8b57}#el-rc-card.ok .h{background:#2e8b57}#el-rc-card.no{border-color:#ef4444}#el-rc-card.no .h{background:#dc2626}"+
+      "#el-rc-card .y b{color:inherit}#el-rc-card.no .y{color:#991b1b}#el-rc-card .r{color:#14532d;font-weight:600}"+
+      "#el-rc-card .ev{margin-top:8px;padding:8px 10px;border-radius:10px;background:#f8fafc;border:1px solid #e3e7eb;font-size:15px}#el-rc-card .ev small{display:block;font-weight:700;color:#2b4fa8;margin-bottom:2px}"+
+      "#el-rc-card mark{background:#ffe680;padding:1px 3px;border-radius:4px;color:inherit}";document.head.append(st)}}
 function rtNote(box,cls,txt){let n=document.getElementById("el-rt-note");if(!n){n=document.createElement("p");n.id="el-rt-note";box.before(n)}n.className=cls;n.textContent=txt}
+/* ✅ Correcting together (Roger, 13 Nov 2026: "when correcting the reading I want students to see the feedback on their Chromebook with the
+   answers according to their level and see what they did", then "they should see this floating and they can move it if it's on their text;
+   when I change the question it disappears and the next one appears"): on the projector's question slides rt.c = {p: the step, qs: [{q,
+   a, alt}] the question (one per level when each level has its own), s: the answer is shown, w: [{r: level, n: its number, h: where the
+   text says it, the sentence marked}]}. The student's own question with that text is outlined and brought into view, and a floating card
+   (drag it by its top bar; the place is kept for the visit) shows that question: once the teacher shows the answer, what they answered
+   (✓ / ✗), the right answer of their level and where their text says it. The card changes with the projector's question and goes when
+   the screen closes or moves to the reading log. A question their level does not have: the card says so (listen). Nothing is written and
+   their answers are not touched. */
+const rcEsc=v=>String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function rcClear(){const c=document.getElementById("el-rc-card");if(c)c.remove();document.querySelectorAll(".el-rc-cur").forEach(e=>e.classList.remove("el-rc-cur"))}
+const rcTitle=el=>{const t=el.querySelector(".q-title");if(!t)return"";const c=t.cloneNode(true);c.querySelectorAll(".q-ca,small").forEach(x=>x.remove());return rtNorm(c.textContent.replace(/^\s*\d+\.\s*/,"").replace(/🔮/g,""))};
+let rcPos=null;try{rcPos=JSON.parse(sessionStorage.getItem("el_rc_pos")||"null")}catch(e){}
+function rcCard(){let c=document.getElementById("el-rc-card");if(c)return c;
+  c=document.createElement("div");c.id="el-rc-card";c.innerHTML='<div class="h"><span class="t"></span><span class="g" aria-hidden="true">⠿</span></div><div class="b"></div>';document.body.append(c);
+  const place=(x,y)=>{const w=c.offsetWidth,h=c.offsetHeight;x=Math.max(4,Math.min(innerWidth-w-4,x));y=Math.max(4,Math.min(innerHeight-h-4,y));c.style.left=x+"px";c.style.top=y+"px";c.style.right=c.style.bottom="auto";return {x,y}};
+  if(rcPos)requestAnimationFrame(()=>place(rcPos.x,rcPos.y));
+  const hd=c.querySelector(".h");let d=null;
+  hd.addEventListener("pointerdown",e=>{const r=c.getBoundingClientRect();d={dx:e.clientX-r.left,dy:e.clientY-r.top};hd.setPointerCapture(e.pointerId);e.preventDefault()});
+  hd.addEventListener("pointermove",e=>{if(d)rcPos=place(e.clientX-d.dx,e.clientY-d.dy)});
+  const up=()=>{if(!d)return;d=null;try{sessionStorage.setItem("el_rc_pos",JSON.stringify(rcPos))}catch(e){}};hd.addEventListener("pointerup",up);hd.addEventListener("pointercancel",up);
+  return c}
+function rtCorrect(c,box){
+  document.querySelectorAll(".el-rc-cur").forEach(e=>e.classList.remove("el-rc-cur"));
+  if(!c||!Array.isArray(c.qs)){rcClear();return}
+  const list=document.getElementById(c.p+"Form")||document.getElementById(c.p+"List");if(!list||list.offsetParent===null){rcClear();return}
+  const ca=lockCa(),want=c.qs.map(x=>rtNorm(x.q));let hit=null,q=null;
+  [...list.querySelectorAll(".question")].some(el=>{const i=want.indexOf(rcTitle(el));if(i<0)return false;hit=el;q=c.qs[i];return true});
+  const card=rcCard(),T=card.querySelector(".t"),B=card.querySelector(".b"),k="c|"+want.join("|")+"|"+(c.s?1:0)+"|"+(hit?1:0);
+  if(!hit){card.className="none";T.textContent=ca?"✅ Corregim junts":"✅ Correcting together";
+    B.innerHTML=`<p>${ca?"Aquesta pregunta no és al teu reading: escolta i busca-la al text de la pissarra.":"This question isn't in your reading: listen and find it in the text on the board."}</p>`;rtKey=k;return}
+  hit.classList.add("el-rc-cur");
+  const num=(hit.querySelector(".q-title")||{}).textContent.match(/^\s*(\d+)\./),qt=(hit.querySelector(".q-title").cloneNode(true));qt.querySelectorAll(".q-ca,small").forEach(x=>x.remove());
+  T.textContent=(ca?"✅ Corregim · pregunta ":"✅ Correcting · question ")+(num?num[1]:"");
+  if(k!==rtKey){rtKey=k;const ae=document.activeElement;if(!(ae&&ae.closest&&ae.closest("input[type=text],textarea")))hit.scrollIntoView({block:"center",behavior:"smooth"})}
+  const qh=`<p class="q">${rcEsc(qt.textContent.replace(/^\s*\d+\.\s*/,"").trim())}</p>`;
+  if(!c.s){card.className="wait";B.innerHTML=qh+`<p class="w">${ca?"Pensa la resposta i escolta…":"Think of your answer and listen…"}</p>`;return}
+  // what they answered: the option they picked (0 = the right one in the data) or what they typed (the page's own ✓ when they checked)
+  const r=hit.querySelector("input[type=radio]:checked"),t=hit.querySelector("input.typed,input[type=text]"),fb=hit.querySelector(".feedback");
+  const said=r?(r.closest("label")||{}).textContent||"":t?t.value.trim():"";
+  const ok=r?+r.value===0:t?(fb&&fb.classList.contains("ok"))||[].concat(q.a||[],q.alt||[]).some(a=>rtNorm(a)===rtNorm(said)):false;
+  // where their text says it: their level's (the one whose marked sentence is in the text on their screen; their route first)
+  const w=Array.isArray(c.w)?c.w:[],inBox=rtNorm(box?box.textContent:""),mk=h=>rtNorm((h.match(/<mark>([\s\S]*?)<\/mark>/)||[,""])[1].replace(/<[^>]*>/g," "));
+  const ev=(q.h?{h:q.h}:null)||w.find(x=>x.r===myLevel&&x.h)||w.filter(x=>x.h&&mk(x.h)&&inBox.includes(mk(x.h))).sort((a,b)=>mk(b.h).length-mk(a.h).length)[0]||null;   // the longest: Starter's short sentence is inside Core's
+  card.className=ok?"ok":"no";
+  B.innerHTML=qh+(said?`<p class="y">${ca?"La teva resposta":"Your answer"}: <b>${rcEsc(said)}</b> ${ok?"✓":"✗"}</p>`:`<p class="y">${ca?"No l'has resposta.":"You didn't answer it."}</p>`)+
+    `<p class="r">${ok?"✓ "+(ca?"Correcte!":"Right!"):"✓ "+(ca?"Resposta correcta":"Right answer")+": <b>"+rcEsc(q.a||"")+"</b>"}</p>`+
+    (ev?`<div class="ev"><small>${ca?"On ho diu el text":"Where the text says it"}</small><div>${ev.h}</div></div>`:"");
+}
 function rtFollow(rt){rtNow=rt||null;
   document.querySelectorAll(".el-rt-cur").forEach(e=>e.classList.remove("el-rt-cur"));
   document.querySelectorAll(".el-rt-newbox").forEach(e=>e.classList.remove("el-rt-newbox"));
   if(typeof CSS!=="undefined"&&CSS.highlights)CSS.highlights.delete("el-rt-new");
-  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){gtClose();wbClose();rtRestore();return}
+  if(!rt||rt.u!==relPath||Date.now()-(+rt.at||0)>3*3600e3){gtClose();wbClose();rtRestore();rcClear();return}
   if(rt.p)return rtGram(rt);
   const box=[...document.querySelectorAll(".reading,#readText")].find(e=>e.offsetParent!==null);if(!box)return;
   rtCss();
   if(rt.x){wbClose();rtRestore();const c=rtExtras(box,rt.h);if(c){const n=document.createElement("p");n.id="el-rt-note";n.className="x";box.before(n);
       n.textContent=lockCa()?"🆕 Les paraules en verd són el que el teu text diu de més que el que hem llegit junts: llegeix-les ara, abans de respondre.":"🆕 The green words are what your text says that we didn't read together: read them now, before you answer."}
-    return}
+    rtCorrect(rt.c,box);return}
   if(typeof rt.h==="string"&&rt.h){
     if(box!==rtBox){rtRestore();rtBox=box;rtOrig=box.innerHTML}
     const sig=rt.l+"|"+rt.h.length+"|"+rt.h.slice(0,80);
