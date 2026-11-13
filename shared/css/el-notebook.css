@@ -358,3 +358,21 @@ html.nb-touring .nb-bt{opacity:1}
 .nb .nb-gned{margin-left:8px;font:600 13px/1 var(--nb-sans,system-ui,sans-serif);border:1px solid #c9d3e6;background:#fff;color:#2f5bd3;border-radius:8px;padding:4px 8px;cursor:pointer;vertical-align:2px}
 .nb .nb-gned:hover{background:#e8eefc}
 .nb .nb-gned:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+/* 📝 Exams section (el-notebook.js examBlocks) */
+.nb-postit.k-exam,.nb-stab.k-exam{background:#ffab91}.nb-postit.k-fp,.nb-stab.k-fp{background:#d1c4e9}
+.nb-xparts{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-wrap:wrap;gap:4px 22px;font:20px/32px var(--nb-hand)}
+.nb-xparts .ok{color:var(--nb-green);font-weight:700}.nb-xparts .ko{color:var(--nb-red);font-weight:700}
+.nb-why{display:block;font:15px/24px var(--nb-hand);color:var(--nb-pencil)}
+.nb-fbl{margin:0 0 8px;padding-left:6px;list-style:none;font:18px/30px var(--nb-hand)}
+.nb-fbl .ok{color:var(--nb-green)}.nb-fbl .todo{color:var(--nb-ink)}
+.nb-chap{font:400 .5em var(--nb-hand);color:var(--nb-pencil)}
+/* 📚 chapters: one per LS, bottom left, like tabs hanging under the book */
+.nb .nb-chaps{position:absolute;left:16px;bottom:4px;display:flex;align-items:center;gap:6px;z-index:3;max-width:calc(50% - 150px)}
+.nb-chl{font-size:18px}
+.nb-ch{display:inline-flex;align-items:center;gap:4px;max-width:260px;padding:7px 12px;border-radius:0 0 10px 10px;background:#eef1f6;border:1px solid #d5dce5;border-top:0;color:#2f5bd3;text-decoration:none;font:600 14px/1.1 var(--nb-sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb-ch span{overflow:hidden;text-overflow:ellipsis}
+.nb-ch.on{background:#fffdf5;color:#23262b;box-shadow:0 3px 6px rgba(0,0,0,.12)}
+a.nb-ch:hover{background:#e3eafb}
+a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+@media (max-width:899px){.nb .nb-chaps{max-width:none;bottom:auto;top:auto;position:static;justify-content:center;margin-top:4px}.nb-ch span{display:none}}
+@media print{.nb-chaps{display:none}}

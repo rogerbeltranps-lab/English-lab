@@ -83,7 +83,7 @@ window.ELNotebook = (function () {
     const parts = (g.parts || []).map(p => {
       const n = (g.notes || {})[p.k], txt = n && String(n.text || '').trim();
       return `<div class="nb-slip">${p.slides && p.slides.length ? p.slides.map(H.slide).join('') : `<h4>${H.md(p.topic)}</h4>`}</div>`
-        + (txt || (n && n.html) ? `<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts', 'My notes')}</span>${H.own ? `<button type="button" class="nb-ui nb-gned" data-g="${esc(g.id)}" data-k="${esc(p.k)}" title="${t('Edita els meus apunts', 'Edit my notes')}">✏️ ${t('Edita', 'Edit')}</button>` : ''}${n.html || (n.dr && n.dr.length) ? `<div class="nb-notes">${clean(n.html)}${svg(n.dr)}</div>` : lines(txt)}</div>` : '');
+        + (txt || (n && n.html) ? `<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts', 'My notes')}${H.own ? `<button type="button" class="nb-ui nb-gned" data-g="${esc(g.id)}" data-k="${esc(p.k)}" title="${t('Edita els meus apunts', 'Edit my notes')}">✏️ ${t('Edita', 'Edit')}</button>` : ''}</span>${n.html || (n.dr && n.dr.length) ? `<div class="nb-notes">${clean(n.html)}${svg(n.dr)}</div>` : lines(txt)}</div>` : '');
     }).join('');
     let study = '';
     if (absent) study = `<div class="nb-sticky pink">${t('No vas fer aquest joc', 'You missed this game')}<small>${t('Llegeix la teoria i copia-la a la teva llibreta. Si tens dubtes, pregunta al professor.', 'Read the theory and copy it into your notebook. If anything is not clear, ask your teacher.')}</small></div>`;
@@ -104,7 +104,7 @@ window.ELNotebook = (function () {
     return `<div class="nb-game"><div class="nb-h3" style="color:var(--nb-black)">${rd ? '📖' : '📘'} ${esc(gname(g))}</div><span class="nb-when">${rd ? t('Lectura junts', 'Reading together') : t('Gramàtica junts', 'Grammar together')}${p.day ? ' · ' + esc(H.gtDay(p.day)) : ''}</span>${sum}<div class="nb-mine"><span class="nb-lab">✍ ${t('Els meus apunts de classe', 'My notes from class')}</span></div>${mine}</div>`;
   }
   const plainOf = h => { const d = document.createElement('div'); d.innerHTML = String(h || ''); return d.textContent; };
-  const KIND = { vocab: '📚', grammar: '🧩', read: '📖', listen: '🎧', other: '📝' };
+  const KIND = { vocab: '📚', grammar: '🧩', read: '📖', listen: '🎧', other: '📝', exam: '🎯', fp: '🎬' };
   // ✏️ the student's answers to an activity, their first try, corrected as a teacher would on paper (Roger, 13 Nov 2026: "with the
   // corrections made as if a corrector had marked them on top, only the first attempt"): their answer in blue pen in the sentence, a red
   // ✓ when it is right; when it is not, their answer crossed out in red with the right one written above it
@@ -133,6 +133,63 @@ window.ELNotebook = (function () {
     return list.map(id => blocks.find(b => b.id === id));
   }
 
+  // 📝 the Exams section's two parts: 🎯 the exam and 🎬 the final product
+  const rel = h => { const m = location.pathname.match(/\/[24]eso\/[^/]+\/[^/]*$/); return m ? '../../' + h : h; };
+  function examBlocks(ex) {
+    const G = (window.EL_GRADING || {})[H.LS] || {}, rs = H.rs || {}, out = [];
+    const stamp = v => v == null ? '' : `<span class="nb-stamp${v >= 8 ? ' ok' : ''}">${String(Math.round(v * 10) / 10).replace('.', ',')} / 10</span>`;
+    const fix = (mine, right) => (String(mine || '').trim() ? `<s class="nb-giv nb-x">${esc(mine)}</s> ` : '') + `<span class="nb-fix in">${esc(right || '')}</span>`;
+    // 🎯 the exam
+    if (G.exam) {
+      const e = G.exam, x = rs[H.LS + '/assessment'] || {}, sc = x.sections || {}, r = x.report || {};
+      const got = e.sections.filter(([k]) => sc[k] && sc[k].score != null);
+      const max = got.reduce((n, [k, , mx]) => n + (+(sc[k].max || mx || e.max)), 0), mark = max ? got.reduce((n, [k]) => n + (+sc[k].score), 0) / max * 10 : null;
+      let h = `<div class="nb-postit k-exam">🎯 ${t('Examen final', 'Final exam')}${ex.exam ? `<small>${esc(H.exDay(ex.exam))}</small>` : ''}</div>`;
+      if (!got.length) h += `<p class="nb-pencil">${t('Quan el professor l\'hagi corregit, aquí hi tindràs la nota de cada part, les preguntes que cal revisar corregides i el teu writing corregit.', 'Once your teacher has marked it, you\'ll find here the mark of each part, the questions to review corrected and your writing corrected.')}</p>`;
+      else {
+        h += `<div class="nb-wh">🧮 ${t('La meva nota', 'My mark')} ${stamp(mark)}</div><ul class="nb-xparts">${got.map(([k, nm, mx]) => { const m = +(sc[k].max || mx || e.max), v = +sc[k].score; return `<li><b>${esc(nm)}</b> <span class="${v / m >= .5 ? 'ok' : 'ko'}">${String(Math.round(v * 10) / 10).replace('.', ',')} / ${m}</span></li>`; }).join('')}</ul>`;
+        const qs = (r.questions || []).filter(q => !(q.ok || (+q.got || 0) >= (+q.pts || 0) && q.pts));
+        if (qs.length) h += `<div class="nb-work"><div class="nb-wh">❓ ${t('Preguntes que cal revisar', 'Questions to review')}</div><ol class="nb-ans">${qs.map(q => `<li>${esc(q.text || '')} <span class="nb-arrow">→</span> ${fix(q.mine, q.right)} <i class="nb-cross">✗</i>${q.why ? `<small class="nb-why">${esc(q.why)}</small>` : ''}</li>`).join('')}</ol></div>`;
+        const w = r.writing;
+        if (w) {
+          const rub = (w.rubric || []).map(y => Array.isArray(y) ? y : [y.name, y.score, y.max]), tot = rub.reduce((a, y) => [a[0] + (+y[1] || 0), a[1] + (+y[2] || 0)], [0, 0]);
+          h += `<div class="nb-wh">✍️ ${t('El meu writing', 'My writing')}${tot[1] ? ` <span class="nb-stamp${tot[0] / tot[1] >= .8 ? ' ok' : ''}">${String(Math.round(tot[0] * 10) / 10).replace('.', ',')} / ${tot[1]}</span>` : ''}</div>`;
+          if (w.feedback) h += `<div class="nb-slip"><h4>💬 ${t('Comentari del professor', 'Your teacher\'s comment')}</h4><div class="ex-rule">${lines(w.feedback)}</div></div>`;
+          if ((w.errors || []).length) h += `<div class="nb-work"><div class="nb-wh">✏️ ${t('Les meves errades, corregides', 'My mistakes, corrected')}</div><ol class="nb-ans">${w.errors.map(y => `<li>${fix(y.orig, y.fix)}${y.why ? `<small class="nb-why">${esc(y.why)}</small>` : ''}</li>`).join('')}</ol></div>`;
+        }
+        if ((r.review || []).length) h += `<div class="nb-sticky pink">${t('Què has de repassar', 'What to review')}<ul>${r.review.map(y => `<li>${esc(y.text || '')}</li>`).join('')}</ul></div>`;
+      }
+      h += `<div class="nb-links nb-ui"><a href="${rel('today.html#exam')}">📝 ${t('L\'informe sencer de l\'examen', 'The whole exam report')} →</a></div>`;
+      out.push({ id: 'x-exam', l: '🎯 ' + t('Examen final', 'Final exam'), side: t('Examen', 'Exam'), kind: 'exam', html: h });
+    }
+    // 🎬 the final product
+    if (G.fp && G.fp.a) {
+      const x = rs[G.fp.a] || {}, mark = x.max ? (+x.score || 0) / x.max * 10 : null;
+      let h = `<div class="nb-postit k-fp">🎬 ${t('Producte final', 'Final product')}</div>`;
+      if (mark == null && !x.feedback) h += `<p class="nb-pencil">${t('Quan el professor l\'hagi corregit, aquí hi tindràs la nota i el seu feedback.', 'Once your teacher has marked it, you\'ll find your mark and the feedback here.')}</p>`;
+      else {
+        if (mark != null) h += `<div class="nb-wh">🏁 ${t('La meva nota', 'My mark')} ${stamp(mark)}</div>`;
+        // the feedback as the teacher writes it: "Part (w %) · m / 10" lines, then ✔ what went well and ➜ what to keep in mind
+        const HL = /^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/, parts = [], com = []; let cur = null;
+        String(x.feedback || '').split('\n').forEach(l => { const s2 = l.trim(); if (!s2 || /^Final mark:/i.test(s2)) return; const m = s2.match(HL);
+          if (m) { cur = { n: m[1], w: m[2], m: m[3], ok: [], todo: [] }; parts.push(cur); return; }
+          if (cur && /^✔/.test(s2)) { cur.ok.push(s2.replace(/^✔\s*/, '')); return; } if (cur && /^➜/.test(s2)) { cur.todo.push(s2.replace(/^➜\s*/, '')); return; }
+          if (cur) (cur.todo.length ? cur.todo : cur.ok).push(s2); else com.push(s2); });
+        if (com.length) h += `<div class="nb-slip"><h4>💬 ${t('Feedback del professor', 'Your teacher\'s feedback')}</h4><div class="ex-rule">${lines(com.join('\n'))}</div></div>`;
+        parts.forEach(p => { const v = parseFloat(p.m.replace(',', '.'));
+          h += `<div class="nb-h3">${esc(p.n)} <small>(${esc(p.w)} %)</small> <span class="nb-stamp${v >= 8 ? ' ok' : ''}">${esc(p.m)} / 10</span></div>`
+            + (p.ok.length || p.todo.length ? `<ul class="nb-fbl">${p.ok.map(y => `<li class="ok">✔ ${esc(y)}</li>`).join('')}${p.todo.map(y => `<li class="todo">➜ ${esc(y)}</li>`).join('')}</ul>` : ''); });
+      }
+      h += `<div class="nb-links nb-ui"><a href="${rel('today.html#final')}">🎬 ${t('El meu producte final', 'My final product')} →</a></div>`;
+      out.push({ id: 'x-fp', l: '🎬 ' + t('Producte final', 'Final product'), side: t('Producte final', 'Final product'), kind: 'fp', html: h });
+    }
+    return out;
+  }
+  // 📚 the chapters (Roger, 13 Nov 2026: "Notebooks should have chapters call LS1 (Name) LS2 (Name)"): one chapter per LS of the course,
+  // each on its LS page (#notes); the chapter name is "LS2 (Seasons & Celebrations)"
+  const chapName = l => `${window.elLsNum ? elLsNum(l) : ''} (${String(l.title || '').replace(/^[^·]*·\s*/, '')})`;
+  const chapters = () => { const me0 = (window.EL_LS || []).find(l => l.id === H.LS); return me0 ? (window.EL_LS || []).filter(l => l.course === me0.course) : []; };
+
   function build(ex, games) {
     const out = [], LS = H.LS, ls = (window.EL_LS || []).find(l => l.id === LS) || {};
     const course = String(ls.course || '').replace(/^(\d)eso$/, '$1 ESO'), name = String(ls.title || '').replace(/^[^·]*·\s*/, '');
@@ -142,7 +199,7 @@ window.ELNotebook = (function () {
     // the cover
     const n = ex.exam && window.ELWeek ? ELWeek.days(ELWeek.today(), ex.exam) : null;
     const when = n == null || n < 0 ? '' : n === 0 ? t('avui!', 'today!') : n === 1 ? t('demà!', 'tomorrow!') : t(`d'aquí a ${n} dies`, `in ${n} days`);
-    out.push({ key: 'cover', fixed: true, blocks: [], head: `<p class="nb-h1"><u>${t('Anglès', 'English')}</u></p><div class="nb-h2">${esc(name)}</div><div class="nb-mine">${esc(course)}</div>
+    out.push({ key: 'cover', fixed: true, blocks: [], head: `<p class="nb-h1"><u>${t('Anglès', 'English')}</u> <span class="nb-mine">${esc(course)}</span></p><div class="nb-h2">📚 ${t('Capítol', 'Chapter')} ${esc(chapName(ls))}</div>
       <div class="nb-links">${ex.sample ? `<a href="${esc(ex.sample)}">📝 ${t('Examen de mostra', 'Sample exam')}</a>` : ''}<button type="button" class="nb-printbtn">🖨 ${t('Imprimeix la llibreta', 'Print my notebook')}</button></div>
       <div class="nb-sticky">${ex.exam ? `🎯 ${t('EXAMEN', 'EXAM')}: ${esc(H.exDay(ex.exam))}${when ? ' · ' + when : ''}` : '🎯 ' + t('Què entra a l\'examen', 'What\'s in the exam')}<small>${t('Tot el que hi ha en aquesta llibreta és el que hem fet a classe: és el que entra a l\'examen. Cada vegada que fem alguna cosa nova, apareix aquí.', 'Everything in this notebook is what we did in class: it\'s what goes in the exam. Each time we do something new, it appears here.')}</small></div>
       ${ex.dropped.length ? `<p class="nb-pencil">✂️ ${t('No entra a l\'examen', 'Not in your exam')}: ${ex.dropped.map(a => `LP${esc(a.n)} ${esc(a.title)}`).join(' · ')}</p>` : ''}
@@ -188,6 +245,11 @@ window.ELNotebook = (function () {
     const rest = games.filter(g => !used.has(g.id) && !ex.dropped.some(a => String(a.n) === H.lpOf(g)));
     if (rest.length) out.push({ key: 'other', tab: '🎮', l: '🎮 ' + t('Altres jocs de classe', 'Other class games'), head: `<div class="nb-h2">🎮 <span class="u">${t('Altres jocs de classe', 'Other class games')}</span></div>`,
       blocks: ordered('other', rest.map(g => ({ id: fk('g-' + g.id), html: g.gt ? together(g) : game(g), gt: !!g.gt })).concat(notesOf('other'))), foot: addBtn('other') });
+    // 📝 Exams (Roger, 13 Nov 2026: "Add a section (post-it) Exams, with the feedback and Final Product Feedback"): the exam, corrected as
+    // on paper (the questions to review, the writing's mistakes, what to review) and the final product's mark and feedback. From the
+    // student's results (results/{ls}/assessment and the final product's activity), which el-cloud.js already keeps on the device.
+    const xb = examBlocks(ex);
+    out.push({ key: 'exams', tab: t('Exàmens', 'Exams'), l: '📝 ' + t('Exàmens', 'Exams'), head: `<p class="nb-h1"><u>📝 ${t('Exàmens', 'Exams')}</u></p>`, blocks: ordered('exams', xb.concat(notesOf('exams'))), foot: addBtn('exams') });
     // ✍ the student's own sections (Roger, 13 Nov 2026: "in the index, I want them to be able to organize their notes, like moving up and
     // down the sections, and I want them to add some sections"); every section after the index can go ▲ up and ▼ down
     const NB = PT(), own = Object.keys(NB).filter(k => /^s[a-z0-9]+$/.test(k) && NB[k] && typeof NB[k] === 'object');
@@ -211,7 +273,7 @@ window.ELNotebook = (function () {
     }).join('');
     const add = H.own ? (own.length < MAXOWN ? `<form class="nb-add nb-ui"><input maxlength="60" placeholder="${t('Nova secció: per exemple, Verbs irregulars', 'New section: for example, Irregular verbs')}" aria-label="${t('Nom de la nova secció', 'Name of the new section')}" spellcheck="false" autocomplete="off"><button type="submit">➕ ${t('Afegeix una secció', 'Add a section')}</button></form>`
       : `<p class="nb-pencil">${t(`Ja tens ${MAXOWN} seccions teves: esborra'n una per afegir-ne una altra.`, `You already have ${MAXOWN} sections of your own: delete one to add another.`)}</p>`) : '';
-    all[1].head = `<p class="nb-h1"><u>${t('Índex', 'Index')}</u></p>` + (ix ? `<ul class="nb-idx">${ix}</ul>` : `<p class="nb-pencil">${t('Encara no heu fet res d\'aquesta LS a classe. Quan ho feu, apareixerà aquí.', 'Your class hasn\'t done anything of this LS yet. When you do, it will appear here.')}</p>`)
+    all[1].head = `<p class="nb-h1"><u>${t('Índex', 'Index')}</u> <small class="nb-chap">· ${esc(chapName((window.EL_LS || []).find(l => l.id === H.LS) || {}))}</small></p>` + (ix ? `<ul class="nb-idx">${ix}</ul>` : `<p class="nb-pencil">${t('Encara no heu fet res d\'aquesta LS a classe. Quan ho feu, apareixerà aquí.', 'Your class hasn\'t done anything of this LS yet. When you do, it will appear here.')}</p>`)
       + (H.own ? `<p class="nb-pencil">${t('▲ ▼ mouen les seccions. Després de cada classe hi apareixen pàgines noves.', '▲ ▼ move the sections. New pages appear here after each class.')}</p>` : '') + add;
     return all;
   }
@@ -443,6 +505,9 @@ window.ELNotebook = (function () {
       + (H.own ? `<button type="button" class="nb-tool nb-help" title="${t('Com funciona la llibreta', 'How the notebook works')}" aria-label="${t('Com funciona la llibreta', 'How the notebook works')}">❓</button>` : '')
       + `<button type="button" class="nb-tool nb-close" title="${t('Tanca la llibreta', 'Close the notebook')}">✕ ${t('Tanca', 'Close')}</button></div>`
       + `<div class="nb-spread"><div class="nb-spine" aria-hidden="true">${rings}</div><nav class="nb-side" aria-label="${t('Seccions', 'Sections')}"></nav></div>`
+      + (chapters().length > 1 ? `<nav class="nb-chaps" aria-label="${t('Capítols', 'Chapters')}"><span class="nb-chl">📚</span>${chapters().map(l => l.id === H.LS
+        ? `<span class="nb-ch on" aria-current="page" title="${esc(chapName(l))}"><b>${esc(window.elLsNum ? elLsNum(l) : '')}</b><span> ${esc(chapName(l).replace(/^\S+\s*/, ''))}</span></span>`
+        : `<a class="nb-ch" href="${rel(l.id.replace(/^(\d+eso)-/, '$1/') + '/index.html#notes')}" title="${esc(chapName(l))}"><b>${esc(window.elLsNum ? elLsNum(l) : '')}</b><span> ${esc(chapName(l).replace(/^\S+\s*/, ''))}</span></a>`).join('')}</nav>` : '')
       + `<nav class="nb-nav" aria-label="${t('Passa la pàgina', 'Turn the page')}"><button type="button" class="nb-prev" aria-label="${t('Pàgina anterior', 'Previous page')}">◀</button><span class="nb-where"></span><button type="button" class="nb-next" aria-label="${t('Pàgina següent', 'Next page')}">▶</button></nav>`
       + (H.own ? `<div class="nb-selbar" role="toolbar" aria-label="${t('Marca les paraules triades', 'Mark the words you selected')}" hidden>${MKS.map(([k, h, ca, en]) => `<button type="button" data-nbmk="${k}" title="${t(ca, en)}" aria-label="${t(ca, en)}">${h}</button>`).join('')}</div>` : '')
       + `</div>`;
