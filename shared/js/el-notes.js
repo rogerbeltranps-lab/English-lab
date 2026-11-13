@@ -168,6 +168,7 @@
     if(!who){box.innerHTML=`<p class="muted">${t("Entra per veure els teus apunts.","Sign in to see your notes.")}</p>`;return}
     if(who.teacher){box.innerHTML=teacherTable()+teacherPreview()+`<article class="bigcard"><p>Each student sees here what their group has done in this LS, learning path by learning path: the tabs done in class, the key terms and grammar of those tabs at their route, and every class game their group played with a copy of the theory, their own notes below it (read only), their result and what to study. Students who missed a game get its theory without notes. You see every student's answers, marks and notes together on the <a href="../../lab/game/results.html">📊 game results</a> page (click a student), or this page as they see it with 👁 Student view.</p></article>`;return}
     if(!data||(!data.ex&&exCtx&&window.ELExam)){box.innerHTML=`<p class="muted">${t("Carregant…","Loading…")}</p>`;return}
+    if(data.ex&&window.ELNotebook){ELNotebook.draw(box,data.ex,data.games,{t,esc,md,slide,day,exDay,gtDay,safe,lpOf,LS,ca:ca(),own:!!who.own,nb:data.nb||(data.nb={parts:{}}),save:nbSave});return}   // 📓 My notebook (el-notebook.js)
     if(data.ex){box.innerHTML=examHtml(data.ex,data.games,g=>card(g,true),true);return}
     const intro=`<p class="muted nintro">${t("Aquí tens cada joc de classe d'aquesta LS: la teoria, els teus apunts de <b>📝 Pren apunts</b> a sota, el teu resultat i què has d'estudiar.","Here is every class game of this LS: the theory, your notes from <b>📝 Take your notes</b> below it, your result and what to study.")}</p>`;
     if(!data.games.length){box.innerHTML=intro+`<article class="bigcard nempty"><span aria-hidden="true">📝</span><p>${t("Encara no heu fet cap joc de classe en aquesta LS.","Your class hasn't played any class game in this LS yet.")}</p></article>`;return}
@@ -190,9 +191,9 @@
       if(D){tPlayed=D.playedAll||{};tInfo=D.info||{played:tPlayed};return draw()}
       busy=true;draw();try{const i=await window.ELCloud.lsInfo(LS);tInfo=i||{};tPlayed=(i&&i.played)||{}}catch(e){console.warn("played",e);tPlayed={};tInfo={}}busy=false;return draw()}
     if(data||busy||!who)return draw();
-    if(D){data={games:build(D.played||{},(D.notes||[]).map(x=>Object.assign({parts:{}},x)),D.myGames||{})};exCtx={gid:D.group,done:((D.info||{}).done||{})[D.group]||{},level:D.level};return exBuild()}
+    if(D){data={games:build(D.played||{},(D.notes||[]).map(x=>Object.assign({parts:{}},x)),D.myGames||{}),nb:D.nb||null};exCtx={gid:D.group,done:((D.info||{}).done||{})[D.group]||{},level:D.level};return exBuild()}
     busy=true;draw();
-    const C=window.ELCloud;let played={},notes=[],mine={},info={},lvs={};
+    const C=window.ELCloud;let played={},notes=[],mine={},info={},lvs={},nb=null;
     try{S=S||await import(FS);
       let q,g;[info,q,g,lvs]=await Promise.all([(C.lsNow||C.lsInfo)(LS).catch(()=>({})),
         S.getDocs(S.query(S.collection(C.db,"students",who.uid,"notes"),S.where("ls","==",LS))).catch(e=>{console.warn("notes",e);return null}),
@@ -200,11 +201,19 @@
         window.ELExam&&C.levels?C.levels().catch(()=>({})):{}]);
       played=((info&&info.played)||{})[who.group||C.group()]||{};
       if(q)notes=q.docs.map(x=>Object.assign({id:x.id,parts:{}},x.data()));
+      nb=notes.find(n=>n.id==="nb-"+LS)||null;notes=notes.filter(n=>!/^nb-/.test(n.id));   // 📓 the notebook's own sections and order
       if(mg)mine=mg;else if(g&&g.exists())mine=mg=g.data().games||{};
     }catch(e){console.warn("notes",e)}
-    data={games:build(played,notes,mine)};busy=false;
+    data={games:build(played,notes,mine),nb};busy=false;
     const gid=who.group||C.group();exCtx={gid,done:((info&&info.done)||{})[gid]||{},level:window.elRouteOf?elRouteOf(lvs||{},LS).level:null};
     exBuild();
+  }
+  // 📓 the student's own notebook sections and their order: students/{uid}/notes/nb-<LS> = {ls, course, deck, title, lp, parts:{o:{list},
+  // s…:{topic, html, text, dr, day}}, updated} (the notes rule: their own, parts ≤ 20). Written whole, so a deleted section goes.
+  async function nbSave(parts){
+    if(!who||!who.own||D)return;const C=window.ELCloud;S=S||await import(FS);
+    const ls=(window.EL_LS||[]).find(l=>l.id===LS)||{};
+    await S.setDoc(S.doc(C.db,"students",who.uid,"notes","nb-"+LS),{ls:LS,course:ls.course||"",deck:"nb-"+LS,title:"📓 My notebook",lp:"",parts,updated:S.serverTimestamp()});
   }
   // 🎯 What's in the exam for the student (el-exam.js), again when the language is known (Catalan for Starter and Base)
   let exCtx=null,exSeq=0;
