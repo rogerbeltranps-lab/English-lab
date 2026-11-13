@@ -1739,6 +1739,9 @@ onAuthStateChanged(auth,async u=>{
   if(isTeacher(u)&&!bellEl)import("./el-bell.js").then(m=>{if(bellEl||!isTeacher(user))return;
     bellEl=m.bell({dash:DASH,onDash,me:()=>(user||{}).uid,watch:cb=>{stopBell=bellWatch(cb)}});draw(user)}).catch(e=>console.warn("bell",e));
   remember(u);
+  // 🟢 Online now + 🕘 Visit history on the dashboard (shared/js/el-visits.js): the student's own visits/{day}_{uid}, never in the student view
+  if(u&&isStudent(u)&&!AS)import("./el-visits.js").then(m=>m.startVisits({db,fs:{doc,setDoc,serverTimestamp},user:u,root:ROOT.href,group:myGroup,tester:isTester(u),
+    name:myRoster&&myRoster.first?[myRoster.first,myRoster.surname1].filter(Boolean).join(" "):u.displayName||u.email||""})).catch(e=>console.warn("visits",e));
   userDone=true;listeners.forEach(f=>f(u));
   // a learning path that links a class presentation: "Join the class" while the teacher presents it (el-live-join.js)
   if(stopJoin){stopJoin();stopJoin=null}const jg=++joinGen;
