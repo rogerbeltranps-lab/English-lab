@@ -527,3 +527,16 @@ html.nb-prlay .nb-paper{padding-left:72px;padding-right:22px}
 .nb-fr-rings .nb-fr-rg>span:last-child{max-width:100%;min-width:0}
 /* the printed cover: its label and statistics spread over the whole sheet, no empty half */
 @media print{.nb-page.nb-cv1 .nb-paper{display:flex;flex-direction:column}.nb-page.nb-cv1 .nb-front{flex:1;display:flex;flex-direction:column;justify-content:space-evenly}.nb-page.nb-cv1 .nb-fr-top{margin:0}}
+/* ⭐ My results written in the notebook by hand (Roger, 13 Nov 2026: "This should be handwriting style too"): on the ruled lines, the
+   LS as a heading, the exam and final product marks circled in red pen, each criterion's degree circled in its colour */
+.nb-front.nb-fr-more{font:500 22px/32px var(--nb-hand);color:var(--nb-black)}
+.nb-fr-more .nb-fr-ls{background:none;border:0;box-shadow:none;border-radius:0;padding:0;margin:0 0 32px;color:var(--nb-black)}
+.nb-fr-more .nb-fr-lh{font:700 27px/32px var(--nb-hand);margin:0;gap:0 14px}
+.nb-fr-more .nb-fr-k{background:none;padding:0;border-radius:0;font:700 23px/32px var(--nb-hand);color:var(--nb-red)}
+.nb-fr-more .nb-fr-k b{display:inline-block;line-height:24px;border:2.2px solid var(--nb-red);border-radius:50% 45% 55% 48%/60% 50% 55% 45%;padding:0 .3em;margin-left:2px}
+.nb-fr-more .nb-fr-row{grid-template-columns:34px 52px 1fr;gap:0 6px;padding:0;border:0;font:500 21px/32px var(--nb-hand)}
+.nb-fr-more .nb-fr-c{font-weight:700;color:var(--nb-pencil)}
+.nb-fr-more .nb-fr-d{background:none!important;justify-self:start;font:700 20px/24px var(--nb-hand);padding:0 5px;margin-top:3px;border:2px solid currentColor;border-radius:50% 45% 55% 48%/60% 50% 55% 45%}
+.nb-fr-more .nb-fr-t b{font-weight:700}
+.nb-fr-more .nb-fr-stats{gap:0;margin:0;font:500 21px/32px var(--nb-hand)}
+.nb-fr-more .nb-fr-key{font:500 18px/32px var(--nb-hand);color:var(--nb-pencil);margin:0}
