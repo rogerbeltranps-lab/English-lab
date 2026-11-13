@@ -14,6 +14,7 @@
      the class tab (shared/correct/open.js) and ✕ Close takes it away. Teacher only. Reads the Learning Path's data (never changes it) and,
      with a group, the students' saved answers once (one read per student) for "Right in the class", and on ⏱ Your turn every 30 s for
      📊 who did it and how (saved in classResults for the dashboard's 📊 Class results). correct.js draws it. -->
+<link rel="stylesheet" href="../css/el-notebook.css">
 <style>
 :root{--bg:#0f2a3a;--bar:#0b1f2b;--card:#fff;--ink:#13222c;--muted:#5f6b73;--line:#e3e7eb;--ok:#1f6b40;--okbg:#e9f7ef;--okb:#2e8b57;--blue:#2b4fa8;--bluebg:#dfe9ff;--mark:#ffe680;--dot:#24485c}
 *{box-sizing:border-box}
@@ -82,6 +83,26 @@ h1.gt{font-size:26px;margin:2px 0 12px}
 h1.gq{font-size:36px;line-height:1.35;font-weight:700}h1.gq .blank{color:#9aa4ad;letter-spacing:1px}h1.gq .fa{color:var(--ok);background:var(--okbg);border-bottom:3px solid var(--okb);border-radius:6px;padding:0 6px}
 h1.gq .cue{font-size:.6em;color:var(--muted);font-weight:600}
 .why{font-size:20px;margin:14px 0 6px;padding:10px 14px;border-radius:12px;background:#fff7e0;border:2px solid #f5d27a;max-width:1000px}
+/* 📓 📘 How it works on the projector, like the notebook (el-notebook.css: .nb-postit, .nb-h3, .nb-slip; the same boxes as the notebook's
+   grammar slips), bigger: lined paper with the red margin, the slips in the teacher's handwriting, the box being explained sharp with a
+   highlighter glow, the others faded */
+.card.nbx{background:linear-gradient(90deg,transparent 62px,var(--nb-margin) 62px,var(--nb-margin) 64px,transparent 64px),repeating-linear-gradient(transparent 0 39px,var(--nb-line) 39px 40px) var(--nb-paper);background-attachment:local;border-radius:6px;padding:14px 34px 30px 92px;color:var(--nb-black)}
+.nbx>.chips{font-family:system-ui,sans-serif}
+.nbx .nb-postit{margin:6px 0 2px -8px;font-size:30px;line-height:36px}
+.nbx h1.gt.nb-h3{font:700 34px/44px var(--nb-hand);color:var(--nb-pencil);margin:4px 0 6px}
+.nbx .gxs{max-width:1240px;gap:30px;padding:12px 0 6px}
+.nbx .gx.nb-slip{margin:0;border:0;border-radius:0;padding:20px 26px 18px;font:400 23px/1.5 var(--nb-teacher);color:#222;transition:opacity .2s,box-shadow .2s}
+.nbx .gx.nb-slip:nth-child(even){transform:rotate(.35deg)}.nbx .gx.nb-slip:nth-child(odd){transform:rotate(-.4deg)}
+.nbx .gx .en em{color:inherit;font-weight:inherit;font-style:italic}
+.nbx .gx .chip{font:700 15px system-ui,sans-serif;margin:0 0 6px}
+.nbx .gx table{font-size:.95em}
+.nbx .gx summary{font-size:.95em}
+.nbx .gxs.focus .gx{opacity:.4}
+.nbx .gxs.focus .gx.now{opacity:1;background:#fff;border:0;box-shadow:0 0 0 5px #ffe680,0 6px 16px rgba(0,0,0,.18);transform:none}
+.nbx .cax{font:400 18px/1.4 var(--nb-teacher)}
+.nbx>.hint{font-family:system-ui,sans-serif}
+@media (min-width:1700px){.nbx .gx.nb-slip{font-size:27px}.nbx .gxs{max-width:1500px}}
+@media (max-width:900px){.card.nbx{padding:12px 16px 20px 40px;background:var(--nb-paper)}.nbx .gx.nb-slip{font-size:18px;padding:14px 14px}}
 @media (max-width:900px){.gx{font-size:17px}h1.gq{font-size:26px}}
 @media (max-width:900px){.rt p{font-size:19px}.timer{font-size:80px}}
 @media (max-width:900px){.where{grid-template-columns:1fr 1fr}h1{font-size:26px}.ans{font-size:22px}.class{float:none;text-align:left;max-width:none;margin:0 0 8px}.bar .keys{display:none}}
