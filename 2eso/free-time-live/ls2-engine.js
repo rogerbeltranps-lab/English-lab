@@ -220,6 +220,27 @@ var LS2 = (function () {
       '<div class="feedback" id="' + prefix + 'f' + i + '"></div></div>').join('');
   }
   const expand = s => (' ' + norm(s).replace(/\bwon't\b/g, 'will not').replace(/\bcan't\b/g, 'cannot').replace(/n't\b/g, ' not').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/'m\b/g, ' am').replace(/'ve\b/g, ' have').replace(/'d\b/g, ' would').replace(/'s\b/g, ' is') + ' ').replace(/\s+/g, ' ');
+  /* More than the gap is right too (problem report, 2ESOA, 13 Nov 2026: "Poso tota la frase i diu que no ho he fet bé"): "I am watching" or the
+     whole sentence for "I ___ (watch) a basketball match right now." counts when it is a run of words of the sentence with the gap filled
+     that holds every word of the answer (contractions either way, the verb in brackets left out). A wrong verb form still fails. */
+  const bare = s => expand(s).replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  function fits(q, answers, typed) {
+    const v = norm(typed); if (!v) return false;
+    if (answers.some(a => norm(a) === v)) return true;
+    const t = bare(typed).split(' '); if (t.length < 2) return false;
+    const parts = String(q || '').replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, ' ').split(/_{2,}(?:[\s/]*_{2,})*/), g = parts.length - 1;
+    if (g < 1) return false;
+    return answers.some(a => {
+      const w = norm(a).split(' '), fills = g === 1 ? [w.join(' ')] : g === w.length ? w : g === 2 && w.length > 2 ? [w[0], w.slice(1).join(' ')] : null;
+      if (!fills) return false;
+      const words = [], gap = [], put = (x, f) => bare(x).split(' ').filter(Boolean).forEach(y => { if (f) gap.push(words.length); words.push(y); });
+      put(parts[0]); fills.forEach((f, i) => { put(f, true); put(parts[i + 1]); });
+      if (!gap.length) return false;
+      for (let k = 0; k + t.length <= words.length; k++)
+        if (k <= gap[0] && k + t.length > gap[gap.length - 1] && t.every((x, j) => x === words[k + j])) return true;
+      return false;
+    });
+  }
   // the accepted answer the student said (in any recognition alternative), or null
   const saidAnswer = (alts, answers) => { const heard = alts.map(expand); return answers.find(a => { const x = expand(a); return x.trim() && heard.some(h => h.includes(x)); }) || null; };
   function bindModes(items, prefix, mode) {
@@ -252,7 +273,7 @@ var LS2 = (function () {
   function checkTyped(items, prefix, reveal, count) {
     let score = 0; got = [];
     items.forEach((it, i) => {
-      const v = norm($('#' + prefix + i).value), ok = it.a.some(a => norm(a) === v), f = $('#' + prefix + 'f' + i);
+      const v = norm($('#' + prefix + i).value), ok = fits(it.q, it.a, $('#' + prefix + i).value), f = $('#' + prefix + 'f' + i);
       got.push([ok, typedAs($('#' + prefix + i))]);
       const key = prefix + i;
       if (ok) score++; else if (v && count !== false) tries[key] = (tries[key] || 0) + 1;
@@ -627,49 +648,88 @@ var LS2 = (function () {
      whether the guess was right (the right option is the first, as in every mc item). */
   /* Answered in the book (Roger, 12 Nov 2026: "can we make them do the activity in full screen (the book) and that they press the options
      there? and then they get the feedback? they can only do it once and when they finish, they can go to the other chapter or leave the
-     LP"). The questions are the book's last page (ELBook opts.end): the student taps an option on the page and presses Check, which works
+     LP"). The questions are the chapter's last page (ELBook opts.end): the student taps an option on the page and presses Check, which works
      only when both are answered and counts once: the feedback stays on the page (the right option green, a wrong one red) and nothing can
-     be changed or done again (no ↺). Then "Chapter n ▶" opens the next chapter (still full screen if the book was), when its tab is open
-     for the student, and "Leave the Book" goes back to the LS page. */
+     be changed or done again (no ↺). Then "Chapter n ▶" goes on with the next chapter (still full screen if the book was), and "Leave the
+     Book" goes back to the LS page. */
+  /* One book, one step (Roger, 13 Nov 2026: "some students will have different paces when reading the book so I need you to make only one
+     SLP for the book so that people can continue where they left off"; "when they have finished, to continue reading as many chapters as
+     wanted"): LP.book = {tab, title, intro} makes the page ONE tab, "book", with one book on it. The chapters stay the steps (LP.panels,
+     state.done.ch1 …), but they are not tabs: the book opens where the student left it (state.bookAt = {c: chapter, i: page}, saved with
+     their work), a chapter opens once the one before it is answered, and the row of chapters above the book takes them back to any
+     chapter they have read. */
+  const ONE = { book: null, c: null };
+  const reachable = c => !c.prev || !!state.done[c.prev];
+  function oneStart() {
+    const at = state.bookAt || {}, s = LP.panels.find(c => c.id === at.c && reachable(c));
+    return s ? { c: s, i: at.i | 0 } : { c: LP.panels.find(c => !state.done[c.id]) || LP.panels[LP.panels.length - 1], i: 0 };
+  }
+  // the chapter c on the book, at page i; full: keep the full screen the book is in
+  function oneShow(c, i, full) {
+    const el = $('#bookBook'); if (!el || !window.ELBook) return;
+    if (ONE.book) ONE.book.destroy(true);
+    ONE.c = c;
+    const pg = x => x && x.media && x.media.pages ? byLevel(x.media.pages) : [], pages = pg(c), n = LP.panels.indexOf(c) + 1;
+    const nx = LP.panels.find(x => x.prev === c.id), pv = LP.panels.find(x => x.id === c.prev);
+    // the paper turns on into the next chapter once this one is answered, and back into the one before (Roger, 13 Nov 2026: "they should
+    // be able to drag on to the next chapter")
+    ONE.book = ELBook.mount(el, pages, { ca: ca(), title: tx(c.title), end: $('#' + c.id + 'QPage'), atEnd: c._after, start: i,
+      pre: (ca() ? 'Capítol ' : 'Chapter ') + n + ' · ',
+      after: nx ? pg(nx) : null, before: pv ? pg(pv).concat([$('#' + pv.id + 'QPage')]) : null, canNext: () => !!state.done[c.id],
+      nextLabel: nx ? tx(nx.tab) : '', more: d => { const full = !!ONE.book && ONE.book.isFull(), to = d > 0 ? nx : pv; if (to) oneShow(to, d > 0 ? 0 : 'end', full); },
+      onTurn: k => { const o = state.bookAt || {}; if (o.c !== c.id || o.i !== k) { state.bookAt = { c: c.id, i: k }; save(); } } });
+    if (full && ONE.book) ONE.book.open();
+    oneChs();
+  }
+  function oneChs() {
+    const el = $('#bookChs'); if (!el) return;
+    el.innerHTML = '<span class="elb-chl">' + (ca() ? 'Capítols' : 'Chapters') + '</span>' + LP.panels.filter(reachable).map(c => { const n = LP.panels.indexOf(c) + 1, d = !!state.done[c.id];
+      return '<button type="button" class="elb-ch' + (c === ONE.c ? ' on' : '') + (d ? ' done' : '') + '" data-ch="' + c.id + '" title="' + esc(tx(c.title)) + '">' + (d ? '✓ ' : '') + n + '</button>'; }).join('');
+    el.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { const c = LP.panels.find(x => x.id === b.dataset.ch); if (c && c !== ONE.c) oneShow(c, 0, false); });
+  }
+  R.onebook = () => ({
+    html: '<style>.elb-chs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 10px}.elb-chl{font-weight:800;color:var(--muted,#66766f);margin-right:4px;font-size:.9rem}'
+      + '.elb-ch{min-width:44px;min-height:38px;border:1px solid var(--line,#d8e6df);background:#fff;color:var(--dark,#174d3d);border-radius:999px;padding:6px 12px;font:inherit;font-weight:800;cursor:pointer}'
+      + '.elb-ch.done{background:#ecfdf3;border-color:#86c9a0;color:#17703f}.elb-ch.on{background:var(--accent,#1f6b52);border-color:transparent;color:#fff}</style>'
+      + '<div class="section-card"><div class="elb-chs" id="bookChs"></div><div class="el-book" id="bookBook"></div>'
+      + '<div id="bookStash" hidden>' + LP.panels.map(c => { const r = bookPanel(c); c._r = r; return r.html; }).join('') + '</div></div>',
+    bind() {
+      LP.panels.forEach(c => c._r.bind());
+      const s = oneStart(); oneShow(s.c, s.i, false);
+    }
+  });
   function bookPanel(p) {
     const T2 = (a, b) => ca() ? a : b, id = p.id;
     const page = '<div class="elb-q" id="' + id + 'QPage"><div class="elbq-top">' + esc(tx(p.title)) + '</div>' + guessBackHtml(p) +
       '<h3 class="elbq-k">Think about it</h3><p class="elbq-how" id="' + id + 'How">' + T2('Toca una resposta a cada pregunta i prem Comprova. Només ho pots fer una vegada!', 'Tap one answer for each question and press Check. You can only do it once!') + '</p>' +
       '<form id="' + id + 'Form"></form><div class="actions"><button class="btn" type="button" id="' + id + 'Check">' + T2('Comprova', 'Check') + '</button>' + againBtn(id) + '</div>' +
       '<div class="result" id="' + id + 'Result"></div><div class="elbq-after" id="' + id + 'After" hidden></div></div>';
-    let book = null;
     const lab = q => q.guess ? '2 · What happens next? Guess!' + T2(' · Què passarà? Endevina-ho!', '') : '1 · Did you understand?' + T2(' · Ho has entès?', '');
     function lock() {
       const pg = $('#' + id + 'QPage'); pg.classList.add('locked');
       $$('#' + id + 'Form input').forEach(x => { x.disabled = true; });
       $('#' + id + 'Check').hidden = true; $('#' + id + 'How').hidden = true;
-      after();
-    }
-    function nextOf() {
-      const nx = LP.panels.find(x => x.prev === id), tab = nx && document.querySelector('.tab[data-panel="' + nx.id + '"]');
-      const open = !!tab && !tab.hidden && !tab.classList.contains('el-sec-hide') && !tab.classList.contains('el-sec-cls') && tab.style.display !== 'none';
-      return { nx, tab, open };
+      after(); oneChs(); if (ONE.c === p && ONE.book) ONE.book.refresh();
     }
     function after() {
       const el = $('#' + id + 'After'); if (!el || !$('#' + id + 'QPage').classList.contains('locked')) return;
-      const { nx, tab, open } = nextOf();
+      const nx = LP.panels.find(x => x.prev === id);
       const h = (!nx ? '<p class="elbq-end">🎉 ' + T2('Has acabat el llibre! En parlarem a classe.', 'You’ve finished the book! We’ll talk about it in class.') + '</p>'
-        : !open ? '<p class="elbq-end">' + T2('El ' + esc(tx(nx.tab)).toLowerCase() + ' encara no està obert: el teu professor el posarà a l’agenda.', esc(tx(nx.tab)) + ' isn’t open yet: your teacher will put it on the agenda.') + '</p>' : '') +
-        '<div class="actions">' + (nx && open ? '<button class="btn" type="button" data-go="next">' + esc(tx(nx.tab)) + ' ▶</button>' : '') +
+        : '<p class="elbq-end">' + T2('Vols continuar llegint? Pots passar al ' + esc(tx(nx.tab)).toLowerCase() + ' ara mateix.', 'Want to keep reading? You can go on to ' + esc(tx(nx.tab)) + ' now.') + '</p>') +
+        '<div class="actions">' + (nx ? '<button class="btn" type="button" data-go="next">' + esc(tx(nx.tab)) + ' ▶</button>' : '') +
         '<a class="btn secondary" href="index.html">' + T2('Surt del llibre', 'Leave the Book') + '</a></div>';
       if (el.innerHTML !== h) el.innerHTML = h;
       el.hidden = false;
       const b = el.querySelector('[data-go]');
       if (b) b.onclick = () => {
-        const full = book && book.isFull();
-        if (book) book.close(true);   // the browser stays in full screen for the next chapter
-        tab.click();
-        if (full && nx._book) nx._book.open();
-        else { const n = $('#' + nx.id + 'Book'); if (n) n.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+        const full = !!ONE.book && ONE.book.isFull();
+        oneShow(nx, 0, full);   // the browser stays in full screen for the next chapter
+        if (!full) { const n = $('#bookBook'); if (n) n.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
       };
     }
+    p._after = after;
     return {
-      html: '<div class="section-card"><div class="el-book" id="' + id + 'Book">' + page + '</div></div>',
+      html: page,
       bind() {
         const items = forLevel(p.items), scored = items.filter(q => !q.guess).length;
         $('#' + id + 'Form').innerHTML = items.map((q, i) => '<div class="question' + (q.guess ? ' guess-q' : '') + '"><p class="elbq-lab">' + lab(q) + '</p><p class="q-title">' + q.q + '</p>' +
@@ -677,8 +737,6 @@ var LS2 = (function () {
           learningSupport.shuffledIndexes(q.o.length).map((j, n) => '<label class="option"><input type="radio" name="' + id + i + '" value="' + j + '"><b class="elbq-l">' + 'ABCD'[n] + '</b><span>' + q.o[j] + '</span></label>').join('') +
           '</div><div class="feedback" id="' + id + 'f' + i + '"></div></div>').join('');
         $('#' + id + 'Again').hidden = true; $('#' + id + 'Again').style.display = 'none';
-        const pages = p.media && p.media.pages ? byLevel(p.media.pages) : [];
-        if (window.ELBook) book = p._book = ELBook.mount($('#' + id + 'Book'), pages, { ca: ca(), title: tx(p.title), end: $('#' + id + 'QPage'), atEnd: after });
         stays(id, id, id + 'Form', items, count => {
           let score = 0; const g = [];
           items.forEach((q, i) => {
@@ -1324,7 +1382,7 @@ var LS2 = (function () {
             const c = document.querySelector('input[name="' + p.id + i + '"]:checked'); ok = !!c && +c.value === 0; g.push([ok, c ? +c.value : null]);
             fb.textContent = learningSupport.evidence(level, ok, c, q.o[0], null, !!(p.media && p.media.audio));
           } else {
-            const v = norm($('#' + p.id + i).value), key = p.id + i; ok = q.a.some(a => norm(a) === v); g.push([ok, typedAs($('#' + p.id + i))]);
+            const v = norm($('#' + p.id + i).value), key = p.id + i; ok = fits(q.q, q.a, $('#' + p.id + i).value); g.push([ok, typedAs($('#' + p.id + i))]);
             if (!ok && v && count) tries[key] = (tries[key] || 0) + 1;
             fb.innerHTML = ok ? (ca() ? 'Correcte!' : 'Correct!') : !v ? (ca() ? 'Escriu una resposta.' : 'Type an answer.')
               : (ca() ? 'Encara no. ' : 'Not yet. ') + (tries[key] >= 2 ? (ca() ? 'Resposta: ' : 'Answer: ') + '<strong>' + esc(q.a[0]) + '</strong>' : (ca() ? 'Torna-ho a provar.' : 'Try again.'));
@@ -1447,7 +1505,7 @@ var LS2 = (function () {
   }
   function markTabs() {
     let next = false;
-    LP.panels.forEach(p => { const t = document.querySelector('.tab[data-panel="' + p.id + '"]'); if (!t || t.classList.contains('el-sec-hide')) return; if (t.classList.contains('el-sec-cls')) { t.classList.remove('next'); return; } const d = stepDone(p); t.classList.toggle('done', d); t.classList.toggle('next', !d && !next); t.dataset.next = ca() ? 'SEGÜENT' : 'NEXT'; if (!d) next = true; });
+    tabsOf().forEach(p => { const t = document.querySelector('.tab[data-panel="' + p.id + '"]'); if (!t || t.classList.contains('el-sec-hide')) return; if (t.classList.contains('el-sec-cls')) { t.classList.remove('next'); return; } const d = stepDone(p); t.classList.toggle('done', d); t.classList.toggle('next', !d && !next); t.dataset.next = ca() ? 'SEGÜENT' : 'NEXT'; if (!d) next = true; });
     // Phone (Roger, 6 Nov 2026): keep the open step visible in the strip of steps.
     const a = $('.lp-body>.tabs .tab.active');
     if (a && innerWidth < 1000 && markTabs.on !== a.dataset.panel) { markTabs.on = a.dataset.panel; a.parentNode.scrollLeft = a.offsetLeft - a.parentNode.offsetLeft - 16; }
@@ -1458,19 +1516,21 @@ var LS2 = (function () {
   function bindStudy() { if (window.ELStudy && LP.study) ELStudy.bind(studyApi()); }
   function render() {
     carryRoute();
-    const active = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : LP.panels[0].id;
-    $('#lp').innerHTML = '<div class="lp-top">' + howTo() + studyCard() + '</div>' + planCard() + '<div class="lp-body"><nav class="tabs" aria-label="Sections">' + LP.panels.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '"><span class="tn">' + (i + 1) + '</span> <span class="tl">' + tx(p.tab) + '</span></button>').join('') + '</nav><div class="lp-panels">' +
-      LP.panels.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') + '</div></div>' +
+    const PS = tabsOf(), act0 = ($('.tab.active') || {}).dataset ? $('.tab.active').dataset.panel : null, active = PS.some(p => p.id === act0) ? act0 : PS[0].id;
+    $('#lp').innerHTML = '<div class="lp-top">' + howTo() + studyCard() + '</div>' + planCard() + '<div class="lp-body"><nav class="tabs" aria-label="Sections">' + PS.map((p, i) => '<button class="tab' + (p.id === active ? ' active' : '') + '" data-panel="' + p.id + '"><span class="tn">' + (i + 1) + '</span> <span class="tl">' + tx(p.tab) + '</span></button>').join('') + '</nav><div class="lp-panels">' +
+      PS.map(p => { const r = R[p.type](p); p._r = r; return '<section class="panel' + (p.id === active ? ' active' : '') + '" id="' + p.id + '"><div class="panel-head"><div><h2>' + tx(p.title) + '</h2><p class="instruction">' + tx(p.intro || '') + '</p>' + '</div>' + (p.pill ? '<span class="pill">' + tx(p.pill) + '</span>' : '') + '</div>' + r.html + '</section>'; }).join('') + '</div></div>' +
       reviewCard() + '<p class="footer-note">' + (ca() ? 'Les respostes i el progrés es desen per a cada ruta.' : 'Your answers and progress are saved for each route.') + '</p>';
     flashcardSet.config = null;
-    LP.panels.forEach(p => p._r.bind());
+    PS.forEach(p => p._r.bind());
     bindPlan();
     bindStudy();
     $$('.tab').forEach(t => t.onclick = () => { $$('.tab,.panel').forEach(x => x.classList.remove('active')); t.classList.add('active'); $('#' + t.dataset.panel).classList.add('active'); markTabs(); const top = innerWidth <= 640 ? $('.lp-body').getBoundingClientRect().top + scrollY : $('#lp').offsetTop - 64; if (innerWidth > 640 || scrollY > top) window.scrollTo({ top, behavior: 'smooth' }); });
-    initNext();
+    if (!LP.book) initNext();
     progress();
   }
-  function stepDone(p) { return p.type === 'info' || p.type === 'summary' ? true : p.type === 'vocab' ? !!state.done.cards && (!p.practice || !!state.done.practice) : !!state.done[p.id]; }
+  // the page's tabs: its panels, or one tab for the whole book (LP.book: the chapters are its steps)
+  function tabsOf() { return LP.book ? [{ id: 'book', type: 'onebook', tab: LP.book.tab, title: LP.book.title, intro: LP.book.intro, steps: LP.panels }] : LP.panels; }
+  function stepDone(p) { if (p.steps) return p.steps.every(stepDone); return p.type === 'info' || p.type === 'summary' ? true : p.type === 'vocab' ? !!state.done.cards && (!p.practice || !!state.done.practice) : !!state.done[p.id]; }
   function initNext() {
     $$('.section-next').forEach(e => e.remove());
     const last = LP.panels[LP.panels.length - 1];

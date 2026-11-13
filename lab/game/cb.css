@@ -8,6 +8,9 @@ body.cb::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .cbmono,.cbbits b,.cbtime,.cbrow .bt,.cbkey{font-family:ui-monospace,"Cascadia Mono","Roboto Mono",Menlo,monospace;letter-spacing:.02em}
 body.cb .btn.go{background:var(--hk);color:#04210f}
 body.cb b.k{color:#0f766e}
+/* key words on the red "Not this time" screen: white and underlined in yellow (the teal was hard to read on red, 13 Nov 2026) */
+body.cb .res b.k{color:#fff;text-decoration:underline 3px #fde047;text-underline-offset:.18em}
+body.cb .res .card b.k{color:#0f766e;text-decoration:none}
 
 /* player */
 .cbtop .pill{background:rgba(56,242,138,.12);border:1px solid rgba(56,242,138,.35)}
@@ -40,10 +43,30 @@ button.cbfile:hover{transform:translateY(-4px);border-color:var(--hk)}
 .cbspin{animation:cbspin 1s ease-in-out infinite}@keyframes cbspin{50%{transform:scale(1.15) rotate(-6deg)}}
 .cbprog{width:min(420px,80vw);height:16px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:16px auto}
 .cbprog i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--hk),var(--hk2));transform-origin:left;animation:cbprog 1.8s ease-out both}@keyframes cbprog{from{transform:scaleX(0)}}
-.cbtoast{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:40;max-width:min(92vw,720px);padding:14px 22px;border-radius:16px;background:#0b2530;border:2px solid var(--hk2);
-  color:#fff;font-size:clamp(18px,2vw,24px);font-weight:600;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.45)}
-.cbtoast.bad{border-color:#f87171;background:#3b0d0d}
-@media (prefers-reduced-motion: reduce){.cbspin,.cbprog i,.cbbits.bump{animation:none}}
+/* hack news in the top bar (between the pills), never over the question: one line, cut with … if the screen is narrow */
+.cbtop .cbnewsw{min-width:0;display:flex;justify-content:center}
+.cbnews{min-width:0;max-width:100%;padding:.2em .9em;border-radius:999px;background:#0b2530;border:2px solid var(--hk2);color:#fff;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.cbnews.bad{border-color:#f87171;background:#3b0d0d}
+/* 👀 read first: the answers wait (greyed) while a bar fills under the question */
+.cbread{height:6px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;margin:-6px 8px 0;transition:opacity .4s}
+.cbread i{display:block;height:100%;background:linear-gradient(90deg,var(--hk),var(--hk2));transform-origin:left;animation:cbread var(--ms,3s) linear both}
+.cbread.done{opacity:0}@keyframes cbread{from{transform:scaleX(0)}}
+.tile.wait,.btn.wait{filter:saturate(.3) brightness(.85);opacity:.6;cursor:wait}
+.cbsimtag{align-self:center;background:var(--hk2);color:#04210f;font-weight:700;border-radius:999px;padding:.2em 1em;font-size:clamp(16px,1.6vw,20px)}
+/* ✗ wrong: the answer, why and the theory, scrollable if long; the button waits a few seconds */
+.res.cbres{overflow:auto;place-items:start center;padding:2vh 1em}.cbfb{width:min(100%,1000px);margin:auto 0}
+.cbfb .mark{font-size:clamp(50px,8vh,90px)}.cbfb .big{font-size:clamp(26px,4vw,44px)}
+.cbth{text-align:left;margin:10px auto;padding:10px 18px 12px;font-size:clamp(15px,1.35vw,18px);line-height:1.35;font-weight:500}
+.cbth small{display:block;text-transform:uppercase;letter-spacing:.08em;font-size:.75em;color:var(--muted);font-weight:700}
+.cbth h4{margin:.4em 0 .2em;font-size:1.15em;color:#5b21b6}.cbth p{margin:.25em 0}.cbth .w{background:#fff4d6;border-left:4px solid var(--gold);border-radius:8px;padding:3px 8px}
+.cbth table{border-collapse:collapse;width:100%;margin:.3em 0;font-size:.92em}.cbth th{background:#ede4ff;color:#4c1d95;text-align:left;padding:3px 6px;border:1px solid #d9c8ff}.cbth td{padding:3px 6px;border:1px solid #e6dcff;vertical-align:top}
+.cbca{background:#e7f8ee;border-left:4px solid #16a34a;border-radius:8px;padding:4px 10px;margin:.3em 0}.cbca.small{font-size:.9em;opacity:.9}
+.btn .wl{font-variant-numeric:tabular-nums}
+/* 🤝 fair play on the hack list */
+.cbrule{text-align:center;margin:0 auto .6em;max-width:900px;font-size:clamp(15px,1.4vw,18px);opacity:.9}
+.cbp.grd .bt{color:#fca5a5}
+@media (prefers-reduced-motion: reduce){.cbspin,.cbprog i,.cbbits.bump,.cbread i{animation:none}}
 
 /* board */
 .cbmins{display:flex;gap:.5em;align-items:center;justify-content:center;flex-wrap:wrap;margin:.8em 0}.cbmins span{font-weight:700;margin-right:.3em}
@@ -64,3 +87,54 @@ button.cbfile:hover{transform:translateY(-4px);border-color:var(--hk)}
 .cbev.hack{border-color:var(--gold)}.cbev.bad{border-color:#f87171}.cbev.good{border-color:var(--hk)}.cbev.shield{border-color:var(--hk2)}
 .cbpod .blk{color:var(--ink)}
 .lpn{max-width:28em;overflow:hidden;text-overflow:ellipsis}
+
+/* 🧑‍💻 hacker avatars (cb-av.js, 13 Nov 2026): in the top bar's name pill while playing (never over the question), big in the lobby,
+   the 👕 locker and the end screen; small on the board's lists */
+.cbav.mini{border-radius:50%;background:#071b24;border:2px solid rgba(56,242,138,.55);flex:none;vertical-align:middle}
+.cbtop .pill.cbme{display:flex;align-items:center;gap:.45em;padding:2px .9em 2px 3px;line-height:1.05}
+.cbtop .pill.cbme .cbav{width:2.1em;height:2.1em}
+.cbtop .pill.cbme small{display:block;font-size:.62em;color:var(--hk);font-weight:600}
+.cbhero{display:flex;flex-direction:column;align-items:center;gap:.25em;text-align:center}
+.cbhero small{opacity:.75}
+.cbhero .cbav{max-width:100%;height:auto}
+.cbhero.up .cbav{animation:cbglow 1.6s ease-in-out 2}@keyframes cbglow{50%{filter:drop-shadow(0 0 22px var(--gold))}}
+.cbrankup{font-weight:700;font-size:1.2em;color:var(--gold);text-shadow:0 0 16px rgba(255,200,61,.5)}
+.cbxp{width:min(280px,70vw);height:12px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:.2em 0}
+.cbxp i{display:block;height:100%;background:linear-gradient(90deg,var(--hk),var(--hk2))}
+.cbend{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(12px,3vw,40px);align-items:center;padding:0 clamp(8px,3vw,40px);overflow:auto}
+.cbend .cbhero .cbav{width:min(190px,30vh);height:auto}
+.cbendr{display:flex;flex-direction:column;gap:.6em;align-items:stretch;text-align:center;min-width:0}
+.cbendr .big,.cbendr .mid{margin:0}
+.cbline{display:flex;justify-content:space-between;gap:1em;background:rgba(11,37,48,.9);border:2px solid rgba(56,242,138,.3);border-radius:14px;padding:.45em 1em;font-size:clamp(17px,1.7vw,22px)}
+.cbline b{color:var(--hk);font-family:ui-monospace,Menlo,monospace}
+.cbcrate{display:flex;align-items:center;gap:.8em;border-radius:16px;padding:.5em 1em;border:3px solid var(--c);background:color-mix(in srgb,var(--c) 14%,#0b2530);font-size:clamp(17px,1.7vw,22px);text-align:left}
+.cbcrate .ce{font-size:2.2em;line-height:1}.cbcrate small{display:block;color:var(--c);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.6em}
+.cbbdgs{display:flex;gap:.4em;flex-wrap:wrap;justify-content:center}
+.cbbdg{display:inline-flex;align-items:center;justify-content:center;min-width:1.9em;height:1.9em;border-radius:999px;background:rgba(255,200,61,.12);border:2px solid var(--gold);font-size:1em}
+.cbbdg.off{opacity:.25;filter:grayscale(1);border-color:#64748b}
+.cbbdg.big{padding:.15em .8em;gap:.3em;font-size:clamp(15px,1.5vw,19px);font-weight:600}
+.cbwait{opacity:.85}
+.cblocker{flex:1;min-height:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(12px,3vw,36px);padding:4px clamp(8px,3vw,36px) 12px;overflow:auto}
+.cblocker .cbhero .cbav{width:min(190px,32vh);height:auto}
+.cbslots{display:flex;flex-direction:column;gap:.5em;min-width:0}
+.cbslots h4{margin:.1em 0 .25em;font-size:1em;font-weight:600;opacity:.9}
+.cbits{display:flex;gap:8px;flex-wrap:wrap}
+.cbit{width:64px;height:64px;border-radius:14px;border:3px solid var(--c);background:color-mix(in srgb,var(--c) 12%,#0b2530);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#fff;cursor:pointer;padding:2px;font:600 10px var(--f)}
+.cbit .sw{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.25)}
+.cbit .ic{font-style:normal;font-size:24px;line-height:1}
+.cbit span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cbit.on{box-shadow:0 0 0 3px #fff}
+.cbit:disabled{opacity:.28;filter:grayscale(.7);cursor:default}
+.cbhow{font-size:.8em;opacity:.8;margin:.3em 0 0}
+@media (max-width:700px){.cbend,.cblocker{grid-template-columns:1fr}}
+/* board */
+.cbrow{grid-template-columns:1.6em 2em minmax(6em,9em) 1fr 4.2em}
+.cbrow .av .cbav{width:1.9em;height:1.9em}
+.names .cbnm{display:inline-flex;align-items:center;gap:.3em}.names .cbnm .cbav{width:1.5em;height:1.5em}
+.cbpav{display:block}.cbpav .cbav{width:2.6em;height:2.6em}.p1 .cbpav .cbav{width:3.2em;height:3.2em}
+.cbp .av .cbav{width:44px;height:44px}
+.cbups{display:flex;flex-wrap:wrap;gap:.5em;justify-content:center;margin:.4em 0}
+.cbup{display:inline-flex;align-items:center;gap:.4em;background:rgba(255,200,61,.12);border:2px solid var(--gold);border-radius:999px;padding:.15em .8em .15em .2em}
+.cbup .cbav{width:1.7em;height:1.7em}
+@media (prefers-reduced-motion: reduce){.cbhero.up .cbav{animation:none}}
+.cbendr>*:not(.cbline):not(.cbcrate){align-self:center}

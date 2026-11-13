@@ -38,12 +38,26 @@
     return [...ids].map(id=>{
       const m=meta(id),th=(window.EL_GAME_THEORY||{})[id],nd=notes.find(n=>(n.deck||n.id)===id),res=Object.values(mine||{}).filter(g=>g.deck===id).sort((a,b)=>b.sid-a.sid);
       const parts=th?th.parts.map(p=>({k:p.k,slides:p.slides,topic:p.slides.map(s=>s.theory).join(" · ")})):Object.keys((nd&&nd.parts)||{}).map(k=>({k,slides:[],topic:nd.parts[k].topic||""}));
-      return {id,title:m.title||(th&&th.title)||(nd&&nd.title)||(res[0]&&res[0].title)||id,kind:m.kind||(res[0]&&res[0].kind)||"",lp:m.lp||(nd&&nd.lp)||(res[0]&&res[0].lp)||"",
+      const gt=/^gt-/.test(id)&&nd&&nd.parts&&nd.parts.gt||null;   // 📘 notes taken while the grammar was explained together (el-cloud.js gtBox)
+      return {id,gt,title:m.title||(th&&th.title)||(nd&&nd.title)||(res[0]&&res[0].title)||id,kind:m.kind||(gt?"grammar":"")||(res[0]&&res[0].kind)||"",lp:m.lp||(nd&&nd.lp)||(res[0]&&res[0].lp)||"",
         when:Math.max(ms((played||{})[id]),res[0]?res[0].sid:0),parts,notes:(nd&&nd.parts)||{},res:res[0]||null,tries:res.length}
     }).sort((a,b)=>lpNum(a.lp)-lpNum(b.lp)||(a.kind==="vocab"?0:1)-(b.kind==="vocab"?0:1)||a.when-b.when);
   }
 
+  /* 📘 Grammar together (Roger, 13 Nov 2026: "It should appear in their notes with the day, the grammar summary and their notes"): the day,
+     the explanation boxes seen together on the projector (as the student saw them) and what the student wrote, read only. The boxes are the
+     site's own text, saved by the student's page: only <b> <strong> <em> <i> <br> <del> <s> <u> are kept as tags. */
+  const safe=h=>String(h||"").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/&lt;(\/?)(strong|em|b|i|br|del|s|u)\s*\/?&gt;/gi,"<$1$2>");
+  const gtDay=d=>{const x=new Date(String(d||"")+"T12:00:00");return isNaN(x)?"":x.toLocaleDateString(ca()?"ca":"en-GB",{weekday:"short",day:"numeric",month:"short"})};
+  function gtCard(g,inLp){
+    const p=g.gt,txt=String(p.text||"").trim(),when=`<span class="muted nt-day">${t("Gramàtica junts","Grammar together")}${p.day?" · "+esc(gtDay(p.day)):""}</span>`,name=esc(String(g.title).replace(/^📘\s*/,""));
+    const body=`<section class="npart">${(p.sum||[]).length?`<div class="nt-th"><h4>📘 ${t("Com funciona","How it works")}</h4>${p.sum.map(b=>`<div class="ex-rule">${safe(b)}</div>`).join("")}</div>`:""}
+      <div class="nt-my"><span class="nt-lab">📝 ${t("Els teus apunts","Your notes")}</span>${txt?`<div class="nread">${esc(txt).replace(/\n/g,"<br>")}</div>`:`<p class="muted nt-none">${t("No vas prendre apunts aquí.","You didn't take notes here.")}</p>`}</div></section>`;
+    if(inLp)return `<details class="ngame" id="ng-${esc(g.id)}"><summary><span class="ng-t">📘 ${name} ${when}</span></summary>${body}</details>`;
+    return `<article class="bigcard ncard"><div class="nt-head"><div>${g.lp?`<span class="nlp">${esc(g.lp)}</span>`:""}<h2>📘 ${name}</h2>${when}</div></div>${body}</article>`;
+  }
   function card(g,inLp){
+    if(g.gt)return gtCard(g,inLp);
     const r=g.res,hasNotes=Object.values(g.notes).some(p=>String(p.text||"").trim()),absent=!r&&!hasNotes;
     const pc=r&&r.of?Math.round(r.r/r.of*100):null,miss=(r&&r.miss)||[];
     const byPart={};miss.forEach(x=>{(byPart[x.p||""]=byPart[x.p||""]||[]).push(x)});
@@ -88,7 +102,7 @@
     const terms=nTerms?`<details class="ex-sec"><summary>🔑 ${t("Paraules clau","Key terms")} <span class="muted">· ${nTerms}</span></summary>${lp.terms.map(g=>`<h4>${g.g}</h4><ul class="ex-terms">${g.items.map(x=>
       `<li><b>${x.en}</b>${x.ca?` <span class="ex-ca">${x.ca}</span>`:""}${x.ex?`<small>${x.ex}</small>`:""}</li>`).join("")}</ul>`).join("")}</details>`:"";
     const gram=lp.grammar.length?`<details class="ex-sec"><summary>🧩 ${t("Gramàtica","Grammar")} <span class="muted">· ${lp.grammar.reduce((n,g)=>n+g.boxes.length,0)}</span></summary>${lp.grammar.map(g=>`<h4>${g.title}</h4>${g.boxes.map(b=>`<div class="ex-rule">${b}</div>`).join("")}`).join("")}</details>`:"";
-    const gm=games.length?`<div class="ex-games"><span class="nt-lab">🎮 ${t("Jocs de classe: teoria i els teus apunts","Class games: theory and your notes")}</span>${games.map(game).join("")}</div>`:"";
+    const gm=games.length?`<div class="ex-games"><span class="nt-lab">${games.some(g=>g.gt)?(games.every(g=>g.gt)?"📘 ":"🎮 📘 ")+t("Teoria i els teus apunts","Theory and your notes"):"🎮 "+t("Jocs de classe: teoria i els teus apunts","Class games: theory and your notes")}</span>${games.map(game).join("")}</div>`:"";
     const none=!terms&&!gram&&!gm?`<p class="muted">${t("En aquest learning path heu fet pràctica de comprensió i expressió: repassa'l obrint-lo.","In this learning path you practised the skills: open it to look at it again.")}</p>`:"";
     return `<article class="bigcard ncard ex-lp"><div class="nt-head"><div><span class="nlp">LP${esc(lpN)}</span><h2>${esc(lp.title)}</h2></div><a class="nbtn" href="${esc(lp.href)}">${t("Obre","Open")} →</a></div>
       ${tabs?`<div class="ex-tabs"><span class="nt-lab">✅ ${t("Fet a classe","Done in class")}</span>${tabs}</div>`:""}${terms}${gram}${gm}${none}</article>`;
@@ -154,6 +168,7 @@
     if(!who){box.innerHTML=`<p class="muted">${t("Entra per veure els teus apunts.","Sign in to see your notes.")}</p>`;return}
     if(who.teacher){box.innerHTML=teacherTable()+teacherPreview()+`<article class="bigcard"><p>Each student sees here what their group has done in this LS, learning path by learning path: the tabs done in class, the key terms and grammar of those tabs at their route, and every class game their group played with a copy of the theory, their own notes below it (read only), their result and what to study. Students who missed a game get its theory without notes. You see every student's answers, marks and notes together on the <a href="../../lab/game/results.html">📊 game results</a> page (click a student), or this page as they see it with 👁 Student view.</p></article>`;return}
     if(!data||(!data.ex&&exCtx&&window.ELExam)){box.innerHTML=`<p class="muted">${t("Carregant…","Loading…")}</p>`;return}
+    if(data.ex&&window.ELNotebook){ELNotebook.draw(box,data.ex,data.games,{t,esc,md,slide,day,exDay,gtDay,safe,lpOf,LS,ca:ca(),own:!!who.own,uid:who.uid||'',rs:data.rs||{},level:exCtx&&exCtx.level||'',name:who.name||(who.email||'').split('@')[0].replace(/[._]/g,' ').replace(/\d+/g,'').replace(/\b\w/g,c=>c.toUpperCase()).trim(),group:who.group||(window.ELCloud&&ELCloud.group&&ELCloud.group())||(D&&D.group)||'',mg:mg||(D&&D.myGames)||{},nb:data.nb||(data.nb={parts:{}}),save:nbSave,saveGt:gtSave,saveGn:gnSave});return}   // 📓 My notebook (el-notebook.js)
     if(data.ex){box.innerHTML=examHtml(data.ex,data.games,g=>card(g,true),true);return}
     const intro=`<p class="muted nintro">${t("Aquí tens cada joc de classe d'aquesta LS: la teoria, els teus apunts de <b>📝 Pren apunts</b> a sota, el teu resultat i què has d'estudiar.","Here is every class game of this LS: the theory, your notes from <b>📝 Take your notes</b> below it, your result and what to study.")}</p>`;
     if(!data.games.length){box.innerHTML=intro+`<article class="bigcard nempty"><span aria-hidden="true">📝</span><p>${t("Encara no heu fet cap joc de classe en aquesta LS.","Your class hasn't played any class game in this LS yet.")}</p></article>`;return}
@@ -176,21 +191,42 @@
       if(D){tPlayed=D.playedAll||{};tInfo=D.info||{played:tPlayed};return draw()}
       busy=true;draw();try{const i=await window.ELCloud.lsInfo(LS);tInfo=i||{};tPlayed=(i&&i.played)||{}}catch(e){console.warn("played",e);tPlayed={};tInfo={}}busy=false;return draw()}
     if(data||busy||!who)return draw();
-    if(D){data={games:build(D.played||{},(D.notes||[]).map(x=>Object.assign({parts:{}},x)),D.myGames||{})};exCtx={gid:D.group,done:((D.info||{}).done||{})[D.group]||{},level:D.level};return exBuild()}
+    if(D){data={games:build(D.played||{},(D.notes||[]).map(x=>Object.assign({parts:{}},x)),D.myGames||{}),nb:D.nb||null,rs:D.rs||{}};exCtx={gid:D.group,done:((D.info||{}).done||{})[D.group]||{},level:D.level};return exBuild()}
     busy=true;draw();
-    const C=window.ELCloud;let played={},notes=[],mine={},info={},lvs={};
+    const C=window.ELCloud;let played={},notes=[],mine={},info={},lvs={},nb=null,rs={};
     try{S=S||await import(FS);
-      let q,g;[info,q,g,lvs]=await Promise.all([(C.lsNow||C.lsInfo)(LS).catch(()=>({})),
+      let q,g,rr;[info,q,g,lvs,rr]=await Promise.all([(C.lsNow||C.lsInfo)(LS).catch(()=>({})),
         S.getDocs(S.query(S.collection(C.db,"students",who.uid,"notes"),S.where("ls","==",LS))).catch(e=>{console.warn("notes",e);return null}),
         who.email&&!mg?S.getDoc(S.doc(C.db,"myGames",who.email)).catch(e=>{console.warn("my games",e);return null}):null,
-        window.ELExam&&C.levels?C.levels().catch(()=>({})):{}]);
+        window.ELExam&&C.levels?C.levels().catch(()=>({})):{},
+        // 📝 Exams in the notebook: the exam report and the final product feedback (the student's results, kept on the device by el-cloud.js)
+        window.ELNotebook&&C.results?C.results().catch(()=>({})):{}]);
+      Object.values(rr||{}).forEach(r=>{if(r&&r.activity)rs[r.activity]=r});
       played=((info&&info.played)||{})[who.group||C.group()]||{};
       if(q)notes=q.docs.map(x=>Object.assign({id:x.id,parts:{}},x.data()));
+      nb=notes.find(n=>n.id==="nb-"+LS)||null;notes=notes.filter(n=>!/^nb-/.test(n.id));   // 📓 the notebook's own sections and order
       if(mg)mine=mg;else if(g&&g.exists())mine=mg=g.data().games||{};
     }catch(e){console.warn("notes",e)}
-    data={games:build(played,notes,mine)};busy=false;
+    data={games:build(played,notes,mine),nb,rs};busy=false;
     const gid=who.group||C.group();exCtx={gid,done:((info&&info.done)||{})[gid]||{},level:window.elRouteOf?elRouteOf(lvs||{},LS).level:null};
     exBuild();
+  }
+  // 📓 the student's own notebook sections and their order: students/{uid}/notes/nb-<LS> = {ls, course, deck, title, lp, parts:{o:{list},
+  // s…:{topic, html, text, dr, day}}, updated} (the notes rule: their own, parts ≤ 20). Written whole, so a deleted section goes.
+  async function nbSave(parts){
+    if(!who||!who.own||D)return;const C=window.ELCloud;S=S||await import(FS);
+    const ls=(window.EL_LS||[]).find(l=>l.id===LS)||{};
+    await S.setDoc(S.doc(C.db,"students",who.uid,"notes","nb-"+LS),{ls:LS,course:ls.course||"",deck:"nb-"+LS,title:"📓 My notebook",lp:"",parts,updated:S.serverTimestamp()});
+  }
+  // ✏️ the notes a student took on the whiteboard, edited in the notebook: back into their own doc (notes/gt-…, parts.gt)
+  async function gtSave(id,gt){
+    if(!who||!who.own||D||!/^gt-/.test(id))return;const C=window.ELCloud;S=S||await import(FS);
+    await S.setDoc(S.doc(C.db,"students",who.uid,"notes",id),{parts:{gt},updated:S.serverTimestamp()},{merge:true});
+  }
+  // ✏️ the notes a student took in a class game, edited in the notebook: back into that game's doc (notes/<deck>, parts.<k>, merged)
+  async function gnSave(id,k,p){
+    if(!who||!who.own||D||/^(nb|gt)-/.test(id)||!k)return;const C=window.ELCloud;S=S||await import(FS);
+    await S.setDoc(S.doc(C.db,"students",who.uid,"notes",id),{parts:{[k]:p},updated:S.serverTimestamp()},{merge:true});
   }
   // 🎯 What's in the exam for the student (el-exam.js), again when the language is known (Catalan for Starter and Base)
   let exCtx=null,exSeq=0;
@@ -208,7 +244,8 @@
     const a=document.querySelector('a.tile.nt[href="#notes"]');if(!a||!window.elRing)return;
     const g=Object.values(mg||{}).filter(x=>x&&x.ls===LS),st=window.elGameStats?elGameStats(g):{},tip=k=>window.elGameTip&&g.length?elGameTip(g,k,ca()):"";
     a.classList.add("gm");
-    a.innerHTML=`<span class="gm-h"><span><b>🎯 ${t("Què entra a l'examen","What's in the exam")}</b><small>${t("El que hem fet, paraules clau, teoria i els teus apunts","What we've done, key terms, theory and your notes")}</small></span><span class="gm-open">${t("Obre","Open")} →</span></span>`
+    const nb=!!window.ELNotebook;   // 📓 LS2 on: the student's notebook
+    a.innerHTML=`<span class="gm-h"><span><b>${nb?"📓 "+t("La meva llibreta","My notebook"):"🎯 "+t("Què entra a l'examen","What's in the exam")}</b><small>${nb?t("Índex, teoria, vocabulari i els teus apunts: el que entra a l'examen","Index, theory, vocabulary and your notes: what's in the exam"):t("El que hem fet, paraules clau, teoria i els teus apunts","What we've done, key terms, theory and your notes")}</small></span><span class="gm-open">${t("Obre","Open")} →</span></span>`
       +`<span class="gm-row"><span class="gm-rings">${elRing(st.grammar??null,"🧩 "+t("Gramàtica","Grammar"),42,tip("grammar"))}${elRing(st.vocab??null,"📚 "+t("Vocabulari","Vocabulary"),42,tip("vocab"))}</span>`
       +`<span class="gm-note"><i aria-hidden="true">📝</i>${t("Els teus apunts","Your notes")}</span></span>`;
   }
@@ -225,10 +262,10 @@
   window.addEventListener("hashchange",()=>{if(here())load()});
   function setWho(u){
     const C=window.ELCloud,AS=C&&C.viewing;
-    who=!u?null:AS?{uid:AS.uid,email:(AS.email||"").toLowerCase(),group:AS.group}:C.isTeacher(u)?{teacher:true}:{uid:u.uid,email:(u.email||"").toLowerCase(),own:true};
+    who=!u?null:AS?{uid:AS.uid,email:(AS.email||"").toLowerCase(),group:AS.group,name:AS.name||""}:C.isTeacher(u)?{teacher:true}:{uid:u.uid,email:(u.email||"").toLowerCase(),own:true,name:u.displayName||""};
     data=null;mg=null;tPlayed=null;tInfo=null;tEx=null;exCtx=null;if(here())load();else draw();loadMg();
   }
-  if(D){who=D.role==="teacher"?{teacher:true}:{uid:"demo",own:D.role!=="as"};mg=D.myGames||null;homeCard();if(here())load();else draw();window.addEventListener("load",()=>{if(here())load()});return}
+  if(D){who=D.role==="teacher"?{teacher:true}:{uid:"demo",own:D.role!=="as",name:D.name||"",group:D.group||""};mg=D.myGames||null;homeCard();if(here())load();else draw();window.addEventListener("load",()=>{if(here())load()});return}
   homeCard();
   let tries=0;(function wait(){if(window.ELCloud&&ELCloud.onUser){ELCloud.onUser(setWho);return}if(++tries<300)setTimeout(wait,100)})();
 })();

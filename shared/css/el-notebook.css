@@ -1,0 +1,542 @@
+/* 📓 My notebook (LS page #notes, shared/js/el-notebook.js) and 📘 the whiteboard students see while the teacher explains together
+   (shared/js/el-whiteboard.js). Roger, 13 Nov 2026: "I need students to see this section as though it was hand written with an index …
+   when doing an activity together and I'm explaining theory I want students to only see a whiteboard and that when they take notes it
+   looks like hand writing and they can underline, highlight, etc." Handwriting: Caveat (the student's pen), Kalam (the teacher's slips
+   and the board). "Aa Print letters" (html.el-nb-plain) switches both to plain letters. */
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Kalam:wght@400;700&display=swap");
+:root{
+  --nb-paper:#fffef8;--nb-line:#c7d9ee;--nb-margin:#ef9a9a;
+  --nb-ink:#1f4fb5;--nb-black:#23262b;--nb-red:#d32f2f;--nb-green:#2e7d32;--nb-pencil:#5f6874;
+  --nb-hl-y:#fff176;--nb-hl-g:#b9f6ca;--nb-hl-p:#ffc1e3;
+  --nb-hand:"Caveat","Segoe Print","Comic Sans MS",cursive;
+  --nb-teacher:"Kalam","Segoe Print","Comic Sans MS",cursive;
+  --nb-sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+html.el-nb-plain{--nb-hand:var(--nb-sans);--nb-teacher:var(--nb-sans)}
+
+/* ---------- marks a student makes (notebook and whiteboard page) ---------- */
+.nb-pen-b{color:#1f4fb5}.nb-pen-k{color:#23262b}.nb-pen-r{color:#d32f2f}.nb-pen-g{color:#2e7d32}
+.nb-hl-y,.nb-hl-g,.nb-hl-p{border-radius:.6em .25em .7em .3em;padding:0 .12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.nb-hl-y{background:linear-gradient(100deg,transparent 0 1%,var(--nb-hl-y) 3% 95%,transparent 99%)}
+.nb-hl-g{background:linear-gradient(100deg,transparent 0 1%,var(--nb-hl-g) 3% 95%,transparent 99%)}
+.nb-hl-p{background:linear-gradient(100deg,transparent 0 1%,var(--nb-hl-p) 3% 95%,transparent 99%)}
+.nb-ul{text-decoration:underline;text-decoration-thickness:2.5px;text-underline-offset:5px;text-decoration-color:var(--nb-red)}
+.nb-ulw{text-decoration:underline wavy;text-decoration-thickness:1.6px;text-underline-offset:5px;text-decoration-color:var(--nb-red)}
+.nb-circ{border:2.2px solid var(--nb-red);border-radius:50% 45% 55% 48%/60% 50% 55% 45%;padding:0 .25em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.nb-boxd{border:2.2px solid var(--nb-green);border-radius:3px 6px 4px 7px;padding:0 .2em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.nb-cp{color:var(--nb-black)}
+.nb-notes{position:relative;width:460px;max-width:100%;color:var(--nb-ink);font:500 25px/32px var(--nb-hand)}
+.nb-notes>svg{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible}
+html.el-nb-plain .nb-notes{font-size:17px}
+
+/* ---------- 📓 the notebook ---------- */
+.nb{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;padding:10px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));background:radial-gradient(ellipse at 50% 40%,#eef1f5,#d9dee6);box-sizing:border-box}
+.nb *,.nb *::before,.nb *::after{box-sizing:border-box}
+html.el-nb-full,html.el-nb-full body{overflow:hidden}
+html.el-nb-full #el-nbfab{display:none}
+.nb-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px;padding:0 6px}
+.nb-tab{border:0;cursor:pointer;padding:8px 14px 10px;border-radius:10px 10px 0 0;font:700 19px/1 var(--nb-hand);color:#2b2b2b;box-shadow:0 -1px 3px rgba(0,0,0,.08);transform:translateY(4px);transition:transform .15s}
+.nb-tab[aria-current="true"]{transform:none;padding-bottom:14px}
+.nb-tab:nth-child(5n+1){background:#ffe082}.nb-tab:nth-child(5n+2){background:#ffccbc}.nb-tab:nth-child(5n+3){background:#c5e1a5}.nb-tab:nth-child(5n+4){background:#b3e5fc}.nb-tab:nth-child(5n){background:#e1bee7}
+.nb-bar .nb-sp{flex:1}
+.nb-tool{border:1px solid #d5dce5;background:#fff;border-radius:10px;padding:6px 10px;font:600 14px var(--nb-sans);cursor:pointer;margin-bottom:6px;color:#16202c;text-decoration:none}
+.nb-tool[aria-pressed="true"]{border-color:#2f5bd3;background:#e8eefc}
+.nb-spread{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);grid-template-rows:minmax(0,1fr);filter:drop-shadow(0 10px 16px rgba(30,40,60,.2))}
+.nb-page{position:relative;background:var(--nb-paper);overflow:hidden;min-width:0;display:none}
+.nb-page.l,.nb-page.r,.nb-page.nb-meas{display:block}
+.nb-page.nb-meas{grid-column:1;visibility:hidden}
+.nb-page.l{border-radius:10px 0 0 10px;grid-column:1}
+.nb-page.r{border-radius:0 10px 10px 0;grid-column:3}
+.nb-spine{grid-column:2;grid-row:1;background:linear-gradient(90deg,#e9e6dc,#f6f3ea 40%,#f6f3ea 60%,#e9e6dc);display:flex;flex-direction:column;justify-content:space-evenly;align-items:center}
+.nb-ring{width:42px;height:9px;border-radius:9px;background:linear-gradient(#f2f4f7,#9aa3ad 55%,#6b737c);box-shadow:0 1px 1px rgba(0,0,0,.25)}
+.nb-page,.nb-spine{grid-row:1}
+.nb-paper{position:absolute;inset:0;overflow:hidden;padding:32px 22px 44px 72px;color:var(--nb-black);font:500 23px/32px var(--nb-hand);
+  background:linear-gradient(90deg,transparent 58px,var(--nb-margin) 58px,var(--nb-margin) 60px,transparent 60px),repeating-linear-gradient(transparent 0 31px,var(--nb-line) 31px 32px);background-attachment:local}
+html.el-nb-plain .nb-paper{font-size:16px}
+.nb-pno{position:absolute;bottom:8px;font:600 16px var(--nb-hand);color:var(--nb-pencil)}
+.nb-page.l .nb-pno{left:44px}.nb-page.r .nb-pno{right:46px}
+@media (max-width:899px){.nb-page.l .nb-pno{left:22px}}
+.nb-nav{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:8px;font:600 14px var(--nb-sans);color:#5b6878}
+.nb-nav button{border:1px solid #d5dce5;background:#fff;border-radius:999px;width:40px;height:40px;font-size:17px;cursor:pointer}
+.nb-nav button:disabled{opacity:.35;cursor:default}
+.nb h3,.nb h4{font-family:inherit}
+.nb-h1{font:700 34px/48px var(--nb-hand);margin:-12px 0 4px;color:var(--nb-black)}
+.nb-h1 u{text-decoration:underline double var(--nb-red);text-underline-offset:6px}
+.nb-h2{font:700 29px/32px var(--nb-hand);margin:32px 0 4px;color:var(--nb-black)}
+.nb-h2:first-child{margin-top:0}
+.nb-h2 span.u{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
+.nb-h3{font:700 23px/32px var(--nb-hand);color:var(--nb-pencil);margin:8px 0 0}
+html.el-nb-plain .nb-h1{font-size:24px;line-height:40px;margin:0}html.el-nb-plain .nb-h2{font-size:19px}html.el-nb-plain .nb-h3{font-size:16px}
+.nb-mdate{position:absolute;left:3px;width:54px;text-align:center;font:600 17px/18px var(--nb-hand);color:var(--nb-red);transform:rotate(-8deg)}
+.nb-pencil{color:var(--nb-pencil);font-size:21px}
+html.el-nb-plain .nb-pencil{font-size:15px}
+.nb-done i{font-style:normal;color:var(--nb-green)}
+.nb-voc{columns:2 220px;column-gap:22px;margin:0;padding:0;list-style:none}
+.nb-voc li{break-inside:avoid}
+.nb-voc b{font-weight:700}
+.nb-voc span{color:var(--nb-pencil);font-size:19px}
+html.el-nb-plain .nb-voc span{font-size:14px}
+.nb-mine{color:var(--nb-ink);font-size:24px}
+html.el-nb-plain .nb-mine{font-size:16px}
+.nb-mine .nb-lab{display:block;font:600 18px/32px var(--nb-hand);color:var(--nb-pencil)}
+/* the teacher's slip, glued in */
+.nb-slip{position:relative;background:#fff;margin:22px 4px 22px;padding:14px 16px 12px;font:400 15.5px/1.5 var(--nb-teacher);color:#222;box-shadow:0 2px 5px rgba(0,0,0,.14);transform:rotate(-.5deg)}
+.nb-slip:nth-of-type(even){transform:rotate(.45deg)}
+.nb-slip::before,.nb-slip::after{content:"";position:absolute;top:-10px;width:66px;height:20px;background:rgba(232,220,180,.78);box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.nb-slip::before{left:16px;transform:rotate(-5deg)}.nb-slip::after{right:16px;transform:rotate(4deg)}
+.nb-slip h4{margin:2px 0 4px;font:700 17px/1.3 var(--nb-teacher);color:#222}
+.nb-slip p{margin:4px 0}
+.nb-slip .ex-rule{background:none;border:0;border-bottom:1px dashed #d6d3c4;border-radius:0;padding:4px 0;margin:0}
+.nb-slip .ex-rule:last-child{border-bottom:0}
+.nb-slip .nt-s h4{color:#222;font-size:16.5px}
+.nb-slip table,.nb-slip .nt-t{border-collapse:collapse;margin:6px 0;width:100%;font-size:14.5px}
+.nb-slip th,.nb-slip td,.nb-slip .nt-t th,.nb-slip .nt-t td{border:1.5px solid #333;padding:3px 7px;text-align:left;vertical-align:top;background:transparent;color:#222}
+.nb-slip th,.nb-slip .nt-t th{background:#f3f4f6}
+.nb-slip .nt-w{background:#fff8dc;border-left:3px solid #f5b400}
+.nb-slip .nt-ca{background:#eef6ff}
+.nb-slip .nb-clip{position:absolute;right:4px;bottom:-14px;font:600 15px var(--nb-hand);color:var(--nb-pencil);transform:rotate(-3deg);background:var(--nb-paper);padding:0 4px}
+.nb-stamp{display:inline-block;border:2.5px solid var(--nb-red);color:var(--nb-red);border-radius:50%;padding:0 12px;font:700 21px/28px var(--nb-hand);transform:rotate(-7deg);margin-left:8px;white-space:nowrap;vertical-align:middle}
+.nb-stamp.ok{border-color:var(--nb-green);color:var(--nb-green)}
+.nb-sticky{background:#fff59d;box-shadow:2px 4px 8px rgba(0,0,0,.15);padding:10px 14px;transform:rotate(1.4deg);font:600 21px/27px var(--nb-hand);color:#3b3300;margin:16px 2px}
+.nb-sticky.pink{background:#f8bbd0;transform:rotate(-1.2deg)}
+.nb-sticky.green{background:#c8e6c9;transform:rotate(-.8deg)}
+.nb-sticky small{display:block;font-weight:500;font-size:19px}
+.nb-sticky ul{margin:2px 0 0;padding-left:20px}
+html.el-nb-plain .nb-sticky{font-size:15px;line-height:1.4}html.el-nb-plain .nb-sticky small{font-size:14px}
+.nb-game{margin:28px 0 0}
+.nb-when{display:block;font:500 18px/24px var(--nb-hand);color:var(--nb-pencil)}
+/* the index */
+.nb-idx{list-style:none;margin:0;padding:0}
+.nb-idx a{display:flex;align-items:baseline;gap:6px;color:inherit;text-decoration:none;cursor:pointer}
+.nb-idx a:hover .t,.nb-idx a:focus-visible .t{text-decoration:underline}
+.nb-idx .dots{flex:1;min-width:12px;border-bottom:2px dotted #9aa3ad;transform:translateY(-6px)}
+.nb-idx .lp>a{font-weight:700;font-size:25px}
+.nb-idx ul{list-style:none;margin:0;padding:0 0 0 24px}
+.nb-idx .n{color:var(--nb-red);font-weight:700}
+html.el-nb-plain .nb-idx .lp>a{font-size:17px}
+.nb-legend{color:var(--nb-pencil);font-size:20px}
+.nb-legend b{color:var(--nb-black)}
+.nb-links{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+.nb-links a,.nb-links button{font:600 14px var(--nb-sans);border:1px solid #d5dce5;background:#fff;border-radius:10px;padding:7px 12px;color:#16202c;text-decoration:none;cursor:pointer}
+@media (max-width:899px){
+  .nb{padding:6px 8px 6px}
+  .nb-spread{grid-template-columns:minmax(0,1fr)}
+  .nb-spine,.nb-page.r{display:none}
+  .nb-page.l{border-radius:0 10px 10px 10px;grid-column:1}
+  .nb-paper{padding-left:62px;padding-right:12px}
+  .nb-tab{padding:6px 10px 8px;font-size:17px}
+  .nb-tool{padding:5px 8px}
+}
+@media print{
+  html.el-nb-full,html.el-nb-full body{overflow:visible}
+  .nb{position:static;display:block;padding:0;background:none}
+  .nb-bar,.nb-nav,.nb-spine,.nb-links,.nb-ui,.nb-selbar,.nb-ed,.nb-leaf,.nb-corner{display:none!important}
+  .nb-spread{display:block;height:auto;filter:none}
+  html.nb-printsel .nb-page:not(.nb-pr){display:none!important}
+  .nb-page{display:block!important;border-radius:0!important;break-after:page;overflow:visible}
+  .nb-paper{position:relative;inset:auto;overflow:visible}
+  .nb-pno{position:static;display:block;text-align:right}
+  /* the pages are laid out for the sheet (html.nb-prlay, el-notebook.js beforeprint): 700 x 950 px fits A4 and Letter */
+  html.nb-prlay .nb-page{width:700px;max-width:100%}
+  /* the cover fills its sheet, like a real cover */
+  .nb-page.nb-cvp .nb-paper{box-sizing:border-box;min-height:98vh}
+}
+
+/* ---------- 📘 the whiteboard (in class, while the teacher explains) ---------- */
+#el-wb{position:fixed;inset:0;z-index:2147483000;background:#dfe5ec;display:flex;flex-direction:column;font:15px/1.45 var(--nb-sans);color:#16202c}
+#el-wb *{box-sizing:border-box}
+#el-wb .wb-top{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;padding:8px 16px;background:#1d3557;color:#fff}
+#el-wb .wb-top b{font-size:16px}
+#el-wb .wb-top .s{opacity:.85;font-size:14px}
+#el-wb .wb-top .sp{flex:1}
+#el-wb .wb-saved{font-size:13px;background:rgba(255,255,255,.14);padding:3px 10px;border-radius:99px}
+#el-wb .wb-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;padding:14px 16px}
+#el-wb .wb-board{position:relative;display:flex;flex-direction:column;min-height:0;background:#fbfcfd;border:12px solid #b9c0c9;border-bottom-width:22px;border-radius:6px;box-shadow:inset 0 0 40px rgba(120,140,160,.12),0 8px 16px rgba(0,0,0,.18)}
+#el-wb .wb-board::after{content:"";position:absolute;left:12%;right:12%;bottom:-17px;height:10px;background:linear-gradient(90deg,transparent 4%,#1565c0 4% 11%,transparent 11% 14%,#d32f2f 14% 21%,transparent 21% 24%,#212121 24% 31%,transparent 31%);border-radius:4px}
+#el-wb .wb-scroll{flex:1;overflow:auto;padding:18px 22px 14px 46px;font:400 19px/1.5 var(--nb-teacher);color:#212121}
+html.el-nb-plain #el-wb .wb-scroll{font-size:17px}
+#el-wb .wb-title{font:700 25px/1.2 var(--nb-teacher);color:#1565c0;margin:0 0 14px;text-decoration:underline;text-underline-offset:6px}
+#el-wb .wb-in .wb-it{position:relative;margin:0 0 14px;padding:8px 10px;border-radius:8px;opacity:.5;transition:opacity .3s;background:none;border:0;box-shadow:none;font:inherit;color:inherit}
+#el-wb .wb-in.all .wb-it,#el-wb .wb-in .wb-now,#el-wb .wb-in .wb-seen{opacity:1}
+#el-wb .wb-in .wb-seen{opacity:.8}
+#el-wb .wb-in .wb-now{background:rgba(255,241,118,.2);outline:2.5px dashed rgba(211,47,47,.55);outline-offset:2px;opacity:1}
+#el-wb .wb-in .wb-now::before{content:"➜";position:absolute;left:-36px;top:6px;font:700 28px var(--nb-teacher);color:var(--nb-red)}
+#el-wb .wb-in strong,#el-wb .wb-in b{color:#1565c0}
+#el-wb .wb-in em,#el-wb .wb-in i{color:#c62828;font-style:normal}
+#el-wb .wb-in table{border-collapse:collapse;margin:6px 0;font-size:.92em}
+#el-wb .wb-in th,#el-wb .wb-in td{border:2px solid #444;padding:3px 8px;text-align:left;background:transparent}
+#el-wb .wb-in .model>span:first-child{display:inline-block;font:700 12px var(--nb-sans);text-transform:uppercase;letter-spacing:.05em;color:#5b6878;margin-right:6px}
+#el-wb .wb-copy{position:absolute;right:8px;top:-15px;border:1px solid #d5dce5;background:#fff;border-radius:99px;padding:3px 10px;font:600 13px var(--nb-sans);color:#2f5bd3;opacity:0;transition:opacity .15s;cursor:pointer;z-index:1}
+#el-wb .wb-it:hover>.wb-copy,#el-wb .wb-it:focus-within>.wb-copy,#el-wb .wb-now>.wb-copy{opacity:1}
+html.el-wb-on,html.el-wb-on body{overflow:hidden}
+html.el-wb-on #el-nbfab{display:none}
+#el-wb .wb-np{display:flex;flex-direction:column;min-height:0;min-width:0}
+#el-wb .wb-sheet{position:relative;flex:1;min-height:0;border:1px solid #d5dce5;border-radius:12px;box-shadow:0 8px 16px rgba(0,0,0,.12);overflow:hidden;background:var(--nb-paper)}
+#el-wb .wb-sheet .nb-paper{padding-top:0}
+#el-wb .wb-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;font-size:13px;color:#5b6878}
+/* ✍ the handwriting page (el-pad.js) */
+.pad-tools{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:4px;align-items:center;background:#fff;border-bottom:1px solid #d5dce5;margin:0 -22px 32px -72px;padding:6px 8px;font:15px/1.4 var(--nb-sans)}
+.nb-page .pad-tools{margin-top:0;border:1px solid #d5dce5;border-radius:10px;margin:8px 0 32px -12px}
+.pad-g{display:flex;gap:2px;padding-right:4px;border-right:1px solid #d5dce5}
+.pad-g:last-child{border:0}
+.pad-tb{border:1px solid transparent;background:transparent;border-radius:8px;min-width:32px;height:34px;padding:0 6px;font:700 15px var(--nb-sans);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#16202c}
+.pad-tb:hover{background:#eef2f6}
+.pad-tb[aria-pressed="true"]{border-color:#2f5bd3;background:#e8eefc}
+.pad-tb:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+.pad-ed:focus,.pad-ed:focus-visible{outline:none}
+.pad-dot{width:18px;height:18px;border-radius:50%;display:block}
+.pad-hlb{width:22px;height:14px;border-radius:3px;display:block;transform:rotate(-8deg)}
+.pad-l{font:700 19px/1 var(--nb-hand)}
+.pad-ed{outline:none;min-height:224px;caret-color:var(--nb-ink);color:var(--nb-ink)}
+.pad-ed:empty::before{content:attr(data-ph);color:#9aa3ad}
+.pad-ed div{min-height:32px}
+.pad-cv{position:absolute;left:0;top:0;touch-action:none;display:none;cursor:crosshair;z-index:1}
+.pad-drawing .pad-cv{display:block}
+#pad-hint{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:2147483600;background:#16202c;color:#fff;padding:8px 14px;border-radius:10px;font:14px var(--nb-sans);opacity:0;pointer-events:none;transition:opacity .2s}
+#pad-hint.on{opacity:1}
+#el-wb button:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+@media (max-width:820px){
+  #el-wb{overflow:auto}
+  #el-wb .wb-main{grid-template-columns:minmax(0,1fr);flex:none}
+  #el-wb .wb-board{min-height:340px}
+  #el-wb .wb-sheet{min-height:380px}
+}
+@media (prefers-reduced-motion:reduce){#el-wb *,.nb *{transition:none!important}}
+
+/* index: ▲ ▼ and the student's own sections */
+.nb-row{display:flex;align-items:baseline;gap:6px}
+.nb-row>a{flex:1;min-width:0}
+.nb-mv{display:inline-flex;gap:2px;flex:0 0 auto}
+.nb-mv button{border:1px solid #d5dce5;background:#fff;border-radius:6px;width:26px;height:24px;font:12px/1 var(--nb-sans);color:#5b6878;cursor:pointer;padding:0}
+.nb-mv button:hover{background:#e8eefc;color:#2f5bd3}
+.nb-mv button:disabled{opacity:.3;cursor:default}
+.nb-add{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+.nb-add input{flex:1;min-width:180px;font:600 21px/1.2 var(--nb-hand);color:var(--nb-ink);border:0;border-bottom:2px dashed #9aa3ad;background:transparent;padding:2px 4px;outline:none}
+.nb-add input:focus{border-bottom-color:var(--nb-ink)}
+.nb-add button,.nb-del{font:600 14px var(--nb-sans);border:1px solid #d5dce5;background:#fff;border-radius:10px;padding:6px 12px;color:#16202c;cursor:pointer}
+.nb-del[data-sure]{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+.nb-stitle{width:100%;font:700 34px/56px var(--nb-hand);color:var(--nb-black);border:0;border-bottom:2px dashed transparent;background:transparent;outline:none;padding:0}
+.nb-stitle:hover,.nb-stitle:focus{border-bottom-color:#9aa3ad}
+html.el-nb-plain .nb-stitle,html.el-nb-plain .nb-add input{font-family:var(--nb-sans);font-size:20px}
+.nb-saved{align-self:center;margin:0 6px 6px 0;font-size:17px}
+.nb-page .pad-tools{margin:6px 0 30px -14px}
+@media (max-width:899px){.nb-page .pad-tools{margin-left:-8px}}
+
+/* the parts of a page: ▲ ▼ ✍ ✏️ in the margin, beside the part (the student's own notebook only) */
+.nb-blk{position:relative}
+.nb-bt{position:absolute;left:-70px;top:2px;width:56px;display:flex;flex-wrap:wrap;gap:2px;z-index:2;opacity:.3;transition:opacity .15s}
+.nb-blk:hover>.nb-bt,.nb-bt:focus-within{opacity:1;z-index:3}
+.nb-bt button{width:27px;height:25px;padding:0;border:1px solid #d5dce5;background:#fff;border-radius:6px;font:12px/1 var(--nb-sans);color:#5b6878;cursor:pointer}
+.nb-bt button:hover{background:#e8eefc;color:#2f5bd3}
+.nb-bt button:disabled{opacity:.3;cursor:default}
+.nb-bt button:focus-visible,.nb-selbar button:focus-visible,.nb-tool:focus-visible,.nb-tab:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+@media (max-width:899px){.nb-bt{left:-60px;width:28px;opacity:.55}}
+.nb-note{cursor:text;border-radius:8px;margin:8px 0}
+.nb-note:hover{background:rgba(31,79,181,.05)}
+.nb-mk{border-radius:.3em}
+.nb-cont.nb-slip::before,.nb-cont.nb-slip::after{display:none}
+.nb-cont.nb-slip{margin-top:4px}
+.nb-addnote{color:var(--nb-ink)!important}
+/* the folded corner: drag it (or a margin) to turn the page */
+.nb-corner{position:absolute;bottom:0;width:38px;height:38px;z-index:2;cursor:grab;background:linear-gradient(135deg,transparent 50%,#e6e1d2 50%,#f7f3e6 70%,#ddd6c3);box-shadow:-2px -2px 4px rgba(0,0,0,.06);border-radius:0 0 10px 0}
+.nb-page.r .nb-corner{right:0}
+.nb-page.l .nb-corner{left:0;transform:scaleX(-1)}
+@media (max-width:899px){.nb-page.l .nb-corner{left:auto;right:0;transform:none}}
+.nb-page .nb-pno{z-index:1}
+/* the leaf that turns */
+.nb-leaf{grid-row:1;z-index:5;position:relative;transform-style:preserve-3d;pointer-events:none;will-change:transform}
+.nb-leaf.r{grid-column:3;transform-origin:left center}
+.nb-leaf.l{grid-column:1;transform-origin:right center}
+.nb-leaf.one{grid-column:1;transform-origin:left center}
+.nb-face{position:absolute;inset:0;background:var(--nb-paper);backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;box-shadow:0 0 calc(30px * var(--nb-sh,0)) rgba(0,0,0,calc(var(--nb-sh,0) * 1.2))}
+.nb-face.back{transform:rotateY(180deg)}
+.nb-leaf.r .nb-face.front,.nb-leaf.l .nb-face.back{border-radius:0 10px 10px 0}
+.nb-leaf.l .nb-face.front,.nb-leaf.r .nb-face.back{border-radius:10px 0 0 10px}
+.nb-leaf.one .nb-face{border-radius:0 10px 10px 10px}
+.nb-face::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,calc(var(--nb-sh,0) * .5)),transparent 40%)}
+.nb-spread .nb-paper{touch-action:pan-y pinch-zoom}
+/* 🖍 the marks for words a student selects on a page */
+.nb-selbar{position:fixed;z-index:6;display:flex;gap:2px;padding:4px;background:#fff;border:1px solid #d5dce5;border-radius:12px;box-shadow:0 8px 20px rgba(20,30,50,.22)}
+.nb-selbar[hidden]{display:none}
+.nb-selbar button{min-width:34px;height:34px;border:1px solid transparent;background:transparent;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font:700 15px var(--nb-sans)}
+.nb-selbar button:hover{background:#eef2f6}
+/* ✍ the handwriting page for a note, on top of the book */
+.nb-ed{position:absolute;inset:0;z-index:20;background:rgba(30,40,60,.45);display:flex;align-items:center;justify-content:center;padding:14px}
+.nb-ed-in{width:min(820px,100%);height:100%;display:flex;flex-direction:column;background:#fff;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden}
+.nb-ed-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:8px 12px;border-bottom:1px solid #e3e8ef;font:15px var(--nb-sans)}
+.nb-ed-top b{font:700 22px/1.1 var(--nb-hand)}
+.nb-ed-where{color:#5b6878;font-size:13px}
+.nb-ed-top .nb-sp{flex:1}
+.nb-ed-top .nb-tool{margin:0}
+.nb-ed-ok{background:#1f4fb5!important;border-color:#1f4fb5!important;color:#fff!important}
+.nb-ed-del[data-sure]{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+.nb-ed-sheet{position:relative;flex:1;min-height:0;background:var(--nb-paper)}
+.nb-ed-sheet .nb-paper{overflow:auto;padding-top:0}
+.nb-ed .pad-tools{margin:0 -22px 32px -72px}
+@media (max-width:899px){.nb-ed{padding:0}.nb-ed-in{border-radius:0}.nb-ed .pad-tools{margin-left:-62px;margin-right:-12px}}
+/* 🖨 what to print */
+.nb-pwrap{position:relative}
+.nb-pmenu{position:absolute;right:0;top:calc(100% - 2px);z-index:8;width:min(320px,90vw);display:flex;flex-direction:column;gap:6px;padding:10px;background:#fff;border:1px solid #d5dce5;border-radius:12px;box-shadow:0 12px 28px rgba(20,30,50,.22);font:14px var(--nb-sans)}
+.nb-pmenu[hidden]{display:none}
+.nb-pmenu>button,.nb-pmenu details>button{text-align:left;border:1px solid #d5dce5;background:#f8fafc;border-radius:8px;padding:8px 10px;font:600 14px var(--nb-sans);cursor:pointer;color:#16202c}
+.nb-pmenu>button:hover,.nb-pmenu details>button:hover{background:#e8eefc}
+.nb-pmenu summary{cursor:pointer;padding:6px 2px;font-weight:600}
+.nb-plist{max-height:min(300px,45vh);overflow:auto;display:flex;flex-direction:column;gap:2px;margin:4px 0 8px;padding:4px;border:1px solid #e3e8ef;border-radius:8px}
+.nb-plist label{display:flex;gap:6px;align-items:baseline;padding:3px 4px;border-radius:6px;cursor:pointer}
+.nb-plist label:hover{background:#f1f5f9}
+.nb-plist b{min-width:20px;color:var(--nb-red)}
+.nb-shake{animation:nbShake .35s}
+@keyframes nbShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.nb-close{font-weight:700}
+@media (prefers-reduced-motion:reduce){.nb-shake{animation:none}}
+/* words on the pages can be selected to mark them (el-nocopy.js turns selection off on student pages; copying stays blocked) */
+.nb .nb-paper .nb-blk:not(.nb-note){-webkit-user-select:text;user-select:text}
+.nb .nb-ui,.nb .nb-stamp,.nb .nb-postit{-webkit-user-select:none;user-select:none}
+/* 📌 a post-it on top of each section of a learning path */
+.nb-postit{display:inline-block;margin:26px 0 6px -6px;padding:4px 16px 5px 12px;font:700 25px/30px var(--nb-hand);color:#2b2b2b;background:#ffe082;box-shadow:2px 3px 6px rgba(0,0,0,.14);transform:rotate(-1.6deg);border-radius:2px 2px 12px 2px}
+.nb-postit small{font:600 17px var(--nb-hand);color:#6b5d3a;margin-left:10px}
+.nb-blk:first-of-type>.nb-postit,.nb-cont .nb-postit{margin-top:12px}
+.nb-postit.k-vocab,.nb-stab.k-vocab{background:#c5e1a5}.nb-postit.k-grammar,.nb-stab.k-grammar{background:#b3e5fc}.nb-postit.k-read,.nb-stab.k-read{background:#ffccbc}
+.nb-postit.k-listen,.nb-stab.k-listen{background:#e1bee7}.nb-postit.k-other,.nb-stab.k-other{background:#ffe082}
+html.el-nb-plain .nb-postit{font-size:18px}
+/* ✏️ the student's answers, corrected in red pen */
+.nb-work{margin:14px 0 8px}
+.nb-wh{font:700 23px/32px var(--nb-hand);color:var(--nb-black)}
+.nb-wh small{font-weight:500;font-size:18px;color:var(--nb-pencil)}
+.nb-ans{margin:0;padding-left:30px;font:500 21px/32px var(--nb-hand);color:var(--nb-black)}
+.nb-ans li{margin:0;padding:0}
+.nb-ans li::marker{color:var(--nb-pencil)}
+.nb-giv{color:var(--nb-ink);font:600 23px/1 var(--nb-hand)}
+.nb-corr{position:relative;display:inline-block;padding-top:14px;line-height:18px}
+.nb-corr s.nb-giv{text-decoration:line-through;text-decoration-color:var(--nb-red);text-decoration-thickness:2.5px}
+.nb-fix{position:absolute;left:4px;top:-6px;white-space:nowrap;font:700 19px/1 "Kalam",var(--nb-teacher);color:var(--nb-red);transform:rotate(-4deg)}
+.nb-fix.in{position:static;display:inline;white-space:normal;transform:none;margin-left:2px}
+.nb-x{text-decoration:line-through;text-decoration-color:var(--nb-red);text-decoration-thickness:2.5px}
+.nb-tick,.nb-cross{font-style:normal;font:700 24px/1 var(--nb-teacher);color:var(--nb-red);margin-left:4px}
+.nb-tick{color:var(--nb-green)}
+.nb-arrow{color:var(--nb-pencil)}
+html.el-nb-plain .nb-ans,html.el-nb-plain .nb-giv{font-size:16px}html.el-nb-plain .nb-fix{font-size:14px}
+/* 📌 the sections of the learning path on the screen, sticking out of the book's right edge */
+.nb-side{position:absolute;right:-34px;top:26px;bottom:26px;width:34px;display:flex;flex-direction:column;gap:6px;z-index:1;pointer-events:none}
+.nb-stab{pointer-events:auto;writing-mode:vertical-rl;border:0;border-radius:0 8px 8px 0;padding:10px 4px 10px 6px;font:700 17px/1 var(--nb-hand);color:#2b2b2b;cursor:pointer;box-shadow:2px 1px 3px rgba(0,0,0,.12);max-height:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transform:translateX(-6px);transition:transform .15s}
+.nb-stab.on,.nb-stab:hover{transform:none}
+.nb-stab:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+@media (min-width:900px){.nb-spread{margin-right:30px}}
+@media (max-width:899px){.nb-side{display:none}}
+@media print{.nb-side{display:none!important}}
+/* 🟨 notes as post-its */
+.nb-notes.nb-pi{width:auto;max-width:430px;padding:10px 16px 12px;margin:8px 0 8px 6px;box-shadow:2px 4px 8px rgba(0,0,0,.15);transform:rotate(-1deg);border-radius:2px 2px 14px 2px}
+.nb-notes.pi-y{background:#fff59d}.nb-notes.pi-p{background:#f8bbd0}.nb-notes.pi-g{background:#c8e6c9}.nb-notes.pi-b{background:#bbdefb}
+.nb-note:nth-of-type(even) .nb-notes.nb-pi{transform:rotate(1.2deg)}
+.nb-pis{display:inline-flex;gap:4px;margin-left:6px}
+.nb-pib{width:26px;height:26px;border-radius:5px;border:2px solid #d5dce5;cursor:pointer;padding:0}
+.nb-pib[aria-pressed="true"]{border-color:#1f4fb5;box-shadow:0 0 0 2px #fff inset}
+.nb-pib.pi-n{background:repeating-linear-gradient(#fffef8 0 6px,#c7d9ee 6px 7px)}.nb-pib.pi-y{background:#fff59d}.nb-pib.pi-p{background:#f8bbd0}.nb-pib.pi-g{background:#c8e6c9}.nb-pib.pi-b{background:#bbdefb}
+.nb-ed-sheet[data-pi="y"] .nb-paper{background-color:#fff9c4}.nb-ed-sheet[data-pi="p"] .nb-paper{background-color:#fce4ec}.nb-ed-sheet[data-pi="g"] .nb-paper{background-color:#e8f5e9}.nb-ed-sheet[data-pi="b"] .nb-paper{background-color:#e3f2fd}
+/* 🔍 the dictionary floats over the notebook, in the free corner under the book */
+html.el-nb-full .eldict-fab{z-index:2147482500!important;position:fixed!important;left:auto!important;top:auto!important;right:18px!important;bottom:4px!important}
+html.el-nb-full .eldict,html.el-nb-full .eldict-tipbox{z-index:2147482600!important}
+@media (max-width:899px){.nb-bt.nb-bt-n{width:56px}}
+/* 👋 first-time tour of the notebook (el-notebook.js tour()) */
+.nb-tour{position:fixed;inset:0;z-index:2147483000}
+.nb-tour-ring{position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(18,28,48,.62);outline:3px solid #ffd84d;outline-offset:2px;transition:all .3s ease;pointer-events:none}
+.nb-tour-ring.none{outline:0}
+.nb-tour-box{position:fixed;background:#fff6a8;color:#26303d;border-radius:4px 4px 18px 4px;padding:16px 18px 12px;box-shadow:0 14px 30px rgba(0,0,0,.35);transform:rotate(-.6deg);font:16px/1.45 var(--nb-sans,system-ui,sans-serif);transition:left .3s ease,top .3s ease;outline:0}
+.nb-tour-box::before{content:"";position:absolute;top:-10px;left:50%;width:90px;height:20px;margin-left:-45px;background:rgba(230,220,180,.85);transform:rotate(-2deg)}
+.nb-tour-h{display:flex;align-items:center;gap:10px;font:700 24px/1.15 'Kalam','Caveat',cursive;color:#1f3c88;margin-bottom:6px}
+.nb-tour-ic{font-size:28px}
+.nb-tour-box p{margin:0 0 12px}
+.nb-tour-f{display:flex;align-items:center;gap:8px}
+.nb-tour-n{font-size:13px;color:#6b6440;margin-right:auto}
+.nb-tour-f button{font:700 15px system-ui,sans-serif;border-radius:10px;padding:8px 14px;cursor:pointer;border:1px solid #c9bd6a;background:#fffbe0;color:#4c4520}
+.nb-tour-f .nb-tour-skip{border-color:transparent;background:none;text-decoration:underline;font-weight:600}
+.nb-tour-f .nb-tour-next{background:#1f4fb5;border-color:#1f4fb5;color:#fff}
+.nb-tour-f button:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+html.nb-touring .eldict-tipbox{display:none!important}
+.nb .nb-help{min-width:40px}
+@media print{.nb-tour{display:none}}
+html.nb-touring .nb-bt{opacity:1}
+/* the corrections in green (Roger, 13 Nov 2026: "use green for the corrections"); what was wrong is still crossed out in red */
+.nb .nb-fix{color:var(--nb-green)}
+.nb-swp{display:inline-block;width:16px;height:13px;background:#f7b9cf;box-shadow:0 1px 2px rgba(0,0,0,.2);transform:rotate(-4deg);vertical-align:-1px}
+.nb .nb-gned{margin-left:8px;font:600 13px/1 var(--nb-sans,system-ui,sans-serif);border:1px solid #c9d3e6;background:#fff;color:#2f5bd3;border-radius:8px;padding:4px 8px;cursor:pointer;vertical-align:2px}
+.nb .nb-gned:hover{background:#e8eefc}
+.nb .nb-gned:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+/* 📝 Exams section (el-notebook.js examBlocks) */
+.nb-postit.k-exam,.nb-stab.k-exam{background:#ffab91}.nb-postit.k-fp,.nb-stab.k-fp{background:#d1c4e9}
+.nb-xparts{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-wrap:wrap;gap:4px 22px;font:20px/32px var(--nb-hand)}
+.nb-xparts .ok{color:var(--nb-green);font-weight:700}.nb-xparts .ko{color:var(--nb-red);font-weight:700}
+.nb-why{display:block;font:15px/24px var(--nb-hand);color:var(--nb-pencil)}
+.nb-fbl{margin:0 0 8px;padding-left:6px;list-style:none;font:18px/30px var(--nb-hand)}
+.nb-fbl .ok{color:var(--nb-green)}.nb-fbl .todo{color:var(--nb-ink)}
+.nb-chap{font:400 .5em var(--nb-hand);color:var(--nb-pencil)}
+/* 📚 chapters: one per LS, bottom left, like tabs hanging under the book */
+.nb .nb-chaps{position:absolute;left:16px;bottom:4px;display:flex;align-items:center;gap:6px;z-index:3;max-width:calc(50% - 150px)}
+.nb-chl{font-size:18px}
+.nb-ch{display:inline-flex;align-items:center;gap:4px;max-width:260px;padding:7px 12px;border-radius:0 0 10px 10px;background:#eef1f6;border:1px solid #d5dce5;border-top:0;color:#2f5bd3;text-decoration:none;font:600 14px/1.1 var(--nb-sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb-ch span{overflow:hidden;text-overflow:ellipsis}
+.nb-ch.on{background:#fffdf5;color:#23262b;box-shadow:0 3px 6px rgba(0,0,0,.12)}
+a.nb-ch:hover{background:#e3eafb}
+a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
+@media (max-width:899px){.nb .nb-chaps{max-width:none;bottom:auto;top:auto;position:static;justify-content:center;margin-top:4px}.nb-ch span{display:none}}
+@media print{.nb .nb-chaps{display:none!important}}
+/* 📘 the front cover: page 1 of every chapter and every print (el-notebook.js front) */
+.nb-front{font:15px/1.4 var(--nb-sans,system-ui,sans-serif);color:#26303d}
+/* 📘 the cover's pages: a hard cover of blue cloth board with a darker spine, corner protectors and an elastic band; the ruled lines,
+   the margin and the page number are not drawn there. Only colours change here (the pages are measured before), so nothing moves. */
+.nb-page.nb-cvp,.nb-face.nb-cvp{background:var(--cv)}
+.nb-page.nb-cvp .nb-paper,.nb-face.nb-cvp .nb-paper{background:radial-gradient(120% 90% at 30% 20%,rgba(255,255,255,.10),transparent 60%),var(--cv-pat),linear-gradient(90deg,var(--cv-dk) 0 40px,rgba(0,0,0,.25) 40px 43px,var(--cv) 43px);color:#fff}
+/* 🎨 the student's cover (Roger, 13 Nov 2026: "Make it possible to change the design and colors of the cover"; green with stars by default: "Set green as a default", "I mean green with stars"): .nb data-cv (colour) and
+   data-cvd (design), chosen with 🎨 My cover (el-notebook.js cvPick) */
+.nb{--cv:#1f5c3f;--cv-dk:#123b28;--cv-pat:radial-gradient(circle at 30% 30%,rgba(255,226,138,.5) 1.4px,transparent 2px) 0 0/34px 34px,radial-gradient(circle,rgba(255,255,255,.35) 1px,transparent 1.6px) 17px 17px/34px 34px}
+.nb[data-cvd="cloth"]{--cv-pat:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(0,0,0,.05) 0 2px,transparent 2px 5px)}
+.nb[data-cv="blue"]{--cv:#1f3c73;--cv-dk:#132a55}.nb[data-cv="red"]{--cv:#8e2430;--cv-dk:#5e1620}.nb[data-cv="green"]{--cv:#1f5c3f;--cv-dk:#123b28}.nb[data-cv="purple"]{--cv:#4a2c6e;--cv-dk:#2f1a48}
+.nb[data-cv="black"]{--cv:#2a2d33;--cv-dk:#15171b}.nb[data-cv="pink"]{--cv:#a3365f;--cv-dk:#6d203e}.nb[data-cv="orange"]{--cv:#a8501c;--cv-dk:#6e3211}.nb[data-cv="teal"]{--cv:#1d5e66;--cv-dk:#103c42}
+.nb[data-cvd="dots"]{--cv-pat:radial-gradient(rgba(255,255,255,.16) 2px,transparent 2.6px) 0 0/18px 18px}
+.nb[data-cvd="stripes"]{--cv-pat:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 14px,transparent 14px 28px)}
+.nb[data-cvd="checks"]{--cv-pat:linear-gradient(rgba(255,255,255,.07) 50%,transparent 0) 0 0/32px 32px,linear-gradient(90deg,rgba(255,255,255,.07) 50%,transparent 0) 0 0/32px 32px}
+.nb[data-cvd="stars"]{--cv-pat:radial-gradient(circle at 30% 30%,rgba(255,226,138,.5) 1.4px,transparent 2px) 0 0/34px 34px,radial-gradient(circle,rgba(255,255,255,.35) 1px,transparent 1.6px) 17px 17px/34px 34px}
+.nb[data-cvd="plain"]{--cv-pat:linear-gradient(transparent,transparent)}
+.nb-cvbtn{position:absolute;right:-12px;top:-14px;z-index:3;white-space:nowrap;font:700 14px var(--nb-sans,system-ui,sans-serif);background:rgba(255,255,255,.92);color:#1f2733;border:0;border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.nb-cvbtn:hover{background:#fff}
+.nb-cvpick{position:fixed;z-index:2147482700;background:#fff;color:#1f2733;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.3);padding:12px 14px;width:min(320px,calc(100vw - 24px));font:14px/1.3 var(--nb-sans,system-ui,sans-serif)}
+.nb-cvpick b{display:block;font-weight:700;margin:2px 0 6px}
+.nb-cvpick .row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.nb-cvpick .sw{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #d5dce5;cursor:pointer;padding:0}
+.nb-cvpick .sw.on,.nb-cvpick .pt.on{box-shadow:0 0 0 3px #2f5bd3}
+.nb-cvpick .pt{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;cursor:pointer;font:600 12px var(--nb-sans,system-ui,sans-serif);color:#1f2733;padding:2px;border-radius:10px}
+.nb-cvpick .pt i{width:46px;height:46px;border-radius:8px;background:var(--cv-pat),var(--cv);display:block}
+.nb-cvpick .ok{width:100%;font:700 14px var(--nb-sans,system-ui,sans-serif);border:0;border-radius:10px;padding:8px;background:#1f3c73;color:#fff;cursor:pointer}
+@media print{.nb-cvbtn,.nb-cvpick{display:none!important}}
+.nb-cvp .nb-pno,.nb-cvp .nb-corner{display:none}
+.nb-cv1::before,.nb-cv1::after{content:"";position:absolute;z-index:2;pointer-events:none}
+.nb-cv1::before{right:0;top:0;width:34px;height:34px;background:linear-gradient(225deg,#c9a24a 0 50%,transparent 50%);opacity:.9}
+.nb-cv1::after{right:9px;top:0;bottom:0;width:9px;background:linear-gradient(90deg,#0b0f17,#2b3446 45%,#0b0f17);box-shadow:-2px 0 4px rgba(0,0,0,.35)}
+.nb-fr-top{display:flex;align-items:center;gap:10px;padding:2px 0 12px;margin-bottom:14px}
+.nb-fr-top img{width:40px;height:40px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.nb-fr-top b{font:800 24px/1 var(--nb-sans,system-ui,sans-serif);color:#f5f7fb;letter-spacing:.5px;text-shadow:0 1px 0 rgba(0,0,0,.45)}
+.nb-fr-top span{margin-left:auto;color:#c7d3ea;font-size:13px;line-height:1.3;text-align:right}
+.nb-fr-label{position:relative;background:#fffef8;color:#26303d;border-radius:14px;padding:12px 18px 10px;margin:4px 6% 16px;box-shadow:0 3px 10px rgba(0,0,0,.35);outline:2px solid #fffef8;outline-offset:-7px;border:1.5px solid #1f3c73}
+.nb-fr-label::before{content:"";position:absolute;inset:6px;border:1.5px solid #9fb3d9;border-radius:10px;pointer-events:none}
+.nb-fr-title{font:700 26px/1.2 var(--nb-hand);text-align:center;color:#1f3c73;margin:0 0 6px}
+.nb-fr-line{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;border-bottom:1.5px solid #c7d9ee;padding:2px 0 1px;margin-bottom:4px}
+.nb-fr-line i{font:600 12px/1 var(--nb-sans,system-ui,sans-serif);font-style:normal;text-transform:uppercase;letter-spacing:.8px;color:#6b7a90}
+.nb-fr-name{font:700 32px/1.15 var(--nb-hand);color:var(--nb-ink)}
+.nb-fr-course{font:700 24px/1.2 var(--nb-hand);color:var(--nb-ink);margin-right:10px}
+.nb-fr-lv{font:700 24px/1.2 var(--nb-hand);color:var(--nb-ink)}
+.nb-fr-res{font:700 18px/1.2 var(--nb-sans,system-ui,sans-serif);color:#ffe28a;margin:0 0 8px;letter-spacing:.3px}
+.nb-fr-ls{border-radius:8px;padding:8px 10px;margin:0 0 12px;background:#fff;color:#26303d;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.nb-fr-ls .nb-pencil{color:#6b7280;font-size:18px}
+.nb-fr-lh{font:700 17px/1.3 var(--nb-sans,system-ui,sans-serif);margin-bottom:6px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center}
+.nb-fr-k{font:600 13px/1 var(--nb-sans,system-ui,sans-serif);background:#f2f4f8;border-radius:999px;padding:4px 9px}
+.nb-fr-row{display:grid;grid-template-columns:42px 40px 1fr;gap:6px;align-items:start;padding:3px 0;border-top:1px dashed #e3e7ee;font-size:12.5px;line-height:1.35}
+.nb-fr-c{font-weight:700;color:#5b6878}
+.nb-fr-d{font-weight:800;text-align:center;border-radius:6px;padding:1px 0;background:#eef1f6;color:#5b6878}
+.nb-fr-d.d-AE{background:#c8e6c9;color:#1b5e20}.nb-fr-d.d-AN{background:#dcedc8;color:#33691e}.nb-fr-d.d-AS{background:#fff3c4;color:#8a6d00}.nb-fr-d.d-NA{background:#ffcdd2;color:#b71c1c}
+.nb-fr-stats{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:13px}
+.nb-fr-key{font-size:11.5px;color:#c7d3ea;margin:4px 0 0}
+@media print{.nb-page.nb-cvp,.nb-page.nb-cvp .nb-paper,.nb-fr-label,.nb-fr-ls,.nb-fr-d{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.nb-pcov{display:flex;align-items:center;gap:6px;font:600 14px var(--nb-sans,system-ui,sans-serif);padding:4px 2px;cursor:pointer}
+@media print{html.el-nb-full [data-place="notes"]>.pt{display:none!important}}
+
+/* ⬜ To do: an activity done in class that the student hasn't done yet */
+.nb-tdo{display:inline-block;margin-left:10px;padding:0 10px;border:2px dashed var(--nb-red);color:var(--nb-red);border-radius:6px;font:700 18px/24px var(--nb-hand);transform:rotate(-3deg);vertical-align:middle}
+.nb-tdo.sm{font-size:15px;line-height:19px;padding:0 6px;margin-left:6px;border-width:1.5px}
+.nb-todo .nb-ans li{color:var(--nb-black)}
+.nb-gap{display:inline-block;min-width:90px;border-bottom:1.5px solid var(--nb-pencil);margin:0 4px;height:1em;vertical-align:baseline}
+.nb-opts{display:flex;flex-wrap:wrap;gap:2px 18px;font:16px/24px var(--nb-hand);color:var(--nb-pencil)}
+
+/* 📋 final product rubric: the student's level underlined (highlighter + red pen line) */
+.nb-rub{margin:6px 0 10px}
+.nb-rbl{list-style:none;margin:2px 0;padding:0}
+.nb-rbl li{font:16px/24px var(--nb-print,inherit);color:var(--nb-pencil);padding-left:4px}
+.nb-rbl li b{font-weight:700;color:var(--nb-black);margin-right:4px}
+.nb-rbl li.on{color:var(--nb-black)}
+.nb-hl{background:linear-gradient(transparent 52%,rgba(255,230,0,.55) 52%);text-decoration:underline;text-decoration-color:var(--nb-red);text-decoration-thickness:2px;text-underline-offset:3px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.nb-you{font:700 17px/24px var(--nb-hand);color:var(--nb-red);white-space:nowrap}
+.nb-pts{font:15px/24px var(--nb-hand);color:var(--nb-pencil);margin-left:4px}
+
+/* 🏠 My board */
+.nb .nb-home{text-decoration:none;font-weight:600;white-space:nowrap}
+@media (max-width:640px){.nb .nb-home .nb-hlab{display:none}}
+@media (max-width:640px){.nb-cv1::after{display:none}}
+
+/* the cover's first-try rings (as on the board's My progress) */
+.nb-fr-rings{background:#fff;color:#26303d;border-radius:12px;padding:10px 14px 12px;margin:4px 3% 0;box-shadow:0 3px 10px rgba(0,0,0,.35);display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.nb-fr-rh{grid-column:1/-1;font:700 12px/1 var(--nb-sans,system-ui,sans-serif);text-transform:uppercase;letter-spacing:1px;color:#6b7a90}
+.nb-fr-rg{display:flex;align-items:center;gap:10px;min-width:0}
+.nb-fr-rg>span:last-child{display:flex;flex-direction:column;min-width:0}
+.nb-fr-rg b{font:700 16px/1.2 var(--nb-sans,system-ui,sans-serif)}
+.nb-fr-rg small{font:13px/1.3 var(--nb-sans,system-ui,sans-serif);color:#6b7280}
+.nb-fr-ring{--p:0;flex:none;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#d4802f calc(var(--p) * 1%),#e5e7eb 0);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.nb-fr-ring.none{background:#e5e7eb}
+.nb-fr-ring.d-AE{--c:#1b7a2b}.nb-fr-ring.d-AN{--c:#5a9e2f}.nb-fr-ring.d-AS{--c:#d4a017}.nb-fr-ring.d-NA{--c:#c62828}
+.nb-fr-ring[class*=" d-"]{background:conic-gradient(var(--c) calc(var(--p) * 1%),#e5e7eb 0)}
+.nb-fr-ring.d-AE b{color:#1b5e20}.nb-fr-ring.d-AN b{color:#33691e}.nb-fr-ring.d-AS b{color:#8a6d00}.nb-fr-ring.d-NA b{color:#b71c1c}
+.nb-fr-ring b{width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;font:800 17px/1 var(--nb-sans,system-ui,sans-serif)!important;color:#26303d}
+.nb-fr-res small{font-weight:500;color:#c7d3ea;font-size:15px}
+@media (max-width:640px){.nb-fr-rings{gap:10px 8px;padding:10px 10px 12px}.nb-fr-rg{flex-direction:column;text-align:center;gap:4px}.nb-fr-rg>span:last-child{align-items:center}.nb-fr-rg b{font-size:14px}.nb-fr-rg small{font-size:12px}.nb-fr-ring{width:50px;height:50px}.nb-fr-ring b{width:38px;height:38px;font-size:15px!important}}
+/* ⭐ My results after the cover: notebook paper (Roger: "This should be notebook like not like a cover"), heading in pen, cards like glued slips */
+.nb-fr-more .nb-fr-res{font:700 29px/32px var(--nb-hand);color:var(--nb-black,#1f2733);letter-spacing:0;margin:0 0 6px}
+.nb-fr-more .nb-fr-res small{font:600 22px var(--nb-hand);color:var(--nb-ink)}
+.nb-fr-more .nb-fr-ls{background:#fff;border:1px solid #d7dde6;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.nb-fr-more .nb-fr-key{color:#6b7280}
+.nb-fr-rings .nb-fr-rh~.nb-fr-rh{margin-top:4px;padding-top:10px;border-top:1px dashed #d7dde6}
+.nb-fr-nums{background:#fff;color:#26303d;border-radius:12px;padding:10px 14px 12px;margin:14px 3% 0;box-shadow:0 3px 10px rgba(0,0,0,.35);display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.nb-fr-num{display:flex;flex-direction:column;align-items:center;text-align:center;background:#f4f6fa;border-radius:10px;padding:8px 6px;min-width:0}
+.nb-fr-num b{font:800 22px/1.1 var(--nb-sans,system-ui,sans-serif);color:#1f3c73}
+.nb-fr-num span{font:600 13px/1.25 var(--nb-sans,system-ui,sans-serif);color:#26303d}
+.nb-fr-num small{font:12px/1.25 var(--nb-sans,system-ui,sans-serif);color:#6b7280}
+@media print{.nb-fr-rings,.nb-fr-nums,.nb-fr-num,.nb-fr-ring{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media (max-width:640px){.nb-fr-nums{grid-template-columns:repeat(2,1fr);gap:8px;padding:10px}.nb-fr-num b{font-size:19px}.nb-fr-num span{font-size:12px}}
+/* 🖨 while printing, the pages are measured on a sheet: one page, 700 x 950 px, fits A4 and Letter with the copyright line */
+html.nb-prlay .nb-spread{flex:none;width:700px;height:950px;grid-template-columns:minmax(0,1fr);margin:0}
+html.nb-prlay .nb-paper{padding-left:72px;padding-right:22px}
+@media print{html.nb-prlay .nb-spread{display:block;width:auto;height:auto}}
+/* 🖨 the full-screen notebook prints alone: nothing of the page around it (no last sheet with the page's header only) */
+@media print{html.el-nb-full body *:not(:has(.nb)):not(.nb):not(.nb *):not(.el-copyright){display:none!important}}
+/* the cover's statistics in rows (Roger: "Add more statistics here"): the first tries and the class games in one row of rings, my work in
+   one row of numbers, so everything fits on the cover */
+.nb-fr-rings{grid-template-columns:repeat(4,1fr) 10px repeat(2,1fr);gap:4px 6px;padding:8px 10px 10px}
+.nb-fr-rings .nb-fr-rh{grid-column:auto/span 4;grid-row:1}
+.nb-fr-rings .nb-fr-rh~.nb-fr-rh{grid-column:6/span 2;margin:0;padding:0;border:0}
+.nb-fr-rings .nb-fr-rg{grid-row:2;flex-direction:column;text-align:center;gap:3px}
+.nb-fr-rings .nb-fr-rg:nth-of-type(7){grid-column:6}.nb-fr-rings .nb-fr-rg:nth-of-type(8){grid-column:7}
+.nb-fr-rings .nb-fr-rg>span:last-child{align-items:center}
+.nb-fr-rings .nb-fr-rg b{font-size:13.5px}
+.nb-fr-rings .nb-fr-rg small{font-size:11.5px}
+.nb-fr-rings .nb-fr-ring{width:48px;height:48px}
+.nb-fr-rings .nb-fr-ring b{width:36px;height:36px;font-size:15px!important}
+.nb-fr-nums{grid-template-columns:repeat(6,1fr);gap:6px;padding:8px 10px 10px;margin-top:10px}
+.nb-fr-nums .nb-fr-rh{grid-column:1/-1}
+.nb-fr-num{padding:6px 4px}
+.nb-fr-num b{font-size:19px}
+.nb-fr-num span{font-size:11.5px}
+.nb-fr-num small{font-size:10.5px}
+@media (max-width:640px){
+  .nb-fr-rings{grid-template-columns:repeat(4,1fr)}
+  .nb-fr-rings .nb-fr-rh,.nb-fr-rings .nb-fr-rh~.nb-fr-rh{grid-column:1/-1;grid-row:auto}
+  .nb-fr-rings .nb-fr-rg,.nb-fr-rings .nb-fr-rg:nth-of-type(n){grid-row:auto;grid-column:auto}
+  .nb-fr-rings .nb-fr-ring{width:40px;height:40px}.nb-fr-rings .nb-fr-ring b{width:30px;height:30px;font-size:13px!important}
+  .nb-fr-rings .nb-fr-rg b{font-size:12px}.nb-fr-rings .nb-fr-rg small{font-size:10.5px}
+  .nb-fr-nums{grid-template-columns:repeat(3,1fr)}.nb-fr-num b{font-size:16px}.nb-fr-num small{display:none}
+  .nb-fr-rings .nb-fr-rg small{line-height:1.2}.nb-fr-rings{gap:2px 4px;padding:6px 8px 8px}.nb-fr-label{margin-bottom:10px}
+  .nb-cvbtn span{display:none}.nb-cvbtn{padding:6px 9px;right:-8px}
+}
+.nb-fr-rings .nb-fr-rg b i{display:block;font-style:normal}
+.nb-fr-rings .nb-fr-rg>span:last-child{max-width:100%;min-width:0}
+/* the printed cover: its label and statistics spread over the whole sheet, no empty half */
+@media print{.nb-page.nb-cv1 .nb-paper{display:flex;flex-direction:column}.nb-page.nb-cv1 .nb-front{flex:1;display:flex;flex-direction:column;justify-content:space-evenly}.nb-page.nb-cv1 .nb-fr-top{margin:0}}
+/* ⭐ My results written in the notebook by hand (Roger, 13 Nov 2026: "This should be handwriting style too"): on the ruled lines, the
+   LS as a heading, the exam and final product marks circled in red pen, each criterion's degree circled in its colour */
+.nb-front.nb-fr-more{font:500 22px/32px var(--nb-hand);color:var(--nb-black)}
+.nb-fr-more .nb-fr-ls{background:none;border:0;box-shadow:none;border-radius:0;padding:0;margin:0 0 32px;color:var(--nb-black)}
+.nb-fr-more .nb-fr-lh{font:700 27px/32px var(--nb-hand);margin:0;gap:0 14px}
+.nb-fr-more .nb-fr-k{background:none;padding:0;border-radius:0;font:700 23px/32px var(--nb-hand);color:var(--nb-red)}
+.nb-fr-more .nb-fr-k b{display:inline-block;line-height:24px;border:2.2px solid var(--nb-red);border-radius:50% 45% 55% 48%/60% 50% 55% 45%;padding:0 .3em;margin-left:2px}
+.nb-fr-more .nb-fr-row{grid-template-columns:34px 52px 1fr;gap:0 6px;padding:0;border:0;font:500 21px/32px var(--nb-hand)}
+.nb-fr-more .nb-fr-c{font-weight:700;color:var(--nb-pencil)}
+.nb-fr-more .nb-fr-d{background:none!important;justify-self:start;font:700 20px/24px var(--nb-hand);padding:0 5px;margin-top:3px;border:2px solid currentColor;border-radius:50% 45% 55% 48%/60% 50% 55% 45%}
+.nb-fr-more .nb-fr-t b{font-weight:700}
+.nb-fr-more .nb-fr-stats{gap:0;margin:0;font:500 21px/32px var(--nb-hand)}
+.nb-fr-more .nb-fr-key{font:500 18px/32px var(--nb-hand);color:var(--nb-pencil);margin:0}
