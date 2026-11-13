@@ -69,15 +69,23 @@ report to change it (`open --all` shows the current one).
 "I need a problem button available for the teacher." Roger has the same ⚠️ Problem button in the bottom bar of the dashboard, the class
 tab and every page he opens signed in (and in the ⋯ menu of a learning path on a phone). His reports are `problems/{id}` with
 `teacher: true` (firestore.rules lets only his account set it), in English, with `group` = the class mode's group when he sends it from the
-class tab. They start this same task. `auto.mjs open` prints them as "FROM ROGER, THE TEACHER". They are Roger's own requests, so:
+class tab. They start this same task. `auto.mjs open` prints them as "FROM ROGER, THE TEACHER". They are Roger's own requests.
 
-- **Technical bug** (on any page, LS1 included: Roger asked) → fix it and squash-merge exactly as in "Each run" step 3, then
-  `node tools/problems/auto.mjs fixed <id> --note "what was wrong, PR #n" --apply` (no `--msg`: there is no student card) and start the
-  email Action (step 5): the ⚠️ IMPORTANT email tells him, with "hard reload the page".
-- **A change he wants** (design, wording, content, a new button…) → make it on a branch `claude/problem-<short id>`, open the PR with a
-  clickable preview (screenshots in the PR) and **do not merge** (Roger: preview before merge). Then
-  `auto.mjs leave <id> --status you --note "what I changed, PR #n" --todo "Say \"merge PR #n\" in the English Lab project" --apply` (no `--reply`).
-- **Unclear** → `leave <id> --status you --note "what I checked and the one question I need answered" --apply`.
+Roger, same day: "little tweaks merge, big changes start a thread" + "I want a dropdown button where I say merge or don't merge yet".
+His window has a dropdown, saved as `merge` (`auto.mjs open` prints "✅ MERGE STRAIGHT AWAY" or "⏸ DON'T MERGE YET"):
+
+- **✅ Merge straight away** (`merge: true`, the default; on any page, LS1 included) → do it and squash-merge exactly as in "Each run"
+  step 3, no preview to wait for. Then `node tools/problems/auto.mjs fixed <id> --note "what changed, PR #n" --apply` (no `--msg`: there is
+  no student card) and start the email Action (step 5): the ⚠️ IMPORTANT email tells him what changed, with "hard reload the page"; he checks
+  it on the site. Only if it is plainly a big change (a new feature or screen, many pages or LSs, student marks, answers or other data,
+  firestore.rules, how a routine works) do not merge: treat it as ⏸ and say why in the note.
+- **⏸ Don't merge yet** (`merge: false`) → small and clear: make it on a branch `claude/problem-<short id>`, open the PR with a clickable
+  preview (screenshots in the PR) and do not merge. Big or unclear: build nothing, write the plan. Then `auto.mjs leave <id> --status you
+  --note "PR #n with its preview, or the plan in two or three lines and your questions" --todo "Start a thread: 🤖 Fix with Claude" --apply`
+  (no `--reply`) and start the email Action: he gets "English Lab: your report not merged yet" with the note and the link to the report,
+  where 🤖 Fix with Claude copies everything (your note too) into a new thread of the English Lab project, where he says "merge" or asks for
+  changes (a task cannot open a project thread by itself).
+- **Unclear**, whatever he chose → as ⏸, with the one question you need answered in the note.
 
 Roger gets no 15-minute "new report" email for his own reports (notify.mjs skips `teacher`); the dashboard shows them as 👨‍🏫 You, with no
 💬 Answer and no suggested reply.

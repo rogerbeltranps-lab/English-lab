@@ -67,7 +67,7 @@ if(cmd==="open"){
   if(nc)console.log(`NEW COMMENTS: ${nc} student(s) wrote a comment since the last run. Answer them: docs/general/problem-reports-auto.md, section "Students' comments, answered at once" (node tools/marking/marks.mjs comments --new).`);
   for(const x of L){
     const en=!!x.route&&!elCa(x.route);
-    if(x.teacher)console.log("\n=== "+x.id+" · "+(x.created||"?")+" · FROM ROGER, THE TEACHER"+(x.group?" (in class with "+x.group+")":"")+": no student to answer; see \"The teacher's own reports\" in docs/general/problem-reports-auto.md");
+    if(x.teacher)console.log("\n=== "+x.id+" · "+(x.created||"?")+" · FROM ROGER, THE TEACHER"+(x.group?" (in class with "+x.group+")":"")+(x.merge===false?" · ⏸ DON'T MERGE YET":" · ✅ MERGE STRAIGHT AWAY")+": no student to answer; see \"The teacher's own reports\" in docs/general/problem-reports-auto.md");
     else console.log("\n=== "+x.id+" · "+(x.created||"?")+" · "+(x.name||"?")+" ("+(x.group||"no group")+", route "+(x.route||"none")+" → answer in "+(en?"English":"Catalan")+")");
     console.log("kind: "+x.kind+"\nwords: "+(x.text?JSON.stringify(x.text):"(none)")+"\npage: "+x.page+"\ntitle: "+x.title+"\nsection: "+x.section+"\nls: "+x.ls+" · activity: "+x.activity+"\ndevice: "+x.device);
     if((x.errors||[]).length)console.log("errors:\n  "+x.errors.map(e=>typeof e==="string"?e:JSON.stringify(e)).join("\n  "));

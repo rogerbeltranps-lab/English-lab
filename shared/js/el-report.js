@@ -87,11 +87,13 @@ export function report({en,save,teacher}){
     +'<div style="display:flex;gap:8px;flex-wrap:wrap"><button data-cap type="button"></button><button data-pick type="button"></button><input data-f type="file" accept="image/*" hidden></div>'
     +'<p data-sp style="margin:6px 0 0;color:#64748b;font-size:13px"></p><div data-sv hidden style="margin-top:6px;position:relative"><img alt="" style="display:block;max-width:100%;max-height:180px;border:1px solid #cbd5e1;border-radius:8px">'
     +'<button data-rm type="button" style="margin-top:6px"></button></div></div>'
+    +(teacher?'<label data-m style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px"><b>When it is ready:</b><select style="font:inherit;padding:4px 8px;border:1px solid #cbd5e1;border-radius:8px">'
+      +'<option value="1">✅ Merge straight away (little tweak)</option><option value="0">⏸ Don\'t merge yet (preview first / big change)</option></select></label>':'')
     +'<p data-w style="margin:6px 0 0;color:#64748b;font-size:13px"></p><p data-e role="alert" style="margin:6px 0 0;color:#b91c1c;font-size:14px;font-weight:600" hidden></p>'
     +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button data-x></button><button data-ok></button></div>';
   const $=s=>d.querySelector(s),ta=$("textarea"),ok=$("[data-ok]"),x=$("[data-x]");
   $("h3").textContent="⚠️ "+t("Avisa d'un problema","Report a problem");
-  $("[data-i]").textContent=teacher?"What is not working? Claude looks at it straight away: a technical problem is fixed and merged, and you get an ⚠️ IMPORTANT email. A change you would like gets a pull request with a preview for your \"merge\". You find it in ⚠️ Problem reports on the dashboard."
+  $("[data-i]").textContent=teacher?"What is not working, or what should change? Claude looks at it straight away and emails you. ✅ Merge straight away: it is done and merged, and you check it on the site. ⏸ Don't merge yet: you get a preview (or, for a big change, a plan) and start a thread with 🤖 Fix with Claude in ⚠️ Problem reports."
     :t("Què no funciona? El professor ho veurà i ho intentarà arreglar.","What is not working? Your teacher will see it and try to fix it.");
   KINDS.forEach(k=>{const l=document.createElement("label");l.style.cssText="display:flex;gap:8px;align-items:center;padding:3px 0;cursor:pointer";
     l.innerHTML='<input type="radio" name="el-rep" value="'+k.id+'"><span></span>';l.querySelector("span").textContent=t(k.ca,k.en);$("[data-k]").append(l)});
@@ -127,8 +129,10 @@ export function report({en,save,teacher}){
     if(!kind){err(t("Tria quin tipus de problema és.","Choose what kind of problem it is."));return}
     if(kind==="other"&&!text){err(t("Explica breument què passa.","Explain briefly what is happening."));ta.focus();return}
     if(busy)return;ok.disabled=true;
-    try{await save(Object.assign({kind,text},ctx,shot?{shot,shotFrom:src}:{}));
-      d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=teacher?"Sent. Claude is looking at it now; you get an email if it is fixed, and it waits for you in ⚠️ Problem reports otherwise.":t("Gràcies! El professor ja té el teu avís.","Thank you! Your teacher has your report.");
+    // ✅ / ⏸ (Roger, 13 Nov 2026: "I want a dropdown button where I say merge or don't merge yet")
+    const mg=teacher?d.querySelector("[data-m] select").value==="1":null;
+    try{await save(Object.assign({kind,text},ctx,shot?{shot,shotFrom:src}:{},teacher?{merge:mg}:{}));
+      d.innerHTML="";const m=document.createElement("p");m.style.cssText="margin:0 0 12px";m.textContent=teacher?(mg?"Sent. Claude makes it and merges it now; the email says what changed. Then hard reload the page (Ctrl+Shift+R) to check it.":"Sent. Nothing is merged: the email brings the preview or the plan, and 🤖 Fix with Claude in ⚠️ Problem reports starts the thread."):t("Gràcies! El professor ja té el teu avís.","Thank you! Your teacher has your report.");
       const c=document.createElement("button");c.style.cssText=bs+"background:#0f766e;color:#fff";c.textContent="OK";c.onclick=()=>d.close();d.append(m,c);c.focus()}
     catch(e){console.warn("problem report",e);ok.disabled=false;err(teacher?"It could not be sent. Try again in a minute (a page open since yesterday: reload it first).":t("No s'ha pogut enviar. Torna-ho a provar més tard o digues-ho al professor a classe.","It could not be sent. Please try again later or tell your teacher in class."))}};
   d.addEventListener("close",()=>d.remove());
