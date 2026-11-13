@@ -5,14 +5,14 @@
 // teacher taps; nothing is written or read in Firestore, no marks, the students' Chromebooks stay where they are.
 // The words and sentences are the class games' (lab/game/decks/<id>.js, + decks/more/<id>.js) of today's learning paths (el-cm-agenda.js
 // warmDecks). Four games take turns, a different one each class for the group (localStorage el_wu, this browser): 🔤 Hangman (a word from
-// the vocabulary, its sentence as the clue, a letter keyboard; 8 lights go out), 🔀 Word order (a sentence in shuffled tiles: tap them in
+// the vocabulary, its sentence as the clue, a letter keyboard; the hangman is drawn in 8 parts), 🔀 Word order (a sentence in shuffled tiles: tap them in
 // order, a wrong tile shakes), 🕵️ Spot the mistake (a sentence with a wrong form: tap the wrong word), 🅰 No vowels (a word without its
 // vowels; 💡 adds one). Three rounds; the teacher never needs to know the answer (👁 Show answer is there anyway).
 const E=t=>String(t==null?"":t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const plain=t=>String(t||"").replace(/\*\*/g,"").replace(/\s+/g," ").trim();
 const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const GAMES=[
-  {id:"hang",name:"Hangman",em:"🔤",how:"Call out a letter. Eight wrong letters and the lights are out."},
+  {id:"hang",name:"Hangman",em:"🔤",how:"Call out a letter. Eight wrong letters and the man is hanged."},
   {id:"order",name:"Word order",em:"🔀",how:"Tell me the words in the right order."},
   {id:"spot",name:"Spot the mistake",em:"🕵️",how:"One word is wrong. Which one? And what should it be?"},
   {id:"vow",name:"No vowels",em:"🅰",how:"The vowels are gone. What's the word?"}];
@@ -150,12 +150,16 @@ function sayBox(){const y=S.say;if(!y)return "";
   return `<div class="wu-say"><span class="wu-sl">💬 Saying of the day</span><q>${E(y[0])}</q>${S.sayOpen?`<p class="wu-sm2">${E(y[1])}${y[2]?` <i>· ${E(y[2])}</i>`:""}</p>`:""}<button class="wu-t" data-say="1">${S.sayOpen?"Hide":"💡 What does it mean?"}</button></div>`}
 function drawHang(){const s=S.st,w=s.it.w,lost=s.miss.length>=LIVES,won=hangWon();
   const slots=w.split("").map(c=>/[a-z]/i.test(c)?`<span class="wu-l ${s.got.has(c.toLowerCase())?"on":""} ${lost&&!s.got.has(c.toLowerCase())?"lost":""}">${s.got.has(c.toLowerCase())||lost?E(c):""}</span>`:c===" "?'<span class="wu-sp"></span>':`<span class="wu-p">${E(c)}</span>`).join("");
-  const lights=Array.from({length:LIVES},(_,i)=>`<span class="wu-bulb ${i<s.miss.length?"off":""}"></span>`).join("");
+  // the hangman, drawn part by part (Roger, 13 Nov 2026: "it's a hangman but I don't see a hangman"): one part per wrong letter, the
+  // parts still to come faint so the class sees how many tries are left
+  const P=['<line x1="8" y1="132" x2="72" y2="132"/>','<line x1="28" y1="132" x2="28" y2="8"/>','<line x1="28" y1="8" x2="86" y2="8"/><line x1="28" y1="28" x2="48" y2="8"/>',
+    '<line x1="86" y1="8" x2="86" y2="26"/>','<circle cx="86" cy="38" r="12"/>','<line x1="86" y1="50" x2="86" y2="90"/>','<line x1="86" y1="62" x2="70" y2="78"/><line x1="86" y1="62" x2="102" y2="78"/>',
+    '<line x1="86" y1="90" x2="72" y2="114"/><line x1="86" y1="90" x2="100" y2="114"/>'];
+  const man=`<svg class="wu-man ${lost?"dead":won?"saved":""}" viewBox="0 0 110 140" aria-label="${LIVES-s.miss.length} wrong letters left">${P.map((x,i)=>`<g class="${i<s.miss.length?"on":"todo"}">${x}</g>`).join("")}</svg>`;
   const kb=["qwertyuiop","asdfghjkl","zxcvbnm"].map(r=>`<div class="wu-kr">${r.split("").map(c=>`<button class="wu-k ${s.got.has(c)?"ok":s.miss.includes(c)?"no":""}" data-k="${c}" ${s.got.has(c)||s.miss.includes(c)||s.shown?"disabled":""}>${c.toUpperCase()}</button>`).join("")}</div>`).join("");
-  return `<div class="wu-lights" aria-label="${LIVES-s.miss.length} lights left">${lights}</div>
-    <div class="wu-word">${slots}</div>
-    <p class="wu-clue">${s.it.img?`<span>${E(s.it.img)}</span> `:""}${E(s.it.c)}</p>
-    ${won?'<p class="wu-ok">✔ Well done!</p>':lost?`<p class="wu-no">The lights are out! It was <b>${E(w)}</b>.</p>`:""}
+  return `<div class="wu-hang">${man}<div class="wu-hr"><div class="wu-word">${slots}</div>
+    <p class="wu-clue">${s.it.img?`<span>${E(s.it.img)}</span> `:""}${E(s.it.c)}</p><p class="wu-sm">${s.miss.length?"✗ "+s.miss.map(c=>c.toUpperCase()).join(" "):""}</p></div></div>
+    ${won?'<p class="wu-ok">✔ Well done!</p>':lost?`<p class="wu-no">Hanged! It was <b>${E(w)}</b>.</p>`:""}
     <div class="wu-kb">${kb}</div>`}
 function drawVow(){const s=S.st,w=s.it.w;let k=0;
   const out=w.split("").map(c=>{if(/[aeiou]/i.test(c)){k++;return s.shown||k<=s.hint?`<span class="wu-l on">${E(c)}</span>`:'<span class="wu-l"></span>'}return c===" "?'<span class="wu-sp"></span>':/[a-z]/i.test(c)?`<span class="wu-l on cons">${E(c)}</span>`:`<span class="wu-p">${E(c)}</span>`}).join("");
@@ -189,9 +193,10 @@ const CSS=`
 #el-wu .wu-l{width:1.1em;height:1.35em;border-bottom:.12em solid #ffc93c;display:grid;place-items:center}
 #el-wu .wu-l.lost{color:#ff8a8a}#el-wu .wu-l.cons{color:#cfd7ff;border-bottom-color:transparent;width:auto;min-width:.8em}#el-wu .wu-sp{width:.8em}#el-wu .wu-p{align-self:end}
 #el-wu .wu-clue{max-width:34em;font-size:1em;color:#dfe5ff;background:rgba(255,255,255,.08);border-radius:.6em;padding:.5em .9em}
-#el-wu .wu-lights{display:flex;gap:.4em}
-#el-wu .wu-bulb{width:1.1em;height:1.1em;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff7c2,#ffc93c 55%,#e08a00);box-shadow:0 0 .7em #ffc93c;transition:all .3s}
-#el-wu .wu-bulb.off{background:#2b3360;box-shadow:none}
+#el-wu .wu-hang{display:flex;align-items:center;justify-content:center;gap:1.4em;flex-wrap:wrap;max-width:52em}
+#el-wu .wu-hr{display:grid;gap:.5em;justify-items:center;min-width:0;flex:1 1 20em}
+#el-wu .wu-man{width:6.5em;height:auto;flex:none;fill:none;stroke-width:5;stroke-linecap:round}
+#el-wu .wu-man .todo{stroke:rgba(255,255,255,.1)}#el-wu .wu-man .on{stroke:#ffc93c}#el-wu .wu-man.dead .on{stroke:#ff6b6b}#el-wu .wu-man.saved .on{stroke:#7cf0a4}
 #el-wu .wu-kb{display:grid;gap:.3em}#el-wu .wu-kr{display:flex;gap:.3em;justify-content:center}
 #el-wu .wu-k{font:700 1em Fredoka,system-ui,sans-serif;width:1.9em;height:1.9em;border-radius:.4em;border:0;background:#e9edff;color:#1b2350;cursor:pointer;box-shadow:0 .12em 0 rgba(0,0,0,.35)}
 #el-wu .wu-k.ok{background:#22c55e;color:#fff}#el-wu .wu-k.no{background:#3a4275;color:#8b93c2;text-decoration:line-through}#el-wu .wu-k:disabled{cursor:default}
