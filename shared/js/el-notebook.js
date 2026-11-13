@@ -310,8 +310,12 @@ window.ELNotebook = (function () {
       + (y.rows.length ? `<div class="nb-fr-crit">${y.rows.map(r => `<div class="nb-fr-row"><span class="nb-fr-c">${esc(r.c)}</span><span class="nb-fr-d d-${r.deg || 'x'}" title="${esc(DG[r.deg] || '')}">${esc(r.deg || '–')}</span><span class="nb-fr-t"><b>${esc(CEN[String(r.c).split('.')[0]] || String(r.comp).replace(/^\S+ · /, ''))}</b>${r.ind ? ` · ${esc(r.ind)}` : r.deg ? '' : ` · ${t('encara sense nota', 'not assessed yet')}`}</span></div>`).join('')}</div>` : `<p class="nb-pencil">${t('Encara no hi ha activitats corregides en aquesta LS.', 'No marked activities in this LS yet.')}</p>`)
       + `<div class="nb-fr-stats">${y.g.grammar != null || y.g.vocab != null ? `<span>🎮 ${t('Jocs', 'Games')}: 🧩 ${y.g.grammar != null ? y.g.grammar + ' %' : '–'} · 📚 ${y.g.vocab != null ? y.g.vocab + ' %' : '–'}</span>` : ''}`
       + `${Object.keys(y.comp).length ? `<span>✅ ${t('Activitats ben fetes', 'Activities done well')}: ${Object.keys(y.comp).sort((a, b) => a - b).map(k => `${esc(CEN[k] || String(window.EL_COMPETENCES && EL_COMPETENCES[k] || 'CE' + k).replace(/^\S+ · /, ''))} <b>${y.comp[k].ok}/${y.comp[k].of}</b>`).join(' · ')}</span>` : ''}</div></div>`;
-    return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="34" height="34"><b>English Lab</b><span>Roger Beltran · ${t('curs', 'school year')} 2026/2027</span></div>`
-      + `<div class="nb-fr-name">${esc(H.name || '')}</div><div class="nb-fr-course">${esc(grp)}${lvl ? ` · <span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div><div class="nb-fr-title">📓 ${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
+    // a hard cover: the brand embossed on top, a white name label as on a school notebook, then the results stuck on as cards
+    return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="40" height="40"><b>English Lab</b><span>Roger Beltran<br>${t('curs', 'school year')} 2026/2027</span></div>`
+      + `<div class="nb-fr-label"><div class="nb-fr-title">${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
+      + `<div class="nb-fr-line"><i>${t('Nom', 'Name')}</i><span class="nb-fr-name">${esc(H.name || '')}</span></div>`
+      + `<div class="nb-fr-line"><i>${t('Grup', 'Class')}</i><span class="nb-fr-course">${esc(grp)}</span>${lvl ? `<i>${t('Nivell', 'Level')}</i><span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div></div>`
+      + `<div class="nb-fr-res">⭐ ${t('Els meus resultats', 'My results')}</div>`
       + sums.map(box).join('')
       + `<p class="nb-fr-key">AE ${t('excel·lent', 'excellent')} · AN ${t('notable', 'good')} · AS ${t('satisfactori', 'satisfactory')} · NA ${t('no assolit', 'not achieved')} · ${t('ben feta = la meitat o més bé al primer intent', 'done well = half or more right on the first try')}</p></div><div class="nb-break"></div>`;
   }
@@ -507,7 +511,7 @@ window.ELNotebook = (function () {
     // a heading never stays alone at the bottom of a page: it goes on with what it is the heading of
     // (Roger, 13 Nov 2026: "heading should appear on top"): also the section post-its and "My answers", and a heading at the top of a
     // part whose first line didn't fit (it goes up through the part's boxes)
-    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh,.nb-fr-lh';
+    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh,.nb-fr-lh,.nb-fr-res';
     const blank = x => (x.nodeType === 3 && !x.nodeValue.trim()) || (x.nodeType === 1 && x.matches(SKIP));
     const breakBefore = force => {
       const keep = []; let box = cur, lvl = stack.length, x = cur.lastChild;
@@ -545,6 +549,8 @@ window.ELNotebook = (function () {
       if (node.nodeType === 1) { const h = node.getBoundingClientRect().height, over = paper.scrollHeight - paper.clientHeight; if (h > 0 && over > 0) node.style.zoom = String(Math.max(.35, (h - over - 4) / h)); }
     };
     newPage(); [...frag.childNodes].forEach(place); page.classList.remove('nb-meas');
+    // the cover's pages look like a notebook's hard cover (Roger, 13 Nov 2026: "The cover should look like a real notebook cover")
+    pages.forEach(p => { if (p.s === si && p.el.querySelector('.nb-front')) p.el.classList.add('nb-cvp', ...(p.el.querySelector('.nb-front:not(.nb-cont)') ? ['nb-cv1'] : [])); });
   }
   function layout(keep) {
     const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || printing()) return false;
@@ -893,7 +899,7 @@ window.ELNotebook = (function () {
     const wd = wide(), a = wd ? pg - pg % 2 : pg, to = a + dir * (wd ? 2 : 1);
     if (to < 0 || to >= pages.length) return null;
     const P = i => pages[i] && pages[i].el, sp = root.querySelector('.nb-spread');
-    const face = (i, cls) => { const f = document.createElement('div'); f.className = 'nb-face ' + cls; const p = P(i); if (p) f.innerHTML = p.innerHTML; else f.classList.add('blank'); return f; };
+    const face = (i, cls) => { const f = document.createElement('div'); f.className = 'nb-face ' + cls; const p = P(i); if (p) { f.innerHTML = p.innerHTML; ['nb-cvp', 'nb-cv1'].forEach(c => { if (p.classList.contains(c)) f.classList.add(c); }); } else f.classList.add('blank'); return f; };
     const leaf = document.createElement('div'); leaf.setAttribute('aria-hidden', 'true'); let ang;
     const cls = (i, c, on) => { const p = P(i); if (p) p.classList.toggle(c, on); };
     if (wd && dir > 0) { leaf.className = 'nb-leaf r'; leaf.append(face(a + 1, 'front'), face(to, 'back')); ang = p => -180 * p; cls(a + 1, 'r', false); cls(to + 1, 'r', true); }
