@@ -838,7 +838,9 @@ function stepDueOf(id,step,g){const p=(window.EL_PLAN||{})[S.ls],sd=p&&p.stepDue
   const key=x=>String(x).replace(/[^a-z0-9]/gi,"").toLowerCase(),i=(p.groups||[]).findIndex(x=>key(x)===key(gr.name));return i>=0?sd[i]:null}
 // done late counts half (Roger, 10 Nov 2026: "if they did them late it must count sth, no 0. Maybe half of it"); not done at all stays 0 (missZ)
 const LATE=0.5;
-function onTime(u,id,step,g){const due=stepDueOf(id,step,g)||dueOf(id,g);if(!due)return undefined;const d=doneAt(u,id,step);return d==null?null:d===true||ymd(d)<=due?1:LATE}
+// 📖 the Book: a chapter is due only on its own Book day (chapter n on the n-th day the Book is on the agenda), never on the path's last day
+const dueStep=(id,step,g)=>stepDueOf(id,step,g)||(elBookPath(id)?null:dueOf(id,g));
+function onTime(u,id,step,g){const due=dueStep(id,step,g);if(!due)return undefined;const d=doneAt(u,id,step);return d==null?null:d===true||ymd(d)<=due?1:LATE}
 // Averages: missing values (null) count 0 or are left out, as the "Missing work" switch says
 // undefined = always left out, whatever the switch: a recall checkpoint the student did not do (Roger, 10 Nov 2026: "if a student is ill,
 // and he doesn't do it we don't take that into account"; chose "Left out for everyone"): never 0, their other checkpoints count as usual
@@ -858,7 +860,7 @@ const canDoZ=(id,k,g)=>{const a=byId(id);if(!a)return false;
   let dm=S.tickZ&&S.tickZ.g===g?S.tickZ.m:null;if(!dm){dm=(((S.D&&S.D.ls||{})[S.ls]||{}).done||{})[g]||{};try{if(S.D&&S.D.tkOk)dm=doneMap(planX(S.ls,g))}catch(e){}S.tickZ={g,m:dm}}
   const secs=secOf(a).map(z=>z[0]);if(!secs.length)return !!dm[a.id+"#"];
   return secs.some(sec=>(sec===k||elSecSteps(a,sec).includes(k))&&!!dm[a.id+"#"+sec])};
-const missZ=(v,id,k)=>{if(v==null&&isCpStep(id,k))return undefined;if(v!=null||!S.dueZero)return v;const d=stepDueOf(id,k,S.dueZero)||dueOf(id,S.dueZero);return d&&d<ELWeek.today()&&canDoZ(id,k,S.dueZero)?0:null};
+const missZ=(v,id,k)=>{if(v==null&&isCpStep(id,k))return undefined;if(v!=null||!S.dueZero)return v;const d=dueStep(id,k,S.dueZero);return d&&d<ELWeek.today()&&canDoZ(id,k,S.dueZero)?0:null};
 // Class games part (games:true; Roger, 9 Nov 2026: "the performance in those games should be counted"): % right in the grammar and vocabulary
 // class games of the LS on screen, out of 10, all games pooled (the 🧩📚 circles' %). A game is counted only when the student answered at least
 // half of its questions (a late arrival or a dropped connection is left out); a student who played none has no value, and the part then drops
@@ -2119,7 +2121,7 @@ function loadGames(gid){const g=gid||S.g;if(!g||GAMES[g])return;if(DEMO){if(DEMO
 // Step names in the column headers open that tab of the learning path in a new tab (Roger, 6 Nov 2026: "when I touch these concepts, I
 // want to go there"): the tab with the step's own panel id, the Vocabulary tab for cards and practice, else the page itself (checkpoints,
 // LS1 steps that have no tab of their own). The criterion chips under it keep opening the criterion (critPanel).
-const stepTab=(a,k)=>{const ids=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]);return ids.includes(k)?k:(k==="cards"||k==="practice")&&ids.includes("vocab")?"vocab":""};
+const stepTab=(a,k)=>{k=elTabOf(a.id,k);const ids=((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]);return ids.includes(k)?k:(k==="cards"||k==="practice")&&ids.includes("vocab")?"vocab":""};
 const stepLink=(a,k)=>{const t=stepTab(a,k),n=t&&(((window.EL_SECTIONS||{})[a.id]||[]).find(x=>x[0]===t)||[])[1];
   return `<a class="stl" href="${esc(a.path)}${t?"#"+esc(t):""}" target="_blank" rel="noopener" title="Open ${esc(a.title)}${n?" at the “"+esc(n)+"” tab":""}">${esc(k)}</a>`};
 // The columns are the tabs of the learning path (Roger, 7 Nov 2026: "practice, cards don't exist in the web"): one column per tab, with the
@@ -2132,6 +2134,7 @@ const secName=(a,t)=>((((window.EL_SECTIONS||{})[a.id]||[]).find(x=>x[0]===t)||[
 const COLS=new Map();
 function lpCols(a){if(COLS.has(a.id))return COLS.get(a.id);const ks=steps(a);let out;
   if(isLS1(a))out=ks.map(k=>({ks:[k],t:stepTab(a,k),n:k}));
+  else if(elBookPath(a))out=ks.map(k=>({ks:[k],t:"book",n:"Chapter "+k.replace(/^ch/,"")}));   // 📖 one tab, but a column per chapter: each student's pace
   else{const by=new Map(),rest=[];ks.forEach(k=>{const t=stepTab(a,k);if(t){if(!by.has(t))by.set(t,[]);by.get(t).push(k)}else rest.push(k)});
     out=[...((window.EL_SECTIONS||{})[a.id]||[]).map(x=>x[0]).filter(t=>by.has(t)).map(t=>({ks:by.get(t),t,n:secName(a,t)})),...rest.map(k=>({ks:[k],t:"",n:STEPNM[k]||cap(k)}))]}
   COLS.set(a.id,out);return out}
@@ -2879,6 +2882,10 @@ function agDrop(k,to){const x=planX(k.ls,k.gid),ag=agOf(x);if(!ag||!k.from&&!to)
   // I do shadowing almost every day"): the original stays, the copy keeps its ⏱ minutes; ✕ or dragging it back to the list takes it off
   if(k.ag==="it"&&k.it===SHD&&k.from&&to){if((ag.days[to]||[]).includes(SHD))return;const m=+((ag.min||{})[k.from+"|"+SHD])||0;
     return agSave(x,g=>{addIt(g,to,SHD);if(m)g.min=Object.assign({},g.min,{[to+"|"+SHD]:m})})}
+  // 📖 The book (Roger, 13 Nov 2026: one step for the whole book, "One chapter per Book day"): dropped from the list on a day, it is added
+  // there and stays on its other days (each Book day is the next chapter's day, el-week.js); moved from a day to another day, it moves
+  if(!k.from&&to&&(k.ag==="it"&&elBookPath(String(k.it).split("#")[0])||k.ag==="act"&&elBookPath(String(k.a||"")))){const it=k.ag==="it"?k.it:k.a+"#book";
+    if((ag.days[to]||[]).includes(it))return;agSave(x,g=>{addIt(g,to,it)});return agOpenSync(x,[it],to)}
   let its;
   if(k.ag==="it"){its=[k.it];agMove(x,its,k.from||"",to)}
   else{const a=byId(k.a);if(!a)return;

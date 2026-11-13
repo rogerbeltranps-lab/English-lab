@@ -1685,7 +1685,7 @@ function stepSc(a,k){const sc=x=>x.score+"/"+x.max;
 const stateOf=a=>{try{return JSON.parse((D.pg[a.ls]||{})[a.keys[0]]||"{}")}catch(e){return {}}};
 const ymd=v=>{const d=new Date(v);return isNaN(d)?"":d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 // the panel a step lives in: its own, or the vocabulary panel for the cards and practice steps (elSecSteps)
-const panelOf=(a,k)=>{const xs=(window.EL_SECTIONS||{})[a.id]||[];return xs.some(x=>x[0]===k)?k:(k==="cards"||k==="practice")&&xs.some(x=>x[0]==="vocab")?"vocab":k};
+const panelOf=(a,k)=>{const xs=(window.EL_SECTIONS||{})[a.id]||[];if(window.elTabOf)k=elTabOf(a.id,k);return xs.some(x=>x[0]===k)?k:(k==="cards"||k==="practice")&&xs.some(x=>x[0]==="vocab")?"vocab":k};
 const tabHref=(a,k)=>a.path.split("/").map(encodeURIComponent).join("/")+(k?"#"+encodeURIComponent(panelOf(a,k)):"");
 function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))return "";
   const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1,today=ELWeek.today(),dr=(gi>=0&&(p._dropped||{})[gi])||[],open=info.status!=="closed";
@@ -1746,7 +1746,7 @@ function lpStatus(ls,list,info){if(only(ls.id)||!list.length||(!TX&&all()))retur
     +(TX?`<p class="muted" style="margin:6px 0 0">“Counted” = its day in the time plan has passed, it is open and no section is still locked: these are the ones in “X of Y done this term” and in the bonus check. Click a score for the details, feedback and self-assessments.</p>`:"")+`</div>`}
 // a step's name = the name of the tab it lives in, as on the learning path (Roger, 7 Nov 2026: "make sure students see the same" as the
 // dashboard): the cards and practice steps are both the Vocabulary tab, never "Cards" or "Practice" (panelOf)
-const tabName=(id,k)=>{const xs=(window.EL_SECTIONS||{})[id]||[],p=xs.some(y=>y[0]===k)?k:(k==="cards"||k==="practice")&&xs.some(y=>y[0]==="vocab")?"vocab":k,x=xs.find(y=>y[0]===p);return x?x[1]:k==="check"?"Checkpoint":k.charAt(0).toUpperCase()+k.slice(1)};
+const tabName=(id,k)=>{if(window.elTabOf)k=elTabOf(id,k);const xs=(window.EL_SECTIONS||{})[id]||[],p=xs.some(y=>y[0]===k)?k:(k==="cards"||k==="practice")&&xs.some(y=>y[0]==="vocab")?"vocab":k,x=xs.find(y=>y[0]===p);return x?x[1]:k==="check"?"Checkpoint":k.charAt(0).toUpperCase()+k.slice(1)};
 // steps grouped by their tab, in the path's order: [[step, …], …] (the Vocabulary tab holds two steps, done when both are)
 const tabGroups=(a,ks)=>elTabGroups(a,ks);
 async function submitMany(list){if(AS)return;if(!confirm(t("Entregar: ","Submit: ")+list.map(a=>a.title).join(", ")+t("? Un cop entregades ja no es podran modificar.","? Once submitted, they can no longer be changed.")))return;if(DEMO)return alert(t("Vista prèvia: no s'entrega res.","Preview: nothing is submitted."));for(const a of list)await ELCloud.submitActivity(a);location.reload()}

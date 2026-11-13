@@ -246,7 +246,7 @@ window.elPlanLater=function(info,gid,today){const none={acts:new Set(),tabs:{}};
   const op=real?elClassOpenAt(gid,today):null,early=op!=null&&Date.now()<op,after=(d,x)=>d>today||(early&&d===today);   // today's items wait for the class
   const src=info.planEdits[gid].agenda,mm=laterMemo.get(info)||{},m=mm[gid];if(m&&m.today===today&&m.early===early&&m.src===src&&m.hw===info.homework&&m.push===info.push&&m.done===info.done)return m.v;
   const first={},tabFirst={};
-  Object.entries(ag.days).forEach(([d,its])=>(its||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0)return;const id=it.slice(0,i),p=it.slice(i+1);
+  Object.entries(ag.days).forEach(([d,its])=>(its||[]).forEach(it=>{const i=String(it).indexOf("#");if(i<0)return;const id=it.slice(0,i),p=elTabOf(id,it.slice(i+1));
     if(!first[id]||d<first[id])first[id]=d;if(p){const k=id+"#"+p;if(!tabFirst[k]||d<tabFirst[k])tabFirst[k]=d}}));
   const free=new Set();   // opened at once by the teacher: homework and a pull-up; the sample exam stays open for revising (Roger, 7 Nov 2026: "I want them to see the sample exam")
   Object.keys(first).forEach(id=>{if(/sample-exam$/.test(id))free.add(id)});Object.keys(tabFirst).forEach(k=>{if(/sample-exam#/.test(k))free.add(k)});
@@ -275,7 +275,11 @@ window.elTabsOf=function(a){const ks=((window.EL_ACTIONS||{})[a.id]||[]).filter(
 // the tabs not done as [[step, …], …] (done = Set of the student's done steps, r = results/{activity}); an activity with no steps: [] or [[]]
 window.elTabsLeft=function(a,done,r){const g=elTabsOf(a);return g?g.filter(x=>!x.every(k=>done.has(k))):elAllDone(a,done,r)?[]:[[]]};
 window.elTabsTotal=a=>{const g=elTabsOf(a);return g?g.length:1};
-window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
+// 📖 The Book is ONE tab, "book" (Roger, 13 Nov 2026: "only one SLP for the book so that people can continue where they left off"): its
+// steps are the chapters (ch1 … ch6). A chapter planned on the Time plan before then (path#ch1) counts as the book (elTabOf).
+window.elBookPath=a=>/\/ls2-book$|(^|\/)book\.html$/.test(typeof a==="string"?a.split("#")[0]:(a&&a.id)||"");   // an id or a page path
+window.elTabOf=(id,p)=>elBookPath(id)&&/^ch\d+$/.test(p||"")?"book":p;
+window.elSecSteps=function(a,id){const ks=(window.EL_ACTIONS||{})[a.id]||[];if(id==="book"&&elBookPath(a))return ks.slice();return id==="vocab"?ks.filter(k=>k==="cards"||k==="practice"):ks.includes(id)?[id]:[]};
 const secDone=(a,id,done)=>{const st=elSecSteps(a,id);return st.length>0&&st.every(k=>done.has(k))};
 // Roger (26 Oct 2026): sections he has opened stay on the student's to-do until they finish them, so a section opened before and locked
 // again stays open for a student who has not finished it; it is read-only for everyone else. done = Set of the student's done steps.
@@ -287,7 +291,7 @@ const secLk=(a,info,gid,done)=>{const op=secOf(info,"secOpened",gid,a)||[];retur
 // as done in class, set as homework or pulled up; nor a path planned whole) is 🏫 for class too: shown read-only, never To do, like a tab
 // planned for a later day (it gets no day on its note). The tabs for a later day + these: [panel id].
 const laterTabs=(a,info,gid)=>{const L=elPlanLater(info,gid),later=L.tabs[a.id]||[];if(!L.planned||!a||a.optional||L.free.has(a.id)||L.whole.has(a.id))return later;
-  const S=(window.EL_SECTIONS||{})[a.id],ids=S?S.map(x=>x[0]):[...new Set(((window.EL_ACTIONS||{})[a.id]||[]).map(k=>k==="cards"||k==="practice"?"vocab":k))];   // LP pages load no el-sections.js
+  const S=(window.EL_SECTIONS||{})[a.id],ids=elBookPath(a)?["book"]:S?S.map(x=>x[0]):[...new Set(((window.EL_ACTIONS||{})[a.id]||[]).map(k=>k==="cards"||k==="practice"?"vocab":k))];   // LP pages load no el-sections.js
   const un=ids.filter(id=>elSecSteps(a,id).length&&!L.planned.has(a.id+"#"+id)&&!L.free.has(a.id+"#"+id));
   return un.length?[...new Set([...later,...un])]:later};
 window.elLaterTabs=laterTabs;
@@ -300,7 +304,7 @@ window.elSecLockedFor=function(a,info,gid,done){const lk=secLk(a,info,gid,done);
 // Returns {panel id: the class day it is planned for (YYYY-MM-DD)}.
 window.elSecSoon=function(a,info,gid,done){if(window.EL_RAW_OPEN||!a||a.optional)return {};const later=laterTabs(a,info,gid);if(!later.length)return {};
   const lk=secLk(a,info,gid,done),ag=elAgendaOf(info,gid),today=agToday(),o={};
-  later.forEach(p=>{if(lk.includes(p))return;let d=null;Object.entries((ag&&ag.days)||{}).forEach(([dd,its])=>{if(dd>=today&&(its||[]).includes(a.id+"#"+p)&&(!d||dd<d))d=dd});o[p]=d});return o};
+  later.forEach(p=>{if(lk.includes(p))return;let d=null;Object.entries((ag&&ag.days)||{}).forEach(([dd,its])=>{if(dd>=today&&(its||[]).some(x=>{x=String(x);const i=x.indexOf("#");return i>0&&x.slice(0,i)===a.id&&elTabOf(a.id,x.slice(i+1))===p})&&(!d||dd<d))d=dd});o[p]=d});return o};
 // the steps of those tabs (elSecSteps), for counting
 window.elSoonSteps=function(a,soon){return Object.keys(soon||{}).flatMap(id=>elSecSteps(a,id))};
 // Sections still to finish (the to-do list): only in a learning path where the teacher uses the section switches, a section that is open

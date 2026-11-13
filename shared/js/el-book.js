@@ -10,7 +10,8 @@
    Full screen is the browser's (on <html>, so going from one chapter to the next keeps it) plus a cover over the page; it leaves the
    browser's full screen only if it entered it (class mode keeps its own).
    opts: {ca: Catalan labels, title: the chapter's name (alt text), end: element, atEnd(): the end page is on screen}.
-   Returns {open(), close(keepBrowserFullScreen), isFull()}. Used by ls2-engine.js on book.html. */
+   opts.start: the page to open at; opts.pre: words before "Page n of m"; opts.onTurn(i): the page on screen changed.
+   Returns {open(), close(keepBrowserFullScreen), isFull(), toEnd(), destroy(keepBrowserFullScreen)}. Used by ls2-engine.js on book.html. */
 (function () {
   const R = 210 / 148;   // A5
   const css = `
@@ -93,7 +94,7 @@ html.elb-lock{overflow:hidden}
   function mount(el, pages, o) {
     o = o || {};
     if (!el || !pages || !pages.length) return null;
-    const endEl = o.end || null;
+    const endEl = o.end || null, home = endEl && endEl.parentNode;   // destroy() gives the end page back to where it was
     if (endEl && endEl.parentNode) endEl.parentNode.removeChild(endEl);
     if (!document.getElementById('elBookCss')) document.head.insertAdjacentHTML('beforeend', '<style id="elBookCss">' + css + '</style>');
     const all = endEl ? pages.concat([endEl]) : pages.slice();
@@ -113,7 +114,7 @@ html.elb-lock{overflow:hidden}
     const q = s => el.querySelector(s), L = q('.elb-l'), Rp = q('.elb-r'), leaf = q('.elb-leaf'), book = q('.elb-book'), stage = q('.elb-stage');
     const nb = q('.elb-n'), bp = q('.elb-p'), bx = q('.elb-x'), bz = q('.elb-z'), bf = q('.elb-f'), tip = q('.elb-tip'), hold = q('.elb-hold');
     if (endEl) hold.appendChild(endEl);
-    let i = 0, busy = false, full = false, zoom = false, single = false, seen = false;
+    let i = Math.max(0, Math.min(n - 1, o.start | 0)), busy = false, full = false, zoom = false, single = false, seen = false, dead = false, atI = -1;
     // the end page on the moving paper: a copy without ids or names (the live form stays where the engine finds it)
     const copyOf = x => { const c = x.cloneNode(true); c.classList.add('elb-copy'); c.removeAttribute('id'); c.querySelectorAll('[id],[name]').forEach(e => { e.removeAttribute('id'); e.removeAttribute('name'); }); c.querySelectorAll('input,button,a').forEach(e => { e.tabIndex = -1; if ('disabled' in e) e.disabled = true; }); return c; };
     const set = (box, k) => {
@@ -127,10 +128,11 @@ html.elb-lock{overflow:hidden}
     pages.forEach(src => { const im = new Image(); im.decoding = 'async'; im.src = src; });   // a chapter is 2–5 pages: load them all, so a turn never waits
     const step = () => single ? 1 : 2;
     function draw() {
+      if (dead) return;
       if (single) { set(Rp, i); set(L, null); } else { set(L, i); set(Rp, i + 1); }
       const last = Math.min(n, i + step()), qs = endEl && last === n && (single || last - i === 1);
       const lt = endEl ? Math.min(last, n - 1) : last;   // the last picture on screen (the questions page is not counted as a page)
-      nb.textContent = qs ? T(ca, 'Preguntes', 'Questions') : (single || lt - i <= 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + lt) + T(ca, ' de ', ' of ') + (endEl ? n - 1 : n) + (endEl && last === n ? ' · ' + T(ca, 'Preguntes', 'Questions') : '');
+      nb.textContent = (o.pre || '') + (qs ? T(ca, 'Preguntes', 'Questions') : (single || lt - i <= 1 ? T(ca, 'Pàgina ', 'Page ') + (i + 1) : T(ca, 'Pàgines ', 'Pages ') + (i + 1) + '–' + lt) + T(ca, ' de ', ' of ') + (endEl ? n - 1 : n) + (endEl && last === n ? ' · ' + T(ca, 'Preguntes', 'Questions') : ''));
       bp.disabled = i === 0; q('.elb-hit.prev').disabled = i === 0;
       const end = i + step() >= n, onEnd = endEl && last === n;
       // the end page takes the taps (its options); the arrows, the keys and dragging the page still turn
@@ -138,8 +140,10 @@ html.elb-lock{overflow:hidden}
       bx.textContent = end ? T(ca, 'Fi', 'The end') : (endEl && i + 2 * step() >= n ? T(ca, 'Preguntes', 'Questions') + ' ▶' : T(ca, 'Gira la pàgina', 'Turn the page') + ' ▶');
       bx.disabled = end; bx.hidden = end && !!endEl;
       if (onEnd && o.atEnd) o.atEnd();
+      if (i !== atI) { atI = i; if (o.onTurn) o.onTurn(i); }   // where the student is (the one-book page keeps it to come back there)
     }
     function fit() {
+      if (dead) return;
       const W = full ? innerWidth - 20 : el.clientWidth - 16, H = full ? innerHeight - (q('.elb-bar').offsetHeight + 30) : Math.min(innerHeight * 0.82, 760);
       if (W <= 0) return;
       const was = single;
@@ -190,7 +194,7 @@ html.elb-lock{overflow:hidden}
       setTimeout(end, sec * 1000 + 300);
     }
     function turn(dir) {
-      if (busy || drag) return;
+      if (dead || busy || drag) return;
       if (!motion()) { const s = step(); if ((dir > 0 && i + s >= n) || (dir < 0 && i === 0)) return; seen = true; tip.hidden = true; i = Math.max(0, i + dir * s); draw(); return; }
       const t = setup(dir); if (t) { leaf.style.transition = ''; go(t, true, .75); }
     }
@@ -254,19 +258,29 @@ html.elb-lock{overflow:hidden}
     q('.elb-hit.prev').onclick = () => turn(-1);
     q('.elb-hit.next').onclick = () => { if (!full && !seen && innerWidth >= 700) { seen = true; toggleFull(true); return; } turn(1); };
     el.addEventListener('keydown', e => {
+      if (dead) return;
       if (e.key !== 'Escape' && e.target.closest && e.target.closest('input,button,a,textarea,select') && e.target !== el) return;   // the end page's options and buttons keep their keys
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || (e.key === ' ' && full)) { e.preventDefault(); turn(1); }
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); turn(-1); }
       else if (e.key === 'Escape' && full) { e.preventDefault(); toggleFull(false); }
     });
-    if (window.ResizeObserver) new ResizeObserver(() => fit()).observe(el); else addEventListener('resize', fit);
-    addEventListener('resize', () => { if (full) fit(); });
+    const ro = window.ResizeObserver ? new ResizeObserver(() => fit()) : null, rz = () => { if (full || !ro) fit(); };
+    if (ro) ro.observe(el); addEventListener('resize', rz);
+    if (!single && i % 2 && innerWidth >= 700) i--;
     fit();
     return {
       open() { if (!full) { seen = true; toggleFull(true); } },
       close(keepFs) { if (full) toggleFull(false, true, keepFs); },
       isFull: () => full,
-      toEnd() { i = single ? n - 1 : (n - 1) - ((n - 1) % 2); draw(); }
+      toEnd() { i = single ? n - 1 : (n - 1) - ((n - 1) % 2); draw(); },
+      // another chapter in the same place (one-book page): listeners off, the end page back home, the browser's full screen kept if asked
+      destroy(keepFs) {
+        if (dead) return; if (full) toggleFull(false, true, keepFs); dead = true;
+        document.removeEventListener('fullscreenchange', fc); document.removeEventListener('webkitfullscreenchange', fc);
+        removeEventListener('resize', rz); if (ro) ro.disconnect();
+        if (endEl && home) home.appendChild(endEl);
+        el.innerHTML = '';
+      }
     };
   }
   window.ELBook = { mount };
