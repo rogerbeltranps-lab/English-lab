@@ -1051,7 +1051,16 @@ function lockToast(t){const ca=lockCa();let n=document.getElementById("el-lock-t
   n.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:2147483001;max-width:92vw;padding:12px 18px;border-radius:12px;background:#7f1d1d;color:#fff;font:600 15px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.3);text-align:center";document.body.append(n)}
   n.textContent=t||(ca?"🔒 El professor t'ha fet venir aquí: no pots anar a cap altra part de la web fins que et deixi anar.":"🔒 Your teacher brought you here: you can't go to any other part of the website until they let you go.");
   clearTimeout(lockToast.t);lockToast.t=setTimeout(()=>n.remove(),3500)}
-function lockBar(){let b=document.getElementById("el-lock");
+// the 🎓 class mode bar is fixed on top of the page: the page moves down by its height (body padding, the sticky top bar with 🔍 Dictionary,
+// the left menu and the path's column), so nothing hides behind it (problem report, 2ESOA, 13 Nov 2026: "the top green line is covering
+// the dictionary"). The 🌟 cheer bar (inline padding) and ⛶ one step full screen (slpPlace, !important) already add the bar's height.
+function lockPad(){const b=document.getElementById("el-lock"),h=b&&b.offsetHeight||0,R=document.documentElement;
+  if(h&&!document.getElementById("el-lock-pad-css")){const st=document.createElement("style");st.id="el-lock-pad-css";
+    st.textContent="body.el-lockpad{padding-top:var(--el-lock-h,0px)}body.el-lockpad .topbar{top:var(--el-lock-h,0px)!important}body.el-lockpad .elrail{top:var(--el-lock-h,0px)!important}body.el-lockpad .ellpside{top:calc(var(--el-lock-h,0px) + 70px);max-height:calc(100vh - var(--el-lock-h,0px) - 80px)}";document.head.append(st)}
+  if(R.style.getPropertyValue("--el-lock-h")!==h+"px")R.style.setProperty("--el-lock-h",h+"px");
+  if(document.body.classList.contains("el-lockpad")!==!!h)document.body.classList.toggle("el-lockpad",!!h)}
+function lockBar(){lockBar0();lockPad()}
+function lockBar0(){let b=document.getElementById("el-lock");
   if(!lockHere()){if(b)b.remove();return}
   const ca=lockCa(),cur=curPanel(),g=LOCK;if(g.p&&cur===g.p)lockFrom=null;
   if(!b){b=document.createElement("div");b.id="el-lock";b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;padding:10px 14px;font:600 15px system-ui,sans-serif;background:#0f766e;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)";
