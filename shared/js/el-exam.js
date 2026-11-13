@@ -18,44 +18,58 @@ window.ELExam = (function () {
   const forLevel = (items, level) => !items ? [] : Array.isArray(items)
     ? items.filter(x => x && ROUTES.indexOf(x.r || 'beginners') <= ROUTES.indexOf(level) && (!x.only || x.only.includes(level)))
     : (items[level] || (level === 'beginners' ? items.insecure : level === 'native' ? items.daring : null) || []);
-  const files = {};
+  const files = {}, ME = document.currentScript && document.currentScript.src;
+  // the section tabs of every activity (el-sections.js), loaded here when the page doesn't have them (an LS1 home, building LS2's chapter)
+  let secP = null;
+  const sections = () => window.EL_SECTIONS || !ME ? Promise.resolve() : secP || (secP = new Promise(ok => {
+    const sc = document.createElement('script'); sc.src = new URL('./el-sections.js', ME).href; sc.onload = sc.onerror = () => ok(); document.head.append(sc); }));
   const src = url => files[url] || (files[url] = fetch(url, { cache: 'no-cache' }).then(r => r.ok ? r.text() : '').catch(() => ''));
-  async function lpData(href, native) {
-    const page = String(href || '').replace(/[?#].*$/, '').replace(/\.html$/, ''), W = {};
+  // base: the LS's folder from this page ('' for this LS; '../other-ls/' for another LS of the course, in the one 📓 notebook)
+  async function lpData(href, native, base) {
+    const page = String(href || '').replace(/[?#].*$/, '').replace(/\.html$/, ''), W = {}, b = base || '';
     const run = s => { if (s) try { new Function('window', s)(W); } catch (e) { console.warn('exam data', page, e); } };
-    run(await src('data/' + page + '.js'));
-    if (native && W.LP) run(await src('data/native/' + page + '.js'));
+    run(await src(b + 'data/' + page + '.js'));
+    if (native && W.LP) run(await src(b + 'data/native/' + page + '.js'));
     return W.LP || null;
   }
   // the learning paths of this LS, in the order of the LS page (its <ol class="lps">), without checkpoints, extras and the final product
-  function lps() {
-    return [...document.querySelectorAll('ol.lps a.lp[data-a]')]
+  function lps(doc) {
+    return [...(doc || document).querySelectorAll('ol.lps a.lp[data-a]')]
       .filter(a => !a.classList.contains('cp') && !a.classList.contains('extra'))
       .map(a => ({ id: a.dataset.a, href: a.getAttribute('href'), n: ((a.querySelector('.n') || {}).textContent || '').trim(), title: ((a.querySelector('.t b') || {}).textContent || '').trim() }))
       .filter(x => x.href && !/^final product/i.test(x.title));
   }
-  const sample = () => { const a = document.querySelector('ol.lps a.lp[href*="sample-exam"]'); return a ? a.getAttribute('href') : null; };
+  const sample = doc => { const a = (doc || document).querySelector('ol.lps a.lp[href*="sample-exam"]'); return a ? a.getAttribute('href') : null; };
+  // another LS of the course, for the one 📓 notebook of every LS (Roger, 13 Nov 2026): its home page, read as text once
+  const homes = {};
+  const home = base => homes[base] || (homes[base] = src(base + 'index.html').then(h => h ? new DOMParser().parseFromString(h, 'text/html') : null));
   // the group's plan: exam day and the learning paths dropped for it
   function plan(LS, gid) {
     const W = window.ELWeek, x = W && gid ? (W.plans(gid) || []).find(y => y.ls === LS) : null;
     return { exam: x ? W.exam(x.p, x.gi) : null, dropped: x ? ((x.p._dropped || {})[x.gi] || []) : [] };
   }
   // done: {"activity#panel": day} · level: a route id · ca: Catalan for Starter/Base · games: {lpNumber: true} played
-  async function build({ LS, gid, done, level, ca, played }) {
+  async function build({ LS, gid, done, level, ca, played, base }) {
     level = ROUTES.includes(level) ? level : 'insecure';
     const tx = o => o == null ? '' : typeof o === 'string' ? o : (ca ? (o.ca || o.en) : (o.en || o.ca));
-    const pl = plan(LS, gid), out = [], dropped = [];
-    for (const a of lps()) {
+    if (base) await sections();
+    const pl = plan(LS, gid), out = [], dropped = [], doc = base ? await home(base) : document;
+    if (!doc) return { lps: [], dropped: [], exam: pl.exam, sample: null };
+    for (const a0 of lps(doc)) {
+      const a = base ? Object.assign({}, a0, { href: base + a0.href }) : a0;
       if (pl.dropped.includes(a.id)) { dropped.push(a); continue; }
       const secs = (window.EL_SECTIONS || {})[a.id] || [], tabs = secs.filter(([id]) => done && done[a.id + '#' + id]).map(([id, name]) => ({ id, name, day: done[a.id + '#' + id] }));
       const st = mine0(a.id), tried = st && st.items && Object.keys(st.items).length;
       if (!tabs.length && !(played && played[a.n]) && !tried) continue;
-      const LP = await lpData(a.href, level === 'native');
+      const LP = await lpData(a0.href, level === 'native', base);
       const panels = ((LP && LP.panels) || []).map(p => level === 'native' && LP.native && LP.native[p.id] ? Object.assign({ id: p.id }, LP.native[p.id]) : p);
       const on = new Set(tabs.map(x => x.id)), mine = panels.filter(p => on.has(p.id));
       const terms = [], grammar = [], parts = [];
-      const termsOf = p => Array.isArray(p.groups) && p.type !== 'self' ? forLevel(p.groups, level).map(g => ({ g: tx(g.g), items: (g.items || []).filter(Array.isArray).map(x => ({ en: x[0], ca: x[1], ex: x[2] })) })).filter(g => g.items.length) : [];
-      const gramOf = p => { const ex = forLevel(p.explain, level).map(tx).filter(Boolean); return ex.length ? [{ title: tx(p.title), boxes: ex }] : []; };
+      // the level in a set's name ("Traditions (Safe)"): the route sets add up (a Plus student also has the Core ones, as on the learning
+      // path), so the notebook leaves the label out (Roger, 13 Nov 2026: "why does she have Core and plus mixed up?")
+      const nolv = s => String(s || '').replace(/\s*\((?:Beginners|Insecure|Safe|Daring|Native|Starter|Base|Core|Plus|Pro)(?: words| route)?\)/g, '');
+      const termsOf = p => Array.isArray(p.groups) && p.type !== 'self' ? forLevel(p.groups, level).map(g => ({ g: nolv(tx(g.g)), items: (g.items || []).filter(Array.isArray).map(x => ({ en: x[0], ca: x[1], ex: x[2] })) })).filter(g => g.items.length) : [];
+      const gramOf = p => { const ex = forLevel(p.explain, level).map(x => nolv(tx(x))).filter(Boolean); return ex.length ? [{ title: nolv(tx(p.title)), boxes: ex }] : []; };
       mine.forEach(p => { terms.push(...termsOf(p)); grammar.push(...gramOf(p)); });
       // 📓 the notebook, tab by tab in the learning path's order: what was done in class (key terms, how it works) and the student's own
       // answers to the activities, their first try only, as the teacher would correct them (Roger, 13 Nov 2026)
@@ -72,7 +86,8 @@ window.ELExam = (function () {
       });
       out.push(Object.assign({}, a, { tabs, terms, grammar, parts }));
     }
-    return { lps: out, dropped, exam: pl.exam, sample: sample() };
+    const sm = sample(doc);
+    return { lps: out, dropped, exam: pl.exam, sample: sm && base ? base + sm : sm };
   }
   // the student's own state of a learning path (the engine's localStorage, kept in sync by el-cloud.js): its first catalog key
   function mine0(id) {

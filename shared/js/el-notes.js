@@ -33,8 +33,8 @@
   const slide=s=>`<div class="nt-s"><h4>${s.img&&!/\./.test(s.img)?esc(s.img)+" ":""}${md(s.theory)}</h4>${(s.lines||[]).map(block).join("")}${ca()&&s.ca?`<div class="nt-ca">${s.ca.map(l=>`<p>${md(l)}</p>`).join("")}</div>`:""}</div>`;
 
   // one card per game: every game the group played, plus any game with notes or a result (a tester, another group's game)
-  function build(played,notes,mine){
-    const ids=new Set([...Object.keys(played||{}),...notes.map(n=>n.deck||n.id),...Object.values(mine||{}).filter(g=>!g.ls||g.ls===LS).map(g=>g.deck)]);
+  function build(played,notes,mine,ls){
+    const ids=new Set([...Object.keys(played||{}),...notes.map(n=>n.deck||n.id),...Object.values(mine||{}).filter(g=>ls?g.ls===ls:(!g.ls||g.ls===LS)).map(g=>g.deck)]);
     return [...ids].map(id=>{
       const m=meta(id),th=(window.EL_GAME_THEORY||{})[id],nd=notes.find(n=>(n.deck||n.id)===id),res=Object.values(mine||{}).filter(g=>g.deck===id).sort((a,b)=>b.sid-a.sid);
       const parts=th?th.parts.map(p=>({k:p.k,slides:p.slides,topic:p.slides.map(s=>s.theory).join(" · ")})):Object.keys((nd&&nd.parts)||{}).map(k=>({k,slides:[],topic:nd.parts[k].topic||""}));
@@ -170,7 +170,7 @@
     if(!who){box.innerHTML=`<p class="muted">${t("Entra per veure els teus apunts.","Sign in to see your notes.")}</p>`;return}
     if(who.teacher){box.innerHTML=teacherTable()+teacherPreview()+`<article class="bigcard"><p>Each student sees here what their group has done in this LS, learning path by learning path: the tabs done in class, the key terms and grammar of those tabs at their route, and every class game their group played with a copy of the theory, their own notes below it (read only), their result and what to study. Students who missed a game get its theory without notes. You see every student's answers, marks and notes together on the <a href="../../lab/game/results.html">📊 game results</a> page (click a student), or this page as they see it with 👁 Student view.</p></article>`;return}
     if(!data||(!data.ex&&exCtx&&window.ELExam)){box.innerHTML=`<p class="muted">${t("Carregant…","Loading…")}</p>`;return}
-    if(data.ex&&window.ELNotebook){ELNotebook.draw(box,data.ex,data.games,{t,esc,md,slide,day,exDay,gtDay,safe,lpOf,LS,ca:ca(),own:!!who.own,uid:who.uid||'',rs:data.rs||{},level:exCtx&&exCtx.level||'',name:who.name||(who.email||'').split('@')[0].replace(/[._]/g,' ').replace(/\d+/g,'').replace(/\b\w/g,c=>c.toUpperCase()).trim(),group:who.group||(window.ELCloud&&ELCloud.group&&ELCloud.group())||(D&&D.group)||'',mg:mg||(D&&D.myGames)||{},nb:data.nb||(data.nb={parts:{}}),save:nbSave,saveGt:gtSave,saveGn:gnSave});return}   // 📓 My notebook (el-notebook.js)
+    if(data.ex&&window.ELNotebook){ELNotebook.draw(box,data.ex,data.games,{t,esc,md,slide,day,exDay,gtDay,safe,lpOf,LS,ca:ca(),own:!!(who.own||who.as),preview:!!who.as,uid:who.uid||'',rs:data.rs||{},level:exCtx&&exCtx.level||'',name:who.name||(who.email||'').split('@')[0].replace(/[._]/g,' ').replace(/\d+/g,'').replace(/\b\w/g,c=>c.toUpperCase()).trim(),group:who.group||(window.ELCloud&&ELCloud.group&&ELCloud.group())||(D&&D.group)||'',mg:mg||(D&&D.myGames)||{},nb:data.nb||(data.nb={parts:{}}),save:nbSave,chapters:data.chs||null,saveGt:gtSave,saveGn:gnSave});return}   // 📓 My notebook (el-notebook.js)
     if(data.ex){box.innerHTML=examHtml(data.ex,data.games,g=>card(g,true),true);return}
     const intro=`<p class="muted nintro">${t("Aquí tens cada joc de classe d'aquesta LS: la teoria, els teus apunts de <b>📝 Pren apunts</b> a sota, el teu resultat i què has d'estudiar.","Here is every class game of this LS: the theory, your notes from <b>📝 Take your notes</b> below it, your result and what to study.")}</p>`;
     if(!data.games.length){box.innerHTML=intro+`<article class="bigcard nempty"><span aria-hidden="true">📝</span><p>${t("Encara no heu fet cap joc de classe en aquesta LS.","Your class hasn't played any class game in this LS yet.")}</p></article>`;return}
@@ -215,10 +215,10 @@
   }
   // 📓 the student's own notebook sections and their order: students/{uid}/notes/nb-<LS> = {ls, course, deck, title, lp, parts:{o:{list},
   // s…:{topic, html, text, dr, day}}, updated} (the notes rule: their own, parts ≤ 20). Written whole, so a deleted section goes.
-  async function nbSave(parts){
-    if(!who||!who.own||D)return;const C=window.ELCloud;S=S||await import(FS);
-    const ls=(window.EL_LS||[]).find(l=>l.id===LS)||{};
-    await S.setDoc(S.doc(C.db,"students",who.uid,"notes","nb-"+LS),{ls:LS,course:ls.course||"",deck:"nb-"+LS,title:"📓 My notebook",lp:"",parts,updated:S.serverTimestamp()});
+  async function nbSave(parts,id){
+    if(!who||!who.own||D)return;const C=window.ELCloud;S=S||await import(FS);id=id||LS;
+    const ls=(window.EL_LS||[]).find(l=>l.id===id)||{};
+    await S.setDoc(S.doc(C.db,"students",who.uid,"notes","nb-"+id),{ls:id,course:ls.course||"",deck:"nb-"+id,title:"📓 My notebook",lp:"",parts,updated:S.serverTimestamp()});
   }
   // ✏️ the notes a student took on the whiteboard, edited in the notebook: back into their own doc (notes/gt-…, parts.gt)
   async function gtSave(id,gt){
@@ -235,8 +235,41 @@
   async function exBuild(){
     if(!window.ELExam||!exCtx||!data){draw();return}
     const k=++exSeq;draw();
-    try{const ex=await ELExam.build({LS,gid:exCtx.gid,done:exCtx.done,level:exCtx.level,ca:ca(),played:lpPlayed(data.games)});if(k===exSeq&&data){data.ex=ex;draw()}}
+    try{const ex=await ELExam.build({LS,gid:exCtx.gid,done:exCtx.done,level:exCtx.level,ca:ca(),played:lpPlayed(data.games)});
+      if(k===exSeq&&data&&window.ELNotebook){const chs=await chBuild(k).catch(e=>{console.warn("chapters",e);return null});if(k===exSeq&&data)data.chs=chs}
+      if(k===exSeq&&data){data.ex=ex;draw()}}
     catch(e){console.warn("exam",e);if(k===exSeq){exCtx=null;draw()}}
+  }
+  /* 📓 one notebook for every LS of the course (Roger, 13 Nov 2026: "Can you make LS1 and LS2 and the following ones to be part of the same
+     notebook? … one Index per LS is okay, but the summary I want it of everything"): the other LSs' chapters, in the course's order, built
+     like this LS's: their ls doc (done, played: one read each, kept for the page), the student's notes of that LS (one query each, as here)
+     and their learning paths read from that LS's home page and data files (el-exam.js, base = its folder). An LS after this one comes in
+     only once the class has started it; a hidden LS never. The chapters are kept until the page changes student or language. */
+  let chCache=null;
+  async function chBuild(k){
+    const cur=(window.EL_LS||[]).find(l=>l.id===LS);if(!cur)return null;
+    const list=(window.EL_LS||[]).filter(l=>l.course===cur.course),me=list.indexOf(cur);if(list.length<2)return null;
+    const key=(who&&who.uid)+"|"+ca()+"|"+exCtx.level;if(chCache&&chCache.key===key)return chCache.chs;
+    const C=window.ELCloud,gid=exCtx.gid,mine=mg||(D&&D.myGames)||{},out=[];
+    for(const L of list){
+      if(L.id===LS){out.push({LS,cur:true});continue}
+      let info={},notes=[];
+      try{
+        if(D){info=((D.lsInfos||{})[L.id])||{};notes=(D.notes||[]).filter(n=>n.ls===L.id).map(x=>Object.assign({parts:{}},x))}
+        else{info=await (C.lsNow||C.lsInfo)(L.id).catch(()=>({}))||{};S=S||await import(FS);
+          const q=await S.getDocs(S.query(S.collection(C.db,"students",who.uid,"notes"),S.where("ls","==",L.id))).catch(()=>null);
+          if(q)notes=q.docs.map(x=>Object.assign({id:x.id,parts:{}},x.data()))}
+      }catch(e){console.warn("chapter",L.id,e)}
+      if(k!==exSeq)return null;
+      if(info.status==="hidden")continue;
+      const done=((info.done||{})[gid])||{},played=((info.played||{})[gid])||{};
+      if(list.indexOf(L)>me&&!Object.keys(done).length&&!Object.keys(played).length)continue;
+      const nb=notes.find(n=>n.id==="nb-"+L.id)||null,games=build(played,notes.filter(n=>!/^nb-/.test(n.id)),mine,L.id);
+      const base="../"+L.id.replace(/^\d+eso-/,"")+"/";
+      const ex=await ELExam.build({LS:L.id,gid,done,level:exCtx.level,ca:ca(),played:lpPlayed(games),base});
+      out.push({LS:L.id,ex,games,nb:nb||{parts:{}},save:parts=>nbSave(parts,L.id)});
+    }
+    const chs=out.length>1?out:null;chCache={key,chs};return chs;
   }
   // 🧩 📚 Games and theory card on the LS home, the board's card (Roger, 7 Nov 2026: "instead of this", the slim 📝 tile): the % right in this
   // LS's grammar and vocabulary class games (elRing, el-catalog.js), Open → and 📝 Your notes, all opening #notes. One read of
@@ -264,10 +297,10 @@
   window.addEventListener("hashchange",()=>{if(here())load()});
   function setWho(u){
     const C=window.ELCloud,AS=C&&C.viewing;
-    who=!u?null:AS?{uid:AS.uid,email:(AS.email||"").toLowerCase(),group:AS.group,name:AS.name||""}:C.isTeacher(u)?{teacher:true}:{uid:u.uid,email:(u.email||"").toLowerCase(),own:true,name:u.displayName||""};
+    who=!u?null:AS?{as:true,uid:AS.uid,email:(AS.email||"").toLowerCase(),group:AS.group,name:AS.name||""}:C.isTeacher(u)?{teacher:true}:{uid:u.uid,email:(u.email||"").toLowerCase(),own:true,name:u.displayName||""};
     data=null;mg=null;tPlayed=null;tInfo=null;tEx=null;exCtx=null;if(here())load();else draw();loadMg();
   }
-  if(D){who=D.role==="teacher"?{teacher:true}:{uid:"demo",own:D.role!=="as",name:D.name||"",group:D.group||""};mg=D.myGames||null;homeCard();if(here())load();else draw();window.addEventListener("load",()=>{if(here())load()});return}
+  if(D){who=D.role==="teacher"?{teacher:true}:{uid:"demo",own:D.role!=="as",as:D.role==="as",name:D.name||"",group:D.group||""};mg=D.myGames||null;homeCard();if(here())load();else draw();window.addEventListener("load",()=>{if(here())load()});return}
   homeCard();
   let tries=0;(function wait(){if(window.ELCloud&&ELCloud.onUser){ELCloud.onUser(setWho);return}if(++tries<300)setTimeout(wait,100)})();
 })();
