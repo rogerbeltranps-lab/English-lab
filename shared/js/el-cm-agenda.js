@@ -320,7 +320,7 @@ function play(src){if(window.elPlayVideo){vid=window.elPlayVideo(src);return}if(
 // the "now" mark follows the class tab (a tab clicked on the page)
 // 🔥 the warm-up game over the class tab (el-warmup.js); also when class mode starts (el-cloud.js cmTeacher)
 export async function warmOpen(auto){if(!C)return;try{await init()}catch(e){}const w=warmDecks();if(auto&&!w.decks.length)return;
-  const m=await import(new URL("shared/js/el-warmup.js",C.root).href);return m.open(Object.assign({root:C.root,g:C.g,gname:C.gname},w))}
+  const m=await import(new URL("shared/js/el-warmup.js",C.root).href);return m.open(Object.assign({root:C.root,g:C.g,gname:C.gname,s:C.s},w))}
 export function refresh(){if(box&&L)draw()}
 
 // ⏹ The end of the class: each of today's steps ✔ Finished, ⏭ Next class or 🏠 Homework (Roger, 12 Nov 2026: "When I finish the class mode, a
