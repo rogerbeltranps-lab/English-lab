@@ -558,6 +558,7 @@ html.el-nb-plain .nb-final{font-size:28px}
 .nb-tab.nb-ctab{background:#26324a;color:#fff;font-weight:700}
 .nb-tab.nb-ctab[aria-current="true"]{background:#1f3c73;box-shadow:0 -3px 0 #f2c94c inset}
 .nb-tab.nb-sumtab{background:#fff2b3}
+.nb-tab.nb-fptab{background:#d1c4e9}
 .nb-chh{margin-top:6px}
 /* ➜ "To do" takes the student to that activity on the learning path (Roger, 13 Nov 2026: "on to do add a link that takes her there") */
 a.nb-tdo.nb-tdgo{text-decoration:none;cursor:pointer;background:#fff;box-shadow:2px 2px 0 rgba(200,40,40,.25);transition:transform .12s}
