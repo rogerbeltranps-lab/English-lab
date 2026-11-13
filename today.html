@@ -429,7 +429,7 @@ const hello=()=>{const n=String(D.me.name||"").trim(),f=n.includes(",")?n.split(
   return t("Hola","Hi")+(f?" "+f:"")+", "+end};   // Roger, 6 Nov 2026: a new encouraging sentence every day, different for each student (el-cheer.js)
 const planOf=ls=>{const p=(window.EL_PLAN||{})[ls.id],gi=p&&D.me.group?ELWeek.col(p,D.me.group):-1;return {p,gi:p?gi:-1}};
 function homeSub(g,ls){const {p,gi}=planOf(ls),ex=gi>=0?ELWeek.exam(p,gi):null,n=ex?ELWeek.days(ELWeek.today(),ex):null;
-  return (g?esc(g.name)+" · ":"")+lsName(ls)+(ex&&n>=0?` · <b style="color:#b91c1c">${n>1?t(`examen d'aquí a ${n} dies`,`exam in ${n} days`):n===1?t("examen demà","exam tomorrow"):t("examen avui","exam today")}</b>`:"")}
+  return (g?esc(g.name)+" · ":"")+lsName(ls)+(ex&&n>=0?` · <b style="color:#b91c1c">${(dt=>n>1?t(`examen ${dt}, d'aquí a ${n} dies`,`exam ${dt}, in ${n} days`):n===1?t(`examen demà, ${dt}`,`exam tomorrow, ${dt}`):t("examen avui","exam today"))(ELWeek.date(ex,EN?"en":"ca"))}</b>`:"")}   // the exam's date beside the countdown (problem report, 2ESOB, 13 Nov 2026)
 // the student's next step: the first open learning path (in the order of the group's plan) with a step still to do, as on 📋 My learning paths
 function nextFor(ls,info){if(only(ls.id)||info.status==="closed")return null;
   const {p,gi}=planOf(ls),dr=(gi>=0&&(p._dropped||{})[gi])||[],today=ELWeek.today(),dueOf=a=>gi>=0?ELWeek.due(p,a.id,gi):null;
