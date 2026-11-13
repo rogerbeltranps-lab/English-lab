@@ -5,8 +5,12 @@
 // {t (target pid), g (password guess), at}}, lx (last file: {k, n, at})}, at}, at most every 3 s (a hack or a firewall at once).
 // The board answers hacks in live/{group}.cb.hr and publishes everyone's bits (cb.pl). Unlike the classic game, this page loads the decks
 // (the questions and their answers) because each student goes at their own pace; the board recomputes every result from the raw answers.
+// 🧑‍💻 Hacker avatars (cb-av.js, Roger 13 Nov 2026): their hacker sits only inside the name pill of the top bar while they play (never over
+// the question or the answers); big in the lobby (with the 👕 locker: cb.wear = what they choose to wear) and on the end screen, where
+// the board's cb.rw[pid] says what they won. Their own cbAv/{email} is read once per round; cb.bs = their best run of right answers.
 export function cbPlayer(ctx){
-const {S,G,esc,md,pic,T,app$}=ctx,CB=window.ELCB;
+const {S,G,esc,md,pic,T,app$}=ctx,CB=window.ELCB,AV=window.ELCBAV;
+let avDoc=null;
 let L=null,loading=null,st=null,sid=0,scr="",scrKey="",pend={a:{},cb:{}},flushT=0,seenHr=null,toastT=0,news=null,tick=0,fbTimer=0;
 const em=()=>(ctx.user().email||"").toLowerCase(),me=()=>CB.pid(em()),x=()=>ctx.x()||{},C=()=>x().cb||{};
 const now=()=>Date.now(),left=()=>Math.max(0,(+C().end||0)-now());
@@ -18,7 +22,7 @@ function rank(){const all=Object.keys(Object.assign({},C().pl||{},{[me()]:1})).m
 const qOf=k=>L&&L.byKey[k];
 
 /* ---------- saving: my own answers doc ---------- */
-function save(now_){Object.assign(pend.cb,{e:st.e,n:st.n,r:st.r,i:st.i,lp:st.lp});clearTimeout(flushT);flushT=setTimeout(flush,now_?0:3000)}
+function save(now_){Object.assign(pend.cb,{e:st.e,n:st.n,r:st.r,i:st.i,lp:st.lp,bs:st.bs||0});clearTimeout(flushT);flushT=setTimeout(flush,now_?0:3000)}
 function flush(){clearTimeout(flushT);const r=ctx.ref();if(!r||!st||ctx.mySid()!==sid)return;
   const d={sid,at:S.serverTimestamp()};if(Object.keys(pend.a).length)d.a=pend.a;if(Object.keys(pend.cb).length)d.cb=pend.cb;pend={a:{},cb:{}};
   S.setDoc(r,d,{merge:true}).catch(e=>{console.warn("code breakers",e);pend.a=Object.assign(d.a||{},pend.a);pend.cb=Object.assign(d.cb||{},pend.cb);flushT=setTimeout(flush,5000)})}
@@ -31,7 +35,10 @@ async function start(){
   got.byKey={};got.pool.forEach(q=>got.byKey[q.key]=q);L=got;
   const sv=ctx.saved()||{},c=sv.cb||{},seed=CB.hash(em()+":"+sid);
   st={seed,order:CB.order(L.pool,seed),a:Object.assign({},sv.a||{}),e:+c.e||0,n:+c.n||0,r:+c.r||0,i:+c.i||0,lp:+c.lp||0,pw:c.pw||"",ws:Array.isArray(c.ws)&&c.ws.length?c.ws:CB.pwFor(em(),L.words).map(w=>w.w),
-    sh:+c.sh||0,hk:Object.keys(c.h||{}).length,cur:null,last:null,sim:null,skip:new Set(),lockUntil:0};
+    sh:+c.sh||0,hk:Object.keys(c.h||{}).length,cur:null,last:null,sim:null,skip:new Set(),lockUntil:0,bs:+c.bs||0,wear:c.wear&&typeof c.wear==="object"?c.wear:null};
+  // my hacker: one read per round (only the board writes it)
+  try{const r=ctx.ref();if(r){const d=await S.getDoc(S.doc(r.firestore,"cbAv",em()));avDoc=d.exists()?d.data():{}}}catch(e){console.warn("hacker",e);avDoc=avDoc||{}}
+  if(x().sid!==sid)return;
   if(st.lp)st.order=CB.order(L.pool,seed+st.lp*101);
   if(!c.ws)pend.cb.ws=st.ws;
   scr=st.pw?"q":"pw";draw();
@@ -45,7 +52,8 @@ function nextQ(){if(!st.order.length)return null;
 /* ---------- screens ---------- */
 const fmt=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
 function top(){const [rk,of]=st?rank():[0,0],sh=st&&st.sh>now(),p=x().phase;
-  return `<div class="top cbtop"><span class="pill">${CB.avatar(em())} ${esc(ctx.first())}</span><span class="pill cbbits">💾 <b id="cbb">${st?myBits():0}</b></span>${st&&p==="play"?`<span class="pill" id="cbrk">#${rk} / ${of}</span>`:""}
+  const lk=myLook();
+  return `<div class="top cbtop"><span class="pill cbme">${AV.svg(lk,{mini:true,size:40})}<span>${esc(ctx.first())}<small>${esc(AV.RANKS[lk.r-1].n)}</small></span></span><span class="pill cbbits">💾 <b id="cbb">${st?myBits():0}</b></span>${st&&p==="play"?`<span class="pill" id="cbrk">#${rk} / ${of}</span>`:""}
     ${sh?`<span class="pill cbsh" id="cbsh">🛡️ ${fmt(st.sh-now())}</span>`:""}<span class="sp cbnewsw">${newsH()}</span>${p==="play"&&+C().end?`<span class="pill cbtime${left()<30e3?" low":""}" id="cbt">⏱ ${fmt(left())}</span>`:""}
     <button class="btn ghost" data-do="mute" aria-label="Sound">${G.sound()?"🔊":"🔇"}</button></div>`}
 function liveTop(){const t=app$.querySelector(".cbtop");if(!t)return;const b=t.querySelector("#cbb");if(!b)return;
@@ -53,6 +61,9 @@ function liveTop(){const t=app$.querySelector(".cbtop");if(!t)return;const b=t.q
   const tm=t.querySelector("#cbt");if(tm){tm.textContent="⏱ "+fmt(left());tm.classList.toggle("low",left()<30e3)}
   const rk=t.querySelector("#cbrk");if(rk&&st){const [a,b2]=rank();rk.textContent=`#${a} / ${b2}`}
   const sh=t.querySelector("#cbsh");if(sh){if(st.sh>now())sh.textContent="🛡️ "+fmt(st.sh-now());else sh.remove()}}
+// what I wear: my cbAv + what I chose in the 👕 locker; at the end, the board's new look (with what I just won)
+function myLook(){const rw=(C().rw||{})[me()],p=(C().pl||{})[me()];
+  if(rw&&p&&p.hv)return Object.assign({a:CB.avatar(em())},p.hv);return AV.look(avDoc,st&&st.wear,CB.avatar(em()))}
 function put(key,h){scrKey=key;app$.innerHTML=top()+`<div class="main cbmain">${h}</div>`;waitCheck()}
 // buttons that wait (data-until = ms): disabled until then, the seconds left on them; checked every second and exactly at the end
 function waitCheck(){const t=now();let next=0;
@@ -68,7 +79,8 @@ function draw(){
   hrCheck();
   if(x().phase==="lobby"&&scr!=="pw"&&!st.pw)scr="pw";
   if(over()){flush();return endView()}
-  if(x().phase==="lobby"&&st.pw)return lobbyWait();
+  if(x().phase==="lobby"&&st.pw)return scr==="locker"?lockerView():lobbyWait();
+  if(scr==="locker")scr="q";
   const key=scr+":"+(scr==="q"?st.i+":"+st.lp+":"+(st.sim||""):"")+(scr==="files"||scr==="hackPick"||scr==="hackPw"||scr==="hackWait"||scr==="hackRes"||scr==="fb"?":"+(st.cur||"")+":"+(st.last?st.last.at:"")+(st.file?":o":""):"");
   if(key===scrKey&&scr!=="hackPick"){liveTop();waitCheck();if(scr==="hackWait")hackWaitCheck();return}
   ({pw:pwView,q:qView,fb:fbView,files:filesView,hackPick:pickView,hackPw:hackPwView,hackWait:hackWaitView,hackRes:hackResView}[scr]||qView)(key);
@@ -81,8 +93,9 @@ function pwView(key){
     <p class="mid">${esc(T("Other players must guess it to hack you. Choose the word you think is hardest!","Els altres l'han d'endevinar per hackejar-te. Tria la paraula que creguis més difícil!"))}</p>
     <div class="cbpw">${ws.map(w=>`<button class="btn cbword${st.pw===w?" on":""}" data-cb="pw" data-w="${esc(w)}">${esc(w)}</button>`).join("")}</div>`));
 }
-function lobbyWait(){const key="lobby:"+st.pw;if(key===scrKey)return liveTop();
-  put(key,center(`<div class="emo pop">🕵️</div><p class="big">${esc(T("You're in","Ja hi ets"))}, ${esc(ctx.first())}!</p>
+function lobbyWait(){const lk=myLook(),key="lobby:"+st.pw+":"+JSON.stringify(lk);if(key===scrKey)return liveTop();
+  put(key,center(`<div class="cbhero pop">${AV.svg(lk,{size:170})}<div><b>${esc(AV.RANKS[lk.r-1].n)}</b> <small>· ${esc(T("rank","rang"))} ${lk.r} / 10</small></div>
+    <button class="btn ghost" data-cb="locker">👕 ${esc(T("My hacker","El meu hacker"))}</button></div><p class="big">${esc(T("You're in","Ja hi ets"))}, ${esc(ctx.first())}!</p>
     <p class="mid">🔒 ${esc(T("Your password","La teva contrasenya"))}: <b class="cbkey">${esc(st.pw)}</b> <button class="btn ghost" data-cb="repw">${esc(T("Change","Canvia"))}</button></p>
     <p class="mid">${esc(T("Wait for the start. Answer right to open files: bits, double, firewall, virus or hack!","Espera que comenci. Encerta per obrir fitxers: bits, doble, tallafoc, virus o hack!"))}</p>`))}
 
@@ -106,7 +119,7 @@ function answer(text,right){
   // a 🔁 similar question is not in my list: the list goes on from where it was; a first wrong answer gets one, a second doesn't
   const second=!!st.sim;if(!second)st.i++;st.sim=null;
   st.last={ok:right,text,key:qu.key,at:now(),second,sim:!right&&!second?CB.similar(L.pool,qu,st.a,st.seed+st.n,new Set([...st.skip,...st.order.slice(st.i,st.i+1)])):null};
-  st.streak=right?(st.streak||0)+1:0;
+  st.streak=right?(st.streak||0)+1:0;st.bs=Math.max(st.bs||0,st.streak);
   G.fx(right?"right":"wrong");save();
   scr=right?"files":"fb";st.file=null;draw();
 }
@@ -127,6 +140,19 @@ function fbView(key){const qu=qOf(st.last.key),sim=st.last.sim,wait=now()+(st.la
   put(key,`<div class="res no cbres"><div class="pop cbfb"><div class="mark">✗</div><p class="big">${esc(st.last.second?T("Not this one either","Aquesta tampoc"):T("Not this time","Aquesta no"))}</p>
     <p class="mid">${qu.write?`${esc(T("You wrote","Has escrit"))}: <s>${esc(st.last.text)}</s><br>`:""}${esc(T("The answer","La resposta"))}: <b>${qu.write?esc(qu.write[0]):md(qu.options[0])}</b></p>
     ${qu.why?`<p class="mid cbwhy">💡 ${md(qu.why)}</p>`:""}${st.last.second?`<p class="mid">💪 ${esc(T("Keep going: you'll see it again later.","Continua: ja hi tornaràs a sortir."))}</p>`:thHtml(qu)}<p>${btn}</p></div></div>`)}
+
+// 👕 the locker (lobby only): what I won, to wear; what I could still win, greyed out. Ranks come from XP; the crates from my % right.
+function lockerView(){const lk=myLook(),doc=avDoc||{},xp=+doc.xp||0,nx=AV.RANKS[lk.r],key="locker:"+JSON.stringify(lk);if(key===scrKey)return liveTop();
+  const cell=(s,k,tier)=>{const own=!k||AV.own(doc,s,k),on=(lk[s]||"")===k,c=k?AV.TIERS[tier].c:"#475569";
+    const face=(s==="v"||s==="p")&&k?`<i class="sw" style="background:${AV.ITEMS[s][k]}"></i>`:k?`<i class="ic">${AV.ICON[k]||"?"}</i>`:`<i class="ic">–</i>`;
+    const name=!k?(s==="p"?T("standard","normal"):T("none","cap")):s==="pt"||s==="fx"?AV.ITEMS[s][k]:k;
+    return `<button class="cbit${on?" on":""}" style="--c:${c}" data-cb="wear" data-s="${s}" data-k="${k}"${own?"":" disabled"} title="${esc(name)}">${face}<span>${esc(name)}</span></button>`};
+  const badges=Object.entries(AV.BADGES).map(([k,b])=>`<span class="cbbdg${doc.b&&doc.b[k]?"":" off"}" title="${esc(b[1]+": "+b[2])}">${b[0]}</span>`).join("");
+  put(key,`<div class="cblocker"><div class="cbhero">${AV.svg(lk,{size:190})}<div><b>${esc(AV.RANKS[lk.r-1].n)}</b> <small>· ${esc(T("rank","rang"))} ${lk.r} / 10</small></div>
+      <div class="cbxp"><i style="width:${nx?Math.round((xp-AV.RANKS[lk.r-1].xp)/(nx.xp-AV.RANKS[lk.r-1].xp)*100):100}%"></i></div><small>${xp} XP${nx?` · ${nx.xp-xp} ${esc(T("to","per a"))} ${esc(nx.n)}`:""}</small>
+      <div class="cbbdgs">${badges}</div><button class="btn go" data-cb="lockerOk">✓ ${esc(T("Done","Fet"))}</button></div>
+    <div class="cbslots">${AV.SLOTS.map(([s,label,items,tier])=>`<div><h4>${esc(label)} <span style="color:${AV.TIERS[tier].c}">· ${esc(AV.TIERS[tier].n)}</span></h4><div class="cbits">${(s!=="v"?[""]:[]).concat(Object.keys(items)).map(k=>cell(s,k,tier)).join("")}</div></div>`).join("")}
+      <p class="cbhow">${esc(T("Better results, better crates: under 50 % a visor, 50–74 % a paint, 75–89 % a pet, 90 % or more an effect. Beat your best % for a better one!","Millors resultats, millors premis: menys del 50 % una visera, 50–74 % una pintura, 75–89 % una mascota, 90 % o més un efecte. Supera el teu millor % i en tindràs un de millor!"))}</p></div></div>`)}
 
 /* ---------- the 3 files ---------- */
 function filesView(key){const f=st.file;
@@ -155,10 +181,10 @@ function pickView(key){const l=others();
   const k2=key+":"+l.map(p=>p.id+p.s+(p.sh>now()?"s":"")+":"+Math.ceil(Math.max(0,guarded(p)-now())/1000)).join(",");if(k2===scrKey)return liveTop();
   put(k2,`<p class="big cbh">💻 ${esc(T("Who do you want to hack?","A qui vols hackejar?"))}</p>
     <p class="cbrule">🤝 ${esc(T("Fair play: you can't hack the same person twice in a row, and someone who was just hacked is safe for a moment.","Joc net: no pots hackejar la mateixa persona dues vegades seguides, i qui acaba de ser hackejat està protegit una estona."))}</p>
-    <div class="cbpick">${l.map(p=>{const g=guarded(p);return `<button class="cbp${g?" grd":""}" data-cb="target" data-id="${esc(p.id)}"${p.s>0&&!g?"":" disabled"}><span class="av">${esc(p.av||"🕵️")}</span><span class="nm">${esc(p.nm||"?")}</span><span class="bt">${g>0?"✋ "+fmt(g-now()):g?"✋ "+esc(T("Last time","L'última vegada")):"💾 "+p.s}</span>${p.sh>now()?'<span class="sh">🛡️</span>':""}</button>`}).join("")||`<p class="mid">${esc(T("Nobody to hack yet.","Encara no hi ha ningú per hackejar."))}</p>`}</div>
+    <div class="cbpick">${l.map(p=>{const g=guarded(p);return `<button class="cbp${g?" grd":""}" data-cb="target" data-id="${esc(p.id)}"${p.s>0&&!g?"":" disabled"}><span class="av">${AV.svg(Object.assign({a:p.av},p.hv),{mini:true,size:44})}</span><span class="nm">${esc(p.nm||"?")}</span><span class="bt">${g>0?"✋ "+fmt(g-now()):g?"✋ "+esc(T("Last time","L'última vegada")):"💾 "+p.s}</span>${p.sh>now()?'<span class="sh">🛡️</span>':""}</button>`}).join("")||`<p class="mid">${esc(T("Nobody to hack yet.","Encara no hi ha ningú per hackejar."))}</p>`}</div>
     <p style="text-align:center"><button class="btn ghost" data-cb="next">${esc(T("Skip","Salta"))}</button></p>`)}
 function hackPwView(key){const p=(C().pl||{})[st.target]||{};
-  put(key,center(`<p class="big">🔓 ${esc(T("Crack the password of","Esbrina la contrasenya de"))} ${esc(p.av||"")} ${esc(p.nm||"")}</p>
+  put(key,center(`<p class="big">🔓 ${esc(T("Crack the password of","Esbrina la contrasenya de"))} ${AV.svg(Object.assign({a:p.av},p.hv),{mini:true,size:48})} ${esc(p.nm||"")}</p>
     <div class="card cbclue"><small>${esc(T("Clue: the missing word","Pista: la paraula que falta"))}</small>${md(p.c||"…")}</div>
     <div class="cbpw">${(p.ws||[]).map(w=>`<button class="btn cbword" data-cb="guess" data-w="${esc(w)}">${esc(w)}</button>`).join("")}</div>
     <p><button class="btn ghost" data-cb="next">${esc(T("Skip","Salta"))}</button></p>`))}
@@ -188,17 +214,29 @@ function newsH(){return news&&news.until>now()?`<span class="cbnews${news.bad?" 
 function toast(h,bad){news={h,bad,until:now()+5000};const w=app$.querySelector(".cbtop .cbnewsw");if(w)w.innerHTML=newsH();
   clearTimeout(toastT);toastT=setTimeout(()=>{news=null;const n=document.getElementById("cbnews");if(n)n.remove()},5000)}
 
-function endView(){const [rk,of]=rank(),key="end:"+myBits()+":"+rk+":"+(x().cp??"");if(key===scrKey)return;
+// the end: my hacker (left) and the round (right): bits, place, % right, then what my hacker won (cb.rw, from the board a moment later)
+function endView(){const [rk,of]=rank(),rw=(C().rw||{})[me()],key="end:"+myBits()+":"+rk+":"+(x().cp??"")+":"+(rw?rw.xp:"-");if(key===scrKey)return;
   if(!scrKey.startsWith("end")){G.fx("fanfare");if(rk&&rk<=3)G.confetti()}
-  const pc=st.n?Math.round(st.r/st.n*100):0;
-  put(key,center(`<div class="emo pop">${rk===1?"🏆":rk&&rk<=3?"🥈":"🕵️"}</div><p class="big">${esc(T("Time's up!","S'ha acabat el temps!"))}</p>
-    <p class="mid">💾 <b>${myBits()} bits</b> · #${rk} / ${of}</p><p class="mid">✓ ${st.r} / ${st.n} ${esc(T("right","encerts"))} (${pc} %)</p>
-    ${typeof x().cp==="number"?G.ring(x().cp,"👥 "+T("The class got right","La classe ha encertat"),"min(24vh,170px)"):""}${ctx.cmWait()}`))}
+  if(rw&&!scrKey.includes(":"+rw.xp)&&rw.r1>rw.r0)setTimeout(()=>{G.fx("reveal");G.confetti()},600);
+  const pc=st.n?Math.round(st.r/st.n*100):0,lk=myLook(),xp=rw?rw.xp:+(avDoc&&avDoc.xp)||0,cur=AV.RANKS[lk.r-1],nx=AV.RANKS[lk.r];
+  const up=rw&&rw.r1>rw.r0,tier=rw?AV.TIERS[rw.t]:null;
+  const won=!rw?(st.n>=3?`<p class="mid cbwait">⏳ ${esc(T("Your hacker is getting its rewards…","El teu hacker està rebent els premis…"))}</p>`:`<p class="mid">${esc(T("Answer 3 questions or more to earn XP for your hacker.","Respon 3 preguntes o més per guanyar XP per al teu hacker."))}</p>`)
+    :`<div class="cbline"><span>✓ ${st.r} × 10 XP${rw.m!==1?` × ${rw.m}`:""}${rw.bo?` + ${rw.bo} 🏆`:""}</span><b>+${rw.x} XP</b></div>
+      <div class="cbcrate pop" style="--c:${tier.c}"><span class="ce">${tier.e}</span><span><small>${esc(tier.n)} ${esc(T("crate","premi"))}${rw.up?" · 📈 "+esc(T("personal best","rècord personal")):""}</small>${rw.g?`${esc(AV.SLOTS.find(z=>z[0]===rw.g.s)[1])}: <b>${esc(rw.g.s==="pt"||rw.g.s==="fx"?AV.ITEMS[rw.g.s][rw.g.k]:rw.g.k)}</b>`:esc(T("You have them all: +50 XP!","Ja els tens tots: +50 XP!"))}</span></div>
+      ${rw.nb&&rw.nb.length?`<div class="cbbdgs">${rw.nb.map(k=>AV.BADGES[k]?`<span class="cbbdg big pop">${AV.BADGES[k][0]} ${esc(AV.BADGES[k][1])}</span>`:"").join("")}</div>`:""}`;
+  put(key,`<div class="cbend"><div class="cbhero${up?" up":""}">${AV.svg(lk,{size:190})}${up?`<div class="cbrankup pop">⭐ ${esc(T("Rank up!","Has pujat de rang!"))}</div>`:""}
+      <div><b>${esc(cur.n)}</b> <small>· ${esc(T("rank","rang"))} ${lk.r} / 10</small></div><div class="cbxp"><i style="width:${nx?Math.round((xp-cur.xp)/(nx.xp-cur.xp)*100):100}%"></i></div><small>${xp} XP${nx?` · ${nx.xp-xp} ${esc(T("to","per a"))} ${esc(nx.n)}`:""}</small></div>
+    <div class="cbendr"><p class="big">${rk===1?"🏆":rk&&rk<=3?"🥈":"⏱"} ${esc(T("Time's up!","S'ha acabat el temps!"))}</p>
+      <p class="mid">💾 <b>${myBits()} bits</b> · #${rk} / ${of} · ✓ ${st.r} / ${st.n} (${pc} %)</p>${won}
+      ${typeof x().cp==="number"?G.ring(x().cp,"👥 "+T("The class got right","La classe ha encertat"),"min(16vh,120px)"):""}${ctx.cmWait()}</div></div>`)}
 
 /* ---------- taps and keys ---------- */
 app$.addEventListener("click",e=>{if(!st||x().mode!=="cb")return;const b=e.target.closest("[data-cb]");if(!b||b.disabled)return;const d=b.dataset.cb;
   if(d==="pw"){st.pw=b.dataset.w;pend.cb.pw=st.pw;pend.cb.ws=st.ws;save(true);G.fx("tap");scr="q";draw()}
   else if(d==="repw"){scr="pw";draw()}
+  else if(d==="locker"){scr="locker";draw()}
+  else if(d==="lockerOk"){scr="q";draw()}
+  else if(d==="wear"){st.wear=Object.assign({},st.wear||{},{[b.dataset.s]:b.dataset.k||""});pend.cb.wear=st.wear;save(true);G.fx("tap");draw()}
   else if(d==="tap"&&scr==="q"&&now()>=st.lockUntil){const qu=qOf(st.cur),o=CB.shown(qu,st.seed),k=o[+b.dataset.v];answer(CB.plain(qu.options[k]),k===0)}
   else if(d==="next"){scr="q";st.file=null;st.sim=null;draw()}
   else if(d==="sim"&&st.last&&st.last.sim){st.sim=st.last.sim;st.skip.add(st.sim);scr="q";st.file=null;draw()}

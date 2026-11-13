@@ -87,3 +87,54 @@ button.cbfile:hover{transform:translateY(-4px);border-color:var(--hk)}
 .cbev.hack{border-color:var(--gold)}.cbev.bad{border-color:#f87171}.cbev.good{border-color:var(--hk)}.cbev.shield{border-color:var(--hk2)}
 .cbpod .blk{color:var(--ink)}
 .lpn{max-width:28em;overflow:hidden;text-overflow:ellipsis}
+
+/* 🧑‍💻 hacker avatars (cb-av.js, 13 Nov 2026): in the top bar's name pill while playing (never over the question), big in the lobby,
+   the 👕 locker and the end screen; small on the board's lists */
+.cbav.mini{border-radius:50%;background:#071b24;border:2px solid rgba(56,242,138,.55);flex:none;vertical-align:middle}
+.cbtop .pill.cbme{display:flex;align-items:center;gap:.45em;padding:2px .9em 2px 3px;line-height:1.05}
+.cbtop .pill.cbme .cbav{width:2.1em;height:2.1em}
+.cbtop .pill.cbme small{display:block;font-size:.62em;color:var(--hk);font-weight:600}
+.cbhero{display:flex;flex-direction:column;align-items:center;gap:.25em;text-align:center}
+.cbhero small{opacity:.75}
+.cbhero .cbav{max-width:100%;height:auto}
+.cbhero.up .cbav{animation:cbglow 1.6s ease-in-out 2}@keyframes cbglow{50%{filter:drop-shadow(0 0 22px var(--gold))}}
+.cbrankup{font-weight:700;font-size:1.2em;color:var(--gold);text-shadow:0 0 16px rgba(255,200,61,.5)}
+.cbxp{width:min(280px,70vw);height:12px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:.2em 0}
+.cbxp i{display:block;height:100%;background:linear-gradient(90deg,var(--hk),var(--hk2))}
+.cbend{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(12px,3vw,40px);align-items:center;padding:0 clamp(8px,3vw,40px);overflow:auto}
+.cbend .cbhero .cbav{width:min(190px,30vh);height:auto}
+.cbendr{display:flex;flex-direction:column;gap:.6em;align-items:stretch;text-align:center;min-width:0}
+.cbendr .big,.cbendr .mid{margin:0}
+.cbline{display:flex;justify-content:space-between;gap:1em;background:rgba(11,37,48,.9);border:2px solid rgba(56,242,138,.3);border-radius:14px;padding:.45em 1em;font-size:clamp(17px,1.7vw,22px)}
+.cbline b{color:var(--hk);font-family:ui-monospace,Menlo,monospace}
+.cbcrate{display:flex;align-items:center;gap:.8em;border-radius:16px;padding:.5em 1em;border:3px solid var(--c);background:color-mix(in srgb,var(--c) 14%,#0b2530);font-size:clamp(17px,1.7vw,22px);text-align:left}
+.cbcrate .ce{font-size:2.2em;line-height:1}.cbcrate small{display:block;color:var(--c);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.6em}
+.cbbdgs{display:flex;gap:.4em;flex-wrap:wrap;justify-content:center}
+.cbbdg{display:inline-flex;align-items:center;justify-content:center;min-width:1.9em;height:1.9em;border-radius:999px;background:rgba(255,200,61,.12);border:2px solid var(--gold);font-size:1em}
+.cbbdg.off{opacity:.25;filter:grayscale(1);border-color:#64748b}
+.cbbdg.big{padding:.15em .8em;gap:.3em;font-size:clamp(15px,1.5vw,19px);font-weight:600}
+.cbwait{opacity:.85}
+.cblocker{flex:1;min-height:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(12px,3vw,36px);padding:4px clamp(8px,3vw,36px) 12px;overflow:auto}
+.cblocker .cbhero .cbav{width:min(190px,32vh);height:auto}
+.cbslots{display:flex;flex-direction:column;gap:.5em;min-width:0}
+.cbslots h4{margin:.1em 0 .25em;font-size:1em;font-weight:600;opacity:.9}
+.cbits{display:flex;gap:8px;flex-wrap:wrap}
+.cbit{width:64px;height:64px;border-radius:14px;border:3px solid var(--c);background:color-mix(in srgb,var(--c) 12%,#0b2530);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#fff;cursor:pointer;padding:2px;font:600 10px var(--f)}
+.cbit .sw{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.25)}
+.cbit .ic{font-style:normal;font-size:24px;line-height:1}
+.cbit span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cbit.on{box-shadow:0 0 0 3px #fff}
+.cbit:disabled{opacity:.28;filter:grayscale(.7);cursor:default}
+.cbhow{font-size:.8em;opacity:.8;margin:.3em 0 0}
+@media (max-width:700px){.cbend,.cblocker{grid-template-columns:1fr}}
+/* board */
+.cbrow{grid-template-columns:1.6em 2em minmax(6em,9em) 1fr 4.2em}
+.cbrow .av .cbav{width:1.9em;height:1.9em}
+.names .cbnm{display:inline-flex;align-items:center;gap:.3em}.names .cbnm .cbav{width:1.5em;height:1.5em}
+.cbpav{display:block}.cbpav .cbav{width:2.6em;height:2.6em}.p1 .cbpav .cbav{width:3.2em;height:3.2em}
+.cbp .av .cbav{width:44px;height:44px}
+.cbups{display:flex;flex-wrap:wrap;gap:.5em;justify-content:center;margin:.4em 0}
+.cbup{display:inline-flex;align-items:center;gap:.4em;background:rgba(255,200,61,.12);border:2px solid var(--gold);border-radius:999px;padding:.15em .8em .15em .2em}
+.cbup .cbav{width:1.7em;height:1.7em}
+@media (prefers-reduced-motion: reduce){.cbhero.up .cbav{animation:none}}
+.cbendr>*:not(.cbline):not(.cbcrate){align-self:center}
