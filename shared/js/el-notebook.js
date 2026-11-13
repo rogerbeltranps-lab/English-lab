@@ -156,10 +156,11 @@ window.ELNotebook = (function () {
       + `<ul class="nb-rbl">${cells.map((c, k) => `<li${k === on ? ' class="on"' : ''}><b>${esc(c[0])}</b> ${k === on ? `<span class="nb-hl">${esc(c[1])}</span> <span class="nb-you">◀ ${t('tu', 'you')}</span>` : esc(c[1])}</li>`).join('')}</ul>`
       + (on == null && mark === 0 ? `<p class="nb-pencil">${t('Sense evidència', 'No evidence')} ◀ ${t('tu', 'you')}</p>` : '') + fb(p) + `</div>`;
     const R = (window.EL_FP_RUBRICS || {})[G.fp.a];
-    if (!G.fp.rows && R && R.rows.length && parts.length === R.rows.length) {
+    if (!G.fp.rows && R && R.rows.length && parts.length) {
+      const al = alignRows(R.rows, parts);
       return `<div class="nb-when">${t('La rúbrica: el teu nivell està subratllat a cada fila.', 'The rubric: your level is underlined in every row.')}</div>`
-        + R.rows.map((r, i) => { const p = parts[i], L = lvOfM(p.m), on = L ? 4 - L : null;
-          return row(r.name, r.sub, r.w, r.d.map((d, k) => [R.levels[k], d]), on != null && on < r.d.length ? on : null, parseFloat(String(p.m).replace(',', '.')), p); }).join('');
+        + R.rows.map((r, i) => { const p = al[i], L = p ? lvOfM(p.m) : null, on = L ? 4 - L : null;
+          return row(r.name, r.sub, r.w, r.d.map((d, k) => [R.levels[k], d]), on != null && on < r.d.length ? on : null, p ? parseFloat(String(p.m).replace(',', '.')) : null, p); }).join('');
     }
     if (!(G.fp.rows || []).length) return '';
     const lv = x.levels || {}, found = (G.fp.rows || []).some(r => (lv[r.step] || {})[r.c]);
@@ -219,11 +220,7 @@ window.ELNotebook = (function () {
       else {
         if (mark != null) h += `<div class="nb-wh">🏁 ${t('La meva nota', 'My mark')} ${stamp(mark)}</div>`;
         // the feedback as the teacher writes it: "Part (w %) · m / 10" lines, then ✔ what went well and ➜ what to keep in mind
-        const HL = /^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/, parts = [], com = []; let cur = null;
-        String(x.feedback || '').split('\n').forEach(l => { const s2 = l.trim(); if (!s2 || /^Final mark:/i.test(s2)) return; const m = s2.match(HL);
-          if (m) { cur = { n: m[1], w: m[2], m: m[3], ok: [], todo: [] }; parts.push(cur); return; }
-          if (cur && /^✔/.test(s2)) { cur.ok.push(s2.replace(/^✔\s*/, '')); return; } if (cur && /^➜/.test(s2)) { cur.todo.push(s2.replace(/^➜\s*/, '')); return; }
-          if (cur) (cur.todo.length ? cur.todo : cur.ok).push(s2); else com.push(s2); });
+        const { parts, com } = fpParts(x.feedback);
         if (com.length) h += `<div class="nb-slip"><h4>💬 ${t('Feedback del professor', 'Your teacher\'s feedback')}</h4><div class="ex-rule">${lines(com.join('\n'))}</div></div>`;
         const rb = fpRubric(G, x, parts);
         if (rb) h += rb;
@@ -242,6 +239,26 @@ window.ELNotebook = (function () {
   // 2026/2027 amb el fav icon"; "La portada tb surt al obrir la llibreta"; "Per defecte la portada surt sempre"). Page 1 of every chapter and
   // of every print. One summary per LS of the course with something in it: from the learning paths' answers on this device (each step's
   // criteria in EL_STEP_CRITERIA; first try), the class games (myGames) and the results (the teacher's final level for a criterion wins).
+  // the final product feedback as the teacher writes it: "Part (w %) · m / 10" lines, then ✔ what went well and ➜ what to keep in mind
+  function fpParts(txt) {
+    const HL = /^(.+?) \((\d+(?:[.,]\d+)?) ?%\) · ([\d.,]+) ?\/ ?10\s*$/, parts = [], com = []; let cur = null;
+    String(txt || '').split('\n').forEach(l => { const s2 = l.trim(); if (!s2 || /^Final mark:/i.test(s2)) return; const m = s2.match(HL);
+      if (m) { cur = { n: m[1], w: m[2], m: m[3], ok: [], todo: [] }; parts.push(cur); return; }
+      if (cur && /^✔/.test(s2)) { cur.ok.push(s2.replace(/^✔\s*/, '')); return; } if (cur && /^➜/.test(s2)) { cur.todo.push(s2.replace(/^➜\s*/, '')); return; }
+      if (cur) (cur.todo.length ? cur.todo : cur.ok).push(s2); else com.push(s2); });
+    return { parts, com };
+  }
+  // which feedback part goes with which rubric row: the same first word ("Speaking & delivery" = "Speaking"), else the next free row
+  // with the same weight ("Visual support (10%)" = "Google Slides", 10 %), so a feedback with a part missing still lines up
+  function alignRows(rows, parts) {
+    const out = rows.map(() => null), used = new Set(), w1 = x => String(x || '').toLowerCase().match(/[a-zà-ü]+/)?.[0] || '';
+    parts.forEach(p => {
+      let i = rows.findIndex((r, k) => !used.has(k) && w1(r.name) === w1(p.n));
+      if (i < 0) i = rows.findIndex((r, k) => !used.has(k) && String(r.w) === String(p.w).replace(',', '.'));
+      if (i >= 0) { used.add(i); out[i] = p; }
+    });
+    return out;
+  }
   const lsSum = L => {
     const G = (window.EL_GRADING || {})[L.id] || {}, SC = window.EL_STEP_CRITERIA || {}, crit = {}, comp = {};
     (window.EL_CATALOG || []).filter(a => a.ls === L.id && a.keys && a.keys[0]).forEach(a => {
@@ -260,10 +277,17 @@ window.ELNotebook = (function () {
     // exam and the final product count (LS1) also shows its criteria
     ((G.exam || {}).sections || []).forEach(([k, , m, cs]) => { const v = (x.sections || {})[k]; if (!v || v.score == null) return;
       (cs || []).filter(c => /^\d+\.\d+$/.test(c)).forEach(c => { const y = crit[c] || (crit[c] = { r: 0, of: 0, n: 0 }); y.r += +v.score || 0; y.of += +(v.max || m) || 0; }); });
+    // the final product is evidence too (Roger: "Final product missing"): LS2 = the level the teacher gave each fp row (results
+    // levels[step][c], or the row's mark in the feedback); LS1 = the rubric's rows (EL_FP_RUBRICS, c) with the mark of each feedback part
+    const fx = G.fp && (H.rs || {})[G.fp.a] || {}, fparts = fpParts(fx.feedback).parts, add = (c, m) => { if (!/^\d+\.\d+$/.test(c) || m == null || isNaN(m)) return; const y = crit[c] || (crit[c] = { r: 0, of: 0, n: 0 }); y.r += m; y.of += 10; };
+    const pm = p => p ? parseFloat(String(p.m).replace(',', '.')) : null;
+    if (G.fp && (G.fp.rows || []).length) G.fp.rows.forEach((r, i) => { const d = ((fx.levels || {})[r.step] || {})[r.c], p = fparts.find(y => y.n.toLowerCase() === String(r.name).toLowerCase()) || (fparts.length === G.fp.rows.length ? fparts[i] : null);
+      add(r.c, d ? (window.EL_DEGREE_MARK || {})[d] : pm(p)); });
+    else { const R = G.fp && (window.EL_FP_RUBRICS || {})[G.fp.a]; if (R && fparts.length) { const al = alignRows(R.rows, fparts); R.rows.forEach((r, i) => add(r.c, pm(al[i]))); } }
     Object.keys(fin).filter(c => /^\d+\.\d+$/.test(c)).forEach(c => { if (!crit[c]) crit[c] = { r: 0, of: 0, n: 0 }; });
     const rows = Object.keys(crit).sort((a, b) => a.localeCompare(b, 'en', { numeric: true })).map(c => {
       const v = crit[c], deg = fin[c] || (v.of ? window.elDegree && elDegree(v.r / v.of * 10) : null), i = (window.EL_DEGREES || []).indexOf(deg);
-      const ind = (i >= 0 ? (((H.ca && G.indCa && G.indCa[c]) || (G.ind || {})[c]) || [])[i] || '' : '') || (window.elCriterion ? String(elCriterion(L.course, c)).replace(/^(.{90}\S*)\s.*$/s, '$1…') : '');
+      const ind = (i >= 0 ? (((H.ca && G.indCa && G.indCa[c]) || (G.ind || {})[c]) || [])[i] || '' : '') || (window.elCriterionEasy && elCriterionEasy(L.course, c, true)) || (window.elCriterion ? String(elCriterion(L.course, c)).replace(/^(.{90}\S*)\s.*$/s, '$1…') : '');   // no indicators (LS1): the criterion in plain English (Roger: "the criteria of the exam should be in English")
       return { c, deg, ind, comp: window.elCompetence ? elCompetence(c) : '' };
     });
     const g = window.elGameStats ? elGameStats(Object.values(H.mg || {}).filter(y => y && y.ls === L.id)) : {};
@@ -272,6 +296,8 @@ window.ELNotebook = (function () {
     const f = G.fp && (H.rs || {})[G.fp.a] || {}, fp = f.max ? (+f.score || 0) / f.max * 10 : null;
     return { L, rows, comp, g, exam, fp, any: rows.length || g.n || exam != null || fp != null };
   };
+  // the competences' names in English on the cover (Roger: "the criteria … should be in English")
+  const CEN = { 1: 'Interculturality', 2: 'Listening', 3: 'Speaking', 4: 'Reading', 5: 'Writing', 6: 'Research', 7: 'Personal reading', 8: 'Mediation', 9: 'Self-regulation', 10: 'Ethical communication' };
   function front() {
     const me0 = (window.EL_LS || []).find(l => l.id === H.LS) || {}, grp = String(H.group || '').replace(/^(\d)ESO\s*([A-Z])?$/i, (m, n, l) => `${n} ESO${l ? ' ' + l : ''}`) || String(me0.course || '').replace(/^(\d)eso$/, '$1 ESO');
     const n1 = v => v == null ? '–' : String(Math.round(v * 10) / 10).replace('.', ',');
@@ -281,11 +307,15 @@ window.ELNotebook = (function () {
     const lvl = lv && LVN[lv] ? [window.elCefr ? elCefr(me0.course, lv) : '', LVN[lv]].filter(Boolean).join(' · ') : '';
     const sums = chapters().map(lsSum).filter(y => y.any || y.L.id === H.LS);
     const box = y => `<div class="nb-fr-ls"><div class="nb-fr-lh">📚 ${esc(chapName(y.L))}${y.exam != null ? ` <span class="nb-fr-k">📝 ${t('Examen', 'Exam')} <b>${n1(y.exam)}</b></span>` : ''}${y.fp != null ? ` <span class="nb-fr-k">🎬 ${t('Producte final', 'Final product')} <b>${n1(y.fp)}</b></span>` : ''}</div>`
-      + (y.rows.length ? `<div class="nb-fr-crit">${y.rows.map(r => `<div class="nb-fr-row"><span class="nb-fr-c">${esc(r.c)}</span><span class="nb-fr-d d-${r.deg || 'x'}" title="${esc(DG[r.deg] || '')}">${esc(r.deg || '–')}</span><span class="nb-fr-t"><b>${esc(String(r.comp).replace(/^\S+ · /, ''))}</b>${r.ind ? ` · ${esc(r.ind)}` : r.deg ? '' : ` · ${t('encara sense nota', 'not assessed yet')}`}</span></div>`).join('')}</div>` : `<p class="nb-pencil">${t('Encara no hi ha activitats corregides en aquesta LS.', 'No marked activities in this LS yet.')}</p>`)
+      + (y.rows.length ? `<div class="nb-fr-crit">${y.rows.map(r => `<div class="nb-fr-row"><span class="nb-fr-c">${esc(r.c)}</span><span class="nb-fr-d d-${r.deg || 'x'}" title="${esc(DG[r.deg] || '')}">${esc(r.deg || '–')}</span><span class="nb-fr-t"><b>${esc(CEN[String(r.c).split('.')[0]] || String(r.comp).replace(/^\S+ · /, ''))}</b>${r.ind ? ` · ${esc(r.ind)}` : r.deg ? '' : ` · ${t('encara sense nota', 'not assessed yet')}`}</span></div>`).join('')}</div>` : `<p class="nb-pencil">${t('Encara no hi ha activitats corregides en aquesta LS.', 'No marked activities in this LS yet.')}</p>`)
       + `<div class="nb-fr-stats">${y.g.grammar != null || y.g.vocab != null ? `<span>🎮 ${t('Jocs', 'Games')}: 🧩 ${y.g.grammar != null ? y.g.grammar + ' %' : '–'} · 📚 ${y.g.vocab != null ? y.g.vocab + ' %' : '–'}</span>` : ''}`
-      + `${Object.keys(y.comp).length ? `<span>✅ ${t('Activitats ben fetes', 'Activities done well')}: ${Object.keys(y.comp).sort((a, b) => a - b).map(k => `${esc(String(window.EL_COMPETENCES && EL_COMPETENCES[k] || 'CE' + k).replace(/^\S+ · /, ''))} <b>${y.comp[k].ok}/${y.comp[k].of}</b>`).join(' · ')}</span>` : ''}</div></div>`;
-    return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="34" height="34"><b>English Lab</b><span>Roger Beltran · ${t('curs', 'school year')} 2026/2027</span></div>`
-      + `<div class="nb-fr-name">${esc(H.name || '')}</div><div class="nb-fr-course">${esc(grp)}${lvl ? ` · <span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div><div class="nb-fr-title">📓 ${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
+      + `${Object.keys(y.comp).length ? `<span>✅ ${t('Activitats ben fetes', 'Activities done well')}: ${Object.keys(y.comp).sort((a, b) => a - b).map(k => `${esc(CEN[k] || String(window.EL_COMPETENCES && EL_COMPETENCES[k] || 'CE' + k).replace(/^\S+ · /, ''))} <b>${y.comp[k].ok}/${y.comp[k].of}</b>`).join(' · ')}</span>` : ''}</div></div>`;
+    // a hard cover: the brand embossed on top, a white name label as on a school notebook, then the results stuck on as cards
+    return `<div class="nb-front"><div class="nb-fr-top"><img src="${rel('favicon-192.png')}" alt="" width="40" height="40"><b>English Lab</b><span>Roger Beltran<br>${t('curs', 'school year')} 2026/2027</span></div>`
+      + `<div class="nb-fr-label"><div class="nb-fr-title">${t('La meva llibreta d\'anglès', 'My English notebook')}</div>`
+      + `<div class="nb-fr-line"><i>${t('Nom', 'Name')}</i><span class="nb-fr-name">${esc(H.name || '')}</span></div>`
+      + `<div class="nb-fr-line"><i>${t('Grup', 'Class')}</i><span class="nb-fr-course">${esc(grp)}</span>${lvl ? `<i>${t('Nivell', 'Level')}</i><span class="nb-fr-lv">${esc(lvl)}</span>` : ''}</div></div>`
+      + `<div class="nb-fr-res">⭐ ${t('Els meus resultats', 'My results')}</div>`
       + sums.map(box).join('')
       + `<p class="nb-fr-key">AE ${t('excel·lent', 'excellent')} · AN ${t('notable', 'good')} · AS ${t('satisfactori', 'satisfactory')} · NA ${t('no assolit', 'not achieved')} · ${t('ben feta = la meitat o més bé al primer intent', 'done well = half or more right on the first try')}</p></div><div class="nb-break"></div>`;
   }
@@ -481,7 +511,7 @@ window.ELNotebook = (function () {
     // a heading never stays alone at the bottom of a page: it goes on with what it is the heading of
     // (Roger, 13 Nov 2026: "heading should appear on top"): also the section post-its and "My answers", and a heading at the top of a
     // part whose first line didn't fit (it goes up through the part's boxes)
-    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh,.nb-fr-lh';
+    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh,.nb-fr-lh,.nb-fr-res';
     const blank = x => (x.nodeType === 3 && !x.nodeValue.trim()) || (x.nodeType === 1 && x.matches(SKIP));
     const breakBefore = force => {
       const keep = []; let box = cur, lvl = stack.length, x = cur.lastChild;
@@ -519,6 +549,8 @@ window.ELNotebook = (function () {
       if (node.nodeType === 1) { const h = node.getBoundingClientRect().height, over = paper.scrollHeight - paper.clientHeight; if (h > 0 && over > 0) node.style.zoom = String(Math.max(.35, (h - over - 4) / h)); }
     };
     newPage(); [...frag.childNodes].forEach(place); page.classList.remove('nb-meas');
+    // the cover's pages look like a notebook's hard cover (Roger, 13 Nov 2026: "The cover should look like a real notebook cover")
+    pages.forEach(p => { if (p.s === si && p.el.querySelector('.nb-front')) p.el.classList.add('nb-cvp', ...(p.el.querySelector('.nb-front:not(.nb-cont)') ? ['nb-cv1'] : [])); });
   }
   function layout(keep) {
     const root = document.querySelector('.nb'), sp = root && root.querySelector('.nb-spread'); if (!sp || !H || printing()) return false;
@@ -867,7 +899,7 @@ window.ELNotebook = (function () {
     const wd = wide(), a = wd ? pg - pg % 2 : pg, to = a + dir * (wd ? 2 : 1);
     if (to < 0 || to >= pages.length) return null;
     const P = i => pages[i] && pages[i].el, sp = root.querySelector('.nb-spread');
-    const face = (i, cls) => { const f = document.createElement('div'); f.className = 'nb-face ' + cls; const p = P(i); if (p) f.innerHTML = p.innerHTML; else f.classList.add('blank'); return f; };
+    const face = (i, cls) => { const f = document.createElement('div'); f.className = 'nb-face ' + cls; const p = P(i); if (p) { f.innerHTML = p.innerHTML; ['nb-cvp', 'nb-cv1'].forEach(c => { if (p.classList.contains(c)) f.classList.add(c); }); } else f.classList.add('blank'); return f; };
     const leaf = document.createElement('div'); leaf.setAttribute('aria-hidden', 'true'); let ang;
     const cls = (i, c, on) => { const p = P(i); if (p) p.classList.toggle(c, on); };
     if (wd && dir > 0) { leaf.className = 'nb-leaf r'; leaf.append(face(a + 1, 'front'), face(to, 'back')); ang = p => -180 * p; cls(a + 1, 'r', false); cls(to + 1, 'r', true); }

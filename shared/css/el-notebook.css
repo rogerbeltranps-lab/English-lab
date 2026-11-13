@@ -136,6 +136,8 @@ html.el-nb-plain .nb-idx .lp>a{font-size:17px}
   .nb-page{display:block!important;border-radius:0!important;break-after:page;overflow:visible}
   .nb-paper{position:relative;inset:auto;overflow:visible}
   .nb-pno{position:static;display:block;text-align:right}
+  /* the cover fills its sheet, like a real cover */
+  .nb-page.nb-cvp .nb-paper{box-sizing:border-box;min-height:98vh}
 }
 
 /* ---------- 📘 the whiteboard (in class, while the teacher explains) ---------- */
@@ -378,15 +380,29 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 @media print{.nb-chaps{display:none}}
 /* 📘 the front cover: page 1 of every chapter and every print (el-notebook.js front) */
 .nb-front{font:15px/1.4 var(--nb-sans,system-ui,sans-serif);color:#26303d}
-.nb-fr-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-bottom:8px;border-bottom:2px solid #1f4fb5;margin-bottom:10px}
-.nb-fr-top img{width:34px;height:34px;border-radius:8px}
-.nb-fr-top b{font:700 20px/1 var(--nb-sans,system-ui,sans-serif);color:#1f4fb5}
-.nb-fr-top span{margin-left:auto;color:#5b6878;font-size:14px}
-.nb-fr-name{font:700 34px/1.1 var(--nb-hand);color:var(--nb-ink);margin-top:6px}
-.nb-fr-course{font:22px/1.3 var(--nb-hand);color:#26303d}
-.nb-fr-lv{display:inline-block;background:#e8eefc;color:#1f4fb5;border-radius:999px;padding:0 10px;font:700 15px/24px var(--nb-sans,system-ui,sans-serif);vertical-align:3px}
-.nb-fr-title{font:700 24px/1.2 var(--nb-hand);margin:6px 0 10px}
-.nb-fr-ls{border:1.5px solid #d5dce5;border-radius:10px;padding:8px 10px;margin:0 0 10px;background:#fff}
+/* 📘 the cover's pages: a hard cover of blue cloth board with a darker spine, corner protectors and an elastic band; the ruled lines,
+   the margin and the page number are not drawn there. Only colours change here (the pages are measured before), so nothing moves. */
+.nb-page.nb-cvp,.nb-face.nb-cvp{background:#1f3c73}
+.nb-page.nb-cvp .nb-paper,.nb-face.nb-cvp .nb-paper{background:radial-gradient(120% 90% at 30% 20%,rgba(255,255,255,.10),transparent 60%),repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 2px,transparent 2px 5px),repeating-linear-gradient(-45deg,rgba(0,0,0,.05) 0 2px,transparent 2px 5px),linear-gradient(90deg,#132a55 0 40px,rgba(0,0,0,.25) 40px 43px,#1f3c73 43px);color:#fff}
+.nb-cvp .nb-pno,.nb-cvp .nb-corner{display:none}
+.nb-cv1::before,.nb-cv1::after{content:"";position:absolute;z-index:2;pointer-events:none}
+.nb-cv1::before{right:0;top:0;width:34px;height:34px;background:linear-gradient(225deg,#c9a24a 0 50%,transparent 50%);opacity:.9}
+.nb-cv1::after{right:9px;top:0;bottom:0;width:9px;background:linear-gradient(90deg,#0b0f17,#2b3446 45%,#0b0f17);box-shadow:-2px 0 4px rgba(0,0,0,.35)}
+.nb-fr-top{display:flex;align-items:center;gap:10px;padding:2px 0 12px;margin-bottom:14px}
+.nb-fr-top img{width:40px;height:40px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.nb-fr-top b{font:800 24px/1 var(--nb-sans,system-ui,sans-serif);color:#f5f7fb;letter-spacing:.5px;text-shadow:0 1px 0 rgba(0,0,0,.45)}
+.nb-fr-top span{margin-left:auto;color:#c7d3ea;font-size:13px;line-height:1.3;text-align:right}
+.nb-fr-label{position:relative;background:#fffef8;color:#26303d;border-radius:14px;padding:12px 18px 10px;margin:4px 6% 16px;box-shadow:0 3px 10px rgba(0,0,0,.35);outline:2px solid #fffef8;outline-offset:-7px;border:1.5px solid #1f3c73}
+.nb-fr-label::before{content:"";position:absolute;inset:6px;border:1.5px solid #9fb3d9;border-radius:10px;pointer-events:none}
+.nb-fr-title{font:700 26px/1.2 var(--nb-hand);text-align:center;color:#1f3c73;margin:0 0 6px}
+.nb-fr-line{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;border-bottom:1.5px solid #c7d9ee;padding:2px 0 1px;margin-bottom:4px}
+.nb-fr-line i{font:600 12px/1 var(--nb-sans,system-ui,sans-serif);font-style:normal;text-transform:uppercase;letter-spacing:.8px;color:#6b7a90}
+.nb-fr-name{font:700 32px/1.15 var(--nb-hand);color:var(--nb-ink)}
+.nb-fr-course{font:700 24px/1.2 var(--nb-hand);color:var(--nb-ink);margin-right:10px}
+.nb-fr-lv{font:700 24px/1.2 var(--nb-hand);color:var(--nb-ink)}
+.nb-fr-res{font:700 18px/1.2 var(--nb-sans,system-ui,sans-serif);color:#ffe28a;margin:0 0 8px;letter-spacing:.3px}
+.nb-fr-ls{border-radius:8px;padding:8px 10px;margin:0 0 12px;background:#fff;color:#26303d;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.nb-fr-ls .nb-pencil{color:#6b7280;font-size:18px}
 .nb-fr-lh{font:700 17px/1.3 var(--nb-sans,system-ui,sans-serif);margin-bottom:6px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center}
 .nb-fr-k{font:600 13px/1 var(--nb-sans,system-ui,sans-serif);background:#f2f4f8;border-radius:999px;padding:4px 9px}
 .nb-fr-row{display:grid;grid-template-columns:42px 40px 1fr;gap:6px;align-items:start;padding:3px 0;border-top:1px dashed #e3e7ee;font-size:12.5px;line-height:1.35}
@@ -394,7 +410,8 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 .nb-fr-d{font-weight:800;text-align:center;border-radius:6px;padding:1px 0;background:#eef1f6;color:#5b6878}
 .nb-fr-d.d-AE{background:#c8e6c9;color:#1b5e20}.nb-fr-d.d-AN{background:#dcedc8;color:#33691e}.nb-fr-d.d-AS{background:#fff3c4;color:#8a6d00}.nb-fr-d.d-NA{background:#ffcdd2;color:#b71c1c}
 .nb-fr-stats{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:13px}
-.nb-fr-key{font-size:11.5px;color:#6b7280;margin:4px 0 0}
+.nb-fr-key{font-size:11.5px;color:#c7d3ea;margin:4px 0 0}
+@media print{.nb-page.nb-cvp,.nb-page.nb-cvp .nb-paper,.nb-fr-label,.nb-fr-ls,.nb-fr-d{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .nb-pcov{display:flex;align-items:center;gap:6px;font:600 14px var(--nb-sans,system-ui,sans-serif);padding:4px 2px;cursor:pointer}
 @media print{html.el-nb-full [data-place="notes"]>.pt{display:none!important}}
 
@@ -418,3 +435,4 @@ a.nb-ch:focus-visible{outline:3px solid #2f5bd3;outline-offset:2px}
 /* 🏠 My board */
 .nb .nb-home{text-decoration:none;font-weight:600;white-space:nowrap}
 @media (max-width:640px){.nb .nb-home .nb-hlab{display:none}}
+@media (max-width:640px){.nb-cv1::after{display:none}}
