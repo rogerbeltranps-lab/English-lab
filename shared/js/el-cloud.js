@@ -1309,7 +1309,7 @@ const CM_K="el_cm";
 function cmRead(){try{const o=JSON.parse(sessionStorage.getItem(CM_K)||"null");return o&&o.g&&Date.now()<o.until?o:null}catch(e){return null}}
 const cmEnd=()=>{try{sessionStorage.removeItem(CM_K)}catch(e){}};
 (()=>{const sp=new URLSearchParams(location.search),v=sp.get("elcm");if(!v)return;const [g,u]=v.split(".");
-  try{sessionStorage.setItem(CM_K,JSON.stringify({g,s:Date.now(),until:+u||Date.now()+LOCK_MS}));sessionStorage.removeItem(CM_K+"_last");sessionStorage.setItem("el_cm_ag","1")}catch(e){}   // 📋 today's agenda shows when class mode starts
+  try{sessionStorage.setItem(CM_K,JSON.stringify({g,s:Date.now(),until:+u||Date.now()+LOCK_MS}));sessionStorage.removeItem(CM_K+"_last");sessionStorage.setItem("el_cm_ag","1");sessionStorage.setItem("el_cm_wu","1")}catch(e){}   // 📋 today's agenda shows when class mode starts
   sp.delete("elcm");history.replaceState(null,"",location.pathname+(sp.toString()?"?"+sp:"")+location.hash)})();
 let cmOn=false;
 function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=true;
@@ -1326,6 +1326,9 @@ function cmTeacher(){const o=cmRead();if(!o||cmOn||onDash||onBoard)return;cmOn=t
   const agToggle=()=>agLoad().then(m=>m.isOpen()?m.close():m.open()).catch(e=>console.warn("agenda",e));
   // today's steps and the 👥 ones (el-cm-agenda.js plan) go with every move; the module loads at once, the panel shown or not
   agLoad().then(m=>m.init()).catch(e=>console.warn("agenda",e));
+  // 🔥 the warm-up game opens by itself when class mode starts (Roger, 13 Nov 2026: "so the class mode the game appears automatically"),
+  // once: not on the next pages of this class mode (el-warmup.js; 🔥 Warm-up in 📋 Today opens it again)
+  try{if(sessionStorage.getItem("el_cm_wu")==="1"){sessionStorage.removeItem("el_cm_wu");agLoad().then(m=>m.warmOpen(true)).catch(e=>console.warn("warm-up",e))}}catch(e){}
   const key=x=>x.u+"#"+x.p+"|"+JSON.stringify(x.ps||[])+"|"+(x.vis||[]).join(",")+"|"+(x.ff||[]).join(",");
   // ✅ Correct (Roger, 12 Nov 2026: correct the reading with the whole class, every level): on a Reading or Reading log tab of an LS2-on
   // learning path, shared/correct/ over this tab (shared/correct/open.js); the students stay on the tab, nothing is sent
