@@ -256,10 +256,14 @@ window.ELNotebook = (function () {
       });
     });
     const x = (H.rs || {})[L.id + '/assessment'] || {}, fin = x.final || {};
+    // the exam is evidence too: each marked section counts for its criteria (points right out of its points), so an LS where only the
+    // exam and the final product count (LS1) also shows its criteria
+    ((G.exam || {}).sections || []).forEach(([k, , m, cs]) => { const v = (x.sections || {})[k]; if (!v || v.score == null) return;
+      (cs || []).filter(c => /^\d+\.\d+$/.test(c)).forEach(c => { const y = crit[c] || (crit[c] = { r: 0, of: 0, n: 0 }); y.r += +v.score || 0; y.of += +(v.max || m) || 0; }); });
     Object.keys(fin).filter(c => /^\d+\.\d+$/.test(c)).forEach(c => { if (!crit[c]) crit[c] = { r: 0, of: 0, n: 0 }; });
     const rows = Object.keys(crit).sort((a, b) => a.localeCompare(b, 'en', { numeric: true })).map(c => {
       const v = crit[c], deg = fin[c] || (v.of ? window.elDegree && elDegree(v.r / v.of * 10) : null), i = (window.EL_DEGREES || []).indexOf(deg);
-      const ind = i >= 0 ? (((H.ca && G.indCa && G.indCa[c]) || (G.ind || {})[c]) || [])[i] || '' : '';
+      const ind = (i >= 0 ? (((H.ca && G.indCa && G.indCa[c]) || (G.ind || {})[c]) || [])[i] || '' : '') || (window.elCriterion ? String(elCriterion(L.course, c)).replace(/^(.{90}\S*)\s.*$/s, '$1…') : '');
       return { c, deg, ind, comp: window.elCompetence ? elCompetence(c) : '' };
     });
     const g = window.elGameStats ? elGameStats(Object.values(H.mg || {}).filter(y => y && y.ls === L.id)) : {};
@@ -477,7 +481,7 @@ window.ELNotebook = (function () {
     // a heading never stays alone at the bottom of a page: it goes on with what it is the heading of
     // (Roger, 13 Nov 2026: "heading should appear on top"): also the section post-its and "My answers", and a heading at the top of a
     // part whose first line didn't fit (it goes up through the part's boxes)
-    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh';
+    const HEAD = '.nb-h2,.nb-h3,h4,.nb-when,.nb-lab,.nb-postit,.nb-wh,.nb-fr-lh';
     const blank = x => (x.nodeType === 3 && !x.nodeValue.trim()) || (x.nodeType === 1 && x.matches(SKIP));
     const breakBefore = force => {
       const keep = []; let box = cur, lvl = stack.length, x = cur.lastChild;
